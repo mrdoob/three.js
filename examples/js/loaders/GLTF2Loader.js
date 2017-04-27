@@ -68,9 +68,19 @@ THREE.GLTF2Loader = ( function () {
 
 			var json = JSON.parse( content );
 
-			if ( json.extensionsUsed && json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_COMMON ) >= 0 ) {
+			if ( json.extensionsUsed ) {
 
-				extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] = new GLTFMaterialsCommonExtension( json );
+				if( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_COMMON ) >= 0 ) {
+
+					extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] = new GLTFMaterialsCommonExtension( json );
+
+				}
+
+				if( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ) >= 0 ) {
+
+					extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
+
+				}
 
 			}
 
@@ -263,7 +273,8 @@ THREE.GLTF2Loader = ( function () {
 
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
-		KHR_MATERIALS_COMMON: 'KHR_materials_common'
+		KHR_MATERIALS_COMMON: 'KHR_materials_common',
+		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness'
 	};
 
 	/* MATERIALS COMMON EXTENSION */
@@ -382,6 +393,300 @@ THREE.GLTF2Loader = ( function () {
 			throw new Error( 'GLTF2Loader: JSON content not found.' );
 
 		}
+
+	}
+
+	/* Specular-Glossiness Extension */
+
+	function GLTFMaterialsPbrSpecularGlossinessExtension() {
+
+		return {
+
+			extendParams: function ( params, material, dependencies ) {
+
+				// specification
+				// https://github.com/sbtron/glTF/tree/KHRpbrSpecGloss/extensions/Khronos/KHR_materials_pbrSpecularGlossiness
+
+				var pbrSpecularGlossiness = material.extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ];
+
+				var shader = THREE.ShaderLib[ 'standard' ];
+
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+				var specularMapParsFragmentChunk = [
+					'#ifdef USE_SPECULARMAP',
+					'	uniform sampler2D specularMap;',
+					'#endif'
+				].join( '\n' );
+
+				var glossinessMapParsFragmentChunk = [
+					'#ifdef USE_GLOSSINESSMAP',
+					'	uniform sampler2D glossinessMap;',
+					'#endif'
+				].join( '\n' );
+
+				var specularMapFragmentChunk = [
+					'vec3 specularFactor = specular;',
+					'#ifdef USE_SPECULARMAP',
+					'	vec4 texelSpecular = texture2D( specularMap, vUv );',
+					'	// reads channel RGB, compatible with a glTF Specular-Glossiness (RGBA) texture',
+					'	specularFactor *= texelSpecular.rgb;',
+					'#endif'
+				].join( '\n' );
+
+				var glossinessMapFragmentChunk = [
+					'float glossinessFactor = glossiness;',
+					'#ifdef USE_GLOSSINESSMAP',
+					'	vec4 texelGlossiness = texture2D( glossinessMap, vUv );',
+					'	// reads channel A, compatible with a glTF Specular-Glossiness (RGBA) texture',
+					'	glossinessFactor *= texelGlossiness.a;',
+					'#endif'
+				].join( '\n' );
+
+				var lightPhysicalFragmentChunk = [
+					'PhysicalMaterial material;',
+					'material.diffuseColor = diffuseColor.rgb;',
+					'material.specularRoughness = clamp( 1.0 - glossinessFactor, 0.04, 1.0 );',
+					'material.specularColor = specularFactor.rgb;',
+				].join( '\n' );
+
+				var fragmentShader = shader.fragmentShader
+							.replace( '#include <specularmap_fragment>', '' )
+							.replace( 'uniform float roughness;', 'uniform vec3 specular;' )
+							.replace( 'uniform float metalness;', 'uniform float glossiness;' )
+							.replace( '#include <roughnessmap_pars_fragment>', specularMapParsFragmentChunk )
+							.replace( '#include <metalnessmap_pars_fragment>', glossinessMapParsFragmentChunk )
+							.replace( '#include <roughnessmap_fragment>', specularMapFragmentChunk )
+							.replace( '#include <metalnessmap_fragment>', glossinessMapFragmentChunk )
+							.replace( '#include <lights_physical_fragment>', lightPhysicalFragmentChunk );
+
+				delete uniforms.roughness;
+				delete uniforms.metalness;
+				delete uniforms.roughnessMap;
+				delete uniforms.metalnessMap;
+
+				uniforms.specular = { value: new THREE.Color().setHex( 0x111111 ) };
+				uniforms.glossiness = { value: 0.5 };
+				uniforms.specularMap = { value: null };
+				uniforms.glossinessMap = { value: null };
+
+				params.vertexShader = shader.vertexShader;
+				params.fragmentShader = fragmentShader;
+				params.uniforms = uniforms;
+				params.defines = { 'STANDARD': '' };
+
+				params.color = new THREE.Color( 1.0, 1.0, 1.0 );
+				params.opacity = 1.0;
+
+				if ( Array.isArray( pbrSpecularGlossiness.diffuseFactor ) ) {
+
+					var array = pbrSpecularGlossiness.diffuseFactor;
+
+					params.color.fromArray( array );
+					params.opacity = array[ 3 ];
+
+				}
+
+				if ( pbrSpecularGlossiness.diffuseTexture !== undefined ) {
+
+					params.map = dependencies.textures[ pbrSpecularGlossiness.diffuseTexture.index ];
+
+				}
+
+				params.glossiness = pbrSpecularGlossiness.glossinessFactor !== undefined ? pbrSpecularGlossiness.glossinessFactor : 1.0;
+				params.specular = new THREE.Color( 1.0, 1.0, 1.0 );
+
+				if ( Array.isArray( pbrSpecularGlossiness.specularFactor ) ) {
+
+					params.specular.fromArray( pbrSpecularGlossiness.specularFactor );
+
+				}
+
+				if ( pbrSpecularGlossiness.specularGlossinessTexture !== undefined ) {
+
+					params.glossinessMap = dependencies.textures[ pbrSpecularGlossiness.specularGlossinessTexture.index ];
+					params.specularMap = dependencies.textures[ pbrSpecularGlossiness.specularGlossinessTexture.index ];
+
+				}
+
+			},
+
+			createMaterial: function ( params ) {
+
+				// setup material properties based on MeshStandardMaterial for Specular-Glossiness
+
+				var material = new THREE.ShaderMaterial( {
+					defines: params.defines,
+					vertexShader: params.vertexShader,
+					fragmentShader: params.fragmentShader,
+					uniforms: params.uniforms,
+					fog: true,
+					lights: true,
+					opacity: params.opacity,
+					transparent: params.transparent
+				} );
+
+				material.color = params.color;
+
+				material.map = params.map === undefined ? null : params.map;
+
+				material.lightMap = null;
+				material.lightMapIntensity = 1.0;
+
+				material.aoMap = params.aoMap === undefined ? null : params.aoMap;
+				material.aoMapIntensity = 1.0;
+
+				material.emissive = params.emissive;
+				material.emissiveIntensity = 1.0;
+				material.emissiveMap = params.emissiveMap === undefined ? null : params.emissiveMap;
+
+				material.bumpMap = params.bumpMap === undefined ? null : params.bumpMap;
+				material.bumpScale = 1;
+
+				material.normalMap = params.normalMap === undefined ? null : params.normalMap;
+				material.normalScale = new THREE.Vector2( 1, 1 );
+
+				material.displacementMap = null;
+				material.displacementScale = 1;
+				material.displacementBias = 0;
+
+				material.specularMap = params.specularMap === undefined ? null : params.specularMap;
+				material.specular = params.specular;
+
+				material.glossinessMap = params.glossinessMap === undefined ? null : params.glossinessMap;
+				material.glossiness = params.glossiness;
+
+				material.alphaMap = null;
+
+				material.envMap = params.envMap === undefined ? null : params.envMap;
+				material.envMapIntensity = 1.0;
+
+				material.refractionRatio = 0.98;
+
+				material.extensions.derivatives = true;
+
+				return material;
+
+			},
+
+			// Here's based on refreshUniformsCommon() and refreshUniformsStandard() in WebGLRenderer.
+			refreshUniforms: function ( renderer, scene, camera, geometry, material, group ) {
+
+				var uniforms = material.uniforms;
+				var defines = material.defines;
+
+				uniforms.opacity.value = material.opacity;
+
+				uniforms.diffuse.value.copy( material.color );
+				uniforms.emissive.value.copy( material.emissive ).multiplyScalar( material.emissiveIntensity );
+
+				uniforms.map.value = material.map;
+				uniforms.specularMap.value = material.specularMap;
+				uniforms.alphaMap.value = material.alphaMap;
+
+				uniforms.lightMap.value = material.lightMap;
+				uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+				uniforms.aoMap.value = material.aoMap;
+				uniforms.aoMapIntensity.value = material.aoMapIntensity;
+
+				// uv repeat and offset setting priorities
+				// 1. color map
+				// 2. specular map
+				// 3. normal map
+				// 4. bump map
+				// 5. alpha map
+				// 6. emissive map
+
+				var uvScaleMap;
+
+				if ( material.map ) {
+
+					uvScaleMap = material.map;
+
+				} else if ( material.specularMap ) {
+
+					uvScaleMap = material.specularMap;
+
+				} else if ( material.displacementMap ) {
+
+					uvScaleMap = material.displacementMap;
+
+				} else if ( material.normalMap ) {
+
+					uvScaleMap = material.normalMap;
+
+				} else if ( material.bumpMap ) {
+
+					uvScaleMap = material.bumpMap;
+
+				} else if ( material.glossinessMap ) {
+
+					uvScaleMap = material.glossinessMap;
+
+				} else if ( material.alphaMap ) {
+
+					uvScaleMap = material.alphaMap;
+
+				} else if ( material.emissiveMap ) {
+
+					uvScaleMap = material.emissiveMap;
+
+				}
+
+				if ( uvScaleMap !== undefined ) {
+
+					// backwards compatibility
+					if ( uvScaleMap.isWebGLRenderTarget ) {
+
+						uvScaleMap = uvScaleMap.texture;
+
+					}
+
+					var offset = uvScaleMap.offset;
+					var repeat = uvScaleMap.repeat;
+
+					uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+				}
+
+				uniforms.envMap.value = material.envMap;
+				uniforms.envMapIntensity.value = material.envMapIntensity;
+				uniforms.flipEnvMap.value = ( material.envMap && material.envMap.isCubeTexture ) ? -1 : 1;
+
+				uniforms.refractionRatio.value = material.refractionRatio;
+
+				uniforms.specular.value.copy( material.specular );
+				uniforms.glossiness.value = material.glossiness;
+
+				uniforms.glossinessMap.value = material.glossinessMap;
+
+				uniforms.emissiveMap.value = material.emissiveMap;
+				uniforms.bumpMap.value = material.bumpMap;
+				uniforms.normalMap.value = material.normalMap;
+
+				uniforms.displacementMap.value = material.displacementMap;
+				uniforms.displacementScale.value = material.displacementScale;
+				uniforms.displacementBias.value = material.displacementBias;
+
+				if ( uniforms.glossinessMap.value !== null && defines.USE_GLOSSINESSMAP === undefined ) {
+
+					defines.USE_GLOSSINESSMAP = '';
+					// set USE_ROUGHNESSMAP to enable vUv
+					defines.USE_ROUGHNESSMAP = ''
+
+				}
+
+				if ( uniforms.glossinessMap.value === null && defines.USE_GLOSSINESSMAP !== undefined ) {
+
+					delete defines.USE_GLOSSINESSMAP;
+					delete defines.USE_ROUGHNESSMAP;
+
+				}
+
+			}
+
+		};
 
 	}
 
@@ -1157,6 +1462,7 @@ THREE.GLTF2Loader = ( function () {
 	GLTFParser.prototype.loadMaterials = function () {
 
 		var json = this.json;
+		var extensions = this.extensions;
 
 		return this._withDependencies( [
 
@@ -1225,7 +1531,12 @@ THREE.GLTF2Loader = ( function () {
 
 				} else if ( material.technique === undefined ) {
 
-					if ( material.pbrMetallicRoughness !== undefined )  {
+					if ( material.extensions && material.extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] ) {
+
+						materialType = THREE.ShaderMaterial;
+						extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].extendParams( materialParams, material, dependencies );
+
+					} else if ( material.pbrMetallicRoughness !== undefined )  {
 
 						// specification
 						// https://github.com/sbtron/glTF/blob/30de0b365d1566b1bbd8b9c140f9e995d3203226/specification/2.0/README.md#metallic-roughness-material
@@ -1254,16 +1565,6 @@ THREE.GLTF2Loader = ( function () {
 
 							}
 
-							if ( materialParams.opacity < 1.0 ||
-							     ( materialParams.map !== undefined &&
-							       ( materialParams.map.format === THREE.AlphaFormat ||
-							         materialParams.map.format === THREE.RGBAFormat ||
-							         materialParams.map.format === THREE.LuminanceAlphaFormat ) ) ) {
-
-								materialParams.transparent = true;
-
-							}
-
 							materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
 							materialParams.roughness = metallicRoughness.roughnessFactor !== undefined ? metallicRoughness.roughnessFactor : 1.0;
 
@@ -1288,6 +1589,20 @@ THREE.GLTF2Loader = ( function () {
 					} else {
 
 						materialType = THREE.MeshPhongMaterial;
+
+					}
+
+					if ( materialParams.opacity !== undefined && materialParams.opacity < 1.0 ||
+					     ( materialParams.map !== undefined &&
+					       ( materialParams.map.format === THREE.AlphaFormat ||
+					         materialParams.map.format === THREE.RGBAFormat ||
+					         materialParams.map.format === THREE.LuminanceAlphaFormat ) ) ) {
+
+						materialParams.transparent = true;
+
+					} else {
+
+						materialParams.transparent = false;
 
 					}
 
@@ -1661,7 +1976,18 @@ THREE.GLTF2Loader = ( function () {
 
 				}
 
-				var _material = new materialType( materialParams );
+				var _material;
+
+				if ( materialType === THREE.ShaderMaterial ) {
+
+					_material = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].createMaterial( materialParams );
+
+				} else {
+
+					_material = new materialType( materialParams );
+
+				}
+
 				if ( material.name !== undefined ) _material.name = material.name;
 
 				return _material;
@@ -2253,6 +2579,7 @@ THREE.GLTF2Loader = ( function () {
 	GLTFParser.prototype.loadScenes = function () {
 
 		var json = this.json;
+		var extensions = this.extensions;
 
 		// scene node hierachy builder
 
@@ -2309,6 +2636,13 @@ THREE.GLTF2Loader = ( function () {
 						child.onBeforeRender = function(renderer, scene, camera){
 							this.gltfShader.update(scene, camera);
 						};
+
+					}
+
+					// for Specular-Glossiness.
+					if ( child.material && child.material.type === 'ShaderMaterial' ) {
+
+						child.onBeforeRender = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].refreshUniforms;
 
 					}
 
