@@ -266,11 +266,15 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+			var isIE = /Trident/i.test( navigator.userAgent );
+			var isEdge = /Edge/i.test( navigator.userAgent );
+
 			var hash = document.location.hash.substr( 1 );
+
 			if ( hash ) hash = parseInt( hash, 0 );
 
 			// Texture width for simulation (each texel is a debris particle)
-			var WIDTH = hash || 64;
+			var WIDTH = hash || ( isIE || isEdge ) ? 4 : 64;
 
 			var container, stats;
 			var camera, scene, renderer, geometry, controls;
