@@ -83,7 +83,6 @@ var files = {
 		"webgl_loader_babylon",
 		"webgl_loader_bvh",
 		"webgl_loader_collada",
-		"webgl_loader_collada_keyframe",
 		"webgl_loader_collada_kinematics",
 		"webgl_loader_collada_skinning",
 		"webgl_loader_ctm",
