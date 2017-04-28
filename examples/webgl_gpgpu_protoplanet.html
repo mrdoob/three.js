@@ -27,6 +27,10 @@
 				width: 100%;
 			}
 
+			#warning {
+				color: #ff0000;
+			}
+
 		</style>
 	</head>
 	<body>
@@ -34,7 +38,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - <span id="protoplanets"></span> webgl gpgpu debris<br/>
 			Select <span id="options"></span> debris<br/>
-
+			<span id="warning"></span>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -301,6 +305,12 @@
 			}
 
 			document.getElementById( 'options' ).innerHTML = options;
+
+			if ( isEdge || isIE ) {
+
+				document.getElementById( 'warning' ).innerText = 'particle counts greater than 16 may not render with ' + ( isEdge ? 'Edge' : 'IE11' );
+
+			}
 
 			var last = performance.now();
 
