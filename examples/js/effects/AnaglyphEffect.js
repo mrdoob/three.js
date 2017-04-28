@@ -48,7 +48,7 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 	var _stereo = new THREE.StereoCamera();
 
 	var _params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
-		
+
 	if ( width === undefined ) width = 512;
 	if ( height === undefined ) height = 512;
 
