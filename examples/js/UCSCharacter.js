@@ -8,8 +8,8 @@ THREE.UCSCharacter = function() {
 
 	this.root = new THREE.Object3D();
 
-	this.numSkins;
-	this.numMorphs;
+	this.numSkins = undefined;
+	this.numMorphs = undefined;
 
 	this.skins = [];
 	this.materials = [];

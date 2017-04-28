@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <base href="../../" />
+    <script src="list.js"></script>
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+  </head>
+  <body>
+    <h1>[name]</h1>
+
+    <div class="desc">A group of objects that receives a shared animation state.</div>
+
+    <h2>Usage:</h2>
+
+    <div>
+      Add objects you would otherwise pass as 'root' to the	constructor or the [page:AnimationMixer.clipAction clipAction]
+      method of [page:AnimationMixer AnimationMixer] and instead pass this object as 'root'.<br /><br />
+
+      Note that objects of this class appear as one object to the mixer,
+      so cache control of the individual objects must be done	on the group.
+    </div>
+
+
+   <h2>Limitations</h2>
+   <div>
+    The animated properties must be compatible among all objects in the group.<br /><br />
+
+    A single property can either be controlled through a target group or directly, but not both.
+    </div>
+
+
+    <h2>Constructor</h2>
+
+
+    <h3>[name]( [page:object obj1], [page:object obj2], [page:object obj3], ... )</h3>
+
+
+    <h2>Properties</h2>
+
+    <h3>[property:object stats]</h3>
+    <div>
+
+    </div>
+
+    <h3>[property:Number timeScale]</h3>
+
+
+    <h2>Methods</h2>
+
+
+    <h3>[method:null add]( [page:object obj1], [page:object obj2], [page:object obj3], ... )</h3>
+    <div>
+
+    </div>
+
+    <h3>[method:null remove]( [page:object obj1], [page:object obj2], [page:object obj3], ... )</h3>
+    <div>
+
+    </div>
+
+    <h3>[method:null uncache]( [page:object obj1], [page:object obj2], [page:object obj3], ... )</h3>
+    <div>
+
+    </div>
+
+
+    <h2>Source</h2>
+
+
+    [link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+  </body>
+</html>

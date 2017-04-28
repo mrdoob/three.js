@@ -1,10 +1,7 @@
 import { Curve } from '../core/Curve';
+import { CatmullRom } from '../core/Interpolations';
 import { Vector2 } from '../../math/Vector2';
-import { CurveUtils } from '../CurveUtils';
 
-/**************************************************************
- *	Spline curve
- **************************************************************/
 
 function SplineCurve( points /* array of Vector2 */ ) {
 
@@ -30,14 +27,11 @@ SplineCurve.prototype.getPoint = function ( t ) {
 	var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
 	var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
-	var interpolate = CurveUtils.interpolate;
-
 	return new Vector2(
-		interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
-		interpolate( point0.y, point1.y, point2.y, point3.y, weight )
+		CatmullRom( weight, point0.x, point1.x, point2.x, point3.x ),
+		CatmullRom( weight, point0.y, point1.y, point2.y, point3.y )
 	);
 
 };
-
 
 export { SplineCurve };

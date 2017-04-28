@@ -115,7 +115,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		if ( _lightShadows.length === 0 ) return;
 
 		// Set GL state for depth map.
-		_state.clearColor( 1, 1, 1, 1 );
+		_state.buffers.color.setClear( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
 		_state.setDepthTest( true );
 		_state.setScissorTest( false );
@@ -141,7 +141,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			_shadowMapSize.copy( shadow.mapSize );
 			_shadowMapSize.min( _maxShadowMapSize );
 
-			if ( (light && light.isPointLight) ) {
+			if ( light && light.isPointLight ) {
 
 				faceCount = 6;
 				isPointLight = true;
@@ -195,7 +195,14 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
-			if ( (shadow && shadow.isSpotLightShadow) ) {
+			if ( shadow.isSpotLightShadow ) {
+
+				shadow.update( light );
+
+			}
+
+			// TODO (abelnation / sam-g-steel): is this needed?
+			if (shadow && shadow.isRectAreaLightShadow ) {
 
 				shadow.update( light );
 
@@ -267,7 +274,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 					var geometry = _objects.update( object );
 					var material = object.material;
 
-					if ( (material && material.isMultiMaterial) ) {
+					if ( material && material.isMultiMaterial ) {
 
 						var groups = geometry.groups;
 						var materials = material.materials;
@@ -330,11 +337,11 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			if ( material.morphTargets ) {
 
-				if ( (geometry && geometry.isBufferGeometry) ) {
+				if ( geometry && geometry.isBufferGeometry ) {
 
 					useMorphing = geometry.morphAttributes && geometry.morphAttributes.position && geometry.morphAttributes.position.length > 0;
 
-				} else if ( (geometry && geometry.isGeometry) ) {
+				} else if ( geometry && geometry.isGeometry ) {
 
 					useMorphing = geometry.morphTargets && geometry.morphTargets.length > 0;
 

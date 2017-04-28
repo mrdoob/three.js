@@ -239,8 +239,8 @@
 
 			//var clothGeometry = new THREE.BufferGeometry();
 			var clothGeometry = new THREE.PlaneBufferGeometry( clothWidth, clothHeight, clothNumSegmentsZ, clothNumSegmentsY );
-			clothGeometry.rotateY( Math.PI * 0.5 )
-			clothGeometry.translate( clothPos.x, clothPos.y + clothHeight * 0.5, clothPos.z - clothWidth * 0.5 )
+			clothGeometry.rotateY( Math.PI * 0.5 );
+			clothGeometry.translate( clothPos.x, clothPos.y + clothHeight * 0.5, clothPos.z - clothWidth * 0.5 );
 			//var clothMaterial = new THREE.MeshLambertMaterial( { color: 0x0030A0, side: THREE.DoubleSide } );
 			var clothMaterial = new THREE.MeshLambertMaterial( { color: 0xFFFFFF, side: THREE.DoubleSide } );
 			cloth = new THREE.Mesh( clothGeometry, clothMaterial );
@@ -266,7 +266,7 @@
 			sbConfig.set_viterations( 10 );
 			sbConfig.set_piterations( 10 );
 
-			clothSoftBody.setTotalMass( 0.9, false )
+			clothSoftBody.setTotalMass( 0.9, false );
 			Ammo.castObject( clothSoftBody, Ammo.btCollisionObject ).getCollisionShape().setMargin( margin * 3 );
 			physicsWorld.addSoftBody( clothSoftBody, 1, -1 );
 			cloth.userData.physicsBody = clothSoftBody;

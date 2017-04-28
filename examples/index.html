@@ -244,7 +244,7 @@
 		<script>
 
 		function extractQuery() {
-			var p = window.location.search.indexOf( '?q=' )
+			var p = window.location.search.indexOf( '?q=' );
 			if( p !== -1 ) {
 				return window.location.search.substr( 3 );
 			}
@@ -383,7 +383,7 @@
 			} else {
 				window.history.replaceState( {} , '', window.location.pathname );
 			}
-			if( selected ) window.location.hash = selected
+			if( selected ) window.location.hash = selected;
 
 			var exp = new RegExp( v, 'gi' );
 
@@ -473,7 +473,7 @@
 
 		}
 
-		filterInput.value = extractQuery()
+		filterInput.value = extractQuery();
 		updateFilter( )
 
 		</script>

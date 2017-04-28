@@ -12,7 +12,10 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Abstract base class for lights.</div>
+		<div class="desc">
+			Abstract base class for lights - all other light types inherit the properties and methods
+			described here.
+		</div>
 
 
 		<h2>Constructor</h2>
@@ -20,37 +23,50 @@
 
 		<h3>[name]( [page:Integer color], [page:float intensity] )</h3>
 		<div>
-		[page:Integer color] — Numeric value of the RGB component of the color.<br />
-		[page:Float intensity] — Numeric value of the light's strength/intensity.
-		</div>
-		<div>
-		This creates a light with color and intensity.<br />
+		[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
+		[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
+
+		Creates a new [name]. Note that this is not intended to be called directly (use one of <thead>
+			derived classes instead).
+		</thead>)
 		</div>
 
 		<h2>Properties</h2>
-
-		See the base [page:Object3D Object3D] class for common properties.
+		<div>
+			See the base [page:Object3D Object3D] class for common properties.
+		</div>
 
 		<h3>[property:Color color]</h3>
 		<div>
-			Color of the light.<br />
+			Color of the light. Defaults to a new [page:Color] set to white, if not passed in the constructor.<br />
 		</div>
 
 		<h3>[property:Float intensity]</h3>
 		<div>
-			Light's intensity.<br />
-			In "physically correct" mode, the product of color * intensity is interpreted as luminous intensity measured in candela.<br/>
-			Default — *1.0*.
+			The light's intensity, or strength.<br />
+			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, the product of
+			[page:.color color] * intensity is interpreted as luminous intensity measured in candela.<br />
+			Default - *1.0*.
 		</div>
 
-		<h2>Methods</h2>
+		<h3>[property:Boolean isLight]</h3>
+		<div>
+			Used to check whether this or derived classes are lights. Default is *true*.<br /><br />
 
-		See the base [page:Object3D Object3D] class for common methods.
+			You should not change this, as it used internally for optimisation.
+		</div>
+
+
+		<h2>Methods</h2>
+		<div>
+			See the base [page:Object3D Object3D] class for common methods.
+		</div>
+
 
 		<h3>[method:Light copy]( [page:Light source] )</h3>
 		<div>
-		<br />
-		Copies value of *source* to this Light object.
+		Copies the value of [page:.color color] and [page:.intensity intensity] from the
+		[page:Light source] light into this one.
 		</div>
 
 		<h3>[method:JSON toJSON]( [page:String meta] )</h3>

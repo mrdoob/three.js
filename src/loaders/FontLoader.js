@@ -1,5 +1,5 @@
 import { Font } from '../extras/core/Font';
-import { XHRLoader } from './XHRLoader';
+import { FileLoader } from './FileLoader';
 import { DefaultLoadingManager } from './LoadingManager';
 
 /**
@@ -18,7 +18,7 @@ Object.assign( FontLoader.prototype, {
 
 		var scope = this;
 
-		var loader = new XHRLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 		loader.load( url, function ( text ) {
 
 			var json;

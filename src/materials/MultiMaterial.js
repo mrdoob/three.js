@@ -10,7 +10,7 @@ function MultiMaterial( materials ) {
 
 	this.type = 'MultiMaterial';
 
-	this.materials = materials instanceof Array ? materials : [];
+	this.materials = Array.isArray( materials ) ? materials : [];
 
 	this.visible = true;
 

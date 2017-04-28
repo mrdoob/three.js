@@ -9,8 +9,8 @@ var files = {
 		"webgl_camera_logarithmicdepthbuffer",
 		"webgl_clipping",
 		"webgl_clipping_advanced",
+		"webgl_clipping_intersection",
 		"webgl_decals",
-		"webgl_deferred_animation",
 		"webgl_depth_texture",
 		"webgl_effects_anaglyph",
 		"webgl_effects_parallaxbarrier",
@@ -30,7 +30,6 @@ var files = {
 		"webgl_geometry_extrude_splines",
 		"webgl_geometry_hierarchy",
 		"webgl_geometry_hierarchy2",
-		"webgl_geometry_large_mesh",
 		"webgl_geometry_minecraft",
 		"webgl_geometry_minecraft_ao",
 		"webgl_geometry_normals",
@@ -68,6 +67,8 @@ var files = {
 		"webgl_lights_pointlights2",
 		"webgl_lights_spotlight",
 		"webgl_lights_spotlights",
+		"webgl_lights_arealight",
+		"webgl_lights_rectarealight",
 		"webgl_lines_colors",
 		"webgl_lines_cubes",
 		"webgl_lines_dashed",
@@ -75,6 +76,7 @@ var files = {
 		"webgl_lines_splines",
 		"webgl_loader_3mf",
 		"webgl_loader_amf",
+		"webgl_loader_assimp",
 		"webgl_loader_assimp2json",
 		"webgl_loader_awd",
 		"webgl_loader_babylon",
@@ -102,10 +104,12 @@ var files = {
 		"webgl_loader_pcd",
 		"webgl_loader_pdb",
 		"webgl_loader_ply",
+		"webgl_loader_ttf",
 		"webgl_loader_sea3d",
 		"webgl_loader_sea3d_hierarchy",
 		"webgl_loader_sea3d_keyframe",
 		"webgl_loader_sea3d_morph",
+		"webgl_loader_sea3d_physics",
 		"webgl_loader_sea3d_skinning",
 		"webgl_loader_sea3d_sound",
 		"webgl_loader_scene",
@@ -153,6 +157,7 @@ var files = {
 		"webgl_materials_variations_phong",
 		"webgl_materials_variations_standard",
 		"webgl_materials_variations_physical",
+		"webgl_materials_variations_toon",
 		"webgl_materials_video",
 		"webgl_materials_wireframe",
 		"webgl_mirror",
@@ -200,8 +205,8 @@ var files = {
 		"webgl_postprocessing_glitch",
 		"webgl_postprocessing_godrays",
 		"webgl_postprocessing_masking",
-		"webgl_postprocessing_msaa",
-		"webgl_postprocessing_msaa_unbiased",
+		"webgl_postprocessing_ssaa",
+		"webgl_postprocessing_ssaa_unbiased",
 		"webgl_postprocessing_nodes",
 		"webgl_postprocessing_outline",
 		"webgl_postprocessing_procedural",
@@ -258,6 +263,12 @@ var files = {
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
 		"webgl_raymarching_reflect"
+	],
+	"webgl deferred": [
+		"webgldeferred_animation"
+	],
+	"webgl2": [
+		"webgl2_sandbox"
 	],
 	"webvr": [
 		"webvr_cubes",
@@ -337,6 +348,7 @@ var files = {
 	],
 	"software": [
 		"software_geometry_earth",
+		"software_lines_splines",
 		"software_sandbox"
 	],
 	"svg": [

@@ -6,16 +6,11 @@ Sidebar.Script = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/script/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
-
-		editor.config.setKey( 'ui/sidebar/script/collapsed', boolean );
-
-	} );
+	var container = new UI.Panel();
 	container.setDisplay( 'none' );
 
-	container.addStatic( new UI.Text( 'Script' ).setTextTransform( 'uppercase' ) );
+	container.add( new UI.Text( 'Script' ).setTextTransform( 'uppercase' ) );
+	container.add( new UI.Break() );
 	container.add( new UI.Break() );
 
 	//
@@ -43,6 +38,7 @@ Sidebar.Script = function ( editor ) {
 	function update() {
 
 		scriptsContainer.clear();
+		scriptsContainer.setDisplay( 'none' );
 
 		var object = editor.selected;
 
@@ -55,6 +51,8 @@ Sidebar.Script = function ( editor ) {
 		var scripts = editor.scripts[ object.uuid ];
 
 		if ( scripts !== undefined ) {
+
+			scriptsContainer.setDisplay( 'block' );
 
 			for ( var i = 0; i < scripts.length; i ++ ) {
 

@@ -184,8 +184,8 @@ test( "getInverse", function() {
 		new THREE.Matrix4().makeRotationZ( -0.3 ),
 		new THREE.Matrix4().makeScale( 1, 2, 3 ),
 		new THREE.Matrix4().makeScale( 1/8, 1/2, 1/3 ),
-		new THREE.Matrix4().makeFrustum( -1, 1, -1, 1, 1, 1000 ),
-		new THREE.Matrix4().makeFrustum( -16, 16, -9, 9, 0.1, 10000 ),
+		new THREE.Matrix4().makePerspective( -1, 1, 1, -1, 1, 1000 ),
+		new THREE.Matrix4().makePerspective( -16, 16, 9, -9, 0.1, 10000 ),
 		new THREE.Matrix4().makeTranslation( 1, 2, 3 )
 		];
 
@@ -217,7 +217,7 @@ test( "makeBasis/extractBasis", function() {
 	var identity = new THREE.Matrix4();
 	ok( matrixEquals4( a, identity ), "Passed!" );
 
-	var testBases = [ [ new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( -1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) ] ]
+	var testBases = [ [ new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( -1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) ] ];
 	for( var i = 0; i < testBases.length; i ++ ) {
 		var testBasis = testBases[i];
 		var b = new THREE.Matrix4().makeBasis( testBasis[0], testBasis[1], testBasis[2] );

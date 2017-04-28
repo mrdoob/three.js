@@ -11,6 +11,9 @@ import { Color } from '../math/Color';
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
  *
+ *  lightMap: new THREE.Texture( <Image> ),
+ *  lightMapIntensity: <float>
+ *
  *  aoMap: new THREE.Texture( <Image> ),
  *  aoMapIntensity: <float>
  *
@@ -44,6 +47,9 @@ function MeshBasicMaterial( parameters ) {
 	this.color = new Color( 0xffffff ); // emissive
 
 	this.map = null;
+
+	this.lightMap = null;
+	this.lightMapIntensity = 1.0;
 
 	this.aoMap = null;
 	this.aoMapIntensity = 1.0;
@@ -83,6 +89,9 @@ MeshBasicMaterial.prototype.copy = function ( source ) {
 	this.color.copy( source.color );
 
 	this.map = source.map;
+
+	this.lightMap = source.lightMap;
+	this.lightMapIntensity = source.lightMapIntensity;
 
 	this.aoMap = source.aoMap;
 	this.aoMapIntensity = source.aoMapIntensity;

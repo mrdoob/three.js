@@ -78,7 +78,7 @@ Spherical.prototype = {
 
 		return this;
 
-	},
+	}
 
 };
 

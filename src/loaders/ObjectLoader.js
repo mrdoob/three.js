@@ -1,4 +1,24 @@
-import { TextureMapping, TextureWrapping, TextureFilter } from '../constants';
+import {
+	UVMapping,
+	CubeReflectionMapping,
+	CubeRefractionMapping,
+	EquirectangularReflectionMapping,
+	EquirectangularRefractionMapping,
+	SphericalReflectionMapping,
+	CubeUVReflectionMapping,
+	CubeUVRefractionMapping,
+
+	RepeatWrapping,
+	ClampToEdgeWrapping,
+	MirroredRepeatWrapping,
+
+	NearestFilter,
+	NearestMipMapNearestFilter,
+	NearestMipMapLinearFilter,
+	LinearFilter,
+	LinearMipMapNearestFilter,
+	LinearMipMapLinearFilter
+} from '../constants';
 import { Color } from '../math/Color';
 import { Matrix4 } from '../math/Matrix4';
 import { Object3D } from '../core/Object3D';
@@ -27,14 +47,14 @@ import { AnimationClip } from '../animation/AnimationClip';
 import { MaterialLoader } from './MaterialLoader';
 import { BufferGeometryLoader } from './BufferGeometryLoader';
 import { JSONLoader } from './JSONLoader';
-import { XHRLoader } from './XHRLoader';
+import { FileLoader } from './FileLoader';
 import * as Geometries from '../geometries/Geometries';
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-function ObjectLoader ( manager ) {
+function ObjectLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 	this.texturePath = '';
@@ -53,10 +73,32 @@ Object.assign( ObjectLoader.prototype, {
 
 		var scope = this;
 
-		var loader = new XHRLoader( scope.manager );
+		var loader = new FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			scope.parse( JSON.parse( text ), onLoad );
+			var json = null;
+
+			try {
+
+				json = JSON.parse( text );
+
+			} catch ( error ) {
+
+				console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+				return;
+
+			}
+
+			var metadata = json.metadata;
+
+			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
+
+				console.error( 'THREE.ObjectLoader: Can\'t load ' + url + '. Use THREE.JSONLoader instead.' );
+				return;
+
+			}
+
+			scope.parse( json, onLoad );
 
 		}, onProgress, onError );
 
@@ -84,7 +126,7 @@ Object.assign( ObjectLoader.prototype, {
 
 		} );
 
-		var textures  = this.parseTextures( json.textures, images );
+		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 
 		var object = this.parseObject( json.object, geometries, materials );
@@ -388,6 +430,32 @@ Object.assign( ObjectLoader.prototype, {
 
 	parseTextures: function ( json, images ) {
 
+		var TextureMapping = {
+			UVMapping: UVMapping,
+			CubeReflectionMapping: CubeReflectionMapping,
+			CubeRefractionMapping: CubeRefractionMapping,
+			EquirectangularReflectionMapping: EquirectangularReflectionMapping,
+			EquirectangularRefractionMapping: EquirectangularRefractionMapping,
+			SphericalReflectionMapping: SphericalReflectionMapping,
+			CubeUVReflectionMapping: CubeUVReflectionMapping,
+			CubeUVRefractionMapping: CubeUVRefractionMapping
+		};
+
+		var TextureWrapping = {
+			RepeatWrapping: RepeatWrapping,
+			ClampToEdgeWrapping: ClampToEdgeWrapping,
+			MirroredRepeatWrapping: MirroredRepeatWrapping
+		};
+
+		var TextureFilter = {
+			NearestFilter: NearestFilter,
+			NearestMipMapNearestFilter: NearestMipMapNearestFilter,
+			NearestMipMapLinearFilter: NearestMipMapLinearFilter,
+			LinearFilter: LinearFilter,
+			LinearMipMapNearestFilter: LinearMipMapNearestFilter,
+			LinearMipMapLinearFilter: LinearMipMapLinearFilter
+		};
+
 		function parseConstant( value, type ) {
 
 			if ( typeof( value ) === 'number' ) return value;
@@ -619,6 +687,10 @@ Object.assign( ObjectLoader.prototype, {
 					object = new Group();
 
 					break;
+
+				case 'SkinnedMesh':
+
+					console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh type. Instantiates Object3D instead.' );
 
 				default:
 

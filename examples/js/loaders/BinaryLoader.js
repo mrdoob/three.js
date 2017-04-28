@@ -37,14 +37,14 @@ THREE.BinaryLoader.prototype = {
 
 		var scope = this;
 
-		var jsonloader = new THREE.XHRLoader( this.manager );
+		var jsonloader = new THREE.FileLoader( this.manager );
 		jsonloader.load( url, function ( data ) {
 
 			var json = JSON.parse( data );
 
 			var bufferUrl = binaryPath + json.buffers;
 
-			var bufferLoader = new THREE.XHRLoader( scope.manager );
+			var bufferLoader = new THREE.FileLoader( scope.manager );
 			bufferLoader.setResponseType( 'arraybuffer' );
 			bufferLoader.load( bufferUrl, function ( bufData ) {
 

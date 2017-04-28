@@ -8,7 +8,7 @@
 		depth: 30,
 		widthSegments: 2,
 		heightSegments: 3,
-		depthSegments: 4,
+		depthSegments: 4
 	};
 
 	var geometries;

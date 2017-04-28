@@ -14,20 +14,12 @@ THREE.ColladaLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		function getBaseUrl( url ) {
-
-			var parts = url.split( '/' );
-			parts.pop();
-			return ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
-
-		}
-
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text, getBaseUrl( url ) ) );
+			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
 
@@ -35,7 +27,7 @@ THREE.ColladaLoader.prototype = {
 
 	options: {
 
-		set convertUpAxis ( value ) {
+		set convertUpAxis( value ) {
 
 			console.log( 'ColladaLoder.options.convertUpAxis: TODO' );
 
@@ -49,7 +41,7 @@ THREE.ColladaLoader.prototype = {
 
 	},
 
-	parse: function ( text, baseUrl ) {
+	parse: function ( text ) {
 
 		function getElementsByTagName( xml, name ) {
 
@@ -182,9 +174,6 @@ THREE.ColladaLoader.prototype = {
 
 		// image
 
-		var imageLoader = new THREE.ImageLoader();
-		imageLoader.setCrossOrigin( this.crossOrigin );
-
 		function parseImage( xml ) {
 
 			var data = {
@@ -199,11 +188,7 @@ THREE.ColladaLoader.prototype = {
 
 			if ( data.build !== undefined ) return data.build;
 
-			var url = data.init_from;
-
-			if ( baseUrl !== undefined ) url = baseUrl + url;
-
-			return imageLoader.load( url );
+			return new Image();
 
 		}
 
@@ -388,6 +373,7 @@ THREE.ColladaLoader.prototype = {
 					case 'diffuse':
 					case 'specular':
 					case 'shininess':
+					case 'transparent':
 					case 'transparency':
 						data[ child.nodeName ] = parseEffectParameter( child );
 						break;
@@ -626,6 +612,7 @@ THREE.ColladaLoader.prototype = {
 				var parameter = parameters[ key ];
 
 				switch ( key ) {
+
 					case 'diffuse':
 						if ( parameter.color ) material.color.fromArray( parameter.color );
 						if ( parameter.texture ) material.map = getTexture( parameter.texture );
@@ -642,12 +629,15 @@ THREE.ColladaLoader.prototype = {
 						if ( parameter.color && material.emissive )
 							material.emissive.fromArray( parameter.color );
 						break;
-					case 'transparency':
-						if ( parameter.float )
-							material.opacity = parameter.float;
-						if ( parameter.float !== 1 )
-							material.transparent = true;
+					case 'transparent':
+						// if ( parameter.texture ) material.alphaMap = getTexture( parameter.texture );
+						material.transparent = true;
 						break;
+					case 'transparency':
+						if ( parameter.float !== undefined ) material.opacity = parameter.float;
+						material.transparent = true;
+						break;
+
 				}
 
 			}
@@ -958,7 +948,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'polygons':
-						console.log( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
+						console.warn( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
 						break;
 
 					case 'lines':
@@ -1235,7 +1225,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			return new THREE.Float32Attribute( array, sourceStride );
+			return new THREE.Float32BufferAttribute( array, sourceStride );
 
 		}
 
@@ -1271,8 +1261,14 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'node':
-						parseNode( child );
-						data.nodes.push( child.getAttribute( 'id' ) );
+
+						if ( child.hasAttribute( 'id' ) ) {
+
+							data.nodes.push( child.getAttribute( 'id' ) );
+							parseNode( child );
+
+						}
+
 						break;
 
 					case 'instance_camera':
@@ -1323,7 +1319,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			if ( xml.getAttribute( 'id' ) !== null ) {
+			if ( xml.hasAttribute( 'id' ) ) {
 
 				library.nodes[ xml.getAttribute( 'id' ) ] = data;
 
@@ -1565,7 +1561,7 @@ THREE.ColladaLoader.prototype = {
 		buildLibrary( library.cameras, buildCamera );
 		buildLibrary( library.lights, buildLight );
 		buildLibrary( library.geometries, buildGeometry );
-		buildLibrary( library.nodes, buildNode );
+		// buildLibrary( library.nodes, buildNode );
 		buildLibrary( library.visualScenes, buildVisualScene );
 
 		console.timeEnd( 'ColladaLoader: Build' );
@@ -1589,6 +1585,7 @@ THREE.ColladaLoader.prototype = {
 		return {
 			animations: [],
 			kinematics: { joints: [] },
+			library: library,
 			scene: scene
 		};
 

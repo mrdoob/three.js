@@ -15,6 +15,8 @@ function InterleavedBuffer( array, stride ) {
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
 
+	this.onUploadCallback = function () {};
+
 	this.version = 0;
 
 }
@@ -28,6 +30,19 @@ InterleavedBuffer.prototype = {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
+
+	},
+
+	setArray: function ( array ) {
+
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		this.count = array !== undefined ? array.length / this.stride : 0;
+		this.array = array;
 
 	},
 
@@ -78,6 +93,14 @@ InterleavedBuffer.prototype = {
 	clone: function () {
 
 		return new this.constructor().copy( this );
+
+	},
+
+	onUpload: function ( callback ) {
+
+		this.onUploadCallback = callback;
+
+		return this;
 
 	}
 

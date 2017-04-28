@@ -47,37 +47,58 @@
 		<!-- replace built-in triangulation with Earcut -->
 		<script src="js/libs/earcut.js"></script>
 		<script>
-			function addContour( vertices, contour ) {
-			    for ( var i = 0; i < contour.length; i++ ) {
-			        vertices.push( contour[i].x );
-			        vertices.push( contour[i].y );
-			    }
-			}
-
 			THREE.ShapeUtils.triangulateShape = function ( contour, holes ) {
-			    var vertices = [];
 
-			    addContour( vertices, contour );
+				function removeDupEndPts( points ) {
 
-			    var holeIndices = [];
-			    var holeIndex = contour.length;
+					var l = points.length;
+					if ( l > 2 && points[ l - 1 ].equals( points[ 0 ] ) ) {
 
-			    for ( i = 0; i < holes.length; i++ ) {
-			        holeIndices.push( holeIndex );
-			        holeIndex += holes[i].length;
-			        addContour( vertices, holes[i] );
-			    }
+						points.pop();
 
-			    var result = earcut( vertices, holeIndices, 2 );
+					}
 
-			    var grouped = [];
-			    for ( var i = 0; i < result.length; i += 3 ) {
-			        grouped.push( result.slice( i, i + 3 ) );
-			    }
-			    return grouped;
+				}
+
+				function addContour( vertices, contour ) {
+
+					for ( var i = 0; i < contour.length; i ++ ) {
+
+						vertices.push( contour[ i ].x );
+						vertices.push( contour[ i ].y );
+
+					}
+
+				}
+
+				removeDupEndPts( contour );
+				holes.forEach( removeDupEndPts );
+
+				var vertices = [];
+				addContour( vertices, contour );
+				var holeIndices = [];
+				var holeIndex = contour.length;
+				for ( i = 0; i < holes.length; i ++ ) {
+
+					holeIndices.push( holeIndex );
+					holeIndex += holes[ i ].length;
+					addContour( vertices, holes[ i ] );
+
+				}
+
+				var result = earcut( vertices, holeIndices, 2 );
+				var grouped = [];
+				for ( var i = 0; i < result.length; i += 3 ) {
+
+					grouped.push( result.slice( i, i + 3 ) );
+
+				}
+
+				return grouped;
+
 			};
+			
 		</script>
-
 
 		<script>
 

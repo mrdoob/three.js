@@ -3,7 +3,7 @@
 	'use strict';
 
 	var parameters = {
-		diameter: 10,
+		diameter: 10
 	};
 
 	var geometries;

@@ -105,7 +105,7 @@
 								roughness: 1.0 - alpha,
 								shading: THREE.SmoothShading,
 								envMap: alphaIndex % 2 === 0 ? null : reflectionCube
-							} )
+							} );
 
 							var mesh = new THREE.Mesh( geometry, material );
 

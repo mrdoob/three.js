@@ -43,8 +43,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-
-		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -54,7 +53,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var stats, loader;
+			var stats;
 
 			var camera, scene, renderer, controls;
 			var settings = {
@@ -192,12 +191,9 @@
 				// textures
 
 				var textureLoader = new THREE.TextureLoader();
-
-				var normalMap = textureLoader.load( "textures/normal/ninja/normal.jpg" );
-
-				var aoMap = textureLoader.load( "textures/normal/ninja/ao.jpg" );
-
-				var displacementMap = textureLoader.load( "textures/normal/ninja/displacement.jpg" );
+				var normalMap = textureLoader.load( "models/obj/ninja/normal.jpg" );
+				var aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
+				var displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
 
 				// material
 
@@ -226,11 +222,12 @@
 
 				//
 
-				loader = new THREE.BinaryLoader();
+				var loader = new THREE.OBJLoader();
+				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
 
-				loader.load( "obj/ninja/NinjaLo_bin.js", function( geometry ) {
-
-					geometry.faceVertexUvs[ 1 ] = geometry.faceVertexUvs[ 0 ]; // 2nd set of UVs required for aoMap
+					geometry = group.children[ 0 ].geometry;
+					geometry.attributes.uv2 = geometry.attributes.uv;
+					geometry.center();
 
 					mesh = new THREE.Mesh( geometry, material );
 					mesh.scale.multiplyScalar( 25 );
@@ -240,9 +237,9 @@
 
 				//
 
-				var description = "normal + ao" + ( renderer.supportsVertexTextures() ? " + displacement + environment" : " + <strike>displacement</strike>" );
+				var description = "normal + ao" + ( renderer.capabilities.vertexTextures ? " + displacement + environment" : " + <strike>displacement</strike>" );
 				document.getElementById( "description" ).innerHTML = description;
-				document.getElementById( "vt" ).style.display = renderer.supportsVertexTextures() ? "none" : "block";
+				document.getElementById( "vt" ).style.display = renderer.capabilities.vertexTextures ? "none" : "block";
 
 				//
 

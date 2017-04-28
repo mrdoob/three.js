@@ -44,12 +44,12 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		uniforms: THREE.UniformsUtils.clone( THREE.LuminosityShader.uniforms ),
 		vertexShader: THREE.LuminosityShader.vertexShader,
 		fragmentShader: THREE.LuminosityShader.fragmentShader,
-		blending: THREE.NoBlending,
+		blending: THREE.NoBlending
 	} );
 
 	this.adaptLuminanceShader = {
 		defines: {
-			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 ),
+			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 )
 		},
 		uniforms: {
 			"lastLum": { value: null },
@@ -91,7 +91,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
 				// "fAdaptedLum = sqrt(fAdaptedLum);",
 				"gl_FragColor = vec4( vec3( fAdaptedLum ), 1.0 );",
-			"}",
+			"}"
 		].join( '\n' )
 	};
 
@@ -119,6 +119,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };

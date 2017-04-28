@@ -1,12 +1,10 @@
-var AnimationUtils;
-
 /**
  * @author tschw
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-AnimationUtils = {
+var AnimationUtils = {
 
 	// same as Array.prototype.slice, but also works on typed arrays
 	arraySlice: function( array, from, to ) {

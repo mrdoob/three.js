@@ -39,7 +39,6 @@ THREE.BlendCharacter = function () {
 			scope.material.skinning = true;
 
 			scope.mixer = new THREE.AnimationMixer( scope );
-			scope.mixer = scope.mixer;
 
 			// Create the animations
 			for ( var i = 0; i < scope.geometry.animations.length; ++ i ) {
@@ -129,7 +128,7 @@ THREE.BlendCharacter = function () {
 
 		return this.mixer.clipAction( animName ).getEffectiveWeight();
 
-	}
+	};
 
 	this.pauseAll = function() {
 
@@ -154,7 +153,7 @@ THREE.BlendCharacter = function () {
 
 		this.visible = boolean;
 
-	}
+	};
 
 };
 

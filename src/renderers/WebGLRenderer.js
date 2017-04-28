@@ -8,8 +8,8 @@ import { SpritePlugin } from './webgl/plugins/SpritePlugin';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { ShaderMaterial } from '../materials/ShaderMaterial';
 import { Mesh } from '../objects/Mesh';
-import { BoxBufferGeometry } from '../geometries/BoxBufferGeometry';
-import { PlaneBufferGeometry } from '../geometries/PlaneBufferGeometry';
+import { BoxBufferGeometry } from '../geometries/BoxGeometry';
+import { PlaneBufferGeometry } from '../geometries/PlaneGeometry';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
@@ -46,14 +46,14 @@ function WebGLRenderer( parameters ) {
 	parameters = parameters || {};
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
-	_context = parameters.context !== undefined ? parameters.context : null,
+		_context = parameters.context !== undefined ? parameters.context : null,
 
-	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
-	_depth = parameters.depth !== undefined ? parameters.depth : true,
-	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
-	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
-	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
-	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false;
+		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
+		_depth = parameters.depth !== undefined ? parameters.depth : true,
+		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
+		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
+		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
+		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false;
 
 	var lights = [];
 
@@ -113,62 +113,64 @@ function WebGLRenderer( parameters ) {
 
 	var _this = this,
 
-	// internal state cache
+		// internal state cache
 
-	_currentProgram = null,
-	_currentRenderTarget = null,
-	_currentFramebuffer = null,
-	_currentMaterialId = - 1,
-	_currentGeometryProgram = '',
-	_currentCamera = null,
+		_currentProgram = null,
+		_currentRenderTarget = null,
+		_currentFramebuffer = null,
+		_currentMaterialId = - 1,
+		_currentGeometryProgram = '',
+		_currentCamera = null,
 
-	_currentScissor = new Vector4(),
-	_currentScissorTest = null,
+		_currentScissor = new Vector4(),
+		_currentScissorTest = null,
 
-	_currentViewport = new Vector4(),
+		_currentViewport = new Vector4(),
 
-	//
+		//
 
-	_usedTextureUnits = 0,
+		_usedTextureUnits = 0,
 
-	//
+		//
 
-	_clearColor = new Color( 0x000000 ),
-	_clearAlpha = 0,
+		_clearColor = new Color( 0x000000 ),
+		_clearAlpha = 0,
 
-	_width = _canvas.width,
-	_height = _canvas.height,
+		_width = _canvas.width,
+		_height = _canvas.height,
 
-	_pixelRatio = 1,
+		_pixelRatio = 1,
 
-	_scissor = new Vector4( 0, 0, _width, _height ),
-	_scissorTest = false,
+		_scissor = new Vector4( 0, 0, _width, _height ),
+		_scissorTest = false,
 
-	_viewport = new Vector4( 0, 0, _width, _height ),
+		_viewport = new Vector4( 0, 0, _width, _height ),
 
-	// frustum
+		// frustum
 
-	_frustum = new Frustum(),
+		_frustum = new Frustum(),
 
-	// clipping
+		// clipping
 
-	_clipping = new WebGLClipping(),
-	_clippingEnabled = false,
-	_localClippingEnabled = false,
+		_clipping = new WebGLClipping(),
+		_clippingEnabled = false,
+		_localClippingEnabled = false,
 
-	_sphere = new Sphere(),
+		_sphere = new Sphere(),
 
-	// camera matrices cache
+		// camera matrices cache
 
-	_projScreenMatrix = new Matrix4(),
+		_projScreenMatrix = new Matrix4(),
 
-	_vector3 = new Vector3(),
+		_vector3 = new Vector3(),
+		_matrix4 = new Matrix4(),
+		_matrix42 = new Matrix4(),
 
-	// light arrays cache
+		// light arrays cache
 
-	_lights = {
+		_lights = {
 
-		hash: '',
+			hash: '',
 
 		ambient: [ 0, 0, 0 ],
 		directional: [],
@@ -177,25 +179,26 @@ function WebGLRenderer( parameters ) {
 		spot: [],
 		spotShadowMap: [],
 		spotShadowMatrix: [],
+		rectArea: [],
 		point: [],
 		pointShadowMap: [],
 		pointShadowMatrix: [],
 		hemi: [],
 
-		shadows: []
+			shadows: []
 
-	},
+		},
 
-	// info
+		// info
 
-	_infoRender = {
+		_infoRender = {
 
-		calls: 0,
-		vertices: 0,
-		faces: 0,
-		points: 0
+			calls: 0,
+			vertices: 0,
+			faces: 0,
+			points: 0
 
-	};
+		};
 
 	this.info = {
 
@@ -322,18 +325,6 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function glClearColor( r, g, b, a ) {
-
-		if ( _premultipliedAlpha === true ) {
-
-			r *= a; g *= a; b *= a;
-
-		}
-
-		state.clearColor( r, g, b, a );
-
-	}
-
 	function setDefaultGLState() {
 
 		state.init();
@@ -341,7 +332,7 @@ function WebGLRenderer( parameters ) {
 		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
 		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
-		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+		state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
 
 	}
 
@@ -485,7 +476,7 @@ function WebGLRenderer( parameters ) {
 
 		_clearAlpha = alpha !== undefined ? alpha : 1;
 
-		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+		state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
 
 	};
 
@@ -499,7 +490,7 @@ function WebGLRenderer( parameters ) {
 
 		_clearAlpha = alpha;
 
-		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+		state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
 
 	};
 
@@ -633,8 +624,9 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
 			if ( ! material.isMeshPhongMaterial &&
-			     ! material.isMeshStandardMaterial &&
-			       material.shading === FlatShading ) {
+				! material.isMeshStandardMaterial &&
+				! material.isMeshNormalMaterial &&
+				material.shading === FlatShading ) {
 
 				for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
 
@@ -767,7 +759,7 @@ function WebGLRenderer( parameters ) {
 			}
 
 			program.getUniforms().setValue(
-					_gl, 'morphTargetInfluences', morphInfluences );
+				_gl, 'morphTargetInfluences', morphInfluences );
 
 			updateBuffers = true;
 
@@ -945,48 +937,16 @@ function WebGLRenderer( parameters ) {
 
 				if ( geometryAttribute !== undefined ) {
 
-					var type = _gl.FLOAT;
-					var array = geometryAttribute.array;
 					var normalized = geometryAttribute.normalized;
-
-					if ( array instanceof Float32Array ) {
-
-						type = _gl.FLOAT;
-
-					} else if ( array instanceof Float64Array ) {
-
-						console.warn( "Unsupported data buffer format: Float64Array" );
-
-					} else if ( array instanceof Uint16Array ) {
-
-						type = _gl.UNSIGNED_SHORT;
-
-					} else if ( array instanceof Int16Array ) {
-
-						type = _gl.SHORT;
-
-					} else if ( array instanceof Uint32Array ) {
-
-						type = _gl.UNSIGNED_INT;
-
-					} else if ( array instanceof Int32Array ) {
-
-						type = _gl.INT;
-
-					} else if ( array instanceof Int8Array ) {
-
-						type = _gl.BYTE;
-
-					} else if ( array instanceof Uint8Array ) {
-
-						type = _gl.UNSIGNED_BYTE;
-
-					}
-
 					var size = geometryAttribute.itemSize;
-					var buffer = objects.getAttributeBuffer( geometryAttribute );
 
-					if ( geometryAttribute && geometryAttribute.isInterleavedBufferAttribute ) {
+					var attributeProperties = objects.getAttributeProperties( geometryAttribute );
+
+					var buffer = attributeProperties.__webglBuffer;
+					var type = attributeProperties.type;
+					var bytesPerElement = attributeProperties.bytesPerElement;
+
+					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
 						var data = geometryAttribute.data;
 						var stride = data.stride;
@@ -1009,11 +969,11 @@ function WebGLRenderer( parameters ) {
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
+						_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, ( startIndex * stride + offset ) * bytesPerElement );
 
 					} else {
 
-						if ( geometryAttribute && geometryAttribute.isInstancedBufferAttribute ) {
+						if ( geometryAttribute.isInstancedBufferAttribute ) {
 
 							state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute, extension );
 
@@ -1030,7 +990,7 @@ function WebGLRenderer( parameters ) {
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, startIndex * size * geometryAttribute.array.BYTES_PER_ELEMENT );
+						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, startIndex * size * bytesPerElement );
 
 					}
 
@@ -1209,11 +1169,11 @@ function WebGLRenderer( parameters ) {
 
 		if ( background === null ) {
 
-			glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+			state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
 
 		} else if ( background && background.isColor ) {
 
-			glClearColor( background.r, background.g, background.b, 1 );
+			state.buffers.color.setClear( background.r, background.g, background.b, 1, _premultipliedAlpha );
 			forceClear = true;
 
 		}
@@ -1352,7 +1312,7 @@ function WebGLRenderer( parameters ) {
 			geometry.computeBoundingSphere();
 
 		_sphere.copy( geometry.boundingSphere ).
-			applyMatrix4( object.matrixWorld );
+		applyMatrix4( object.matrixWorld );
 
 		return isSphereViewable( _sphere );
 
@@ -1422,7 +1382,7 @@ function WebGLRenderer( parameters ) {
 				if ( _this.sortObjects === true ) {
 
 					_vector3.setFromMatrixPosition( object.matrixWorld );
-					_vector3.applyProjection( _projScreenMatrix );
+					_vector3.applyMatrix4( _projScreenMatrix );
 
 				}
 
@@ -1445,7 +1405,7 @@ function WebGLRenderer( parameters ) {
 						if ( _this.sortObjects === true ) {
 
 							_vector3.setFromMatrixPosition( object.matrixWorld );
-							_vector3.applyProjection( _projScreenMatrix );
+							_vector3.applyMatrix4( _projScreenMatrix );
 
 						}
 
@@ -1541,7 +1501,7 @@ function WebGLRenderer( parameters ) {
 		var materialProperties = properties.get( material );
 
 		var parameters = programCache.getParameters(
-				material, _lights, fog, _clipping.numPlanes, object );
+			material, _lights, fog, _clipping.numPlanes, _clipping.numIntersection, object );
 
 		var code = programCache.getProgramCode( material, parameters );
 
@@ -1640,10 +1600,11 @@ function WebGLRenderer( parameters ) {
 		var uniforms = materialProperties.__webglShader.uniforms;
 
 		if ( ! material.isShaderMaterial &&
-		     ! material.isRawShaderMaterial ||
-		       material.clipping === true ) {
+			! material.isRawShaderMaterial ||
+			material.clipping === true ) {
 
 			materialProperties.numClippingPlanes = _clipping.numPlanes;
+			materialProperties.numIntersection = _clipping.numIntersection;
 			uniforms.clippingPlanes = _clipping.uniform;
 
 		}
@@ -1661,6 +1622,7 @@ function WebGLRenderer( parameters ) {
 			uniforms.ambientLightColor.value = _lights.ambient;
 			uniforms.directionalLights.value = _lights.directional;
 			uniforms.spotLights.value = _lights.spot;
+			uniforms.rectAreaLights.value = _lights.rectArea;
 			uniforms.pointLights.value = _lights.point;
 			uniforms.hemisphereLights.value = _lights.hemi;
 
@@ -1670,12 +1632,13 @@ function WebGLRenderer( parameters ) {
 			uniforms.spotShadowMatrix.value = _lights.spotShadowMatrix;
 			uniforms.pointShadowMap.value = _lights.pointShadowMap;
 			uniforms.pointShadowMatrix.value = _lights.pointShadowMatrix;
+			// TODO (abelnation): add area lights shadow info to uniforms
 
 		}
 
 		var progUniforms = materialProperties.program.getUniforms(),
 			uniformsList =
-					WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
+				WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
 		materialProperties.uniformsList = uniformsList;
 
@@ -1712,15 +1675,15 @@ function WebGLRenderer( parameters ) {
 			if ( _localClippingEnabled || camera !== _currentCamera ) {
 
 				var useCache =
-						camera === _currentCamera &&
-						material.id === _currentMaterialId;
+					camera === _currentCamera &&
+					material.id === _currentMaterialId;
 
 				// we might want to call this function with some ClippingGroup
 				// object instead of the material, once it becomes feasible
 				// (#8465, #8379)
 				_clipping.setState(
-						material.clippingPlanes, material.clipShadows,
-						camera, materialProperties, useCache );
+					material.clippingPlanes, material.clipIntersection, material.clipShadows,
+					camera, materialProperties, useCache );
 
 			}
 
@@ -1741,7 +1704,8 @@ function WebGLRenderer( parameters ) {
 				material.needsUpdate = true;
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
-				materialProperties.numClippingPlanes !== _clipping.numPlanes ) {
+				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
+				materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
 
 				material.needsUpdate = true;
 
@@ -1790,7 +1754,7 @@ function WebGLRenderer( parameters ) {
 			if ( capabilities.logarithmicDepthBuffer ) {
 
 				p_uniforms.setValue( _gl, 'logDepthBufFC',
-						2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
+					2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
 
 			}
 
@@ -1812,27 +1776,27 @@ function WebGLRenderer( parameters ) {
 			// (shader material also gets them for the sake of genericity)
 
 			if ( material.isShaderMaterial ||
-			     material.isMeshPhongMaterial ||
-			     material.isMeshStandardMaterial ||
-			     material.envMap ) {
+				material.isMeshPhongMaterial ||
+				material.isMeshStandardMaterial ||
+				material.envMap ) {
 
 				var uCamPos = p_uniforms.map.cameraPosition;
 
 				if ( uCamPos !== undefined ) {
 
 					uCamPos.setValue( _gl,
-							_vector3.setFromMatrixPosition( camera.matrixWorld ) );
+						_vector3.setFromMatrixPosition( camera.matrixWorld ) );
 
 				}
 
 			}
 
 			if ( material.isMeshPhongMaterial ||
-			     material.isMeshLambertMaterial ||
-			     material.isMeshBasicMaterial ||
-			     material.isMeshStandardMaterial ||
-			     material.isShaderMaterial ||
-			     material.skinning ) {
+				material.isMeshLambertMaterial ||
+				material.isMeshBasicMaterial ||
+				material.isMeshStandardMaterial ||
+				material.isShaderMaterial ||
+				material.skinning ) {
 
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -1898,10 +1862,11 @@ function WebGLRenderer( parameters ) {
 			}
 
 			if ( material.isMeshBasicMaterial ||
-			     material.isMeshLambertMaterial ||
-			     material.isMeshPhongMaterial ||
-			     material.isMeshStandardMaterial ||
-			     material.isMeshDepthMaterial ) {
+				material.isMeshLambertMaterial ||
+				material.isMeshPhongMaterial ||
+				material.isMeshStandardMaterial ||
+				material.isMeshNormalMaterial ||
+				material.isMeshDepthMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
 
@@ -1925,6 +1890,10 @@ function WebGLRenderer( parameters ) {
 			} else if ( material.isMeshLambertMaterial ) {
 
 				refreshUniformsLambert( m_uniforms, material );
+
+			} else if ( material.isMeshToonMaterial ) {
+
+				refreshUniformsToon( m_uniforms, material );
 
 			} else if ( material.isMeshPhongMaterial ) {
 
@@ -1950,12 +1919,18 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( material.isMeshNormalMaterial ) {
 
-				m_uniforms.opacity.value = material.opacity;
+				refreshUniformsNormal( m_uniforms, material );
 
 			}
 
+			// RectAreaLight Texture
+			// TODO (mrdoob): Find a nicer implementation
+
+			if ( m_uniforms.ltcMat !== undefined ) m_uniforms.ltcMat.value = THREE.UniformsLib.LTC_MAT_TEXTURE;
+			if ( m_uniforms.ltcMag !== undefined ) m_uniforms.ltcMag.value = THREE.UniformsLib.LTC_MAG_TEXTURE;
+
 			WebGLUniforms.upload(
-					_gl, materialProperties.uniformsList, m_uniforms, _this );
+				_gl, materialProperties.uniformsList, m_uniforms, _this );
 
 		}
 
@@ -1987,6 +1962,13 @@ function WebGLRenderer( parameters ) {
 		uniforms.map.value = material.map;
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;
+
+		if ( material.lightMap ) {
+
+			uniforms.lightMap.value = material.lightMap;
+			uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+		}
 
 		if ( material.aoMap ) {
 
@@ -2126,13 +2108,6 @@ function WebGLRenderer( parameters ) {
 
 	function refreshUniformsLambert( uniforms, material ) {
 
-		if ( material.lightMap ) {
-
-			uniforms.lightMap.value = material.lightMap;
-			uniforms.lightMapIntensity.value = material.lightMapIntensity;
-
-		}
-
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
@@ -2145,13 +2120,6 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.specular.value = material.specular;
 		uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
-
-		if ( material.lightMap ) {
-
-			uniforms.lightMap.value = material.lightMap;
-			uniforms.lightMapIntensity.value = material.lightMapIntensity;
-
-		}
 
 		if ( material.emissiveMap ) {
 
@@ -2183,6 +2151,18 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	function refreshUniformsToon( uniforms, material ) {
+
+		refreshUniformsPhong( uniforms, material );
+
+		if ( material.gradientMap ) {
+
+			uniforms.gradientMap.value = material.gradientMap;
+
+		}
+
+	}
+
 	function refreshUniformsStandard( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
@@ -2197,13 +2177,6 @@ function WebGLRenderer( parameters ) {
 		if ( material.metalnessMap ) {
 
 			uniforms.metalnessMap.value = material.metalnessMap;
-
-		}
-
-		if ( material.lightMap ) {
-
-			uniforms.lightMap.value = material.lightMap;
-			uniforms.lightMapIntensity.value = material.lightMapIntensity;
 
 		}
 
@@ -2253,6 +2226,32 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	function refreshUniformsNormal( uniforms, material ) {
+
+		if ( material.bumpMap ) {
+
+			uniforms.bumpMap.value = material.bumpMap;
+			uniforms.bumpScale.value = material.bumpScale;
+
+		}
+
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.value = material.normalMap;
+			uniforms.normalScale.value.copy( material.normalScale );
+
+		}
+
+		if ( material.displacementMap ) {
+
+			uniforms.displacementMap.value = material.displacementMap;
+			uniforms.displacementScale.value = material.displacementScale;
+			uniforms.displacementBias.value = material.displacementBias;
+
+		}
+
+	}
+
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
 
 	function markUniformsLightsNeedsUpdate( uniforms, value ) {
@@ -2262,6 +2261,7 @@ function WebGLRenderer( parameters ) {
 		uniforms.directionalLights.needsUpdate = value;
 		uniforms.pointLights.needsUpdate = value;
 		uniforms.spotLights.needsUpdate = value;
+		uniforms.rectAreaLights.needsUpdate = value;
 		uniforms.hemisphereLights.needsUpdate = value;
 
 	}
@@ -2291,17 +2291,18 @@ function WebGLRenderer( parameters ) {
 	function setupLights( lights, camera ) {
 
 		var l, ll, light,
-		r = 0, g = 0, b = 0,
-		color,
-		intensity,
-		distance,
-		shadowMap,
+			r = 0, g = 0, b = 0,
+			color,
+			intensity,
+			distance,
+			shadowMap,
 
-		viewMatrix = camera.matrixWorldInverse,
+			viewMatrix = camera.matrixWorldInverse,
 
 		directionalLength = 0,
 		pointLength = 0,
 		spotLength = 0,
+		rectAreaLength = 0,
 		hemiLength = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
@@ -2377,6 +2378,38 @@ function WebGLRenderer( parameters ) {
 				_lights.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 				_lights.spot[ spotLength ++ ] = uniforms;
 
+			} else if ( light.isRectAreaLight ) {
+
+				var uniforms = lightCache.get( light );
+
+				// (a) intensity controls irradiance of entire light
+				uniforms.color
+					.copy( color )
+					.multiplyScalar( intensity / ( light.width * light.height ) );
+
+				// (b) intensity controls the radiance per light area
+				// uniforms.color.copy( color ).multiplyScalar( intensity );
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
+
+				// extract local rotation of light to derive width/height half vectors
+				_matrix42.identity();
+				_matrix4.copy( light.matrixWorld );
+				_matrix4.premultiply( viewMatrix );
+				_matrix42.extractRotation( _matrix4 );
+
+				uniforms.halfWidth.set( light.width * 0.5,                0.0, 0.0 );
+				uniforms.halfHeight.set(              0.0, light.height * 0.5, 0.0 );
+
+				uniforms.halfWidth.applyMatrix4( _matrix42 );
+				uniforms.halfHeight.applyMatrix4( _matrix42 );
+
+				// TODO (abelnation): RectAreaLight distance?
+				// uniforms.distance = distance;
+
+				_lights.rectArea[ rectAreaLength ++ ] = uniforms;
+
 			} else if ( light.isPointLight ) {
 
 				var uniforms = lightCache.get( light );
@@ -2436,10 +2469,12 @@ function WebGLRenderer( parameters ) {
 
 		_lights.directional.length = directionalLength;
 		_lights.spot.length = spotLength;
+		_lights.rectArea.length = rectAreaLength;
 		_lights.point.length = pointLength;
 		_lights.hemi.length = hemiLength;
 
-		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + _lights.shadows.length;
+		// TODO (sam-g-steel) why aren't we using join
+		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + _lights.shadows.length;
 
 	}
 
@@ -2541,7 +2576,7 @@ function WebGLRenderer( parameters ) {
 			// currently relying on the fact that WebGLRenderTargetCube.texture is a Texture and NOT a CubeTexture
 			// TODO: unify these code paths
 			if ( ( texture && texture.isCubeTexture ) ||
-				 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
+				( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
 
 				// CompressedTexture can have Array in image :/
 
@@ -2667,8 +2702,8 @@ function WebGLRenderer( parameters ) {
 				}
 
 				if ( textureType !== UnsignedByteType && paramThreeToGL( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
-				     ! ( textureType === FloatType && ( extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
-				     ! ( textureType === HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
+					! ( textureType === FloatType && ( extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
+					! ( textureType === HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
 
 					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 					return;
@@ -2785,7 +2820,7 @@ function WebGLRenderer( parameters ) {
 		}
 
 		if ( p === RGB_PVRTC_4BPPV1_Format || p === RGB_PVRTC_2BPPV1_Format ||
-			 p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
+			p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
 
 			extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
 

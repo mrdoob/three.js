@@ -18,7 +18,7 @@ AmbientLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	constructor: AmbientLight,
 
-	isAmbientLight: true,
+	isAmbientLight: true
 
 } );
 

@@ -54,7 +54,7 @@
 			bevelSegments: 1
 		};
 
-		var geometry = new THREE.ExtrudeGeometry( shape, data );
+		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var mesh = new THREE.Mesh( geometry, material ) ;
 		scene.add( mesh );
@@ -107,8 +107,8 @@
 				<li>bevelThickness —  float. how deep into the original shape bevel goes</li>
 				<li>bevelSize —  float. how far from shape outline is bevel</li>
 				<li>bevelSegments —  int. number of bevel layers</li>
-				<li>extrudePath —  THREE.CurvePath. 3d spline path to extrude shape along. (creates Frames if (frames aren't defined)</li>
-				<li>frames —  THREE.TubeGeometry.FrenetFrames.  containing arrays of tangents, normals, binormals</li>
+				<li>extrudePath —  THREE.Curve. curve to extrude shape along</li>
+				<li>frames —  Object.  containing arrays of tangents, normals, binormals</li>
 				<li>material —  int. material index for front and back faces</li>
 				<li>extrudeMaterial —  int. material index for extrusion and beveled faces</li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
@@ -128,8 +128,8 @@
 				<li>bevelThickness —  float. how deep into the original shape bevel goes</li>
 				<li>bevelSize —  float. how far from shape outline is bevel</li>
 				<li>bevelSegments —  int. number of bevel layers</li>
-				<li>extrudePath —  THREE.CurvePath. 3d spline path to extrude shape along. (creates Frames if (frames aren't defined)</li>
-				<li>frames —  THREE.TubeGeometry.FrenetFrames.  containing arrays of tangents, normals, binormals</li>
+				<li>extrudePath —  THREE.Curve. curve to extrude shape along</li>
+				<li>frames —  Object.  containing arrays of tangents, normals, binormals</li>
 				<li>material —  int. material index for front and back faces</li>
 				<li>extrudeMaterial —  int. material index for extrusion and beveled faces</li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>

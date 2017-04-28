@@ -1,58 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-	<title>three.js - BufferGeometry constructed from Geometry Example</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<style>
-		body {
-			background-color: #000;
-			font-family: Monospace;
-			margin: 0;
-			color: #000;
-			overflow: hidden;
-		}
-		#title {
-			position: absolute;
-			width: 100%;
-			top: 0;
-			padding: 0;
-			text-align: center;
-			font-size: 1.1em;
-			background-color: rgba(64,96,64,0.7);
-			color: #fff;
-		}
-		#title a {color:#ff0;}
-	</style>
-	<script type="text/javascript" src="../build/three.js"></script>
-	<script type="text/javascript" src="js/Detector.js"></script>
-	<script type="text/javascript" src="js/libs/stats.min.js"></script>
-	<script type="text/javascript" src="js/controls/TrackballControls.js"></script>
+		<title>three.js webgl - buffer geometry constructed from geometry</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+			a {
+				color: #0080ff;
+			}
+		</style>
+		<script type="text/javascript" src="../build/three.js"></script>
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/libs/stats.min.js"></script>
+		<script type="text/javascript" src="js/controls/TrackballControls.js"></script>
 	</head>
-	<body onload="app()">
-		<div id="title"></div>
+	<body>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffer geometry constructed from geometry - (<a target="_blank" href="http://callum.com">author</a>)</div>
 		<script>
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
 		var camera, scene, renderer, controls, stats;
 
-		function app() {
-
-			if ( ! Detector.webgl ) {
-
-				Detector.addGetWebGLMessage();
-
-			}
-
-			init();
-			animate();
-
-		}
+		init();
+		animate();
 
 		function init() {
 
 			renderer = new THREE.WebGLRenderer( {
 				antialias: true
 			} );
-			renderer.setClearColor( 0x000000, 0.0 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -89,16 +81,17 @@
 
 		function createGeometry() {
 
-			var heart_shape = new THREE.Shape(); // From http://blog.burlock.org/html5/130-paths
-			var x = 0,
-				y = 0;
-			heart_shape.moveTo( x + 25, y + 25 );
-			heart_shape.bezierCurveTo( x + 25, y + 25, x + 20, y, x, y );
-			heart_shape.bezierCurveTo( x - 30, y, x - 30, y + 35, x - 30, y + 35 );
-			heart_shape.bezierCurveTo( x - 30, y + 55, x - 10, y + 77, x + 25, y + 95 );
-			heart_shape.bezierCurveTo( x + 60, y + 77, x + 80, y + 55, x + 80, y + 35 );
-			heart_shape.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y );
-			heart_shape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
+			var heartShape = new THREE.Shape(); // From http://blog.burlock.org/html5/130-paths
+			var x = 0, y = 0;
+
+			heartShape.moveTo( x + 25, y + 25 );
+			heartShape.bezierCurveTo( x + 25, y + 25, x + 20, y, x, y );
+			heartShape.bezierCurveTo( x - 30, y, x - 30, y + 35, x - 30, y + 35 );
+			heartShape.bezierCurveTo( x - 30, y + 55, x - 10, y + 77, x + 25, y + 95 );
+			heartShape.bezierCurveTo( x + 60, y + 77, x + 80, y + 55, x + 80, y + 35 );
+			heartShape.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y );
+			heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
+
 			var extrudeSettings = {
 				amount: 16,
 				bevelEnabled: true,
@@ -107,122 +100,92 @@
 				bevelSize: 1,
 				bevelThickness: 1
 			};
-			var geom = new THREE.ExtrudeGeometry( heart_shape, extrudeSettings );
-			geom.rotateX( - Math.PI / 2 );
-			geom.scale( 0.4, 0.4, 0.4 );
-			return geom;
+
+			var geometry = new THREE.ExtrudeGeometry( heartShape, extrudeSettings );
+			geometry.rotateX( Math.PI );
+			geometry.scale( 0.4, 0.4, 0.4 );
+
+			return geometry;
 
 		}
 
 		function createScene() {
 
-			var buffer_geometry = new THREE.BufferGeometry();
-			var radius = 100.0;
-			var positions = 0;
-			var normals = 0;
-			var colors = 0;
-			var shape_density = 14;
+			var bufferGeometry = new THREE.BufferGeometry();
 
-			for ( var num_lat = 0; num_lat < shape_density / 2; ++ num_lat ) {
+			var radius = 125;
+			var count = 80;
 
-				var lat_lhs = ( num_lat + 0 ) * 180 / ( shape_density / 2 );
-				var lat_rhs = ( num_lat + 1 ) * 180 / ( shape_density / 2 );
-				var lat = ( lat_lhs + lat_rhs ) / 2.0;
+			var positions = [];
+			var normals = [];
+			var colors = [];
 
-				for ( var num_lng = 0; num_lng < shape_density; ++ num_lng ) {
+			var spherical = new THREE.Spherical();
+			var vector = new THREE.Vector3();
 
-					var lng_lhs = ( num_lng + 0 ) * 360 / shape_density;
-					var lng_rhs = ( num_lng + 1 ) * 360 / shape_density;
-					var lng = ( lng_lhs + lng_rhs ) / 2.0;
+			for ( var i = 1, l = count; i <= l; i ++ ) {
 
-					var height = 30.0;
+				var phi = Math.acos( -1 + ( 2 * i ) / l );
+				var theta = Math.sqrt( l * Math.PI ) * phi;
 
-					var phi = lat * Math.PI / 180.0;
-					var theta = lng * Math.PI / 180.0;
-					var x = radius * Math.sin( phi ) * Math.cos( theta );
-					var y = radius * Math.cos( phi );
-					var z = radius * Math.sin( phi ) * Math.sin( theta );
+				spherical.set( radius, phi, theta );
+				vector.setFromSpherical( spherical );
 
-					var geometry = createGeometry();
+				var geometry = createGeometry();
 
-					geometry.translate( 0, height / 2, 0 );
-					geometry.rotateX( - Math.PI / 2 );
-					geometry.lookAt( new THREE.Vector3( - x, - y, - z ) );
-					geometry.translate( x, y, z );
+				geometry.lookAt( vector );
+				geometry.translate( vector.x, vector.y, vector.z );
 
-					var color = new THREE.Color( 0xffffff );
-					color.setHSL( lat / 180.0, 1.0, 0.7 );
+				var color = new THREE.Color( 0xffffff );
+				color.setHSL( ( i / l ), 1.0, 0.7 );
 
-					if ( positions === 0 ) {
+				geometry.faces.forEach( function ( face, index ) {
 
-						var num_stacks = shape_density * shape_density / 2;
+					positions.push( geometry.vertices[ face.a ].x );
+					positions.push( geometry.vertices[ face.a ].y );
+					positions.push( geometry.vertices[ face.a ].z );
+					positions.push( geometry.vertices[ face.b ].x );
+					positions.push( geometry.vertices[ face.b ].y );
+					positions.push( geometry.vertices[ face.b ].z );
+					positions.push( geometry.vertices[ face.c ].x );
+					positions.push( geometry.vertices[ face.c ].y );
+					positions.push( geometry.vertices[ face.c ].z );
 
-						var str = 'BufferGeometry constructed from Geometry Example - ' + parseInt( num_stacks * geometry.faces.length, 10 ) + ' triangles (<a target="_blank" href="http://callum.com">author</a>)';
-						document.getElementById( 'title' ).innerHTML = str.replace( /\B(?=(\d{3})+(?!\d))/g, "," );
+					normals.push( face.normal.x );
+					normals.push( face.normal.y );
+					normals.push( face.normal.z );
+					normals.push( face.normal.x );
+					normals.push( face.normal.y );
+					normals.push( face.normal.z );
+					normals.push( face.normal.x );
+					normals.push( face.normal.y );
+					normals.push( face.normal.z );
 
-						positions = new Float32Array( num_stacks * geometry.faces.length * 3 * 3 );
-						normals = new Float32Array( num_stacks * geometry.faces.length * 3 * 3 );
-						colors = new Float32Array( num_stacks * geometry.faces.length * 3 * 3 );
+					colors.push( color.r );
+					colors.push( color.g );
+					colors.push( color.b );
+					colors.push( color.r );
+					colors.push( color.g );
+					colors.push( color.b );
+					colors.push( color.r );
+					colors.push( color.g );
+					colors.push( color.b );
 
-					}
-
-					geometry.faces.forEach( function ( face, index ) {
-
-						var cur_element = ( ( num_lng + num_lat * shape_density ) * geometry.faces.length + index );
-
-						positions[ cur_element * 9 + 0 ] = geometry.vertices[ face.a ].x;
-						positions[ cur_element * 9 + 1 ] = geometry.vertices[ face.a ].y;
-						positions[ cur_element * 9 + 2 ] = geometry.vertices[ face.a ].z;
-						positions[ cur_element * 9 + 3 ] = geometry.vertices[ face.b ].x;
-						positions[ cur_element * 9 + 4 ] = geometry.vertices[ face.b ].y;
-						positions[ cur_element * 9 + 5 ] = geometry.vertices[ face.b ].z;
-						positions[ cur_element * 9 + 6 ] = geometry.vertices[ face.c ].x;
-						positions[ cur_element * 9 + 7 ] = geometry.vertices[ face.c ].y;
-						positions[ cur_element * 9 + 8 ] = geometry.vertices[ face.c ].z;
-
-						normals[ cur_element * 9 + 0 ] = face.normal.x;
-						normals[ cur_element * 9 + 1 ] = face.normal.y;
-						normals[ cur_element * 9 + 2 ] = face.normal.z;
-						normals[ cur_element * 9 + 3 ] = face.normal.x;
-						normals[ cur_element * 9 + 4 ] = face.normal.y;
-						normals[ cur_element * 9 + 5 ] = face.normal.z;
-						normals[ cur_element * 9 + 6 ] = face.normal.x;
-						normals[ cur_element * 9 + 7 ] = face.normal.y;
-						normals[ cur_element * 9 + 8 ] = face.normal.z;
-
-						colors[ cur_element * 9 + 0 ] = color.r;
-						colors[ cur_element * 9 + 1 ] = color.g;
-						colors[ cur_element * 9 + 2 ] = color.b;
-						colors[ cur_element * 9 + 3 ] = color.r;
-						colors[ cur_element * 9 + 4 ] = color.g;
-						colors[ cur_element * 9 + 5 ] = color.b;
-						colors[ cur_element * 9 + 6 ] = color.r;
-						colors[ cur_element * 9 + 7 ] = color.g;
-						colors[ cur_element * 9 + 8 ] = color.b;
-
-					} );
-
-				}
+				} );
 
 			}
 
-			buffer_geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-			buffer_geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-			buffer_geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+			bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+			bufferGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+			bufferGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-			buffer_geometry.computeBoundingSphere();
-
-			var buffer_material = new THREE.MeshPhongMaterial( {
-				color: 0x999999,
-				specular: 0x333333,
-				shininess: 50,
-				side: THREE.DoubleSide,
-				vertexColors: THREE.VertexColors,
-				shading: THREE.SmoothShading
+			var material = new THREE.MeshPhongMaterial( {
+				shininess: 80,
+				vertexColors: THREE.VertexColors
 			} );
 
-			var buffer_mesh = new THREE.Mesh( buffer_geometry, buffer_material );
-			scene.add( buffer_mesh );
+			var mesh = new THREE.Mesh( bufferGeometry, material );
+			scene.add( mesh );
 
 		}
 
@@ -237,6 +200,7 @@
 		function animate( time ) {
 
 			requestAnimationFrame( animate );
+
 			controls.update();
 			stats.update();
 			renderer.render( scene, camera );

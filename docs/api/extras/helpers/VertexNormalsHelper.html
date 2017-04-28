@@ -12,42 +12,60 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Renders [page:ArrowHelper arrows] to visualize an object's vertex normal vectors. Requires that normals have been specified in a [page:BufferAttribute custom attribute] or have been calculated using [page:Geometry.computeVertexNormals computeVertexNormals]. </div>
+		<div class="desc">
+			Renders [page:ArrowHelper arrows] to visualize an object's vertex normal vectors.
+			Requires that normals have been specified in a [page:BufferAttribute custom attribute] or
+			have been calculated using [page:Geometry.computeVertexNormals computeVertexNormals].<br /><br />
+
+			Unline [page:FaceNormalsHelper], this works with [page:BufferGeometry].
+		</div>
 
 		<h2>Example</h2>
 
+		[example:webgl_helpers WebGL / helpers]
+
 		<code>
-		geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
-		material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-		object = new THREE.Mesh( geometry, material );
+		var geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		var box = new THREE.Mesh( geometry, material );
 
-		edges = new THREE.VertexNormalsHelper( object, 2, 0x00ff00, 1 );
+		var helper = new THREE.VertexNormalsHelper( box, 2, 0x00ff00, 1 );
 
-		scene.add( object );
-		scene.add( edges );
+		scene.add( box );
+		scene.add( helper );
 		</code>
-		[example:webgl_helpers Example using various helpers]
+
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Object3D object], [page:Number size], [page:Color color], [page:Number linewidth] )</h3>
-		<div>object -- object for which to render vertex normals
-		size -- size (length) of the arrows
-		color -- color of the arrows
-		linewidth -- width of the arrow lines
+		<h3>[name]( [page:Object3D object], [page:Number size], [page:Hex color], [page:Number linewidth] )</h3>
+		<div>
+			[page:Object3D object] -- object for which to render vertex normals.<br />
+			[page:Number size] -- (optional) length of the arrows. Default is 1.<br />
+			[page:Hex color] -- hex color of the arrows. Default is 0xff0000.<br />
+			[page:Number linewidth] -- (optional) width of the arrow lines. Default is 1.
 		</div>
 
 
 		<h2>Properties</h2>
+		<div>See the base [page:LineSegments] class for common properties.</div>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
+		<div>
+			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			objects's [page:Object3D.matrixWorld matrixWorld].
+		</div>
 
 		<h3>[property:Object3D object]</h3>
-		<div>
-		The attached object
-		</div>
+		<div>The object for which the vertex normals are being visualized.</div>
+
+		<h3>[property:Number size]</h3>
+		<div>Length of the arrows. Default is *1*.</div>
 
 
 		<h2>Methods</h2>
+		<div>See the base [page:LineSegments] class for common methods.</div>
 
 
 		<h3>[method:null update]()</h3>

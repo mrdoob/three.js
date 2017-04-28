@@ -205,7 +205,8 @@
 			gui = new dat.GUI();
 
 			var example = gui.add( param, 'example', {
-				'basic / standard (PBR)': 'standard',
+				'basic / standard': 'standard',
+				'basic / physical': 'physical',
 				'basic / phong': 'phong',
 				'basic / layers': 'layers',
 				'basic / rim': 'rim',
@@ -391,7 +392,7 @@
 						THREE.OperatorNode.MUL
 					);
 
-					mtl.color = new THREE.ColorNode( 0xFFFFFF );
+					mtl.color = new THREE.ColorNode( 0xEEEEEE );
 					mtl.roughness = roughness;
 					mtl.metalness = metalness;
 					mtl.environment = new THREE.CubeTextureNode( cubemap );
@@ -435,6 +436,131 @@
 						normalScale.number = val;
 
 					}, false, 0, 1 );
+
+					break;
+
+					case 'physical':
+
+						// MATERIAL
+
+						mtl = new THREE.StandardNodeMaterial();
+
+						//mtl.color = // albedo (vec3)
+						//mtl.alpha = // opacity (float)
+						//mtl.roughness = // roughness (float)
+						//mtl.metalness = // metalness (float)
+						//mtl.reflectivity = // reflectivity (float)
+						//mtl.clearCoat = // clearCoat (float)
+						//mtl.clearCoatRoughness = // clearCoatRoughness (float)
+						//mtl.normal = // normalmap (vec3)
+						//mtl.normalScale = // normalmap scale (vec2)
+						//mtl.emissive = // emissive color (vec3)
+						//mtl.ambient = // ambient color (vec3)
+						//mtl.shadow = // shadowmap (vec3)
+						//mtl.light = // custom-light (vec3)
+						//mtl.ao = // ambient occlusion (float)
+						//mtl.environment = // reflection/refraction (vec3)
+						//mtl.transform = // vertex transformation (vec3)
+
+						var mask = new THREE.SwitchNode( new THREE.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+
+						var normalScale = new THREE.FloatNode( .3 );
+
+						var roughnessA = new THREE.FloatNode( .5 );
+						var metalnessA = new THREE.FloatNode( .5 );
+
+						var roughnessB = new THREE.FloatNode( 0 );
+						var metalnessB = new THREE.FloatNode( 1 );
+
+						var reflectivity = new THREE.FloatNode( 0 );
+						var clearCoat = new THREE.FloatNode( 1 );
+						var clearCoatRoughness = new THREE.FloatNode( 1 );
+
+						var roughness = new THREE.Math3Node(
+							roughnessA,
+							roughnessB,
+							mask,
+							THREE.Math3Node.MIX
+						);
+
+						var metalness = new THREE.Math3Node(
+							metalnessA,
+							metalnessB,
+							mask,
+							THREE.Math3Node.MIX
+						);
+
+						var normalMask = new THREE.OperatorNode(
+							new THREE.Math1Node( mask, THREE.Math1Node.INVERT ),
+							normalScale,
+							THREE.OperatorNode.MUL
+						);
+
+						mtl.color = new THREE.ColorNode( 0xEEEEEE );
+						mtl.roughness = roughness;
+						mtl.metalness = metalness;
+						mtl.reflectivity = reflectivity;
+						mtl.clearCoat = clearCoat;
+						mtl.clearCoatRoughness = clearCoatRoughness;
+						mtl.environment = new THREE.CubeTextureNode( cubemap );
+						mtl.normal = new THREE.TextureNode( getTexture( "grassNormal" ) );
+						mtl.normalScale = normalMask;
+
+						// GUI
+
+						addGui( 'color', mtl.color.value.getHex(), function( val ) {
+
+							mtl.color.value.setHex( val );
+
+						}, true );
+
+						addGui( 'reflectivity', reflectivity.number, function( val ) {
+
+							 reflectivity.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearCoat', clearCoat.number, function( val ) {
+
+							 clearCoat.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearCoatRoughness', clearCoatRoughness.number, function( val ) {
+
+							 clearCoatRoughness.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'roughnessA', roughnessA.number, function( val ) {
+
+							 roughnessA.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalnessA', metalnessA.number, function( val ) {
+
+							metalnessA.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'roughnessB', roughnessB.number, function( val ) {
+
+							 roughnessB.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalnessB', metalnessB.number, function( val ) {
+
+							metalnessB.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'normalScale', normalScale.number, function( val ) {
+
+							normalScale.number = val;
+
+						}, false, 0, 1 );
 
 					break;
 
@@ -902,7 +1028,6 @@
 					//saturation.inputs[1] = sat;
 
 					mtl.color = saturation;
-					mtl.environment = new THREE.CubeTextureNode( cubemap ); // optional
 
 					// GUI
 
@@ -1519,8 +1644,11 @@
 
 						// StandardNodeMaterial
 
-						mtl.metalness = new THREE.FloatNode( .05 );
-						mtl.roughness = new THREE.FloatNode( .5 );
+						mtl.metalness = new THREE.FloatNode( 0 );
+						mtl.roughness = new THREE.FloatNode( 1 );
+						mtl.reflectivity = new THREE.FloatNode( 0 );
+						mtl.clearCoat = new THREE.FloatNode( .2 );
+						mtl.clearCoatRoughness = new THREE.FloatNode( .3 );
 						mtl.environment = new THREE.CubeTextureNode( cubemap );
 
 					} else {
@@ -1528,7 +1656,7 @@
 						// PhongNodeMaterial
 
 						mtl.specular = new THREE.ColorNode( 0x2f2e2d );
-						mtl.shininess = new THREE.FloatNode( 10 );
+						mtl.shininess = new THREE.FloatNode( 15 );
 
 					}
 

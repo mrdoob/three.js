@@ -727,7 +727,7 @@ THREE.UTF8Loader.prototype.downloadModelJson = function ( jsonUrl, callback, opt
 
 function getHttpRequest( url, onload, opt_onprogress ) {
 
-	var req = new THREE.XHRLoader();
+	var req = new THREE.FileLoader();
 	req.load( url, onload, opt_onprogress );
 
 }

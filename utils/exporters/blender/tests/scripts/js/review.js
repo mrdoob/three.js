@@ -77,8 +77,9 @@ function loadObject( data ) {
 
     var hasLights = false;
 
+    // TODO: RectAreaLight support
     var lights = ['AmbientLight', 'DirectionalLight',
-        'PointLight', 'SpotLight', 'HemisphereLight'];
+        'PointLight', 'SpotLight', 'RectAreaLight', 'HemisphereLight'];
 
     var cameras = ['OrthographicCamera', 'PerspectiveCamera'];
 

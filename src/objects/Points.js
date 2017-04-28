@@ -86,7 +86,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			}
 
-			if ( (geometry && geometry.isBufferGeometry) ) {
+			if ( geometry.isBufferGeometry ) {
 
 				var index = geometry.index;
 				var attributes = geometry.attributes;

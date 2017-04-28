@@ -1,9 +1,10 @@
-import { XHRLoader } from './XHRLoader';
-import { DefaultLoadingManager } from './LoadingManager';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
+
+import { Cache } from './Cache';
+import { DefaultLoadingManager } from './LoadingManager';
+
 
 function ImageLoader( manager ) {
 
@@ -15,40 +16,63 @@ Object.assign( ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		if ( url === undefined ) url = '';
+
+		if ( this.path !== undefined ) url = this.path + url;
+
 		var scope = this;
 
-		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
-		image.onload = function () {
+		var cached = Cache.get( url );
 
-			image.onload = null;
+		if ( cached !== undefined ) {
 
-			URL.revokeObjectURL( image.src );
+			scope.manager.itemStart( url );
 
-			if ( onLoad ) onLoad( image );
+			setTimeout( function () {
 
-			scope.manager.itemEnd( url );
+				if ( onLoad ) onLoad( cached );
 
-		};
+				scope.manager.itemEnd( url );
 
-		if ( url.indexOf( 'data:' ) === 0 ) {
+			}, 0 );
 
-			image.src = url;
-
-		} else {
-
-			var loader = new XHRLoader();
-			loader.setPath( this.path );
-			loader.setResponseType( 'blob' );
-			loader.setWithCredentials( this.withCredentials );
-			loader.load( url, function ( blob ) {
-
-				image.src = URL.createObjectURL( blob );
-
-			}, onProgress, onError );
+			return cached;
 
 		}
 
+		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+
+		image.addEventListener( 'load', function () {
+
+			Cache.add( url, this );
+
+			if ( onLoad ) onLoad( this );
+
+			scope.manager.itemEnd( url );
+
+		}, false );
+
+		/*
+		image.addEventListener( 'progress', function ( event ) {
+
+			if ( onProgress ) onProgress( event );
+
+		}, false );
+		*/
+
+		image.addEventListener( 'error', function ( event ) {
+
+			if ( onError ) onError( event );
+
+			scope.manager.itemError( url );
+
+		}, false );
+
+		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+
 		scope.manager.itemStart( url );
+
+		image.src = url;
 
 		return image;
 
@@ -57,13 +81,6 @@ Object.assign( ImageLoader.prototype, {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
-		return this;
-
-	},
-
-	setWithCredentials: function ( value ) {
-
-		this.withCredentials = value;
 		return this;
 
 	},

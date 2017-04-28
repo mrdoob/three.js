@@ -41,8 +41,6 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/Half.js"></script>
-		<script src="js/Encodings.js"></script>
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -108,7 +106,7 @@
 					shading: THREE.SmoothShading
 				} );
 
-				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
+				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
 				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				torusMesh1.position.x = 0.0;
 				torusMesh1.castShadow = true;
@@ -154,7 +152,7 @@
 				var spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.position.set( 50, 100, 50 );
 				spotLight.angle = Math.PI / 7;
-				spotLight.penumbra = 0.8
+				spotLight.penumbra = 0.8;
 				spotLight.castShadow = true;
 				scene.add( spotLight );
 

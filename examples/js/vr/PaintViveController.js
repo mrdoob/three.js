@@ -52,7 +52,7 @@ THREE.PaintViveController = function ( id ) {
 	mesh.position.set( 0, 0.005, 0.0495 );
 	mesh.rotation.x = - 1.45;
 	mesh.scale.setScalar( 0.02 );
-	this.add( mesh )
+	this.add( mesh );
 
 	var geometry = new THREE.IcosahedronGeometry( 0.1, 2 );
 	var material = new THREE.MeshBasicMaterial();

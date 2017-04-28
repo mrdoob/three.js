@@ -11,7 +11,7 @@
 //
 //    Orbit - left mouse / touch: one finger move
 //    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
-//    Pan - right mouse, or arrow keys / touch: three finter swipe
+//    Pan - right mouse, or arrow keys / touch: three finger swipe
 
 THREE.OrbitControls = function ( object, domElement ) {
 
@@ -112,7 +112,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	};
 
 	// this method is exposed, but perhaps it would be better if we can make it private...
-	this.update = function() {
+	this.update = function () {
 
 		var offset = new THREE.Vector3();
 
@@ -123,7 +123,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		var lastPosition = new THREE.Vector3();
 		var lastQuaternion = new THREE.Quaternion();
 
-		return function update () {
+		return function update() {
 
 			var position = scope.object.position;
 
@@ -208,7 +208,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		scope.domElement.removeEventListener( 'contextmenu', onContextMenu, false );
 		scope.domElement.removeEventListener( 'mousedown', onMouseDown, false );
@@ -237,7 +237,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var startEvent = { type: 'start' };
 	var endEvent = { type: 'end' };
 
-	var STATE = { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
+	var STATE = { NONE: - 1, ROTATE: 0, DOLLY: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_DOLLY: 4, TOUCH_PAN: 5 };
 
 	var state = STATE.NONE;
 
@@ -287,7 +287,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	var panLeft = function() {
+	var panLeft = function () {
 
 		var v = new THREE.Vector3();
 
@@ -302,7 +302,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	var panUp = function() {
+	var panUp = function () {
 
 		var v = new THREE.Vector3();
 
@@ -318,11 +318,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}();
 
 	// deltaX and deltaY are in pixels; right and down are positive
-	var pan = function() {
+	var pan = function () {
 
 		var offset = new THREE.Vector3();
 
-		return function pan ( deltaX, deltaY ) {
+		return function pan( deltaX, deltaY ) {
 
 			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
@@ -491,13 +491,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleMouseUp( event ) {
 
-		//console.log( 'handleMouseUp' );
+		// console.log( 'handleMouseUp' );
 
 	}
 
 	function handleMouseWheel( event ) {
 
-		//console.log( 'handleMouseWheel' );
+		// console.log( 'handleMouseWheel' );
 
 		if ( event.deltaY < 0 ) {
 
@@ -977,7 +977,7 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 
 	},
 
-	staticMoving : {
+	staticMoving: {
 
 		get: function () {
 
@@ -995,7 +995,7 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 
 	},
 
-	dynamicDampingFactor : {
+	dynamicDampingFactor: {
 
 		get: function () {
 

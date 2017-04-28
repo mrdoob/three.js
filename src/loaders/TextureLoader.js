@@ -1,11 +1,12 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 import { RGBAFormat, RGBFormat } from '../constants';
 import { ImageLoader } from './ImageLoader';
 import { Texture } from '../textures/Texture';
 import { DefaultLoadingManager } from './LoadingManager';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
 
 function TextureLoader( manager ) {
 
@@ -21,7 +22,6 @@ Object.assign( TextureLoader.prototype, {
 
 		var loader = new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
-		loader.setWithCredentials( this.withCredentials );
 		loader.setPath( this.path );
 		loader.load( url, function ( image ) {
 
@@ -51,21 +51,12 @@ Object.assign( TextureLoader.prototype, {
 
 	},
 
-	setWithCredentials: function ( value ) {
-
-		this.withCredentials = value;
-		return this;
-
-	},
-
 	setPath: function ( value ) {
 
 		this.path = value;
 		return this;
 
 	}
-
-
 
 } );
 

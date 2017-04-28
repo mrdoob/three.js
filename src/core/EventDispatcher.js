@@ -4,7 +4,7 @@
 
 function EventDispatcher() {}
 
-Object.assign( EventDispatcher.prototype, {
+EventDispatcher.prototype = {
 
 	addEventListener: function ( type, listener ) {
 
@@ -32,13 +32,7 @@ Object.assign( EventDispatcher.prototype, {
 
 		var listeners = this._listeners;
 
-		if ( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1 ) {
-
-			return true;
-
-		}
-
-		return false;
+		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
 
 	},
 
@@ -93,7 +87,7 @@ Object.assign( EventDispatcher.prototype, {
 
 	}
 
-} );
+};
 
 
 export { EventDispatcher };

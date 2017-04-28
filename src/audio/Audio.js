@@ -12,14 +12,14 @@ function Audio( listener ) {
 	this.type = 'Audio';
 
 	this.context = listener.context;
-	this.source = this.context.createBufferSource();
-	this.source.onended = this.onEnded.bind( this );
 
 	this.gain = this.context.createGain();
 	this.gain.connect( listener.getInput() );
 
 	this.autoplay = false;
 
+	this.buffer = null;
+	this.loop = false;
 	this.startTime = 0;
 	this.playbackRate = 1;
 	this.isPlaying = false;
@@ -53,7 +53,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	setBuffer: function ( audioBuffer ) {
 
-		this.source.buffer = audioBuffer;
+		this.buffer = audioBuffer;
 		this.sourceType = 'buffer';
 
 		if ( this.autoplay ) this.play();
@@ -80,11 +80,11 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		var source = this.context.createBufferSource();
 
-		source.buffer = this.source.buffer;
-		source.loop = this.source.loop;
-		source.onended = this.source.onended;
+		source.buffer = this.buffer;
+		source.loop = this.loop;
+		source.onended = this.onEnded.bind( this );
+		source.playbackRate.setValueAtTime( this.playbackRate, this.startTime );
 		source.start( 0, this.startTime );
-		source.playbackRate.value = this.playbackRate;
 
 		this.isPlaying = true;
 
@@ -227,7 +227,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
-			this.source.playbackRate.value = this.playbackRate;
+			this.source.playbackRate.setValueAtTime( this.playbackRate, this.context.currentTime );
 
 		}
 
@@ -256,7 +256,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		return this.source.loop;
+		return this.loop;
 
 	},
 
@@ -269,7 +269,15 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		this.source.loop = value;
+		this.loop = value;
+
+		if ( this.isPlaying === true ) {
+
+			this.source.loop = this.loop;
+
+		}
+
+		return this;
 
 	},
 

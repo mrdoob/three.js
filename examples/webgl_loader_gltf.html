@@ -92,9 +92,9 @@
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> -
 		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> loader -
-		<br></br>
+		<br>
 		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> -
-		COLLADA duck by Sony - other models courtesy <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
+		COLLADA duck by Sony - Cesium models courtesy <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
 		</div>
 	<div id="container">
 	</div>
@@ -126,11 +126,7 @@
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/gltf/glTF-parser.js"></script>
-		<script src="js/loaders/gltf/glTFLoader.js"></script>
-		<script src="js/loaders/gltf/glTFLoaderUtils.js"></script>
-		<script src="js/loaders/gltf/glTFAnimation.js"></script>
-		<script src="js/loaders/gltf/glTFShaders.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
 			var orbitControls = null;
@@ -141,6 +137,8 @@
 			var cameraNames = [];
 			var defaultCamera = null;
 			var gltf = null;
+			var mixer = null;
+			var clock = new THREE.Clock();
 
 			function onload() {
 
@@ -216,7 +214,7 @@
 				if (sceneInfo.addGround) {
 					var groundMaterial = new THREE.MeshPhongMaterial({
 							color: 0xFFFFFF,
-							shading: THREE.SmoothShading,
+							shading: THREE.SmoothShading
 						});
 					ground = new THREE.Mesh( new THREE.PlaneBufferGeometry(512, 512), groundMaterial);
 
@@ -235,7 +233,8 @@
 					scene.add(ground);
 				}
 
-				loader = new THREE.glTFLoader;
+				THREE.GLTFLoader.Shaders.removeAll(); // remove all previous shaders
+				loader = new THREE.GLTFLoader;
 				var loadStartTime = Date.now();
 				var status = document.getElementById("status");
 				status.innerHTML = "Loading...";
@@ -251,7 +250,7 @@
 
 					gltf = data;
 
-					var object = gltf.scene;
+					var object = gltf.scene !== undefined ? gltf.scene : gltf.scenes[ 0 ];
 
 					var loadEndTime = Date.now();
 
@@ -315,18 +314,25 @@
 
 					}
 
-					if (gltf.animations && gltf.animations.length) {
+					var animations = gltf.animations;
 
-						var i, len = gltf.animations.length;
-						for (i = 0; i < len; i++) {
-							var animation = gltf.animations[i];
-							animation.loop = true;
+					if ( animations && animations.length ) {
+
+						mixer = new THREE.AnimationMixer( object );
+
+						for ( var i = 0; i < animations.length; i ++ ) {
+
+							var animation = animations[ i ];
+
 							// There's .3333 seconds junk at the tail of the Monster animation that
 							// keeps it from looping cleanly. Clip it at 3 seconds
-							if (sceneInfo.animationTime)
+							if ( sceneInfo.animationTime )
 								animation.duration = sceneInfo.animationTime;
-							animation.play();
+
+							mixer.clipAction( animation ).play();
+
 						}
+
 					}
 
 					scene.add( object );
@@ -356,8 +362,8 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
-				THREE.glTFAnimator.update();
-				THREE.glTFShaders.update(scene, camera);
+				if (mixer) mixer.update(clock.getDelta());
+				THREE.GLTFLoader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
@@ -393,8 +399,8 @@
 				{
 					name : "Monster", url : "./models/gltf/monster/%s/monster.gltf",
 					cameraPos: new THREE.Vector3(30, 10, 70),
-					objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
-					objectPosition: new THREE.Vector3(2, 6, 0),
+					objectScale: new THREE.Vector3(0.4, 0.4, 0.4),
+					objectPosition: new THREE.Vector3(2, 1, 0),
 					objectRotation: new THREE.Euler(0, - 3 * Math.PI / 4, 0),
 					animationTime: 3,
 					addLights:true,
@@ -424,7 +430,25 @@
 					addGround:true,
 					shadows:true
 				},
-
+				{
+					name : "Snowflake",
+					url : "./models/gltf/snowflake/snowFlake.gltf",
+					objectScale: new THREE.Vector3(4, 4, 1),
+					cameraPos: new THREE.Vector3(0, 100, 5000),
+					objectPosition: new THREE.Vector3(0, 0, 0),
+					addLights:false,
+					addGround:false,
+					shadows:false
+				},
+				{
+					name : "Snowflakes",
+					url : "./models/gltf/snowflakes/snowFlakes.gltf",
+					cameraPos: new THREE.Vector3(0, 100, 5000),
+					objectPosition: new THREE.Vector3(-1200, -1200, 0),
+					addLights:false,
+					addGround:false,
+					shadows:false
+				}
 			];
 
 			function buildSceneList() {
@@ -521,12 +545,13 @@
 
 				for (i = 0; i < len; i++) {
 
-					var animation = gltf.animations[i];
+					var clip = gltf.animations[i];
+					var action = mixer.existingAction( clip );
 
-					if (animation.running) {
-						animation.stop();
+					if (action.isRunning()) {
+						action.stop();
 					} else {
-						animation.play();
+						action.play();
 					}
 
 				}
@@ -553,17 +578,10 @@
 				cameraNames = [];
 				defaultCamera = null;
 
-				if (!loader || !gltf.animations)
+				if (!loader || !mixer)
 					return;
 
-				var i, len = gltf.animations.length;
-
-				for (i = 0; i < len; i++) {
-					var animation = gltf.animations[i];
-					if (animation.running) {
-						animation.stop();
-					}
-				}
+				mixer.stopAllAction();
 
 			}
 

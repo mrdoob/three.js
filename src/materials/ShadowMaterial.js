@@ -11,7 +11,7 @@ function ShadowMaterial() {
 
 	ShaderMaterial.call( this, {
 		uniforms: UniformsUtils.merge( [
-			UniformsLib[ "lights" ],
+			UniformsLib.lights,
 			{
 				opacity: { value: 1.0 }
 			}

@@ -1,5 +1,5 @@
 import { BufferGeometry } from '../core/BufferGeometry';
-import { BufferAttribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { Geometry } from '../core/Geometry';
 import { _Math } from '../math/Math';
 
@@ -27,7 +27,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	var geometry2;
 
-	if ( (geometry && geometry.isBufferGeometry) ) {
+	if ( geometry.isBufferGeometry ) {
 
 		geometry2 = new Geometry();
 		geometry2.fromBufferGeometry( geometry );
@@ -76,6 +76,8 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 		var h = hash[ key ];
 
+		// An edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
+
 		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
 			var vertex = vertices[ h.vert1 ];
@@ -92,7 +94,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	}
 
-	this.addAttribute( 'position', new BufferAttribute( new Float32Array( coords ), 3 ) );
+	this.addAttribute( 'position', new Float32BufferAttribute( coords, 3 ) );
 
 }
 

@@ -34,7 +34,13 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 			},
 
-			setClear: function ( r, g, b, a ) {
+			setClear: function ( r, g, b, a, premultipliedAlpha ) {
+
+				if ( premultipliedAlpha === true ) {
+
+					r *= a; g *= a; b *= a;
+
+				}
 
 				color.set( r, g, b, a );
 
@@ -200,7 +206,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		var currentStencilFunc = null;
 		var currentStencilRef = null;
 		var currentStencilFuncMask = null;
-		var currentStencilFail  = null;
+		var currentStencilFail = null;
 		var currentStencilZFail = null;
 		var currentStencilZPass = null;
 		var currentStencilClear = null;
@@ -238,10 +244,10 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 				     currentStencilRef 	!== stencilRef 	||
 				     currentStencilFuncMask !== stencilMask ) {
 
-					gl.stencilFunc( stencilFunc,  stencilRef, stencilMask );
+					gl.stencilFunc( stencilFunc, stencilRef, stencilMask );
 
 					currentStencilFunc = stencilFunc;
-					currentStencilRef  = stencilRef;
+					currentStencilRef = stencilRef;
 					currentStencilFuncMask = stencilMask;
 
 				}
@@ -254,9 +260,9 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 				     currentStencilZFail !== stencilZFail ||
 				     currentStencilZPass !== stencilZPass ) {
 
-					gl.stencilOp( stencilFail,  stencilZFail, stencilZPass );
+					gl.stencilOp( stencilFail, stencilZFail, stencilZPass );
 
-					currentStencilFail  = stencilFail;
+					currentStencilFail = stencilFail;
 					currentStencilZFail = stencilZFail;
 					currentStencilZPass = stencilZPass;
 
@@ -336,6 +342,9 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 
+	var version = parseFloat( /^WebGL\ ([0-9])/.exec( gl.getParameter( gl.VERSION ) )[ 1 ] );
+	var lineWidthAvailable = parseFloat( version ) >= 1.0;
+
 	var currentTextureSlot = null;
 	var currentBoundTextures = {};
 
@@ -369,9 +378,9 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	function init() {
 
-		clearColor( 0, 0, 0, 1 );
-		clearDepth( 1 );
-		clearStencil( 0 );
+		colorBuffer.setClear( 0, 0, 0, 1 );
+		depthBuffer.setClear( 1 );
+		stencilBuffer.setClear( 0 );
 
 		enable( gl.DEPTH_TEST );
 		setDepthFunc( LessEqualDepth );
@@ -509,8 +518,6 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		} else {
 
 			disable( gl.BLEND );
-			currentBlending = blending; // no blending, that is
-			return;
 
 		}
 
@@ -728,7 +735,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 		if ( width !== currentLineWidth ) {
 
-			gl.lineWidth( width );
+			if ( lineWidthAvailable ) gl.lineWidth( width );
 
 			currentLineWidth = width;
 
@@ -852,26 +859,6 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	}
 
-	// TODO Deprecate
-
-	function clearColor( r, g, b, a ) {
-
-		colorBuffer.setClear( r, g, b, a );
-
-	}
-
-	function clearDepth( depth ) {
-
-		depthBuffer.setClear( depth );
-
-	}
-
-	function clearStencil( stencil ) {
-
-		stencilBuffer.setClear( stencil );
-
-	}
-
 	//
 
 	function scissor( scissor ) {
@@ -970,10 +957,6 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		bindTexture: bindTexture,
 		compressedTexImage2D: compressedTexImage2D,
 		texImage2D: texImage2D,
-
-		clearColor: clearColor,
-		clearDepth: clearDepth,
-		clearStencil: clearStencil,
 
 		scissor: scissor,
 		viewport: viewport,

@@ -226,7 +226,7 @@
 		<script>
 
 			function extractQuery() {
-				var p = window.location.search.indexOf( '?q=' )
+				var p = window.location.search.indexOf( '?q=' );
 				if( p !== -1 ) {
 					return window.location.search.substr( 3 );
 				} 
@@ -284,7 +284,7 @@
 								goTo( s, c, p );
 								e.preventDefault();
 							} )
-						} )( section, category, page[ 0 ] )
+						} )( section, category, page[ 0 ] );
 						a.textContent = page[ 0 ];
 						li.appendChild( a );
 						ul.appendChild( li );
@@ -306,7 +306,7 @@
 
 			}
 
-			panel.appendChild( content )
+			panel.appendChild( content );
 
 			function layoutList() {
 
@@ -315,7 +315,6 @@
 					Array.prototype.slice.apply( el.children ).forEach( function( item ) {
 						if( !item.classList.contains( 'filtered' ) ) {
 							collapsed = false;
-							return;
 						}
 					} );
 					if( collapsed ) {
@@ -344,7 +343,7 @@
 				} else {
 					window.history.replaceState( {} , '', window.location.pathname );
 				}
-				if( selected ) window.location.hash = selected
+				if( selected ) window.location.hash = selected;
 
 				var exp = new RegExp( filterInput.value, 'gi' );
 				for( var j in nameCategoryMap ) {
@@ -387,7 +386,7 @@
 
 					// Resolve links of the form 'Class.member'
 					if(section.indexOf(MEMBER_DELIMITER) !== -1) {
-						parts = section.split(MEMBER_DELIMITER)
+						parts = section.split(MEMBER_DELIMITER);
 						section = parts[0];
 						member = parts[1];
 					}
@@ -401,7 +400,7 @@
 
 				var title = 'three.js - documentation - ' + section + ' - ' + name;
 				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name) + (!!member ? MEMBER_DELIMITER + encodeUrl(member) : '');
-				selected = url
+				selected = url;
 
 				window.location.hash = url;
 				window.document.title = title;
@@ -415,7 +414,7 @@
 			function goToHash() {
 
 				var hash = window.location.hash.substring( 1 ).split(DELIMITER);
-				var member = hash[2].split(MEMBER_DELIMITER)
+				var member = hash[2].split(MEMBER_DELIMITER);
 				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(member[0]), decodeUrl(member.length > 1 ? member[1] : '') );
 
 			}
@@ -435,7 +434,7 @@
 				'                                         \\/____/\\/_____/'
 			].join('\n'));
 
-			filterInput.value = extractQuery()
+			filterInput.value = extractQuery();
 			updateFilter( )
 
 		</script>

@@ -346,7 +346,7 @@ THREE.Projector = function () {
 			_object.object = object;
 
 			_vector3.setFromMatrixPosition( object.matrixWorld );
-			_vector3.applyProjection( _viewProjectionMatrix );
+			_vector3.applyMatrix4( _viewProjectionMatrix );
 			_object.z = _vector3.z;
 			_object.renderOrder = object.renderOrder;
 
@@ -444,9 +444,9 @@ THREE.Projector = function () {
 
 						if ( groups.length > 0 ) {
 
-							for ( var o = 0; o < groups.length; o ++ ) {
+							for ( var g = 0; g < groups.length; g ++ ) {
 
-								var group = groups[ o ];
+								var group = groups[ g ];
 
 								for ( var i = group.start, l = group.start + group.count; i < l; i += 3 ) {
 

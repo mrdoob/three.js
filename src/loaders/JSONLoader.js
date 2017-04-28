@@ -6,7 +6,7 @@ import { Color } from '../math/Color';
 import { Vector2 } from '../math/Vector2';
 import { Face3 } from '../core/Face3';
 import { Geometry } from '../core/Geometry';
-import { XHRLoader } from './XHRLoader';
+import { FileLoader } from './FileLoader';
 import { DefaultLoadingManager } from './LoadingManager';
 
 /**
@@ -37,7 +37,7 @@ Object.assign( JSONLoader.prototype, {
 
 		var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : Loader.prototype.extractUrlBase( url );
 
-		var loader = new XHRLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 

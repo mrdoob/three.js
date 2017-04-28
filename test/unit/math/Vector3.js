@@ -344,3 +344,36 @@ test( "equals", function() {
 	ok( a.equals( b ), "Passed!" );
 	ok( b.equals( a ), "Passed!" );
 });
+
+test( "applyMatrix4", function() {
+
+	var a = new THREE.Vector3( x, y, z );
+	var b = new THREE.Vector4( x, y, z, 1 );
+
+	var m = new THREE.Matrix4().makeRotationX( Math.PI );
+	a.applyMatrix4( m );
+	b.applyMatrix4( m );
+	ok( a.x == b.x / b.w, "Passed!" );
+	ok( a.y == b.y / b.w, "Passed!" );
+	ok( a.z == b.z / b.w, "Passed!" );
+
+	m = new THREE.Matrix4().makeTranslation( 3, 2, 1 );
+	a.applyMatrix4( m );
+	b.applyMatrix4( m );
+	ok( a.x == b.x / b.w, "Passed!" );
+	ok( a.y == b.y / b.w, "Passed!" );
+	ok( a.z == b.z / b.w, "Passed!" );
+
+	m = new THREE.Matrix4().set(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 1, 0
+	);
+	a.applyMatrix4( m );
+	b.applyMatrix4( m );
+	ok( a.x == b.x / b.w, "Passed!" );
+	ok( a.y == b.y / b.w, "Passed!" );
+	ok( a.z == b.z / b.w, "Passed!" );
+
+});
