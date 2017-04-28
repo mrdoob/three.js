@@ -688,35 +688,45 @@
 
 		domElement.addEventListener( "mousedown", onPointerDown, false );
 		domElement.addEventListener( "touchstart", onPointerDown, false );
+		domElement.addEventListener( "pointerdown", onPointerDown, false );
 
 		domElement.addEventListener( "mousemove", onPointerHover, false );
 		domElement.addEventListener( "touchmove", onPointerHover, false );
+		domElement.addEventListener( "pointermove", onPointerHover, false );
 
 		domElement.addEventListener( "mousemove", onPointerMove, false );
 		domElement.addEventListener( "touchmove", onPointerMove, false );
-
+		domElement.addEventListener( "pointermove", onPointerMove, false );
+		
 		domElement.addEventListener( "mouseup", onPointerUp, false );
 		domElement.addEventListener( "mouseout", onPointerUp, false );
 		domElement.addEventListener( "touchend", onPointerUp, false );
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
+		domElement.addEventListener( "pointerup", onPointerUp, false );
+		domElement.addEventListener( "pointerout", onPointerUp, false );
 
 		this.dispose = function () {
 
 			domElement.removeEventListener( "mousedown", onPointerDown );
 			domElement.removeEventListener( "touchstart", onPointerDown );
+			domElement.removeEventListener( "pointerdown", onPointerDown );
 
 			domElement.removeEventListener( "mousemove", onPointerHover );
 			domElement.removeEventListener( "touchmove", onPointerHover );
+			domElement.removeEventListener( "pointermove", onPointerHover );
 
 			domElement.removeEventListener( "mousemove", onPointerMove );
 			domElement.removeEventListener( "touchmove", onPointerMove );
+			domElement.removeEventListener( "pointermove", onPointerMove );
 
 			domElement.removeEventListener( "mouseup", onPointerUp );
 			domElement.removeEventListener( "mouseout", onPointerUp );
 			domElement.removeEventListener( "touchend", onPointerUp );
 			domElement.removeEventListener( "touchcancel", onPointerUp );
 			domElement.removeEventListener( "touchleave", onPointerUp );
+			domElement.removeEventListener( "pointerup", onPointerUp );
+			domElement.removeEventListener( "pointerout", onPointerUp );
 
 		};
 
@@ -865,10 +875,10 @@
 
 					event.preventDefault();
 					event.stopPropagation();
-
-					scope.dispatchEvent( mouseDownEvent );
-
+					
 					scope.axis = intersect.object.name;
+					
+					scope.dispatchEvent( mouseDownEvent );				
 
 					scope.update();
 
@@ -903,7 +913,7 @@
 
 		function onPointerMove( event ) {
 
-			if ( scope.object === undefined || scope.axis === null || _dragging === false || ( event.button !== undefined && event.button !== 0 ) ) return;
+			if ( scope.object === undefined || scope.axis === null || _dragging === false ) return;
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
