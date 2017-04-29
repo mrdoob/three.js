@@ -42,9 +42,9 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/lights/RectAreaLightUniformsLib.js"></script>
-
-		<script src="../examples/js/libs/dat.gui.min.js"></script>
-		<script src="../examples/js/controls/OrbitControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 		<script src="js/Detector.js"></script>
 
 		<script>
@@ -53,11 +53,11 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var rnd = new THREE.WebGLRenderer();
-			var cam = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-			var orb = new THREE.OrbitControls( cam, rnd.domElement );
+			var renderer = new THREE.WebGLRenderer();
+			var camera = new THREE.PerspectiveCamera( 34, window.innerWidth / window.innerHeight, 0.1, 20000 );
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-			var scn = new THREE.Scene();
+			var scene = new THREE.Scene();
 			var origin = new THREE.Object3D();
 
 			var matStdParams = {
@@ -84,35 +84,46 @@
 			var rectLightHelper;
 
 			var ray = new THREE.Raycaster();
-			var mouseDown = new THREE.Vector2();
-			var mouse = new THREE.Vector2();
 
-			var gui, guiElements;
 			var param = {};
+			var stats;
+
+			init();
+			animate();
 
 			function init() {
 
-				var gl = rnd.context;
+				var gl = renderer.context;
 
 				// Check for float-RT support
 				// TODO (abelnation): figure out fall-back for float textures
-				if (!gl.getExtension("OES_texture_float")) {
-					alert("OES_texture_float not supported");
-					throw "missing webgl extension";
+
+				if ( ! gl.getExtension( 'OES_texture_float' ) ) {
+
+					alert( 'OES_texture_float not supported' );
+					throw 'missing webgl extension';
+
 				}
 
-				if (!gl.getExtension("OES_texture_float_linear")) {
-					alert("OES_texture_float_linear not supported");
-					throw "missing webgl extension";
+				if ( ! gl.getExtension('OES_texture_float_linear' ) ) {
+
+					alert( 'OES_texture_float_linear not supported' );
+					throw 'missing webgl extension';
+
 				}
 
-				rnd.shadowMap.enabled = true;
-				rnd.shadowMap.type = THREE.PCFSoftShadowMap;
-				rnd.gammaInput = true;
-				rnd.gammaOutput = true;
-				rnd.antialias = true;
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.antialias = true;
+				document.body.appendChild( renderer.domElement );
 
-				cam.position.set( 0, 20, 45 );
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				camera.position.set( 0, 20, 45 );
 
 				rectLight = new THREE.RectAreaLight( 0xffffff, 100, 10, 10 );
 				rectLight.position.set( 5, 5, 0 );
@@ -120,12 +131,12 @@
 				// TODO: ensure RectAreaLight handles target param correctly
 
 				rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
-				scn.add( rectLightHelper );
+				scene.add( rectLightHelper );
 
 				// TODO (abelnation): rect light shadow
 
-				scn.add( cam );
-				scn.add( origin );
+				scene.add( camera );
+				scene.add( origin );
 
 				matStdFloor.color.set( 0x808080 );
 				matStdObjects.color.set( 0xA00000 );
@@ -137,27 +148,23 @@
 
 				mshStdSphere.castShadow = true;
 				mshStdSphere.receiveShadow = true;
-				mshStdSphere.position.set( -5, 5, 0 );
+				mshStdSphere.position.set( - 5, 5, 0 );
 
 				mshStdKnot.position.set( 5, 5, 0 );
 				mshStdKnot.castShadow = true;
 				mshStdKnot.receiveShadow = true;
 
-				scn.add( mshStdFloor );
-				scn.add( mshStdBox );
-				scn.add( mshStdSphere );
-				scn.add( mshStdKnot );
+				scene.add( mshStdFloor );
+				scene.add( mshStdBox );
+				scene.add( mshStdSphere );
+				scene.add( mshStdKnot );
+				scene.add( amb );
+				scene.add( rectLight );
 
-				scn.add( amb );
+				controls.target.copy( mshStdBox.position );
+				controls.update();
 
-				scn.add( rectLight );
-
-				document.body.appendChild( rnd.domElement );
-
-				onResize();
-
-				orb.target.copy( mshStdBox.position );
-				orb.update();
+				buildGui();
 
 				window.addEventListener( 'resize', onResize, false );
 
@@ -165,20 +172,26 @@
 
 			function onResize() {
 
-				rnd.setSize( window.innerWidth, window.innerHeight );
-				cam.aspect = ( window.innerWidth / window.innerHeight );
-				cam.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				camera.aspect = ( window.innerWidth / window.innerHeight );
+				camera.updateProjectionMatrix();
 
 			}
 
-			function tick() {
+			function animate() {
 
-				if ( param.motion )
+				requestAnimationFrame( animate );
+
+				if ( param.motion ) {
+
 					update();
+					rectLightHelper.update();
 
-				render();
+				}
 
-				requestAnimationFrame( tick );
+				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 
@@ -208,22 +221,11 @@
 
 			}
 
-			function clearGui() {
-
-				if ( gui ) gui.destroy();
-
-				gui = new dat.GUI();
-				var gStyle = gui.domElement.style;
-				gStyle.position = "absolute";
-				gStyle.top = "48px";
-
-				gui.open();
-
-			}
 
 			function buildGui() {
 
-				clearGui();
+				var gui = new dat.GUI( { width: 300 } );
+				gui.open();
 
 				param = {
 					motion: true,
@@ -261,13 +263,13 @@
 
 				} );
 
-				lightFolder.add( param, 'intensity', 0.0, 400.0 ).onChange( function ( val ) {
+				lightFolder.add( param, 'intensity', 0.0, 400 ).onChange( function ( val ) {
 
 					rectLight.intensity = val;
 
 				} );
 
-				lightFolder.add( param, 'ambient', 0.0, 0.05 ).onChange( function ( val ) {
+				lightFolder.add( param, 'ambient', 0.0, 1 ).step( 0.01 ).onChange( function ( val ) {
 
 					amb.intensity = val;
 
@@ -289,7 +291,7 @@
 
 				} );
 
-				standardFolder.add( param, 'roughness', 0.0, 1.0 ).onChange( function ( val ) {
+				standardFolder.add( param, 'roughness', 0.0, 1.0 ).step( 0.01 ).onChange( function ( val ) {
 
 					matStdObjects.roughness = val;
 					matStdFloor.roughness = val;
@@ -297,7 +299,7 @@
 				} );
 
 				// TODO (abelnation): use env map to reflect metal property
-				standardFolder.add( param, 'metalness', 0.0, 1.0 ).onChange( function ( val ) {
+				standardFolder.add( param, 'metalness', 0.0, 1.0 ).step( 0.01 ).onChange( function ( val ) {
 
 					matStdObjects.metalness = val;
 					matStdFloor.metalness = val;
@@ -310,10 +312,6 @@
 				// TODO: rect area light decay
 
 			}
-
-			init();
-			buildGui();
-			tick();
 
 		</script>
 	</body>
