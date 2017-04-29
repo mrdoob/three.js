@@ -426,7 +426,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	}
 
-	function enableAttributeAndDivisor( attribute, meshPerAttribute, extension ) {
+	function enableAttributeAndDivisor( attribute, meshPerAttribute ) {
 
 		newAttributes[ attribute ] = 1;
 
@@ -438,6 +438,8 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		}
 
 		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
+
+			var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
 			extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
 			attributeDivisors[ attribute ] = meshPerAttribute;

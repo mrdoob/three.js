@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - glTF</title>
+		<title>three.js webgl - glTF 1.0</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -63,7 +63,7 @@
 	<body>
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> -
-		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> loader
+		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> 1.0 loader
 		<br>
 		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> - COLLADA duck by Sony -
 		Cesium models by <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
@@ -95,7 +95,7 @@
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTF2Loader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
 			var orbitControls = null;
@@ -202,7 +202,7 @@
 					scene.add(ground);
 				}
 
-				loader = new THREE.GLTF2Loader();
+				loader = new THREE.GLTFLoader();
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
@@ -228,7 +228,7 @@
 
 					gltf = data;
 
-					var object = gltf.scene !== undefined ? gltf.scene : gltf.scenes[ 0 ];
+					var object = gltf.scene;
 
 					status.innerHTML = "Load time: " + ( performance.now() - loadStartTime ).toFixed( 2 ) + " ms.";
 

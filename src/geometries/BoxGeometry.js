@@ -1,9 +1,14 @@
 /**
  * @author mrdoob / http://mrdoob.com/
- * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
+
+// BoxGeometry
 
 function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
@@ -28,13 +33,7 @@ function BoxGeometry( width, height, depth, widthSegments, heightSegments, depth
 BoxGeometry.prototype = Object.create( Geometry.prototype );
 BoxGeometry.prototype.constructor = BoxGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
+// BoxBufferGeometry
 
 function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
@@ -195,5 +194,6 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 
 BoxBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 BoxBufferGeometry.prototype.constructor = BoxBufferGeometry;
+
 
 export { BoxGeometry, BoxBufferGeometry };

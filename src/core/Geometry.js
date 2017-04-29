@@ -110,9 +110,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		// rotate geometry around world x-axis
 
-		var m1 = new Matrix4();
+		var m1;
 
 		return function rotateX( angle ) {
+
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationX( angle );
 
@@ -128,9 +130,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		// rotate geometry around world y-axis
 
-		var m1 = new Matrix4();
+		var m1;
 
 		return function rotateY( angle ) {
+
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationY( angle );
 
@@ -146,9 +150,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		// rotate geometry around world z-axis
 
-		var m1 = new Matrix4();
+		var m1;
 
 		return function rotateZ( angle ) {
+
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationZ( angle );
 
@@ -164,9 +170,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		// translate geometry
 
-		var m1 = new Matrix4();
+		var m1;
 
 		return function translate( x, y, z ) {
+
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeTranslation( x, y, z );
 
@@ -182,9 +190,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		// scale geometry
 
-		var m1 = new Matrix4();
+		var m1;
 
 		return function scale( x, y, z ) {
+
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeScale( x, y, z );
 
@@ -198,9 +208,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	lookAt: function () {
 
-		var obj = new Object3D();
+		var obj;
 
 		return function lookAt( vector ) {
+
+			if ( obj === undefined ) obj = new Object3D();
 
 			obj.lookAt( vector );
 
@@ -284,32 +296,28 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		if ( indices !== undefined ) {
+		var groups = geometry.groups;
 
-			var groups = geometry.groups;
+		if ( groups.length > 0 ) {
 
-			if ( groups.length > 0 ) {
+			for ( var i = 0; i < groups.length; i ++ ) {
 
-				for ( var i = 0; i < groups.length; i ++ ) {
+				var group = groups[ i ];
 
-					var group = groups[ i ];
+				var start = group.start;
+				var count = group.count;
 
-					var start = group.start;
-					var count = group.count;
+				for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
+					if ( indices !== undefined ) {
 
 						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex );
 
+					} else {
+
+						addFace( j, j + 1, j + 2, group.materialIndex );
+
 					}
-
-				}
-
-			} else {
-
-				for ( var i = 0; i < indices.length; i += 3 ) {
-
-					addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
 
 				}
 
@@ -317,9 +325,21 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		} else {
 
-			for ( var i = 0; i < positions.length / 3; i += 3 ) {
+			if ( indices !== undefined ) {
 
-				addFace( i, i + 1, i + 2 );
+				for ( var i = 0; i < indices.length; i += 3 ) {
+
+					addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+
+				}
+
+			} else {
+
+				for ( var i = 0; i < positions.length / 3; i += 3 ) {
+
+					addFace( i, i + 1, i + 2 );
+
+				}
 
 			}
 
@@ -965,7 +985,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		var data = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'Geometry',
 				generator: 'Geometry.toJSON'
 			}

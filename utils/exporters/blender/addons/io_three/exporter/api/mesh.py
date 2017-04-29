@@ -134,6 +134,26 @@ def bones(mesh, options):
 
 
 @_mesh
+def buffer_color(mesh, options):
+    """
+
+    :param mesh:
+    :rtype: []
+
+    """
+    colors_ = []
+
+    try:
+        vertex_colors_ = mesh.vertex_colors[0]  # only supports one set
+    except IndexError:
+        return []  # no colors found
+    for color_data in vertex_colors_.data:
+        colors_.extend(tuple(color_data.color))
+
+    return colors_
+
+
+@_mesh
 def buffer_normal(mesh, options):
     """
 

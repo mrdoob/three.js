@@ -369,6 +369,7 @@ class Geometry(base_classes.BaseNode):
         options_vertices = self.options.get(constants.VERTICES)
         option_normals = self.options.get(constants.NORMALS)
         option_uvs = self.options.get(constants.UVS)
+        option_colors = self.options.get(constants.COLORS)
         option_extra_vgroups = self.options.get(constants.EXTRA_VGROUPS)
         option_index_type = self.options.get(constants.INDEX_TYPE)
 
@@ -380,7 +381,9 @@ class Geometry(base_classes.BaseNode):
                      lambda m: api.mesh.buffer_uv(m, layer=1), 2)
         normals_tuple = (constants.NORMAL, option_normals,
                          lambda m: api.mesh.buffer_normal(m, self.options), 3)
-        dispatch = (pos_tuple, uvs_tuple, uvs2_tuple, normals_tuple)
+        colors_tuple = (constants.COLOR, option_colors,
+                        lambda m: api.mesh.buffer_color(m, self.options), 3)
+        dispatch = (pos_tuple, uvs_tuple, uvs2_tuple, normals_tuple, colors_tuple)
 
         for key, option, func, size in dispatch:
 

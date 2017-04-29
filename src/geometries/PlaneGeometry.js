@@ -1,9 +1,13 @@
 /**
  * @author mrdoob / http://mrdoob.com/
- * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+
+// PlaneGeometry
 
 function PlaneGeometry( width, height, widthSegments, heightSegments ) {
 
@@ -19,21 +23,14 @@ function PlaneGeometry( width, height, widthSegments, heightSegments ) {
 	};
 
 	this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
+	this.mergeVertices();
 
 }
 
 PlaneGeometry.prototype = Object.create( Geometry.prototype );
 PlaneGeometry.prototype.constructor = PlaneGeometry;
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- *
- * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
+// PlaneBufferGeometry
 
 function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 
@@ -121,5 +118,6 @@ function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 
 PlaneBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 PlaneBufferGeometry.prototype.constructor = PlaneBufferGeometry;
+
 
 export { PlaneGeometry, PlaneBufferGeometry };

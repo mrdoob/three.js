@@ -37,9 +37,6 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/loaders/collada/Animation.js"></script>
-		<script src="js/loaders/collada/AnimationHandler.js"></script>
-		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -48,7 +45,10 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var stats, clock;
-			var scene, camera, renderer;
+			var scene, camera, renderer, mixer;
+
+			init();
+			animate();
 
 			function init() {
 
@@ -74,41 +74,21 @@
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				//
+				// create a keyframe track (i.e. a timed sequence of keyframes) for each animated property
 
-				var animationData = {
-					"name"      : "Action",
-					"fps"       : 25,
-					"length"    : 2.0,
-					"hierarchy" : [
-						{
-							"parent" : -1, //root
-							"keys"   : [
-								{
-									"time": 0,
-									"pos" : [ 0, 0, 0 ],
-									"rot" : [ 0, 0, 0, 0 ],
-									"scl" : [ 1, 1, 1 ]
-								},
-								{
-									"time": 1.0,
-									"pos" : [ 30, 0, 0 ],
-									"scl" : [ 2, 2, 2 ]
-								}
-								,
-								{
-									"time": 2.0,
-									"pos" : [ 0, 0, 0 ]
-								}
-							]
-						}
-					]
-				};
+				var tracks = [];
 
-				ensureLoop( animationData );
+				tracks.push( new THREE.NumberKeyframeTrack( '.position', [ 0, 1, 2 ], [  0, 0, 0, 30, 0, 0, 0, 0, 0 ] ) );
+				tracks.push( new THREE.NumberKeyframeTrack( '.scale', [ 0, 1, 2 ], [  1, 1, 1, 2, 2, 2, 1, 1, 1 ] ) );
 
-				var animation = new THREE.Animation( mesh, animationData );
-				animation.play();
+				// create an animation sequence with the tracks
+
+				var clip = new THREE.AnimationClip( 'Action', -1, tracks );
+
+				// setup the mixer and play the animation sequence
+
+				mixer = new THREE.AnimationMixer( mesh );
+				mixer.clipAction( clip ).play();
 
 				//
 
@@ -142,30 +122,9 @@
 
 			};
 
-			var ensureLoop = function( animation ) {
-
-				for ( var i = 0; i < animation.hierarchy.length; i ++ ) {
-
-					var obj = animation.hierarchy[ i ];
-
-					var first = obj.keys[ 0 ];
-					var last = obj.keys[ obj.keys.length - 1 ];
-
-					last.pos = first.pos;
-					last.rot = first.rot;
-					last.scl = first.scl;
-
-				}
-
-			};
-
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				var delta = clock.getDelta();
-
-				THREE.AnimationHandler.update( delta );
 
 				render();
 
@@ -173,13 +132,19 @@
 
 			function render() {
 
+				var delta = clock.getDelta();
+
+				if ( mixer ) {
+
+					mixer.update( delta );
+
+				}
+
 				renderer.render( scene, camera );
+
 				stats.update();
 
 			};
-
-			init();
-			animate();
 
 		</script>
 

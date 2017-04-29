@@ -62,8 +62,8 @@ HemisphereLightHelper.prototype.update = function () {
 
 		var colors = mesh.geometry.getAttribute( 'color' );
 
-		color1.copy( this.light.color ).multiplyScalar( this.light.intensity );
-		color2.copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
+		color1.copy( this.light.color );
+		color2.copy( this.light.groundColor );
 
 		for ( var i = 0, l = colors.count; i < l; i ++ ) {
 

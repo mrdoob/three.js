@@ -1,8 +1,15 @@
 /**
  * @author Kaleb Murphy
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector2 } from '../math/Vector2';
+import { Vector3 } from '../math/Vector3';
+
+// RingGeometry
 
 function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
@@ -20,20 +27,14 @@ function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, the
 	};
 
 	this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
+	this.mergeVertices();
 
 }
 
 RingGeometry.prototype = Object.create( Geometry.prototype );
 RingGeometry.prototype.constructor = RingGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector2 } from '../math/Vector2';
-import { Vector3 } from '../math/Vector3';
+// RingBufferGeometry
 
 function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
@@ -146,5 +147,6 @@ function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegment
 
 RingBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 RingBufferGeometry.prototype.constructor = RingBufferGeometry;
+
 
 export { RingGeometry, RingBufferGeometry };

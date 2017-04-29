@@ -75,7 +75,10 @@ Object.assign( Matrix4.prototype, {
 		var te = this.elements;
 		var me = m.elements;
 
-		for ( var i = 0; i < 16; i ++ ) te[ i ] = me[ i ];
+		te[ 0 ] = me[ 0 ]; te[ 1 ] = me[ 1 ]; te[ 2 ] = me[ 2 ]; te[ 3 ] = me[ 3 ];
+		te[ 4 ] = me[ 4 ]; te[ 5 ] = me[ 5 ]; te[ 6 ] = me[ 6 ]; te[ 7 ] = me[ 7 ];
+		te[ 8 ] = me[ 8 ]; te[ 9 ] = me[ 9 ]; te[ 10 ] = me[ 10 ]; te[ 11 ] = me[ 11 ];
+		te[ 12 ] = me[ 12 ]; te[ 13 ] = me[ 13 ]; te[ 14 ] = me[ 14 ]; te[ 15 ] = me[ 15 ];
 
 		return this;
 
@@ -118,9 +121,11 @@ Object.assign( Matrix4.prototype, {
 
 	extractRotation: function () {
 
-		var v1 = new Vector3();
+		var v1;
 
 		return function extractRotation( m ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			var te = this.elements;
 			var me = m.elements;
@@ -279,7 +284,7 @@ Object.assign( Matrix4.prototype, {
 
 		var te = this.elements;
 
-		var x = q.x, y = q.y, z = q.z, w = q.w;
+		var x = q._x, y = q._y, z = q._z, w = q._w;
 		var x2 = x + x, y2 = y + y, z2 = z + z;
 		var xx = x * x2, xy = x * y2, xz = x * z2;
 		var yy = y * y2, yz = y * z2, zz = z * z2;
@@ -314,11 +319,17 @@ Object.assign( Matrix4.prototype, {
 
 	lookAt: function () {
 
-		var x = new Vector3();
-		var y = new Vector3();
-		var z = new Vector3();
+		var x, y, z;
 
 		return function lookAt( eye, target, up ) {
+
+			if ( x === undefined ) {
+
+				x = new Vector3();
+				y = new Vector3();
+				z = new Vector3();
+
+			}
 
 			var te = this.elements;
 
@@ -431,9 +442,11 @@ Object.assign( Matrix4.prototype, {
 
 	applyToBufferAttribute: function () {
 
-		var v1 = new Vector3();
+		var v1;
 
 		return function applyToBufferAttribute( attribute ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
@@ -751,10 +764,16 @@ Object.assign( Matrix4.prototype, {
 
 	decompose: function () {
 
-		var vector = new Vector3();
-		var matrix = new Matrix4();
+		var vector, matrix;
 
 		return function decompose( position, quaternion, scale ) {
+
+			if ( vector === undefined ) {
+
+				vector = new Vector3();
+				matrix = new Matrix4();
+
+			}
 
 			var te = this.elements;
 
@@ -764,18 +783,14 @@ Object.assign( Matrix4.prototype, {
 
 			// if determine is negative, we need to invert one scale
 			var det = this.determinant();
-			if ( det < 0 ) {
-
-				sx = - sx;
-
-			}
+			if ( det < 0 ) sx = - sx;
 
 			position.x = te[ 12 ];
 			position.y = te[ 13 ];
 			position.z = te[ 14 ];
 
 			// scale the rotation part
-			for ( var i = 0; i < 16; i ++ ) matrix.elements[ i ] = this.elements[ i ]; // at this point matrix is incomplete so we can't use .copy()
+			matrix.copy( this );
 
 			var invSX = 1 / sx;
 			var invSY = 1 / sy;
@@ -870,7 +885,7 @@ Object.assign( Matrix4.prototype, {
 
 		if ( offset === undefined ) offset = 0;
 
-		for( var i = 0; i < 16; i ++ ) {
+		for ( var i = 0; i < 16; i ++ ) {
 
 			this.elements[ i ] = array[ i + offset ];
 
@@ -897,8 +912,8 @@ Object.assign( Matrix4.prototype, {
 		array[ offset + 6 ] = te[ 6 ];
 		array[ offset + 7 ] = te[ 7 ];
 
-		array[ offset + 8 ]  = te[ 8 ];
-		array[ offset + 9 ]  = te[ 9 ];
+		array[ offset + 8 ] = te[ 8 ];
+		array[ offset + 9 ] = te[ 9 ];
 		array[ offset + 10 ] = te[ 10 ];
 		array[ offset + 11 ] = te[ 11 ];
 

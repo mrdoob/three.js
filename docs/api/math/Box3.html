@@ -112,6 +112,15 @@
 		Returns true if this box and [page:Box3 box] share the same lower and upper bounds.
 		</div>
 
+		<h3>[method:Box3 expandByObject]( [page:Object3D object] )</h3>
+		<div>
+		[page:Object3D object] - [page:Object3D] to expand the box by.<br /><br />
+
+		Expands the boundaries of this box to include [page:Object3D object] and its children,
+		accounting for the object's, and children's, world transforms.
+
+		</div>
+
 		<h3>[method:Box3 expandByPoint]( [page:Vector3 point] )</h3>
 		<div>
 		[page:Vector3 point] - [page:Vector3] that should be included in the box.<br /><br />
@@ -255,7 +264,8 @@
 		[page:Object3D object] - [page:Object3D] to compute the bounding box of.<br /><br />
 
 		Computes the world-axis-aligned bounding box of an [page:Object3D] (including its children),
-		accounting for the world transforms of both the object and its childrens.
+		accounting for the object's, and children's, world transforms.
+
 		</div>
 
 		<h3>[method:Box3 setFromPoints]( [page:Array points] )</h3>
