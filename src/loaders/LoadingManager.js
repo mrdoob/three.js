@@ -13,6 +13,8 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	this.onProgress = onProgress;
 	this.onError = onError;
 
+	this.resourceTransform = undefined;
+
 	this.itemStart = function ( url ) {
 
 		itemsTotal ++;
@@ -62,6 +64,24 @@ function LoadingManager( onLoad, onProgress, onError ) {
 			scope.onError( url );
 
 		}
+
+	};
+
+	this.resolveResourceURL = function ( url ) {
+
+		if ( this.resourceTransform ) {
+
+			return this.resourceTransform( url );
+
+		}
+
+		return url;
+
+	};
+
+	this.setResourceTransform = function ( transform ) {
+
+		this.resourceTransform = transform;
 
 	};
 
