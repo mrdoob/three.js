@@ -54,7 +54,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var renderer = new THREE.WebGLRenderer();
-			var camera = new THREE.PerspectiveCamera( 34, window.innerWidth / window.innerHeight, 0.1, 20000 );
+			var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 			var scene = new THREE.Scene();
