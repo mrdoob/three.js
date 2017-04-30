@@ -1430,7 +1430,8 @@ THREE.GLTF2Loader = ( function () {
 
 							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : THREE.UnsignedByteType;
 
-							var sampler = texture.sampler === undefined ? {} : json.samplers[ texture.sampler ];
+							var samplers = json.samplers || {};
+							var sampler = samplers[ texture.sampler ] || {};
 
 							_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
 							_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.NearestMipMapLinearFilter;
