@@ -1,0 +1,230 @@
+/**
+ * @author bhouston / http://clara.io
+ * @author WestLangley
+ *
+ * Primary theory reference:
+ *   https://graphics.stanford.edu/papers/envmap/envmap.pdf
+ *
+ * Good secondary references:
+ *   http://www1.cs.columbia.edu/~cs4162/slides/spherical-harmonic-lighting.pdf
+ *   http://www.ppsloan.org/publications/StupidSH36.pdf
+ *   http://www.sunandblackcat.com/tipFullView.php?l=eng&topicid=32
+ */
+
+
+// The 3 in the name refernces to this structure storing the first 3 bands of the harmonics in 9 coefficients.
+THREE.SphericalHarmonics3 = function () {
+
+	this.coefficients = [];
+
+	for( var i = 0; i < 9; i ++ ) {
+		this.coefficients.push( new THREE.Color() );
+	}
+
+};
+
+// constants to convert from radiance to hemispheric irradiance
+// source: https://graphics.stanford.edu/papers/envmap/envmap.pdf
+THREE.SphericalHarmonics3.C1 = 0.429043;
+THREE.SphericalHarmonics3.C2 = 0.511664;
+THREE.SphericalHarmonics3.C3 = 0.743125;
+THREE.SphericalHarmonics3.C4 = 0.886227;
+THREE.SphericalHarmonics3.C5 = 0.247708;
+
+THREE.SphericalHarmonics3.prototype = {
+
+	constructor: THREE.SphericalHarmonics3,
+
+	zero: function () {
+
+		for( var i = 0; i < 9; i ++ ) {
+			this.coefficients[i].setRGB( 0, 0, 0 );
+		}
+
+		return this;
+
+	},
+
+	set: function ( coefficients ) {
+
+		for( var i = 0; i < 9; i ++ ) {
+			this.coefficients[i].copy( coefficients[i] );
+		}
+
+		return this;
+
+	},
+
+	// adds color contribution in normal direction to the SH coefficients.
+	addAt: function( normal, color ) {
+
+		// based on sphericalHarmonicsEvaluateDirection from:
+		//    http://www.sunandblackcat.com/tipFullView.php?l=eng&topicid=32
+	   var p_0_0 = 0.282094791773878140;
+	   var p_1_0 = 0.488602511902919920 * dir.z;
+	   var p_1_1 = -0.488602511902919920;
+	   var p_2_0 = 0.946174695757560080 * dir.z * dir.z - 0.315391565252520050;
+	   var p_2_1 = -1.092548430592079200 * dir.z;
+	   var p_2_2 = 0.546274215296039590;
+
+	   this.coefficients[0].addScale( color, p_0_0 );
+	   this.coefficients[1].addScale( color, p_1_1 * dir.y );
+	   this.coefficients[2].addScale( color, p_1_0 );
+	   this.coefficients[3].addScale( color, p_1_1 * dir.x );
+	   this.coefficients[4].addScale( color, p_2_2 * (dir.x * dir.y + dir.y * dir.x) );
+	   this.coefficients[5].addScale( color, p_2_1 * dir.y );
+	   this.coefficients[6].addScale( color, p_2_0 );
+	   this.coefficients[7].addScale( color, p_2_1 * dir.x );
+	   this.coefficients[8].addScale( color, p_2_2 * (dir.x * dir.x - dir.y * dir.y) );
+
+	},
+
+	copy: function ( sh ) {
+
+		return this.set( sh.coefficients );
+
+	},
+
+	// get the radiance
+	// normal is assumed to be unit length!
+	getAt: function( normal, optionalResult ) {
+
+		var result = optionalResult || new THREE.Color();
+
+		var x = normal.x, y = normal.y, z = normal.z;
+		var coeff = this.coefficients;
+
+		// band 0
+		result.copy( coeff[0] );
+
+		// band 1
+		result.addScale( coeff[1], y );
+		result.addScale( coeff[2], z );
+		result.addScale( coeff[3], x );
+
+		// band 2
+		result.addScale( coeff[4], x*y );
+		result.addScale( coeff[5], y*z );
+		result.addScale( coeff[6], 3.0 * z*z - 1.0 );
+		result.addScale( coeff[7], x*z );
+		result.addScale( coeff[8], ( x*x - y*y ) );
+
+		return result;
+	},
+
+	// get the irradiance (radiance convolved with hermispheric smooth lobe)
+	// normal is assumed to be unit length!
+	getIrradianceAt: function( normal, optionalResult ) {
+
+		var result = optionalResult || new THREE.Color();
+
+		var x = normal.x, y = normal.y, z = normal.z;
+		var coeff = this.coefficients;
+		var c = THREE.SphericalHarmonics3;
+
+		// band 0
+		result.copy( coeff[0] );
+		result.multiplyScalar( c.C4 );
+
+		// band 1
+		result.addScale( coeff[1], 2.0 * c.C2 * y );
+		result.addScale( coeff[2], 2.0 * c.C2 * z );
+		result.addScale( coeff[3], 2.0 * c.C2 * x );
+
+		// band 2
+		result.addScale( coeff[4], 2.0 * c.C1 * x*y );
+		result.addScale( coeff[5], 2.0 * c.C1 * y*z );
+		result.addScale( coeff[6], c.C3 * z*z - c.C5 );
+		result.addScale( coeff[7], 2.0 * c.C1 * x*z );
+		result.addScale( coeff[8], c.C1 * ( x*x - y*y ) );
+
+		return result;
+	},
+
+	add: function( other ) {
+
+		for( var i = 0; i < 9; i ++ ) {
+			this.coefficients[i].add( other.coefficients[i] );
+		}
+
+		return this;
+	},
+
+
+	scale: function( s ) {
+
+		for( var i = 0; i < 9; i ++ ) {
+			this.coefficients[i].multiplyScalar( s );
+		}
+
+		return this;
+	},
+
+	lerp: function( other, alpha ) {
+
+		for( var i = 0; i < 9; i ++ ) {
+			this.coefficients[i].lerp( other.coefficients[i], alpha );
+		}
+
+		return this;
+
+	},
+
+	equals: function ( other ) {
+
+		for( var i = 0; i < 9; i ++ ) {
+			if( ! this.coefficients[i].equals( other.coefficients[i] ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	},
+
+	clone: function () {
+
+		return new THREE.SphericalHarmonics3().copy( this );
+
+	}
+
+};
+
+//
+// Debevec's light probe gallery examples.  Source: http://www.yaldex.com/open-gl/ch12lev1sec3.html
+//
+
+THREE.SphericalHarmonics3.EucalyptusGroove = new THREE.SphericalHarmoncs3().set(
+    new THREE.Color( 0.3783264,  0.4260425,  0.4504587),
+    new THREE.Color( 0.2887813,  0.3586803,  0.4147053),
+    new THREE.Color( 0.0379030,  0.0295216,  0.0098567),
+    new THREE.Color(-0.1033028, -0.1031690, -0.0884924),
+    new THREE.Color(-0.0621750, -0.0554432, -0.0396779),
+    new THREE.Color( 0.0077820, -0.0148312, -0.0471301),
+    new THREE.Color(-0.0935561, -0.1254260, -0.1525629),
+    new THREE.Color(-0.0572703, -0.0502192, -0.0363410),
+    new THREE.Color( 0.0203348, -0.0044201, -0.0452180)
+);
+
+THREE.SphericalHarmonics3.FunstoneBeachSunset = new THREE.SphericalHarmoncs3().set(
+    new THREE.Color( 0.6841148,  0.6929004,  0.7069543),
+    new THREE.Color( 0.3173355,  0.3694407,  0.4406839),
+    new THREE.Color(-0.1747193, -0.1737154, -0.1657420),
+    new THREE.Color(-0.4496467, -0.4155184, -0.3416573),
+    new THREE.Color(-0.1690202, -0.1703022, -0.1525870),
+    new THREE.Color(-0.0837808, -0.0940454, -0.1027518),
+    new THREE.Color(-0.0319670, -0.0214051, -0.0147691),
+    new THREE.Color( 0.1641816,  0.1377558,  0.1010403),
+    new THREE.Color( 0.3697189,  0.3097930,  0.2029923)
+);
+
+THREE.SphericalHarmonics3.GalileoTomb = new THREE.SphericalHarmoncs3().set(
+    new THREE.Color( 1.0351604,  0.7603549,  0.7074635),
+    new THREE.Color( 0.4442150,  0.3430402,  0.3403777),
+    new THREE.Color(-0.2247797, -0.1828517, -0.1705181),
+    new THREE.Color( 0.7110400,  0.5423169,  0.5587956),
+    new THREE.Color( 0.6430452,  0.4971454,  0.5156357),
+    new THREE.Color(-0.1150112, -0.0936603, -0.0839287),
+    new THREE.Color(-0.3742487, -0.2755962, -0.2875017),
+    new THREE.Color(-0.1694954, -0.1343096, -0.1335315),
+    new THREE.Color( 0.5515260,  0.4222179,  0.4162488)
+);
