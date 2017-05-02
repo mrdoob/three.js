@@ -28,15 +28,21 @@ Object.assign( Clock.prototype, {
 
 	stop: function () {
 
-		this.getElapsedTime();
+		this.updateElapsedTime();
 		this.running = false;
 
 	},
 
 	getElapsedTime: function () {
 
-		this.getDelta();
+		this.updateElapsedTime();
 		return this.elapsedTime;
+
+	},
+
+	updateElapsedTime: function () {
+
+		this.elapsedTime += this.getDelta();
 
 	},
 
@@ -57,8 +63,6 @@ Object.assign( Clock.prototype, {
 
 			diff = ( newTime - this.oldTime ) / 1000;
 			this.oldTime = newTime;
-
-			this.elapsedTime += diff;
 
 		}
 
