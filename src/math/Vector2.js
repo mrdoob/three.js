@@ -395,6 +395,12 @@ Object.assign( Vector2.prototype, {
 		return dx * dx + dy * dy;
 
 	},
+	
+	angleTo : function( v, signed ) {
+		
+		return Math.atan2( this.x * v.y - this.y * v.x, this.dot( v ) );
+		
+	};
 
 	distanceToManhattan: function ( v ) {
 
