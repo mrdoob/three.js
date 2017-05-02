@@ -22,26 +22,53 @@ var SceneUtils = {
 
 	},
 
-	detach: function ( child, parent, scene ) {
 
-		child.applyMatrix( parent.matrixWorld );
-		parent.remove( child );
-		scene.add( child );
+	updateMatrixWorldOfAncestors: function ( obj ) {
+
+		var ancestors = [];
+
+		for ( var a = obj; a !== null; a = a.parent) ancestors.push( a );
+
+		for ( var a = ancestors.pop() ; a !== undefined ; a = ancestors.pop() ){
+
+			a.matrix.compose( a.position, a.quaternion, a.scale );
+
+			if ( a.parent === null) a.matrixWorld.copy ( a.matrix );
+
+			if ( a.parent !== null) a.matrixWorld.multiplyMatrices( a.parent.matrixWorld, a.matrix );
+
+		}
 
 	},
 
-	attach: function ( child, scene, parent ) {
+	detach: function ( child ) {
 
-		var matrixWorldInverse = new Matrix4();
-		matrixWorldInverse.getInverse( parent.matrixWorld );
-		child.applyMatrix( matrixWorldInverse );
+		if (child.parent == null) return;
 
-		scene.remove( child );
-		parent.add( child );
+		SceneUtils.updateMatrixWorldOfAncestors( child );
+		
+		child.matrix.copy( child.matrixWorld );
+
+		child.matrix.decompose( child.position, child.quaternion, child.scale );
+
+		child.parent.remove( child )
+	
+	},
+
+	attach: function ( child, parent ) {
+
+		SceneUtils.updateMatrixWorldOfAncestors( child );
+
+		SceneUtils.updateMatrixWorldOfAncestors( parent );
+
+		child.matrix.getInverse( parent.matrixWorld ).multiply( child.matrixWorld  );
+		 
+		child.matrix.decompose( child.position, child.quaternion, child.scale );
+
+		parent.add( child )
 
 	}
 
-};
-
+}
 
 export { SceneUtils };
