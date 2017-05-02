@@ -471,7 +471,7 @@ Object.assign( Ray.prototype, {
 			}
 
 			diff.subVectors( this.origin, a );
-			var DdQxE2 = sign * this.direction.dot( edge2.crossVectors( diff, edge2 ) );
+			var DdQxE2 = sign * this.direction.dot( edge2.cross( diff ) );
 
 			// b1 < 0, no intersection
 			if ( DdQxE2 < 0 ) {
