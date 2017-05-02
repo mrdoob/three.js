@@ -404,6 +404,8 @@ function WebGLRenderer( parameters ) {
 
 		this.setSize( _viewport.z, _viewport.w, false );
 
+		this.setSize( _width, _height, false );
+		
 	};
 
 	this.getSize = function () {
