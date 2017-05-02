@@ -43,6 +43,7 @@ import { OrthographicCamera } from '../cameras/OrthographicCamera';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { Scene } from '../scenes/Scene';
 import { Texture } from '../textures/Texture';
+import { CubeTexture } from '../textures/CubeTexture';
 import { ImageLoader } from './ImageLoader';
 import { LoadingManager, DefaultLoadingManager } from './LoadingManager';
 import { AnimationClip } from '../animation/AnimationClip';
@@ -471,22 +472,41 @@ Object.assign( ObjectLoader.prototype, {
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-				var data = json[ i ];
+				var data = json[ i ], texture;
 
-				if ( data.image === undefined ) {
+				if ( data.images !== undefined ) {
+
+					texture = new CubeTexture( data.images.map( function ( image ) {
+
+						if ( images[ image ] === undefined ) {
+
+							console.warn( 'THREE.ObjectLoader: Undefined cube image', image );
+
+						}
+
+						return images[ image ];
+
+					} ) );
+
+				} else if ( data.image !== undefined ) {
+
+					if ( images[ data.image ] === undefined ) {
+
+						console.warn( 'THREE.ObjectLoader: Undefined image', data.image );
+
+					}
+
+					texture = new Texture( images[ data.image ] );
+
+				} else {
 
 					console.warn( 'THREE.ObjectLoader: No "image" specified for', data.uuid );
 
-				}
-
-				if ( images[ data.image ] === undefined ) {
-
-					console.warn( 'THREE.ObjectLoader: Undefined image', data.image );
+					texture = new Texture();
 
 				}
 
-				var texture = new Texture( images[ data.image ] );
-				texture.needsUpdate = true;
+				if ( texture.image !== undefined ) texture.needsUpdate = true;
 
 				texture.uuid = data.uuid;
 

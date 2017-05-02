@@ -121,7 +121,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		}
 
-		function getDataURL( image ) {
+		function getDataURL ( image ) {
 
 			var canvas;
 
@@ -151,6 +151,27 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		}
 
+		function getImageId ( image ) {
+
+				if ( image.uuid === undefined ) {
+
+					image.uuid = _Math.generateUUID(); // UGH
+
+				}
+
+				if ( meta.images[ image.uuid ] === undefined ) {
+
+					meta.images[ image.uuid ] = {
+						uuid: image.uuid,
+						url: getDataURL( image )
+					};
+
+				}
+
+				return image.uuid;
+
+		}
+
 		var output = {
 			metadata: {
 				version: 4.5,
@@ -172,32 +193,20 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 			anisotropy: this.anisotropy,
 
 			flipY: this.flipY
-		};
 
-		if ( this.image !== undefined ) {
+		};
+		
+		if ( this.images !== undefined ) {
+
+			output.images = this.images.map( getImageId );
+
+		} else if ( this.image !== undefined ) {
 
 			// TODO: Move to THREE.Image
 
-			var image = this.image;
+			output.image = getImageId( this.image );
 
-			if ( image.uuid === undefined ) {
-
-				image.uuid = _Math.generateUUID(); // UGH
-
-			}
-
-			if ( meta.images[ image.uuid ] === undefined ) {
-
-				meta.images[ image.uuid ] = {
-					uuid: image.uuid,
-					url: getDataURL( image )
-				};
-
-			}
-
-			output.image = image.uuid;
-
-		}
+		} 
 
 		meta.textures[ this.uuid ] = output;
 
