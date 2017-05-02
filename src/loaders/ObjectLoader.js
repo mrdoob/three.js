@@ -733,7 +733,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			object.uuid = data.uuid;
 
-			if ( data.name !== undefined ) object.name = data.name;
+			if ( data.name !== undefined ) object.name = data.name; else object.name = object.type; // + " @" + object.id;
 			if ( data.matrix !== undefined ) {
 
 				matrix.fromArray( data.matrix );
