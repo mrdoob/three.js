@@ -137,6 +137,7 @@ Sidebar.Material = function ( editor ) {
 
 	var materialColorRow = new UI.Row();
 	var materialColor = new UI.Color().onChange( update );
+	materialColor.setValue('#ffffff');
 
 	materialColorRow.add( new UI.Text( 'Color' ).setWidth( '90px' ) );
 	materialColorRow.add( materialColor );
