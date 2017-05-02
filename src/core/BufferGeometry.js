@@ -92,6 +92,14 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	},
 
+	removeAttribute: function ( name ) {
+		var i = this.attributesKeys.indexOf ( name );
+		if ( i > -1 ) {
+			this.attributesKeys.splice ( i, 1 );
+		}
+		delete this.attributes[ name ];
+	},
+
 	getAttribute: function ( name ) {
 
 		return this.attributes[ name ];
