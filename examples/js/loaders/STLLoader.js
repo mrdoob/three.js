@@ -212,7 +212,7 @@ THREE.STLLoader.prototype = {
 		while ( ( result = patternFace.exec( data ) ) !== null ) {
 
 			text = result[ 0 ];
-			patternNormal = /normal[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
+			patternNormal = /normal[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]*([eE][\-+]?[0-9]+)?)+/g;
 
 			while ( ( result = patternNormal.exec( text ) ) !== null ) {
 
@@ -222,7 +222,7 @@ THREE.STLLoader.prototype = {
 
 			}
 
-			patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
+			patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]*([eE][\-+]?[0-9]+)?)+/g;
 
 			while ( ( result = patternVertex.exec( text ) ) !== null ) {
 
