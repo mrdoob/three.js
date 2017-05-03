@@ -363,8 +363,27 @@ Object.assign( ObjectLoader.prototype, {
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-				var material = loader.parse( json[ i ] );
-				materials[ material.uuid ] = material;
+				var data = json[ i ];
+
+				if ( data.type === 'MultiMaterial' ) {
+
+					// Deprecated
+
+					var array = [];
+
+					for ( var j = 0; j < data.materials.length; j ++ ) {
+
+						array.push( loader.parse( data.materials[ j ] ) );
+
+					}
+
+					materials[ data.uuid ] = array;
+
+				} else {
+
+					materials[ data.uuid ] = loader.parse( data );
+
+				}
 
 			}
 
@@ -405,6 +424,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			}, undefined, function () {
 
+				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
 
 			} );
@@ -434,32 +454,6 @@ Object.assign( ObjectLoader.prototype, {
 	},
 
 	parseTextures: function ( json, images ) {
-
-		var TextureMapping = {
-			UVMapping: UVMapping,
-			CubeReflectionMapping: CubeReflectionMapping,
-			CubeRefractionMapping: CubeRefractionMapping,
-			EquirectangularReflectionMapping: EquirectangularReflectionMapping,
-			EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-			SphericalReflectionMapping: SphericalReflectionMapping,
-			CubeUVReflectionMapping: CubeUVReflectionMapping,
-			CubeUVRefractionMapping: CubeUVRefractionMapping
-		};
-
-		var TextureWrapping = {
-			RepeatWrapping: RepeatWrapping,
-			ClampToEdgeWrapping: ClampToEdgeWrapping,
-			MirroredRepeatWrapping: MirroredRepeatWrapping
-		};
-
-		var TextureFilter = {
-			NearestFilter: NearestFilter,
-			NearestMipMapNearestFilter: NearestMipMapNearestFilter,
-			NearestMipMapLinearFilter: NearestMipMapLinearFilter,
-			LinearFilter: LinearFilter,
-			LinearMipMapNearestFilter: LinearMipMapNearestFilter,
-			LinearMipMapLinearFilter: LinearMipMapLinearFilter
-		};
 
 		function parseConstant( value, type ) {
 
@@ -498,19 +492,19 @@ Object.assign( ObjectLoader.prototype, {
 
 				if ( data.name !== undefined ) texture.name = data.name;
 
-				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, TextureMapping );
+				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, TEXTURE_MAPPING );
 
 				if ( data.offset !== undefined ) texture.offset.fromArray( data.offset );
 				if ( data.repeat !== undefined ) texture.repeat.fromArray( data.repeat );
 				if ( data.wrap !== undefined ) {
 
-					texture.wrapS = parseConstant( data.wrap[ 0 ], TextureWrapping );
-					texture.wrapT = parseConstant( data.wrap[ 1 ], TextureWrapping );
+					texture.wrapS = parseConstant( data.wrap[ 0 ], TEXTURE_WRAPPING );
+					texture.wrapT = parseConstant( data.wrap[ 1 ], TEXTURE_WRAPPING );
 
 				}
 
-				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TextureFilter );
-				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TextureFilter );
+				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
+				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
 
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
@@ -548,6 +542,28 @@ Object.assign( ObjectLoader.prototype, {
 			function getMaterial( name ) {
 
 				if ( name === undefined ) return undefined;
+
+				if ( Array.isArray( name ) ) {
+
+					var array = [];
+
+					for ( var i = 0, l = name.length; i < l; i ++ ) {
+
+						var uuid = name[ i ];
+
+						if ( materials[ uuid ] === undefined ) {
+
+							console.warn( 'THREE.ObjectLoader: Undefined material', uuid );
+
+						}
+
+						array.push( materials[ uuid ] );
+
+					}
+
+					return array;
+
+				}
 
 				if ( materials[ name ] === undefined ) {
 
@@ -783,6 +799,32 @@ Object.assign( ObjectLoader.prototype, {
 	}()
 
 } );
+
+var TEXTURE_MAPPING = {
+	UVMapping: UVMapping,
+	CubeReflectionMapping: CubeReflectionMapping,
+	CubeRefractionMapping: CubeRefractionMapping,
+	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
+	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
+	SphericalReflectionMapping: SphericalReflectionMapping,
+	CubeUVReflectionMapping: CubeUVReflectionMapping,
+	CubeUVRefractionMapping: CubeUVRefractionMapping
+};
+
+var TEXTURE_WRAPPING = {
+	RepeatWrapping: RepeatWrapping,
+	ClampToEdgeWrapping: ClampToEdgeWrapping,
+	MirroredRepeatWrapping: MirroredRepeatWrapping
+};
+
+var TEXTURE_FILTER = {
+	NearestFilter: NearestFilter,
+	NearestMipMapNearestFilter: NearestMipMapNearestFilter,
+	NearestMipMapLinearFilter: NearestMipMapLinearFilter,
+	LinearFilter: LinearFilter,
+	LinearMipMapNearestFilter: LinearMipMapNearestFilter,
+	LinearMipMapLinearFilter: LinearMipMapLinearFilter
+};
 
 
 export { ObjectLoader };

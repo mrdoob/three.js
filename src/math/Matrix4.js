@@ -121,9 +121,11 @@ Object.assign( Matrix4.prototype, {
 
 	extractRotation: function () {
 
-		var v1 = new Vector3();
+		var v1;
 
 		return function extractRotation( m ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			var te = this.elements;
 			var me = m.elements;
@@ -317,11 +319,17 @@ Object.assign( Matrix4.prototype, {
 
 	lookAt: function () {
 
-		var x = new Vector3();
-		var y = new Vector3();
-		var z = new Vector3();
+		var x, y, z;
 
 		return function lookAt( eye, target, up ) {
+
+			if ( x === undefined ) {
+
+				x = new Vector3();
+				y = new Vector3();
+				z = new Vector3();
+
+			}
 
 			var te = this.elements;
 
@@ -434,9 +442,11 @@ Object.assign( Matrix4.prototype, {
 
 	applyToBufferAttribute: function () {
 
-		var v1 = new Vector3();
+		var v1;
 
 		return function applyToBufferAttribute( attribute ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
@@ -754,10 +764,16 @@ Object.assign( Matrix4.prototype, {
 
 	decompose: function () {
 
-		var vector = new Vector3();
-		var matrix = new Matrix4();
+		var vector, matrix;
 
 		return function decompose( position, quaternion, scale ) {
+
+			if ( vector === undefined ) {
+
+				vector = new Vector3();
+				matrix = new Matrix4();
+
+			}
 
 			var te = this.elements;
 

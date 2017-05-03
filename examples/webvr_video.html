@@ -4,6 +4,8 @@
 		<title>three.js webvr - video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR, origin = https://threejs.org, expires = 2017-05-25 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR" data-expires="2017-05-25" content="Atlrg03BdkeS00YJBz6xcPTMf/Kvm+vc4Mhb0JUzhgCXXe64/YztVsRiOc5dA3OXXPCCaTmY3yVplbeQyGTtmQsAAABKeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUiIsImV4cGlyeSI6MTQ5NTczNjMwN30=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -148,11 +150,11 @@
 				effect.scale = 0; // video doesn't need eye separation
 				effect.setSize( window.innerWidth, window.innerHeight );
 
-				if ( WEBVR.isAvailable() === true ) {
+				WEBVR.getVRDisplay( function ( display ) {
 
-					document.body.appendChild( WEBVR.getButton( effect ) );
+					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
-				}
+				} );
 
 
 				//

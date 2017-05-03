@@ -407,7 +407,8 @@ var Script = function ( editor ) {
 
 		container.setDisplay( '' );
 		codemirror.setValue( source );
-		if (mode === 'json' ) mode = { name: 'javascript', json: true };
+		codemirror.clearHistory();
+		if ( mode === 'json' ) mode = { name: 'javascript', json: true };
 		codemirror.setOption( 'mode', mode );
 
 	} );

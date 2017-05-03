@@ -140,30 +140,6 @@ THREE.VRControls = function ( object, onError ) {
 
 	};
 
-	this.resetPose = function () {
-
-		if ( vrDisplay ) {
-
-			vrDisplay.resetPose();
-
-		}
-
-	};
-
-	this.resetSensor = function () {
-
-		console.warn( 'THREE.VRControls: .resetSensor() is now .resetPose().' );
-		this.resetPose();
-
-	};
-
-	this.zeroSensor = function () {
-
-		console.warn( 'THREE.VRControls: .zeroSensor() is now .resetPose().' );
-		this.resetPose();
-
-	};
-
 	this.dispose = function () {
 
 		vrDisplay = null;

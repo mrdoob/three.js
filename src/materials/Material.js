@@ -52,6 +52,8 @@ function Material() {
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
 
+	this.dithering = false;
+
 	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
@@ -129,7 +131,7 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 		var data = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'Material',
 				generator: 'Material.toJSON'
 			}
@@ -218,6 +220,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		data.skinning = this.skinning;
 		data.morphTargets = this.morphTargets;
 
+		data.dithering = this.dithering;
+
 		// TODO: Copied from Object3D.toJSON
 
 		function extractFromCache( cache ) {
@@ -289,6 +293,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		this.polygonOffset = source.polygonOffset;
 		this.polygonOffsetFactor = source.polygonOffsetFactor;
 		this.polygonOffsetUnits = source.polygonOffsetUnits;
+
+		this.dithering = source.dithering;
 
 		this.alphaTest = source.alphaTest;
 

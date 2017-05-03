@@ -103,6 +103,47 @@ QUnit.test( "identity" , function( assert ) {
 	assert.ok( matrixEquals4( a, b ), "Passed!" );
 });
 
+QUnit.test( "multiplyMatrices" , function ( assert ) {
+	// Reference:
+	//
+	// #!/usr/bin/env python
+	// from __future__ import print_function
+	// import numpy as np
+	// print(
+	//     np.dot(
+	//         np.reshape([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53], (4, 4)),
+	//         np.reshape([59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131], (4, 4))
+	//     )
+	// )
+	//
+	// [[ 1585  1655  1787  1861]
+	//  [ 5318  5562  5980  6246]
+	//  [10514 11006 11840 12378]
+	//  [15894 16634 17888 18710]]
+	var lhs = new THREE.Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
+	var rhs = new THREE.Matrix4().set( 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 );
+	var ans = new THREE.Matrix4();
+
+	ans.multiplyMatrices(lhs, rhs);
+
+	assert.ok( ans.elements[0] == 1585 );
+	assert.ok( ans.elements[1] == 5318 );
+	assert.ok( ans.elements[2] == 10514 );
+	assert.ok( ans.elements[3] == 15894 );
+	assert.ok( ans.elements[4] == 1655 );
+	assert.ok( ans.elements[5] == 5562 );
+	assert.ok( ans.elements[6] == 11006 );
+	assert.ok( ans.elements[7] == 16634 );
+	assert.ok( ans.elements[8] == 1787 );
+	assert.ok( ans.elements[9] == 5980 );
+	assert.ok( ans.elements[10] == 11840 );
+	assert.ok( ans.elements[11] == 17888 );
+	assert.ok( ans.elements[12] == 1861 );
+	assert.ok( ans.elements[13] == 6246 );
+	assert.ok( ans.elements[14] == 12378 );
+	assert.ok( ans.elements[15] == 18710 );
+});
+
 QUnit.test( "multiplyScalar" , function( assert ) {
 	var b = new THREE.Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	assert.ok( b.elements[0] == 0 );

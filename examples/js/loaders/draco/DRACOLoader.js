@@ -19,6 +19,7 @@ THREE.DRACOLoader = function(manager) {
         THREE.DefaultLoadingManager;
     this.materials = null;
     this.verbosity = 0;
+    this.dracoDecoderType = {};
 };
 
 
@@ -32,7 +33,7 @@ THREE.DRACOLoader.prototype = {
         loader.setPath(this.path);
         loader.setResponseType('arraybuffer');
         loader.load(url, function(blob) {
-            onLoad(scope.decodeDracoFile(blob));
+            scope.decodeDracoFile(blob, onLoad);
         }, onProgress, onError);
     },
 
@@ -44,49 +45,49 @@ THREE.DRACOLoader.prototype = {
         this.verbosity = level;
     },
 
-    decodeDracoFile: ( function() {
-        let dracoDecoder;
+    setDracoDecoderType: function(dracoDecoderType) {
+        this.dracoDecoderType = dracoDecoderType;
+    },
 
-        if (typeof DracoModule === 'function') {
-          dracoDecoder = DracoModule();
-        } else {
-          console.error('THREE.DRACOLoader: DracoModule not found.');
-          return;
+    decodeDracoFile: function(rawBuffer, callback) {
+      const scope = this;
+      THREE.DRACOLoader.getDecoder(this.dracoDecoderType,
+          function(dracoDecoder) {
+            scope.decodeDracoFileInternal(rawBuffer, dracoDecoder, callback);
+      });
+    },
+
+    decodeDracoFileInternal : function(rawBuffer, dracoDecoder, callback) {
+      /*
+       * Here is how to use Draco Javascript decoder and get the geometry.
+       */
+      const buffer = new dracoDecoder.DecoderBuffer();
+      buffer.Init(new Int8Array(rawBuffer), rawBuffer.byteLength);
+      const wrapper = new dracoDecoder.WebIDLWrapper();
+
+      /*
+       * Determine what type is this file: mesh or point cloud.
+       */
+      const geometryType = wrapper.GetEncodedGeometryType(buffer);
+      if (geometryType == dracoDecoder.TRIANGULAR_MESH) {
+        if (this.verbosity > 0) {
+          console.log('Loaded a mesh.');
         }
-
-        return function(rawBuffer) {
-          const scope = this;
-          /*
-           * Here is how to use Draco Javascript decoder and get the geometry.
-           */
-          const buffer = new dracoDecoder.DecoderBuffer();
-          buffer.Init(new Int8Array(rawBuffer), rawBuffer.byteLength);
-          const wrapper = new dracoDecoder.WebIDLWrapper();
-
-          /*
-           * Determine what type is this file: mesh or point cloud.
-           */
-          const geometryType = wrapper.GetEncodedGeometryType(buffer);
-          if (geometryType == dracoDecoder.TRIANGULAR_MESH) {
-            if (this.verbosity > 0) {
-              console.log('Loaded a mesh.');
-            }
-          } else if (geometryType == dracoDecoder.POINT_CLOUD) {
-            if (this.verbosity > 0) {
-              console.log('Loaded a point cloud.');
-            }
-          } else {
-            const errorMsg = 'THREE.DRACOLoader: Unknown geometry type.'
-            console.error(errorMsg);
-            throw new Error(errorMsg);
-          }
-          return scope.convertDracoGeometryTo3JS(wrapper, geometryType, buffer,
-                                                 dracoDecoder);
+      } else if (geometryType == dracoDecoder.POINT_CLOUD) {
+        if (this.verbosity > 0) {
+          console.log('Loaded a point cloud.');
         }
-    } )(),
+      } else {
+        const errorMsg = 'THREE.DRACOLoader: Unknown geometry type.'
+        console.error(errorMsg);
+        throw new Error(errorMsg);
+      }
+      callback(this.convertDracoGeometryTo3JS(dracoDecoder, wrapper,
+          geometryType, buffer));
+    },
 
-    convertDracoGeometryTo3JS: function(wrapper, geometryType, buffer,
-                                        dracoDecoder) {
+    convertDracoGeometryTo3JS: function(dracoDecoder, wrapper, geometryType,
+                                        buffer) {
         let dracoGeometry;
         const start_time = performance.now();
         if (geometryType == dracoDecoder.TRIANGULAR_MESH) {
@@ -273,5 +274,40 @@ THREE.DRACOLoader.prototype = {
           console.log('Import time: ' + this.import_time);
         }
         return geometry;
+    },
+
+    isVersionSupported: function(version, callback) {
+        return THREE.DRACOLoader.getDecoder(this.dracoDecoderType,
+            function(decoder) { return decoder.isVersionSupported(version); });
     }
 };
+
+/**
+ * Creates and returns a singleton instance of the DracoModule decoder.
+ * The module loading is done asynchronously for WebAssembly. Initialized module
+ * can be accessed through the callback function |onDracoModuleLoadedCallback|.
+ */
+THREE.DRACOLoader.getDecoder = (function() {
+    let decoder;
+
+    return function(dracoDecoderType, onDracoModuleLoadedCallback) {
+        if (typeof DracoModule === 'undefined') {
+          throw new Error('THREE.DRACOLoader: DracoModule not found.');
+        }
+        if (typeof decoder !== 'undefined') {
+          // Module already initialized.
+          if (typeof onDracoModuleLoadedCallback !== 'undefined') {
+            onDracoModuleLoadedCallback(decoder);
+          }
+        } else {
+          dracoDecoderType['onModuleLoaded'] = function(module) {
+            if (typeof onDracoModuleLoadedCallback === 'function') {
+              decoder = module;
+              onDracoModuleLoadedCallback(module);
+            }
+          };
+          DracoModule(dracoDecoderType);
+        }
+    };
+
+})();

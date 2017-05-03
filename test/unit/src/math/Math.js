@@ -24,12 +24,21 @@ QUnit.test( "Math.sign/polyfill", function( assert ) {
 	assert.ok( isNaN( Math.sign(new THREE.Vector3()) ) , "If x is NaN<object>, the result is NaN.");
 	assert.ok( isNaN( Math.sign() ) , "If x is NaN<undefined>, the result is NaN.");
 	assert.ok( isNaN( Math.sign('--3') ) , "If x is NaN<'--3'>, the result is NaN.");
-	assert.ok( Math.sign(-0) === -0 , "If x is -0, the result is -0.");
+	assert.ok( isNegativeZero( Math.sign(-0) ) , "If x is -0, the result is -0.");
 	assert.ok( Math.sign(+0) === +0 , "If x is +0, the result is +0.");
 	assert.ok( Math.sign(-Infinity) === -1 , "If x is negative<-Infinity> and not -0, the result is -1.");
 	assert.ok( Math.sign('-3') === -1 , "If x is negative<'-3'> and not -0, the result is -1.");
 	assert.ok( Math.sign('-1e-10') === -1 , "If x is negative<'-1e-10'> and not -0, the result is -1.");
 	assert.ok( Math.sign(+Infinity) === +1 , "If x is positive<+Infinity> and not +0, the result is +1.");
 	assert.ok( Math.sign('+3') === +1 , "If x is positive<'+3'> and not +0, the result is +1.");
+
+	// Comparing with -0 is tricky because 0 === -0. But
+	// luckily 1 / -0 === -Infinity so we can use that.
+
+	function isNegativeZero( value ) {
+
+		return value === 0 && 1 / value < 0;
+
+	}
 
 });

@@ -35,7 +35,9 @@
 		<h2>Example</h2>
 
 		<code>
-		function CustomSinCurve( scale ){
+		function CustomSinCurve( scale ) {
+
+			THREE.Curve.call( this );
 
 			this.scale = ( scale === undefined ) ? 1 : scale;
 

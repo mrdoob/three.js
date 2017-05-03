@@ -23,6 +23,26 @@ Sidebar.Scene = function ( editor ) {
 
 	}
 
+	function getMaterialName( material ) {
+
+		if ( Array.isArray( material ) ) {
+
+			var array = [];
+
+			for ( var i = 0; i < material.length; i ++ ) {
+
+				array.push( material[ i ].name );
+
+			}
+
+			return array.join( ',' );
+
+		}
+
+		return material.name;
+
+	}
+
 	function buildHTML( object ) {
 
 		var html = '<span class="type ' + object.type + '"></span> ' + object.name;
@@ -33,7 +53,7 @@ Sidebar.Scene = function ( editor ) {
 			var material = object.material;
 
 			html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
-			html += ' <span class="type ' + material.type + '"></span> ' + material.name;
+			html += ' <span class="type ' + material.type + '"></span> ' + getMaterialName( material );
 
 		}
 

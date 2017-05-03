@@ -118,11 +118,11 @@
             // ! If [ Texture ] was reversed Y axis, enable the following. 
             // THREE.XLoader.IsUvYReverse = false;
             
-		    // ! And if [ Model ] was reversed X axis, enable the following. 
-            // loader.load([' your model url ', false ], function (object) {
+		    // ! And if [ Model ] was reversed polygons, enable the following. 
+            // loader.load([' your model url ', true ], function (object) {
             
             // read (download) model file
-            loader.load(['models/xfile/SSR06_Born2.x', true], function (object) {
+            loader.load(['models/xfile/SSR06_Born2.x', false], function (object) {
 
                 for (var i = 0; i < object.FrameInfo.length; i++) {
 
@@ -226,7 +226,7 @@
             light.position.set(10, 100, 1).normalize();
             scene.add(light);
 
-            light = new THREE.DirectionalLight(0xaa5555);
+            light = new THREE.DirectionalLight(0x555588);
             light.position.set(-1, -1, -1).normalize();
             scene.add(light);
 
