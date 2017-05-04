@@ -53,18 +53,8 @@ function Object3D() {
 	var quaternion = new Quaternion();
 	var scale = new Vector3( 1, 1, 1 );
 
-	function onRotationChange() {
-
-		quaternion.setFromEuler( rotation, false );
-
-	}
-
-	function onQuaternionChange() {
-
-		rotation.setFromQuaternion( quaternion, undefined, false );
-
-	}
-
+	rotation._quaternion = quaternion;
+	quaternion._rotation = rotation;
 	rotation._onChange( onRotationChange );
 	quaternion._onChange( onQuaternionChange );
 
@@ -853,6 +843,19 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	}
 
 } );
+
+
+function onRotationChange() {
+
+	this._quaternion.setFromEuler( this, false );
+
+}
+
+function onQuaternionChange() {
+
+	this._rotation.setFromQuaternion( this, undefined, false );
+
+}
 
 
 export { Object3D };
