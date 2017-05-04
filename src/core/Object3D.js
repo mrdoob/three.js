@@ -92,10 +92,6 @@ function Object3D() {
 	this.renderOrder = 0;
 
 	this.userData = {};
-
-	this.onBeforeRender = function () {};
-	this.onAfterRender = function () {};
-
 }
 
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
@@ -104,6 +100,9 @@ Object3D.DefaultMatrixAutoUpdate = true;
 Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	isObject3D: true,
+
+	onBeforeRender: function () {},
+	onAfterRender: function () {},
 
 	applyMatrix: function ( matrix ) {
 
