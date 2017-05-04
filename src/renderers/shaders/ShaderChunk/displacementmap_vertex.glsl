@@ -1,5 +1,14 @@
 #ifdef USE_DISPLACEMENTMAP
 
-	transformed += objectNormal * ( texture2D( displacementMap, uv ).x * displacementScale + displacementBias );
+	#ifdef USE_MORPHNORMALS
+
+		transformed += morphNormal * ( texture2D( displacementMap, uv ).x * displacementScale + displacementBias );
+
+	#else
+
+		transformed += normal * ( texture2D( displacementMap, uv ).x * displacementScale + displacementBias );
+
+	#endif
+
 
 #endif
