@@ -134,6 +134,12 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
+			if ( shadow.isSpotLightShadow ) {
+
+				shadow.update( light );
+
+			}
+
 			var shadowCamera = shadow.camera;
 			var shadowMatrix = shadow.matrix;
 
@@ -218,12 +224,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				shadow.map.texture.name = light.name + ".shadowMap";
 
 				shadowCamera.updateProjectionMatrix();
-
-			}
-
-			if ( shadow.isSpotLightShadow ) {
-
-				shadow.update( light );
 
 			}
 
