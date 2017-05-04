@@ -32,24 +32,14 @@ function Object3D() {
 	this.up = Object3D.DefaultUp.clone();
 
 	var position = new Vector3();
-	var rotation = new Euler();
-	var quaternion = new Quaternion();
 	var scale = new Vector3( 1, 1, 1 );
 
-	function onRotationChange() {
-
-		quaternion.setFromEuler( rotation, false );
-
-	}
-
-	function onQuaternionChange() {
-
-		rotation.setFromQuaternion( quaternion, undefined, false );
-
-	}
-
-	rotation.onChange( onRotationChange );
-	quaternion.onChange( onQuaternionChange );
+	var rotation = new Euler();
+	var quaternion = new Quaternion();
+	rotation._object3DQuaternion = quaternion;
+	quaternion._object3DRotation = rotation;
+	rotation.onChange( syncRotationToQuaternion );
+	quaternion.onChange( syncQuaternionToRotation );
 
 	Object.defineProperties( this, {
 		position: {
@@ -752,6 +742,19 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 	}
 
 } );
+
+
+function syncQuaternionToRotation() {
+
+	this._object3DRotation.setFromQuaternion( this, undefined, false );
+
+}
+
+function syncRotationToQuaternion() {
+
+	this._object3DQuaternion.setFromEuler( this, false );
+
+}
 
 
 export { Object3D };
