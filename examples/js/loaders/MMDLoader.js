@@ -786,6 +786,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var params = { name: m.name };
 
 			var attribute = new THREE.Float32BufferAttribute( model.metadata.vertexCount * 3, 3 );
+			attribute.name = m.name;
 
 			for ( var j = 0; j < model.metadata.vertexCount * 3; j++ ) {
 
