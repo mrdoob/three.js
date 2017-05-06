@@ -46,23 +46,29 @@ var
 	})
 ;
 
-function InstancedMesh ( bufferGeometry , material , numInstances , uniformScale ) {
+//main class
+function InstancedMesh ( bufferGeometry , material , numInstances , dynamic , uniformScale ) {
 
-	Mesh.call( this , (new InstancedBufferGeometry()).copy( bufferGeometry ) );
+	Mesh.call( this , (new InstancedBufferGeometry()).copy( bufferGeometry ) ); //hacky for now
 
+	this._dynamic = !!dynamic;
+
+ 	this._uniformScale = !!uniformScale;
 
 	this.numInstances = numInstances;
 
 	this._setAttributes();
 
-	//use the setter to decorate this material
+	/**
+	 * use the setter to decorate this material
+	 * this is in lieu of changing the renderer
+	 * WebGLRenderer injects stuff like this
+	 */
 	this.material = material.clone();
  	
- 	this._uniformScale = !!uniformScale;
-
 	this.frustumCulled = false; //you can uncheck this if you generate your own bounding info
 
-	//work with depth effects
+	//make it work with depth effects
 	this.customDepthMaterial = depthMaterialTemplate; 
 
 	this.customDistanceMaterial = distanceMaterialTemplate;
@@ -73,18 +79,38 @@ InstancedMesh.prototype = Object.create( Mesh.prototype );
 
 InstancedMesh.constructor = InstancedMesh;
 
-// Object.defineProperty( InstancedMesh.prototype, 'material', {
+//this is kinda gnarly, done in order to avoid setting these defines in the WebGLRenderer (it manages most if not all of the define flags)
 Object.defineProperties( InstancedMesh.prototype , {
 
 	'material': {
 
 		set: function( m ){ 
 
+			/**
+			 * @pailhead:
+			 *
+			 * whenever a material is set, decorate it, 
+			 * if a material used with regular geometry is passed, 
+			 * it will mutate it which is bad mkay
+			 *
+			 * either flag Material with these instance properties:
+			 * 
+			 *  "i want to create a RED PLASTIC material that will
+			 *   be INSTANCED and i know it will be used on clones
+			 *   that are known to be UNIFORMly scaled"
+			 *  (also figure out where dynamic fits here)
+			 *  
+			 * or check here if the material has INSTANCE_TRANSFORM
+			 * define set, if not, clone, document that it breaks reference
+			 * or do a shallow copy or something
+			 * 
+			 * or something else?
+			 */
 			if ( m.defines ) {
-			
+				
 				m.defines.INSTANCE_TRANSFORM = '';
 				
-				if( this._uniformScale) m.defines.INSTANCE_UNIFORM = '';
+				if( this._uniformScale ) m.defines.INSTANCE_UNIFORM = ''; //an optimization, should avoid doing an expensive matrix inverse in the shader
 
 			}
 
@@ -104,6 +130,7 @@ Object.defineProperties( InstancedMesh.prototype , {
 
 	},
 
+	//force new attributes to be created when set?
 	'numInstances': {
 
 		set: function( v ){ 
@@ -120,6 +147,8 @@ Object.defineProperties( InstancedMesh.prototype , {
 
 	},
 
+	//do some auto-magic when BufferGeometry is set
+	//TODO: account for Geometry, or change this approach completely 
 	'geometry':{
 
 		set: function( g ){ 
@@ -169,33 +198,33 @@ InstancedMesh.prototype.needsUpdate = function( attribute ){
 
 		case 'position' :
 
-			this.geometry.attributes.instancePosition.needsUpdate = 	true;
+			this.geometry.attributes.instancePosition.needsUpdate =   true;
 
 			break;
 
 		case 'quaternion' :
 
-			this.geometry.attributes.instanceQuaternion.needsUpdate = 	true;
+			this.geometry.attributes.instanceQuaternion.needsUpdate = true;
 
 			break;
 
 		case 'scale' :
 
-			this.geometry.attributes.instanceScale.needsUpdate = 		true;
+			this.geometry.attributes.instanceScale.needsUpdate =      true;
 
 			break;
 
 		default:
 
-			this.geometry.attributes.instancePosition.needsUpdate = 	true;
-			this.geometry.attributes.instanceQuaternion.needsUpdate = 	true;
-			this.geometry.attributes.instanceScale.needsUpdate = 		true;
+			this.geometry.attributes.instancePosition.needsUpdate =   true;
+			this.geometry.attributes.instanceQuaternion.needsUpdate = true;
+			this.geometry.attributes.instanceScale.needsUpdate =      true;
 
 			break;
 
 	}
 
-}
+};
 
 InstancedMesh.prototype._setAttributes = function(){
 
@@ -203,6 +232,10 @@ InstancedMesh.prototype._setAttributes = function(){
 	this.geometry.addAttribute( 'instanceQuaternion' , 	new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 4 ) , 4 , 1 ) );
 	this.geometry.addAttribute( 'instanceScale' , 		new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 3 ) , 3 , 1 ) );
 
+	this.geometry.attributes.instancePosition.dynamic = this._dynamic;
+	this.geometry.attributes.instanceQuaternion.dynamic = this._dynamic;
+	this.geometry.attributes.instanceScale.dynamic = this._dynamic;
+	
 };
 
 export { InstancedMesh };

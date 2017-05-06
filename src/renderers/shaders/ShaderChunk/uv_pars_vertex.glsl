@@ -5,11 +5,8 @@
 
 #endif
 
-
-//for now the most convenient place to attach vert transformation logic in global scope
-// #ifdef INSTANCE_TRANSFORM
+//for now the most convenient place to attach vert transformation logic in global scope ( before main() )
 #if defined ( INSTANCE_TRANSFORM )
-
 
 mat3 inverse(mat3 m) {
   float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];
@@ -26,120 +23,46 @@ mat3 inverse(mat3 m) {
               b11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10),
               b21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det;
 }
-
-// attribute vec4 aTRS0;
-// attribute vec4 aTRS1;
-// attribute vec4 aTRS2;
-
-  //for static? 
-// #ifndef STATIC_INSTANCE
-
-
-//   mat4 getInstanceMatrix(){
-
-//     return mat4(
-      
-//       vec4( aTRS0.xyz , 0.),
-//       vec4( aTRS1.xyz , 0.),
-//       vec4( aTRS2.xyz , 0.),
-//       vec4( aTRS0.w , aTRS1.w , aTRS2.w , 1.)
-
-//     );
-
-//   }
-
-// #else
   
-  //for dynamic, avoid computing the matrices on the cpu
-  attribute vec3 instancePosition;
-  attribute vec4 instanceQuaternion;
-  attribute vec3 instanceScale;
+//for dynamic, avoid computing the matrices on the cpu
+attribute vec3 instancePosition;
+attribute vec4 instanceQuaternion;
+attribute vec3 instanceScale;
 
-  // vec3 applyTRS( vec3 position, vec3 translation, vec4 rotation, vec3 scale ) {
+mat4 getInstanceMatrix(){
 
-  //   position *= scale;
-  //   position += 2.0 * cross( rotation.xyz, cross( rotation.xyz, position ) + rotation.w * position );
-  //   position += translation;
+  vec4 q = instanceQuaternion;
+  vec3 s = instanceScale;
+  vec3 v = instancePosition;
 
-  //   return position;
+  float x2 = q.x + q.x;
+  float y2 = q.y + q.y;
+  float z2 = q.z + q.z;
 
-  // }
+  float xx = q.x * x2;
+  float xy = q.x * y2;
+  float xz = q.x * z2;
 
-  mat4 getInstanceMatrix(){
+  float yy = q.y * y2;
+  float yz = q.y * z2;
+  float zz = q.z * z2;
 
+  float wx = q.w * x2;
+  float wy = q.w * y2;
+  float wz = q.w * z2;
 
-    //precompute some stuff
-    vec4 q = vec4(
-      instanceQuaternion.x,
-      instanceQuaternion.y,
-      instanceQuaternion.z,
-      instanceQuaternion.w
-    );
+  return mat4(
 
-    //do one instruction?
-    vec4 q2 = q * q;
+      (1.0 - (yy + zz)) * s.x  ,   (xy + wz)  * s.x         ,   (xz - wy)  * s.x          , 0.0 ,
 
-    vec3 s = instanceScale;
+      (xy - wz)  * s.y         ,   (1.0 - (xx + zz)) * s.y  ,  (yz + wx) * s.y            , 0.0 ,
 
-    //halve the number of mult?
-    float qxy = q.x * q.y;
-    float qxz = q.x * q.z;
-    float qxw = q.x * q.w;
-    float qyw = q.y * q.w;
-    float qyz = q.y * q.z;
-    float qzw = q.z * q.w;
+      (xz + wy) * s.z          ,   (yz - wx) * s.z          ,   (1.0 - (xx + yy)) * s.z   , 0.0 ,
 
+      v.x                      ,   v.y                      ,   v.z                       , 1.0
 
+  );
 
-    // return mat4(
-
-    //     1.0 - 2.0 * ( q2.y - q2.z ) * s.x ,   2.0 * ( q.x * q.y + q.z * q.w )   ,   2.0 * ( q.x * q.z - q.y * q.w )   , 0.0 ,
-        
-    //     2.0 * ( q.x * q.y - q.z * q.w )   ,   1.0 - 2.0 * ( q2.x - q2.z ) * s.y ,   2.0 * ( q.y * q.z + q.x * q.w )   , 0.0 ,
-        
-    //     2.0 * ( q.x * q.z + q.y * q.w )   ,   2.0 * ( q.y * q.z - q.x * q.w )   ,   1.0 - 2.0 * ( q2.x - q2.y ) * s.z , 0.0 ,
-
-    //     instancePosition.x                ,   instancePosition.y                ,   instancePosition.z                , 1.0 
-
-    // )
-
-    // return mat4(
-
-    //     (1.0 - 2.0 * ( q2.y + q2.z )) * s.x ,   2.0 * ( qxy + qzw ) * s.y           ,   2.0 * ( qxz - qyw ) * s.z           , 0.0 ,
-        
-    //     2.0 * ( qxy - qzw ) * s.x           ,   (1.0 - 2.0 * ( q2.x + q2.z )) * s.y ,   2.0 * ( qyz + qxw ) * s.z           , 0.0 ,
-        
-    //     2.0 * ( qxz + qyw ) * s.x           ,   2.0 * ( qyz - qxw ) * s.y           ,   (1.0 - 2.0 * ( q2.x + q2.y )) * s.z , 0.0 ,
-
-    //     instancePosition.x                  ,   instancePosition.y                  ,   instancePosition.z                  , 1.0 
-
-    // );
-
-    return mat4(
-
-        (1.0 - 2.0 * ( q2.y + q2.z )) * s.x ,   2.0 * ( qxy - qzw ) * s.x           ,   2.0 * ( qxz + qyw ) * s.x           , 0.0 ,
-        
-        2.0 * ( qxy + qzw ) * s.y           ,   (1.0 - 2.0 * ( q2.x + q2.z )) * s.y ,   2.0 * ( qyz - qxw ) * s.y           , 0.0 ,
-        
-        2.0 * ( qxz - qyw ) * s.z           ,   2.0 * ( qyz + qxw ) * s.z           ,   (1.0 - 2.0 * ( q2.x + q2.y )) * s.z , 0.0 ,
-
-        instancePosition.x                  ,   instancePosition.y                  ,   instancePosition.z                  , 1.0 
-
-    );
-
-    // return mat4(
-
-    //   (1.0 - 2.0 * ( q2.y - q2.z )) * s.x , 2.0 * ( qxy - qzw ) * s.x           , 2.0 * ( qxz + qyw ) * s.x           , 0. ,
-    //   2.0 * ( qxy + qzw ) * s.y           , (1.0 - 2.0 * ( q2.x - q2.z )) * s.y , 2.0 * ( qyz - qxw ) * s.y           , 0. ,
-    //   2.0 * ( qxz - qyw ) * s.z           , 2.0 * ( qyz + qxw ) * s.z           , (1.0 - 2.0 * ( q2.x - q2.y )) * s.z , 0. ,
-    //   instancePosition.x                  ,   instancePosition.y                 ,   instancePosition.z               , 1.0 
-
-    // );
-
-  }
-
-// #endif
-
-
+}
 
 #endif
