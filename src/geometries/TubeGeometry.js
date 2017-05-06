@@ -4,11 +4,17 @@
  * @author zz85 / https://github.com/zz85
  * @author miningold / https://github.com/miningold
  * @author jonobr1 / https://github.com/jonobr1
+ * @author Mugen87 / https://github.com/Mugen87
  *
- * Creates a tube which extrudes along a 3d spline.
  */
 
 import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector2 } from '../math/Vector2';
+import { Vector3 } from '../math/Vector3';
+
+// TubeGeometry
 
 function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, taper ) {
 
@@ -44,14 +50,7 @@ function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, ta
 TubeGeometry.prototype = Object.create( Geometry.prototype );
 TubeGeometry.prototype.constructor = TubeGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector2 } from '../math/Vector2';
-import { Vector3 } from '../math/Vector3';
+// TubeBufferGeometry
 
 function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed ) {
 
@@ -218,5 +217,6 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 TubeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 TubeBufferGeometry.prototype.constructor = TubeBufferGeometry;
+
 
 export { TubeGeometry, TubeBufferGeometry };

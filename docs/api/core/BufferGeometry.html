@@ -138,12 +138,12 @@
 		<h3>[property:Array groups]</h3>
 		<div>
 			Split the geometry into groups, each of which will be rendered in a separate WebGL draw call.
-			This allows a [page:MultiMaterial] to be used with the bufferGeometry.<br /><br />
+			This allows an array of materials to be used with the bufferGeometry.<br /><br />
 
 			Each group is an object of the form:
 			<code>{ start: Integer, count: Integer, materialIndex: Integer }</code>
 			where start specifies the index of the first vertex in this draw call, count specifies
-			how many vertices are included, and materialIndex specifies the [page:MultiMaterial] index to use.<br /><br />
+			how many vertices are included, and materialIndex specifies the material array index to use.<br /><br />
 
 			Use [page:.addGroup] to add groups, rather than modifying this array directly.
 		</div>

@@ -196,11 +196,11 @@
 
 				effect = new THREE.VREffect( renderer );
 
-				if ( WEBVR.isAvailable() === true ) {
+				WEBVR.getVRDisplay( function ( display ) {
 
-					document.body.appendChild( WEBVR.getButton( effect ) );
+					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
-				}
+				} );
 
 				//
 

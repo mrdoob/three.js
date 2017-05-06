@@ -101,7 +101,7 @@ Particle.prototype.integrate = function( timesq ) {
 
 var diff = new THREE.Vector3();
 
-function satisifyConstraints( p1, p2, distance ) {
+function satisfyConstraints( p1, p2, distance ) {
 
 	diff.subVectors( p2.position, p1.position );
 	var currentDist = diff.length();
@@ -272,7 +272,7 @@ function simulate( time ) {
 	for ( i = 0; i < il; i ++ ) {
 
 		constraint = constraints[ i ];
-		satisifyConstraints( constraint[ 0 ], constraint[ 1 ], constraint[ 2 ] );
+		satisfyConstraints( constraint[ 0 ], constraint[ 1 ], constraint[ 2 ] );
 
 	}
 
