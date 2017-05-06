@@ -371,23 +371,15 @@
 					o.rotation.y += o.scale.y * dt;
 					o.rotation.z += o.scale.z * dt;
 
-					// _obj.rotation.copy( o.rotation );
-					// _obj.position.copy( o.position );
-
 					if( !options.uniformScale ) _obj.scale.copy( o.scale );
 					
 					else _obj.scale.set(1,1,1);
 
-
-					// _obj.updateMatrixWorld();
-
-					// currentMesh.geometry.setTransformationAtIndex( i , _obj.matrixWorld );
-
 					currentMesh.setQuaternionAt( i , o.quaternion.setFromEuler( o.rotation ) );
+
 				}
 
 				currentMesh.needsUpdate( 'quaternion' );
-				// currentMesh.geometry.needsUpdate();
 
 			}
 
