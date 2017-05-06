@@ -75,7 +75,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
 
-						name = morphAttribute[ m ].name || m;
+						name = morphAttribute[ m ].name || String( m );
 
 						this.morphTargetInfluences.push( 0 );
 						this.morphTargetDictionary[ name ] = m;
@@ -97,7 +97,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				for ( m = 0, ml = morphTargets.length; m < ml; m ++ ) {
 
-					name = morphTargets[ m ].name || m;
+					name = morphTargets[ m ].name || String( m );
 
 					this.morphTargetInfluences.push( 0 );
 					this.morphTargetDictionary[ name ] = m;
