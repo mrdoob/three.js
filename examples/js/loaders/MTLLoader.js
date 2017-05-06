@@ -449,7 +449,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
-				case 'Tr':
+				case 'tr':
 
 					if ( value > 0 ) {
 
