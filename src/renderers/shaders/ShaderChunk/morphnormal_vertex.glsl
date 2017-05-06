@@ -5,10 +5,4 @@
 	objectNormal += ( morphNormal2 - normal ) * morphTargetInfluences[ 2 ];
 	objectNormal += ( morphNormal3 - normal ) * morphTargetInfluences[ 3 ];
 
-	#ifdef USE_DISPLACEMENTMAP
-
-		vec3 morphNormal = normalize(objectNormal);
-
-	#endif
-
 #endif
