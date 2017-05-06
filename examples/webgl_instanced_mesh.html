@@ -194,14 +194,14 @@
 				var materials = {
 					
 					phong: new THREE.MeshPhongMaterial( {
-						color: 0xff0000,
+						color: 0xff00ff,
 						shininess: 150,
 						specular: 0x222222,
 						shading: THREE.SmoothShading
 					}),
 
 					lambert: new THREE.MeshLambertMaterial({
-						color: 0x00ff00
+						color: 0xffff00
 
 					}),
 					
@@ -386,7 +386,6 @@
 
 			function rotateObjects( dt ){
 
-
 				var currentMesh = cache[ getKey() ];
 
 				var _obj = new THREE.Object3D();
@@ -400,15 +399,11 @@
 					o.rotation.y += o.scale.y * dt;
 					o.rotation.z += o.scale.z * dt;
 
-					// if( !options.uniformScale ) _obj.scale.copy( o.scale );
-					
-					// else _obj.scale.set(1,1,1);
-
-					tester.rotation.copy(trsCache[0].rotation);
-
 					currentMesh.setQuaternionAt( i , o.quaternion.setFromEuler( o.rotation ) );
 
 				}
+				
+				tester.rotation.copy(trsCache[0].rotation);
 
 				currentMesh.needsUpdate( 'quaternion' );
 

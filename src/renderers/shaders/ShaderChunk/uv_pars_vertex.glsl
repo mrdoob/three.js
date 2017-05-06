@@ -5,7 +5,7 @@
 
 #endif
 
-//@pailhead
+//@author pailhead
 //for now the most convenient place to attach vert transformation logic in global scope ( before main() )
 #if defined( INSTANCE_TRANSFORM )
 

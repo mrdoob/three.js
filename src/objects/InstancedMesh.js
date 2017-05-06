@@ -89,8 +89,6 @@ Object.defineProperties( InstancedMesh.prototype , {
 		set: function( m ){ 
 
 			/**
-			 * @pailhead:
-			 *
 			 * whenever a material is set, decorate it, 
 			 * if a material used with regular geometry is passed, 
 			 * it will mutate it which is bad mkay
