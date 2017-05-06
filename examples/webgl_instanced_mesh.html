@@ -43,6 +43,7 @@
 			var camera, scene, renderer, clock, stats;
 			var dirLight, spotLight;
 			var torusKnot, cube;
+			var tester;
 
 			var objectWrapper;
 			var finalTriNum = 0;
@@ -83,10 +84,10 @@
 				spotLight.name = 'Spot Light';
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.3;
-				spotLight.position.set( 20, 20, 15 );
+				spotLight.position.set( 30, 30, 25 );
 				spotLight.castShadow = true;
-				spotLight.shadow.camera.near = 8;
-				spotLight.shadow.camera.far = 30;
+				spotLight.shadow.camera.near = 1;
+				spotLight.shadow.camera.far = 60;
 				spotLight.shadow.mapSize.width = 1024;
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
@@ -156,7 +157,7 @@
 					return key;
 				} 
 
-				return options.geometry + options.instanceNumber + options.dynamic + options.uniformScale ;
+				return options.geometry + options.instanceNumber + options.dynamic + options.uniformScale + options.color ;
 
 			}
 
@@ -167,6 +168,7 @@
 				options = {
 					dynamic: false,
 					uniformScale: false,
+					color: false,
 					material: 'phong',
 					instanceNumber: 200,
 					geometry: 'box'
@@ -204,7 +206,7 @@
 					}),
 					
 					standard: new THREE.MeshStandardMaterial({
-						color: 0x0000ff
+						color: 0x00ffff
 					})
 				};
 
@@ -245,13 +247,10 @@
 
 					var dummyObj = new THREE.Object3D(); //will hold position , rotation , scale 
 
-					// dummyObj.position.set( Math.random() * 2 - 1 , 0 , Math.random() * 2 - 1 );
-					// dummyObj.position.multiplyScalar( 14 );
-					// dummyObj.rotation.set( Math.random() * pi2 , Math.random() * pi2 , Math.random() * pi2 );
-					// dummyObj.scale.set( Math.random() + .5 , Math.random() + .5 , Math.random() + .5 );
-
 					let rot = new THREE.Euler(  Math.random() * pi2 , Math.random() * pi2 , Math.random() * pi2 );
+					
 					let quat = new THREE.Quaternion().setFromEuler( rot );
+					
 					trsCache.push({
 						position: new THREE.Vector3( Math.random() * 2 - 1 , 0 , Math.random() * 2 - 1 ).multiplyScalar( 14 ),
 						rotation: rot,
@@ -260,57 +259,75 @@
 					});
 
 				}
+
+				trsCache[0].position.set(20,-3,18);
+
 				console.timeEnd( 'Object cache initialized.');
 
 				console.log( 'Initializing instanced mesh permutations...');
 				console.time( 'Instanced mesh permutations initialized.');
+
+				var _color = new THREE.Color();
 
 				instanceNumbers.forEach( function( iNum ){
 
 					for ( var g in geometries ){
 
 						for ( var uScale = 0 ; uScale < 2 ; uScale ++ ){
+						
+							for ( var color = 0 ; color < 2 ; color ++ ){
 
-							for ( var dynamic = 0 ; dynamic < 2 ; dynamic ++ ){
+								for ( var dynamic = 0 ; dynamic < 2 ; dynamic ++ ){
 
-								var instancedMesh = cache[ getKey( g , iNum , dynamic , uScale ) ] = new THREE.InstancedMesh(
+									var instancedMesh = cache[ getKey( g , iNum , dynamic , uScale , color ) ] = new THREE.InstancedMesh(
 
-									//provide geometry
-									geometries[ g ], 		
+										//provide geometry
+										geometries[ g ], 		
 
-									//provide material
-									materials[ options.material ],	
+										//provide material
+										materials[ options.material ],	
 
-									//how many instances to allocate
-									iNum, 								
-									
-									//will the position attributes be changed
-									dynamic, 
-									
- 									//is the scale known to be uniform, will do less shader work, improperly applying this will result in wrong shading 
-									!!uScale
+										//how many instances to allocate
+										iNum, 								
+										
+										//will the position attributes be changed
+										!!dynamic, 
 
-								);
+										//should there be per instance color variation
+										!!color,
+										
+	 									//is the scale known to be uniform, will do less shader work, improperly applying this will result in wrong shading 
+										!!uScale
 
-								var ss = new THREE.Vector3(1,1,1);
+									);
 
-								for ( var i = 0 ; i < iNum ; i++ ){
+									var ss = new THREE.Vector3(1,1,1);
 
-									instancedMesh.setPositionAt( 	i , trsCache[ i ].position );
-									instancedMesh.setQuaternionAt( 	i , trsCache[ i ].quaternion );
-									instancedMesh.setScaleAt( 		i , uScale ? ss : trsCache[ i ].scale );
+									for ( var i = 0 ; i < iNum ; i++ ){
+
+										instancedMesh.setPositionAt( 	i , trsCache[ i ].position );
+										instancedMesh.setQuaternionAt( 	i , trsCache[ i ].quaternion );
+										instancedMesh.setScaleAt( 		i , uScale ? ss : trsCache[ i ].scale );
+										
+										if ( color ) {
+
+											_color.setHSL( Math.random() , 0.5 , 0.5 );
+
+											instancedMesh.setColorAt( i , _color );
+
+										}
+
+									}
+
+									instancedMesh.visible = false;
+
+									instancedMesh.castShadow = true;
+
+									instancedMesh.receiveShadow = true;
+
+									objectWrapper.add( instancedMesh );
 
 								}
-
-								instancedMesh.visible = false;
-
-								instancedMesh.castShadow = true;
-
-								instancedMesh.receiveShadow = true;
-
-								objectWrapper.add( instancedMesh );
-
-								console.log( instancedMesh );
 
 							}
 
@@ -337,7 +354,14 @@
 
 					for ( var m in cache ) cache[ m ].material = materials[ options.material ];
 
+					tester.material = materials[ options.material ];
+				
 				}
+
+				tester = new THREE.Mesh( geometries.box , materials[ options.material ] );
+				tester.position.set( 18 , 0 , 18 );
+				tester.rotation.copy( trsCache[0].rotation );
+				scene.add(tester);
 
 				var gui = new dat.GUI();
 
@@ -350,6 +374,11 @@
 				gui.add( options, 'dynamic' ).onChange( onChangeMesh );
 
 				gui.add( options, 'uniformScale' ).onChange( onChangeMesh );
+
+				gui.add( options, 'color' ).onChange( function(){
+					onChangeMesh();
+					onChangeMaterial();
+				});
 
 				gui.open();
 
@@ -371,9 +400,11 @@
 					o.rotation.y += o.scale.y * dt;
 					o.rotation.z += o.scale.z * dt;
 
-					if( !options.uniformScale ) _obj.scale.copy( o.scale );
+					// if( !options.uniformScale ) _obj.scale.copy( o.scale );
 					
-					else _obj.scale.set(1,1,1);
+					// else _obj.scale.set(1,1,1);
+
+					tester.rotation.copy(trsCache[0].rotation);
 
 					currentMesh.setQuaternionAt( i , o.quaternion.setFromEuler( o.rotation ) );
 
@@ -398,6 +429,10 @@
 				requestAnimationFrame( animate );
 
 				var delta = clock.getDelta()*0.12;
+
+
+				if( !options.uniformScale ) tester.scale.copy( trsCache[0].scale );
+				else tester.scale.set(1,1,1);
 
 				if( options.dynamic ) rotateObjects( delta );
 

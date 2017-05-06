@@ -47,13 +47,15 @@ var
 ;
 
 //main class
-function InstancedMesh ( bufferGeometry , material , numInstances , dynamic , uniformScale ) {
+function InstancedMesh ( bufferGeometry , material , numInstances , dynamic , colors , uniformScale ) {
 
 	Mesh.call( this , (new InstancedBufferGeometry()).copy( bufferGeometry ) ); //hacky for now
 
-	this._dynamic = !!dynamic;
+	this._dynamic = !!dynamic; //TODO: set a bit mask for different attributes?
 
  	this._uniformScale = !!uniformScale;
+
+ 	this._colors = !!colors;
 
 	this.numInstances = numInstances;
 
@@ -106,12 +108,17 @@ Object.defineProperties( InstancedMesh.prototype , {
 			 * 
 			 * or something else?
 			 */
+			m = m.clone();
+
 			if ( m.defines ) {
 				
 				m.defines.INSTANCE_TRANSFORM = '';
 				
-				if( this._uniformScale ) m.defines.INSTANCE_UNIFORM = ''; //an optimization, should avoid doing an expensive matrix inverse in the shader
+				if ( this._uniformScale ) m.defines.INSTANCE_UNIFORM = ''; //an optimization, should avoid doing an expensive matrix inverse in the shader
+				else delete m.defines['INSTANCE_UNIFORM'];
 
+				if ( this._colors ) m.defines.INSTANCE_COLOR = '';
+				else delete m.defines['INSTANCE_COLOR'];
 			}
 
 			else{ 
@@ -119,7 +126,7 @@ Object.defineProperties( InstancedMesh.prototype , {
 				m.defines = { INSTANCE_TRANSFORM: '' };
 
 				if ( this._uniformScale ) m.defines.INSTANCE_UNIFORM = '';
-			
+				if ( this._colors ) m.defines.INSTANCE_COLOR = '';
 			}
 
 			this._material = m;
@@ -192,6 +199,25 @@ InstancedMesh.prototype.setScaleAt = function ( index , scale ) {
 
 };
 
+InstancedMesh.prototype.setColorAt = function ( index , color ) {
+
+	if( !this._colors ) {
+
+		console.warn( 'THREE.InstancedMesh: color not enabled');
+
+		return;
+
+	}
+
+	this.geometry.attributes.instanceColor.setXYZ( 
+		index , 
+		Math.floor( color.r * 255 ), 
+		Math.floor( color.g * 255 ), 
+		Math.floor( color.b * 255 )
+	);
+
+};
+
 InstancedMesh.prototype.needsUpdate = function( attribute ){
 
 	switch ( attribute ){
@@ -214,11 +240,16 @@ InstancedMesh.prototype.needsUpdate = function( attribute ){
 
 			break;
 
+		case 'colors' :
+
+			this.geometry.attributes.instanceColor.needsUpdate =      true;
+
 		default:
 
 			this.geometry.attributes.instancePosition.needsUpdate =   true;
 			this.geometry.attributes.instanceQuaternion.needsUpdate = true;
 			this.geometry.attributes.instanceScale.needsUpdate =      true;
+			this.geometry.attributes.instanceColor.needsUpdate =      true;
 
 			break;
 
@@ -232,10 +263,19 @@ InstancedMesh.prototype._setAttributes = function(){
 	this.geometry.addAttribute( 'instanceQuaternion' , 	new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 4 ) , 4 , 1 ) );
 	this.geometry.addAttribute( 'instanceScale' , 		new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 3 ) , 3 , 1 ) );
 
+	//TODO: allow different combinations
 	this.geometry.attributes.instancePosition.dynamic = this._dynamic;
 	this.geometry.attributes.instanceQuaternion.dynamic = this._dynamic;
 	this.geometry.attributes.instanceScale.dynamic = this._dynamic;
 	
+	if ( this._colors ){
+
+		this.geometry.addAttribute( 'instanceColor' , 	new THREE.InstancedBufferAttribute( new Uint8Array( this.numInstances * 3 ) , 3 , 1 ) );
+		this.geometry.attributes.instanceColor.normalized = true;
+		this.geometry.attributes.instanceColor.dynamic = this._dynamic;
+
+	}	
+
 };
 
 export { InstancedMesh };

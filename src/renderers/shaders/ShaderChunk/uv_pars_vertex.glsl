@@ -5,8 +5,9 @@
 
 #endif
 
+//@pailhead
 //for now the most convenient place to attach vert transformation logic in global scope ( before main() )
-#if defined ( INSTANCE_TRANSFORM )
+#if defined( INSTANCE_TRANSFORM )
 
 mat3 inverse(mat3 m) {
   float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];
@@ -28,6 +29,11 @@ mat3 inverse(mat3 m) {
 attribute vec3 instancePosition;
 attribute vec4 instanceQuaternion;
 attribute vec3 instanceScale;
+
+#if defined( INSTANCE_COLOR )
+  attribute vec3 instanceColor;
+  varying vec3 vInstanceColor;
+#endif 
 
 mat4 getInstanceMatrix(){
 
