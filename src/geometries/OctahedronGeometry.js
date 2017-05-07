@@ -1,8 +1,12 @@
 /**
  * @author timothypratley / https://github.com/timothypratley
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 import { Geometry } from '../core/Geometry';
+import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
+
+// OctahedronGeometry
 
 function OctahedronGeometry( radius, detail ) {
 
@@ -23,11 +27,7 @@ function OctahedronGeometry( radius, detail ) {
 OctahedronGeometry.prototype = Object.create( Geometry.prototype );
 OctahedronGeometry.prototype.constructor = OctahedronGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
+// OctahedronBufferGeometry
 
 function OctahedronBufferGeometry( radius, detail ) {
 
@@ -52,5 +52,6 @@ function OctahedronBufferGeometry( radius, detail ) {
 
 OctahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 OctahedronBufferGeometry.prototype.constructor = OctahedronBufferGeometry;
+
 
 export { OctahedronGeometry, OctahedronBufferGeometry };

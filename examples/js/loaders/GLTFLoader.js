@@ -745,6 +745,11 @@ THREE.GLTFLoader = ( function () {
 					shaderText = shaderText.replace( regEx, 'uv' );
 					break;
 
+				case 'TEXCOORD_1':
+
+					shaderText = shaderText.replace( regEx, 'uv2' );
+					break;
+
 				case 'COLOR_0':
 				case 'COLOR0':
 				case 'COLOR':
@@ -1623,6 +1628,10 @@ THREE.GLTFLoader = ( function () {
 								case 'TEXCOORD0':
 								case 'TEXCOORD':
 									geometry.addAttribute( 'uv', bufferAttribute );
+									break;
+
+								case 'TEXCOORD_1':
+									geometry.addAttribute( 'uv2', bufferAttribute );
 									break;
 
 								case 'COLOR_0':

@@ -373,7 +373,8 @@ function WebGLRenderer( parameters ) {
 
 	this.forceContextLoss = function () {
 
-		extensions.get( 'WEBGL_lose_context' ).loseContext();
+		var extension = extensions.get( 'WEBGL_lose_context' );
+		if ( extension ) extension.loseContext();
 
 	};
 
@@ -687,6 +688,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	function absNumericalSort( a, b ) {
+
+		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
+
+	}
+
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 		state.setMaterial( material );
@@ -900,13 +907,9 @@ function WebGLRenderer( parameters ) {
 
 	function setupVertexAttributes( material, program, geometry, startIndex ) {
 
-		var extension;
-
 		if ( geometry && geometry.isInstancedBufferGeometry ) {
 
-			extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-			if ( extension === null ) {
+			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 				console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 				return;
@@ -952,7 +955,7 @@ function WebGLRenderer( parameters ) {
 
 						if ( data && data.isInstancedInterleavedBuffer ) {
 
-							state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute, extension );
+							state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
@@ -973,7 +976,7 @@ function WebGLRenderer( parameters ) {
 
 						if ( geometryAttribute.isInstancedBufferAttribute ) {
 
-							state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute, extension );
+							state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
@@ -1029,13 +1032,47 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	// Sorting
+	// Compile
 
-	function absNumericalSort( a, b ) {
+	this.compile = function ( scene, camera ) {
 
-		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
+		lights = [];
 
-	}
+		scene.traverse( function ( object ) {
+
+			if ( object.isLight ) {
+
+				lights.push( object );
+
+			}
+
+		} );
+
+		setupLights( lights, camera );
+
+		scene.traverse( function ( object ) {
+
+			if ( object.material ) {
+
+				if ( Array.isArray( object.material ) ) {
+
+					for ( var i = 0; i < object.material.length; i ++ ) {
+
+						initMaterial( object.material[ i ], scene.fog, object );
+
+					}
+
+				} else {
+
+					initMaterial( object.material, scene.fog, object );
+
+				}
+
+			}
+
+		} );
+
+	};
 
 	// Rendering
 
@@ -1418,6 +1455,7 @@ function WebGLRenderer( parameters ) {
 
 					var camera2 = cameras[ j ];
 					var bounds = camera2.bounds;
+
 					_this.setViewport(
 						bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
 						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
@@ -1427,6 +1465,7 @@ function WebGLRenderer( parameters ) {
 						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
 					);
 					_this.setScissorTest( true );
+
 					renderObject( object, scene, camera2, geometry, material, group );
 
 				}
@@ -2430,18 +2469,7 @@ function WebGLRenderer( parameters ) {
 				}
 
 				_lights.pointShadowMap[ pointLength ] = shadowMap;
-
-				if ( _lights.pointShadowMatrix[ pointLength ] === undefined ) {
-
-					_lights.pointShadowMatrix[ pointLength ] = new Matrix4();
-
-				}
-
-				// for point lights we set the shadow matrix to be a translation-only matrix
-				// equal to inverse of the light's position
-				_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-				_lights.pointShadowMatrix[ pointLength ].identity().setPosition( _vector3 );
-
+				_lights.pointShadowMatrix[ pointLength ] = light.shadow.matrix;
 				_lights.point[ pointLength ] = uniforms;
 
 				pointLength ++;

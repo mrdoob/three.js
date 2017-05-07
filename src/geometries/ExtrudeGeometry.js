@@ -1,9 +1,3 @@
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector2 } from '../math/Vector2';
-import { Vector3 } from '../math/Vector3';
-import { ShapeUtils } from '../extras/ShapeUtils';
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
@@ -26,9 +20,16 @@ import { ShapeUtils } from '../extras/ShapeUtils';
  *  UVGenerator: <Object> // object that provides UV generator functions
  *
  * }
- **/
- 
- import { Geometry } from '../core/Geometry';
+ */
+
+import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector2 } from '../math/Vector2';
+import { Vector3 } from '../math/Vector3';
+import { ShapeUtils } from '../extras/ShapeUtils';
+
+// ExtrudeGeometry
 
 function ExtrudeGeometry( shapes, options ) {
 
@@ -46,11 +47,10 @@ function ExtrudeGeometry( shapes, options ) {
 
 }
 
-
 ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
 ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
 
- 
+// ExtrudeBufferGeometry
 
 function ExtrudeBufferGeometry( shapes, options ) {
 
@@ -567,7 +567,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 	/////  Internal functions
 
 	function buildLidFaces() {
-		
+
 		var start = verticesArray.length/3;
 
 		if ( bevelEnabled ) {
@@ -617,7 +617,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 			}
 
 		}
-		
+
 		scope.addGroup( start, verticesArray.length/3 -start, options.material !== undefined ? options.material : 0);
 
 	}
@@ -640,7 +640,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 			layeroffset += ahole.length;
 
 		}
-		
+
 
 		scope.addGroup( start, verticesArray.length/3 -start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1);
 
@@ -814,7 +814,4 @@ ExtrudeGeometry.WorldUVGenerator = {
 };
 
 
-export {
-	ExtrudeGeometry,
-	ExtrudeBufferGeometry
-};
+export { ExtrudeGeometry, ExtrudeBufferGeometry };

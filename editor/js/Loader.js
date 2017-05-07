@@ -525,19 +525,6 @@ var Loader = function ( editor ) {
 
 				break;
 
-			case 'scene':
-
-				// DEPRECATED
-
-				var loader = new THREE.SceneLoader();
-				loader.parse( data, function ( result ) {
-
-					editor.execute( new SetSceneCommand( result.scene ) );
-
-				}, '' );
-
-				break;
-
 			case 'app':
 
 				editor.fromJSON( data );

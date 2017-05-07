@@ -421,7 +421,7 @@
 					var mult = 0.025;
 					var r = 0;
 					for ( var i = 0; i < 15; i++ ) {
-						r += multR * simplex.noise3d( x * mult, y * mult, z * mult );
+						r += multR * simplex.noise( x * mult, y * mult );
 						multR *= 0.53 + 0.025 * i;
 						mult *= 1.25;
 					}

@@ -610,11 +610,7 @@ Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
 
 			var action = actions[ i ];
 
-			if ( action.enabled ) {
-
-				action._update( time, deltaTime, timeDirection, accuIndex );
-
-			}
+			action._update( time, deltaTime, timeDirection, accuIndex );
 
 		}
 
