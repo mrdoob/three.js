@@ -24,7 +24,7 @@ mat3 inverse(mat3 m) {
               b11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10),
               b21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det;
 }
-  
+
 //for dynamic, avoid computing the matrices on the cpu
 attribute vec3 instancePosition;
 attribute vec4 instanceQuaternion;
@@ -33,7 +33,7 @@ attribute vec3 instanceScale;
 #if defined( INSTANCE_COLOR )
   attribute vec3 instanceColor;
   varying vec3 vInstanceColor;
-#endif 
+#endif
 
 mat4 getInstanceMatrix(){
 
@@ -46,15 +46,15 @@ mat4 getInstanceMatrix(){
   vec3 b = q.yyz * q2.yzz;
   vec3 c = q.www * q2.xyz;
 
+  vec4 r0 = vec4( 1.0 - (b.x + b.z) , a.y + c.z , a.z - c.y , 0. ) * s.xxxx;
+  vec4 r1 = vec4( a.y - c.z , 1.0 - (a.x + b.z) , b.y + c.x , 0. ) * s.yyyy;
+  vec4 r2 = vec4( a.z + c.y , b.y - c.x , 1.0 - (a.x + b.x) , 0. ) * s.zzzz;
+
   return mat4(
 
-      (1.0 - (b.x + b.z)) * s.x  ,   (a.y + c.z)  * s.x         ,   (a.z - c.y)  * s.x          , 0.0 ,
+      r0 , r1 , r2 ,
 
-      (a.y - c.z)  * s.y         ,   (1.0 - (a.x + b.z)) * s.y  ,  (b.y + c.x) * s.y            , 0.0 ,
-
-      (a.z + c.y) * s.z          ,   (b.y - c.x) * s.z          ,   (1.0 - (a.x + b.x)) * s.z   , 0.0 ,
-
-      v.x                      ,   v.y                      ,   v.z                       , 1.0
+      v , 1.0
 
   );
 
