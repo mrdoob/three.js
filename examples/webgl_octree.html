@@ -23,7 +23,7 @@
 				scene,
 				renderer,
 				octree,
-				geometry,
+				geometry = new THREE.BoxGeometry( 50, 50, 50 ),
 				material,
 				mesh,
 				meshes = [],
@@ -121,8 +121,6 @@
 				octree.update();
 
 			}
-
-			var geometry = new THREE.BoxGeometry( 50, 50, 50 );
 
 			function modifyOctree() {
 
