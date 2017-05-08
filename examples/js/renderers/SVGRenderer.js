@@ -326,6 +326,11 @@ THREE.SVGRenderer = function () {
 		var scaleX = element.scale.x * _svgWidthHalf;
 		var scaleY = element.scale.y * _svgHeightHalf;
 
+		if ( material.isPointsMaterial ) {
+			scaleX *= material.size;
+			scaleY *= material.size;
+		}
+
 		_svgNode = getRectNode( _rectCount ++ );
 
 		_svgNode.setAttribute( 'x', v1.x - ( scaleX * 0.5 ) );
@@ -333,7 +338,7 @@ THREE.SVGRenderer = function () {
 		_svgNode.setAttribute( 'width', scaleX );
 		_svgNode.setAttribute( 'height', scaleY );
 
-		if ( material instanceof THREE.SpriteMaterial ) {
+		if ( material.isSpriteMaterial || material.isPointsMaterial ) {
 
 			_svgNode.setAttribute( 'style', 'fill: ' + material.color.getStyle() );
 
