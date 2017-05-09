@@ -87,7 +87,7 @@
         // Rotation should be performed using quaternions, using a QuaternionKeyframeTrack
         // Interpolating Euler angles (.rotation property) can be problematic and is currently not supported
         
-        // rotation about x axis
+        // set up rotation about x axis
         var xAxis = new THREE.Vector3( 1, 0, 0 );
 
         var qInitial = new THREE.Quaternion().setFromAxisAngle( xAxis, 0 );
@@ -101,8 +101,7 @@
         // If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
 				var clip = new THREE.AnimationClip( 'Action', -1, [scaleKF, positionKF, quaternionKF] );
 
-				// setup the AnimationMixer and play the animation sequence
-
+				// setup the AnimationMixer
 				mixer = new THREE.AnimationMixer( mesh );
 
         // create a ClipAction and set it to play
