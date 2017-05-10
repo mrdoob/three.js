@@ -2283,7 +2283,7 @@
           "!doc": "[page:String value] — the empty string (default), \"arraybuffer\", \"blob\", \"document\", \"json\", or \"text\"."
         }
       },
-      "!doc": "A low level class for loading resources with XmlHttpRequest, used internaly by most loaders.",
+      "!doc": "A low level class for loading resources with XMLHttpRequest, used internaly by most loaders.",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
     "GLTFLoader": {
