@@ -87,7 +87,7 @@
 				spotLight.position.set( 30, 30, 25 );
 				spotLight.castShadow = true;
 				spotLight.shadow.camera.near = 1;
-				spotLight.shadow.camera.far = 60;
+				spotLight.shadow.camera.far = 80;
 				spotLight.shadow.mapSize.width = 1024;
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
@@ -109,9 +109,9 @@
 
 				var geometry = new THREE.BoxGeometry( 10, 0.15, 10 );
 				var material = new THREE.MeshPhongMaterial( {
-					color: 0xa0adaf,
+					color: 0x888888,
 					shininess: 150,
-					specular: 0xffffff,
+					specular: 0x888888,
 					shading: THREE.SmoothShading
 				} );
 
