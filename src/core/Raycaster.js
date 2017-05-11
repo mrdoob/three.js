@@ -1,4 +1,5 @@
 import { Ray } from '../math/Ray';
+import { Layers } from '../math/Layers';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -13,6 +14,10 @@ function Raycaster( origin, direction, near, far ) {
 
 	this.near = near || 0;
 	this.far = far || Infinity;
+
+	this.layers = new Layers();
+	// the default layer mask of 0 turns off layer testing
+	this.layers.mask = 0;
 
 	this.params = {
 		Mesh: {},
@@ -43,7 +48,11 @@ function intersectObject( object, raycaster, intersects, recursive ) {
 
 	if ( object.visible === false ) return;
 
-	object.raycast( raycaster, intersects );
+	if ( raycaster.layers.mask === 0 || raycaster.layers.test( object.layers ) ) {
+
+		object.raycast( raycaster, intersects );
+
+	}
 
 	if ( recursive === true ) {
 
