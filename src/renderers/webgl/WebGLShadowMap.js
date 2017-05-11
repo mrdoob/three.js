@@ -120,12 +120,13 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		// render depth map
 
-		var faceCount, isPointLight;
+		var faceCount;
 
 		for ( var i = 0, il = _lightShadows.length; i < il; i ++ ) {
 
 			var light = _lightShadows[ i ];
 			var shadow = light.shadow;
+			var isPointLight = light && light.isPointLight;
 
 			if ( shadow === undefined ) {
 
@@ -134,25 +135,12 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
-			if ( shadow.isSpotLightShadow ) {
-
-				shadow.update( light );
-
-			}
-
 			var shadowCamera = shadow.camera;
-			var shadowMatrix = shadow.matrix;
-
-			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-			shadowCamera.position.copy( _lightPositionWorld );
 
 			_shadowMapSize.copy( shadow.mapSize );
 			_shadowMapSize.min( _maxShadowMapSize );
 
-			if ( light && light.isPointLight ) {
-
-				faceCount = 6;
-				isPointLight = true;
+			if ( isPointLight ) {
 
 				var vpWidth = _shadowMapSize.x;
 				var vpHeight = _shadowMapSize.y;
@@ -186,6 +174,34 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				_shadowMapSize.x *= 4.0;
 				_shadowMapSize.y *= 2.0;
 
+			}
+
+			if ( shadow.map === null ) {
+
+				var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
+
+				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
+				shadow.map.texture.name = light.name + ".shadowMap";
+
+				shadowCamera.updateProjectionMatrix();
+
+			}
+
+			if ( shadow.isSpotLightShadow ) {
+
+				shadow.update( light );
+
+			}
+
+			var shadowMap = shadow.map;
+			var shadowMatrix = shadow.matrix;
+
+			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+			shadowCamera.position.copy( _lightPositionWorld );
+
+			if ( isPointLight ) {
+
+				faceCount = 6;
 
 				// for point lights we set the shadow matrix to be a translation-only matrix
 				// equal to inverse of the light's position
@@ -195,7 +211,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			} else {
 
 				faceCount = 1;
-				isPointLight = false;
 
 				_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
 				shadowCamera.lookAt( _lookTarget );
@@ -215,19 +230,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
 
 			}
-
-			if ( shadow.map === null ) {
-
-				var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
-
-				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
-				shadow.map.texture.name = light.name + ".shadowMap";
-
-				shadowCamera.updateProjectionMatrix();
-
-			}
-
-			var shadowMap = shadow.map;
 
 			_renderer.setRenderTarget( shadowMap );
 			_renderer.clear();
