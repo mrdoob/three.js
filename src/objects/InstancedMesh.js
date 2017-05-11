@@ -257,9 +257,9 @@ InstancedMesh.prototype.needsUpdate = function( attribute ){
 
 InstancedMesh.prototype._setAttributes = function(){
 
-	this.geometry.addAttribute( 'instancePosition' , 	new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 3 ) , 3 , 1 ) ); 
-	this.geometry.addAttribute( 'instanceQuaternion' , 	new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 4 ) , 4 , 1 ) );
-	this.geometry.addAttribute( 'instanceScale' , 		new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 3 ) , 3 , 1 ) );
+	this.geometry.addAttribute( 'instancePosition' , 	new InstancedBufferAttribute( new Float32Array( this.numInstances * 3 ) , 3 , 1 ) ); 
+	this.geometry.addAttribute( 'instanceQuaternion' , 	new InstancedBufferAttribute( new Float32Array( this.numInstances * 4 ) , 4 , 1 ) );
+	this.geometry.addAttribute( 'instanceScale' , 		new InstancedBufferAttribute( new Float32Array( this.numInstances * 3 ) , 3 , 1 ) );
 
 	//TODO: allow different combinations
 	this.geometry.attributes.instancePosition.dynamic = this._dynamic;
@@ -268,7 +268,7 @@ InstancedMesh.prototype._setAttributes = function(){
 	
 	if ( this._colors ){
 
-		this.geometry.addAttribute( 'instanceColor' , 	new THREE.InstancedBufferAttribute( new Uint8Array( this.numInstances * 3 ) , 3 , 1 ) );
+		this.geometry.addAttribute( 'instanceColor' , 	new InstancedBufferAttribute( new Uint8Array( this.numInstances * 3 ) , 3 , 1 ) );
 		this.geometry.attributes.instanceColor.normalized = true;
 		this.geometry.attributes.instanceColor.dynamic = this._dynamic;
 
