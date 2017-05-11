@@ -40,11 +40,11 @@
 
 		<script>
 
-			if ( WEBVR.isAvailable() === false ) {
+			WEBVR.checkAvailability().catch( function( message ) {
 
-				document.body.appendChild( WEBVR.getMessage() );
+				document.body.appendChild( WEBVR.getMessageContainer( message ) );
 
-			}
+			} );
 
 			//
 
