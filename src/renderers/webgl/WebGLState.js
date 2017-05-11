@@ -340,7 +340,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	var currentScissorTest = null;
 
-	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
+	var maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
 
 	var version = parseFloat( /^WebGL\ ([0-9])/.exec( gl.getParameter( gl.VERSION ) )[ 1 ] );
 	var lineWidthAvailable = parseFloat( version ) >= 1.0;
