@@ -228,9 +228,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	var cameraR = new THREE.PerspectiveCamera();
 	cameraR.layers.enable( 2 );
 
-	// For use by view dependant post processing effects
-	this.cameraL = cameraL;
-	this.cameraR = cameraR;
+	var cameras = [cameraL, cameraR];
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
@@ -334,6 +332,8 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
+			this.cameras = cameras;
+
 			// render left eye
 			if ( renderTarget ) {
 
@@ -394,6 +394,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		// Regular render mode if not HMD
 
+		this.cameras = null;
 		renderer.render( scene, camera, renderTarget, forceClear );
 
 	};
