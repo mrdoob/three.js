@@ -8,6 +8,8 @@ import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute';
 import { Matrix3 } from '../math/Matrix3';
 import { Matrix4 } from '../math/Matrix4';
+import { Vector3 } from '../math/Vector3';
+import { Quaternion } from '../math/Quaternion';
 
 import { MeshDepthMaterial } from '../materials/MeshDepthMaterial';
 import { RGBADepthPacking } from '../constants';
@@ -215,6 +217,99 @@ InstancedMesh.prototype.setColorAt = function ( index , color ) {
 	);
 
 };
+
+InstancedMesh.prototype.setColorAt = function ( index , color ) {
+
+	if( !this._colors ) {
+
+		console.warn( 'THREE.InstancedMesh: color not enabled');
+
+		return;
+
+	}
+
+	this.geometry.attributes.instanceColor.setXYZ( 
+		index , 
+		Math.floor( color.r * 255 ), 
+		Math.floor( color.g * 255 ), 
+		Math.floor( color.b * 255 )
+	);
+
+};
+
+InstancedMesh.prototype.getPositionAt = function( index , position ){
+
+	var arr = this.geometry.attributes.instancePosition.array;
+
+	index *= 3;
+
+	return position ? 
+
+		position.set( arr[index++], arr[index++], arr[index] ) :
+
+		new Vector3(  arr[index++], arr[index++], arr[index] )
+	;
+	
+};
+
+InstancedMesh.prototype.getQuaternionAt = function ( index , quat ) {
+
+	var arr = this.geometry.attributes.instanceQuaternion.array;
+
+	index = index << 2;
+
+	return quat ? 
+
+		quat.set(       arr[index++], arr[index++], arr[index++], arr[index] ) :
+
+		new Quaternion( arr[index++], arr[index++], arr[index++], arr[index] )
+	;
+	
+};
+
+InstancedMesh.prototype.getScaleAt = function ( index , scale ) {
+
+	var arr = this.geometry.attributes.instanceScale.array;
+
+	index *= 3;
+
+	return scale ? 
+
+		scale.set(   arr[index++], arr[index++], arr[index] ) :
+
+		new Vector3( arr[index++], arr[index++], arr[index] )
+	;
+
+};
+
+InstancedMesh.prototype.getColorAt = (function(){
+
+	var inv255 = 1/255;
+
+	return function ( index , color ) {
+
+		if( !this._colors ) {
+
+			console.warn( 'THREE.InstancedMesh: color not enabled');
+
+			return false;
+
+		}
+
+		var arr = this.geometry.attributes.instanceColor.array;
+		
+		index *= 3;
+
+		return color ? 
+
+			color.setRGB( arr[index++] * inv255, arr[index++] * inv255, arr[index] * inv255 ) :
+
+			new Vector3( arr[index++], arr[index++], arr[index] ).multiplyScalar( inv255 )
+		;
+
+	};
+
+})()
 
 InstancedMesh.prototype.needsUpdate = function( attribute ){
 
