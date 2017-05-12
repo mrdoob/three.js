@@ -332,7 +332,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			this.cameras = cameras;
+			scope.cameras = cameras;
 
 			// render left eye
 			if ( renderTarget ) {
@@ -394,7 +394,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		// Regular render mode if not HMD
 
-		this.cameras = null;
+		scope.cameras = null;
 		renderer.render( scene, camera, renderTarget, forceClear );
 
 	};
