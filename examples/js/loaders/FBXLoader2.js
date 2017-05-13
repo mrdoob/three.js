@@ -118,7 +118,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
