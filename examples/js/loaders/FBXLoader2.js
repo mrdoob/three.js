@@ -1516,31 +1516,13 @@
 			var PoseNode = BindPoseNode.subNodes.PoseNode;
 			var worldMatrices = new Map();
 
-			if ( Array.isArray( PoseNode ) ) {
+			for ( var PoseNodeIndex = 0, PoseNodeLength = PoseNode.length; PoseNodeIndex < PoseNodeLength; ++ PoseNodeIndex ) {
 
-				for ( var PoseNodeIndex = 0, PoseNodeLength = PoseNode.length; PoseNodeIndex < PoseNodeLength; ++ PoseNodeIndex ) {
+				var node = PoseNode[ PoseNodeIndex ];
 
-					var node = PoseNode[ PoseNodeIndex ];
+				var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
 
-					var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
-
-					worldMatrices.set( parseInt( node.id ), rawMatWrd );
-
-				}
-
-			} else {
-
-				var keys = Object.keys( PoseNode );
-
-				for ( var i = 0, il = keys.length; i < il; i++ ) {
-
-					var node = PoseNode[ keys[ i ] ];
-
-					var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
-
-					worldMatrices.set( parseInt( node.id ), rawMatWrd );
-
-				}
+				worldMatrices.set( parseInt( node.id ), rawMatWrd );
 
 			}
 
@@ -4046,10 +4028,6 @@
 						// of text format here.
 
 						properties[ node.name ] = value;
-
-						// If child node's name is Node, this node's id is set to child node's Node value.
-						// This follows TextParser manner.
-						if ( node.name === 'Node' ) id = value;
 
 					}
 
