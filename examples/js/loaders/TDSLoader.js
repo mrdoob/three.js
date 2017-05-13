@@ -1,10 +1,10 @@
-/**
- * Autodesk 3DS threee.js file loader based on lib3ds.
+/*
+ * Autodesk 3DS threee.js file loader, based on lib3ds.
  * 
  * Loads geometry with uv and materials basic properties.
  * 
- * @author @timknip
  * @author @tentone
+ * @author @timknip
  */
 
 "use strict";
@@ -12,7 +12,7 @@
 THREE.TDSLoader = function(manager)
 {
 	this.manager = (manager !== undefined) ? manager : THREE.DefaultLoadingManager;
-	this.debug = true;
+	this.debug = false;
 
 	this.group = null;
 	this.position = 0;
@@ -179,14 +179,33 @@ THREE.TDSLoader.prototype.readMaterialEntry = function(data)
 		}
 		else if(next === MAT_TEXMAP)
 		{
-			this.debugMessage("   Map");
+			this.debugMessage("   Map (TODO ImageLoader)");
 			//var map = this.readMap(data);
 			//TODO <ADD CODE HERE>
 		}
 		else if(next === MAT_BUMPMAP)
 		{
-			this.debugMessage("   BumpMap");
-			//var bumpMap = this.readMap(data);
+			this.debugMessage("   BumpMap (TODO ImageLoader)");
+			//TODO <ADD CODE HERE>
+		}
+		else if(next == MAT_OPACMAP)
+		{
+			this.debugMessage("   OpacityMap (TODO ImageLoader)");
+			//TODO <ADD CODE HERE>
+		}
+		else if(next == MAT_SPECMAP)
+		{
+			this.debugMessage("   SpecularMap (TODO ImageLoader)");
+			//TODO <ADD CODE HERE>
+		}
+		else if(next == MAT_SHINMAP)
+		{
+			this.debugMessage("   ShininessrMap (TODO ImageLoader)");
+			//TODO <ADD CODE HERE>
+		}
+		else if(next == MAT_REFLMAP)
+		{
+			this.debugMessage("   RelectMap (TODO ImageLoader)");
 			//TODO <ADD CODE HERE>
 		}
 		else
@@ -241,7 +260,19 @@ THREE.TDSLoader.prototype.readMesh = function(data)
 	var chunk = this.readChunk(data);
 	var next = this.nextChunk(data, chunk);
 
-	var geometry = new THREE.Geometry();
+	var useBufferGeometry = false;
+	var geometry = null;
+	var uvs = [];
+
+	if(useBufferGeometry)
+	{
+		geometry = new THREE.BufferGeometry();
+	}
+	else
+	{
+		geometry = new THREE.Geometry();
+	}
+
 	var material = new THREE.MeshPhongMaterial();
 	var mesh = new THREE.Mesh(geometry, material);
 	mesh.name = "mesh";
@@ -252,12 +283,28 @@ THREE.TDSLoader.prototype.readMesh = function(data)
 		{
 			var points = this.readWord(data);
 
-			for(var i = 0; i < points; i++)
-			{
-				geometry.vertices.push(new THREE.Vector3(this.readFloat(data), this.readFloat(data), this.readFloat(data)));
-			}
-
 			this.debugMessage("   Vertex: " + points);
+
+			//BufferGeometry
+			if(useBufferGeometry)
+			{
+				var vertices = [];
+				for(var i = 0; i < points; i++)
+				{
+					vertices.push(this.readFloat(data));
+					vertices.push(this.readFloat(data));
+					vertices.push(this.readFloat(data));
+				}
+				geometry.addAttribute("position", new THREE.BufferAttribute(new Float32Array(vertices), 3));
+			}
+			//Geometry
+			else
+			{
+				for(var i = 0; i < points; i++)
+				{
+					geometry.vertices.push(new THREE.Vector3(this.readFloat(data), this.readFloat(data), this.readFloat(data)));
+				}
+			}
 		}
 		else if(next === FACE_ARRAY)
 		{
@@ -268,16 +315,32 @@ THREE.TDSLoader.prototype.readMesh = function(data)
 		{
 			var texels = this.readWord(data);
 
-			for(var i = 0; i < texels; i++)
-			{
-				//geometry.faceVertexUvs[0].push(new THREE.Vector2(this.readFloat(data), this.readFloat(data)));
-			}
-
 			this.debugMessage("   UV: " + texels);
+
+			//BufferGeometry
+			if(useBufferGeometry)
+			{
+				var uvs = [];
+				for(var i = 0; i < texels; i++)
+				{
+					uvs.push(this.readFloat(data));
+					uvs.push(this.readFloat(data));
+				}
+				geometry.addAttribute("uv", new THREE.BufferAttribute(new Float32Array(uvs), 2));
+			}
+			//Geometry
+			else
+			{
+				uvs = [];
+				for(var i = 0; i < texels; i++)
+				{
+					uvs.push(new THREE.Vector2(this.readFloat(data), this.readFloat(data)));
+				}
+			}
 		}
 		else if(next === MESH_MATRIX)
 		{
-			this.debugMessage("   Matrix");
+			this.debugMessage("   Tranformation Matrix (TODO)");
 			//TODO <ADD CODE HERE>
 		}
 		else
@@ -287,8 +350,20 @@ THREE.TDSLoader.prototype.readMesh = function(data)
 
 		next = this.nextChunk(data, chunk);
 	}
-
 	this.endChunk(chunk);
+
+	if(!useBufferGeometry)
+	{
+		//geometry.faceVertexUvs[0][faceIndex][vertexIndex]
+		var faceUV = [];
+		for(var i = 0; i < geometry.faces.length; i++)
+		{
+			faceUV.push([uvs[geometry.faces[i].a], uvs[geometry.faces[i].b], uvs[geometry.faces[i].c]]);
+		}
+		geometry.faceVertexUvs[0] = faceUV;
+
+		geometry.computeVertexNormals();
+	}
 
 	return mesh;
 };
@@ -333,7 +408,7 @@ THREE.TDSLoader.prototype.readFaceArray = function(data, mesh)
 		}
 		else if(chunk.id === SMOOTH_GROUP)
 		{
-			this.debugMessage("      Smooth Group");
+			this.debugMessage("      Smooth Group (TODO)");
 			//TODO <ADD CODE HERE>
 		}
 		else
@@ -346,6 +421,7 @@ THREE.TDSLoader.prototype.readFaceArray = function(data, mesh)
 
 	this.endChunk(chunk);
 };
+
 
 THREE.TDSLoader.prototype.readMap = function(data)
 {
