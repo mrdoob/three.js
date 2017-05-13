@@ -74,7 +74,16 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 	this.addAttribute( 'position', new Float32BufferAttribute( vertexBuffer, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
-	this.normalizeNormals();
+
+	if ( detail === 0 ) {
+
+		BufferGeometry.prototype.computeVertexNormals.call( this ); // flat normals
+
+	} else {
+
+		this.normalizeNormals(); // smooth normals
+
+	}
 
 	// helper functions
 
