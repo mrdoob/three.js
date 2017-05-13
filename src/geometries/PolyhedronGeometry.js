@@ -77,7 +77,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	if ( detail === 0 ) {
 
-		BufferGeometry.prototype.computeVertexNormals.call( this ); // flat normals
+		this.computeVertexNormals(); // flat normals
 
 	} else {
 
