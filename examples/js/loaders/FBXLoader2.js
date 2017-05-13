@@ -1,8 +1,9 @@
 /**
  * @author Kyle-Larson https://github.com/Kyle-Larson
+ * @author Takahiro https://github.com/takahirox
  *
  * Loader loads FBX file and generates Group representing FBX scene.
- * Requires FBX file to be >= 7.0 and in ASCII format.
+ * Requires FBX file to be >= 7.0 and in ASCII or to be any version in Binary format.
  *
  * Supports:
  * 	Mesh Generation (Positional Data)
@@ -35,7 +36,7 @@
 	Object.assign( THREE.FBXLoader.prototype, {
 
 		/**
-		 * Loads an ASCII FBX file from URL and parses into a THREE.Group.
+		 * Loads an ASCII/Binary FBX file from URL and parses into a THREE.Group.
 		 * THREE.Group will have an animations property of AnimationClips
 		 * of the different animations exported with the FBX.
 		 * @param {string} url - URL of the FBX file.
@@ -52,11 +53,12 @@
 			resourceDirectory = resourceDirectory.join( '/' ) + '/';
 
 			var loader = new THREE.FileLoader( this.manager );
-			loader.load( url, function ( text ) {
+			loader.setResponseType( 'arraybuffer' );
+			loader.load( url, function ( buffer ) {
 
 				try {
 
-					var scene = self.parse( text, resourceDirectory );
+					var scene = self.parse( buffer, resourceDirectory );
 
 					onLoad( scene );
 
@@ -77,38 +79,50 @@
 		},
 
 		/**
-		 * Parses an ASCII FBX file and returns a THREE.Group.
+		 * Parses an ASCII/Binary FBX file and returns a THREE.Group.
 		 * THREE.Group will have an animations property of AnimationClips
 		 * of the different animations within the FBX file.
-		 * @param {string} FBXText - Contents of FBX file to parse.
+		 * @param {ArrayBuffer} FBXBuffer - Contents of FBX file to parse.
 		 * @param {string} resourceDirectory - Directory to load external assets (e.g. textures ) from.
 		 * @returns {THREE.Group}
 		 */
-		parse: function ( FBXText, resourceDirectory ) {
+		parse: function ( FBXBuffer, resourceDirectory ) {
 
-			if ( ! isFbxFormatASCII( FBXText ) ) {
+			var FBXTree;
 
-				throw new Error( 'FBXLoader: FBX Binary format not supported.' );
-				self.manager.itemError( url );
-				return;
+			if ( isFbxFormatBinary( FBXBuffer ) ) {
 
-				//TODO: Support Binary parsing.  Hopefully in the future,
-				//we call var FBXTree = new BinaryParser().parse( FBXText );
+				FBXTree = new BinaryParser().parse( FBXBuffer );
+
+			} else {
+
+				var FBXText = convertArrayBufferToString( FBXBuffer );
+
+				if ( ! isFbxFormatASCII( FBXText ) ) {
+
+					throw new Error( 'FBXLoader: Unknown format.' );
+					self.manager.itemError( url );
+					return;
+
+				}
+
+				if ( getFbxVersion( FBXText ) < 7000 ) {
+
+					throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( FBXText ) );
+					self.manager.itemError( url );
+					return;
+
+				}
+
+				FBXTree = new TextParser().parse( FBXText );
 
 			}
 
-			if ( getFbxVersion( FBXText ) < 7000 ) {
-
-				throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( text ) );
-				self.manager.itemError( url );
-				return;
-
-			}
-
-			var FBXTree = new TextParser().parse( FBXText );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
-			var textures = parseTextures( FBXTree, new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ) );
+			var images = parseImages( FBXTree );
+			var textures = parseTextures( FBXTree, new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ), images, connections );
 			var materials = parseMaterials( FBXTree, textures, connections );
 			var deformers = parseDeformers( FBXTree, connections );
 			var geometryMap = parseGeometries( FBXTree, connections, deformers );
@@ -175,11 +189,96 @@
 	}
 
 	/**
+	 * Parses map of images referenced in FBXTree.
+	 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
+	 * @returns {Map<number, string(image blob URL)>}
+	 */
+	function parseImages( FBXTree ) {
+
+		/**
+		 * @type {Map<number, string(image blob URL)>}
+		 */
+		var imageMap = new Map();
+
+		if ( 'Video' in FBXTree.Objects.subNodes ) {
+
+			var videoNodes = FBXTree.Objects.subNodes.Video;
+
+			for ( var nodeID in videoNodes ) {
+
+				var videoNode = videoNodes[ nodeID ];
+
+				// raw image data is in videoNode.properties.Content
+				if ( 'Content' in videoNode.properties ) {
+
+					var image = parseImage( videoNodes[ nodeID ] );
+					imageMap.set( parseInt( nodeID ), image );
+
+				}
+
+			}
+
+		}
+
+		return imageMap;
+
+	}
+
+	/**
+	 * @param {videoNode} videoNode - Node to get texture image information from.
+	 * @returns {string} - image blob URL
+	 */
+	function parseImage( videoNode ) {
+
+		var buffer = videoNode.properties.Content;
+		var array = new Uint8Array( buffer );
+		var fileName = videoNode.properties.RelativeFilename || videoNode.properties.Filename;
+		var extension = fileName.slice( fileName.lastIndexOf( '.' ) + 1 ).toLowerCase();
+
+		var type;
+
+		switch ( extension ) {
+
+			case 'bmp':
+
+				type = 'image/bmp';
+				break;
+
+			case 'jpg':
+
+				type = 'image/jpeg';
+				break;
+
+			case 'png':
+
+				type = 'image/png';
+				break;
+
+			case 'tif':
+
+				type = 'image/tiff';
+				break;
+
+			default:
+
+				console.warn( 'FBXLoader: No support image type ' + extension );
+				return;
+
+		}
+
+		return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+
+	}
+
+	/**
 	 * Parses map of textures referenced in FBXTree.
 	 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
+	 * @param {THREE.TextureLoader} loader
+	 * @param {Map<number, string(image blob URL)>} imageMap
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 	 * @returns {Map<number, THREE.Texture>}
 	 */
-	function parseTextures( FBXTree, loader ) {
+	function parseTextures( FBXTree, loader, imageMap, connections ) {
 
 		/**
 		 * @type {Map<number, THREE.Texture>}
@@ -191,7 +290,7 @@
 			var textureNodes = FBXTree.Objects.subNodes.Texture;
 			for ( var nodeID in textureNodes ) {
 
-				var texture = parseTexture( textureNodes[ nodeID ], loader );
+				var texture = parseTexture( textureNodes[ nodeID ], loader, imageMap, connections );
 				textureMap.set( parseInt( nodeID ), texture );
 
 			}
@@ -204,29 +303,68 @@
 
 	/**
 	 * @param {textureNode} textureNode - Node to get texture information from.
+	 * @param {THREE.TextureLoader} loader
+	 * @param {Map<number, string(image blob URL)>} imageMap
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 	 * @returns {THREE.Texture}
 	 */
-	function parseTexture( textureNode, loader ) {
+	function parseTexture( textureNode, loader, imageMap, connections ) {
 
 		var FBX_ID = textureNode.id;
-		var name = textureNode.name;
-		var filePath = textureNode.properties.FileName;
-		var split = filePath.split( /[\\\/]/ );
-		if ( split.length > 0 ) {
 
-			var fileName = split[ split.length - 1 ];
+		var name = textureNode.name;
+
+		var fileName;
+
+		var filePath = textureNode.properties.FileName;
+		var relativeFilePath = textureNode.properties.RelativeFilename;
+
+		var children = connections.get( FBX_ID ).children;
+
+		if ( children !== undefined && children.length > 0 && imageMap.has( children[ 0 ].ID ) ) {
+
+			fileName = imageMap.get( children[ 0 ].ID );
+
+		} else if ( relativeFilePath !== undefined && relativeFilePath[ 0 ] !== '/' &&
+				relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
+
+			// use textureNode.properties.RelativeFilename
+			// if it exists and it doesn't seem an absolute path
+
+			fileName = relativeFilePath;
 
 		} else {
 
-			var fileName = filePath;
+			var split = filePath.split( /[\\\/]/ );
+
+			if ( split.length > 0 ) {
+
+				fileName = split[ split.length - 1 ];
+
+			} else {
+
+				fileName = filePath;
+
+			}
 
 		}
+
+		var currentPath = loader.path;
+
+		if ( fileName.indexOf( 'blob:' ) === 0 ) {
+
+			loader.setPath( undefined );
+
+		}
+
 		/**
 		 * @type {THREE.Texture}
 		 */
 		var texture = loader.load( fileName );
 		texture.name = name;
 		texture.FBX_ID = FBX_ID;
+
+		loader.setPath( currentPath );
 
 		return texture;
 
@@ -284,6 +422,7 @@
 		var parameters = parseParameters( materialNode.properties, textureMap, children );
 
 		var material;
+
 		switch ( type ) {
 
 			case 'phong':
@@ -363,8 +502,10 @@
 			var relationship = childrenRelationships[ childrenRelationshipsIndex ];
 
 			var type = relationship.relationship;
+
 			switch ( type ) {
 
+				case "DiffuseColor":
 				case " \"DiffuseColor":
 					parameters.map = textureMap.get( relationship.ID );
 					break;
@@ -372,6 +513,9 @@
 				case " \"AmbientColor":
 				case " \"Bump":
 				case " \"EmissiveColor":
+				case "AmbientColor":
+				case "Bump":
+				case "EmissiveColor":
 				default:
 					console.warn( 'Unknown texture application of type ' + type + ', skipping texture' );
 					break;
@@ -694,9 +838,21 @@
 			if ( endOfFace ) {
 
 				var face = new Face();
-				var materials = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo );
 				face.genTrianglesFromVertices( faceVertexBuffer );
-				face.materialIndex = materials[ 0 ];
+
+				if ( materialInfo !== undefined ) {
+
+					var materials = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo );
+					face.materialIndex = materials[ 0 ];
+
+				} else {
+
+					// Seems like some models don't have materialInfo(subNodes.LayerElementMaterial).
+					// Set 0 in such a case.
+					face.materialIndex = 0;
+
+				}
+
 				geometry.faces.push( face );
 				faceVertexBuffer = [];
 				polygonIndex ++;
@@ -1153,8 +1309,13 @@
 
 					if ( subDeformer ) {
 
+						var model2 = model;
 						model = new THREE.Bone();
 						deformer.bones[ subDeformer.index ] = model;
+
+						// seems like we need this not to make non-connected bone, maybe?
+						// TODO: confirm
+						if ( model2 !== null ) model.add( model2 );
 
 					}
 
@@ -1355,13 +1516,31 @@
 			var PoseNode = BindPoseNode.subNodes.PoseNode;
 			var worldMatrices = new Map();
 
-			for ( var PoseNodeIndex = 0, PoseNodeLength = PoseNode.length; PoseNodeIndex < PoseNodeLength; ++ PoseNodeIndex ) {
+			if ( Array.isArray( PoseNode ) ) {
 
-				var node = PoseNode[ PoseNodeIndex ];
+				for ( var PoseNodeIndex = 0, PoseNodeLength = PoseNode.length; PoseNodeIndex < PoseNodeLength; ++ PoseNodeIndex ) {
 
-				var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
+					var node = PoseNode[ PoseNodeIndex ];
 
-				worldMatrices.set( parseInt( node.id ), rawMatWrd );
+					var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
+
+					worldMatrices.set( parseInt( node.id ), rawMatWrd );
+
+				}
+
+			} else {
+
+				var keys = Object.keys( PoseNode );
+
+				for ( var i = 0, il = keys.length; i < il; i++ ) {
+
+					var node = PoseNode[ keys[ i ] ];
+
+					var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
+
+					worldMatrices.set( parseInt( node.id ), rawMatWrd );
+
+				}
 
 			}
 
@@ -1928,6 +2107,10 @@
 			if ( nodeID.match( /\d+/ ) ) {
 
 				var animationCurve = parseAnimationCurve( rawCurves[ nodeID ] );
+
+				// seems like this check would be necessary?
+				if ( ! connections.has( animationCurve.id ) ) continue;
+
 				animationCurves.push( animationCurve );
 
 				var firstParentConn = connections.get( animationCurve.id ).parents[ 0 ];
@@ -3724,6 +3907,770 @@
 
 	} );
 
+	// Binary format specification:
+	//   https://code.blender.org/2013/08/fbx-binary-file-format-specification/
+	//   https://wiki.rogiken.org/specifications/file-format/fbx/ (more detail but Japanese)
+	function BinaryParser() {}
+
+	Object.assign( BinaryParser.prototype, {
+
+		/**
+		 * Parses binary data and builds FBXTree as much compatible as possible with the one built by TextParser.
+		 * @param {ArrayBuffer} buffer
+		 * @returns {THREE.FBXTree}
+		 */
+		parse: function ( buffer ) {
+
+			var reader = new BinaryReader( buffer );
+			reader.skip( 23 ); // skip magic 23 bytes
+
+			var version = reader.getUint32();
+
+			console.log( 'FBX binary version: ' + version );
+
+			var allNodes = new FBXTree();
+
+			while ( ! this.endOfContent( reader ) ) {
+
+				var node = this.parseNode( reader, version );
+				if ( node !== null ) allNodes.add( node.name, node );
+
+			}
+
+			return allNodes;
+
+		},
+
+		/**
+		 * Checks if reader has reached the end of content.
+		 * @param {BinaryReader} reader
+		 * @returns {boolean}
+		 */
+		endOfContent: function( reader ) {
+
+			// footer size: 160bytes + 16-byte alignment padding
+			// - 16bytes: magic
+			// - padding til 16-byte alignment
+			//   (seems like some exporters embed fixed 15bytes?)
+			// - 4bytes: magic
+			// - 4bytes: version
+			// - 120bytes: zero
+			// - 16bytes: magic
+			if ( reader.size() % 16 === 0 ) {
+
+				return ( ( reader.getOffset() + 160 + 15 ) & ~0xf ) >= reader.size();
+
+			} else {
+
+				return reader.getOffset() + 160 + 15 >= reader.size();
+
+			}
+
+		},
+
+		/**
+		 * Parses Node as much compatible as possible with the one parsed by TextParser
+		 * TODO: could be optimized more?
+		 * @param {BinaryReader} reader
+		 * @param {number} version
+		 * @returns {Object} - Returns an Object as node, or null if NULL-record.
+		 */
+		parseNode: function ( reader, version ) {
+
+			// The first three data sizes depends on version.
+			var endOffset = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+			var numProperties = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+			var propertyListLen = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+			var nameLen = reader.getUint8();
+			var name = reader.getString( nameLen );
+
+			// Regards this node as NULL-record if endOffset is zero
+			if ( endOffset === 0 ) return null;
+
+			var propertyList = [];
+
+			for ( var i = 0; i < numProperties; i ++ ) {
+
+				propertyList.push( this.parseProperty( reader ) );
+
+			}
+
+			// Regards the first three elements in propertyList as id, attrName, and attrType
+			var id = propertyList.length > 0 ? propertyList[ 0 ] : '';
+			var attrName = propertyList.length > 1 ? propertyList[ 1 ] : '';
+			var attrType = propertyList.length > 2 ? propertyList[ 2 ] : '';
+
+			var subNodes = {};
+			var properties = {};
+
+			var isSingleProperty = false;
+
+			// if this node represents just a single property
+			// like (name, 0) set or (name2, [0, 1, 2]) set of {name: 0, name2: [0, 1, 2]}
+			if ( numProperties === 1 && reader.getOffset() === endOffset ) {
+
+				isSingleProperty = true;
+
+			}
+
+			while ( endOffset > reader.getOffset() ) {
+
+				var node = this.parseNode( reader, version );
+
+				if ( node === null ) continue;
+
+				// special case: child node is single property
+				if ( node.singleProperty === true ) {
+
+					var value = node.propertyList[ 0 ];
+
+					if ( Array.isArray( value ) ) {
+
+						// node represents
+						//	Vertices: *3 {
+						//		a: 0.01, 0.02, 0.03
+						//	}
+						// of text format here.
+
+						node.properties[ node.name ] = node.propertyList[ 0 ];
+						subNodes[ node.name ] = node;
+
+						// Later phase expects single property array is in node.properties.a as String.
+						// TODO: optimize
+						node.properties.a = value.toString();
+
+					} else {
+
+						// node represents
+						// 	Version: 100
+						// of text format here.
+
+						properties[ node.name ] = value;
+
+						// If child node's name is Node, this node's id is set to child node's Node value.
+						// This follows TextParser manner.
+						if ( node.name === 'Node' ) id = value;
+
+					}
+
+					continue;
+
+				}
+
+				// special case: connections
+				if ( name === 'Connections' && node.name === 'C' ) {
+
+					var array = [];
+
+					// node.propertyList would be like
+					// ["OO", 111264976, 144038752, "d|x"] (?, from, to, additional values)
+					for ( var i = 1, il = node.propertyList.length; i < il; i ++ ) {
+
+						array[ i - 1 ] = node.propertyList[ i ];
+
+					}
+
+					if ( properties.connections === undefined ) {
+
+						properties.connections = [];
+
+					}
+
+					properties.connections.push( array );
+
+					continue;
+
+				}
+
+				// special case: child node is Properties\d+
+				if ( node.name.match( /^Properties\d+$/ ) ) {
+
+					// move child node's properties to this node.
+
+					var keys = Object.keys( node.properties );
+
+					for ( var i = 0, il = keys.length; i < il; i ++ ) {
+
+						var key = keys[ i ];
+						properties[ key ] = node.properties[ key ];
+
+					}
+
+					continue;
+
+				}
+
+				// special case: properties
+				if ( name.match( /^Properties\d+$/ ) && node.name === 'P' ) {
+
+					var innerPropName = node.propertyList[ 0 ];
+					var innerPropType1 = node.propertyList[ 1 ];
+					var innerPropType2 = node.propertyList[ 2 ];
+					var innerPropFlag = node.propertyList[ 3 ];
+					var innerPropValue;
+
+					if ( innerPropName.indexOf( 'Lcl ' ) === 0 ) innerPropName = innerPropName.replace( 'Lcl ', 'Lcl_' );
+					if ( innerPropType1.indexOf( 'Lcl ' ) === 0 ) innerPropType1 = innerPropType1.replace( 'Lcl ', 'Lcl_' );
+
+					if ( innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' ||
+						 innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
+
+						innerPropValue = [
+							node.propertyList[ 4 ],
+							node.propertyList[ 5 ],
+							node.propertyList[ 6 ]
+						];
+
+					} else {
+
+						innerPropValue = node.propertyList[ 4 ];
+
+					}
+
+					if ( innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
+
+						innerPropValue = innerPropValue.toString();
+
+					}
+
+					// this will be copied to parent. see above.
+					properties[ innerPropName ] = {
+
+						'type': innerPropType1,
+						'type2': innerPropType2,
+						'flag': innerPropFlag,
+						'value': innerPropValue
+
+					};
+
+					continue;
+
+				}
+
+				// standard case
+				// follows TextParser's manner.
+				if ( subNodes[ node.name ] === undefined ) {
+
+					if ( typeof node.id === 'number' ) {
+
+						subNodes[ node.name ] = {};
+						subNodes[ node.name ][ node.id ] = node;
+
+					} else {
+
+						subNodes[ node.name ] = node;
+
+					}
+
+				} else {
+
+					if ( node.id === '' ) {
+
+						if ( ! Array.isArray( subNodes[ node.name ] ) ) {
+
+							subNodes[ node.name ] = [ subNodes[ node.name ] ];
+
+						}
+
+						subNodes[ node.name ].push( node );
+
+					} else {
+
+						if ( subNodes[ node.name ][ node.id ] === undefined ) {
+
+							subNodes[ node.name ][ node.id ] = node;
+
+						} else {
+
+							// conflict id. irregular?
+
+							if ( ! Array.isArray( subNodes[ node.name ][ node.id ] ) ) {
+
+								subNodes[ node.name ][ node.id ] = [ subNodes[ node.name ][ node.id ] ];
+
+							}
+
+							subNodes[ node.name ][ node.id ].push( node );
+
+						}
+
+					}
+
+				}
+
+			}
+
+			return {
+
+				singleProperty: isSingleProperty,
+				id: id,
+				attrName: attrName,
+				attrType: attrType,
+				name: name,
+				properties: properties,
+				propertyList: propertyList, // raw property list, would be used by parent
+				subNodes: subNodes
+
+			};
+
+		},
+
+		parseProperty: function ( reader ) {
+
+			var type = reader.getChar();
+
+			switch ( type ) {
+
+				case 'F':
+					return reader.getFloat32();
+
+				case 'D':
+					return reader.getFloat64();
+
+				case 'L':
+					return reader.getInt64();
+
+				case 'I':
+					return reader.getInt32();
+
+				case 'Y':
+					return reader.getInt16();
+
+				case 'C':
+					return reader.getBoolean();
+
+				case 'f':
+				case 'd':
+				case 'l':
+				case 'i':
+				case 'b':
+
+					var arrayLength = reader.getUint32();
+					var encoding = reader.getUint32(); // 0: non-compressed, 1: compressed
+					var compressedLength = reader.getUint32();
+
+					if ( encoding === 0 ) {
+
+						switch ( type ) {
+
+							case 'f':
+								return reader.getFloat32Array( arrayLength );
+
+							case 'd':
+								return reader.getFloat64Array( arrayLength );
+
+							case 'l':
+								return reader.getInt64Array( arrayLength );
+
+							case 'i':
+								return reader.getInt32Array( arrayLength );
+
+							case 'b':
+								return reader.getBooleanArray( arrayLength );
+
+						}
+
+					}
+
+					if ( window.Zlib === undefined ) {
+
+						throw new Error( 'FBXLoader: Import https://github.com/imaya/zlib.js' );
+
+					}
+
+					var inflate = new Zlib.Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
+					var reader2 = new BinaryReader( inflate.decompress().buffer );
+
+					switch ( type ) {
+
+						case 'f':
+							return reader2.getFloat32Array( arrayLength );
+
+						case 'd':
+							return reader2.getFloat64Array( arrayLength );
+
+						case 'l':
+							return reader2.getInt64Array( arrayLength );
+
+						case 'i':
+							return reader2.getInt32Array( arrayLength );
+
+						case 'b':
+							return reader2.getBooleanArray( arrayLength );
+
+					}
+
+				case 'S':
+					var length = reader.getUint32();
+					return reader.getString( length );
+
+				case 'R':
+					var length = reader.getUint32();
+					return reader.getArrayBuffer( length );
+
+				default:
+					throw new Error( 'FBXLoader: Unknown property type ' + type );
+
+			}
+
+		}
+
+	} );
+
+
+	function BinaryReader( buffer, littleEndian ) {
+
+		this.dv = new DataView( buffer );
+		this.offset = 0;
+		this.littleEndian = ( littleEndian !== undefined ) ? littleEndian : true;
+
+	}
+
+	Object.assign( BinaryReader.prototype, {
+
+		getOffset: function () {
+
+			return this.offset;
+
+		},
+
+		size: function () {
+
+			return this.dv.buffer.byteLength;
+
+		},
+
+		skip: function ( length ) {
+
+			this.offset += length;
+
+		},
+
+		// seems like true/false representation depends on exporter.
+		//   true: 1 or 'Y'(=0x59), false: 0 or 'T'(=0x54)
+		// then sees LSB.
+		getBoolean: function () {
+
+			return ( this.getUint8() & 1 ) === 1;
+
+		},
+
+		getBooleanArray: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getBoolean() );
+
+			}
+
+			return a;
+
+		},
+
+		getInt8: function () {
+
+			var value = this.dv.getInt8( this.offset );
+			this.offset += 1;
+			return value;
+
+		},
+
+		getInt8Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getInt8() );
+
+			}
+
+			return a;
+
+		},
+
+		getUint8: function () {
+
+			var value = this.dv.getUint8( this.offset );
+			this.offset += 1;
+			return value;
+
+		},
+
+		getUint8Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getUint8() );
+
+			}
+
+			return a;
+
+		},
+
+		getInt16: function () {
+
+			var value = this.dv.getInt16( this.offset, this.littleEndian );
+			this.offset += 2;
+			return value;
+
+		},
+
+		getInt16Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getInt16() );
+
+			}
+
+			return a;
+
+		},
+
+		getUint16: function () {
+
+			var value = this.dv.getUint16( this.offset, this.littleEndian );
+			this.offset += 2;
+			return value;
+
+		},
+
+		getUint16Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getUint16() );
+
+			}
+
+			return a;
+
+		},
+
+		getInt32: function () {
+
+			var value = this.dv.getInt32( this.offset, this.littleEndian );
+			this.offset += 4;
+			return value;
+
+		},
+
+		getInt32Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getInt32() );
+
+			}
+
+			return a;
+
+		},
+
+		getUint32: function () {
+
+			var value = this.dv.getUint32( this.offset, this.littleEndian );
+			this.offset += 4;
+			return value;
+
+		},
+
+		getUint32Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getUint32() );
+
+			}
+
+			return a;
+
+		},
+
+		// JavaScript doesn't support 64-bit integer so attempting to calculate by ourselves.
+		// 1 << 32 will return 1 so using multiply operation instead here.
+		// There'd be a possibility that this method returns wrong value if the value
+		// is out of the range between Number.MAX_SAFE_INTEGER and Number.MIN_SAFE_INTEGER.
+		// TODO: safely handle 64-bit integer
+		getInt64: function () {
+
+			var low, high;
+
+			if ( this.littleEndian ) {
+
+				low = this.getUint32();
+				high = this.getUint32();
+
+			} else {
+
+				high = this.getUint32();
+				low = this.getUint32();
+
+			}
+
+			// calculate negative value
+			if ( high & 0x80000000 ) {
+
+				high = ~high & 0xFFFFFFFF;
+				low = ~low & 0xFFFFFFFF;
+
+				if ( low === 0xFFFFFFFF ) high = ( high + 1 ) & 0xFFFFFFFF;
+
+				low = ( low + 1 ) & 0xFFFFFFFF;
+
+				return - ( high * 0x100000000 + low );
+
+			}
+
+			return high * 0x100000000 + low;
+
+		},
+
+		getInt64Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getInt64() );
+
+			}
+
+			return a;
+
+		},
+
+		// Note: see getInt64() comment
+		getUint64: function () {
+
+			var low, high;
+
+			if ( this.littleEndian ) {
+
+				low = this.getUint32();
+				high = this.getUint32();
+
+			} else {
+
+				high = this.getUint32();
+				low = this.getUint32();
+
+			}
+
+			return high * 0x100000000 + low;
+
+		},
+
+		getUint64Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getUint64() );
+
+			}
+
+			return a;
+
+		},
+
+		getFloat32: function () {
+
+			var value = this.dv.getFloat32( this.offset, this.littleEndian );
+			this.offset += 4;
+			return value;
+
+		},
+
+		getFloat32Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getFloat32() );
+
+			}
+
+			return a;
+
+		},
+
+		getFloat64: function () {
+
+			var value = this.dv.getFloat64( this.offset, this.littleEndian );
+			this.offset += 8;
+			return value;
+
+		},
+
+		getFloat64Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getFloat64() );
+
+			}
+
+			return a;
+
+		},
+
+		getArrayBuffer: function ( size ) {
+
+			var value = this.dv.buffer.slice( this.offset, this.offset + size );
+			this.offset += size;
+			return value;
+
+		},
+
+		getChar: function () {
+
+			return String.fromCharCode( this.getUint8() );
+
+		},
+
+		getString: function ( size ) {
+
+			var s = '';
+
+			while ( size > 0 ) {
+
+				var value = this.getUint8();
+				size--;
+
+				if ( value === 0 ) break;
+
+				s += String.fromCharCode( value );
+
+			}
+
+			this.skip( size );
+
+			return s;
+
+		}
+
+	} );
+
+
 	function FBXTree() {}
 
 	Object.assign( FBXTree.prototype, {
@@ -3868,6 +4815,19 @@
 
 	} );
 
+
+	/**
+	 * @param {ArrayBuffer} buffer
+	 * @returns {boolean}
+	 */
+	function isFbxFormatBinary( buffer ) {
+
+		var CORRECT = 'Kaydara FBX Binary  \0';
+
+		return buffer.byteLength >= CORRECT.length && CORRECT === convertArrayBufferToString( buffer, 0, CORRECT.length );
+
+	}
+
 	/**
 	 * @returns {boolean}
 	 */
@@ -3997,6 +4957,32 @@
 	function parseMatrixArray( floatString ) {
 
 		return new THREE.Matrix4().fromArray( parseFloatArray( floatString ) );
+
+	}
+
+	/**
+	 * Converts ArrayBuffer to String.
+	 * @param {ArrayBuffer} buffer
+	 * @param {number} from
+	 * @param {number} to
+	 * @returns {String}
+	 */
+	function convertArrayBufferToString( buffer, from, to ) {
+
+		if ( from === undefined ) from = 0;
+		if ( to === undefined ) to = buffer.byteLength;
+
+		var array = new Uint8Array( buffer, from, to );
+
+		var s = '';
+
+		for ( var i = 0, il = array.length; i < il; i ++ ) {
+
+			s += String.fromCharCode( array[ i ] );
+
+		}
+
+		return s;
 
 	}
 
