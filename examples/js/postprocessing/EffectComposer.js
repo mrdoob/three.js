@@ -14,22 +14,35 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 			format: THREE.RGBAFormat,
 			stencilBuffer: false
 		};
+
 		var size = renderer.getSize();
 		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
-		renderTarget.texture.name = "EffectComposer.rt1";
+		renderTarget.texture.name = 'EffectComposer.rt1';
+
 	}
 
 	this.renderTarget1 = renderTarget;
 	this.renderTarget2 = renderTarget.clone();
-	this.renderTarget2.texture.name = "EffectComposer.rt2";
+	this.renderTarget2.texture.name = 'EffectComposer.rt2';
 
 	this.writeBuffer = this.renderTarget1;
 	this.readBuffer = this.renderTarget2;
 
 	this.passes = [];
 
-	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.EffectComposer relies on THREE.CopyShader" );
+	// dependencies
+
+	if ( THREE.CopyShader === undefined ) {
+
+		console.error( 'THREE.EffectComposer relies on THREE.CopyShader' );
+
+	}
+
+	if ( THREE.ShaderPass === undefined ) {
+
+		console.error( 'THREE.EffectComposer relies on THREE.ShaderPass' );
+
+	}
 
 	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
 
@@ -169,7 +182,7 @@ Object.assign( THREE.Pass.prototype, {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		console.error( "THREE.Pass: .render() must be implemented in derived pass." );
+		console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
 
 	}
 
