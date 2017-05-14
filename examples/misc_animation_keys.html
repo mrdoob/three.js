@@ -69,28 +69,46 @@
 
 				//
 
-				var geometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+				var geometry = new THREE.BoxBufferGeometry( 5, 5, 5 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				// create a keyframe track (i.e. a timed sequence of keyframes) for each animated property
+        			// Note: the keyframe track type should correspond to the type of the property being animated
 
-				var tracks = [];
+				// POSITION
+				var positionKF = new THREE.VectorKeyframeTrack('.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] );
 
-				tracks.push( new THREE.NumberKeyframeTrack( '.position', [ 0, 1, 2 ], [  0, 0, 0, 30, 0, 0, 0, 0, 0 ] ) );
-				tracks.push( new THREE.NumberKeyframeTrack( '.scale', [ 0, 1, 2 ], [  1, 1, 1, 2, 2, 2, 1, 1, 1 ] ) );
+        			// SCALE
+        			var scaleKF = new THREE.VectorKeyframeTrack('.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
+
+				// ROTATION
+				// Rotation should be performed using quaternions, using a QuaternionKeyframeTrack
+				// Interpolating Euler angles (.rotation property) can be problematic and is currently not supported
+        
+        			// set up rotation about x axis
+        			var xAxis = new THREE.Vector3( 1, 0, 0 );
+
+				var qInitial = new THREE.Quaternion().setFromAxisAngle( xAxis, 0 );
+				var qFinal = new THREE.Quaternion().setFromAxisAngle( xAxis, Math.PI );
+				var quaternionKF = new THREE.QuaternionKeyframeTrack('.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
+
+				// COLOR - Not yet implemented!
+				// var colorKF = new THREE.ColorKeyframeTrack('.material.color', [0, 1, 2], [0xffff00, 0xffffff, 0xffff00])
 
 				// create an animation sequence with the tracks
+       				 // If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
+				var clip = new THREE.AnimationClip( 'Action', -1, [ scaleKF, positionKF, quaternionKF ] );
 
-				var clip = new THREE.AnimationClip( 'Action', -1, tracks );
-
-				// setup the mixer and play the animation sequence
-
+				// setup the AnimationMixer
 				mixer = new THREE.AnimationMixer( mesh );
-				mixer.clipAction( clip ).play();
 
-				//
+				// create a ClipAction and set it to play
+				var clipAction = mixer.clipAction( clip );
+				clipAction.play();
+
+				// 
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0x555555 );
