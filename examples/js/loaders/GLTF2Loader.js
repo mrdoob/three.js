@@ -1590,6 +1590,12 @@ THREE.GLTF2Loader = ( function () {
 
 					}
 
+					if ( material.doubleSided === true ) {
+
+						materialParams.side = THREE.DoubleSide;
+
+					}
+
 					if ( materialParams.opacity !== undefined && materialParams.opacity < 1.0 ||
 					     ( materialParams.map !== undefined &&
 					       ( materialParams.map.format === THREE.AlphaFormat ||
