@@ -76,6 +76,7 @@ var files = {
 		"webgl_lines_sphere",
 		"webgl_lines_splines",
 		"webgl_loader_3mf",
+		"webgl_loader_3ds",
 		"webgl_loader_amf",
 		"webgl_loader_assimp",
 		"webgl_loader_assimp2json",
