@@ -1309,9 +1309,10 @@ THREE.GLTF2Loader = ( function () {
 
 				var arraybuffer = dependencies.buffers[ bufferView.buffer ];
 
-				var byteLength = bufferView.byteLength !== undefined ? bufferView.byteLength : 0;
+				var byteLength = bufferView.byteLength || 0;
+				var byteOffset = bufferView.byteOffset || 0;
 
-				return arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + byteLength );
+				return arraybuffer.slice( byteOffset, byteOffset + byteLength );
 
 			} );
 
