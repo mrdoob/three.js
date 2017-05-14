@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - OBJ loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - TDSLoader 3DS loader test
+			<p>Press the mouse right button to rotate the model and use the scroll wheel to zoom.</p>
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/loaders/TDSLoader.js"></script>
+		<script src="js/libs/syncinput.min.js"></script>
+
+		<script>
+
+			var container;
+			var camera, scene, renderer;
+			var mouse;
+
+			initialize();
+
+			function initialize()
+			{
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// Mouse
+				mouse = new Mouse();
+
+				// Camera
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 2;
+
+				// Setup scene
+				scene = new THREE.Scene();
+
+				var ambient = new THREE.AmbientLight( 0x101030 );
+				scene.add( ambient );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				directionalLight.position.set( 0, 0, 2 );
+				scene.add( directionalLight );
+
+				// Texture
+				var texture = new THREE.Texture();
+
+				var loader = new THREE.ImageLoader();
+				loader.load( 'models/3ds/portalgun/textures/color.jpg', function ( image ) {
+
+					texture.image = image;
+					texture.needsUpdate = true;
+
+				} );
+
+				// Normal texture
+				var normal = new THREE.Texture();
+
+				loader.load( 'models/3ds/portalgun/textures/normal.jpg', function ( image ) {
+
+					normal.image = image;
+					normal.needsUpdate = true;
+
+				} );
+
+				// 3DS Model
+				var loader = new THREE.TDSLoader( );
+				loader.load( 'models/3ds/portalgun/portalgun.3ds', function ( object ) {
+
+					object.traverse( function ( child ) {
+
+						if ( child instanceof THREE.Mesh ) {
+
+							child.material.map = texture;
+							child.material.normalMap = normal;
+						}
+
+					} );
+
+					scene.add( object );
+
+				});
+
+				// Renderer
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', resize, false );
+
+				update();
+			}
+
+			function update() {
+
+				requestAnimationFrame( update );
+
+				mouse.update();
+
+				if ( mouse.buttonPressed( Mouse.LEFT ) ) {
+
+					scene.rotation.y += mouse.delta.x * 0.01;
+
+				}
+				
+				camera.position.z += mouse.wheel * 0.001;
+
+				renderer.render( scene, camera );
+
+			}
+
+			function resize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+		</script>
+
+	</body>
+</html>

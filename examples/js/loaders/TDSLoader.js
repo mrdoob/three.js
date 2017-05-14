@@ -1,17 +1,17 @@
 /*
  * Autodesk 3DS threee.js file loader, based on lib3ds.
- * 
+ *
  * Loads geometry with uv and materials basic properties.
- * 
+ *
  * @author @tentone
  * @author @timknip
  */
 
-"use strict";
+'use strict';
 
-THREE.TDSLoader = function(manager)
-{
-	this.manager = (manager !== undefined) ? manager : THREE.DefaultLoadingManager;
+THREE.TDSLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.debug = false;
 
 	this.group = null;
@@ -19,595 +19,675 @@ THREE.TDSLoader = function(manager)
 
 	this.materials = [];
 	this.meshes = [];
+
 };
 
-THREE.TDSLoader.prototype.load = function(url, onLoad, onProgress, onError)
-{
-	var scope = this;
+THREE.TDSLoader.prototype = {
 
-	var loader = new THREE.FileLoader(this.manager);
-	loader.setResponseType("arraybuffer");
-	loader.load(url, function(data)
-	{
-		onLoad(scope.parse(data));
-	}, onProgress, onError);
-};
+	load : function ( url, onLoad, onProgress, onError ) {
 
-THREE.TDSLoader.prototype.parse = function(arraybuffer)
-{
-	this.group = new THREE.Group();
-	this.position = 0;
-	this.materials = [];
-	this.meshes = [];
+		var scope = this;
 
-	this.readFile(arraybuffer);
+		var loader = new THREE.FileLoader( this.manager );
 
-	for(var i = 0; i < this.meshes.length; i++)
-	{
-		this.group.add(this.meshes[i]);
-	}
+		loader.setResponseType( 'arraybuffer' );
 
-	return this.group;
-};
+		loader.load( url, function ( data ) {
 
-THREE.TDSLoader.prototype.readFile = function(arraybuffer)
-{
-	var data = new DataView(arraybuffer);
-	var chunk = this.readChunk(data);
+			onLoad( scope.parse( data ) );
 
-	if(chunk.id === MLIBMAGIC || chunk.id === CMAGIC || chunk.id === M3DMAGIC)
-	{
-		var next = this.nextChunk(data, chunk);
+		}, onProgress, onError );
 
-		while(next !== 0)
-		{
-			if(next === M3D_VERSION)
-			{
-				var version = this.readDWord(data);
-				this.debugMessage("3DS file version: " + version);
-			}
-			else if(next === MDATA)
-			{
-				this.resetPosition(data);
-				this.readMeshData(data);
-			}
-			else
-			{
-				this.debugMessage("Unknown main chunk: " + next.toString(16));
-			}
+	},
 
-			next = this.nextChunk(data, chunk);
-		}
-	}
-	
-	this.debugMessage("Parsed " + this.meshes.length + " meshes");
-};
+	parse : function ( arraybuffer ) {
 
-THREE.TDSLoader.prototype.readMeshData = function(data)
-{
-	var chunk = this.readChunk(data);
-	var next = this.nextChunk(data, chunk);
+		this.group = new THREE.Group();
+		this.position = 0;
+		this.materials = [];
+		this.meshes = [];
 
-	while(next !== 0)
-	{
-		if(next === MESH_VERSION)
-		{
-			var version =  + this.readDWord(data);
-			this.debugMessage("Mesh Version: " + version);
-		}
-		else if(next === MASTER_SCALE)
-		{
-			var scale = this.readFloat(data);
-			this.debugMessage("Master scale: " + scale);
-			this.group.scale.set(scale, scale, scale);
-		}
-		else if(next === NAMED_OBJECT)
-		{
-			this.debugMessage("Named Object");
-			this.resetPosition(data);
-			this.readNamedObject(data);
-		}
-		else if(next === MAT_ENTRY)
-		{
-			this.debugMessage("Material");
-			this.resetPosition(data);
-			this.readMaterialEntry(data);
-		}
-		else
-		{
-			this.debugMessage("Unknown MDATA chunk: " + next.toString(16));
+		this.readFile( arraybuffer );
+
+		for ( var i = 0; i < this.meshes.length; i ++ ) {
+
+			this.group.add( this.meshes[ i ] );
+
 		}
 
-		next = this.nextChunk(data, chunk);
-	}
-};
+		return this.group;
 
-THREE.TDSLoader.prototype.readMaterialEntry = function(data)
-{
-	var chunk = this.readChunk(data);
-	var next = this.nextChunk(data, chunk);
-	var material = new THREE.MeshPhongMaterial();
+	},
 
-	while(next !== 0)
-	{
-		if(next === MAT_NAME)
-		{
-			material.name = this.readString(data, 64);
-			this.debugMessage("   Name: " + material.name);
-		}
-		else if(next === MAT_WIRE)
-		{
-			this.debugMessage("   Wireframe");
-			material.wireframe = true;
-		}
-		else if(next === MAT_WIRE_SIZE)
-		{
-			var value = this.readByte(data);
-			material.wireframeLinewidth = value;
-			this.debugMessage("   Wireframe Thickness: " + value);
-		}
-		else if(next === MAT_TWO_SIDE)
-		{
-			material.side = THREE.DoubleSide;
-			this.debugMessage("   DoubleSided");
-		}
-		else if(next === MAT_ADDITIVE)
-		{
-			this.debugMessage("   Additive Blending");
-			material.blending = THREE.AdditiveBlending;
-		}
-		else if(next === MAT_DIFFUSE)
-		{
-			this.debugMessage("   Diffuse Color");
-			material.color = this.readColor(data);
-		}
-		else if(next === MAT_SPECULAR)
-		{
-			this.debugMessage("   Specular Color");
-			material.specular = this.readColor(data);
-		}
-		else if(next === MAT_AMBIENT)
-		{
-			this.debugMessage("   Ambient color");
-			material.color = this.readColor(data);
-		}
-		else if(next === MAT_SHININESS)
-		{
-			var shininess = this.readWord(data);
-			material.shininess = shininess;
-			this.debugMessage("   Shininess : " + shininess);
-		}
-		else if(next === MAT_TEXMAP)
-		{
-			this.debugMessage("   Map (TODO ImageLoader)");
-			//var map = this.readMap(data);
-			//TODO <ADD CODE HERE>
-		}
-		else if(next === MAT_BUMPMAP)
-		{
-			this.debugMessage("   BumpMap (TODO ImageLoader)");
-			//TODO <ADD CODE HERE>
-		}
-		else if(next == MAT_OPACMAP)
-		{
-			this.debugMessage("   OpacityMap (TODO ImageLoader)");
-			//TODO <ADD CODE HERE>
-		}
-		else if(next == MAT_SPECMAP)
-		{
-			this.debugMessage("   SpecularMap (TODO ImageLoader)");
-			//TODO <ADD CODE HERE>
-		}
-		else if(next == MAT_SHINMAP)
-		{
-			this.debugMessage("   ShininessrMap (TODO ImageLoader)");
-			//TODO <ADD CODE HERE>
-		}
-		else if(next == MAT_REFLMAP)
-		{
-			this.debugMessage("   RelectMap (TODO ImageLoader)");
-			//TODO <ADD CODE HERE>
-		}
-		else
-		{
-			this.debugMessage("   Unknown material chunk: " + next.toString(16));
-		}
+	readFile : function ( arraybuffer ) {
 
-		next = this.nextChunk(data, chunk);
-	}
+		var data = new DataView( arraybuffer );
+		var chunk = this.readChunk( data );
 
-	this.endChunk(chunk);
+		if ( chunk.id === MLIBMAGIC || chunk.id === CMAGIC || chunk.id === M3DMAGIC ) {
 
-	this.materials[material.name] = material;
-};
+			var next = this.nextChunk( data, chunk );
 
-THREE.TDSLoader.prototype.readColor = function(data)
-{
-	var chunk = this.readChunk(data);
-	var color = new THREE.Color();
+			while ( next !== 0 ) {
 
-	if(chunk.id === COLOR_24 || chunk.id === LIN_COLOR_24)
-	{
-		var r = this.readByte(data);
-		var g = this.readByte(data);
-		var b = this.readByte(data);
+				if ( next === M3D_VERSION ) {
 
-		color.setRGB(r / 255, g / 255, b / 255);
+					var version = this.readDWord( data );
+					this.debugMessage( '3DS file version: ' + version );
 
-		this.debugMessage("      Color: " + color.r + ", " + color.g + ", " + color.b);
-	}
-	else if(chunk.id === COLOR_F || chunk.id === LIN_COLOR_F)
-	{
-		var r = this.readFloat(data);
-		var g = this.readFloat(data);
-		var b = this.readFloat(data);
-		
-		color.setRGB(r, g, b);
+				} else if ( next === MDATA ) {
 
-		this.debugMessage("      Color: " + color.r + ", " + color.g + ", " + color.b);
-	}
-	else
-	{
-		this.debugMessage("      Unknown color chunk: " + c.toString(16));
-	}
+					this.resetPosition( data );
+					this.readMeshData( data );
 
-	this.endChunk(chunk);
-	return color;
-};
+				} else {
 
-THREE.TDSLoader.prototype.readMesh = function(data)
-{
-	var chunk = this.readChunk(data);
-	var next = this.nextChunk(data, chunk);
+					this.debugMessage( 'Unknown main chunk: ' + next.toString( 16 ) );
 
-	var useBufferGeometry = false;
-	var geometry = null;
-	var uvs = [];
-
-	if(useBufferGeometry)
-	{
-		geometry = new THREE.BufferGeometry();
-	}
-	else
-	{
-		geometry = new THREE.Geometry();
-	}
-
-	var material = new THREE.MeshPhongMaterial();
-	var mesh = new THREE.Mesh(geometry, material);
-	mesh.name = "mesh";
-
-	while(next !== 0)
-	{
-		if(next === POINT_ARRAY)
-		{
-			var points = this.readWord(data);
-
-			this.debugMessage("   Vertex: " + points);
-
-			//BufferGeometry
-			if(useBufferGeometry)
-			{
-				var vertices = [];
-				for(var i = 0; i < points; i++)
-				{
-					vertices.push(this.readFloat(data));
-					vertices.push(this.readFloat(data));
-					vertices.push(this.readFloat(data));
 				}
-				geometry.addAttribute("position", new THREE.BufferAttribute(new Float32Array(vertices), 3));
+
+				next = this.nextChunk( data, chunk );
+
 			}
-			//Geometry
-			else
-			{
-				for(var i = 0; i < points; i++)
-				{
-					geometry.vertices.push(new THREE.Vector3(this.readFloat(data), this.readFloat(data), this.readFloat(data)));
+
+		}
+
+		this.debugMessage( 'Parsed ' + this.meshes.length + ' meshes' );
+
+	},
+
+	readMeshData : function ( data ) {
+
+		var chunk = this.readChunk( data );
+		var next = this.nextChunk( data, chunk );
+
+		while ( next !== 0 ) {
+
+			if ( next === MESH_VERSION ) {
+
+				var version = + this.readDWord( data );
+				this.debugMessage( 'Mesh Version: ' + version );
+
+			} else if ( next === MASTER_SCALE ) {
+
+				var scale = this.readFloat( data );
+				this.debugMessage( 'Master scale: ' + scale );
+				this.group.scale.set( scale, scale, scale );
+
+			} else if ( next === NAMED_OBJECT ) {
+
+				this.debugMessage( 'Named Object' );
+				this.resetPosition( data );
+				this.readNamedObject( data );
+
+			} else if ( next === MAT_ENTRY ) {
+
+				this.debugMessage( 'Material' );
+				this.resetPosition( data );
+				this.readMaterialEntry( data );
+
+			} else {
+
+				this.debugMessage( 'Unknown MDATA chunk: ' + next.toString( 16 ) );
+
+			}
+
+			next = this.nextChunk( data, chunk );
+
+		}
+
+	},
+
+	readMaterialEntry : function ( data ) {
+
+		var chunk = this.readChunk( data );
+		var next = this.nextChunk( data, chunk );
+		var material = new THREE.MeshPhongMaterial();
+
+		while ( next !== 0 ) {
+
+			if ( next === MAT_NAME ) {
+
+				material.name = this.readString( data, 64 );
+				this.debugMessage( '   Name: ' + material.name );
+
+			} else if ( next === MAT_WIRE ) {
+
+				this.debugMessage( '   Wireframe' );
+				material.wireframe = true;
+
+			} else if ( next === MAT_WIRE_SIZE ) {
+
+				var value = this.readByte( data );
+				material.wireframeLinewidth = value;
+				this.debugMessage( '   Wireframe Thickness: ' + value );
+
+			} else if ( next === MAT_TWO_SIDE ) {
+
+				material.side = THREE.DoubleSide;
+				this.debugMessage( '   DoubleSided' );
+
+			} else if ( next === MAT_ADDITIVE ) {
+
+				this.debugMessage( '   Additive Blending' );
+				material.blending = THREE.AdditiveBlending;
+
+			} else if ( next === MAT_DIFFUSE ) {
+
+				this.debugMessage( '   Diffuse Color' );
+				material.color = this.readColor( data );
+
+			} else if ( next === MAT_SPECULAR ) {
+
+				this.debugMessage( '   Specular Color' );
+				material.specular = this.readColor( data );
+
+			} else if ( next === MAT_AMBIENT ) {
+
+				this.debugMessage( '   Ambient color' );
+				material.color = this.readColor( data );
+
+			} else if ( next === MAT_SHININESS ) {
+
+				var shininess = this.readWord( data );
+				material.shininess = shininess;
+				this.debugMessage( '   Shininess : ' + shininess );
+
+			} else if ( next === MAT_TEXMAP ) {
+
+				this.debugMessage( '   Map (TODO ImageLoader)' );
+				//var map = this.readMap(data);
+
+				//TODO <ADD CODE HERE>
+
+			} else if ( next === MAT_BUMPMAP ) {
+
+				this.debugMessage( '   BumpMap (TODO ImageLoader)' );
+
+				//TODO <ADD CODE HERE>
+
+			} else if ( next == MAT_OPACMAP ) {
+
+				this.debugMessage( '   OpacityMap (TODO ImageLoader)' );
+
+				//TODO <ADD CODE HERE>
+
+			} else if ( next == MAT_SPECMAP ) {
+
+				this.debugMessage( '   SpecularMap (TODO ImageLoader)' );
+
+				//TODO <ADD CODE HERE>
+
+			} else if ( next == MAT_SHINMAP ) {
+
+				this.debugMessage( '   ShininessrMap (TODO ImageLoader)' );
+
+				//TODO <ADD CODE HERE>
+
+			} else if ( next == MAT_REFLMAP ) {
+
+				this.debugMessage( '   RelectMap (TODO ImageLoader)' );
+
+				//TODO <ADD CODE HERE>
+
+			} else {
+
+				this.debugMessage( '   Unknown material chunk: ' + next.toString( 16 ) );
+
+			}
+
+			next = this.nextChunk( data, chunk );
+
+		}
+
+		this.endChunk( chunk );
+
+		this.materials[ material.name ] = material;
+
+	},
+
+	readColor : function ( data ) {
+
+		var chunk = this.readChunk( data );
+		var color = new THREE.Color();
+
+		if ( chunk.id === COLOR_24 || chunk.id === LIN_COLOR_24 ) {
+
+			var r = this.readByte( data );
+			var g = this.readByte( data );
+			var b = this.readByte( data );
+
+			color.setRGB( r / 255, g / 255, b / 255 );
+
+			this.debugMessage( '      Color: ' + color.r + ', ' + color.g + ', ' + color.b );
+
+		}	else if ( chunk.id === COLOR_F || chunk.id === LIN_COLOR_F ) {
+
+			var r = this.readFloat( data );
+			var g = this.readFloat( data );
+			var b = this.readFloat( data );
+
+			color.setRGB( r, g, b );
+
+			this.debugMessage( '      Color: ' + color.r + ', ' + color.g + ', ' + color.b );
+
+		}	else {
+
+			this.debugMessage( '      Unknown color chunk: ' + c.toString( 16 ) );
+
+		}
+
+		this.endChunk( chunk );
+		return color;
+
+	},
+
+	readMesh : function ( data ) {
+
+		var chunk = this.readChunk( data );
+		var next = this.nextChunk( data, chunk );
+
+		var useBufferGeometry = false;
+		var geometry = null;
+		var uvs = [];
+
+		if ( useBufferGeometry ) {
+
+			geometry = new THREE.BufferGeometry();
+
+		}	else {
+
+			geometry = new THREE.Geometry();
+
+		}
+
+		var material = new THREE.MeshPhongMaterial();
+		var mesh = new THREE.Mesh( geometry, material );
+		mesh.name = 'mesh';
+
+		while ( next !== 0 ) {
+
+			if ( next === POINT_ARRAY ) {
+
+				var points = this.readWord( data );
+
+				this.debugMessage( '   Vertex: ' + points );
+
+				//BufferGeometry
+
+				if ( useBufferGeometry )	{
+
+					var vertices = [];
+					for ( var i = 0; i < points; i ++ )		{
+
+						vertices.push( this.readFloat( data ) );
+						vertices.push( this.readFloat( data ) );
+						vertices.push( this.readFloat( data ) );
+
+					}
+
+					geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
+
+				} else	{ //Geometry
+
+					for ( var i = 0; i < points; i ++ )		{
+
+						geometry.vertices.push( new THREE.Vector3( this.readFloat( data ), this.readFloat( data ), this.readFloat( data ) ) );
+
+					}
+
 				}
-			}
-		}
-		else if(next === FACE_ARRAY)
-		{
-			this.resetPosition(data);
-			this.readFaceArray(data, mesh);
-		}
-		else if(next === TEX_VERTS)
-		{
-			var texels = this.readWord(data);
 
-			this.debugMessage("   UV: " + texels);
+			} else if ( next === FACE_ARRAY ) {
 
-			//BufferGeometry
-			if(useBufferGeometry)
-			{
-				var uvs = [];
-				for(var i = 0; i < texels; i++)
-				{
-					uvs.push(this.readFloat(data));
-					uvs.push(this.readFloat(data));
+				this.resetPosition( data );
+				this.readFaceArray( data, mesh );
+
+			} else if ( next === TEX_VERTS ) {
+
+				var texels = this.readWord( data );
+
+				this.debugMessage( '   UV: ' + texels );
+
+				//BufferGeometry
+
+				if ( useBufferGeometry )	{
+
+					var uvs = [];
+					for ( var i = 0; i < texels; i ++ )		{
+
+						uvs.push( this.readFloat( data ) );
+						uvs.push( this.readFloat( data ) );
+
+					}
+					geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( uvs ), 2 ) );
+
+				} else { //Geometry
+
+					uvs = [];
+					for ( var i = 0; i < texels; i ++ )		{
+
+						uvs.push( new THREE.Vector2( this.readFloat( data ), this.readFloat( data ) ) );
+
+					}
+
 				}
-				geometry.addAttribute("uv", new THREE.BufferAttribute(new Float32Array(uvs), 2));
+
+			} else if ( next === MESH_MATRIX ) {
+
+				this.debugMessage( '   Tranformation Matrix (TODO)' );
+
+				//TODO <ADD CODE HERE>
+
+			} else {
+
+				this.debugMessage( '   Unknown mesh chunk: ' + next.toString( 16 ) );
+
 			}
-			//Geometry
-			else
-			{
-				uvs = [];
-				for(var i = 0; i < texels; i++)
-				{
-					uvs.push(new THREE.Vector2(this.readFloat(data), this.readFloat(data)));
+
+			next = this.nextChunk( data, chunk );
+
+		}
+
+		this.endChunk( chunk );
+
+		if ( ! useBufferGeometry ) {
+
+			//geometry.faceVertexUvs[0][faceIndex][vertexIndex]
+
+			var faceUV = [];
+
+			for ( var i = 0; i < geometry.faces.length; i ++ ) {
+
+				faceUV.push( [ uvs[ geometry.faces[ i ].a ], uvs[ geometry.faces[ i ].b ], uvs[ geometry.faces[ i ].c ] ] );
+
+			}
+
+			geometry.faceVertexUvs[ 0 ] = faceUV;
+
+			geometry.computeVertexNormals();
+
+		}
+
+		return mesh;
+
+	},
+
+	readFaceArray : function ( data, mesh ) {
+
+		var chunk = this.readChunk( data );
+		var faces = this.readWord( data );
+
+		this.debugMessage( '   Faces: ' + faces );
+
+		for ( var i = 0; i < faces; ++ i ) {
+
+			mesh.geometry.faces.push( new THREE.Face3( this.readWord( data ), this.readWord( data ), this.readWord( data ) ) );
+
+			var visibility = this.readWord( data );
+
+		}
+
+		//The rest of the FACE_ARRAY chunk is subchunks
+
+		while ( this.position < chunk.end ) {
+
+			var chunk = this.readChunk( data );
+
+			if ( chunk.id === MSH_MAT_GROUP ) {
+
+				this.debugMessage( '      Material Group' );
+
+				this.resetPosition( data );
+
+				var group = this.readMaterialGroup( data );
+
+				var material = this.materials[ group.name ];
+
+				if ( material !== undefined )	{
+
+					mesh.material = material;
+
+					if ( material.name === '' )		{
+
+						material.name = mesh.name;
+
+					}
+
 				}
+
+			} else if ( chunk.id === SMOOTH_GROUP ) {
+
+				this.debugMessage( '      Smooth Group (TODO)' );
+
+				//TODO <ADD CODE HERE>
+
+			} else {
+
+				this.debugMessage( '      Unknown face array chunk: ' + chunk.toString( 16 ) );
+
 			}
-		}
-		else if(next === MESH_MATRIX)
-		{
-			this.debugMessage("   Tranformation Matrix (TODO)");
-			//TODO <ADD CODE HERE>
-		}
-		else
-		{
-			this.debugMessage("   Unknown mesh chunk: " + next.toString(16));
+
+			this.endChunk( chunk );
+
 		}
 
-		next = this.nextChunk(data, chunk);
-	}
-	this.endChunk(chunk);
+		this.endChunk( chunk );
 
-	if(!useBufferGeometry)
-	{
-		//geometry.faceVertexUvs[0][faceIndex][vertexIndex]
-		var faceUV = [];
-		for(var i = 0; i < geometry.faces.length; i++)
-		{
-			faceUV.push([uvs[geometry.faces[i].a], uvs[geometry.faces[i].b], uvs[geometry.faces[i].c]]);
-		}
-		geometry.faceVertexUvs[0] = faceUV;
+	},
 
-		geometry.computeVertexNormals();
-	}
+	readMap : function ( data ) {
 
-	return mesh;
-};
+		var chunk = this.readChunk( data );
+		var next = this.nextChunk( data, chunk );
 
-THREE.TDSLoader.prototype.readFaceArray = function(data, mesh)
-{
-	var chunk = this.readChunk(data);
-	var faces = this.readWord(data);
+		while ( next !== 0 ) {
 
-	this.debugMessage("   Faces: " + faces);
+			if ( next === MAT_MAPNAME ) {
 
-	for(var i = 0; i < faces; ++i)
-	{
-		mesh.geometry.faces.push(new THREE.Face3(this.readWord(data), this.readWord(data), this.readWord(data)));
+				var name = this.readString( data, 128 );
+				this.debugMessage( '      MapName: ' + name );
 
-		var visibility = this.readWord(data);
-	}
+			} else {
 
-	//The rest of the FACE_ARRAY chunk is subchunks
-	while(this.position < chunk.end)
-	{
-		var chunk = this.readChunk(data);
+				this.debugMessage( '      Unknown named object chunk: ' + next.toString( 16 ) );
 
-		if(chunk.id === MSH_MAT_GROUP)
-		{
-			this.debugMessage("      Material Group");
-
-			this.resetPosition(data);
-
-			var group = this.readMaterialGroup(data);
-
-			var material = this.materials[group.name];
-			if(material !== undefined)
-			{
-				mesh.material = material;
-
-				if(material.name === "")
-				{
-					material.name = mesh.name;
-				}
 			}
-		}
-		else if(chunk.id === SMOOTH_GROUP)
-		{
-			this.debugMessage("      Smooth Group (TODO)");
-			//TODO <ADD CODE HERE>
-		}
-		else
-		{
-			this.debugMessage("      Unknown face array chunk: " + chunk.toString(16));
+
+			next = this.nextChunk( data, chunk );
+
 		}
 
-		this.endChunk(chunk);
-	}
+		this.endChunk( chunk );
 
-	this.endChunk(chunk);
-};
+	},
 
+	readMaterialGroup : function ( data ) {
 
-THREE.TDSLoader.prototype.readMap = function(data)
-{
-	var chunk = this.readChunk(data);
-	var next = this.nextChunk(data, chunk);
+		var chunk = this.readChunk( data );
+		var name = this.readString( data, 64 );
+		var numFaces = this.readWord( data );
 
-	while(next !== 0)
-	{
-		if(next === MAT_MAPNAME)
-		{
-			var name = this.readString(data, 128);
-			this.debugMessage("      MapName: " + name);
-		}
-		else
-		{
-			this.debugMessage("      Unknown named object chunk: " + next.toString(16));
+		this.debugMessage( '         Name: ' + name );
+		this.debugMessage( '         Faces: ' + numFaces );
+
+		var index = [];
+		for ( var i = 0; i < numFaces; ++ i ) {
+
+			index.push( this.readWord( data ) );
+
 		}
 
-		next = this.nextChunk(data, chunk);
-	}
+		return { name: name, index: index };
 
-	this.endChunk(chunk);
-}
+	},
 
-THREE.TDSLoader.prototype.readMaterialGroup = function(data)
-{
-	var chunk = this.readChunk(data);
-	var name = this.readString(data, 64);
-	var numFaces = this.readWord(data);
-	
-	this.debugMessage("         Name: " + name);
-	this.debugMessage("         Faces: " + numFaces);
+	readNamedObject : function ( data ) {
 
-	var index = [];
-	for(var i = 0; i < numFaces; ++i)
-	{
-		index.push(this.readWord(data));
-	}
+		var chunk = this.readChunk( data );
+		var name = this.readString( data, 64 );
+		chunk.cur = this.position;
 
-	return {name: name, index: index};
-};
+		var next = this.nextChunk( data, chunk );
+		while ( next !== 0 ) {
 
-THREE.TDSLoader.prototype.readNamedObject = function(data)
-{
-	var chunk = this.readChunk(data);
-	var name = this.readString(data, 64);
-	chunk.cur = this.position;
+			if ( next === N_TRI_OBJECT ) {
 
-	var next = this.nextChunk(data, chunk);
-	while(next !== 0)
-	{
-		if(next === N_TRI_OBJECT)
-		{
-			this.resetPosition(data);
-			var mesh = this.readMesh(data);
-			mesh.name = name;
-			this.meshes.push(mesh);
-		}
-		else
-		{
-			this.debugMessage("Unknown named object chunk: " + next.toString(16));
+				this.resetPosition( data );
+				var mesh = this.readMesh( data );
+				mesh.name = name;
+				this.meshes.push( mesh );
+
+			} else {
+
+				this.debugMessage( 'Unknown named object chunk: ' + next.toString( 16 ) );
+
+			}
+
+			next = this.nextChunk( data, chunk );
+
 		}
 
-		next = this.nextChunk(data, chunk);
-	}
+		this.endChunk( chunk );
 
-	this.endChunk(chunk);
-};
+	},
 
-THREE.TDSLoader.prototype.readChunk = function(data)
-{
-	var chunk = {};
+	readChunk : function ( data ) {
 
-	chunk.cur = this.position;
-	chunk.id = this.readWord(data);
-	chunk.size = this.readDWord(data);
-	chunk.end = chunk.cur + chunk.size;
-	chunk.cur += 6;
+		var chunk = {};
 
-	return chunk;
-};
+		chunk.cur = this.position;
+		chunk.id = this.readWord( data );
+		chunk.size = this.readDWord( data );
+		chunk.end = chunk.cur + chunk.size;
+		chunk.cur += 6;
 
-THREE.TDSLoader.prototype.endChunk = function(chunk)
-{
-	this.position = chunk.end;
-};
+		return chunk;
 
-THREE.TDSLoader.prototype.nextChunk = function(data, chunk)
-{
-	if(chunk.cur >= chunk.end)
-	{
-		return 0;
-	}
+	},
 
-	this.position = chunk.cur;
+	endChunk : function ( chunk ) {
 
-	try 
-	{
-		var next = this.readChunk(data);
-		chunk.cur += next.size;
-		return next.id;
-	}
-	catch(e)
-	{
-		this.debugMessage("Unable to read chunk at " + this.position);
-		return 0;
-	}
-};
+		this.position = chunk.end;
 
-THREE.TDSLoader.prototype.resetPosition = function(data, chunk)
-{
-	this.position -= 6;
-};
+	},
 
-THREE.TDSLoader.prototype.readByte = function(data)
-{
-	var v = data.getUint8(this.position, true);
-	this.position += 1;
-	return v;
-};
+	nextChunk : function ( data, chunk ) {
 
-THREE.TDSLoader.prototype.readFloat = function(data)
-{
-	try
-	{
-		var v = data.getFloat32(this.position, true);
+		if ( chunk.cur >= chunk.end ) {
+
+			return 0;
+
+		}
+
+		this.position = chunk.cur;
+
+		try {
+
+			var next = this.readChunk( data );
+			chunk.cur += next.size;
+			return next.id;
+
+		}	catch ( e ) {
+
+			this.debugMessage( 'Unable to read chunk at ' + this.position );
+			return 0;
+
+		}
+
+	},
+
+	resetPosition : function ( data, chunk ) {
+
+		this.position -= 6;
+
+	},
+
+	readByte : function ( data ) {
+
+		var v = data.getUint8( this.position, true );
+		this.position += 1;
+		return v;
+
+	},
+
+	readFloat : function ( data ) {
+
+		try {
+
+			var v = data.getFloat32( this.position, true );
+			this.position += 4;
+			return v;
+
+		}	catch ( e ) {
+
+			this.debugMessage( e + ' ' + this.position + ' ' + data.byteLength );
+
+		}
+
+	},
+
+	readInt : function ( data ) {
+
+		var v = data.getInt32( this.position, true );
 		this.position += 4;
 		return v;
-	}
-	catch(e)
-	{
-		this.debugMessage(e + " " + this.position + " " + data.byteLength);
-	}
-};
 
-THREE.TDSLoader.prototype.readInt = function(data)
-{
-	var v = data.getInt32(this.position, true);
-	this.position += 4;
-	return v;
-};
+	},
 
-THREE.TDSLoader.prototype.readShort = function(data)
-{
-	var v = data.getInt16(this.position, true);
-	this.position += 2;
-	return v;
-};
+	readShort : function ( data ) {
 
-THREE.TDSLoader.prototype.readDWord = function(data)
-{
-	var v = data.getUint32(this.position, true);
-	this.position += 4;
-	return v;
-};
+		var v = data.getInt16( this.position, true );
+		this.position += 2;
+		return v;
 
-THREE.TDSLoader.prototype.readWord = function(data)
-{
-	var v = data.getUint16(this.position, true);
-	this.position += 2;
-	return v;
-};
+	},
 
-THREE.TDSLoader.prototype.readString = function(data, maxLength)
-{
-	var s = "";
+	readDWord : function ( data ) {
 
-	for(var i = 0; i < maxLength; i++)
-	{
-		var c = this.readByte(data);
-		if(!c)
-		{
-			break;
+		var v = data.getUint32( this.position, true );
+		this.position += 4;
+		return v;
+
+	},
+
+	readWord : function ( data ) {
+
+		var v = data.getUint16( this.position, true );
+		this.position += 2;
+		return v;
+
+	},
+
+	readString : function ( data, maxLength ) {
+
+		var s = '';
+
+		for ( var i = 0; i < maxLength; i ++ ) {
+
+			var c = this.readByte( data );
+			if ( ! c ) {
+
+				break;
+
+			}
+
+			s += String.fromCharCode( c );
+
 		}
 
-		s += String.fromCharCode(c);
-	}
+		return s;
 
-	return s;
-};
+	},
 
-THREE.TDSLoader.prototype.debugMessage = function(message)
-{
-	if(this.debug)
-	{
-		console.log(message);
+	debugMessage : function ( message ) {
+
+		if ( this.debug ) {
+
+			console.log( message );
+
+		}
+
 	}
 };
 
@@ -828,3 +908,4 @@ var VIEWPORT_DATA = 0x7011;
 var VIEWPORT_DATA_3 = 0x7012;
 var VIEWPORT_SIZE = 0x7020;
 var NETWORK_VIEW = 0x7030;
+
