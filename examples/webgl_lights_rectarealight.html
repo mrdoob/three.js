@@ -123,9 +123,9 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				camera.position.set( 0, 20, 45 );
+				camera.position.set( 0, 20, 35 );
 
-				rectLight = new THREE.RectAreaLight( 0xffffff, 100, 10, 10 );
+				rectLight = new THREE.RectAreaLight( 0xffffff, 500, 10, 10 );
 				rectLight.position.set( 5, 5, 0 );
 
 				// TODO: ensure RectAreaLight handles target param correctly
@@ -263,7 +263,7 @@
 
 				} );
 
-				lightFolder.add( param, 'intensity', 0.0, 400 ).onChange( function ( val ) {
+				lightFolder.add( param, 'intensity', 0.0, 1000 ).onChange( function ( val ) {
 
 					rectLight.intensity = val;
 
