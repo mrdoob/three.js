@@ -242,6 +242,7 @@ var files = {
 		"webgl_simple_gi",
 		"webgl_skinning_simple",
 		"webgl_sprites",
+		"webgl_sprites_alpha",
 		"webgl_terrain_dynamic",
 		"webgl_test_memory",
 		"webgl_test_memory2",
