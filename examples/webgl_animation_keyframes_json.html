@@ -30,7 +30,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> webgl - animation - keyframes
+			<a href="http://threejs.org" target="_blank">three.js</a> webgl - animation - keyframes - json
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -50,22 +50,26 @@
 			container.appendChild( stats.dom );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0x000000 );
+			renderer.setClearColor( 0x000000, 1 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
 			scene = new THREE.Scene();
-			scene.add( new THREE.GridHelper( 20, 20 ) );
 
-			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.01, 1000 );
+			var grid = new THREE.GridHelper( 20, 20, 0x888888, 0x888888 );
+			grid.position.set( 0, - 1.1, 0 );
+			scene.add( grid );
+
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( - 5.00, 3.43, 11.31 );
 			camera.lookAt( new THREE.Vector3( - 1.22, 2.18, 4.58 ) );
 
-			pointLight = new THREE.PointLight( 0xffffff, 1.75 );
+			scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+			pointLight = new THREE.PointLight( 0xffffff, 1 );
 			pointLight.position.copy( camera.position );
 			scene.add( pointLight );
-
 
 			new THREE.ObjectLoader().load( 'models/json/pump/pump.json', function ( model ) {
 
@@ -94,6 +98,7 @@
 				requestAnimationFrame( animate );
 
 				mixer.update( clock.getDelta() );
+
 				stats.update();
 
 				renderer.render( scene, camera );
