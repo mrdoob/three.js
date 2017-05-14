@@ -106,13 +106,11 @@ Object.assign( Loader.prototype, {
 			CustomBlending: CustomBlending
 		};
 
-		var color, textureLoader, materialLoader;
+		var color = new Color();
+		var textureLoader = new TextureLoader();
+		var materialLoader = new MaterialLoader();
 
 		return function createMaterial( m, texturePath, crossOrigin ) {
-
-			if ( color === undefined ) color = new Color();
-			if ( textureLoader === undefined ) textureLoader = new TextureLoader();
-			if ( materialLoader === undefined ) materialLoader = new MaterialLoader();
 
 			// convert from old material format
 

@@ -191,18 +191,12 @@ Object.assign( Triangle.prototype, {
 
 	closestPointToPoint: function () {
 
-		var plane, edgeList, projectedPoint, closestPoint;
+		var plane = new Plane();
+		var edgeList = [ new Line3(), new Line3(), new Line3() ];
+		var projectedPoint = new Vector3();
+		var closestPoint = new Vector3();
 
 		return function closestPointToPoint( point, optionalTarget ) {
-
-			if ( plane === undefined ) {
-
-				plane = new Plane();
-				edgeList = [ new Line3(), new Line3(), new Line3() ];
-				projectedPoint = new Vector3();
-				closestPoint = new Vector3();
-
-			}
 
 			var result = optionalTarget || new Vector3();
 			var minDistance = Infinity;

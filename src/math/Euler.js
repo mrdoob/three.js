@@ -255,11 +255,9 @@ Object.assign( Euler.prototype, {
 
 	setFromQuaternion: function () {
 
-		var matrix;
+		var matrix = new Matrix4();
 
 		return function setFromQuaternion( q, order, update ) {
-
-			if ( matrix === undefined ) matrix = new Matrix4();
 
 			matrix.makeRotationFromQuaternion( q );
 
