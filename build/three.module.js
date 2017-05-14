@@ -6979,7 +6979,7 @@ function SpritePlugin( renderer, sprites ) {
 			gl.uniform1f( uniforms.rotation, material.rotation );
 			gl.uniform2fv( uniforms.scale, scale );
 
-			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
 			state.buffers.depth.setTest( material.depthTest );
 			state.buffers.depth.setMask( material.depthWrite );
 
@@ -24645,7 +24645,16 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 	this.addAttribute( 'position', new Float32BufferAttribute( vertexBuffer, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
-	this.normalizeNormals();
+
+	if ( detail === 0 ) {
+
+		this.computeVertexNormals(); // flat normals
+
+	} else {
+
+		this.normalizeNormals(); // smooth normals
+
+	}
 
 	// helper functions
 
