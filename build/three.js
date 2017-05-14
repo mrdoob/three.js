@@ -756,16 +756,10 @@
 
 		clampScalar: function () {
 
-			var min, max;
+			var min = new Vector2();
+			var max = new Vector2();
 
 			return function clampScalar( minVal, maxVal ) {
-
-				if ( min === undefined ) {
-
-					min = new Vector2();
-					max = new Vector2();
-
-				}
 
 				min.set( minVal, minVal );
 				max.set( maxVal, maxVal );
@@ -2325,7 +2319,8 @@
 
 			// assumes direction vectors vFrom and vTo are normalized
 
-			var v1, r;
+			var v1 = new Vector3();
+			var r;
 
 			var EPS = 0.000001;
 
@@ -2811,7 +2806,7 @@
 
 		applyEuler: function () {
 
-			var quaternion;
+			var quaternion = new Quaternion();
 
 			return function applyEuler( euler ) {
 
@@ -2821,8 +2816,6 @@
 
 				}
 
-				if ( quaternion === undefined ) quaternion = new Quaternion();
-
 				return this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
 			};
@@ -2831,11 +2824,9 @@
 
 		applyAxisAngle: function () {
 
-			var quaternion;
+			var quaternion = new Quaternion();
 
 			return function applyAxisAngle( axis, angle ) {
-
-				if ( quaternion === undefined ) quaternion = new Quaternion();
 
 				return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
@@ -2894,11 +2885,9 @@
 
 		project: function () {
 
-			var matrix;
+			var matrix = new Matrix4();
 
 			return function project( camera ) {
-
-				if ( matrix === undefined ) matrix = new Matrix4();
 
 				matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
 				return this.applyMatrix4( matrix );
@@ -2909,11 +2898,9 @@
 
 		unproject: function () {
 
-			var matrix;
+			var matrix = new Matrix4();
 
 			return function unproject( camera ) {
-
-				if ( matrix === undefined ) matrix = new Matrix4();
 
 				matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
 				return this.applyMatrix4( matrix );
@@ -2988,16 +2975,10 @@
 
 		clampScalar: function () {
 
-			var min, max;
+			var min = new Vector3();
+			var max = new Vector3();
 
 			return function clampScalar( minVal, maxVal ) {
-
-				if ( min === undefined ) {
-
-					min = new Vector3();
-					max = new Vector3();
-
-				}
 
 				min.set( minVal, minVal, minVal );
 				max.set( maxVal, maxVal, maxVal );
@@ -3162,11 +3143,9 @@
 
 		projectOnPlane: function () {
 
-			var v1;
+			var v1 = new Vector3();
 
 			return function projectOnPlane( planeNormal ) {
-
-				if ( v1 === undefined ) v1 = new Vector3();
 
 				v1.copy( this ).projectOnVector( planeNormal );
 
@@ -3181,11 +3160,9 @@
 			// reflect incident vector off plane orthogonal to normal
 			// normal is assumed to have unit length
 
-			var v1;
+			var v1 = new Vector3();
 
 			return function reflect( normal ) {
-
-				if ( v1 === undefined ) v1 = new Vector3();
 
 				return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
@@ -3442,11 +3419,9 @@
 
 		extractRotation: function () {
 
-			var v1;
+			var v1 = new Vector3();
 
 			return function extractRotation( m ) {
-
-				if ( v1 === undefined ) v1 = new Vector3();
 
 				var te = this.elements;
 				var me = m.elements;
@@ -3640,17 +3615,11 @@
 
 		lookAt: function () {
 
-			var x, y, z;
+			var x = new Vector3();
+			var y = new Vector3();
+			var z = new Vector3();
 
 			return function lookAt( eye, target, up ) {
-
-				if ( x === undefined ) {
-
-					x = new Vector3();
-					y = new Vector3();
-					z = new Vector3();
-
-				}
 
 				var te = this.elements;
 
@@ -3763,11 +3732,9 @@
 
 		applyToBufferAttribute: function () {
 
-			var v1;
+			var v1 = new Vector3();
 
 			return function applyToBufferAttribute( attribute ) {
-
-				if ( v1 === undefined ) v1 = new Vector3();
 
 				for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
@@ -4085,16 +4052,10 @@
 
 		decompose: function () {
 
-			var vector, matrix;
+			var vector = new Vector3();
+			var matrix = new Matrix4();
 
 			return function decompose( position, quaternion, scale ) {
-
-				if ( vector === undefined ) {
-
-					vector = new Vector3();
-					matrix = new Matrix4();
-
-				}
 
 				var te = this.elements;
 
@@ -7979,11 +7940,9 @@
 
 		intersectsSphere: ( function () {
 
-			var closestPoint;
+			var closestPoint = new Vector3();
 
 			return function intersectsSphere( sphere ) {
-
-				if ( closestPoint === undefined ) closestPoint = new Vector3();
 
 				// Find the point on the AABB closest to the sphere center.
 				this.clampPoint( sphere.center, closestPoint );
@@ -8179,11 +8138,9 @@
 
 		setFromPoints: function () {
 
-			var box;
+			var box = new Box3();
 
 			return function setFromPoints( points, optionalCenter ) {
-
-				if ( box === undefined ) box = new Box3(); // see #10547
 
 				var center = this.center;
 
@@ -8421,11 +8378,9 @@
 
 		applyToBufferAttribute: function () {
 
-			var v1;
+			var v1 = new Vector3();
 
 			return function applyToBufferAttribute( attribute ) {
-
-				if ( v1 === undefined ) v1 = new Vector3();
 
 				for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
@@ -10311,11 +10266,9 @@
 
 		setFromQuaternion: function () {
 
-			var matrix;
+			var matrix = new Matrix4();
 
 			return function setFromQuaternion( q, order, update ) {
-
-				if ( matrix === undefined ) matrix = new Matrix4();
 
 				matrix.makeRotationFromQuaternion( q );
 
@@ -11510,18 +11463,12 @@
 
 		closestPointToPoint: function () {
 
-			var plane, edgeList, projectedPoint, closestPoint;
+			var plane = new Plane();
+			var edgeList = [ new Line3(), new Line3(), new Line3() ];
+			var projectedPoint = new Vector3();
+			var closestPoint = new Vector3();
 
 			return function closestPointToPoint( point, optionalTarget ) {
-
-				if ( plane === undefined ) {
-
-					plane = new Plane();
-					edgeList = [ new Line3(), new Line3(), new Line3() ];
-					projectedPoint = new Vector3();
-					closestPoint = new Vector3();
-
-				}
 
 				var result = optionalTarget || new Vector3();
 				var minDistance = Infinity;
@@ -12553,11 +12500,9 @@
 
 			// rotate geometry around world x-axis
 
-			var m1;
+			var m1 = new Matrix4();
 
 			return function rotateX( angle ) {
-
-				if ( m1 === undefined ) m1 = new Matrix4();
 
 				m1.makeRotationX( angle );
 
@@ -12573,11 +12518,9 @@
 
 			// rotate geometry around world y-axis
 
-			var m1;
+			var m1 = new Matrix4();
 
 			return function rotateY( angle ) {
-
-				if ( m1 === undefined ) m1 = new Matrix4();
 
 				m1.makeRotationY( angle );
 
@@ -12593,11 +12536,9 @@
 
 			// rotate geometry around world z-axis
 
-			var m1;
+			var m1 = new Matrix4();
 
 			return function rotateZ( angle ) {
-
-				if ( m1 === undefined ) m1 = new Matrix4();
 
 				m1.makeRotationZ( angle );
 
@@ -12613,11 +12554,9 @@
 
 			// translate geometry
 
-			var m1;
+			var m1 = new Matrix4();
 
 			return function translate( x, y, z ) {
-
-				if ( m1 === undefined ) m1 = new Matrix4();
 
 				m1.makeTranslation( x, y, z );
 
@@ -12633,11 +12572,9 @@
 
 			// scale geometry
 
-			var m1;
+			var m1 = new Matrix4();
 
 			return function scale( x, y, z ) {
-
-				if ( m1 === undefined ) m1 = new Matrix4();
 
 				m1.makeScale( x, y, z );
 
@@ -12651,11 +12588,9 @@
 
 		lookAt: function () {
 
-			var obj;
+			var obj = new Object3D();
 
 			return function lookAt( vector ) {
-
-				if ( obj === undefined ) obj = new Object3D();
 
 				obj.lookAt( vector );
 
@@ -14051,11 +13986,9 @@
 
 			// rotate geometry around world x-axis
 
-			var m1;
+			var m1 = new Matrix4();
 
 			return function rotateX( angle ) {
-
-				if ( m1 === undefined ) m1 = new Matrix4();
 
 				m1.makeRotationX( angle );
 
@@ -14071,11 +14004,9 @@
 
 			// rotate geometry around world y-axis
 
-			var m1;
+			var m1 = new Matrix4();
 
 			return function rotateY( angle ) {
-
-				if ( m1 === undefined ) m1 = new Matrix4();
 
 				m1.makeRotationY( angle );
 
@@ -14091,11 +14022,9 @@
 
 			// rotate geometry around world z-axis
 
-			var m1;
+			var m1 = new Matrix4();
 
 			return function rotateZ( angle ) {
-
-				if ( m1 === undefined ) m1 = new Matrix4();
 
 				m1.makeRotationZ( angle );
 
@@ -14111,11 +14040,9 @@
 
 			// translate geometry
 
-			var m1;
+			var m1 = new Matrix4();
 
 			return function translate( x, y, z ) {
-
-				if ( m1 === undefined ) m1 = new Matrix4();
 
 				m1.makeTranslation( x, y, z );
 
@@ -14131,11 +14058,9 @@
 
 			// scale geometry
 
-			var m1;
+			var m1 = new Matrix4();
 
 			return function scale( x, y, z ) {
-
-				if ( m1 === undefined ) m1 = new Matrix4();
 
 				m1.makeScale( x, y, z );
 
@@ -14149,11 +14074,9 @@
 
 		lookAt: function () {
 
-			var obj;
+			var obj = new Object3D();
 
 			return function lookAt( vector ) {
-
-				if ( obj === undefined ) obj = new Object3D();
 
 				obj.lookAt( vector );
 
@@ -32603,13 +32526,11 @@
 				CustomBlending: CustomBlending
 			};
 
-			var color, textureLoader, materialLoader;
+			var color = new Color();
+			var textureLoader = new TextureLoader();
+			var materialLoader = new MaterialLoader();
 
 			return function createMaterial( m, texturePath, crossOrigin ) {
-
-				if ( color === undefined ) color = new Color();
-				if ( textureLoader === undefined ) textureLoader = new TextureLoader();
-				if ( materialLoader === undefined ) materialLoader = new MaterialLoader();
 
 				// convert from old material format
 
