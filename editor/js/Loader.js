@@ -151,7 +151,7 @@ var Loader = function ( editor ) {
 					editor.execute( new AddObjectCommand( object ) );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
