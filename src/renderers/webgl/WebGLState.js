@@ -523,7 +523,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 		}
 
-		if ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) {
+		if ( ( blending !== CustomBlending ) && ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) ) {
 
 			if ( blending === AdditiveBlending ) {
 
