@@ -510,11 +510,19 @@
 					parameters.map = textureMap.get( relationship.ID );
 					break;
 
-				case " \"AmbientColor":
+				case "Bump":
 				case " \"Bump":
+					parameters.bumpMap = textureMap.get( relationship.ID );
+					break;
+
+				case "NormalMap":
+				case " \"NormalMap":
+					parameters.normalMap = textureMap.get( relationship.ID );
+					break;
+
+				case " \"AmbientColor":
 				case " \"EmissiveColor":
 				case "AmbientColor":
-				case "Bump":
 				case "EmissiveColor":
 				default:
 					console.warn( 'Unknown texture application of type ' + type + ', skipping texture' );
@@ -1362,7 +1370,7 @@
 						}
 						if ( materials.length > 1 ) {
 
-							material = new THREE.MultiMaterial( materials );
+							material = materials;
 
 						} else if ( materials.length > 0 ) {
 
