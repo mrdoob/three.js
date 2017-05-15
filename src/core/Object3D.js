@@ -112,6 +112,14 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	},
 
+	applyQuaternion: function ( q ) {
+
+		this.quaternion.premultiply( q );
+
+		return this;
+
+	},
+
 	setRotationFromAxisAngle: function ( axis, angle ) {
 
 		// assumes axis is normalized
@@ -272,7 +280,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	lookAt: function () {
 
-		// This routine does not support objects with rotated and/or translated parent(s)
+		// This method does not support objects with rotated and/or translated parent(s)
 
 		var m1 = new Matrix4();
 
