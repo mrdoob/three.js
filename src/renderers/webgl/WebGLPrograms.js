@@ -239,6 +239,8 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		}
 
+		array.push( renderer.gammaOutput );
+
 		return array.join();
 
 	};
