@@ -38,10 +38,10 @@ Object.assign( JSONLoader.prototype, {
 		var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : Loader.prototype.extractUrlBase( url );
 
 		var loader = new FileLoader( this.manager );
-		loader.setResponseType( 'json' );
 		loader.setWithCredentials( this.withCredentials );
-		loader.load( url, function ( json ) {
+		loader.load( url, function ( text ) {
 
+			var json = JSON.parse( text );
 			var metadata = json.metadata;
 
 			if ( metadata !== undefined ) {
