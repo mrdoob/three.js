@@ -22,10 +22,9 @@ Object.assign( BufferGeometryLoader.prototype, {
 		var scope = this;
 
 		var loader = new FileLoader( scope.manager );
-		loader.setResponseType( 'json' );
-		loader.load( url, function ( json ) {
+		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( json ) );
+			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
 

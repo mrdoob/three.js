@@ -10508,6 +10508,14 @@
 
 		},
 
+		applyQuaternion: function ( q ) {
+
+			this.quaternion.premultiply( q );
+
+			return this;
+
+		},
+
 		setRotationFromAxisAngle: function ( axis, angle ) {
 
 			// assumes axis is normalized
@@ -10668,7 +10676,7 @@
 
 		lookAt: function () {
 
-			// This routine does not support objects with rotated and/or translated parent(s)
+			// This method does not support objects with rotated and/or translated parent(s)
 
 			var m1 = new Matrix4();
 
@@ -19119,7 +19127,7 @@
 
 			}
 
-			if ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) {
+			if ( ( blending !== CustomBlending ) && ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) ) {
 
 				if ( blending === AdditiveBlending ) {
 
@@ -32212,10 +32220,9 @@
 			var scope = this;
 
 			var loader = new FileLoader( scope.manager );
-			loader.setResponseType( 'json' );
-			loader.load( url, function ( json ) {
+			loader.load( url, function ( text ) {
 
-				onLoad( scope.parse( json ) );
+				onLoad( scope.parse( JSON.parse( text ) ) );
 
 			}, onProgress, onError );
 
@@ -32359,10 +32366,9 @@
 			var scope = this;
 
 			var loader = new FileLoader( scope.manager );
-			loader.setResponseType( 'json' );
-			loader.load( url, function ( json ) {
+			loader.load( url, function ( text ) {
 
-				onLoad( scope.parse( json ) );
+				onLoad( scope.parse( JSON.parse( text ) ) );
 
 			}, onProgress, onError );
 
@@ -32800,10 +32806,10 @@
 			var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : Loader.prototype.extractUrlBase( url );
 
 			var loader = new FileLoader( this.manager );
-			loader.setResponseType( 'json' );
 			loader.setWithCredentials( this.withCredentials );
-			loader.load( url, function ( json ) {
+			loader.load( url, function ( text ) {
 
+				var json = JSON.parse( text );
 				var metadata = json.metadata;
 
 				if ( metadata !== undefined ) {
