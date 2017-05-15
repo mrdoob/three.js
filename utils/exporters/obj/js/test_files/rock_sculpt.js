@@ -1,0 +1,1 @@
+{"materials": [{"DbgColor": 16777215, "DbgName": "Material_ao", "DbgIndex": 0}], "buffers": "GPshm.p3d.r48.bin", "metadata": {"uvs": 78, "generatedBy": "JS OBJConverter", "sourceFile": ".obj", "vertices": 78, "formatVersion": 3, "materials": 1, "normals": 78, "faces": 62}}
