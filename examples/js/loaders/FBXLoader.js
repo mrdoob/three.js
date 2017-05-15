@@ -3932,7 +3932,7 @@
 
 			// footer size: 160bytes + 16-byte alignment padding
 			// - 16bytes: magic
-			// - padding til 16-byte alignment
+			// - padding til 16-byte alignment (at least 1byte?)
 			//   (seems like some exporters embed fixed 15bytes?)
 			// - 4bytes: magic
 			// - 4bytes: version
@@ -3940,7 +3940,7 @@
 			// - 16bytes: magic
 			if ( reader.size() % 16 === 0 ) {
 
-				return ( ( reader.getOffset() + 160 + 15 ) & ~0xf ) >= reader.size();
+				return ( ( reader.getOffset() + 160 + 16 ) & ~0xf ) >= reader.size();
 
 			} else {
 
