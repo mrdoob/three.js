@@ -82,6 +82,12 @@ THREE.GLTF2Loader = ( function () {
 
 				}
 
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_TECHNIQUE_WEBGL ) >= 0 ) {
+
+					extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ] = new GLTFTechniqueWebglExtension( json );
+
+				}
+
 			}
 
 			console.time( 'GLTF2Loader' );
@@ -273,6 +279,7 @@ THREE.GLTF2Loader = ( function () {
 
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
+		KHR_TECHNIQUE_WEBGL: 'KHR_technique_webgl',
 		KHR_MATERIALS_COMMON: 'KHR_materials_common',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness'
 	};
@@ -393,6 +400,20 @@ THREE.GLTF2Loader = ( function () {
 			throw new Error( 'GLTF2Loader: JSON content not found.' );
 
 		}
+
+	}
+
+	/* Technique WebGL Extension */
+
+	function GLTFTechniqueWebglExtension( json ) {
+
+		this.name = EXTENSIONS.KHR_TECHNIQUE_WEBGL;
+
+		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ] ) || {};
+
+		this.techniques = extension.techniques || {};
+		this.programs = extension.programs || {};
+		this.shaders = extension.shaders || {};
 
 	}
 
@@ -1221,6 +1242,7 @@ THREE.GLTF2Loader = ( function () {
 
 		var json = this.json;
 		var options = this.options;
+		var extensions = this.extensions;
 
 		return this._withDependencies( [
 
@@ -1228,7 +1250,11 @@ THREE.GLTF2Loader = ( function () {
 
 		] ).then( function ( dependencies ) {
 
-			return _each( json.shaders, function ( shader ) {
+			var shaders = extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ] !== undefined ? extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ].shaders : json.shaders;
+
+			if ( shaders === undefined ) shaders = {};
+
+			return _each( shaders, function ( shader ) {
 
 				if ( shader.bufferView !== undefined ) {
 
@@ -1642,11 +1668,16 @@ THREE.GLTF2Loader = ( function () {
 
 					materialType = DeferredShaderMaterial;
 
-					var technique = json.techniques[ material.technique ];
+					var extension = extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ];
+
+					var techniques = extension !== undefined ? extension.techniques : json.techniques;
+					var programs = extension !== undefined ? extension.programs : json.programs;
+
+					var technique = techniques[ material.technique ];
 
 					materialParams.uniforms = {};
 
-					var program = json.programs[ technique.program ];
+					var program = programs[ technique.program ];
 
 					if ( program ) {
 
