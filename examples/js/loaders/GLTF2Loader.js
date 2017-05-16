@@ -1668,6 +1668,12 @@ THREE.GLTF2Loader = ( function () {
 
 					materialType = DeferredShaderMaterial;
 
+					// I've left the existing json.techniques code as is so far though
+					// techniques is moved to extension in glTF 2.0 because
+					// it seems there still be many models which have techniques under json.
+					// I'm gonna move the techniques code into GLTFTechniqueWebglExtension
+					// when glTF 2.0 release is officially announced.
+
 					var extension = extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ];
 
 					var techniques = extension !== undefined ? extension.techniques : json.techniques;
