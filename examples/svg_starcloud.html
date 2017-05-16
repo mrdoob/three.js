@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js svg - starcloud</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				overflow: hidden;
+			}
+			g {
+				cursor:pointer
+			}
+			svg{
+				background:-moz-linear-gradient(top,#000121,#071E55)!important;/*Mozilla*/
+				background:-webkit-gradient(linear,center top,center bottom,from(#000121), to(#071E55))!important;/*Old gradient for webkit*/
+				background:-webkit-linear-gradient(top,#000121,#071E55)!important;/*new gradient for Webkit*/
+				background:-o-linear-gradient(top,#000121,#071E55)!important; /*Opera11*/
+			}
+			line{
+				stroke:url(#line) !important;
+			}
+			g text{
+				font-family: "Microsoft YaHei" !important;
+			}
+			.circle text{
+				font-size:8px;
+			}
+			.point  text{
+				font-size:6px;
+			}
+			.point  circle{
+				fill:url(#glow)
+			}
+
+		</style>
+
+	</head>
+	<body>
+	<div style="display:none">
+	<svg>
+		<defs id='defs'>
+			<radialGradient id="glow" cx="50%" cy="50%" r="50%"
+			fx="50%" fy="50%">
+				<stop offset="0%" style="stop-color:rgb(255,255,255);
+				stop-opacity:1"/>
+				<stop offset="60%" style="stop-color:rgb(255,255,255);
+				stop-opacity:1"/>
+				<stop offset="100%" style="stop-color:rgb(0,0,0);
+				stop-opacity:0"/>
+			</radialGradient>
+		<radialGradient id="line" cx="100%" cy="100%" r="100%">
+				<stop offset="0%" style="stop-color:rgb(255,255,255);
+				stop-opacity:1"/>
+				<stop offset="50%" style="stop-color:rgb(2,65,229);
+				stop-opacity:1"/>
+				<stop offset="100%" style="stop-color:rgb(255,255,255);
+				stop-opacity:1"/>
+		</radialGradient>
+		</defs>
+		<g  id="circle" class="circle"  fill-opacity=1 >
+			<circle  r="30.38" fill-opacity="0">
+			</circle>
+			<path   fill="#FFFFFF"  d="M6.115-0.002c0,3.377-2.738,6.115-6.115,6.115s-6.115-2.738-6.115-6.115
+			S-3.377-6.117,0-6.117S6.115-3.379,6.115-0.002 M8.105-22.994l2.208-5.472c-0.972-0.352-1.958-0.669-2.973-0.922l-1.225,5.776
+			C6.792-23.436,7.452-23.224,8.105-22.994 M4.004-24.072l1.227-5.784c-1.012-0.176-2.059-0.239-3.103-0.313l-0.204,5.887
+			C2.622-24.227,3.323-24.185,4.004-24.072 M11.972-21.225l3.12-4.998c-0.901-0.52-1.786-1.062-2.743-1.489l-2.215,5.489
+			C10.771-21.931,11.365-21.568,11.972-21.225 M15.476-18.817l3.937-4.375c-0.799-0.67-1.544-1.402-2.41-1.988l-3.142,5.031
+			C14.438-19.752,14.937-19.261,15.476-18.817 M-0.237-24.452l0.204-5.928c-1.065,0.001-2.073,0.205-3.109,0.313
+			l0.821,5.825C-1.625-24.308-0.949-24.445-0.237-24.452 M24.473-0.003C24.473,13.513,13.516,24.47,0,24.47
+			S-24.473,13.513-24.473-0.003c0-11.981,8.622-21.911,19.993-24.021l-0.822-5.825C-19.542-27.332-30.38-14.965-30.38-0.003
+			c0,16.779,13.602,30.38,30.38,30.38s30.38-13.601,30.38-30.38c0-8.576-3.584-16.288-9.299-21.812l-3.936,4.375
+			C21.66-13,24.473-6.836,24.473-0.003"  />
+			<text x="10" y="2" fill="white">test</text>
+		</g>
+		<g id="point" class="point" >
+			<text x="10" y="5" fill="white" >test_point</text>
+			<circle  r="5" ></circle>
+		</g>
+	</svg>
+	<div />
+
+		<script src="../build/three.js"></script>
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/SVGRenderer.js"></script>
+
+        <script type="text/javascript">
+
+			var camera, scene;
+			var renderer;
+
+			var objects = { circle: {},
+				point: {},
+				line: {}
+			};
+			var timenow = Date.now() * 0.0002;
+			
+			//animation frames array,first move to initial camera position
+			var aniseries = [new THREE.Vector3(Math.sin(timenow) * 971, 224, Math.cos(timenow) * 971)];
+
+			//animate speed
+			var speed = 12;
+			var pi = 3.1415926;
+			//record if the last click node is circle(star).
+			var lastcircle = true;
+
+			//mock data
+			var mockdata = [{ text: 'star 1', data: ['planet1', 'planet2', 'planet3'] },
+			 { text: 'star 2', data: ['planet3', 'planet4', 'planet5'] }, 
+			 { text: 'star 3', data: ['planet5', 'planet7', 'planet8'] }, 
+			 { text: 'star 4', data: ['planet9', 'planet10'] }, 
+			 { text: 'star 5', data: ['planet10', 'planet11', 'planet12'] }, 
+			 { text: 'star 6', data: ['planet12', 'planet13', 'planet14'] }, 
+			 { text: 'star 7', data: ['planet14', 'planet15', 'planet16', 'planet17'] }, 
+			 { text: 'star 8', data: ['planet17', 'planet16', 'planet19'] }, 
+			 { text: 'star 9', data: ['planet20', 'planet21', 'planet22'] }, 
+			 { text: 'star 10', data: ['planet21', 'planet22', 'planet23', 'planet24'] }, 
+			 { text: 'star 11', data: ['planet24', 'planet25', 'planet26'] }, 
+			 { text: 'star 12', data: ['planet26', 'planet27', 'planet28'] }, 
+			 { text: 'star 13', data: ['planet29', 'planet30', 'planet31'] }, 
+			 { text: 'star 14', data: ['planet31', 'planet30'] }];
+
+			init();
+			animate();
+			bindEvent('g');
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+
+				scene = new THREE.Scene();
+				var defs = document.getElementById('defs');
+				scene.add(new THREE.SVGObject(defs, null));
+
+				//build the svg shapes based on mock data.
+				buildShape(mockdata);
+				renderer = new THREE.SVGRenderer();
+
+				//def scalar and opacity,make svg perspective.
+				renderer.scalar = function (distance) {
+					return 1000 / distance + 0.1;
+				};
+				renderer.opacity = function (distance) {
+					return 1000 / distance;
+				};
+				renderer.sortSVG=true;
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				renderer.setQuality('high');
+
+				document.body.appendChild(renderer.domElement);
+
+				function buildShape(data) {
+					//get base element 
+					var circlenode = document.getElementById('circle');
+					var pointnode = document.getElementById('point');
+
+					var count = data.length;
+					for (var i = 0; i < count; i++) {
+
+						var text = data[i].text;
+						var spenode = circlenode.cloneNode(true);
+						spenode.setAttribute('id', text);
+						spenode.children[2].innerHTML = data[i].text;
+						var crlobj = new THREE.SVGObject(spenode);
+						crlobj.name = 'circle';
+
+						//make stars in one circle
+						crlobj.position.x = Math.cos(i * 360 / count / 180 * pi) * 515;
+						crlobj.position.z = Math.sin(i * 360 / count / 180 * pi) * 515;
+						crlobj.position.y = 0;
+						scene.add(crlobj);
+						//store it in global,so we can get it on click event.
+						objects.circle[text] = crlobj;
+						var pointdata = data[i].data;
+
+						//start to generate points(plant)
+						var datacount = pointdata.length;
+						for (var k = 0; k < datacount; k++) {
+							
+							var _text = pointdata[k];
+
+							//check if the plant has been generated,the text is uuid.
+							if (!objects.point[_text]) {
+
+								var _spenode = pointnode.cloneNode(true);
+								_spenode.setAttribute('id', _text);
+								_spenode.children[0].innerHTML = _text;
+								var ptobj = new THREE.SVGObject(_spenode);
+
+								//make the position random surrounded at the related star
+								var pntest = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.25, Math.random() - 0.5);
+								var randomvec = new THREE.Vector3(pntest.x / Math.abs(pntest.x) * (Math.random() * 130 + 40), pntest.y / Math.abs(pntest.y) * (Math.random() * 220 + 30) + 90, pntest.z / Math.abs(pntest.z) * (Math.random() * 130 + 40));
+								var ptvec = randomvec.add(crlobj.position);
+								
+								ptobj.position.copy(ptvec);
+								scene.add(ptobj);
+								objects.point[_text] = ptobj;
+
+							}
+
+							//generate the connection lines
+							var geometry = new THREE.Geometry();
+							geometry.vertices.push(crlobj.position);
+							geometry.vertices.push(objects.point[_text].position);
+							scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({
+								linewidth: 1.2,
+								opacity: 0.3 })));
+						}
+					}
+				};
+			}
+
+			function bindEvent(tagname) {
+				var sels = document.getElementsByTagName(tagname);
+				for (i = 0; i < sels.length; i++) {
+					applyNodeEvent(sels[i]);
+				}
+				window.addEventListener('resize', onWindowResize, false);
+				window.addEventListener('DOMMouseScroll', onMouseScroll, false);  
+				window.addEventListener('mousewheel', onMouseScroll, false);  
+				
+			}
+
+			function applyNodeEvent(node) {
+				node.addEventListener('click', function (e) {
+					clickNodeEvent(node);
+				}, false);
+			}
+
+			function clickNodeEvent(node) {
+				//clear the animation array
+				aniseries = [];
+				var id = node.getAttribute('id');
+
+				//get object from global objects
+				var obj = objects.circle[id] || objects.point[id];
+
+				if (obj) {
+					(function () {
+						var yaxis = new THREE.Vector3(0, 1, 0);
+						var distance = obj.position.distanceTo(scene.position);
+						//get the target position of camera by relative angle and distance. 
+						var target = getTarget(pi/8,350);
+						//record current camera postion
+						var currentcmr = camera.position.clone();
+						//record the target radius
+						var targetdist = target.length();
+						//first move camera  to position that meet target radius.
+						scaleToRadius();
+
+						//if the shape is circle(star) then just move the camera horizontally.
+						if (obj.name === 'circle') {
+							if (lastcircle) {
+								rotByYaxis();
+							} else {
+								lastcircle = true;
+							}
+						} else {
+							lastcircle = false;
+						}
+
+						//move the camera to target follow the shortest arc.
+						rotByshortest();
+						//execute the animation.
+						animate();
+
+						function getTarget(angle,distance){
+
+							var objunit = obj.position.clone().normalize();
+							var ndir = objunit.clone().cross(yaxis);
+							var adddir = objunit.clone().applyAxisAngle(ndir, angle);
+							return obj.position.clone().addScaledVector(adddir, distance);
+						}
+
+						function scaleToRadius(){
+
+							var cmdist = camera.position.length();
+							var step = speed;
+							var count = (targetdist - cmdist) / step;
+							if (count < 0) {
+								count = -count;
+								step = -speed;
+							}
+							var unit = currentcmr.clone().normalize();
+							for (var _i = 1; _i <= count; _i++) {
+								
+								aniseries.push(currentcmr.addScaledVector(unit, step).clone());
+							}
+						}
+						
+						
+
+						function rotByYaxis() {
+							//project the current camera and target vector.
+							var srcproj = currentcmr.clone().projectOnPlane(yaxis);
+							var tgtproj = target.clone().projectOnPlane(yaxis);
+							//calculate the angle on plane xz
+							var angle = tgtproj.angleTo(srcproj);
+							var rotlength = tgtproj.length();
+							//make it a little faster
+							var spespeed = speed + 5;
+							//calculate the number of frames and the step.
+							var curcount = rotlength * angle / spespeed;
+							var step = spespeed / rotlength;
+							
+							//check if the angle is a real sharp angle
+							var ruler = currentcmr.clone().applyAxisAngle(yaxis, pi / 2);
+							var res = ruler.x * tgtproj.x + ruler.y * tgtproj.y + ruler.z * tgtproj.z;
+
+							if (res < 0) {
+								step = -step;
+							}
+
+							for (var _i2 = 1; _i2 <= curcount; _i2++) {
+								aniseries.push(currentcmr.applyAxisAngle(yaxis, step).clone());
+							}
+						}
+						function rotByshortest() {
+
+							//get the rotation axis
+							var rotaxis = currentcmr.clone().cross(target).normalize();
+							//calculate the angle to rotate
+							var angle = target.angleTo(currentcmr);
+
+							//adjust move speed by the angle to Y axis
+							//x=0 degree => slowest
+							//x=90 degree => infinite assume: f(x)=log a (-(x-pi/2))
+							//f(0)=5  log a pi/2 =5;a=1.0945
+							//f(x)=lg(pi/2-x)/lg(1.0945)=lg(pi/2-x)/0.039
+							var relangle = target.angleTo(yaxis);
+							if (relangle > pi / 2) {
+								relangle = pi - relangle;
+							}
+
+							var k = -8 / (pi * pi / 4);
+							var spespeed = speed + Math.log(pi / 2 - relangle) / 0.039;
+							var curcount = targetdist * angle / speed;
+							var step = speed / targetdist;
+
+							for (var _i3 = 1; _i3 <= curcount; _i3++) {
+								aniseries.push(currentcmr.applyAxisAngle(rotaxis, step).clone());
+							}
+						}
+
+					})();
+				}
+			};
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			}
+
+			function onMouseScroll(event) {
+				if(event.wheelDelta>0){
+
+					aniseries.push(camera.position.multiplyScalar(0.9));
+
+				}
+				else{
+
+					aniseries.push(camera.position.multiplyScalar(1.1));
+
+				}
+				animate();
+			}
+
+			function animate() {
+				requestAnimationFrame(render);
+				render();
+			}
+
+			function render() {
+				
+				if (aniseries.length > 0) {
+					var _cmpos = aniseries.shift();
+					requestAnimationFrame(render);
+					camera.position.x = _cmpos.x;
+					camera.position.y = _cmpos.y;
+					camera.position.z = _cmpos.z;
+					camera.lookAt(scene.position);
+				}
+
+
+				renderer.render(scene, camera);
+			}
+		</script>
+	</body>
+</html>

@@ -53,6 +53,7 @@ THREE.SVGRenderer = function () {
 	this.autoClear = true;
 	this.sortObjects = true;
 	this.sortElements = true;
+	this.sortSVG = this.sortSVG||false;
 
 	this.info = {
 
@@ -220,6 +221,9 @@ THREE.SVGRenderer = function () {
 
 		}
 
+		var _sortArray=[];
+		var that=this;
+
 		scene.traverseVisible( function ( object ) {
 
 			 if ( object instanceof THREE.SVGObject ) {
@@ -231,14 +235,45 @@ THREE.SVGRenderer = function () {
 				var y = - _vector3.y * _svgHeightHalf;
 
 				var node = object.node;
-				node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
+				var distance=object.position.distanceTo(camera.position);
+				var transform=(x&&y)?'translate(' + x + ',' + y + ')':'';
 
-				_svg.appendChild( node );
+				if(that.scalar){
+
+				    transform+=' scale('+that.scalar(distance)+')' ;
+
+				}
+				if(that.opacity){
+
+					node.setAttribute("fill-opacity",that.opacity(distance));
+				
+				}
+
+				node.setAttribute( 'transform', transform );
+
+				_sortArray.push([distance,node]);
 
 			}
 
-		} );
+		});
 
+		if(this.sortSVG){
+
+			_sortArray.sort(function(a,b){
+
+				return b[0]-a[0];
+
+			});
+
+		 }
+
+			_sortArray.forEach(function(x){
+
+				_svg.appendChild(x[1]);
+
+			});
+
+		
 	};
 
 	function calculateLights( lights ) {
