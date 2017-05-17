@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webvr - htc vive</title>
@@ -43,7 +43,10 @@
 			var container;
 			var camera, scene, renderer;
 			var effect, controls;
-			var controller1, controller2;
+			var controller1, controller2, controllerRay;
+			
+			var raycaster;
+			var INTERSECTED;
 
 			var room;
 
@@ -167,6 +170,8 @@
 
 				controls = new THREE.VRControls( camera );
 				controls.standing = true;
+				
+				raycaster = new THREE.Raycaster();
 
 				// controllers
 
@@ -193,6 +198,16 @@
 					controller2.add( object.clone() );
 
 				} );
+				
+				// controller ray
+				
+				var dir = new THREE.Vector3(0, 0, -1);
+				var origin = new THREE.Vector3(0, 0, 0);
+				
+				controllerRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000, 1, 1);
+				controllerRay.direction = dir;
+				controllerRay.visible = true;
+				controller1.add(controllerRay);
 
 				effect = new THREE.VREffect( renderer );
 
@@ -222,6 +237,7 @@
 			function animate() {
 
 				effect.requestAnimationFrame( animate );
+				updateControllerRay();
 				render();
 
 			}
@@ -270,6 +286,73 @@
 
 				effect.render( scene, camera );
 
+			}
+			
+			function updateControllerRay() {
+				
+				if (controllerRay.visible) {
+					
+					// raycasting
+					
+					var matrix = new THREE.Matrix4();
+					matrix.extractRotation(controller1.matrix);
+					
+					var direction = new THREE.Vector3(0, 0, 1);
+					direction.applyMatrix4(matrix);
+					direction.multiplyScalar(-1);
+					
+					var globalControllerPos = new THREE.Vector3();
+					globalControllerPos.setFromMatrixPosition(controller1.matrixWorld);
+					
+					raycaster.set(globalControllerPos, direction);
+					
+					var intersections = raycaster.intersectObjects(scene.children, true);
+					
+					var filteredIntersections = null;
+					var intersectedObj = null;
+					
+					if(intersections.length > 0) {
+						
+						filteredIntersections = intersections.filter(function(obj) {
+							return obj.object.type == 'Mesh';
+						});
+						
+						var intersectedObj = filteredIntersections[0] != null ? filteredIntersections[0] : null;
+						
+						// var intersectedObj = intersections[1] != null ? intersections[1] : null;						
+						
+					}
+					
+					if (intersectedObj) {
+						
+						if (INTERSECTED != null) {
+							
+							INTERSECTED.material.color.set(INTERSECTED.oldColor);
+							
+						}
+						
+						INTERSECTED = intersectedObj.object;
+						INTERSECTED.oldColor = new THREE.Color();
+						INTERSECTED.oldColor.copy(INTERSECTED.material.color);
+						
+						INTERSECTED.material.color = new THREE.Color(1,0,0);
+						
+					}
+					
+					else {
+						
+						if (INTERSECTED != null) {
+							
+							INTERSECTED.material.color.set(INTERSECTED.oldColor);
+							
+						}
+						
+						INTERSECTED = null;
+						
+					}
+					
+				}			
+			
 			}
 
 		</script>
