@@ -362,8 +362,15 @@ THREE.XLoader = function () {
 		if ( typeof buf !== "string" ) {
 
 			var array_buffer = new Uint8Array( buf );
+
+			if ( window.TextDecoder !== undefined ) {
+
+				return new TextDecoder().decode( array_buffer );
+
+			}
+
 			var str = '';
-			for ( var i = 0; i < buf.byteLength; i ++ ) {
+			for ( var i = 0, il = buf.byteLength; i < il; i ++ ) {
 
 				str += String.fromCharCode( array_buffer[ i ] );
 
