@@ -2309,7 +2309,7 @@ THREE.GLTF2Loader = ( function () {
 					if ( sampler ) {
 
 						var target = channel.target;
-						var name = target.node || target.id; // NOTE: target.id is deprecated.
+						var name = target.node !== undefined ? target.node : target.id; // NOTE: target.id is deprecated.
 						var input = animation.parameters !== undefined ? animation.parameters[ sampler.input ] : sampler.input;
 						var output = animation.parameters !== undefined ? animation.parameters[ sampler.output ] : sampler.output;
 
