@@ -679,7 +679,9 @@ Object.assign( Vector3.prototype, {
 
 	equals: function ( v ) {
 
-		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
+		return Math.abs( v.x - this.x ) < Number.EPSILON &&
+			Math.abs( v.y - this.y ) < Number.EPSILON &&
+			Math.abs( v.z - this.z ) < Number.EPSILON;
 
 	},
 
