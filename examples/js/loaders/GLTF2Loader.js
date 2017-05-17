@@ -2141,7 +2141,7 @@ THREE.GLTF2Loader = ( function () {
 									//     + weight1 * morphTarget1
 									//     ...
 									// then adding position to morphTarget.
-									// motphTarget should depend on mesh, so cloning attribute.
+									// morphTarget should depend on mesh, so cloning attribute.
 
 									var attribute = dependencies.accessors[ target.POSITION ].clone();
 									var position = geometry.attributes.position;
