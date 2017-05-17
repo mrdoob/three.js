@@ -250,7 +250,7 @@ THREE.BinaryLoader.prototype = {
 
 				for ( var i = 0; i < length; i ++ ) {
 
-					text += String.fromCharCode( charArray[ offset + i ] );
+					text += String.fromCharCode( charArray[ i ] );
 
 				}
 
