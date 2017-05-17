@@ -4960,6 +4960,12 @@
 
 		var array = new Uint8Array( buffer, from, to );
 
+		if ( window.TextDecoder !== undefined ) {
+
+			return new TextDecoder().decode( array );
+
+		}
+
 		var s = '';
 
 		for ( var i = 0, il = array.length; i < il; i ++ ) {

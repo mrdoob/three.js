@@ -35,9 +35,16 @@ THREE.PCDLoader.prototype = {
 
 	binarryToStr: function ( data ) {
 
-		var text = "";
 		var charArray = new Uint8Array( data );
-		for ( var i = 0; i < data.byteLength; i ++ ) {
+
+		if ( window.TextDecoder !== undefined ) {
+
+			return new TextDecoder().decode( charArray );
+
+		}
+
+		var text = "";
+		for ( var i = 0, il = data.byteLength; i < il; i ++ ) {
 
 			text += String.fromCharCode( charArray[ i ] );
 
