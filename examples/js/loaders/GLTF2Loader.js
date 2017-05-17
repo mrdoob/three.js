@@ -2158,15 +2158,13 @@ THREE.GLTF2Loader = ( function () {
 
 						if ( primitive.targets !== undefined ) {
 
-							geometry.morphTargets = [];
-
 							var targets = primitive.targets;
 							var morphAttributes = geometry.morphAttributes;
 
 							for ( var i = 0, il = targets.length; i < il; i ++ ) {
 
 								var target = targets[ i ];
-								geometry.morphTargets.push( { name: 'morphTarget' + i } );
+								var attributeName = 'morphTarget' + i;
 
 								if ( target.POSITION !== undefined ) {
 
@@ -2189,6 +2187,7 @@ THREE.GLTF2Loader = ( function () {
 									// for the case if attribute is shared among two or more meshes.
 
 									var attribute = dependencies.accessors[ target.POSITION ].clone();
+									attribute.name = attributeName;
 									var position = geometry.attributes.position;
 
 									for ( var j = 0, jl = attribute.array.length; j < jl; j ++ ) {
@@ -2210,6 +2209,7 @@ THREE.GLTF2Loader = ( function () {
 									// see target.POSITION's comment
 
 									var attribute = dependencies.accessors[ target.NORMAL ].clone();
+									attribute.name = attributeName;
 									var normal = geometry.attributes.normal;
 
 									for ( var j = 0, jl = attribute.array.length; j < jl; j ++ ) {
