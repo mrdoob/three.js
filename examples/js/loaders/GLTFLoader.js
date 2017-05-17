@@ -662,13 +662,20 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	// Avoid the String.fromCharCode.apply(null, array) shortcut, which
-	// throws a "maximum call stack size exceeded" error for large arrays.
 	function convertUint8ArrayToString( array ) {
+
+		if ( window.TextDecoder !== undefined ) {
+
+			//return new TextDecoder().decode( array );
+
+		}
+
+		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
+		// throws a "maximum call stack size exceeded" error for large arrays.
 
 		var s = '';
 
-		for ( var i = 0; i < array.length; i ++ ) {
+		for ( var i = 0, il = array.length; i < il; i ++ ) {
 
 			s += String.fromCharCode( array[ i ] );
 
