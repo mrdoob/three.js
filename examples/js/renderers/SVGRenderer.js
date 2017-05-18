@@ -107,8 +107,6 @@ THREE.SVGRenderer = function () {
 	function removeChildNodes() {
 
 		_pathCount = 0;
-		_lineCount = 0;
-		_rectCount = 0;
 
 		while ( _svg.childNodes.length > 0 ) {
 
