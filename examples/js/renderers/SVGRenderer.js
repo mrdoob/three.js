@@ -350,12 +350,9 @@ THREE.SVGRenderer = function () {
 
 	function renderLine( v1, v2, element, material ) {
 
-		_svgNode = getLineNode( _lineCount ++ );
+		_svgNode = getPathNode( _pathCount ++ );
 
-		_svgNode.setAttribute( 'x1', v1.positionScreen.x );
-		_svgNode.setAttribute( 'y1', v1.positionScreen.y );
-		_svgNode.setAttribute( 'x2', v2.positionScreen.x );
-		_svgNode.setAttribute( 'y2', v2.positionScreen.y );
+		_svgNode.setAttribute( 'd', 'M ' + v1.positionScreen.x + ' ' + v1.positionScreen.y + ' L ' + v2.positionScreen.x + ' ' + v2.positionScreen.y );
 
 		if ( material instanceof THREE.LineBasicMaterial ) {
 
