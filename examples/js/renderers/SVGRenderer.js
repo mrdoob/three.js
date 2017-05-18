@@ -331,12 +331,9 @@ THREE.SVGRenderer = function () {
 			scaleY *= material.size;
 		}
 
-		_svgNode = getRectNode( _rectCount ++ );
+		_svgNode = getPathNode( _pathCount ++ );
 
-		_svgNode.setAttribute( 'x', v1.x - ( scaleX * 0.5 ) );
-		_svgNode.setAttribute( 'y', v1.y - ( scaleY * 0.5 ) );
-		_svgNode.setAttribute( 'width', scaleX );
-		_svgNode.setAttribute( 'height', scaleY );
+		_svgNode.setAttribute( 'd', 'M ' + ( v1.x - scaleX * 0.5 ) + ' ' + ( v1.y - scaleY * 0.5 ) + ' h ' + scaleX + ' v ' + scaleY + ' h ' + (-scaleX) + ' z' );
 
 		if ( material.isSpriteMaterial || material.isPointsMaterial ) {
 
