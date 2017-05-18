@@ -44,8 +44,8 @@ THREE.SVGRenderer = function () {
 	_viewMatrix = new THREE.Matrix4(),
 	_viewProjectionMatrix = new THREE.Matrix4(),
 
-	_svgPathPool = [], _svgLinePool = [], _svgRectPool = [],
-	_svgNode, _pathCount = 0, _lineCount = 0, _rectCount = 0,
+	_svgPathPool = [],
+	_svgNode, _pathCount = 0,
 	_quality = 1;
 
 	this.domElement = _svg;
@@ -367,6 +367,7 @@ THREE.SVGRenderer = function () {
 		_this.info.render.faces ++;
 
 		_svgNode = getPathNode( _pathCount ++ );
+
 		_svgNode.setAttribute( 'd', 'M ' + v1.positionScreen.x + ' ' + v1.positionScreen.y + ' L ' + v2.positionScreen.x + ' ' + v2.positionScreen.y + ' L ' + v3.positionScreen.x + ',' + v3.positionScreen.y + 'z' );
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
@@ -419,26 +420,6 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function getLineNode( id ) {
-
-		if ( _svgLinePool[ id ] == null ) {
-
-			_svgLinePool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'line' );
-
-			if ( _quality == 0 ) {
-
-				_svgLinePool[ id ].setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
-
-			}
-
-			return _svgLinePool[ id ];
-
-		}
-
-		return _svgLinePool[ id ];
-
-	}
-
 	function getPathNode( id ) {
 
 		if ( _svgPathPool[ id ] == null ) {
@@ -456,26 +437,6 @@ THREE.SVGRenderer = function () {
 		}
 
 		return _svgPathPool[ id ];
-
-	}
-
-	function getRectNode( id ) {
-
-		if ( _svgRectPool[ id ] == null ) {
-
-			_svgRectPool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'rect' );
-
-			if ( _quality == 0 ) {
-
-				_svgRectPool[ id ].setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
-
-			}
-
-			return _svgRectPool[ id ];
-
-		}
-
-		return _svgRectPool[ id ];
 
 	}
 
