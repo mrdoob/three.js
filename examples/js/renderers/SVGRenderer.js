@@ -118,10 +118,20 @@ THREE.SVGRenderer = function () {
 
 	}
 
+	function getSvgColor ( color, opacity ) {
+
+		var arg = Math.floor( color.r * 255 ) + ',' + Math.floor( color.g * 255 ) + ',' + Math.floor( color.b * 255 );
+
+		if ( opacity === undefined || opacity === 1 ) return 'rgb(' + arg + ')';
+
+		return 'rgba(' + arg + ',' + opacity + ')';
+
+	}
+
 	this.clear = function () {
 
 		removeChildNodes();
-		_svg.style.backgroundColor = 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearAlpha + ')';
+		_svg.style.backgroundColor = getSvgColor( _clearColor, _clearAlpha );
 
 	};
 
@@ -139,7 +149,7 @@ THREE.SVGRenderer = function () {
 		if ( background && background.isColor ) {
 
 			removeChildNodes();
-			_svg.style.backgroundColor = 'rgb(' + Math.floor( background.r * 255 ) + ',' + Math.floor( background.g * 255 ) + ',' + Math.floor( background.b * 255 ) + ')';
+			_svg.style.backgroundColor = getSvgColor( background );
 
 		} else if ( this.autoClear === true ) {
 
@@ -339,7 +349,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material.isSpriteMaterial || material.isPointsMaterial ) {
 
-			style = 'fill:' + material.color.getStyle();
+			style = 'fill:' + getSvgColor( material.color, material.opacity );
 
 		}
 
@@ -353,7 +363,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material instanceof THREE.LineBasicMaterial ) {
 
-			var style = 'fill:none;stroke:' + material.color.getStyle() + ';stroke-width:' + material.linewidth + ';stroke-opacity:' + material.opacity + ';stroke-linecap:' + material.linecap + ';stroke-linejoin:' + material.linejoin;
+			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity ) + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap + ';stroke-linejoin:' + material.linejoin;
 
 			addPath( style, path );
 
@@ -407,11 +417,11 @@ THREE.SVGRenderer = function () {
 
 		if ( material.wireframe ) {
 
-			style = 'fill:none;stroke:' + _color.getStyle() + ';stroke-width:' + material.wireframeLinewidth + ';stroke-opacity:' + material.opacity + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
+			style = 'fill:none;stroke:' + getSvgColor( _color, material.opacity ) + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
 
 		} else {
 
-			style = 'fill:' + _color.getStyle() + ';fill-opacity:' + material.opacity;
+			style = 'fill:' + getSvgColor( _color, material.opacity );
 
 		}
 
