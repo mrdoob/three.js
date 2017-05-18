@@ -100,16 +100,16 @@
 
 				if ( ! isFbxFormatASCII( FBXText ) ) {
 
-					throw new Error( 'FBXLoader: Unknown format.' );
 					self.manager.itemError( url );
+					throw new Error( 'FBXLoader: Unknown format.' );
 					return;
 
 				}
 
 				if ( getFbxVersion( FBXText ) < 7000 ) {
 
-					throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( FBXText ) );
 					self.manager.itemError( url );
+					throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( FBXText ) );
 					return;
 
 				}
