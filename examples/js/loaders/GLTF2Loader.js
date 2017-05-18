@@ -2161,16 +2161,19 @@ THREE.GLTF2Loader = ( function () {
 							var targets = primitive.targets;
 							var morphAttributes = geometry.morphAttributes;
 
+							morphAttributes.position = [];
+							morphAttributes.normal = [];
+
+							material.morphTargets = true;
+
 							for ( var i = 0, il = targets.length; i < il; i ++ ) {
 
 								var target = targets[ i ];
 								var attributeName = 'morphTarget' + i;
 
+								var positionAttribute, normalAttribute;
+
 								if ( target.POSITION !== undefined ) {
-
-									material.morphTargets = true;
-
-									if ( morphAttributes.position === undefined ) morphAttributes.position = [];
 
 									// Three.js morph formula is
 									//   position
@@ -2186,17 +2189,20 @@ THREE.GLTF2Loader = ( function () {
 									// So morphTarget value will depend on mesh's position, then cloning attribute
 									// for the case if attribute is shared among two or more meshes.
 
-									var attribute = dependencies.accessors[ target.POSITION ].clone();
-									attribute.name = attributeName;
+									positionAttribute = dependencies.accessors[ target.POSITION ].clone();
 									var position = geometry.attributes.position;
 
-									for ( var j = 0, jl = attribute.array.length; j < jl; j ++ ) {
+									for ( var j = 0, jl = positionAttribute.array.length; j < jl; j ++ ) {
 
-										attribute.array[ j ] += position.array[ j ];
+										positionAttribute.array[ j ] += position.array[ j ];
 
 									}
 
-									morphAttributes.position.push( attribute );
+								} else {
+
+									// Copying the original position not to affect the final position.
+									// See the formula above.
+									positionAttribute = geometry.attributes.position.clone();
 
 								}
 
@@ -2204,21 +2210,20 @@ THREE.GLTF2Loader = ( function () {
 
 									material.morphNormals = true;
 
-									if ( morphAttributes.normal === undefined ) morphAttributes.normal = [];
-
 									// see target.POSITION's comment
 
-									var attribute = dependencies.accessors[ target.NORMAL ].clone();
-									attribute.name = attributeName;
+									normalAttribute = dependencies.accessors[ target.NORMAL ].clone();
 									var normal = geometry.attributes.normal;
 
-									for ( var j = 0, jl = attribute.array.length; j < jl; j ++ ) {
+									for ( var j = 0, jl = normalAttribute.array.length; j < jl; j ++ ) {
 
-										attribute.array[ j ] += normal.array[ j ];
+										normalAttribute.array[ j ] += normal.array[ j ];
 
 									}
 
-									morphAttributes.normal.push( attribute );
+								} else {
+
+									normalAttribute = geometry.attributes.normal.clone();
 
 								}
 
@@ -2226,6 +2231,12 @@ THREE.GLTF2Loader = ( function () {
 								if ( target.TANGENT !== undefined ) {
 
 								}
+
+								positionAttribute.name = attributeName;
+								normalAttribute.name = attributeName;
+
+								morphAttributes.position.push( positionAttribute );
+								morphAttributes.normal.push( normalAttribute );
 
 							}
 
