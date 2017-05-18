@@ -25,16 +25,15 @@ THREE.BVHLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
-		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function( buffer ) {
+		loader.load( url, function( text ) {
 
-			onLoad( scope.parse( buffer ) );
+			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
 
 	},
 
-	parse: function ( buffer ) {
+	parse: function ( text ) {
 
 		/*
 			reads a string array (lines) from a BVH file
@@ -375,15 +374,6 @@ THREE.BVHLoader.prototype = {
 		}
 
 		var scope = this;
-
-		// convert buffer to ASCII string
-		var text = "";
-		var raw = new Uint8Array( buffer );
-		for ( var i = 0; i < raw.length; ++ i ) {
-
-			text += String.fromCharCode( raw[ i ] );
-
-		}
 
 		var lines = text.split( /[\r\n]+/g );
 
