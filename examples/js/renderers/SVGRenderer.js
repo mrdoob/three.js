@@ -46,7 +46,7 @@ THREE.SVGRenderer = function () {
 
 	_svgPathPool = [],
 	_svgNode, _pathCount = 0, _currPath, _currStyle,
-	_quality = 1;
+	_quality = 1, _precision = -1;
 
 	this.domElement = _svg;
 
@@ -104,6 +104,12 @@ THREE.SVGRenderer = function () {
 
 	};
 
+	this.setPrecision = function ( precision ) {
+
+		_precision = precision;
+
+	};
+
 	function removeChildNodes() {
 
 		_pathCount = 0;
@@ -123,6 +129,12 @@ THREE.SVGRenderer = function () {
 		if ( opacity === undefined || opacity === 1 ) return 'rgb(' + arg + ')';
 
 		return 'rgba(' + arg + ',' + opacity + ')';
+
+	}
+
+	function convert ( c ) {
+
+		return _precision < 0 ? c : c.toFixed(_precision);
 
 	}
 
@@ -342,7 +354,7 @@ THREE.SVGRenderer = function () {
 			scaleY *= material.size;
 		}
 
-		var path = 'M' + ( v1.x - scaleX * 0.5 ) + ',' + ( v1.y - scaleY * 0.5 ) + 'h' + scaleX + 'v' + scaleY + 'h' + (-scaleX) + 'z';
+		var path = 'M' + convert( v1.x - scaleX * 0.5 ) + ',' + convert( v1.y - scaleY * 0.5 ) + 'h' + convert( scaleX ) + 'v' + convert( scaleY ) + 'h' + convert(-scaleX) + 'z';
 		var style = "";
 
 		if ( material.isSpriteMaterial || material.isPointsMaterial ) {
@@ -357,7 +369,7 @@ THREE.SVGRenderer = function () {
 
 	function renderLine( v1, v2, element, material ) {
 
-		var path = 'M' + v1.positionScreen.x + ',' + v1.positionScreen.y + 'L' + v2.positionScreen.x + ',' + v2.positionScreen.y;
+		var path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y );
 
 		if ( material instanceof THREE.LineBasicMaterial ) {
 
@@ -374,7 +386,7 @@ THREE.SVGRenderer = function () {
 		_this.info.render.vertices += 3;
 		_this.info.render.faces ++;
 
-		var path = 'M' + v1.positionScreen.x + ',' + v1.positionScreen.y + 'L' + v2.positionScreen.x + ',' + v2.positionScreen.y + 'L' + v3.positionScreen.x + ',' + v3.positionScreen.y + 'z';
+		var path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y ) + 'L' + convert( v3.positionScreen.x ) + ',' + convert( v3.positionScreen.y ) + 'z';
 		var style = '';
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
