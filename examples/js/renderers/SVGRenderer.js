@@ -46,7 +46,7 @@ THREE.SVGRenderer = function () {
 
 	_svgPathPool = [],
 	_svgNode, _pathCount = 0, _currPath, _currStyle,
-	_quality = 1, _precision = -1;
+	_quality = 1, _precision = null;
 
 	this.domElement = _svg;
 
@@ -134,7 +134,7 @@ THREE.SVGRenderer = function () {
 
 	function convert ( c ) {
 
-		return _precision < 0 ? c : c.toFixed(_precision);
+		return _precision !== null ? c.toFixed(_precision) : c;
 
 	}
 
@@ -241,7 +241,7 @@ THREE.SVGRenderer = function () {
 
 		}
 
-		addPath ( "!dummy!", ""); // just to flush last svg:path
+		flushPath(); // just to flush last svg:path
 
 		scene.traverseVisible( function ( object ) {
 
@@ -447,20 +447,27 @@ THREE.SVGRenderer = function () {
 
 		} else {
 
-			if ( _currPath ) {
-
-				_svgNode = getPathNode( _pathCount ++ );
-				_svgNode.setAttribute( 'd', _currPath );
-				_svgNode.setAttribute( 'style', _currStyle );
-				_svg.appendChild( _svgNode );
-
-			}
+			flushPath();
 
 			_currStyle = style;
 			_currPath = path;
 
 		}
 
+	}
+
+	function flushPath() {
+
+		if ( _currPath ) {
+
+			_svgNode = getPathNode( _pathCount ++ );
+			_svgNode.setAttribute( 'd', _currPath );
+			_svgNode.setAttribute( 'style', _currStyle );
+			_svg.appendChild( _svgNode );
+
+		}
+
+		_currPath = _currStyle = "";
 	}
 
 	function getPathNode( id ) {
