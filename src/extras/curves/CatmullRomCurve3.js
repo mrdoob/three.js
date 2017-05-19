@@ -83,11 +83,13 @@ function CubicPoly() {
 var tmp = new Vector3();
 var px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
 
-function CatmullRomCurve3( p /* array of Vector3 */ ) {
+function CatmullRomCurve3( points ) {
 
 	Curve.call( this );
 
-	this.points = p || [];
+	if ( points.length < 2 ) console.warn( 'THREE.CatmullRomCurve3: Points array needs at least two entries.' );
+
+	this.points = points || [];
 	this.closed = false;
 
 }
@@ -99,8 +101,6 @@ CatmullRomCurve3.prototype.getPoint = function ( t ) {
 
 	var points = this.points;
 	var l = points.length;
-
-	if ( l < 2 ) console.log( 'duh, you need at least 2 points' );
 
 	var point = ( l - ( this.closed ? 0 : 1 ) ) * t;
 	var intPoint = Math.floor( point );
