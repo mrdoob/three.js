@@ -11720,6 +11720,7 @@
 		}
 
 		this.uuid = _Math.generateUUID();
+		this.name = '';
 
 		this.array = array;
 		this.itemSize = itemSize;
@@ -14964,17 +14965,53 @@
 
 		updateMorphTargets: function () {
 
-			var morphTargets = this.geometry.morphTargets;
+			var geometry = this.geometry;
+			var m, ml, name;
 
-			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
+			if ( geometry.isBufferGeometry ) {
 
-				this.morphTargetInfluences = [];
-				this.morphTargetDictionary = {};
+				var morphAttributes = geometry.morphAttributes;
+				var keys = Object.keys( morphAttributes );
 
-				for ( var m = 0, ml = morphTargets.length; m < ml; m ++ ) {
+				if ( keys.length > 0 ) {
 
-					this.morphTargetInfluences.push( 0 );
-					this.morphTargetDictionary[ morphTargets[ m ].name ] = m;
+					var morphAttribute = morphAttributes[ keys[ 0 ] ];
+
+					if ( morphAttribute !== undefined ) {
+
+						this.morphTargetInfluences = [];
+						this.morphTargetDictionary = {};
+
+						for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+
+							name = morphAttribute[ m ].name || String( m );
+
+							this.morphTargetInfluences.push( 0 );
+							this.morphTargetDictionary[ name ] = m;
+
+						}
+
+					}
+
+				}
+
+			} else {
+
+				var morphTargets = geometry.morphTargets;
+
+				if ( morphTargets !== undefined && morphTargets.length > 0 ) {
+
+					this.morphTargetInfluences = [];
+					this.morphTargetDictionary = {};
+
+					for ( m = 0, ml = morphTargets.length; m < ml; m ++ ) {
+
+						name = morphTargets[ m ].name || String( m );
+
+						this.morphTargetInfluences.push( 0 );
+						this.morphTargetDictionary[ name ] = m;
+
+					}
 
 				}
 
@@ -17719,6 +17756,8 @@
 				array.push( parameters[ parameterNames[ i ] ] );
 
 			}
+
+			array.push( renderer.gammaOutput );
 
 			return array.join();
 
@@ -37350,19 +37389,44 @@
 
 					}
 
-					if ( ! targetObject.geometry.morphTargets ) {
+					if ( targetObject.geometry.isBufferGeometry ) {
 
-						console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
-						return;
+						if ( ! targetObject.geometry.morphAttributes ) {
 
-					}
+							console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphAttributes', this );
+							return;
 
-					for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+						}
 
-						if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
+						for ( var i = 0; i < this.node.geometry.morphAttributes.position.length; i ++ ) {
 
-							propertyIndex = i;
-							break;
+							if ( targetObject.geometry.morphAttributes.position[ i ].name === propertyIndex ) {
+
+								propertyIndex = i;
+								break;
+
+							}
+
+						}
+
+
+					} else {
+
+						if ( ! targetObject.geometry.morphTargets ) {
+
+							console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
+							return;
+
+						}
+
+						for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+
+							if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
+
+								propertyIndex = i;
+								break;
+
+							}
 
 						}
 
