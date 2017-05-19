@@ -27,6 +27,37 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 	isLineSegmentsGeometry: true,
 
+	applyMatrix: function ( matrix ) {
+
+		var start = this.attributes.instanceStart;
+		var end = this.attributes.instanceEnd;
+
+		if ( start !== undefined ) {
+
+			matrix.applyToBufferAttribute( start );
+
+			matrix.applyToBufferAttribute( end );
+
+			start.data.needsUpdate = true;
+
+		}
+
+		if ( this.boundingBox !== null ) {
+
+			this.computeBoundingBox();
+
+		}
+
+		if ( this.boundingSphere !== null ) {
+
+			this.computeBoundingSphere();
+
+		}
+
+		return this;
+
+	},
+
 	setPositions: function ( array ) {
 
 		var lineSegments;
@@ -126,22 +157,32 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 	computeBoundingBox: function () {
 
-		if ( this.boundingBox === null ) {
+		var box = new THREE.Box3();
 
-			this.boundingBox = new THREE.Box3();
+		return function computeBoundingBox() {
 
-		}
+			if ( this.boundingBox === null ) {
 
-		if ( this.attributes.instanceStart !== undefined ) {
+				this.boundingBox = new THREE.Box3();
 
-			this.boundingBox.setFromBufferAttribute( this.attributes.instanceStart );
-			var box = new THREE.Box3().setFromBufferAttribute( this.attributes.instanceEnd );
+			}
 
-			this.boundingBox.union( box );
+			var start = this.attributes.instanceStart;
+			var end = this.attributes.instanceEnd;
 
-		}
+			if ( start !== undefined && end !== undefined ) {
 
-	},
+				this.boundingBox.setFromBufferAttribute( start );
+
+				box.setFromBufferAttribute( end );
+
+				this.boundingBox.union( box );
+
+			}
+
+		};
+
+	}(),
 
 	computeBoundingSphere: function () {
 
@@ -164,7 +205,7 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 			var start = this.attributes.instanceStart;
 			var end = this.attributes.instanceEnd;
 
-			if ( start && end ) {
+			if ( start !== undefined && end !== undefined ) {
 
 				var center = this.boundingSphere.center;
 
@@ -195,6 +236,18 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 		};
 
 	}(),
+
+	toJSON: function () {
+
+		// todo
+
+	},
+
+	clone: function () {
+
+		// todo
+
+	},
 
 	copy: function ( source ) {
 
