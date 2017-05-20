@@ -842,7 +842,8 @@ THREE.GLTF2Loader = ( function () {
 	var PATH_PROPERTIES = {
 		scale: 'scale',
 		translation: 'position',
-		rotation: 'quaternion'
+		rotation: 'quaternion',
+		weights: 'morphTargetInfluences'
 	};
 
 	var INTERPOLATION = {
@@ -2155,6 +2156,104 @@ THREE.GLTF2Loader = ( function () {
 						meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
 
+						if ( primitive.targets !== undefined ) {
+
+							var targets = primitive.targets;
+							var morphAttributes = geometry.morphAttributes;
+
+							morphAttributes.position = [];
+							morphAttributes.normal = [];
+
+							material.morphTargets = true;
+
+							for ( var i = 0, il = targets.length; i < il; i ++ ) {
+
+								var target = targets[ i ];
+								var attributeName = 'morphTarget' + i;
+
+								var positionAttribute, normalAttribute;
+
+								if ( target.POSITION !== undefined ) {
+
+									// Three.js morph formula is
+									//   position
+									//     + weight0 * ( morphTarget0 - position )
+									//     + weight1 * ( morphTarget1 - position )
+									//     ...
+									// while the glTF one is
+									//   position
+									//     + weight0 * morphTarget0
+									//     + weight1 * morphTarget1
+									//     ...
+									// then adding position to morphTarget.
+									// So morphTarget value will depend on mesh's position, then cloning attribute
+									// for the case if attribute is shared among two or more meshes.
+
+									positionAttribute = dependencies.accessors[ target.POSITION ].clone();
+									var position = geometry.attributes.position;
+
+									for ( var j = 0, jl = positionAttribute.array.length; j < jl; j ++ ) {
+
+										positionAttribute.array[ j ] += position.array[ j ];
+
+									}
+
+								} else {
+
+									// Copying the original position not to affect the final position.
+									// See the formula above.
+									positionAttribute = geometry.attributes.position.clone();
+
+								}
+
+								if ( target.NORMAL !== undefined ) {
+
+									material.morphNormals = true;
+
+									// see target.POSITION's comment
+
+									normalAttribute = dependencies.accessors[ target.NORMAL ].clone();
+									var normal = geometry.attributes.normal;
+
+									for ( var j = 0, jl = normalAttribute.array.length; j < jl; j ++ ) {
+
+										normalAttribute.array[ j ] += normal.array[ j ];
+
+									}
+
+								} else {
+
+									normalAttribute = geometry.attributes.normal.clone();
+
+								}
+
+								// TODO: implement
+								if ( target.TANGENT !== undefined ) {
+
+								}
+
+								positionAttribute.name = attributeName;
+								normalAttribute.name = attributeName;
+
+								morphAttributes.position.push( positionAttribute );
+								morphAttributes.normal.push( normalAttribute );
+
+							}
+
+							meshNode.updateMorphTargets();
+
+							if ( mesh.weights !== undefined ) {
+
+								for ( var i = 0, il = mesh.weights.length; i < il; i ++ ) {
+
+									meshNode.morphTargetInfluences[ i ] = mesh.weights[ i ];
+
+								}
+
+							}
+
+						}
+
 					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
 
 						geometry = new THREE.BufferGeometry();
@@ -2330,22 +2429,70 @@ THREE.GLTF2Loader = ( function () {
 							node.updateMatrix();
 							node.matrixAutoUpdate = true;
 
-							var TypedKeyframeTrack = PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.rotation
-								? THREE.QuaternionKeyframeTrack
-								: THREE.VectorKeyframeTrack;
+							var TypedKeyframeTrack;
+
+							switch ( PATH_PROPERTIES[ target.path ] ) {
+
+								case PATH_PROPERTIES.weights:
+
+									TypedKeyframeTrack = THREE.NumberKeyframeTrack;
+									break;
+
+								case PATH_PROPERTIES.rotation:
+
+									TypedKeyframeTrack = THREE.QuaternionKeyframeTrack;
+									break;
+
+								case PATH_PROPERTIES.position:
+								case PATH_PROPERTIES.scale:
+								default:
+
+									TypedKeyframeTrack = THREE.VectorKeyframeTrack;
+									break;
+
+							}
 
 							var targetName = node.name ? node.name : node.uuid;
 							var interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : THREE.InterpolateLinear;
 
+							var targetNames = [];
+
+							if ( PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.weights ) {
+
+								// node should be THREE.Group here but
+								// PATH_PROPERTIES.weights(morphTargetInfluences) should be
+								// the property of a mesh object under node.
+								// So finding targets here.
+
+								node.traverse( function ( object ) {
+
+									if ( object.isMesh === true && object.material.morphTargets === true ) {
+
+										targetNames.push( object.name ? object.name : object.uuid );
+
+									}
+
+								} );
+
+							} else {
+
+								targetNames.push( targetName );
+
+							}
+
 							// KeyframeTrack.optimize() will modify given 'times' and 'values'
 							// buffers before creating a truncated copy to keep. Because buffers may
 							// be reused by other tracks, make copies here.
-							tracks.push( new TypedKeyframeTrack(
-								targetName + '.' + PATH_PROPERTIES[ target.path ],
-								THREE.AnimationUtils.arraySlice( inputAccessor.array, 0 ),
-								THREE.AnimationUtils.arraySlice( outputAccessor.array, 0 ),
-								interpolation
-							) );
+							for ( var i = 0, il = targetNames.length; i < il; i ++ ) {
+
+								tracks.push( new TypedKeyframeTrack(
+									targetNames[ i ] + '.' + PATH_PROPERTIES[ target.path ],
+									THREE.AnimationUtils.arraySlice( inputAccessor.array, 0 ),
+									THREE.AnimationUtils.arraySlice( outputAccessor.array, 0 ),
+									interpolation
+								) );
+
+							}
 
 						}
 
