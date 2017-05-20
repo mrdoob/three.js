@@ -101,16 +101,21 @@
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var scenes = [], views, t, canvas, renderer;
+			var scenes = [], views, t, canvas, renderer,stats;
 
 			window.onload = init;
 
 			function init() {
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				var balls = 20;
 				var size = .25;
@@ -215,8 +220,10 @@
 			}
 
 			function animate() {
+				stats.begin();
 
 				render();
+				stats.end();
 				requestAnimationFrame( animate );
 
 			}

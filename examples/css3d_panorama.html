@@ -32,12 +32,13 @@
 	<body>
 		<script src="../build/three.js"></script>
 		<script src="js/renderers/CSS3DRenderer.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - panorama demo. cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>.</div>
 
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 			var geometry, material, mesh;
 			var target = new THREE.Vector3();
 
@@ -106,6 +107,9 @@
 				renderer = new THREE.CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -189,7 +193,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
+				stats.begin();
 				lon +=  0.1;
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = THREE.Math.degToRad( 90 - lat );
@@ -202,7 +206,7 @@
 				camera.lookAt( target );
 
 				renderer.render( scene, camera );
-
+				stats.end();
 			}
 
 		</script>

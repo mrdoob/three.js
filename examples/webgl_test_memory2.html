@@ -44,6 +44,7 @@
 		</script>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -51,7 +52,7 @@
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 
 			var geometry, meshes = [];
 
@@ -64,6 +65,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				vertexShader = document.getElementById( "vertexShader" ).textContent;
 				fragmentShader = document.getElementById( "fragmentShader" ).textContent;
@@ -112,9 +116,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render() {

@@ -20,6 +20,8 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/effects/VREffect.js"></script>
@@ -40,7 +42,7 @@
 			//
 
 			var container;
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 			var effect, controls;
 			var controller1, controller2;
 
@@ -56,6 +58,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
@@ -232,8 +237,9 @@
 			function animate() {
 
 				effect.requestAnimationFrame( animate );
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function transformPoint( vector ) {

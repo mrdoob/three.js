@@ -21,12 +21,13 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			var container;
 
-			var camera, scene, renderer, controls;
+			var camera, scene, renderer, controls,stats;
 
 			init();
 			animate();
@@ -48,6 +49,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				scene = new THREE.Scene();
 
@@ -182,10 +186,12 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				controls.update();
 
 				renderer.render( scene, camera );
-
+				stats.end();
 			}
 
 		</script>

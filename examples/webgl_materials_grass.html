@@ -19,6 +19,8 @@
 
 	<body>
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script src="js/Detector.js"></script>
 
@@ -26,7 +28,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 
 			init();
 			animate();
@@ -68,6 +70,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -114,7 +119,11 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				render();
+
+				stats.end();
 
 			}
 

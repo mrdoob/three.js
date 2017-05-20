@@ -31,6 +31,8 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - typed arrays - nearest neighbour for 500,000 sprites</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 		<script src="js/TypedArrayUtils.js"></script>
 		<script src="js/controls/FirstPersonControls.js"></script>
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -71,7 +73,7 @@
 		</script>
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 			var geometry, mesh;
 			var controls;
 
@@ -168,6 +170,9 @@
 				// display particles after the kd-tree was generated and the sorting of the positions-array is done
 				scene.add(particles);
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -186,12 +191,16 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				//
 				displayNearest(camera.position);
 
 				controls.update( clock.getDelta() );
 
 				renderer.render( scene, camera );
+
+				stats.end();
 
 			}
 

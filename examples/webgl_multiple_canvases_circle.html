@@ -142,11 +142,16 @@
 
 		<script type="text/javascript" src="js/Detector.js"></script>
 
+		<script src="js/libs/stats.min.js"></script>
+
+
 		<script type="text/javascript">
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var apps = [];
+
+			var stats;
 
 			init();
 			animate();
@@ -173,12 +178,14 @@
 
 			function animate() {
 
+				stats.begin();
+
 				for ( var i = 0; i < apps.length; ++ i ) {
 
 					apps[ i ].animate();
 
 				}
-
+				stats.end();
 				requestAnimationFrame( animate );
 
 			}
@@ -202,6 +209,9 @@
 				function init() {
 
 					container = document.getElementById( containerId );
+
+					stats = new Stats();
+					container.appendChild( stats.dom );
 
 					camera = new THREE.PerspectiveCamera( 20, container.clientWidth / container.clientHeight, 1, 20000 );
 					camera.rotation.y = rotateY;

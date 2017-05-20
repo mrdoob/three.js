@@ -26,6 +26,8 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/objects/ShadowMesh.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 		<script>
 
 			var SCREEN_WIDTH = window.innerWidth;
@@ -59,7 +61,7 @@
 			var horizontalAngle = 0;
 			var frameTime = 0;
 			var TWO_PI = Math.PI * 2;
-
+			var stats;
 			init();
 			animate();
 
@@ -69,6 +71,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.getElementById( "container" ).appendChild( renderer.domElement );
+				stats = new Stats();
+				container.appendChild( stats.dom );
 				window.addEventListener( 'resize' , onWindowResize, false );
 
 				camera.position.set( 0, 2.5, 10 );
@@ -177,6 +181,8 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				frameTime = clock.getDelta();
 
 				cube.rotation.x += 1.0 * frameTime;
@@ -214,7 +220,7 @@
 
 				renderer.render( scene, camera );
 
-
+				stats.end();
 			}
 
 			function onWindowResize() {

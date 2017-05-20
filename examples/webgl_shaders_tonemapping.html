@@ -38,6 +38,8 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -65,7 +67,7 @@
 			var bloomPass, adaptToneMappingPass;
 			var params;
 
-			var camera, scene, renderer, dynamicHdrEffectComposer, hdrEffectComposer, ldrEffectComposer;
+			var camera, scene, renderer, dynamicHdrEffectComposer, hdrEffectComposer, ldrEffectComposer,stats;
 			var cameraCube, sceneCube;
 			var cameraBG, debugScene;
 			var adaptiveLuminanceMat, currentLuminanceRT, previousLuminanceMat;
@@ -99,6 +101,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				// CAMERAS
 
@@ -447,6 +452,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 				if ( bloomPass ) {
 					bloomPass.copyUniforms[ "opacity" ].value = params.bloomAmount;
 				}
@@ -480,6 +486,8 @@
 				orbitControls.update();
 
 				render();
+
+				stats.end();
 
 			}
 

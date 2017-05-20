@@ -36,6 +36,8 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - effects - anaglyph. skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a></div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script src="js/effects/AnaglyphEffect.js"></script>
 
@@ -47,7 +49,7 @@
 
 			var container;
 
-			var camera, scene, renderer, effect;
+			var camera, scene, renderer, effect,stats;
 
 			var mesh, lightMesh, geometry;
 			var spheres = [];
@@ -69,6 +71,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 100 );
 				camera.position.z = 3;
@@ -148,9 +153,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render() {

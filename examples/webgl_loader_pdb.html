@@ -63,6 +63,8 @@
 	</head>
 	<body>
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/PDBLoader.js"></script>
@@ -74,7 +76,7 @@
 
 		<script>
 
-			var camera, scene, renderer, labelsRenderer;
+			var camera, scene, renderer, labelsRenderer,stats;
 			var controls;
 
 			var root;
@@ -140,6 +142,9 @@
 				labelRenderer.domElement.style.top = '0';
 				labelRenderer.domElement.style.pointerEvents = 'none';
 				document.getElementById( 'container' ).appendChild( labelRenderer.domElement );
+
+				stats = new Stats();
+				document.getElementById( 'container' ).appendChild( stats.dom );
 
 				//
 
@@ -305,6 +310,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 				controls.update();
 
 				var time = Date.now() * 0.0004;
@@ -313,7 +319,7 @@
 				root.rotation.y = time * 0.7;
 
 				render();
-
+				stats.end();
 			}
 
 			function render() {

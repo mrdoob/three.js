@@ -45,6 +45,8 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 		<script src="js/loaders/3MFLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -56,7 +58,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 
 			init();
 
@@ -85,6 +87,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				var loader = new THREE.ThreeMFLoader();
 				loader.load( './models/3mf/cube_gears.3mf', function ( object ) {
@@ -118,6 +123,14 @@
 
 				renderer.render( scene, camera );
 
+			}
+
+			updateStats();
+
+			function updateStats(){
+				requestAnimationFrame( updateStats );
+				stats.begin();
+				stats.end();
 			}
 
 		</script>

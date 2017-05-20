@@ -56,6 +56,8 @@
 		<script src="js/postprocessing/FilmPass.js"></script>
 
 		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
@@ -66,7 +68,7 @@
 
 			var container;
 
-			var camera, scene, renderer, mesh, directionalLight;
+			var camera, scene, renderer, mesh, directionalLight,stats;
 
 			var parent, meshes = [], clonemeshes = [];
 
@@ -82,6 +84,9 @@
 			function init() {
 
 				container = document.getElementById( 'container' );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 50000 );
 				camera.position.set( 0, 700, 7000 );
@@ -266,8 +271,9 @@
 			function animate () {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render () {

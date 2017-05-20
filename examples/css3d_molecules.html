@@ -90,6 +90,7 @@
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/renderers/CSS3DRenderer.js"></script>
 		<script src="js/loaders/PDBLoader.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - molecules</div>
@@ -101,7 +102,7 @@
 		<div id="menu"></div>
 
 		<script>
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 			var controls;
 			var root;
 
@@ -158,6 +159,9 @@
 				renderer = new THREE.CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.getElementById( 'container' ).appendChild( stats.dom );
 
 				//
 
@@ -515,6 +519,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 				controls.update();
 
 				var time = Date.now() * 0.0004;
@@ -523,7 +528,7 @@
 				root.rotation.y = time * 0.7;
 
 				render();
-
+				stats.end();
 			}
 
 			function render() {

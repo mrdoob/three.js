@@ -33,11 +33,13 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/TDSLoader.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
 			var container, controls;
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 
 			init();
 			animate();
@@ -46,6 +48,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.z = 2;
@@ -100,11 +105,14 @@
 			}
 
 			function animate() {
+				stats.begin();
 
 				controls.update();
 				renderer.render( scene, camera );
 
 				requestAnimationFrame( animate );
+
+				stats.end();
 
 			}
 		</script>

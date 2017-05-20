@@ -59,6 +59,9 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
+		<script src="js/libs/stats.min.js"></script>
+
+
 		<!-- NodeLibrary -->
 		<script src="js/nodes/GLNode.js"></script>
 		<script src="js/nodes/RawNode.js"></script>
@@ -122,7 +125,7 @@
 
 		var container = document.getElementById( 'container' );
 
-		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+		var renderer, scene, camera,stats, clock = new THREE.Clock(), fov = 50;
 		var teapot;
 		var controls;
 		var move = false;
@@ -151,6 +154,9 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
 
 			scene = new THREE.Scene();
 
@@ -287,6 +293,7 @@
 		}
 
 		function animate() {
+			stats.begin();
 
 			var delta = clock.getDelta();
 			for (var i = 0; i < meshes.length; i++ ){
@@ -297,7 +304,7 @@
 			}
 
 			renderer.render( scene, camera );
-
+			stats.end();
 			requestAnimationFrame( animate );
 
 		}

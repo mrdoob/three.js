@@ -16,6 +16,7 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/effects/VREffect.js"></script>
@@ -33,7 +34,7 @@
 
 			//
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 			var effect, controls;
 
 			var mirror;
@@ -114,6 +115,9 @@
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				//
 
 				controls = new THREE.VRControls( camera );
@@ -143,8 +147,9 @@
 			function animate() {
 
 				effect.requestAnimationFrame( animate );
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render() {

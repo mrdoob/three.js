@@ -45,6 +45,8 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 		<script src="js/loaders/AMFLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -54,7 +56,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 
 			init();
 
@@ -83,6 +85,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				var loader = new THREE.AMFLoader();
 				loader.load( './models/amf/rook.amf', function ( amfobject ) {
@@ -116,6 +121,14 @@
 
 				renderer.render( scene, camera );
 
+			}
+
+			updateStats();
+
+			function updateStats(){
+				requestAnimationFrame( updateStats );
+				stats.begin();
+				stats.end();
 			}
 
 		</script>

@@ -25,6 +25,8 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -38,7 +40,7 @@
 
 		<script>
 
-			var controls, camera, scene, renderer;
+			var controls, camera, scene, renderer,stats;
 			var cameraCube, sceneCube;
 			var textureEquirec, textureCube, textureSphere;
 			var cubeMesh, sphereMesh;
@@ -138,6 +140,9 @@
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				//
 
 				var params = {
@@ -206,9 +211,12 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				render();
 
 				controls.update();
+				stats.end();
 
 			}
 

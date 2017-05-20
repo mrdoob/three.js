@@ -40,6 +40,7 @@
 		<a href="http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS" target="_blank">basic instructions for building the reflective prism</a></div>
 
 <script src="../build/three.js"></script>
+<script src="js/libs/stats.min.js"></script>
 
 <script src="js/effects/PeppersGhostEffect.js"></script>
 
@@ -51,7 +52,7 @@
 
 		var container;
 
-		var camera, scene, renderer, effect;
+		var camera, scene, renderer, effect,stats;
 		var group;
 
 		init();
@@ -98,6 +99,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
 				effect = new THREE.PeppersGhostEffect( renderer );
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.cameraDistance = 5;
@@ -118,9 +122,9 @@
 		function animate() {
 
 				requestAnimationFrame( animate );
-
+				stats.begin();
 				render();
-
+				stats.end();
 		}
 
 		function render() {

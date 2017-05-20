@@ -33,9 +33,12 @@
 
 		<script src="../build/three.js"></script>
 
+		<script src="js/libs/stats.min.js"></script>
+
+
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 			var cube, sphere, torus, material;
 
 			var count = 0, cubeCamera1, cubeCamera2;
@@ -77,6 +80,9 @@
 				scene.add( cubeCamera2 );
 
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -150,8 +156,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render() {

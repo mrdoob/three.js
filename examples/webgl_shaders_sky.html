@@ -42,6 +42,8 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/SkyShader.js"></script>
@@ -56,7 +58,7 @@
 
 			var container;
 
-			var camera, controls, scene, renderer;
+			var camera, controls, scene, renderer,stats;
 
 			var sky, sunSphere;
 
@@ -149,6 +151,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				//controls.maxPolarAngle = Math.PI / 2;
@@ -173,9 +178,9 @@
 			}
 
 			function render() {
-
+				stats.begin();
 				renderer.render( scene, camera );
-
+				stats.end();
 			}
 
 		</script>

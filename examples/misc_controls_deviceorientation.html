@@ -37,6 +37,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 		<script src="js/controls/DeviceOrientationControls.js"></script>
 
 		<script>
@@ -45,18 +46,21 @@
 
 				  window.addEventListener('load', function() {
 
-						var container, camera, scene, renderer, controls, geometry, mesh;
+						var container, camera, scene, renderer, controls, geometry, mesh,stats;
 
 						var animate = function(){
 
 							window.requestAnimationFrame( animate );
-
+							stats.begin();
 							controls.update();
 							renderer.render(scene, camera);
-
+							stats.end();
 						};
 
 						container = document.getElementById( 'container' );
+
+						stats = new Stats();
+						container.appendChild( stats.dom );
 
 						camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
 

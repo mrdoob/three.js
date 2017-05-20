@@ -33,12 +33,13 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/DeviceOrientationControls.js"></script>
 		<script src="js/renderers/CSS3DRenderer.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - panorama - decideorientation. cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>.</div>
 
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 			var geometry, material, mesh;
 
 			init();
@@ -106,7 +107,8 @@
 				renderer = new THREE.CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
-
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -125,10 +127,10 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
+				stats.begin();
 				controls.update();
 				renderer.render( scene, camera );
-
+				stats.end();
 			}
 
 		</script>

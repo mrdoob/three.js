@@ -15,10 +15,11 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			var scene, renderer;
+			var scene, renderer,stats;
 			var camera, light;
 			var fnh, vnh;
 
@@ -31,6 +32,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -121,6 +125,8 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				var time = - performance.now() * 0.0003;
 
 				camera.position.x = 400 * Math.cos( time );
@@ -135,7 +141,7 @@
 				if ( vnh ) vnh.update();
 
 				renderer.render( scene, camera );
-
+				stats.end();
 			}
 
 		</script>

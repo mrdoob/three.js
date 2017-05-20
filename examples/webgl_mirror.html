@@ -38,6 +38,9 @@
 		<script src="js/Mirror.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
+		<script src="js/libs/stats.min.js"></script>
+
+
 		<script>
 
 			// scene size
@@ -50,7 +53,7 @@
 			var NEAR = 1;
 			var FAR = 500;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 
 			var cameraControls;
 
@@ -62,6 +65,9 @@
 			function init() {
 
 				var container = document.getElementById( 'container' );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				// renderer
 				renderer = new THREE.WebGLRenderer();
@@ -173,6 +179,8 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				var timer = Date.now() * 0.01;
 
 				sphereGroup.rotation.y -= 0.002;
@@ -188,6 +196,8 @@
 				cameraControls.update();
 
 				renderer.render(scene, camera);
+
+				stats.end();
 
 			}
 

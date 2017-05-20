@@ -15,6 +15,8 @@
 	</head>
 	<body>
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 		<script src="js/renderers/RaytracingRenderer.js"></script>
 
 		<script>
@@ -25,7 +27,7 @@
 
 			var container, info;
 
-			var camera, controls, scene, renderer;
+			var camera, controls, scene, renderer,stats;
 
 			var torus, cube, objects = [];
 
@@ -239,6 +241,9 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
 				info = document.createElement( 'div' );
 				info.style.position = 'absolute';
 				info.style.top = '10px';
@@ -311,6 +316,14 @@
 
 				renderer.render( scene, camera );
 
+			}
+
+			updateStats();
+
+			function updateStats(){
+				requestAnimationFrame( updateStats );
+				stats.begin();
+				stats.end();
 			}
 
 

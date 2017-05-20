@@ -22,6 +22,8 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script src="js/RollerCoaster.js"></script>
 
@@ -36,7 +38,7 @@
 				document.body.appendChild( WEBVR.getMessageContainer( message ) );
 
 			} );
-
+			var stats;
 			//
 
 			var renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -44,6 +46,9 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			document.body.appendChild( stats.dom );
 
 			var scene = new THREE.Scene();
 
@@ -220,6 +225,8 @@
 
 			function animate( time ) {
 
+				stats.begin();
+
 				effect.requestAnimationFrame( animate );
 
 				var delta = time - prevTime;
@@ -254,6 +261,8 @@
 				effect.render( scene, camera );
 
 				prevTime = time;
+
+				stats.end();
 
 			}
 

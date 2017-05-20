@@ -36,6 +36,8 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script src="js/Detector.js"></script>
 
@@ -45,7 +47,7 @@
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 
 			var mesh, lightMesh, geometry;
 			var spheres = [];
@@ -66,6 +68,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
@@ -138,7 +143,11 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				render();
+
+				stats.end();
 
 			}
 

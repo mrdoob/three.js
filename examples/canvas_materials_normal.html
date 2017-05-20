@@ -40,6 +40,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -47,7 +48,7 @@
 		<script>
 
 			var camera, scene, renderer,
-			loader, mesh;
+			loader, mesh, stats;
 
 			init();
 			animate();
@@ -74,6 +75,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -94,8 +98,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render() {

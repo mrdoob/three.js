@@ -23,13 +23,14 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/renderers/CSS3DRenderer.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<div id="container"></div>
 		<div id="blocker"></div>
 
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 
 			var Element = function ( id, x, y, z, ry ) {
 
@@ -71,6 +72,9 @@
 				renderer.domElement.style.top = 0;
 				container.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
 				var group = new THREE.Group();
 				group.add( new Element( 'njCDZWTI-xg', 0, 0, 240, 0 ) );
 				group.add( new Element( 'HDh4uK9PvJU', 240, 0, 0, Math.PI / 2 ) );
@@ -104,9 +108,10 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 				controls.update();
 				renderer.render( scene, camera );
-
+				stats.end();
 			}
 
 		</script>

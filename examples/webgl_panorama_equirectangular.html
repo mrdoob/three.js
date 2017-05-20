@@ -36,10 +36,12 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 
 			var isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
@@ -55,6 +57,9 @@
 				var container, mesh;
 
 				container = document.getElementById( 'container' );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 				camera.target = new THREE.Vector3( 0, 0, 0 );
@@ -176,7 +181,10 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 				update();
+				stats.end();
+
 
 			}
 

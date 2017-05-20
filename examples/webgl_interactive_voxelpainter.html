@@ -21,12 +21,15 @@
 
 		<script src="js/Detector.js"></script>
 
+		<script src="js/libs/stats.min.js"></script>
+
+
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container;
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 			var plane, cube;
 			var mouse, raycaster, isShiftDown = false;
 
@@ -42,6 +45,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
@@ -214,6 +220,14 @@
 
 				renderer.render( scene, camera );
 
+			}
+
+			updateStats();
+
+			function updateStats(){
+				requestAnimationFrame( updateStats );
+				stats.begin();
+				stats.end();
 			}
 
 		</script>

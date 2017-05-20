@@ -68,6 +68,8 @@
 			</div>
 		</fieldset>
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 		<script>
 
 			CanvasTexture = function ( parentTexture ) {
@@ -191,7 +193,7 @@
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer,stats;
 
 			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2();
@@ -203,6 +205,9 @@
 			function init() {
 
 				container = document.getElementById( "container" );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				scene = new THREE.Scene();
 
@@ -331,7 +336,9 @@
 			function render() {
 
 				requestAnimationFrame( render );
+				stats.begin();
 				renderer.render( scene, camera );
+				stats.end();
 
 			}
 
