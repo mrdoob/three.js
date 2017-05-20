@@ -46,10 +46,22 @@
 
 	LTC_MAT_TEXTURE.needsUpdate = true;
 	LTC_MAG_TEXTURE.needsUpdate = true;
+    
+    // Add  onUpdate event
+    LTC_MAT_TEXTURE.onUpdate = function (texture) {
+        texture.needsUpdate = true;
+    };
 
+<<<<<<< HEAD
+    LTC_MAG_TEXTURE.onUpdate = function (texture) {
+        texture.needsUpdate = true;
+    };
+    
+=======
 	THREE.UniformsLib.LTC_MAT_TEXTURE = LTC_MAT_TEXTURE;
 	THREE.UniformsLib.LTC_MAG_TEXTURE = LTC_MAG_TEXTURE;
 
+>>>>>>> ad43815b46f965d6cbf90346f64a6234978c828c
 	// Add ltc tables to materials
 
 	var ltc_brdf = { ltcMat: { value: null }, ltcMag: { value: null } };

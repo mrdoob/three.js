@@ -39,9 +39,10 @@ var UniformsUtils = {
 				if ( parameter_src && ( parameter_src.isColor ||
 					parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
 					parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
-					parameter_src.isTexture ) ) {
+					parameter_src.isTexture) ) {
 
 					uniforms_dst[ u ][ p ] = parameter_src.clone();
+					if( parameter_src.onUpdate ) uniforms_dst[ u ][ p ].onUpdate = parameter_src.onUpdate;
 
 				} else if ( Array.isArray( parameter_src ) ) {
 
