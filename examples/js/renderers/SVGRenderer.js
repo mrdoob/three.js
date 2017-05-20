@@ -45,7 +45,10 @@ THREE.SVGRenderer = function () {
 	_viewProjectionMatrix = new THREE.Matrix4(),
 
 	_svgPathPool = [],
-	_svgNode, _pathCount = 0, _currPath, _currStyle,
+	_svgNode, _pathCount = 0,
+
+	_currentPath, _currentStyle,
+
 	_quality = 1, _precision = null;
 
 	this.domElement = _svg;
@@ -180,7 +183,11 @@ THREE.SVGRenderer = function () {
 		_normalViewMatrix.getNormalMatrix( camera.matrixWorldInverse );
 
 		calculateLights( _lights );
-		_currPath = _currStyle = ""; // reset accumulated path
+
+		 // reset accumulated path
+
+		_currentPath = '';
+		_currentStyle = '';
 
 		for ( var e = 0, el = _elements.length; e < el; e ++ ) {
 
@@ -441,16 +448,16 @@ THREE.SVGRenderer = function () {
 
 	function addPath ( style, path ) {
 
-		if ( _currStyle == style ) {
+		if ( _currentStyle === style ) {
 
-			_currPath += path
+			_currentPath += path
 
 		} else {
 
 			flushPath();
 
-			_currStyle = style;
-			_currPath = path;
+			_currentStyle = style;
+			_currentPath = path;
 
 		}
 
@@ -458,16 +465,18 @@ THREE.SVGRenderer = function () {
 
 	function flushPath() {
 
-		if ( _currPath ) {
+		if ( _currentPath ) {
 
 			_svgNode = getPathNode( _pathCount ++ );
-			_svgNode.setAttribute( 'd', _currPath );
-			_svgNode.setAttribute( 'style', _currStyle );
+			_svgNode.setAttribute( 'd', _currentPath );
+			_svgNode.setAttribute( 'style', _currentStyle );
 			_svg.appendChild( _svgNode );
 
 		}
 
-		_currPath = _currStyle = "";
+		_currentPath = '';
+		_currentStyle = '';
+
 	}
 
 	function getPathNode( id ) {
