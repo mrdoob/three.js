@@ -34,16 +34,14 @@
 		<script src="js/controls/TransformControls.js"></script>
 		<script src="js/libs/timeliner_gui.min.js"></script>
 		<script src="js/TimelinerController.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 
 		<script>
 
-			var camera, scene, renderer, control,stats;
+			var camera, scene, renderer, control;
 
 			init();
 			render();
-			updateStats();
 
 			function init() {
 
@@ -52,9 +50,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				//
 
@@ -176,18 +171,11 @@
 
 			}
 
-			function updateStats(){
-				requestAnimationFrame( updateStats );
-				stats.begin();
-				stats.end();
-			}
 
 			function render() {
-				stats.begin();
 				control.update();
 
 				renderer.render( scene, camera );
-				stats.end();
 			}
 
 		</script>

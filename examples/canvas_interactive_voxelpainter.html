@@ -16,14 +16,13 @@
 	<body>
 
 		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script>
 
 			var container;
-			var camera, scene, renderer, stats;
+			var camera, scene, renderer;
 			var plane;
 
 			var mouse, raycaster, isShiftDown = false;
@@ -35,15 +34,11 @@
 
 			init();
 			render();
-			updateStats();
 
 			function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
@@ -193,16 +188,9 @@
 
 			}
 
-			function updateStats(){
-				requestAnimationFrame( updateStats );
-				stats.begin();
-				stats.end();
-			}
 
 			function render() {
-				stats.begin()
 				renderer.render( scene, camera );
-				stats.end();
 			}
 
 		</script>

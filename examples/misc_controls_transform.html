@@ -31,13 +31,12 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/controls/TransformControls.js"></script>
 
 		<script>
 
-			var camera, scene, renderer, control,stats;
+			var camera, scene, renderer, control;
 
 			init();
 			render();
@@ -51,9 +50,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+				
 				//
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
@@ -150,11 +147,6 @@
 
 			}
 
-			function updateStats(){
-				requestAnimationFrame( updateStats );
-				stats.begin();
-				stats.end();
-			}
 
 			function render() {
 

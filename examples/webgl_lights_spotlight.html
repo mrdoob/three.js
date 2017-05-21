@@ -43,14 +43,13 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var renderer, scene, camera,stats;
+			var renderer, scene, camera;
 
 			var spotLight, lightHelper, shadowCameraHelper;
 
@@ -62,8 +61,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -216,13 +214,6 @@
 
 			render();
 
-			updateStats();
-
-			function updateStats(){
-				requestAnimationFrame( updateStats );
-				stats.begin();
-				stats.end();
-			}
 
 		</script>
 
