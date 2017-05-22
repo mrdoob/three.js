@@ -427,7 +427,7 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 
 		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks );
 
-		if ( clip !== null ) {
+		if ( clip != null ) {
 
 			if ( camera.center === undefined ) camera.center = new THREE.Vector3( 0, 0, 0 );
 			if ( camera.animations === undefined ) camera.animations = [];
@@ -1587,7 +1587,7 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks );
 
-		if ( clip !== null ) {
+		if ( clip != null ) {
 
 			if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
 			mesh.geometry.animations.push( clip );
@@ -1629,7 +1629,7 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name + 'Morph', -1, tracks );
 
-		if ( clip !== null ) {
+		if ( clip != null ) {
 
 			if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
 			mesh.geometry.animations.push( clip );
