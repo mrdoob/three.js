@@ -86,16 +86,16 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var canvas;
-
-			var scenes = [], renderer;
+			var app, scenes = [];
 
 			init();
 			animate();
 
 			function init() {
 
-				canvas = document.getElementById( "c" );
+				app = new THREE.App( {
+					canvas: document.getElementById( "c" ),
+				} );
 
 				var geometries = [
 					new THREE.BoxGeometry( 1, 1, 1 ),
@@ -117,7 +117,7 @@
 					element.innerHTML = template.replace( '$', i + 1 );
 
 					// Look up the element that represents the area
-					// we want to render the scene
+					// we want to render the scene into
 					scene.userData.element = element.querySelector( ".scene" );
 					content.appendChild( element );
 
@@ -156,24 +156,6 @@
 
 				}
 
-
-				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
-				renderer.setClearColor( 0xffffff, 1 );
-				renderer.setPixelRatio( window.devicePixelRatio );
-
-			}
-
-			function updateSize() {
-
-				var width = canvas.clientWidth;
-				var height = canvas.clientHeight;
-
-				if ( canvas.width !== width || canvas.height != height ) {
-
-					renderer.setSize( width, height, false );
-
-				}
-
 			}
 
 			function animate() {
@@ -185,14 +167,12 @@
 
 			function render() {
 
-				updateSize();
+				app.renderer.setClearColor( 0xffffff );
+				app.renderer.setScissorTest( false );
+				app.renderer.clear();
 
-				renderer.setClearColor( 0xffffff );
-				renderer.setScissorTest( false );
-				renderer.clear();
-
-				renderer.setClearColor( 0xe0e0e0 );
-				renderer.setScissorTest( true );
+				app.renderer.setClearColor( 0xe0e0e0 );
+				app.renderer.setScissorTest( true );
 
 				scenes.forEach( function( scene ) {
 
@@ -207,8 +187,8 @@
 					var rect = element.getBoundingClientRect();
 
 					// check if it's offscreen. If so skip it
-					if ( rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
-						 rect.right  < 0 || rect.left > renderer.domElement.clientWidth ) {
+					if ( rect.bottom < 0 || rect.top  > app.renderer.domElement.clientHeight ||
+						 rect.right  < 0 || rect.left > app.renderer.domElement.clientWidth ) {
 
 						return;  // it's off screen
 
@@ -218,19 +198,19 @@
 					var width  = rect.right - rect.left;
 					var height = rect.bottom - rect.top;
 					var left   = rect.left;
-					var bottom = renderer.domElement.clientHeight - rect.bottom;
+					var bottom = app.renderer.domElement.clientHeight - rect.bottom;
 
-					renderer.setViewport( left, bottom, width, height );
-					renderer.setScissor( left, bottom, width, height );
+					app.renderer.setViewport( left, bottom, width, height );
+					app.renderer.setScissor( left, bottom, width, height );
 
 					var camera = scene.userData.camera;
 
 					//camera.aspect = width / height; // not changing in this example
 					//camera.updateProjectionMatrix();
 
-					//scene.userData.controls.update();
+					// scene.userData.controls.update();
 
-					renderer.render( scene, camera );
+					app.renderer.render( scene, camera );
 
 				} );
 

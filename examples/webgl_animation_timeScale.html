@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - cube</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				width: 100%;
+				height: 100%;
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				padding: 10px;
+				width: 100%;
+				text-align: center;
+				color: white;
+				z-index: 0;
+			}
+
+			canvas {
+				z-index: -1;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			Timescale control demonstration<br />
+			<div>Total Time: <span id="totalTime"></span> Total Unscaled Time: <span id="totalUnscaledTime"></span> Frame Count: <span id="frameCount"></span> </div>
+			<div>Last Frame Time: <span id="lastFrameTime"></span> Min Frame Time: <span id="minFrameTime"></span> Max Frame Time: <span id="maxFrameTime"></span></div>
+			<div></span> Average Frame Time: <span id="avgFrameTime"></span> Average FPS: <span id="fps"></span></div>
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+			var total = document.querySelector( '#totalTime' );
+			var totalUnscaled = document.querySelector( '#totalUnscaledTime' );
+			var frameCount = document.querySelector( '#frameCount' );
+			var lastFrameTime = document.querySelector( '#lastFrameTime' );
+			var minFrameTime = document.querySelector( '#minFrameTime' );
+			var maxFrameTime = document.querySelector( '#maxFrameTime' );
+			var avgFrameTime = document.querySelector( '#avgFrameTime' );
+			var fps = document.querySelector( '#fps');
+
+			var stats = new Stats();
+			document.body.appendChild( stats.dom );
+
+			var app;
+
+			init();
+			initGUI();
+			app.play();
+
+			function init() {
+
+				app = new THREE.App();
+
+				app.camera.position.z = 400;
+
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				var material = new THREE.MeshStandardMaterial( { color: 0x95cfb8 } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				app.scene.add( mesh );
+
+				var light = new THREE.HemisphereLight( 0xffffff, 0x000000, 3);
+				app.scene.add( light );
+
+				app.onUpdate = function () {
+
+					//Call this only once per frame!
+					var delta = app.time.delta;
+
+					mesh.rotation.x += 0.0005 * delta;
+					mesh.rotation.y += 0.001 * delta;
+
+					updateStatistics( delta );
+
+					stats.update();
+
+				};
+
+			}
+
+			var minFrame = 1000000;
+			var maxFrame = 0;
+
+			function updateStatistics( delta ) {
+
+
+				total.innerText = ( app.time.totalTime / 1000 ).toFixed( 1 );
+				totalUnscaled.innerText = ( app.time.unscaledTotalTime / 1000 ).toFixed( 1 );
+				frameCount.innerText = app.frameCount;
+
+				if ( delta ) {
+
+					var unscaledDelta = Math.floor( delta / app.time.timeScale );
+
+					if ( unscaledDelta < minFrame )	minFrameTime.innerText = minFrame = unscaledDelta;
+					if ( unscaledDelta > maxFrame ) maxFrameTime.innerText = maxFrame = unscaledDelta;
+
+					lastFrameTime.innerText = unscaledDelta;
+
+				}
+
+				avgFrameTime.innerText = Math.floor( app.averageFrameTime );
+				fps.innerText = ( app.averageFrameTime !== 0 ) ? Math.floor( 1000 / app.averageFrameTime ) : 0;
+
+			}
+
+			function initGUI() {
+
+				var gui = new dat.GUI();
+
+				var animationController = {
+
+					stop: function () {
+
+						if ( ! app.time.running ) app.play();
+						else app.stop();
+
+						updateStatistics();
+
+					},
+					pause: function () {
+
+						if ( ! app.time.running ) return;
+
+						if ( app.time.paused ) app.play();
+						else app.pause();
+
+					},
+					timeScale: 1.0,
+
+				};
+
+				var timeScaleChanger = function () {
+
+					app.time.timeScale = animationController.timeScale;
+
+				};
+
+				gui.add( animationController, 'stop' ).onChange( function () {
+
+					var buttonTextElem = this.domElement.previousSibling;
+
+					if ( buttonTextElem.innerText === 'stop' ) buttonTextElem.innerText = 'play';
+					else buttonTextElem.innerText = 'stop';
+
+					gui.__controllers[ 1 ].domElement.previousSibling.innerText = 'pause';
+
+				} );
+
+				gui.add( animationController, 'pause' ).onChange( function () {
+
+					if ( ! app.time.running ) return;
+
+					var buttonTextElem = this.domElement.previousSibling;
+
+					if ( buttonTextElem.innerText === 'pause' ) buttonTextElem.innerText = 'play';
+					else buttonTextElem.innerText = 'pause';
+
+				} );
+
+				gui.add( animationController, "timeScale", - 10.0, 10.0, 0.1 ).onChange( timeScaleChanger );
+
+			}
+
+
+		</script>
+
+	</body>
+</html>

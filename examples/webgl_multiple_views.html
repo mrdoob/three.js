@@ -23,8 +23,14 @@
 			}
 
 			a {
-
 				color: #0080ff;
+			}
+
+			canvas {
+				position: absolute;
+				left: 0;
+				width: 100%;
+				height: 100%;
 			}
 
 		</style>
@@ -45,13 +51,11 @@
 
 			var container, stats;
 
-			var views, scene, renderer;
+			var app, views;
 
 			var mesh, group1, group2, group3, light;
 
 			var mouseX = 0, mouseY = 0;
-
-			var windowWidth, windowHeight;
 
 			var views = [
 				{
@@ -102,11 +106,18 @@
 			];
 
 			init();
-			animate();
+			app.animate();
 
 			function init() {
 
 				container = document.getElementById( 'container' );
+
+				app = new THREE.App({
+					canvas: container.appendChild( document.createElement( 'canvas' ) ),
+					autoRender: false,
+				});
+
+				app.onUpdate = onUpdate;
 
 				for (var ii =  0; ii < views.length; ++ii ) {
 
@@ -119,13 +130,12 @@
 					camera.up.y = view.up[ 1 ];
 					camera.up.z = view.up[ 2 ];
 					view.camera = camera;
-				}
 
-				scene = new THREE.Scene();
+				}
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
-				scene.add( light );
+				app.scene.add( light );
 
 				// shadow
 
@@ -149,19 +159,19 @@
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.rotation.x = - Math. PI / 2;
-				scene.add( mesh );
+				app.scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.x = - 400;
 				mesh.position.y = - 250;
 				mesh.rotation.x = - Math. PI / 2;
-				scene.add( mesh );
+				app.scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.x = 400;
 				mesh.position.y = - 250;
 				mesh.rotation.x = - Math. PI / 2;
-				scene.add( mesh );
+				app.scene.add( mesh );
 
 				var faceIndices = [ 'a', 'b', 'c' ];
 
@@ -215,22 +225,17 @@
 				group1 = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
 				group1.position.x = -400;
 				group1.rotation.x = -1.87;
-				scene.add( group1 );
+				app.scene.add( group1 );
 
 				group2 = THREE.SceneUtils.createMultiMaterialObject( geometry2, materials );
 				group2.position.x = 400;
 				group2.rotation.x = 0;
-				scene.add( group2 );
+				app.scene.add( group2 );
 
 				group3 = THREE.SceneUtils.createMultiMaterialObject( geometry3, materials );
 				group3.position.x = 0;
 				group3.rotation.x = 0;
-				scene.add( group3 );
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				app.scene.add( group3 );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -241,56 +246,36 @@
 
 			function onDocumentMouseMove( event ) {
 
-				mouseX = ( event.clientX - windowWidth / 2 );
-				mouseY = ( event.clientY - windowHeight / 2 );
+				mouseX = ( event.clientX - window.innerWidth / 2 );
+				mouseY = ( event.clientY - window.innerHeight / 2 );
 
 			}
 
-			function updateSize() {
+			function onUpdate() {
 
-				if ( windowWidth != window.innerWidth || windowHeight != window.innerHeight ) {
-
-					windowWidth  = window.innerWidth;
-					windowHeight = window.innerHeight;
-
-					renderer.setSize ( windowWidth, windowHeight );
-
-				}
-
-			}
-
-			function animate() {
-
-				render();
 				stats.update();
-
-				requestAnimationFrame( animate );
-			}
-
-			function render() {
-
-				updateSize();
 
 				for ( var ii = 0; ii < views.length; ++ii ) {
 
 					view = views[ii];
 					camera = view.camera;
 
-					view.updateCamera( camera, scene, mouseX, mouseY );
+					view.updateCamera( camera, app.scene, mouseX, mouseY );
 
-					var left   = Math.floor( windowWidth  * view.left );
-					var bottom = Math.floor( windowHeight * view.bottom );
-					var width  = Math.floor( windowWidth  * view.width );
-					var height = Math.floor( windowHeight * view.height );
-					renderer.setViewport( left, bottom, width, height );
-					renderer.setScissor( left, bottom, width, height );
-					renderer.setScissorTest( true );
-					renderer.setClearColor( view.background );
+					var left   = Math.floor( window.innerWidth  * view.left );
+					var bottom = Math.floor( window.innerHeight * view.bottom );
+					var width  = Math.floor( window.innerWidth  * view.width );
+					var height = Math.floor( window.innerHeight * view.height );
+					app.renderer.setViewport( left, bottom, width, height );
+					app.renderer.setScissor( left, bottom, width, height );
+					app.renderer.setScissorTest( true );
+					app.renderer.setClearColor( view.background );
 
 					camera.aspect = width / height;
 					camera.updateProjectionMatrix();
 
-					renderer.render( scene, camera );
+					app.renderer.render( app.scene, camera );
+
 				}
 
 			}
