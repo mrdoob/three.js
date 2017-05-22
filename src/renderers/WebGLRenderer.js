@@ -415,6 +415,15 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.getPhysicalSize = function () {
+
+		return {
+			width: _canvas.width,
+			height: _canvas.height
+		};
+
+	};
+
 	this.setSize = function ( width, height, updateStyle ) {
 
 		_width = width;
