@@ -138,7 +138,7 @@ THREE.WebVRCamera = function ( display, renderer ) {
 
 	this.onAfterRender = function () {
 
-		if ( display.isPresenting ) display.submitFrame();
+		if ( scope.submitFrameEnabled && display.isPresenting ) display.submitFrame();
 
 	};
 
@@ -148,6 +148,14 @@ THREE.WebVRCamera.prototype = Object.assign( Object.create( THREE.ArrayCamera.pr
 
 	constructor: THREE.WebVRCamera,
 
-	isWebVRCamera: true
+	isWebVRCamera: true,
+
+	submitFrameEnabled: true,
+
+	enableSubmitFrame: function ( enable ) {
+
+		this.submitFrameEnabled = enable;
+
+	}
 
 } );
