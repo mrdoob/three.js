@@ -13,9 +13,11 @@ THREE.SVGObject = function ( node ) {
 THREE.SVGObject.prototype = Object.create( THREE.Object3D.prototype );
 THREE.SVGObject.prototype.constructor = THREE.SVGObject;
 
-THREE.SVGRenderer = function () {
+THREE.SVGRenderer = function ( parameters ) {
 
 	console.log( 'THREE.SVGRenderer', THREE.REVISION );
+
+	parameters = parameters || {};
 
 	var _this = this,
 	_renderData, _elements, _lights,
@@ -49,7 +51,7 @@ THREE.SVGRenderer = function () {
 
 	_currentPath, _currentStyle,
 
-	_quality = 1, _precision = null;
+	_quality = 1, _precision = parameters.precision !== undefined ? parameters.precision : null;
 
 	this.domElement = _svg;
 
@@ -450,7 +452,7 @@ THREE.SVGRenderer = function () {
 
 		if ( _currentStyle === style ) {
 
-			_currentPath += path
+			_currentPath += path;
 
 		} else {
 
