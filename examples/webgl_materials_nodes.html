@@ -35,8 +35,10 @@
 
 		<script src="../build/three.js"></script>
 
+
 		<script src='js/geometries/TeapotBufferGeometry.js'></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<!-- NodeLibrary -->
@@ -105,7 +107,7 @@
 		var container = document.getElementById( 'container' );
 
 		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
-		var teapot, mesh;
+		var teapot, mesh, stats;
 		var controls;
 		var move = false;
 		var rtTexture, rtMaterial;
@@ -161,6 +163,9 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
 
 			scene = new THREE.Scene();
 
@@ -2204,6 +2209,8 @@
 
 		function animate() {
 
+			stats.begin();
+
 			var delta = clock.getDelta();
 
 			if ( move ) {
@@ -2236,6 +2243,8 @@
 			}
 
 			renderer.render( scene, camera );
+
+			stats.end();
 
 			requestAnimationFrame( animate );
 

@@ -22,6 +22,7 @@
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -34,7 +35,7 @@
 			AMOUNTX = 10,
 			AMOUNTY = 10,
 
-			camera, scene, renderer;
+			camera, scene, renderer, stats;
 
 			init();
 			animate();
@@ -46,6 +47,9 @@
 
 				container = document.createElement('div');
 				document.body.appendChild(container);
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 100;
@@ -158,8 +162,9 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render() {

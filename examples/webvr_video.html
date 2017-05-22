@@ -37,6 +37,8 @@
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/WebVR.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
@@ -48,7 +50,7 @@
 
 			//
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 			var video, texture;
 
 			var controls, effect;
@@ -142,6 +144,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
 				//
 
 				controls = new THREE.VRControls( camera );
@@ -175,8 +180,9 @@
 			function animate() {
 
 				effect.requestAnimationFrame( animate );
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render() {

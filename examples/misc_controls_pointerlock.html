@@ -61,6 +61,7 @@
 	<body>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/PointerLockControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<div id="blocker">
 
@@ -74,7 +75,7 @@
 
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 			var geometry, material, mesh;
 			var controls;
 
@@ -305,6 +306,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -323,6 +326,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 
 				if ( controlsEnabled ) {
 					raycaster.ray.origin.copy( controls.getObject().position );
@@ -370,7 +374,7 @@
 				}
 
 				renderer.render( scene, camera );
-
+				stats.end();
 			}
 
 		</script>

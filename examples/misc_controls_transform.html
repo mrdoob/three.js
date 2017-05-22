@@ -31,6 +31,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+
 		<script src="js/controls/TransformControls.js"></script>
 
 		<script>
@@ -40,6 +41,8 @@
 			init();
 			render();
 
+			updateStats();
+
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
@@ -47,7 +50,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				document.body.appendChild( renderer.domElement );
-
+				
 				//
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
@@ -143,6 +146,7 @@
 				render();
 
 			}
+
 
 			function render() {
 

@@ -37,6 +37,8 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/loaders/TTFLoader.js"></script>
 		<script src="js/libs/opentype.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - TTFLoader using opentype by gero3
 			<br/>type to enter new text, drag to spin the text
@@ -53,7 +55,7 @@
 
 			var container, hex, color;
 
-			var camera, cameraTarget, scene, renderer;
+			var camera, cameraTarget, scene, renderer, stats;
 
 			var group, textMesh1, textMesh2, textGeo, material;
 
@@ -97,6 +99,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				// CAMERA
 
@@ -438,12 +443,14 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 
 				camera.lookAt( cameraTarget );
 
 				renderer.render( scene, camera );
-
+				stats.end();
 			}
 
 		</script>

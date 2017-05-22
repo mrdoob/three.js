@@ -103,6 +103,8 @@
 		<script src="js/libs/tween.min.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/renderers/CSS3DRenderer.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - periodic table. <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank">info</a>.</div>
@@ -236,7 +238,7 @@
 				"Uuo", "Ununoctium", "(294)", 18, 7
 			];
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 			var controls;
 
 			var objects = [];
@@ -364,6 +366,9 @@
 				renderer.domElement.style.position = 'absolute';
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.getElementById( 'container' ).appendChild( stats.dom );
+
 				//
 
 				controls = new THREE.TrackballControls( camera, renderer.domElement );
@@ -450,11 +455,11 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
+				stats.begin();
 				TWEEN.update();
 
 				controls.update();
-
+				stats.end();
 			}
 
 			function render() {

@@ -74,9 +74,11 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script id="template" type="notjs">
 			<div class="scene"></div>
@@ -88,7 +90,7 @@
 
 			var canvas;
 
-			var scenes = [], renderer;
+			var scenes = [], renderer, stats;
 
 			init();
 			animate();
@@ -161,6 +163,9 @@
 				renderer.setClearColor( 0xffffff, 1 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 			}
 
 			function updateSize() {
@@ -177,8 +182,10 @@
 			}
 
 			function animate() {
+				stats.begin();
 
 				render();
+				stats.end();
 				requestAnimationFrame( animate );
 
 			}

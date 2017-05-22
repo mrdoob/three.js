@@ -16,12 +16,14 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 			var mesh, mapBg;
 
 			var textureLoader = new THREE.TextureLoader();
@@ -125,6 +127,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				// EVENTS
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -171,6 +176,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 
 				var time = Date.now() * 0.00025;
 				var ox = ( time * -0.01 * mapBg.repeat.x ) % 1;
@@ -179,7 +185,7 @@
 				mapBg.offset.set( ox, oy );
 
 				renderer.render( scene, camera );
-
+				stats.end();
 			}
 
 		</script>

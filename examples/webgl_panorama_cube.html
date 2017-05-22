@@ -36,10 +36,12 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
-		var camera, controls;
+		var camera, controls, stats;
 		var renderer;
 		var scene;
 
@@ -54,6 +56,9 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
 
 			scene = new THREE.Scene();
 
@@ -130,9 +135,13 @@
 
 		function animate() {
 
+			stats.begin();
+
 			controls.update();
 
 			renderer.render( scene, camera );
+
+			stats.end();
 
 			requestAnimationFrame( animate );
 

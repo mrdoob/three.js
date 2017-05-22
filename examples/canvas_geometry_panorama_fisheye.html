@@ -33,13 +33,13 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - panorama fisheye demo. cubemap by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>. (mousewheel: change fov)</div>
 
 		<script src="../build/three.js"></script>
-
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			var texture_placeholder,
 			isUserInteracting = false,
@@ -57,6 +57,9 @@
 				var container, mesh;
 
 				container = document.getElementById( 'container' );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 
@@ -209,7 +212,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 				update();
+				stats.end();
 
 			}
 

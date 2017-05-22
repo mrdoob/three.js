@@ -45,6 +45,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+
 		<script src="js/loaders/3MFLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -86,6 +87,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+
+
 				var loader = new THREE.ThreeMFLoader();
 				loader.load( './models/3mf/cube_gears.3mf', function ( object ) {
 
@@ -119,6 +122,7 @@
 				renderer.render( scene, camera );
 
 			}
+
 
 		</script>
 	</body>

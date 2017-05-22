@@ -16,6 +16,9 @@
 
 		<script src="../build/three.js"></script>
 
+		<script src="js/libs/stats.min.js"></script>
+
+
 		<script type="x-shader/x-vertex" id="vertexShader">
 
 			attribute vec3 center;
@@ -52,7 +55,7 @@
 
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			init();
 			animate();
@@ -120,6 +123,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				// events
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -162,6 +168,8 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 
 					var object = scene.children[ i ];
@@ -171,6 +179,8 @@
 				}
 
 				renderer.render( scene, camera );
+
+				stats.end();
 
 			}
 

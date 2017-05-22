@@ -22,6 +22,8 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script src="js/vr/DaydreamController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
@@ -40,7 +42,7 @@
 			var clock = new THREE.Clock();
 
 			var container;
-			var camera, scene, ray, raycaster, renderer;
+			var camera, scene, ray, raycaster, renderer, stats;
 			var gamepad, vrdisplay;
 
 			var room;
@@ -54,6 +56,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
@@ -170,12 +175,12 @@
 			//
 
 			function animate() {
-
+				stats.begin();
 				gamepad.update();
 				render();
 
 				( vrdisplay ? vrdisplay : window ).requestAnimationFrame( animate );
-
+				stats.end();
 			}
 
 			function render() {

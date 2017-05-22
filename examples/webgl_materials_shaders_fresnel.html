@@ -40,13 +40,16 @@
 
 		<script src="js/Detector.js"></script>
 
+		<script src="js/libs/stats.min.js"></script>
+
+
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			var mesh, zmesh, lightMesh, geometry;
 			var spheres = [];
@@ -67,6 +70,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
@@ -158,7 +164,11 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				render();
+
+				stats.end();
 
 			}
 

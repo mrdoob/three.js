@@ -48,6 +48,7 @@
 
 		<script src="js/Detector.js"></script>
 
+		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
@@ -55,7 +56,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container;
-			var camera, controls, scene, renderer;
+			var camera, controls, scene, renderer, stats;
 			var light, pointLight;
 
 			var mesh;
@@ -71,6 +72,9 @@
 			function init() {
 
 				container = document.getElementById( 'container' );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 25, 0 );
@@ -240,7 +244,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 				render();
+				stats.end();
 
 			}
 

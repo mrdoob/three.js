@@ -18,6 +18,7 @@
 	</head>
 	<body>
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/effects/VREffect.js"></script>
@@ -35,7 +36,7 @@
 
 		var camera;
 		var effect, controls;
-		var renderer;
+		var renderer, stats;
 		var scene;
 
 		init();
@@ -47,6 +48,9 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			document.body.appendChild( stats.dom );
 
 			scene = new THREE.Scene();
 
@@ -143,12 +147,14 @@
 
 		function animate() {
 
+			stats.begin();
+
 			controls.update();
 
 			effect.render( scene, camera );
 
 			effect.requestAnimationFrame( animate );
-
+			stats.end();
 		}
 
 		</script>

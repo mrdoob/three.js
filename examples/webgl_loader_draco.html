@@ -40,9 +40,11 @@
 	<script src="../build/three.js"></script>
 	<script src="js/loaders/draco/draco_decoder.js"></script>
 	<script src="js/loaders/draco/DRACOLoader.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+
 	<script>
 
-		var camera, scene, renderer;
+		var camera, scene, renderer, stats;
 
 		init();
 		animate();
@@ -99,6 +101,9 @@
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
 			window.addEventListener( 'resize', onWindowResize, false );
 
 		}
@@ -113,10 +118,11 @@
 		}
 
 		function animate() {
+			stats.begin();
 
 			render();
 			requestAnimationFrame( animate );
-
+			stats.end();
 		}
 
 		function render() {

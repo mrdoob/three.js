@@ -37,9 +37,11 @@
 
 		<script src="../build/three.js"></script>
 
+
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
 
@@ -54,7 +56,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 			var cameraControls;
 			var effectController;
 			var teapotSize = 400;
@@ -83,6 +85,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				var canvasWidth = window.innerWidth;
 				var canvasHeight = window.innerHeight;
@@ -361,6 +366,14 @@
 
 				scene.add( teapot );
 
+			}
+
+			updateStats();
+
+			function updateStats(){
+				requestAnimationFrame( updateStats );
+				stats.begin();
+				stats.end();
 			}
 
 		</script>

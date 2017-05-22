@@ -32,6 +32,8 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
@@ -88,7 +90,7 @@
 
 		<script>
 
-			var camera, scene, renderer, composer;
+			var camera, scene, renderer, composer, stats;
 			var object, light, nodepass;
 			var gui, guiElements = [];
 			var clock = new THREE.Clock();
@@ -506,6 +508,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				//
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -569,6 +574,8 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				var delta = clock.getDelta();
 
 				object.rotation.x += 0.005;
@@ -577,7 +584,7 @@
 				nodepass.node.updateFrame( delta );
 
 				composer.render();
-
+				stats.end();
 			}
 
 		</script>

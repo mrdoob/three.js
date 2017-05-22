@@ -44,6 +44,7 @@
 
 		<script src="js/Detector.js"></script>
 
+
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -60,6 +61,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -211,6 +213,7 @@
 			buildGui();
 
 			render();
+
 
 		</script>
 

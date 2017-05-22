@@ -17,10 +17,13 @@
 
 		<script type="text/javascript" src="../build/three.js"></script>
 		<script type="text/javascript" src="js/Octree.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 		<script>
 
 			var camera,
 				scene,
+				stats,
 				renderer,
 				octree,
 				geometry,
@@ -58,6 +61,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				// create octree
 
@@ -104,6 +110,8 @@
 				// note: three.js includes requestAnimationFrame shim
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				// modify octree structure by adding/removing objects
 
 				modifyOctree();
@@ -119,6 +127,8 @@
 				// update octree to add deferred objects
 
 				octree.update();
+
+				stats.end();
 
 			}
 

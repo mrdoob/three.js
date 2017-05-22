@@ -96,10 +96,12 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/GLTF2Loader.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 			var orbitControls = null;
-			var container, camera, scene, renderer, loader;
+			var container, camera, scene, renderer, loader, stats;
 
 			var cameraIndex = 0;
 			var cameras = [];
@@ -123,6 +125,9 @@
 			function initScene(index) {
 
 				container = document.getElementById( 'container' );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				scene = new THREE.Scene();
 
@@ -356,10 +361,12 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
+				stats.begin();
 				if (mixer) mixer.update(clock.getDelta());
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
+				stats.end();
 			}
 
 			function render() {

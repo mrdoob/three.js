@@ -42,9 +42,12 @@
 
 		<script src="js/Detector.js"></script>
 
+		<script src="js/controls/OrbitControls.js"></script>
+
+
+		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
-		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
 
@@ -54,7 +57,7 @@
 			var container;
 
 			var camera, scene;
-			var renderer;
+			var renderer, stats;
 
 			var mesh;
 
@@ -75,6 +78,9 @@
 			function init() {
 
 				container = document.getElementById( 'container' );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.set( 2000, 5000, 5000 );
@@ -230,9 +236,13 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				controls.update();
 
 				render();
+
+				stats.end();
 
 			}
 

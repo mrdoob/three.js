@@ -21,12 +21,14 @@
 
 		<script src="../build/three.js"></script>
 
+
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/ViveController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -41,7 +43,7 @@
 			var clock = new THREE.Clock();
 
 			var container;
-			var cameraRig, camera, scene, renderer;
+			var cameraRig, camera, scene, renderer, stats;
 			var effect, controls;
 			var controller1, controller2;
 			var scale = 1;
@@ -61,6 +63,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
@@ -235,8 +240,9 @@
 			function animate() {
 
 				effect.requestAnimationFrame( animate );
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render() {

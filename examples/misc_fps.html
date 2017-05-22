@@ -33,10 +33,14 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - platformer demo. cubemap by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>.<br />Use arrow keys to look around, WASD to move and SPACE to jump.</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
 			// player motion parameters
+
+			var stats;
 
 			var motion = {
 				airborne : false,
@@ -309,11 +313,13 @@
 
 
 			var gameLoop = function( dt ) {
+				stats.begin();
 				resetPlayer();
 				keyboardControls();
 				jumpPads();
 				applyPhysics( dt );
 				updateCamera();
+				stats.end();
 			};
 
 			var gameViewportSize = function() { return {
@@ -321,6 +327,9 @@
 			}};
 
 			document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
 
 			start( gameLoop, gameViewportSize );
 		</script>

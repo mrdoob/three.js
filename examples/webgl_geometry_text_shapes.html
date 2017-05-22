@@ -26,10 +26,12 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
-			var camera, scene, renderer, controls;
+			var camera, scene, renderer, controls, stats;
 
 			init();
 			animate();
@@ -132,6 +134,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			} // end init
@@ -149,8 +154,10 @@
 
 				requestAnimationFrame( animate );
 
-				render();
+				stats.begin();
 
+				render();
+				stats.end();
 			}
 
 			function render() {

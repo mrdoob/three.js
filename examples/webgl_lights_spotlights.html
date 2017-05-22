@@ -44,6 +44,8 @@
 		<script src="js/libs/tween.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
@@ -57,6 +59,7 @@
 			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 			var scene = new THREE.Scene();
+			var stats;
 
 			var matFloor = new THREE.MeshPhongMaterial();
 			var matBox = new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
@@ -116,6 +119,9 @@
 				controls.maxPolarAngle = Math.PI / 2;
 				controls.update();
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 			}
 
 			function createSpotlight( color ) {
@@ -161,13 +167,14 @@
 			}
 
 			function animate() {
+				stats.begin();
 
 				tween( spotLight1 );
 				tween( spotLight2 );
 				tween( spotLight3 );
 
 				setTimeout( animate, 5000 );
-
+				stats.end();
 			}
 
 			function render() {

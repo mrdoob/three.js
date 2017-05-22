@@ -42,13 +42,14 @@
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			var camera, scene, renderer,
 			particle1, particle2, particle2,
 			light1, light2, light3,
-			loader, mesh;
+			loader, mesh, stats;
 
 			init();
 			animate();
@@ -80,6 +81,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -101,8 +105,9 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render() {

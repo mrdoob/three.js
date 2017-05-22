@@ -45,6 +45,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+
 		<script src="js/loaders/AMFLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -84,6 +85,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+
 				var loader = new THREE.AMFLoader();
 				loader.load( './models/amf/rook.amf', function ( amfobject ) {
 
@@ -117,6 +119,7 @@
 				renderer.render( scene, camera );
 
 			}
+
 
 		</script>
 	</body>

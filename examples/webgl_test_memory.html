@@ -18,12 +18,14 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
 
 		<script>
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			init();
 			animate();
@@ -32,6 +34,8 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 200;
@@ -65,9 +69,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
+				stats.begin();
 				render();
-
+				stats.end();
 			}
 
 			function render() {

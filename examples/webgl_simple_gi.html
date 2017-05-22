@@ -34,7 +34,9 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -163,7 +165,7 @@
 
 			//
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			init();
 			animate();
@@ -224,6 +226,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				new SimpleGI( renderer, scene );
 
 				controls = new THREE.OrbitControls( camera );
@@ -245,9 +250,13 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				controls.update();
 
 				renderer.render( scene, camera );
+
+				stats.end();
 
 			}
 

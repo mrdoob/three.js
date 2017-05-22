@@ -30,13 +30,15 @@
 			animation from <a href="http://mocap.cs.cmu.edu/">http://mocap.cs.cmu.edu/</a>
 		</div>
 		<script src="../build/three.js"></script>
+
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/BVHLoader.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 		<script>
 
 			var clock = new THREE.Clock();
 
-			var camera, controls, scene, renderer;
+			var camera, controls, scene, renderer, stats;
 			var mixer, skeletonHelper;
 
 			init();
@@ -81,6 +83,9 @@
 
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -97,6 +102,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 
 				var delta = clock.getDelta();
 
@@ -104,6 +110,8 @@
 				if ( skeletonHelper ) skeletonHelper.update();
 
 				renderer.render( scene, camera );
+
+				stats.end();
 
 			}
 

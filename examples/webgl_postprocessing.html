@@ -16,6 +16,7 @@
 
 		<script src="../build/three.js"></script>
 
+
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/DotScreenShader.js"></script>
 		<script src="js/shaders/RGBShiftShader.js"></script>
@@ -23,11 +24,12 @@
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 
 		<script>
 
-			var camera, scene, renderer, composer;
+			var camera, scene, renderer, composer, stats;
 			var object, light;
 
 			init();
@@ -39,6 +41,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -105,10 +110,14 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;
 
 				composer.render();
+
+				stats.end();
 
 			}
 

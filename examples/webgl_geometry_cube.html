@@ -15,10 +15,11 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 			var mesh;
 
 			init();
@@ -44,6 +45,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -62,12 +65,13 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				stats.begin();
 
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
 
 				renderer.render( scene, camera );
-
+				stats.end();
 			}
 
 		</script>

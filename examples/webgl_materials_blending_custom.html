@@ -77,13 +77,15 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+
 		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			var materialBg;
 			var materials = [];
@@ -291,6 +293,9 @@
 
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				// EVENTS
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -436,6 +441,8 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				var time = Date.now() * 0.00025;
 				var ox = ( time * -0.01 * materialBg.map.repeat.x ) % 1;
 				var oy = ( time * -0.01 * materialBg.map.repeat.y ) % 1;
@@ -443,6 +450,8 @@
 				materialBg.map.offset.set( ox, oy );
 
 				renderer.render( scene, camera );
+
+				stats.end();
 
 			}
 

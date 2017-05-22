@@ -38,6 +38,7 @@
 
 		<script src="../build/three.js"></script>
 
+
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 
@@ -48,6 +49,7 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 
 		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<video id="video" autoplay loop webkit-playsinline style="display:none">
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
@@ -60,7 +62,7 @@
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			var video, texture, material, mesh;
 
@@ -87,6 +89,9 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
@@ -235,7 +240,11 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
+
 				render();
+
+				stats.end();
 
 			}
 
