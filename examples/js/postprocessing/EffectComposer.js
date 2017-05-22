@@ -85,6 +85,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			if ( pass.enabled === false ) continue;
 
+			pass.update( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 
 			if ( pass.needsSwap ) {
@@ -179,6 +180,8 @@ THREE.Pass = function () {
 Object.assign( THREE.Pass.prototype, {
 
 	setSize: function( width, height ) {},
+
+	update: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {},
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
