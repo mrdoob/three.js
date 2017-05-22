@@ -22,7 +22,7 @@ THREE.SVGRenderer = function ( parameters ) {
 	var _this = this,
 	_renderData, _elements, _lights,
 	_projector = new THREE.Projector(),
-	_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ),
+	_svg = parameters.astext ? null : document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ),
 	_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
 
 	_v1, _v2, _v3, _v4,
@@ -51,9 +51,12 @@ THREE.SVGRenderer = function ( parameters ) {
 
 	_currentPath, _currentStyle,
 
-	_quality = 1, _precision = parameters.precision !== undefined ? parameters.precision : null;
+	_quality = 1,
+	_precision = parameters.precision !== undefined ? parameters.precision : null,
+	_textSizeAttr = '', _textClearAttr = '', _accumulatedPath;
 
 	this.domElement = _svg;
+	if ( parameters.astext ) this.outerHTML = ""; // can be used to identify text mode
 
 	this.autoClear = true;
 	this.sortObjects = true;
@@ -100,9 +103,14 @@ THREE.SVGRenderer = function ( parameters ) {
 		_svgWidth = width; _svgHeight = height;
 		_svgWidthHalf = _svgWidth / 2; _svgHeightHalf = _svgHeight / 2;
 
-		_svg.setAttribute( 'viewBox', ( - _svgWidthHalf ) + ' ' + ( - _svgHeightHalf ) + ' ' + _svgWidth + ' ' + _svgHeight );
-		_svg.setAttribute( 'width', _svgWidth );
-		_svg.setAttribute( 'height', _svgHeight );
+		if ( _svg ) {
+			_svg.setAttribute( 'viewBox', ( - _svgWidthHalf ) + ' ' + ( - _svgHeightHalf ) + ' ' + _svgWidth + ' ' + _svgHeight );
+			_svg.setAttribute( 'width', _svgWidth );
+			_svg.setAttribute( 'height', _svgHeight );
+		} else {
+			_textSizeAttr = ' viewBox="' + ( - _svgWidthHalf ) + ' ' + ( - _svgHeightHalf ) + ' ' + _svgWidth + ' ' + _svgHeight + '" ' +
+					'width="' + _svgWidth + '" height="' + _svgHeight + '"';
+		}
 
 		_clipBox.min.set( - _svgWidthHalf, - _svgHeightHalf );
 		_clipBox.max.set( _svgWidthHalf, _svgHeightHalf );
@@ -116,6 +124,8 @@ THREE.SVGRenderer = function ( parameters ) {
 	};
 
 	function removeChildNodes() {
+
+		if ( ! _svg ) return;
 
 		_pathCount = 0;
 
@@ -146,7 +156,10 @@ THREE.SVGRenderer = function ( parameters ) {
 	this.clear = function () {
 
 		removeChildNodes();
-		_svg.style.backgroundColor = getSvgColor( _clearColor, _clearAlpha );
+		if ( _svg )
+			_svg.style.backgroundColor = getSvgColor( _clearColor, _clearAlpha );
+		else
+			_textClearAttr = ' style="background:' + getSvgColor( _clearColor, _clearAlpha ) + '"';
 
 	};
 
@@ -164,7 +177,10 @@ THREE.SVGRenderer = function ( parameters ) {
 		if ( background && background.isColor ) {
 
 			removeChildNodes();
-			_svg.style.backgroundColor = getSvgColor( background );
+			if ( _svg )
+				_svg.style.backgroundColor = getSvgColor( background );
+			else
+				_textClearAttr = ' style="background:' + getSvgColor( background ) + '"';
 
 		} else if ( this.autoClear === true ) {
 
@@ -190,6 +206,7 @@ THREE.SVGRenderer = function ( parameters ) {
 
 		_currentPath = '';
 		_currentStyle = '';
+		_accumulatedPath = '';
 
 		for ( var e = 0, el = _elements.length; e < el; e ++ ) {
 
@@ -263,13 +280,17 @@ THREE.SVGRenderer = function ( parameters ) {
 				var y = - _vector3.y * _svgHeightHalf;
 
 				var node = object.node;
-				node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
+				node.setAttribute( 'transform', 'translate(' + convert( x ) + ',' + convert( y ) + ')' );
 
-				_svg.appendChild( node );
+				if ( _svg ) _svg.appendChild( node );
+				else _accumulatedPath += node.outerHTML;
 
 			}
 
 		} );
+
+		if ( ! _svg )
+			this.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg"' + _textSizeAttr  + _textClearAttr + '>' + _accumulatedPath + '</svg>';
 
 	};
 
@@ -469,10 +490,14 @@ THREE.SVGRenderer = function ( parameters ) {
 
 		if ( _currentPath ) {
 
-			_svgNode = getPathNode( _pathCount ++ );
-			_svgNode.setAttribute( 'd', _currentPath );
-			_svgNode.setAttribute( 'style', _currentStyle );
-			_svg.appendChild( _svgNode );
+			if ( _svg ) {
+				_svgNode = getPathNode( _pathCount ++ );
+				_svgNode.setAttribute( 'd', _currentPath );
+				_svgNode.setAttribute( 'style', _currentStyle );
+				_svg.appendChild( _svgNode );
+			} else {
+				_accumulatedPath += '<path style="' + _currentStyle + '" d="' + _currentPath + '"/>';
+			}
 
 		}
 
