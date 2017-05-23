@@ -16030,7 +16030,7 @@
 
 			} else if ( array instanceof Float64Array ) {
 
-				console.warn( "Unsupported data buffer format: Float64Array" );
+				console.warn( 'THREE.WebGLAttributes: Unsupported data buffer format: Float64Array.' );
 
 			} else if ( array instanceof Uint16Array ) {
 
@@ -17341,10 +17341,10 @@
 
 		}
 
-		vertexShader = parseIncludes( vertexShader, parameters );
+		vertexShader = parseIncludes( vertexShader );
 		vertexShader = replaceLightNums( vertexShader, parameters );
 
-		fragmentShader = parseIncludes( fragmentShader, parameters );
+		fragmentShader = parseIncludes( fragmentShader );
 		fragmentShader = replaceLightNums( fragmentShader, parameters );
 
 		if ( ! material.isShaderMaterial ) {
@@ -19455,7 +19455,7 @@
 
 			} catch ( error ) {
 
-				console.error( error );
+				console.error( 'THREE.WebGLState:', error );
 
 			}
 
@@ -19469,7 +19469,7 @@
 
 			} catch ( error ) {
 
-				console.error( error );
+				console.error( 'THREE.WebGLState:', error );
 
 			}
 
@@ -22388,7 +22388,7 @@
 
 			if ( textureUnit >= capabilities.maxTextures ) {
 
-				console.warn( 'WebGLRenderer: trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures );
+				console.warn( 'THREE.WebGLRenderer: Trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures );
 
 			}
 
@@ -31213,7 +31213,7 @@
 
 				}
 
-				console.warn( message );
+				console.warn( 'THREE.KeyframeTrackPrototype:', message );
 				return;
 
 			}
@@ -31324,7 +31324,7 @@
 			var valueSize = this.getValueSize();
 			if ( valueSize - Math.floor( valueSize ) !== 0 ) {
 
-				console.error( "invalid value size in track", this );
+				console.error( 'THREE.KeyframeTrackPrototype: Invalid value size in track.', this );
 				valid = false;
 
 			}
@@ -31336,7 +31336,7 @@
 
 			if ( nKeys === 0 ) {
 
-				console.error( "track is empty", this );
+				console.error( 'THREE.KeyframeTrackPrototype: Track is empty.', this );
 				valid = false;
 
 			}
@@ -31349,7 +31349,7 @@
 
 				if ( typeof currTime === 'number' && isNaN( currTime ) ) {
 
-					console.error( "time is not a valid number", this, i, currTime );
+					console.error( 'THREE.KeyframeTrackPrototype: Time is not a valid number.', this, i, currTime );
 					valid = false;
 					break;
 
@@ -31357,7 +31357,7 @@
 
 				if ( prevTime !== null && prevTime > currTime ) {
 
-					console.error( "out of order keys", this, i, currTime, prevTime );
+					console.error( 'THREE.KeyframeTrackPrototype: Out of order keys.', this, i, currTime, prevTime );
 					valid = false;
 					break;
 
@@ -31377,7 +31377,7 @@
 
 						if ( isNaN( value ) ) {
 
-							console.error( "value is not a valid number", this, i, value );
+							console.error( 'THREE.KeyframeTrackPrototype: Value is not a valid number.', this, i, value );
 							valid = false;
 							break;
 
@@ -32076,7 +32076,7 @@
 
 			if ( ! animation ) {
 
-				console.error( "  no animation in JSONLoader data" );
+				console.error( 'THREE.AnimationClip: No animation in JSONLoader data.' );
 				return null;
 
 			}
@@ -37253,7 +37253,7 @@
 			// ensure there is a value node
 			if ( ! targetObject ) {
 
-				console.error( "  trying to update node for track: " + this.path + " but it wasn't found." );
+				console.error( 'THREE.PropertyBinding: Trying to update node for track: ' + this.path + ' but it wasn\'t found.' );
 				return;
 
 			}
@@ -37269,14 +37269,14 @@
 
 						if ( ! targetObject.material ) {
 
-							console.error( '  can not bind to material as node does not have a material', this );
+							console.error( 'THREE.PropertyBinding: Can not bind to material as node does not have a material.', this );
 							return;
 
 						}
 
 						if ( ! targetObject.material.materials ) {
 
-							console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
+							console.error( 'THREE.PropertyBinding: Can not bind to material.materials as node.material does not have a materials array.', this );
 							return;
 
 						}
@@ -37289,7 +37289,7 @@
 
 						if ( ! targetObject.skeleton ) {
 
-							console.error( '  can not bind to bones as node does not have a skeleton', this );
+							console.error( 'THREE.PropertyBinding: Can not bind to bones as node does not have a skeleton.', this );
 							return;
 
 						}
@@ -37317,7 +37317,7 @@
 
 						if ( targetObject[ objectName ] === undefined ) {
 
-							console.error( '  can not bind to objectName of node, undefined', this );
+							console.error( 'THREE.PropertyBinding: Can not bind to objectName of node undefined.', this );
 							return;
 
 						}
@@ -37331,7 +37331,7 @@
 
 					if ( targetObject[ objectIndex ] === undefined ) {
 
-						console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
+						console.error( 'THREE.PropertyBinding: Trying to bind to objectIndex of objectName, but is undefined.', this, targetObject );
 						return;
 
 					}
@@ -37349,8 +37349,8 @@
 
 				var nodeName = parsedPath.nodeName;
 
-				console.error( "  trying to update property for track: " + nodeName +
-					'.' + propertyName + " but it wasn't found.", targetObject );
+				console.error( 'THREE.PropertyBinding: Trying to update property for track: ' + nodeName +
+					'.' + propertyName + ' but it wasn\'t found.', targetObject );
 				return;
 
 			}
@@ -37384,7 +37384,7 @@
 					// support resolving morphTarget names into indices.
 					if ( ! targetObject.geometry ) {
 
-						console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );
+						console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences because node does not have a geometry.', this );
 						return;
 
 					}
@@ -37393,7 +37393,7 @@
 
 						if ( ! targetObject.geometry.morphAttributes ) {
 
-							console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphAttributes', this );
+							console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences because node does not have a geometry.morphAttributes.', this );
 							return;
 
 						}
@@ -37414,7 +37414,7 @@
 
 						if ( ! targetObject.geometry.morphTargets ) {
 
-							console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
+							console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences because node does not have a geometry.morphTargets.', this );
 							return;
 
 						}
@@ -37639,9 +37639,8 @@
 
 				} else if ( objects[ index ] !== knownObject ) {
 
-					console.error( "Different objects with the same UUID " +
-							"detected. Clean the caches or recreate your " +
-							"infrastructure when reloading scenes..." );
+					console.error( 'THREE.AnimationObjectGroup: Different objects with the same UUID ' +
+							'detected. Clean the caches or recreate your infrastructure when reloading scenes.' );
 
 				} // else the object is already where we want it to be
 
@@ -41705,11 +41704,13 @@
 	var py = new CubicPoly();
 	var pz = new CubicPoly();
 
-	function CatmullRomCurve3( p /* array of Vector3 */ ) {
+	function CatmullRomCurve3( points ) {
 
 		Curve.call( this );
 
-		this.points = p || [];
+		if ( points.length < 2 ) console.warn( 'THREE.CatmullRomCurve3: Points array needs at least two entries.' );
+
+		this.points = points || [];
 		this.closed = false;
 
 	}
@@ -41721,8 +41722,6 @@
 
 		var points = this.points;
 		var l = points.length;
-
-		if ( l < 2 ) console.log( 'duh, you need at least 2 points' );
 
 		var point = ( l - ( this.closed ? 0 : 1 ) ) * t;
 		var intPoint = Math.floor( point );
