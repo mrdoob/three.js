@@ -652,12 +652,10 @@ THREE.VRMLLoader.prototype = {
 				else
 				if('PointLight' === data.nodeType){
 						var l_distance =0;	//0="unendlich" ...1000
-						var l_decay=0;		//-1.. ?
 
 						if(data.radius!=undefined && data.radius<1000){
 							//l_radius=data.radius;
 							l_distance=data.radius;
-							l_decay=1;
 						}
 						object=new THREE.PointLight(
 								l_color.getHex(),
@@ -673,13 +671,11 @@ THREE.VRMLLoader.prototype = {
 						var l_distance =0;//0="unendlich"=1000
 						var l_angle=Math.PI/3;
 						var l_penumbra=0.0;//0..1
-						var l_decay=0;//-1.. ?
 						var l_visible=true;
 
 						if(data.radius!=undefined && data.radius<1000){
 							//l_radius=data.radius;
 							l_distance=data.radius;
-							l_decay=1;
 						}
 						if(data.cutOffAngle!=undefined)l_angle=data.cutOffAngle;
 
@@ -688,8 +684,7 @@ THREE.VRMLLoader.prototype = {
 									l_intensity,
 									l_distance,
 									l_angle,
-									l_penumbra,
-									l_decay
+									l_penumbra
 									);
 						object.visible=l_visible;
 						parent.add( object );
