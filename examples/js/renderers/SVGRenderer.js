@@ -129,9 +129,17 @@ THREE.SVGRenderer = function ( parameters ) {
 
 		_pathCount = 0;
 
-		while ( _svg.childNodes.length > 0 ) {
+		if ( typeof _svg.innerHTML !== 'undefined' ) {
 
-			_svg.removeChild( _svg.childNodes[ 0 ] );
+			_svg.innerHTML = '';
+
+		} else {
+
+			while ( _svg.childNodes.length > 0 ) {
+
+				_svg.removeChild( _svg.childNodes[ 0 ] );
+
+			}
 
 		}
 
