@@ -61,7 +61,7 @@
 
 				// controls
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
@@ -117,12 +117,12 @@
 
 				var meshGeometry = new THREE.ConvexBufferGeometry( pointsGeometry.vertices );
 
-				mesh = new THREE.Mesh( meshGeometry, meshMaterial );
+				var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
 				mesh.material.side = THREE.BackSide; // back faces
 				mesh.renderOrder = 0;
 				group.add( mesh );
 
-				mesh = new THREE.Mesh( meshGeometry, meshMaterial.clone() );
+				var mesh = new THREE.Mesh( meshGeometry, meshMaterial.clone() );
 				mesh.material.side = THREE.FrontSide; // front faces
 				mesh.renderOrder = 1;
 				group.add( mesh );

@@ -79,7 +79,7 @@
 
 					var material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
 
-					mesh = new THREE.Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = ( 0.5 - Math.random() ) * 1000;
 					mesh.position.y = ( 0.5 - Math.random() ) * 1000;

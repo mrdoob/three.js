@@ -171,8 +171,7 @@ THREE.Mirror = function ( width, height, options ) {
 		q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
 
 		// Calculate the scaled plane vector
-		var c = new THREE.Vector4();
-		c = clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
+		var c = clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
 
 		// Replacing the third row of the projection matrix
 		projectionMatrix.elements[ 2 ] = c.x;

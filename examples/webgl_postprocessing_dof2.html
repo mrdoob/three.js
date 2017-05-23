@@ -156,8 +156,8 @@ Use WEBGL Depth buffer support?
 
 				var rand = Math.random;
 
-				for (i=0;i<leaves;i++) {
-					plane = new THREE.Mesh(planePiece, planeMat);
+				for (var i=0;i<leaves;i++) {
+					var plane = new THREE.Mesh(planePiece, planeMat);
 					plane.rotation.set(rand(), rand(), rand());
 					plane.rotation.dx = rand() * 0.1;
 					plane.rotation.dy = rand() * 0.1;
@@ -231,19 +231,13 @@ Use WEBGL Depth buffer support?
 
 				// Lights
 
-				// scene.add( new THREE.AmbientLight( 0xffffff ) );
-
-				// light = new THREE.DirectionalLight( 0xffffff );
-				// light.position.set( 1, 1, 1 );
-				// scene.add( light );
-
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
 				directionalLight.position.set( 2, 1.2, 10 ).normalize();
 				scene.add( directionalLight );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( -2, 1.2, -10 ).normalize();
 				scene.add( directionalLight );
 
@@ -501,7 +495,7 @@ Use WEBGL Depth buffer support?
 
 				}
 
-				for (i=0;i<leaves;i++) {
+				for (var i=0;i<leaves;i++) {
 					plane = planes[i];
 					plane.rotation.x += plane.rotation.dx;
 					plane.rotation.y += plane.rotation.dy;

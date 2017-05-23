@@ -183,7 +183,7 @@
 			renderer.autoClear = false;
 
 			var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
-			renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
+			var renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
 			effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
@@ -198,8 +198,6 @@
 			hblur.uniforms[ 'r' ].value = vblur.uniforms[ 'r' ].value = 0.5;
 
 			effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
-
-			composer = new THREE.EffectComposer( renderer, renderTarget );
 
 			var renderModel = new THREE.RenderPass( scene, camera );
 
@@ -595,7 +593,7 @@
 
 				} else if ( current_material === "hatching2" ) {
 
-					u = effect.material.uniforms;
+					var u = effect.material.uniforms;
 
 					u.uLineColor1.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 					u.uLineColor2.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );

@@ -10,11 +10,11 @@ THREE.OBJLoader = function ( manager ) {
 
 	this.regexp = {
 		// v float float float
-		vertex_pattern           : /^v\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		vertex_pattern           : /^v\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/,
 		// vn float float float
-		normal_pattern           : /^vn\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		normal_pattern           : /^vn\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/,
 		// vt float float
-		uv_pattern               : /^vt\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		uv_pattern               : /^vt\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/,
 		// f vertex vertex vertex
 		face_vertex              : /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/,
 		// f vertex/uv vertex/uv vertex/uv

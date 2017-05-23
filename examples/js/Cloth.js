@@ -286,7 +286,7 @@ function simulate( time ) {
 		for ( particles = cloth.particles, i = 0, il = particles.length; i < il; i ++ ) {
 
 			particle = particles[ i ];
-			pos = particle.position;
+			var pos = particle.position;
 			diff.subVectors( pos, ballPosition );
 			if ( diff.length() < ballSize ) {
 

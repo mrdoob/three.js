@@ -1308,14 +1308,14 @@ THREE.XLoader.prototype = {
 					scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials[sk].skinning = true;
 
 				}
-				mesh = new THREE.SkinnedMesh(bufferGeometry.fromGeometry(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry), new THREE.MultiMaterial(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials));
+				mesh = new THREE.SkinnedMesh(bufferGeometry.fromGeometry(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry), scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials);
 				var skeleton = new THREE.Skeleton(putBones /*, BoneInverse*/);
 				mesh.add(putBones[0]);
 				mesh.bind(skeleton);
 
 			} else {
 
-				mesh = new THREE.Mesh(bufferGeometry.fromGeometry(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry), new THREE.MultiMaterial(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials));
+				mesh = new THREE.Mesh(bufferGeometry.fromGeometry(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry), scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials);
 
 			}
 			mesh.name = nowFrameName;
@@ -1503,7 +1503,7 @@ THREE.XLoader.XAnimationObj.prototype = {
 		for (var i = 0; i < XAnimationInfo.keyFrames.length; i++) {
 
 			var keyframe = {};
-			keyframe.time = XAnimationInfo.keyFrames[i].time * scope.fps;
+			keyframe.time = XAnimationInfo.keyFrames[i].time * this.fps;
 			keyframe.matrix = XAnimationInfo.keyFrames[i].matrix;
 			keyframe.pos = new THREE.Vector3().setFromMatrixPosition(keyframe.matrix);
 			keyframe.rot = new THREE.Quaternion().setFromRotationMatrix(keyframe.matrix);

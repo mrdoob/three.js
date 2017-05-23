@@ -283,7 +283,7 @@
 				// postprocessing
 				composer = new THREE.EffectComposer( renderer );
 
-				renderPass = new THREE.RenderPass( scene, camera );
+				var renderPass = new THREE.RenderPass( scene, camera );
 				composer.addPass( renderPass );
 
 				outlinePass = new THREE.OutlinePass( new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
@@ -334,6 +334,8 @@
 				window.addEventListener( 'touchmove', onTouchMove );
 
 				function onTouchMove( event ) {
+
+					var x, y;
 
 					if ( event.changedTouches ) {
 

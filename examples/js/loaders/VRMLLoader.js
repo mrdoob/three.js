@@ -374,7 +374,7 @@ THREE.VRMLLoader.prototype = {
 
 					while ( null !== ( parts = float3_pattern.exec( line ) ) ) {
 
-						color = {
+						var color = {
 							r: parseFloat( parts[ 1 ] ),
 							g: parseFloat( parts[ 2 ] ),
 							b: parseFloat( parts[ 3 ] )
@@ -415,7 +415,7 @@ THREE.VRMLLoader.prototype = {
 							};
 
 							break;
-							
+
 						case 'location':
 						case 'direction':
 						case 'translation':
@@ -436,7 +436,7 @@ THREE.VRMLLoader.prototype = {
 
 							break;
 
-						case 'intensity':				
+						case 'intensity':
 						case 'cutOffAngle':
 						case 'radius':
 						case 'topRadius':
@@ -472,7 +472,7 @@ THREE.VRMLLoader.prototype = {
 							};
 
 							break;
-							
+
 						case 'on':
 						case 'ccw':
 						case 'solid':
@@ -629,66 +629,60 @@ THREE.VRMLLoader.prototype = {
 				var object = parent;
 
 				if(data.string.indexOf("AmbientLight")>-1 && data.nodeType=='PointLight'){
-					//wenn im Namen "AmbientLight" vorkommt und es ein PointLight ist, 
+					//wenn im Namen "AmbientLight" vorkommt und es ein PointLight ist,
 					//diesen Typ in 'AmbientLight' ändern
-					data.nodeType='AmbientLight';	
+					data.nodeType='AmbientLight';
 				}
-				
-				l_visible=data.on;
-				if(l_visible==undefined)l_visible=true;
-				l_intensity=data.intensity;
-				if(l_intensity==undefined)l_intensity=true;
-				if(data.color!=undefined)
-					l_color= new THREE.Color(data.color.r, data.color.g,data.color.b );
-					else
-					l_color= new THREE.Color(0, 0,0);
-				
-				
-				
+
+				var l_visible = data.on !== undefined ? data.on : true;
+				var l_intensity = data.intensity !== undefined ? data.intensity : 1;
+				var l_color = new THREE.Color();
+				if ( data.color ) l_color.copy( data.color );
+
 				if('AmbientLight' === data.nodeType){
-					object=new THREE.AmbientLight( 
-								l_color.getHex(), 
+					object=new THREE.AmbientLight(
+								l_color.getHex(),
 								l_intensity
 								);
 					object.visible=l_visible;
-					
+
 					parent.add( object );
-					
+
 				}
 				else
 				if('PointLight' === data.nodeType){
-						l_distance =0;	//0="unendlich" ...1000
-						l_decay=0;		//-1.. ?
-						
+						var l_distance =0;	//0="unendlich" ...1000
+						var l_decay=0;		//-1.. ?
+
 						if(data.radius!=undefined && data.radius<1000){
 							//l_radius=data.radius;
 							l_distance=data.radius;
 							l_decay=1;
 						}
-						object=new THREE.PointLight( 
-								l_color.getHex(), 
-								l_intensity, 
+						object=new THREE.PointLight(
+								l_color.getHex(),
+								l_intensity,
 								l_distance);
 						object.visible=l_visible;
-						
+
 						parent.add( object );
 				}
 				else
-				if('SpotLight' === data.nodeType){						
-						l_intensity=1;
-						l_distance =0;//0="unendlich"=1000
-						l_angle=Math.PI/3;
-						l_penumbra=0.0;//0..1
-						l_decay=0;//-1.. ?
-						l_visible=true;
-						
+				if('SpotLight' === data.nodeType){
+						var l_intensity=1;
+						var l_distance =0;//0="unendlich"=1000
+						var l_angle=Math.PI/3;
+						var l_penumbra=0.0;//0..1
+						var l_decay=0;//-1.. ?
+						var l_visible=true;
+
 						if(data.radius!=undefined && data.radius<1000){
 							//l_radius=data.radius;
 							l_distance=data.radius;
 							l_decay=1;
 						}
 						if(data.cutOffAngle!=undefined)l_angle=data.cutOffAngle;
-						
+
 						object = new THREE.SpotLight(
 									l_color.getHex(),
 									l_intensity,
@@ -697,7 +691,7 @@ THREE.VRMLLoader.prototype = {
 									l_penumbra,
 									l_decay
 									);
-						object.visible=l_visible;						
+						object.visible=l_visible;
 						parent.add( object );
 						/*
 						var lightHelper = new THREE.SpotLightHelper( object );
@@ -705,8 +699,8 @@ THREE.VRMLLoader.prototype = {
 						lightHelper.update();
 						*/
 				}
-				else				
-				
+				else
+
 				if ( 'Transform' === data.nodeType || 'Group' === data.nodeType ) {
 
 					object = new THREE.Object3D();

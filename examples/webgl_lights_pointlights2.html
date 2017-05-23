@@ -49,13 +49,12 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer, controls,
-			particle1, particle2, particle4, particle5, particle6,
-			light1, light2, light3, light4, light5, light6;
-
-			var FAR = 300;
+			var camera, scene, renderer, controls;
+			var light1, light2, light3, light4, light5, light6;
 
 			var clock = new THREE.Clock();
+
+			var stats;
 
 			init();
 			animate();
@@ -66,14 +65,14 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, FAR );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 300 );
 				camera.position.set( 0, 15, 150 );
 				camera.lookAt( new THREE.Vector3() );
 
 				// SCENE
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x040306, 10, FAR );
+				scene.fog = new THREE.Fog( 0x040306, 10, 300 );
 
 				// CONTROLS
 

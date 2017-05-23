@@ -67,8 +67,6 @@
 
 			var textureCube;
 
-			var loader;
-
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -150,12 +148,11 @@
 
 				// new way via CTMLoader and separate parts
 
-				loaderCTM = new THREE.CTMLoader();
-
 				var position = new THREE.Vector3( -105, -78, -30 );
 				var scale = new THREE.Vector3( 30, 30, 30 );
 
-				loaderCTM.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
+				var loader = new THREE.CTMLoader();
+				loader.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
 
 					hackMaterials( materials );
 

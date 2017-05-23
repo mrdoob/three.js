@@ -111,8 +111,12 @@
 				directionalLight.position.set( 0, -0.1, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
-				loader = new THREE.JSONLoader();
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createMesh( geometry, sceneModel, 100 ) } );
+				var loader = new THREE.JSONLoader();
+				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) {
+
+					createMesh( geometry, sceneModel, 100 );
+
+				} );
 
 				//
 

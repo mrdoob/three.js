@@ -249,14 +249,10 @@
 
 			function onWindowResize( event ) {
 
-				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight;
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
 
 			}
 

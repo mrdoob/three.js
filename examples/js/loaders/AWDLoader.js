@@ -52,16 +52,16 @@
 
 	}
 
-	AWDProperties = function() {};
+	function AWDProperties() {}
 
 	AWDProperties.prototype = {
-		set : function( key, value ) {
+		set: function( key, value ) {
 
 			this[ key ] = value;
 
 		},
 
-		get : function( key, fallback ) {
+		get: function( key, fallback ) {
 
 			if ( this.hasOwnProperty( key ) )
 				return this[ key ];

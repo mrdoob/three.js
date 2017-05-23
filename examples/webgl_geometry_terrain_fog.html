@@ -79,7 +79,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
 
-				data = generateHeight( worldWidth, worldDepth );
+				var data = generateHeight( worldWidth, worldDepth );
 
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 

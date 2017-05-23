@@ -125,7 +125,7 @@
 				imagePreviewTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				imagePreviewTexture.magFilter = THREE.LinearFilter;
 
-				pointShaderMaterial = new THREE.ShaderMaterial( {
+				var pointShaderMaterial = new THREE.ShaderMaterial( {
 					uniforms: {
 						tex1: { value: imagePreviewTexture },
 						zoom: { value: 9.0 }
@@ -208,7 +208,7 @@
 				_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 				_frustum.setFromMatrix( _projScreenMatrix );
 
-				for ( i = 0, il = imagePositionsInRange.length; i < il; i ++ ) {
+				for ( var i = 0, il = imagePositionsInRange.length; i < il; i ++ ) {
 					var object = imagePositionsInRange[i];
 					var objectPoint = new THREE.Vector3().fromArray( object[ 0 ].obj );
 

@@ -46,14 +46,13 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer, mesh, material;
-			var drawStartPos = { x: 0, y: 0 };
+			var drawStartPos = new THREE.Vector2();
 
 			init();
 			setupCanvasDrawing();
@@ -62,15 +61,13 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 400;
+				camera.position.z = 500;
 
 				scene = new THREE.Scene();
 
-				geometry = new THREE.BoxGeometry( 200, 200, 200 );
-
 				material = new THREE.MeshBasicMaterial();
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -78,13 +75,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
-			
+
 			// Sets up the drawing canvas and adds it as the material map.
 			function setupCanvasDrawing() {
 				// get canvas and context
@@ -106,7 +100,7 @@
 				// add canvas event listeners
 				drawingCanvas.addEventListener( 'mousedown', function( e ) {
 					paint = true;
-					drawStartPos = { x: e.offsetX, y: e.offsetY };
+					drawStartPos.set( e.offsetX, e.offsetY );
 				} );
 
 				drawingCanvas.addEventListener( 'mousemove', function( e ) {
@@ -118,7 +112,7 @@
 				drawingCanvas.addEventListener( 'mouseup', function( e ) {
 					paint = false;
 				} );
-				
+
 				drawingCanvas.addEventListener( 'mouseleave', function( e ) {
 					paint = false;
 				} );
@@ -132,7 +126,7 @@
 				drawContext.lineTo( x, y );
 				drawContext.stroke();
 				// reset drawing start position to current position.
-				drawStartPos = { x: x, y: y };
+				drawStartPos.set( x, y );
 				// need to flag the map as needing updating.
 				material.map.needsUpdate = true;
 
@@ -155,7 +149,6 @@
 				mesh.rotation.y += 0.01;
 
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

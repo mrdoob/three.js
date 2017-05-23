@@ -111,14 +111,11 @@
 				for (var ii =  0; ii < views.length; ++ii ) {
 
 					var view = views[ii];
-					camera = new THREE.PerspectiveCamera( view.fov, window.innerWidth / window.innerHeight, 1, 10000 );
-					camera.position.x = view.eye[ 0 ];
-					camera.position.y = view.eye[ 1 ];
-					camera.position.z = view.eye[ 2 ];
-					camera.up.x = view.up[ 0 ];
-					camera.up.y = view.up[ 1 ];
-					camera.up.z = view.up[ 2 ];
+					var camera = new THREE.PerspectiveCamera( view.fov, window.innerWidth / window.innerHeight, 1, 10000 );
+					camera.position.fromArray( view.eye );
+					camera.up.fromArray( view.up );
 					view.camera = camera;
+
 				}
 
 				scene = new THREE.Scene();
@@ -273,8 +270,8 @@
 
 				for ( var ii = 0; ii < views.length; ++ii ) {
 
-					view = views[ii];
-					camera = view.camera;
+					var view = views[ii];
+					var camera = view.camera;
 
 					view.updateCamera( camera, scene, mouseX, mouseY );
 
@@ -291,6 +288,7 @@
 					camera.updateProjectionMatrix();
 
 					renderer.render( scene, camera );
+
 				}
 
 			}

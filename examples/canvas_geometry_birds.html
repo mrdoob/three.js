@@ -209,16 +209,15 @@
 
 				this.alignment = function ( boids ) {
 
-					var boid, velSum = new THREE.Vector3(),
-					count = 0;
+					var count = 0;
+					var velSum = new THREE.Vector3();
 
 					for ( var i = 0, il = boids.length; i < il; i++ ) {
 
 						if ( Math.random() > 0.6 ) continue;
 
-						boid = boids[ i ];
-
-						distance = boid.position.distanceTo( this.position );
+						var boid = boids[ i ];
+						var distance = boid.position.distanceTo( this.position );
 
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
@@ -249,17 +248,16 @@
 
 				this.cohesion = function ( boids ) {
 
-					var boid, distance,
-					posSum = new THREE.Vector3(),
-					steer = new THREE.Vector3(),
-					count = 0;
+					var count = 0;
+					var posSum = new THREE.Vector3();
+					var steer = new THREE.Vector3();
 
 					for ( var i = 0, il = boids.length; i < il; i ++ ) {
 
 						if ( Math.random() > 0.6 ) continue;
 
-						boid = boids[ i ];
-						distance = boid.position.distanceTo( this.position );
+						var boid = boids[ i ];
+						var distance = boid.position.distanceTo( this.position );
 
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
@@ -292,16 +290,15 @@
 
 				this.separation = function ( boids ) {
 
-					var boid, distance,
-					posSum = new THREE.Vector3(),
-					repulse = new THREE.Vector3();
+					var posSum = new THREE.Vector3();
+					var repulse = new THREE.Vector3();
 
 					for ( var i = 0, il = boids.length; i < il; i ++ ) {
 
 						if ( Math.random() > 0.6 ) continue;
 
-						boid = boids[ i ];
-						distance = boid.position.distanceTo( this.position );
+						var boid = boids[ i ];
+						var distance = boid.position.distanceTo( this.position );
 
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
@@ -432,7 +429,7 @@
 					bird = birds[ i ];
 					bird.position.copy( boids[ i ].position );
 
-					color = bird.material.color;
+					var color = bird.material.color;
 					color.r = color.g = color.b = ( 500 - bird.position.z ) / 1000;
 
 					bird.rotation.y = Math.atan2( - boid.velocity.z, boid.velocity.x );

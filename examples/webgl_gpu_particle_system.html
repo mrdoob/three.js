@@ -48,6 +48,8 @@
 			controls, container, gui = new dat.GUI( { width: 350 } ),
 			options, spawnerOptions, particleSystem;
 
+		var stats;
+
 		init();
 		animate();
 
@@ -148,6 +150,7 @@
 			controls.update();
 
 			var delta = clock.getDelta() * spawnerOptions.timeScale;
+
 			tick += delta;
 
 			if ( tick < 0 ) tick = 0;
@@ -172,6 +175,7 @@
 			particleSystem.update( tick );
 
 			render();
+
 			stats.update();
 
 		}

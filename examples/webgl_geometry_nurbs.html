@@ -31,7 +31,6 @@
 		<script src="js/curves/NURBSUtils.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-
 		<script>
 
 			var container, stats;
@@ -155,9 +154,11 @@
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
-				getSurfacePoint = function(u, v) {
+				function getSurfacePoint(u, v) {
+
 					return nurbsSurface.getPoint(u, v);
-				};
+
+				}
 
 				var geometry = new THREE.ParametricBufferGeometry( getSurfacePoint, 20, 20 );
 				var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );

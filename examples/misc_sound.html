@@ -58,8 +58,7 @@
 			var camera, controls, scene, renderer;
 			var light, pointLight;
 
-			var mesh;
-			var material_sphere1, material_sphere2;
+			var material1, material2, material3;
 
 			var analyser1, analyser2, analyser3;
 
@@ -87,15 +86,15 @@
 
 				var sphere = new THREE.SphereGeometry( 20, 32, 16 );
 
-				material_sphere1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, shading: THREE.FlatShading, shininess: 0 } );
-				material_sphere2 = new THREE.MeshPhongMaterial( { color: 0xff2200, shading: THREE.FlatShading, shininess: 0 } );
-				material_sphere3 = new THREE.MeshPhongMaterial( { color: 0x6622aa, shading: THREE.FlatShading, shininess: 0 } );
+				material1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, shading: THREE.FlatShading, shininess: 0 } );
+				material2 = new THREE.MeshPhongMaterial( { color: 0xff2200, shading: THREE.FlatShading, shininess: 0 } );
+				material3 = new THREE.MeshPhongMaterial( { color: 0x6622aa, shading: THREE.FlatShading, shininess: 0 } );
 
 				// sound spheres
 
 				var audioLoader = new THREE.AudioLoader();
 
-				var mesh1 = new THREE.Mesh( sphere, material_sphere1 );
+				var mesh1 = new THREE.Mesh( sphere, material1 );
 				mesh1.position.set( -250, 30, 0 );
 				scene.add( mesh1 );
 
@@ -109,7 +108,7 @@
 
 				//
 
-				var mesh2 = new THREE.Mesh( sphere, material_sphere2 );
+				var mesh2 = new THREE.Mesh( sphere, material2 );
 				mesh2.position.set( 250, 30, 0 );
 				scene.add( mesh2 );
 
@@ -124,7 +123,7 @@
 				//
 
 
-				var mesh3 = new THREE.Mesh( sphere, material_sphere3 );
+				var mesh3 = new THREE.Mesh( sphere, material3 );
 				mesh3.position.set( 0, 30, -250 );
 				scene.add( mesh3 );
 
@@ -251,9 +250,9 @@
 
 				controls.update( delta );
 
-				material_sphere1.emissive.b = analyser1.getAverageFrequency() / 256;
-				material_sphere2.emissive.b = analyser2.getAverageFrequency() / 256;
-				material_sphere3.emissive.b = analyser3.getAverageFrequency() / 256;
+				material1.emissive.b = analyser1.getAverageFrequency() / 256;
+				material2.emissive.b = analyser2.getAverageFrequency() / 256;
+				material3.emissive.b = analyser3.getAverageFrequency() / 256;
 
 				renderer.render( scene, camera );
 

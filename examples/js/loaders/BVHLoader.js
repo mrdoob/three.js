@@ -84,7 +84,7 @@ THREE.BVHLoader.prototype = {
 
 				tokens = nextLine( lines ).split( /[\s]+/ );
 
-				readFrameData( tokens, i * frameTime, root, list );
+				readFrameData( tokens, i * frameTime, root );
 
 			}
 

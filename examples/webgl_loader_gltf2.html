@@ -442,7 +442,7 @@
 				var i, len = sceneList.length;
 
 				for (i = 0; i < len; i++) {
-					option = document.createElement("option");
+					var option = document.createElement("option");
 					option.text=sceneList[i].name;
 					elt.add(option);
 				}
@@ -494,14 +494,14 @@
 					elt.removeChild(elt.lastChild);
 				}
 
-				option = document.createElement("option");
+				var option = document.createElement("option");
 				option.text="[default]";
 				elt.add(option);
 
 				var i, len = cameraNames.length;
 
 				for (i = 0; i < len; i++) {
-					option = document.createElement("option");
+					var option = document.createElement("option");
 					option.text=cameraNames[i];
 					elt.add(option);
 				}
