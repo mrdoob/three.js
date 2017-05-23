@@ -384,6 +384,12 @@ THREE.SVGRenderer = function () {
 
 			addPath( style, path );
 
+		} else if ( material.isLineDashedMaterial ) {
+
+			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity ) + ';stroke-width:' + material.linewidth + ';stroke-dasharray:' + material.dashSize + "," + material.gapSize;
+
+			addPath( style, path );
+
 		}
 
 	}
