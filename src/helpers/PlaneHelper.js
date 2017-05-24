@@ -15,11 +15,9 @@ function PlaneHelper( plane, size, hex ) {
 
 	this.plane = plane;
 
-	this.size = size;
+	this.size = ( size === undefined ) ? 1 : size;
 
 	var color = ( hex !== undefined ) ? hex : 0xffff00;
-
-	if ( size === undefined ) size = 1;
 
 	var positions = [ 1, - 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0 ];
 
