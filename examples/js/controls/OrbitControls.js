@@ -84,31 +84,31 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// public methods
 	//
 
-	this.panCamera = function ( deltaX, deltaY ) {
+	this.pan = function ( deltaX, deltaY ) {
 
 		pan( deltaX, deltaY );
 		scope.update();
 	};
 
-	this.dollyInCamera = function() {
+	this.dollyIn = function() {
 
 		dollyIn( getZoomScale() );
 		scope.update();
 	};
 
-	this.dollyOutCamera = function() {
+	this.dollyOut = function() {
 
 		dollyOut( getZoomScale() );
 		scope.update();
 	};
 
-	this.rotateCameraLeft = function( angle ) {
+	this.rotateLeft = function( angle ) {
 
 		rotateLeft( angle );
 		scope.update();
 	};
 
-	this.rotateCameraUp = function( angle ) {
+	this.rotateUp = function( angle ) {
 
 		rotateUp( angle );
 		scope.update();
