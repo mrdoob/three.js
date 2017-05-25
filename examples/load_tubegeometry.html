@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+	<head>
+			<title>three.js canvas - camera - orthographic</title>
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	</head>
+	<body>
+		<div id="container">
+		</div>
+		<script src="../build/three.js"></script>
+		<script>
+			init();
+			function init()
+			{
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize(window.innerWidth,window.innerHeight);
+				renderer.setClearColor(new THREE.Color("rgb(153,153,102)"));
+
+				container = document.getElementById('container');
+			    document.body.appendChild(container);
+			    container.style.height=window.innerHeight+"px";
+			    container.style.width=window.innerWidth+"px";
+				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,10000);
+				camera.position.z=100;
+				container.appendChild(renderer.domElement);
+				animate();
+			}
+			function animate()
+			{
+				window.requestAnimationFrame(animate);
+				render();
+			}
+			function render() 
+			{
+				renderer.render(scene,camera);
+				controls.update();
+			}
+			function showpipe()
+			{	
+				filename="tubegeometry.json";
+				var loader = new THREE.ObjectLoader();
+				loader.load(filename,function(obj){
+					 	scene.add(obj);
+				});
+				
+			}
+		</script>
+	</body>
+</html>
