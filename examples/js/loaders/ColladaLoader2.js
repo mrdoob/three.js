@@ -597,8 +597,6 @@ THREE.ColladaLoader.prototype = {
 
 					}
 
-					texture.needsUpdate = true;
-
 					return texture;
 
 				}
