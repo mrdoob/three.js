@@ -8,13 +8,14 @@
 		<div id="container">
 		</div>
 		<script src="../build/three.js"></script>
+		<script src="../src/loaders/ObjectLoader.js"></script>
 		<script>
 			init();
 			function init()
 			{
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize(window.innerWidth,window.innerHeight);
-				renderer.setClearColor(new THREE.Color("rgb(153,153,102)"));
+				renderer.setClearColor(new THREE.Color("rgb(0,0,0)"));
 
 				container = document.getElementById('container');
 			    document.body.appendChild(container);
@@ -25,6 +26,7 @@
 				camera.position.z=100;
 				container.appendChild(renderer.domElement);
 				animate();
+				showpipe();
 			}
 			function animate()
 			{
@@ -34,11 +36,10 @@
 			function render() 
 			{
 				renderer.render(scene,camera);
-				controls.update();
 			}
 			function showpipe()
 			{	
-				filename="tubegeometry.json";
+				filename="./models/json/TubeGeometry.json";
 				var loader = new THREE.ObjectLoader();
 				loader.load(filename,function(obj){
 					 	scene.add(obj);
