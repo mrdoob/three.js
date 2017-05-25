@@ -38,16 +38,64 @@
 		<a href="https://github.com/google/draco" target="_blank">DRACO</a> loader
 	</div>
 	<script src="../build/three.js"></script>
-	<script src="js/loaders/draco/draco_decoder.js"></script>
 	<script src="js/loaders/draco/DRACOLoader.js"></script>
 	<script>
 
 		var camera, scene, renderer;
+		var dracoDecoderType = {};
 
-		init();
-		animate();
+		loadDracoDecoder( function( dracoLoader ) {
+			init(dracoLoader);
+			animate();
+		} );
 
-		function init() {
+		function loadDracoDecoder( onDecoderLoaded ) {
+			if ( typeof WebAssembly !== 'object' ) {
+				// No WebAssembly support
+				loadJavaScriptFile( 'js/loaders/draco/draco_decoder.js', createDracoDecoder, onDecoderLoaded );
+			} else {
+				loadJavaScriptFile( 'js/loaders/draco/draco_wasm_wrapper.js', loadWebAssemblyDecoder, onDecoderLoaded );
+			}
+		}
+
+		// This function loads a JavaScript file and adds it to the page. "path"
+		// is the path to the JavaScript file. "onLoadFunc" is the function to be
+		// called when the JavaScript file has been loaded.
+		function loadJavaScriptFile( path, onLoadFunc, onDecoderLoaded ) {
+			var head = document.getElementsByTagName( 'head' )[ 0 ];
+			var element = document.createElement( 'script' );
+			element.id = "decoder_script";
+			element.type = 'text/javascript';
+			element.src = path;
+			if ( onLoadFunc !== null )
+				element.onload = function() { onLoadFunc( onDecoderLoaded ); }
+
+			head.appendChild( element );
+		}
+
+		function loadWebAssemblyDecoder( onDecoderLoaded ) {
+			dracoDecoderType['wasmBinaryFile'] = 'js/loaders/draco/draco_decoder.wasm';
+			var xhr = new XMLHttpRequest();
+			xhr.open( 'GET', 'js/loaders/draco/draco_decoder.wasm', true );
+			xhr.responseType = 'arraybuffer';
+			xhr.onload = function() {
+				// draco_wasm_wrapper.js must be loaded before DracoModule is
+				// created. The object passed into DracoModule() must contain a
+				// property with the name of wasmBinary and the value must be an
+				// ArrayBuffer containing the contents of the .wasm file.
+				dracoDecoderType[ 'wasmBinary' ] = xhr.response;
+				createDracoDecoder( onDecoderLoaded );
+			};
+			xhr.send( null )
+		}
+
+		function createDracoDecoder( onDecoderLoaded ) {
+			var dracoLoader = new THREE.DRACOLoader();
+			dracoLoader.setDracoDecoderType( dracoDecoderType );
+			onDecoderLoaded( dracoLoader );
+		}
+
+		function init( dracoLoader ) {
 
 			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
 			camera.position.set( 3, 0.25, 3 );
@@ -77,8 +125,7 @@
 			light.position.set( - 1, 1, 1 );
 			scene.add( light );
 
-			var loader = new THREE.DRACOLoader();
-			loader.load( 'models/draco/bunny.drc', function ( geometry ) {
+			dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
 
 				geometry.computeVertexNormals();
 
