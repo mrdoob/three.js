@@ -42,7 +42,6 @@
 	<script>
 
 		var camera, scene, renderer;
-		var dracoDecoderType = {};
 
 		loadDracoDecoder( function( dracoLoader ) {
 			init(dracoLoader);
@@ -74,23 +73,23 @@
 		}
 
 		function loadWebAssemblyDecoder( onDecoderLoaded ) {
-			dracoDecoderType['wasmBinaryFile'] = 'js/loaders/draco/draco_decoder.wasm';
 			var xhr = new XMLHttpRequest();
 			xhr.open( 'GET', 'js/loaders/draco/draco_decoder.wasm', true );
 			xhr.responseType = 'arraybuffer';
 			xhr.onload = function() {
-				// draco_wasm_wrapper.js must be loaded before DracoModule is
-				// created. The object passed into DracoModule() must contain a
-				// property with the name of wasmBinary and the value must be an
-				// ArrayBuffer containing the contents of the .wasm file.
+				// draco_wasm_wrapper.js must be loaded before THREE.DRACOLoader() is used.
+				var dracoDecoderType = {};
+				dracoDecoderType[ 'wasmBinaryFile' ] = 'js/loaders/draco/draco_decoder.wasm';
 				dracoDecoderType[ 'wasmBinary' ] = xhr.response;
-				createDracoDecoder( onDecoderLoaded );
+				createDracoDecoder( onDecoderLoaded, dracoDecoderType );
 			};
 			xhr.send( null )
 		}
 
-		function createDracoDecoder( onDecoderLoaded ) {
+		function createDracoDecoder( onDecoderLoaded, dracoDecoderType ) {
 			var dracoLoader = new THREE.DRACOLoader();
+			if ( dracoDecoderType === undefined )
+				dracoDecoderType = {};
 			dracoLoader.setDracoDecoderType( dracoDecoderType );
 			onDecoderLoaded( dracoLoader );
 		}
