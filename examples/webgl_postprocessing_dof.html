@@ -9,25 +9,25 @@
 				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
 				font-weight: bold;
-				text-align:center;
+				text-align: center;
 			}
 
 			a {
-				color:#0078ff;
+				color: #0078ff;
 			}
 
 			#info {
-				color:#fff;
+				color: #fff;
 				position: relative;
 				top: 0px;
 				width: 50em;
 				margin: 0 auto -2.1em;
 				padding: 5px;
-				z-index:100;
+				z-index: 100;
 			}
 		</style>
 	</head>
@@ -122,14 +122,14 @@
 
 				nobjects = xgrid * ygrid * zgrid;
 
-				c = 0;
-
-				//var s = 0.25;
 				var s = 60;
+				var count = 0;
 
 				for ( i = 0; i < xgrid; i ++ )
 				for ( j = 0; j < ygrid; j ++ )
 				for ( k = 0; k < zgrid; k ++ ) {
+
+					var mesh;
 
 					if ( singleMaterial ) {
 
@@ -137,8 +137,8 @@
 
 					} else {
 
-						materials[ c ] = new THREE.MeshBasicMaterial( parameters );
-						mesh = new THREE.Mesh( geo, materials[ c ] );
+						mesh = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( parameters ) );
+						materials[ count ] = mesh.material
 
 					}
 
@@ -155,7 +155,7 @@
 					scene.add( mesh );
 					objects.push( mesh );
 
-					c ++;
+					count ++;
 
 				}
 

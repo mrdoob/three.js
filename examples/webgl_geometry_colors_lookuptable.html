@@ -33,7 +33,6 @@
 
 	<body>
 
-
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - lookuptable - vertex color values from a range of data values.<br />
 		press A: change color map, press S: change numberOfColors, press D: toggle Legend on/off, press F: change Legend layout<br />
 		</div>
@@ -183,7 +182,7 @@
 
 						var colorValue = geometry.attributes.pressure.array[ i ];
 
-						color = lut.getColor( colorValue );
+						var color = lut.getColor( colorValue );
 
 						if ( color == undefined ) {
 
@@ -217,13 +216,13 @@
 
 					if ( legendLayout ) {
 
+						var legend;
+
 						if ( legendLayout == 'horizontal' ) {
 
 							legend = lut.setLegendOn( { 'layout':'horizontal', 'position': { 'x': 21, 'y': 6, 'z': 5 } } );
 
-						}
-
-						else {
+						} else {
 
 							legend = lut.setLegendOn();
 

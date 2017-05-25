@@ -103,24 +103,24 @@
 				// Line
 				var points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 				var spline = new THREE.CatmullRomCurve3( points );
-				var n_sub = 6, colors = [], line;
+				var n_sub = 6, colors = [];
+
 				var lineGeometry = new THREE.Geometry();
+				var vertices = lineGeometry.vertices;
 
-				for ( i = 0; i < points.length * n_sub; i ++ ) {
+				for ( var i = 0; i < points.length * n_sub; i ++ ) {
 
-					index = i / ( points.length * n_sub );
-					position = spline.getPoint( index );
+					var index = i / ( points.length * n_sub );
 
-					lineGeometry.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
-
+					vertices[ i ] = spline.getPoint( index );
 					colors[ i ] = new THREE.Color( 0x88aaff );
 
 				}
 
 				lineGeometry.colors = colors;
 
-				material = new THREE.LineBasicMaterial( { opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
-				line = new THREE.Line( lineGeometry, material );
+				var material = new THREE.LineBasicMaterial( { opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
+				var line = new THREE.Line( lineGeometry, material );
 				line.scale.set( 0.5, 0.5, 0.5 );
 				line.position.set( 0, -200, 0);
 				scene.add( line );

@@ -225,7 +225,7 @@
 				var loader = new THREE.OBJLoader();
 				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
 
-					geometry = group.children[ 0 ].geometry;
+					var geometry = group.children[ 0 ].geometry;
 					geometry.attributes.uv2 = geometry.attributes.uv;
 					geometry.center();
 

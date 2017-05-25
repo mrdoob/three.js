@@ -81,7 +81,7 @@ KeyframeTrackPrototype = {
 
 			}
 
-			console.warn( message );
+			console.warn( 'THREE.KeyframeTrackPrototype:', message );
 			return;
 
 		}
@@ -192,7 +192,7 @@ KeyframeTrackPrototype = {
 		var valueSize = this.getValueSize();
 		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
 
-			console.error( "invalid value size in track", this );
+			console.error( 'THREE.KeyframeTrackPrototype: Invalid value size in track.', this );
 			valid = false;
 
 		}
@@ -204,7 +204,7 @@ KeyframeTrackPrototype = {
 
 		if ( nKeys === 0 ) {
 
-			console.error( "track is empty", this );
+			console.error( 'THREE.KeyframeTrackPrototype: Track is empty.', this );
 			valid = false;
 
 		}
@@ -217,7 +217,7 @@ KeyframeTrackPrototype = {
 
 			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
 
-				console.error( "time is not a valid number", this, i, currTime );
+				console.error( 'THREE.KeyframeTrackPrototype: Time is not a valid number.', this, i, currTime );
 				valid = false;
 				break;
 
@@ -225,7 +225,7 @@ KeyframeTrackPrototype = {
 
 			if ( prevTime !== null && prevTime > currTime ) {
 
-				console.error( "out of order keys", this, i, currTime, prevTime );
+				console.error( 'THREE.KeyframeTrackPrototype: Out of order keys.', this, i, currTime, prevTime );
 				valid = false;
 				break;
 
@@ -245,7 +245,7 @@ KeyframeTrackPrototype = {
 
 					if ( isNaN( value ) ) {
 
-						console.error( "value is not a valid number", this, i, value );
+						console.error( 'THREE.KeyframeTrackPrototype: Value is not a valid number.', this, i, value );
 						valid = false;
 						break;
 

@@ -272,7 +272,7 @@
 
 			function render () {
 
-				delta = 10 * clock.getDelta();
+				var delta = 10 * clock.getDelta();
 
 				delta = delta < 2 ? delta : 2;
 
@@ -310,7 +310,7 @@
 
 					}
 
-					for ( i = 0; i < vl; i ++ ) {
+					for ( var i = 0; i < vl; i ++ ) {
 
 						p = vertices[ i ];
 						vt = vertices_tmp[ i ];

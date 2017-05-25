@@ -77,6 +77,8 @@
 			var geometry, meshPlanet, meshClouds, meshMoon;
 			var dirLight, pointLight, ambientLight;
 
+			var composer;
+
 			var textureLoader = new THREE.TextureLoader();
 
 			var d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
@@ -201,9 +203,7 @@
 					stars.rotation.x = Math.random() * 6;
 					stars.rotation.y = Math.random() * 6;
 					stars.rotation.z = Math.random() * 6;
-
-					s = i * 10;
-					stars.scale.set( s, s, s );
+					stars.scale.setScalar( i * 10 );
 
 					stars.matrixAutoUpdate = false;
 					stars.updateMatrix();

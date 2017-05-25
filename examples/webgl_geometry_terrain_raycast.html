@@ -82,7 +82,7 @@
 				controls.target.set( 0.0, 100.0, 0.0 );
 				controls.userPanSpeed = 100;
 
-				data = generateHeight( worldWidth, worldDepth );
+				var data = generateHeight( worldWidth, worldDepth );
 
 				controls.target.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
 				camera.position.y =  controls.target.y + 2000;

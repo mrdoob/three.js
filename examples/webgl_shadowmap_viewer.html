@@ -165,7 +165,7 @@
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 
 				// Mouse control
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 

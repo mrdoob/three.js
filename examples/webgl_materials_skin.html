@@ -142,7 +142,7 @@
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
 				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true };
 
-				material = new THREE.ShaderMaterial( parameters );
+				var material = new THREE.ShaderMaterial( parameters );
 				material.extensions.derivatives = true;
 
 				var materialUV = new THREE.ShaderMaterial( parametersUV );
@@ -151,7 +151,11 @@
 				// LOADER
 
 				loader = new THREE.JSONLoader();
-				loader.load(  "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
+				loader.load(  "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) {
+
+					createScene( geometry, 100, material );
+
+				} );
 
 				// RENDERER
 
@@ -206,10 +210,10 @@
 
 				//
 
-				composerScene = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
-				composerScene.addPass( renderModelUV );
+				composer = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
+				composer.addPass( renderModelUV );
 
-				renderScene = new THREE.TexturePass( composerScene.renderTarget2.texture );
+				var renderScene = new THREE.TexturePass( composer.renderTarget2.texture );
 
 				//
 
@@ -236,7 +240,7 @@
 
 				//
 
-				uniforms[ "tBlur1" ].value = composerScene.renderTarget2.texture;
+				uniforms[ "tBlur1" ].value = composer.renderTarget2.texture;
 				uniforms[ "tBlur2" ].value = composerUV1.renderTarget2.texture;
 				uniforms[ "tBlur3" ].value = composerUV2.renderTarget2.texture;
 				uniforms[ "tBlur4" ].value = composerUV3.renderTarget2.texture;
@@ -310,7 +314,7 @@
 
 				}
 
-				composerScene.render();
+				composer.render();
 
 				composerUV1.render();
 				composerUV2.render();

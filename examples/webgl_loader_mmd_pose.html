@@ -53,16 +53,9 @@
 			var container, stats;
 
 			var camera, scene, renderer, effect;
-			var helper;
+			var mesh, helper;
 
 			var vpds = [];
-
-			var ready = false;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			var clock = new THREE.Clock();
 
@@ -132,12 +125,12 @@
 				loader.loadModel( modelFile, function ( object ) {
 
 					mesh = object;
-
 					mesh.position.y = -10;
 
 					scene.add( mesh );
 
 					var vpdIndex = 0;
+
 					function loadVpd () {
 
 						var vpdFile = vpdFiles[ vpdIndex ];
@@ -154,8 +147,7 @@
 
 							} else {
 
-								initGui( mesh, vpds );
-								ready = true;
+								initGui();
 
 							}
 
@@ -165,8 +157,6 @@
 					loadVpd();
 
 				}, onProgress, onError );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 				//
 
@@ -283,25 +273,14 @@
 
 				}
 
-
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				effect.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) / 2;
-				mouseY = ( event.clientY - windowHalfY ) / 2;
 
 			}
 
@@ -315,12 +294,7 @@
 			}
 
 			function render() {
-/*
-				camera.position.x += ( - mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				camera.lookAt( scene.position );
-*/
 				effect.render( scene, camera );
 
 			}

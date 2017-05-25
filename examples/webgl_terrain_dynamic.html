@@ -211,7 +211,7 @@
 
 			var renderer, container, stats;
 
-			var camera, scene;
+			var camera, scene, controls;
 			var cameraOrtho, sceneRenderTarget;
 
 			var uniformsNoise, uniformsNormal, uniformsTerrain,
@@ -368,7 +368,7 @@
 
 				for( var i = 0; i < params.length; i ++ ) {
 
-					material = new THREE.ShaderMaterial( {
+					var material = new THREE.ShaderMaterial( {
 
 						uniforms: 		params[ i ][ 3 ],
 						vertexShader: 	params[ i ][ 2 ],

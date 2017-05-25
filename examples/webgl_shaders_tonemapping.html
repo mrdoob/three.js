@@ -62,13 +62,13 @@
 
 			var container;
 
-			var bloomPass, adaptToneMappingPass;
+			var bloomPass, adaptToneMappingPass, ldrToneMappingPass, hdrToneMappingPass;
 			var params;
 
 			var camera, scene, renderer, dynamicHdrEffectComposer, hdrEffectComposer, ldrEffectComposer;
 			var cameraCube, sceneCube;
 			var cameraBG, debugScene;
-			var adaptiveLuminanceMat, currentLuminanceRT, previousLuminanceMat;
+			var adaptiveLuminanceMat, currentLuminanceRT, currentLuminanceMat, previousLuminanceMat;
 
 			var directionalLight;
 

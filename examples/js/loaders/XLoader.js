@@ -287,7 +287,7 @@ THREE.XLoader.prototype = {
 		var scope = this;
 		var find = scope.data.indexOf(";", _baseOffset);
 		find = scope.data.indexOf(";", find + 2);
-		find2 = scope.data.indexOf(";", find + 2);
+		var find2 = scope.data.indexOf(";", find + 2);
 		var _data = scope.data.substr(find + 1, find2 - find + 1);
 		var v_data = _data.split(",");
 		for (var i = 0; i < v_data.length; i++) {
@@ -1308,14 +1308,14 @@ THREE.XLoader.prototype = {
 					scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials[sk].skinning = true;
 
 				}
-				mesh = new THREE.SkinnedMesh(bufferGeometry.fromGeometry(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry), new THREE.MultiMaterial(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials));
+				mesh = new THREE.SkinnedMesh(bufferGeometry.fromGeometry(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry), scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials);
 				var skeleton = new THREE.Skeleton(putBones /*, BoneInverse*/);
 				mesh.add(putBones[0]);
 				mesh.bind(skeleton);
 
 			} else {
 
-				mesh = new THREE.Mesh(bufferGeometry.fromGeometry(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry), new THREE.MultiMaterial(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials));
+				mesh = new THREE.Mesh(bufferGeometry.fromGeometry(scope.loadingXdata.FrameInfo_Raw[nowFrameName].Geometry), scope.loadingXdata.FrameInfo_Raw[nowFrameName].Materials);
 
 			}
 			mesh.name = nowFrameName;
@@ -1450,7 +1450,7 @@ THREE.XLoader.XAnimationObj.prototype = {
 
 	make: function (XAnimationInfoArray, mesh) {
 
-		scope = this;
+		var scope = this;
 		var keys = Object.keys(XAnimationInfoArray);
 		var hierarchy_tmp = [];
 		for (var i = 0; i < keys.length; i++) {
@@ -1503,7 +1503,7 @@ THREE.XLoader.XAnimationObj.prototype = {
 		for (var i = 0; i < XAnimationInfo.keyFrames.length; i++) {
 
 			var keyframe = {};
-			keyframe.time = XAnimationInfo.keyFrames[i].time * scope.fps;
+			keyframe.time = XAnimationInfo.keyFrames[i].time * this.fps;
 			keyframe.matrix = XAnimationInfo.keyFrames[i].matrix;
 			keyframe.pos = new THREE.Vector3().setFromMatrixPosition(keyframe.matrix);
 			keyframe.rot = new THREE.Quaternion().setFromRotationMatrix(keyframe.matrix);
@@ -1572,4 +1572,3 @@ THREE.XLoader.XKeyFrameInfo = function () {
 	this.matrix = null;
 
 };
-

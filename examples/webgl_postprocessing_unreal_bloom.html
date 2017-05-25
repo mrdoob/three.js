@@ -239,9 +239,10 @@
 					standardMaterial.bumpScale = - 0.05;
 
 					var newEnvMap = standardMaterial.envMap;
-					newEnvMap = hdrCubeRenderTarget ? hdrCubeRenderTarget.texture : null;
 
-					if( newEnvMap !== standardMaterial.envMap ) {
+					if ( hdrCubeRenderTarget ) newEnvMap = hdrCubeRenderTarget.texture;
+
+					if ( newEnvMap !== standardMaterial.envMap ) {
 
 						standardMaterial.envMap = newEnvMap;
 						standardMaterial.needsUpdate = true;

@@ -111,7 +111,7 @@
 
 			function init() {
 
-				container = document.getElementById( "container" );
+				var container = document.getElementById( "container" );
 
 				var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
@@ -141,7 +141,7 @@
 
 				scene = new THREE.Scene();
 
-				group = new THREE.Object3D();
+				var group = new THREE.Group();
 				scene.add( group );
 
 				var light = new THREE.PointLight( 0xddffdd, 1.0 );
@@ -208,7 +208,7 @@
 				renderPass.clear = false;
 				composer.addPass( renderPass );
 
-				copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
 

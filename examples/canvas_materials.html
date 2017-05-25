@@ -131,19 +131,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var debugCanvas = document.createElement( 'canvas' );
-				debugCanvas.width = 512;
-				debugCanvas.height = 512;
-				debugCanvas.style.position = 'absolute';
-				debugCanvas.style.top = '0px';
-				debugCanvas.style.left = '0px';
-
-				container.appendChild( debugCanvas );
-
-				debugContext = debugCanvas.getContext( '2d' );
-				debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
-				debugContext.strokeStyle = '#000000';
-
 				stats = new Stats();
 				container.appendChild(stats.dom);
 

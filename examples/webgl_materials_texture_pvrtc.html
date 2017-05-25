@@ -36,7 +36,6 @@
 		<script src="js/loaders/PVRLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -55,29 +54,23 @@
 
 				scene = new THREE.Scene();
 
-				geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
+				//
 
-
-
-
-				/*
-
-				*/
-
-    			var onCube1Loaded = function(texture){
+					var onCube1Loaded = function(texture){
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
 					material6.needsUpdate = true;
-    			};
-    			var onCube2Loaded = function(texture){
+					};
+					var onCube2Loaded = function(texture){
 					texture.magFilter = THREE.LinearFilter;
 					// texture.minFilter = THREE.LinearMipMapNearestFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
 					material8.needsUpdate = true;
-    			};
+					};
 
 
 				var loader = new THREE.PVRLoader();
@@ -171,9 +164,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -202,7 +192,6 @@
 				}
 
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

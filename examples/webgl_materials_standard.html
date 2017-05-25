@@ -126,7 +126,7 @@
 					material.metalness = 1;
 
 					material.map = loader.load( path + 'Cerberus_A.jpg' );
-					// roughness is in G channel, metalness is in B channel 
+					// roughness is in G channel, metalness is in B channel
 					material.metalnessMap = material.roughnessMap = loader.load( path + 'Cerberus_RM.jpg' );
 					material.normalMap = loader.load( path + 'Cerberus_N.jpg' );
 
@@ -168,7 +168,7 @@
 					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
 
-					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+					var hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
 					material.envMap = hdrCubeRenderTarget.texture;
 					material.needsUpdate = true;
@@ -192,12 +192,9 @@
 
 			function onWindowResize( event ) {
 
-				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight;
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 			}

@@ -42,6 +42,7 @@
 			String.prototype.format = function () {
 
 				var str = this;
+
 				for ( var i = 0; i < arguments.length; i ++ ) {
 
 					str = str.replace( '{' + i + '}', arguments[ i ] );
@@ -59,6 +60,7 @@
 			var options;
 
 			var geometry = new THREE.BoxGeometry( 20, 20, 20 );
+			var transformControl;
 
 			var ARC_SEGMENTS = 200;
 			var splineMesh;
@@ -142,13 +144,24 @@
 				gui.open();
 
 				// Controls
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
 
+				controls.addEventListener( 'start', function() {
+
+					cancelHideTransorm();
+
+				} );
+
+				controls.addEventListener( 'end', function() {
+
+					delayHideTransform();
+
+				} );
+
 				transformControl = new THREE.TransformControls( camera, renderer.domElement );
 				transformControl.addEventListener( 'change', render );
-
 				scene.add( transformControl );
 
 				// Hiding transform situation is a little in a mess :()
@@ -191,19 +204,6 @@
 
 				} );
 
-
-				controls.addEventListener( 'start', function() {
-
-					cancelHideTransorm();
-
-				} );
-
-				controls.addEventListener( 'end', function() {
-
-					delayHideTransform();
-
-				} );
-
 				var hiding;
 
 				function delayHideTransform() {
@@ -234,14 +234,15 @@
 				 * Curves
 				 *********/
 
-				var i;
-				for ( i = 0; i < splinePointsLength; i ++ ) {
+				for ( var i = 0; i < splinePointsLength; i ++ ) {
 
 					addSplineObject( positions[ i ] );
 
 				}
+
 				positions = [];
-				for ( i = 0; i < splinePointsLength; i ++ ) {
+
+				for ( var i = 0; i < splinePointsLength; i ++ ) {
 
 					positions.push( splineHelperObjects[ i ].position );
 
@@ -255,10 +256,7 @@
 
 				}
 
-				var curve;
-
-
-				curve = new THREE.CatmullRomCurve3( positions );
+				var curve = new THREE.CatmullRomCurve3( positions );
 				curve.type = 'catmullrom';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0xff0000,
@@ -304,10 +302,9 @@
 
 			function addSplineObject( position ) {
 
-				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( {
-					color: Math.random() * 0xffffff
-					} ) );
-				object.material.ambient = object.material.color;
+				var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
+				var object = new THREE.Mesh( geometry, material );
+
 				if ( position ) {
 
 					object.position.copy( position );
@@ -331,8 +328,8 @@
 			function addPoint() {
 
 				splinePointsLength ++;
-				positions.push( addSplineObject()
-								.position );
+
+				positions.push( addSplineObject().position );
 
 				updateSplineOutline();
 
@@ -355,8 +352,6 @@
 
 			function updateSplineOutline() {
 
-				var p;
-
 				for ( var k in splines ) {
 
 					var spline = splines[ k ];
@@ -365,7 +360,7 @@
 
 					for ( var i = 0; i < ARC_SEGMENTS; i ++ ) {
 
-						p = splineMesh.geometry.vertices[ i ];
+						var p = splineMesh.geometry.vertices[ i ];
 						p.copy( spline.getPoint( i /  ( ARC_SEGMENTS - 1 ) ) );
 
 					}
@@ -379,11 +374,11 @@
 
 			function exportSpline() {
 
-				var p;
 				var strplace = [];
-				for ( i = 0; i < splinePointsLength; i ++ ) {
 
-					p = splineHelperObjects[ i ].position;
+				for ( var i = 0; i < splinePointsLength; i ++ ) {
+
+					var p = splineHelperObjects[ i ].position;
 					strplace.push( 'new THREE.Vector3({0}, {1}, {2})'.format( p.x, p.y, p.z ) )
 
 				}
@@ -408,7 +403,7 @@
 
 				}
 
-				for ( i = 0; i < positions.length; i ++ ) {
+				for ( var i = 0; i < positions.length; i ++ ) {
 
 					positions[ i ].copy( new_positions[ i ] );
 

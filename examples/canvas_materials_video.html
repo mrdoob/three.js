@@ -138,12 +138,12 @@
 
 					for ( var iy = 0; iy < amounty; iy++ ) {
 
-						particle = new THREE.Sprite( material );
-						particle.position.x = ix * separation - ( ( amountx * separation ) / 2 );
-						particle.position.y = -153;
-						particle.position.z = iy * separation - ( ( amounty * separation ) / 2 );
-						particle.scale.x = particle.scale.y = 2;
-						scene.add( particle );
+						var sprite = new THREE.Sprite( material );
+						sprite.position.x = ix * separation - ( ( amountx * separation ) / 2 );
+						sprite.position.y = -153;
+						sprite.position.z = iy * separation - ( ( amounty * separation ) / 2 );
+						sprite.scale.setScalar( 2 );
+						scene.add( sprite );
 
 					}
 

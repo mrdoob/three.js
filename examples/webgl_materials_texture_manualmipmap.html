@@ -137,8 +137,8 @@
 				textureCanvas2.magFilter = THREE.NearestFilter;
 				textureCanvas2.minFilter = THREE.NearestMipMapNearestFilter;
 
-				materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
-				materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
+				var materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
+				var materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 

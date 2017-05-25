@@ -312,10 +312,9 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 				var stride = values.length / times.length;
 				var interpolateStride = ( stride === 3 ) ? 12 : 4;  // 3: Vector3, others: Quaternion or Number
 
-				var aheadIndex = 2;
 				var index = 1;
 
-				for ( aheadIndex = 2, endIndex = times.length; aheadIndex < endIndex; aheadIndex ++ ) {
+				for ( var aheadIndex = 2, endIndex = times.length; aheadIndex < endIndex; aheadIndex ++ ) {
 
 					for ( var i = 0; i < stride; i ++ ) {
 
@@ -427,13 +426,9 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 
 		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks );
 
-		if ( clip !== null ) {
-
-			if ( camera.center === undefined ) camera.center = new THREE.Vector3( 0, 0, 0 );
-			if ( camera.animations === undefined ) camera.animations = [];
-			camera.animations.push( clip );
-
-		}
+		if ( camera.center === undefined ) camera.center = new THREE.Vector3( 0, 0, 0 );
+		if ( camera.animations === undefined ) camera.animations = [];
+		camera.animations.push( clip );
 
 	};
 
@@ -1587,12 +1582,8 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks );
 
-		if ( clip !== null ) {
-
-			if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
-			mesh.geometry.animations.push( clip );
-
-		}
+		if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
+		mesh.geometry.animations.push( clip );
 
 	};
 
@@ -1629,12 +1620,8 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name + 'Morph', -1, tracks );
 
-		if ( clip !== null ) {
-
-			if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
-			mesh.geometry.animations.push( clip );
-
-		}
+		if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
+		mesh.geometry.animations.push( clip );
 
 	};
 
@@ -1652,10 +1639,11 @@ THREE.MMDLoader.DataCreationHelper.prototype = {
 	constructor: THREE.MMDLoader.DataCreationHelper,
 
 	/*
-         * Note: Sometimes to use Japanese Unicode characters runs into problems in Three.js.
+	 * Note: Sometimes to use Japanese Unicode characters runs into problems in Three.js.
 	 *       In such a case, use this method to convert it to Unicode hex charcode strings,
-         *       like 'あいう' -> '0x30420x30440x3046'
-         */
+	 *       like 'あいう' -> '0x30420x30440x3046'
+	 */
+
 	toCharcodeStrings: function ( s ) {
 
 		var str = '';

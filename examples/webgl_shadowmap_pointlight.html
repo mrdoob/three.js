@@ -110,7 +110,7 @@
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 				document.body.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 10, 0 );
 				controls.update();
 

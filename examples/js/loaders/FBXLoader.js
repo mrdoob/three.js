@@ -102,7 +102,6 @@
 
 					self.manager.itemError( url );
 					throw new Error( 'FBXLoader: Unknown format.' );
-					return;
 
 				}
 
@@ -110,7 +109,6 @@
 
 					self.manager.itemError( url );
 					throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( FBXText ) );
-					return;
 
 				}
 
