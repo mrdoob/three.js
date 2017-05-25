@@ -103,15 +103,15 @@ function CustomSinCurve( scale ){
 CustomSinCurve.prototype = Object.create( THREE.Curve.prototype );
 CustomSinCurve.prototype.constructor = CustomSinCurve;
 
-CustomSinCurve.prototype.getPoint = function ( t ) {
+// CustomSinCurve.prototype.getPoint = function ( t ) {
 
-	var tx = eval( this.xEq );
-	var ty = eval( this.yEq );
-	var tz = eval( this.zEq );
+// 	var tx = eval( this.xEq );
+// 	var ty = eval( this.yEq );
+// 	var tz = eval( this.zEq );
 
-	return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+// 	return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
 
-};
+// };
 
 // heart shape
 
