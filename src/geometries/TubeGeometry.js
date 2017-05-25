@@ -66,6 +66,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 		closed: closed
 	};
 
+	path = new Curve(path.scale,path.xEq,path.yEq,path.zEq);
 	tubularSegments = tubularSegments || 64;
 	radius = radius || 1;
 	radialSegments = radialSegments || 8;
