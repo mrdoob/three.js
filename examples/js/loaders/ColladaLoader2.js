@@ -16,10 +16,14 @@ THREE.ColladaLoader.prototype = {
 
 		var scope = this;
 
+		var resourceDirectory = url.split( /[\\\/]/ );
+		resourceDirectory.pop();
+		resourceDirectory = resourceDirectory.join( '/' ) + '/';
+
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			onLoad( scope.parse( text, resourceDirectory ) );
 
 		}, onProgress, onError );
 
@@ -29,7 +33,7 @@ THREE.ColladaLoader.prototype = {
 
 		set convertUpAxis( value ) {
 
-			console.log( 'ColladaLoder.options.convertUpAxis: TODO' );
+			console.log( 'ColladaLoader.options.convertUpAxis: TODO' );
 
 		}
 
@@ -41,7 +45,7 @@ THREE.ColladaLoader.prototype = {
 
 	},
 
-	parse: function ( text ) {
+	parse: function ( text, resourceDirectory ) {
 
 		function getElementsByTagName( xml, name ) {
 
@@ -188,7 +192,7 @@ THREE.ColladaLoader.prototype = {
 
 			if ( data.build !== undefined ) return data.build;
 
-			return new Image();
+			return data.init_from;
 
 		}
 
@@ -572,7 +576,7 @@ THREE.ColladaLoader.prototype = {
 
 					var surface = effect.profile.surfaces[ sampler.source ];
 
-					var texture = new THREE.Texture( getImage( surface.init_from ) );
+					var texture = textureLoader.load( getImage( surface.init_from ) );
 
 					var extra = textureObject.extra;
 
@@ -599,7 +603,7 @@ THREE.ColladaLoader.prototype = {
 
 				}
 
-				console.error( 'ColladaLoder: Undefined sampler', textureObject.id );
+				console.error( 'ColladaLoader: Undefined sampler', textureObject.id );
 
 				return null;
 
@@ -1527,6 +1531,7 @@ THREE.ColladaLoader.prototype = {
 		console.log( 'ColladaLoader: File version', version );
 
 		var asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
+		var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory );
 
 		//
 
