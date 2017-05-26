@@ -587,8 +587,8 @@ THREE.ColladaLoader.prototype = {
 						texture.wrapS = technique.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 						texture.wrapT = technique.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 
-						texture.offset.set( technique.offsetU, technique.offsetV );
-						texture.repeat.set( technique.repeatU, technique.repeatV );
+						texture.offset.set( technique.offsetU || 0, technique.offsetV || 0 );
+						texture.repeat.set( technique.repeatU || 1, technique.repeatV || 1 );
 
 					} else {
 
