@@ -159,7 +159,7 @@ Object.assign( Box3.prototype, {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
 
-		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y ) || ( this.max.z < this.min.z );
+		return ( this.max.x <= this.min.x ) || ( this.max.y <= this.min.y ) || ( this.max.z <= this.min.z );
 
 	},
 
