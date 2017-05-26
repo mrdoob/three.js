@@ -29,14 +29,14 @@ function PlaneHelper( plane, size, hex ) {
 
 	this.geometry.computeBoundingSphere();
 
-	this.update();
+	this.onBeforeRender();
 
 }
 
 PlaneHelper.prototype = Object.create( Line.prototype );
 PlaneHelper.prototype.constructor = PlaneHelper;
 
-PlaneHelper.prototype.update = function () {
+PlaneHelper.prototype.onBeforeRender = function () {
 
 	var scale = - this.plane.constant;
 
