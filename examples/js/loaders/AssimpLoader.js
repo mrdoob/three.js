@@ -493,16 +493,6 @@
 
 	}
 
-	function aiAnimation() {
-
-		this.mName = "";
-		this.mDuration = 0;
-		this.mTicksPerSecond = 0;
-		this.mNumChannels = 0;
-		this.mChannels = [];
-
-	}
-
 	function sortWeights( indexes, weights ) {
 
 		var pairs = [];

@@ -80,11 +80,9 @@ self.onmessage = function( e ) {
  * @author zz95 / http://github.com/zz85
  */
 
-THREE.RaytracingRendererWorker = function ( parameters ) {
+THREE.RaytracingRendererWorker = function () {
 
 	console.log( 'THREE.RaytracingRendererWorker', THREE.REVISION );
-
-	parameters = parameters || {};
 
 	var scope = this;
 

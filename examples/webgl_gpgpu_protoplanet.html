@@ -312,8 +312,6 @@
 
 			}
 
-			var last = performance.now();
-
 			var gpuCompute;
 			var velocityVariable;
 			var positionVariable;
@@ -599,12 +597,6 @@
 			}
 
 			function render() {
-
-				var now = performance.now();
-				var delta = (now - last) / 1000;
-
-				if (delta > 1) delta = 1; // safety cap on large deltas
-				last = now;
 
 				gpuCompute.compute();
 

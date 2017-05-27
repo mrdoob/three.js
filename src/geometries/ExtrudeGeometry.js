@@ -56,7 +56,6 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 	if ( typeof ( shapes ) === "undefined" ) {
 
-		shapes = [];
 		return;
 
 	}
@@ -211,8 +210,6 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-		reverse = false; // If vertices are in order now, we shouldn't need to worry about them again (hopefully)!
-
 	}
 
 
@@ -256,7 +253,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 		// inPt' is the intersection of the two lines parallel to the two
 		//  adjacent edges of inPt at a distance of 1 unit on the left side.
 
-		var v_trans_x, v_trans_y, shrink_by = 1; // resulting translation vector for inPt
+		var v_trans_x, v_trans_y, shrink_by; // resulting translation vector for inPt
 
 		// good reading for geometry algorithms (here: line-line intersection)
 		// http://geomalgorithms.com/a05-_intersect-1.html

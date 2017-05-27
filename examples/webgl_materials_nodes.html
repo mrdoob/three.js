@@ -577,8 +577,6 @@
 					var colorA = new THREE.ColorNode( 0xFFFFFF );
 					var colorB = new THREE.ColorNode( 0x0054df );
 
-					var uv = new THREE.UVNode();
-
 					var timeScale = new THREE.OperatorNode(
 						time,
 						speed,
@@ -1901,7 +1899,7 @@
 
 					var setMyVar = new THREE.FunctionNode( [
 					"float setMyVar( vec3 pos ) {",
-					// set "myVar" in vertex shader in this example, 
+					// set "myVar" in vertex shader in this example,
 					// can be used in fragment shader too or in rest of the current shader
 					"	myVar = pos;",
 					// it is not accept "void" functions for now!

@@ -367,13 +367,6 @@ THREE.NRRDLoader.prototype = {
 		} else {
 
 			var v = headerObject.vectors;
-			var origin = headerObject.space_origin;
-
-			if ( ! origin ) {
-
-				origin = [ 0, 0, 0 ];
-
-			}
 
 			volume.matrix.set( _spaceX * v[ 0 ][ 0 ], _spaceX * v[ 1 ][ 0 ], _spaceX * v[ 2 ][ 0 ], 0,
 			_spaceY * v[ 0 ][ 1 ], _spaceY * v[ 1 ][ 1 ], _spaceY * v[ 2 ][ 1 ], 0,

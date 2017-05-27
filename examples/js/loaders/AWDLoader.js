@@ -288,7 +288,6 @@
 					mtx,
 					materials, mat, mat_id,
 					num_materials,
-					materials_parsed,
 					parent,
 					i;
 
@@ -301,7 +300,6 @@
 			geometries = this.getBlock( data_id );
 
 			materials = [];
-			materials_parsed = 0;
 
 			for ( i = 0; i < num_materials; i ++ ) {
 

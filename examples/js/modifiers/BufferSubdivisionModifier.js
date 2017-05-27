@@ -242,7 +242,6 @@ function compute_vertex_normals( geometry ) {
 
 	}
 
-	var tmpx, tmpy, tmpz;
 	var t_len;
 
 	for ( var i = 0, il = oldFaces.length; i < il; i++ ) {
@@ -267,10 +266,6 @@ function compute_vertex_normals( geometry ) {
 		full_weights[ 0 ] = ( my_weight / newNormalFaces.buffer[ oldFaces.register[ 0 ].a ] );
 		full_weights[ 1 ] = ( my_weight / newNormalFaces.buffer[ oldFaces.register[ 0 ].b ] );
 		full_weights[ 2 ] = ( my_weight / newNormalFaces.buffer[ oldFaces.register[ 0 ].c ] );
-
-		tmpx = newNormals.register[ 3 ].x * full_weights[ 0 ];
-		tmpy = newNormals.register[ 3 ].y * full_weights[ 0 ];
-		tmpz = newNormals.register[ 3 ].z * full_weights[ 0 ];
 
 		newNormals.buffer[ ( oldFaces.register[ 0 ].a * 3 ) + 0 ] += newNormals.register[ 3 ].x * full_weights[ 0 ];
 		newNormals.buffer[ ( oldFaces.register[ 0 ].a * 3 ) + 1 ] += newNormals.register[ 3 ].y * full_weights[ 0 ];

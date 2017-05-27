@@ -307,8 +307,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
 
 	// Calculate the scaled plane vector
-	var c = new THREE.Vector4();
-	c = this.clipPlane.multiplyScalar( 2.0 / this.clipPlane.dot( q ) );
+	var c = this.clipPlane.multiplyScalar( 2.0 / this.clipPlane.dot( q ) );
 
 	// Replacing the third row of the projection matrix
 	projectionMatrix.elements[ 2 ] = c.x;

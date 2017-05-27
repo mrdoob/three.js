@@ -114,22 +114,20 @@ THREE.VRMLLoader.prototype = {
 			 */
 			var paintFaces = function ( geometry, radius, angles, colors, directionIsDown ) {
 
-				var f, n, p, vertexIndex, color;
-
 				var direction = directionIsDown ? 1 : - 1;
 
 				var faceIndices = [ 'a', 'b', 'c', 'd' ];
 
-				var coord = [ ], aColor, bColor, t = 1, A = {}, B = {}, applyColor = false, colorIndex;
+				var coord = [], A = {}, B = {}, applyColor = false;
 
 				for ( var k = 0; k < angles.length; k ++ ) {
 
-					var vec = { };
-
 					// push the vector at which the color changes
-					vec.y = direction * ( Math.cos( angles[ k ] ) * radius );
 
-					vec.x = direction * ( Math.sin( angles[ k ] ) * radius );
+					var vec = {
+						x: direction * ( Math.cos( angles[ k ] ) * radius ),
+						y: direction * ( Math.sin( angles[ k ] ) * radius )
+					};
 
 					coord.push( vec );
 
@@ -138,15 +136,15 @@ THREE.VRMLLoader.prototype = {
 				// painting the colors on the faces
 				for ( var i = 0; i < geometry.faces.length ; i ++ ) {
 
-					f  = geometry.faces[ i ];
+					var f = geometry.faces[ i ];
 
-					n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+					var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
 
 					for ( var j = 0; j < n; j ++ ) {
 
-						vertexIndex = f[ faceIndices[ j ] ];
+						var vertexIndex = f[ faceIndices[ j ] ];
 
-						p = geometry.vertices[ vertexIndex ];
+						var p = geometry.vertices[ vertexIndex ];
 
 						for ( var index = 0; index < colors.length; index ++ ) {
 
@@ -174,15 +172,14 @@ THREE.VRMLLoader.prototype = {
 
 								if ( applyColor ) {
 
-									bColor = colors[ index + 1 ];
-
-									aColor = colors[ index ];
+									var aColor = colors[ index ];
+									var bColor = colors[ index + 1 ];
 
 									// below is simple linear interpolation
-									t = Math.abs( p.y - A.y ) / ( A.y - B.y );
+									var t = Math.abs( p.y - A.y ) / ( A.y - B.y );
 
 									// to make it faster, you can only calculate this if the y coord changes, the color is the same for points with the same y
-									color = interpolateColors( aColor, bColor, t );
+									var color = interpolateColors( aColor, bColor, t );
 
 									f.vertexColors[ j ] = color;
 
@@ -190,7 +187,7 @@ THREE.VRMLLoader.prototype = {
 
 							} else if ( undefined === f.vertexColors[ j ] ) {
 
-								colorIndex = directionIsDown ? colors.length - 1 : 0;
+								var colorIndex = directionIsDown ? colors.length - 1 : 0;
 								f.vertexColors[ j ] = colors[ colorIndex ];
 
 							}
@@ -1024,8 +1021,6 @@ THREE.VRMLLoader.prototype = {
 				}
 
 				for ( var i = 0, l = data.children.length; i < l; i ++ ) {
-
-					var child = data.children[ i ];
 
 					parseNode( data.children[ i ], object );
 
