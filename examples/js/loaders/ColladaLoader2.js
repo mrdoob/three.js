@@ -5,6 +5,9 @@
 THREE.ColladaLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.options = {
+		convertUpAxis: false
+	};
 
 };
 
@@ -29,23 +32,16 @@ THREE.ColladaLoader.prototype = {
 
 	},
 
-	options: {
-
-		set convertUpAxis( value ) {
-
-			console.log( 'ColladaLoader.options.convertUpAxis: TODO' );
-
-		}
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-
-	},
-
 	parse: function ( text, resourceDirectory ) {
+
+		var scope = this;
+
+		// helper objects
+
+		var matrix = new THREE.Matrix4();
+		var vector = new THREE.Vector3();
+
+		// helper functions
 
 		function getElementsByTagName( xml, name ) {
 
@@ -601,7 +597,7 @@ THREE.ColladaLoader.prototype = {
 
 				}
 
-				console.error( 'ColladaLoader: Undefined sampler', textureObject.id );
+				console.error( 'THREE.ColladaLoader: Undefined sampler', textureObject.id );
 
 				return null;
 
@@ -959,12 +955,11 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'vertices':
-						// data.sources[ id ] = data.sources[ parseId( getElementsByTagName( child, 'input' )[ 0 ].getAttribute( 'source' ) ) ];
 						data.vertices = parseGeometryVertices( child );
 						break;
 
 					case 'polygons':
-						console.warn( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
+						console.warn( 'THREE.ColladaLoader: Unsupported primitive type: ', child.nodeName );
 						break;
 
 					case 'lines':
@@ -1115,21 +1110,21 @@ THREE.ColladaLoader.prototype = {
 						case 'VERTEX':
 							for ( var key in vertices ) {
 
-								geometry.addAttribute( key.toLowerCase(), buildGeometryAttribute( primitive, sources[ vertices[ key ] ], input.offset ) );
+								geometry.addAttribute( key.toLowerCase(), convertBufferAttribute( buildGeometryAttribute( primitive, sources[ vertices[ key ] ], input.offset, true ) ) );
 
 							}
 							break;
 
 						case 'NORMAL':
-							geometry.addAttribute( 'normal', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
+							geometry.addAttribute( 'normal', convertBufferAttribute( buildGeometryAttribute( primitive, sources[ input.id ], input.offset, true ) ) );
 							break;
 
 						case 'COLOR':
-							geometry.addAttribute( 'color', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
+							geometry.addAttribute( 'color', buildGeometryAttribute( primitive, sources[ input.id ], input.offset, false ) );
 							break;
 
 						case 'TEXCOORD':
-							geometry.addAttribute( 'uv', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
+							geometry.addAttribute( 'uv', buildGeometryAttribute( primitive, sources[ input.id ], input.offset, false ) );
 							break;
 
 					}
@@ -1227,7 +1222,7 @@ THREE.ColladaLoader.prototype = {
 
 				if ( maxcount > 0 ) {
 
-					console.log( 'ColladaLoader: Geometry has faces with more than 4 vertices.' );
+					console.log( 'THREE.ColladaLoader: Geometry has faces with more than 4 vertices.' );
 
 				}
 
@@ -1252,9 +1247,6 @@ THREE.ColladaLoader.prototype = {
 		}
 
 		// nodes
-
-		var matrix = new THREE.Matrix4();
-		var vector = new THREE.Vector3();
 
 		function parseNode( xml ) {
 
@@ -1305,12 +1297,12 @@ THREE.ColladaLoader.prototype = {
 
 					case 'matrix':
 						var array = parseFloats( child.textContent );
-						data.matrix.multiply( matrix.fromArray( array ).transpose() ); // .transpose() when Z_UP?
+						data.matrix.multiply( convertMatrix4( matrix.fromArray( array ).transpose() ) );
 						break;
 
 					case 'translate':
 						var array = parseFloats( child.textContent );
-						vector.fromArray( array );
+						convertVector3( vector.fromArray( array ) );
 						data.matrix.multiply( matrix.makeTranslation( vector.x, vector.y, vector.z ) );
 						break;
 
@@ -1322,7 +1314,8 @@ THREE.ColladaLoader.prototype = {
 
 					case 'scale':
 						var array = parseFloats( child.textContent );
-						data.matrix.scale( vector.fromArray( array ) );
+						convertVector3( vector.fromArray( array ), 1 );
+						data.matrix.scale( vector );
 						break;
 
 					case 'extra':
@@ -1521,7 +1514,130 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		console.time( 'ColladaLoader' );
+		// conversion
+
+		function setupConversion() {
+
+			var options = scope.options;
+
+			if ( options.convertUpAxis === true ) {
+
+				switch ( asset.upAxis ) {
+
+					case 'X_UP':
+						asset.upConversion = 'X-Y';
+						break;
+
+					case 'Y_UP':
+						asset.upConversion = 'NONE';
+						break;
+
+					case 'Z_UP':
+						asset.upConversion = 'Z-Y';
+						break;
+
+					default:
+						console.log( asset.upAxis );
+
+				}
+
+			}
+
+		}
+
+		function convertVector3( vector, sign ) {
+
+			if ( sign === undefined ) sign = - 1;
+
+			if ( scope.options.convertUpAxis === true ) {
+
+				switch ( asset.upConversion ) {
+
+					case 'X-Y':
+						var tmp = vector.x;
+						vector.x = sign * vector.y;
+						vector.y = tmp;
+						break;
+
+					case 'Z-Y':
+						var tmp = vector.y;
+						vector.y = vector.z;
+						vector.z = sign * tmp;
+						break;
+
+					case 'NONE':
+						break;
+
+					default:
+						console.error( 'THREE.ColladaLoader: Invalid up axis conversion:', asset.upAxis );
+
+				}
+
+			}
+
+			return vector;
+
+		}
+
+		function convertBufferAttribute( attribute ) {
+
+			// assuming vector3 values
+
+			if ( scope.options.convertUpAxis === true ) {
+
+				for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+
+					vector.fromBufferAttribute( attribute, i );
+					convertVector3( vector );
+					attribute.setX( i, vector.x );
+					attribute.setY( i, vector.y );
+					attribute.setZ( i, vector.z );
+
+				}
+
+			}
+
+			return attribute;
+
+		}
+
+		var convertMatrix4 = function() {
+
+			var xAxis = new THREE.Vector3();
+			var yAxis = new THREE.Vector3();
+			var zAxis = new THREE.Vector3();
+			var translation = new THREE.Vector3();
+
+			return function convertMatrix4( matrix ) {
+
+				if ( scope.options.convertUpAxis === true ) {
+
+					xAxis.setFromMatrixColumn( matrix, 0 );
+					yAxis.setFromMatrixColumn( matrix, 1 );
+					zAxis.setFromMatrixColumn( matrix, 2 );
+					translation.setFromMatrixColumn( matrix, 3 );
+
+					convertVector3( xAxis );
+					convertVector3( yAxis );
+					convertVector3( zAxis );
+					convertVector3( translation );
+
+					matrix.set(
+						xAxis.x, yAxis.x, zAxis.x, translation.x,
+						xAxis.y, yAxis.y, zAxis.y, translation.y,
+						xAxis.z, yAxis.z, zAxis.z, translation.z,
+						0,       0,       0,       1
+					);
+
+				}
+
+				return matrix;
+
+			};
+
+		} ();
+
+		console.time( 'THREE.ColladaLoader' );
 
 		if ( text.length === 0 ) {
 
@@ -1529,18 +1645,18 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		console.time( 'ColladaLoader: DOMParser' );
+		console.time( 'THREE.ColladaLoader: DOMParser' );
 
 		var xml = new DOMParser().parseFromString( text, 'application/xml' );
 
-		console.timeEnd( 'ColladaLoader: DOMParser' );
+		console.timeEnd( 'THREE.ColladaLoader: DOMParser' );
 
 		var collada = getElementsByTagName( xml, 'COLLADA' )[ 0 ];
 
 		// metadata
 
 		var version = collada.getAttribute( 'version' );
-		console.log( 'ColladaLoader: File version', version );
+		console.log( 'THREE.ColladaLoader: File version', version );
 
 		var asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
 		var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory );
@@ -1558,7 +1674,9 @@ THREE.ColladaLoader.prototype = {
 			visualScenes: {}
 		};
 
-		console.time( 'ColladaLoader: Parse' );
+		setupConversion();
+
+		console.time( 'THREE.ColladaLoader: Parse' );
 
 		parseLibrary( collada, 'library_images', 'image', parseImage );
 		parseLibrary( collada, 'library_effects', 'effect', parseEffect );
@@ -1569,9 +1687,9 @@ THREE.ColladaLoader.prototype = {
 		parseLibrary( collada, 'library_nodes', 'node', parseNode );
 		parseLibrary( collada, 'library_visual_scenes', 'visual_scene', parseVisualScene );
 
-		console.timeEnd( 'ColladaLoader: Parse' );
+		console.timeEnd( 'THREE.ColladaLoader: Parse' );
 
-		console.time( 'ColladaLoader: Build' );
+		console.time( 'THREE.ColladaLoader: Build' );
 
 		buildLibrary( library.images, buildImage );
 		buildLibrary( library.effects, buildEffect );
@@ -1579,26 +1697,15 @@ THREE.ColladaLoader.prototype = {
 		buildLibrary( library.cameras, buildCamera );
 		buildLibrary( library.lights, buildLight );
 		buildLibrary( library.geometries, buildGeometry );
-		// buildLibrary( library.nodes, buildNode );
 		buildLibrary( library.visualScenes, buildVisualScene );
 
-		console.timeEnd( 'ColladaLoader: Build' );
-
-		// console.log( library );
+		console.timeEnd( 'THREE.ColladaLoader: Build' );
 
 		var scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
 
-		if ( asset.upAxis === 'Z_UP' ) {
-
-			scene.rotation.x = - Math.PI / 2;
-
-		}
-
 		scene.scale.multiplyScalar( asset.unit );
 
-		console.timeEnd( 'ColladaLoader' );
-
-		// console.log( scene );
+		console.timeEnd( 'THREE.ColladaLoader' );
 
 		return {
 			animations: [],
