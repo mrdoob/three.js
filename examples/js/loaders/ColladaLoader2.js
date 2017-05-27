@@ -771,7 +771,21 @@ THREE.ColladaLoader.prototype = {
 					break;
 
 				case 'orthographic':
-					camera = new THREE.OrthographicCamera( /* TODO */ );
+					var ymag = data.optics.parameters.ymag;
+					var xmag = data.optics.parameters.xmag;
+					var aspectRatio = data.optics.parameters.aspect_ratio;
+
+					xmag = ( xmag === undefined ) ? ( ymag * aspectRatio ) : xmag;
+					ymag = ( ymag === undefined ) ? ( xmag / aspectRatio ) : ymag;
+
+					xmag *= 0.5;
+					ymag *= 0.5;
+
+					camera = new THREE.OrthographicCamera(
+						- xmag, xmag, ymag, - ymag, // left, right, top, bottom
+						data.optics.parameters.znear,
+						data.optics.parameters.zfar
+					);
 					break;
 
 				default:
