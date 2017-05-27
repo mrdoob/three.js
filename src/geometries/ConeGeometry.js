@@ -3,6 +3,9 @@
  */
 
 import { CylinderGeometry } from './CylinderGeometry';
+import { CylinderBufferGeometry } from './CylinderGeometry';
+
+// ConeGeometry
 
 function ConeGeometry( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
@@ -25,11 +28,7 @@ function ConeGeometry( radius, height, radialSegments, heightSegments, openEnded
 ConeGeometry.prototype = Object.create( CylinderGeometry.prototype );
 ConeGeometry.prototype.constructor = ConeGeometry;
 
-/**
- * @author: abelnation / http://github.com/abelnation
- */
-
-import { CylinderBufferGeometry } from './CylinderGeometry';
+// ConeBufferGeometry
 
 function ConeBufferGeometry( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
@@ -51,5 +50,6 @@ function ConeBufferGeometry( radius, height, radialSegments, heightSegments, ope
 
 ConeBufferGeometry.prototype = Object.create( CylinderBufferGeometry.prototype );
 ConeBufferGeometry.prototype.constructor = ConeBufferGeometry;
+
 
 export { ConeGeometry, ConeBufferGeometry };

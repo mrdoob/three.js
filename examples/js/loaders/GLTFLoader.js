@@ -662,13 +662,20 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	// Avoid the String.fromCharCode.apply(null, array) shortcut, which
-	// throws a "maximum call stack size exceeded" error for large arrays.
 	function convertUint8ArrayToString( array ) {
+
+		if ( window.TextDecoder !== undefined ) {
+
+			//return new TextDecoder().decode( array );
+
+		}
+
+		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
+		// throws a "maximum call stack size exceeded" error for large arrays.
 
 		var s = '';
 
-		for ( var i = 0; i < array.length; i ++ ) {
+		for ( var i = 0, il = array.length; i < il; i ++ ) {
 
 			s += String.fromCharCode( array[ i ] );
 
@@ -743,6 +750,11 @@ THREE.GLTFLoader = ( function () {
 				case 'TEXCOORD':
 
 					shaderText = shaderText.replace( regEx, 'uv' );
+					break;
+
+				case 'TEXCOORD_1':
+
+					shaderText = shaderText.replace( regEx, 'uv2' );
 					break;
 
 				case 'COLOR_0':
@@ -882,8 +894,6 @@ THREE.GLTFLoader = ( function () {
 
 		] ).then( function ( dependencies ) {
 
-			var scene = dependencies.scenes[ json.scene ];
-
 			var scenes = [];
 
 			for ( var name in dependencies.scenes ) {
@@ -891,6 +901,8 @@ THREE.GLTFLoader = ( function () {
 				scenes.push( dependencies.scenes[ name ] );
 
 			}
+
+			var scene = json.scene !== undefined ? dependencies.scenes[ json.scene ] : scenes[ 0 ];
 
 			var cameras = [];
 
@@ -1623,6 +1635,10 @@ THREE.GLTFLoader = ( function () {
 								case 'TEXCOORD0':
 								case 'TEXCOORD':
 									geometry.addAttribute( 'uv', bufferAttribute );
+									break;
+
+								case 'TEXCOORD_1':
+									geometry.addAttribute( 'uv2', bufferAttribute );
 									break;
 
 								case 'COLOR_0':

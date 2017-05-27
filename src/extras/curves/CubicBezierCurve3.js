@@ -5,6 +5,8 @@ import { Vector3 } from '../../math/Vector3';
 
 function CubicBezierCurve3( v0, v1, v2, v3 ) {
 
+	Curve.call( this );
+
 	this.v0 = v0;
 	this.v1 = v1;
 	this.v2 = v2;

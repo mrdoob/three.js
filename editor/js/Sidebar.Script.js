@@ -102,7 +102,7 @@ Sidebar.Script = function ( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		if ( object !== null ) {
+		if ( object !== null && editor.camera !== object ) {
 
 			container.setDisplay( 'block' );
 

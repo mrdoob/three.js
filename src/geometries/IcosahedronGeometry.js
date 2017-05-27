@@ -1,8 +1,12 @@
 /**
  * @author timothypratley / https://github.com/timothypratley
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 import { Geometry } from '../core/Geometry';
+import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
+
+// IcosahedronGeometry
 
 function IcosahedronGeometry( radius, detail ) {
 
@@ -23,11 +27,7 @@ function IcosahedronGeometry( radius, detail ) {
 IcosahedronGeometry.prototype = Object.create( Geometry.prototype );
 IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
+// IcosahedronBufferGeometry
 
 function IcosahedronBufferGeometry( radius, detail ) {
 
@@ -59,5 +59,6 @@ function IcosahedronBufferGeometry( radius, detail ) {
 
 IcosahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 IcosahedronBufferGeometry.prototype.constructor = IcosahedronBufferGeometry;
+
 
 export { IcosahedronGeometry, IcosahedronBufferGeometry };

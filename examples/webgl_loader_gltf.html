@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - glTF</title>
+		<title>three.js webgl - glTF 1.0</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -62,11 +62,11 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> -
-		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> loader
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		<a href="https://github.com/KhronosGroup/glTF" target="_blank" rel="noopener">glTF</a> 1.0 loader
 		<br>
-		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> - COLLADA duck by Sony -
-		Cesium models by <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
+		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank" rel="noopener">3drt</a> - COLLADA duck by Sony -
+		Cesium models by <a href="http://cesiumjs.org/" target="_blank" rel="noopener">Cesium</a>
 		</div>
 	<div id="container"></div>
 	<div id="controls">
@@ -95,7 +95,7 @@
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTF2Loader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
 			var orbitControls = null;
@@ -202,7 +202,7 @@
 					scene.add(ground);
 				}
 
-				loader = new THREE.GLTF2Loader();
+				loader = new THREE.GLTFLoader();
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
@@ -228,7 +228,7 @@
 
 					gltf = data;
 
-					var object = gltf.scene !== undefined ? gltf.scene : gltf.scenes[ 0 ];
+					var object = gltf.scene;
 
 					status.innerHTML = "Load time: " + ( performance.now() - loadStartTime ).toFixed( 2 ) + " ms.";
 
@@ -408,6 +408,15 @@
 					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
 				},
 				{
+					name : "Rigged Simple",
+					url : "./models/gltf/RiggedSimple/%s/RiggedSimple.gltf",
+					cameraPos: new THREE.Vector3(0, 5, 15),
+					objectRotation: new THREE.Euler(0, 90, 0),
+					addLights:true,
+					shadows:true,
+					extensions: ["glTF"]
+				},
+				{
 					name : "Snowflake",
 					url : "./models/gltf/snowflake/snowFlake.gltf",
 					objectScale: new THREE.Vector3(4, 4, 1),
@@ -441,7 +450,7 @@
 				var i, len = sceneList.length;
 
 				for (i = 0; i < len; i++) {
-					option = document.createElement("option");
+					var option = document.createElement("option");
 					option.text=sceneList[i].name;
 					elt.add(option);
 				}
@@ -493,14 +502,14 @@
 					elt.removeChild(elt.lastChild);
 				}
 
-				option = document.createElement("option");
+				var option = document.createElement("option");
 				option.text="[default]";
 				elt.add(option);
 
 				var i, len = cameraNames.length;
 
 				for (i = 0; i < len; i++) {
-					option = document.createElement("option");
+					var option = document.createElement("option");
 					option.text=cameraNames[i];
 					elt.add(option);
 				}

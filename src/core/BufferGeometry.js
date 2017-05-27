@@ -826,7 +826,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
 
-			normals.setXYZ(i, x * n, y * n, z * n)
+			normals.setXYZ( i, x * n, y * n, z * n );
 
 		}
 
@@ -881,7 +881,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		var data = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'BufferGeometry',
 				generator: 'BufferGeometry.toJSON'
 			}

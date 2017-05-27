@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - animation - keyframes - json</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+			a {
+				color: #2983ff;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - keyframes - json
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var scene, camera, pointLight, stats;
+			var renderer, mixer, animationClip;
+
+			var clock = new THREE.Clock();
+			var container = document.getElementById( 'container' );
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setClearColor( 0x000000, 1 );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			container.appendChild( renderer.domElement );
+
+			scene = new THREE.Scene();
+
+			var grid = new THREE.GridHelper( 20, 20, 0x888888, 0x888888 );
+			grid.position.set( 0, - 1.1, 0 );
+			scene.add( grid );
+
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			camera.position.set( - 5.00, 3.43, 11.31 );
+			camera.lookAt( new THREE.Vector3( - 1.22, 2.18, 4.58 ) );
+
+			scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+			pointLight = new THREE.PointLight( 0xffffff, 1 );
+			pointLight.position.copy( camera.position );
+			scene.add( pointLight );
+
+			new THREE.ObjectLoader().load( 'models/json/pump/pump.json', function ( model ) {
+
+				scene.add( model );
+
+				mixer = new THREE.AnimationMixer( model );
+				mixer.clipAction( model.animations[ 0 ] ).play();
+
+				animate();
+
+			} );
+
+
+			window.onresize = function () {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			};
+
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				mixer.update( clock.getDelta() );
+
+				stats.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+
+		</script>
+
+	</body>
+
+</html>

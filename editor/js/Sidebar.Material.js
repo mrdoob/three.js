@@ -1279,7 +1279,8 @@ Sidebar.Material = function ( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		if ( object && object.material ) {
+		if ( object && object.material &&
+			Array.isArray( object.material ) === false ) {
 
 			var objectChanged = object !== currentObject;
 

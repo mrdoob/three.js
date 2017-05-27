@@ -1,0 +1,240 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 3575,
+      "type": "VEC2",
+      "max": [
+        0.9999003,
+        -0.0221377648
+      ],
+      "min": [
+        0.0006585993,
+        -0.996773958
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 3575,
+      "type": "VEC3",
+      "max": [
+        1.0,
+        1.0,
+        0.9999782
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -0.9980823
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 3575,
+      "type": "VEC3",
+      "max": [
+        0.009921154,
+        0.00977163,
+        0.0100762453
+      ],
+      "min": [
+        -0.009921154,
+        -0.00977163,
+        -0.0100762453
+      ]
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 18108,
+      "type": "SCALAR",
+      "max": [
+        3574
+      ],
+      "min": [
+        0
+      ]
+    }
+  ],
+  "asset": {
+    "generator": "glTF Tools for Unity",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 28600,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 28600,
+      "byteLength": 42900,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 71500,
+      "byteLength": 42900,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 114400,
+      "byteLength": 36216,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "BoomBox.bin",
+      "byteLength": 150616
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_pbrSpecularGlossiness"
+  ],
+  "images": [
+    {
+      "uri": "BoomBox_baseColor.png"
+    },
+    {
+      "uri": "BoomBox_metallicRoughness.png"
+    },
+    {
+      "uri": "BoomBox_normal.png"
+    },
+    {
+      "uri": "BoomBox_occlusion.png"
+    },
+    {
+      "uri": "BoomBox_emissive.png"
+    },
+    {
+      "uri": "BoomBox_diffuse.png"
+    },
+    {
+      "uri": "BoomBox_specularGlossiness.png"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "TEXCOORD_0": 0,
+            "NORMAL": 1,
+            "POSITION": 2
+          },
+          "indices": 3,
+          "material": 0,
+          "mode": 4
+        }
+      ],
+      "name": "BoomBox"
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 1
+        }
+      },
+      "normalTexture": {
+        "index": 2
+      },
+      "occlusionTexture": {
+        "index": 3
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveTexture": {
+        "index": 4
+      },
+      "name": "BoomBox_Mat",
+      "extensions": {
+        "KHR_materials_pbrSpecularGlossiness": {
+          "diffuseTexture": {
+            "index": 5
+          },
+          "specularGlossinessTexture": {
+            "index": 6
+          }
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "children": [],
+      "mesh": 0,
+      "scale": [
+        80.0,
+        80.0,
+        80.0
+      ],
+      "translation": [
+        0.0,
+        0.163,
+        0.053
+      ],
+      "name": "BoomBox"
+    }
+  ],
+  "samplers": [
+    {}
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    },
+    {
+      "sampler": 0,
+      "source": 4
+    },
+    {
+      "sampler": 0,
+      "source": 5
+    },
+    {
+      "sampler": 0,
+      "source": 6
+    }
+  ]
+}

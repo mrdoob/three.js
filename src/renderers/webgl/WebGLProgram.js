@@ -152,7 +152,7 @@ function replaceLightNums( string, parameters ) {
 
 function parseIncludes( string ) {
 
-	var pattern = /#include +<([\w\d.]+)>/g;
+	var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
 
 	function replace( match, include ) {
 
@@ -477,6 +477,8 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '',  // this code is required here because it is used by the toneMapping() function defined below
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
 
+			parameters.dithering ? '#define DITHERING' : '',
+
 			( parameters.outputEncoding || parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
 			parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
 			parameters.envMapEncoding ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
@@ -491,10 +493,10 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 	}
 
-	vertexShader = parseIncludes( vertexShader, parameters );
+	vertexShader = parseIncludes( vertexShader );
 	vertexShader = replaceLightNums( vertexShader, parameters );
 
-	fragmentShader = parseIncludes( fragmentShader, parameters );
+	fragmentShader = parseIncludes( fragmentShader );
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 
 	if ( ! material.isShaderMaterial ) {

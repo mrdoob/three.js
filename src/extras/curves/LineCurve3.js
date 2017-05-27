@@ -4,6 +4,8 @@ import { Curve } from '../core/Curve';
 
 function LineCurve3( v1, v2 ) {
 
+	Curve.call( this );
+
 	this.v1 = v1;
 	this.v2 = v2;
 

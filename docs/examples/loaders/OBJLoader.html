@@ -53,7 +53,7 @@
 		<div>
 		[page:String url] — required<br />
 		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Object3D].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
 		[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>
@@ -67,7 +67,7 @@
 		<div>
 		Returns an [page:Object3D]. It contains the parsed meshes as [page:Mesh] and lines as [page:LineSegments].<br />
 		All geometry is created as [page:BufferGeometry]. Default materials are created as [page:MeshPhongMaterial].<br />
-		If an <em>obj</em> object or group uses multiple materials while declaring faces geometry groups and a [page:MultiMaterial] is used.
+		If an <em>obj</em> object or group uses multiple materials while declaring faces geometry groups and an array of materials are used.
 		</div>
 
 		<h2>Source</h2>

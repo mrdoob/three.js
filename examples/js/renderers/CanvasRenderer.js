@@ -517,7 +517,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var scaleX = element.scale.x * _canvasWidthHalf;
 		var scaleY = element.scale.y * _canvasHeightHalf;
 
-		var dist = 0.5 * Math.sqrt( scaleX * scaleX + scaleY * scaleY ); // allow for rotated sprite
+		var dist = Math.sqrt( scaleX * scaleX + scaleY * scaleY ); // allow for rotated sprite
 		_elemBox.min.set( v1.x - dist, v1.y - dist );
 		_elemBox.max.set( v1.x + dist, v1.y + dist );
 

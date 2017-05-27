@@ -120,12 +120,13 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		// render depth map
 
-		var faceCount, isPointLight;
+		var faceCount;
 
 		for ( var i = 0, il = _lightShadows.length; i < il; i ++ ) {
 
 			var light = _lightShadows[ i ];
 			var shadow = light.shadow;
+			var isPointLight = light && light.isPointLight;
 
 			if ( shadow === undefined ) {
 
@@ -139,10 +140,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			_shadowMapSize.copy( shadow.mapSize );
 			_shadowMapSize.min( _maxShadowMapSize );
 
-			if ( light && light.isPointLight ) {
-
-				faceCount = 6;
-				isPointLight = true;
+			if ( isPointLight ) {
 
 				var vpWidth = _shadowMapSize.x;
 				var vpHeight = _shadowMapSize.y;
@@ -176,11 +174,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				_shadowMapSize.x *= 4.0;
 				_shadowMapSize.y *= 2.0;
 
-			} else {
-
-				faceCount = 1;
-				isPointLight = false;
-
 			}
 
 			if ( shadow.map === null ) {
@@ -206,31 +199,21 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 			shadowCamera.position.copy( _lightPositionWorld );
 
-			_renderer.setRenderTarget( shadowMap );
-			_renderer.clear();
+			if ( isPointLight ) {
 
-			// render shadow map for each cube face (if omni-directional) or
-			// run a single pass if not
+				faceCount = 6;
 
-			for ( var face = 0; face < faceCount; face ++ ) {
+				// for point lights we set the shadow matrix to be a translation-only matrix
+				// equal to inverse of the light's position
 
-				if ( isPointLight ) {
+				shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
 
-					_lookTarget.copy( shadowCamera.position );
-					_lookTarget.add( cubeDirections[ face ] );
-					shadowCamera.up.copy( cubeUps[ face ] );
-					shadowCamera.lookAt( _lookTarget );
+			} else {
 
-					var vpDimensions = cube2DViewPorts[ face ];
-					_state.viewport( vpDimensions );
+				faceCount = 1;
 
-				} else {
-
-					_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-					shadowCamera.lookAt( _lookTarget );
-
-				}
-
+				_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+				shadowCamera.lookAt( _lookTarget );
 				shadowCamera.updateMatrixWorld();
 				shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
@@ -245,6 +228,30 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 				shadowMatrix.multiply( shadowCamera.projectionMatrix );
 				shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
+
+			}
+
+			_renderer.setRenderTarget( shadowMap );
+			_renderer.clear();
+
+			// render shadow map for each cube face (if omni-directional) or
+			// run a single pass if not
+
+			for ( var face = 0; face < faceCount; face ++ ) {
+
+				if ( isPointLight ) {
+
+					_lookTarget.copy( shadowCamera.position );
+					_lookTarget.add( cubeDirections[ face ] );
+					shadowCamera.up.copy( cubeUps[ face ] );
+					shadowCamera.lookAt( _lookTarget );
+					shadowCamera.updateMatrixWorld();
+					shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
+
+					var vpDimensions = cube2DViewPorts[ face ];
+					_state.viewport( vpDimensions );
+
+				}
 
 				// update camera matrices and frustum
 

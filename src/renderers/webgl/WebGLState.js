@@ -340,7 +340,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	var currentScissorTest = null;
 
-	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
+	var maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
 
 	var version = parseFloat( /^WebGL\ ([0-9])/.exec( gl.getParameter( gl.VERSION ) )[ 1 ] );
 	var lineWidthAvailable = parseFloat( version ) >= 1.0;
@@ -426,7 +426,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	}
 
-	function enableAttributeAndDivisor( attribute, meshPerAttribute, extension ) {
+	function enableAttributeAndDivisor( attribute, meshPerAttribute ) {
 
 		newAttributes[ attribute ] = 1;
 
@@ -438,6 +438,8 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		}
 
 		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
+
+			var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
 			extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
 			attributeDivisors[ attribute ] = meshPerAttribute;
@@ -521,7 +523,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 		}
 
-		if ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) {
+		if ( ( blending !== CustomBlending ) && ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) ) {
 
 			if ( blending === AdditiveBlending ) {
 
@@ -810,7 +812,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 		} catch ( error ) {
 
-			console.error( error );
+			console.error( 'THREE.WebGLState:', error );
 
 		}
 
@@ -824,7 +826,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 		} catch ( error ) {
 
-			console.error( error );
+			console.error( 'THREE.WebGLState:', error );
 
 		}
 

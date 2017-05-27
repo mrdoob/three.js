@@ -80,7 +80,7 @@ QUnit.test( "Quaternion.setFromEuler/Euler.fromQuaternion", function( assert ) {
 
 		var v2 = new THREE.Euler().setFromQuaternion( q, v.order );
 		var q2 = new THREE.Quaternion().setFromEuler( v2 );
-		assert.ok( eulerEquals( q, q2 ), "Passed!" );
+		assert.ok( quatEquals( q, q2 ), "Passed!" );
 	}
 });
 

@@ -33,13 +33,10 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> webgl - animation - basic use
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - basic use
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/loaders/collada/Animation.js"></script>
-		<script src="js/loaders/collada/AnimationHandler.js"></script>
-		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -48,7 +45,10 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var stats, clock;
-			var scene, camera, renderer;
+			var scene, camera, renderer, mixer;
+
+			init();
+			animate();
 
 			function init() {
 
@@ -69,48 +69,46 @@
 
 				//
 
-				var geometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+				var geometry = new THREE.BoxBufferGeometry( 5, 5, 5 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				//
+				// create a keyframe track (i.e. a timed sequence of keyframes) for each animated property
+        			// Note: the keyframe track type should correspond to the type of the property being animated
 
-				var animationData = {
-					"name"      : "Action",
-					"fps"       : 25,
-					"length"    : 2.0,
-					"hierarchy" : [
-						{
-							"parent" : -1, //root
-							"keys"   : [
-								{
-									"time": 0,
-									"pos" : [ 0, 0, 0 ],
-									"rot" : [ 0, 0, 0, 0 ],
-									"scl" : [ 1, 1, 1 ]
-								},
-								{
-									"time": 1.0,
-									"pos" : [ 30, 0, 0 ],
-									"scl" : [ 2, 2, 2 ]
-								}
-								,
-								{
-									"time": 2.0,
-									"pos" : [ 0, 0, 0 ]
-								}
-							]
-						}
-					]
-				};
+				// POSITION
+				var positionKF = new THREE.VectorKeyframeTrack('.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] );
 
-				ensureLoop( animationData );
+        			// SCALE
+        			var scaleKF = new THREE.VectorKeyframeTrack('.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
 
-				var animation = new THREE.Animation( mesh, animationData );
-				animation.play();
+				// ROTATION
+				// Rotation should be performed using quaternions, using a QuaternionKeyframeTrack
+				// Interpolating Euler angles (.rotation property) can be problematic and is currently not supported
+        
+        			// set up rotation about x axis
+        			var xAxis = new THREE.Vector3( 1, 0, 0 );
 
-				//
+				var qInitial = new THREE.Quaternion().setFromAxisAngle( xAxis, 0 );
+				var qFinal = new THREE.Quaternion().setFromAxisAngle( xAxis, Math.PI );
+				var quaternionKF = new THREE.QuaternionKeyframeTrack('.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
+
+				// COLOR - Not yet implemented!
+				// var colorKF = new THREE.ColorKeyframeTrack('.material.color', [0, 1, 2], [0xffff00, 0xffffff, 0xffff00])
+
+				// create an animation sequence with the tracks
+       				 // If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
+				var clip = new THREE.AnimationClip( 'Action', -1, [ scaleKF, positionKF, quaternionKF ] );
+
+				// setup the AnimationMixer
+				mixer = new THREE.AnimationMixer( mesh );
+
+				// create a ClipAction and set it to play
+				var clipAction = mixer.clipAction( clip );
+				clipAction.play();
+
+				// 
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0x555555 );
@@ -142,30 +140,9 @@
 
 			};
 
-			var ensureLoop = function( animation ) {
-
-				for ( var i = 0; i < animation.hierarchy.length; i ++ ) {
-
-					var obj = animation.hierarchy[ i ];
-
-					var first = obj.keys[ 0 ];
-					var last = obj.keys[ obj.keys.length - 1 ];
-
-					last.pos = first.pos;
-					last.rot = first.rot;
-					last.scl = first.scl;
-
-				}
-
-			};
-
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				var delta = clock.getDelta();
-
-				THREE.AnimationHandler.update( delta );
 
 				render();
 
@@ -173,13 +150,19 @@
 
 			function render() {
 
+				var delta = clock.getDelta();
+
+				if ( mixer ) {
+
+					mixer.update( delta );
+
+				}
+
 				renderer.render( scene, camera );
+
 				stats.update();
 
 			};
-
-			init();
-			animate();
 
 		</script>
 

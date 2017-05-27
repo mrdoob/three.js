@@ -776,6 +776,25 @@ THREE.Projector = function () {
 
 					}
 
+				} else if ( geometry instanceof THREE.BufferGeometry ) {
+
+					var attributes = geometry.attributes;
+
+					if ( attributes.position !== undefined ) {
+
+						var positions = attributes.position.array;
+
+						for ( var i = 0, l = positions.length; i < l; i += 3 ) {
+
+							_vector4.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ], 1 );
+							_vector4.applyMatrix4( _modelViewProjectionMatrix );
+
+							pushPoint( _vector4, object, camera );
+
+						}
+
+					}
+
 				}
 
 			} else if ( object instanceof THREE.Sprite ) {

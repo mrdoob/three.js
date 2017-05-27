@@ -33,7 +33,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking"
+		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering"
 	];
 
 
@@ -185,6 +185,8 @@ function WebGLPrograms( renderer, capabilities ) {
 			numClippingPlanes: nClipPlanes,
 			numClipIntersection: nClipIntersection,
 
+			dithering: material.dithering,
+
 			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 
@@ -236,6 +238,8 @@ function WebGLPrograms( renderer, capabilities ) {
 			array.push( parameters[ parameterNames[ i ] ] );
 
 		}
+
+		array.push( renderer.gammaOutput );
 
 		return array.join();
 

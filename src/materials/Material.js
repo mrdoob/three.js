@@ -52,6 +52,8 @@ function Material() {
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
 
+	this.dithering = false;
+
 	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
@@ -59,26 +61,9 @@ function Material() {
 
 	this.visible = true;
 
-	this._needsUpdate = true;
+	this.needsUpdate = true;
 
 }
-
-Object.defineProperty( Material.prototype, 'needsUpdate', {
-
-	get: function () {
-
-		return this._needsUpdate;
-
-	},
-
-	set: function ( value ) {
-
-		if ( value === true ) this.update();
-		this._needsUpdate = value;
-
-	}
-
-} );
 
 Object.assign( Material.prototype, EventDispatcher.prototype, {
 
@@ -146,7 +131,7 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 		var data = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'Material',
 				generator: 'Material.toJSON'
 			}
@@ -235,6 +220,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		data.skinning = this.skinning;
 		data.morphTargets = this.morphTargets;
 
+		data.dithering = this.dithering;
+
 		// TODO: Copied from Object3D.toJSON
 
 		function extractFromCache( cache ) {
@@ -307,6 +294,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		this.polygonOffsetFactor = source.polygonOffsetFactor;
 		this.polygonOffsetUnits = source.polygonOffsetUnits;
 
+		this.dithering = source.dithering;
+
 		this.alphaTest = source.alphaTest;
 
 		this.premultipliedAlpha = source.premultipliedAlpha;
@@ -333,12 +322,6 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		this.clippingPlanes = dstPlanes;
 
 		return this;
-
-	},
-
-	update: function () {
-
-		this.dispatchEvent( { type: 'update' } );
 
 	},
 

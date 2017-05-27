@@ -17,6 +17,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 	}
 
 	this.uuid = _Math.generateUUID();
+	this.name = '';
 
 	this.array = array;
 	this.itemSize = itemSize;

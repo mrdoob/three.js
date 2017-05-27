@@ -161,7 +161,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	},
 
-	clearViewOffset: function() {
+	clearViewOffset: function () {
 
 		this.view = null;
 		this.updateProjectionMatrix();

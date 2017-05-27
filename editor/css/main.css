@@ -41,32 +41,6 @@ textarea, input { outline: none; } /* osx */
 	user-select: none;
 }
 
-	.Panel.Collapsible .Static {
-		margin: 0;
-	}
-
-	.Panel.Collapsible .Static .Button {
-		float: left;
-		margin-right: 6px;
-		width: 0;
-		height: 0;
-		border: 6px solid transparent;
-	}
-
-	.Panel.Collapsible.collapsed .Static .Button {
-		margin-top: 2px;
-		border-left-color: #bbb;
-	}
-
-	.Panel.Collapsible:not(.collapsed) .Static .Button {
-		margin-top: 6px;
-		border-top-color: #bbb;
-	}
-
-	.Panel.Collapsible.collapsed .Content {
-		display: none;
-	}
-
 /* CodeMirror */
 
 .CodeMirror {

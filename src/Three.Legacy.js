@@ -435,8 +435,7 @@ Object.assign( Matrix3.prototype, {
 	},
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'THREE.Matrix3: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
-		return this.applyToVector3Array( a );
+		console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.'  );
 
 	},
 	applyToBuffer: function( buffer, offset, length ) {
@@ -505,8 +504,7 @@ Object.assign( Matrix4.prototype, {
 	},
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'THREE.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
-		return this.applyToVector3Array( a );
+		console.error( 'THREE.Matrix4: .multiplyVector3Array() has been removed.'  );
 
 	},
 	rotateAxis: function ( v ) {
@@ -771,6 +769,23 @@ Object.defineProperty( Skeleton.prototype, 'useVertexTexture', {
 	set: function () {
 
 		console.warn( 'THREE.Skeleton: useVertexTexture has been removed.' );
+
+	}
+
+} );
+
+Object.defineProperty( Curve.prototype, '__arcLengthDivisions', {
+
+	get: function () {
+
+		console.warn( 'THREE.Curve: .__arcLengthDivisions is now .arcLengthDivisions.' );
+		return this.arcLengthDivisions;
+
+	},
+	set: function ( value ) {
+
+		console.warn( 'THREE.Curve: .__arcLengthDivisions is now .arcLengthDivisions.' );
+		this.arcLengthDivisions = value;
 
 	}
 

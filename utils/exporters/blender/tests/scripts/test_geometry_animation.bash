@@ -5,5 +5,5 @@ source "$DIR/setup_test_env.bash"
 
 blender --background $BLEND/anim.blend --python $PYSCRIPT -- \
     $JSON --vertices --faces --animation rest --bones --skinning \
-    --embedAnimation
+    --embedAnimation --geometryType Geometry
 makereview $@ --tag $(tagname)
