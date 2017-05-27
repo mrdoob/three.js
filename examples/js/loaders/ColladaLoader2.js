@@ -1518,9 +1518,7 @@ THREE.ColladaLoader.prototype = {
 
 		function setupConversion() {
 
-			var options = scope.options;
-
-			if ( options.convertUpAxis === true ) {
+			if ( scope.options.convertUpAxis === true ) {
 
 				switch ( asset.upAxis ) {
 
