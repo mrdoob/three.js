@@ -1314,8 +1314,7 @@ THREE.ColladaLoader.prototype = {
 
 					case 'scale':
 						var array = parseFloats( child.textContent );
-						convertVector3( vector.fromArray( array ), 1 );
-						data.matrix.scale( vector );
+						data.matrix.scale( convertVector3( vector.fromArray( array ), 1 ) );
 						break;
 
 					case 'extra':
