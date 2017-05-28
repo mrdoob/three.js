@@ -184,7 +184,7 @@ Object.assign( Matrix3.prototype, {
 
 		if ( matrix && matrix.isMatrix4 ) {
 
-			console.error( "THREE.Matrix3: .getInverse no longer takes a Matrix4 argument." );
+			console.error( "THREE.Matrix3: .getInverse() no longer takes a Matrix4 argument." );
 
 		}
 
