@@ -210,6 +210,7 @@ THREE.OBJLoader.prototype = {
 
 					var declared = previousMaterial.clone( 0 );
 					declared.inherited = true;
+					declared.groupStart = 0;
 					this.object.materials.push( declared );
 
 				}
