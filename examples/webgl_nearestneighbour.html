@@ -96,7 +96,6 @@
 				controls.movementSpeed = 100;
 				controls.lookSpeed = 0.1;
 
-
 				// add a skybox background
 				var cubeTextureLoader = new THREE.CubeTextureLoader();
 
@@ -121,7 +120,7 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var imagePreviewTexture = textureLoader.load( 'textures/crate.gif');
+				var imagePreviewTexture = textureLoader.load( 'textures/crate.gif' );
 
 				imagePreviewTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				imagePreviewTexture.magFilter = THREE.LinearFilter;
@@ -138,7 +137,7 @@
 
 
 				//create particles with buffer geometry
-				var distanceFunction = function( a, b ) {
+				var distanceFunction = function ( a, b ) {
 
 					return Math.pow( a[ 0 ] - b [0 ], 2 ) +  Math.pow( a[ 1 ] - b[ 1 ], 2 ) +  Math.pow( a[ 2 ] - b[ 2 ], 2 );
 
@@ -178,7 +177,7 @@
 
 			}
 
-			function onWindowResize() {
+			function onWindowResize () {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -188,7 +187,7 @@
 				controls.handleResize();
 			}
 
-			function animate() {
+			function animate () {
 
 				requestAnimationFrame( animate );
 
@@ -201,7 +200,7 @@
 
 			}
 
-			function displayNearest( position ) {
+			function displayNearest ( position ) {
 
 				// take the nearest 200 around him. distance^2 'cause we use the manhattan distance and no square is applied in the distance function
 				var imagePositionsInRange = kdtree.nearest( [ position.x, position.y, position.z ], 100, maxDistance );
