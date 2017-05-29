@@ -784,11 +784,14 @@ function WebGLRenderer( parameters ) {
 		}
 
 		var renderer = bufferRenderer;
+		var indexProperties;
 
 		if ( index !== null ) {
 
+			indexProperties = attributes.get( index );
+
 			renderer = indexedBufferRenderer;
-			renderer.setIndex( index );
+			renderer.setIndex( indexProperties );
 
 		}
 
@@ -798,7 +801,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( index !== null ) {
 
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributes.get( index ).buffer );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indexProperties.buffer );
 
 			}
 

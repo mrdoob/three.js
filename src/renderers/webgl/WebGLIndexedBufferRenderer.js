@@ -14,24 +14,10 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 	var type, size;
 
-	function setIndex( index ) {
+	function setIndex( indexProperties ) {
 
-		if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
-
-			type = gl.UNSIGNED_INT;
-			size = 4;
-
-		} else if ( index.array instanceof Uint16Array ) {
-
-			type = gl.UNSIGNED_SHORT;
-			size = 2;
-
-		} else {
-
-			type = gl.UNSIGNED_BYTE;
-			size = 1;
-
-		}
+		type = indexProperties.type;
+		size = indexProperties.bytesPerElement;
 
 	}
 
