@@ -655,8 +655,9 @@
 				camera.lookAt( scene.position );
 
 				if( mixer ) {
+
 					mixer.update( delta );
-					helper.update();
+
 				}
 
 				renderer.render( scene, camera );

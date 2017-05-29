@@ -54,7 +54,7 @@ function SkeletonHelper( object ) {
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	this.update();
+	this.onBeforeRender();
 
 }
 
@@ -82,14 +82,14 @@ SkeletonHelper.prototype.getBoneList = function( object ) {
 
 };
 
-SkeletonHelper.prototype.update = function () {
+SkeletonHelper.prototype.onBeforeRender = function () {
 
 	var vector = new Vector3();
 
 	var boneMatrix = new Matrix4();
 	var matrixWorldInv = new Matrix4();
 
-	return function update() {
+	return function onBeforeRender() {
 
 		var geometry = this.geometry;
 		var position = geometry.getAttribute( 'position' );
@@ -122,5 +122,10 @@ SkeletonHelper.prototype.update = function () {
 
 }();
 
+SkeletonHelper.prototype.update = function () {
+
+	// backwards compatability
+
+};
 
 export { SkeletonHelper };
