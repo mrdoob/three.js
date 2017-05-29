@@ -96,22 +96,17 @@
 				controls.movementSpeed = 100;
 				controls.lookSpeed = 0.1;
 
-				var textureLoader = new THREE.TextureLoader();
+				var cubeTextureLoader = new THREE.CubeTextureLoader();
 
-				var materials = [
+				cubeTextureLoader.setPath( 'textures/cube/skybox/' );
 
-					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/px.jpg' ) } ), // right
-					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/nx.jpg' ) } ), // left
-					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/py.jpg' ) } ), // top
-					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/ny.jpg' ) } ), // bottom
-					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/pz.jpg' ) } ), // back
-					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/nz.jpg' ) } )  // front
+				var cubeTexture = cubeTextureLoader.load( [
+					'px.jpg', 'nx.jpg',
+					'py.jpg', 'ny.jpg',
+					'pz.jpg', 'nz.jpg',
+				] );
 
-				];
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 10000, 10000, 10000, 7, 7, 7 ), materials );
-				mesh.scale.x = - 1;
-				scene.add(mesh);
+				scene.background = cubeTexture;
 
 				//
 
@@ -121,7 +116,11 @@
 				document.body.appendChild( renderer.domElement );
 
 				// create the custom shader
+
+				var textureLoader = new THREE.TextureLoader();
+
 				var imagePreviewTexture = textureLoader.load( 'textures/crate.gif');
+
 				imagePreviewTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				imagePreviewTexture.magFilter = THREE.LinearFilter;
 
