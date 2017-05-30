@@ -209,7 +209,20 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
 			_touchZoomDistanceStart = _touchZoomDistanceEnd;
-			_eye.multiplyScalar( factor );
+
+			if ( this.object instanceof THREE.PerspectiveCamera ) {
+
+				_eye.multiplyScalar( factor );
+
+			} else {
+
+				this.object.left *= factor;
+				this.object.right *= factor;
+				this.object.top *= factor;
+				this.object.bottom *= factor;
+
+				this.object.updateProjectionMatrix();
+			}
 
 		} else {
 
@@ -217,7 +230,19 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			if ( factor !== 1.0 && factor > 0.0 ) {
 
-				_eye.multiplyScalar( factor );
+				if ( this.object instanceof THREE.PerspectiveCamera ) {
+
+					_eye.multiplyScalar( factor );
+
+				} else {
+
+					this.object.left *= factor;
+					this.object.right *= factor;
+					this.object.top *= factor;
+					this.object.bottom *= factor;
+
+					this.object.updateProjectionMatrix();
+				}
 
 			}
 
