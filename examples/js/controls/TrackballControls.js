@@ -45,6 +45,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	var _state = STATE.NONE,
 	_prevState = STATE.NONE,
+	_stateLock = false,
 
 	_eye = new THREE.Vector3(),
 
@@ -367,14 +368,17 @@ THREE.TrackballControls = function ( object, domElement ) {
 		} else if ( event.keyCode === _this.keys[ STATE.ROTATE ] && ! _this.noRotate ) {
 
 			_state = STATE.ROTATE;
+			_stateLock = true;
 
 		} else if ( event.keyCode === _this.keys[ STATE.ZOOM ] && ! _this.noZoom ) {
 
 			_state = STATE.ZOOM;
+			_stateLock = true;
 
 		} else if ( event.keyCode === _this.keys[ STATE.PAN ] && ! _this.noPan ) {
 
 			_state = STATE.PAN;
+			_stateLock = true;
 
 		}
 
@@ -385,6 +389,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		if ( _this.enabled === false ) return;
 
 		_state = _prevState;
+		_stateLock = false;
 
 		window.addEventListener( 'keydown', keydown, false );
 
@@ -458,7 +463,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		_state = STATE.NONE;
+		if (_stateLock === false) {
+			_state = STATE.NONE;
+		}
 
 		document.removeEventListener( 'mousemove', mousemove );
 		document.removeEventListener( 'mouseup', mouseup );
