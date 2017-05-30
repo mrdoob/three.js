@@ -326,7 +326,7 @@ struct Material {
               Quantize(Kd[1], 0, 1, 255),
               Quantize(Kd[2], 0, 1, 255));
     } else {
-      fprintf(out, "\"map_Kd\": \"%s\" }", map_Kd.c_str());
+       fprintf(out, "\"map_Kd\": \"%s\" }", map_Kd.c_str());
     }
   }
 };
