@@ -26,9 +26,9 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isCamera: true,
 
-	copy: function ( source ) {
+	copy: function ( source, recursive ) {
 
-		Object3D.prototype.copy.call( this, source );
+		Object3D.prototype.copy.call( this, source, recursive );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
 		this.projectionMatrix.copy( source.projectionMatrix );
