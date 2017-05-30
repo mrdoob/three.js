@@ -417,6 +417,10 @@ Object.assign( Vector2.prototype, {
 
 	},
 
+	isFinite: function () {
+		return isFinite(this.x) && isFinite(this.y);
+	},
+
 	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) );
