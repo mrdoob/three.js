@@ -921,6 +921,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		return diff;
 
 	},
+	
+	updateVertices : function(iterator){
+		this.vertices.forEach(iterator);
+		this.verticesNeedUpdate = true;
+	},
 
 	sortFacesByMaterialIndex: function () {
 
