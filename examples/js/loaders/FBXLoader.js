@@ -421,7 +421,7 @@
 
 		var material;
 
-		switch ( type ) {
+		switch ( type.toLowerCase() ) {
 
 			case 'phong':
 				material = new THREE.MeshPhongMaterial();
