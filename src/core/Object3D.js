@@ -295,6 +295,14 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	}(),
 
+	lookAwayFrom: function( vector ) {
+
+		var origin = new THREE.Vector3().subVectors( this.position, vector.position ),
+			translated = new THREE.Vector3().addVectors( this.position, origin );
+
+		this.lookAt( translated );
+	},
+
 	add: function ( object ) {
 
 		if ( arguments.length > 1 ) {
