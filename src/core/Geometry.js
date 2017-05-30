@@ -538,6 +538,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	},
 
+	clearVertexNormals: function () {
+		for(var i = 0; i < this.faces.length; ++i)    
+			this.faces[ i ].vertexNormals = [ ];
+	},
+
 	computeMorphNormals: function () {
 
 		var i, il, f, fl, face;
