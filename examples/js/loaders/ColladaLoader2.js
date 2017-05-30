@@ -1515,6 +1515,8 @@ THREE.ColladaLoader.prototype = {
 
 		// conversion
 
+		var convertVector3;
+
 		function setupConversion() {
 
 			if ( scope.options.convertUpAxis === true ) {
@@ -1522,15 +1524,29 @@ THREE.ColladaLoader.prototype = {
 				switch ( asset.upAxis ) {
 
 					case 'X_UP':
-						asset.upConversion = 'X-Y';
+						convertVector3 = function ( vector, sign ) {
+							if ( sign === undefined ) sign = - 1;
+							var tmp = vector.x;
+							vector.x = sign * vector.y;
+							vector.y = tmp;
+							return vector;
+						};
 						break;
 
 					case 'Y_UP':
-						asset.upConversion = 'NONE';
+						convertVector3 = function ( vector, sign ) {
+							return vector;
+						};
 						break;
 
 					case 'Z_UP':
-						asset.upConversion = 'Z-Y';
+						convertVector3 = function ( vector, sign ) {
+							if ( sign === undefined ) sign = - 1;
+							var tmp = vector.y;
+							vector.y = vector.z;
+							vector.z = sign * tmp;
+							return vector;
+						};
 						break;
 
 					default:
@@ -1539,40 +1555,6 @@ THREE.ColladaLoader.prototype = {
 				}
 
 			}
-
-		}
-
-		function convertVector3( vector, sign ) {
-
-			if ( sign === undefined ) sign = - 1;
-
-			if ( scope.options.convertUpAxis === true ) {
-
-				switch ( asset.upConversion ) {
-
-					case 'X-Y':
-						var tmp = vector.x;
-						vector.x = sign * vector.y;
-						vector.y = tmp;
-						break;
-
-					case 'Z-Y':
-						var tmp = vector.y;
-						vector.y = vector.z;
-						vector.z = sign * tmp;
-						break;
-
-					case 'NONE':
-						break;
-
-					default:
-						console.error( 'THREE.ColladaLoader: Invalid up axis conversion:', asset.upAxis );
-
-				}
-
-			}
-
-			return vector;
 
 		}
 
