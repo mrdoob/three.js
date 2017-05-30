@@ -428,6 +428,22 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	getPoints: function () {
+
+		return [
+			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+			new THREE.Vector3().set( this.min.x, this.min.y, this.min.z ), // 000
+			new THREE.Vector3().set( this.min.x, this.min.y, this.max.z ), // 001
+			new THREE.Vector3().set( this.min.x, this.max.y, this.min.z ), // 010
+			new THREE.Vector3().set( this.min.x, this.max.y, this.max.z ), // 011
+			new THREE.Vector3().set( this.max.x, this.min.y, this.min.z ), // 100
+			new THREE.Vector3().set( this.max.x, this.min.y, this.max.z ), // 101
+			new THREE.Vector3().set( this.max.x, this.max.y, this.min.z ), // 110
+			new THREE.Vector3().set( this.max.x, this.max.y, this.max.z )  // 111
+		];
+
+	},
+
 	applyMatrix4: function () {
 
 		var points = [
