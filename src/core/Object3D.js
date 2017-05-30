@@ -92,6 +92,8 @@ function Object3D() {
 	this.renderOrder = 0;
 
 	this.userData = {};
+	
+	this.referenceData = null;
 
 	this.onBeforeRender = function () {};
 	this.onAfterRender = function () {};
@@ -736,6 +738,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		this.renderOrder = source.renderOrder;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		
+		this.referenceData = source.referenceData;
 
 		if ( recursive === true ) {
 
