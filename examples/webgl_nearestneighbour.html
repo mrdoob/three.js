@@ -177,7 +177,7 @@
 
 			}
 
-			function onWindowResize () {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -187,7 +187,7 @@
 				controls.handleResize();
 			}
 
-			function animate () {
+			function animate() {
 
 				requestAnimationFrame( animate );
 
@@ -200,7 +200,7 @@
 
 			}
 
-			function displayNearest ( position ) {
+			function displayNearest( position ) {
 
 				// take the nearest 200 around him. distance^2 'cause we use the manhattan distance and no square is applied in the distance function
 				var imagePositionsInRange = kdtree.nearest( [ position.x, position.y, position.z ], 100, maxDistance );
