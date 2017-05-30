@@ -24,6 +24,16 @@ function Face3( a, b, c, normal, color, materialIndex ) {
 
 Object.assign( Face3.prototype, {
 
+	invert: function() {
+	
+	    var a = face.a;
+
+            face.a = face.c;
+
+            face.c = a;
+		
+	},
+
 	clone: function () {
 
 		return new this.constructor().copy( this );
