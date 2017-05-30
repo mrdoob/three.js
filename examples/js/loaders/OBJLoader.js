@@ -680,6 +680,9 @@ THREE.OBJLoader.prototype = {
 				buffergeometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geometry.uvs ), 2 ) );
 
 			}
+			
+			buffergeometry.computeFaceNormals();
+			buffergeometry.computeVertexNormals();
 
 			// Create materials
 
