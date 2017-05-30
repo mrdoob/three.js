@@ -703,7 +703,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			scope.dispatchEvent( startEvent );
 
-		}
+		}
+
+		scope.update();
 
 	}
 
