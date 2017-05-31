@@ -231,6 +231,8 @@ THREE.VREffect = function ( renderer, onError ) {
 	var cameraR = new THREE.PerspectiveCamera();
 	cameraR.layers.enable( 2 );
 
+	var cameras = [cameraL, cameraR];
+
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
 		if ( vrDisplay && scope.isPresenting ) {
@@ -262,8 +264,8 @@ THREE.VREffect = function ( renderer, onError ) {
 
 				var layer = layers[ 0 ];
 
-				leftBounds = layer.leftBounds !== null && layer.leftBounds.length === 4 ? layer.leftBounds : defaultLeftBounds;
-				rightBounds = layer.rightBounds !== null && layer.rightBounds.length === 4 ? layer.rightBounds : defaultRightBounds;
+				leftBounds = layer.leftBounds && layer.leftBounds.length === 4 ? layer.leftBounds : defaultLeftBounds;
+				rightBounds = layer.rightBounds && layer.rightBounds.length === 4 ? layer.rightBounds : defaultRightBounds;
 
 			} else {
 
@@ -343,6 +345,8 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
+			scope.cameras = cameras;
+
 			// render left eye
 			if ( renderTarget ) {
 
@@ -403,6 +407,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		// Regular render mode if not HMD
 
+		scope.cameras = null;
 		renderer.render( scene, camera, renderTarget, forceClear );
 
 	};
