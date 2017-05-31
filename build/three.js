@@ -15626,9 +15626,9 @@
 
 		isCamera: true,
 
-		copy: function ( source ) {
+		copy: function ( source, recursive ) {
 
-			Object3D.prototype.copy.call( this, source );
+			Object3D.prototype.copy.call( this, source, recursive );
 
 			this.matrixWorldInverse.copy( source.matrixWorldInverse );
 			this.projectionMatrix.copy( source.projectionMatrix );
@@ -15697,9 +15697,9 @@
 
 		isPerspectiveCamera: true,
 
-		copy: function ( source ) {
+		copy: function ( source, recursive ) {
 
-			Camera.prototype.copy.call( this, source );
+			Camera.prototype.copy.call( this, source, recursive );
 
 			this.fov = source.fov;
 			this.zoom = source.zoom;
@@ -15912,9 +15912,9 @@
 
 		isOrthographicCamera: true,
 
-		copy: function ( source ) {
+		copy: function ( source, recursive ) {
 
-			Camera.prototype.copy.call( this, source );
+			Camera.prototype.copy.call( this, source, recursive );
 
 			this.left = source.left;
 			this.right = source.right;
@@ -26411,7 +26411,6 @@
 
 		if ( typeof ( shapes ) === "undefined" ) {
 
-			shapes = [];
 			return;
 
 		}
@@ -26566,8 +26565,6 @@
 
 			}
 
-			reverse = false; // If vertices are in order now, we shouldn't need to worry about them again (hopefully)!
-
 		}
 
 
@@ -26611,7 +26608,7 @@
 			// inPt' is the intersection of the two lines parallel to the two
 			//  adjacent edges of inPt at a distance of 1 unit on the left side.
 
-			var v_trans_x, v_trans_y, shrink_by = 1; // resulting translation vector for inPt
+			var v_trans_x, v_trans_y, shrink_by; // resulting translation vector for inPt
 
 			// good reading for geometry algorithms (here: line-line intersection)
 			// http://geomalgorithms.com/a05-_intersect-1.html
