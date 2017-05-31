@@ -366,6 +366,7 @@ var files = {
 		"software_sandbox"
 	],
 	"svg": [
+		"svg_lines",
 		"svg_sandbox"
 	]
 };
