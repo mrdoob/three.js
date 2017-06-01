@@ -9244,7 +9244,6 @@
 					_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
 					shadowCamera.lookAt( _lookTarget );
 					shadowCamera.updateMatrixWorld();
-					shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
 					// compute shadow matrix
 
@@ -9275,7 +9274,6 @@
 						shadowCamera.up.copy( cubeUps[ face ] );
 						shadowCamera.lookAt( _lookTarget );
 						shadowCamera.updateMatrixWorld();
-						shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
 						var vpDimensions = cube2DViewPorts[ face ];
 						_state.viewport( vpDimensions );
@@ -15653,6 +15651,14 @@
 
 		}(),
 
+		updateMatrixWorld: function ( force ) {
+
+			Object3D.prototype.updateMatrixWorld.call( this, force );
+
+			this.matrixWorldInverse.getInverse( this.matrixWorld );
+
+		},
+
 		clone: function () {
 
 			return new this.constructor().copy( this );
@@ -20973,8 +20979,6 @@
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
-			camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 			_frustum.setFromMatrix( _projScreenMatrix );
 
@@ -21145,7 +21149,7 @@
 			state.buffers.depth.setMask( true );
 			state.buffers.color.setMask( true );
 
-			if ( camera.isArrayCamera && camera.enabled ) {
+			if ( camera.isArrayCamera ) {
 
 				_this.setScissorTest( false );
 
@@ -21319,7 +21323,7 @@
 
 				object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
-				if ( camera.isArrayCamera && camera.enabled ) {
+				if ( camera.isArrayCamera ) {
 
 					var cameras = camera.cameras;
 
@@ -21328,14 +21332,13 @@
 						var camera2 = cameras[ j ];
 						var bounds = camera2.bounds;
 
-						_this.setViewport(
-							bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
-							bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
-						);
-						_this.setScissor(
-							bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
-							bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
-						);
+						var x = bounds.x * _width * _pixelRatio;
+						var y = bounds.y * _height * _pixelRatio;
+						var width = bounds.z * _width * _pixelRatio;
+						var height = bounds.w * _height * _pixelRatio;
+
+						_this.setViewport( x, y, width, height );
+						_this.setScissor( x, y, width, height );
 						_this.setScissorTest( true );
 
 						renderObject( object, scene, camera2, geometry, material, group );
@@ -35999,7 +36002,6 @@
 
 		PerspectiveCamera.call( this );
 
-		this.enabled = false;
 		this.cameras = array || [];
 
 	}
@@ -41918,9 +41920,7 @@
 
 		attach: function ( child, scene, parent ) {
 
-			var matrixWorldInverse = new Matrix4();
-			matrixWorldInverse.getInverse( parent.matrixWorld );
-			child.applyMatrix( matrixWorldInverse );
+			child.applyMatrix( new Matrix4().getInverse( parent.matrixWorld ) );
 
 			scene.remove( child );
 			parent.add( child );
