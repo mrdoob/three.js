@@ -1456,14 +1456,13 @@ function WebGLRenderer( parameters ) {
 					var camera2 = cameras[ j ];
 					var bounds = camera2.bounds;
 
-					_this.setViewport(
-						bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
-						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
-					);
-					_this.setScissor(
-						bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
-						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
-					);
+					var x = bounds.x * _width * _pixelRatio;
+					var y = bounds.y * _height * _pixelRatio;
+					var width = bounds.z * _width * _pixelRatio;
+					var height = bounds.w * _height * _pixelRatio;
+
+					_this.setViewport( x, y, width, height );
+					_this.setScissor( x, y, width, height );
 					_this.setScissorTest( true );
 
 					renderObject( object, scene, camera2, geometry, material, group );
