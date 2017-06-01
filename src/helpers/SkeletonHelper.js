@@ -122,10 +122,4 @@ SkeletonHelper.prototype.onBeforeRender = function () {
 
 }();
 
-SkeletonHelper.prototype.update = function () {
-
-	// backwards compatability
-
-};
-
 export { SkeletonHelper };
