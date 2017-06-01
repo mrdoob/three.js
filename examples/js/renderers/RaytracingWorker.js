@@ -514,7 +514,6 @@ THREE.RaytracingRendererWorker = function () {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 		cameraPosition.setFromMatrixPosition( camera.matrixWorld );
 
 		//

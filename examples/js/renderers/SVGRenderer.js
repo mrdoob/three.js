@@ -173,7 +173,7 @@ THREE.SVGRenderer = function () {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
+		_viewMatrix.copy( camera.matrixWorldInverse );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
 		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );

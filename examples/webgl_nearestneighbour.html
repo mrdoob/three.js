@@ -206,8 +206,6 @@
 				var _frustum = new THREE.Frustum();
 				var _projScreenMatrix = new THREE.Matrix4();
 
-				camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
 				_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 				_frustum.setFromMatrix( _projScreenMatrix );
 

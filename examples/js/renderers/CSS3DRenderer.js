@@ -277,8 +277,6 @@ THREE.CSS3DRenderer = function () {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
 		var cameraCSSMatrix = 'translateZ(' + fov + 'px)' +
 			getCameraCSSMatrix( camera.matrixWorldInverse );
 
