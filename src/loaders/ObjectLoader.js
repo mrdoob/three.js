@@ -764,11 +764,10 @@ Object.assign( ObjectLoader.prototype, {
 			if ( data.userData !== undefined ) object.userData = data.userData;
 
 			if ( data.children !== undefined ) {
-
-				var that = this;
-				data.children.forEach(function(index, child){
-					object.add( that.parseObject( data.children[ child ], geometries, materials ) );
-				});
+				
+				data.children.forEach(function(child){
+					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+				}, this);
 
 			}
 
