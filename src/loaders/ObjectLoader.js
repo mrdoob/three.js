@@ -766,7 +766,7 @@ Object.assign( ObjectLoader.prototype, {
 			if ( data.children !== undefined ) {
 				
 				data.children.forEach(function(child){
-					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+					object.add( this.parseObject( child, geometries, materials ) );
 				}, this);
 
 			}
