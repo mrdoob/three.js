@@ -92,16 +92,27 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
-	float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );
-	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
-	float dotNH = saturate( dot( geometry.normal, halfDir ) );
+	// float dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );
+	// float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
+	// float dotNH = saturate( dot( geometry.normal, halfDir ) );
+
+	mat3 m = mat3(
+		incidentLight.direction.x , geometry.viewDir.x , halfDir.x , 
+		incidentLight.direction.y , geometry.viewDir.y , halfDir.y ,
+		incidentLight.direction.z , geometry.viewDir.z , halfDir.z 
+	);
+
+	vec3 res = m * geometry.normal;
+
 	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
 
 	vec3 F = F_Schlick( specularColor, dotLH );
 
-	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
+	// float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
+	float G = G_GGX_SmithCorrelated( alpha, res.x, res.y );
 
-	float D = D_GGX( alpha, dotNH );
+	// float D = D_GGX( alpha, dotNH );
+	float D = D_GGX( alpha, res.z );
 
 	return F * ( G * D );
 
