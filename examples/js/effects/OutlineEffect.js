@@ -252,20 +252,20 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	function setOutlineMaterial( object ) {
 
 		if ( object.material === undefined ) return;
-
-		if ( Array.isArray( object.material ) ) {
-
-			for ( var i = 0, il = object.material.length; i < il; i ++ ) {
-
-				object.material[ i ] = getOutlineMaterial( object.material[ i ] );
-
+		
+		object.traverseMaterials( function( material, index, isArray ) {
+			
+			var outlineMaterial = getOutlineMaterial(material);
+			if ( isArray ) {
+				
+				object.material[ index ] = outlineMaterial;
+				
+			} else {
+				
+				object.material = outlineMaterial;
+				
 			}
-
-		} else {
-
-			object.material = getOutlineMaterial( object.material );
-
-		}
+		});
 
 		originalOnBeforeRenders[ object.uuid ] = object.onBeforeRender;
 		object.onBeforeRender = onBeforeRender;
@@ -276,19 +276,19 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		if ( object.material === undefined ) return;
 
-		if ( Array.isArray( object.material ) ) {
-
-			for ( var i = 0, il = object.material.length; i < il; i ++ ) {
-
-				object.material[ i ] = originalMaterials[ object.material[ i ].uuid ];
-
+		object.traverseMaterials( function( material, index, isArray ) {
+			
+			var originalMaterial = originalMaterials[ material.uuid ];
+			if ( isArray ) {
+				
+				object.material[ index ] = originalMaterial;
+				
+			} else {
+				
+				object.material = originalMaterial;
+				
 			}
-
-		} else {
-
-			object.material = originalMaterials[ object.material.uuid ];
-
-		}
+		});
 
 		object.onBeforeRender = originalOnBeforeRenders[ object.uuid ];
 

@@ -53,6 +53,27 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		return this;
 
 	},
+	
+	traverseMaterials: function( fn ){
+		
+		var material = this.material;
+		var isArray = Array.isArray( material );
+				
+		if ( isArray ) {
+					
+			for ( var i = 0; i < material.length; i ++ ) {
+				
+				fn( material[i], i, isArray ); 
+				
+			}
+			
+		} else {
+			
+			fn( material[i], -1, isArray ); 
+			
+		}
+		
+	},
 
 	updateMorphTargets: function () {
 
