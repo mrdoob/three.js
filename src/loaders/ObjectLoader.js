@@ -765,11 +765,10 @@ Object.assign( ObjectLoader.prototype, {
 
 			if ( data.children !== undefined ) {
 
-				for ( var child in data.children ) {
-
-					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
-
-				}
+				var that = this;
+				data.children.forEach(function(index, child){
+					object.add( that.parseObject( data.children[ child ], geometries, materials ) );
+				});
 
 			}
 
