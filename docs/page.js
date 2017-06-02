@@ -49,6 +49,56 @@ var onDocumentLoad = function ( event ) {
 			break;
 
 	}
+    
+
+    // redirect, if the page is not yet displayed as an iframe (with navigation panel and working links)    
+    
+    if ( !window.frameElement ) {
+        
+        var redirectUrl;
+
+        for ( var mainCategory in list ) {
+            
+            var subCategories = list[ mainCategory ];
+            
+            for ( var subCategory in subCategories ) {
+                
+                var pages = subCategories[ subCategory ]
+                
+                for ( i = 0; i < pages.length; i++ ) {
+                    
+                    var page = pages[ i ];
+
+                    if ( page[ 1 ] === section + '/' + path ) {  
+
+                        redirectUrl = '#'
+                                    + mainCategory 
+                                    + '/' 
+                                    + subCategory.replace(/\ \/\ /g, '.').replace(/\ /g, '_') 
+                                    + '/' 
+                                    + page[ 0 ].replace(/\ /g, '_');
+                        break;
+                        
+                    };
+                    
+                };
+                
+            };
+            
+        }; 
+        
+        if ( redirectUrl ) {
+            
+            window.location.replace( redirectUrl );
+            
+        } else {
+            
+            console.warn( 'Unknown URL - page can\'t be displayed as an inline frame.' )
+            
+        }
+        
+    }
+
 
 	var text = document.body.innerHTML;
 
