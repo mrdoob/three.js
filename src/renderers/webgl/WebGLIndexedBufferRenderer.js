@@ -12,18 +12,18 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 	}
 
-	var type, size;
+	var type, bytesPerElement;
 
-	function setIndex( indexProperties ) {
+	function setIndex( value ) {
 
-		type = indexProperties.type;
-		size = indexProperties.bytesPerElement;
+		type = value.type;
+		bytesPerElement = value.bytesPerElement;
 
 	}
 
 	function render( start, count ) {
 
-		gl.drawElements( mode, count, type, start * size );
+		gl.drawElements( mode, count, type, start * bytesPerElement );
 
 		infoRender.calls ++;
 		infoRender.vertices += count;
@@ -43,7 +43,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 		}
 
-		extension.drawElementsInstancedANGLE( mode, count, type, start * size, geometry.maxInstancedCount );
+		extension.drawElementsInstancedANGLE( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
 
 		infoRender.calls ++;
 		infoRender.vertices += count * geometry.maxInstancedCount;
