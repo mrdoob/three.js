@@ -59,7 +59,7 @@ Object.assign( JSONLoader.prototype, {
 
 					if ( type.toLowerCase() === 'scene' ) {
 
-						console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.SceneLoader instead.' );
+						console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.' );
 						return;
 
 					}
