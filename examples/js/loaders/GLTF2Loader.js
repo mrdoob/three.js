@@ -2380,7 +2380,7 @@ THREE.GLTF2Loader = ( function () {
 
 				var _skin = {
 					bindShapeMatrix: bindShapeMatrix,
-					jointNames: skin.jointNames,
+					joints: skin.joints,
 					inverseBindMatrices: dependencies.accessors[ skin.inverseBindMatrices ]
 				};
 
@@ -2665,24 +2665,8 @@ THREE.GLTF2Loader = ( function () {
 								// Replace Mesh with SkinnedMesh in library
 								if ( skinEntry ) {
 
-									var getJointNode = function ( jointId ) {
-
-										var keys = Object.keys( __nodes );
-
-										for ( var i = 0, il = keys.length; i < il; i ++ ) {
-
-											var n = __nodes[ keys[ i ] ];
-
-											if ( n.jointName === jointId ) return n;
-
-										}
-
-										return null;
-
-									};
-
 									var geometry = originalGeometry;
-									var material = originalMaterial;
+									material = originalMaterial;
 									material.skinning = true;
 
 									child = new THREE.SkinnedMesh( geometry, material, false );
@@ -2693,10 +2677,10 @@ THREE.GLTF2Loader = ( function () {
 									var bones = [];
 									var boneInverses = [];
 
-									for ( var i = 0, l = skinEntry.jointNames.length; i < l; i ++ ) {
+									for ( var i = 0, l = skinEntry.joints.length; i < l; i ++ ) {
 
-										var jointId = skinEntry.jointNames[ i ];
-										var jointNode = getJointNode( jointId );
+										var jointId = skinEntry.joints[ i ];
+										var jointNode = __nodes[ jointId ];
 
 										if ( jointNode ) {
 
