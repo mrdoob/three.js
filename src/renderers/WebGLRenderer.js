@@ -436,14 +436,16 @@ function WebGLRenderer( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		state.viewport( _viewport.set( x, y, width, height ) );
-
+		_viewport.set( x, y, width, height )
+		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
+	
 	};
 
 	this.setScissor = function ( x, y, width, height ) {
 
-		state.scissor( _scissor.set( x, y, width, height ) );
-
+		_scissor.set( x, y, width, height )
+		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
+	
 	};
 
 	this.setScissorTest = function ( boolean ) {
@@ -2675,7 +2677,7 @@ function WebGLRenderer( parameters ) {
 		state.scissor( _currentScissor );
 		state.setScissorTest( _currentScissorTest );
 
-		state.viewport( _currentViewport );
+		!window.xx && state.viewport( _currentViewport );
 
 		if ( isCube ) {
 
