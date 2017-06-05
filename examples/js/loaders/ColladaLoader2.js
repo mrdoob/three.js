@@ -1,5 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 THREE.ColladaLoader = function ( manager ) {
@@ -435,6 +436,22 @@ THREE.ColladaLoader.prototype = {
 			}
 
 			return data;
+
+		}
+
+		function buildController( data ) {
+
+			// for now, we only return the id of the skin in order to get the corresponding geometry
+
+			var keys = Object.keys( data.skin );
+
+			return { id: keys[ 0 ] };
+
+		}
+
+		function getController( id ) {
+
+			return getBuild( library.controllers[ id ], buildController );
 
 		}
 
@@ -1276,9 +1293,6 @@ THREE.ColladaLoader.prototype = {
 						}
 						break;
 
-					default:
-						console.log( child );
-
 				}
 
 			}
@@ -1525,6 +1539,7 @@ THREE.ColladaLoader.prototype = {
 				matrix: new THREE.Matrix4(),
 				nodes: [],
 				instanceCameras: [],
+				instanceControllers: [],
 				instanceLights: [],
 				instanceGeometries: [],
 				instanceNodes: []
@@ -1553,12 +1568,16 @@ THREE.ColladaLoader.prototype = {
 						data.instanceCameras.push( parseId( child.getAttribute( 'url' ) ) );
 						break;
 
+					case 'instance_controller':
+						data.instanceControllers.push( parseNodeInstance( child ) );
+						break;
+
 					case 'instance_light':
 						data.instanceLights.push( parseId( child.getAttribute( 'url' ) ) );
 						break;
 
 					case 'instance_geometry':
-						data.instanceGeometries.push( parseNodeInstanceGeometry( child ) );
+						data.instanceGeometries.push( parseNodeInstance( child ) );
 						break;
 
 					case 'instance_node':
@@ -1607,7 +1626,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function parseNodeInstanceGeometry( xml ) {
+		function parseNodeInstance( xml ) {
 
 			var data = {
 				id: parseId( xml.getAttribute( 'url' ) ),
@@ -1618,21 +1637,29 @@ THREE.ColladaLoader.prototype = {
 
 				var child = xml.childNodes[ i ];
 
-				if ( child.nodeName === 'bind_material' ) {
+				switch ( child.nodeName ) {
 
-					var instances = child.getElementsByTagName( 'instance_material' );
+					case 'bind_material':
+						var instances = child.getElementsByTagName( 'instance_material' );
 
-					for ( var j = 0; j < instances.length; j ++ ) {
+						for ( var j = 0; j < instances.length; j ++ ) {
 
-						var instance = instances[ j ];
-						var symbol = instance.getAttribute( 'symbol' );
-						var target = instance.getAttribute( 'target' );
+							var instance = instances[ j ];
+							var symbol = instance.getAttribute( 'symbol' );
+							var target = instance.getAttribute( 'target' );
 
-						data.materials[ symbol ] = parseId( target );
+							data.materials[ symbol ] = parseId( target );
 
-					}
+						}
 
-					break;
+						break;
+
+					case 'skeleton':
+						data.skeleton = parseId( child.textContent );;
+						break;
+
+					default:
+						break;
 
 				}
 
@@ -1649,6 +1676,7 @@ THREE.ColladaLoader.prototype = {
 			var matrix = data.matrix;
 			var nodes = data.nodes;
 			var instanceCameras = data.instanceCameras;
+			var instanceControllers = data.instanceControllers;
 			var instanceLights = data.instanceLights;
 			var instanceGeometries = data.instanceGeometries;
 			var instanceNodes = data.instanceNodes;
@@ -1662,6 +1690,28 @@ THREE.ColladaLoader.prototype = {
 			for ( var i = 0, l = instanceCameras.length; i < l; i ++ ) {
 
 				objects.push( getCamera( instanceCameras[ i ] ).clone() );
+
+			}
+
+			for ( var i = 0, l = instanceControllers.length; i < l; i ++ ) {
+
+				var instance = instanceControllers[ i ];
+				var controller = getController( instance.id );
+				var geometries = getGeometry( controller.id );
+
+				for ( var key in geometries ) {
+
+					var object = geometries[ key ].clone();
+
+					if ( instance.materials[ key ] !== undefined ) {
+
+						object.material = getMaterial( instance.materials[ key ] );
+
+					}
+
+					objects.push( object );
+
+				}
 
 			}
 
@@ -1825,7 +1875,7 @@ THREE.ColladaLoader.prototype = {
 		console.time( 'THREE.ColladaLoader: Parse' );
 
 		// parseLibrary( collada, 'library_animations', 'animation', parseAnimation );
-		// parseLibrary( collada, 'library_controllers', 'controller', parseController );
+		parseLibrary( collada, 'library_controllers', 'controller', parseController );
 		parseLibrary( collada, 'library_images', 'image', parseImage );
 		parseLibrary( collada, 'library_effects', 'effect', parseEffect );
 		parseLibrary( collada, 'library_materials', 'material', parseMaterial );
@@ -1839,13 +1889,13 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'THREE.ColladaLoader: Build' );
 
+		buildLibrary( library.controllers, buildController );
 		buildLibrary( library.images, buildImage );
 		buildLibrary( library.effects, buildEffect );
 		buildLibrary( library.materials, buildMaterial );
 		buildLibrary( library.cameras, buildCamera );
 		buildLibrary( library.lights, buildLight );
 		buildLibrary( library.geometries, buildGeometry );
-		// buildLibrary( library.nodes, buildNode );
 		buildLibrary( library.visualScenes, buildVisualScene );
 
 		console.timeEnd( 'THREE.ColladaLoader: Build' );
