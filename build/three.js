@@ -20302,14 +20302,14 @@
 
 			_viewport.set( x, y, width, height );
 			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
-		
+
 		};
 
 		this.setScissor = function ( x, y, width, height ) {
 
 			_scissor.set( x, y, width, height );
 			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
-		
+
 		};
 
 		this.setScissorTest = function ( boolean ) {
@@ -21323,10 +21323,10 @@
 						var camera2 = cameras[ j ];
 						var bounds = camera2.bounds;
 
-						var x = bounds.x * _width * _pixelRatio;
-						var y = bounds.y * _height * _pixelRatio;
-						var width = bounds.z * _width * _pixelRatio;
-						var height = bounds.w * _height * _pixelRatio;
+						var x = bounds.x * _width;
+						var y = bounds.y * _height;
+						var width = bounds.z * _width;
+						var height = bounds.w * _height;
 
 						_this.setViewport( x, y, width, height );
 						_this.setScissor( x, y, width, height );
