@@ -2677,7 +2677,7 @@ function WebGLRenderer( parameters ) {
 		state.scissor( _currentScissor );
 		state.setScissorTest( _currentScissorTest );
 
-		!window.xx && state.viewport( _currentViewport );
+		state.viewport( _currentViewport );
 
 		if ( isCube ) {
 
