@@ -291,6 +291,17 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		if ( ! customMaterial ) {
 
+<<<<<<< HEAD
+			var useMorphing, morphTargets;
+
+			if ( material.morphTargets ) {
+
+				if ( geometry instanceof THREE.Geometry ) morphTargets = geometry.morphTargets;
+
+				if ( geometry instanceof THREE.BufferGeometry && geometry.morphAttributes !== undefined ) morphTargets = geometry.morphAttributes.position;
+
+				if ( morphTargets !== undefined && morphTargets.length > 0 ) useMorphing = true;
+=======
 			var useMorphing = false;
 
 			if ( material.morphTargets ) {
@@ -304,6 +315,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 					useMorphing = geometry.morphTargets && geometry.morphTargets.length > 0;
 
 				}
+>>>>>>> upstream/dev
 
 			}
 
