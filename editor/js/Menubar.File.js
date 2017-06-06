@@ -1,5 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * REVISIONS
+ * -Added d/L capability (multiple files) @ Seagat2011 11.01.2017
  */
 
 Menubar.File = function ( editor ) {
@@ -294,7 +296,25 @@ Menubar.File = function ( editor ) {
 
 		}
 
-	} );
+	
+	files = [];
+for(var myfile in zip.files){
+	if(zip.files.hasOwnProperty(myfile)){
+		files.push(myfile);	
+	}
+}
+    a = setInterval(function(){
+      if(files.length){
+        saveString( files[0].name.match(/\.json$/)?JSON_stringify(files[0]._data):files[0]._data,files[0].name );
+        console.log(files[0].name," - download complete")
+       files.shift();
+      }
+      else{
+        clearInterval(a);
+        console.log("Downloads complete")
+      }
+    },150)
+  } );
 	options.add( option );
 
 	/*
@@ -320,15 +340,11 @@ Menubar.File = function ( editor ) {
 
 	//
 
-	var link = document.createElement( 'a' );
-	link.style.display = 'none';
-	document.body.appendChild( link ); // Firefox workaround, see #6594
-
 	function save( blob, filename ) {
 
-		link.href = URL.createObjectURL( blob );
-		link.download = filename || 'data.json';
-		link.click();
+		g_link.href = URL.createObjectURL( blob ); // Firefox workaround, see #6594
+		g_link.download = filename || 'data.json';
+		g_link.click();
 
 		// URL.revokeObjectURL( url ); breaks Firefox...
 
@@ -340,6 +356,16 @@ Menubar.File = function ( editor ) {
 
 	}
 
+function JSON_stringify( text,re ){
+    re || (re = /[\n\t]+([\d\.e\-\[\]]+)/g);
+    try {    
+      text = JSON.stringify( text, null, '\t' );
+      text = text.replace( re, '$1' );
+    } catch ( e ) {
+      text = JSON.stringify( text,2,2 );
+    }
+    return text;
+  }
 	return container;
 
 };
