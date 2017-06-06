@@ -13097,7 +13097,7 @@
 
 		merge: function ( geometry, matrix, materialIndexOffset ) {
 
-			if ( ( geometry && geometry.isGeometry ) === false ) {
+			if ( ! ( geometry && geometry.isGeometry ) ) {
 
 				console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 				return;
@@ -13217,7 +13217,7 @@
 
 		mergeMesh: function ( mesh ) {
 
-			if ( ( mesh && mesh.isMesh ) === false ) {
+			if ( ! ( mesh && mesh.isMesh ) ) {
 
 				console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
 				return;
@@ -20300,14 +20300,16 @@
 
 		this.setViewport = function ( x, y, width, height ) {
 
-			state.viewport( _viewport.set( x, y, width, height ) );
-
+			_viewport.set( x, y, width, height );
+			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
+		
 		};
 
 		this.setScissor = function ( x, y, width, height ) {
 
-			state.scissor( _scissor.set( x, y, width, height ) );
-
+			_scissor.set( x, y, width, height );
+			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
+		
 		};
 
 		this.setScissorTest = function ( boolean ) {
