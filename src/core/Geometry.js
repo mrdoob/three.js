@@ -700,7 +700,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	merge: function ( geometry, matrix, materialIndexOffset ) {
 
-		if ( ( geometry && geometry.isGeometry ) === false ) {
+		if ( !geometry || !geometry.isGeometry ) {
 
 			console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 			return;
