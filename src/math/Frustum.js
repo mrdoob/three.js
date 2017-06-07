@@ -1,5 +1,6 @@
 import { Vector3 } from './Vector3';
 import { Sphere } from './Sphere';
+import { Box3 } from './Box3';
 import { Plane } from './Plane';
 
 /**
@@ -83,18 +84,33 @@ Object.assign( Frustum.prototype, {
 	intersectsObject: function () {
 
 		var sphere = new Sphere();
+		var box = new Box3();
 
 		return function intersectsObject( object ) {
 
 			var geometry = object.geometry;
 
-			if ( geometry.boundingSphere === null )
-				geometry.computeBoundingSphere();
+			if ( object.cullingBoundsBox ) {
 
-			sphere.copy( geometry.boundingSphere )
-				.applyMatrix4( object.matrixWorld );
+				if ( geometry.boundingBox === null )
+					geometry.computeBoundingBox();
 
-			return this.intersectsSphere( sphere );
+				box.copy( geometry.boundingBox )
+					.applyMatrix4( object.matrixWorld );
+
+				return this.intersectsBox( box );
+
+			} else {
+
+				if ( geometry.boundingSphere === null )
+					geometry.computeBoundingSphere();
+
+				sphere.copy( geometry.boundingSphere )
+					.applyMatrix4( object.matrixWorld );
+
+				return this.intersectsSphere( sphere );
+
+			}
 
 		};
 
