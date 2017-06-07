@@ -1082,8 +1082,7 @@ function WebGLRenderer( parameters ) {
 	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
-
-		if ( camera !== undefined && camera.isCamera !== true ) {
+		if ( ! ( camera && camera.isCamera ) ) {
 
 			console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
