@@ -53,6 +53,14 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}(),
 
+	updateMatrixWorld: function ( force ) {
+
+		Object3D.prototype.updateMatrixWorld.call( this, force );
+
+		this.matrixWorldInverse.getInverse( this.matrixWorld );
+
+	},
+
 	clone: function () {
 
 		return new this.constructor().copy( this );

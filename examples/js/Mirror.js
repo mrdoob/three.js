@@ -143,7 +143,6 @@ THREE.Mirror = function ( width, height, options ) {
 
 		mirrorCamera.updateProjectionMatrix();
 		mirrorCamera.updateMatrixWorld();
-		mirrorCamera.matrixWorldInverse.getInverse( mirrorCamera.matrixWorld );
 
 		// Update the texture matrix
 		textureMatrix.set(

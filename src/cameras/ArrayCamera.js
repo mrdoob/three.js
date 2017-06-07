@@ -8,7 +8,6 @@ function ArrayCamera( array ) {
 
 	PerspectiveCamera.call( this );
 
-	this.enabled = false;
 	this.cameras = array || [];
 
 }

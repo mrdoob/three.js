@@ -350,7 +350,7 @@ Use WEBGL Depth buffer support?
 				mouse.x = ( event.clientX - windowHalfX ) / windowHalfX;
 				mouse.y = - ( event.clientY - windowHalfY ) / windowHalfY;
 
-				postprocessing.bokeh_uniforms[ 'focusCoords' ].value.set(event.clientX / window.innerWidth, 1-event.clientY / window.innerHeight);
+				postprocessing.bokeh_uniforms[ 'focusCoords' ].value.set(event.clientX / window.innerWidth, 1-(event.clientY / window.innerHeight));
 
 			}
 

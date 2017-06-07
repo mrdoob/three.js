@@ -202,7 +202,7 @@
 
 					var scale = labeldata[i].scale || 1;
 
-					var labelgeo = new THREE.TextGeometry( labeldata[i].label, {
+					var labelgeo = new THREE.TextBufferGeometry( labeldata[i].label, {
 						font: font,
 						size: labeldata[i].size,
 						height: labeldata[i].size / 2
