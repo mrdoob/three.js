@@ -709,6 +709,28 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	},
 
+	log: function () {
+
+		this.traverse( function ( obj ) {
+
+			var s = '|___';
+
+			var obj2 = obj;
+
+			while ( obj2.parent !== null ) {
+
+				s = '\t' + s;
+
+				obj2 = obj2.parent;
+
+			}
+
+			console.log( s + obj.name + ' <' + obj.type + '>' );
+
+		} );
+
+	},
+
 	clone: function ( recursive ) {
 
 		return new this.constructor().copy( this, recursive );
