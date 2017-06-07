@@ -124,6 +124,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 		function getDataURL( image ) {
 
 			var canvas;
+			var transparent = false;
 
 			if ( image.toDataURL !== undefined ) {
 
@@ -131,21 +132,35 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 			} else {
 
-				canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+				canvas = document.createElement( 'canvas' );
 				canvas.width = image.width;
 				canvas.height = image.height;
 
-				canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
+				var context = canvas.getContext( '2d' );
+				context.drawImage( image, 0, 0, image.width, image.height );
+
+				var data = context.getImageData( 0, 0, image.width, image.height ).data;
+
+				for( var i = 0; i < data.length; i += 4 ) {
+
+					if( data[i] !== 255 ) {
+
+						transparent = true;
+						break;
+
+					}
+
+				}
 
 			}
 
-			if ( canvas.width > 2048 || canvas.height > 2048 ) {
+			if ( transparent ) {
 
-				return canvas.toDataURL( 'image/jpeg', 0.6 );
+				return canvas.toDataURL( 'image/png' );
 
 			} else {
 
-				return canvas.toDataURL( 'image/png' );
+				return canvas.toDataURL( 'image/jpeg', 0.8 );
 
 			}
 
