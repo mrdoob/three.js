@@ -2158,7 +2158,7 @@ Object.assign( Quaternion.prototype, {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( ( euler && euler.isEuler ) === false ) {
+		if ( ! ( euler && euler.isEuler ) ) {
 
 			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
@@ -2804,7 +2804,7 @@ Object.assign( Vector3.prototype, {
 
 		return function applyEuler( euler ) {
 
-			if ( ( euler && euler.isEuler ) === false ) {
+			if ( ! ( euler && euler.isEuler ) ) {
 
 				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
@@ -3444,7 +3444,7 @@ Object.assign( Matrix4.prototype, {
 
 	makeRotationFromEuler: function ( euler ) {
 
-		if ( ( euler && euler.isEuler ) === false ) {
+		if ( ! ( euler && euler.isEuler ) ) {
 
 			console.error( 'THREE.Matrix: .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 
@@ -9989,10 +9989,8 @@ Object.assign( Ray.prototype, {
 
 	applyMatrix4: function ( matrix4 ) {
 
-		this.direction.add( this.origin ).applyMatrix4( matrix4 );
 		this.origin.applyMatrix4( matrix4 );
-		this.direction.sub( this.origin );
-		this.direction.normalize();
+		this.direction.transformDirection( matrix4 );
 
 		return this;
 
@@ -13881,7 +13879,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	addAttribute: function ( name, attribute ) {
 
-		if ( ( attribute && attribute.isBufferAttribute ) === false && ( attribute && attribute.isInterleavedBufferAttribute ) === false ) {
+		if ( ! ( attribute && attribute.isBufferAttribute ) && ! ( attribute && attribute.isInterleavedBufferAttribute ) ) {
 
 			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
@@ -14591,7 +14589,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	merge: function ( geometry, offset ) {
 
-		if ( ( geometry && geometry.isBufferGeometry ) === false ) {
+		if ( ! ( geometry && geometry.isBufferGeometry ) ) {
 
 			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
 			return;
@@ -20940,8 +20938,8 @@ function WebGLRenderer( parameters ) {
 	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
-
-		if ( camera !== undefined && camera.isCamera !== true ) {
+		
+		if ( ! ( camera && camera.isCamera ) ) {
 
 			console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
@@ -22548,7 +22546,7 @@ function WebGLRenderer( parameters ) {
 
 	this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer ) {
 
-		if ( ( renderTarget && renderTarget.isWebGLRenderTarget ) === false ) {
+		if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
 			console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
 			return;
@@ -27201,7 +27199,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	var font = parameters.font;
 
-	if ( ( font && font.isFont ) === false ) {
+	if ( ! ( font && font.isFont ) ) {
 
 		console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
 		return new Geometry();
