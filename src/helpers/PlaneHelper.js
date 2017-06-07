@@ -29,6 +29,22 @@ function PlaneHelper( plane, size, hex ) {
 
 	this.geometry.computeBoundingSphere();
 
+	//
+
+	var positions = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, - 1, 1, 1, - 1, 1 ];
+
+	var geometry = new BufferGeometry();
+
+	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+
+	var child = new THREE.Mesh( geometry, new LineBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) );
+
+	child.geometry.computeBoundingSphere();
+
+	this.add( child );
+
+	//
+
 	this.onBeforeRender();
 
 }
