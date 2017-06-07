@@ -20264,7 +20264,7 @@
 
 			_pixelRatio = value;
 
-			this.setSize( _viewport.z, _viewport.w, false );
+			this.setSize( _width, _height, false );
 
 		};
 
@@ -20298,14 +20298,14 @@
 
 		this.setViewport = function ( x, y, width, height ) {
 
-			_viewport.set( x, y, width, height );
+			_viewport.set( x, _height - y - height, width, height );
 			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
 		};
 
 		this.setScissor = function ( x, y, width, height ) {
 
-			_scissor.set( x, y, width, height );
+			_scissor.set( x, _height - y - height, width, height );
 			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
 
 		};
@@ -20944,7 +20944,7 @@
 		// Rendering
 
 		this.render = function ( scene, camera, renderTarget, forceClear ) {
-			
+
 			if ( ! ( camera && camera.isCamera ) ) {
 
 				console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
