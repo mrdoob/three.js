@@ -80,3 +80,45 @@ QUnit.test( "getWorldRotation" , function( assert ) {
 	obj.lookAt(new THREE.Vector3(1, 0, 0));
 	assert.numEqual( obj.getWorldRotation().y * RadToDeg, 90, "y is equal" );
 });
+
+QUnit.test( "add" , function( assert ) {
+	assert.expect( 14 );
+
+	var parent = new THREE.Object3D();
+	var child = new THREE.Object3D();
+
+	function parentAdd() {
+		assert.success( "parent dispatches 'add' event when adding a child" );
+		assert.strictEqual( parent.children[0], child, "parent has child when 'add' event dispatched" );
+		assert.strictEqual( parent, child.parent, "child has parent when 'add' event dispatched" );
+	}
+
+	function parentRemove() {
+		assert.success( "parent dispatches 'remove' event when removing a child" );
+		assert.strictEqual( parent.children.length, 0, "child removed from parent when 'remove' event dispatched" );
+		assert.strictEqual( child.parent, null, "child has no parent when 'remove' event dispatched" );
+	}
+
+	function childAdded() {
+		assert.success( "child dispatches 'added' event when adding to a parent object" );
+		assert.strictEqual( parent.children[0], child, "parent has child when 'added' event dispatched" );
+		assert.strictEqual( parent, child.parent, "child has parent when 'added' event dispatched" );
+	}
+
+	function childRemoved() {
+		assert.success( "child dispatches 'removed' event when removing from parent" );
+		assert.strictEqual( parent.children.length, 0, "child removed from parent when 'removed' event dispatched" );
+		assert.strictEqual( child.parent, null, "child has no parent when 'removed' event dispatched" );
+	}
+
+	parent.addEventListener( "add", parentAdd );
+	parent.addEventListener( "remove", parentRemove );
+	parent.addEventListener( "add", childAdded );
+	parent.addEventListener( "remove", childRemoved );
+
+	parent.add( child );
+	assert.strictEqual( parent.children[0], child, "parent has child after parent.add( child )" );
+	assert.strictEqual( parent, child.parent, "child has parent after parent.add( child )" );
+
+	parent.remove( child );
+});
