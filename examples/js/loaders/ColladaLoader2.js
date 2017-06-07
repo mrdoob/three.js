@@ -323,8 +323,9 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'skin':
-						var id = parseId( child.getAttribute( 'source' ) );
-						data.skin[ id ] = parseSkin( child );
+						// there is exactly one skin per controller
+						data.skin.id = parseId( child.getAttribute( 'source' ) );
+						data.skin.data = parseSkin( child );
 						break;
 
 				}
@@ -441,11 +442,106 @@ THREE.ColladaLoader.prototype = {
 
 		function buildController( data ) {
 
-			// for now, we only return the id of the skin in order to get the corresponding geometry
+			var build = {};
 
-			var keys = Object.keys( data.skin );
+			build.id = data.skin.id;
+			build.sources = buildSkin( data.skin.data );
 
-			return { id: keys[ 0 ] };
+			// we enhance the 'sources' property of the corresponding geometry with our skin data
+
+			var geometry = library.geometries[ build.id ];
+			geometry.sources.skinIndices = build.sources.skinIndices;
+			geometry.sources.skinWeights = build.sources.skinWeights;
+
+			return build;
+
+		}
+
+		function buildSkin( data ) {
+
+			var BONE_LIMIT = 4;
+
+			var build = {
+				skinIndices: {
+					array: [],
+					stride: BONE_LIMIT
+				},
+				skinWeights: {
+					array: [],
+					stride: BONE_LIMIT
+				}
+			};
+
+			var sources = data.sources;
+			var vertexWeights = data.vertexWeights;
+
+			var vcount = vertexWeights.vcount;
+			var v = vertexWeights.v;
+			var jointOffset = vertexWeights.inputs.JOINT.offset;
+			var weightOffset = vertexWeights.inputs.WEIGHT.offset;
+
+			var weights = sources[ vertexWeights.inputs.WEIGHT.id ].array;
+			var stride = 0;
+
+			var skinIndices = [];
+			var skinWeights = [];
+
+			// procces skin data for each vertex
+
+			for ( var i = 0, l = vcount.length; i < l; i ++ ) {
+
+				var jointCount = vcount[ i ]; // this is the amount of joints that affect a single vertex
+				var vertexSkinData = [];
+
+				for ( var j = 0; j < jointCount; j ++ ) {
+
+					var skinIndex = v[ stride + jointOffset ];
+					var weightId = v[ stride + weightOffset ];
+					var skinWeight = weights[ weightId ];
+
+					vertexSkinData.push( { index: skinIndex, weight: skinWeight } );
+
+					stride += 2;
+
+				}
+
+				// we sort the joints in descending order based on the weights.
+				// this ensures, we only procced the most important joints of the vertex
+
+				vertexSkinData.sort( descending );
+
+				// now we provide for each vertex a set of four index and weight values.
+				// the order of the skin data matches the order of vertices
+
+				for ( var j = 0; j < BONE_LIMIT; j ++ ) {
+
+					var d = vertexSkinData[ j ];
+
+					if ( d !== undefined ) {
+
+						build.skinIndices.array.push( d.index );
+						build.skinWeights.array.push( d.weight );
+
+					} else {
+
+						build.skinIndices.array.push( 0 );
+						build.skinWeights.array.push( 0 );
+
+					}
+
+				}
+
+			}
+
+			return build;
+
+			// array sort function
+
+			function descending( a, b ) {
+
+				return b.weight - a.weight;
+
+			}
 
 		}
 
@@ -1392,6 +1488,13 @@ THREE.ColladaLoader.prototype = {
 							for ( var key in vertices ) {
 
 								geometry.addAttribute( key.toLowerCase(), buildGeometryAttribute( primitive, sources[ vertices[ key ] ], input.offset ) );
+
+								if ( key.toLowerCase() === 'position' && sources.skinWeights && sources.skinIndices ) {
+
+									geometry.addAttribute( 'skinWeight', buildGeometryAttribute( primitive, sources.skinWeights, input.offset ) );
+									geometry.addAttribute( 'skinIndex', buildGeometryAttribute( primitive, sources.skinIndices, input.offset ) );
+
+								}
 
 							}
 							break;
