@@ -416,11 +416,11 @@ Object.assign( ObjectLoader.prototype, {
 
 		function loadImage( url ) {
 
-			scope.manager.itemStart( url );
+			manager.itemStart( url );
 
 			return loader.load( url, function () {
 
-				scope.manager.itemEnd( url );
+				manager.itemEnd( url );
 
 			}, undefined, function () {
 
