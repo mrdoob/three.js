@@ -69,6 +69,8 @@ function SkeletonHelper( object ) {
 
 	LineSegments.call( this, geometry, material );
 
+	this.type = 'SkeletonHelper';
+
 	this.root = object;
 	this.bones = bones;
 

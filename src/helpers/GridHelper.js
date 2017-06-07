@@ -44,6 +44,8 @@ function GridHelper( size, divisions, color1, color2 ) {
 
 	LineSegments.call( this, geometry, material );
 
+	this.type = 'GridHelper';
+
 }
 
 GridHelper.prototype = Object.create( LineSegments.prototype );

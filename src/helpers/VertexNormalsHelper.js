@@ -46,7 +46,7 @@ function VertexNormalsHelper( object, size, hex, linewidth ) {
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
 
-	//
+	this.type = 'VertexNormalsHelper';
 
 	this.matrixAutoUpdate = false;
 

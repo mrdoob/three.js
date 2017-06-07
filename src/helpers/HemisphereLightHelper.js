@@ -17,6 +17,8 @@ function HemisphereLightHelper( light, size ) {
 
 	Object3D.call( this );
 
+	this.type = 'HemisphereLightHelper';
+
 	this.light = light;
 	this.light.updateMatrixWorld();
 

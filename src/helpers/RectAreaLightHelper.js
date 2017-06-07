@@ -15,6 +15,8 @@ function RectAreaLightHelper( light ) {
 
 	Object3D.call( this );
 
+	this.type = 'RectAreaLightHelper';
+
 	this.light = light;
 	this.light.updateMatrixWorld();
 

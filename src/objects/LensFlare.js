@@ -12,6 +12,8 @@ function LensFlare( texture, size, distance, blending, color ) {
 
 	Object3D.call( this );
 
+	this.type = 'LensFlare';
+
 	this.lensFlares = [];
 
 	this.positionScreen = new Vector3();
