@@ -335,7 +335,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 			this.children.push( object );
 
 			object.dispatchEvent( { type: 'added' } );
-			this.dispatchEvent( { type: 'add', child: object } );
+			this.dispatchEvent( { type: 'childAdded', child: object } );
 
 		} else {
 
@@ -367,7 +367,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 			this.children.splice( index, 1 );
 
 			object.dispatchEvent( { type: 'removed' } );
-			this.dispatchEvent( { type: 'remove', child: object } );
+			this.dispatchEvent( { type: 'childRemoved', child: object } );
 
 		}
 
