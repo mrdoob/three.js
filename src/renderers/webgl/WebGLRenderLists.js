@@ -152,7 +152,7 @@ function WebGLRenderLists() {
 
 		if ( list === undefined ) {
 
-			console.log( 'THREE.WebGLRenderLists:', hash );
+			// console.log( 'THREE.WebGLRenderLists:', hash );
 
 			list = new WebGLRenderList();
 			lists[ hash ] = list;

@@ -76,7 +76,7 @@ DirectionalLightHelper.prototype.update = function () {
 		var targetLine = this.children[ 1 ];
 
 		lightPlane.lookAt( v3 );
-		lightPlane.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		lightPlane.material.color.copy( this.light.color );
 
 		targetLine.lookAt( v3 );
 		targetLine.scale.z = v3.length();

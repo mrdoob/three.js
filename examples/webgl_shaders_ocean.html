@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - geometry - terrain</title>
+		<title>three.js webgl - shaders - ocean</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
+
 			body {
 				color: #000;
 				font-family:Monospace;
@@ -20,21 +21,18 @@
 				padding: 5px;
 			}
 
-			a {
-
-				color: #a06851;
-			}
-
 		</style>
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl ocean demo</div>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl ocean demo
+		</div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Mirror.js"></script>
 		<script src="js/WaterShader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -70,19 +68,26 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				container = document.getElementById( 'container' );
+
+				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				//
+
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2(0xaabbbb, 0.0001);
+				scene.fog = new THREE.FogExp2( 0xaabbbb, 0.0001 );
+
+				//
 
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.5, 3000000 );
 				camera.position.set( 2000, 750, 2000 );
+
+				//
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.enablePan = false;
@@ -93,10 +98,13 @@
 
 				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
+				//
+
 				var light = new THREE.DirectionalLight( 0xffffbb, 1 );
 				light.position.set( - 1, 1, - 1 );
 				scene.add( light );
 
+				//
 
 				waterNormals = new THREE.TextureLoader().load( 'textures/waternormals.jpg' );
 				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
@@ -123,8 +131,7 @@
 				mirrorMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( mirrorMesh );
 
-
-				// load skybox
+				// skybox
 
 				var cubeMap = new THREE.CubeTexture( [] );
 				cubeMap.format = THREE.RGBFormat;
@@ -175,6 +182,7 @@
 
 				scene.add( skyBox );
 
+				//
 
 				var geometry = new THREE.IcosahedronGeometry( 400, 4 );
 
@@ -193,6 +201,24 @@
 				sphere = new THREE.Mesh( geometry, material );
 				scene.add( sphere );
 
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			//
@@ -201,6 +227,7 @@
 
 				requestAnimationFrame( animate );
 				render();
+				stats.update();
 
 			}
 

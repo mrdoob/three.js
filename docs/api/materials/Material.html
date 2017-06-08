@@ -17,8 +17,8 @@
 		They are defined in a (mostly) renderer-independent way, so you don't have to
 		rewrite materials if you decide to use a different renderer.<br /><br />
 
-		With the exception of [page:MultiMaterial MultiMaterial], the following properties
-		and methods are inherited by all other material types (although they may have different defaults).
+		The following properties and methods are inherited by all other material types
+		(although they may have different defaults).
 		</div>
 
 		<h2>Constructor</h2>
@@ -195,6 +195,12 @@
 		<div>
 		Whether to premultiply the alpha (transparency) value.
 		See [Example:webgl_materials_transparency WebGL / Materials / Transparency] for an example of the difference.
+		Default is *false*.
+		</div>
+
+		<h3>[property:Boolean dithering]</h3>
+		<div>
+		Whether to apply dithering to the color to remove the appearance of banding.
 		Default is *false*.
 		</div>
 

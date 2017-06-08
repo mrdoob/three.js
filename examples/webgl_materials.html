@@ -27,7 +27,7 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-			var particleLight;
+			var pointLight;
 
 			var objects = [], materials = [];
 
@@ -46,22 +46,9 @@
 
 				// Grid
 
-				var line_material = new THREE.LineBasicMaterial( { color: 0x303030 } ),
-					geometry = new THREE.Geometry(),
-					floor = -75, step = 25;
-
-				for ( var i = 0; i <= 40; i ++ ) {
-
-					geometry.vertices.push( new THREE.Vector3( - 500, floor, i * step - 500 ) );
-					geometry.vertices.push( new THREE.Vector3(   500, floor, i * step - 500 ) );
-
-					geometry.vertices.push( new THREE.Vector3( i * step - 500, floor, -500 ) );
-					geometry.vertices.push( new THREE.Vector3( i * step - 500, floor,  500 ) );
-
-				}
-
-				var line = new THREE.LineSegments( geometry, line_material );
-				scene.add( line );
+				var helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
+				helper.position.y = - 75;
+				scene.add( helper );
 
 				// Materials
 
@@ -110,25 +97,23 @@
 
 				addMesh( geometry, materials );
 
-				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
-				scene.add( particleLight );
-
 				// Lights
 
 				scene.add( new THREE.AmbientLight( 0x111111 ) );
 
-				var directionalLight = new THREE.DirectionalLight( /*Math.random() * */ 0xffffff, 0.125 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
 
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
-
 				directionalLight.position.normalize();
 
 				scene.add( directionalLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 1 );
-				particleLight.add( pointLight );
+				pointLight = new THREE.PointLight( 0xffffff, 1 );
+				scene.add( pointLight );
+
+				pointLight.add( new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
 
 				//
 
@@ -235,9 +220,9 @@
 				materials[ materials.length - 2 ].emissive.setHSL( 0.54, 1, 0.35 * ( 0.5 + 0.5 * Math.sin( 35 * timer ) ) );
 				materials[ materials.length - 3 ].emissive.setHSL( 0.04, 1, 0.35 * ( 0.5 + 0.5 * Math.cos( 35 * timer ) ) );
 
-				particleLight.position.x = Math.sin( timer * 7 ) * 300;
-				particleLight.position.y = Math.cos( timer * 5 ) * 400;
-				particleLight.position.z = Math.cos( timer * 3 ) * 300;
+				pointLight.position.x = Math.sin( timer * 7 ) * 300;
+				pointLight.position.y = Math.cos( timer * 5 ) * 400;
+				pointLight.position.z = Math.cos( timer * 3 ) * 300;
 
 				renderer.render( scene, camera );
 

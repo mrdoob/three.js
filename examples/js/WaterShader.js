@@ -210,8 +210,35 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 
 };
 
-THREE.Water.prototype = Object.create( THREE.Mirror.prototype );
+THREE.Water.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Water.prototype.constructor = THREE.Water;
+
+THREE.Water.prototype.render = function () {
+
+	if ( this.matrixNeedsUpdate ) this.updateTextureMatrix();
+
+	this.matrixNeedsUpdate = true;
+
+	// Render the mirrored view of the current scene into the target texture
+	var scene = this;
+
+	while ( scene.parent !== null ) {
+
+		scene = scene.parent;
+
+	}
+
+	if ( scene !== undefined && scene instanceof THREE.Scene ) {
+
+		this.material.visible = false;
+
+		this.renderer.render( scene, this.mirrorCamera, this.renderTarget, true );
+
+		this.material.visible = true;
+
+	}
+
+};
 
 
 THREE.Water.prototype.updateTextureMatrix = function () {

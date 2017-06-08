@@ -718,12 +718,12 @@ THREE.GLTF2Loader = ( function () {
 
 			switch ( semantic ) {
 
-				case "POSITION":
+				case 'POSITION':
 
 					shaderText = shaderText.replace( regEx, 'position' );
 					break;
 
-				case "NORMAL":
+				case 'NORMAL':
 
 					shaderText = shaderText.replace( regEx, 'normal' );
 					break;
@@ -735,6 +735,11 @@ THREE.GLTF2Loader = ( function () {
 					shaderText = shaderText.replace( regEx, 'uv' );
 					break;
 
+				case 'TEXCOORD_1':
+
+					shaderText = shaderText.replace( regEx, 'uv2' );
+					break;
+
 				case 'COLOR_0':
 				case 'COLOR0':
 				case 'COLOR':
@@ -742,12 +747,14 @@ THREE.GLTF2Loader = ( function () {
 					shaderText = shaderText.replace( regEx, 'color' );
 					break;
 
-				case "WEIGHT":
+				case 'WEIGHTS_0':
+				case 'WEIGHT': // WEIGHT semantic deprecated.
 
 					shaderText = shaderText.replace( regEx, 'skinWeight' );
 					break;
 
-				case "JOINT":
+				case 'JOINTS_0':
+				case 'JOINT': // JOINT semantic deprecated.
 
 					shaderText = shaderText.replace( regEx, 'skinIndex' );
 					break;
@@ -1689,9 +1696,15 @@ THREE.GLTF2Loader = ( function () {
 
 					var primitive = primitives[ name ];
 
+					var material = primitive.material !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
+
+					var geometry;
+
+					var meshNode;
+
 					if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
 
-						var geometry = new THREE.BufferGeometry();
+						geometry = new THREE.BufferGeometry();
 
 						var attributes = primitive.attributes;
 
@@ -1706,30 +1719,43 @@ THREE.GLTF2Loader = ( function () {
 							switch ( attributeId ) {
 
 								case 'POSITION':
+
 									geometry.addAttribute( 'position', bufferAttribute );
 									break;
 
 								case 'NORMAL':
+
 									geometry.addAttribute( 'normal', bufferAttribute );
 									break;
 
 								case 'TEXCOORD_0':
 								case 'TEXCOORD0':
 								case 'TEXCOORD':
+
 									geometry.addAttribute( 'uv', bufferAttribute );
+									break;
+
+								case 'TEXCOORD_1':
+
+									geometry.addAttribute( 'uv2', bufferAttribute );
 									break;
 
 								case 'COLOR_0':
 								case 'COLOR0':
 								case 'COLOR':
+
 									geometry.addAttribute( 'color', bufferAttribute );
 									break;
 
-								case 'WEIGHT':
+								case 'WEIGHTS_0':
+								case 'WEIGHT': // WEIGHT semantic deprecated.
+
 									geometry.addAttribute( 'skinWeight', bufferAttribute );
 									break;
 
-								case 'JOINT':
+								case 'JOINTS_0':
+								case 'JOINT': // JOINT semantic deprecated.
+
 									geometry.addAttribute( 'skinIndex', bufferAttribute );
 									break;
 
@@ -1743,19 +1769,12 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						var material = dependencies.materials !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
-
-						var meshNode = new THREE.Mesh( geometry, material );
+						meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
-						meshNode.name = ( name === "0" ? group.name : group.name + name );
-
-						if ( primitive.extras ) meshNode.userData = primitive.extras;
-
-						group.add( meshNode );
 
 					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
 
-						var geometry = new THREE.BufferGeometry();
+						geometry = new THREE.BufferGeometry();
 
 						var attributes = primitive.attributes;
 
@@ -1783,10 +1802,6 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						var material = dependencies.materials[ primitive.material ];
-
-						var meshNode;
-
 						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
@@ -1799,17 +1814,24 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						meshNode.name = ( name === "0" ? group.name : group.name + name );
-
-						if ( primitive.extras ) meshNode.userData = primitive.extras;
-
-						group.add( meshNode );
-
 					} else {
 
-						console.warn( "Only triangular and line primitives are supported" );
+						throw new Error( "Only triangular and line primitives are supported" );
 
 					}
+
+					if ( geometry.attributes.color !== undefined ) {
+
+						material.vertexColors = THREE.VertexColors;
+						material.needsUpdate = true;
+
+					}
+
+					meshNode.name = ( name === "0" ? group.name : group.name + name );
+
+					if ( primitive.extras ) meshNode.userData = primitive.extras;
+
+					group.add( meshNode );
 
 				}
 
@@ -1911,7 +1933,7 @@ THREE.GLTF2Loader = ( function () {
 					if ( sampler ) {
 
 						var target = channel.target;
-						var name = target.id;
+						var name = target.node || target.id; // NOTE: target.id is deprecated.
 						var input = animation.parameters !== undefined ? animation.parameters[ sampler.input ] : sampler.input;
 						var output = animation.parameters !== undefined ? animation.parameters[ sampler.output ] : sampler.output;
 

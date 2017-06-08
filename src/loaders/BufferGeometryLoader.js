@@ -22,9 +22,10 @@ Object.assign( BufferGeometryLoader.prototype, {
 		var scope = this;
 
 		var loader = new FileLoader( scope.manager );
-		loader.load( url, function ( text ) {
+		loader.setResponseType( 'json' );
+		loader.load( url, function ( json ) {
 
-			onLoad( scope.parse( JSON.parse( text ) ) );
+			onLoad( scope.parse( json ) );
 
 		}, onProgress, onError );
 
@@ -35,18 +36,6 @@ Object.assign( BufferGeometryLoader.prototype, {
 		var geometry = new BufferGeometry();
 
 		var index = json.data.index;
-
-		var TYPED_ARRAYS = {
-			'Int8Array': Int8Array,
-			'Uint8Array': Uint8Array,
-			'Uint8ClampedArray': Uint8ClampedArray,
-			'Int16Array': Int16Array,
-			'Uint16Array': Uint16Array,
-			'Int32Array': Int32Array,
-			'Uint32Array': Uint32Array,
-			'Float32Array': Float32Array,
-			'Float64Array': Float64Array
-		};
 
 		if ( index !== undefined ) {
 
@@ -102,5 +91,16 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 } );
 
+var TYPED_ARRAYS = {
+	Int8Array: Int8Array,
+	Uint8Array: Uint8Array,
+	Uint8ClampedArray: Uint8ClampedArray,
+	Int16Array: Int16Array,
+	Uint16Array: Uint16Array,
+	Int32Array: Int32Array,
+	Uint32Array: Uint32Array,
+	Float32Array: Float32Array,
+	Float64Array: Float64Array
+};
 
 export { BufferGeometryLoader };

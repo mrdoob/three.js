@@ -153,7 +153,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		var output = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'Texture',
 				generator: 'Texture.toJSON'
 			},

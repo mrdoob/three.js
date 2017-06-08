@@ -6,42 +6,39 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
+				background:#777;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
 			}
 
 			#info {
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0px;
+				width: 100%;
+				color: #ffffff;
 				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
 			}
 
 			a {
-
-				color: #f00;
+				color: #ffffff;
 			}
-
 		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
-
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - collada - skinning
+			<a href="https://threejs.org" target="_blank">three.js</a> webgl - collada - skinning
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/loaders/collada/Animation.js"></script>
-		<script src="js/loaders/collada/AnimationHandler.js"></script>
-		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
 		<script src="js/loaders/ColladaLoader.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -49,60 +46,82 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
-			var camera, scene, renderer;
-			var clock = new THREE.Clock();
+			var container, stats, clock;
+			var camera, scene, renderer, mixer;
 
 			init();
+			animate();
 
 			function init() {
 
 				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( -5, -5, 5 );
-				camera.up.set( 0, 0, 1 );
+				camera.position.set( - 7, 4, 7 );
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light.position.set( 0, -4, -4 ).normalize();
-				scene.add( light );
+				clock = new THREE.Clock();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xfff4e5 );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
-				container.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-				
+				// collada
 
 				var loader = new THREE.ColladaLoader();
+				loader.options.convertUpAxis = true;
 				loader.load( "./models/collada/avatar.dae", function ( collada ) {
-				
-					collada.scene.traverse( function ( child ) {
+
+					var object = collada.scene;
+
+					mixer = new THREE.AnimationMixer( object );
+
+					object.traverse( function ( child ) {
 
 						if ( child instanceof THREE.SkinnedMesh ) {
 
-							var animation = new THREE.Animation( child, child.geometry.animation );
-							animation.play();
-
-							camera.lookAt( child.position );
+							var clip = THREE.AnimationClip.parseAnimation( child.geometry.animation, child.geometry.bones );
+							mixer.clipAction( clip, child ).play();
 
 						}
 
 					} );
 
-					scene.add( collada.scene );
+					scene.add( object );
 
 				} );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				//
 
-				animate();
+				var gridHelper = new THREE.GridHelper( 5, 20 );
+				scene.add( gridHelper );
+
+				//
+
+				var ambientLight = new THREE.AmbientLight( 0xcccccc );
+				scene.add( ambientLight );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight.position.set( -1, 0.5, -1 ).normalize();
+				scene.add( directionalLight );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
+				container.appendChild( renderer.domElement );
+
+				//
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -117,13 +136,24 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate, renderer.domElement );
+				requestAnimationFrame( animate );
 
-				THREE.AnimationHandler.update( clock.getDelta() );
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				if ( mixer !== undefined ) {
+
+					mixer.update( delta );
+
+				}
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 
@@ -131,4 +161,3 @@
 
 	</body>
 </html>
-
