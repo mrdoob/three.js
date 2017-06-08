@@ -91,26 +91,27 @@ function updateGroupGeometry( mesh, geometry ) {
 
 }
 
-function CustomSinCurve( scale ) {
-
-	THREE.Curve.call( this );
+function CustomSinCurve( scale ){
 
 	this.scale = ( scale === undefined ) ? 1 : scale;
+	this.xEq = "t * 3 - 1.5";
+	this.yEq = "Math.sin( 2 * Math.PI * t )";
+	this.zEq = "0";
 
 }
 
 CustomSinCurve.prototype = Object.create( THREE.Curve.prototype );
 CustomSinCurve.prototype.constructor = CustomSinCurve;
 
-CustomSinCurve.prototype.getPoint = function ( t ) {
+// CustomSinCurve.prototype.getPoint = function ( t ) {
 
-	var tx = t * 3 - 1.5;
-	var ty = Math.sin( 2 * Math.PI * t );
-	var tz = 0;
+// 	var tx = eval( this.xEq );
+// 	var ty = eval( this.yEq );
+// 	var tz = eval( this.zEq );
 
-	return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+// 	return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
 
-};
+// };
 
 // heart shape
 
@@ -746,7 +747,7 @@ var guis = {
 
 		var folder = gui.addFolder( 'THREE.RingBufferGeometry' );
 
-		folder.add( data, 'innerRadius', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
@@ -780,7 +781,7 @@ var guis = {
 
 		var folder = gui.addFolder( 'THREE.RingGeometry' );
 
-		folder.add( data, 'innerRadius', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
@@ -1302,46 +1303,6 @@ var guis = {
 
 		generateGeometry();
 
-	},
-
-	ExtrudeBufferGeometry: function( mesh ) {
-
-		var data = {
-			steps: 2,
-			amount: 16,
-			bevelEnabled: true,
-			bevelThickness: 1,
-			bevelSize: 1,
-			bevelSegments: 1
-		};
-
-		var length = 12, width = 8;
-
-		var shape = new THREE.Shape();
-		shape.moveTo( 0,0 );
-		shape.lineTo( 0, width );
-		shape.lineTo( length, width );
-		shape.lineTo( length, 0 );
-		shape.lineTo( 0, 0 );
-
-		function generateGeometry() {
-
-			updateGroupGeometry( mesh,
-				new THREE.ExtrudeBufferGeometry( shape, data )
-			);
-
-		}
-
-		var folder = gui.addFolder( 'THREE.ExtrudeBufferGeometry' );
-
-		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );
-
-		generateGeometry();
-
 	}
 
 };
@@ -1366,3 +1327,5 @@ function chooseFromHash ( mesh ) {
 	return {};
 
 }
+
+

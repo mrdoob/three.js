@@ -11716,7 +11716,6 @@
 		}
 
 		this.uuid = _Math.generateUUID();
-		this.name = '';
 
 		this.array = array;
 		this.itemSize = itemSize;
@@ -14961,53 +14960,17 @@
 
 		updateMorphTargets: function () {
 
-			var geometry = this.geometry;
-			var m, ml, name;
+			var morphTargets = this.geometry.morphTargets;
 
-			if ( geometry.isBufferGeometry ) {
+			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
 
-				var morphAttributes = geometry.morphAttributes;
-				var keys = Object.keys( morphAttributes );
+				this.morphTargetInfluences = [];
+				this.morphTargetDictionary = {};
 
-				if ( keys.length > 0 ) {
+				for ( var m = 0, ml = morphTargets.length; m < ml; m ++ ) {
 
-					var morphAttribute = morphAttributes[ keys[ 0 ] ];
-
-					if ( morphAttribute !== undefined ) {
-
-						this.morphTargetInfluences = [];
-						this.morphTargetDictionary = {};
-
-						for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
-
-							name = morphAttribute[ m ].name || String( m );
-
-							this.morphTargetInfluences.push( 0 );
-							this.morphTargetDictionary[ name ] = m;
-
-						}
-
-					}
-
-				}
-
-			} else {
-
-				var morphTargets = geometry.morphTargets;
-
-				if ( morphTargets !== undefined && morphTargets.length > 0 ) {
-
-					this.morphTargetInfluences = [];
-					this.morphTargetDictionary = {};
-
-					for ( m = 0, ml = morphTargets.length; m < ml; m ++ ) {
-
-						name = morphTargets[ m ].name || String( m );
-
-						this.morphTargetInfluences.push( 0 );
-						this.morphTargetDictionary[ name ] = m;
-
-					}
+					this.morphTargetInfluences.push( 0 );
+					this.morphTargetDictionary[ morphTargets[ m ].name ] = m;
 
 				}
 
@@ -17746,8 +17709,6 @@
 				array.push( parameters[ parameterNames[ i ] ] );
 
 			}
-
-			array.push( renderer.gammaOutput );
 
 			return array.join();
 
@@ -25185,6 +25146,7 @@
 			closed: closed
 		};
 
+		path = new Curve(path.scale,path.xEq,path.yEq,path.zEq);
 		tubularSegments = tubularSegments || 64;
 		radius = radius || 1;
 		radialSegments = radialSegments || 8;
@@ -33608,6 +33570,19 @@
 
 							break;
 
+						case 'TubeGeometry':
+						case 'TubeBufferGeometry':
+
+							geometry = new Geometries[ data.type ](
+								data.path,
+								data.tubularSegments,
+								data.radius,
+								data.radialSegments,
+								data.closed
+							);
+
+							break;
+
 						case 'TorusKnotGeometry':
 						case 'TorusKnotBufferGeometry':
 
@@ -34257,10 +34232,13 @@
 	 *	Abstract Curve base class
 	 **************************************************************/
 
-	function Curve() {
+	function Curve(scale,xEq,yEq,zEq) {
 
 		this.arcLengthDivisions = 200;
-
+		this.scale = scale;
+		this.xEq=xEq;
+		this.yEq=yEq;
+		this.zEq=zEq;
 	}
 
 	Object.assign( Curve.prototype, {
@@ -34268,10 +34246,12 @@
 		// Virtual base class method to overwrite and implement in subclasses
 		//	- t [0 .. 1]
 
-		getPoint: function () {
+		getPoint: function (t) {
+			var tx = eval(this.xEq);
+			var ty = eval(this.yEq);
+			var tz = eval(this.zEq);
 
-			console.warn( 'THREE.Curve: .getPoint() not implemented.' );
-			return null;
+			return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
 
 		},
 
@@ -37378,6 +37358,12 @@
 
 					}
 
+
+					if ( ! targetObject.geometry.morphTargets ) {
+
+						console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
+						return;
+
 					if ( targetObject.geometry.isBufferGeometry ) {
 
 						if ( ! targetObject.geometry.morphAttributes ) {
@@ -37406,16 +37392,14 @@
 							console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences because node does not have a geometry.morphTargets.', this );
 							return;
 
-						}
+					}
 
-						for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+					for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
 
-							if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
+						if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
 
-								propertyIndex = i;
-								break;
-
-							}
+							propertyIndex = i;
+							break;
 
 						}
 

@@ -35,11 +35,12 @@
 		<h2>Example</h2>
 
 		<code>
-		function CustomSinCurve( scale ) {
-
-			THREE.Curve.call( this );
+		function CustomSinCurve( scale ){
 
 			this.scale = ( scale === undefined ) ? 1 : scale;
+			this.xEq = "t * 3 - 1.5";
+			this.yEq = "Math.sin( 2 * Math.PI * t )";
+			this.zEq = "0";
 
 		}
 
@@ -48,9 +49,9 @@
 
 		CustomSinCurve.prototype.getPoint = function ( t ) {
 
-			var tx = t * 3 - 1.5;
-			var ty = Math.sin( 2 * Math.PI * t );
-			var tz = 0;
+			var tx = eval( this.xEq );
+			var ty = eval( this.yEq );
+			var tz = eval( this.zEq );
 
 			return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
 
