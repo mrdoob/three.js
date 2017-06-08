@@ -53,6 +53,7 @@ var list = {
 			"AudioAnalyser": "api/audio/AudioAnalyser",
 			"AudioContext": "api/audio/AudioContext",
 			"AudioListener": "api/audio/AudioListener",
+			"AudioStream": "api/audio/AudioStream",
 			"PositionalAudio": "api/audio/PositionalAudio"
 		},
 

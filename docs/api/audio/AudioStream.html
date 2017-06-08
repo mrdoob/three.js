@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+			Wrapper for a HTML5 audio stream.
+		</div>
+
+
+		<h2>Example</h2>
+
+		<div>[example:misc_sound_stream misc / sound_stream ]</div>
+		<code>
+		// create an AudioListener and add it to the camera
+		var listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create an audio stream
+		var audioStream = new THREE.AudioStream( listener );
+		audioStream.setAudioElement( new Audio( 'myaudio.mp3' ) );
+		audioStream.play();
+
+		</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:AudioListener listener] )</h3>
+		<div>
+		listener — (required) [page:AudioListener AudioListener] instance.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:HTMLAudioElement audioElement]</h3>
+		<div>The [link:https://developer.mozilla.org/de/docs/Web/API/HTMLAudioElement HTMLAudioElement] that represents the actual stream.</div>
+
+		<h3>[property:AudioContext context]</h3>
+		<div>The [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] of the [page:AudioListener listener] given in the constructor.</div>
+
+		<h3>[property:GainNode gain]</h3>
+		<div>A [link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode] created
+		using [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]().</div>
+
+		<h3>[property:String source]</h3>
+		<div>An [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode AudioBufferSourceNode] created
+		using [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createBufferSource AudioContext.createBufferSource]().</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:GainNode getOutput]()</h3>
+		<div>
+		Returns the [page:.gain gainNode].
+		</div>
+
+		<h3>[method:AudioStream setAudioElement]( audioElement )</h3>
+		<div>
+		Sets the [link:https://developer.mozilla.org/de/docs/Web/API/HTMLAudioElement HTMLAudioElement].
+		</div>
+
+		<h3>[method:AudioStream play]()</h3>
+		<div>
+		Starts playback.
+		</div>
+
+		<h3>[method:AudioStream pause]()</h3>
+		<div>
+		Pauses playback.
+		</div>
+
+		<h3>[method:Number getCurrentTime]()</h3>
+		<div>
+		Returns the current time of the audio.
+		</div>
+
+		<h3>[method:AudioStream setCurrentTime]( value )</h3>
+		<div>
+		Sets the current time of the audio.
+		</div>
+
+		<h3>[method:Number getVolume]()</h3>
+		<div>
+		Returns the current volume.
+		</div>
+
+		<h3>[method:AudioStream setVolume]( value )</h3>
+		<div>
+		Sets the current volume.
+		</div>
+
+		<h3>[method:Number getLoop]()</h3>
+		<div>
+		Returns the loop property of the [page:.audioElement].
+		</div>
+
+		<h3>[method:AudioStream setLoop]( value )</h3>
+		<div>
+		Sets the loop property of the [page:.audioElement]. If set to true, the audio will start over again, every time it is finished.
+		</div>
+
+		<h3>[method:AudioStream connect]()</h3>
+		<div>
+		Connects to the output node.
+		</div>
+
+		<h3>[method:AudioStream disconnect]()</h3>
+		<div>
+		Disconnects from the output node.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
