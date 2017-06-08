@@ -92,10 +92,6 @@ function Object3D() {
 	this.renderOrder = 0;
 
 	this.userData = {};
-
-	this.onBeforeRender = function () {};
-	this.onAfterRender = function () {};
-
 }
 
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
@@ -105,11 +101,22 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	isObject3D: true,
 
+	onBeforeRender: function () {},
+	onAfterRender: function () {},
+
 	applyMatrix: function ( matrix ) {
 
 		this.matrix.multiplyMatrices( matrix, this.matrix );
 
 		this.matrix.decompose( this.position, this.quaternion, this.scale );
+
+	},
+
+	applyQuaternion: function ( q ) {
+
+		this.quaternion.premultiply( q );
+
+		return this;
 
 	},
 
@@ -273,7 +280,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	lookAt: function () {
 
-		// This routine does not support objects with rotated and/or translated parent(s)
+		// This method does not support objects with rotated and/or translated parent(s)
 
 		var m1 = new Matrix4();
 

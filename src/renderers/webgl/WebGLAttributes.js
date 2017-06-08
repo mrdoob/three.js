@@ -26,7 +26,7 @@ function WebGLAttributes( gl ) {
 
 		} else if ( array instanceof Float64Array ) {
 
-			console.warn( "Unsupported data buffer format: Float64Array" );
+			console.warn( 'THREE.WebGLAttributes: Unsupported data buffer format: Float64Array.' );
 
 		} else if ( array instanceof Uint16Array ) {
 

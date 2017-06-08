@@ -10,7 +10,7 @@ This utility refactors THREE.js JSON model files that were exported using `Three
 
 * THREE.js JSON (.js)
 
-## Usage 
+## Usage
 
 ```
 annotate.py [-h] [-u] -i FILE -o FILE range [range ...]
@@ -48,16 +48,6 @@ example:
 
 ```
 ./annotate.py -i model.js -o model.new.js idle=1..10 walk=1..20
-```
-
-```
-// ...
-this.animation = new THREE.Animation(
-    mesh,
-    geometry.animations.walk,
-    THREE.AnimationHandler.CATMULLROM
-);
-// ...
 ```
 
 ## Contribution

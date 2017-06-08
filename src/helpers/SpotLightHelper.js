@@ -71,6 +71,8 @@ SpotLightHelper.prototype.update = function () {
 
 	return function update() {
 
+		this.light.updateMatrixWorld();
+
 		var coneLength = this.light.distance ? this.light.distance : 1000;
 		var coneWidth = coneLength * Math.tan( this.light.angle );
 

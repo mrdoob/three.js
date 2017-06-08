@@ -245,13 +245,22 @@ THREE.STLLoader.prototype = {
 		if ( typeof buf !== "string" ) {
 
 			var array_buffer = new Uint8Array( buf );
-			var strArray = [];
-			for ( var i = 0; i < buf.byteLength; i ++ ) {
 
-				strArray.push(String.fromCharCode( array_buffer[ i ] )); // implicitly assumes little-endian
+			if ( window.TextDecoder !== undefined ) {
+
+				return new TextDecoder().decode( array_buffer );
 
 			}
-			return strArray.join('');
+
+			var str = '';
+
+			for ( var i = 0, il = buf.byteLength; i < il; i ++ ) {
+
+				str += String.fromCharCode( array_buffer[ i ] ); // implicitly assumes little-endian
+
+			}
+
+			return str;
 
 		} else {
 

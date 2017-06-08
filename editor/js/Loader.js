@@ -25,6 +25,20 @@ var Loader = function ( editor ) {
 
 		switch ( extension ) {
 
+			case '3ds':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var loader = new THREE.TDSLoader();
+					var object = loader.parse( event.target.result );
+
+					editor.execute( new AddObjectCommand( object ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'amf':
 
 				reader.addEventListener( 'load', function ( event ) {
@@ -151,7 +165,7 @@ var Loader = function ( editor ) {
 					editor.execute( new AddObjectCommand( object ) );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 

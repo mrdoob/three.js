@@ -561,29 +561,6 @@ var Viewport = function ( editor ) {
 
 		requestAnimationFrame( animate );
 
-		/*
-
-		// animations
-
-		if ( THREE.AnimationHandler.animations.length > 0 ) {
-
-			THREE.AnimationHandler.update( 0.016 );
-
-			for ( var i = 0, l = sceneHelpers.children.length; i < l; i ++ ) {
-
-				var helper = sceneHelpers.children[ i ];
-
-				if ( helper instanceof THREE.SkeletonHelper ) {
-
-					helper.update();
-
-				}
-
-			}
-
-		}
-		*/
-
 		if ( vrEffect && vrEffect.isPresenting ) {
 
 			render();

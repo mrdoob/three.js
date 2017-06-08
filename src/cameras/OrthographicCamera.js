@@ -33,9 +33,9 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	isOrthographicCamera: true,
 
-	copy: function ( source ) {
+	copy: function ( source, recursive ) {
 
-		Camera.prototype.copy.call( this, source );
+		Camera.prototype.copy.call( this, source, recursive );
 
 		this.left = source.left;
 		this.right = source.right;

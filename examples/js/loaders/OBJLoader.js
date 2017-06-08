@@ -10,11 +10,11 @@ THREE.OBJLoader = function ( manager ) {
 
 	this.regexp = {
 		// v float float float
-		vertex_pattern           : /^v\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		vertex_pattern           : /^v\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/,
 		// vn float float float
-		normal_pattern           : /^vn\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		normal_pattern           : /^vn\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/,
 		// vt float float
-		uv_pattern               : /^vt\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		uv_pattern               : /^vt\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/,
 		// f vertex vertex vertex
 		face_vertex              : /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/,
 		// f vertex/uv vertex/uv vertex/uv
@@ -615,7 +615,18 @@ THREE.OBJLoader.prototype = {
 				// Example asset: examples/models/obj/cerberus/Cerberus.obj
 
 				var value = result[ 1 ].trim().toLowerCase();
-				state.object.smooth = ( value === '1' || value === 'on' );
+				/*
+				 * http://paulbourke.net/dataformats/obj/
+				 * or
+				 * http://www.cs.utah.edu/~boulos/cs3505/obj_spec.pdf
+				 *
+				 * From chapter "Grouping" Syntax explanation "s group_number":
+				 * "group_number is the smoothing group number. To turn off smoothing groups, use a value of 0 or off.
+				 * Polygonal elements use group numbers to put elements in different smoothing groups. For free-form
+				 * surfaces, smoothing groups are either turned on or off; there is no difference between values greater
+				 * than 0."
+				 */
+				state.object.smooth = ( value !== '0' && value !== 'off' );
 
 				var material = state.object.currentMaterial();
 				if ( material ) {

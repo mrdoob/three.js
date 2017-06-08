@@ -38,9 +38,9 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	isPerspectiveCamera: true,
 
-	copy: function ( source ) {
+	copy: function ( source, recursive ) {
 
-		Camera.prototype.copy.call( this, source );
+		Camera.prototype.copy.call( this, source, recursive );
 
 		this.fov = source.fov;
 		this.zoom = source.zoom;
