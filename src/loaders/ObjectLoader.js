@@ -64,7 +64,41 @@ function ObjectLoader( manager ) {
 }
 
 Object.assign( ObjectLoader.prototype, {
-
+	fix_blender_armature_animations: function(out) { /* support of non-location-applied geometry from blender, not affecting location-applied, by applying location to bones and pose keyframe data */
+		if(typeof(out.object) == "undefined" || typeof(out.object.children) == "undefined" || typeof(out.geometries) == "undefined" ) return;
+	
+		if(typeof(out.animations_fixed) == 'undefined') 
+			for (var i = 0; i < out.object.children.length; i++) {
+				for (var j = 0; j < out.geometries.length; j++) {
+					if(typeof(out.geometries[j].uuid) != "undefined")
+						if (out.geometries[j].uuid == out.object.children[i].geometry) {
+							var matrix = out.object.children[i].matrix;
+							if(typeof(out.geometries[j].data) != "undefined" && typeof(out.geometries[j].data.bones) != "undefined")
+							for (var k = 0; k < out.geometries[j].data.bones.length; k++) {
+								var ijk = out.geometries[j].data.bones[k];
+								ijk.pos[0] -= matrix[12];
+								ijk.pos[1] -= matrix[14];
+								ijk.pos[2] += matrix[13];
+							}
+							if(typeof(out.geometries[j].data) != "undefined" && typeof(out.geometries[j].data.animations) != "undefined")
+							for (var k = 0; k < out.geometries[j].data.animations.length; k++) {
+								if(typeof(out.geometries[j].data.animations[k].hierarchy) != "undefined")
+									for (var m = 0; m < out.geometries[j].data.animations[k].hierarchy.length; m++) {
+										if(typeof(out.geometries[j].data.animations[k].hierarchy[m].keys) != "undefined")
+											for (var l = 0; l < out.geometries[j].data.animations[k].hierarchy[m].keys.length; l++) {
+												var ijkl = out.geometries[j].data.animations[k].hierarchy[m].keys[l];
+												ijkl.pos[0] -= matrix[12];
+												ijkl.pos[1] -= matrix[14];
+												ijkl.pos[2] += matrix[13];
+											}
+									}
+							}
+						}
+				}
+			}
+		out.animations_fixed = true;
+		return out;
+	},
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		if ( this.texturePath === '' ) {
@@ -102,7 +136,7 @@ Object.assign( ObjectLoader.prototype, {
 				return;
 
 			}
-
+			json = fix_blender_armature_animations(json);
 			scope.parse( json, onLoad );
 
 		}, onProgress, onError );
