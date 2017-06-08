@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - meshlines</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				color: #ffffff;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+			a {
+				color: #fff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - meshlines</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/geometries/hilbert3D.js"></script>
+		<script src="js/Detector.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer, controls;
+			var material1, material2, material3;
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				// camera
+
+				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1000;
+
+				// scene
+
+				scene = new THREE.Scene();
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				// setup geometry for our meshlines
+
+				var geometry = new THREE.BufferGeometry();
+				var vertices = [];
+				var colors = [];
+
+				var points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+
+				var spline = new THREE.CatmullRomCurve3( points );
+				var divisions = points.length * 6;
+				var color = new THREE.Color();
+
+				for ( var i = 0, l = divisions; i < l; i ++ ) {
+
+					var point = spline.getPoint( i / l ); // sample points along the spline
+					point.multiplyScalar( 0.5 );
+					vertices.push( point.x, point.y, point.z )
+
+					color.setHSL( i / l, 1.0, 0.5 );
+					colors.push( color.r, color.g, color.b );
+
+				}
+
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+				// materials
+
+				material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, meshLine: true, meshLineWidth: 10, meshLineSizeAttenuation: true } );
+				material2 = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors, meshLine: true, meshLineWidth: 5 } );
+				material3 = new THREE.MeshBasicMaterial( { color: 0xffffff, meshLine: true, meshLineWidth: 10 } );
+
+				// mesh lines
+
+				var meshLine = new THREE.MeshLine( geometry, material1 );
+				meshLine.position.set( - 200, 0, 0 );
+				scene.add( meshLine );
+
+				meshLine = new THREE.MeshLine( geometry, material2 );
+				scene.add( meshLine );
+
+				meshLine = new THREE.MeshLine( geometry, material3, widthCallback );
+				meshLine.position.set( 200, 0, 0 );
+				scene.add( meshLine );
+
+				// event listener
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// controls
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+			}
+
+			function widthCallback( p ) {
+
+				return 2 + 1.5 * Math.sin( 50 * p ); // this will create a wavy curve effect
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				var time = Date.now() * 0.0005;
+
+				// animate line width
+
+				material2.meshLineWidth = 50 * ( 1 + 0.5 * Math.sin( 5 * time ) );
+
+				renderer.render( scene, camera );
+
+			}
+
+
+		</script>
+	</body>
+</html>

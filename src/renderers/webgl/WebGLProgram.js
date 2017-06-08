@@ -351,6 +351,8 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
 			parameters.flipSided ? '#define FLIP_SIDED' : '',
 
+			parameters.meshLine ? '#define USE_MESHLINE' : '',
+
 			'#define NUM_CLIPPING_PLANES ' + parameters.numClippingPlanes,
 
 			parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
@@ -407,6 +409,15 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 			'	attribute vec4 skinIndex;',
 			'	attribute vec4 skinWeight;',
+
+			'#endif',
+
+			'#ifdef USE_MESHLINE',
+
+			'	attribute float side;',
+			'	attribute float width;',
+			'	attribute vec3 prev;',
+			'	attribute vec3 next;',
 
 			'#endif',
 

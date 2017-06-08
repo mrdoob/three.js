@@ -220,6 +220,10 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		data.skinning = this.skinning;
 		data.morphTargets = this.morphTargets;
 
+		data.meshLine = this.meshLine;
+		data.meshLineWidth = this.meshLineWidth;
+		data.meshLineSizeAttenuation = this.meshLineSizeAttenuation;
+		
 		data.dithering = this.dithering;
 
 		// TODO: Copied from Object3D.toJSON

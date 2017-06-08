@@ -34,7 +34,11 @@ import { Color } from '../math/Color';
  *  wireframeLinewidth: <float>,
  *
  *  skinning: <bool>,
- *  morphTargets: <bool>
+ *  morphTargets: <bool>,
+ *
+ *  meshLine: <bool>,
+ *  meshLineWidth: <float>,
+ *  meshLineSizeAttenuation: <bool>
  * }
  */
 
@@ -70,6 +74,10 @@ function MeshBasicMaterial( parameters ) {
 
 	this.skinning = false;
 	this.morphTargets = false;
+
+	this.meshLine = false;
+	this.meshLineWidth = 1;
+	this.meshLineSizeAttenuation= false;
 
 	this.lights = false;
 
@@ -112,6 +120,10 @@ MeshBasicMaterial.prototype.copy = function ( source ) {
 
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
+
+	this.meshLine = source.meshLine;
+	this.meshLineWidth = source.meshLineWidth;
+	this.meshLineSizeAttenuation = source.meshLineSizeAttenuation;
 
 	return this;
 

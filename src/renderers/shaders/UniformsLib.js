@@ -171,6 +171,14 @@ var UniformsLib = {
 		map: { value: null },
 		offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) }
 
+	},
+
+	meshLine: {
+
+		lineWidth: { value: 1 },
+		sizeAttenuation: { value: 0 },
+		resolution: { value: new Vector2( 1, 1 ) }
+
 	}
 
 };

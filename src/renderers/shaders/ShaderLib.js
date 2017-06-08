@@ -18,7 +18,8 @@ var ShaderLib = {
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
-			UniformsLib.fog
+			UniformsLib.fog,
+			UniformsLib.meshLine
 		] ),
 
 		vertexShader: ShaderChunk.meshbasic_vert,

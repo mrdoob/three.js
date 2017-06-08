@@ -1976,6 +1976,15 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( material.meshLine ) {
+
+			uniforms.lineWidth.value = material.meshLineWidth * getTargetPixelRatio();
+			uniforms.sizeAttenuation.value = material.meshLineSizeAttenuation ? 1 : 0;
+			uniforms.resolution.value.x = _width;
+			uniforms.resolution.value.y = _height;
+
+		}
+
 		uniforms.map.value = material.map;
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;

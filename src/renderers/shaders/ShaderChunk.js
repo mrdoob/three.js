@@ -50,6 +50,8 @@ import map_fragment from './ShaderChunk/map_fragment.glsl';
 import map_pars_fragment from './ShaderChunk/map_pars_fragment.glsl';
 import map_particle_fragment from './ShaderChunk/map_particle_fragment.glsl';
 import map_particle_pars_fragment from './ShaderChunk/map_particle_pars_fragment.glsl';
+import meshline_pars_vertex from './ShaderChunk/meshline_pars_vertex.glsl';
+import meshline_vertex from './ShaderChunk/meshline_vertex.glsl';
 import metalnessmap_fragment from './ShaderChunk/metalnessmap_fragment.glsl';
 import metalnessmap_pars_fragment from './ShaderChunk/metalnessmap_pars_fragment.glsl';
 import morphnormal_vertex from './ShaderChunk/morphnormal_vertex.glsl';
@@ -163,6 +165,8 @@ export var ShaderChunk = {
 	map_pars_fragment: map_pars_fragment,
 	map_particle_fragment: map_particle_fragment,
 	map_particle_pars_fragment: map_particle_pars_fragment,
+	meshline_pars_vertex: meshline_pars_vertex,
+	meshline_vertex: meshline_vertex,
 	metalnessmap_fragment: metalnessmap_fragment,
 	metalnessmap_pars_fragment: metalnessmap_pars_fragment,
 	morphnormal_vertex: morphnormal_vertex,
