@@ -908,7 +908,78 @@ Object.assign( Matrix4.prototype, {
 
 		return array;
 
-	}
+	},
+    
+    log: function ( decimals ) {    
+
+        var elementsData = [];
+        var maxLength = 0;
+
+        var white = 'background: #fff';
+        var grey = 'background: #ddd; color: #000';
+
+        for ( var i = 0; i < this.elements.length; i ++ ) {
+
+            var element = this.elements[ i ];
+            var elementString;
+            var elementLength;
+            var elementData;
+
+            if ( decimals === undefined || decimals <0 || decimals > 20) {
+
+                elementString = element.toString();
+
+            } else {
+
+                elementString = element.toFixed( decimals );
+
+            }
+
+            elementLength = elementString.length;
+
+            elementData = { string: elementString, length: elementLength };
+
+            elementsData.push ( elementData );
+
+            maxLength = Math.max( elementLength, maxLength );
+
+        };
+
+        function formatCell ( index ) {
+
+            var currentElement = elementsData[index];
+            var str = ' ';
+            var spaces = maxLength - currentElement.length;
+
+            for ( var i = 0; i < spaces; i ++ ) {
+
+                str += ' ';
+
+            }
+
+            return str + currentElement.string + ' ';
+
+        }
+
+        console.log( '\n', this );
+
+        this._consoleOutput( grey, white, formatCell );
+
+    },
+
+    _consoleOutput: function( color1, color2, formatCell ) {
+
+        for ( var i = 0; i < 4; i ++ ) {    
+
+            console.log ( '%c'    + formatCell( 0 + i ) + 
+                          '%c %c' + formatCell( 4 + i ) + 
+                          '%c %c' + formatCell( 8 + i ) + 
+                          '%c %c' + formatCell( 12 + i ),
+                          color1, color2, color1, color2, color1, color2, color1 );
+
+        }
+
+    }
 
 } );
 
