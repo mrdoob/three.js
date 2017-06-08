@@ -229,13 +229,15 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		// Re-render scene if depth texture extension is not supported
 		if ( ! this.supportsDepthTextureExtension ) {
 
-			this.renderOverride( renderer, this.depthMaterial, this.depthRenderTarget );
+			// Clear rule : far clipping plane in both RGBA and Basic encoding
+			this.renderOverride( renderer, this.depthMaterial, this.depthRenderTarget, 0xffffff, 1.0 );
 
 		}
 
 		if ( this.supportsNormalTexture ) {
 
-			this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget );
+			// Clear rule : default normal is facing the camera
+			this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
 
 		}
 

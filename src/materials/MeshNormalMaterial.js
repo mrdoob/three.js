@@ -46,10 +46,6 @@ function MeshNormalMaterial( parameters ) {
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
-	// default normal is facing the camera.
-	this.clearColor = new THREE.Color( 0.5, 0.5, 1.0 );
-	this.clearAlpha = 1.0;
-
 	this.fog = false;
 	this.lights = false;
 
@@ -82,9 +78,6 @@ MeshNormalMaterial.prototype.copy = function ( source ) {
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
-
-	this.clearColor = source.clearColor;
-	this.clearAlpha = source.clearAlpha;
 
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
