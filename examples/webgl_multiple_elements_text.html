@@ -115,8 +115,10 @@
 				var balls = 20;
 				var size = .25;
 
-				var colors = [ 'rgb(0,127,255)', 'rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(0,255,255)',
-        				       'rgb(255,0,255)', 'rgb(255,0,127)', 'rgb(255,255,0)', 'rgb(0,255,127)' ];
+				var colors = [
+					'rgb(0,127,255)', 'rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(0,255,255)',
+					'rgb(255,0,255)', 'rgb(255,0,127)', 'rgb(255,255,0)', 'rgb(0,255,127)'
+				];
 
 				canvas = document.getElementById( 'c' );
 
@@ -244,9 +246,10 @@
 					var width  = rect.right - rect.left;
 					var height = rect.bottom - rect.top;
 					var left   = rect.left;
-					var bottom = renderer.domElement.clientHeight - rect.bottom;
-					renderer.setViewport( left, bottom, width, height );
-					renderer.setScissor( left, bottom, width, height );
+					var top    = rect.top;
+
+					renderer.setViewport( left, top, width, height );
+					renderer.setScissor( left, top, width, height );
 
 					renderer.render( scene, scene.userData.camera );
 
