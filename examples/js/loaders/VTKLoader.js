@@ -743,7 +743,8 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						for ( var i = 0; i<blocks; i++ ) {
 							var currentBlockSize = byteData[i*numBytes + cSizeStart];
 							for ( var j = 1; j<numBytes-1; j++ ) {
-								currentBlockSize = currentBlockSize | ( byteData[i*numBytes + cSizeStart + j] << (j*numBytes) );
+								// Each data point consists of 8 bytes regardless of the header type
+								currentBlockSize = currentBlockSize | ( byteData[i*numBytes + cSizeStart + j] << (j*8) );
 							}
 							
 							currentOffset = currentOffset + currentBlockSize;
