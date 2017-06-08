@@ -434,6 +434,24 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+    this.resizeCanvasToMatchDisplaySize = function() {
+
+        var canvas = this.domElement;
+        var width = canvas.clientWidth / _pixelRatio | 0;
+        var height = canvas.clientHeight / _pixelRatio | 0;
+
+        var needResize = canvas.width !== width || canvas.height !== height;
+
+        if ( needResize ) {
+
+            this.setSize( width, height, false );
+
+        }
+
+        return needResize;
+
+    }
+
 	this.setViewport = function ( x, y, width, height ) {
 
 		_viewport.set( x, y, width, height )
