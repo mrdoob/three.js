@@ -70,7 +70,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			var vertex = this.vertices[ i ];
-			vertex.applyMatrix4( matrix );
+			vertex.applyProjection( matrix );
 
 		}
 
