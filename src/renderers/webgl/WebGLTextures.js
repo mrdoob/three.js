@@ -72,9 +72,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 	}
 
 	function textureNeedsGenerateMipmaps( texture, isPowerOfTwo ) {
-		
-		return isPowerOfTwo && texture.generateMipmaps && texture.minFilter !== NearestFilter && 
-			texture.minFilter !== LinearFilter;
+
+		return texture.generateMipmaps && isPowerOfTwo &&
+			texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter;
 
 	}
 
