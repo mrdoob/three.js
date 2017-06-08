@@ -307,7 +307,7 @@
 
 		<h3>[method:null compile]( [page:Scene scene], [page:Camera camera] )</h3>
 		<div>Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.</div>
-		
+
 		<h3>[method:null dispose]( )</h3>
 		<div>Dispose of the current rendering context.</div>
 
@@ -421,12 +421,8 @@
 
 		<h3>[method:null setScissorTest]( [page:Boolean boolean] )</h3>
 		<div>
-		Enable or disable the scissor test. When this is enabled, only the pixels within
-			the defined scissor area will be affected by further renderer actions..<br /><br />
-
-		NOTE: The point (x, y) is the lower left corner of the area to be set for both of these methods.
-			The area is defined from left to right in width but bottom to top in height.
-			The sense of the vertical definition is opposite to the fill direction of an HTML canvas element.
+		Enable or disable the scissor test. When this is enabled, only the pixels within the defined
+			scissor area will be affected by further renderer actions.
 		</div>
 
 		<h3>[method:Boolean supportsVertexTextures]()</h3>
