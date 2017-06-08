@@ -200,7 +200,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				}
 
 				intersection.face = new Face3( a, b, c, Triangle.normal( vA, vB, vC ) );
-				intersection.faceIndex = a;
 
 			}
 
