@@ -7166,6 +7166,8 @@
 
 		isMaterial: true,
 
+		onBeforeCompile: function () {},
+
 		setValues: function ( values ) {
 
 			if ( values === undefined ) return;
@@ -17747,6 +17749,8 @@
 
 			}
 
+			array.push( material.onBeforeCompile.toString() );
+
 			array.push( renderer.gammaOutput );
 
 			return array.join();
@@ -21434,6 +21438,8 @@
 				}
 
 				material.__webglShader = materialProperties.__webglShader;
+
+				material.onBeforeCompile();
 
 				program = programCache.acquireProgram( material, parameters, code );
 

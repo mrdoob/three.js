@@ -7160,6 +7160,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 	isMaterial: true,
 
+	onBeforeCompile: function () {},
+
 	setValues: function ( values ) {
 
 		if ( values === undefined ) return;
@@ -17741,6 +17743,8 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		}
 
+		array.push( material.onBeforeCompile.toString() );
+
 		array.push( renderer.gammaOutput );
 
 		return array.join();
@@ -21428,6 +21432,8 @@ function WebGLRenderer( parameters ) {
 			}
 
 			material.__webglShader = materialProperties.__webglShader;
+
+			material.onBeforeCompile();
 
 			program = programCache.acquireProgram( material, parameters, code );
 
