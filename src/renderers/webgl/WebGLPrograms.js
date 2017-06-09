@@ -239,6 +239,8 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		}
 
+		array.push( material.onBeforeCompile.toString() );
+
 		array.push( renderer.gammaOutput );
 
 		return array.join();

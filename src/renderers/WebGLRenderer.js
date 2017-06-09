@@ -1567,6 +1567,8 @@ function WebGLRenderer( parameters ) {
 
 			material.__webglShader = materialProperties.__webglShader;
 
+			material.onBeforeCompile();
+
 			program = programCache.acquireProgram( material, parameters, code );
 
 			materialProperties.program = program;
