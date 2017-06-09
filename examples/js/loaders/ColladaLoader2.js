@@ -71,6 +71,23 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function parseStrings( text ) {
+
+			if ( text.length === 0 ) return [];
+
+			var parts = text.trim().split( /\s+/ );
+			var array = new Array( parts.length );
+
+			for ( var i = 0, l = parts.length; i < l; i ++ ) {
+
+				array[ i ] = parts[ i ];
+
+			}
+
+			return array;
+
+		}
+
 		function parseFloats( text ) {
 
 			if ( text.length === 0 ) return [];
@@ -310,9 +327,7 @@ THREE.ColladaLoader.prototype = {
 
 		function parseController( xml ) {
 
-			var data = {
-				skin: {}
-			};
+			var data = {};
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -324,8 +339,8 @@ THREE.ColladaLoader.prototype = {
 
 					case 'skin':
 						// there is exactly one skin per controller
-						data.skin.id = parseId( child.getAttribute( 'source' ) );
-						data.skin.data = parseSkin( child );
+						data.id = parseId( child.getAttribute( 'source' ) );
+						data.skin = parseSkin( child );
 						break;
 
 				}
@@ -444,14 +459,14 @@ THREE.ColladaLoader.prototype = {
 
 			var build = {};
 
-			build.id = data.skin.id;
-			build.sources = buildSkin( data.skin.data );
+			build.id = data.id;
+			build.skin = buildSkin( data.skin );
 
 			// we enhance the 'sources' property of the corresponding geometry with our skin data
 
 			var geometry = library.geometries[ build.id ];
-			geometry.sources.skinIndices = build.sources.skinIndices;
-			geometry.sources.skinWeights = build.sources.skinWeights;
+			geometry.sources.skinIndices = build.skin.indices;
+			geometry.sources.skinWeights = build.skin.weights;
 
 			return build;
 
@@ -462,11 +477,12 @@ THREE.ColladaLoader.prototype = {
 			var BONE_LIMIT = 4;
 
 			var build = {
-				skinIndices: {
+				bones: {},
+				indices: {
 					array: [],
 					stride: BONE_LIMIT
 				},
-				skinWeights: {
+				weights: {
 					array: [],
 					stride: BONE_LIMIT
 				}
@@ -480,20 +496,22 @@ THREE.ColladaLoader.prototype = {
 			var jointOffset = vertexWeights.inputs.JOINT.offset;
 			var weightOffset = vertexWeights.inputs.WEIGHT.offset;
 
+			var jointSource = data.sources[ data.joints.inputs.JOINT ];
+			var inverseSource = data.sources[ data.joints.inputs.INV_BIND_MATRIX ];
+
 			var weights = sources[ vertexWeights.inputs.WEIGHT.id ].array;
 			var stride = 0;
 
-			var skinIndices = [];
-			var skinWeights = [];
+			var i, j, l;
 
 			// procces skin data for each vertex
 
-			for ( var i = 0, l = vcount.length; i < l; i ++ ) {
+			for ( i = 0, l = vcount.length; i < l; i ++ ) {
 
 				var jointCount = vcount[ i ]; // this is the amount of joints that affect a single vertex
 				var vertexSkinData = [];
 
-				for ( var j = 0; j < jointCount; j ++ ) {
+				for ( j = 0; j < jointCount; j ++ ) {
 
 					var skinIndex = v[ stride + jointOffset ];
 					var weightId = v[ stride + weightOffset ];
@@ -513,23 +531,38 @@ THREE.ColladaLoader.prototype = {
 				// now we provide for each vertex a set of four index and weight values.
 				// the order of the skin data matches the order of vertices
 
-				for ( var j = 0; j < BONE_LIMIT; j ++ ) {
+				for ( j = 0; j < BONE_LIMIT; j ++ ) {
 
 					var d = vertexSkinData[ j ];
 
 					if ( d !== undefined ) {
 
-						build.skinIndices.array.push( d.index );
-						build.skinWeights.array.push( d.weight );
+						build.indices.array.push( d.index );
+						build.weights.array.push( d.weight );
 
 					} else {
 
-						build.skinIndices.array.push( 0 );
-						build.skinWeights.array.push( 0 );
+						build.indices.array.push( 0 );
+						build.weights.array.push( 0 );
 
 					}
 
 				}
+
+			}
+
+			// setup bind matrix
+
+			build.bindMatrix = new THREE.Matrix4().fromArray( data.bindShapeMatrix ).transpose();
+
+			// process bones and inverse bind matrix data
+
+			for ( i = 0, l = jointSource.array.length; i < l; i ++ ) {
+
+				var name = jointSource.array[ i ];
+				var boneInverse = new THREE.Matrix4().fromArray( inverseSource.array, i * inverseSource.stride ).transpose();
+
+				build.bones[ name ] = boneInverse;
 
 			}
 
@@ -1379,6 +1412,10 @@ THREE.ColladaLoader.prototype = {
 						data.array = parseFloats( child.textContent );
 						break;
 
+					case 'Name_array':
+						data.array = parseStrings( child.textContent );
+						break;
+
 					case 'technique_common':
 						var accessor = getElementsByTagName( child, 'accessor' )[ 0 ];
 
@@ -1467,6 +1504,8 @@ THREE.ColladaLoader.prototype = {
 			var vertices = data.vertices;
 			var primitives = data.primitives;
 
+			var skinning = false;
+
 			if ( primitives.length === 0 ) return group;
 
 			for ( var p = 0; p < primitives.length; p ++ ) {
@@ -1493,6 +1532,8 @@ THREE.ColladaLoader.prototype = {
 
 									geometry.addAttribute( 'skinWeight', buildGeometryAttribute( primitive, sources.skinWeights, input.offset ) );
 									geometry.addAttribute( 'skinIndex', buildGeometryAttribute( primitive, sources.skinIndices, input.offset ) );
+
+									skinning = true;
 
 								}
 
@@ -1529,7 +1570,7 @@ THREE.ColladaLoader.prototype = {
 
 					case 'triangles':
 					case 'polylist':
-						object = new THREE.Mesh( geometry, DEFAULT_MESHMATERIAL );
+						object = ( skinning === true ) ? new THREE.SkinnedMesh( geometry, DEFAULT_MESHMATERIAL ) : new THREE.Mesh( geometry, DEFAULT_MESHMATERIAL );
 						break;
 
 				}
@@ -1639,6 +1680,8 @@ THREE.ColladaLoader.prototype = {
 
 			var data = {
 				name: xml.getAttribute( 'name' ),
+				type: xml.getAttribute( 'type' ),
+				sid: xml.getAttribute( 'sid' ),
 				matrix: new THREE.Matrix4(),
 				nodes: [],
 				instanceCameras: [],
@@ -1772,12 +1815,33 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function getSkeleton( root, controller ) {
+
+			var boneArray = [];
+			var boneInverseArray = [];
+
+			root.traverse( function( object ) {
+
+				if ( object.isBone === true ) {
+
+					boneArray.push( object );
+					boneInverseArray.push( controller.skin.bones[ object.name ] );
+
+				}
+
+			} );
+
+			return new THREE.Skeleton( boneArray, boneInverseArray );
+
+		}
+
 		function buildNode( data ) {
 
 			var objects = [];
 
 			var matrix = data.matrix;
 			var nodes = data.nodes;
+			var type = data.type;
 			var instanceCameras = data.instanceCameras;
 			var instanceControllers = data.instanceControllers;
 			var instanceLights = data.instanceLights;
@@ -1802,13 +1866,21 @@ THREE.ColladaLoader.prototype = {
 				var controller = getController( instance.id );
 				var geometries = getGeometry( controller.id );
 
+				var node = getNode( instance.skeleton );
+				var skeleton = getSkeleton( node, controller );
+
 				for ( var key in geometries ) {
 
 					var object = geometries[ key ].clone();
 
 					if ( instance.materials[ key ] !== undefined ) {
 
+						object.bind( skeleton, controller.skin.bindMatrix );
+						object.normalizeSkinWeights();
+						object.add( node ); // bone hierarchy is a child of the skinned mesh
+
 						object.material = getMaterial( instance.materials[ key ] );
+						object.material.skinning = true;
 
 					}
 
@@ -1859,7 +1931,7 @@ THREE.ColladaLoader.prototype = {
 
 			} else {
 
-				object = new THREE.Group();
+				object = ( type === 'JOINT' ) ? new THREE.Bone() : new THREE.Group();
 
 				for ( var i = 0; i < objects.length; i ++ ) {
 
@@ -1869,7 +1941,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			object.name = data.name;
+			object.name = ( type === 'JOINT' ) ? data.sid : data.name;
 			object.matrix.copy( matrix );
 			object.matrix.decompose( object.position, object.quaternion, object.scale );
 
