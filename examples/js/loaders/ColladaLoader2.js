@@ -1820,10 +1820,14 @@ THREE.ColladaLoader.prototype = {
 			var boneArray = [];
 			var boneInverseArray = [];
 
-			root.traverse( function( bone ) {
+			root.traverse( function( object ) {
 
-				boneArray.push( bone );
-				boneInverseArray.push( controller.skin.bones[ bone.name ] );
+				if ( object.isBone === true ) {
+
+					boneArray.push( object );
+					boneInverseArray.push( controller.skin.bones[ object.name ] );
+
+				}
 
 			} );
 
