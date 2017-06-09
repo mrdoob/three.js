@@ -167,16 +167,9 @@ Object.assign( EventDispatcher.prototype, {
 
 			event.target = this;
 
-			var array = [], i = 0;
-			var length = listenerArray.length;
+			var array = listenerArray.slice( 0 );
 
-			for ( i = 0; i < length; i ++ ) {
-
-				array[ i ] = listenerArray[ i ];
-
-			}
-
-			for ( i = 0; i < length; i ++ ) {
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
 				array[ i ].call( this, event );
 
@@ -16111,6 +16104,8 @@ function WebGLAttributes( gl ) {
 
 	function remove( attribute ) {
 
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		
 		var data = buffers[ attribute.uuid ];
 
 		if ( data ) {
