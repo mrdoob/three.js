@@ -1565,9 +1565,9 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			material.__webglShader = materialProperties.__webglShader;
+			material.onBeforeCompile( materialProperties.__webglShader );
 
-			material.onBeforeCompile();
+			material.__webglShader = materialProperties.__webglShader; // TODO: Remove?
 
 			program = programCache.acquireProgram( material, parameters, code );
 
