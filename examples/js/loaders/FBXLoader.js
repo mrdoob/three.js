@@ -58,7 +58,7 @@
 
 				try {
 
-					var scene = self.parse( buffer, resourceDirectory );
+					var scene = self.parse( buffer, resourceDirectory, url );
 
 					onLoad( scene );
 
@@ -86,7 +86,7 @@
 		 * @param {string} resourceDirectory - Directory to load external assets (e.g. textures ) from.
 		 * @returns {THREE.Group}
 		 */
-		parse: function ( FBXBuffer, resourceDirectory ) {
+		parse: function ( FBXBuffer, resourceDirectory, url ) {
 
 			var FBXTree;
 
@@ -100,14 +100,14 @@
 
 				if ( ! isFbxFormatASCII( FBXText ) ) {
 
-					self.manager.itemError( url );
+					this.manager.itemError( url );
 					throw new Error( 'FBXLoader: Unknown format.' );
 
 				}
 
 				if ( getFbxVersion( FBXText ) < 7000 ) {
 
-					self.manager.itemError( url );
+					this.manager.itemError( url );
 					throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( FBXText ) );
 
 				}
