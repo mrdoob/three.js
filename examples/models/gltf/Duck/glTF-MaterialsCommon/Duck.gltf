@@ -141,11 +141,47 @@
             "type" : "perspective"
         }
     ], 
+    "extensions" : {
+        "KHR_lights" : {
+            "lights" : [
+                {
+                    "color" : [
+                        1.0, 
+                        1.0, 
+                        1.0
+                    ], 
+                    "name" : "directionalLightShape1", 
+                    "type" : "directional"
+                }, 
+                {
+                    "color" : [
+                        1.0, 
+                        1.0, 
+                        1.0
+                    ], 
+                    "name" : "Lamp", 
+                    "quadraticAttenuation" : 0.03333335240683057, 
+                    "type" : "point"
+                }, 
+                {
+                    "color" : [
+                        0.0, 
+                        0.0, 
+                        0.0
+                    ], 
+                    "name" : "Ambient_Scene", 
+                    "type" : "ambient"
+                }
+            ]
+        }
+    }, 
     "extensionsRequired" : [
-        "KHR_materials_common"
+        "KHR_materials_common", 
+        "KHR_lights"
     ], 
     "extensionsUsed" : [
-        "KHR_materials_common"
+        "KHR_materials_common", 
+        "KHR_lights"
     ], 
     "images" : [
         {
@@ -266,6 +302,23 @@
             ]
         }, 
         {
+            "extensions" : {
+                "KHR_lights" : {
+                    "light" : 0
+                }
+            }, 
+            "name" : "Correction_directionalLight1", 
+            "rotation" : [
+                -0.7071067690849304, 
+                -0.0, 
+                0.0, 
+                0.7071067690849304
+            ]
+        }, 
+        {
+            "children" : [
+                4
+            ], 
             "name" : "directionalLight1", 
             "rotation" : [
                 0.14142043888568878, 
@@ -285,6 +338,23 @@
             ]
         }, 
         {
+            "extensions" : {
+                "KHR_lights" : {
+                    "light" : 1
+                }
+            }, 
+            "name" : "Correction_Lamp", 
+            "rotation" : [
+                -0.7071067690849304, 
+                -0.0, 
+                0.0, 
+                0.7071067690849304
+            ]
+        }, 
+        {
+            "children" : [
+                6
+            ], 
             "name" : "Lamp", 
             "rotation" : [
                 0.16907575726509094, 
@@ -325,12 +395,17 @@
     "scene" : 0, 
     "scenes" : [
         {
+            "extensions" : {
+                "KHR_lights" : {
+                    "light" : 2
+                }
+            }, 
             "name" : "Scene", 
             "nodes" : [
-                4, 
-                3, 
-                6, 
                 5, 
+                3, 
+                8, 
+                7, 
                 1
             ]
         }

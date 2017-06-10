@@ -310,8 +310,7 @@ THREE.GLTF2Loader = ( function () {
 			var light = lights[ lightId ];
 			var lightNode;
 
-			var lightParams = light[ light.type ];
-			var color = new THREE.Color().fromArray( lightParams.color );
+			var color = new THREE.Color().fromArray( light.color );
 
 			switch ( light.type ) {
 
@@ -337,6 +336,7 @@ THREE.GLTF2Loader = ( function () {
 
 			if ( lightNode ) {
 
+				lightNode.name = light.name || ( 'light_' + lightId );
 				this.lights[ lightId ] = lightNode;
 
 			}
