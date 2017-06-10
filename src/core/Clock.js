@@ -30,6 +30,7 @@ Object.assign( Clock.prototype, {
 
 		this.getElapsedTime();
 		this.running = false;
+		this.autoStart = false;
 
 	},
 
