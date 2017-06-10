@@ -95,7 +95,8 @@
 
 
 			function init() {
-				document.getElementById('endianness').innerHTML = THREE.PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
+
+				document.getElementById( 'endianness' ).innerHTML = THREE.PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -116,54 +117,68 @@
 				// model
 
 				var loader = new THREE.PRWMLoader();
-				var material = new THREE.MeshPhongMaterial({});
+				var material = new THREE.MeshPhongMaterial( {} );
 				var busy = false;
 				var mesh = null;
 
 				var onProgress = function ( xhr ) {
-					if ( xhr.lengthComputable ) {
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
 
-						if (xhr.loaded === xhr.total) {
-							console.log('File size: ' + (xhr.total / 1024).toFixed(2) + 'kB');
-							console.timeEnd('Download');
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+						if ( xhr.loaded === xhr.total ) {
+
+							console.log( 'File size: ' + ( xhr.total / 1024 ).toFixed( 2 ) + 'kB' );
+							console.timeEnd( 'Download' );
+
 						}
+
 					}
+
 				};
 
 				var onError = function ( xhr ) {
+
 					busy = false;
+
 				};
 
-				function loadGeometry (url) {
-					if (busy) return;
+				function loadGeometry( url ) {
+
+					if ( busy ) return;
 
 					busy = true;
 
-					if (mesh !== null) {
-						scene.remove(mesh);
+					if ( mesh !== null ) {
+
+						scene.remove( mesh );
 						mesh.geometry.dispose();
+
 					}
 
-					console.log('-- Loading', url);
-					console.time('Download');
+					console.log( '-- Loading', url );
+					console.time( 'Download' );
+
 					loader.load( url, function ( geometry ) {
-						mesh = new THREE.Mesh(geometry, material);
-						mesh.scale.set(50,50,50);
+
+						mesh = new THREE.Mesh( geometry, material );
+						mesh.scale.set( 50, 50, 50 );
 						scene.add( mesh );
 
-						console.log(geometry.index ? 'indexed geometry' : 'non-indexed geometry');
-						console.log('# of vertices: ' + geometry.attributes.position.count);
-						console.log('# of polygons: ' + (geometry.index ? geometry.index.count / 3 : geometry.attributes.position.count / 3));
+						console.log( geometry.index ? 'indexed geometry' : 'non-indexed geometry' );
+						console.log( '# of vertices: ' + geometry.attributes.position.count );
+						console.log( '# of polygons: ' + ( geometry.index ? geometry.index.count / 3 : geometry.attributes.position.count / 3 ) );
 						busy = false;
-					}, onProgress, onError );
-				}
 
+					}, onProgress, onError );
+
+				}
 
 				//
 
-				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -172,17 +187,21 @@
 
 				//
 
-				document.querySelectorAll('a.model').forEach(function (anchor) {
-					anchor.addEventListener('click', function (e) {
+				document.querySelectorAll( 'a.model' ).forEach( function ( anchor ) {
+
+					anchor.addEventListener( 'click', function ( e ) {
+
 						e.preventDefault();
 
-						loadGeometry(anchor.href);
-					});
-				});
+						loadGeometry( anchor.href );
+
+					} );
+
+				} );
 
 				//
 
-				loadGeometry('./models/prwm/smooth-suzanne-LE.prwm');
+				loadGeometry( './models/prwm/smooth-suzanne-LE.prwm' );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
