@@ -356,6 +356,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 			}
 
+			return;
+			
 		}
 
 		var index = this.children.indexOf( object );
