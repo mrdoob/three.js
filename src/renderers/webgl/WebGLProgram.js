@@ -152,7 +152,7 @@ function replaceLightNums( string, parameters ) {
 
 function parseIncludes( string , materialIncludes ) {
 
-	var pattern = /#include +<([\w\d.]+)>/g;
+	var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
 
 	function replace( match, include ) {
 
@@ -194,17 +194,18 @@ function unrollLoops( string ) {
 
 }
 
-function WebGLProgram( renderer, code, material, parameters ) {
+function WebGLProgram( renderer, code, material, shader, parameters ) {
 
 	var gl = renderer.context;
 
 	var extensions = material.extensions;
 	var defines = material.defines;
 
+
 	var materialIncludes = material.shaderIncludes;
 
-	var vertexShader = material.__webglShader.vertexShader;
-	var fragmentShader = material.__webglShader.fragmentShader;
+	var vertexShader = shader.vertexShader;
+	var fragmentShader = shader.fragmentShader;
 
 	var shadowMapTypeDefine = 'SHADOWMAP_TYPE_BASIC';
 
@@ -318,7 +319,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
 
-			'#define SHADER_NAME ' + material.__webglShader.name,
+			'#define SHADER_NAME ' + shader.name,
 
 			customDefines,
 
@@ -425,7 +426,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
 
-			'#define SHADER_NAME ' + material.__webglShader.name,
+			'#define SHADER_NAME ' + shader.name,
 
 			customDefines,
 
@@ -481,6 +482,8 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '',  // this code is required here because it is used by the toneMapping() function defined below
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
 
+			parameters.dithering ? '#define DITHERING' : '',
+
 			( parameters.outputEncoding || parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
 			parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
 			parameters.envMapEncoding ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
@@ -499,6 +502,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 	vertexShader = replaceLightNums( vertexShader, parameters );
 
 	fragmentShader = parseIncludes( fragmentShader, customIncludes );
+
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 
 	if ( ! material.isShaderMaterial ) {

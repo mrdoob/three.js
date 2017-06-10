@@ -81,6 +81,7 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 		if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;
 		if ( json.wireframeLinejoin !== undefined ) material.wireframeLinejoin = json.wireframeLinejoin;
+		if ( json.skinning !== undefined ) material.skinning = json.skinning;
 		if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
 
 		// for PointsMaterial
@@ -142,18 +143,6 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
 
 		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
-
-		// MultiMaterial
-
-		if ( json.materials !== undefined ) {
-
-			for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
-
-				material.materials.push( this.parse( json.materials[ i ] ) );
-
-			}
-
-		}
 
 		return material;
 

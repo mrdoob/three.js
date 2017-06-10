@@ -14,7 +14,7 @@ function PointLightHelper( light, sphereSize ) {
 
 	var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
 	var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
-	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	material.color.copy( this.light.color );
 
 	Mesh.call( this, geometry, material );
 
@@ -57,7 +57,7 @@ PointLightHelper.prototype.dispose = function () {
 
 PointLightHelper.prototype.update = function () {
 
-	this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	this.material.color.copy( this.light.color );
 
 	/*
 	var d = this.light.distance;

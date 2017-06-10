@@ -36,11 +36,11 @@
 	<body>
 		<div id="d">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank">three.js</a> webgl - effects - parallax barrier.
-				texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a> :
+				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - effects - parallax barrier.
+				texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a> :
 				<span id="car_info">
 					<span id="car_name">Bugatti Veyron model</span>
-					by <span id="car_author"><a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank">Troyano</a></span>
+					by <span id="car_author"><a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank" rel="noopener">Troyano</a></span>
 				</span>
 
 			</div>
@@ -75,7 +75,7 @@
 
 					name:	"Bugatti Veyron",
 					url: 	"obj/veyron/VeyronNoUv_bin.js",
-					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank">Troyano</a>',
+					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank" rel="noopener">Troyano</a>',
 					init_rotation: [ 0, 0, 0 ],
 					scale: 5.5,
 					init_material: 4,
@@ -91,7 +91,7 @@
 
 					name: 	"Lamborghini Gallardo",
 					url:	"obj/gallardo/GallardoNoUv_bin.js",
-					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1711" target="_blank">machman_3d</a>',
+					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1711" target="_blank" rel="noopener">machman_3d</a>',
 					init_rotation: [ 0, 0, 0 ],
 					scale: 3.7,
 					init_material: 9,
@@ -107,7 +107,7 @@
 
 					name: 	"Ferrari F50",
 					url:	"obj/f50/F50NoUv_bin.js",
-					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1687" target="_blank">daniel sathya</a>',
+					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1687" target="_blank" rel="noopener">daniel sathya</a>',
 					init_rotation: [ 0, 0, 0 ],
 					scale: 0.175,
 					init_material: 2,
@@ -123,7 +123,7 @@
 
 					name: 	"Chevrolet Camaro",
 					url:	"obj/camaro/CamaroNoUv_bin.js",
-					author: '<a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a>',
+					author: '<a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank" rel="noopener">dskfnwn</a>',
 					init_rotation: [ 0.0, 0.0, 0.0 ],
 					scale: 75,
 					init_material: 0,
@@ -517,7 +517,7 @@
 
 			}
 
-			function attachButtonMaterials( materials, faceMaterial, material_indices, car ) {
+			function attachButtonMaterials( materials, faceMaterials, material_indices, car ) {
 
 				for( var i = 0; i < materials.length; i++ ) {
 
@@ -526,7 +526,7 @@
 
 						for ( var j = 0; j < material_indices.length; j ++ ) {
 
-							faceMaterial.materials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
+							faceMaterials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
 
 						}
 
@@ -540,7 +540,7 @@
 
 				geometry.sortFacesByMaterialIndex();
 
-				var m = new THREE.MultiMaterial(),
+				var m = [],
 					s = CARS[ car ].scale * 1,
 					r = CARS[ car ].init_rotation,
 					materials = CARS[ car ].materials,
@@ -549,7 +549,7 @@
 
 				for( var i in CARS[ car ].mmap ) {
 
-					m.materials[ i ] = CARS[ car ].mmap[ i ];
+					m[ i ] = CARS[ car ].mmap[ i ];
 
 				}
 

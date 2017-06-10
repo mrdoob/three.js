@@ -8,13 +8,13 @@ export { PolyhedronGeometry, PolyhedronBufferGeometry } from './PolyhedronGeomet
 export { TubeGeometry, TubeBufferGeometry } from './TubeGeometry.js';
 export { TorusKnotGeometry, TorusKnotBufferGeometry } from './TorusKnotGeometry.js';
 export { TorusGeometry, TorusBufferGeometry } from './TorusGeometry.js';
-export { TextGeometry } from './TextGeometry.js';
+export { TextGeometry, TextBufferGeometry } from './TextGeometry.js';
 export { SphereGeometry, SphereBufferGeometry } from './SphereGeometry.js';
 export { RingGeometry, RingBufferGeometry } from './RingGeometry.js';
 export { PlaneGeometry, PlaneBufferGeometry } from './PlaneGeometry.js';
 export { LatheGeometry, LatheBufferGeometry } from './LatheGeometry.js';
 export { ShapeGeometry, ShapeBufferGeometry } from './ShapeGeometry.js';
-export { ExtrudeGeometry } from './ExtrudeGeometry.js';
+export { ExtrudeGeometry, ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
 export { EdgesGeometry } from './EdgesGeometry.js';
 export { ConeGeometry, ConeBufferGeometry } from './ConeGeometry.js';
 export { CylinderGeometry, CylinderBufferGeometry } from './CylinderGeometry.js';

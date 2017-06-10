@@ -67,7 +67,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	addAttribute: function ( name, attribute ) {
 
-		if ( ( attribute && attribute.isBufferAttribute ) === false && ( attribute && attribute.isInterleavedBufferAttribute ) === false ) {
+		if ( ! ( attribute && attribute.isBufferAttribute ) && ! ( attribute && attribute.isInterleavedBufferAttribute ) ) {
 
 			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
@@ -777,7 +777,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	merge: function ( geometry, offset ) {
 
-		if ( ( geometry && geometry.isBufferGeometry ) === false ) {
+		if ( ! ( geometry && geometry.isBufferGeometry ) ) {
 
 			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
 			return;
@@ -814,21 +814,19 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	normalizeNormals: function () {
 
-		var normals = this.attributes.normal.array;
+		var normals = this.attributes.normal;
 
 		var x, y, z, n;
 
-		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
+		for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
-			x = normals[ i ];
-			y = normals[ i + 1 ];
-			z = normals[ i + 2 ];
+			x = normals.getX( i );
+			y = normals.getY( i );
+			z = normals.getZ( i );
 
 			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
 
-			normals[ i ] *= n;
-			normals[ i + 1 ] *= n;
-			normals[ i + 2 ] *= n;
+			normals.setXYZ( i, x * n, y * n, z * n );
 
 		}
 
@@ -883,7 +881,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		var data = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'BufferGeometry',
 				generator: 'BufferGeometry.toJSON'
 			}

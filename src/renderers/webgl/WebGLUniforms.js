@@ -245,7 +245,7 @@ function getSingularSetter( type ) {
 		case 0x8b5b: return setValue3fm; // _MAT3
 		case 0x8b5c: return setValue4fm; // _MAT4
 
-		case 0x8b5e: return setValueT1; // SAMPLER_2D
+		case 0x8b5e: case 0x8d66: return setValueT1; // SAMPLER_2D, SAMPLER_EXTERNAL_OES
 		case 0x8b60: return setValueT6; // SAMPLER_CUBE
 
 		case 0x1404: case 0x8b56: return setValue1i; // INT, BOOL
@@ -507,14 +507,6 @@ WebGLUniforms.prototype.setValue = function ( gl, name, value ) {
 	var u = this.map[ name ];
 
 	if ( u !== undefined ) u.setValue( gl, value, this.renderer );
-
-};
-
-WebGLUniforms.prototype.set = function ( gl, object, name ) {
-
-	var u = this.map[ name ];
-
-	if ( u !== undefined ) u.setValue( gl, object[ name ], this.renderer );
 
 };
 

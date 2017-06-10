@@ -147,7 +147,7 @@ Object.assign( Frustum.prototype, {
 
 			var planes = this.planes;
 
-			for ( var i = 0; i < 6 ; i ++ ) {
+			for ( var i = 0; i < 6; i ++ ) {
 
 				var plane = planes[ i ];
 
@@ -176,7 +176,7 @@ Object.assign( Frustum.prototype, {
 		};
 
 	}(),
-	
+
 	containsPoint: function ( point ) {
 
 		var planes = this.planes;

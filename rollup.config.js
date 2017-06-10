@@ -8,9 +8,9 @@ function glsl() {
 
 			var transformedCode = 'export default ' + JSON.stringify(
 				code
-					.replace( /[ \t]*\/\/.*\n/g, '' )
-					.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' )
-					.replace( /\n{2,}/g, '\n' )
+					.replace( /[ \t]*\/\/.*\n/g, '' ) // remove //
+					.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
+					.replace( /\n{2,}/g, '\n' ) // # \n+ to \n
 			) + ';';
 			return {
 				code: transformedCode,

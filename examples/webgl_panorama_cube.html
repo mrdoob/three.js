@@ -31,7 +31,7 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js webgl</a> - cube panorama demo.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - cube panorama demo.
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -74,7 +74,7 @@
 
 			}
 
-			var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MultiMaterial( materials ) );
+			var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), materials );
 			skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
 			scene.add( skyBox );
 

@@ -15,6 +15,8 @@
 
 THREE.NURBSCurve = function ( degree, knots /* array of reals */, controlPoints /* array of Vector(2|3|4) */, startKnot /* index in knots */, endKnot /* index in knots */ ) {
 
+	THREE.Curve.call( this );
+
 	this.degree = degree;
 	this.knots = knots;
 	this.controlPoints = [];
@@ -65,4 +67,3 @@ THREE.NURBSCurve.prototype.getTangent = function ( t ) {
 	return tangent;
 
 };
-

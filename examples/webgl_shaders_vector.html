@@ -22,7 +22,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
 		</div>
 		<script src="../build/three.js"></script>
 		<script src="./js/controls/OrbitControls.js"></script>
@@ -156,7 +156,7 @@
 					pts2.push( path[0].getPoint(0) );
 
 					for (var i=0; i < path.length; i++) {
-						curve = path[i];
+						var curve = path[i];
 						if (curve instanceof THREE.LineCurve) {
 							pts.push( curve.v2 );
 							pts2.push( curve.v2 );
@@ -244,7 +244,7 @@
 				var bezierGeometry = new THREE.Geometry();
 
 				for (var i=0;i<beziers.length;i++) {
-					p = beziers[i];
+					var p = beziers[i];
 					bezierGeometry.vertices.push( new THREE.Vector3(p.x, p.y, 0) );
 				}
 

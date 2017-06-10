@@ -189,7 +189,7 @@ Object.assign( AnimationClip, {
 
 		if ( ! animation ) {
 
-			console.error( "  no animation in JSONLoader data" );
+			console.error( 'THREE.AnimationClip: No animation in JSONLoader data.' );
 			return null;
 
 		}
@@ -231,8 +231,7 @@ Object.assign( AnimationClip, {
 			// skip empty tracks
 			if ( ! animationKeys || animationKeys.length === 0 ) continue;
 
-			// process morph targets in a way exactly compatible
-			// with AnimationHandler.init( animation )
+			// process morph targets
 			if ( animationKeys[ 0 ].morphTargets ) {
 
 				// figure out all morph targets used in this track

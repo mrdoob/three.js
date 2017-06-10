@@ -15,7 +15,7 @@
  * @param v2         Corner index +X, +Z.
  * @param v3         Corner index +X, -Z.
  */
-function hilbert2D ( center, size, iterations, v0, v1, v2, v3 ) {
+function hilbert2D( center, size, iterations, v0, v1, v2, v3 ) {
 
 	// Default Vars
 	var center     = undefined !== center ? center : new THREE.Vector3( 0, 0, 0 ),

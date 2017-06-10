@@ -28,7 +28,6 @@ THREE.ThreeMFLoader.prototype = {
 
 		function loadDocument( data ) {
 
-			var view = new DataView( data );
 			var zip = null;
 			var file = null;
 
@@ -92,7 +91,7 @@ THREE.ThreeMFLoader.prototype = {
 			for ( var i = 0; i < modelPartNames.length; i++ ) {
 
 				var modelPart = modelPartNames[ i ];
-				view = new DataView( zip.file( modelPart ).asArrayBuffer() );
+				var view = new DataView( zip.file( modelPart ).asArrayBuffer() );
 
 				if ( TextDecoder === undefined ) {
 
@@ -267,7 +266,7 @@ THREE.ThreeMFLoader.prototype = {
 				}
 
 				if ( pid ) {
-				  
+
 					triangleProperty[ 'pid' ] = pid;
 
 				}
@@ -540,7 +539,7 @@ THREE.ThreeMFLoader.prototype = {
 			var modelsKeys = Object.keys( modelsData );
 
 			for ( var i = 0; i < modelsKeys.length; i++ ) {
-			  
+
 				var modelsKey = modelsKeys[ i ];
 				var modelData = modelsData[ modelsKey ];
 				var modelXml = modelData[ 'xml' ];

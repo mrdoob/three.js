@@ -27,6 +27,7 @@ import { Curve } from './extras/core/Curve.js';
 import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 import { BoxHelper } from './helpers/BoxHelper';
 import { GridHelper } from './helpers/GridHelper.js';
+import { SkeletonHelper } from './helpers/SkeletonHelper.js';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
 import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
@@ -318,6 +319,12 @@ GridHelper.prototype.setColors = function () {
 
 };
 
+SkeletonHelper.prototype.update = function () {
+
+	console.error( 'THREE.SkeletonHelper: update() no longer needs to be called.' );
+	
+};
+
 export function WireframeHelper( object, hex ) {
 
 	console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
@@ -435,8 +442,7 @@ Object.assign( Matrix3.prototype, {
 	},
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'THREE.Matrix3: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
-		return this.applyToVector3Array( a );
+		console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.'  );
 
 	},
 	applyToBuffer: function( buffer, offset, length ) {
@@ -505,8 +511,7 @@ Object.assign( Matrix4.prototype, {
 	},
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'THREE.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
-		return this.applyToVector3Array( a );
+		console.error( 'THREE.Matrix4: .multiplyVector3Array() has been removed.'  );
 
 	},
 	rotateAxis: function ( v ) {
@@ -776,6 +781,23 @@ Object.defineProperty( Skeleton.prototype, 'useVertexTexture', {
 
 } );
 
+Object.defineProperty( Curve.prototype, '__arcLengthDivisions', {
+
+	get: function () {
+
+		console.warn( 'THREE.Curve: .__arcLengthDivisions is now .arcLengthDivisions.' );
+		return this.arcLengthDivisions;
+
+	},
+	set: function ( value ) {
+
+		console.warn( 'THREE.Curve: .__arcLengthDivisions is now .arcLengthDivisions.' );
+		this.arcLengthDivisions = value;
+
+	}
+
+} );
+
 //
 
 PerspectiveCamera.prototype.setLens = function ( focalLength, filmGauge ) {
@@ -994,20 +1016,6 @@ Object.defineProperties( Uniform.prototype, {
 
 Object.defineProperties( Material.prototype, {
 
-	skinning: {
-		get: function () {
-
-			console.warn( 'THREE.Material: .skinning has been removed.' );
-
-		},
-		set: function () {
-
-			console.warn( 'THREE.Material: .skinning has been removed.' );
-
-		}
-
-	},
-
 	wrapAround: {
 		get: function () {
 
@@ -1071,6 +1079,13 @@ Object.defineProperties( ShaderMaterial.prototype, {
 //
 
 Object.assign( WebGLRenderer.prototype, {
+
+	getCurrentRenderTarget: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );
+		return this.getRenderTarget();
+
+	},
 
 	supportsFloatTextures: function () {
 

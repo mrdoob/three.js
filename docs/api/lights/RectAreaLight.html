@@ -35,13 +35,13 @@
 var width = 2;
 var height = 10;
 var rectLight = new THREE.RectAreaLight( 0xffffff, undefined,  width, height );
-rectLight.matrixAutoUpdate = true;
 rectLight.intensity = 70.0;
 rectLight.position.set( 5, 5, 0 );
-rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
-rectLight.add( rectLightHelper );
+scene.add( rectLight )
 
-scene.add(rectLight)
+rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+scene.add( rectLightHelper );
+
 			</code>
 		</div>
 
