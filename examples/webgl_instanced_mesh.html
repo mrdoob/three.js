@@ -171,7 +171,8 @@
 					color: false,
 					material: 'phong',
 					instanceNumber: 200,
-					geometry: 'box'
+					geometry: 'box',
+					debug: function(){}
 				};
 
 
@@ -317,6 +318,15 @@
 
 										}
 
+										if( i === 15 ){
+
+
+											instancedMesh.setPositionAt( 	i , new THREE.Vector3() );
+											instancedMesh.setQuaternionAt( 	i , new THREE.Quaternion() );
+											instancedMesh.setScaleAt( 		i , new THREE.Vector3() );
+
+										}
+
 									}
 
 									instancedMesh.visible = false;
@@ -380,6 +390,15 @@
 					onChangeMaterial();
 				});
 
+				gui.add( options, 'debug' ).onChange( function(){
+
+					console.log(
+						cache[ getKey() ].getQuaternionAt( 15 ),
+						cache[ getKey() ].getPositionAt( 15 ),
+						cache[ getKey() ].getScaleAt( 15 ),
+						cache[ getKey() ].getColorAt( 15 )
+					)	
+				})
 				gui.open();
 
 			}
