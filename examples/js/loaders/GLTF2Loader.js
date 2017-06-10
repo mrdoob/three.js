@@ -70,6 +70,12 @@ THREE.GLTF2Loader = ( function () {
 
 			if ( json.extensionsUsed ) {
 
+				if( json.extensionsUsed.indexOf( EXTENSIONS.KHR_LIGHTS ) >= 0 ) {
+
+					extensions[ EXTENSIONS.KHR_LIGHTS ] = new GLTFLightsExtension( json );
+
+				}
+
 				if( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_COMMON ) >= 0 ) {
 
 					extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] = new GLTFMaterialsCommonExtension( json );
@@ -279,20 +285,24 @@ THREE.GLTF2Loader = ( function () {
 
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
-		KHR_TECHNIQUE_WEBGL: 'KHR_technique_webgl',
+		KHR_LIGHTS: 'KHR_lights',
 		KHR_MATERIALS_COMMON: 'KHR_materials_common',
-		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness'
+		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
+		KHR_TECHNIQUE_WEBGL: 'KHR_technique_webgl',
 	};
 
-	/* MATERIALS COMMON EXTENSION */
+	/**
+	 * Lights Extension
+	 *
+	 * Specification: PENDING
+	 */
+	function GLTFLightsExtension( json ) {
 
-	function GLTFMaterialsCommonExtension( json ) {
-
-		this.name = EXTENSIONS.KHR_MATERIALS_COMMON;
+		this.name = EXTENSIONS.KHR_LIGHTS;
 
 		this.lights = {};
 
-		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] ) || {};
+		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_LIGHTS ] ) || {};
 		var lights = extension.lights || {};
 
 		for ( var lightId in lights ) {
@@ -305,21 +315,21 @@ THREE.GLTF2Loader = ( function () {
 
 			switch ( light.type ) {
 
-				case "directional":
+				case 'directional':
 					lightNode = new THREE.DirectionalLight( color );
 					lightNode.position.set( 0, 0, 1 );
 					break;
 
-				case "point":
+				case 'point':
 					lightNode = new THREE.PointLight( color );
 					break;
 
-				case "spot":
+				case 'spot':
 					lightNode = new THREE.SpotLight( color );
 					lightNode.position.set( 0, 0, 1 );
 					break;
 
-				case "ambient":
+				case 'ambient':
 					lightNode = new THREE.AmbientLight( color );
 					break;
 
@@ -334,6 +344,102 @@ THREE.GLTF2Loader = ( function () {
 		}
 
 	}
+
+	/**
+	 * Common Materials Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_common
+	 */
+	function GLTFMaterialsCommonExtension( json ) {
+
+		this.name = EXTENSIONS.KHR_MATERIALS_COMMON;
+
+	}
+
+	GLTFMaterialsCommonExtension.prototype.getMaterialType = function ( material ) {
+
+		var khrMaterial = material.extensions[ this.name ];
+
+		switch ( khrMaterial.type ) {
+
+			case 'commonBlinn' :
+			case 'commonPhong' :
+				return THREE.MeshPhongMaterial;
+
+			case 'commonLambert' :
+				return THREE.MeshLambertMaterial;
+
+			case 'commonConstant' :
+			default :
+				return THREE.MeshBasicMaterial;
+
+		}
+
+	};
+
+	GLTFMaterialsCommonExtension.prototype.extendParams = function ( materialParams, material, dependencies ) {
+
+		var khrMaterial = material.extensions[ this.name ];
+
+		var keys = [];
+
+		// TODO: Currently ignored: 'ambientFactor', 'ambientTexture'
+		switch ( khrMaterial.type ) {
+
+			case 'commonBlinn' :
+			case 'commonPhong' :
+				keys.push( 'diffuseFactor', 'diffuseTexture', 'specularFactor', 'specularTexture', 'shininessFactor' );
+				break;
+
+			case 'commonLambert' :
+				keys.push( 'diffuseFactor', 'diffuseTexture' );
+				break;
+
+			case 'commonConstant' :
+			default :
+				break;
+
+		}
+
+		var materialValues = {};
+
+		keys.forEach( function( v ) {
+
+			if ( khrMaterial[ v ] !== undefined ) materialValues[ v ] = khrMaterial[ v ];
+
+		} );
+
+		if ( materialValues.diffuseFactor !== undefined ) {
+
+			materialParams.color = new THREE.Color().fromArray( materialValues.diffuseFactor );
+
+		}
+
+		if ( materialValues.diffuseTexture !== undefined ) {
+
+			materialParams.map = dependencies.textures[ materialValues.diffuseTexture.index ];
+
+		}
+
+		if ( materialValues.specularFactor !== undefined ) {
+
+			materialParams.specular = new THREE.Color().fromArray( materialValues.specularFactor );
+
+		}
+
+		if ( materialValues.specularTexture !== undefined ) {
+
+			materialParams.specularMap = dependencies.textures[ materialValues.specularTexture.index ];
+
+		}
+
+		if ( materialValues.shininessFactor !== undefined ) {
+
+			materialParams.shininess = materialValues.shininessFactor;
+
+		}
+
+	};
 
 	/* BINARY EXTENSION */
 
@@ -403,8 +509,11 @@ THREE.GLTF2Loader = ( function () {
 
 	}
 
-	/* Technique WebGL Extension */
-
+	/**
+	 * WebGL Technique Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_technique_webgl
+	 */
 	function GLTFTechniqueWebglExtension( json ) {
 
 		this.name = EXTENSIONS.KHR_TECHNIQUE_WEBGL;
@@ -417,18 +526,310 @@ THREE.GLTF2Loader = ( function () {
 
 	}
 
-	/* Specular-Glossiness Extension */
+	GLTFTechniqueWebglExtension.prototype.getMaterialType = function () {
 
+		return DeferredShaderMaterial;
+
+	};
+
+	GLTFTechniqueWebglExtension.prototype.extendParams = function ( materialParams, material, dependencies ) {
+
+		var extension = material[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ];
+		var technique = dependencies.techniques[ extension.technique ];
+
+		materialParams.uniforms = {};
+
+		var program = dependencies.programs[ technique.program ];
+
+		if ( program === undefined ) {
+
+			return;
+
+		}
+
+		materialParams.fragmentShader = dependencies.shaders[ program.fragmentShader ];
+
+		if ( ! materialParams.fragmentShader ) {
+
+			throw new Error( 'ERROR: Missing fragment shader definition:', program.fragmentShader );
+
+		}
+
+		var vertexShader = dependencies.shaders[ program.vertexShader ];
+
+		if ( ! vertexShader ) {
+
+			throw new Error( 'ERROR: Missing vertex shader definition:', program.vertexShader );
+
+		}
+
+		// IMPORTANT: FIX VERTEX SHADER ATTRIBUTE DEFINITIONS
+		materialParams.vertexShader = replaceTHREEShaderAttributes( vertexShader, technique );
+
+		var uniforms = technique.uniforms;
+
+		for ( var uniformId in uniforms ) {
+
+			var pname = uniforms[ uniformId ];
+			var shaderParam = technique.parameters[ pname ];
+
+			var ptype = shaderParam.type;
+
+			if ( WEBGL_TYPE[ ptype ] ) {
+
+				var pcount = shaderParam.count;
+				var value;
+
+				if ( material.values !== undefined ) value = material.values[ pname ];
+
+				var uvalue = new WEBGL_TYPE[ ptype ]();
+				var usemantic = shaderParam.semantic;
+				var unode = shaderParam.node;
+
+				switch ( ptype ) {
+
+					case WEBGL_CONSTANTS.FLOAT:
+
+						uvalue = shaderParam.value;
+
+						if ( pname === 'transparency' ) {
+
+							materialParams.transparent = true;
+
+						}
+
+						if ( value !== undefined ) {
+
+							uvalue = value;
+
+						}
+
+						break;
+
+					case WEBGL_CONSTANTS.FLOAT_VEC2:
+					case WEBGL_CONSTANTS.FLOAT_VEC3:
+					case WEBGL_CONSTANTS.FLOAT_VEC4:
+					case WEBGL_CONSTANTS.FLOAT_MAT3:
+
+						if ( shaderParam && shaderParam.value ) {
+
+							uvalue.fromArray( shaderParam.value );
+
+						}
+
+						if ( value ) {
+
+							uvalue.fromArray( value );
+
+						}
+
+						break;
+
+					case WEBGL_CONSTANTS.FLOAT_MAT2:
+
+						// what to do?
+						console.warn( 'FLOAT_MAT2 is not a supported uniform type' );
+						break;
+
+					case WEBGL_CONSTANTS.FLOAT_MAT4:
+
+						if ( pcount ) {
+
+							uvalue = new Array( pcount );
+
+							for ( var mi = 0; mi < pcount; mi ++ ) {
+
+								uvalue[ mi ] = new WEBGL_TYPE[ ptype ]();
+
+							}
+
+							if ( shaderParam && shaderParam.value ) {
+
+								var m4v = shaderParam.value;
+								uvalue.fromArray( m4v );
+
+							}
+
+							if ( value ) {
+
+								uvalue.fromArray( value );
+
+							}
+
+						} else {
+
+							if ( shaderParam && shaderParam.value ) {
+
+								var m4 = shaderParam.value;
+								uvalue.fromArray( m4 );
+
+							}
+
+							if ( value ) {
+
+								uvalue.fromArray( value );
+
+							}
+
+						}
+
+						break;
+
+					case WEBGL_CONSTANTS.SAMPLER_2D:
+
+						if ( value !== undefined ) {
+
+							uvalue = dependencies.textures[ value ];
+
+						} else if ( shaderParam.value !== undefined ) {
+
+							uvalue = dependencies.textures[ shaderParam.value ];
+
+						} else {
+
+							uvalue = null;
+
+						}
+
+						break;
+
+				}
+
+				materialParams.uniforms[ uniformId ] = {
+					value: uvalue,
+					semantic: usemantic,
+					node: unode
+				};
+
+			} else {
+
+				throw new Error( 'Unknown shader uniform param type: ' + ptype );
+
+			}
+
+		}
+
+		var states = technique.states || {};
+		var enables = states.enable || [];
+		var functions = states.functions || {};
+
+		var enableCullFace = false;
+		var enableDepthTest = false;
+		var enableBlend = false;
+
+		for ( var i = 0, il = enables.length; i < il; i ++ ) {
+
+			var enable = enables[ i ];
+
+			switch ( STATES_ENABLES[ enable ] ) {
+
+				case 'CULL_FACE':
+
+					enableCullFace = true;
+
+					break;
+
+				case 'DEPTH_TEST':
+
+					enableDepthTest = true;
+
+					break;
+
+				case 'BLEND':
+
+					enableBlend = true;
+
+					break;
+
+				// TODO: implement
+				case 'SCISSOR_TEST':
+				case 'POLYGON_OFFSET_FILL':
+				case 'SAMPLE_ALPHA_TO_COVERAGE':
+
+					break;
+
+				default:
+
+					throw new Error( "Unknown technique.states.enable: " + enable );
+
+			}
+
+		}
+
+		if ( enableCullFace ) {
+
+			materialParams.side = functions.cullFace !== undefined ? WEBGL_SIDES[ functions.cullFace ] : THREE.FrontSide;
+
+		} else {
+
+			materialParams.side = THREE.DoubleSide;
+
+		}
+
+		materialParams.depthTest = enableDepthTest;
+		materialParams.depthFunc = functions.depthFunc !== undefined ? WEBGL_DEPTH_FUNCS[ functions.depthFunc ] : THREE.LessDepth;
+		materialParams.depthWrite = functions.depthMask !== undefined ? functions.depthMask[ 0 ] : true;
+
+		materialParams.blending = enableBlend ? THREE.CustomBlending : THREE.NoBlending;
+		materialParams.transparent = enableBlend;
+
+		var blendEquationSeparate = functions.blendEquationSeparate;
+
+		if ( blendEquationSeparate !== undefined ) {
+
+			materialParams.blendEquation = WEBGL_BLEND_EQUATIONS[ blendEquationSeparate[ 0 ] ];
+			materialParams.blendEquationAlpha = WEBGL_BLEND_EQUATIONS[ blendEquationSeparate[ 1 ] ];
+
+		} else {
+
+			materialParams.blendEquation = THREE.AddEquation;
+			materialParams.blendEquationAlpha = THREE.AddEquation;
+
+		}
+
+		var blendFuncSeparate = functions.blendFuncSeparate;
+
+		if ( blendFuncSeparate !== undefined ) {
+
+			materialParams.blendSrc = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 0 ] ];
+			materialParams.blendDst = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 1 ] ];
+			materialParams.blendSrcAlpha = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 2 ] ];
+			materialParams.blendDstAlpha = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 3 ] ];
+
+		} else {
+
+			materialParams.blendSrc = THREE.OneFactor;
+			materialParams.blendDst = THREE.ZeroFactor;
+			materialParams.blendSrcAlpha = THREE.OneFactor;
+			materialParams.blendDstAlpha = THREE.ZeroFactor;
+
+		}
+
+	};
+
+	/**
+	 * Specular-Glossiness Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_pbrSpecularGlossiness
+	 */
 	function GLTFMaterialsPbrSpecularGlossinessExtension() {
 
 		return {
+
+			name: EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS,
+
+			getMaterialType: function () {
+
+				return THREE.ShaderMaterial;
+
+			},
 
 			extendParams: function ( params, material, dependencies ) {
 
 				// specification
 				// https://github.com/sbtron/glTF/tree/KHRpbrSpecGloss/extensions/Khronos/KHR_materials_pbrSpecularGlossiness
 
-				var pbrSpecularGlossiness = material.extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ];
+				var pbrSpecularGlossiness = material.extensions[ this.name ];
 
 				var shader = THREE.ShaderLib[ 'standard' ];
 
@@ -514,6 +915,7 @@ THREE.GLTF2Loader = ( function () {
 
 				}
 
+				params.emissive = new THREE.Color( 0.0, 0.0, 0.0 );
 				params.glossiness = pbrSpecularGlossiness.glossinessFactor !== undefined ? pbrSpecularGlossiness.glossinessFactor : 1.0;
 				params.specular = new THREE.Color( 1.0, 1.0, 1.0 );
 
@@ -1459,7 +1861,7 @@ THREE.GLTF2Loader = ( function () {
 							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
 
 								console.warn( 'THREE.GLTF2Loader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
-								              'internalFormat will be forced to be the same value as format.' );
+															'internalFormat will be forced to be the same value as format.' );
 
 							}
 
@@ -1498,530 +1900,133 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
-			"shaders",
-			"textures"
+			'shaders',
+			'textures'
 
 		] ).then( function ( dependencies ) {
 
 			return _each( json.materials, function ( material ) {
 
 				var materialType;
-				var materialValues = {};
 				var materialParams = {};
+				var materialExtensions = material.extensions || {};
 
-				var khr_material;
+				if ( materialExtensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] ) {
 
-				if ( material.extensions && material.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] ) {
+					materialType = extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].getMaterialType( material );
+					extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].extendParams( materialParams, material, dependencies );
 
-					khr_material = material.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ];
+				} else if ( materialExtensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] ) {
+
+					materialType = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].getMaterialType();
+					extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].extendParams( materialParams, material, dependencies );
+
+				} else if ( materialExtensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ] ) {
+
+					materialType = extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ].getMaterialType();
+					extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ].extendParams( materialParams, material, dependencies );
+
+				} else if ( material.pbrMetallicRoughness !== undefined ) {
+
+					// Specification:
+					// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#metallic-roughness-material
+
+					materialType = THREE.MeshStandardMaterial;
+
+					var metallicRoughness = material.pbrMetallicRoughness;
+
+					materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
+					materialParams.opacity = 1.0;
+
+					if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
+
+						var array = metallicRoughness.baseColorFactor;
+
+						materialParams.color.fromArray( array );
+						materialParams.opacity = array[ 3 ];
+
+					}
+
+					if ( metallicRoughness.baseColorTexture !== undefined ) {
+
+						materialParams.map = dependencies.textures[ metallicRoughness.baseColorTexture.index ];
+
+					}
+
+					materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
+					materialParams.roughness = metallicRoughness.roughnessFactor !== undefined ? metallicRoughness.roughnessFactor : 1.0;
+
+					if ( metallicRoughness.metallicRoughnessTexture !== undefined ) {
+
+						var textureIndex = metallicRoughness.metallicRoughnessTexture.index;
+						materialParams.metalnessMap = dependencies.textures[ textureIndex ];
+						materialParams.roughnessMap = dependencies.textures[ textureIndex ];
+
+					}
+
+				} else {
+
+					materialType = THREE.MeshPhongMaterial;
 
 				}
 
-				if ( khr_material ) {
+				if ( material.doubleSided === true ) {
 
-					// don't copy over unused values to avoid material warning spam
-					var keys = [ 'ambient', 'emission', 'transparent', 'transparency', 'doubleSided' ];
+					materialParams.side = THREE.DoubleSide;
 
-					switch ( khr_material.technique ) {
+				}
 
-						case 'BLINN' :
-						case 'PHONG' :
-							materialType = THREE.MeshPhongMaterial;
-							keys.push( 'diffuse', 'specular', 'shininess' );
-							break;
+				if ( materialParams.opacity !== undefined && materialParams.opacity < 1.0 ||
+							( materialParams.map !== undefined &&
+							( materialParams.map.format === THREE.AlphaFormat ||
+								 materialParams.map.format === THREE.RGBAFormat ||
+								 materialParams.map.format === THREE.LuminanceAlphaFormat ) ) ) {
 
-						case 'LAMBERT' :
-							materialType = THREE.MeshLambertMaterial;
-							keys.push( 'diffuse' );
-							break;
+					materialParams.transparent = true;
 
-						case 'CONSTANT' :
-						default :
-							materialType = THREE.MeshBasicMaterial;
-							break;
+				} else {
 
-					}
+					materialParams.transparent = false;
 
-					keys.forEach( function( v ) {
+				}
 
-						if ( khr_material.values[ v ] !== undefined ) materialValues[ v ] = khr_material.values[ v ];
+				if ( material.normalTexture !== undefined ) {
 
-					} );
+					materialParams.normalMap = dependencies.textures[ material.normalTexture.index ];
 
-					if ( khr_material.doubleSided || materialValues.doubleSided ) {
+				}
 
-						materialParams.side = THREE.DoubleSide;
+				if ( material.occlusionTexture !== undefined ) {
 
-					}
+					materialParams.aoMap = dependencies.textures[ material.occlusionTexture.index ];
 
-					if ( khr_material.transparent || materialValues.transparent ) {
+				}
 
-						materialParams.transparent = true;
-						materialParams.opacity = ( materialValues.transparency !== undefined ) ? materialValues.transparency : 1;
+				if ( material.emissiveFactor !== undefined ) {
 
-					}
+					if ( materialType === THREE.MeshBasicMaterial ) {
 
-				} else if ( material.technique === undefined ) {
-
-					if ( material.extensions && material.extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] ) {
-
-						materialType = THREE.ShaderMaterial;
-						extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].extendParams( materialParams, material, dependencies );
-
-					} else if ( material.pbrMetallicRoughness !== undefined )  {
-
-						// specification
-						// https://github.com/sbtron/glTF/blob/30de0b365d1566b1bbd8b9c140f9e995d3203226/specification/2.0/README.md#metallic-roughness-material
-
-						materialType = THREE.MeshStandardMaterial;
-
-						if ( material.pbrMetallicRoughness !== undefined ) {
-
-							var metallicRoughness = material.pbrMetallicRoughness;
-
-							materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
-							materialParams.opacity = 1.0;
-
-							if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
-
-								var array = metallicRoughness.baseColorFactor;
-
-								materialParams.color.fromArray( array );
-								materialParams.opacity = array[ 3 ];
-
-							}
-
-							if ( metallicRoughness.baseColorTexture !== undefined ) {
-
-								materialParams.map = dependencies.textures[ metallicRoughness.baseColorTexture.index ];
-
-							}
-
-							materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
-							materialParams.roughness = metallicRoughness.roughnessFactor !== undefined ? metallicRoughness.roughnessFactor : 1.0;
-
-							if ( metallicRoughness.metallicRoughnessTexture !== undefined ) {
-
-								var textureIndex = metallicRoughness.metallicRoughnessTexture.index;
-
-								// Note that currently metalnessMap would be entirely ignored because
-								// Three.js and glTF specification use different texture channels for metalness
-								// (Blue: Three.js, Red: glTF).
-								// But glTF specification team is discussing if they can change.
-								// Let's keep an eye on it so far.
-								//
-								// https://github.com/KhronosGroup/glTF/issues/857
-								materialParams.metalnessMap = dependencies.textures[ textureIndex ];
-								materialParams.roughnessMap = dependencies.textures[ textureIndex ];
-
-							}
-
-						}
+						materialParams.color = new THREE.Color().fromArray( material.emissiveFactor );
 
 					} else {
 
-						materialType = THREE.MeshPhongMaterial;
+						materialParams.emissive = new THREE.Color().fromArray( material.emissiveFactor );
 
 					}
 
-					if ( material.doubleSided === true ) {
+				}
 
-						materialParams.side = THREE.DoubleSide;
+				if ( material.emissiveTexture !== undefined ) {
 
-					}
+					if ( materialType === THREE.MeshBasicMaterial ) {
 
-					if ( materialParams.opacity !== undefined && materialParams.opacity < 1.0 ||
-					     ( materialParams.map !== undefined &&
-					       ( materialParams.map.format === THREE.AlphaFormat ||
-					         materialParams.map.format === THREE.RGBAFormat ||
-					         materialParams.map.format === THREE.LuminanceAlphaFormat ) ) ) {
-
-						materialParams.transparent = true;
+						materialParams.map = dependencies.textures[ material.emissiveTexture.index ];
 
 					} else {
-
-						materialParams.transparent = false;
-
-					}
-
-					if ( material.normalTexture !== undefined ) {
-
-						materialParams.normalMap = dependencies.textures[ material.normalTexture.index ];
-
-					}
-
-					if ( material.occlusionTexture !== undefined ) {
-
-						materialParams.aoMap = dependencies.textures[ material.occlusionTexture.index ];
-
-					}
-
-					if ( material.emissiveTexture !== undefined ) {
 
 						materialParams.emissiveMap = dependencies.textures[ material.emissiveTexture.index ];
 
 					}
-
-					materialParams.emissive = new THREE.Color( 0.0, 0.0, 0.0 );
-
-					if ( material.emissiveFactor !== undefined ) {
-
-						materialParams.emissive.fromArray( material.emissiveFactor );
-
-					}
-
-					Object.assign( materialValues, material.values );
-
-				} else {
-
-					materialType = DeferredShaderMaterial;
-
-					// I've left the existing json.techniques code as is so far though
-					// techniques is moved to extension in glTF 2.0 because
-					// it seems there still be many models which have techniques under json.
-					// I'm gonna move the techniques code into GLTFTechniqueWebglExtension
-					// when glTF 2.0 release is officially announced.
-
-					var extension = extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ];
-
-					var techniques = extension !== undefined ? extension.techniques : json.techniques;
-					var programs = extension !== undefined ? extension.programs : json.programs;
-
-					var technique = techniques[ material.technique ];
-
-					materialParams.uniforms = {};
-
-					var program = programs[ technique.program ];
-
-					if ( program ) {
-
-						materialParams.fragmentShader = dependencies.shaders[ program.fragmentShader ];
-
-						if ( ! materialParams.fragmentShader ) {
-
-							console.warn( "ERROR: Missing fragment shader definition:", program.fragmentShader );
-							materialType = THREE.MeshPhongMaterial;
-
-						}
-
-						var vertexShader = dependencies.shaders[ program.vertexShader ];
-
-						if ( ! vertexShader ) {
-
-							console.warn( "ERROR: Missing vertex shader definition:", program.vertexShader );
-							materialType = THREE.MeshPhongMaterial;
-
-						}
-
-						// IMPORTANT: FIX VERTEX SHADER ATTRIBUTE DEFINITIONS
-						materialParams.vertexShader = replaceTHREEShaderAttributes( vertexShader, technique );
-
-						var uniforms = technique.uniforms;
-
-						for ( var uniformId in uniforms ) {
-
-							var pname = uniforms[ uniformId ];
-							var shaderParam = technique.parameters[ pname ];
-
-							var ptype = shaderParam.type;
-
-							if ( WEBGL_TYPE[ ptype ] ) {
-
-								var pcount = shaderParam.count;
-								var value;
-
-								if ( material.values !== undefined ) value = material.values[ pname ];
-
-								var uvalue = new WEBGL_TYPE[ ptype ]();
-								var usemantic = shaderParam.semantic;
-								var unode = shaderParam.node;
-
-								switch ( ptype ) {
-
-									case WEBGL_CONSTANTS.FLOAT:
-
-										uvalue = shaderParam.value;
-
-										if ( pname == "transparency" ) {
-
-											materialParams.transparent = true;
-
-										}
-
-										if ( value !== undefined ) {
-
-											uvalue = value;
-
-										}
-
-										break;
-
-									case WEBGL_CONSTANTS.FLOAT_VEC2:
-									case WEBGL_CONSTANTS.FLOAT_VEC3:
-									case WEBGL_CONSTANTS.FLOAT_VEC4:
-									case WEBGL_CONSTANTS.FLOAT_MAT3:
-
-										if ( shaderParam && shaderParam.value ) {
-
-											uvalue.fromArray( shaderParam.value );
-
-										}
-
-										if ( value ) {
-
-											uvalue.fromArray( value );
-
-										}
-
-										break;
-
-									case WEBGL_CONSTANTS.FLOAT_MAT2:
-
-										// what to do?
-										console.warn( "FLOAT_MAT2 is not a supported uniform type" );
-										break;
-
-									case WEBGL_CONSTANTS.FLOAT_MAT4:
-
-										if ( pcount ) {
-
-											uvalue = new Array( pcount );
-
-											for ( var mi = 0; mi < pcount; mi ++ ) {
-
-												uvalue[ mi ] = new WEBGL_TYPE[ ptype ]();
-
-											}
-
-											if ( shaderParam && shaderParam.value ) {
-
-												var m4v = shaderParam.value;
-												uvalue.fromArray( m4v );
-
-											}
-
-											if ( value ) {
-
-												uvalue.fromArray( value );
-
-											}
-
-										} else {
-
-											if ( shaderParam && shaderParam.value ) {
-
-												var m4 = shaderParam.value;
-												uvalue.fromArray( m4 );
-
-											}
-
-											if ( value ) {
-
-												uvalue.fromArray( value );
-
-											}
-
-										}
-
-										break;
-
-									case WEBGL_CONSTANTS.SAMPLER_2D:
-
-										if ( value !== undefined ) {
-
-											uvalue = dependencies.textures[ value ];
-
-										} else if ( shaderParam.value !== undefined ) {
-
-											uvalue = dependencies.textures[ shaderParam.value ];
-
-										} else {
-
-											uvalue = null;
-
-										}
-
-										break;
-
-								}
-
-								materialParams.uniforms[ uniformId ] = {
-									value: uvalue,
-									semantic: usemantic,
-									node: unode
-								};
-
-							} else {
-
-								throw new Error( "Unknown shader uniform param type: " + ptype );
-
-							}
-
-						}
-
-						var states = technique.states || {};
-						var enables = states.enable || [];
-						var functions = states.functions || {};
-
-						var enableCullFace = false;
-						var enableDepthTest = false;
-						var enableBlend = false;
-
-						for ( var i = 0, il = enables.length; i < il; i ++ ) {
-
-							var enable = enables[ i ];
-
-							switch ( STATES_ENABLES[ enable ] ) {
-
-								case 'CULL_FACE':
-
-									enableCullFace = true;
-
-									break;
-
-								case 'DEPTH_TEST':
-
-									enableDepthTest = true;
-
-									break;
-
-								case 'BLEND':
-
-									enableBlend = true;
-
-									break;
-
-								// TODO: implement
-								case 'SCISSOR_TEST':
-								case 'POLYGON_OFFSET_FILL':
-								case 'SAMPLE_ALPHA_TO_COVERAGE':
-
-									break;
-
-								default:
-
-									throw new Error( "Unknown technique.states.enable: " + enable );
-
-							}
-
-						}
-
-						if ( enableCullFace ) {
-
-							materialParams.side = functions.cullFace !== undefined ? WEBGL_SIDES[ functions.cullFace ] : THREE.FrontSide;
-
-						} else {
-
-							materialParams.side = THREE.DoubleSide;
-
-						}
-
-						materialParams.depthTest = enableDepthTest;
-						materialParams.depthFunc = functions.depthFunc !== undefined ? WEBGL_DEPTH_FUNCS[ functions.depthFunc ] : THREE.LessDepth;
-						materialParams.depthWrite = functions.depthMask !== undefined ? functions.depthMask[ 0 ] : true;
-
-						materialParams.blending = enableBlend ? THREE.CustomBlending : THREE.NoBlending;
-						materialParams.transparent = enableBlend;
-
-						var blendEquationSeparate = functions.blendEquationSeparate;
-
-						if ( blendEquationSeparate !== undefined ) {
-
-							materialParams.blendEquation = WEBGL_BLEND_EQUATIONS[ blendEquationSeparate[ 0 ] ];
-							materialParams.blendEquationAlpha = WEBGL_BLEND_EQUATIONS[ blendEquationSeparate[ 1 ] ];
-
-						} else {
-
-							materialParams.blendEquation = THREE.AddEquation;
-							materialParams.blendEquationAlpha = THREE.AddEquation;
-
-						}
-
-						var blendFuncSeparate = functions.blendFuncSeparate;
-
-						if ( blendFuncSeparate !== undefined ) {
-
-							materialParams.blendSrc = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 0 ] ];
-							materialParams.blendDst = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 1 ] ];
-							materialParams.blendSrcAlpha = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 2 ] ];
-							materialParams.blendDstAlpha = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 3 ] ];
-
-						} else {
-
-							materialParams.blendSrc = THREE.OneFactor;
-							materialParams.blendDst = THREE.ZeroFactor;
-							materialParams.blendSrcAlpha = THREE.OneFactor;
-							materialParams.blendDstAlpha = THREE.ZeroFactor;
-
-						}
-
-					}
-
-				}
-
-				if ( Array.isArray( materialValues.diffuse ) ) {
-
-					materialParams.color = new THREE.Color().fromArray( materialValues.diffuse );
-
-				} else if ( typeof( materialValues.diffuse ) === 'string' ) {
-
-					materialParams.map = dependencies.textures[ materialValues.diffuse ];
-
-				}
-
-				delete materialParams.diffuse;
-
-				if ( typeof( materialValues.reflective ) === 'string' ) {
-
-					materialParams.envMap = dependencies.textures[ materialValues.reflective ];
-
-				}
-
-				if ( typeof( materialValues.bump ) === 'string' ) {
-
-					materialParams.bumpMap = dependencies.textures[ materialValues.bump ];
-
-				}
-
-				if ( Array.isArray( materialValues.emission ) ) {
-
-					if ( materialType === THREE.MeshBasicMaterial ) {
-
-						materialParams.color = new THREE.Color().fromArray( materialValues.emission );
-
-					} else {
-
-						materialParams.emissive = new THREE.Color().fromArray( materialValues.emission );
-
-					}
-
-				} else if ( typeof( materialValues.emission ) === 'string' ) {
-
-					if ( materialType === THREE.MeshBasicMaterial ) {
-
-						materialParams.map = dependencies.textures[ materialValues.emission ];
-
-					} else {
-
-						materialParams.emissiveMap = dependencies.textures[ materialValues.emission ];
-
-					}
-
-				}
-
-				if ( Array.isArray( materialValues.specular ) ) {
-
-					materialParams.specular = new THREE.Color().fromArray( materialValues.specular );
-
-				} else if ( typeof( materialValues.specular ) === 'string' ) {
-
-					materialParams.specularMap = dependencies.textures[ materialValues.specular ];
-
-				}
-
-				if ( materialValues.shininess !== undefined ) {
-
-					materialParams.shininess = materialValues.shininess;
 
 				}
 
@@ -2747,8 +2752,8 @@ THREE.GLTF2Loader = ( function () {
 							 && node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ]
 							 && node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].light ) {
 
-						var extensionLights = extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].lights;
-						var light = extensionLights[ node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].light ];
+						var extensionLights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
+						var light = extensionLights[ node.extensions[ EXTENSIONS.KHR_LIGHTS ].light ];
 
 						_node.add( light );
 
