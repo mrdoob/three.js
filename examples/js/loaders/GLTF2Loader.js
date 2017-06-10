@@ -1918,12 +1918,12 @@ THREE.GLTF2Loader = ( function () {
 
 				} else if ( materialExtensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] ) {
 
-					materialType = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].getMaterialType();
+					materialType = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].getMaterialType( material );
 					extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].extendParams( materialParams, material, dependencies );
 
 				} else if ( materialExtensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ] ) {
 
-					materialType = extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ].getMaterialType();
+					materialType = extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ].getMaterialType( material );
 					extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ].extendParams( materialParams, material, dependencies );
 
 				} else if ( material.pbrMetallicRoughness !== undefined ) {
