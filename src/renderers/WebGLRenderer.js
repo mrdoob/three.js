@@ -406,6 +406,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.getRenderLists = function () {
+
+		return renderLists;
+
+	};
+
 	this.getSize = function () {
 
 		return {
