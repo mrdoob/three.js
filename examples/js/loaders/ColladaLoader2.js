@@ -128,6 +128,12 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function isEmpty( object ) {
+
+			return  Object.keys( object ).length === 0;
+
+		}
+
 		// asset
 
 		function parseAsset( xml ) {
@@ -320,6 +326,387 @@ THREE.ColladaLoader.prototype = {
 			data.sampler = parseId( xml.getAttribute( 'source' ) );
 
 			return data;
+
+		}
+
+		function buildAnimation( data ) {
+
+			var tracks = [];
+
+			var channels = data.channels;
+			var samplers = data.samplers;
+			var sources = data.sources;
+
+			for ( var target in channels ) {
+
+				if ( channels.hasOwnProperty( target ) ) {
+
+					var channel = channels[ target ];
+					var sampler = samplers[ channel.sampler ];
+
+					var inputId = sampler.inputs.INPUT;
+					var outputId = sampler.inputs.OUTPUT;
+					var interpolationId = sampler.inputs.INTERPOLATION;
+
+					var inputSource = sources[ inputId ];
+					var outputSource = sources[ outputId ];
+					var interpolationSource = sources[ interpolationId ];
+
+					var animation = buildAnimationChannel( channel, inputSource, outputSource, interpolationSource );
+
+					createKeyframeTracks( animation, tracks );
+
+				}
+
+			}
+
+			return tracks;
+
+		}
+
+		function getAnimation( id ) {
+
+			return getBuild( library.animations[ id ], buildAnimation );
+
+		}
+
+		function buildAnimationChannel( channel, inputSource, outputSource, interpolationSource ) {
+
+			var node = library.nodes[ channel.id ];
+			var transform = node.transforms[ channel.sid ];
+			var defaultMatrix = node.matrix.clone().transpose();
+
+			var time, stride;
+			var i, il, j, jl;
+
+			var data = {};
+
+			// the collada spec allows the animation of data in various ways.
+			// depending on the transform type (matrix, translate, rotate, scale), we execute different logic
+
+			switch ( transform ) {
+
+				case 'matrix':
+
+					for ( i = 0, il = inputSource.array.length; i < il; i ++ ) {
+
+						time = inputSource.array[ i ];
+						stride = i * outputSource.stride;
+
+						if ( data[ time ] === undefined ) data[ time ] = {};
+
+						if ( channel.arraySyntax === true ) {
+
+							var value = outputSource.array[ stride ];
+							var index = channel.indices[ 0 ] + 4 * channel.indices[ 1 ];
+
+							data[ time ][ index ] = value;
+
+						} else {
+
+							for ( j = 0, jl = outputSource.stride; j < jl; j ++ ) {
+
+								data[ time ][ j ] = outputSource.array[ stride + j ];
+
+							}
+
+						}
+
+					}
+
+					break;
+
+				case 'translate':
+					console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
+					break;
+
+				case 'rotate':
+					console.warn( 'THREE.ColladaLoader: Animation transform "%s" not yet implemented.', transform );
+					break;
+
+				case 'scale':
+					console.warn( 'THREE.ColladaLoader: Animation transform "%s" not yet implemented.', transform );
+					break;
+
+			}
+
+			keyframes = prepareAnimationData( data, defaultMatrix );
+
+			var animation = {
+				name: '.bones[' + node.sid + ']',
+				keyframes: keyframes
+			}
+
+			return animation;
+
+		}
+
+		function prepareAnimationData( data, defaultMatrix ) {
+
+			var keyframes = [];
+
+			// transfer data into a sortable array
+
+			for ( var time in data ) {
+
+				keyframes.push( { time: parseFloat( time ), value: data[ time ] } );
+
+			}
+
+			// ensure keyframes are sorted by time
+
+			keyframes.sort( ascending );
+
+			// now we clean up all animation data, so we can use them for keyframe tracks
+
+			for ( var i = 0; i < 16; i ++ ) {
+
+				transformAnimationData( keyframes, i, defaultMatrix.elements[ i ] );
+
+			}
+
+			return keyframes;
+
+			// array sort function
+
+			function ascending( a, b ) {
+
+				return a.time - b.time;
+
+			}
+
+		}
+
+		var position = new THREE.Vector3();
+		var scale = new THREE.Vector3();
+		var quaternion = new THREE.Quaternion();
+
+		function createKeyframeTracks( animation, tracks ) {
+
+			var keyframes = animation.keyframes;
+			var name = animation.name;
+
+			var times = [];
+			var positionData = [];
+			var quaternionData = [];
+			var scaleData = [];
+
+			for ( var i = 0, l = keyframes.length; i < l; i ++ ) {
+
+				var keyframe = keyframes[ i ];
+
+				var time = keyframe.time;
+				var value = keyframe.value;
+
+				matrix.set(
+					value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ],
+					value[ 4 ], value[ 5 ], value[ 6 ], value[ 7 ],
+					value[ 8 ], value[ 9 ], value[ 10 ], value[ 11 ],
+					value[ 12 ], value[ 13 ], value[ 14 ], value[ 15 ]
+				);
+
+				matrix.decompose( position, quaternion, scale );
+
+				times.push( time );
+				positionData.push( position.x, position.y, position.z );
+				quaternionData.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+				scaleData.push( scale.x, scale.y, scale.z );
+
+			}
+
+			if ( positionData.length > 0 ) tracks.push( new THREE.VectorKeyframeTrack( name + '.position', times, positionData ) );
+			if ( quaternionData.length > 0 ) tracks.push( new THREE.QuaternionKeyframeTrack( name + '.quaternion', times, quaternionData ) );
+			if ( scaleData.length > 0 ) tracks.push( new THREE.VectorKeyframeTrack( name + '.scale', times, scaleData ) );
+
+			return tracks;
+
+		}
+
+		function transformAnimationData( keyframes, property, defaultValue ) {
+
+			var keyframe;
+
+			var empty = true;
+			var i, l;
+
+			// check, if values of a property are missing in our keyframes
+
+			for ( i = 0, l = keyframes.length; i < l; i ++ ) {
+
+				keyframe = keyframes[ i ];
+
+				if ( keyframe.value[ property ] === undefined ) {
+
+					keyframe.value[ property ] = null; // mark as missing
+
+				} else {
+
+					empty = false;
+
+				}
+
+			}
+
+			if ( empty === true ) {
+
+				// no values at all, so we set a default value
+
+				for ( i = 0, l = keyframes.length; i < l; i ++ ) {
+
+					keyframe = keyframes[ i ];
+
+					keyframe.value[ property ] = defaultValue;
+
+				}
+
+			} else {
+
+				// filling gaps
+
+				createMissingKeyframes( keyframes, property );
+
+			}
+
+		}
+
+		function createMissingKeyframes( keyframes, property ) {
+
+			var prev, next;
+
+			for ( var i = 0, l = keyframes.length; i < l; i ++ ) {
+
+				var keyframe = keyframes[ i ];
+
+				if ( keyframe.value[ property ] === null ) {
+
+					prev = getPrev( keyframes, i, property );
+					next = getNext( keyframes, i, property );
+
+					if ( prev === null )  {
+
+						keyframe.value[ property ] = next.value[ property ];
+						continue;
+
+					}
+
+					if ( next === null ) {
+
+						keyframe.value[ property ] = prev.value[ property ];
+						continue;
+
+					}
+
+					interpolate( keyframe, prev, next, property );
+
+				}
+
+			}
+
+		}
+
+		function getPrev( keyframes, i, property ) {
+
+			while ( i >= 0 ) {
+
+				var keyframe = keyframes[ i ];
+
+				if ( keyframe.value[ property ] !== null ) return keyframe;
+
+				i --;
+
+			}
+
+			return null;
+
+		}
+
+		function getNext( keyframes, i, property ) {
+
+			while ( i < keyframes.length ) {
+
+				var keyframe = keyframes[ i ];
+
+				if ( keyframe.value[ property ] !== null ) return keyframe;
+
+				i ++;
+
+			}
+
+			return null;
+
+		}
+
+		function interpolate( key, prev, next, property ) {
+
+			if ( ( next.time - prev.time ) === 0 ) {
+
+				key.value[ property ] = prev.value[ property ];
+				return;
+
+			}
+
+			key.value[ property ] = ( ( key.time - prev.time ) * ( next.value[ property ] - prev.value[ property ] ) / ( next.time - prev.time ) ) + prev.value[ property ];
+
+		}
+
+		// animation clips
+
+		function parseAnimationClip( xml ) {
+
+			var data = {
+				name: xml.getAttribute( 'id' ) || 'default',
+				start: parseFloat( xml.getAttribute( 'start' ) || 0 ),
+				end: parseFloat( xml.getAttribute( 'end' ) || 0 ),
+				animations: []
+			};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'instance_animation':
+						data.animations.push( parseId( child.getAttribute( 'url' ) ) );
+						break;
+
+				}
+
+			}
+
+			library.clips[ xml.getAttribute( 'id' ) ] = data;
+
+		}
+
+		function buildAnimationClip( data ) {
+
+			var tracks = [];
+
+			var name = data.name;
+			var duration = ( data.end - data.start ) || - 1;
+			var animations = data.animations;
+
+			for ( var i = 0, il = animations.length; i < il; i ++ ) {
+
+				var animationTracks = getAnimation( animations[ i ] );
+
+				for ( var j = 0, jl = animationTracks.length; j < jl; j ++ ) {
+
+					tracks.push( animationTracks[ j ] );
+
+				}
+
+			}
+
+			return new THREE.AnimationClip( name, duration, tracks );
+
+		}
+
+		function getAnimationClip( id ) {
+
+			return getBuild( library.clips[ id ], buildAnimationClip );
 
 		}
 
@@ -1681,6 +2068,7 @@ THREE.ColladaLoader.prototype = {
 			var data = {
 				name: xml.getAttribute( 'name' ),
 				type: xml.getAttribute( 'type' ),
+				id: xml.getAttribute( 'id' ),
 				sid: xml.getAttribute( 'sid' ),
 				matrix: new THREE.Matrix4(),
 				nodes: [],
@@ -1688,7 +2076,8 @@ THREE.ColladaLoader.prototype = {
 				instanceControllers: [],
 				instanceLights: [],
 				instanceGeometries: [],
-				instanceNodes: []
+				instanceNodes: [],
+				transforms: {}
 			};
 
 			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
@@ -1732,24 +2121,28 @@ THREE.ColladaLoader.prototype = {
 
 					case 'matrix':
 						var array = parseFloats( child.textContent );
-						data.matrix.multiply( matrix.fromArray( array ).transpose() ); // .transpose() when Z_UP?
+						data.matrix.multiply( matrix.fromArray( array ).transpose() );
+						data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 						break;
 
 					case 'translate':
 						var array = parseFloats( child.textContent );
 						vector.fromArray( array );
 						data.matrix.multiply( matrix.makeTranslation( vector.x, vector.y, vector.z ) );
+						data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 						break;
 
 					case 'rotate':
 						var array = parseFloats( child.textContent );
 						var angle = THREE.Math.degToRad( array[ 3 ] );
 						data.matrix.multiply( matrix.makeRotationAxis( vector.fromArray( array ), angle ) );
+						data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 						break;
 
 					case 'scale':
 						var array = parseFloats( child.textContent );
 						data.matrix.scale( vector.fromArray( array ) );
+						data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 						break;
 
 					case 'extra':
@@ -1877,6 +2270,7 @@ THREE.ColladaLoader.prototype = {
 
 						object.bind( skeleton, controller.skin.bindMatrix );
 						object.normalizeSkinWeights();
+						object.bones = skeleton.bones; // this is necessary for property binding
 						object.add( node ); // bone hierarchy is a child of the skinned mesh
 
 						object.material = getMaterial( instance.materials[ key ] );
@@ -2008,6 +2402,46 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function setupAnimations() {
+
+			var clips = library.clips;
+
+			if ( isEmpty( clips ) === true ) {
+
+				if ( isEmpty( library.animations ) === false ) {
+
+					// if there are animations but no clips, we create a default clip for playback
+
+					var tracks = [];
+
+					for ( var id in library.animations ) {
+
+						var animationTracks = getAnimation( id );
+
+						for ( var i = 0, l = animationTracks.length; i < l; i ++ ) {
+
+							tracks.push( animationTracks[ i ] );
+
+						}
+
+					}
+
+					animations.push( new THREE.AnimationClip( 'default', - 1, tracks ) );
+
+				}
+
+			} else {
+
+				for ( var id in clips ) {
+
+					animations.push( getAnimationClip( id ) );
+
+				}
+
+			}
+
+		}
+
 		console.time( 'THREE.ColladaLoader' );
 
 		if ( text.length === 0 ) {
@@ -2034,8 +2468,13 @@ THREE.ColladaLoader.prototype = {
 
 		//
 
+		var animations = [];
+
+		//
+
 		var library = {
 			animations: {},
+			clips: {},
 			controllers: {},
 			images: {},
 			effects: {},
@@ -2049,7 +2488,8 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'THREE.ColladaLoader: Parse' );
 
-		// parseLibrary( collada, 'library_animations', 'animation', parseAnimation );
+		parseLibrary( collada, 'library_animations', 'animation', parseAnimation );
+		parseLibrary( collada, 'library_animation_clips', 'animation_clip', parseAnimationClip );
 		parseLibrary( collada, 'library_controllers', 'controller', parseController );
 		parseLibrary( collada, 'library_images', 'image', parseImage );
 		parseLibrary( collada, 'library_effects', 'effect', parseEffect );
@@ -2064,6 +2504,8 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'THREE.ColladaLoader: Build' );
 
+		buildLibrary( library.animations, buildAnimation );
+		buildLibrary( library.clips, buildAnimationClip );
 		buildLibrary( library.controllers, buildController );
 		buildLibrary( library.images, buildImage );
 		buildLibrary( library.effects, buildEffect );
@@ -2075,7 +2517,7 @@ THREE.ColladaLoader.prototype = {
 
 		console.timeEnd( 'THREE.ColladaLoader: Build' );
 
-		// console.log( library );
+		setupAnimations();
 
 		var scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
 
@@ -2089,11 +2531,8 @@ THREE.ColladaLoader.prototype = {
 
 		console.timeEnd( 'THREE.ColladaLoader' );
 
-		// console.log( scene );
-
 		return {
-			animations: [],
-			kinematics: { joints: [] },
+			animations: animations,
 			library: library,
 			scene: scene
 		};
