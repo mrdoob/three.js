@@ -4,6 +4,7 @@ varying vec4 vWorldPosition;
 #include <common>
 #include <packing>
 #include <clipping_planes_pars_fragment>
+#include <global_fragment>
 
 void main () {
 

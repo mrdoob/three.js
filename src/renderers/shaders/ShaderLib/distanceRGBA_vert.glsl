@@ -4,6 +4,7 @@ varying vec4 vWorldPosition;
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>
 #include <clipping_planes_pars_vertex>
+#include <global_vertex>
 
 void main() {
 

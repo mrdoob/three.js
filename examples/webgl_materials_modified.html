@@ -94,7 +94,6 @@
 
 				// BEGIN custom shader injection ----
 
-				//same
 				var myShader = [
 					'float theta = sin( time + position.y ) / 2.0;',
 					'float c = cos( theta );',
@@ -104,39 +103,38 @@
 					'vNormal = vNormal * m;'
 				].join( '\n' );
 
-				//[D1] 
 				material.shaderIncludes = {
+
 					begin_vertex: myShader,
 
-					/**[D3]
-					 * there could probably be a better way to inject 
-					 * outside of main(), but when this was written there
-					 * were no good hooks. common is both in vert and frag
-					 * uv_pars_vertex works as its present in most of the shaders
-					 */
-					uv_pars_vertex: [
+					global_vertex: 'uniform float time;\n'
 
-						THREE.ShaderChunk['uv_pars_vertex'],
-						"uniform float time;",
-					].join('\n')
 				};
 
-				//[D2] this one needs an object literal to be created
 				material.shaderUniforms = {
-					time: { value: 0 }
+					time: { value: 0 }  
 				};
+
+				//OR
+
+				// material.shaderIncludes = {
+
+					// begin_vertex: myShader,
+
+				// };
+
+				// material.shaderUniforms = {
+					// time: { value: 0 , type:'float' } //if type is provided the uniform will be injected automatically  
+				// };
 
 				materialShader = material;
 
-				material.onBeforeCompile = function ( shader ) {
+				// material.onBeforeCompile = function ( shader ) {
 
-					//[D2] this one already has a uniforms object
 					// shader.uniforms.time = { value: 0 };
 
-					//[D3] way better
 					// shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
 					
-					//[D1] tad more verbose?
 					// shader.vertexShader = shader.vertexShader.replace(
 					// 	'#include <begin_vertex>',
 					// 	myShader
@@ -144,7 +142,7 @@
 
 					// materialShader = shader;
 
-				};
+				// };
 
 				loader = new THREE.JSONLoader();
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) {

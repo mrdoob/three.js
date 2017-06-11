@@ -1543,6 +1543,8 @@ function WebGLRenderer( parameters ) {
 
 		if ( programChange ) {
 
+			var shaderUniformsGLSL = ''
+
 			if ( parameters.shaderID ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
@@ -1551,10 +1553,24 @@ function WebGLRenderer( parameters ) {
 					UniformsUtils.merge([ UniformsUtils.clone( shader.uniforms ) , material.shaderUniforms ]) :
 					UniformsUtils.clone( shader.uniforms );
 
+				//if shader uniforms are present
+				for ( var u in material.shaderUniforms ) {
+
+					var uniform = material.shaderUniforms[ u ];
+					var type = uniform.type;
+
+					if ( type ) {
+
+						shaderUniformsGLSL += 'uniform ' + type + ' ' + u + ';\n'
+
+					}
+
+				}
+
 				materialProperties.shader = {
 					name: material.type,
 					uniforms: computedUniforms,
-					vertexShader: shader.vertexShader,
+					vertexShader: shaderUniformsGLSL + shader.vertexShader,
 					fragmentShader: shader.fragmentShader
 				};
 
