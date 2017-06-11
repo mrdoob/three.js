@@ -10743,6 +10743,8 @@
 
 				}
 
+				return this;
+
 			}
 
 			var index = this.children.indexOf( object );
@@ -10757,6 +10759,8 @@
 
 			}
 
+			return this;
+			
 		},
 
 		getObjectById: function ( id ) {
