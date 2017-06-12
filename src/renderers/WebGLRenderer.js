@@ -1571,7 +1571,7 @@ function WebGLRenderer( parameters ) {
 					name: material.type,
 					uniforms: computedUniforms,
 					vertexShader: shaderUniformsGLSL + shader.vertexShader,
-					fragmentShader: shader.fragmentShader
+					fragmentShader: shaderUniformsGLSL + shader.fragmentShader
 				};
 
 			} else {
