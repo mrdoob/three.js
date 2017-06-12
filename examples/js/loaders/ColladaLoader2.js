@@ -430,7 +430,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			keyframes = prepareAnimationData( data, defaultMatrix );
+			var keyframes = prepareAnimationData( data, defaultMatrix );
 
 			var animation = {
 				name: '.bones[' + node.sid + ']',
