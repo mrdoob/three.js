@@ -2540,6 +2540,12 @@ THREE.GLTF2Loader = ( function () {
 
 			}
 
+			if ( _node.name !== undefined ) {
+
+				_node.name = THREE.PropertyBinding.sanitizeNodeName( _node.name );
+
+			}
+
 			if ( node.extras ) _node.userData = node.extras;
 
 			if ( node.matrix !== undefined ) {
