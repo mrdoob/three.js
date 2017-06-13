@@ -1909,7 +1909,7 @@ THREE.ColladaLoader.prototype = {
 
 				var primitive = primitives[ p ];
 				var inputs = primitive.inputs;
-				var triangleCount = 1
+				var triangleCount = 1;
 
 				if ( primitive.vcount && primitive.vcount[ 0 ] === 4 ) {
 
