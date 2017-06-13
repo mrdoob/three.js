@@ -212,6 +212,11 @@
 		Used internally by the renderer to keep track of various sub object properties.
 		</div>
 
+		<h3>[property:WebGLRenderLists renderLists]</h3>
+		<div>
+		Internal object handling ordering of scene object rendering.
+		</div>
+
 		<h3>[property:WebGLShadowMap shadowMap]</h3>
 		<div>
 		This contains the reference to the shadow map, if used.
@@ -353,9 +358,6 @@
 
 		<h3>[method:string getPrecision]()</h3>
 		<div>This gets the precision used by the shaders. It returns "highp","mediump" or "lowp".</div>
-
-		<h3>[method:WebGLRenderLists getRenderLists]()</h3>
-		<div>Returns the renderer's internal WebGLRenderLists object.</div>
 
 		<h3>[method:Object getSize]()</h3>
 		<div>Returns an object containing the width and height of the renderer's output canvas, in pixels.</div>
