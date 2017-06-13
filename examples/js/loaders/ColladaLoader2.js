@@ -1844,6 +1844,7 @@ THREE.ColladaLoader.prototype = {
 			var primitive = {
 				type: xml.nodeName,
 				material: xml.getAttribute( 'material' ),
+				count:  parseInt( xml.getAttribute( 'count' ) ),
 				inputs: {},
 				stride: 0
 			};
@@ -1880,29 +1881,53 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		var DEFAULT_LINEMATERIAL = new THREE.LineBasicMaterial();
-		var DEFAULT_MESHMATERIAL = new THREE.MeshPhongMaterial();
-
 		function buildGeometry( data ) {
-
-			var group = {};
 
 			var sources = data.sources;
 			var vertices = data.vertices;
 			var primitives = data.primitives;
 
-			var skinning = false;
+			if ( primitives.length === 0 ) return {};
 
-			if ( primitives.length === 0 ) return group;
+			var position = { array: [], stride: 0 };
+			var normal = { array: [], stride: 0 };
+			var uv = { array: [], stride: 0 };
+			var color = { array: [], stride: 0 };
+
+			var skinIndex = { array: [], stride: 4 };
+			var skinWeight = { array: [], stride: 4 };
+
+			var geometry = new THREE.BufferGeometry();
+			geometry.name = data.name || '';
+
+			var materials = [];
+
+			var start = 0, count = 0;
+			var array;
 
 			for ( var p = 0; p < primitives.length; p ++ ) {
 
 				var primitive = primitives[ p ];
 				var inputs = primitive.inputs;
+				var triangleCount = 1;
 
-				var geometry = new THREE.BufferGeometry();
+				if ( primitive.vcount && primitive.vcount[ 0 ] === 4 ) {
 
-				if ( data.name ) geometry.name = data.name;
+					triangleCount = 2; // one quad -> two triangles
+
+				}
+
+				// groups
+
+				count = primitive.count * 3 * triangleCount;
+				geometry.addGroup( start, count, p );
+				start += count;
+
+				// material
+
+				materials.push( getMaterial( primitive.material ) );
+
+				// geometry data
 
 				for ( var name in inputs ) {
 
@@ -1913,14 +1938,17 @@ THREE.ColladaLoader.prototype = {
 						case 'VERTEX':
 							for ( var key in vertices ) {
 
-								geometry.addAttribute( key.toLowerCase(), buildGeometryAttribute( primitive, sources[ vertices[ key ] ], input.offset ) );
+								if ( key === 'POSITION' ) {
 
-								if ( key.toLowerCase() === 'position' && sources.skinWeights && sources.skinIndices ) {
+									buildGeometryData( primitive, sources[ vertices[ key ] ], input.offset, position.array );
+									position.stride = sources[ vertices[ key ] ].stride;
 
-									geometry.addAttribute( 'skinWeight', buildGeometryAttribute( primitive, sources.skinWeights, input.offset ) );
-									geometry.addAttribute( 'skinIndex', buildGeometryAttribute( primitive, sources.skinIndices, input.offset ) );
+									if ( sources.skinWeights && sources.skinIndices ) {
 
-									skinning = true;
+										buildGeometryData( primitive, sources.skinIndices, input.offset, skinIndex.array );
+										buildGeometryData( primitive, sources.skinWeights, input.offset, skinWeight.array );
+
+									}
 
 								}
 
@@ -1928,49 +1956,82 @@ THREE.ColladaLoader.prototype = {
 							break;
 
 						case 'NORMAL':
-							geometry.addAttribute( 'normal', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
+							buildGeometryData( primitive, sources[ input.id ], input.offset, normal.array );
+							normal.stride = sources[ input.id ].stride;
 							break;
 
 						case 'COLOR':
-							geometry.addAttribute( 'color', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
+							buildGeometryData( primitive, sources[ input.id ], input.offset, color.array );
+							color.stride = sources[ input.id ].stride;
 							break;
 
 						case 'TEXCOORD':
-							geometry.addAttribute( 'uv', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
+							buildGeometryData( primitive, sources[ input.id ], input.offset, uv.array );
+							uv.stride = sources[ input.id ].stride;
 							break;
 
 					}
 
 				}
 
-				var object;
+			}
 
-				switch ( primitive.type ) {
+			// build geometry
 
-					case 'lines':
-						object = new THREE.LineSegments( geometry, DEFAULT_LINEMATERIAL );
-						break;
+			if ( position.array.length > 0 ) geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position.array, position.stride ) );
+			if ( normal.array.length > 0 ) geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normal.array, normal.stride ) );
+			if ( color.array.length > 0 ) geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( color.array, color.stride ) );
+			if ( uv.array.length > 0 ) geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uv.array, uv.stride ) );
 
-					case 'linestrips':
-						object = new THREE.Line( geometry, DEFAULT_LINEMATERIAL );
-						break;
+			if ( skinIndex.array.length > 0 ) geometry.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( skinIndex.array, skinIndex.stride ) );
+			if ( skinWeight.array.length > 0 ) geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeight.array, skinWeight.stride ) );
 
-					case 'triangles':
-					case 'polylist':
-						object = ( skinning === true ) ? new THREE.SkinnedMesh( geometry, DEFAULT_MESHMATERIAL ) : new THREE.Mesh( geometry, DEFAULT_MESHMATERIAL );
-						break;
+			// setup material
 
-				}
+			var material = ( materials.length === 1 ) ? materials[ 0 ] : materials;
 
-				group[ primitive.material ] = object;
+			// setup object
+
+			var object;
+
+			switch ( primitives[ 0 ].type ) {
+
+				case 'lines':
+					object = new THREE.LineSegments( geometry, material );
+					break;
+
+				case 'linestrips':
+					object = new THREE.Line( geometry, material );
+					break;
+
+				case 'triangles':
+				case 'polylist':
+
+					if ( geometry.attributes.skinIndex ) {
+
+						for ( var i = 0, l = materials.length; i < l; i ++ ) {
+
+							materials[ i ].skinning = true;
+
+						}
+
+						object = new THREE.SkinnedMesh( geometry, material );
+
+					} else {
+
+						object = new THREE.Mesh( geometry, material );
+
+					}
+
+					break;
 
 			}
 
-			return group;
+			return object;
 
 		}
 
-		function buildGeometryAttribute( primitive, source, offset ) {
+		function buildGeometryData( primitive, source, offset, array ) {
 
 			var indices = primitive.p;
 			var stride = primitive.stride;
@@ -1993,8 +2054,6 @@ THREE.ColladaLoader.prototype = {
 
 			var sourceArray = source.array;
 			var sourceStride = source.stride;
-
-			var array = [];
 
 			if ( primitive.vcount !== undefined ) {
 
@@ -2047,8 +2106,6 @@ THREE.ColladaLoader.prototype = {
 				}
 
 			}
-
-			return new THREE.Float32BufferAttribute( array, sourceStride );
 
 		}
 
@@ -2257,30 +2314,17 @@ THREE.ColladaLoader.prototype = {
 
 				var instance = instanceControllers[ i ];
 				var controller = getController( instance.id );
-				var geometries = getGeometry( controller.id );
+				var object = getGeometry( controller.id ).clone();
 
 				var node = getNode( instance.skeleton );
 				var skeleton = getSkeleton( node, controller );
 
-				for ( var key in geometries ) {
+				object.bind( skeleton, controller.skin.bindMatrix );
+				object.normalizeSkinWeights();
+				object.bones = skeleton.bones; // this is necessary for property binding
+				object.add( node ); // bone hierarchy is a child of the skinned mesh
 
-					var object = geometries[ key ].clone();
-
-					if ( instance.materials[ key ] !== undefined ) {
-
-						object.bind( skeleton, controller.skin.bindMatrix );
-						object.normalizeSkinWeights();
-						object.bones = skeleton.bones; // this is necessary for property binding
-						object.add( node ); // bone hierarchy is a child of the skinned mesh
-
-						object.material = getMaterial( instance.materials[ key ] );
-						object.material.skinning = true;
-
-					}
-
-					objects.push( object );
-
-				}
+				objects.push( object );
 
 			}
 
@@ -2293,21 +2337,8 @@ THREE.ColladaLoader.prototype = {
 			for ( var i = 0, l = instanceGeometries.length; i < l; i ++ ) {
 
 				var instance = instanceGeometries[ i ];
-				var geometries = getGeometry( instance.id );
-
-				for ( var key in geometries ) {
-
-					var object = geometries[ key ].clone();
-
-					if ( instance.materials[ key ] !== undefined ) {
-
-						object.material = getMaterial( instance.materials[ key ] );
-
-					}
-
-					objects.push( object );
-
-				}
+				var object = getGeometry( instance.id ).clone();
+				objects.push( object );
 
 			}
 
