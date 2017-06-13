@@ -1262,6 +1262,12 @@ THREE.GLTF2Loader = ( function () {
 		32926: 'SAMPLE_ALPHA_TO_COVERAGE'
 	};
 
+	var ALPHA_MODES = {
+		OPAQUE: 'OPAQUE',
+		MASK: 'MASK',
+		BLEND: 'BLEND'
+	};
+
 	/* UTILITY FUNCTIONS */
 
 	function _each( object, callback, thisObj ) {
@@ -1951,6 +1957,14 @@ THREE.GLTF2Loader = ( function () {
 
 						materialParams.map = dependencies.textures[ metallicRoughness.baseColorTexture.index ];
 
+						var alphaMode = metallicRoughness.baseColorTexture.alphaMode || ALPHA_MODES.OPAQUE;
+
+						if ( alphaMode !== ALPHA_MODES.OPAQUE ) {
+
+							materialParams.transparent = true;
+
+						}
+
 					}
 
 					materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
@@ -1976,11 +1990,7 @@ THREE.GLTF2Loader = ( function () {
 
 				}
 
-				if ( materialParams.opacity !== undefined && materialParams.opacity < 1.0 ||
-							( materialParams.map !== undefined &&
-							( materialParams.map.format === THREE.AlphaFormat ||
-								 materialParams.map.format === THREE.RGBAFormat ||
-								 materialParams.map.format === THREE.LuminanceAlphaFormat ) ) ) {
+				if ( materialParams.opacity !== undefined && materialParams.opacity < 1.0 ) {
 
 					materialParams.transparent = true;
 
