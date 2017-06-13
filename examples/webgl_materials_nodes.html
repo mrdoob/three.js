@@ -1463,8 +1463,8 @@
 
 					var velocity = new THREE.VelocityNode( mesh, {
 						type: 'elastic',
-						spring: .8,
-						friction: .9
+						spring: .95,
+						damping: .95
 					} );
 
 					var velocityArea = new THREE.OperatorNode(
@@ -1501,13 +1501,13 @@
 
 						velocity.params.spring = val;
 
-					}, false, 0, .9 );
+					}, false, 0, .95 );
 
-					addGui( 'friction', velocity.params.friction, function( val ) {
+					addGui( 'damping', velocity.params.damping, function( val ) {
 
-						velocity.params.friction = val;
+						velocity.params.damping = val;
 
-					}, false, 0, .9 );
+					}, false, 0, .95 );
 
 					addGui( 'scale', scale.number, function( val ) {
 
