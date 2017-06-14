@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loader - ImageBitmap</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body
+			{
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info
+			{
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button
+			{
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
+			}
+		</style>
+	</head>
+	<body>
+		<script src="../build/three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/ImageBitmapLoader.js"></script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Texture loader using ImageBitmap
+		</div>
+
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			THREE.Cache.enabled = true;
+
+			var container;
+
+			var camera, scene, renderer;
+			var controls;
+
+			init();
+			animate();
+
+			function decimalToHex( d ) {
+
+				var hex = Number( d ).toString( 16 );
+				hex = "000000".substr( 0, 6 - hex.length ) + hex;
+				return hex.toUpperCase();
+
+			}
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
+				camera.position.set( 0, 4, 7 );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+
+				// CONTROLS
+
+				controls = new THREE.OrbitControls( camera );
+
+				// LIGHTS
+
+				new THREE.ImageBitmapLoader()
+				.setOptions( { imageOrientation: 'none' } )
+				.load ( 'textures/planets/earth_atmos_2048.jpg', function( imageBitmap ) {
+
+					var tex = new THREE.Texture ( imageBitmap );
+					tex.needsUpdate = true;
+
+					var cube = new THREE.Mesh(
+						new THREE.BoxBufferGeometry( 1,1,1 ),
+						new THREE.MeshBasicMaterial( {
+							map: tex
+						})
+					);
+					cube.position.x = 1;
+					scene.add( cube );
+
+				}, function( p ) {
+					console.log( p );
+				}, function( e ) {
+					console.log( e );
+				} );
+
+				new THREE.ImageBitmapLoader()
+				.setOptions( { imageOrientation: 'flipY' } )
+				.load ( 'textures/planets/earth_specular_2048.jpg', function( imageBitmap ) {
+
+					var tex = new THREE.Texture ( imageBitmap );
+					tex.needsUpdate = true;
+
+					var cube = new THREE.Mesh(
+						new THREE.BoxBufferGeometry( 1,1,1 ),
+						new THREE.MeshBasicMaterial( {
+							map: tex
+						})
+					);
+					cube.position.x = -1;
+					scene.add( cube );
+
+				}, function( p ) {
+					console.log( p );
+				}, function( e ) {
+					console.log( e );
+				} );
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				// EVENTS
+
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
