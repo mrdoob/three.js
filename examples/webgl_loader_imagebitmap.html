@@ -74,6 +74,8 @@
 				group = new THREE.Group();
 				scene.add( group );
 
+				group.add( new THREE.GridHelper( 4, 12 ) );
+
 				new THREE.ImageBitmapLoader()
 				.setOptions( { imageOrientation: 'none' } )
 				.load ( 'textures/planets/earth_atmos_2048.jpg', function( imageBitmap ) {
@@ -87,7 +89,7 @@
 							map: tex
 						})
 					);
-					cube.position.x = 1;
+					cube.position.set( 1, 0.5, 0 );
 					group.add( cube );
 
 				}, function( p ) {
@@ -109,7 +111,7 @@
 							map: tex
 						})
 					);
-					cube.position.x = -1;
+					cube.position.set( -1, 0.5, 0 );
 					group.add( cube );
 
 				}, function( p ) {
