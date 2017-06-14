@@ -1883,6 +1883,8 @@ THREE.ColladaLoader.prototype = {
 
 		function buildGeometry( data ) {
 
+			var build = {};
+
 			var sources = data.sources;
 			var vertices = data.vertices;
 			var primitives = data.primitives;
@@ -1900,7 +1902,7 @@ THREE.ColladaLoader.prototype = {
 			var geometry = new THREE.BufferGeometry();
 			geometry.name = data.name || '';
 
-			var materials = [];
+			var materialKeys = [];
 
 			var start = 0, count = 0;
 			var array;
@@ -1925,7 +1927,7 @@ THREE.ColladaLoader.prototype = {
 
 				// material
 
-				materials.push( getMaterial( primitive.material ) );
+				materialKeys.push( primitive.material );
 
 				// geometry data
 
@@ -1986,48 +1988,11 @@ THREE.ColladaLoader.prototype = {
 			if ( skinIndex.array.length > 0 ) geometry.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( skinIndex.array, skinIndex.stride ) );
 			if ( skinWeight.array.length > 0 ) geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeight.array, skinWeight.stride ) );
 
-			// setup material
+			build.data = geometry;
+			build.type = primitives[ 0 ].type;
+			build.materialKeys = materialKeys;
 
-			var material = ( materials.length === 1 ) ? materials[ 0 ] : materials;
-
-			// setup object
-
-			var object;
-
-			switch ( primitives[ 0 ].type ) {
-
-				case 'lines':
-					object = new THREE.LineSegments( geometry, material );
-					break;
-
-				case 'linestrips':
-					object = new THREE.Line( geometry, material );
-					break;
-
-				case 'triangles':
-				case 'polylist':
-
-					if ( geometry.attributes.skinIndex ) {
-
-						for ( var i = 0, l = materials.length; i < l; i ++ ) {
-
-							materials[ i ].skinning = true;
-
-						}
-
-						object = new THREE.SkinnedMesh( geometry, material );
-
-					} else {
-
-						object = new THREE.Mesh( geometry, material );
-
-					}
-
-					break;
-
-			}
-
-			return object;
+			return build;
 
 		}
 
@@ -2314,7 +2279,9 @@ THREE.ColladaLoader.prototype = {
 
 				var instance = instanceControllers[ i ];
 				var controller = getController( instance.id );
-				var object = getGeometry( controller.id ).clone();
+				var geometry = getGeometry( controller.id );
+				var materials = resolveMaterialBinding( geometry.materialKeys, instance.materials );
+				var object = getObject( geometry, materials );
 
 				var node = getNode( instance.skeleton );
 				var skeleton = getSkeleton( node, controller );
@@ -2337,7 +2304,9 @@ THREE.ColladaLoader.prototype = {
 			for ( var i = 0, l = instanceGeometries.length; i < l; i ++ ) {
 
 				var instance = instanceGeometries[ i ];
-				var object = getGeometry( instance.id ).clone();
+				var geometry = getGeometry( instance.id );
+				var materials = resolveMaterialBinding( geometry.materialKeys, instance.materials );
+				var object = getObject( geometry, materials );
 				objects.push( object );
 
 			}
@@ -2369,6 +2338,68 @@ THREE.ColladaLoader.prototype = {
 			object.name = ( type === 'JOINT' ) ? data.sid : data.name;
 			object.matrix.copy( matrix );
 			object.matrix.decompose( object.position, object.quaternion, object.scale );
+
+			return object;
+
+		}
+
+		function resolveMaterialBinding( keys, instanceMaterials ) {
+
+			var materials = [];
+
+			for ( var i = 0, l = keys.length; i < l; i ++ ) {
+
+				var id = instanceMaterials[ keys[ i ] ];
+				materials.push( getMaterial( id ) );
+
+			}
+
+			return materials;
+
+		}
+
+		function getObject( geometry, materials ) {
+
+			var object;
+
+			var skinning = ( geometry.data.attributes.skinIndex !== undefined );
+
+			if ( skinning ) {
+
+				for ( var i = 0, l = materials.length; i < l; i ++ ) {
+
+					materials[ i ].skinning = true;
+
+				}
+
+			}
+
+			var material = ( materials.length === 1 ) ? materials[ 0 ] : materials;
+
+			switch ( geometry.type ) {
+
+				case 'lines':
+					object = new THREE.LineSegments( geometry.data, material );
+					break;
+
+				case 'linestrips':
+					object = new THREE.Line( geometry.data, material );
+					break;
+
+				case 'triangles':
+				case 'polylist':
+					if ( skinning ) {
+
+						object = new THREE.SkinnedMesh( geometry.data, material );
+
+					} else {
+
+						object = new THREE.Mesh( geometry.data, material );
+
+					}
+					break;
+
+			}
 
 			return object;
 
