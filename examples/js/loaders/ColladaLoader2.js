@@ -2390,12 +2390,6 @@ THREE.ColladaLoader.prototype = {
 				case 'polylist':
 					if ( skinning ) {
 
-						for ( var i = 0, l = material.length; i < l; i ++ ) {
-
-							material[ i ].skinning = true;
-
-						}
-
 						object = new THREE.SkinnedMesh( geometry.data, material );
 
 					} else {
