@@ -92,6 +92,7 @@ var files = {
 		"webgl_loader_draco",
 		"webgl_loader_fbx",
 		"webgl_loader_gltf2",
+		"webgl_loader_imagebitmap",
 		"webgl_loader_json_blender",
 		"webgl_loader_json_claraio",
 		"webgl_loader_json_objconverter",

@@ -34,7 +34,6 @@
 	<body>
 		<script src="../build/three.js"></script>
 		<script src="js/Detector.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/ImageBitmapLoader.js"></script>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Texture loader using ImageBitmap
@@ -50,18 +49,10 @@
 			var container;
 
 			var camera, scene, renderer;
-			var controls;
+			var group;
 
 			init();
 			animate();
-
-			function decimalToHex( d ) {
-
-				var hex = Number( d ).toString( 16 );
-				hex = "000000".substr( 0, 6 - hex.length ) + hex;
-				return hex.toUpperCase();
-
-			}
 
 			function init() {
 
@@ -72,16 +63,16 @@
 
 				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
 				camera.position.set( 0, 4, 7 );
+				camera.lookAt( new THREE.Vector3() );
 
 				// SCENE
 
 				scene = new THREE.Scene();
 
-				// CONTROLS
+				//
 
-				controls = new THREE.OrbitControls( camera );
-
-				// LIGHTS
+				group = new THREE.Group();
+				scene.add( group );
 
 				new THREE.ImageBitmapLoader()
 				.setOptions( { imageOrientation: 'none' } )
@@ -97,7 +88,7 @@
 						})
 					);
 					cube.position.x = 1;
-					scene.add( cube );
+					group.add( cube );
 
 				}, function( p ) {
 					console.log( p );
@@ -119,7 +110,7 @@
 						})
 					);
 					cube.position.x = -1;
-					scene.add( cube );
+					group.add( cube );
 
 				}, function( p ) {
 					console.log( p );
@@ -141,9 +132,6 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
@@ -155,7 +143,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				group.rotation.y = performance.now() / 2000;
 
 				renderer.render( scene, camera );
 
