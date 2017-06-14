@@ -343,6 +343,7 @@ function WebGLRenderer( parameters ) {
 	this.capabilities = capabilities;
 	this.extensions = extensions;
 	this.properties = properties;
+	this.renderLists = renderLists;
 	this.state = state;
 
 	// shadow map
