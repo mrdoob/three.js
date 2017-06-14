@@ -2,6 +2,45 @@
  * @author thespite / http://clicktorelease.com/
  */
 
+ function detectCreateImageBitmap() {
+
+	var url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+	return new Promise(function (resolve, reject) {
+
+		if (!('createImageBitmap' in window)) {
+			reject();
+			return;
+		}
+
+		fetch(url).then(function (res) {
+			return res.blob();
+		}).then(function (blob) {
+			Promise.all([
+				createImageBitmap(blob, { imageOrientation: "none", premultiplyAlpha: "none" }),
+				createImageBitmap(blob, { imageOrientation: "flipY", premultiplyAlpha: "none" }),
+				createImageBitmap(blob, { imageOrientation: "none", premultiplyAlpha: "premultiply" }),
+				createImageBitmap(blob, { imageOrientation: "flipY", premultiplyAlpha: "premultiply" })
+			]).then(function (res) {
+				resolve();
+			}).catch(function (e) {
+				reject();
+			});
+		});
+	});
+
+}
+
+var canUseImageBitmap = detectCreateImageBitmap();
+canUseImageBitmap
+.then( function( res ) {
+	console.log( 'createImageBitmap supported' );
+})
+.catch( function( res ) {
+	console.log( 'createImageBitmap not supported' );
+});
+
+
 THREE.ImageBitmapLoader = function (manager) {
 
 	this.manager = manager !== undefined ? manager : THREE.DefaultLoadingManager;
