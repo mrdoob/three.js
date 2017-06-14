@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @author thespite / http://clicktorelease.com/
  */
