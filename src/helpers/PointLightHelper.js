@@ -62,6 +62,7 @@ PointLightHelper.prototype.dispose = function () {
 PointLightHelper.prototype.update = function () {
 
 	if ( ! this.overrideColor ) this.material.color.copy( this.light.color );
+	else this.material.color.set( this.overrideColor );
 
 	/*
 	var d = this.light.distance;
