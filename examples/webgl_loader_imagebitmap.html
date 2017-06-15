@@ -84,7 +84,7 @@
 
 				new THREE.ImageBitmapLoader()
 					.setOptions( { imageOrientation: 'none' } )
-					.load( 'textures/planets/earth_atmos_2048.jpg', function( imageBitmap ) {
+					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function( imageBitmap ) {
 
 						var tex = new THREE.CanvasTexture( imageBitmap );
 
