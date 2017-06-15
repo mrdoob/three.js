@@ -2345,7 +2345,7 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0, l = nodes.length; i < l; i ++ ) {
 
-				objects.push( getNode( nodes[ i ] ).clone() );
+				objects.push( getNode( nodes[ i ] ) );
 
 			}
 
