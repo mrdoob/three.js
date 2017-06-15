@@ -2285,7 +2285,7 @@ THREE.ColladaLoader.prototype = {
 
 			} );
 
-			// sort bone data (the joint order is defined in the corresponding controller)
+			// sort bone data (the order is defined in the corresponding controller)
 
 			for ( var i = 0; i < joints.length; i ++ ) {
 
@@ -2303,7 +2303,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			// add missing data at the end of the list
+			// add missing bone data at the end of the list
 
 			for ( var i = 0; i < missingBoneData.length; i ++ ) {
 
