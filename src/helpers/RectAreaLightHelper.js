@@ -67,6 +67,7 @@ RectAreaLightHelper.prototype.update = function () {
 	position.needsUpdate = true;
 
 	if ( ! this.overrideColor ) this.line.material.color.copy( this.light.color );
+	else this.line.material.color.set( this.overrideColor );
 
 };
 
