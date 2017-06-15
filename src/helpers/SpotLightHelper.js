@@ -86,6 +86,7 @@ SpotLightHelper.prototype.update = function () {
 		this.cone.lookAt( vector2.sub( vector ) );
 
 		if ( ! this.overrideColor ) this.cone.material.color.copy( this.light.color );
+		else this.cone.material.color.set( this.overrideColor );
 
 	};
 
