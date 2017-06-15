@@ -682,11 +682,11 @@ THREE.ColladaLoader = function () {
 
 	}
 
-	function applySkin ( geometry, instanceCtrl, frame ) {
+	function applySkin( geometry, instanceCtrl, frame ) {
+
+		if ( frame === undefined ) frame = 40;
 
 		var skinController = controllers[ instanceCtrl.url ];
-
-		frame = frame !== undefined ? frame : 40;
 
 		if ( !skinController || !skinController.skin ) {
 
@@ -2171,13 +2171,11 @@ THREE.ColladaLoader = function () {
 			var dotSyntax = (sid.indexOf(".") >= 0);
 			var arrSyntax = (sid.indexOf("(") >= 0);
 			var arrIndices;
-			var member;
 
 			if ( dotSyntax ) {
 
 				parts = sid.split(".");
 				sid = parts.shift();
-				member = parts.shift();
 
 			} else if ( arrSyntax ) {
 
@@ -2871,7 +2869,7 @@ THREE.ColladaLoader = function () {
 		var j, k, pList = primitive.p, inputs = primitive.inputs;
 		var input, index, idx32;
 		var source, numParams;
-		var vcIndex = 0, vcount = 3, maxOffset = 0;
+		var vcount, vcIndex = 0, maxOffset = 0;
 		var texture_sets = [];
 
 		for ( j = 0; j < inputs.length; j ++ ) {

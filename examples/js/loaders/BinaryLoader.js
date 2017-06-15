@@ -92,7 +92,7 @@ THREE.BinaryLoader.prototype = {
 				start_quad_flat, start_quad_smooth, start_quad_flat_uv, start_quad_smooth_uv,
 				tri_size, quad_size,
 				len_tri_flat, len_tri_smooth, len_tri_flat_uv, len_tri_smooth_uv,
-				len_quad_flat, len_quad_smooth, len_quad_flat_uv, len_quad_smooth_uv;
+				len_quad_flat, len_quad_smooth, len_quad_flat_uv;
 
 
 			THREE.Geometry.call( this );
@@ -119,7 +119,6 @@ THREE.BinaryLoader.prototype = {
 			len_quad_flat      = md.nquad_flat      * ( quad_size );
 			len_quad_smooth    = md.nquad_smooth    * ( quad_size + md.normal_index_bytes * 4 );
 			len_quad_flat_uv   = md.nquad_flat_uv   * ( quad_size + md.uv_index_bytes * 4 );
-			len_quad_smooth_uv = md.nquad_smooth_uv * ( quad_size + md.normal_index_bytes * 4 + md.uv_index_bytes * 4 );
 
 			// read buffers
 

@@ -67,7 +67,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	addAttribute: function ( name, attribute ) {
 
-		if ( ( attribute && attribute.isBufferAttribute ) === false && ( attribute && attribute.isInterleavedBufferAttribute ) === false ) {
+		if ( ! ( attribute && attribute.isBufferAttribute ) && ! ( attribute && attribute.isInterleavedBufferAttribute ) ) {
 
 			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
@@ -777,7 +777,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	merge: function ( geometry, offset ) {
 
-		if ( ( geometry && geometry.isBufferGeometry ) === false ) {
+		if ( ! ( geometry && geometry.isBufferGeometry ) ) {
 
 			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
 			return;

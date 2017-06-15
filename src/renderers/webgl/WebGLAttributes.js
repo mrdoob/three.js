@@ -107,6 +107,8 @@ function WebGLAttributes( gl ) {
 
 	function remove( attribute ) {
 
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		
 		var data = buffers[ attribute.uuid ];
 
 		if ( data ) {

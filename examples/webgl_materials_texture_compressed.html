@@ -29,7 +29,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl - compressed textures -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed textures -
 			leaf texture by <a href="http://opengameart.org/node/10505">lauris71</a>, explosion texture by <a href="http://opengameart.org/node/7728">bart</a>
 		</div>
 
@@ -37,7 +37,6 @@
 		<script src="js/loaders/DDSLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -56,7 +55,7 @@
 
 				scene = new THREE.Scene();
 
-				geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
 				/*
 				This is how compressed textures are supposed to be used:
@@ -143,13 +142,13 @@
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material5 );
+				mesh = new THREE.Mesh( geometry, material5 );
 				mesh.position.x = 200;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material6 );
+				mesh = new THREE.Mesh( geometry, material6 );
 				mesh.position.x = 200;
 				mesh.position.y = -200;
 				scene.add( mesh );
@@ -172,9 +171,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -204,7 +200,6 @@
 				}
 
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

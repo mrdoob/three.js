@@ -173,7 +173,7 @@ THREE.SVGRenderer = function () {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
+		_viewMatrix.copy( camera.matrixWorldInverse );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
 		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
@@ -378,9 +378,15 @@ THREE.SVGRenderer = function () {
 
 		var path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y );
 
-		if ( material instanceof THREE.LineBasicMaterial ) {
+		if ( material.isLineBasicMaterial ) {
 
-			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity ) + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap + ';stroke-linejoin:' + material.linejoin;
+			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity ) + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
+
+			addPath( style, path );
+
+		} else if ( material.isLineDashedMaterial ) {
+
+			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity ) + ';stroke-width:' + material.linewidth + ';stroke-dasharray:' + material.dashSize + "," + material.gapSize;
 
 			addPath( style, path );
 

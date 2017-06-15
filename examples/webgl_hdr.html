@@ -33,8 +33,8 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl HDR texture example -
-			based on <a href="http://spidergl.org/example.php?id=13" target="_blank">SpiderGL</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl HDR texture example -
+			based on <a href="http://spidergl.org/example.php?id=13" target="_blank" rel="noopener">SpiderGL</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -190,7 +190,7 @@
 
 			function render() {
 
-				delta = clock.getDelta() * 5;
+				var delta = clock.getDelta() * 5;
 
 				if ( materialHDR.uniforms.exposure.value > 0 || materialHDR.uniforms.exposure.value < 1 ) {
 

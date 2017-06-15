@@ -15,9 +15,29 @@ import { Float32BufferAttribute } from '../core/BufferAttribute';
  * @author Mugen87 / https://github.com/Mugen87
  */
 
+function getBoneList( object ) {
+
+	var boneList = [];
+
+	if ( object && object.isBone ) {
+
+		boneList.push( object );
+
+	}
+
+	for ( var i = 0; i < object.children.length; i ++ ) {
+
+		boneList.push.apply( boneList, getBoneList( object.children[ i ] ) );
+
+	}
+
+	return boneList;
+
+}
+
 function SkeletonHelper( object ) {
 
-	this.bones = this.getBoneList( object );
+	var bones = getBoneList( object );
 
 	var geometry = new BufferGeometry();
 
@@ -27,9 +47,9 @@ function SkeletonHelper( object ) {
 	var color1 = new Color( 0, 0, 1 );
 	var color2 = new Color( 0, 1, 0 );
 
-	for ( var i = 0; i < this.bones.length; i ++ ) {
+	for ( var i = 0; i < bones.length; i ++ ) {
 
-		var bone = this.bones[ i ];
+		var bone = bones[ i ];
 
 		if ( bone.parent && bone.parent.isBone ) {
 
@@ -50,55 +70,37 @@ function SkeletonHelper( object ) {
 	LineSegments.call( this, geometry, material );
 
 	this.root = object;
+	this.bones = bones;
 
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	this.update();
+	this.onBeforeRender();
 
 }
-
 
 SkeletonHelper.prototype = Object.create( LineSegments.prototype );
 SkeletonHelper.prototype.constructor = SkeletonHelper;
 
-SkeletonHelper.prototype.getBoneList = function( object ) {
-
-	var boneList = [];
-
-	if ( object && object.isBone ) {
-
-		boneList.push( object );
-
-	}
-
-	for ( var i = 0; i < object.children.length; i ++ ) {
-
-		boneList.push.apply( boneList, this.getBoneList( object.children[ i ] ) );
-
-	}
-
-	return boneList;
-
-};
-
-SkeletonHelper.prototype.update = function () {
+SkeletonHelper.prototype.onBeforeRender = function () {
 
 	var vector = new Vector3();
 
 	var boneMatrix = new Matrix4();
 	var matrixWorldInv = new Matrix4();
 
-	return function update() {
+	return function onBeforeRender() {
+
+		var bones = this.bones;
 
 		var geometry = this.geometry;
 		var position = geometry.getAttribute( 'position' );
 
 		matrixWorldInv.getInverse( this.root.matrixWorld );
 
-		for ( var i = 0, j = 0; i < this.bones.length; i ++ ) {
+		for ( var i = 0, j = 0; i < bones.length; i ++ ) {
 
-			var bone = this.bones[ i ];
+			var bone = bones[ i ];
 
 			if ( bone.parent && bone.parent.isBone ) {
 
@@ -121,6 +123,5 @@ SkeletonHelper.prototype.update = function () {
 	};
 
 }();
-
 
 export { SkeletonHelper };

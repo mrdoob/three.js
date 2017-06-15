@@ -4,7 +4,7 @@ import { Quaternion } from './Quaternion';
 
 /**
  * @author mrdoob / http://mrdoob.com/
- * @author *kile / http://kile.stravaganza.org/
+ * @author kile / http://kile.stravaganza.org/
  * @author philogb / http://blog.thejit.org/
  * @author mikael emtinger / http://gomo.se/
  * @author egraether / http://egraether.com/
@@ -238,7 +238,7 @@ Object.assign( Vector3.prototype, {
 
 		return function applyEuler( euler ) {
 
-			if ( ( euler && euler.isEuler ) === false ) {
+			if ( ! ( euler && euler.isEuler ) ) {
 
 				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 

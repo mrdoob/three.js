@@ -30,7 +30,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Node-Based Material
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -576,8 +576,6 @@
 					var worldScale = new THREE.FloatNode( .4 );
 					var colorA = new THREE.ColorNode( 0xFFFFFF );
 					var colorB = new THREE.ColorNode( 0x0054df );
-
-					var uv = new THREE.UVNode();
 
 					var timeScale = new THREE.OperatorNode(
 						time,
@@ -1465,8 +1463,8 @@
 
 					var velocity = new THREE.VelocityNode( mesh, {
 						type: 'elastic',
-						spring: .8,
-						friction: .9
+						spring: .95,
+						damping: .95
 					} );
 
 					var velocityArea = new THREE.OperatorNode(
@@ -1503,13 +1501,13 @@
 
 						velocity.params.spring = val;
 
-					}, false, 0, .9 );
+					}, false, 0, .95 );
 
-					addGui( 'friction', velocity.params.friction, function( val ) {
+					addGui( 'damping', velocity.params.damping, function( val ) {
 
-						velocity.params.friction = val;
+						velocity.params.damping = val;
 
-					}, false, 0, .9 );
+					}, false, 0, .95 );
 
 					addGui( 'scale', scale.number, function( val ) {
 
@@ -1901,7 +1899,7 @@
 
 					var setMyVar = new THREE.FunctionNode( [
 					"float setMyVar( vec3 pos ) {",
-					// set "myVar" in vertex shader in this example, 
+					// set "myVar" in vertex shader in this example,
 					// can be used in fragment shader too or in rest of the current shader
 					"	myVar = pos;",
 					// it is not accept "void" functions for now!

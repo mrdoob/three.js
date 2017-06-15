@@ -102,6 +102,19 @@ Object.assign( PropertyBinding, {
 
 	},
 
+	/**
+	 * Replaces spaces with underscores and removes unsupported characters from
+	 * node names, to ensure compatibility with parseTrackName().
+	 *
+	 * @param  {string} name Node name to be sanitized.
+	 * @return {string}
+	 */
+	sanitizeNodeName: function ( name ) {
+
+		return name.replace( /\s/g, '_' ).replace( /[^\w-]/g, '' );
+
+	},
+
 	parseTrackName: function () {
 
 		// Parent directories, delimited by '/' or ':'. Currently unused, but must

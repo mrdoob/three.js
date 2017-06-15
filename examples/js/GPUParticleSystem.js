@@ -330,7 +330,7 @@ THREE.GPUParticleContainer = function( maxParticles, particleSystem ) {
 
 		if ( this.DPR !== undefined ) size *= this.DPR;
 
-		i = this.PARTICLE_CURSOR;
+		var i = this.PARTICLE_CURSOR;
 
 		// position
 

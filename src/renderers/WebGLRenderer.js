@@ -343,6 +343,7 @@ function WebGLRenderer( parameters ) {
 	this.capabilities = capabilities;
 	this.extensions = extensions;
 	this.properties = properties;
+	this.renderLists = renderLists;
 	this.state = state;
 
 	// shadow map
@@ -402,7 +403,7 @@ function WebGLRenderer( parameters ) {
 
 		_pixelRatio = value;
 
-		this.setSize( _viewport.z, _viewport.w, false );
+		this.setSize( _width, _height, false );
 
 	};
 
@@ -436,13 +437,15 @@ function WebGLRenderer( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		state.viewport( _viewport.set( x, y, width, height ) );
+		_viewport.set( x, _height - y - height, width, height )
+		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
 	};
 
 	this.setScissor = function ( x, y, width, height ) {
 
-		state.scissor( _scissor.set( x, y, width, height ) );
+		_scissor.set( x, _height - y - height, width, height )
+		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
 
 	};
 
@@ -783,12 +786,15 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		var attribute;
 		var renderer = bufferRenderer;
 
 		if ( index !== null ) {
 
+			attribute = attributes.get( index );
+
 			renderer = indexedBufferRenderer;
-			renderer.setIndex( index );
+			renderer.setIndex( attribute );
 
 		}
 
@@ -798,7 +804,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( index !== null ) {
 
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributes.get( index ).buffer );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attribute.buffer );
 
 			}
 
@@ -941,11 +947,11 @@ function WebGLRenderer( parameters ) {
 					var normalized = geometryAttribute.normalized;
 					var size = geometryAttribute.itemSize;
 
-					var attributeProperties = attributes.get( geometryAttribute );
+					var attribute = attributes.get( geometryAttribute );
 
-					var buffer = attributeProperties.buffer;
-					var type = attributeProperties.type;
-					var bytesPerElement = attributeProperties.bytesPerElement;
+					var buffer = attribute.buffer;
+					var type = attribute.type;
+					var bytesPerElement = attribute.bytesPerElement;
 
 					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
@@ -1078,7 +1084,7 @@ function WebGLRenderer( parameters ) {
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
-		if ( camera !== undefined && camera.isCamera !== true ) {
+		if ( ! ( camera && camera.isCamera ) ) {
 
 			console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
@@ -1100,8 +1106,6 @@ function WebGLRenderer( parameters ) {
 		camera.onBeforeRender( _this );
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
-
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
@@ -1441,7 +1445,7 @@ function WebGLRenderer( parameters ) {
 
 			object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
-			if ( camera.isArrayCamera && camera.enabled ) {
+			if ( camera.isArrayCamera ) {
 
 				var cameras = camera.cameras;
 
@@ -1450,18 +1454,13 @@ function WebGLRenderer( parameters ) {
 					var camera2 = cameras[ j ];
 					var bounds = camera2.bounds;
 
-					state.viewport(
-						_currentViewport.set(
-							bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
-							bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
-						)
-					);
-					state.scissor(
-						_currentScissor.set(
-							bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
-							bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
-						)
-					);
+					var x = bounds.x * _width;
+					var y = bounds.y * _height;
+					var width = bounds.z * _width;
+					var height = bounds.w * _height;
+
+					state.viewport(	_currentViewport.set( x, y, width, height ) );
+					state.scissor( _currentScissor.set( x, y, width, height ) );
 					state.setScissorTest( true );
 
 					renderObject( object, scene, camera2, geometry, material, group );
@@ -1543,7 +1542,7 @@ function WebGLRenderer( parameters ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
 
-				materialProperties.__webglShader = {
+				materialProperties.shader = {
 					name: material.type,
 					uniforms: UniformsUtils.clone( shader.uniforms ),
 					vertexShader: shader.vertexShader,
@@ -1552,7 +1551,7 @@ function WebGLRenderer( parameters ) {
 
 			} else {
 
-				materialProperties.__webglShader = {
+				materialProperties.shader = {
 					name: material.type,
 					uniforms: material.uniforms,
 					vertexShader: material.vertexShader,
@@ -1561,9 +1560,9 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			material.__webglShader = materialProperties.__webglShader;
+			material.onBeforeCompile( materialProperties.shader );
 
-			program = programCache.acquireProgram( material, parameters, code );
+			program = programCache.acquireProgram( material, materialProperties.shader, parameters, code );
 
 			materialProperties.program = program;
 			material.program = program;
@@ -1604,7 +1603,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var uniforms = materialProperties.__webglShader.uniforms;
+		var uniforms = materialProperties.shader.uniforms;
 
 		if ( ! material.isShaderMaterial &&
 			! material.isRawShaderMaterial ||
@@ -1713,7 +1712,7 @@ function WebGLRenderer( parameters ) {
 
 		var program = materialProperties.program,
 			p_uniforms = program.getUniforms(),
-			m_uniforms = materialProperties.__webglShader.uniforms;
+			m_uniforms = materialProperties.shader.uniforms;
 
 		if ( program.id !== _currentProgram ) {
 
@@ -2686,7 +2685,7 @@ function WebGLRenderer( parameters ) {
 
 	this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer ) {
 
-		if ( ( renderTarget && renderTarget.isWebGLRenderTarget ) === false ) {
+		if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
 			console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
 			return;

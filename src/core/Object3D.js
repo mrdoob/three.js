@@ -356,6 +356,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 			}
 
+			return this;
+
 		}
 
 		var index = this.children.indexOf( object );
@@ -370,6 +372,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		}
 
+		return this;
+		
 	},
 
 	getObjectById: function ( id ) {

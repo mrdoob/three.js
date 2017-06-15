@@ -69,6 +69,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 	isMaterial: true,
 
+	onBeforeCompile: function () {},
+
 	setValues: function ( values ) {
 
 		if ( values === undefined ) return;

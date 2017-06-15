@@ -312,10 +312,9 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 				var stride = values.length / times.length;
 				var interpolateStride = ( stride === 3 ) ? 12 : 4;  // 3: Vector3, others: Quaternion or Number
 
-				var aheadIndex = 2;
 				var index = 1;
 
-				for ( aheadIndex = 2, endIndex = times.length; aheadIndex < endIndex; aheadIndex ++ ) {
+				for ( var aheadIndex = 2, endIndex = times.length; aheadIndex < endIndex; aheadIndex ++ ) {
 
 					for ( var i = 0; i < stride; i ++ ) {
 

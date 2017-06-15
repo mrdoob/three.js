@@ -80,7 +80,7 @@
 		</div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - cameras - logarithmic depth buffer<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras - logarithmic depth buffer<br/>
 			Zoom through scene with objects ranging in size from 1µm to 100,000,000 light years using the mousewheel<br/>
 			Linear z-buffer handles close-up objects well, but fails spectacularly at distant objects<br/>
 			Logarithmic handles all but the smallest objects with ease
@@ -100,7 +100,7 @@
 			var zoompos = -100, minzoomspeed = .015;
 			var zoomspeed = minzoomspeed;
 
-			var container, stats;
+			var container, border, stats;
 			var objects = {};
 
 			// Generate a number of text labels, from 1µm in size up to 100,000,000 light years
@@ -202,7 +202,7 @@
 
 					var scale = labeldata[i].scale || 1;
 
-					var labelgeo = new THREE.TextGeometry( labeldata[i].label, {
+					var labelgeo = new THREE.TextBufferGeometry( labeldata[i].label, {
 						font: font,
 						size: labeldata[i].size,
 						height: labeldata[i].size / 2

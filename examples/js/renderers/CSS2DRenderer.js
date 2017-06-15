@@ -92,9 +92,7 @@ THREE.CSS2DRenderer = function () {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
-		viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
+		viewMatrix.copy( camera.matrixWorldInverse );
 		viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, viewMatrix );
 
 		renderObject( scene, camera );
