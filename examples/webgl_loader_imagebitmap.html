@@ -59,9 +59,9 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Texture loader using ImageBitmap
 			<div class="actions">
-				<span id="add_ib_btn" >Press to add ImageBitmap</span>
-				<span id="add_i_btn">Press to add Image</span>
-				<span id="clear_btn" >Clear</span>
+				<span id="add_ib_btn">Add ImageBitmap</span>
+				<span id="add_i_btn">Add Image</span>
+				<span id="clear_btn">Clear</span>
 			</div>
 		</div>
 
@@ -77,53 +77,49 @@
 			var camera, scene, renderer;
 			var group, cubes;
 
-			var autoAddImageBitmap = false;
-			var autoAddImage = false;
-
 			init();
 			animate();
 
 			function addImageBitmap () {
 
 				new THREE.ImageBitmapLoader()
-				.setOptions( { imageOrientation: 'none' } )
-				.load ( 'textures/planets/earth_atmos_2048.jpg', function( imageBitmap ) {
+					.setOptions( { imageOrientation: 'none' } )
+					.load( 'textures/planets/earth_atmos_2048.jpg', function( imageBitmap ) {
 
-					var tex = new THREE.Texture ( imageBitmap );
-					tex.needsUpdate = true;
+						var tex = new THREE.CanvasTexture( imageBitmap );
 
-					/* ImageBitmap should be disposed when done with it
-					   Can't be done until it's actually uploaded to WebGLTexture */
+						/* ImageBitmap should be disposed when done with it
+						   Can't be done until it's actually uploaded to WebGLTexture */
 
-					// imageBitmap.close();
+						// imageBitmap.close();
 
-					addCube( tex );
+						addCube( tex );
 
-				}, function( p ) {
-					console.log( p );
-				}, function( e ) {
-					console.log( e );
-				} );
+					}, function( p ) {
+						console.log( p );
+					}, function( e ) {
+						console.log( e );
+					} );
 
 			}
 
 			function addImage () {
 
-
-				new THREE.TextureLoader().load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function( tex ) {
-					addCube( tex );
+				new THREE.ImageLoader()
+					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function( image ) {
+							var tex = new THREE.CanvasTexture( image );
+							addCube( tex );
 				});
 
 			}
 
-			function addCube ( texture ) {
+			var geometry = new THREE.BoxBufferGeometry( 1,1,1 );
 
-				var cube = new THREE.Mesh(
-					new THREE.BoxBufferGeometry( 1,1,1 ),
-					new THREE.MeshBasicMaterial( {
-						map: texture
-					})
-				);
+			function addCube( texture ) {
+
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				var cube = new THREE.Mesh( geometry, material );
 				cube.position.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 				cube.rotation.set( Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI );
 				cubes.add( cube );
@@ -199,11 +195,11 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				group.rotation.y = performance.now() / 2000;
+				group.rotation.y = performance.now() / 3000;
 
 				renderer.render( scene, camera );
+
+				requestAnimationFrame( animate );
 
 			}
 
