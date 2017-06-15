@@ -145,7 +145,7 @@ function WebGLRenderer( parameters ) {
 
 		// frustum
 
-		_frustum = new Frustum(),
+		_cullingVolume = null,
 
 		// clipping
 
@@ -1132,7 +1132,7 @@ function WebGLRenderer( parameters ) {
 		}
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		_frustum.setFromMatrix( _projScreenMatrix );
+		_cullingVolume = camera.getCullingVolume();
 
 		lights.length = 0;
 		sprites.length = 0;
@@ -1276,7 +1276,7 @@ function WebGLRenderer( parameters ) {
 
 	function isSphereViewable( sphere ) {
 
-		if ( ! _frustum.intersectsSphere( sphere ) ) return false;
+		if ( ! _cullingVolume.intersectsSphere( sphere ) ) return false;
 
 		var numPlanes = _clipping.numPlanes;
 
@@ -1314,7 +1314,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( object.isSprite ) {
 
-				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
+				if ( ! object.frustumCulled || _cullingVolume.intersectsSprite( object ) ) {
 
 					sprites.push( object );
 
@@ -1343,7 +1343,7 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
+				if ( ! object.frustumCulled || _cullingVolume.intersectsObject( object ) ) {
 
 					if ( sortObjects ) {
 

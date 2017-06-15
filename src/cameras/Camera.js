@@ -8,6 +8,7 @@ import { Matrix4 } from '../math/Matrix4';
 import { Quaternion } from '../math/Quaternion';
 import { Object3D } from '../core/Object3D';
 import { Vector3 } from '../math/Vector3';
+import { Frustum } from '../math/Frustum';
 
 function Camera() {
 
@@ -26,6 +27,8 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isCamera: true,
 
+	_cullingVolume: null,
+	
 	copy: function ( source, recursive ) {
 
 		Object3D.prototype.copy.call( this, source, recursive );
@@ -65,8 +68,24 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return new this.constructor().copy( this );
 
-	}
+	},
 
+	getCullingVolume: function () {
+
+		var projScreenMatrix = new Matrix4();
+
+		return function getCullingVolume() {
+
+			if (!this._cullingVolume) {
+				this._cullingVolume = new Frustum();
+			}
+
+			projScreenMatrix.multiplyMatrices( this.projectionMatrix, this.matrixWorldInverse );
+
+			return this._cullingVolume.setFromMatrix( projScreenMatrix );
+
+		}
+	}()
 } );
 
 export { Camera };
