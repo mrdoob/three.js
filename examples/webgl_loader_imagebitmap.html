@@ -106,6 +106,7 @@
 			function addImage () {
 
 				new THREE.ImageLoader()
+					.setCrossOrigin( '*' )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function( image ) {
 							var tex = new THREE.CanvasTexture( image );
 							addCube( tex );
