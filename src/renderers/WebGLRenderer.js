@@ -28,6 +28,7 @@ import { WebGLTextures } from './webgl/WebGLTextures';
 import { WebGLProperties } from './webgl/WebGLProperties';
 import { WebGLState } from './webgl/WebGLState';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities';
+import { WebVRManager } from './webvr/WebVRManager';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { WebGLExtensions } from './webgl/WebGLExtensions';
 import { Vector3 } from '../math/Vector3';
@@ -295,6 +296,7 @@ function WebGLRenderer( parameters ) {
 	var programCache = new WebGLPrograms( this, capabilities );
 	var lightCache = new WebGLLights();
 	var renderLists = new WebGLRenderLists();
+	var vr = new WebVRManager( this );
 
 	this.info.programs = programCache.programs;
 
@@ -345,6 +347,7 @@ function WebGLRenderer( parameters ) {
 	this.properties = properties;
 	this.renderLists = renderLists;
 	this.state = state;
+	this.vr = vr;
 
 	// shadow map
 
@@ -1082,6 +1085,20 @@ function WebGLRenderer( parameters ) {
 
 	// Rendering
 
+	this.animate = function ( callback ) {
+
+		function onFrame() {
+
+			callback();
+
+			( vr.getDevice() || window ).requestAnimationFrame( onFrame );
+
+		}
+
+		( vr.getDevice() || window ).requestAnimationFrame( onFrame );
+
+	};
+
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
 		if ( ! ( camera && camera.isCamera ) ) {
@@ -1106,6 +1123,12 @@ function WebGLRenderer( parameters ) {
 		camera.onBeforeRender( _this );
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
+
+		if ( vr.enabled ) {
+
+			camera = vr.getCamera( camera );
+
+		}
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );

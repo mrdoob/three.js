@@ -2,10 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WebVRCamera = function ( display, renderer ) {
+function WebVRManager( renderer ) {
 
 	var scope = this;
 
+	var device = null;
 	var frameData = null;
 
 	if ( 'VRFrameData' in window ) {
@@ -22,7 +23,7 @@ THREE.WebVRCamera = function ( display, renderer ) {
 	cameraR.bounds = new THREE.Vector4( 0.5, 0.0, 0.5, 1.0 );
 	cameraR.layers.enable( 2 );
 
-	var matrixWorldInverse = new THREE.Matrix4();
+	var cameraVR = new THREE.ArrayCamera( [ cameraL, cameraR ] );
 
 	//
 
@@ -30,9 +31,9 @@ THREE.WebVRCamera = function ( display, renderer ) {
 
 	function onVRDisplayPresentChange() {
 
-		if ( display.isPresenting ) {
+		if ( device.isPresenting ) {
 
-			var eyeParameters = display.getEyeParameters( 'left' );
+			var eyeParameters = device.getEyeParameters( 'left' );
 			var renderWidth = eyeParameters.renderWidth;
 			var renderHeight = eyeParameters.renderHeight;
 
@@ -42,11 +43,7 @@ THREE.WebVRCamera = function ( display, renderer ) {
 			renderer.setPixelRatio( 1 );
 			renderer.setSize( renderWidth * 2, renderHeight, false );
 
-			scope.enabled = true;
-
 		} else if ( scope.enabled ) {
-
-			scope.enabled = false;
 
 			renderer.setPixelRatio( currentPixelRatio );
 			renderer.setSize( currentSize.width, currentSize.height, true );
@@ -59,48 +56,67 @@ THREE.WebVRCamera = function ( display, renderer ) {
 
 	//
 
-	THREE.ArrayCamera.call( this, [ cameraL, cameraR ] );
+	this.enabled = false;
 
-	//
+	this.getDevice = function () {
 
-	this.onBeforeRender = function () {
+		return device;
 
-		display.depthNear = scope.near;
-		display.depthFar = scope.far;
+	};
 
-		display.getFrameData( frameData );
+	this.setDevice = function ( value ) {
+
+		if ( value !== undefined ) device = value;
+
+	};
+
+	this.getCamera = function ( camera ) {
+
+		if ( device === null ) return camera;
+
+		device.depthNear = camera.near;
+		device.depthFar = camera.far;
+
+		device.getFrameData( frameData );
 
 		//
 
 		var pose = frameData.pose;
 
-		if ( pose.orientation !== null ) {
-
-			scope.quaternion.fromArray( pose.orientation );
-
-		}
-
 		if ( pose.position !== null ) {
 
-			scope.position.fromArray( pose.position );
+			camera.position.fromArray( pose.position );
 
 		} else {
 
-			scope.position.set( 0, 0, 0 );
+			camera.position.set( 0, 0, 0 );
 
 		}
 
+		if ( pose.orientation !== null ) {
+
+			camera.quaternion.fromArray( pose.orientation );
+
+		}
+
+		camera.updateMatrixWorld();
+
+		if ( device.isPresenting === false ) return camera;
+
 		//
+
+		cameraVR.matrixWorld.copy( camera.matrixWorld );
+		cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
 
 		cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 		cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
 
-		if ( scope.parent !== null ) {
+		var parent = camera.parent;
 
-			matrixWorldInverse.getInverse( scope.parent.matrixWorld );
+		if ( parent !== null ) {
 
-			cameraL.matrixWorldInverse.multiply( matrixWorldInverse );
-			cameraR.matrixWorldInverse.multiply( matrixWorldInverse );
+			cameraL.matrixWorldInverse.multiply( parent.matrixWorldInverse );
+			cameraR.matrixWorldInverse.multiply( parent.matrixWorldInverse );
 
 		}
 
@@ -110,11 +126,11 @@ THREE.WebVRCamera = function ( display, renderer ) {
 		// HACK @mrdoob
 		// https://github.com/w3c/webvr/issues/203
 
-		scope.projectionMatrix.copy( cameraL.projectionMatrix );
+		cameraVR.projectionMatrix.copy( cameraL.projectionMatrix );
 
 		//
 
-		var layers = display.getLayers();
+		var layers = device.getLayers();
 
 		if ( layers.length ) {
 
@@ -134,20 +150,10 @@ THREE.WebVRCamera = function ( display, renderer ) {
 
 		}
 
-	};
-
-	this.onAfterRender = function () {
-
-		if ( display.isPresenting ) display.submitFrame();
+		return cameraVR;
 
 	};
 
-};
+}
 
-THREE.WebVRCamera.prototype = Object.assign( Object.create( THREE.ArrayCamera.prototype ), {
-
-	constructor: THREE.WebVRCamera,
-
-	isWebVRCamera: true
-
-} );
+export { WebVRManager };
