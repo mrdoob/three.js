@@ -84,7 +84,7 @@
 
 				new THREE.ImageBitmapLoader()
 					.setOptions( { imageOrientation: 'none' } )
-					.load( 'textures/planets/earth_atmos_2048.jpg', function( imageBitmap ) {
+					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function( imageBitmap ) {
 
 						var tex = new THREE.CanvasTexture( imageBitmap );
 
@@ -106,6 +106,7 @@
 			function addImage () {
 
 				new THREE.ImageLoader()
+					.setCrossOrigin( '*' )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function( image ) {
 							var tex = new THREE.CanvasTexture( image );
 							addCube( tex );
@@ -169,9 +170,13 @@
 				var clearBtn = document.getElementById( 'clear_btn' );
 				clearBtn.addEventListener( 'click', function( e ) {
 					while( cubes.children.length ) {
-						cubes.remove( cubes.children[ 0 ] );
+						var cube = cubes.children[ 0 ]
+						cubes.remove( cube );
+						cube.geometry.dispose();
+						cube.material.map.dispose();
 					}
 				})
+
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
