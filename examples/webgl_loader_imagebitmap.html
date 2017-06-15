@@ -169,9 +169,13 @@
 				var clearBtn = document.getElementById( 'clear_btn' );
 				clearBtn.addEventListener( 'click', function( e ) {
 					while( cubes.children.length ) {
-						cubes.remove( cubes.children[ 0 ] );
+						var cube = cubes.children[ 0 ]
+						cubes.remove( cube );
+						cube.geometry.dispose();
+						cube.material.map.dispose();
 					}
 				})
+
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
