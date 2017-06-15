@@ -11,7 +11,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial';
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function DirectionalLightHelper( light, size ) {
+function DirectionalLightHelper( light, size, overrideColor ) {
 
 	Object3D.call( this );
 
@@ -20,6 +20,8 @@ function DirectionalLightHelper( light, size ) {
 
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
+
+	this.overrideColor = overrideColor;
 
 	if ( size === undefined ) size = 1;
 
@@ -32,14 +34,16 @@ function DirectionalLightHelper( light, size ) {
 		- size,   size, 0
 	], 3 ) );
 
-	var material = new LineBasicMaterial( { fog: false } );
+	var material = new LineBasicMaterial( { fog: false, color: this.overrideColor } );
 
-	this.add( new Line( geometry, material ) );
+	this.lightPlane = new Line( geometry, material );
+	this.add( this.lightPlane );
 
 	geometry = new BufferGeometry();
 	geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
 
-	this.add( new Line( geometry, material ));
+	this.targetLine = new Line( geometry, material );
+	this.add( this.targetLine );
 
 	this.update();
 
@@ -50,13 +54,10 @@ DirectionalLightHelper.prototype.constructor = DirectionalLightHelper;
 
 DirectionalLightHelper.prototype.dispose = function () {
 
-	var lightPlane = this.children[ 0 ];
-	var targetLine = this.children[ 1 ];
-
-	lightPlane.geometry.dispose();
-	lightPlane.material.dispose();
-	targetLine.geometry.dispose();
-	targetLine.material.dispose();
+	this.lightPlane.geometry.dispose();
+	this.lightPlane.material.dispose();
+	this.targetLine.geometry.dispose();
+	this.targetLine.material.dispose();
 
 };
 
@@ -72,14 +73,12 @@ DirectionalLightHelper.prototype.update = function () {
 		v2.setFromMatrixPosition( this.light.target.matrixWorld );
 		v3.subVectors( v2, v1 );
 
-		var lightPlane = this.children[ 0 ];
-		var targetLine = this.children[ 1 ];
+		this.lightPlane.lookAt( v3 );
+		if ( ! this.overrideColor ) this.lightPlane.material.color.copy( this.light.color );
 
-		lightPlane.lookAt( v3 );
-		lightPlane.material.color.copy( this.light.color );
-
-		targetLine.lookAt( v3 );
-		targetLine.scale.z = v3.length();
+		this.targetLine.lookAt( v3 );
+		this.targetLine.scale.z = v3.length();
+		if ( ! this.overrideColor ) this.targetLine.material.color.copy( this.light.color );
 
 	};
 
