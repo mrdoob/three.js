@@ -243,17 +243,13 @@
 			var loader = new THREE.FileLoader( scope.manager );
 			loader.setResponseType( 'arraybuffer' );
 
+			url = url.replace( /\*/g, isBigEndianPlatform() ? 'be' : 'le' );
+
 			loader.load( url, function ( arrayBuffer ) {
 
 				onLoad( scope.parse( arrayBuffer ) );
 
 			}, onProgress, onError );
-
-		},
-
-		loadBest: function ( urlLittleEndian, urlBigEndian, onLoad, onProgress, onError ) {
-
-			this.load( ( isBigEndianPlatform() ? urlBigEndian : urlLittleEndian ), onLoad, onProgress, onError );
 
 		},
 

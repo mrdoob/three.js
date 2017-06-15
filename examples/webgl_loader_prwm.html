@@ -39,13 +39,11 @@
 			.models strong {
 				color:#FFFFFF;
 				text-transform: uppercase;
-				display:inline-block;
-				min-width:120px;
 			}
 
 			.models a, .models a:visited {
 				color:#FFFFFF;
-				margin-right:12px;
+				margin-left:12px;
 				text-decoration: none;
 			}
 
@@ -59,18 +57,17 @@
 
 
 		<div class="models">
-			<strong>Little-Endian</strong>
-			<a class="model" href="./models/prwm/faceted-nefertiti-LE.prwm">Faceted Nefertiti</a>
-			<a class="model" href="./models/prwm/smooth-suzanne-LE.prwm">Smooth Suzanne</a>
-			<a class="model" href="./models/prwm/vive-controller-LE.prwm">Vive Controller</a><br>
-			<strong>Big-Endian</strong>
-			<a class="model" href="./models/prwm/faceted-nefertiti-BE.prwm">Faceted Nefertiti</a>
-			<a class="model" href="./models/prwm/smooth-suzanne-BE.prwm">Smooth Suzanne</a>
-			<a class="model" href="./models/prwm/vive-controller-BE.prwm">Vive Controller</a>
+			<strong>Models</strong>
+			<a class="model" href="models/prwm/faceted-nefertiti.*.prwm">Faceted Nefertiti</a>
+			<a class="model" href="models/prwm/smooth-suzanne.*.prwm">Smooth Suzanne</a>
+			<a class="model" href="models/prwm/vive-controller.*.prwm">Vive Controller</a>
 		</div>
 		<div class="notes">
 			The parsing of PRWM file is especially fast when the endianness of the file is the same as the endianness
-			of the client platform. This platform endianness is <strong id="endianness"></strong>.<br><br>
+			of the client platform. The loader will automatically replace the <strong>*</strong> in the model url
+			by either <strong>le</strong> or <strong>be</strong> depending on the client platform's endianness to
+			download the most appropriate file.<br><br>
+			This platform endianness is <strong id="endianness"></strong>.<br><br>
 			See your console for stats.<br><br>
 			<a href="https://github.com/kchapelier/PRWM" target="_blank">Specifications and implementations</a>
 		</div>
@@ -201,7 +198,8 @@
 
 				//
 
-				loadGeometry( './models/prwm/smooth-suzanne-LE.prwm' );
+				// * is automatically replaced by 'le' or 'be' depending on the client platform's endianness
+				loadGeometry( './models/prwm/smooth-suzanne.*.prwm' );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
