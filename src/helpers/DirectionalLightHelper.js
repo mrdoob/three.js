@@ -75,10 +75,12 @@ DirectionalLightHelper.prototype.update = function () {
 
 		this.lightPlane.lookAt( v3 );
 		if ( ! this.overrideColor ) this.lightPlane.material.color.copy( this.light.color );
+		else this.lightPlane.material.color.set( this.overrideColor );
 
 		this.targetLine.lookAt( v3 );
 		this.targetLine.scale.z = v3.length();
 		if ( ! this.overrideColor ) this.targetLine.material.color.copy( this.light.color );
+		else this.targetLine.material.color.set( this.overrideColor );
 
 	};
 
