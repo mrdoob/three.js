@@ -432,7 +432,7 @@ THREE.ColladaLoader.prototype = {
 
 			var keyframes = prepareAnimationData( data, defaultMatrix );
 
-			if ( node.sid === null ) console.warn( 'THREE.ColladaLoader: Invalid node in joint hierarchy: ', node );
+			if ( node.type !== 'JOINT' ) console.warn( 'THREE.ColladaLoader: Animation data for invalid node with ID "%s" found. The loader only supports animation of bones (skeletal animation).', node.id );
 
 			var animation = {
 				name: '.skeleton.bones[' + node.sid + ']',
@@ -2218,7 +2218,8 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'skeleton':
-						data.skeleton = parseId( child.textContent );;
+						if ( data.skeleton !== undefined ) console.warn( 'THREE.ColladaLoader: The loader only supports one skeleton per instance_controller.' );
+						data.skeleton = parseId( child.textContent );
 						break;
 
 					default:
@@ -2267,13 +2268,14 @@ THREE.ColladaLoader.prototype = {
 
 						// Unfortunately, there can be joints in the visual scene that are not part of the
 						// corresponding controller. In this case, we have to create a boneInverse matrix
-						// for the respective bone. These data won't affect the skeleton, because there are no skin indices
-						// and weights defined for the bone. But we still have to add these data to the sorted bone list in order to
+						// for the respective bone. These bone won't affect any vertices, because there are no skin indices
+						// and weights defined for it. But we still have to add the bone to the sorted bone list in order to
 						// ensure a correct animation of the model.
 
 						boneInverse = new THREE.Matrix4().getInverse( object.matrixWorld );
-						console.warn( 'THREE.ColladaLoader: Missing data for bone: %s.', object.name );
 						missingBoneData.push( { bone: object, boneInverse: boneInverse } );
+
+						console.warn( 'THREE.ColladaLoader: Missing data for bone: %s.', object.name );
 
 					} else {
 
