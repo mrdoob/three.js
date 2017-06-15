@@ -13,7 +13,7 @@ import { BufferAttribute } from '../core/BufferAttribute';
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-function HemisphereLightHelper( light, size ) {
+function HemisphereLightHelper( light, size, overrideColor ) {
 
 	Object3D.call( this );
 
@@ -26,7 +26,8 @@ function HemisphereLightHelper( light, size ) {
 	var geometry = new OctahedronBufferGeometry( size );
 	geometry.rotateY( Math.PI * 0.5 );
 
-	var material = new MeshBasicMaterial( { vertexColors: VertexColors, wireframe: true } );
+	var material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.overrideColor } );
+	if ( ! overrideColor ) material.vertexColors = VertexColors;
 
 	var position = geometry.getAttribute( 'position' );
 	var colors = new Float32Array( position.count * 3 );
