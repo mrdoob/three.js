@@ -432,8 +432,10 @@ THREE.ColladaLoader.prototype = {
 
 			var keyframes = prepareAnimationData( data, defaultMatrix );
 
+			if ( node.sid === null ) console.warn( 'THREE.ColladaLoader: Invalid node in joint hierarchy: ', node );
+
 			var animation = {
-				name: '.bones[' + node.sid + ']',
+				name: '.skeleton.bones[' + node.sid + ']',
 				keyframes: keyframes
 			}
 
@@ -864,7 +866,7 @@ THREE.ColladaLoader.prototype = {
 			var BONE_LIMIT = 4;
 
 			var build = {
-				bones: {},
+				joints: [], // this must be an array to preserve the joint order
 				indices: {
 					array: [],
 					stride: BONE_LIMIT
@@ -949,7 +951,7 @@ THREE.ColladaLoader.prototype = {
 				var name = jointSource.array[ i ];
 				var boneInverse = new THREE.Matrix4().fromArray( inverseSource.array, i * inverseSource.stride ).transpose();
 
-				build.bones[ name ] = boneInverse;
+				build.joints.push( { name: name, boneInverse: boneInverse } );
 
 			}
 
@@ -2232,21 +2234,99 @@ THREE.ColladaLoader.prototype = {
 
 		function getSkeleton( root, controller ) {
 
-			var boneArray = [];
-			var boneInverseArray = [];
+			var boneData = [];
+			var missingBoneData = [];
+			var sortedBoneData = [];
+
+			var joints = controller.skin.joints;
+
+			root.updateMatrixWorld( true );
+
+			// setup bone data from visual scene
 
 			root.traverse( function( object ) {
 
 				if ( object.isBone === true ) {
 
-					boneArray.push( object );
-					boneInverseArray.push( controller.skin.bones[ object.name ] );
+					var boneInverse;
+
+					for ( var i = 0; i < joints.length; i ++ ) {
+
+						var joint = joints[ i ];
+
+						if ( joint.name === object.name ) {
+
+							boneInverse = joint.boneInverse;
+							break;
+
+						}
+
+					}
+
+					if ( boneInverse === undefined ) {
+
+						// Unfortunately, there can be joints in the visual scene that are not part of the
+						// corresponding controller. In this case, we have to create a boneInverse matrix
+						// for the respective bone. These data won't affect the skeleton, because there are no skin indices
+						// and weights defined for the bone. But we still have to add these data to the sorted bone list in order to
+						// ensure a correct animation of the model.
+
+						boneInverse = new THREE.Matrix4().getInverse( object.matrixWorld );
+						console.warn( 'THREE.ColladaLoader: Missing data for bone: %s.', object.name );
+						missingBoneData.push( { bone: object, boneInverse: boneInverse } );
+
+					} else {
+
+						boneData.push( { bone: object, boneInverse: boneInverse } );
+
+					}
 
 				}
 
 			} );
 
-			return new THREE.Skeleton( boneArray, boneInverseArray );
+			// sort bone data (the order is defined in the corresponding controller)
+
+			for ( var i = 0; i < joints.length; i ++ ) {
+
+				for ( var j = 0; j < boneData.length; j ++ ) {
+
+					var data = boneData[ j ];
+
+					if ( data.bone.name === joints[ i ].name ) {
+
+						sortedBoneData[ i ] = data;
+						break;
+
+					}
+
+				}
+
+			}
+
+			// add missing bone data at the end of the list
+
+			for ( var i = 0; i < missingBoneData.length; i ++ ) {
+
+				sortedBoneData.push( missingBoneData[ i ] );
+
+			}
+
+			// setup arrays for skeleton creation
+
+			var bones = [];
+			var boneInverses = [];
+
+			for ( var i = 0; i < sortedBoneData.length; i ++ ) {
+
+				var data = sortedBoneData[ i ];
+
+				bones.push( data.bone );
+				boneInverses.push( data.boneInverse );
+
+			}
+
+			return new THREE.Skeleton( bones, boneInverses );
 
 		}
 
@@ -2288,7 +2368,6 @@ THREE.ColladaLoader.prototype = {
 
 				object.bind( skeleton, controller.skin.bindMatrix );
 				object.normalizeSkinWeights();
-				object.bones = skeleton.bones; // this is necessary for property binding
 				object.add( node ); // bone hierarchy is a child of the skinned mesh
 
 				objects.push( object );
