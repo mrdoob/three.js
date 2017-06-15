@@ -2296,6 +2296,7 @@ THREE.ColladaLoader.prototype = {
 					if ( data.bone.name === joints[ i ].name ) {
 
 						sortedBoneData[ i ] = data;
+						break;
 
 					}
 
