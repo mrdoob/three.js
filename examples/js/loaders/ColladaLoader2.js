@@ -2219,7 +2219,7 @@ THREE.ColladaLoader.prototype = {
 
 					case 'skeleton':
 						if ( data.skeleton !== undefined ) console.warn( 'THREE.ColladaLoader: The loader only supports one skeleton per instance_controller.' );
-						else data.skeleton = parseId( child.textContent );
+						data.skeleton = parseId( child.textContent );
 						break;
 
 					default:
