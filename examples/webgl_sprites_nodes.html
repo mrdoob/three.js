@@ -137,7 +137,8 @@
 			// use scale to adjuste the real sprite size
 			plane = new THREE.PlaneBufferGeometry( 1, 1 );
 
-			var walkingManTexture = new THREE.TextureLoader().load( "textures/WalkingManSpriteSheet.png" );
+			// https://openclipart.org/detail/239883/walking-man-sprite-sheet
+			var walkingManTexture = new THREE.TextureLoader().load( "./textures/WalkingManSpriteSheet.png" );
 			walkingManTexture.wrapS = walkingManTexture.wrapT = THREE.RepeatWrapping;
 
 			// horizontal sprite-sheet animator
