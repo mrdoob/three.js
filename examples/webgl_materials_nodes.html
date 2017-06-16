@@ -71,6 +71,7 @@
 		<script src="js/nodes/inputs/Vector3Node.js"></script>
 		<script src="js/nodes/inputs/Vector4Node.js"></script>
 		<script src="js/nodes/inputs/TextureNode.js"></script>
+		<script src="js/nodes/inputs/Matrix4Node.js"></script>
 		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
 
 		<!-- Math -->
@@ -91,6 +92,7 @@
 		<script src="js/nodes/utils/ResolutionNode.js"></script>
 		<script src="js/nodes/utils/BumpNode.js"></script>
 		<script src="js/nodes/utils/BlurNode.js"></script>
+		<script src="js/nodes/utils/UVTransformNode.js"></script>
 
 		<!-- Phong Material -->
 		<script src="js/nodes/materials/PhongNode.js"></script>
@@ -211,6 +213,7 @@
 				'basic / layers': 'layers',
 				'basic / rim': 'rim',
 				'basic / color-adjustment': 'color-adjustment',
+				'basic / uv-transform': 'uv-transform',
 				'basic / bump': 'bump',
 				'basic / blur': 'blur',
 				'basic / spherical-reflection': 'spherical-reflection',
@@ -813,6 +816,71 @@
 						contrast.number = val;
 
 					}, false, 0, 2 );
+
+					break;
+
+				case 'uv-transform':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var translate = new THREE.Vector2();
+					var rotate = 0;
+					var scale = new THREE.Vector2(1, 1);
+
+					var texture = new THREE.TextureNode( getTexture( "brick" ) );
+					texture.coord = new THREE.UVTransformNode();
+
+					mtl.color = texture;
+
+					// GUI
+
+					function updateUVTransform() {
+					
+						texture.coord.compose( translate, THREE.Math.degToRad( rotate ), scale );
+					
+					}
+
+					addGui( 'translateX', translate.x, function( val ) {
+
+						translate.x = val;
+
+						updateUVTransform();
+
+					}, false, 0, 10 );
+					
+					addGui( 'translateY', translate.y, function( val ) {
+
+						translate.y = val;
+
+						updateUVTransform();
+
+					}, false, 0, 10 );
+					
+					addGui( 'scaleX', scale.x, function( val ) {
+
+						scale.x = val;
+
+						updateUVTransform();
+
+					}, false, .1, 5 );
+					
+					addGui( 'scaleY', scale.y, function( val ) {
+
+						scale.y = val;
+
+						updateUVTransform();
+
+					}, false, .1, 5 );
+					
+					addGui( 'rotate', rotate, function( val ) {
+
+						rotate = val;
+						
+						updateUVTransform();
+
+					}, false, 0, 360 );
 
 					break;
 
