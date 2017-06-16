@@ -61,7 +61,7 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 			'modelMtx[3][0] = 0.0;',
 			'modelMtx[3][1] = 0.0;',
 			'modelMtx[3][2] = 0.0;'
-);
+		);
 
 		if ( ! this.spherical ) {
 
