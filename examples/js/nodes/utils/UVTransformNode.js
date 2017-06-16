@@ -35,11 +35,11 @@ THREE.UVTransformNode.prototype.compose = function () {
 
 		var matrix = this.transform.value;
 
-		matrix.identity();
-		matrix.setPosition( tempVector.set( - optionalCenter.x, - optionalCenter.y, 0 ) );
-		matrix.premultiply( tempMatrix.makeRotationZ( rotate ) );
-		matrix.multiply( tempMatrix.makeScale( scale.x, scale.y, 0 ) );
-		matrix.multiply( tempMatrix.makeTranslation( translate.x, translate.y, 0 ) );
+		matrix.identity()
+			.setPosition( tempVector.set( - optionalCenter.x, - optionalCenter.y, 0 ) )
+			.premultiply( tempMatrix.makeRotationZ( rotate ) )
+			.multiply( tempMatrix.makeScale( scale.x, scale.y, 0 ) )
+			.multiply( tempMatrix.makeTranslation( translate.x, translate.y, 0 ) );
 
 		return this;
 
