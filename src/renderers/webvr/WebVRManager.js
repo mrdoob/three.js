@@ -115,6 +115,7 @@ function WebVRManager( renderer ) {
 			standingMatrixInverse.getInverse( standingMatrix );
 
 			camera.matrixWorld.multiply( standingMatrix );
+			camera.matrixWorldInverse.multiply( standingMatrixInverse );
 
 		}
 
