@@ -200,6 +200,7 @@
 			sprite2.material.color = new THREE.TextureNode( walkingManTexture );
 			sprite2.material.color.coord = createHorizontalSpriteSheetNode( 8, 30 );
 			sprite2.material.color = new THREE.Math1Node( sprite2.material.color, THREE.Math1Node.INVERT );
+			sprite2.material.spherical = false; // look at camera horizontally only, very used to vegetation
 			sprite2.material.build();
 
 			var sineWaveFunction = new THREE.FunctionNode( [

@@ -7,6 +7,7 @@ THREE.SpriteNode = function () {
 	THREE.GLNode.call( this );
 
 	this.color = new THREE.ColorNode( 0xEEEEEE );
+	this.spherical = true;
 
 };
 
@@ -59,18 +60,42 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 			// ignore position from modelMatrix (use vary position)
 			'modelMtx[3][0] = 0.0;',
 			'modelMtx[3][1] = 0.0;',
-			'modelMtx[3][2] = 0.0;',
+			'modelMtx[3][2] = 0.0;'
+);
 
+		if ( ! this.spherical ) {
+
+			output.push(
+
+			'modelMtx[1][1] = 1.0;'
+
+			);
+
+		}
+
+		output.push(
 			// http://www.geeks3d.com/20140807/billboarding-vertex-shader-glsl/
 			// First colunm.
 			'modelViewMtx[0][0] = 1.0;',
 			'modelViewMtx[0][1] = 0.0;',
-			'modelViewMtx[0][2] = 0.0;',
+			'modelViewMtx[0][2] = 0.0;'
 
-			// Second colunm.
-			'modelViewMtx[1][0] = 0.0;',
-			'modelViewMtx[1][1] = 1.0;',
-			'modelViewMtx[1][2] = 0.0;',
+		);
+
+		if ( this.spherical ) {
+
+			output.push(
+
+				// Second colunm.
+				'modelViewMtx[1][0] = 0.0;',
+				'modelViewMtx[1][1] = 1.0;',
+				'modelViewMtx[1][2] = 0.0;'
+
+			);
+
+		}
+
+		output.push(
 
 			// Thrid colunm.
 			'modelViewMtx[2][0] = 0.0;',
