@@ -830,6 +830,7 @@
 
 					var texture = new THREE.TextureNode( getTexture( "brick" ) );
 					texture.coord = new THREE.UVTransformNode();
+					//texture.coord.uv = new THREE.UVNode( 1 ); // uv2 for example
 
 					mtl.color = texture;
 
