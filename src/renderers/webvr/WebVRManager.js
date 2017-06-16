@@ -154,6 +154,12 @@ function WebVRManager( renderer ) {
 
 	};
 
+	this.submitFrame = function () {
+
+		if ( device && device.isPresenting ) device.submitFrame();
+
+	};
+
 }
 
 export { WebVRManager };

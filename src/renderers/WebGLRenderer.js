@@ -1120,8 +1120,6 @@ function WebGLRenderer( parameters ) {
 
 		// update camera matrices and frustum
 
-		camera.onBeforeRender( _this );
-
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		if ( vr.enabled ) {
@@ -1306,7 +1304,11 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		camera.onAfterRender( _this );
+		if ( vr.enabled ) {
+
+			vr.submitFrame();
+
+		}
 
 		// _gl.finish();
 
