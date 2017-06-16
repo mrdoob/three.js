@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.PhongNode = function() {
+THREE.PhongNode = function () {
 
 	THREE.GLNode.call( this );
 
@@ -15,7 +15,7 @@ THREE.PhongNode = function() {
 THREE.PhongNode.prototype = Object.create( THREE.GLNode.prototype );
 THREE.PhongNode.prototype.constructor = THREE.PhongNode;
 
-THREE.PhongNode.prototype.build = function( builder ) {
+THREE.PhongNode.prototype.build = function ( builder ) {
 
 	var material = builder.material;
 	var code;
@@ -27,7 +27,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache : 'transform' } ) : undefined;
+		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache: 'transform' } ) : undefined;
 
 		material.mergeUniform( THREE.UniformsUtils.merge( [
 
@@ -46,7 +46,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 			"#endif",
 
 			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "fog_parse_vertex" ],
+			THREE.ShaderChunk[ "fog_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
@@ -55,11 +55,11 @@ THREE.PhongNode.prototype.build = function( builder ) {
 		].join( "\n" ) );
 
 		var output = [
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "morphnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			THREE.ShaderChunk[ "beginnormal_vertex" ],
+			THREE.ShaderChunk[ "morphnormal_vertex" ],
+			THREE.ShaderChunk[ "skinbase_vertex" ],
+			THREE.ShaderChunk[ "skinnormal_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
 			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
 
@@ -67,8 +67,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 			"#endif",
 
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "fog_vertex" ]
+			THREE.ShaderChunk[ "begin_vertex" ]
 		];
 
 		if ( transform ) {
@@ -84,6 +83,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "project_vertex" ],
+				THREE.ShaderChunk[ "fog_vertex" ],
 				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"	vViewPosition = - mvPosition.xyz;",
@@ -98,44 +98,44 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		// parse all nodes to reuse generate codes
 
-		this.color.parse( builder, { slot : 'color' } );
+		this.color.parse( builder, { slot: 'color' } );
 		this.specular.parse( builder );
 		this.shininess.parse( builder );
 
 		if ( this.alpha ) this.alpha.parse( builder );
-		
+
 		if ( this.normal ) this.normal.parse( builder );
 		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
-		
-		if ( this.light ) this.light.parse( builder, { cache : 'light' } );
+
+		if ( this.light ) this.light.parse( builder, { cache: 'light' } );
 
 		if ( this.ao ) this.ao.parse( builder );
 		if ( this.ambient ) this.ambient.parse( builder );
 		if ( this.shadow ) this.shadow.parse( builder );
-		if ( this.emissive ) this.emissive.parse( builder, { slot : 'emissive' } );
+		if ( this.emissive ) this.emissive.parse( builder, { slot: 'emissive' } );
 
-		if ( this.environment ) this.environment.parse( builder, { slot : 'environment' } );
+		if ( this.environment ) this.environment.parse( builder, { slot: 'environment' } );
 		if ( this.environmentAlpha && this.environment ) this.environmentAlpha.parse( builder );
 
 		// build code
 
-		var color = this.color.buildCode( builder, 'c', { slot : 'color' } );
+		var color = this.color.buildCode( builder, 'c', { slot: 'color' } );
 		var specular = this.specular.buildCode( builder, 'c' );
 		var shininess = this.shininess.buildCode( builder, 'fv1' );
 
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
-		
+
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
 		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
-		
-		var light = this.light ? this.light.buildCode( builder, 'v3', { cache : 'light' } ) : undefined;
+
+		var light = this.light ? this.light.buildCode( builder, 'v3', { cache: 'light' } ) : undefined;
 
 		var ao = this.ao ? this.ao.buildCode( builder, 'fv1' ) : undefined;
 		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
 		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
-		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot : 'emissive' } ) : undefined;
+		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot: 'emissive' } ) : undefined;
 
-		var environment = this.environment ? this.environment.buildCode( builder, 'c', { slot : 'environment' } ) : undefined;
+		var environment = this.environment ? this.environment.buildCode( builder, 'c', { slot: 'environment' } ) : undefined;
 		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.buildCode( builder, 'fv1' ) : undefined;
 
 		material.requestAttribs.transparent = alpha != undefined;
@@ -152,17 +152,17 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		var output = [
 				// prevent undeclared normal
-				THREE.ShaderChunk[ "normal_flip" ],
-				THREE.ShaderChunk[ "normal_fragment" ],
+			THREE.ShaderChunk[ "normal_flip" ],
+			THREE.ShaderChunk[ "normal_fragment" ],
 
 				// prevent undeclared material
 			"	BlinnPhongMaterial material;",
 
-				color.code,
+			color.code,
 			"	vec3 diffuseColor = " + color.result + ";",
 			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+			THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 
 			specular.code,
 			"	vec3 specular = " + specular.result + ";",
