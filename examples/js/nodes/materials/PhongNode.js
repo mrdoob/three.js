@@ -45,21 +45,20 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 
 			"#endif",
 
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "fog_pars_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ]
-
+			"#include <common>",
+			"#include <fog_pars_vertex>",
+			"#include <morphtarget_pars_vertex>",
+			"#include <skinning_pars_vertex>",
+			"#include <shadowmap_pars_vertex>",
+			"#include <logdepthbuf_pars_vertex>"
 		].join( "\n" ) );
 
 		var output = [
-			THREE.ShaderChunk[ "beginnormal_vertex" ],
-			THREE.ShaderChunk[ "morphnormal_vertex" ],
-			THREE.ShaderChunk[ "skinbase_vertex" ],
-			THREE.ShaderChunk[ "skinnormal_vertex" ],
-			THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			"#include <beginnormal_vertex>",
+			"#include <morphnormal_vertex>",
+			"#include <skinbase_vertex>",
+			"#include <skinnormal_vertex>",
+			"#include <defaultnormal_vertex>",
 
 			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
 
@@ -67,7 +66,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 
 			"#endif",
 
-			THREE.ShaderChunk[ "begin_vertex" ]
+			"#include <begin_vertex>"
 		];
 
 		if ( transform ) {
@@ -80,16 +79,16 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 		}
 
 		output.push(
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-				THREE.ShaderChunk[ "fog_vertex" ],
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+			"	#include <morphtarget_vertex>",
+			"	#include <skinning_vertex>",
+			"	#include <project_vertex>",
+			"	#include <fog_vertex>",
+			"	#include <logdepthbuf_vertex>",
 
 			"	vViewPosition = - mvPosition.xyz;",
 
-				THREE.ShaderChunk[ "worldpos_vertex" ],
-				THREE.ShaderChunk[ "shadowmap_vertex" ]
+			"	#include <worldpos_vertex>",
+			"	#include <shadowmap_vertex>"
 		);
 
 		code = output.join( "\n" );
@@ -141,28 +140,28 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 		material.requestAttribs.transparent = alpha != undefined;
 
 		material.addFragmentPars( [
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "fog_pars_fragment" ],
-			THREE.ShaderChunk[ "bsdfs" ],
-			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
-			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ]
+			"#include <common>",
+			"#include <fog_pars_fragment>",
+			"#include <bsdfs>",
+			"#include <lights_pars>",
+			"#include <lights_phong_pars_fragment>",
+			"#include <shadowmap_pars_fragment>",
+			"#include <logdepthbuf_pars_fragment>"
 		].join( "\n" ) );
 
 		var output = [
-				// prevent undeclared normal
-			THREE.ShaderChunk[ "normal_flip" ],
-			THREE.ShaderChunk[ "normal_fragment" ],
+			// prevent undeclared normal
+			"#include <normal_flip>",
+			"#include <normal_fragment>",
 
-				// prevent undeclared material
+			// prevent undeclared material
 			"	BlinnPhongMaterial material;",
 
 			color.code,
 			"	vec3 diffuseColor = " + color.result + ";",
 			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 
-			THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+			"#include <logdepthbuf_fragment>",
 
 			specular.code,
 			"	vec3 specular = " + specular.result + ";",
@@ -209,7 +208,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 			'material.specularShininess = shininess;',
 			'material.specularStrength = specularStrength;',
 
-			THREE.ShaderChunk[ "lights_template" ]
+			"#include <lights_template>"
 		);
 
 		if ( light ) {
@@ -297,10 +296,10 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 		}
 
 		output.push(
-			THREE.ShaderChunk[ "premultiplied_alpha_fragment" ],
-			THREE.ShaderChunk[ "tonemapping_fragment" ],
-			THREE.ShaderChunk[ "encodings_fragment" ],
-			THREE.ShaderChunk[ "fog_fragment" ]
+			"#include <premultiplied_alpha_fragment>",
+			"#include <tonemapping_fragment>",
+			"#include <encodings_fragment>",
+			"#include <fog_fragment>"
 		);
 
 		code = output.join( "\n" );

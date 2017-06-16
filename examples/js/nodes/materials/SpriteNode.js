@@ -33,11 +33,11 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 		] ) );
 
 		material.addVertexPars( [
-			THREE.ShaderChunk[ "fog_pars_vertex" ],
+			"#include <fog_pars_vertex>"
 		].join( "\n" ) );
 
 		output = [
-			THREE.ShaderChunk[ "begin_vertex" ]
+			"#include <begin_vertex>"
 		];
 
 		if ( transform ) {
@@ -51,8 +51,8 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 
 		output.push(
 
-			THREE.ShaderChunk[ "project_vertex" ],
-			THREE.ShaderChunk[ "fog_vertex" ],
+			"#include <project_vertex>",
+			"#include <fog_vertex>",
 
 			'mat4 modelViewMtx = modelViewMatrix;',
 			'mat4 modelMtx = modelMatrix;',
@@ -106,12 +106,10 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 			'gl_Position = projectionMatrix * modelViewMtx * modelMtx * vec4( position, 1.0 );'
 		);
 
-		code = output.join( "\n" );
-
 	} else {
 
 		material.addFragmentPars( [
-			THREE.ShaderChunk[ "fog_pars_fragment" ]
+			"#include <fog_pars_fragment>",
 		].join( "\n" ) );
 
 		// parse all nodes to reuse generate codes
@@ -139,12 +137,10 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 
 		}
 
-		output.push( THREE.ShaderChunk[ "fog_fragment" ] );
-
-		code = output.join( "\n" );
+		output.push( "#include <fog_fragment>" );
 
 	}
 
-	return code;
+	return output.join( "\n" );
 
 };
