@@ -19854,6 +19854,12 @@
 
 		};
 
+		this.submitFrame = function () {
+
+			if ( device && device.isPresenting ) device.submitFrame();
+
+		};
+
 	}
 
 	/**
@@ -21162,8 +21168,6 @@
 
 			// update camera matrices and frustum
 
-			camera.onBeforeRender( _this );
-
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
 			if ( vr.enabled ) {
@@ -21348,7 +21352,11 @@
 
 			}
 
-			camera.onAfterRender( _this );
+			if ( vr.enabled ) {
+
+				vr.submitFrame();
+
+			}
 
 			// _gl.finish();
 
