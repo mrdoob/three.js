@@ -17,9 +17,10 @@ THREE.ResolutionNode.prototype.constructor = THREE.ResolutionNode;
 
 THREE.ResolutionNode.prototype.updateFrame = function( delta ) {
 
-	var size = this.renderer.getSize();
+	var size = this.renderer.getSize(),
+		pixelRatio = this.renderer.getPixelRatio();
 
-	this.x = size.width;
-	this.y = size.height;
+	this.x = size.width * pixelRatio;
+	this.y = size.height * pixelRatio;
 
 };
