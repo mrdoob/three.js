@@ -2241,8 +2241,6 @@ THREE.ColladaLoader.prototype = {
 
 			var joints = controller.skin.joints;
 
-			root.updateMatrixWorld( true );
-
 			// setup bone data from visual scene
 
 			root.traverse( function( object ) {
@@ -2267,14 +2265,12 @@ THREE.ColladaLoader.prototype = {
 					if ( boneInverse === undefined ) {
 
 						// Unfortunately, there can be joints in the visual scene that are not part of the
-						// corresponding controller. In this case, we have to create a boneInverse matrix
-						// for the respective bone. These bone won't affect any vertices, because there are no skin indices
+						// corresponding controller. In this case, we have to create a dummy boneInverse matrix
+						// for the respective bone. This bone won't affect any vertices, because there are no skin indices
 						// and weights defined for it. But we still have to add the bone to the sorted bone list in order to
 						// ensure a correct animation of the model.
 
-						boneInverse = new THREE.Matrix4().getInverse( object.matrixWorld );
-						missingBoneData.push( { bone: object, boneInverse: boneInverse } );
-
+						missingBoneData.push( { bone: object, boneInverse: new THREE.Matrix4() } );
 						console.warn( 'THREE.ColladaLoader: Missing data for bone: %s.', object.name );
 
 					} else {
