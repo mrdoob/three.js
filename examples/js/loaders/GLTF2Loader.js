@@ -2531,28 +2531,34 @@ THREE.GLTF2Loader = ( function () {
 		var extensions = this.extensions;
 		var scope = this;
 
+		var nodes = json.nodes || [];
+
+		// Nothing in the node definition indicates whether it is a Bone or an
+		// Object3D. So, traverse the hierarchy once in advance, using node.skins
+		// references to mark bones.
+		nodes.forEach( function ( node ) {
+
+			if ( node.skin !== undefined ) {
+
+				json.skins[ node.skin ].joints.forEach( function ( id ) {
+
+					nodes[ id ].isBone = true;
+
+				} );
+
+			}
+
+		} );
+
 		return _each( json.nodes, function ( node ) {
 
 			var matrix = new THREE.Matrix4();
 
-			var _node;
+			var _node = node.isBone === true ? new THREE.Bone() : new THREE.Object3D();
 
-			if ( node.jointName ) {
+			if ( node.name !== undefined ) {
 
-				_node = new THREE.Bone();
-				_node.name = node.name !== undefined ? node.name : node.jointName;
-				_node.jointName = node.jointName;
-
-			} else {
-
-				_node = new THREE.Object3D();
-				if ( node.name !== undefined ) _node.name = node.name;
-
-			}
-
-			if ( _node.name !== undefined ) {
-
-				_node.name = THREE.PropertyBinding.sanitizeNodeName( _node.name );
+				_node.name = THREE.PropertyBinding.sanitizeNodeName( node.name );
 
 			}
 
