@@ -19709,6 +19709,8 @@ function WebVRManager( renderer ) {
 
 	}
 
+	var matrixWorldInverse = new THREE.Matrix4();
+
 	var cameraL = new THREE.PerspectiveCamera();
 	cameraL.bounds = new THREE.Vector4( 0.0, 0.0, 0.5, 1.0 );
 	cameraL.layers.enable( 1 );
@@ -19809,8 +19811,10 @@ function WebVRManager( renderer ) {
 
 		if ( parent !== null ) {
 
-			cameraL.matrixWorldInverse.multiply( parent.matrixWorldInverse );
-			cameraR.matrixWorldInverse.multiply( parent.matrixWorldInverse );
+			matrixWorldInverse.getInverse( parent.matrixWorld );
+
+			cameraL.matrixWorldInverse.multiply( matrixWorldInverse );
+			cameraR.matrixWorldInverse.multiply( matrixWorldInverse );
 
 		}
 
