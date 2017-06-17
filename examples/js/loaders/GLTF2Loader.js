@@ -2532,21 +2532,17 @@ THREE.GLTF2Loader = ( function () {
 		var scope = this;
 
 		var nodes = json.nodes || [];
+		var skins = json.skins || [];
 
 		// Nothing in the node definition indicates whether it is a Bone or an
-		// Object3D. So, traverse the hierarchy once in advance, using node.skins
-		// references to mark bones.
-		nodes.forEach( function ( node ) {
+		// Object3D. Use the skins' joint references to mark bones.
+		skins.forEach( function ( skin ) {
 
-			if ( node.skin !== undefined ) {
+			skin.joints.forEach( function ( id ) {
 
-				json.skins[ node.skin ].joints.forEach( function ( id ) {
+				nodes[ id ].isBone = true;
 
-					nodes[ id ].isBone = true;
-
-				} );
-
-			}
+			} );
 
 		} );
 
