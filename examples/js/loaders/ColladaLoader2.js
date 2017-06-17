@@ -6,6 +6,9 @@
 THREE.ColladaLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.options = {
+		convertUpAxis: false
+	};
 
 };
 
@@ -27,16 +30,6 @@ THREE.ColladaLoader.prototype = {
 			onLoad( scope.parse( text, resourceDirectory ) );
 
 		}, onProgress, onError );
-
-	},
-
-	options: {
-
-		set convertUpAxis( value ) {
-
-			console.log( 'THREE.ColladaLoader.options.convertUpAxis: TODO' );
-
-		}
 
 	},
 
@@ -2660,9 +2653,13 @@ THREE.ColladaLoader.prototype = {
 
 		var scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
 
-		if ( asset.upAxis === 'Z_UP' ) {
+		if ( this.options.convertUpAxis === true ) {
 
-			scene.rotation.x = - Math.PI / 2;
+			if ( asset.upAxis === 'Z_UP' ) {
+
+				THREE.SceneUtils.convertFromZUp( scene, animations );
+
+			}
 
 		}
 
