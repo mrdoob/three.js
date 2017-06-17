@@ -652,7 +652,13 @@ Object.assign( Vector3.prototype, {
 
 	setFromMatrixPosition: function ( m ) {
 
-		return this.setFromMatrixColumn( m, 3 );
+		var e = m.elements;
+
+		this.x = e[ 12 ];
+		this.y = e[ 13 ];
+		this.z = e[ 14 ];
+
+		return this;
 
 	},
 
@@ -671,7 +677,6 @@ Object.assign( Vector3.prototype, {
 	},
 
 	setFromMatrixColumn: function ( m, index ) {
-
 
 		return this.fromArray( m.elements, index * 4 );
 
