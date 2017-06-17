@@ -268,9 +268,9 @@ Object.assign( UpAxisConverter.prototype, {
 
 					break;
 
-				}
+			}
 
-			};
+		};
 
 	} (),
 
