@@ -212,7 +212,8 @@ Object.assign( UpAxisConverter.prototype, {
 			var propertyName = result.propertyName;
 
 			var values = track.values;
-			var stride = track.values.length / track.times.length;
+			var times = track.times;
+			var stride = values.length / times.length;
 
 			var i, il, j, jl;
 
