@@ -15,6 +15,11 @@ function WebVRManager( renderer ) {
 
 	}
 
+	var matrixWorldInverse = new THREE.Matrix4();
+
+	var standingMatrix = new THREE.Matrix4();
+	var standingMatrixInverse = new THREE.Matrix4();
+
 	var cameraL = new THREE.PerspectiveCamera();
 	cameraL.bounds = new THREE.Vector4( 0.0, 0.0, 0.5, 1.0 );
 	cameraL.layers.enable( 1 );
@@ -57,6 +62,7 @@ function WebVRManager( renderer ) {
 	//
 
 	this.enabled = false;
+	this.standing = false;
 
 	this.getDevice = function () {
 
@@ -101,6 +107,18 @@ function WebVRManager( renderer ) {
 
 		camera.updateMatrixWorld();
 
+		var stageParameters = device.stageParameters;
+
+		if ( this.standing && stageParameters ) {
+
+			standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
+			standingMatrixInverse.getInverse( standingMatrix );
+
+			camera.matrixWorld.multiply( standingMatrix );
+			camera.matrixWorldInverse.multiply( standingMatrixInverse );
+
+		}
+
 		if ( device.isPresenting === false ) return camera;
 
 		//
@@ -111,12 +129,21 @@ function WebVRManager( renderer ) {
 		cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 		cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
 
+		if ( this.standing && stageParameters ) {
+
+			cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
+			cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
+
+		}
+
 		var parent = camera.parent;
 
 		if ( parent !== null ) {
 
-			cameraL.matrixWorldInverse.multiply( parent.matrixWorldInverse );
-			cameraR.matrixWorldInverse.multiply( parent.matrixWorldInverse );
+			matrixWorldInverse.getInverse( parent.matrixWorld );
+
+			cameraL.matrixWorldInverse.multiply( matrixWorldInverse );
+			cameraR.matrixWorldInverse.multiply( matrixWorldInverse );
 
 		}
 
@@ -151,6 +178,18 @@ function WebVRManager( renderer ) {
 		}
 
 		return cameraVR;
+
+	};
+
+	this.getStandingMatrix = function () {
+
+		return standingMatrix;
+
+	};
+
+	this.submitFrame = function () {
+
+		if ( device && device.isPresenting ) device.submitFrame();
 
 	};
 

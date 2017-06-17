@@ -34,8 +34,6 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
@@ -50,8 +48,6 @@
 
 			var camera, scene, renderer;
 			var video, texture;
-
-			var controls, effect;
 
 			init();
 			animate();
@@ -142,15 +138,13 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				renderer.vr.enabled = true;
+
 				//
 
-				controls = new THREE.VRControls( camera );
-
-				effect = new THREE.VREffect( renderer );
-				effect.scale = 0; // video doesn't need eye separation
-				effect.setSize( window.innerWidth, window.innerHeight );
-
 				WEBVR.getVRDisplay( function ( display ) {
+
+					renderer.vr.setDevice( display );
 
 					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
@@ -168,22 +162,19 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
 			function animate() {
 
-				effect.requestAnimationFrame( animate );
-				render();
+				renderer.animate( render );
 
 			}
 
 			function render() {
 
-				controls.update();
-
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

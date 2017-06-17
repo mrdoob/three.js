@@ -738,7 +738,7 @@
 
 		clamp: function ( min, max ) {
 
-			// This function assumes min < max, if this assumption isn't true it will not operate correctly
+			// assumes min < max, componentwise
 
 			this.x = Math.max( min.x, Math.min( max.x, this.x ) );
 			this.y = Math.max( min.y, Math.min( max.y, this.y ) );
@@ -767,7 +767,7 @@
 
 			var length = this.length();
 
-			return this.multiplyScalar( Math.max( min, Math.min( max, length ) ) / length );
+			return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
 
 		},
 
@@ -842,7 +842,7 @@
 
 		normalize: function () {
 
-			return this.divideScalar( this.length() );
+			return this.divideScalar( this.length() || 1 );
 
 		},
 
@@ -879,7 +879,7 @@
 
 		setLength: function ( length ) {
 
-			return this.multiplyScalar( length / this.length() );
+			return this.normalize().multiplyScalar( length );
 
 		},
 
@@ -1670,7 +1670,7 @@
 
 		clamp: function ( min, max ) {
 
-			// This function assumes min < max, if this assumption isn't true it will not operate correctly
+			// assumes min < max, componentwise
 
 			this.x = Math.max( min.x, Math.min( max.x, this.x ) );
 			this.y = Math.max( min.y, Math.min( max.y, this.y ) );
@@ -1683,10 +1683,16 @@
 
 		clampScalar: function () {
 
-			var min = new Vector4();
-			var max = new Vector4();
+			var min, max;
 
 			return function clampScalar( minVal, maxVal ) {
+
+				if ( min === undefined ) {
+
+					min = new Vector4();
+					max = new Vector4();
+
+				}
 
 				min.set( minVal, minVal, minVal, minVal );
 				max.set( maxVal, maxVal, maxVal, maxVal );
@@ -1696,6 +1702,14 @@
 			};
 
 		}(),
+
+		clampLength: function ( min, max ) {
+
+			var length = this.length();
+
+			return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
+
+		},
 
 		floor: function () {
 
@@ -1778,13 +1792,13 @@
 
 		normalize: function () {
 
-			return this.divideScalar( this.length() );
+			return this.divideScalar( this.length() || 1 );
 
 		},
 
 		setLength: function ( length ) {
 
-			return this.multiplyScalar( length / this.length() );
+			return this.normalize().multiplyScalar( length );
 
 		},
 
@@ -2845,12 +2859,13 @@
 			var x = this.x, y = this.y, z = this.z;
 			var e = m.elements;
 
-			this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ];
-			this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ];
-			this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ];
-			var w =  e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ];
+			var w = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] );
 
-			return this.divideScalar( w );
+			this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ] ) * w;
+			this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ] ) * w;
+			this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * w;
+
+			return this;
 
 		},
 
@@ -2956,7 +2971,7 @@
 
 		clamp: function ( min, max ) {
 
-			// This function assumes min < max, if this assumption isn't true it will not operate correctly
+			// assumes min < max, componentwise
 
 			this.x = Math.max( min.x, Math.min( max.x, this.x ) );
 			this.y = Math.max( min.y, Math.min( max.y, this.y ) );
@@ -2986,7 +3001,7 @@
 
 			var length = this.length();
 
-			return this.multiplyScalar( Math.max( min, Math.min( max, length ) ) / length );
+			return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
 
 		},
 
@@ -3068,13 +3083,13 @@
 
 		normalize: function () {
 
-			return this.divideScalar( this.length() );
+			return this.divideScalar( this.length() || 1 );
 
 		},
 
 		setLength: function ( length ) {
 
-			return this.multiplyScalar( length / this.length() );
+			return this.normalize().multiplyScalar( length );
 
 		},
 
@@ -3217,7 +3232,13 @@
 
 		setFromMatrixPosition: function ( m ) {
 
-			return this.setFromMatrixColumn( m, 3 );
+			var e = m.elements;
+
+			this.x = e[ 12 ];
+			this.y = e[ 13 ];
+			this.z = e[ 14 ];
+
+			return this;
 
 		},
 
@@ -3236,7 +3257,6 @@
 		},
 
 		setFromMatrixColumn: function ( m, index ) {
-
 
 			return this.fromArray( m.elements, index * 4 );
 
@@ -19701,6 +19721,11 @@
 
 		}
 
+		var matrixWorldInverse = new THREE.Matrix4();
+
+		var standingMatrix = new THREE.Matrix4();
+		var standingMatrixInverse = new THREE.Matrix4();
+
 		var cameraL = new THREE.PerspectiveCamera();
 		cameraL.bounds = new THREE.Vector4( 0.0, 0.0, 0.5, 1.0 );
 		cameraL.layers.enable( 1 );
@@ -19743,6 +19768,7 @@
 		//
 
 		this.enabled = false;
+		this.standing = false;
 
 		this.getDevice = function () {
 
@@ -19787,6 +19813,18 @@
 
 			camera.updateMatrixWorld();
 
+			var stageParameters = device.stageParameters;
+
+			if ( this.standing && stageParameters ) {
+
+				standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
+				standingMatrixInverse.getInverse( standingMatrix );
+
+				camera.matrixWorld.multiply( standingMatrix );
+				camera.matrixWorldInverse.multiply( standingMatrixInverse );
+
+			}
+
 			if ( device.isPresenting === false ) return camera;
 
 			//
@@ -19797,12 +19835,21 @@
 			cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 			cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
 
+			if ( this.standing && stageParameters ) {
+
+				cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
+				cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
+
+			}
+
 			var parent = camera.parent;
 
 			if ( parent !== null ) {
 
-				cameraL.matrixWorldInverse.multiply( parent.matrixWorldInverse );
-				cameraR.matrixWorldInverse.multiply( parent.matrixWorldInverse );
+				matrixWorldInverse.getInverse( parent.matrixWorld );
+
+				cameraL.matrixWorldInverse.multiply( matrixWorldInverse );
+				cameraR.matrixWorldInverse.multiply( matrixWorldInverse );
 
 			}
 
@@ -19837,6 +19884,18 @@
 			}
 
 			return cameraVR;
+
+		};
+
+		this.getStandingMatrix = function () {
+
+			return standingMatrix;
+
+		};
+
+		this.submitFrame = function () {
+
+			if ( device && device.isPresenting ) device.submitFrame();
 
 		};
 
@@ -21148,8 +21207,6 @@
 
 			// update camera matrices and frustum
 
-			camera.onBeforeRender( _this );
-
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
 			if ( vr.enabled ) {
@@ -21285,27 +21342,33 @@
 
 			}
 
-			//
+			// render scene
 
-			var opaqueObjects = currentRenderList.opaque;
-			var transparentObjects = currentRenderList.transparent;
+			if ( camera.isArrayCamera ) {
 
-			if ( scene.overrideMaterial ) {
+				var cameras = camera.cameras;
 
-				var overrideMaterial = scene.overrideMaterial;
+				for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
 
-				if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera, overrideMaterial );
-				if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera, overrideMaterial );
+					var camera2 = cameras[ j ];
+					var bounds = camera2.bounds;
+
+					var x = bounds.x * _width;
+					var y = bounds.y * _height;
+					var width = bounds.z * _width;
+					var height = bounds.w * _height;
+
+					_this.setViewport( x, y, width, height );
+					_this.setScissor( x, y, width, height );
+					_this.setScissorTest( true );
+
+					renderScene( currentRenderList, scene, camera2 );
+
+				}
 
 			} else {
 
-				// opaque pass (front-to-back order)
-
-				if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
-
-				// transparent pass (back-to-front order)
-
-				if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
+				renderScene( currentRenderList, scene, camera );
 
 			}
 
@@ -21334,7 +21397,11 @@
 
 			}
 
-			camera.onAfterRender( _this );
+			if ( vr.enabled ) {
+
+				vr.submitFrame();
+
+			}
 
 			// _gl.finish();
 
@@ -21489,11 +21556,37 @@
 
 		}
 
-		function renderObjects( renderList, scene, camera, overrideMaterial ) {
+		function renderScene( renderList, scene, camera ) {
 
-			for ( var i = 0, l = renderList.length; i < l; i ++ ) {
+			var opaqueObjects = renderList.opaque;
+			var transparentObjects = renderList.transparent;
 
-				var renderItem = renderList[ i ];
+			if ( scene.overrideMaterial ) {
+
+				var overrideMaterial = scene.overrideMaterial;
+
+				if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera, overrideMaterial );
+				if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera, overrideMaterial );
+
+			} else {
+
+				// opaque pass (front-to-back order)
+
+				if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
+
+				// transparent pass (back-to-front order)
+
+				if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
+
+			}
+
+		}
+
+		function renderObjects( renderItems, scene, camera, overrideMaterial ) {
+
+			for ( var i = 0, l = renderItems.length; i < l; i ++ ) {
+
+				var renderItem = renderItems[ i ];
 
 				var object = renderItem.object;
 				var geometry = renderItem.geometry;
@@ -21502,33 +21595,7 @@
 
 				object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
-				if ( camera.isArrayCamera ) {
-
-					var cameras = camera.cameras;
-
-					for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
-
-						var camera2 = cameras[ j ];
-						var bounds = camera2.bounds;
-
-						var x = bounds.x * _width;
-						var y = bounds.y * _height;
-						var width = bounds.z * _width;
-						var height = bounds.w * _height;
-
-						_this.setViewport( x, y, width, height );
-						_this.setScissor( x, y, width, height );
-						_this.setScissorTest( true );
-
-						renderObject( object, scene, camera2, geometry, material, group );
-
-					}
-
-				} else {
-
-					renderObject( object, scene, camera, geometry, material, group );
-
-				}
+				renderObject( object, scene, camera, geometry, material, group );
 
 				object.onAfterRender( _this, scene, camera, geometry, material, group );
 

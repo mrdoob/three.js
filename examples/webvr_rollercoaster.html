@@ -25,8 +25,6 @@
 
 		<script src="js/RollerCoaster.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
@@ -44,6 +42,8 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
+
+			renderer.vr.enabled = true;
 
 			var scene = new THREE.Scene();
 
@@ -186,10 +186,9 @@
 
 			//
 
-			var controls = new THREE.VRControls( camera );
-			var effect = new THREE.VREffect( renderer );
-
 			WEBVR.getVRDisplay( function ( display ) {
+
+				renderer.vr.setDevice( display );
 
 				document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
@@ -202,7 +201,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}, false );
 
@@ -218,10 +217,9 @@
 
 			var prevTime = performance.now();
 
-			function animate( time ) {
+			function render() {
 
-				effect.requestAnimationFrame( animate );
-
+				var time = performance.now();
 				var delta = time - prevTime;
 
 				for ( var i = 0; i < funfairs.length; i ++ ) {
@@ -249,15 +247,13 @@
 
 				//
 
-				controls.update();
-
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 				prevTime = time;
 
 			}
 
-			effect.requestAnimationFrame( animate );
+			renderer.animate( render );
 
 		</script>
 
