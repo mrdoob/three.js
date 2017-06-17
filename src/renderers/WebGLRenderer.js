@@ -1275,7 +1275,7 @@ function WebGLRenderer( parameters ) {
 				_this.setScissor( x, y, width, height );
 				_this.setScissorTest( true );
 
-				renderScene( currentRenderList, scene, camera );
+				renderScene( currentRenderList, scene, camera2 );
 
 			}
 
