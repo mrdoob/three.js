@@ -15,20 +15,20 @@ function WebVRManager( renderer ) {
 
 	}
 
-	var matrixWorldInverse = new THREE.Matrix4();
+	var matrixWorldInverse = new Matrix4();
 
-	var standingMatrix = new THREE.Matrix4();
-	var standingMatrixInverse = new THREE.Matrix4();
+	var standingMatrix = new Matrix4();
+	var standingMatrixInverse = new Matrix4();
 
-	var cameraL = new THREE.PerspectiveCamera();
-	cameraL.bounds = new THREE.Vector4( 0.0, 0.0, 0.5, 1.0 );
+	var cameraL = new PerspectiveCamera();
+	cameraL.bounds = new Vector4( 0.0, 0.0, 0.5, 1.0 );
 	cameraL.layers.enable( 1 );
 
-	var cameraR = new THREE.PerspectiveCamera();
-	cameraR.bounds = new THREE.Vector4( 0.5, 0.0, 0.5, 1.0 );
+	var cameraR = new PerspectiveCamera();
+	cameraR.bounds = new Vector4( 0.5, 0.0, 0.5, 1.0 );
 	cameraR.layers.enable( 2 );
 
-	var cameraVR = new THREE.ArrayCamera( [ cameraL, cameraR ] );
+	var cameraVR = new ArrayCamera( [ cameraL, cameraR ] );
 
 	//
 
