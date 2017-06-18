@@ -461,6 +461,7 @@ THREE.GPUParticleContainer = function( maxParticles, particleSystem ) {
 				sizeAttribute.updateRange.offset = 0;
 				lifeTimeAttribute.updateRange.offset = 0;
 
+				// Use -1 to update the entire buffer, see https://github.com/mrdoob/three.js/pull/11476
 				positionStartAttribute.updateRange.count = -1;
 				startTimeAttribute.updateRange.count = -1;
 				velocityAttribute.updateRange.count = -1;
