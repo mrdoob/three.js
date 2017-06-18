@@ -58,20 +58,20 @@ var SceneUtils = {
 			0,   0,   0,   1
 		);
 
-		var converter = new CoordSystemConverter( matrix );
+		var converter = new BasisConverter( matrix );
 		converter.convert( root, animations );
 
 	}
 
 };
 
-function CoordSystemConverter( matrix ) {
+function BasisConverter( matrix ) {
 
 	this.matrix = matrix;
 
 }
 
-Object.assign( CoordSystemConverter.prototype, {
+Object.assign( BasisConverter.prototype, {
 
 	convert: function ( root, animations ) {
 
