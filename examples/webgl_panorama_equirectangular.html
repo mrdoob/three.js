@@ -141,11 +141,11 @@
 
 				isUserInteracting = true;
 
-				onPointerDownPointerX = event.clientX;
-				onPointerDownPointerY = event.clientY;
+				onMouseDownMouseX = event.clientX;
+				onMouseDownMouseY = event.clientY;
 
-				onPointerDownLon = lon;
-				onPointerDownLat = lat;
+				onMouseDownLon = lon;
+				onMouseDownLat = lat;
 
 			}
 
@@ -153,8 +153,8 @@
 
 				if ( isUserInteracting === true ) {
 
-					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
-					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+					lon = ( onMouseDownMouseX - event.clientX ) * 0.1 + onMouseDownLon;
+					lat = ( event.clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
 
 				}
 
