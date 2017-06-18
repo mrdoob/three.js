@@ -1,6 +1,10 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  */
+import { Matrix4 } from '../../math/Matrix4';
+import { Vector4 } from '../../math/Vector4';
+import { ArrayCamera } from '../../cameras/ArrayCamera';
+import { PerspectiveCamera } from '../../cameras/PerspectiveCamera';
 
 function WebVRManager( renderer ) {
 
