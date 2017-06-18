@@ -19708,6 +19708,26 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
+	function ArrayCamera( array ) {
+
+		PerspectiveCamera.call( this );
+
+		this.cameras = array || [];
+
+	}
+
+	ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototype ), {
+
+		constructor: ArrayCamera,
+
+		isArrayCamera: true
+
+	} );
+
+	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 */
+
 	function WebVRManager( renderer ) {
 
 		var scope = this;
@@ -19721,20 +19741,20 @@
 
 		}
 
-		var matrixWorldInverse = new THREE.Matrix4();
+		var matrixWorldInverse = new Matrix4();
 
-		var standingMatrix = new THREE.Matrix4();
-		var standingMatrixInverse = new THREE.Matrix4();
+		var standingMatrix = new Matrix4();
+		var standingMatrixInverse = new Matrix4();
 
-		var cameraL = new THREE.PerspectiveCamera();
-		cameraL.bounds = new THREE.Vector4( 0.0, 0.0, 0.5, 1.0 );
+		var cameraL = new PerspectiveCamera();
+		cameraL.bounds = new Vector4( 0.0, 0.0, 0.5, 1.0 );
 		cameraL.layers.enable( 1 );
 
-		var cameraR = new THREE.PerspectiveCamera();
-		cameraR.bounds = new THREE.Vector4( 0.5, 0.0, 0.5, 1.0 );
+		var cameraR = new PerspectiveCamera();
+		cameraR.bounds = new Vector4( 0.5, 0.0, 0.5, 1.0 );
 		cameraR.layers.enable( 2 );
 
-		var cameraVR = new THREE.ArrayCamera( [ cameraL, cameraR ] );
+		var cameraVR = new ArrayCamera( [ cameraL, cameraR ] );
 
 		//
 
@@ -36240,26 +36260,6 @@
 
 	CubeCamera.prototype = Object.create( Object3D.prototype );
 	CubeCamera.prototype.constructor = CubeCamera;
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
-	function ArrayCamera( array ) {
-
-		PerspectiveCamera.call( this );
-
-		this.cameras = array || [];
-
-	}
-
-	ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototype ), {
-
-		constructor: ArrayCamera,
-
-		isArrayCamera: true
-
-	} );
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
