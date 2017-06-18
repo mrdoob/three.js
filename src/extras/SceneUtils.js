@@ -1,6 +1,7 @@
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
+import { Matrix3 } from '../math/Matrix3';
 import { Mesh } from '../objects/Mesh';
 import { Group } from '../objects/Group';
 import { PropertyBinding } from '../animation/PropertyBinding';
@@ -91,8 +92,20 @@ Object.assign( UpAxisConverter.prototype, {
 				var position = geometry.attributes.position;
 				var normal = geometry.attributes.normal;
 
-				if ( position !== null ) scope.conversionMatrix.applyToBufferAttribute( position );
-				if ( normal !== null ) scope.conversionMatrix.applyToBufferAttribute( normal );
+				var conversionMatrix = scope.conversionMatrix;
+
+				if ( position !== null ) {
+
+					conversionMatrix.applyToBufferAttribute( position );
+
+				}
+
+				if ( normal !== null ) {
+
+					var normalMatrix = new Matrix3().setFromMatrix4( conversionMatrix );
+					normalMatrix.applyToBufferAttribute( normal );
+
+				}
 
 			}
 
