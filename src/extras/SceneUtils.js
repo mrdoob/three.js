@@ -48,29 +48,30 @@ var SceneUtils = {
 
 		// see https://gamedev.stackexchange.com/a/7932
 
-		var conversionMatrix = new Matrix4().set(
+		// this matrix will change the coordinate system of an object hierarchy and
+		// animations (optional) from right-handed Z-up to right-handed Y-up
+
+		var matrix = new Matrix4().set(
 			1,   0,   0,   0,
 			0,   0,   1,   0,
 			0, - 1,   0,   0,
 			0,   0,   0,   1
 		);
 
-		var converter = new UpAxisConverter( conversionMatrix );
+		var converter = new CoordSystemConverter( matrix );
 		converter.convert( root, animations );
 
 	}
 
 };
 
-// up axis converter
+function CoordSystemConverter( matrix ) {
 
-function UpAxisConverter( conversionMatrix ) {
-
-	this.conversionMatrix = conversionMatrix;
+	this.matrix = matrix;
 
 }
 
-Object.assign( UpAxisConverter.prototype, {
+Object.assign( CoordSystemConverter.prototype, {
 
 	convert: function ( root, animations ) {
 
@@ -92,17 +93,17 @@ Object.assign( UpAxisConverter.prototype, {
 				var position = geometry.attributes.position;
 				var normal = geometry.attributes.normal;
 
-				var conversionMatrix = scope.conversionMatrix;
+				var matrix = scope.matrix;
 
 				if ( position !== null ) {
 
-					conversionMatrix.applyToBufferAttribute( position );
+					matrix.applyToBufferAttribute( position );
 
 				}
 
 				if ( normal !== null ) {
 
-					var normalMatrix = new Matrix3().setFromMatrix4( conversionMatrix );
+					var normalMatrix = new Matrix3().setFromMatrix4( matrix );
 					normalMatrix.applyToBufferAttribute( normal );
 
 				}
@@ -162,46 +163,32 @@ Object.assign( UpAxisConverter.prototype, {
 
 			// columns first
 
-			xAxis.setFromMatrixColumn( matrix, 0 );
-			yAxis.setFromMatrixColumn( matrix, 1 );
-			zAxis.setFromMatrixColumn( matrix, 2 );
+			matrix.extractBasis( xAxis, yAxis, zAxis );
 			translation.setFromMatrixColumn( matrix, 3 );
 
-			xAxis.applyMatrix4( this.conversionMatrix );
-			yAxis.applyMatrix4( this.conversionMatrix );
-			zAxis.applyMatrix4( this.conversionMatrix );
+			xAxis.applyMatrix4( this.matrix );
+			yAxis.applyMatrix4( this.matrix );
+			zAxis.applyMatrix4( this.matrix );
 
-			matrix.set(
-				xAxis.x, yAxis.x, zAxis.x, 0,
-				xAxis.y, yAxis.y, zAxis.y, 0,
-				xAxis.z, yAxis.z, zAxis.z, 0,
-				0,       0,       0,       1
-			);
+			matrix.makeBasis( xAxis, yAxis, zAxis );
 
 			// then rows
 
 			matrix.transpose();
 
-			xAxis.setFromMatrixColumn( matrix, 0 );
-			yAxis.setFromMatrixColumn( matrix, 1 );
-			zAxis.setFromMatrixColumn( matrix, 2 );
+			matrix.extractBasis( xAxis, yAxis, zAxis );
 
-			xAxis.applyMatrix4( this.conversionMatrix );
-			yAxis.applyMatrix4( this.conversionMatrix );
-			zAxis.applyMatrix4( this.conversionMatrix );
+			xAxis.applyMatrix4( this.matrix );
+			yAxis.applyMatrix4( this.matrix );
+			zAxis.applyMatrix4( this.matrix );
 
-			matrix.set(
-				xAxis.x, yAxis.x, zAxis.x, 0,
-				xAxis.y, yAxis.y, zAxis.y, 0,
-				xAxis.z, yAxis.z, zAxis.z, 0,
-				0,       0,       0,       1
-			);
+			matrix.makeBasis( xAxis, yAxis, zAxis );
 
 			matrix.transpose();
 
 			// translation at the end
 
-			translation.applyMatrix4( this.conversionMatrix );
+			translation.applyMatrix4( this.matrix );
 
 			matrix.elements[ 12 ] = translation.x;
 			matrix.elements[ 13 ] = translation.y;
@@ -236,7 +223,7 @@ Object.assign( UpAxisConverter.prototype, {
 
 					for ( i = 0, il = values.length; i < il; i += stride ) {
 
-						vector.fromArray( values, i ).applyMatrix4( this.conversionMatrix );
+						vector.fromArray( values, i ).applyMatrix4( this.matrix );
 
 						for ( j = 0, jl = stride; j < jl; j ++ ) {
 
@@ -252,7 +239,7 @@ Object.assign( UpAxisConverter.prototype, {
 
 					for ( i = 0, il = values.length; i < il; i += stride ) {
 
-						vector.fromArray( values, i ).applyMatrix4( this.conversionMatrix );
+						vector.fromArray( values, i ).applyMatrix4( this.matrix );
 
 						for ( j = 0, jl = stride; j < jl; j ++ ) {
 
