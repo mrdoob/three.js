@@ -182,6 +182,8 @@ function SpritePlugin( renderer, sprites ) {
 
 			if ( material.visible === false ) continue;
 
+			sprite.onBeforeRender( renderer, scene, camera, undefined, material, undefined );
+
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
 
@@ -238,6 +240,8 @@ function SpritePlugin( renderer, sprites ) {
 			}
 
 			gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
+
+			sprite.onAfterRender( renderer, scene, camera, undefined, material, undefined );
 
 		}
 
