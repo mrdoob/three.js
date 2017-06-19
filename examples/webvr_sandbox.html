@@ -87,7 +87,10 @@
 
 				//
 
-				mirror = new THREE.Mirror( 1.4, 1.4, { textureWidth: window.innerWidth, textureHeight: window.innerHeight } );
+				mirror = new THREE.Mirror( 1.4, 1.4, {
+					textureWidth: window.innerWidth * window.devicePixelRatio,
+					textureHeight: window.innerHeight * window.devicePixelRatio
+				} );
 				mirror.position.x = 1;
 				mirror.position.y = 0.5;
 				mirror.position.z = -3;
