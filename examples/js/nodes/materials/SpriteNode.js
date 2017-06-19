@@ -50,7 +50,6 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 		}
 
 		output.push(
-
 			"#include <project_vertex>",
 			"#include <fog_vertex>",
 
@@ -66,9 +65,7 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 		if ( ! this.spherical ) {
 
 			output.push(
-
-			'modelMtx[1][1] = 1.0;'
-
+				'modelMtx[1][1] = 1.0;'
 			);
 
 		}
@@ -79,31 +76,27 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 			'modelViewMtx[0][0] = 1.0;',
 			'modelViewMtx[0][1] = 0.0;',
 			'modelViewMtx[0][2] = 0.0;'
-
 		);
 
 		if ( this.spherical ) {
 
 			output.push(
-
 				// Second colunm.
 				'modelViewMtx[1][0] = 0.0;',
 				'modelViewMtx[1][1] = 1.0;',
 				'modelViewMtx[1][2] = 0.0;'
-
 			);
 
 		}
 
 		output.push(
-
 			// Thrid colunm.
 			'modelViewMtx[2][0] = 0.0;',
 			'modelViewMtx[2][1] = 0.0;',
 			'modelViewMtx[2][2] = 1.0;',
 
 			// apply
-			'gl_Position = projectionMatrix * modelViewMtx * modelMtx * vec4( position, 1.0 );'
+			'gl_Position = projectionMatrix * modelViewMtx * modelMtx * vec4( transformed, 1.0 );'
 		);
 
 	} else {
