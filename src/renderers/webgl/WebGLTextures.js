@@ -5,6 +5,8 @@
 import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants';
 import { _Math } from '../../math/Math';
 
+var canvas;
+
 function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, infoMemory ) {
 
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
@@ -20,7 +22,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 			var scale = maxSize / Math.max( image.width, image.height );
 
-			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+			if ( ! canvas ) {
+
+				canvas = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+
+			}
+
 			canvas.width = Math.floor( image.width * scale );
 			canvas.height = Math.floor( image.height * scale );
 
@@ -47,7 +54,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement ) {
 
-			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+			if ( ! canvas ) {
+
+				canvas = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+
+			}
+			
 			canvas.width = _Math.nearestPowerOfTwo( image.width );
 			canvas.height = _Math.nearestPowerOfTwo( image.height );
 
