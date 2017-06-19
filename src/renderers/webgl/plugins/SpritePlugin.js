@@ -260,6 +260,8 @@ function SpritePlugin( renderer, sprites ) {
 
 			'precision ' + renderer.getPrecision() + ' float;',
 
+			'#define SHADER_NAME ' + 'SpriteMaterial',
+
 			'uniform mat4 modelViewMatrix;',
 			'uniform mat4 projectionMatrix;',
 			'uniform float rotation;',
@@ -297,6 +299,8 @@ function SpritePlugin( renderer, sprites ) {
 		gl.shaderSource( fragmentShader, [
 
 			'precision ' + renderer.getPrecision() + ' float;',
+
+			'#define SHADER_NAME ' + 'SpriteMaterial',
 
 			'uniform vec3 color;',
 			'uniform sampler2D map;',
