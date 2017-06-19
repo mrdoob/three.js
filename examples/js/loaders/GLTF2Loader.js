@@ -336,6 +336,36 @@ THREE.GLTF2Loader = ( function () {
 
 			if ( lightNode ) {
 
+				if ( light.constantAttenuation !== undefined ) {
+
+					lightNode.intensity = light.constantAttenuation;
+
+				}
+
+				if ( light.linearAttenuation !== undefined ) {
+
+					lightNode.distance = 1 / light.linearAttenuation;
+
+				}
+
+				if ( light.quadraticAttenuation !== undefined ) {
+
+					console.warn( 'GLTF2Loader: light.quadraticAttenuation not currently supported.' );
+
+				}
+
+				if ( light.fallOffAngle !== undefined ) {
+
+					lightNode.angle = light.fallOffAngle;
+
+				}
+
+				if ( light.fallOffExponent !== undefined ) {
+
+					lightNode.decay = light.fallOffExponent;
+
+				}
+
 				lightNode.name = light.name || ( 'light_' + lightId );
 				this.lights[ lightId ] = lightNode;
 
@@ -2767,13 +2797,11 @@ THREE.GLTF2Loader = ( function () {
 					}
 
 					if ( node.extensions
-							 && node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ]
-							 && node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].light ) {
+							 && node.extensions[ EXTENSIONS.KHR_LIGHTS ]
+							 && node.extensions[ EXTENSIONS.KHR_LIGHTS ].light !== undefined ) {
 
-						var extensionLights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
-						var light = extensionLights[ node.extensions[ EXTENSIONS.KHR_LIGHTS ].light ];
-
-						_node.add( light );
+						var lights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
+						_node.add( lights[ node.extensions[ EXTENSIONS.KHR_LIGHTS ].light ] );
 
 					}
 
@@ -2858,6 +2886,16 @@ THREE.GLTF2Loader = ( function () {
 					}
 
 				} );
+
+				// Ambient lighting, if present, is always attached to the scene root.
+				if ( scene.extensions
+							 && scene.extensions[ EXTENSIONS.KHR_LIGHTS ]
+							 && scene.extensions[ EXTENSIONS.KHR_LIGHTS ].light !== undefined ) {
+
+					var lights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
+					_scene.add( lights[ scene.extensions[ EXTENSIONS.KHR_LIGHTS ].light ] );
+
+				}
 
 				return _scene;
 
