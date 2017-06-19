@@ -201,6 +201,16 @@
 			sprite2.material.color.coord = createHorizontalSpriteSheetNode( 8, 30 );
 			sprite2.material.color = new THREE.Math1Node( sprite2.material.color, THREE.Math1Node.INVERT );
 			sprite2.material.spherical = false; // look at camera horizontally only, very used to vegetation
+			// horizontal zigzag sprite
+			sprite2.material.transform = new THREE.OperatorNode(
+				new THREE.OperatorNode( 
+					new THREE.Math1Node( new THREE.TimerNode( 0, 3 ), THREE.Math1Node.SIN ), // 3 is speed (time scale)
+					new THREE.Vector2Node( .3, 0 ), // horizontal scale (position)
+					THREE.OperatorNode.MUL
+				),
+				new THREE.PositionNode(),
+				THREE.OperatorNode.ADD
+			);
 			sprite2.material.build();
 
 			var sineWaveFunction = new THREE.FunctionNode( [
