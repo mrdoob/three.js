@@ -1,5 +1,7 @@
 var files = {
 	"webgl": [
+
+		"webgl_instanced_mesh",
 		"webgl_animation_cloth",
 		"webgl_animation_keyframes_json",
 		"webgl_animation_scene",

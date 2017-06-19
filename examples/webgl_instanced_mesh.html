@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - InstancedMesh example </title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> - Mesh abstraction for InstancedBufferGeometry <a href="https://github.com/pailhead">pailhead</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
+		<script src="js/utils/ShadowMapViewer.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer, clock, stats;
+			var dirLight, spotLight;
+			var torusKnot, cube;
+			var tester;
+
+			var objectWrapper;
+			var finalTriNum = 0;
+			var currentMesh;
+			var cache = {};
+			var options;
+			var trsCache;
+
+			
+			init();
+
+			animate();
+
+
+			function init() {
+
+				initScene();
+				initMisc();
+				initExample();
+
+				document.body.appendChild( renderer.domElement );
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function initScene() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 15, 35 );
+
+				scene = new THREE.Scene();
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+				spotLight = new THREE.SpotLight( 0xffffff );
+				spotLight.name = 'Spot Light';
+				spotLight.angle = Math.PI / 5;
+				spotLight.penumbra = 0.3;
+				spotLight.position.set( 30, 30, 25 );
+				spotLight.castShadow = true;
+				spotLight.shadow.camera.near = 1;
+				spotLight.shadow.camera.far = 80;
+				spotLight.shadow.mapSize.width = 1024;
+				spotLight.shadow.mapSize.height = 1024;
+				scene.add( spotLight );
+
+				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				dirLight.name = 'Dir. Light';
+				dirLight.position.set( 0, 10, 0 );
+				// dirLight.castShadow = true;
+				dirLight.shadow.camera.near = 1;
+				dirLight.shadow.camera.far = 10;
+				dirLight.shadow.camera.right = 15;
+				dirLight.shadow.camera.left = - 15;
+				dirLight.shadow.camera.top	= 15;
+				dirLight.shadow.camera.bottom = - 15;
+				dirLight.shadow.mapSize.width = 1024;
+				dirLight.shadow.mapSize.height = 1024;
+				scene.add( dirLight );
+
+
+				var geometry = new THREE.BoxGeometry( 10, 0.15, 10 );
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0x888888,
+					shininess: 150,
+					specular: 0x888888,
+					shading: THREE.SmoothShading
+				} );
+
+				var ground = new THREE.Mesh( geometry, material );
+				ground.scale.multiplyScalar( 3 );
+				ground.castShadow = false;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+			}
+
+			function initMisc() {
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0x000000 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.BasicShadowMap;
+
+				// Mouse control
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2, 0 );
+				controls.update();
+
+				clock = new THREE.Clock();
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+			}
+
+			function getKey(){
+				
+				if( arguments.length ){
+					
+					var key = '';
+
+					for( var i = 0 ; i < arguments.length ; i ++ )
+
+						key += i < 2 ? arguments[i] : !!arguments[i];
+
+					return key;
+				} 
+
+				return options.geometry + options.instanceNumber + options.dynamic + options.uniformScale + options.color ;
+
+			}
+
+			function initExample(){
+
+				//setup
+
+				options = {
+					dynamic: false,
+					uniformScale: false,
+					color: false,
+					material: 'phong',
+					instanceNumber: 200,
+					geometry: 'box',
+					debug: function(){}
+				};
+
+
+
+
+				var geometries = {
+					box: new THREE.BoxBufferGeometry(1,1,1), 
+					sphere: new THREE.SphereBufferGeometry(1,12,8), 
+					cylinder: new THREE.CylinderBufferGeometry(.3,.3,1,8)
+				};	
+
+				var instanceNumbers = [ 200 , 1000 , 5000 , 20000 , 100000 ];
+
+				var totalTriangleNumber = {};
+
+				var geometriesTriNum = {};
+
+				//different built-in materials
+
+				var materials = {
+					
+					phong: new THREE.MeshPhongMaterial( {
+						color: 0xff00ff,
+						shininess: 150,
+						specular: 0x222222,
+						shading: THREE.SmoothShading
+					}),
+
+					lambert: new THREE.MeshLambertMaterial({
+						color: 0xffff00
+
+					}),
+					
+					standard: new THREE.MeshStandardMaterial({
+						color: 0x00ffff
+					})
+				};
+
+
+				//calculate how many trinagles will be pushed
+
+				for( var g in geometries ){
+					
+					totalTriangleNumber[ g ] = [];
+
+					var n = geometriesTriNum[ g ] = geometries[ g ].index.count/3;
+
+					instanceNumbers.forEach( function( num ) { totalTriangleNumber[ g ].push( n * num ); });
+					
+				}
+				
+				//mesh wrapper
+
+				objectWrapper = new THREE.Object3D();
+				
+				objectWrapper.position.y = 3;
+
+				scene.add( objectWrapper );
+
+
+				//create mesh cache
+
+				//to avoid matrix decomposition 
+				
+				trsCache = [];
+
+				var pi2 = Math.PI * 2;
+				
+				console.log( 'Initializing object cache for 100k objects...');
+				console.time( 'Object cache initialized.');
+
+				for ( var i = 0 ; i < instanceNumbers[ 4 ] ; i ++ ){
+
+					var dummyObj = new THREE.Object3D(); //will hold position , rotation , scale 
+
+					let rot = new THREE.Euler(  Math.random() * pi2 , Math.random() * pi2 , Math.random() * pi2 );
+					
+					let quat = new THREE.Quaternion().setFromEuler( rot );
+					
+					trsCache.push({
+						position: new THREE.Vector3( Math.random() * 2 - 1 , 0 , Math.random() * 2 - 1 ).multiplyScalar( 14 ),
+						rotation: rot,
+						quaternion: quat,
+						scale: new THREE.Vector3( Math.random() + .5 , Math.random() + .5 , Math.random() + .5 )
+					});
+
+				}
+
+				trsCache[0].position.set(20,-3,18);
+
+				console.timeEnd( 'Object cache initialized.');
+
+				console.log( 'Initializing instanced mesh permutations...');
+				console.time( 'Instanced mesh permutations initialized.');
+
+				var _color = new THREE.Color();
+
+				instanceNumbers.forEach( function( iNum ){
+
+					for ( var g in geometries ){
+
+						for ( var uScale = 0 ; uScale < 2 ; uScale ++ ){
+						
+							for ( var color = 0 ; color < 2 ; color ++ ){
+
+								for ( var dynamic = 0 ; dynamic < 2 ; dynamic ++ ){
+
+									var instancedMesh = cache[ getKey( g , iNum , dynamic , uScale , color ) ] = new THREE.InstancedMesh(
+
+										//provide geometry
+										geometries[ g ], 		
+
+										//provide material
+										materials[ options.material ],	
+
+										//how many instances to allocate
+										iNum, 								
+										
+										//will the position attributes be changed
+										!!dynamic, 
+
+										//should there be per instance color variation
+										!!color,
+										
+	 									//is the scale known to be uniform, will do less shader work, improperly applying this will result in wrong shading 
+										!!uScale
+
+									);
+
+									var ss = new THREE.Vector3(1,1,1);
+
+									for ( var i = 0 ; i < iNum ; i++ ){
+
+										instancedMesh.setPositionAt( 	i , trsCache[ i ].position );
+										instancedMesh.setQuaternionAt( 	i , trsCache[ i ].quaternion );
+										instancedMesh.setScaleAt( 		i , uScale ? ss : trsCache[ i ].scale );
+										
+										if ( color ) {
+
+											_color.setHSL( Math.random() , 0.5 , 0.5 );
+
+											instancedMesh.setColorAt( i , _color );
+
+										}
+
+										if( i === 15 ){
+
+
+											instancedMesh.setPositionAt( 	i , new THREE.Vector3() );
+											instancedMesh.setQuaternionAt( 	i , new THREE.Quaternion() );
+											instancedMesh.setScaleAt( 		i , new THREE.Vector3() );
+
+										}
+
+									}
+
+									instancedMesh.visible = false;
+
+									instancedMesh.castShadow = true;
+
+									instancedMesh.receiveShadow = true;
+
+									objectWrapper.add( instancedMesh );
+
+								}
+
+							}
+
+						}
+
+					}
+
+				});
+				console.timeEnd( 'Instanced mesh permutations initialized.');
+
+				onChangeMesh();
+
+				function onChangeMesh(){
+
+					for ( var c in cache ) cache[c].visible = false;
+					
+					cache[ getKey() ].visible = true;
+
+					console.log( 'key' , getKey() );
+					console.log( 'triangles' , totalTriangleNumber[ options.geometry ][ instanceNumbers.indexOf( parseInt(options.instanceNumber) )].toLocaleString() );
+				}
+
+				function onChangeMaterial(){
+
+					for ( var m in cache ) cache[ m ].material = materials[ options.material ];
+
+					tester.material = materials[ options.material ];
+				
+				}
+
+				tester = new THREE.Mesh( geometries.box , materials[ options.material ] );
+				tester.position.set( 18 , 0 , 18 );
+				tester.rotation.copy( trsCache[0].rotation );
+				scene.add(tester);
+
+				var gui = new dat.GUI();
+
+				gui.add( options, 'material' , Object.keys( materials ) ).onChange( onChangeMaterial );
+
+				gui.add( options, 'instanceNumber' , instanceNumbers ).onChange( onChangeMesh );
+				
+				gui.add( options, 'geometry' , Object.keys( geometries ) ).onChange( onChangeMesh );
+
+				gui.add( options, 'dynamic' ).onChange( onChangeMesh );
+
+				gui.add( options, 'uniformScale' ).onChange( onChangeMesh );
+
+				gui.add( options, 'color' ).onChange( function(){
+					onChangeMesh();
+					onChangeMaterial();
+				});
+
+				gui.add( options, 'debug' ).onChange( function(){
+
+					console.log(
+						cache[ getKey() ].getQuaternionAt( 15 ),
+						cache[ getKey() ].getPositionAt( 15 ),
+						cache[ getKey() ].getScaleAt( 15 ),
+						cache[ getKey() ].getColorAt( 15 )
+					)	
+				})
+				gui.open();
+
+			}
+
+			function rotateObjects( dt ){
+
+				var currentMesh = cache[ getKey() ];
+
+				var _obj = new THREE.Object3D();
+
+				for ( var i = 0 ; i < currentMesh.numInstances ; i ++ ){
+
+					var o = trsCache[ i ];
+
+					//modify the cache
+					o.rotation.x += o.scale.x * dt;
+					o.rotation.y += o.scale.y * dt;
+					o.rotation.z += o.scale.z * dt;
+
+					currentMesh.setQuaternionAt( i , o.quaternion.setFromEuler( o.rotation ) );
+
+				}
+				
+				tester.rotation.copy(trsCache[0].rotation);
+
+				currentMesh.needsUpdate( 'quaternion' );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var delta = clock.getDelta()*0.12;
+
+
+				if( !options.uniformScale ) tester.scale.copy( trsCache[0].scale );
+				else tester.scale.set(1,1,1);
+
+				if( options.dynamic ) rotateObjects( delta );
+
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+		</script>
+
+	</body>
+
+</html>
