@@ -152,6 +152,11 @@ function WebVRManager( renderer ) {
 
 		}
 
+		// envMap and Mirror needs camera.matrixWorld
+
+		cameraL.matrixWorld.getInverse( cameraL.matrixWorldInverse );
+		cameraR.matrixWorld.getInverse( cameraR.matrixWorldInverse );
+
 		cameraL.projectionMatrix.fromArray( frameData.leftProjectionMatrix );
 		cameraR.projectionMatrix.fromArray( frameData.rightProjectionMatrix );
 
