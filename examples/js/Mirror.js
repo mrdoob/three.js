@@ -186,13 +186,19 @@ THREE.Mirror = function ( width, height, options ) {
 
 		scope.visible = false;
 
-		var currentVrEnabled = renderer.vr.enabled;
 		var currentRenderTarget = renderer.getRenderTarget();
 
+		var currentVrEnabled = renderer.vr.enabled;
+		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+
 		renderer.vr.enabled = false; // Avoid camera modification and recursion
+		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
+
 		renderer.render( scene, mirrorCamera, renderTarget, true );
 
 		renderer.vr.enabled = currentVrEnabled;
+		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+
 		renderer.setRenderTarget( currentRenderTarget );
 
 		scope.visible = true;
