@@ -34,6 +34,8 @@ function WebVRManager( renderer ) {
 	cameraR.layers.enable( 2 );
 
 	var cameraVR = new ArrayCamera( [ cameraL, cameraR ] );
+	cameraVR.layers.enable( 1 );
+	cameraVR.layers.enable( 2 );
 
 	//
 

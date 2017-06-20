@@ -1373,18 +1373,23 @@ function WebGLRenderer( parameters ) {
 				for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
 
 					var camera2 = cameras[ j ];
-					var bounds = camera2.bounds;
 
-					var x = bounds.x * _width;
-					var y = bounds.y * _height;
-					var width = bounds.z * _width;
-					var height = bounds.w * _height;
+					if ( object.layers.test( camera2.layers ) ) {
 
-					_this.setViewport( x, y, width, height );
-					_this.setScissor( x, y, width, height );
-					_this.setScissorTest( true );
+						var bounds = camera2.bounds;
 
-					renderObject( object, scene, camera2, geometry, material, group );
+						var x = bounds.x * _width;
+						var y = bounds.y * _height;
+						var width = bounds.z * _width;
+						var height = bounds.w * _height;
+
+						_this.setViewport( x, y, width, height );
+						_this.setScissor( x, y, width, height );
+						_this.setScissorTest( true );
+
+						renderObject( object, scene, camera2, geometry, material, group );
+
+					}
 
 				}
 
