@@ -52,13 +52,11 @@ function WebVRManager( renderer ) {
 			currentPixelRatio = renderer.getPixelRatio();
 			currentSize = renderer.getSize();
 
-			renderer.setPixelRatio( 1 );
-			renderer.setSize( renderWidth * 2, renderHeight, false );
+			renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
 
 		} else if ( scope.enabled ) {
 
-			renderer.setPixelRatio( currentPixelRatio );
-			renderer.setSize( currentSize.width, currentSize.height, true );
+			renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
 
 		}
 
