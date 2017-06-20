@@ -19899,6 +19899,8 @@
 		cameraR.layers.enable( 2 );
 
 		var cameraVR = new ArrayCamera( [ cameraL, cameraR ] );
+		cameraVR.layers.enable( 1 );
+		cameraVR.layers.enable( 2 );
 
 		//
 
@@ -19915,13 +19917,11 @@
 				currentPixelRatio = renderer.getPixelRatio();
 				currentSize = renderer.getSize();
 
-				renderer.setPixelRatio( 1 );
-				renderer.setSize( renderWidth * 2, renderHeight, false );
+				renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
 
 			} else if ( scope.enabled ) {
 
-				renderer.setPixelRatio( currentPixelRatio );
-				renderer.setSize( currentSize.width, currentSize.height, true );
+				renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
 
 			}
 
@@ -20671,6 +20671,15 @@
 
 		this.setSize = function ( width, height, updateStyle ) {
 
+			var device = vr.getDevice();
+
+			if ( device && device.isPresenting ) {
+
+				console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
+				return;
+
+			}
+
 			_width = width;
 			_height = height;
 
@@ -20683,6 +20692,20 @@
 				_canvas.style.height = height + 'px';
 
 			}
+
+			this.setViewport( 0, 0, width, height );
+
+		};
+
+		this.setDrawingBufferSize = function ( width, height, pixelRatio ) {
+
+			_width = width;
+			_height = height;
+
+			_pixelRatio = pixelRatio;
+
+			_canvas.width = width * pixelRatio;
+			_canvas.height = height * pixelRatio;
 
 			this.setViewport( 0, 0, width, height );
 
@@ -21636,18 +21659,23 @@
 					for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
 
 						var camera2 = cameras[ j ];
-						var bounds = camera2.bounds;
 
-						var x = bounds.x * _width;
-						var y = bounds.y * _height;
-						var width = bounds.z * _width;
-						var height = bounds.w * _height;
+						if ( object.layers.test( camera2.layers ) ) {
 
-						_this.setViewport( x, y, width, height );
-						_this.setScissor( x, y, width, height );
-						_this.setScissorTest( true );
+							var bounds = camera2.bounds;
 
-						renderObject( object, scene, camera2, geometry, material, group );
+							var x = bounds.x * _width;
+							var y = bounds.y * _height;
+							var width = bounds.z * _width;
+							var height = bounds.w * _height;
+
+							_this.setViewport( x, y, width, height );
+							_this.setScissor( x, y, width, height );
+							_this.setScissorTest( true );
+
+							renderObject( object, scene, camera2, geometry, material, group );
+
+						}
 
 					}
 
