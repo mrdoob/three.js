@@ -71,7 +71,7 @@ function BasisConverter( matrix ) {
 	this.matrix = matrix;
 
 	// because the change-of-basis matrix is orthonormal, the inverse of
-	// this.matrix is the transposition of this.matrix
+	// this.matrix is its transposition
 
 	this.matrixInverse = this.matrix.clone().transpose();
 
