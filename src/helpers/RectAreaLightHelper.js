@@ -10,7 +10,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { BufferAttribute } from '../core/BufferAttribute';
 
-function RectAreaLightHelper( light, overrideColor ) {
+function RectAreaLightHelper( light, color ) {
 
 	Object3D.call( this );
 
@@ -20,9 +20,9 @@ function RectAreaLightHelper( light, overrideColor ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	this.overrideColor = overrideColor;
+	this.color = color;
 
-	var material = new LineBasicMaterial( { fog: false, color: this.overrideColor } );
+	var material = new LineBasicMaterial( { fog: false, color: this.color } );
 
 	var geometry = new BufferGeometry();
 
@@ -66,8 +66,8 @@ RectAreaLightHelper.prototype.update = function () {
 
 	position.needsUpdate = true;
 
-	if ( ! this.overrideColor ) this.line.material.color.copy( this.light.color );
-	else this.line.material.color.set( this.overrideColor );
+	if ( ! this.color ) this.line.material.color.copy( this.light.color );
+	else this.line.material.color.set( this.color );
 
 };
 

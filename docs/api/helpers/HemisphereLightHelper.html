@@ -29,13 +29,13 @@ scene.add( helper );
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:HemisphereLight light], [page:Number sphereSize], [page:Hex overrideColor] )</h3>
+		<h3>[name]( [page:HemisphereLight light], [page:Number sphereSize], [page:Hex color] )</h3>
 		<div>
 			[page:HemisphereLight light] -- The light being visualized. <br /><br />
 
 			[page:Number size] -- The size of the mesh used to visualize the light.<br /><br />
 			
-			[page:Hex overrideColor] -- (optional) by default the helper will take the color of the light.
+			[page:Hex color] -- (optional) by default the helper will take the color of the light.
 				In cases where this makes the helper difficult to see 
 				(for example a white light against a white background) you can directly set the color here. 
 		</div>
@@ -56,7 +56,7 @@ scene.add( helper );
 			hemisphereLight's [page:Object3D.matrixWorld matrixWorld].
 		</div>
 
-		<h3>[property:hex overrideColor]</h3>
+		<h3>[property:hex color]</h3>
 		<div>
 			A color that overrides the default color of the helper. If this was not passed in the constructor 
 			but is set later, the helper's color will update the next time [page:.update update] is called.

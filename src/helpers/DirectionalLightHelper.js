@@ -11,7 +11,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial';
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function DirectionalLightHelper( light, size, overrideColor ) {
+function DirectionalLightHelper( light, size, color ) {
 
 	Object3D.call( this );
 
@@ -21,7 +21,7 @@ function DirectionalLightHelper( light, size, overrideColor ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	this.overrideColor = overrideColor;
+	this.color = color;
 
 	if ( size === undefined ) size = 1;
 
@@ -34,7 +34,7 @@ function DirectionalLightHelper( light, size, overrideColor ) {
 		- size,   size, 0
 	], 3 ) );
 
-	var material = new LineBasicMaterial( { fog: false, color: this.overrideColor } );
+	var material = new LineBasicMaterial( { fog: false, color: this.color } );
 
 	this.lightPlane = new Line( geometry, material );
 	this.add( this.lightPlane );
@@ -74,13 +74,13 @@ DirectionalLightHelper.prototype.update = function () {
 		v3.subVectors( v2, v1 );
 
 		this.lightPlane.lookAt( v3 );
-		if ( ! this.overrideColor ) this.lightPlane.material.color.copy( this.light.color );
-		else this.lightPlane.material.color.set( this.overrideColor );
+		if ( ! this.color ) this.lightPlane.material.color.copy( this.light.color );
+		else this.lightPlane.material.color.set( this.color );
 
 		this.targetLine.lookAt( v3 );
 		this.targetLine.scale.z = v3.length();
-		if ( ! this.overrideColor ) this.targetLine.material.color.copy( this.light.color );
-		else this.targetLine.material.color.set( this.overrideColor );
+		if ( ! this.color ) this.targetLine.material.color.copy( this.light.color );
+		else this.targetLine.material.color.set( this.color );
 
 	};
 

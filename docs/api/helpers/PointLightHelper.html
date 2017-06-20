@@ -37,13 +37,13 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:PointLight light], [page:Float sphereSize], [page:Hex overrideColor] )</h3>
+		<h3>[name]( [page:PointLight light], [page:Float sphereSize], [page:Hex color] )</h3>
 		<div>
 		[page:PointLight light] -- The light to be visualized. <br /><br />
 
 		[page:Float sphereSize] -- (optional) The size of the sphere helper. Default is *1*.<br /><br />
 
-		[page:Hex overrideColor] -- (optional) by default the helper will take the color of the light.
+		[page:Hex color] -- (optional) by default the helper will take the color of the light.
 			In cases where this makes the helper difficult to see 
 			(for example a white light against a white background) you can directly set the color here. 
 		</div>
@@ -63,7 +63,7 @@
 			pointLight's [page:Object3D.matrixWorld matrixWorld].
 		</div>
 
-		<h3>[property:hex overrideColor]</h3>
+		<h3>[property:hex color]</h3>
 		<div>
 			A color that overrides the default color of the helper. If this was not passed in the constructor but is set later, the helper's
 			color will update the next time [page:.update update] is called.

@@ -11,7 +11,7 @@ import { BufferGeometry } from '../core/BufferGeometry';
  * @author WestLangley / http://github.com/WestLangley
 */
 
-function SpotLightHelper( light, overrideColor ) {
+function SpotLightHelper( light, color ) {
 
 	Object3D.call( this );
 
@@ -21,7 +21,7 @@ function SpotLightHelper( light, overrideColor ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	this.overrideColor = overrideColor;
+	this.color = color;
 
 	var geometry = new BufferGeometry();
 
@@ -47,7 +47,7 @@ function SpotLightHelper( light, overrideColor ) {
 
 	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
-	var material = new LineBasicMaterial( { fog: false, color: this.overrideColor } );
+	var material = new LineBasicMaterial( { fog: false, color: this.color } );
 
 	this.cone = new LineSegments( geometry, material );
 	this.add( this.cone );
@@ -85,8 +85,8 @@ SpotLightHelper.prototype.update = function () {
 
 		this.cone.lookAt( vector2.sub( vector ) );
 
-		if ( ! this.overrideColor ) this.cone.material.color.copy( this.light.color );
-		else this.cone.material.color.set( this.overrideColor );
+		if ( ! this.color ) this.cone.material.color.copy( this.light.color );
+		else this.cone.material.color.set( this.color );
 
 	};
 

@@ -7,15 +7,15 @@ import { SphereBufferGeometry } from '../geometries/SphereGeometry';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function PointLightHelper( light, sphereSize, overrideColor ) {
+function PointLightHelper( light, sphereSize, color ) {
 
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.overrideColor = overrideColor;
+	this.color = color;
 
 	var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
-	var material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.overrideColor } );
+	var material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.color } );
 
 	Mesh.call( this, geometry, material );
 
@@ -61,8 +61,8 @@ PointLightHelper.prototype.dispose = function () {
 
 PointLightHelper.prototype.update = function () {
 
-	if ( ! this.overrideColor ) this.material.color.copy( this.light.color );
-	else this.material.color.set( this.overrideColor );
+	if ( ! this.color ) this.material.color.copy( this.light.color );
+	else this.material.color.set( this.color );
 
 	/*
 	var d = this.light.distance;
