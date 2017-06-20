@@ -1722,7 +1722,7 @@ THREE.ShaderDeferred = {
 			THREE.ShaderChunk[ "skinning_vertex" ],
 			THREE.ShaderChunk[ "project_vertex" ],
 
-			"	vNormal = normalize( normalMatrix * objectNormal );",
+			"	vNormal = normalize( transformedNormal );",
 			"	vPosition = gl_Position;",
 
 			"}"
@@ -2131,7 +2131,7 @@ THREE.ShaderDeferred = {
 			THREE.ShaderChunk[ "skinning_vertex" ],
 			THREE.ShaderChunk[ "project_vertex" ],
 
-			"	vNormal = normalize( normalMatrix * objectNormal );",
+			"	vNormal = normalize( transformedNormal );",
 			"	vPosition = gl_Position;",
 
 			"}"
