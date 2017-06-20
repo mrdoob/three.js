@@ -1826,9 +1826,6 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
-			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
-
 		}
 
 		// skinning uniforms must be set even if material didn't change
@@ -1887,6 +1884,9 @@ function WebGLRenderer( parameters ) {
 		}
 
 		if ( refreshMaterial ) {
+
+			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
+			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
 			if ( material.lights ) {
 
