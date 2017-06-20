@@ -124,7 +124,9 @@ function WebGLRenderer( parameters ) {
 		_currentFramebuffer = null,
 		_currentMaterialId = - 1,
 		_currentGeometryProgram = '',
+
 		_currentCamera = null,
+		_currentArrayCamera = null,
 
 		_currentScissor = new Vector4(),
 		_currentScissorTest = null,
@@ -1476,6 +1478,8 @@ function WebGLRenderer( parameters ) {
 
 			if ( camera.isArrayCamera ) {
 
+				_currentArrayCamera = camera;
+
 				var cameras = camera.cameras;
 
 				for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
@@ -1497,6 +1501,8 @@ function WebGLRenderer( parameters ) {
 				}
 
 			} else {
+
+				_currentArrayCamera = null;
 
 				renderObject( object, scene, camera, geometry, material, group );
 
@@ -1775,10 +1781,11 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+			// Avoid unneeded uniform updates per ArrayCamera's sub-camera
 
-			if ( camera !== _currentCamera ) {
+			if ( _currentCamera !== ( _currentArrayCamera || camera ) ) {
 
-				_currentCamera = camera;
+				_currentCamera = ( _currentArrayCamera || camera );
 
 				// lighting uniforms depend on the camera so enforce an update
 				// now, in case this material supports lights - or later, when
