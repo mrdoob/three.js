@@ -1,7 +1,6 @@
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
-import { Matrix3 } from '../math/Matrix3';
 import { Mesh } from '../objects/Mesh';
 import { Group } from '../objects/Group';
 import { PropertyBinding } from '../animation/PropertyBinding';
@@ -67,7 +66,14 @@ var SceneUtils = {
 
 function BasisConverter( matrix ) {
 
+	// change-of-basis matrix
+
 	this.matrix = matrix;
+
+	// because the change-of-basis matrix is orthonormal, the inverse of
+	// this.matrix is the transposition of this.matrix
+
+	this.matrixInverse = this.matrix.clone().transpose();
 
 }
 
@@ -79,7 +85,11 @@ Object.assign( BasisConverter.prototype, {
 
 		root.traverse( function( object ) {
 
-			// position, quaternion, scale
+			// ensure matrix is up to date
+
+			object.updateMatrix();
+
+			// convert position, quaternion, scale
 
 			scope.convertMatrix4( object.matrix );
 			object.matrix.decompose( object.position, object.quaternion, object.scale );
@@ -93,20 +103,11 @@ Object.assign( BasisConverter.prototype, {
 				var position = geometry.attributes.position;
 				var normal = geometry.attributes.normal;
 
-				var matrix = scope.matrix;
+				if ( position !== null ) scope.matrix.applyToBufferAttribute( position );
 
-				if ( position !== null ) {
+				// the change-of-basis matrix contains no non-uniform scaling
 
-					matrix.applyToBufferAttribute( position );
-
-				}
-
-				if ( normal !== null ) {
-
-					var normalMatrix = new Matrix3().setFromMatrix4( matrix );
-					normalMatrix.applyToBufferAttribute( normal );
-
-				}
+				if ( normal !== null ) scope.matrix.applyToBufferAttribute( normal );
 
 			}
 
@@ -152,53 +153,11 @@ Object.assign( BasisConverter.prototype, {
 
 	},
 
-	convertMatrix4: function() {
+	convertMatrix4: function( matrix ) {
 
-		var xAxis = new Vector3();
-		var yAxis = new Vector3();
-		var zAxis = new Vector3();
-		var translation = new Vector3();
+		return matrix.premultiply( this.matrix ).multiply( this.matrixInverse );
 
-		return function convertMatrix4( matrix ) {
-
-			// columns first
-
-			matrix.extractBasis( xAxis, yAxis, zAxis );
-			translation.setFromMatrixColumn( matrix, 3 );
-
-			xAxis.applyMatrix4( this.matrix );
-			yAxis.applyMatrix4( this.matrix );
-			zAxis.applyMatrix4( this.matrix );
-
-			matrix.makeBasis( xAxis, yAxis, zAxis );
-
-			// then rows
-
-			matrix.transpose();
-
-			matrix.extractBasis( xAxis, yAxis, zAxis );
-
-			xAxis.applyMatrix4( this.matrix );
-			yAxis.applyMatrix4( this.matrix );
-			zAxis.applyMatrix4( this.matrix );
-
-			matrix.makeBasis( xAxis, yAxis, zAxis );
-
-			matrix.transpose();
-
-			// translation at the end
-
-			translation.applyMatrix4( this.matrix );
-
-			matrix.elements[ 12 ] = translation.x;
-			matrix.elements[ 13 ] = translation.y;
-			matrix.elements[ 14 ] = translation.z;
-
-			return matrix;
-
-		};
-
-	} (),
+	},
 
 	convertKeyframeTrack: function() {
 
