@@ -29340,7 +29340,7 @@ MeshToonMaterial.prototype.copy = function ( source ) {
 
 function MeshNormalMaterial( parameters ) {
 
-	Material.call( this, parameters );
+	Material.call( this );
 
 	this.type = 'MeshNormalMaterial';
 
