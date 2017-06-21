@@ -25,11 +25,11 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 
 	WWOBJLoader2.prototype._init = function () {
 		console.log( "Using THREE.OBJLoader2.WWOBJLoader2 version: " + WWOBJLOADER2_VERSION );
-		
+
 		// check worker support first
 		if ( window.Worker === undefined ) throw "This browser does not support web workers!";
 		if ( window.Blob === undefined  ) throw "This browser does not support Blob!";
-		if ( ! typeof window.URL.createObjectURL === 'function'  ) throw "This browser does not support Object creation from URL!";
+		if ( typeof window.URL.createObjectURL !== 'function'  ) throw "This browser does not support Object creation from URL!";
 
 		this.instanceNo = 0;
 		this.worker = null;
@@ -304,7 +304,6 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 
 				var refPercentComplete = 0;
 				var percentComplete = 0;
-				var output;
 				var onLoad = function ( objAsArrayBuffer ) {
 
 					scope._announceProgress( 'Running web worker!' );
@@ -323,7 +322,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 					if ( percentComplete > refPercentComplete ) {
 
 						refPercentComplete = percentComplete;
-						output = 'Download of "' + scope.fileObj + '": ' + percentComplete + '%';
+						var output = 'Download of "' + scope.fileObj + '": ' + percentComplete + '%';
 						console.log( output );
 						scope._announceProgress( output );
 
@@ -331,7 +330,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 				};
 
 				var onError = function ( event ) {
-					output = 'Error occurred while downloading "' + scope.fileObj + '"';
+					var output = 'Error occurred while downloading "' + scope.fileObj + '"';
 					console.error( output + ': ' + event );
 					scope._announceProgress( output );
 					scope._finalize( 'error' );
@@ -356,7 +355,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 			if ( Validator.isValid( this.fileMtl ) ) {
 
 				var onError = function ( event ) {
-					output = 'Error occurred while downloading "' + scope.fileMtl + '"';
+					var output = 'Error occurred while downloading "' + scope.fileMtl + '"';
 					console.error( output + ': ' + event );
 					scope._announceProgress( output );
 					scope._finalize( 'error' );

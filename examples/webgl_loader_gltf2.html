@@ -62,10 +62,10 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> -
-		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> 2.0 loader
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		<a href="https://github.com/KhronosGroup/glTF" target="_blank" rel="noopener">glTF</a> 2.0 loader
 		<br>
-		BoomBox by <a href="https://www.microsoft.com/" target="_blank">Microsoft</a>
+		BoomBox by <a href="https://www.microsoft.com/" target="_blank" rel="noopener">Microsoft</a>
 		</div>
 	<div id="container"></div>
 	<div id="controls">
@@ -86,9 +86,12 @@
 		<div>
 			Extension
 			<select id="extensions_list" onchange="selectExtension();">
-				<option value="glTF">None</option>
-				<option value="glTF-MaterialsCommon">Built-in shaders</option>
-				<option value="glTF-Binary">Binary</option>
+				<option value="glTF">None (Default)</option>
+				<option value="glTF-Embedded">None (Embedded)</option>
+				<option value="glTF-Binary">None (Binary)</option>
+				<option value="glTF-MaterialsCommon">Common Materials</option>
+				<option value="glTF-pbrSpecularGlossiness">Specular-Glossiness (PBR)</option>
+				<option value="glTF-techniqueWebGL">GLSL</option>
 			</select>
 		</div>
 	</div>
@@ -125,7 +128,7 @@
 
 				scene = new THREE.Scene();
 
-				defaultCamera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 20000 );
+				defaultCamera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.1, 1000 );
 
 				//defaultCamera.up = new THREE.Vector3( 0, 1, 0 );
 				scene.add( defaultCamera );
@@ -259,7 +262,8 @@
 
 						object.traverse( function( node ) {
 
-							if ( node.material && node.material.isMeshStandardMaterial ) {
+							if ( node.material && ( node.material.isMeshStandardMaterial ||
+								 ( node.material.isShaderMaterial && node.material.envMap !== undefined ) ) ) {
 
 								node.material.envMap = envMap;
 								node.material.needsUpdate = true;
@@ -283,7 +287,7 @@
 						for (i = 0; i < len; i++) {
 
 							var addCamera = true;
-							var cameraName = gltf.cameras[i].parent.name;
+							var cameraName = gltf.cameras[i].parent.name || ('camera_' + i);
 
 							if (sceneInfo.cameras && !(cameraName in sceneInfo.cameras)) {
 									addCamera = false;
@@ -412,13 +416,73 @@
 
 			var sceneList = [
 				{
-					name : "BoomBox (PBR)", url : "./models/gltf/BoomBox/%s/BoomBox.gltf",
+					name : 'BoomBox (PBR)', url : './models/gltf/BoomBox/%s/BoomBox.gltf',
 					cameraPos: new THREE.Vector3(2, 1, 3),
 					objectRotation: new THREE.Euler(0, Math.PI, 0),
 					addLights:true,
-					extensions: ["glTF", "glTF-Binary"],
+					extensions: ['glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary'],
 					addEnvMap: true
-				}
+				},
+				{
+					name : 'MetalRoughSpheres (PBR)', url : './models/gltf/MetalRoughSpheres/%s/MetalRoughSpheres.gltf',
+					cameraPos: new THREE.Vector3(2, 1, 35),
+					objectRotation: new THREE.Euler(0, 0, 0),
+					addLights:true,
+					extensions: ['glTF'],
+					addEnvMap: true
+				},
+				{
+					name : 'Duck', url : './models/gltf/Duck/%s/duck.gltf',
+					cameraPos: new THREE.Vector3(0, 3, 5),
+					addLights:true,
+					addGround:true,
+					shadows:true,
+					// TODO: 'glTF-techniqueWebGL'
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-MaterialsCommon', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+				},
+				{
+					name : "Monster", url : "./models/gltf/Monster/%s/Monster.gltf",
+					cameraPos: new THREE.Vector3(30, 10, 70),
+					objectScale: new THREE.Vector3(0.4, 0.4, 0.4),
+					objectPosition: new THREE.Vector3(2, 1, 0),
+					objectRotation: new THREE.Euler(0, - 3 * Math.PI / 4, 0),
+					animationTime: 3,
+					addLights:true,
+					shadows:true,
+					addGround:true,
+					// TODO: 'glTF-MaterialsCommon', 'glTF-techniqueWebGL'
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+				},
+				{
+					name : "Cesium Man", url : "./models/gltf/CesiumMan/%s/CesiumMan.gltf",
+					 cameraPos: new THREE.Vector3(0, 3, 10),
+					 objectRotation: new THREE.Euler(0, 0, 0),
+					 addLights:true,
+					 addGround:true,
+					 shadows:true,
+					// TODO: 'glTF-MaterialsCommon', 'glTF-techniqueWebGL'
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+				},
+				{
+					name : "Cesium Milk Truck",
+					url : "./models/gltf/CesiumMilkTruck/%s/CesiumMilkTruck.gltf",
+					cameraPos: new THREE.Vector3(0, 3, 10),
+					addLights:true,
+					addGround:true,
+					shadows:true,
+					// TODO: 'glTF-MaterialsCommon', 'glTF-techniqueWebGL'
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+				},
+				{
+					name : "Rigged Simple",
+					url : "./models/gltf/RiggedSimple/%s/RiggedSimple.gltf",
+					cameraPos: new THREE.Vector3(0, 5, 15),
+					objectRotation: new THREE.Euler(0, 90, 0),
+					addLights:true,
+					shadows:true,
+					// TODO: 'glTF-MaterialsCommon', 'glTF-techniqueWebGL'
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+				},
 			];
 
 			function buildSceneList() {
@@ -432,7 +496,7 @@
 				var i, len = sceneList.length;
 
 				for (i = 0; i < len; i++) {
-					option = document.createElement("option");
+					var option = document.createElement("option");
 					option.text=sceneList[i].name;
 					elt.add(option);
 				}
@@ -484,14 +548,14 @@
 					elt.removeChild(elt.lastChild);
 				}
 
-				option = document.createElement("option");
+				var option = document.createElement("option");
 				option.text="[default]";
 				elt.add(option);
 
 				var i, len = cameraNames.length;
 
 				for (i = 0; i < len; i++) {
-					option = document.createElement("option");
+					var option = document.createElement("option");
 					option.text=cameraNames[i];
 					elt.add(option);
 				}

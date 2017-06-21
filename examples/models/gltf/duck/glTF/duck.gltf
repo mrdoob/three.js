@@ -1,362 +1,238 @@
 {
-    "accessors": {
-        "accessor_21": {
-            "bufferView": "bufferView_29",
-            "byteOffset": 0,
-            "byteStride": 0,
-            "componentType": 5123,
-            "count": 12636,
-            "type": "SCALAR"
-        },
-        "accessor_23": {
-            "bufferView": "bufferView_30",
-            "byteOffset": 0,
-            "byteStride": 12,
-            "componentType": 5126,
-            "count": 2399,
-            "max": [
-                0.961799,
-                1.6397,
-                0.539252
-            ],
-            "min": [
-                -0.692985,
-                0.0992937,
-                -0.613282
-            ],
-            "type": "VEC3"
-        },
-        "accessor_25": {
-            "bufferView": "bufferView_30",
-            "byteOffset": 28788,
-            "byteStride": 12,
-            "componentType": 5126,
-            "count": 2399,
-            "max": [
-                0.999599,
-                0.999581,
-                0.998436
-            ],
-            "min": [
-                -0.999084,
-                -1,
-                -0.999832
-            ],
-            "type": "VEC3"
-        },
-        "accessor_27": {
-            "bufferView": "bufferView_30",
-            "byteOffset": 57576,
-            "byteStride": 8,
-            "componentType": 5126,
-            "count": 2399,
-            "max": [
-                0.983346,
-                0.980037
-            ],
-            "min": [
-                0.026409,
-                0.019963
-            ],
-            "type": "VEC2"
-        }
-    },
-    "animations": {},
     "asset": {
-        "generator": "collada2gltf@ceec062e3d5793f2f249f53cbd843aee382ad40b",
-        "premultipliedAlpha": true,
-        "profile": {
-            "api": "WebGL",
-            "version": "1.0.2"
-        },
-        "version": 1
+        "generator": "COLLADA2GLTF",
+        "version": "2.0"
     },
-    "bufferViews": {
-        "bufferView_29": {
-            "buffer": "duck",
-            "byteLength": 25272,
-            "byteOffset": 0,
-            "target": 34963
-        },
-        "bufferView_30": {
-            "buffer": "duck",
-            "byteLength": 76768,
-            "byteOffset": 25272,
-            "target": 34962
+    "scene": 0,
+    "scenes": [
+        {
+            "nodes": [
+                0
+            ]
         }
-    },
-    "buffers": {
-        "duck": {
-            "byteLength": 102040,
-            "type": "arraybuffer",
-            "uri": "duck.bin"
+    ],
+    "nodes": [
+        {
+            "children": [
+                3,
+                2,
+                1
+            ],
+            "matrix": [
+                0.009999999776482582,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.009999999776482582,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.009999999776482582,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        {
+            "matrix": [
+                -0.9546916484832764,
+                0.2181433141231537,
+                -0.2024286538362503,
+                0.0,
+                0.014671952463686468,
+                0.7138853073120117,
+                0.7001089453697205,
+                0.0,
+                0.2972349226474762,
+                0.6654181480407715,
+                -0.6847409009933472,
+                0.0,
+                148.6540069580078,
+                183.6720123291016,
+                -292.1790161132813,
+                1.0
+            ]
+        },
+        {
+            "matrix": [
+                -0.7289686799049377,
+                0.0,
+                -0.6845470666885376,
+                0.0,
+                -0.4252049028873444,
+                0.7836934328079224,
+                0.4527972936630249,
+                0.0,
+                0.5364750623703003,
+                0.6211478114128113,
+                -0.571287989616394,
+                0.0,
+                400.1130065917969,
+                463.2640075683594,
+                -431.0780334472656,
+                1.0
+            ],
+            "camera": 0
+        },
+        {
+            "mesh": 0
         }
-    },
-    "cameras": {
-        "cameraShape1": {
-            "name": "cameraShape1",
+    ],
+    "cameras": [
+        {
             "perspective": {
-                "aspect_ratio": 1.5,
-                "yfov": 0.660593,
-                "zfar": 100,
-                "znear": 0.01
+                "aspectRatio": 1.5,
+                "yfov": 0.6605925559997559,
+                "zfar": 10000.0,
+                "znear": 1.0
             },
             "type": "perspective"
         }
-    },
-    "images": {
-        "file2": {
-            "name": "file2",
-            "uri": "duckCM.png"
-        }
-    },
-    "materials": {
-        "blinn3-fx": {
-            "name": "blinn3",
-            "technique": "technique0",
-            "values": {
-                "ambient": [
-                    0,
-                    0,
-                    0,
-                    1
-                ],
-                "diffuse": "texture_file2",
-                "emission": [
-                    0,
-                    0,
-                    0,
-                    1
-                ],
-                "shininess": 38.4,
-                "specular": [
-                    0,
-                    0,
-                    0,
-                    1
-                ]
-            }
-        }
-    },
-    "meshes": {
-        "LOD3spShape-lib": {
-            "name": "LOD3spShape",
+    ],
+    "meshes": [
+        {
             "primitives": [
                 {
                     "attributes": {
-                        "NORMAL": "accessor_25",
-                        "POSITION": "accessor_23",
-                        "TEXCOORD_0": "accessor_27"
+                        "NORMAL": 1,
+                        "POSITION": 2,
+                        "TEXCOORD_0": 3
                     },
-                    "indices": "accessor_21",
-                    "material": "blinn3-fx",
-                    "mode": 4
+                    "indices": 0,
+                    "mode": 4,
+                    "material": 0
                 }
+            ],
+            "name": "LOD3spShape"
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5123,
+            "count": 12636,
+            "max": [
+                2398
+            ],
+            "min": [
+                0
+            ],
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 2399,
+            "max": [
+                0.9995989799499512,
+                0.999580979347229,
+                0.9984359741210938
+            ],
+            "min": [
+                -0.9990839958190918,
+                -1.0,
+                -0.9998319745063782
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 28788,
+            "componentType": 5126,
+            "count": 2399,
+            "max": [
+                96.17990112304688,
+                163.97000122070313,
+                53.92519760131836
+            ],
+            "min": [
+                -69.29850006103516,
+                9.929369926452637,
+                -61.32819747924805
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 2399,
+            "max": [
+                0.9833459854125976,
+                0.9800369739532472
+            ],
+            "min": [
+                0.026409000158309938,
+                0.01996302604675293
+            ],
+            "type": "VEC2"
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0
+                }
+            },
+            "emissiveFactor": [
+                0.0,
+                0.0,
+                0.0
             ]
         }
-    },
-    "nodes": {
-        "LOD3sp": {
-            "children": [],
-            "matrix": [
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1
-            ],
-            "meshes": [
-                "LOD3spShape-lib"
-            ],
-            "name": "LOD3sp"
-        },
-        "camera1": {
-            "camera": "cameraShape1",
-            "children": [],
-            "matrix": [
-                -0.728969,
-                0,
-                -0.684547,
-                0,
-                -0.425205,
-                0.783693,
-                0.452797,
-                0,
-                0.536475,
-                0.621148,
-                -0.571288,
-                0,
-                4.00113,
-                4.63264,
-                -4.31078,
-                1
-            ],
-            "name": "camera1"
-        },
-        "directionalLight1": {
-            "children": [],
-            "matrix": [
-                -0.954692,
-                0.218143,
-                -0.202429,
-                0,
-                0.014672,
-                0.713885,
-                0.700109,
-                0,
-                0.297235,
-                0.665418,
-                -0.684741,
-                0,
-                1.48654,
-                1.83672,
-                -2.92179,
-                1
-            ],
-            "name": "directionalLight1"
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
         }
-    },
-    "programs": {
-        "program_0": {
-            "attributes": [
-                "a_normal",
-                "a_position",
-                "a_texcoord0"
-            ],
-            "fragmentShader": "duck0FS",
-            "vertexShader": "duck0VS"
+    ],
+    "images": [
+        {
+            "uri": "DuckCM.png"
         }
-    },
-    "samplers": {
-        "sampler_0": {
+    ],
+    "samplers": [
+        {
             "magFilter": 9729,
-            "minFilter": 9987,
+            "minFilter": 9986,
             "wrapS": 10497,
             "wrapT": 10497
         }
-    },
-    "scene": "defaultScene",
-    "scenes": {
-        "defaultScene": {
-            "nodes": [
-                "LOD3sp",
-                "camera1",
-                "directionalLight1"
-            ]
-        }
-    },
-    "shaders": {
-        "duck0FS": {
-            "type": 35632,
-            "uri": "duck0FS.glsl"
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 76768,
+            "byteLength": 25272,
+            "target": 34963
         },
-        "duck0VS": {
-            "type": 35633,
-            "uri": "duck0VS.glsl"
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 57576,
+            "byteStride": 12,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 57576,
+            "byteLength": 19192,
+            "byteStride": 8,
+            "target": 34962
         }
-    },
-    "skins": {},
-    "techniques": {
-        "technique0": {
-            "attributes": {
-                "a_normal": "normal",
-                "a_position": "position",
-                "a_texcoord0": "texcoord0"
-            },
-            "parameters": {
-                "ambient": {
-                    "type": 35666
-                },
-                "diffuse": {
-                    "type": 35678
-                },
-                "emission": {
-                    "type": 35666
-                },
-                "light0Color": {
-                    "type": 35665,
-                    "value": [
-                        1,
-                        1,
-                        1
-                    ]
-                },
-                "light0Transform": {
-                    "node": "directionalLight1",
-                    "semantic": "MODELVIEW",
-                    "type": 35676
-                },
-                "modelViewMatrix": {
-                    "semantic": "MODELVIEW",
-                    "type": 35676
-                },
-                "normal": {
-                    "semantic": "NORMAL",
-                    "type": 35665
-                },
-                "normalMatrix": {
-                    "semantic": "MODELVIEWINVERSETRANSPOSE",
-                    "type": 35675
-                },
-                "position": {
-                    "semantic": "POSITION",
-                    "type": 35665
-                },
-                "projectionMatrix": {
-                    "semantic": "PROJECTION",
-                    "type": 35676
-                },
-                "shininess": {
-                    "type": 5126
-                },
-                "specular": {
-                    "type": 35666
-                },
-                "texcoord0": {
-                    "semantic": "TEXCOORD_0",
-                    "type": 35664
-                }
-            },
-            "program": "program_0",
-            "states": {
-                "enable": [
-                    2929,
-                    2884
-                ]
-            },
-            "uniforms": {
-                "u_ambient": "ambient",
-                "u_diffuse": "diffuse",
-                "u_emission": "emission",
-                "u_light0Color": "light0Color",
-                "u_light0Transform": "light0Transform",
-                "u_modelViewMatrix": "modelViewMatrix",
-                "u_normalMatrix": "normalMatrix",
-                "u_projectionMatrix": "projectionMatrix",
-                "u_shininess": "shininess",
-                "u_specular": "specular"
-            }
+    ],
+    "buffers": [
+        {
+            "byteLength": 102040,
+            "uri": "Duck0.bin"
         }
-    },
-    "textures": {
-        "texture_file2": {
-            "format": 6408,
-            "internalFormat": 6408,
-            "sampler": "sampler_0",
-            "source": "file2",
-            "target": 3553,
-            "type": 5121
-        }
-    }
+    ]
 }

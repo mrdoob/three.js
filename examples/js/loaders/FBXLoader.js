@@ -1,53 +1,76 @@
 /**
- * @author yamahigashi https://github.com/yamahigashi
  * @author Kyle-Larson https://github.com/Kyle-Larson
+ * @author Takahiro https://github.com/takahirox
  *
- * This loader loads FBX file in *ASCII and version 7 format*.
+ * Loader loads FBX file and generates Group representing FBX scene.
+ * Requires FBX file to be >= 7.0 and in ASCII or to be any version in Binary format.
  *
- * Support
- *  - mesh
- *  - skinning
- *  - normal / uv
- *  - material (Multi-Material too)
- *  - textures (Must be in same directory)
- *  - nurbs (Open, Closed and Periodic forms)
+ * Supports:
+ * 	Mesh Generation (Positional Data)
+ * 	Normal Data (Per Vertex Drawing Instance)
+ *  UV Data (Per Vertex Drawing Instance)
+ *  Skinning
+ *  Animation
+ * 	- Separated Animations based on stacks.
+ * 	- Skeletal & Non-Skeletal Animations
+ *  NURBS (Open, Closed and Periodic forms)
  *
- *  No Support
- *  - morph
+ * Needs Support:
+ * 	Indexed Buffers
+ * 	PreRotation support.
  */
 
 ( function () {
 
+	/**
+	 * Generates a loader for loading FBX files from URL and parsing into
+	 * a THREE.Group.
+	 * @param {THREE.LoadingManager} manager - Loading Manager for loader to use.
+	 */
 	THREE.FBXLoader = function ( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-		this.textureLoader = null;
-		this.textureBasePath = null;
 
 	};
 
 	Object.assign( THREE.FBXLoader.prototype, {
 
+		/**
+		 * Loads an ASCII/Binary FBX file from URL and parses into a THREE.Group.
+		 * THREE.Group will have an animations property of AnimationClips
+		 * of the different animations exported with the FBX.
+		 * @param {string} url - URL of the FBX file.
+		 * @param {function(THREE.Group):void} onLoad - Callback for when FBX file is loaded and parsed.
+		 * @param {function(ProgressEvent):void} onProgress - Callback fired periodically when file is being retrieved from server.
+		 * @param {function(Event):void} onError - Callback fired when error occurs (Currently only with retrieving file, not with parsing errors).
+		 */
 		load: function ( url, onLoad, onProgress, onError ) {
 
-			var scope = this;
+			var self = this;
 
-			var loader = new THREE.FileLoader( scope.manager );
-			// loader.setCrossOrigin( this.crossOrigin );
-			loader.load( url, function ( text ) {
+			var resourceDirectory = url.split( /[\\\/]/ );
+			resourceDirectory.pop();
+			resourceDirectory = resourceDirectory.join( '/' ) + '/';
 
-				if ( ! scope.isFbxFormatASCII( text ) ) {
+			var loader = new THREE.FileLoader( this.manager );
+			loader.setResponseType( 'arraybuffer' );
+			loader.load( url, function ( buffer ) {
 
-					console.warn( 'FBXLoader: !!! FBX Binary format not supported !!!' );
+				try {
 
-				} else if ( ! scope.isFbxVersionSupported( text ) ) {
+					var scene = self.parse( buffer, resourceDirectory );
 
-					console.warn( 'FBXLoader: !!! FBX Version below 7 not supported !!!' );
+					onLoad( scene );
 
-				} else {
+				} catch ( error ) {
 
-					scope.textureBasePath = scope.extractUrlBase( url );
-					onLoad( scope.parse( text ) );
+					window.setTimeout( function () {
+
+						if ( onError ) onError( error );
+
+						self.manager.itemError( url );
+
+					}, 0 );
 
 				}
 
@@ -55,810 +78,3441 @@
 
 		},
 
-		setCrossOrigin: function ( value ) {
+		/**
+		 * Parses an ASCII/Binary FBX file and returns a THREE.Group.
+		 * THREE.Group will have an animations property of AnimationClips
+		 * of the different animations within the FBX file.
+		 * @param {ArrayBuffer} FBXBuffer - Contents of FBX file to parse.
+		 * @param {string} resourceDirectory - Directory to load external assets (e.g. textures ) from.
+		 * @returns {THREE.Group}
+		 */
+		parse: function ( FBXBuffer, resourceDirectory ) {
 
-			this.crossOrigin = value;
+			var FBXTree;
 
-		},
+			if ( isFbxFormatBinary( FBXBuffer ) ) {
 
-		isFbxFormatASCII: function ( body ) {
+				FBXTree = new BinaryParser().parse( FBXBuffer );
 
-			var CORRECT = [ 'K', 'a', 'y', 'd', 'a', 'r', 'a', '\\', 'F', 'B', 'X', '\\', 'B', 'i', 'n', 'a', 'r', 'y', '\\', '\\' ];
+			} else {
 
-			var cursor = 0;
-			var read = function ( offset ) {
+				var FBXText = convertArrayBufferToString( FBXBuffer );
 
-				var result = body[ offset - 1 ];
-				body = body.slice( cursor + offset );
-				cursor ++;
-				return result;
+				if ( ! isFbxFormatASCII( FBXText ) ) {
 
+					self.manager.itemError( url );
+					throw new Error( 'FBXLoader: Unknown format.' );
+
+				}
+
+				if ( getFbxVersion( FBXText ) < 7000 ) {
+
+					self.manager.itemError( url );
+					throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( FBXText ) );
+
+				}
+
+				FBXTree = new TextParser().parse( FBXText );
+
+			}
+
+			// console.log( FBXTree );
+
+			var connections = parseConnections( FBXTree );
+			var images = parseImages( FBXTree );
+			var textures = parseTextures( FBXTree, new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ), images, connections );
+			var materials = parseMaterials( FBXTree, textures, connections );
+			var deformers = parseDeformers( FBXTree, connections );
+			var geometryMap = parseGeometries( FBXTree, connections, deformers );
+			var sceneGraph = parseScene( FBXTree, connections, deformers, geometryMap, materials );
+
+			return sceneGraph;
+
+		}
+
+	} );
+
+	/**
+	 * Parses map of relationships between objects.
+	 * @param {{Connections: { properties: { connections: [number, number, string][]}}}} FBXTree
+	 * @returns {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>}
+	 */
+	function parseConnections( FBXTree ) {
+
+		/**
+		 * @type {Map<number, { parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>}
+		 */
+		var connectionMap = new Map();
+
+		if ( 'Connections' in FBXTree ) {
+
+			/**
+			 * @type {[number, number, string][]}
+			 */
+			var connectionArray = FBXTree.Connections.properties.connections;
+			for ( var connectionArrayIndex = 0, connectionArrayLength = connectionArray.length; connectionArrayIndex < connectionArrayLength; ++ connectionArrayIndex ) {
+
+				var connection = connectionArray[ connectionArrayIndex ];
+
+				if ( ! connectionMap.has( connection[ 0 ] ) ) {
+
+					connectionMap.set( connection[ 0 ], {
+						parents: [],
+						children: []
+					} );
+
+				}
+
+				var parentRelationship = { ID: connection[ 1 ], relationship: connection[ 2 ] };
+				connectionMap.get( connection[ 0 ] ).parents.push( parentRelationship );
+
+				if ( ! connectionMap.has( connection[ 1 ] ) ) {
+
+					connectionMap.set( connection[ 1 ], {
+						parents: [],
+						children: []
+					} );
+
+				}
+
+				var childRelationship = { ID: connection[ 0 ], relationship: connection[ 2 ] };
+				connectionMap.get( connection[ 1 ] ).children.push( childRelationship );
+
+			}
+
+		}
+
+		return connectionMap;
+
+	}
+
+	/**
+	 * Parses map of images referenced in FBXTree.
+	 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
+	 * @returns {Map<number, string(image blob URL)>}
+	 */
+	function parseImages( FBXTree ) {
+
+		/**
+		 * @type {Map<number, string(image blob URL)>}
+		 */
+		var imageMap = new Map();
+
+		if ( 'Video' in FBXTree.Objects.subNodes ) {
+
+			var videoNodes = FBXTree.Objects.subNodes.Video;
+
+			for ( var nodeID in videoNodes ) {
+
+				var videoNode = videoNodes[ nodeID ];
+
+				// raw image data is in videoNode.properties.Content
+				if ( 'Content' in videoNode.properties ) {
+
+					var image = parseImage( videoNodes[ nodeID ] );
+					imageMap.set( parseInt( nodeID ), image );
+
+				}
+
+			}
+
+		}
+
+		return imageMap;
+
+	}
+
+	/**
+	 * @param {videoNode} videoNode - Node to get texture image information from.
+	 * @returns {string} - image blob URL
+	 */
+	function parseImage( videoNode ) {
+
+		var buffer = videoNode.properties.Content;
+		var array = new Uint8Array( buffer );
+		var fileName = videoNode.properties.RelativeFilename || videoNode.properties.Filename;
+		var extension = fileName.slice( fileName.lastIndexOf( '.' ) + 1 ).toLowerCase();
+
+		var type;
+
+		switch ( extension ) {
+
+			case 'bmp':
+
+				type = 'image/bmp';
+				break;
+
+			case 'jpg':
+
+				type = 'image/jpeg';
+				break;
+
+			case 'png':
+
+				type = 'image/png';
+				break;
+
+			case 'tif':
+
+				type = 'image/tiff';
+				break;
+
+			default:
+
+				console.warn( 'FBXLoader: No support image type ' + extension );
+				return;
+
+		}
+
+		return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+
+	}
+
+	/**
+	 * Parses map of textures referenced in FBXTree.
+	 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
+	 * @param {THREE.TextureLoader} loader
+	 * @param {Map<number, string(image blob URL)>} imageMap
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+	 * @returns {Map<number, THREE.Texture>}
+	 */
+	function parseTextures( FBXTree, loader, imageMap, connections ) {
+
+		/**
+		 * @type {Map<number, THREE.Texture>}
+		 */
+		var textureMap = new Map();
+
+		if ( 'Texture' in FBXTree.Objects.subNodes ) {
+
+			var textureNodes = FBXTree.Objects.subNodes.Texture;
+			for ( var nodeID in textureNodes ) {
+
+				var texture = parseTexture( textureNodes[ nodeID ], loader, imageMap, connections );
+				textureMap.set( parseInt( nodeID ), texture );
+
+			}
+
+		}
+
+		return textureMap;
+
+	}
+
+	/**
+	 * @param {textureNode} textureNode - Node to get texture information from.
+	 * @param {THREE.TextureLoader} loader
+	 * @param {Map<number, string(image blob URL)>} imageMap
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+	 * @returns {THREE.Texture}
+	 */
+	function parseTexture( textureNode, loader, imageMap, connections ) {
+
+		var FBX_ID = textureNode.id;
+
+		var name = textureNode.name;
+
+		var fileName;
+
+		var filePath = textureNode.properties.FileName;
+		var relativeFilePath = textureNode.properties.RelativeFilename;
+
+		var children = connections.get( FBX_ID ).children;
+
+		if ( children !== undefined && children.length > 0 && imageMap.has( children[ 0 ].ID ) ) {
+
+			fileName = imageMap.get( children[ 0 ].ID );
+
+		} else if ( relativeFilePath !== undefined && relativeFilePath[ 0 ] !== '/' &&
+				relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
+
+			// use textureNode.properties.RelativeFilename
+			// if it exists and it doesn't seem an absolute path
+
+			fileName = relativeFilePath;
+
+		} else {
+
+			var split = filePath.split( /[\\\/]/ );
+
+			if ( split.length > 0 ) {
+
+				fileName = split[ split.length - 1 ];
+
+			} else {
+
+				fileName = filePath;
+
+			}
+
+		}
+
+		var currentPath = loader.path;
+
+		if ( fileName.indexOf( 'blob:' ) === 0 ) {
+
+			loader.setPath( undefined );
+
+		}
+
+		/**
+		 * @type {THREE.Texture}
+		 */
+		var texture = loader.load( fileName );
+		texture.name = name;
+		texture.FBX_ID = FBX_ID;
+
+		var wrapModeU = textureNode.properties.WrapModeU;
+		var wrapModeV = textureNode.properties.WrapModeV;
+
+		var valueU = wrapModeU !== undefined ? wrapModeU.value : 0;
+		var valueV = wrapModeV !== undefined ? wrapModeV.value : 0;
+
+		// http://download.autodesk.com/us/fbx/SDKdocs/FBX_SDK_Help/files/fbxsdkref/class_k_fbx_texture.html#889640e63e2e681259ea81061b85143a
+		// 0: repeat(default), 1: clamp
+
+		texture.wrapS = valueU === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+		texture.wrapT = valueV === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+
+		loader.setPath( currentPath );
+
+		return texture;
+
+	}
+
+	/**
+	 * Parses map of Material information.
+	 * @param {{Objects: {subNodes: {Material: Object.<number, FBXMaterialNode>}}}} FBXTree
+	 * @param {Map<number, THREE.Texture>} textureMap
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+	 * @returns {Map<number, THREE.Material>}
+	 */
+	function parseMaterials( FBXTree, textureMap, connections ) {
+
+		var materialMap = new Map();
+
+		if ( 'Material' in FBXTree.Objects.subNodes ) {
+
+			var materialNodes = FBXTree.Objects.subNodes.Material;
+			for ( var nodeID in materialNodes ) {
+
+				var material = parseMaterial( materialNodes[ nodeID ], textureMap, connections );
+				materialMap.set( parseInt( nodeID ), material );
+
+			}
+
+		}
+
+		return materialMap;
+
+	}
+
+	/**
+	 * Takes information from Material node and returns a generated THREE.Material
+	 * @param {FBXMaterialNode} materialNode
+	 * @param {Map<number, THREE.Texture>} textureMap
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+	 * @returns {THREE.Material}
+	 */
+	function parseMaterial( materialNode, textureMap, connections ) {
+
+		var FBX_ID = materialNode.id;
+		var name = materialNode.attrName;
+		var type = materialNode.properties.ShadingModel;
+
+		//Case where FBXs wrap shading model in property object.
+		if ( typeof type === 'object' ) {
+
+			type = type.value;
+
+		}
+
+		var children = connections.get( FBX_ID ).children;
+
+		var parameters = parseParameters( materialNode.properties, textureMap, children );
+
+		var material;
+
+		switch ( type.toLowerCase() ) {
+
+			case 'phong':
+				material = new THREE.MeshPhongMaterial();
+				break;
+			case 'lambert':
+				material = new THREE.MeshLambertMaterial();
+				break;
+			default:
+				console.warn( 'No implementation given for material type ' + type + ' in FBXLoader.js.  Defaulting to basic material' );
+				material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+				break;
+
+		}
+
+		material.setValues( parameters );
+		material.name = name;
+
+		return material;
+
+	}
+
+	/**
+	 * @typedef {{Diffuse: FBXVector3, Specular: FBXVector3, Shininess: FBXValue, Emissive: FBXVector3, EmissiveFactor: FBXValue, Opacity: FBXValue}} FBXMaterialProperties
+	 */
+	/**
+	 * @typedef {{color: THREE.Color=, specular: THREE.Color=, shininess: number=, emissive: THREE.Color=, emissiveIntensity: number=, opacity: number=, transparent: boolean=, map: THREE.Texture=}} THREEMaterialParameterPack
+	 */
+	/**
+	 * @param {FBXMaterialProperties} properties
+	 * @param {Map<number, THREE.Texture>} textureMap
+	 * @param {{ID: number, relationship: string}[]} childrenRelationships
+	 * @returns {THREEMaterialParameterPack}
+	 */
+	function parseParameters( properties, textureMap, childrenRelationships ) {
+
+		var parameters = {};
+
+		if ( properties.Diffuse ) {
+
+			parameters.color = parseColor( properties.Diffuse );
+
+		}
+		if ( properties.Specular ) {
+
+			parameters.specular = parseColor( properties.Specular );
+
+		}
+		if ( properties.Shininess ) {
+
+			parameters.shininess = properties.Shininess.value;
+
+		}
+		if ( properties.Emissive ) {
+
+			parameters.emissive = parseColor( properties.Emissive );
+
+		}
+		if ( properties.EmissiveFactor ) {
+
+			parameters.emissiveIntensity = properties.EmissiveFactor.value;
+
+		}
+		if ( properties.Opacity ) {
+
+			parameters.opacity = properties.Opacity.value;
+
+		}
+		if ( parameters.opacity < 1.0 ) {
+
+			parameters.transparent = true;
+
+		}
+
+		for ( var childrenRelationshipsIndex = 0, childrenRelationshipsLength = childrenRelationships.length; childrenRelationshipsIndex < childrenRelationshipsLength; ++ childrenRelationshipsIndex ) {
+
+			var relationship = childrenRelationships[ childrenRelationshipsIndex ];
+
+			var type = relationship.relationship;
+
+			switch ( type ) {
+
+				case "DiffuseColor":
+				case " \"DiffuseColor":
+					parameters.map = textureMap.get( relationship.ID );
+					break;
+
+				case "Bump":
+				case " \"Bump":
+					parameters.bumpMap = textureMap.get( relationship.ID );
+					break;
+
+				case "NormalMap":
+				case " \"NormalMap":
+					parameters.normalMap = textureMap.get( relationship.ID );
+					break;
+
+				case " \"AmbientColor":
+				case " \"EmissiveColor":
+				case "AmbientColor":
+				case "EmissiveColor":
+				default:
+					console.warn( 'Unknown texture application of type ' + type + ', skipping texture' );
+					break;
+
+			}
+
+		}
+
+		return parameters;
+
+	}
+
+	/**
+	 * Generates map of Skeleton-like objects for use later when generating and binding skeletons.
+	 * @param {{Objects: {subNodes: {Deformer: Object.<number, FBXSubDeformerNode>}}}} FBXTree
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+	 * @returns {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>}
+	 */
+	function parseDeformers( FBXTree, connections ) {
+
+		var deformers = {};
+
+		if ( 'Deformer' in FBXTree.Objects.subNodes ) {
+
+			var DeformerNodes = FBXTree.Objects.subNodes.Deformer;
+
+			for ( var nodeID in DeformerNodes ) {
+
+				var deformerNode = DeformerNodes[ nodeID ];
+
+				if ( deformerNode.attrType === 'Skin' ) {
+
+					var conns = connections.get( parseInt( nodeID ) );
+					var skeleton = parseSkeleton( conns, DeformerNodes );
+					skeleton.FBX_ID = parseInt( nodeID );
+
+					deformers[ nodeID ] = skeleton;
+
+				}
+
+			}
+
+		}
+
+		return deformers;
+
+	}
+
+	/**
+	 * Generates a "Skeleton Representation" of FBX nodes based on an FBX Skin Deformer's connections and an object containing SubDeformer nodes.
+	 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} connections
+	 * @param {Object.<number, FBXSubDeformerNode>} DeformerNodes
+	 * @returns {{map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}}
+	 */
+	function parseSkeleton( connections, DeformerNodes ) {
+
+		var subDeformers = {};
+		var children = connections.children;
+
+		for ( var i = 0, l = children.length; i < l; ++ i ) {
+
+			var child = children[ i ];
+
+			var subDeformerNode = DeformerNodes[ child.ID ];
+
+			var subDeformer = {
+				FBX_ID: child.ID,
+				index: i,
+				indices: [],
+				weights: [],
+				transform: parseMatrixArray( subDeformerNode.subNodes.Transform.properties.a ),
+				transformLink: parseMatrixArray( subDeformerNode.subNodes.TransformLink.properties.a ),
+				linkMode: subDeformerNode.properties.Mode
 			};
 
-			for ( var i = 0; i < CORRECT.length; ++ i ) {
+			if ( 'Indexes' in subDeformerNode.subNodes ) {
 
-				var num = read( 1 );
-				if ( num == CORRECT[ i ] ) {
-
-					return false;
-
-				}
+				subDeformer.indices = parseIntArray( subDeformerNode.subNodes.Indexes.properties.a );
+				subDeformer.weights = parseFloatArray( subDeformerNode.subNodes.Weights.properties.a );
 
 			}
 
-			return true;
+			subDeformers[ child.ID ] = subDeformer;
 
-		},
+		}
 
-		isFbxVersionSupported: function ( body ) {
+		return {
+			map: subDeformers,
+			bones: []
+		};
 
-			var versionExp = /FBXVersion: (\d+)/;
-			var match = body.match( versionExp );
-			if ( match ) {
+	}
 
-				var version = parseInt( match[ 1 ] );
-				console.log( 'FBXLoader: FBX version ' + version );
-				return version >= 7000;
+	/**
+	 * Generates Buffer geometries from geometry information in FBXTree, and generates map of THREE.BufferGeometries
+	 * @param {{Objects: {subNodes: {Geometry: Object.<number, FBXGeometryNode}}}} FBXTree
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>} deformers
+	 * @returns {Map<number, THREE.BufferGeometry>}
+	 */
+	function parseGeometries( FBXTree, connections, deformers ) {
 
-			}
-			return false;
+		var geometryMap = new Map();
 
-		},
+		if ( 'Geometry' in FBXTree.Objects.subNodes ) {
 
-		parse: function ( text ) {
+			var geometryNodes = FBXTree.Objects.subNodes.Geometry;
 
-			var scope = this;
+			for ( var nodeID in geometryNodes ) {
 
-			console.time( 'FBXLoader' );
-
-			console.time( 'FBXLoader: TextParser' );
-			var nodes = new FBXParser().parse( text );
-			console.timeEnd( 'FBXLoader: TextParser' );
-
-			console.time( 'FBXLoader: ObjectParser' );
-			scope.hierarchy = ( new Bones() ).parseHierarchy( nodes );
-			scope.weights	= ( new Weights() ).parse( nodes, scope.hierarchy );
-			scope.animations = ( new Animation() ).parse( nodes, scope.hierarchy );
-			scope.textures = ( new Textures() ).parse( nodes, scope.hierarchy );
-			scope.materials = ( new Materials() ).parse( nodes, scope.hierarchy );
-			scope.geometries = ( new Geometries() ).parse( nodes, scope.hierarchy );
-			console.timeEnd( 'FBXLoader: ObjectParser' );
-
-			this.texture_cache = {};
-			this.material_cache = {};
-			this.geometry_cache = {};
-
-			console.time( 'FBXLoader: MeshParser' );
-			var meshes = this.parseMeshes( nodes );
-			console.timeEnd( 'FBXLoader: MeshParser' );
-
-			var container = new THREE.Group();
-
-			for ( var i = 0; i < meshes.length; ++ i ) {
-
-				if ( meshes[ i ] === undefined ) {
-
-					continue;
-
-				}
-
-				container.add( meshes[ i ] );
-
-				//wireframe = new THREE.WireframeHelper( geometries[i], 0x00ff00 );
-				//container.add( wireframe );
-
-				//vnh = new THREE.VertexNormalsHelper( geometries[i], 0.6 );
-				//container.add( vnh );
-
-				//skh = new THREE.SkeletonHelper( geometries[i] );
-				//container.add( skh );
-
-				// container.add( new THREE.BoxHelper( geometries[i] ) );
+				var relationships = connections.get( parseInt( nodeID ) );
+				var geo = parseGeometry( geometryNodes[ nodeID ], relationships, deformers );
+				geometryMap.set( parseInt( nodeID ), geo );
 
 			}
 
-			console.timeEnd( 'FBXLoader' );
-			return container;
+		}
 
-		},
+		return geometryMap;
 
-		getTexture: function ( texNode ) {
+	}
 
-			if ( ! ( texNode.id in this.texture_cache ) ) {
+	/**
+	 * Generates BufferGeometry from FBXGeometryNode.
+	 * @param {FBXGeometryNode} geometryNode
+	 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships
+	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformers
+	 * @returns {THREE.BufferGeometry}
+	 */
+	function parseGeometry( geometryNode, relationships, deformers ) {
 
-				if ( this.textureLoader === null ) {
+		switch ( geometryNode.attrType ) {
 
-					this.textureLoader = new THREE.TextureLoader();
+			case 'Mesh':
+				return parseMeshGeometry( geometryNode, relationships, deformers );
+				break;
 
-				}
+			case 'NurbsCurve':
+				return parseNurbsGeometry( geometryNode );
+				break;
 
-				this.texture_cache[ texNode.id ] = this.textureLoader.load( this.textureBasePath + '/' + texNode.fileName );
+		}
+
+	}
+
+	/**
+	 * Specialty function for parsing Mesh based Geometry Nodes.
+	 * @param {FBXGeometryNode} geometryNode
+	 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships - Object representing relationships between specific geometry node and other nodes.
+	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformers - Map object of deformers and subDeformers by ID.
+	 * @returns {THREE.BufferGeometry}
+	 */
+	function parseMeshGeometry( geometryNode, relationships, deformers ) {
+
+		for ( var i = 0; i < relationships.children.length; ++ i ) {
+
+			var deformer = deformers[ relationships.children[ i ].ID ];
+			if ( deformer !== undefined ) break;
+
+		}
+
+		return genGeometry( geometryNode, deformer );
+
+	}
+
+	/**
+	 * @param {{map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}} deformer - Skeleton representation for geometry instance.
+	 * @returns {THREE.BufferGeometry}
+	 */
+	function genGeometry( geometryNode, deformer ) {
+
+		var geometry = new Geometry();
+
+		var subNodes = geometryNode.subNodes;
+
+		// First, each index is going to be its own vertex.
+
+		var vertexBuffer = parseFloatArray( subNodes.Vertices.properties.a );
+		var indexBuffer = parseIntArray( subNodes.PolygonVertexIndex.properties.a );
+
+		if ( subNodes.LayerElementNormal ) {
+
+			var normalInfo = getNormals( subNodes.LayerElementNormal[ 0 ] );
+
+		}
+
+		if ( subNodes.LayerElementUV ) {
+
+			var uvInfo = getUVs( subNodes.LayerElementUV[ 0 ] );
+
+		}
+
+		if ( subNodes.LayerElementColor ) {
+
+			var colorInfo = getColors( subNodes.LayerElementColor[ 0 ] );
+
+		}
+
+		if ( subNodes.LayerElementMaterial ) {
+
+			var materialInfo = getMaterials( subNodes.LayerElementMaterial[ 0 ] );
+
+		}
+
+		var faceVertexBuffer = [];
+		var polygonIndex = 0;
+
+		for ( var polygonVertexIndex = 0; polygonVertexIndex < indexBuffer.length; polygonVertexIndex ++ ) {
+
+			var vertexIndex = indexBuffer[ polygonVertexIndex ];
+
+			var endOfFace = false;
+
+			if ( vertexIndex < 0 ) {
+
+				vertexIndex = vertexIndex ^ - 1;
+				indexBuffer[ polygonVertexIndex ] = vertexIndex;
+				endOfFace = true;
 
 			}
 
-			return this.texture_cache[ texNode.id ];
+			var vertex = new Vertex();
+			var weightIndices = [];
+			var weights = [];
 
-		},
+			vertex.position.fromArray( vertexBuffer, vertexIndex * 3 );
 
-		getMaterial: function ( matNode, nodes ) {
+			if ( deformer ) {
 
-			if ( ! ( matNode.id in this.material_cache ) ) {
+				var subDeformers = deformer.map;
 
-				// TODO:
-				// Cannot find a list of possible ShadingModel values.
-				// If someone finds a list, please add additional cases
-				// and map to appropriate materials.
-				var tmpMat;
-				switch ( matNode.type ) {
+				for ( var key in subDeformers ) {
 
-					case "phong":
-						tmpMat = new THREE.MeshPhongMaterial();
-						break;
-					case "lambert":
-						tmpMat = new THREE.MeshLambertMaterial();
-						break;
-					default:
-						console.warn( "No implementation given for material type " + matNode.type + " in FBXLoader.js.  Defaulting to basic material" );
-						tmpMat = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
-						break;
+					var subDeformer = subDeformers[ key ];
+					var indices = subDeformer.indices;
 
-				}
+					for ( var j = 0; j < indices.length; j ++ ) {
 
-				var children = nodes.searchConnectionChildren( matNode.id );
-				for ( var i = 0; i < children.length; ++ i ) {
+						var index = indices[ j ];
 
-					var type = nodes.searchConnectionType( children[ i ], matNode.id );
-					switch ( type ) {
+						if ( index === vertexIndex ) {
 
-						case " \"AmbientColor":
-							//TODO: Support AmbientColor textures
+							weights.push( subDeformer.weights[ j ] );
+							weightIndices.push( subDeformer.index );
+
 							break;
-
-						case " \"DiffuseColor":
-							matNode.parameters.map = this.getTexture( this.textures.textures[ children[ i ] ] );
-							break;
-
-						default:
-							console.warn( 'Unknown texture application of type ' + type + ', skipping texture' );
-							break;
-
-					}
-
-				}
-
-				tmpMat.setValues( matNode.parameters );
-
-				this.material_cache[ matNode.id ] = tmpMat;
-
-			}
-
-			return this.material_cache[ matNode.id ];
-
-		},
-
-		getGeometry: function ( geoNode ) {
-
-			if ( ! ( geoNode.id in this.geometry_cache ) ) {
-
-				var tmpGeo = new THREE.BufferGeometry();
-				tmpGeo.name = geoNode.name;
-				tmpGeo.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( geoNode.vertices ), 3 ) );
-
-				if ( geoNode.normals !== undefined && geoNode.normals.length > 0 ) {
-
-					tmpGeo.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( geoNode.normals ), 3 ) );
-
-				}
-
-				if ( geoNode.uvs !== undefined && geoNode.uvs.length > 0 ) {
-
-					tmpGeo.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geoNode.uvs ), 2 ) );
-
-				}
-
-				if ( geoNode.indices !== undefined && geoNode.indices.length > 0 ) {
-
-					tmpGeo.setIndex( geoNode.indices );
-
-				}
-
-				tmpGeo.verticesNeedUpdate = true;
-				tmpGeo.computeBoundingSphere();
-				tmpGeo.computeBoundingBox();
-
-				//Material groupings
-				if ( geoNode.materialIndices.length > 1 ) {
-
-					tmpGeo.groups = [];
-
-					for ( var i = 0, prevIndex = - 1; i < geoNode.materialIndices.length; ++ i ) {
-
-						if ( geoNode.materialIndices[ i ] !== prevIndex ) {
-
-							tmpGeo.groups.push( { start: i * 3, count: 0, materialIndex: geoNode.materialIndices[ i ] } );
-							prevIndex = geoNode.materialIndices[ i ];
 
 						}
 
-						tmpGeo.groups[ tmpGeo.groups.length - 1 ].count += 3;
+					}
+
+				}
+
+				if ( weights.length > 4 ) {
+
+					console.warn( 'FBXLoader: Vertex has more than 4 skinning weights assigned to vertex.  Deleting additional weights.' );
+
+					var WIndex = [ 0, 0, 0, 0 ];
+					var Weight = [ 0, 0, 0, 0 ];
+
+					weights.forEach( function ( weight, weightIndex ) {
+
+						var currentWeight = weight;
+						var currentIndex = weightIndices[ weightIndex ];
+
+						Weight.forEach( function ( comparedWeight, comparedWeightIndex, comparedWeightArray ) {
+
+							if ( currentWeight > comparedWeight ) {
+
+								comparedWeightArray[ comparedWeightIndex ] = currentWeight;
+								currentWeight = comparedWeight;
+
+								var tmp = WIndex[ comparedWeightIndex ];
+								WIndex[ comparedWeightIndex ] = currentIndex;
+								currentIndex = tmp;
+
+							}
+
+						} );
+
+					} );
+
+					weightIndices = WIndex;
+					weights = Weight;
+
+				}
+
+				for ( var i = weights.length; i < 4; ++ i ) {
+
+					weights[ i ] = 0;
+					weightIndices[ i ] = 0;
+
+				}
+
+				vertex.skinWeights.fromArray( weights );
+				vertex.skinIndices.fromArray( weightIndices );
+
+			}
+
+			if ( normalInfo ) {
+
+				vertex.normal.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, normalInfo ) );
+
+			}
+
+			if ( uvInfo ) {
+
+				vertex.uv.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo ) );
+
+			}
+
+			if ( colorInfo ) {
+
+				vertex.color.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, colorInfo ) );
+
+			}
+
+			faceVertexBuffer.push( vertex );
+
+			if ( endOfFace ) {
+
+				var face = new Face();
+				face.genTrianglesFromVertices( faceVertexBuffer );
+
+				if ( materialInfo !== undefined ) {
+
+					var materials = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo );
+					face.materialIndex = materials[ 0 ];
+
+				} else {
+
+					// Seems like some models don't have materialInfo(subNodes.LayerElementMaterial).
+					// Set 0 in such a case.
+					face.materialIndex = 0;
+
+				}
+
+				geometry.faces.push( face );
+				faceVertexBuffer = [];
+				polygonIndex ++;
+
+				endOfFace = false;
+
+			}
+
+		}
+
+		/**
+		 * @type {{vertexBuffer: number[], normalBuffer: number[], uvBuffer: number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
+		 */
+		var bufferInfo = geometry.flattenToBuffers();
+
+		var geo = new THREE.BufferGeometry();
+		geo.name = geometryNode.name;
+		geo.addAttribute( 'position', new THREE.Float32BufferAttribute( bufferInfo.vertexBuffer, 3 ) );
+
+		if ( bufferInfo.normalBuffer.length > 0 ) {
+
+			geo.addAttribute( 'normal', new THREE.Float32BufferAttribute( bufferInfo.normalBuffer, 3 ) );
+
+		}
+		if ( bufferInfo.uvBuffer.length > 0 ) {
+
+			geo.addAttribute( 'uv', new THREE.Float32BufferAttribute( bufferInfo.uvBuffer, 2 ) );
+
+		}
+		if ( subNodes.LayerElementColor ) {
+
+			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( bufferInfo.colorBuffer, 3 ) );
+
+		}
+
+		if ( deformer ) {
+
+			geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( bufferInfo.skinIndexBuffer, 4 ) );
+
+			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( bufferInfo.skinWeightBuffer, 4 ) );
+
+			geo.FBX_Deformer = deformer;
+
+		}
+
+		// Convert the material indices of each vertex into rendering groups on the geometry.
+
+		var materialIndexBuffer = bufferInfo.materialIndexBuffer;
+		var prevMaterialIndex = materialIndexBuffer[ 0 ];
+		var startIndex = 0;
+
+		for ( var i = 0; i < materialIndexBuffer.length; ++ i ) {
+
+			if ( materialIndexBuffer[ i ] !== prevMaterialIndex ) {
+
+				geo.addGroup( startIndex, i - startIndex, prevMaterialIndex );
+
+				prevMaterialIndex = materialIndexBuffer[ i ];
+				startIndex = i;
+
+			}
+
+		}
+
+		return geo;
+
+	}
+
+	/**
+	 * Parses normal information for geometry.
+	 * @param {FBXGeometryNode} geometryNode
+	 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
+	 */
+	function getNormals( NormalNode ) {
+
+		var mappingType = NormalNode.properties.MappingInformationType;
+		var referenceType = NormalNode.properties.ReferenceInformationType;
+		var buffer = parseFloatArray( NormalNode.subNodes.Normals.properties.a );
+		var indexBuffer = [];
+		if ( referenceType === 'IndexToDirect' ) {
+
+			if ( 'NormalIndex' in NormalNode.subNodes ) {
+
+				indexBuffer = parseIntArray( NormalNode.subNodes.NormalIndex.properties.a );
+
+			} else if ( 'NormalsIndex' in NormalNode.subNodes ) {
+
+				indexBuffer = parseIntArray( NormalNode.subNodes.NormalsIndex.properties.a );
+
+			}
+
+		}
+
+		return {
+			dataSize: 3,
+			buffer: buffer,
+			indices: indexBuffer,
+			mappingType: mappingType,
+			referenceType: referenceType
+		};
+
+	}
+
+	/**
+	 * Parses UV information for geometry.
+	 * @param {FBXGeometryNode} geometryNode
+	 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
+	 */
+	function getUVs( UVNode ) {
+
+		var mappingType = UVNode.properties.MappingInformationType;
+		var referenceType = UVNode.properties.ReferenceInformationType;
+		var buffer = parseFloatArray( UVNode.subNodes.UV.properties.a );
+		var indexBuffer = [];
+		if ( referenceType === 'IndexToDirect' ) {
+
+			indexBuffer = parseIntArray( UVNode.subNodes.UVIndex.properties.a );
+
+		}
+
+		return {
+			dataSize: 2,
+			buffer: buffer,
+			indices: indexBuffer,
+			mappingType: mappingType,
+			referenceType: referenceType
+		};
+
+	}
+
+	/**
+	 * Parses Vertex Color information for geometry.
+	 * @param {FBXGeometryNode} geometryNode
+	 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
+	 */
+	function getColors( ColorNode ) {
+
+		var mappingType = ColorNode.properties.MappingInformationType;
+		var referenceType = ColorNode.properties.ReferenceInformationType;
+		var buffer = parseFloatArray( ColorNode.subNodes.Colors.properties.a );
+		var indexBuffer = [];
+		if ( referenceType === 'IndexToDirect' ) {
+
+			indexBuffer = parseFloatArray( ColorNode.subNodes.ColorIndex.properties.a );
+
+		}
+
+		return {
+			dataSize: 4,
+			buffer: buffer,
+			indices: indexBuffer,
+			mappingType: mappingType,
+			referenceType: referenceType
+		};
+
+	}
+
+	/**
+	 * Parses material application information for geometry.
+	 * @param {FBXGeometryNode}
+	 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
+	 */
+	function getMaterials( MaterialNode ) {
+
+		var mappingType = MaterialNode.properties.MappingInformationType;
+		var referenceType = MaterialNode.properties.ReferenceInformationType;
+
+		if ( mappingType === 'NoMappingInformation' ) {
+
+			return {
+				dataSize: 1,
+				buffer: [ 0 ],
+				indices: [ 0 ],
+				mappingType: 'AllSame',
+				referenceType: referenceType
+			};
+
+		}
+
+		var materialIndexBuffer = parseIntArray( MaterialNode.subNodes.Materials.properties.a );
+
+		// Since materials are stored as indices, there's a bit of a mismatch between FBX and what
+		// we expect.  So we create an intermediate buffer that points to the index in the buffer,
+		// for conforming with the other functions we've written for other data.
+		var materialIndices = [];
+
+		for ( var materialIndexBufferIndex = 0, materialIndexBufferLength = materialIndexBuffer.length; materialIndexBufferIndex < materialIndexBufferLength; ++ materialIndexBufferIndex ) {
+
+			materialIndices.push( materialIndexBufferIndex );
+
+		}
+
+		return {
+			dataSize: 1,
+			buffer: materialIndexBuffer,
+			indices: materialIndices,
+			mappingType: mappingType,
+			referenceType: referenceType
+		};
+
+	}
+
+	/**
+	 * Function uses the infoObject and given indices to return value array of object.
+	 * @param {number} polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
+	 * @param {number} polygonIndex - Index of polygon in geometry.
+	 * @param {number} vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+	 * @param {{datasize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}} infoObject - Object containing data and how to access data.
+	 * @returns {number[]}
+	 */
+
+	var dataArray = [];
+
+	var GetData = {
+
+		ByPolygonVertex: {
+
+			/**
+			 * Function uses the infoObject and given indices to return value array of object.
+			 * @param {number} polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
+			 * @param {number} polygonIndex - Index of polygon in geometry.
+			 * @param {number} vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+			 * @param {{datasize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}} infoObject - Object containing data and how to access data.
+			 * @returns {number[]}
+			 */
+			Direct: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
+
+				var from = ( polygonVertexIndex * infoObject.dataSize );
+				var to = ( polygonVertexIndex * infoObject.dataSize ) + infoObject.dataSize;
+
+				// return infoObject.buffer.slice( from, to );
+				return slice( dataArray, infoObject.buffer, from, to );
+
+			},
+
+			/**
+			 * Function uses the infoObject and given indices to return value array of object.
+			 * @param {number} polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
+			 * @param {number} polygonIndex - Index of polygon in geometry.
+			 * @param {number} vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+			 * @param {{datasize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}} infoObject - Object containing data and how to access data.
+			 * @returns {number[]}
+			 */
+			IndexToDirect: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
+
+				var index = infoObject.indices[ polygonVertexIndex ];
+				var from = ( index * infoObject.dataSize );
+				var to = ( index * infoObject.dataSize ) + infoObject.dataSize;
+
+				// return infoObject.buffer.slice( from, to );
+				return slice( dataArray, infoObject.buffer, from, to );
+
+			}
+
+		},
+
+		ByPolygon: {
+
+			/**
+			 * Function uses the infoObject and given indices to return value array of object.
+			 * @param {number} polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
+			 * @param {number} polygonIndex - Index of polygon in geometry.
+			 * @param {number} vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+			 * @param {{datasize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}} infoObject - Object containing data and how to access data.
+			 * @returns {number[]}
+			 */
+			Direct: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
+
+				var from = polygonIndex * infoObject.dataSize;
+				var to = polygonIndex * infoObject.dataSize + infoObject.dataSize;
+
+				// return infoObject.buffer.slice( from, to );
+				return slice( dataArray, infoObject.buffer, from, to );
+
+			},
+
+			/**
+			 * Function uses the infoObject and given indices to return value array of object.
+			 * @param {number} polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
+			 * @param {number} polygonIndex - Index of polygon in geometry.
+			 * @param {number} vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+			 * @param {{datasize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}} infoObject - Object containing data and how to access data.
+			 * @returns {number[]}
+			 */
+			IndexToDirect: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
+
+				var index = infoObject.indices[ polygonIndex ];
+				var from = index * infoObject.dataSize;
+				var to = index * infoObject.dataSize + infoObject.dataSize;
+
+				// return infoObject.buffer.slice( from, to );
+				return slice( dataArray, infoObject.buffer, from, to );
+
+			}
+
+		},
+
+		ByVertice: {
+
+			Direct: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
+
+				var from = ( vertexIndex * infoObject.dataSize );
+				var to = ( vertexIndex * infoObject.dataSize ) + infoObject.dataSize;
+
+				// return infoObject.buffer.slice( from, to );
+				return slice( dataArray, infoObject.buffer, from, to );
+
+			}
+
+		},
+
+		AllSame: {
+
+			/**
+			 * Function uses the infoObject and given indices to return value array of object.
+			 * @param {number} polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
+			 * @param {number} polygonIndex - Index of polygon in geometry.
+			 * @param {number} vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+			 * @param {{datasize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}} infoObject - Object containing data and how to access data.
+			 * @returns {number[]}
+			 */
+			IndexToDirect: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
+
+				var from = infoObject.indices[ 0 ] * infoObject.dataSize;
+				var to = infoObject.indices[ 0 ] * infoObject.dataSize + infoObject.dataSize;
+
+				// return infoObject.buffer.slice( from, to );
+				return slice( dataArray, infoObject.buffer, from, to );
+
+			}
+
+		}
+
+	};
+
+	function getData( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
+
+		return GetData[ infoObject.mappingType ][ infoObject.referenceType ]( polygonVertexIndex, polygonIndex, vertexIndex, infoObject );
+
+	}
+
+	/**
+	 * Specialty function for parsing NurbsCurve based Geometry Nodes.
+	 * @param {FBXGeometryNode} geometryNode
+	 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships
+	 * @returns {THREE.BufferGeometry}
+	 */
+	function parseNurbsGeometry( geometryNode ) {
+
+		if ( THREE.NURBSCurve === undefined ) {
+
+			console.error( "THREE.FBXLoader relies on THREE.NURBSCurve for any nurbs present in the model.  Nurbs will show up as empty geometry." );
+			return new THREE.BufferGeometry();
+
+		}
+
+		var order = parseInt( geometryNode.properties.Order );
+
+		if ( isNaN( order ) ) {
+
+			console.error( "FBXLoader: Invalid Order " + geometryNode.properties.Order + " given for geometry ID: " + geometryNode.id );
+			return new THREE.BufferGeometry();
+
+		}
+
+		var degree = order - 1;
+
+		var knots = parseFloatArray( geometryNode.subNodes.KnotVector.properties.a );
+		var controlPoints = [];
+		var pointsValues = parseFloatArray( geometryNode.subNodes.Points.properties.a );
+
+		for ( var i = 0, l = pointsValues.length; i < l; i += 4 ) {
+
+			controlPoints.push( new THREE.Vector4().fromArray( pointsValues, i ) );
+
+		}
+
+		var startKnot, endKnot;
+
+		if ( geometryNode.properties.Form === 'Closed' ) {
+
+			controlPoints.push( controlPoints[ 0 ] );
+
+		} else if ( geometryNode.properties.Form === 'Periodic' ) {
+
+			startKnot = degree;
+			endKnot = knots.length - 1 - startKnot;
+
+			for ( var i = 0; i < degree; ++ i ) {
+
+				controlPoints.push( controlPoints[ i ] );
+
+			}
+
+		}
+
+		var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
+		var vertices = curve.getPoints( controlPoints.length * 7 );
+
+		var positions = new Float32Array( vertices.length * 3 );
+
+		for ( var i = 0, l = vertices.length; i < l; ++ i ) {
+
+			vertices[ i ].toArray( positions, i * 3 );
+
+		}
+
+		var geometry = new THREE.BufferGeometry();
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+		return geometry;
+
+	}
+
+	/**
+	 * Finally generates Scene graph and Scene graph Objects.
+	 * @param {{Objects: {subNodes: {Model: Object.<number, FBXModelNode>}}}} FBXTree
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>} deformers
+	 * @param {Map<number, THREE.BufferGeometry>} geometryMap
+	 * @param {Map<number, THREE.Material>} materialMap
+	 * @returns {THREE.Group}
+	 */
+	function parseScene( FBXTree, connections, deformers, geometryMap, materialMap ) {
+
+		var sceneGraph = new THREE.Group();
+
+		var ModelNode = FBXTree.Objects.subNodes.Model;
+
+		/**
+		 * @type {Array.<THREE.Object3D>}
+		 */
+		var modelArray = [];
+
+		/**
+		 * @type {Map.<number, THREE.Object3D>}
+		 */
+		var modelMap = new Map();
+
+		for ( var nodeID in ModelNode ) {
+
+			var id = parseInt( nodeID );
+			var node = ModelNode[ nodeID ];
+			var conns = connections.get( id );
+			var model = null;
+
+			for ( var i = 0; i < conns.parents.length; ++ i ) {
+
+				for ( var FBX_ID in deformers ) {
+
+					var deformer = deformers[ FBX_ID ];
+					var subDeformers = deformer.map;
+					var subDeformer = subDeformers[ conns.parents[ i ].ID ];
+
+					if ( subDeformer ) {
+
+						var model2 = model;
+						model = new THREE.Bone();
+						deformer.bones[ subDeformer.index ] = model;
+
+						// seems like we need this not to make non-connected bone, maybe?
+						// TODO: confirm
+						if ( model2 !== null ) model.add( model2 );
 
 					}
 
 				}
 
-				this.geometry_cache[ geoNode.id ] = new THREE.Geometry().fromBufferGeometry( tmpGeo );
-				this.geometry_cache[ geoNode.id ].bones = geoNode.bones;
-				this.geometry_cache[ geoNode.id ].skinIndices = this.weights.skinIndices;
-				this.geometry_cache[ geoNode.id ].skinWeights = this.weights.skinWeights;
-
 			}
 
-			return this.geometry_cache[ geoNode.id ];
+			if ( ! model ) {
 
-		},
+				switch ( node.attrType ) {
 
-		parseMeshes: function ( node ) {
+					case "Mesh":
+						/**
+						 * @type {?THREE.BufferGeometry}
+						 */
+						var geometry = null;
 
-			var modelNode = node.Objects.subNodes.Model;
-			var meshes = [];
+						/**
+						 * @type {THREE.MultiMaterial|THREE.Material}
+						 */
+						var material = null;
 
-			for ( var ID in modelNode ) {
+						/**
+						 * @type {Array.<THREE.Material>}
+						 */
+						var materials = [];
 
-				if ( modelNode[ ID ].attrType === 'Mesh' ) {
+						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
 
-					//Parse Mesh
-					meshes.push( this.parseMesh( modelNode[ ID ], node ) );
+							var child = conns.children[ childrenIndex ];
 
-				} else if ( modelNode[ ID ].attrType === 'NurbsCurve' ) {
+							if ( geometryMap.has( child.ID ) ) {
 
-					//Parse NURBS
-					meshes.push( this.parseNURBS( modelNode[ ID ], node ) );
+								geometry = geometryMap.get( child.ID );
+
+							}
+
+							if ( materialMap.has( child.ID ) ) {
+
+								materials.push( materialMap.get( child.ID ) );
+
+							}
+
+						}
+						if ( materials.length > 1 ) {
+
+							material = materials;
+
+						} else if ( materials.length > 0 ) {
+
+							material = materials[ 0 ];
+
+						} else {
+
+							material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+							materials.push( material );
+
+						}
+						if ( 'color' in geometry.attributes ) {
+
+							for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++materialIndex ) {
+
+								materials[ materialIndex ].vertexColors = THREE.VertexColors;
+
+							}
+
+						}
+						if ( geometry.FBX_Deformer ) {
+
+							for ( var materialsIndex = 0, materialsLength = materials.length; materialsIndex < materialsLength; ++ materialsIndex ) {
+
+								materials[ materialsIndex ].skinning = true;
+
+							}
+							model = new THREE.SkinnedMesh( geometry, material );
+
+						} else {
+
+							model = new THREE.Mesh( geometry, material );
+
+						}
+						break;
+
+					case "NurbsCurve":
+						var geometry = null;
+
+						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+							var child = conns.children[ childrenIndex ];
+
+							if ( geometryMap.has( child.ID ) ) {
+
+								geometry = geometryMap.get( child.ID );
+
+							}
+
+						}
+
+						// FBX does not list materials for Nurbs lines, so we'll just put our own in here.
+						material = new THREE.LineBasicMaterial( { color: 0x3300ff, linewidth: 5 } );
+						model = new THREE.Line( geometry, material );
+						break;
+
+					default:
+						model = new THREE.Object3D();
+						break;
 
 				}
 
 			}
 
-			return meshes;
+			model.name = node.attrName.replace( /:/, '' ).replace( /_/, '' ).replace( /-/, '' );
+			model.FBX_ID = id;
 
-		},
+			modelArray.push( model );
+			modelMap.set( id, model );
 
-		parseFloatList: function ( floatList ) {
+		}
 
-			return floatList.split( ',' ).map( function ( number ) {
+		for ( var modelArrayIndex = 0, modelArrayLength = modelArray.length; modelArrayIndex < modelArrayLength; ++ modelArrayIndex ) {
 
-				return parseFloat( number );
+			var model = modelArray[ modelArrayIndex ];
 
-			} );
+			var node = ModelNode[ model.FBX_ID ];
 
-		},
+			if ( 'Lcl_Translation' in node.properties ) {
 
-		parseNURBS: function ( meshNode, FBXNodes ) {
-
-			if ( THREE.NURBSCurve === undefined ) {
-
-				console.error( "THREE.FBXLoader relies on THREE.NURBSCurve" );
-				return;
+				model.position.fromArray( parseFloatArray( node.properties.Lcl_Translation.value ) );
 
 			}
 
-			var geoNodes = FBXNodes.Objects.subNodes.Geometry;
+			if ( 'Lcl_Rotation' in node.properties ) {
 
-			var children = FBXNodes.searchConnectionChildren( meshNode.id );
-			var nurbsInfo;
+				var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( degreeToRadian );
+				rotation.push( 'ZYX' );
+				model.rotation.fromArray( rotation );
 
-			for ( var i = 0; i < children.length; ++ i ) {
+			}
 
-				if ( children[ i ] in geoNodes ) {
+			if ( 'Lcl_Scaling' in node.properties ) {
 
-					nurbsInfo = geoNodes[ children[ i ] ];
+				model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
+
+			}
+
+			if ( 'PreRotation' in node.properties ) {
+
+				var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( DEG2RAD ), 'ZYX' );
+				preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+				var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
+				preRotations.multiply( currentRotation );
+				model.rotation.setFromQuaternion( preRotations, 'ZYX' );
+
+			}
+
+			var conns = connections.get( model.FBX_ID );
+			for ( var parentIndex = 0; parentIndex < conns.parents.length; parentIndex ++ ) {
+
+				var pIndex = findIndex( modelArray, function ( mod ) {
+
+					return mod.FBX_ID === conns.parents[ parentIndex ].ID;
+
+				} );
+				if ( pIndex > - 1 ) {
+
+					modelArray[ pIndex ].add( model );
 					break;
 
 				}
 
 			}
+			if ( model.parent === null ) {
 
-			if ( nurbsInfo === undefined ) {
-
-				return;
-
-			}
-
-			var order = parseInt( nurbsInfo.properties.Order );
-
-			if ( isNaN( order ) ) {
-
-				console.error( "Invalid Order: `" + nurbsInfo.properties.Order + "` (should be an integer)" );
-				return;
+				sceneGraph.add( model );
 
 			}
-
-			var degree = order - 1;
-			var knots = this.parseFloatList( nurbsInfo.subNodes.KnotVector.properties.a );
-
-			var controlPoints = [];
-			var pointsValues = this.parseFloatList( nurbsInfo.subNodes.Points.properties.a );
-
-			for ( var i = 0; i < pointsValues.length; i += 4 ) {
-
-				// NURBSCurve recreates a Vector4, so no need to construct it twice
-				controlPoints.push( { x: pointsValues[ i ], y: pointsValues[ i + 1 ], z: pointsValues[ i + 2 ], w: pointsValues[ i + 3 ] } );
-
-			}
-
-			var startKnot, endKnot;
-
-			if ( nurbsInfo.properties.Form == "Closed" ) {
-
-				controlPoints.push( controlPoints[ 0 ] );
-
-			} else if ( nurbsInfo.properties.Form === 'Periodic' ) {
-
-				startKnot = degree;
-				endKnot = knots.length - 1 - startKnot;
-
-				for ( var i = 0; i < degree; ++ i ) {
-
-					controlPoints.push( controlPoints[ i ] );
-
-				}
-
-			}
-
-			var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
-
-			// Pre-generate a geometry
-			var geometry = new THREE.Geometry();
-			geometry.vertices = curve.getPoints( controlPoints.length * 7 );
-
-			var mesh = new THREE.Line( geometry );
-			// Store the THREE.NURBSCurve class so the user can recreate a new geometry with a different number of points
-			mesh.userData.curve = curve;
-
-			return mesh;
-
-		},
-
-		parseMesh: function ( meshNode, FBXNodes ) {
-
-			var geoNodes = FBXNodes.Objects.subNodes.Geometry;
-			var matNodes = FBXNodes.Objects.subNodes.Material;
-
-			var children = FBXNodes.searchConnectionChildren( meshNode.id );
-			var geometry;
-			var materials = [];
-			var material;
-			var mesh;
-			for ( var i = 0; i < children.length; ++ i ) {
-
-				if ( children[ i ] in geoNodes ) {
-
-					geometry = this.getGeometry( this.geometries.geometries[ children[ i ] ] );
-					continue;
-
-				}
-
-				if ( children[ i ] in matNodes ) {
-
-					materials.push( this.getMaterial( this.materials.materials[ children[ i ] ], FBXNodes ) );
-					continue;
-
-				}
-
-			}
-
-			if ( materials.length > 1 ) {
-
-				material = new THREE.MultiMaterial( materials );
-				//material = materials[ 0 ];
-
-			} else {
-
-				material = materials[ 0 ];
-
-			}
-
-			if ( geometry.bones !== undefined && geometry.skinWeights !== undefined && geometry.skinWeights.length > 0 ) {
-
-				if ( material instanceof THREE.MultiMaterial ) {
-
-					for ( var i = 0; i < material.materials.length; ++ i ) {
-
-						material.materials[ i ].skinning = true;
-
-					}
-
-				} else {
-
-					material.skinning = true;
-
-				}
-
-				mesh = new THREE.SkinnedMesh( geometry, material );
-
-			} else {
-
-				mesh = new THREE.Mesh( geometry, material );
-
-			}
-
-			if ( this.animations !== undefined ) {
-
-				this.addAnimation( mesh, this.weights.matrices, this.animations );
-
-			}
-
-			return mesh;
-
-		},
-
-		addAnimation: function ( mesh, matrices, animations ) {
-
-			for ( var key in animations.stacks ) {
-
-				var animationData = {
-					name: animations.stacks[ key ].name,
-					fps: 30,
-					length: animations.stacks[ key ].length,
-					hierarchy: []
-				};
-
-				for ( var i = 0; i < mesh.geometry.bones.length; ++ i ) {
-
-					var name = mesh.geometry.bones[ i ].name;
-					name = name.replace( /.*:/, '' );
-					animationData.hierarchy.push( { parent: mesh.geometry.bones[ i ].parent, name: name, keys: [] } );
-
-				}
-
-				function hasCurve( animNode, attr ) {
-
-					if ( animNode === undefined ) {
-
-						return false;
-
-					}
-
-					var attrNode;
-					switch ( attr ) {
-
-						case 'S':
-							if ( ! ( animNode.S ) ) {
-
-								return false;
-
-							}
-							attrNode = animNode.S;
-							break;
-
-						case 'R':
-							if ( ! ( animNode.R ) ) {
-
-								return false;
-
-							}
-							attrNode = animNode.R;
-							break;
-
-						case 'T':
-							if ( ! ( animNode.T ) ) {
-
-								return false;
-
-							}
-							attrNode = animNode.T;
-							break;
-
-					}
-
-					if ( attrNode.curves.x === undefined ) {
-
-						return false;
-
-					}
-
-					if ( attrNode.curves.y === undefined ) {
-
-						return false;
-
-					}
-
-					if ( attrNode.curves.z === undefined ) {
-
-						return false;
-
-					}
-
-					return true;
-
-				}
-
-				function hasKeyOnFrame( attrNode, frame ) {
-
-					var x = isKeyExistOnFrame( attrNode.curves.x, frame );
-					var y = isKeyExistOnFrame( attrNode.curves.y, frame );
-					var z = isKeyExistOnFrame( attrNode.curves.z, frame );
-
-					return x && y && z;
-
-				}
-
-				function isKeyExistOnFrame( curve, frame ) {
-
-					var value = curve.values[ frame ];
-					return value !== undefined;
-
-				}
-
-				function genKey( animNode, bone ) {
-
-					// key initialize with its bone's bind pose at first
-					var key = {};
-					key.time = frame / animations.fps; // TODO:
-					key.pos = bone.pos;
-					key.rot = bone.rotq;
-					key.scl = bone.scl;
-
-					if ( animNode === undefined ) {
-
-						return key;
-
-					}
-
-					try {
-
-						if ( hasCurve( animNode, 'T' ) && hasKeyOnFrame( animNode.T, frame ) ) {
-
-							var pos = new THREE.Vector3(
-								animNode.T.curves.x.values[ frame ],
-								animNode.T.curves.y.values[ frame ],
-								animNode.T.curves.z.values[ frame ] );
-							key.pos = [ pos.x, pos.y, pos.z ];
-
-						}
-
-						if ( hasCurve( animNode, 'R' ) && hasKeyOnFrame( animNode.R, frame ) ) {
-
-							var rx = degToRad( animNode.R.curves.x.values[ frame ] );
-							var ry = degToRad( animNode.R.curves.y.values[ frame ] );
-							var rz = degToRad( animNode.R.curves.z.values[ frame ] );
-							var eul = new THREE.Vector3( rx, ry, rz );
-							var rot = quatFromVec( eul.x, eul.y, eul.z );
-							key.rot = [ rot.x, rot.y, rot.z, rot.w ];
-
-						}
-
-						if ( hasCurve( animNode, 'S' ) && hasKeyOnFrame( animNode.S, frame ) ) {
-
-							var scl = new THREE.Vector3(
-								animNode.S.curves.x.values[ frame ],
-								animNode.S.curves.y.values[ frame ],
-								animNode.S.curves.z.values[ frame ] );
-							key.scl = [ scl.x, scl.y, scl.z ];
-
-						}
-
-					} catch ( e ) {
-
-						// curve is not full plotted
-						console.log( bone );
-						console.log( e );
-
-					}
-
-					return key;
-
-				}
-
-				var bones = mesh.geometry.bones;
-				for ( var frame = 0; frame < animations.stacks[ key ].frames; frame ++ ) {
-
-
-					for ( i = 0; i < bones.length; i ++ ) {
-
-						var bone = bones[ i ];
-						var animNode = animations.stacks[ key ].layers[ 0 ][ i ];
-
-						for ( var j = 0; j < animationData.hierarchy.length; j ++ ) {
-
-							if ( animationData.hierarchy[ j ].name === bone.name ) {
-
-								animationData.hierarchy[ j ].keys.push( genKey( animNode, bone ) );
-
-							}
-
-						}
-
-					}
-
-				}
-
-				if ( mesh.geometry.animations === undefined ) {
-
-					mesh.geometry.animations = [];
-
-				}
-
-				mesh.geometry.animations.push( THREE.AnimationClip.parseAnimation( animationData, mesh.geometry.bones ) );
-
-			}
-
-		},
-
-		loadFile: function ( url, onLoad, onProgress, onError, responseType ) {
-
-			var loader = new THREE.FileLoader( this.manager );
-
-			loader.setResponseType( responseType );
-
-			var request = loader.load( url, onLoad, onProgress, onError );
-
-			return request;
-
-		},
-
-		loadFileAsBuffer: function ( url, onLoad, onProgress, onError ) {
-
-			this.loadFile( url, onLoad, onProgress, onError, 'arraybuffer' );
-
-		},
-
-		loadFileAsText: function ( url, onLoad, onProgress, onError ) {
-
-			this.loadFile( url, onLoad, onProgress, onError, 'text' );
 
 		}
 
-	} );
 
-	/* ----------------------------------------------------------------- */
+		// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
+		sceneGraph.updateMatrixWorld( true );
 
-	function FBXNodes() {}
+		// Put skeleton into bind pose.
+		var BindPoseNode = FBXTree.Objects.subNodes.Pose;
+		for ( var nodeID in BindPoseNode ) {
 
-	Object.assign( FBXNodes.prototype, {
+			if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
 
-		add: function ( key, val ) {
-
-			this[ key ] = val;
-
-		},
-
-		searchConnectionParent: function ( id ) {
-
-			if ( this.__cache_search_connection_parent === undefined ) {
-
-				this.__cache_search_connection_parent = [];
+				BindPoseNode = BindPoseNode[ nodeID ];
+				break;
 
 			}
 
-			if ( this.__cache_search_connection_parent[ id ] !== undefined ) {
+		}
+		if ( BindPoseNode ) {
 
-				return this.__cache_search_connection_parent[ id ];
+			var PoseNode = BindPoseNode.subNodes.PoseNode;
+			var worldMatrices = new Map();
 
-			} else {
+			for ( var PoseNodeIndex = 0, PoseNodeLength = PoseNode.length; PoseNodeIndex < PoseNodeLength; ++ PoseNodeIndex ) {
 
-				this.__cache_search_connection_parent[ id ] = [];
+				var node = PoseNode[ PoseNodeIndex ];
+
+				var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
+
+				worldMatrices.set( parseInt( node.id ), rawMatWrd );
 
 			}
 
-			var conns = this.Connections.properties.connections;
+		}
 
-			var results = [];
-			for ( var i = 0; i < conns.length; ++ i ) {
+		for ( var FBX_ID in deformers ) {
 
-				if ( conns[ i ][ 0 ] == id ) {
+			var deformer = deformers[ FBX_ID ];
+			var subDeformers = deformer.map;
 
-					// 0 means scene root
-					var res = conns[ i ][ 1 ] === 0 ? - 1 : conns[ i ][ 1 ];
-					results.push( res );
+			for ( var key in subDeformers ) {
+
+				var subDeformer = subDeformers[ key ];
+				var subDeformerIndex = subDeformer.index;
+
+				/**
+				 * @type {THREE.Bone}
+				 */
+				var bone = deformer.bones[ subDeformerIndex ];
+				if ( ! worldMatrices.has( bone.FBX_ID ) ) {
+
+					break;
+
+				}
+				var mat = worldMatrices.get( bone.FBX_ID );
+				bone.matrixWorld.copy( mat );
+
+			}
+
+			// Now that skeleton is in bind pose, bind to model.
+			deformer.skeleton = new THREE.Skeleton( deformer.bones );
+
+			var conns = connections.get( deformer.FBX_ID );
+			var parents = conns.parents;
+
+			for ( var parentsIndex = 0, parentsLength = parents.length; parentsIndex < parentsLength; ++ parentsIndex ) {
+
+				var parent = parents[ parentsIndex ];
+
+				if ( geometryMap.has( parent.ID ) ) {
+
+					var geoID = parent.ID;
+					var geoConns = connections.get( geoID );
+
+					for ( var i = 0; i < geoConns.parents.length; ++ i ) {
+
+						if ( modelMap.has( geoConns.parents[ i ].ID ) ) {
+
+							var model = modelMap.get( geoConns.parents[ i ].ID );
+							//ASSERT model typeof SkinnedMesh
+							model.bind( deformer.skeleton, model.matrixWorld );
+							break;
+
+						}
+
+					}
 
 				}
 
 			}
 
-			if ( results.length > 0 ) {
+		}
 
-				this.__cache_search_connection_parent[ id ] = this.__cache_search_connection_parent[ id ].concat( results );
-				return results;
+		//Skeleton is now bound, return objects to starting
+		//world positions.
+		sceneGraph.updateMatrixWorld( true );
 
-			} else {
+		// Silly hack with the animation parsing.  We're gonna pretend the scene graph has a skeleton
+		// to attach animations to, since FBXs treat animations as animations for the entire scene,
+		// not just for individual objects.
+		sceneGraph.skeleton = {
+			bones: modelArray
+		};
 
-				this.__cache_search_connection_parent[ id ] = [ - 1 ];
-				return [ - 1 ];
+		var animations = parseAnimations( FBXTree, connections, sceneGraph );
+
+		addAnimations( sceneGraph, animations );
+
+		return sceneGraph;
+
+	}
+
+	/**
+	 * Parses animation information from FBXTree and generates an AnimationInfoObject.
+	 * @param {{Objects: {subNodes: {AnimationCurveNode: any, AnimationCurve: any, AnimationLayer: any, AnimationStack: any}}}} FBXTree
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+	 */
+	function parseAnimations( FBXTree, connections, sceneGraph ) {
+
+		var rawNodes = FBXTree.Objects.subNodes.AnimationCurveNode;
+		var rawCurves = FBXTree.Objects.subNodes.AnimationCurve;
+		var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
+		var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
+
+		/**
+		 * @type {{
+				 curves: Map<number, {
+				 T: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					};
+				},
+				 R: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					};
+				},
+				 S: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					};
+				}
+			 }>,
+			 layers: Map<number, {
+				T: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					},
+				},
+				R: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					},
+				},
+				S: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					},
+				}
+				}[]>,
+			 stacks: Map<number, {
+				 name: string,
+				 layers: {
+					T: {
+						id: number;
+						attr: string;
+						internalID: number;
+						attrX: boolean;
+						attrY: boolean;
+						attrZ: boolean;
+						containerBoneID: number;
+						containerID: number;
+						curves: {
+							x: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							y: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							z: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+						};
+					};
+					R: {
+						id: number;
+						attr: string;
+						internalID: number;
+						attrX: boolean;
+						attrY: boolean;
+						attrZ: boolean;
+						containerBoneID: number;
+						containerID: number;
+						curves: {
+							x: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							y: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							z: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+						};
+					};
+					S: {
+						id: number;
+						attr: string;
+						internalID: number;
+						attrX: boolean;
+						attrY: boolean;
+						attrZ: boolean;
+						containerBoneID: number;
+						containerID: number;
+						curves: {
+							x: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							y: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							z: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+						};
+					};
+				}[][],
+			 length: number,
+			 frames: number }>,
+			 length: number,
+			 fps: number,
+			 frames: number
+		 }}
+		 */
+		var returnObject = {
+			curves: new Map(),
+			layers: {},
+			stacks: {},
+			length: 0,
+			fps: 30,
+			frames: 0
+		};
+
+		/**
+		 * @type {Array.<{
+				id: number;
+				attr: string;
+				internalID: number;
+				attrX: boolean;
+				attrY: boolean;
+				attrZ: boolean;
+				containerBoneID: number;
+				containerID: number;
+			}>}
+		 */
+		var animationCurveNodes = [];
+		for ( var nodeID in rawNodes ) {
+
+			if ( nodeID.match( /\d+/ ) ) {
+
+				var animationNode = parseAnimationNode( FBXTree, rawNodes[ nodeID ], connections, sceneGraph );
+				animationCurveNodes.push( animationNode );
 
 			}
 
-		},
+		}
 
-		searchConnectionChildren: function ( id ) {
+		/**
+		 * @type {Map.<number, {
+				id: number,
+				attr: string,
+				internalID: number,
+				attrX: boolean,
+				attrY: boolean,
+				attrZ: boolean,
+				containerBoneID: number,
+				containerID: number,
+				curves: {
+					x: {
+						version: any,
+						id: number,
+						internalID: number,
+						times: number[],
+						values: number[],
+						attrFlag: number[],
+						attrData: number[],
+					},
+					y: {
+						version: any,
+						id: number,
+						internalID: number,
+						times: number[],
+						values: number[],
+						attrFlag: number[],
+						attrData: number[],
+					},
+					z: {
+						version: any,
+						id: number,
+						internalID: number,
+						times: number[],
+						values: number[],
+						attrFlag: number[],
+						attrData: number[],
+					}
+				}
+			}>}
+		 */
+		var tmpMap = new Map();
+		for ( var animationCurveNodeIndex = 0; animationCurveNodeIndex < animationCurveNodes.length; ++ animationCurveNodeIndex ) {
 
-			if ( this.__cache_search_connection_children === undefined ) {
+			if ( animationCurveNodes[ animationCurveNodeIndex ] === null ) {
 
-				this.__cache_search_connection_children = [];
+				continue;
+
+			}
+			tmpMap.set( animationCurveNodes[ animationCurveNodeIndex ].id, animationCurveNodes[ animationCurveNodeIndex ] );
+
+		}
+
+
+		/**
+		 * @type {{
+				version: any,
+				id: number,
+				internalID: number,
+				times: number[],
+				values: number[],
+				attrFlag: number[],
+				attrData: number[],
+			}[]}
+		 */
+		var animationCurves = [];
+		for ( nodeID in rawCurves ) {
+
+			if ( nodeID.match( /\d+/ ) ) {
+
+				var animationCurve = parseAnimationCurve( rawCurves[ nodeID ] );
+
+				// seems like this check would be necessary?
+				if ( ! connections.has( animationCurve.id ) ) continue;
+
+				animationCurves.push( animationCurve );
+
+				var firstParentConn = connections.get( animationCurve.id ).parents[ 0 ];
+				var firstParentID = firstParentConn.ID;
+				var firstParentRelationship = firstParentConn.relationship;
+				var axis = '';
+
+				if ( firstParentRelationship.match( /X/ ) ) {
+
+					axis = 'x';
+
+				} else if ( firstParentRelationship.match( /Y/ ) ) {
+
+					axis = 'y';
+
+				} else if ( firstParentRelationship.match( /Z/ ) ) {
+
+					axis = 'z';
+
+				} else {
+
+					continue;
+
+				}
+
+				tmpMap.get( firstParentID ).curves[ axis ] = animationCurve;
 
 			}
 
-			if ( this.__cache_search_connection_children[ id ] !== undefined ) {
+		}
 
-				return this.__cache_search_connection_children[ id ];
+		tmpMap.forEach( function ( curveNode ) {
 
-			} else {
+			var id = curveNode.containerBoneID;
+			if ( ! returnObject.curves.has( id ) ) {
 
-				this.__cache_search_connection_children[ id ] = [];
+				returnObject.curves.set( id, { T: null, R: null, S: null } );
 
 			}
+			returnObject.curves.get( id )[ curveNode.attr ] = curveNode;
+			if ( curveNode.attr === 'R' ) {
 
-			var conns = this.Connections.properties.connections;
+				var curves = curveNode.curves;
+				curves.x.values = curves.x.values.map( degreeToRadian );
+				curves.y.values = curves.y.values.map( degreeToRadian );
+				curves.z.values = curves.z.values.map( degreeToRadian );
 
-			var res = [];
-			for ( var i = 0; i < conns.length; ++ i ) {
+				if ( curveNode.preRotations !== null ) {
 
-				if ( conns[ i ][ 1 ] == id ) {
+					var preRotations = new THREE.Euler().setFromVector3( curveNode.preRotations, 'ZYX' );
+					preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+					var frameRotation = new THREE.Euler();
+					var frameRotationQuaternion = new THREE.Quaternion();
+					for ( var frame = 0; frame < curves.x.times.length; ++ frame ) {
 
-					// 0 means scene root
-					res.push( conns[ i ][ 0 ] === 0 ? - 1 : conns[ i ][ 0 ] );
-					// there may more than one kid, then search to the end
+						frameRotation.set( curves.x.values[ frame ], curves.y.values[ frame ], curves.z.values[ frame ], 'ZYX' );
+						frameRotationQuaternion.setFromEuler( frameRotation ).premultiply( preRotations );
+						frameRotation.setFromQuaternion( frameRotationQuaternion, 'ZYX' );
+						curves.x.values[ frame ] = frameRotation.x;
+						curves.y.values[ frame ] = frameRotation.y;
+						curves.z.values[ frame ] = frameRotation.z;
+
+					}
 
 				}
 
 			}
 
-			if ( res.length > 0 ) {
+		} );
 
-				this.__cache_search_connection_children[ id ] = this.__cache_search_connection_children[ id ].concat( res );
-				return res;
+		for ( var nodeID in rawLayers ) {
 
-			} else {
+			/**
+			 * @type {{
+				T: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					},
+				},
+				R: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					},
+				},
+				S: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					},
+				}
+				}[]}
+			 */
+			var layer = [];
+			var children = connections.get( parseInt( nodeID ) ).children;
 
-				this.__cache_search_connection_children[ id ] = [ ];
-				return [ ];
+			for ( var childIndex = 0; childIndex < children.length; childIndex ++ ) {
 
-			}
+				// Skip lockInfluenceWeights
+				if ( tmpMap.has( children[ childIndex ].ID ) ) {
 
-		},
+					var curveNode = tmpMap.get( children[ childIndex ].ID );
+					var boneID = curveNode.containerBoneID;
+					if ( layer[ boneID ] === undefined ) {
 
-		searchConnectionType: function ( id, to ) {
+						layer[ boneID ] = {
+							T: null,
+							R: null,
+							S: null
+						};
 
-			var key = id + ',' + to; // TODO: to hash
-			if ( this.__cache_search_connection_type === undefined ) {
+					}
 
-				this.__cache_search_connection_type = {};
-
-			}
-
-			if ( this.__cache_search_connection_type[ key ] !== undefined ) {
-
-				return this.__cache_search_connection_type[ key ];
-
-			} else {
-
-				this.__cache_search_connection_type[ key ] = '';
-
-			}
-
-			var conns = this.Connections.properties.connections;
-
-			for ( var i = 0; i < conns.length; ++ i ) {
-
-				if ( conns[ i ][ 0 ] == id && conns[ i ][ 1 ] == to ) {
-
-					// 0 means scene root
-					this.__cache_search_connection_type[ key ] = conns[ i ][ 2 ];
-					return conns[ i ][ 2 ];
+					layer[ boneID ][ curveNode.attr ] = curveNode;
 
 				}
 
 			}
 
-			this.__cache_search_connection_type[ id ] = null;
+			returnObject.layers[ nodeID ] = layer;
+
+		}
+
+		for ( var nodeID in rawStacks ) {
+
+			var layers = [];
+			var children = connections.get( parseInt( nodeID ) ).children;
+			var timestamps = { max: 0, min: Number.MAX_VALUE };
+
+			for ( var childIndex = 0; childIndex < children.length; ++ childIndex ) {
+
+				var currentLayer = returnObject.layers[ children[ childIndex ].ID ];
+
+				if ( currentLayer !== undefined ) {
+
+					layers.push( currentLayer );
+
+					for ( var currentLayerIndex = 0, currentLayerLength = currentLayer.length; currentLayerIndex < currentLayerLength; ++ currentLayerIndex ) {
+
+						var layer = currentLayer[ currentLayerIndex ];
+
+						if ( layer ) {
+
+							getCurveNodeMaxMinTimeStamps( layer, timestamps );
+
+						}
+
+					}
+
+				}
+
+			}
+
+			// Do we have an animation clip with actual length?
+			if ( timestamps.max > timestamps.min ) {
+
+				returnObject.stacks[ nodeID ] = {
+					name: rawStacks[ nodeID ].attrName,
+					layers: layers,
+					length: timestamps.max - timestamps.min,
+					frames: ( timestamps.max - timestamps.min ) * 30
+				};
+
+			}
+
+		}
+
+		return returnObject;
+
+	}
+
+	/**
+	 * @param {Object} FBXTree
+	 * @param {{id: number, attrName: string, properties: Object<string, any>}} animationCurveNode
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+	 * @param {{skeleton: {bones: {FBX_ID: number}[]}}} sceneGraph
+	 */
+	function parseAnimationNode( FBXTree, animationCurveNode, connections, sceneGraph ) {
+
+		var rawModels = FBXTree.Objects.subNodes.Model;
+
+		var returnObject = {
+			/**
+			 * @type {number}
+			 */
+			id: animationCurveNode.id,
+
+			/**
+			 * @type {string}
+			 */
+			attr: animationCurveNode.attrName,
+
+			/**
+			 * @type {number}
+			 */
+			internalID: animationCurveNode.id,
+
+			/**
+			 * @type {boolean}
+			 */
+			attrX: false,
+
+			/**
+			 * @type {boolean}
+			 */
+			attrY: false,
+
+			/**
+			 * @type {boolean}
+			 */
+			attrZ: false,
+
+			/**
+			 * @type {number}
+			 */
+			containerBoneID: - 1,
+
+			/**
+			 * @type {number}
+			 */
+			containerID: - 1,
+
+			curves: {
+				x: null,
+				y: null,
+				z: null
+			},
+
+			/**
+			 * @type {number[]}
+			 */
+			preRotations: null
+		};
+
+		if ( returnObject.attr.match( /S|R|T/ ) ) {
+
+			for ( var attributeKey in animationCurveNode.properties ) {
+
+				if ( attributeKey.match( /X/ ) ) {
+
+					returnObject.attrX = true;
+
+				}
+				if ( attributeKey.match( /Y/ ) ) {
+
+					returnObject.attrY = true;
+
+				}
+				if ( attributeKey.match( /Z/ ) ) {
+
+					returnObject.attrZ = true;
+
+				}
+
+			}
+
+		} else {
+
 			return null;
 
 		}
 
+		var conns = connections.get( returnObject.id );
+		var containerIndices = conns.parents;
+
+		for ( var containerIndicesIndex = containerIndices.length - 1; containerIndicesIndex >= 0; -- containerIndicesIndex ) {
+
+			var boneID = findIndex( sceneGraph.skeleton.bones, function ( bone ) {
+
+				return bone.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
+
+			} );
+			if ( boneID > - 1 ) {
+
+				returnObject.containerBoneID = boneID;
+				returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
+				var model = rawModels[ returnObject.containerID.toString() ];
+				if ( 'PreRotation' in model.properties ) {
+
+					returnObject.preRotations = parseVector3( model.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
+
+				}
+				break;
+
+			}
+
+		}
+
+		return returnObject;
+
+	}
+
+	/**
+	 * @param {{id: number, subNodes: {KeyTime: {properties: {a: string}}, KeyValueFloat: {properties: {a: string}}, KeyAttrFlags: {properties: {a: string}}, KeyAttrDataFloat: {properties: {a: string}}}}} animationCurve
+	 */
+	function parseAnimationCurve( animationCurve ) {
+
+		return {
+			version: null,
+			id: animationCurve.id,
+			internalID: animationCurve.id,
+			times: parseFloatArray( animationCurve.subNodes.KeyTime.properties.a ).map( convertFBXTimeToSeconds ),
+			values: parseFloatArray( animationCurve.subNodes.KeyValueFloat.properties.a ),
+
+			attrFlag: parseIntArray( animationCurve.subNodes.KeyAttrFlags.properties.a ),
+			attrData: parseFloatArray( animationCurve.subNodes.KeyAttrDataFloat.properties.a )
+		};
+
+	}
+
+	/**
+	 * Sets the maxTimeStamp and minTimeStamp variables if it has timeStamps that are either larger or smaller
+	 * than the max or min respectively.
+	 * @param {{
+				T: {
+						id: number,
+						attr: string,
+						internalID: number,
+						attrX: boolean,
+						attrY: boolean,
+						attrZ: boolean,
+						containerBoneID: number,
+						containerID: number,
+						curves: {
+								x: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								y: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								z: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+						},
+				},
+				R: {
+						id: number,
+						attr: string,
+						internalID: number,
+						attrX: boolean,
+						attrY: boolean,
+						attrZ: boolean,
+						containerBoneID: number,
+						containerID: number,
+						curves: {
+								x: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								y: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								z: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+						},
+				},
+				S: {
+						id: number,
+						attr: string,
+						internalID: number,
+						attrX: boolean,
+						attrY: boolean,
+						attrZ: boolean,
+						containerBoneID: number,
+						containerID: number,
+						curves: {
+								x: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								y: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								z: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+						},
+				},
+		}} layer
+	 */
+	function getCurveNodeMaxMinTimeStamps( layer, timestamps ) {
+
+		if ( layer.R ) {
+
+			getCurveMaxMinTimeStamp( layer.R.curves, timestamps );
+
+		}
+		if ( layer.S ) {
+
+			getCurveMaxMinTimeStamp( layer.S.curves, timestamps );
+
+		}
+		if ( layer.T ) {
+
+			getCurveMaxMinTimeStamp( layer.T.curves, timestamps );
+
+		}
+
+	}
+
+	/**
+	 * Sets the maxTimeStamp and minTimeStamp if one of the curve's time stamps
+	 * exceeds the maximum or minimum.
+	 * @param {{
+				x: {
+						version: any,
+						id: number,
+						internalID: number,
+						times: number[],
+						values: number[],
+						attrFlag: number[],
+						attrData: number[],
+				},
+				y: {
+						version: any,
+						id: number,
+						internalID: number,
+						times: number[],
+						values: number[],
+						attrFlag: number[],
+						attrData: number[],
+				},
+				z: {
+						version: any,
+						id: number,
+						internalID: number,
+						times: number[],
+						values: number[],
+						attrFlag: number[],
+						attrData: number[],
+				}
+		}} curve
+	 */
+	function getCurveMaxMinTimeStamp( curve, timestamps ) {
+
+		if ( curve.x ) {
+
+			getCurveAxisMaxMinTimeStamps( curve.x, timestamps );
+
+		}
+		if ( curve.y ) {
+
+			getCurveAxisMaxMinTimeStamps( curve.y, timestamps );
+
+		}
+		if ( curve.z ) {
+
+			getCurveAxisMaxMinTimeStamps( curve.z, timestamps );
+
+		}
+
+	}
+
+	/**
+	 * Sets the maxTimeStamp and minTimeStamp if one of its timestamps exceeds the maximum or minimum.
+	 * @param {{times: number[]}} axis
+	 */
+	function getCurveAxisMaxMinTimeStamps( axis, timestamps ) {
+
+		timestamps.max = axis.times[ axis.times.length - 1 ] > timestamps.max ? axis.times[ axis.times.length - 1 ] : timestamps.max;
+		timestamps.min = axis.times[ 0 ] < timestamps.min ? axis.times[ 0 ] : timestamps.min;
+
+	}
+
+	/**
+	 * @param {{
+		curves: Map<number, {
+			T: {
+				id: number;
+				attr: string;
+				internalID: number;
+				attrX: boolean;
+				attrY: boolean;
+				attrZ: boolean;
+				containerBoneID: number;
+				containerID: number;
+				curves: {
+					x: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					y: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					z: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+				};
+			};
+			R: {
+				id: number;
+				attr: string;
+				internalID: number;
+				attrX: boolean;
+				attrY: boolean;
+				attrZ: boolean;
+				containerBoneID: number;
+				containerID: number;
+				curves: {
+					x: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					y: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					z: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+				};
+			};
+			S: {
+				id: number;
+				attr: string;
+				internalID: number;
+				attrX: boolean;
+				attrY: boolean;
+				attrZ: boolean;
+				containerBoneID: number;
+				containerID: number;
+				curves: {
+					x: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					y: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					z: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+				};
+			};
+		}>;
+		layers: Map<number, {
+			T: {
+				id: number;
+				attr: string;
+				internalID: number;
+				attrX: boolean;
+				attrY: boolean;
+				attrZ: boolean;
+				containerBoneID: number;
+				containerID: number;
+				curves: {
+					x: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					y: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					z: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+				};
+			};
+			R: {
+				id: number;
+				attr: string;
+				internalID: number;
+				attrX: boolean;
+				attrY: boolean;
+				attrZ: boolean;
+				containerBoneID: number;
+				containerID: number;
+				curves: {
+					x: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					y: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					z: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+				};
+			};
+			S: {
+				id: number;
+				attr: string;
+				internalID: number;
+				attrX: boolean;
+				attrY: boolean;
+				attrZ: boolean;
+				containerBoneID: number;
+				containerID: number;
+				curves: {
+					x: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					y: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+					z: {
+						version: any;
+						id: number;
+						internalID: number;
+						times: number[];
+						values: number[];
+						attrFlag: number[];
+						attrData: number[];
+					};
+				};
+			};
+		}[]>;
+		stacks: Map<number, {
+			name: string;
+			layers: {
+				T: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					};
+				};
+				R: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					};
+				};
+				S: {
+					id: number;
+					attr: string;
+					internalID: number;
+					attrX: boolean;
+					attrY: boolean;
+					attrZ: boolean;
+					containerBoneID: number;
+					containerID: number;
+					curves: {
+						x: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						y: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+						z: {
+							version: any;
+							id: number;
+							internalID: number;
+							times: number[];
+							values: number[];
+							attrFlag: number[];
+							attrData: number[];
+						};
+					};
+				};
+			}[][];
+			length: number;
+			frames: number;
+		}>;
+		length: number;
+		fps: number;
+		frames: number;
+	}} animations,
+	 * @param {{skeleton: { bones: THREE.Bone[]}}} group
+	 */
+	function addAnimations( group, animations ) {
+
+		if ( group.animations === undefined ) {
+
+			group.animations = [];
+
+		}
+
+		var stacks = animations.stacks;
+
+		for ( var key in stacks ) {
+
+			var stack = stacks[ key ];
+
+			/**
+			 * @type {{
+			 * name: string,
+			 * fps: number,
+			 * length: number,
+			 * hierarchy: Array.<{
+			 * 	parent: number,
+			 * 	name: string,
+			 * 	keys: Array.<{
+			 * 		time: number,
+			 * 		pos: Array.<number>,
+			 * 		rot: Array.<number>,
+			 * 		scl: Array.<number>
+			 * 	}>
+			 * }>
+			 * }}
+			 */
+			var animationData = {
+				name: stack.name,
+				fps: 30,
+				length: stack.length,
+				hierarchy: []
+			};
+
+			var bones = group.skeleton.bones;
+
+			for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
+
+				var bone = bones[ bonesIndex ];
+
+				var name = bone.name.replace( /.*:/, '' );
+				var parentIndex = findIndex( bones, function ( parentBone ) {
+
+					return bone.parent === parentBone;
+
+				} );
+				animationData.hierarchy.push( { parent: parentIndex, name: name, keys: [] } );
+
+			}
+
+			for ( var frame = 0; frame <= stack.frames; frame ++ ) {
+
+				for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
+
+					var bone = bones[ bonesIndex ];
+					var boneIndex = bonesIndex;
+
+					var animationNode = stack.layers[ 0 ][ boneIndex ];
+
+					for ( var hierarchyIndex = 0, hierarchyLength = animationData.hierarchy.length; hierarchyIndex < hierarchyLength; ++ hierarchyIndex ) {
+
+						var node = animationData.hierarchy[ hierarchyIndex ];
+
+						if ( node.name === bone.name ) {
+
+							node.keys.push( generateKey( animations, animationNode, bone, frame ) );
+
+						}
+
+					}
+
+				}
+
+			}
+
+			group.animations.push( THREE.AnimationClip.parseAnimation( animationData, bones ) );
+
+		}
+
+	}
+
+	var euler = new THREE.Euler();
+	var quaternion = new THREE.Quaternion();
+
+	/**
+	 * @param {THREE.Bone} bone
+	 */
+	function generateKey( animations, animationNode, bone, frame ) {
+
+		var key = {
+			time: frame / animations.fps,
+			pos: bone.position.toArray(),
+			rot: bone.quaternion.toArray(),
+			scl: bone.scale.toArray()
+		};
+
+		if ( animationNode === undefined ) return key;
+
+		try {
+
+			if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
+
+				key.pos = [ animationNode.T.curves.x.values[ frame ], animationNode.T.curves.y.values[ frame ], animationNode.T.curves.z.values[ frame ] ];
+
+			}
+
+			if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
+
+				var rotationX = animationNode.R.curves.x.values[ frame ];
+				var rotationY = animationNode.R.curves.y.values[ frame ];
+				var rotationZ = animationNode.R.curves.z.values[ frame ];
+
+				quaternion.setFromEuler( euler.set( rotationX, rotationY, rotationZ, 'ZYX' ) );
+				key.rot = quaternion.toArray();
+
+			}
+
+			if ( hasCurve( animationNode, 'S' ) && hasKeyOnFrame( animationNode.S, frame ) ) {
+
+				key.scl = [ animationNode.S.curves.x.values[ frame ], animationNode.S.curves.y.values[ frame ], animationNode.S.curves.z.values[ frame ] ];
+
+			}
+
+		} catch ( error ) {
+
+			// Curve is not fully plotted.
+			console.log( bone );
+			console.log( error );
+
+		}
+
+		return key;
+
+	}
+
+	var AXES = [ 'x', 'y', 'z' ];
+
+	function hasCurve( animationNode, attribute ) {
+
+		if ( animationNode === undefined ) {
+
+			return false;
+
+		}
+
+		var attributeNode = animationNode[ attribute ];
+
+		if ( ! attributeNode ) {
+
+			return false;
+
+		}
+
+		return AXES.every( function ( key ) {
+
+			return attributeNode.curves[ key ] !== null;
+
+		} );
+
+	}
+
+	function hasKeyOnFrame( attributeNode, frame ) {
+
+		return AXES.every( function ( key ) {
+
+			return isKeyExistOnFrame( attributeNode.curves[ key ], frame );
+
+		} );
+
+	}
+
+	function isKeyExistOnFrame( curve, frame ) {
+
+		return curve.values[ frame ] !== undefined;
+
+	}
+
+	/**
+	 * An instance of a Vertex with data for drawing vertices to the screen.
+	 * @constructor
+	 */
+	function Vertex() {
+
+		/**
+		 * Position of the vertex.
+		 * @type {THREE.Vector3}
+		 */
+		this.position = new THREE.Vector3();
+
+		/**
+		 * Normal of the vertex
+		 * @type {THREE.Vector3}
+		 */
+		this.normal = new THREE.Vector3();
+
+		/**
+		 * UV coordinates of the vertex.
+		 * @type {THREE.Vector2}
+		 */
+		this.uv = new THREE.Vector2();
+
+		/**
+		 * Color of the vertex
+		 * @type {THREE.Vector3}
+		 */
+		this.color = new THREE.Vector3();
+
+		/**
+		 * Indices of the bones vertex is influenced by.
+		 * @type {THREE.Vector4}
+		 */
+		this.skinIndices = new THREE.Vector4( 0, 0, 0, 0 );
+
+		/**
+		 * Weights that each bone influences the vertex.
+		 * @type {THREE.Vector4}
+		 */
+		this.skinWeights = new THREE.Vector4( 0, 0, 0, 0 );
+
+	}
+
+	Object.assign( Vertex.prototype, {
+
+		copy: function ( target ) {
+
+			var returnVar = target || new Vertex();
+
+			returnVar.position.copy( this.position );
+			returnVar.normal.copy( this.normal );
+			returnVar.uv.copy( this.uv );
+			returnVar.skinIndices.copy( this.skinIndices );
+			returnVar.skinWeights.copy( this.skinWeights );
+
+			return returnVar;
+
+		},
+
+		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer ) {
+
+			this.position.toArray( vertexBuffer, vertexBuffer.length );
+			this.normal.toArray( normalBuffer, normalBuffer.length );
+			this.uv.toArray( uvBuffer, uvBuffer.length );
+			this.color.toArray( colorBuffer, colorBuffer.length );
+			this.skinIndices.toArray( skinIndexBuffer, skinIndexBuffer.length );
+			this.skinWeights.toArray( skinWeightBuffer, skinWeightBuffer.length );
+
+		}
+
 	} );
 
-	function FBXParser() {}
+	/**
+	 * @constructor
+	 */
+	function Triangle() {
 
-	Object.assign( FBXParser.prototype, {
+		/**
+		 * @type {{position: THREE.Vector3, normal: THREE.Vector3, uv: THREE.Vector2, skinIndices: THREE.Vector4, skinWeights: THREE.Vector4}[]}
+		 */
+		this.vertices = [];
+
+	}
+
+	Object.assign( Triangle.prototype, {
+
+		copy: function ( target ) {
+
+			var returnVar = target || new Triangle();
+
+			for ( var i = 0; i < this.vertices.length; ++ i ) {
+
+				 this.vertices[ i ].copy( returnVar.vertices[ i ] );
+
+			}
+
+			return returnVar;
+
+		},
+
+		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer ) {
+
+			var vertices = this.vertices;
+
+			for ( var i = 0, l = vertices.length; i < l; ++ i ) {
+
+				vertices[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer );
+
+			}
+
+		}
+
+	} );
+
+	/**
+	 * @constructor
+	 */
+	function Face() {
+
+		/**
+		 * @type {{vertices: {position: THREE.Vector3, normal: THREE.Vector3, uv: THREE.Vector2, skinIndices: THREE.Vector4, skinWeights: THREE.Vector4}[]}[]}
+		 */
+		this.triangles = [];
+		this.materialIndex = 0;
+
+	}
+
+	Object.assign( Face.prototype, {
+
+		copy: function ( target ) {
+
+			var returnVar = target || new Face();
+
+			for ( var i = 0; i < this.triangles.length; ++ i ) {
+
+				this.triangles[ i ].copy( returnVar.triangles[ i ] );
+
+			}
+
+			returnVar.materialIndex = this.materialIndex;
+
+			return returnVar;
+
+		},
+
+		genTrianglesFromVertices: function ( vertexArray ) {
+
+			for ( var i = 2; i < vertexArray.length; ++ i ) {
+
+				var triangle = new Triangle();
+				triangle.vertices[ 0 ] = vertexArray[ 0 ];
+				triangle.vertices[ 1 ] = vertexArray[ i - 1 ];
+				triangle.vertices[ 2 ] = vertexArray[ i ];
+				this.triangles.push( triangle );
+
+			}
+
+		},
+
+		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer, materialIndexBuffer ) {
+
+			var triangles = this.triangles;
+			var materialIndex = this.materialIndex;
+
+			for ( var i = 0, l = triangles.length; i < l; ++ i ) {
+
+				triangles[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer );
+				append( materialIndexBuffer, [ materialIndex, materialIndex, materialIndex ] );
+
+			}
+
+		}
+
+	} );
+
+	/**
+	 * @constructor
+	 */
+	function Geometry() {
+
+		/**
+		 * @type {{triangles: {vertices: {position: THREE.Vector3, normal: THREE.Vector3, uv: THREE.Vector2, skinIndices: THREE.Vector4, skinWeights: THREE.Vector4}[]}[], materialIndex: number}[]}
+		 */
+		this.faces = [];
+
+		/**
+		 * @type {{}|THREE.Skeleton}
+		 */
+		this.skeleton = null;
+
+	}
+
+	Object.assign( Geometry.prototype, {
+
+		/**
+		 * @returns	{{vertexBuffer: number[], normalBuffer: number[], uvBuffer: number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
+		 */
+		flattenToBuffers: function () {
+
+			var vertexBuffer = [];
+			var normalBuffer = [];
+			var uvBuffer = [];
+			var colorBuffer = [];
+			var skinIndexBuffer = [];
+			var skinWeightBuffer = [];
+
+			var materialIndexBuffer = [];
+
+			var faces = this.faces;
+
+			for ( var i = 0, l = faces.length; i < l; ++ i ) {
+
+				faces[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer, materialIndexBuffer );
+
+			}
+
+			return {
+				vertexBuffer: vertexBuffer,
+				normalBuffer: normalBuffer,
+				uvBuffer: uvBuffer,
+				colorBuffer: colorBuffer,
+				skinIndexBuffer: skinIndexBuffer,
+				skinWeightBuffer: skinWeightBuffer,
+				materialIndexBuffer: materialIndexBuffer
+			};
+
+		}
+
+	} );
+
+	function TextParser() {}
+
+	Object.assign( TextParser.prototype, {
 
 		getPrevNode: function () {
 
@@ -903,12 +3557,13 @@
 		parse: function ( text ) {
 
 			this.currentIndent = 0;
-			this.allNodes = new FBXNodes();
+			this.allNodes = new FBXTree();
 			this.nodeStack = [];
 			this.currentProp = [];
 			this.currentPropName = '';
 
 			var split = text.split( "\n" );
+
 			for ( var line in split ) {
 
 				var l = split[ line ];
@@ -931,11 +3586,11 @@
 				if ( match ) {
 
 					var nodeName = match[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, "" );
-					var nodeAttrs = match[ 2 ].split( ',' ).map( function ( element ) {
+					var nodeAttrs = match[ 2 ].split( ',' );
 
-						return element.trim().replace( /^"/, '' ).replace( /"$/, '' );
-
-					} );
+					for ( var i = 0, l = nodeAttrs.length; i < l; i ++ ) {
+						nodeAttrs[ i ] = nodeAttrs[ i ].trim().replace( /^"/, '' ).replace( /"$/, '' );
+					}
 
 					this.parseNodeBegin( l, nodeName, nodeAttrs || null );
 					continue;
@@ -1078,8 +3733,8 @@
 
 			}
 
-			var name;
-			var type;
+			var name = '', type = '';
+
 			if ( attrs.length > 1 ) {
 
 				name = attrs[ 1 ].replace( /^(\w+)::/, '' );
@@ -1087,7 +3742,7 @@
 
 			}
 
-			return { id: id, name: name || '', type: type || '' };
+			return { id: id, name: name, type: type };
 
 		},
 
@@ -1121,7 +3776,7 @@
 
 				propName = 'connections';
 				propValue = [ from, to ];
-				propValue = propValue.concat( rest );
+				append( propValue, rest );
 
 				if ( currentNode.properties[ propName ] === undefined ) {
 
@@ -1186,11 +3841,11 @@
 			// P: "Lcl Scaling", "Lcl Scaling", "", "A",1,1,1
 			// into array like below
 			// ["Lcl Scaling", "Lcl Scaling", "", "A", "1,1,1" ]
-			var props = propValue.split( '",' ).map( function ( element ) {
+			var props = propValue.split( '",' );
 
-				return element.trim().replace( /^\"/, '' ).replace( /\s/, '_' );
-
-			} );
+			for ( var i = 0, l = props.length; i < l; i ++ ) {
+				props[ i ] = props[ i ].trim().replace( /^\"/, '' ).replace( /\s/, '_' );
+			}
 
 			var innerPropName = props[ 0 ];
 			var innerPropType1 = props[ 1 ];
@@ -1217,8 +3872,7 @@
 
 				case "ColorRGB":
 				case "Vector3D":
-					var tmp = innerPropValue.split( ',' );
-					innerPropValue = new THREE.Vector3( tmp[ 0 ], tmp[ 1 ], tmp[ 2 ] );
+					innerPropValue = parseFloatArray( innerPropValue );
 					break;
 
 			}
@@ -1253,1546 +3907,286 @@
 
 	} );
 
+	// Binary format specification:
+	//   https://code.blender.org/2013/08/fbx-binary-file-format-specification/
+	//   https://wiki.rogiken.org/specifications/file-format/fbx/ (more detail but Japanese)
+	function BinaryParser() {}
 
-	// generate skinIndices, skinWeights
-	//	  @skinIndices: per vertex data, this represents the bone indexes affects that vertex
-	//	  @skinWeights: per vertex data, this represents the Weight Values affects that vertex
-	//	  @matrices:	per `bones` data
-	function Weights() {
+	Object.assign( BinaryParser.prototype, {
 
-		this.skinIndices = [];
-		this.skinWeights = [];
+		/**
+		 * Parses binary data and builds FBXTree as much compatible as possible with the one built by TextParser.
+		 * @param {ArrayBuffer} buffer
+		 * @returns {THREE.FBXTree}
+		 */
+		parse: function ( buffer ) {
 
-		this.matrices	= [];
+			var reader = new BinaryReader( buffer );
+			reader.skip( 23 ); // skip magic 23 bytes
 
-	}
+			var version = reader.getUint32();
 
+			console.log( 'FBX binary version: ' + version );
 
-	Weights.prototype.parseCluster = function ( node, id, entry ) {
+			var allNodes = new FBXTree();
 
-		var _p = node.searchConnectionParent( id );
-		var _indices = parseArrayToInt( entry.subNodes.Indexes.properties.a );
-		var _weights = parseArrayToFloat( entry.subNodes.Weights.properties.a );
-		var _transform = parseArrayToMatrix( entry.subNodes.Transform.properties.a );
-		var _link = parseArrayToMatrix( entry.subNodes.TransformLink.properties.a );
+			while ( ! this.endOfContent( reader ) ) {
 
-		return {
+				var node = this.parseNode( reader, version );
+				if ( node !== null ) allNodes.add( node.name, node );
 
-			'parent': _p,
-			'id': parseInt( id ),
-			'indices': _indices,
-			'weights': _weights,
-			'transform': _transform,
-			'transformlink': _link,
-			'linkMode': entry.properties.Mode
+			}
 
-		};
+			return allNodes;
 
-	};
+		},
 
-	Weights.prototype.parse = function ( node, bones ) {
+		/**
+		 * Checks if reader has reached the end of content.
+		 * @param {BinaryReader} reader
+		 * @returns {boolean}
+		 */
+		endOfContent: function( reader ) {
 
-		this.skinIndices = [];
-		this.skinWeights = [];
+			// footer size: 160bytes + 16-byte alignment padding
+			// - 16bytes: magic
+			// - padding til 16-byte alignment (at least 1byte?)
+			//   (seems like some exporters embed fixed 15bytes?)
+			// - 4bytes: magic
+			// - 4bytes: version
+			// - 120bytes: zero
+			// - 16bytes: magic
+			if ( reader.size() % 16 === 0 ) {
 
-		this.matrices = [];
+				return ( ( reader.getOffset() + 160 + 16 ) & ~0xf ) >= reader.size();
 
-		var deformers = node.Objects.subNodes.Deformer;
+			} else {
 
-		var clusters = {};
-		for ( var id in deformers ) {
+				return reader.getOffset() + 160 + 15 >= reader.size();
 
-			if ( deformers[ id ].attrType === 'Cluster' ) {
+			}
 
-				if ( ! ( 'Indexes' in deformers[ id ].subNodes ) ) {
+		},
+
+		/**
+		 * Parses Node as much compatible as possible with the one parsed by TextParser
+		 * TODO: could be optimized more?
+		 * @param {BinaryReader} reader
+		 * @param {number} version
+		 * @returns {Object} - Returns an Object as node, or null if NULL-record.
+		 */
+		parseNode: function ( reader, version ) {
+
+			// The first three data sizes depends on version.
+			var endOffset = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+			var numProperties = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+			var propertyListLen = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+			var nameLen = reader.getUint8();
+			var name = reader.getString( nameLen );
+
+			// Regards this node as NULL-record if endOffset is zero
+			if ( endOffset === 0 ) return null;
+
+			var propertyList = [];
+
+			for ( var i = 0; i < numProperties; i ++ ) {
+
+				propertyList.push( this.parseProperty( reader ) );
+
+			}
+
+			// Regards the first three elements in propertyList as id, attrName, and attrType
+			var id = propertyList.length > 0 ? propertyList[ 0 ] : '';
+			var attrName = propertyList.length > 1 ? propertyList[ 1 ] : '';
+			var attrType = propertyList.length > 2 ? propertyList[ 2 ] : '';
+
+			var subNodes = {};
+			var properties = {};
+
+			var isSingleProperty = false;
+
+			// if this node represents just a single property
+			// like (name, 0) set or (name2, [0, 1, 2]) set of {name: 0, name2: [0, 1, 2]}
+			if ( numProperties === 1 && reader.getOffset() === endOffset ) {
+
+				isSingleProperty = true;
+
+			}
+
+			while ( endOffset > reader.getOffset() ) {
+
+				var node = this.parseNode( reader, version );
+
+				if ( node === null ) continue;
+
+				// special case: child node is single property
+				if ( node.singleProperty === true ) {
+
+					var value = node.propertyList[ 0 ];
+
+					if ( Array.isArray( value ) ) {
+
+						// node represents
+						//	Vertices: *3 {
+						//		a: 0.01, 0.02, 0.03
+						//	}
+						// of text format here.
+
+						node.properties[ node.name ] = node.propertyList[ 0 ];
+						subNodes[ node.name ] = node;
+
+						// Later phase expects single property array is in node.properties.a as String.
+						// TODO: optimize
+						node.properties.a = value.toString();
+
+					} else {
+
+						// node represents
+						// 	Version: 100
+						// of text format here.
+
+						properties[ node.name ] = value;
+
+					}
 
 					continue;
 
 				}
 
-				//clusters.push( this.parseCluster( node, id, deformers[id] ) );
-				var cluster = this.parseCluster( node, id, deformers[ id ] );
-				var boneId = node.searchConnectionChildren( cluster.id )[ 0 ];
-				clusters[ boneId ] = cluster;
+				// special case: connections
+				if ( name === 'Connections' && node.name === 'C' ) {
 
-			}
+					var array = [];
 
-		}
+					// node.propertyList would be like
+					// ["OO", 111264976, 144038752, "d|x"] (?, from, to, additional values)
+					for ( var i = 1, il = node.propertyList.length; i < il; i ++ ) {
 
-
-		// this clusters is per Bone data, thus we make this into per vertex data
-		var weights = [];
-		var hi = bones.hierarchy;
-		for ( var b = 0; b < hi.length; ++ b ) {
-
-			var bid = hi[ b ].internalId;
-			if ( clusters[ bid ] === undefined ) {
-
-				//console.log( bid );
-				this.matrices.push( new THREE.Matrix4() );
-				continue;
-
-			}
-
-			var clst = clusters[ bid ];
-			// store transform matrix per bones
-			this.matrices.push( clst.transform );
-			//this.matrices.push( clst.transformlink );
-			for ( var v = 0; v < clst.indices.length; ++ v ) {
-
-				if ( weights[ clst.indices[ v ] ] === undefined ) {
-
-					weights[ clst.indices[ v ] ] = {};
-					weights[ clst.indices[ v ] ].joint = [];
-					weights[ clst.indices[ v ] ].weight = [];
-
-				}
-
-				// indices
-				var affect = node.searchConnectionChildren( clst.id );
-
-				if ( affect.length > 1 ) {
-
-					console.warn( "FBXLoader: node " + clst.id + " have many weight kids: " + affect );
-
-				}
-				weights[ clst.indices[ v ] ].joint.push( bones.getBoneIdfromInternalId( node, affect[ 0 ] ) );
-
-				// weight value
-				weights[ clst.indices[ v ] ].weight.push( clst.weights[ v ] );
-
-			}
-
-		}
-
-		// normalize the skin weights
-		// TODO -  this might be a good place to choose greatest 4 weights
-		for ( var i = 0; i < weights.length; i ++ ) {
-
-			if ( weights[ i ] === undefined ) {
-
-				this.skinIndices.push( new THREE.Vector4( 0, 0, 0, 0 ) );
-				this.skinWeights.push( new THREE.Vector4( 0, 0, 0, 0 ) );
-				continue;
-
-			}
-
-			var indicies = new THREE.Vector4(
-				weights[ i ].joint[ 0 ] ? weights[ i ].joint[ 0 ] : 0,
-				weights[ i ].joint[ 1 ] ? weights[ i ].joint[ 1 ] : 0,
-				weights[ i ].joint[ 2 ] ? weights[ i ].joint[ 2 ] : 0,
-				weights[ i ].joint[ 3 ] ? weights[ i ].joint[ 3 ] : 0 );
-
-			var weight = new THREE.Vector4(
-				weights[ i ].weight[ 0 ] ? weights[ i ].weight[ 0 ] : 0,
-				weights[ i ].weight[ 1 ] ? weights[ i ].weight[ 1 ] : 0,
-				weights[ i ].weight[ 2 ] ? weights[ i ].weight[ 2 ] : 0,
-				weights[ i ].weight[ 3 ] ? weights[ i ].weight[ 3 ] : 0 );
-
-			this.skinIndices.push( indicies );
-			this.skinWeights.push( weight );
-
-		}
-
-		//console.log( this );
-		return this;
-
-	};
-
-	function Bones() {
-
-		// returns bones hierarchy tree.
-		//	  [
-		//		  {
-		//			  "parent": id,
-		//			  "name": name,
-		//			  "pos": pos,
-		//			  "rotq": quat
-		//		  },
-		//		  ...
-		//		  {},
-		//		  ...
-		//	  ]
-		//
-		/* sample response
-
-		   "bones" : [
-			{"parent":-1, "name":"Fbx01",			"pos":[-0.002,	 98.739,   1.6e-05],	 "rotq":[0, 0, 0, 1]},
-			{"parent":0,  "name":"Fbx01_Pelvis",	 "pos":[0.00015963, 0,		7.33107e-08], "rotq":[0, 0, 0, 1]},
-			{"parent":1,  "name":"Fbx01_Spine",	  "pos":[6.577e-06,  10.216,   0.0106811],   "rotq":[0, 0, 0, 1]},
-			{"parent":2,  "name":"Fbx01_R_Thigh",	"pos":[14.6537,	-10.216,  -0.00918758], "rotq":[0, 0, 0, 1]},
-			{"parent":3,  "name":"Fbx01_R_Calf",	 "pos":[-3.70047,	 -42.9681,	 -7.78158],	 "rotq":[0, 0, 0, 1]},
-			{"parent":4,  "name":"Fbx01_R_Foot",	 "pos":[-2.0696,	  -46.0488,	 9.42052],	  "rotq":[0, 0, 0, 1]},
-			{"parent":5,  "name":"Fbx01_R_Toe0",	 "pos":[-0.0234785,   -9.46233,	 -15.3187],	 "rotq":[0, 0, 0, 1]},
-			{"parent":2,  "name":"Fbx01_L_Thigh",	"pos":[-14.6537,	 -10.216,	  -0.00918314],  "rotq":[0, 0, 0, 1]},
-			{"parent":7,  "name":"Fbx01_L_Calf",	 "pos":[3.70037,	  -42.968,	  -7.78155],	 "rotq":[0, 0, 0, 1]},
-			{"parent":8,  "name":"Fbx01_L_Foot",	 "pos":[2.06954,	  -46.0488,	 9.42052],	  "rotq":[0, 0, 0, 1]},
-			{"parent":9,  "name":"Fbx01_L_Toe0",	 "pos":[0.0234566,	-9.46235,	 -15.3187],	 "rotq":[0, 0, 0, 1]},
-			{"parent":2,  "name":"Fbx01_Spine1",	 "pos":[-2.97523e-05, 11.5892,	  -9.81027e-05], "rotq":[0, 0, 0, 1]},
-			{"parent":11, "name":"Fbx01_Spine2",	 "pos":[-2.91292e-05, 11.4685,	  8.27126e-05],  "rotq":[0, 0, 0, 1]},
-			{"parent":12, "name":"Fbx01_Spine3",	 "pos":[-4.48857e-05, 11.5783,	  8.35108e-05],  "rotq":[0, 0, 0, 1]},
-			{"parent":13, "name":"Fbx01_Neck",	   "pos":[1.22987e-05,  11.5582,	  -0.0044775],   "rotq":[0, 0, 0, 1]},
-			{"parent":14, "name":"Fbx01_Head",	   "pos":[-3.50709e-05, 6.62915,	  -0.00523254],  "rotq":[0, 0, 0, 1]},
-			{"parent":15, "name":"Fbx01_R_Eye",	  "pos":[3.31681,	  12.739,	   -10.5267],	 "rotq":[0, 0, 0, 1]},
-			{"parent":15, "name":"Fbx01_L_Eye",	  "pos":[-3.32038,	 12.7391,	  -10.5267],	 "rotq":[0, 0, 0, 1]},
-			{"parent":15, "name":"Jaw",			  "pos":[-0.0017738,   7.43481,	  -4.08114],	 "rotq":[0, 0, 0, 1]},
-			{"parent":14, "name":"Fbx01_R_Clavicle", "pos":[3.10919,	  2.46577,	  -0.0115284],   "rotq":[0, 0, 0, 1]},
-			{"parent":19, "name":"Fbx01_R_UpperArm", "pos":[16.014,	   4.57764e-05,  3.10405],	  "rotq":[0, 0, 0, 1]},
-			{"parent":20, "name":"Fbx01_R_Forearm",  "pos":[22.7068,	  -1.66322,	 -2.13803],	 "rotq":[0, 0, 0, 1]},
-			{"parent":21, "name":"Fbx01_R_Hand",	 "pos":[25.5881,	  -0.80249,	 -6.37307],	 "rotq":[0, 0, 0, 1]},
-			...
-			{"parent":27, "name":"Fbx01_R_Finger32", "pos":[2.15572,	  -0.548737,	-0.539604],	"rotq":[0, 0, 0, 1]},
-			{"parent":22, "name":"Fbx01_R_Finger2",  "pos":[9.79318,	  0.132553,	 -2.97845],	 "rotq":[0, 0, 0, 1]},
-			{"parent":29, "name":"Fbx01_R_Finger21", "pos":[2.74037,	  0.0483093,	-0.650531],	"rotq":[0, 0, 0, 1]},
-			{"parent":55, "name":"Fbx01_L_Finger02", "pos":[-1.65308,	 -1.43208,	 -1.82885],	 "rotq":[0, 0, 0, 1]}
-			]
-		*/
-		this.hierarchy = [];
-
-	}
-
-	Bones.prototype.parseHierarchy = function ( node ) {
-
-		var objects = node.Objects;
-		var models = objects.subNodes.Model;
-
-		var bones = [];
-		for ( var id in models ) {
-
-			if ( models[ id ].attrType === undefined ) {
-
-				continue;
-
-			}
-			bones.push( models[ id ] );
-
-		}
-
-		this.hierarchy = [];
-		for ( var i = 0; i < bones.length; ++ i ) {
-
-			var bone = bones[ i ];
-
-			var p = node.searchConnectionParent( bone.id )[ 0 ];
-			var t = [ 0.0, 0.0, 0.0 ];
-			var r = [ 0.0, 0.0, 0.0, 1.0 ];
-			var s = [ 1.0, 1.0, 1.0 ];
-
-			if ( 'Lcl_Translation' in bone.properties ) {
-
-				t = parseArrayToFloat( bone.properties.Lcl_Translation.value );
-
-			}
-
-			if ( 'Lcl_Rotation' in bone.properties ) {
-
-				r = parseArrayToRadians( bone.properties.Lcl_Rotation.value );
-				var q = new THREE.Quaternion();
-				q.setFromEuler( new THREE.Euler( r[ 0 ], r[ 1 ], r[ 2 ], 'ZYX' ) );
-				r = [ q.x, q.y, q.z, q.w ];
-
-			}
-
-			if ( 'Lcl_Scaling' in bone.properties ) {
-
-				s = parseArrayToFloat( bone.properties.Lcl_Scaling.value );
-
-			}
-
-			// replace unsafe character
-			var name = bone.attrName;
-			name = name.replace( /:/, '' );
-			name = name.replace( /_/, '' );
-			name = name.replace( /-/, '' );
-			this.hierarchy.push( { "parent": p, "name": name, "pos": t, "rotq": r, "scl": s, "internalId": bone.id } );
-
-		}
-
-		this.reindexParentId();
-
-		this.restoreBindPose( node );
-
-		return this;
-
-	};
-
-	Bones.prototype.reindexParentId = function () {
-
-		for ( var h = 0; h < this.hierarchy.length; h ++ ) {
-
-			for ( var ii = 0; ii < this.hierarchy.length; ++ ii ) {
-
-				if ( this.hierarchy[ h ].parent == this.hierarchy[ ii ].internalId ) {
-
-					this.hierarchy[ h ].parent = ii;
-					break;
-
-				}
-
-			}
-
-		}
-
-	};
-
-	Bones.prototype.restoreBindPose = function ( node ) {
-
-		var bindPoseNode = node.Objects.subNodes.Pose;
-		if ( bindPoseNode === undefined ) {
-
-			return;
-
-		}
-
-		for ( var key in bindPoseNode ) {
-
-			if ( bindPoseNode[ key ].attrType === 'BindPose' ) {
-
-				bindPoseNode = bindPoseNode[ key ];
-				break;
-
-			}
-
-		}
-
-		var poseNode = bindPoseNode.subNodes.PoseNode;
-		var localMatrices = {}; // store local matrices, modified later( initialy world space )
-		var worldMatrices = {}; // store world matrices
-
-		for ( var i = 0; i < poseNode.length; ++ i ) {
-
-			var rawMatLcl = parseArrayToMatrix( poseNode[ i ].subNodes.Matrix.properties.a );
-			var rawMatWrd = parseArrayToMatrix( poseNode[ i ].subNodes.Matrix.properties.a );
-
-			localMatrices[ poseNode[ i ].id ] = rawMatLcl;
-			worldMatrices[ poseNode[ i ].id ] = rawMatWrd;
-
-		}
-
-		for ( var h = 0; h < this.hierarchy.length; ++ h ) {
-
-			var bone = this.hierarchy[ h ];
-			var inId = bone.internalId;
-
-			if ( worldMatrices[ inId ] === undefined ) {
-
-				// has no bind pose node, possibly be mesh
-				// console.log( bone );
-				continue;
-
-			}
-
-			var t = new THREE.Vector3( 0, 0, 0 );
-			var r = new THREE.Quaternion();
-			var s = new THREE.Vector3( 1, 1, 1 );
-
-			var parentId;
-			var parentNodes = node.searchConnectionParent( inId );
-			for ( var pn = 0; pn < parentNodes.length; ++ pn ) {
-
-				if ( this.isBoneNode( parentNodes[ pn ] ) ) {
-
-					parentId = parentNodes[ pn ];
-					break;
-
-				}
-
-			}
-
-			if ( parentId !== undefined && localMatrices[ parentId ] !== undefined ) {
-
-				// convert world space matrix into local space
-				var inv = new THREE.Matrix4();
-				inv.getInverse( worldMatrices[ parentId ] );
-				inv.multiply( localMatrices[ inId ] );
-				localMatrices[ inId ] = inv;
-
-			} else {
-				//console.log( bone );
-			}
-
-			localMatrices[ inId ].decompose( t, r, s );
-			bone.pos = [ t.x, t.y, t.z ];
-			bone.rotq = [ r.x, r.y, r.z, r.w ];
-			bone.scl = [ s.x, s.y, s.z ];
-
-		}
-
-	};
-
-	Bones.prototype.searchRealId = function ( internalId ) {
-
-		for ( var h = 0; h < this.hierarchy.length; h ++ ) {
-
-			if ( internalId == this.hierarchy[ h ].internalId ) {
-
-				return h;
-
-			}
-
-		}
-
-		// console.warn( 'FBXLoader: notfound internalId in bones: ' + internalId);
-		return - 1;
-
-	};
-
-	Bones.prototype.getByInternalId = function ( internalId ) {
-
-		for ( var h = 0; h < this.hierarchy.length; h ++ ) {
-
-			if ( internalId == this.hierarchy[ h ].internalId ) {
-
-				return this.hierarchy[ h ];
-
-			}
-
-		}
-
-		return null;
-
-	};
-
-	Bones.prototype.isBoneNode = function ( id ) {
-
-		for ( var i = 0; i < this.hierarchy.length; ++ i ) {
-
-			if ( id === this.hierarchy[ i ].internalId ) {
-
-				return true;
-
-			}
-
-		}
-		return false;
-
-	};
-
-	Bones.prototype.getBoneIdfromInternalId = function ( node, id ) {
-
-		if ( node.__cache_get_boneid_from_internalid === undefined ) {
-
-			node.__cache_get_boneid_from_internalid = [];
-
-		}
-
-		if ( node.__cache_get_boneid_from_internalid[ id ] !== undefined ) {
-
-			return node.__cache_get_boneid_from_internalid[ id ];
-
-		}
-
-		for ( var i = 0; i < this.hierarchy.length; ++ i ) {
-
-			if ( this.hierarchy[ i ].internalId == id ) {
-
-				node.__cache_get_boneid_from_internalid[ id ] = i;
-				return i;
-
-			}
-
-		}
-
-		// console.warn( 'FBXLoader: bone internalId(' + id + ') not found in bone hierarchy' );
-		return - 1;
-
-	};
-
-	function Geometries() {
-
-		this.geometries = {};
-
-	}
-
-	Object.assign( Geometries.prototype, {
-
-		parse: function ( FBXNodes, hierarchy ) {
-
-			if ( ! ( 'Geometry' in FBXNodes.Objects.subNodes ) ) {
-
-				return this;
-
-			}
-
-			for ( var geo in FBXNodes.Objects.subNodes.Geometry ) {
-
-				if ( FBXNodes.Objects.subNodes.Geometry[ geo ].attrType === 'Mesh' ) {
-
-					this.geometries[ geo ] = ( new Geometry() ).parse( FBXNodes.Objects.subNodes.Geometry[ geo ] );
-					this.geometries[ geo ].addBones( hierarchy.hierarchy );
-
-				}
-
-			}
-
-			return this;
-
-		}
-
-	} );
-
-
-	function Geometry() {
-
-		this.node = null;
-		this.name = null;
-		this.id = null;
-
-		this.vertices = [];
-		this.indices = [];
-		this.normals = [];
-		this.uvs = [];
-
-		this.bones = [];
-
-	}
-
-	Geometry.prototype.parse = function ( geoNode ) {
-
-		this.node = geoNode;
-		this.name = geoNode.attrName;
-		this.id = geoNode.id;
-
-		this.vertices = this.getVertices();
-
-		if ( this.vertices === undefined ) {
-
-			console.log( 'FBXLoader: Geometry.parse(): pass' + this.node.id );
-			return;
-
-		}
-
-		this.indices = this.getPolygonVertexIndices();
-		this.uvs = ( new UV() ).parse( this.node, this );
-		this.normals = ( new Normal() ).parse( this.node, this );
-		this.materialIndices = ( new MaterialIndex() ).parse( this.node );
-
-		if ( this.getPolygonTopologyMax() > 3 ) {
-
-			var indexInfo = this.convertPolyIndicesToTri(
-								this.indices,
-								this.materialIndices,
-								this.getPolygonTopologyArray() );
-			this.indices = indexInfo.res;
-			this.materialIndices = indexInfo.materialIndices;
-			this.polyIndices = indexInfo.polyIndices;
-
-		}
-
-		return this;
-
-	};
-
-
-	Geometry.prototype.getVertices = function () {
-
-		if ( this.node.__cache_vertices ) {
-
-			return this.node.__cache_vertices;
-
-		}
-
-		if ( this.node.subNodes.Vertices === undefined ) {
-
-			console.warn( 'this.node: ' + this.node.attrName + "(" + this.node.id + ") does not have Vertices" );
-			this.node.__cache_vertices = undefined;
-			return null;
-
-		}
-
-		var rawTextVert	= this.node.subNodes.Vertices.properties.a;
-		var vertices = rawTextVert.split( ',' ).map( function ( element ) {
-
-			return parseFloat( element );
-
-		} );
-
-		this.node.__cache_vertices = vertices;
-		return this.node.__cache_vertices;
-
-	};
-
-	Geometry.prototype.getPolygonVertexIndices = function () {
-
-		if ( this.node.__cache_indices && this.node.__cache_poly_topology_max ) {
-
-			return this.node.__cache_indices;
-
-		}
-
-		if ( this.node.subNodes === undefined ) {
-
-			console.error( 'this.node.subNodes undefined' );
-			console.log( this.node );
-			return;
-
-		}
-
-		if ( this.node.subNodes.PolygonVertexIndex === undefined ) {
-
-			console.warn( 'this.node: ' + this.node.attrName + "(" + this.node.id + ") does not have PolygonVertexIndex " );
-			this.node.__cache_indices = undefined;
-			return;
-
-		}
-
-		var rawTextIndices = this.node.subNodes.PolygonVertexIndex.properties.a;
-		var indices = rawTextIndices.split( ',' );
-
-		var currentTopo = 1;
-		var topologyN = null;
-		var topologyArr = [];
-
-		// The indices that make up the polygon are in order and a negative index
-		// means that it’s the last index of the polygon. That index needs
-		// to be made positive and then you have to subtract 1 from it!
-		for ( var i = 0; i < indices.length; ++ i ) {
-
-			var tmpI = parseInt( indices[ i ] );
-			// found n
-			if ( tmpI < 0 ) {
-
-				if ( currentTopo > topologyN ) {
-
-					topologyN = currentTopo;
-
-				}
-
-				indices[ i ] = tmpI ^ - 1;
-				topologyArr.push( currentTopo );
-				currentTopo = 1;
-
-			} else {
-
-				indices[ i ] = tmpI;
-				currentTopo ++;
-
-			}
-
-		}
-
-		if ( topologyN === null ) {
-
-			console.warn( "FBXLoader: topology N not found: " + this.node.attrName );
-			console.warn( this.node );
-			topologyN = 3;
-
-		}
-
-		this.node.__cache_poly_topology_max = topologyN;
-		this.node.__cache_poly_topology_arr = topologyArr;
-		this.node.__cache_indices = indices;
-
-		return this.node.__cache_indices;
-
-	};
-
-	Geometry.prototype.getPolygonTopologyMax = function () {
-
-		if ( this.node.__cache_indices && this.node.__cache_poly_topology_max ) {
-
-			return this.node.__cache_poly_topology_max;
-
-		}
-
-		this.getPolygonVertexIndices( this.node );
-		return this.node.__cache_poly_topology_max;
-
-	};
-
-	Geometry.prototype.getPolygonTopologyArray = function () {
-
-		if ( this.node.__cache_indices && this.node.__cache_poly_topology_max ) {
-
-			return this.node.__cache_poly_topology_arr;
-
-		}
-
-		this.getPolygonVertexIndices( this.node );
-		return this.node.__cache_poly_topology_arr;
-
-	};
-
-	// a - d
-	// |   |
-	// b - c
-	//
-	// [( a, b, c, d ) ...........
-	// [( a, b, c ), (a, c, d )....
-
-	// Also keep track of original poly index.
-	Geometry.prototype.convertPolyIndicesToTri = function ( indices, materialIndices, strides ) {
-
-		var res = [];
-
-		var i = 0;
-		var currentPolyNum = 0;
-		var currentStride = 0;
-		var polyIndices = [];
-
-		while ( i < indices.length ) {
-
-			currentStride = strides[ currentPolyNum ];
-
-			// CAUTIN: NG over 6gon
-			for ( var j = 0; j <= ( currentStride - 3 ); j ++ ) {
-
-				res.push( indices[ i ] );
-				res.push( indices[ i + ( currentStride - 2 - j ) ] );
-				res.push( indices[ i + ( currentStride - 1 - j ) ] );
-
-				polyIndices.push( currentPolyNum );
-
-			}
-
-			currentPolyNum ++;
-			i += currentStride;
-
-		}
-
-		var newMaterialIndices = [ materialIndices[ 0 ] ];
-
-		if ( materialIndices.length > 1 ) {
-
-			for ( var i = 0; i < polyIndices.length; ++ i ) {
-
-				newMaterialIndices[ i ] = materialIndices[ polyIndices[ i ] ];
-
-			}
-
-		}
-
-		return {
-			res: res,
-			materialIndices: newMaterialIndices,
-			polyIndices: polyIndices };
-
-	};
-
-	Geometry.prototype.addBones = function ( bones ) {
-
-		this.bones = bones;
-
-	};
-
-
-	function UV() {
-
-		this.uv = null;
-		this.map = null;
-		this.ref = null;
-		this.node = null;
-		this.index = null;
-
-	}
-
-	UV.prototype.getUV = function ( node ) {
-
-		if ( this.node && this.uv && this.map && this.ref ) {
-
-			return this.uv;
-
-		} else {
-
-			return this._parseText( node );
-
-		}
-
-	};
-
-	UV.prototype.getMap = function ( node ) {
-
-		if ( this.node && this.uv && this.map && this.ref ) {
-
-			return this.map;
-
-		} else {
-
-			this._parseText( node );
-			return this.map;
-
-		}
-
-	};
-
-	UV.prototype.getRef = function ( node ) {
-
-		if ( this.node && this.uv && this.map && this.ref ) {
-
-			return this.ref;
-
-		} else {
-
-			this._parseText( node );
-			return this.ref;
-
-		}
-
-	};
-
-	UV.prototype.getIndex = function ( node ) {
-
-		if ( this.node && this.uv && this.map && this.ref ) {
-
-			return this.index;
-
-		} else {
-
-			this._parseText( node );
-			return this.index;
-
-		}
-
-	};
-
-	UV.prototype.getNode = function ( topnode ) {
-
-		if ( this.node !== null ) {
-
-			return this.node;
-
-		}
-
-		this.node = topnode.subNodes.LayerElementUV;
-		return this.node;
-
-	};
-
-	UV.prototype._parseText = function ( node ) {
-
-		var uvNode = this.getNode( node )[ 0 ];
-		if ( uvNode === undefined ) {
-
-			// console.log( node.attrName + "(" + node.id + ")" + " has no LayerElementUV." );
-			return [];
-
-		}
-
-		var count = 0;
-		for ( var n in uvNode ) {
-
-			if ( n.match( /^\d+$/ ) ) {
-
-				count ++;
-
-			}
-
-		}
-
-		if ( count > 0 ) {
-
-			console.warn( 'multi uv not supported' );
-			uvNode = uvNode[ n ];
-
-		}
-
-		var uvIndex = uvNode.subNodes.UVIndex.properties.a;
-		var uvs = uvNode.subNodes.UV.properties.a;
-		var uvMap = uvNode.properties.MappingInformationType;
-		var uvRef = uvNode.properties.ReferenceInformationType;
-
-
-		this.uv	= parseArrayToFloat( uvs );
-		this.index = parseArrayToInt( uvIndex );
-
-		this.map = uvMap; // TODO: normalize notation shaking... FOR BLENDER
-		this.ref = uvRef;
-
-		return this.uv;
-
-	};
-
-	UV.prototype.parse = function ( node, geo ) {
-
-		if ( ! ( 'LayerElementUV' in node.subNodes ) ) {
-
-			return;
-
-		}
-
-		this.uvNode = this.getNode( node );
-
-		this.uv = this.getUV( node );
-		var mappingType = this.getMap( node );
-		var refType = this.getRef( node );
-		var indices = this.getIndex( node );
-
-		var strides = geo.getPolygonTopologyArray();
-
-		// it means that there is a normal for every vertex of every polygon of the model.
-		// For example, if the models has 8 vertices that make up four quads, then there
-		// will be 16 normals (one normal * 4 polygons * 4 vertices of the polygon). Note
-		// that generally a game engine needs the vertices to have only one normal defined.
-		// So, if you find a vertex has more tha one normal, you can either ignore the normals
-		// you find after the first, or calculate the mean from all of them (normal smoothing).
-		//if ( mappingType == "ByPolygonVertex" ){
-		switch ( mappingType ) {
-
-			case "ByPolygonVertex":
-
-				switch ( refType ) {
-
-					// Direct
-					// The this.uv are in order.
-					case "Direct":
-						this.uv = this.parseUV_ByPolygonVertex_Direct( this.uv, indices, strides, 2 );
-						break;
-
-					// IndexToDirect
-					// The order of the this.uv is given by the uvsIndex property.
-					case "IndexToDirect":
-						this.uv = this.parseUV_ByPolygonVertex_IndexToDirect( this.uv, indices );
-						break;
-
-				}
-
-				// convert from by polygon(vert) data into by verts data
-				this.uv = mapByPolygonVertexToByVertex( this.uv, geo.getPolygonVertexIndices( node ), 2 );
-				break;
-
-			case "ByPolygon":
-
-				switch ( refType ) {
-
-					// Direct
-					// The this.uv are in order.
-					case "Direct":
-						this.uv = this.parseUV_ByPolygon_Direct();
-						break;
-
-					// IndexToDirect
-					// The order of the this.uv is given by the uvsIndex property.
-					case "IndexToDirect":
-						this.uv = this.parseUV_ByPolygon_IndexToDirect();
-						break;
-
-				}
-				break;
-
-		}
-
-		return this.uv;
-
-	};
-
-	UV.prototype.parseUV_ByPolygonVertex_Direct = function ( node, indices, strides, itemSize ) {
-
-		return parse_Data_ByPolygonVertex_Direct( node, indices, strides, itemSize );
-
-	};
-
-	UV.prototype.parseUV_ByPolygonVertex_IndexToDirect = function ( node, indices ) {
-
-		return parse_Data_ByPolygonVertex_IndexToDirect( node, indices, 2 );
-
-	};
-
-	UV.prototype.parseUV_ByPolygon_Direct = function ( node ) {
-
-		console.warn( "not implemented" );
-		return node;
-
-	};
-
-	UV.prototype.parseUV_ByPolygon_IndexToDirect = function ( node ) {
-
-		console.warn( "not implemented" );
-		return node;
-
-	};
-
-	UV.prototype.parseUV_ByVertex_Direct = function ( node ) {
-
-		console.warn( "not implemented" );
-		return node;
-
-	};
-
-
-	function Normal() {
-
-		this.normal = null;
-		this.map	= null;
-		this.ref	= null;
-		this.node = null;
-		this.index = null;
-
-	}
-
-	Normal.prototype.getNormal = function ( node ) {
-
-		if ( this.node && this.normal && this.map && this.ref ) {
-
-			return this.normal;
-
-		} else {
-
-			this._parseText( node );
-			return this.normal;
-
-		}
-
-	};
-
-	// mappingType: possible variant
-	//	  ByPolygon
-	//	  ByPolygonVertex
-	//	  ByVertex (or also ByVertice, as the Blender exporter writes)
-	//	  ByEdge
-	//	  AllSame
-	//	var mappingType = node.properties.MappingInformationType;
-	Normal.prototype.getMap = function ( node ) {
-
-		if ( this.node && this.normal && this.map && this.ref ) {
-
-			return this.map;
-
-		} else {
-
-			this._parseText( node );
-			return this.map;
-
-		}
-
-	};
-
-	// refType: possible variants
-	//	  Direct
-	//	  IndexToDirect (or Index for older versions)
-	// var refType	 = node.properties.ReferenceInformationType;
-	Normal.prototype.getRef = function ( node ) {
-
-		if ( this.node && this.normal && this.map && this.ref ) {
-
-			return this.ref;
-
-		} else {
-
-			this._parseText( node );
-			return this.ref;
-
-		}
-
-	};
-
-	Normal.prototype.getNode = function ( node ) {
-
-		if ( this.node ) {
-
-			return this.node;
-
-		}
-
-		this.node = node.subNodes.LayerElementNormal;
-		return this.node;
-
-	};
-
-	Normal.prototype._parseText = function ( node ) {
-
-		var normalNode = this.getNode( node )[ 0 ];
-
-		if ( normalNode === undefined ) {
-
-			console.warn( 'node: ' + node.attrName + "(" + node.id + ") does not have LayerElementNormal" );
-			return;
-
-		}
-
-		var mappingType = normalNode.properties.MappingInformationType;
-		var refType = normalNode.properties.ReferenceInformationType;
-
-		var rawTextNormals = normalNode.subNodes.Normals.properties.a;
-		this.normal = parseArrayToFloat( rawTextNormals );
-
-		// TODO: normalize notation shaking, vertex / vertice... blender...
-		this.map	= mappingType;
-		this.ref	= refType;
-
-	};
-
-	Normal.prototype.parse = function ( topnode, geo ) {
-
-		var normals = this.getNormal( topnode );
-		//var normalNode = this.getNode( topnode );
-		var mappingType = this.getMap( topnode );
-		var refType = this.getRef( topnode );
-
-		var indices = geo.getPolygonVertexIndices( topnode );
-		var strides = geo.getPolygonTopologyArray( topnode );
-
-		// it means that there is a normal for every vertex of every polygon of the model.
-		// For example, if the models has 8 vertices that make up four quads, then there
-		// will be 16 normals (one normal * 4 polygons * 4 vertices of the polygon). Note
-		// that generally a game engine needs the vertices to have only one normal defined.
-		// So, if you find a vertex has more tha one normal, you can either ignore the normals
-		// you find after the first, or calculate the mean from all of them (normal smoothing).
-		//if ( mappingType == "ByPolygonVertex" ){
-		switch ( mappingType ) {
-
-			case "ByPolygonVertex":
-
-				switch ( refType ) {
-
-					// Direct
-					// The normals are in order.
-					case "Direct":
-						normals = this.parseNormal_ByPolygonVertex_Direct( normals, indices, strides, 3 );
-						break;
-
-					// IndexToDirect
-					// The order of the normals is given by the NormalsIndex property.
-					case "IndexToDirect":
-						normals = this.parseNormal_ByPolygonVertex_IndexToDirect();
-						break;
-
-				}
-				break;
-
-			case "ByPolygon":
-
-				switch ( refType ) {
-
-					// Direct
-					// The normals are in order.
-					case "Direct":
-						normals = this.parseNormal_ByPolygon_Direct();
-						break;
-
-					// IndexToDirect
-					// The order of the normals is given by the NormalsIndex property.
-					case "IndexToDirect":
-						normals = this.parseNormal_ByPolygon_IndexToDirect();
-						break;
-
-				}
-				break;
-
-		}
-
-		return normals;
-
-	};
-
-	Normal.prototype.parseNormal_ByPolygonVertex_Direct = function ( node, indices, strides, itemSize ) {
-
-		return parse_Data_ByPolygonVertex_Direct( node, indices, strides, itemSize );
-
-	};
-
-	Normal.prototype.parseNormal_ByPolygonVertex_IndexToDirect = function ( node ) {
-
-		console.warn( "not implemented" );
-		return node;
-
-	};
-
-	Normal.prototype.parseNormal_ByPolygon_Direct = function ( node ) {
-
-		console.warn( "not implemented" );
-		return node;
-
-	};
-
-	Normal.prototype.parseNormal_ByPolygon_IndexToDirect = function ( node ) {
-
-		console.warn( "not implemented" );
-		return node;
-
-	};
-
-	Normal.prototype.parseNormal_ByVertex_Direct = function ( node ) {
-
-		console.warn( "not implemented" );
-		return node;
-
-	};
-
-	function MaterialIndex() {
-
-		this.indexBuffer = [];
-
-	}
-
-	Object.assign( MaterialIndex.prototype, {
-
-		parse: function ( node ) {
-
-			if ( ! ( 'LayerElementMaterial' in node.subNodes ) ) {
-
-				return;
-
-			}
-
-			var indexNode = node.subNodes.LayerElementMaterial[ 0 ];
-			var mappingType = indexNode.properties.MappingInformationType;
-			var refType = indexNode.properties.ReferenceInformationType;
-			var indices = parseArrayToInt( indexNode.subNodes.Materials.properties.a );
-
-			// it means that there is a normal for every vertex of every polygon of the model.
-			// For example, if the models has 8 vertices that make up four quads, then there
-			// will be 16 normals (one normal * 4 polygons * 4 vertices of the polygon). Note
-			// that generally a game engine needs the vertices to have only one normal defined.
-			// So, if you find a vertex has more tha one normal, you can either ignore the normals
-			// you find after the first, or calculate the mean from all of them (normal smoothing).
-			//if ( mappingType == "ByPolygonVertex" ){
-			switch ( mappingType ) {
-
-
-				case "ByPolygon":
-
-					switch ( refType ) {
-
-						// Direct
-						// The material indices are in order.
-						case "IndexToDirect":
-							this.indexBuffer = this.parse_ByPolygon_IndexToDirect( indices );
-							break;
-
-						default:
-							this.indexBuffer = [ 0 ];
-							break;
+						array[ i - 1 ] = node.propertyList[ i ];
 
 					}
-					break;
 
-				default:
+					if ( properties.connections === undefined ) {
 
-					this.indexBuffer = [ 0 ];
-					break;
+						properties.connections = [];
 
-			}
+					}
 
-			return this.indexBuffer;
+					properties.connections.push( array );
 
-		},
-
-		parse_ByPolygon_IndexToDirect: function ( indices ) {
-
-			return indices;
-
-		},
-
-	} );
-
-	function AnimationCurve() {
-
-		this.version = null;
-
-		this.id = null;
-		this.internalId = null;
-		this.times = null;
-		this.values = null;
-
-		this.attrFlag = null; // tangeant
-		this.attrData = null; // slope, weight
-
-	}
-
-	AnimationCurve.prototype.fromNode = function ( curveNode ) {
-
-		this.id = curveNode.id;
-		this.internalId = curveNode.id;
-		this.times = curveNode.subNodes.KeyTime.properties.a;
-		this.values = curveNode.subNodes.KeyValueFloat.properties.a;
-
-		this.attrFlag = curveNode.subNodes.KeyAttrFlags.properties.a;
-		this.attrData = curveNode.subNodes.KeyAttrDataFloat.properties.a;
-
-		this.times = parseArrayToFloat( this.times );
-		this.values = parseArrayToFloat( this.values );
-		this.attrData = parseArrayToFloat( this.attrData );
-		this.attrFlag = parseArrayToInt( this.attrFlag );
-
-		this.times = this.times.map( function ( element ) {
-
-			return FBXTimeToSeconds( element );
-
-		} );
-
-		return this;
-
-	};
-
-	AnimationCurve.prototype.getLength = function () {
-
-		return this.times[ this.times.length - 1 ];
-
-	};
-
-	function AnimationNode() {
-
-		this.id = null;
-		this.attr = null; // S, R, T
-		this.attrX = false;
-		this.attrY = false;
-		this.attrZ = false;
-		this.internalId = null;
-		this.containerInternalId = null; // bone, null etc Id
-		this.containerBoneId = null; // bone, null etc Id
-		this.curveIdx = null; // AnimationCurve's indices
-		this.curves = {};	// AnimationCurve refs
-
-	}
-
-	AnimationNode.prototype.fromNode = function ( allNodes, node, bones ) {
-
-		this.id = node.id;
-		this.attr = node.attrName;
-		this.internalId = node.id;
-
-		if ( this.attr.match( /S|R|T/ ) ) {
-
-			for ( var attrKey in node.properties ) {
-
-				if ( attrKey.match( /X/ ) ) {
-
-					this.attrX = true;
-
-				}
-				if ( attrKey.match( /Y/ ) ) {
-
-					this.attrY = true;
-
-				}
-				if ( attrKey.match( /Z/ ) ) {
-
-					this.attrZ = true;
+					continue;
 
 				}
 
-			}
+				// special case: child node is Properties\d+
+				if ( node.name.match( /^Properties\d+$/ ) ) {
 
-		} else {
+					// move child node's properties to this node.
 
-			// may be deform percent nodes
-			return null;
+					var keys = Object.keys( node.properties );
 
-		}
+					for ( var i = 0, il = keys.length; i < il; i ++ ) {
 
-		this.containerIndices = allNodes.searchConnectionParent( this.id );
-		this.curveIdx	= allNodes.searchConnectionChildren( this.id );
+						var key = keys[ i ];
+						properties[ key ] = node.properties[ key ];
 
-		for ( var i = this.containerIndices.length - 1; i >= 0; -- i ) {
+					}
 
-			var boneId = bones.searchRealId( this.containerIndices[ i ] );
-			if ( boneId >= 0 ) {
+					continue;
 
-				this.containerBoneId = boneId;
-				this.containerId = this.containerIndices[ i ];
+				}
 
-			}
+				// special case: properties
+				if ( name.match( /^Properties\d+$/ ) && node.name === 'P' ) {
 
-			if ( boneId >= 0 ) {
+					var innerPropName = node.propertyList[ 0 ];
+					var innerPropType1 = node.propertyList[ 1 ];
+					var innerPropType2 = node.propertyList[ 2 ];
+					var innerPropFlag = node.propertyList[ 3 ];
+					var innerPropValue;
 
-				break;
+					if ( innerPropName.indexOf( 'Lcl ' ) === 0 ) innerPropName = innerPropName.replace( 'Lcl ', 'Lcl_' );
+					if ( innerPropType1.indexOf( 'Lcl ' ) === 0 ) innerPropType1 = innerPropType1.replace( 'Lcl ', 'Lcl_' );
 
-			}
+					if ( innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' ||
+						 innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
 
-		}
-		// this.containerBoneId = bones.searchRealId( this.containerIndices );
+						innerPropValue = [
+							node.propertyList[ 4 ],
+							node.propertyList[ 5 ],
+							node.propertyList[ 6 ]
+						];
 
-		return this;
+					} else {
 
-	};
+						innerPropValue = node.propertyList[ 4 ];
 
-	AnimationNode.prototype.setCurve = function ( curve ) {
+					}
 
-		this.curves.push( curve );
+					if ( innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
 
-	};
+						innerPropValue = innerPropValue.toString();
 
-	function Animation() {
+					}
 
-		this.curves = {};
-		this.length = 0.0;
-		this.fps	= 30.0;
-		this.frames = 0.0;
+					// this will be copied to parent. see above.
+					properties[ innerPropName ] = {
 
-	}
+						'type': innerPropType1,
+						'type2': innerPropType2,
+						'flag': innerPropFlag,
+						'value': innerPropValue
 
-	Animation.prototype.parse = function ( node, bones ) {
+					};
 
-		var rawNodes = node.Objects.subNodes.AnimationCurveNode;
-		var rawCurves = node.Objects.subNodes.AnimationCurve;
-		var rawLayers = node.Objects.subNodes.AnimationLayer;
-		var rawStacks = node.Objects.subNodes.AnimationStack;
+					continue;
 
-		// first: expand AnimationCurveNode into curve nodes
-		var curveNodes = [];
-		for ( var key in rawNodes ) {
+				}
 
-			if ( key.match( /\d+/ ) ) {
+				// standard case
+				// follows TextParser's manner.
+				if ( subNodes[ node.name ] === undefined ) {
 
-				var a = ( new AnimationNode() ).fromNode( node, rawNodes[ key ], bones );
-				curveNodes.push( a );
+					if ( typeof node.id === 'number' ) {
 
-			}
+						subNodes[ node.name ] = {};
+						subNodes[ node.name ][ node.id ] = node;
 
-		}
+					} else {
 
-		// second: gen dict, mapped by internalId
-		var tmp = {};
-		for ( var i = 0; i < curveNodes.length; ++ i ) {
+						subNodes[ node.name ] = node;
 
-			if ( curveNodes[ i ] === null ) {
-
-				continue;
-
-			}
-
-			tmp[ curveNodes[ i ].id ] = curveNodes[ i ];
-
-		}
-
-		// third: insert curves into the dict
-		var ac = [];
-		for ( key in rawCurves ) {
-
-			if ( key.match( /\d+/ ) ) {
-
-				var c = ( new AnimationCurve() ).fromNode( rawCurves[ key ] );
-				ac.push( c );
-
-				var parentId = node.searchConnectionParent( c.id )[ 0 ];
-				var axis = node.searchConnectionType( c.id, parentId );
-
-				if ( axis.match( /X/ ) ) {
-
-					axis = 'x';
-
-				} else if ( axis.match( /Y/ ) ) {
-
-					axis = 'y';
-
-				} else if ( axis.match( /Z/ ) ) {
-
-					axis = 'z';
+					}
 
 				} else {
 
-					continue;
+					if ( node.id === '' ) {
 
-				}
+						if ( ! Array.isArray( subNodes[ node.name ] ) ) {
 
-				tmp[ parentId ].curves[ axis ] = c;
-
-			}
-
-		}
-
-		// forth:
-		for ( var t in tmp ) {
-
-			var id = tmp[ t ].containerBoneId;
-			if ( this.curves[ id ] === undefined ) {
-
-				this.curves[ id ] = {
-					T: null,
-					R: null,
-					S: null
-				};
-
-			}
-
-			this.curves[ id ][ tmp[ t ].attr ] = tmp[ t ];
-
-		}
-
-		//Layers
-		this.layers = {};
-		for ( var key in rawLayers ) {
-
-			var layer = [];
-			var children = node.searchConnectionChildren( key );
-			for ( var i = 0; i < children.length; ++ i ) {
-
-				//Skip lockInfluenceWeights
-				if ( tmp[ children[ i ] ] ) {
-
-					if ( layer[ tmp[ children[ i ] ].containerBoneId ] === undefined ) {
-
-						layer[ tmp[ children[ i ] ].containerBoneId ] = {
-							T: null,
-							R: null,
-							S: null
-						};
-
-					}
-
-					layer[ tmp[ children[ i ] ].containerBoneId ][ tmp[ children[ i ] ].attr ] = tmp[ children[ i ] ];
-
-				}
-
-			}
-
-			this.layers[ key ] = layer;
-
-		}
-
-		//Takes
-		this.stacks = {};
-		for ( var key in rawStacks ) {
-
-			var layers = [];
-			var children = node.searchConnectionChildren( key );
-			var max = 0.0;
-			var min = Number.MAX_VALUE;
-			for ( var i = 0; i < children.length; ++ i ) {
-
-				if ( children[ i ] in this.layers ) {
-
-					layers.push( this.layers[ children[ i ] ] );
-
-					for ( var j = 0; j < this.layers[ children[ i ] ].length; ++ j ) {
-
-						function getMaxMin( layer ) {
-
-							function _getMaxMin( curves ) {
-
-								if ( curves.x ) {
-
-									max = curves.x.getLength() > max ? curves.x.getLength() : max;
-									min = curves.x.times[ 0 ] < min ? curves.x.times[ 0 ] : min;
-
-								}
-								if ( curves.y ) {
-
-									max = curves.y.getLength() > max ? curves.y.getLength() : max;
-									min = curves.y.times[ 0 ] < min ? curves.y.times[ 0 ] : min;
-
-								}
-								if ( curves.z ) {
-
-									max = curves.z.getLength() > max ? curves.z.getLength() : max;
-									min = curves.z.times[ 0 ] < min ? curves.z.times[ 0 ] : min;
-
-								}
-
-							}
-
-							if ( layer.R ) {
-
-								_getMaxMin( layer.R.curves );
-
-							}
-							if ( layer.S ) {
-
-								_getMaxMin( layer.S.curves );
-
-							}
-							if ( layer.T ) {
-
-								_getMaxMin( layer.T.curves );
-
-							}
+							subNodes[ node.name ] = [ subNodes[ node.name ] ];
 
 						}
 
-						var layer = this.layers[ children[ i ] ][ j ];
-						if ( layer ) {
+						subNodes[ node.name ].push( node );
 
-							getMaxMin( layer );
+					} else {
+
+						if ( subNodes[ node.name ][ node.id ] === undefined ) {
+
+							subNodes[ node.name ][ node.id ] = node;
+
+						} else {
+
+							// conflict id. irregular?
+
+							if ( ! Array.isArray( subNodes[ node.name ][ node.id ] ) ) {
+
+								subNodes[ node.name ][ node.id ] = [ subNodes[ node.name ][ node.id ] ];
+
+							}
+
+							subNodes[ node.name ][ node.id ].push( node );
 
 						}
 
@@ -2802,448 +4196,844 @@
 
 			}
 
-			//Do we have an animation clip with an actual length?
-			if ( max > min ) {
-
-				this.stacks[ key ] = {
-
-					name: rawStacks[ key ].attrName,
-					layers: layers,
-					length: max - min,
-					frames: ( max - min ) * 30,
-
-				};
-
-			}
-
-		}
-
-		return this;
-
-	};
-
-
-	function Textures() {
-
-		this.textures = {};
-		//this.perGeoMap = {};
-
-	}
-
-	Textures.prototype.add = function ( tex ) {
-
-		debugger;
-
-		if ( this.textures === undefined ) {
-
-			this.textures = [];
-
-		}
-
-		this.textures.push( tex );
-
-		for ( var i = 0; i < tex.parentIds.length; ++ i ) {
-
-			if ( this.perGeoMap[ tex.parentIds[ i ] ] === undefined ) {
-
-				this.perGeoMap[ tex.parentIds[ i ] ] = [];
-
-			}
-
-			this.perGeoMap[ tex.parentIds[ i ] ].push( this.textures[ this.textures.length - 1 ] );
-
-		}
-
-	};
-
-	Textures.prototype.parse = function ( node ) {
-
-		var rawNodes = node.Objects.subNodes.Texture;
-
-		for ( var n in rawNodes ) {
-
-			var tex = ( new Texture() ).parse( rawNodes[ n ], node );
-			this.textures[ n ] = tex;
-
-		}
-
-		return this;
-
-	};
-
-	Textures.prototype.getById = function ( id ) {
-
-		return this.perGeoMap[ id ];
-
-	};
-
-	function Texture() {
-
-		this.fileName = "";
-		this.name = "";
-		this.id = null;
-		this.parentIds = [];
-
-	}
-
-	Texture.prototype.parse = function ( node, nodes ) {
-
-		this.id = node.id;
-		this.name = node.attrName;
-		this.fileName = this.parseFileName( node.properties.FileName );
-
-		this.parentIds = this.searchParents( this.id, nodes );
-
-		return this;
-
-	};
-
-	// TODO: support directory
-	Texture.prototype.parseFileName = function ( fname ) {
-
-		if ( fname === undefined ) {
-
-			return "";
-
-		}
-
-		// ignore directory structure, flatten path
-		var splitted = fname.split( /[\\\/]/ );
-		if ( splitted.length > 0 ) {
-
-			return splitted[ splitted.length - 1 ];
-
-		} else {
-
-			return fname;
-
-		}
-
-	};
-
-	Texture.prototype.searchParents = function ( id, nodes ) {
-
-		var p = nodes.searchConnectionParent( id );
-
-		return p;
-
-	};
-
-	function Materials() {
-
-		this.materials = {};
-		this.perGeoMap = {};
-
-	}
-
-	Object.assign( Materials.prototype, {
-
-		parse: function ( node ) {
-
-			var rawNodes = node.Objects.subNodes.Material;
-
-			for ( var n in rawNodes ) {
-
-				var mat = ( new Material() ).parse( rawNodes[ n ], node );
-				this.materials[ n ] = mat;
-
-			}
-
-			return this;
-
-		}
-
-	} );
-
-	function Material() {
-
-		this.fileName = "";
-		this.name = "";
-		this.id = null;
-		this.parentIds = [];
-
-	}
-
-	Object.assign( Material.prototype, {
-
-		parse: function ( node, nodes ) {
-
-			this.id = node.id;
-			this.name = node.attrName;
-			this.type = node.properties.ShadingModel;
-
-			this.parameters = this.parseParameters( node.properties );
-
-			this.parentIds = this.searchParents( this.id, nodes );
-
-			return this;
+			return {
+
+				singleProperty: isSingleProperty,
+				id: id,
+				attrName: attrName,
+				attrType: attrType,
+				name: name,
+				properties: properties,
+				propertyList: propertyList, // raw property list, would be used by parent
+				subNodes: subNodes
+
+			};
 
 		},
 
-		parseParameters: function ( properties ) {
+		parseProperty: function ( reader ) {
 
-			var parameters = {};
+			var type = reader.getChar();
 
-			//TODO: Missing parameters:
-			// - Ambient
-			// - MultiLayer
-			// - ShininessExponent (Same vals as Shininess)
-			// - Specular (Same vals as SpecularColor)
-			// - TransparencyFactor (Maybe same as Opacity?).
+			switch ( type ) {
 
-			if ( properties.Diffuse ) {
+				case 'F':
+					return reader.getFloat32();
 
-				parameters.color = new THREE.Color().fromArray( [ parseFloat( properties.Diffuse.value.x ), parseFloat( properties.Diffuse.value.y ), parseFloat( properties.Diffuse.value.z ) ] );
+				case 'D':
+					return reader.getFloat64();
+
+				case 'L':
+					return reader.getInt64();
+
+				case 'I':
+					return reader.getInt32();
+
+				case 'Y':
+					return reader.getInt16();
+
+				case 'C':
+					return reader.getBoolean();
+
+				case 'f':
+				case 'd':
+				case 'l':
+				case 'i':
+				case 'b':
+
+					var arrayLength = reader.getUint32();
+					var encoding = reader.getUint32(); // 0: non-compressed, 1: compressed
+					var compressedLength = reader.getUint32();
+
+					if ( encoding === 0 ) {
+
+						switch ( type ) {
+
+							case 'f':
+								return reader.getFloat32Array( arrayLength );
+
+							case 'd':
+								return reader.getFloat64Array( arrayLength );
+
+							case 'l':
+								return reader.getInt64Array( arrayLength );
+
+							case 'i':
+								return reader.getInt32Array( arrayLength );
+
+							case 'b':
+								return reader.getBooleanArray( arrayLength );
+
+						}
+
+					}
+
+					if ( window.Zlib === undefined ) {
+
+						throw new Error( 'FBXLoader: Import inflate.min.js from https://github.com/imaya/zlib.js' );
+
+					}
+
+					var inflate = new Zlib.Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
+					var reader2 = new BinaryReader( inflate.decompress().buffer );
+
+					switch ( type ) {
+
+						case 'f':
+							return reader2.getFloat32Array( arrayLength );
+
+						case 'd':
+							return reader2.getFloat64Array( arrayLength );
+
+						case 'l':
+							return reader2.getInt64Array( arrayLength );
+
+						case 'i':
+							return reader2.getInt32Array( arrayLength );
+
+						case 'b':
+							return reader2.getBooleanArray( arrayLength );
+
+					}
+
+				case 'S':
+					var length = reader.getUint32();
+					return reader.getString( length );
+
+				case 'R':
+					var length = reader.getUint32();
+					return reader.getArrayBuffer( length );
+
+				default:
+					throw new Error( 'FBXLoader: Unknown property type ' + type );
 
 			}
-			if ( properties.Specular ) {
-
-				parameters.specular = new THREE.Color().fromArray( [ parseFloat( properties.Specular.value.x ), parseFloat( properties.Specular.value.y ), parseFloat( properties.Specular.value.z ) ] );
-
-			}
-			if ( properties.Shininess ) {
-
-				parameters.shininess = properties.Shininess.value;
-
-			}
-			if ( properties.Emissive ) {
-
-				parameters.emissive = new THREE.Color().fromArray( [ parseFloat( properties.Emissive.value.x ), parseFloat( properties.Emissive.value.y ), parseFloat( properties.Emissive.value.z ) ] );
-
-			}
-			if ( properties.EmissiveFactor ) {
-
-				parameters.emissiveIntensity = properties.EmissiveFactor.value;
-
-			}
-			if ( properties.Reflectivity ) {
-
-				parameters.reflectivity = properties.Reflectivity.value;
-
-			}
-			if ( properties.Opacity ) {
-
-				parameters.opacity = properties.Opacity.value;
-
-			}
-			if ( parameters.opacity < 1.0 ) {
-
-				parameters.transparent = true;
-
-			}
-
-			//Assigning textures
-
-
-			return parameters;
-
-		},
-
-		searchParents: function ( id, nodes ) {
-
-			return nodes.searchConnectionParent( id );
 
 		}
 
 	} );
 
 
-	/* --------------------------------------------------------------------- */
-	/* --------------------------------------------------------------------- */
-	/* --------------------------------------------------------------------- */
-	/* --------------------------------------------------------------------- */
+	function BinaryReader( buffer, littleEndian ) {
 
-	// LayerElementUV: 0 {
-	// 	Version: 101
-	//	Name: "Texture_Projection"
-	//	MappingInformationType: "ByPolygonVertex"
-	//	ReferenceInformationType: "IndexToDirect"
-	//	UV: *1746 {
-	//	UVIndex: *7068 {
+		this.dv = new DataView( buffer );
+		this.offset = 0;
+		this.littleEndian = ( littleEndian !== undefined ) ? littleEndian : true;
+
+	}
+
+	Object.assign( BinaryReader.prototype, {
+
+		getOffset: function () {
+
+			return this.offset;
+
+		},
+
+		size: function () {
+
+			return this.dv.buffer.byteLength;
+
+		},
+
+		skip: function ( length ) {
+
+			this.offset += length;
+
+		},
+
+		// seems like true/false representation depends on exporter.
+		//   true: 1 or 'Y'(=0x59), false: 0 or 'T'(=0x54)
+		// then sees LSB.
+		getBoolean: function () {
+
+			return ( this.getUint8() & 1 ) === 1;
+
+		},
+
+		getBooleanArray: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getBoolean() );
+
+			}
+
+			return a;
+
+		},
+
+		getInt8: function () {
+
+			var value = this.dv.getInt8( this.offset );
+			this.offset += 1;
+			return value;
+
+		},
+
+		getInt8Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getInt8() );
+
+			}
+
+			return a;
+
+		},
+
+		getUint8: function () {
+
+			var value = this.dv.getUint8( this.offset );
+			this.offset += 1;
+			return value;
+
+		},
+
+		getUint8Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getUint8() );
+
+			}
+
+			return a;
+
+		},
+
+		getInt16: function () {
+
+			var value = this.dv.getInt16( this.offset, this.littleEndian );
+			this.offset += 2;
+			return value;
+
+		},
+
+		getInt16Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getInt16() );
+
+			}
+
+			return a;
+
+		},
+
+		getUint16: function () {
+
+			var value = this.dv.getUint16( this.offset, this.littleEndian );
+			this.offset += 2;
+			return value;
+
+		},
+
+		getUint16Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getUint16() );
+
+			}
+
+			return a;
+
+		},
+
+		getInt32: function () {
+
+			var value = this.dv.getInt32( this.offset, this.littleEndian );
+			this.offset += 4;
+			return value;
+
+		},
+
+		getInt32Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getInt32() );
+
+			}
+
+			return a;
+
+		},
+
+		getUint32: function () {
+
+			var value = this.dv.getUint32( this.offset, this.littleEndian );
+			this.offset += 4;
+			return value;
+
+		},
+
+		getUint32Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getUint32() );
+
+			}
+
+			return a;
+
+		},
+
+		// JavaScript doesn't support 64-bit integer so attempting to calculate by ourselves.
+		// 1 << 32 will return 1 so using multiply operation instead here.
+		// There'd be a possibility that this method returns wrong value if the value
+		// is out of the range between Number.MAX_SAFE_INTEGER and Number.MIN_SAFE_INTEGER.
+		// TODO: safely handle 64-bit integer
+		getInt64: function () {
+
+			var low, high;
+
+			if ( this.littleEndian ) {
+
+				low = this.getUint32();
+				high = this.getUint32();
+
+			} else {
+
+				high = this.getUint32();
+				low = this.getUint32();
+
+			}
+
+			// calculate negative value
+			if ( high & 0x80000000 ) {
+
+				high = ~high & 0xFFFFFFFF;
+				low = ~low & 0xFFFFFFFF;
+
+				if ( low === 0xFFFFFFFF ) high = ( high + 1 ) & 0xFFFFFFFF;
+
+				low = ( low + 1 ) & 0xFFFFFFFF;
+
+				return - ( high * 0x100000000 + low );
+
+			}
+
+			return high * 0x100000000 + low;
+
+		},
+
+		getInt64Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getInt64() );
+
+			}
+
+			return a;
+
+		},
+
+		// Note: see getInt64() comment
+		getUint64: function () {
+
+			var low, high;
+
+			if ( this.littleEndian ) {
+
+				low = this.getUint32();
+				high = this.getUint32();
+
+			} else {
+
+				high = this.getUint32();
+				low = this.getUint32();
+
+			}
+
+			return high * 0x100000000 + low;
+
+		},
+
+		getUint64Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getUint64() );
+
+			}
+
+			return a;
+
+		},
+
+		getFloat32: function () {
+
+			var value = this.dv.getFloat32( this.offset, this.littleEndian );
+			this.offset += 4;
+			return value;
+
+		},
+
+		getFloat32Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getFloat32() );
+
+			}
+
+			return a;
+
+		},
+
+		getFloat64: function () {
+
+			var value = this.dv.getFloat64( this.offset, this.littleEndian );
+			this.offset += 8;
+			return value;
+
+		},
+
+		getFloat64Array: function ( size ) {
+
+			var a = [];
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a.push( this.getFloat64() );
+
+			}
+
+			return a;
+
+		},
+
+		getArrayBuffer: function ( size ) {
+
+			var value = this.dv.buffer.slice( this.offset, this.offset + size );
+			this.offset += size;
+			return value;
+
+		},
+
+		getChar: function () {
+
+			return String.fromCharCode( this.getUint8() );
+
+		},
+
+		getString: function ( size ) {
+
+			var s = '';
+
+			while ( size > 0 ) {
+
+				var value = this.getUint8();
+				size--;
+
+				if ( value === 0 ) break;
+
+				s += String.fromCharCode( value );
+
+			}
+
+			this.skip( size );
+
+			return s;
+
+		}
+
+	} );
+
+
+	function FBXTree() {}
+
+	Object.assign( FBXTree.prototype, {
+
+		add: function ( key, val ) {
+
+			this[ key ] = val;
+
+		},
+
+		searchConnectionParent: function ( id ) {
+
+			if ( this.__cache_search_connection_parent === undefined ) {
+
+				this.__cache_search_connection_parent = [];
+
+			}
+
+			if ( this.__cache_search_connection_parent[ id ] !== undefined ) {
+
+				return this.__cache_search_connection_parent[ id ];
+
+			} else {
+
+				this.__cache_search_connection_parent[ id ] = [];
+
+			}
+
+			var conns = this.Connections.properties.connections;
+
+			var results = [];
+			for ( var i = 0; i < conns.length; ++ i ) {
+
+				if ( conns[ i ][ 0 ] == id ) {
+
+					// 0 means scene root
+					var res = conns[ i ][ 1 ] === 0 ? - 1 : conns[ i ][ 1 ];
+					results.push( res );
+
+				}
+
+			}
+
+			if ( results.length > 0 ) {
+
+				append( this.__cache_search_connection_parent[ id ], results );
+				return results;
+
+			} else {
+
+				this.__cache_search_connection_parent[ id ] = [ - 1 ];
+				return [ - 1 ];
+
+			}
+
+		},
+
+		searchConnectionChildren: function ( id ) {
+
+			if ( this.__cache_search_connection_children === undefined ) {
+
+				this.__cache_search_connection_children = [];
+
+			}
+
+			if ( this.__cache_search_connection_children[ id ] !== undefined ) {
+
+				return this.__cache_search_connection_children[ id ];
+
+			} else {
+
+				this.__cache_search_connection_children[ id ] = [];
+
+			}
+
+			var conns = this.Connections.properties.connections;
+
+			var res = [];
+			for ( var i = 0; i < conns.length; ++ i ) {
+
+				if ( conns[ i ][ 1 ] == id ) {
+
+					// 0 means scene root
+					res.push( conns[ i ][ 0 ] === 0 ? - 1 : conns[ i ][ 0 ] );
+					// there may more than one kid, then search to the end
+
+				}
+
+			}
+
+			if ( res.length > 0 ) {
+
+				append( this.__cache_search_connection_children[ id ], res );
+				return res;
+
+			} else {
+
+				this.__cache_search_connection_children[ id ] = [ ];
+				return [ ];
+
+			}
+
+		},
+
+		searchConnectionType: function ( id, to ) {
+
+			var key = id + ',' + to; // TODO: to hash
+			if ( this.__cache_search_connection_type === undefined ) {
+
+				this.__cache_search_connection_type = {};
+
+			}
+
+			if ( this.__cache_search_connection_type[ key ] !== undefined ) {
+
+				return this.__cache_search_connection_type[ key ];
+
+			} else {
+
+				this.__cache_search_connection_type[ key ] = '';
+
+			}
+
+			var conns = this.Connections.properties.connections;
+
+			for ( var i = 0; i < conns.length; ++ i ) {
+
+				if ( conns[ i ][ 0 ] == id && conns[ i ][ 1 ] == to ) {
+
+					// 0 means scene root
+					this.__cache_search_connection_type[ key ] = conns[ i ][ 2 ];
+					return conns[ i ][ 2 ];
+
+				}
+
+			}
+
+			this.__cache_search_connection_type[ id ] = null;
+			return null;
+
+		}
+
+	} );
+
+
+	/**
+	 * @param {ArrayBuffer} buffer
+	 * @returns {boolean}
+	 */
+	function isFbxFormatBinary( buffer ) {
+
+		var CORRECT = 'Kaydara FBX Binary  \0';
+
+		return buffer.byteLength >= CORRECT.length && CORRECT === convertArrayBufferToString( buffer, 0, CORRECT.length );
+
+	}
+
+	/**
+	 * @returns {boolean}
+	 */
+	function isFbxFormatASCII( text ) {
+
+		var CORRECT = [ 'K', 'a', 'y', 'd', 'a', 'r', 'a', '\\', 'F', 'B', 'X', '\\', 'B', 'i', 'n', 'a', 'r', 'y', '\\', '\\' ];
+
+		var cursor = 0;
+
+		function read( offset ) {
+
+			var result = text[ offset - 1 ];
+			text = text.slice( cursor + offset );
+			cursor ++;
+			return result;
+
+		}
+
+		for ( var i = 0; i < CORRECT.length; ++ i ) {
+
+			var num = read( 1 );
+			if ( num == CORRECT[ i ] ) {
+
+				return false;
+
+			}
+
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * @returns {number}
+	 */
+	function getFbxVersion( text ) {
+
+		var versionRegExp = /FBXVersion: (\d+)/;
+		var match = text.match( versionRegExp );
+		if ( match ) {
+
+			var version = parseInt( match[ 1 ] );
+			return version;
+
+		}
+		throw new Error( 'FBXLoader: Cannot find the version number for the file given.' );
+
+	}
+
+	/**
+	 * Converts FBX ticks into real time seconds.
+	 * @param {number} time - FBX tick timestamp to convert.
+	 * @returns {number} - FBX tick in real world time.
+	 */
+	function convertFBXTimeToSeconds( time ) {
+
+		// Constant is FBX ticks per second.
+		return time / 46186158000;
+
+	}
+
+	/**
+	 * Parses comma separated list of float numbers and returns them in an array.
+	 * @example
+	 * // Returns [ 5.6, 9.4, 2.5, 1.4 ]
+	 * parseFloatArray( "5.6,9.4,2.5,1.4" )
+	 * @returns {number[]}
+	 */
+	function parseFloatArray( string ) {
+
+		var array = string.split( ',' );
+
+		for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+			array[ i ] = parseFloat( array[ i ] );
+
+		}
+
+		return array;
+
+	}
+
+	/**
+	 * Parses comma separated list of int numbers and returns them in an array.
+	 * @example
+	 * // Returns [ 5, 8, 2, 3 ]
+	 * parseFloatArray( "5,8,2,3" )
+	 * @returns {number[]}
+	 */
+	function parseIntArray( string ) {
+
+		var array = string.split( ',' );
+
+		for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+			array[ i ] = parseInt( array[ i ] );
+
+		}
+
+		return array;
+
+	}
+
+	/**
+	 * Parses Vector3 property from FBXTree.  Property is given as .value.x, .value.y, etc.
+	 * @param {FBXVector3} property - Property to parse as Vector3.
+	 * @returns {THREE.Vector3}
+	 */
+	function parseVector3( property ) {
+
+		return new THREE.Vector3().fromArray( property.value );
+
+	}
+
+	/**
+	 * Parses Color property from FBXTree.  Property is given as .value.x, .value.y, etc.
+	 * @param {FBXVector3} property - Property to parse as Color.
+	 * @returns {THREE.Color}
+	 */
+	function parseColor( property ) {
+
+		return new THREE.Color().fromArray( property.value );
+
+	}
+
+	function parseMatrixArray( floatString ) {
+
+		return new THREE.Matrix4().fromArray( parseFloatArray( floatString ) );
+
+	}
+
+	/**
+	 * Converts ArrayBuffer to String.
+	 * @param {ArrayBuffer} buffer
+	 * @param {number} from
+	 * @param {number} to
+	 * @returns {String}
+	 */
+	function convertArrayBufferToString( buffer, from, to ) {
+
+		if ( from === undefined ) from = 0;
+		if ( to === undefined ) to = buffer.byteLength;
+
+		var array = new Uint8Array( buffer, from, to );
+
+		if ( window.TextDecoder !== undefined ) {
+
+			return new TextDecoder().decode( array );
+
+		}
+
+		var s = '';
+
+		for ( var i = 0, il = array.length; i < il; i ++ ) {
+
+			s += String.fromCharCode( array[ i ] );
+
+		}
+
+		return s;
+
+	}
+
+	/**
+	 * Converts number from degrees into radians.
+	 * @param {number} value
+	 * @returns {number}
+	 */
+	function degreeToRadian( value ) {
+
+		return value * DEG2RAD;
+
+	}
+
+	var DEG2RAD = Math.PI / 180;
+
 	//
-	//	The order of the uvs is given by the UVIndex property.
-	function parse_Data_ByPolygonVertex_IndexToDirect( node, indices, itemSize ) {
 
-		var res = [];
+	function findIndex( array, func ) {
 
-		for ( var i = 0; i < indices.length; ++ i ) {
+		for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-			for ( var j = 0; j < itemSize; ++ j ) {
-
-				res.push( node[ ( indices[ i ] * itemSize ) + j ] );
-
-			}
+			if ( func( array[ i ] ) ) return i;
 
 		}
 
-		return res;
+		return -1;
 
 	}
 
+	function append( a, b ) {
 
-	// what want:　normal per vertex, order vertice
-	// i have: normal per polygon
-	// i have: indice per polygon
-	function parse_Data_ByPolygonVertex_Direct( node, indices, strides, itemSize ) {
+		for ( var i = 0, j = a.length, l = b.length; i < l; i ++, j ++ ) {
 
-		// *21204 > 3573
-		// Geometry: 690680816, "Geometry::", "Mesh" {
-		//  Vertices: *3573 {
-		//  PolygonVertexIndex: *7068 {
-
-		var tmp = [];
-		var currentIndex = 0;
-
-		// first: sort to per vertex
-		for ( var i = 0; i < indices.length; ++ i ) {
-
-			tmp[ indices[ i ] ] = [];
-
-			// TODO: duped entry? blend or something?
-			for ( var s = 0; s < itemSize; ++ s ) {
-
-				tmp[ indices[ i ] ][ s ] = node[ currentIndex + s ];
-
-			}
-
-			currentIndex += itemSize;
+			a[ j ] = b[ i ];
 
 		}
 
-		// second: expand x,y,z into serial array
-		var res = [];
-		for ( var jj = 0; jj < tmp.length; ++ jj ) {
+	}
 
-			if ( tmp[ jj ] === undefined ) {
+	function slice( a, b, from, to ) {
 
-				continue;
+		for ( var i = from, j = 0; i < to; i ++, j ++ ) {
 
-			}
-
-			for ( var t = 0; t < itemSize; ++ t ) {
-
-				if ( tmp[ jj ][ t ] === undefined ) {
-
-					continue;
-
-				}
-				res.push( tmp[ jj ][ t ] );
-
-			}
+			a[ j ] = b[ i ];
 
 		}
 
-		return res;
-
-	}
-
-	// convert from by polygon(vert) data into by verts data
-	function mapByPolygonVertexToByVertex( data, indices, stride ) {
-
-		var tmp = {};
-		var res = [];
-		var max = 0;
-
-		for ( var i = 0; i < indices.length; ++ i ) {
-
-			if ( indices[ i ] in tmp ) {
-
-				continue;
-
-			}
-
-			tmp[ indices[ i ] ] = {};
-
-			for ( var j = 0; j < stride; ++ j ) {
-
-				tmp[ indices[ i ] ][ j ] = data[ i * stride + j ];
-
-			}
-
-			max = max < indices[ i ] ? indices[ i ] : max;
-
-		}
-
-		try {
-
-			for ( i = 0; i <= max; i ++ ) {
-
-				for ( var s = 0; s < stride; s ++ ) {
-
-					res.push( tmp[ i ][ s ] );
-
-				}
-
-			}
-
-		} catch ( e ) {
-			//console.log( max );
-			//console.log( tmp );
-			//console.log( i );
-			//console.log( e );
-		}
-
-		return res;
-
-	}
-
-	// AUTODESK uses broken clock. i guess
-	function FBXTimeToSeconds( adskTime ) {
-
-		return adskTime / 46186158000;
-
-	}
-
-	function degToRad( degrees ) {
-
-		return degrees * Math.PI / 180;
-
-	}
-
-	function quatFromVec( x, y, z ) {
-
-		var euler = new THREE.Euler( x, y, z, 'ZYX' );
-		var quat = new THREE.Quaternion();
-		quat.setFromEuler( euler );
-
-		return quat;
-
-	}
-
-	function parseArrayToInt( string ) {
-
-		return string.split( ',' ).map( function ( element ) {
-
-			return parseInt( element );
-
-		} );
-
-	}
-
-	function parseArrayToFloat( string ) {
-
-		return string.split( ',' ).map( function ( element ) {
-
-			return parseFloat( element );
-
-		} );
-
-	}
-
-	function parseArrayToRadians( string ) {
-
-		return string.split( ',' ).map( function ( element ) {
-
-			return degToRad( parseFloat( element ) );
-
-		} );
-
-	}
-
-	function parseArrayToMatrix( string ) {
-
-		var arr = parseArrayToFloat( string );
-		return new THREE.Matrix4().fromArray( arr );
+		return a;
 
 	}
 

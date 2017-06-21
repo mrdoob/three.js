@@ -114,22 +114,20 @@ THREE.VRMLLoader.prototype = {
 			 */
 			var paintFaces = function ( geometry, radius, angles, colors, directionIsDown ) {
 
-				var f, n, p, vertexIndex, color;
-
 				var direction = directionIsDown ? 1 : - 1;
 
 				var faceIndices = [ 'a', 'b', 'c', 'd' ];
 
-				var coord = [ ], aColor, bColor, t = 1, A = {}, B = {}, applyColor = false, colorIndex;
+				var coord = [], A = {}, B = {}, applyColor = false;
 
 				for ( var k = 0; k < angles.length; k ++ ) {
 
-					var vec = { };
-
 					// push the vector at which the color changes
-					vec.y = direction * ( Math.cos( angles[ k ] ) * radius );
 
-					vec.x = direction * ( Math.sin( angles[ k ] ) * radius );
+					var vec = {
+						x: direction * ( Math.cos( angles[ k ] ) * radius ),
+						y: direction * ( Math.sin( angles[ k ] ) * radius )
+					};
 
 					coord.push( vec );
 
@@ -138,15 +136,15 @@ THREE.VRMLLoader.prototype = {
 				// painting the colors on the faces
 				for ( var i = 0; i < geometry.faces.length ; i ++ ) {
 
-					f  = geometry.faces[ i ];
+					var f = geometry.faces[ i ];
 
-					n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+					var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
 
 					for ( var j = 0; j < n; j ++ ) {
 
-						vertexIndex = f[ faceIndices[ j ] ];
+						var vertexIndex = f[ faceIndices[ j ] ];
 
-						p = geometry.vertices[ vertexIndex ];
+						var p = geometry.vertices[ vertexIndex ];
 
 						for ( var index = 0; index < colors.length; index ++ ) {
 
@@ -174,15 +172,14 @@ THREE.VRMLLoader.prototype = {
 
 								if ( applyColor ) {
 
-									bColor = colors[ index + 1 ];
-
-									aColor = colors[ index ];
+									var aColor = colors[ index ];
+									var bColor = colors[ index + 1 ];
 
 									// below is simple linear interpolation
-									t = Math.abs( p.y - A.y ) / ( A.y - B.y );
+									var t = Math.abs( p.y - A.y ) / ( A.y - B.y );
 
 									// to make it faster, you can only calculate this if the y coord changes, the color is the same for points with the same y
-									color = interpolateColors( aColor, bColor, t );
+									var color = interpolateColors( aColor, bColor, t );
 
 									f.vertexColors[ j ] = color;
 
@@ -190,7 +187,7 @@ THREE.VRMLLoader.prototype = {
 
 							} else if ( undefined === f.vertexColors[ j ] ) {
 
-								colorIndex = directionIsDown ? colors.length - 1 : 0;
+								var colorIndex = directionIsDown ? colors.length - 1 : 0;
 								f.vertexColors[ j ] = colors[ colorIndex ];
 
 							}
@@ -374,7 +371,7 @@ THREE.VRMLLoader.prototype = {
 
 					while ( null !== ( parts = float3_pattern.exec( line ) ) ) {
 
-						color = {
+						var color = {
 							r: parseFloat( parts[ 1 ] ),
 							g: parseFloat( parts[ 2 ] ),
 							b: parseFloat( parts[ 3 ] )
@@ -415,7 +412,7 @@ THREE.VRMLLoader.prototype = {
 							};
 
 							break;
-							
+
 						case 'location':
 						case 'direction':
 						case 'translation':
@@ -436,7 +433,7 @@ THREE.VRMLLoader.prototype = {
 
 							break;
 
-						case 'intensity':				
+						case 'intensity':
 						case 'cutOffAngle':
 						case 'radius':
 						case 'topRadius':
@@ -472,7 +469,7 @@ THREE.VRMLLoader.prototype = {
 							};
 
 							break;
-							
+
 						case 'on':
 						case 'ccw':
 						case 'solid':
@@ -629,75 +626,64 @@ THREE.VRMLLoader.prototype = {
 				var object = parent;
 
 				if(data.string.indexOf("AmbientLight")>-1 && data.nodeType=='PointLight'){
-					//wenn im Namen "AmbientLight" vorkommt und es ein PointLight ist, 
+					//wenn im Namen "AmbientLight" vorkommt und es ein PointLight ist,
 					//diesen Typ in 'AmbientLight' ändern
-					data.nodeType='AmbientLight';	
+					data.nodeType='AmbientLight';
 				}
-				
-				l_visible=data.on;
-				if(l_visible==undefined)l_visible=true;
-				l_intensity=data.intensity;
-				if(l_intensity==undefined)l_intensity=true;
-				if(data.color!=undefined)
-					l_color= new THREE.Color(data.color.r, data.color.g,data.color.b );
-					else
-					l_color= new THREE.Color(0, 0,0);
-				
-				
-				
+
+				var l_visible = data.on !== undefined ? data.on : true;
+				var l_intensity = data.intensity !== undefined ? data.intensity : 1;
+				var l_color = new THREE.Color();
+				if ( data.color ) l_color.copy( data.color );
+
 				if('AmbientLight' === data.nodeType){
-					object=new THREE.AmbientLight( 
-								l_color.getHex(), 
+					object=new THREE.AmbientLight(
+								l_color.getHex(),
 								l_intensity
 								);
 					object.visible=l_visible;
-					
+
 					parent.add( object );
-					
+
 				}
 				else
 				if('PointLight' === data.nodeType){
-						l_distance =0;	//0="unendlich" ...1000
-						l_decay=0;		//-1.. ?
-						
+						var l_distance =0;	//0="unendlich" ...1000
+
 						if(data.radius!=undefined && data.radius<1000){
 							//l_radius=data.radius;
 							l_distance=data.radius;
-							l_decay=1;
 						}
-						object=new THREE.PointLight( 
-								l_color.getHex(), 
-								l_intensity, 
+						object=new THREE.PointLight(
+								l_color.getHex(),
+								l_intensity,
 								l_distance);
 						object.visible=l_visible;
-						
+
 						parent.add( object );
 				}
 				else
-				if('SpotLight' === data.nodeType){						
-						l_intensity=1;
-						l_distance =0;//0="unendlich"=1000
-						l_angle=Math.PI/3;
-						l_penumbra=0.0;//0..1
-						l_decay=0;//-1.. ?
-						l_visible=true;
-						
+				if('SpotLight' === data.nodeType){
+						var l_intensity=1;
+						var l_distance =0;//0="unendlich"=1000
+						var l_angle=Math.PI/3;
+						var l_penumbra=0.0;//0..1
+						var l_visible=true;
+
 						if(data.radius!=undefined && data.radius<1000){
 							//l_radius=data.radius;
 							l_distance=data.radius;
-							l_decay=1;
 						}
 						if(data.cutOffAngle!=undefined)l_angle=data.cutOffAngle;
-						
+
 						object = new THREE.SpotLight(
 									l_color.getHex(),
 									l_intensity,
 									l_distance,
 									l_angle,
-									l_penumbra,
-									l_decay
+									l_penumbra
 									);
-						object.visible=l_visible;						
+						object.visible=l_visible;
 						parent.add( object );
 						/*
 						var lightHelper = new THREE.SpotLightHelper( object );
@@ -705,8 +691,8 @@ THREE.VRMLLoader.prototype = {
 						lightHelper.update();
 						*/
 				}
-				else				
-				
+				else
+
 				if ( 'Transform' === data.nodeType || 'Group' === data.nodeType ) {
 
 					object = new THREE.Object3D();
@@ -1035,8 +1021,6 @@ THREE.VRMLLoader.prototype = {
 				}
 
 				for ( var i = 0, l = data.children.length; i < l; i ++ ) {
-
-					var child = data.children[ i ];
 
 					parseNode( data.children[ i ], object );
 
