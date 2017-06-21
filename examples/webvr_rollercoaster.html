@@ -115,22 +115,23 @@
 
 						t = t * PI2;
 
-						var x = Math.sin( t * 3 ) * Math.cos( t * 4 ) * 50;
-						var y = Math.sin( t * 10 ) * 2 + Math.cos( t * 17 ) * 2 + 5;
-						var z = Math.sin( t ) * Math.sin( t * 4 ) * 50;
+						var x = Math.sin( t * 3 ) * Math.cos( t * 4 ) * 100;
+						var y = Math.sin( t * 10 ) * 4 + Math.cos( t * 17 ) * 4 + 10;
+						var z = Math.sin( t ) * Math.sin( t * 4 ) * 100;
 
-						return vector.set( x, y, z ).multiplyScalar( 2 );
+						return vector.set( x, y, z );
 
 					},
 
 					getTangentAt: function ( t ) {
 
-						var delta = 0.0001;
-						var t1 = Math.max( 0, t - delta );
-						var t2 = Math.min( 1, t + delta );
+						t = t * PI2;
 
-						return vector2.copy( this.getPointAt ( t2 ) )
-							.sub( this.getPointAt( t1 ) ).normalize();
+						var x = -50 * ( Math.cos( t ) - 7 * Math.cos( 7 * t ) );
+						var y = 40 * Math.cos( 10 * t ) - 68 * Math.sin( 17 * t );
+						var z = 50 * ( 5 * Math.sin( 5 * t ) - 3 * Math.sin( 3 * t ));
+
+						return vector2.set( x, y, z ).normalize();
 
 					}
 
