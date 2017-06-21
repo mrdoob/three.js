@@ -52,16 +52,16 @@
 
 	}
 
-	AWDProperties = function() {};
+	function AWDProperties() {}
 
 	AWDProperties.prototype = {
-		set : function( key, value ) {
+		set: function( key, value ) {
 
 			this[ key ] = value;
 
 		},
 
-		get : function( key, fallback ) {
+		get: function( key, fallback ) {
 
 			if ( this.hasOwnProperty( key ) )
 				return this[ key ];
@@ -288,7 +288,6 @@
 					mtx,
 					materials, mat, mat_id,
 					num_materials,
-					materials_parsed,
 					parent,
 					i;
 
@@ -301,7 +300,6 @@
 			geometries = this.getBlock( data_id );
 
 			materials = [];
-			materials_parsed = 0;
 
 			for ( i = 0; i < num_materials; i ++ ) {
 

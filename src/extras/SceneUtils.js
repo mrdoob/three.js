@@ -32,9 +32,7 @@ var SceneUtils = {
 
 	attach: function ( child, scene, parent ) {
 
-		var matrixWorldInverse = new Matrix4();
-		matrixWorldInverse.getInverse( parent.matrixWorld );
-		child.applyMatrix( matrixWorldInverse );
+		child.applyMatrix( new Matrix4().getInverse( parent.matrixWorld ) );
 
 		scene.remove( child );
 		parent.add( child );

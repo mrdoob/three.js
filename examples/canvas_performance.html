@@ -47,29 +47,13 @@
 
 				// Grid
 
-				var size = 500, step = 100;
-
-				var geometry = new THREE.Geometry();
-
-				for ( var i = - size; i <= size; i += step ) {
-
-					geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
-					geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
-
-					geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
-					geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
-
-				}
-
-				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } );
-
-				var line = new THREE.LineSegments( geometry, material );
-				scene.add( line );
+				var gridHelper = new THREE.GridHelper( 1000, 10 );
+				scene.add( gridHelper );
 
 				// Spheres
 
-				geometry = new THREE.SphereGeometry( 100, 26, 18 );
-				material = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
+				var geometry = new THREE.SphereGeometry( 100, 26, 18 );
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 20; i ++ ) {
 

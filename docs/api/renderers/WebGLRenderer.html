@@ -212,6 +212,11 @@
 		Used internally by the renderer to keep track of various sub object properties.
 		</div>
 
+		<h3>[property:WebGLRenderLists renderLists]</h3>
+		<div>
+		Used internally to handle ordering of scene object rendering.
+		</div>
+
 		<h3>[property:WebGLShadowMap shadowMap]</h3>
 		<div>
 		This contains the reference to the shadow map, if used.
@@ -307,7 +312,7 @@
 
 		<h3>[method:null compile]( [page:Scene scene], [page:Camera camera] )</h3>
 		<div>Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.</div>
-		
+
 		<h3>[method:null dispose]( )</h3>
 		<div>Dispose of the current rendering context.</div>
 
@@ -347,6 +352,9 @@
 
 		<h3>[method:Number getMaxAnisotropy]()</h3>
 		<div>This returns the anisotropy level of the textures.</div>
+
+		<h3>[method:Object getDrawingBufferSize]()</h3>
+		<div>Returns an object containing the width and height of the renderer's drawing buffer, in pixels.</div>
 
 		<h3>[method:number getPixelRatio]()</h3>
 		<div>Returns current device pixel ratio used.</div>
@@ -421,12 +429,8 @@
 
 		<h3>[method:null setScissorTest]( [page:Boolean boolean] )</h3>
 		<div>
-		Enable or disable the scissor test. When this is enabled, only the pixels within
-			the defined scissor area will be affected by further renderer actions..<br /><br />
-
-		NOTE: The point (x, y) is the lower left corner of the area to be set for both of these methods.
-			The area is defined from left to right in width but bottom to top in height.
-			The sense of the vertical definition is opposite to the fill direction of an HTML canvas element.
+		Enable or disable the scissor test. When this is enabled, only the pixels within the defined
+			scissor area will be affected by further renderer actions.
 		</div>
 
 		<h3>[method:Boolean supportsVertexTextures]()</h3>

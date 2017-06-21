@@ -515,10 +515,8 @@ Object.assign( Ray.prototype, {
 
 	applyMatrix4: function ( matrix4 ) {
 
-		this.direction.add( this.origin ).applyMatrix4( matrix4 );
 		this.origin.applyMatrix4( matrix4 );
-		this.direction.sub( this.origin );
-		this.direction.normalize();
+		this.direction.transformDirection( matrix4 );
 
 		return this;
 

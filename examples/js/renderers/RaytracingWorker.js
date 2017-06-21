@@ -80,11 +80,9 @@ self.onmessage = function( e ) {
  * @author zz95 / http://github.com/zz85
  */
 
-THREE.RaytracingRendererWorker = function ( parameters ) {
+THREE.RaytracingRendererWorker = function () {
 
 	console.log( 'THREE.RaytracingRendererWorker', THREE.REVISION );
-
-	parameters = parameters || {};
 
 	var scope = this;
 
@@ -516,7 +514,6 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 		cameraPosition.setFromMatrixPosition( camera.matrixWorld );
 
 		//

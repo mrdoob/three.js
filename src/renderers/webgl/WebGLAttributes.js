@@ -26,7 +26,7 @@ function WebGLAttributes( gl ) {
 
 		} else if ( array instanceof Float64Array ) {
 
-			console.warn( "Unsupported data buffer format: Float64Array" );
+			console.warn( 'THREE.WebGLAttributes: Unsupported data buffer format: Float64Array.' );
 
 		} else if ( array instanceof Uint16Array ) {
 
@@ -89,7 +89,7 @@ function WebGLAttributes( gl ) {
 			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
 				array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
 
-			updateRange.count = 0; // reset range
+			updateRange.count = -1; // reset range
 
 		}
 
@@ -107,6 +107,8 @@ function WebGLAttributes( gl ) {
 
 	function remove( attribute ) {
 
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		
 		var data = buffers[ attribute.uuid ];
 
 		if ( data ) {

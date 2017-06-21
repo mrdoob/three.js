@@ -182,6 +182,8 @@ function SpritePlugin( renderer, sprites ) {
 
 			if ( material.visible === false ) continue;
 
+			sprite.onBeforeRender( renderer, scene, camera, undefined, material, undefined );
+
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
 
@@ -223,7 +225,7 @@ function SpritePlugin( renderer, sprites ) {
 			gl.uniform1f( uniforms.rotation, material.rotation );
 			gl.uniform2fv( uniforms.scale, scale );
 
-			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
 			state.buffers.depth.setTest( material.depthTest );
 			state.buffers.depth.setMask( material.depthWrite );
 
@@ -238,6 +240,8 @@ function SpritePlugin( renderer, sprites ) {
 			}
 
 			gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
+
+			sprite.onAfterRender( renderer, scene, camera, undefined, material, undefined );
 
 		}
 
@@ -259,6 +263,8 @@ function SpritePlugin( renderer, sprites ) {
 		gl.shaderSource( vertexShader, [
 
 			'precision ' + renderer.getPrecision() + ' float;',
+
+			'#define SHADER_NAME ' + 'SpriteMaterial',
 
 			'uniform mat4 modelViewMatrix;',
 			'uniform mat4 projectionMatrix;',
@@ -297,6 +303,8 @@ function SpritePlugin( renderer, sprites ) {
 		gl.shaderSource( fragmentShader, [
 
 			'precision ' + renderer.getPrecision() + ' float;',
+
+			'#define SHADER_NAME ' + 'SpriteMaterial',
 
 			'uniform vec3 color;',
 			'uniform sampler2D map;',

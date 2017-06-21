@@ -2876,6 +2876,7 @@ THREE.SEA3D.prototype.readMorpher = function ( sea ) {
 		var node = sea.node[ i ];
 
 		attribs.position[ i ] = new THREE.Float32BufferAttribute( node.vertex, 3 );
+		attribs.position[ i ].name = node.name;
 
 		if ( node.normal ) {
 

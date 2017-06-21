@@ -120,12 +120,13 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		// render depth map
 
-		var faceCount, isPointLight;
+		var faceCount;
 
 		for ( var i = 0, il = _lightShadows.length; i < il; i ++ ) {
 
 			var light = _lightShadows[ i ];
 			var shadow = light.shadow;
+			var isPointLight = light && light.isPointLight;
 
 			if ( shadow === undefined ) {
 
@@ -135,18 +136,11 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			}
 
 			var shadowCamera = shadow.camera;
-			var shadowMatrix = shadow.matrix;
-
-			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-			shadowCamera.position.copy( _lightPositionWorld );
 
 			_shadowMapSize.copy( shadow.mapSize );
 			_shadowMapSize.min( _maxShadowMapSize );
 
-			if ( light && light.isPointLight ) {
-
-				faceCount = 6;
-				isPointLight = true;
+			if ( isPointLight ) {
 
 				var vpWidth = _shadowMapSize.x;
 				var vpHeight = _shadowMapSize.y;
@@ -180,34 +174,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				_shadowMapSize.x *= 4.0;
 				_shadowMapSize.y *= 2.0;
 
-
-				// for point lights we set the shadow matrix to be a translation-only matrix
-				// equal to inverse of the light's position
-
-				shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
-
-			} else {
-
-				faceCount = 1;
-				isPointLight = false;
-
-				_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-				shadowCamera.lookAt( _lookTarget );
-				shadowCamera.updateMatrixWorld();
-				shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
-
-				// compute shadow matrix
-
-				shadowMatrix.set(
-					0.5, 0.0, 0.0, 0.5,
-					0.0, 0.5, 0.0, 0.5,
-					0.0, 0.0, 0.5, 0.5,
-					0.0, 0.0, 0.0, 1.0
-				);
-
-				shadowMatrix.multiply( shadowCamera.projectionMatrix );
-				shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
-
 			}
 
 			if ( shadow.map === null ) {
@@ -228,6 +194,41 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			}
 
 			var shadowMap = shadow.map;
+			var shadowMatrix = shadow.matrix;
+
+			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+			shadowCamera.position.copy( _lightPositionWorld );
+
+			if ( isPointLight ) {
+
+				faceCount = 6;
+
+				// for point lights we set the shadow matrix to be a translation-only matrix
+				// equal to inverse of the light's position
+
+				shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
+
+			} else {
+
+				faceCount = 1;
+
+				_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+				shadowCamera.lookAt( _lookTarget );
+				shadowCamera.updateMatrixWorld();
+
+				// compute shadow matrix
+
+				shadowMatrix.set(
+					0.5, 0.0, 0.0, 0.5,
+					0.0, 0.5, 0.0, 0.5,
+					0.0, 0.0, 0.5, 0.5,
+					0.0, 0.0, 0.0, 1.0
+				);
+
+				shadowMatrix.multiply( shadowCamera.projectionMatrix );
+				shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
+
+			}
 
 			_renderer.setRenderTarget( shadowMap );
 			_renderer.clear();
@@ -244,7 +245,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 					shadowCamera.up.copy( cubeUps[ face ] );
 					shadowCamera.lookAt( _lookTarget );
 					shadowCamera.updateMatrixWorld();
-					shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
 					var vpDimensions = cube2DViewPorts[ face ];
 					_state.viewport( vpDimensions );

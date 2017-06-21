@@ -30,7 +30,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Unbiased Manual Supersamling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersamling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 			This example shows how to unbias the rounding errors accumulated using high number of SSAA samples on a 8-bit per channel buffer.<br/><br/>
 			Turn off the "unbiased" feature to see the banding that results from accumulated rounding errors.
 		</div>
@@ -65,7 +65,7 @@
 				clearColor: 'black',
 				clearAlpha: 1.0,
 				autoRotate: true
-		
+
 			};
 
 			init();
@@ -90,17 +90,17 @@
 					'Level 5: 32 Samples': 5
 				} );
 				gui.add( params, 'camera', [ 'perspective', 'orthographic' ] );
-				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );		
-				gui.add( params, "clearAlpha", 0, 1 );		
+				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );
+				gui.add( params, "clearAlpha", 0, 1 );
 				gui.add( params, "autoRotate" );
-			
+
 				gui.open();
 
 			}
 
 			function init() {
 
-				container = document.getElementById( "container" );
+				var container = document.getElementById( "container" );
 
 				var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
@@ -129,7 +129,7 @@
 
 				scene = new THREE.Scene();
 
-				group = new THREE.Object3D();
+				var group = new THREE.Group();
 				scene.add( group );
 
 				var light = new THREE.PointLight( 0xddffdd, 1.0 );
@@ -169,8 +169,9 @@
 					mesh.rotation.y = Math.random();
 					mesh.rotation.z = Math.random();
 
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 0.2 + 0.05;
+					mesh.scale.setScalar( Math.random() * 0.2 + 0.05 );
 					group.add( mesh );
+
 				}
 
 				// postprocessing

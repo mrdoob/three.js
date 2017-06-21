@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 	<head>
 		<title>three.js webgl - post processing - Outline Pass</title>
@@ -50,7 +49,7 @@
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Outline Pass by <a href="http://eduperiment.com" target="_blank">Prashant Sharma</a> and <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Outline Pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 		</div>
 
 		<script>
@@ -283,7 +282,7 @@
 				// postprocessing
 				composer = new THREE.EffectComposer( renderer );
 
-				renderPass = new THREE.RenderPass( scene, camera );
+				var renderPass = new THREE.RenderPass( scene, camera );
 				composer.addPass( renderPass );
 
 				outlinePass = new THREE.OutlinePass( new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
@@ -311,29 +310,12 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var moved = false;
-
-				controls.addEventListener( 'change', function() {
-
-					moved = true;
-
-				} );
-
-				window.addEventListener( 'mousedown', function () {
-
-					moved = false;
-
-				}, false );
-
-				window.addEventListener( 'mouseup', function() {
-					if(!moved)
-						checkIntersection();
-				} );
-
 				window.addEventListener( 'mousemove', onTouchMove );
 				window.addEventListener( 'touchmove', onTouchMove );
 
 				function onTouchMove( event ) {
+
+					var x, y;
 
 					if ( event.changedTouches ) {
 
@@ -349,6 +331,8 @@
 
 					mouse.x = ( x / window.innerWidth ) * 2 - 1;
 					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
+
+					checkIntersection();
 
 				}
 

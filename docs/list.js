@@ -332,12 +332,6 @@ var list = {
 
 	"Examples": {
 
-		"Collada Animation": {
-			"ColladaAnimation": "examples/collada/Animation",
-			"AnimationHandler": "examples/collada/AnimationHandler",
-			"KeyFrameAnimation": "examples/collada/KeyFrameAnimation"
-		},
-
 		"Geometries": {
 			"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
 			"ConvexGeometry": "examples/geometries/ConvexGeometry"

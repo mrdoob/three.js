@@ -198,3 +198,25 @@ QUnit.test( 'parseTrackName' , function( assert ) {
 
 	} );
 });
+
+QUnit.test( 'sanitizeNodeName' , function( assert ) {
+
+	assert.equal(
+		THREE.PropertyBinding.sanitizeNodeName( 'valid-name-123_' ),
+		'valid-name-123_',
+		'Leaves valid name intact.'
+	);
+
+	assert.equal(
+		THREE.PropertyBinding.sanitizeNodeName( 'space separated name 123_ -' ),
+		'space_separated_name_123__-',
+		'Replaces spaces with underscores.'
+	);
+
+	assert.equal(
+		THREE.PropertyBinding.sanitizeNodeName( '"invalid" name %123%_' ),
+		'invalid_name_123_',
+		'Strips invalid characters.'
+	);
+
+} );

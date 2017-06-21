@@ -102,6 +102,19 @@ Object.assign( PropertyBinding, {
 
 	},
 
+	/**
+	 * Replaces spaces with underscores and removes unsupported characters from
+	 * node names, to ensure compatibility with parseTrackName().
+	 *
+	 * @param  {string} name Node name to be sanitized.
+	 * @return {string}
+	 */
+	sanitizeNodeName: function ( name ) {
+
+		return name.replace( /\s/g, '_' ).replace( /[^\w-]/g, '' );
+
+	},
+
 	parseTrackName: function () {
 
 		// Parent directories, delimited by '/' or ':'. Currently unused, but must
@@ -480,7 +493,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		// ensure there is a value node
 		if ( ! targetObject ) {
 
-			console.error( "  trying to update node for track: " + this.path + " but it wasn't found." );
+			console.error( 'THREE.PropertyBinding: Trying to update node for track: ' + this.path + ' but it wasn\'t found.' );
 			return;
 
 		}
@@ -496,14 +509,14 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 					if ( ! targetObject.material ) {
 
-						console.error( '  can not bind to material as node does not have a material', this );
+						console.error( 'THREE.PropertyBinding: Can not bind to material as node does not have a material.', this );
 						return;
 
 					}
 
 					if ( ! targetObject.material.materials ) {
 
-						console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
+						console.error( 'THREE.PropertyBinding: Can not bind to material.materials as node.material does not have a materials array.', this );
 						return;
 
 					}
@@ -516,7 +529,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 					if ( ! targetObject.skeleton ) {
 
-						console.error( '  can not bind to bones as node does not have a skeleton', this );
+						console.error( 'THREE.PropertyBinding: Can not bind to bones as node does not have a skeleton.', this );
 						return;
 
 					}
@@ -544,7 +557,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 					if ( targetObject[ objectName ] === undefined ) {
 
-						console.error( '  can not bind to objectName of node, undefined', this );
+						console.error( 'THREE.PropertyBinding: Can not bind to objectName of node undefined.', this );
 						return;
 
 					}
@@ -558,7 +571,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 				if ( targetObject[ objectIndex ] === undefined ) {
 
-					console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
+					console.error( 'THREE.PropertyBinding: Trying to bind to objectIndex of objectName, but is undefined.', this, targetObject );
 					return;
 
 				}
@@ -576,8 +589,8 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			var nodeName = parsedPath.nodeName;
 
-			console.error( "  trying to update property for track: " + nodeName +
-				'.' + propertyName + " but it wasn't found.", targetObject );
+			console.error( 'THREE.PropertyBinding: Trying to update property for track: ' + nodeName +
+				'.' + propertyName + ' but it wasn\'t found.', targetObject );
 			return;
 
 		}
@@ -611,24 +624,49 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 				// support resolving morphTarget names into indices.
 				if ( ! targetObject.geometry ) {
 
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry', this );
+					console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences because node does not have a geometry.', this );
 					return;
 
 				}
 
-				if ( ! targetObject.geometry.morphTargets ) {
+				if ( targetObject.geometry.isBufferGeometry ) {
 
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
-					return;
+					if ( ! targetObject.geometry.morphAttributes ) {
 
-				}
+						console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences because node does not have a geometry.morphAttributes.', this );
+						return;
 
-				for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+					}
 
-					if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
+					for ( var i = 0; i < this.node.geometry.morphAttributes.position.length; i ++ ) {
 
-						propertyIndex = i;
-						break;
+						if ( targetObject.geometry.morphAttributes.position[ i ].name === propertyIndex ) {
+
+							propertyIndex = i;
+							break;
+
+						}
+
+					}
+
+
+				} else {
+
+					if ( ! targetObject.geometry.morphTargets ) {
+
+						console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences because node does not have a geometry.morphTargets.', this );
+						return;
+
+					}
+
+					for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+
+						if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
+
+							propertyIndex = i;
+							break;
+
+						}
 
 					}
 

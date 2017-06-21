@@ -22,10 +22,9 @@ Object.assign( BufferGeometryLoader.prototype, {
 		var scope = this;
 
 		var loader = new FileLoader( scope.manager );
-		loader.setResponseType( 'json' );
-		loader.load( url, function ( json ) {
+		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( json ) );
+			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
 
@@ -94,7 +93,8 @@ Object.assign( BufferGeometryLoader.prototype, {
 var TYPED_ARRAYS = {
 	Int8Array: Int8Array,
 	Uint8Array: Uint8Array,
-	Uint8ClampedArray: Uint8ClampedArray,
+	// Workaround for IE11 pre KB2929437. See #11440
+	Uint8ClampedArray: typeof Uint8ClampedArray !== 'undefined' ? Uint8ClampedArray : Uint8Array,
 	Int16Array: Int16Array,
 	Uint16Array: Uint16Array,
 	Int32Array: Int32Array,

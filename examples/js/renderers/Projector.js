@@ -403,7 +403,7 @@ THREE.Projector = function () {
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
+		_viewMatrix.copy( camera.matrixWorldInverse );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
 		_frustum.setFromMatrix( _viewProjectionMatrix );
@@ -773,6 +773,25 @@ THREE.Projector = function () {
 						_vector4.applyMatrix4( _modelViewProjectionMatrix );
 
 						pushPoint( _vector4, object, camera );
+
+					}
+
+				} else if ( geometry instanceof THREE.BufferGeometry ) {
+
+					var attributes = geometry.attributes;
+
+					if ( attributes.position !== undefined ) {
+
+						var positions = attributes.position.array;
+
+						for ( var i = 0, l = positions.length; i < l; i += 3 ) {
+
+							_vector4.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ], 1 );
+							_vector4.applyMatrix4( _modelViewProjectionMatrix );
+
+							pushPoint( _vector4, object, camera );
+
+						}
 
 					}
 
