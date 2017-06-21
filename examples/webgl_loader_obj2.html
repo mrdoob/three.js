@@ -150,8 +150,12 @@
 					this.scene.add( this.pivot );
 				};
 
-				OBJLoader2Example.prototype.initPostGL = function ( objDef ) {
-					var scope = this;
+				OBJLoader2Example.prototype.initPostGL = function () {
+					return true;
+				};
+
+				OBJLoader2Example.prototype.loadObj = function ( objDef ) {
+					this.scene.add( objDef.pivot );
 
 					var mtlLoader = new THREE.MTLLoader();
 					mtlLoader.setPath( objDef.texturePath );
@@ -161,7 +165,7 @@
 						materials.preload();
 
 						var objLoader = new THREE.OBJLoader2();
-						objLoader.setSceneGraphBaseNode( scope.pivot );
+						objLoader.setSceneGraphBaseNode( objDef.pivot );
 						objLoader.setMaterials( materials.materials );
 						objLoader.setPath( objDef.path );
 						objLoader.setDebug( false, false );
@@ -187,8 +191,6 @@
 						objLoader.load( objDef.fileObj, onSuccess, onProgress, onError );
 
 					});
-
-					return true;
 				};
 
 				OBJLoader2Example.prototype.resizeDisplayGL = function () {
@@ -330,11 +332,26 @@
 			console.log( 'Starting initialisation phase...' );
 			app.initGL();
 			app.resizeDisplayGL();
-			app.initPostGL( {
+			app.initPostGL();
+
+			var pivotA = new THREE.Object3D();
+			pivotA.name = 'PivotA';
+			pivotA.position.set( -50, 0, 0 );
+			app.loadObj( {
+				path: 'obj/female02/',
+				fileObj: 'female02_vertex_colors.obj',
+				pivot: pivotA
+			} );
+
+			var pivotB = new THREE.Object3D();
+			pivotB.name = 'PivotB';
+			pivotB.position.set( 50, 0, 0 );
+			app.loadObj( {
 				path: 'obj/female02/',
 				fileObj: 'female02.obj',
 				texturePath: 'obj/female02/',
-				fileMtl: 'female02.mtl'
+				fileMtl: 'female02.mtl',
+				pivot: pivotB
 			} );
 
 			render();

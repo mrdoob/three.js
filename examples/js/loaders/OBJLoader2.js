@@ -15,7 +15,7 @@ if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
  */
 THREE.OBJLoader2 = (function () {
 
-	var OBJLOADER2_VERSION = '1.2.1';
+	var OBJLOADER2_VERSION = '1.3.0';
 
 	function OBJLoader2( manager ) {
 		console.log( "Using THREE.OBJLoader2 version: " + OBJLOADER2_VERSION );
@@ -356,17 +356,31 @@ THREE.OBJLoader2 = (function () {
 			if ( bufferPointer < 1 ) return reachedFaces;
 
 			var bufferLength = bufferPointer - 1;
+			var concatBuffer;
 			switch ( buffer[ 0 ] ) {
 				case Consts.LINE_V:
 
 					// object complete instance required if reached faces already (= reached next block of v)
 					if ( reachedFaces ) {
 
+						if ( this.rawObject.colors.length > 0 && this.rawObject.colors.length !== this.rawObject.vertices.length ) {
+
+							throw 'Vertex Colors were detected, but vertex count and color count do not match!';
+
+						}
 						this.processCompletedObject( null, this.rawObject.groupName );
 						reachedFaces = false;
 
 					}
-					this.rawObject.pushVertex( buffer );
+					if ( bufferLength === 3 ) {
+
+						this.rawObject.pushVertex( buffer )
+
+					} else {
+
+						this.rawObject.pushVertexAndVertextColors( buffer );
+
+					}
 					break;
 
 				case Consts.LINE_VT:
@@ -438,28 +452,32 @@ THREE.OBJLoader2 = (function () {
 					break;
 
 				case Consts.LINE_G:
-					this.processCompletedGroup( buffer[ 1 ] );
+					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
+					this.processCompletedGroup( concatBuffer );
 					break;
 
 				case Consts.LINE_O:
+					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
 					if ( this.rawObject.vertices.length > 0 ) {
 
-						this.processCompletedObject( buffer[ 1 ], null );
+						this.processCompletedObject( concatBuffer, null );
 						reachedFaces = false;
 
 					} else {
 
-						this.rawObject.pushObject( buffer[ 1 ] );
+						this.rawObject.pushObject( concatBuffer );
 
 					}
 					break;
 
 				case Consts.LINE_MTLLIB:
-					this.rawObject.pushMtllib( buffer[ 1 ] );
+					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
+					this.rawObject.pushMtllib( concatBuffer );
 					break;
 
 				case Consts.LINE_USEMTL:
-					this.rawObject.pushUsemtl( buffer[ 1 ] );
+					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
+					this.rawObject.pushUsemtl( concatBuffer );
 					break;
 
 				default:
@@ -510,14 +528,15 @@ THREE.OBJLoader2 = (function () {
 			this.globalNormalOffset = 1;
 
 			this.vertices = [];
+			this.colors = [];
 			this.normals = [];
 			this.uvs = [];
 
 			// faces are stored according combined index of group, material and smoothingGroup (0 or not)
-			this.mtllibName = Validator.verifyInput( mtllibName, 'none' );
-			this.objectName = Validator.verifyInput( objectName, 'none' );
-			this.groupName = Validator.verifyInput( groupName, 'none' );
-			this.activeMtlName = 'none';
+			this.mtllibName = Validator.verifyInput( mtllibName, '' );
+			this.objectName = Validator.verifyInput( objectName, '' );
+			this.groupName = Validator.verifyInput( groupName, '' );
+			this.activeMtlName = '';
 			this.activeSmoothingGroup = 1;
 
 			this.mtlCount = 0;
@@ -550,6 +569,7 @@ THREE.OBJLoader2 = (function () {
 
 			// keep current buffers and indices forward
 			newRawObject.vertices = this.vertices;
+			newRawObject.colors = this.colors;
 			newRawObject.uvs = this.uvs;
 			newRawObject.normals = this.normals;
 			newRawObject.globalVertexOffset = this.globalVertexOffset;
@@ -563,6 +583,15 @@ THREE.OBJLoader2 = (function () {
 			this.vertices.push( parseFloat( buffer[ 1 ] ) );
 			this.vertices.push( parseFloat( buffer[ 2 ] ) );
 			this.vertices.push( parseFloat( buffer[ 3 ] ) );
+		};
+
+		RawObject.prototype.pushVertexAndVertextColors = function ( buffer ) {
+			this.vertices.push( parseFloat( buffer[ 1 ] ) );
+			this.vertices.push( parseFloat( buffer[ 2 ] ) );
+			this.vertices.push( parseFloat( buffer[ 3 ] ) );
+			this.colors.push( parseFloat( buffer[ 4 ] ) );
+			this.colors.push( parseFloat( buffer[ 5 ] ) );
+			this.colors.push( parseFloat( buffer[ 6 ] ) );
 		};
 
 		RawObject.prototype.pushUv = function ( buffer ) {
@@ -598,7 +627,10 @@ THREE.OBJLoader2 = (function () {
 		};
 
 		RawObject.prototype.pushSmoothingGroup = function ( activeSmoothingGroup ) {
-			var normalized = activeSmoothingGroup === 'off' ? 0 : activeSmoothingGroup;
+			var normalized = parseInt( activeSmoothingGroup );
+			if ( normalized === NaN ) {
+				normalized = activeSmoothingGroup === "off" ? 0 : 1;
+			}
 			if ( this.activeSmoothingGroup === normalized ) return;
 			this.activeSmoothingGroup = normalized;
 			this.smoothingGroupCount++;
@@ -674,17 +706,26 @@ THREE.OBJLoader2 = (function () {
 		};
 
 		RawObject.prototype.attachFaceV_ = function ( faceIndex ) {
-			var faceIndexInt =  parseInt( faceIndex );
+			var faceIndexInt = parseInt( faceIndex );
 			var index = ( faceIndexInt - this.globalVertexOffset ) * 3;
 
 			var rodiu = this.rawObjectDescriptionInUse;
 			rodiu.vertices.push( this.vertices[ index++ ] );
 			rodiu.vertices.push( this.vertices[ index++ ] );
 			rodiu.vertices.push( this.vertices[ index ] );
+
+			if ( this.colors.length > 0 ) {
+
+				index -= 2;
+				rodiu.colors.push( this.colors[ index++ ] );
+				rodiu.colors.push( this.colors[ index++ ] );
+				rodiu.colors.push( this.colors[ index ] );
+
+			}
 		};
 
 		RawObject.prototype.attachFaceVt = function ( faceIndex ) {
-			var faceIndexInt =  parseInt( faceIndex );
+			var faceIndexInt = parseInt( faceIndex );
 			var index = ( faceIndexInt - this.globalUvOffset ) * 2;
 
 			var rodiu = this.rawObjectDescriptionInUse;
@@ -693,7 +734,7 @@ THREE.OBJLoader2 = (function () {
 		};
 
 		RawObject.prototype.attachFaceVn = function ( faceIndex ) {
-			var faceIndexInt =  parseInt( faceIndex );
+			var faceIndexInt = parseInt( faceIndex );
 			var index = ( faceIndexInt - this.globalNormalOffset ) * 3;
 
 			var rodiu = this.rawObjectDescriptionInUse;
@@ -731,6 +772,7 @@ THREE.OBJLoader2 = (function () {
 			var rawObjectDescription;
 			var index = 0;
 			var absoluteVertexCount = 0;
+			var absoluteColorCount = 0;
 			var absoluteNormalCount = 0;
 			var absoluteUvCount = 0;
 
@@ -739,9 +781,9 @@ THREE.OBJLoader2 = (function () {
 				rawObjectDescription = temp[ name ];
 				if ( rawObjectDescription.vertices.length > 0 ) {
 
-					if ( rawObjectDescription.objectName === 'none' ) rawObjectDescription.objectName = rawObjectDescription.groupName;
 					this.rawObjectDescriptions[ index++ ] = rawObjectDescription;
 					absoluteVertexCount += rawObjectDescription.vertices.length;
+					absoluteColorCount += rawObjectDescription.colors.length;
 					absoluteUvCount += rawObjectDescription.uvs.length;
 					absoluteNormalCount += rawObjectDescription.normals.length;
 
@@ -757,6 +799,7 @@ THREE.OBJLoader2 = (function () {
 					this.rawObjectDescriptions,
 					inputObjectCount,
 					absoluteVertexCount,
+					absoluteColorCount,
 					absoluteNormalCount,
 					absoluteUvCount
 				);
@@ -813,6 +856,7 @@ THREE.OBJLoader2 = (function () {
 			this.materialName = materialName;
 			this.smoothingGroup = smoothingGroup;
 			this.vertices = [];
+			this.colors = [];
 			this.uvs = [];
 			this.normals = [];
 		}
@@ -844,6 +888,24 @@ THREE.OBJLoader2 = (function () {
 		MeshCreator.prototype.setMaterials = function ( materials ) {
 			this.materials = Validator.verifyInput( materials, this.materials );
 			this.materials = Validator.verifyInput( this.materials, { materials: [] } );
+
+			var defaultMaterial = this.materials[ 'defaultMaterial' ];
+			if ( ! defaultMaterial ) {
+
+				defaultMaterial = new THREE.MeshStandardMaterial( { color: 0xDCF1FF } );
+				defaultMaterial.name = 'defaultMaterial';
+				this.materials[ 'defaultMaterial' ] = defaultMaterial;
+
+			}
+			var vertexColorMaterial = this.materials[ 'vertexColorMaterial' ];
+			if ( ! vertexColorMaterial ) {
+
+				vertexColorMaterial = new THREE.MeshBasicMaterial( { color: 0xDCF1FF } );
+				vertexColorMaterial.name = 'vertexColorMaterial';
+				vertexColorMaterial.vertexColors = THREE.VertexColors;
+				this.materials[ 'vertexColorMaterial' ] = vertexColorMaterial;
+
+			}
 		};
 
 		MeshCreator.prototype.setDebug = function ( debug ) {
@@ -874,16 +936,26 @@ THREE.OBJLoader2 = (function () {
 		 * @param {RawObjectDescription[]} rawObjectDescriptions Array of descriptive information and data (vertices, normals, uvs) about the parsed object(s)
 		 * @param {number} inputObjectCount Number of objects already retrieved from OBJ
 		 * @param {number} absoluteVertexCount Sum of all vertices of all rawObjectDescriptions
+		 * @param {number} absoluteColorCount Sum of all vertex colors of all rawObjectDescriptions
 		 * @param {number} absoluteNormalCount Sum of all normals of all rawObjectDescriptions
 		 * @param {number} absoluteUvCount Sum of all uvs of all rawObjectDescriptions
 		 */
-		MeshCreator.prototype.buildMesh = function ( rawObjectDescriptions, inputObjectCount, absoluteVertexCount, absoluteNormalCount, absoluteUvCount ) {
+		MeshCreator.prototype.buildMesh = function ( rawObjectDescriptions, inputObjectCount, absoluteVertexCount,
+													 absoluteColorCount, absoluteNormalCount, absoluteUvCount ) {
 
 			if ( this.debug ) console.log( 'MeshCreator.buildRawMeshData:\nInput object no.: ' + inputObjectCount );
 
 			var bufferGeometry = new THREE.BufferGeometry();
 			var vertexBA = new THREE.BufferAttribute( new Float32Array( absoluteVertexCount ), 3 );
 			bufferGeometry.addAttribute( 'position', vertexBA );
+
+			var colorBA;
+			if ( absoluteColorCount > 0 ) {
+
+				colorBA = new THREE.BufferAttribute( new Float32Array( absoluteColorCount ), 3 );
+				bufferGeometry.addAttribute( 'color', colorBA );
+
+			}
 
 			var normalBA;
 			if ( absoluteNormalCount > 0 ) {
@@ -900,8 +972,6 @@ THREE.OBJLoader2 = (function () {
 
 			}
 
-			if ( this.debug ) console.log( 'Creating Multi-Material for object no.: ' + this.globalObjectCount );
-
 			var rawObjectDescription;
 			var material;
 			var materialName;
@@ -914,25 +984,24 @@ THREE.OBJLoader2 = (function () {
 			var vertexBAOffset = 0;
 			var vertexGroupOffset = 0;
 			var vertexLength;
-			var normalOffset = 0;
-			var uvOffset = 0;
+			var colorBAOffset = 0;
+			var normalBAOffset = 0;
+			var uvBAOffset = 0;
+
+			if ( this.debug ) {
+				console.log( createMultiMaterial ? 'Creating Multi-Material' : 'Creating Material' + ' for object no.: ' + this.globalObjectCount );
+			}
 
 			for ( var oodIndex in rawObjectDescriptions ) {
 				rawObjectDescription = rawObjectDescriptions[ oodIndex ];
 
 				materialName = rawObjectDescription.materialName;
-				material = this.materials[ materialName ];
+				material = colorBA ? this.materials[ 'vertexColorMaterial' ] : this.materials[ materialName ];
 				if ( ! material ) {
 
 					material = this.materials[ 'defaultMaterial' ];
-					if ( ! material ) {
-
-						material = new THREE.MeshStandardMaterial( { color: 0xDCF1FF} );
-						material.name = 'defaultMaterial';
-						this.materials[ 'defaultMaterial' ] = material;
-
-					}
-					console.warn( 'object_group "' + rawObjectDescription.objectName + '_' + rawObjectDescription.groupName + '" was defined without material! Assigning "defaultMaterial".' );
+					if ( ! material ) console.warn( 'object_group "' + rawObjectDescription.objectName + '_' + rawObjectDescription.groupName +
+													'" was defined without material! Assigning "defaultMaterial".' );
 
 				}
 				// clone material in case flat shading is needed due to smoothingGroup 0
@@ -972,16 +1041,23 @@ THREE.OBJLoader2 = (function () {
 				vertexBA.set( rawObjectDescription.vertices, vertexBAOffset );
 				vertexBAOffset += vertexLength;
 
+				if ( colorBA ) {
+
+					colorBA.set( rawObjectDescription.colors, colorBAOffset );
+					colorBAOffset += rawObjectDescription.colors.length;
+
+				}
+
 				if ( normalBA ) {
 
-					normalBA.set( rawObjectDescription.normals, normalOffset );
-					normalOffset += rawObjectDescription.normals.length;
+					normalBA.set( rawObjectDescription.normals, normalBAOffset );
+					normalBAOffset += rawObjectDescription.normals.length;
 
 				}
 				if ( uvBA ) {
 
-					uvBA.set( rawObjectDescription.uvs, uvOffset );
-					uvOffset += rawObjectDescription.uvs.length;
+					uvBA.set( rawObjectDescription.uvs, uvBAOffset );
+					uvBAOffset += rawObjectDescription.uvs.length;
 
 				}
 				if ( this.debug ) this.printReport( rawObjectDescription, selectedMaterialIndex );
@@ -991,20 +1067,23 @@ THREE.OBJLoader2 = (function () {
 
 			if ( createMultiMaterial ) material = materials;
 			var mesh = new THREE.Mesh( bufferGeometry, material );
+			mesh.name = rawObjectDescription.groupName !== '' ? rawObjectDescription.groupName : rawObjectDescription.objectName;
 			this.sceneGraphBaseNode.add( mesh );
 
 			this.globalObjectCount++;
 		};
 
 		MeshCreator.prototype.printReport = function ( rawObjectDescription, selectedMaterialIndex ) {
+			var materialIndexLine = Validator.isValid( selectedMaterialIndex ) ? '\n materialIndex: ' + selectedMaterialIndex : '';
 			console.log(
 				' Output Object no.: ' + this.globalObjectCount +
 				'\n objectName: ' + rawObjectDescription.objectName +
 				'\n groupName: ' + rawObjectDescription.groupName +
 				'\n materialName: ' + rawObjectDescription.materialName +
-				'\n materialIndex: ' + selectedMaterialIndex +
+				materialIndexLine +
 				'\n smoothingGroup: ' + rawObjectDescription.smoothingGroup +
 				'\n #vertices: ' + rawObjectDescription.vertices.length / 3 +
+				'\n #colors: ' + rawObjectDescription.colors.length / 3 +
 				'\n #uvs: ' + rawObjectDescription.uvs.length / 2 +
 				'\n #normals: ' + rawObjectDescription.normals.length / 3
 			);
