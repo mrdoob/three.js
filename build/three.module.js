@@ -20691,6 +20691,15 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.getDrawingBufferSize = function () {
+
+		return {
+			width: _width * _pixelRatio,
+			height: _height * _pixelRatio
+		};
+
+	};
+
 	this.setDrawingBufferSize = function ( width, height, pixelRatio ) {
 
 		_width = width;
