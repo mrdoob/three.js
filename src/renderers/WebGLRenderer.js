@@ -415,11 +415,11 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.getPhysicalSize = function () {
+	this.getDrawingBufferSize = function () {
 
 		return {
-			width: _canvas.width,
-			height: _canvas.height
+			width: _width * _pixelRatio,
+			height: _height * _pixelRatio
 		};
 
 	};
