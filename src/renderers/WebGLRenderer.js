@@ -406,6 +406,15 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.getDrawingBufferSize = function () {
+
+		return {
+			width: _width * _pixelRatio,
+			height: _height * _pixelRatio
+		};
+
+	};
+
 	this.setSize = function ( width, height, updateStyle ) {
 
 		var device = vr.getDevice();
