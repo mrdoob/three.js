@@ -94,6 +94,9 @@ THREE.GLTF2Loader = ( function () {
 
 				}
 
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.AVR_TEXTURE_OFFSET_SCALE ) >= 0 ) {
+					extensions[EXTENSIONS.AVR_TEXTURE_OFFSET_SCALE] = new GLTFTextureOffsetScale( json );
+				}
 			}
 
 			console.time( 'GLTF2Loader' );
@@ -289,6 +292,7 @@ THREE.GLTF2Loader = ( function () {
 		KHR_MATERIALS_COMMON: 'KHR_materials_common',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
 		KHR_TECHNIQUE_WEBGL: 'KHR_technique_webgl',
+		AVR_TEXTURE_OFFSET_SCALE: 'AVR_texture_offset_scale'
 	};
 
 	/**
@@ -1113,6 +1117,22 @@ THREE.GLTF2Loader = ( function () {
 
 	}
 
+	function GLTFTextureOffsetScale( json ) {
+		this.name = EXTENSIONS.AVR_TEXTURE_OFFSET_SCALE;
+	}
+
+	GLTFTextureOffsetScale.prototype.extendParams = function ( textureParams, texture, dependencies ) {
+
+		var extensions = texture.extensions || {};
+		var offsetScaleData = extensions[this.name];
+
+		if(offsetScaleData)
+		{
+			textureParams.offset = new THREE.Vector2(offsetScaleData.offsetS || 0, offsetScaleData.offsetT || 0);
+			textureParams.repeat = new THREE.Vector2(offsetScaleData.tileS || 1, offsetScaleData.tileT || 1);
+		}
+	}
+
 	/*********************************/
 	/********** INTERNALS ************/
 	/*********************************/
@@ -1605,6 +1625,44 @@ THREE.GLTF2Loader = ( function () {
 
 	};
 
+	GLTFParser.prototype._loadTextureInfo = function ( textureInfo, dependencies, isLightmap) {
+
+		var textureParams = {};
+		var texInfoExtensions = textureInfo.extensions || {};
+		var textureObject;
+
+		if( textureInfo.index !== undefined ) {
+			textureObject = dependencies.textures[textureInfo.index];
+		}
+		else {
+			console.warn("GLTF2Loader: textureInfo missing required 'index' field");
+			return null;
+		}
+
+		if( isLightmap && textureInfo.texCoord !== 1 ) {
+			console.warn("GLTF2Loader: Lightmap texCoord required to be 1");
+		}
+		else if( textureInfo.texCoord !== 0 && textureInfo.texCoord !== undefined ) {
+			console.warn("GLTF2Loader: texCoord not supported, will be 0");
+		}
+
+		if ( texInfoExtensions[ EXTENSIONS.AVR_TEXTURE_OFFSET_SCALE ] )
+		{
+			this.extensions[ EXTENSIONS.AVR_TEXTURE_OFFSET_SCALE ].extendParams( textureParams, textureInfo, dependencies );
+			textureObject = textureObject.clone();
+		}
+
+		for(var prop in textureParams){
+			if(textureParams[prop] instanceof THREE.Vector2)
+				textureObject[prop].copy(textureParams[prop]);
+			else
+				textureObject[prop] = textureParams[prop];
+		}
+
+		textureObject.needsUpdate = true;
+		return textureObject;
+	}
+
 	GLTFParser.prototype.parse = function ( callback ) {
 
 		var json = this.json;
@@ -1903,6 +1961,7 @@ THREE.GLTF2Loader = ( function () {
 
 		var json = this.json;
 		var extensions = this.extensions;
+		var loadTextureInfo = this._loadTextureInfo.bind(this);
 
 		return this._withDependencies( [
 
@@ -1955,16 +2014,7 @@ THREE.GLTF2Loader = ( function () {
 
 					if ( metallicRoughness.baseColorTexture !== undefined ) {
 
-						materialParams.map = dependencies.textures[ metallicRoughness.baseColorTexture.index ];
-
-						var alphaMode = metallicRoughness.baseColorTexture.alphaMode || ALPHA_MODES.OPAQUE;
-
-						if ( alphaMode !== ALPHA_MODES.OPAQUE ) {
-
-							materialParams.transparent = true;
-
-						}
-
+						materialParams.map = loadTextureInfo( metallicRoughness.baseColorTexture, dependencies );
 					}
 
 					materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
@@ -1972,9 +2022,9 @@ THREE.GLTF2Loader = ( function () {
 
 					if ( metallicRoughness.metallicRoughnessTexture !== undefined ) {
 
-						var textureIndex = metallicRoughness.metallicRoughnessTexture.index;
-						materialParams.metalnessMap = dependencies.textures[ textureIndex ];
-						materialParams.roughnessMap = dependencies.textures[ textureIndex ];
+						var texture = loadTextureInfo(metallicRoughness.metallicRoughnessTexture, dependencies);
+						materialParams.metalnessMap = texture;
+						materialParams.roughnessMap = texture;
 
 					}
 
@@ -1990,7 +2040,7 @@ THREE.GLTF2Loader = ( function () {
 
 				}
 
-				if ( materialParams.opacity !== undefined && materialParams.opacity < 1.0 ) {
+				if ( material.alphaMode !== ALPHA_MODES.OPAQUE ) {
 
 					materialParams.transparent = true;
 
@@ -2002,13 +2052,16 @@ THREE.GLTF2Loader = ( function () {
 
 				if ( material.normalTexture !== undefined ) {
 
-					materialParams.normalMap = dependencies.textures[ material.normalTexture.index ];
+					materialParams.normalMap = loadTextureInfo( material.normalTexture, dependencies );
+					materialParams.normalScale = new THREE.Vector2();
+					materialParams.normalScale.setScalar(material.normalTexture.scale || 1);
 
 				}
 
 				if ( material.occlusionTexture !== undefined ) {
 
-					materialParams.aoMap = dependencies.textures[ material.occlusionTexture.index ];
+					materialParams.aoMap = loadTextureInfo( material.occlusionTexture, dependencies );
+					materialParams.aoMapIntensity = material.occlusionTexture.strength || 1;
 
 				}
 
@@ -2028,13 +2081,14 @@ THREE.GLTF2Loader = ( function () {
 
 				if ( material.emissiveTexture !== undefined ) {
 
+					var texture = loadTextureInfo( material.emissiveTexture, dependencies );
 					if ( materialType === THREE.MeshBasicMaterial ) {
 
-						materialParams.map = dependencies.textures[ material.emissiveTexture.index ];
+						materialParams.map = texture;
 
 					} else {
 
-						materialParams.emissiveMap = dependencies.textures[ material.emissiveTexture.index ];
+						materialParams.emissiveMap = texture;
 
 					}
 
