@@ -45,10 +45,8 @@ var SceneUtils = {
 
 	convertFromZUp: function ( root, animations ) {
 
-		// see https://gamedev.stackexchange.com/a/7932
-
-		// this matrix will change the coordinate system of an object hierarchy and
-		// animations (optional) from right-handed Z-up to right-handed Y-up
+		// this change-of-basis matrix performs a change-of basis from right-handed Z-up to right-handed Y-up
+		// for a given object hierarchy and animations (optional)
 
 		var matrix = new Matrix4().set(
 			1,   0,   0,   0,
@@ -71,7 +69,7 @@ function BasisConverter( matrix ) {
 	this.matrix = matrix;
 
 	// because the change-of-basis matrix is orthonormal, the inverse of
-	// this.matrix is its transposition
+	// this.matrix is its transpose
 
 	this.matrixInverse = this.matrix.clone().transpose();
 
