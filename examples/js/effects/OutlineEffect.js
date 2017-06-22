@@ -93,23 +93,20 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	var vertexShaderChunk2 = [
 
 		"#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( TOON ) && ! defined( PHYSICAL )",
-
 		"	#ifndef USE_ENVMAP",
-		"		vec3 transformedNormal = normalize( normal );",
-
-		"		#ifdef FLIP_SIDED",
-		"			transformedNormal = -transformedNormal;",
-		"		#endif",
-
+		"		vec3 objectNormal = normalize( normal );",
 		"	#endif",
+		"#endif",
 
+		"#ifdef FLIP_SIDED",
+		"	objectNormal = -objectNormal;",
 		"#endif",
 
 		"#ifdef DECLARE_TRANSFORMED",
 		"	vec3 transformed = vec3( position );",
 		"#endif",
 
-		"gl_Position = calculateOutline( gl_Position, transformedNormal, vec4( transformed, 1.0 ) );",
+		"gl_Position = calculateOutline( gl_Position, objectNormal, vec4( transformed, 1.0 ) );",
 
 		"#include <fog_vertex>"
 
