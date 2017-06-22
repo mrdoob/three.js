@@ -200,22 +200,22 @@ THREE.STLLoader.prototype = {
 
 	parseASCII: function ( data ) {
 
-		var geometry, length, patternFace, patternNormal, patternVertex, result, text, vertexCountPerFace, normalCountPerFace, faceCounter;
-		
+		var geometry, patternFace, patternNormal, patternVertex, result, text, vertexCountPerFace, normalCountPerFace, faceCounter;
+
 		faceCounter = vertexCountPerFace = normalCountPerFace = 0;
 		geometry = new THREE.BufferGeometry();
 		patternFace = /facet([\s\S]*?)endfacet/g;
-		
+
 		var patternFloat = /[\s]+([+-]?(?:\d+.\d+|\d+.|\d+|.\d+)(?:[eE][+-]?\d+)?)/.source;
-		patternNormal = new RegExp(''
+		patternNormal = new RegExp( ''
 			+ 'normal'
 			+ patternFloat
 			+ patternFloat
 			+ patternFloat
 			, 'g'
 		);
-		
-		patternVertex = new RegExp(''
+
+		patternVertex = new RegExp( ''
 			+ 'vertex'
 			+ patternFloat
 			+ patternFloat
@@ -229,6 +229,7 @@ THREE.STLLoader.prototype = {
 		var normal = new THREE.Vector3();
 
 		while ( ( result = patternFace.exec( data ) ) !== null ) {
+
 			vertexCountPerFace = normalCountPerFace = 0;
 
 			text = result[ 0 ];
@@ -238,25 +239,32 @@ THREE.STLLoader.prototype = {
 				normal.x = parseFloat( result[ 1 ] );
 				normal.y = parseFloat( result[ 2 ] );
 				normal.z = parseFloat( result[ 3 ] );
-				normalCountPerFace++;
+				normalCountPerFace ++;
+
 			}
 
 			while ( ( result = patternVertex.exec( text ) ) !== null ) {
 
 				vertices.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
 				normals.push( normal.x, normal.y, normal.z );
-				vertexCountPerFace++;
+				vertexCountPerFace ++;
+
 			}
-					
+
 			// Every face have to own ONE valid normal
-			if (normalCountPerFace !== 1) {
-				throw 'Something isn\' right with the normal of face number ' + faceCounter;
+			if ( normalCountPerFace !== 1 ) {
+
+				throw new Error( 'Something isn\'t right with the normal of face number ' + faceCounter );
+
 			}
-			// Every face have to own THREE valid vertices
-			if (vertexCountPerFace !== 3) {
-				throw 'Something isn\' right with the vertices of face number ' + faceCounter;
+			// Each face have to own THREE valid vertices
+			if ( vertexCountPerFace !== 3 ) {
+
+				throw new Error( 'Something isn\'t right with the vertices of face number ' + faceCounter );
+
 			}
-			faceCounter++;
+			faceCounter ++;
+
 		}
 
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
@@ -274,10 +282,10 @@ THREE.STLLoader.prototype = {
 			var strArray = [];
 			for ( var i = 0; i < buf.byteLength; i ++ ) {
 
-				strArray.push(String.fromCharCode( array_buffer[ i ] )); // implicitly assumes little-endian
+				strArray.push( String.fromCharCode( array_buffer[ i ] ) ); // implicitly assumes little-endian
 
 			}
-			return strArray.join('');
+			return strArray.join( '' );
 
 		} else {
 
