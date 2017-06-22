@@ -95,7 +95,11 @@ THREE.GLTF2Loader = ( function () {
 				}
 
 				if ( json.extensionsUsed.indexOf( EXTENSIONS.AVR_TEXTURE_OFFSET_SCALE ) >= 0 ) {
-					extensions[EXTENSIONS.AVR_TEXTURE_OFFSET_SCALE] = new GLTFTextureOffsetScale( json );
+					extensions[EXTENSIONS.AVR_TEXTURE_OFFSET_SCALE] = new GLTFTextureOffsetScaleExtension( json );
+				}
+
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.AVR_LIGHTS_STATIC ) >= 0 ) {
+					extensions[EXTENSIONS.AVR_LIGHTS_STATIC] = new GLTFLightsStaticExtension( json );
 				}
 			}
 
@@ -292,7 +296,8 @@ THREE.GLTF2Loader = ( function () {
 		KHR_MATERIALS_COMMON: 'KHR_materials_common',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
 		KHR_TECHNIQUE_WEBGL: 'KHR_technique_webgl',
-		AVR_TEXTURE_OFFSET_SCALE: 'AVR_texture_offset_scale'
+		AVR_TEXTURE_OFFSET_SCALE: 'AVR_texture_offset_scale',
+		AVR_LIGHTS_STATIC: 'AVR_lights_static',
 	};
 
 	/**
@@ -1117,11 +1122,11 @@ THREE.GLTF2Loader = ( function () {
 
 	}
 
-	function GLTFTextureOffsetScale( json ) {
+	function GLTFTextureOffsetScaleExtension( json ) {
 		this.name = EXTENSIONS.AVR_TEXTURE_OFFSET_SCALE;
 	}
 
-	GLTFTextureOffsetScale.prototype.extendParams = function ( textureParams, texture, dependencies ) {
+	GLTFTextureOffsetScaleExtension.prototype.extendParams = function ( textureParams, texture, dependencies ) {
 
 		var extensions = texture.extensions || {};
 		var offsetScaleData = extensions[this.name];
@@ -1131,6 +1136,10 @@ THREE.GLTF2Loader = ( function () {
 			textureParams.offset = new THREE.Vector2(offsetScaleData.offsetS || 0, offsetScaleData.offsetT || 0);
 			textureParams.repeat = new THREE.Vector2(offsetScaleData.tileS || 1, offsetScaleData.tileT || 1);
 		}
+	}
+
+	function GLTFLightsStaticExtension( json ) {
+
 	}
 
 	/*********************************/
@@ -2645,13 +2654,12 @@ THREE.GLTF2Loader = ( function () {
 
 		} ).then( function ( __nodes ) {
 
-			return scope._withDependencies( [
+			var deps = [ "meshes", "skins", "cameras" ];
+			if( extensions[ EXTENSIONS.AVR_LIGHTS_STATIC ] )
+				deps.push( "textures" );
 
-				"meshes",
-				"skins",
-				"cameras"
-
-			] ).then( function ( dependencies ) {
+			return scope._withDependencies(deps)
+			.then( function ( dependencies ) {
 
 				return _each( __nodes, function ( _node, nodeId ) {
 
@@ -2820,15 +2828,33 @@ THREE.GLTF2Loader = ( function () {
 
 					}
 
-					if ( node.extensions
-							 && node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ]
-							 && node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].light ) {
+					if ( node.extensions )
+					{
+						if( node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ]
+							&& node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].light ) {
 
-						var extensionLights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
-						var light = extensionLights[ node.extensions[ EXTENSIONS.KHR_LIGHTS ].light ];
+							var extensionLights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
+							var light = extensionLights[ node.extensions[ EXTENSIONS.KHR_LIGHTS ].light ];
 
-						_node.add( light );
+							_node.add( light );
+						}
 
+						if( node.extensions[ EXTENSIONS.AVR_LIGHTS_STATIC ] )
+						{
+							var lightmapInfo = node.extensions[ EXTENSIONS.AVR_LIGHTS_STATIC ];
+							var lightmap = scope._loadTextureInfo(lightmapInfo, dependencies, true);
+
+							for( var i=0; i<_node.children.length; i++ )
+							{
+								var mesh = _node.children[i];
+								if( ! (mesh instanceof THREE.Mesh) )
+									continue;
+
+								mesh.material = mesh.material.clone();
+								mesh.material.lightMap = lightmap;
+								mesh.material.lightMapIntensity = lightmapInfo.strength || 1;
+							}
+						}
 					}
 
 					return _node;
