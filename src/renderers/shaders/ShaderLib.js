@@ -190,9 +190,12 @@ var ShaderLib = {
 
 	distanceRGBA: {
 
-		uniforms: {
-			lightPos: { value: new Vector3() }
-		},
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.common,
+			{
+				lightPos: { value: new Vector3() }
+			}
+		] ),
 
 		vertexShader: ShaderChunk.distanceRGBA_vert,
 		fragmentShader: ShaderChunk.distanceRGBA_frag
