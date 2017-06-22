@@ -2154,6 +2154,41 @@
 			if ( curveNode.attr === 'R' ) {
 
 				var curves = curveNode.curves;
+
+				// Seems like some FBX files have AnimationCurveNode
+				// which doesn't have any connected AnimationCurve.
+				// Setting animation parameter for them here.
+
+				if ( curves.x === null ) {
+
+					curves.x = {
+						version: null,
+						times: [ 0.0 ],
+						values: [ 0.0 ]
+					};
+
+				}
+
+				if ( curves.y === null ) {
+
+					curves.y = {
+						version: null,
+						times: [ 0.0 ],
+						values: [ 0.0 ]
+					};
+
+				}
+
+				if ( curves.z === null ) {
+
+					curves.z = {
+						version: null,
+						times: [ 0.0 ],
+						values: [ 0.0 ]
+					};
+
+				}
+
 				curves.x.values = curves.x.values.map( degreeToRadian );
 				curves.y.values = curves.y.values.map( degreeToRadian );
 				curves.z.values = curves.z.values.map( degreeToRadian );
