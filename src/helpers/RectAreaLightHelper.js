@@ -66,8 +66,15 @@ RectAreaLightHelper.prototype.update = function () {
 
 	position.needsUpdate = true;
 
-	if ( ! this.color ) this.line.material.color.copy( this.light.color );
-	else this.line.material.color.set( this.color );
+	if ( this.color !== undefined ) {
+
+		this.line.material.color.set( this.color );
+
+	} else {
+
+		this.line.material.color.copy( this.light.color );
+
+	}
 
 };
 

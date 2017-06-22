@@ -29,7 +29,7 @@ function HemisphereLightHelper( light, size, color ) {
 	geometry.rotateY( Math.PI * 0.5 );
 
 	this.material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.color } );
-	if ( ! color ) this.material.vertexColors = VertexColors;
+	if ( this.color === undefined ) this.material.vertexColors = VertexColors;
 
 	var position = geometry.getAttribute( 'position' );
 	var colors = new Float32Array( position.count * 3 );
@@ -63,7 +63,7 @@ HemisphereLightHelper.prototype.update = function () {
 
 		var mesh = this.children[ 0 ];
 
-		if ( this.color ) {
+		if ( this.color !== undefined ) {
 
 			this.material.color.set( this.color );
 

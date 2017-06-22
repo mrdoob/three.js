@@ -74,13 +74,21 @@ DirectionalLightHelper.prototype.update = function () {
 		v3.subVectors( v2, v1 );
 
 		this.lightPlane.lookAt( v3 );
-		if ( ! this.color ) this.lightPlane.material.color.copy( this.light.color );
-		else this.lightPlane.material.color.set( this.color );
+
+		if ( this.color !== undefined ) {
+
+			this.lightPlane.material.color.set( this.color );
+			this.targetLine.material.color.set( this.color );
+
+		} else {
+
+			this.lightPlane.material.color.copy( this.light.color );
+			this.targetLine.material.color.copy( this.light.color );
+
+		}
 
 		this.targetLine.lookAt( v3 );
 		this.targetLine.scale.z = v3.length();
-		if ( ! this.color ) this.targetLine.material.color.copy( this.light.color );
-		else this.targetLine.material.color.set( this.color );
 
 	};
 
