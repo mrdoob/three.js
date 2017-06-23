@@ -257,6 +257,7 @@
 				}
 
 				var curve = new THREE.CatmullRomCurve3( positions );
+				curve.curveType = 'catmullrom';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0xff0000,
 					opacity: 0.35,
