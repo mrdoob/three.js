@@ -93,7 +93,7 @@ function CatmullRomCurve3( points ) {
 
 	this.points = points || [];
 	this.closed = false;
-	this.curveType = 'catmullrom';
+	this.curveType = 'centripetal';
 
 }
 
