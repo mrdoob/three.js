@@ -147,10 +147,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		function checkIntersection( object, raycaster, ray, pA, pB, pC, point ) {
+		function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 
 			var intersect;
-			var material = object.material;
 
 			if ( material.side === BackSide ) {
 
@@ -185,7 +184,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			vB.fromBufferAttribute( position, b );
 			vC.fromBufferAttribute( position, c );
 
-			var intersection = checkIntersection( object, raycaster, ray, vA, vB, vC, intersectionPoint );
+			var intersection = checkIntersection( object, object.material, raycaster, ray, vA, vB, vC, intersectionPoint );
 
 			if ( intersection ) {
 
@@ -348,7 +347,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					}
 
-					intersection = checkIntersection( this, raycaster, ray, fvA, fvB, fvC, intersectionPoint );
+					intersection = checkIntersection( this, faceMaterial, raycaster, ray, fvA, fvB, fvC, intersectionPoint );
 
 					if ( intersection ) {
 
