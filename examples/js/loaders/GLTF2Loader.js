@@ -442,6 +442,7 @@ THREE.GLTF2Loader = ( function () {
 		if ( materialValues.diffuseFactor !== undefined ) {
 
 			materialParams.color = new THREE.Color().fromArray( materialValues.diffuseFactor );
+			materialParams.opacity = materialValues.diffuseFactor[ 3 ];
 
 		}
 
@@ -1987,14 +1988,6 @@ THREE.GLTF2Loader = ( function () {
 
 						materialParams.map = dependencies.textures[ metallicRoughness.baseColorTexture.index ];
 
-						var alphaMode = metallicRoughness.baseColorTexture.alphaMode || ALPHA_MODES.OPAQUE;
-
-						if ( alphaMode !== ALPHA_MODES.OPAQUE ) {
-
-							materialParams.transparent = true;
-
-						}
-
 					}
 
 					materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
@@ -2020,7 +2013,9 @@ THREE.GLTF2Loader = ( function () {
 
 				}
 
-				if ( materialParams.opacity !== undefined && materialParams.opacity < 1.0 ) {
+				var alphaMode = material.alphaMode || ALPHA_MODES.OPAQUE;
+
+				if ( alphaMode !== ALPHA_MODES.OPAQUE ) {
 
 					materialParams.transparent = true;
 
