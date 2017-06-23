@@ -156,6 +156,7 @@
 
 				OBJLoader2Example.prototype.loadObj = function ( objDef ) {
 					this.scene.add( objDef.pivot );
+					var scope = this;
 
 					var mtlLoader = new THREE.MTLLoader();
 					mtlLoader.setPath( objDef.texturePath );
@@ -164,6 +165,7 @@
 
 						materials.preload();
 
+						scope.pivot.add( objDef.pivot );
 						var objLoader = new THREE.OBJLoader2();
 						objLoader.setSceneGraphBaseNode( objDef.pivot );
 						objLoader.setMaterials( materials.materials );

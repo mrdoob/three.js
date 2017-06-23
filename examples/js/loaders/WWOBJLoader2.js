@@ -420,7 +420,6 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 				for ( key in materialDescriptions ) {
 
 					materialDescription = materialDescriptions[ key ];
-					material = this.materials[ materialDescription.name ];
 					material = haveVertexColors ? this.materials[ 'vertexColorMaterial' ] : this.materials[ materialDescription.name ];
 					if ( ! material ) material = this.materials[ 'defaultMaterial' ];
 
