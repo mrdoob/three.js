@@ -1781,17 +1781,17 @@ THREE.GLTF2Loader = ( function () {
 				// For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
 				var elementBytes = TypedArray.BYTES_PER_ELEMENT;
 				var itemBytes = elementBytes * itemSize;
-
+				var byteStride = json.bufferViews[accessor.bufferView].byteStride;	
 				var array;
 
 				// The buffer is not interleaved if the stride is the item size in bytes.
-				if ( accessor.byteStride && accessor.byteStride !== itemBytes ) {
+				if ( byteStride && byteStride !== itemBytes ) {
 
 					// Use the full buffer if it's interleaved.
 					array = new TypedArray( arraybuffer );
 
 					// Integer parameters to IB/IBA are in array elements, not bytes.
-					var ib = new THREE.InterleavedBuffer( array, accessor.byteStride / elementBytes );
+					var ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
 
 					return new THREE.InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes );
 
