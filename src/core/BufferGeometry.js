@@ -907,7 +907,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		data.data = { attributes: {} };
+		data.data = { attributes: {}, morphAttributes: {} };
 
 		var index = this.index;
 
@@ -936,6 +936,32 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 				array: array,
 				normalized: attribute.normalized
 			};
+
+		}
+
+		var morphAttributes = this.morphAttributes;
+
+		for ( var key in morphAttributes ) {
+
+			var attributeArray = this.morphAttributes[ key ];
+
+			var array = [];
+
+			for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
+
+				var attribute = attributeArray[ i ];
+
+				array.push( {
+					name: attribute.name,
+					itemSize: attribute.itemSize,
+					type: attribute.array.constructor.name,
+					array: Array.prototype.slice.call( attribute.array ),
+					normalized: attribute.normalized
+				} );
+
+			}
+
+			data.data.morphAttributes[ key ] = array;
 
 		}
 
