@@ -594,7 +594,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 				geometries: {},
 				materials: {},
 				textures: {},
-				images: {}
+				images: {},
+				skeletons: {}
 			};
 
 			output.metadata = {
@@ -619,6 +620,11 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		if ( this.visible === false ) object.visible = false;
 
 		object.matrix = this.matrix.toArray();
+
+		// SkinnedMesh specific
+
+		if ( this.bindMode !== undefined ) object.bindMode = this.bindMode;
+		if ( this.bindMatrix !== undefined ) object.bindMatrix = this.bindMatrix.toArray();
 
 		//
 
@@ -662,6 +668,20 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		}
 
+		// SkinnedMesh specific
+
+		if ( this.skeleton !== undefined ) {
+
+			if ( meta.skeletons[ this.skeleton.uuid ] === undefined ) {
+
+				meta.skeletons[ this.skeleton.uuid ] = this.skeleton.toJSON( meta );
+
+			}
+
+			object.skeleton = this.skeleton.uuid;
+
+		}
+
 		//
 
 		if ( this.children.length > 0 ) {
@@ -682,11 +702,13 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 			var materials = extractFromCache( meta.materials );
 			var textures = extractFromCache( meta.textures );
 			var images = extractFromCache( meta.images );
+			var skeletons = extractFromCache( meta.skeletons );
 
 			if ( geometries.length > 0 ) output.geometries = geometries;
 			if ( materials.length > 0 ) output.materials = materials;
 			if ( textures.length > 0 ) output.textures = textures;
 			if ( images.length > 0 ) output.images = images;
+			if ( skeletons.length > 0 ) output.skeletons = skeletons;
 
 		}
 
