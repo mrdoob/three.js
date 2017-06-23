@@ -11,6 +11,8 @@ import { CurvePath } from './CurvePath';
 function Path( points ) {
 
 	CurvePath.call( this );
+
+	this.type = 'Path';
 	this.currentPoint = new Vector2();
 
 	if ( points ) {
@@ -23,5 +25,6 @@ function Path( points ) {
 
 Path.prototype = PathPrototype;
 PathPrototype.constructor = Path;
+
 
 export { Path };

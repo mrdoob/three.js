@@ -9,6 +9,7 @@ import { ShapePath } from './ShapePath';
 
 function Font( data ) {
 
+	this.type = 'Font';
 	this.data = data;
 
 }

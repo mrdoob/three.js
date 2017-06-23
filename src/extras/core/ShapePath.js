@@ -9,6 +9,7 @@ import { ShapeUtils } from '../ShapeUtils';
 
 function ShapePath() {
 
+	this.type = 'ShapePath';
 	this.subPaths = [];
 	this.currentPath = null;
 
