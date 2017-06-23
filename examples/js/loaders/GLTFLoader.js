@@ -666,7 +666,7 @@ THREE.GLTFLoader = ( function () {
 
 		if ( window.TextDecoder !== undefined ) {
 
-			//return new TextDecoder().decode( array );
+			return new TextDecoder().decode( array );
 
 		}
 
