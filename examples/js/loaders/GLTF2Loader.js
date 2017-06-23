@@ -350,7 +350,7 @@ THREE.GLTF2Loader = ( function () {
 
 				if ( light.quadraticAttenuation !== undefined ) {
 
-					console.warn( 'GLTF2Loader: light.quadraticAttenuation not currently supported.' );
+					lightNode.decay = light.quadraticAttenuation;
 
 				}
 
@@ -362,7 +362,7 @@ THREE.GLTF2Loader = ( function () {
 
 				if ( light.fallOffExponent !== undefined ) {
 
-					lightNode.decay = light.fallOffExponent;
+					console.warn( 'GLTF2Loader: light.fallOffExponent not currently supported.' );
 
 				}
 
