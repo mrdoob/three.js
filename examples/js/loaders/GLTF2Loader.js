@@ -412,6 +412,7 @@ THREE.GLTF2Loader = ( function () {
 		if ( materialValues.diffuseFactor !== undefined ) {
 
 			materialParams.color = new THREE.Color().fromArray( materialValues.diffuseFactor );
+			materialParams.opacity = materialValues.diffuseFactor[ 3 ];
 
 		}
 
