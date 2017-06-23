@@ -742,6 +742,7 @@ Object.assign( ObjectLoader.prototype, {
 
 					object = new SkinnedMesh( geometry, material );
 
+					// rebinds with skeleton whose uuid is data.skeleton later.
 					if ( data.skeleton !== undefined ) object.skeletonUUID = data.skeleton;
 					if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
 					if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
