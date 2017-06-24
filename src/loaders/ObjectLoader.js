@@ -622,20 +622,6 @@ Object.assign( ObjectLoader.prototype, {
 
 			}
 
-			function getSkeleton( name ) {
-
-				if ( name === undefined ) return undefined;
-
-				if ( skeletons[ name ] === undefined ) {
-
-					console.warn( 'THREE.ObjectLoader: Undefined skeleton', name );
-
-				}
-
-				return skeletons[ name ];
-
-			}
-
 			switch ( data.type ) {
 
 				case 'Scene':
