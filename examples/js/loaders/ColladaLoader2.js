@@ -1221,7 +1221,9 @@ THREE.ColladaLoader.prototype = {
 
 		function parseEffectParameterTexture( xml ) {
 
-			var data = {};
+			var data = {
+				technique: {}
+			};
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -1232,7 +1234,7 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'extra':
-						data = parseEffectParameterTextureExtra( child );
+						parseEffectParameterTextureExtra( child, data );
 						break;
 
 				}
@@ -1243,9 +1245,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function parseEffectParameterTextureExtra( xml ) {
-
-			var data = {};
+		function parseEffectParameterTextureExtra( xml, data ) {
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -1256,20 +1256,16 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'technique':
-						data[ child.nodeName ] = parseEffectParameterTextureExtraTechnique( child );
+						parseEffectParameterTextureExtraTechnique( child, data );
 						break;
 
 				}
 
 			}
 
-			return data;
-
 		}
 
-		function parseEffectParameterTextureExtraTechnique( xml ) {
-
-			var data = {};
+		function parseEffectParameterTextureExtraTechnique( xml, data ) {
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -1283,19 +1279,33 @@ THREE.ColladaLoader.prototype = {
 					case 'repeatV':
 					case 'offsetU':
 					case 'offsetV':
-						data[ child.nodeName ] = parseFloat( child.textContent );
+						data.technique[ child.nodeName ] = parseFloat( child.textContent );
 						break;
 
 					case 'wrapU':
 					case 'wrapV':
-						data[ child.nodeName ] = parseInt( child.textContent );
+
+						// some files have values for wrapU/wrapV which become NaN via parseInt
+
+						if ( child.textContent.toUpperCase() === 'TRUE' ) {
+
+							data.technique[ child.nodeName ] = 1;
+
+						} else if ( child.textContent.toUpperCase() === 'FALSE' ) {
+
+							data.technique[ child.nodeName ] = 0;
+
+						} else {
+
+							data.technique[ child.nodeName ] = parseInt( child.textContent );
+
+						}
+
 						break;
 
 				}
 
 			}
-
-			return data;
 
 		}
 
@@ -1417,8 +1427,8 @@ THREE.ColladaLoader.prototype = {
 						if ( parameter.texture ) material.map = getTexture( parameter.texture );
 						break;
 					case 'specular':
-						if ( parameter.color && material.specular )
-							material.specular.fromArray( parameter.color );
+						if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
+						if ( parameter.texture ) material.specularMap = getTexture( parameter.texture );
 						break;
 					case 'shininess':
 						if ( parameter.float && material.shininess )
