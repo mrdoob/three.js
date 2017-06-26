@@ -4329,7 +4329,7 @@
 
 					if ( window.Zlib === undefined ) {
 
-						throw new Error( 'FBXLoader: Import inflate.min.js from https://github.com/imaya/zlib.js' );
+						throw new Error( 'FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
 					}
 
