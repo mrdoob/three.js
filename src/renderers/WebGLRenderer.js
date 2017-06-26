@@ -2416,6 +2416,7 @@ function WebGLRenderer( parameters ) {
 					uniforms.shadowBias = shadow.bias;
 					uniforms.shadowRadius = shadow.radius;
 					uniforms.shadowMapSize = shadow.mapSize;
+					uniforms.shadowCameraFar = shadow.camera.far || 1000;
 
 				}
 

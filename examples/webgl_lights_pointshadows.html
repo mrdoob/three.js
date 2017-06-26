@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - point lights</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+
+			a {
+				color: #ff0080;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #0080ff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - point lights WebGL demo
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			init();
+
+			function init() {
+
+				var canvasWidth = 800;
+				var canvasHeight = 800;
+
+				var scene,
+					distance = 6000,
+					meshZOffset = 200,
+					camera = new THREE.PerspectiveCamera(50, canvasWidth / canvasHeight, 0.1, distance);
+
+				var renderer = new THREE.WebGLRenderer({
+					antialias: true,
+					alpha: true
+				});
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.setSize(canvasWidth, canvasHeight);
+				document.body.appendChild(renderer.domElement);
+
+				var itemMaterial = new THREE.MeshPhongMaterial({
+				color: 0x2180ce,
+				shininess: 280
+				});
+
+				var ambientLight = new THREE.AmbientLight(0xe5e5e5);
+
+				var light = new THREE.PointLight(0xffffff, 1);
+				light.position.set(0, 0, 900);
+				// var light = new THREE.DirectionalLight(0xffffff, 1);
+				// light.position.set(0, 0, distance/4);
+				light.castShadow = true;
+				light.shadow.camera.near = 0.1;
+				light.shadow.camera.far = distance - 1;
+				light.shadow.radius = 3;
+
+				var shadowMaterial = new THREE.ShadowMaterial();
+				shadowMaterial.opacity = 0.3;
+
+				var planeGeometry = new THREE.PlaneGeometry(canvasWidth * 2, canvasHeight * 2);
+				var shadowPlane = new THREE.Mesh(planeGeometry, itemMaterial);
+				shadowPlane.receiveShadow = true;
+
+				camera.position.z = 1000;
+
+				var itemGeometry = new THREE.TorusKnotBufferGeometry(80, 12, 100, 16);
+
+				function addItem(x, y) {
+				var item = new THREE.Mesh(itemGeometry, itemMaterial);
+				item.position.x = x;
+				item.position.y = y;
+				item.position.z = meshZOffset;
+				item.castShadow = true;
+				item.receiveShadow = true;
+				scene.add(item);
+				}
+
+				scene = new THREE.Scene();
+				scene.add(ambientLight);
+				scene.add(light);
+				scene.add(shadowPlane);
+				addItem(-200, 0);
+				addItem(200, 0);
+				renderer.render(scene, camera);
+			}
+
+		</script>
+	</body>
+</html>

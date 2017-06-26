@@ -201,7 +201,7 @@
 
 	}
 
-	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, float shadowCameraFar, vec4 shadowCoord ) {
 
 		vec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );
 
@@ -212,7 +212,7 @@
 		// bd3D = base direction 3D
 		vec3 bd3D = normalize( lightToPosition );
 		// dp = distance from light to fragment position
-		float dp = ( length( lightToPosition ) - shadowBias ) / 1000.0;
+		float dp = ( length( lightToPosition ) - shadowBias ) / shadowCameraFar;
 
 		#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )
 

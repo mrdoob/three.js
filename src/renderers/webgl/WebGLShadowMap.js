@@ -29,6 +29,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		_lookTarget = new Vector3(),
 		_lightPositionWorld = new Vector3(),
+		_shadowCameraFar = 1000,
 
 		_MorphingFlag = 1,
 		_SkinningFlag = 2,
@@ -198,6 +199,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 			shadowCamera.position.copy( _lightPositionWorld );
+			_shadowCameraFar = (light.shadow && light.shadow.camera.far) || light.distance || 1000;
 
 			if ( isPointLight ) {
 
@@ -273,7 +275,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 	};
 
-	function getDepthMaterial( object, material, isPointLight, lightPositionWorld ) {
+	function getDepthMaterial( object, material, isPointLight, lightPositionWorld, shadowCameraFar ) {
 
 		var geometry = object.geometry;
 
@@ -388,6 +390,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		if ( isPointLight && result.uniforms.lightPos !== undefined ) {
 
 			result.uniforms.lightPos.value.copy( lightPositionWorld );
+			result.uniforms.shadowCameraFar.value = shadowCameraFar;
 
 		}
 
@@ -421,7 +424,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 						if ( groupMaterial && groupMaterial.visible ) {
 
-							var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
+							var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld, _shadowCameraFar );
 							_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
 
 						}
@@ -430,7 +433,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 				} else if ( material.visible ) {
 
-					var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
+					var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld, _shadowCameraFar );
 					_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
 
 				}

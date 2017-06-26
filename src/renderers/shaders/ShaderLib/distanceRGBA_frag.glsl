@@ -1,4 +1,6 @@
 uniform vec3 lightPos;
+uniform float shadowCameraFar;
+
 varying vec4 vWorldPosition;
 
 #include <common>
@@ -9,6 +11,6 @@ void main () {
 
 	#include <clipping_planes_fragment>
 
-	gl_FragColor = packDepthToRGBA( length( vWorldPosition.xyz - lightPos.xyz ) / 1000.0 );
+	gl_FragColor = packDepthToRGBA( length( vWorldPosition.xyz - lightPos.xyz ) / shadowCameraFar );
 
 }

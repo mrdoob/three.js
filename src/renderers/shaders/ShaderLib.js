@@ -191,7 +191,8 @@ var ShaderLib = {
 	distanceRGBA: {
 
 		uniforms: {
-			lightPos: { value: new Vector3() }
+			lightPos: { value: new Vector3() },
+			shadowCameraFar: { value: 0 }
 		},
 
 		vertexShader: ShaderChunk.distanceRGBA_vert,
