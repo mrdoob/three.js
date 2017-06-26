@@ -84,7 +84,7 @@
 		<div>
 		User-defined clipping planes specified as THREE.Plane objects in world space.
 		These planes apply to the objects this material is attached to.
-		Points in space whose dot product with the plane is negative are cut away.
+		Points in space whose signed distance to the plane is negative are clipped (not rendered).
 		See the [example:webgl_clipping_intersection WebGL / clipping /intersection] example.
 		Default is *null*.
 		</div>
