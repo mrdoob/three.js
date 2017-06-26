@@ -8,6 +8,6 @@
 	skinned += boneMatZ * skinVertex * skinWeight.z;
 	skinned += boneMatW * skinVertex * skinWeight.w;
 
-	transformed = ( bindMatrixInverse * skinned ).xyz;
+	transformed = ( bindMatrixInverse * modelMatrix * skinned ).xyz;
 
 #endif
