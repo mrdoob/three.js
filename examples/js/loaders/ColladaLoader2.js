@@ -2203,7 +2203,8 @@ THREE.ColladaLoader.prototype = {
 
 			var data = {
 				id: parseId( xml.getAttribute( 'url' ) ),
-				materials: {}
+				materials: {},
+				skeletons: []
 			};
 
 			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
@@ -2228,8 +2229,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'skeleton':
-						if ( data.skeleton !== undefined ) console.warn( 'THREE.ColladaLoader: The loader only supports one skeleton per instance_controller.' );
-						data.skeleton = parseId( child.textContent );
+						data.skeletons.push( parseId( child.textContent ) );
 						break;
 
 					default:
@@ -2243,13 +2243,85 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getSkeleton( root, controller ) {
+		function getSkeleton( skeletons, joints, skinnedMesh ) {
 
 			var boneData = [];
-			var missingBoneData = [];
 			var sortedBoneData = [];
 
-			var joints = controller.skin.joints;
+			var i, j, data;
+
+			// a skeleton can have multiple root bones. collada expresses this
+			// situtation with multiple "skeleton" tags per controller instance
+
+			for ( i = 0; i < skeletons.length; i ++ ) {
+
+				var skeleton = skeletons[ i ];
+				var root = getNode( skeleton );
+
+				// bone hierarchy is a child of the skinned mesh
+
+				skinnedMesh.add( root );
+
+				// setup bone data for a single bone hierarchy
+
+				buildBoneHierarchy( root, joints, boneData );
+
+			}
+
+			// sort bone data (the order is defined in the corresponding controller)
+
+			for ( i = 0; i < joints.length; i ++ ) {
+
+				for ( j = 0; j < boneData.length; j ++ ) {
+
+					data = boneData[ j ];
+
+					if ( data.bone.name === joints[ i ].name ) {
+
+						sortedBoneData[ i ] = data;
+						data.processed = true;
+						break;
+
+					}
+
+				}
+
+			}
+
+			// add unprocessed bone data at the end of the list
+
+			for ( i = 0; i < boneData.length; i ++ ) {
+
+				data = boneData[ i ];
+
+				if ( data.processed === false ) {
+
+					sortedBoneData.push( data );
+					data.processed = true;
+
+				}
+
+			}
+
+			// setup arrays for skeleton creation
+
+			var bones = [];
+			var boneInverses = [];
+
+			for ( i = 0; i < sortedBoneData.length; i ++ ) {
+
+				data = sortedBoneData[ i ];
+
+				bones.push( data.bone );
+				boneInverses.push( data.boneInverse );
+
+			}
+
+			return new THREE.Skeleton( bones, boneInverses );
+
+		}
+
+		function buildBoneHierarchy( root, joints, boneData ) {
 
 			// setup bone data from visual scene
 
@@ -2258,6 +2330,8 @@ THREE.ColladaLoader.prototype = {
 				if ( object.isBone === true ) {
 
 					var boneInverse;
+
+					// retrieve the boneInverse from the controller data
 
 					for ( var i = 0; i < joints.length; i ++ ) {
 
@@ -2280,61 +2354,16 @@ THREE.ColladaLoader.prototype = {
 						// and weights defined for it. But we still have to add the bone to the sorted bone list in order to
 						// ensure a correct animation of the model.
 
-						missingBoneData.push( { bone: object, boneInverse: new THREE.Matrix4() } );
-						console.warn( 'THREE.ColladaLoader: Missing data for bone: %s.', object.name );
-
-					} else {
-
-						boneData.push( { bone: object, boneInverse: boneInverse } );
+						 boneInverse = new THREE.Matrix4();
+						 console.warn( 'THREE.ColladaLoader: Missing data for bone: %s.', object.name );
 
 					}
+
+					boneData.push( { bone: object, boneInverse: boneInverse, processed: false } );
 
 				}
 
 			} );
-
-			// sort bone data (the order is defined in the corresponding controller)
-
-			for ( var i = 0; i < joints.length; i ++ ) {
-
-				for ( var j = 0; j < boneData.length; j ++ ) {
-
-					var data = boneData[ j ];
-
-					if ( data.bone.name === joints[ i ].name ) {
-
-						sortedBoneData[ i ] = data;
-						break;
-
-					}
-
-				}
-
-			}
-
-			// add missing bone data at the end of the list
-
-			for ( var i = 0; i < missingBoneData.length; i ++ ) {
-
-				sortedBoneData.push( missingBoneData[ i ] );
-
-			}
-
-			// setup arrays for skeleton creation
-
-			var bones = [];
-			var boneInverses = [];
-
-			for ( var i = 0; i < sortedBoneData.length; i ++ ) {
-
-				var data = sortedBoneData[ i ];
-
-				bones.push( data.bone );
-				boneInverses.push( data.boneInverse );
-
-			}
-
-			return new THREE.Skeleton( bones, boneInverses );
 
 		}
 
@@ -2371,12 +2400,13 @@ THREE.ColladaLoader.prototype = {
 				var materials = resolveMaterialBinding( geometry.materialKeys, instance.materials );
 				var object = getObject( geometry, materials );
 
-				var node = getNode( instance.skeleton );
-				var skeleton = getSkeleton( node, controller );
+				var skeletons = instance.skeletons;
+				var joints = controller.skin.joints;
+
+				var skeleton = getSkeleton( skeletons, joints, object );
 
 				object.bind( skeleton, controller.skin.bindMatrix );
 				object.normalizeSkinWeights();
-				object.add( node ); // bone hierarchy is a child of the skinned mesh
 
 				objects.push( object );
 
