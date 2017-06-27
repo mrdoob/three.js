@@ -1,6 +1,7 @@
 three.js
 ========
 
+[![Gitter][gitter-badge]][gitter-badge-url]
 [![Latest NPM release][npm-badge]][npm-badge-url]
 [![License][license-badge]][license-badge-url]
 [![Dependencies][dependencies-badge]][dependencies-badge-url]
@@ -73,7 +74,8 @@ If everything went well you should see [this](https://jsfiddle.net/hfj7gm6t/).
 [releases](https://github.com/mrdoob/three.js/releases)
 
 
-
+[gitter-badge]: https://badges.gitter.im/mrdoob/three.js.svg
+[gitter-badge-url]: https://gitter.im/mrdoob/three.js
 [npm-badge]: https://img.shields.io/npm/v/three.svg
 [npm-badge-url]: https://www.npmjs.com/package/three
 [license-badge]: https://img.shields.io/npm/l/three.svg
