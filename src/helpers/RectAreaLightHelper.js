@@ -5,13 +5,12 @@
  */
 
 import { Object3D } from '../core/Object3D';
-import { Vector3 } from '../math/Vector3';
 import { Line } from '../objects/Line';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { BufferAttribute } from '../core/BufferAttribute';
 
-function RectAreaLightHelper( light ) {
+function RectAreaLightHelper( light, color ) {
 
 	Object3D.call( this );
 
@@ -21,13 +20,17 @@ function RectAreaLightHelper( light ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	var material = new LineBasicMaterial( { color: light.color } );
+	this.color = color;
+
+	var material = new LineBasicMaterial( { fog: false, color: this.color } );
 
 	var geometry = new BufferGeometry();
 
 	geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( 5 * 3 ), 3 ) );
 
-	this.add( new Line( geometry, material ) );
+	this.line = new Line( geometry, material );
+	this.add( this.line );
+
 
 	this.update();
 
@@ -45,18 +48,12 @@ RectAreaLightHelper.prototype.dispose = function () {
 
 RectAreaLightHelper.prototype.update = function () {
 
-	var line = this.children[ 0 ];
-
-	// update material
-
-	line.material.color.copy( this.light.color );
-
 	// calculate new dimensions of the helper
 
 	var hx = this.light.width * 0.5;
 	var hy = this.light.height * 0.5;
 
-	var position = line.geometry.attributes.position;
+	var position = this.line.geometry.attributes.position;
 	var array = position.array;
 
 	// update vertices
@@ -68,6 +65,16 @@ RectAreaLightHelper.prototype.update = function () {
 	array[ 12 ] =   hx; array[ 13 ] = - hy; array[ 14 ] = 0;
 
 	position.needsUpdate = true;
+
+	if ( this.color !== undefined ) {
+
+		this.line.material.color.set( this.color );
+
+	} else {
+
+		this.line.material.color.copy( this.light.color );
+
+	}
 
 };
 
