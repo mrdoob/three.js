@@ -824,7 +824,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 			y = normals.getY( i );
 			z = normals.getZ( i );
 
-			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
+			n = 1.0 / ( Math.sqrt( x * x + y * y + z * z ) || 1.0 );
 
 			normals.setXYZ( i, x * n, y * n, z * n );
 
