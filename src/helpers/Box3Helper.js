@@ -1,14 +1,13 @@
+/**
+ * @author WestLangley / http://github.com/WestLangley
+ */
+
 import { Box3 } from '../math/Box3';
 import { LineSegments } from '../objects/LineSegments';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 import { BufferAttribute } from '../core/BufferAttribute';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
-
-/**
-  * @author WestLangley / http://github.com/WestLangley
-  *
- */
 
 function Box3Helper( box, hex ) {
 

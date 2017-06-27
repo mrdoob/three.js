@@ -1,13 +1,12 @@
+/**
+ * @author WestLangley / http://github.com/WestLangley
+ */
+ 
 import { Box3 } from '../math/Box3';
 import { Line } from '../objects/Line';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
-
-/**
-  * @author WestLangley / http://github.com/WestLangley
-  *
- */
 
 function PlaneHelper( plane, size, hex ) {
 

@@ -1,13 +1,13 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 import { LineSegments } from '../objects/LineSegments';
 import { VertexColors } from '../constants';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Color } from '../math/Color';
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
 
 function GridHelper( size, divisions, color1, color2 ) {
 

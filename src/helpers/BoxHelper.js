@@ -1,13 +1,13 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / http://github.com/Mugen87
+ */
+
 import { Box3 } from '../math/Box3';
 import { LineSegments } from '../objects/LineSegments';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 import { BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
-
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / http://github.com/Mugen87
- */
 
 function BoxHelper( object, color ) {
 
