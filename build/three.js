@@ -40649,7 +40649,7 @@
 	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author WestLangley / http://github.com/WestLangley
-	*/
+	 */
 
 	function VertexNormalsHelper( object, size, hex, linewidth ) {
 
@@ -40794,9 +40794,9 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author WestLangley / http://github.com/WestLangley
-	*/
+	 */
 
-	function SpotLightHelper( light ) {
+	function SpotLightHelper( light, color ) {
 
 		Object3D.call( this );
 
@@ -40805,6 +40805,8 @@
 
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
+
+		this.color = color;
 
 		var geometry = new BufferGeometry();
 
@@ -40830,7 +40832,7 @@
 
 		geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
-		var material = new LineBasicMaterial( { fog: false } );
+		var material = new LineBasicMaterial( { fog: false, color: this.color } );
 
 		this.cone = new LineSegments( geometry, material );
 		this.add( this.cone );
@@ -40868,7 +40870,15 @@
 
 			this.cone.lookAt( vector2.sub( vector ) );
 
-			this.cone.material.color.copy( this.light.color );
+			if ( this.color !== undefined ) {
+
+				this.cone.material.color.set( this.color );
+
+			} else {
+
+				this.cone.material.color.copy( this.light.color );
+
+			}
 
 		};
 
@@ -40996,19 +41006,23 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function PointLightHelper( light, sphereSize ) {
+	function PointLightHelper( light, sphereSize, color ) {
 
 		this.light = light;
 		this.light.updateMatrixWorld();
 
+		this.color = color;
+
 		var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
-		var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
-		material.color.copy( this.light.color );
+		var material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.color } );
 
 		Mesh.call( this, geometry, material );
 
 		this.matrix = this.light.matrixWorld;
 		this.matrixAutoUpdate = false;
+
+		this.update();
+
 
 		/*
 		var distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
@@ -41046,7 +41060,15 @@
 
 	PointLightHelper.prototype.update = function () {
 
-		this.material.color.copy( this.light.color );
+		if ( this.color !== undefined ) {
+
+			this.material.color.set( this.color );
+
+		} else {
+
+			this.material.color.copy( this.light.color );
+
+		}
 
 		/*
 		var d = this.light.distance;
@@ -41071,7 +41093,7 @@
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
-	function RectAreaLightHelper( light ) {
+	function RectAreaLightHelper( light, color ) {
 
 		Object3D.call( this );
 
@@ -41081,13 +41103,17 @@
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 
-		var material = new LineBasicMaterial( { color: light.color } );
+		this.color = color;
+
+		var material = new LineBasicMaterial( { fog: false, color: this.color } );
 
 		var geometry = new BufferGeometry();
 
 		geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( 5 * 3 ), 3 ) );
 
-		this.add( new Line( geometry, material ) );
+		this.line = new Line( geometry, material );
+		this.add( this.line );
+
 
 		this.update();
 
@@ -41105,18 +41131,12 @@
 
 	RectAreaLightHelper.prototype.update = function () {
 
-		var line = this.children[ 0 ];
-
-		// update material
-
-		line.material.color.copy( this.light.color );
-
 		// calculate new dimensions of the helper
 
 		var hx = this.light.width * 0.5;
 		var hy = this.light.height * 0.5;
 
-		var position = line.geometry.attributes.position;
+		var position = this.line.geometry.attributes.position;
 		var array = position.array;
 
 		// update vertices
@@ -41129,6 +41149,16 @@
 
 		position.needsUpdate = true;
 
+		if ( this.color !== undefined ) {
+
+			this.line.material.color.set( this.color );
+
+		} else {
+
+			this.line.material.color.copy( this.light.color );
+
+		}
+
 	};
 
 	/**
@@ -41137,7 +41167,7 @@
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
-	function HemisphereLightHelper( light, size ) {
+	function HemisphereLightHelper( light, size, color ) {
 
 		Object3D.call( this );
 
@@ -41147,17 +41177,20 @@
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 
+		this.color = color;
+
 		var geometry = new OctahedronBufferGeometry( size );
 		geometry.rotateY( Math.PI * 0.5 );
 
-		var material = new MeshBasicMaterial( { vertexColors: VertexColors, wireframe: true } );
+		this.material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.color } );
+		if ( this.color === undefined ) this.material.vertexColors = VertexColors;
 
 		var position = geometry.getAttribute( 'position' );
 		var colors = new Float32Array( position.count * 3 );
 
 		geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
 
-		this.add( new Mesh( geometry, material ) );
+		this.add( new Mesh( geometry, this.material ) );
 
 		this.update();
 
@@ -41184,22 +41217,30 @@
 
 			var mesh = this.children[ 0 ];
 
-			var colors = mesh.geometry.getAttribute( 'color' );
+			if ( this.color !== undefined ) {
 
-			color1.copy( this.light.color );
-			color2.copy( this.light.groundColor );
+				this.material.color.set( this.color );
 
-			for ( var i = 0, l = colors.count; i < l; i ++ ) {
+			} else {
 
-				var color = ( i < ( l / 2 ) ) ? color1 : color2;
+				var colors = mesh.geometry.getAttribute( 'color' );
 
-				colors.setXYZ( i, color.r, color.g, color.b );
+				color1.copy( this.light.color );
+				color2.copy( this.light.groundColor );
+
+				for ( var i = 0, l = colors.count; i < l; i ++ ) {
+
+					var color = ( i < ( l / 2 ) ) ? color1 : color2;
+
+					colors.setXYZ( i, color.r, color.g, color.b );
+
+				}
+
+				colors.needsUpdate = true;
 
 			}
 
 			mesh.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
-
-			colors.needsUpdate = true;
 
 		};
 
@@ -41339,7 +41380,7 @@
 	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author WestLangley / http://github.com/WestLangley
-	*/
+	 */
 
 	function FaceNormalsHelper( object, size, hex, linewidth ) {
 
@@ -41451,7 +41492,7 @@
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
-	function DirectionalLightHelper( light, size ) {
+	function DirectionalLightHelper( light, size, color ) {
 
 		Object3D.call( this );
 
@@ -41460,6 +41501,8 @@
 
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
+
+		this.color = color;
 
 		if ( size === undefined ) size = 1;
 
@@ -41472,14 +41515,16 @@
 			- size,   size, 0
 		], 3 ) );
 
-		var material = new LineBasicMaterial( { fog: false } );
+		var material = new LineBasicMaterial( { fog: false, color: this.color } );
 
-		this.add( new Line( geometry, material ) );
+		this.lightPlane = new Line( geometry, material );
+		this.add( this.lightPlane );
 
 		geometry = new BufferGeometry();
 		geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
 
-		this.add( new Line( geometry, material ));
+		this.targetLine = new Line( geometry, material );
+		this.add( this.targetLine );
 
 		this.update();
 
@@ -41490,13 +41535,10 @@
 
 	DirectionalLightHelper.prototype.dispose = function () {
 
-		var lightPlane = this.children[ 0 ];
-		var targetLine = this.children[ 1 ];
-
-		lightPlane.geometry.dispose();
-		lightPlane.material.dispose();
-		targetLine.geometry.dispose();
-		targetLine.material.dispose();
+		this.lightPlane.geometry.dispose();
+		this.lightPlane.material.dispose();
+		this.targetLine.geometry.dispose();
+		this.targetLine.material.dispose();
 
 	};
 
@@ -41512,14 +41554,22 @@
 			v2.setFromMatrixPosition( this.light.target.matrixWorld );
 			v3.subVectors( v2, v1 );
 
-			var lightPlane = this.children[ 0 ];
-			var targetLine = this.children[ 1 ];
+			this.lightPlane.lookAt( v3 );
 
-			lightPlane.lookAt( v3 );
-			lightPlane.material.color.copy( this.light.color );
+			if ( this.color !== undefined ) {
 
-			targetLine.lookAt( v3 );
-			targetLine.scale.z = v3.length();
+				this.lightPlane.material.color.set( this.color );
+				this.targetLine.material.color.set( this.color );
+
+			} else {
+
+				this.lightPlane.material.color.copy( this.light.color );
+				this.targetLine.material.color.copy( this.light.color );
+
+			}
+
+			this.targetLine.lookAt( v3 );
+			this.targetLine.scale.z = v3.length();
 
 		};
 
@@ -41822,8 +41872,7 @@
 	};
 
 	/**
-	  * @author WestLangley / http://github.com/WestLangley
-	  *
+	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
 	function Box3Helper( box, hex ) {
@@ -41870,10 +41919,9 @@
 	};
 
 	/**
-	  * @author WestLangley / http://github.com/WestLangley
-	  *
+	 * @author WestLangley / http://github.com/WestLangley
 	 */
-
+	 
 	function PlaneHelper( plane, size, hex ) {
 
 		this.type = 'PlaneHelper';
