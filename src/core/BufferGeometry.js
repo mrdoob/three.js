@@ -814,23 +814,27 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	normalizeNormals: function () {
 
-		var normals = this.attributes.normal;
+		var vector = new Vector3();
 
-		var x, y, z, n;
+		return function normalizeNormals() {
 
-		for ( var i = 0, il = normals.count; i < il; i ++ ) {
+			var normals = this.attributes.normal;
 
-			x = normals.getX( i );
-			y = normals.getY( i );
-			z = normals.getZ( i );
+			for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
-			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
+				vector.x = normals.getX( i );
+				vector.y = normals.getY( i );
+				vector.z = normals.getZ( i );
 
-			normals.setXYZ( i, x * n, y * n, z * n );
+				vector.normalize();
 
-		}
+				normals.setXYZ( i, vector.x, vector.y, vector.z );
 
-	},
+			}
+
+		};
+
+	}(),
 
 	toNonIndexed: function () {
 
