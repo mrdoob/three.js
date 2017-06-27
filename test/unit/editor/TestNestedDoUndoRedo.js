@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "NestedDoUndoRedo" );
+QUnit.module( "NestedDoUndoRedo" );
 
-test( "Test nested Do's, Undo's and Redo's", function() {
+QUnit.test( "Test nested Do's, Undo's and Redo's", function( assert ) {
 
 	var editor = new Editor();
 
@@ -46,17 +46,17 @@ test( "Test nested Do's, Undo's and Redo's", function() {
 
 	/* full check */
 
-	ok( mesh.position.x ==   102, "OK, X position is correct " );
-	ok( mesh.position.y ==     3, "OK, Y position is correct " );
-	ok( mesh.position.z ==     4, "OK, Z position is correct " );
+	assert.ok( mesh.position.x ==   102, "OK, X position is correct " );
+	assert.ok( mesh.position.y ==     3, "OK, Y position is correct " );
+	assert.ok( mesh.position.z ==     4, "OK, Z position is correct " );
 
-	ok( mesh.rotation.x ==    12, "OK, X rotation is correct " );
-	ok( mesh.rotation.y ==  1013, "OK, Y rotation is correct " );
-	ok( mesh.rotation.z ==    14, "OK, Z rotation is correct " );
+	assert.ok( mesh.rotation.x ==    12, "OK, X rotation is correct " );
+	assert.ok( mesh.rotation.y ==  1013, "OK, Y rotation is correct " );
+	assert.ok( mesh.rotation.z ==    14, "OK, Z rotation is correct " );
 
-	ok( mesh.scale.x    ==    22, "OK, X scale is correct " );
-	ok( mesh.scale.y    ==    23, "OK, Y scale is correct " );
-	ok( mesh.scale.z    == 10024, "OK, Z scale is correct " );
+	assert.ok( mesh.scale.x    ==    22, "OK, X scale is correct " );
+	assert.ok( mesh.scale.y    ==    23, "OK, Y scale is correct " );
+	assert.ok( mesh.scale.z    == 10024, "OK, Z scale is correct " );
 
 
 	editor.undo();  // rescaling undone
@@ -65,44 +65,44 @@ test( "Test nested Do's, Undo's and Redo's", function() {
 
 	/* full check */
 
-	ok( mesh.position.x ==     2, "OK, X position is correct " );
-	ok( mesh.position.y ==     3, "OK, Y position is correct " );
-	ok( mesh.position.z ==     4, "OK, Z position is correct " );
+	assert.ok( mesh.position.x ==     2, "OK, X position is correct " );
+	assert.ok( mesh.position.y ==     3, "OK, Y position is correct " );
+	assert.ok( mesh.position.z ==     4, "OK, Z position is correct " );
 
-	ok( mesh.rotation.x ==    12, "OK, X rotation is correct " );
-	ok( mesh.rotation.y ==    13, "OK, Y rotation is correct " );
-	ok( mesh.rotation.z ==    14, "OK, Z rotation is correct " );
+	assert.ok( mesh.rotation.x ==    12, "OK, X rotation is correct " );
+	assert.ok( mesh.rotation.y ==    13, "OK, Y rotation is correct " );
+	assert.ok( mesh.rotation.z ==    14, "OK, Z rotation is correct " );
 
-	ok( mesh.scale.x    ==    22, "OK, X scale is correct " );
-	ok( mesh.scale.y    ==    23, "OK, Y scale is correct " );
-	ok( mesh.scale.z    ==    24, "OK, Z scale is correct " );
+	assert.ok( mesh.scale.x    ==    22, "OK, X scale is correct " );
+	assert.ok( mesh.scale.y    ==    23, "OK, Y scale is correct " );
+	assert.ok( mesh.scale.z    ==    24, "OK, Z scale is correct " );
 
 
 	editor.redo();  // translation redone
 	editor.redo();  // rotation redone
 
 	editor.execute( new RemoveObjectCommand( mesh ) );
-	ok( editor.scene.children.length == 0, "OK, object removal was successful" );
+	assert.ok( editor.scene.children.length == 0, "OK, object removal was successful" );
 
 	editor.undo();  // removal undone
-	ok( mesh.rotation.y ==    1013, "OK, Y rotation is correct " );
+	assert.ok( mesh.rotation.y ==    1013, "OK, Y rotation is correct " );
 
 
 	editor.undo();  // rotation undone (expected!)
 
 	/* full check */
 
-	ok( mesh.position.x ==   102, "OK, X position is correct " );
-	ok( mesh.position.y ==     3, "OK, Y position is correct " );
-	ok( mesh.position.z ==     4, "OK, Z position is correct " );
+	assert.ok( mesh.position.x ==   102, "OK, X position is correct " );
+	assert.ok( mesh.position.y ==     3, "OK, Y position is correct " );
+	assert.ok( mesh.position.z ==     4, "OK, Z position is correct " );
 
-	ok( mesh.rotation.x ==    12, "OK, X rotation is correct " );
-	ok( mesh.rotation.y ==    13, "OK, Y rotation is correct " );
-	ok( mesh.rotation.z ==    14, "OK, Z rotation is correct " );
+	assert.ok( mesh.rotation.x ==    12, "OK, X rotation is correct " );
+	assert.ok( mesh.rotation.y ==    13, "OK, Y rotation is correct " );
+	assert.ok( mesh.rotation.z ==    14, "OK, Z rotation is correct " );
 
-	ok( mesh.scale.x    ==    22, "OK, X scale is correct " );
-	ok( mesh.scale.y    ==    23, "OK, Y scale is correct " );
-	ok( mesh.scale.z    ==    24, "OK, Z scale is correct " );
+	assert.ok( mesh.scale.x    ==    22, "OK, X scale is correct " );
+	assert.ok( mesh.scale.y    ==    23, "OK, Y scale is correct " );
+	assert.ok( mesh.scale.z    ==    24, "OK, Z scale is correct " );
 
 
 } );

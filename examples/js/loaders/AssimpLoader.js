@@ -493,16 +493,6 @@
 
 	}
 
-	function aiAnimation() {
-
-		this.mName = "";
-		this.mDuration = 0;
-		this.mTicksPerSecond = 0;
-		this.mNumChannels = 0;
-		this.mChannels = [];
-
-	}
-
 	function sortWeights( indexes, weights ) {
 
 		var pairs = [];
@@ -656,7 +646,7 @@
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
 			if ( this.mTexCoordsBuffers[ 0 ] && this.mTexCoordsBuffers[ 0 ].length > 0 )
 				geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
-			if ( this.mTexCoordsBuffers[ 1 ] && this.mTexCoordsBuffers[ 1 ] && this.mTextureCoords[ 1 ].length > 0 )
+			if ( this.mTexCoordsBuffers[ 1 ] && this.mTexCoordsBuffers[ 1 ].length > 0 )
 				geometry.addAttribute( 'uv1', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
 			if ( this.mTangentBuffer && this.mTangentBuffer.length > 0 )
 				geometry.addAttribute( 'tangents', new THREE.BufferAttribute( this.mTangentBuffer, 3 ) );
@@ -967,7 +957,7 @@
 
 			}
 
-			return THREE.ImageUtils.loadTexture( baseURL + path );
+			return new THREE.TextureLoader().load( baseURL + path );
 
 		};
 
@@ -1850,7 +1840,7 @@
 
 					}
 
-					
+
 
 				}
 
@@ -1873,7 +1863,7 @@
 				} else {
 
 					throw ( new Error( "Sorry, can't currently triangulate polys. Use the triangulate preprocessor in Assimp." ))
-					
+
 				}
 
 
@@ -2305,6 +2295,8 @@
 		};
 
 	}
+
+	var shortened, compressed;
 
 	function InternReadFile( pFiledata, url ) {
 

@@ -28,7 +28,6 @@ THREE.ThreeMFLoader.prototype = {
 
 		function loadDocument( data ) {
 
-			var view = new DataView( data );
 			var zip = null;
 			var file = null;
 
@@ -92,7 +91,7 @@ THREE.ThreeMFLoader.prototype = {
 			for ( var i = 0; i < modelPartNames.length; i++ ) {
 
 				var modelPart = modelPartNames[ i ];
-				view = new DataView( zip.file( modelPart ).asArrayBuffer() );
+				var view = new DataView( zip.file( modelPart ).asArrayBuffer() );
 
 				if ( TextDecoder === undefined ) {
 
@@ -267,7 +266,7 @@ THREE.ThreeMFLoader.prototype = {
 				}
 
 				if ( pid ) {
-				  
+
 					triangleProperty[ 'pid' ] = pid;
 
 				}
@@ -418,10 +417,10 @@ THREE.ThreeMFLoader.prototype = {
 					} );
 					var mat4 = new THREE.Matrix4();
 					buildItem[ 'transform' ] = mat4.set(
-						t[ 0 ], t[  1 ], t[  2 ], 0.0,
-						t[ 3 ], t[  4 ], t[  5 ], 0.0,
-						t[ 6 ], t[  7 ], t[  8 ], 0.0,
-						t[ 9 ], t[ 10 ], t[ 11 ], 1.0
+						t[ 0 ], t[  3 ], t[  6 ], t[  9 ],
+						t[ 1 ], t[  4 ], t[  7 ], t[ 10 ],
+						t[ 2 ], t[  5 ], t[  8 ], t[ 11 ],
+						   0.0,     0.0,     0.0,     1.0
 					);
 
 				}
@@ -540,7 +539,7 @@ THREE.ThreeMFLoader.prototype = {
 			var modelsKeys = Object.keys( modelsData );
 
 			for ( var i = 0; i < modelsKeys.length; i++ ) {
-			  
+
 				var modelsKey = modelsKeys[ i ];
 				var modelData = modelsData[ modelsKey ];
 				var modelXml = modelData[ 'xml' ];

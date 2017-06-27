@@ -18,29 +18,27 @@ import { Frustum } from '../../math/Frustum';
 function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 	var _gl = _renderer.context,
-	_state = _renderer.state,
-	_frustum = new Frustum(),
-	_projScreenMatrix = new Matrix4(),
+		_state = _renderer.state,
+		_frustum = new Frustum(),
+		_projScreenMatrix = new Matrix4(),
 
-	_lightShadows = _lights.shadows,
+		_lightShadows = _lights.shadows,
 
-	_shadowMapSize = new Vector2(),
-	_maxShadowMapSize = new Vector2( capabilities.maxTextureSize, capabilities.maxTextureSize ),
+		_shadowMapSize = new Vector2(),
+		_maxShadowMapSize = new Vector2( capabilities.maxTextureSize, capabilities.maxTextureSize ),
 
-	_lookTarget = new Vector3(),
-	_lightPositionWorld = new Vector3(),
+		_lookTarget = new Vector3(),
+		_lightPositionWorld = new Vector3(),
 
-	_renderList = [],
+		_MorphingFlag = 1,
+		_SkinningFlag = 2,
 
-	_MorphingFlag = 1,
-	_SkinningFlag = 2,
+		_NumberOfMaterialVariants = ( _MorphingFlag | _SkinningFlag ) + 1,
 
-	_NumberOfMaterialVariants = ( _MorphingFlag | _SkinningFlag ) + 1,
+		_depthMaterials = new Array( _NumberOfMaterialVariants ),
+		_distanceMaterials = new Array( _NumberOfMaterialVariants ),
 
-	_depthMaterials = new Array( _NumberOfMaterialVariants ),
-	_distanceMaterials = new Array( _NumberOfMaterialVariants ),
-
-	_materialCache = {};
+		_materialCache = {};
 
 	var cubeDirections = [
 		new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
@@ -115,19 +113,20 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		if ( _lightShadows.length === 0 ) return;
 
 		// Set GL state for depth map.
-		_state.buffers.color.setClear( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
-		_state.setDepthTest( true );
+		_state.buffers.color.setClear( 1, 1, 1, 1 );
+		_state.buffers.depth.setTest( true );
 		_state.setScissorTest( false );
 
 		// render depth map
 
-		var faceCount, isPointLight;
+		var faceCount;
 
 		for ( var i = 0, il = _lightShadows.length; i < il; i ++ ) {
 
 			var light = _lightShadows[ i ];
 			var shadow = light.shadow;
+			var isPointLight = light && light.isPointLight;
 
 			if ( shadow === undefined ) {
 
@@ -141,10 +140,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			_shadowMapSize.copy( shadow.mapSize );
 			_shadowMapSize.min( _maxShadowMapSize );
 
-			if ( light && light.isPointLight ) {
-
-				faceCount = 6;
-				isPointLight = true;
+			if ( isPointLight ) {
 
 				var vpWidth = _shadowMapSize.x;
 				var vpHeight = _shadowMapSize.y;
@@ -178,11 +174,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				_shadowMapSize.x *= 4.0;
 				_shadowMapSize.y *= 2.0;
 
-			} else {
-
-				faceCount = 1;
-				isPointLight = false;
-
 			}
 
 			if ( shadow.map === null ) {
@@ -190,6 +181,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
+				shadow.map.texture.name = light.name + ".shadowMap";
 
 				shadowCamera.updateProjectionMatrix();
 
@@ -201,18 +193,42 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
-			// TODO (abelnation / sam-g-steel): is this needed?
-			if (shadow && shadow.isRectAreaLightShadow ) {
-
-				shadow.update( light );
-
-			}
-
 			var shadowMap = shadow.map;
 			var shadowMatrix = shadow.matrix;
 
 			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 			shadowCamera.position.copy( _lightPositionWorld );
+
+			if ( isPointLight ) {
+
+				faceCount = 6;
+
+				// for point lights we set the shadow matrix to be a translation-only matrix
+				// equal to inverse of the light's position
+
+				shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
+
+			} else {
+
+				faceCount = 1;
+
+				_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+				shadowCamera.lookAt( _lookTarget );
+				shadowCamera.updateMatrixWorld();
+
+				// compute shadow matrix
+
+				shadowMatrix.set(
+					0.5, 0.0, 0.0, 0.5,
+					0.0, 0.5, 0.0, 0.5,
+					0.0, 0.0, 0.5, 0.5,
+					0.0, 0.0, 0.0, 1.0
+				);
+
+				shadowMatrix.multiply( shadowCamera.projectionMatrix );
+				shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
+
+			}
 
 			_renderer.setRenderTarget( shadowMap );
 			_renderer.clear();
@@ -228,31 +244,12 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 					_lookTarget.add( cubeDirections[ face ] );
 					shadowCamera.up.copy( cubeUps[ face ] );
 					shadowCamera.lookAt( _lookTarget );
+					shadowCamera.updateMatrixWorld();
 
 					var vpDimensions = cube2DViewPorts[ face ];
 					_state.viewport( vpDimensions );
 
-				} else {
-
-					_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-					shadowCamera.lookAt( _lookTarget );
-
 				}
-
-				shadowCamera.updateMatrixWorld();
-				shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
-
-				// compute shadow matrix
-
-				shadowMatrix.set(
-					0.5, 0.0, 0.0, 0.5,
-					0.0, 0.5, 0.0, 0.5,
-					0.0, 0.0, 0.5, 0.5,
-					0.0, 0.0, 0.0, 1.0
-				);
-
-				shadowMatrix.multiply( shadowCamera.projectionMatrix );
-				shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
 
 				// update camera matrices and frustum
 
@@ -261,54 +258,15 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 				// set object matrices & frustum culling
 
-				_renderList.length = 0;
-
-				projectObject( scene, camera, shadowCamera );
-
-				// render shadow map
-				// render regular objects
-
-				for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
-
-					var object = _renderList[ j ];
-					var geometry = _objects.update( object );
-					var material = object.material;
-
-					if ( material && material.isMultiMaterial ) {
-
-						var groups = geometry.groups;
-						var materials = material.materials;
-
-						for ( var k = 0, kl = groups.length; k < kl; k ++ ) {
-
-							var group = groups[ k ];
-							var groupMaterial = materials[ group.materialIndex ];
-
-							if ( groupMaterial.visible === true ) {
-
-								var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
-								_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
-
-							}
-
-						}
-
-					} else {
-
-						var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
-						_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
-
-					}
-
-				}
+				renderObject( scene, camera, shadowCamera, isPointLight );
 
 			}
 
 		}
 
 		// Restore GL state.
-		var clearColor = _renderer.getClearColor(),
-		clearAlpha = _renderer.getClearAlpha();
+		var clearColor = _renderer.getClearColor();
+		var clearAlpha = _renderer.getClearAlpha();
 		_renderer.setClearColor( clearColor, clearAlpha );
 
 		scope.needsUpdate = false;
@@ -349,6 +307,12 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
+			if ( object.isSkinnedMesh && material.skinning === false ) {
+
+				console.warn( 'THREE.WebGLShadowMap: THREE.SkinnedMesh with material.skinning set to false:', object );
+
+			}
+
 			var useSkinning = object.isSkinnedMesh && material.skinning;
 
 			var variantIndex = 0;
@@ -365,7 +329,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		}
 
 		if ( _renderer.localClippingEnabled &&
-			 material.clipShadows === true &&
+				material.clipShadows === true &&
 				material.clippingPlanes.length !== 0 ) {
 
 			// in this case we need a unique material instance reflecting the
@@ -417,6 +381,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;
+		result.clipIntersection = material.clipIntersection;
 
 		result.wireframeLinewidth = material.wireframeLinewidth;
 		result.linewidth = material.linewidth;
@@ -431,22 +396,43 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 	}
 
-	function projectObject( object, camera, shadowCamera ) {
+	function renderObject( object, camera, shadowCamera, isPointLight ) {
 
 		if ( object.visible === false ) return;
 
-		var visible = ( object.layers.mask & camera.layers.mask ) !== 0;
+		var visible = object.layers.test( camera.layers );
 
 		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
-			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+			if ( object.castShadow && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
 
+				object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+
+				var geometry = _objects.update( object );
 				var material = object.material;
 
-				if ( material.visible === true ) {
+				if ( Array.isArray( material ) ) {
 
-					object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-					_renderList.push( object );
+					var groups = geometry.groups;
+
+					for ( var k = 0, kl = groups.length; k < kl; k ++ ) {
+
+						var group = groups[ k ];
+						var groupMaterial = material[ group.materialIndex ];
+
+						if ( groupMaterial && groupMaterial.visible ) {
+
+							var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
+							_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
+
+						}
+
+					}
+
+				} else if ( material.visible ) {
+
+					var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
+					_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
 
 				}
 
@@ -458,7 +444,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			projectObject( children[ i ], camera, shadowCamera );
+			renderObject( children[ i ], camera, shadowCamera, isPointLight );
 
 		}
 

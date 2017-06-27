@@ -28,6 +28,7 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	this.maskBufferMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 	this.maskBufferMaterial.side = THREE.DoubleSide;
 	this.renderTargetMaskBuffer = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, pars );
+	this.renderTargetMaskBuffer.texture.name = "OutlinePass.mask";
 	this.renderTargetMaskBuffer.texture.generateMipmaps = false;
 
 	this.depthMaterial = new THREE.MeshDepthMaterial();
@@ -39,20 +40,26 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	this.prepareMaskMaterial.side = THREE.DoubleSide;
 
 	this.renderTargetDepthBuffer = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, pars );
+	this.renderTargetDepthBuffer.texture.name = "OutlinePass.depth";
 	this.renderTargetDepthBuffer.texture.generateMipmaps = false;
 
 	this.renderTargetMaskDownSampleBuffer = new THREE.WebGLRenderTarget( resx, resy, pars );
+	this.renderTargetMaskDownSampleBuffer.texture.name = "OutlinePass.depthDownSample";
 	this.renderTargetMaskDownSampleBuffer.texture.generateMipmaps = false;
 
 	this.renderTargetBlurBuffer1 = new THREE.WebGLRenderTarget( resx, resy, pars );
+	this.renderTargetBlurBuffer1.texture.name = "OutlinePass.blur1";
 	this.renderTargetBlurBuffer1.texture.generateMipmaps = false;
 	this.renderTargetBlurBuffer2 = new THREE.WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), pars );
+	this.renderTargetBlurBuffer2.texture.name = "OutlinePass.blur2";
 	this.renderTargetBlurBuffer2.texture.generateMipmaps = false;
 
 	this.edgeDetectionMaterial = this.getEdgeDetectionMaterial();
 	this.renderTargetEdgeBuffer1 = new THREE.WebGLRenderTarget( resx, resy, pars );
+	this.renderTargetEdgeBuffer1.texture.name = "OutlinePass.edge1";
 	this.renderTargetEdgeBuffer1.texture.generateMipmaps = false;
 	this.renderTargetEdgeBuffer2 = new THREE.WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), pars );
+	this.renderTargetEdgeBuffer2.texture.name = "OutlinePass.edge2";
 	this.renderTargetEdgeBuffer2.texture.generateMipmaps = false;
 
 	var MAX_EDGE_THICKNESS = 4;

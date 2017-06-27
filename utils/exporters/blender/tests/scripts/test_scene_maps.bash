@@ -5,5 +5,5 @@ source "$DIR/setup_test_env.bash"
 
 blender --background $BLEND/scene_maps.blend --python $PYSCRIPT -- \
     $JSON --vertices --faces --scene --materials --maps \
-    --uvs --embedGeometry --copyTextures
+    --uvs --embedGeometry --exportTextures --geometryType Geometry
 makereview $@ --tag $(tagname)

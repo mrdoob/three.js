@@ -25,6 +25,20 @@ var Loader = function ( editor ) {
 
 		switch ( extension ) {
 
+			case '3ds':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var loader = new THREE.TDSLoader();
+					var object = loader.parse( event.target.result );
+
+					editor.execute( new AddObjectCommand( object ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'amf':
 
 				reader.addEventListener( 'load', function ( event ) {
@@ -151,19 +165,19 @@ var Loader = function ( editor ) {
 					editor.execute( new AddObjectCommand( object ) );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
+			case 'glb':
 			case 'gltf':
 
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
-					var json = JSON.parse( contents );
 
 					var loader = new THREE.GLTFLoader();
-					loader.parse( json, function ( result ) {
+					loader.parse( contents, function ( result ) {
 
 						result.scene.name = filename;
 						editor.execute( new AddObjectCommand( result.scene ) );
@@ -171,7 +185,7 @@ var Loader = function ( editor ) {
 					} );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
@@ -522,19 +536,6 @@ var Loader = function ( editor ) {
 					editor.execute( new AddObjectCommand( result ) );
 
 				}
-
-				break;
-
-			case 'scene':
-
-				// DEPRECATED
-
-				var loader = new THREE.SceneLoader();
-				loader.parse( data, function ( result ) {
-
-					editor.execute( new SetSceneCommand( result.scene ) );
-
-				}, '' );
 
 				break;
 

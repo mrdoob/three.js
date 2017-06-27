@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webvr - sandbox</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-07-28 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-07-28" content="Ave6CPNUgSwHb3vCbyd55P/R7pfkwNniUJsYfSoUqI+l1X1BIOt6HfriVP0g2hmaG7Pp3qaUXuXdZeqGBmoMKg8AAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUwMTI2NzQwNX0=">
+		<style>
+			body {
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/vr/WebVR.js"></script>
+
+		<script src="js/Mirror.js"></script>
+
+		<script>
+
+			WEBVR.checkAvailability().catch( function( message ) {
+
+				document.body.appendChild( WEBVR.getMessageContainer( message ) );
+
+			} );
+
+			//
+
+			var camera, scene, renderer;
+
+			var mirror;
+
+			init();
+			animate();
+
+			function init() {
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				scene.add( camera );
+
+				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
+				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2 } );
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.y = 0.75;
+				mesh.position.z = - 2;
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				var geometry = new THREE.BoxGeometry( 1.5, 0.1, 1.5 );
+				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.y = - 0.2;
+				mesh.position.z = - 2;
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				var light = new THREE.DirectionalLight( 0x8800ff );
+				light.position.set( - 1, 1.5, - 1.5 );
+				light.castShadow = true;
+				light.shadow.camera.zoom = 4;
+				scene.add( light );
+				light.target.position.set( 0, 0, - 2 );
+				scene.add( light.target );
+
+				var helper = new THREE.CameraHelper( light.shadow.camera );
+				// scene.add( helper );
+
+				var light = new THREE.DirectionalLight( 0xff0000 );
+				light.position.set( 1, 1.5, - 2.5 );
+				light.castShadow = true;
+				light.shadow.camera.zoom = 4;
+				scene.add( light );
+				light.target.position.set( 0, 0, - 2 );
+				scene.add( light.target );
+
+				var helper = new THREE.CameraHelper( light.shadow.camera );
+				// scene.add( helper );
+
+				//
+
+				mirror = new THREE.Mirror( 1.4, 1.4, {
+					textureWidth: window.innerWidth * window.devicePixelRatio,
+					textureHeight: window.innerHeight * window.devicePixelRatio
+				} );
+				mirror.position.x = 1;
+				mirror.position.y = 0.5;
+				mirror.position.z = -3;
+				mirror.rotation.y = - Math.PI / 4;
+				scene.add( mirror );
+
+				var geometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
+				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.z = - 0.07;
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				mirror.add( mesh );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0x101010 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				renderer.vr.enabled = true;
+
+				//
+
+				WEBVR.getVRDisplay( function ( display ) {
+
+					renderer.vr.setDevice( display );
+
+					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
+
+				} );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.animate( render );
+
+			}
+
+			function render() {
+
+				var time = performance.now() * 0.0002;
+				var mesh = scene.children[ 1 ];
+				mesh.rotation.x = time * 2;
+				mesh.rotation.y = time * 5;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

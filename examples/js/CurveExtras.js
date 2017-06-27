@@ -15,7 +15,11 @@
 
 	// GrannyKnot
 
-	function GrannyKnot() {}
+	function GrannyKnot() {
+
+		THREE.Curve.call( this );
+
+	}
 
 	GrannyKnot.prototype = Object.create( THREE.Curve.prototype );
 	GrannyKnot.prototype.constructor = GrannyKnot;
@@ -35,6 +39,8 @@
 	// HeartCurve
 
 	function HeartCurve( s ) {
+
+		THREE.Curve.call( this );
 
 		this.scale = ( s === undefined ) ? 5 : s;
 
@@ -59,6 +65,8 @@
 
 	function VivianiCurve( radius ) {
 
+		THREE.Curve.call( this );
+
 		this.radius = radius;
 
 	}
@@ -81,7 +89,11 @@
 
 	// KnotCurve
 
-	function KnotCurve() {}
+	function KnotCurve() {
+
+		THREE.Curve.call( this );
+
+	}
 
 	KnotCurve.prototype = Object.create( THREE.Curve.prototype );
 	KnotCurve.prototype.constructor = KnotCurve;
@@ -103,7 +115,11 @@
 
 	// HelixCurve
 
-	function HelixCurve() {}
+	function HelixCurve() {
+
+		THREE.Curve.call( this );
+
+	}
 
 	HelixCurve.prototype = Object.create( THREE.Curve.prototype );
 	HelixCurve.prototype.constructor = HelixCurve;
@@ -127,6 +143,8 @@
 
 	function TrefoilKnot( s ) {
 
+		THREE.Curve.call( this );
+
 		this.scale = ( s === undefined ) ? 10 : s;
 
 	}
@@ -149,6 +167,8 @@
 	// TorusKnot
 
 	function TorusKnot( s ) {
+
+		THREE.Curve.call( this );
 
 		this.scale = ( s === undefined ) ? 10 : s;
 
@@ -176,6 +196,8 @@
 
 	function CinquefoilKnot( s ) {
 
+		THREE.Curve.call( this );
+
 		this.scale = ( s === undefined ) ? 10 : s;
 
 	}
@@ -201,6 +223,8 @@
 	// TrefoilPolynomialKnot
 
 	function TrefoilPolynomialKnot( s ) {
+
+		THREE.Curve.call( this );
 
 		this.scale = ( s === undefined ) ? 10 : s;
 
@@ -232,6 +256,8 @@
 
 	function FigureEightPolynomialKnot( s ) {
 
+		THREE.Curve.call( this );
+
 		this.scale = ( s === undefined ) ? 1 : s;
 
 	}
@@ -254,6 +280,8 @@
 	// DecoratedTorusKnot4a
 
 	function DecoratedTorusKnot4a( s ) {
+
+		THREE.Curve.call( this );
 
 		this.scale = ( s === undefined ) ? 40 : s;
 
@@ -278,6 +306,8 @@
 
 	function DecoratedTorusKnot4b( s ) {
 
+		THREE.Curve.call( this );
+
 		this.scale = ( s === undefined ) ? 40 : s;
 
 	}
@@ -301,6 +331,8 @@
 
 	function DecoratedTorusKnot5a( s ) {
 
+		THREE.Curve.call( this );
+
 		this.scale = ( s === undefined ) ? 40 : s;
 
 	}
@@ -323,6 +355,8 @@
 	// DecoratedTorusKnot5c
 
 	function DecoratedTorusKnot5c( s ) {
+
+		THREE.Curve.call( this );
 
 		this.scale = ( s === undefined ) ? 40 : s;
 

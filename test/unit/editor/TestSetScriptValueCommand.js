@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "SetScriptValueCommand" );
+QUnit.module( "SetScriptValueCommand" );
 
-test( "Test SetScriptValueCommand for source (Undo and Redo)", function() {
+QUnit.test( "Test SetScriptValueCommand for source (Undo and Redo)", function( assert ) {
 
 
 	// setup
@@ -41,15 +41,15 @@ test( "Test SetScriptValueCommand for source (Undo and Redo)", function() {
 	} );
 
 	var length = testSourceData.length;
-	ok( editor.scripts[ box.uuid ][ 0 ][ 'source' ] == testSourceData[ length - 1 ].source,
+	assert.ok( editor.scripts[ box.uuid ][ 0 ][ 'source' ] == testSourceData[ length - 1 ].source,
 		"OK, 'source' was set correctly to the last value (expected: '" + testSourceData[ length - 1 ].source + "', actual: '" + editor.scripts[ box.uuid ][ 0 ][ 'source' ] + "')" );
 
 	editor.undo();
-	ok( editor.scripts[ box.uuid ][ 0 ][ 'source' ] == testSourceData[ length - 2 ].source,
+	assert.ok( editor.scripts[ box.uuid ][ 0 ][ 'source' ] == testSourceData[ length - 2 ].source,
 		"OK, 'source' was set correctly to the second to the last value after undo (expected: '" + testSourceData[ length - 2 ].source + "', actual: '" + editor.scripts[ box.uuid ][ 0 ][ 'source' ] + "')" );
 
 	editor.redo();
-	ok( editor.scripts[ box.uuid ][ 0 ][ 'source' ] == testSourceData[ length - 1 ].source,
+	assert.ok( editor.scripts[ box.uuid ][ 0 ][ 'source' ] == testSourceData[ length - 1 ].source,
 		"OK, 'source' was set correctly to the last value again after redo (expected: '" + testSourceData[ length - 1 ].source + "', actual: '" + editor.scripts[ box.uuid ][ 0 ][ 'source' ]	 + "')" );
 
 
@@ -64,14 +64,14 @@ test( "Test SetScriptValueCommand for source (Undo and Redo)", function() {
 	} );
 
 	var scriptName = editor.scripts[ box.uuid ][ 0 ][ "name" ];
-	ok( scriptName == names[ names.length - 1 ], "OK, the script name corresponds to the last script name that was assigned" );
+	assert.ok( scriptName == names[ names.length - 1 ], "OK, the script name corresponds to the last script name that was assigned" );
 
 	editor.undo();
 	scriptName = editor.scripts[ box.uuid ][ 0 ][ "name" ];
-	ok( scriptName == names[ names.length - 2 ], "OK, the script name corresponds to the second last script name that was assigned" );
+	assert.ok( scriptName == names[ names.length - 2 ], "OK, the script name corresponds to the second last script name that was assigned" );
 
 	editor.redo();
 	scriptName = editor.scripts[ box.uuid ][ 0 ][ "name" ];
-	ok( scriptName == names[ names.length - 1 ], "OK, the script name corresponds to the last script name that was assigned, again" );
+	assert.ok( scriptName == names[ names.length - 1 ], "OK, the script name corresponds to the last script name that was assigned, again" );
 
 } );

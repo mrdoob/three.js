@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - Web Worker Parallel Demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0 0 0 0;
+				padding: 0 0 0 0;
+				border: none;
+				cursor: default;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a {
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
+			}
+			#glFullscreen {
+				width: 100%;
+				height: 100vh;
+				min-width: 640px;
+				min-height: 360px;
+				position: relative;
+				overflow: hidden;
+				z-index: 0;
+			}
+			#example {
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				background-color: #000000;
+			}
+			#feedback {
+				position: absolute;
+				color: darkorange;
+				text-align: left;
+				bottom: 0%;
+				left: 0%;
+				width: auto;
+				padding: 0px 0px 4px 4px;
+			}
+			#dat {
+				user-select: none;
+				position: absolute;
+				left: 0;
+				top: 0;
+				z-Index: 200;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="glFullscreen">
+			<canvas id="example"></canvas>
+		</div>
+		<div id="dat">
+
+		</div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WWOBJLoader2Director Parallels Demo
+		</div>
+		<div id="feedback">
+		</div>
+
+		<script src="js/Detector.js"></script>
+		<script src="../build/three.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/MTLLoader.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script src="js/loaders/OBJLoader2.js"></script>
+		<script src="js/loaders/WWOBJLoader2.js"></script>
+		<script>
+
+			'use strict';
+
+			var WWParallels = (function () {
+
+				var Validator = THREE.OBJLoader2.prototype._getValidator();
+
+				function WWParallels( elementToBindTo ) {
+					this.renderer = null;
+					this.canvas = elementToBindTo;
+					this.aspectRatio = 1;
+					this.recalcAspectRatio();
+
+					this.scene = null;
+					this.cameraDefaults = {
+						posCamera: new THREE.Vector3( 0.0, 175.0, 500.0 ),
+						posCameraTarget: new THREE.Vector3( 0, 0, 0 ),
+						near: 0.1,
+						far: 10000,
+						fov: 45
+					};
+					this.camera = null;
+					this.cameraTarget = this.cameraDefaults.posCameraTarget;
+
+					this.wwDirector = new THREE.OBJLoader2.WWOBJLoader2Director();
+					this.wwDirector.setCrossOrigin( 'anonymous' );
+
+					this.controls = null;
+					this.cube = null;
+
+					this.allAssets = [];
+					this.feedbackArray = null;
+
+					this.running = false;
+				}
+
+				WWParallels.prototype.initGL = function () {
+					this.renderer = new THREE.WebGLRenderer( {
+						canvas: this.canvas,
+						antialias: true,
+						autoClear: true
+					} );
+					this.renderer.setClearColor( 0x050505 );
+
+					this.scene = new THREE.Scene();
+
+					this.camera = new THREE.PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
+					this.resetCamera();
+					this.controls = new THREE.TrackballControls( this.camera, this.renderer.domElement );
+
+					var ambientLight = new THREE.AmbientLight( 0x404040 );
+					var directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
+					var directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
+
+					directionalLight1.position.set( -100, -50, 100 );
+					directionalLight2.position.set( 100, 50, -100 );
+
+					this.scene.add( directionalLight1 );
+					this.scene.add( directionalLight2 );
+					this.scene.add( ambientLight );
+
+					var geometry = new THREE.BoxGeometry( 10, 10, 10 );
+					var material = new THREE.MeshNormalMaterial();
+					this.cube = new THREE.Mesh( geometry, material );
+					this.cube.position.set( 0, 0, 0 );
+					this.scene.add( this.cube );
+				};
+
+				WWParallels.prototype.resizeDisplayGL = function () {
+					this.controls.handleResize();
+
+					this.recalcAspectRatio();
+					this.renderer.setSize( this.canvas.offsetWidth, this.canvas.offsetHeight, false );
+
+					this.updateCamera();
+				};
+
+				WWParallels.prototype.recalcAspectRatio = function () {
+					this.aspectRatio = ( this.canvas.offsetHeight === 0 ) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+				};
+
+				WWParallels.prototype.resetCamera = function () {
+					this.camera.position.copy( this.cameraDefaults.posCamera );
+					this.cameraTarget.copy( this.cameraDefaults.posCameraTarget );
+
+					this.updateCamera();
+				};
+
+				WWParallels.prototype.updateCamera = function () {
+					this.camera.aspect = this.aspectRatio;
+					this.camera.lookAt( this.cameraTarget );
+					this.camera.updateProjectionMatrix();
+				};
+
+				WWParallels.prototype.render = function () {
+					if ( ! this.renderer.autoClear ) this.renderer.clear();
+
+					this.controls.update();
+
+					this.cube.rotation.x += 0.05;
+					this.cube.rotation.y += 0.05;
+
+					this.renderer.render( this.scene, this.camera );
+				};
+				WWParallels.prototype.reportProgress = function( text ) {
+					document.getElementById( 'feedback' ).innerHTML = text;
+				};
+
+				WWParallels.prototype.enqueueAllAssests = function ( maxQueueSize, maxWebWorkers, streamMeshes ) {
+					if ( this.running ) {
+
+						return;
+
+					} else {
+
+						this.running = true;
+
+					}
+					var scope = this;
+					scope.wwDirector.objectsCompleted = 0;
+					scope.feedbackArray = new Array( maxWebWorkers );
+
+					var i;
+					for ( i = 0; i < maxWebWorkers; i++ ) {
+
+						scope.feedbackArray[ i ] = 'Worker #' + i + ': Awaiting feedback';
+
+					}
+					scope.reportProgress( scope.feedbackArray.join( '\<br\>' ) );
+
+					var callbackCompletedLoading = function ( modelName, instanceNo ) {
+						var msg = 'Worker #' + instanceNo + ': Completed loading: ' + modelName + ' (#' + scope.wwDirector.objectsCompleted + ')';
+						console.log( msg );
+						scope.feedbackArray[ instanceNo ] = msg;
+						scope.reportProgress( scope.feedbackArray.join( '\<br\>' ) );
+
+						if ( scope.wwDirector.objectsCompleted + 1 === maxQueueSize ) scope.running = false;
+					};
+
+					var callbackMeshLoaded = function ( name, bufferGeometry, material ) {
+						var materialOverride;
+
+						if ( Validator.isValid( material ) && material.name === 'defaultMaterial' || name === 'Mesh_Mesh_head_geo.001' ) {
+
+							materialOverride = material;
+							materialOverride.color = new THREE.Color( Math.random(), Math.random(), Math.random() );
+
+						}
+
+						return new THREE.OBJLoader2.WWOBJLoader2.LoadedMeshUserOverride( false, undefined, materialOverride );
+					};
+
+					var globalCallbacks = new THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks();
+					globalCallbacks.registerCallbackCompletedLoading( callbackCompletedLoading );
+					globalCallbacks.registerCallbackMeshLoaded( callbackMeshLoaded );
+					this.wwDirector.prepareWorkers( globalCallbacks, maxQueueSize, maxWebWorkers );
+					console.log( 'Configuring WWManager with queue size ' + this.wwDirector.getMaxQueueSize() + ' and ' + this.wwDirector.getMaxWebWorkers() + ' workers.' );
+
+					var callbackCompletedLoadingWalt = function () {
+						console.log( 'Callback check: WALT was loaded (#' + scope.wwDirector.objectsCompleted + ')' );
+					};
+
+					var models = [];
+					models.push( {
+						modelName: 'male02',
+						dataAvailable: false,
+						pathObj: 'obj/male02/',
+						fileObj: 'male02.obj',
+						pathTexture: 'obj/male02/',
+						fileMtl: 'male02.mtl'
+					} );
+
+					models.push( {
+						modelName: 'female02',
+						dataAvailable: false,
+						pathObj: 'obj/female02/',
+						fileObj: 'female02.obj',
+						pathTexture: 'obj/female02/',
+						fileMtl: 'female02.mtl'
+					} );
+
+					models.push( {
+						modelName: 'viveController',
+						dataAvailable: false,
+						pathObj: 'models/obj/vive-controller/',
+						fileObj: 'vr_controller_vive_1_5.obj',
+						scale: 400.0
+					} );
+
+					models.push( {
+						modelName: 'cerberus',
+						dataAvailable: false,
+						pathObj: 'models/obj/cerberus/',
+						fileObj: 'Cerberus.obj',
+						scale: 50.0
+					} );
+					models.push( {
+						modelName: 'WaltHead',
+						dataAvailable: false,
+						pathObj: 'obj/walt/',
+						fileObj: 'WaltHead.obj',
+						pathTexture: 'obj/walt/',
+						fileMtl: 'WaltHead.mtl'
+					} );
+
+					var pivot;
+					var distributionBase = -500;
+					var distributionMax = 1000;
+					var modelIndex = 0;
+					var model;
+					var runParams;
+					for ( i = 0; i < maxQueueSize; i++ ) {
+
+						modelIndex = Math.floor( Math.random() * models.length );
+						model = models[ modelIndex ];
+
+						pivot = new THREE.Object3D();
+						pivot.position.set(
+							distributionBase + distributionMax * Math.random(),
+							distributionBase + distributionMax * Math.random(),
+							distributionBase + distributionMax * Math.random()
+						);
+						if ( Validator.isValid( model.scale ) ) pivot.scale.set( model.scale, model.scale, model.scale );
+
+						this.scene.add( pivot );
+
+						model.sceneGraphBaseNode = pivot;
+
+						runParams = new THREE.OBJLoader2.WWOBJLoader2.PrepDataFile(
+							model.modelName, model.pathObj, model.fileObj, model.pathTexture, model.fileMtl
+						);
+						runParams.setSceneGraphBaseNode( model.sceneGraphBaseNode );
+						runParams.setStreamMeshes( streamMeshes );
+						if ( model.modelName === 'WaltHead' ) {
+							runParams.getCallbacks().registerCallbackCompletedLoading( callbackCompletedLoadingWalt );
+						}
+
+						this.wwDirector.enqueueForRun( runParams );
+						this.allAssets.push( runParams );
+					}
+
+					this.wwDirector.processQueue();
+				};
+
+				WWParallels.prototype.clearAllAssests = function () {
+					var ref;
+					var scope = this;
+
+					for ( var asset in this.allAssets ) {
+						ref = this.allAssets[ asset ];
+
+						var remover = function ( object3d ) {
+
+							if ( object3d === ref.sceneGraphBaseNode ) return;
+							console.log( 'Removing ' + object3d.name );
+							scope.scene.remove( object3d );
+
+							if ( object3d.hasOwnProperty( 'geometry' ) ) object3d.geometry.dispose();
+							if ( object3d.hasOwnProperty( 'material' ) ) {
+
+								var mat = object3d.material;
+								if ( mat.hasOwnProperty( 'materials' ) ) {
+
+									var materials = mat.materials;
+									for ( var name in materials ) {
+
+										if ( materials.hasOwnProperty( name ) ) materials[ name ].dispose();
+
+									}
+								}
+							}
+							if ( object3d.hasOwnProperty( 'texture' ) ) object3d.texture.dispose();
+						};
+						scope.scene.remove( ref.sceneGraphBaseNode );
+						ref.sceneGraphBaseNode.traverse( remover );
+						ref.sceneGraphBaseNode = null;
+					}
+					this.allAssets = [];
+				};
+
+				WWParallels.prototype.terminateManager = function () {
+					this.wwDirector.deregister();
+				};
+
+				return WWParallels;
+
+			})();
+
+			var app = new WWParallels( document.getElementById( 'example' ) );
+
+			var WWParallelsControl = function() {
+				this.queueLength = 128;
+				this.workerCount = 4;
+				this.streamMeshes = true;
+				this.run = function () {
+					app.enqueueAllAssests( this.queueLength, this.workerCount, this.streamMeshes );
+				};
+				this.terminate = function () {
+					app.terminateManager();
+				};
+				this.clearAllAssests = function () {
+					app.terminateManager();
+					app.clearAllAssests();
+				};
+			};
+			var wwParallelsControl = new WWParallelsControl();
+
+			var gui = new dat.GUI( {
+				autoPlace: false,
+				width: 320
+			} );
+
+			var menuDiv = document.getElementById( 'dat' );
+			menuDiv.appendChild(gui.domElement);
+			var folderQueue = gui.addFolder( 'Web Worker Director Queue Control' );
+			folderQueue.add( wwParallelsControl, 'queueLength' ).min( 1 ).max( 1024 ).step( 1 );
+			folderQueue.add( wwParallelsControl, 'workerCount' ).min( 1 ).max( 16 ).step( 1 );
+			folderQueue.add( wwParallelsControl, 'streamMeshes' );
+			folderQueue.add( wwParallelsControl, 'run' ).name( 'Run Queue' );
+			folderQueue.open();
+
+			var folderWWControl = gui.addFolder( 'Resource Management' );
+			folderWWControl.add( wwParallelsControl, 'terminate' ).name( 'Terminate WWManager' );
+			folderWWControl.add( wwParallelsControl, 'clearAllAssests' ).name( 'Clear Scene' );
+
+			var resizeWindow = function () {
+				app.resizeDisplayGL();
+			};
+
+			var render = function () {
+				requestAnimationFrame( render );
+				app.render();
+			};
+
+			window.addEventListener( 'resize', resizeWindow, false );
+
+			console.log( 'Starting initialisation phase...' );
+			app.initGL();
+			app.resizeDisplayGL();
+
+			render();
+
+		</script>
+	</body>
+</html>

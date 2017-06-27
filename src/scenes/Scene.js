@@ -18,34 +18,38 @@ function Scene () {
 
 }
 
-Scene.prototype = Object.create( Object3D.prototype );
+Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-Scene.prototype.constructor = Scene;
+	constructor: Scene,
 
-Scene.prototype.copy = function ( source, recursive ) {
+	copy: function ( source, recursive ) {
 
-	Object3D.prototype.copy.call( this, source, recursive );
+		Object3D.prototype.copy.call( this, source, recursive );
 
-	if ( source.background !== null ) this.background = source.background.clone();
-	if ( source.fog !== null ) this.fog = source.fog.clone();
-	if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
+		if ( source.background !== null ) this.background = source.background.clone();
+		if ( source.fog !== null ) this.fog = source.fog.clone();
+		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-	this.autoUpdate = source.autoUpdate;
-	this.matrixAutoUpdate = source.matrixAutoUpdate;
+		this.autoUpdate = source.autoUpdate;
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
-	return this;
+		return this;
 
-};
+	},
 
-Scene.prototype.toJSON = function ( meta ) {
+	toJSON: function ( meta ) {
 
-	var data = Object3D.prototype.toJSON.call( this, meta );
+		var data = Object3D.prototype.toJSON.call( this, meta );
 
-	if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
-	if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
+		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
+		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
-	return data;
+		return data;
 
-};
+	}
+
+} );
+
+
 
 export { Scene };

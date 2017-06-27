@@ -92,26 +92,31 @@ function Object3D() {
 	this.renderOrder = 0;
 
 	this.userData = {};
-
-	this.onBeforeRender = function () {};
-	this.onAfterRender = function () {};
-
 }
 
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
-Object3D.prototype = {
-
-	constructor: Object3D,
+Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	isObject3D: true,
+
+	onBeforeRender: function () {},
+	onAfterRender: function () {},
 
 	applyMatrix: function ( matrix ) {
 
 		this.matrix.multiplyMatrices( matrix, this.matrix );
 
 		this.matrix.decompose( this.position, this.quaternion, this.scale );
+
+	},
+
+	applyQuaternion: function ( q ) {
+
+		this.quaternion.premultiply( q );
+
+		return this;
 
 	},
 
@@ -275,13 +280,21 @@ Object3D.prototype = {
 
 	lookAt: function () {
 
-		// This routine does not support objects with rotated and/or translated parent(s)
+		// This method does not support objects with rotated and/or translated parent(s)
 
 		var m1 = new Matrix4();
 
 		return function lookAt( vector ) {
 
-			m1.lookAt( vector, this.position, this.up );
+			if ( this.isCamera ) {
+
+				m1.lookAt( this.position, vector, this.up );
+
+			} else {
+
+				m1.lookAt( vector, this.position, this.up );
+
+			}
 
 			this.quaternion.setFromRotationMatrix( m1 );
 
@@ -343,6 +356,8 @@ Object3D.prototype = {
 
 			}
 
+			return this;
+
 		}
 
 		var index = this.children.indexOf( object );
@@ -357,6 +372,8 @@ Object3D.prototype = {
 
 		}
 
+		return this;
+		
 	},
 
 	getObjectById: function ( id ) {
@@ -528,9 +545,9 @@ Object3D.prototype = {
 
 	updateMatrixWorld: function ( force ) {
 
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
 			if ( this.parent === null ) {
 
@@ -581,7 +598,7 @@ Object3D.prototype = {
 			};
 
 			output.metadata = {
-				version: 4.4,
+				version: 4.5,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
 			};
@@ -605,27 +622,43 @@ Object3D.prototype = {
 
 		//
 
-		if ( this.geometry !== undefined ) {
+		function serialize( library, element ) {
 
-			if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+			if ( library[ element.uuid ] === undefined ) {
 
-				meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+				library[ element.uuid ] = element.toJSON( meta );
 
 			}
 
-			object.geometry = this.geometry.uuid;
+			return element.uuid;
+
+		}
+
+		if ( this.geometry !== undefined ) {
+
+			object.geometry = serialize( meta.geometries, this.geometry );
 
 		}
 
 		if ( this.material !== undefined ) {
 
-			if ( meta.materials[ this.material.uuid ] === undefined ) {
+			if ( Array.isArray( this.material ) ) {
 
-				meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
+				var uuids = [];
+
+				for ( var i = 0, l = this.material.length; i < l; i ++ ) {
+
+					uuids.push( serialize( meta.materials, this.material[ i ] ) );
+
+				}
+
+				object.material = uuids;
+
+			} else {
+
+				object.material = serialize( meta.materials, this.material );
 
 			}
-
-			object.material = this.material.uuid;
 
 		}
 
@@ -730,8 +763,7 @@ Object3D.prototype = {
 
 	}
 
-};
+} );
 
-Object.assign( Object3D.prototype, EventDispatcher.prototype );
 
 export { Object3D };

@@ -52,6 +52,8 @@ function Material() {
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
 
+	this.dithering = false;
+
 	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
@@ -59,28 +61,15 @@ function Material() {
 
 	this.visible = true;
 
-	this._needsUpdate = true;
+	this.needsUpdate = true;
 
 }
 
-Material.prototype = {
-
-	constructor: Material,
+Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 	isMaterial: true,
 
-	get needsUpdate() {
-
-		return this._needsUpdate;
-
-	},
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.update();
-		this._needsUpdate = value;
-
-	},
+	onBeforeCompile: function () {},
 
 	setValues: function ( values ) {
 
@@ -144,7 +133,7 @@ Material.prototype = {
 
 		var data = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'Material',
 				generator: 'Material.toJSON'
 			}
@@ -233,6 +222,8 @@ Material.prototype = {
 		data.skinning = this.skinning;
 		data.morphTargets = this.morphTargets;
 
+		data.dithering = this.dithering;
+
 		// TODO: Copied from Object3D.toJSON
 
 		function extractFromCache( cache ) {
@@ -305,6 +296,8 @@ Material.prototype = {
 		this.polygonOffsetFactor = source.polygonOffsetFactor;
 		this.polygonOffsetUnits = source.polygonOffsetUnits;
 
+		this.dithering = source.dithering;
+
 		this.alphaTest = source.alphaTest;
 
 		this.premultipliedAlpha = source.premultipliedAlpha;
@@ -334,20 +327,13 @@ Material.prototype = {
 
 	},
 
-	update: function () {
-
-		this.dispatchEvent( { type: 'update' } );
-
-	},
-
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
-};
+} );
 
-Object.assign( Material.prototype, EventDispatcher.prototype );
 
 export { Material };

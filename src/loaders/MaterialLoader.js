@@ -144,18 +144,6 @@ Object.assign( MaterialLoader.prototype, {
 
 		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
 
-		// MultiMaterial
-
-		if ( json.materials !== undefined ) {
-
-			for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
-
-				material.materials.push( this.parse( json.materials[ i ] ) );
-
-			}
-
-		}
-
 		return material;
 
 	}

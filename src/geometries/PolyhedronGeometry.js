@@ -2,9 +2,16 @@
  * @author clockworkgeek / https://github.com/clockworkgeek
  * @author timothypratley / https://github.com/timothypratley
  * @author WestLangley / http://github.com/WestLangley
-*/
+ * @author Mugen87 / https://github.com/Mugen87
+ */
 
 import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
+import { Vector2 } from '../math/Vector2';
+
+// PolyhedronGeometry
 
 function PolyhedronGeometry( vertices, indices, radius, detail ) {
 
@@ -27,15 +34,7 @@ function PolyhedronGeometry( vertices, indices, radius, detail ) {
 PolyhedronGeometry.prototype = Object.create( Geometry.prototype );
 PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
-import { Sphere } from '../math/Sphere';
+// PolyhedronBufferGeometry
 
 function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
@@ -75,9 +74,16 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 	this.addAttribute( 'position', new Float32BufferAttribute( vertexBuffer, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
-	this.normalizeNormals();
 
-	this.boundingSphere = new Sphere( new Vector3(), radius );
+	if ( detail === 0 ) {
+
+		this.computeVertexNormals(); // flat normals
+
+	} else {
+
+		this.normalizeNormals(); // smooth normals
+
+	}
 
 	// helper functions
 
@@ -330,5 +336,6 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 PolyhedronBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 PolyhedronBufferGeometry.prototype.constructor = PolyhedronBufferGeometry;
+
 
 export { PolyhedronGeometry, PolyhedronBufferGeometry };

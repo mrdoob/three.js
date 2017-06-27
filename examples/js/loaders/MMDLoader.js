@@ -312,10 +312,9 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 				var stride = values.length / times.length;
 				var interpolateStride = ( stride === 3 ) ? 12 : 4;  // 3: Vector3, others: Quaternion or Number
 
-				var aheadIndex = 2;
 				var index = 1;
 
-				for ( aheadIndex = 2, endIndex = times.length; aheadIndex < endIndex; aheadIndex ++ ) {
+				for ( var aheadIndex = 2, endIndex = times.length; aheadIndex < endIndex; aheadIndex ++ ) {
 
 					for ( var i = 0; i < stride; i ++ ) {
 
@@ -427,13 +426,9 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 
 		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks );
 
-		if ( clip !== null ) {
-
-			if ( camera.center === undefined ) camera.center = new THREE.Vector3( 0, 0, 0 );
-			if ( camera.animations === undefined ) camera.animations = [];
-			camera.animations.push( clip );
-
-		}
+		if ( camera.center === undefined ) camera.center = new THREE.Vector3( 0, 0, 0 );
+		if ( camera.animations === undefined ) camera.animations = [];
+		camera.animations.push( clip );
 
 	};
 
@@ -495,7 +490,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var scope = this;
 	var geometry = new THREE.BufferGeometry();
-	var material = new THREE.MultiMaterial();
+	var materials = [];
 	var helper = new THREE.MMDLoader.DataCreationHelper();
 
 	var buffer = {};
@@ -786,6 +781,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var params = { name: m.name };
 
 			var attribute = new THREE.Float32BufferAttribute( model.metadata.vertexCount * 3, 3 );
+			attribute.name = m.name;
 
 			for ( var j = 0; j < model.metadata.vertexCount * 3; j++ ) {
 
@@ -1330,7 +1326,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-			material.materials.push( m );
+			materials.push( m );
 
 		}
 
@@ -1354,7 +1350,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					}
 
-					var m = material.materials[ e.index ];
+					var m = materials[ e.index ];
 
 					if ( m.opacity !== e.diffuse[ 3 ] ) {
 
@@ -1477,7 +1473,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var initGeometry = function () {
 
-		geometry.setIndex( new ( buffer.indices.length > 65535 ? THREE.Uint32BufferAttribute : THREE.Uint16BufferAttribute )( buffer.indices, 1 ) );
+		geometry.setIndex( buffer.indices );
 		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( buffer.vertices, 3 ) );
 		geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( buffer.normals, 3 ) );
 		geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.uvs, 2 ) );
@@ -1499,7 +1495,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 	initPhysics();
 	initGeometry();
 
-	var mesh = new THREE.SkinnedMesh( geometry, material );
+	var mesh = new THREE.SkinnedMesh( geometry, materials );
 
 	// console.log( mesh ); // for console debug
 
@@ -1586,12 +1582,8 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks );
 
-		if ( clip !== null ) {
-
-			if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
-			mesh.geometry.animations.push( clip );
-
-		}
+		if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
+		mesh.geometry.animations.push( clip );
 
 	};
 
@@ -1628,12 +1620,8 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name + 'Morph', -1, tracks );
 
-		if ( clip !== null ) {
-
-			if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
-			mesh.geometry.animations.push( clip );
-
-		}
+		if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
+		mesh.geometry.animations.push( clip );
 
 	};
 
@@ -1651,10 +1639,11 @@ THREE.MMDLoader.DataCreationHelper.prototype = {
 	constructor: THREE.MMDLoader.DataCreationHelper,
 
 	/*
-         * Note: Sometimes to use Japanese Unicode characters runs into problems in Three.js.
+	 * Note: Sometimes to use Japanese Unicode characters runs into problems in Three.js.
 	 *       In such a case, use this method to convert it to Unicode hex charcode strings,
-         *       like 'あいう' -> '0x30420x30440x3046'
-         */
+	 *       like 'あいう' -> '0x30420x30440x3046'
+	 */
+
 	toCharcodeStrings: function ( s ) {
 
 		var str = '';

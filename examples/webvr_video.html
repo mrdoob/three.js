@@ -4,6 +4,8 @@
 		<title>three.js webvr - video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-07-28 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-07-28" content="Ave6CPNUgSwHb3vCbyd55P/R7pfkwNniUJsYfSoUqI+l1X1BIOt6HfriVP0g2hmaG7Pp3qaUXuXdZeqGBmoMKg8AAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUwMTI2NzQwNX0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -26,30 +28,26 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> webgl - vr video<br />
-			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank">mery project</a>.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - vr video<br />
+			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.
 		</div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
-			if ( WEBVR.isAvailable() === false ) {
+			WEBVR.checkAvailability().catch( function( message ) {
 
-				document.body.appendChild( WEBVR.getMessage() );
+				document.body.appendChild( WEBVR.getMessageContainer( message ) );
 
-			}
+			} );
 
 			//
 
 			var camera, scene, renderer;
 			var video, texture;
-
-			var controls, effect;
 
 			init();
 			animate();
@@ -140,19 +138,17 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				renderer.vr.enabled = true;
+
 				//
 
-				controls = new THREE.VRControls( camera );
+				WEBVR.getVRDisplay( function ( display ) {
 
-				effect = new THREE.VREffect( renderer );
-				effect.scale = 0; // video doesn't need eye separation
-				effect.setSize( window.innerWidth, window.innerHeight );
+					renderer.vr.setDevice( display );
 
-				if ( WEBVR.isAvailable() === true ) {
+					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
-					document.body.appendChild( WEBVR.getButton( effect ) );
-
-				}
+				} );
 
 
 				//
@@ -166,22 +162,19 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
 			function animate() {
 
-				effect.requestAnimationFrame( animate );
-				render();
+				renderer.animate( render );
 
 			}
 
 			function render() {
 
-				controls.update();
-
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

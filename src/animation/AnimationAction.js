@@ -66,8 +66,8 @@ function AnimationAction( mixer, clip, localRoot ) {
 
 	this.repetitions = Infinity; 		// no. of repetitions when looping
 
-	this.paused = false;				// false -> zero effective time scale
-	this.enabled = true;				// true -> zero effective weight
+	this.paused = false;				// true -> zero effective time scale
+	this.enabled = true;				// false -> zero effective weight
 
 	this.clampWhenFinished 	= false;	// keep feeding the last frame?
 
@@ -76,9 +76,7 @@ function AnimationAction( mixer, clip, localRoot ) {
 
 }
 
-AnimationAction.prototype = {
-
-	constructor: AnimationAction,
+Object.assign( AnimationAction.prototype, {
 
 	// State & Scheduling
 
@@ -222,7 +220,7 @@ AnimationAction.prototype = {
 
 	// Time Scale Control
 
-	// set the weight stopping any scheduled warping
+	// set the time scale stopping any scheduled warping
 	// although .paused = true yields an effective time scale of zero, this
 	// method does *not* change .paused, because it would be confusing
 	setEffectiveTimeScale: function( timeScale ) {
@@ -329,7 +327,17 @@ AnimationAction.prototype = {
 	// Interna
 
 	_update: function( time, deltaTime, timeDirection, accuIndex ) {
+
 		// called by the mixer
+
+		if ( ! this.enabled ) {
+
+			// call ._updateWeight() to update ._effectiveWeight
+
+			this._updateWeight( time );
+			return;
+
+		}
 
 		var startTime = this._startTime;
 
@@ -651,7 +659,7 @@ AnimationAction.prototype = {
 
 	}
 
-};
+} );
 
 
 export { AnimationAction };

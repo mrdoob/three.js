@@ -66,7 +66,7 @@ function animate() {
 }
 ```
 
-If everything went well you should see [this](http://jsfiddle.net/hfj7gm6t/).
+If everything went well you should see [this](https://jsfiddle.net/hfj7gm6t/).
 
 ### Change log ###
 

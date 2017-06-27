@@ -52,8 +52,10 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		event.preventDefault();
 
-		_mouse.x = ( event.clientX / _domElement.width ) * 2 - 1;
-		_mouse.y = - ( event.clientY / _domElement.height ) * 2 + 1;
+		var rect = _domElement.getBoundingClientRect();
+
+		_mouse.x = ( (event.clientX - rect.left) / rect.width ) * 2 - 1;
+		_mouse.y = - ( (event.clientY - rect.top) / rect.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 

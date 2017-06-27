@@ -59,11 +59,7 @@ function intersectObject( object, raycaster, intersects, recursive ) {
 
 }
 
-//
-
-Raycaster.prototype = {
-
-	constructor: Raycaster,
+Object.assign( Raycaster.prototype, {
 
 	linePrecision: 1,
 
@@ -77,12 +73,12 @@ Raycaster.prototype = {
 
 	setFromCamera: function ( coords, camera ) {
 
-		if ( (camera && camera.isPerspectiveCamera) ) {
+		if ( ( camera && camera.isPerspectiveCamera ) ) {
 
 			this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
 			this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
 
-		} else if ( (camera && camera.isOrthographicCamera) ) {
+		} else if ( ( camera && camera.isOrthographicCamera ) ) {
 
 			this.ray.origin.set( coords.x, coords.y, ( camera.near + camera.far ) / ( camera.near - camera.far ) ).unproject( camera ); // set origin in plane of camera
 			this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
@@ -130,7 +126,7 @@ Raycaster.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Raycaster };

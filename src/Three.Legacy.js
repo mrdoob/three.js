@@ -27,6 +27,7 @@ import { Curve } from './extras/core/Curve.js';
 import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 import { BoxHelper } from './helpers/BoxHelper';
 import { GridHelper } from './helpers/GridHelper.js';
+import { SkeletonHelper } from './helpers/SkeletonHelper.js';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
 import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
@@ -41,7 +42,6 @@ import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
 import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
 import { MeshPhongMaterial } from './materials/MeshPhongMaterial.js';
-import { MultiMaterial } from './materials/MultiMaterial.js';
 import { PointsMaterial } from './materials/PointsMaterial.js';
 import { ShaderMaterial } from './materials/ShaderMaterial.js';
 import { Box2 } from './math/Box2.js';
@@ -61,6 +61,7 @@ import { LineSegments } from './objects/LineSegments.js';
 import { LOD } from './objects/LOD.js';
 import { Points } from './objects/Points.js';
 import { Sprite } from './objects/Sprite.js';
+import { Skeleton } from './objects/Skeleton.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
@@ -81,8 +82,24 @@ export var LinePieces = 1;
 
 export function MeshFaceMaterial( materials ) {
 
-	console.warn( 'THREE.MeshFaceMaterial has been renamed to THREE.MultiMaterial.' );
-	return new MultiMaterial( materials );
+	console.warn( 'THREE.MeshFaceMaterial has been removed. Use an Array instead.' );
+	return materials;
+
+}
+
+export function MultiMaterial( materials ) {
+
+	if ( materials === undefined ) materials = [];
+
+	console.warn( 'THREE.MultiMaterial has been removed. Use an Array instead.' );
+	materials.isMultiMaterial = true;
+	materials.materials = materials;
+	materials.clone = function () {
+
+		return materials.slice();
+
+	};
+	return materials;
 
 }
 
@@ -302,6 +319,12 @@ GridHelper.prototype.setColors = function () {
 
 };
 
+SkeletonHelper.prototype.update = function () {
+
+	console.error( 'THREE.SkeletonHelper: update() no longer needs to be called.' );
+	
+};
+
 export function WireframeHelper( object, hex ) {
 
 	console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
@@ -419,8 +442,7 @@ Object.assign( Matrix3.prototype, {
 	},
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'THREE.Matrix3: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
-		return this.applyToVector3Array( a );
+		console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.'  );
 
 	},
 	applyToBuffer: function( buffer, offset, length ) {
@@ -470,6 +492,11 @@ Object.assign( Matrix4.prototype, {
 		return this.makeRotationFromQuaternion( q );
 
 	},
+	multiplyToArray: function () {
+
+		console.warn( 'THREE.Matrix4: .multiplyToArray() has been removed.' );
+
+	},
 	multiplyVector3: function ( vector ) {
 
 		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
@@ -484,8 +511,7 @@ Object.assign( Matrix4.prototype, {
 	},
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'THREE.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
-		return this.applyToVector3Array( a );
+		console.error( 'THREE.Matrix4: .multiplyVector3Array() has been removed.'  );
 
 	},
 	rotateAxis: function ( v ) {
@@ -740,6 +766,38 @@ Object.defineProperties( LOD.prototype, {
 
 } );
 
+Object.defineProperty( Skeleton.prototype, 'useVertexTexture', {
+
+	get: function () {
+
+		console.warn( 'THREE.Skeleton: useVertexTexture has been removed.' );
+
+	},
+	set: function () {
+
+		console.warn( 'THREE.Skeleton: useVertexTexture has been removed.' );
+
+	}
+
+} );
+
+Object.defineProperty( Curve.prototype, '__arcLengthDivisions', {
+
+	get: function () {
+
+		console.warn( 'THREE.Curve: .__arcLengthDivisions is now .arcLengthDivisions.' );
+		return this.arcLengthDivisions;
+
+	},
+	set: function ( value ) {
+
+		console.warn( 'THREE.Curve: .__arcLengthDivisions is now .arcLengthDivisions.' );
+		this.arcLengthDivisions = value;
+
+	}
+
+} );
+
 //
 
 PerspectiveCamera.prototype.setLens = function ( focalLength, filmGauge ) {
@@ -961,19 +1019,19 @@ Object.defineProperties( Material.prototype, {
 	wrapAround: {
 		get: function () {
 
-			console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+			console.warn( 'THREE.Material: .wrapAround has been removed.' );
 
 		},
 		set: function () {
 
-			console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+			console.warn( 'THREE.Material: .wrapAround has been removed.' );
 
 		}
 	},
 	wrapRGB: {
 		get: function () {
 
-			console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
+			console.warn( 'THREE.Material: .wrapRGB has been removed.' );
 			return new Color();
 
 		}
@@ -1021,6 +1079,13 @@ Object.defineProperties( ShaderMaterial.prototype, {
 //
 
 Object.assign( WebGLRenderer.prototype, {
+
+	getCurrentRenderTarget: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );
+		return this.getRenderTarget();
+
+	},
 
 	supportsFloatTextures: function () {
 

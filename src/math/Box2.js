@@ -11,9 +11,7 @@ function Box2( min, max ) {
 
 }
 
-Box2.prototype = {
-
-	constructor: Box2,
+Object.assign( Box2.prototype, {
 
 	set: function ( min, max ) {
 
@@ -157,7 +155,8 @@ Box2.prototype = {
 
 	intersectsBox: function ( box ) {
 
-		// using 6 splitting planes to rule out intersections.
+		// using 4 splitting planes to rule out intersections
+
 		return box.max.x < this.min.x || box.min.x > this.max.x ||
 			box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
 
@@ -216,7 +215,7 @@ Box2.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Box2 };

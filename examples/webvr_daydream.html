@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webvr - daydream</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-07-28 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-07-28" content="Ave6CPNUgSwHb3vCbyd55P/R7pfkwNniUJsYfSoUqI+l1X1BIOt6HfriVP0g2hmaG7Pp3qaUXuXdZeqGBmoMKg8AAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUwMTI2NzQwNX0=">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #101010;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			a {
+				color: #f00;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/vr/DaydreamController.js"></script>
+		<script src="js/vr/WebVR.js"></script>
+
+		<script>
+
+			WEBVR.checkAvailability().catch( function( message ) {
+
+				document.body.appendChild( WEBVR.getMessageContainer( message ) );
+
+			} );
+
+			//
+
+			var clock = new THREE.Clock();
+
+			var container;
+			var camera, scene, ray, raycaster, renderer;
+			var gamepad;
+
+			var room;
+
+			var INTERSECTED;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - daydream';
+				container.appendChild( info );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x505050 );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+
+				room = new THREE.Mesh(
+					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x808080, wireframe: true } )
+				);
+				scene.add( room );
+
+				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 ).normalize();
+				scene.add( light );
+
+				var geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
+
+				for ( var i = 0; i < 200; i ++ ) {
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+
+					object.position.x = Math.random() * 4 - 2;
+					object.position.y = Math.random() * 4 - 2;
+					object.position.z = Math.random() * 4 - 2;
+
+					object.rotation.x = Math.random() * 2 * Math.PI;
+					object.rotation.y = Math.random() * 2 * Math.PI;
+					object.rotation.z = Math.random() * 2 * Math.PI;
+
+					object.scale.x = Math.random() + 0.5;
+					object.scale.y = Math.random() + 0.5;
+					object.scale.z = Math.random() + 0.5;
+
+					object.userData.velocity = new THREE.Vector3();
+					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
+					object.userData.velocity.y = Math.random() * 0.01 - 0.005;
+					object.userData.velocity.z = Math.random() * 0.01 - 0.005;
+
+					room.add( object );
+
+				}
+
+				//
+
+				raycaster = new THREE.Raycaster();
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
+				container.appendChild( renderer.domElement );
+
+				renderer.vr.enabled = true;
+
+				//
+
+				WEBVR.getVRDisplay( function ( device ) {
+
+					renderer.vr.setDevice( device );
+					document.body.appendChild( WEBVR.getButton( device, renderer.domElement ) );
+
+				} );
+
+				//
+
+				gamepad = new THREE.DaydreamController();
+				gamepad.position.set( 0.25, - 0.5, 0 );
+				scene.add( gamepad );
+
+				//
+
+				var gamepadHelper = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( { linewidth: 4 } ) );
+				gamepadHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 10 ], 3 ) );
+				gamepad.add( gamepadHelper );
+
+				renderer.domElement.addEventListener( 'click', function ( event ) {
+
+					gamepadHelper.material.color.setHex( Math.random() * 0xffffff );
+
+				} );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				renderer.animate( render );
+
+			}
+
+			function render() {
+
+				gamepad.update();
+
+				var delta = clock.getDelta() * 60;
+
+				// find intersections
+
+				raycaster.ray.origin.copy( gamepad.position );
+				raycaster.ray.direction.set( 0, 0, - 1 ).applyQuaternion( gamepad.quaternion );
+
+				var intersects = raycaster.intersectObjects( room.children );
+
+				if ( intersects.length > 0 ) {
+
+					if ( INTERSECTED != intersects[ 0 ].object ) {
+
+						if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+						INTERSECTED = intersects[ 0 ].object;
+						INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+						INTERSECTED.material.emissive.setHex( 0xff0000 );
+
+					}
+
+				} else {
+
+					if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+					INTERSECTED = undefined;
+
+				}
+
+				// keep cubes inside room
+
+				for ( var i = 0; i < room.children.length; i ++ ) {
+
+					var cube = room.children[ i ];
+
+					cube.position.add( cube.userData.velocity );
+
+					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
+
+						cube.position.x = THREE.Math.clamp( cube.position.x, - 3, 3 );
+						cube.userData.velocity.x = - cube.userData.velocity.x;
+
+					}
+
+					if ( cube.position.y < - 3 || cube.position.y > 3 ) {
+
+						cube.position.y = THREE.Math.clamp( cube.position.y, - 3, 3 );
+						cube.userData.velocity.y = - cube.userData.velocity.y;
+
+					}
+
+					if ( cube.position.z < - 3 || cube.position.z > 3 ) {
+
+						cube.position.z = THREE.Math.clamp( cube.position.z, - 3, 3 );
+						cube.userData.velocity.z = - cube.userData.velocity.z;
+
+					}
+
+					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
+					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
+					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

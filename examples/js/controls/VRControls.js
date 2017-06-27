@@ -37,7 +37,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	if ( navigator.getVRDisplays ) {
 
-		navigator.getVRDisplays().then( gotVRDisplays ).catch ( function () {
+		navigator.getVRDisplays().then( gotVRDisplays ).catch( function () {
 
 			console.warn( 'THREE.VRControls: Unable to get VR Displays' );
 
@@ -137,30 +137,6 @@ THREE.VRControls = function ( object, onError ) {
 			object.position.multiplyScalar( scope.scale );
 
 		}
-
-	};
-
-	this.resetPose = function () {
-
-		if ( vrDisplay ) {
-
-			vrDisplay.resetPose();
-
-		}
-
-	};
-
-	this.resetSensor = function () {
-
-		console.warn( 'THREE.VRControls: .resetSensor() is now .resetPose().' );
-		this.resetPose();
-
-	};
-
-	this.zeroSensor = function () {
-
-		console.warn( 'THREE.VRControls: .zeroSensor() is now .resetPose().' );
-		this.resetPose();
 
 	};
 

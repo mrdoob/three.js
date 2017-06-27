@@ -30,7 +30,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - panorama demo. cubemap by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - panorama demo. cubemap by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>.</div>
 
 		<script src="../build/three.js"></script>
 
@@ -81,7 +81,7 @@
 
 				];
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 300, 300, 300, 7, 7, 7 ), new THREE.MultiMaterial( materials ) );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 300, 300, 300, 7, 7, 7 ), materials );
 				mesh.scale.x = - 1;
 				scene.add( mesh );
 

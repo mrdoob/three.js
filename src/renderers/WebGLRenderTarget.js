@@ -39,9 +39,7 @@ function WebGLRenderTarget( width, height, options ) {
 
 }
 
-WebGLRenderTarget.prototype = {
-
-	constructor: WebGLRenderTarget,
+Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
 
 	isWebGLRenderTarget: true,
 
@@ -90,8 +88,7 @@ WebGLRenderTarget.prototype = {
 
 	}
 
-};
+} );
 
-Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype );
 
 export { WebGLRenderTarget };

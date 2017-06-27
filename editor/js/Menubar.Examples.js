@@ -22,7 +22,8 @@ Menubar.Examples = function ( editor ) {
 		{ title: 'Arkanoid', file: 'arkanoid.app.json' },
 		{ title: 'Camera', file: 'camera.app.json' },
 		{ title: 'Particles', file: 'particles.app.json' },
-		{ title: 'Pong', file: 'pong.app.json' }
+		{ title: 'Pong', file: 'pong.app.json' },
+		{ title: 'Shaders', file: 'shaders.app.json' }
 	];
 
 	var loader = new THREE.FileLoader();

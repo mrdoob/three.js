@@ -28,13 +28,13 @@
 		cubeA.position.set( 100, 100, 0 );
 
 		var cubeB = new THREE.Mesh( geometry, material );
-		cubeA.position.set( -100, -100, 0 );
+		cubeB.position.set( -100, -100, 0 );
 
 		//create a group and add the two cubes
 		//These cubes can now be rotated / scaled etc as a group
 		var group = new THREE.Group();
 		group.add( cubeA );
-		group.add( cubeB )
+		group.add( cubeB );
 
 		scene.add( group );
 		</code>

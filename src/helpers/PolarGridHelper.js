@@ -1,15 +1,15 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / http://github.com/Mugen87
+ * @author Hectate / http://www.github.com/Hectate
+ */
+
 import { LineSegments } from '../objects/LineSegments';
 import { VertexColors } from '../constants';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Color } from '../math/Color';
-
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / http://github.com/Mugen87
- * @author Hectate / http://www.github.com/Hectate
- */
 
 function PolarGridHelper( radius, radials, circles, divisions, color1, color2 ) {
 
