@@ -1,12 +1,3 @@
-import { Camera } from '../cameras/Camera';
-import { Vector3 } from '../math/Vector3';
-import { LineSegments } from '../objects/LineSegments';
-import { Color } from '../math/Color';
-import { FaceColors } from '../constants';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author Mugen87 / https://github.com/Mugen87
@@ -16,6 +7,15 @@ import { Float32BufferAttribute } from '../core/BufferAttribute';
  * 	- based on frustum visualization in lightgl.js shadowmap example
  *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
  */
+
+import { Camera } from '../cameras/Camera';
+import { Vector3 } from '../math/Vector3';
+import { LineSegments } from '../objects/LineSegments';
+import { Color } from '../math/Color';
+import { FaceColors } from '../constants';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 
 function CameraHelper( camera ) {
 

@@ -1,15 +1,15 @@
+/**
+ * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
+ * @author WestLangley / http://github.com/WestLangley
+ */
+
 import { Vector3 } from '../math/Vector3';
 import { Object3D } from '../core/Object3D';
 import { LineSegments } from '../objects/LineSegments';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
-
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
-*/
 
 function SpotLightHelper( light, color ) {
 

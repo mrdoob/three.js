@@ -1708,21 +1708,21 @@ THREE.ShaderDeferred = {
 			"varying vec3 vNormal;",
 			"varying vec4 vPosition;",
 
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
+			"#include <morphtarget_pars_vertex>",
+			"#include <skinning_pars_vertex>",
 
 			"void main() {",
 
-			THREE.ShaderChunk[ "begin_vertex" ],
-			THREE.ShaderChunk[ "beginnormal_vertex" ],
-			THREE.ShaderChunk[ "skinbase_vertex" ],
-			THREE.ShaderChunk[ "skinnormal_vertex" ],
-			THREE.ShaderChunk[ "defaultnormal_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_vertex" ],
-			THREE.ShaderChunk[ "skinning_vertex" ],
-			THREE.ShaderChunk[ "project_vertex" ],
+			"#include <begin_vertex>",
+			"#include <beginnormal_vertex>",
+			"#include <skinbase_vertex>",
+			"#include <skinnormal_vertex>",
+			"#include <defaultnormal_vertex>",
+			"#include <morphtarget_vertex>",
+			"#include <skinning_vertex>",
+			"#include <project_vertex>",
 
-			"	vNormal = normalize( normalMatrix * objectNormal );",
+			"	vNormal = normalize( transformedNormal );",
 			"	vPosition = gl_Position;",
 
 			"}"
@@ -1765,21 +1765,21 @@ THREE.ShaderDeferred = {
 
 		vertexShader: [
 
-			THREE.ShaderChunk[ "uv_pars_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
+			"#include <uv_pars_vertex>",
+			"#include <morphtarget_pars_vertex>",
+			"#include <skinning_pars_vertex>",
 
 			"void main() {",
 
-			THREE.ShaderChunk[ "uv_vertex" ],
-			THREE.ShaderChunk[ "begin_vertex" ],
-			THREE.ShaderChunk[ "beginnormal_vertex" ],
-			THREE.ShaderChunk[ "skinbase_vertex" ],
-			THREE.ShaderChunk[ "skinnormal_vertex" ],
-			THREE.ShaderChunk[ "defaultnormal_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_vertex" ],
-			THREE.ShaderChunk[ "skinning_vertex" ],
-			THREE.ShaderChunk[ "project_vertex" ],
+			"#include <uv_vertex>",
+			"#include <begin_vertex>",
+			"#include <beginnormal_vertex>",
+			"#include <skinbase_vertex>",
+			"#include <skinnormal_vertex>",
+			"#include <defaultnormal_vertex>",
+			"#include <morphtarget_vertex>",
+			"#include <skinning_vertex>",
+			"#include <project_vertex>",
 
 			"}"
 
@@ -1792,8 +1792,8 @@ THREE.ShaderDeferred = {
 			"uniform vec3 specular;",
 			"uniform float shininess;",
 
-			THREE.ShaderChunk[ "uv_pars_fragment" ],
-			THREE.ShaderChunk[ "map_pars_fragment" ],
+			"#include <uv_pars_fragment>",
+			"#include <map_pars_fragment>",
 			THREE.DeferredShaderChunk[ "packVector3" ],
 
 			"void main() {",
@@ -1802,7 +1802,7 @@ THREE.ShaderDeferred = {
 			"	vec3 emissiveColor = emissive;",
 			"	vec3 specularColor = specular;",
 
-			THREE.ShaderChunk[ "map_fragment" ],
+			"#include <map_fragment>",
 			THREE.DeferredShaderChunk[ "packColor" ],
 
 			"	gl_FragColor = packedColor;",
@@ -2117,21 +2117,21 @@ THREE.ShaderDeferred = {
 			"varying vec3 vNormal;",
 			"varying vec4 vPosition;",
 
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
+			"#include <morphtarget_pars_vertex>",
+			"#include <skinning_pars_vertex>",
 
 			"void main() {",
 
-			THREE.ShaderChunk[ "begin_vertex" ],
-			THREE.ShaderChunk[ "beginnormal_vertex" ],
-			THREE.ShaderChunk[ "skinbase_vertex" ],
-			THREE.ShaderChunk[ "skinnormal_vertex" ],
-			THREE.ShaderChunk[ "defaultnormal_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_vertex" ],
-			THREE.ShaderChunk[ "skinning_vertex" ],
-			THREE.ShaderChunk[ "project_vertex" ],
+			"#include <begin_vertex>",
+			"#include <beginnormal_vertex>",
+			"#include <skinbase_vertex>",
+			"#include <skinnormal_vertex>",
+			"#include <defaultnormal_vertex>",
+			"#include <morphtarget_vertex>",
+			"#include <skinning_vertex>",
+			"#include <project_vertex>",
 
-			"	vNormal = normalize( normalMatrix * objectNormal );",
+			"	vNormal = normalize( transformedNormal );",
 			"	vPosition = gl_Position;",
 
 			"}"
@@ -2420,21 +2420,21 @@ THREE.ShaderDeferred = {
 
 		vertexShader: [
 
-			THREE.ShaderChunk[ "uv_pars_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
+			"#include <uv_pars_vertex>",
+			"#include <morphtarget_pars_vertex>",
+			"#include <skinning_pars_vertex>",
 
 			"void main() {",
 
-			THREE.ShaderChunk[ "uv_vertex" ],
-			THREE.ShaderChunk[ "begin_vertex" ],
-			THREE.ShaderChunk[ "beginnormal_vertex" ],
-			THREE.ShaderChunk[ "skinbase_vertex" ],
-			THREE.ShaderChunk[ "skinnormal_vertex" ],
-			THREE.ShaderChunk[ "defaultnormal_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_vertex" ],
-			THREE.ShaderChunk[ "skinning_vertex" ],
-			THREE.ShaderChunk[ "project_vertex" ],
+			"#include <uv_vertex>",
+			"#include <begin_vertex>",
+			"#include <beginnormal_vertex>",
+			"#include <skinbase_vertex>",
+			"#include <skinnormal_vertex>",
+			"#include <defaultnormal_vertex>",
+			"#include <morphtarget_vertex>",
+			"#include <skinning_vertex>",
+			"#include <project_vertex>",
 
 			"}"
 
@@ -2452,8 +2452,8 @@ THREE.ShaderDeferred = {
 			"uniform float viewHeight;",
 			"uniform float viewWidth;",
 
-			THREE.ShaderChunk[ "uv_pars_fragment" ],
-			THREE.ShaderChunk[ "map_pars_fragment" ],
+			"#include <uv_pars_fragment>",
+			"#include <map_pars_fragment>",
 
 			THREE.DeferredShaderChunk[ "unpackFloat" ],
 
@@ -2467,7 +2467,7 @@ THREE.ShaderDeferred = {
 
 			"	vec4 light = texture2D( samplerLight, texCoord );",
 
-			THREE.ShaderChunk[ "map_fragment" ],
+			"#include <map_fragment>",
 
 			"	vec3 diffuseFinal = diffuseColor.rgb * light.rgb;",
 			"	vec3 emissiveFinal = emissiveColor;",

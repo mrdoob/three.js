@@ -432,8 +432,10 @@ THREE.ColladaLoader.prototype = {
 
 			var keyframes = prepareAnimationData( data, defaultMatrix );
 
+			if ( node.type !== 'JOINT' ) console.warn( 'THREE.ColladaLoader: Animation data for invalid node with ID "%s" found. The loader only supports animation of bones (skeletal animation).', node.id );
+
 			var animation = {
-				name: '.bones[' + node.sid + ']',
+				name: '.skeleton.bones[' + node.sid + ']',
 				keyframes: keyframes
 			}
 
@@ -864,7 +866,7 @@ THREE.ColladaLoader.prototype = {
 			var BONE_LIMIT = 4;
 
 			var build = {
-				bones: {},
+				joints: [], // this must be an array to preserve the joint order
 				indices: {
 					array: [],
 					stride: BONE_LIMIT
@@ -949,7 +951,7 @@ THREE.ColladaLoader.prototype = {
 				var name = jointSource.array[ i ];
 				var boneInverse = new THREE.Matrix4().fromArray( inverseSource.array, i * inverseSource.stride ).transpose();
 
-				build.bones[ name ] = boneInverse;
+				build.joints.push( { name: name, boneInverse: boneInverse } );
 
 			}
 
@@ -1219,7 +1221,9 @@ THREE.ColladaLoader.prototype = {
 
 		function parseEffectParameterTexture( xml ) {
 
-			var data = {};
+			var data = {
+				technique: {}
+			};
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -1230,7 +1234,7 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'extra':
-						data = parseEffectParameterTextureExtra( child );
+						parseEffectParameterTextureExtra( child, data );
 						break;
 
 				}
@@ -1241,9 +1245,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function parseEffectParameterTextureExtra( xml ) {
-
-			var data = {};
+		function parseEffectParameterTextureExtra( xml, data ) {
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -1254,20 +1256,16 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'technique':
-						data[ child.nodeName ] = parseEffectParameterTextureExtraTechnique( child );
+						parseEffectParameterTextureExtraTechnique( child, data );
 						break;
 
 				}
 
 			}
 
-			return data;
-
 		}
 
-		function parseEffectParameterTextureExtraTechnique( xml ) {
-
-			var data = {};
+		function parseEffectParameterTextureExtraTechnique( xml, data ) {
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -1281,19 +1279,33 @@ THREE.ColladaLoader.prototype = {
 					case 'repeatV':
 					case 'offsetU':
 					case 'offsetV':
-						data[ child.nodeName ] = parseFloat( child.textContent );
+						data.technique[ child.nodeName ] = parseFloat( child.textContent );
 						break;
 
 					case 'wrapU':
 					case 'wrapV':
-						data[ child.nodeName ] = parseInt( child.textContent );
+
+						// some files have values for wrapU/wrapV which become NaN via parseInt
+
+						if ( child.textContent.toUpperCase() === 'TRUE' ) {
+
+							data.technique[ child.nodeName ] = 1;
+
+						} else if ( child.textContent.toUpperCase() === 'FALSE' ) {
+
+							data.technique[ child.nodeName ] = 0;
+
+						} else {
+
+							data.technique[ child.nodeName ] = parseInt( child.textContent );
+
+						}
+
 						break;
 
 				}
 
 			}
-
-			return data;
 
 		}
 
@@ -1415,8 +1427,8 @@ THREE.ColladaLoader.prototype = {
 						if ( parameter.texture ) material.map = getTexture( parameter.texture );
 						break;
 					case 'specular':
-						if ( parameter.color && material.specular )
-							material.specular.fromArray( parameter.color );
+						if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
+						if ( parameter.texture ) material.specularMap = getTexture( parameter.texture );
 						break;
 					case 'shininess':
 						if ( parameter.float && material.shininess )
@@ -2191,7 +2203,8 @@ THREE.ColladaLoader.prototype = {
 
 			var data = {
 				id: parseId( xml.getAttribute( 'url' ) ),
-				materials: {}
+				materials: {},
+				skeletons: []
 			};
 
 			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
@@ -2216,7 +2229,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'skeleton':
-						data.skeleton = parseId( child.textContent );;
+						data.skeletons.push( parseId( child.textContent ) );
 						break;
 
 					default:
@@ -2230,23 +2243,127 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getSkeleton( root, controller ) {
+		function getSkeleton( skeletons, joints, skinnedMesh ) {
 
-			var boneArray = [];
-			var boneInverseArray = [];
+			var boneData = [];
+			var sortedBoneData = [];
+
+			var i, j, data;
+
+			// a skeleton can have multiple root bones. collada expresses this
+			// situtation with multiple "skeleton" tags per controller instance
+
+			for ( i = 0; i < skeletons.length; i ++ ) {
+
+				var skeleton = skeletons[ i ];
+				var root = getNode( skeleton );
+
+				// bone hierarchy is a child of the skinned mesh
+
+				skinnedMesh.add( root );
+
+				// setup bone data for a single bone hierarchy
+
+				buildBoneHierarchy( root, joints, boneData );
+
+			}
+
+			// sort bone data (the order is defined in the corresponding controller)
+
+			for ( i = 0; i < joints.length; i ++ ) {
+
+				for ( j = 0; j < boneData.length; j ++ ) {
+
+					data = boneData[ j ];
+
+					if ( data.bone.name === joints[ i ].name ) {
+
+						sortedBoneData[ i ] = data;
+						data.processed = true;
+						break;
+
+					}
+
+				}
+
+			}
+
+			// add unprocessed bone data at the end of the list
+
+			for ( i = 0; i < boneData.length; i ++ ) {
+
+				data = boneData[ i ];
+
+				if ( data.processed === false ) {
+
+					sortedBoneData.push( data );
+					data.processed = true;
+
+				}
+
+			}
+
+			// setup arrays for skeleton creation
+
+			var bones = [];
+			var boneInverses = [];
+
+			for ( i = 0; i < sortedBoneData.length; i ++ ) {
+
+				data = sortedBoneData[ i ];
+
+				bones.push( data.bone );
+				boneInverses.push( data.boneInverse );
+
+			}
+
+			return new THREE.Skeleton( bones, boneInverses );
+
+		}
+
+		function buildBoneHierarchy( root, joints, boneData ) {
+
+			// setup bone data from visual scene
 
 			root.traverse( function( object ) {
 
 				if ( object.isBone === true ) {
 
-					boneArray.push( object );
-					boneInverseArray.push( controller.skin.bones[ object.name ] );
+					var boneInverse;
+
+					// retrieve the boneInverse from the controller data
+
+					for ( var i = 0; i < joints.length; i ++ ) {
+
+						var joint = joints[ i ];
+
+						if ( joint.name === object.name ) {
+
+							boneInverse = joint.boneInverse;
+							break;
+
+						}
+
+					}
+
+					if ( boneInverse === undefined ) {
+
+						// Unfortunately, there can be joints in the visual scene that are not part of the
+						// corresponding controller. In this case, we have to create a dummy boneInverse matrix
+						// for the respective bone. This bone won't affect any vertices, because there are no skin indices
+						// and weights defined for it. But we still have to add the bone to the sorted bone list in order to
+						// ensure a correct animation of the model.
+
+						 boneInverse = new THREE.Matrix4();
+						 console.warn( 'THREE.ColladaLoader: Missing data for bone: %s.', object.name );
+
+					}
+
+					boneData.push( { bone: object, boneInverse: boneInverse, processed: false } );
 
 				}
 
 			} );
-
-			return new THREE.Skeleton( boneArray, boneInverseArray );
 
 		}
 
@@ -2265,7 +2382,7 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0, l = nodes.length; i < l; i ++ ) {
 
-				objects.push( getNode( nodes[ i ] ).clone() );
+				objects.push( getNode( nodes[ i ] ) );
 
 			}
 
@@ -2283,13 +2400,13 @@ THREE.ColladaLoader.prototype = {
 				var materials = resolveMaterialBinding( geometry.materialKeys, instance.materials );
 				var object = getObject( geometry, materials );
 
-				var node = getNode( instance.skeleton );
-				var skeleton = getSkeleton( node, controller );
+				var skeletons = instance.skeletons;
+				var joints = controller.skin.joints;
+
+				var skeleton = getSkeleton( skeletons, joints, object );
 
 				object.bind( skeleton, controller.skin.bindMatrix );
 				object.normalizeSkinWeights();
-				object.bones = skeleton.bones; // this is necessary for property binding
-				object.add( node ); // bone hierarchy is a child of the skinned mesh
 
 				objects.push( object );
 

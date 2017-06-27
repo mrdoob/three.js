@@ -341,7 +341,7 @@ class Geometry(base_classes.BaseNode):
             metadata[constants.FACES] = faces
 
     def _scene_format(self):
-        """Format the output for Scene compatability
+        """Format the output for Scene compatibility
 
         :rtype: dict
 
@@ -358,7 +358,7 @@ class Geometry(base_classes.BaseNode):
             data.update(self._component_data())
             draw_calls = self.get(constants.DRAW_CALLS)
             if draw_calls is not None:
-                geometry_data[constants.DRAW_CALLS] = draw_calls
+                data[constants.DRAW_CALLS] = draw_calls
 
         return data
 

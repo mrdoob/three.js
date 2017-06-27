@@ -27,10 +27,13 @@ THREE.Mirror = function ( width, height, options ) {
 	var lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
 	var clipPlane = new THREE.Vector4();
 
+	var view = new THREE.Vector3();
+	var target = new THREE.Vector3();
+	var q = new THREE.Vector4();
+
 	var textureMatrix = new THREE.Matrix4();
 
 	var mirrorCamera = new THREE.PerspectiveCamera();
-	mirrorCamera.matrixAutoUpdate = true;
 
 	var parameters = {
 		minFilter: THREE.LinearFilter,
@@ -106,11 +109,6 @@ THREE.Mirror = function ( width, height, options ) {
 
 	function updateTextureMatrix( camera ) {
 
-		camera.updateMatrixWorld();
-
-		mirrorCamera.copy( camera );
-		mirrorCamera.updateProjectionMatrix();
-
 		scope.updateMatrixWorld();
 
 		mirrorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
@@ -121,7 +119,7 @@ THREE.Mirror = function ( width, height, options ) {
 		normal.set( 0, 0, 1 );
 		normal.applyMatrix4( rotationMatrix );
 
-		var view = mirrorWorldPosition.clone().sub( cameraWorldPosition );
+		view.subVectors( mirrorWorldPosition, cameraWorldPosition );
 		view.reflect( normal ).negate();
 		view.add( mirrorWorldPosition );
 
@@ -131,7 +129,7 @@ THREE.Mirror = function ( width, height, options ) {
 		lookAtPosition.applyMatrix4( rotationMatrix );
 		lookAtPosition.add( cameraWorldPosition );
 
-		var target = mirrorWorldPosition.clone().sub( lookAtPosition );
+		target.subVectors( mirrorWorldPosition, lookAtPosition );
 		target.reflect( normal ).negate();
 		target.add( mirrorWorldPosition );
 
@@ -141,8 +139,11 @@ THREE.Mirror = function ( width, height, options ) {
 		mirrorCamera.up.reflect( normal ).negate();
 		mirrorCamera.lookAt( target );
 
-		mirrorCamera.updateProjectionMatrix();
+		mirrorCamera.near = camera.near;
+		mirrorCamera.far = camera.far;
+
 		mirrorCamera.updateMatrixWorld();
+		mirrorCamera.updateProjectionMatrix();
 
 		// Update the texture matrix
 		textureMatrix.set(
@@ -161,7 +162,6 @@ THREE.Mirror = function ( width, height, options ) {
 
 		clipPlane.set( mirrorPlane.normal.x, mirrorPlane.normal.y, mirrorPlane.normal.z, mirrorPlane.constant );
 
-		var q = new THREE.Vector4();
 		var projectionMatrix = mirrorCamera.projectionMatrix;
 
 		q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
@@ -170,13 +170,13 @@ THREE.Mirror = function ( width, height, options ) {
 		q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
 
 		// Calculate the scaled plane vector
-		var c = clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
+		clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
 
 		// Replacing the third row of the projection matrix
-		projectionMatrix.elements[ 2 ] = c.x;
-		projectionMatrix.elements[ 6 ] = c.y;
-		projectionMatrix.elements[ 10 ] = c.z + 1.0 - clipBias;
-		projectionMatrix.elements[ 14 ] = c.w;
+		projectionMatrix.elements[ 2 ] = clipPlane.x;
+		projectionMatrix.elements[ 6 ] = clipPlane.y;
+		projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
+		projectionMatrix.elements[ 14 ] = clipPlane.w;
 
 	}
 
@@ -188,7 +188,17 @@ THREE.Mirror = function ( width, height, options ) {
 
 		var currentRenderTarget = renderer.getRenderTarget();
 
+		var currentVrEnabled = renderer.vr.enabled;
+		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+
+		renderer.vr.enabled = false; // Avoid camera modification and recursion
+		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
+
 		renderer.render( scene, mirrorCamera, renderTarget, true );
+
+		renderer.vr.enabled = currentVrEnabled;
+		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+
 		renderer.setRenderTarget( currentRenderTarget );
 
 		scope.visible = true;

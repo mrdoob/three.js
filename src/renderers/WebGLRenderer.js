@@ -1,4 +1,4 @@
-import { REVISION, MaxEquation, MinEquation, RGB_ETC1_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, SrcAlphaSaturateFactor, OneMinusDstColorFactor, DstColorFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaFactor, OneMinusSrcColorFactor, SrcColorFactor, OneFactor, ZeroFactor, ReverseSubtractEquation, SubtractEquation, AddEquation, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RGBAFormat, RGBFormat, AlphaFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedInt248Type, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestFilter, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, FrontFaceDirectionCW, NoBlending, BackSide, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, FlatShading, LinearToneMapping } from '../constants';
+import { REVISION, MaxEquation, MinEquation, RGB_ETC1_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, SrcAlphaSaturateFactor, OneMinusDstColorFactor, DstColorFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaFactor, OneMinusSrcColorFactor, SrcColorFactor, OneFactor, ZeroFactor, ReverseSubtractEquation, SubtractEquation, AddEquation, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RGBAFormat, RGBFormat, AlphaFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedInt248Type, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestFilter, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, FrontFaceDirectionCW, NoBlending, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, FlatShading, LinearToneMapping } from '../constants';
 import { _Math } from '../math/Math';
 import { Matrix4 } from '../math/Matrix4';
 import { DataTexture } from '../textures/DataTexture';
@@ -9,14 +9,8 @@ import { ShaderLib } from './shaders/ShaderLib';
 import { LensFlarePlugin } from './webgl/plugins/LensFlarePlugin';
 import { SpritePlugin } from './webgl/plugins/SpritePlugin';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
-import { ShaderMaterial } from '../materials/ShaderMaterial';
-import { Mesh } from '../objects/Mesh';
-import { BoxBufferGeometry } from '../geometries/BoxGeometry';
-import { PlaneBufferGeometry } from '../geometries/PlaneGeometry';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
-import { OrthographicCamera } from '../cameras/OrthographicCamera';
 import { WebGLAttributes } from './webgl/WebGLAttributes';
+import { WebGLBackground } from './webgl/WebGLBackground';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer';
@@ -28,6 +22,7 @@ import { WebGLTextures } from './webgl/WebGLTextures';
 import { WebGLProperties } from './webgl/WebGLProperties';
 import { WebGLState } from './webgl/WebGLState';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities';
+import { WebVRManager } from './webvr/WebVRManager';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { WebGLExtensions } from './webgl/WebGLExtensions';
 import { Vector3 } from '../math/Vector3';
@@ -35,7 +30,6 @@ import { Vector3 } from '../math/Vector3';
 import { WebGLClipping } from './webgl/WebGLClipping';
 import { Frustum } from '../math/Frustum';
 import { Vector4 } from '../math/Vector4';
-import { Color } from '../math/Color';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -123,7 +117,9 @@ function WebGLRenderer( parameters ) {
 		_currentFramebuffer = null,
 		_currentMaterialId = - 1,
 		_currentGeometryProgram = '',
+
 		_currentCamera = null,
+		_currentArrayCamera = null,
 
 		_currentScissor = new Vector4(),
 		_currentScissorTest = null,
@@ -135,9 +131,6 @@ function WebGLRenderer( parameters ) {
 		_usedTextureUnits = 0,
 
 		//
-
-		_clearColor = new Color( 0x000000 ),
-		_clearAlpha = 0,
 
 		_width = _canvas.width,
 		_height = _canvas.height,
@@ -296,15 +289,13 @@ function WebGLRenderer( parameters ) {
 	var lightCache = new WebGLLights();
 	var renderLists = new WebGLRenderLists();
 
+	var background = new WebGLBackground( this, state, objects, _premultipliedAlpha );
+	var vr = new WebVRManager( this );
+
 	this.info.programs = programCache.programs;
 
 	var bufferRenderer = new WebGLBufferRenderer( _gl, extensions, _infoRender );
 	var indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
-
-	//
-
-	var backgroundPlaneCamera, backgroundPlaneMesh;
-	var backgroundBoxCamera, backgroundBoxMesh;
 
 	//
 
@@ -320,8 +311,6 @@ function WebGLRenderer( parameters ) {
 
 		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
 		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
-
-		state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
 
 	}
 
@@ -345,6 +334,7 @@ function WebGLRenderer( parameters ) {
 	this.properties = properties;
 	this.renderLists = renderLists;
 	this.state = state;
+	this.vr = vr;
 
 	// shadow map
 
@@ -418,6 +408,15 @@ function WebGLRenderer( parameters ) {
 
 	this.setSize = function ( width, height, updateStyle ) {
 
+		var device = vr.getDevice();
+
+		if ( device && device.isPresenting ) {
+
+			console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
+			return;
+
+		}
+
 		_width = width;
 		_height = height;
 
@@ -430,6 +429,29 @@ function WebGLRenderer( parameters ) {
 			_canvas.style.height = height + 'px';
 
 		}
+
+		this.setViewport( 0, 0, width, height );
+
+	};
+
+	this.getDrawingBufferSize = function () {
+
+		return {
+			width: _width * _pixelRatio,
+			height: _height * _pixelRatio
+		};
+
+	};
+
+	this.setDrawingBufferSize = function ( width, height, pixelRatio ) {
+
+		_width = width;
+		_height = height;
+
+		_pixelRatio = pixelRatio;
+
+		_canvas.width = width * pixelRatio;
+		_canvas.height = height * pixelRatio;
 
 		this.setViewport( 0, 0, width, height );
 
@@ -457,35 +479,10 @@ function WebGLRenderer( parameters ) {
 
 	// Clearing
 
-	this.getClearColor = function () {
-
-		return _clearColor;
-
-	};
-
-	this.setClearColor = function ( color, alpha ) {
-
-		_clearColor.set( color );
-
-		_clearAlpha = alpha !== undefined ? alpha : 1;
-
-		state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
-
-	};
-
-	this.getClearAlpha = function () {
-
-		return _clearAlpha;
-
-	};
-
-	this.setClearAlpha = function ( alpha ) {
-
-		_clearAlpha = alpha;
-
-		state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
-
-	};
+	this.getClearColor = background.getClearColor;
+	this.setClearColor = background.setClearColor;
+	this.getClearAlpha = background.getClearAlpha;
+	this.setClearAlpha = background.setClearAlpha;
 
 	this.clear = function ( color, depth, stencil ) {
 
@@ -1082,6 +1079,20 @@ function WebGLRenderer( parameters ) {
 
 	// Rendering
 
+	this.animate = function ( callback ) {
+
+		function onFrame() {
+
+			callback();
+
+			( vr.getDevice() || window ).requestAnimationFrame( onFrame );
+
+		}
+
+		( vr.getDevice() || window ).requestAnimationFrame( onFrame );
+
+	};
+
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
 		if ( ! ( camera && camera.isCamera ) ) {
@@ -1103,9 +1114,13 @@ function WebGLRenderer( parameters ) {
 
 		// update camera matrices and frustum
 
-		camera.onBeforeRender( _this );
-
 		if ( camera.parent === null ) camera.updateMatrixWorld();
+
+		if ( vr.enabled ) {
+
+			camera = vr.getCamera( camera );
+
+		}
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
@@ -1160,81 +1175,9 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		var background = scene.background;
+		background.render( scene, camera, forceClear );
 
-		if ( background === null ) {
-
-			state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
-
-		} else if ( background && background.isColor ) {
-
-			state.buffers.color.setClear( background.r, background.g, background.b, 1, _premultipliedAlpha );
-			forceClear = true;
-
-		}
-
-		if ( this.autoClear || forceClear ) {
-
-			this.clear( this.autoClearColor, this.autoClearDepth, this.autoClearStencil );
-
-		}
-
-		if ( background && background.isCubeTexture ) {
-
-			if ( backgroundBoxCamera === undefined ) {
-
-				backgroundBoxCamera = new PerspectiveCamera();
-
-				backgroundBoxMesh = new Mesh(
-					new BoxBufferGeometry( 5, 5, 5 ),
-					new ShaderMaterial( {
-						uniforms: ShaderLib.cube.uniforms,
-						vertexShader: ShaderLib.cube.vertexShader,
-						fragmentShader: ShaderLib.cube.fragmentShader,
-						side: BackSide,
-						depthTest: false,
-						depthWrite: false,
-						fog: false
-					} )
-				);
-
-			}
-
-			backgroundBoxCamera.projectionMatrix.copy( camera.projectionMatrix );
-
-			backgroundBoxCamera.matrixWorld.extractRotation( camera.matrixWorld );
-			backgroundBoxCamera.matrixWorldInverse.getInverse( backgroundBoxCamera.matrixWorld );
-
-
-			backgroundBoxMesh.material.uniforms[ "tCube" ].value = background;
-			backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundBoxCamera.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
-
-			objects.update( backgroundBoxMesh );
-
-			_this.renderBufferDirect( backgroundBoxCamera, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
-
-		} else if ( background && background.isTexture ) {
-
-			if ( backgroundPlaneCamera === undefined ) {
-
-				backgroundPlaneCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-				backgroundPlaneMesh = new Mesh(
-					new PlaneBufferGeometry( 2, 2 ),
-					new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
-				);
-
-			}
-
-			backgroundPlaneMesh.material.map = background;
-
-			objects.update( backgroundPlaneMesh );
-
-			_this.renderBufferDirect( backgroundPlaneCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
-
-		}
-
-		//
+		// render scene
 
 		var opaqueObjects = currentRenderList.opaque;
 		var transparentObjects = currentRenderList.transparent;
@@ -1283,7 +1226,11 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		camera.onAfterRender( _this );
+		if ( vr.enabled ) {
+
+			vr.submitFrame();
+
+		}
 
 		// _gl.finish();
 
@@ -1449,37 +1396,42 @@ function WebGLRenderer( parameters ) {
 			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
 			var group = renderItem.group;
 
-			object.onBeforeRender( _this, scene, camera, geometry, material, group );
-
 			if ( camera.isArrayCamera ) {
+
+				_currentArrayCamera = camera;
 
 				var cameras = camera.cameras;
 
 				for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
 
 					var camera2 = cameras[ j ];
-					var bounds = camera2.bounds;
 
-					var x = bounds.x * _width;
-					var y = bounds.y * _height;
-					var width = bounds.z * _width;
-					var height = bounds.w * _height;
+					if ( object.layers.test( camera2.layers ) ) {
 
-					_this.setViewport( x, y, width, height );
-					_this.setScissor( x, y, width, height );
-					_this.setScissorTest( true );
+						var bounds = camera2.bounds;
 
-					renderObject( object, scene, camera2, geometry, material, group );
+						var x = bounds.x * _width;
+						var y = bounds.y * _height;
+						var width = bounds.z * _width;
+						var height = bounds.w * _height;
+
+						_this.setViewport( x, y, width, height );
+						_this.setScissor( x, y, width, height );
+						_this.setScissorTest( true );
+
+						renderObject( object, scene, camera2, geometry, material, group );
+
+					}
 
 				}
 
 			} else {
 
+				_currentArrayCamera = null;
+
 				renderObject( object, scene, camera, geometry, material, group );
 
 			}
-
-			object.onAfterRender( _this, scene, camera, geometry, material, group );
 
 		}
 
@@ -1489,6 +1441,8 @@ function WebGLRenderer( parameters ) {
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+
+		object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
 		if ( object.isImmediateRenderObject ) {
 
@@ -1505,6 +1459,8 @@ function WebGLRenderer( parameters ) {
 			_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
 
 		}
+
+		object.onAfterRender( _this, scene, camera, geometry, material, group );
 
 	}
 
@@ -1750,10 +1706,11 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+			// Avoid unneeded uniform updates per ArrayCamera's sub-camera
 
-			if ( camera !== _currentCamera ) {
+			if ( _currentCamera !== ( _currentArrayCamera || camera ) ) {
 
-				_currentCamera = camera;
+				_currentCamera = ( _currentArrayCamera || camera );
 
 				// lighting uniforms depend on the camera so enforce an update
 				// now, in case this material supports lights - or later, when
@@ -1793,9 +1750,6 @@ function WebGLRenderer( parameters ) {
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
 			}
-
-			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
-			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
 		}
 
@@ -1855,6 +1809,9 @@ function WebGLRenderer( parameters ) {
 		}
 
 		if ( refreshMaterial ) {
+
+			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
+			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
 			if ( material.lights ) {
 

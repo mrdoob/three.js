@@ -88,11 +88,21 @@
 
 				// MIRROR planes
 
-				var groundMirror = new THREE.Mirror( 100, 100, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color: 0x777777 } );
+				var groundMirror = new THREE.Mirror( 100, 100, {
+					clipBias: 0.003,
+					textureWidth: WIDTH * window.devicePixelRatio,
+					textureHeight: HEIGHT * window.devicePixelRatio,
+					color: 0x777777
+				} );
 				groundMirror.rotateX( - Math.PI / 2 );
 				scene.add( groundMirror );
 
-				var verticalMirror = new THREE.Mirror( 60, 60, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color:0x889999 } );
+				var verticalMirror = new THREE.Mirror( 60, 60, {
+					clipBias: 0.003,
+					textureWidth: WIDTH * window.devicePixelRatio,
+					textureHeight: HEIGHT * window.devicePixelRatio,
+					color: 0x889999
+				} );
 				verticalMirror.position.y = 35;
 				verticalMirror.position.z = -45;
 				scene.add( verticalMirror );

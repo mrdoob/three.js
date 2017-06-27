@@ -4,8 +4,8 @@
 		<title>three.js webvr - roller coaster</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR, origin = https://threejs.org, expires = 2017-06-13 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR" data-expires="2017-06-13" content="ApAQvHfiHMQB7SmRhfvCUX61adJaTA6pAu0Ry439jjeipa5lGm1RcTQynFoHGGcaSJkWfMOv7qK6pwSUb95ClQgAAABKeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUiIsImV4cGlyeSI6MTQ5NzMxMjAwMH0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-07-28 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-07-28" content="Ave6CPNUgSwHb3vCbyd55P/R7pfkwNniUJsYfSoUqI+l1X1BIOt6HfriVP0g2hmaG7Pp3qaUXuXdZeqGBmoMKg8AAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUwMTI2NzQwNX0=">
 		<style>
 			body {
 				margin: 0px;
@@ -25,8 +25,6 @@
 
 		<script src="js/RollerCoaster.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
@@ -44,6 +42,8 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
+
+			renderer.vr.enabled = true;
 
 			var scene = new THREE.Scene();
 
@@ -186,10 +186,9 @@
 
 			//
 
-			var controls = new THREE.VRControls( camera );
-			var effect = new THREE.VREffect( renderer );
-
 			WEBVR.getVRDisplay( function ( display ) {
+
+				renderer.vr.setDevice( display );
 
 				document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
@@ -197,14 +196,16 @@
 
 			//
 
-			window.addEventListener( 'resize', function () {
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			}, false );
+			}
 
 			//
 
@@ -218,10 +219,9 @@
 
 			var prevTime = performance.now();
 
-			function animate( time ) {
+			function render() {
 
-				effect.requestAnimationFrame( animate );
-
+				var time = performance.now();
 				var delta = time - prevTime;
 
 				for ( var i = 0; i < funfairs.length; i ++ ) {
@@ -249,15 +249,13 @@
 
 				//
 
-				controls.update();
-
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 				prevTime = time;
 
 			}
 
-			effect.requestAnimationFrame( animate );
+			renderer.animate( render );
 
 		</script>
 

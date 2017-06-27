@@ -134,6 +134,8 @@ export { FaceNormalsHelper } from './helpers/FaceNormalsHelper.js';
 export { DirectionalLightHelper } from './helpers/DirectionalLightHelper.js';
 export { CameraHelper } from './helpers/CameraHelper.js';
 export { BoxHelper } from './helpers/BoxHelper.js';
+export { Box3Helper } from './helpers/Box3Helper.js';
+export { PlaneHelper } from './helpers/PlaneHelper.js';
 export { ArrowHelper } from './helpers/ArrowHelper.js';
 export { AxisHelper } from './helpers/AxisHelper.js';
 export { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';

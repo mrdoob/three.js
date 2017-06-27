@@ -1,3 +1,9 @@
+/**
+ * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
 import { Vector3 } from '../math/Vector3';
 import { Color } from '../math/Color';
 import { Object3D } from '../core/Object3D';
@@ -6,12 +12,6 @@ import { VertexColors } from '../constants';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
 import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry';
 import { BufferAttribute } from '../core/BufferAttribute';
-
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
 
 function HemisphereLightHelper( light, size, color ) {
 

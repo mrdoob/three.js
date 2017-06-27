@@ -336,6 +336,36 @@ THREE.GLTF2Loader = ( function () {
 
 			if ( lightNode ) {
 
+				if ( light.constantAttenuation !== undefined ) {
+
+					lightNode.intensity = light.constantAttenuation;
+
+				}
+
+				if ( light.linearAttenuation !== undefined ) {
+
+					lightNode.distance = 1 / light.linearAttenuation;
+
+				}
+
+				if ( light.quadraticAttenuation !== undefined ) {
+
+					lightNode.decay = light.quadraticAttenuation;
+
+				}
+
+				if ( light.fallOffAngle !== undefined ) {
+
+					lightNode.angle = light.fallOffAngle;
+
+				}
+
+				if ( light.fallOffExponent !== undefined ) {
+
+					console.warn( 'GLTF2Loader: light.fallOffExponent not currently supported.' );
+
+				}
+
 				lightNode.name = light.name || ( 'light_' + lightId );
 				this.lights[ lightId ] = lightNode;
 
@@ -412,6 +442,7 @@ THREE.GLTF2Loader = ( function () {
 		if ( materialValues.diffuseFactor !== undefined ) {
 
 			materialParams.color = new THREE.Color().fromArray( materialValues.diffuseFactor );
+			materialParams.opacity = materialValues.diffuseFactor[ 3 ];
 
 		}
 
@@ -1781,17 +1812,17 @@ THREE.GLTF2Loader = ( function () {
 				// For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
 				var elementBytes = TypedArray.BYTES_PER_ELEMENT;
 				var itemBytes = elementBytes * itemSize;
-
+				var byteStride = json.bufferViews[accessor.bufferView].byteStride;	
 				var array;
 
 				// The buffer is not interleaved if the stride is the item size in bytes.
-				if ( accessor.byteStride && accessor.byteStride !== itemBytes ) {
+				if ( byteStride && byteStride !== itemBytes ) {
 
 					// Use the full buffer if it's interleaved.
 					array = new TypedArray( arraybuffer );
 
 					// Integer parameters to IB/IBA are in array elements, not bytes.
-					var ib = new THREE.InterleavedBuffer( array, accessor.byteStride / elementBytes );
+					var ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
 
 					return new THREE.InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes );
 
@@ -1957,14 +1988,6 @@ THREE.GLTF2Loader = ( function () {
 
 						materialParams.map = dependencies.textures[ metallicRoughness.baseColorTexture.index ];
 
-						var alphaMode = metallicRoughness.baseColorTexture.alphaMode || ALPHA_MODES.OPAQUE;
-
-						if ( alphaMode !== ALPHA_MODES.OPAQUE ) {
-
-							materialParams.transparent = true;
-
-						}
-
 					}
 
 					materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
@@ -1990,7 +2013,9 @@ THREE.GLTF2Loader = ( function () {
 
 				}
 
-				if ( materialParams.opacity !== undefined && materialParams.opacity < 1.0 ) {
+				var alphaMode = material.alphaMode || ALPHA_MODES.OPAQUE;
+
+				if ( alphaMode !== ALPHA_MODES.OPAQUE ) {
 
 					materialParams.transparent = true;
 
@@ -2531,28 +2556,30 @@ THREE.GLTF2Loader = ( function () {
 		var extensions = this.extensions;
 		var scope = this;
 
+		var nodes = json.nodes || [];
+		var skins = json.skins || [];
+
+		// Nothing in the node definition indicates whether it is a Bone or an
+		// Object3D. Use the skins' joint references to mark bones.
+		skins.forEach( function ( skin ) {
+
+			skin.joints.forEach( function ( id ) {
+
+				nodes[ id ].isBone = true;
+
+			} );
+
+		} );
+
 		return _each( json.nodes, function ( node ) {
 
 			var matrix = new THREE.Matrix4();
 
-			var _node;
+			var _node = node.isBone === true ? new THREE.Bone() : new THREE.Object3D();
 
-			if ( node.jointName ) {
+			if ( node.name !== undefined ) {
 
-				_node = new THREE.Bone();
-				_node.name = node.name !== undefined ? node.name : node.jointName;
-				_node.jointName = node.jointName;
-
-			} else {
-
-				_node = new THREE.Object3D();
-				if ( node.name !== undefined ) _node.name = node.name;
-
-			}
-
-			if ( _node.name !== undefined ) {
-
-				_node.name = THREE.PropertyBinding.sanitizeNodeName( _node.name );
+				_node.name = THREE.PropertyBinding.sanitizeNodeName( node.name );
 
 			}
 
@@ -2765,13 +2792,11 @@ THREE.GLTF2Loader = ( function () {
 					}
 
 					if ( node.extensions
-							 && node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ]
-							 && node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].light ) {
+							 && node.extensions[ EXTENSIONS.KHR_LIGHTS ]
+							 && node.extensions[ EXTENSIONS.KHR_LIGHTS ].light !== undefined ) {
 
-						var extensionLights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
-						var light = extensionLights[ node.extensions[ EXTENSIONS.KHR_LIGHTS ].light ];
-
-						_node.add( light );
+						var lights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
+						_node.add( lights[ node.extensions[ EXTENSIONS.KHR_LIGHTS ].light ] );
 
 					}
 
@@ -2856,6 +2881,16 @@ THREE.GLTF2Loader = ( function () {
 					}
 
 				} );
+
+				// Ambient lighting, if present, is always attached to the scene root.
+				if ( scene.extensions
+							 && scene.extensions[ EXTENSIONS.KHR_LIGHTS ]
+							 && scene.extensions[ EXTENSIONS.KHR_LIGHTS ].light !== undefined ) {
+
+					var lights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
+					_scene.add( lights[ scene.extensions[ EXTENSIONS.KHR_LIGHTS ].light ] );
+
+				}
 
 				return _scene;
 

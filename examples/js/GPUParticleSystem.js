@@ -461,13 +461,14 @@ THREE.GPUParticleContainer = function( maxParticles, particleSystem ) {
 				sizeAttribute.updateRange.offset = 0;
 				lifeTimeAttribute.updateRange.offset = 0;
 
-				positionStartAttribute.updateRange.count = positionStartAttribute.count;
-				startTimeAttribute.updateRange.count = startTimeAttribute.count;
-				velocityAttribute.updateRange.count = velocityAttribute.count;
-				turbulenceAttribute.updateRange.count = turbulenceAttribute.count;
-				colorAttribute.updateRange.count = colorAttribute.count;
-				sizeAttribute.updateRange.count = sizeAttribute.count;
-				lifeTimeAttribute.updateRange.count = lifeTimeAttribute.count;
+				// Use -1 to update the entire buffer, see #11476
+				positionStartAttribute.updateRange.count = -1;
+				startTimeAttribute.updateRange.count = -1;
+				velocityAttribute.updateRange.count = -1;
+				turbulenceAttribute.updateRange.count = -1;
+				colorAttribute.updateRange.count = -1;
+				sizeAttribute.updateRange.count = -1;
+				lifeTimeAttribute.updateRange.count = -1;
 
 			}
 

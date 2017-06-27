@@ -1,3 +1,11 @@
+/**
+ * @author Sean Griffin / http://twitter.com/sgrif
+ * @author Michael Guerrero / http://realitymeltdown.com
+ * @author mrdoob / http://mrdoob.com/
+ * @author ikerr / http://verold.com
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
 import { LineSegments } from '../objects/LineSegments';
 import { Matrix4 } from '../math/Matrix4';
 import { VertexColors } from '../constants';
@@ -6,14 +14,6 @@ import { Color } from '../math/Color';
 import { Vector3 } from '../math/Vector3';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
-
-/**
- * @author Sean Griffin / http://twitter.com/sgrif
- * @author Michael Guerrero / http://realitymeltdown.com
- * @author mrdoob / http://mrdoob.com/
- * @author ikerr / http://verold.com
- * @author Mugen87 / https://github.com/Mugen87
- */
 
 function getBoneList( object ) {
 

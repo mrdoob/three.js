@@ -1,11 +1,11 @@
-import { Mesh } from '../objects/Mesh';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { SphereBufferGeometry } from '../geometries/SphereGeometry';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  */
+
+import { Mesh } from '../objects/Mesh';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
+import { SphereBufferGeometry } from '../geometries/SphereGeometry';
 
 function PointLightHelper( light, sphereSize, color ) {
 

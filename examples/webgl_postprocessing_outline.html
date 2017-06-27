@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 	<head>
 		<title>three.js webgl - post processing - Outline Pass</title>
@@ -311,25 +310,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var moved = false;
-
-				controls.addEventListener( 'change', function() {
-
-					moved = true;
-
-				} );
-
-				window.addEventListener( 'mousedown', function () {
-
-					moved = false;
-
-				}, false );
-
-				window.addEventListener( 'mouseup', function() {
-					if(!moved)
-						checkIntersection();
-				} );
-
 				window.addEventListener( 'mousemove', onTouchMove );
 				window.addEventListener( 'touchmove', onTouchMove );
 
@@ -351,6 +331,8 @@
 
 					mouse.x = ( x / window.innerWidth ) * 2 - 1;
 					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
+
+					checkIntersection();
 
 				}
 

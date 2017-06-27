@@ -738,8 +738,38 @@
 
 		}
 
+		var weightTable = {};
+
+		if ( deformer ) {
+
+			var subDeformers = deformer.map;
+
+			for ( var key in subDeformers ) {
+
+				var subDeformer = subDeformers[ key ];
+				var indices = subDeformer.indices;
+
+				for ( var j = 0; j < indices.length; j ++ ) {
+
+					var index = indices[ j ];
+					var weight = subDeformer.weights[ j ];
+
+					if ( weightTable[ index ] === undefined ) weightTable[ index ] = [];
+
+					weightTable[ index ].push( {
+						id: subDeformer.index,
+						weight: weight
+					} );
+
+				}
+
+			}
+
+		}
+
 		var faceVertexBuffer = [];
 		var polygonIndex = 0;
+		var displayedWeightsWarning = false;
 
 		for ( var polygonVertexIndex = 0; polygonVertexIndex < indexBuffer.length; polygonVertexIndex ++ ) {
 
@@ -763,25 +793,14 @@
 
 			if ( deformer ) {
 
-				var subDeformers = deformer.map;
+				if ( weightTable[ vertexIndex ] !== undefined ) {
 
-				for ( var key in subDeformers ) {
+					var array = weightTable[ vertexIndex ];
 
-					var subDeformer = subDeformers[ key ];
-					var indices = subDeformer.indices;
+					for ( var j = 0, jl = array.length; j < jl; j ++ ) {
 
-					for ( var j = 0; j < indices.length; j ++ ) {
-
-						var index = indices[ j ];
-
-						if ( index === vertexIndex ) {
-
-							weights.push( subDeformer.weights[ j ] );
-							weightIndices.push( subDeformer.index );
-
-							break;
-
-						}
+						weights.push( array[ j ].weight );
+						weightIndices.push( array[ j ].id );
 
 					}
 
@@ -789,7 +808,12 @@
 
 				if ( weights.length > 4 ) {
 
-					console.warn( 'FBXLoader: Vertex has more than 4 skinning weights assigned to vertex.  Deleting additional weights.' );
+					if ( ! displayedWeightsWarning ) {
+
+						console.warn( 'FBXLoader: Vertex has more than 4 skinning weights assigned to vertex.  Deleting additional weights.' );
+						displayedWeightsWarning = true;
+
+					}
 
 					var WIndex = [ 0, 0, 0, 0 ];
 					var Weight = [ 0, 0, 0, 0 ];
@@ -2154,6 +2178,41 @@
 			if ( curveNode.attr === 'R' ) {
 
 				var curves = curveNode.curves;
+
+				// Seems like some FBX files have AnimationCurveNode
+				// which doesn't have any connected AnimationCurve.
+				// Setting animation parameter for them here.
+
+				if ( curves.x === null ) {
+
+					curves.x = {
+						version: null,
+						times: [ 0.0 ],
+						values: [ 0.0 ]
+					};
+
+				}
+
+				if ( curves.y === null ) {
+
+					curves.y = {
+						version: null,
+						times: [ 0.0 ],
+						values: [ 0.0 ]
+					};
+
+				}
+
+				if ( curves.z === null ) {
+
+					curves.z = {
+						version: null,
+						times: [ 0.0 ],
+						values: [ 0.0 ]
+					};
+
+				}
+
 				curves.x.values = curves.x.values.map( degreeToRadian );
 				curves.y.values = curves.y.values.map( degreeToRadian );
 				curves.z.values = curves.z.values.map( degreeToRadian );
@@ -4270,7 +4329,7 @@
 
 					if ( window.Zlib === undefined ) {
 
-						throw new Error( 'FBXLoader: Import inflate.min.js from https://github.com/imaya/zlib.js' );
+						throw new Error( 'FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
 					}
 
