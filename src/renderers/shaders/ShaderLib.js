@@ -192,6 +192,7 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.displacementmap,
 			{
 				lightPos: { value: new Vector3() }
 			}
