@@ -22,26 +22,20 @@ function PlaneHelper( plane, size, hex ) {
 	var positions = [ 1, - 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0 ];
 
 	var geometry = new BufferGeometry();
-
 	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+	geometry.computeBoundingSphere();
 
 	Line.call( this, geometry, new LineBasicMaterial( { color: color } ) );
 
-	this.geometry.computeBoundingSphere();
-
 	//
 
-	var positions = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, - 1, 1, 1, - 1, 1 ];
+	var positions2 = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, - 1, 1, 1, - 1, 1 ];
 
-	var geometry = new BufferGeometry();
+	var geometry2 = new BufferGeometry();
+	geometry2.addAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
+	geometry2.computeBoundingSphere();
 
-	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-
-	var child = new THREE.Mesh( geometry, new LineBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) );
-
-	child.geometry.computeBoundingSphere();
-
-	this.add( child );
+	this.add( new THREE.Mesh( geometry2, new LineBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
 
 	//
 
