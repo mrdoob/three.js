@@ -4010,7 +4010,7 @@
 			// footer size: 160bytes + 16-byte alignment padding
 			// - 16bytes: magic
 			// - padding til 16-byte alignment (at least 1byte?)
-			//   (seems like some exporters embed fixed 15bytes?)
+			//   (seems like some exporters embed fixed 15 or 16bytes?)
 			// - 4bytes: magic
 			// - 4bytes: version
 			// - 120bytes: zero
@@ -4021,7 +4021,7 @@
 
 			} else {
 
-				return reader.getOffset() + 160 + 15 >= reader.size();
+				return reader.getOffset() + 160 + 16 >= reader.size();
 
 			}
 
