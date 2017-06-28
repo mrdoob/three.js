@@ -15,7 +15,7 @@ function PointLightHelper( light, sphereSize, color ) {
 	this.color = color;
 
 	var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
-	var material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.color } );
+	var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
 
 	Mesh.call( this, geometry, material );
 

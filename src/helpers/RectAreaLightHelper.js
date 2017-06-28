@@ -22,7 +22,7 @@ function RectAreaLightHelper( light, color ) {
 
 	this.color = color;
 
-	var material = new LineBasicMaterial( { fog: false, color: this.color } );
+	var material = new LineBasicMaterial( { fog: false } );
 
 	var geometry = new BufferGeometry();
 

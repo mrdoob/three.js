@@ -47,7 +47,7 @@ function SpotLightHelper( light, color ) {
 
 	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
-	var material = new LineBasicMaterial( { fog: false, color: this.color } );
+	var material = new LineBasicMaterial( { fog: false } );
 
 	this.cone = new LineSegments( geometry, material );
 	this.add( this.cone );
