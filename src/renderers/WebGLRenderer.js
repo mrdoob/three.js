@@ -1439,10 +1439,10 @@ function WebGLRenderer( parameters ) {
 
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
+		object.onBeforeRender( _this, scene, camera, geometry, material, group );
+
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
-		object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
 		if ( object.isImmediateRenderObject ) {
 
