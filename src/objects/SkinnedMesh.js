@@ -116,6 +116,13 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
+	shareSkeleton: function ( skin ) {
+
+		skin.bind( this.skeleton, skin.matrixWorld );
+		skin.master = this;
+
+	},
+
 	pose: function () {
 
 		this.skeleton.pose();
