@@ -28,7 +28,7 @@ function HemisphereLightHelper( light, size, color ) {
 	var geometry = new OctahedronBufferGeometry( size );
 	geometry.rotateY( Math.PI * 0.5 );
 
-	this.material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.color } );
+	this.material = new MeshBasicMaterial( { wireframe: true, fog: false } );
 	if ( this.color === undefined ) this.material.vertexColors = VertexColors;
 
 	var position = geometry.getAttribute( 'position' );
