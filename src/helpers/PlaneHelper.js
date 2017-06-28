@@ -57,7 +57,7 @@ PlaneHelper.prototype.onBeforeRender = function () {
 
 	this.lookAt( this.plane.normal );
 
-	this.updateMatrixWorld( true );
+	this.updateMatrixWorld();
 
 };
 
