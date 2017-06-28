@@ -1798,8 +1798,6 @@ function WebGLRenderer( parameters ) {
 					p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture );
 					p_uniforms.setValue( _gl, 'boneTextureSize', skeleton.boneTextureSize );
 
-					skeleton.restoreParents();
-
 				} else {
 
 					p_uniforms.setOptional( _gl, skeleton, 'boneMatrices' );

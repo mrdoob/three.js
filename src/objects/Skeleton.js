@@ -15,8 +15,6 @@ function Skeleton( bones, boneInverses ) {
 
 	this.bones = bones.slice( 0 );
 	this.boneMatrices = new Float32Array( this.bones.length * 16 );
-	this.boneParents = [];
-	this.updated = false;
 
 	// use the supplied bone inverses or calculate the inverses
 
@@ -122,30 +120,10 @@ Object.assign( Skeleton.prototype, {
 
 		return function update() {
 
-			if ( this.updated ) return;
-
-			this.updated = true;
-
 			var bones = this.bones;
 			var boneInverses = this.boneInverses;
 			var boneMatrices = this.boneMatrices;
 			var boneTexture = this.boneTexture;
-			var boneParents = this.boneParents;
-
-			for ( var i = 0, il = bones.length; i < il; i ++ ) {
-
-				var parent = bones[ i ].parent;
-
-				boneParents[ i ] = parent;
-
-				if ( parent !== null && parent.isBone !== true ) {
-
-					bones[ i ].parent.remove( bones[ i ] );
-					bones[ i ].updateMatrixWorld( true );
-
-				}
-
-			}
 
 			// flatten bone matrices to array
 
@@ -169,30 +147,6 @@ Object.assign( Skeleton.prototype, {
 		};
 
 	} )(),
-
-	restoreParents: function () {
-
-		if ( ! this.updated ) return;
-
-		this.updated = false;
-
-		var bones = this.bones;
-		var boneParents = this.boneParents;
-
-		for ( var i = 0, il = bones.length; i < il; i ++ ) {
-
-			var parent = boneParents[ i ];
-
-			if ( parent !== null && parent.isBone !== true ) {
-
-				parent.add( bones[ i ] );
-				parent.updateMatrixWorld( true );
-
-			}
-
-		}
-
-	},
 
 	clone: function () {
 

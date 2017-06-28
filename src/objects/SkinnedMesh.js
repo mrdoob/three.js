@@ -20,6 +20,8 @@ function SkinnedMesh( geometry, material ) {
 	this.bindMatrix = new Matrix4();
 	this.bindMatrixInverse = new Matrix4();
 
+	this.master = this;
+
 	var bones = this.initBones();
 	var skeleton = new Skeleton( bones );
 
@@ -183,7 +185,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		if ( this.bindMode === 'attached' ) {
 
-			this.bindMatrixInverse.getInverse( this.matrixWorld );
+			this.bindMatrixInverse.getInverse( this.master.matrixWorld );
 
 		} else if ( this.bindMode === 'detached' ) {
 

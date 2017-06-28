@@ -5,7 +5,7 @@
 	skinMatrix += skinWeight.y * boneMatY;
 	skinMatrix += skinWeight.z * boneMatZ;
 	skinMatrix += skinWeight.w * boneMatW;
-	skinMatrix  = bindMatrixInverse * modelMatrix * skinMatrix * bindMatrix;
+	skinMatrix  = bindMatrixInverse * skinMatrix * bindMatrix;
 
 	objectNormal = vec4( skinMatrix * vec4( objectNormal, 0.0 ) ).xyz;
 
