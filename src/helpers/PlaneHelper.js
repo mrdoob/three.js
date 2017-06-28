@@ -1,10 +1,12 @@
 /**
  * @author WestLangley / http://github.com/WestLangley
  */
- 
+
 import { Box3 } from '../math/Box3';
 import { Line } from '../objects/Line';
+import { Mesh } from '../objects/Mesh';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 
@@ -34,7 +36,7 @@ function PlaneHelper( plane, size, hex ) {
 	geometry2.addAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
 	geometry2.computeBoundingSphere();
 
-	this.add( new THREE.Mesh( geometry2, new LineBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
+	this.add( new Mesh( geometry2, new MeshBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
 
 	//
 
