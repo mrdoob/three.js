@@ -14197,23 +14197,27 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	normalizeNormals: function () {
 
-		var normals = this.attributes.normal;
+		var vector = new Vector3();
 
-		var x, y, z, n;
+		return function normalizeNormals() {
 
-		for ( var i = 0, il = normals.count; i < il; i ++ ) {
+			var normals = this.attributes.normal;
 
-			x = normals.getX( i );
-			y = normals.getY( i );
-			z = normals.getZ( i );
+			for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
-			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
+				vector.x = normals.getX( i );
+				vector.y = normals.getY( i );
+				vector.z = normals.getZ( i );
 
-			normals.setXYZ( i, x * n, y * n, z * n );
+				vector.normalize();
 
-		}
+				normals.setXYZ( i, vector.x, vector.y, vector.z );
 
-	},
+			}
+
+		};
+
+	}(),
 
 	toNonIndexed: function () {
 
@@ -21695,10 +21699,10 @@ function WebGLRenderer( parameters ) {
 
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
+		object.onBeforeRender( _this, scene, camera, geometry, material, group );
+
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
-		object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
 		if ( object.isImmediateRenderObject ) {
 
@@ -41915,7 +41919,7 @@ Box3Helper.prototype.onBeforeRender = function () {
 /**
  * @author WestLangley / http://github.com/WestLangley
  */
- 
+
 function PlaneHelper( plane, size, hex ) {
 
 	this.type = 'PlaneHelper';
@@ -41942,7 +41946,7 @@ function PlaneHelper( plane, size, hex ) {
 	geometry2.addAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
 	geometry2.computeBoundingSphere();
 
-	this.add( new THREE.Mesh( geometry2, new LineBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
+	this.add( new Mesh( geometry2, new MeshBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
 
 	//
 
@@ -41962,6 +41966,8 @@ PlaneHelper.prototype.onBeforeRender = function () {
 	this.scale.set( 0.5 * this.size, 0.5 * this.size, scale );
 
 	this.lookAt( this.plane.normal );
+
+	this.updateMatrixWorld( true );
 
 };
 
