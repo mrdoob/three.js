@@ -182,7 +182,7 @@ function SpritePlugin( renderer, sprites ) {
 
 			if ( material.visible === false ) continue;
 
-			sprite.onBeforeRender( renderer, scene, camera, undefined, material, undefined );
+			//sprite.onBeforeRender( renderer, scene, camera, undefined, material, undefined );
 
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
