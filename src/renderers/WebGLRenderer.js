@@ -112,7 +112,6 @@ function WebGLRenderer( parameters ) {
 
 		// internal state cache
 
-		_currentProgram = null,
 		_currentRenderTarget = null,
 		_currentFramebuffer = null,
 		_currentMaterialId = - 1,
@@ -316,7 +315,6 @@ function WebGLRenderer( parameters ) {
 
 	function resetGLState() {
 
-		_currentProgram = null;
 		_currentCamera = null;
 
 		_currentGeometryProgram = '';
@@ -1676,10 +1674,7 @@ function WebGLRenderer( parameters ) {
 			p_uniforms = program.getUniforms(),
 			m_uniforms = materialProperties.shader.uniforms;
 
-		if ( program.id !== _currentProgram ) {
-
-			_gl.useProgram( program.program );
-			_currentProgram = program.id;
+		if ( state.useProgram( program.program ) ) {
 
 			refreshProgram = true;
 			refreshMaterial = true;
