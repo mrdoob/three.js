@@ -101,7 +101,10 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	isObject3D: true,
 
+	onUpdate: function () {},
+
 	onBeforeRender: function () {},
+
 	onAfterRender: function () {},
 
 	applyMatrix: function ( matrix ) {

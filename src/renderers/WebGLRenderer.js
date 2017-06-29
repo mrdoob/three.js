@@ -1108,6 +1108,14 @@ function WebGLRenderer( parameters ) {
 		_currentMaterialId = - 1;
 		_currentCamera = null;
 
+		// onUpdate
+
+		scene.traverse( function( node ) {
+
+			node.onUpdate( _this, scene, camera );
+
+		} );
+
 		// update scene graph
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
