@@ -1,4 +1,4 @@
-import { Texture } from '../../../textures/Texture';
+import { CanvasTexture } from '../../../textures/CanvasTexture';
 import { Vector3 } from '../../../math/Vector3';
 import { Quaternion } from '../../../math/Quaternion';
 
