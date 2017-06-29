@@ -889,7 +889,7 @@ Object.assign( ObjectLoader.prototype, {
 
 				if ( skeleton === undefined ) {
 
-					console.warn( 'THREE.ObjectLoader: Not found Skeleton whose uuid is ' + obj.sjeletonUUID );
+					console.warn( 'THREE.ObjectLoader: Not found Skeleton whose uuid is ' + obj.skeletonUUID );
 
 				} else {
 
