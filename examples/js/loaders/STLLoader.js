@@ -200,28 +200,9 @@ THREE.STLLoader.prototype = {
 
 	parseASCII: function ( data ) {
 
-		var geometry, patternFace, patternNormal, patternVertex, result, text, vertexCountPerFace, normalCountPerFace, faceCounter;
-
-		faceCounter = vertexCountPerFace = normalCountPerFace = 0;
+		var geometry, length, patternFace, patternNormal, patternVertex, result, text;
 		geometry = new THREE.BufferGeometry();
 		patternFace = /facet([\s\S]*?)endfacet/g;
-
-		var patternFloat = /[\s]+([+-]?(?:\d+.\d+|\d+.|\d+|.\d+)(?:[eE][+-]?\d+)?)/.source;
-		patternNormal = new RegExp( ''
-			+ 'normal'
-			+ patternFloat
-			+ patternFloat
-			+ patternFloat
-			, 'g'
-		);
-
-		patternVertex = new RegExp( ''
-			+ 'vertex'
-			+ patternFloat
-			+ patternFloat
-			+ patternFloat
-			, 'g'
-		);
 
 		var vertices = [];
 		var normals = [];
@@ -230,40 +211,25 @@ THREE.STLLoader.prototype = {
 
 		while ( ( result = patternFace.exec( data ) ) !== null ) {
 
-			vertexCountPerFace = normalCountPerFace = 0;
-
 			text = result[ 0 ];
+			patternNormal = /normal[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
 
 			while ( ( result = patternNormal.exec( text ) ) !== null ) {
 
 				normal.x = parseFloat( result[ 1 ] );
-				normal.y = parseFloat( result[ 2 ] );
-				normal.z = parseFloat( result[ 3 ] );
-				normalCountPerFace ++;
+				normal.y = parseFloat( result[ 3 ] );
+				normal.z = parseFloat( result[ 5 ] );
 
 			}
+
+			patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
 
 			while ( ( result = patternVertex.exec( text ) ) !== null ) {
 
-				vertices.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+				vertices.push( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) );
 				normals.push( normal.x, normal.y, normal.z );
-				vertexCountPerFace ++;
 
 			}
-
-			// Every face have to own ONE valid normal
-			if ( normalCountPerFace !== 1 ) {
-
-				throw new Error( 'Something isn\'t right with the normal of face number ' + faceCounter );
-
-			}
-			// Each face have to own THREE valid vertices
-			if ( vertexCountPerFace !== 3 ) {
-
-				throw new Error( 'Something isn\'t right with the vertices of face number ' + faceCounter );
-
-			}
-			faceCounter ++;
 
 		}
 
@@ -279,13 +245,22 @@ THREE.STLLoader.prototype = {
 		if ( typeof buf !== "string" ) {
 
 			var array_buffer = new Uint8Array( buf );
-			var strArray = [];
-			for ( var i = 0; i < buf.byteLength; i ++ ) {
 
-				strArray.push( String.fromCharCode( array_buffer[ i ] ) ); // implicitly assumes little-endian
+			if ( window.TextDecoder !== undefined ) {
+
+				return new TextDecoder().decode( array_buffer );
 
 			}
-			return strArray.join( '' );
+
+			var str = '';
+
+			for ( var i = 0, il = buf.byteLength; i < il; i ++ ) {
+
+				str += String.fromCharCode( array_buffer[ i ] ); // implicitly assumes little-endian
+
+			}
+
+			return str;
 
 		} else {
 
