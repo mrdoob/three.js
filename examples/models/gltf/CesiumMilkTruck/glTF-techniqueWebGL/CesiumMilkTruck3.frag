@@ -3,7 +3,6 @@ uniform vec4 u_diffuse;
 uniform vec4 u_specular;
 uniform float u_shininess;
 uniform float u_transparency;
-uniform vec3 u_light0Color;
 varying vec3 v_position;
 varying vec3 v_normal;
 void main(void) {
@@ -15,9 +14,7 @@ void main(void) {
     vec3 ambient = diffuse.rgb;
     vec3 viewDir = -normalize(v_position);
     vec3 ambientLight = vec3(0.0, 0.0, 0.0);
-    {
-        ambientLight += u_light0Color;
-    }
+    ambientLight += vec3(0.2, 0.2, 0.2);
     vec3 l = vec3(0.0, 0.0, 1.0);
     diffuseLight += vec3(1.0, 1.0, 1.0) * max(dot(normal, l), 0.); 
     vec3 reflectDir = reflect(-l, normal);
