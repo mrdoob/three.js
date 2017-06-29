@@ -84,8 +84,7 @@ function SpritePlugin( renderer, sprites ) {
 		context.fillStyle = 'white';
 		context.fillRect( 0, 0, 8, 8 );
 
-		texture = new Texture( canvas );
-		texture.needsUpdate = true;
+		texture = new CanvasTexture( canvas );
 
 	}
 
