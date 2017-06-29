@@ -373,6 +373,8 @@ THREE.ColladaLoader.prototype = {
 		function buildAnimationChannel( channel, inputSource, outputSource, interpolationSource ) {
 
 			var node = library.nodes[ channel.id ];
+			var object3D = getNode( node.id );
+
 			var transform = node.transforms[ channel.sid ];
 			var defaultMatrix = node.matrix.clone().transpose();
 
@@ -432,10 +434,8 @@ THREE.ColladaLoader.prototype = {
 
 			var keyframes = prepareAnimationData( data, defaultMatrix );
 
-			if ( node.type !== 'JOINT' ) console.warn( 'THREE.ColladaLoader: Animation data for invalid node with ID "%s" found. The loader only supports animation of bones (skeletal animation).', node.id );
-
 			var animation = {
-				name: '.skeleton.bones[' + node.sid + ']',
+				name: object3D.uuid,
 				keyframes: keyframes
 			}
 
@@ -2243,7 +2243,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getSkeleton( skeletons, joints, skinnedMesh ) {
+		function getSkeleton( skeletons, joints ) {
 
 			var boneData = [];
 			var sortedBoneData = [];
@@ -2257,10 +2257,6 @@ THREE.ColladaLoader.prototype = {
 
 				var skeleton = skeletons[ i ];
 				var root = getNode( skeleton );
-
-				// bone hierarchy is a child of the skinned mesh
-
-				skinnedMesh.add( root );
 
 				// setup bone data for a single bone hierarchy
 
@@ -2403,7 +2399,7 @@ THREE.ColladaLoader.prototype = {
 				var skeletons = instance.skeletons;
 				var joints = controller.skin.joints;
 
-				var skeleton = getSkeleton( skeletons, joints, object );
+				var skeleton = getSkeleton( skeletons, joints );
 
 				object.bind( skeleton, controller.skin.bindMatrix );
 				object.normalizeSkinWeights();
@@ -2558,7 +2554,9 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0; i < children.length; i ++ ) {
 
-				group.add( buildNode( children[ i ] ) );
+				var child = children[ i ];
+
+				group.add( getNode( child.id ) );
 
 			}
 
