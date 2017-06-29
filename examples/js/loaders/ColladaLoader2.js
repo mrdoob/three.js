@@ -1387,7 +1387,7 @@ THREE.ColladaLoader.prototype = {
 
 					var extra = textureObject.extra;
 
-					if ( extra !== undefined && extra.technique !== undefined ) {
+					if ( extra !== undefined && extra.technique !== undefined  && isEmpty( extra.technique ) === false ) {
 
 						var technique = extra.technique;
 
