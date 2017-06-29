@@ -115,7 +115,7 @@ def children(obj, valid_types):
     """
     logger.debug('object.children(%s, %s)', obj, valid_types)
     for child in obj.children:
-        if child.type in valid_types:
+        if child.type in valid_types and child.THREE_export:
             yield child.name
 
 
@@ -451,6 +451,10 @@ def extract_mesh(obj, options, recalculate=False):
 
     """
     logger.debug('object.extract_mesh(%s, %s)', obj, options)
+    bpy.context.scene.objects.active = obj
+    hidden_state = obj.hide
+    obj.hide = False
+
     apply_modifiers = options.get(constants.APPLY_MODIFIERS, True)
     if apply_modifiers:
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -466,8 +470,6 @@ def extract_mesh(obj, options, recalculate=False):
     opt_buffer = opt_buffer == constants.BUFFER_GEOMETRY
     prop_buffer = mesh_node.THREE_geometry_type == constants.BUFFER_GEOMETRY
 
-    bpy.context.scene.objects.active = obj
-
     # if doing buffer geometry it is imperative to triangulate the mesh
     if opt_buffer or prop_buffer:
         original_mesh = obj.data
@@ -476,8 +478,6 @@ def extract_mesh(obj, options, recalculate=False):
                      original_mesh.name,
                      mesh_node.name)
 
-        hidden_state = obj.hide
-        obj.hide = False
         bpy.ops.object.mode_set(mode='OBJECT')
         obj.select = True
         bpy.context.scene.objects.active = obj
@@ -487,7 +487,6 @@ def extract_mesh(obj, options, recalculate=False):
                                       modifier='Triangulate')
         obj.data = original_mesh
         obj.select = False
-        obj.hide = hidden_state
 
     # split sharp edges
     original_mesh = obj.data
@@ -499,6 +498,7 @@ def extract_mesh(obj, options, recalculate=False):
     bpy.context.object.modifiers['EdgeSplit'].use_edge_sharp = True
     bpy.ops.object.modifier_apply(apply_as='DATA', modifier='EdgeSplit')
 
+    obj.hide = hidden_state
     obj.select = False
     obj.data = original_mesh
 
