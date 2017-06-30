@@ -200,39 +200,27 @@ THREE.STLLoader.prototype = {
 
 	parseASCII: function ( data ) {
 
-		var geometry, patternFace, patternNormal, patternVertex, result, text, vertexCountPerFace, normalCountPerFace, faceCounter;
-
-		faceCounter = vertexCountPerFace = normalCountPerFace = 0;
-		geometry = new THREE.BufferGeometry();
-		patternFace = /facet([\s\S]*?)endfacet/g;
+		var geometry = new THREE.BufferGeometry();
+		var patternFace = /facet([\s\S]*?)endfacet/g;
+		var faceCounter = 0;
 
 		var patternFloat = /[\s]+([+-]?(?:\d+.\d+|\d+.|\d+|.\d+)(?:[eE][+-]?\d+)?)/.source;
-		patternNormal = new RegExp( ''
-			+ 'normal'
-			+ patternFloat
-			+ patternFloat
-			+ patternFloat
-			, 'g'
-		);
-
-		patternVertex = new RegExp( ''
-			+ 'vertex'
-			+ patternFloat
-			+ patternFloat
-			+ patternFloat
-			, 'g'
-		);
+		var patternVertex = new RegExp( 'vertex' + patternFloat + patternFloat + patternFloat, 'g' );
+		var patternNormal = new RegExp( 'normal' + patternFloat + patternFloat + patternFloat, 'g' );
 
 		var vertices = [];
 		var normals = [];
 
 		var normal = new THREE.Vector3();
 
+		var result;
+
 		while ( ( result = patternFace.exec( data ) ) !== null ) {
 
-			vertexCountPerFace = normalCountPerFace = 0;
+			var vertexCountPerFace = 0;
+			var normalCountPerFace = 0;
 
-			text = result[ 0 ];
+			var text = result[ 0 ];
 
 			while ( ( result = patternNormal.exec( text ) ) !== null ) {
 
@@ -257,12 +245,14 @@ THREE.STLLoader.prototype = {
 				throw new Error( 'Something isn\'t right with the normal of face number ' + faceCounter );
 
 			}
+
 			// Each face have to own THREE valid vertices
 			if ( vertexCountPerFace !== 3 ) {
 
 				throw new Error( 'Something isn\'t right with the vertices of face number ' + faceCounter );
 
 			}
+
 			faceCounter ++;
 
 		}
