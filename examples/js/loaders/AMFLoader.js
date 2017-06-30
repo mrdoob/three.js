@@ -7,10 +7,10 @@
  * More information about the AMF format: http://amf.wikispaces.com
  *
  * Usage:
- *	var loader = new AMFLoader();
- *	loader.load('/path/to/project.amf', function(objecttree) {
- *		scene.add(objecttree);
- *	});
+ *    var loader = new AMFLoader();
+ *    loader.load('/path/to/project.amf', function(objecttree) {
+ *        scene.add(objecttree);
+ *    });
  *
  * Materials now supported, material colors supported
  * Zip support, requires jszip
@@ -65,7 +65,7 @@ THREE.AMFLoader.prototype = {
 
 					if ( e instanceof ReferenceError ) {
 
-						console.log( "	jszip missing and file is compressed." );
+						console.log( "  jszip missing and file is compressed." );
 						return null;
 
 					}
@@ -82,14 +82,14 @@ THREE.AMFLoader.prototype = {
 
 				}
 
-				console.log( "	Trying to load file asset: " + file );
+				console.log( "  Trying to load file asset: " + file );
 				view = new DataView( zip.file( file ).asArrayBuffer() );
 
 			}
 
 			if ( TextDecoder === undefined ) {
 
-				console.log( "	TextDecoder not present.	Please use TextDecoder polyfill." );
+				console.log( "  TextDecoder not present.    Please use TextDecoder polyfill." );
 				return null;
 
 			}
@@ -99,7 +99,7 @@ THREE.AMFLoader.prototype = {
 
 			if ( xmlData.documentElement.nodeName.toLowerCase() !== "amf" ) {
 
-				console.log( "	Error loading AMF - no AMF document found." );
+				console.log( "  Error loading AMF - no AMF document found." );
 				return null;
 
 			}
@@ -133,7 +133,7 @@ THREE.AMFLoader.prototype = {
 
 			}
 
-			console.log( "	Unit scale: " + scale );
+			console.log( "  Unit scale: " + scale );
 			return scale;
 
 		}
@@ -146,9 +146,16 @@ THREE.AMFLoader.prototype = {
 
 			var loadedMaterial = null;
 
-			for ( var i = 0; i < node.children.length; i ++ ) {
+			var children;
+			if ( window.navigator.userAgent.indexOf ( "Edge" > -1 ) ) {
+				children = node.childNodes;
+			} else {
+				children = node.children;
+			}
 
-				var matChildEl = node.children[ i ];
+			for (var i = 0; i < children.length; i++) {
+
+				var matChildEl = children[i];
 
 				if ( matChildEl.nodeName === "metadata" && matChildEl.attributes[ 'type' ] !== undefined ) {
 
@@ -184,12 +191,18 @@ THREE.AMFLoader.prototype = {
 		}
 
 		function loadColor( node ) {
+			var children;
+			if ( window.navigator.userAgent.indexOf ( "Edge" > -1 ) ) {
+				children = node.childNodes;
+			} else {
+				children = node.children;
+			}
 
 			var color = { 'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 1.0 };
 
-			for ( var i = 0; i < node.children.length; i ++ ) {
+			for ( var i = 0; i < children.length; i ++ ) {
 
-				var matColor = node.children[ i ];
+				var matColor = children[ i ];
 
 				if ( matColor.nodeName === 'r' ) {
 
@@ -377,8 +390,12 @@ THREE.AMFLoader.prototype = {
 		var amfScale = loadDocumentScale( xmlData );
 		var amfMaterials = {};
 		var amfObjects = {};
-		var children = xmlData.documentElement.children;
-
+		var children;
+		if ( window.navigator.userAgent.indexOf ( "Edge" > -1 ) ) {
+			children = xmlData.documentElement.childNodes;
+		} else {
+			children = xmlData.documentElement.children;
+		}
 		for ( var i = 0; i < children.length; i ++ ) {
 
 			var child = children[ i ];
