@@ -85,6 +85,8 @@
 
 			var OBJLoader2Example = (function () {
 
+				var Validator = THREE.OBJLoader2.prototype._getValidator();
+
 				function OBJLoader2Example( elementToBindTo ) {
 					this.renderer = null;
 					this.canvas = elementToBindTo;
@@ -109,6 +111,8 @@
 
 					this.cube = null;
 					this.pivot = null;
+
+					this.feedbackArray = [];
 				}
 
 				OBJLoader2Example.prototype.initGL = function () {
@@ -157,6 +161,7 @@
 				OBJLoader2Example.prototype.loadObj = function ( objDef ) {
 					this.scene.add( objDef.pivot );
 					var scope = this;
+					scope._reportProgress( 'Loading: ' + objDef.fileObj, objDef.instanceNo );
 
 					var mtlLoader = new THREE.MTLLoader();
 					mtlLoader.setPath( objDef.texturePath );
@@ -174,6 +179,7 @@
 
 						var onSuccess = function ( object3d ) {
 							console.log( 'Loading complete. Meshes were attached to: ' + object3d.name );
+							scope._reportProgress( '', objDef.instanceNo );
 						};
 
 						var onProgress = function ( event ) {
@@ -181,18 +187,25 @@
 
 								var percentComplete = event.loaded / event.total * 100;
 								var output = 'Download of "' + objDef.fileObj + '": ' + Math.round( percentComplete ) + '%';
-								console.log(output);
-
+								scope._reportProgress( output, objDef.instanceNo );
 							}
 						};
 
 						var onError = function ( event ) {
-							console.error( 'Error of type "' + event.type + '" occurred when trying to load: ' + event.src );
+							var output = 'Error of type "' + event.type + '" occurred when trying to load: ' + event.src;
+							scope._reportProgress( output, objDef.instanceNo );
 						};
 
 						objLoader.load( objDef.fileObj, onSuccess, onProgress, onError );
 
 					});
+				};
+
+				OBJLoader2Example.prototype._reportProgress = function( text, instanceNo ) {
+					this.feedbackArray[ instanceNo ] = text;
+					console.log( 'Progress: ' + text );
+
+					document.getElementById( 'feedback' ).innerHTML = Validator.isValid( this.feedbackArray ) && this.feedbackArray.length > 0 ? this.feedbackArray.join( '\<br\>' ) : '';
 				};
 
 				OBJLoader2Example.prototype.resizeDisplayGL = function () {
@@ -342,7 +355,8 @@
 			app.loadObj( {
 				path: 'obj/female02/',
 				fileObj: 'female02_vertex_colors.obj',
-				pivot: pivotA
+				pivot: pivotA,
+				instanceNo: 0
 			} );
 
 			var pivotB = new THREE.Object3D();
@@ -353,7 +367,8 @@
 				fileObj: 'female02.obj',
 				texturePath: 'obj/female02/',
 				fileMtl: 'female02.mtl',
-				pivot: pivotB
+				pivot: pivotB,
+				instanceNo: 1
 			} );
 
 			render();

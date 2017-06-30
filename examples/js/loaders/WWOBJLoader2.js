@@ -600,7 +600,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		for ( var index in this.callbacks.progress ) {
 
 			callbackProgress = this.callbacks.progress[ index ];
-			callbackProgress( output );
+			callbackProgress( output, this.instanceNo );
 
 		}
 
