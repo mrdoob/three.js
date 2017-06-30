@@ -45,7 +45,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats, clock, avatar;
+			var container, stats, clock;
 			var camera, scene, renderer, mixer;
 
 			init();
@@ -62,25 +62,19 @@
 
 				clock = new THREE.Clock();
 
-				// loading manager
-
-				var loadingManager = new THREE.LoadingManager( function() {
-
-					scene.add( avatar );
-
-				} );
-
 				// collada
 
-				var loader = new THREE.ColladaLoader( loadingManager );
+				var loader = new THREE.ColladaLoader();
 				loader.options.convertUpAxis = true;
 				loader.load( "./models/collada/avatar.dae", function ( collada ) {
 
 					var animations = collada.animations;
-					avatar = collada.scene;
+					var avatar = collada.scene;
 
 					mixer = new THREE.AnimationMixer( avatar );
 					var action = mixer.clipAction( animations[ 0 ] ).play();
+
+					scene.add( avatar );
 
 				} );
 
