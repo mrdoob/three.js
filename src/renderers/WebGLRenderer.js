@@ -538,15 +538,19 @@ function WebGLRenderer( parameters ) {
 
 		event.preventDefault();
 
+		console.log( 'THREE.WebGLRenderer: Context Lost.' );
+
 		_isContextLost = true;
 
 	}
 
 	function onContextRestore( event ) {
 
-		initGLContext();
+		console.log( 'THREE.WebGLRenderer: Context Restored.' );
 
 		_isContextLost = false;
+
+		initGLContext();
 
 	}
 
