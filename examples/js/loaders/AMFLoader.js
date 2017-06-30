@@ -120,11 +120,11 @@ THREE.AMFLoader.prototype = {
 			}
 
 			var scaleUnits = {
-				'millimeter': 1.0,
-				'inch': 25.4,
-				'feet': 304.8,
-				'meter': 1000.0,
-				'micron': 0.001
+				millimeter: 1.0,
+				inch: 25.4,
+				feet: 304.8,
+				meter: 1000.0,
+				micron: 0.001
 			};
 
 			if ( scaleUnits[ unit ] !== undefined ) {
@@ -179,13 +179,13 @@ THREE.AMFLoader.prototype = {
 
 			}
 
-			return { 'id': matId, 'material': loadedMaterial };
+			return { id: matId, material: loadedMaterial };
 
 		}
 
 		function loadColor( node ) {
 
-			var color = { 'r': 1.0, 'g': 1.0, 'b': 1.0, 'a': 1.0 };
+			var color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
 
 			for ( var i = 0; i < node.children.length; i ++ ) {
 
@@ -217,7 +217,7 @@ THREE.AMFLoader.prototype = {
 
 		function loadMeshVolume( node ) {
 
-			var volume = { 'name': '', 'triangles': [], 'materialid': null };
+			var volume = { name: '', triangles: [], materialid: null };
 
 			var currVolumeNode = node.firstElementChild;
 
@@ -307,7 +307,7 @@ THREE.AMFLoader.prototype = {
 		function loadObject( node ) {
 
 			var objId = node.attributes.id.textContent;
-			var loadedObject = { 'name': 'amfobject', 'meshes': [] };
+			var loadedObject = { name: 'amfobject', meshes: [] };
 			var currColor = null;
 			var currObjNode = node.firstElementChild;
 
@@ -332,7 +332,7 @@ THREE.AMFLoader.prototype = {
 				} else if ( currObjNode.nodeName === 'mesh' ) {
 
 					var currMeshNode = currObjNode.firstElementChild;
-					var mesh = { 'vertices': [], 'normals': [], 'volumes': [], 'color': currColor };
+					var mesh = { vertices: [], normals: [], volumes: [], color: currColor };
 
 					while ( currMeshNode ) {
 
