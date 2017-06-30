@@ -6575,7 +6575,7 @@
 
 			}
 
-			gl.useProgram( program );
+			state.useProgram( program );
 
 			state.initAttributes();
 			state.enableAttribute( attributes.vertex );
@@ -6722,7 +6722,7 @@
 			state.enable( gl.DEPTH_TEST );
 			state.buffers.depth.setMask( true );
 
-			renderer.resetGLState();
+			state.reset();
 
 		};
 
@@ -6751,6 +6751,21 @@
 		}
 
 	}
+
+	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 */
+
+	function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+		Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+		this.needsUpdate = true;
+
+	}
+
+	CanvasTexture.prototype = Object.create( Texture.prototype );
+	CanvasTexture.prototype.constructor = CanvasTexture;
 
 	/**
 	 * @author mikael emtinger / http://gomo.se/
@@ -6834,8 +6849,7 @@
 			context.fillStyle = 'white';
 			context.fillRect( 0, 0, 8, 8 );
 
-			texture = new Texture( canvas );
-			texture.needsUpdate = true;
+			texture = new CanvasTexture( canvas );
 
 		}
 
@@ -6851,7 +6865,7 @@
 
 			}
 
-			gl.useProgram( program );
+			state.useProgram( program );
 
 			state.initAttributes();
 			state.enableAttribute( attributes.position );
@@ -6999,7 +7013,7 @@
 
 			state.enable( gl.CULL_FACE );
 
-			renderer.resetGLState();
+			state.reset();
 
 		};
 
@@ -19131,6 +19145,8 @@
 
 		var compressedTextureFormats = null;
 
+		var currentProgram = null;
+
 		var currentBlending = null;
 		var currentBlendEquation = null;
 		var currentBlendSrc = null;
@@ -19184,25 +19200,23 @@
 		emptyTextures[ gl.TEXTURE_2D ] = createTexture( gl.TEXTURE_2D, gl.TEXTURE_2D, 1 );
 		emptyTextures[ gl.TEXTURE_CUBE_MAP ] = createTexture( gl.TEXTURE_CUBE_MAP, gl.TEXTURE_CUBE_MAP_POSITIVE_X, 6 );
 
+		// init
+
+		colorBuffer.setClear( 0, 0, 0, 1 );
+		depthBuffer.setClear( 1 );
+		stencilBuffer.setClear( 0 );
+
+		enable( gl.DEPTH_TEST );
+		depthBuffer.setFunc( LessEqualDepth );
+
+		setFlipSided( false );
+		setCullFace( CullFaceBack );
+		enable( gl.CULL_FACE );
+
+		enable( gl.BLEND );
+		setBlending( NormalBlending );
+
 		//
-
-		function init() {
-
-			colorBuffer.setClear( 0, 0, 0, 1 );
-			depthBuffer.setClear( 1 );
-			stencilBuffer.setClear( 0 );
-
-			enable( gl.DEPTH_TEST );
-			depthBuffer.setFunc( LessEqualDepth );
-
-			setFlipSided( false );
-			setCullFace( CullFaceBack );
-			enable( gl.CULL_FACE );
-
-			enable( gl.BLEND );
-			setBlending( NormalBlending );
-
-		}
 
 		function initAttributes() {
 
@@ -19318,6 +19332,22 @@
 			}
 
 			return compressedTextureFormats;
+
+		}
+
+		function useProgram( program ) {
+
+			if ( currentProgram !== program ) {
+
+				gl.useProgram( program );
+
+				currentProgram = program;
+
+				return true;
+
+			}
+
+			return false;
 
 		}
 
@@ -19688,6 +19718,8 @@
 			currentTextureSlot = null;
 			currentBoundTextures = {};
 
+			currentProgram = null;
+
 			currentBlending = null;
 
 			currentFlipSided = null;
@@ -19707,7 +19739,6 @@
 				stencil: stencilBuffer
 			},
 
-			init: init,
 			initAttributes: initAttributes,
 			enableAttribute: enableAttribute,
 			enableAttributeAndDivisor: enableAttributeAndDivisor,
@@ -19715,6 +19746,8 @@
 			enable: enable,
 			disable: disable,
 			getCompressedTextureFormats: getCompressedTextureFormats,
+
+			useProgram: useProgram,
 
 			setBlending: setBlending,
 			setMaterial: setMaterial,
@@ -20377,9 +20410,10 @@
 
 		var _this = this,
 
+			_isContextLost = false,
+
 			// internal state cache
 
-			_currentProgram = null,
 			_currentRenderTarget = null,
 			_currentFramebuffer = null,
 			_currentMaterialId = - 1,
@@ -20520,6 +20554,7 @@
 			}
 
 			_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
+			_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
 		} catch ( error ) {
 
@@ -20527,42 +20562,56 @@
 
 		}
 
-		var extensions = new WebGLExtensions( _gl );
+		var extensions, capabilities, state;
+		var properties, textures, attributes, geometries, objects;
+		var programCache, lightCache, renderLists;
 
-		extensions.get( 'WEBGL_depth_texture' );
-		extensions.get( 'OES_texture_float' );
-		extensions.get( 'OES_texture_float_linear' );
-		extensions.get( 'OES_texture_half_float' );
-		extensions.get( 'OES_texture_half_float_linear' );
-		extensions.get( 'OES_standard_derivatives' );
-		extensions.get( 'ANGLE_instanced_arrays' );
+		var background, bufferRenderer, indexedBufferRenderer;
 
-		if ( extensions.get( 'OES_element_index_uint' ) ) {
+		function initGLContext() {
 
-			BufferGeometry.MaxIndex = 4294967296;
+			extensions = new WebGLExtensions( _gl );
+			extensions.get( 'WEBGL_depth_texture' );
+			extensions.get( 'OES_texture_float' );
+			extensions.get( 'OES_texture_float_linear' );
+			extensions.get( 'OES_texture_half_float' );
+			extensions.get( 'OES_texture_half_float_linear' );
+			extensions.get( 'OES_standard_derivatives' );
+			extensions.get( 'ANGLE_instanced_arrays' );
+
+			if ( extensions.get( 'OES_element_index_uint' ) ) {
+
+				BufferGeometry.MaxIndex = 4294967296;
+
+			}
+
+			capabilities = new WebGLCapabilities( _gl, extensions, parameters );
+
+			state = new WebGLState( _gl, extensions, paramThreeToGL );
+			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
+			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
+
+			properties = new WebGLProperties();
+			textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, _infoMemory );
+			attributes = new WebGLAttributes( _gl );
+			geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
+			objects = new WebGLObjects( _gl, geometries, _infoRender );
+			programCache = new WebGLPrograms( _this, capabilities );
+			lightCache = new WebGLLights();
+			renderLists = new WebGLRenderLists();
+
+			background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
+
+			bufferRenderer = new WebGLBufferRenderer( _gl, extensions, _infoRender );
+			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
+
+			_this.info.programs = programCache.programs;
 
 		}
 
-		var capabilities = new WebGLCapabilities( _gl, extensions, parameters );
+		initGLContext();
 
-		var state = new WebGLState( _gl, extensions, paramThreeToGL );
-
-		var properties = new WebGLProperties();
-		var textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, _infoMemory );
-		var attributes = new WebGLAttributes( _gl );
-		var geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
-		var objects = new WebGLObjects( _gl, geometries, _infoRender );
-		var programCache = new WebGLPrograms( this, capabilities );
-		var lightCache = new WebGLLights();
-		var renderLists = new WebGLRenderLists();
-
-		var background = new WebGLBackground( this, state, objects, _premultipliedAlpha );
-		var vr = new WebVRManager( this );
-
-		this.info.programs = programCache.programs;
-
-		var bufferRenderer = new WebGLBufferRenderer( _gl, extensions, _infoRender );
-		var indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
+		var vr = new WebVRManager( _this );
 
 		//
 
@@ -20571,29 +20620,6 @@
 			return _currentRenderTarget === null ? _pixelRatio : 1;
 
 		}
-
-		function setDefaultGLState() {
-
-			state.init();
-
-			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
-			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
-
-		}
-
-		function resetGLState() {
-
-			_currentProgram = null;
-			_currentCamera = null;
-
-			_currentGeometryProgram = '';
-			_currentMaterialId = - 1;
-
-			state.reset();
-
-		}
-
-		setDefaultGLState();
 
 		this.context = _gl;
 		this.capabilities = capabilities;
@@ -20633,6 +20659,13 @@
 
 			var extension = extensions.get( 'WEBGL_lose_context' );
 			if ( extension ) extension.loseContext();
+
+		};
+
+		this.forceContextRestore = function () {
+
+			var extension = extensions.get( 'WEBGL_lose_context' );
+			if ( extension ) extension.restoreContext();
 
 		};
 
@@ -20788,13 +20821,12 @@
 
 		};
 
-		// Reset
-
-		this.resetGLState = resetGLState;
+		//
 
 		this.dispose = function () {
 
 			_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
+			_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 
 			renderLists.dispose();
 
@@ -20806,11 +20838,15 @@
 
 			event.preventDefault();
 
-			resetGLState();
-			setDefaultGLState();
+			_isContextLost = true;
 
-			properties.clear();
-			objects.clear();
+		}
+
+		function onContextRestore( event ) {
+
+			initGLContext();
+
+			_isContextLost = false;
 
 		}
 
@@ -21368,6 +21404,8 @@
 				return;
 
 			}
+
+			if ( _isContextLost ) return;
 
 			// reset caching for this frame
 
@@ -21943,10 +21981,7 @@
 				p_uniforms = program.getUniforms(),
 				m_uniforms = materialProperties.shader.uniforms;
 
-			if ( program.id !== _currentProgram ) {
-
-				_gl.useProgram( program.program );
-				_currentProgram = program.id;
+			if ( state.useProgram( program.program ) ) {
 
 				refreshProgram = true;
 				refreshMaterial = true;
@@ -24534,21 +24569,6 @@
 	CompressedTexture.prototype.constructor = CompressedTexture;
 
 	CompressedTexture.prototype.isCompressedTexture = true;
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
-	function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
-
-		Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
-
-		this.needsUpdate = true;
-
-	}
-
-	CanvasTexture.prototype = Object.create( Texture.prototype );
-	CanvasTexture.prototype.constructor = CanvasTexture;
 
 	/**
 	 * @author Matt DesLauriers / @mattdesl
@@ -40837,7 +40857,7 @@
 
 		geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
-		var material = new LineBasicMaterial( { fog: false, color: this.color } );
+		var material = new LineBasicMaterial( { fog: false } );
 
 		this.cone = new LineSegments( geometry, material );
 		this.add( this.cone );
@@ -41019,7 +41039,7 @@
 		this.color = color;
 
 		var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
-		var material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.color } );
+		var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
 
 		Mesh.call( this, geometry, material );
 
@@ -41110,7 +41130,7 @@
 
 		this.color = color;
 
-		var material = new LineBasicMaterial( { fog: false, color: this.color } );
+		var material = new LineBasicMaterial( { fog: false } );
 
 		var geometry = new BufferGeometry();
 
@@ -41187,7 +41207,7 @@
 		var geometry = new OctahedronBufferGeometry( size );
 		geometry.rotateY( Math.PI * 0.5 );
 
-		this.material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.color } );
+		this.material = new MeshBasicMaterial( { wireframe: true, fog: false } );
 		if ( this.color === undefined ) this.material.vertexColors = VertexColors;
 
 		var position = geometry.getAttribute( 'position' );
@@ -41520,7 +41540,7 @@
 			- size,   size, 0
 		], 3 ) );
 
-		var material = new LineBasicMaterial( { fog: false, color: this.color } );
+		var material = new LineBasicMaterial( { fog: false } );
 
 		this.lightPlane = new Line( geometry, material );
 		this.add( this.lightPlane );
