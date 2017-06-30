@@ -176,7 +176,7 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					var loader = new THREE.GLTFLoader();
+					var loader = new THREE.GLTF2Loader();
 					loader.parse( contents, function ( result ) {
 
 						result.scene.name = filename;
