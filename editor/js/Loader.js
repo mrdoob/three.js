@@ -176,7 +176,17 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					var loader = new THREE.GLTFLoader();
+					var version;
+					var magic = convertUint8ArrayToString( new Uint8Array( contents, 0, 4 ) );
+					if(magic === 'glTF') {
+						var headerView = new DataView( contents, 0, 20 );
+						version = headerView.getUint32( 4, true );
+					} else {
+						var json = JSON.parse( convertUint8ArrayToString( new Uint8Array( contents ) ) );
+						version = json.asset.version;
+					}
+
+					var loader = version < 2.0 ? new THREE.GLTFLoader() : new THREE.GLTF2Loader();
 					loader.parse( contents, function ( result ) {
 
 						result.scene.name = filename;
@@ -546,6 +556,29 @@ var Loader = function ( editor ) {
 				break;
 
 		}
+
+	}
+
+	function convertUint8ArrayToString( array ) {
+
+		if ( window.TextDecoder !== undefined ) {
+
+			return new TextDecoder().decode( array );
+
+		}
+
+		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
+		// throws a "maximum call stack size exceeded" error for large arrays.
+
+		var s = '';
+
+		for ( var i = 0, il = array.length; i < il; i ++ ) {
+
+			s += String.fromCharCode( array[ i ] );
+
+		}
+
+		return s;
 
 	}
 
