@@ -423,11 +423,11 @@ THREE.ColladaLoader.prototype = {
 					break;
 
 				case 'rotate':
-					console.warn( 'THREE.ColladaLoader: Animation transform "%s" not yet implemented.', transform );
+					console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
 					break;
 
 				case 'scale':
-					console.warn( 'THREE.ColladaLoader: Animation transform "%s" not yet implemented.', transform );
+					console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
 					break;
 
 			}
