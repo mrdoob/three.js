@@ -321,6 +321,8 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	var compressedTextureFormats = null;
 
+	var currentProgram = null;
+
 	var currentBlending = null;
 	var currentBlendEquation = null;
 	var currentBlendSrc = null;
@@ -374,25 +376,23 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 	emptyTextures[ gl.TEXTURE_2D ] = createTexture( gl.TEXTURE_2D, gl.TEXTURE_2D, 1 );
 	emptyTextures[ gl.TEXTURE_CUBE_MAP ] = createTexture( gl.TEXTURE_CUBE_MAP, gl.TEXTURE_CUBE_MAP_POSITIVE_X, 6 );
 
+	// init
+
+	colorBuffer.setClear( 0, 0, 0, 1 );
+	depthBuffer.setClear( 1 );
+	stencilBuffer.setClear( 0 );
+
+	enable( gl.DEPTH_TEST );
+	depthBuffer.setFunc( LessEqualDepth );
+
+	setFlipSided( false );
+	setCullFace( CullFaceBack );
+	enable( gl.CULL_FACE );
+
+	enable( gl.BLEND );
+	setBlending( NormalBlending );
+
 	//
-
-	function init() {
-
-		colorBuffer.setClear( 0, 0, 0, 1 );
-		depthBuffer.setClear( 1 );
-		stencilBuffer.setClear( 0 );
-
-		enable( gl.DEPTH_TEST );
-		depthBuffer.setFunc( LessEqualDepth );
-
-		setFlipSided( false );
-		setCullFace( CullFaceBack );
-		enable( gl.CULL_FACE );
-
-		enable( gl.BLEND );
-		setBlending( NormalBlending );
-
-	}
 
 	function initAttributes() {
 
@@ -508,6 +508,22 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		}
 
 		return compressedTextureFormats;
+
+	}
+
+	function useProgram( program ) {
+
+		if ( currentProgram !== program ) {
+
+			gl.useProgram( program );
+
+			currentProgram = program;
+
+			return true;
+
+		}
+
+		return false;
 
 	}
 
@@ -878,6 +894,8 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		currentTextureSlot = null;
 		currentBoundTextures = {};
 
+		currentProgram = null;
+
 		currentBlending = null;
 
 		currentFlipSided = null;
@@ -897,7 +915,6 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 			stencil: stencilBuffer
 		},
 
-		init: init,
 		initAttributes: initAttributes,
 		enableAttribute: enableAttribute,
 		enableAttributeAndDivisor: enableAttributeAndDivisor,
@@ -905,6 +922,8 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		enable: enable,
 		disable: disable,
 		getCompressedTextureFormats: getCompressedTextureFormats,
+
+		useProgram: useProgram,
 
 		setBlending: setBlending,
 		setMaterial: setMaterial,

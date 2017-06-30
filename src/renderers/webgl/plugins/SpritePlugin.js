@@ -1,4 +1,4 @@
-import { Texture } from '../../../textures/Texture';
+import { CanvasTexture } from '../../../textures/CanvasTexture';
 import { Vector3 } from '../../../math/Vector3';
 import { Quaternion } from '../../../math/Quaternion';
 
@@ -84,8 +84,7 @@ function SpritePlugin( renderer, sprites ) {
 		context.fillStyle = 'white';
 		context.fillRect( 0, 0, 8, 8 );
 
-		texture = new Texture( canvas );
-		texture.needsUpdate = true;
+		texture = new CanvasTexture( canvas );
 
 	}
 
@@ -101,7 +100,7 @@ function SpritePlugin( renderer, sprites ) {
 
 		}
 
-		gl.useProgram( program );
+		state.useProgram( program );
 
 		state.initAttributes();
 		state.enableAttribute( attributes.position );
@@ -249,7 +248,7 @@ function SpritePlugin( renderer, sprites ) {
 
 		state.enable( gl.CULL_FACE );
 
-		renderer.resetGLState();
+		state.reset();
 
 	};
 

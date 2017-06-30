@@ -208,7 +208,7 @@ function LensFlarePlugin( renderer, flares ) {
 
 		}
 
-		gl.useProgram( program );
+		state.useProgram( program );
 
 		state.initAttributes();
 		state.enableAttribute( attributes.vertex );
@@ -355,7 +355,7 @@ function LensFlarePlugin( renderer, flares ) {
 		state.enable( gl.DEPTH_TEST );
 		state.buffers.depth.setMask( true );
 
-		renderer.resetGLState();
+		state.reset();
 
 	};
 
