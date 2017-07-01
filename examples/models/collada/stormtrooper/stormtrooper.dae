@@ -40,10 +40,10 @@
               <texture texture="Stormtrooper_D-sampler" texcoord="StormtrooperDiffuseUVLayer"/>
             </diffuse>
             <specular>
-              <color sid="specular">0 0 0 1</color>
+              <color sid="specular">0.05 0.05 0.05 1</color>
             </specular>
             <shininess>
-              <float sid="shininess">103</float>
+              <float sid="shininess">100</float>
             </shininess>
             <index_of_refraction>
               <float sid="index_of_refraction">1</float>
