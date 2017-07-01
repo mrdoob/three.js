@@ -49,7 +49,7 @@
               <texture texture="ce_jpg-sampler" texcoord="UVMap"/>
             </diffuse>
             <specular>
-              <color sid="specular">0.5 0.5 0.5 1</color>
+              <color sid="specular">0.05 0.05 0.05 1</color>
             </specular>
             <shininess>
               <float sid="shininess">50</float>
@@ -91,7 +91,7 @@
               <texture texture="Body_tex_003_jpg-sampler" texcoord="UVMap"/>
             </diffuse>
             <specular>
-              <color sid="specular">0.5 0.5 0.5 1</color>
+              <color sid="specular">0.1 0.1 0.1 1</color>
             </specular>
             <shininess>
               <float sid="shininess">50</float>
@@ -133,7 +133,7 @@
               <texture texture="Face_tex_002_toObj_jpg-sampler" texcoord="UVMap"/>
             </diffuse>
             <specular>
-              <color sid="specular">0.5 0.5 0.5 1</color>
+              <color sid="specular">0.05 0.05 0.05 1</color>
             </specular>
             <shininess>
               <float sid="shininess">50</float>
@@ -175,7 +175,7 @@
               <texture texture="Hair_tex_001_jpg-sampler" texcoord="UVMap"/>
             </diffuse>
             <specular>
-              <color sid="specular">0.5 0.5 0.5 1</color>
+              <color sid="specular">0.05 0.05 0.05 1</color>
             </specular>
             <shininess>
               <float sid="shininess">50</float>
