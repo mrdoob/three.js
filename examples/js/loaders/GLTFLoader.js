@@ -2041,7 +2041,7 @@ THREE.GLTFLoader = ( function () {
 									var material = originalMaterial;
 									material.skinning = true;
 
-									child = new THREE.SkinnedMesh( geometry, material, false );
+									child = new THREE.SkinnedMesh( geometry, material );
 									child.castShadow = true;
 									child.userData = originalUserData;
 									child.name = originalName;
@@ -2070,7 +2070,7 @@ THREE.GLTFLoader = ( function () {
 
 									}
 
-									child.bind( new THREE.Skeleton( bones, boneInverses, false ), skinEntry.bindShapeMatrix );
+									child.bind( new THREE.Skeleton( bones, boneInverses ), skinEntry.bindShapeMatrix );
 
 									var buildBoneGraph = function ( parentJson, parentObject, property ) {
 

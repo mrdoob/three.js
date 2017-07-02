@@ -2712,7 +2712,7 @@ THREE.GLTF2Loader = ( function () {
 									material = originalMaterial;
 									material.skinning = true;
 
-									child = new THREE.SkinnedMesh( geometry, material, false );
+									child = new THREE.SkinnedMesh( geometry, material );
 									child.castShadow = true;
 									child.userData = originalUserData;
 									child.name = originalName;
@@ -2741,7 +2741,7 @@ THREE.GLTF2Loader = ( function () {
 
 									}
 
-									child.bind( new THREE.Skeleton( bones, boneInverses, false ), child.matrixWorld );
+									child.bind( new THREE.Skeleton( bones, boneInverses ), child.matrixWorld );
 
 								}
 
