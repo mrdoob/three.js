@@ -3657,17 +3657,22 @@ THREE.ColladaLoader = function () {
 
 		var transparent = false;
 
-		if (this['transparency'] !== undefined && this['transparent'] !== undefined) {
-			// convert transparent color RBG to average value
-			var transparentColor = this['transparent'];
-			var transparencyLevel = (this.transparent.color.r + this.transparent.color.g + this.transparent.color.b) / 3 * this.transparency;
+		if (this['transparency'] !== undefined) {
 
-			if (transparencyLevel > 0) {
-				transparent = true;
-				props[ 'transparent' ] = true;
-				props[ 'opacity' ] = 1 - transparencyLevel;
+			if (this['transparent'] !== undefined) {
+				// convert transparent color RBG to average value
+				var transparentColor = this['transparent'];
+				var transparencyLevel = (this.transparent.color.r + this.transparent.color.g + this.transparent.color.b) / 3 * this.transparency;
 
+				if (transparencyLevel > 0) {
+					props[ 'opacity' ] = 1 - transparencyLevel;
+				}
+			} else {
+				props[ 'opacity' ] = this.transparency;
 			}
+
+			transparent = true;
+			props[ 'transparent' ] = true;
 
 		}
 
