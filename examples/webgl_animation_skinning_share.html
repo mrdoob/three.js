@@ -192,7 +192,7 @@
 				mesh.receiveShadow = true;
 
 				var geometry2 = geometry.clone();
-				delete geometry2.bones;
+				delete geometry2.bones; // makes sure not to generate bones graph under mesh2
 
 				mesh2 = new THREE.SkinnedMesh( geometry2, materials );
 
