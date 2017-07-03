@@ -649,7 +649,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		} else {
 
-			throw new Error('Unknown depthTexture format')
+			throw new Error('Unknown depthTexture format');
 
 		}
 

@@ -2,7 +2,6 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { Box3 } from '../math/Box3';
 import { Line } from '../objects/Line';
 import { Mesh } from '../objects/Mesh';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial';
