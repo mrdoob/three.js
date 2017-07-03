@@ -76,15 +76,16 @@ THREE.BabylonLoader.prototype = {
 
 		var geometry = new THREE.BufferGeometry();
 
+		var indices = json.indices;
+		var positions = json.positions;
+		var normals = json.normals;
+		var uvs = json.uvs;
+
 		// indices
 
-		var indices = new Uint16Array( json.indices );
-
-		geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+		geometry.setIndex( indices );
 
 		// positions
-
-		var positions = new Float32Array( json.positions );
 
 		for ( var j = 2, jl = positions.length; j < jl; j += 3 ) {
 
@@ -92,13 +93,11 @@ THREE.BabylonLoader.prototype = {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
 		// normals
 
-		if ( json.normals ) {
-
-			var normals = new Float32Array( json.normals );
+		if ( normals ) {
 
 			for ( var j = 2, jl = normals.length; j < jl; j += 3 ) {
 
@@ -106,17 +105,15 @@ THREE.BabylonLoader.prototype = {
 
 			}
 
-			geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+			geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
 		}
 
 		// uvs
 
-		if ( json.uvs ) {
+		if ( uvs ) {
 
-			var uvs = new Float32Array( json.uvs );
-
-			geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+			geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 		}
 
