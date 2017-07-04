@@ -278,7 +278,7 @@ Object.assign( AnimationClip, {
 
 				// ...assume skeletal animation
 
-				var boneName = '.bones[' + bones[ h ].name + ']';
+				var boneName = '.bones[' + bones[hierarchyTracks[h].parent+1].name + ']';
 
 				addNonemptyTrack(
 						VectorKeyframeTrack, boneName + '.position',
