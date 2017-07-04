@@ -1,5 +1,6 @@
 /**
  * @author Filipe Caixeta / http://filipecaixeta.com.br
+ * @author Mugen87 / https://github.com/Mugen87
  *
  * Description: A THREE loader for PCD ascii and binary files.
  *
@@ -33,147 +34,149 @@ THREE.PCDLoader.prototype = {
 
 	},
 
-	binarryToStr: function ( data ) {
+	parse: function ( data, url ) {
 
-		var charArray = new Uint8Array( data );
+		function binarryToStr( data ) {
 
-		if ( window.TextDecoder !== undefined ) {
+			var charArray = new Uint8Array( data );
 
-			return new TextDecoder().decode( charArray );
+			if ( window.TextDecoder !== undefined ) {
 
-		}
-
-		var text = '';
-		for ( var i = 0, il = data.byteLength; i < il; i ++ ) {
-
-			text += String.fromCharCode( charArray[ i ] );
-
-		}
-		return text;
-
-	},
-
-	parseHeader: function ( data ) {
-
-		var PCDheader = {};
-		var result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
-		var result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.substr( result1 - 1 ) );
-
-		var i, l;
-
-		PCDheader.data = result2[ 1 ];
-		PCDheader.headerLen = result2[ 0 ].length + result1;
-		PCDheader.str = data.substr( 0, PCDheader.headerLen );
-
-		// remove comments
-
-		PCDheader.str = PCDheader.str.replace( /\#.*/gi, '' );
-
-		// parse
-
-		PCDheader.version = /VERSION (.*)/i.exec( PCDheader.str );
-		PCDheader.fields = /FIELDS (.*)/i.exec( PCDheader.str );
-		PCDheader.size = /SIZE (.*)/i.exec( PCDheader.str );
-		PCDheader.type = /TYPE (.*)/i.exec( PCDheader.str );
-		PCDheader.count = /COUNT (.*)/i.exec( PCDheader.str );
-		PCDheader.width = /WIDTH (.*)/i.exec( PCDheader.str );
-		PCDheader.height = /HEIGHT (.*)/i.exec( PCDheader.str );
-		PCDheader.viewpoint = /VIEWPOINT (.*)/i.exec( PCDheader.str );
-		PCDheader.points = /POINTS (.*)/i.exec( PCDheader.str );
-
-		// evaluate
-
-		if ( PCDheader.version !== null )
-			PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
-
-		if ( PCDheader.fields !== null )
-			PCDheader.fields = PCDheader.fields[ 1 ].split( ' ' );
-
-		if ( PCDheader.type !== null )
-			PCDheader.type = PCDheader.type[ 1 ].split( ' ' );
-
-		if ( PCDheader.width !== null )
-			PCDheader.width = parseInt( PCDheader.width[ 1 ] );
-
-		if ( PCDheader.height !== null )
-			PCDheader.height = parseInt( PCDheader.height[ 1 ] );
-
-		if ( PCDheader.viewpoint !== null )
-			PCDheader.viewpoint = PCDheader.viewpoint[ 1 ];
-
-		if ( PCDheader.points !== null )
-			PCDheader.points = parseInt( PCDheader.points[ 1 ], 10 );
-
-		if ( PCDheader.points === null )
-			PCDheader.points = PCDheader.width * PCDheader.height;
-
-		if ( PCDheader.size !== null ) {
-
-			PCDheader.size = PCDheader.size[ 1 ].split( ' ' ).map( function ( x ) {
-
-				return parseInt( x, 10 );
-
-			} );
-
-		}
-
-		if ( PCDheader.count !== null ) {
-
-			PCDheader.count = PCDheader.count[ 1 ].split( ' ' ).map( function ( x ) {
-
-				return parseInt( x, 10 );
-
-			} );
-
-		} else {
-
-			PCDheader.count = [];
-
-			for ( i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
-
-				PCDheader.count.push( 1 );
+				return new TextDecoder().decode( charArray );
 
 			}
 
+			var text = '';
+
+			for ( var i = 0, il = data.byteLength; i < il; i ++ ) {
+
+				text += String.fromCharCode( charArray[ i ] );
+
+			}
+
+			return text;
+
 		}
 
-		PCDheader.offset = {};
+		function parseHeader( data ) {
 
-		var sizeSum = 0;
+			var PCDheader = {};
+			var result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
+			var result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.substr( result1 - 1 ) );
 
-		for ( i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
+			var i, l;
 
-			if ( PCDheader.data === 'ascii' ) {
+			PCDheader.data = result2[ 1 ];
+			PCDheader.headerLen = result2[ 0 ].length + result1;
+			PCDheader.str = data.substr( 0, PCDheader.headerLen );
 
-				PCDheader.offset[ PCDheader.fields[ i ] ] = i;
+			// remove comments
+
+			PCDheader.str = PCDheader.str.replace( /\#.*/gi, '' );
+
+			// parse
+
+			PCDheader.version = /VERSION (.*)/i.exec( PCDheader.str );
+			PCDheader.fields = /FIELDS (.*)/i.exec( PCDheader.str );
+			PCDheader.size = /SIZE (.*)/i.exec( PCDheader.str );
+			PCDheader.type = /TYPE (.*)/i.exec( PCDheader.str );
+			PCDheader.count = /COUNT (.*)/i.exec( PCDheader.str );
+			PCDheader.width = /WIDTH (.*)/i.exec( PCDheader.str );
+			PCDheader.height = /HEIGHT (.*)/i.exec( PCDheader.str );
+			PCDheader.viewpoint = /VIEWPOINT (.*)/i.exec( PCDheader.str );
+			PCDheader.points = /POINTS (.*)/i.exec( PCDheader.str );
+
+			// evaluate
+
+			if ( PCDheader.version !== null )
+				PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
+
+			if ( PCDheader.fields !== null )
+				PCDheader.fields = PCDheader.fields[ 1 ].split( ' ' );
+
+			if ( PCDheader.type !== null )
+				PCDheader.type = PCDheader.type[ 1 ].split( ' ' );
+
+			if ( PCDheader.width !== null )
+				PCDheader.width = parseInt( PCDheader.width[ 1 ] );
+
+			if ( PCDheader.height !== null )
+				PCDheader.height = parseInt( PCDheader.height[ 1 ] );
+
+			if ( PCDheader.viewpoint !== null )
+				PCDheader.viewpoint = PCDheader.viewpoint[ 1 ];
+
+			if ( PCDheader.points !== null )
+				PCDheader.points = parseInt( PCDheader.points[ 1 ], 10 );
+
+			if ( PCDheader.points === null )
+				PCDheader.points = PCDheader.width * PCDheader.height;
+
+			if ( PCDheader.size !== null ) {
+
+				PCDheader.size = PCDheader.size[ 1 ].split( ' ' ).map( function ( x ) {
+
+					return parseInt( x, 10 );
+
+				} );
+
+			}
+
+			if ( PCDheader.count !== null ) {
+
+				PCDheader.count = PCDheader.count[ 1 ].split( ' ' ).map( function ( x ) {
+
+					return parseInt( x, 10 );
+
+				} );
 
 			} else {
 
-				PCDheader.offset[ PCDheader.fields[ i ] ] = sizeSum;
-				sizeSum += PCDheader.size[ i ];
+				PCDheader.count = [];
+
+				for ( i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
+
+					PCDheader.count.push( 1 );
+
+				}
 
 			}
 
+			PCDheader.offset = {};
+
+			var sizeSum = 0;
+
+			for ( i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
+
+				if ( PCDheader.data === 'ascii' ) {
+
+					PCDheader.offset[ PCDheader.fields[ i ] ] = i;
+
+				} else {
+
+					PCDheader.offset[ PCDheader.fields[ i ] ] = sizeSum;
+					sizeSum += PCDheader.size[ i ];
+
+				}
+
+			}
+
+			// for binary only
+
+			PCDheader.rowSize = sizeSum;
+
+			return PCDheader;
+
 		}
-
-		// for binary only
-
-		PCDheader.rowSize = sizeSum;
-
-		return PCDheader;
-
-	},
-
-	parse: function ( data, url ) {
 
 		var dataView, offset;
 		var i, l;
 
-		var textData = this.binarryToStr( data );
+		var textData = binarryToStr( data );
 
 		// parse header (always ascii format)
 
-		var PCDheader = this.parseHeader( textData );
+		var PCDheader = parseHeader( textData );
 
 		// parse data
 
