@@ -2901,7 +2901,6 @@ THREE.ColladaLoader.prototype = {
 						// ensure a correct animation of the model.
 
 						 boneInverse = new THREE.Matrix4();
-						 console.warn( 'THREE.ColladaLoader: Missing data for bone: %s.', object.name );
 
 					}
 
