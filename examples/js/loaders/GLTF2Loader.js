@@ -1812,7 +1812,7 @@ THREE.GLTF2Loader = ( function () {
 				// For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
 				var elementBytes = TypedArray.BYTES_PER_ELEMENT;
 				var itemBytes = elementBytes * itemSize;
-				var byteStride = json.bufferViews[accessor.bufferView].byteStride;	
+				var byteStride = json.bufferViews[ accessor.bufferView ].byteStride;
 				var array;
 
 				// The buffer is not interleaved if the stride is the item size in bytes.
@@ -2328,17 +2328,13 @@ THREE.GLTF2Loader = ( function () {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
-							meshNode = new THREE.LineSegments( geometry, material );
-
-						} else {
-
-							meshNode = new THREE.Line( geometry, material );
-
 						}
+
+						meshNode = new THREE.LineSegments( geometry, material );
 
 					} else {
 
-						throw new Error( "Only triangular and line primitives are supported" );
+						throw new Error( 'Only triangular and line primitives are supported' );
 
 					}
 

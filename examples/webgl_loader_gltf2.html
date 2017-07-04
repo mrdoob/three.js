@@ -483,6 +483,16 @@
 					// TODO: 'glTF-MaterialsCommon', 'glTF-techniqueWebGL'
 					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
 				},
+				{
+					name : 'Outlined Box',
+					url : './models/gltf/OutlinedBox/OutlinedBox.gltf',
+					cameraPos: new THREE.Vector3(0, 5, 15),
+					objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
+					objectRotation: new THREE.Euler(0, 90, 0),
+					addLights:true,
+					shadows:true,
+					extensions: ['glTF']
+				},
 			];
 
 			function buildSceneList() {
