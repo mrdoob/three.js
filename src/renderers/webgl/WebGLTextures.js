@@ -299,7 +299,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 								} else {
 
-									console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()" );
+									console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()' );
 
 								}
 
@@ -525,7 +525,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 					} else {
 
-						console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()" );
+						console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
 
 					}
 
@@ -616,13 +616,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 	function setupDepthTexture( framebuffer, renderTarget ) {
 
 		var isCube = ( renderTarget && renderTarget.isWebGLRenderTargetCube );
-		if ( isCube ) throw new Error('Depth Texture with cube render targets is not supported!');
+		if ( isCube ) throw new Error( 'Depth Texture with cube render targets is not supported' );
 
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 		if ( !( renderTarget.depthTexture && renderTarget.depthTexture.isDepthTexture ) ) {
 
-			throw new Error('renderTarget.depthTexture must be an instance of THREE.DepthTexture');
+			throw new Error( 'renderTarget.depthTexture must be an instance of THREE.DepthTexture' );
 
 		}
 
@@ -649,7 +649,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		} else {
 
-			throw new Error('Unknown depthTexture format')
+			throw new Error( 'Unknown depthTexture format' );
 
 		}
 
@@ -664,7 +664,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		if ( renderTarget.depthTexture ) {
 
-			if ( isCube ) throw new Error('target.depthTexture not supported in Cube render targets');
+			if ( isCube ) throw new Error( 'target.depthTexture not supported in Cube render targets' );
 
 			setupDepthTexture( renderTargetProperties.__webglFramebuffer, renderTarget );
 
