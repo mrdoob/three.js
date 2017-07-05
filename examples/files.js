@@ -7,6 +7,7 @@ var files = {
 		"webgl_animation_skinning_morph",
 		"webgl_camera",
 		"webgl_camera_array",
+		"webgl_camera_array2",
 		"webgl_camera_cinematic",
 		"webgl_camera_logarithmicdepthbuffer",
 		"webgl_clipping",
