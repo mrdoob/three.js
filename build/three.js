@@ -18288,7 +18288,7 @@
 
 									} else {
 
-										console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()" );
+										console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()' );
 
 									}
 
@@ -18514,7 +18514,7 @@
 
 						} else {
 
-							console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()" );
+							console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
 
 						}
 
@@ -18605,13 +18605,13 @@
 		function setupDepthTexture( framebuffer, renderTarget ) {
 
 			var isCube = ( renderTarget && renderTarget.isWebGLRenderTargetCube );
-			if ( isCube ) throw new Error('Depth Texture with cube render targets is not supported!');
+			if ( isCube ) throw new Error( 'Depth Texture with cube render targets is not supported' );
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 			if ( !( renderTarget.depthTexture && renderTarget.depthTexture.isDepthTexture ) ) {
 
-				throw new Error('renderTarget.depthTexture must be an instance of THREE.DepthTexture');
+				throw new Error( 'renderTarget.depthTexture must be an instance of THREE.DepthTexture' );
 
 			}
 
@@ -18638,7 +18638,7 @@
 
 			} else {
 
-				throw new Error('Unknown depthTexture format')
+				throw new Error( 'Unknown depthTexture format' );
 
 			}
 
@@ -18653,7 +18653,7 @@
 
 			if ( renderTarget.depthTexture ) {
 
-				if ( isCube ) throw new Error('target.depthTexture not supported in Cube render targets');
+				if ( isCube ) throw new Error( 'target.depthTexture not supported in Cube render targets' );
 
 				setupDepthTexture( renderTargetProperties.__webglFramebuffer, renderTarget );
 
@@ -24585,7 +24585,7 @@
 
 		if ( format !== DepthFormat && format !== DepthStencilFormat ) {
 
-			throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' )
+			throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' );
 
 		}
 
@@ -26233,7 +26233,7 @@
 				if ( indices ) return vertIndices;
 				return result;
 
-			}
+			};
 
 		} )(),
 
@@ -26571,7 +26571,7 @@
 						hIdx, nextIdx, intersection;
 					for ( ihIdx = 0; ihIdx < indepHoles.length; ihIdx ++ ) {
 
-						chkHole = holes[ indepHoles[ ihIdx ]];
+						chkHole = holes[ indepHoles[ ihIdx ] ];
 						for ( hIdx = 0; hIdx < chkHole.length; hIdx ++ ) {
 
 							nextIdx = hIdx + 1; nextIdx %= chkHole.length;
@@ -26604,7 +26604,7 @@
 					counter --;
 					if ( counter < 0 ) {
 
-						console.log( "Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!" );
+						console.log( 'THREE.ShapeUtils: Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!' );
 						break;
 
 					}
@@ -26622,7 +26622,7 @@
 							holeIdx = indepHoles[ h ];
 
 							// prevent multiple checks
-							cutKey = shapePt.x + ":" + shapePt.y + ":" + holeIdx;
+							cutKey = shapePt.x + ':' + shapePt.y + ':' + holeIdx;
 							if ( failedCuts[ cutKey ] !== undefined )			continue;
 
 							hole = holes[ holeIdx ];
@@ -26687,11 +26687,11 @@
 
 			for ( i = 0, il = allpoints.length; i < il; i ++ ) {
 
-				key = allpoints[ i ].x + ":" + allpoints[ i ].y;
+				key = allpoints[ i ].x + ':' + allpoints[ i ].y;
 
 				if ( allPointsMap[ key ] !== undefined ) {
 
-					console.warn( "THREE.ShapeUtils: Duplicate point", key, i );
+					console.warn( 'THREE.ShapeUtils: Duplicate point', key, i );
 
 				}
 
@@ -26713,7 +26713,7 @@
 
 				for ( f = 0; f < 3; f ++ ) {
 
-					key = face[ f ].x + ":" + face[ f ].y;
+					key = face[ f ].x + ':' + face[ f ].y;
 
 					index = allPointsMap[ key ];
 
@@ -36780,7 +36780,7 @@
 			return this.gain.gain.value;
 
 		},
-		
+
 		setVolume: function ( value ) {
 
 			this.gain.gain.value = value;
