@@ -21523,12 +21523,6 @@ function WebGLRenderer( parameters ) {
 		state.buffers.depth.setMask( true );
 		state.buffers.color.setMask( true );
 
-		if ( camera.isArrayCamera ) {
-
-			_this.setScissorTest( false );
-
-		}
-
 		if ( vr.enabled ) {
 
 			vr.submitFrame();
@@ -21718,9 +21712,9 @@ function WebGLRenderer( parameters ) {
 						var width = bounds.z * _width;
 						var height = bounds.w * _height;
 
-						_this.setViewport( x, y, width, height );
-						_this.setScissor( x, y, width, height );
-						_this.setScissorTest( true );
+						state.viewport( _currentViewport.set( x, y, width, height ) );
+						state.scissor( _currentScissor.set( x, y, width, height ) );
+						state.setScissorTest( true );
 
 						renderObject( object, scene, camera2, geometry, material, group );
 
