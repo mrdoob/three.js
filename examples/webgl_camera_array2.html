@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - arraycamera</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+
+		<script>
+
+		var mesh, renderer, scene, camera;
+		var arrayCamera;
+
+		init();
+		animate();
+
+		function init() {
+
+		    // renderer
+		    renderer = new THREE.WebGLRenderer();
+		    renderer.setSize( window.innerWidth, window.innerHeight );
+		    document.body.appendChild( renderer.domElement );
+
+		    // scene
+		    scene = new THREE.Scene();
+
+		    // camera
+		    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+		    camera.position.set( 20, 20, 20 );
+		    camera.lookAt( scene.position );
+		    camera.updateMatrixWorld();
+		    camera.updateProjectionMatrix();
+		    camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+
+		    arrayCamera = new THREE.ArrayCamera( [
+		        camera.clone(),
+		        camera.clone()
+		    ] );
+		    arrayCamera.cameras[0].bounds = new THREE.Vector4(0.0, 0.0, 0.5, 1.0);
+		    arrayCamera.cameras[1].bounds = new THREE.Vector4(0.5, 0.0, 0.5, 1.0);
+		    arrayCamera.cameras[0].layers.enable(1);
+		    arrayCamera.cameras[1].layers.enable(2);
+		    arrayCamera.position.set( 20, 20, 20 );
+		    arrayCamera.lookAt( scene.position );
+		    arrayCamera.enabled = true;
+
+		    // ambient
+		    scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+		    // light
+		    var light = new THREE.DirectionalLight( 0xffffff, 1 );
+		    light.position.set( 20, 20, 0 );
+		    scene.add( light );
+
+		    // axes
+		    scene.add( new THREE.AxisHelper( 20 ) );
+
+		    // geometry
+		    var geometry = new THREE.SphereGeometry( 5, 12, 8 );
+
+		    // material
+		    var material = new THREE.MeshPhongMaterial( {
+		        color: 0x00ffff,
+		        shading: THREE.FlatShading,
+		        transparent: true,
+		        opacity: 0.7,
+		    } );
+
+		    // mesh
+		    mesh = new THREE.Mesh( geometry, material );
+		    scene.add( mesh );
+
+		}
+
+		function animate() {
+
+		    requestAnimationFrame( animate );
+
+		    renderer.autoClear = true;
+		    renderer.render( scene, arrayCamera ); // should render left and right
+		    renderer.autoClear = false;
+		    renderer.render( scene, camera ); // should render center
+
+		}
+
+		</script>
+
+	</body>
+</html>
