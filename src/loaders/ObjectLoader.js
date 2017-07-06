@@ -764,11 +764,13 @@ Object.assign( ObjectLoader.prototype, {
 			if ( data.userData !== undefined ) object.userData = data.userData;
 
 			if ( data.children !== undefined ) {
-
-				for ( var child in data.children ) {
-
-					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
-
+				
+				var children = data.children;
+				
+				for ( var  i = 0; i < children.length; i ++ ) {
+					
+					object.add( this.parseObject( children[ i ], geometries, materials );
+						   
 				}
 
 			}
