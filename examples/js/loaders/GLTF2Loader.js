@@ -2184,7 +2184,7 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						if ( material.aoMap !== undefined
+						if ( material.aoMap
 								&& geometry.attributes.uv2 === undefined
 								&& geometry.attributes.uv !== undefined ) {
 
@@ -2361,38 +2361,43 @@ THREE.GLTF2Loader = ( function () {
 
 	};
 
+	/**
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#cameras
+	 */
 	GLTFParser.prototype.loadCameras = function () {
 
 		var json = this.json;
 
 		return _each( json.cameras, function ( camera ) {
 
-			if ( camera.type == "perspective" && camera.perspective ) {
+			var _camera;
 
-				var yfov = camera.perspective.yfov;
-				var aspectRatio = camera.perspective.aspectRatio !== undefined ? camera.perspective.aspectRatio : 1;
+			var params = camera[ camera.type ];
 
-				// According to COLLADA spec...
-				// aspectRatio = xfov / yfov
-				var xfov = yfov * aspectRatio;
+			if ( !params ) {
 
-				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspectRatio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
-				if ( camera.name !== undefined ) _camera.name = camera.name;
-
-				if ( camera.extras ) _camera.userData = camera.extras;
-
-				return _camera;
-
-			} else if ( camera.type == "orthographic" && camera.orthographic ) {
-
-				var _camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, camera.orthographic.znear, camera.orthographic.zfar );
-				if ( camera.name !== undefined ) _camera.name = camera.name;
-
-				if ( camera.extras ) _camera.userData = camera.extras;
-
-				return _camera;
+				console.warn( 'GLTF2Loader: Missing camera parameters.' );
+				return;
 
 			}
+
+			if ( camera.type === 'perspective' ) {
+
+				var aspectRatio = params.aspectRatio || 1;
+				var xfov = params.yfov * aspectRatio;
+
+				_camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspectRatio, params.znear || 1, params.zfar || 2e6 );
+
+			} else if ( camera.type === 'orthographic' ) {
+
+				_camera = new THREE.OrthographicCamera( params.xmag / -2, params.xmag / 2, params.ymag / 2, params.ymag / -2, params.znear, params.zfar );
+
+			}
+
+			if ( camera.name !== undefined ) _camera.name = camera.name;
+			if ( camera.extras ) _camera.userData = camera.extras;
+
+			return _camera;
 
 		} );
 
