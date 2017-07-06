@@ -318,70 +318,80 @@ THREE.OBJLoader.prototype = {
 
 			},
 
-			addFace: function ( a, b, c, d, ua, ub, uc, ud, na, nb, nc, nd ) {
+			addFace: function ( vs, us, ns ) {
 
 				var vLen = this.vertices.length;
+				var ivs = [];
 
-				var ia = this.parseVertexIndex( a, vLen );
-				var ib = this.parseVertexIndex( b, vLen );
-				var ic = this.parseVertexIndex( c, vLen );
-				var id;
+				for ( var j = 0; j < vs.length; j++ ) {
 
-				if ( d === undefined ) {
-
-					this.addVertex( ia, ib, ic );
-
-				} else {
-
-					id = this.parseVertexIndex( d, vLen );
-
-					this.addVertex( ia, ib, id );
-					this.addVertex( ib, ic, id );
+				  ivs.push( this.parseVertexIndex( vs[ j ], vLen ) )
 
 				}
 
-				if ( ua !== undefined ) {
+				if ( vs.length > 3 ) {
+
+					for ( var j = 2; j < ivs.length; j ++ ) {
+
+						this.addVertex( ivs[ 0 ], ivs[ j - 1 ], ivs[ j ] );
+
+					}
+
+				} else {
+
+					this.addVertex( ivs[ 0 ], ivs[ 1 ], ivs[ 2 ] );
+
+				}
+
+				if ( us[ 0 ] !== undefined ) {
 
 					var uvLen = this.uvs.length;
+					var ius = [];
 
-					ia = this.parseUVIndex( ua, uvLen );
-					ib = this.parseUVIndex( ub, uvLen );
-					ic = this.parseUVIndex( uc, uvLen );
+				  for ( var j = 0; j < us.length; j++ ) {
 
-					if ( d === undefined ) {
+				    ius.push( this.parseUVIndex( us[ j ], uvLen ) )
 
-						this.addUV( ia, ib, ic );
+				  }
+
+					if ( us.length > 3 ) {
+
+						for ( var j = 2; j < ius.length; j ++ ) {
+
+							this.addUV( ius[ 0 ], ius[ j - 1 ], ius[ j ] );
+
+						}
 
 					} else {
 
-						id = this.parseUVIndex( ud, uvLen );
-
-						this.addUV( ia, ib, id );
-						this.addUV( ib, ic, id );
+						this.addUV( ius[ 0 ], ius[ 1 ], ius[ 2 ] );
 
 					}
 
 				}
 
-				if ( na !== undefined ) {
+				if ( ns[ 0 ] !== undefined ) {
 
-					// Normals are many times the same. If so, skip function call and parseInt.
 					var nLen = this.normals.length;
-					ia = this.parseNormalIndex( na, nLen );
+					var ins = [];
+					ins.push( this.parseNormalIndex( ns[ 0 ], nLen ) );
+					for ( var j = 1; j < ns.length; j ++ ) {
 
-					ib = na === nb ? ia : this.parseNormalIndex( nb, nLen );
-					ic = na === nc ? ia : this.parseNormalIndex( nc, nLen );
+						ins[ j ] = ns[ j - 1 ] === ns[ j ] ? ins[ j - 1 ] : this.parseNormalIndex( ns[ j ], nLen );
 
-					if ( d === undefined ) {
+					}
 
-						this.addNormal( ia, ib, ic );
+					if ( ns.length > 3 ) {
+
+						for ( var j = 2; j < ins.length; j ++ ) {
+
+							this.addNormal( ins[ 0 ], ins[ j - 1 ], ins[ j ] );
+
+						}
 
 					} else {
 
-						id = this.parseNormalIndex( nd, nLen );
-
-						this.addNormal( ia, ib, id );
-						this.addNormal( ib, ic, id );
+						this.addNormal( ins[ 0 ], ins[ 1 ], ins[ 2 ] );
 
 					}
 
@@ -505,17 +515,35 @@ THREE.OBJLoader.prototype = {
 
 			} else if ( lineFirstChar === "f" ) {
 
+				// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
+				// 0                        1    2    3    4    5    6    7    8    9   10         11         12
+				// ["f 1/1/1 2/2/2 3/3/3", "1", "1", "1", "2", "2", "2", "3", "3", "3", undefined, undefined, undefined]
+
 				if ( ( result = this.regexp.face_vertex_uv_normal.exec( line ) ) !== null ) {
 
-					// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
-					// 0                        1    2    3    4    5    6    7    8    9   10         11         12
-					// ["f 1/1/1 2/2/2 3/3/3", "1", "1", "1", "2", "2", "2", "3", "3", "3", undefined, undefined, undefined]
+					var rawdata = /^f\s+/.exec( line );
+					var data = line.slice( rawdata[ 0 ].length );
+					var vuns = [];
+					var splitData = data.split( ' ' );
 
-					state.addFace(
-						result[ 1 ], result[ 4 ], result[ 7 ], result[ 10 ],
-						result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
-						result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
-					);
+					for ( var j = 0; j < splitData.length; j ++ ) {
+
+						vuns = vuns.concat( splitData[ j ].split( '/' ) );
+
+					}
+
+					var vs = [];
+					var us = [];
+					var ns = [];
+					for ( var j = 0; j < vuns.length / 3; j ++ ) {
+
+						vs.push( vuns[ 3 * j ] );
+						us.push( vuns[ 3 * j + 1 ] );
+						ns.push( vuns[ 3 * j + 2 ] );
+
+					}
+
+					state.addFace( vs, us, ns );
 
 				} else if ( ( result = this.regexp.face_vertex_uv.exec( line ) ) !== null ) {
 
@@ -523,10 +551,27 @@ THREE.OBJLoader.prototype = {
 					// 0                  1    2    3    4    5    6   7          8
 					// ["f 1/1 2/2 3/3", "1", "1", "2", "2", "3", "3", undefined, undefined]
 
-					state.addFace(
-						result[ 1 ], result[ 3 ], result[ 5 ], result[ 7 ],
-						result[ 2 ], result[ 4 ], result[ 6 ], result[ 8 ]
-					);
+					var rawdata = /^f\s+/.exec( line );
+					var data = line.slice( rawdata[ 0 ].length );
+					var vus = [];
+					var splitData = data.split( ' ' );
+
+					for ( var j = 0; j < splitData.length; j ++ ) {
+
+						vus = vus.concat( splitData[ j ].split( '/' ) );
+
+					}
+
+					var vs = [];
+					var us = [];
+					for ( var j = 0; j < vus.length / 2; j ++ ) {
+
+						vs.push( vus[ 2 * j ] );
+						us.push( vus[ 2 * j + 1 ] );
+
+					}
+
+					state.addFace( vs, us, [] );
 
 				} else if ( ( result = this.regexp.face_vertex_normal.exec( line ) ) !== null ) {
 
@@ -534,11 +579,27 @@ THREE.OBJLoader.prototype = {
 					// 0                     1    2    3    4    5    6   7          8
 					// ["f 1//1 2//2 3//3", "1", "1", "2", "2", "3", "3", undefined, undefined]
 
-					state.addFace(
-						result[ 1 ], result[ 3 ], result[ 5 ], result[ 7 ],
-						undefined, undefined, undefined, undefined,
-						result[ 2 ], result[ 4 ], result[ 6 ], result[ 8 ]
-					);
+					var rawdata = /^f\s+/.exec( line );
+					var data = line.slice( rawdata[ 0 ].length );
+					var vns = [];
+					var splitData = data.split( ' ' );
+
+					for ( var j = 0; j < splitData.length; j ++ ) {
+
+						vns = vns.concat( splitData[ j ].split( '/' ) );
+
+					}
+
+					var vs = [];
+					var ns = [];
+					for ( var j = 0; j < vns.length / 3; j ++ ) {
+
+						vs.push( vns[ 2 * j ] );
+						ns.push( vns[ 2 * j + 1 ] );
+
+					}
+
+					state.addFace( vs, [], ns );
 
 				} else if ( ( result = this.regexp.face_vertex.exec( line ) ) !== null ) {
 
@@ -546,13 +607,22 @@ THREE.OBJLoader.prototype = {
 					// 0            1    2    3   4
 					// ["f 1 2 3", "1", "2", "3", undefined]
 
-					state.addFace(
-						result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ]
-					);
+					var rawdata = /^f\s+/.exec( line );
+					var data = line.slice( rawdata[ 0 ].length );
+					var vs = [];
+					var splitData = data.split( ' ' );
+
+					for ( var j = 0; j < splitData.length; j ++ ) {
+
+						vs = vs.concat( splitData[ j ].split( '/' ) );
+
+					}
+
+					state.addFace( vs, [], [] );
 
 				} else {
 
-					throw new Error( "Unexpected face line: '" + line  + "'" );
+					throw new Error( "Unexpected face line: '" + line + "'" );
 
 				}
 
@@ -685,9 +755,9 @@ THREE.OBJLoader.prototype = {
 
 			var createdMaterials = [];
 
-			for ( var mi = 0, miLen = materials.length; mi < miLen ; mi++ ) {
+			for ( var mi = 0, miLen = materials.length; mi < miLen ; mi ++ ) {
 
-				var sourceMaterial = materials[mi];
+				var sourceMaterial = materials[ mi ];
 				var material = undefined;
 
 				if ( this.materials !== null ) {
@@ -714,7 +784,7 @@ THREE.OBJLoader.prototype = {
 
 				material.shading = sourceMaterial.smooth ? THREE.SmoothShading : THREE.FlatShading;
 
-				createdMaterials.push(material);
+				createdMaterials.push( material );
 
 			}
 
@@ -724,9 +794,9 @@ THREE.OBJLoader.prototype = {
 
 			if ( createdMaterials.length > 1 ) {
 
-				for ( var mi = 0, miLen = materials.length; mi < miLen ; mi++ ) {
+				for ( var mi = 0, miLen = materials.length; mi < miLen ; mi ++ ) {
 
-					var sourceMaterial = materials[mi];
+					var sourceMaterial = materials[ mi ];
 					buffergeometry.addGroup( sourceMaterial.groupStart, sourceMaterial.groupCount, mi );
 
 				}
@@ -736,6 +806,7 @@ THREE.OBJLoader.prototype = {
 			} else {
 
 				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] ) : new THREE.LineSegments( buffergeometry, createdMaterials[ 0 ] ) );
+
 			}
 
 			mesh.name = object.name;
