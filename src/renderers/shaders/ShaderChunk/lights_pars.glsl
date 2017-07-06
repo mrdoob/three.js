@@ -263,7 +263,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		#elif defined( ENVMAP_TYPE_EQUIREC )
 
 			vec2 sampleUV;
-			sampleUV.y = saturate( reflectVec.y * 0.5 + 0.5 );
+			sampleUV.y = asin( clamp( reflectVec.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;
 			sampleUV.x = atan( reflectVec.z, reflectVec.x ) * RECIPROCAL_PI2 + 0.5;
 
 			#ifdef TEXTURE_LOD_EXT
