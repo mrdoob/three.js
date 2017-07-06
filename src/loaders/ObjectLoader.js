@@ -765,9 +765,11 @@ Object.assign( ObjectLoader.prototype, {
 
 			if ( data.children !== undefined ) {
 				
-				for( var i=0; i<data.children.length; i++){
+				var children = data.children;
+				
+				for ( var  i = 0; i < children.length; i ++ ) {
 					
-					object.add( this.parseObject( data.children[i], geometries, materials );
+					object.add( this.parseObject( children[ i ], geometries, materials );
 						   
 				}
 
