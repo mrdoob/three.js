@@ -2594,21 +2594,21 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var framebuffer;
+		var framebuffer = null;
 		var isCube = false;
 
 		if ( renderTarget ) {
 
-			var renderTargetProperties = properties.get( renderTarget );
+			var __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
 			if ( renderTarget.isWebGLRenderTargetCube ) {
 
-				framebuffer = renderTargetProperties.__webglFramebuffer[ renderTarget.activeCubeFace ];
+				framebuffer = __webglFramebuffer[ renderTarget.activeCubeFace ];
 				isCube = true;
 
 			} else {
 
-				framebuffer = renderTargetProperties.__webglFramebuffer;
+				framebuffer = __webglFramebuffer;
 
 			}
 
@@ -2617,8 +2617,6 @@ function WebGLRenderer( parameters ) {
 			_currentScissorTest = renderTarget.scissorTest;
 
 		} else {
-
-			framebuffer = null;
 
 			_currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio );
 			_currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio );
