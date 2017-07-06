@@ -20422,10 +20422,9 @@
 			_currentCamera = null,
 			_currentArrayCamera = null,
 
+			_currentViewport = new Vector4(),
 			_currentScissor = new Vector4(),
 			_currentScissorTest = null,
-
-			_currentViewport = new Vector4(),
 
 			//
 
@@ -20438,10 +20437,9 @@
 
 			_pixelRatio = 1,
 
+			_viewport = new Vector4( 0, 0, _width, _height ),
 			_scissor = new Vector4( 0, 0, _width, _height ),
 			_scissorTest = false,
-
-			_viewport = new Vector4( 0, 0, _width, _height ),
 
 			// frustum
 
@@ -21718,8 +21716,8 @@
 							var width = bounds.z * _width;
 							var height = bounds.w * _height;
 
-							state.viewport( _currentViewport.set( x, y, width, height ) );
-							state.scissor( _currentScissor.set( x, y, width, height ) );
+							state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
+							state.scissor( _currentScissor.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
 							state.setScissorTest( true );
 
 							renderObject( object, scene, camera2, geometry, material, group );
@@ -21727,6 +21725,10 @@
 						}
 
 					}
+
+					state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
+					state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
+					state.setScissorTest( _currentScissorTest );
 
 				} else {
 
@@ -22892,36 +22894,33 @@
 
 			}
 
-			var isCube = ( renderTarget && renderTarget.isWebGLRenderTargetCube );
-			var framebuffer;
+			var framebuffer = null;
+			var isCube = false;
 
 			if ( renderTarget ) {
 
-				var renderTargetProperties = properties.get( renderTarget );
+				var __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
-				if ( isCube ) {
+				if ( renderTarget.isWebGLRenderTargetCube ) {
 
-					framebuffer = renderTargetProperties.__webglFramebuffer[ renderTarget.activeCubeFace ];
+					framebuffer = __webglFramebuffer[ renderTarget.activeCubeFace ];
+					isCube = true;
 
 				} else {
 
-					framebuffer = renderTargetProperties.__webglFramebuffer;
+					framebuffer = __webglFramebuffer;
 
 				}
 
+				_currentViewport.copy( renderTarget.viewport );
 				_currentScissor.copy( renderTarget.scissor );
 				_currentScissorTest = renderTarget.scissorTest;
 
-				_currentViewport.copy( renderTarget.viewport );
-
 			} else {
 
-				framebuffer = null;
-
+				_currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio );
 				_currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio );
 				_currentScissorTest = _scissorTest;
-
-				_currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio );
 
 			}
 
@@ -22932,10 +22931,9 @@
 
 			}
 
+			state.viewport( _currentViewport );
 			state.scissor( _currentScissor );
 			state.setScissorTest( _currentScissorTest );
-
-			state.viewport( _currentViewport );
 
 			if ( isCube ) {
 
