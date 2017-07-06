@@ -21726,10 +21726,6 @@
 
 					}
 
-					state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
-					state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
-					state.setScissorTest( _currentScissorTest );
-
 				} else {
 
 					_currentArrayCamera = null;
