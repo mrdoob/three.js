@@ -110,6 +110,7 @@ var files = {
 		"webgl_loader_nrrd",
 		"webgl_loader_pcd",
 		"webgl_loader_pdb",
+		"webgl_loader_playcanvas",
 		"webgl_loader_ply",
 		"webgl_loader_prwm",
 		"webgl_loader_ttf",
