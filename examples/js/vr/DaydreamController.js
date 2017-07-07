@@ -8,6 +8,7 @@ THREE.DaydreamController = function () {
 
 	var scope = this;
 	var gamepad;
+	var exists = typeof navigator.getGamepads == 'function';
 
 	var axes = [ 0, 0 ];
 	var touchpadIsPressed = false;
@@ -19,15 +20,19 @@ THREE.DaydreamController = function () {
 
 		// iterate across gamepads as the Daydream Controller may not be in position 0
 
-		var gamepads = navigator.getGamepads();
+		if ( exists ) {
 
-		for ( var i = 0; i < 4; i ++ ) {
+			var gamepads = navigator.getGamepads();
 
-			var gamepad = gamepads[ i ];
+			for ( var i = 0; i < 4; i ++ ) {
 
-			if ( gamepad && ( gamepad.id === 'Daydream Controller' ) ) {
+				var gamepad = gamepads[ i ];
 
-				return gamepad;
+				if ( gamepad && ( gamepad.id === 'Daydream Controller' ) ) {
+
+					return gamepad;
+
+				}
 
 			}
 
