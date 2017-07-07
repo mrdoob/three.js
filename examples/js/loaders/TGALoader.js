@@ -103,7 +103,8 @@ THREE.TGALoader.prototype = {
 
 		}
 
-		// Parse tga image buffer
+		// parse tga image buffer
+
 		function tgaParse( use_rle, use_pal, header, offset, data ) {
 
 			var pixel_data,
