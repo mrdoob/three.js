@@ -8,7 +8,7 @@ THREE.DaydreamController = function () {
 
 	var scope = this;
 	var gamepad;
-	var exists = typeof navigator.getGamepads == 'function';
+	var exists = 'getGamepads' in navigator;
 
 	var axes = [ 0, 0 ];
 	var touchpadIsPressed = false;
