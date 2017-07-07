@@ -76,7 +76,7 @@ THREE.PDBLoader.prototype = {
 
 		function buildGeometry() {
 
-			var result = {
+			var build = {
 				geometryAtoms: new THREE.BufferGeometry(),
 				geometryBonds: new THREE.BufferGeometry(),
 				json: {
@@ -85,8 +85,8 @@ THREE.PDBLoader.prototype = {
 				}
 			};
 
-			var geometryAtoms = result.geometryAtoms;
-			var geometryBonds = result.geometryBonds;
+			var geometryAtoms = build.geometryAtoms;
+			var geometryBonds = build.geometryBonds;
 
 			var i, l;
 
@@ -140,7 +140,7 @@ THREE.PDBLoader.prototype = {
 
 			geometryBonds.addAttribute( 'position', new THREE.Float32BufferAttribute( verticesBonds, 3 ) );
 
-			return result;
+			return build;
 
 		}
 

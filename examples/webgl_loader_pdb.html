@@ -196,11 +196,11 @@
 
 				}
 
-				loader.load( url, function ( result ) {
+				loader.load( url, function ( pdb ) {
 
-					var geometryAtoms = result.geometryAtoms;
-					var geometryBonds = result.geometryBonds;
-					var json = result.json;
+					var geometryAtoms = pdb.geometryAtoms;
+					var geometryBonds = pdb.geometryBonds;
+					var json = pdb.json;
 
 					var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 					var sphereGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
