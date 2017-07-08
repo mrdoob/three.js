@@ -20,8 +20,6 @@
 
 		<script>
 
-			var hasChanged = true;
-
 			var camera, scene, renderer;
 
 			var params = {
@@ -37,7 +35,7 @@
 			];
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -54,7 +52,7 @@
 				camera.position.set( - 20, 30, 40 );
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', function () { hasChanged = true; } ); // use only if there is no animation loop
+				controls.addEventListener( 'change', render ); // use only if there is no animation loop
 				controls.minDistance = 10;
 				controls.maxDistance = 100;
 				controls.enablePan = false;
@@ -111,7 +109,7 @@
 
 					}
 
-					hasChanged = true;
+					render();
 
 				} );
 
@@ -123,7 +121,7 @@
 
 					}
 
-					hasChanged = true;
+					render();
 
 				} );
 
@@ -131,7 +129,7 @@
 
 					helpers.visible = value;
 
-					hasChanged = true;
+					render();
 
 				} );
 
@@ -148,20 +146,13 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				hasChanged = true;
+				render();
 
 			}
 
-			function animate() {
+			function render() {
 
-				requestAnimationFrame( animate );
-
-				if ( hasChanged ) {
-
-					renderer.render( scene, camera );
-					hasChanged = false;
-
-				}
+				renderer.render( scene, camera );
 
 			}
 
