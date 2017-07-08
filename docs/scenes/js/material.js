@@ -337,6 +337,7 @@ function guiMeshBasicMaterial ( gui, mesh, material, geometry ) {
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
 	folder.add( data, 'specularMap', textureMapKeys ).onChange( updateTexture( material, 'specularMap', textureMaps ) );
+	folder.add( material, 'specularStrength', 0, 1 );
 	folder.add( data, 'alphaMap', textureMapKeys ).onChange( updateTexture( material, 'alphaMap', textureMaps ) );
 	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );
 	folder.add( material, 'combine', constants.combine ).onChange( updateMorphs( mesh, material ) );
@@ -409,6 +410,7 @@ function guiMeshLambertMaterial ( gui, mesh, material, geometry ) {
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
 	folder.add( data, 'specularMap', textureMapKeys ).onChange( updateTexture( material, 'specularMap', textureMaps ) );
+	folder.add( material, 'specularStrength', 0, 1 );
 	folder.add( data, 'alphaMap', textureMapKeys ).onChange( updateTexture( material, 'alphaMap', textureMaps ) );
 	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );
 	folder.add( material, 'combine', constants.combine ).onChange( updateMorphs( mesh, material ) );
@@ -447,6 +449,7 @@ function guiMeshPhongMaterial ( gui, mesh, material, geometry ) {
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
 	folder.add( data, 'lightMap', textureMapKeys ).onChange( updateTexture( material, 'lightMap', textureMaps ) );
 	folder.add( data, 'specularMap', textureMapKeys ).onChange( updateTexture( material, 'specularMap', textureMaps ) );
+	folder.add( material, 'specularStrength', 0, 1 );
 	folder.add( data, 'alphaMap', textureMapKeys ).onChange( updateTexture( material, 'alphaMap', textureMaps ) );
 
 }

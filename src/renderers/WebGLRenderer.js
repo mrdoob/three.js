@@ -1938,6 +1938,8 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.map.value = material.map;
 		uniforms.specularMap.value = material.specularMap;
+		uniforms.uSpecularStrength.value = Math.max( Math.min( material.specularStrength , 1. ) , .0 ); //make it work with everything that has specularMap
+
 		uniforms.alphaMap.value = material.alphaMap;
 
 		if ( material.lightMap ) {

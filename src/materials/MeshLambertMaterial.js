@@ -61,6 +61,7 @@ function MeshLambertMaterial( parameters ) {
 	this.emissiveMap = null;
 
 	this.specularMap = null;
+	this.specularStrength = 1;
 
 	this.alphaMap = null;
 
@@ -106,6 +107,7 @@ MeshLambertMaterial.prototype.copy = function ( source ) {
 	this.emissiveIntensity = source.emissiveIntensity;
 
 	this.specularMap = source.specularMap;
+	this.specularStrength = source.specularStrength;
 
 	this.alphaMap = source.alphaMap;
 

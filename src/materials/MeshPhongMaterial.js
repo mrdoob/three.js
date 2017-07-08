@@ -36,6 +36,7 @@ import { Color } from '../math/Color';
  *  displacementBias: <float>,
  *
  *  specularMap: new THREE.Texture( <Image> ),
+ *  specularStrength: <float>, 
  *
  *  alphaMap: new THREE.Texture( <Image> ),
  *
@@ -86,6 +87,7 @@ function MeshPhongMaterial( parameters ) {
 	this.displacementBias = 0;
 
 	this.specularMap = null;
+	this.specularStrength = 1; //modulate map/spec
 
 	this.alphaMap = null;
 
@@ -143,6 +145,7 @@ MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.displacementBias = source.displacementBias;
 
 	this.specularMap = source.specularMap;
+	this.specularStrength = source.specularStrength;
 
 	this.alphaMap = source.alphaMap;
 
