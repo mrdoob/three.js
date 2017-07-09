@@ -22,13 +22,6 @@ var constants = {
 
 	},
 
-	shading : {
-
-		"THREE.FlatShading" : THREE.FlatShading,
-		"THREE.SmoothShading" : THREE.SmoothShading
-
-	},
-
 	colors : {
 
 		"THREE.NoColors" : THREE.NoColors,

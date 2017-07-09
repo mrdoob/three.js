@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
+import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
 import { WebGLProgram } from './WebGLProgram';
 
 function WebGLPrograms( renderer, capabilities ) {
@@ -162,7 +162,7 @@ function WebGLPrograms( renderer, capabilities ) {
 			useFog: material.fog,
 			fogExp: ( fog && fog.isFogExp2 ),
 
-			flatShading: material.shading === FlatShading,
+			flatShading: material.flatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,

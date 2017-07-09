@@ -26,7 +26,6 @@ import { Color } from '../math/Color';
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  shading: THREE.SmoothShading,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
