@@ -66,8 +66,8 @@
 
 					if ( child instanceof THREE.Mesh ) {
 
-						child.geometry.computeFaceNormals();
-						child.material.shading = THREE.FlatShading;
+						// model does not have normals
+						child.material.flatShading = true;
 
 					}
 

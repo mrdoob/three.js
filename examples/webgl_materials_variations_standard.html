@@ -101,7 +101,7 @@
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					var shininess = 50, specular = 0x333333, bumpScale = 1, shading = THREE.SmoothShading;
+					var shininess = 50, specular = 0x333333, bumpScale = 1;
 
 					var materials = [];
 
@@ -130,7 +130,6 @@
 									color: diffuseColor,
 									metalness: beta,
 									roughness: 1.0 - alpha,
-									shading: THREE.SmoothShading,
 									envMap: index % 2 === 0 ? null : hdrCubeRenderTarget.texture						
 								} );
 

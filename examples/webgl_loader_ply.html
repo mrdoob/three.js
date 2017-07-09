@@ -94,7 +94,7 @@
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, shading: THREE.FlatShading } );
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.2;
@@ -113,7 +113,7 @@
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, shading: THREE.FlatShading } );
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = - 0.2;
