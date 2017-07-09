@@ -106,7 +106,7 @@
 
 					this.controls = null;
 
-					this.smoothShading = true;
+					this.flatShading = false;
 					this.doubleSide = false;
 
 					this.cube = null;
@@ -245,14 +245,14 @@
 					this.renderer.render( this.scene, this.camera );
 				};
 
-				OBJLoader2Example.prototype.alterSmoothShading = function () {
+				OBJLoader2Example.prototype.alterShading = function () {
 
 					var scope = this;
-					scope.smoothShading = ! scope.smoothShading;
-					console.log( scope.smoothShading ? 'Enabling SmoothShading' : 'Enabling FlatShading');
+					scope.flatShading = ! scope.flatShading;
+					console.log( scope.flatShading ? 'Enabling flat shading' : 'Enabling smooth shading');
 
 					scope.traversalFunction = function ( material ) {
-						material.shading = scope.smoothShading ? THREE.SmoothShading : THREE.FlatShading;
+						material.flatShading = scope.flatShading;
 						material.needsUpdate = true;
 					};
 					var scopeTraverse = function ( object3d ) {
@@ -304,7 +304,7 @@
 
 			// Init dat.gui and controls
 			var OBJLoader2Control = function() {
-				this.smoothShading = app.smoothShading;
+				this.flatShading = app.flatShading;
 				this.doubleSide = app.doubleSide;
 			};
 			var objLoader2Control = new OBJLoader2Control();
@@ -317,10 +317,10 @@
 			var menuDiv = document.getElementById( 'dat' );
 			menuDiv.appendChild(gui.domElement);
 			var folderQueue = gui.addFolder( 'OBJLoader2 Options' );
-			var controlSmooth = folderQueue.add( objLoader2Control, 'smoothShading' ).name( 'Smooth Shading' );
+			var controlSmooth = folderQueue.add( objLoader2Control, 'flatShading' ).name( 'Flat Shading' );
 			controlSmooth.onChange( function( value ) {
-				console.log( 'Setting smoothShading to: ' + value );
-				app.alterSmoothShading();
+				console.log( 'Setting flatShading to: ' + value );
+				app.alterShading();
 			});
 
 			var controlDouble = folderQueue.add( objLoader2Control, 'doubleSide' ).name( 'Double Side Materials' );

@@ -103,7 +103,7 @@
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
-				parameters = { color: 0xff1100, envMap: textureCube, shading: THREE.FlatShading };
+				parameters = { color: 0xff1100, envMap: textureCube };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
 
 				singleMaterial = false;

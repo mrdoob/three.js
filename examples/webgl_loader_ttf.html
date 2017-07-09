@@ -100,7 +100,7 @@
 				pointLight.color.setHSL( Math.random(), 1, 0.5 );
 				scene.add( pointLight );
 
-				material = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
+				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				group = new THREE.Group();
 				group.position.y = 100;

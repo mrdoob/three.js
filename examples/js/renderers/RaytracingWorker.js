@@ -267,7 +267,7 @@ THREE.RaytracingRendererWorker = function () {
 						// the same normal can be reused for all lights
 						// (should be possible to cache even more)
 
-						computePixelNormal( normalVector, localPoint, material.shading, face, vertices );
+						computePixelNormal( normalVector, localPoint, material.flatShading, face, vertices );
 						normalVector.applyMatrix3( _object.normalMatrix ).normalize();
 
 						normalComputed = true;
@@ -397,16 +397,16 @@ THREE.RaytracingRendererWorker = function () {
 		var tmpVec2 = new THREE.Vector3();
 		var tmpVec3 = new THREE.Vector3();
 
-		return function computePixelNormal( outputVector, point, shading, face, vertices ) {
+		return function computePixelNormal( outputVector, point, flatShading, face, vertices ) {
 
 			var faceNormal = face.normal;
 			var vertexNormals = face.vertexNormals;
 
-			if ( shading === THREE.FlatShading ) {
+			if ( flatShading === true ) {
 
 				outputVector.copy( faceNormal );
 
-			} else if ( shading === THREE.SmoothShading ) {
+			} else {
 
 				// compute barycentric coordinates
 

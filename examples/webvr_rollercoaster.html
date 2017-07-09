@@ -165,7 +165,8 @@
 
 			var geometry = new THREE.CylinderBufferGeometry( 10, 10, 5, 15 );
 			var material = new THREE.MeshLambertMaterial( {
-				color: 0xff8080, shading: THREE.FlatShading
+				color: 0xff8080,
+				//flatShading: true // Lambert does not support flat shading
 			} );
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - 80, 10, - 70 );
@@ -176,7 +177,8 @@
 
 			var geometry = new THREE.CylinderBufferGeometry( 5, 6, 4, 10 );
 			var material = new THREE.MeshLambertMaterial( {
-				color: 0x8080ff, shading: THREE.FlatShading
+				color: 0x8080ff,
+				//flatShading: true // Lambert does not support flat shading
 			} );
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( 50, 2, 30 );
