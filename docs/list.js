@@ -168,6 +168,7 @@ var list = {
 			"SphereGeometry": "api/geometries/SphereGeometry",
 			"TetrahedronBufferGeometry": "api/geometries/TetrahedronBufferGeometry",
 			"TetrahedronGeometry": "api/geometries/TetrahedronGeometry",
+			"TextBufferGeometry": "api/geometries/TextBufferGeometry",
 			"TextGeometry": "api/geometries/TextGeometry",
 			"TorusBufferGeometry": "api/geometries/TorusBufferGeometry",
 			"TorusGeometry": "api/geometries/TorusGeometry",
