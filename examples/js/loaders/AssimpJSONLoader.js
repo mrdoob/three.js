@@ -158,9 +158,7 @@ THREE.AssimpJSONLoader.prototype = {
 		var scope = this;
 		var i, prop, has_textures = [],
 
-		init_props = {
-			shading : THREE.SmoothShading
-		};
+		init_props = {};
 
 		function toColor( value_arr ) {
 
@@ -261,7 +259,7 @@ THREE.AssimpJSONLoader.prototype = {
 				// aiShadingMode_Flat
 				if ( prop.value === 1 ) {
 
-					init_props.shading = THREE.FlatShading;
+					init_props.flatShading = true;
 
 				}
 
