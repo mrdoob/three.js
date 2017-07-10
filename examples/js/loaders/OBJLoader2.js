@@ -846,7 +846,7 @@ THREE.OBJLoader2 = (function () {
 	 * @param {string} objectName Name of the mesh
 	 * @param {string} groupName Name of the group
 	 * @param {string} materialName Name of the material
-	 * @param {number} smoothingGroup Normalized smoothingGroup (0: THREE.FlatShading, 1: THREE.SmoothShading)
+	 * @param {number} smoothingGroup Normalized smoothingGroup (0: flat shading, 1: smooth shading)
 	 */
 	var RawObjectDescription = (function () {
 
@@ -1013,7 +1013,7 @@ THREE.OBJLoader2 = (function () {
 
 						materialClone = material.clone();
 						materialClone.name = materialName;
-						materialClone.shading = THREE.FlatShading;
+						materialClone.flatShading = true;
 						this.materials[ materialName ] = name;
 
 					}

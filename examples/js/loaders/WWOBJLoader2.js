@@ -435,7 +435,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 
 							materialClone = material.clone();
 							materialClone.name = materialName;
-							materialClone.shading = THREE.FlatShading;
+							materialClone.flatShading = true;
 							this.materials[ materialName ] = name;
 
 						}

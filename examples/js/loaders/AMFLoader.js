@@ -167,7 +167,7 @@ THREE.AMFLoader.prototype = {
 			}
 
 			loadedMaterial = new THREE.MeshPhongMaterial( {
-				shading: THREE.FlatShading,
+				flatShading: true,
 				color: new THREE.Color( color.r, color.g, color.b ),
 				name: matName
 			} );
@@ -412,7 +412,7 @@ THREE.AMFLoader.prototype = {
 		}
 
 		var sceneObject = new THREE.Group();
-		var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xaaaaff, shading: THREE.FlatShading } );
+		var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
 
 		sceneObject.name = amfName;
 		sceneObject.userData.author = amfAuthor;

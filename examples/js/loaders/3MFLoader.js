@@ -479,7 +479,7 @@ THREE.ThreeMFLoader.prototype = {
 			geometry.computeBoundingSphere();
 
 			var materialOpts = {
-				shading: THREE.FlatShading
+				flatShading: true
 			};
 
 			if ( meshData[ 'colors' ] && 0 < meshData[ 'colors' ].length ) {
