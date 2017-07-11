@@ -2153,11 +2153,12 @@ THREE.GLTF2Loader = ( function () {
 				for ( var name in primitives ) {
 
 					var primitive = primitives[ name ];
-					var meshNode;
 
 					var material = primitive.material !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
 
 					var geometry;
+
+					var meshNode;
 
 					if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) {
 
@@ -2391,13 +2392,6 @@ THREE.GLTF2Loader = ( function () {
 
 					}
 
-					meshNode.name = ( name === "0" ? group.name : group.name + name );
-
-					if ( primitive.extras ) meshNode.userData = primitive.extras;
-
-					group.add( meshNode );
-
-					meshNode.castShadow = true;
 					meshNode.name = ( name === "0" ? group.name : group.name + name );
 
 					if ( primitive.extras ) meshNode.userData = primitive.extras;
