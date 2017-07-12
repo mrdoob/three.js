@@ -641,6 +641,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		}
 
 		currentBlending = blending;
+		
 	}
 
 	function setMaterial( material ) {
