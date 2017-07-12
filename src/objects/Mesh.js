@@ -147,17 +147,50 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
+		function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point, faceIndex ) {
 
 			var intersect;
+			var faceMaterial;
+			
+			if ( material.length && faceIndex ) {
+				
+				let groups = object.geometry.groups;
+				
+				if ( groups ) {
+					
+					for ( let i = 0; i < groups.length; i++ ) {
+						
+						let group = groups[ i ];
+						
+						if ( faceIndex >= group.start && faceIndex <= group.start + group.count ) {
+							
+							faceMaterial = object.materials[ i ];
+							
+							break;
+							
+						}
+						
+					}
+					
+				} else {
+					
+					faceMaterial = material;
+					
+				}
+				
+			} else {
+				
+				faceMaterial = material;
+				
+			}
 
-			if ( material.side === BackSide ) {
+			if ( faceMaterial.side === BackSide ) {
 
 				intersect = ray.intersectTriangle( pC, pB, pA, true, point );
 
 			} else {
 
-				intersect = ray.intersectTriangle( pA, pB, pC, material.side !== DoubleSide, point );
+				intersect = ray.intersectTriangle( pA, pB, pC, faceMaterial.side !== DoubleSide, point );
 
 			}
 
@@ -178,13 +211,13 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		function checkBufferGeometryIntersection( object, raycaster, ray, position, uv, a, b, c ) {
+		function checkBufferGeometryIntersection( object, raycaster, ray, position, uv, a, b, c, faceIndex ) {
 
 			vA.fromBufferAttribute( position, a );
 			vB.fromBufferAttribute( position, b );
 			vC.fromBufferAttribute( position, c );
 
-			var intersection = checkIntersection( object, object.material, raycaster, ray, vA, vB, vC, intersectionPoint );
+			var intersection = checkIntersection( object, object.material, raycaster, ray, vA, vB, vC, intersectionPoint, faceIndex );
 
 			if ( intersection ) {
 
@@ -257,7 +290,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 						b = index.getX( i + 1 );
 						c = index.getX( i + 2 );
 
-						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c, i );
 
 						if ( intersection ) {
 
