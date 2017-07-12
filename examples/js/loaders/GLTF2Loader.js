@@ -549,6 +549,8 @@ THREE.GLTF2Loader = ( function () {
 
 	/**
 	 * DRACO Mesh Compression Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/pull/874
 	 */
 	function GLTFDracoMeshCompressionExtension () {
 
@@ -2140,116 +2142,237 @@ THREE.GLTF2Loader = ( function () {
 
 	};
 
+	GLTFParser.prototype.loadGeometries = function ( primitives ) {
+
+		var extensions = this.extensions;
+
+		return this._withDependencies( [
+
+			'accessors',
+			'bufferViews',
+
+		] ).then( function ( dependencies ) {
+
+			return _each( primitives, function ( primitive ) {
+
+				if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) {
+
+					var dracoExtension = extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ];
+
+					return new Promise( function ( resolve ) {
+
+						dracoExtension.decodePrimitive( primitive, dependencies, resolve );
+
+					} );
+
+				}
+
+				geometry = new THREE.BufferGeometry();
+
+				var attributes = primitive.attributes;
+
+				for ( var attributeId in attributes ) {
+
+					var attributeEntry = attributes[ attributeId ];
+
+					if ( attributeEntry === undefined ) return;
+
+					var bufferAttribute = dependencies.accessors[ attributeEntry ];
+
+					switch ( attributeId ) {
+
+						case 'POSITION':
+
+							geometry.addAttribute( 'position', bufferAttribute );
+							break;
+
+						case 'NORMAL':
+
+							geometry.addAttribute( 'normal', bufferAttribute );
+							break;
+
+						case 'TEXCOORD_0':
+						case 'TEXCOORD0':
+						case 'TEXCOORD':
+
+							geometry.addAttribute( 'uv', bufferAttribute );
+							break;
+
+						case 'TEXCOORD_1':
+
+							geometry.addAttribute( 'uv2', bufferAttribute );
+							break;
+
+						case 'COLOR_0':
+						case 'COLOR0':
+						case 'COLOR':
+
+							geometry.addAttribute( 'color', bufferAttribute );
+							break;
+
+						case 'WEIGHTS_0':
+						case 'WEIGHT': // WEIGHT semantic deprecated.
+
+							geometry.addAttribute( 'skinWeight', bufferAttribute );
+							break;
+
+						case 'JOINTS_0':
+						case 'JOINT': // JOINT semantic deprecated.
+
+							geometry.addAttribute( 'skinIndex', bufferAttribute );
+							break;
+
+					}
+
+				}
+
+				if ( primitive.indices !== undefined ) {
+
+					geometry.setIndex( dependencies.accessors[ primitive.indices ] );
+
+				}
+
+				return geometry;
+
+			} );
+
+		} );
+
+	};
+
+	GLTFParser.prototype.loadMorphTargets = function ( meshNode, primitive, dependencies ) {
+
+		var geometry = meshNode.geometry;
+		var material = meshNode.material;
+
+		var targets = primitive.targets;
+		var morphAttributes = geometry.morphAttributes;
+
+		morphAttributes.position = [];
+		morphAttributes.normal = [];
+
+		material.morphTargets = true;
+
+		for ( var i = 0, il = targets.length; i < il; i ++ ) {
+
+			var target = targets[ i ];
+			var attributeName = 'morphTarget' + i;
+
+			var positionAttribute, normalAttribute;
+
+			if ( target.POSITION !== undefined ) {
+
+				// Three.js morph formula is
+				//   position
+				//     + weight0 * ( morphTarget0 - position )
+				//     + weight1 * ( morphTarget1 - position )
+				//     ...
+				// while the glTF one is
+				//   position
+				//     + weight0 * morphTarget0
+				//     + weight1 * morphTarget1
+				//     ...
+				// then adding position to morphTarget.
+				// So morphTarget value will depend on mesh's position, then cloning attribute
+				// for the case if attribute is shared among two or more meshes.
+
+				positionAttribute = dependencies.accessors[ target.POSITION ].clone();
+				var position = geometry.attributes.position;
+
+				for ( var j = 0, jl = positionAttribute.array.length; j < jl; j ++ ) {
+
+					positionAttribute.array[ j ] += position.array[ j ];
+
+				}
+
+			} else {
+
+				// Copying the original position not to affect the final position.
+				// See the formula above.
+				positionAttribute = geometry.attributes.position.clone();
+
+			}
+
+			if ( target.NORMAL !== undefined ) {
+
+				material.morphNormals = true;
+
+				// see target.POSITION's comment
+
+				normalAttribute = dependencies.accessors[ target.NORMAL ].clone();
+				var normal = geometry.attributes.normal;
+
+				for ( var j = 0, jl = normalAttribute.array.length; j < jl; j ++ ) {
+
+					normalAttribute.array[ j ] += normal.array[ j ];
+
+				}
+
+			} else {
+
+				normalAttribute = geometry.attributes.normal.clone();
+
+			}
+
+			// TODO: implement
+			if ( target.TANGENT !== undefined ) {
+
+			}
+
+			positionAttribute.name = attributeName;
+			normalAttribute.name = attributeName;
+
+			morphAttributes.position.push( positionAttribute );
+			morphAttributes.normal.push( normalAttribute );
+
+		}
+
+		meshNode.updateMorphTargets();
+
+		if ( mesh.weights !== undefined ) {
+
+			for ( var i = 0, il = mesh.weights.length; i < il; i ++ ) {
+
+				meshNode.morphTargetInfluences[ i ] = mesh.weights[ i ];
+
+			}
+
+		}
+
+
+	};
+
 	GLTFParser.prototype.loadMeshes = function () {
 
+		var scope = this;
 		var json = this.json;
 		var extensions = this.extensions;
 
 		return this._withDependencies( [
 
-			"accessors",
-			"bufferViews",
-			"materials"
+			'materials'
 
 		] ).then( function ( dependencies ) {
 
 			return _each( json.meshes, function ( mesh ) {
 
 				var group = new THREE.Group();
-				if ( mesh.name !== undefined ) group.name = mesh.name;
 
+				if ( mesh.name !== undefined ) group.name = mesh.name;
 				if ( mesh.extras ) group.userData = mesh.extras;
 
 				var primitives = mesh.primitives || [];
 
-				for ( var name in primitives ) {
+				return scope.loadGeometries( primitives ).then( function ( geometries ) {
 
-					var primitive = primitives[ name ];
+					for ( var name in primitives ) {
 
-					var material = primitive.material !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
+						var primitive = primitives[ name ];
+						var geometry = geometries[ name ];
 
-					var geometry;
-
-					var meshNode;
-
-					if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) {
-
-						var dracoExtension = extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ];
-
-						dracoExtension.decodePrimitive( primitive, dependencies, function ( _geometry ) {
-
-							geometry = _geometry;
-							meshNode = new THREE.Mesh( geometry, material );
-							meshNode.castShadow = true;
-
-						} );
-
-					} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
-
-						geometry = new THREE.BufferGeometry();
-
-						var attributes = primitive.attributes;
-
-						for ( var attributeId in attributes ) {
-
-							var attributeEntry = attributes[ attributeId ];
-
-							if ( attributeEntry === undefined ) return;
-
-							var bufferAttribute = dependencies.accessors[ attributeEntry ];
-
-							switch ( attributeId ) {
-
-								case 'POSITION':
-
-									geometry.addAttribute( 'position', bufferAttribute );
-									break;
-
-								case 'NORMAL':
-
-									geometry.addAttribute( 'normal', bufferAttribute );
-									break;
-
-								case 'TEXCOORD_0':
-								case 'TEXCOORD0':
-								case 'TEXCOORD':
-
-									geometry.addAttribute( 'uv', bufferAttribute );
-									break;
-
-								case 'TEXCOORD_1':
-
-									geometry.addAttribute( 'uv2', bufferAttribute );
-									break;
-
-								case 'COLOR_0':
-								case 'COLOR0':
-								case 'COLOR':
-
-									geometry.addAttribute( 'color', bufferAttribute );
-									break;
-
-								case 'WEIGHTS_0':
-								case 'WEIGHT': // WEIGHT semantic deprecated.
-
-									geometry.addAttribute( 'skinWeight', bufferAttribute );
-									break;
-
-								case 'JOINTS_0':
-								case 'JOINT': // JOINT semantic deprecated.
-
-									geometry.addAttribute( 'skinIndex', bufferAttribute );
-									break;
-
-							}
-
-						}
-
-						if ( primitive.indices !== undefined ) {
-
-							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
-
-						}
+						var material = primitive.material === undefined
+							? createDefaultMaterial()
+							: dependencies.materials[ primitive.material ];
 
 						if ( material.aoMap
 								&& geometry.attributes.uv2 === undefined
@@ -2260,167 +2383,46 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						meshNode = new THREE.Mesh( geometry, material );
-						meshNode.castShadow = true;
+						if ( geometry.attributes.color !== undefined ) {
+
+							material.vertexColors = THREE.VertexColors;
+							material.needsUpdate = true;
+
+						}
+
+						var mesh;
+
+						if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
+
+							mesh = new THREE.Mesh( geometry, material );
+
+						} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
+
+							mesh = new THREE.LineSegments( geometry, material );
+
+						} else {
+
+							throw new Error( 'GLTF2Loader: Only TRIANGLE and LINE primitives are supported.' );
+
+						}
+
+						mesh.name = name === '0' ? group.name : group.name + name;
 
 						if ( primitive.targets !== undefined ) {
 
-							var targets = primitive.targets;
-							var morphAttributes = geometry.morphAttributes;
-
-							morphAttributes.position = [];
-							morphAttributes.normal = [];
-
-							material.morphTargets = true;
-
-							for ( var i = 0, il = targets.length; i < il; i ++ ) {
-
-								var target = targets[ i ];
-								var attributeName = 'morphTarget' + i;
-
-								var positionAttribute, normalAttribute;
-
-								if ( target.POSITION !== undefined ) {
-
-									// Three.js morph formula is
-									//   position
-									//     + weight0 * ( morphTarget0 - position )
-									//     + weight1 * ( morphTarget1 - position )
-									//     ...
-									// while the glTF one is
-									//   position
-									//     + weight0 * morphTarget0
-									//     + weight1 * morphTarget1
-									//     ...
-									// then adding position to morphTarget.
-									// So morphTarget value will depend on mesh's position, then cloning attribute
-									// for the case if attribute is shared among two or more meshes.
-
-									positionAttribute = dependencies.accessors[ target.POSITION ].clone();
-									var position = geometry.attributes.position;
-
-									for ( var j = 0, jl = positionAttribute.array.length; j < jl; j ++ ) {
-
-										positionAttribute.array[ j ] += position.array[ j ];
-
-									}
-
-								} else {
-
-									// Copying the original position not to affect the final position.
-									// See the formula above.
-									positionAttribute = geometry.attributes.position.clone();
-
-								}
-
-								if ( target.NORMAL !== undefined ) {
-
-									material.morphNormals = true;
-
-									// see target.POSITION's comment
-
-									normalAttribute = dependencies.accessors[ target.NORMAL ].clone();
-									var normal = geometry.attributes.normal;
-
-									for ( var j = 0, jl = normalAttribute.array.length; j < jl; j ++ ) {
-
-										normalAttribute.array[ j ] += normal.array[ j ];
-
-									}
-
-								} else {
-
-									normalAttribute = geometry.attributes.normal.clone();
-
-								}
-
-								// TODO: implement
-								if ( target.TANGENT !== undefined ) {
-
-								}
-
-								positionAttribute.name = attributeName;
-								normalAttribute.name = attributeName;
-
-								morphAttributes.position.push( positionAttribute );
-								morphAttributes.normal.push( normalAttribute );
-
-							}
-
-							meshNode.updateMorphTargets();
-
-							if ( mesh.weights !== undefined ) {
-
-								for ( var i = 0, il = mesh.weights.length; i < il; i ++ ) {
-
-									meshNode.morphTargetInfluences[ i ] = mesh.weights[ i ];
-
-								}
-
-							}
+							scope.loadMorphTargets( mesh, primitive, dependencies );
 
 						}
 
-					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
+						if ( primitive.extras ) mesh.userData = primitive.extras;
 
-						geometry = new THREE.BufferGeometry();
-
-						var attributes = primitive.attributes;
-
-						for ( var attributeId in attributes ) {
-
-							var attributeEntry = attributes[ attributeId ];
-
-							if ( ! attributeEntry ) return;
-
-							var bufferAttribute = dependencies.accessors[ attributeEntry ];
-
-							switch ( attributeId ) {
-
-								case 'POSITION':
-									geometry.addAttribute( 'position', bufferAttribute );
-									break;
-
-								case 'COLOR_0':
-								case 'COLOR0':
-								case 'COLOR':
-									geometry.addAttribute( 'color', bufferAttribute );
-									break;
-
-							}
-
-						}
-
-						if ( primitive.indices !== undefined ) {
-
-							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
-
-						}
-
-						meshNode = new THREE.LineSegments( geometry, material );
-
-					} else {
-
-						throw new Error( 'Only triangular and line primitives are supported' );
+						group.add( mesh );
 
 					}
 
-					if ( geometry.attributes.color !== undefined ) {
+					return group;
 
-						material.vertexColors = THREE.VertexColors;
-						material.needsUpdate = true;
-
-					}
-
-					meshNode.name = ( name === "0" ? group.name : group.name + name );
-
-					if ( primitive.extras ) meshNode.userData = primitive.extras;
-
-					group.add( meshNode );
-
-				}
-
-				return group;
+				} );
 
 			} );
 
