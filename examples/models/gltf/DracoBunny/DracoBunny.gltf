@@ -1,5 +1,32 @@
 {
-  "accessors": [],
+  "accessors": [
+    {
+      "componentType" : 5123,
+      "count" : 208353,
+      "type" : "SCALAR",
+      "max" : [
+        11758
+      ],
+      "min" : [
+        0
+      ]
+    },
+    {
+      "componentType" : 5126,
+      "count" : 34834,
+      "type" : "VEC3",
+      "max" : [
+        0.06100910156965256,
+        0.1873178631067276,
+        0.05880429595708847
+      ],
+      "min" : [
+        -0.09468989819288254,
+        0.03298740088939667,
+        -0.061873599886894226
+      ]
+    }
+  ],
   "asset": {
     "generator": "Hand-crafted, artisanal glTF",
     "version": "2.0"
@@ -34,20 +61,15 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 1
           },
+          "indices" : 0,
           "mode": 4,
           "extensions" : {
             "KHR_draco_mesh_compression" : {
               "bufferView" : 0,
-              "indexCount" : 1000,
-              "vertexCount" : 500,
-              "attributes" : [
-                {
-                  "semantic" : "POSITION",
-                  "componentType" : 5126,
-                  "type" : "VEC3"
-                }
+              "attributesOrder" : [
+                  "POSITION"
               ],
               "version" : "0.9.1"
             }

@@ -291,6 +291,7 @@ THREE.GLTF2Loader = ( function () {
 
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
+		KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
 		KHR_LIGHTS: 'KHR_lights',
 		KHR_MATERIALS_COMMON: 'KHR_materials_common',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
@@ -546,6 +547,24 @@ THREE.GLTF2Loader = ( function () {
 		}
 
 	}
+
+	/* DRACO MESH COMPRESSION EXTENSION */
+	function GLTFDracoMeshCompressionExtension () {
+
+		this.name = EXTENSIONS.KHR_DRACO_MESH_COMPRESSION;
+
+		this.dracoLoader = new THREE.DRACOLoader();
+                this.dracoLoader.setDracoDecoderType({});
+
+	}
+
+	GLTFDracoMeshCompressionExtension.prototype.decodePrimitive = function ( primitive, dependencies, onDecode ) {
+
+		var bufferViewID = primitive.extensions[ this.name ].bufferView;
+		var bufferView = dependencies.bufferViews[ bufferViewID ];
+		this.dracoLoader.decodeDracoFile( bufferView, onDecode);
+
+	};
 
 	/**
 	 * WebGL Technique Extension
@@ -2153,16 +2172,16 @@ THREE.GLTF2Loader = ( function () {
 				for ( var name in primitives ) {
 
 					var primitive = primitives[ name ];
+                                        var geometry;
+					var meshNode;
 
 					var material = primitive.material !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
 
-					var geometry;
-
-					var meshNode;
-
 					if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) {
 
-						geometry = extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ].decodePrimitive( primitive, dependencies );
+						geometry = extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ].decodePrimitive( primitive, dependencies, function (geometry) {
+                                                  meshNode = new THREE.Mesh( geometry, material );
+                                                });
 
 					} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
 
@@ -2241,7 +2260,6 @@ THREE.GLTF2Loader = ( function () {
 						}
 
 						meshNode = new THREE.Mesh( geometry, material );
-						meshNode.castShadow = true;
 
 						if ( primitive.targets !== undefined ) {
 
@@ -2385,13 +2403,14 @@ THREE.GLTF2Loader = ( function () {
 
 					}
 
-					if ( geometry.attributes.color !== undefined ) {
+					if ( geometry !== undefined && geometry.attributes.color !== undefined ) {
 
 						material.vertexColors = THREE.VertexColors;
 						material.needsUpdate = true;
 
 					}
 
+					meshNode.castShadow = true;
 					meshNode.name = ( name === "0" ? group.name : group.name + name );
 
 					if ( primitive.extras ) meshNode.userData = primitive.extras;
