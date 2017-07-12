@@ -599,7 +599,6 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 			}
 
-			currentBlending = blending;
 			currentPremultipledAlpha = premultipliedAlpha;
 
 		}
@@ -641,6 +640,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 		}
 
+		currentBlending = blending;
 	}
 
 	function setMaterial( material ) {
