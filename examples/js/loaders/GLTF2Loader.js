@@ -1600,6 +1600,107 @@ THREE.GLTF2Loader = ( function () {
 
 	}
 
+	function addMorphTargets( meshNode, primitive, dependencies ) {
+
+		var geometry = meshNode.geometry;
+		var material = meshNode.material;
+
+		var targets = primitive.targets;
+		var morphAttributes = geometry.morphAttributes;
+
+		morphAttributes.position = [];
+		morphAttributes.normal = [];
+
+		material.morphTargets = true;
+
+		for ( var i = 0, il = targets.length; i < il; i ++ ) {
+
+			var target = targets[ i ];
+			var attributeName = 'morphTarget' + i;
+
+			var positionAttribute, normalAttribute;
+
+			if ( target.POSITION !== undefined ) {
+
+				// Three.js morph formula is
+				//   position
+				//     + weight0 * ( morphTarget0 - position )
+				//     + weight1 * ( morphTarget1 - position )
+				//     ...
+				// while the glTF one is
+				//   position
+				//     + weight0 * morphTarget0
+				//     + weight1 * morphTarget1
+				//     ...
+				// then adding position to morphTarget.
+				// So morphTarget value will depend on mesh's position, then cloning attribute
+				// for the case if attribute is shared among two or more meshes.
+
+				positionAttribute = dependencies.accessors[ target.POSITION ].clone();
+				var position = geometry.attributes.position;
+
+				for ( var j = 0, jl = positionAttribute.array.length; j < jl; j ++ ) {
+
+					positionAttribute.array[ j ] += position.array[ j ];
+
+				}
+
+			} else {
+
+				// Copying the original position not to affect the final position.
+				// See the formula above.
+				positionAttribute = geometry.attributes.position.clone();
+
+			}
+
+			if ( target.NORMAL !== undefined ) {
+
+				material.morphNormals = true;
+
+				// see target.POSITION's comment
+
+				normalAttribute = dependencies.accessors[ target.NORMAL ].clone();
+				var normal = geometry.attributes.normal;
+
+				for ( var j = 0, jl = normalAttribute.array.length; j < jl; j ++ ) {
+
+					normalAttribute.array[ j ] += normal.array[ j ];
+
+				}
+
+			} else {
+
+				normalAttribute = geometry.attributes.normal.clone();
+
+			}
+
+			// TODO: implement
+			if ( target.TANGENT !== undefined ) {
+
+			}
+
+			positionAttribute.name = attributeName;
+			normalAttribute.name = attributeName;
+
+			morphAttributes.position.push( positionAttribute );
+			morphAttributes.normal.push( normalAttribute );
+
+		}
+
+		meshNode.updateMorphTargets();
+
+		if ( mesh.weights !== undefined ) {
+
+			for ( var i = 0, il = mesh.weights.length; i < il; i ++ ) {
+
+				meshNode.morphTargetInfluences[ i ] = mesh.weights[ i ];
+
+			}
+
+		}
+
+	};
+
 	// Deferred constructor for RawShaderMaterial types
 	function DeferredShaderMaterial( params ) {
 
@@ -2240,108 +2341,6 @@ THREE.GLTF2Loader = ( function () {
 
 	};
 
-	GLTFParser.prototype.loadMorphTargets = function ( meshNode, primitive, dependencies ) {
-
-		var geometry = meshNode.geometry;
-		var material = meshNode.material;
-
-		var targets = primitive.targets;
-		var morphAttributes = geometry.morphAttributes;
-
-		morphAttributes.position = [];
-		morphAttributes.normal = [];
-
-		material.morphTargets = true;
-
-		for ( var i = 0, il = targets.length; i < il; i ++ ) {
-
-			var target = targets[ i ];
-			var attributeName = 'morphTarget' + i;
-
-			var positionAttribute, normalAttribute;
-
-			if ( target.POSITION !== undefined ) {
-
-				// Three.js morph formula is
-				//   position
-				//     + weight0 * ( morphTarget0 - position )
-				//     + weight1 * ( morphTarget1 - position )
-				//     ...
-				// while the glTF one is
-				//   position
-				//     + weight0 * morphTarget0
-				//     + weight1 * morphTarget1
-				//     ...
-				// then adding position to morphTarget.
-				// So morphTarget value will depend on mesh's position, then cloning attribute
-				// for the case if attribute is shared among two or more meshes.
-
-				positionAttribute = dependencies.accessors[ target.POSITION ].clone();
-				var position = geometry.attributes.position;
-
-				for ( var j = 0, jl = positionAttribute.array.length; j < jl; j ++ ) {
-
-					positionAttribute.array[ j ] += position.array[ j ];
-
-				}
-
-			} else {
-
-				// Copying the original position not to affect the final position.
-				// See the formula above.
-				positionAttribute = geometry.attributes.position.clone();
-
-			}
-
-			if ( target.NORMAL !== undefined ) {
-
-				material.morphNormals = true;
-
-				// see target.POSITION's comment
-
-				normalAttribute = dependencies.accessors[ target.NORMAL ].clone();
-				var normal = geometry.attributes.normal;
-
-				for ( var j = 0, jl = normalAttribute.array.length; j < jl; j ++ ) {
-
-					normalAttribute.array[ j ] += normal.array[ j ];
-
-				}
-
-			} else {
-
-				normalAttribute = geometry.attributes.normal.clone();
-
-			}
-
-			// TODO: implement
-			if ( target.TANGENT !== undefined ) {
-
-			}
-
-			positionAttribute.name = attributeName;
-			normalAttribute.name = attributeName;
-
-			morphAttributes.position.push( positionAttribute );
-			morphAttributes.normal.push( normalAttribute );
-
-		}
-
-		meshNode.updateMorphTargets();
-
-		if ( mesh.weights !== undefined ) {
-
-			for ( var i = 0, il = mesh.weights.length; i < il; i ++ ) {
-
-				meshNode.morphTargetInfluences[ i ] = mesh.weights[ i ];
-
-			}
-
-		}
-
-
-	};
-
 	GLTFParser.prototype.loadMeshes = function () {
 
 		var scope = this;
@@ -2410,7 +2409,7 @@ THREE.GLTF2Loader = ( function () {
 
 						if ( primitive.targets !== undefined ) {
 
-							scope.loadMorphTargets( mesh, primitive, dependencies );
+							addMorphTargets( mesh, primitive, dependencies );
 
 						}
 
