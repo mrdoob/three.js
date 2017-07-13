@@ -154,13 +154,13 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			
 			if ( material.length && faceIndex ) {
 				
-				let groups = object.geometry.groups;
+				var groups = object.geometry.groups;
 				
 				if ( groups ) {
 					
-					for ( let i = 0; i < groups.length; i++ ) {
+					for ( var i = 0; i < groups.length; i++ ) {
 						
-						let group = groups[ i ];
+						var group = groups[ i ];
 						
 						if ( faceIndex >= group.start && faceIndex <= group.start + group.count ) {
 							
@@ -172,13 +172,11 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 						
 					}
 					
-				} else {
-					
-					faceMaterial = material;
-					
 				}
 				
-			} else {
+			}
+			
+			if ( faceMaterial === undefined ) {
 				
 				faceMaterial = material;
 				
