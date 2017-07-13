@@ -400,6 +400,8 @@ THREE.OBJLoader = ( function () {
 
 			this.materials = materials;
 
+			return this;
+
 		},
 
 		parse: function ( text ) {

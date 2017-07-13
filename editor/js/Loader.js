@@ -428,6 +428,29 @@ var Loader = function ( editor ) {
 
 				break;
 
+			case 'zip':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var zip = new JSZip( contents );
+
+					// BLOCKS
+
+					if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
+
+						var materials = new THREE.MTLLoader().parse( zip.file( 'materials.mtl' ).asText() );
+						var object = new THREE.OBJLoader().setMaterials( materials ).parse( zip.file( 'model.obj' ).asText() );
+						editor.execute( new AddObjectCommand( object ) );
+
+					}
+
+				}, false );
+				reader.readAsBinaryString( file );
+
+				break;
+
 			default:
 
 				alert( 'Unsupported file format (' + extension +  ').' );
