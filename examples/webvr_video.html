@@ -80,6 +80,7 @@
 				texture.generateMipmaps = false;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x101010 );
 
 				// left
 
@@ -133,7 +134,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x101010 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

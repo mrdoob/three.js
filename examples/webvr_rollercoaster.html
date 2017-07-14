@@ -38,7 +38,6 @@
 			//
 
 			var renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0xf0f0ff );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
@@ -46,6 +45,7 @@
 			renderer.vr.enabled = true;
 
 			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xf0f0ff );
 
 			var light = new THREE.HemisphereLight( 0xfff0f0, 0x606066 );
 			light.position.set( 1, 1, 1 );

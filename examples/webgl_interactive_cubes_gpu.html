@@ -72,6 +72,7 @@
 				controls.dynamicDampingFactor = 0.3;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				pickingScene = new THREE.Scene();
 				pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
@@ -164,7 +165,6 @@
 				scene.add( highlightBox );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

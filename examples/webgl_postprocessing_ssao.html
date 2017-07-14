@@ -79,7 +79,6 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				document.body.appendChild( container );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0xa0a0a0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -88,6 +87,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
 
 				group = new THREE.Object3D();
 				scene.add( group );

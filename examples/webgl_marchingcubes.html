@@ -118,6 +118,7 @@
 			// SCENE
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x050505 );
 
 			// LIGHTS
 
@@ -154,7 +155,6 @@
 			// RENDERER
 
 			renderer = new THREE.WebGLRenderer();
-			renderer.setClearColor( 0x050505 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 

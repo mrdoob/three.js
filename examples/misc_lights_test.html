@@ -67,6 +67,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				// Spheres
 
@@ -114,13 +115,11 @@
 				pointLight.add( mesh );
 
 				canvasRenderer = new THREE.CanvasRenderer();
-				canvasRenderer.setClearColor( 0xffffff );
 				canvasRenderer.setPixelRatio( window.devicePixelRatio );
 				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( canvasRenderer.domElement );
 
 				webglRenderer = new THREE.WebGLRenderer();
-				webglRenderer.setClearColor( 0xffffff );
 				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				webglRenderer.domElement.style.position = "relative";

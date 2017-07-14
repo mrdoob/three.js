@@ -95,10 +95,12 @@
 				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0x000000, 1500, 4000 );
 
 				scene2 = new THREE.Scene();
-				scene2.fog = scene.fog;
+				scene2.background = new THREE.Color( 0x000000 );
+				scene2.fog = new THREE.Fog( 0x000000, 1500, 4000 );
 
 				// GROUND
 
@@ -196,7 +198,6 @@
 
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;

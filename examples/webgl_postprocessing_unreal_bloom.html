@@ -94,9 +94,9 @@
 				camera.position.set( 0.0, 35, 35 * 3.5 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( new THREE.Color( 0x111111 ) );
 				renderer.toneMapping = THREE.LinearToneMapping;
 
 				standardMaterial = new THREE.MeshStandardMaterial( {

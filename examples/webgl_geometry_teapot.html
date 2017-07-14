@@ -99,7 +99,6 @@
 
 				// RENDERER
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xAAAAAA );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
 				renderer.gammaInput = true;
@@ -147,6 +146,7 @@
 
 				// scene itself
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xAAAAAA );
 
 				scene.add( ambientLight );
 				scene.add( light );

@@ -120,6 +120,7 @@
 			controls = new THREE.TrackballControls( camera );
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x101010 );
 
 			//
 
@@ -201,7 +202,6 @@
 				return;
 			}
 
-			renderer.setClearColor( 0x101010 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );

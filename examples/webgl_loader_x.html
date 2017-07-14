@@ -79,6 +79,7 @@
             container.style.zIndex = -10;
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
             scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x666666);
             scene.add(new THREE.AmbientLight(0x999999));
             // grid
             var gridHelper = new THREE.GridHelper(14, 1, 0x303030, 0x303030);
@@ -214,7 +215,6 @@
             renderer = new THREE.WebGLRenderer();
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x666666);
             container.appendChild(renderer.domElement);
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);

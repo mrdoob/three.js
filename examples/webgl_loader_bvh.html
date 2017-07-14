@@ -73,12 +73,12 @@
 				controls.maxDistance = 700;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xeeeeee );
 
 				scene.add( new THREE.GridHelper( 400, 10 ) );
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xeeeeee );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

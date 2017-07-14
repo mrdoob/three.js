@@ -65,7 +65,8 @@
 
 			function init() {
 
-				renderer.setClearColor( 'rgb(0,150,255)' );
+				scene.background = new THREE.Color( 0x0096ff );
+
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.getElementById( "container" ).appendChild( renderer.domElement );
@@ -235,8 +236,9 @@
 
 				if ( useDirectionalLight ) {
 
-					renderer.setClearColor( 'rgb(0,150,255)' );
-					groundMesh.material.color.set( 'rgb(0,130,0)' );
+					scene.background.setHex( 0x0096ff );
+
+					groundMesh.material.color.setHex( 0x008200 );
 					sunLight.position.set( 5, 7, - 1 );
 					sunLight.lookAt( scene.position );
 
@@ -256,8 +258,9 @@
 
 				} else {
 
-					renderer.setClearColor( 'rgb(0,0,0)' );
-					groundMesh.material.color.set( 'rgb(150,150,150)' );
+					scene.background.setHex( 0x000000 );
+
+					groundMesh.material.color.setHex( 0x969696 );
 
 					sunLight.position.set( 0, 6, - 2 );
 					sunLight.lookAt( scene.position );

@@ -63,12 +63,12 @@
 			function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x333333 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 

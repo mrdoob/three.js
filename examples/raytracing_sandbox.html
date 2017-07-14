@@ -37,6 +37,7 @@
 				camera.position.z = 600;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				// materials
 
@@ -256,7 +257,6 @@
 					randomize: true,
 					blockSize: 64
 				} );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.domElement.style.position = "absolute";

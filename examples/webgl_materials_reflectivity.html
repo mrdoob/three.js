@@ -83,9 +83,9 @@
 				camera.position.set( 0.0, -10, 20 * 3.5 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( new THREE.Color( 0x000000 ) );
 
 				gemBackMaterial = new THREE.MeshPhysicalMaterial( {
 					map: null,

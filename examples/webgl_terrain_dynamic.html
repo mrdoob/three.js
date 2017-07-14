@@ -268,6 +268,7 @@
 				// SCENE (FINAL)
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 				scene.fog = new THREE.Fog( 0x050505, 2000, 4000 );
 
 				// LIGHTS
@@ -403,7 +404,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -477,9 +477,8 @@
 
 					var valNorm = ( lightVal - fLow ) / ( fHigh - fLow );
 
+					scene.background.setHSL( 0.1, 0.5, lightVal );
 					scene.fog.color.setHSL( 0.1, 0.5, lightVal );
-
-					renderer.setClearColor( scene.fog.color );
 
 					directionalLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.1, 1.15 );
 					pointLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.9, 1.5 );

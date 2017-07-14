@@ -126,12 +126,11 @@
 				WWParallels.prototype.initGL = function () {
 					this.renderer = new THREE.WebGLRenderer( {
 						canvas: this.canvas,
-						antialias: true,
-						autoClear: true
+						antialias: true
 					} );
-					this.renderer.setClearColor( 0x050505 );
 
 					this.scene = new THREE.Scene();
+					this.scene.background = new THREE.Color( 0x050505 );
 
 					this.camera = new THREE.PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
 					this.resetCamera();

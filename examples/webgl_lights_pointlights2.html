@@ -72,6 +72,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x040306 );
 				scene.fog = new THREE.Fog( 0x040306, 10, 300 );
 
 				// CONTROLS
@@ -175,7 +176,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

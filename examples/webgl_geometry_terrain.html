@@ -72,6 +72,7 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
 
 				controls = new THREE.FirstPersonControls( camera );
 				controls.movementSpeed = 1000;
@@ -100,7 +101,6 @@
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xbfd1e5 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

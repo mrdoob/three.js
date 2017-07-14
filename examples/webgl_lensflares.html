@@ -79,8 +79,8 @@
 				// scene
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
-				scene.fog.color.setHSL( 0.51, 0.4, 0.01 );
+				scene.background = new THREE.Color().setHSL( 0.51, 0.4, 0.01 );
+				scene.fog = new THREE.Fog( scene.background, 3500, 15000 );
 
 				// world
 
@@ -160,7 +160,6 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

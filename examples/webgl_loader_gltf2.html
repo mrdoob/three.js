@@ -127,6 +127,7 @@
 				container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
 
 				defaultCamera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.001, 1000 );
 
@@ -168,8 +169,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer({antialias:true});
-				renderer.setClearColor( 0x222222 );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

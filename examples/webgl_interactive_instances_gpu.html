@@ -452,6 +452,8 @@
 			} );
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xffffff );
+
 			scene.add( camera );
 			scene.add( highlightBox );
 
@@ -956,7 +958,6 @@
 				return;
 
 			}
-			renderer.setClearColor( 0xffffff );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			//renderer.sortObjects = false;
