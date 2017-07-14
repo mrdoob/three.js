@@ -18850,7 +18850,7 @@
 
 			var color = new Vector4();
 			var currentColorMask = null;
-			var currentColorClear = new Vector4();
+			var currentColorClear = new Vector4( 0, 0, 0, 0 );
 
 			return {
 
@@ -18895,7 +18895,7 @@
 					locked = false;
 
 					currentColorMask = null;
-					currentColorClear.set( 0, 0, 0, 1 );
+					currentColorClear.set( - 1, 0, 0, 0 ); // set to invalid state
 
 				}
 
