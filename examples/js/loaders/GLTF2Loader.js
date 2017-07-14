@@ -2652,6 +2652,8 @@ THREE.GLTF2Loader = ( function () {
 
 							}
 
+							//do not clone children as they will be replaced anyway
+							var clonedgroup = group.clone( false );
 							for ( var childrenId in group.children ) {
 
 								var child = group.children[ childrenId ];
@@ -2746,10 +2748,10 @@ THREE.GLTF2Loader = ( function () {
 
 								}
 
-								_node.add( child );
 
+								clonedgroup.add(child);
 							}
-
+							_node.add( clonedgroup );
 						}
 
 					}
