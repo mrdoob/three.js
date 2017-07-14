@@ -599,8 +599,6 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 			}
 
-			currentPremultipledAlpha = premultipliedAlpha;
-
 		}
 
 		if ( blending === CustomBlending ) {
@@ -641,7 +639,8 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		}
 
 		currentBlending = blending;
-		
+		currentPremultipledAlpha = premultipliedAlpha;
+
 	}
 
 	function setMaterial( material ) {
