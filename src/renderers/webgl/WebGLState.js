@@ -13,7 +13,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 		var color = new Vector4();
 		var currentColorMask = null;
-		var currentColorClear = new Vector4();
+		var currentColorClear = null;
 
 		return {
 
@@ -44,10 +44,19 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 				color.set( r, g, b, a );
 
-				if ( currentColorClear.equals( color ) === false ) {
+				if ( !currentColorClear || currentColorClear.equals( color ) === false ) {
 
 					gl.clearColor( r, g, b, a );
-					currentColorClear.copy( color );
+
+					if ( currentColorClear ) {
+
+						currentColorClear.copy( color );
+
+					} else {
+
+						currentColorClear = color.clone();
+
+					}
 
 				}
 
@@ -58,7 +67,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 				locked = false;
 
 				currentColorMask = null;
-				currentColorClear.set( 0, 0, 0, 1 );
+				currentColorClear = null;
 
 			}
 
