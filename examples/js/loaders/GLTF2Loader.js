@@ -2653,10 +2653,7 @@ THREE.GLTF2Loader = ( function () {
 							}
 
 							//do not clone children as they will be replaced anyway
-							var children = group.children
-							group.children=[];
-							var clonedgroup = group.clone();
-							group.children=children;
+							var clonedgroup = group.clone( false );
 							for ( var childrenId in group.children ) {
 
 								var child = group.children[ childrenId ];
