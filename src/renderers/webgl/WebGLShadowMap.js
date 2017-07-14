@@ -273,7 +273,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 	};
 
-	function getDepthMaterial( object, material, isPointLight, lightPositionWorld ) {
+	function getDepthMaterial( object, material, isPointLight, lightPositionWorld, shadowCameraNear, shadowCameraFar ) {
 
 		var geometry = object.geometry;
 
@@ -389,6 +389,8 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		if ( isPointLight && result.uniforms.lightPos !== undefined ) {
 
 			result.uniforms.lightPos.value.copy( lightPositionWorld );
+			result.uniforms.shadowCameraNear.value = shadowCameraNear;
+			result.uniforms.shadowCameraFar.value = shadowCameraFar;
 
 		}
 
@@ -422,7 +424,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 						if ( groupMaterial && groupMaterial.visible ) {
 
-							var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
+							var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld, shadowCamera.near, shadowCamera.far );
 							_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
 
 						}
@@ -431,7 +433,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 				} else if ( material.visible ) {
 
-					var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
+					var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld, shadowCamera.near, shadowCamera.far );
 					_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
 
 				}

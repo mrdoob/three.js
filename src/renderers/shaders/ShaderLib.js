@@ -194,7 +194,9 @@ var ShaderLib = {
 			UniformsLib.common,
 			UniformsLib.displacementmap,
 			{
-				lightPos: { value: new Vector3() }
+				lightPos: { value: new Vector3() },
+				shadowCameraNear: { value: 1 },
+				shadowCameraFar: { value: 1000 }
 			}
 		] ),
 

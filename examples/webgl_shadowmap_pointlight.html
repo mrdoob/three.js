@@ -58,8 +58,8 @@
 					var pointLight = new THREE.PointLight( color, 1, 30 );
 					pointLight.castShadow = true;
 					pointLight.shadow.camera.near = 1;
-					pointLight.shadow.camera.far = 30;
-					pointLight.shadow.bias = 0.01;
+					pointLight.shadow.camera.far = 60;
+					pointLight.shadow.bias = - 0.005; // reduces self-shadowing on double-sided objects
 
 					var geometry = new THREE.SphereGeometry( 0.3, 12, 6 );
 					var material = new THREE.MeshBasicMaterial( { color: color } );
@@ -97,6 +97,7 @@
 				torusKnot = new THREE.Mesh( geometry, material );
 				torusKnot.position.set( 0, 5, 0 );
 				torusKnot.castShadow = true;
+				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
 
 				// custom distance material
