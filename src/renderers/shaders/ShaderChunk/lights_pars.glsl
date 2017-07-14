@@ -51,6 +51,8 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		float shadowBias;
 		float shadowRadius;
 		vec2 shadowMapSize;
+		float shadowCameraNear;
+		float shadowCameraFar;
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
