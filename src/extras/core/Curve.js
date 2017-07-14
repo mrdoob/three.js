@@ -39,6 +39,7 @@ import { Matrix4 } from '../../math/Matrix4';
 
 function Curve() {
 
+	this.type = 'Curve';
 	this.arcLengthDivisions = 200;
 
 }

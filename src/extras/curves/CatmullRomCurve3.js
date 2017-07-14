@@ -8,8 +8,8 @@ import { Curve } from '../core/Curve';
  * cusps and self-intersections in non-uniform catmull rom curves.
  * http://www.cemyuksel.com/research/catmullrom_param/catmullrom.pdf
  *
- * curve.type accepts centripetal(default), chordal and catmullrom
- * curve.tension is used for catmullrom which defaults to 0.5
+ * this.curveType accepts centripetal(default), chordal and catmullrom
+ * this.tension is used for catmullrom which defaults to 0.5
  */
 
 
@@ -87,10 +87,13 @@ function CatmullRomCurve3( points ) {
 
 	Curve.call( this );
 
+	this.type = 'CatmullRomCurve3';
+
 	if ( points.length < 2 ) console.warn( 'THREE.CatmullRomCurve3: Points array needs at least two entries.' );
 
 	this.points = points || [];
 	this.closed = false;
+	this.curveType = 'centripetal';
 
 }
 
@@ -146,10 +149,10 @@ CatmullRomCurve3.prototype.getPoint = function ( t ) {
 
 	}
 
-	if ( this.type === undefined || this.type === 'centripetal' || this.type === 'chordal' ) {
+	if ( this.curveType === 'centripetal' || this.curveType === 'chordal' ) {
 
 		// init Centripetal / Chordal Catmull-Rom
-		var pow = this.type === 'chordal' ? 0.5 : 0.25;
+		var pow = this.curveType === 'chordal' ? 0.5 : 0.25;
 		var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
 		var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
 		var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
@@ -163,7 +166,7 @@ CatmullRomCurve3.prototype.getPoint = function ( t ) {
 		py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
 		pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
 
-	} else if ( this.type === 'catmullrom' ) {
+	} else if ( this.curveType === 'catmullrom' ) {
 
 		var tension = this.tension !== undefined ? this.tension : 0.5;
 		px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );

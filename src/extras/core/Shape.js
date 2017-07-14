@@ -16,6 +16,7 @@ function Shape() {
 
 	Path.apply( this, arguments );
 
+	this.type = 'Shape';
 	this.holes = [];
 
 }
