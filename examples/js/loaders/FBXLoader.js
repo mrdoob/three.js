@@ -58,7 +58,7 @@
 
 				try {
 
-					var scene = self.parse( buffer, resourceDirectory );
+					var scene = self.parse( url, buffer, resourceDirectory );
 
 					onLoad( scene );
 
@@ -82,12 +82,14 @@
 		 * Parses an ASCII/Binary FBX file and returns a THREE.Group.
 		 * THREE.Group will have an animations property of AnimationClips
 		 * of the different animations within the FBX file.
+		 * @param {string} url - URL of the FBX file.
 		 * @param {ArrayBuffer} FBXBuffer - Contents of FBX file to parse.
 		 * @param {string} resourceDirectory - Directory to load external assets (e.g. textures ) from.
 		 * @returns {THREE.Group}
 		 */
-		parse: function ( FBXBuffer, resourceDirectory ) {
+		parse: function ( url, FBXBuffer, resourceDirectory ) {
 
+			var self = this;
 			var FBXTree;
 
 			if ( isFbxFormatBinary( FBXBuffer ) ) {
