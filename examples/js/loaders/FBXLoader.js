@@ -48,9 +48,7 @@
 
 			var self = this;
 
-			var resourceDirectory = url.split( /[\\\/]/ );
-			resourceDirectory.pop();
-			resourceDirectory = resourceDirectory.join( '/' ) + '/';
+			var resourceDirectory = THREE.Loader.prototype.extractUrlBase( url );
 
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setResponseType( 'arraybuffer' );
@@ -100,15 +98,13 @@
 
 				if ( ! isFbxFormatASCII( FBXText ) ) {
 
-					self.manager.itemError( url );
 					throw new Error( 'FBXLoader: Unknown format.' );
 
 				}
 
 				if ( getFbxVersion( FBXText ) < 7000 ) {
 
-					self.manager.itemError( url );
-					throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( FBXText ) );
+					throw new Error( 'FBXLoader: FBX version not supported, FileVersion: ' + getFbxVersion( FBXText ) );
 
 				}
 
