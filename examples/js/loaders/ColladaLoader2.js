@@ -17,14 +17,12 @@ THREE.ColladaLoader.prototype = {
 
 		var scope = this;
 
-		var resourceDirectory = url.split( /[\\\/]/ );
-		resourceDirectory.pop();
-		resourceDirectory = resourceDirectory.join( '/' ) + '/';
+		var path = THREE.Loader.prototype.extractUrlBase( url );
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text, resourceDirectory ) );
+			onLoad( scope.parse( text, path ) );
 
 		}, onProgress, onError );
 
@@ -46,7 +44,7 @@ THREE.ColladaLoader.prototype = {
 
 	},
 
-	parse: function ( text, resourceDirectory ) {
+	parse: function ( text, path ) {
 
 		function getElementsByTagName( xml, name ) {
 
@@ -3184,7 +3182,8 @@ THREE.ColladaLoader.prototype = {
 		console.log( 'THREE.ColladaLoader: File version', version );
 
 		var asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
-		var textureLoader = new THREE.TextureLoader( this.manager ).setPath( resourceDirectory );
+		var textureLoader = new THREE.TextureLoader( this.manager );
+		textureLoader.setPath( path ).setCrossOrigin( this.crossOrigin );
 
 		//
 
