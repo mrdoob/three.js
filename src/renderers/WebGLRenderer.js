@@ -246,6 +246,7 @@ function WebGLRenderer( parameters ) {
 	var programCache, renderLists;
 
 	var background, bufferRenderer, indexedBufferRenderer;
+	var flareRenderer, spriteRenderer;
 
 	function initGLContext() {
 
@@ -284,6 +285,9 @@ function WebGLRenderer( parameters ) {
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, _infoRender );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
 
+		flareRenderer = new WebGLFlareRenderer( _this, _gl, state, capabilities );
+		spriteRenderer = new WebGLSpriteRenderer( _this, _gl, state, capabilities );
+
 		_this.info.programs = programCache.programs;
 
 		_this.context = _gl;
@@ -308,11 +312,6 @@ function WebGLRenderer( parameters ) {
 	var shadowMap = new WebGLShadowMap( this, shadowsArray, objects, capabilities );
 
 	this.shadowMap = shadowMap;
-
-	//
-
-	var spriteRenderer = new WebGLSpriteRenderer( this, spritesArray );
-	var flareRenderer = new WebGLFlareRenderer( this, flaresArray );
 
 	// API
 
@@ -1184,8 +1183,8 @@ function WebGLRenderer( parameters ) {
 
 		// custom renderers
 
-		spriteRenderer.render( scene, camera );
-		flareRenderer.render( scene, camera, _currentViewport );
+		spriteRenderer.render( spritesArray, scene, camera );
+		flareRenderer.render( flaresArray, scene, camera, _currentViewport );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 

@@ -7,10 +7,7 @@ import { Box2 } from '../../math/Box2';
 import { Vector2 } from '../../math/Vector2';
 import { Vector3 } from '../../math/Vector3';
 
-function WebGLFlareRenderer( renderer, flares ) {
-
-	var gl = renderer.context;
-	var state = renderer.state;
+function WebGLFlareRenderer( renderer, gl, state, capabilities ) {
 
 	var vertexBuffer, elementBuffer;
 	var shader, program, attributes, uniforms;
@@ -181,7 +178,7 @@ function WebGLFlareRenderer( renderer, flares ) {
 	 *         reads these back and calculates occlusion.
 	 */
 
-	this.render = function ( scene, camera, viewport ) {
+	this.render = function ( flares, scene, camera, viewport ) {
 
 		if ( flares.length === 0 ) return;
 
@@ -366,7 +363,7 @@ function WebGLFlareRenderer( renderer, flares ) {
 		var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
 		var vertexShader = gl.createShader( gl.VERTEX_SHADER );
 
-		var prefix = "precision " + renderer.getPrecision() + " float;\n";
+		var prefix = "precision " + capabilities.precision + " float;\n";
 
 		gl.shaderSource( fragmentShader, prefix + shader.fragmentShader );
 		gl.shaderSource( vertexShader, prefix + shader.vertexShader );
