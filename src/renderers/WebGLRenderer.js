@@ -6,8 +6,8 @@ import { WebGLUniforms } from './webgl/WebGLUniforms';
 import { UniformsLib } from './shaders/UniformsLib';
 import { UniformsUtils } from './shaders/UniformsUtils';
 import { ShaderLib } from './shaders/ShaderLib';
-import { LensFlarePlugin } from './webgl/plugins/LensFlarePlugin';
-import { SpritePlugin } from './webgl/plugins/SpritePlugin';
+import { WebGLFlareRenderer } from './webgl/WebGLFlareRenderer';
+import { WebGLSpriteRenderer } from './webgl/WebGLSpriteRenderer';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { WebGLAttributes } from './webgl/WebGLAttributes';
 import { WebGLBackground } from './webgl/WebGLBackground';
@@ -62,8 +62,8 @@ function WebGLRenderer( parameters ) {
 
 	var morphInfluences = new Float32Array( 8 );
 
-	var sprites = [];
-	var lensFlares = [];
+	var spritesArray = [];
+	var flaresArray = [];
 
 	// public properties
 
@@ -309,11 +309,10 @@ function WebGLRenderer( parameters ) {
 
 	this.shadowMap = shadowMap;
 
+	//
 
-	// Plugins
-
-	var spritePlugin = new SpritePlugin( this, sprites );
-	var lensFlarePlugin = new LensFlarePlugin( this, lensFlares );
+	var spriteRenderer = new WebGLSpriteRenderer( this, spritesArray );
+	var flareRenderer = new WebGLFlareRenderer( this, flaresArray );
 
 	// API
 
@@ -1110,8 +1109,8 @@ function WebGLRenderer( parameters ) {
 		lightsArray.length = 0;
 		shadowsArray.length = 0;
 
-		sprites.length = 0;
-		lensFlares.length = 0;
+		spritesArray.length = 0;
+		flaresArray.length = 0;
 
 		_localClippingEnabled = this.localClippingEnabled;
 		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
@@ -1183,10 +1182,10 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		// custom render plugins (post pass)
+		// custom renderers
 
-		spritePlugin.render( scene, camera );
-		lensFlarePlugin.render( scene, camera, _currentViewport );
+		spriteRenderer.render( scene, camera );
+		flareRenderer.render( scene, camera, _currentViewport );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -1289,13 +1288,13 @@ function WebGLRenderer( parameters ) {
 
 				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
-					sprites.push( object );
+					spritesArray.push( object );
 
 				}
 
 			} else if ( object.isLensFlare ) {
 
-				lensFlares.push( object );
+				flaresArray.push( object );
 
 			} else if ( object.isImmediateRenderObject ) {
 

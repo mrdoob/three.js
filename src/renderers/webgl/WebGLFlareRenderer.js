@@ -1,13 +1,13 @@
-import { Box2 } from '../../../math/Box2';
-import { Vector2 } from '../../../math/Vector2';
-import { Vector3 } from '../../../math/Vector3';
-
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
 
-function LensFlarePlugin( renderer, flares ) {
+import { Box2 } from '../../math/Box2';
+import { Vector2 } from '../../math/Vector2';
+import { Vector3 } from '../../math/Vector3';
+
+function WebGLFlareRenderer( renderer, flares ) {
 
 	var gl = renderer.context;
 	var state = renderer.state;
@@ -386,4 +386,4 @@ function LensFlarePlugin( renderer, flares ) {
 }
 
 
-export { LensFlarePlugin };
+export { WebGLFlareRenderer };

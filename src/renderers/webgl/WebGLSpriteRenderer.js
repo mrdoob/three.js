@@ -1,13 +1,13 @@
-import { CanvasTexture } from '../../../textures/CanvasTexture';
-import { Vector3 } from '../../../math/Vector3';
-import { Quaternion } from '../../../math/Quaternion';
-
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
 
-function SpritePlugin( renderer, sprites ) {
+import { CanvasTexture } from '../../textures/CanvasTexture';
+import { Vector3 } from '../../math/Vector3';
+import { Quaternion } from '../../math/Quaternion';
+
+function WebGLSpriteRenderer( renderer, sprites ) {
 
 	var gl = renderer.context;
 	var state = renderer.state;
@@ -384,4 +384,4 @@ function SpritePlugin( renderer, sprites ) {
 }
 
 
-export { SpritePlugin };
+export { WebGLSpriteRenderer };
