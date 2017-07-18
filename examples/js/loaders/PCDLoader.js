@@ -48,7 +48,7 @@ THREE.PCDLoader.prototype = {
 
 			var text = '';
 
-			for ( var i = 0, il = data.byteLength; i < il; i ++ ) {
+			for ( var i = 0, l = data.byteLength; i < l; i ++ ) {
 
 				text += String.fromCharCode( charArray[ i ] );
 
@@ -63,8 +63,6 @@ THREE.PCDLoader.prototype = {
 			var PCDheader = {};
 			var result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
 			var result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.substr( result1 - 1 ) );
-
-			var i, l;
 
 			PCDheader.data = result2[ 1 ];
 			PCDheader.headerLen = result2[ 0 ].length + result1;
@@ -134,7 +132,7 @@ THREE.PCDLoader.prototype = {
 
 				PCDheader.count = [];
 
-				for ( i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
+				for ( var i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
 
 					PCDheader.count.push( 1 );
 
@@ -146,7 +144,7 @@ THREE.PCDLoader.prototype = {
 
 			var sizeSum = 0;
 
-			for ( i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
+			for ( var i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
 
 				if ( PCDheader.data === 'ascii' ) {
 
@@ -169,9 +167,6 @@ THREE.PCDLoader.prototype = {
 
 		}
 
-		var dataView, offset;
-		var i, l;
-
 		var textData = binarryToStr( data );
 
 		// parse header (always ascii format)
@@ -188,11 +183,11 @@ THREE.PCDLoader.prototype = {
 
 		if ( PCDheader.data === 'ascii' ) {
 
-			offset = PCDheader.offset;
+			var offset = PCDheader.offset;
 			var pcdData = textData.substr( PCDheader.headerLen );
 			var lines = pcdData.split( '\n' );
 
-			for ( i = 0, l = lines.length; i < l; i ++ ) {
+			for ( var i = 0, l = lines.length; i < l; i ++ ) {
 
 				var line = lines[ i ].split( ' ' );
 
@@ -207,7 +202,7 @@ THREE.PCDLoader.prototype = {
 				if ( offset.rgb !== undefined ) {
 
 					var c = new Float32Array( [ parseFloat( line[ offset.rgb ] ) ] );
-					dataview = new DataView( c.buffer, 0 );
+					var dataview = new DataView( c.buffer, 0 );
 					color.push( dataview.getUint8( 0 ) / 255.0 );
 					color.push( dataview.getUint8( 1 ) / 255.0 );
 					color.push( dataview.getUint8( 2 ) / 255.0 );
@@ -237,10 +232,10 @@ THREE.PCDLoader.prototype = {
 
 		if ( PCDheader.data === 'binary' ) {
 
-			dataview = new DataView( data, PCDheader.headerLen );
-			offset = PCDheader.offset;
+			var dataview = new DataView( data, PCDheader.headerLen );
+			var offset = PCDheader.offset;
 
-			for ( i = 0, row = 0; i < PCDheader.points; i ++, row += PCDheader.rowSize ) {
+			for ( var i = 0, row = 0; i < PCDheader.points; i ++, row += PCDheader.rowSize ) {
 
 				if ( offset.x !== undefined ) {
 
