@@ -2237,8 +2237,21 @@ THREE.GLTF2Loader = ( function () {
 
 									for ( var j = 0, jl = positionAttribute.array.length; j < jl; j ++ ) {
 
-										positionAttribute.array[ j ] += position.array[ j ];
-
+									    // vertex saved in single buffer view
+                                        // p0,n0,t0,w0,p1,n1,t1,w1,...pn,nn,tn,wn in buffer
+                                        // so we need calculate offset & stride
+                                        if (position.data !== undefined) {
+                                            var index = Math.floor(j / position.itemSize) * position.data.stride + position.offset;
+                                            positionAttribute.array[ j ] += position.array[ j%position.itemSize +index];
+                                        }
+                                        // vertex saved in separate buffer
+                                        // view
+                                        // p0,p1,p2...pn,
+                                        // n0,n1,n2...nn,
+                                        // t0,t1,t2...tn
+                                        else {
+                                            positionAttribute.array[ j ] += position.array[ j ];
+                                        }
 									}
 
 								} else {
@@ -2260,8 +2273,13 @@ THREE.GLTF2Loader = ( function () {
 
 									for ( var j = 0, jl = normalAttribute.array.length; j < jl; j ++ ) {
 
-										normalAttribute.array[ j ] += normal.array[ j ];
-
+                                        if (normal.data !== undefined) {
+                                            var index = Math.floor(j / normal.itemSize) * normal.data.stride + normal.offset;
+                                            normalAttribute.array[ j ] += normal.array[ j%normal.itemSize +index];
+                                        }
+                                        else {
+                                            normalAttribute.array[ j ] += normal.array[ j ];
+                                        }
 									}
 
 								} else {
@@ -2696,7 +2714,11 @@ THREE.GLTF2Loader = ( function () {
 										break;
 
 									default:
-										child = new THREE.Mesh( originalGeometry, material );
+									    // save morph targets before replace
+                                        // meshes
+                                        var morph = child.morphTargetInfluences;
+                                        child = new THREE.Mesh( originalGeometry, material );
+                                        child.morphTargetInfluences = morph;
 
 								}
 
