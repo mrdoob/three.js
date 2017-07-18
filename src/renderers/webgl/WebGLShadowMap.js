@@ -15,7 +15,7 @@ import { Vector2 } from '../../math/Vector2';
 import { Matrix4 } from '../../math/Matrix4';
 import { Frustum } from '../../math/Frustum';
 
-function WebGLShadowMap( _renderer, _shadows, _objects, capabilities ) {
+function WebGLShadowMap( _renderer, _shadows, _objects, maxTextureSize ) {
 
 	var _gl = _renderer.context,
 		_state = _renderer.state,
@@ -23,7 +23,7 @@ function WebGLShadowMap( _renderer, _shadows, _objects, capabilities ) {
 		_projScreenMatrix = new Matrix4(),
 
 		_shadowMapSize = new Vector2(),
-		_maxShadowMapSize = new Vector2( capabilities.maxTextureSize, capabilities.maxTextureSize ),
+		_maxShadowMapSize = new Vector2( maxTextureSize, maxTextureSize ),
 
 		_lookTarget = new Vector3(),
 		_lightPositionWorld = new Vector3(),
