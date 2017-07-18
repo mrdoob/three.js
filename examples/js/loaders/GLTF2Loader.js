@@ -2345,7 +2345,7 @@ THREE.GLTF2Loader = ( function () {
 
 					}
 
-					meshNode.name = ( name === "0" ? group.name : group.name + name );
+					meshNode.name = group.name + '_' + name;
 
 					if ( primitive.extras ) meshNode.userData = primitive.extras;
 
