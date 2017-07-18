@@ -16,7 +16,7 @@ import { Vector2 } from '../../math/Vector2';
 import { Matrix4 } from '../../math/Matrix4';
 import { Frustum } from '../../math/Frustum';
 
-function WebGLShadowMap( _renderer, _shadows, _objects, maxTextureSize ) {
+function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	var _gl = _renderer.context,
 		_state = _renderer.state,
@@ -99,12 +99,12 @@ function WebGLShadowMap( _renderer, _shadows, _objects, maxTextureSize ) {
 	this.renderReverseSided = true;
 	this.renderSingleSided = true;
 
-	this.render = function ( scene, camera ) {
+	this.render = function ( lights, scene, camera ) {
 
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
-		if ( _shadows.length === 0 ) return;
+		if ( lights.length === 0 ) return;
 
 		// Set GL state for depth map.
 		_state.disable( _gl.BLEND );
@@ -116,9 +116,9 @@ function WebGLShadowMap( _renderer, _shadows, _objects, maxTextureSize ) {
 
 		var faceCount;
 
-		for ( var i = 0, il = _shadows.length; i < il; i ++ ) {
+		for ( var i = 0, il = lights.length; i < il; i ++ ) {
 
-			var light = _shadows[ i ];
+			var light = lights[ i ];
 			var shadow = light.shadow;
 			var isPointLight = light && light.isPointLight;
 
@@ -257,11 +257,6 @@ function WebGLShadowMap( _renderer, _shadows, _objects, maxTextureSize ) {
 			}
 
 		}
-
-		// Restore GL state.
-		var clearColor = _renderer.getClearColor();
-		var clearAlpha = _renderer.getClearAlpha();
-		_renderer.setClearColor( clearColor, clearAlpha );
 
 		scope.needsUpdate = false;
 

@@ -309,7 +309,7 @@ function WebGLRenderer( parameters ) {
 
 	// shadow map
 
-	var shadowMap = new WebGLShadowMap( _this, shadowsArray, objects, capabilities.maxTextureSize );
+	var shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
 
 	this.shadowMap = shadowMap;
 
@@ -1131,7 +1131,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( _clippingEnabled ) _clipping.beginShadows();
 
-		shadowMap.render( scene, camera );
+		shadowMap.render( shadowsArray, scene, camera );
 
 		lights.setup( lightsArray, shadowsArray, camera );
 
