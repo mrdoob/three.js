@@ -343,18 +343,6 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.getMaxAnisotropy = function () {
-
-		return capabilities.getMaxAnisotropy();
-
-	};
-
-	this.getPrecision = function () {
-
-		return capabilities.precision;
-
-	};
-
 	this.getPixelRatio = function () {
 
 		return _pixelRatio;
