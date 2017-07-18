@@ -15,14 +15,12 @@ import { Vector2 } from '../../math/Vector2';
 import { Matrix4 } from '../../math/Matrix4';
 import { Frustum } from '../../math/Frustum';
 
-function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
+function WebGLShadowMap( _renderer, _shadows, _objects, capabilities ) {
 
 	var _gl = _renderer.context,
 		_state = _renderer.state,
 		_frustum = new Frustum(),
 		_projScreenMatrix = new Matrix4(),
-
-		_lightShadows = _lights.shadows,
 
 		_shadowMapSize = new Vector2(),
 		_maxShadowMapSize = new Vector2( capabilities.maxTextureSize, capabilities.maxTextureSize ),
@@ -110,7 +108,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
-		if ( _lightShadows.length === 0 ) return;
+		if ( _shadows.length === 0 ) return;
 
 		// Set GL state for depth map.
 		_state.disable( _gl.BLEND );
@@ -122,9 +120,9 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		var faceCount;
 
-		for ( var i = 0, il = _lightShadows.length; i < il; i ++ ) {
+		for ( var i = 0, il = _shadows.length; i < il; i ++ ) {
 
-			var light = _lightShadows[ i ];
+			var light = _shadows[ i ];
 			var shadow = light.shadow;
 			var isPointLight = light && light.isPointLight;
 
