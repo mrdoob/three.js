@@ -156,6 +156,7 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.shadowMap.enabled = true;
+				renderer.setClearColor( 0xa0a0a0 );
 				renderer.setPixelRatio( 1 );
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
@@ -165,7 +166,6 @@
 				camera.position.x = 0;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xa0a0a0 );
 
 				var manager = new THREE.LoadingManager();
 				manager.onProgress = function ( item, loaded, total ) {
