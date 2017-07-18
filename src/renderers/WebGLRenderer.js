@@ -1818,7 +1818,8 @@ function WebGLRenderer( parameters ) {
 				material.isMeshPhongMaterial ||
 				material.isMeshStandardMaterial ||
 				material.isMeshNormalMaterial ||
-				material.isMeshDepthMaterial ) {
+				material.isMeshDepthMaterial ||
+				material.isMeshDistanceMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
 
@@ -1861,13 +1862,11 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( material.isMeshDepthMaterial ) {
 
-				if ( material.displacementMap ) {
+				refreshUniformsDepth( m_uniforms, material );
 
-					m_uniforms.displacementMap.value = material.displacementMap;
-					m_uniforms.displacementScale.value = material.displacementScale;
-					m_uniforms.displacementBias.value = material.displacementBias;
+			} else if ( material.isMeshDistanceMaterial ) {
 
-				}
+				refreshUniformsDistance( m_uniforms, material );
 
 			} else if ( material.isMeshNormalMaterial ) {
 
@@ -2175,6 +2174,34 @@ function WebGLRenderer( parameters ) {
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
 
 		refreshUniformsStandard( uniforms, material );
+
+	}
+
+	function refreshUniformsDepth( uniforms, material ) {
+
+		if ( material.displacementMap ) {
+
+			uniforms.displacementMap.value = material.displacementMap;
+			uniforms.displacementScale.value = material.displacementScale;
+			uniforms.displacementBias.value = material.displacementBias;
+
+		}
+
+	}
+
+	function refreshUniformsDistance( uniforms, material ) {
+
+		if ( material.displacementMap ) {
+
+			uniforms.displacementMap.value = material.displacementMap;
+			uniforms.displacementScale.value = material.displacementScale;
+			uniforms.displacementBias.value = material.displacementBias;
+
+		}
+
+		uniforms.referencePosition.value.copy( material.referencePosition );
+		uniforms.nearDistance.value = material.nearDistance;
+		uniforms.farDistance.value = material.farDistance;
 
 	}
 

@@ -1,4 +1,6 @@
-varying vec4 vWorldPosition;
+#define DISTANCE
+
+varying vec3 vWorldPosition;
 
 #include <common>
 #include <uv_pars_vertex>
@@ -29,6 +31,6 @@ void main() {
 	#include <worldpos_vertex>
 	#include <clipping_planes_vertex>
 
-	vWorldPosition = worldPosition;
+	vWorldPosition = worldPosition.xyz;
 
 }

@@ -1,7 +1,9 @@
-uniform vec3 lightPos;
-uniform float shadowCameraNear;
-uniform float shadowCameraFar;
-varying vec4 vWorldPosition;
+#define DISTANCE
+
+uniform vec3 referencePosition;
+uniform float nearDistance;
+uniform float farDistance;
+varying vec3 vWorldPosition;
 
 #include <common>
 #include <packing>
@@ -20,8 +22,8 @@ void main () {
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 
-	float dist = length( vWorldPosition.xyz - lightPos.xyz );
-	dist = ( dist - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear );
+	float dist = length( vWorldPosition - referencePosition );
+	dist = ( dist - nearDistance ) / ( farDistance - nearDistance );
 	dist = saturate( dist ); // clamp to [ 0, 1 ]
 
 	gl_FragColor = packDepthToRGBA( dist );
