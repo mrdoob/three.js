@@ -2488,7 +2488,6 @@ THREE.GLTF2Loader = ( function () {
 
 							}
 
-							var targetName = node.name ? node.name : node.uuid;
 							var interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : THREE.InterpolateLinear;
 
 							var targetNames = [];
@@ -2504,7 +2503,7 @@ THREE.GLTF2Loader = ( function () {
 
 									if ( object.isMesh === true && object.material.morphTargets === true ) {
 
-										targetNames.push( object.name ? object.name : object.uuid );
+										targetNames.push( object.uuid );
 
 									}
 
@@ -2512,7 +2511,7 @@ THREE.GLTF2Loader = ( function () {
 
 							} else {
 
-								targetNames.push( targetName );
+								targetNames.push( node.uuid );
 
 							}
 
