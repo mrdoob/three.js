@@ -9166,9 +9166,7 @@ Object.assign( Frustum.prototype, {
 
 function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
-	var _gl = _renderer.context,
-		_state = _renderer.state,
-		_frustum = new Frustum(),
+	var _frustum = new Frustum(),
 		_projScreenMatrix = new Matrix4(),
 
 		_shadowMapSize = new Vector2(),
@@ -9253,6 +9251,10 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
 		if ( lights.length === 0 ) return;
+
+		// TODO Clean up (needed in case of contextlost)
+		var _gl = _renderer.context;
+		var _state = _renderer.state;
 
 		// Set GL state for depth map.
 		_state.disable( _gl.BLEND );
