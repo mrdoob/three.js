@@ -6375,7 +6375,7 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
-	function LensFlarePlugin( renderer, flares ) {
+	function WebGLFlareRenderer( renderer, flares ) {
 
 		var gl = renderer.context;
 		var state = renderer.state;
@@ -6773,7 +6773,7 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
-	function SpritePlugin( renderer, sprites ) {
+	function WebGLSpriteRenderer( renderer, sprites ) {
 
 		var gl = renderer.context;
 		var state = renderer.state;
@@ -17456,11 +17456,10 @@
 
 	}
 
-	function WebGLProgram( renderer, code, material, shader, parameters ) {
+	function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
 
 		var gl = renderer.context;
 
-		var extensions = material.extensions;
 		var defines = material.defines;
 
 		var vertexShader = shader.vertexShader;
@@ -17540,7 +17539,7 @@
 
 		//
 
-		var customExtensions = generateExtensions( extensions, parameters, renderer.extensions );
+		var customExtensions = generateExtensions( material.extensions, parameters, extensions );
 
 		var customDefines = generateDefines( defines );
 
@@ -17621,7 +17620,7 @@
 				parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+				parameters.logarithmicDepthBuffer && extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 				'uniform mat4 modelMatrix;',
 				'uniform mat4 modelViewMatrix;',
@@ -17728,9 +17727,9 @@
 				parameters.physicallyCorrectLights ? "#define PHYSICALLY_CORRECT_LIGHTS" : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+				parameters.logarithmicDepthBuffer && extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
-				parameters.envMap && renderer.extensions.get( 'EXT_shader_texture_lod' ) ? '#define TEXTURE_LOD_EXT' : '',
+				parameters.envMap && extensions.get( 'EXT_shader_texture_lod' ) ? '#define TEXTURE_LOD_EXT' : '',
 
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
@@ -17857,12 +17856,11 @@
 
 		var cachedUniforms;
 
-		this.getUniforms = function() {
+		this.getUniforms = function () {
 
 			if ( cachedUniforms === undefined ) {
 
-				cachedUniforms =
-					new WebGLUniforms( gl, program, renderer );
+				cachedUniforms = new WebGLUniforms( gl, program, renderer );
 
 			}
 
@@ -17874,7 +17872,7 @@
 
 		var cachedAttributes;
 
-		this.getAttributes = function() {
+		this.getAttributes = function () {
 
 			if ( cachedAttributes === undefined ) {
 
@@ -17937,7 +17935,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLPrograms( renderer, capabilities ) {
+	function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		var programs = [];
 
@@ -18043,7 +18041,7 @@
 			// (not to blow over maxLights budget)
 
 			var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
-			var precision = renderer.getPrecision();
+			var precision = capabilities.precision;
 
 			if ( material.precision !== null ) {
 
@@ -18201,7 +18199,7 @@
 
 			if ( program === undefined ) {
 
-				program = new WebGLProgram( renderer, code, material, shader, parameters );
+				program = new WebGLProgram( renderer, extensions, code, material, shader, parameters );
 				programs.push( program );
 
 			}
@@ -20608,8 +20606,8 @@
 
 		var morphInfluences = new Float32Array( 8 );
 
-		var sprites = [];
-		var lensFlares = [];
+		var spritesArray = [];
+		var flaresArray = [];
 
 		// public properties
 
@@ -20729,6 +20727,11 @@
 
 		};
 
+		function getTargetPixelRatio() {
+
+			return _currentRenderTarget === null ? _pixelRatio : 1;
+
+		}
 
 		// initialize
 
@@ -20816,7 +20819,7 @@
 			attributes = new WebGLAttributes( _gl );
 			geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
 			objects = new WebGLObjects( _gl, geometries, _infoRender );
-			programCache = new WebGLPrograms( _this, capabilities );
+			programCache = new WebGLPrograms( _this, extensions, capabilities );
 			lights = new WebGLLights();
 			renderLists = new WebGLRenderLists();
 
@@ -20827,26 +20830,21 @@
 
 			_this.info.programs = programCache.programs;
 
+			_this.context = _gl;
+			_this.capabilities = capabilities;
+			_this.extensions = extensions;
+			_this.properties = properties;
+			_this.renderLists = renderLists;
+			_this.state = state;
+
 		}
 
 		initGLContext();
 
+		// vr
+
 		var vr = new WebVRManager( _this );
 
-		//
-
-		function getTargetPixelRatio() {
-
-			return _currentRenderTarget === null ? _pixelRatio : 1;
-
-		}
-
-		this.context = _gl;
-		this.capabilities = capabilities;
-		this.extensions = extensions;
-		this.properties = properties;
-		this.renderLists = renderLists;
-		this.state = state;
 		this.vr = vr;
 
 		// shadow map
@@ -20855,11 +20853,10 @@
 
 		this.shadowMap = shadowMap;
 
+		//
 
-		// Plugins
-
-		var spritePlugin = new SpritePlugin( this, sprites );
-		var lensFlarePlugin = new LensFlarePlugin( this, lensFlares );
+		var spriteRenderer = new WebGLSpriteRenderer( this, spritesArray );
+		var flareRenderer = new WebGLFlareRenderer( this, flaresArray );
 
 		// API
 
@@ -20886,18 +20883,6 @@
 
 			var extension = extensions.get( 'WEBGL_lose_context' );
 			if ( extension ) extension.restoreContext();
-
-		};
-
-		this.getMaxAnisotropy = function () {
-
-			return capabilities.getMaxAnisotropy();
-
-		};
-
-		this.getPrecision = function () {
-
-			return capabilities.precision;
 
 		};
 
@@ -21668,8 +21653,8 @@
 			lightsArray.length = 0;
 			shadowsArray.length = 0;
 
-			sprites.length = 0;
-			lensFlares.length = 0;
+			spritesArray.length = 0;
+			flaresArray.length = 0;
 
 			_localClippingEnabled = this.localClippingEnabled;
 			_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
@@ -21741,10 +21726,10 @@
 
 			}
 
-			// custom render plugins (post pass)
+			// custom renderers
 
-			spritePlugin.render( scene, camera );
-			lensFlarePlugin.render( scene, camera, _currentViewport );
+			spriteRenderer.render( scene, camera );
+			flareRenderer.render( scene, camera, _currentViewport );
 
 			// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -21847,13 +21832,13 @@
 
 					if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
-						sprites.push( object );
+						spritesArray.push( object );
 
 					}
 
 				} else if ( object.isLensFlare ) {
 
-					lensFlares.push( object );
+					flaresArray.push( object );
 
 				} else if ( object.isImmediateRenderObject ) {
 
@@ -42720,7 +42705,7 @@
 	SkeletonHelper.prototype.update = function () {
 
 		console.error( 'THREE.SkeletonHelper: update() no longer needs to be called.' );
-		
+
 	};
 
 	function WireframeHelper( object, hex ) {
@@ -43496,6 +43481,20 @@
 
 			console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );
 			return this.getRenderTarget();
+
+		},
+
+		getMaxAnisotropy: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .getMaxAnisotropy() is now .capabilities.getMaxAnisotropy().' );
+			return this.capabilities.getMaxAnisotropy();
+
+		},
+
+		getPrecision: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .getPrecision() is now .capabilities.precision.' );
+			return this.capabilities.precision;
 
 		},
 
