@@ -26,7 +26,7 @@
 
 		</div>
 
-		<iframe></iframe>
+		<iframe name="viewer"></iframe>
 
 		<script src="list.js"></script>
 
@@ -42,11 +42,6 @@
 			var pageProperties = {};
 			var titles = {};
 			var categoryElements = [];
-
-
-// ----------------------------------------------------------------------------
-// Initialization
-// ----------------------------------------------------------------------------
 
 
 			// Functionality for hamburger button (on small devices)
@@ -79,28 +74,40 @@
 
 			};
 
-
 			// Activate content and title change on browser navigation
 
 			window.onpopstate = createNewIframe;
-
 
 			// Create the navigation panel and configure the iframe
 
 			createNavigation();
 			createNewIframe();
 
+			// Navigation Panel
 
-// ----------------------------------------------------------------------------
-// Navigation Panel
-// ----------------------------------------------------------------------------
+			function createLink( pageName, pageURL ) {
 
+				var link = document.createElement( 'a' );
+				link.href = pageURL + '.html';
+				link.textContent = pageName;
+				link.setAttribute( 'target', 'viewer' );
+				link.addEventListener( 'click', function ( event ) {
 
-			function createNavigation () {
+					window.location.hash = pageURL;
+					panel.classList.add( 'collapsed' );
+
+				} );
+
+				return link;
+
+			}
+
+			function createNavigation() {
 
 				// Create the navigation panel using data from list.js
 
-				var navigation = createAndAppendDOMElement( { type: 'div', parent: content } );
+				var navigation = document.createElement( 'div' );
+				content.appendChild( navigation );
 
 				for ( var section in list ) {
 
@@ -108,7 +115,9 @@
 
 					var categories = list[ section ];
 
-					var sectionHead = createAndAppendDOMElement( { type: 'h2', parent: navigation, content: section } )
+					var sectionHead = document.createElement( 'h2' );
+					sectionHead.textContent = section;
+					navigation.appendChild( sectionHead );
 
 					for ( var category in categories ) {
 
@@ -116,9 +125,15 @@
 
 						var pages = categories[ category ];
 
-						var categoryContainer = createAndAppendDOMElement( { type: 'div', parent: navigation } );
-						var categoryHead = createAndAppendDOMElement( { type: 'h3', parent: categoryContainer, content: category } );
-						var categoryContent = createAndAppendDOMElement( { type: 'ul', parent: categoryContainer } );
+						var categoryContainer = document.createElement( 'div' );
+						navigation.appendChild( categoryContainer );
+
+						var categoryHead = document.createElement( 'h3' );
+						categoryHead.textContent = category;
+						categoryContainer.appendChild( categoryHead );
+
+						var categoryContent = document.createElement( 'ul' );
+						categoryContainer.appendChild( categoryContent );
 
 						for ( var pageName in pages ) {
 
@@ -126,14 +141,11 @@
 
 							var pageURL = pages[ pageName ];
 
-							var listElement = createAndAppendDOMElement( { type: 'li', parent: categoryContent } );
-							var linkElement = createAndAppendDOMElement( { type: 'a', parent: listElement, content: pageName } );
+							var listElement = document.createElement( 'li' );
+							categoryContent.appendChild( listElement );
 
-							// The href attribute is only used for the option to create a new tab by right click
-
-							linkElement.setAttribute( 'href', '#' + pageURL );
-
-							addClickHandlers( linkElement, pageURL );
+							var linkElement = createLink( pageName, pageURL )
+							listElement.appendChild( linkElement );
 
 							// Gather the main properties for the current subpage
 
@@ -158,92 +170,15 @@
 
 				}
 
-			};
-
-
-			function createAndAppendDOMElement( properties ) {
-
-				// Helper function for creating and appending new DOM elements
-
-				var newElement = document.createElement( properties.type );
-
-				properties.parent.appendChild( newElement );
-
-				if ( properties.content ) {
-
-					newElement.textContent = properties.content;
-
-				}
-
-				return newElement;
-
 			}
 
 
-			function addClickHandlers ( linkElement, pageURL ) {
-
-				// Helper function for adding ClickHandlers to the page links
-
-				linkElement.onclick = function ( event ) {
-
-					event.preventDefault();
-
-					window.location.hash = pageURL;
-					createNewIframe();
-
-					panel.classList.add( 'collapsed' );
-
-				};
-
-			};
-
-
-// ----------------------------------------------------------------------------
-// Query Strings (optional)
-// ----------------------------------------------------------------------------
-
-
-//			(uncomment the following lines and the first line in updateFilter(), if you want query strings):
-
-//			filterInput.value = extractFromQueryString();
-//			updateFilter();
-//
-//
-//			function extractFromQueryString() {
-//
-//				var queryString = window.location.search;
-//
-//				if ( queryString.indexOf( '?q=' ) === -1 ) return '';
-//
-//				return queryString.substr( 3 );
-//
-//			}
-//
-//			function updateQueryString() {
-//
-//				var searchString = filterInput.value;
-//				var query = '';
-//
-//				if (searchString !== '') {
-//
-//					query = '?q=' + searchString;
-//
-//				}
-//
-//				window.history.replaceState( {} , '', window.location.pathname + query + window.location.hash ); 
-//
-//			}
-
-
-// ----------------------------------------------------------------------------
-// Filtering
-// ----------------------------------------------------------------------------
-
+			// Filtering
 
 			function updateFilter() {
 
-//			(uncomment the following line and the "Query strings" section, if you want query strings):
-//			updateQueryString();
+				// (uncomment the following line and the "Query strings" section, if you want query strings):
+				// updateQueryString();
 
 				var regExp = new RegExp( filterInput.value, 'gi' );
 
@@ -283,7 +218,6 @@
 				displayFilteredPanel();
 
 			}
-
 
 			function displayFilteredPanel() {
 
@@ -327,10 +261,7 @@
 			}
 
 
-// ----------------------------------------------------------------------------
-// Routing
-// ----------------------------------------------------------------------------
-
+			// Routing
 
 			function setUrlFragment( pageName ) {
 
@@ -351,7 +282,6 @@
 				}
 
 			}
-
 
 			function createNewIframe() {
 
@@ -391,11 +321,10 @@
 
 			}
 
-
-			function decomposePageName ( pageName, oldDelimiter, newDelimiter ) {
+			function decomposePageName( pageName, oldDelimiter, newDelimiter ) {
 
 				// Helper function for separating the member (if existing) from the pageName
-				// For example: 'Geometry.morphTarget' can be converted to 
+				// For example: 'Geometry.morphTarget' can be converted to
 				// ['Geometry', '.morphTarget'] or ['Geometry', '#morphTarget']
 				// Note: According RFC 3986 no '#' allowed inside of an URL fragment!
 
@@ -419,11 +348,7 @@
 
 			}
 
-
-// ----------------------------------------------------------------------------
-// ASCII Art ;-)
-// ----------------------------------------------------------------------------
-
+			//
 
 			console.log([
 				'    __     __',
