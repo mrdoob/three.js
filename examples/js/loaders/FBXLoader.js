@@ -98,13 +98,13 @@
 
 				if ( ! isFbxFormatASCII( FBXText ) ) {
 
-					throw new Error( 'FBXLoader: Unknown format.' );
+					throw new Error( 'THREE.FBXLoader: Unknown format.' );
 
 				}
 
 				if ( getFbxVersion( FBXText ) < 7000 ) {
 
-					throw new Error( 'FBXLoader: FBX version not supported, FileVersion: ' + getFbxVersion( FBXText ) );
+					throw new Error( 'THREE.FBXLoader: FBX version not supported, FileVersion: ' + getFbxVersion( FBXText ) );
 
 				}
 
@@ -438,7 +438,7 @@
 				material = new THREE.MeshLambertMaterial();
 				break;
 			default:
-				console.warn( 'No implementation given for material type ' + type + ' in FBXLoader.js.  Defaulting to basic material' );
+				console.warn( 'THREE.FBXLoader: No implementation given for material type %s in FBXLoader.js. Defaulting to basic material.', type );
 				material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
 				break;
 
@@ -511,27 +511,27 @@
 
 			switch ( type ) {
 
-				case "DiffuseColor":
-				case " \"DiffuseColor":
+				case 'DiffuseColor':
+				case ' "DiffuseColor':
 					parameters.map = textureMap.get( relationship.ID );
 					break;
 
-				case "Bump":
-				case " \"Bump":
+				case 'Bump':
+				case ' "Bump':
 					parameters.bumpMap = textureMap.get( relationship.ID );
 					break;
 
-				case "NormalMap":
-				case " \"NormalMap":
+				case 'NormalMap':
+				case ' "NormalMap':
 					parameters.normalMap = textureMap.get( relationship.ID );
 					break;
 
-				case " \"AmbientColor":
-				case " \"EmissiveColor":
-				case "AmbientColor":
-				case "EmissiveColor":
+				case 'AmbientColor':
+				case 'EmissiveColor':
+				case ' "AmbientColor':
+				case ' "EmissiveColor':
 				default:
-					console.warn( 'Unknown texture application of type ' + type + ', skipping texture' );
+					console.warn( 'THREE.FBXLoader: Unknown texture application of type %s, skipping texture.', type );
 					break;
 
 			}
@@ -806,7 +806,7 @@
 
 					if ( ! displayedWeightsWarning ) {
 
-						console.warn( 'FBXLoader: Vertex has more than 4 skinning weights assigned to vertex.  Deleting additional weights.' );
+						console.warn( 'THREE.FBXLoader: Vertex has more than 4 skinning weights assigned to vertex. Deleting additional weights.' );
 						displayedWeightsWarning = true;
 
 					}
@@ -1242,7 +1242,7 @@
 
 		if ( THREE.NURBSCurve === undefined ) {
 
-			console.error( "THREE.FBXLoader relies on THREE.NURBSCurve for any nurbs present in the model.  Nurbs will show up as empty geometry." );
+			console.error( 'THREE.FBXLoader: The loader relies on THREE.NURBSCurve for any nurbs present in the model. Nurbs will show up as empty geometry.' );
 			return new THREE.BufferGeometry();
 
 		}
@@ -1251,7 +1251,7 @@
 
 		if ( isNaN( order ) ) {
 
-			console.error( "FBXLoader: Invalid Order " + geometryNode.properties.Order + " given for geometry ID: " + geometryNode.id );
+			console.error( 'THREE.FBXLoader: Invalid Order %s given for geometry ID: %s', geometryNode.properties.Order, geometryNode.id );
 			return new THREE.BufferGeometry();
 
 		}
@@ -1365,7 +1365,7 @@
 
 				switch ( node.attrType ) {
 
-					case "Mesh":
+					case 'Mesh':
 						/**
 						 * @type {?THREE.BufferGeometry}
 						 */
@@ -1437,7 +1437,7 @@
 						}
 						break;
 
-					case "NurbsCurve":
+					case 'NurbsCurve':
 						var geometry = null;
 
 						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
@@ -3283,8 +3283,8 @@
 		} catch ( error ) {
 
 			// Curve is not fully plotted.
-			console.log( bone );
-			console.log( error );
+			console.log( 'THREE.FBXLoader: ', bone );
+			console.log( 'THREE.FBXLoader: ', error );
 
 		}
 
@@ -3617,7 +3617,7 @@
 			this.currentProp = [];
 			this.currentPropName = '';
 
-			var split = text.split( "\n" );
+			var split = text.split( '\n' );
 
 			for ( var line in split ) {
 
@@ -3636,11 +3636,11 @@
 				} // skip empty line
 
 				// beginning of node
-				var beginningOfNodeExp = new RegExp( "^\\t{" + this.currentIndent + "}(\\w+):(.*){", '' );
+				var beginningOfNodeExp = new RegExp( '^\\t{' + this.currentIndent + '}(\\w+):(.*){', '' );
 				var match = l.match( beginningOfNodeExp );
 				if ( match ) {
 
-					var nodeName = match[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, "" );
+					var nodeName = match[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, '' );
 					var nodeAttrs = match[ 2 ].split( ',' );
 
 					for ( var i = 0, l = nodeAttrs.length; i < l; i ++ ) {
@@ -3653,12 +3653,12 @@
 				}
 
 				// node's property
-				var propExp = new RegExp( "^\\t{" + ( this.currentIndent ) + "}(\\w+):[\\s\\t\\r\\n](.*)" );
+				var propExp = new RegExp( '^\\t{' + ( this.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
 				var match = l.match( propExp );
 				if ( match ) {
 
-					var propName = match[ 1 ].replace( /^"/, '' ).replace( /"$/, "" ).trim();
-					var propValue = match[ 2 ].replace( /^"/, '' ).replace( /"$/, "" ).trim();
+					var propName = match[ 1 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
+					var propValue = match[ 2 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
 
 					this.parseNodeProperty( l, propName, propValue );
 					continue;
@@ -3666,7 +3666,7 @@
 				}
 
 				// end of node
-				var endOfNodeExp = new RegExp( "^\\t{" + ( this.currentIndent - 1 ) + "}}" );
+				var endOfNodeExp = new RegExp( '^\\t{' + ( this.currentIndent - 1 ) + '}}' );
 				if ( l.match( endOfNodeExp ) ) {
 
 					this.nodeEnd();
@@ -3775,7 +3775,7 @@
 
 			var id = attrs[ 0 ];
 
-			if ( attrs[ 0 ] !== "" ) {
+			if ( attrs[ 0 ] !== '' ) {
 
 				id = parseInt( attrs[ 0 ] );
 
@@ -3807,7 +3807,7 @@
 			var parentName = currentNode.name;
 
 			// special case parent node's is like "Properties70"
-			// these chilren nodes must treat with careful
+			// these children nodes must treat with careful
 			if ( parentName !== undefined ) {
 
 				var propMatch = parentName.match( /Properties(\d)+/ );
@@ -3821,7 +3821,7 @@
 			}
 
 			// special case Connections
-			if ( propName == 'C' ) {
+			if ( propName === 'C' ) {
 
 				var connProps = propValue.split( ',' ).slice( 1 );
 				var from = parseInt( connProps[ 0 ] );
@@ -3842,7 +3842,7 @@
 			}
 
 			// special case Connections
-			if ( propName == 'Node' ) {
+			if ( propName === 'Node' ) {
 
 				var id = parseInt( propValue );
 				currentNode.properties.id = id;
@@ -3917,16 +3917,16 @@
 			// cast value in its type
 			switch ( innerPropType1 ) {
 
-				case "int":
+				case 'int':
 					innerPropValue = parseInt( innerPropValue );
 					break;
 
-				case "double":
+				case 'double':
 					innerPropValue = parseFloat( innerPropValue );
 					break;
 
-				case "ColorRGB":
-				case "Vector3D":
+				case 'ColorRGB':
+				case 'Vector3D':
 					innerPropValue = parseFloatArray( innerPropValue );
 					break;
 
@@ -3981,7 +3981,7 @@
 
 			var version = reader.getUint32();
 
-			console.log( 'FBX binary version: ' + version );
+			console.log( 'THREE.FBXLoader: FBX binary version: ' + version );
 
 			var allNodes = new FBXTree();
 
@@ -4325,7 +4325,7 @@
 
 					if ( window.Zlib === undefined ) {
 
-						throw new Error( 'FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+						throw new Error( 'THREE.FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
 					}
 
@@ -4360,7 +4360,7 @@
 					return reader.getArrayBuffer( length );
 
 				default:
-					throw new Error( 'FBXLoader: Unknown property type ' + type );
+					throw new Error( 'THREE.FBXLoader: Unknown property type ' + type );
 
 			}
 
@@ -4900,7 +4900,7 @@
 		for ( var i = 0; i < CORRECT.length; ++ i ) {
 
 			var num = read( 1 );
-			if ( num == CORRECT[ i ] ) {
+			if ( num === CORRECT[ i ] ) {
 
 				return false;
 
@@ -4925,7 +4925,7 @@
 			return version;
 
 		}
-		throw new Error( 'FBXLoader: Cannot find the version number for the file given.' );
+		throw new Error( 'THREE.FBXLoader: Cannot find the version number for the file given.' );
 
 	}
 
