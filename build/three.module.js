@@ -6369,10 +6369,7 @@ Object.assign( Box2.prototype, {
  * @author alteredq / http://alteredqualia.com/
  */
 
-function WebGLFlareRenderer( renderer, flares ) {
-
-	var gl = renderer.context;
-	var state = renderer.state;
+function WebGLFlareRenderer( renderer, gl, state, capabilities ) {
 
 	var vertexBuffer, elementBuffer;
 	var shader, program, attributes, uniforms;
@@ -6543,7 +6540,7 @@ function WebGLFlareRenderer( renderer, flares ) {
 	 *         reads these back and calculates occlusion.
 	 */
 
-	this.render = function ( scene, camera, viewport ) {
+	this.render = function ( flares, scene, camera, viewport ) {
 
 		if ( flares.length === 0 ) return;
 
@@ -6728,7 +6725,7 @@ function WebGLFlareRenderer( renderer, flares ) {
 		var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
 		var vertexShader = gl.createShader( gl.VERTEX_SHADER );
 
-		var prefix = "precision " + renderer.getPrecision() + " float;\n";
+		var prefix = "precision " + capabilities.precision + " float;\n";
 
 		gl.shaderSource( fragmentShader, prefix + shader.fragmentShader );
 		gl.shaderSource( vertexShader, prefix + shader.vertexShader );
@@ -6767,10 +6764,7 @@ CanvasTexture.prototype.constructor = CanvasTexture;
  * @author alteredq / http://alteredqualia.com/
  */
 
-function WebGLSpriteRenderer( renderer, sprites ) {
-
-	var gl = renderer.context;
-	var state = renderer.state;
+function WebGLSpriteRenderer( renderer, gl, state, capabilities ) {
 
 	var vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
@@ -6848,7 +6842,7 @@ function WebGLSpriteRenderer( renderer, sprites ) {
 
 	}
 
-	this.render = function ( scene, camera ) {
+	this.render = function ( sprites, scene, camera ) {
 
 		if ( sprites.length === 0 ) return;
 
@@ -7021,7 +7015,7 @@ function WebGLSpriteRenderer( renderer, sprites ) {
 
 		gl.shaderSource( vertexShader, [
 
-			'precision ' + renderer.getPrecision() + ' float;',
+			'precision ' + capabilities.precision + ' float;',
 
 			'#define SHADER_NAME ' + 'SpriteMaterial',
 
@@ -7061,7 +7055,7 @@ function WebGLSpriteRenderer( renderer, sprites ) {
 
 		gl.shaderSource( fragmentShader, [
 
-			'precision ' + renderer.getPrecision() + ' float;',
+			'precision ' + capabilities.precision + ' float;',
 
 			'#define SHADER_NAME ' + 'SpriteMaterial',
 
@@ -9091,7 +9085,7 @@ Object.assign( Frustum.prototype, {
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLShadowMap( _renderer, _shadows, _objects, capabilities ) {
+function WebGLShadowMap( _renderer, _shadows, _objects, maxTextureSize ) {
 
 	var _gl = _renderer.context,
 		_state = _renderer.state,
@@ -9099,7 +9093,7 @@ function WebGLShadowMap( _renderer, _shadows, _objects, capabilities ) {
 		_projScreenMatrix = new Matrix4(),
 
 		_shadowMapSize = new Vector2(),
-		_maxShadowMapSize = new Vector2( capabilities.maxTextureSize, capabilities.maxTextureSize ),
+		_maxShadowMapSize = new Vector2( maxTextureSize, maxTextureSize ),
 
 		_lookTarget = new Vector3(),
 		_lightPositionWorld = new Vector3(),
@@ -20784,6 +20778,7 @@ function WebGLRenderer( parameters ) {
 	var programCache, renderLists;
 
 	var background, bufferRenderer, indexedBufferRenderer;
+	var flareRenderer, spriteRenderer;
 
 	function initGLContext() {
 
@@ -20822,6 +20817,9 @@ function WebGLRenderer( parameters ) {
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, _infoRender );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
 
+		flareRenderer = new WebGLFlareRenderer( _this, _gl, state, capabilities );
+		spriteRenderer = new WebGLSpriteRenderer( _this, _gl, state, capabilities );
+
 		_this.info.programs = programCache.programs;
 
 		_this.context = _gl;
@@ -20843,14 +20841,9 @@ function WebGLRenderer( parameters ) {
 
 	// shadow map
 
-	var shadowMap = new WebGLShadowMap( this, shadowsArray, objects, capabilities );
+	var shadowMap = new WebGLShadowMap( _this, shadowsArray, objects, capabilities.maxTextureSize );
 
 	this.shadowMap = shadowMap;
-
-	//
-
-	var spriteRenderer = new WebGLSpriteRenderer( this, spritesArray );
-	var flareRenderer = new WebGLFlareRenderer( this, flaresArray );
 
 	// API
 
@@ -21722,8 +21715,8 @@ function WebGLRenderer( parameters ) {
 
 		// custom renderers
 
-		spriteRenderer.render( scene, camera );
-		flareRenderer.render( scene, camera, _currentViewport );
+		spriteRenderer.render( spritesArray, scene, camera );
+		flareRenderer.render( flaresArray, scene, camera, _currentViewport );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
