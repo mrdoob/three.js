@@ -1540,13 +1540,16 @@ THREE.GLTF2Loader = ( function () {
 
 	}
 
+	/**
+	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#default-material
+	 */
 	function createDefaultMaterial() {
 
-		return new THREE.MeshPhongMaterial( {
-			color: 0x00000,
-			emissive: 0x888888,
-			specular: 0x000000,
-			shininess: 0,
+		return new THREE.MeshStandardMaterial( {
+			color: 0xFFFFFF,
+			emissive: 0x000000,
+			metalness: 1,
+			roughness: 1,
 			transparent: false,
 			depthTest: true,
 			side: THREE.FrontSide
@@ -2662,6 +2665,7 @@ THREE.GLTF2Loader = ( function () {
 
 								var originalMaterial = child.material;
 								var originalGeometry = child.geometry;
+								var originalInfluences = child.morphTargetInfluences;
 								var originalUserData = child.userData;
 								var originalName = child.name;
 
@@ -2697,6 +2701,7 @@ THREE.GLTF2Loader = ( function () {
 								}
 
 								child.castShadow = true;
+								child.morphTargetInfluences = originalInfluences;
 								child.userData = originalUserData;
 								child.name = originalName;
 
