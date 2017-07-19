@@ -275,7 +275,7 @@ function WebGLRenderer( parameters ) {
 		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, _infoMemory );
 		attributes = new WebGLAttributes( _gl );
 		geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
-		objects = new WebGLObjects( _gl, geometries, _infoRender );
+		objects = new WebGLObjects( geometries, _infoRender );
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
 		lights = new WebGLLights();
 		renderLists = new WebGLRenderLists();
