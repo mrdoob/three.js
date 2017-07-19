@@ -20,8 +20,6 @@ THREE.OBJLoader = ( function () {
 	var face_vertex_normal       = /^f\s+(-?\d+)\/\/(-?\d+)\s+(-?\d+)\/\/(-?\d+)\s+(-?\d+)\/\/(-?\d+)(?:\s+(-?\d+)\/\/(-?\d+))?/;
 	// o object_name | g group_name
 	var object_pattern           = /^[og]\s*(.+)?/;
-	// s boolean
-	var smoothing_pattern        = /^s\s+(\d+|on|off)/;
 	// mtllib file_reference
 	var material_library_pattern = /^mtllib /;
 	// usemtl material_name
@@ -589,7 +587,9 @@ THREE.OBJLoader = ( function () {
 
 					state.materialLibraries.push( line.substring( 7 ).trim() );
 
-				} else if ( ( result = smoothing_pattern.exec( line ) ) !== null ) {
+				} else if ( lineFirstChar === "s" ) {
+
+					result = line.split( ' ' );
 
 					// smooth shading
 
@@ -600,7 +600,6 @@ THREE.OBJLoader = ( function () {
 					// where explicit usemtl defines geometry groups.
 					// Example asset: examples/models/obj/cerberus/Cerberus.obj
 
-					var value = result[ 1 ].trim().toLowerCase();
 					/*
 					 * http://paulbourke.net/dataformats/obj/
 					 * or
@@ -612,14 +611,18 @@ THREE.OBJLoader = ( function () {
 					 * surfaces, smoothing groups are either turned on or off; there is no difference between values greater
 					 * than 0."
 					 */
-					state.object.smooth = ( value !== '0' && value !== 'off' );
+					if ( result.length > 1 ) {
 
-					var material = state.object.currentMaterial();
-					if ( material ) {
+						var value = result[ 1 ].trim().toLowerCase();
+						state.object.smooth = ( value !== '0' && value !== 'off' );
 
-						material.smooth = state.object.smooth;
+					} else {
+
+						state.object.smooth = true;
 
 					}
+					var material = state.object.currentMaterial();
+					if ( material ) material.smooth = state.object.smooth;
 
 				} else {
 

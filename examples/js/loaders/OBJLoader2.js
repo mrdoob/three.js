@@ -15,7 +15,7 @@ if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
  */
 THREE.OBJLoader2 = (function () {
 
-	var OBJLOADER2_VERSION = '1.3.0';
+	var OBJLOADER2_VERSION = '1.3.1';
 
 	function OBJLoader2( manager ) {
 		console.log( "Using THREE.OBJLoader2 version: " + OBJLOADER2_VERSION );
@@ -449,11 +449,13 @@ THREE.OBJLoader2 = (function () {
 
 				case Consts.LINE_S:
 					this.rawObject.pushSmoothingGroup( buffer[ 1 ] );
+					this.flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				case Consts.LINE_G:
 					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
 					this.processCompletedGroup( concatBuffer );
+					this.flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				case Consts.LINE_O:
@@ -468,22 +470,31 @@ THREE.OBJLoader2 = (function () {
 						this.rawObject.pushObject( concatBuffer );
 
 					}
+					this.flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				case Consts.LINE_MTLLIB:
 					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
 					this.rawObject.pushMtllib( concatBuffer );
+					this.flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				case Consts.LINE_USEMTL:
 					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
 					this.rawObject.pushUsemtl( concatBuffer );
+					this.flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				default:
 					break;
 			}
 			return reachedFaces;
+		};
+
+		Parser.prototype.flushStringBuffer = function ( buffer, bufferLength ) {
+			for ( var i = 0; i < bufferLength; i++ ) {
+				buffer[ i ] = '';
+			}
 		};
 
 		Parser.prototype.processCompletedObject = function ( objectName, groupName ) {
