@@ -1540,6 +1540,9 @@ THREE.GLTF2Loader = ( function () {
 
 	}
 
+	/**
+	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#default-material
+	 */
 	function createDefaultMaterial() {
 
 		return new THREE.MeshStandardMaterial( {
