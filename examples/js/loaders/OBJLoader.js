@@ -589,7 +589,7 @@ THREE.OBJLoader = ( function () {
 
 				} else if ( lineFirstChar === "s" ) {
 
-					result = line.length > 1 ? line.substring( 1 ).trim().split( " " ) : [];
+					result = line.split( ' ' );
 
 					// smooth shading
 
@@ -611,9 +611,9 @@ THREE.OBJLoader = ( function () {
 					 * surfaces, smoothing groups are either turned on or off; there is no difference between values greater
 					 * than 0."
 					 */
-					if ( result.length > 0 ) {
+					if ( result.length > 1 ) {
 
-						var value = result[ 0 ].trim().toLowerCase();
+						var value = result[ 1 ].trim().toLowerCase();
 						state.object.smooth = ( value !== '0' && value !== 'off' );
 
 					} else {
