@@ -504,6 +504,8 @@ function WebGLRenderer( parameters ) {
 
 		renderLists.dispose();
 
+		vr.dispose();
+
 	};
 
 	// Events
