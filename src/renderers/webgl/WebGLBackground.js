@@ -13,7 +13,7 @@ import { Color } from '../../math/Color';
 import { Mesh } from '../../objects/Mesh';
 import { ShaderLib } from '../shaders/ShaderLib';
 
-function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
+function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 	var clearColor = new Color( 0x000000 );
 	var clearAlpha = 0;
@@ -71,7 +71,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 			boxMesh.material.uniforms[ "tCube" ].value = background;
 			boxMesh.modelViewMatrix.multiplyMatrices( boxCamera.matrixWorldInverse, boxMesh.matrixWorld );
 
-			objects.update( boxMesh );
+			geometries.update( boxMesh.geometry );
 
 			renderer.renderBufferDirect( boxCamera, null, boxMesh.geometry, boxMesh.material, boxMesh, null );
 
@@ -90,7 +90,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 			planeMesh.material.map = background;
 
-			objects.update( planeMesh );
+			geometries.update( planeMesh.geometry );
 
 			renderer.renderBufferDirect( planeCamera, null, planeMesh.geometry, planeMesh.material, planeMesh, null );
 
