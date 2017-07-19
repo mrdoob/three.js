@@ -618,6 +618,7 @@ THREE.OBJLoader = ( function () {
 
 					} else {
 
+						// ZBrush can produce "s" lines #11707
 						state.object.smooth = true;
 
 					}
