@@ -7711,7 +7711,7 @@ function MeshDistanceMaterial( parameters ) {
 
 	this.type = 'MeshDistanceMaterial';
 
-	this.referencePosition = new THREE.Vector3();
+	this.referencePosition = new Vector3();
 	this.nearDistance = 1;
 	this.farDistance = 1000;
 
