@@ -1089,7 +1089,17 @@
 					canvas.width = image.width;
 					canvas.height = image.height;
 
-					canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
+					var context = canvas.getContext( '2d' );
+
+					if ( image instanceof ImageData ) {
+
+						context.putImageData( image, 0, 0 );
+
+					} else {
+
+						context.drawImage( image, 0, 0, image.width, image.height );
+
+					}
 
 				}
 
@@ -20415,6 +20425,12 @@
 
 		};
 
+		this.dispose = function() {
+
+			window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
+
+		};
+
 	}
 
 	/**
@@ -21099,6 +21115,8 @@
 			_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 
 			renderLists.dispose();
+
+			vr.dispose();
 
 		};
 

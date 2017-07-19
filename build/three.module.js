@@ -1083,7 +1083,17 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 				canvas.width = image.width;
 				canvas.height = image.height;
 
-				canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
+				var context = canvas.getContext( '2d' );
+
+				if ( image instanceof ImageData ) {
+
+					context.putImageData( image, 0, 0 );
+
+				} else {
+
+					context.drawImage( image, 0, 0, image.width, image.height );
+
+				}
 
 			}
 
@@ -20409,6 +20419,12 @@ function WebVRManager( renderer ) {
 
 	};
 
+	this.dispose = function() {
+
+		window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
+
+	};
+
 }
 
 /**
@@ -21093,6 +21109,8 @@ function WebGLRenderer( parameters ) {
 		_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 
 		renderLists.dispose();
+
+		vr.dispose();
 
 	};
 
