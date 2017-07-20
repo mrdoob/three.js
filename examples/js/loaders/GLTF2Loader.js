@@ -2237,21 +2237,9 @@ THREE.GLTF2Loader = ( function () {
 
 									for ( var j = 0, jl = positionAttribute.array.length; j < jl; j ++ ) {
 
-									    // vertex saved in single buffer view
-                                        // p0,n0,t0,w0,p1,n1,t1,w1,...pn,nn,tn,wn in buffer
-                                        // so we need calculate offset & stride
-                                        if (position.data !== undefined) {
-                                            var index = Math.floor(j / position.itemSize) * position.data.stride + position.offset;
-                                            positionAttribute.array[ j ] += position.array[ j%position.itemSize +index];
-                                        }
-                                        // vertex saved in separate buffer
-                                        // view
-                                        // p0,p1,p2...pn,
-                                        // n0,n1,n2...nn,
-                                        // t0,t1,t2...tn
-                                        else {
-                                            positionAttribute.array[ j ] += position.array[ j ];
-                                        }
+                                        positionAttribute.setXYZ(j,positionAttribute.getX( j ) + position.getX( j ),
+                                            positionAttribute.getY( j ) + position.getY( j ),
+                                            positionAttribute.getZ( j ) + position.getZ( j ));
 									}
 
 								} else {
@@ -2273,13 +2261,9 @@ THREE.GLTF2Loader = ( function () {
 
 									for ( var j = 0, jl = normalAttribute.array.length; j < jl; j ++ ) {
 
-                                        if (normal.data !== undefined) {
-                                            var index = Math.floor(j / normal.itemSize) * normal.data.stride + normal.offset;
-                                            normalAttribute.array[ j ] += normal.array[ j%normal.itemSize +index];
-                                        }
-                                        else {
-                                            normalAttribute.array[ j ] += normal.array[ j ];
-                                        }
+                                        normalAttribute.setXYZ(j,normalAttribute.getX( j ) + normal.getX( j ),
+                                            normalAttribute.getY( j ) + normal.getY( j ),
+                                            normalAttribute.getZ( j ) + normal.getZ( j ));
 									}
 
 								} else {
