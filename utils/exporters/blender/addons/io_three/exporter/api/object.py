@@ -371,8 +371,9 @@ def receive_shadow(obj):
                     return True
         return False
 
-# manthrax: TODO: Would like to evaluate wether this axis conversion stuff is still neccesary AXIS_CONVERSION = mathutils.Matrix()
-AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4() 
+# manthrax: TODO: Would like to evaluate wether this axis conversion stuff is still neccesary 
+AXIS_CONVERSION = mathutils.Matrix()
+#manthrax: removing this to allow wysiwyg export AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4() 
 
 @_object
 def matrix(obj, options):

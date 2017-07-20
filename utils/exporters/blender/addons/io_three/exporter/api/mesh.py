@@ -28,6 +28,10 @@ def flip_axes (a, dir=XYZ):
     :function to swap vectors:
 
     """
+    # manthrax: disabling this coordinate mangling stuff. the exporter is complicated enough without this layer of weirdness.
+    # this function is called in multiple places, sometimes with swap parameters, sometimes not.
+    return (a[0], a[1], a[2])
+    
 
     if dir == XZ_Y:
         a = (a[0], a[2], -a[1])
