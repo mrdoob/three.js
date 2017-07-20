@@ -22,7 +22,7 @@ THREE.GLTF2Loader = ( function () {
 
 			var scope = this;
 
-			var path = this.path && ( typeof this.path === "string" ) ? this.path : THREE.Loader.prototype.extractUrlBase( url );
+			var path = this.path && ( typeof this.path === 'string' ) ? this.path : THREE.Loader.prototype.extractUrlBase( url );
 
 			var loader = new THREE.FileLoader( scope.manager );
 
@@ -110,10 +110,10 @@ THREE.GLTF2Loader = ( function () {
 				console.timeEnd( 'GLTF2Loader' );
 
 				var glTF = {
-					"scene": scene,
-					"scenes": scenes,
-					"cameras": cameras,
-					"animations": animations
+					scene: scene,
+					scenes: scenes,
+					cameras: cameras,
+					animations: animations
 				};
 
 				callback( glTF );
@@ -229,26 +229,26 @@ THREE.GLTF2Loader = ( function () {
 
 			switch ( boundUniform.semantic ) {
 
-				case "MODELVIEW":
+				case 'MODELVIEW':
 
 					var m4 = boundUniform.uniform.value;
 					m4.multiplyMatrices( camera.matrixWorldInverse, boundUniform.sourceNode.matrixWorld );
 					break;
 
-				case "MODELVIEWINVERSETRANSPOSE":
+				case 'MODELVIEWINVERSETRANSPOSE':
 
 					var m3 = boundUniform.uniform.value;
 					this._m4.multiplyMatrices( camera.matrixWorldInverse, boundUniform.sourceNode.matrixWorld );
 					m3.getNormalMatrix( this._m4 );
 					break;
 
-				case "PROJECTION":
+				case 'PROJECTION':
 
 					var m4 = boundUniform.uniform.value;
 					m4.copy( camera.projectionMatrix );
 					break;
 
-				case "JOINTMATRIX":
+				case 'JOINTMATRIX':
 
 					var m4v = boundUniform.uniform.value;
 
@@ -270,7 +270,7 @@ THREE.GLTF2Loader = ( function () {
 
 				default :
 
-					console.warn( "Unhandled shader semantic: " + boundUniform.semantic );
+					console.warn( 'THREE.GLTF2Loader: Unhandled shader semantic: ' + boundUniform.semantic );
 					break;
 
 			}
@@ -362,7 +362,7 @@ THREE.GLTF2Loader = ( function () {
 
 				if ( light.fallOffExponent !== undefined ) {
 
-					console.warn( 'GLTF2Loader: light.fallOffExponent not currently supported.' );
+					console.warn( 'THREE.GLTF2Loader:: light.fallOffExponent not currently supported.' );
 
 				}
 
@@ -495,11 +495,11 @@ THREE.GLTF2Loader = ( function () {
 
 		if ( this.header.magic !== BINARY_EXTENSION_HEADER_MAGIC ) {
 
-			throw new Error( 'GLTF2Loader: Unsupported glTF-Binary header.' );
+			throw new Error( 'THREE.GLTF2Loader: Unsupported glTF-Binary header.' );
 
 		} else if ( this.header.version < 2.0 ) {
 
-			throw new Error( 'GLTF2Loader: Legacy binary file detected. Use GLTFLoader instead.' );
+			throw new Error( 'THREE.GLTF2Loader: Legacy binary file detected. Use GLTFLoader instead.' );
 
 		}
 
@@ -534,7 +534,7 @@ THREE.GLTF2Loader = ( function () {
 
 		if ( this.content === null ) {
 
-			throw new Error( 'GLTF2Loader: JSON content not found.' );
+			throw new Error( 'THREE.GLTF2Loader: JSON content not found.' );
 
 		}
 
@@ -582,7 +582,7 @@ THREE.GLTF2Loader = ( function () {
 
 		if ( ! materialParams.fragmentShader ) {
 
-			throw new Error( 'ERROR: Missing fragment shader definition:', program.fragmentShader );
+			throw new Error( 'THREE.GLTF2Loader: Missing fragment shader definition: ', program.fragmentShader );
 
 		}
 
@@ -590,7 +590,7 @@ THREE.GLTF2Loader = ( function () {
 
 		if ( ! vertexShader ) {
 
-			throw new Error( 'ERROR: Missing vertex shader definition:', program.vertexShader );
+			throw new Error( 'THREE.GLTF2Loader: Missing vertex shader definition: ', program.vertexShader );
 
 		}
 
@@ -659,7 +659,7 @@ THREE.GLTF2Loader = ( function () {
 					case WEBGL_CONSTANTS.FLOAT_MAT2:
 
 						// what to do?
-						console.warn( 'FLOAT_MAT2 is not a supported uniform type' );
+						console.warn( 'THREE.GLTF2Loader: FLOAT_MAT2 is not a supported uniform type.' );
 						break;
 
 					case WEBGL_CONSTANTS.FLOAT_MAT4:
@@ -734,7 +734,7 @@ THREE.GLTF2Loader = ( function () {
 
 			} else {
 
-				throw new Error( 'Unknown shader uniform param type: ' + ptype );
+				throw new Error( 'THREE.GLTF2Loader: Unknown shader uniform param type: ' + ptype );
 
 			}
 
@@ -781,7 +781,7 @@ THREE.GLTF2Loader = ( function () {
 
 				default:
 
-					throw new Error( "Unknown technique.states.enable: " + enable );
+					throw new Error( 'THREE.GLTF2Loader: Unknown technique.states.enable: ' + enable );
 
 			}
 
@@ -1487,7 +1487,7 @@ THREE.GLTF2Loader = ( function () {
 			var param = params[ pname ];
 			var semantic = param.semantic;
 
-			var regEx = new RegExp( "\\b" + pname + "\\b", "g" );
+			var regEx = new RegExp( '\\b' + pname + '\\b', 'g' );
 
 			switch ( semantic ) {
 
@@ -1612,7 +1612,7 @@ THREE.GLTF2Loader = ( function () {
 		for ( var i = 0; i < dependencies.length; i ++ ) {
 
 			var dependency = dependencies[ i ];
-			var fnName = "load" + dependency.charAt( 0 ).toUpperCase() + dependency.slice( 1 );
+			var fnName = 'load' + dependency.charAt( 0 ).toUpperCase() + dependency.slice( 1 );
 
 			var cached = this.cache.get( dependency );
 
@@ -1649,9 +1649,9 @@ THREE.GLTF2Loader = ( function () {
 		// Fire the callback on complete
 		this._withDependencies( [
 
-			"scenes",
-			"cameras",
-			"animations"
+			'scenes',
+			'cameras',
+			'animations'
 
 		] ).then( function ( dependencies ) {
 
@@ -1696,7 +1696,7 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
-			"bufferViews"
+			'bufferViews'
 
 		] ).then( function ( dependencies ) {
 
@@ -1763,7 +1763,7 @@ THREE.GLTF2Loader = ( function () {
 
 			} else {
 
-				console.warn( 'THREE.GLTF2Loader: ' + buffer.type + ' buffer type is not supported' );
+				console.warn( 'THREE.GLTF2Loader: %s buffer type is not supported.', buffer.type );
 
 			}
 
@@ -1777,7 +1777,7 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
-			"buffers"
+			'buffers'
 
 		] ).then( function ( dependencies ) {
 
@@ -1802,7 +1802,7 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
-			"bufferViews"
+			'bufferViews'
 
 		] ).then( function ( dependencies ) {
 
@@ -1850,7 +1850,7 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
-			"bufferViews"
+			'bufferViews'
 
 		] ).then( function ( dependencies ) {
 
@@ -1900,7 +1900,7 @@ THREE.GLTF2Loader = ( function () {
 
 							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
 
-								console.warn( 'THREE.GLTF2Loader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
+								console.warn( 'THREE.GLTF2Loader: Three.js does not support texture internalFormat which is different from texture format. ' +
 															'internalFormat will be forced to be the same value as format.' );
 
 							}
@@ -2096,8 +2096,8 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
-			"accessors",
-			"materials"
+			'accessors',
+			'materials'
 
 		] ).then( function ( dependencies ) {
 
@@ -2191,7 +2191,7 @@ THREE.GLTF2Loader = ( function () {
 								&& geometry.attributes.uv2 === undefined
 								&& geometry.attributes.uv !== undefined ) {
 
-							console.log( 'GLTF2Loader: Duplicating UVs to support aoMap.' );
+							console.log( 'THREE.GLTF2Loader: Duplicating UVs to support aoMap.' );
 							geometry.addAttribute( 'uv2', new THREE.BufferAttribute( geometry.attributes.uv.array, 2 ) );
 
 						}
@@ -2337,7 +2337,7 @@ THREE.GLTF2Loader = ( function () {
 
 					} else {
 
-						throw new Error( 'Only triangular and line primitives are supported' );
+						throw new Error( 'THREE.GLTF2Loader: Only triangular and line primitives are supported.' );
 
 					}
 
@@ -2379,7 +2379,7 @@ THREE.GLTF2Loader = ( function () {
 
 			if ( !params ) {
 
-				console.warn( 'GLTF2Loader: Missing camera parameters.' );
+				console.warn( 'THREE.GLTF2Loader: Missing camera parameters.' );
 				return;
 
 			}
@@ -2412,7 +2412,7 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
-			"accessors"
+			'accessors'
 
 		] ).then( function ( dependencies ) {
 
@@ -2437,8 +2437,8 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
-			"accessors",
-			"nodes"
+			'accessors',
+			'nodes'
 
 		] ).then( function ( dependencies ) {
 
@@ -2539,7 +2539,7 @@ THREE.GLTF2Loader = ( function () {
 
 				}
 
-				var name = animation.name !== undefined ? animation.name : "animation_" + animationId;
+				var name = animation.name !== undefined ? animation.name : 'animation_' + animationId;
 
 				return new THREE.AnimationClip( name, undefined, tracks );
 
@@ -2617,9 +2617,9 @@ THREE.GLTF2Loader = ( function () {
 
 			return scope._withDependencies( [
 
-				"meshes",
-				"skins",
-				"cameras"
+				'meshes',
+				'skins',
+				'cameras'
 
 			] ).then( function ( dependencies ) {
 
@@ -2635,7 +2635,7 @@ THREE.GLTF2Loader = ( function () {
 
 					} else if ( node.meshes !== undefined ) {
 
-						console.warn( 'GLTF2Loader: Legacy glTF file detected. Nodes may have no more than 1 mesh.' );
+						console.warn( 'THREE.GLTF2Loader: Legacy glTF file detected. Nodes may have no more than one mesh.' );
 
 						meshes = node.meshes;
 
@@ -2650,7 +2650,7 @@ THREE.GLTF2Loader = ( function () {
 
 							if ( group === undefined ) {
 
-								console.warn( 'GLTF2Loader: Couldn\'t find node "' + mesh + '".' );
+								console.warn( 'THREE.GLTF2Loader: Could not find node "' + mesh + '".' );
 								continue;
 
 							}
@@ -2743,7 +2743,7 @@ THREE.GLTF2Loader = ( function () {
 
 										} else {
 
-											console.warn( "WARNING: joint: '" + jointId + "' could not be found" );
+											console.warn( 'THREE.GLTF2Loader: Joint "%s" could not be found.', jointId );
 
 										}
 
@@ -2819,7 +2819,7 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
-			"nodes"
+			'nodes'
 
 		] ).then( function ( dependencies ) {
 
