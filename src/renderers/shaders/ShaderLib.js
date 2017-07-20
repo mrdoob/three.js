@@ -172,15 +172,10 @@ var ShaderLib = {
 
 	},
 
-	/* -------------------------------------------------------------------------
-	//	Cube map shader
-	 ------------------------------------------------------------------------- */
-
 	equirect: {
 
 		uniforms: {
 			tEquirect: { value: null },
-			tFlip: { value: - 1 }
 		},
 
 		vertexShader: ShaderChunk.equirect_vert,
