@@ -6385,7 +6385,7 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
-	function WebGLFlareRenderer( renderer, gl, state, capabilities ) {
+	function WebGLFlareRenderer( renderer, gl, state, textures, capabilities ) {
 
 		var vertexBuffer, elementBuffer;
 		var shader, program, attributes, uniforms;
@@ -6712,7 +6712,8 @@
 							gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
 
 							state.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
-							renderer.setTexture2D( sprite.texture, 1 );
+
+							textures.setTexture2D( sprite.texture, 1 );
 
 							gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
@@ -6780,7 +6781,7 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
-	function WebGLSpriteRenderer( renderer, gl, state, capabilities ) {
+	function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 		var vertexBuffer, elementBuffer;
 		var program, attributes, uniforms;
@@ -6998,15 +6999,7 @@
 				state.buffers.depth.setTest( material.depthTest );
 				state.buffers.depth.setMask( material.depthWrite );
 
-				if ( material.map ) {
-
-					renderer.setTexture2D( material.map, 0 );
-
-				} else {
-
-					renderer.setTexture2D( texture, 0 );
-
-				}
+				textures.setTexture2D( material.map || texture, 0 );
 
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
@@ -20911,8 +20904,8 @@
 			bufferRenderer = new WebGLBufferRenderer( _gl, extensions, _infoRender );
 			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
 
-			flareRenderer = new WebGLFlareRenderer( _this, _gl, state, capabilities );
-			spriteRenderer = new WebGLSpriteRenderer( _this, _gl, state, capabilities );
+			flareRenderer = new WebGLFlareRenderer( _this, _gl, state, textures, capabilities );
+			spriteRenderer = new WebGLSpriteRenderer( _this, _gl, state, textures, capabilities );
 
 			_this.info.programs = programCache.programs;
 
