@@ -7,7 +7,7 @@ import { CanvasTexture } from '../../textures/CanvasTexture';
 import { Vector3 } from '../../math/Vector3';
 import { Quaternion } from '../../math/Quaternion';
 
-function WebGLSpriteRenderer( renderer, gl, state, capabilities ) {
+function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 	var vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
@@ -225,15 +225,7 @@ function WebGLSpriteRenderer( renderer, gl, state, capabilities ) {
 			state.buffers.depth.setTest( material.depthTest );
 			state.buffers.depth.setMask( material.depthWrite );
 
-			if ( material.map ) {
-
-				renderer.setTexture2D( material.map, 0 );
-
-			} else {
-
-				renderer.setTexture2D( texture, 0 );
-
-			}
+			textures.setTexture2D( material.map || texture, 0 );
 
 			gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
