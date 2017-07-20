@@ -25,6 +25,13 @@ THREE.OBJLoader = ( function () {
 	// usemtl material_name
 	var material_use_pattern     = /^usemtl /;
 
+	var adding_face_modes = {
+		vertex: 1,
+		vertex_uv: 2,
+		vertex_uv_normal: 3,
+		vertex_normal: 4
+	}
+
 	function ParserState() {
 
 		var state = {
@@ -260,72 +267,96 @@ THREE.OBJLoader = ( function () {
 
 			},
 
-			addFace: function ( a, b, c, d, ua, ub, uc, ud, na, nb, nc, nd ) {
+			addFace: function ( args ) {
 
 				var vLen = this.vertices.length;
+				var uvLen = this.uvs.length;
+				var nLen = this.normals.length;
 
-				var ia = this.parseVertexIndex( a, vLen );
-				var ib = this.parseVertexIndex( b, vLen );
-				var ic = this.parseVertexIndex( c, vLen );
-				var id;
+				var addingFaceMode = Array.prototype.pop.call( arguments );
+				var ivs = [ ], ius = [ ], ins = [ ];
 
-				if ( d === undefined ) {
+				if( addingFaceMode === adding_face_modes.vertex ) {
 
-					this.addVertex( ia, ib, ic );
+					for( var i = 0; i < arguments.length; i++ ) {
 
-				} else {
+						if( !arguments[ i ] ) {
 
-					id = this.parseVertexIndex( d, vLen );
+							break;
 
-					this.addVertex( ia, ib, id );
-					this.addVertex( ib, ic, id );
+						}
 
-				}
-
-				if ( ua !== undefined ) {
-
-					var uvLen = this.uvs.length;
-
-					ia = this.parseUVIndex( ua, uvLen );
-					ib = this.parseUVIndex( ub, uvLen );
-					ic = this.parseUVIndex( uc, uvLen );
-
-					if ( d === undefined ) {
-
-						this.addUV( ia, ib, ic );
-
-					} else {
-
-						id = this.parseUVIndex( ud, uvLen );
-
-						this.addUV( ia, ib, id );
-						this.addUV( ib, ic, id );
+						ivs.push( this.parseVertexIndex( arguments[ i ], vLen ) );
 
 					}
 
 				}
 
-				if ( na !== undefined ) {
+				if( addingFaceMode === adding_face_modes.vertex_uv ) {
 
-					// Normals are many times the same. If so, skip function call and parseInt.
-					var nLen = this.normals.length;
-					ia = this.parseNormalIndex( na, nLen );
+					for( var i = 0; i < arguments.length - 1; i = i + 2 ) {
 
-					ib = na === nb ? ia : this.parseNormalIndex( nb, nLen );
-					ic = na === nc ? ia : this.parseNormalIndex( nc, nLen );
+						if( !arguments[ i ] ) {
 
-					if ( d === undefined ) {
+							break;
 
-						this.addNormal( ia, ib, ic );
+						}
 
-					} else {
+						ivs.push( this.parseVertexIndex( arguments[ i ], vLen ) );
+						ius.push( this.parseUVIndex( arguments[ i + 1 ], uvLen ) );
+					}
+				}
 
-						id = this.parseNormalIndex( nd, nLen );
+				if( addingFaceMode === adding_face_modes.vertex_uv_normal ) {
 
-						this.addNormal( ia, ib, id );
-						this.addNormal( ib, ic, id );
+					for( var i = 0; i < arguments.length - 2; i = i + 3 ) {
+
+						if( !arguments[ i ] ) {
+
+							break;
+
+						}
+
+						ivs.push( this.parseVertexIndex( arguments[ i ], vLen ) );
+						ius.push( this.parseUVIndex( arguments[ i + 1 ], uvLen ) );
+						ins.push( this.parseNormalIndex( arguments[ i + 2 ], nLen ) );
 
 					}
+
+				}
+
+				if( addingFaceMode === adding_face_modes.vertex_normal ) {
+
+					for( var i = 0; i < arguments.length - 1; i = i + 2 ) {
+
+						if( !arguments[ i ] ) {
+
+							break;
+
+						}
+
+						ivs.push( this.parseVertexIndex( arguments[ i ], vLen ) );
+						ins.push( this.parseNormalIndex( arguments[ i + 1 ], nLen ) );
+
+					}
+
+				}
+
+				for ( var j = 2; j < ivs.length; j++ ) {
+
+					this.addVertex( ivs[ 0 ], ivs[ j - 1 ], ivs[ j ] );
+
+				}
+
+				for ( var j = 2; j < ius.length; j++ ) {
+
+					this.addUV( ius[ 0 ], ius[ j - 1 ], ius[ j ] );
+
+				}
+
+				for ( var j = 2; j < ins.length; j++ ) {
+
+					this.addNormal( ins[ 0 ], ins[ j - 1 ], ins[ j ] );
 
 				}
 
@@ -489,17 +520,15 @@ THREE.OBJLoader = ( function () {
 
 				} else if ( lineFirstChar === "f" ) {
 
+					var addingFaceMode;
+
 					if ( ( result = face_vertex_uv_normal.exec( line ) ) !== null ) {
 
 						// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
 						// 0                        1    2    3    4    5    6    7    8    9   10         11         12
 						// ["f 1/1/1 2/2/2 3/3/3", "1", "1", "1", "2", "2", "2", "3", "3", "3", undefined, undefined, undefined]
 
-						state.addFace(
-							result[ 1 ], result[ 4 ], result[ 7 ], result[ 10 ],
-							result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
-							result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
-						);
+						addingFaceMode = adding_face_modes.vertex_uv_normal;
 
 					} else if ( ( result = face_vertex_uv.exec( line ) ) !== null ) {
 
@@ -507,10 +536,7 @@ THREE.OBJLoader = ( function () {
 						// 0                  1    2    3    4    5    6   7          8
 						// ["f 1/1 2/2 3/3", "1", "1", "2", "2", "3", "3", undefined, undefined]
 
-						state.addFace(
-							result[ 1 ], result[ 3 ], result[ 5 ], result[ 7 ],
-							result[ 2 ], result[ 4 ], result[ 6 ], result[ 8 ]
-						);
+						addingFaceMode = adding_face_modes.vertex_uv;
 
 					} else if ( ( result = face_vertex_normal.exec( line ) ) !== null ) {
 
@@ -518,11 +544,7 @@ THREE.OBJLoader = ( function () {
 						// 0                     1    2    3    4    5    6   7          8
 						// ["f 1//1 2//2 3//3", "1", "1", "2", "2", "3", "3", undefined, undefined]
 
-						state.addFace(
-							result[ 1 ], result[ 3 ], result[ 5 ], result[ 7 ],
-							undefined, undefined, undefined, undefined,
-							result[ 2 ], result[ 4 ], result[ 6 ], result[ 8 ]
-						);
+						addingFaceMode = adding_face_modes.vertex_normal;
 
 					} else if ( ( result = face_vertex.exec( line ) ) !== null ) {
 
@@ -530,15 +552,26 @@ THREE.OBJLoader = ( function () {
 						// 0            1    2    3   4
 						// ["f 1 2 3", "1", "2", "3", undefined]
 
-						state.addFace(
-							result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ]
-						);
+						addingFaceMode = adding_face_modes.vertex;
 
 					} else {
 
 						throw new Error( "Unexpected face line: '" + line  + "'" );
 
 					}
+
+					if( result[ 0 ].length === result.input.length ) {
+
+						result.shift();
+
+					} else {
+
+						result.push.apply( result, ( result.input.substring( result.shift().length ).match( /\d+/g ) ) );
+
+					}
+
+					result.push( addingFaceMode );
+					state.addFace.apply( state, result );
 
 				} else if ( lineFirstChar === "l" ) {
 
