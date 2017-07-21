@@ -98,11 +98,12 @@ def cast_shadow(obj):
             ret = None
         return ret
     elif obj.type == MESH:
-        mat = material(obj)
-        if mat:
-            return data.materials[mat].use_cast_shadows
-        else:
-            return False
+        mats = material(obj)
+        if mats:
+            for m in mats:
+                if data.materials[m].use_cast_shadows:
+                    return True
+        return False
 
 
 @_object
@@ -127,8 +128,10 @@ def material(obj):
 
     """
     logger.debug('object.material(%s)', obj)
+
     try:
-        return obj.material_slots[0].name
+        matName = obj.material_slots[0].name # manthrax: Make this throw an error on an empty material array, resulting in non-material
+        return [o.name for o in obj.material_slots]
     except IndexError:
         pass
 
@@ -361,13 +364,15 @@ def receive_shadow(obj):
 
     """
     if obj.type == MESH:
-        mat = material(obj)
-        if mat:
-            return data.materials[mat].use_shadows
-        else:
-            return False
+        mats = material(obj)
+        if mats:
+            for m in mats:
+                if data.materials[m].use_shadows:
+                    return True
+        return False
 
-AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4()
+# manthrax: TODO: Would like to evaluate wether this axis conversion stuff is still neccesary AXIS_CONVERSION = mathutils.Matrix()
+AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4() 
 
 @_object
 def matrix(obj, options):
