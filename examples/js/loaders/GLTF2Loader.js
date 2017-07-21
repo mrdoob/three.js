@@ -2237,8 +2237,9 @@ THREE.GLTF2Loader = ( function () {
 
 									for ( var j = 0, jl = positionAttribute.array.length; j < jl; j ++ ) {
 
-										positionAttribute.array[ j ] += position.array[ j ];
-
+                                        positionAttribute.setXYZ(j,positionAttribute.getX( j ) + position.getX( j ),
+                                            positionAttribute.getY( j ) + position.getY( j ),
+                                            positionAttribute.getZ( j ) + position.getZ( j ));
 									}
 
 								} else {
@@ -2260,8 +2261,9 @@ THREE.GLTF2Loader = ( function () {
 
 									for ( var j = 0, jl = normalAttribute.array.length; j < jl; j ++ ) {
 
-										normalAttribute.array[ j ] += normal.array[ j ];
-
+                                        normalAttribute.setXYZ(j,normalAttribute.getX( j ) + normal.getX( j ),
+                                            normalAttribute.getY( j ) + normal.getY( j ),
+                                            normalAttribute.getZ( j ) + normal.getZ( j ));
 									}
 
 								} else {
@@ -2696,7 +2698,11 @@ THREE.GLTF2Loader = ( function () {
 										break;
 
 									default:
-										child = new THREE.Mesh( originalGeometry, material );
+									    // save morph targets before replace
+                                        // meshes
+                                        var morph = child.morphTargetInfluences;
+                                        child = new THREE.Mesh( originalGeometry, material );
+                                        child.morphTargetInfluences = morph;
 
 								}
 
