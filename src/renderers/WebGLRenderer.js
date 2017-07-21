@@ -1674,6 +1674,10 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( material.volatile ) {
+			refreshMaterial = true;
+		}
+
 		if ( refreshProgram || camera !== _currentCamera ) {
 
 			p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
