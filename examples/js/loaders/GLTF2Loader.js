@@ -1911,7 +1911,7 @@ THREE.GLTF2Loader = ( function () {
 							var sampler = samplers[ texture.sampler ] || {};
 
 							_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
-							_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.NearestMipMapLinearFilter;
+							_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.LinearMipMapLinearFilter;
 							_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
 							_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
 
@@ -2235,14 +2235,18 @@ THREE.GLTF2Loader = ( function () {
 									positionAttribute = dependencies.accessors[ target.POSITION ].clone();
 									var position = geometry.attributes.position;
 
-									for ( var j = 0, jl = positionAttribute.array.length; j < jl; j ++ ) {
+									for ( var j = 0, jl = positionAttribute.count; j < jl; j ++ ) {
 
-                                        positionAttribute.setXYZ(j,positionAttribute.getX( j ) + position.getX( j ),
-                                            positionAttribute.getY( j ) + position.getY( j ),
-                                            positionAttribute.getZ( j ) + position.getZ( j ));
+										positionAttribute.setXYZ(
+											j,
+											positionAttribute.getX( j ) + position.getX( j ),
+											positionAttribute.getY( j ) + position.getY( j ),
+											positionAttribute.getZ( j ) + position.getZ( j )
+										);
+
 									}
 
-								} else {
+								} else if ( geometry.attributes.position ) {
 
 									// Copying the original position not to affect the final position.
 									// See the formula above.
@@ -2259,14 +2263,18 @@ THREE.GLTF2Loader = ( function () {
 									normalAttribute = dependencies.accessors[ target.NORMAL ].clone();
 									var normal = geometry.attributes.normal;
 
-									for ( var j = 0, jl = normalAttribute.array.length; j < jl; j ++ ) {
+									for ( var j = 0, jl = normalAttribute.count; j < jl; j ++ ) {
 
-                                        normalAttribute.setXYZ(j,normalAttribute.getX( j ) + normal.getX( j ),
-                                            normalAttribute.getY( j ) + normal.getY( j ),
-                                            normalAttribute.getZ( j ) + normal.getZ( j ));
+										normalAttribute.setXYZ(
+											j,
+											normalAttribute.getX( j ) + normal.getX( j ),
+											normalAttribute.getY( j ) + normal.getY( j ),
+											normalAttribute.getZ( j ) + normal.getZ( j )
+										);
+
 									}
 
-								} else {
+								} else if ( geometry.attributes.normal ) {
 
 									normalAttribute = geometry.attributes.normal.clone();
 
@@ -2277,11 +2285,19 @@ THREE.GLTF2Loader = ( function () {
 
 								}
 
-								positionAttribute.name = attributeName;
-								normalAttribute.name = attributeName;
+								if ( positionAttribute ) {
 
-								morphAttributes.position.push( positionAttribute );
-								morphAttributes.normal.push( normalAttribute );
+									positionAttribute.name = attributeName;
+									morphAttributes.position.push( positionAttribute );
+
+								}
+
+								if ( normalAttribute ) {
+
+									normalAttribute.name = attributeName;
+									morphAttributes.normal.push( normalAttribute );
+
+								}
 
 							}
 
@@ -2698,11 +2714,7 @@ THREE.GLTF2Loader = ( function () {
 										break;
 
 									default:
-									    // save morph targets before replace
-                                        // meshes
-                                        var morph = child.morphTargetInfluences;
-                                        child = new THREE.Mesh( originalGeometry, material );
-                                        child.morphTargetInfluences = morph;
+										child = new THREE.Mesh( originalGeometry, material );
 
 								}
 
