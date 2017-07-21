@@ -1963,7 +1963,16 @@ THREE.ColladaLoader.prototype = {
 
 				// groups
 
-				count = primitive.count * 3 * triangleCount;
+				if ( primitive.type === 'lines' || primitive.type === 'linestrips' ) {
+
+					count = primitive.count * 2;
+
+				} else {
+
+					count = primitive.count * 3 * triangleCount;
+
+				}
+
 				geometry.addGroup( start, count, p );
 				start += count;
 
