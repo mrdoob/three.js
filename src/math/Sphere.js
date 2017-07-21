@@ -104,13 +104,12 @@ Object.assign( Sphere.prototype, {
 		return box.intersectsSphere( this );
 
 	},
-	
+
 	intersectsPlane: function ( plane ) {
 
 		return Math.abs( plane.distanceToPoint( this.center ) ) <= this.radius;
 
 	},
-
 
 	clampPoint: function ( point, optionalTarget ) {
 
