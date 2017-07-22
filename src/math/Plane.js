@@ -98,7 +98,7 @@ Object.assign( Plane.prototype, {
 
 	distanceToPoint: function ( point ) {
 
-		return this.normal.dot( point ) + this.constant;
+		return this.normal.dot( point ) / this.normal.length() + this.constant;
 
 	},
 
