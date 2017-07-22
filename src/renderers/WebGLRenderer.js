@@ -687,23 +687,49 @@ function WebGLRenderer( parameters ) {
 
 		if ( objectInfluences !== undefined ) {
 
+			var length = objectInfluences.length;
+
 			var influences = influencesList[ geometry.id ];
 
 			if ( influences === undefined ) {
 
-				influencesList[ geometry.id ] = influences = new Array( objectInfluences.length );
+				// initialise list
+
+				influences = [];
+
+				for ( var i = 0; i < length; i ++ ) {
+
+					influences[ i ] = [ i, 0 ];
+
+				}
+
+				influencesList[ geometry.id ] = influences;
 
 			}
 
-			for ( var i = 0, l = objectInfluences.length; i < l; i ++ ) {
+			var morphTargets = material.morphTargets && geometry.morphAttributes.position;
+			var morphNormals = material.morphNormals && geometry.morphAttributes.normal;
+
+			// Remove current morphAttributes
+
+			for ( var i = 0; i < length; i ++ ) {
 
 				var influence = influences[ i ];
 
-				if ( influence === undefined ) {
+				if ( influence[ 1 ] !== 0 ) {
 
-					influences[ i ] = influence = new Array( 2 );
+					if ( morphTargets ) geometry.removeAttribute( 'morphTarget' + i );
+					if ( morphNormals ) geometry.removeAttribute( 'morphNormal' + i );
 
 				}
+
+			}
+
+			// Collect influences
+
+			for ( var i = 0; i < length; i ++ ) {
+
+				var influence = influences[ i ];
 
 				influence[ 0 ] = i;
 				influence[ 1 ] = objectInfluences[ i ];
@@ -712,36 +738,28 @@ function WebGLRenderer( parameters ) {
 
 			influences.sort( absNumericalSort );
 
-			var morphTargets = material.morphTargets && geometry.morphAttributes.position;
-			var morphNormals = material.morphNormals && geometry.morphAttributes.normal;
+			// Add morphAttributes
 
-			for ( var i = 0, l = Math.min( influences.length, 8 ); i < l; i ++ ) {
-
-				var morphTargetId = 'morphTarget' + i;
-				var morphNormalId = 'morphNormal' + i;
+			for ( var i = 0; i < 8; i ++ ) {
 
 				var influence = influences[ i ];
 
-				var index = influence[ 0 ];
-				var value = influence[ 1 ];
+				if ( influence ) {
 
-				if ( value !== 0 ) {
+					var index = influence[ 0 ];
+					var value = influence[ 1 ];
 
-					if ( morphTargets ) geometry.addAttribute( morphTargetId, morphTargets[ index ] );
-					if ( morphNormals ) geometry.addAttribute( morphNormalId, morphNormals[ index ] );
+					if ( value ) {
 
-				} else {
+						if ( morphTargets ) geometry.addAttribute( 'morphTarget' + i, morphTargets[ index ] );
+						if ( morphNormals ) geometry.addAttribute( 'morphNormal' + i, morphNormals[ index ] );
 
-					if ( morphTargets ) geometry.removeAttribute( morphTargetId );
-					if ( morphNormals ) geometry.removeAttribute( morphNormalId );
+						morphInfluences[ i ] = value;
+						continue;
+
+					}
 
 				}
-
-				morphInfluences[ i ] = value;
-
-			}
-
-			for ( var i = Math.min( influences.length, 8 ), il = morphInfluences.length; i < il; i ++ ) {
 
 				morphInfluences[ i ] = 0;
 
