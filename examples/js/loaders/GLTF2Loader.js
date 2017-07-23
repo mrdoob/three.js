@@ -980,6 +980,8 @@ THREE.GLTF2Loader = ( function () {
 					transparent: params.transparent
 				} );
 
+				material.isGLTFSpecularGlossinessMaterial = true;
+
 				material.color = params.color;
 
 				material.map = params.map === undefined ? null : params.map;
@@ -1280,6 +1282,8 @@ THREE.GLTF2Loader = ( function () {
 	};
 
 	var INTERPOLATION = {
+		CATMULLROMSPLINE: THREE.InterpolateSmooth,
+		CUBICSPLINE: THREE.InterpolateSmooth,
 		LINEAR: THREE.InterpolateLinear,
 		STEP: THREE.InterpolateDiscrete
 	};
@@ -2082,6 +2086,10 @@ THREE.GLTF2Loader = ( function () {
 
 				if ( material.name !== undefined ) _material.name = material.name;
 
+				// Normal map textures use OpenGL conventions:
+				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
+				_material.normalScale.x = -1;
+
 				return _material;
 
 			} );
@@ -2510,6 +2518,13 @@ THREE.GLTF2Loader = ( function () {
 							}
 
 							var targetName = node.name ? node.name : node.uuid;
+
+							if ( sampler.interpolation === 'CATMULLROMSPLINE' ) {
+
+								console.warn( 'THREE.GLTF2Loader: CATMULLROMSPLINE interpolation is not supported. Using CUBICSPLINE instead.' );
+
+							}
+
 							var interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : THREE.InterpolateLinear;
 
 							var targetNames = [];
@@ -2870,7 +2885,7 @@ THREE.GLTF2Loader = ( function () {
 					}
 
 					// for Specular-Glossiness.
-					if ( child.material && child.material.type === 'ShaderMaterial' ) {
+					if ( child.material && child.material.isGLTFSpecularGlossinessMaterial ) {
 
 						child.onBeforeRender = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].refreshUniforms;
 
