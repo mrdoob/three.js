@@ -44,7 +44,7 @@ Sidebar.Material = function ( editor ) {
 	managerRow.add( new UI.Button( 'New' ).onClick( function () {
 
 		var material = new THREE[ materialClass.getValue() ]();
-		editor.execute( new SetMaterialCommand( currentObject, material ), 'New Material: ' + materialClass.getValue(), currentMaterialSlot );
+		editor.execute( new SetMaterialCommand( currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
 		update();
 
 	} ) );
@@ -57,7 +57,7 @@ Sidebar.Material = function ( editor ) {
 
 			if( copiedMaterial.length == 0 ) return;
 			
-			copiedMaterial = copiedMaterial[0]
+			copiedMaterial = copiedMaterial[ currentMaterialSlot ]
 		}
 
 	} ) );
@@ -66,7 +66,7 @@ Sidebar.Material = function ( editor ) {
 
 		if ( copiedMaterial === undefined ) return;
 
-		editor.execute( new SetMaterialCommand( currentObject, copiedMaterial ), 'Pasted Material: ' + materialClass.getValue(), currentMaterialSlot );
+		editor.execute( new SetMaterialCommand( currentObject, copiedMaterial, currentMaterialSlot ), 'Pasted Material: ' + materialClass.getValue() );
 		refreshUI();
 		update();
 
@@ -442,11 +442,8 @@ Sidebar.Material = function ( editor ) {
 
 	var materialShadingRow = new UI.Row();
 	var materialShading = new UI.Select().setOptions( {
-
-		0: 'No',
-		1: 'Flat',
-		2: 'Smooth'
-
+		true: 'Flat',
+		false: 'Smooth'
 	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
 
 	materialShadingRow.add( new UI.Text( 'Shading' ).setWidth( '90px' ) );
@@ -527,7 +524,12 @@ Sidebar.Material = function ( editor ) {
 
 		if( Array.isArray( material ) == true){
 			
-			currentMaterialSlot = (materialSlotNumber.getValue() | 0) - 1
+			var previousSelectedSlot = currentMaterialSlot;
+
+			currentMaterialSlot = (materialSlotNumber.getValue() | 0) - 1;
+
+			if( currentMaterialSlot != previousSelectedSlot )
+				refreshUI(true);
 
 			materialSlotCountText.setValue(' of ' + material.length);
 
@@ -561,7 +563,7 @@ Sidebar.Material = function ( editor ) {
 
 				material = new THREE[ materialClass.getValue() ]();
 
-				editor.execute( new SetMaterialCommand( currentObject, material ), 'New Material: ' + materialClass.getValue(), currentMaterialSlot );
+				editor.execute( new SetMaterialCommand( currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
 				// TODO Copy other references in the scene graph
 				// keeping name and UUID then.
 				// Also there should be means to create a unique
@@ -624,7 +626,7 @@ Sidebar.Material = function ( editor ) {
 
 				if ( material.vertexColors !== vertexColors ) {
 
-					editor.execute( new SetMaterialValueCommand( currentObject, 'vertexColors', vertexColors ), currentMaterialSlot );
+					editor.execute( new SetMaterialValueCommand( currentObject, 'vertexColors', vertexColors, currentMaterialSlot ) );
 
 				}
 
@@ -923,12 +925,12 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.shading !== undefined ) {
+			if ( material.flatShading !== undefined ) {
 
-				var shading = parseInt( materialShading.getValue() );
-				if ( material.shading !== shading ) {
+				var flatShading = ( materialShading.getValue() === 'true' ) ? true : false;
+				if ( material.flatShading != flatShading ) {
 
-					editor.execute( new SetMaterialValueCommand( currentObject, 'shading', shading, currentMaterialSlot ) );
+					editor.execute( new SetMaterialValueCommand( currentObject, 'flatShading', flatShading, currentMaterialSlot ) );
 
 				}
 
@@ -1017,7 +1019,7 @@ Sidebar.Material = function ( editor ) {
 			'aoMap': materialAOMapRow,
 			'emissiveMap': materialEmissiveMapRow,
 			'side': materialSideRow,
-			'shading': materialShadingRow,
+			'flatShading': materialShadingRow,
 			'blending': materialBlendingRow,
 			'opacity': materialOpacityRow,
 			'transparent': materialTransparentRow,
@@ -1059,6 +1061,8 @@ Sidebar.Material = function ( editor ) {
 				currentMaterialSlot = 0;
 				materialSlotNumber.setValue( currentMaterialSlot + 1 );
 			}
+			
+
 			materialSlotCountText.setValue( ' of ' + material.length )
 			materialSlotNumber.setRange( 1,  material.length )
 
@@ -1307,9 +1311,9 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
-		if ( material.shading !== undefined ) {
+		if ( material.flatShading !== undefined ) {
 
-			materialShading.setValue( material.shading );
+			materialShading.setValue( material.flatShading );
 
 		}
 
