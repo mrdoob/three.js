@@ -96,7 +96,11 @@ THREE.TrackballControls = function ( object, domElement ) {
 			this.screen.top = box.top + window.pageYOffset - d.clientTop;
 			this.screen.width = box.width;
 			this.screen.height = box.height;
+			
 
+		}
+		if(!this.screen.width && !this.screen.height) {
+			console.warn('The width and height of container are both 0. Is the container properly sized?');
 		}
 
 	};
