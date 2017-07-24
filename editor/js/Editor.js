@@ -377,11 +377,6 @@ Editor.prototype = {
 		}else
 			object.material = newMaterial;
 	},
-//	getSelectedMaterial: function ( ) {
-
-//		return this.getObjectMaterial( currentObject, currentMaterialSlot )
-		
-//	},
 
 	//
 

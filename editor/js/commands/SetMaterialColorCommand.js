@@ -22,7 +22,7 @@ var SetMaterialColorCommand = function ( object, attributeName, newValue, slot )
 	this.attributeName = attributeName;
 	this.slot = slot | 0;
 
-	var material = this.editor.getCurrentMaterial()
+	var material = this.editor.getObjectMaterial( this.object, this.slot );
 
 	//this.oldValue = ( object !== undefined ) ? this.object.material[ this.attributeName ].getHex() : undefined;
 	this.oldValue = ( material !== undefined ) ? material[ this.attributeName ].getHex() : undefined;
