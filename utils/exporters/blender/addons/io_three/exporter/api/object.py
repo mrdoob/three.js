@@ -371,7 +371,7 @@ def receive_shadow(obj):
                     return True
         return False
 
-AXIS_CONVERSION = axis_conversion(to_forward='-Z', to_up='Y').to_4x4() 
+AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4() 
 
 @_object
 def matrix(obj, options):
