@@ -111,7 +111,7 @@ def _blending_types(index):
 bpy.types.Material.THREE_blending_type = EnumProperty(
     name="Blending type",
     description="Blending type",
-    items=[_blending_types(x) for x in range(5)],
+    items=[_blending_types(x) for x in range(6)],
     default=constants.BLENDING_TYPES.NORMAL)
 
 bpy.types.Material.THREE_depth_write = BoolProperty(default=True)
@@ -769,6 +769,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         default=2)
 
     def invoke(self, context, event):
+        
         settings = context.scene.get(constants.EXPORT_SETTINGS_KEY)
         if settings:
             try:
@@ -797,6 +798,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         :param context:
 
         """
+
         if not self.properties.filepath:
             raise Exception("filename not set")
 
