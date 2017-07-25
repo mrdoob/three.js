@@ -371,7 +371,6 @@ def receive_shadow(obj):
                     return True
         return False
 
-# manthrax: TODO: Would like to evaluate wether this axis conversion stuff is still neccesary AXIS_CONVERSION = mathutils.Matrix()
 AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4() 
 
 @_object
@@ -498,6 +497,7 @@ def extract_mesh(obj, options, recalculate=False):
     obj.data = mesh_node
     obj.select = True
 
+    logger.info("Applying EDGE_SPLIT modifier....")
     bpy.ops.object.modifier_add(type='EDGE_SPLIT')
     bpy.context.object.modifiers['EdgeSplit'].use_edge_angle = False
     bpy.context.object.modifiers['EdgeSplit'].use_edge_sharp = True
@@ -594,7 +594,8 @@ def objects_using_mesh(mesh_node):
     :return: list of object names
 
     """
-    logger.debug('object.objects_using_mesh(%s)', mesh_node)
+    #manthrax: remove spam
+    #logger.debug('object.objects_using_mesh(%s)', mesh_node)
     for mesh_name, objects in _MESH_MAP.items():
         if mesh_name == mesh_node.name:
             return objects

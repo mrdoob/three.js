@@ -94,7 +94,9 @@ class Object(base_classes.BaseNode):
 
             material_names = api.object.material(self.node) #manthrax: changes for multimaterial start here
             if material_names:
-                logger.info("Got material names for this object:",material_names);
+
+                logger.info("Got material names for this object:%s",str(material_names));
+
                 materialArray = [self.scene.material(objname)[constants.UUID] for objname in material_names]
                 if len(materialArray) == 0:  # If no materials.. dont export a material entry
                     materialArray = None
@@ -102,7 +104,8 @@ class Object(base_classes.BaseNode):
                     materialArray = materialArray[0]
                 # else export array of material uuids
                 self[constants.MATERIAL] = materialArray
-                logger.info("materials:",self[constants.MATERIAL]);
+
+                logger.info("Materials:%s",str(self[constants.MATERIAL]));
             else:
                 logger.info("%s has no materials", self.node) #manthrax: end multimaterial
 

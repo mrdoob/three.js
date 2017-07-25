@@ -13,6 +13,15 @@ BLENDING_TYPES = type('Blending', (), {
     'CUSTOM': 'CustomBlending'
 })
 
+BLENDING_CONSTANTS = type('BlendingConstant', (), {
+    'NoBlending':0,
+    'NormalBlending':1,
+    'AdditiveBlending':2,
+    'SubtractiveBlending':3,
+    'MultiplyBlending':4,
+    'CustomBlending':5
+})
+
 NEAREST_FILTERS = type('NearestFilters', (), {
     'NEAREST': 'NearestFilter',
     'MIP_MAP_NEAREST': 'NearestMipMapNearestFilter',
@@ -73,6 +82,9 @@ DRAW_CALLS = 'drawcalls'
 DC_START = 'start'
 DC_COUNT = 'count'
 DC_INDEX = 'index'
+
+GROUPS = 'groups'
+
 SCALE = 'scale'
 COMPRESSION = 'compression'
 MAPS = 'maps'
