@@ -19,7 +19,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 	var clearAlpha = 0;
 
 	var planeCamera, planeMesh;
-	var boxCamera, boxMesh;
+	var boxMesh;
 
 	function render( scene, camera, forceClear ) {
 
@@ -44,9 +44,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 		if ( background && background.isCubeTexture ) {
 
-			if ( boxCamera === undefined ) {
-
-				boxCamera = new PerspectiveCamera();
+			if ( boxMesh === undefined ) {
 
 				boxMesh = new Mesh(
 					new BoxBufferGeometry( 5, 5, 5 ),
@@ -63,17 +61,13 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 			}
 
-			boxCamera.projectionMatrix.copy( camera.projectionMatrix );
-
-			boxCamera.matrixWorld.extractRotation( camera.matrixWorld );
-			boxCamera.matrixWorldInverse.getInverse( boxCamera.matrixWorld );
-
 			boxMesh.material.uniforms[ "tCube" ].value = background;
-			boxMesh.modelViewMatrix.multiplyMatrices( boxCamera.matrixWorldInverse, boxMesh.matrixWorld );
+			boxMesh.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, boxMesh.matrixWorld );
+			boxMesh.normalMatrix.getNormalMatrix( boxMesh.modelViewMatrix );
 
 			geometries.update( boxMesh.geometry );
 
-			renderer.renderBufferDirect( boxCamera, null, boxMesh.geometry, boxMesh.material, boxMesh, null );
+			renderer.renderBufferDirect( camera, null, boxMesh.geometry, boxMesh.material, boxMesh, null );
 
 		} else if ( background && background.isTexture ) {
 

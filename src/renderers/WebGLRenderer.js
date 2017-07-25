@@ -12,6 +12,7 @@ import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { WebGLAttributes } from './webgl/WebGLAttributes';
 import { WebGLBackground } from './webgl/WebGLBackground';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists';
+import { WebGLMorphtargets } from './webgl/WebGLMorphtargets';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer';
 import { WebGLGeometries } from './webgl/WebGLGeometries';
@@ -59,8 +60,6 @@ function WebGLRenderer( parameters ) {
 	var shadowsArray = [];
 
 	var currentRenderList = null;
-
-	var morphInfluences = new Float32Array( 8 );
 
 	var spritesArray = [];
 	var flaresArray = [];
@@ -245,7 +244,7 @@ function WebGLRenderer( parameters ) {
 	var properties, textures, attributes, geometries, objects, lights;
 	var programCache, renderLists;
 
-	var background, bufferRenderer, indexedBufferRenderer;
+	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 	var flareRenderer, spriteRenderer;
 
 	function initGLContext() {
@@ -276,6 +275,7 @@ function WebGLRenderer( parameters ) {
 		attributes = new WebGLAttributes( _gl );
 		geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
 		objects = new WebGLObjects( geometries, _infoRender );
+		morphtargets = new WebGLMorphtargets( _gl );
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
 		lights = new WebGLLights();
 		renderLists = new WebGLRenderLists();
@@ -657,12 +657,6 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	function absNumericalSort( a, b ) {
-
-		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
-
-	}
-
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 		state.setMaterial( material );
@@ -679,61 +673,9 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		// morph targets
+		if ( object.morphTargetInfluences ) {
 
-		var morphTargetInfluences = object.morphTargetInfluences;
-
-		if ( morphTargetInfluences !== undefined ) {
-
-			// TODO Remove allocations
-
-			var activeInfluences = [];
-
-			for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
-
-				var influence = morphTargetInfluences[ i ];
-				activeInfluences.push( [ influence, i ] );
-
-			}
-
-			activeInfluences.sort( absNumericalSort );
-
-			if ( activeInfluences.length > 8 ) {
-
-				activeInfluences.length = 8;
-
-			}
-
-			var morphAttributes = geometry.morphAttributes;
-
-			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
-
-				var influence = activeInfluences[ i ];
-				morphInfluences[ i ] = influence[ 0 ];
-
-				if ( influence[ 0 ] !== 0 ) {
-
-					var index = influence[ 1 ];
-
-					if ( material.morphTargets === true && morphAttributes.position ) geometry.addAttribute( 'morphTarget' + i, morphAttributes.position[ index ] );
-					if ( material.morphNormals === true && morphAttributes.normal ) geometry.addAttribute( 'morphNormal' + i, morphAttributes.normal[ index ] );
-
-				} else {
-
-					if ( material.morphTargets === true ) geometry.removeAttribute( 'morphTarget' + i );
-					if ( material.morphNormals === true ) geometry.removeAttribute( 'morphNormal' + i );
-
-				}
-
-			}
-
-			for ( var i = activeInfluences.length, il = morphInfluences.length; i < il; i ++ ) {
-
-				morphInfluences[ i ] = 0.0;
-
-			}
-
-			program.getUniforms().setValue( _gl, 'morphTargetInfluences', morphInfluences );
+			morphtargets.update( object, geometry, material, program );
 
 			updateBuffers = true;
 
@@ -1120,8 +1062,6 @@ function WebGLRenderer( parameters ) {
 		currentRenderList.init();
 
 		projectObject( scene, camera, _this.sortObjects );
-
-		currentRenderList.finish();
 
 		if ( _this.sortObjects === true ) {
 
@@ -1904,7 +1844,11 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.opacity.value = material.opacity;
 
-		uniforms.diffuse.value = material.color;
+		if ( material.color ) {
+
+			uniforms.diffuse.value = material.color;
+
+		}
 
 		if ( material.emissive ) {
 
@@ -1912,9 +1856,38 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		uniforms.map.value = material.map;
-		uniforms.specularMap.value = material.specularMap;
-		uniforms.alphaMap.value = material.alphaMap;
+		if ( material.map ) {
+
+			uniforms.map.value = material.map;
+
+		}
+
+		if ( material.alphaMap ) {
+
+			uniforms.alphaMap.value = material.alphaMap;
+
+		}
+
+		if ( material.specularMap ) {
+
+			uniforms.specularMap.value = material.specularMap;
+
+		}
+
+		if ( material.envMap ) {
+
+			uniforms.envMap.value = material.envMap;
+
+			// don't flip CubeTexture envMaps, flip everything else:
+			//  WebGLRenderTargetCube will be flipped for backwards compatibility
+			//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
+			// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
+			uniforms.flipEnvMap.value = ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1;
+
+			uniforms.reflectivity.value = material.reflectivity;
+			uniforms.refractionRatio.value = material.refractionRatio;
+
+		}
 
 		if ( material.lightMap ) {
 
@@ -1993,17 +1966,6 @@ function WebGLRenderer( parameters ) {
 			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
 		}
-
-		uniforms.envMap.value = material.envMap;
-
-		// don't flip CubeTexture envMaps, flip everything else:
-		//  WebGLRenderTargetCube will be flipped for backwards compatibility
-		//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
-		// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
-		uniforms.flipEnvMap.value = ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1;
-
-		uniforms.reflectivity.value = material.reflectivity;
-		uniforms.refractionRatio.value = material.refractionRatio;
 
 	}
 

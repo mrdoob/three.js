@@ -5383,8 +5383,17 @@ var UniformsLib = {
 		map: { value: null },
 		offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) },
 
-		specularMap: { value: null },
 		alphaMap: { value: null },
+
+	},
+
+	specularmap: {
+
+		specularMap: { value: null },
+
+	},
+
+	envmap: {
 
 		envMap: { value: null },
 		flipEnvMap: { value: - 1 },
@@ -5778,9 +5787,9 @@ var uv2_vertex = "#if defined( USE_LIGHTMAP ) || defined( USE_AOMAP )\n\tvUv2 = 
 
 var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( PHYSICAL ) || defined( LAMBERT ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP )\n\tvec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );\n#endif\n";
 
-var cube_frag = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tgl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n\tgl_FragColor.a *= opacity;\n}\n";
+var cube_frag = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldPosition;\nvoid main() {\n\tgl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n\tgl_FragColor.a *= opacity;\n}\n";
 
-var cube_vert = "varying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvWorldPosition = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n}\n";
+var cube_vert = "varying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvWorldPosition = transformDirection( position, modelMatrix );\n\tgl_Position = projectionMatrix * vec4( normalMatrix * position, 1.0 );\n}\n";
 
 var depth_frag = "#if DEPTH_PACKING == 3200\n\tuniform float opacity;\n#endif\n#include <common>\n#include <packing>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( 1.0 );\n\t#if DEPTH_PACKING == 3200\n\t\tdiffuseColor.a = opacity;\n\t#endif\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <logdepthbuf_fragment>\n\t#if DEPTH_PACKING == 3200\n\t\tgl_FragColor = vec4( vec3( gl_FragCoord.z ), opacity );\n\t#elif DEPTH_PACKING == 3201\n\t\tgl_FragColor = packDepthToRGBA( gl_FragCoord.z );\n\t#endif\n}\n";
 
@@ -5790,7 +5799,7 @@ var distanceRGBA_frag = "#define DISTANCE\nuniform vec3 referencePosition;\nunif
 
 var distanceRGBA_vert = "#define DISTANCE\nvarying vec3 vWorldPosition;\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <skinbase_vertex>\n\t#ifdef USE_DISPLACEMENTMAP\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <worldpos_vertex>\n\t#include <clipping_planes_vertex>\n\tvWorldPosition = worldPosition.xyz;\n}\n";
 
-var equirect_frag = "uniform sampler2D tEquirect;\nuniform float tFlip;\nvarying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvec3 direction = normalize( vWorldPosition );\n\tvec2 sampleUV;\n\tsampleUV.y = saturate( tFlip * direction.y * -0.5 + 0.5 );\n\tsampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;\n\tgl_FragColor = texture2D( tEquirect, sampleUV );\n}\n";
+var equirect_frag = "uniform sampler2D tEquirect;\nvarying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvec3 direction = normalize( vWorldPosition );\n\tvec2 sampleUV;\n\tsampleUV.y = asin( clamp( direction.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;\n\tsampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;\n\tgl_FragColor = texture2D( tEquirect, sampleUV );\n}\n";
 
 var equirect_vert = "varying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvWorldPosition = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n}\n";
 
@@ -5951,6 +5960,8 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.fog
@@ -5965,6 +5976,8 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
@@ -5984,6 +5997,8 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
@@ -6009,6 +6024,7 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
@@ -6107,15 +6123,10 @@ var ShaderLib = {
 
 	},
 
-	/* -------------------------------------------------------------------------
-	//	Cube map shader
-	 ------------------------------------------------------------------------- */
-
 	equirect: {
 
 		uniforms: {
 			tEquirect: { value: null },
-			tFlip: { value: - 1 }
 		},
 
 		vertexShader: ShaderChunk.equirect_vert,
@@ -8350,15 +8361,7 @@ Object.assign( Sphere.prototype, {
 
 	intersectsPlane: function ( plane ) {
 
-		// We use the following equation to compute the signed distance from
-		// the center of the sphere to the plane.
-		//
-		// distance = q * n - d
-		//
-		// If this distance is greater than the radius of the sphere,
-		// then there is no intersection.
-
-		return Math.abs( this.center.dot( plane.normal ) - plane.constant ) <= this.radius;
+		return Math.abs( plane.distanceToPoint( this.center ) ) <= this.radius;
 
 	},
 
@@ -8749,6 +8752,8 @@ Object.assign( Matrix3.prototype, {
  */
 
 function Plane( normal, constant ) {
+
+	// normal is assumed to be normalized
 
 	this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
 	this.constant = ( constant !== undefined ) ? constant : 0;
@@ -16295,7 +16300,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 	var clearAlpha = 0;
 
 	var planeCamera, planeMesh;
-	var boxCamera, boxMesh;
+	var boxMesh;
 
 	function render( scene, camera, forceClear ) {
 
@@ -16320,9 +16325,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 		if ( background && background.isCubeTexture ) {
 
-			if ( boxCamera === undefined ) {
-
-				boxCamera = new PerspectiveCamera();
+			if ( boxMesh === undefined ) {
 
 				boxMesh = new Mesh(
 					new BoxBufferGeometry( 5, 5, 5 ),
@@ -16339,17 +16342,13 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 			}
 
-			boxCamera.projectionMatrix.copy( camera.projectionMatrix );
-
-			boxCamera.matrixWorld.extractRotation( camera.matrixWorld );
-			boxCamera.matrixWorldInverse.getInverse( boxCamera.matrixWorld );
-
 			boxMesh.material.uniforms[ "tCube" ].value = background;
-			boxMesh.modelViewMatrix.multiplyMatrices( boxCamera.matrixWorldInverse, boxMesh.matrixWorld );
+			boxMesh.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, boxMesh.matrixWorld );
+			boxMesh.normalMatrix.getNormalMatrix( boxMesh.modelViewMatrix );
 
 			geometries.update( boxMesh.geometry );
 
-			renderer.renderBufferDirect( boxCamera, null, boxMesh.geometry, boxMesh.material, boxMesh, null );
+			renderer.renderBufferDirect( camera, null, boxMesh.geometry, boxMesh.material, boxMesh, null );
 
 		} else if ( background && background.isTexture ) {
 
@@ -16461,53 +16460,26 @@ function reversePainterSortStable( a, b ) {
 
 function WebGLRenderList() {
 
-	var opaque = [];
-	var opaqueLastIndex = - 1;
+	var renderItems = [];
+	var renderItemsIndex = 0;
 
+	var opaque = [];
 	var transparent = [];
-	var transparentLastIndex = - 1;
 
 	function init() {
 
-		opaqueLastIndex = - 1;
-		transparentLastIndex = - 1;
+		renderItemsIndex = 0;
+
+		opaque.length = 0;
+		transparent.length = 0;
 
 	}
 
 	function push( object, geometry, material, z, group ) {
 
-		var array, index;
+		var renderItem = renderItems[ renderItemsIndex ];
 
-		// allocate the next position in the appropriate array
-
-		if ( material.transparent ) {
-
-			array = transparent;
-			index = ++ transparentLastIndex;
-
-		} else {
-
-			array = opaque;
-			index = ++ opaqueLastIndex;
-
-		}
-
-		// recycle existing render item or grow the array
-
-		var renderItem = array[ index ];
-
-		if ( renderItem ) {
-
-			renderItem.id = object.id;
-			renderItem.object = object;
-			renderItem.geometry = geometry;
-			renderItem.material = material;
-			renderItem.program = material.program;
-			renderItem.renderOrder = object.renderOrder;
-			renderItem.z = z;
-			renderItem.group = group;
-
-		} else {
+		if ( renderItem === undefined ) {
 
 			renderItem = {
 				id: object.id,
@@ -16520,24 +16492,31 @@ function WebGLRenderList() {
 				group: group
 			};
 
-			// assert( index === array.length );
-			array.push( renderItem );
+			renderItems[ renderItemsIndex ] = renderItem;
+
+		} else {
+
+			renderItem.id = object.id;
+			renderItem.object = object;
+			renderItem.geometry = geometry;
+			renderItem.material = material;
+			renderItem.program = material.program;
+			renderItem.renderOrder = object.renderOrder;
+			renderItem.z = z;
+			renderItem.group = group;
 
 		}
 
-	}
+		( material.transparent === true ? transparent : opaque ).push( renderItem );
 
-	function finish() {
-
-		opaque.length = opaqueLastIndex + 1;
-		transparent.length = transparentLastIndex + 1;
+		renderItemsIndex ++;
 
 	}
 
 	function sort() {
 
-		opaque.sort( painterSortStable );
-		transparent.sort( reversePainterSortStable );
+		if ( opaque.length > 1 ) opaque.sort( painterSortStable );
+		if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
 
 	}
 
@@ -16547,7 +16526,6 @@ function WebGLRenderList() {
 
 		init: init,
 		push: push,
-		finish: finish,
 
 		sort: sort
 	};
@@ -16586,6 +16564,115 @@ function WebGLRenderLists() {
 		get: get,
 		dispose: dispose
 	};
+
+}
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+function absNumericalSort( a, b ) {
+
+	return Math.abs( b[ 1 ] ) - Math.abs( a[ 1 ] );
+
+}
+
+function WebGLMorphtargets( gl ) {
+
+	var influencesList = {};
+	var morphInfluences = new Float32Array( 8 );
+
+	function update( object, geometry, material, program ) {
+
+		var objectInfluences = object.morphTargetInfluences;
+
+		var length = objectInfluences.length;
+
+		var influences = influencesList[ geometry.id ];
+
+		if ( influences === undefined ) {
+
+			// initialise list
+
+			influences = [];
+
+			for ( var i = 0; i < length; i ++ ) {
+
+				influences[ i ] = [ i, 0 ];
+
+			}
+
+			influencesList[ geometry.id ] = influences;
+
+		}
+
+		var morphTargets = material.morphTargets && geometry.morphAttributes.position;
+		var morphNormals = material.morphNormals && geometry.morphAttributes.normal;
+
+		// Remove current morphAttributes
+
+		for ( var i = 0; i < length; i ++ ) {
+
+			var influence = influences[ i ];
+
+			if ( influence[ 1 ] !== 0 ) {
+
+				if ( morphTargets ) geometry.removeAttribute( 'morphTarget' + i );
+				if ( morphNormals ) geometry.removeAttribute( 'morphNormal' + i );
+
+			}
+
+		}
+
+		// Collect influences
+
+		for ( var i = 0; i < length; i ++ ) {
+
+			var influence = influences[ i ];
+
+			influence[ 0 ] = i;
+			influence[ 1 ] = objectInfluences[ i ];
+
+		}
+
+		influences.sort( absNumericalSort );
+
+		// Add morphAttributes
+
+		for ( var i = 0; i < 8; i ++ ) {
+
+			var influence = influences[ i ];
+
+			if ( influence ) {
+
+				var index = influence[ 0 ];
+				var value = influence[ 1 ];
+
+				if ( value ) {
+
+					if ( morphTargets ) geometry.addAttribute( 'morphTarget' + i, morphTargets[ index ] );
+					if ( morphNormals ) geometry.addAttribute( 'morphNormal' + i, morphNormals[ index ] );
+
+					morphInfluences[ i ] = value;
+					continue;
+
+				}
+
+			}
+
+			morphInfluences[ i ] = 0;
+
+		}
+
+		program.getUniforms().setValue( gl, 'morphTargetInfluences', morphInfluences );
+
+	}
+
+	return {
+
+		update: update
+
+	}
 
 }
 
@@ -20673,8 +20760,6 @@ function WebGLRenderer( parameters ) {
 
 	var currentRenderList = null;
 
-	var morphInfluences = new Float32Array( 8 );
-
 	var spritesArray = [];
 	var flaresArray = [];
 
@@ -20858,7 +20943,7 @@ function WebGLRenderer( parameters ) {
 	var properties, textures, attributes, geometries, objects, lights;
 	var programCache, renderLists;
 
-	var background, bufferRenderer, indexedBufferRenderer;
+	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 	var flareRenderer, spriteRenderer;
 
 	function initGLContext() {
@@ -20889,6 +20974,7 @@ function WebGLRenderer( parameters ) {
 		attributes = new WebGLAttributes( _gl );
 		geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
 		objects = new WebGLObjects( geometries, _infoRender );
+		morphtargets = new WebGLMorphtargets( _gl );
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
 		lights = new WebGLLights();
 		renderLists = new WebGLRenderLists();
@@ -21270,12 +21356,6 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	function absNumericalSort( a, b ) {
-
-		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
-
-	}
-
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 		state.setMaterial( material );
@@ -21292,61 +21372,9 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		// morph targets
+		if ( object.morphTargetInfluences ) {
 
-		var morphTargetInfluences = object.morphTargetInfluences;
-
-		if ( morphTargetInfluences !== undefined ) {
-
-			// TODO Remove allocations
-
-			var activeInfluences = [];
-
-			for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
-
-				var influence = morphTargetInfluences[ i ];
-				activeInfluences.push( [ influence, i ] );
-
-			}
-
-			activeInfluences.sort( absNumericalSort );
-
-			if ( activeInfluences.length > 8 ) {
-
-				activeInfluences.length = 8;
-
-			}
-
-			var morphAttributes = geometry.morphAttributes;
-
-			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
-
-				var influence = activeInfluences[ i ];
-				morphInfluences[ i ] = influence[ 0 ];
-
-				if ( influence[ 0 ] !== 0 ) {
-
-					var index = influence[ 1 ];
-
-					if ( material.morphTargets === true && morphAttributes.position ) geometry.addAttribute( 'morphTarget' + i, morphAttributes.position[ index ] );
-					if ( material.morphNormals === true && morphAttributes.normal ) geometry.addAttribute( 'morphNormal' + i, morphAttributes.normal[ index ] );
-
-				} else {
-
-					if ( material.morphTargets === true ) geometry.removeAttribute( 'morphTarget' + i );
-					if ( material.morphNormals === true ) geometry.removeAttribute( 'morphNormal' + i );
-
-				}
-
-			}
-
-			for ( var i = activeInfluences.length, il = morphInfluences.length; i < il; i ++ ) {
-
-				morphInfluences[ i ] = 0.0;
-
-			}
-
-			program.getUniforms().setValue( _gl, 'morphTargetInfluences', morphInfluences );
+			morphtargets.update( object, geometry, material, program );
 
 			updateBuffers = true;
 
@@ -21733,8 +21761,6 @@ function WebGLRenderer( parameters ) {
 		currentRenderList.init();
 
 		projectObject( scene, camera, _this.sortObjects );
-
-		currentRenderList.finish();
 
 		if ( _this.sortObjects === true ) {
 
@@ -22517,7 +22543,11 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.opacity.value = material.opacity;
 
-		uniforms.diffuse.value = material.color;
+		if ( material.color ) {
+
+			uniforms.diffuse.value = material.color;
+
+		}
 
 		if ( material.emissive ) {
 
@@ -22525,9 +22555,38 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		uniforms.map.value = material.map;
-		uniforms.specularMap.value = material.specularMap;
-		uniforms.alphaMap.value = material.alphaMap;
+		if ( material.map ) {
+
+			uniforms.map.value = material.map;
+
+		}
+
+		if ( material.alphaMap ) {
+
+			uniforms.alphaMap.value = material.alphaMap;
+
+		}
+
+		if ( material.specularMap ) {
+
+			uniforms.specularMap.value = material.specularMap;
+
+		}
+
+		if ( material.envMap ) {
+
+			uniforms.envMap.value = material.envMap;
+
+			// don't flip CubeTexture envMaps, flip everything else:
+			//  WebGLRenderTargetCube will be flipped for backwards compatibility
+			//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
+			// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
+			uniforms.flipEnvMap.value = ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1;
+
+			uniforms.reflectivity.value = material.reflectivity;
+			uniforms.refractionRatio.value = material.refractionRatio;
+
+		}
 
 		if ( material.lightMap ) {
 
@@ -22606,17 +22665,6 @@ function WebGLRenderer( parameters ) {
 			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
 		}
-
-		uniforms.envMap.value = material.envMap;
-
-		// don't flip CubeTexture envMaps, flip everything else:
-		//  WebGLRenderTargetCube will be flipped for backwards compatibility
-		//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
-		// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
-		uniforms.flipEnvMap.value = ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1;
-
-		uniforms.reflectivity.value = material.reflectivity;
-		uniforms.refractionRatio.value = material.refractionRatio;
 
 	}
 
@@ -32270,7 +32318,7 @@ Object.assign( KeyframeTrack, {
 
 		} else {
 
-			// by default, we asssume a constructor compatible with the base
+			// by default, we assume a constructor compatible with the base
 			return new trackType(
 					json.name, json.times, json.values, json.interpolation );
 

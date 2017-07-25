@@ -7,6 +7,8 @@ import { Vector3 } from './Vector3';
 
 function Plane( normal, constant ) {
 
+	// normal is assumed to be normalized
+
 	this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
 	this.constant = ( constant !== undefined ) ? constant : 0;
 

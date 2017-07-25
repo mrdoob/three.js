@@ -16,6 +16,8 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.fog
@@ -30,6 +32,8 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
@@ -49,6 +53,8 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
@@ -74,6 +80,7 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
@@ -172,15 +179,10 @@ var ShaderLib = {
 
 	},
 
-	/* -------------------------------------------------------------------------
-	//	Cube map shader
-	 ------------------------------------------------------------------------- */
-
 	equirect: {
 
 		uniforms: {
 			tEquirect: { value: null },
-			tFlip: { value: - 1 }
 		},
 
 		vertexShader: ShaderChunk.equirect_vert,

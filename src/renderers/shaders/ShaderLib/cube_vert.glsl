@@ -5,8 +5,6 @@ varying vec3 vWorldPosition;
 void main() {
 
 	vWorldPosition = transformDirection( position, modelMatrix );
-
-	#include <begin_vertex>
-	#include <project_vertex>
+	gl_Position = projectionMatrix * vec4( normalMatrix * position, 1.0 );
 
 }
