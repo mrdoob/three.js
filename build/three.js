@@ -16336,13 +16336,13 @@
 					// TODO Adjust skybox to camera somehow
 
 					boxMesh = new Mesh(
-						new BoxBufferGeometry( 5, 5, 5 ),
+						new BoxBufferGeometry( 2, 2, 2 ),
 						new ShaderMaterial( {
 							uniforms: ShaderLib.cube.uniforms,
 							vertexShader: ShaderLib.cube.vertexShader,
 							fragmentShader: ShaderLib.cube.fragmentShader,
 							side: BackSide,
-							depthTest: false,
+							depthTest: true,
 							depthWrite: false,
 							fog: false
 						} )
@@ -16353,13 +16353,13 @@
 				}
 
 				boxMesh.material.uniforms.tCube.value = background;
+
+				var scale = camera.far / 1.732; // distance from 0,0,0 to 1,1,1
+
+				boxMesh.matrixWorld.makeScale( scale, scale, scale );
 				boxMesh.matrixWorld.copyPosition( camera.matrixWorld );
 
 				renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
-
-				// TOFIX Ideally background should be rendered last
-
-				renderList.opaque.unshift( renderList.opaque.pop() ); // Hack to make sure background gets rendered first
 
 			} else if ( background && background.isTexture ) {
 
@@ -20436,6 +20436,9 @@
 			if ( device.isPresenting === false ) return camera;
 
 			//
+
+			cameraVR.near = camera.near;
+			cameraVR.far = camera.far;
 
 			cameraVR.matrixWorld.copy( camera.matrixWorld );
 			cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
