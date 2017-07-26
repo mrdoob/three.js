@@ -21,7 +21,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 	var planeCamera, planeMesh;
 	var boxMesh;
 
-	function render( scene, camera, forceClear ) {
+	function render( renderList, scene, camera, forceClear ) {
 
 		var background = scene.background;
 
@@ -47,7 +47,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 			if ( boxMesh === undefined ) {
 
 				boxMesh = new Mesh(
-					new BoxBufferGeometry( 5, 5, 5 ),
+					new BoxBufferGeometry( 1, 1, 1 ),
 					new ShaderMaterial( {
 						uniforms: ShaderLib.cube.uniforms,
 						vertexShader: ShaderLib.cube.vertexShader,
@@ -59,15 +59,18 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 					} )
 				);
 
+				geometries.update( boxMesh.geometry );
+
 			}
 
-			boxMesh.material.uniforms[ "tCube" ].value = background;
-			boxMesh.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, boxMesh.matrixWorld );
-			boxMesh.normalMatrix.getNormalMatrix( boxMesh.modelViewMatrix );
+			boxMesh.material.uniforms.tCube.value = background;
 
-			geometries.update( boxMesh.geometry );
+			renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
 
-			renderer.renderBufferDirect( camera, null, boxMesh.geometry, boxMesh.material, boxMesh, null );
+			// TOFIX Hack to make sure background gets rendered first
+			// TOFIX Ideally background should be rendered last
+
+			renderList.opaque.unshift( renderList.opaque.pop() );
 
 		} else if ( background && background.isTexture ) {
 
@@ -80,11 +83,13 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 					new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
 				);
 
+				geometries.update( planeMesh.geometry );
+
 			}
 
 			planeMesh.material.map = background;
 
-			geometries.update( planeMesh.geometry );
+			// TODO Push this to renderList
 
 			renderer.renderBufferDirect( planeCamera, null, planeMesh.geometry, planeMesh.material, planeMesh, null );
 
