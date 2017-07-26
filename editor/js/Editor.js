@@ -351,14 +351,7 @@ Editor.prototype = {
 
 		var material = object.material;
 
-		if( Array.isArray( material ) == true){
-			var slot = slot | 0;
-
-			if(slot <  0) slot = 0;
-			else if(slot >= material.length) slot = material.length;
-
-			material = material[ slot ];
-		}
+		if( Array.isArray( material ) == true) material = material[ slot ];
 		
 		return material;
 
@@ -368,15 +361,8 @@ Editor.prototype = {
 
 		var material = object.material;
 
-		if( Array.isArray( material ) == true){
-			var slot = this.materialSlot | 0;
-
-			if(slot <  0) slot = 0;
-			else if(slot >= material.length) slot = material.length;
-
-			material[ slot ] = newMaterial;
-		}else
-			object.material = newMaterial;
+		if( Array.isArray( material ) == true) material[ slot ] = newMaterial;
+		else object.material = newMaterial;
 	},
 
 	//

@@ -513,7 +513,7 @@ Sidebar.Material = function ( editor ) {
 
 		var previousSelectedSlot = currentMaterialSlot;
 
-		currentMaterialSlot = materialSlotSelect.getValue() | 0;
+		currentMaterialSlot = parseInt( materialSlotSelect.getValue() );
 
 		if( currentMaterialSlot != previousSelectedSlot )
 			refreshUI(true);
