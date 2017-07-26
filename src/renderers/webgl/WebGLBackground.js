@@ -61,16 +61,20 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 					} )
 				);
 
+				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
+
+					var scale = camera.far / 1.732; // distance from 0,0,0 to 1,1,1
+
+					this.matrixWorld.makeScale( scale, scale, scale );
+					this.matrixWorld.copyPosition( camera.matrixWorld );
+
+				};
+
 				geometries.update( boxMesh.geometry );
 
 			}
 
 			boxMesh.material.uniforms.tCube.value = background;
-
-			var scale = camera.far / 1.732; // distance from 0,0,0 to 1,1,1
-
-			boxMesh.matrixWorld.makeScale( scale, scale, scale );
-			boxMesh.matrixWorld.copyPosition( camera.matrixWorld );
 
 			renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
 

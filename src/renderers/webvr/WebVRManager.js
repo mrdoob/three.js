@@ -128,8 +128,11 @@ function WebVRManager( renderer ) {
 
 		//
 
-		cameraVR.near = camera.near;
-		cameraVR.far = camera.far;
+		cameraL.near = camera.near;
+		cameraR.near = camera.near;
+
+		cameraL.far = camera.far;
+		cameraR.far = camera.far;
 
 		cameraVR.matrixWorld.copy( camera.matrixWorld );
 		cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
