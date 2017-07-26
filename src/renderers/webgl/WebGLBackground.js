@@ -62,6 +62,9 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 					} )
 				);
 
+				boxMesh.geometry.removeAttribute( 'normal' );
+				boxMesh.geometry.removeAttribute( 'uv' );
+
 				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
 					var scale = camera.far;
