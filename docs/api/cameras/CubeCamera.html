@@ -20,21 +20,21 @@
 		<div>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</div>
 		<div>[example:webgl_shading_physical shading / physical ]</div>
 
-		<code>//Create cube camera
+		<code>// Create cube camera
 		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
 		scene.add( cubeCamera );
 
-		//Create car
+		// Create car
 		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget } );
 		var car = new Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 
-		//Update the render target cube
+		// Update the render target cube
 		car.setVisible( false );
 		cubeCamera.position.copy( car.position );
 		cubeCamera.update( renderer, scene );
 
-		//Render the scene
+		// Render the scene
 		car.setVisible( true );
 		renderer.render( scene, camera );
 		</code>
