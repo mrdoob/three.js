@@ -2595,6 +2595,8 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	this.paramThreeToGL = paramThreeToGL;
+
 }
 
 
