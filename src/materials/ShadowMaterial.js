@@ -7,6 +7,7 @@ import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
  * @author mrdoob / http://mrdoob.com/
  *
  * parameters = {
+ *  color: <THREE.Color>,
  *  opacity: <float>
  * }
  */
@@ -17,6 +18,7 @@ function ShadowMaterial( parameters ) {
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.lights,
 			{
+				color: { value: new THREE.Color( 0, 0, 0 ) },
 				opacity: { value: 1.0 }
 			}
 		] ),
@@ -28,6 +30,15 @@ function ShadowMaterial( parameters ) {
 	this.transparent = true;
 
 	Object.defineProperties( this, {
+		color: {
+			enumerable: true,
+			get: function () {
+				return this.uniforms.color.value;
+			},
+			set: function ( value ) {
+				this.uniforms.color.value = value;
+			}
+		},
 		opacity: {
 			enumerable: true,
 			get: function () {
