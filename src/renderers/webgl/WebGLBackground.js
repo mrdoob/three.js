@@ -47,7 +47,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 			if ( boxMesh === undefined ) {
 
 				boxMesh = new Mesh(
-					new BoxBufferGeometry( 1, 1, 1 ),
+					new BoxBufferGeometry( 5, 5, 5 ),
 					new ShaderMaterial( {
 						uniforms: ShaderLib.cube.uniforms,
 						vertexShader: ShaderLib.cube.vertexShader,
