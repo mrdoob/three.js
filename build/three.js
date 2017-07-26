@@ -16333,10 +16333,11 @@
 
 				if ( boxMesh === undefined ) {
 
-					// TODO Adjust skybox to camera somehow
+					// Normalized box
+					// 1.1547 = (1,1,1).normalize() * 2.0
 
 					boxMesh = new Mesh(
-						new BoxBufferGeometry( 2, 2, 2 ),
+						new BoxBufferGeometry( 1.1547, 1.1547, 1.1547 ),
 						new ShaderMaterial( {
 							uniforms: ShaderLib.cube.uniforms,
 							vertexShader: ShaderLib.cube.vertexShader,
@@ -16348,9 +16349,12 @@
 						} )
 					);
 
+					boxMesh.geometry.removeAttribute( 'normal' );
+					boxMesh.geometry.removeAttribute( 'uv' );
+
 					boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
-						var scale = camera.far / 1.732; // distance from 0,0,0 to 1,1,1
+						var scale = camera.far;
 
 						this.matrixWorld.makeScale( scale, scale, scale );
 						this.matrixWorld.copyPosition( camera.matrixWorld );
