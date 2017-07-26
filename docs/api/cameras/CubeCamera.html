@@ -32,7 +32,7 @@
 		//Update the render target cube
 		car.setVisible( false );
 		cubeCamera.position.copy( car.position );
-		cubeCamera.updateCubeMap( renderer, scene );
+		cubeCamera.update( renderer, scene );
 
 		//Render the scene
 		car.setVisible( true );
@@ -67,7 +67,7 @@
 		<div>See the base [page:Object3D] class for common methods.</div>
 
 
-		<h3>[method:null updateCubeMap]( [page:WebGLRenderer renderer], [page:Scene scene] )</h3>
+		<h3>[method:null update]( [page:WebGLRenderer renderer], [page:Scene scene] )</h3>
 		<div>
 		renderer -- The current WebGL renderer <br />
 		scene -- The current scene
@@ -76,7 +76,7 @@
 		Call this to update the [page:CubeCamera.renderTarget renderTarget].
 		</div>
 
-		<h3>[method:null clearCubeMap]( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
+		<h3>[method:null clear]( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
 		<div>
 		Call this to clear the [page:CubeCamera.renderTarget renderTarget] color, depth, and/or stencil buffers.
 		The color buffer is set to the renderer's current clear color. Arguments default to *true*.

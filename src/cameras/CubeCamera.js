@@ -54,7 +54,7 @@ function CubeCamera( near, far, cubeResolution ) {
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
 	this.renderTarget.texture.name = "CubeCamera";
 
-	this.updateCubeMap = function ( renderer, scene ) {
+	this.update = function ( renderer, scene ) {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
 
@@ -87,7 +87,7 @@ function CubeCamera( near, far, cubeResolution ) {
 
 	};
 
-	this.clearCubeMap = function ( color, depth, stencil ) {
+	this.clear = function ( color, depth, stencil ) {
 
 		var renderTarget = this.renderTarget;
 
