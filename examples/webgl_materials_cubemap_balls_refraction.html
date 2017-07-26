@@ -77,12 +77,8 @@
 
 				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
 
-				var textureCube = new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/Park3Med/' )
-					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-				textureCube.mapping = THREE.CubeRefractionMapping;
-
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: scene.background, refractionRatio: 0.95 } );
+				material.envMap.mapping = THREE.CubeRefractionMapping;
 
 				for ( var i = 0; i < 500; i ++ ) {
 
