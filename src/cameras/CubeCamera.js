@@ -87,6 +87,23 @@ function CubeCamera( near, far, cubeResolution ) {
 
 	};
 
+	this.clearCubeMap = function () {
+
+		var renderTarget = this.renderTarget;
+
+		for ( var i = 0; i < 6; i ++ ) {
+
+			renderTarget.activeCubeFace = i;
+			renderer.setRenderTarget( renderTarget );
+
+			renderer.clear();
+
+		}
+
+		renderer.setRenderTarget( null );
+
+	}
+
 }
 
 CubeCamera.prototype = Object.create( Object3D.prototype );
