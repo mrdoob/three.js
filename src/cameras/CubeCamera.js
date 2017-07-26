@@ -87,7 +87,7 @@ function CubeCamera( near, far, cubeResolution ) {
 
 	};
 
-	this.clearCubeMap = function () {
+	this.clearCubeMap = function ( color, depth, stencil ) {
 
 		var renderTarget = this.renderTarget;
 
@@ -96,7 +96,7 @@ function CubeCamera( near, far, cubeResolution ) {
 			renderTarget.activeCubeFace = i;
 			renderer.setRenderTarget( renderTarget );
 
-			renderer.clear();
+			renderer.clear( color, depth, stencil );
 
 		}
 

@@ -76,9 +76,10 @@
 		Call this to update the [page:CubeCamera.renderTarget renderTarget].
 		</div>
 
-		<h3>[method:null clearCubeMap]()</h3>
+		<h3>[method:null clearCubeMap]( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
 		<div>
-		Call this to clear the [page:CubeCamera.renderTarget renderTarget] using the renderer's current clear color.
+		Call this to clear the [page:CubeCamera.renderTarget renderTarget] color, depth, and/or stencil buffers.
+		The color buffer is set to the renderer's current clear color. Arguments default to *true*.
 		</div>
 
 		<h2>Source</h2>
