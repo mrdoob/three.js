@@ -16327,8 +16327,10 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 			if ( boxMesh === undefined ) {
 
+				// TODO Adjust skybox to camera somehow
+
 				boxMesh = new Mesh(
-					new BoxBufferGeometry( 1, 1, 1 ),
+					new BoxBufferGeometry( 5, 5, 5 ),
 					new ShaderMaterial( {
 						uniforms: ShaderLib.cube.uniforms,
 						vertexShader: ShaderLib.cube.vertexShader,
@@ -16349,10 +16351,9 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 			renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
 
-			// TOFIX Hack to make sure background gets rendered first
 			// TOFIX Ideally background should be rendered last
 
-			renderList.opaque.unshift( renderList.opaque.pop() );
+			renderList.opaque.unshift( renderList.opaque.pop() ); // Hack to make sure background gets rendered first
 
 		} else if ( background && background.isTexture ) {
 
