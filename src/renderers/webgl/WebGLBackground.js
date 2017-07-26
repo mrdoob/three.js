@@ -64,6 +64,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 			}
 
 			boxMesh.material.uniforms.tCube.value = background;
+			boxMesh.matrixWorld.copyPosition( camera.matrixWorld );
 
 			renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
 
