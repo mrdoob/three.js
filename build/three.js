@@ -22499,64 +22499,74 @@
 
 				}
 
-				if ( material.isMeshBasicMaterial ||
-					material.isMeshLambertMaterial ||
-					material.isMeshPhongMaterial ||
-					material.isMeshStandardMaterial ||
-					material.isMeshNormalMaterial ||
-					material.isMeshDepthMaterial ||
-					material.isMeshDistanceMaterial ) {
+				if ( material.isMeshBasicMaterial ) {
 
 					refreshUniformsCommon( m_uniforms, material );
 
-				}
-
-				// refresh single material specific uniforms
-
-				if ( material.isLineBasicMaterial ) {
-
-					refreshUniformsLine( m_uniforms, material );
-
-				} else if ( material.isLineDashedMaterial ) {
-
-					refreshUniformsLine( m_uniforms, material );
-					refreshUniformsDash( m_uniforms, material );
-
-				} else if ( material.isPointsMaterial ) {
-
-					refreshUniformsPoints( m_uniforms, material );
-
 				} else if ( material.isMeshLambertMaterial ) {
 
+					refreshUniformsCommon( m_uniforms, material );
 					refreshUniformsLambert( m_uniforms, material );
-
-				} else if ( material.isMeshToonMaterial ) {
-
-					refreshUniformsToon( m_uniforms, material );
 
 				} else if ( material.isMeshPhongMaterial ) {
 
-					refreshUniformsPhong( m_uniforms, material );
+					refreshUniformsCommon( m_uniforms, material );
 
-				} else if ( material.isMeshPhysicalMaterial ) {
+					if ( material.isMeshToonMaterial ) {
 
-					refreshUniformsPhysical( m_uniforms, material );
+						refreshUniformsToon( m_uniforms, material );
+
+					} else {
+
+						refreshUniformsPhong( m_uniforms, material );
+
+					}
 
 				} else if ( material.isMeshStandardMaterial ) {
 
-					refreshUniformsStandard( m_uniforms, material );
+					refreshUniformsCommon( m_uniforms, material );
+
+					if ( material.isMeshPhysicalMaterial ) {
+
+						refreshUniformsPhysical( m_uniforms, material );
+
+					} else {
+
+						refreshUniformsStandard( m_uniforms, material );
+
+					}
+
+				} else if ( material.isMeshNormalMaterial ) {
+
+					refreshUniformsCommon( m_uniforms, material );
 
 				} else if ( material.isMeshDepthMaterial ) {
 
+					refreshUniformsCommon( m_uniforms, material );
 					refreshUniformsDepth( m_uniforms, material );
 
 				} else if ( material.isMeshDistanceMaterial ) {
 
+					refreshUniformsCommon( m_uniforms, material );
 					refreshUniformsDistance( m_uniforms, material );
 
 				} else if ( material.isMeshNormalMaterial ) {
 
 					refreshUniformsNormal( m_uniforms, material );
+
+				} else if ( material.isLineBasicMaterial ) {
+
+					refreshUniformsLine( m_uniforms, material );
+
+					if ( material.isLineDashedMaterial ) {
+
+						refreshUniformsDash( m_uniforms, material );
+
+					}
+
+				} else if ( material.isPointsMaterial ) {
+
+					refreshUniformsPoints( m_uniforms, material );
 
 				} else if ( material.isShadowMaterial ) {
 
@@ -29757,36 +29767,26 @@
 
 	function LineDashedMaterial( parameters ) {
 
-		Material.call( this );
+		LineBasicMaterial.call( this );
 
 		this.type = 'LineDashedMaterial';
-
-		this.color = new Color( 0xffffff );
-
-		this.linewidth = 1;
 
 		this.scale = 1;
 		this.dashSize = 3;
 		this.gapSize = 1;
 
-		this.lights = false;
-
 		this.setValues( parameters );
 
 	}
 
-	LineDashedMaterial.prototype = Object.create( Material.prototype );
+	LineDashedMaterial.prototype = Object.create( LineBasicMaterial.prototype );
 	LineDashedMaterial.prototype.constructor = LineDashedMaterial;
 
 	LineDashedMaterial.prototype.isLineDashedMaterial = true;
 
 	LineDashedMaterial.prototype.copy = function ( source ) {
 
-		Material.prototype.copy.call( this, source );
-
-		this.color.copy( source.color );
-
-		this.linewidth = source.linewidth;
+		LineBasicMaterial.prototype.copy.call( this, source );
 
 		this.scale = source.scale;
 		this.dashSize = source.dashSize;
