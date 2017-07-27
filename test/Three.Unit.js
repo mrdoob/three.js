@@ -89,7 +89,6 @@ export { SplineCurve } from '../src/extras/curves/SplineCurve.js';
 
 //src/extras/objects
 export { ImmediateRenderObject } from '../src/extras/objects/ImmediateRenderObject.js';
-export { MorphBlendMesh } from '../src/extras/objects/MorphBlendMesh.js';
 
 
 //src/geometries
@@ -241,9 +240,3 @@ export { DataTexture } from '../src/textures/DataTexture.js';
 export { DepthTexture } from '../src/textures/DepthTexture.js';
 export { Texture } from '../src/textures/Texture.js';
 export { VideoTexture } from '../src/textures/VideoTexture.js';
-
-
-
-
-
-

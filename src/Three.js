@@ -120,7 +120,6 @@ export { Vector3 } from './math/Vector3.js';
 export { Vector2 } from './math/Vector2.js';
 export { Quaternion } from './math/Quaternion.js';
 export { Color } from './math/Color.js';
-export { MorphBlendMesh } from './extras/objects/MorphBlendMesh.js';
 export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
 export { VertexNormalsHelper } from './helpers/VertexNormalsHelper.js';
 export { SpotLightHelper } from './helpers/SpotLightHelper.js';
