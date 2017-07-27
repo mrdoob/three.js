@@ -20,7 +20,7 @@ var SetMaterialColorCommand = function ( object, attributeName, newValue, slot )
 
 	this.object = object;
 	this.attributeName = attributeName;
-	this.slot = slot | 0;
+	this.slot = slot;
 
 	var material = this.editor.getObjectMaterial( this.object, this.slot );
 

@@ -19,7 +19,7 @@ var SetMaterialCommand = function ( object, newMaterial , slot) {
 
 	this.object = object;
 
-	this.slot = slot | 0;
+	this.slot = slot;
 
 	var material = this.editor.getObjectMaterial( this.object, this.slot );
 
