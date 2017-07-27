@@ -43,7 +43,7 @@
 		<script>
 
 			var group;
-			var container, controls, stats;
+			var container, stats;
 			var particlesData = [];
 			var camera, scene, renderer;
 			var positions, colors;
@@ -98,7 +98,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
 				camera.position.z = 1750;
 
-				controls = new THREE.OrbitControls( camera, container );
+				var controls = new THREE.OrbitControls( camera, container );
 
 				scene = new THREE.Scene();
 

@@ -1,6 +1,5 @@
 ﻿<!DOCTYPE html>
 <html lang='en'>
-
 <head>
     <title>three.js webgl - loaders - X-File loader</title>
     <meta charset='utf-8'>
@@ -34,7 +33,6 @@
         }
     </style>
 </head>
-
 <body>
 
     <div id='info'>
@@ -116,12 +114,12 @@
             Texloader = new THREE.TextureLoader();
             var loader = new THREE.XLoader(manager, Texloader);
 
-            // ! If [ Texture ] was reversed Y axis, enable the following. 
+            // ! If [ Texture ] was reversed Y axis, enable the following.
             // THREE.XLoader.IsUvYReverse = false;
-            
-		    // ! And if [ Model ] was reversed polygons, enable the following. 
+
+		    // ! And if [ Model ] was reversed polygons, enable the following.
             // loader.load([' your model url ', true ], function (object) {
-            
+
             // read (download) model file
             loader.load(['models/xfile/SSR06_Born2.x', false], function (object) {
 
@@ -139,14 +137,14 @@
 
                             Models[i].geometry.animations = [];
 
-                            /* 
+                            /*
                             *  ↓ that is BASIC animation data code.
                             *  Usually, please use this.
                             *  Because of the data I have, I use a different code
-                            * 
+                            *
                            for (var a = 0; a < object.XAnimationObj.length; a++) {
                                Models[i].geometry.animations.push(THREE.AnimationClip.parseAnimation(object.XAnimationObj[a], Models[i].skeleton.bones));
-                           } 
+                           }
                            Models[i].mixer = new THREE.AnimationMixer(Models[i]);
                            animates.push(Models[i].mixer);
 
@@ -154,7 +152,7 @@
                            action.play();
                            */
 
-                            // ↓ that is a code for [ All animation-keyframes are connected data ]. output from 'LightWave3D' 
+                            // ↓ that is a code for [ All animation-keyframes are connected data ]. output from 'LightWave3D'
                             {
 
                                 Models[i].geometry.animations.push(THREE.AnimationClip.parseAnimation(splitAnimation(object.XAnimationObj[0], 'stand', 10 * object.XAnimationObj[0].fps, 11 * object.XAnimationObj[0].fps), Models[i].skeleton.bones));
@@ -205,7 +203,7 @@
                         }
 
                     }
-                    
+
                 }
 
                 object = null;
@@ -219,6 +217,8 @@
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.target.set(0, 12, 0);
+						controls.update();
+
             camera.position.set(2, 18, 28);
             camera.up.set(0, 1, 0);
 
@@ -230,7 +230,7 @@
             light.position.set(-1, -1, -1).normalize();
             scene.add(light);
 
-            controls.update();
+
             window.addEventListener('resize', onWindowResize, false);
             animate();
 
@@ -267,7 +267,7 @@
         }
 
         function render() {
-            
+
             renderer.render(scene, camera);
 
         }
@@ -300,7 +300,7 @@
 
                             firstKey = m - 1;
                             frame.keys.push(_baseAnime.hierarchy[i].keys[m - 1]);
-                            
+
                         }
 
                         frame.keys.push(_baseAnime.hierarchy[i].keys[m]);

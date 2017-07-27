@@ -154,15 +154,13 @@
 
 			function animate() {
 
-				meshes.forEach( m => {
+				meshes.forEach( function( m ) {
 					m.rotation.x += 0.01;
 					m.rotation.y += 0.01;
 					m.rotation.z += 0.01;
-				})
+				} );
 
 				requestAnimationFrame( animate );
-
-				controls.update();
 
 				stats.begin();
 				render();
