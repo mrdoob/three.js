@@ -205,6 +205,21 @@ var ShaderLib = {
 		vertexShader: ShaderChunk.distanceRGBA_vert,
 		fragmentShader: ShaderChunk.distanceRGBA_frag
 
+	},
+
+	shadow: {
+
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.lights,
+			{
+				color: { value: new Color( 0x00000 ) },
+				opacity: { value: 1.0 }
+			},
+		] ),
+
+		vertexShader: ShaderChunk.shadow_vert,
+		fragmentShader: ShaderChunk.shadow_frag
+
 	}
 
 };

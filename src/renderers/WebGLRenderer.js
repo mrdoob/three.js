@@ -1816,6 +1816,11 @@ function WebGLRenderer( parameters ) {
 
 				refreshUniformsNormal( m_uniforms, material );
 
+			} else if ( material.isShadowMaterial ) {
+
+				m_uniforms.color.value = material.color;
+				m_uniforms.opacity.value = material.opacity;
+
 			}
 
 			// RectAreaLight Texture
