@@ -110,6 +110,7 @@
 
 				controls = new THREE.OrbitControls( camera );
 				controls.target.set( 0, 100, 0 );
+				controls.update();
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
@@ -361,7 +362,6 @@
 
 			function render() {
 
-				controls.update();
 				renderer.render( scene, camera );
 
 			}

@@ -257,7 +257,6 @@
 				camera.position.set( -1200, 800, 1200 );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0, 0 );
 
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;
@@ -466,8 +465,6 @@
 				var delta = clock.getDelta();
 
 				if ( terrain.visible ) {
-
-					controls.update();
 
 					var time = Date.now() * 0.001;
 
