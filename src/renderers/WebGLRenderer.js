@@ -1757,64 +1757,74 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			if ( material.isMeshBasicMaterial ||
-				material.isMeshLambertMaterial ||
-				material.isMeshPhongMaterial ||
-				material.isMeshStandardMaterial ||
-				material.isMeshNormalMaterial ||
-				material.isMeshDepthMaterial ||
-				material.isMeshDistanceMaterial ) {
+			if ( material.isMeshBasicMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
 
-			}
-
-			// refresh single material specific uniforms
-
-			if ( material.isLineBasicMaterial ) {
-
-				refreshUniformsLine( m_uniforms, material );
-
-			} else if ( material.isLineDashedMaterial ) {
-
-				refreshUniformsLine( m_uniforms, material );
-				refreshUniformsDash( m_uniforms, material );
-
-			} else if ( material.isPointsMaterial ) {
-
-				refreshUniformsPoints( m_uniforms, material );
-
 			} else if ( material.isMeshLambertMaterial ) {
 
+				refreshUniformsCommon( m_uniforms, material );
 				refreshUniformsLambert( m_uniforms, material );
-
-			} else if ( material.isMeshToonMaterial ) {
-
-				refreshUniformsToon( m_uniforms, material );
 
 			} else if ( material.isMeshPhongMaterial ) {
 
-				refreshUniformsPhong( m_uniforms, material );
+				refreshUniformsCommon( m_uniforms, material );
 
-			} else if ( material.isMeshPhysicalMaterial ) {
+				if ( material.isMeshToonMaterial ) {
 
-				refreshUniformsPhysical( m_uniforms, material );
+					refreshUniformsToon( m_uniforms, material );
+
+				} else {
+
+					refreshUniformsPhong( m_uniforms, material );
+
+				}
 
 			} else if ( material.isMeshStandardMaterial ) {
 
-				refreshUniformsStandard( m_uniforms, material );
+				refreshUniformsCommon( m_uniforms, material );
+
+				if ( material.isMeshPhysicalMaterial ) {
+
+					refreshUniformsPhysical( m_uniforms, material );
+
+				} else {
+
+					refreshUniformsStandard( m_uniforms, material );
+
+				}
+
+			} else if ( material.isMeshNormalMaterial ) {
+
+				refreshUniformsCommon( m_uniforms, material );
 
 			} else if ( material.isMeshDepthMaterial ) {
 
+				refreshUniformsCommon( m_uniforms, material );
 				refreshUniformsDepth( m_uniforms, material );
 
 			} else if ( material.isMeshDistanceMaterial ) {
 
+				refreshUniformsCommon( m_uniforms, material );
 				refreshUniformsDistance( m_uniforms, material );
 
 			} else if ( material.isMeshNormalMaterial ) {
 
 				refreshUniformsNormal( m_uniforms, material );
+
+			} else if ( material.isLineBasicMaterial ) {
+
+				refreshUniformsLine( m_uniforms, material );
+
+				if ( material.isLineDashedMaterial ) {
+
+					refreshUniformsDash( m_uniforms, material );
+
+				}
+
+			} else if ( material.isPointsMaterial ) {
+
+				refreshUniformsPoints( m_uniforms, material );
 
 			} else if ( material.isShadowMaterial ) {
 
