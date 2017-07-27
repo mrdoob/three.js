@@ -1142,6 +1142,8 @@ function WebGLRenderer( parameters ) {
 		state.buffers.depth.setMask( true );
 		state.buffers.color.setMask( true );
 
+		state.setPolygonOffset( false );
+
 		if ( vr.enabled ) {
 
 			vr.submitFrame();

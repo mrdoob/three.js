@@ -46,11 +46,8 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 			if ( boxMesh === undefined ) {
 
-				// Normalized box
-				// 1.1547 = (1,1,1).normalize() * 2.0
-
 				boxMesh = new Mesh(
-					new BoxBufferGeometry( 1.1547, 1.1547, 1.1547 ),
+					new BoxBufferGeometry( 1, 1, 1 ),
 					new ShaderMaterial( {
 						uniforms: ShaderLib.cube.uniforms,
 						vertexShader: ShaderLib.cube.vertexShader,
@@ -58,6 +55,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 						side: BackSide,
 						depthTest: true,
 						depthWrite: false,
+						polygonOffset: true,
 						fog: false
 					} )
 				);
@@ -71,6 +69,8 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 					this.matrixWorld.makeScale( scale, scale, scale );
 					this.matrixWorld.copyPosition( camera.matrixWorld );
+
+					this.material.polygonOffsetUnits = scale * 10;
 
 				};
 
