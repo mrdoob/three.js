@@ -257,7 +257,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 						for ( i = 0, il = groups.length; i < il; i ++ ) {
 
-						  group = groups[ i ];
+							group = groups[ i ];
 							groupMaterial = material[ group.materialIndex ];
 
 							for ( j = group.start, jl =  ( group.start + group.count ); j < jl; j += 3 ) {
