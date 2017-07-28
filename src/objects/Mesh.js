@@ -321,7 +321,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 								if ( intersection ) {
 
-									intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indices buffer semantics
+									intersection.index = a; // triangle number in positions buffer semantics
 									intersects.push( intersection );
 
 								}
