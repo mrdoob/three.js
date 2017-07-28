@@ -23,8 +23,8 @@
 
 THREE.XLoader = function (manager, Texloader, _zflg) {
 
-	this.manager = manager !== undefined ? manager : new THREE.DefaultLoadingManager();
-	this.Texloader = Texloader !== undefined ? Texloader : new THREE.TextureLoader();
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.Texloader = ( Texloader !== undefined ) ? Texloader : new THREE.TextureLoader();
 	this.zflg = _zflg === undefined ? false : _zflg;
 	this.url = "";
 	this.baseDir = "";
