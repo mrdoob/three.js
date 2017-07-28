@@ -2196,6 +2196,12 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
+						if ( geometry.attributes.normal === undefined ) {
+
+							material.shading = THREE.FlatShading;
+
+						}
+
 						meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
 
