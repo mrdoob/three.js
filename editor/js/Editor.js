@@ -347,6 +347,24 @@ Editor.prototype = {
 
 	},
 
+	getObjectMaterial: function ( object, slot ) {
+
+		var material = object.material;
+
+		if( Array.isArray( material ) == true) material = material[ slot ];
+		
+		return material;
+
+	},
+
+	setObjectMaterial: function ( object, slot, newMaterial ) {
+
+		var material = object.material;
+
+		if( Array.isArray( material ) == true) material[ slot ] = newMaterial;
+		else object.material = newMaterial;
+	},
+
 	//
 
 	select: function ( object ) {
