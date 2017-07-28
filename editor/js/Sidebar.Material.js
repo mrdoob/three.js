@@ -5,9 +5,9 @@
 Sidebar.Material = function ( editor ) {
 
 	var signals = editor.signals;
-	
+
 	var currentObject;
-	
+
 	var currentMaterialSlot = 0;
 
 	var container = new UI.Panel();
@@ -24,7 +24,7 @@ Sidebar.Material = function ( editor ) {
 
 	var materialSlotRow = new UI.Row();
 
-	materialSlotRow.add( new UI.Text( 'Material Slot' ).setWidth( '90px' ) );
+	materialSlotRow.add( new UI.Text( 'Slot' ).setWidth( '90px' ) );
 
 	var materialSlotSelect =  new UI.Select().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
 
@@ -33,7 +33,7 @@ Sidebar.Material = function ( editor ) {
 	container.add( materialSlotRow );
 
 	managerRow.add( new UI.Text( '' ).setWidth( '90px' ) );
-	
+
 	managerRow.add( new UI.Button( 'New' ).onClick( function () {
 
 		var material = new THREE[ materialClass.getValue() ]();
@@ -46,11 +46,12 @@ Sidebar.Material = function ( editor ) {
 
 		copiedMaterial = currentObject.material;
 
-		if( Array.isArray( copiedMaterial ) == true){
+		if ( Array.isArray( copiedMaterial ) ) {
 
-			if( copiedMaterial.length == 0 ) return;
-			
-			copiedMaterial = copiedMaterial[ currentMaterialSlot ]
+			if ( copiedMaterial.length === 0 ) return;
+
+			copiedMaterial = copiedMaterial[ currentMaterialSlot ];
+
 		}
 
 	} ) );
@@ -515,9 +516,8 @@ Sidebar.Material = function ( editor ) {
 
 		currentMaterialSlot = parseInt( materialSlotSelect.getValue() );
 
-		if( currentMaterialSlot != previousSelectedSlot )
-			refreshUI(true);
-			
+		if ( currentMaterialSlot !== previousSelectedSlot ) refreshUI( true );
+
 		material  = editor.getObjectMaterial( currentObject, currentMaterialSlot )
 
 		var textureWarning = false;
@@ -1005,11 +1005,18 @@ Sidebar.Material = function ( editor ) {
 
 		var material = currentObject.material;
 
-		if( Array.isArray( material ) == true){
+		if ( Array.isArray( material ) ) {
 
-			if( material.length == 0 ) return;
-			
-			material = material[0]
+			materialSlotRow.setDisplay( '' );
+
+			if ( material.length === 0 ) return;
+
+			material = material[ 0 ];
+
+		} else {
+
+			materialSlotRow.setDisplay( 'none' );
+
 		}
 
 		for ( var property in properties ) {
@@ -1027,45 +1034,23 @@ Sidebar.Material = function ( editor ) {
 
 		var material = currentObject.material;
 
-		var materialArray = []
-		
-		if( Array.isArray( material ) == true){
+		if ( Array.isArray( material ) ) {
 
-			if( material.length == 0 ){
+			var slotOptions = {};
 
-				currentMaterialSlot = 0;
+			currentMaterialSlot = Math.max( 0, Math.min( material.length, currentMaterialSlot ) );
 
-				materialArray = [undefined];
-		
-			}else{
+			for ( var i = 0; i < material.length; i ++ ) {
 
-				materialArray = material;
+				slotOptions[ i ] = String( i + 1 ) + ': ' + material[ i ].name;
 
 			}
 
-		} else {
-
-			materialArray = [material];
+			materialSlotSelect.setOptions( slotOptions ).setValue( currentMaterialSlot );
 
 		}
 
-		var slotOptions = {};
-
-		if( ( currentMaterialSlot < 0 ) || ( currentMaterialSlot >= materialArray.length ) ) currentMaterialSlot = 0;
-
-		for( var i=0; i < materialArray.length; i++){
-
-			var material = materialArray[ i ];
-
-			var label =  material ? ( material.name == '' ? '[Unnamed]' : material.name ) : '[No Material]';
-
-			slotOptions[i] = '' + (i+1) + ':' + materialArray.length + ' ' + label;
-		} 
-
-		materialSlotSelect.setOptions(slotOptions).setValue( currentMaterialSlot )
-
 		material = editor.getObjectMaterial( currentObject, currentMaterialSlot );
-
 
 		if ( material.uuid !== undefined ) {
 
@@ -1352,14 +1337,22 @@ Sidebar.Material = function ( editor ) {
 	// events
 
 	signals.objectSelected.add( function ( object ) {
-		var hasMaterial = false
+
+		var hasMaterial = false;
 
 		if ( object && object.material ) {
-			if( ( Array.isArray( object.material ) === false ) || ( object.material.length > 0 ) )
-				hasMaterial = true;
+
+			hasMaterial = true;
+
+			if ( Array.isArray( object.material ) && object.material.length === 0 ) {
+
+				hasMaterial = false;
+
+			}
+
 		}
 
-		if( hasMaterial ){
+		if ( hasMaterial ) {
 
 			var objectChanged = object !== currentObject;
 
