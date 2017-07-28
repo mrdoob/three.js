@@ -31,7 +31,7 @@ import { Vector3 } from '../math/Vector3';
 import { WebGLClipping } from './webgl/WebGLClipping';
 import { Frustum } from '../math/Frustum';
 import { Vector4 } from '../math/Vector4';
-import { WebGLUtils } from '../extras/WebGLUtils';
+import { WebGLUtils } from './webgl/WebGLUtils';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
