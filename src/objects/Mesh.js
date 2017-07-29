@@ -248,7 +248,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				var groups = geometry.groups;
 				var drawRange = geometry.drawRange;
 				var drawStart = drawRange.start;
-				var drawEnd = drawRange.start + drawRange.count;
+				var drawEnd = drawStart + drawRange.count;
 				var i, j, il, jl;
 				var group, groupMaterial;
 
