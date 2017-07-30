@@ -2,10 +2,10 @@ import { Vector3 } from '../../math/Vector3';
 import { Curve } from '../core/Curve';
 
 /**
- * @author zz85 https://github.com/zz85
+ * @author FracturedShader https://github.com/FracturedShader
  *
- * Centripetal CatmullRom Curve - which is useful for avoiding
- * cusps and self-intersections in non-uniform catmull rom curves.
+ * Centripetal Catmull-Rom Curves avoid cusps and self-intersections
+ * in non-uniform catmull rom curves.
  * http://www.cemyuksel.com/research/catmullrom_param/catmullrom.pdf
  *
  * curve.type accepts centripetal(default), chordal and catmullrom
@@ -14,16 +14,15 @@ import { Curve } from '../core/Curve';
 
 
 /*
-Based on an optimized c++ solution in
- - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
- - http://ideone.com/NoEbVM
-
-This CubicPoly class could be used for reusing some variables and calculations,
-but for three.js curve use, it could be possible inlined and flatten into a single function call
-which can be placed in CurveUtils.
+* Based on an optimized c++ solution in
+*  - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
+*  - http://ideone.com/NoEbVM
+*
+* HermiteSegment may be useful elsewhere for caching calculations, as it is just a standard Uniform Cubic Hermite Spline.
+*  - https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Unit_interval_.280.2C_1.29
 */
 
-function CubicPoly() {
+function HermiteSegment() {
 
 	var c0 = 0, c1 = 0, c2 = 0, c3 = 0;
 
@@ -45,13 +44,14 @@ function CubicPoly() {
 	}
 
 	return {
-
+		// Standard Catmull-Rom spline
 		initCatmullRom: function ( x0, x1, x2, x3, tension ) {
 
 			init( x1, x2, tension * ( x2 - x0 ), tension * ( x3 - x1 ) );
 
 		},
 
+		// Computes coefficients for a nonuniform Catmull-Rom spline
 		initNonuniformCatmullRom: function ( x0, x1, x2, x3, dt0, dt1, dt2 ) {
 
 			// compute tangents when parameterized in [t1,t2]
@@ -73,106 +73,310 @@ function CubicPoly() {
 			return c0 + c1 * t + c2 * t2 + c3 * t3;
 
 		}
-
 	};
 
 }
-
-//
-
-var tmp = new Vector3();
-var px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
 
 function CatmullRomCurve3( points ) {
 
 	Curve.call( this );
 
-	if ( points.length < 2 ) console.warn( 'THREE.CatmullRomCurve3: Points array needs at least two entries.' );
+	if ( points.length < 2 ) {
+
+		console.warn( 'THREE.CatmullRomCurve3: Points array needs at least two entries.' );
+
+	}
 
 	this.points = points || [];
 	this.closed = false;
+	this.hermiteSegments = [];
+	this.timeValues = [];
+	this.segmentsOutdated = true;
 
 }
 
 CatmullRomCurve3.prototype = Object.create( Curve.prototype );
 CatmullRomCurve3.prototype.constructor = CatmullRomCurve3;
 
-CatmullRomCurve3.prototype.getPoint = function ( t ) {
+CatmullRomCurve3.prototype.generateSegments = function () {
 
-	var points = this.points;
-	var l = points.length;
+	if ( ! this.segmentsOutdated ) {
 
-	var point = ( l - ( this.closed ? 0 : 1 ) ) * t;
-	var intPoint = Math.floor( point );
-	var weight = point - intPoint;
+		return;
+
+	}
+
+	// Reset the main data
+	this.hermiteSegments = [];
+	this.segmentsOutdated = false;
+	this.timeValues = [ 0 ];
+
+	// Define useful constants
+	const epsilon = 1e-4;
+	const points = this.points;
+	const numPoints = points.length;
+	const numSegments = this.closed ? numPoints : ( numPoints - 1 );
+	const tmp = new Vector3();
+	const isCatmullRom = this.type === "catmullrom";
+	const tension = isCatmullRom ? ( ( this.tension === undefined ) ? 0.5 : this.tension ) : ( ( this.type === "chordal" ) ? 0.5 : 0.25 );
+
+	// First, make sure all the time values are set
+	let prevTime = 0,
+		timeDiff = 0,
+		numTimePoints = this.closed ? numPoints : ( numPoints + 1 );
+
+	for ( let i = 1; i < numTimePoints; ++ i ) {
+
+		if ( isCatmullRom ) {
+
+			this.timeValues[ i ] = i;
+
+		} else {
+
+			timeDiff = Math.pow( points[ i - 1 ].distanceToSquared( points[ i % numPoints ] ), tension );
+
+			if ( timeDiff < epsilon ) {
+
+				timeDiff = 1;
+
+			}
+
+			this.timeValues[ i ] = prevTime = prevTime + timeDiff;
+
+		}
+
+	}
+
+	// Data in play
+	let p0, p1, p2, p3,
+		px, py, pz;
+
+	// Construct each segment
+	for ( let i = 0; i < numSegments; ++ i ) {
+
+		// p0 is a special case when looking at the first point
+		if ( this.closed || i > 0 ) {
+
+			let idx = i - 1;
+
+			while ( idx < 0 ) {
+
+				idx += numPoints;
+
+			}
+
+			p0 = points[ idx % numPoints ];
+
+		} else {
+
+			p0 = tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] ).clone();
+
+		}
+
+		p1 = points[ i % numPoints ];
+		p2 = points[ ( i + 1 ) % numPoints ];
+
+		// p3 is a special case when looking at the last point
+		if ( this.closed || ( i + 2 ) < numPoints ) {
+
+			p3 = points[ ( i + 2 ) % numPoints ];
+
+		} else {
+
+			p3 = tmp.subVectors( p2, p1 ).add( p2 ).clone();
+
+		}
+
+		px = new HermiteSegment();
+		py = new HermiteSegment();
+		pz = new HermiteSegment();
+
+		if ( isCatmullRom ) {
+
+			// Regular Catmull-Rom is pretty straightforward
+			px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
+			py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, tension );
+			pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, tension );
+
+		} else {
+
+			let t0, t1, t2, t3;
+
+			// As with p0, t0 is special when looking at the first point
+			if ( this.closed || i > 0 ) {
+
+				t0 = this.timeValues[ ( i - 1 ) % numPoints ];
+
+			} else {
+
+				t0 = - Math.pow( p0.distanceToSquared( points[ i % 1 ] ), tension );
+
+				if ( t0 > - epsilon ) {
+
+					t0 = - 1;
+
+				}
+
+			}
+
+			t1 = this.timeValues[ i % numPoints ];
+			t2 = this.timeValues[ ( i + 1 ) % numPoints ];
+
+			// As with p3, t3 is special when looking at the last point
+			if ( this.closed || ( i + 2 ) < numPoints ) {
+
+				t3 = this.timeValues[ ( i + 2 ) % numPoints ];
+
+			} else {
+
+				t3 = Math.pow( p2.distanceToSquared( p3 ), tension );
+
+				if ( t3 < epsilon ) {
+
+					t3 = 1;
+
+				}
+
+				t3 += t2;
+
+			}
+
+			let dt0 = t1 - t0,
+				dt1 = t2 - t1,
+				dt2 = t3 - t2;
+
+			px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
+			py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
+			pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
+
+		}
+
+		this.hermiteSegments.push( { x: px, y: py, z: pz } );
+
+	}
+
+};
+
+CatmullRomCurve3.prototype.getCatmullSegment = function ( t ) {
+
+	if ( this.segmentsOutdated ) {
+
+		this.generateSegments;
+
+	}
+
+	const timeValues = this.timeValues;
+	const numTimeValues = timeValues.length;
+	const totalTime = timeValues[ numTimeValues - 1 ];
+
+	let i = 1;
+
+	while ( t < 0 ) {
+
+		t += totalTime;
+
+	}
+
+	while ( t > totalTime ) {
+
+		t -= totalTime;
+
+	}
+
+	while ( t > timeValues[ i ] ) {
+
+		++ i;
+		t -= timeValues[ i ];
+
+	}
+
+	const segmentIdx = i - 1;
+	const t1 = timeValues[ i - 1 ];
+	const t2 = timeValues[ i ];
+
+	return {
+		segment: this.hermiteSegments[ segmentIdx ],
+		localTime: t / ( t2 - t1 ),
+		points: this.points.slice( segmentIdx, 2 ),
+		times: [ t1, t2 ]
+	};
+
+};
+
+CatmullRomCurve3.prototype.getCatmullPoint = function ( t ) {
+
+	if ( this.segmentsOutdated ) {
+
+		this.generateSegments();
+
+	}
+
+	const localizedSegment = this.getCatmullSegment( t );
+	const segment = localizedSegment.segment;
+	const localT = localizedSegment.localTime;
+
+	return new Vector3( segment.x.calc( localT ), segment.y.calc( localT ), segment.z.calc( localT ) );
+
+};
+
+CatmullRomCurve3.prototype.getNormalizedSegment = function ( t ) {
+
+	if ( this.segmentsOutdated ) {
+
+		this.generateSegments();
+
+	}
+
+	const numPoints = this.points.length;
+	const numSegments = this.hermiteSegments.length;
+	const scaledTime = ( numPoints - ( this.closed ? 0 : 1 ) ) * t;
+	let segmentIdx = Math.floor( scaledTime );
+	let localT = scaledTime - segmentIdx;
 
 	if ( this.closed ) {
 
-		intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
+		while ( segmentIdx < 0 ) {
 
-	} else if ( weight === 0 && intPoint === l - 1 ) {
+			segmentIdx += numSegments;
 
-		intPoint = l - 2;
-		weight = 1;
+		}
 
-	}
+		segmentIdx = segmentIdx % numSegments;
 
-	var p0, p1, p2, p3; // 4 points
+	} else if ( localT === 0 && ( segmentIdx === numPoints - 1 ) ) {
 
-	if ( this.closed || intPoint > 0 ) {
-
-		p0 = points[ ( intPoint - 1 ) % l ];
-
-	} else {
-
-		// extrapolate first point
-		tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
-		p0 = tmp;
+		-- segmentIdx;
+		localT = 1;
 
 	}
 
-	p1 = points[ intPoint % l ];
-	p2 = points[ ( intPoint + 1 ) % l ];
+	return {
+		segment: this.hermiteSegments[ segmentIdx ],
+		localTime: localT,
+		points: this.points.slice( segmentIdx, 2 )
+	};
 
-	if ( this.closed || intPoint + 2 < l ) {
+};
 
-		p3 = points[ ( intPoint + 2 ) % l ];
+CatmullRomCurve3.prototype.getNormalizedPoint = function ( t ) {
 
-	} else {
+	if ( this.segmentsOutdated ) {
 
-		// extrapolate last point
-		tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
-		p3 = tmp;
-
-	}
-
-	if ( this.type === undefined || this.type === 'centripetal' || this.type === 'chordal' ) {
-
-		// init Centripetal / Chordal Catmull-Rom
-		var pow = this.type === 'chordal' ? 0.5 : 0.25;
-		var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
-		var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
-		var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
-
-		// safety check for repeated points
-		if ( dt1 < 1e-4 ) dt1 = 1.0;
-		if ( dt0 < 1e-4 ) dt0 = dt1;
-		if ( dt2 < 1e-4 ) dt2 = dt1;
-
-		px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
-		py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
-		pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
-
-	} else if ( this.type === 'catmullrom' ) {
-
-		var tension = this.tension !== undefined ? this.tension : 0.5;
-		px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
-		py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, tension );
-		pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, tension );
+		this.generateSegments();
 
 	}
 
-	return new Vector3( px.calc( weight ), py.calc( weight ), pz.calc( weight ) );
+	const localizedSegment = this.getNormalizedSegment( t );
+	const segment = localizedSegment.segment;
+	const localT = localizedSegment.localTime;
+
+	return new Vector3( segment.x.calc( localT ), segment.y.calc( localT ), segment.z.calc( localT ) );
+
+};
+
+CatmullRomCurve3.prototype.getPoint = function ( t ) {
+
+	return this.getNormalizedPoint( t );
 
 };
 
