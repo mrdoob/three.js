@@ -322,7 +322,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							start = Math.max( group.start, drawRange.start );
 							end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
 
-							for ( j = group.start, jl = ( group.start + group.count ); j < jl; j += 3 ) {
+							for ( j = start, jl = end; j < jl; j += 3 ) {
 
 								a = j;
 								b = j + 1;
