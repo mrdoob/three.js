@@ -247,10 +247,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				var uv = geometry.attributes.uv;
 				var groups = geometry.groups;
 				var drawRange = geometry.drawRange;
-				var drawStart = drawRange.start;
-				var drawEnd = drawStart + drawRange.count;
 				var i, j, il, jl;
 				var group, groupMaterial;
+				var start, end;
 
 				if ( index !== null ) {
 
@@ -263,22 +262,21 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							group = groups[ i ];
 							groupMaterial = material[ group.materialIndex ];
 
-							for ( j = group.start, jl = ( group.start + group.count ); j < jl; j += 3 ) {
+							start = Math.max( group.start, drawRange.start );
+							end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
 
-								if ( j >= drawStart && ( j + 2 ) < drawEnd ) {
+							for ( j = start, jl = end; j < jl; j += 3 ) {
 
-									a = index.getX( j );
-									b = index.getX( j + 1 );
-									c = index.getX( j + 2 );
+								a = index.getX( j );
+								b = index.getX( j + 1 );
+								c = index.getX( j + 2 );
 
-									intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, uv, a, b, c );
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, uv, a, b, c );
 
-									if ( intersection ) {
+								if ( intersection ) {
 
-										intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indices buffer semantics
-										intersects.push( intersection );
-
-									}
+									intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indices buffer semantics
+									intersects.push( intersection );
 
 								}
 
@@ -288,22 +286,21 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					} else {
 
-						for ( i = 0, il = index.count; i < il; i += 3 ) {
+						start = Math.max( 0, drawRange.start );
+						end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
 
-							if ( i >= drawStart && ( i + 2 ) < drawEnd ) {
+						for ( i = start, il = end; i < il; i += 3 ) {
 
-								a = index.getX( i );
-								b = index.getX( i + 1 );
-								c = index.getX( i + 2 );
+							a = index.getX( i );
+							b = index.getX( i + 1 );
+							c = index.getX( i + 2 );
 
-								intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, uv, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, uv, a, b, c );
 
-								if ( intersection ) {
+							if ( intersection ) {
 
-									intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indices buffer semantics
-									intersects.push( intersection );
-
-								}
+								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indices buffer semantics
+								intersects.push( intersection );
 
 							}
 
@@ -322,22 +319,21 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							group = groups[ i ];
 							groupMaterial = material[ group.materialIndex ];
 
+							start = Math.max( group.start, drawRange.start );
+							end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+
 							for ( j = group.start, jl = ( group.start + group.count ); j < jl; j += 3 ) {
 
-								if ( j >= drawStart && ( j + 2 ) < drawEnd ) {
+								a = j;
+								b = j + 1;
+								c = j + 2;
 
-									a = j;
-									b = j + 1;
-									c = j + 2;
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, uv, a, b, c );
 
-									intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, uv, a, b, c );
+								if ( intersection ) {
 
-									if ( intersection ) {
-
-										intersection.index = a; // triangle number in positions buffer semantics
-										intersects.push( intersection );
-
-									}
+									intersection.index = a; // triangle number in positions buffer semantics
+									intersects.push( intersection );
 
 								}
 
@@ -347,22 +343,21 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					} else {
 
-						for ( i = 0, il = position.count; i < il; i += 3 ) {
+						start = Math.max( 0, drawRange.start );
+						end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
 
-							if ( i >= drawStart && ( i + 2 ) < drawEnd ) {
+						for ( i = start, il = end; i < il; i += 3 ) {
 
-								a = i;
-								b = i + 1;
-								c = i + 2;
+							a = i;
+							b = i + 1;
+							c = i + 2;
 
-								intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, uv, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, uv, a, b, c );
 
-								if ( intersection ) {
+							if ( intersection ) {
 
-									intersection.index = a; // triangle number in positions buffer semantics
-									intersects.push( intersection );
-
-								}
+								intersection.index = a; // triangle number in positions buffer semantics
+								intersects.push( intersection );
 
 							}
 
