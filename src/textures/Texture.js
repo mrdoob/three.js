@@ -38,6 +38,8 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
+	this.rotation = 0;
+	this.center = new Vector2( 0, 0 );
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
@@ -102,6 +104,8 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
+		this.rotation = source.rotation;
+		this.center.copy( source.center );
 
 		this.generateMipmaps = source.generateMipmaps;
 		this.premultiplyAlpha = source.premultiplyAlpha;
@@ -175,6 +179,8 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],
+			rotation: this.rotation,
+			center: [ this.center.x, this.center.y ],
 			wrap: [ this.wrapS, this.wrapT ],
 
 			minFilter: this.minFilter,

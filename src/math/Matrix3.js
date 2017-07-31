@@ -273,6 +273,19 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	setUvTransform: function ( tx, ty, sx, sy, rotation, cx, cy ) {
+
+		var c = Math.cos( rotation );
+		var s = Math.sin( rotation );
+
+		this.set(
+			sx * c, sx * s, - sx * ( c * cx + s * cy ) + cx + tx,
+			- sy * s, sy * c, - sy * ( - s * cx + c * cy ) + cy + ty,
+			0, 0, 0
+		);
+
+	},
+
 	equals: function ( matrix ) {
 
 		var te = this.elements;
