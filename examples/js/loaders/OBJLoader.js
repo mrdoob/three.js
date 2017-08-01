@@ -10,14 +10,6 @@ THREE.OBJLoader = ( function () {
 	var normal_pattern           = /^vn\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/;
 	// vt float float
 	var uv_pattern               = /^vt\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/;
-	// f vertex vertex vertex
-	var face_vertex              = /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/;
-	// f vertex/uv vertex/uv vertex/uv
-	var face_vertex_uv           = /^f\s+(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)(?:\s+(-?\d+)\/(-?\d+))?/;
-	// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
-	var face_vertex_uv_normal    = /^f\s+(-?\d+)\/(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\/(-?\d+)(?:\s+(-?\d+)\/(-?\d+)\/(-?\d+))?/;
-	// f vertex//normal vertex//normal vertex//normal
-	var face_vertex_normal       = /^f\s+(-?\d+)\/\/(-?\d+)\s+(-?\d+)\/\/(-?\d+)\s+(-?\d+)\/\/(-?\d+)(?:\s+(-?\d+)\/\/(-?\d+))?/;
 	// o object_name | g group_name
 	var object_pattern           = /^[og]\s*(.+)?/;
 	// mtllib file_reference
@@ -489,54 +481,38 @@ THREE.OBJLoader = ( function () {
 
 				} else if ( lineFirstChar === "f" ) {
 
-					if ( ( result = face_vertex_uv_normal.exec( line ) ) !== null ) {
+					var lineData = line.substr(1).trim(),
+					    vertexData = lineData.split(' '),
+					    faceVertices = [];
 
-						// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
-						// 0                        1    2    3    4    5    6    7    8    9   10         11         12
-						// ["f 1/1/1 2/2/2 3/3/3", "1", "1", "1", "2", "2", "2", "3", "3", "3", undefined, undefined, undefined]
+					// Parse the face vertex data into an easy to work with format
 
-						state.addFace(
-							result[ 1 ], result[ 4 ], result[ 7 ], result[ 10 ],
-							result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
-							result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
-						);
+					for (var idx = 0; idx < vertexData.length; idx++) {
 
-					} else if ( ( result = face_vertex_uv.exec( line ) ) !== null ) {
+						if (vertexData[idx].length > 0) {
 
-						// f vertex/uv vertex/uv vertex/uv
-						// 0                  1    2    3    4    5    6   7          8
-						// ["f 1/1 2/2 3/3", "1", "1", "2", "2", "3", "3", undefined, undefined]
+							var vertexParts = vertexData[idx].split('/');
+							faceVertices.push(vertexParts);
 
-						state.addFace(
-							result[ 1 ], result[ 3 ], result[ 5 ], result[ 7 ],
-							result[ 2 ], result[ 4 ], result[ 6 ], result[ 8 ]
-						);
+						}
 
-					} else if ( ( result = face_vertex_normal.exec( line ) ) !== null ) {
+					}
 
-						// f vertex//normal vertex//normal vertex//normal
-						// 0                     1    2    3    4    5    6   7          8
-						// ["f 1//1 2//2 3//3", "1", "1", "2", "2", "3", "3", undefined, undefined]
+					// Draw an edge between the first vertex and all subsequent vertices to form an n-gon
+
+					var v1 = faceVertices[0],
+					    numFaces = faceVertices.length - 1;
+
+					for (var idx = 1; idx < numFaces; idx++) {
+
+						var v2 = faceVertices[idx],
+						    v3 = faceVertices[idx+1];
 
 						state.addFace(
-							result[ 1 ], result[ 3 ], result[ 5 ], result[ 7 ],
-							undefined, undefined, undefined, undefined,
-							result[ 2 ], result[ 4 ], result[ 6 ], result[ 8 ]
+							v1[ 0 ], v2[ 0 ], v3[ 0 ], undefined,
+							v1[ 1 ], v2[ 1 ], v3[ 1 ], undefined,
+							v1[ 2 ], v2[ 2 ], v3[ 2 ], undefined
 						);
-
-					} else if ( ( result = face_vertex.exec( line ) ) !== null ) {
-
-						// f vertex vertex vertex
-						// 0            1    2    3   4
-						// ["f 1 2 3", "1", "2", "3", undefined]
-
-						state.addFace(
-							result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ]
-						);
-
-					} else {
-
-						throw new Error( "Unexpected face line: '" + line  + "'" );
 
 					}
 
