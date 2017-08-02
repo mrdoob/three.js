@@ -138,6 +138,12 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 			setClear( clearColor, clearAlpha );
 
 		},
+		getPlaneCamera: function () {
+			return planeCamera;
+ 		},
+ 		getPlaneMesh: function () {
+ 			return planeMesh;
+ 		},		
 		render: render
 
 	};
