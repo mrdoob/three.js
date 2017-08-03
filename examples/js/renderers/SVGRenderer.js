@@ -382,11 +382,11 @@ THREE.SVGRenderer = function () {
 
 			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity ) + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
 
-			addPath( style, path );
+			if ( material.isLineDashedMaterial ) {
 
-		} else if ( material.isLineDashedMaterial ) {
+				style = style + ';stroke-dasharray:' + material.dashSize + "," + material.gapSize;
 
-			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity ) + ';stroke-width:' + material.linewidth + ';stroke-dasharray:' + material.dashSize + "," + material.gapSize;
+			}
 
 			addPath( style, path );
 
