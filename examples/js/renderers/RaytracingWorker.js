@@ -41,7 +41,7 @@ self.onmessage = function( e ) {
 		var meta = data.annex;
 		scene.traverse( function( o ) {
 
-			if ( o instanceof THREE.PointLight ) {
+			if ( o.isPointLight ) {
 
 				o.physicalAttenuation = true;
 
@@ -193,9 +193,9 @@ THREE.RaytracingRendererWorker = function () {
 
 			// resolve pixel diffuse color
 
-			if ( material instanceof THREE.MeshLambertMaterial ||
-				 material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshBasicMaterial ) {
+			if ( material.isMeshLambertMaterial ||
+				 material.isMeshPhongMaterial ||
+				 material.isMeshBasicMaterial ) {
 
 				diffuseColor.copyGammaToLinear( material.color );
 
@@ -215,7 +215,7 @@ THREE.RaytracingRendererWorker = function () {
 
 			rayLight.origin.copy( point );
 
-			if ( material instanceof THREE.MeshBasicMaterial ) {
+			if ( material.isMeshBasicMaterial ) {
 
 				for ( var i = 0, l = lights.length; i < l; i ++ ) {
 
@@ -238,8 +238,8 @@ THREE.RaytracingRendererWorker = function () {
 
 				}
 
-			} else if ( material instanceof THREE.MeshLambertMaterial ||
-						material instanceof THREE.MeshPhongMaterial ) {
+			} else if ( material.isMeshLambertMaterial ||
+						material.isMeshPhongMaterial ) {
 
 				var normalComputed = false;
 
@@ -300,7 +300,7 @@ THREE.RaytracingRendererWorker = function () {
 
 					// compute specular
 
-					if ( material instanceof THREE.MeshPhongMaterial ) {
+					if ( material.isMeshPhongMaterial ) {
 
 						halfVector.addVectors( lightVector, eyeVector ).normalize();
 
@@ -531,7 +531,7 @@ THREE.RaytracingRendererWorker = function () {
 
 		scene.traverse( function ( object ) {
 
-			if ( object instanceof THREE.Light ) {
+			if ( object.isLight ) {
 
 				lights.push( object );
 
