@@ -18,6 +18,8 @@ THREE.GLTF2Loader = ( function () {
 
 		constructor: GLTF2Loader,
 
+		crossOrigin: 'Anonymous',
+
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
@@ -30,7 +32,16 @@ THREE.GLTF2Loader = ( function () {
 
 			loader.load( url, function ( data ) {
 
-				scope.parse( data, onLoad, path );
+				try {
+
+					scope.parse( data, path, onLoad, onError );
+
+				} catch ( e ) {
+
+					// For SyntaxError or TypeError, return a generic failure message.
+					onError( e.constructor === Error ? e : new Error( 'THREE.GLTF2Loader: Unable to parse model.' ) );
+
+				}
 
 			}, onProgress, onError );
 
@@ -48,7 +59,7 @@ THREE.GLTF2Loader = ( function () {
 
 		},
 
-		parse: function ( data, callback, path ) {
+		parse: function ( data, path, onLoad, onError ) {
 
 			var content;
 			var extensions = {};
@@ -67,6 +78,13 @@ THREE.GLTF2Loader = ( function () {
 			}
 
 			var json = JSON.parse( content );
+
+			if ( json.asset.version[0] < 2 ) {
+
+				onError( new Error( 'THREE.GLTF2Loader: Legacy glTF detected. Use THREE.GLTFLoader instead.' ) );
+				return;
+
+			}
 
 			if ( json.extensionsUsed ) {
 
@@ -116,9 +134,9 @@ THREE.GLTF2Loader = ( function () {
 					animations: animations
 				};
 
-				callback( glTF );
+				onLoad( glTF );
 
-			} );
+			}, onError );
 
 		}
 
@@ -582,7 +600,7 @@ THREE.GLTF2Loader = ( function () {
 
 		if ( ! materialParams.fragmentShader ) {
 
-			throw new Error( 'THREE.GLTF2Loader: Missing fragment shader definition: ', program.fragmentShader );
+			throw new Error( 'THREE.GLTF2Loader: Missing fragment shader definition: ' + program.fragmentShader );
 
 		}
 
@@ -590,7 +608,7 @@ THREE.GLTF2Loader = ( function () {
 
 		if ( ! vertexShader ) {
 
-			throw new Error( 'THREE.GLTF2Loader: Missing vertex shader definition: ', program.vertexShader );
+			throw new Error( 'THREE.GLTF2Loader: Missing vertex shader definition: ' + program.vertexShader );
 
 		}
 
@@ -1643,7 +1661,7 @@ THREE.GLTF2Loader = ( function () {
 
 	};
 
-	GLTFParser.prototype.parse = function ( callback ) {
+	GLTFParser.prototype.parse = function ( onLoad, onError ) {
 
 		var json = this.json;
 
@@ -1686,9 +1704,9 @@ THREE.GLTF2Loader = ( function () {
 
 			}
 
-			callback( scene, scenes, cameras, animations );
+			onLoad( scene, scenes, cameras, animations );
 
-		} );
+		} ).catch( onError );
 
 	};
 
@@ -2204,6 +2222,21 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
+						if ( geometry.attributes.normal === undefined ) {
+
+							if ( material.flatShading !== undefined ) {
+
+								material.flatShading = true;
+
+							} else {
+
+								// TODO: Remove this backwards-compatibility fix after r87 release.
+								material.shading = THREE.FlatShading;
+
+							}
+
+						}
+
 						meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
 
@@ -2688,8 +2721,9 @@ THREE.GLTF2Loader = ( function () {
 
 							}
 
-							//do not clone children as they will be replaced anyway
+							// do not clone children as they will be replaced anyway
 							var clonedgroup = group.clone( false );
+
 							for ( var childrenId in group.children ) {
 
 								var child = group.children[ childrenId ];
@@ -2786,10 +2820,12 @@ THREE.GLTF2Loader = ( function () {
 
 								}
 
+								clonedgroup.add( child );
 
-								clonedgroup.add(child);
 							}
+
 							_node.add( clonedgroup );
+
 						}
 
 					}

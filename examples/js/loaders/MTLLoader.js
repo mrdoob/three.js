@@ -202,6 +202,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	constructor: THREE.MTLLoader.MaterialCreator,
 
+	crossOrigin: 'Anonymous',
+
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;

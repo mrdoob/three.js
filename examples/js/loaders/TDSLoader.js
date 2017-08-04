@@ -193,43 +193,6 @@ THREE.TDSLoader.prototype = {
 				material.shininess = shininess;
 				this.debugMessage( '   Shininess : ' + shininess );
 
-			} else if ( next === MAT_TEXMAP ) {
-
-				this.debugMessage( '   Map (TODO ImageLoader)' );
-				//var map = this.readMap(data);
-
-				//TODO <ADD CODE HERE>
-
-			} else if ( next === MAT_BUMPMAP ) {
-
-				this.debugMessage( '   BumpMap (TODO ImageLoader)' );
-
-				//TODO <ADD CODE HERE>
-
-			} else if ( next == MAT_OPACMAP ) {
-
-				this.debugMessage( '   OpacityMap (TODO ImageLoader)' );
-
-				//TODO <ADD CODE HERE>
-
-			} else if ( next == MAT_SPECMAP ) {
-
-				this.debugMessage( '   SpecularMap (TODO ImageLoader)' );
-
-				//TODO <ADD CODE HERE>
-
-			} else if ( next == MAT_SHINMAP ) {
-
-				this.debugMessage( '   ShininessrMap (TODO ImageLoader)' );
-
-				//TODO <ADD CODE HERE>
-
-			} else if ( next == MAT_REFLMAP ) {
-
-				this.debugMessage( '   RelectMap (TODO ImageLoader)' );
-
-				//TODO <ADD CODE HERE>
-
 			} else {
 
 				this.debugMessage( '   Unknown material chunk: ' + next.toString( 16 ) );
@@ -377,7 +340,46 @@ THREE.TDSLoader.prototype = {
 
 				this.debugMessage( '   Tranformation Matrix (TODO)' );
 
-				//TODO <ADD CODE HERE>
+				var values = [];
+				for( var i = 0; i < 12; i++ ) {
+
+					values[ i ] = this.readFloat( data );
+				
+				}
+
+				var matrix = new THREE.Matrix4();
+
+				//X Line
+				matrix.elements[ 0 ] = values[ 0 ];
+				matrix.elements[ 1 ] = values[ 6 ];
+				matrix.elements[ 2 ] = values[ 3 ];
+				matrix.elements[ 3 ] = values[ 9 ];
+
+				//Y Line
+				matrix.elements[ 4 ] = -values[ 2 ];
+				matrix.elements[ 5 ] = -values[ 8 ];
+				matrix.elements[ 6 ] = -values[ 5 ];
+				matrix.elements[ 7 ] = -values[ 11 ];
+
+				//Z Line
+				matrix.elements[ 8 ] = values[ 1 ];
+				matrix.elements[ 9 ] = values[ 7 ];
+				matrix.elements[ 10 ] = values[ 4 ];
+				matrix.elements[ 11 ] = -values[ 10 ];
+
+				//W Line
+				matrix.elements[ 12 ] = 0;
+				matrix.elements[ 13 ] = 0;
+				matrix.elements[ 14 ] = 0;
+				matrix.elements[ 15 ] = 1;
+
+				matrix.transpose();
+
+				var inverse = new THREE.Matrix4();
+				inverse.getInverse( matrix, true );
+				geometry.applyMatrix( inverse );
+				
+				matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
 
 			} else {
 
@@ -395,15 +397,19 @@ THREE.TDSLoader.prototype = {
 
 			//geometry.faceVertexUvs[0][faceIndex][vertexIndex]
 
-			var faceUV = [];
+			if ( uvs.length > 0 ) {
 
-			for ( var i = 0; i < geometry.faces.length; i ++ ) {
+				var faceUV = [];
 
-				faceUV.push( [ uvs[ geometry.faces[ i ].a ], uvs[ geometry.faces[ i ].b ], uvs[ geometry.faces[ i ].c ] ] );
+				for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
-			}
+					faceUV.push( [ uvs[ geometry.faces[ i ].a ], uvs[ geometry.faces[ i ].b ], uvs[ geometry.faces[ i ].c ] ] );
 
-			geometry.faceVertexUvs[ 0 ] = faceUV;
+				}
+
+				geometry.faceVertexUvs[ 0 ] = faceUV;
+	
+			}		
 
 			geometry.computeVertexNormals();
 
@@ -455,12 +461,6 @@ THREE.TDSLoader.prototype = {
 					}
 
 				}
-
-			} else if ( chunk.id === SMOOTH_GROUP ) {
-
-				this.debugMessage( '      Smooth Group (TODO)' );
-
-				//TODO <ADD CODE HERE>
 
 			} else {
 

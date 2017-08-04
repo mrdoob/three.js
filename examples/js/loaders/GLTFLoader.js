@@ -17,6 +17,8 @@ THREE.GLTFLoader = ( function () {
 
 		constructor: GLTFLoader,
 
+		crossOrigin: 'Anonymous',
+
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
