@@ -1011,9 +1011,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.length === 0 ) return;
 
-			if( material.length == 0 ) return;
-			
-			material = material[ currentMaterialSlot ]
+			material = material[ currentMaterialSlot ];
 
 		} else {
 
