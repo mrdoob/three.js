@@ -99,7 +99,7 @@
 
 		<script>
 
-			var camera, scene, renderer, controls, stats;
+			var camera, scene, renderer, stats;
 			var target;
 			var postScene, postCamera;
 			var supportsExtension = true;
@@ -130,7 +130,7 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
 				camera.position.z = -4;
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
 				controls.rotateSpeed = 0.35;
@@ -227,7 +227,6 @@
 				if ( !supportsExtension ) return;
 
 				requestAnimationFrame( animate );
-				controls.update();
 
 				// render scene into target
 				renderer.render( scene, camera, target );

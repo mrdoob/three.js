@@ -132,7 +132,6 @@ var list = {
 
 		"Extras / Objects": {
 			"ImmediateRenderObject": "api/extras/objects/ImmediateRenderObject",
-			"MorphBlendMesh": "api/extras/objects/MorphBlendMesh"
 		},
 
 		"Geometries": {

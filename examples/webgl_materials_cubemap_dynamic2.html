@@ -191,12 +191,12 @@
 				if ( count % 2 === 0 ) {
 
 					material.envMap = cubeCamera1.renderTarget.texture;
-					cubeCamera2.updateCubeMap( renderer, scene );
+					cubeCamera2.update( renderer, scene );
 
 				} else {
 
 					material.envMap = cubeCamera2.renderTarget.texture;
-					cubeCamera1.updateCubeMap( renderer, scene );
+					cubeCamera1.update( renderer, scene );
 
 				}
 

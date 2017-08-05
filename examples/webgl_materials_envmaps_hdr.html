@@ -208,8 +208,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -284,11 +282,11 @@
 						case 'front': side = THREE.FrontSide; break;
 						case 'back': side = THREE.BackSide; break;
 						case 'double': side = THREE.DoubleSide; break;
-	
+
 					}
 
 					if( standardMaterial.side !== side ) {
-						
+
 						standardMaterial.side = side;
 						standardMaterial.needsUpdate = true;
 

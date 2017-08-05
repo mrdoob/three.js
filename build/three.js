@@ -5389,8 +5389,17 @@
 			map: { value: null },
 			offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) },
 
-			specularMap: { value: null },
 			alphaMap: { value: null },
+
+		},
+
+		specularmap: {
+
+			specularMap: { value: null },
+
+		},
+
+		envmap: {
 
 			envMap: { value: null },
 			flipEnvMap: { value: - 1 },
@@ -5784,7 +5793,7 @@
 
 	var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( PHYSICAL ) || defined( LAMBERT ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP )\n\tvec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );\n#endif\n";
 
-	var cube_frag = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tgl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n\tgl_FragColor.a *= opacity;\n}\n";
+	var cube_frag = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldPosition;\nvoid main() {\n\tgl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n\tgl_FragColor.a *= opacity;\n}\n";
 
 	var cube_vert = "varying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvWorldPosition = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n}\n";
 
@@ -5796,7 +5805,7 @@
 
 	var distanceRGBA_vert = "#define DISTANCE\nvarying vec3 vWorldPosition;\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <skinbase_vertex>\n\t#ifdef USE_DISPLACEMENTMAP\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <worldpos_vertex>\n\t#include <clipping_planes_vertex>\n\tvWorldPosition = worldPosition.xyz;\n}\n";
 
-	var equirect_frag = "uniform sampler2D tEquirect;\nuniform float tFlip;\nvarying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvec3 direction = normalize( vWorldPosition );\n\tvec2 sampleUV;\n\tsampleUV.y = saturate( tFlip * direction.y * -0.5 + 0.5 );\n\tsampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;\n\tgl_FragColor = texture2D( tEquirect, sampleUV );\n}\n";
+	var equirect_frag = "uniform sampler2D tEquirect;\nvarying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvec3 direction = normalize( vWorldPosition );\n\tvec2 sampleUV;\n\tsampleUV.y = asin( clamp( direction.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;\n\tsampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;\n\tgl_FragColor = texture2D( tEquirect, sampleUV );\n}\n";
 
 	var equirect_vert = "varying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvWorldPosition = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n}\n";
 
@@ -5828,7 +5837,7 @@
 
 	var points_vert = "uniform float size;\nuniform float scale;\n#include <common>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <color_vertex>\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\t#ifdef USE_SIZEATTENUATION\n\t\tgl_PointSize = size * ( scale / - mvPosition.z );\n\t#else\n\t\tgl_PointSize = size;\n\t#endif\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}\n";
 
-	var shadow_frag = "uniform float opacity;\n#include <common>\n#include <packing>\n#include <bsdfs>\n#include <lights_pars>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\tgl_FragColor = vec4( 0.0, 0.0, 0.0, opacity * ( 1.0 - getShadowMask() ) );\n}\n";
+	var shadow_frag = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <bsdfs>\n#include <lights_pars>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n}\n";
 
 	var shadow_vert = "#include <shadowmap_pars_vertex>\nvoid main() {\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n}\n";
 
@@ -5957,6 +5966,8 @@
 
 			uniforms: UniformsUtils.merge( [
 				UniformsLib.common,
+				UniformsLib.specularmap,
+				UniformsLib.envmap,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
 				UniformsLib.fog
@@ -5971,6 +5982,8 @@
 
 			uniforms: UniformsUtils.merge( [
 				UniformsLib.common,
+				UniformsLib.specularmap,
+				UniformsLib.envmap,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
 				UniformsLib.emissivemap,
@@ -5990,6 +6003,8 @@
 
 			uniforms: UniformsUtils.merge( [
 				UniformsLib.common,
+				UniformsLib.specularmap,
+				UniformsLib.envmap,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
 				UniformsLib.emissivemap,
@@ -6015,6 +6030,7 @@
 
 			uniforms: UniformsUtils.merge( [
 				UniformsLib.common,
+				UniformsLib.envmap,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
 				UniformsLib.emissivemap,
@@ -6113,15 +6129,10 @@
 
 		},
 
-		/* -------------------------------------------------------------------------
-		//	Cube map shader
-		 ------------------------------------------------------------------------- */
-
 		equirect: {
 
 			uniforms: {
 				tEquirect: { value: null },
-				tFlip: { value: - 1 }
 			},
 
 			vertexShader: ShaderChunk.equirect_vert,
@@ -6143,6 +6154,21 @@
 
 			vertexShader: ShaderChunk.distanceRGBA_vert,
 			fragmentShader: ShaderChunk.distanceRGBA_frag
+
+		},
+
+		shadow: {
+
+			uniforms: UniformsUtils.merge( [
+				UniformsLib.lights,
+				{
+					color: { value: new Color( 0x00000 ) },
+					opacity: { value: 1.0 }
+				},
+			] ),
+
+			vertexShader: ShaderChunk.shadow_vert,
+			fragmentShader: ShaderChunk.shadow_frag
 
 		}
 
@@ -8356,15 +8382,7 @@
 
 		intersectsPlane: function ( plane ) {
 
-			// We use the following equation to compute the signed distance from
-			// the center of the sphere to the plane.
-			//
-			// distance = q * n - d
-			//
-			// If this distance is greater than the radius of the sphere,
-			// then there is no intersection.
-
-			return Math.abs( this.center.dot( plane.normal ) - plane.constant ) <= this.radius;
+			return Math.abs( plane.distanceToPoint( this.center ) ) <= this.radius;
 
 		},
 
@@ -8755,6 +8773,8 @@
 	 */
 
 	function Plane( normal, constant ) {
+
+		// normal is assumed to be normalized
 
 		this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
 		this.constant = ( constant !== undefined ) ? constant : 0;
@@ -16301,9 +16321,9 @@
 		var clearAlpha = 0;
 
 		var planeCamera, planeMesh;
-		var boxCamera, boxMesh;
+		var boxMesh;
 
-		function render( scene, camera, forceClear ) {
+		function render( renderList, scene, camera, forceClear ) {
 
 			var background = scene.background;
 
@@ -16326,36 +16346,43 @@
 
 			if ( background && background.isCubeTexture ) {
 
-				if ( boxCamera === undefined ) {
-
-					boxCamera = new PerspectiveCamera();
+				if ( boxMesh === undefined ) {
 
 					boxMesh = new Mesh(
-						new BoxBufferGeometry( 5, 5, 5 ),
+						new BoxBufferGeometry( 1, 1, 1 ),
 						new ShaderMaterial( {
 							uniforms: ShaderLib.cube.uniforms,
 							vertexShader: ShaderLib.cube.vertexShader,
 							fragmentShader: ShaderLib.cube.fragmentShader,
 							side: BackSide,
-							depthTest: false,
+							depthTest: true,
 							depthWrite: false,
+							polygonOffset: true,
 							fog: false
 						} )
 					);
 
+					boxMesh.geometry.removeAttribute( 'normal' );
+					boxMesh.geometry.removeAttribute( 'uv' );
+
+					boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
+
+						var scale = camera.far;
+
+						this.matrixWorld.makeScale( scale, scale, scale );
+						this.matrixWorld.copyPosition( camera.matrixWorld );
+
+						this.material.polygonOffsetUnits = scale * 10;
+
+					};
+
+					geometries.update( boxMesh.geometry );
+
 				}
 
-				boxCamera.projectionMatrix.copy( camera.projectionMatrix );
+				boxMesh.material.uniforms.tCube.value = background;
 
-				boxCamera.matrixWorld.extractRotation( camera.matrixWorld );
-				boxCamera.matrixWorldInverse.getInverse( boxCamera.matrixWorld );
-
-				boxMesh.material.uniforms[ "tCube" ].value = background;
-				boxMesh.modelViewMatrix.multiplyMatrices( boxCamera.matrixWorldInverse, boxMesh.matrixWorld );
-
-				geometries.update( boxMesh.geometry );
-
-				renderer.renderBufferDirect( boxCamera, null, boxMesh.geometry, boxMesh.material, boxMesh, null );
+				renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
 
 			} else if ( background && background.isTexture ) {
 
@@ -16368,11 +16395,13 @@
 						new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
 					);
 
+					geometries.update( planeMesh.geometry );
+
 				}
 
 				planeMesh.material.map = background;
 
-				geometries.update( planeMesh.geometry );
+				// TODO Push this to renderList
 
 				renderer.renderBufferDirect( planeCamera, null, planeMesh.geometry, planeMesh.material, planeMesh, null );
 
@@ -16467,53 +16496,26 @@
 
 	function WebGLRenderList() {
 
-		var opaque = [];
-		var opaqueLastIndex = - 1;
+		var renderItems = [];
+		var renderItemsIndex = 0;
 
+		var opaque = [];
 		var transparent = [];
-		var transparentLastIndex = - 1;
 
 		function init() {
 
-			opaqueLastIndex = - 1;
-			transparentLastIndex = - 1;
+			renderItemsIndex = 0;
+
+			opaque.length = 0;
+			transparent.length = 0;
 
 		}
 
 		function push( object, geometry, material, z, group ) {
 
-			var array, index;
+			var renderItem = renderItems[ renderItemsIndex ];
 
-			// allocate the next position in the appropriate array
-
-			if ( material.transparent ) {
-
-				array = transparent;
-				index = ++ transparentLastIndex;
-
-			} else {
-
-				array = opaque;
-				index = ++ opaqueLastIndex;
-
-			}
-
-			// recycle existing render item or grow the array
-
-			var renderItem = array[ index ];
-
-			if ( renderItem ) {
-
-				renderItem.id = object.id;
-				renderItem.object = object;
-				renderItem.geometry = geometry;
-				renderItem.material = material;
-				renderItem.program = material.program;
-				renderItem.renderOrder = object.renderOrder;
-				renderItem.z = z;
-				renderItem.group = group;
-
-			} else {
+			if ( renderItem === undefined ) {
 
 				renderItem = {
 					id: object.id,
@@ -16526,24 +16528,31 @@
 					group: group
 				};
 
-				// assert( index === array.length );
-				array.push( renderItem );
+				renderItems[ renderItemsIndex ] = renderItem;
+
+			} else {
+
+				renderItem.id = object.id;
+				renderItem.object = object;
+				renderItem.geometry = geometry;
+				renderItem.material = material;
+				renderItem.program = material.program;
+				renderItem.renderOrder = object.renderOrder;
+				renderItem.z = z;
+				renderItem.group = group;
 
 			}
 
-		}
+			( material.transparent === true ? transparent : opaque ).push( renderItem );
 
-		function finish() {
-
-			opaque.length = opaqueLastIndex + 1;
-			transparent.length = transparentLastIndex + 1;
+			renderItemsIndex ++;
 
 		}
 
 		function sort() {
 
-			opaque.sort( painterSortStable );
-			transparent.sort( reversePainterSortStable );
+			if ( opaque.length > 1 ) opaque.sort( painterSortStable );
+			if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
 
 		}
 
@@ -16553,7 +16562,6 @@
 
 			init: init,
 			push: push,
-			finish: finish,
 
 			sort: sort
 		};
@@ -16592,6 +16600,115 @@
 			get: get,
 			dispose: dispose
 		};
+
+	}
+
+	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 */
+
+	function absNumericalSort( a, b ) {
+
+		return Math.abs( b[ 1 ] ) - Math.abs( a[ 1 ] );
+
+	}
+
+	function WebGLMorphtargets( gl ) {
+
+		var influencesList = {};
+		var morphInfluences = new Float32Array( 8 );
+
+		function update( object, geometry, material, program ) {
+
+			var objectInfluences = object.morphTargetInfluences;
+
+			var length = objectInfluences.length;
+
+			var influences = influencesList[ geometry.id ];
+
+			if ( influences === undefined ) {
+
+				// initialise list
+
+				influences = [];
+
+				for ( var i = 0; i < length; i ++ ) {
+
+					influences[ i ] = [ i, 0 ];
+
+				}
+
+				influencesList[ geometry.id ] = influences;
+
+			}
+
+			var morphTargets = material.morphTargets && geometry.morphAttributes.position;
+			var morphNormals = material.morphNormals && geometry.morphAttributes.normal;
+
+			// Remove current morphAttributes
+
+			for ( var i = 0; i < length; i ++ ) {
+
+				var influence = influences[ i ];
+
+				if ( influence[ 1 ] !== 0 ) {
+
+					if ( morphTargets ) geometry.removeAttribute( 'morphTarget' + i );
+					if ( morphNormals ) geometry.removeAttribute( 'morphNormal' + i );
+
+				}
+
+			}
+
+			// Collect influences
+
+			for ( var i = 0; i < length; i ++ ) {
+
+				var influence = influences[ i ];
+
+				influence[ 0 ] = i;
+				influence[ 1 ] = objectInfluences[ i ];
+
+			}
+
+			influences.sort( absNumericalSort );
+
+			// Add morphAttributes
+
+			for ( var i = 0; i < 8; i ++ ) {
+
+				var influence = influences[ i ];
+
+				if ( influence ) {
+
+					var index = influence[ 0 ];
+					var value = influence[ 1 ];
+
+					if ( value ) {
+
+						if ( morphTargets ) geometry.addAttribute( 'morphTarget' + i, morphTargets[ index ] );
+						if ( morphNormals ) geometry.addAttribute( 'morphNormal' + i, morphNormals[ index ] );
+
+						morphInfluences[ i ] = value;
+						continue;
+
+					}
+
+				}
+
+				morphInfluences[ i ] = 0;
+
+			}
+
+			program.getUniforms().setValue( gl, 'morphTargetInfluences', morphInfluences );
+
+		}
+
+		return {
+
+			update: update
+
+		}
 
 	}
 
@@ -18019,7 +18136,8 @@
 			MeshPhysicalMaterial: 'physical',
 			LineBasicMaterial: 'basic',
 			LineDashedMaterial: 'dashed',
-			PointsMaterial: 'points'
+			PointsMaterial: 'points',
+			ShadowMaterial: 'shadow'
 		};
 
 		var parameterNames = [
@@ -18302,7 +18420,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, infoMemory ) {
+	function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory ) {
 
 		var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 
@@ -18561,8 +18679,8 @@
 
 					var image = cubeImage[ 0 ],
 					isPowerOfTwoImage = isPowerOfTwo( image ),
-					glFormat = paramThreeToGL( texture.format ),
-					glType = paramThreeToGL( texture.type );
+					glFormat = utils.convert( texture.format ),
+					glType = utils.convert( texture.type );
 
 					setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, isPowerOfTwoImage );
 
@@ -18646,11 +18764,11 @@
 
 			if ( isPowerOfTwoImage ) {
 
-				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
-				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
+				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, utils.convert( texture.wrapS ) );
+				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, utils.convert( texture.wrapT ) );
 
-				_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
-				_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.minFilter ) );
+				_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, utils.convert( texture.magFilter ) );
+				_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, utils.convert( texture.minFilter ) );
 
 			} else {
 
@@ -18722,8 +18840,8 @@
 			}
 
 			var isPowerOfTwoImage = isPowerOfTwo( image ),
-			glFormat = paramThreeToGL( texture.format ),
-			glType = paramThreeToGL( texture.type );
+			glFormat = utils.convert( texture.format ),
+			glType = utils.convert( texture.type );
 
 			setTextureParameters( _gl.TEXTURE_2D, texture, isPowerOfTwoImage );
 
@@ -18757,7 +18875,7 @@
 					        console.warn( 'THREE.WebGLRenderer: Use UnsignedShortType or UnsignedIntType for DepthFormat DepthTexture.' );
 
 						texture.type = UnsignedShortType;
-						glType = paramThreeToGL( texture.type );
+						glType = utils.convert( texture.type );
 
 					}
 
@@ -18777,7 +18895,7 @@
 						console.warn( 'THREE.WebGLRenderer: Use UnsignedInt248Type for DepthStencilFormat DepthTexture.' );
 
 						texture.type = UnsignedInt248Type;
-						glType = paramThreeToGL( texture.type );
+						glType = utils.convert( texture.type );
 
 					}
 
@@ -18874,8 +18992,8 @@
 		// Setup storage for target texture and bind it to correct framebuffer
 		function setupFrameBufferTexture( framebuffer, renderTarget, attachment, textureTarget ) {
 
-			var glFormat = paramThreeToGL( renderTarget.texture.format );
-			var glType = paramThreeToGL( renderTarget.texture.type );
+			var glFormat = utils.convert( renderTarget.texture.format );
+			var glType = utils.convert( renderTarget.texture.type );
 			state.texImage2D( textureTarget, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
@@ -19137,7 +19255,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLState( gl, extensions, paramThreeToGL ) {
+	function WebGLState( gl, extensions, utils ) {
 
 		function ColorBuffer() {
 
@@ -19755,7 +19873,7 @@
 
 				if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
 
-					gl.blendEquationSeparate( paramThreeToGL( blendEquation ), paramThreeToGL( blendEquationAlpha ) );
+					gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
 
 					currentBlendEquation = blendEquation;
 					currentBlendEquationAlpha = blendEquationAlpha;
@@ -19764,7 +19882,7 @@
 
 				if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
 
-					gl.blendFuncSeparate( paramThreeToGL( blendSrc ), paramThreeToGL( blendDst ), paramThreeToGL( blendSrcAlpha ), paramThreeToGL( blendDstAlpha ) );
+					gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
 
 					currentBlendSrc = blendSrc;
 					currentBlendDst = blendDst;
@@ -20343,6 +20461,12 @@
 
 			//
 
+			cameraL.near = camera.near;
+			cameraR.near = camera.near;
+
+			cameraL.far = camera.far;
+			cameraR.far = camera.far;
+
 			cameraVR.matrixWorld.copy( camera.matrixWorld );
 			cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
 
@@ -20649,6 +20773,142 @@
 
 	}
 
+	/**
+	 * @author thespite / http://www.twitter.com/thespite
+	 */
+
+	function WebGLUtils ( gl, extensions ) {
+
+		function convert ( p ) {
+
+			var extension;
+
+			if ( p === RepeatWrapping ) return gl.REPEAT;
+			if ( p === ClampToEdgeWrapping ) return gl.CLAMP_TO_EDGE;
+			if ( p === MirroredRepeatWrapping ) return gl.MIRRORED_REPEAT;
+
+			if ( p === NearestFilter ) return gl.NEAREST;
+			if ( p === NearestMipMapNearestFilter ) return gl.NEAREST_MIPMAP_NEAREST;
+			if ( p === NearestMipMapLinearFilter ) return gl.NEAREST_MIPMAP_LINEAR;
+
+			if ( p === LinearFilter ) return gl.LINEAR;
+			if ( p === LinearMipMapNearestFilter ) return gl.LINEAR_MIPMAP_NEAREST;
+			if ( p === LinearMipMapLinearFilter ) return gl.LINEAR_MIPMAP_LINEAR;
+
+			if ( p === UnsignedByteType ) return gl.UNSIGNED_BYTE;
+			if ( p === UnsignedShort4444Type ) return gl.UNSIGNED_SHORT_4_4_4_4;
+			if ( p === UnsignedShort5551Type ) return gl.UNSIGNED_SHORT_5_5_5_1;
+			if ( p === UnsignedShort565Type ) return gl.UNSIGNED_SHORT_5_6_5;
+
+			if ( p === ByteType ) return gl.BYTE;
+			if ( p === ShortType ) return gl.SHORT;
+			if ( p === UnsignedShortType ) return gl.UNSIGNED_SHORT;
+			if ( p === IntType ) return gl.INT;
+			if ( p === UnsignedIntType ) return gl.UNSIGNED_INT;
+			if ( p === FloatType ) return gl.FLOAT;
+
+			if ( p === HalfFloatType ) {
+
+				extension = extensions.get( 'OES_texture_half_float' );
+
+				if ( extension !== null ) return extension.HALF_FLOAT_OES;
+
+			}
+
+			if ( p === AlphaFormat ) return gl.ALPHA;
+			if ( p === RGBFormat ) return gl.RGB;
+			if ( p === RGBAFormat ) return gl.RGBA;
+			if ( p === LuminanceFormat ) return gl.LUMINANCE;
+			if ( p === LuminanceAlphaFormat ) return gl.LUMINANCE_ALPHA;
+			if ( p === DepthFormat ) return gl.DEPTH_COMPONENT;
+			if ( p === DepthStencilFormat ) return gl.DEPTH_STENCIL;
+
+			if ( p === AddEquation ) return gl.FUNC_ADD;
+			if ( p === SubtractEquation ) return gl.FUNC_SUBTRACT;
+			if ( p === ReverseSubtractEquation ) return gl.FUNC_REVERSE_SUBTRACT;
+
+			if ( p === ZeroFactor ) return gl.ZERO;
+			if ( p === OneFactor ) return gl.ONE;
+			if ( p === SrcColorFactor ) return gl.SRC_COLOR;
+			if ( p === OneMinusSrcColorFactor ) return gl.ONE_MINUS_SRC_COLOR;
+			if ( p === SrcAlphaFactor ) return gl.SRC_ALPHA;
+			if ( p === OneMinusSrcAlphaFactor ) return gl.ONE_MINUS_SRC_ALPHA;
+			if ( p === DstAlphaFactor ) return gl.DST_ALPHA;
+			if ( p === OneMinusDstAlphaFactor ) return gl.ONE_MINUS_DST_ALPHA;
+
+			if ( p === DstColorFactor ) return gl.DST_COLOR;
+			if ( p === OneMinusDstColorFactor ) return gl.ONE_MINUS_DST_COLOR;
+			if ( p === SrcAlphaSaturateFactor ) return gl.SRC_ALPHA_SATURATE;
+
+			if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
+				p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
+
+				extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
+
+				if ( extension !== null ) {
+
+					if ( p === RGB_S3TC_DXT1_Format ) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
+					if ( p === RGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
+					if ( p === RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
+					if ( p === RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+
+				}
+
+			}
+
+			if ( p === RGB_PVRTC_4BPPV1_Format || p === RGB_PVRTC_2BPPV1_Format ||
+				p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
+
+				extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
+
+				if ( extension !== null ) {
+
+					if ( p === RGB_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+					if ( p === RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+					if ( p === RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+					if ( p === RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+
+				}
+
+			}
+
+			if ( p === RGB_ETC1_Format ) {
+
+				extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
+
+				if ( extension !== null ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
+
+			}
+
+			if ( p === MinEquation || p === MaxEquation ) {
+
+				extension = extensions.get( 'EXT_blend_minmax' );
+
+				if ( extension !== null ) {
+
+					if ( p === MinEquation ) return extension.MIN_EXT;
+					if ( p === MaxEquation ) return extension.MAX_EXT;
+
+				}
+
+			}
+
+			if ( p === UnsignedInt248Type ) {
+
+				extension = extensions.get( 'WEBGL_depth_texture' );
+
+				if ( extension !== null ) return extension.UNSIGNED_INT_24_8_WEBGL;
+
+			}
+
+			return 0;
+
+		}
+
+		return { convert: convert }
+
+	}
+
 	// import { Sphere } from '../math/Sphere';
 	/**
 	 * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -20678,8 +20938,6 @@
 		var shadowsArray = [];
 
 		var currentRenderList = null;
-
-		var morphInfluences = new Float32Array( 8 );
 
 		var spritesArray = [];
 		var flaresArray = [];
@@ -20864,8 +21122,10 @@
 		var properties, textures, attributes, geometries, objects, lights;
 		var programCache, renderLists;
 
-		var background, bufferRenderer, indexedBufferRenderer;
+		var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 		var flareRenderer, spriteRenderer;
+
+		var utils;
 
 		function initGLContext() {
 
@@ -20884,17 +21144,20 @@
 
 			}
 
+			utils = new WebGLUtils( _gl, extensions );
+
 			capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 
-			state = new WebGLState( _gl, extensions, paramThreeToGL );
+			state = new WebGLState( _gl, extensions, utils );
 			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
 			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
 			properties = new WebGLProperties();
-			textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, _infoMemory );
+			textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, _infoMemory );
 			attributes = new WebGLAttributes( _gl );
 			geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
 			objects = new WebGLObjects( geometries, _infoRender );
+			morphtargets = new WebGLMorphtargets( _gl );
 			programCache = new WebGLPrograms( _this, extensions, capabilities );
 			lights = new WebGLLights();
 			renderLists = new WebGLRenderLists();
@@ -21276,12 +21539,6 @@
 
 		};
 
-		function absNumericalSort( a, b ) {
-
-			return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
-
-		}
-
 		this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 			state.setMaterial( material );
@@ -21298,61 +21555,9 @@
 
 			}
 
-			// morph targets
+			if ( object.morphTargetInfluences ) {
 
-			var morphTargetInfluences = object.morphTargetInfluences;
-
-			if ( morphTargetInfluences !== undefined ) {
-
-				// TODO Remove allocations
-
-				var activeInfluences = [];
-
-				for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
-
-					var influence = morphTargetInfluences[ i ];
-					activeInfluences.push( [ influence, i ] );
-
-				}
-
-				activeInfluences.sort( absNumericalSort );
-
-				if ( activeInfluences.length > 8 ) {
-
-					activeInfluences.length = 8;
-
-				}
-
-				var morphAttributes = geometry.morphAttributes;
-
-				for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
-
-					var influence = activeInfluences[ i ];
-					morphInfluences[ i ] = influence[ 0 ];
-
-					if ( influence[ 0 ] !== 0 ) {
-
-						var index = influence[ 1 ];
-
-						if ( material.morphTargets === true && morphAttributes.position ) geometry.addAttribute( 'morphTarget' + i, morphAttributes.position[ index ] );
-						if ( material.morphNormals === true && morphAttributes.normal ) geometry.addAttribute( 'morphNormal' + i, morphAttributes.normal[ index ] );
-
-					} else {
-
-						if ( material.morphTargets === true ) geometry.removeAttribute( 'morphTarget' + i );
-						if ( material.morphNormals === true ) geometry.removeAttribute( 'morphNormal' + i );
-
-					}
-
-				}
-
-				for ( var i = activeInfluences.length, il = morphInfluences.length; i < il; i ++ ) {
-
-					morphInfluences[ i ] = 0.0;
-
-				}
-
-				program.getUniforms().setValue( _gl, 'morphTargetInfluences', morphInfluences );
+				morphtargets.update( object, geometry, material, program );
 
 				updateBuffers = true;
 
@@ -21740,8 +21945,6 @@
 
 			projectObject( scene, camera, _this.sortObjects );
 
-			currentRenderList.finish();
-
 			if ( _this.sortObjects === true ) {
 
 				currentRenderList.sort();
@@ -21776,7 +21979,7 @@
 
 			//
 
-			background.render( scene, camera, forceClear );
+			background.render( currentRenderList, scene, camera, forceClear );
 
 			// render scene
 
@@ -21820,6 +22023,8 @@
 			state.buffers.depth.setTest( true );
 			state.buffers.depth.setMask( true );
 			state.buffers.color.setMask( true );
+
+			state.setPolygonOffset( false );
 
 			if ( vr.enabled ) {
 
@@ -22434,64 +22639,79 @@
 
 				}
 
-				if ( material.isMeshBasicMaterial ||
-					material.isMeshLambertMaterial ||
-					material.isMeshPhongMaterial ||
-					material.isMeshStandardMaterial ||
-					material.isMeshNormalMaterial ||
-					material.isMeshDepthMaterial ||
-					material.isMeshDistanceMaterial ) {
+				if ( material.isMeshBasicMaterial ) {
 
 					refreshUniformsCommon( m_uniforms, material );
 
-				}
-
-				// refresh single material specific uniforms
-
-				if ( material.isLineBasicMaterial ) {
-
-					refreshUniformsLine( m_uniforms, material );
-
-				} else if ( material.isLineDashedMaterial ) {
-
-					refreshUniformsLine( m_uniforms, material );
-					refreshUniformsDash( m_uniforms, material );
-
-				} else if ( material.isPointsMaterial ) {
-
-					refreshUniformsPoints( m_uniforms, material );
-
 				} else if ( material.isMeshLambertMaterial ) {
 
+					refreshUniformsCommon( m_uniforms, material );
 					refreshUniformsLambert( m_uniforms, material );
-
-				} else if ( material.isMeshToonMaterial ) {
-
-					refreshUniformsToon( m_uniforms, material );
 
 				} else if ( material.isMeshPhongMaterial ) {
 
-					refreshUniformsPhong( m_uniforms, material );
+					refreshUniformsCommon( m_uniforms, material );
 
-				} else if ( material.isMeshPhysicalMaterial ) {
+					if ( material.isMeshToonMaterial ) {
 
-					refreshUniformsPhysical( m_uniforms, material );
+						refreshUniformsToon( m_uniforms, material );
+
+					} else {
+
+						refreshUniformsPhong( m_uniforms, material );
+
+					}
 
 				} else if ( material.isMeshStandardMaterial ) {
 
-					refreshUniformsStandard( m_uniforms, material );
+					refreshUniformsCommon( m_uniforms, material );
+
+					if ( material.isMeshPhysicalMaterial ) {
+
+						refreshUniformsPhysical( m_uniforms, material );
+
+					} else {
+
+						refreshUniformsStandard( m_uniforms, material );
+
+					}
+
+				} else if ( material.isMeshNormalMaterial ) {
+
+					refreshUniformsCommon( m_uniforms, material );
 
 				} else if ( material.isMeshDepthMaterial ) {
 
+					refreshUniformsCommon( m_uniforms, material );
 					refreshUniformsDepth( m_uniforms, material );
 
 				} else if ( material.isMeshDistanceMaterial ) {
 
+					refreshUniformsCommon( m_uniforms, material );
 					refreshUniformsDistance( m_uniforms, material );
 
 				} else if ( material.isMeshNormalMaterial ) {
 
 					refreshUniformsNormal( m_uniforms, material );
+
+				} else if ( material.isLineBasicMaterial ) {
+
+					refreshUniformsLine( m_uniforms, material );
+
+					if ( material.isLineDashedMaterial ) {
+
+						refreshUniformsDash( m_uniforms, material );
+
+					}
+
+				} else if ( material.isPointsMaterial ) {
+
+					refreshUniformsPoints( m_uniforms, material );
+
+				} else if ( material.isShadowMaterial ) {
+
+					m_uniforms.color.value = material.color;
+					m_uniforms.opacity.value = material.opacity;
 
 				}
 
@@ -22523,7 +22743,11 @@
 
 			uniforms.opacity.value = material.opacity;
 
-			uniforms.diffuse.value = material.color;
+			if ( material.color ) {
+
+				uniforms.diffuse.value = material.color;
+
+			}
 
 			if ( material.emissive ) {
 
@@ -22531,9 +22755,38 @@
 
 			}
 
-			uniforms.map.value = material.map;
-			uniforms.specularMap.value = material.specularMap;
-			uniforms.alphaMap.value = material.alphaMap;
+			if ( material.map ) {
+
+				uniforms.map.value = material.map;
+
+			}
+
+			if ( material.alphaMap ) {
+
+				uniforms.alphaMap.value = material.alphaMap;
+
+			}
+
+			if ( material.specularMap ) {
+
+				uniforms.specularMap.value = material.specularMap;
+
+			}
+
+			if ( material.envMap ) {
+
+				uniforms.envMap.value = material.envMap;
+
+				// don't flip CubeTexture envMaps, flip everything else:
+				//  WebGLRenderTargetCube will be flipped for backwards compatibility
+				//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
+				// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
+				uniforms.flipEnvMap.value = ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1;
+
+				uniforms.reflectivity.value = material.reflectivity;
+				uniforms.refractionRatio.value = material.refractionRatio;
+
+			}
 
 			if ( material.lightMap ) {
 
@@ -22612,17 +22865,6 @@
 				uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
 			}
-
-			uniforms.envMap.value = material.envMap;
-
-			// don't flip CubeTexture envMaps, flip everything else:
-			//  WebGLRenderTargetCube will be flipped for backwards compatibility
-			//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
-			// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
-			uniforms.flipEnvMap.value = ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1;
-
-			uniforms.reflectivity.value = material.reflectivity;
-			uniforms.refractionRatio.value = material.refractionRatio;
 
 		}
 
@@ -23078,14 +23320,14 @@
 					var textureFormat = texture.format;
 					var textureType = texture.type;
 
-					if ( textureFormat !== RGBAFormat && paramThreeToGL( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+					if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
 
 						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 						return;
 
 					}
 
-					if ( textureType !== UnsignedByteType && paramThreeToGL( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
+					if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
 						! ( textureType === FloatType && ( extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
 						! ( textureType === HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
 
@@ -23100,7 +23342,7 @@
 
 						if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-							_gl.readPixels( x, y, width, height, paramThreeToGL( textureFormat ), paramThreeToGL( textureType ), buffer );
+							_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), buffer );
 
 						}
 
@@ -23123,134 +23365,6 @@
 			}
 
 		};
-
-		// Map three.js constants to WebGL constants
-
-		function paramThreeToGL( p ) {
-
-			var extension;
-
-			if ( p === RepeatWrapping ) return _gl.REPEAT;
-			if ( p === ClampToEdgeWrapping ) return _gl.CLAMP_TO_EDGE;
-			if ( p === MirroredRepeatWrapping ) return _gl.MIRRORED_REPEAT;
-
-			if ( p === NearestFilter ) return _gl.NEAREST;
-			if ( p === NearestMipMapNearestFilter ) return _gl.NEAREST_MIPMAP_NEAREST;
-			if ( p === NearestMipMapLinearFilter ) return _gl.NEAREST_MIPMAP_LINEAR;
-
-			if ( p === LinearFilter ) return _gl.LINEAR;
-			if ( p === LinearMipMapNearestFilter ) return _gl.LINEAR_MIPMAP_NEAREST;
-			if ( p === LinearMipMapLinearFilter ) return _gl.LINEAR_MIPMAP_LINEAR;
-
-			if ( p === UnsignedByteType ) return _gl.UNSIGNED_BYTE;
-			if ( p === UnsignedShort4444Type ) return _gl.UNSIGNED_SHORT_4_4_4_4;
-			if ( p === UnsignedShort5551Type ) return _gl.UNSIGNED_SHORT_5_5_5_1;
-			if ( p === UnsignedShort565Type ) return _gl.UNSIGNED_SHORT_5_6_5;
-
-			if ( p === ByteType ) return _gl.BYTE;
-			if ( p === ShortType ) return _gl.SHORT;
-			if ( p === UnsignedShortType ) return _gl.UNSIGNED_SHORT;
-			if ( p === IntType ) return _gl.INT;
-			if ( p === UnsignedIntType ) return _gl.UNSIGNED_INT;
-			if ( p === FloatType ) return _gl.FLOAT;
-
-			if ( p === HalfFloatType ) {
-
-				extension = extensions.get( 'OES_texture_half_float' );
-
-				if ( extension !== null ) return extension.HALF_FLOAT_OES;
-
-			}
-
-			if ( p === AlphaFormat ) return _gl.ALPHA;
-			if ( p === RGBFormat ) return _gl.RGB;
-			if ( p === RGBAFormat ) return _gl.RGBA;
-			if ( p === LuminanceFormat ) return _gl.LUMINANCE;
-			if ( p === LuminanceAlphaFormat ) return _gl.LUMINANCE_ALPHA;
-			if ( p === DepthFormat ) return _gl.DEPTH_COMPONENT;
-			if ( p === DepthStencilFormat ) return _gl.DEPTH_STENCIL;
-
-			if ( p === AddEquation ) return _gl.FUNC_ADD;
-			if ( p === SubtractEquation ) return _gl.FUNC_SUBTRACT;
-			if ( p === ReverseSubtractEquation ) return _gl.FUNC_REVERSE_SUBTRACT;
-
-			if ( p === ZeroFactor ) return _gl.ZERO;
-			if ( p === OneFactor ) return _gl.ONE;
-			if ( p === SrcColorFactor ) return _gl.SRC_COLOR;
-			if ( p === OneMinusSrcColorFactor ) return _gl.ONE_MINUS_SRC_COLOR;
-			if ( p === SrcAlphaFactor ) return _gl.SRC_ALPHA;
-			if ( p === OneMinusSrcAlphaFactor ) return _gl.ONE_MINUS_SRC_ALPHA;
-			if ( p === DstAlphaFactor ) return _gl.DST_ALPHA;
-			if ( p === OneMinusDstAlphaFactor ) return _gl.ONE_MINUS_DST_ALPHA;
-
-			if ( p === DstColorFactor ) return _gl.DST_COLOR;
-			if ( p === OneMinusDstColorFactor ) return _gl.ONE_MINUS_DST_COLOR;
-			if ( p === SrcAlphaSaturateFactor ) return _gl.SRC_ALPHA_SATURATE;
-
-			if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
-				p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
-
-				extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
-
-				if ( extension !== null ) {
-
-					if ( p === RGB_S3TC_DXT1_Format ) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
-					if ( p === RGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
-					if ( p === RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
-					if ( p === RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
-
-				}
-
-			}
-
-			if ( p === RGB_PVRTC_4BPPV1_Format || p === RGB_PVRTC_2BPPV1_Format ||
-				p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
-
-				extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
-
-				if ( extension !== null ) {
-
-					if ( p === RGB_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-					if ( p === RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-					if ( p === RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
-					if ( p === RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-
-				}
-
-			}
-
-			if ( p === RGB_ETC1_Format ) {
-
-				extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
-
-				if ( extension !== null ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
-
-			}
-
-			if ( p === MinEquation || p === MaxEquation ) {
-
-				extension = extensions.get( 'EXT_blend_minmax' );
-
-				if ( extension !== null ) {
-
-					if ( p === MinEquation ) return extension.MIN_EXT;
-					if ( p === MaxEquation ) return extension.MAX_EXT;
-
-				}
-
-			}
-
-			if ( p === UnsignedInt248Type ) {
-
-				extension = extensions.get( 'WEBGL_depth_texture' );
-
-				if ( extension !== null ) return extension.UNSIGNED_INT_24_8_WEBGL;
-
-			}
-
-			return 0;
-
-		}
 
 	}
 
@@ -28981,43 +29095,28 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 *
 	 * parameters = {
+	 *  color: <THREE.Color>,
 	 *  opacity: <float>
 	 * }
 	 */
 
 	function ShadowMaterial( parameters ) {
 
-		ShaderMaterial.call( this, {
-			uniforms: UniformsUtils.merge( [
-				UniformsLib.lights,
-				{
-					opacity: { value: 1.0 }
-				}
-			] ),
-			vertexShader: ShaderChunk[ 'shadow_vert' ],
-			fragmentShader: ShaderChunk[ 'shadow_frag' ]
-		} );
+		Material.call( this );
+
+		this.type = 'ShadowMaterial';
+
+		this.color = new Color( 0x000000 );
+		this.opacity = 1.0;
 
 		this.lights = true;
 		this.transparent = true;
-
-		Object.defineProperties( this, {
-			opacity: {
-				enumerable: true,
-				get: function () {
-					return this.uniforms.opacity.value;
-				},
-				set: function ( value ) {
-					this.uniforms.opacity.value = value;
-				}
-			}
-		} );
 
 		this.setValues( parameters );
 
 	}
 
-	ShadowMaterial.prototype = Object.create( ShaderMaterial.prototype );
+	ShadowMaterial.prototype = Object.create( Material.prototype );
 	ShadowMaterial.prototype.constructor = ShadowMaterial;
 
 	ShadowMaterial.prototype.isShadowMaterial = true;
@@ -29680,36 +29779,26 @@
 
 	function LineDashedMaterial( parameters ) {
 
-		Material.call( this );
+		LineBasicMaterial.call( this );
 
 		this.type = 'LineDashedMaterial';
-
-		this.color = new Color( 0xffffff );
-
-		this.linewidth = 1;
 
 		this.scale = 1;
 		this.dashSize = 3;
 		this.gapSize = 1;
 
-		this.lights = false;
-
 		this.setValues( parameters );
 
 	}
 
-	LineDashedMaterial.prototype = Object.create( Material.prototype );
+	LineDashedMaterial.prototype = Object.create( LineBasicMaterial.prototype );
 	LineDashedMaterial.prototype.constructor = LineDashedMaterial;
 
 	LineDashedMaterial.prototype.isLineDashedMaterial = true;
 
 	LineDashedMaterial.prototype.copy = function ( source ) {
 
-		Material.prototype.copy.call( this, source );
-
-		this.color.copy( source.color );
-
-		this.linewidth = source.linewidth;
+		LineBasicMaterial.prototype.copy.call( this, source );
 
 		this.scale = source.scale;
 		this.dashSize = source.dashSize;
@@ -30331,6 +30420,8 @@
 
 	Object.assign( ImageLoader.prototype, {
 
+		crossOrigin: 'Anonymous',
+
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			if ( url === undefined ) url = '';
@@ -30428,6 +30519,8 @@
 
 	Object.assign( CubeTextureLoader.prototype, {
 
+		crossOrigin: 'Anonymous',
+
 		load: function ( urls, onLoad, onProgress, onError ) {
 
 			var texture = new CubeTexture();
@@ -30495,6 +30588,8 @@
 	}
 
 	Object.assign( TextureLoader.prototype, {
+
+		crossOrigin: 'Anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -32276,7 +32371,7 @@
 
 			} else {
 
-				// by default, we asssume a constructor compatible with the base
+				// by default, we assume a constructor compatible with the base
 				return new trackType(
 						json.name, json.times, json.values, json.interpolation );
 
@@ -32780,7 +32875,7 @@
 			if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 			if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
 			if ( json.fog !== undefined ) material.fog = json.fog;
-			if ( json.shading !== undefined ) material.shading = json.shading;
+			if ( json.flatShading !== undefined ) material.flatShading = json.flatShading;
 			if ( json.blending !== undefined ) material.blending = json.blending;
 			if ( json.side !== undefined ) material.side = json.side;
 			if ( json.opacity !== undefined ) material.opacity = json.opacity;
@@ -32795,6 +32890,10 @@
 			if ( json.wireframeLinejoin !== undefined ) material.wireframeLinejoin = json.wireframeLinejoin;
 			if ( json.skinning !== undefined ) material.skinning = json.skinning;
 			if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
+
+			// Deprecated
+
+			if ( json.shading !== undefined ) material.shading = json.shading;
 
 			// for PointsMaterial
 
@@ -36433,7 +36532,7 @@
 		this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
 		this.renderTarget.texture.name = "CubeCamera";
 
-		this.updateCubeMap = function ( renderer, scene ) {
+		this.update = function ( renderer, scene ) {
 
 			if ( this.parent === null ) this.updateMatrixWorld();
 
@@ -36461,6 +36560,23 @@
 
 			renderTarget.activeCubeFace = 5;
 			renderer.render( scene, cameraNZ, renderTarget );
+
+			renderer.setRenderTarget( null );
+
+		};
+
+		this.clear = function ( renderer, color, depth, stencil ) {
+
+			var renderTarget = this.renderTarget;
+
+			for ( var i = 0; i < 6; i ++ ) {
+
+				renderTarget.activeCubeFace = i;
+				renderer.setRenderTarget( renderTarget );
+
+				renderer.clear( color, depth, stencil );
+
+			}
 
 			renderer.setRenderTarget( null );
 
@@ -40445,322 +40561,6 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
-	function MorphBlendMesh( geometry, material ) {
-
-		Mesh.call( this, geometry, material );
-
-		this.animationsMap = {};
-		this.animationsList = [];
-
-		// prepare default animation
-		// (all frames played together in 1 second)
-
-		var numFrames = this.geometry.morphTargets.length;
-
-		var name = "__default";
-
-		var startFrame = 0;
-		var endFrame = numFrames - 1;
-
-		var fps = numFrames / 1;
-
-		this.createAnimation( name, startFrame, endFrame, fps );
-		this.setAnimationWeight( name, 1 );
-
-	}
-
-	MorphBlendMesh.prototype = Object.create( Mesh.prototype );
-	MorphBlendMesh.prototype.constructor = MorphBlendMesh;
-
-	MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fps ) {
-
-		var animation = {
-
-			start: start,
-			end: end,
-
-			length: end - start + 1,
-
-			fps: fps,
-			duration: ( end - start ) / fps,
-
-			lastFrame: 0,
-			currentFrame: 0,
-
-			active: false,
-
-			time: 0,
-			direction: 1,
-			weight: 1,
-
-			directionBackwards: false,
-			mirroredLoop: false
-
-		};
-
-		this.animationsMap[ name ] = animation;
-		this.animationsList.push( animation );
-
-	};
-
-	MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
-
-		var pattern = /([a-z]+)_?(\d+)/i;
-
-		var firstAnimation, frameRanges = {};
-
-		var geometry = this.geometry;
-
-		for ( var i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
-
-			var morph = geometry.morphTargets[ i ];
-			var chunks = morph.name.match( pattern );
-
-			if ( chunks && chunks.length > 1 ) {
-
-				var name = chunks[ 1 ];
-
-				if ( ! frameRanges[ name ] ) frameRanges[ name ] = { start: Infinity, end: - Infinity };
-
-				var range = frameRanges[ name ];
-
-				if ( i < range.start ) range.start = i;
-				if ( i > range.end ) range.end = i;
-
-				if ( ! firstAnimation ) firstAnimation = name;
-
-			}
-
-		}
-
-		for ( var name in frameRanges ) {
-
-			var range = frameRanges[ name ];
-			this.createAnimation( name, range.start, range.end, fps );
-
-		}
-
-		this.firstAnimation = firstAnimation;
-
-	};
-
-	MorphBlendMesh.prototype.setAnimationDirectionForward = function ( name ) {
-
-		var animation = this.animationsMap[ name ];
-
-		if ( animation ) {
-
-			animation.direction = 1;
-			animation.directionBackwards = false;
-
-		}
-
-	};
-
-	MorphBlendMesh.prototype.setAnimationDirectionBackward = function ( name ) {
-
-		var animation = this.animationsMap[ name ];
-
-		if ( animation ) {
-
-			animation.direction = - 1;
-			animation.directionBackwards = true;
-
-		}
-
-	};
-
-	MorphBlendMesh.prototype.setAnimationFPS = function ( name, fps ) {
-
-		var animation = this.animationsMap[ name ];
-
-		if ( animation ) {
-
-			animation.fps = fps;
-			animation.duration = ( animation.end - animation.start ) / animation.fps;
-
-		}
-
-	};
-
-	MorphBlendMesh.prototype.setAnimationDuration = function ( name, duration ) {
-
-		var animation = this.animationsMap[ name ];
-
-		if ( animation ) {
-
-			animation.duration = duration;
-			animation.fps = ( animation.end - animation.start ) / animation.duration;
-
-		}
-
-	};
-
-	MorphBlendMesh.prototype.setAnimationWeight = function ( name, weight ) {
-
-		var animation = this.animationsMap[ name ];
-
-		if ( animation ) {
-
-			animation.weight = weight;
-
-		}
-
-	};
-
-	MorphBlendMesh.prototype.setAnimationTime = function ( name, time ) {
-
-		var animation = this.animationsMap[ name ];
-
-		if ( animation ) {
-
-			animation.time = time;
-
-		}
-
-	};
-
-	MorphBlendMesh.prototype.getAnimationTime = function ( name ) {
-
-		var time = 0;
-
-		var animation = this.animationsMap[ name ];
-
-		if ( animation ) {
-
-			time = animation.time;
-
-		}
-
-		return time;
-
-	};
-
-	MorphBlendMesh.prototype.getAnimationDuration = function ( name ) {
-
-		var duration = - 1;
-
-		var animation = this.animationsMap[ name ];
-
-		if ( animation ) {
-
-			duration = animation.duration;
-
-		}
-
-		return duration;
-
-	};
-
-	MorphBlendMesh.prototype.playAnimation = function ( name ) {
-
-		var animation = this.animationsMap[ name ];
-
-		if ( animation ) {
-
-			animation.time = 0;
-			animation.active = true;
-
-		} else {
-
-			console.warn( "THREE.MorphBlendMesh: animation[" + name + "] undefined in .playAnimation()" );
-
-		}
-
-	};
-
-	MorphBlendMesh.prototype.stopAnimation = function ( name ) {
-
-		var animation = this.animationsMap[ name ];
-
-		if ( animation ) {
-
-			animation.active = false;
-
-		}
-
-	};
-
-	MorphBlendMesh.prototype.update = function ( delta ) {
-
-		for ( var i = 0, il = this.animationsList.length; i < il; i ++ ) {
-
-			var animation = this.animationsList[ i ];
-
-			if ( ! animation.active ) continue;
-
-			var frameTime = animation.duration / animation.length;
-
-			animation.time += animation.direction * delta;
-
-			if ( animation.mirroredLoop ) {
-
-				if ( animation.time > animation.duration || animation.time < 0 ) {
-
-					animation.direction *= - 1;
-
-					if ( animation.time > animation.duration ) {
-
-						animation.time = animation.duration;
-						animation.directionBackwards = true;
-
-					}
-
-					if ( animation.time < 0 ) {
-
-						animation.time = 0;
-						animation.directionBackwards = false;
-
-					}
-
-				}
-
-			} else {
-
-				animation.time = animation.time % animation.duration;
-
-				if ( animation.time < 0 ) animation.time += animation.duration;
-
-			}
-
-			var keyframe = animation.start + _Math.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
-			var weight = animation.weight;
-
-			if ( keyframe !== animation.currentFrame ) {
-
-				this.morphTargetInfluences[ animation.lastFrame ] = 0;
-				this.morphTargetInfluences[ animation.currentFrame ] = 1 * weight;
-
-				this.morphTargetInfluences[ keyframe ] = 0;
-
-				animation.lastFrame = animation.currentFrame;
-				animation.currentFrame = keyframe;
-
-			}
-
-			var mix = ( animation.time % frameTime ) / frameTime;
-
-			if ( animation.directionBackwards ) mix = 1 - mix;
-
-			if ( animation.currentFrame !== animation.lastFrame ) {
-
-				this.morphTargetInfluences[ animation.currentFrame ] = mix * weight;
-				this.morphTargetInfluences[ animation.lastFrame ] = ( 1 - mix ) * weight;
-
-			} else {
-
-				this.morphTargetInfluences[ animation.currentFrame ] = weight;
-
-			}
-
-		}
-
-	};
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
 	function ImmediateRenderObject( material ) {
 
 		Object3D.call( this );
@@ -43913,6 +43713,15 @@
 
 	//
 
+	CubeCamera.prototype.updateCubeMap = function ( renderer, scene ) {
+
+		console.warn( 'THREE.CubeCamera: .updateCubeMap() is now .update().' );
+		return this.update( renderer, scene );
+
+	};
+
+	//
+
 	var GeometryUtils = {
 
 		merge: function ( geometry1, geometry2, materialIndexOffset ) {
@@ -44150,7 +43959,6 @@
 	exports.Vector2 = Vector2;
 	exports.Quaternion = Quaternion;
 	exports.Color = Color;
-	exports.MorphBlendMesh = MorphBlendMesh;
 	exports.ImmediateRenderObject = ImmediateRenderObject;
 	exports.VertexNormalsHelper = VertexNormalsHelper;
 	exports.SpotLightHelper = SpotLightHelper;
@@ -44186,6 +43994,7 @@
 	exports.Curve = Curve;
 	exports.ShapeUtils = ShapeUtils;
 	exports.SceneUtils = SceneUtils;
+	exports.WebGLUtils = WebGLUtils;
 	exports.WireframeGeometry = WireframeGeometry;
 	exports.ParametricGeometry = ParametricGeometry;
 	exports.ParametricBufferGeometry = ParametricBufferGeometry;

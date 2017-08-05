@@ -672,22 +672,20 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			}
 
+			if ( material.isLineDashedMaterial ) {
+
+				setLineDash( [ material.dashSize, material.gapSize ] );
+
+			}
+
 			_context.stroke();
 			_elemBox.expandByScalar( material.linewidth * 2 );
 
-		} else if ( material.isLineDashedMaterial ) {
+			if ( material.isLineDashedMaterial ) {
 
-			setLineWidth( material.linewidth );
-			setLineCap( material.linecap );
-			setLineJoin( material.linejoin );
-			setStrokeStyle( material.color.getStyle() );
-			setLineDash( [ material.dashSize, material.gapSize ] );
+				setLineDash( [] );
 
-			_context.stroke();
-
-			_elemBox.expandByScalar( material.linewidth * 2 );
-
-			setLineDash( [] );
+			}
 
 		}
 

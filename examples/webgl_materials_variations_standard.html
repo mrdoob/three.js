@@ -80,7 +80,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = textureCube;
-				
+
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				var hdrCubeRenderTarget = null;
 
@@ -109,7 +109,7 @@
 					var numberOfSphersPerSide = 5;
 					var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
 					var stepSize = 1.0 / numberOfSphersPerSide;
-					
+
 					var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
 					var index = 0;
@@ -130,7 +130,7 @@
 									color: diffuseColor,
 									metalness: beta,
 									roughness: 1.0 - alpha,
-									envMap: index % 2 === 0 ? null : hdrCubeRenderTarget.texture						
+									envMap: index % 2 === 0 ? null : hdrCubeRenderTarget.texture
 								} );
 
 								index ++;
@@ -144,9 +144,9 @@
 								scene.add( mesh );
 
 							}
-							
+
 						}
-						
+
 						index ++;
 
 					}
@@ -212,8 +212,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

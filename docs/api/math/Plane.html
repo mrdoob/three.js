@@ -12,7 +12,7 @@
 
 		<div class="desc">
 			A two dimensional surface that extends infinitely in 3d space, represented in [link:http://mathworld.wolfram.com/HessianNormalForm.html Hessian normal form]
-			by a normal vector and a constant.
+			by a unit length normal vector and a constant.
 		</div>
 
 
@@ -21,7 +21,7 @@
 
 		<h3>[name]( [page:Vector3 normal], [page:Float constant] )</h3>
 		<div>
-		[page:Vector3 normal] - (optional) a [page:Vector3] defining the normal of the plane. Default is *(1, 0, 0)*.<br />
+		[page:Vector3 normal] - (optional) a unit length [page:Vector3] defining the normal of the plane. Default is *(1, 0, 0)*.<br />
 		[page:Float constant] - (optional) the signed distance from the origin to the plane. Default is *0*.
 		</div>
 
@@ -130,7 +130,7 @@
 
 		<h3>[method:Plane set]( [page:Vector3 normal], [page:Float constant] )</h3>
 		<div>
-			[page:Vector3 normal] - a [page:Vector3] defining the normal of the plane.<br />
+			[page:Vector3 normal] - a unit length [page:Vector3] defining the normal of the plane.<br />
 			[page:Float constant] - the signed distance from the origin to the plane. Default is *0*.<br /><br />
 
 			 Sets the plane's [page:.normal normal] and [page:.constant constant] properties.
@@ -138,9 +138,9 @@
 
 		<h3>[method:Plane setComponents]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
 		<div>
-		[page:Float x] - x value of the normal vector.<br />
-		[page:Float y] - y value of the normal vector.<br />
-		[page:Float z] - z value of the normal vector.<br />
+		[page:Float x] - x value of the unit length normal vector.<br />
+		[page:Float y] - y value of the unit length normal vector.<br />
+		[page:Float z] - z value of the unit length normal vector.<br />
 		[page:Float w] - the value of the plane's [page:.constant constant] property.<br /><br />
 
 		Set the individual components that define the plane.
@@ -158,7 +158,7 @@
 
 		<h3>[method:Plane setFromNormalAndCoplanarPoint]( [page:Vector3 normal], [page:Vector3 point] ) [page:Vector3 this]</h3>
 		<div>
-		[page:Vector3 normal] - a [page:Vector3] defining the normal of the plane.<br />
+		[page:Vector3 normal] - a unit length [page:Vector3] defining the normal of the plane.<br />
 		[page:Vector3 point] - [page:Vector3]<br /><br />
 
 		Sets the plane's properties as defined by a [page:Vector3 normal] and an arbitrary coplanar [page:Vector3 point].

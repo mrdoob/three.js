@@ -66,6 +66,7 @@ import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 import { Shape } from './extras/core/Shape.js';
+import { CubeCamera } from './cameras/CubeCamera.js';
 
 export { BoxGeometry as CubeGeometry };
 
@@ -1421,6 +1422,15 @@ AudioAnalyser.prototype.getData = function () {
 
 	console.warn( 'THREE.AudioAnalyser: .getData() is now .getFrequencyData().' );
 	return this.getFrequencyData();
+
+};
+
+//
+
+CubeCamera.prototype.updateCubeMap = function ( renderer, scene ) {
+
+	console.warn( 'THREE.CubeCamera: .updateCubeMap() is now .update().' );
+	return this.update( renderer, scene );
 
 };
 
