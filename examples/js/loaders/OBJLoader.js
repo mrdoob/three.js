@@ -273,20 +273,20 @@ THREE.OBJLoader = ( function () {
 				var uvLen = this.uvs.length;
 				var nLen = this.normals.length;
 
-				var addingFaceMode = Array.prototype.pop.call( arguments );
+				var addingFaceMode = args.pop();
 				var ivs = [ ], ius = [ ], ins = [ ];
 
 				if( addingFaceMode === adding_face_modes.vertex ) {
 
-					for( var i = 0; i < arguments.length; i++ ) {
+					for( var i = 0; i < args.length; i++ ) {
 
-						if( !arguments[ i ] ) {
+						if( !args[ i ] ) {
 
 							break;
 
 						}
 
-						ivs.push( this.parseVertexIndex( arguments[ i ], vLen ) );
+						ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
 
 					}
 
@@ -294,32 +294,32 @@ THREE.OBJLoader = ( function () {
 
 				if( addingFaceMode === adding_face_modes.vertex_uv ) {
 
-					for( var i = 0; i < arguments.length - 1; i = i + 2 ) {
+					for( var i = 0; i < args.length - 1; i = i + 2 ) {
 
-						if( !arguments[ i ] ) {
+						if( !args[ i ] ) {
 
 							break;
 
 						}
 
-						ivs.push( this.parseVertexIndex( arguments[ i ], vLen ) );
-						ius.push( this.parseUVIndex( arguments[ i + 1 ], uvLen ) );
+						ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
+						ius.push( this.parseUVIndex( args[ i + 1 ], uvLen ) );
 					}
 				}
 
 				if( addingFaceMode === adding_face_modes.vertex_uv_normal ) {
 
-					for( var i = 0; i < arguments.length - 2; i = i + 3 ) {
+					for( var i = 0; i < args.length - 2; i = i + 3 ) {
 
-						if( !arguments[ i ] ) {
+						if( !args[ i ] ) {
 
 							break;
 
 						}
 
-						ivs.push( this.parseVertexIndex( arguments[ i ], vLen ) );
-						ius.push( this.parseUVIndex( arguments[ i + 1 ], uvLen ) );
-						ins.push( this.parseNormalIndex( arguments[ i + 2 ], nLen ) );
+						ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
+						ius.push( this.parseUVIndex( args[ i + 1 ], uvLen ) );
+						ins.push( this.parseNormalIndex( args[ i + 2 ], nLen ) );
 
 					}
 
@@ -327,16 +327,16 @@ THREE.OBJLoader = ( function () {
 
 				if( addingFaceMode === adding_face_modes.vertex_normal ) {
 
-					for( var i = 0; i < arguments.length - 1; i = i + 2 ) {
+					for( var i = 0; i < args.length - 1; i = i + 2 ) {
 
-						if( !arguments[ i ] ) {
+						if( !args[ i ] ) {
 
 							break;
 
 						}
 
-						ivs.push( this.parseVertexIndex( arguments[ i ], vLen ) );
-						ins.push( this.parseNormalIndex( arguments[ i + 1 ], nLen ) );
+						ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
+						ins.push( this.parseNormalIndex( args[ i + 1 ], nLen ) );
 
 					}
 
@@ -571,7 +571,7 @@ THREE.OBJLoader = ( function () {
 					}
 
 					result.push( addingFaceMode );
-					state.addFace.apply( state, result );
+					state.addFace( result );
 
 				} else if ( lineFirstChar === "l" ) {
 
