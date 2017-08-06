@@ -21,6 +21,8 @@ THREE.AssimpJSONLoader.prototype = {
 
 	constructor: THREE.AssimpJSONLoader,
 
+	crossOrigin: 'Anonymous',
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;

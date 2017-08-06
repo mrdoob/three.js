@@ -26,6 +26,8 @@ THREE.VRMLLoader.prototype = {
 
 	recordingFieldname: null,
 
+	crossOrigin: 'Anonymous',
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
