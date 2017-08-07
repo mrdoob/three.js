@@ -1982,12 +1982,18 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			var offset = uvScaleMap.offset;
-			var repeat = uvScaleMap.repeat;
-			var rotation = uvScaleMap.rotation;
-			var center = uvScaleMap.center;
+			if ( uvScaleMap.matrixAutoUpdate === true ) {
 
-			uniforms.uvTransform.value.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+				var offset = uvScaleMap.offset;
+				var repeat = uvScaleMap.repeat;
+
+				uniforms.uvTransform.value.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, 0, 0, 0 );
+
+			} else {
+
+				uniforms.uvTransform.value.copy( uvScaleMap.matrix );
+
+			}
 
 		}
 
@@ -2019,12 +2025,18 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.map !== null ) {
 
-			var offset = material.map.offset;
-			var repeat = material.map.repeat;
-			var rotation = material.map.rotation;
-			var center = material.map.center;
+			if ( material.map.matrixAutoUpdate === true ) {
 
-			uniforms.uvTransform.value.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+				var offset = material.map.offset;
+				var repeat = material.map.repeat;
+
+				uniforms.uvTransform.value.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, 0, 0, 0 );
+
+			} else {
+
+				uniforms.uvTransform.value.copy( material.map.matrix );
+
+			}
 
 		}
 

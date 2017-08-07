@@ -87,13 +87,14 @@
 				var loader = new THREE.TextureLoader();
 				var texture = loader.load( 'textures/UV_Grid_Sm.jpg', render );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				texture.matrixAutoUpdate = false;
 
 				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				updateTextureParams();
+				updateUvTransform();
 
 				initGui();
 
@@ -119,17 +120,11 @@
 
 			}
 
-			function updateTextureParams() {
+			function updateUvTransform() {
 
-				var map = mesh.material.map;
+				var matrix = mesh.material.map.matrix;
 
-				map.offset.x = API.translateX;
-				map.offset.y = API.translateY;
-				map.repeat.x = API.scaleX;
-				map.repeat.y = API.scaleY;
-				map.rotation = API.rotation;
-				map.center.x = API.centerX;
-				map.center.y = API.centerY;
+				matrix.setUvTransform( API.translateX, API.translateY, API.scaleX, API.scaleY, API.rotation, API.centerX, API.centerY );
 
 				render();
 
@@ -141,13 +136,13 @@
 
 				gui = new dat.GUI();
 
-				gui.add( API, 'translateX', 0.0, 1.0 ).name( 'offset.x' ).onChange( updateTextureParams );
-				gui.add( API, 'translateY', 0.0, 1.0 ).name( 'offset.y' ).onChange( updateTextureParams );
-				gui.add( API, 'scaleX', 0.25, 2.0 ).name( 'repeat.x' ).onChange( updateTextureParams );
-				gui.add( API, 'scaleY', 0.25, 2.0 ).name( 'repeat.y' ).onChange( updateTextureParams );
-				gui.add( API, 'rotation', - 2.0, 2.0 ).name( 'rotation' ).onChange( updateTextureParams );
-				gui.add( API, 'centerX', 0.0, 1.0 ).name( 'center.x' ).onChange( updateTextureParams );
-				gui.add( API, 'centerY', 0.0, 1.0 ).name( 'center.y' ).onChange( updateTextureParams );
+				gui.add( API, 'translateX', 0.0, 1.0 ).name( 'offset.x' ).onChange( updateUvTransform );
+				gui.add( API, 'translateY', 0.0, 1.0 ).name( 'offset.y' ).onChange( updateUvTransform );
+				gui.add( API, 'scaleX', 0.25, 2.0 ).name( 'repeat.x' ).onChange( updateUvTransform );
+				gui.add( API, 'scaleY', 0.25, 2.0 ).name( 'repeat.y' ).onChange( updateUvTransform );
+				gui.add( API, 'rotation', - 2.0, 2.0 ).name( 'rotation' ).onChange( updateUvTransform );
+				gui.add( API, 'centerX', 0.0, 1.0 ).name( 'center.x' ).onChange( updateUvTransform );
+				gui.add( API, 'centerY', 0.0, 1.0 ).name( 'center.y' ).onChange( updateUvTransform );
 
 			}
 
