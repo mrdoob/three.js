@@ -31,9 +31,9 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 		_domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
-                _domElement.addEventListener( 'touchmove', onDocumentMouseMove, false );
-                _domElement.addEventListener( 'touchstart', onDocumentMouseDown, false );
-                _domElement.addEventListener( 'touchend', onDocumentMouseUp, false );
+		_domElement.addEventListener( 'touchmove', onDocumentMouseMove, false );
+		_domElement.addEventListener( 'touchstart', onDocumentMouseDown, false );
+		_domElement.addEventListener( 'touchend', onDocumentMouseUp, false );
 
 	}
 
@@ -42,9 +42,9 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 		_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
 		_domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-                _domElement.removeEventListener( 'touchmove', onDocumentMouseMove, false );
-                _domElement.removeEventListener( 'touchstart', onDocumentMouseDown, false );
-                _domElement.removeEventListener( 'touchend', onDocumentMouseUp, false );
+		_domElement.removeEventListener( 'touchmove', onDocumentMouseMove, false );
+		_domElement.removeEventListener( 'touchstart', onDocumentMouseDown, false );
+		_domElement.removeEventListener( 'touchend', onDocumentMouseUp, false );
 
 
 	}
@@ -58,12 +58,12 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	function onDocumentMouseMove( event ) {
 
 		event.preventDefault();
-                pointer = event.changedTouches ? event.changedTouches[0] : event;
+		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 		var rect = _domElement.getBoundingClientRect();
 
-		_mouse.x = ( (pointer.clientX - rect.left) / rect.width ) * 2 - 1;
-		_mouse.y = - ( (pointer.clientY - rect.top) / rect.height ) * 2 + 1;
+		_mouse.x = ( ( pointer.clientX - rect.left ) / rect.width ) * 2 - 1;
+		_mouse.y = - ( ( pointer.clientY - rect.top ) / rect.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
@@ -74,8 +74,8 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 				_selected.position.copy( _intersection.sub( _offset ) );
 
 			}
-			scope.dispatchEvent( { type: 'drag', object: _selected } );
 
+			scope.dispatchEvent( { type: 'drag', object: _selected } );
 
 			return;
 
@@ -118,12 +118,12 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	function onDocumentMouseDown( event ) {
 
 		event.preventDefault();
-                pointer = event.changedTouches ? event.changedTouches[0] : event;
+        var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
-                var rect = _domElement.getBoundingClientRect();
+		var rect = _domElement.getBoundingClientRect();
 
-                _mouse.x = ( (pointer.clientX - rect.left) / rect.width ) * 2 - 1;
-                _mouse.y = - ( (pointer.clientY - rect.top) / rect.height ) * 2 + 1;
+		_mouse.x = ( ( pointer.clientX - rect.left ) / rect.width ) * 2 - 1;
+		_mouse.y = - ( ( pointer.clientY - rect.top ) / rect.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
@@ -133,7 +133,9 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			_selected = intersects[ 0 ].object;
 
-                        _plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _selected.position );
+			// to avoid don't have a touchmove event before touchstart on mobile
+
+			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _selected.position );
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
@@ -153,7 +155,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	function onDocumentMouseUp( event ) {
 
 		event.preventDefault();
-                event = event.changedTouches ? event.changedTouches[0] : event;
+		event = event.changedTouches ? event.changedTouches[0] : event;
 
 		if ( _selected ) {
 
