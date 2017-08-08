@@ -14,7 +14,7 @@
 THREE.TDSLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-	this.debug = true;
+	this.debug = false;
 
 	this.group = null;
 	this.position = 0;
