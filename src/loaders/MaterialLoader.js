@@ -86,7 +86,7 @@ Object.assign( MaterialLoader.prototype, {
 
 		// Deprecated
 
-		if ( json.shading !== undefined ) material.shading = json.shading;
+		if ( json.shading !== undefined ) material.flatShading = json.shading === 1; // THREE.FlatShading
 
 		// for PointsMaterial
 
