@@ -4,12 +4,6 @@
 
 THREE.OBJLoader = ( function () {
 
-	// v float float float
-	var vertex_pattern           = /^v\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/;
-	// vn float float float
-	var normal_pattern           = /^vn\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/;
-	// vt float float
-	var uv_pattern               = /^vt\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/;
 	// o object_name | g group_name
 	var object_pattern           = /^[og]\s*(.+)?/;
 	// mtllib file_reference
@@ -61,7 +55,7 @@ THREE.OBJLoader = ( function () {
 					materials : [],
 					smooth : true,
 
-					startMaterial : function( name, libraries ) {
+					startMaterial: function ( name, libraries ) {
 
 						var previous = this._finalize( false );
 
@@ -83,7 +77,7 @@ THREE.OBJLoader = ( function () {
 							groupCount : -1,
 							inherited  : false,
 
-							clone : function( index ) {
+							clone: function ( index ) {
 								var cloned = {
 									index      : ( typeof index === 'number' ? index : this.index ),
 									name       : this.name,
@@ -105,7 +99,7 @@ THREE.OBJLoader = ( function () {
 
 					},
 
-					currentMaterial : function() {
+					currentMaterial: function () {
 
 						if ( this.materials.length > 0 ) {
 							return this.materials[ this.materials.length - 1 ];
@@ -115,7 +109,7 @@ THREE.OBJLoader = ( function () {
 
 					},
 
-					_finalize : function( end ) {
+					_finalize: function ( end ) {
 
 						var lastMultiMaterial = this.currentMaterial();
 						if ( lastMultiMaterial && lastMultiMaterial.groupEnd === -1 ) {
@@ -158,7 +152,7 @@ THREE.OBJLoader = ( function () {
 				// overwrite the inherited material. Exception being that there was already face declarations
 				// to the inherited material, then it will be preserved for proper MultiMaterial continuation.
 
-				if ( previousMaterial && previousMaterial.name && typeof previousMaterial.clone === "function" ) {
+				if ( previousMaterial && previousMaterial.name && typeof previousMaterial.clone === 'function' ) {
 
 					var declared = previousMaterial.clone( 0 );
 					declared.inherited = true;
@@ -170,7 +164,7 @@ THREE.OBJLoader = ( function () {
 
 			},
 
-			finalize : function() {
+			finalize: function () {
 
 				if ( this.object && typeof this.object._finalize === 'function' ) {
 
@@ -221,7 +215,7 @@ THREE.OBJLoader = ( function () {
 
 			},
 
-			addNormal : function ( a, b, c ) {
+			addNormal: function ( a, b, c ) {
 
 				var src = this.normals;
 				var dst = this.object.geometry.normals;
@@ -252,27 +246,15 @@ THREE.OBJLoader = ( function () {
 
 			},
 
-			addFace: function ( a, b, c, d, ua, ub, uc, ud, na, nb, nc, nd ) {
+			addFace: function ( a, b, c, ua, ub, uc, na, nb, nc ) {
 
 				var vLen = this.vertices.length;
 
 				var ia = this.parseVertexIndex( a, vLen );
 				var ib = this.parseVertexIndex( b, vLen );
 				var ic = this.parseVertexIndex( c, vLen );
-				var id;
 
-				if ( d === undefined ) {
-
-					this.addVertex( ia, ib, ic );
-
-				} else {
-
-					id = this.parseVertexIndex( d, vLen );
-
-					this.addVertex( ia, ib, id );
-					this.addVertex( ib, ic, id );
-
-				}
+				this.addVertex( ia, ib, ic );
 
 				if ( ua !== undefined ) {
 
@@ -282,18 +264,7 @@ THREE.OBJLoader = ( function () {
 					ib = this.parseUVIndex( ub, uvLen );
 					ic = this.parseUVIndex( uc, uvLen );
 
-					if ( d === undefined ) {
-
-						this.addUV( ia, ib, ic );
-
-					} else {
-
-						id = this.parseUVIndex( ud, uvLen );
-
-						this.addUV( ia, ib, id );
-						this.addUV( ib, ic, id );
-
-					}
+					this.addUV( ia, ib, ic );
 
 				}
 
@@ -306,18 +277,7 @@ THREE.OBJLoader = ( function () {
 					ib = na === nb ? ia : this.parseNormalIndex( nb, nLen );
 					ic = na === nc ? ia : this.parseNormalIndex( nc, nLen );
 
-					if ( d === undefined ) {
-
-						this.addNormal( ia, ib, ic );
-
-					} else {
-
-						id = this.parseNormalIndex( nd, nLen );
-
-						this.addNormal( ia, ib, id );
-						this.addNormal( ib, ic, id );
-
-					}
+					this.addNormal( ia, ib, ic );
 
 				}
 
@@ -415,7 +375,7 @@ THREE.OBJLoader = ( function () {
 			}
 
 			var lines = text.split( '\n' );
-			var line = '', lineFirstChar = '', lineSecondChar = '';
+			var line = '', lineFirstChar = '';
 			var lineLength = 0;
 			var result = [];
 
@@ -439,60 +399,47 @@ THREE.OBJLoader = ( function () {
 
 				if ( lineFirstChar === 'v' ) {
 
-					lineSecondChar = line.charAt( 1 );
+					var data = line.split( /\s+/ );
 
-					if ( lineSecondChar === ' ' && ( result = vertex_pattern.exec( line ) ) !== null ) {
+					switch ( data[ 0 ] ) {
 
-						// 0                  1      2      3
-						// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
-
-						state.vertices.push(
-							parseFloat( result[ 1 ] ),
-							parseFloat( result[ 2 ] ),
-							parseFloat( result[ 3 ] )
-						);
-
-					} else if ( lineSecondChar === 'n' && ( result = normal_pattern.exec( line ) ) !== null ) {
-
-						// 0                   1      2      3
-						// ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
-
-						state.normals.push(
-							parseFloat( result[ 1 ] ),
-							parseFloat( result[ 2 ] ),
-							parseFloat( result[ 3 ] )
-						);
-
-					} else if ( lineSecondChar === 't' && ( result = uv_pattern.exec( line ) ) !== null ) {
-
-						// 0               1      2
-						// ["vt 0.1 0.2", "0.1", "0.2"]
-
-						state.uvs.push(
-							parseFloat( result[ 1 ] ),
-							parseFloat( result[ 2 ] )
-						);
-
-					} else {
-
-						throw new Error( "Unexpected vertex/normal/uv line: '" + line  + "'" );
-
+						case 'v':
+							state.vertices.push(
+								parseFloat( data[ 1 ] ),
+								parseFloat( data[ 2 ] ),
+								parseFloat( data[ 3 ] )
+							);
+							break;
+						case 'vn':
+							state.normals.push(
+								parseFloat( data[ 1 ] ),
+								parseFloat( data[ 2 ] ),
+								parseFloat( data[ 3 ] )
+							);
+						case 'vt':
+							state.uvs.push(
+								parseFloat( data[ 1 ] ),
+								parseFloat( data[ 2 ] )
+							);
+							break;
 					}
 
-				} else if ( lineFirstChar === "f" ) {
+				} else if ( lineFirstChar === 'f' ) {
 
-					var lineData = line.substr(1).trim(),
-					    vertexData = lineData.split(' '),
-					    faceVertices = [];
+					var lineData = line.substr( 1 ).trim();
+					var vertexData = lineData.split( /\s+/ );
+					var faceVertices = [];
 
 					// Parse the face vertex data into an easy to work with format
 
-					for (var idx = 0; idx < vertexData.length; idx++) {
+					for ( var j = 0, jl = vertexData.length; j < jl; j ++ ) {
 
-						if (vertexData[idx].length > 0) {
+						var vertex = vertexData[ j ];
 
-							var vertexParts = vertexData[idx].split('/');
-							faceVertices.push(vertexParts);
+						if ( vertex.length > 0 ) {
+
+							var vertexParts = vertex.split( '/' );
+							faceVertices.push( vertexParts );
 
 						}
 
@@ -500,23 +447,22 @@ THREE.OBJLoader = ( function () {
 
 					// Draw an edge between the first vertex and all subsequent vertices to form an n-gon
 
-					var v1 = faceVertices[0],
-					    numFaces = faceVertices.length - 1;
+					var v1 = faceVertices[ 0 ];
 
-					for (var idx = 1; idx < numFaces; idx++) {
+					for ( var j = 1, jl = faceVertices.length - 1; j < jl; j ++ ) {
 
-						var v2 = faceVertices[idx],
-						    v3 = faceVertices[idx+1];
+						var v2 = faceVertices[ j ];
+						var v3 = faceVertices[ j + 1 ];
 
 						state.addFace(
-							v1[ 0 ], v2[ 0 ], v3[ 0 ], undefined,
-							v1[ 1 ], v2[ 1 ], v3[ 1 ], undefined,
-							v1[ 2 ], v2[ 2 ], v3[ 2 ], undefined
+							v1[ 0 ], v2[ 0 ], v3[ 0 ],
+							v1[ 1 ], v2[ 1 ], v3[ 1 ],
+							v1[ 2 ], v2[ 2 ], v3[ 2 ]
 						);
 
 					}
 
-				} else if ( lineFirstChar === "l" ) {
+				} else if ( lineFirstChar === 'l' ) {
 
 					var lineParts = line.substring( 1 ).trim().split( " " );
 					var lineVertices = [], lineUVs = [];
@@ -563,7 +509,7 @@ THREE.OBJLoader = ( function () {
 
 					state.materialLibraries.push( line.substring( 7 ).trim() );
 
-				} else if ( lineFirstChar === "s" ) {
+				} else if ( lineFirstChar === 's' ) {
 
 					result = line.split( ' ' );
 
