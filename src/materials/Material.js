@@ -62,6 +62,8 @@ function Material() {
 	this.visible = true;
 
 	this.needsUpdate = true;
+	
+	this.userData = {};
 
 }
 
@@ -153,6 +155,7 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		data.type = this.type;
 
 		if ( this.name !== '' ) data.name = this.name;
+		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
 		if ( this.color && this.color.isColor ) data.color = this.color.getHex();
 
@@ -331,6 +334,7 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		}
 
 		this.clippingPlanes = dstPlanes;
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
 		return this;
 
