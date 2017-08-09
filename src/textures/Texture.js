@@ -39,6 +39,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
+	this.rotation = 0;
 
 	this.matrixAutoUpdate = true;
 	this.matrix = new Matrix3();
@@ -106,6 +107,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
+		this.rotation = source.rotation;
 
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 		this.matrix.copy( source.matrix );
@@ -182,6 +184,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],
+			rotation: this.rotation,
 
 			matrixAutoUpdate: this.matrixAutoUpdate,
 			matrix: this.matrix.toArray(),
@@ -237,7 +240,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 		if ( this.mapping !== UVMapping ) return;
 
 		uv.multiply( this.repeat );
-		uv.add( this.offset );
+		uv.add( this.offset ); // todo: support rotation and matrixAutoUpdate flag
 
 		if ( uv.x < 0 || uv.x > 1 ) {
 

@@ -88,7 +88,7 @@
 				var texture = loader.load( 'textures/UV_Grid_Sm.jpg', render );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
-				texture.matrixAutoUpdate = false;
+				texture.matrixAutoUpdate = false; // set this to false to update texture.matrix manually
 
 				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
@@ -129,12 +129,14 @@
 
 					texture.offset.set( API.offsetX, API.offsetY );
 					texture.repeat.set( API.repeatX, API.repeatY );
+					texture.rotation = API.rotation; // rotation is around [ 0.5, 0.5 ]
 
 				} else {
 
+					// one way...
 					//texture.matrix.setUvTransform( API.offsetX, API.offsetY, API.repeatX, API.repeatY, API.rotation, API.centerX, API.centerY );
-					//console.log( texture.matrix.elements );
 
+					// another way...
 					texture.matrix
 					    .identity()
 					    .translate( - API.centerX, - API.centerY )
@@ -142,9 +144,6 @@
 					    .scale( API.repeatX, API.repeatY )
 					    .translate( API.centerX, API.centerY )
 					    .translate( API.offsetX, API.offsetY );
-
-					//console.log( texture.matrix.elements );
-					//console.log( '-------------')
 
 				}
 

@@ -175,15 +175,15 @@ m.elements = [ 11, 21, 31,
 			[page:Float rotation], [page:Float cx], [page:Float cy] )
 		</h3>
 		<div>
-		[page:Float tx] - translation x<br />
-		[page:Float ty] - translation y<br />
-		[page:Float sx] - scale x<br />
-		[page:Float sy] - scale y<br />
+		[page:Float tx] - offset x<br />
+		[page:Float ty] - offset y<br />
+		[page:Float sx] - repeat x<br />
+		[page:Float sy] - repeat y<br />
 		[page:Float rotation] - rotation (in radians)<br />
 		[page:Float cx] - center x of rotation<br />
 		[page:Float cy] - center y of rotation<br /><br />
 
-		Sets the UV transform matrix from the texture properties offset (translate), repeat (scale), rotation, and center.
+		Sets the UV transform matrix from offset, repeat, rotation, and center.
 		</div>
 
 		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
