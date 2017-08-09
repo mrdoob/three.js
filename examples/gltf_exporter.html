@@ -190,7 +190,9 @@
 				var gltfExporter = new THREE.GLTFExporter();
 				// gltfExporter.parse(scene);
 				//console.log(JSON.stringify(gltfExporter.parse(scene), null, 2));
-				saveString( JSON.stringify(gltfExporter.parse(scene),null, 2), 'scene.gltf' );
+				gltfExporter.parse(scene, function(result){
+					saveString( JSON.stringify(result,null, 2), 'scene.gltf' );
+				});
 
 				//
 

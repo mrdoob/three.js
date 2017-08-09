@@ -608,7 +608,7 @@ THREE.GLTFExporter = function () {};
 THREE.GLTFExporter.prototype = {
 
 	constructor: THREE.GLTFExporter,
-	parse: function ( input ) {
+	parse: function ( input, onDone ) {
 
 		var outputJSON = {
 /*
@@ -939,10 +939,7 @@ THREE.GLTFExporter.prototype = {
 			 base64data = reader.result;
 			 outputJSON.buffers[0].uri = base64data;
 			 console.log(JSON.stringify(outputJSON, null, 2));
+			 onDone(outputJSON);
 		 }
-
-		return outputJSON;
-
 	}
-
 };
