@@ -2107,7 +2107,9 @@ THREE.GLTF2Loader = ( function () {
 				// Normal map textures use OpenGL conventions:
 				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
 				_material.normalScale.x = -1;
-
+				
+				_material.userData = material.extras;
+				
 				return _material;
 
 			} );
