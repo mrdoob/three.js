@@ -40,7 +40,7 @@ THREE.AssimpLoader.prototype = {
 	parse: function ( buffer, path ) {
 
 		var textureLoader = new THREE.TextureLoader( this.manager );
-		textureLoader.setPath( path ).setCrossOrigin( this.crossOrigin );;
+		textureLoader.setPath( path ).setCrossOrigin( this.crossOrigin );
 
 		var Virtulous = {};
 
