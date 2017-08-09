@@ -25,11 +25,11 @@ THREE.OBJLoader = ( function () {
 	// usemtl material_name
 	var material_use_pattern     = /^usemtl /;
 
-	var adding_face_modes = {
-		vertex: 1,
-		vertex_uv: 2,
-		vertex_uv_normal: 3,
-		vertex_normal: 4
+	var MODE = {
+		ADDING_VERTEX: 1,
+		ADDING_VERTEX_UV: 2,
+		ADDING_VERTEX_UV_NORMAL: 3,
+		ADDING_VERTEX_NORMAL: 4
 	}
 
 	function ParserState() {
@@ -273,72 +273,79 @@ THREE.OBJLoader = ( function () {
 				var uvLen = this.uvs.length;
 				var nLen = this.normals.length;
 
-				var addingFaceMode = args.pop();
 				var ivs = [ ], ius = [ ], ins = [ ];
 
-				if( addingFaceMode === adding_face_modes.vertex ) {
+				var mode = args.pop();
 
-					for( var i = 0; i < args.length; i++ ) {
+				switch ( mode ) {
 
-						if( !args[ i ] ) {
+					case MODE.ADDING_VERTEX:
 
-							break;
+						for ( var i = 0; i < args.length; i ++ ) {
 
-						}
+							if ( ! args[ i ] ) {
 
-						ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
+								break;
 
-					}
+							}
 
-				}
-
-				if( addingFaceMode === adding_face_modes.vertex_uv ) {
-
-					for( var i = 0; i < args.length - 1; i = i + 2 ) {
-
-						if( !args[ i ] ) {
-
-							break;
+							ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
 
 						}
 
-						ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
-						ius.push( this.parseUVIndex( args[ i + 1 ], uvLen ) );
-					}
-				}
+						break;
 
-				if( addingFaceMode === adding_face_modes.vertex_uv_normal ) {
+					case MODE.ADDING_VERTEX_UV:
 
-					for( var i = 0; i < args.length - 2; i = i + 3 ) {
+						for ( var i = 0; i < args.length - 1; i = i + 2 ) {
 
-						if( !args[ i ] ) {
+							if ( ! args[ i ] ) {
 
-							break;
+								break;
 
-						}
+							}
 
-						ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
-						ius.push( this.parseUVIndex( args[ i + 1 ], uvLen ) );
-						ins.push( this.parseNormalIndex( args[ i + 2 ], nLen ) );
-
-					}
-
-				}
-
-				if( addingFaceMode === adding_face_modes.vertex_normal ) {
-
-					for( var i = 0; i < args.length - 1; i = i + 2 ) {
-
-						if( !args[ i ] ) {
-
-							break;
+							ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
+							ius.push( this.parseUVIndex( args[ i + 1 ], uvLen ) );
 
 						}
 
-						ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
-						ins.push( this.parseNormalIndex( args[ i + 1 ], nLen ) );
+						break;
 
-					}
+					case MODE.ADDING_VERTEX_UV_NORMAL:
+
+						for ( var i = 0; i < args.length - 2; i = i + 3 ) {
+
+							if ( ! args[ i ] ) {
+
+								break;
+
+							}
+
+							ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
+							ius.push( this.parseUVIndex( args[ i + 1 ], uvLen ) );
+							ins.push( this.parseNormalIndex( args[ i + 2 ], nLen ) );
+
+						}
+
+						break;
+
+					case MODE.ADDING_VERTEX_NORMAL:
+
+						for ( var i = 0; i < args.length - 1; i = i + 2 ) {
+
+							if ( ! args[ i ] ) {
+
+								break;
+
+							}
+
+							ivs.push( this.parseVertexIndex( args[ i ], vLen ) );
+							ins.push( this.parseNormalIndex( args[ i + 1 ], nLen ) );
+
+						}
+
+						break;
 
 				}
 
@@ -528,7 +535,7 @@ THREE.OBJLoader = ( function () {
 						// 0                        1    2    3    4    5    6    7    8    9   10         11         12
 						// ["f 1/1/1 2/2/2 3/3/3", "1", "1", "1", "2", "2", "2", "3", "3", "3", undefined, undefined, undefined]
 
-						addingFaceMode = adding_face_modes.vertex_uv_normal;
+						addingFaceMode = MODE.ADDING_VERTEX_UV_NORMAL;
 
 					} else if ( ( result = face_vertex_uv.exec( line ) ) !== null ) {
 
@@ -536,7 +543,7 @@ THREE.OBJLoader = ( function () {
 						// 0                  1    2    3    4    5    6   7          8
 						// ["f 1/1 2/2 3/3", "1", "1", "2", "2", "3", "3", undefined, undefined]
 
-						addingFaceMode = adding_face_modes.vertex_uv;
+						addingFaceMode = MODE.ADDING_VERTEX_UV;
 
 					} else if ( ( result = face_vertex_normal.exec( line ) ) !== null ) {
 
@@ -544,7 +551,7 @@ THREE.OBJLoader = ( function () {
 						// 0                     1    2    3    4    5    6   7          8
 						// ["f 1//1 2//2 3//3", "1", "1", "2", "2", "3", "3", undefined, undefined]
 
-						addingFaceMode = adding_face_modes.vertex_normal;
+						addingFaceMode = MODE.ADDING_VERTEX_NORMAL;
 
 					} else if ( ( result = face_vertex.exec( line ) ) !== null ) {
 
@@ -552,15 +559,15 @@ THREE.OBJLoader = ( function () {
 						// 0            1    2    3   4
 						// ["f 1 2 3", "1", "2", "3", undefined]
 
-						addingFaceMode = adding_face_modes.vertex;
+						addingFaceMode = MODE.ADDING_VERTEX;
 
 					} else {
 
-						throw new Error( "Unexpected face line: '" + line  + "'" );
+						throw new Error( "Unexpected face line: '" + line + "'" );
 
 					}
 
-					if( result[ 0 ].length === result.input.length ) {
+					if ( result[ 0 ].length === result.input.length ) {
 
 						result.shift();
 
@@ -572,7 +579,6 @@ THREE.OBJLoader = ( function () {
 
 					result.push( addingFaceMode );
 					state.addFace( result );
-
 				} else if ( lineFirstChar === "l" ) {
 
 					var lineParts = line.substring( 1 ).trim().split( " " );
