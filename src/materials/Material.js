@@ -5,6 +5,7 @@ import { _Math } from '../math/Math';
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
+ * @author jcowles / http://visualcore.com/
  */
 
 var materialId = 0;
@@ -61,6 +62,7 @@ function Material() {
 
 	this.visible = true;
 
+	this.needsInverseMatrices;
 	this.needsUpdate = true;
 	
 	this.userData = {};
@@ -231,6 +233,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
 		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
 
+		if ( this.needsInverseMatrices !== undefined ) data.needsInverseMatrices = this.needsInverseMatrices;
+
 		data.skinning = this.skinning;
 		data.morphTargets = this.morphTargets;
 
@@ -317,6 +321,7 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		this.overdraw = source.overdraw;
 
 		this.visible = source.visible;
+		this.needsInverseMatrices = source.needsInverseMatrices;
 		this.clipShadows = source.clipShadows;
 		this.clipIntersection = source.clipIntersection;
 
