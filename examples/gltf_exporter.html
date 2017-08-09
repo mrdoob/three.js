@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometries</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/exporters/GLTFExporter.js"></script>
+
+		<script>
+
+		var link = document.createElement( 'a' );
+		link.style.display = 'none';
+		document.body.appendChild( link ); // Firefox workaround, see #6594
+
+		function save( blob, filename ) {
+
+			link.href = URL.createObjectURL( blob );
+			link.download = filename || 'data.json';
+			link.click();
+
+			// URL.revokeObjectURL( url ); breaks Firefox...
+
+		}
+
+		function saveString( text, filename ) {
+
+			save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+		}
+
+
+
+
+
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.y = 400;
+
+				scene = new THREE.Scene();
+
+				var light, object;
+
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 1, 0 );
+				scene.add( light );
+
+				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
+				map.wrapS = map.wrapT = THREE.RepeatWrapping;
+				map.anisotropy = 16;
+
+				// var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
+
+				//
+/*
+				object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
+				object.position.set( -400, 0, 200 );
+				scene.add( object );
+
+				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 1 ), material );
+				object.position.set( -200, 0, 200 );
+				scene.add( object );
+
+				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 2 ), material );
+				object.position.set( 0, 0, 200 );
+				scene.add( object );
+
+				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
+				object.position.set( 200, 0, 200 );
+				scene.add( object );
+
+				//
+
+				object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
+				object.position.set( -400, 0, 0 );
+				scene.add( object );
+*/
+
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0xffff00,
+					metalness: 0.5,
+					roughness: 1.0
+				} );
+
+				object = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 32, 32 ), material );
+				object.position.set( 0, 0, 0 );
+				object.name = "Sphere";
+				scene.add(object);
+
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0xff0000,
+					metalness: 0.1,
+					roughness: 0.5
+				} );
+
+				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), material );
+				object.position.set( -200, 0, 0 );
+				object.name = "Cube";
+
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0xff00ff
+				} );
+
+				object3 = new THREE.Mesh( new THREE.CylinderBufferGeometry( 100, 100, 100 ), material );
+				object3.position.set( 200, 0, 0 );
+				object3.name = "Cube";
+				scene.add(object3);
+
+
+				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 10, 80, 2, 2, 2 ), material );
+				object2.position.set( 40, 40, 40 );
+				object2.name = "SubCube";
+				// object.add(object2);
+
+				scene.add( object );
+
+/*
+				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );
+				object.position.set( 0, 0, 0 );
+				scene.add( object );
+
+				object = new THREE.Mesh( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
+				object.position.set( 200, 0, 0 );
+				scene.add( object );
+
+				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
+				object.position.set( 400, 0, 0 );
+				scene.add( object );
+*/
+				//
+/*
+				var points = [];
+
+				for ( var i = 0; i < 50; i ++ ) {
+
+					points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * Math.sin( i * 0.1 ) * 15 + 50, ( i - 5 ) * 2 ) );
+
+				}
+
+				object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
+				object.position.set( -400, 0, -200 );
+				scene.add( object );
+
+				object = new THREE.Mesh( new THREE.TorusGeometry( 50, 20, 20, 20 ), material );
+				object.position.set( -200, 0, -200 );
+				scene.add( object );
+
+				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), material );
+				object.position.set( 0, 0, -200 );
+				scene.add( object );
+
+				object = new THREE.AxisHelper( 50 );
+				object.position.set( 200, 0, -200 );
+				scene.add( object );
+
+				object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
+				object.position.set( 400, 0, -200 );
+				scene.add( object );
+*/
+				var gltfExporter = new THREE.GLTFExporter();
+				gltfExporter.parse(scene);
+				//console.log(JSON.stringify(gltfExporter.parse(scene), null, 2));
+
+				//saveString( gltfExporter.parse(scene), 'model.gltf' );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = Date.now() * 0.0001;
+
+				camera.position.x = Math.cos( timer ) * 800;
+				camera.position.z = Math.sin( timer ) * 800;
+
+				camera.lookAt( scene.position );
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
