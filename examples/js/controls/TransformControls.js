@@ -439,13 +439,6 @@
 
 			THREE.TransformGizmo.prototype.update.apply( this, arguments );
 
-			var group = {
-
-				handles: this[ "handles" ],
-				pickers: this[ "pickers" ]
-
-			};
-
 			var tempMatrix = new THREE.Matrix4();
 			var worldRotation = new THREE.Euler( 0, 0, 1 );
 			var tempQuaternion = new THREE.Quaternion();
@@ -623,7 +616,6 @@
 
 		var _mode = "translate";
 		var _dragging = false;
-		var _plane = "XY";
 		var _gizmo = {
 
 			"translate": new THREE.TransformGizmoTranslate(),
