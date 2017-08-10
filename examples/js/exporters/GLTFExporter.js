@@ -23,6 +23,14 @@ function paramThreeToGL( p ) {
 
 // @TODO Move it to constants.js ?
 var WebGLConstants = {
+	POINTS: 0x0000,
+	LINES: 0x0001,
+	LINE_LOOP: 0x0002,
+	LINE_STRIP: 0x0003,
+	TRIANGLES: 0x0004,
+	TRIANGLE_STRIP: 0x0005,
+	TRIANGLE_FAN: 0x0006,
+
 	ARRAY_BUFFER: 0x8892,
 	ELEMENT_ARRAY_BUFFER: 0x8893,
 
@@ -324,18 +332,8 @@ THREE.GLTFExporter.prototype = {
 
 			var geometry = mesh.geometry;
 
-			var modes = {
-				POINTS: 0,
-				LINES: 1,
-				LINE_LOOP: 2,
-				LINE_STRIP: 3,
-				TRIANGLES: 4,
-				TRIANGLE_STRIP: 5,
-				TRIANGLE_FAN: 6
-			}
-
 			// @FIXME Select the correct mode based on the mesh
-			var mode = modes.TRIANGLES;
+			var mode = WebGLConstants.TRIANGLES;
 
 			var gltfMesh = {
 				primitives: [
