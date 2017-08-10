@@ -2239,8 +2239,6 @@ THREE.GLTF2Loader = ( function () {
 
 	GLTFParser.prototype.loadGeometries = function ( primitives ) {
 
-		var extensions = this.extensions;
-
 		return this._withDependencies( [
 
 			'accessors',
