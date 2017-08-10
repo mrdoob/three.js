@@ -140,10 +140,13 @@
 
 				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 10, 80, 2, 2, 2 ), material );
 				object2.position.set( 0, 0, 50 );
+				object2.rotation.set( 0, 45, 0 );
 				object2.name = "SubCube";
 				object.add(object2);
 
 				scene.add( object );
+
+				scene.add( camera );
 
 /*
 				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );

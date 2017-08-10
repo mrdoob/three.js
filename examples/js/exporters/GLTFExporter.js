@@ -63,6 +63,13 @@ THREE.GLTFExporter.prototype = {
 
 	constructor: THREE.GLTFExporter,
 
+	/**
+	 * Parse scenes and generate GLTF output
+	 * @param  {THREE.Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
+	 * @param  {[type]} onDone  Callback on completed
+	 * @param  {[type]} options options
+	 *                          trs: Exports position, rotation and scale instead of matrix
+	 */
 	parse: function ( input, onDone, options) {
 		options = options || {};
 
@@ -71,11 +78,19 @@ THREE.GLTFExporter.prototype = {
 				version: "2.0",
 				generator: "THREE.JS GLTFExporter" // @QUESTION Does it support spaces?
 		 	}
-      // extensionsUsed : ['KHR_materials_common'], // @TODO
     };
 
 		var byteOffset = 0;
 		var dataViews = [];
+
+		/**
+		 * Compare two arrays
+		 */
+		function sameArray ( array1, array2 ) {
+			return ( array1.length === array2.length ) && array1.every( function( element, index ) {
+    		return element === array2[ index ];
+			});
+		}
 
 		/**
 		 * Get the min and he max vectors from the given attribute
@@ -97,6 +112,20 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			return output;
+		}
+
+		/**
+		 * Add extension to the extensions array
+		 * @param {String} extensionName Extension name
+		 */
+		function addExtension ( extensionName ) {
+			if ( !outputJSON.extensionsUsed ) {
+				outputJSON.extensionsUsed = [];
+			}
+
+			if ( outputJSON.extensionsUsed.indexOf( extensionName ) !== -1 ) {
+				outputJSON.extensionsUsed.push( extensionName );
+			}
 		}
 
 		/**
@@ -183,10 +212,10 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			var types = [
-				"SCALAR",
-				"VEC2",
-				"VEC3",
-				"VEC4"
+				'SCALAR',
+				'VEC2',
+				'VEC3',
+				'VEC4'
 			];
 
 			// Detect the component type of the attribute array (float, uint or ushort)
@@ -352,9 +381,9 @@ THREE.GLTFExporter.prototype = {
 
 			// Conversion between attributes names in threejs and gltf spec
 			var nameConversion = {
-				'uv': 'TEXCOORD_0',
-				'uv2': 'TEXCOORD_1',
-				'color': 'COLOR_0'
+				uv: 'TEXCOORD_0',
+				uv2: 'TEXCOORD_1',
+				color: 'COLOR_0'
 			};
 
 			// For every attribute create an accessor
@@ -385,8 +414,30 @@ THREE.GLTFExporter.prototype = {
 				outputJSON.nodes = [];
 			}
 
-			var gltfNode = {
-				matrix: object.matrix.elements
+			var gltfNode = {};
+
+			if ( options.trs ) {
+				var rotation = object.quaternion.toArray();
+				var position = object.position.toArray();
+				var scale = object.scale.toArray();
+
+				if ( !sameArray( rotation, [ 0, 0, 0, 1 ] ) ) {
+					gltfNode.rotation = rotation;
+				}
+
+				if ( !sameArray( position, [ 0, 0, 0 ] ) ) {
+					gltfNode.position = position;
+				}
+
+				if ( !sameArray( scale, [ 1, 1, 1 ] ) ) {
+					gltfNode.scale = scale;
+				}
+
+			} else {
+				object.updateMatrix();
+				if (! sameArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
+					gltfNode.matrix = object.matrix.elements;
+				}
 			};
 
 			if ( object.name ) {
@@ -395,8 +446,6 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object instanceof THREE.Mesh ) {
 				gltfNode.mesh = processMesh( object );
-			} else {
-
 			}
 
 			if ( object.children.length > 0 ) {
@@ -420,7 +469,6 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {THREE.Scene} node Scene to process
 		 */
 		function processScene( scene ) {
-			console.log('Processing scene');
 			if ( !outputJSON.scenes ) {
 				outputJSON.scenes = [];
 				outputJSON.scene = 0;
@@ -439,8 +487,8 @@ THREE.GLTFExporter.prototype = {
 			for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 				var child = scene.children[ i ];
 
-				// @TODO Right now we just process meshes
-				if ( child instanceof THREE.Mesh ) {
+				// @TODO Right now we just process meshes and lights
+				if ( child instanceof THREE.Mesh || child instanceof THREE.Camera ) {
 					gltfScene.nodes.push( processNode( child ) );
 				}
 			}
