@@ -202,12 +202,6 @@
 				scene2.name = 'Scene2';
 				scene2.add(object);
 
-
-				var gltfExporter = new THREE.GLTFExporter();
-				gltfExporter.parse( [scene, scene2], function( result ) {
-					console.log( JSON.stringify( result, null, 2 ) );
-				} );
-
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -223,6 +217,10 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				var gltfExporter = new THREE.GLTFExporter( renderer );
+				gltfExporter.parse( [scene, scene2], function( result ) {
+					console.log( JSON.stringify( result, null, 2 ) );
+				} );
 			}
 
 			function onWindowResize() {

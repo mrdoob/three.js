@@ -2,25 +2,6 @@
  * @author fernandojsg / http://fernandojsg.com
  */
 
-// @TODO Should be accessible from the renderer itself instead of duplicating it here
-function paramThreeToGL( p ) {
-
-	var extension;
-
-	if ( p === THREE.RepeatWrapping ) return WebGLConstants.REPEAT;
-	if ( p === THREE.ClampToEdgeWrapping ) return WebGLConstants.CLAMP_TO_EDGE;
-	if ( p === THREE.MirroredRepeatWrapping ) return WebGLConstants.MIRRORED_REPEAT;
-
-	if ( p === THREE.NearestFilter ) return WebGLConstants.NEAREST;
-	if ( p === THREE.NearestMipMapNearestFilter ) return WebGLConstants.NEAREST_MIPMAP_NEAREST;
-	if ( p === THREE.NearestMipMapLinearFilter ) return WebGLConstants.NEAREST_MIPMAP_LINEAR;
-
-	if ( p === THREE.LinearFilter ) return WebGLConstants.LINEAR;
-	if ( p === THREE.LinearMipMapNearestFilter ) return WebGLConstants.LINEAR_MIPMAP_NEAREST;
-	if ( p === THREE.LinearMipMapLinearFilter ) return WebGLConstants.LINEAR_MIPMAP_LINEAR;
-	return 0;
-}
-
 // @TODO Move it to constants.js ?
 var WebGLConstants = {
 	POINTS: 0x0000,
@@ -57,7 +38,9 @@ var WebGLConstants = {
 //------------------------------------------------------------------------------
 // GLTF Exporter
 //------------------------------------------------------------------------------
-THREE.GLTFExporter = function () {};
+THREE.GLTFExporter = function ( renderer ) {
+	this.renderer = renderer;
+};
 
 THREE.GLTFExporter.prototype = {
 
@@ -70,8 +53,11 @@ THREE.GLTFExporter.prototype = {
 	 * @param  {[type]} options options
 	 *                          trs: Exports position, rotation and scale instead of matrix
 	 */
-	parse: function ( input, onDone, options) {
+	parse: function ( input, onDone, options ) {
+
 		options = options || {};
+
+		var glUtils = new THREE.WebGLUtils( renderer.context, renderer.extensions );
 
 		var outputJSON = {
 			asset: {
@@ -275,10 +261,10 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			var gltfSampler = {
-				magFilter: paramThreeToGL( map.magFilter ),
-				minFilter: paramThreeToGL( map.minFilter ),
-				wrapS: paramThreeToGL( map.wrapS ),
-				wrapT: paramThreeToGL( map.wrapT )
+				magFilter: glUtils.convert( map.magFilter ),
+				minFilter: glUtils.convert( map.minFilter ),
+				wrapS: glUtils.convert( map.wrapS ),
+				wrapT: glUtils.convert( map.wrapT )
 			};
 
 			outputJSON.samplers.push( gltfSampler );
@@ -520,6 +506,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {THREE.Scene} node Scene to process
 		 */
 		function processScene( scene ) {
+
 			if ( !outputJSON.scenes ) {
 				outputJSON.scenes = [];
 				outputJSON.scene = 0;
