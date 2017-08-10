@@ -202,18 +202,12 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export GLTF2' );
 	option.onClick( function () {
 
-		var object = editor.scene;
-
-		if ( object === null ) {
-
-			alert( 'No object selected.' );
-			return;
-
-		}
-
 		var exporter = new THREE.GLTFExporter();
 
-		saveString( JSON.stringify(exporter.parse( object ),null, 2), 'scene.gltf' );
+		exporter.parse(editor.scene, function(result){
+			saveString( JSON.stringify(result,null, 2), 'scene.gltf' );
+		});
+
 
 	} );
 	options.add( option );
