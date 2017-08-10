@@ -66,6 +66,7 @@
 				camera.position.y = 400;
 
 				scene = new THREE.Scene();
+				scene.name = 'Scene1';
 
 				var light, object;
 
@@ -188,8 +189,16 @@
 				scene.add( object );
 */
 
+				var scene2 = new THREE.Scene();
+				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), material );
+				object.position.set( 0, 0, 0 );
+				object.name = "Cube2ndScene";
+				scene2.name = 'Scene2';
+				scene2.add(object);
+
+
 				var gltfExporter = new THREE.GLTFExporter();
-				gltfExporter.parse( scene, function( result ) {
+				gltfExporter.parse( [scene, scene2], function( result ) {
 					console.log( JSON.stringify( result, null, 2 ) );
 				} );
 

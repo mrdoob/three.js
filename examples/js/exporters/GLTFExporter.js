@@ -420,7 +420,8 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {THREE.Scene} node Scene to process
 		 */
 		function processScene( scene ) {
-			if ( !outputJSON.scene ) {
+			console.log('Processing scene');
+			if ( !outputJSON.scenes ) {
 				outputJSON.scenes = [];
 				outputJSON.scene = 0;
 			}
