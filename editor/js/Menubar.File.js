@@ -204,9 +204,11 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.GLTFExporter();
 
-		exporter.parse(editor.scene, function(result){
-			saveString( JSON.stringify(result,null, 2), 'scene.gltf' );
-		});
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveString( JSON.stringify( result, null, 2 ), 'scene.gltf' );
+
+		} );
 
 
 	} );

@@ -187,12 +187,11 @@
 				object.position.set( 400, 0, -200 );
 				scene.add( object );
 */
+
 				var gltfExporter = new THREE.GLTFExporter();
-				// gltfExporter.parse(scene);
-				//console.log(JSON.stringify(gltfExporter.parse(scene), null, 2));
-				gltfExporter.parse(scene, function(result){
-					saveString( JSON.stringify(result,null, 2), 'scene.gltf' );
-				});
+				gltfExporter.parse( scene, function( result ) {
+					console.log( JSON.stringify( result, null, 2 ) );
+				} );
 
 				//
 
