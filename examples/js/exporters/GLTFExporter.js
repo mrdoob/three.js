@@ -2,39 +2,6 @@
  * @author fernandojsg / http://fernandojsg.com
  */
 
-// @TODO Move it to constants.js ?
-var WebGLConstants = {
-	POINTS: 0x0000,
-	LINES: 0x0001,
-	LINE_LOOP: 0x0002,
-	LINE_STRIP: 0x0003,
-	TRIANGLES: 0x0004,
-	TRIANGLE_STRIP: 0x0005,
-	TRIANGLE_FAN: 0x0006,
-
-	ARRAY_BUFFER: 0x8892,
-	ELEMENT_ARRAY_BUFFER: 0x8893,
-
-	BYTE: 0x1400,
-	UNSIGNED_BYTE: 0x1401,
-	SHORT: 0x1402,
-	UNSIGNED_SHORT: 0x1403,
-	INT: 0x1404,
-	UNSIGNED_INT: 0x1405,
-	FLOAT: 0x1406,
-
-	NEAREST: 0x2600,
-	LINEAR: 0x2601,
-	NEAREST_MIPMAP_NEAREST: 0x2700,
-	LINEAR_MIPMAP_NEAREST: 0x2701,
-	NEAREST_MIPMAP_LINEAR: 0x2702,
-	LINEAR_MIPMAP_LINEAR: 0x2703,
-
-	REPEAT: 0x2901,
-	CLAMP_TO_EDGE: 0x812F,
-	MIRRORED_REPEAT: 0x8370,
-};
-
 //------------------------------------------------------------------------------
 // GLTF Exporter
 //------------------------------------------------------------------------------
@@ -57,7 +24,8 @@ THREE.GLTFExporter.prototype = {
 
 		options = options || {};
 
-		var glUtils = new THREE.WebGLUtils( renderer.context, renderer.extensions );
+		var glUtils = new THREE.WebGLUtils( this.renderer.context, this.renderer.extensions );
+		var gl = this.renderer.context;
 
 		var outputJSON = {
 			asset: {
@@ -134,16 +102,16 @@ THREE.GLTFExporter.prototype = {
 			var dataView = new DataView( new ArrayBuffer( attribute.array.byteLength ) );
 
 			var offset = 0;
-			var offsetInc = componentType === WebGLConstants.UNSIGNED_SHORT ? 2 : 4;
+			var offsetInc = componentType === gl.UNSIGNED_SHORT ? 2 : 4;
 
 			for ( var i = 0; i < attribute.count; i++ ) {
 				for (var a = 0; a < attribute.itemSize; a++ ) {
 					var value = attribute.array[ i * attribute.itemSize + a ];
-					if ( componentType === WebGLConstants.FLOAT ) {
+					if ( componentType === gl.FLOAT ) {
 						dataView.setFloat32( offset, value, true );
-					} else if ( componentType === WebGLConstants.UNSIGNED_INT ) {
+					} else if ( componentType === gl.UNSIGNED_INT ) {
 						dataView.setUint8( offset, value, true );
-					} else if ( componentType === WebGLConstants.UNSIGNED_SHORT ) {
+					} else if ( componentType === gl.UNSIGNED_SHORT ) {
 						dataView.setUint16( offset, value, true );
 					}
 					offset += offsetInc;
@@ -162,7 +130,7 @@ THREE.GLTFExporter.prototype = {
 		 * @return {[type]}      [description]
 		 */
 		function processBufferView ( data, componentType ) {
-			var isVertexAttributes = componentType === WebGLConstants.FLOAT;
+			var isVertexAttributes = componentType === gl.FLOAT;
 			if ( !outputJSON.bufferViews ) {
 				outputJSON.bufferViews = [];
 			}
@@ -171,8 +139,8 @@ THREE.GLTFExporter.prototype = {
 				buffer: processBuffer( data, componentType ),
 				byteOffset: byteOffset,
 				byteLength: data.array.byteLength,
-				byteStride: data.itemSize * ( componentType === WebGLConstants.UNSIGNED_SHORT ? 2 : 4 ),
-				target: isVertexAttributes ? WebGLConstants.ARRAY_BUFFER : WebGLConstants.ELEMENT_ARRAY_BUFFER
+				byteStride: data.itemSize * ( componentType === gl.UNSIGNED_SHORT ? 2 : 4 ),
+				target: isVertexAttributes ? gl.ARRAY_BUFFER : gl.ELEMENT_ARRAY_BUFFER
 			};
 
 			byteOffset += data.array.byteLength;
@@ -205,8 +173,8 @@ THREE.GLTFExporter.prototype = {
 			];
 
 			// Detect the component type of the attribute array (float, uint or ushort)
-			var componentType = attribute instanceof THREE.Float32BufferAttribute ? WebGLConstants.FLOAT :
-				( attribute instanceof THREE.Uint32BufferAttribute ? WebGLConstants.UNSIGNED_INT : WebGLConstants.UNSIGNED_SHORT );
+			var componentType = attribute instanceof THREE.Float32BufferAttribute ? gl.FLOAT :
+				( attribute instanceof THREE.Uint32BufferAttribute ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT );
 
 			var minMax = getMinMax( attribute );
 			var bufferView = processBufferView( attribute, componentType );
@@ -348,7 +316,7 @@ THREE.GLTFExporter.prototype = {
 			var geometry = mesh.geometry;
 
 			// @FIXME Select the correct mode based on the mesh
-			var mode = WebGLConstants.TRIANGLES;
+			var mode = gl.TRIANGLES;
 
 			var gltfMesh = {
 				primitives: [
