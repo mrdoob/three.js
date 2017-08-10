@@ -142,11 +142,14 @@
 				object2.position.set( 0, 0, 50 );
 				object2.rotation.set( 0, 45, 0 );
 				object2.name = "SubCube";
-				object.add(object2);
+				object.add( object2 );
 
 				scene.add( object );
 
 				scene.add( camera );
+
+				var cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10, 10 );
+				scene.add( cameraOrtho );
 
 /*
 				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );

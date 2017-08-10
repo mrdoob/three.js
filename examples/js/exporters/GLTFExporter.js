@@ -404,6 +404,55 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
+		 * Process camera
+		 * @param  {THREE.Camera} camera Camera to process
+		 * @return {Integer}      Index of the processed mesh in the "camera" array
+		 */
+		function processCamera( camera ) {
+			if ( !outputJSON.cameras ) {
+				outputJSON.cameras = [];
+			}
+
+			var isOrtho = camera instanceof THREE.OrthographicCamera;
+
+			var gltfCamera = {
+				type: isOrtho ? 'orthographic' : 'perspective'
+			};
+
+			if ( isOrtho ) {
+
+				gltfCamera.orthographic = {
+
+					xmag: camera.right * 2,
+					ymag: camera.top * 2,
+					zfar: camera.far,
+					znear: camera.near
+
+				}
+
+			} else {
+
+				gltfCamera.perspective = {
+
+					aspectRatio: camera.aspect,
+					yfov: THREE.Math.degToRad( camera.fov ) / camera.aspect,
+					zfar: camera.far,
+					znear: camera.near
+
+				};
+
+			}
+
+			if ( camera.name ) {
+				gltfCamera.name = camera.type;
+			}
+
+			outputJSON.cameras.push( gltfCamera );
+
+			return outputJSON.cameras.length - 1;
+		}
+
+		/**
 		 * Process Object3D node
 		 * @param  {THREE.Object3D} node Object3D to processNode
 		 * @return {Integer}      Index of the node in the nodes list
@@ -446,6 +495,8 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object instanceof THREE.Mesh ) {
 				gltfNode.mesh = processMesh( object );
+			} else if ( object instanceof THREE.Camera ) {
+				gltfNode.camera = processCamera( object );
 			}
 
 			if ( object.children.length > 0 ) {
