@@ -399,12 +399,12 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			return;
 
+		} else {
+			
+			// Regular render mode if not HMD
+			renderer.render( scene, camera, renderTarget, forceClear );
+			
 		}
-
-		// Regular render mode if not HMD
-
-		renderer.render( scene, camera, renderTarget, forceClear );
-
 	};
 
 	this.dispose = function () {
