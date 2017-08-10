@@ -26,7 +26,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Toon Material Variantions w/ OutlineEffect by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Toon Material Variantions w/ OutlineEffect by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -78,7 +78,7 @@
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
-				var shininess = 50, specular = 0x333333, bumpScale = 1, shading = THREE.SmoothShading;
+				var shininess = 50, specular = 0x333333, bumpScale = 1;
 
 				var materials = [];
 
@@ -110,7 +110,6 @@
 								specular: specularColor,
 								reflectivity: beta,
 								shininess: specularShininess,
-								shading: THREE.SmoothShading,
 								envMap: alphaIndex % 2 === 0 ? null : reflectionCube
 							} );
 
@@ -130,7 +129,7 @@
 
 				function addLabel( name, location ) {
 
-					var textGeo = new THREE.TextGeometry( name, {
+					var textGeo = new THREE.TextBufferGeometry( name, {
 
 						font: font,
 
@@ -188,8 +187,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

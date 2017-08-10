@@ -1,8 +1,12 @@
 /**
  * @author Abe Pazos / https://hamoid.com
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 import { Geometry } from '../core/Geometry';
+import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
+
+// DodecahedronGeometry
 
 function DodecahedronGeometry( radius, detail ) {
 
@@ -23,11 +27,7 @@ function DodecahedronGeometry( radius, detail ) {
 DodecahedronGeometry.prototype = Object.create( Geometry.prototype );
 DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
+// DodecahedronBufferGeometry
 
 function DodecahedronBufferGeometry( radius, detail ) {
 
@@ -83,5 +83,6 @@ function DodecahedronBufferGeometry( radius, detail ) {
 
 DodecahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 DodecahedronBufferGeometry.prototype.constructor = DodecahedronBufferGeometry;
+
 
 export { DodecahedronGeometry, DodecahedronBufferGeometry };

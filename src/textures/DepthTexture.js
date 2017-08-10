@@ -12,7 +12,7 @@ function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, mi
 
 	if ( format !== DepthFormat && format !== DepthStencilFormat ) {
 
-		throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' )
+		throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' );
 
 	}
 

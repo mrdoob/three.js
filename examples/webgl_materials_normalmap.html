@@ -43,8 +43,8 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl normalmap demo.
-			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a> head.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl normalmap demo.
+			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 
 			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)<br/>
 			on Windows use <span class="code">Chrome --use-gl=desktop</span> or Firefox 4<br/>
@@ -102,6 +102,7 @@
 				camera.position.z = 1200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
 
 				// LIGHTS
 
@@ -133,8 +134,6 @@
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x111111 );
-				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -199,20 +198,20 @@
 
 			function onWindowResize( event ) {
 
-				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight;
+				var width = window.innerWidth;
+				var height = window.innerHeight;
 
-				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
 
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );

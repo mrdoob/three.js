@@ -27,7 +27,7 @@
 	<body>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - shadowmap - models by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br />
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shadowmap - models by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br />
 		move camera with WASD / RF + mouse<br />
 		t: toggle HUD
 		</div>
@@ -98,6 +98,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x59472b );
 				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
 
 				// LIGHTS
@@ -125,7 +126,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -209,7 +209,7 @@
 				var loader = new THREE.FontLoader();
 				loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
-					var textGeo = new THREE.TextGeometry( "THREE.JS", {
+					var textGeo = new THREE.TextBufferGeometry( "THREE.JS", {
 
 						font: font,
 
@@ -349,7 +349,7 @@
 
 				for ( var i = 0; i < morphs.length; i ++ ) {
 
-					morph = morphs[ i ];
+					var morph = morphs[ i ];
 
 					morph.position.x += morph.speed * delta;
 

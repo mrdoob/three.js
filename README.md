@@ -1,6 +1,7 @@
 three.js
 ========
 
+[![Gitter][gitter-badge]][gitter-badge-url]
 [![Latest NPM release][npm-badge]][npm-badge-url]
 [![License][license-badge]][license-badge-url]
 [![Dependencies][dependencies-badge]][dependencies-badge-url]
@@ -18,7 +19,7 @@ The aim of the project is to create an easy to use, lightweight, 3D library. The
 
 ### Usage ###
 
-Download the [minified library](http://threejs.org/build/three.min.js) and include it in your html.
+Download the [minified library](http://threejs.org/build/three.min.js) and include it in your html, or install and import it as a [module](http://threejs.org/docs/#manual/introduction/Import-via-modules),
 Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/Build-instructions).
 
 ```html
@@ -66,14 +67,15 @@ function animate() {
 }
 ```
 
-If everything went well you should see [this](http://jsfiddle.net/hfj7gm6t/).
+If everything went well you should see [this](https://jsfiddle.net/hfj7gm6t/).
 
 ### Change log ###
 
 [releases](https://github.com/mrdoob/three.js/releases)
 
 
-
+[gitter-badge]: https://badges.gitter.im/mrdoob/three.js.svg
+[gitter-badge-url]: https://gitter.im/mrdoob/three.js
 [npm-badge]: https://img.shields.io/npm/v/three.svg
 [npm-badge-url]: https://www.npmjs.com/package/three
 [license-badge]: https://img.shields.io/npm/l/three.svg

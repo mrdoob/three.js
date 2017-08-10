@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+		<h1>[name]</h1>
+
+		<div class="desc">
+		A loader for *glTF* 2.0 resources.
+		<br /><br />
+		<a href="https://www.khronos.org/gltf">glTF</a> (GL Transmission Format) is an
+		<a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0">open format specification</a>
+		for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
+		or binary (.glb) format. External files store textures (.jpg, .png, ...) and additional binary
+		data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
+		textures, shaders, skins, skeletons, morph targets, animations, lights, and/or cameras.
+		</div>
+
+		<h2>Extensions</h2>
+
+		<div>
+		GLTF2Loader supports the following glTF extensions:
+		</div>
+
+		<ul>
+			<li>
+				KHR_lights
+			</li>
+			<li>
+				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_common">
+					KHR_materials_common
+				</a>
+			</li>
+			<li>
+				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_pbrSpecularGlossiness">
+					KHR_materials_pbrSpecularGlossiness
+				</a>
+			</li>
+		</ul>
+
+		<h2>Example</h2>
+
+		<code>
+		// Instantiate a loader
+		var loader = new THREE.GLTF2Loader();
+
+		// Load a glTF resource
+		loader.load( 'models/gltf/duck/duck.gltf', function ( gltf ) {
+			scene.add( gltf.scene );
+
+			gltf.animations; // Array&lt;THREE.AnimationClip&gt;
+			gltf.scene;      // THREE.Scene
+			gltf.scenes;     // Array&lt;THREE.Scene&gt;
+			gltf.cameras;    // Array&lt;THREE.Camera&gt;
+		} );
+		</code>
+
+		[example:webgl_loader_gltf2]
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+		<h2>Properties</h2>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — required<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded JSON response returned from [page:Function parse].<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</div>
+		<div>
+		Begin loading from url and call the callback function with the parsed response content.
+		</div>
+
+		<h3>[method:null setPath]( [page:String path] )</h3>
+		<div>
+		[page:String path] — Base path for loading additional resources e.g. textures, GLSL shaders, .bin data.
+		</div>
+		<div>
+		Set the base path for additional resources.
+		</div>
+
+		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
+		<div>
+		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</div>
+
+		<h3>[method:null parse]( [page:Object json], [page:Function callBack], [page:String path] )</h3>
+		<div>
+		[page:Object json] — <em>JSON</em> object to parse.<br />
+		[page:Function callBack] — Will be called when parse completes.<br />
+		[page:String path] — The base path from which to find subsequent glTF resources such as textures, GLSL shaders and .bin data files.<br />
+		</div>
+		<div>
+		Parse a glTF-based <em>JSON</em> structure and fire [page:Function callback] when complete. The argument to [page:Function callback] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], and .[page:Array animations].
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/GLTF2Loader.js examples/js/loaders/GLTF2Loader.js]
+	</body>
+</html>

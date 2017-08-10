@@ -4,6 +4,8 @@
 		<title>three.js webvr - cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-09-03 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-09-03" content="Aqj+6XPnxHoSxQj/CDjGXhzrVFeP12/Pgvj7rfqFqVzodYX0ZXJNHTJIvCVExQfvip+Zq9GES+SOQ/zJlpceZgcAAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUwNDQ2NDIwNn0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -21,17 +23,15 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
-			if ( WEBVR.isAvailable() === false ) {
+			WEBVR.checkAvailability().catch( function( message ) {
 
-				document.body.appendChild( WEBVR.getMessage() );
+				document.body.appendChild( WEBVR.getMessageContainer( message ) );
 
-			}
+			} );
 
 			//
 
@@ -39,7 +39,6 @@
 
 			var container;
 			var camera, scene, raycaster, renderer;
-			var effect, controls;
 
 			var room;
 			var isMouseDown = false;
@@ -60,10 +59,11 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes';
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				scene.add( camera );
@@ -121,29 +121,19 @@
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x505050 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.VRControls( camera );
-				effect = new THREE.VREffect( renderer );
+				renderer.vr.enabled = true;
 
-				if ( navigator.getVRDisplays ) {
+				WEBVR.getVRDisplay( function ( display ) {
 
-					navigator.getVRDisplays()
-						.then( function ( displays ) {
-							effect.setVRDisplay( displays[ 0 ] );
-							controls.setVRDisplay( displays[ 0 ] );
-						} )
-						.catch( function () {
-							// no displays
-						} );
+					renderer.vr.setDevice( display );
 
-					document.body.appendChild( WEBVR.getButton( effect ) );
+					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
-				}
+				} );
 
 				renderer.domElement.addEventListener( 'mousedown', onMouseDown, false );
 				renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
@@ -173,7 +163,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -181,8 +171,7 @@
 
 			function animate() {
 
-				effect.requestAnimationFrame( animate );
-				render();
+				renderer.animate( render );
 
 			}
 
@@ -268,8 +257,7 @@
 
 				}
 
-				controls.update();
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

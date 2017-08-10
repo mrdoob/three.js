@@ -35,7 +35,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Physically accurate lighting example using a incandescent bulb - by <a href="http://clara.io" target="_blank">Ben Houston</a><br />
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Physically accurate lighting example using a incandescent bulb - by <a href="http://clara.io" target="_blank" rel="noopener">Ben Houston</a><br />
 			Using real world scale: Brick cube is 1 meter in size.  Light is 2 meters from floor.  Globe is 25 cm in diameter.<br/>
 			Using Reinhard inline tonemapping with real-world light falloff (decay = 2).
 		</div>
@@ -51,7 +51,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer,
-			bulbLight, bulbMat, ambientLight,
+			bulbLight, bulbMat, hemiLight,
 			object, loader, stats;
 			var ballMat, cubeMat, floorMat;
 
@@ -240,8 +240,6 @@
 
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

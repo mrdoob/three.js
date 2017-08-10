@@ -34,7 +34,7 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - orbit controls example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - orbit controls example
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -59,10 +59,10 @@
 			function init() {
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xcccccc );
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -82,7 +82,7 @@
 				// world
 
 				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-				var material =  new THREE.MeshPhongMaterial( { color:0xffffff, shading: THREE.FlatShading } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
@@ -98,15 +98,15 @@
 
 				// lights
 
-				light = new THREE.DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				light = new THREE.DirectionalLight( 0x002288 );
+				var light = new THREE.DirectionalLight( 0x002288 );
 				light.position.set( -1, -1, -1 );
 				scene.add( light );
 
-				light = new THREE.AmbientLight( 0x222222 );
+				var light = new THREE.AmbientLight( 0x222222 );
 				scene.add( light );
 
 				//

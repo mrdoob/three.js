@@ -48,7 +48,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - morph normals - model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - morph normals - model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>';
 				container.appendChild( info );
 
 				//
@@ -77,7 +77,7 @@
 						color: 0xffffff,
 						morphTargets: true,
 						vertexColors: THREE.FaceColors,
-						shading: THREE.FlatShading
+						flatShading: true
 					} );
 					var mesh = new THREE.Mesh( geometry, material );
 
@@ -103,8 +103,7 @@
 						color: 0xffffff,
 						morphTargets: true,
 						morphNormals: true,
-						vertexColors: THREE.FaceColors,
-						shading: THREE.SmoothShading
+						vertexColors: THREE.FaceColors
 					} );
 					var mesh = new THREE.Mesh( geometry, material );
 

@@ -1,5 +1,5 @@
 import { EventDispatcher } from '../core/EventDispatcher';
-import { NoColors, FrontSide, SmoothShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants';
+import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants';
 import { _Math } from '../math/Math';
 
 /**
@@ -23,7 +23,7 @@ function Material() {
 
 	this.blending = NormalBlending;
 	this.side = FrontSide;
-	this.shading = SmoothShading; // THREE.FlatShading, THREE.SmoothShading
+	this.flatShading = false;
 	this.vertexColors = NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
 
 	this.opacity = 1;
@@ -52,6 +52,8 @@ function Material() {
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
 
+	this.dithering = false;
+
 	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
@@ -59,28 +61,17 @@ function Material() {
 
 	this.visible = true;
 
-	this._needsUpdate = true;
+	this.userData = {};
+
+	this.needsUpdate = true;
 
 }
 
-Material.prototype = {
-
-	constructor: Material,
+Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 	isMaterial: true,
 
-	get needsUpdate() {
-
-		return this._needsUpdate;
-
-	},
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.update();
-		this._needsUpdate = value;
-
-	},
+	onBeforeCompile: function () {},
 
 	setValues: function ( values ) {
 
@@ -93,6 +84,15 @@ Material.prototype = {
 			if ( newValue === undefined ) {
 
 				console.warn( "THREE.Material: '" + key + "' parameter is undefined." );
+				continue;
+
+			}
+
+			// for backward compatability if shading is set in the constructor
+			if ( key === 'shading' ) {
+
+				console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
+				this.flatShading = ( newValue === FlatShading ) ? true : false;
 				continue;
 
 			}
@@ -144,7 +144,7 @@ Material.prototype = {
 
 		var data = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'Material',
 				generator: 'Material.toJSON'
 			}
@@ -212,7 +212,7 @@ Material.prototype = {
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 
 		if ( this.blending !== NormalBlending ) data.blending = this.blending;
-		if ( this.shading !== SmoothShading ) data.shading = this.shading;
+		if ( this.flatShading === true ) data.flatShading = this.flatShading;
 		if ( this.side !== FrontSide ) data.side = this.side;
 		if ( this.vertexColors !== NoColors ) data.vertexColors = this.vertexColors;
 
@@ -223,15 +223,21 @@ Material.prototype = {
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
 
+		if ( this.dithering === true ) data.dithering = true;
+
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
+
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
 		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
 
-		data.skinning = this.skinning;
-		data.morphTargets = this.morphTargets;
+		if ( this.morphTargets === true ) data.morphTargets = true;
+		if ( this.skinning === true ) data.skinning = true;
+
+		if ( this.visible === false ) data.visible = false;
+		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
 		// TODO: Copied from Object3D.toJSON
 
@@ -280,7 +286,7 @@ Material.prototype = {
 
 		this.blending = source.blending;
 		this.side = source.side;
-		this.shading = source.shading;
+		this.flatShading = source.flatShading;
 		this.vertexColors = source.vertexColors;
 
 		this.opacity = source.opacity;
@@ -305,13 +311,16 @@ Material.prototype = {
 		this.polygonOffsetFactor = source.polygonOffsetFactor;
 		this.polygonOffsetUnits = source.polygonOffsetUnits;
 
-		this.alphaTest = source.alphaTest;
+		this.dithering = source.dithering;
 
+		this.alphaTest = source.alphaTest;
 		this.premultipliedAlpha = source.premultipliedAlpha;
 
 		this.overdraw = source.overdraw;
 
 		this.visible = source.visible;
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+
 		this.clipShadows = source.clipShadows;
 		this.clipIntersection = source.clipIntersection;
 
@@ -334,20 +343,13 @@ Material.prototype = {
 
 	},
 
-	update: function () {
-
-		this.dispatchEvent( { type: 'update' } );
-
-	},
-
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
-};
+} );
 
-Object.assign( Material.prototype, EventDispatcher.prototype );
 
 export { Material };

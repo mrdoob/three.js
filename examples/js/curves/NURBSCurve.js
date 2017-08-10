@@ -13,11 +13,16 @@
  *	NURBS curve
  **************************************************************/
 
-THREE.NURBSCurve = function ( degree, knots /* array of reals */, controlPoints /* array of Vector(2|3|4) */ ) {
+THREE.NURBSCurve = function ( degree, knots /* array of reals */, controlPoints /* array of Vector(2|3|4) */, startKnot /* index in knots */, endKnot /* index in knots */ ) {
+
+	THREE.Curve.call( this );
 
 	this.degree = degree;
 	this.knots = knots;
 	this.controlPoints = [];
+	// Used by periodic NURBS to remove hidden spans
+	this.startKnot = startKnot || 0;
+	this.endKnot = endKnot || ( this.knots.length - 1 );
 	for ( var i = 0; i < controlPoints.length; ++ i ) {
 
 		// ensure Vector4 for control points
@@ -35,7 +40,7 @@ THREE.NURBSCurve.prototype.constructor = THREE.NURBSCurve;
 
 THREE.NURBSCurve.prototype.getPoint = function ( t ) {
 
-	var u = this.knots[ 0 ] + t * ( this.knots[ this.knots.length - 1 ] - this.knots[ 0 ] ); // linear mapping t->u
+	var u = this.knots[ this.startKnot ] + t * ( this.knots[ this.endKnot ] - this.knots[ this.startKnot ] ); // linear mapping t->u
 
 	// following results in (wx, wy, wz, w) homogeneous point
 	var hpoint = THREE.NURBSUtils.calcBSplinePoint( this.degree, this.knots, this.controlPoints, u );
@@ -62,4 +67,3 @@ THREE.NURBSCurve.prototype.getTangent = function ( t ) {
 	return tangent;
 
 };
-

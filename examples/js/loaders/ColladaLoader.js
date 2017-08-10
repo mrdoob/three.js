@@ -31,7 +31,6 @@ THREE.ColladaLoader = function () {
 	var skins;
 
 	var flip_uv = true;
-	var preferredShading = THREE.SmoothShading;
 
 	var options = {
 		// Force Geometry to always be centered at the local origin of the
@@ -210,12 +209,6 @@ THREE.ColladaLoader = function () {
 		}
 
 		return result;
-
-	}
-
-	function setPreferredShading ( shading ) {
-
-		preferredShading = shading;
 
 	}
 
@@ -682,11 +675,11 @@ THREE.ColladaLoader = function () {
 
 	}
 
-	function applySkin ( geometry, instanceCtrl, frame ) {
+	function applySkin( geometry, instanceCtrl, frame ) {
+
+		if ( frame === undefined ) frame = 40;
 
 		var skinController = controllers[ instanceCtrl.url ];
-
-		frame = frame !== undefined ? frame : 40;
 
 		if ( !skinController || !skinController.skin ) {
 
@@ -907,12 +900,14 @@ THREE.ColladaLoader = function () {
 						var transforms = jointData.transforms;
 
 						var matrix = new THREE.Matrix4();
+						var m1 = new THREE.Matrix4();
 
 						for (i = 0; i < transforms.length; i ++ ) {
 
 							var transform = transforms[ i ];
 
 							// kinda ghetto joint detection
+
 							if ( transform.sid && transform.sid.indexOf( 'joint' + jointIndex ) !== -1 ) {
 
 								// apply actual joint value here
@@ -936,8 +931,6 @@ THREE.ColladaLoader = function () {
 								}
 
 							} else {
-
-								var m1 = new THREE.Matrix4();
 
 								switch ( transform.type ) {
 
@@ -988,6 +981,9 @@ THREE.ColladaLoader = function () {
 
 						threejsNode.matrix.set.apply( threejsNode.matrix, elementsRowMajor );
 						threejsNode.matrix.decompose( threejsNode.position, threejsNode.quaternion, threejsNode.scale );
+
+						jointMap[ jointIndex ].position = value;
+
 					}
 
 				} else {
@@ -2168,13 +2164,11 @@ THREE.ColladaLoader = function () {
 			var dotSyntax = (sid.indexOf(".") >= 0);
 			var arrSyntax = (sid.indexOf("(") >= 0);
 			var arrIndices;
-			var member;
 
 			if ( dotSyntax ) {
 
 				parts = sid.split(".");
 				sid = parts.shift();
-				member = parts.shift();
 
 			} else if ( arrSyntax ) {
 
@@ -2868,7 +2862,7 @@ THREE.ColladaLoader = function () {
 		var j, k, pList = primitive.p, inputs = primitive.inputs;
 		var input, index, idx32;
 		var source, numParams;
-		var vcIndex = 0, vcount = 3, maxOffset = 0;
+		var vcount, vcIndex = 0, maxOffset = 0;
 		var texture_sets = [];
 
 		for ( j = 0; j < inputs.length; j ++ ) {
@@ -3816,7 +3810,6 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		props[ 'shading' ] = preferredShading;
 		props[ 'side' ] = this.effect.doubleSided ? THREE.DoubleSide : THREE.FrontSide;
 
 		if ( props.diffuse !== undefined ) {
@@ -5535,7 +5528,6 @@ THREE.ColladaLoader = function () {
 
 		load: load,
 		parse: parse,
-		setPreferredShading: setPreferredShading,
 		applySkin: applySkin,
 		geometries : geometries,
 		options: options

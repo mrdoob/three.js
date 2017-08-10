@@ -20,10 +20,11 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 		infoRender.vertices += count;
 
 		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
+		else if ( mode === gl.POINTS ) infoRender.points += count;
 
 	}
 
-	function renderInstances( geometry ) {
+	function renderInstances( geometry, start, count ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -36,8 +37,6 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 		var position = geometry.attributes.position;
 
-		var count = 0;
-
 		if ( position.isInterleavedBufferAttribute ) {
 
 			count = position.data.count;
@@ -46,9 +45,7 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 		} else {
 
-			count = position.count;
-
-			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
+			extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
 
 		}
 
@@ -56,14 +53,15 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 		infoRender.vertices += count * geometry.maxInstancedCount;
 
 		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
+		else if ( mode === gl.POINTS ) infoRender.points += geometry.maxInstancedCount * count;
 
 	}
 
-	return {
-		setMode: setMode,
-		render: render,
-		renderInstances: renderInstances
-	};
+	//
+
+	this.setMode = setMode;
+	this.render = render;
+	this.renderInstances = renderInstances;
 
 }
 

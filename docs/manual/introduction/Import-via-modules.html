@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1><br />
+
+		<div>
+			While importing three.js via script tags is a great way to get up and running fast, it has a few drawbacks for longer lived projects, for example:
+			<ul>
+				<li>You have to manually fetch and include a copy of the library as part of your project's source code</li>
+				<li>Updating the library's version is a manual process</li>
+				<li>When checking in a new version of the library your version control diffs are cluttered by the many lines of the build file</li>
+			</ul>
+		</div>
+
+		<div>Using a dependency manager like npm avoids these caveats by allowing you to simply download and import your desired version of the libarary onto your machine.</div>
+
+		<h2>Installation via npm</h2>
+
+		<div>Three.js is published as an npm module, see: <a href="https://www.npmjs.com/package/three" target="_blank">npm</a>. This means all you need to do to include three.js into your project is run "npm install three"</div>
+
+		<h2>Importing the module</h2>
+
+		<div>Assuming that you're bundling your files with a tool such as <a href="https://webpack.github.io/" target="_blank">Webpack</a> or <a href="https://github.com/substack/node-browserify" target="_blank">Browserify</a>, which allow you to "require('modules') in the browser by bundling up all of your dependencies."</div>
+
+		<div>
+			You should now be able to import the module into your source files and continue to use it as per normal.
+		</div>
+
+		<code>
+		var THREE = require('three');
+
+		var scene = new THREE.Scene();
+		...
+		</code>
+
+		<div>
+			You're also able to leverage <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import" target="_blank">ES6 import syntax</a>:
+		</div>
+
+		<code>
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+		...
+		</code>
+
+		<div>
+			or if you wish to import only select parts of three.js library, for example Scene:
+		</div>
+
+		<code>
+		import { Scene } from 'three';
+
+		const scene = new Scene();
+		...
+		</code>
+
+		<h2>Caveats</h2>
+
+		<div>
+			Currenlty it's not possible to import the files within the "examples/js" directroy in this way.
+			This is due to some of the files relying on global namespace pollution of THREE. For more information see <a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank">Transform `examples/js` to support modules #9562</a>.
+		</div>
+	</body>
+</html>

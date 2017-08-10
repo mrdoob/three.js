@@ -1,8 +1,16 @@
 /**
  * @author oosmoxiecode
+ * @author Mugen87 / https://github.com/Mugen87
+ *
+ * based on http://www.blackpawn.com/texts/pqtorus/
  */
 
 import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
+
+// TorusKnotGeometry
 
 function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
 
@@ -29,15 +37,7 @@ function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q,
 TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
 TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- * see: http://www.blackpawn.com/texts/pqtorus/
- */
-
-import { BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
+// TorusKnotBufferGeometry
 
 function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
 
@@ -61,22 +61,19 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 	p = p || 2;
 	q = q || 3;
 
-	// used to calculate buffer length
-	var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
-	var indexCount = radialSegments * tubularSegments * 2 * 3;
-
 	// buffers
-	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
-	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+	var indices = [];
+	var vertices = [];
+	var normals = [];
+	var uvs = [];
 
 	// helper variables
-	var i, j, index = 0, indexOffset = 0;
+
+	var i, j;
 
 	var vertex = new Vector3();
 	var normal = new Vector3();
-	var uv = new Vector2();
 
 	var P1 = new Vector3();
 	var P2 = new Vector3();
@@ -127,20 +124,18 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 			vertex.y = P1.y + ( cx * N.y + cy * B.y );
 			vertex.z = P1.z + ( cx * N.z + cy * B.z );
 
-			// vertex
-			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+			vertices.push( vertex.x, vertex.y, vertex.z );
 
 			// normal (P1 is always the center/origin of the extrusion, thus we can use it to calculate the normal)
+
 			normal.subVectors( vertex, P1 ).normalize();
-			normals.setXYZ( index, normal.x, normal.y, normal.z );
+
+			normals.push( normal.x, normal.y, normal.z );
 
 			// uv
-			uv.x = i / tubularSegments;
-			uv.y = j / radialSegments;
-			uvs.setXY( index, uv.x, uv.y );
 
-			// increase index
-			index ++;
+			uvs.push( i / tubularSegments );
+			uvs.push( j / radialSegments );
 
 		}
 
@@ -153,20 +148,16 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 		for ( i = 1; i <= radialSegments; i ++ ) {
 
 			// indices
+
 			var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
 			var b = ( radialSegments + 1 ) * j + ( i - 1 );
 			var c = ( radialSegments + 1 ) * j + i;
 			var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
 
-			// face one
-			indices.setX( indexOffset, a ); indexOffset ++;
-			indices.setX( indexOffset, b ); indexOffset ++;
-			indices.setX( indexOffset, d ); indexOffset ++;
+			// faces
 
-			// face two
-			indices.setX( indexOffset, b ); indexOffset ++;
-			indices.setX( indexOffset, c ); indexOffset ++;
-			indices.setX( indexOffset, d ); indexOffset ++;
+			indices.push( a, b, d );
+			indices.push( b, c, d );
 
 		}
 
@@ -175,9 +166,9 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 	// build geometry
 
 	this.setIndex( indices );
-	this.addAttribute( 'position', vertices );
-	this.addAttribute( 'normal', normals );
-	this.addAttribute( 'uv', uvs );
+	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	// this function calculates the current position on the torus curve
 
@@ -198,5 +189,6 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 TorusKnotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 TorusKnotBufferGeometry.prototype.constructor = TorusKnotBufferGeometry;
+
 
 export { TorusKnotGeometry, TorusKnotBufferGeometry };

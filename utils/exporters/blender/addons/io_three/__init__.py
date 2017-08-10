@@ -111,7 +111,7 @@ def _blending_types(index):
 bpy.types.Material.THREE_blending_type = EnumProperty(
     name="Blending type",
     description="Blending type",
-    items=[_blending_types(x) for x in range(5)],
+    items=[_blending_types(x) for x in range(6)],
     default=constants.BLENDING_TYPES.NORMAL)
 
 bpy.types.Material.THREE_depth_write = BoolProperty(default=True)
@@ -551,7 +551,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
     option_faces = BoolProperty(
         name="Faces",
-        description="Export faces",
+        description="Export faces (Geometry only)",
         default=constants.EXPORT_OPTIONS[constants.FACES])
 
     option_normals = BoolProperty(
@@ -581,7 +581,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
     option_face_materials = BoolProperty(
         name="Face Materials",
-        description="Face mapping materials",
+        description="Face mapping materials (Geometry only)",
         default=constants.EXPORT_OPTIONS[constants.FACE_MATERIALS])
 
     option_maps = BoolProperty(
@@ -769,6 +769,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         default=2)
 
     def invoke(self, context, event):
+        
         settings = context.scene.get(constants.EXPORT_SETTINGS_KEY)
         if settings:
             try:
@@ -797,6 +798,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         :param context:
 
         """
+
         if not self.properties.filepath:
             raise Exception("filename not set")
 
@@ -821,6 +823,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         :param context:
 
         """
+
+        using_geometry = self.option_geometry_type == constants.GEOMETRY
+
         layout = self.layout
 
         ## Geometry {
@@ -829,7 +834,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_vertices')
-        row.prop(self.properties, 'option_faces')
+        col = row.column()
+        col.prop(self.properties, 'option_faces')
+        col.enabled = using_geometry
 
         row = layout.row()
         row.prop(self.properties, 'option_normals')
@@ -841,6 +848,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_extra_vgroups')
+        row.enabled = not using_geometry
 
         row = layout.row()
         row.prop(self.properties, 'option_apply_modifiers')
@@ -861,6 +869,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_face_materials')
+        row.enabled = using_geometry
 
         row = layout.row()
         row.prop(self.properties, 'option_colors')

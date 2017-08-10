@@ -178,8 +178,9 @@ function WebGL2Renderer( parameters ) {
 		setPixelRatio: setPixelRatio,
 		setSize: setSize,
 		render: render
-	}
+	};
 
 }
+
 
 export { WebGL2Renderer };

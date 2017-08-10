@@ -15,6 +15,8 @@ import { LineCurve } from '../curves/LineCurve';
 
 function CurvePath() {
 
+	Curve.call( this );
+
 	this.curves = [];
 
 	this.autoClose = false; // Automatically closes the path
@@ -102,7 +104,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		this.needsUpdate = true;
 		this.cacheLengths = null;
-		this.getLengths();
+		this.getCurveLengths();
 
 	},
 
@@ -139,7 +141,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 	getSpacedPoints: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = 40;
+		if ( divisions === undefined ) divisions = 40;
 
 		var points = [];
 

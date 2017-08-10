@@ -20,7 +20,7 @@ THREE.OBJExporter.prototype = {
 		var normal = new THREE.Vector3();
 		var uv = new THREE.Vector2();
 
-		var i, j, l, m, face = [];
+		var i, j, k, l, m, face = [];
 
 		var parseMesh = function ( mesh ) {
 
@@ -48,6 +48,11 @@ THREE.OBJExporter.prototype = {
 
 				// name of the mesh object
 				output += 'o ' + mesh.name + '\n';
+
+				// name of the mesh material
+				if ( mesh.material && mesh.material.name ) {
+					output += 'usemtl ' + mesh.material.name + '\n';
+				}
 
 				// vertices
 

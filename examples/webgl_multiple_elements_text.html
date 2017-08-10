@@ -95,7 +95,7 @@
 
 		<canvas id="c"></canvas>
 
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - multiple elements with text - webgl</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements with text - webgl</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -115,13 +115,14 @@
 				var balls = 20;
 				var size = .25;
 
-				var colors = [ 'rgb(0,127,255)', 'rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(0,255,255)',
-        				       'rgb(255,0,255)', 'rgb(255,0,127)', 'rgb(255,255,0)', 'rgb(0,255,127)' ];
+				var colors = [
+					'rgb(0,127,255)', 'rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(0,255,255)',
+					'rgb(255,0,255)', 'rgb(255,0,127)', 'rgb(255,255,0)', 'rgb(0,255,127)'
+				];
 
 				canvas = document.getElementById( 'c' );
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
-				renderer.setClearColor( 0xffffff, 1 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 
 				views = document.querySelectorAll( '.view' );
@@ -129,6 +130,7 @@
 				for ( var n = 0 ; n < views.length ; n++ ) {
 
 					var scene = new THREE.Scene();
+					scene.background = new THREE.Color( 0xffffff );
 
 					var geometry = new THREE.Geometry();
 					var geometry0 = new THREE.Geometry();
@@ -244,9 +246,10 @@
 					var width  = rect.right - rect.left;
 					var height = rect.bottom - rect.top;
 					var left   = rect.left;
-					var bottom = renderer.domElement.clientHeight - rect.bottom;
-					renderer.setViewport( left, bottom, width, height );
-					renderer.setScissor( left, bottom, width, height );
+					var top    = rect.top;
+
+					renderer.setViewport( left, top, width, height );
+					renderer.setScissor( left, top, width, height );
 
 					renderer.render( scene, scene.userData.camera );
 

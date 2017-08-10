@@ -13,9 +13,7 @@ function Sphere( center, radius ) {
 
 }
 
-Sphere.prototype = {
-
-	constructor: Sphere,
+Object.assign( Sphere.prototype, {
 
 	set: function ( center, radius ) {
 
@@ -28,11 +26,9 @@ Sphere.prototype = {
 
 	setFromPoints: function () {
 
-		var box;
+		var box = new Box3();
 
 		return function setFromPoints( points, optionalCenter ) {
-
-			if ( box === undefined ) box = new Box3(); // see #10547
 
 			var center = this.center;
 
@@ -111,15 +107,7 @@ Sphere.prototype = {
 
 	intersectsPlane: function ( plane ) {
 
-		// We use the following equation to compute the signed distance from
-		// the center of the sphere to the plane.
-		//
-		// distance = q * n - d
-		//
-		// If this distance is greater than the radius of the sphere,
-		// then there is no intersection.
-
-		return Math.abs( this.center.dot( plane.normal ) - plane.constant ) <= this.radius;
+		return Math.abs( plane.distanceToPoint( this.center ) ) <= this.radius;
 
 	},
 
@@ -176,7 +164,7 @@ Sphere.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Sphere };

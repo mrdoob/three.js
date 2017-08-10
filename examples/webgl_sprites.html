@@ -69,6 +69,8 @@
 					var y = Math.random() - 0.5;
 					var z = Math.random() - 0.5;
 
+					var material;
+
 					if ( z < 0 ) {
 
 						material = materialB.clone();
@@ -140,7 +142,7 @@
 
 			}
 
-			function updateHUDSprites () {
+			function updateHUDSprites() {
 
 				var width = window.innerWidth / 2;
 				var height = window.innerHeight / 2;

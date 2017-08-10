@@ -75,8 +75,7 @@ var Editor = function () {
 
 		showGridChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
-		historyChanged: new Signal(),
-		refreshScriptEditor: new Signal()
+		historyChanged: new Signal()
 
 	};
 
@@ -345,6 +344,34 @@ Editor.prototype = {
 		}
 
 		this.signals.scriptRemoved.dispatch( script );
+
+	},
+
+	getObjectMaterial: function ( object, slot ) {
+
+		var material = object.material;
+
+		if ( Array.isArray( material ) ) {
+
+			material = material[ slot ];
+
+		}
+
+		return material;
+
+	},
+
+	setObjectMaterial: function ( object, slot, newMaterial ) {
+
+		if ( Array.isArray( object.material ) ) {
+
+			object.material[ slot ] = newMaterial;
+
+		} else {
+
+			object.material = newMaterial;
+
+		}
 
 	},
 

@@ -33,10 +33,10 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl dynamic particles + postprocessing
-			- models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank">Reallusion</a>
-			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank">iClone</a>,
-			<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank">Troyano</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl dynamic particles + postprocessing
+			- models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank" rel="noopener">Reallusion</a>
+			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank" rel="noopener">iClone</a>,
+			<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank" rel="noopener">Troyano</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -87,6 +87,7 @@
 				camera.position.set( 0, 700, 7000 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000104 );
 				scene.fog = new THREE.FogExp2( 0x000104, 0.0000675 );
 
 				camera.lookAt( scene.position );
@@ -123,11 +124,9 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -272,7 +271,7 @@
 
 			function render () {
 
-				delta = 10 * clock.getDelta();
+				var delta = 10 * clock.getDelta();
 
 				delta = delta < 2 ? delta : 2;
 
@@ -310,7 +309,7 @@
 
 					}
 
-					for ( i = 0; i < vl; i ++ ) {
+					for ( var i = 0; i < vl; i ++ ) {
 
 						p = vertices[ i ];
 						vt = vertices_tmp[ i ];

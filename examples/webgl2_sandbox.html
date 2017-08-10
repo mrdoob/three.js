@@ -32,7 +32,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl2 sandbox.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl2 sandbox.</div>
 
 		<script src="../build/three.js"></script>
 
@@ -81,8 +81,8 @@
 					new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ),
 					new THREE.MeshBasicMaterial( { map: texture1, fog: false } ),
 					new THREE.MeshLambertMaterial( { color: 0xdddddd } ),
-					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ),
-					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } )
+					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, flatShading: true } ),
+					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30 } )
 
 				];
 

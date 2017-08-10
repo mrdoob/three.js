@@ -32,7 +32,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - io blender - vertex colors</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - io blender - vertex colors</div>
 
 		<script src="../build/three.js"></script>
 
@@ -105,9 +105,7 @@
 
 			function createScene1( geometry, materials ) {
 
-				materials[ 0 ].shading = THREE.FlatShading;
-
-				mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
+				mesh = new THREE.Mesh( geometry, materials );
 				mesh.position.x = 400;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 250;
 				scene.add( mesh );
@@ -116,9 +114,7 @@
 
 			function createScene2( geometry, materials ) {
 
-				materials[ 0 ].shading = THREE.FlatShading;
-
-				mesh2 = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
+				mesh2 = new THREE.Mesh( geometry, materials );
 				mesh2.position.x = - 400;
 				mesh2.scale.x = mesh2.scale.y = mesh2.scale.z = 250;
 				scene.add( mesh2 );

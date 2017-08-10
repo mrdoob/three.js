@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "MassUndoAndRedo" );
+QUnit.module( "MassUndoAndRedo" );
 
-test( "MassUndoAndRedo (stress test)", function() {
+QUnit.test( "MassUndoAndRedo (stress test)", function( assert ) {
 
 	var editor = new Editor();
 
@@ -24,7 +24,7 @@ test( "MassUndoAndRedo (stress test)", function() {
 
 	}
 
-	ok( editor.scene.children.lenght = MAX_OBJECTS,
+	assert.ok( editor.scene.children.lenght = MAX_OBJECTS,
 		"OK, " + MAX_OBJECTS + " objects have been added" );
 
 	// remove all objects
@@ -37,7 +37,7 @@ test( "MassUndoAndRedo (stress test)", function() {
 	}
 
 
-	ok( editor.scene.children.length == 0,
+	assert.ok( editor.scene.children.length == 0,
 		"OK, all objects have been removed by undos" );
 
 
@@ -49,7 +49,7 @@ test( "MassUndoAndRedo (stress test)", function() {
 
 	}
 
-	ok( editor.scene.children.lenght = MAX_OBJECTS,
+	assert.ok( editor.scene.children.lenght = MAX_OBJECTS,
 		"OK, " + MAX_OBJECTS + " objects have been added again by redos" );
 
 } );

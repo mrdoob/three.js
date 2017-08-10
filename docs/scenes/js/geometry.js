@@ -22,13 +22,6 @@ var constants = {
 
 	},
 
-	shading : {
-
-		"THREE.FlatShading" : THREE.FlatShading,
-		"THREE.SmoothShading" : THREE.SmoothShading
-
-	},
-
 	colors : {
 
 		"THREE.NoColors" : THREE.NoColors,
@@ -91,7 +84,9 @@ function updateGroupGeometry( mesh, geometry ) {
 
 }
 
-function CustomSinCurve( scale ){
+function CustomSinCurve( scale ) {
+
+	THREE.Curve.call( this );
 
 	this.scale = ( scale === undefined ) ? 1 : scale;
 
@@ -744,7 +739,7 @@ var guis = {
 
 		var folder = gui.addFolder( 'THREE.RingBufferGeometry' );
 
-		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'innerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
@@ -778,7 +773,7 @@ var guis = {
 
 		var folder = gui.addFolder( 'THREE.RingGeometry' );
 
-		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'innerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
@@ -924,7 +919,8 @@ var guis = {
 			weight : "regular",
 			bevelEnabled : false,
 			bevelThickness : 1,
-			bevelSize : 0.5
+			bevelSize : 0.5,
+			bevelSegments : 3
 		};
 
 		var fonts = [
@@ -950,7 +946,8 @@ var guis = {
 					curveSegments: data.curveSegments,
 					bevelEnabled: data.bevelEnabled,
 					bevelThickness: data.bevelThickness,
-					bevelSize: data.bevelSize
+					bevelSize: data.bevelSize,
+					bevelSegments: data.bevelSegments
 				} );
 				geometry.center();
 
@@ -974,6 +971,76 @@ var guis = {
 		folder.add( data, 'bevelEnabled' ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 0.1, 3 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSize', 0.1, 3 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSegments', 0, 8 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	TextBufferGeometry : function( mesh ) {
+
+		var data = {
+			text : "TextBufferGeometry",
+			size : 5,
+			height : 2,
+			curveSegments : 12,
+			font : "helvetiker",
+			weight : "regular",
+			bevelEnabled : false,
+			bevelThickness : 1,
+			bevelSize : 0.5,
+			bevelSegments : 3
+		};
+
+		var fonts = [
+			"helvetiker",
+			"optimer",
+			"gentilis",
+			"droid/droid_serif"
+		];
+
+		var weights = [
+			"regular", "bold"
+		];
+
+		function generateGeometry() {
+
+			var loader = new THREE.FontLoader();
+			loader.load( '../../examples/fonts/' + data.font + '_' + data.weight + '.typeface.json', function ( font ) {
+
+				var geometry = new THREE.TextBufferGeometry( data.text, {
+					font: font,
+					size: data.size,
+					height: data.height,
+					curveSegments: data.curveSegments,
+					bevelEnabled: data.bevelEnabled,
+					bevelThickness: data.bevelThickness,
+					bevelSize: data.bevelSize,
+					bevelSegments: data.bevelSegments
+				} );
+				geometry.center();
+
+				updateGroupGeometry( mesh, geometry );
+
+			} );
+
+		}
+
+		//Hide the wireframe
+		mesh.children[ 0 ].visible = false;
+
+		var folder = gui.addFolder( 'THREE.TextBufferGeometry' );
+
+		folder.add( data, 'text' ).onChange( generateGeometry );
+		folder.add( data, 'size', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'height', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'curveSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'font', fonts ).onChange( generateGeometry );
+		folder.add( data, 'weight', weights ).onChange( generateGeometry );
+		folder.add( data, 'bevelEnabled' ).onChange( generateGeometry );
+		folder.add( data, 'bevelThickness', 0.1, 3 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSize', 0.1, 3 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSegments', 0, 8 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 
@@ -1297,6 +1364,46 @@ var guis = {
 
 		generateGeometry();
 
+	},
+
+	ExtrudeBufferGeometry: function( mesh ) {
+
+		var data = {
+			steps: 2,
+			amount: 16,
+			bevelEnabled: true,
+			bevelThickness: 1,
+			bevelSize: 1,
+			bevelSegments: 1
+		};
+
+		var length = 12, width = 8;
+
+		var shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ExtrudeBufferGeometry( shape, data )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ExtrudeBufferGeometry' );
+
+		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
 	}
 
 };
@@ -1311,7 +1418,7 @@ function chooseFromHash ( mesh ) {
 
 	}
 
-	if ( selectedGeometry === 'TextGeometry' ) {
+	if ( selectedGeometry === 'TextGeometry' || selectedGeometry === 'TextBufferGeometry' ) {
 
 		return { fixed : true };
 

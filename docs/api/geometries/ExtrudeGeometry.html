@@ -70,23 +70,27 @@
 		options — Object that can contain the following parameters.
 
 			<ul>
-				<li>curveSegments —  int. number of points on the curves</li>
-				<li>steps —  int. number of points used for subdividing segements of extrude spline</li>
-				<li>amount —  int. Depth to extrude the shape</li>
-				<li>bevelEnabled —  bool. turn on bevel</li>
-				<li>bevelThickness —  float. how deep into the original shape bevel goes</li>
-				<li>bevelSize —  float. how far from shape outline is bevel</li>
-				<li>bevelSegments —  int. number of bevel layers</li>
-				<li>extrudePath —  THREE.CurvePath. 3d spline path to extrude shape along. (creates Frames if frames aren't defined)</li>
-				<li>frames —  THREE.TubeGeometry.FrenetFrames.  containing arrays of tangents, normals, binormals</li>
-				<li>material —  int. material index for front and back faces</li>
-				<li>extrudeMaterial —  int. material index for extrusion and beveled faces</li>
+				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
+				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
+				<li>amount — int. Depth to extrude the shape. Default is 100.</li>
+				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
+				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
+				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
+				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
+				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
+				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 
 		</div>
 		<div>
-		This object extrudes an 2D shape to an 3D geometry.
+			This object extrudes a 2D shape to a 3D geometry.
+		</div>
+
+		<div>
+			When creating a Mesh with this geometry, if you'd like to have a separate material used for its face
+			and its extruded sides, you can use an array of materials. The first material will be
+			applied to the face; the second material will be applied to the sides.
 		</div>
 
 
@@ -100,17 +104,15 @@
 			shapes — An Array of shapes to add. <br />
 			options — Object that can contain the following parameters.
 			<ul>
-				<li>curveSegments —  int. number of points on the curves</li>
-				<li>steps —  int. number of points used for subdividing segements of extrude spline</li>
-				<li>amount —  int. Depth to extrude the shape</li>
-				<li>bevelEnabled —  bool. turn on bevel</li>
-				<li>bevelThickness —  float. how deep into the original shape bevel goes</li>
-				<li>bevelSize —  float. how far from shape outline is bevel</li>
-				<li>bevelSegments —  int. number of bevel layers</li>
-				<li>extrudePath —  THREE.Curve. curve to extrude shape along</li>
-				<li>frames —  Object.  containing arrays of tangents, normals, binormals</li>
-				<li>material —  int. material index for front and back faces</li>
-				<li>extrudeMaterial —  int. material index for extrusion and beveled faces</li>
+				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
+				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
+				<li>amount — int. Depth to extrude the shape. Default is 100.</li>
+				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
+				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
+				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
+				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
+				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
+				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 		</div>
@@ -121,17 +123,15 @@
 			shape — A shape to add. <br />
 			options — Object that can contain the following parameters.
 			<ul>
-				<li>curveSegments —  int. number of points on the curves</li>
-				<li>steps —  int. number of points used for subdividing segements of extrude spline</li>
-				<li>amount —  int. Depth to extrude the shape</li>
-				<li>bevelEnabled —  bool. turn on bevel</li>
-				<li>bevelThickness —  float. how deep into the original shape bevel goes</li>
-				<li>bevelSize —  float. how far from shape outline is bevel</li>
-				<li>bevelSegments —  int. number of bevel layers</li>
-				<li>extrudePath —  THREE.Curve. curve to extrude shape along</li>
-				<li>frames —  Object.  containing arrays of tangents, normals, binormals</li>
-				<li>material —  int. material index for front and back faces</li>
-				<li>extrudeMaterial —  int. material index for extrusion and beveled faces</li>
+				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
+				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
+				<li>amount — int. Depth to extrude the shape. Default is 100.</li>
+				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
+				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
+				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
+				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
+				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
+				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 		</div>

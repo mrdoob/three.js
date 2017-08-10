@@ -28,7 +28,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">Three.JS</a> - Ammo Physics Example - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a> edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Studio</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Ammo Physics Example - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a> edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Studio</a>
 			<br/>
 			<br/><div id="description">Right click to clone</div>
 		</div>
@@ -133,6 +133,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -143,7 +144,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x333333, 1 );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

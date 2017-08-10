@@ -21,6 +21,8 @@ THREE.AssimpJSONLoader.prototype = {
 
 	constructor: THREE.AssimpJSONLoader,
 
+	crossOrigin: 'Anonymous',
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
@@ -125,7 +127,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 		}
 
-		geometry.setIndex( new ( indices.length > 65535 ? THREE.Uint32BufferAttribute : THREE.Uint16BufferAttribute )( indices, 1 ) );
+		geometry.setIndex( indices );
 		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 		if ( normals.length > 0 ) {
@@ -158,9 +160,7 @@ THREE.AssimpJSONLoader.prototype = {
 		var scope = this;
 		var i, prop, has_textures = [],
 
-		init_props = {
-			shading : THREE.SmoothShading
-		};
+		init_props = {};
 
 		function toColor( value_arr ) {
 
@@ -261,7 +261,7 @@ THREE.AssimpJSONLoader.prototype = {
 				// aiShadingMode_Flat
 				if ( prop.value === 1 ) {
 
-					init_props.shading = THREE.FlatShading;
+					init_props.flatShading = true;
 
 				}
 

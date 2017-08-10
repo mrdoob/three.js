@@ -70,7 +70,7 @@
 		<canvas id="c"></canvas>
 
 		<div id="content">
-			<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - multiple elements - webgl</div>
+			<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements - webgl</div>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -140,7 +140,7 @@
 						color: new THREE.Color().setHSL( Math.random(), 1, 0.75 ),
 						roughness: 0.5,
 						metalness: 0,
-						shading: THREE.FlatShading
+						flatShading: true
 
 					} );
 
@@ -218,10 +218,10 @@
 					var width  = rect.right - rect.left;
 					var height = rect.bottom - rect.top;
 					var left   = rect.left;
-					var bottom = renderer.domElement.clientHeight - rect.bottom;
+					var top    = rect.top;
 
-					renderer.setViewport( left, bottom, width, height );
-					renderer.setScissor( left, bottom, width, height );
+					renderer.setViewport( left, top, width, height );
+					renderer.setScissor( left, top, width, height );
 
 					var camera = scene.userData.camera;
 

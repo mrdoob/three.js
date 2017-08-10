@@ -6,30 +6,30 @@ import { Matrix4 } from '../../math/Matrix4';
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Extensible curve object
  *
- * Some common of Curve methods
+ * Some common of curve methods:
  * .getPoint(t), getTangent(t)
  * .getPointAt(u), getTangentAt(u)
  * .getPoints(), .getSpacedPoints()
  * .getLength()
  * .updateArcLengths()
  *
- * This following classes subclasses THREE.Curve:
+ * This following curves inherit from THREE.Curve:
  *
- * -- 2d classes --
+ * -- 2D curves --
+ * THREE.ArcCurve
+ * THREE.CubicBezierCurve
+ * THREE.EllipseCurve
  * THREE.LineCurve
  * THREE.QuadraticBezierCurve
- * THREE.CubicBezierCurve
  * THREE.SplineCurve
- * THREE.ArcCurve
- * THREE.EllipseCurve
  *
- * -- 3d classes --
+ * -- 3D curves --
+ * THREE.CatmullRomCurve3
+ * THREE.CubicBezierCurve3
  * THREE.LineCurve3
  * THREE.QuadraticBezierCurve3
- * THREE.CubicBezierCurve3
- * THREE.CatmullRomCurve3
  *
- * A series of curves can be represented as a THREE.CurvePath
+ * A series of curves can be represented as a THREE.CurvePath.
  *
  **/
 
@@ -37,18 +37,20 @@ import { Matrix4 } from '../../math/Matrix4';
  *	Abstract Curve base class
  **************************************************************/
 
-function Curve() {}
+function Curve() {
 
-Curve.prototype = {
+	this.arcLengthDivisions = 200;
 
-	constructor: Curve,
+}
+
+Object.assign( Curve.prototype, {
 
 	// Virtual base class method to overwrite and implement in subclasses
 	//	- t [0 .. 1]
 
-	getPoint: function ( t ) {
+	getPoint: function () {
 
-		console.warn( "THREE.Curve: Warning, getPoint() not implemented!" );
+		console.warn( 'THREE.Curve: .getPoint() not implemented.' );
 		return null;
 
 	},
@@ -67,7 +69,7 @@ Curve.prototype = {
 
 	getPoints: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = 5;
+		if ( divisions === undefined ) divisions = 5;
 
 		var points = [];
 
@@ -85,7 +87,7 @@ Curve.prototype = {
 
 	getSpacedPoints: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = 5;
+		if ( divisions === undefined ) divisions = 5;
 
 		var points = [];
 
@@ -112,13 +114,12 @@ Curve.prototype = {
 
 	getLengths: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+		if ( divisions === undefined ) divisions = this.arcLengthDivisions;
 
-		if ( this.cacheArcLengths
-			&& ( this.cacheArcLengths.length === divisions + 1 )
-			&& ! this.needsUpdate ) {
+		if ( this.cacheArcLengths &&
+			( this.cacheArcLengths.length === divisions + 1 ) &&
+			! this.needsUpdate ) {
 
-			//console.log( "cached", this.cacheArcLengths );
 			return this.cacheArcLengths;
 
 		}
@@ -133,7 +134,7 @@ Curve.prototype = {
 
 		for ( p = 1; p <= divisions; p ++ ) {
 
-			current = this.getPoint ( p / divisions );
+			current = this.getPoint( p / divisions );
 			sum += current.distanceTo( last );
 			cache.push( sum );
 			last = current;
@@ -142,11 +143,11 @@ Curve.prototype = {
 
 		this.cacheArcLengths = cache;
 
-		return cache; // { sums: cache, sum:sum }; Sum is in the last element.
+		return cache; // { sums: cache, sum: sum }; Sum is in the last element.
 
 	},
 
-	updateArcLengths: function() {
+	updateArcLengths: function () {
 
 		this.needsUpdate = true;
 		this.getLengths();
@@ -172,8 +173,6 @@ Curve.prototype = {
 			targetArcLength = u * arcLengths[ il - 1 ];
 
 		}
-
-		//var time = Date.now();
 
 		// binary search for the index with largest value smaller than target u distance
 
@@ -206,12 +205,9 @@ Curve.prototype = {
 
 		i = high;
 
-		//console.log('b' , i, low, high, Date.now()- time);
-
 		if ( arcLengths[ i ] === targetArcLength ) {
 
-			var t = i / ( il - 1 );
-			return t;
+			return i / ( il - 1 );
 
 		}
 
@@ -239,7 +235,7 @@ Curve.prototype = {
 	// 2 points a small delta apart will be used to find its gradient
 	// which seems to give a reasonable approximation
 
-	getTangent: function( t ) {
+	getTangent: function ( t ) {
 
 		var delta = 0.0001;
 		var t1 = t - delta;
@@ -382,6 +378,7 @@ Curve.prototype = {
 
 	}
 
-};
+} );
+
 
 export { Curve };

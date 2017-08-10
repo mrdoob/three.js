@@ -1,8 +1,12 @@
 /**
  * @author timothypratley / https://github.com/timothypratley
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 import { Geometry } from '../core/Geometry';
+import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
+
+// TetrahedronGeometry
 
 function TetrahedronGeometry( radius, detail ) {
 
@@ -23,11 +27,7 @@ function TetrahedronGeometry( radius, detail ) {
 TetrahedronGeometry.prototype = Object.create( Geometry.prototype );
 TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
+// TetrahedronBufferGeometry
 
 function TetrahedronBufferGeometry( radius, detail ) {
 
@@ -52,5 +52,6 @@ function TetrahedronBufferGeometry( radius, detail ) {
 
 TetrahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 TetrahedronBufferGeometry.prototype.constructor = TetrahedronBufferGeometry;
+
 
 export { TetrahedronGeometry, TetrahedronBufferGeometry };

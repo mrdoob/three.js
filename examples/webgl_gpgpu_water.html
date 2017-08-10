@@ -31,7 +31,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - <span id="waterSize"></span> webgl gpgpu water<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="waterSize"></span> webgl gpgpu water<br/>
 			Select <span id="options"></span> water size<br/>
 			Move mouse to disturb water.<br>
 			Press mouse button to orbit around. 'W' key toggles wireframe.
@@ -182,9 +182,9 @@
 				vec3 transformed = vec3( position.x, position.y, heightValue );
 				//<begin_vertex>
 
-				#include <displacementmap_vertex>
 				#include <morphtarget_vertex>
 				#include <skinning_vertex>
+				#include <displacementmap_vertex>
 				#include <project_vertex>
 				#include <logdepthbuf_vertex>
 				#include <clipping_planes_vertex>
@@ -270,7 +270,6 @@
 				scene.add( sun2 );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -421,7 +420,7 @@
 					var mult = 0.025;
 					var r = 0;
 					for ( var i = 0; i < 15; i++ ) {
-						r += multR * simplex.noise3d( x * mult, y * mult, z * mult );
+						r += multR * simplex.noise( x * mult, y * mult );
 						multR *= 0.53 + 0.025 * i;
 						mult *= 1.25;
 					}
