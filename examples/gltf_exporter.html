@@ -159,12 +159,36 @@
 				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
 				object2.name = "Cube in group";
 				object2.position.set( 0, 100, 100 );
-				group2.add( object2 );
+				// group2.add( object2 );
 
+				// ---------------------------------
+				// Axis
+				// ---------------------------------
 				var axis = new THREE.AxisHelper(100);
 				axis.name = "AxisHelper";
+				// scene1.add( axis );
 
-				scene1.add( axis );
+				// ---------------------------------
+				// Points
+				// ---------------------------------
+				var NUM_POINTS = 100;
+				var pointsArray = new Float32Array( NUM_POINTS * 3 );
+				for ( var i = 0; i < NUM_POINTS; i++ ) {
+					pointsArray[ 3 * i ] = Math.random() * 100;
+					pointsArray[ 3 * i + 1 ] = Math.random() * 100;
+					pointsArray[ 3 * i + 2 ] = Math.random() * 100;
+				}
+
+				pointsGeo = new THREE.BufferGeometry();
+				pointsGeo.addAttribute( 'position', new THREE.BufferAttribute( pointsArray, 3 ).setDynamic( true ) );
+
+				var pointsMaterial = new THREE.PointsMaterial( { color: 0xffff00 } );
+				var points = new THREE.Points( pointsGeo, pointsMaterial );
+				points.name = "Points";
+				scene1.add( points );
+
+
+
 
 				scene1.add( camera );
 
@@ -268,8 +292,8 @@
 
 				var timer = Date.now() * 0.001;
 
-				camera.position.x = Math.cos( timer ) * 800;
-				camera.position.z = Math.sin( timer ) * 800;
+				camera.position.x = Math.cos( timer ) * 300;
+				camera.position.z = Math.sin( timer ) * 300;
 
 				camera.lookAt( scene1.position );
 				renderer.render( scene1, camera );

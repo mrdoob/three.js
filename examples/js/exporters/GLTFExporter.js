@@ -288,7 +288,8 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			if ( material instanceof THREE.MeshBasicMaterial
-				|| material instanceof THREE.LineBasicMaterial) {
+				|| material instanceof THREE.LineBasicMaterial
+				|| material instanceof THREE.PointsMaterial ) {
 
 				// emissiveFactor
 				var color = material.color.toArray();
@@ -570,7 +571,9 @@ THREE.GLTFExporter.prototype = {
 				gltfNode.name = object.name;
 			}
 
-			if ( object instanceof THREE.Mesh || object instanceof THREE.Line) {
+			if ( object instanceof THREE.Mesh
+				|| object instanceof THREE.Line 
+				|| object instanceof THREE.Points ) {
 				gltfNode.mesh = processMesh( object );
 			} else if ( object instanceof THREE.Camera ) {
 				gltfNode.camera = processCamera( object );
@@ -581,7 +584,11 @@ THREE.GLTFExporter.prototype = {
 
 				for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 					var child = object.children[ i ];
-					if ( child instanceof THREE.Mesh || child instanceof THREE.Camera || child instanceof THREE.Group || child instanceof THREE.Line ) {
+					if ( child instanceof THREE.Mesh
+						|| child instanceof THREE.Camera
+						|| child instanceof THREE.Group
+						|| child instanceof THREE.Line
+						|| child instanceof THREE.Points) {
 						gltfNode.children.push( processNode( child ) );
 					}
 				}
@@ -617,7 +624,11 @@ THREE.GLTFExporter.prototype = {
 				var child = scene.children[ i ];
 
 				// @TODO Right now we just process meshes and lights
-				if ( child instanceof THREE.Mesh || child instanceof THREE.Camera || child instanceof THREE.Group || child instanceof THREE.Line ) {
+				if ( child instanceof THREE.Mesh
+					|| child instanceof THREE.Camera
+					|| child instanceof THREE.Group
+					|| child instanceof THREE.Line
+					|| child instanceof THREE.Points) {
 					gltfScene.nodes.push( processNode( child ) );
 				}
 			}
