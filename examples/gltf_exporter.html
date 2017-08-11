@@ -71,11 +71,11 @@
 
 				var light, object;
 
-				scene1.add( new THREE.AmbientLight( 0xffffff ) );
+				// scene1.add( new THREE.AmbientLight( 0xffffff ) );
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 1, 0 );
-				scene1.add( light );
+				// scene1.add( light );
 
 				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
@@ -84,7 +84,6 @@
 				// var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
 
 				//
-/*
 
 				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 1 ), material );
 				object.position.set( -200, 0, 200 );
@@ -92,18 +91,18 @@
 
 				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 2 ), material );
 				object.position.set( 0, 0, 200 );
-				scene1.add( object );
+				// scene1.add( object );
 
 				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
 				object.position.set( 200, 0, 200 );
-				scene1.add( object );
+				// scene1.add( object );
 
 				//
 
 				object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
 				object.position.set( -400, 0, 0 );
-				scene1.add( object );
-*/
+				// scene1.add( object );
+
 
 				var map2 = new THREE.TextureLoader().load( 'textures/hardwood2_diffuse.jpg' );
 
@@ -116,7 +115,7 @@
 				object = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 32, 32 ), material );
 				object.position.set( 0, 0, 0 );
 				object.name = "Sphere";
-				scene1.add(object);
+				// scene1.add(object);
 /*
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xff0000,
@@ -132,14 +131,14 @@
 				object3 = new THREE.Mesh( new THREE.CylinderBufferGeometry( 100, 100, 100 ), material );
 				object3.position.set( 200, 0, 0 );
 				object3.name = "Cube";
-				scene1.add(object3);
+				// scene1.add(object3);
 */
 
 /*
 				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), material );
 				object.position.set( -200, 0, 0 );
 				object.name = "Cube";
-				scene1.add( object );
+				// scene1.add( object );
 
 				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 10, 80, 2, 2, 2 ), material );
 				object2.position.set( 0, 0, 50 );
@@ -150,7 +149,7 @@
 
 				group1 = new THREE.Group();
 				group1.name = "Group";
-				// scene1.add( group1 );
+				// // scene1.add( group1 );
 
 				group2 = new THREE.Group();
 				group2.name = "subGroup";
@@ -196,9 +195,10 @@
 				object = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { color: 0xff00ff, side: THREE.DoubleSide } ) );
 				object.position.x = 150;
 				object.setDrawMode( THREE.TriangleStripDrawMode );
-				console.log(object);
-				console.log('>>>>', JSON.stringify(object));
-				scene1.add( object );
+
+				object.userData = { data: 'customdata', list: [ 1,2,3,4 ] };
+
+				// scene1.add( object );
 
 
 				// ---------------------------------
@@ -218,7 +218,7 @@
 				object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
 				object.position.x = -150;
 
-				scene1.add( object );
+				// scene1.add( object );
 
 
 				// ---------------------------------
@@ -240,7 +240,7 @@
 				object = new THREE.LineLoop( geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
 				object.position.x = -100;
 
-				scene1.add( object );
+				// scene1.add( object );
 
 
 				// ---------------------------------

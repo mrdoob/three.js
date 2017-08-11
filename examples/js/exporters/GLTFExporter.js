@@ -430,7 +430,6 @@ THREE.GLTFExporter.prototype = {
 				mode = gl.POINTS;
 
 			} else {
-				console.log(mesh.drawMode, THREE.TrianglesDrawMode, THREE.TriangleStripDrawMode, THREE.TriangleFanDrawMode,gl.TRIANGLE_STRIP);
 
 				// @QUESTION Set mode = gl.LINES if material.wireframe = true ?
 				if ( mesh.drawMode === THREE.TriangleFanDrawMode ) {
@@ -579,6 +578,20 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.name !== undefined ) {
 				gltfNode.name = object.name;
+			}
+
+			if ( object.userData && Object.keys( object.userData ).length > 0 ) {
+
+				try {
+
+					gltfNode.extras = JSON.parse( JSON.stringify( object.userData ) );
+
+				} catch (e) {
+
+					throw new Error( 'GLTFExporter: userData can\'t be serialized' );
+
+				}
+
 			}
 
 			if ( object instanceof THREE.Mesh
