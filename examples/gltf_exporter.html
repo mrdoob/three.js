@@ -161,6 +161,11 @@
 				object2.position.set( 0, 100, 100 );
 				group2.add( object2 );
 
+				var axis = new THREE.AxisHelper(100);
+				axis.name = "AxisHelper";
+
+				scene1.add( axis );
+
 				scene1.add( camera );
 
 				var cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10, 10 );

@@ -287,7 +287,8 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material instanceof THREE.MeshBasicMaterial ) {
+			if ( material instanceof THREE.MeshBasicMaterial
+				|| material instanceof THREE.LineBasicMaterial) {
 
 				// emissiveFactor
 				var color = material.color.toArray();
@@ -396,24 +397,62 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMesh( mesh ) {
 			if ( !outputJSON.meshes ) {
-				outputJSON.meshes = [];
+					outputJSON.meshes = [];
 			}
 
 			var geometry = mesh.geometry;
 
-			// @FIXME Select the correct mode based on the mesh
-			var mode = gl.TRIANGLES;
+			// Use the correct mode
+			if ( mesh instanceof THREE.LineSegments ) {
+
+				mode = gl.LINES;
+
+			} else if ( mesh instanceof THREE.LineLoop ) {
+
+				mode = gl.LINE_LOOP;
+
+			} else if ( mesh instanceof THREE.Line ) {
+
+				mode = gl.LINE_STRIP;
+
+			} else if ( mesh instanceof THREE.Points ) {
+
+				mode = gl.POINTS;
+
+			} else {
+
+				// @QUESTION Set mode = gl.LINES if material.wireframe = true ?
+				if ( mesh.drawMode === THREE.TriangleFanDrawMode ) {
+
+					mode = gl.TRIANGLES_FAN;
+
+				} else if ( mesh.drawMode === THREE.TriangleStripDrawMode ) {
+
+					mode = gl.TRIANGLES_STRIP;
+
+				} else {
+
+					mode = gl.TRIANGLES;
+
+				}
+
+			}
 
 			var gltfMesh = {
 				primitives: [
 					{
 						mode: mode,
 						attributes: {},
-						material: processMaterial( mesh.material ),
-					 	indices: processAccessor( geometry.index )
+						material: processMaterial( mesh.material )
 					}
 				]
 			};
+
+			if ( geometry.index ) {
+
+				gltfMesh.primitives[ 0 ].indices = processAccessor( geometry.index );
+
+			}
 
 			// We've just one primitive per mesh
 			var gltfAttributes = gltfMesh.primitives[ 0 ].attributes;
@@ -423,19 +462,17 @@ THREE.GLTFExporter.prototype = {
 			var nameConversion = {
 				uv: 'TEXCOORD_0',
 				uv2: 'TEXCOORD_1',
-				color: 'COLOR_0'
+				color: 'COLOR_0',
+				skinWeight: 'WEIGHTS_0',
+				skinIndex: 'JOINTS_0'
 			};
 
+			// @QUESTION Detect if .vertexColors = THREE.VertexColors?
 			// For every attribute create an accessor
 			for ( attributeName in geometry.attributes ) {
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase()
 				gltfAttributes[ attributeName ] = processAccessor( attribute );
-			}
-
-			// @todo Not really necessary, isn't it?
-			if ( geometry.type ) {
-				gltfMesh.name = geometry.type;
 			}
 
 			outputJSON.meshes.push( gltfMesh );
@@ -533,7 +570,7 @@ THREE.GLTFExporter.prototype = {
 				gltfNode.name = object.name;
 			}
 
-			if ( object instanceof THREE.Mesh ) {
+			if ( object instanceof THREE.Mesh || object instanceof THREE.Line) {
 				gltfNode.mesh = processMesh( object );
 			} else if ( object instanceof THREE.Camera ) {
 				gltfNode.camera = processCamera( object );
@@ -544,7 +581,7 @@ THREE.GLTFExporter.prototype = {
 
 				for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 					var child = object.children[ i ];
-					if ( child instanceof THREE.Mesh || child instanceof THREE.Camera || child instanceof THREE.Group ) {
+					if ( child instanceof THREE.Mesh || child instanceof THREE.Camera || child instanceof THREE.Group || child instanceof THREE.Line ) {
 						gltfNode.children.push( processNode( child ) );
 					}
 				}
@@ -580,7 +617,7 @@ THREE.GLTFExporter.prototype = {
 				var child = scene.children[ i ];
 
 				// @TODO Right now we just process meshes and lights
-				if ( child instanceof THREE.Mesh || child instanceof THREE.Camera || child instanceof THREE.Group ) {
+				if ( child instanceof THREE.Mesh || child instanceof THREE.Camera || child instanceof THREE.Group || child instanceof THREE.Line ) {
 					gltfScene.nodes.push( processNode( child ) );
 				}
 			}
