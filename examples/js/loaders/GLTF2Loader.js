@@ -1181,8 +1181,12 @@ THREE.GLTF2Loader = ( function () {
 		LINEAR: 9729,
 		REPEAT: 10497,
 		SAMPLER_2D: 35678,
-		TRIANGLES: 4,
 		LINES: 1,
+		LINE_LOOP: 2,
+		LINE_STRIP: 3,
+		TRIANGLES: 4,
+		TRIANGLE_STRIP: 5,
+		TRIANGLE_FAN: 6,
 		UNSIGNED_BYTE: 5121,
 		UNSIGNED_SHORT: 5123,
 
@@ -2226,9 +2230,9 @@ THREE.GLTF2Loader = ( function () {
 				// Normal map textures use OpenGL conventions:
 				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
 				_material.normalScale.x = -1;
-				
+
 				_material.userData = material.extras;
-				
+
 				return _material;
 
 			} );
@@ -2393,13 +2397,31 @@ THREE.GLTF2Loader = ( function () {
 
 							mesh = new THREE.Mesh( geometry, material );
 
+						} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
+
+							mesh = new THREE.Mesh( geometry, material );
+							mesh.drawMode = THREE.TriangleStripDrawMode;
+
+						} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ) {
+
+							mesh = new THREE.Mesh( geometry, material );
+							mesh.drawMode = THREE.TriangleFanDrawMode;
+
 						} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
 
 							mesh = new THREE.LineSegments( geometry, material );
 
+						} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_STRIP ) {
+
+							mesh = new THREE.Line( geometry, material );
+
+						} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_LOOP ) {
+
+							mesh = new THREE.LineLoop( geometry, material );
+
 						} else {
 
-							throw new Error( 'THREE.GLTF2Loader: Only TRIANGLE and LINE primitives are supported.' );
+							throw new Error( 'THREE.GLTF2Loader: Primitive mode unsupported: ', primitive.mode );
 
 						}
 
