@@ -150,7 +150,7 @@
 
 				group1 = new THREE.Group();
 				group1.name = "Group";
-				scene1.add( group1 );
+				// scene1.add( group1 );
 
 				group2 = new THREE.Group();
 				group2.name = "subGroup";
@@ -159,14 +159,96 @@
 				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
 				object2.name = "Cube in group";
 				object2.position.set( 0, 100, 100 );
-				// group2.add( object2 );
+				group2.add( object2 );
+
+				// ---------------------------------
+				// Triangle Strip
+				// ---------------------------------
+				var geometry = new THREE.BufferGeometry();
+				var positions = new Float32Array( 6 * 3 );
+
+				positions[ 0 ] = 0;
+				positions[ 1 ] = 0;
+				positions[ 2 ] = 0;
+
+				positions[ 3 ] = 0;
+				positions[ 4 ] = 100;
+				positions[ 5 ] = 0;
+
+				positions[ 6 ] = 100;
+				positions[ 7 ] = 0;
+				positions[ 8 ] = 0;
+
+				positions[ 9 ] = 100;
+				positions[ 10 ] = 100;
+				positions[ 11 ] = 0;
+
+				positions[ 12 ] = 100;
+				positions[ 13 ] = 0;
+				positions[ 14 ] = 100;
+
+				positions[ 15 ] = 100;
+				positions[ 16 ] = 100;
+				positions[ 17 ] = 100;
+
+
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				object = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { color: 0xff00ff, side: THREE.DoubleSide } ) );
+				object.position.x = 150;
+				object.setDrawMode( THREE.TriangleStripDrawMode );
+				console.log(object);
+				console.log('>>>>', JSON.stringify(object));
+				scene1.add( object );
+
+
+				// ---------------------------------
+				// Line Strip
+				// ---------------------------------
+				var geometry = new THREE.BufferGeometry();
+				var numPoints = 100;
+				var positions = new Float32Array( numPoints * 3 );
+
+				for (var i = 0; i < numPoints; i++ ) {
+					positions[ i * 3 ] = i;
+					positions[ i * 3 + 1 ] = Math.sin( i / 2 ) * 20;
+					positions[ i * 3 + 2 ] = 0;
+				}
+
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
+				object.position.x = -150;
+
+				scene1.add( object );
+
+
+				// ---------------------------------
+				// Line Loop
+				// ---------------------------------
+				var geometry = new THREE.BufferGeometry();
+				var numPoints = 5;
+				var radius = 100;
+				var positions = new Float32Array( numPoints * 3 );
+
+				for (var i = 0; i < numPoints; i++ ) {
+					var s = i * Math.PI * 2 / numPoints;
+					positions[ i * 3 ] = radius * Math.sin ( s );
+					positions[ i * 3 + 1 ] = radius * Math.cos ( s );
+					positions[ i * 3 + 2 ] = 0;
+				}
+
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				object = new THREE.LineLoop( geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
+				object.position.x = -100;
+
+				scene1.add( object );
+
 
 				// ---------------------------------
 				// Axis
 				// ---------------------------------
 				var axis = new THREE.AxisHelper(100);
 				axis.name = "AxisHelper";
-				// scene1.add( axis );
+				//scene1.add( axis );
 
 				// ---------------------------------
 				// Points
@@ -185,10 +267,7 @@
 				var pointsMaterial = new THREE.PointsMaterial( { color: 0xffff00 } );
 				var points = new THREE.Points( pointsGeo, pointsMaterial );
 				points.name = "Points";
-				scene1.add( points );
-
-
-
+				// scene1.add( points );
 
 				scene1.add( camera );
 

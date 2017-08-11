@@ -172,9 +172,18 @@ THREE.GLTFExporter.prototype = {
 				'VEC4'
 			];
 
+			var componentType;
+
 			// Detect the component type of the attribute array (float, uint or ushort)
-			var componentType = attribute instanceof THREE.Float32BufferAttribute ? gl.FLOAT :
-				( attribute instanceof THREE.Uint32BufferAttribute ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT );
+			if ( attribute.array.constructor === Float32Array ) {
+				componentType = gl.FLOAT;
+			} else if ( attribute.array.constructor === Uint32Array ) {
+				componentType = gl.UNSIGNED_INT;
+			} else if ( attribute.array.constructor === Uint16Array ) {
+				componentType = gl.UNSIGNED_SHORT;
+			} else {
+				throw new Error( 'THREE.GLTF2Exporter: Unsupported bufferAttribute component type.' );
+			}
 
 			var minMax = getMinMax( attribute );
 			var bufferView = processBufferView( attribute, componentType );
@@ -421,15 +430,16 @@ THREE.GLTFExporter.prototype = {
 				mode = gl.POINTS;
 
 			} else {
+				console.log(mesh.drawMode, THREE.TrianglesDrawMode, THREE.TriangleStripDrawMode, THREE.TriangleFanDrawMode,gl.TRIANGLE_STRIP);
 
 				// @QUESTION Set mode = gl.LINES if material.wireframe = true ?
 				if ( mesh.drawMode === THREE.TriangleFanDrawMode ) {
 
-					mode = gl.TRIANGLES_FAN;
+					mode = gl.TRIANGLE_FAN;
 
 				} else if ( mesh.drawMode === THREE.TriangleStripDrawMode ) {
 
-					mode = gl.TRIANGLES_STRIP;
+					mode = gl.TRIANGLE_STRIP;
 
 				} else {
 
@@ -572,7 +582,7 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			if ( object instanceof THREE.Mesh
-				|| object instanceof THREE.Line 
+				|| object instanceof THREE.Line
 				|| object instanceof THREE.Points ) {
 				gltfNode.mesh = processMesh( object );
 			} else if ( object instanceof THREE.Camera ) {
