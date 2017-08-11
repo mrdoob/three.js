@@ -64,6 +64,7 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.y = 400;
+				camera.name = "PerspectiveCamera";
 
 				scene1 = new THREE.Scene();
 				scene1.name = 'Scene1';
@@ -147,20 +148,24 @@
 				object.add( object2 );
 */
 
-				object = new THREE.Group();
-				object.name = "Group";
-				scene1.add( object );
+				group1 = new THREE.Group();
+				group1.name = "Group";
+				scene1.add( group1 );
+
+				group2 = new THREE.Group();
+				group2.name = "subGroup";
+				group1.add( group2 );
 
 				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
 				object2.name = "Cube in group";
 				object2.position.set( 0, 100, 100 );
-				object.add( object2 );
-
+				group2.add( object2 );
 
 				scene1.add( camera );
 
 				var cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10, 10 );
 				scene1.add( cameraOrtho );
+				cameraOrtho.name = 'OrthographicCamera';
 
 /*
 				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );

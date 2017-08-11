@@ -544,7 +544,7 @@ THREE.GLTFExporter.prototype = {
 
 				for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 					var child = object.children[ i ];
-					if ( child instanceof THREE.Mesh ) {
+					if ( child instanceof THREE.Mesh || child instanceof THREE.Camera || child instanceof THREE.Group ) {
 						gltfNode.children.push( processNode( child ) );
 					}
 				}
@@ -580,7 +580,7 @@ THREE.GLTFExporter.prototype = {
 				var child = scene.children[ i ];
 
 				// @TODO Right now we just process meshes and lights
-				if ( child instanceof THREE.Mesh || child instanceof THREE.Camera ) {
+				if ( child instanceof THREE.Mesh || child instanceof THREE.Camera || child instanceof THREE.Group ) {
 					gltfScene.nodes.push( processNode( child ) );
 				}
 			}
