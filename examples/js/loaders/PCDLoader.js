@@ -36,7 +36,7 @@ THREE.PCDLoader.prototype = {
 
 	parse: function ( data, url ) {
 
-		function binarryToStr( data ) {
+		function binaryToStr( data ) {
 
 			var charArray = new Uint8Array( data );
 
@@ -167,7 +167,7 @@ THREE.PCDLoader.prototype = {
 
 		}
 
-		var textData = binarryToStr( data );
+		var textData = binaryToStr( data );
 
 		// parse header (always ascii format)
 
