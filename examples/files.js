@@ -323,6 +323,7 @@ var files = {
 		"misc_lights_test",
 		"misc_lookat",
 		"misc_sound",
+		"misc_sound_visualizer",
 		"misc_ubiquity_test",
 		"misc_ubiquity_test2",
 		"misc_uv_tests"
