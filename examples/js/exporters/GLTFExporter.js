@@ -40,7 +40,7 @@ THREE.GLTFExporter.prototype = {
 		/**
 		 * Compare two arrays
 		 */
-		function sameArray ( array1, array2 ) {
+		function equalArray ( array1, array2 ) {
 			return ( array1.length === array2.length ) && array1.every( function( element, index ) {
     		return element === array2[ index ];
 			});
@@ -275,32 +275,118 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			// @QUESTION Should we avoid including any attribute that has the default value?
-			var gltfMaterial = {
-				pbrMetallicRoughness: {
+			var gltfMaterial = {};
+
+			if ( material instanceof THREE.MeshStandardMaterial ) {
+
+				gltfMaterial.pbrMetallicRoughness = {
 					baseColorFactor: material.color.toArray().concat( [ material.opacity ] ),
 					metallicFactor: material.metalness,
 					roughnessFactor: material.roughness
-				}
-			};
+				};
 
-			if ( material.map ) {
-				gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
-					index: processTexture( material.map ),
+			}
+
+			if ( material instanceof THREE.MeshBasicMaterial ) {
+
+				// emissiveFactor
+				var color = material.color.toArray();
+				if ( !equalArray( color, [ 0, 0, 0 ] ) ) {
+
+					gltfMaterial.emissiveFactor = color;
+
+				}
+
+				// emissiveTexture
+				if ( material.map ) {
+
+					gltfMaterial.emissiveTexture = {
+
+						index: processTexture( material.map ),
+						texCoord: 0 // @FIXME
+
+					};
+
+				}
+
+			} else {
+
+				// emissiveFactor
+				var emissive = material.emissive.toArray();
+				if ( !equalArray( emissive, [ 0, 0, 0 ] ) ) {
+
+					gltfMaterial.emissiveFactor = emissive;
+
+				}
+
+				// pbrMetallicRoughness.baseColorTexture
+				if ( material.map ) {
+
+					gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
+						index: processTexture( material.map ),
+						texCoord: 0 // @FIXME
+					};
+
+				}
+
+				// emissiveTexture
+				if ( material.emissiveMap ) {
+
+					gltfMaterial.emissiveTexture = {
+
+						index: processTexture( material.emissiveMap ),
+						texCoord: 0 // @FIXME
+
+					};
+
+				}
+
+			}
+
+			// normalTexture
+			if ( material.normalMap ) {
+
+				gltfMaterial.normalTexture = {
+					index: processTexture( material.normalMap ),
 					texCoord: 0 // @FIXME
-				}
+				};
+
 			}
 
+			// occlusionTexture
+			if ( material.aoMap ) {
+
+				gltfMaterial.occlusionTexture = {
+					index: processTexture( material.aoMap ),
+					texCoord: 0 // @FIXME
+				};
+
+			}
+
+			// alphaMode
+			if ( material.transparent ) {
+
+				gltfMaterial.alphaMode = 'BLEND'; // @FIXME We should detect MASK or BLEND
+
+			}
+
+			// doubleSided
 			if ( material.side === THREE.DoubleSide ) {
+
 				gltfMaterial.doubleSided = true;
+
 			}
 
-			if ( material.name ) {
+			if ( material.name !== undefined ) {
+
 				gltfMaterial.name = material.name;
+
 			}
 
 			outputJSON.materials.push( gltfMaterial );
 
 			return outputJSON.materials.length - 1;
+
 		}
 
 		/**
@@ -397,7 +483,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( camera.name ) {
+			if ( camera.name !== undefined ) {
 				gltfCamera.name = camera.type;
 			}
 
@@ -424,26 +510,26 @@ THREE.GLTFExporter.prototype = {
 				var position = object.position.toArray();
 				var scale = object.scale.toArray();
 
-				if ( !sameArray( rotation, [ 0, 0, 0, 1 ] ) ) {
+				if ( !equalArray( rotation, [ 0, 0, 0, 1 ] ) ) {
 					gltfNode.rotation = rotation;
 				}
 
-				if ( !sameArray( position, [ 0, 0, 0 ] ) ) {
+				if ( !equalArray( position, [ 0, 0, 0 ] ) ) {
 					gltfNode.position = position;
 				}
 
-				if ( !sameArray( scale, [ 1, 1, 1 ] ) ) {
+				if ( !equalArray( scale, [ 1, 1, 1 ] ) ) {
 					gltfNode.scale = scale;
 				}
 
 			} else {
 				object.updateMatrix();
-				if (! sameArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
+				if (! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
 					gltfNode.matrix = object.matrix.elements;
 				}
 			};
 
-			if ( object.name ) {
+			if ( object.name !== undefined ) {
 				gltfNode.name = object.name;
 			}
 
@@ -484,7 +570,7 @@ THREE.GLTFExporter.prototype = {
 				nodes: []
 			};
 
-			if ( scene.name ) {
+			if ( scene.name !== undefined ) {
 				gltfScene.name = scene.name;
 			}
 
@@ -514,15 +600,19 @@ THREE.GLTFExporter.prototype = {
 		var blob = new Blob( dataViews, { type: 'application/octet-binary' } );
 
 		// Update the bytlength of the only main buffer and update the uri with the base64 representation of it
-		outputJSON.buffers[ 0 ].byteLength = blob.size;
-		objectURL = URL.createObjectURL( blob );
+		if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
+			outputJSON.buffers[ 0 ].byteLength = blob.size;
+			objectURL = URL.createObjectURL( blob );
 
-		var reader = new window.FileReader();
-		 reader.readAsDataURL( blob );
-		 reader.onloadend = function() {
-			 base64data = reader.result;
-			 outputJSON.buffers[ 0 ].uri = base64data;
-			 onDone( outputJSON );
-		 }
+			var reader = new window.FileReader();
+			 reader.readAsDataURL( blob );
+			 reader.onloadend = function() {
+				 base64data = reader.result;
+				 outputJSON.buffers[ 0 ].uri = base64data;
+				 onDone( outputJSON );
+			 }
+		} else {
+			onDone ( outputJSON );
+		}
 	}
 };

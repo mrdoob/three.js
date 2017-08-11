@@ -52,7 +52,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, scene1, renderer;
 
 			init();
 			animate();
@@ -65,16 +65,16 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.y = 400;
 
-				scene = new THREE.Scene();
-				scene.name = 'Scene1';
+				scene1 = new THREE.Scene();
+				scene1.name = 'Scene1';
 
 				var light, object;
 
-				scene.add( new THREE.AmbientLight( 0xffffff ) );
+				scene1.add( new THREE.AmbientLight( 0xffffff ) );
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 1, 0 );
-				scene.add( light );
+				scene1.add( light );
 
 				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
@@ -87,21 +87,21 @@
 
 				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 1 ), material );
 				object.position.set( -200, 0, 200 );
-				scene.add( object );
+				scene1.add( object );
 
 				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 2 ), material );
 				object.position.set( 0, 0, 200 );
-				scene.add( object );
+				scene1.add( object );
 
 				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
 				object.position.set( 200, 0, 200 );
-				scene.add( object );
+				scene1.add( object );
 
 				//
 
 				object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
 				object.position.set( -400, 0, 0 );
-				scene.add( object );
+				scene1.add( object );
 */
 
 				var map2 = new THREE.TextureLoader().load( 'textures/hardwood2_diffuse.jpg' );
@@ -111,11 +111,11 @@
 					metalness: 0.5,
 					roughness: 1.0
 				} );
-
+/*
 				object = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 32, 32 ), material );
 				object.position.set( 0, 0, 0 );
 				object.name = "Sphere";
-				scene.add(object);
+				scene1.add(object);
 /*
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xff0000,
@@ -131,38 +131,49 @@
 				object3 = new THREE.Mesh( new THREE.CylinderBufferGeometry( 100, 100, 100 ), material );
 				object3.position.set( 200, 0, 0 );
 				object3.name = "Cube";
-				scene.add(object3);
+				scene1.add(object3);
 */
 
+/*
 				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), material );
 				object.position.set( -200, 0, 0 );
 				object.name = "Cube";
+				scene1.add( object );
 
 				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 10, 80, 2, 2, 2 ), material );
 				object2.position.set( 0, 0, 50 );
 				object2.rotation.set( 0, 45, 0 );
 				object2.name = "SubCube";
 				object.add( object2 );
+*/
 
-				scene.add( object );
+				object = new THREE.Group();
+				object.name = "Group";
+				scene1.add( object );
 
-				scene.add( camera );
+				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
+				object2.name = "Cube in group";
+				object2.position.set( 0, 100, 100 );
+				object.add( object2 );
+
+
+				scene1.add( camera );
 
 				var cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10, 10 );
-				scene.add( cameraOrtho );
+				scene1.add( cameraOrtho );
 
 /*
 				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );
 				object.position.set( 0, 0, 0 );
-				scene.add( object );
+				scene1.add( object );
 
 				object = new THREE.Mesh( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
 				object.position.set( 200, 0, 0 );
-				scene.add( object );
+				scene1.add( object );
 
 				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
 				object.position.set( 400, 0, 0 );
-				scene.add( object );
+				scene1.add( object );
 */
 				//
 /*
@@ -176,23 +187,23 @@
 
 				object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
 				object.position.set( -400, 0, -200 );
-				scene.add( object );
+				scene1.add( object );
 
 				object = new THREE.Mesh( new THREE.TorusGeometry( 50, 20, 20, 20 ), material );
 				object.position.set( -200, 0, -200 );
-				scene.add( object );
+				scene1.add( object );
 
 				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), material );
 				object.position.set( 0, 0, -200 );
-				scene.add( object );
+				scene1.add( object );
 
 				object = new THREE.AxisHelper( 50 );
 				object.position.set( 200, 0, -200 );
-				scene.add( object );
+				scene1.add( object );
 
 				object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
 				object.position.set( 400, 0, -200 );
-				scene.add( object );
+				scene1.add( object );
 */
 
 				var scene2 = new THREE.Scene();
@@ -218,8 +229,8 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				var gltfExporter = new THREE.GLTFExporter( renderer );
-				gltfExporter.parse( [scene, scene2], function( result ) {
-					console.log( JSON.stringify( result, null, 2 ) );
+				gltfExporter.parse( [ scene1 ], function( result ) {
+					 console.log( JSON.stringify( result, null, 2 ) );
 				} );
 			}
 
@@ -250,8 +261,8 @@
 				camera.position.x = Math.cos( timer ) * 800;
 				camera.position.z = Math.sin( timer ) * 800;
 
-				camera.lookAt( scene.position );
-				renderer.render( scene, camera );
+				camera.lookAt( scene1.position );
+				renderer.render( scene1, camera );
 
 			}
 
