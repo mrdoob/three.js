@@ -71,18 +71,23 @@
 
 				var light, object;
 
-				// scene1.add( new THREE.AmbientLight( 0xffffff ) );
+				scene1.add( new THREE.AmbientLight( 0xffffff ) );
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 1, 0 );
-				// scene1.add( light );
+				scene1.add( light );
 
-				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
-				map.wrapS = map.wrapT = THREE.RepeatWrapping;
-				map.anisotropy = 16;
+				var mapGrid = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
+				mapGrid.wrapS = mapGrid.wrapT = THREE.RepeatWrapping;
+				mapGrid.anisotropy = 16;
 
 				// var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } )
 
+
+				// ---------------------------------------------------------------------
+				// Simple geometry with basic material
+				// ---------------------------------------------------------------------
+				// Icosahedron
 				var material = new THREE.MeshBasicMaterial( {
 					color: 0xff0000
 				} );
@@ -91,51 +96,56 @@
 				object.position.set( -200, 0, 200 );
 				scene1.add( object );
 
+				// Octahedron
+				material = new THREE.MeshBasicMaterial( {
+					color: 0x0000ff,
+					wireframe: true
+				} );
 				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 1 ), material );
 				object.position.set( 0, 0, 200 );
 				scene1.add( object );
+
+				// Tetrahedron
+				material = new THREE.MeshBasicMaterial( {
+					color: 0xffffff,
+					map: mapGrid
+				} );
 
 				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
 				object.position.set( 200, 0, 200 );
 				scene1.add( object );
 
-				//
-
-				object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
-				object.position.set( -400, 0, 0 );
-				// scene1.add( object );
-
-
-				var map2 = new THREE.TextureLoader().load( 'textures/hardwood2_diffuse.jpg' );
-
+				// ---------------------------------------------------------------------
+				// Buffered geometry primitives
+				// ---------------------------------------------------------------------
 				var material = new THREE.MeshStandardMaterial( {
-					map: map2,
+					color: 0xffff00,
 					metalness: 0.5,
 					roughness: 1.0
 				} );
-/*Ç
-				object = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 32, 32 ), material );
+
+				// Sphere
+				object = new THREE.Mesh( new THREE.SphereBufferGeometry( 70, 32, 32 ), material );
 				object.position.set( 0, 0, 0 );
 				object.name = "Sphere";
 				scene1.add( object );
 
-/*
-				var material = new THREE.MeshStandardMaterial( {
-					color: 0xff0000,
-					metalness: 0.1,
-					roughness: 0.5
-				} );
-*/
+				// Cylinder
+				object = new THREE.Mesh( new THREE.CylinderBufferGeometry( 10, 80, 100 ), material );
+				object.position.set( 200, 0, 0 );
+				object.name = "Cylinder";
+				scene1.add( object );
+
+				// TorusKnot
+				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 60, 10, 20, 10 ), material );
+				object.position.set( -200, 0, 0 );
+				object.name = "Cylinder";
+				scene1.add( object );
 
 
-				var material = new THREE.MeshStandardMaterial( { map: map, side: THREE.DoubleSide } );
+				var material = new THREE.MeshStandardMaterial( { map: mapGrid, side: THREE.DoubleSide } );
+				var map2 = new THREE.TextureLoader().load( 'textures/hardwood2_diffuse.jpg' );
 
-/*
-				object3 = new THREE.Mesh( new THREE.CylinderBufferGeometry( 100, 100, 100 ), material );
-				object3.position.set( 200, 0, 0 );
-				object3.name = "Cube";
-				// scene1.add(object3);
-*/
 
 /*
 				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), material );
@@ -163,9 +173,9 @@
 				object2.position.set( 0, 100, 100 );
 				group2.add( object2 );
 
-				// ---------------------------------
+				// ---------------------------------------------------------------------
 				// Triangle Strip
-				// ---------------------------------
+				// ---------------------------------------------------------------------
 				var geometry = new THREE.BufferGeometry();
 				var positions = new Float32Array( 6 * 3 );
 
@@ -201,12 +211,12 @@
 
 				object.userData = { data: 'customdata', list: [ 1,2,3,4 ] };
 
-				scene1.add( object );
+				//scene1.add( object );
 
 
-				// ---------------------------------
+				// ---------------------------------------------------------------------
 				// Line Strip
-				// ---------------------------------
+				// ---------------------------------------------------------------------
 				var geometry = new THREE.BufferGeometry();
 				var numPoints = 100;
 				var positions = new Float32Array( numPoints * 3 );
@@ -224,9 +234,9 @@
 				// scene1.add( object );
 
 
-				// ---------------------------------
+				// ---------------------------------------------------------------------
 				// Line Loop
-				// ---------------------------------
+				// ---------------------------------------------------------------------
 				var geometry = new THREE.BufferGeometry();
 				var numPoints = 5;
 				var radius = 100;
@@ -246,16 +256,16 @@
 				// scene1.add( object );
 
 
-				// ---------------------------------
+				// ---------------------------------------------------------------------
 				// Axis
-				// ---------------------------------
+				// ---------------------------------------------------------------------
 				var axis = new THREE.AxisHelper(100);
 				axis.name = "AxisHelper";
 				//scene1.add( axis );
 
-				// ---------------------------------
+				// ---------------------------------------------------------------------
 				// Points
-				// ---------------------------------
+				// ---------------------------------------------------------------------
 				var NUM_POINTS = 100;
 				var pointsArray = new Float32Array( NUM_POINTS * 3 );
 				for ( var i = 0; i < NUM_POINTS; i++ ) {

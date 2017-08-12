@@ -441,18 +441,18 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				// @QUESTION Set mode = gl.LINES if material.wireframe = true ?
 				if ( mesh.drawMode === THREE.TriangleFanDrawMode ) {
 
+					console.warn( 'GLTFExporter: TriangleFanDrawMode and wireframe incompatible.' );
 					mode = gl.TRIANGLE_FAN;
 
 				} else if ( mesh.drawMode === THREE.TriangleStripDrawMode ) {
 
-					mode = gl.TRIANGLE_STRIP;
+					mode = mesh.material.wireframe ? gl.LINE_STRIP : gl.TRIANGLE_STRIP;
 
 				} else {
 
-					mode = gl.TRIANGLES;
+					mode = mesh.material.wireframe ? gl.LINES : gl.TRIANGLES;
 
 				}
 
