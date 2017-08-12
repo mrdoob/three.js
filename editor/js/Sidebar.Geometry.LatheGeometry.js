@@ -85,25 +85,55 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 	//
 
-	function createPointRow( x, y ) {
+		function createPointRow( x, y ) {
 
-		var pointRow = new UI.Div();
-		var lbl = new UI.Text( lastPointIdx + 1 ).setWidth( '20px' );
-		var txtX = new UI.Number( x ).setRange( 0, Infinity ).setWidth( '40px' ).onChange( update );
-		var txtY = new UI.Number( y ).setWidth( '40px' ).onChange( update );
-		var idx = lastPointIdx;
-		var btn = new UI.Button( '-' ).onClick( function() {
+			var pointRow = new UI.Div();
+			var lbl = new UI.Text( lastPointIdx + 1 ).setWidth( '20px' );
+			var txtX = new UI.Number( x ).setRange( 0, Infinity ).setWidth( '30px' ).onChange( update );
+			var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( update );
+			var idx = lastPointIdx;
+			var btn = new UI.Button( '-' ).onClick( function() {
+				deletePointRow( idx );
+			} );
+			var btnPlus = new UI.Button( '+' ).onClick( function() {
+				newMidPoint( x, y , idx );
+			} );
 
-			deletePointRow( idx );
 
-		} );
+			pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
+			lastPointIdx ++;
+			pointRow.add(btnPlus, lbl, txtX, txtY, btn );
 
-		pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
-		lastPointIdx ++;
-		pointRow.add( lbl, txtX, txtY, btn );
+			return pointRow;
 
-		return pointRow;
+		}
 
+		function createPointRowAt( x, y , idx) {
+
+				var pointRow = new UI.Div();
+				var lbl = new UI.Text( idx + 1 ).setWidth( '20px' );
+				var txtX = new UI.Number( x ).setRange( 0, Infinity ).setWidth( '30px' ).onChange( update );
+				var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( update );
+				
+				var btn = new UI.Button( '-' ).onClick( function() {
+					deletePointRow( idx );
+				} );
+				var btnPlus = new UI.Button( '+' ).onClick( function() {
+					newMidPoint( x, y , idx );
+				} );
+
+				pointsUI.splice(idx, 0, { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
+				lastPointIdx ++;
+				pointRow.add(btnPlus, lbl, txtX, txtY, btn );
+
+				return pointRow;
+
+	}
+
+	function newMidPoint( x, y , idx ) {
+		var n = createPointRowAt( x, y , idx );
+		update();
+		return n;
 	}
 
 	function deletePointRow( idx ) {
