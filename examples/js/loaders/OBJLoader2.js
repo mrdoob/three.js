@@ -267,8 +267,10 @@ THREE.OBJLoader2 = (function () {
 			var length = arrayBufferView.byteLength;
 			var buffer = new Array( 128 );
 			var bufferPointer = 0;
-			var slashes = new Array( 128 );
-			var slashesPointer = 0;
+			var slashesLast = 0;
+			var slashesDistance = 0;
+			var slashesCount = 0;
+			var faceDescType = -1;
 			var reachedFaces = false;
 			var code;
 			var word = '';
@@ -278,11 +280,23 @@ THREE.OBJLoader2 = (function () {
 				switch ( code ) {
 					case Consts.CODE_SPACE:
 						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
+
+						//Whenever space is reached after first block (f v/vn" ") and no face type has been calculated, it will be performed once
+						if ( faceDescType === -1 && bufferPointer > 1 ) {
+							faceDescType = ( slashesCount === 0 ) ? 3 : ( slashesCount === 1 ) ? 1 : ( slashesCount === 2 && slashesDistance === 1 ) ? 2 : 0;
+						}
 						word = '';
 						break;
 
 					case Consts.CODE_SLASH:
-						slashes[ slashesPointer++ ] = i;
+						if ( faceDescType === -1 ) {
+
+							slashesCount++;
+							slashesDistance = i - slashesLast;
+							slashesLast = i;
+
+						}
+
 						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
 						word = '';
 						break;
@@ -290,9 +304,13 @@ THREE.OBJLoader2 = (function () {
 					case Consts.CODE_LF:
 						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
 						word = '';
-						reachedFaces = this.processLine( buffer, bufferPointer, slashes, slashesPointer, reachedFaces );
-						slashesPointer = 0;
+
+						reachedFaces = this.processLine( buffer, bufferPointer, faceDescType, reachedFaces );
 						bufferPointer = 0;
+						slashesLast = 0;
+						slashesDistance = 0;
+						slashesCount = 0;
+						faceDescType = -1;
 						break;
 
 					case Consts.CODE_CR:
@@ -315,8 +333,10 @@ THREE.OBJLoader2 = (function () {
 			var length = text.length;
 			var buffer = new Array( 128 );
 			var bufferPointer = 0;
-			var slashes = new Array( 128 );
-			var slashesPointer = 0;
+			var slashesLast = 0;
+			var slashesDistance = 0;
+			var slashesCount = 0;
+			var faceDescType = -1;
 			var reachedFaces = false;
 			var char;
 			var word = '';
@@ -326,11 +346,22 @@ THREE.OBJLoader2 = (function () {
 				switch ( char ) {
 					case Consts.STRING_SPACE:
 						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
+
+						//Whenever space is reached after first block (f v/vn" ") and no face type has been calculated, it will be performed once
+						if ( faceDescType === -1 && bufferPointer > 1 ) {
+							faceDescType = ( slashesCount === 0 ) ? 3 : ( slashesCount === 1 ) ? 1 : ( slashesCount === 2 && slashesDistance === 1 ) ? 2 : 0;
+						}
 						word = '';
 						break;
 
 					case Consts.STRING_SLASH:
-						slashes[ slashesPointer++ ] = i;
+						if ( faceDescType === -1 ) {
+
+							slashesCount++;
+							slashesDistance = i - slashesLast;
+							slashesLast = i;
+
+						}
 						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
 						word = '';
 						break;
@@ -338,9 +369,12 @@ THREE.OBJLoader2 = (function () {
 					case Consts.STRING_LF:
 						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
 						word = '';
-						reachedFaces = this.processLine( buffer, bufferPointer, slashes, slashesPointer, reachedFaces );
-						slashesPointer = 0;
+						reachedFaces = this.processLine( buffer, bufferPointer, faceDescType, reachedFaces );
 						bufferPointer = 0;
+						slashesLast = 0;
+						slashesDistance = 0;
+						slashesCount = 0;
+						faceDescType = -1;
 						break;
 
 					case Consts.STRING_CR:
@@ -352,7 +386,7 @@ THREE.OBJLoader2 = (function () {
 			}
 		};
 
-		Parser.prototype.processLine = function ( buffer, bufferPointer, slashes, slashesPointer, reachedFaces ) {
+		Parser.prototype.processLine = function ( buffer, bufferPointer, faceDescType, reachedFaces ) {
 			if ( bufferPointer < 1 ) return reachedFaces;
 
 			var bufferLength = bufferPointer - 1;
@@ -393,18 +427,11 @@ THREE.OBJLoader2 = (function () {
 
 				case Consts.LINE_F:
 					reachedFaces = true;
-					/*
-					 * 0: "f vertex/uv/normal ..."
-					 * 1: "f vertex/uv ..."
-					 * 2: "f vertex//normal ..."
-					 * 3: "f vertex ..."
-					 */
-					var faceDescType = ( slashesPointer > 1 && ( slashes[ 1 ] - slashes[ 0 ] ) === 1 ) ? 2 : ( bufferLength === slashesPointer * 2 ) ? 1 : ( bufferLength * 2 === slashesPointer * 3 ) ? 0 : 3;
 					this.rawObject.processFaces( buffer, bufferPointer, faceDescType );
 					break;
 
 				case Consts.LINE_L:
-					if ( bufferLength === slashesPointer * 2 ) {
+					if ( faceDescType === 1 ) {
 
 						this.rawObject.buildLineVvt( buffer );
 
@@ -526,8 +553,6 @@ THREE.OBJLoader2 = (function () {
 			var index = this.buildIndex( this.activeMtlName, this.activeSmoothingGroup );
 			this.rawObjectDescriptionInUse = new RawObjectDescription( this.objectName, this.groupName, this.activeMtlName, this.activeSmoothingGroup );
 			this.rawObjectDescriptions[ index ] = this.rawObjectDescriptionInUse;
-
-			this.facesBuffer = new Array( 128 );
 		}
 
 		RawObject.prototype.buildIndex = function ( materialName, smoothingGroup) {
@@ -632,92 +657,92 @@ THREE.OBJLoader2 = (function () {
 
 		RawObject.prototype.processFaces = function ( buffer, bufferPointer, faceDescType ) {
 			var bufferLength = bufferPointer - 1;
-			var facesBuffer = this.facesBuffer;
 			var i;
-			for ( i = 1; i < bufferLength + 1; i++) {
-				facesBuffer[ i ] = parseInt( buffer[ i ] );
-			}
 
-			/*
-			 * 0: "f vertex/uv/normal ..."
-			 * 1: "f vertex/uv ..."
-			 * 2: "f vertex//normal ..."
-			 * 3: "f vertex ..."
-			 */
-			if ( faceDescType === 0 ) {
+			switch ( faceDescType ) {
+				// "f vertex/uv/normal ..."
+				case 0:
+					for ( i = 4; i < bufferLength - 3; i += 3 ) {
 
-				for ( i = 4; i < bufferLength - 3; i += 3 ) {
+						this.attachFace( buffer[ 1     ], buffer[ 2     ], buffer[ 3     ] );
+						this.attachFace( buffer[ i     ], buffer[ i + 1 ], buffer[ i + 2 ] );
+						this.attachFace( buffer[ i + 3 ], buffer[ i + 4 ], buffer[ i + 5 ] );
 
-					this.attachFace( facesBuffer[ 1     ], facesBuffer[ 2     ], facesBuffer[ 3     ] );
-					this.attachFace( facesBuffer[ i     ], facesBuffer[ i + 1 ], facesBuffer[ i + 2 ] );
-					this.attachFace( facesBuffer[ i + 3 ], facesBuffer[ i + 4 ], facesBuffer[ i + 5 ] );
+					}
+					break;
 
-				}
+				// "f vertex/uv ..."
+				case 1:
+					for ( i = 3; i < bufferLength - 2; i += 2 ) {
 
-			} else if ( faceDescType === 1 ) {
+						this.attachFace( buffer[ 1     ], buffer[ 2     ] );
+						this.attachFace( buffer[ i     ], buffer[ i + 1 ] );
+						this.attachFace( buffer[ i + 2 ], buffer[ i + 3 ] );
 
-				for ( i = 3; i < bufferLength - 2; i += 2 ) {
+					}
+					break;
 
-					this.attachFace( facesBuffer[ 1     ], facesBuffer[ 2     ], -1 );
-					this.attachFace( facesBuffer[ i     ], facesBuffer[ i + 1 ], -1 );
-					this.attachFace( facesBuffer[ i + 2 ], facesBuffer[ i + 3 ], -1 );
+				// "f vertex//normal ..."
+				case 2:
+					for ( i = 3; i < bufferLength - 2; i += 2 ) {
 
-				}
+						this.attachFace( buffer[ 1     ], undefined, buffer[ 2     ] );
+						this.attachFace( buffer[ i     ], undefined, buffer[ i + 1 ] );
+						this.attachFace( buffer[ i + 2 ], undefined, buffer[ i + 3 ] );
 
-			} else if ( faceDescType === 2 ) {
+					}
+					break;
 
-				for ( i = 3; i < bufferLength - 2; i += 2 ) {
+				// "f vertex ..."
+				case 3:
+					for ( i = 2; i < bufferLength - 1; i ++ ) {
 
-					this.attachFace( facesBuffer[ 1     ], -1, facesBuffer[ 2     ] );
-					this.attachFace( facesBuffer[ i     ], -1, facesBuffer[ i + 1 ] );
-					this.attachFace( facesBuffer[ i + 2 ], -1, facesBuffer[ i + 3 ] );
+						this.attachFace( buffer[ 1     ] );
+						this.attachFace( buffer[ i     ] );
+						this.attachFace( buffer[ i + 1 ] );
 
-				}
+					}
+					break;
 
-			} else {
-
-				for ( i = 2; i < bufferLength - 1; i ++ ) {
-
-					this.attachFace( facesBuffer[ 1     ], -1, -1 );
-					this.attachFace( facesBuffer[ i     ], -1, -1 );
-					this.attachFace( facesBuffer[ i + 1 ], -1, -1 );
-
-				}
+				default:
+					break;
 
 			}
 		};
 
-		RawObject.prototype.attachFace = function ( faceIndexV, faceIndexVt, faceIndexVn ) {
-			var indexV = ( faceIndexV - this.globalVertexOffset ) * 3;
+		RawObject.prototype.attachFace = function ( faceIndexV, faceIndexU, faceIndexN ) {
+			var indexV = ( parseInt( faceIndexV ) - this.globalVertexOffset ) * 3;
 			var vertices = this.rawObjectDescriptionInUse.vertices;
-			vertices.push( this.vertices[ indexV++ ] );
-			vertices.push( this.vertices[ indexV++ ] );
+			vertices.push( this.vertices[ indexV ++ ] );
+			vertices.push( this.vertices[ indexV ++ ] );
 			vertices.push( this.vertices[ indexV ] );
 
 			if ( this.colors.length > 0 ) {
 
 				indexV -= 2;
 				var colors = this.rawObjectDescriptionInUse.colors;
-				colors.push( this.colors[ indexV++ ] );
-				colors.push( this.colors[ indexV++ ] );
+				colors.push( this.colors[ indexV ++ ] );
+				colors.push( this.colors[ indexV ++ ] );
 				colors.push( this.colors[ indexV ] );
 
 			}
-			if ( faceIndexVt > -1 ) {
 
-				var indexVt = ( faceIndexVt - this.globalUvOffset ) * 2;
+			if ( faceIndexU ) {
+
+				var indexU = ( parseInt( faceIndexU ) - this.globalUvOffset ) * 2;
 				var uvs = this.rawObjectDescriptionInUse.uvs;
-				uvs.push( this.uvs[ indexVt++ ] );
-				uvs.push( this.uvs[ indexVt ] );
+				uvs.push( this.uvs[ indexU ++ ] );
+				uvs.push( this.uvs[ indexU ] );
 
 			}
-			if ( faceIndexVn > -1 ) {
 
-				var indexVn = ( faceIndexVn - this.globalNormalOffset ) * 3;
+			if ( faceIndexN ) {
+
+				var indexN = ( parseInt( faceIndexN ) - this.globalNormalOffset ) * 3;
 				var normals = this.rawObjectDescriptionInUse.normals;
-				normals.push( this.normals[ indexVn ++ ] );
-				normals.push( this.normals[ indexVn ++ ] );
-				normals.push( this.normals[ indexVn ] );
+				normals.push( this.normals[ indexN ++ ] );
+				normals.push( this.normals[ indexN ++ ] );
+				normals.push( this.normals[ indexN ] );
 
 			}
 		};
