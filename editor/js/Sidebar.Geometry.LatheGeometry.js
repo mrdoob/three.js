@@ -1,180 +1,190 @@
-﻿/**
- * @author rfm1201
- */
+/**
+﻿ * @author rfm1201
+﻿ */
 
-Sidebar.Geometry.LatheGeometry = function( editor, object ) {
+﻿Sidebar.Geometry.LatheGeometry = function ( editor, object ) {
 
-	var signals = editor.signals;
+﻿	var signals = editor.signals;
 
-	var container = new UI.Row();
+﻿	var container = new UI.Row();
 
-	var geometry = object.geometry;
-	var parameters = geometry.parameters;
+﻿	var geometry = object.geometry;
+﻿	var parameters = geometry.parameters;
 
-	// segments
+﻿	// segments
 
-	var segmentsRow = new UI.Row();
-	var segments = new UI.Integer( parameters.segments ).onChange( update );
+﻿	var segmentsRow = new UI.Row();
+﻿	var segments = new UI.Integer( parameters.segments ).onChange( update );
 
-	segmentsRow.add( new UI.Text( 'Segments' ).setWidth( '90px' ) );
-	segmentsRow.add( segments );
+﻿	segmentsRow.add( new UI.Text( 'Segments' ).setWidth( '90px' ) );
+﻿	segmentsRow.add( segments );
 
-	container.add( segmentsRow );
+﻿	container.add( segmentsRow );
 
-	// phiStart
+﻿	// phiStart
 
-	var phiStartRow = new UI.Row();
-	var phiStart = new UI.Number( parameters.phiStart * 180 / Math.PI ).onChange( update );
+﻿	var phiStartRow = new UI.Row();
+﻿	var phiStart = new UI.Number( parameters.phiStart * 180 / Math.PI ).onChange( update );
 
-	phiStartRow.add( new UI.Text( 'Phi start (°)' ).setWidth( '90px' ) );
-	phiStartRow.add( phiStart );
+﻿	phiStartRow.add( new UI.Text( 'Phi start (°)' ).setWidth( '90px' ) );
+﻿	phiStartRow.add( phiStart );
 
-	container.add( phiStartRow );
+﻿	container.add( phiStartRow );
 
-	// phiLength
+﻿	// phiLength
 
-	var phiLengthRow = new UI.Row();
-	var phiLength = new UI.Number( parameters.phiLength * 180 / Math.PI ).onChange( update );
+﻿	var phiLengthRow = new UI.Row();
+﻿	var phiLength = new UI.Number( parameters.phiLength * 180 / Math.PI ).onChange( update );
 
-	phiLengthRow.add( new UI.Text( 'Phi length (°)' ).setWidth( '90px' ) );
-	phiLengthRow.add( phiLength );
+﻿	phiLengthRow.add( new UI.Text( 'Phi length (°)' ).setWidth( '90px' ) );
+﻿	phiLengthRow.add( phiLength );
 
-	container.add( phiLengthRow );
+﻿	container.add( phiLengthRow );
 
-	// points
+﻿	// points
 
-	var lastPointIdx = 0;
-	var pointsUI = [];
+﻿	var lastPointIdx = 0;
+﻿	var pointsUI = [];
 
-	var pointsRow = new UI.Row();
-	pointsRow.add( new UI.Text( 'Points' ).setWidth( '90px' ) );
+﻿	var pointsRow = new UI.Row();
+﻿	pointsRow.add( new UI.Text( 'Points' ).setWidth( '90px' ) );
 
-	var points = new UI.Span().setDisplay( 'inline-block' );
-	pointsRow.add( points );
+﻿	var points = new UI.Span().setDisplay( 'inline-block' );
+﻿	pointsRow.add( points );
 
-	var pointsList = new UI.Div();
-	points.add( pointsList );
+﻿	var pointsList = new UI.Div();
+﻿	points.add( pointsList );
 
-	for ( var i = 0; i < parameters.points.length; i ++ ) {
+﻿	for ( var i = 0; i < parameters.points.length; i ++ ) {
 
-		var point = parameters.points[ i ];
-		pointsList.add( createPointRow( point.x, point.y ) );
+﻿		var point = parameters.points[ i ];
+﻿		pointsList.add( createPointRow( point.x, point.y ) );
 
-	}
+﻿	}
 
-	var addPointButton = new UI.Button( '+' ).onClick( function() {
+﻿	var addPointButton = new UI.Button( '+' ).onClick( function () {
 
-		if( pointsUI.length === 0 ){
+﻿		if ( pointsUI.length === 0 ) {
 
-			pointsList.add( createPointRow( 0, 0 ) );
+﻿			pointsList.add( createPointRow( 0, 0 ) );
 
-		} else {
+﻿		} else {
 
-			var point = pointsUI[ pointsUI.length - 1 ];
+﻿			var point = pointsUI[ pointsUI.length - 1 ];
 
-			pointsList.add( createPointRow( point.x.getValue(), point.y.getValue() ) );
+﻿			pointsList.add( createPointRow( point.x.getValue(), point.y.getValue() ) );
 
-		}
+﻿		}
 
-		update();
+﻿		update();
 
-	} );
-	points.add( addPointButton );
+﻿	} );
+﻿	points.add( addPointButton );
 
-	container.add( pointsRow );
+﻿	container.add( pointsRow );
 
-	//
+﻿	//
 
-		function createPointRow( x, y ) {
+﻿	function createPointRow( x, y ) {
 
-			var pointRow = new UI.Div();
-			var lbl = new UI.Text( lastPointIdx + 1 ).setWidth( '20px' );
-			var txtX = new UI.Number( x ).setRange( 0, Infinity ).setWidth( '30px' ).onChange( update );
-			var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( update );
-			var idx = lastPointIdx;
-			var btn = new UI.Button( '-' ).onClick( function() {
-				deletePointRow( idx );
-			} );
-			var btnPlus = new UI.Button( '+' ).onClick( function() {
-				newMidPoint( x, y , idx );
-			} );
+﻿			var pointRow = new UI.Div();
+﻿			var lbl = new UI.Text( lastPointIdx + 1 ).setWidth( '20px' );
+﻿			var txtX = new UI.Number( x ).setRange( 0, Infinity ).setWidth( '30px' ).onChange( update );
+﻿			var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( update );
+﻿			var idx = lastPointIdx;
+﻿			var btn = new UI.Button( '-' ).onClick( function () {
 
+﻿				deletePointRow( idx );
 
-			pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
-			lastPointIdx ++;
-			pointRow.add(btnPlus, lbl, txtX, txtY, btn );
+﻿			﻿} );
+﻿			var btnPlus = new UI.Button( '+' ).onClick( function () {
 
-			return pointRow;
+﻿				newMidPoint( x, y, idx );
 
-		}
+﻿			} );
 
-		function createPointRowAt( x, y , idx) {
 
-				var pointRow = new UI.Div();
-				var lbl = new UI.Text( idx + 1 ).setWidth( '20px' );
-				var txtX = new UI.Number( x ).setRange( 0, Infinity ).setWidth( '30px' ).onChange( update );
-				var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( update );
-				
-				var btn = new UI.Button( '-' ).onClick( function() {
-					deletePointRow( idx );
-				} );
-				var btnPlus = new UI.Button( '+' ).onClick( function() {
-					newMidPoint( x, y , idx );
-				} );
+﻿			pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
+﻿			lastPointIdx ++;
+﻿			pointRow.add( btnPlus, lbl, txtX, txtY, btn );
 
-				pointsUI.splice(idx, 0, { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
-				lastPointIdx ++;
-				pointRow.add(btnPlus, lbl, txtX, txtY, btn );
+﻿			return pointRow;
 
-				return pointRow;
+﻿		}
 
-	}
+﻿	function createPointRowAt( x, y, idx ) {
 
-	function newMidPoint( x, y , idx ) {
-		var n = createPointRowAt( x, y , idx );
-		update();
-		return n;
-	}
+﻿			var pointRow = new UI.Div();
+﻿			var lbl = new UI.Text( idx + 1 ).setWidth( '20px' );
+﻿			var txtX = new UI.Number( x ).setRange( 0, Infinity ).setWidth( '30px' ).onChange( update );
+﻿			var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( update );
 
-	function deletePointRow( idx ) {
+﻿			var btn = new UI.Button( '-' ).onClick( function () {
 
-		if ( ! pointsUI[ idx ] ) return;
+﻿					deletePointRow( idx );
 
-		pointsList.remove( pointsUI[ idx ].row );
-		pointsUI[ idx ] = null;
+﻿			﻿} );
+﻿			var btnPlus = new UI.Button( '+' ).onClick( function () {
 
-		update();
+﻿					newMidPoint( x, y, idx );
 
-	}
+﻿﻿			} );
 
-	function update() {
+﻿			pointsUI.splice( idx, 0, { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
+﻿			lastPointIdx ++;
+﻿			pointRow.add( btnPlus, lbl, txtX, txtY, btn );
 
-		var points = [];
-		var count = 0;
+﻿			return pointRow;
 
-		for ( var i = 0; i < pointsUI.length; i ++ ) {
+﻿		}
 
-			var pointUI = pointsUI[ i ];
+﻿	function newMidPoint( x, y, idx ) {
 
-			if ( ! pointUI ) continue;
+﻿		var n = createPointRowAt( x, y, idx );
+﻿		update();
+﻿		return n;
 
-			points.push( new THREE.Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
-			count ++;
-			pointUI.lbl.setValue( count );
+﻿	}
 
-		}
+﻿	function deletePointRow( idx ) {
 
-		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
-			points,
-			segments.getValue(),
-			phiStart.getValue() / 180 * Math.PI,
-			phiLength.getValue() / 180 * Math.PI
-		) ) );
+﻿		if ( ! pointsUI[ idx ] ) return;
 
-	}
+﻿		pointsList.remove( pointsUI[ idx ].row );
+﻿		pointsUI[ idx ] = null;
 
-	return container;
+﻿		update();
 
-};
+﻿	}
 
-Sidebar.Geometry.LatheBufferGeometry = Sidebar.Geometry.LatheGeometry;
+﻿	function update() {
+
+﻿		var points = [];
+﻿		var count = 0;
+
+﻿		for ( var i = 0; i < pointsUI.length; i ++ ) {
+
+﻿			var pointUI = pointsUI[ i ];
+
+﻿			if ( ! pointUI ) continue;
+
+﻿			points.push( new THREE.Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
+﻿			count ++;
+﻿			pointUI.lbl.setValue( count );
+
+﻿		}
+
+﻿		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
+﻿			points,
+﻿			segments.getValue(),
+﻿			phiStart.getValue() / 180 * Math.PI,
+﻿			phiLength.getValue() / 180 * Math.PI
+﻿		) ) );
+
+﻿	}
+
+﻿	return container;
+
+﻿};
+
+﻿Sidebar.Geometry.LatheBufferGeometry = Sidebar.Geometry.LatheGeometry;
