@@ -19,7 +19,7 @@
 		for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
 		or binary (.glb) format. External files store textures (.jpg, .png, ...) and additional binary
 		data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
-		textures, shaders, skins, skeletons, morph targets, animations, lights, and/or cameras.
+		textures, skins, skeletons, morph targets, animations, lights, and/or cameras.
 		</div>
 
 		<h2>Extensions</h2>
@@ -30,17 +30,18 @@
 
 		<ul>
 			<li>
-				KHR_lights
+				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_pbrSpecularGlossiness">
+					KHR_materials_pbrSpecularGlossiness
+				</a>
 			</li>
 			<li>
 				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_common">
 					KHR_materials_common
 				</a>
+				(experimental)
 			</li>
 			<li>
-				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_pbrSpecularGlossiness">
-					KHR_materials_pbrSpecularGlossiness
-				</a>
+				KHR_lights (experimental)
 			</li>
 		</ul>
 
@@ -91,7 +92,7 @@
 
 		<h3>[method:null setPath]( [page:String path] )</h3>
 		<div>
-		[page:String path] — Base path for loading additional resources e.g. textures, GLSL shaders, .bin data.
+		[page:String path] — Base path for loading additional resources e.g. textures and .bin data.
 		</div>
 		<div>
 		Set the base path for additional resources.
@@ -106,7 +107,7 @@
 		<div>
 		[page:Object json] — <em>JSON</em> object to parse.<br />
 		[page:Function callBack] — Will be called when parse completes.<br />
-		[page:String path] — The base path from which to find subsequent glTF resources such as textures, GLSL shaders and .bin data files.<br />
+		[page:String path] — The base path from which to find subsequent glTF resources such as textures and .bin data files.<br />
 		</div>
 		<div>
 		Parse a glTF-based <em>JSON</em> structure and fire [page:Function callback] when complete. The argument to [page:Function callback] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], and .[page:Array animations].
