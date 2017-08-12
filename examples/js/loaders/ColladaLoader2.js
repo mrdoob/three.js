@@ -3136,6 +3136,8 @@ THREE.ColladaLoader.prototype = {
 
 				var material = ( materials.length === 1 ) ? materials[ 0 ] : materials;
 
+				var object;
+
 				switch ( type ) {
 
 					case 'lines':
