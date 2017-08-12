@@ -279,8 +279,10 @@ THREE.GLTFExporter.prototype = {
 				outputJSON.materials = [];
 			}
 
-			if ( !material instanceof THREE.MeshStandardMaterial ) {
-				throw 'Currently just support THREE.StandardMaterial is supported';
+			if ( !( material instanceof THREE.MeshStandardMaterial ) ) {
+
+				console.warn( 'Currently just THREE.StandardMaterial is supported. Material conversion may lose information.' );
+
 			}
 
 			// @QUESTION Should we avoid including any attribute that has the default value?
@@ -430,6 +432,14 @@ THREE.GLTFExporter.prototype = {
 				mode = gl.POINTS;
 
 			} else {
+
+				if ( !( geometry instanceof THREE.BufferGeometry) ) {
+
+					var geometryTemp = new THREE.BufferGeometry();
+					geometryTemp.fromGeometry( geometry );
+					geometry = geometryTemp;
+
+				}
 
 				// @QUESTION Set mode = gl.LINES if material.wireframe = true ?
 				if ( mesh.drawMode === THREE.TriangleFanDrawMode ) {

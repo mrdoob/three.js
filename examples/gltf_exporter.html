@@ -81,21 +81,23 @@
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
-				// var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
+				// var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } )
 
-				//
+				var material = new THREE.MeshBasicMaterial( {
+					color: 0xff0000
+				} );
 
-				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 1 ), material );
+				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 0 ), material );
 				object.position.set( -200, 0, 200 );
 				scene1.add( object );
 
-				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 2 ), material );
+				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 1 ), material );
 				object.position.set( 0, 0, 200 );
-				// scene1.add( object );
+				scene1.add( object );
 
 				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
 				object.position.set( 200, 0, 200 );
-				// scene1.add( object );
+				scene1.add( object );
 
 				//
 
@@ -111,11 +113,12 @@
 					metalness: 0.5,
 					roughness: 1.0
 				} );
-/*
+/*Ç
 				object = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 32, 32 ), material );
 				object.position.set( 0, 0, 0 );
 				object.name = "Sphere";
-				// scene1.add(object);
+				scene1.add( object );
+
 /*
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xff0000,
@@ -198,7 +201,7 @@
 
 				object.userData = { data: 'customdata', list: [ 1,2,3,4 ] };
 
-				// scene1.add( object );
+				scene1.add( object );
 
 
 				// ---------------------------------
@@ -371,8 +374,8 @@
 
 				var timer = Date.now() * 0.001;
 
-				camera.position.x = Math.cos( timer ) * 300;
-				camera.position.z = Math.sin( timer ) * 300;
+				camera.position.x = Math.cos( timer ) * 600;
+				camera.position.z = Math.sin( timer ) * 600;
 
 				camera.lookAt( scene1.position );
 				renderer.render( scene1, camera );
