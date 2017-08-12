@@ -189,23 +189,7 @@ THREE.OBJLoader2 = (function () {
 		LINE_VT: 'vt',
 		LINE_VN: 'vn',
 		LINE_MTLLIB: 'mtllib',
-		LINE_USEMTL: 'usemtl',
-		/*
-		 * Build Face/Quad: first element in indexArray is the line identification, therefore offset of one needs to be taken into account
-		 * N-Gons are not supported
-		 * Quad Faces: FaceA: 0, 1, 2  FaceB: 2, 3, 0
-		 *
-		 * 0: "f vertex/uv/normal	vertex/uv/normal	vertex/uv/normal	(vertex/uv/normal)"
-		 * 1: "f vertex/uv		  	vertex/uv		   	vertex/uv		   	(vertex/uv		 )"
-		 * 2: "f vertex//normal	 	vertex//normal	  	vertex//normal	  	(vertex//normal  )"
-		 * 3: "f vertex			 	vertex			  	vertex			  	(vertex		  	 )"
-		 *
-		 * @param indexArray
-		 * @param faceType
-		 */
-		QUAD_INDICES_1: [ 1, 2, 3, 3, 4, 1 ],
-		QUAD_INDICES_2: [ 1, 3, 5, 5, 7, 1 ],
-		QUAD_INDICES_3: [ 1, 4, 7, 7, 10, 1 ]
+		LINE_USEMTL: 'usemtl'
 	};
 
 	var Validator = {
