@@ -37,7 +37,7 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/GrayScaleShader.js"></script>
+		<script src="js/shaders/LuminosityShader.js"></script>
 		<script src="js/shaders/SobelOperatorShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
@@ -105,7 +105,7 @@
 
 				// color to grayscale conversion
 
-				var effectGrayScale = new THREE.ShaderPass( THREE.GrayScaleShader );
+				var effectGrayScale = new THREE.ShaderPass( THREE.LuminosityShader );
 				composer.addPass( effectGrayScale );
 
 				// you might want to use a gaussian blur filter before
