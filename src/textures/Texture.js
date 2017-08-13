@@ -239,8 +239,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		if ( this.mapping !== UVMapping ) return;
 
-		uv.multiply( this.repeat );
-		uv.add( this.offset ); // todo: support rotation and matrixAutoUpdate flag
+		uv.applyMatrix3( this.matrix );
 
 		if ( uv.x < 0 || uv.x > 1 ) {
 
