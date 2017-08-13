@@ -2798,7 +2798,9 @@ THREE.GLTF2Loader = ( function () {
 										break;
 
 									default:
+										var previousDrawMode = child.drawMode;
 										child = new THREE.Mesh( originalGeometry, material );
+										child.drawMode = previousDrawMode;
 
 								}
 
