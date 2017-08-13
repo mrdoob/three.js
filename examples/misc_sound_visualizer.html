@@ -133,7 +133,7 @@
 		var size = fftSize / 2;
 
 		uniforms = {
-			tAudioData: { value: new THREE.DataTexture( new Uint8Array( size * 3 ), size, 1, THREE.RGBFormat ) }
+			tAudioData: { value: new THREE.DataTexture( analyser.data, size, 1, THREE.LuminanceFormat ) }
 		};
 
 		var material = new THREE.ShaderMaterial( {
@@ -172,14 +172,6 @@
 	function render() {
 
 		var data = analyser.getFrequencyData();
-
-		// transfer all frequency data to our data texture so we can use them in the fragment shader
-
-		for ( var i = 0, l = data.length; i < l; i ++ ) {
-
-			uniforms.tAudioData.value.image.data[ i * 3 ] = data[ i ];
-
-		}
 
 		uniforms.tAudioData.value.needsUpdate = true;
 
