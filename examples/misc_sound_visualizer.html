@@ -97,14 +97,14 @@
 
 		renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setSize( window.innerWidth, window.innerHeight );
-		renderer.setClearColor( 0x20252f );
+		renderer.setClearColor( 0x000000 );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		container.appendChild( renderer.domElement );
 
 		//
 
-		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-		camera.position.set( 0, 5, 50 );
+		camera = new THREE.Camera();
+		camera.position.z = 1;
 
 		//
 
