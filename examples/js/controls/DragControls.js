@@ -31,9 +31,6 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 		_domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
-		_domElement.addEventListener( 'touchmove', onDocumentMouseMove, false );
-		_domElement.addEventListener( 'touchstart', onDocumentMouseDown, false );
-		_domElement.addEventListener( 'touchend', onDocumentMouseUp, false );
 
 	}
 
@@ -42,10 +39,6 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 		_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
 		_domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-		_domElement.removeEventListener( 'touchmove', onDocumentMouseMove, false );
-		_domElement.removeEventListener( 'touchstart', onDocumentMouseDown, false );
-		_domElement.removeEventListener( 'touchend', onDocumentMouseUp, false );
-
 
 	}
 
@@ -58,12 +51,11 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	function onDocumentMouseMove( event ) {
 
 		event.preventDefault();
-		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 		var rect = _domElement.getBoundingClientRect();
 
-		_mouse.x = ( ( pointer.clientX - rect.left ) / rect.width ) * 2 - 1;
-		_mouse.y = - ( ( pointer.clientY - rect.top ) / rect.height ) * 2 + 1;
+		_mouse.x = ( (event.clientX - rect.left) / rect.width ) * 2 - 1;
+		_mouse.y = - ( (event.clientY - rect.top) / rect.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
@@ -118,12 +110,6 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	function onDocumentMouseDown( event ) {
 
 		event.preventDefault();
-		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
-
-		var rect = _domElement.getBoundingClientRect();
-
-		_mouse.x = ( ( pointer.clientX - rect.left ) / rect.width ) * 2 - 1;
-		_mouse.y = - ( ( pointer.clientY - rect.top ) / rect.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
@@ -132,10 +118,6 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 		if ( intersects.length > 0 ) {
 
 			_selected = intersects[ 0 ].object;
-
-			// to avoid don't have a touchmove event before touchstart on mobile
-
-			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _selected.position );
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
