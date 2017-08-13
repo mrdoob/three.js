@@ -34,8 +34,11 @@
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
+			varying vec2 vUv;
+
 			void main()	{
 
+				vUv = uv;
 				gl_Position = vec4( position, 1.0 );
 
 			}
@@ -45,17 +48,16 @@
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
 			uniform sampler2D tAudioData;
-			uniform vec2 resolution;
+
+			varying vec2 vUv;
 
 			void main()	{
-
-				vec2 uv = gl_FragCoord.xy / resolution.xy;
 
 				vec3 backgroundColor = vec3( 0.0 );
 				vec3 color = vec3( 1.0, 0.0, 0.0 );
 
-				float f = texture2D( tAudioData, vec2( uv.x, 0.0 ) ).r; // sample data texture (only the red channel is relevant)
-				float i = step( uv.y, f );
+				float f = texture2D( tAudioData, vec2( vUv.x, 0.0 ) ).r; // sample data texture (only the red channel is relevant)
+				float i = step( vUv.y, f );
 
 				gl_FragColor = vec4( mix( backgroundColor, color, i ), 1.0 );
 
@@ -131,8 +133,7 @@
 		var size = fftSize / 2;
 
 		uniforms = {
-			tAudioData: { value: new THREE.DataTexture( new Uint8Array( size * 3 ), size, 1, THREE.RGBFormat ) },
-			resolution: { value: new THREE.Vector2( renderer.domElement.width, renderer.domElement.height ) }
+			tAudioData: { value: new THREE.DataTexture( new Uint8Array( size * 3 ), size, 1, THREE.RGBFormat ) }
 		};
 
 		var material = new THREE.ShaderMaterial( {
@@ -157,9 +158,6 @@
 	function onResize() {
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
-
-		uniforms.resolution.value.x = renderer.domElement.width;
-		uniforms.resolution.value.y = renderer.domElement.height;
 
 	}
 
