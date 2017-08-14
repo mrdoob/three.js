@@ -6,7 +6,9 @@
 // GLTF Exporter
 //------------------------------------------------------------------------------
 THREE.GLTFExporter = function ( renderer ) {
+
 	this.renderer = renderer;
+
 };
 
 THREE.GLTFExporter.prototype = {
@@ -16,8 +18,8 @@ THREE.GLTFExporter.prototype = {
 	/**
 	 * Parse scenes and generate GLTF output
 	 * @param  {THREE.Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
-	 * @param  {[type]} onDone  Callback on completed
-	 * @param  {[type]} options options
+	 * @param  {Function} onDone  Callback on completed
+	 * @param  {Object} options options
 	 *                          trs: Exports position, rotation and scale instead of matrix
 	 */
 	parse: function ( input, onDone, options ) {
@@ -28,10 +30,14 @@ THREE.GLTFExporter.prototype = {
 		var gl = this.renderer.context;
 
 		var outputJSON = {
+
 			asset: {
+
 				version: "2.0",
 				generator: "THREE.JS GLTFExporter" // @QUESTION Does it support spaces?
+
 		 	}
+
     };
 
 		var byteOffset = 0;
@@ -40,10 +46,20 @@ THREE.GLTFExporter.prototype = {
 		/**
 		 * Compare two arrays
 		 */
+		/**
+		 * Compare two arrays
+		 * @param  {Array} array1 Array 1 to compare
+		 * @param  {Array} array2 Array 2 to compare
+		 * @return {Boolean}        Returns true if both arrays are equal
+		 */
 		function equalArray ( array1, array2 ) {
+
 			return ( array1.length === array2.length ) && array1.every( function( element, index ) {
+
     		return element === array2[ index ];
+
 			});
+
 		}
 
 		/**
@@ -52,34 +68,27 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Object} Object containing the `min` and `max` values (As an array of attribute.itemSize components)
 		 */
 		function getMinMax ( attribute ) {
+
 			var output = {
+
 				min: new Array( attribute.itemSize ).fill( Number.POSITIVE_INFINITY ),
 				max: new Array( attribute.itemSize ).fill( Number.NEGATIVE_INFINITY )
+
 			};
 
 			for ( var i = 0; i < attribute.count; i++ ) {
+
 				for ( var a = 0; a < attribute.itemSize; a++ ) {
+
 					var value = attribute.array[ i * attribute.itemSize + a ];
 					output.min[ a ] = Math.min( output.min[ a ], value );
 					output.max[ a ] = Math.max( output.max[ a ], value );
+
 				}
+
 			}
 
 			return output;
-		}
-
-		/**
-		 * Add extension to the extensions array
-		 * @param {String} extensionName Extension name
-		 */
-		function addExtension ( extensionName ) {
-			if ( !outputJSON.extensionsUsed ) {
-				outputJSON.extensionsUsed = [];
-			}
-
-			if ( outputJSON.extensionsUsed.indexOf( extensionName ) !== -1 ) {
-				outputJSON.extensionsUsed.push( extensionName );
-			}
 		}
 
 		/**
@@ -89,13 +98,20 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Integer}               Index of the buffer created (Currently always 0)
 		 */
 		function processBuffer ( attribute, componentType ) {
+
 			if ( !outputJSON.buffers ) {
+
 				outputJSON.buffers = [
+
 					{
+
 						byteLength: 0,
 						uri: ''
+
 					}
+
 				];
+
 			}
 
 			// Create a new dataview and dump the attribute's array into it
@@ -105,22 +121,35 @@ THREE.GLTFExporter.prototype = {
 			var offsetInc = componentType === gl.UNSIGNED_SHORT ? 2 : 4;
 
 			for ( var i = 0; i < attribute.count; i++ ) {
+
 				for (var a = 0; a < attribute.itemSize; a++ ) {
+
 					var value = attribute.array[ i * attribute.itemSize + a ];
+
 					if ( componentType === gl.FLOAT ) {
+
 						dataView.setFloat32( offset, value, true );
+
 					} else if ( componentType === gl.UNSIGNED_INT ) {
+
 						dataView.setUint8( offset, value, true );
+
 					} else if ( componentType === gl.UNSIGNED_SHORT ) {
+
 						dataView.setUint16( offset, value, true );
+
 					}
+
 					offset += offsetInc;
+
 				}
+
 			}
 
 			// We just use one buffer
 			dataViews.push( dataView );
 
+			// Always using just one buffer
 			return 0;
 		}
 
@@ -130,17 +159,23 @@ THREE.GLTFExporter.prototype = {
 		 * @return {[type]}      [description]
 		 */
 		function processBufferView ( data, componentType ) {
+
 			var isVertexAttributes = componentType === gl.FLOAT;
+
 			if ( !outputJSON.bufferViews ) {
+
 				outputJSON.bufferViews = [];
+
 			}
 
 			var gltfBufferView = {
+
 				buffer: processBuffer( data, componentType ),
 				byteOffset: byteOffset,
 				byteLength: data.array.byteLength,
 				byteStride: data.itemSize * ( componentType === gl.UNSIGNED_SHORT ? 2 : 4 ),
 				target: isVertexAttributes ? gl.ARRAY_BUFFER : gl.ELEMENT_ARRAY_BUFFER
+
 			};
 
 			byteOffset += data.array.byteLength;
@@ -149,10 +184,14 @@ THREE.GLTFExporter.prototype = {
 
 			// @TODO Ideally we'll have just two bufferviews: 0 is for vertex attributes, 1 for indices
 			var output = {
+
 				id: outputJSON.bufferViews.length - 1,
 				byteLength: 0
+
 			};
+
 			return output;
+
 		}
 
 		/**
@@ -161,34 +200,48 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Integer}           Index of the processed accessor on the "accessors" array
 		 */
 		function processAccessor ( attribute ) {
+
 			if ( !outputJSON.accessors ) {
+
 				outputJSON.accessors = [];
+
 			}
 
 			var types = [
+
 				'SCALAR',
 				'VEC2',
 				'VEC3',
 				'VEC4'
+
 			];
 
 			var componentType;
 
 			// Detect the component type of the attribute array (float, uint or ushort)
 			if ( attribute.array.constructor === Float32Array ) {
+
 				componentType = gl.FLOAT;
+
 			} else if ( attribute.array.constructor === Uint32Array ) {
+
 				componentType = gl.UNSIGNED_INT;
+
 			} else if ( attribute.array.constructor === Uint16Array ) {
+
 				componentType = gl.UNSIGNED_SHORT;
+
 			} else {
+
 				throw new Error( 'THREE.GLTF2Exporter: Unsupported bufferAttribute component type.' );
+
 			}
 
 			var minMax = getMinMax( attribute );
 			var bufferView = processBufferView( attribute, componentType );
 
 			var gltfAccessor = {
+
 				bufferView: bufferView.id,
 				byteOffset: bufferView.byteOffset,
 				componentType: componentType,
@@ -196,11 +249,13 @@ THREE.GLTFExporter.prototype = {
 				max: minMax.max,
 				min: minMax.min,
 				type: types[ attribute.itemSize - 1 ]
+
 			};
 
 			outputJSON.accessors.push( gltfAccessor );
 
 			return outputJSON.accessors.length - 1;
+
 		}
 
 		/**
@@ -209,22 +264,30 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Integer}     Index of the processed texture in the "images" array
 		 */
 		function processImage ( map ) {
+
 			if ( !outputJSON.images ) {
+
 				outputJSON.images = [];
+
 			}
 
 			var gltfImage = {};
 
 			if ( options.embedImages ) {
+
 				// @TODO { bufferView, mimeType }
+
 			} else {
+
 				// @TODO base64 based on options
 				gltfImage.uri = map.image.src;
+
 			}
 
 			outputJSON.images.push( gltfImage );
 
 			return outputJSON.images.length - 1;
+
 		}
 
 		/**
@@ -233,20 +296,26 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Integer}     Index of the processed texture in the "samplers" array
 		 */
 		function processSampler ( map ) {
+
 			if ( !outputJSON.samplers ) {
+
 				outputJSON.samplers = [];
+
 			}
 
 			var gltfSampler = {
+
 				magFilter: glUtils.convert( map.magFilter ),
 				minFilter: glUtils.convert( map.minFilter ),
 				wrapS: glUtils.convert( map.wrapS ),
 				wrapT: glUtils.convert( map.wrapT )
+
 			};
 
 			outputJSON.samplers.push( gltfSampler );
 
 			return outputJSON.samplers.length - 1;
+
 		}
 
 		/**
@@ -255,18 +324,24 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Integer}     Index of the processed texture in the "textures" array
 		 */
 		function processTexture ( map ) {
+
 			if (!outputJSON.textures) {
+
 				outputJSON.textures = [];
+
 			}
 
 			var gltfTexture = {
+
 				sampler: processSampler( map ),
 				source: processImage( map )
+
 			};
 
 			outputJSON.textures.push( gltfTexture );
 
 			return outputJSON.textures.length - 1;
+
 		}
 
 		/**
@@ -275,8 +350,11 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Integer}      Index of the processed material in the "materials" array
 		 */
 		function processMaterial ( material ) {
+
 			if ( !outputJSON.materials ) {
+
 				outputJSON.materials = [];
+
 			}
 
 			if ( !( material instanceof THREE.MeshStandardMaterial ) ) {
@@ -287,11 +365,14 @@ THREE.GLTFExporter.prototype = {
 
 			// @QUESTION Should we avoid including any attribute that has the default value?
 			var gltfMaterial = {
+
 				pbrMetallicRoughness: {}
+
 			};
 
 			// pbrMetallicRoughness.baseColorFactor
 			var color = material.color.toArray().concat( [ material.opacity ] );
+
 			if ( !equalArray( color, [ 1, 1, 1, 1 ] ) ) {
 
 				gltfMaterial.pbrMetallicRoughness.baseColorFactor = color;
@@ -314,21 +395,23 @@ THREE.GLTFExporter.prototype = {
 			if ( material.map ) {
 
 				gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
+
 					index: processTexture( material.map ),
 					texCoord: 0 // @FIXME
+
 				};
 
 			}
 
-
-			if ( material instanceof THREE.MeshBasicMaterial
-				|| material instanceof THREE.LineBasicMaterial
-				|| material instanceof THREE.PointsMaterial ) {
+			if ( material instanceof THREE.MeshBasicMaterial ||
+				material instanceof THREE.LineBasicMaterial ||
+				material instanceof THREE.PointsMaterial ) {
 
 			} else {
 
 				// emissiveFactor
 				var emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
+
 				if ( !equalArray( emissive, [ 0, 0, 0 ] ) ) {
 
 					gltfMaterial.emissiveFactor = emissive;
@@ -353,8 +436,10 @@ THREE.GLTFExporter.prototype = {
 			if ( material.normalMap ) {
 
 				gltfMaterial.normalTexture = {
+
 					index: processTexture( material.normalMap ),
 					texCoord: 0 // @FIXME
+
 				};
 
 			}
@@ -363,8 +448,10 @@ THREE.GLTFExporter.prototype = {
 			if ( material.aoMap ) {
 
 				gltfMaterial.occlusionTexture = {
+
 					index: processTexture( material.aoMap ),
 					texCoord: 0 // @FIXME
+
 				};
 
 			}
@@ -383,7 +470,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material.name !== undefined ) {
+			if ( material.name ) {
 
 				gltfMaterial.name = material.name;
 
@@ -401,8 +488,11 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Integer}      Index of the processed mesh in the "meshes" array
 		 */
 		function processMesh( mesh ) {
+
 			if ( !outputJSON.meshes ) {
-					outputJSON.meshes = [];
+
+				outputJSON.meshes = [];
+
 			}
 
 			var geometry = mesh.geometry;
@@ -473,19 +563,23 @@ THREE.GLTFExporter.prototype = {
 
 			// Conversion between attributes names in threejs and gltf spec
 			var nameConversion = {
+
 				uv: 'TEXCOORD_0',
 				uv2: 'TEXCOORD_1',
 				color: 'COLOR_0',
 				skinWeight: 'WEIGHTS_0',
 				skinIndex: 'JOINTS_0'
+
 			};
 
 			// @QUESTION Detect if .vertexColors = THREE.VertexColors?
 			// For every attribute create an accessor
-			for ( attributeName in geometry.attributes ) {
+			for ( var attributeName in geometry.attributes ) {
+
 				var attribute = geometry.attributes[ attributeName ];
-				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase()
+				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
 				gltfAttributes[ attributeName ] = processAccessor( attribute );
+
 			}
 
 			outputJSON.meshes.push( gltfMesh );
@@ -499,14 +593,19 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Integer}      Index of the processed mesh in the "camera" array
 		 */
 		function processCamera( camera ) {
+
 			if ( !outputJSON.cameras ) {
+
 				outputJSON.cameras = [];
+
 			}
 
 			var isOrtho = camera instanceof THREE.OrthographicCamera;
 
 			var gltfCamera = {
+
 				type: isOrtho ? 'orthographic' : 'perspective'
+
 			};
 
 			if ( isOrtho ) {
@@ -518,7 +617,7 @@ THREE.GLTFExporter.prototype = {
 					zfar: camera.far,
 					znear: camera.near
 
-				}
+				};
 
 			} else {
 
@@ -533,8 +632,10 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( camera.name !== undefined ) {
+			if ( camera.name ) {
+
 				gltfCamera.name = camera.type;
+
 			}
 
 			outputJSON.cameras.push( gltfCamera );
@@ -550,37 +651,52 @@ THREE.GLTFExporter.prototype = {
 		function processNode ( object ) {
 
 			if ( !outputJSON.nodes ) {
+
 				outputJSON.nodes = [];
+
 			}
 
 			var gltfNode = {};
 
 			if ( options.trs ) {
+
 				var rotation = object.quaternion.toArray();
 				var position = object.position.toArray();
 				var scale = object.scale.toArray();
 
 				if ( !equalArray( rotation, [ 0, 0, 0, 1 ] ) ) {
+
 					gltfNode.rotation = rotation;
+
 				}
 
 				if ( !equalArray( position, [ 0, 0, 0 ] ) ) {
+
 					gltfNode.position = position;
+
 				}
 
 				if ( !equalArray( scale, [ 1, 1, 1 ] ) ) {
+
 					gltfNode.scale = scale;
+
 				}
 
 			} else {
+
 				object.updateMatrix();
 				if (! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
-					gltfNode.matrix = object.matrix.elements;
-				}
-			};
 
-			if ( object.name !== undefined ) {
+					gltfNode.matrix = object.matrix.elements;
+
+				}
+
+			}
+
+			if ( object.name ) {
+
 				gltfNode.name = object.name;
+
 			}
 
 			if ( object.userData && Object.keys( object.userData ).length > 0 ) {
@@ -597,32 +713,43 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( object instanceof THREE.Mesh
-				|| object instanceof THREE.Line
-				|| object instanceof THREE.Points ) {
+			if ( object instanceof THREE.Mesh ||
+				object instanceof THREE.Line ||
+				object instanceof THREE.Points ) {
+
 				gltfNode.mesh = processMesh( object );
+
 			} else if ( object instanceof THREE.Camera ) {
+
 				gltfNode.camera = processCamera( object );
+
 			}
 
 			if ( object.children.length > 0 ) {
+
 				gltfNode.children = [];
 
 				for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
 					var child = object.children[ i ];
-					if ( child instanceof THREE.Mesh
-						|| child instanceof THREE.Camera
-						|| child instanceof THREE.Group
-						|| child instanceof THREE.Line
-						|| child instanceof THREE.Points) {
+					if ( child instanceof THREE.Mesh ||
+						child instanceof THREE.Camera ||
+						child instanceof THREE.Group ||
+						child instanceof THREE.Line ||
+						child instanceof THREE.Points) {
+
 						gltfNode.children.push( processNode( child ) );
+
 					}
+
 				}
+
 			}
 
 			outputJSON.nodes.push( gltfNode );
 
 			return outputJSON.nodes.length - 1;
+
 		}
 
 		/**
@@ -632,41 +759,58 @@ THREE.GLTFExporter.prototype = {
 		function processScene( scene ) {
 
 			if ( !outputJSON.scenes ) {
+
 				outputJSON.scenes = [];
 				outputJSON.scene = 0;
+
 			}
 
 			var gltfScene = {
+
 				nodes: []
+
 			};
 
-			if ( scene.name !== undefined ) {
+			if ( scene.name ) {
+
 				gltfScene.name = scene.name;
+
 			}
 
 			outputJSON.scenes.push( gltfScene );
 
 			for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
 				var child = scene.children[ i ];
 
-				// @TODO Right now we just process meshes and lights
-				if ( child instanceof THREE.Mesh
-					|| child instanceof THREE.Camera
-					|| child instanceof THREE.Group
-					|| child instanceof THREE.Line
-					|| child instanceof THREE.Points) {
+				// @TODO We don't process lights yet
+				if ( child instanceof THREE.Mesh ||
+					child instanceof THREE.Camera ||
+					child instanceof THREE.Group ||
+					child instanceof THREE.Line ||
+					child instanceof THREE.Points) {
+
 					gltfScene.nodes.push( processNode( child ) );
+
 				}
+
 			}
+
 		}
 
 		// Process the scene/s
 		if ( input instanceof Array ) {
+
 			for ( i = 0; i < input.length; i++ ) {
+
 				processScene( input[ i ] );
+
 			}
+
 		} else {
+
 			processScene( input );
+
 		}
 
 		// Generate buffer
@@ -675,18 +819,24 @@ THREE.GLTFExporter.prototype = {
 
 		// Update the bytlength of the only main buffer and update the uri with the base64 representation of it
 		if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
+
 			outputJSON.buffers[ 0 ].byteLength = blob.size;
 			objectURL = URL.createObjectURL( blob );
 
 			var reader = new window.FileReader();
 			 reader.readAsDataURL( blob );
 			 reader.onloadend = function() {
+
 				 base64data = reader.result;
 				 outputJSON.buffers[ 0 ].uri = base64data;
 				 onDone( outputJSON );
-			 }
+
+			 };
+
 		} else {
+
 			onDone ( outputJSON );
+
 		}
 	}
 };
