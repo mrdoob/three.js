@@ -199,8 +199,6 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	// touch
 
-	var touch = new THREE.Vector3();
-
 	var touches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 	var prevTouches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 
