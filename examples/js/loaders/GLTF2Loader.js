@@ -2758,6 +2758,7 @@ THREE.GLTF2Loader = ( function () {
 							for ( var childrenId in group.children ) {
 
 								var child = group.children[ childrenId ];
+								var originalChild = child;
 
 								// clone Mesh to add to _node
 
@@ -2798,9 +2799,8 @@ THREE.GLTF2Loader = ( function () {
 										break;
 
 									default:
-										var previousDrawMode = child.drawMode;
 										child = new THREE.Mesh( originalGeometry, material );
-										child.drawMode = previousDrawMode;
+										child.drawMode = originalChild.drawMode;
 
 								}
 
