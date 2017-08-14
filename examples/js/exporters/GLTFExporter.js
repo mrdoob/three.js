@@ -286,59 +286,52 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			// @QUESTION Should we avoid including any attribute that has the default value?
-			var gltfMaterial = {};
+			var gltfMaterial = {
+				pbrMetallicRoughness: {}
+			};
+
+			// pbrMetallicRoughness.baseColorFactor
+			var color = material.color.toArray().concat( [ material.opacity ] );
+			if ( !equalArray( color, [ 1, 1, 1, 1 ] ) ) {
+
+				gltfMaterial.pbrMetallicRoughness.baseColorFactor = color;
+
+			}
 
 			if ( material instanceof THREE.MeshStandardMaterial ) {
 
-				gltfMaterial.pbrMetallicRoughness = {
-					baseColorFactor: material.color.toArray().concat( [ material.opacity ] ),
-					metallicFactor: material.metalness,
-					roughnessFactor: material.roughness
+				gltfMaterial.pbrMetallicRoughness.metallicFactor = material.metalness;
+				gltfMaterial.pbrMetallicRoughness.roughnessFactor = material.roughness;
+
+ 			} else {
+
+					gltfMaterial.pbrMetallicRoughness.metallicFactor = 0.5;
+					gltfMaterial.pbrMetallicRoughness.roughnessFactor = 0.5;
+
+			}
+
+			// pbrMetallicRoughness.baseColorTexture
+			if ( material.map ) {
+
+				gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
+					index: processTexture( material.map ),
+					texCoord: 0 // @FIXME
 				};
 
 			}
+
 
 			if ( material instanceof THREE.MeshBasicMaterial
 				|| material instanceof THREE.LineBasicMaterial
 				|| material instanceof THREE.PointsMaterial ) {
 
-				// emissiveFactor
-				var color = material.color.toArray();
-				if ( !equalArray( color, [ 0, 0, 0 ] ) ) {
-
-					gltfMaterial.emissiveFactor = color;
-
-				}
-
-				// emissiveTexture
-				if ( material.map ) {
-
-					gltfMaterial.emissiveTexture = {
-
-						index: processTexture( material.map ),
-						texCoord: 0 // @FIXME
-
-					};
-
-				}
-
 			} else {
 
 				// emissiveFactor
-				var emissive = material.emissive.toArray();
+				var emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
 				if ( !equalArray( emissive, [ 0, 0, 0 ] ) ) {
 
 					gltfMaterial.emissiveFactor = emissive;
-
-				}
-
-				// pbrMetallicRoughness.baseColorTexture
-				if ( material.map ) {
-
-					gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
-						index: processTexture( material.map ),
-						texCoord: 0 // @FIXME
-					};
 
 				}
 
