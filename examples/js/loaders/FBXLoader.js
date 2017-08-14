@@ -185,12 +185,12 @@
 	/**
 	 * Parses map of images referenced in FBXTree.
 	 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
-	 * @returns {Map<number, string(image blob URL)>}
+	 * @returns {Map<number, string(image blob/data URL)>}
 	 */
 	function parseImages( FBXTree ) {
 
 		/**
-		 * @type {Map<number, string(image blob URL)>}
+		 * @type {Map<number, string(image blob/data URL)>}
 		 */
 		var imageMap = new Map();
 
@@ -220,12 +220,11 @@
 
 	/**
 	 * @param {videoNode} videoNode - Node to get texture image information from.
-	 * @returns {string} - image blob URL
+	 * @returns {string} - image blob/data URL
 	 */
 	function parseImage( videoNode ) {
 
-		var buffer = videoNode.properties.Content;
-		var array = new Uint8Array( buffer );
+		var content = videoNode.properties.Content;
 		var fileName = videoNode.properties.RelativeFilename || videoNode.properties.Filename;
 		var extension = fileName.slice( fileName.lastIndexOf( '.' ) + 1 ).toLowerCase();
 
@@ -260,7 +259,16 @@
 
 		}
 
-		return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+		if ( typeof content === 'string' ) {
+
+			return 'data:' + type + ';base64,' + content;
+
+		} else {
+
+			var array = new Uint8Array( content );
+			return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+
+		}
 
 	}
 
@@ -268,7 +276,7 @@
 	 * Parses map of textures referenced in FBXTree.
 	 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
 	 * @param {THREE.TextureLoader} loader
-	 * @param {Map<number, string(image blob URL)>} imageMap
+	 * @param {Map<number, string(image blob/data URL)>} imageMap
 	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 	 * @returns {Map<number, THREE.Texture>}
 	 */
@@ -298,7 +306,7 @@
 	/**
 	 * @param {textureNode} textureNode - Node to get texture information from.
 	 * @param {THREE.TextureLoader} loader
-	 * @param {Map<number, string(image blob URL)>} imageMap
+	 * @param {Map<number, string(image blob/data URL)>} imageMap
 	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 	 * @returns {THREE.Texture}
 	 */
@@ -345,7 +353,7 @@
 
 		var currentPath = loader.path;
 
-		if ( fileName.indexOf( 'blob:' ) === 0 ) {
+		if ( fileName.indexOf( 'blob:' ) === 0 || fileName.indexOf( 'data:' ) === 0 ) {
 
 			loader.setPath( undefined );
 
@@ -3619,25 +3627,28 @@
 
 			var split = text.split( '\n' );
 
-			for ( var line in split ) {
+			for ( var lineNum = 0, lineLength = split.length; lineNum < lineLength; lineNum ++ ) {
 
-				var l = split[ line ];
+				var l = split[ lineNum ];
 
-				// short cut
+				// skip comment line
 				if ( l.match( /^[\s\t]*;/ ) ) {
 
 					continue;
 
-				} // skip comment line
+				}
+
+				// skip empty line
 				if ( l.match( /^[\s\t]*$/ ) ) {
 
 					continue;
 
-				} // skip empty line
+				}
 
 				// beginning of node
 				var beginningOfNodeExp = new RegExp( '^\\t{' + this.currentIndent + '}(\\w+):(.*){', '' );
 				var match = l.match( beginningOfNodeExp );
+
 				if ( match ) {
 
 					var nodeName = match[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, '' );
@@ -3655,10 +3666,20 @@
 				// node's property
 				var propExp = new RegExp( '^\\t{' + ( this.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
 				var match = l.match( propExp );
+
 				if ( match ) {
 
 					var propName = match[ 1 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
 					var propValue = match[ 2 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
+
+					// for special case: base64 image data follows "Content: ," line
+					//	Content: ,
+					//	 "iVB..."
+					if ( propName === 'Content' && propValue === ',' ) {
+
+						propValue = split[ ++ lineNum ].replace( /"/g, '' ).trim();
+
+					}
 
 					this.parseNodeProperty( l, propName, propValue );
 					continue;
@@ -3667,6 +3688,7 @@
 
 				// end of node
 				var endOfNodeExp = new RegExp( '^\\t{' + ( this.currentIndent - 1 ) + '}}' );
+
 				if ( l.match( endOfNodeExp ) ) {
 
 					this.nodeEnd();
