@@ -11,46 +11,63 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			#info {
+				text-align: center;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
 		</style>
 	</head>
 	<body>
+		<div id="info">
+			<button id="export">Export scene to .GLTF</button>
+		</div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 		<script src="js/exporters/GLTFExporter.js"></script>
 
 		<script>
 
-		var link = document.createElement( 'a' );
-		link.style.display = 'none';
-		document.body.appendChild( link ); // Firefox workaround, see #6594
+			document.getElementById( 'export' ).addEventListener( 'click', function () {
 
-		function save( blob, filename ) {
+				var gltfExporter = new THREE.GLTFExporter( renderer );
 
-			link.href = URL.createObjectURL( blob );
-			link.download = filename || 'data.json';
-			link.click();
+				gltfExporter.parse( [ scene1 ], function( result ) {
 
-			// URL.revokeObjectURL( url ); breaks Firefox...
+					var output = JSON.stringify( result, null, 2 );
+					console.log( output );
+					saveString( output, 'scene.gltf' );
 
-		}
+				} );
 
-		function saveString( text, filename ) {
+			} );
 
-			save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+			var link = document.createElement( 'a' );
+			link.style.display = 'none';
+			document.body.appendChild( link ); // Firefox workaround, see #6594
 
-		}
+			function save( blob, filename ) {
 
+				link.href = URL.createObjectURL( blob );
+				link.download = filename || 'data.json';
+				link.click();
 
+				// URL.revokeObjectURL( url ); breaks Firefox...
 
+			}
 
+			function saveString( text, filename ) {
 
+				save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+			}
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var container;
 
 			var camera, scene1, renderer;
 
@@ -78,12 +95,12 @@
 				// ---------------------------------------------------------------------
 				// Ambient light
 				// ---------------------------------------------------------------------
-				scene1.add( new THREE.AmbientLight( 0xffffff ) );
+				scene1.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 
 				// ---------------------------------------------------------------------
 				// DirectLight
 				// ---------------------------------------------------------------------
-				var light = new THREE.DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 0 );
 				scene1.add( light );
 
@@ -235,7 +252,7 @@
 
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-				object = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
+				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
 				object.position.set( 140, -40, -250);
 				object.setDrawMode( THREE.TriangleStripDrawMode );
 				object.name = 'Custom buffered';
@@ -311,10 +328,8 @@
 				scene1.add( cameraOrtho );
 				cameraOrtho.name = 'OrthographicCamera';
 
-				material = new THREE.MeshStandardMaterial( {
+				material = new THREE.MeshLambertMaterial( {
 					color: 0xffff00,
-					metalness: 0.5,
-					roughness: 1.0,
 					side: THREE.DoubleSide
 				} );
 
@@ -362,17 +377,10 @@
 
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gltfExporter = new THREE.GLTFExporter( renderer );
-				gltfExporter.parse( [ scene1 ], function( result ) {
-					 console.log( JSON.stringify( result, null, 2 ) );
-				} );
 			}
 
 			function onWindowResize() {
@@ -391,7 +399,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
 
 			}
 
