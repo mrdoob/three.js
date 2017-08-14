@@ -1181,6 +1181,7 @@ THREE.GLTF2Loader = ( function () {
 		LINEAR: 9729,
 		REPEAT: 10497,
 		SAMPLER_2D: 35678,
+		POINTS: 0,
 		LINES: 1,
 		LINE_LOOP: 2,
 		LINE_STRIP: 3,
@@ -2419,6 +2420,10 @@ THREE.GLTF2Loader = ( function () {
 
 							mesh = new THREE.LineLoop( geometry, material );
 
+						} else if ( primitive.mode === WEBGL_CONSTANTS.POINTS ) {
+
+							mesh = new THREE.Points( geometry, material );
+
 						} else {
 
 							throw new Error( 'THREE.GLTF2Loader: Primitive mode unsupported: ', primitive.mode );
@@ -2786,6 +2791,10 @@ THREE.GLTF2Loader = ( function () {
 
 									case 'Line':
 										child = new THREE.Line( originalGeometry, material );
+										break;
+
+									case 'Points':
+										child = new THREE.Points( originalGeometry, material );
 										break;
 
 									default:
