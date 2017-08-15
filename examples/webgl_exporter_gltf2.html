@@ -12,6 +12,7 @@
 				overflow: hidden;
 			}
 			#info {
+				color: #ccc;
 				text-align: center;
 				position: absolute;
 				top: 0px; width: 100%;
@@ -21,7 +22,12 @@
 	</head>
 	<body>
 		<div id="info">
-			<button id="export">Export scene to .GLTF</button>
+			GLTF2 Exporter<br/>
+			<button id="export_scene">Export Scene1</button>
+			<button id="export_scenes">Export Scene1 and Scene 2</button>
+			<button id="export_object">Export Sphere</button>
+			<button id="export_objects">Export Sphere and Grid</button>
+			<button id="export_scene_object">Export Scene1 and Sphere</button>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -31,11 +37,11 @@
 
 		<script>
 
-			document.getElementById( 'export' ).addEventListener( 'click', function () {
+			function exportGLTF( input ) {
 
 				var gltfExporter = new THREE.GLTFExporter( renderer );
 
-				gltfExporter.parse( [ scene1 ], function( result ) {
+				gltfExporter.parse( input, function( result ) {
 
 					var output = JSON.stringify( result, null, 2 );
 					console.log( output );
@@ -43,7 +49,38 @@
 
 				} );
 
+			}
+
+			document.getElementById( 'export_scene' ).addEventListener( 'click', function () {
+
+				exportGLTF( scene1 );
+
 			} );
+
+			document.getElementById( 'export_scenes' ).addEventListener( 'click', function () {
+
+				exportGLTF( [ scene1, scene2 ] );
+
+			} );
+
+			document.getElementById( 'export_object' ).addEventListener( 'click', function () {
+
+				exportGLTF( sphere );
+
+			} );
+
+			document.getElementById( 'export_objects' ).addEventListener( 'click', function () {
+
+				exportGLTF( [ sphere, gridHelper ] );
+
+			} );
+
+			document.getElementById( 'export_scene_object' ).addEventListener( 'click', function () {
+
+				exportGLTF( [ scene1, gridHelper ] );
+
+			} );
+
 
 			var link = document.createElement( 'a' );
 			link.style.display = 'none';
@@ -69,13 +106,13 @@
 
 			var container;
 
-			var camera, scene1, renderer;
+			var camera, scene1, scene2, renderer;
+			var gridHelper, sphere;
 
 			init();
 			animate();
 
 			function init() {
-				var object;
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -107,7 +144,7 @@
 				// ---------------------------------------------------------------------
 				// Grid
 				// ---------------------------------------------------------------------
-				var gridHelper = new THREE.GridHelper( 2000, 20 );
+				gridHelper = new THREE.GridHelper( 2000, 20 );
 				gridHelper.position.y = -50;
 				gridHelper.name = "Grid";
 				scene1.add( gridHelper );
@@ -167,10 +204,10 @@
 					roughness: 1.0,
 					flatShading: true
 				} );
-				object = new THREE.Mesh( new THREE.SphereBufferGeometry( 70, 10, 10 ), material );
-				object.position.set( 0, 0, 0 );
-				object.name = "Sphere";
-				scene1.add( object );
+				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 70, 10, 10 ), material );
+				sphere.position.set( 0, 0, 0 );
+				sphere.name = "Sphere";
+				scene1.add( sphere );
 
 				// Cylinder
 				material = new THREE.MeshStandardMaterial( {
@@ -362,7 +399,7 @@
 				// ---------------------------------------------------------------------
 				// 2nd Scene
 				// ---------------------------------------------------------------------
-				var scene2 = new THREE.Scene();
+				scene2 = new THREE.Scene();
 				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), material );
 				object.position.set( 0, 0, 0 );
 				object.name = "Cube2ndScene";
