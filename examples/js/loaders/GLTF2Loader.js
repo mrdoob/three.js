@@ -1772,6 +1772,7 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
+			'accessors',
 			'materials'
 
 		] ).then( function ( dependencies ) {
