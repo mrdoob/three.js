@@ -196,8 +196,7 @@ THREE.GLTF2Loader = ( function () {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
 		KHR_LIGHTS: 'KHR_lights',
 		KHR_MATERIALS_COMMON: 'KHR_materials_common',
-		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
-		KHR_TECHNIQUE_WEBGL: 'KHR_technique_webgl',
+		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness'
 	};
 
 	/**
@@ -746,7 +745,7 @@ THREE.GLTF2Loader = ( function () {
 
 					defines.USE_GLOSSINESSMAP = '';
 					// set USE_ROUGHNESSMAP to enable vUv
-					defines.USE_ROUGHNESSMAP = ''
+					defines.USE_ROUGHNESSMAP = '';
 
 				}
 
@@ -1319,40 +1318,35 @@ THREE.GLTF2Loader = ( function () {
 
 	};
 
-	GLTFParser.prototype.loadBuffers = function () {
+	/**
+	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#buffers-and-buffer-views
+	 * @param {number} bufferIndex
+	 * @return {Promise<ArrayBuffer>}
+	 */
+	GLTFParser.prototype.loadBuffer = function ( bufferIndex ) {
 
-		var json = this.json;
-		var extensions = this.extensions;
+		var bufferDef = this.json.buffers[ bufferIndex ];
+
+		if ( bufferDef.type && bufferDef.type !== 'arraybuffer' ) {
+
+			throw new Error( 'THREE.GLTF2Loader: %s buffer type is not supported.', bufferDef.type );
+
+		}
+
+		// If present, GLB container is required to be the first buffer.
+		if ( bufferDef.uri === undefined && bufferIndex === 0 ) {
+
+			return Promise.resolve( this.extensions[ EXTENSIONS.KHR_BINARY_GLTF ].body );
+
+		}
+
 		var options = this.options;
 
-		return _each( json.buffers, function ( buffer, name ) {
+		return new Promise( function ( resolve ) {
 
-			if ( buffer.type === 'arraybuffer' || buffer.type === undefined ) {
-
-				// If present, GLB container is required to be the first buffer.
-				if ( buffer.uri === undefined && name === 0 ) {
-
-					return extensions[ EXTENSIONS.KHR_BINARY_GLTF ].body;
-
-				}
-
-				return new Promise( function ( resolve ) {
-
-					var loader = new THREE.FileLoader();
-					loader.setResponseType( 'arraybuffer' );
-					loader.load( resolveURL( buffer.uri, options.path ), function ( buffer ) {
-
-						resolve( buffer );
-
-					} );
-
-				} );
-
-			} else {
-
-				console.warn( 'THREE.GLTF2Loader: %s buffer type is not supported.', buffer.type );
-
-			}
+			var loader = new THREE.FileLoader();
+			loader.setResponseType( 'arraybuffer' );
+			loader.load( resolveURL( bufferDef.uri, options.path ), resolve);
 
 		} );
 
@@ -1365,39 +1359,13 @@ THREE.GLTF2Loader = ( function () {
 	 */
 	GLTFParser.prototype.loadBufferView = function ( bufferViewIndex ) {
 
-		return this._withDependencies( [
+		var bufferViewDef = this.json.bufferViews[ bufferViewIndex ];
 
-			'bufferViews'
+		return this.getDependency( 'buffer', bufferViewDef.buffer ).then( function ( buffer ) {
 
-		] ).then( function ( dependencies ) {
-
-			return dependencies.bufferViews[ bufferViewIndex ];
-
-		} );
-
-	};
-
-	/** @deprecated */
-	GLTFParser.prototype.loadBufferViews = function () {
-
-		var json = this.json;
-
-		return this._withDependencies( [
-
-			'buffers'
-
-		] ).then( function ( dependencies ) {
-
-			return _each( json.bufferViews, function ( bufferView ) {
-
-				var arraybuffer = dependencies.buffers[ bufferView.buffer ];
-
-				var byteLength = bufferView.byteLength || 0;
-				var byteOffset = bufferView.byteOffset || 0;
-
-				return arraybuffer.slice( byteOffset, byteOffset + byteLength );
-
-			} );
+			var byteLength = bufferViewDef.byteLength || 0;
+			var byteOffset = bufferViewDef.byteOffset || 0;
+			return buffer.slice( byteOffset, byteOffset + byteLength );
 
 		} );
 
@@ -1405,17 +1373,13 @@ THREE.GLTF2Loader = ( function () {
 
 	GLTFParser.prototype.loadAccessors = function () {
 
+		var parser = this;
 		var json = this.json;
 
-		return this._withDependencies( [
+		return _each( json.accessors, function ( accessor ) {
 
-			'bufferViews'
+			return parser.getDependency( 'bufferView', accessor.bufferView ).then( function ( bufferView ) {
 
-		] ).then( function ( dependencies ) {
-
-			return _each( json.accessors, function ( accessor ) {
-
-				var arraybuffer = dependencies.bufferViews[ accessor.bufferView ];
 				var itemSize = WEBGL_TYPE_SIZES[ accessor.type ];
 				var TypedArray = WEBGL_COMPONENT_TYPES[ accessor.componentType ];
 
@@ -1429,7 +1393,7 @@ THREE.GLTF2Loader = ( function () {
 				if ( byteStride && byteStride !== itemBytes ) {
 
 					// Use the full buffer if it's interleaved.
-					array = new TypedArray( arraybuffer );
+					array = new TypedArray( bufferView );
 
 					// Integer parameters to IB/IBA are in array elements, not bytes.
 					var ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
@@ -1438,7 +1402,7 @@ THREE.GLTF2Loader = ( function () {
 
 				} else {
 
-					array = new TypedArray( arraybuffer, accessor.byteOffset, accessor.count * itemSize );
+					array = new TypedArray( bufferView, accessor.byteOffset, accessor.count * itemSize );
 
 					return new THREE.BufferAttribute( array, itemSize );
 
@@ -1449,8 +1413,6 @@ THREE.GLTF2Loader = ( function () {
 		} );
 
 	};
-
-	var URL = window.URL || window.webkitURL;
 
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#textures
@@ -1463,14 +1425,9 @@ THREE.GLTF2Loader = ( function () {
 		var json = this.json;
 		var options = this.options;
 
-		var textureDef = this.json.textures[ textureIndex ];
+		var URL = window.URL || window.webkitURL;
 
-		if ( textureDef.source === undefined ) {
-
-			throw new Error( 'THREE.GLTF2Loader: Unknown texture for index ' + textureIndex );
-
-		}
-
+		var textureDef = json.textures[ textureIndex ];
 		var source = json.images[ textureDef.source ];
 		var sourceURI = source.uri;
 		var isObjectURL = false;
@@ -1479,7 +1436,7 @@ THREE.GLTF2Loader = ( function () {
 
 			// Load binary image data from bufferView, if provided.
 
-			sourceURI = parser.loadBufferView( source.bufferView )
+			sourceURI = parser.getDependency( 'bufferView', source.bufferView )
 				.then( function ( bufferView ) {
 
 					isObjectURL = true;
@@ -1589,11 +1546,6 @@ THREE.GLTF2Loader = ( function () {
 				var sgExtension = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ];
 				materialType = sgExtension.getMaterialType( material );
 				pending.push( sgExtension.extendParams( materialParams, material, parser ) );
-
-			} else if ( materialExtensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ] ) {
-
-				materialType = extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ].getMaterialType( material );
-				extensions[ EXTENSIONS.KHR_TECHNIQUE_WEBGL ].extendParams( materialParams, material, dependencies );
 
 			} else if ( material.pbrMetallicRoughness !== undefined ) {
 
@@ -1732,7 +1684,6 @@ THREE.GLTF2Loader = ( function () {
 		return this._withDependencies( [
 
 			'accessors',
-			'bufferViews',
 
 		] ).then( function ( dependencies ) {
 
@@ -1821,7 +1772,6 @@ THREE.GLTF2Loader = ( function () {
 
 		return this._withDependencies( [
 
-			'accessors',
 			'materials'
 
 		] ).then( function ( dependencies ) {
