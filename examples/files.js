@@ -18,8 +18,8 @@ var files = {
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
-		"webgl_exporter_obj",
 		"webgl_exporter_gltf2",
+		"webgl_exporter_obj",
 		"webgl_geometries",
 		"webgl_geometries2",
 		"webgl_geometry_colors",
@@ -148,7 +148,6 @@ var files = {
 		"webgl_materials_envmaps_hdr",
 		"webgl_materials_grass",
 		"webgl_materials_lightmap",
-		"webgl_materials_modified",
 		"webgl_materials_nodes",
 		"webgl_materials_normalmap",
 		"webgl_materials_parallaxmap",
@@ -279,6 +278,7 @@ var files = {
 		"webgl_custom_attributes_points",
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
+		"webgl_materials_modified",
 		"webgl_raymarching_reflect"
 	],
 	"webgl deferred": [
