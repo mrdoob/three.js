@@ -3162,6 +3162,8 @@ THREE.ColladaLoader.prototype = {
 
 				// now create a specific 3D object
 
+				var object;
+
 				switch ( type ) {
 
 					case 'lines':
