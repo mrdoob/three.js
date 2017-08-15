@@ -18,7 +18,11 @@ THREE.SobelOperatorShader = {
 
 	vertexShader: [
 
+		"varying vec2 vUv;",
+
 		"void main() {",
+
+			"vUv = uv;",
 
 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
@@ -30,8 +34,11 @@ THREE.SobelOperatorShader = {
 
 		"uniform sampler2D tDiffuse;",
 		"uniform vec2 resolution;",
+		"varying vec2 vUv;",
 
 		"void main() {",
+
+			"vec2 texel = vec2( 1.0 / resolution.x, 1.0 / resolution.y );",
 
 			// kernel definition (in glsl matrices are filled in column-major order)
 
@@ -40,39 +47,23 @@ THREE.SobelOperatorShader = {
 
 			// fetch the 3x3 neighbourhood of a fragment
 
-			"vec2 p = vec2( gl_FragCoord.x, gl_FragCoord.y );",
-
 			// first column
 
-			"vec2 x0y0 = ( p + vec2( -1, -1 ) ) / resolution;",
-			"vec2 x0y1 = ( p + vec2( -1,  0 ) ) / resolution;",
-			"vec2 x0y2 = ( p + vec2( -1,  1 ) ) / resolution;",
+			"float tx0y0 = texture2D( tDiffuse, vUv + texel * vec2( -1, -1 ) ).r;",
+			"float tx0y1 = texture2D( tDiffuse, vUv + texel * vec2( -1,  0 ) ).r;",
+			"float tx0y2 = texture2D( tDiffuse, vUv + texel * vec2( -1,  1 ) ).r;",
 
 			// second column
 
-			"vec2 x1y0 = ( p + vec2(  0, -1 ) ) / resolution;",
-			"vec2 x1y1 = ( p + vec2(  0,  0 ) ) / resolution;",
-			"vec2 x1y2 = ( p + vec2(  0,  1 ) ) / resolution;",
+			"float tx1y0 = texture2D( tDiffuse, vUv + texel * vec2(  0, -1 ) ).r;",
+			"float tx1y1 = texture2D( tDiffuse, vUv + texel * vec2(  0,  0 ) ).r;",
+			"float tx1y2 = texture2D( tDiffuse, vUv + texel * vec2(  0,  1 ) ).r;",
 
 			// third column
 
-			"vec2 x2y0 = ( p + vec2(  1, -1 ) ) / resolution;",
-			"vec2 x2y1 = ( p + vec2(  1,  0 ) ) / resolution;",
-			"vec2 x2y2 = ( p + vec2(  1,  1 ) ) / resolution;",
-
-			// sample values (we assume grayscale colors so only read a single channel)
-
-			"float tx0y0 = texture2D( tDiffuse, x0y0 ).r;",
-			"float tx0y1 = texture2D( tDiffuse, x0y1 ).r;",
-			"float tx0y2 = texture2D( tDiffuse, x0y2 ).r;",
-
-			"float tx1y0 = texture2D( tDiffuse, x1y0 ).r;",
-			"float tx1y1 = texture2D( tDiffuse, x1y1 ).r;",
-			"float tx1y2 = texture2D( tDiffuse, x1y2 ).r;",
-
-			"float tx2y0 = texture2D( tDiffuse, x2y0 ).r;",
-			"float tx2y1 = texture2D( tDiffuse, x2y1 ).r;",
-			"float tx2y2 = texture2D( tDiffuse, x2y2 ).r;",
+			"float tx2y0 = texture2D( tDiffuse, vUv + texel * vec2(  1, -1 ) ).r;",
+			"float tx2y1 = texture2D( tDiffuse, vUv + texel * vec2(  1,  0 ) ).r;",
+			"float tx2y2 = texture2D( tDiffuse, vUv + texel * vec2(  1,  1 ) ).r;",
 
 			// gradient value in x direction
 
