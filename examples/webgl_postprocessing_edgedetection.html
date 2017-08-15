@@ -60,6 +60,8 @@
 				enable: true
 			};
 
+			var pixelRatio = window.devicePixelRatio;
+
 			init();
 			animate();
 
@@ -93,7 +95,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setPixelRatio( pixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -115,8 +117,8 @@
 
 				effectSobel = new THREE.ShaderPass( THREE.SobelOperatorShader );
 				effectSobel.renderToScreen = true;
-				effectSobel.uniforms.resolution.value.x = window.innerWidth;
-				effectSobel.uniforms.resolution.value.y = window.innerHeight;
+				effectSobel.uniforms.resolution.value.x = window.innerWidth * pixelRatio;
+				effectSobel.uniforms.resolution.value.y = window.innerHeight * pixelRatio;
 				composer.addPass( effectSobel );
 
 				var controls = new THREE.OrbitControls( camera );
@@ -142,8 +144,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
-				effectSobel.uniforms.resolution.value.x = window.innerWidth;
-				effectSobel.uniforms.resolution.value.y = window.innerHeight;
+				effectSobel.uniforms.resolution.value.x = window.innerWidth * pixelRatio;
+				effectSobel.uniforms.resolution.value.y = window.innerHeight * pixelRatio;
 
 			}
 
