@@ -195,6 +195,26 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Export GLTF
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export GLTF2' );
+	option.onClick( function () {
+
+		var exporter = new THREE.GLTFExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveString( JSON.stringify( result, null, 2 ), 'scene.gltf' );
+
+		} );
+
+
+	} );
+	options.add( option );
+
+
 	// Export STL
 
 	var option = new UI.Row();
