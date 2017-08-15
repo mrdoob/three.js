@@ -798,18 +798,59 @@ THREE.GLTFExporter.prototype = {
 
 		}
 
-		// Process the scene/s
+		/**
+		 * Creates a THREE.Scene to hold a list of objects and parse it
+		 * @param  {Array} objects List of objects to process
+		 */
+		function processObjects ( objects ) {
+
+			var scene = new THREE.Scene();
+
+			for ( var i = 0; i < objects.length; i++ ) {
+
+				scene.add( objects[ i ] );
+
+			}
+
+			processScene( scene );
+
+		}
+
+
 		if ( input instanceof Array ) {
 
+			var allScenes = false;
 			for ( i = 0; i < input.length; i++ ) {
 
-				processScene( input[ i ] );
+				allScenes &= input instanceof THREE.Scene;
+
+			}
+
+			if ( allScenes ) {
+
+				for ( i = 0; i < input.length; i++ ) {
+
+					processScene( input[ i ] );
+
+				}
+
+			} else {
+
+				processObjects( input );
 
 			}
 
 		} else {
 
-			processScene( input );
+			if ( input instanceof THREE.Scene ) {
+
+				processScene( input );
+
+			} else {
+
+				processObjects( [ input ] );
+
+			}
 
 		}
 
