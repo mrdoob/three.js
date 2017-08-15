@@ -19,6 +19,7 @@ var files = {
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
 		"webgl_exporter_obj",
+		"webgl_exporter_gltf2",
 		"webgl_geometries",
 		"webgl_geometries2",
 		"webgl_geometry_colors",
