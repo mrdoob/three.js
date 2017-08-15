@@ -805,10 +805,13 @@ THREE.GLTFExporter.prototype = {
 		function processObjects ( objects ) {
 
 			var scene = new THREE.Scene();
+			scene.name = 'AuxScene';
 
 			for ( var i = 0; i < objects.length; i++ ) {
 
-				scene.add( objects[ i ] );
+				// We push directly to children instead of calling `add` to prevent
+				// modify the .parent and break its original scene and hierarchy
+				scene.children.push( objects[ i ] );
 
 			}
 
@@ -816,43 +819,34 @@ THREE.GLTFExporter.prototype = {
 
 		}
 
+		function processInput( input ) {
 
-		if ( input instanceof Array ) {
+			input = input instanceof Array ? input : [ input ];
 
-			var allScenes = false;
+			var objectsWithoutScene = [];
 			for ( i = 0; i < input.length; i++ ) {
 
-				allScenes &= input instanceof THREE.Scene;
-
-			}
-
-			if ( allScenes ) {
-
-				for ( i = 0; i < input.length; i++ ) {
+				if ( input[ i ] instanceof THREE.Scene ) {
 
 					processScene( input[ i ] );
 
+				} else {
+
+					objectsWithoutScene.push( input[ i ] );
+
 				}
-
-			} else {
-
-				processObjects( input );
 
 			}
 
-		} else {
+			if ( objectsWithoutScene.length > 0 ) {
 
-			if ( input instanceof THREE.Scene ) {
-
-				processScene( input );
-
-			} else {
-
-				processObjects( [ input ] );
+				processObjects( objectsWithoutScene );
 
 			}
 
 		}
+
+		processInput( input );
 
 		// Generate buffer
 		// Create a new blob with all the dataviews from the buffers
