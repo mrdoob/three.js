@@ -1517,6 +1517,23 @@
 
 			}
 
+			// allow transformed pivots - see https://github.com/mrdoob/three.js/issues/11895
+			if ( 'GeometricTranslation' in node.properties ) {
+
+				var array = node.properties.GeometricTranslation.value;
+
+				model.traverse( function ( child ) {
+
+					if ( child.geometry ) {
+
+						child.geometry.translate( array[ 0 ], array[ 1 ], array[ 2 ] );
+
+					}
+
+				} );
+
+			}
+
 			var conns = connections.get( model.FBX_ID );
 			for ( var parentIndex = 0; parentIndex < conns.parents.length; parentIndex ++ ) {
 
