@@ -4,6 +4,7 @@
 
 Menubar.File = function ( editor ) {
 
+	var signals = editor.signals;
 	var NUMBER_PRECISION = 6;
 
 	function parseNumber( key, value ) {
@@ -13,6 +14,13 @@ Menubar.File = function ( editor ) {
 	}
 
 	//
+	var renderer = null;
+	signals.rendererChanged.add( function ( newRenderer ) {
+
+		renderer = newRenderer;
+
+	} );
+
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
@@ -183,7 +191,7 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export GLTF' );
 	option.onClick( function () {
 
-		var exporter = new THREE.GLTFExporter();
+		var exporter = new THREE.GLTFExporter( renderer );
 
 		exporter.parse( editor.scene, function ( result ) {
 
