@@ -20,7 +20,10 @@ function Audio( listener ) {
 
 	this.buffer = null;
 	this.loop = false;
-	this.startTime = 0;
+	
+	this.startTime = this.context.currentTime;
+	this.offset = 0;
+	
 	this.playbackRate = 1;
 	this.isPlaying = false;
 	this.hasPlaybackControl = true;
@@ -83,8 +86,12 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		source.buffer = this.buffer;
 		source.loop = this.loop;
 		source.onended = this.onEnded.bind( this );
+		
+		this.startTime = this.context.currentTime;
+		
 		source.playbackRate.setValueAtTime( this.playbackRate, this.startTime );
-		source.start( 0, this.startTime );
+		
+		source.start( this.startTime, this.offset );
 
 		this.isPlaying = true;
 
@@ -102,11 +109,16 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			return;
 
 		}
-
-		this.source.stop();
-		this.startTime = this.context.currentTime;
-		this.isPlaying = false;
-
+		
+		if( this.isPlaying === true ) {
+			
+			this.source.stop();
+			this.offset += this.context.currentTime - this.startTime;
+			
+			this.isPlaying = false;
+			
+		}
+		
 		return this;
 
 	},
@@ -121,7 +133,8 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		}
 
 		this.source.stop();
-		this.startTime = 0;
+		
+		this.offset = 0;
 		this.isPlaying = false;
 
 		return this;
