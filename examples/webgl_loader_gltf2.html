@@ -96,7 +96,7 @@
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTF2Loader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
 			var orbitControls = null;
@@ -202,7 +202,7 @@
 					scene.add(ground);
 				}
 
-				loader = new THREE.GLTF2Loader();
+				loader = new THREE.GLTFLoader();
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
