@@ -233,7 +233,7 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
-				throw new Error( 'THREE.GLTF2Exporter: Unsupported bufferAttribute component type.' );
+				throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type.' );
 
 			}
 

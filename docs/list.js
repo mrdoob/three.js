@@ -341,7 +341,7 @@ var list = {
 		"Loaders": {
 			"BabylonLoader": "examples/loaders/BabylonLoader",
 			"ColladaLoader": "examples/loaders/ColladaLoader",
-			"GLTF2Loader": "examples/loaders/GLTF2Loader",
+			"GLTFLoader": "examples/loaders/GLTFLoader",
 			"MTLLoader": "examples/loaders/MTLLoader",
 			"OBJLoader": "examples/loaders/OBJLoader",
 			"OBJLoader2": "examples/loaders/OBJLoader2",
