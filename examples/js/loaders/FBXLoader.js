@@ -4010,11 +4010,9 @@
 			while ( ! this.endOfContent( reader ) ) {
 
 				var node = this.parseNode( reader, version );
-				if ( node !== null ) 
-					allNodes.add( node.name, node );
-				else
-					break;
-
+				if ( node === null ) break;
+                		allNodes.add( node.name, node );
+                
 			}
 
 			return allNodes;
