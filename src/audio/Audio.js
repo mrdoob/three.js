@@ -110,11 +110,13 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 		
-		if( this.isPlaying ) {
+		if( this.isPlaying === true ) {
+			
 			this.source.stop();
 			this.offset += this.context.currentTime - this.startTime;
 			
 			this.isPlaying = false;
+			
 		}
 		
 		return this;
