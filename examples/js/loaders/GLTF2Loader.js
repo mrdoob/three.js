@@ -79,7 +79,7 @@ THREE.GLTF2Loader = ( function () {
 
 			var json = JSON.parse( content );
 
-			if ( json.asset.version[0] < 2 ) {
+			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
 				onError( new Error( 'THREE.GLTF2Loader: Legacy glTF detected. Use THREE.GLTFLoader instead.' ) );
 				return;
