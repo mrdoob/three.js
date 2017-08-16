@@ -9,6 +9,7 @@ THREE.ViveController = function ( id ) {
 
 	var scope = this;
 	var gamepad;
+	var exists = 'getGamepads' in navigator;
 
 	var axes = [ 0, 0 ];
 	var thumbpadIsPressed = false;
@@ -21,17 +22,21 @@ THREE.ViveController = function ( id ) {
 		// Iterate across gamepads as Vive Controllers may not be
 		// in position 0 and 1.
 
-		var gamepads = navigator.getGamepads();
+		if ( exists ) {
 
-		for ( var i = 0, j = 0; i < 4; i ++ ) {
+			var gamepads = navigator.getGamepads();
 
-			var gamepad = gamepads[ i ];
+			for ( var i = 0, j = 0; i < 4; i ++ ) {
 
-			if ( gamepad && ( gamepad.id === 'OpenVR Gamepad' || gamepad.id === 'Oculus Touch (Left)' || gamepad.id === 'Oculus Touch (Right)' ) ) {
+				var gamepad = gamepads[ i ];
 
-				if ( j === id ) return gamepad;
+				if ( gamepad && ( gamepad.id === 'OpenVR Gamepad' || gamepad.id === 'Oculus Touch (Left)' || gamepad.id === 'Oculus Touch (Right)' ) ) {
 
-				j ++;
+					if ( j === id ) return gamepad;
+
+					j ++;
+
+				}
 
 			}
 
