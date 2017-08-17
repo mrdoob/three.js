@@ -28,6 +28,8 @@
 			<button id="export_object">Export Sphere</button>
 			<button id="export_objects">Export Sphere and Grid</button>
 			<button id="export_scene_object">Export Scene1 and Sphere</button>
+			<br/>
+			<input id="option_trs" type="checkbox" value="trs"/> TRS
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -41,13 +43,16 @@
 
 				var gltfExporter = new THREE.GLTFExporter();
 
+				var options = {
+					trs: document.getElementById('option_trs').checked
+				}
 				gltfExporter.parse( input, function( result ) {
 
 					var output = JSON.stringify( result, null, 2 );
 					console.log( output );
 					saveString( output, 'scene.gltf' );
 
-				} );
+				}, options );
 
 			}
 
