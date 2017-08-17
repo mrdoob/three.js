@@ -175,11 +175,9 @@ var APP = {
 
 		}
 
-		var prevTime, request;
+		var prevTime;
 
 		function animate( time ) {
-
-			request = requestAnimationFrame( animate );
 
 			try {
 
@@ -199,6 +197,8 @@ var APP = {
 
 		this.play = function () {
 
+			prevTime = performance.now();
+
 			document.addEventListener( 'keydown', onDocumentKeyDown );
 			document.addEventListener( 'keyup', onDocumentKeyUp );
 			document.addEventListener( 'mousedown', onDocumentMouseDown );
@@ -210,8 +210,7 @@ var APP = {
 
 			dispatch( events.start, arguments );
 
-			request = requestAnimationFrame( animate );
-			prevTime = performance.now();
+			renderer.animate( animate );
 
 		};
 
@@ -228,7 +227,7 @@ var APP = {
 
 			dispatch( events.stop, arguments );
 
-			cancelAnimationFrame( request );
+			renderer.animate( null );
 
 		};
 
