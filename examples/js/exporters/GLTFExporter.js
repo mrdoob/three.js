@@ -387,9 +387,17 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			if ( material instanceof THREE.ShaderMaterial ) {
+
+				console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
+				return null;
+
+			}
+
+
 			if ( !( material instanceof THREE.MeshStandardMaterial ) ) {
 
-				console.warn( 'Currently just THREE.StandardMaterial is supported. Material conversion may lose information.' );
+				console.warn( 'GLTFExporter: Currently just THREE.StandardMaterial is supported. Material conversion may lose information.' );
 
 			}
 
@@ -576,10 +584,17 @@ THREE.GLTFExporter.prototype = {
 					{
 						mode: mode,
 						attributes: {},
-						material: processMaterial( mesh.material )
 					}
 				]
 			};
+
+			var material = processMaterial( mesh.material );
+			if ( material ) {
+
+				gltfMesh.primitives[ 0 ].material = material;
+
+			}
+
 
 			if ( geometry.index ) {
 
