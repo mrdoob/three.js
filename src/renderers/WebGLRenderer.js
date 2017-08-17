@@ -1004,21 +1004,33 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	// Rendering
+	// Animation Loop
+
+	var isAnimating = false;
+	var onAnimationFrame = null;
+
+	function start() {
+
+		if ( isAnimating ) return;
+		( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+	}
+
+	function loop( time ) {
+
+		if ( onAnimationFrame !== null ) onAnimationFrame( time );
+		( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+	}
 
 	this.animate = function ( callback ) {
 
-		function onFrame() {
-
-			callback();
-
-			( vr.getDevice() || window ).requestAnimationFrame( onFrame );
-
-		}
-
-		( vr.getDevice() || window ).requestAnimationFrame( onFrame );
+		onAnimationFrame = callback;
+		start();
 
 	};
+
+	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
