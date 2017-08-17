@@ -19591,8 +19591,6 @@ function WebGLState( gl, extensions, utils ) {
 	var currentPolygonOffsetFactor = null;
 	var currentPolygonOffsetUnits = null;
 
-	var currentScissorTest = null;
-
 	var maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
 
 	var version = parseFloat( /^WebGL\ ([0-9])/.exec( gl.getParameter( gl.VERSION ) )[ 1 ] );
@@ -20011,15 +20009,7 @@ function WebGLState( gl, extensions, utils ) {
 
 	}
 
-	function getScissorTest() {
-
-		return currentScissorTest;
-
-	}
-
 	function setScissorTest( scissorTest ) {
-
-		currentScissorTest = scissorTest;
 
 		if ( scissorTest ) {
 
@@ -20190,7 +20180,6 @@ function WebGLState( gl, extensions, utils ) {
 		setLineWidth: setLineWidth,
 		setPolygonOffset: setPolygonOffset,
 
-		getScissorTest: getScissorTest,
 		setScissorTest: setScissorTest,
 
 		activeTexture: activeTexture,
@@ -22235,8 +22224,6 @@ function WebGLRenderer( parameters ) {
 						var height = bounds.w * _height;
 
 						state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
-						state.scissor( _currentScissor.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
-						state.setScissorTest( true );
 
 						renderObject( object, scene, camera2, geometry, material, group );
 
