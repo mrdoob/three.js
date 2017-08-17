@@ -724,6 +724,12 @@ THREE.OBJLoader2 = (function () {
 
 			for ( var name in this.rawObjectDescriptions ) {
 
+				if ( ! this.rawObjectDescriptions.hasOwnProperty( name ) ) {
+
+					continue;
+
+				}
+
 				rawObjectDescription = this.rawObjectDescriptions[ name ];
 				if ( rawObjectDescription.vertices.length > 0 ) {
 
@@ -939,6 +945,13 @@ THREE.OBJLoader2 = (function () {
 			}
 
 			for ( var oodIndex in rawObjectDescriptions ) {
+
+				if ( ! rawObjectDescriptions.hasOwnProperty( oodIndex ) ) {
+
+					continue;
+
+				}
+
 				rawObjectDescription = rawObjectDescriptions[ oodIndex ];
 
 				materialName = rawObjectDescription.materialName;
