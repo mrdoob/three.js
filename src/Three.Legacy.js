@@ -1047,7 +1047,7 @@ Object.defineProperties( Material.prototype, {
 		set: function ( value ) {
 
 			console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
-			this.flatShading = value === FlatShading;
+			this.flatShading = ( value === FlatShading );
 
 		}
 	}
