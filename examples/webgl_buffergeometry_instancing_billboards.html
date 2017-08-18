@@ -139,7 +139,10 @@
 			scene = new THREE.Scene();
 
 			geometry = new THREE.InstancedBufferGeometry();
-			geometry.copy( new THREE.CircleBufferGeometry( 1, 6 ) );
+			var circleGeometry = new THREE.CircleBufferGeometry( 1, 6 );
+
+			geometry.index = circleGeometry.index;
+			geometry.attributes = circleGeometry.attributes;
 
 			var particleCount = 75000;
 
