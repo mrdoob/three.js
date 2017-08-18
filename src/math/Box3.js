@@ -59,7 +59,7 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	setFromBufferAttribute: function ( attribute ) {
+	setFromBufferAttribute: function ( attribute, drawRange ) {
 
 		var minX = + Infinity;
 		var minY = + Infinity;
@@ -69,7 +69,22 @@ Object.assign( Box3.prototype, {
 		var maxY = - Infinity;
 		var maxZ = - Infinity;
 
-		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+		var start = 0;
+		var count = attribute.count;
+
+		if ( drawRange ) {
+
+			start = drawRange.start;
+
+			if ( drawRange.count !== Infinity ) {
+
+				count = drawRange.count;
+
+			}
+
+		}
+
+		for ( var i = start; i < count; i ++ ) {
 
 			var x = attribute.getX( i );
 			var y = attribute.getY( i );

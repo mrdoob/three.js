@@ -582,7 +582,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		if ( position !== undefined ) {
 
-			this.boundingBox.setFromBufferAttribute( position );
+			this.boundingBox.setFromBufferAttribute( position, this.drawRange );
 
 		} else {
 
