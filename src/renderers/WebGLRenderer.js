@@ -1005,13 +1005,10 @@ function WebGLRenderer( parameters ) {
 	};
 
 	// Animation Loop
-
-	var isAnimating = false;
 	var onAnimationFrame = null;
 
 	function start() {
 
-		if ( isAnimating ) return;
 		( vr.getDevice() || window ).requestAnimationFrame( loop );
 
 	}
