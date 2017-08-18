@@ -156,5 +156,7 @@ export { Curve } from './extras/core/Curve.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { SceneUtils } from './extras/SceneUtils.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
+export { WEBGL_CONSTANTS } from './renderers/webgl/WebGLConstants.js';
+export { THREE_TO_WEBGL } from './renderers/webgl/THREEToWebGL.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';

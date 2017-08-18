@@ -2,19 +2,6 @@
  * @author fernandojsg / http://fernandojsg.com
  */
 
- //------------------------------------------------------------------------------
- // Constants
- //------------------------------------------------------------------------------
-var THREE_TO_WEBGL = {
-	// @TODO Replace with computed property name [THREE.*] when available on es6
-	1003: THREE.WEBGL_CONSTANTS.NEAREST,
-	1004: THREE.WEBGL_CONSTANTS.LINEAR,
-	1005: THREE.WEBGL_CONSTANTS.NEAREST_MIPMAP_NEAREST,
-	1006: THREE.WEBGL_CONSTANTS.LINEAR_MIPMAP_NEAREST,
-	1007: THREE.WEBGL_CONSTANTS.NEAREST_MIPMAP_LINEAR,
-	1008: THREE.WEBGL_CONSTANTS.LINEAR_MIPMAP_LINEAR
- };
-
 //------------------------------------------------------------------------------
 // GLTF Exporter
 //------------------------------------------------------------------------------
@@ -381,10 +368,10 @@ THREE.GLTFExporter.prototype = {
 
 			var gltfSampler = {
 
-				magFilter: THREE_TO_WEBGL[ map.magFilter ],
-				minFilter: THREE_TO_WEBGL[ map.minFilter ],
-				wrapS: THREE_TO_WEBGL[ map.wrapS ],
-				wrapT: THREE_TO_WEBGL[ map.wrapT ]
+				magFilter: THREE.THREE_TO_WEBGL[ map.magFilter ],
+				minFilter: THREE.THREE_TO_WEBGL[ map.minFilter ],
+				wrapS: THREE.THREE_TO_WEBGL[ map.wrapS ],
+				wrapT: THREE.THREE_TO_WEBGL[ map.wrapT ]
 
 			};
 

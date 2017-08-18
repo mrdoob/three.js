@@ -1,0 +1,17 @@
+/**
+ * @author fernandojsg / http://fernandojsg.com
+ */
+
+import { WEBGL_CONSTANTS } from './WebGLConstants';
+
+var THREE_TO_WEBGL = {
+	// @TODO Replace with computed property name [THREE.*] when available on es6
+	1003: WEBGL_CONSTANTS.NEAREST,
+	1004: WEBGL_CONSTANTS.LINEAR,
+	1005: WEBGL_CONSTANTS.NEAREST_MIPMAP_NEAREST,
+	1006: WEBGL_CONSTANTS.LINEAR_MIPMAP_NEAREST,
+	1007: WEBGL_CONSTANTS.NEAREST_MIPMAP_LINEAR,
+	1008: WEBGL_CONSTANTS.LINEAR_MIPMAP_LINEAR
+ };
+
+ export { THREE_TO_WEBGL };
