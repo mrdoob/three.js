@@ -13,6 +13,8 @@ THREE.Mirror = function ( width, height, options ) {
 
 	options = options || {};
 
+	var viewport = new THREE.Vector4();
+
 	var textureWidth = options.textureWidth !== undefined ? options.textureWidth : 512;
 	var textureHeight = options.textureHeight !== undefined ? options.textureHeight : 512;
 
@@ -200,6 +202,24 @@ THREE.Mirror = function ( width, height, options ) {
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 
 		renderer.setRenderTarget( currentRenderTarget );
+
+		// Restore viewport
+
+		var bounds = camera.bounds;
+
+		if ( bounds !== undefined ) {
+
+			var size = renderer.getSize();
+			var pixelRatio = renderer.getPixelRatio();
+
+			viewport.x = bounds.x * size.width * pixelRatio;
+			viewport.y = bounds.y * size.height * pixelRatio;
+			viewport.z = bounds.z * size.width * pixelRatio;
+			viewport.w = bounds.w * size.height * pixelRatio;
+
+			renderer.state.viewport( viewport );
+
+		}
 
 		scope.visible = true;
 
