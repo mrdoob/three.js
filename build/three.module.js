@@ -181,7 +181,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '87dev';
+var REVISION = '87';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -22676,10 +22676,6 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-			} else if ( material.isMeshNormalMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-
 			} else if ( material.isMeshDepthMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
@@ -22692,6 +22688,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( material.isMeshNormalMaterial ) {
 
+				refreshUniformsCommon( m_uniforms, material );
 				refreshUniformsNormal( m_uniforms, material );
 
 			} else if ( material.isLineBasicMaterial ) {
