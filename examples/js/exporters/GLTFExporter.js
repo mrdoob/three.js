@@ -57,8 +57,6 @@ THREE.GLTFExporter.prototype = {
 	 */
 	parse: function ( input, onDone, options ) {
 
-		options = options || {};
-
 		var outputJSON = {
 
 			asset: {
