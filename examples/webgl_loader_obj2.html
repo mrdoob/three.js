@@ -85,6 +85,8 @@
 
 			var OBJLoader2Example = (function () {
 
+				var Validator = THREE.OBJLoader2.prototype._getValidator();
+
 				function OBJLoader2Example( elementToBindTo ) {
 					this.renderer = null;
 					this.canvas = elementToBindTo;
@@ -104,22 +106,23 @@
 
 					this.controls = null;
 
-					this.smoothShading = true;
+					this.flatShading = false;
 					this.doubleSide = false;
 
 					this.cube = null;
 					this.pivot = null;
+
+					this.feedbackArray = [];
 				}
 
 				OBJLoader2Example.prototype.initGL = function () {
 					this.renderer = new THREE.WebGLRenderer( {
 						canvas: this.canvas,
-						antialias: true,
-						autoClear: true
+						antialias: true
 					} );
-					this.renderer.setClearColor( 0x050505 );
 
 					this.scene = new THREE.Scene();
+					this.scene.background = new THREE.Color( 0x050505 );
 
 					this.camera = new THREE.PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
 					this.resetCamera();
@@ -150,8 +153,14 @@
 					this.scene.add( this.pivot );
 				};
 
-				OBJLoader2Example.prototype.initPostGL = function ( objDef ) {
+				OBJLoader2Example.prototype.initPostGL = function () {
+					return true;
+				};
+
+				OBJLoader2Example.prototype.loadObj = function ( objDef ) {
+					this.scene.add( objDef.pivot );
 					var scope = this;
+					scope._reportProgress( 'Loading: ' + objDef.fileObj, objDef.instanceNo );
 
 					var mtlLoader = new THREE.MTLLoader();
 					mtlLoader.setPath( objDef.texturePath );
@@ -160,14 +169,16 @@
 
 						materials.preload();
 
+						scope.pivot.add( objDef.pivot );
 						var objLoader = new THREE.OBJLoader2();
-						objLoader.setSceneGraphBaseNode( scope.pivot );
+						objLoader.setSceneGraphBaseNode( objDef.pivot );
 						objLoader.setMaterials( materials.materials );
 						objLoader.setPath( objDef.path );
 						objLoader.setDebug( false, false );
 
 						var onSuccess = function ( object3d ) {
 							console.log( 'Loading complete. Meshes were attached to: ' + object3d.name );
+							scope._reportProgress( '', objDef.instanceNo );
 						};
 
 						var onProgress = function ( event ) {
@@ -175,20 +186,25 @@
 
 								var percentComplete = event.loaded / event.total * 100;
 								var output = 'Download of "' + objDef.fileObj + '": ' + Math.round( percentComplete ) + '%';
-								console.log(output);
-
+								scope._reportProgress( output, objDef.instanceNo );
 							}
 						};
 
 						var onError = function ( event ) {
-							console.error( 'Error of type "' + event.type + '" occurred when trying to load: ' + event.src );
+							var output = 'Error of type "' + event.type + '" occurred when trying to load: ' + event.src;
+							scope._reportProgress( output, objDef.instanceNo );
 						};
 
 						objLoader.load( objDef.fileObj, onSuccess, onProgress, onError );
 
 					});
+				};
 
-					return true;
+				OBJLoader2Example.prototype._reportProgress = function( text, instanceNo ) {
+					this.feedbackArray[ instanceNo ] = text;
+					console.log( 'Progress: ' + text );
+
+					document.getElementById( 'feedback' ).innerHTML = Validator.isValid( this.feedbackArray ) && this.feedbackArray.length > 0 ? this.feedbackArray.join( '\<br\>' ) : '';
 				};
 
 				OBJLoader2Example.prototype.resizeDisplayGL = function () {
@@ -228,14 +244,14 @@
 					this.renderer.render( this.scene, this.camera );
 				};
 
-				OBJLoader2Example.prototype.alterSmoothShading = function () {
+				OBJLoader2Example.prototype.alterShading = function () {
 
 					var scope = this;
-					scope.smoothShading = ! scope.smoothShading;
-					console.log( scope.smoothShading ? 'Enabling SmoothShading' : 'Enabling FlatShading');
+					scope.flatShading = ! scope.flatShading;
+					console.log( scope.flatShading ? 'Enabling flat shading' : 'Enabling smooth shading');
 
 					scope.traversalFunction = function ( material ) {
-						material.shading = scope.smoothShading ? THREE.SmoothShading : THREE.FlatShading;
+						material.flatShading = scope.flatShading;
 						material.needsUpdate = true;
 					};
 					var scopeTraverse = function ( object3d ) {
@@ -287,7 +303,7 @@
 
 			// Init dat.gui and controls
 			var OBJLoader2Control = function() {
-				this.smoothShading = app.smoothShading;
+				this.flatShading = app.flatShading;
 				this.doubleSide = app.doubleSide;
 			};
 			var objLoader2Control = new OBJLoader2Control();
@@ -300,10 +316,10 @@
 			var menuDiv = document.getElementById( 'dat' );
 			menuDiv.appendChild(gui.domElement);
 			var folderQueue = gui.addFolder( 'OBJLoader2 Options' );
-			var controlSmooth = folderQueue.add( objLoader2Control, 'smoothShading' ).name( 'Smooth Shading' );
+			var controlSmooth = folderQueue.add( objLoader2Control, 'flatShading' ).name( 'Flat Shading' );
 			controlSmooth.onChange( function( value ) {
-				console.log( 'Setting smoothShading to: ' + value );
-				app.alterSmoothShading();
+				console.log( 'Setting flatShading to: ' + value );
+				app.alterShading();
 			});
 
 			var controlDouble = folderQueue.add( objLoader2Control, 'doubleSide' ).name( 'Double Side Materials' );
@@ -330,11 +346,28 @@
 			console.log( 'Starting initialisation phase...' );
 			app.initGL();
 			app.resizeDisplayGL();
-			app.initPostGL( {
+			app.initPostGL();
+
+			var pivotA = new THREE.Object3D();
+			pivotA.name = 'PivotA';
+			pivotA.position.set( -50, 0, 0 );
+			app.loadObj( {
+				path: 'obj/female02/',
+				fileObj: 'female02_vertex_colors.obj',
+				pivot: pivotA,
+				instanceNo: 0
+			} );
+
+			var pivotB = new THREE.Object3D();
+			pivotB.name = 'PivotB';
+			pivotB.position.set( 50, 0, 0 );
+			app.loadObj( {
 				path: 'obj/female02/',
 				fileObj: 'female02.obj',
 				texturePath: 'obj/female02/',
-				fileMtl: 'female02.mtl'
+				fileMtl: 'female02.mtl',
+				pivot: pivotB,
+				instanceNo: 1
 			} );
 
 			render();

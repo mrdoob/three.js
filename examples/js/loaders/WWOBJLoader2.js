@@ -15,7 +15,7 @@ if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
  */
 THREE.OBJLoader2.WWOBJLoader2 = (function () {
 
-	var WWOBJLOADER2_VERSION = '1.2.1';
+	var WWOBJLOADER2_VERSION = '1.4.1';
 
 	var Validator = THREE.OBJLoader2.prototype._getValidator();
 
@@ -39,7 +39,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		this.sceneGraphBaseNode = null;
 		this.streamMeshes = true;
 		this.meshStore = null;
-		this.modelName = 'none';
+		this.modelName = '';
 		this.validated = false;
 		this.running = false;
 		this.requestTerminate = false;
@@ -178,7 +178,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		this.sceneGraphBaseNode = null;
 		this.streamMeshes = true;
 		this.meshStore = [];
-		this.modelName = 'none';
+		this.modelName = '';
 		this.validated = true;
 		this.running = true;
 		this.requestTerminate = false;
@@ -200,6 +200,11 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		var defaultMaterial = new THREE.MeshStandardMaterial( { color: 0xDCF1FF } );
 		defaultMaterial.name = 'defaultMaterial';
 		this.materials[ defaultMaterial.name ] = defaultMaterial;
+
+		var vertexColorMaterial = new THREE.MeshBasicMaterial( { color: 0xDCF1FF } );
+		vertexColorMaterial.name = 'vertexColorMaterial';
+		vertexColorMaterial.vertexColors = THREE.VertexColors;
+		this.materials[ 'vertexColorMaterial' ] = vertexColorMaterial;
 
 		this.counter = 0;
 	};
@@ -383,6 +388,12 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 
 				var bufferGeometry = new THREE.BufferGeometry();
 				bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( payload.vertices ), 3 ) );
+				var haveVertexColors = Validator.isValid( payload.colors );
+				if ( haveVertexColors ) {
+
+					bufferGeometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( payload.colors ), 3 ) );
+
+				}
 				if ( Validator.isValid( payload.normals ) ) {
 
 					bufferGeometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( payload.normals ), 3 ) );
@@ -409,13 +420,14 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 				for ( key in materialDescriptions ) {
 
 					materialDescription = materialDescriptions[ key ];
-					material = this.materials[ materialDescription.name ];
+					material = haveVertexColors ? this.materials[ 'vertexColorMaterial' ] : this.materials[ materialDescription.name ];
+					if ( ! material ) material = this.materials[ 'defaultMaterial' ];
 
 					if ( materialDescription.default ) {
 
 						material = this.materials[ 'defaultMaterial' ];
 
-					} else if ( materialDescription.clone ) {
+					} else if ( materialDescription.flat ) {
 
 						materialName = material.name + '_flat';
 						var materialClone = this.materials[ materialName ];
@@ -423,16 +435,14 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 
 							materialClone = material.clone();
 							materialClone.name = materialName;
-							materialClone.shading = THREE.FlatShading;
+							materialClone.flatShading = true;
 							this.materials[ materialName ] = name;
 
 						}
 
-					} else if ( ! material ) {
-
-						material = this.materials[ 'defaultMaterial' ];
-
 					}
+
+					if ( materialDescription.vertexColors ) material.vertexColors = THREE.VertexColors;
 					if ( createMultiMaterial ) multiMaterials.push( material );
 
 				}
@@ -590,7 +600,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		for ( var index in this.callbacks.progress ) {
 
 			callbackProgress = this.callbacks.progress[ index ];
-			callbackProgress( output );
+			callbackProgress( output, this.instanceNo );
 
 		}
 
@@ -725,10 +735,12 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 				 * @param absoluteNormalCount
 				 * @param absoluteUvCount
 				 */
-				WWMeshCreator.prototype.buildMesh = function ( rawObjectDescriptions, inputObjectCount, absoluteVertexCount, absoluteNormalCount, absoluteUvCount ) {
+				WWMeshCreator.prototype.buildMesh = function ( rawObjectDescriptions, inputObjectCount, absoluteVertexCount,
+															   absoluteColorCount, absoluteNormalCount, absoluteUvCount ) {
 					if ( this.debug ) console.log( 'OBJLoader.buildMesh:\nInput object no.: ' + inputObjectCount );
 
-					var vertexFa = new Float32Array( absoluteVertexCount );
+					var vertexFA = new Float32Array( absoluteVertexCount );
+					var colorFA = ( absoluteColorCount > 0 ) ? new Float32Array( absoluteColorCount ) : null;
 					var normalFA = ( absoluteNormalCount > 0 ) ? new Float32Array( absoluteNormalCount ) : null;
 					var uvFA = ( absoluteUvCount > 0 ) ? new Float32Array( absoluteUvCount ) : null;
 
@@ -743,17 +755,23 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 					var materialGroup;
 					var materialGroups = [];
 
-					var vertexBAOffset = 0;
+					var vertexFAOffset = 0;
 					var vertexGroupOffset = 0;
 					var vertexLength;
-					var normalOffset = 0;
-					var uvOffset = 0;
+					var colorFAOffset = 0;
+					var normalFAOffset = 0;
+					var uvFAOffset = 0;
 
 					for ( var oodIndex in rawObjectDescriptions ) {
 						if ( ! rawObjectDescriptions.hasOwnProperty( oodIndex ) ) continue;
 						rawObjectDescription = rawObjectDescriptions[ oodIndex ];
 
-						materialDescription = { name: rawObjectDescription.materialName, flat: false, default: false };
+						materialDescription = {
+							name: rawObjectDescription.materialName,
+							flat: false,
+							vertexColors: false,
+							default: false
+						};
 						if ( this.materials[ materialDescription.name ] === null ) {
 
 							materialDescription.default = true;
@@ -791,37 +809,68 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 
 						}
 
-						vertexFa.set( rawObjectDescription.vertices, vertexBAOffset );
-						vertexBAOffset += vertexLength;
+						vertexFA.set( rawObjectDescription.vertices, vertexFAOffset );
+						vertexFAOffset += vertexLength;
+
+						if ( colorFA ) {
+
+							colorFA.set( rawObjectDescription.colors, colorFAOffset );
+							colorFAOffset += rawObjectDescription.colors.length;
+							materialDescription.vertexColors = true;
+
+						}
 
 						if ( normalFA ) {
 
-							normalFA.set( rawObjectDescription.normals, normalOffset );
-							normalOffset += rawObjectDescription.normals.length;
+							normalFA.set( rawObjectDescription.normals, normalFAOffset );
+							normalFAOffset += rawObjectDescription.normals.length;
 
 						}
 						if ( uvFA ) {
 
-							uvFA.set( rawObjectDescription.uvs, uvOffset );
-							uvOffset += rawObjectDescription.uvs.length;
+							uvFA.set( rawObjectDescription.uvs, uvFAOffset );
+							uvFAOffset += rawObjectDescription.uvs.length;
 
 						}
 						if ( this.debug ) this.printReport( rawObjectDescription, selectedMaterialIndex );
 
 					}
 
-					self.postMessage( {
-						cmd: 'objData',
-						meshName: rawObjectDescription.objectName,
-						multiMaterial: createMultiMaterial,
-						materialDescriptions: materialDescriptions,
-						materialGroups: materialGroups,
-						vertices: vertexFa,
-						normals: normalFA,
-						uvs: uvFA
-					}, [ vertexFa.buffer ], normalFA !== null ? [ normalFA.buffer ] : null, uvFA !== null ? [ uvFA.buffer ] : null );
+					self.postMessage(
+						{
+							cmd: 'objData',
+							meshName: rawObjectDescription.groupName !== '' ? rawObjectDescription.groupName : rawObjectDescription.objectName,
+							multiMaterial: createMultiMaterial,
+							materialDescriptions: materialDescriptions,
+							materialGroups: materialGroups,
+							vertices: vertexFA,
+							colors: colorFA,
+							normals: normalFA,
+							uvs: uvFA
+						},
+						[ vertexFA.buffer ],
+						colorFA !== null ? [ colorFA.buffer ] : null,
+						normalFA !== null ? [ normalFA.buffer ] : null,
+						uvFA !== null ? [ uvFA.buffer ] : null
+					);
 
 					this.globalObjectCount++;
+				};
+
+				WWMeshCreator.prototype.printReport = function ( rawObjectDescription, selectedMaterialIndex ) {
+					var materialIndexLine = Validator.isValid( selectedMaterialIndex ) ? '\n materialIndex: ' + selectedMaterialIndex : '';
+					console.log(
+						' Output Object no.: ' + this.globalObjectCount +
+						'\n objectName: ' + rawObjectDescription.objectName +
+						'\n groupName: ' + rawObjectDescription.groupName +
+						'\n materialName: ' + rawObjectDescription.materialName +
+						materialIndexLine +
+						'\n smoothingGroup: ' + rawObjectDescription.smoothingGroup +
+						'\n #vertices: ' + rawObjectDescription.vertices.length / 3 +
+						'\n #colors: ' + rawObjectDescription.colors.length / 3 +
+						'\n #uvs: ' + rawObjectDescription.uvs.length / 2 +
+						'\n #normals: ' + rawObjectDescription.normals.length / 3
+					);
 				};
 
 				return WWMeshCreator;
@@ -1003,7 +1052,7 @@ THREE.OBJLoader2.WWOBJLoader2.PrepDataArrayBuffer = function ( modelName, objAsA
 		getCallbacks: function () {
 			return this.callbacks;
 		},
-		modelName: Validator.verifyInput( modelName, 'none' ),
+		modelName: Validator.verifyInput( modelName, '' ),
 		dataAvailable: true,
 		objAsArrayBuffer: Validator.verifyInput( objAsArrayBuffer, null ),
 		pathTexture: Validator.verifyInput( pathTexture, null ),
@@ -1072,7 +1121,7 @@ THREE.OBJLoader2.WWOBJLoader2.PrepDataFile = function ( modelName, pathObj, file
 		getCallbacks: function () {
 			return this.callbacks;
 		},
-		modelName: Validator.verifyInput( modelName, 'none' ),
+		modelName: Validator.verifyInput( modelName, '' ),
 		dataAvailable: false,
 		pathObj: Validator.verifyInput( pathObj, null ),
 		fileObj: Validator.verifyInput( fileObj, null ),

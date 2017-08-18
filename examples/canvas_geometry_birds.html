@@ -342,6 +342,7 @@
 				camera.position.z = 450;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				birds = [];
 				boids = [];
@@ -366,7 +367,6 @@
 				}
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 

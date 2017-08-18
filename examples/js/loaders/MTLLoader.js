@@ -202,6 +202,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	constructor: THREE.MTLLoader.MaterialCreator,
 
+	crossOrigin: 'Anonymous',
+
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
@@ -418,6 +420,12 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// Specular map
 
 					setMapForType( "specularMap", value );
+
+					break;
+
+				case 'norm':
+
+					setMapForType( "normalMap", value );
 
 					break;
 

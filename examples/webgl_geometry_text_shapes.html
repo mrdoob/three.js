@@ -29,7 +29,7 @@
 
 		<script>
 
-			var camera, scene, renderer, controls;
+			var camera, scene, renderer;
 
 			init();
 			animate();
@@ -39,10 +39,12 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, - 400, 600 );
 
-				controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera );
 				controls.target.set( 0, 0, 0 );
+				controls.update();
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				var loader = new THREE.FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
@@ -128,7 +130,6 @@
 				} ); //end load function
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -156,7 +157,6 @@
 
 			function render() {
 
-				controls.update();
 				renderer.render( scene, camera );
 
 			}

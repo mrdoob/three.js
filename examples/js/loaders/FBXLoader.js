@@ -48,9 +48,7 @@
 
 			var self = this;
 
-			var resourceDirectory = url.split( /[\\\/]/ );
-			resourceDirectory.pop();
-			resourceDirectory = resourceDirectory.join( '/' ) + '/';
+			var resourceDirectory = THREE.Loader.prototype.extractUrlBase( url );
 
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setResponseType( 'arraybuffer' );
@@ -100,15 +98,13 @@
 
 				if ( ! isFbxFormatASCII( FBXText ) ) {
 
-					self.manager.itemError( url );
-					throw new Error( 'FBXLoader: Unknown format.' );
+					throw new Error( 'THREE.FBXLoader: Unknown format.' );
 
 				}
 
 				if ( getFbxVersion( FBXText ) < 7000 ) {
 
-					self.manager.itemError( url );
-					throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( FBXText ) );
+					throw new Error( 'THREE.FBXLoader: FBX version not supported, FileVersion: ' + getFbxVersion( FBXText ) );
 
 				}
 
@@ -189,12 +185,12 @@
 	/**
 	 * Parses map of images referenced in FBXTree.
 	 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
-	 * @returns {Map<number, string(image blob URL)>}
+	 * @returns {Map<number, string(image blob/data URL)>}
 	 */
 	function parseImages( FBXTree ) {
 
 		/**
-		 * @type {Map<number, string(image blob URL)>}
+		 * @type {Map<number, string(image blob/data URL)>}
 		 */
 		var imageMap = new Map();
 
@@ -224,12 +220,11 @@
 
 	/**
 	 * @param {videoNode} videoNode - Node to get texture image information from.
-	 * @returns {string} - image blob URL
+	 * @returns {string} - image blob/data URL
 	 */
 	function parseImage( videoNode ) {
 
-		var buffer = videoNode.properties.Content;
-		var array = new Uint8Array( buffer );
+		var content = videoNode.properties.Content;
 		var fileName = videoNode.properties.RelativeFilename || videoNode.properties.Filename;
 		var extension = fileName.slice( fileName.lastIndexOf( '.' ) + 1 ).toLowerCase();
 
@@ -264,7 +259,16 @@
 
 		}
 
-		return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+		if ( typeof content === 'string' ) {
+
+			return 'data:' + type + ';base64,' + content;
+
+		} else {
+
+			var array = new Uint8Array( content );
+			return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+
+		}
 
 	}
 
@@ -272,7 +276,7 @@
 	 * Parses map of textures referenced in FBXTree.
 	 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
 	 * @param {THREE.TextureLoader} loader
-	 * @param {Map<number, string(image blob URL)>} imageMap
+	 * @param {Map<number, string(image blob/data URL)>} imageMap
 	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 	 * @returns {Map<number, THREE.Texture>}
 	 */
@@ -302,7 +306,7 @@
 	/**
 	 * @param {textureNode} textureNode - Node to get texture information from.
 	 * @param {THREE.TextureLoader} loader
-	 * @param {Map<number, string(image blob URL)>} imageMap
+	 * @param {Map<number, string(image blob/data URL)>} imageMap
 	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 	 * @returns {THREE.Texture}
 	 */
@@ -349,7 +353,7 @@
 
 		var currentPath = loader.path;
 
-		if ( fileName.indexOf( 'blob:' ) === 0 ) {
+		if ( fileName.indexOf( 'blob:' ) === 0 || fileName.indexOf( 'data:' ) === 0 ) {
 
 			loader.setPath( undefined );
 
@@ -442,7 +446,7 @@
 				material = new THREE.MeshLambertMaterial();
 				break;
 			default:
-				console.warn( 'No implementation given for material type ' + type + ' in FBXLoader.js.  Defaulting to basic material' );
+				console.warn( 'THREE.FBXLoader: No implementation given for material type %s in FBXLoader.js. Defaulting to basic material.', type );
 				material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
 				break;
 
@@ -515,27 +519,27 @@
 
 			switch ( type ) {
 
-				case "DiffuseColor":
-				case " \"DiffuseColor":
+				case 'DiffuseColor':
+				case ' "DiffuseColor':
 					parameters.map = textureMap.get( relationship.ID );
 					break;
 
-				case "Bump":
-				case " \"Bump":
+				case 'Bump':
+				case ' "Bump':
 					parameters.bumpMap = textureMap.get( relationship.ID );
 					break;
 
-				case "NormalMap":
-				case " \"NormalMap":
+				case 'NormalMap':
+				case ' "NormalMap':
 					parameters.normalMap = textureMap.get( relationship.ID );
 					break;
 
-				case " \"AmbientColor":
-				case " \"EmissiveColor":
-				case "AmbientColor":
-				case "EmissiveColor":
+				case 'AmbientColor':
+				case 'EmissiveColor':
+				case ' "AmbientColor':
+				case ' "EmissiveColor':
 				default:
-					console.warn( 'Unknown texture application of type ' + type + ', skipping texture' );
+					console.warn( 'THREE.FBXLoader: Unknown texture application of type %s, skipping texture.', type );
 					break;
 
 			}
@@ -738,8 +742,38 @@
 
 		}
 
+		var weightTable = {};
+
+		if ( deformer ) {
+
+			var subDeformers = deformer.map;
+
+			for ( var key in subDeformers ) {
+
+				var subDeformer = subDeformers[ key ];
+				var indices = subDeformer.indices;
+
+				for ( var j = 0; j < indices.length; j ++ ) {
+
+					var index = indices[ j ];
+					var weight = subDeformer.weights[ j ];
+
+					if ( weightTable[ index ] === undefined ) weightTable[ index ] = [];
+
+					weightTable[ index ].push( {
+						id: subDeformer.index,
+						weight: weight
+					} );
+
+				}
+
+			}
+
+		}
+
 		var faceVertexBuffer = [];
 		var polygonIndex = 0;
+		var displayedWeightsWarning = false;
 
 		for ( var polygonVertexIndex = 0; polygonVertexIndex < indexBuffer.length; polygonVertexIndex ++ ) {
 
@@ -763,25 +797,14 @@
 
 			if ( deformer ) {
 
-				var subDeformers = deformer.map;
+				if ( weightTable[ vertexIndex ] !== undefined ) {
 
-				for ( var key in subDeformers ) {
+					var array = weightTable[ vertexIndex ];
 
-					var subDeformer = subDeformers[ key ];
-					var indices = subDeformer.indices;
+					for ( var j = 0, jl = array.length; j < jl; j ++ ) {
 
-					for ( var j = 0; j < indices.length; j ++ ) {
-
-						var index = indices[ j ];
-
-						if ( index === vertexIndex ) {
-
-							weights.push( subDeformer.weights[ j ] );
-							weightIndices.push( subDeformer.index );
-
-							break;
-
-						}
+						weights.push( array[ j ].weight );
+						weightIndices.push( array[ j ].id );
 
 					}
 
@@ -789,7 +812,12 @@
 
 				if ( weights.length > 4 ) {
 
-					console.warn( 'FBXLoader: Vertex has more than 4 skinning weights assigned to vertex.  Deleting additional weights.' );
+					if ( ! displayedWeightsWarning ) {
+
+						console.warn( 'THREE.FBXLoader: Vertex has more than 4 skinning weights assigned to vertex. Deleting additional weights.' );
+						displayedWeightsWarning = true;
+
+					}
 
 					var WIndex = [ 0, 0, 0, 0 ];
 					var Weight = [ 0, 0, 0, 0 ];
@@ -1222,7 +1250,7 @@
 
 		if ( THREE.NURBSCurve === undefined ) {
 
-			console.error( "THREE.FBXLoader relies on THREE.NURBSCurve for any nurbs present in the model.  Nurbs will show up as empty geometry." );
+			console.error( 'THREE.FBXLoader: The loader relies on THREE.NURBSCurve for any nurbs present in the model. Nurbs will show up as empty geometry.' );
 			return new THREE.BufferGeometry();
 
 		}
@@ -1231,7 +1259,7 @@
 
 		if ( isNaN( order ) ) {
 
-			console.error( "FBXLoader: Invalid Order " + geometryNode.properties.Order + " given for geometry ID: " + geometryNode.id );
+			console.error( 'THREE.FBXLoader: Invalid Order %s given for geometry ID: %s', geometryNode.properties.Order, geometryNode.id );
 			return new THREE.BufferGeometry();
 
 		}
@@ -1345,7 +1373,7 @@
 
 				switch ( node.attrType ) {
 
-					case "Mesh":
+					case 'Mesh':
 						/**
 						 * @type {?THREE.BufferGeometry}
 						 */
@@ -1417,7 +1445,7 @@
 						}
 						break;
 
-					case "NurbsCurve":
+					case 'NurbsCurve':
 						var geometry = null;
 
 						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
@@ -2154,6 +2182,41 @@
 			if ( curveNode.attr === 'R' ) {
 
 				var curves = curveNode.curves;
+
+				// Seems like some FBX files have AnimationCurveNode
+				// which doesn't have any connected AnimationCurve.
+				// Setting animation parameter for them here.
+
+				if ( curves.x === null ) {
+
+					curves.x = {
+						version: null,
+						times: [ 0.0 ],
+						values: [ 0.0 ]
+					};
+
+				}
+
+				if ( curves.y === null ) {
+
+					curves.y = {
+						version: null,
+						times: [ 0.0 ],
+						values: [ 0.0 ]
+					};
+
+				}
+
+				if ( curves.z === null ) {
+
+					curves.z = {
+						version: null,
+						times: [ 0.0 ],
+						values: [ 0.0 ]
+					};
+
+				}
+
 				curves.x.values = curves.x.values.map( degreeToRadian );
 				curves.y.values = curves.y.values.map( degreeToRadian );
 				curves.z.values = curves.z.values.map( degreeToRadian );
@@ -3228,8 +3291,8 @@
 		} catch ( error ) {
 
 			// Curve is not fully plotted.
-			console.log( bone );
-			console.log( error );
+			console.log( 'THREE.FBXLoader: ', bone );
+			console.log( 'THREE.FBXLoader: ', error );
 
 		}
 
@@ -3562,30 +3625,33 @@
 			this.currentProp = [];
 			this.currentPropName = '';
 
-			var split = text.split( "\n" );
+			var split = text.split( '\n' );
 
-			for ( var line in split ) {
+			for ( var lineNum = 0, lineLength = split.length; lineNum < lineLength; lineNum ++ ) {
 
-				var l = split[ line ];
+				var l = split[ lineNum ];
 
-				// short cut
+				// skip comment line
 				if ( l.match( /^[\s\t]*;/ ) ) {
 
 					continue;
 
-				} // skip comment line
+				}
+
+				// skip empty line
 				if ( l.match( /^[\s\t]*$/ ) ) {
 
 					continue;
 
-				} // skip empty line
+				}
 
 				// beginning of node
-				var beginningOfNodeExp = new RegExp( "^\\t{" + this.currentIndent + "}(\\w+):(.*){", '' );
+				var beginningOfNodeExp = new RegExp( '^\\t{' + this.currentIndent + '}(\\w+):(.*){', '' );
 				var match = l.match( beginningOfNodeExp );
+
 				if ( match ) {
 
-					var nodeName = match[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, "" );
+					var nodeName = match[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, '' );
 					var nodeAttrs = match[ 2 ].split( ',' );
 
 					for ( var i = 0, l = nodeAttrs.length; i < l; i ++ ) {
@@ -3598,12 +3664,22 @@
 				}
 
 				// node's property
-				var propExp = new RegExp( "^\\t{" + ( this.currentIndent ) + "}(\\w+):[\\s\\t\\r\\n](.*)" );
+				var propExp = new RegExp( '^\\t{' + ( this.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
 				var match = l.match( propExp );
+
 				if ( match ) {
 
-					var propName = match[ 1 ].replace( /^"/, '' ).replace( /"$/, "" ).trim();
-					var propValue = match[ 2 ].replace( /^"/, '' ).replace( /"$/, "" ).trim();
+					var propName = match[ 1 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
+					var propValue = match[ 2 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
+
+					// for special case: base64 image data follows "Content: ," line
+					//	Content: ,
+					//	 "iVB..."
+					if ( propName === 'Content' && propValue === ',' ) {
+
+						propValue = split[ ++ lineNum ].replace( /"/g, '' ).trim();
+
+					}
 
 					this.parseNodeProperty( l, propName, propValue );
 					continue;
@@ -3611,7 +3687,8 @@
 				}
 
 				// end of node
-				var endOfNodeExp = new RegExp( "^\\t{" + ( this.currentIndent - 1 ) + "}}" );
+				var endOfNodeExp = new RegExp( '^\\t{' + ( this.currentIndent - 1 ) + '}}' );
+
 				if ( l.match( endOfNodeExp ) ) {
 
 					this.nodeEnd();
@@ -3720,7 +3797,7 @@
 
 			var id = attrs[ 0 ];
 
-			if ( attrs[ 0 ] !== "" ) {
+			if ( attrs[ 0 ] !== '' ) {
 
 				id = parseInt( attrs[ 0 ] );
 
@@ -3752,7 +3829,7 @@
 			var parentName = currentNode.name;
 
 			// special case parent node's is like "Properties70"
-			// these chilren nodes must treat with careful
+			// these children nodes must treat with careful
 			if ( parentName !== undefined ) {
 
 				var propMatch = parentName.match( /Properties(\d)+/ );
@@ -3766,7 +3843,7 @@
 			}
 
 			// special case Connections
-			if ( propName == 'C' ) {
+			if ( propName === 'C' ) {
 
 				var connProps = propValue.split( ',' ).slice( 1 );
 				var from = parseInt( connProps[ 0 ] );
@@ -3787,7 +3864,7 @@
 			}
 
 			// special case Connections
-			if ( propName == 'Node' ) {
+			if ( propName === 'Node' ) {
 
 				var id = parseInt( propValue );
 				currentNode.properties.id = id;
@@ -3862,16 +3939,16 @@
 			// cast value in its type
 			switch ( innerPropType1 ) {
 
-				case "int":
+				case 'int':
 					innerPropValue = parseInt( innerPropValue );
 					break;
 
-				case "double":
+				case 'double':
 					innerPropValue = parseFloat( innerPropValue );
 					break;
 
-				case "ColorRGB":
-				case "Vector3D":
+				case 'ColorRGB':
+				case 'Vector3D':
 					innerPropValue = parseFloatArray( innerPropValue );
 					break;
 
@@ -3926,7 +4003,7 @@
 
 			var version = reader.getUint32();
 
-			console.log( 'FBX binary version: ' + version );
+			console.log( 'THREE.FBXLoader: FBX binary version: ' + version );
 
 			var allNodes = new FBXTree();
 
@@ -3951,7 +4028,7 @@
 			// footer size: 160bytes + 16-byte alignment padding
 			// - 16bytes: magic
 			// - padding til 16-byte alignment (at least 1byte?)
-			//   (seems like some exporters embed fixed 15bytes?)
+			//   (seems like some exporters embed fixed 15 or 16bytes?)
 			// - 4bytes: magic
 			// - 4bytes: version
 			// - 120bytes: zero
@@ -3962,7 +4039,7 @@
 
 			} else {
 
-				return reader.getOffset() + 160 + 15 >= reader.size();
+				return reader.getOffset() + 160 + 16 >= reader.size();
 
 			}
 
@@ -4270,7 +4347,7 @@
 
 					if ( window.Zlib === undefined ) {
 
-						throw new Error( 'FBXLoader: Import inflate.min.js from https://github.com/imaya/zlib.js' );
+						throw new Error( 'THREE.FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
 					}
 
@@ -4305,7 +4382,7 @@
 					return reader.getArrayBuffer( length );
 
 				default:
-					throw new Error( 'FBXLoader: Unknown property type ' + type );
+					throw new Error( 'THREE.FBXLoader: Unknown property type ' + type );
 
 			}
 
@@ -4845,7 +4922,7 @@
 		for ( var i = 0; i < CORRECT.length; ++ i ) {
 
 			var num = read( 1 );
-			if ( num == CORRECT[ i ] ) {
+			if ( num === CORRECT[ i ] ) {
 
 				return false;
 
@@ -4870,7 +4947,7 @@
 			return version;
 
 		}
-		throw new Error( 'FBXLoader: Cannot find the version number for the file given.' );
+		throw new Error( 'THREE.FBXLoader: Cannot find the version number for the file given.' );
 
 	}
 

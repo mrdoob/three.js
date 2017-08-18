@@ -9,7 +9,6 @@
 				background:#777;
 				padding:0;
 				margin:0;
-				font-weight: bold;
 				overflow:hidden;
 			}
 
@@ -31,14 +30,14 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader - kinematics
+			 | robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/libs/tween.min.js"></script>
-		<script src="js/loaders/ColladaLoader.js"></script>
+		<script src="js/loaders/ColladaLoader2.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -67,8 +66,8 @@
 
 					if ( child instanceof THREE.Mesh ) {
 
-						child.geometry.computeFaceNormals();
-						child.material.shading = THREE.FlatShading;
+						// model does not have normals
+						child.material.flatShading = true;
 
 					}
 
@@ -132,7 +131,7 @@
 
 			function setupTween() {
 
-				var duration = getRandomInt( 1000, 5000 );
+				var duration = THREE.Math.randInt( 1000, 5000 );
 
 				var target = {};
 
@@ -146,7 +145,7 @@
 
 					tweenParameters[ i ] = position;
 
-					target[ i ] = getRandomInt( joint.limits.min, joint.limits.max )
+					target[ i ] = THREE.Math.randInt( joint.limits.min, joint.limits.max )
 
 				}
 
@@ -204,15 +203,6 @@
 				particleLight.position.z = Math.cos( timer * 4 ) * 3009;
 
 				renderer.render( scene, camera );
-
-			}
-
-			// Returns a random integer between min (inclusive) and max (inclusive)
-			// Using Math.round() will give you a non-uniform distribution!
-
-			function getRandomInt( min, max ) {
-
-				return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
 
 			}
 

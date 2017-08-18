@@ -9,7 +9,8 @@
  * @constructor
  */
 
-var SetMaterialCommand = function ( object, newMaterial ) {
+
+var SetMaterialCommand = function ( object, newMaterial , slot) {
 
 	Command.call( this );
 
@@ -17,23 +18,31 @@ var SetMaterialCommand = function ( object, newMaterial ) {
 	this.name = 'New Material';
 
 	this.object = object;
-	this.oldMaterial = ( object !== undefined ) ? object.material : undefined;
-	this.newMaterial = newMaterial;
 
+	this.slot = slot;
+
+	var material = this.editor.getObjectMaterial( this.object, this.slot );
+
+	this.oldMaterial = material;
+
+	this.newMaterial = newMaterial;
+	
 };
 
 SetMaterialCommand.prototype = {
 
 	execute: function () {
+		
+		this.editor.setObjectMaterial( this.object, this.slot, this.newMaterial );
 
-		this.object.material = this.newMaterial;
 		this.editor.signals.materialChanged.dispatch( this.newMaterial );
 
 	},
 
 	undo: function () {
+		
+		this.editor.setObjectMaterial( this.object, this.slot, this.oldMaterial );
 
-		this.object.material = this.oldMaterial;
 		this.editor.signals.materialChanged.dispatch( this.oldMaterial );
 
 	},

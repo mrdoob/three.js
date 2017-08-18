@@ -303,6 +303,8 @@
 				raycaster = new THREE.Raycaster();
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
+
 				velocity = new THREE.Vector3();
 
 				container = document.createElement( 'div' );
@@ -319,7 +321,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x333333, 1 );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

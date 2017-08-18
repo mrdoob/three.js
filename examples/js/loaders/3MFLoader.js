@@ -1,3 +1,7 @@
+/**
+ * @author technohippy / https://github.com/technohippy
+ */
+
 THREE.ThreeMFLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
@@ -14,9 +18,9 @@ THREE.ThreeMFLoader.prototype = {
 		var scope = this;
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function( text ) {
+		loader.load( url, function( buffer ) {
 
-			onLoad( scope.parse( text ) );
+			onLoad( scope.parse( buffer ) );
 
 		}, onProgress, onError );
 
@@ -51,7 +55,7 @@ THREE.ThreeMFLoader.prototype = {
 
 				if ( e instanceof ReferenceError ) {
 
-					console.log( '	jszip missing and file is compressed.' );
+					console.error( 'THREE.ThreeMFLoader: jszip missing and file is compressed.' );
 					return null;
 
 				}
@@ -95,7 +99,7 @@ THREE.ThreeMFLoader.prototype = {
 
 				if ( TextDecoder === undefined ) {
 
-					console.log( '	TextDecoder not present.	Please use TextDecoder polyfill.' );
+					console.error( 'THREE.ThreeMFLoader: TextDecoder not present. Please use a TextDecoder polyfill.' );
 					return null;
 
 				}
@@ -105,7 +109,7 @@ THREE.ThreeMFLoader.prototype = {
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
 
-					console.log( '	Error loading 3MF - no 3MF document found: ' + modelPart );
+					console.error( 'THREE.ThreeMFLoader: Error loading 3MF - no 3MF document found: ', modelPart );
 
 				}
 
@@ -372,7 +376,6 @@ THREE.ThreeMFLoader.prototype = {
 		function parseResourcesNode( resourcesNode ) {
 
 			var resourcesData = {};
-			var geometry, material;
 			var basematerialsNode = resourcesNode.querySelector( 'basematerials' );
 
 			if ( basematerialsNode ) {
@@ -479,7 +482,7 @@ THREE.ThreeMFLoader.prototype = {
 			geometry.computeBoundingSphere();
 
 			var materialOpts = {
-				shading: THREE.FlatShading
+				flatShading: true
 			};
 
 			if ( meshData[ 'colors' ] && 0 < meshData[ 'colors' ].length ) {
@@ -499,8 +502,10 @@ THREE.ThreeMFLoader.prototype = {
 
 		function applyExtensions( extensions, meshData, modelXml, data3mf ) {
 
-			if ( !extensions ) {
+			if ( ! extensions ) {
+
 				return;
+
 			}
 
 			var availableExtensions = [];
@@ -530,6 +535,7 @@ THREE.ThreeMFLoader.prototype = {
 				extension.apply( modelXml, extensions[ extension[ 'ns' ] ], meshData );
 
 			}
+
 		}
 
 		function buildMeshes( data3mf ) {
@@ -590,14 +596,14 @@ THREE.ThreeMFLoader.prototype = {
 		var data3mf = loadDocument( data );
 		var meshes = buildMeshes( data3mf );
 
-		return build( meshes, data3mf[ 'rels' ], data3mf )
+		return build( meshes, data3mf[ 'rels' ], data3mf );
 
 	},
 
-    addExtension: function( extension ) {
+	addExtension: function( extension ) {
 
 		this.availableExtensions.push( extension );
 
-    }
+	}
 
 };

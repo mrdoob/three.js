@@ -4,6 +4,7 @@ var list = {
 
 		"Getting Started": {
 			"Creating a scene": "manual/introduction/Creating-a-scene",
+			"Import via modules": "manual/introduction/Import-via-modules",
 			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
 			"How to run things locally": "manual/introduction/How-to-run-thing-locally",
 			"Drawing Lines": "manual/introduction/Drawing-lines",
@@ -131,7 +132,6 @@ var list = {
 
 		"Extras / Objects": {
 			"ImmediateRenderObject": "api/extras/objects/ImmediateRenderObject",
-			"MorphBlendMesh": "api/extras/objects/MorphBlendMesh"
 		},
 
 		"Geometries": {
@@ -168,6 +168,7 @@ var list = {
 			"SphereGeometry": "api/geometries/SphereGeometry",
 			"TetrahedronBufferGeometry": "api/geometries/TetrahedronBufferGeometry",
 			"TetrahedronGeometry": "api/geometries/TetrahedronGeometry",
+			"TextBufferGeometry": "api/geometries/TextBufferGeometry",
 			"TextGeometry": "api/geometries/TextGeometry",
 			"TorusBufferGeometry": "api/geometries/TorusBufferGeometry",
 			"TorusGeometry": "api/geometries/TorusGeometry",
@@ -340,7 +341,7 @@ var list = {
 		"Loaders": {
 			"BabylonLoader": "examples/loaders/BabylonLoader",
 			"ColladaLoader": "examples/loaders/ColladaLoader",
-			"GLTF2Loader": "examples/loaders/GLTF2Loader",
+			"GLTFLoader": "examples/loaders/GLTFLoader",
 			"MTLLoader": "examples/loaders/MTLLoader",
 			"OBJLoader": "examples/loaders/OBJLoader",
 			"OBJLoader2": "examples/loaders/OBJLoader2",

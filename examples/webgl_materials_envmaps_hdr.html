@@ -84,9 +84,9 @@
 				camera.position.set( 0.0, 40, 40 * 3.5 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				renderer.toneMapping = THREE.LinearToneMapping;
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
@@ -94,8 +94,7 @@
 					bumpScale: - 0.05,
 					color: 0xff4444,
 					metalness: 0.5,
-					roughness: 1.0,
-					shading: THREE.SmoothShading
+					roughness: 1.0
 				} );
 
 				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
@@ -111,8 +110,7 @@
 					roughnessMap: null,
 					color: 0xffffff,
 					metalness: 0.0,
-					roughness: 0.0,
-					shading: THREE.SmoothShading
+					roughness: 0.0
 				} );
 
 				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
@@ -210,8 +208,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -286,11 +282,11 @@
 						case 'front': side = THREE.FrontSide; break;
 						case 'back': side = THREE.BackSide; break;
 						case 'double': side = THREE.DoubleSide; break;
-	
+
 					}
 
 					if( standardMaterial.side !== side ) {
-						
+
 						standardMaterial.side = side;
 						standardMaterial.needsUpdate = true;
 

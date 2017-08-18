@@ -10,16 +10,20 @@
  * @constructor
  */
 
-var SetMaterialValueCommand = function ( object, attributeName, newValue ) {
+var SetMaterialValueCommand = function ( object, attributeName, newValue, slot ) {
 
 	Command.call( this );
 
 	this.type = 'SetMaterialValueCommand';
 	this.name = 'Set Material.' + attributeName;
 	this.updatable = true;
+	this.slot = slot;
 
 	this.object = object;
-	this.oldValue = ( object !== undefined ) ? object.material[ attributeName ] : undefined;
+
+	var material = this.editor.getObjectMaterial( this.object, this.slot );
+	
+	this.oldValue = ( material !== undefined ) ? material[ attributeName ] : undefined;
 	this.newValue = newValue;
 	this.attributeName = attributeName;
 
@@ -28,20 +32,21 @@ var SetMaterialValueCommand = function ( object, attributeName, newValue ) {
 SetMaterialValueCommand.prototype = {
 
 	execute: function () {
-
-		this.object.material[ this.attributeName ] = this.newValue;
-		this.object.material.needsUpdate = true;
+		var material = this.editor.getObjectMaterial( this.object, this.slot );
+		material[ this.attributeName ] = this.newValue;
+		material.needsUpdate = true;
 		this.editor.signals.objectChanged.dispatch( this.object );
-		this.editor.signals.materialChanged.dispatch( this.object.material );
+		this.editor.signals.materialChanged.dispatch( material );
 
 	},
 
 	undo: function () {
+		var material = this.editor.getObjectMaterial( this.object, this.slot );
 
-		this.object.material[ this.attributeName ] = this.oldValue;
-		this.object.material.needsUpdate = true;
+		material[ this.attributeName ] = this.oldValue;
+		material.needsUpdate = true;
 		this.editor.signals.objectChanged.dispatch( this.object );
-		this.editor.signals.materialChanged.dispatch( this.object.material );
+		this.editor.signals.materialChanged.dispatch( material );
 
 	},
 

@@ -94,16 +94,15 @@
 				camera.position.set( 0.0, 35, 35 * 3.5 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( new THREE.Color( 0x111111 ) );
 				renderer.toneMapping = THREE.LinearToneMapping;
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					color: 0xffffff,
-					metalness: 1.0,
-					shading: THREE.SmoothShading
+					metalness: 1.0
 				} );
 
 				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
@@ -185,8 +184,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
