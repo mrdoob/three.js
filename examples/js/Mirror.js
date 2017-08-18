@@ -136,9 +136,9 @@ THREE.Mirror = function ( width, height, options ) {
 		target.add( mirrorWorldPosition );
 
 		mirrorCamera.position.copy( view );
-		mirrorCamera.up.set( 0, - 1, 0 );
+		mirrorCamera.up.set( 0, 1, 0 );
 		mirrorCamera.up.applyMatrix4( rotationMatrix );
-		mirrorCamera.up.reflect( normal ).negate();
+		mirrorCamera.up.reflect( normal );
 		mirrorCamera.lookAt( target );
 
 		mirrorCamera.aspect = camera.aspect;
