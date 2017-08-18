@@ -27,7 +27,7 @@ Sidebar.Material = function ( editor ) {
 	materialSlotRow.add( new UI.Text( 'Slot' ).setWidth( '90px' ) );
 
 	var materialSlotSelect =  new UI.Select().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
-
+	materialSlotSelect.setOptions( { 0: '' } ).setValue( 0 );
 	materialSlotRow.add( materialSlotSelect );
 
 	container.add( materialSlotRow );
