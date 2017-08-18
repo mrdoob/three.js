@@ -21880,6 +21880,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( isAnimating ) return;
 		( vr.getDevice() || window ).requestAnimationFrame( loop );
+		isAnimating = true;
 
 	}
 
@@ -43335,7 +43336,7 @@ Object.defineProperties( Material.prototype, {
 		set: function ( value ) {
 
 			console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
-			this.flatShading = ( value === THREE.FlatShading ) ? true : false;
+			this.flatShading = ( value === FlatShading );
 
 		}
 	}
