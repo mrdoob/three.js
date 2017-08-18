@@ -838,29 +838,6 @@ THREE.GLTFLoader = ( function () {
 	/*********************************/
 
 	/* CONSTANTS */
-
-	var WEBGL_CONSTANTS = {
-		FLOAT: 5126,
-		//FLOAT_MAT2: 35674,
-		FLOAT_MAT3: 35675,
-		FLOAT_MAT4: 35676,
-		FLOAT_VEC2: 35664,
-		FLOAT_VEC3: 35665,
-		FLOAT_VEC4: 35666,
-		LINEAR: 9729,
-		REPEAT: 10497,
-		SAMPLER_2D: 35678,
-		POINTS: 0,
-		LINES: 1,
-		LINE_LOOP: 2,
-		LINE_STRIP: 3,
-		TRIANGLES: 4,
-		TRIANGLE_STRIP: 5,
-		TRIANGLE_FAN: 6,
-		UNSIGNED_BYTE: 5121,
-		UNSIGNED_SHORT: 5123
-	};
-
 	var WEBGL_TYPE = {
 		5126: Number,
 		//35674: THREE.Matrix2,
@@ -1951,33 +1928,33 @@ THREE.GLTFLoader = ( function () {
 
 						var mesh;
 
-						if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
+						if ( primitive.mode === THREE.WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
 
 							mesh = new THREE.Mesh( geometry, material );
 
-						} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
+						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
 
 							mesh = new THREE.Mesh( geometry, material );
 							mesh.drawMode = THREE.TriangleStripDrawMode;
 
-						} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ) {
+						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.TRIANGLE_FAN ) {
 
 							mesh = new THREE.Mesh( geometry, material );
 							mesh.drawMode = THREE.TriangleFanDrawMode;
 
-						} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
+						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.LINES ) {
 
 							mesh = new THREE.LineSegments( geometry, material );
 
-						} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_STRIP ) {
+						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.LINE_STRIP ) {
 
 							mesh = new THREE.Line( geometry, material );
 
-						} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_LOOP ) {
+						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.LINE_LOOP ) {
 
 							mesh = new THREE.LineLoop( geometry, material );
 
-						} else if ( primitive.mode === WEBGL_CONSTANTS.POINTS ) {
+						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.POINTS ) {
 
 							mesh = new THREE.Points( geometry, material );
 
