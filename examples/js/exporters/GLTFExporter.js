@@ -57,6 +57,13 @@ THREE.GLTFExporter.prototype = {
 	 */
 	parse: function ( input, onDone, options ) {
 
+		var DEFAULT_OPTIONS = {
+			trs: false,
+			onlyVisible: true
+		};
+
+		options = Object.assign( {}, DEFAULT_OPTIONS, options );
+
 		var outputJSON = {
 
 			asset: {
