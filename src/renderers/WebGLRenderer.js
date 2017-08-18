@@ -1013,6 +1013,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( isAnimating ) return;
 		( vr.getDevice() || window ).requestAnimationFrame( loop );
+		isAnimating = true;
 
 	}
 
