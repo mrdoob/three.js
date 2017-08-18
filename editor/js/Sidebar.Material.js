@@ -26,8 +26,8 @@ Sidebar.Material = function ( editor ) {
 
 	materialSlotRow.add( new UI.Text( 'Slot' ).setWidth( '90px' ) );
 
-	var materialSlotSelect =  new UI.Select().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
-
+	var materialSlotSelect = new UI.Select().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
+	materialSlotSelect.setOptions( { 0: '' } ).setValue( 0 );
 	materialSlotRow.add( materialSlotSelect );
 
 	container.add( materialSlotRow );
@@ -518,7 +518,7 @@ Sidebar.Material = function ( editor ) {
 
 		if ( currentMaterialSlot !== previousSelectedSlot ) refreshUI( true );
 
-		material  = editor.getObjectMaterial( currentObject, currentMaterialSlot )
+		material = editor.getObjectMaterial( currentObject, currentMaterialSlot )
 
 		var textureWarning = false;
 		var objectHasUvs = false;
