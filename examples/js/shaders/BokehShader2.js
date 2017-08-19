@@ -220,7 +220,7 @@ THREE.BokehShader = {
 			"col.g = texture2D(tColor,coords + vec2(-0.866,-0.5)*texel*fringe*blur).g;",
 			"col.b = texture2D(tColor,coords + vec2(0.866,-0.5)*texel*fringe*blur).b;",
 
-			"vec3 lumcoeff = vec3(0.299,0.587,0.114);",
+			"vec3 lumcoeff = vec3(0.2126, 0.7152, 0.0722);",
 			"float lum = dot(col.rgb, lumcoeff);",
 			"float thresh = max((lum-threshold)*gain, 0.0);",
 			"return col+mix(vec3(0.0),col,thresh*blur);",

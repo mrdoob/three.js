@@ -212,7 +212,7 @@ THREE.SSAOShader = {
 
 			"vec3 color = texture2D( tDiffuse, vUv ).rgb;",
 
-			"vec3 lumcoeff = vec3( 0.299, 0.587, 0.114 );",
+			"vec3 lumcoeff = vec3( 0.2126, 0.7152, 0.0722 );",
 			"float lum = dot( color.rgb, lumcoeff );",
 			"vec3 luminance = vec3( lum );",
 

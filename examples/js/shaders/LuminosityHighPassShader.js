@@ -47,7 +47,7 @@ THREE.LuminosityHighPassShader = {
 
 			"vec4 texel = texture2D( tDiffuse, vUv );",
 
-			"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
+			"vec3 luma = vec3( 0.2126, 0.7152, 0.0722 );",
 
 			"float v = dot( texel.xyz, luma );",
 
