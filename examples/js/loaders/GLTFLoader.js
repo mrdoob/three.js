@@ -1815,16 +1815,7 @@ THREE.GLTFLoader = ( function () {
 
 						if ( geometry.attributes.normal === undefined ) {
 
-							if ( material.flatShading !== undefined ) {
-
-								material.flatShading = true;
-
-							} else {
-
-								// TODO: Remove this backwards-compatibility fix after r87 release.
-								material.shading = THREE.FlatShading;
-
-							}
+							material.flatShading = true;
 
 						}
 
