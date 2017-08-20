@@ -335,7 +335,8 @@ var list = {
 
 		"Geometries": {
 			"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
-			"ConvexGeometry": "examples/geometries/ConvexGeometry"
+			"ConvexGeometry": "examples/geometries/ConvexGeometry",
+			"DecalGeometry": "examples/geometries/DecalGeometry"
 		},
 
 		"Loaders": {
