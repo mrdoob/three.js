@@ -166,16 +166,16 @@ THREE.STLLoader.prototype = {
 					vertices.push( reader.getFloat32( vertexstart, true ) );
 					vertices.push( reader.getFloat32( vertexstart + 4, true ) );
 					vertices.push( reader.getFloat32( vertexstart + 8, true ) );
+				}
 
-					normals.push( normalX, normalY, normalZ );
+				normals.push( normalX, normalY, normalZ );
 
-					if ( hasColors ) {
+				if ( hasColors ) {
 
-						colors.push( r, g, b );
-
-					}
+					colors.push( r, g, b );
 
 				}
+
 
 			}
 
