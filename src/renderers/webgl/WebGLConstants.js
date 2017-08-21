@@ -2,7 +2,7 @@
  * @author fernandojsg / http://fernandojsg.com
  */
 
-var WEBGL_CONSTANTS = {
+var WebGLConstants = {
 	// Rendering primitives
 	POINTS: 0x0000,
 	LINES: 0x0001,
@@ -54,4 +54,4 @@ var WEBGL_CONSTANTS = {
 	MIRRORED_REPEAT: 0x8370
 };
 
-export { WEBGL_CONSTANTS };
+export { WebGLConstants };
