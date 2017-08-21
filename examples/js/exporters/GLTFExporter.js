@@ -772,7 +772,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.children.length > 0 ) {
 
-				gltfNode.children = [];
+				var children = [];
 
 				for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
@@ -783,11 +783,18 @@ THREE.GLTFExporter.prototype = {
 						child instanceof THREE.Line ||
 						child instanceof THREE.Points) {
 
-						gltfNode.children.push( processNode( child ) );
+						children.push( processNode( child ) );
 
 					}
 
 				}
+
+				if ( children.length > 0 ) {
+
+					gltfNode.children = children;
+
+				}
+
 
 			}
 
