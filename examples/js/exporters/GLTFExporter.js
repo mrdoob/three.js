@@ -895,7 +895,7 @@ THREE.GLTFExporter.prototype = {
 
 		// Generate buffer
 		// Create a new blob with all the dataviews from the buffers
-		var blob = new Blob( dataViews, { type: 'application/octet-binary' } );
+		var blob = new Blob( dataViews, { type: 'application/octet-stream' } );
 
 		// Update the bytlength of the only main buffer and update the uri with the base64 representation of it
 		if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
