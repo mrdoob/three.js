@@ -834,6 +834,7 @@ THREE.GLTFExporter.prototype = {
 			for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
 				var child = scene.children[ i ];
+				var nodes = [];
 
 				// @TODO We don't process lights yet
 				if ( child instanceof THREE.Mesh ||
@@ -842,7 +843,13 @@ THREE.GLTFExporter.prototype = {
 					child instanceof THREE.Line ||
 					child instanceof THREE.Points) {
 
-					gltfScene.nodes.push( processNode( child ) );
+					nodes.push( processNode( child ) );
+
+				}
+
+				if ( nodes.length > 0 ) {
+
+					gltfScene.nodes = nodes;
 
 				}
 
