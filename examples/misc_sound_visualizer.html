@@ -34,8 +34,11 @@
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
-			void main()	{
+			varying vec2 vUv;
 
+			void main() {
+
+				vUv = uv;
 				gl_Position = vec4( position, 1.0 );
 
 			}
@@ -45,17 +48,16 @@
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
 			uniform sampler2D tAudioData;
-			uniform vec2 resolution;
 
-			void main()	{
+			varying vec2 vUv;
 
-				vec2 uv = gl_FragCoord.xy / resolution.xy;
+			void main() {
 
 				vec3 backgroundColor = vec3( 0.0 );
 				vec3 color = vec3( 1.0, 0.0, 0.0 );
 
-				float f = texture2D( tAudioData, vec2( uv.x, 0.0 ) ).r; // sample data texture (only the red channel is relevant)
-				float i = step( uv.y, f );
+				float f = texture2D( tAudioData, vec2( vUv.x, 0.0 ) ).r; // sample data texture (only the red channel is relevant)
+				float i = step( vUv.y, f );
 
 				gl_FragColor = vec4( mix( backgroundColor, color, i ), 1.0 );
 
@@ -97,14 +99,14 @@
 
 		renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setSize( window.innerWidth, window.innerHeight );
-		renderer.setClearColor( 0x20252f );
+		renderer.setClearColor( 0x000000 );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		container.appendChild( renderer.domElement );
 
 		//
 
-		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-		camera.position.set( 0, 5, 50 );
+		camera = new THREE.Camera();
+		camera.position.z = 1;
 
 		//
 
@@ -131,8 +133,7 @@
 		var size = fftSize / 2;
 
 		uniforms = {
-			tAudioData: { value: new THREE.DataTexture( new Uint8Array( size * 3 ), size, 1, THREE.RGBFormat ) },
-			resolution: { value: new THREE.Vector2( renderer.domElement.width, renderer.domElement.height ) }
+			tAudioData: { value: new THREE.DataTexture( analyser.data, size, 1, THREE.LuminanceFormat ) }
 		};
 
 		var material = new THREE.ShaderMaterial( {
@@ -158,9 +159,6 @@
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
 
-		uniforms.resolution.value.x = renderer.domElement.width;
-		uniforms.resolution.value.y = renderer.domElement.height;
-
 	}
 
 	function animate() {
@@ -174,14 +172,6 @@
 	function render() {
 
 		var data = analyser.getFrequencyData();
-
-		// transfer all frequency data to our data texture so we can use them in the fragment shader
-
-		for ( var i = 0, l = data.length; i < l; i ++ ) {
-
-			uniforms.tAudioData.value.image.data[ i * 3 ] = data[ i ];
-
-		}
 
 		uniforms.tAudioData.value.needsUpdate = true;
 

@@ -1980,7 +1980,11 @@ THREE.ColladaLoader.prototype = {
 
 				// material
 
-				materialKeys.push( primitive.material );
+				if ( primitive.material ) {
+
+					materialKeys.push( primitive.material );
+
+				}
 
 				// geometry data
 
@@ -3122,6 +3126,24 @@ THREE.ColladaLoader.prototype = {
 
 				var materials = resolveMaterialBinding( geometry.materialKeys, instanceMaterials );
 
+				// handle case if no materials are defined
+
+				if ( materials.length === 0 ) {
+
+					if ( type === 'lines' || type === 'linestrips' ) {
+
+						materials.push( new THREE.LineBasicMaterial() );
+
+					} else {
+
+						materials.push( new THREE.MeshPhongMaterial() );
+
+					}
+
+				}
+
+				// regard skinning
+
 				var skinning = ( geometry.data.attributes.skinIndex !== undefined );
 
 				if ( skinning ) {
@@ -3134,7 +3156,13 @@ THREE.ColladaLoader.prototype = {
 
 				}
 
+				// choose between a single or multi materials (material array)
+
 				var material = ( materials.length === 1 ) ? materials[ 0 ] : materials;
+
+				// now create a specific 3D object
+
+				var object;
 
 				switch ( type ) {
 

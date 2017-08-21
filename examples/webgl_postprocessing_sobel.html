@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - sobel (edge detection)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#777;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+
+			a {
+				color: #ffffff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/LuminosityShader.js"></script>
+		<script src="js/shaders/SobelOperatorShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank">three.js</a> - webgl - postprocessing - sobel (edge detection)
+		</div>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer, composer;
+
+			var effectSobel;
+
+			var params = {
+				enable: true
+			};
+
+			init();
+			animate();
+
+			function init() {
+
+				//
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 10, 20 );
+				camera.lookAt( scene.position );
+
+				//
+
+				var geometry = new THREE.IcosahedronGeometry( 8 );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				//
+
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
+
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( pointLight );
+				scene.add( camera );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// postprocessing
+
+				composer = new THREE.EffectComposer( renderer );
+				var renderPass = new THREE.RenderPass( scene, camera );
+				composer.addPass( renderPass );
+
+				// color to grayscale conversion
+
+				var effectGrayScale = new THREE.ShaderPass( THREE.LuminosityShader );
+				composer.addPass( effectGrayScale );
+
+				// you might want to use a gaussian blur filter before
+				// the next pass to improve the result of the Sobel operator
+
+				// Sobel operator
+
+				effectSobel = new THREE.ShaderPass( THREE.SobelOperatorShader );
+				effectSobel.renderToScreen = true;
+				effectSobel.uniforms.resolution.value.x = window.innerWidth;
+				effectSobel.uniforms.resolution.value.y = window.innerHeight;
+				composer.addPass( effectSobel );
+
+				var controls = new THREE.OrbitControls( camera );
+
+				//
+
+				var gui = new dat.GUI();
+
+				gui.add( params, 'enable' );
+				gui.open();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect =  window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer.setSize( window.innerWidth, window.innerHeight );
+
+				effectSobel.uniforms.resolution.value.x = window.innerWidth;
+				effectSobel.uniforms.resolution.value.y = window.innerHeight;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				if ( params.enable === true ) {
+
+					composer.render();
+
+				} else {
+
+					renderer.render( scene, camera );
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>

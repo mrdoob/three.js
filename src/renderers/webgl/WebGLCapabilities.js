@@ -66,7 +66,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	}
 
-	var logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true && !! extensions.get( 'EXT_frag_depth' );
+	var logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 	var maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );

@@ -1004,21 +1004,34 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	// Rendering
+	// Animation Loop
+
+	var isAnimating = false;
+	var onAnimationFrame = null;
+
+	function start() {
+
+		if ( isAnimating ) return;
+		( vr.getDevice() || window ).requestAnimationFrame( loop );
+		isAnimating = true;
+
+	}
+
+	function loop( time ) {
+
+		if ( onAnimationFrame !== null ) onAnimationFrame( time );
+		( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+	}
 
 	this.animate = function ( callback ) {
 
-		function onFrame() {
-
-			callback();
-
-			( vr.getDevice() || window ).requestAnimationFrame( onFrame );
-
-		}
-
-		( vr.getDevice() || window ).requestAnimationFrame( onFrame );
+		onAnimationFrame = callback;
+		start();
 
 	};
+
+	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
@@ -1350,8 +1363,6 @@ function WebGLRenderer( parameters ) {
 						var height = bounds.w * _height;
 
 						state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
-						state.scissor( _currentScissor.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
-						state.setScissorTest( true );
 
 						renderObject( object, scene, camera2, geometry, material, group );
 
@@ -1804,10 +1815,6 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-			} else if ( material.isMeshNormalMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-
 			} else if ( material.isMeshDepthMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
@@ -1820,6 +1827,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( material.isMeshNormalMaterial ) {
 
+				refreshUniformsCommon( m_uniforms, material );
 				refreshUniformsNormal( m_uniforms, material );
 
 			} else if ( material.isLineBasicMaterial ) {
