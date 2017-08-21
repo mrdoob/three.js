@@ -1834,33 +1834,33 @@ THREE.GLTFLoader = ( function () {
 
 						var mesh;
 
-						if ( primitive.mode === THREE.WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
+						if ( primitive.mode === THREE.WebGLConstants.TRIANGLES || primitive.mode === undefined ) {
 
 							mesh = new THREE.Mesh( geometry, material );
 
-						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
+						} else if ( primitive.mode === THREE.WebGLConstants.TRIANGLE_STRIP ) {
 
 							mesh = new THREE.Mesh( geometry, material );
 							mesh.drawMode = THREE.TriangleStripDrawMode;
 
-						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.TRIANGLE_FAN ) {
+						} else if ( primitive.mode === THREE.WebGLConstants.TRIANGLE_FAN ) {
 
 							mesh = new THREE.Mesh( geometry, material );
 							mesh.drawMode = THREE.TriangleFanDrawMode;
 
-						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.LINES ) {
+						} else if ( primitive.mode === THREE.WebGLConstants.LINES ) {
 
 							mesh = new THREE.LineSegments( geometry, material );
 
-						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.LINE_STRIP ) {
+						} else if ( primitive.mode === THREE.WebGLConstants.LINE_STRIP ) {
 
 							mesh = new THREE.Line( geometry, material );
 
-						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.LINE_LOOP ) {
+						} else if ( primitive.mode === THREE.WebGLConstants.LINE_LOOP ) {
 
 							mesh = new THREE.LineLoop( geometry, material );
 
-						} else if ( primitive.mode === THREE.WEBGL_CONSTANTS.POINTS ) {
+						} else if ( primitive.mode === THREE.WebGLConstants.POINTS ) {
 
 							mesh = new THREE.Points( geometry, material );
 
