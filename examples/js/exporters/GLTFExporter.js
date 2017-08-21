@@ -32,10 +32,10 @@ var WEBGL_CONSTANTS = {
 var THREE_TO_WEBGL = {
 	// @TODO Replace with computed property name [THREE.*] when available on es6
 	1003: WEBGL_CONSTANTS.NEAREST,
-	1004: WEBGL_CONSTANTS.LINEAR,
-	1005: WEBGL_CONSTANTS.NEAREST_MIPMAP_NEAREST,
-	1006: WEBGL_CONSTANTS.LINEAR_MIPMAP_NEAREST,
-	1007: WEBGL_CONSTANTS.NEAREST_MIPMAP_LINEAR,
+	1004: WEBGL_CONSTANTS.NEAREST_MIPMAP_NEAREST,
+	1005: WEBGL_CONSTANTS.NEAREST_MIPMAP_LINEAR,
+	1006: WEBGL_CONSTANTS.LINEAR,
+	1007: WEBGL_CONSTANTS.LINEAR_MIPMAP_NEAREST,
 	1008: WEBGL_CONSTANTS.LINEAR_MIPMAP_LINEAR
  };
 
@@ -772,7 +772,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.children.length > 0 ) {
 
-				gltfNode.children = [];
+				var children = [];
 
 				for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
@@ -783,11 +783,18 @@ THREE.GLTFExporter.prototype = {
 						child instanceof THREE.Line ||
 						child instanceof THREE.Points) {
 
-						gltfNode.children.push( processNode( child ) );
+						children.push( processNode( child ) );
 
 					}
 
 				}
+
+				if ( children.length > 0 ) {
+
+					gltfNode.children = children;
+
+				}
+
 
 			}
 
@@ -827,6 +834,7 @@ THREE.GLTFExporter.prototype = {
 			for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
 				var child = scene.children[ i ];
+				var nodes = [];
 
 				// @TODO We don't process lights yet
 				if ( child instanceof THREE.Mesh ||
@@ -835,7 +843,13 @@ THREE.GLTFExporter.prototype = {
 					child instanceof THREE.Line ||
 					child instanceof THREE.Points) {
 
-					gltfScene.nodes.push( processNode( child ) );
+					nodes.push( processNode( child ) );
+
+				}
+
+				if ( nodes.length > 0 ) {
+
+					gltfScene.nodes = nodes;
 
 				}
 
@@ -895,7 +909,7 @@ THREE.GLTFExporter.prototype = {
 
 		// Generate buffer
 		// Create a new blob with all the dataviews from the buffers
-		var blob = new Blob( dataViews, { type: 'application/octet-binary' } );
+		var blob = new Blob( dataViews, { type: 'application/octet-stream' } );
 
 		// Update the bytlength of the only main buffer and update the uri with the base64 representation of it
 		if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
