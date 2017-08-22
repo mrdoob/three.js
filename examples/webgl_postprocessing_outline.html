@@ -43,7 +43,7 @@
 		<script src="js/shaders/FXAAShader.js"></script>
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
-    <script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/OutlinePass.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
@@ -57,8 +57,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
-			var camera, scene, renderer, controls;
-			var mesh, decal;
+			var camera, scene, renderer;
 			var raycaster = new THREE.Raycaster();
 
 			var mouse = new THREE.Vector2();
@@ -67,7 +66,7 @@
 			var composer, effectFXAA, outlinePass;
 			var obj3d = new THREE.Object3D();
 
-			var group = new THREE.Object3D();
+			var group = new THREE.Group();
 
 			var params = {
 				edgeStrength: 3.0,
@@ -79,68 +78,77 @@
 			};
 
 			// Init gui
-			var gui = new dat.GUI();
-			gui.add(params, "edgeStrength", 0.01, 10).onChange(function( value ) {
-				outlinePass.edgeStrength = Number(value);
+			var gui = new dat.GUI( { width: 300 } );
+			gui.add( params, 'edgeStrength', 0.01, 10 ).onChange( function( value ) {
+				outlinePass.edgeStrength = Number( value );
 			});
-			gui.add(params, "edgeGlow", 0.0, 1).onChange(function( value ) {
-				outlinePass.edgeGlow = Number(value);
+			gui.add( params, 'edgeGlow', 0.0, 1 ).onChange( function( value ) {
+				outlinePass.edgeGlow = Number( value );
 			});
-			gui.add(params, "edgeThickness", 1, 4).onChange(function( value ) {
-				outlinePass.edgeThickness = Number(value);
+			gui.add( params, 'edgeThickness', 1, 4 ).onChange( function( value ) {
+				outlinePass.edgeThickness = Number( value );
 			});
-			gui.add(params, "pulsePeriod", 0.0, 5).onChange(function( value ) {
-				outlinePass.pulsePeriod = Number(value);
+			gui.add( params, 'pulsePeriod', 0.0, 5 ).onChange( function( value ) {
+				outlinePass.pulsePeriod = Number( value );
 			});
-			gui.add(params, "rotate");
-			gui.add(params, "usePatternTexture").onChange(function( value ) {
+			gui.add( params, 'rotate' );
+			gui.add( params, 'usePatternTexture' ).onChange( function( value ) {
 				outlinePass.usePatternTexture = value;
 			});
 			var Configuration = function() {
-				this.visibleEdgeColor = "#ffffff";
-				this.hiddenEdgeColor  = "#190a05";
+				this.visibleEdgeColor = '#ffffff';
+				this.hiddenEdgeColor  = '#190a05';
 			};
 			var conf = new Configuration();
 
-			var controladorVisible = gui.addColor( conf, 'visibleEdgeColor');
-				var controladorHidden = gui.addColor( conf, 'hiddenEdgeColor');
-			controladorVisible.onChange(function( colorValue ) {
+			var controladorVisible = gui.addColor( conf, 'visibleEdgeColor' );
+			var controladorHidden = gui.addColor( conf, 'hiddenEdgeColor' );
+
+			controladorVisible.onChange( function( colorValue ) {
 				//the return value by the chooser is like as: #ffff
-				colorValue = colorValue.replace('#', '');
+				colorValue = colorValue.replace( '#', '' );
+
 				function hexToRgb( hex ) {
-					var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+					var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec( hex );
 					return result ? {
-						r: parseInt(result[ 1 ], 16),
-						g: parseInt(result[ 2 ], 16),
-						b: parseInt(result[ 3 ], 16)
+						r: parseInt( result[ 1 ], 16 ),
+						g: parseInt( result[ 2 ], 16 ),
+						b: parseInt( result[ 3 ], 16 )
 					} : null;
+
 				}
 
-				var rgba  = hexToRgb(colorValue);
+				var rgba  = hexToRgb( colorValue );
 				var color = outlinePass.visibleEdgeColor;
 				color.r   = rgba.r / 255;
 				color.g   = rgba.g / 255;
 				color.b   = rgba.b / 255;
-			});
 
-			controladorHidden.onChange(function( colorValue ) {
+			} );
+
+			controladorHidden.onChange( function( colorValue ) {
 				//the return value by the chooser is like as: #ffff
-				colorValue = colorValue.replace('#', '');
+				colorValue = colorValue.replace( '#', '' );
+
 				function hexToRgb( hex ) {
-					var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+					var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec( hex );
 					return result ? {
-						r: parseInt(result[ 1 ], 16),
-						g: parseInt(result[ 2 ], 16),
-						b: parseInt(result[ 3 ], 16)
+						r: parseInt( result[ 1 ], 16 ),
+						g: parseInt( result[ 2 ], 16 ),
+						b: parseInt( result[ 3 ], 16 )
 					} : null;
+
 				}
 
-				var rgba  = hexToRgb(colorValue);
+				var rgba  = hexToRgb( colorValue );
 				var color = outlinePass.hiddenEdgeColor;
 				color.r   = rgba.r / 255;
 				color.g   = rgba.g / 255;
 				color.b   = rgba.b / 255;
-			});
+
+			} );
 
 			init();
 			animate();
@@ -152,12 +160,10 @@
 
 				var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
-				var devicePixelRatio = window.devicePixelRatio || 1;
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.shadowMap.enabled = true;
 				renderer.setClearColor( 0xa0a0a0 );
-				renderer.setPixelRatio( 1 );
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
 
@@ -174,34 +180,43 @@
 				// model
 				var loader = new THREE.OBJLoader( manager );
 				loader.load( 'models/obj/tree.obj', function ( object ) {
+
 					var scale = 1.0;
+
 					object.traverse( function ( child ) {
+
 						if ( child instanceof THREE.Mesh ) {
+
 							child.geometry.center();
 							child.geometry.computeBoundingSphere();
-							scale = 0.2*child.geometry.boundingSphere.radius;
+							scale = 0.2 * child.geometry.boundingSphere.radius;
 							var phongMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 5 } );
 							child.material = phongMaterial;
 							child.material.side = THREE.DoubleSide;
 							child.receiveShadow = true;
 							child.castShadow = true;
+
 						}
+
 					} );
+
 					object.position.y = 1;
 					object.scale.x /= scale;
 					object.scale.y /= scale;
 					object.scale.z /= scale;
 					obj3d.add( object );
-				} );
-				group.add(obj3d);
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				} );
+
+				group.add( obj3d );
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
 
 				scene.add( group );
 
-				var light = new THREE.DirectionalLight( 0xddffdd, 0.4);
+				var light = new THREE.DirectionalLight( 0xddffdd, 0.4 );
 				light.position.z = 1;
 				light.position.y = 1;
 				light.position.x = 1;
@@ -236,11 +251,10 @@
 				scene.add( light3 );
 
 				var geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
+
 				for ( var i = 0; i < 20; i ++ ) {
 
 					var material = new THREE.MeshLambertMaterial();
-					material.roughness = 1;//0.5 * Math.random() + 0.25;
-					material.metalness = 0;
 					material.color.setHSL( Math.random(), 1.0, 0.3 );
 
 					var mesh = new THREE.Mesh( geometry, material );
@@ -254,6 +268,7 @@
 					mesh.castShadow = true;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 0.3 + 0.1;
 					group.add( mesh );
+
 				}
 
 				var floorMaterial = new THREE.MeshLambertMaterial();
@@ -268,7 +283,7 @@
 				group.add( floorMesh );
 				floorMesh.receiveShadow = true;
 
-				var geometry = new THREE.TorusGeometry( 1, 0.3, 16, 100 );
+				var geometry = new THREE.TorusBufferGeometry( 1, 0.3, 16, 100 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffaaff } );
 				var torus = new THREE.Mesh( geometry, material );
 				torus.position.z = -4;
@@ -285,12 +300,15 @@
 				var renderPass = new THREE.RenderPass( scene, camera );
 				composer.addPass( renderPass );
 
-				outlinePass = new THREE.OutlinePass( new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+				outlinePass = new THREE.OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera);
 				composer.addPass( outlinePass );
+
 				var onLoad = function ( texture ) {
+
 					outlinePass.patternTexture = texture;
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.wrapT = THREE.RepeatWrapping;
+
 				};
 
 				var loader = new THREE.TextureLoader();
@@ -299,12 +317,12 @@
 				loader.load(
 					// resource URL
 					'textures/tri_pattern.jpg',
-					// Function when resource is loaded
+					// function when resource is loaded
 					onLoad
 				);
 
-				effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
-				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 				effectFXAA.renderToScreen = true;
 				composer.addPass( effectFXAA );
 
@@ -336,9 +354,11 @@
 
 				}
 
-				function addSelectedObject(object) {
+				function addSelectedObject( object ) {
+
 					selectedObjects = [];
-					selectedObjects.push(object);
+					selectedObjects.push( object );
+
 				}
 
 				function checkIntersection() {
@@ -348,13 +368,17 @@
 					var intersects = raycaster.intersectObjects( [ scene ], true );
 
 					if ( intersects.length > 0 ) {
+
 						var selectedObject = intersects[ 0 ].object;
-						addSelectedObject(selectedObject);
+						addSelectedObject( selectedObject );
 						outlinePass.selectedObjects = selectedObjects;
-					}
-					else {
+
+					} else {
+
 						// outlinePass.selectedObjects = [];
+
 					}
+
 				}
 
 			}
@@ -363,14 +387,14 @@
 
 				var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
-				var devicePixelRatio = window.devicePixelRatio || 1;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
 				composer.setSize( width, height );
-				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+
 			}
 
 			function animate() {
@@ -380,16 +404,21 @@
 				stats.begin();
 
 				var timer = performance.now();
-				if(params.rotate)
+
+				if ( params.rotate ) {
+
 					group.rotation.y = timer * 0.0001;
+
+				}
+
 				renderer.autoClear = true;
 				renderer.setClearColor( 0xfff0f0 );
 				renderer.setClearAlpha( 0.0 );
 
 				composer.render();
 				stats.end();
-			}
 
+			}
 
 		</script>
 	</body>
