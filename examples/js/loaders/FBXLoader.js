@@ -401,7 +401,7 @@
 			for ( var nodeID in materialNodes ) {
 
 				var material = parseMaterial( materialNodes[ nodeID ], textureMap, connections );
-				materialMap.set( parseInt( nodeID ), material );
+				if ( material !== null ) materialMap.set( parseInt( nodeID ), material );
 
 			}
 
@@ -430,6 +430,10 @@
 			type = type.value;
 
 		}
+
+		// Seems like FBX can include unused materials which don't have any connections.
+		// Ignores them so far.
+		if ( ! connections.has( FBX_ID ) ) return null;
 
 		var children = connections.get( FBX_ID ).children;
 
