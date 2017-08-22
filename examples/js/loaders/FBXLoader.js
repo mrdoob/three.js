@@ -450,8 +450,8 @@
 				material = new THREE.MeshLambertMaterial();
 				break;
 			default:
-				console.warn( 'THREE.FBXLoader: No implementation given for material type %s in FBXLoader.js. Defaulting to basic material.', type );
-				material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+				console.warn( 'THREE.FBXLoader: No implementation given for material type %s in FBXLoader.js. Defaulting to standard material.', type );
+				material = new THREE.MeshStandardMaterial( { color: 0x3300ff } );
 				break;
 
 		}
@@ -1420,7 +1420,7 @@
 
 						} else {
 
-							material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+							material = new THREE.MeshStandardMaterial( { color: 0x3300ff } );
 							materials.push( material );
 
 						}
