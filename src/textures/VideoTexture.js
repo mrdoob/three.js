@@ -14,17 +14,17 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	function update() {
 
-		requestAnimationFrame( update );
-
 		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
 
 			scope.needsUpdate = true;
 
 		}
 
+		requestAnimationFrame( update );
+
 	}
 
-	update();
+	requestAnimationFrame( udpate );
 
 }
 
