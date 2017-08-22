@@ -181,7 +181,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '87';
+var REVISION = '88dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -20264,7 +20264,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	}
 
-	var logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true && !! extensions.get( 'EXT_frag_depth' );
+	var logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 	var maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
@@ -24738,17 +24738,17 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	function update() {
 
-		requestAnimationFrame( update );
-
 		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
 
 			scope.needsUpdate = true;
 
 		}
 
+		requestAnimationFrame( update );
+
 	}
 
-	update();
+	requestAnimationFrame( update );
 
 }
 
