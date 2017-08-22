@@ -1669,7 +1669,7 @@ THREE.GLTFLoader = ( function () {
 				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
 				_material.normalScale.x = -1;
 
-				_material.userData = material.extras;
+				if ( material.extras ) _material.userData = material.extras;
 
 				return _material;
 
