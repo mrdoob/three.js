@@ -24,7 +24,7 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	}
 
-	requestAnimationFrame( udpate );
+	requestAnimationFrame( update );
 
 }
 
