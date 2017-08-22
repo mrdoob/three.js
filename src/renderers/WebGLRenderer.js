@@ -1172,6 +1172,11 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	/* get universal renderer Frustum to run external intersects without duplicating code. */
+	this.getFrustum = function() {
+		return _frustum;
+	};
+
 	/*
 	// TODO Duplicated code (Frustum)
 
