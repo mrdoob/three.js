@@ -2,119 +2,110 @@
  * @author thespite / http://www.twitter.com/thespite
  * @author fernandojsg / http://fernandojsg.com
  */
+ /* jshint esversion: 6 */
 
-import { MaxEquation, MinEquation, RGB_ETC1_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, SrcAlphaSaturateFactor, OneMinusDstColorFactor, DstColorFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaFactor, OneMinusSrcColorFactor, SrcColorFactor, OneFactor, ZeroFactor, ReverseSubtractEquation, SubtractEquation, AddEquation, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RGBAFormat, RGBFormat, AlphaFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedInt248Type, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestFilter, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping } from '../../constants.js';
-export { WebGLConstants } from './renderers/webgl/WebGLConstants.js';
+import * as Constants from '../../constants';
+import { WebGLConstants } from './WebGLConstants';
 
-function WebGLUtils( gl, extensions ) {
-
-	function convert( p ) {
-
-		var extension;
-
-		var glValue = toGL( p );
-		if ( typeof glValue !== 'undefined' ) {
-
-			return glValue;
-
-		}
-
-		if ( p === HalfFloatType ) {
-
-			extension = extensions.get( 'OES_texture_half_float' );
-
-			if ( extension !== null ) return extension.HALF_FLOAT_OES;
-
-		}
-
-		if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
-			p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
-
-			extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
-
-			if ( extension !== null ) {
-
-				if ( p === RGB_S3TC_DXT1_Format ) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
-				if ( p === RGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
-				if ( p === RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
-				if ( p === RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
-
-			}
-
-		}
-
-		if ( p === RGB_PVRTC_4BPPV1_Format || p === RGB_PVRTC_2BPPV1_Format ||
-			p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
-
-			extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
-
-			if ( extension !== null ) {
-
-				if ( p === RGB_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-				if ( p === RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-				if ( p === RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
-				if ( p === RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-
-			}
-
-		}
-
-		if ( p === RGB_ETC1_Format ) {
-
-			extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
-
-			if ( extension !== null ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
-
-		}
-
-		if ( p === MinEquation || p === MaxEquation ) {
-
-			extension = extensions.get( 'EXT_blend_minmax' );
-
-			if ( extension !== null ) {
-
-				if ( p === MinEquation ) return extension.MIN_EXT;
-				if ( p === MaxEquation ) return extension.MAX_EXT;
-
-			}
-
-		}
-
-		if ( p === UnsignedInt248Type ) {
-
-			extension = extensions.get( 'WEBGL_depth_texture' );
-
-			if ( extension !== null ) return extension.UNSIGNED_INT_24_8_WEBGL;
-
-		}
-
-		return 0;
-
-	}
-
-	return { convert: convert };
-
-}
-
-
+//------------------------------------------------------------------------------
+// THREE TO WEBGL
+//------------------------------------------------------------------------------
 var THREE_TO_WEBGL = {
-	// @TODO Replace with computed property name [THREE.*] when available on es6
-	1003: WebGLConstants.NEAREST,
-	1004: WebGLConstants.LINEAR,
-	1005: WebGLConstants.NEAREST_MIPMAP_NEAREST,
-	1006: WebGLConstants.LINEAR_MIPMAP_NEAREST,
-	1007: WebGLConstants.NEAREST_MIPMAP_LINEAR,
-	1008: WebGLConstants.LINEAR_MIPMAP_LINEAR
- };
 
-function fromGL ( webglConstant ) {
+	[ Constants.NearestFilter ]: WebGLConstants.NEAREST,
+	[ Constants.LinearFilter ]: WebGLConstants.LINEAR,
+	[ Constants.NearestMipMapNearestFilter ]: WebGLConstants.NEAREST_MIPMAP_NEAREST,
+	[ Constants.LinearMipMapNearestFilter ]: WebGLConstants.LINEAR_MIPMAP_NEAREST,
+	[ Constants.NearestMipMapLinearFilter ]: WebGLConstants.NEAREST_MIPMAP_LINEAR,
+	[ Constants.LinearMipMapLinearFilter ]: WebGLConstants.LINEAR_MIPMAP_LINEAR,
 
-	return WEBGL_TO_THREE[ webglConstant ];
+	[ Constants.RepeatWrapping ]: WebGLConstants.REPEAT,
+	[ Constants.ClampToEdgeWrapping ]: WebGLConstants.CLAMP_TO_EDGE,
+	[ Constants.MirroredRepeatWrapping ]: WebGLConstants.MIRRORED_REPEAT,
+
+	[ Constants.NearestFilter ]: WebGLConstants.NEAREST,
+	[ Constants.NearestMipMapNearestFilter ]: WebGLConstants.NEAREST_MIPMAP_NEAREST,
+	[ Constants.NearestMipMapLinearFilter ]: WebGLConstants.NEAREST_MIPMAP_LINEAR,
+
+	[ Constants.LinearFilter ]: WebGLConstants.LINEAR,
+	[ Constants.LinearMipMapNearestFilter ]: WebGLConstants.LINEAR_MIPMAP_NEAREST,
+	[ Constants.LinearMipMapLinearFilter ]: WebGLConstants.LINEAR_MIPMAP_LINEAR,
+
+	[ Constants.UnsignedByteType ]: WebGLConstants.UNSIGNED_BYTE,
+	[ Constants.UnsignedShort4444Type ]: WebGLConstants.UNSIGNED_SHORT_4_4_4_4,
+	[ Constants.UnsignedShort5551Type ]: WebGLConstants.UNSIGNED_SHORT_5_5_5_1,
+	[ Constants.UnsignedShort565Type ]: WebGLConstants.UNSIGNED_SHORT_5_6_5,
+
+	[ Constants.ByteType ]: WebGLConstants.BYTE,
+	[ Constants.ShortType ]: WebGLConstants.SHORT,
+	[ Constants.UnsignedShortType ]: WebGLConstants.UNSIGNED_SHORT,
+	[ Constants.IntType ]: WebGLConstants.INT,
+	[ Constants.UnsignedIntType ]: WebGLConstants.UNSIGNED_INT,
+	[ Constants.FloatType ]: WebGLConstants.FLOAT,
+
+	[ Constants.AlphaFormat ]: WebGLConstants.ALPHA,
+	[ Constants.RGBFormat ]: WebGLConstants.RGB,
+	[ Constants.RGBAFormat ]: WebGLConstants.RGBA,
+	[ Constants.LuminanceFormat ]: WebGLConstants.LUMINANCE,
+	[ Constants.LuminanceAlphaFormat ]: WebGLConstants.LUMINANCE_ALPHA,
+	[ Constants.DepthFormat ]: WebGLConstants.DEPTH_COMPONENT,
+	[ Constants.DepthStencilFormat ]: WebGLConstants.DEPTH_STENCIL,
+
+	[ Constants.AddEquation ]: WebGLConstants.FUNC_ADD,
+	[ Constants.SubtractEquation ]: WebGLConstants.FUNC_SUBSTRACT,
+	[ Constants.ReverseSubtractEquation ]: WebGLConstants.FUNC_REVERSE_SUBTRACT,
+
+	[ Constants.ZeroFactor ]: WebGLConstants.ZERO,
+	[ Constants.OneFactor ]: WebGLConstants.ONE,
+	[ Constants.SrcColorFactor ]: WebGLConstants.SRC_COLOR,
+	[ Constants.OneMinusSrcColorFactor ]: WebGLConstants.ONE_MINUS_SRC_COLOR,
+	[ Constants.SrcAlphaFactor ]: WebGLConstants.SRC_ALPHA,
+	[ Constants.OneMinusSrcAlphaFactor ]: WebGLConstants.ONE_MINUS_SRC_ALPHA,
+	[ Constants.DstAlphaFactor ]: WebGLConstants.DST_ALPHA,
+	[ Constants.OneMinusDstAlphaFactor ]: WebGLConstants.ONE_MINUS_DST_ALPHA,
+
+	[ Constants.DstColorFactor ]: WebGLConstants.DST_COLOR,
+	[ Constants.OneMinusDstColorFactor ]: WebGLConstants.ONE_MINUS_DST_COLOR,
+	[ Constants.SrcAlphaSaturateFactor ]: WebGLConstants.SRC_ALPHA_SATURATE,
+
+
+	// Extensions
+	[ Constants.UnsignedInt248Type ]: WebGLConstants.UNSIGNED_INT_24_8_WEBGL,
+
+	[ Constants.MinEquation ]: WebGLConstants.MIN_EXT,
+	[ Constants.MaxEquation ]: WebGLConstants.MAX_EXT,
+
+	[ Constants.HalfFloatType ]: WebGLConstants.HALF_FLOAT_OES,
+
+	[ Constants.RGB_S3TC_DXT1_Format ]: WebGLConstants.COMPRESSED_RGB_S3TC_DXT1_EXT,
+	[ Constants.RGBA_S3TC_DXT1_Format ]: WebGLConstants.COMPRESSED_RGBA_S3TC_DXT1_EXT,
+	[ Constants.RGBA_S3TC_DXT3_Format ]: WebGLConstants.COMPRESSED_RGBA_S3TC_DXT3_EXT,
+	[ Constants.RGBA_S3TC_DXT5_Format ]: WebGLConstants.COMPRESSED_RGBA_S3TC_DXT5_EXT,
+
+	[ Constants.RGB_PVRTC_4BPPV1_Format ]: WebGLConstants.COMPRESSED_RGB_PVRTC_4BPPV1_IMG,
+	[ Constants.RGB_PVRTC_2BPPV1_Format ]: WebGLConstants.COMPRESSED_RGB_PVRTC_2BPPV1_IMG,
+	[ Constants.RGBA_PVRTC_4BPPV1_Format ]: WebGLConstants.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG,
+	[ Constants.RGBA_PVRTC_2BPPV1_Format ]: WebGLConstants.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG,
+
+	[ Constants.RGB_ETC1_Format ]: WebGLConstants.COMPRESSED_RGB_ETC1_WEBGL
 
 }
 
+/**
+ * Convert a THREE.js constant to WEBGL
+ * @param  {Number} threeConstant Three.js constant
+ * @return {Number}               WebGL constant
+ */
+function toGL ( threeConstant ) {
+
+	return THREE_TO_WEBGL[ threeConstant ];
+
+}
+
+//------------------------------------------------------------------------------
+// WEBGL TO THREE
+//------------------------------------------------------------------------------
 var WEBGL_TO_THREE = {
-	// @TODO Replace with computed property name [WEBGL_CONSTANTS.*] when available on es6
 
 	// Types
 	5126: Number,
@@ -204,10 +195,15 @@ var WEBGL_TO_THREE = {
 };
 
 
-function toGL ( threeConstant ) {
+/**
+ * Convert a WEBGL constant to THREE.js
+ * @param  {Number} webglConstant WebGL constant
+ * @return {Number}               Three.js constant
+ */
+function fromGL ( webglConstant ) {
 
-	return THREE_TO_WEBGL[ threeConstant ];
+	return WEBGL_TO_THREE[ webglConstant ];
 
 }
 
-export { WebGLUtils, toGL, fromGL };
+export { toGL, fromGL };

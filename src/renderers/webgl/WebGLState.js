@@ -4,8 +4,9 @@
 
 import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, DoubleSide, BackSide } from '../../constants.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { toGL } from './WebGLUtils';
 
-function WebGLState( gl, extensions, utils ) {
+function WebGLState( gl, extensions ) {
 
 	function ColorBuffer() {
 
@@ -621,7 +622,7 @@ function WebGLState( gl, extensions, utils ) {
 
 			if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
 
-				gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
+				gl.blendEquationSeparate( toGL( blendEquation ), toGL( blendEquationAlpha ) );
 
 				currentBlendEquation = blendEquation;
 				currentBlendEquationAlpha = blendEquationAlpha;
@@ -630,7 +631,7 @@ function WebGLState( gl, extensions, utils ) {
 
 			if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
 
-				gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
+				gl.blendFuncSeparate( toGL( blendSrc ), toGL( blendDst ), toGL( blendSrcAlpha ), toGL( blendDstAlpha ) );
 
 				currentBlendSrc = blendSrc;
 				currentBlendDst = blendDst;

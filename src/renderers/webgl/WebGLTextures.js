@@ -2,10 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants.js';
-import { _Math } from '../../math/Math.js';
+import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants';
+import { _Math } from '../../math/Math';
+import { toGL } from './WebGLUtils';
 
-function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory ) {
+function WebGLTextures( _gl, extensions, state, properties, capabilities, infoMemory ) {
 
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof window.WebGL2RenderingContext );
 
@@ -263,9 +264,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				}
 
 				var image = cubeImage[ 0 ],
-					isPowerOfTwoImage = isPowerOfTwo( image ),
-					glFormat = utils.convert( texture.format ),
-					glType = utils.convert( texture.type );
+				isPowerOfTwoImage = isPowerOfTwo( image ),
+				glFormat = toGL( texture.format ),
+				glType = toGL( texture.type );
 
 				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, isPowerOfTwoImage );
 
@@ -349,11 +350,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( isPowerOfTwoImage ) {
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, utils.convert( texture.wrapS ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, utils.convert( texture.wrapT ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, toGL( texture.wrapS ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, toGL( texture.wrapT ) );
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, utils.convert( texture.magFilter ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, utils.convert( texture.minFilter ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, toGL( texture.magFilter ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, toGL( texture.minFilter ) );
 
 		} else {
 
@@ -425,8 +426,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		}
 
 		var isPowerOfTwoImage = isPowerOfTwo( image ),
-			glFormat = utils.convert( texture.format ),
-			glType = utils.convert( texture.type );
+		glFormat = toGL( texture.format ),
+		glType = toGL( texture.type );
 
 		setTextureParameters( _gl.TEXTURE_2D, texture, isPowerOfTwoImage );
 
@@ -460,7 +461,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					console.warn( 'THREE.WebGLRenderer: Use UnsignedShortType or UnsignedIntType for DepthFormat DepthTexture.' );
 
 					texture.type = UnsignedShortType;
-					glType = utils.convert( texture.type );
+					glType = toGL( texture.type );
 
 				}
 
@@ -480,7 +481,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					console.warn( 'THREE.WebGLRenderer: Use UnsignedInt248Type for DepthStencilFormat DepthTexture.' );
 
 					texture.type = UnsignedInt248Type;
-					glType = utils.convert( texture.type );
+					glType = toGL( texture.type );
 
 				}
 
@@ -577,8 +578,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	// Setup storage for target texture and bind it to correct framebuffer
 	function setupFrameBufferTexture( framebuffer, renderTarget, attachment, textureTarget ) {
 
-		var glFormat = utils.convert( renderTarget.texture.format );
-		var glType = utils.convert( renderTarget.texture.type );
+		var glFormat = toGL( renderTarget.texture.format );
+		var glType = toGL( renderTarget.texture.type );
 		state.texImage2D( textureTarget, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
