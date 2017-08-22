@@ -28,6 +28,9 @@
 			<button id="export_object">Export Sphere</button>
 			<button id="export_objects">Export Sphere and Grid</button>
 			<button id="export_scene_object">Export Scene1 and Sphere</button>
+			<br/>
+			<label><input id="option_trs" name="trs" type="checkbox"/>TRS</label>
+			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -41,13 +44,17 @@
 
 				var gltfExporter = new THREE.GLTFExporter();
 
+				var options = {
+					trs: document.getElementById('option_trs').checked,
+					onlyVisible: document.getElementById('option_visible').checked,
+				}
 				gltfExporter.parse( input, function( result ) {
 
 					var output = JSON.stringify( result, null, 2 );
 					console.log( output );
 					saveString( output, 'scene.gltf' );
 
-				} );
+				}, options );
 
 			}
 
@@ -395,6 +402,17 @@
 				object.position.set( 200, 0, 400 );
 				scene1.add( object );
 
+				// ---------------------------------------------------------------------
+				// Big red box hidden just for testing `onlyVisible` option
+				// ---------------------------------------------------------------------
+				material = new THREE.MeshBasicMaterial( {
+					color: 0xff0000
+				} );
+				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 200, 200, 200 ), material );
+				object.position.set( 0, 0, 0 );
+				object.name = "CubeHidden";
+				object.visible = false;
+				scene1.add( object );
 
 				// ---------------------------------------------------------------------
 				// 2nd Scene
