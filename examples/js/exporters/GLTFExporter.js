@@ -782,13 +782,18 @@ THREE.GLTFExporter.prototype = {
 				for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
 					var child = object.children[ i ];
-					if ( child instanceof THREE.Mesh ||
-						child instanceof THREE.Camera ||
-						child instanceof THREE.Group ||
-						child instanceof THREE.Line ||
-						child instanceof THREE.Points) {
 
-						children.push( processNode( child ) );
+					if ( child.visible || options.onlyVisible === false ) {
+
+						if ( child instanceof THREE.Mesh ||
+							child instanceof THREE.Camera ||
+							child instanceof THREE.Group ||
+							child instanceof THREE.Line ||
+							child instanceof THREE.Points) {
+
+							children.push( processNode( child ) );
+
+						}
 
 					}
 
@@ -842,14 +847,18 @@ THREE.GLTFExporter.prototype = {
 
 				var child = scene.children[ i ];
 
-				// @TODO We don't process lights yet
-				if ( child instanceof THREE.Mesh ||
-					child instanceof THREE.Camera ||
-					child instanceof THREE.Group ||
-					child instanceof THREE.Line ||
-					child instanceof THREE.Points) {
+				if ( child.visible || options.onlyVisible === false ) {
 
-					nodes.push( processNode( child ) );
+					// @TODO We don't process lights yet
+					if ( child instanceof THREE.Mesh ||
+						child instanceof THREE.Camera ||
+						child instanceof THREE.Group ||
+						child instanceof THREE.Line ||
+						child instanceof THREE.Points) {
+
+						nodes.push( processNode( child ) );
+
+					}
 
 				}
 
