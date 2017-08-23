@@ -59,7 +59,8 @@ THREE.GLTFExporter.prototype = {
 
 		var DEFAULT_OPTIONS = {
 			trs: false,
-			onlyVisible: true
+			onlyVisible: true,
+			truncateDrawRange: true
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
@@ -132,7 +133,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {Integer} componentType Component type (Unsigned short, unsigned int or float)
 		 * @return {Integer}               Index of the buffer created (Currently always 0)
 		 */
-		function processBuffer ( attribute, componentType ) {
+		function processBuffer ( attribute, componentType, start, count ) {
 
 			if ( !outputJSON.buffers ) {
 
@@ -149,13 +150,15 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			// Create a new dataview and dump the attribute's array into it
-			var dataView = new DataView( new ArrayBuffer( attribute.array.byteLength ) );
-
 			var offset = 0;
-			var offsetInc = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
+			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
 
-			for ( var i = 0; i < attribute.count; i++ ) {
+			// Create a new dataview and dump the attribute's array into it
+			var byteLength = count * attribute.itemSize * componentSize;
+
+			var dataView = new DataView( new ArrayBuffer( byteLength ) );
+
+			for ( var i = start; i < start + count; i++ ) {
 
 				for (var a = 0; a < attribute.itemSize; a++ ) {
 
@@ -175,7 +178,7 @@ THREE.GLTFExporter.prototype = {
 
 					}
 
-					offset += offsetInc;
+					offset += componentSize;
 
 				}
 
@@ -193,7 +196,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {[type]} data [description]
 		 * @return {[type]}      [description]
 		 */
-		function processBufferView ( data, componentType ) {
+		function processBufferView ( data, componentType, start, count ) {
 
 			var isVertexAttributes = componentType === WEBGL_CONSTANTS.FLOAT;
 
@@ -203,17 +206,22 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
+
+			// Create a new dataview and dump the attribute's array into it
+			var byteLength = count * data.itemSize * componentSize;
+
 			var gltfBufferView = {
 
-				buffer: processBuffer( data, componentType ),
+				buffer: processBuffer( data, componentType, start, count ),
 				byteOffset: byteOffset,
-				byteLength: data.array.byteLength,
-				byteStride: data.itemSize * ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4 ),
+				byteLength: byteLength,
+				byteStride: data.itemSize * componentSize,
 				target: isVertexAttributes ? WEBGL_CONSTANTS.ARRAY_BUFFER : WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER
 
 			};
 
-			byteOffset += data.array.byteLength;
+			byteOffset += byteLength;
 
 			outputJSON.bufferViews.push( gltfBufferView );
 
@@ -234,7 +242,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {THREE.WebGLAttribute} attribute Attribute to process
 		 * @return {Integer}           Index of the processed accessor on the "accessors" array
 		 */
-		function processAccessor ( attribute ) {
+		function processAccessor ( attribute, geometry ) {
 
 			if ( !outputJSON.accessors ) {
 
@@ -273,14 +281,24 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			var minMax = getMinMax( attribute );
-			var bufferView = processBufferView( attribute, componentType );
+
+			var start = 0;
+			var count = attribute.count;
+
+			// @TODO Indexed buffer geometry with drawRange not supported yet
+			if ( options.truncateDrawRange && geometry.index === null ) {
+				start = geometry.drawRange.start;
+				count = geometry.drawRange.count !== Infinity ? geometry.drawRange.count : attribute.count;
+			}
+
+			var bufferView = processBufferView( attribute, componentType, start, count );
 
 			var gltfAccessor = {
 
 				bufferView: bufferView.id,
 				byteOffset: bufferView.byteOffset,
 				componentType: componentType,
-				count: attribute.count,
+				count: count,
 				max: minMax.max,
 				min: minMax.min,
 				type: types[ attribute.itemSize - 1 ]
@@ -559,7 +577,7 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
-				if ( !( geometry instanceof THREE.BufferGeometry) ) {
+				if ( !geometry.isBufferGeometry ) {
 
 					var geometryTemp = new THREE.BufferGeometry();
 					geometryTemp.fromGeometry( geometry );
@@ -603,7 +621,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( geometry.index ) {
 
-				gltfMesh.primitives[ 0 ].indices = processAccessor( geometry.index );
+				gltfMesh.primitives[ 0 ].indices = processAccessor( geometry.index, geometry );
 
 			}
 
@@ -628,7 +646,7 @@ THREE.GLTFExporter.prototype = {
 
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
-				gltfAttributes[ attributeName ] = processAccessor( attribute );
+				gltfAttributes[ attributeName ] = processAccessor( attribute, geometry );
 
 			}
 

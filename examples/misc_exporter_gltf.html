@@ -346,6 +346,44 @@
 				scene1.add( object );
 
 				// ---------------------------------------------------------------------
+				// Buffer geometry truncated (DrawRange)
+				// ---------------------------------------------------------------------
+				var geometry = new THREE.BufferGeometry();
+				var numElements = 6;
+				var outOfRange = 3;
+
+				var positions = new Float32Array( ( numElements + outOfRange ) * 3 );
+				var colors = new Float32Array( ( numElements + outOfRange ) * 3 );
+
+				positions.set([
+					0, 0, 0,
+					0, 80, 0,
+					80, 0, 0,
+					80, 0, 0,
+					0, 80, 0,
+					80, 80, 0
+				]);
+
+				colors.set([
+					1, 0, 0,
+					1, 0, 0,
+					1, 1, 0,
+					1, 1, 0,
+					0, 0, 1,
+					0, 0, 1,
+				]);
+
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setDrawRange( 0, numElements );
+
+				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
+				object.name = 'Custom buffered truncated';
+				object.position.set( 340, -40, -200 );
+
+				scene1.add( object );
+
+				// ---------------------------------------------------------------------
 				// Points
 				// ---------------------------------------------------------------------
 				var numPoints = 100;
