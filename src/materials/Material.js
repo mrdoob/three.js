@@ -223,7 +223,13 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
 
+		// rotation (SpriteMaterial)
 		if ( this.rotation !== 0 ) data.rotation = this.rotation;
+
+		if ( this.linewidth !== 1 ) data.linewidth = this.linewidth;
+		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
+		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
+		if ( this.scale !== undefined ) data.scale = this.scale;
 
 		if ( this.dithering === true ) data.dithering = true;
 
