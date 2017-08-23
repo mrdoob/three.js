@@ -82,7 +82,6 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				var indices = [];
 				var positions = [];
 				var normals = [];
 				var colors = [];
@@ -165,8 +164,8 @@
 				colorAttribute.normalized = true;
 
 				geometry.addAttribute( 'position', positionAttribute );
-				geometry.addAttribute( 'normal',  normalAttribute );
-				geometry.addAttribute( 'color',colorAttribute );
+				geometry.addAttribute( 'normal', normalAttribute );
+				geometry.addAttribute( 'color', colorAttribute );
 
 				geometry.computeBoundingSphere();
 
