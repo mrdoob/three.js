@@ -99,8 +99,25 @@ THREE.PDBLoader.prototype = {
 			for ( i = 0, l = atoms.length; i < l; i ++ ) {
 
 				var atom = atoms[ i ];
+                               
+				//atom coords from pdb
+				/*
+				
+				             e                   x       y       z   
+				ATOM      2  C           1      -8.580   0.025  -4.537  1.00  0.00
+				1234567890123567890123567890123567890123567890123567890123567890123567890
+				0**4       E   i)            Xiiiiiii) Yiiiiiii)
+				                                        
+				or
+								x        y       z 
+				HETATM    1  C01 UNK A   1     -10.447   3.465   0.000  0.00  0.00   0
+				1234567890123567890123567890123567890123567890123567890123567890123567890
+				0****6
 
-				var x = atom[ 0 ];
+				*/
+				
+				
+				var x = atom[ 0 ];  
 				var y = atom[ 1 ];
 				var z = atom[ 2 ];
 
