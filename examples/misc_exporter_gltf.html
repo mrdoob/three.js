@@ -31,6 +31,7 @@
 			<br/>
 			<label><input id="option_trs" name="trs" type="checkbox"/>TRS</label>
 			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
+			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -47,6 +48,7 @@
 				var options = {
 					trs: document.getElementById('option_trs').checked,
 					onlyVisible: document.getElementById('option_visible').checked,
+					truncateDrawRange: document.getElementById('option_drawrange').checked
 				}
 				gltfExporter.parse( input, function( result ) {
 
