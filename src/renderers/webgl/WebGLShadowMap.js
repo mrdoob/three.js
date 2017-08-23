@@ -97,12 +97,31 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 	this.renderReverseSided = true;
 	this.renderSingleSided = true;
 
-	this.render = function ( lights, scene, camera ) {
+	this.render = function ( renderData, scene, camera ) {
 
 		if ( scope.enabled === false ) return;
 		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
+		var lights = renderData.shadowsArray;
+
 		if ( lights.length === 0 ) return;
+
+		// Are there new lights to render() for?
+
+		var newLights = false;
+
+		for ( var i = 0, il = lights.length; i < il; i ++ ) {
+
+			if ( lights[i].mapFrameId !== _renderer.frameId ) {
+
+				newLights = true;
+				break;
+
+			}
+
+		}
+
+		if ( !newLights ) return;
 
 		// TODO Clean up (needed in case of contextlost)
 		var _gl = _renderer.context;
@@ -112,6 +131,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		_state.disable( _gl.BLEND );
 		_state.buffers.color.setClear( 1, 1, 1, 1 );
 		_state.buffers.depth.setTest( true );
+		_state.buffers.stencil.setTest(false);
 		_state.setScissorTest( false );
 
 		// render depth map
@@ -121,8 +141,17 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		for ( var i = 0, il = lights.length; i < il; i ++ ) {
 
 			var light = lights[ i ];
+
+			if ( light.mapFrameId === _renderer.frameId ) {
+
+				continue;
+
+			}
+
 			var shadow = light.shadow;
 			var isPointLight = light && light.isPointLight;
+
+			light.mapFrameId = _renderer.frameId;
 
 			if ( shadow === undefined ) {
 
@@ -254,7 +283,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				// set object matrices & frustum culling
 
-				renderObject( scene, camera, shadowCamera, isPointLight );
+				renderObject( renderData, scene, camera, shadowCamera, isPointLight );
 
 			}
 
@@ -389,7 +418,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
-	function renderObject( object, camera, shadowCamera, isPointLight ) {
+	function renderObject( renderData, object, camera, shadowCamera, isPointLight ) {
 
 		if ( object.visible === false ) return;
 
@@ -416,7 +445,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 						if ( groupMaterial && groupMaterial.visible ) {
 
 							var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld, shadowCamera.near, shadowCamera.far );
-							_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
+							_renderer.renderBufferDirect( renderData, shadowCamera, null, geometry, depthMaterial, object, group );
 
 						}
 
@@ -425,7 +454,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 				} else if ( material.visible ) {
 
 					var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld, shadowCamera.near, shadowCamera.far );
-					_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
+					_renderer.renderBufferDirect( renderData, shadowCamera, null, geometry, depthMaterial, object, null );
 
 				}
 
@@ -437,7 +466,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			renderObject( children[ i ], camera, shadowCamera, isPointLight );
+			renderObject( renderData, children[ i ], camera, shadowCamera, isPointLight );
 
 		}
 

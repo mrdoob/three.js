@@ -96,6 +96,7 @@ export { Raycaster } from './core/Raycaster.js';
 export { Layers } from './core/Layers.js';
 export { EventDispatcher } from './core/EventDispatcher.js';
 export { Clock } from './core/Clock.js';
+export { Portal } from './core/Portal.js';
 export { QuaternionLinearInterpolant } from './math/interpolants/QuaternionLinearInterpolant.js';
 export { LinearInterpolant } from './math/interpolants/LinearInterpolant.js';
 export { DiscreteInterpolant } from './math/interpolants/DiscreteInterpolant.js';

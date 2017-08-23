@@ -1,11 +1,13 @@
 import { REVISION, RGBAFormat, HalfFloatType, FloatType, ByteType, UnsignedByteType, FrontFaceDirectionCW, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, LinearToneMapping } from '../constants';
 import { _Math } from '../math/Math';
 import { Matrix4 } from '../math/Matrix4';
+import { Plane } from '../math/Plane';
 import { DataTexture } from '../textures/DataTexture';
 import { WebGLUniforms } from './webgl/WebGLUniforms';
 import { UniformsLib } from './shaders/UniformsLib';
 import { UniformsUtils } from './shaders/UniformsUtils';
 import { ShaderLib } from './shaders/ShaderLib';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
 import { WebGLFlareRenderer } from './webgl/WebGLFlareRenderer';
 import { WebGLSpriteRenderer } from './webgl/WebGLSpriteRenderer';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
@@ -57,13 +59,7 @@ function WebGLRenderer( parameters ) {
 		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false;
 
-	var lightsArray = [];
-	var shadowsArray = [];
-
 	var currentRenderList = null;
-
-	var spritesArray = [];
-	var flaresArray = [];
 
 	// public properties
 
@@ -107,6 +103,19 @@ function WebGLRenderer( parameters ) {
 	this.maxMorphTargets = 8;
 	this.maxMorphNormals = 4;
 
+	// portals
+
+	this.currentPortalDepth = 0;
+	this.currentPortalStencil = 0;
+	this.currentlyMirrored = false;
+	this.maxPortalCount = 15;
+	this.maxPortalDepth = 2;
+	this.maxPortalTotal = 15 + 15 * 15;
+
+	//
+
+	this.frameId = 0;
+
 	// internal properties
 
 	var _this = this,
@@ -142,20 +151,6 @@ function WebGLRenderer( parameters ) {
 		_scissor = new Vector4( 0, 0, _width, _height ),
 		_scissorTest = false,
 
-		// frustum
-
-		_frustum = new Frustum(),
-
-		// clipping
-
-		_clipping = new WebGLClipping(),
-		_clippingEnabled = false,
-		_localClippingEnabled = false,
-
-		// camera matrices cache
-
-		_projScreenMatrix = new Matrix4(),
-
 		_vector3 = new Vector3(),
 
 		// info
@@ -171,7 +166,8 @@ function WebGLRenderer( parameters ) {
 			calls: 0,
 			vertices: 0,
 			faces: 0,
-			points: 0
+			points: 0,
+			portals: 0
 
 		};
 
@@ -242,7 +238,7 @@ function WebGLRenderer( parameters ) {
 	}
 
 	var extensions, capabilities, state;
-	var properties, textures, attributes, geometries, objects, lights;
+	var properties, textures, attributes, geometries, objects;
 	var programCache, renderLists;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
@@ -282,7 +278,6 @@ function WebGLRenderer( parameters ) {
 		objects = new WebGLObjects( geometries, _infoRender );
 		morphtargets = new WebGLMorphtargets( _gl );
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
-		lights = new WebGLLights();
 		renderLists = new WebGLRenderLists();
 
 		background = new WebGLBackground( _this, state, geometries, _premultipliedAlpha );
@@ -314,9 +309,7 @@ function WebGLRenderer( parameters ) {
 
 	// shadow map
 
-	var shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
-
-	this.shadowMap = shadowMap;
+	this.shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
 
 	// API
 
@@ -662,11 +655,17 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
+	this.renderBufferDirect = function ( renderData, camera, fog, geometry, material, object, group ) {
+
+		if ( camera !== _currentCamera ) {
+
+			this.currentlyMirrored = camera.scale.x<0 !== camera.scale.y<0;
+
+		}
 
 		state.setMaterial( material );
 
-		var program = setProgram( camera, fog, material, object );
+		var program = setProgram( renderData, camera, fog, material, object );
 		var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
 
 		var updateBuffers = false;
@@ -959,18 +958,26 @@ function WebGLRenderer( parameters ) {
 
 	this.compile = function ( scene, camera ) {
 
-		lightsArray.length = 0;
-		shadowsArray.length = 0;
+		var renderData = {
+			lightsArray: [],
+			shadowsArray: [],
+			spritesArray: [],
+			flaresArray: [],
+			lights: new WebGLLights(),
+			clipping: new WebGLClipping(),
+			clippingEnabled: false,
+			localClippingEnabled: this.localClippingEnabled
+		};
 
 		scene.traverse( function ( object ) {
 
 			if ( object.isLight ) {
 
-				lightsArray.push( object );
+				renderData.lightsArray.push( object );
 
 				if ( object.castShadow ) {
 
-					shadowsArray.push( object );
+					renderData.shadowsArray.push( object );
 
 				}
 
@@ -978,7 +985,7 @@ function WebGLRenderer( parameters ) {
 
 		} );
 
-		lights.setup( lightsArray, shadowsArray, camera );
+		renderData.lights.setup( renderData, camera );
 
 		scene.traverse( function ( object ) {
 
@@ -988,13 +995,13 @@ function WebGLRenderer( parameters ) {
 
 					for ( var i = 0; i < object.material.length; i ++ ) {
 
-						initMaterial( object.material[ i ], scene.fog, object );
+						initMaterial( renderData, object.material[ i ], scene.fog, object );
 
 					}
 
 				} else {
 
-					initMaterial( object.material, scene.fog, object );
+					initMaterial( renderData, object.material, scene.fog, object );
 
 				}
 
@@ -1036,53 +1043,19 @@ function WebGLRenderer( parameters ) {
 		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 		_currentCamera = null;
+		this.currentPortalDepth = 0;
+		this.currentPortalStencil = 0;
+		this.frameId = ( this.frameId + 1 ) % 9007199254740991;
 
 		// update scene graph
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
-
-		// update camera matrices and frustum
-
-		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		if ( vr.enabled ) {
 
 			camera = vr.getCamera( camera );
 
 		}
-
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		_frustum.setFromMatrix( _projScreenMatrix );
-
-		lightsArray.length = 0;
-		shadowsArray.length = 0;
-
-		spritesArray.length = 0;
-		flaresArray.length = 0;
-
-		_localClippingEnabled = this.localClippingEnabled;
-		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
-
-		currentRenderList = renderLists.get( scene, camera );
-		currentRenderList.init();
-
-		projectObject( scene, camera, _this.sortObjects );
-
-		if ( _this.sortObjects === true ) {
-
-			currentRenderList.sort();
-
-		}
-
-		//
-
-		if ( _clippingEnabled ) _clipping.beginShadows();
-
-		shadowMap.render( shadowsArray, scene, camera );
-
-		lights.setup( lightsArray, shadowsArray, camera );
-
-		if ( _clippingEnabled ) _clipping.endShadows();
 
 		//
 
@@ -1091,47 +1064,11 @@ function WebGLRenderer( parameters ) {
 		_infoRender.vertices = 0;
 		_infoRender.faces = 0;
 		_infoRender.points = 0;
+		_infoRender.portals = 0;
 
-		if ( renderTarget === undefined ) {
+		var clear = renderer.autoClear || forceClear;
 
-			renderTarget = null;
-
-		}
-
-		this.setRenderTarget( renderTarget );
-
-		//
-
-		background.render( currentRenderList, scene, camera, forceClear );
-
-		// render scene
-
-		var opaqueObjects = currentRenderList.opaque;
-		var transparentObjects = currentRenderList.transparent;
-
-		if ( scene.overrideMaterial ) {
-
-			var overrideMaterial = scene.overrideMaterial;
-
-			if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera, overrideMaterial );
-			if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera, overrideMaterial );
-
-		} else {
-
-			// opaque pass (front-to-back order)
-
-			if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
-
-			// transparent pass (back-to-front order)
-
-			if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
-
-		}
-
-		// custom renderers
-
-		spriteRenderer.render( spritesArray, scene, camera );
-		flareRenderer.render( flaresArray, scene, camera, _currentViewport );
+		this.renderCamera( scene, camera, renderTarget, clear );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -1157,6 +1094,96 @@ function WebGLRenderer( parameters ) {
 
 		// _gl.finish();
 
+	}
+
+	this.renderCamera = function ( scene, camera, renderTarget, clear ) {
+
+		// update camera matrices and frustum
+
+		if ( camera.parent === null ) camera.updateMatrixWorld();
+
+		var renderData = {
+			projScreenMatrix: new Matrix4(),
+			frustum: new Frustum(),
+			lightsArray: [],
+			shadowsArray: [],
+			spritesArray: [],
+			flaresArray: [],
+			lights: new WebGLLights(),
+			clipping: new WebGLClipping(),
+			clippingEnabled: false,
+			localClippingEnabled: this.localClippingEnabled
+		};
+
+		renderData.projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+		renderData.frustum.setFromMatrix( renderData.projScreenMatrix );
+
+		renderData.clippingEnabled = renderData.clipping.init( this.clippingPlanes, renderData.localClippingEnabled, camera );
+
+		currentRenderList = renderLists.get( scene, camera );
+		currentRenderList.init();
+
+		projectObject( renderData, scene, camera, _this.sortObjects );
+
+		if ( _this.sortObjects === true ) {
+
+			currentRenderList.sort();
+
+		}
+
+		//
+
+		if ( renderData.clippingEnabled ) renderData.clipping.beginShadows();
+
+		_this.shadowMap.render( renderData, scene, camera );
+
+		renderData.lights.setup( renderData, camera );
+
+		if ( renderData.clippingEnabled ) renderData.clipping.endShadows();
+
+		if ( renderTarget === undefined ) {
+
+			renderTarget = null;
+
+		}
+
+		this.setRenderTarget( renderTarget );
+
+		if ( _this.currentPortalDepth > 0 ) this.state.buffers.stencil.setTest(true);
+
+		//
+
+		background.render( renderData, currentRenderList, scene, camera, clear, this.currentPortalDepth > 0 );
+
+		// render scene
+
+		var opaqueObjects = currentRenderList.opaque;
+		var portalObjects = currentRenderList.portal;
+		var transparentObjects = currentRenderList.transparent;
+
+		var overrideMaterial = scene.overrideMaterial ? scene.overrideMaterial : undefined;
+
+		// opaque pass (front-to-back order)
+
+		if ( opaqueObjects.length ) renderObjects( renderData, opaqueObjects, scene, camera, overrideMaterial );
+
+		// portal pass (front-to-back order)
+
+		if ( portalObjects.length > 0 && this.currentPortalDepth < this.maxPortalDepth) {
+
+			renderPortalObjects( renderData, portalObjects, scene, camera, overrideMaterial, renderTarget );
+
+		}
+
+		// transparent pass (back-to-front order)
+
+		if ( transparentObjects.length ) renderObjects( renderData, transparentObjects, scene, camera, overrideMaterial );
+
+		// custom renderers
+
+		spriteRenderer.render( renderData.spritesArray, scene, camera );
+		flareRenderer.render( renderData.flaresArray, scene, camera, _currentViewport );
+
 	};
 
 	/*
@@ -1164,7 +1191,7 @@ function WebGLRenderer( parameters ) {
 
 	var _sphere = new Sphere();
 
-	function isObjectViewable( object ) {
+	function isObjectViewable( renderData, object ) {
 
 		var geometry = object.geometry;
 
@@ -1174,25 +1201,25 @@ function WebGLRenderer( parameters ) {
 		_sphere.copy( geometry.boundingSphere ).
 		applyMatrix4( object.matrixWorld );
 
-		return isSphereViewable( _sphere );
+		return isSphereViewable( renderData, _sphere );
 
 	}
 
-	function isSpriteViewable( sprite ) {
+	function isSpriteViewable( renderData, sprite ) {
 
 		_sphere.center.set( 0, 0, 0 );
 		_sphere.radius = 0.7071067811865476;
 		_sphere.applyMatrix4( sprite.matrixWorld );
 
-		return isSphereViewable( _sphere );
+		return isSphereViewable( renderData, _sphere );
 
 	}
 
-	function isSphereViewable( sphere ) {
+	function isSphereViewable( renderData, sphere ) {
 
-		if ( ! _frustum.intersectsSphere( sphere ) ) return false;
+		if ( ! renderData.frustum.intersectsSphere( sphere ) ) return false;
 
-		var numPlanes = _clipping.numPlanes;
+		var numPlanes = renderData.clipping.numPlanes;
 
 		if ( numPlanes === 0 ) return true;
 
@@ -1214,7 +1241,7 @@ function WebGLRenderer( parameters ) {
 	}
 	*/
 
-	function projectObject( object, camera, sortObjects ) {
+	function projectObject( renderData, object, camera, sortObjects ) {
 
 		if ( ! object.visible ) return;
 
@@ -1224,36 +1251,36 @@ function WebGLRenderer( parameters ) {
 
 			if ( object.isLight ) {
 
-				lightsArray.push( object );
+				renderData.lightsArray.push( object );
 
 				if ( object.castShadow ) {
 
-					shadowsArray.push( object );
+					renderData.shadowsArray.push( object );
 
 				}
 
 			} else if ( object.isSprite ) {
 
-				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
+				if ( ! object.frustumCulled || renderData.frustum.intersectsSprite( object ) ) {
 
-					spritesArray.push( object );
+					renderData.spritesArray.push( object );
 
 				}
 
 			} else if ( object.isLensFlare ) {
 
-				flaresArray.push( object );
+				renderData.flaresArray.push( object );
 
 			} else if ( object.isImmediateRenderObject ) {
 
 				if ( sortObjects ) {
 
 					_vector3.setFromMatrixPosition( object.matrixWorld )
-						.applyMatrix4( _projScreenMatrix );
+						.applyMatrix4( renderData.projScreenMatrix );
 
 				}
 
-				currentRenderList.push( object, null, object.material, _vector3.z, null );
+				currentRenderList.push( camera, object, null, object.material, _vector3.z, null );
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
@@ -1263,12 +1290,12 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
+				if ( ! object.frustumCulled || renderData.frustum.intersectsObject( object ) ) {
 
 					if ( sortObjects ) {
 
 						_vector3.setFromMatrixPosition( object.matrixWorld )
-							.applyMatrix4( _projScreenMatrix );
+							.applyMatrix4( renderData.projScreenMatrix );
 
 					}
 
@@ -1286,7 +1313,7 @@ function WebGLRenderer( parameters ) {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group );
+								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group, camera );
 
 							}
 
@@ -1294,7 +1321,7 @@ function WebGLRenderer( parameters ) {
 
 					} else if ( material.visible ) {
 
-						currentRenderList.push( object, geometry, material, _vector3.z, null );
+						currentRenderList.push( object, geometry, material, _vector3.z, null, camera );
 
 					}
 
@@ -1308,13 +1335,152 @@ function WebGLRenderer( parameters ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			projectObject( children[ i ], camera, sortObjects );
+			projectObject( renderData,children[ i ], camera, sortObjects );
 
 		}
 
 	}
 
-	function renderObjects( renderList, scene, camera, overrideMaterial ) {
+	var portalSealMaterial = new MeshBasicMaterial( { depthTest: true, depthFunc: THREE.AlwaysDepth, depthWrite: true, colorWrite: false } );
+
+	function renderPortalObjects( renderData, renderList, scene, camera, overrideMaterial, renderTarget ) {
+
+		var count = Math.min(renderList.length, Math.min( _this.maxPortalCount, _this.maxPortalTotal - _infoRender.portals ) );
+
+		var state = _this.state;
+		var context = _this.context;
+
+		var rotateY = new Matrix4();
+		rotateY.makeRotationY( Math.PI );
+
+		var mirrorZ = new Matrix4();
+		mirrorZ.elements[10] = -1;
+
+		state.buffers.color.setMask( false );
+		state.buffers.color.setLocked( true );
+		if ( _this.currentPortalDepth < 1 ) {
+			state.buffers.stencil.setTest( true );
+		}
+		state.buffers.stencil.setOp( context.KEEP, context.KEEP, context.REPLACE );
+		state.buffers.stencil.setMask( 0x0f << (_this.currentPortalDepth * 4) );
+
+		for ( var i = 0; i < count; i ++ ) {
+
+			var renderItem = renderList[ i ];
+
+			var object = renderItem.object;
+			var portal = object.portal;
+			var geometry = renderItem.geometry;
+			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
+			var group = renderItem.group;
+
+			state.buffers.stencil.setFunc( context.EQUAL, _this.currentPortalStencil | ( ( ( i + 1 ) & 0x0f ) << (_this.currentPortalDepth*4) ), _this.currentPortalDepth > 0 ? 0x0f << ((_this.currentPortalDepth-1) * 4) : 0 );
+
+			renderObject( renderData, object, scene, camera, geometry, material, group );
+
+		}
+
+		state.buffers.color.setLocked( false );
+		state.buffers.color.setMask( true );
+
+		var cameraToPortal = new Matrix4();
+		var portalToCamera = new Matrix4();
+
+		for ( var i = 0; i < count; i ++ ) {
+
+			var renderItem = renderList[ i ];
+
+			var object = renderItem.object;
+			var portal = object.portal;
+			var target = portal.target || object;
+			var geometry = renderItem.geometry;
+			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
+			var group = renderItem.group;
+
+			var stencilValue = ( ( i + 1 ) & 0x0f) << (_this.currentPortalDepth*4);
+
+			var oldPortalStencil = _this.currentPortalStencil;
+			_this.currentPortalStencil |= stencilValue;
+
+			state.buffers.stencil.setOp( context.KEEP, context.KEEP, context.KEEP );
+			state.buffers.stencil.setFunc( context.EQUAL, _this.currentPortalStencil, 0x0f << (_this.currentPortalDepth * 4) );
+
+			// calculate the transform from the camera to the portal..
+			portalToCamera.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			cameraToPortal.getInverse( portalToCamera );
+
+			var targetMatrix = target.matrixWorld.clone();
+			if ( portal.mirror ) {
+
+				var _x = targetMatrix.elements[12];
+				var _y = targetMatrix.elements[13];
+				var _z = targetMatrix.elements[14];
+				targetMatrix.multiply( mirrorZ );
+				targetMatrix.elements[12] = _x;
+				targetMatrix.elements[13] = _y;
+				targetMatrix.elements[14] = _z;
+
+			} else {
+
+				targetMatrix.multiply( rotateY );
+
+			}
+
+			var portalCamera = camera.clone(); //needs to be a separate instance for each iteration (due to deferred rendering/object instance caching?)
+
+			// ..then place the portal camera over the target and reverse it by this transform..
+			portalCamera.matrix.multiplyMatrices( targetMatrix, cameraToPortal );
+			portalCamera.matrix.decompose( portalCamera.position, portalCamera.quaternion, portalCamera.scale );
+			portalCamera.updateMatrixWorld();
+
+
+			// ..then transform the near clipping plane to the destination surface
+			var nearPlane = new Plane();
+			nearPlane.setFromNormalAndCoplanarPoint(
+				new Vector3(-portalToCamera.elements[8], -portalToCamera.elements[9], -portalToCamera.elements[10]),
+				new Vector3(portalToCamera.elements[12], portalToCamera.elements[13], portalToCamera.elements[14])
+			);
+			nearPlane.constant -= 0.01;
+			setProjectionNearPlane( portalCamera.projectionMatrix, nearPlane );
+
+			_infoRender.portals ++;
+
+			// render its contents
+
+			++_this.currentPortalDepth;
+
+			_this.renderCamera( portal.scene||scene, portalCamera, renderTarget, true );
+
+			--_this.currentPortalDepth;
+
+			// finally, seal off the portal (by writing depth and clearing the stencil of this portal) - for the transparent pass doesn't draw within the portal and so identical cousin portals with the same id don't interfer with this one
+
+			state.buffers.stencil.setOp( context.KEEP, context.KEEP, context.ZERO );
+			state.buffers.stencil.setFunc( context.EQUAL, _this.currentPortalStencil, 0x0f << (_this.currentPortalDepth * 4) );
+			state.buffers.stencil.setMask( 0x0f << (_this.currentPortalDepth * 4) );
+
+			renderObject( renderData, object, scene, camera, geometry, portalSealMaterial, group );
+
+			_this.currentPortalStencil = oldPortalStencil;
+		}
+
+		if ( _this.currentPortalDepth > 0 ) {
+
+			//restore previous test from depth above
+
+			state.buffers.stencil.setOp( context.KEEP, context.KEEP, context.KEEP );
+			state.buffers.stencil.setFunc( context.EQUAL, _this.currentPortalStencil, 0x0f << ( ( _this.currentPortalDepth - 1 ) * 4) );
+
+		} else {
+
+			state.buffers.stencil.setTest( false );
+			state.reset();
+
+		}
+
+	}
+
+	function renderObjects( renderData, renderList, scene, camera, overrideMaterial ) {
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
@@ -1325,48 +1491,54 @@ function WebGLRenderer( parameters ) {
 			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
 			var group = renderItem.group;
 
-			if ( camera.isArrayCamera ) {
-
-				_currentArrayCamera = camera;
-
-				var cameras = camera.cameras;
-
-				for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
-
-					var camera2 = cameras[ j ];
-
-					if ( object.layers.test( camera2.layers ) ) {
-
-						var bounds = camera2.bounds;
-
-						var x = bounds.x * _width;
-						var y = bounds.y * _height;
-						var width = bounds.z * _width;
-						var height = bounds.w * _height;
-
-						state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
-						state.scissor( _currentScissor.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
-						state.setScissorTest( true );
-
-						renderObject( object, scene, camera2, geometry, material, group );
-
-					}
-
-				}
-
-			} else {
-
-				_currentArrayCamera = null;
-
-				renderObject( object, scene, camera, geometry, material, group );
-
-			}
+			renderObject( renderData, object, scene, camera, geometry, material, group );
 
 		}
 
 	}
 
-	function renderObject( object, scene, camera, geometry, material, group ) {
+	function renderObject( renderData, object, scene, camera, geometry, material, group ) {
+
+		if ( camera.isArrayCamera ) {
+
+			_currentArrayCamera = camera;
+
+			var cameras = camera.cameras;
+
+			for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
+
+				var camera2 = cameras[ j ];
+
+				if ( object.layers.test( camera2.layers ) ) {
+
+					var bounds = camera2.bounds;
+
+					var x = bounds.x * _width;
+					var y = bounds.y * _height;
+					var width = bounds.z * _width;
+					var height = bounds.w * _height;
+
+					state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
+					state.scissor( _currentScissor.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
+					state.setScissorTest( true );
+
+					renderObjectInternal( renderData, object, scene, camera2, geometry, material, group );
+
+				}
+
+			}
+
+		} else {
+
+			_currentArrayCamera = null;
+
+			renderObjectInternal( renderData, object, scene, camera, geometry, material, group );
+
+		}
+
+	}
+
+	function renderObjectInternal( renderData, object, scene, camera, geometry, material, group ) {
 
 		object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
@@ -1375,9 +1547,15 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isImmediateRenderObject ) {
 
+			if ( camera !== _currentCamera ) {
+
+				_this.currentlyMirrored = camera.scale.x<0 !== camera.scale.y<0;
+				
+			}
+
 			state.setMaterial( material );
 
-			var program = setProgram( camera, scene.fog, material, object );
+			var program = setProgram( renderData, camera, scene.fog, material, object );
 
 			_currentGeometryProgram = '';
 
@@ -1385,7 +1563,7 @@ function WebGLRenderer( parameters ) {
 
 		} else {
 
-			_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
+			_this.renderBufferDirect( renderData, camera, scene.fog, geometry, material, object, group );
 
 		}
 
@@ -1393,12 +1571,47 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function initMaterial( material, fog, object ) {
+	// https://web.archive.org/web/20160318114033/http://www.terathon.com/code/oblique.html
+
+	var setProjectionNearPlane = (function() {
+
+		function sign( x ) { return x>0?1:x<1?-1:0; }
+
+		return function( matrix, nearPlane ) {
+
+			// Calculate the clip-space corner point opposite the clipping plane
+			// as (sign(nearPlane.x), sign(nearPlane.y), 1, 1) and
+			// transform it into camera space by multiplying it
+			// by the inverse of the projection matrix
+
+			var q = new Vector4(
+				(sign(nearPlane.normal.x) + matrix.elements[8]) / matrix.elements[0],
+				(sign(nearPlane.normal.y) + matrix.elements[9]) / matrix.elements[5],
+				-1.0,
+				(1.0 + matrix.elements[10]) / matrix.elements[14]
+			);
+
+			// Calculate the scaled plane vector
+			var c = new Vector4( nearPlane.normal.x, nearPlane.normal.y, nearPlane.normal.z, nearPlane.constant );
+			c.multiplyScalar( 2.0 / c.dot( q ) );
+
+	 		// Replace the third row of the projection matrix
+			matrix.elements[2] = c.x;
+			matrix.elements[6] = c.y;
+			matrix.elements[10] = c.z + 1.0;
+			matrix.elements[14] = c.w;
+		}
+
+	})();
+
+	function initMaterial( renderData, material, fog, object ) {
 
 		var materialProperties = properties.get( material );
 
+		var lights = renderData.lights;
+
 		var parameters = programCache.getParameters(
-			material, lights.state, shadowsArray, fog, _clipping.numPlanes, _clipping.numIntersection, object );
+			material, lights.state, renderData.shadowsArray, fog, renderData.clipping.numPlanes, renderData.clipping.numIntersection, object );
 
 		var code = programCache.getProgramCode( material, parameters );
 
@@ -1500,9 +1713,9 @@ function WebGLRenderer( parameters ) {
 			! material.isRawShaderMaterial ||
 			material.clipping === true ) {
 
-			materialProperties.numClippingPlanes = _clipping.numPlanes;
-			materialProperties.numIntersection = _clipping.numIntersection;
-			uniforms.clippingPlanes = _clipping.uniform;
+			materialProperties.numClippingPlanes = renderData.clipping.numPlanes;
+			materialProperties.numIntersection = renderData.clipping.numIntersection;
+			uniforms.clippingPlanes = renderData.clipping.uniform;
 
 		}
 
@@ -1512,27 +1725,6 @@ function WebGLRenderer( parameters ) {
 
 		materialProperties.lightsHash = lights.state.hash;
 
-		if ( material.lights ) {
-
-			// wire up the material to this renderer's lighting state
-
-			uniforms.ambientLightColor.value = lights.state.ambient;
-			uniforms.directionalLights.value = lights.state.directional;
-			uniforms.spotLights.value = lights.state.spot;
-			uniforms.rectAreaLights.value = lights.state.rectArea;
-			uniforms.pointLights.value = lights.state.point;
-			uniforms.hemisphereLights.value = lights.state.hemi;
-
-			uniforms.directionalShadowMap.value = lights.state.directionalShadowMap;
-			uniforms.directionalShadowMatrix.value = lights.state.directionalShadowMatrix;
-			uniforms.spotShadowMap.value = lights.state.spotShadowMap;
-			uniforms.spotShadowMatrix.value = lights.state.spotShadowMatrix;
-			uniforms.pointShadowMap.value = lights.state.pointShadowMap;
-			uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix;
-			// TODO (abelnation): add area lights shadow info to uniforms
-
-		}
-
 		var progUniforms = materialProperties.program.getUniforms(),
 			uniformsList =
 				WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
@@ -1541,15 +1733,15 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function setProgram( camera, fog, material, object ) {
+	function setProgram( renderData, camera, fog, material, object ) {
 
 		_usedTextureUnits = 0;
 
 		var materialProperties = properties.get( material );
 
-		if ( _clippingEnabled ) {
+		if ( renderData.clippingEnabled ) {
 
-			if ( _localClippingEnabled || camera !== _currentCamera ) {
+			if ( renderData.localClippingEnabled || camera !== _currentCamera ) {
 
 				var useCache =
 					camera === _currentCamera &&
@@ -1558,7 +1750,7 @@ function WebGLRenderer( parameters ) {
 				// we might want to call this function with some ClippingGroup
 				// object instead of the material, once it becomes feasible
 				// (#8465, #8379)
-				_clipping.setState(
+				renderData.clipping.setState(
 					material.clippingPlanes, material.clipIntersection, material.clipShadows,
 					camera, materialProperties, useCache );
 
@@ -1576,13 +1768,13 @@ function WebGLRenderer( parameters ) {
 
 				material.needsUpdate = true;
 
-			} else if ( material.lights && materialProperties.lightsHash !== lights.state.hash ) {
+			} else if ( material.lights && materialProperties.lightsHash !== renderData.lights.state.hash ) {
 
 				material.needsUpdate = true;
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
-				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
-				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
+				( materialProperties.numClippingPlanes !== renderData.clipping.numPlanes ||
+				materialProperties.numIntersection !== renderData.clipping.numIntersection ) ) {
 
 				material.needsUpdate = true;
 
@@ -1592,7 +1784,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.needsUpdate ) {
 
-			initMaterial( material, fog, object );
+			initMaterial( renderData, material, fog, object );
 			material.needsUpdate = false;
 
 		}
@@ -1739,21 +1931,6 @@ function WebGLRenderer( parameters ) {
 			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
 			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
-			if ( material.lights ) {
-
-				// the current material requires lighting info
-
-				// note: all lighting uniforms are always set correctly
-				// they simply reference the renderer's state for their
-				// values
-				//
-				// use the current material's .needsUpdate flags to set
-				// the GL state when required
-
-				markUniformsLightsNeedsUpdate( m_uniforms, refreshLights );
-
-			}
-
 			// refresh uniforms common to several materials
 
 			if ( fog && material.fog ) {
@@ -1844,8 +2021,7 @@ function WebGLRenderer( parameters ) {
 			if ( m_uniforms.ltcMat !== undefined ) m_uniforms.ltcMat.value = UniformsLib.LTC_MAT_TEXTURE;
 			if ( m_uniforms.ltcMag !== undefined ) m_uniforms.ltcMag.value = UniformsLib.LTC_MAG_TEXTURE;
 
-			WebGLUniforms.upload(
-				_gl, materialProperties.uniformsList, m_uniforms, _this );
+			WebGLUniforms.upload(_gl, materialProperties.uniformsList, m_uniforms, _this );
 
 		}
 
@@ -1855,6 +2031,24 @@ function WebGLRenderer( parameters ) {
 		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
+
+		if ( refreshMaterial && refreshLights && material.lights ) {
+			var lightState = renderData.lights.state;
+			p_uniforms.setValue( _gl, 'ambientLightColor', lightState.ambient);
+			p_uniforms.setValue( _gl, 'directionalLights', lightState.directional);
+			p_uniforms.setValue( _gl, 'spotLights', lightState.spot);
+			p_uniforms.setValue( _gl, 'rectAreaLights', lightState.rectArea);
+			p_uniforms.setValue( _gl, 'pointLights', lightState.point);
+			p_uniforms.setValue( _gl, 'hemisphereLights', lightState.hemi);
+
+			p_uniforms.setValue( _gl, 'directionalShadowMap', lightState.directionalShadowMap);
+			p_uniforms.setValue( _gl, 'directionalShadowMatrix', lightState.directionalShadowMatrix);
+			p_uniforms.setValue( _gl, 'spotShadowMap', lightState.spotShadowMap);
+			p_uniforms.setValue( _gl, 'spotShadowMatrix', lightState.spotShadowMatrix);
+			p_uniforms.setValue( _gl, 'pointShadowMap', lightState.pointShadowMap);
+			p_uniforms.setValue( _gl, 'pointShadowMatrix', lightState.pointShadowMatrix);
+			// TODO (abelnation): add area lights shadow info to uniforms
+		}
 
 		return program;
 
@@ -2214,20 +2408,6 @@ function WebGLRenderer( parameters ) {
 			uniforms.displacementBias.value = material.displacementBias;
 
 		}
-
-	}
-
-	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
-
-	function markUniformsLightsNeedsUpdate( uniforms, value ) {
-
-		uniforms.ambientLightColor.needsUpdate = value;
-
-		uniforms.directionalLights.needsUpdate = value;
-		uniforms.pointLights.needsUpdate = value;
-		uniforms.spotLights.needsUpdate = value;
-		uniforms.rectAreaLights.needsUpdate = value;
-		uniforms.hemisphereLights.needsUpdate = value;
 
 	}
 

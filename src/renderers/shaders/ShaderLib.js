@@ -38,7 +38,6 @@ var ShaderLib = {
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
 			UniformsLib.fog,
-			UniformsLib.lights,
 			{
 				emissive: { value: new Color( 0x000000 ) }
 			}
@@ -63,7 +62,6 @@ var ShaderLib = {
 			UniformsLib.displacementmap,
 			UniformsLib.gradientmap,
 			UniformsLib.fog,
-			UniformsLib.lights,
 			{
 				emissive: { value: new Color( 0x000000 ) },
 				specular: { value: new Color( 0x111111 ) },
@@ -90,7 +88,6 @@ var ShaderLib = {
 			UniformsLib.roughnessmap,
 			UniformsLib.metalnessmap,
 			UniformsLib.fog,
-			UniformsLib.lights,
 			{
 				emissive: { value: new Color( 0x000000 ) },
 				roughness: { value: 0.5 },
@@ -209,13 +206,10 @@ var ShaderLib = {
 
 	shadow: {
 
-		uniforms: UniformsUtils.merge( [
-			UniformsLib.lights,
-			{
-				color: { value: new Color( 0x00000 ) },
-				opacity: { value: 1.0 }
-			},
-		] ),
+		uniforms: {
+			color: { value: new Color( 0x00000 ) },
+			opacity: { value: 1.0 }
+		},
 
 		vertexShader: ShaderChunk.shadow_vert,
 		fragmentShader: ShaderChunk.shadow_frag

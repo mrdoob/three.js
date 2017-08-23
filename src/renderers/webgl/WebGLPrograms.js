@@ -199,7 +199,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			alphaTest: material.alphaTest,
 			doubleSided: material.side === DoubleSide,
-			flipSided: material.side === BackSide,
+			flipSided: ( material.side === BackSide ) !== renderer.currentlyMirrored,
 
 			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false
 

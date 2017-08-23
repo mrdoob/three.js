@@ -21,7 +21,24 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 	var planeCamera, planeMesh;
 	var boxMesh;
 
-	function render( renderList, scene, camera, forceClear ) {
+	function initPlaneMesh () {
+		if ( planeCamera !== undefined ) return;
+
+		planeCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+		planeMesh = new Mesh(
+			new PlaneBufferGeometry( 2, 2 ),
+			new MeshBasicMaterial( { fog: false } )
+		);
+
+		planeMesh.position.z = -1;
+		planeMesh.updateMatrixWorld();
+		planeMesh.modelViewMatrix.multiplyMatrices( planeCamera.matrixWorldInverse, planeMesh.matrixWorld );
+
+		geometries.update( planeMesh.geometry );
+	}
+
+	function render( renderData, renderList, scene, camera, forceClear, clearRegion ) {
 
 		var background = scene.background;
 
@@ -38,7 +55,24 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 		if ( renderer.autoClear || forceClear ) {
 
-			renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
+			if ( clearRegion ) {
+
+				initPlaneMesh();
+
+				planeMesh.material.map = null;
+				planeMesh.material.color = background === null ? clearColor : background;
+				planeMesh.material.color = new THREE.Color(0,0,0);
+				planeMesh.material.depthTest = true;
+				planeMesh.material.depthFunc = THREE.AlwaysDepth;
+				planeMesh.material.depthWrite = true;
+
+				renderer.renderBufferDirect( renderData, planeCamera, null, planeMesh.geometry, planeMesh.material, planeMesh, null );
+
+			} else {
+
+				renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
+
+			}
 
 		}
 
@@ -80,28 +114,29 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 			boxMesh.material.uniforms.tCube.value = background;
 
-			renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
+			renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null, null );
 
 		} else if ( background && background.isTexture ) {
 
-			if ( planeCamera === undefined ) {
-
-				planeCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-				planeMesh = new Mesh(
-					new PlaneBufferGeometry( 2, 2 ),
-					new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
-				);
-
-				geometries.update( planeMesh.geometry );
-
-			}
+			initPlaneMesh();
 
 			planeMesh.material.map = background;
 
+			if ( clearRegion ) {
+
+				planeMesh.material.depthTest = true;
+				planeMesh.material.depthFunc = THREE.AlwaysDepth;
+				planeMesh.material.depthWrite = true;
+
+			} else {
+
+				planeMesh.material.depthTest = false;
+
+			}
+
 			// TODO Push this to renderList
 
-			renderer.renderBufferDirect( planeCamera, null, planeMesh.geometry, planeMesh.material, planeMesh, null );
+			renderer.renderBufferDirect( renderData, planeCamera, null, planeMesh.geometry, planeMesh.material, planeMesh, null );
 
 		}
 

@@ -654,7 +654,7 @@ function WebGLState( gl, extensions, utils ) {
 			? disable( gl.CULL_FACE )
 			: enable( gl.CULL_FACE );
 
-		setFlipSided( material.side === BackSide );
+		setFlipSided( ( material.side === BackSide ) !== renderer.currentlyMirrored );
 
 		material.transparent === true
 			? setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )

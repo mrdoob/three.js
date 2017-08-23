@@ -2,6 +2,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { Vector3 } from '../../math/Vector3';
+
 function painterSortStable( a, b ) {
 
 	if ( a.renderOrder !== b.renderOrder ) {
@@ -46,12 +48,17 @@ function reversePainterSortStable( a, b ) {
 
 }
 
+var _vector = new Vector3();
+var _objectForward = new Vector3();
+var _cameraForward = new Vector3();
+
 function WebGLRenderList() {
 
 	var renderItems = [];
 	var renderItemsIndex = 0;
 
 	var opaque = [];
+	var portal = [];
 	var transparent = [];
 
 	function init() {
@@ -59,11 +66,12 @@ function WebGLRenderList() {
 		renderItemsIndex = 0;
 
 		opaque.length = 0;
+		portal.length = 0;
 		transparent.length = 0;
 
 	}
 
-	function push( object, geometry, material, z, group ) {
+	function push( object, geometry, material, z, group, camera ) {
 
 		var renderItem = renderItems[ renderItemsIndex ];
 
@@ -95,7 +103,38 @@ function WebGLRenderList() {
 
 		}
 
-		( material.transparent === true ? transparent : opaque ).push( renderItem );
+		if ( object.portal ) {
+
+			if ( camera ) {
+
+				_objectForward.setFromMatrixColumn( object.matrixWorld, 2 ).normalize();
+				_cameraForward.setFromMatrixColumn( camera.matrixWorld, 2 ).normalize();
+
+				_vector.setFromMatrixPosition( object.matrixWorld );
+				_vector.x -= camera.matrixWorld.elements[12];
+				_vector.y -= camera.matrixWorld.elements[13];
+				_vector.z -= camera.matrixWorld.elements[14];
+
+				if ( _cameraForward.dot( _vector ) < 0 && _objectForward.dot( _vector ) < 0 ) {
+
+					portal.push( renderItem );
+
+				}
+
+			} else {
+
+				portal.push( renderItem );
+
+			}
+
+			if ( material.transparent ) transparent.push( renderItem );
+
+		} else {
+
+			if ( material.transparent ) transparent.push( renderItem );
+			else opaque.push( renderItem );
+			
+		}
 
 		renderItemsIndex ++;
 
@@ -104,12 +143,14 @@ function WebGLRenderList() {
 	function sort() {
 
 		if ( opaque.length > 1 ) opaque.sort( painterSortStable );
+		if ( portal.length > 1 ) portal.sort( painterSortStable );
 		if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
 
 	}
 
 	return {
 		opaque: opaque,
+		portal: portal,
 		transparent: transparent,
 
 		init: init,

@@ -29,6 +29,8 @@ function Object3D() {
 	this.parent = null;
 	this.children = [];
 
+	this.portal = null;
+
 	this.up = Object3D.DefaultUp.clone();
 
 	var position = new Vector3();

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - portal</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script>
+
+			var camera;
+			var cameraControls;
+
+			var scene;
+			var renderer;
+
+			init();
+			animate();
+
+			function init() {
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
+
+				document.body.appendChild( renderer.domElement );
+
+				var state = renderer.state;
+				var context = renderer.context;
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 75, 120 );
+
+				cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
+				cameraControls.target.set( 0, 40, 0);
+				cameraControls.maxDistance = 400;
+				cameraControls.minDistance = 10;
+				cameraControls.update();
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x500050 );
+
+				var textureLoader = new THREE.TextureLoader();
+
+				var redMaterial = new THREE.MeshPhongMaterial( { color: 0xff8080, flatShading: true } );
+				var greenMaterial = new THREE.MeshPhongMaterial( { color: 0x80ff80, flatShading: true } );
+				var blueMaterial = new THREE.MeshPhongMaterial( { color: 0x8080ff, flatShading: true } );
+				var yellowMaterial = new THREE.MeshPhongMaterial( { color: 0xffff80, flatShading: true } );
+				var whiteMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+
+				var maskTexture = textureLoader.load( 'textures/mask_edge_rough.png' );
+				var maskBumpTexture = textureLoader.load( 'textures/mask_edge_rough_bump.png' );
+				var dirtTexture = textureLoader.load( 'textures/disturb.jpg' );
+
+				var brickMaterial = new THREE.MeshPhongMaterial( {
+					flatShading: true,
+					map: textureLoader.load('textures/brick_diffuse.jpg'),
+					bumpMap: textureLoader.load('textures/brick_bump.jpg'),
+					roughnessMap: textureLoader.load('textures/brick_roughness.jpg')
+				} );
+
+				var mirrorMaterial = new THREE.MeshPhongMaterial( { transparent: true, opacity: 0.8, color: 0x202020, map: dirtTexture } );
+				var bluePortalMaterial = new THREE.MeshPhongMaterial( { transparent: true, color: 0x8080ff, map: maskTexture, bumpMap: maskBumpTexture } );
+				var greenPortalMaterial = new THREE.MeshPhongMaterial( { transparent: true, color: 0x80ff80, map: maskTexture, bumpMap: maskBumpTexture } );
+
+				{ //walls
+					var wallGeo = new THREE.PlaneBufferGeometry( 200.1, 200.1 );
+
+					var ceiling = new THREE.Mesh( wallGeo, mirrorMaterial );
+					ceiling.position.y = 200;
+					ceiling.rotateX( Math.PI / 2 );
+					ceiling.receiveShadow = true;
+					ceiling.portal = new THREE.Portal( { mirror: true } );
+					scene.add( ceiling );
+
+					var floor = new THREE.Mesh( wallGeo, mirrorMaterial );
+					floor.position.y = 0;
+					floor.rotateX( - Math.PI / 2 );
+					floor.receiveShadow = true;
+					floor.portal = new THREE.Portal( { mirror: true } );
+					scene.add( floor );
+
+					var wallLeft = new THREE.Mesh( wallGeo, brickMaterial );
+					wallLeft.position.set( -100, 100, 0);
+					wallLeft.rotateY( Math.PI / 2 );
+					wallLeft.receiveShadow = true;
+					scene.add( wallLeft );
+
+					var wallRight = new THREE.Mesh( wallGeo, greenMaterial );
+					wallRight.position.set( 100, 100, 0);
+					wallRight.rotateY( - Math.PI / 2 );
+					wallRight.castShadow = true;
+					wallRight.receiveShadow = true;
+					scene.add( wallRight );
+
+					var wallBack = new THREE.Mesh( wallGeo, blueMaterial );
+					wallBack.position.set( 0, 100, -100 );
+					wallBack.receiveShadow = true;
+					scene.add( wallBack );
+
+					var wallFront = new THREE.Mesh( wallGeo, yellowMaterial );
+					wallFront.position.set( 0, 100, 100 );
+					wallFront.rotateY( Math.PI );
+					wallFront.receiveShadow = true;
+					scene.add( wallFront );
+				}
+
+				var rightPortal = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), greenPortalMaterial );
+				rightPortal.position.set( 99.9, 60, 0 );
+				rightPortal.rotateY( - Math.PI / 2 );
+				rightPortal.receiveShadow = true;
+				scene.add( rightPortal );
+
+				var frontPortal = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), bluePortalMaterial );
+				frontPortal.position.set( 0, 60, -99.9 );
+				frontPortal.receiveShadow = true;
+				scene.add( frontPortal );
+
+				frontPortal.portal = new THREE.Portal( { target: rightPortal } );
+				rightPortal.portal = new THREE.Portal( { target: frontPortal } );
+
+				var cube = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 40, 40 ), redMaterial );
+				cube.castShadow = true;
+				cube.receiveShadow = true;
+				cube.position.set( 0, 40, 0 );
+				scene.add( cube );
+
+				var ambientLight = new THREE.AmbientLight( 0x202020 );
+				scene.add( ambientLight);
+
+				var mainLight = new THREE.PointLight( 0xcccccc, 1.5, 250 );
+				mainLight.position.set( 40, 90, 50 );
+				mainLight.castShadow = true;
+				scene.add( mainLight );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var state = renderer.state;
+				var context = renderer.context;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
