@@ -267,7 +267,7 @@ function WebGLRenderer( parameters ) {
 
 		capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 
-		state = new WebGLState( _gl, extensions, utils );
+		state = new WebGLState( _this, _gl, extensions, utils );
 		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
 		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
@@ -1011,21 +1011,34 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	// Rendering
+	// Animation Loop
+
+	var isAnimating = false;
+	var onAnimationFrame = null;
+
+	function start() {
+
+		if ( isAnimating ) return;
+		( vr.getDevice() || window ).requestAnimationFrame( loop );
+		isAnimating = true;
+
+	}
+
+	function loop( time ) {
+
+		if ( onAnimationFrame !== null ) onAnimationFrame( time );
+		( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+	}
 
 	this.animate = function ( callback ) {
 
-		function onFrame() {
-
-			callback();
-
-			( vr.getDevice() || window ).requestAnimationFrame( onFrame );
-
-		}
-
-		( vr.getDevice() || window ).requestAnimationFrame( onFrame );
+		onAnimationFrame = callback;
+		start();
 
 	};
+
+	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
@@ -1066,7 +1079,7 @@ function WebGLRenderer( parameters ) {
 		_infoRender.points = 0;
 		_infoRender.portals = 0;
 
-		var clear = renderer.autoClear || forceClear;
+		var clear = this.autoClear || forceClear;
 
 		this.renderCamera( scene, camera, renderTarget, clear );
 
@@ -1519,8 +1532,6 @@ function WebGLRenderer( parameters ) {
 					var height = bounds.w * _height;
 
 					state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
-					state.scissor( _currentScissor.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
-					state.setScissorTest( true );
 
 					renderObjectInternal( renderData, object, scene, camera2, geometry, material, group );
 
@@ -1976,10 +1987,6 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-			} else if ( material.isMeshNormalMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-
 			} else if ( material.isMeshDepthMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
@@ -1992,6 +1999,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( material.isMeshNormalMaterial ) {
 
+				refreshUniformsCommon( m_uniforms, material );
 				refreshUniformsNormal( m_uniforms, material );
 
 			} else if ( material.isLineBasicMaterial ) {

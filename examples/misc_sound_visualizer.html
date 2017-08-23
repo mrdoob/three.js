@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js misc - sound visualizer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#777;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+
+			a {
+				color: #ffffff;
+			}
+		</style>
+
+		<script src="../build/three.js"></script>
+		<script src="js/Detector.js"></script>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+
+			void main() {
+
+				vUv = uv;
+				gl_Position = vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+			uniform sampler2D tAudioData;
+
+			varying vec2 vUv;
+
+			void main() {
+
+				vec3 backgroundColor = vec3( 0.0 );
+				vec3 color = vec3( 1.0, 0.0, 0.0 );
+
+				float f = texture2D( tAudioData, vec2( vUv.x, 0.0 ) ).r; // sample data texture (only the red channel is relevant)
+				float i = step( vUv.y, f );
+
+				gl_FragColor = vec4( mix( backgroundColor, color, i ), 1.0 );
+
+			}
+
+		</script>
+
+	</head>
+<body>
+
+	<div id="container"></div>
+	<div id="info">
+		<a href="https://threejs.org" target="_blank">three.js</a> - misc - sound visualizer -
+		music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank">larrylarrybb</a>
+	</div>
+
+	<script>
+
+	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+	var scene, camera, renderer, analyser, uniforms;
+
+	init();
+	animate();
+
+	function init() {
+
+		var fftSize = 2048;
+
+		//
+
+		var container = document.getElementById( 'container' );
+
+		//
+
+		scene = new THREE.Scene();
+
+		//
+
+		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.setClearColor( 0x000000 );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		container.appendChild( renderer.domElement );
+
+		//
+
+		camera = new THREE.Camera();
+		camera.position.z = 1;
+
+		//
+
+		var audioLoader = new THREE.AudioLoader();
+
+		var listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		var audio = new THREE.Audio( listener );
+		audioLoader.load( 'sounds/358232_j_s_song.mp3', function( buffer ) {
+			audio.setBuffer( buffer );
+			audio.setLoop( true );
+			audio.play();
+		});
+
+		analyser = new THREE.AudioAnalyser( audio, fftSize );
+
+		//
+
+		var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+
+		//
+
+		var size = fftSize / 2;
+
+		uniforms = {
+			tAudioData: { value: new THREE.DataTexture( analyser.data, size, 1, THREE.LuminanceFormat ) }
+		};
+
+		var material = new THREE.ShaderMaterial( {
+
+			uniforms: uniforms,
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+		} );
+
+		//
+
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+
+		//
+
+		window.addEventListener( 'resize', onResize, false );
+
+	}
+
+	function onResize() {
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+
+	}
+
+	function animate() {
+
+		requestAnimationFrame( animate );
+
+		render();
+
+	}
+
+	function render() {
+
+		var data = analyser.getFrequencyData();
+
+		uniforms.tAudioData.value.needsUpdate = true;
+
+		renderer.render( scene, camera );
+
+	}
+
+	</script>
+
+</body>
+</html>

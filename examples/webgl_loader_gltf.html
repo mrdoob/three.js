@@ -91,13 +91,12 @@
 				<option value="glTF-Binary">None (Binary)</option>
 				<option value="glTF-MaterialsCommon">Common Materials</option>
 				<option value="glTF-pbrSpecularGlossiness">Specular-Glossiness (PBR)</option>
-				<option value="glTF-techniqueWebGL">GLSL</option>
 			</select>
 		</div>
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTF2Loader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
 			var orbitControls = null;
@@ -203,7 +202,7 @@
 					scene.add(ground);
 				}
 
-				loader = new THREE.GLTF2Loader();
+				loader = new THREE.GLTFLoader();
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
@@ -436,7 +435,6 @@
 					addLights:true,
 					addGround:true,
 					shadows:true,
-					// TODO: 'glTF-techniqueWebGL'
 					extensions: ['glTF', 'glTF-Embedded', 'glTF-MaterialsCommon', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
 				},
 				{
@@ -449,7 +447,7 @@
 					addLights:true,
 					shadows:true,
 					addGround:true,
-					// TODO: 'glTF-MaterialsCommon', 'glTF-techniqueWebGL'
+					// TODO: 'glTF-MaterialsCommon'
 					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
 				},
 				{
@@ -459,7 +457,7 @@
 					 addLights:true,
 					 addGround:true,
 					 shadows:true,
-					// TODO: 'glTF-MaterialsCommon', 'glTF-techniqueWebGL'
+					// TODO: 'glTF-MaterialsCommon'
 					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
 				},
 				{
@@ -469,7 +467,7 @@
 					addLights:true,
 					addGround:true,
 					shadows:true,
-					// TODO: 'glTF-MaterialsCommon', 'glTF-techniqueWebGL'
+					// TODO: 'glTF-MaterialsCommon'
 					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
 				},
 				{
@@ -479,7 +477,7 @@
 					objectRotation: new THREE.Euler(0, 90, 0),
 					addLights:true,
 					shadows:true,
-					// TODO: 'glTF-MaterialsCommon', 'glTF-techniqueWebGL'
+					// TODO: 'glTF-MaterialsCommon'
 					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
 				},
 				{

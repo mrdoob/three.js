@@ -335,13 +335,14 @@ var list = {
 
 		"Geometries": {
 			"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
-			"ConvexGeometry": "examples/geometries/ConvexGeometry"
+			"ConvexGeometry": "examples/geometries/ConvexGeometry",
+			"DecalGeometry": "examples/geometries/DecalGeometry"
 		},
 
 		"Loaders": {
 			"BabylonLoader": "examples/loaders/BabylonLoader",
 			"ColladaLoader": "examples/loaders/ColladaLoader",
-			"GLTF2Loader": "examples/loaders/GLTF2Loader",
+			"GLTFLoader": "examples/loaders/GLTFLoader",
 			"MTLLoader": "examples/loaders/MTLLoader",
 			"OBJLoader": "examples/loaders/OBJLoader",
 			"OBJLoader2": "examples/loaders/OBJLoader2",

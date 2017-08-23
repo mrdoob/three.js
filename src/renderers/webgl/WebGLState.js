@@ -5,7 +5,7 @@
 import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, DoubleSide, BackSide } from '../../constants';
 import { Vector4 } from '../../math/Vector4';
 
-function WebGLState( gl, extensions, utils ) {
+function WebGLState( renderer, gl, extensions, utils ) {
 
 	function ColorBuffer() {
 
@@ -339,8 +339,6 @@ function WebGLState( gl, extensions, utils ) {
 
 	var currentPolygonOffsetFactor = null;
 	var currentPolygonOffsetUnits = null;
-
-	var currentScissorTest = null;
 
 	var maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
 
@@ -760,15 +758,7 @@ function WebGLState( gl, extensions, utils ) {
 
 	}
 
-	function getScissorTest() {
-
-		return currentScissorTest;
-
-	}
-
 	function setScissorTest( scissorTest ) {
-
-		currentScissorTest = scissorTest;
 
 		if ( scissorTest ) {
 
@@ -939,7 +929,6 @@ function WebGLState( gl, extensions, utils ) {
 		setLineWidth: setLineWidth,
 		setPolygonOffset: setPolygonOffset,
 
-		getScissorTest: getScissorTest,
 		setScissorTest: setScissorTest,
 
 		activeTexture: activeTexture,
