@@ -1613,7 +1613,7 @@ THREE.GLTFLoader = ( function () {
 
 				pending.push( parser.assignTexture( materialParams, 'normalMap', material.normalTexture.index ) );
 
-				if ( material.normalTexture.scale ) {
+				if ( material.normalTexture.scale !== undefined ) {
 
 					materialParams.normalScale = new THREE.Vector2( material.normalTexture.scale, material.normalTexture.scale );
 
