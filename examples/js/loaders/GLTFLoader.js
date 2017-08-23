@@ -616,7 +616,7 @@ THREE.GLTFLoader = ( function () {
 				material.bumpScale = 1;
 
 				material.normalMap = params.normalMap === undefined ? null : params.normalMap;
-				material.normalScale = new THREE.Vector2( 1, 1 );
+				material.normalScale = params.normalScale || new THREE.Vector2( 1, 1 );
 
 				material.displacementMap = null;
 				material.displacementScale = 1;
