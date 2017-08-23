@@ -39,13 +39,12 @@
 		<script type="x-shader/x-vertex" id="vertexshader">
 
 			attribute float size;
-			attribute vec3 customColor;
 
 			varying vec3 vColor;
 
 			void main() {
 
-				vColor = customColor;
+				vColor = color;
 
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
@@ -59,14 +58,13 @@
 
 		<script type="x-shader/x-fragment" id="fragmentshader">
 
-			uniform vec3 color;
 			uniform sampler2D texture;
 
 			varying vec3 vColor;
 
 			void main() {
 
-				gl_FragColor = vec4( color * vColor, 1.0 );
+				gl_FragColor = vec4( vColor, 1.0 );
 
 				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
 
@@ -97,7 +95,6 @@
 
 			uniforms = {
 
-				color:     { value: new THREE.Color( 0xffffff ) },
 				texture:   { value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
 
 			};
@@ -110,7 +107,8 @@
 
 				blending:       THREE.AdditiveBlending,
 				depthTest:      false,
-				transparent:    true
+				transparent:    true,
+				vertexColors:   true
 
 			});
 
@@ -140,8 +138,8 @@
 			}
 
 			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'customColor', new THREE.Float32BufferAttribute( colors, 3 ) );
-			geometry.addAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ) );
+			geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+			geometry.addAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ).setDynamic( true ) );
 
 			particleSystem = new THREE.Points( geometry, shaderMaterial );
 
