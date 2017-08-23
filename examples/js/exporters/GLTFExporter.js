@@ -149,7 +149,7 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			var offset = 0;
-			var componentSize = componentType === THREE.WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
+			var componentSize = componentType === THREE.WebGLConstants.UNSIGNED_SHORT ? 2 : 4;
 
 			// Create a new dataview and dump the attribute's array into it
 			var byteLength = count * attribute.itemSize * componentSize;
@@ -162,15 +162,15 @@ THREE.GLTFExporter.prototype = {
 
 					var value = attribute.array[ i * attribute.itemSize + a ];
 
-					if ( componentType === THREE.WEBGL_CONSTANTS.FLOAT ) {
+					if ( componentType === THREE.WebGLConstants.FLOAT ) {
 
 						dataView.setFloat32( offset, value, true );
 
-					} else if ( componentType === THREE.WEBGL_CONSTANTS.UNSIGNED_INT ) {
+					} else if ( componentType === THREE.WebGLConstants.UNSIGNED_INT ) {
 
 						dataView.setUint8( offset, value, true );
 
-					} else if ( componentType === THREE.WEBGL_CONSTANTS.UNSIGNED_SHORT ) {
+					} else if ( componentType === THREE.WebGLConstants.UNSIGNED_SHORT ) {
 
 						dataView.setUint16( offset, value, true );
 
@@ -197,7 +197,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processBufferView( data, componentType, start, count ) {
 
-			var isVertexAttributes = componentType === THREE.WEBGL_CONSTANTS.FLOAT;
+			var isVertexAttributes = componentType === THREE.WebGLConstants.FLOAT;
 
 			if ( ! outputJSON.bufferViews ) {
 
@@ -205,7 +205,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
+			var componentSize = componentType === THREE.WebGLConstants.UNSIGNED_SHORT ? 2 : 4;
 
 			// Create a new dataview and dump the attribute's array into it
 			var byteLength = count * data.itemSize * componentSize;
@@ -216,7 +216,7 @@ THREE.GLTFExporter.prototype = {
 				byteOffset: byteOffset,
 				byteLength: byteLength,
 				byteStride: data.itemSize * componentSize,
-				target: isVertexAttributes ? THREE.WEBGL_CONSTANTS.ARRAY_BUFFER : THREE.WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER
+				target: isVertexAttributes ? THREE.WebGLConstants.ARRAY_BUFFER : THREE.WebGLConstants.ELEMENT_ARRAY_BUFFER
 
 			};
 
@@ -263,15 +263,15 @@ THREE.GLTFExporter.prototype = {
 			// Detect the component type of the attribute array (float, uint or ushort)
 			if ( attribute.array.constructor === Float32Array ) {
 
-				componentType = THREE.WEBGL_CONSTANTS.FLOAT;
+				componentType = THREE.WebGLConstants.FLOAT;
 
 			} else if ( attribute.array.constructor === Uint32Array ) {
 
-				componentType = THREE.WEBGL_CONSTANTS.UNSIGNED_INT;
+				componentType = THREE.WebGLConstants.UNSIGNED_INT;
 
 			} else if ( attribute.array.constructor === Uint16Array ) {
 
-				componentType = THREE.WEBGL_CONSTANTS.UNSIGNED_SHORT;
+				componentType = THREE.WebGLConstants.UNSIGNED_SHORT;
 
 			} else {
 
@@ -368,10 +368,10 @@ THREE.GLTFExporter.prototype = {
 
 			var gltfSampler = {
 
-				magFilter: THREE.THREE_TO_WEBGL[ map.magFilter ],
-				minFilter: THREE.THREE_TO_WEBGL[ map.minFilter ],
-				wrapS: THREE.THREE_TO_WEBGL[ map.wrapS ],
-				wrapT: THREE.THREE_TO_WEBGL[ map.wrapT ]
+				magFilter: THREE.WebGLUtils.toGL[ map.magFilter ],
+				minFilter: THREE.WebGLUtils.toGL[ map.minFilter ],
+				wrapS: THREE.WebGLUtils.toGL[ map.wrapS ],
+				wrapT: THREE.WebGLUtils.toGL[ map.wrapT ]
 
 			};
 
@@ -602,19 +602,19 @@ THREE.GLTFExporter.prototype = {
 			// Use the correct mode
 			if ( mesh instanceof THREE.LineSegments ) {
 
-				mode = THREE.WEBGL_CONSTANTS.LINES;
+				mode = THREE.WebGLConstants.LINES;
 
 			} else if ( mesh instanceof THREE.LineLoop ) {
 
-				mode = THREE.WEBGL_CONSTANTS.LINE_LOOP;
+				mode = THREE.WebGLConstants.LINE_LOOP;
 
 			} else if ( mesh instanceof THREE.Line ) {
 
-				mode = THREE.WEBGL_CONSTANTS.LINE_STRIP;
+				mode = THREE.WebGLConstants.LINE_STRIP;
 
 			} else if ( mesh instanceof THREE.Points ) {
 
-				mode = THREE.WEBGL_CONSTANTS.POINTS;
+				mode = THREE.WebGLConstants.POINTS;
 
 			} else {
 
@@ -629,15 +629,15 @@ THREE.GLTFExporter.prototype = {
 				if ( mesh.drawMode === THREE.TriangleFanDrawMode ) {
 
 					console.warn( 'GLTFExporter: TriangleFanDrawMode and wireframe incompatible.' );
-					mode = THREE.WEBGL_CONSTANTS.TRIANGLE_FAN;
+					mode = THREE.WebGLConstants.TRIANGLE_FAN;
 
 				} else if ( mesh.drawMode === THREE.TriangleStripDrawMode ) {
 
-					mode = mesh.material.wireframe ? THREE.WEBGL_CONSTANTS.LINE_STRIP : THREE.WEBGL_CONSTANTS.TRIANGLE_STRIP;
+					mode = mesh.material.wireframe ? THREE.WebGLConstants.LINE_STRIP : THREE.WebGLConstants.TRIANGLE_STRIP;
 
 				} else {
 
-					mode = mesh.material.wireframe ? THREE.WEBGL_CONSTANTS.LINES : THREE.WEBGL_CONSTANTS.TRIANGLES;
+					mode = mesh.material.wireframe ? THREE.WebGLConstants.LINES : THREE.WebGLConstants.TRIANGLES;
 
 				}
 

@@ -91,17 +91,6 @@ var THREE_TO_WEBGL = {
 
 }
 
-/**
- * Convert a THREE.js constant to WEBGL
- * @param  {Number} threeConstant Three.js constant
- * @return {Number}               WebGL constant
- */
-function toGL ( threeConstant ) {
-
-	return THREE_TO_WEBGL[ threeConstant ];
-
-}
-
 //------------------------------------------------------------------------------
 // WEBGL TO THREE
 //------------------------------------------------------------------------------
@@ -195,15 +184,29 @@ var WEBGL_TO_THREE = {
 };
 
 
-/**
- * Convert a WEBGL constant to THREE.js
- * @param  {Number} webglConstant WebGL constant
- * @return {Number}               Three.js constant
- */
-function fromGL ( webglConstant ) {
+var WebGLUtils = {
 
-	return WEBGL_TO_THREE[ webglConstant ];
+	/**
+	 * Convert a WEBGL constant to THREE.js
+	 * @param  {Number} webglConstant WebGL constant
+	 * @return {Number}               Three.js constant
+	 */
+	fromGL: function( webglConstant ) {
 
+		return WEBGL_TO_THREE[ webglConstant ];
+
+	},
+
+	/**
+	 * Convert a THREE.js constant to WEBGL
+	 * @param  {Number} threeConstant Three.js constant
+	 * @return {Number}               WebGL constant
+	 */
+	toGL: function( threeConstant ) {
+
+		return THREE_TO_WEBGL[ threeConstant ];
+
+	}
 }
 
-export { toGL, fromGL };
+export { WebGLUtils };

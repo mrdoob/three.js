@@ -29,7 +29,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { WebGLClipping } from './webgl/WebGLClipping.js';
 import { Frustum } from '../math/Frustum.js';
 import { Vector4 } from '../math/Vector4.js';
-import { toGL } from './webgl/WebGLUtils';
+import { WebGLUtils } from './webgl/WebGLUtils';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -2481,14 +2481,14 @@ function WebGLRenderer( parameters ) {
 				var textureFormat = texture.format;
 				var textureType = texture.type;
 
-				if ( textureFormat !== RGBAFormat && toGL( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+				if ( textureFormat !== RGBAFormat && WebGLUtils.toGL( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
 
 					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 					return;
 
 				}
 
-				if ( textureType !== UnsignedByteType && toGL( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
+				if ( textureType !== UnsignedByteType && WebGLUtils.toGL( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
 					! ( textureType === FloatType && ( extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
 					! ( textureType === HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
 
@@ -2503,7 +2503,7 @@ function WebGLRenderer( parameters ) {
 
 					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-						_gl.readPixels( x, y, width, height, toGL( textureFormat ), toGL( textureType ), buffer );
+						_gl.readPixels( x, y, width, height, WebGLUtils.toGL( textureFormat ), WebGLUtils.toGL( textureType ), buffer );
 
 					}
 
