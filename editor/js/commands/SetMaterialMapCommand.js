@@ -10,7 +10,7 @@
  * @constructor
  */
 
-var SetMaterialMapCommand = function ( object, mapName, newMap ) {
+var SetMaterialMapCommand = function ( object, mapName, newMap, materialSlot ) {
 
 	Command.call( this );
 	this.type = 'SetMaterialMapCommand';
@@ -18,7 +18,8 @@ var SetMaterialMapCommand = function ( object, mapName, newMap ) {
 
 	this.object = object;
 	this.mapName = mapName;
-	this.oldMap = ( object !== undefined ) ? object.material[ mapName ] : undefined;
+	this.material = ( Array.isArray( object.material ) ) ? object.material[ materialSlot ] : object.material;
+	this.oldMap = ( object !== undefined ) ? this.material[ mapName ] : undefined;
 	this.newMap = newMap;
 
 };
@@ -27,17 +28,17 @@ SetMaterialMapCommand.prototype = {
 
 	execute: function () {
 
-		this.object.material[ this.mapName ] = this.newMap;
-		this.object.material.needsUpdate = true;
-		this.editor.signals.materialChanged.dispatch( this.object.material );
+		this.material[ this.mapName ] = this.newMap;
+		this.material.needsUpdate = true;
+		this.editor.signals.materialChanged.dispatch( this.material );
 
 	},
 
 	undo: function () {
 
-		this.object.material[ this.mapName ] = this.oldMap;
-		this.object.material.needsUpdate = true;
-		this.editor.signals.materialChanged.dispatch( this.object.material );
+		this.material[ this.mapName ] = this.oldMap;
+		this.material.needsUpdate = true;
+		this.editor.signals.materialChanged.dispatch( this.material );
 
 	},
 
