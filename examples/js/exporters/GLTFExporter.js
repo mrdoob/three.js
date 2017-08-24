@@ -520,7 +520,13 @@ THREE.GLTFExporter.prototype = {
 			// alphaMode
 			if ( material.transparent ) {
 
-				gltfMaterial.alphaMode = 'BLEND'; // @FIXME We should detect MASK or BLEND
+				gltfMaterial.alphaMode = 'MASK'; // @FIXME We should detect MASK or BLEND
+
+				if ( material.alphaTest !== 0.5 ) {
+
+					gltfMaterial.alphaCutoff = material.alphaTest;
+
+				}
 
 			}
 
