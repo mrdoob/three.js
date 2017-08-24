@@ -478,8 +478,7 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
 
-					index: processTexture( material.map ),
-					texCoord: 0 // @FIXME
+					index: processTexture( material.map )
 
 				};
 
@@ -505,8 +504,7 @@ THREE.GLTFExporter.prototype = {
 
 					gltfMaterial.emissiveTexture = {
 
-						index: processTexture( material.emissiveMap ),
-						texCoord: 0 // @FIXME
+						index: processTexture( material.emissiveMap )
 
 					};
 
@@ -519,10 +517,21 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.normalTexture = {
 
-					index: processTexture( material.normalMap ),
-					texCoord: 0 // @FIXME
+					index: processTexture( material.normalMap )
 
 				};
+
+				if ( material.normalScale.x !== -1 ) {
+
+					if ( material.normalScale.x !== material.normalScale.y ) {
+
+						console.warn('GLTFExporter: Normal scale components are different, ignoring Y and exporting X');
+
+					}
+
+					gltfMaterial.normalTexture.scale = material.normalScale.x;
+
+				}
 
 			}
 
@@ -531,10 +540,15 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.occlusionTexture = {
 
-					index: processTexture( material.aoMap ),
-					texCoord: 0 // @FIXME
+					index: processTexture( material.aoMap )
 
 				};
+
+				if ( material.aoMapIntensity !== 1.0 ) {
+
+					gltfMaterial.occlusionTexture.strength = material.aoMapIntensity;
+
+				}
 
 			}
 
