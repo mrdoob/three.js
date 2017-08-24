@@ -115,7 +115,7 @@
 
 			var container;
 
-			var camera, scene1, scene2, renderer;
+			var camera, object, scene1, scene2, renderer;
 			var gridHelper, sphere;
 
 			init();
@@ -141,13 +141,16 @@
 				// ---------------------------------------------------------------------
 				// Ambient light
 				// ---------------------------------------------------------------------
-				scene1.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
+				var light = new THREE.AmbientLight( 0xffffff, 0.2 );
+				light.name = 'AmbientLight';
+				scene1.add( light );
 
 				// ---------------------------------------------------------------------
 				// DirectLight
 				// ---------------------------------------------------------------------
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 0 );
+				light.name = 'DirectionalLight';
 				scene1.add( light );
 
 				// ---------------------------------------------------------------------
