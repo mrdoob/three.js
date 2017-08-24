@@ -523,6 +523,12 @@ THREE.GLTFExporter.prototype = {
 
 				};
 
+				if ( material.aoMapIntensity !== 1.0 ) {
+
+					gltfMaterial.occlusionTexture.strength = material.aoMapIntensity;
+
+				}
+
 			}
 
 			// alphaMode
