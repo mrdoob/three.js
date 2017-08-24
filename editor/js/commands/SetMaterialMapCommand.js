@@ -13,14 +13,17 @@
 var SetMaterialMapCommand = function ( object, mapName, newMap, materialSlot ) {
 
 	Command.call( this );
+
 	this.type = 'SetMaterialMapCommand';
 	this.name = 'Set Material.' + mapName;
 
 	this.object = object;
-	this.mapName = mapName;
-	this.material = ( Array.isArray( object.material ) ) ? object.material[ materialSlot ] : object.material;
+	this.material = this.editor.getObjectMaterial( object, materialSlot );
+
 	this.oldMap = ( object !== undefined ) ? this.material[ mapName ] : undefined;
 	this.newMap = newMap;
+
+	this.mapName = mapName;
 
 };
 
@@ -30,6 +33,7 @@ SetMaterialMapCommand.prototype = {
 
 		this.material[ this.mapName ] = this.newMap;
 		this.material.needsUpdate = true;
+
 		this.editor.signals.materialChanged.dispatch( this.material );
 
 	},
@@ -38,6 +42,7 @@ SetMaterialMapCommand.prototype = {
 
 		this.material[ this.mapName ] = this.oldMap;
 		this.material.needsUpdate = true;
+
 		this.editor.signals.materialChanged.dispatch( this.material );
 
 	},
