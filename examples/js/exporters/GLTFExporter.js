@@ -650,7 +650,7 @@ THREE.GLTFExporter.prototype = {
 			};
 
 			var material = processMaterial( mesh.material );
-			if ( material ) {
+			if ( material !== null ) {
 
 				gltfMesh.primitives[ 0 ].material = material;
 
