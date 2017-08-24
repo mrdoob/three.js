@@ -616,7 +616,7 @@ THREE.GLTFLoader = ( function () {
 				material.bumpScale = 1;
 
 				material.normalMap = params.normalMap === undefined ? null : params.normalMap;
-				material.normalScale = params.normalScale || new THREE.Vector2( 1, 1 );
+				material.normalScale = params.normalScale === undefined ? new THREE.Vector2( 1, 1 ) : params.normalScale;
 
 				material.displacementMap = null;
 				material.displacementScale = 1;
@@ -1613,9 +1613,11 @@ THREE.GLTFLoader = ( function () {
 
 				pending.push( parser.assignTexture( materialParams, 'normalMap', material.normalTexture.index ) );
 
+				materialParams.normalScale = new THREE.Vector2( 1, 1 );
+
 				if ( material.normalTexture.scale !== undefined ) {
 
-					materialParams.normalScale = new THREE.Vector2( material.normalTexture.scale, material.normalTexture.scale );
+					materialParams.normalScale.set( material.normalTexture.scale, material.normalTexture.scale );
 
 				}
 			}
