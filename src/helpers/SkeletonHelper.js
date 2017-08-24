@@ -14,6 +14,7 @@ import { Color } from '../math/Color';
 import { Vector3 } from '../math/Vector3';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Object3D } from '../core/Object3D';
 
 function getBoneList( object ) {
 
@@ -75,21 +76,19 @@ function SkeletonHelper( object ) {
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	this.onBeforeRender();
-
 }
 
 SkeletonHelper.prototype = Object.create( LineSegments.prototype );
 SkeletonHelper.prototype.constructor = SkeletonHelper;
 
-SkeletonHelper.prototype.onBeforeRender = function () {
+SkeletonHelper.prototype.updateMatrixWorld = function () {
 
 	var vector = new Vector3();
 
 	var boneMatrix = new Matrix4();
 	var matrixWorldInv = new Matrix4();
 
-	return function onBeforeRender() {
+	return function updateMatrixWorld( force ) {
 
 		var bones = this.bones;
 
@@ -119,6 +118,8 @@ SkeletonHelper.prototype.onBeforeRender = function () {
 		}
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
+
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
 	};
 
