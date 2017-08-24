@@ -315,9 +315,9 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 				'vec4 texture = texture2D( map, vUV );',
 
-				'if ( texture.a < alphaTest ) discard;',
-
 				'gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );',
+
+				'if ( gl_FragColor.a < alphaTest ) discard;',
 
 				'if ( fogType > 0 ) {',
 
