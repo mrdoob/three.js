@@ -6869,6 +6869,7 @@
 				fogNear:			gl.getUniformLocation( program, 'fogNear' ),
 				fogFar:				gl.getUniformLocation( program, 'fogFar' ),
 				fogColor:			gl.getUniformLocation( program, 'fogColor' ),
+				fogDepth:			gl.getUniformLocation( program, 'fogDepth' ),
 
 				alphaTest:			gl.getUniformLocation( program, 'alphaTest' )
 			};
@@ -7065,6 +7066,7 @@
 				'attribute vec2 uv;',
 
 				'varying vec2 vUV;',
+				'varying float fogDepth;',
 
 				'void main() {',
 
@@ -7076,13 +7078,14 @@
 					'rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;',
 					'rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;',
 
-					'vec4 finalPosition;',
+					'vec4 mvPosition;',
 
-					'finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );',
-					'finalPosition.xy += rotatedPosition;',
-					'finalPosition = projectionMatrix * finalPosition;',
+					'mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );',
+					'mvPosition.xy += rotatedPosition;',
 
-					'gl_Position = finalPosition;',
+					'gl_Position = projectionMatrix * mvPosition;',
+
+					'fogDepth = - mvPosition.z;',
 
 				'}'
 
@@ -7106,33 +7109,33 @@
 				'uniform float alphaTest;',
 
 				'varying vec2 vUV;',
+				'varying float fogDepth;',
 
 				'void main() {',
 
 					'vec4 texture = texture2D( map, vUV );',
 
-					'if ( texture.a < alphaTest ) discard;',
-
 					'gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );',
+
+					'if ( gl_FragColor.a < alphaTest ) discard;',
 
 					'if ( fogType > 0 ) {',
 
-						'float depth = gl_FragCoord.z / gl_FragCoord.w;',
 						'float fogFactor = 0.0;',
 
 						'if ( fogType == 1 ) {',
 
-							'fogFactor = smoothstep( fogNear, fogFar, depth );',
+							'fogFactor = smoothstep( fogNear, fogFar, fogDepth );',
 
 						'} else {',
 
 							'const float LOG2 = 1.442695;',
-							'fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );',
+							'fogFactor = exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 );',
 							'fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );',
 
 						'}',
 
-						'gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );',
+						'gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );',
 
 					'}',
 
@@ -40890,21 +40893,19 @@
 		this.matrix = object.matrixWorld;
 		this.matrixAutoUpdate = false;
 
-		this.onBeforeRender();
-
 	}
 
 	SkeletonHelper.prototype = Object.create( LineSegments.prototype );
 	SkeletonHelper.prototype.constructor = SkeletonHelper;
 
-	SkeletonHelper.prototype.onBeforeRender = function () {
+	SkeletonHelper.prototype.updateMatrixWorld = function () {
 
 		var vector = new Vector3();
 
 		var boneMatrix = new Matrix4();
 		var matrixWorldInv = new Matrix4();
 
-		return function onBeforeRender() {
+		return function updateMatrixWorld( force ) {
 
 			var bones = this.bones;
 
@@ -40934,6 +40935,8 @@
 			}
 
 			geometry.getAttribute( 'position' ).needsUpdate = true;
+
+			Object3D.prototype.updateMatrixWorld.call( this, force );
 
 		};
 
@@ -41835,14 +41838,12 @@
 
 		this.geometry.computeBoundingSphere();
 
-		this.onBeforeRender();
-
 	}
 
 	Box3Helper.prototype = Object.create( LineSegments.prototype );
 	Box3Helper.prototype.constructor = Box3Helper;
 
-	Box3Helper.prototype.onBeforeRender = function () {
+	Box3Helper.prototype.updateMatrixWorld = function ( force ) {
 
 		var box = this.box;
 
@@ -41853,6 +41854,8 @@
 		box.getSize( this.scale );
 
 		this.scale.multiplyScalar( 0.5 );
+
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
 	};
 
@@ -41888,16 +41891,12 @@
 
 		this.add( new Mesh( geometry2, new MeshBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
 
-		//
-
-		this.onBeforeRender();
-
 	}
 
 	PlaneHelper.prototype = Object.create( Line.prototype );
 	PlaneHelper.prototype.constructor = PlaneHelper;
 
-	PlaneHelper.prototype.onBeforeRender = function () {
+	PlaneHelper.prototype.updateMatrixWorld = function ( force ) {
 
 		var scale = - this.plane.constant;
 
@@ -41907,7 +41906,7 @@
 
 		this.lookAt( this.plane.normal );
 
-		this.updateMatrixWorld();
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
 	};
 
