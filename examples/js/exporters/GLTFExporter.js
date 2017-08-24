@@ -500,6 +500,18 @@ THREE.GLTFExporter.prototype = {
 
 				};
 
+				if ( material.normalScale.x !== -1 ) {
+
+					if ( material.normalScale.x !== material.normalScale.y ) {
+
+						console.warn('GLTFExporter: Normal scale components are different, ignoring Y and exporting X');
+
+					}
+
+					gltfMaterial.normalTexture.scale = material.normalScale.x;
+
+				}
+
 			}
 
 			// occlusionTexture
