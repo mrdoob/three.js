@@ -765,7 +765,7 @@ THREE.GLTFExporter.prototype = {
 			if ( object instanceof THREE.Light ) {
 
 				console.warn( 'GLTFExporter: Unsupported node type:', object.constructor.name );
-				return false;
+				return null;
 
 			}
 
@@ -856,7 +856,7 @@ THREE.GLTFExporter.prototype = {
 
 						var node = processNode( child );
 
-						if ( node !== false ) {
+						if ( node !== null ) {
 
 							children.push( node );
 
@@ -918,7 +918,7 @@ THREE.GLTFExporter.prototype = {
 
 					var node = processNode( child );
 
-					if ( node !== false ) {
+					if ( node !== null ) {
 
 						nodes.push( node );
 
