@@ -1603,6 +1603,12 @@ THREE.GLTFLoader = ( function () {
 
 				materialParams.transparent = true;
 
+				if ( alphaMode === ALPHA_MODES.MASK ) {
+
+				  materialParams.alphaTest = material.alphaCutoff || 0.5;
+
+				}
+
 			} else {
 
 				materialParams.transparent = false;
