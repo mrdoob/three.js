@@ -5,7 +5,7 @@
 import { Audio } from './audio/Audio.js';
 import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
-import { CullFaceFront, CullFaceBack } from './constants.js';
+import { CullFaceFront, CullFaceBack, FlatShading } from './constants.js';
 import {
 	Float64BufferAttribute,
 	Float32BufferAttribute,
@@ -1047,7 +1047,7 @@ Object.defineProperties( Material.prototype, {
 		set: function ( value ) {
 
 			console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
-			this.flatShading = ( value === THREE.FlatShading ) ? true : false;
+			this.flatShading = ( value === FlatShading );
 
 		}
 	}

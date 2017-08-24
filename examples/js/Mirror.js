@@ -13,6 +13,8 @@ THREE.Mirror = function ( width, height, options ) {
 
 	options = options || {};
 
+	var viewport = new THREE.Vector4();
+
 	var textureWidth = options.textureWidth !== undefined ? options.textureWidth : 512;
 	var textureHeight = options.textureHeight !== undefined ? options.textureHeight : 512;
 
@@ -134,11 +136,12 @@ THREE.Mirror = function ( width, height, options ) {
 		target.add( mirrorWorldPosition );
 
 		mirrorCamera.position.copy( view );
-		mirrorCamera.up.set( 0, - 1, 0 );
+		mirrorCamera.up.set( 0, 1, 0 );
 		mirrorCamera.up.applyMatrix4( rotationMatrix );
-		mirrorCamera.up.reflect( normal ).negate();
+		mirrorCamera.up.reflect( normal );
 		mirrorCamera.lookAt( target );
 
+		mirrorCamera.aspect = camera.aspect;
 		mirrorCamera.near = camera.near;
 		mirrorCamera.far = camera.far;
 
@@ -200,6 +203,24 @@ THREE.Mirror = function ( width, height, options ) {
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 
 		renderer.setRenderTarget( currentRenderTarget );
+
+		// Restore viewport
+
+		var bounds = camera.bounds;
+
+		if ( bounds !== undefined ) {
+
+			var size = renderer.getSize();
+			var pixelRatio = renderer.getPixelRatio();
+
+			viewport.x = bounds.x * size.width * pixelRatio;
+			viewport.y = bounds.y * size.height * pixelRatio;
+			viewport.z = bounds.z * size.width * pixelRatio;
+			viewport.w = bounds.w * size.height * pixelRatio;
+
+			renderer.state.viewport( viewport );
+
+		}
 
 		scope.visible = true;
 

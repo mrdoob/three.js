@@ -59,19 +59,18 @@
 				directionalLight.position.set( 0, 0, 2 );
 				scene.add( directionalLight );
 
+				//3ds files dont store normal maps
 				var loader = new THREE.TextureLoader();
-
-				var texture = loader.load( 'models/3ds/portalgun/textures/color.jpg' );
 				var normal = loader.load( 'models/3ds/portalgun/textures/normal.jpg' );
 
 				var loader = new THREE.TDSLoader( );
+				loader.setPath( 'models/3ds/portalgun/textures/' );
 				loader.load( 'models/3ds/portalgun/portalgun.3ds', function ( object ) {
 
 					object.traverse( function ( child ) {
 
 						if ( child instanceof THREE.Mesh ) {
 
-							child.material.map = texture;
 							child.material.normalMap = normal;
 						}
 

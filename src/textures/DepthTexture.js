@@ -1,10 +1,10 @@
-import { Texture } from './Texture';
-import { NearestFilter, UnsignedShortType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants';
-
 /**
  * @author Matt DesLauriers / @mattdesl
  * @author atix / arthursilber.de
  */
+
+import { Texture } from './Texture';
+import { NearestFilter, UnsignedShortType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants';
 
 function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
 

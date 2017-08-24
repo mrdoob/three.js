@@ -21,7 +21,7 @@ THREE.ViveController = function ( id ) {
 		// Iterate across gamepads as Vive Controllers may not be
 		// in position 0 and 1.
 
-		var gamepads = navigator.getGamepads();
+		var gamepads = navigator.getGamepads && navigator.getGamepads();
 
 		for ( var i = 0, j = 0; i < 4; i ++ ) {
 
@@ -89,7 +89,7 @@ THREE.ViveController = function ( id ) {
 			if ( thumbpadIsPressed !== gamepad.buttons[ 0 ].pressed ) {
 
 				thumbpadIsPressed = gamepad.buttons[ 0 ].pressed;
-				scope.dispatchEvent( { type: thumbpadIsPressed ? 'thumbpaddown' : 'thumbpadup' } );
+				scope.dispatchEvent( { type: thumbpadIsPressed ? 'thumbpaddown' : 'thumbpadup', axes: axes } );
 
 			}
 

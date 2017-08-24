@@ -1,9 +1,9 @@
-import { Texture } from './Texture';
-import { NearestFilter } from '../constants';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  */
+
+import { Texture } from './Texture';
+import { NearestFilter } from '../constants';
 
 function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
