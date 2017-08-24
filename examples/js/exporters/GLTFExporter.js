@@ -457,8 +457,7 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
 
-					index: processTexture( material.map ),
-					texCoord: 0 // @FIXME
+					index: processTexture( material.map )
 
 				};
 
@@ -484,8 +483,7 @@ THREE.GLTFExporter.prototype = {
 
 					gltfMaterial.emissiveTexture = {
 
-						index: processTexture( material.emissiveMap ),
-						texCoord: 0 // @FIXME
+						index: processTexture( material.emissiveMap )
 
 					};
 
@@ -498,8 +496,7 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.normalTexture = {
 
-					index: processTexture( material.normalMap ),
-					texCoord: 0 // @FIXME
+					index: processTexture( material.normalMap )
 
 				};
 
@@ -510,8 +507,7 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.occlusionTexture = {
 
-					index: processTexture( material.aoMap ),
-					texCoord: 0 // @FIXME
+					index: processTexture( material.aoMap )
 
 				};
 
