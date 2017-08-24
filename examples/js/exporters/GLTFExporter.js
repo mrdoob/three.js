@@ -718,6 +718,13 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processNode ( object ) {
 
+			if ( object instanceof THREE.Light ) {
+
+				console.warn( 'GLTFExporter: Unsupported node type:', object.constructor.name );
+				return false;
+
+			}
+
 			if ( !outputJSON.nodes ) {
 
 				outputJSON.nodes = [];
@@ -803,13 +810,11 @@ THREE.GLTFExporter.prototype = {
 
 					if ( child.visible || options.onlyVisible === false ) {
 
-						if ( child instanceof THREE.Mesh ||
-							child instanceof THREE.Camera ||
-							child instanceof THREE.Group ||
-							child instanceof THREE.Line ||
-							child instanceof THREE.Points) {
+						var node = processNode( child );
 
-							children.push( processNode( child ) );
+						if ( node !== false ) {
+
+							children.push( node );
 
 						}
 
@@ -867,14 +872,11 @@ THREE.GLTFExporter.prototype = {
 
 				if ( child.visible || options.onlyVisible === false ) {
 
-					// @TODO We don't process lights yet
-					if ( child instanceof THREE.Mesh ||
-						child instanceof THREE.Camera ||
-						child instanceof THREE.Group ||
-						child instanceof THREE.Line ||
-						child instanceof THREE.Points) {
+					var node = processNode( child );
 
-						nodes.push( processNode( child ) );
+					if ( node !== false ) {
+
+						nodes.push( node );
 
 					}
 
