@@ -78,6 +78,12 @@ THREE.GLTFExporter.prototype = {
 
 		var byteOffset = 0;
 		var dataViews = [];
+		var cachedData = {
+
+			images: {},
+			materials: {}
+
+		};
 
 		/**
 		 * Compare two arrays
@@ -318,6 +324,12 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processImage ( map ) {
 
+			if ( cachedData.images[ map.uuid ] ) {
+
+				return cachedData.images[ map.uuid ];
+
+			}
+
 			if ( !outputJSON.images ) {
 
 				outputJSON.images = [];
@@ -339,7 +351,10 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.images.push( gltfImage );
 
-			return outputJSON.images.length - 1;
+			var index = outputJSON.images.length - 1;
+			cachedData.images[ map.uuid ] = index;
+
+			return index;
 
 		}
 
@@ -403,6 +418,12 @@ THREE.GLTFExporter.prototype = {
 		 * @return {Integer}      Index of the processed material in the "materials" array
 		 */
 		function processMaterial ( material ) {
+
+			if ( cachedData.materials[ material.uuid ] ) {
+
+				return cachedData.materials[ material.uuid ];
+
+			}
 
 			if ( !outputJSON.materials ) {
 
@@ -539,7 +560,10 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.materials.push( gltfMaterial );
 
-			return outputJSON.materials.length - 1;
+			var index = outputJSON.materials.length - 1;
+			cachedData.materials[ material.uuid ] = index;
+
+			return index;
 
 		}
 
