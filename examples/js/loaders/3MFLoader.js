@@ -88,6 +88,13 @@ THREE.ThreeMFLoader.prototype = {
 
 			}
 
+			if ( window.TextDecoder === undefined ) {
+
+				console.error( 'THREE.ThreeMFLoader: TextDecoder not present. Please use a TextDecoder polyfill.' );
+				return null;
+
+			}
+
 			var relsView = new DataView( zip.file( relsName ).asArrayBuffer() );
 			var relsFileText = new TextDecoder( 'utf-8' ).decode( relsView );
 			rels = parseRelsXml( relsFileText );
@@ -96,13 +103,6 @@ THREE.ThreeMFLoader.prototype = {
 
 				var modelPart = modelPartNames[ i ];
 				var view = new DataView( zip.file( modelPart ).asArrayBuffer() );
-
-				if ( TextDecoder === undefined ) {
-
-					console.error( 'THREE.ThreeMFLoader: TextDecoder not present. Please use a TextDecoder polyfill.' );
-					return null;
-
-				}
 
 				var fileText = new TextDecoder( 'utf-8' ).decode( view );
 				var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
