@@ -1,14 +1,14 @@
-import { EventDispatcher } from '../core/EventDispatcher';
-import { UVMapping } from '../constants';
-import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
-import { _Math } from '../math/Math';
-import { Vector2 } from '../math/Vector2';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
  */
+
+import { EventDispatcher } from '../core/EventDispatcher';
+import { UVMapping } from '../constants';
+import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
+import { _Math } from '../math/Math';
+import { Vector2 } from '../math/Vector2';
 
 var textureId = 0;
 
