@@ -125,11 +125,12 @@
 
 			var bufferGeometry = new THREE.BoxBufferGeometry( 2, 2, 2 );
 
-			// copy data from a simple box geometry
+			// copying data from a simple box geometry, but you can specify a custom geometry if you want
 
 			var geometry = new THREE.InstancedBufferGeometry();
 			geometry.index = bufferGeometry.index;
-			geometry.attributes = bufferGeometry.attributes;
+			geometry.attributes.position = bufferGeometry.attributes.position;
+			geometry.attributes.uv = bufferGeometry.attributes.uv;
 
 			// per instance data
 
