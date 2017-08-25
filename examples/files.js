@@ -212,6 +212,7 @@ var files = {
 		"webgl_postprocessing_crossfade",
 		"webgl_postprocessing_dof",
 		"webgl_postprocessing_dof2",
+		"webgl_postprocessing_fxaa",
 		"webgl_postprocessing_glitch",
 		"webgl_postprocessing_godrays",
 		"webgl_postprocessing_masking",
@@ -244,7 +245,6 @@ var files = {
 		"webgl_shadowmap_pointlight",
 		"webgl_shadowmap_viewer",
 		"webgl_shadowmesh",
-		"webgl_simple_gi",
 		"webgl_skinning_simple",
 		"webgl_sprites",
 		"webgl_sprites_nodes",
@@ -279,7 +279,8 @@ var files = {
 		"webgl_custom_attributes_points3",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
-		"webgl_shadowmap_pcss"
+		"webgl_shadowmap_pcss",
+		"webgl_simple_gi"
 	],
 	"webgl deferred": [
 		"webgldeferred_animation"
@@ -289,6 +290,10 @@ var files = {
 		"webgl2_sandbox"
 	],
 	*/
+	"webaudio": [
+		"misc_sound",
+		"misc_sound_visualizer"
+	],
 	"webvr": [
 		"webvr_cubes",
 		"webvr_daydream",
@@ -301,15 +306,6 @@ var files = {
 		"webvr_vive_camerarig",
 		"webvr_vive_paint",
 		"webvr_vive_sculpt"
-	],
-	"css3d": [
-		"css3d_molecules",
-		"css3d_panorama",
-		"css3d_panorama_deviceorientation",
-		"css3d_periodictable",
-		"css3d_sandbox",
-		"css3d_sprites",
-		"css3d_youtube"
 	],
 	"misc": [
 		"misc_animation_authoring",
@@ -325,11 +321,18 @@ var files = {
 		"misc_fps",
 		"misc_lights_test",
 		"misc_lookat",
-		"misc_sound",
-		"misc_sound_visualizer",
 		"misc_ubiquity_test",
 		"misc_ubiquity_test2",
 		"misc_uv_tests"
+	],
+	"css3d": [
+		"css3d_molecules",
+		"css3d_panorama",
+		"css3d_panorama_deviceorientation",
+		"css3d_periodictable",
+		"css3d_sandbox",
+		"css3d_sprites",
+		"css3d_youtube"
 	],
 	"canvas": [
 		"canvas_ascii_effect",

@@ -28,7 +28,12 @@
 			// resource URL
 			'models/molecules/caffeine.pdb',
 			// Function when resource is loaded
-			function ( geometryAtoms, geometryBonds, json ) {
+			function ( pdb ) {
+
+				var geometryAtoms = pdb.geometryAtoms;
+				var geometryBonds = pdb.geometryBonds;
+				var json = pdb.json;
+
 				console.log( 'This molecule has ' + json.atoms.length + ' atoms' );
 			},
 			// Function called when download progresses
@@ -71,23 +76,13 @@
 		Begin loading from url and call onLoad with the parsed response content.
 		</div>
 
-		<h3>[method:Object parsePDB]( [page:String text] )</h3>
+		<h3>[method:Object parse]( [page:String text] )</h3>
 		<div>
 		[page:String text] — The textual <em>pdb</em> structure to parse.
 		</div>
 		<div>
 		Parse a <em>pdb</em> text and return a <em>JSON</em> structure.<br />
 		</div>
-
-		<h3>[method:null createModel]( [page:Object json], [page:Function callback] )</h3>
-		<div>
-		[page:Object json] — The <em>(JSON) pdb</em> structure to parse.<br />
-		[page:Function callback] — Will be called when parse completes, with three arguments: [page:BufferGeometry geometryAtoms], [page:BufferGeometry geometryBonds] and the original [page:Object json].<br />
-		</div>
-		<div>
-		Parse a <em>(JSON) pdb</em> structure and return two [page:BufferGeometry]: one for atoms, one for bonds.<br />
-		</div>
-
 
 		<h2>Source</h2>
 

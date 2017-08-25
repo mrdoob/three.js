@@ -28,6 +28,10 @@
 			<button id="export_object">Export Sphere</button>
 			<button id="export_objects">Export Sphere and Grid</button>
 			<button id="export_scene_object">Export Scene1 and Sphere</button>
+			<br/>
+			<label><input id="option_trs" name="trs" type="checkbox"/>TRS</label>
+			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
+			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -41,13 +45,18 @@
 
 				var gltfExporter = new THREE.GLTFExporter();
 
+				var options = {
+					trs: document.getElementById('option_trs').checked,
+					onlyVisible: document.getElementById('option_visible').checked,
+					truncateDrawRange: document.getElementById('option_drawrange').checked
+				}
 				gltfExporter.parse( input, function( result ) {
 
 					var output = JSON.stringify( result, null, 2 );
 					console.log( output );
 					saveString( output, 'scene.gltf' );
 
-				} );
+				}, options );
 
 			}
 
@@ -106,7 +115,7 @@
 
 			var container;
 
-			var camera, scene1, scene2, renderer;
+			var camera, object, scene1, scene2, renderer;
 			var gridHelper, sphere;
 
 			init();
@@ -132,13 +141,16 @@
 				// ---------------------------------------------------------------------
 				// Ambient light
 				// ---------------------------------------------------------------------
-				scene1.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
+				var light = new THREE.AmbientLight( 0xffffff, 0.2 );
+				light.name = 'AmbientLight';
+				scene1.add( light );
 
 				// ---------------------------------------------------------------------
 				// DirectLight
 				// ---------------------------------------------------------------------
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 0 );
+				light.name = 'DirectionalLight';
 				scene1.add( light );
 
 				// ---------------------------------------------------------------------
@@ -339,6 +351,44 @@
 				scene1.add( object );
 
 				// ---------------------------------------------------------------------
+				// Buffer geometry truncated (DrawRange)
+				// ---------------------------------------------------------------------
+				var geometry = new THREE.BufferGeometry();
+				var numElements = 6;
+				var outOfRange = 3;
+
+				var positions = new Float32Array( ( numElements + outOfRange ) * 3 );
+				var colors = new Float32Array( ( numElements + outOfRange ) * 3 );
+
+				positions.set([
+					0, 0, 0,
+					0, 80, 0,
+					80, 0, 0,
+					80, 0, 0,
+					0, 80, 0,
+					80, 80, 0
+				]);
+
+				colors.set([
+					1, 0, 0,
+					1, 0, 0,
+					1, 1, 0,
+					1, 1, 0,
+					0, 0, 1,
+					0, 0, 1,
+				]);
+
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setDrawRange( 0, numElements );
+
+				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
+				object.name = 'Custom buffered truncated';
+				object.position.set( 340, -40, -200 );
+
+				scene1.add( object );
+
+				// ---------------------------------------------------------------------
 				// Points
 				// ---------------------------------------------------------------------
 				var numPoints = 100;
@@ -395,6 +445,17 @@
 				object.position.set( 200, 0, 400 );
 				scene1.add( object );
 
+				// ---------------------------------------------------------------------
+				// Big red box hidden just for testing `onlyVisible` option
+				// ---------------------------------------------------------------------
+				material = new THREE.MeshBasicMaterial( {
+					color: 0xff0000
+				} );
+				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 200, 200, 200 ), material );
+				object.position.set( 0, 0, 0 );
+				object.name = "CubeHidden";
+				object.visible = false;
+				scene1.add( object );
 
 				// ---------------------------------------------------------------------
 				// 2nd Scene
