@@ -744,12 +744,10 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 						scope.running = false;
 
 						if ( scope.terminateRequested ) {
+
 							console.log( 'WorkerSupport: Run is complete. Terminating application on request!' );
-							if ( Validator.isValid( scope.worker ) ) {
-								scope.worker.terminate();
-							}
-							scope.worker = null;
-							scope.workerCode = null;
+							scope.terminateWorker();
+
 						}
 						break;
 
@@ -762,6 +760,14 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 			this.worker.addEventListener( 'message', receiveWorkerMessage, false );
 
 		}
+	};
+
+	WorkerSupport.prototype.terminateWorker = function () {
+		if ( Validator.isValid( this.worker ) ) {
+			this.worker.terminate();
+		}
+		this.worker = null;
+		this.workerCode = null;
 	};
 
 	WorkerSupport.prototype.setCallbacks = function ( builder, onLoad ) {

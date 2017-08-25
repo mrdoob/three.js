@@ -222,6 +222,7 @@
 
 					var callbackOnLoad = function ( loaderRootNode, modelName, instanceNo ) {
 						scope.reportDonwload[ instanceNo ] = false;
+						scope.allAssets.push( loaderRootNode );
 
 						var msg = 'Worker #' + instanceNo + ': Completed loading: ' + modelName + ' (#' + scope.workerDirector.objectsCompleted + ')';
 						console.log( msg );
@@ -319,22 +320,21 @@
 						modelPrepData.setUseAsync( true );
 
 						this.workerDirector.enqueueForRun( modelPrepData );
-						this.allAssets.push( modelPrepData );
 					}
 
 					this.workerDirector.processQueue();
 				};
 
 				WWParallels.prototype.clearAllAssests = function () {
-					var prepData;
-					var scope = this;
-
+					var storedObject3d;
 					for ( var asset in this.allAssets ) {
-						prepData = this.allAssets[ asset ];
 
+						storedObject3d = this.allAssets[ asset ];
+						var scope = this;
 						var remover = function ( object3d ) {
 
-							if ( object3d === prepData.streamMeshesTo ) return;
+							if ( storedObject3d === object3d ) return;
+
 							console.log( 'Removing ' + object3d.name );
 							scope.scene.remove( object3d );
 
@@ -352,11 +352,15 @@
 									}
 								}
 							}
-							if ( object3d.hasOwnProperty( 'texture' ) ) object3d.texture.dispose();
+							if ( object3d.hasOwnProperty( 'texture' ) )	object3d.texture.dispose();
 						};
-						scope.scene.remove( prepData.streamMeshesTo );
-						prepData.streamMeshesTo.traverse( remover );
-						prepData.streamMeshesTo = null;
+						if ( Validator.isValid( storedObject3d ) ) {
+
+							if ( this.pivot !== storedObject3d ) scope.scene.remove( storedObject3d );
+							storedObject3d.traverse( remover );
+							storedObject3d = null;
+
+						}
 					}
 					this.allAssets = [];
 				};
@@ -373,23 +377,21 @@
 
 			var app = new WWParallels( document.getElementById( 'example' ) );
 
-			var WWParallelsControl = function() {
-				this.queueLength = 128;
-				this.workerCount = 4;
-				this.streamMeshes = true;
-				this.run = function () {
+			var wwParallelsControl = {
+				queueLength: 128,
+				workerCount: 4,
+				streamMeshes: true,
+				run: function () {
 					app.enqueueAllAssests( this.queueLength, this.workerCount, this.streamMeshes );
-				};
-				this.terminate = function () {
+				},
+				terminate: function () {
 					app.terminateManager();
-				};
-				this.clearAllAssests = function () {
+				},
+				clearAllAssests: function () {
 					app.terminateManager();
 					app.clearAllAssests();
-				};
+				}
 			};
-			var wwParallelsControl = new WWParallelsControl();
-
 			var gui = new dat.GUI( {
 				autoPlace: false,
 				width: 320

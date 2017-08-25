@@ -56,9 +56,6 @@
 				top: 0;
 				z-Index: 200;
 			}
-			#fileUploadInput {
-				display: none;
-			}
 		</style>
 
 	</head>
@@ -71,10 +68,9 @@
 
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 direct loader test
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 usage options
 			<div id="feedback"></div>
 		</div>
-		<input id="fileUploadInput" type="file" name="files[]" multiple accept=".obj,.mtl" />
 
 		<script src="js/Detector.js"></script>
 		<script src="../build/three.js"></script>
@@ -116,20 +112,6 @@
 
 					this.cube = null;
 					this.pivot = null;
-
-					// Check for the various File API support.
-					this.fileApiAvailable = true;
-					if ( window.File && window.FileReader && window.FileList && window.Blob ) {
-
-						console.log( 'File API is supported! Enabling all features.' );
-
-					} else {
-
-						this.fileApiAvailable = false;
-						console.warn( 'File API is not supported! Disabling file loading.' );
-
-					}
-					this.streamMeshes = true;
 				}
 
 				WWOBJLoader2Example.prototype.initGL = function () {
@@ -182,6 +164,7 @@
 						objLoader.setMaterials( materials );
 
 						var fileLoader = new THREE.FileLoader();
+						fileLoader.setPath( '' );
 						fileLoader.setResponseType( 'arraybuffer' );
 						fileLoader.load( 'obj/female02/female02.obj',
 							function ( content ) {
@@ -218,6 +201,7 @@
 					objLoader.setModelName( modelName );
 
 					var fileLoader = new THREE.FileLoader();
+					fileLoader.setPath( '' );
 					fileLoader.setResponseType( 'arraybuffer' );
 					fileLoader.load( 'obj/female02/female02_vertex_colors.obj',
 						function ( content ) {
@@ -345,73 +329,6 @@
 					document.getElementById( 'feedback' ).innerHTML = Validator.isValid( content ) ? content : '';
 				};
 
-				WWOBJLoader2Example.prototype._handleFileSelect = function ( event, pathTexture ) {
-					var fileObj = null;
-					var fileMtl = null;
-					var files = event.target.files;
-
-					for ( var i = 0, file; file = files[ i ]; i++) {
-
-						if ( file.name.indexOf( '\.obj' ) > 0 && fileObj === null ) {
-							fileObj = file;
-						}
-
-						if ( file.name.indexOf( '\.mtl' ) > 0 && fileMtl === null ) {
-							fileMtl = file;
-						}
-
-					}
-
-					if ( ! Validator.isValid( fileObj ) ) {
-						alert( 'Unable to load OBJ file from given files.' );
-					}
-
-					var scope = this;
-					var callbackOnLoad = function ( loderRootNode, modelName, instanceNo ) {
-						scope.scene.add( loderRootNode );
-						console.log( 'Loading complete: ' + modelName );
-						scope._reportProgress( '' );
-					};
-
-					var fileReader = new FileReader();
-					fileReader.onload = function( fileDataObj ) {
-
-						var uint8Array = new Uint8Array( fileDataObj.target.result );
-
-						var prepData = new THREE.LoaderSupport.PrepData( 'userObj' );
-						var resourceOBJ = new THREE.LoaderSupport.ResourceDescriptor( pathTexture + '/' + fileObj.name, 'OBJ' );
-						var userPivot = new THREE.Object3D();
-						userPivot.position.set(
-							-100 + 200 * Math.random(),
-							-100 + 200 * Math.random(),
-							-100 + 200 * Math.random()
-						);
-						prepData.setStreamMeshesTo( userPivot );
-						scope.pivot.add( prepData.streamMeshesTo );
-
-						resourceOBJ.setContent( uint8Array );
-						prepData.addResource( resourceOBJ );
-						prepData.setUseAsync( true );
-						var callbacks = prepData.getCallbacks();
-						callbacks.setCallbackOnProgress( scope._reportProgress );
-						callbacks.setCallbackOnLoad( callbackOnLoad );
-
-						fileReader.onload = function( fileDataMtl ) {
-
-							var resourceMTL = new THREE.LoaderSupport.ResourceDescriptor( pathTexture + '/' + fileMtl.name, 'MTL' );
-							resourceMTL.setContent( fileDataMtl.target.result );
-							prepData.addResource( resourceMTL );
-
-							var objLoader = new THREE.OBJLoader2();
-							objLoader.run( prepData );
-						};
-						fileReader.readAsText( fileMtl );
-
-					};
-					fileReader.readAsArrayBuffer( fileObj );
-
-				};
-
 				WWOBJLoader2Example.prototype.resizeDisplayGL = function () {
 					this.controls.handleResize();
 
@@ -496,66 +413,27 @@
 					}
 				};
 
-				WWOBJLoader2Example.prototype.clearAllAssests = function () {
-					var scope = this;
-					var remover = function ( object3d ) {
-
-						if ( object3d === scope.pivot ) {
-							return;
-						}
-						console.log( 'Removing: ' + object3d.name );
-						scope.scene.remove( object3d );
-
-						if ( object3d.hasOwnProperty( 'geometry' ) ) {
-							object3d.geometry.dispose();
-						}
-						if ( object3d.hasOwnProperty( 'material' ) ) {
-
-							var mat = object3d.material;
-							if ( mat.hasOwnProperty( 'materials' ) ) {
-
-								var materials = mat.materials;
-								for ( var name in materials ) {
-
-									if ( materials.hasOwnProperty( name ) ) materials[ name ].dispose();
-
-								}
-							}
-						}
-						if ( object3d.hasOwnProperty( 'texture' ) ) {
-							object3d.texture.dispose();
-						}
-					};
-
-					scope.scene.remove( scope.pivot );
-					scope.pivot.traverse( remover );
-				};
-
 				return WWOBJLoader2Example;
 
 			})();
 
 			var app = new WWOBJLoader2Example( document.getElementById( 'example' ) );
 
-			// Init dat.gui and controls
-			var elemFileInput = document.getElementById( 'fileUploadInput' );
-			var WWOBJLoader2Control = function() {
-				this.flatShading = app.flatShading;
-				this.doubleSide = app.doubleSide;
-				this.streamMeshes = app.streamMeshes;
+			var wwObjLoader2Control = {
+				flatShading: app.flatShading,
+				doubleSide: app.doubleSide
 			};
-			var wwObjLoader2Control = new WWOBJLoader2Control();
 
+			var menuDiv = document.getElementById( 'dat' );
 			var gui = new dat.GUI( {
 				autoPlace: false,
 				width: 320
 			} );
+			menuDiv.appendChild( gui.domElement );
 
-			var menuDiv = document.getElementById( 'dat' );
-			menuDiv.appendChild(gui.domElement);
 			var folderOptions = gui.addFolder( 'WWOBJLoader2 Options' );
-			var controlSmooth = folderOptions.add( wwObjLoader2Control, 'flatShading' ).name( 'Flat Shading' );
-			controlSmooth.onChange( function( value ) {
+			var controlFlat = folderOptions.add( wwObjLoader2Control, 'flatShading' ).name( 'Flat Shading' );
+			controlFlat.onChange( function( value ) {
 				console.log( 'Setting flatShading to: ' + value );
 				app.alterShading();
 			});
@@ -565,38 +443,6 @@
 				console.log( 'Setting doubleSide to: ' + value );
 				app.alterDouble();
 			});
-
-			var controlStreamMeshes = folderOptions.add( wwObjLoader2Control, 'streamMeshes' ).name( 'Stream Meshes' );
-			controlStreamMeshes.onChange( function( value ) {
-				console.log( 'Setting streamMeshes to: ' + value );
-				app.streamMeshes = value;
-			});
-
-			if ( app.fileApiAvailable ) {
-
-				wwObjLoader2Control.pathTexture = 'obj/female02/';
-				var controlPathTexture = folderOptions.add( wwObjLoader2Control, 'pathTexture' ).name( 'Relative path to textures' );
-				controlPathTexture.onChange( function( value ) {
-					console.log( 'Setting pathTexture to: ' + value );
-					app.pathTexture = value + '/';
-				});
-
-				wwObjLoader2Control.loadObjFile = function () {
-					elemFileInput.click();
-				};
-				folderOptions.add( wwObjLoader2Control, 'loadObjFile' ).name( 'Load OBJ/MTL Files' );
-
-				var handleFileSelect = function ( object3d ) {
-					app._handleFileSelect( object3d, wwObjLoader2Control.pathTexture );
-				};
-				elemFileInput.addEventListener( 'change' , handleFileSelect, false );
-
-				wwObjLoader2Control.clearAllAssests = function () {
-					app.clearAllAssests();
-				};
-				folderOptions.add( wwObjLoader2Control, 'clearAllAssests' ).name( 'Clear Scene' );
-
-			}
 			folderOptions.open();
 
 
