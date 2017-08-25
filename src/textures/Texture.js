@@ -186,9 +186,6 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 			offset: [ this.offset.x, this.offset.y ],
 			rotation: this.rotation,
 
-			matrixAutoUpdate: this.matrixAutoUpdate,
-			matrix: this.matrix.toArray(),
-
 			wrap: [ this.wrapS, this.wrapT ],
 
 			minFilter: this.minFilter,
