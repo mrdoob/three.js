@@ -1990,10 +1990,16 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			var offset = uvScaleMap.offset;
-			var repeat = uvScaleMap.repeat;
+			if ( uvScaleMap.matrixAutoUpdate === true ) {
 
-			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+			    var offset = uvScaleMap.offset;
+			    var repeat = uvScaleMap.repeat;
+			    var rotation = uvScaleMap.rotation;
+			    uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
+
+			}
+
+			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 		}
 
@@ -2025,10 +2031,16 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.map !== null ) {
 
-			var offset = material.map.offset;
-			var repeat = material.map.repeat;
+			if ( material.map.matrixAutoUpdate === true ) {
 
-			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+			    var offset = material.map.offset;
+			    var repeat = material.map.repeat;
+			    var rotation = material.map.rotation;
+			    material.map.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
+
+			}
+
+			uniforms.uvTransform.value.copy( material.map.matrix );
 
 		}
 

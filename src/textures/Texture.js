@@ -9,6 +9,7 @@ import { UVMapping } from '../constants';
 import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
 import { _Math } from '../math/Math';
 import { Vector2 } from '../math/Vector2';
+import { Matrix3 } from '../math/Matrix3';
 
 var textureId = 0;
 
@@ -38,6 +39,10 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
+	this.rotation = 0;
+
+	this.matrixAutoUpdate = true;
+	this.matrix = new Matrix3();
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
@@ -102,6 +107,10 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
+		this.rotation = source.rotation;
+
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
+		this.matrix.copy( source.matrix );
 
 		this.generateMipmaps = source.generateMipmaps;
 		this.premultiplyAlpha = source.premultiplyAlpha;
@@ -175,6 +184,11 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],
+			rotation: this.rotation,
+
+			matrixAutoUpdate: this.matrixAutoUpdate,
+			matrix: this.matrix.toArray(),
+
 			wrap: [ this.wrapS, this.wrapT ],
 
 			minFilter: this.minFilter,
@@ -225,8 +239,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		if ( this.mapping !== UVMapping ) return;
 
-		uv.multiply( this.repeat );
-		uv.add( this.offset );
+		uv.applyMatrix3( this.matrix );
 
 		if ( uv.x < 0 || uv.x > 1 ) {
 
