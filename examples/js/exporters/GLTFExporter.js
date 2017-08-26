@@ -602,6 +602,8 @@ THREE.GLTFExporter.prototype = {
 
 			var geometry = mesh.geometry;
 
+			var mode;
+
 			// Use the correct mode
 			if ( mesh instanceof THREE.LineSegments ) {
 
@@ -962,7 +964,8 @@ THREE.GLTFExporter.prototype = {
 			input = input instanceof Array ? input : [ input ];
 
 			var objectsWithoutScene = [];
-			for ( i = 0; i < input.length; i++ ) {
+
+			for ( var i = 0; i < input.length; i++ ) {
 
 				if ( input[ i ] instanceof THREE.Scene ) {
 
@@ -997,14 +1000,14 @@ THREE.GLTFExporter.prototype = {
 			objectURL = URL.createObjectURL( blob );
 
 			var reader = new window.FileReader();
-			 reader.readAsDataURL( blob );
-			 reader.onloadend = function() {
+			reader.readAsDataURL( blob );
+			reader.onloadend = function () {
 
-				 base64data = reader.result;
-				 outputJSON.buffers[ 0 ].uri = base64data;
-				 onDone( outputJSON );
+				var base64data = reader.result;
+				outputJSON.buffers[ 0 ].uri = base64data;
+				onDone( outputJSON );
 
-			 };
+			};
 
 		} else {
 
