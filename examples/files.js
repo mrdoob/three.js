@@ -160,6 +160,7 @@ var files = {
 		"webgl_materials_texture_hdr",
 		"webgl_materials_texture_manualmipmap",
 		"webgl_materials_texture_pvrtc",
+		"webgl_materials_texture_rotation",
 		"webgl_materials_texture_tga",
 		"webgl_materials_transparency",
 		"webgl_materials_variations_basic",
