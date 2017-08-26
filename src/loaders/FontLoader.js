@@ -19,6 +19,7 @@ Object.assign( FontLoader.prototype, {
 		var scope = this;
 
 		var loader = new FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
 			var json;
@@ -45,6 +46,13 @@ Object.assign( FontLoader.prototype, {
 	parse: function ( json ) {
 
 		return new Font( json );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 
