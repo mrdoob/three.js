@@ -1,8 +1,8 @@
-import { Texture } from './Texture';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
+
+import { Texture } from './Texture';
 
 function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 

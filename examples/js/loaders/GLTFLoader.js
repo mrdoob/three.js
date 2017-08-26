@@ -616,7 +616,7 @@ THREE.GLTFLoader = ( function () {
 				material.bumpScale = 1;
 
 				material.normalMap = params.normalMap === undefined ? null : params.normalMap;
-				material.normalScale = new THREE.Vector2( 1, 1 );
+				if ( params.normalScale ) material.normalScale = params.normalScale;
 
 				material.displacementMap = null;
 				material.displacementScale = 1;
@@ -1603,6 +1603,12 @@ THREE.GLTFLoader = ( function () {
 
 				materialParams.transparent = true;
 
+				if ( alphaMode === ALPHA_MODES.MASK ) {
+
+				  materialParams.alphaTest = material.alphaCutoff || 0.5;
+
+				}
+
 			} else {
 
 				materialParams.transparent = false;
@@ -1613,11 +1619,24 @@ THREE.GLTFLoader = ( function () {
 
 				pending.push( parser.assignTexture( materialParams, 'normalMap', material.normalTexture.index ) );
 
+				materialParams.normalScale = new THREE.Vector2( 1, 1 );
+
+				if ( material.normalTexture.scale !== undefined ) {
+
+					materialParams.normalScale.set( material.normalTexture.scale, material.normalTexture.scale );
+
+				}
 			}
 
 			if ( material.occlusionTexture !== undefined ) {
 
 				pending.push( parser.assignTexture( materialParams, 'aoMap', material.occlusionTexture.index ) );
+
+				if ( material.occlusionTexture.strength !== undefined ) {
+
+					materialParams.aoMapIntensity = material.occlusionTexture.strength;
+
+				}
 
 			}
 
@@ -1667,7 +1686,7 @@ THREE.GLTFLoader = ( function () {
 
 				// Normal map textures use OpenGL conventions:
 				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
-				_material.normalScale.x = -1;
+				_material.normalScale.x = -_material.normalScale.x;
 
 				if ( material.extras ) _material.userData = material.extras;
 

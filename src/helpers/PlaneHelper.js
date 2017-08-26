@@ -8,6 +8,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
+import { Object3D } from '../core/Object3D';
 
 function PlaneHelper( plane, size, hex ) {
 
@@ -37,16 +38,12 @@ function PlaneHelper( plane, size, hex ) {
 
 	this.add( new Mesh( geometry2, new MeshBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
 
-	//
-
-	this.onBeforeRender();
-
 }
 
 PlaneHelper.prototype = Object.create( Line.prototype );
 PlaneHelper.prototype.constructor = PlaneHelper;
 
-PlaneHelper.prototype.onBeforeRender = function () {
+PlaneHelper.prototype.updateMatrixWorld = function ( force ) {
 
 	var scale = - this.plane.constant;
 
@@ -56,7 +53,7 @@ PlaneHelper.prototype.onBeforeRender = function () {
 
 	this.lookAt( this.plane.normal );
 
-	this.updateMatrixWorld();
+	Object3D.prototype.updateMatrixWorld.call( this, force );
 
 };
 

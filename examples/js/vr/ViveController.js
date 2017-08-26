@@ -89,7 +89,7 @@ THREE.ViveController = function ( id ) {
 			if ( thumbpadIsPressed !== gamepad.buttons[ 0 ].pressed ) {
 
 				thumbpadIsPressed = gamepad.buttons[ 0 ].pressed;
-				scope.dispatchEvent( { type: thumbpadIsPressed ? 'thumbpaddown' : 'thumbpadup' } );
+				scope.dispatchEvent( { type: thumbpadIsPressed ? 'thumbpaddown' : 'thumbpadup', axes: axes } );
 
 			}
 
