@@ -70,11 +70,11 @@ THREE.GLTFExporter.prototype = {
 			asset: {
 
 				version: "2.0",
-				generator: "THREE.JS GLTFExporter" // @QUESTION Does it support spaces?
+				generator: "THREE.GLTFExporter"
 
-		 	}
+			}
 
-    };
+		};
 
 		var byteOffset = 0;
 		var dataViews = [];
@@ -94,11 +94,11 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {Array} array2 Array 2 to compare
 		 * @return {Boolean}        Returns true if both arrays are equal
 		 */
-		function equalArray ( array1, array2 ) {
+		function equalArray( array1, array2 ) {
 
 			return ( array1.length === array2.length ) && array1.every( function( element, index ) {
 
-    		return element === array2[ index ];
+				return element === array2[ index ];
 
 			});
 
@@ -109,7 +109,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {THREE.WebGLAttribute} attribute Attribute to find the min/max
 		 * @return {Object} Object containing the `min` and `max` values (As an array of attribute.itemSize components)
 		 */
-		function getMinMax ( attribute ) {
+		function getMinMax( attribute ) {
 
 			var output = {
 
@@ -139,7 +139,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {Integer} componentType Component type (Unsigned short, unsigned int or float)
 		 * @return {Integer}               Index of the buffer created (Currently always 0)
 		 */
-		function processBuffer ( attribute, componentType, start, count ) {
+		function processBuffer( attribute, componentType, start, count ) {
 
 			if ( !outputJSON.buffers ) {
 
@@ -202,7 +202,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {[type]} data [description]
 		 * @return {[type]}      [description]
 		 */
-		function processBufferView ( data, componentType, start, count ) {
+		function processBufferView( data, componentType, start, count ) {
 
 			var isVertexAttributes = componentType === WEBGL_CONSTANTS.FLOAT;
 
@@ -248,7 +248,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {THREE.WebGLAttribute} attribute Attribute to process
 		 * @return {Integer}           Index of the processed accessor on the "accessors" array
 		 */
-		function processAccessor ( attribute, geometry ) {
+		function processAccessor( attribute, geometry ) {
 
 			if ( !outputJSON.accessors ) {
 
@@ -322,7 +322,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {Texture} map Texture to process
 		 * @return {Integer}     Index of the processed texture in the "images" array
 		 */
-		function processImage ( map ) {
+		function processImage( map ) {
 
 			if ( cachedData.images[ map.uuid ] ) {
 
@@ -363,7 +363,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {Texture} map Texture to process
 		 * @return {Integer}     Index of the processed texture in the "samplers" array
 		 */
-		function processSampler ( map ) {
+		function processSampler( map ) {
 
 			if ( !outputJSON.samplers ) {
 
@@ -391,7 +391,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {Texture} map Map to process
 		 * @return {Integer}     Index of the processed texture in the "textures" array
 		 */
-		function processTexture ( map ) {
+		function processTexture( map ) {
 
 			if (!outputJSON.textures) {
 
@@ -417,7 +417,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {THREE.Material} material Material to process
 		 * @return {Integer}      Index of the processed material in the "materials" array
 		 */
-		function processMaterial ( material ) {
+		function processMaterial( material ) {
 
 			if ( cachedData.materials[ material.uuid ] ) {
 
@@ -466,7 +466,7 @@ THREE.GLTFExporter.prototype = {
 				gltfMaterial.pbrMetallicRoughness.metallicFactor = material.metalness;
 				gltfMaterial.pbrMetallicRoughness.roughnessFactor = material.roughness;
 
- 			} else {
+			} else {
 
 					gltfMaterial.pbrMetallicRoughness.metallicFactor = 0.5;
 					gltfMaterial.pbrMetallicRoughness.roughnessFactor = 0.5;
@@ -760,7 +760,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {THREE.Object3D} node Object3D to processNode
 		 * @return {Integer}      Index of the node in the nodes list
 		 */
-		function processNode ( object ) {
+		function processNode( object ) {
 
 			if ( object instanceof THREE.Light ) {
 
@@ -940,7 +940,7 @@ THREE.GLTFExporter.prototype = {
 		 * Creates a THREE.Scene to hold a list of objects and parse it
 		 * @param  {Array} objects List of objects to process
 		 */
-		function processObjects ( objects ) {
+		function processObjects( objects ) {
 
 			var scene = new THREE.Scene();
 			scene.name = 'AuxScene';
@@ -1011,5 +1011,7 @@ THREE.GLTFExporter.prototype = {
 			onDone ( outputJSON );
 
 		}
+
 	}
+
 };
