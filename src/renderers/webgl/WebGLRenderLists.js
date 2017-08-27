@@ -50,7 +50,6 @@ function reversePainterSortStable( a, b ) {
 
 var _vector = new Vector3();
 var _objectForward = new Vector3();
-var _cameraForward = new Vector3();
 
 function WebGLRenderList() {
 
@@ -107,15 +106,20 @@ function WebGLRenderList() {
 
 			if ( camera ) {
 
+				if (!object.geometry.boundingBox) object.geometry.computeBoundingBox();
+
+				let box = object.geometry.boundingBox;
+
 				_objectForward.setFromMatrixColumn( object.matrixWorld, 2 ).normalize();
-				_cameraForward.setFromMatrixColumn( camera.matrixWorld, 2 ).normalize();
 
-				_vector.setFromMatrixPosition( object.matrixWorld );
-				_vector.x -= camera.matrixWorld.elements[12];
-				_vector.y -= camera.matrixWorld.elements[13];
-				_vector.z -= camera.matrixWorld.elements[14];
+				//calculate the back z face of the portal to the camera position
+				_vector.setFromMatrixPosition( camera.matrixWorld );
+				_vector.x -= object.matrixWorld.elements[12] + object.matrixWorld.elements[ 8] * box.min.z;
+				_vector.y -= object.matrixWorld.elements[13] + object.matrixWorld.elements[ 9] * box.min.z;
+				_vector.z -= object.matrixWorld.elements[14] + object.matrixWorld.elements[10] * box.min.z;
 
-				if ( _cameraForward.dot( _vector ) < 0 && _objectForward.dot( _vector ) < 0 ) {
+				//ensure the camera is on the +z side of the backmost face
+				if ( _objectForward.dot( _vector ) > 0 ) {
 
 					portal.push( renderItem );
 
