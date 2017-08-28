@@ -121,15 +121,15 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 				// Init gui
 				var gui = new dat.GUI();
-				gui.add( postprocessing, "enabled" );
+				gui.add( postprocessing, 'enabled' );
 
-				gui.add( postprocessing, "onlyAO", false ).onChange( function( value ) { ssaoPass.onlyAO = value; } );
+				gui.add( postprocessing, 'onlyAO', false ).onChange( function( value ) { ssaoPass.onlyAO = value; } );
 
-				gui.add( postprocessing, "radius" ).min( 0 ).max( 64 ).onChange( function( value ) { ssaoPass.radius = value; } );
+				gui.add( postprocessing, 'radius' ).min( 0 ).max( 64 ).onChange( function( value ) { ssaoPass.radius = value; } );
 				
-				gui.add( postprocessing, "aoClamp" ).min( 0 ).max( 1 ).onChange( function( value ) { ssaoPass.aoClamp = value; } );
+				gui.add( postprocessing, 'aoClamp' ).min( 0 ).max( 1 ).onChange( function( value ) { ssaoPass.aoClamp = value; } );
 				
-				gui.add( postprocessing, "lumInfluence" ).min( 0 ).max( 1 ).onChange( function( value ) { ssaoPass.lumInfluence = value; } );
+				gui.add( postprocessing, 'lumInfluence' ).min( 0 ).max( 1 ).onChange( function( value ) { ssaoPass.lumInfluence = value; } );
 				
 
 				window.addEventListener( 'resize', onWindowResize, false );
