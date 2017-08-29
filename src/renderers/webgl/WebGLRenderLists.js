@@ -108,7 +108,7 @@ function WebGLRenderList() {
 
 				if (!object.geometry.boundingBox) object.geometry.computeBoundingBox();
 
-				let box = object.geometry.boundingBox;
+				var box = object.geometry.boundingBox;
 
 				_objectForward.setFromMatrixColumn( object.matrixWorld, 2 ).normalize();
 
