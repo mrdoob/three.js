@@ -290,7 +290,7 @@ var Loader = function ( editor ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
-
+					contents = contents.replace(/(\\\r\n)/g, '');
 					var object = new THREE.OBJLoader().parse( contents );
 					object.name = filename;
 
