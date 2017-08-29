@@ -1,10 +1,10 @@
-import { CurvePath } from './CurvePath';
-import { EllipseCurve } from '../curves/EllipseCurve';
-import { SplineCurve } from '../curves/SplineCurve';
-import { Vector2 } from '../../math/Vector2';
-import { CubicBezierCurve } from '../curves/CubicBezierCurve';
-import { QuadraticBezierCurve } from '../curves/QuadraticBezierCurve';
-import { LineCurve } from '../curves/LineCurve';
+import { CurvePath } from './CurvePath.js';
+import { EllipseCurve } from '../curves/EllipseCurve.js';
+import { SplineCurve } from '../curves/SplineCurve.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { CubicBezierCurve } from '../curves/CubicBezierCurve.js';
+import { QuadraticBezierCurve } from '../curves/QuadraticBezierCurve.js';
+import { LineCurve } from '../curves/LineCurve.js';
 
 var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 

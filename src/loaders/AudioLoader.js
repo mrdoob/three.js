@@ -1,6 +1,6 @@
-import { AudioContext } from '../audio/AudioContext';
-import { FileLoader } from './FileLoader';
-import { DefaultLoadingManager } from './LoadingManager';
+import { AudioContext } from '../audio/AudioContext.js';
+import { FileLoader } from './FileLoader.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 /**
  * @author Reece Aaron Lecrivain / http://reecenotes.com/

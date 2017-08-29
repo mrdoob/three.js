@@ -1,5 +1,5 @@
-import { PropertyBinding } from './PropertyBinding';
-import { _Math } from '../math/Math';
+import { PropertyBinding } from './PropertyBinding.js';
+import { _Math } from '../math/Math.js';
 
 /**
  *

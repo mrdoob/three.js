@@ -1,5 +1,5 @@
-import { Camera } from './Camera';
-import { Object3D } from '../core/Object3D';
+import { Camera } from './Camera.js';
+import { Object3D } from '../core/Object3D.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/

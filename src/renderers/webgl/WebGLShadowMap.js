@@ -3,18 +3,18 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, PCFShadowMap, RGBADepthPacking } from '../../constants';
-import { WebGLRenderTarget } from '../WebGLRenderTarget';
-import { ShaderMaterial } from '../../materials/ShaderMaterial';
-import { UniformsUtils } from '../shaders/UniformsUtils';
-import { ShaderLib } from '../shaders/ShaderLib';
-import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial';
-import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial';
-import { Vector4 } from '../../math/Vector4';
-import { Vector3 } from '../../math/Vector3';
-import { Vector2 } from '../../math/Vector2';
-import { Matrix4 } from '../../math/Matrix4';
-import { Frustum } from '../../math/Frustum';
+import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, PCFShadowMap, RGBADepthPacking } from '../../constants.js';
+import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
+import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
+import { UniformsUtils } from '../shaders/UniformsUtils.js';
+import { ShaderLib } from '../shaders/ShaderLib.js';
+import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
+import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial.js';
+import { Vector4 } from '../../math/Vector4.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { Matrix4 } from '../../math/Matrix4.js';
+import { Frustum } from '../../math/Frustum.js';
 
 function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 

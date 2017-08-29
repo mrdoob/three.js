@@ -1,5 +1,5 @@
-import { Box3 } from './Box3';
-import { Vector3 } from './Vector3';
+import { Box3 } from './Box3.js';
+import { Vector3 } from './Vector3.js';
 
 /**
  * @author bhouston / http://clara.io

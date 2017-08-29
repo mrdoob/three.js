@@ -1,6 +1,6 @@
-import { InterpolateDiscrete } from '../../constants';
-import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype';
-import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
+import { InterpolateDiscrete } from '../../constants.js';
+import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype.js';
+import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor.js';
 
 /**
  *

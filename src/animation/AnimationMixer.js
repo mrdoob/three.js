@@ -1,9 +1,9 @@
-import { AnimationAction } from './AnimationAction';
-import { EventDispatcher } from '../core/EventDispatcher';
-import { LinearInterpolant } from '../math/interpolants/LinearInterpolant';
-import { PropertyBinding } from './PropertyBinding';
-import { PropertyMixer } from './PropertyMixer';
-import { AnimationClip } from './AnimationClip';
+import { AnimationAction } from './AnimationAction.js';
+import { EventDispatcher } from '../core/EventDispatcher.js';
+import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
+import { PropertyBinding } from './PropertyBinding.js';
+import { PropertyMixer } from './PropertyMixer.js';
+import { AnimationClip } from './AnimationClip.js';
 
 /**
  *

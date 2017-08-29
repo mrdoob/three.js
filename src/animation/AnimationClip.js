@@ -1,9 +1,9 @@
-import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack';
-import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack';
-import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack';
-import { AnimationUtils } from './AnimationUtils';
-import { KeyframeTrack } from './KeyframeTrack';
-import { _Math } from '../math/Math';
+import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
+import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack.js';
+import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack.js';
+import { AnimationUtils } from './AnimationUtils.js';
+import { KeyframeTrack } from './KeyframeTrack.js';
+import { _Math } from '../math/Math.js';
 
 /**
  *

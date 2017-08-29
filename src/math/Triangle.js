@@ -1,6 +1,6 @@
-import { Vector3 } from './Vector3';
-import { Line3 } from './Line3';
-import { Plane } from './Plane';
+import { Vector3 } from './Vector3.js';
+import { Line3 } from './Line3.js';
+import { Plane } from './Plane.js';
 
 /**
  * @author bhouston / http://clara.io

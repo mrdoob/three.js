@@ -1,4 +1,4 @@
-import { _Math } from './Math';
+import { _Math } from './Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

@@ -1,5 +1,5 @@
-import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype';
-import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
+import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype.js';
+import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor.js';
 
 /**
  *

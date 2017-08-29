@@ -2,10 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { RGBAFormat, RGBFormat } from '../constants';
-import { ImageLoader } from './ImageLoader';
-import { Texture } from '../textures/Texture';
-import { DefaultLoadingManager } from './LoadingManager';
+import { RGBAFormat, RGBFormat } from '../constants.js';
+import { ImageLoader } from './ImageLoader.js';
+import { Texture } from '../textures/Texture.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 
 function TextureLoader( manager ) {

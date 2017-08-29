@@ -8,14 +8,14 @@
  *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
  */
 
-import { Camera } from '../cameras/Camera';
-import { Vector3 } from '../math/Vector3';
-import { LineSegments } from '../objects/LineSegments';
-import { Color } from '../math/Color';
-import { FaceColors } from '../constants';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Camera } from '../cameras/Camera.js';
+import { Vector3 } from '../math/Vector3.js';
+import { LineSegments } from '../objects/LineSegments.js';
+import { Color } from '../math/Color.js';
+import { FaceColors } from '../constants.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
 function CameraHelper( camera ) {
 

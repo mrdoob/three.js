@@ -1,4 +1,4 @@
-import { Curve } from '../core/Curve';
+import { Curve } from '../core/Curve.js';
 
 
 function LineCurve( v1, v2 ) {

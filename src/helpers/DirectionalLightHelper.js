@@ -4,12 +4,12 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { Vector3 } from '../math/Vector3';
-import { Object3D } from '../core/Object3D';
-import { Line } from '../objects/Line';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
+import { Vector3 } from '../math/Vector3.js';
+import { Object3D } from '../core/Object3D.js';
+import { Line } from '../objects/Line.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 
 function DirectionalLightHelper( light, size, color ) {
 
