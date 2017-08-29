@@ -1008,11 +1008,13 @@ function WebGLRenderer( parameters ) {
 
 	var isAnimating = false;
 	var onAnimationFrame = null;
+	var vrDevice = null;
 
 	function start() {
 
 		if ( isAnimating ) return;
-		( vr.getDevice() || window ).requestAnimationFrame( loop );
+		vrDevice = vr.getDevice();
+		( vrDevice || window ).requestAnimationFrame( loop );
 		isAnimating = true;
 
 	}
@@ -1020,7 +1022,8 @@ function WebGLRenderer( parameters ) {
 	function loop( time ) {
 
 		if ( onAnimationFrame !== null ) onAnimationFrame( time );
-		( vr.getDevice() || window ).requestAnimationFrame( loop );
+		vrDevice = vr.getDevice();
+		( vrDevice || window ).requestAnimationFrame( loop );
 
 	}
 
@@ -1162,7 +1165,7 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		if ( vr.enabled ) {
+		if ( vr.enabled && vrDevice ) {
 
 			vr.submitFrame();
 
