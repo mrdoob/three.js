@@ -76,10 +76,14 @@ Object.assign( FileLoader.prototype, {
 
 						if ( responseType === 'blob' ) {
 
-							response = new Blob( [ response ], { type: mimeType } );
+							response = new Blob( [ view ], { type: mimeType } );
 
-						}
-
+						} else{
+						   
+							response = view;	
+						}	
+                                                  
+						
 						break;
 
 					case 'document':
