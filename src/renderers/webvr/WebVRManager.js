@@ -41,7 +41,19 @@ function WebVRManager( renderer ) {
 
 	var currentSize, currentPixelRatio;
 
-	function onVRDisplayPresentChange() {
+	function onVRDisplayPresentChange( event ) {
+
+		if ( event.display ) {
+
+			// In WebVR spec its provided on the event
+			scope.setDevice( event.display );
+
+		} else if ( event.detail && event.detail.display ) {
+
+			// In Polyfill its provided under event.detail
+			scope.setDevice( event.detail.display );
+
+		}
 
 		if ( device !== null && device.isPresenting ) {
 
