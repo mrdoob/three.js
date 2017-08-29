@@ -211,6 +211,7 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.lights,
+			UniformsLib.fog,
 			{
 				color: { value: new Color( 0x00000 ) },
 				opacity: { value: 1.0 }
