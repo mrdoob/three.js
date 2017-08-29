@@ -353,6 +353,10 @@ var list = {
 			"TGALoader": "examples/loaders/TGALoader"
 		},
 
+		"Exporters": {
+			"GLTFExporter": "examples/exporters/GLTFExporter"
+		},
+
 		"Plugins": {
 			"CombinedCamera": "examples/cameras/CombinedCamera",
 			"LookupTable": "examples/Lut",
