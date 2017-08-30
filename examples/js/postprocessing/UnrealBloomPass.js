@@ -131,6 +131,8 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene = new THREE.Scene();
 
+	this.basic = new THREE.MeshBasicMaterial();
+
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
@@ -191,11 +193,24 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
 
+		// Render input to screen
+
+		if( this.renderToScreen ) {
+
+			this.quad.material = this.basic;
+			this.basic.map = readBuffer.texture;
+
+			renderer.render( this.scene, this.camera, undefined, true );
+
+		}
+
+
 		// 1. Extract Bright Areas
 
 		this.highPassUniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.highPassUniforms[ "luminosityThreshold" ].value = this.threshold;
-		this.quad.material = this.materialHighPassFilter;
+		this.quad.material = this.materialHighPassFilter;		
+
 		renderer.render( this.scene, this.camera, this.renderTargetBright, true );
 
 		// 2. Blur All the mips progressively
@@ -228,6 +243,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		this.compositeMaterial.uniforms[ "bloomStrength" ].value = this.strength;
 		this.compositeMaterial.uniforms[ "bloomRadius" ].value = this.radius;
 		this.compositeMaterial.uniforms[ "bloomTintColors" ].value = this.bloomTintColors;
+
 		renderer.render( this.scene, this.camera, this.renderTargetsHorizontal[ 0 ], true );
 
 		// Blend it additively over the input texture
@@ -237,7 +253,18 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 
-		renderer.render( this.scene, this.camera, readBuffer, false );
+
+		if( this.renderToScreen ) {
+
+			renderer.render( this.scene, this.camera, undefined, false );
+
+		} else {
+
+			renderer.render( this.scene, this.camera, readBuffer, false );
+
+		}
+
+		// Restore renderer settings
 
 		renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
 		renderer.autoClear = oldAutoClear;
