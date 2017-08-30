@@ -90,7 +90,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
 			renderer.setPixelRatio( 1 );
-			renderer.setSize( eyeParamsL.renderWidth * 2, eyeParamsL.renderHeight, false );
+			renderer.setSize( eyeParamsL.renderWidth * 2  * vrResolutionRatio, eyeParamsL.renderHeight  * vrResolutionRatio, false );
 
 		} else {
 
@@ -106,6 +106,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	var canvas = renderer.domElement;
 	var defaultLeftBounds = [ 0.0, 0.0, 0.5, 1.0 ];
 	var defaultRightBounds = [ 0.5, 0.0, 0.5, 1.0 ];
+	var vrResolutionRatio = 1.0;
 	var fovRenderRatio = 1.0;
 
 	function onVRDisplayPresentChange() {
@@ -125,8 +126,9 @@ THREE.VREffect = function ( renderer, onError ) {
 				rendererSize = renderer.getSize();
 
 				renderer.setPixelRatio( 1 );
-				renderer.setSize( eyeWidth * 2, eyeHeight, false );
+				renderer.setSize( eyeWidth * 2 * vrResolutionRatio, eyeHeight * vrResolutionRatio, false);
 
+				scope.setVRResolutionRatio(vrResolutionRatio)
 			}
 
 		} else if ( wasPresenting ) {
@@ -140,6 +142,34 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
+	// Set the resolution draw and presented in VR. Changing this ratio will trigger a 
+	// canvas resize which takes a bit of time. So don't call this function every frame.
+	this.setVRResolutionRatio = function (ratio) {
+
+		vrResolutionRatio = THREE.Math.clamp(ratio, 0, 1.0);
+
+		if ( vrDisplay !== undefined && vrDisplay.isPresenting ) {
+
+			const resizeCanvas = true; // TODO: allow dynamic resize without resizing the canvas
+			if ( scope.isPresenting && resizeCanvas ) {
+				var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
+				var eyeWidth = eyeParamsL.renderWidth;
+				var eyeHeight = eyeParamsL.renderHeight;
+
+				renderer.setSize( eyeWidth * 2 * vrResolutionRatio, eyeHeight * vrResolutionRatio, false);
+			}
+
+			// since we're already presenting, this doesn't need to be initiated by user interaction
+			requestPresentToVRDisplay();
+		}
+
+	}
+	this.getVRResolutionRatio = function () {
+
+		return vrResolutionRatio;
+	
+	}
+
 	// Set the ratio of the eye FOV you want to render. This basically leaves a black border to the outside
 	// of the view, reducing the amount of pixels that need to be rendered each frame
 	this.setFOVRenderRatio = function (ratio) {
@@ -150,6 +180,12 @@ THREE.VREffect = function ( renderer, onError ) {
 	this.getFOVRenderRatio = function () {
 
 		return fovRenderRatio;
+
+	}
+
+	function requestPresentToVRDisplay() {
+
+		return vrDisplay.requestPresent([{ source: canvas }]);
 
 	}
 
@@ -173,7 +209,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( boolean ) {
 
-				resolve( vrDisplay.requestPresent( [ { source: canvas } ] ) );
+				resolve( requestPresentToVRDisplay() );
 
 			} else {
 
