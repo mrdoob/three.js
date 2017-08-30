@@ -56,7 +56,11 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		this.buffer = audioBuffer;
 		this.sourceType = 'buffer';
 
-		if ( this.autoplay ) this.play();
+		if ( this.autoplay ) {
+
+			this.play();
+
+		}
 
 		return this;
 
@@ -184,7 +188,11 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	setFilters: function ( value ) {
 
-		if ( ! value ) value = [];
+		if ( ! value ) {
+
+			value = [];
+
+		}
 
 		if ( this.isPlaying === true ) {
 
