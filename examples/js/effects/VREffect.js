@@ -251,6 +251,11 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
+			// do one clear for both eyes
+			if ( renderer.autoClear || forceClear ) renderer.clear();
+			const rendererAutoClear = renderer.autoClear;
+			renderer.autoClear = false;
+
 			// When rendering we don't care what the recommended size is, only what the actual size
 			// of the backbuffer is.
 			var size = renderer.getSize();
@@ -297,7 +302,6 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			if ( renderer.autoClear || forceClear ) renderer.clear();
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
@@ -355,7 +359,7 @@ THREE.VREffect = function ( renderer, onError ) {
 				renderer.setScissor( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
 
 			}
-			renderer.render( scene, cameraL, renderTarget, forceClear );
+			renderer.render( scene, cameraL, renderTarget );
 
 			// render right eye
 			if ( renderTarget ) {
@@ -369,8 +373,8 @@ THREE.VREffect = function ( renderer, onError ) {
 				renderer.setScissor( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
 
 			}
-			renderer.render( scene, cameraR, renderTarget, forceClear );
-
+			renderer.render( scene, cameraR, renderTarget );
+			
 			if ( renderTarget ) {
 
 				renderTarget.viewport.set( 0, 0, size.width, size.height );
@@ -396,6 +400,8 @@ THREE.VREffect = function ( renderer, onError ) {
 				scope.submitFrame();
 
 			}
+
+			renderer.autoClear = rendererAutoClear;
 
 			return;
 
