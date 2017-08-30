@@ -268,7 +268,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.submitFrame = function () {
 
-		if ( vrDisplay !== undefined && scope.isPresenting ) {
+		if ( vrDisplay !== undefined && vrDisplay.isPresenting ) {
 
 			vrDisplay.submitFrame();
 
