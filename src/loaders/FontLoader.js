@@ -1,6 +1,6 @@
-import { Font } from '../extras/core/Font';
-import { FileLoader } from './FileLoader';
-import { DefaultLoadingManager } from './LoadingManager';
+import { Font } from '../extras/core/Font.js';
+import { FileLoader } from './FileLoader.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

@@ -2,13 +2,13 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { Line } from '../objects/Line';
-import { Mesh } from '../objects/Mesh';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Object3D } from '../core/Object3D';
+import { Line } from '../objects/Line.js';
+import { Mesh } from '../objects/Mesh.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Object3D } from '../core/Object3D.js';
 
 function PlaneHelper( plane, size, hex ) {
 

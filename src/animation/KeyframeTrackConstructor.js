@@ -1,4 +1,4 @@
-import { AnimationUtils } from './AnimationUtils';
+import { AnimationUtils } from './AnimationUtils.js';
 
 function KeyframeTrackConstructor( name, times, values, interpolation ) {
 

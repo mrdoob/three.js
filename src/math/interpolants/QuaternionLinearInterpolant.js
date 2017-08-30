@@ -1,5 +1,5 @@
-import { Interpolant } from '../Interpolant';
-import { Quaternion } from '../Quaternion';
+import { Interpolant } from '../Interpolant.js';
+import { Quaternion } from '../Quaternion.js';
 
 /**
  * Spherical linear unit quaternion interpolant.

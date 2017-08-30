@@ -2,8 +2,8 @@
  * @author tschw
  */
 
-import { Matrix3 } from '../../math/Matrix3';
-import { Plane } from '../../math/Plane';
+import { Matrix3 } from '../../math/Matrix3.js';
+import { Plane } from '../../math/Plane.js';
 
 function WebGLClipping() {
 

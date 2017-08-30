@@ -6,15 +6,15 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { LineSegments } from '../objects/LineSegments';
-import { Matrix4 } from '../math/Matrix4';
-import { VertexColors } from '../constants';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { Color } from '../math/Color';
-import { Vector3 } from '../math/Vector3';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Object3D } from '../core/Object3D';
+import { LineSegments } from '../objects/LineSegments.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { VertexColors } from '../constants.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { Color } from '../math/Color.js';
+import { Vector3 } from '../math/Vector3.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Object3D } from '../core/Object3D.js';
 
 function getBoneList( object ) {
 

@@ -3,9 +3,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-import { CanvasTexture } from '../../textures/CanvasTexture';
-import { Vector3 } from '../../math/Vector3';
-import { Quaternion } from '../../math/Quaternion';
+import { CanvasTexture } from '../../textures/CanvasTexture.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { Quaternion } from '../../math/Quaternion.js';
 
 function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 

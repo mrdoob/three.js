@@ -6,10 +6,10 @@
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  */
 
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector3 } from '../math/Vector3';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
 
 // ParametricGeometry
 

@@ -3,11 +3,11 @@
  * @author Mugen87 / http://github.com/Mugen87
  */
 
-import { Box3 } from '../math/Box3';
-import { LineSegments } from '../objects/LineSegments';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
+import { Box3 } from '../math/Box3.js';
+import { LineSegments } from '../objects/LineSegments.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
 
 function BoxHelper( object, color ) {
 

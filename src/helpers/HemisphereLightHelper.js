@@ -4,14 +4,14 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { Vector3 } from '../math/Vector3';
-import { Color } from '../math/Color';
-import { Object3D } from '../core/Object3D';
-import { Mesh } from '../objects/Mesh';
-import { VertexColors } from '../constants';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry';
-import { BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3.js';
+import { Color } from '../math/Color.js';
+import { Object3D } from '../core/Object3D.js';
+import { Mesh } from '../objects/Mesh.js';
+import { VertexColors } from '../constants.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
 
 function HemisphereLightHelper( light, size, color ) {
 

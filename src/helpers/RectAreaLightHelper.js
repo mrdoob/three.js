@@ -4,11 +4,11 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { Object3D } from '../core/Object3D';
-import { Line } from '../objects/Line';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { BufferAttribute } from '../core/BufferAttribute';
+import { Object3D } from '../core/Object3D.js';
+import { Line } from '../objects/Line.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
 
 function RectAreaLightHelper( light, color ) {
 

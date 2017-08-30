@@ -1,7 +1,7 @@
-import { InterpolateLinear } from '../../constants';
-import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype';
-import { QuaternionLinearInterpolant } from '../../math/interpolants/QuaternionLinearInterpolant';
-import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
+import { InterpolateLinear } from '../../constants.js';
+import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype.js';
+import { QuaternionLinearInterpolant } from '../../math/interpolants/QuaternionLinearInterpolant.js';
+import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor.js';
 
 /**
  *

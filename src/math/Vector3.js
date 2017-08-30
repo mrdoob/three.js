@@ -1,6 +1,6 @@
-import { _Math } from './Math';
-import { Matrix4 } from './Matrix4';
-import { Quaternion } from './Quaternion';
+import { _Math } from './Math.js';
+import { Matrix4 } from './Matrix4.js';
+import { Quaternion } from './Quaternion.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

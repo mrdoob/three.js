@@ -3,11 +3,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { LineSegments } from '../objects/LineSegments';
-import { VertexColors } from '../constants';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
+import { LineSegments } from '../objects/LineSegments.js';
+import { VertexColors } from '../constants.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
 
 function AxisHelper( size ) {
 

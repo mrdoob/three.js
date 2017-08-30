@@ -3,8 +3,8 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { Geometry } from '../core/Geometry';
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
+import { Geometry } from '../core/Geometry.js';
+import { PolyhedronBufferGeometry } from './PolyhedronGeometry.js';
 
 // TetrahedronGeometry
 

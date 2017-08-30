@@ -1,12 +1,12 @@
-import { KeyframeTrackPrototype } from './KeyframeTrackPrototype';
-import { StringKeyframeTrack } from './tracks/StringKeyframeTrack';
-import { BooleanKeyframeTrack } from './tracks/BooleanKeyframeTrack';
-import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack';
-import { ColorKeyframeTrack } from './tracks/ColorKeyframeTrack';
-import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack';
-import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack';
-import { AnimationUtils } from './AnimationUtils';
-import { KeyframeTrackConstructor } from './KeyframeTrackConstructor';
+import { KeyframeTrackPrototype } from './KeyframeTrackPrototype.js';
+import { StringKeyframeTrack } from './tracks/StringKeyframeTrack.js';
+import { BooleanKeyframeTrack } from './tracks/BooleanKeyframeTrack.js';
+import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack.js';
+import { ColorKeyframeTrack } from './tracks/ColorKeyframeTrack.js';
+import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
+import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack.js';
+import { AnimationUtils } from './AnimationUtils.js';
+import { KeyframeTrackConstructor } from './KeyframeTrackConstructor.js';
 
 /**
  *

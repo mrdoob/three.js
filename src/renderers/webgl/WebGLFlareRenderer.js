@@ -3,9 +3,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-import { Box2 } from '../../math/Box2';
-import { Vector2 } from '../../math/Vector2';
-import { Vector3 } from '../../math/Vector3';
+import { Box2 } from '../../math/Box2.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { Vector3 } from '../../math/Vector3.js';
 
 function WebGLFlareRenderer( renderer, gl, state, textures, capabilities ) {
 
