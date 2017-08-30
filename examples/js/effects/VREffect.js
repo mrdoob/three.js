@@ -213,6 +213,10 @@ THREE.VREffect = function ( renderer, onError ) {
 				resolve( requestPresentToVRDisplay() );
 
 			} else {
+				if (!vrDisplay.isPresenting) {
+					resolve();
+					return;
+				}
 
 				resolve( vrDisplay.exitPresent() );
 
