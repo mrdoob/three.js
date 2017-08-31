@@ -27,7 +27,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isPoints: true,
 	
-	isMultiMaterial: function() {
+	hasMultiMaterial: function() {
 		
 		return Array.isArray( this.material );
 		
