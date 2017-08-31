@@ -26,6 +26,12 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: Points,
 
 	isPoints: true,
+	
+	hasMultiMaterial: function() {
+		
+		return Array.isArray( this.material );
+		
+	},
 
 	raycast: ( function () {
 

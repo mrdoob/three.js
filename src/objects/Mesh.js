@@ -37,6 +37,12 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: Mesh,
 
 	isMesh: true,
+	
+	hasMultiMaterial: function() {
+		
+		return Array.isArray( this.material );
+		
+	},
 
 	setDrawMode: function ( value ) {
 
