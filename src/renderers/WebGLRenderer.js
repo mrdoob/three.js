@@ -1354,7 +1354,7 @@ function WebGLRenderer( parameters ) {
 					var geometry = objects.update( object );
 					var material = object.material;
 
-					if ( object.isMultiMaterial() ) {
+					if ( object.hasMultiMaterial() ) {
 
 						var groups = geometry.groups;
 
