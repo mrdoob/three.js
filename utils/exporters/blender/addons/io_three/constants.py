@@ -251,8 +251,6 @@ CAST_SHADOW = 'castShadow'
 RECEIVE_SHADOW = 'receiveShadow'
 QUAD = 'quad'
 
-USER_DATA = 'userData'
-
 MASK = {
     QUAD: 0,
     MATERIALS: 1,
@@ -355,7 +353,6 @@ THREE_PHONG = 'MeshPhongMaterial'
 
 INTENSITY = 'intensity'
 DISTANCE = 'distance'
-ASPECT = 'aspect'
 ANGLE = 'angle'
 DECAY = 'decayExponent'
 
