@@ -35,7 +35,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isLine: true,
 	
-	isMultiMaterial: function() {
+	hasMultiMaterial: function() {
 		
 		return Array.isArray( this.material );
 		
