@@ -353,7 +353,6 @@ THREE_PHONG = 'MeshPhongMaterial'
 
 INTENSITY = 'intensity'
 DISTANCE = 'distance'
-ASPECT = 'aspect'
 ANGLE = 'angle'
 DECAY = 'decayExponent'
 
