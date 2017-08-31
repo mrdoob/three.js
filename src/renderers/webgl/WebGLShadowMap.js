@@ -405,7 +405,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				var geometry = _objects.update( object );
 				var material = object.material;
 
-				if ( object.isMultiMaterial() ) {
+				if ( object.hasMultiMaterial() ) {
 
 					var groups = geometry.groups;
 
