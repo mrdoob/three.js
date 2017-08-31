@@ -692,15 +692,12 @@
 				num_subs  = this.readU16(),
 				geom,
 				subs_parsed = 0,
-				props,
 				buffer,
 				skinW, skinI,
 				geometries = [];
-
-			props = this.parseProperties( {
-				1: this._geoNrType,
-				2: this._geoNrType
-			} );
+			
+			// Ignore for now
+			this.parseProperties( { 1: this._geoNrType, 2: this._geoNrType } );
 
 			// Loop through sub meshes
 			while ( subs_parsed < num_subs ) {
