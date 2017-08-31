@@ -23,7 +23,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isSprite: true,
 	
-	isMultiMaterial: function() {
+	hasMultiMaterial: function() {
 		
 		return Array.isArray( this.material );
 		
