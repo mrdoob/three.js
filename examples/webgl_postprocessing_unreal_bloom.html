@@ -165,14 +165,14 @@
 				effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
 				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
 
-		    	bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);//1.0, 9, 0.5, 512);
+				bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);//1.0, 9, 0.5, 512);
 				bloomPass.renderToScreen = true;
 
 				composer = new THREE.EffectComposer(renderer);
-		    	composer.setSize(window.innerWidth, window.innerHeight);
-		   		composer.addPass(renderScene);
+				composer.setSize(window.innerWidth, window.innerHeight);
+				composer.addPass(renderScene);
 				composer.addPass(effectFXAA);
-		    	composer.addPass(bloomPass);
+				composer.addPass(bloomPass);
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
@@ -188,14 +188,14 @@
 
 				gui.add( params, 'exposure', 0.1, 2 );
 				gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function(value) {
-		        bloomPass.threshold = Number(value);
-		    });
+				bloomPass.threshold = Number(value);
+			});
 				gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function(value) {
-		        bloomPass.strength = Number(value);
-		    });
+				bloomPass.strength = Number(value);
+			});
 				gui.add( params, 'bloomRadius', 0.0, 1.0 ).onChange( function(value) {
-		        bloomPass.radius = Number(value);
-		    });
+				bloomPass.radius = Number(value);
+			});
 				gui.open();
 
 			}

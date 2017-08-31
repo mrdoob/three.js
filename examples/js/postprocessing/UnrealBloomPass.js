@@ -1,9 +1,9 @@
 /**
  * @author spidersharma / http://eduperiment.com/
- Inspired from Unreal Engine::
- https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
+ * 
+ * Inspired from Unreal Engine
+ * https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
  */
-
 THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 	THREE.Pass.call( this );
@@ -195,7 +195,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 		// Render input to screen
 
-		if( this.renderToScreen ) {
+		if ( this.renderToScreen ) {
 
 			this.quad.material = this.basic;
 			this.basic.map = readBuffer.texture;
@@ -203,7 +203,6 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 			renderer.render( this.scene, this.camera, undefined, true );
 
 		}
-
 
 		// 1. Extract Bright Areas
 
@@ -222,15 +221,11 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 			this.quad.material = this.separableBlurMaterials[ i ];
 
 			this.separableBlurMaterials[ i ].uniforms[ "colorTexture" ].value = inputRenderTarget.texture;
-
 			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = THREE.UnrealBloomPass.BlurDirectionX;
-
 			renderer.render( this.scene, this.camera, this.renderTargetsHorizontal[ i ], true );
 
 			this.separableBlurMaterials[ i ].uniforms[ "colorTexture" ].value = this.renderTargetsHorizontal[ i ].texture;
-
 			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = THREE.UnrealBloomPass.BlurDirectionY;
-
 			renderer.render( this.scene, this.camera, this.renderTargetsVertical[ i ], true );
 
 			inputRenderTarget = this.renderTargetsVertical[ i ];
@@ -254,7 +249,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 
 
-		if( this.renderToScreen ) {
+		if ( this.renderToScreen ) {
 
 			renderer.render( this.scene, this.camera, undefined, false );
 
