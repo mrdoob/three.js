@@ -27,7 +27,6 @@ import { WebVRManager } from './webvr/WebVRManager.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { WebGLExtensions } from './webgl/WebGLExtensions.js';
 import { Vector3 } from '../math/Vector3.js';
-// import { Sphere } from '../math/Sphere.js';
 import { WebGLClipping } from './webgl/WebGLClipping.js';
 import { Frustum } from '../math/Frustum.js';
 import { Vector4 } from '../math/Vector4.js';
