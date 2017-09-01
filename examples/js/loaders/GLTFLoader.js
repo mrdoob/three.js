@@ -38,8 +38,12 @@ THREE.GLTFLoader = ( function () {
 
 				} catch ( e ) {
 
-					// For SyntaxError or TypeError, return a generic failure message.
-					onError( e.constructor === Error ? e : new Error( 'THREE.GLTFLoader: Unable to parse model.' ) );
+					if ( onError !== undefined ) {
+
+						// For SyntaxError or TypeError, return a generic failure message.
+						onError( e.constructor === Error ? e : new Error( 'THREE.GLTFLoader: Unable to parse model.' ) );
+
+					}
 
 				}
 
