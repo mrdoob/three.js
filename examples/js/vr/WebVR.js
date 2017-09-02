@@ -7,13 +7,6 @@
 
 var WEBVR = {
 
-	isAvailable: function () {
-
-		console.warn( 'WEBVR: isAvailable() is being deprecated. Use .checkAvailability() instead.' );
-		return navigator.getVRDisplays !== undefined;
-
-	},
-
 	checkAvailability: function () {
 
 		return new Promise( function( resolve, reject ) {
