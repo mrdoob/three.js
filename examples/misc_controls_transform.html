@@ -79,8 +79,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var altMode = false;
-
 				window.addEventListener( 'keydown', function ( event ) {
 
 					switch ( event.keyCode ) {
@@ -127,7 +125,7 @@
 						case 90: // a, g, x, y, z
 							var gizmoType = control.getMode();
 
-							if ( altMode ) {
+							if ( event.altKey ) {
 
 								var gizmo = { 65: "XYZ", 71: "E", 88: "XY", 89: "YZ", 90: "XZ" }[event.keyCode];
 	
@@ -156,10 +154,6 @@
 						case 17: // Ctrl
 							control.setTranslationSnap( null );
 							control.setRotationSnap( null );
-							break;
-
-						case 18: // Alt
-							altMode = false;
 							break;
 
 					}
