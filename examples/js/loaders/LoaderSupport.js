@@ -325,6 +325,8 @@ THREE.LoaderSupport.Commons = (function () {
 		this.instanceNo = 0;
 		this.path = '';
 		this.debug = false;
+		this.useIndices = false;
+		this.disregardNormals = false;
 
 		this.loaderRootNode = new THREE.Group();
 		this.builder = new THREE.LoaderSupport.Builder();
@@ -337,6 +339,8 @@ THREE.LoaderSupport.Commons = (function () {
 			this.setModelName( prepData.modelName );
 			this.setStreamMeshesTo( prepData.streamMeshesTo );
 			this.builder.setMaterials( prepData.materials );
+			this.setUseIndices( prepData.useIndices );
+			this.setDisregardNormals( prepData.disregardNormals );
 
 			this._setCallbacks( prepData.getCallbacks().onProgress, prepData.getCallbacks().onMeshAlter, prepData.getCallbacks().onLoad );
 		}
@@ -390,6 +394,26 @@ THREE.LoaderSupport.Commons = (function () {
 	 */
 	Commons.prototype.setMaterials = function ( materials ) {
 		this.builder.setMaterials( materials );
+	};
+
+	/**
+	 * Tells whether indices should be used
+	 * @memberOf THREE.LoaderSupport.Commons
+	 *
+	 * @param {boolean} useIndices=false Default is false
+	 */
+	Commons.prototype.setUseIndices = function ( useIndices ) {
+		this.useIndices = useIndices === true;
+	};
+
+	/**
+	 * Tells whether normals should be completely disregarded
+	 * @memberOf THREE.LoaderSupport.Commons
+	 *
+	 * @param {boolean} disregardNormals=false Default is false
+	 */
+	Commons.prototype.setDisregardNormals = function ( disregardNormals ) {
+		this.disregardNormals = disregardNormals === true;
 	};
 
 	/**
@@ -519,6 +543,8 @@ THREE.LoaderSupport.PrepData = (function () {
 		this.resources = [];
 		this.streamMeshesTo = null;
 		this.materialPerSmoothingGroup = false;
+		this.useIndices = false;
+		this.disregardNormals = false;
 		this.callbacks = new THREE.LoaderSupport.Callbacks();
 		this.crossOrigin;
 		this.useAsync = false;
@@ -538,10 +564,31 @@ THREE.LoaderSupport.PrepData = (function () {
 	 * Tells whether a material shall be created per smoothing group
 	 * @memberOf THREE.LoaderSupport.PrepData
 	 *
-	 * @param {boolean} materialPerSmoothingGroup=false Default is false
+	 * @param {boolean} materialPerSmoothingGroup
 	 */
 	PrepData.prototype.setMaterialPerSmoothingGroup = function ( materialPerSmoothingGroup ) {
 		this.materialPerSmoothingGroup = materialPerSmoothingGroup;
+	};
+
+	/**
+	 * Tells whether indices should be used
+	 * @memberOf THREE.LoaderSupport.PrepData
+	 *
+	 * @param {boolean} useIndices=false Default is false
+	 */
+	PrepData.prototype.setUseIndices = function ( useIndices ) {
+		this.useIndices = useIndices === true;
+	};
+
+
+	/**
+	 * Tells whether normals should be completely disregarded
+	 * @memberOf THREE.LoaderSupport.PrepData
+	 *
+	 * @param {boolean} disregardNormals=false Default is false
+	 */
+	PrepData.prototype.setDisregardNormals = function ( disregardNormals ) {
+		this.disregardNormals = disregardNormals === true;
 	};
 
 	/**
@@ -592,6 +639,8 @@ THREE.LoaderSupport.PrepData = (function () {
 		clone.resources = this.resources;
 		clone.streamMeshesTo = this.streamMeshesTo;
 		clone.materialPerSmoothingGroup = this.materialPerSmoothingGroup;
+		clone.useIndices = this.useIndices;
+		clone.disregardNormals = this.disregardNormals;
 		clone.callbacks = this.callbacks;
 		clone.crossOrigin = this.crossOrigin;
 		clone.useAsync = this.useAsync;
