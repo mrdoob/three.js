@@ -208,7 +208,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 		this.highPassUniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.highPassUniforms[ "luminosityThreshold" ].value = this.threshold;
-		this.quad.material = this.materialHighPassFilter;		
+		this.quad.material = this.materialHighPassFilter;
 
 		renderer.render( this.scene, this.camera, this.renderTargetBright, true );
 
