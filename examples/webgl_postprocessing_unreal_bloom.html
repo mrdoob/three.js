@@ -70,7 +70,7 @@
 			var params = {
 				projection: 'normal',
 				background: false,
-				exposure: 1.0,
+				exposure: 0.9,
 				bloomStrength: 1.5,
 				bloomThreshold: 0.85,
 				bloomRadius: 0.4
@@ -114,7 +114,8 @@
 				objects.push( torusMesh1 );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "./textures/roughness_map.jpg", function( map ) {
+				textureLoader.load( './textures/roughness_map.jpg', function ( map ) {
+
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -122,17 +123,20 @@
 					standardMaterial.roughnessMap = map;
 					standardMaterial.bumpMap = map;
 					standardMaterial.needsUpdate = true;
+
 				} );
 
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
+
 				};
 
-				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
+				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
@@ -147,9 +151,9 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.1 ) );
 
-				var spotLight = new THREE.SpotLight( 0xffffff );
+				var spotLight = new THREE.SpotLight( 0xffffff, 1 );
 				spotLight.position.set( 50, 100, 50 );
 				spotLight.angle = Math.PI / 7;
 				spotLight.penumbra = 0.8;
@@ -161,19 +165,19 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderScene = new THREE.RenderPass(scene, camera);
+				renderScene = new THREE.RenderPass( scene, camera );
 
-				effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
-				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
-				bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);//1.0, 9, 0.5, 512);
+				bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 ); //1.0, 9, 0.5, 512);
 				bloomPass.renderToScreen = true;
 
-				composer = new THREE.EffectComposer(renderer);
-				composer.setSize(window.innerWidth, window.innerHeight);
-				composer.addPass(renderScene);
-				composer.addPass(effectFXAA);
-				composer.addPass(bloomPass);
+				composer = new THREE.EffectComposer( renderer );
+				composer.setSize( window.innerWidth, window.innerHeight );
+				composer.addPass( renderScene );
+				composer.addPass( effectFXAA );
+				composer.addPass( bloomPass );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
@@ -182,21 +186,33 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 200;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				var gui = new dat.GUI();
 
 				gui.add( params, 'exposure', 0.1, 2 );
-				gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function(value) {
-					bloomPass.threshold = Number(value);
-				});
-				gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function(value) {
-					bloomPass.strength = Number(value);
-				});
-				gui.add( params, 'bloomRadius', 0.0, 1.0 ).onChange( function(value) {
-					bloomPass.radius = Number(value);
-				});
+
+				gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
+
+					bloomPass.threshold = Number( value );
+
+				} );
+
+				gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function ( value ) {
+
+					bloomPass.strength = Number( value );
+
+				} );
+
+				gui.add( params, 'bloomRadius', 0.0, 1.0 ).onChange( function ( value ) {
+
+					bloomPass.radius = Number( value );
+
+				} );
+
 				gui.open();
 
 			}
@@ -211,7 +227,8 @@
 
 				renderer.setSize( width, height );
 				composer.setSize( width, height );
-				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+
 			}
 
 			//
@@ -231,7 +248,7 @@
 				if ( standardMaterial !== undefined ) {
 
 					standardMaterial.roughness = 1.0;
-					standardMaterial.bumpScale = - 0.05;
+					standardMaterial.bumpScale = 0.25;
 
 					var newEnvMap = standardMaterial.envMap;
 
@@ -240,6 +257,7 @@
 					if ( newEnvMap !== standardMaterial.envMap ) {
 
 						standardMaterial.envMap = newEnvMap;
+						standardMaterial.envMapIntensity = 1;
 						standardMaterial.needsUpdate = true;
 
 					}
@@ -260,6 +278,7 @@
 				}
 
 				composer.render();
+
 			}
 
 		</script>
