@@ -30105,9 +30105,8 @@
 						case 'arraybuffer':
 						case 'blob':
 
-						 	response = new ArrayBuffer( data.length );
-
-							var view = new Uint8Array( response );
+						 
+							var view = new Uint8Array( data.length );
 
 							for ( var i = 0; i < data.length; i ++ ) {
 
@@ -30117,9 +30116,12 @@
 
 							if ( responseType === 'blob' ) {
 
-								response = new Blob( [ response ], { type: mimeType } );
+								response = new Blob( [ view.buffer ], { type: mimeType } );
 
-							}
+							} else {
+							   
+								response = view.buffer;	
+							}	
 
 							break;
 
@@ -30144,7 +30146,7 @@
 
 					}
 
-					// Wait for next browser tick
+					// Wait for next browser tick like standard XMLHttpRequest event dispatching does
 					window.setTimeout( function () {
 
 						if ( onLoad ) onLoad( response );
@@ -30155,7 +30157,7 @@
 
 				} catch ( error ) {
 
-					// Wait for next browser tick
+					// Wait for next browser tick like standard XMLHttpRequest event dispatching does
 					window.setTimeout( function () {
 
 						if ( onError ) onError( error );
