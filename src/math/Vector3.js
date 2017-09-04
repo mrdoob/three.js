@@ -175,6 +175,16 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	vectorTo: function ( v ){
+		var x = v.x, y = v.y, z = v.z;
+		x -= this.x;
+		y -= this.y;
+		z -= this.z;
+
+		return new Vector3(x,y,z).normalize();
+
+	},
+
 	subScalar: function ( s ) {
 
 		this.x -= s;
