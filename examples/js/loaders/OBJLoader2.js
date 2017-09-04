@@ -110,7 +110,7 @@ THREE.OBJLoader2 = (function () {
 
 	};
 
-    /**
+	/**
 	 * Run the loader according the provided instructions.
 	 * @memberOf THREE.OBJLoader2
 	 *
@@ -217,13 +217,13 @@ THREE.OBJLoader2 = (function () {
 		return this.loaderRootNode;
 	};
 
-    /**
-     * Parses OBJ content asynchronously.
+	/**
+	 * Parses OBJ content asynchronously.
 	 * @memberOf THREE.OBJLoader2
 	 *
-     * @param {arraybuffer} content
-     * @param {callback} onLoad
-     */
+	 * @param {arraybuffer} content
+	 * @param {callback} onLoad
+	 */
 	OBJLoader2.prototype.parseAsync = function ( content, onLoad ) {
 		console.time( 'OBJLoader2 parseAsync: ' + this.modelName);
 
@@ -258,26 +258,26 @@ THREE.OBJLoader2 = (function () {
 			return workerCode;
 		};
 		this.workerSupport.validate( buildCode, false );
-        this.workerSupport.setCallbacks( scopedOnMeshLoaded, scopedOnLoad );
-        this.workerSupport.run(
-            {
-                cmd: 'run',
-                params: {
-                    debug: this.debug,
-                    materialPerSmoothingGroup: this.materialPerSmoothingGroup,
+		this.workerSupport.setCallbacks( scopedOnMeshLoaded, scopedOnLoad );
+		this.workerSupport.run(
+			{
+				cmd: 'run',
+				params: {
+					debug: this.debug,
+					materialPerSmoothingGroup: this.materialPerSmoothingGroup,
 					useIndices: this.useIndices,
 					disregardNormals: this.disregardNormals
-                },
-                materials: {
-                    materialNames: this.builder.materialNames
-                },
-                buffers: {
-                    input: content
-                }
-            },
-            [ content.buffer ]
-        );
-        };
+				},
+				materials: {
+					materialNames: this.builder.materialNames
+				},
+				buffers: {
+					input: content
+				}
+			},
+			[ content.buffer ]
+		);
+	};
 
 	/**
 	 * Constants used by THREE.OBJLoader2
@@ -758,7 +758,7 @@ THREE.OBJLoader2 = (function () {
 				{
 					cmd: 'meshData',
 					params: {
-						meshName: rawObjectDescription.groupName !== '' ? rawObjectDescription.groupName : rawObjectDescription.objectName
+						meshName: result.name
 					},
 					materials: {
 						multiMaterial: createMultiMaterial,
@@ -895,15 +895,15 @@ THREE.OBJLoader2 = (function () {
 		};
 
 		RawObject.prototype.pushObject = function ( objectName ) {
-			this.objectName = objectName;
+			this.objectName = Validator.verifyInput( objectName, '' );
 		};
 
 		RawObject.prototype.pushMtllib = function ( mtllibName ) {
-			this.mtllibName = mtllibName;
+			this.mtllibName = Validator.verifyInput( mtllibName, '' );
 		};
 
 		RawObject.prototype.pushGroup = function ( groupName ) {
-			this.groupName = groupName;
+			this.groupName = Validator.verifyInput( groupName, '' );
 		};
 
 		RawObject.prototype.pushUsemtl = function ( mtlName ) {
@@ -958,7 +958,7 @@ THREE.OBJLoader2 = (function () {
 
 				}
 
-			// "f vertex/uv ..."
+				// "f vertex/uv ..."
 			} else if  ( bufferLength === slashesCount * 2 ) {
 
 				for ( i = 3, length = bufferLength - 2; i < length; i += 2 ) {
@@ -969,7 +969,7 @@ THREE.OBJLoader2 = (function () {
 
 				}
 
-			// "f vertex/uv/normal ..."
+				// "f vertex/uv/normal ..."
 			} else if  ( bufferLength * 2 === slashesCount * 3 ) {
 
 				for ( i = 4, length = bufferLength - 3; i < length; i += 3 ) {
@@ -980,7 +980,7 @@ THREE.OBJLoader2 = (function () {
 
 				}
 
-			// "f vertex//normal ..."
+				// "f vertex//normal ..."
 			} else {
 
 				for ( i = 3, length = bufferLength - 2; i < length; i += 2 ) {
@@ -1124,6 +1124,7 @@ THREE.OBJLoader2 = (function () {
 			if ( rawObjectDescriptionsTemp.length > 0 ) {
 
 				result = {
+					name: this.groupName !== '' ? this.groupName : this.objectName,
 					rawObjectDescriptions: rawObjectDescriptionsTemp,
 					absoluteVertexCount: absoluteVertexCount,
 					absoluteIndexCount: absoluteIndexCount,
@@ -1140,7 +1141,8 @@ THREE.OBJLoader2 = (function () {
 
 		RawObject.prototype.createReport = function ( inputObjectCount, printDirectly ) {
 			var report = {
-				name: this.objectName ? this.objectName : 'groups',
+				objectName: this.objectName,
+				groupName: this.groupName,
 				mtllibName: this.mtllibName,
 				vertexCount: this.vertices.length / 3,
 				normalCount: this.normals.length / 3,
@@ -1151,14 +1153,16 @@ THREE.OBJLoader2 = (function () {
 			};
 
 			if ( printDirectly ) {
-				console.log( 'Input Object number: ' + inputObjectCount + ' Object name: ' + report.name +
-					'\n Mtllib name: ' + report.mtllibName +
-					'\n Vertex count: ' + report.vertexCount +
-					'\n Normal count: ' + report.normalCount +
-					'\n UV count: ' + report.uvCount +
-					'\n SmoothingGroup count: ' + report.smoothingGroupCount +
-					'\n Material count: ' + report.mtlCount +
-					'\n Real RawObjectDescription count: ' + report.rawObjectDescriptions
+				console.log( 'Input Object number: ' + inputObjectCount +
+					'\n\tObject name: ' + report.objectName +
+					'\n\tGroup name: ' + report.groupName +
+					'\n\tMtllib name: ' + report.mtllibName +
+					'\n\tVertex count: ' + report.vertexCount +
+					'\n\tNormal count: ' + report.normalCount +
+					'\n\tUV count: ' + report.uvCount +
+					'\n\tSmoothingGroup count: ' + report.smoothingGroupCount +
+					'\n\tMaterial count: ' + report.mtlCount +
+					'\n\tReal RawObjectDescription count: ' + report.rawObjectDescriptions
 				);
 			}
 
