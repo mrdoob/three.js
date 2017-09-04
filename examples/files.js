@@ -292,8 +292,8 @@ var files = {
 	],
 	*/
 	"webaudio": [
-		"misc_sound",
-		"misc_sound_visualizer"
+		"webaudio_sandbox",
+		"webaudio_visualizer"
 	],
 	"webvr": [
 		"webvr_cubes",
