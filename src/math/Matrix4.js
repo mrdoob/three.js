@@ -634,7 +634,12 @@ Object.assign( Matrix4.prototype, {
 	},
 
 	makeTranslation: function ( x, y, z ) {
-
+		if (x instanceof THREE.Vector3) { // if a THREE.Vector3 is passed in
+			z = x.z;
+			y = x.y;
+			x = x.x;
+		}
+		
 		this.set(
 
 			1, 0, 0, x,
