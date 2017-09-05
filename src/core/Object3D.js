@@ -283,8 +283,19 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		// This method does not support objects with rotated and/or translated parent(s)
 
 		var m1 = new Matrix4();
+		var vector = new Vector3();
 
-		return function lookAt( vector ) {
+		return function lookAt( x, y, z ) {
+
+			if ( x.isVector3 ) {
+
+				vector.copy( x );
+
+			} else {
+
+				vector.set( x, y, z );
+
+			}
 
 			if ( this.isCamera ) {
 
