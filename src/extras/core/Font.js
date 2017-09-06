@@ -3,8 +3,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { QuadraticBezier, CubicBezier } from './Interpolations';
-import { ShapePath } from './ShapePath';
+import { QuadraticBezier, CubicBezier } from './Interpolations.js';
+import { ShapePath } from './ShapePath.js';
 
 
 function Font( data ) {

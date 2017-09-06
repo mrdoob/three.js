@@ -48,13 +48,19 @@ Menubar.File = function ( editor ) {
 
 	// Import
 
+	var form = document.createElement( 'form' );
+	form.style.display = 'none';
+	document.body.appendChild( form );
+
 	var fileInput = document.createElement( 'input' );
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', function ( event ) {
 
 		editor.loader.loadFile( fileInput.files[ 0 ] );
+		form.reset();
 
 	} );
+	form.appendChild( fileInput );
 
 	var option = new UI.Row();
 	option.setClass( 'option' );

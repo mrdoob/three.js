@@ -38,8 +38,12 @@ THREE.GLTFLoader = ( function () {
 
 				} catch ( e ) {
 
-					// For SyntaxError or TypeError, return a generic failure message.
-					onError( e.constructor === Error ? e : new Error( 'THREE.GLTFLoader: Unable to parse model.' ) );
+					if ( onError !== undefined ) {
+
+						// For SyntaxError or TypeError, return a generic failure message.
+						onError( e.constructor === Error ? e : new Error( 'THREE.GLTFLoader: Unable to parse model.' ) );
+
+					}
 
 				}
 
@@ -616,7 +620,7 @@ THREE.GLTFLoader = ( function () {
 				material.bumpScale = 1;
 
 				material.normalMap = params.normalMap === undefined ? null : params.normalMap;
-				material.normalScale = new THREE.Vector2( 1, 1 );
+				if ( params.normalScale ) material.normalScale = params.normalScale;
 
 				material.displacementMap = null;
 				material.displacementScale = 1;
@@ -1603,6 +1607,12 @@ THREE.GLTFLoader = ( function () {
 
 				materialParams.transparent = true;
 
+				if ( alphaMode === ALPHA_MODES.MASK ) {
+
+				  materialParams.alphaTest = material.alphaCutoff || 0.5;
+
+				}
+
 			} else {
 
 				materialParams.transparent = false;
@@ -1613,11 +1623,24 @@ THREE.GLTFLoader = ( function () {
 
 				pending.push( parser.assignTexture( materialParams, 'normalMap', material.normalTexture.index ) );
 
+				materialParams.normalScale = new THREE.Vector2( 1, 1 );
+
+				if ( material.normalTexture.scale !== undefined ) {
+
+					materialParams.normalScale.set( material.normalTexture.scale, material.normalTexture.scale );
+
+				}
 			}
 
 			if ( material.occlusionTexture !== undefined ) {
 
 				pending.push( parser.assignTexture( materialParams, 'aoMap', material.occlusionTexture.index ) );
+
+				if ( material.occlusionTexture.strength !== undefined ) {
+
+					materialParams.aoMapIntensity = material.occlusionTexture.strength;
+
+				}
 
 			}
 
@@ -1667,9 +1690,9 @@ THREE.GLTFLoader = ( function () {
 
 				// Normal map textures use OpenGL conventions:
 				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
-				_material.normalScale.x = -1;
+				_material.normalScale.x = -_material.normalScale.x;
 
-				_material.userData = material.extras;
+				if ( material.extras ) _material.userData = material.extras;
 
 				return _material;
 
@@ -1815,16 +1838,7 @@ THREE.GLTFLoader = ( function () {
 
 						if ( geometry.attributes.normal === undefined ) {
 
-							if ( material.flatShading !== undefined ) {
-
-								material.flatShading = true;
-
-							} else {
-
-								// TODO: Remove this backwards-compatibility fix after r87 release.
-								material.shading = THREE.FlatShading;
-
-							}
+							material.flatShading = true;
 
 						}
 
@@ -2157,37 +2171,16 @@ THREE.GLTFLoader = ( function () {
 			] ).then( function ( dependencies ) {
 
 				return _each( __nodes, function ( _node, nodeId ) {
-
+	
 					var node = json.nodes[ nodeId ];
 
-					var meshes;
+					var mesh = node.mesh;
 
-					if ( node.mesh !== undefined) {
+					if ( mesh !== undefined) {
 
-						meshes = [ node.mesh ];
+						var group = dependencies.meshes[ mesh ];
 
-					} else if ( node.meshes !== undefined ) {
-
-						console.warn( 'THREE.GLTFLoader: Legacy glTF file detected. Nodes may have no more than one mesh.' );
-
-						meshes = node.meshes;
-
-					}
-
-					if ( meshes !== undefined ) {
-
-						for ( var meshId in meshes ) {
-
-							var mesh = meshes[ meshId ];
-							var group = dependencies.meshes[ mesh ];
-
-							if ( group === undefined ) {
-
-								console.warn( 'THREE.GLTFLoader: Could not find node "' + mesh + '".' );
-								continue;
-
-							}
-
+						if ( group !== undefined ) {
 							// do not clone children as they will be replaced anyway
 							var clonedgroup = group.clone( false );
 
@@ -2288,8 +2281,11 @@ THREE.GLTFLoader = ( function () {
 							}
 
 							_node.add( clonedgroup );
+						} else {
 
-						}
+							console.warn( 'THREE.GLTFLoader: Could not find node "' + mesh + '".' );
+
+						}                            
 
 					}
 

@@ -1,6 +1,6 @@
-import { Camera } from './Camera';
-import { Object3D } from '../core/Object3D';
-import { _Math } from '../math/Math';
+import { Camera } from './Camera.js';
+import { Object3D } from '../core/Object3D.js';
+import { _Math } from '../math/Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

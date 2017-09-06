@@ -103,7 +103,6 @@ var list = {
 		},
 
 		"Extras": {
-			"CurveUtils": "api/extras/CurveUtils",
 			"SceneUtils": "api/extras/SceneUtils",
 			"ShapeUtils": "api/extras/ShapeUtils"
 		},
@@ -112,6 +111,7 @@ var list = {
 			"Curve": "api/extras/core/Curve",
 			"CurvePath": "api/extras/core/CurvePath",
 			"Font": "api/extras/core/Font",
+			"Interpolations": "api/extras/core/Interpolations",
 			"Path": "api/extras/core/Path",
 			"Shape": "api/extras/core/Shape",
 			"ShapePath": "api/extras/core/ShapePath"
@@ -335,7 +335,8 @@ var list = {
 
 		"Geometries": {
 			"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
-			"ConvexGeometry": "examples/geometries/ConvexGeometry"
+			"ConvexGeometry": "examples/geometries/ConvexGeometry",
+			"DecalGeometry": "examples/geometries/DecalGeometry"
 		},
 
 		"Loaders": {
@@ -350,6 +351,10 @@ var list = {
 			"PDBLoader": "examples/loaders/PDBLoader",
 			"SVGLoader": "examples/loaders/SVGLoader",
 			"TGALoader": "examples/loaders/TGALoader"
+		},
+
+		"Exporters": {
+			"GLTFExporter": "examples/exporters/GLTFExporter"
 		},
 
 		"Plugins": {

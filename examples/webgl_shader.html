@@ -39,7 +39,6 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -90,7 +89,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
 
@@ -103,8 +102,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera();
-				camera.position.z = 1;
+				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 				scene = new THREE.Scene();
 
@@ -130,9 +128,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				onWindowResize();
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -150,18 +145,11 @@
 
 			//
 
-			function animate() {
+			function animate( timestamp ) {
 
 				requestAnimationFrame( animate );
 
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
-				uniforms.time.value += 0.05;
+				uniforms.time.value = timestamp / 1000;
 
 				renderer.render( scene, camera );
 

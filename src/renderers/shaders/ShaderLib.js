@@ -1,8 +1,8 @@
-import { ShaderChunk } from './ShaderChunk';
-import { UniformsUtils } from './UniformsUtils';
-import { Vector3 } from '../../math/Vector3';
-import { UniformsLib } from './UniformsLib';
-import { Color } from '../../math/Color';
+import { ShaderChunk } from './ShaderChunk.js';
+import { UniformsUtils } from './UniformsUtils.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { UniformsLib } from './UniformsLib.js';
+import { Color } from '../../math/Color.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -211,6 +211,7 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.lights,
+			UniformsLib.fog,
 			{
 				color: { value: new Color( 0x00000 ) },
 				opacity: { value: 1.0 }

@@ -1,6 +1,6 @@
-import { Path } from './Path';
-import { Shape } from './Shape';
-import { ShapeUtils } from '../ShapeUtils';
+import { Path } from './Path.js';
+import { Shape } from './Shape.js';
+import { ShapeUtils } from '../ShapeUtils.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog

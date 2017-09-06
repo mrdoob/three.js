@@ -1,4 +1,4 @@
-import { Color } from '../math/Color';
+import { Color } from '../math/Color.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

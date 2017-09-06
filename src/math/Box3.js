@@ -1,5 +1,5 @@
-import { Vector3 } from './Vector3';
-import { Sphere } from './Sphere';
+import { Vector3 } from './Vector3.js';
+import { Sphere } from './Sphere.js';
 
 /**
  * @author bhouston / http://clara.io

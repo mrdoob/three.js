@@ -726,6 +726,11 @@ THREE.ColladaLoader.prototype = {
 						data.skin = parseSkin( child );
 						break;
 
+					case 'morph':
+						data.id = parseId( child.getAttribute( 'source' ) );
+						console.warn( 'THREE.ColladaLoader: Morph target animation not supported yet.' );
+						break;
+
 				}
 
 			}
@@ -840,16 +845,22 @@ THREE.ColladaLoader.prototype = {
 
 		function buildController( data ) {
 
-			var build = {};
-
-			build.id = data.id;
-			build.skin = buildSkin( data.skin );
-
-			// we enhance the 'sources' property of the corresponding geometry with our skin data
+			var build = {
+				id: data.id
+			};
 
 			var geometry = library.geometries[ build.id ];
-			geometry.sources.skinIndices = build.skin.indices;
-			geometry.sources.skinWeights = build.skin.weights;
+
+			if ( data.skin !== undefined ) {
+
+				build.skin = buildSkin( data.skin );
+
+				// we enhance the 'sources' property of the corresponding geometry with our skin data
+
+				geometry.sources.skinIndices = build.skin.indices;
+				geometry.sources.skinWeights = build.skin.weights;
+
+			}
 
 			return build;
 

@@ -1,7 +1,7 @@
-import { LinearFilter } from '../constants';
-import { FileLoader } from './FileLoader';
-import { CompressedTexture } from '../textures/CompressedTexture';
-import { DefaultLoadingManager } from './LoadingManager';
+import { LinearFilter } from '../constants.js';
+import { FileLoader } from './FileLoader.js';
+import { CompressedTexture } from '../textures/CompressedTexture.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

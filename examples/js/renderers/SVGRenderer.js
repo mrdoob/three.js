@@ -131,7 +131,7 @@ THREE.SVGRenderer = function () {
 
 		if ( opacity === undefined || opacity === 1 ) return 'rgb(' + arg + ')';
 
-		return 'rgba(' + arg + ',' + opacity + ')';
+		return 'rgb(' + arg + '); fill-opacity: ' + opacity;
 
 	}
 
