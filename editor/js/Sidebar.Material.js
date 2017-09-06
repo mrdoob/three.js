@@ -510,7 +510,6 @@ Sidebar.Material = function ( editor ) {
 		var object = currentObject;
 
 		var geometry = object.geometry;
-		var material = object.material;
 
 		var previousSelectedSlot = currentMaterialSlot;
 
