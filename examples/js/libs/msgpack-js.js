@@ -87,7 +87,7 @@ function utf8Read(view, offset, length) {
     // Two byte character
     if ((byte & 0xe0) === 0xc0) {
       string += String.fromCharCode(
-        ((byte & 0x0f) << 6) | 
+        ((byte & 0x1f) << 6) | 
         (view.getUint8(++i) & 0x3f)
       );
       continue;
