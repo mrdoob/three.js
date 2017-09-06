@@ -1829,14 +1829,23 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						if ( geometry.attributes.color !== undefined ) {
+						var useVertexColors = geometry.attributes.color !== undefined;
+						var useFlatShading = geometry.attributes.normal === undefined;
+
+						if ( useVertexColors || useFlatShading ) {
+
+							material = material.clone();
+
+						}
+
+						if ( useVertexColors ) {
 
 							material.vertexColors = THREE.VertexColors;
 							material.needsUpdate = true;
 
 						}
 
-						if ( geometry.attributes.normal === undefined ) {
+						if ( useFlatShading ) {
 
 							material.flatShading = true;
 
@@ -2171,7 +2180,7 @@ THREE.GLTFLoader = ( function () {
 			] ).then( function ( dependencies ) {
 
 				return _each( __nodes, function ( _node, nodeId ) {
-	
+
 					var node = json.nodes[ nodeId ];
 
 					var mesh = node.mesh;
@@ -2285,7 +2294,7 @@ THREE.GLTFLoader = ( function () {
 
 							console.warn( 'THREE.GLTFLoader: Could not find node "' + mesh + '".' );
 
-						}                            
+						}
 
 					}
 
