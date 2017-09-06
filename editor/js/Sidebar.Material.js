@@ -510,7 +510,6 @@ Sidebar.Material = function ( editor ) {
 		var object = currentObject;
 
 		var geometry = object.geometry;
-		var material = object.material;
 
 		var previousSelectedSlot = currentMaterialSlot;
 
@@ -518,7 +517,7 @@ Sidebar.Material = function ( editor ) {
 
 		if ( currentMaterialSlot !== previousSelectedSlot ) refreshUI( true );
 
-		material = editor.getObjectMaterial( currentObject, currentMaterialSlot )
+		var material = editor.getObjectMaterial( currentObject, currentMaterialSlot )
 
 		var textureWarning = false;
 		var objectHasUvs = false;
