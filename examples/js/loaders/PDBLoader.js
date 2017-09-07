@@ -4,7 +4,7 @@
  */
 
 THREE.PDBLoader = function ( manager ) {
-        //add your own manager or use default manager
+
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
@@ -49,50 +49,23 @@ THREE.PDBLoader.prototype = {
 		}
 
 		function parseBond( start, length ) {
-			/*
-			
-		line1	CONECT    1    2
-		        12345678901234567890123456789001234567890
-	                      Siiii)
-				   P1iii)
-					P2iii)
-				     	     P3iii)
-						  P4iii)
-	 	line2	CONECT    2    1    9   49
-			
-			 satomL1 = 1, satomL2 = 2
-			 P1 = eatomL1 = 2, eatomL2_i = 1,
-			 P2   eatomL2_ii = 9
-			 P3   eatomL2_iii = 49
-			 P4
-			 
-			 hL1 = s1e2
-			 hL2 = s1e2 X, s2e9, s2e49
-			 bhash = {s1e2: 0, s2e9: 1, s2e49: 2      ...}  //bond connections 
-			 bonds = [ [0,1,1], [1, 8, 1], [1, 48, 1    ...]
-			 
-			 
-			*/
-                            
+
 			var eatom = parseInt( lines[ i ].substr( start, length ) );
 
 			if ( eatom ) {
-                                //Generate Hash Key from Starting Atom and Connecting End Atom corresponding Connection
+
 				var h = hash( satom, eatom );
-                                
-				//if already exists do not create, skip
+
 				if ( bhash[ h ] === undefined ) {
-                                        
-					//reduce satom and eatom connection by factor of 1 (single bond)
+
 					bonds.push( [ satom - 1, eatom - 1, 1 ] );
-					bhash[ h ] = bonds.length - 1; //identifies bond entry in bonds[bhash[s1e2]] array (key: endpoints Index: bond)
+					bhash[ h ] = bonds.length - 1;
 
 				} else {
 
 					// doesn't really work as almost all PDBs
 					// have just normal bonds appearing multiple
 					// times instead of being double/triple bonds
-					//increase last entry by 1, represents multiple bond
 					// bonds[bhash[h]][2] += 1;
 
 				}
@@ -104,11 +77,6 @@ THREE.PDBLoader.prototype = {
 		function buildGeometry() {
 
 			var build = {
-				/*
-				This class is an efficient alternative to Geometry, because it stores all data, 
-				including vertex positions, face indices, normals, colors, UVs, and custom attributes 
-				within buffers; this reduces the cost of passing all this data to the GPU.
-				*/
 				geometryAtoms: new THREE.BufferGeometry(),
 				geometryBonds: new THREE.BufferGeometry(),
 				json: {
@@ -130,70 +98,43 @@ THREE.PDBLoader.prototype = {
 
 			for ( i = 0, l = atoms.length; i < l; i ++ ) {
 
-				/*
-				//Array of Atoms, Arrays consisting of 4 entries: 
-				   [ [X-Coord, Y-Coord, Z-Coord, Color_Array[element_name], Element_Name], ... ]
-				
-				atoms.push( [ x, y, z, CPK[ e ], capitalize( e ) ] );
-				*/
-				
 				var atom = atoms[ i ];
-                               
-										
-				var x = atom[ 0 ];  
+
+				var x = atom[ 0 ];
 				var y = atom[ 1 ];
 				var z = atom[ 2 ];
-                                
-				// Array of Atoms Coord Positions
+
 				verticesAtoms.push( x, y, z );
-				
-				
-                                /*
-				 Generate float value representations for each color channels for use
-				 in Float32BufferAttribute for color:  
-				        THREE.Float32BufferAttribute( colorsAtoms, 3 )  in
-				    geometryAtoms.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsAtoms, 3 ) );
-				      where geometryAtoms is a BufferGeometry Object
-				
-				*/
+
 				var r = atom[ 3 ][ 0 ] / 255;
 				var g = atom[ 3 ][ 1 ] / 255;
 				var b = atom[ 3 ][ 2 ] / 255;
-                                
-				//Generate Array of Color Float32 Arrays Entries for each Atom 
+
 				colorsAtoms.push( r, g, b );
 
 			}
 
 			// bonds
-                         /*  Graphite
-			    bonds = [ [0,1,1], [1, 8, 1], [1, 48, 1    ...]
-			 */
+
 			for ( i = 0, l = bonds.length; i < l; i ++ ) {
 
 				var bond = bonds[ i ];
 
 				var start = bond[ 0 ];
 				var end = bond[ 1 ];
-                                 
-				// verticesBonds == verticesAtoms positions multiplied by factor of 3 and incremented 
-				verticesBonds.push( verticesAtoms[ ( start * 3 ) + 0 ] );   //verticesAtoms[0]  -- verticesAtoms[3]
-				verticesBonds.push( verticesAtoms[ ( start * 3 ) + 1 ] );   //verticesAtoms[1]  -- verticesAtoms[4]
-				verticesBonds.push( verticesAtoms[ ( start * 3 ) + 2 ] );   //verticesAtoms[2]  -- verticesAtoms[5]
 
-				verticesBonds.push( verticesAtoms[ ( end * 3 ) + 0 ] );     //verticesAtoms[3]  -- verticesAtoms[24]
-				verticesBonds.push( verticesAtoms[ ( end * 3 ) + 1 ] );     //verticesAtoms[4]  -- verticesAtoms[25]
-				verticesBonds.push( verticesAtoms[ ( end * 3 ) + 2 ] );     //verticesAtoms[5]  -- verticesAtoms[26] 
+				verticesBonds.push( verticesAtoms[ ( start * 3 ) + 0 ] );
+				verticesBonds.push( verticesAtoms[ ( start * 3 ) + 1 ] );
+				verticesBonds.push( verticesAtoms[ ( start * 3 ) + 2 ] );
+
+				verticesBonds.push( verticesAtoms[ ( end * 3 ) + 0 ] );
+				verticesBonds.push( verticesAtoms[ ( end * 3 ) + 1 ] );
+				verticesBonds.push( verticesAtoms[ ( end * 3 ) + 2 ] );
 
 			}
 
 			// build geometry
-                         
-			
-			/* BufferAttribute class stores data for an attribute (such as vertex positions, face indices, normals, colors, UVs, and any custom attributes ) 
-			     associated with a BufferGeometry, which allows for more efficient passing of data to the GPU.
-			*/
-			
+
 			geometryAtoms.addAttribute( 'position', new THREE.Float32BufferAttribute( verticesAtoms, 3 ) );
 			geometryAtoms.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsAtoms, 3 ) );
 
@@ -202,23 +143,7 @@ THREE.PDBLoader.prototype = {
 			return build;
 
 		}
-		
-		/*    https://en.wikipedia.org/wiki/CPK_coloring?oldformat=true
-		
-                  CPK coloring is a popular color convention for distinguishing atoms of different chemical elements in molecular models. 
-		  (CPK <== Corey, Pauling, Koltun)
-		     CPK molecular models designed by chemists Robert Corey and Linus Pauling, and improved by Walter Koltun 
-		       Koltun Colors Scheme for Periodic Table: 
-			White for hydrogen
-			Black for carbon
-			Blue for nitrogen
-			Red for oxygen
-			Deep yellow for sulfur
-			Purple for phosphorus
-			Light, medium, medium dark, and dark green for the halogens (F, Cl, Br, I)
-			Silver for metals (Co, Fe, Ni, Cu)
-		     
-		*/
+
 		var CPK = { h: [ 255, 255, 255 ], he: [ 217, 255, 255 ], li: [ 204, 128, 255 ], be: [ 194, 255, 0 ], b: [ 255, 181, 181 ], c: [ 144, 144, 144 ], n: [ 48, 80, 248 ], o: [ 255, 13, 13 ], f: [ 144, 224, 80 ], ne: [ 179, 227, 245 ], na: [ 171, 92, 242 ], mg: [ 138, 255, 0 ], al: [ 191, 166, 166 ], si: [ 240, 200, 160 ], p: [ 255, 128, 0 ], s: [ 255, 255, 48 ], cl: [ 31, 240, 31 ], ar: [ 128, 209, 227 ], k: [ 143, 64, 212 ], ca: [ 61, 255, 0 ], sc: [ 230, 230, 230 ], ti: [ 191, 194, 199 ], v: [ 166, 166, 171 ], cr: [ 138, 153, 199 ], mn: [ 156, 122, 199 ], fe: [ 224, 102, 51 ], co: [ 240, 144, 160 ], ni: [ 80, 208, 80 ], cu: [ 200, 128, 51 ], zn: [ 125, 128, 176 ], ga: [ 194, 143, 143 ], ge: [ 102, 143, 143 ], as: [ 189, 128, 227 ], se: [ 255, 161, 0 ], br: [ 166, 41, 41 ], kr: [ 92, 184, 209 ], rb: [ 112, 46, 176 ], sr: [ 0, 255, 0 ], y: [ 148, 255, 255 ], zr: [ 148, 224, 224 ], nb: [ 115, 194, 201 ], mo: [ 84, 181, 181 ], tc: [ 59, 158, 158 ], ru: [ 36, 143, 143 ], rh: [ 10, 125, 140 ], pd: [ 0, 105, 133 ], ag: [ 192, 192, 192 ], cd: [ 255, 217, 143 ], in: [ 166, 117, 115 ], sn: [ 102, 128, 128 ], sb: [ 158, 99, 181 ], te: [ 212, 122, 0 ], i: [ 148, 0, 148 ], xe: [ 66, 158, 176 ], cs: [ 87, 23, 143 ], ba: [ 0, 201, 0 ], la: [ 112, 212, 255 ], ce: [ 255, 255, 199 ], pr: [ 217, 255, 199 ], nd: [ 199, 255, 199 ], pm: [ 163, 255, 199 ], sm: [ 143, 255, 199 ], eu: [ 97, 255, 199 ], gd: [ 69, 255, 199 ], tb: [ 48, 255, 199 ], dy: [ 31, 255, 199 ], ho: [ 0, 255, 156 ], er: [ 0, 230, 117 ], tm: [ 0, 212, 82 ], yb: [ 0, 191, 56 ], lu: [ 0, 171, 36 ], hf: [ 77, 194, 255 ], ta: [ 77, 166, 255 ], w: [ 33, 148, 214 ], re: [ 38, 125, 171 ], os: [ 38, 102, 150 ], ir: [ 23, 84, 135 ], pt: [ 208, 208, 224 ], au: [ 255, 209, 35 ], hg: [ 184, 184, 208 ], tl: [ 166, 84, 77 ], pb: [ 87, 89, 97 ], bi: [ 158, 79, 181 ], po: [ 171, 92, 0 ], at: [ 117, 79, 69 ], rn: [ 66, 130, 150 ], fr: [ 66, 0, 102 ], ra: [ 0, 125, 0 ], ac: [ 112, 171, 250 ], th: [ 0, 186, 255 ], pa: [ 0, 161, 255 ], u: [ 0, 143, 255 ], np: [ 0, 128, 255 ], pu: [ 0, 107, 255 ], am: [ 84, 92, 242 ], cm: [ 120, 92, 227 ], bk: [ 138, 79, 227 ], cf: [ 161, 54, 212 ], es: [ 179, 31, 212 ], fm: [ 179, 31, 186 ], md: [ 179, 13, 166 ], no: [ 189, 13, 135 ], lr: [ 199, 0, 102 ], rf: [ 204, 0, 89 ], db: [ 209, 0, 79 ], sg: [ 217, 0, 69 ], bh: [ 224, 0, 56 ], hs: [ 230, 0, 46 ], mt: [ 235, 0, 38 ],
 		ds: [ 235, 0, 38 ], rg: [ 235, 0, 38 ], cn: [ 235, 0, 38 ], uut: [ 235, 0, 38 ], uuq: [ 235, 0, 38 ], uup: [ 235, 0, 38 ], uuh: [ 235, 0, 38 ], uus: [ 235, 0, 38 ], uuo: [ 235, 0, 38 ] };
 
@@ -231,63 +156,27 @@ THREE.PDBLoader.prototype = {
 		var x, y, z, e;
 
 		// parse
-                
-		//Decompose text into Array: (an array entry for each line)
+
 		var lines = text.split( '\n' );
 
 		for ( var i = 0, l = lines.length; i < l; i ++ ) {
-                         
-			// extract atom coords from pdb
-			 //Also SDF file Format similar to PDB file format: http://link.fyicenter.com/out.php?ID=571
-			
-			
-			/*  
-			https://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
-				
-			            e                    x       y       z   
-			ATOM      2  C           1      -8.580   0.025  -4.537  1.00  0.00			
-			12345678901234567890123456789012345678901234567890123456789012345678901234567890
-			0**4        Ei)               Xiiiiii)Yiiiiii)Ziiiiii) 
-				                                        
-			 or
-			 
-			 https://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#HETATM
-			 
-								x        y       z 
-			HETATM    1  C01 UNK A   1     -10.447   3.465   0.000  0.00  0.00   0
-			12345678901234567890123456789012345678901234567890123456789012345678901234567890
-			0****6                        Xiiiiii)Yiiiiii)Ziiiiii)     
-			
-			*/
-			
-			if ( lines[ i ].substr( 0, 4 ) === 'ATOM' || lines[ i ].substr( 0, 6 ) === 'HETATM' ) {				
-				
-				//extract x,y,z coord for each atom from pdb file extracted lines
-				//extract values from locations for each coord
+
+			if ( lines[ i ].substr( 0, 4 ) === 'ATOM' || lines[ i ].substr( 0, 6 ) === 'HETATM' ) {
+
 				x = parseFloat( lines[ i ].substr( 30, 7 ) );
 				y = parseFloat( lines[ i ].substr( 38, 7 ) );
 				z = parseFloat( lines[ i ].substr( 46, 7 ) );
 
-				//If long line extract Chemistry Element from near the end of line
 				e = trim( lines[ i ].substr( 76, 2 ) ).toLowerCase();
-                                
-				//If not a long line extract the Chemistry from near the beginning of line  
+
 				if ( e === '' ) {
-					//extract first 2 characters of Chemical Element Name
-					/*
-					             e                     
-				ATOM      2  C           1      -8.580   0.025  -4.537  1.00  0.00
-				1234567890123567890123567890123567890123567890123567890123567890123567890
-				0**4       E   i)            
-					*/
+
 					e = trim( lines[ i ].substr( 12, 2 ) ).toLowerCase();
 
 				}
-                                
-				//add atoms to atoms array
+
 				atoms.push( [ x, y, z, CPK[ e ], capitalize( e ) ] );
-                                
-				//create histogram
+
 				if ( histogram[ e ] === undefined ) {
 
 					histogram[ e ] = 1;
@@ -299,25 +188,7 @@ THREE.PDBLoader.prototype = {
 				}
 
 			} else if ( lines[ i ].substr( 0, 6 ) === 'CONECT' ) {
-				/*
-				https://www.wwpdb.org/documentation/file-format-content/format33/sect10.html#CONECT
-				
-				The CONECT records specify connectivity between atoms for which coordinates are supplied.
-				
-				CONECT    1    2
-				12345678901234567890123456789001234567890
-	                              Siiii)
-				           Piiii)
-					        Piiii)
-						     Piiii)
-						          Piiii)
-	 			CONECT    2    1    9   49
-				CONECT    3    4
-				
-				*/
-				
-                                //Extract Bonds per line
-				//Get the 1st atom_serial_num per line & convert String Representation to Int
+
 				var satom = parseInt( lines[ i ].substr( 6, 5 ) );
 
 				parseBond( 11, 5 );
