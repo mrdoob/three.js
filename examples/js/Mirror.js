@@ -122,6 +122,11 @@ THREE.Mirror = function ( width, height, options ) {
 		normal.applyMatrix4( rotationMatrix );
 
 		view.subVectors( mirrorWorldPosition, cameraWorldPosition );
+
+		// Avoid rendering when mirror is facing away
+
+		if ( view.dot( normal ) > 0 ) return;
+
 		view.reflect( normal ).negate();
 		view.add( mirrorWorldPosition );
 
