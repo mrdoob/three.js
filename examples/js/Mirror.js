@@ -109,7 +109,7 @@ THREE.Mirror = function ( width, height, options ) {
 
 	scope.material = material;
 
-	function updateTextureMatrix( camera ) {
+	scope.onBeforeRender = function ( renderer, scene, camera ) {
 
 		scope.updateMatrixWorld();
 
@@ -181,11 +181,7 @@ THREE.Mirror = function ( width, height, options ) {
 		projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
 		projectionMatrix.elements[ 14 ] = clipPlane.w;
 
-	}
-
-	scope.onBeforeRender = function ( renderer, scene, camera ) {
-
-		updateTextureMatrix( camera );
+		// Render
 
 		scope.visible = false;
 
