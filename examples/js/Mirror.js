@@ -109,6 +109,22 @@ THREE.Mirror = function ( width, height, options ) {
 
 	scope.material = material;
 
+	scope.isVisible = function ( camera ) {
+
+		mirrorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
+		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
+
+		rotationMatrix.extractRotation( scope.matrixWorld );
+
+		normal.set( 0, 0, 1 );
+		normal.applyMatrix4( rotationMatrix );
+
+		view.subVectors( mirrorWorldPosition, cameraWorldPosition );
+
+		return view.dot( normal ) < 0;
+
+	};
+
 	scope.onBeforeRender = function ( renderer, scene, camera ) {
 
 		mirrorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
