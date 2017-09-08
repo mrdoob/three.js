@@ -1228,7 +1228,7 @@ function WebGLRenderer( parameters ) {
 
 	function projectObject( object, camera, sortObjects ) {
 
-		if ( ! object.visible ) return;
+		if ( ! object.isVisible( camera ) ) return;
 
 		var visible = object.layers.test( camera.layers );
 

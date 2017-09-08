@@ -500,6 +500,12 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	}(),
 
+	isVisible: function ( camera ) {
+
+		return this.visible;
+
+	},
+
 	raycast: function () {},
 
 	traverse: function ( callback ) {
