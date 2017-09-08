@@ -111,8 +111,6 @@ THREE.Mirror = function ( width, height, options ) {
 
 	scope.onBeforeRender = function ( renderer, scene, camera ) {
 
-		scope.updateMatrixWorld();
-
 		mirrorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
 
