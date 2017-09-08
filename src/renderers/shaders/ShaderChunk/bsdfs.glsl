@@ -49,7 +49,7 @@ vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
 // alpha is "roughness squared" in Disney’s reparameterization
 float G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {
 
-	// geometry term = 4(n⋅l)(n⋅v) / G(l)⋅G(v)
+	// geometry term = G(l)⋅G(v)
 
 	float a2 = pow2( alpha );
 
