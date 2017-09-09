@@ -34,7 +34,7 @@ var  camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerH
 
 var controls = new THREE.OrbitControls( camera );
 
-//controls.update() must be called after any manual changes to the camera transform
+//controls.update() must be called after any manual changes to the camera's transform
 camera.position.set( 0, 20, 100 );
 controls.update();
 
@@ -57,7 +57,7 @@ function animate() {
       [page:Camera object]: ( required ) The camera to be controlled.<br><br>
 
       [page:HTMLDOMElement domElement]: (optional) The HTML element used for event listeners. By default this is the whole document,
-      however if you only want to the controls to over a specific element (e.g. the canvas) you can specify that here.
+      however if you only want to the controls to work over a specific element (e.g. the canvas) you can specify that here.
 		</div>
 
 
@@ -65,7 +65,7 @@ function animate() {
 
     <h3>[property:HTMLDOMElement domElement]</h3>
     <div>
-      The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constuctor; changing it here will
+      The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
       not set up new event listeners. Default is the whole document.
     </div>
 
@@ -136,12 +136,13 @@ function animate() {
     <div>
       Set to true to enable damping (inertia), which can be used to give a sense of weight to the controls.
       Default is false.<br>
-      Note that if this is enabled, you must call controls.update() in your animation loop.
+      Note that if this is enabled, you must call [page:.update] () in your animation loop.
     </div>
 
     <h3>[property:Float dampingFactor]</h3>
     <div>
-      The damping "weight", if [property:Boolean enableDamping] is set to true.
+      The damping inertia used if [property:Boolean enableDamping] is set to true.<br>
+      Note that for this to work, you must call [page:.update] () in your animation loop.
     </div>
 
     <h3>[property:Boolean enableZoom]</h3>
@@ -158,7 +159,8 @@ function animate() {
     <div>
       Enable or disable horizontal and vertical rotation of the camera. Default is true.<br>
       Note that it is possible to disable a single axis by setting the min and max of the
-      [page:.minPolarAngle polar angle] or [page:.minAzimuthAngle azimuth angle] accordingly.
+      [page:.minPolarAngle polar angle] or [page:.minAzimuthAngle azimuth angle] to the same value,
+      which will cause the vertical or horizontal rotation to be fixed at that value.
     </div>
 
     <h3>[property:Float rotateSpeed]</h3>
@@ -195,7 +197,7 @@ function animate() {
 
     <h3>[property:Object keys]</h3>
     <div>
-      This object contains references to the keycodes for controlling camera panning:
+      This object contains references to the keycodes for controlling camera panning.
       Default is the 4 arrow keys.
        <code>
 controls.keys = {
