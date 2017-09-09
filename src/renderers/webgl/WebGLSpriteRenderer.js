@@ -51,10 +51,10 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 		};
 
 		uniforms = {
-			uvOffset:	gl.getUniformLocation( program, 'uvOffset' ),
+			uvOffset: gl.getUniformLocation( program, 'uvOffset' ),
 			uvScale: gl.getUniformLocation( program, 'uvScale' ),
 
-			rotation:	gl.getUniformLocation( program, 'rotation' ),
+			rotation: gl.getUniformLocation( program, 'rotation' ),
 			scale: gl.getUniformLocation( program, 'scale' ),
 
 			color: gl.getUniformLocation( program, 'color' ),
@@ -62,10 +62,10 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			opacity: gl.getUniformLocation( program, 'opacity' ),
 
 			modelViewMatrix: gl.getUniformLocation( program, 'modelViewMatrix' ),
-			projectionMatrix:	gl.getUniformLocation( program, 'projectionMatrix' ),
+			projectionMatrix: gl.getUniformLocation( program, 'projectionMatrix' ),
 
 			fogType: gl.getUniformLocation( program, 'fogType' ),
-			fogDensity:	gl.getUniformLocation( program, 'fogDensity' ),
+			fogDensity: gl.getUniformLocation( program, 'fogDensity' ),
 			fogNear: gl.getUniformLocation( program, 'fogNear' ),
 			fogFar: gl.getUniformLocation( program, 'fogFar' ),
 			fogColor: gl.getUniformLocation( program, 'fogColor' ),
