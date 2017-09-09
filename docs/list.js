@@ -333,6 +333,10 @@ var list = {
 
 	"Examples": {
 
+		"Controls": {
+			"OrbitControls": "examples/controls/OrbitControls"
+		},
+
 		"Geometries": {
 			"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
 			"ConvexGeometry": "examples/geometries/ConvexGeometry",
@@ -396,4 +400,4 @@ var list = {
 
 	}
 
-}
+};
