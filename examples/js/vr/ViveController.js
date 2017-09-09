@@ -23,7 +23,7 @@ THREE.ViveController = function ( id ) {
 
 		var gamepads = navigator.getGamepads && navigator.getGamepads();
 
-		for ( var i = 0, j = 0; i < 4; i ++ ) {
+		for ( var i = 0, j = 0; i < gamepads.length; i ++ ) {
 
 			var gamepad = gamepads[ i ];
 
