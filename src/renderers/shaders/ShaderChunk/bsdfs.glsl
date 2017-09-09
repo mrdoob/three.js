@@ -61,8 +61,8 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 
 } // validated
 
-// Moving Frostbite to Physically Based Rendering 2.0 - page 12, listing 2
-// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
+// Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
+// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
 
 	float a2 = pow2( alpha );
@@ -72,6 +72,7 @@ float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const i
 	float gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
 
 	return 0.5 / max( gv + gl, EPSILON );
+
 }
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
