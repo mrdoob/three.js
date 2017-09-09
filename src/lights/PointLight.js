@@ -15,15 +15,18 @@ function PointLight( color, intensity, distance, decay ) {
 
 	Object.defineProperty( this, 'power', {
 		get: function () {
+
 			// intensity = power per solid angle.
 			// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
 			return this.intensity * 4 * Math.PI;
 
 		},
 		set: function ( power ) {
+
 			// intensity = power per solid angle.
 			// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
 			this.intensity = power / ( 4 * Math.PI );
+
 		}
 	} );
 

@@ -193,16 +193,40 @@ Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
 		this.stats = {
 
 			actions: {
-				get total() { return scope._actions.length; },
-				get inUse() { return scope._nActiveActions; }
+				get total() {
+
+					return scope._actions.length;
+
+				},
+				get inUse() {
+
+					return scope._nActiveActions;
+
+				}
 			},
 			bindings: {
-				get total() { return scope._bindings.length; },
-				get inUse() { return scope._nActiveBindings; }
+				get total() {
+
+					return scope._bindings.length;
+
+				},
+				get inUse() {
+
+					return scope._nActiveBindings;
+
+				}
 			},
 			controlInterpolants: {
-				get total() { return scope._controlInterpolants.length; },
-				get inUse() { return scope._nActiveControlInterpolants; }
+				get total() {
+
+					return scope._controlInterpolants.length;
+
+				},
+				get inUse() {
+
+					return scope._nActiveControlInterpolants;
+
+				}
 			}
 
 		};

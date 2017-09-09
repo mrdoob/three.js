@@ -64,7 +64,6 @@ Object.assign( FileLoader.prototype, {
 					case 'arraybuffer':
 					case 'blob':
 
-					 
 						var view = new Uint8Array( data.length );
 
 						for ( var i = 0; i < data.length; i ++ ) {
@@ -78,9 +77,10 @@ Object.assign( FileLoader.prototype, {
 							response = new Blob( [ view.buffer ], { type: mimeType } );
 
 						} else {
-						   
-							response = view.buffer;	
-						}	
+
+							response = view.buffer;
+
+						}
 
 						break;
 

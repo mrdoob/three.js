@@ -84,9 +84,9 @@ Object.assign( AnimationClip, {
 			var values = [];
 
 			times.push(
-					( i + numMorphTargets - 1 ) % numMorphTargets,
-					i,
-					( i + 1 ) % numMorphTargets );
+				( i + numMorphTargets - 1 ) % numMorphTargets,
+				i,
+				( i + 1 ) % numMorphTargets );
 
 			values.push( 0, 1, 0 );
 
@@ -104,10 +104,10 @@ Object.assign( AnimationClip, {
 			}
 
 			tracks.push(
-					new NumberKeyframeTrack(
-						'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
-						times, values
-					).scale( 1.0 / fps ) );
+				new NumberKeyframeTrack(
+					'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
+					times, values
+				).scale( 1.0 / fps ) );
 
 		}
 
@@ -281,16 +281,16 @@ Object.assign( AnimationClip, {
 				var boneName = '.bones[' + bones[ h ].name + ']';
 
 				addNonemptyTrack(
-						VectorKeyframeTrack, boneName + '.position',
-						animationKeys, 'pos', tracks );
+					VectorKeyframeTrack, boneName + '.position',
+					animationKeys, 'pos', tracks );
 
 				addNonemptyTrack(
-						QuaternionKeyframeTrack, boneName + '.quaternion',
-						animationKeys, 'rot', tracks );
+					QuaternionKeyframeTrack, boneName + '.quaternion',
+					animationKeys, 'rot', tracks );
 
 				addNonemptyTrack(
-						VectorKeyframeTrack, boneName + '.scale',
-						animationKeys, 'scl', tracks );
+					VectorKeyframeTrack, boneName + '.scale',
+					animationKeys, 'scl', tracks );
 
 			}
 

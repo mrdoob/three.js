@@ -479,6 +479,7 @@ Object.assign( AnimationAction.prototype, {
 		if ( loop === LoopOnce ) {
 
 			if ( loopCount === - 1 ) {
+
 				// just started
 
 				this._loopCount = 0;
@@ -513,6 +514,7 @@ Object.assign( AnimationAction.prototype, {
 			var pingPong = ( loop === LoopPingPong );
 
 			if ( loopCount === - 1 ) {
+
 				// just started
 
 				if ( deltaTime >= 0 ) {
@@ -534,6 +536,7 @@ Object.assign( AnimationAction.prototype, {
 			}
 
 			if ( time >= duration || time < 0 ) {
+
 				// wrap around
 
 				var loopDelta = Math.floor( time / duration ); // signed
@@ -544,6 +547,7 @@ Object.assign( AnimationAction.prototype, {
 				var pending = this.repetitions - loopCount;
 
 				if ( pending < 0 ) {
+
 					// have to stop (switch state, clamp time, fire event)
 
 					if ( this.clampWhenFinished ) this.paused = true;
@@ -553,13 +557,15 @@ Object.assign( AnimationAction.prototype, {
 
 					this._mixer.dispatchEvent( {
 						type: 'finished', action: this,
-						direction: deltaTime > 0 ? 1 : -1
+						direction: deltaTime > 0 ? 1 : - 1
 					} );
 
 				} else {
+
 					// keep running
 
 					if ( pending === 0 ) {
+
 						// entering the last round
 
 						var atStart = deltaTime < 0;
@@ -582,6 +588,7 @@ Object.assign( AnimationAction.prototype, {
 			}
 
 			if ( pingPong && ( loopCount & 1 ) === 1 ) {
+
 				// invert time for the "pong round"
 
 				this.time = time;

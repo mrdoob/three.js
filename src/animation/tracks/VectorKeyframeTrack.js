@@ -17,8 +17,7 @@ function VectorKeyframeTrack( name, times, values, interpolation ) {
 
 }
 
-VectorKeyframeTrack.prototype =
-		Object.assign( Object.create( KeyframeTrackPrototype ), {
+VectorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
 
 	constructor: VectorKeyframeTrack,
 

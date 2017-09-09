@@ -25,8 +25,10 @@ function Raycaster( origin, direction, near, far ) {
 	Object.defineProperties( this.params, {
 		PointCloud: {
 			get: function () {
+
 				console.warn( 'THREE.Raycaster: params.PointCloud has been renamed to params.Points.' );
 				return this.Points;
+
 			}
 		}
 	} );

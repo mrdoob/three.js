@@ -93,8 +93,8 @@ Object.assign( Font.prototype, {
 
 						case 'q': // quadraticCurveTo
 
-							cpx  = outline[ i ++ ] * scale + offsetX;
-							cpy  = outline[ i ++ ] * scale + offsetY;
+							cpx = outline[ i ++ ] * scale + offsetX;
+							cpy = outline[ i ++ ] * scale + offsetY;
 							cpx1 = outline[ i ++ ] * scale + offsetX;
 							cpy1 = outline[ i ++ ] * scale + offsetY;
 
@@ -121,8 +121,8 @@ Object.assign( Font.prototype, {
 
 						case 'b': // bezierCurveTo
 
-							cpx  = outline[ i ++ ] * scale + offsetX;
-							cpy  = outline[ i ++ ] * scale + offsetY;
+							cpx = outline[ i ++ ] * scale + offsetX;
+							cpy = outline[ i ++ ] * scale + offsetY;
 							cpx1 = outline[ i ++ ] * scale + offsetX;
 							cpy1 = outline[ i ++ ] * scale + offsetY;
 							cpx2 = outline[ i ++ ] * scale + offsetX;

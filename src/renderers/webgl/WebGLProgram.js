@@ -112,7 +112,7 @@ function generateDefines( defines ) {
 
 }
 
-function fetchAttributeLocations( gl, program, identifiers ) {
+function fetchAttributeLocations( gl, program ) {
 
 	var attributes = {};
 
@@ -123,7 +123,7 @@ function fetchAttributeLocations( gl, program, identifiers ) {
 		var info = gl.getActiveAttrib( program, i );
 		var name = info.name;
 
-		// console.log("THREE.WebGLProgram: ACTIVE VERTEX ATTRIBUTE:", name, i );
+		// console.log( 'THREE.WebGLProgram: ACTIVE VERTEX ATTRIBUTE:', name, i );
 
 		attributes[ name ] = gl.getAttribLocation( program, name );
 
@@ -473,7 +473,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			'uniform vec3 cameraPosition;',
 
 			( parameters.toneMapping !== NoToneMapping ) ? "#define TONE_MAPPING" : '',
-			( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '',  // this code is required here because it is used by the toneMapping() function defined below
+			( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '', // this code is required here because it is used by the toneMapping() function defined below
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
 
 			parameters.dithering ? '#define DITHERING' : '',
