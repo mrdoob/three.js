@@ -10746,12 +10746,6 @@
 
 		}(),
 
-		isVisible: function ( camera ) {
-
-			return this.visible;
-
-		},
-
 		raycast: function () {},
 
 		traverse: function ( callback ) {
@@ -22200,7 +22194,7 @@
 
 		function projectObject( object, camera, sortObjects ) {
 
-			if ( ! object.isVisible( camera ) ) return;
+			if ( object.visible === false ) return;
 
 			var visible = object.layers.test( camera.layers );
 
