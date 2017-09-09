@@ -150,7 +150,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 			var v = j / radialSegments * Math.PI * 2;
 
-			var sin =   Math.sin( v );
+			var sin = Math.sin( v );
 			var cos = - Math.cos( v );
 
 			// normal

@@ -565,7 +565,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 	function buildLidFaces() {
 
-		var start = verticesArray.length/3;
+		var start = verticesArray.length / 3;
 
 		if ( bevelEnabled ) {
 
@@ -615,7 +615,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-		scope.addGroup( start, verticesArray.length/3 -start, options.material !== undefined ? options.material : 0);
+		scope.addGroup( start, verticesArray.length / 3 - start, options.material !== undefined ? options.material : 0 );
 
 	}
 
@@ -623,7 +623,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 	function buildSideFaces() {
 
-		var start = verticesArray.length/3;
+		var start = verticesArray.length / 3;
 		var layeroffset = 0;
 		sidewalls( contour, layeroffset );
 		layeroffset += contour.length;
@@ -639,7 +639,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 		}
 
 
-		scope.addGroup( start, verticesArray.length/3 -start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1);
+		scope.addGroup( start, verticesArray.length / 3 - start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1 );
 
 
 	}

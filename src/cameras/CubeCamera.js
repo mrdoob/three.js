@@ -102,7 +102,7 @@ function CubeCamera( near, far, cubeResolution ) {
 
 		renderer.setRenderTarget( null );
 
-	}
+	};
 
 }
 

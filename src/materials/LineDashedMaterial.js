@@ -14,7 +14,6 @@
  */
 
 import { LineBasicMaterial } from './LineBasicMaterial.js';
-import { Color } from '../math/Color.js';
 
 function LineDashedMaterial( parameters ) {
 

@@ -443,16 +443,16 @@ Object.assign( Matrix3.prototype, {
 	},
 	multiplyVector3Array: function ( a ) {
 
-		console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.'  );
+		console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.' );
 
 	},
-	applyToBuffer: function( buffer, offset, length ) {
+	applyToBuffer: function ( buffer, offset, length ) {
 
 		console.warn( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 		return this.applyToBufferAttribute( buffer );
 
 	},
-	applyToVector3Array: function( array, offset, length ) {
+	applyToVector3Array: function ( array, offset, length ) {
 
 		console.error( 'THREE.Matrix3: .applyToVector3Array() has been removed.' );
 
@@ -512,7 +512,7 @@ Object.assign( Matrix4.prototype, {
 	},
 	multiplyVector3Array: function ( a ) {
 
-		console.error( 'THREE.Matrix4: .multiplyVector3Array() has been removed.'  );
+		console.error( 'THREE.Matrix4: .multiplyVector3Array() has been removed.' );
 
 	},
 	rotateAxis: function ( v ) {
@@ -552,18 +552,18 @@ Object.assign( Matrix4.prototype, {
 		console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 
 	},
-	applyToBuffer: function( buffer, offset, length ) {
+	applyToBuffer: function ( buffer, offset, length ) {
 
 		console.warn( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 		return this.applyToBufferAttribute( buffer );
 
 	},
-	applyToVector3Array: function( array, offset, length ) {
+	applyToVector3Array: function ( array, offset, length ) {
 
 		console.error( 'THREE.Matrix4: .applyToVector3Array() has been removed.' );
 
 	},
-	makeFrustum: function( left, right, bottom, top, near, far ) {
+	makeFrustum: function ( left, right, bottom, top, near, far ) {
 
 		console.warn( 'THREE.Matrix4: .makeFrustum() has been removed. Use .makePerspective( left, right, top, bottom, near, far ) instead.' );
 		return this.makePerspective( left, right, top, bottom, near, far );

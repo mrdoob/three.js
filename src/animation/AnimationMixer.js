@@ -77,7 +77,7 @@ Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
 				}
 
 				var path = prototypeAction && prototypeAction.
-						_propertyBindings[ i ].binding.parsedPath;
+					_propertyBindings[ i ].binding.parsedPath;
 
 				binding = new PropertyMixer(
 					PropertyBinding.create( root, trackName, path ),

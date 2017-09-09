@@ -91,7 +91,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	getEffectiveFOV: function () {
 
 		return _Math.RAD2DEG * 2 * Math.atan(
-				Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
+			Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
 
 	},
 
@@ -172,7 +172,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 		var near = this.near,
 			top = near * Math.tan(
-					_Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+				_Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
 			height = 2 * top,
 			width = this.aspect * height,
 			left = - 0.5 * width,

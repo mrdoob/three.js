@@ -4,7 +4,6 @@
 
 import { BackSide } from '../../constants.js';
 import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
-import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { BoxBufferGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneBufferGeometry } from '../../geometries/PlaneGeometry.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';

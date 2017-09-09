@@ -297,9 +297,9 @@ Object.assign( Vector3.prototype, {
 
 		// calculate quat * vector
 
-		var ix =  qw * x + qy * z - qz * y;
-		var iy =  qw * y + qz * x - qx * z;
-		var iz =  qw * z + qx * y - qy * x;
+		var ix = qw * x + qy * z - qz * y;
+		var iy = qw * y + qz * x - qx * z;
+		var iz = qw * z + qx * y - qy * x;
 		var iw = - qx * x - qy * y - qz * z;
 
 		// calculate result * inverse quat

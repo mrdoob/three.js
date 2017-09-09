@@ -22,7 +22,7 @@ import { ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
 
 // TextGeometry
 
-function TextGeometry(  text, parameters ) {
+function TextGeometry( text, parameters ) {
 
 	Geometry.call( this );
 

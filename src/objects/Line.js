@@ -67,7 +67,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			var vEnd = new Vector3();
 			var interSegment = new Vector3();
 			var interRay = new Vector3();
-			var step = (this && this.isLineSegments) ? 2 : 1;
+			var step = ( this && this.isLineSegments ) ? 2 : 1;
 
 			if ( geometry.isBufferGeometry ) {
 

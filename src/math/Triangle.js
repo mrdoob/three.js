@@ -208,7 +208,7 @@ Object.assign( Triangle.prototype, {
 
 			// check if the projection lies within the triangle
 
-			if( this.containsPoint( projectedPoint ) === true ) {
+			if ( this.containsPoint( projectedPoint ) === true ) {
 
 				// if so, this is the closest point
 
@@ -222,13 +222,13 @@ Object.assign( Triangle.prototype, {
 				edgeList[ 1 ].set( this.b, this.c );
 				edgeList[ 2 ].set( this.c, this.a );
 
-				for( var i = 0; i < edgeList.length; i ++ ) {
+				for ( var i = 0; i < edgeList.length; i ++ ) {
 
 					edgeList[ i ].closestPointToPoint( projectedPoint, true, closestPoint );
 
 					var distance = projectedPoint.distanceToSquared( closestPoint );
 
-					if( distance < minDistance ) {
+					if ( distance < minDistance ) {
 
 						minDistance = distance;
 

@@ -209,7 +209,7 @@ function WebVRManager( renderer ) {
 
 	};
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
 

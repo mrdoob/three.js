@@ -454,8 +454,8 @@ function parseUniform( activeInfo, addr, container ) {
 			// bare name or "pure" bottom-level array "[0]" suffix
 
 			addUniform( container, subscript === undefined ?
-					new SingleUniform( id, activeInfo, addr ) :
-					new PureArrayUniform( id, activeInfo, addr ) );
+				new SingleUniform( id, activeInfo, addr ) :
+				new PureArrayUniform( id, activeInfo, addr ) );
 
 			break;
 

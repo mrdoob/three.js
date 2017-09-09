@@ -26,7 +26,7 @@ function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer
 	this._cachedIndex = 0;
 
 	this.resultBuffer = resultBuffer !== undefined ?
-			resultBuffer : new sampleValues.constructor( sampleSize );
+		resultBuffer : new sampleValues.constructor( sampleSize );
 	this.sampleValues = sampleValues;
 	this.valueSize = sampleSize;
 
@@ -34,12 +34,12 @@ function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer
 
 Object.assign( Interpolant.prototype, {
 
-	evaluate: function( t ) {
+	evaluate: function ( t ) {
 
 		var pp = this.parameterPositions,
 			i1 = this._cachedIndex,
 
-			t1 = pp[   i1   ],
+			t1 = pp[ i1 ],
 			t0 = pp[ i1 - 1 ];
 
 		validate_interval: {
@@ -162,7 +162,7 @@ Object.assign( Interpolant.prototype, {
 
 				}
 
-				t1 = pp[   i1   ];
+				t1 = pp[ i1 ];
 				t0 = pp[ i1 - 1 ];
 
 				// check boundary cases, again
@@ -201,13 +201,13 @@ Object.assign( Interpolant.prototype, {
 
 	DefaultSettings_: {},
 
-	getSettings_: function() {
+	getSettings_: function () {
 
 		return this.settings || this.DefaultSettings_;
 
 	},
 
-	copySampleValue_: function( index ) {
+	copySampleValue_: function ( index ) {
 
 		// copies a sample value to the result buffer
 
@@ -228,14 +228,14 @@ Object.assign( Interpolant.prototype, {
 
 	// Template methods for derived classes:
 
-	interpolate_: function( i1, t0, t, t1 ) {
+	interpolate_: function ( i1, t0, t, t1 ) {
 
 		throw new Error( "call to abstract method" );
 		// implementations shall return this.resultBuffer
 
 	},
 
-	intervalChanged_: function( i1, t0, t1 ) {
+	intervalChanged_: function ( i1, t0, t1 ) {
 
 		// empty
 

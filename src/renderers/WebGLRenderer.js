@@ -1,4 +1,4 @@
-import { REVISION, RGBAFormat, HalfFloatType, FloatType, ByteType, UnsignedByteType, FrontFaceDirectionCW, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, LinearToneMapping } from '../constants.js';
+import { REVISION, RGBAFormat, HalfFloatType, FloatType, UnsignedByteType, FrontFaceDirectionCW, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, LinearToneMapping } from '../constants.js';
 import { _Math } from '../math/Math.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { DataTexture } from '../textures/DataTexture.js';
@@ -1991,10 +1991,10 @@ function WebGLRenderer( parameters ) {
 
 			if ( uvScaleMap.matrixAutoUpdate === true ) {
 
-			    var offset = uvScaleMap.offset;
-			    var repeat = uvScaleMap.repeat;
-			    var rotation = uvScaleMap.rotation;
-			    uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
+				var offset = uvScaleMap.offset;
+				var repeat = uvScaleMap.repeat;
+				var rotation = uvScaleMap.rotation;
+				uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
 
 			}
 
@@ -2032,10 +2032,10 @@ function WebGLRenderer( parameters ) {
 
 			if ( material.map.matrixAutoUpdate === true ) {
 
-			    var offset = material.map.offset;
-			    var repeat = material.map.repeat;
-			    var rotation = material.map.rotation;
-			    material.map.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
+				var offset = material.map.offset;
+				var repeat = material.map.repeat;
+				var rotation = material.map.rotation;
+				material.map.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
 
 			}
 
