@@ -65,8 +65,8 @@
 
 			function initSky() {
 
-				// Add Sky Mesh
-				sky = new THREE.Sky();
+				// Add Sky Mesh of radius 450000
+				sky = new THREE.Sky( 450000 );
 				scene.add( sky.mesh );
 
 				// Add Sun Helper
