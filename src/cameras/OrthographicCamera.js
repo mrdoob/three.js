@@ -51,7 +51,7 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	},
 
-	setViewOffset: function( fullWidth, fullHeight, x, y, width, height ) {
+	setViewOffset: function ( fullWidth, fullHeight, x, y, width, height ) {
 
 		this.view = {
 			fullWidth: fullWidth,
@@ -66,7 +66,7 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	},
 
-	clearViewOffset: function() {
+	clearViewOffset: function () {
 
 		this.view = null;
 		this.updateProjectionMatrix();

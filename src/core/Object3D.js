@@ -92,6 +92,7 @@ function Object3D() {
 	this.renderOrder = 0;
 
 	this.userData = {};
+
 }
 
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );

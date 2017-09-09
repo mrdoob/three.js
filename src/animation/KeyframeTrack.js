@@ -34,9 +34,9 @@ Object.assign( KeyframeTrack, {
 	// Serialization (in static context, because of constructor invocation
 	// and automatic invocation of .toJSON):
 
-	parse: function( json ) {
+	parse: function ( json ) {
 
-		if( json.type === undefined ) {
+		if ( json.type === undefined ) {
 
 			throw new Error( "track type undefined, can not parse" );
 
@@ -63,14 +63,13 @@ Object.assign( KeyframeTrack, {
 		} else {
 
 			// by default, we assume a constructor compatible with the base
-			return new trackType(
-					json.name, json.times, json.values, json.interpolation );
+			return new trackType( json.name, json.times, json.values, json.interpolation );
 
 		}
 
 	},
 
-	toJSON: function( track ) {
+	toJSON: function ( track ) {
 
 		var trackType = track.constructor;
 
@@ -108,9 +107,9 @@ Object.assign( KeyframeTrack, {
 
 	},
 
-	_getTrackTypeForValueTypeName: function( typeName ) {
+	_getTrackTypeForValueTypeName: function ( typeName ) {
 
-		switch( typeName.toLowerCase() ) {
+		switch ( typeName.toLowerCase() ) {
 
 			case "scalar":
 			case "double":

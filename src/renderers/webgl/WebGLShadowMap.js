@@ -5,9 +5,6 @@
 
 import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, PCFShadowMap, RGBADepthPacking } from '../../constants.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
-import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
-import { UniformsUtils } from '../shaders/UniformsUtils.js';
-import { ShaderLib } from '../shaders/ShaderLib.js';
 import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
 import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial.js';
 import { Vector4 } from '../../math/Vector4.js';

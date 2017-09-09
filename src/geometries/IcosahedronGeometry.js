@@ -10,7 +10,7 @@ import { PolyhedronBufferGeometry } from './PolyhedronGeometry.js';
 
 function IcosahedronGeometry( radius, detail ) {
 
- 	Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'IcosahedronGeometry';
 

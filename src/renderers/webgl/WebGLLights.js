@@ -322,7 +322,7 @@ function WebGLLights() {
 	return {
 		setup: setup,
 		state: state
-	}
+	};
 
 }
 
