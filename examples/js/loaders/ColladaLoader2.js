@@ -2165,7 +2165,7 @@ THREE.ColladaLoader.prototype = {
 
 			var data = {
 				name: xml.getAttribute( 'name' ) || '',
-				joints: [],
+				joints: {},
 				links: []
 			};
 
@@ -2453,8 +2453,7 @@ THREE.ColladaLoader.prototype = {
 						var param = child.getElementsByTagName( 'param' )[ 0 ];
 						data.axis = param.textContent;
 						var tmpJointIndex = data.axis.split( 'inst_' ).pop().split( 'axis' )[ 0 ];
-						tmpJointIndex = tmpJointIndex.substr(0, tmpJointIndex.length - 1);
-						data.jointIndex = tmpJointIndex;
+						data.jointIndex = tmpJointIndex.substr( 0, tmpJointIndex.length - 1 );
 						break;
 
 				}
