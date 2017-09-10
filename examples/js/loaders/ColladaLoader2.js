@@ -2176,7 +2176,7 @@ THREE.ColladaLoader.prototype = {
 
 			var data = {
 				name: xml.getAttribute( 'name' ) || '',
-				joints: [],
+				joints: {},
 				links: []
 			};
 
@@ -2225,7 +2225,7 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'joint':
-						data.joints.push( parseKinematicsJoint( child ) );
+						data.joints[ child.getAttribute( 'sid' ) ] = parseKinematicsJoint( child );
 						break;
 
 					case 'link':
@@ -2463,7 +2463,8 @@ THREE.ColladaLoader.prototype = {
 					case 'axis':
 						var param = child.getElementsByTagName( 'param' )[ 0 ];
 						data.axis = param.textContent;
-						data.jointIndex = parseInt( data.axis.split( 'joint' ).pop().split( '.' )[ 0 ] );
+						var tmpJointIndex = data.axis.split( 'inst_' ).pop().split( 'axis' )[ 0 ];
+						data.jointIndex = tmpJointIndex.substr( 0, tmpJointIndex.length - 1 );
 						break;
 
 				}
@@ -2602,7 +2603,7 @@ THREE.ColladaLoader.prototype = {
 
 								// if there is a connection of the transform node with a joint, apply the joint value
 
-								if ( transform.sid && transform.sid.indexOf( 'joint' + jointIndex ) !== -1 ) {
+								if ( transform.sid && transform.sid.indexOf( jointIndex ) !== -1 ) {
 
 									switch ( joint.type ) {
 
