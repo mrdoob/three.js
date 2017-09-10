@@ -457,7 +457,7 @@ Object.assign( ObjectLoader.prototype, {
 
 		function parseConstant( value, type ) {
 
-			if ( typeof( value ) === 'number' ) return value;
+			if ( typeof value === 'number' ) return value;
 
 			console.warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
 
@@ -769,7 +769,7 @@ Object.assign( ObjectLoader.prototype, {
 
 				var children = data.children;
 
-				for ( var  i = 0; i < children.length; i ++ ) {
+				for ( var i = 0; i < children.length; i ++ ) {
 
 					object.add( this.parseObject( children[ i ], geometries, materials ) );
 

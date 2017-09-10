@@ -88,7 +88,7 @@ Object.assign( CompressedTextureLoader.prototype, {
 
 					for ( var f = 0; f < faces; f ++ ) {
 
-						images[ f ] = { mipmaps : [] };
+						images[ f ] = { mipmaps: [] };
 
 						for ( var i = 0; i < texDatas.mipmapCount; i ++ ) {
 

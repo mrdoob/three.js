@@ -18,8 +18,7 @@ function StringKeyframeTrack( name, times, values, interpolation ) {
 
 }
 
-StringKeyframeTrack.prototype =
-		Object.assign( Object.create( KeyframeTrackPrototype ), {
+StringKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
 
 	constructor: StringKeyframeTrack,
 

@@ -23,10 +23,10 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 	function init() {
 
 		var vertices = new Float32Array( [
-			- 0.5, - 0.5,  0, 0,
-			  0.5, - 0.5,  1, 0,
-			  0.5,   0.5,  1, 1,
-			- 0.5,   0.5,  0, 1
+			- 0.5, - 0.5, 0, 0,
+			  0.5, - 0.5, 1, 0,
+			  0.5, 0.5, 1, 1,
+			- 0.5, 0.5, 0, 1
 		] );
 
 		var faces = new Uint16Array( [
@@ -34,7 +34,7 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			0, 2, 3
 		] );
 
-		vertexBuffer  = gl.createBuffer();
+		vertexBuffer = gl.createBuffer();
 		elementBuffer = gl.createBuffer();
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
@@ -46,32 +46,32 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 		program = createProgram();
 
 		attributes = {
-			position:			gl.getAttribLocation ( program, 'position' ),
-			uv:					gl.getAttribLocation ( program, 'uv' )
+			position: gl.getAttribLocation( program, 'position' ),
+			uv: gl.getAttribLocation( program, 'uv' )
 		};
 
 		uniforms = {
-			uvOffset:			gl.getUniformLocation( program, 'uvOffset' ),
-			uvScale:			gl.getUniformLocation( program, 'uvScale' ),
+			uvOffset: gl.getUniformLocation( program, 'uvOffset' ),
+			uvScale: gl.getUniformLocation( program, 'uvScale' ),
 
-			rotation:			gl.getUniformLocation( program, 'rotation' ),
-			scale:				gl.getUniformLocation( program, 'scale' ),
+			rotation: gl.getUniformLocation( program, 'rotation' ),
+			scale: gl.getUniformLocation( program, 'scale' ),
 
-			color:				gl.getUniformLocation( program, 'color' ),
-			map:				gl.getUniformLocation( program, 'map' ),
-			opacity:			gl.getUniformLocation( program, 'opacity' ),
+			color: gl.getUniformLocation( program, 'color' ),
+			map: gl.getUniformLocation( program, 'map' ),
+			opacity: gl.getUniformLocation( program, 'opacity' ),
 
-			modelViewMatrix: 	gl.getUniformLocation( program, 'modelViewMatrix' ),
-			projectionMatrix:	gl.getUniformLocation( program, 'projectionMatrix' ),
+			modelViewMatrix: gl.getUniformLocation( program, 'modelViewMatrix' ),
+			projectionMatrix: gl.getUniformLocation( program, 'projectionMatrix' ),
 
-			fogType:			gl.getUniformLocation( program, 'fogType' ),
-			fogDensity:			gl.getUniformLocation( program, 'fogDensity' ),
-			fogNear:			gl.getUniformLocation( program, 'fogNear' ),
-			fogFar:				gl.getUniformLocation( program, 'fogFar' ),
-			fogColor:			gl.getUniformLocation( program, 'fogColor' ),
-			fogDepth:			gl.getUniformLocation( program, 'fogDepth' ),
+			fogType: gl.getUniformLocation( program, 'fogType' ),
+			fogDensity: gl.getUniformLocation( program, 'fogDensity' ),
+			fogNear: gl.getUniformLocation( program, 'fogNear' ),
+			fogFar: gl.getUniformLocation( program, 'fogFar' ),
+			fogColor: gl.getUniformLocation( program, 'fogColor' ),
+			fogDepth: gl.getUniformLocation( program, 'fogDepth' ),
 
-			alphaTest:			gl.getUniformLocation( program, 'alphaTest' )
+			alphaTest: gl.getUniformLocation( program, 'alphaTest' )
 		};
 
 		var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );

@@ -18,8 +18,7 @@ function BooleanKeyframeTrack( name, times, values ) {
 
 }
 
-BooleanKeyframeTrack.prototype =
-		Object.assign( Object.create( KeyframeTrackPrototype ), {
+BooleanKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
 
 	constructor: BooleanKeyframeTrack,
 

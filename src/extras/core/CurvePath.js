@@ -170,14 +170,14 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
 			var curve = curves[ i ];
-			var resolution = (curve && curve.isEllipseCurve) ? divisions * 2
-				: (curve && curve.isLineCurve) ? 1
-				: (curve && curve.isSplineCurve) ? divisions * curve.points.length
-				: divisions;
+			var resolution = ( curve && curve.isEllipseCurve ) ? divisions * 2
+				: ( curve && curve.isLineCurve ) ? 1
+					: ( curve && curve.isSplineCurve ) ? divisions * curve.points.length
+						: divisions;
 
 			var pts = curve.getPoints( resolution );
 
-			for ( var j = 0; j < pts.length; j++ ) {
+			for ( var j = 0; j < pts.length; j ++ ) {
 
 				var point = pts[ j ];
 
@@ -190,7 +190,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		}
 
-		if ( this.autoClose && points.length > 1 && !points[ points.length - 1 ].equals( points[ 0 ] ) ) {
+		if ( this.autoClose && points.length > 1 && ! points[ points.length - 1 ].equals( points[ 0 ] ) ) {
 
 			points.push( points[ 0 ] );
 

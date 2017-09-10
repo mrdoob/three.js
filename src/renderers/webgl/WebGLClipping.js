@@ -58,12 +58,12 @@ function WebGLClipping() {
 
 	this.setState = function ( planes, clipIntersection, clipShadows, camera, cache, fromCache ) {
 
-		if ( ! localClippingEnabled ||
-				planes === null || planes.length === 0 ||
-				renderingShadows && ! clipShadows ) {
+		if ( ! localClippingEnabled || planes === null || planes.length === 0 || renderingShadows && ! clipShadows ) {
+
 			// there's no local clipping
 
 			if ( renderingShadows ) {
+
 				// there's no global clipping
 
 				projectPlanes( null );

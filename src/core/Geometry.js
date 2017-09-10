@@ -20,7 +20,12 @@ import { _Math } from '../math/Math.js';
  */
 
 var count = 0;
-function GeometryIdCount() { return count++; }
+
+function GeometryIdCount() {
+
+	return count ++;
+
+}
 
 function Geometry() {
 

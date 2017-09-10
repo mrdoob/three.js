@@ -61,11 +61,22 @@ function AnimationObjectGroup( var_args ) {
 	this.stats = {
 
 		objects: {
-			get total() { return scope._objects.length; },
-			get inUse() { return this.total - scope.nCachedObjects_; }
-		},
+			get total() {
 
-		get bindingsPerObject() { return scope._bindings.length; }
+				return scope._objects.length;
+
+			},
+			get inUse() {
+
+				return this.total - scope.nCachedObjects_;
+
+			}
+		},
+		get bindingsPerObject() {
+
+			return scope._bindings.length;
+
+		}
 
 	};
 

@@ -138,33 +138,63 @@ function allocTexUnits( renderer, n ) {
 
 // Single scalar
 
-function setValue1f( gl, v ) { gl.uniform1f( this.addr, v ) }
-function setValue1i( gl, v ) { gl.uniform1i( this.addr, v ) }
+function setValue1f( gl, v ) {
+
+	gl.uniform1f( this.addr, v );
+
+}
+
+function setValue1i( gl, v ) {
+
+	gl.uniform1i( this.addr, v );
+
+}
 
 // Single float vector (from flat array or THREE.VectorN)
 
 function setValue2fv( gl, v ) {
 
-	if ( v.x === undefined ) gl.uniform2fv( this.addr, v );
-	else gl.uniform2f( this.addr, v.x, v.y );
+	if ( v.x === undefined ) {
+
+		gl.uniform2fv( this.addr, v );
+
+	} else {
+
+		gl.uniform2f( this.addr, v.x, v.y );
+
+	}
 
 }
 
 function setValue3fv( gl, v ) {
 
-	if ( v.x !== undefined )
+	if ( v.x !== undefined ) {
+
 		gl.uniform3f( this.addr, v.x, v.y, v.z );
-	else if ( v.r !== undefined )
+
+	} else if ( v.r !== undefined ) {
+
 		gl.uniform3f( this.addr, v.r, v.g, v.b );
-	else
+
+	} else {
+
 		gl.uniform3fv( this.addr, v );
+
+	}
 
 }
 
 function setValue4fv( gl, v ) {
 
-	if ( v.x === undefined ) gl.uniform4fv( this.addr, v );
-	else gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
+	if ( v.x === undefined ) {
+
+		gl.uniform4fv( this.addr, v );
+
+	} else {
+
+		 gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
+
+	}
 
 }
 
@@ -226,9 +256,23 @@ function setValueT6( gl, v, renderer ) {
 
 // Integer / Boolean vectors or arrays thereof (always flat arrays)
 
-function setValue2iv( gl, v ) { gl.uniform2iv( this.addr, v ) }
-function setValue3iv( gl, v ) { gl.uniform3iv( this.addr, v ) }
-function setValue4iv( gl, v ) { gl.uniform4iv( this.addr, v ) }
+function setValue2iv( gl, v ) {
+
+	gl.uniform2iv( this.addr, v );
+
+}
+
+function setValue3iv( gl, v ) {
+
+	gl.uniform3iv( this.addr, v );
+
+}
+
+function setValue4iv( gl, v ) {
+
+	gl.uniform4iv( this.addr, v );
+
+}
 
 // Helper to pick the right setter for the singular case
 
@@ -259,8 +303,16 @@ function getSingularSetter( type ) {
 
 // Array of scalars
 
-function setValue1fv( gl, v ) { gl.uniform1fv( this.addr, v ) }
-function setValue1iv( gl, v ) { gl.uniform1iv( this.addr, v ) }
+function setValue1fv( gl, v ) {
+
+	gl.uniform1fv( this.addr, v );
+
+}
+function setValue1iv( gl, v ) {
+
+	gl.uniform1iv( this.addr, v );
+
+}
 
 // Array of vectors (flat or from THREE classes)
 

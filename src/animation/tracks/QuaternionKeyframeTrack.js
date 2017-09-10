@@ -18,8 +18,7 @@ function QuaternionKeyframeTrack( name, times, values, interpolation ) {
 
 }
 
-QuaternionKeyframeTrack.prototype =
-		Object.assign( Object.create( KeyframeTrackPrototype ), {
+QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
 
 	constructor: QuaternionKeyframeTrack,
 
@@ -29,10 +28,9 @@ QuaternionKeyframeTrack.prototype =
 
 	DefaultInterpolation: InterpolateLinear,
 
-	InterpolantFactoryMethodLinear: function( result ) {
+	InterpolantFactoryMethodLinear: function ( result ) {
 
-		return new QuaternionLinearInterpolant(
-				this.times, this.values, this.getValueSize(), result );
+		return new QuaternionLinearInterpolant( this.times, this.values, this.getValueSize(), result );
 
 	},
 

@@ -49,13 +49,14 @@ Object.assign( Interpolant.prototype, {
 				var right;
 
 				linear_scan: {
+
 					//- See http://jsperf.com/comparison-to-undefined/3
 					//- slower code:
 					//-
 					//- 				if ( t >= t1 || t1 === undefined ) {
 					forward_scan: if ( ! ( t < t1 ) ) {
 
-						for ( var giveUpAt = i1 + 2; ;) {
+						for ( var giveUpAt = i1 + 2; ; ) {
 
 							if ( t1 === undefined ) {
 
@@ -106,7 +107,7 @@ Object.assign( Interpolant.prototype, {
 
 						// linear reverse scan
 
-						for ( var giveUpAt = i1 - 2; ;) {
+						for ( var giveUpAt = i1 - 2; ; ) {
 
 							if ( t0 === undefined ) {
 
@@ -230,7 +231,7 @@ Object.assign( Interpolant.prototype, {
 
 	interpolate_: function ( i1, t0, t, t1 ) {
 
-		throw new Error( "call to abstract method" );
+		throw new Error( 'call to abstract method' );
 		// implementations shall return this.resultBuffer
 
 	},

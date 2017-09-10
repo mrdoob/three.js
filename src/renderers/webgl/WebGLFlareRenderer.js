@@ -17,10 +17,10 @@ function WebGLFlareRenderer( renderer, gl, state, textures, capabilities ) {
 	function init() {
 
 		var vertices = new Float32Array( [
-			- 1, - 1,  0, 0,
-			 1, - 1,  1, 0,
-			 1,  1,  1, 1,
-			- 1,  1,  0, 1
+			- 1, - 1, 0, 0,
+			  1, - 1, 1, 0,
+			  1,   1, 1, 1,
+			- 1,   1, 0, 1
 		] );
 
 		var faces = new Uint16Array( [
@@ -30,8 +30,8 @@ function WebGLFlareRenderer( renderer, gl, state, textures, capabilities ) {
 
 		// buffers
 
-		vertexBuffer     = gl.createBuffer();
-		elementBuffer    = gl.createBuffer();
+		vertexBuffer = gl.createBuffer();
+		elementBuffer = gl.createBuffer();
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
 		gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW );
@@ -41,7 +41,7 @@ function WebGLFlareRenderer( renderer, gl, state, textures, capabilities ) {
 
 		// textures
 
-		tempTexture      = gl.createTexture();
+		tempTexture = gl.createTexture();
 		occlusionTexture = gl.createTexture();
 
 		state.bindTexture( gl.TEXTURE_2D, tempTexture );
@@ -155,18 +155,18 @@ function WebGLFlareRenderer( renderer, gl, state, textures, capabilities ) {
 		program = createProgram( shader );
 
 		attributes = {
-			vertex: gl.getAttribLocation ( program, "position" ),
-			uv:     gl.getAttribLocation ( program, "uv" )
+			vertex: gl.getAttribLocation( program, "position" ),
+			uv: gl.getAttribLocation( program, "uv" )
 		};
 
 		uniforms = {
-			renderType:     gl.getUniformLocation( program, "renderType" ),
-			map:            gl.getUniformLocation( program, "map" ),
-			occlusionMap:   gl.getUniformLocation( program, "occlusionMap" ),
-			opacity:        gl.getUniformLocation( program, "opacity" ),
-			color:          gl.getUniformLocation( program, "color" ),
-			scale:          gl.getUniformLocation( program, "scale" ),
-			rotation:       gl.getUniformLocation( program, "rotation" ),
+			renderType: gl.getUniformLocation( program, "renderType" ),
+			map: gl.getUniformLocation( program, "map" ),
+			occlusionMap: gl.getUniformLocation( program, "occlusionMap" ),
+			opacity: gl.getUniformLocation( program, "opacity" ),
+			color: gl.getUniformLocation( program, "color" ),
+			scale: gl.getUniformLocation( program, "scale" ),
+			rotation: gl.getUniformLocation( program, "rotation" ),
 			screenPosition: gl.getUniformLocation( program, "screenPosition" )
 		};
 
