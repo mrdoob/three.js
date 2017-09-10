@@ -20,7 +20,7 @@ import { KeyframeTrackConstructor } from './KeyframeTrackConstructor.js';
 
 function KeyframeTrack( name, times, values, interpolation ) {
 
-	KeyframeTrackConstructor.apply( this, arguments );
+	KeyframeTrackConstructor.apply( this, name, times, values, interpolation );
 
 }
 
@@ -38,7 +38,7 @@ Object.assign( KeyframeTrack, {
 
 		if ( json.type === undefined ) {
 
-			throw new Error( "track type undefined, can not parse" );
+			throw new Error( 'track type undefined, can not parse' );
 
 		}
 
@@ -111,41 +111,41 @@ Object.assign( KeyframeTrack, {
 
 		switch ( typeName.toLowerCase() ) {
 
-			case "scalar":
-			case "double":
-			case "float":
-			case "number":
-			case "integer":
+			case 'scalar':
+			case 'double':
+			case 'float':
+			case 'number':
+			case 'integer':
 
 				return NumberKeyframeTrack;
 
-			case "vector":
-			case "vector2":
-			case "vector3":
-			case "vector4":
+			case 'vector':
+			case 'vector2':
+			case 'vector3':
+			case 'vector4':
 
 				return VectorKeyframeTrack;
 
-			case "color":
+			case 'color':
 
 				return ColorKeyframeTrack;
 
-			case "quaternion":
+			case 'quaternion':
 
 				return QuaternionKeyframeTrack;
 
-			case "bool":
-			case "boolean":
+			case 'bool':
+			case 'boolean':
 
 				return BooleanKeyframeTrack;
 
-			case "string":
+			case 'string':
 
 				return StringKeyframeTrack;
 
 		}
 
-		throw new Error( "Unsupported typeName: " + typeName );
+		throw new Error( 'Unsupported typeName: ' + typeName );
 
 	}
 

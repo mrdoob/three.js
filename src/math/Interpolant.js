@@ -229,14 +229,14 @@ Object.assign( Interpolant.prototype, {
 
 	// Template methods for derived classes:
 
-	interpolate_: function ( i1, t0, t, t1 ) {
+	interpolate_: function ( /* i1, t0, t, t1 */ ) {
 
 		throw new Error( 'call to abstract method' );
 		// implementations shall return this.resultBuffer
 
 	},
 
-	intervalChanged_: function ( i1, t0, t1 ) {
+	intervalChanged_: function ( /* i1, t0, t1 */ ) {
 
 		// empty
 

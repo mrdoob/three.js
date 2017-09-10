@@ -9,7 +9,7 @@ function ImmediateRenderObject( material ) {
 	Object3D.call( this );
 
 	this.material = material;
-	this.render = function ( renderCallback ) {};
+	this.render = function ( /* renderCallback */ ) {};
 
 }
 

@@ -112,7 +112,7 @@ Object.assign( Matrix4.prototype, {
 			xAxis.x, yAxis.x, zAxis.x, 0,
 			xAxis.y, yAxis.y, zAxis.y, 0,
 			xAxis.z, yAxis.z, zAxis.z, 0,
-			0,       0,       0,       1
+			0, 0, 0, 1
 		);
 
 		return this;
@@ -654,10 +654,10 @@ Object.assign( Matrix4.prototype, {
 
 		this.set(
 
-			1, 0,  0, 0,
+			1, 0, 0, 0,
 			0, c, - s, 0,
-			0, s,  c, 0,
-			0, 0,  0, 1
+			0, s, c, 0,
+			0, 0, 0, 1
 
 		);
 
@@ -689,9 +689,9 @@ Object.assign( Matrix4.prototype, {
 		this.set(
 
 			c, - s, 0, 0,
-			s,  c, 0, 0,
-			0,  0, 1, 0,
-			0,  0, 0, 1
+			s, c, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
 
 		);
 

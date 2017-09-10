@@ -65,9 +65,7 @@ function WebGL2Renderer( parameters ) {
 
 	//
 
-	var _this = this,
-
-		_autoClear = true,
+	var _autoClear = true,
 		_autoClearColor = true,
 		_autoClearDepth = true,
 		_autoClearStencil = true,
