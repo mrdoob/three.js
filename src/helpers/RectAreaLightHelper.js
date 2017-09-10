@@ -58,11 +58,11 @@ RectAreaLightHelper.prototype.update = function () {
 
 	// update vertices
 
-	array[  0 ] =   hx; array[  1 ] = - hy; array[  2 ] = 0;
-	array[  3 ] =   hx; array[  4 ] =   hy; array[  5 ] = 0;
-	array[  6 ] = - hx; array[  7 ] =   hy; array[  8 ] = 0;
-	array[  9 ] = - hx; array[ 10 ] = - hy; array[ 11 ] = 0;
-	array[ 12 ] =   hx; array[ 13 ] = - hy; array[ 14 ] = 0;
+	array[ 0 ] = hx; array[ 1 ] = - hy; array[ 2 ] = 0;
+	array[ 3 ] = hx; array[ 4 ] = hy; array[ 5 ] = 0;
+	array[ 6 ] = - hx; array[ 7 ] = hy; array[ 8 ] = 0;
+	array[ 9 ] = - hx; array[ 10 ] = - hy; array[ 11 ] = 0;
+	array[ 12 ] = hx; array[ 13 ] = - hy; array[ 14 ] = 0;
 
 	position.needsUpdate = true;
 

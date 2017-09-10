@@ -670,7 +670,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 					c = layeroffset + k + slen2,
 					d = layeroffset + j + slen2;
 
-				f4( a, b, c, d, contour, s, sl, j, k );
+				f4( a, b, c, d );
 
 			}
 
@@ -702,7 +702,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
+	function f4( a, b, c, d ) {
 
 		addVertex( a );
 		addVertex( b );

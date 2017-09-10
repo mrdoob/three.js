@@ -24,7 +24,7 @@ Fog.prototype.clone = function () {
 
 };
 
-Fog.prototype.toJSON = function ( meta ) {
+Fog.prototype.toJSON = function ( /* meta */ ) {
 
 	return {
 		type: 'Fog',

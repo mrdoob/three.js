@@ -281,17 +281,17 @@ Spline.prototype = Object.create( CatmullRomCurve3.prototype );
 
 Object.assign( Spline.prototype, {
 
-	initFromArray: function ( a ) {
+	initFromArray: function ( /* a */ ) {
 
 		console.error( 'THREE.Spline: .initFromArray() has been removed.' );
 
 	},
-	getControlPointsArray: function ( optionalTarget ) {
+	getControlPointsArray: function ( /* optionalTarget */ ) {
 
 		console.error( 'THREE.Spline: .getControlPointsArray() has been removed.' );
 
 	},
-	reparametrizeByArcLength: function ( samplingCoef ) {
+	reparametrizeByArcLength: function ( /* samplingCoef */ ) {
 
 		console.error( 'THREE.Spline: .reparametrizeByArcLength() has been removed.' );
 
@@ -441,18 +441,18 @@ Object.assign( Matrix3.prototype, {
 		return vector.applyMatrix3( this );
 
 	},
-	multiplyVector3Array: function ( a ) {
+	multiplyVector3Array: function ( /* a */ ) {
 
 		console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.' );
 
 	},
-	applyToBuffer: function ( buffer, offset, length ) {
+	applyToBuffer: function ( buffer /*, offset, length */ ) {
 
 		console.warn( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 		return this.applyToBufferAttribute( buffer );
 
 	},
-	applyToVector3Array: function ( array, offset, length ) {
+	applyToVector3Array: function ( /* array, offset, length */ ) {
 
 		console.error( 'THREE.Matrix3: .applyToVector3Array() has been removed.' );
 
@@ -510,7 +510,7 @@ Object.assign( Matrix4.prototype, {
 		return vector.applyMatrix4( this );
 
 	},
-	multiplyVector3Array: function ( a ) {
+	multiplyVector3Array: function ( /* a */ ) {
 
 		console.error( 'THREE.Matrix4: .multiplyVector3Array() has been removed.' );
 
@@ -552,13 +552,13 @@ Object.assign( Matrix4.prototype, {
 		console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 
 	},
-	applyToBuffer: function ( buffer, offset, length ) {
+	applyToBuffer: function ( buffer /*, offset, length */ ) {
 
 		console.warn( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 		return this.applyToBufferAttribute( buffer );
 
 	},
-	applyToVector3Array: function ( array, offset, length ) {
+	applyToVector3Array: function ( /* array, offset, length */ ) {
 
 		console.error( 'THREE.Matrix4: .applyToVector3Array() has been removed.' );
 

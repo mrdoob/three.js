@@ -26,11 +26,11 @@ function SpotLightHelper( light, color ) {
 	var geometry = new BufferGeometry();
 
 	var positions = [
-		0, 0, 0,   0,   0,   1,
-		0, 0, 0,   1,   0,   1,
-		0, 0, 0, - 1,   0,   1,
-		0, 0, 0,   0,   1,   1,
-		0, 0, 0,   0, - 1,   1
+		0, 0, 0, 	0, 0, 1,
+		0, 0, 0, 	1, 0, 1,
+		0, 0, 0,	- 1, 0, 1,
+		0, 0, 0, 	0, 1, 1,
+		0, 0, 0, 	0, - 1, 1
 	];
 
 	for ( var i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {

@@ -159,7 +159,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 				height: 1
 			};
 
-		};
+		}
 
 		this.view.fullWidth = fullWidth;
 		this.view.fullHeight = fullHeight;
