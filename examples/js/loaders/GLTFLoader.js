@@ -92,19 +92,19 @@ THREE.GLTFLoader = ( function () {
 
 			if ( json.extensionsUsed ) {
 
-				if( json.extensionsUsed.indexOf( EXTENSIONS.KHR_LIGHTS ) >= 0 ) {
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_LIGHTS ) >= 0 ) {
 
 					extensions[ EXTENSIONS.KHR_LIGHTS ] = new GLTFLightsExtension( json );
 
 				}
 
-				if( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_COMMON ) >= 0 ) {
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_COMMON ) >= 0 ) {
 
 					extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] = new GLTFMaterialsCommonExtension( json );
 
 				}
 
-				if( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ) >= 0 ) {
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ) >= 0 ) {
 
 					extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
 
@@ -347,7 +347,7 @@ THREE.GLTFLoader = ( function () {
 
 		var materialValues = {};
 
-		keys.forEach( function( v ) {
+		keys.forEach( function ( v ) {
 
 			if ( khrMaterial[ v ] !== undefined ) materialValues[ v ] = khrMaterial[ v ];
 
@@ -519,14 +519,14 @@ THREE.GLTFLoader = ( function () {
 				].join( '\n' );
 
 				var fragmentShader = shader.fragmentShader
-							.replace( '#include <specularmap_fragment>', '' )
-							.replace( 'uniform float roughness;', 'uniform vec3 specular;' )
-							.replace( 'uniform float metalness;', 'uniform float glossiness;' )
-							.replace( '#include <roughnessmap_pars_fragment>', specularMapParsFragmentChunk )
-							.replace( '#include <metalnessmap_pars_fragment>', glossinessMapParsFragmentChunk )
-							.replace( '#include <roughnessmap_fragment>', specularMapFragmentChunk )
-							.replace( '#include <metalnessmap_fragment>', glossinessMapFragmentChunk )
-							.replace( '#include <lights_physical_fragment>', lightPhysicalFragmentChunk );
+					.replace( '#include <specularmap_fragment>', '' )
+					.replace( 'uniform float roughness;', 'uniform vec3 specular;' )
+					.replace( 'uniform float metalness;', 'uniform float glossiness;' )
+					.replace( '#include <roughnessmap_pars_fragment>', specularMapParsFragmentChunk )
+					.replace( '#include <metalnessmap_pars_fragment>', glossinessMapParsFragmentChunk )
+					.replace( '#include <roughnessmap_fragment>', specularMapFragmentChunk )
+					.replace( '#include <metalnessmap_fragment>', glossinessMapFragmentChunk )
+					.replace( '#include <lights_physical_fragment>', lightPhysicalFragmentChunk );
 
 				delete uniforms.roughness;
 				delete uniforms.metalness;
@@ -728,7 +728,7 @@ THREE.GLTFLoader = ( function () {
 
 				uniforms.envMap.value = material.envMap;
 				uniforms.envMapIntensity.value = material.envMapIntensity;
-				uniforms.flipEnvMap.value = ( material.envMap && material.envMap.isCubeTexture ) ? -1 : 1;
+				uniforms.flipEnvMap.value = ( material.envMap && material.envMap.isCubeTexture ) ? - 1 : 1;
 
 				uniforms.refractionRatio.value = material.refractionRatio;
 
@@ -845,8 +845,8 @@ THREE.GLTFLoader = ( function () {
 	};
 
 	var WEBGL_SIDES = {
-		1028: THREE.BackSide,  // Culling front
-		1029: THREE.FrontSide  // Culling back
+		1028: THREE.BackSide, // Culling front
+		1029: THREE.FrontSide // Culling back
 		//1032: THREE.NoSide   // Culling front and back, what to do?
 	};
 
@@ -929,8 +929,10 @@ THREE.GLTFLoader = ( function () {
 
 	function _each( object, callback, thisObj ) {
 
-		if ( !object ) {
+		if ( ! object ) {
+
 			return Promise.resolve();
+
 		}
 
 		var results;
@@ -952,11 +954,11 @@ THREE.GLTFLoader = ( function () {
 
 					if ( value instanceof Promise ) {
 
-						value.then( function( key, value ) {
+						value.then( function ( key, value ) {
 
 							results[ key ] = value;
 
-						}.bind( this, idx ));
+						}.bind( this, idx ) );
 
 					} else {
 
@@ -984,11 +986,11 @@ THREE.GLTFLoader = ( function () {
 
 						if ( value instanceof Promise ) {
 
-							value.then( function( key, value ) {
+							value.then( function ( key, value ) {
 
 								results[ key ] = value;
 
-							}.bind( this, key ));
+							}.bind( this, key ) );
 
 						} else {
 
@@ -1004,11 +1006,11 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		return Promise.all( fns ).then( function() {
+		return Promise.all( fns ).then( function () {
 
 			return results;
 
-		});
+		} );
 
 	}
 
@@ -1091,7 +1093,7 @@ THREE.GLTFLoader = ( function () {
 	 * @param {GLTF.Primitive} primitiveDef
 	 * @param {Object} dependencies
 	 */
-	function addMorphTargets ( mesh, meshDef, primitiveDef, dependencies ) {
+	function addMorphTargets( mesh, meshDef, primitiveDef, dependencies ) {
 
 		var geometry = mesh.geometry;
 		var material = mesh.material;
@@ -1310,7 +1312,7 @@ THREE.GLTFLoader = ( function () {
 		var cacheKey = type + ':' + index;
 		var dependency = this.cache.get( cacheKey );
 
-		if ( !dependency ) {
+		if ( ! dependency ) {
 
 			var fnName = 'load' + type.charAt( 0 ).toUpperCase() + type.slice( 1 );
 			dependency = this[ fnName ]( index );
@@ -1350,7 +1352,7 @@ THREE.GLTFLoader = ( function () {
 
 			var loader = new THREE.FileLoader();
 			loader.setResponseType( 'arraybuffer' );
-			loader.load( resolveURL( bufferDef.uri, options.path ), resolve);
+			loader.load( resolveURL( bufferDef.uri, options.path ), resolve );
 
 		} );
 
@@ -1630,6 +1632,7 @@ THREE.GLTFLoader = ( function () {
 					materialParams.normalScale.set( material.normalTexture.scale, material.normalTexture.scale );
 
 				}
+
 			}
 
 			if ( material.occlusionTexture !== undefined ) {
@@ -1690,7 +1693,7 @@ THREE.GLTFLoader = ( function () {
 
 				// Normal map textures use OpenGL conventions:
 				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
-				_material.normalScale.x = -_material.normalScale.x;
+				_material.normalScale.x = - _material.normalScale.x;
 
 				if ( material.extras ) _material.userData = material.extras;
 
@@ -1926,7 +1929,7 @@ THREE.GLTFLoader = ( function () {
 
 			var params = camera[ camera.type ];
 
-			if ( !params ) {
+			if ( ! params ) {
 
 				console.warn( 'THREE.GLTFLoader: Missing camera parameters.' );
 				return;
@@ -1942,7 +1945,7 @@ THREE.GLTFLoader = ( function () {
 
 			} else if ( camera.type === 'orthographic' ) {
 
-				_camera = new THREE.OrthographicCamera( params.xmag / -2, params.xmag / 2, params.ymag / 2, params.ymag / -2, params.znear, params.zfar );
+				_camera = new THREE.OrthographicCamera( params.xmag / - 2, params.xmag / 2, params.ymag / 2, params.ymag / - 2, params.znear, params.zfar );
 
 			}
 
@@ -2185,11 +2188,12 @@ THREE.GLTFLoader = ( function () {
 
 					var mesh = node.mesh;
 
-					if ( mesh !== undefined) {
+					if ( mesh !== undefined ) {
 
 						var group = dependencies.meshes[ mesh ];
 
 						if ( group !== undefined ) {
+
 							// do not clone children as they will be replaced anyway
 							var clonedgroup = group.clone( false );
 
@@ -2290,6 +2294,7 @@ THREE.GLTFLoader = ( function () {
 							}
 
 							_node.add( clonedgroup );
+
 						} else {
 
 							console.warn( 'THREE.GLTFLoader: Could not find node "' + mesh + '".' );
