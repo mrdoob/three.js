@@ -130,7 +130,7 @@ THREE.ColladaLoader.prototype = {
 
 		function isEmpty( object ) {
 
-			return  Object.keys( object ).length === 0;
+			return Object.keys( object ).length === 0;
 
 		}
 
@@ -346,13 +346,11 @@ THREE.ColladaLoader.prototype = {
 
 					var inputId = sampler.inputs.INPUT;
 					var outputId = sampler.inputs.OUTPUT;
-					var interpolationId = sampler.inputs.INTERPOLATION;
 
 					var inputSource = sources[ inputId ];
 					var outputSource = sources[ outputId ];
-					var interpolationSource = sources[ interpolationId ];
 
-					var animation = buildAnimationChannel( channel, inputSource, outputSource, interpolationSource );
+					var animation = buildAnimationChannel( channel, inputSource, outputSource );
 
 					createKeyframeTracks( animation, tracks );
 
@@ -370,7 +368,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function buildAnimationChannel( channel, inputSource, outputSource, interpolationSource ) {
+		function buildAnimationChannel( channel, inputSource, outputSource ) {
 
 			var node = library.nodes[ channel.id ];
 			var object3D = getNode( node.id );
@@ -437,7 +435,7 @@ THREE.ColladaLoader.prototype = {
 			var animation = {
 				name: object3D.uuid,
 				keyframes: keyframes
-			}
+			};
 
 			return animation;
 
@@ -578,7 +576,7 @@ THREE.ColladaLoader.prototype = {
 					prev = getPrev( keyframes, i, property );
 					next = getNext( keyframes, i, property );
 
-					if ( prev === null )  {
+					if ( prev === null ) {
 
 						keyframe.value[ property ] = next.value[ property ];
 						continue;
@@ -743,7 +741,7 @@ THREE.ColladaLoader.prototype = {
 
 			var data = {
 				sources: {}
-			}
+			};
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -782,7 +780,7 @@ THREE.ColladaLoader.prototype = {
 
 			var data = {
 				inputs: {}
-			}
+			};
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -810,7 +808,7 @@ THREE.ColladaLoader.prototype = {
 
 			var data = {
 				inputs: {}
-			}
+			};
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -1392,7 +1390,7 @@ THREE.ColladaLoader.prototype = {
 
 					var extra = textureObject.extra;
 
-					if ( extra !== undefined && extra.technique !== undefined  && isEmpty( extra.technique ) === false ) {
+					if ( extra !== undefined && extra.technique !== undefined && isEmpty( extra.technique ) === false ) {
 
 						var technique = extra.technique;
 
@@ -1861,7 +1859,7 @@ THREE.ColladaLoader.prototype = {
 			var primitive = {
 				type: xml.nodeName,
 				material: xml.getAttribute( 'material' ),
-				count:  parseInt( xml.getAttribute( 'count' ) ),
+				count: parseInt( xml.getAttribute( 'count' ) ),
 				inputs: {},
 				stride: 0
 			};
@@ -1960,7 +1958,6 @@ THREE.ColladaLoader.prototype = {
 			var materialKeys = [];
 
 			var start = 0, count = 0;
-			var array;
 
 			for ( var p = 0; p < primitives.length; p ++ ) {
 
@@ -2008,7 +2005,7 @@ THREE.ColladaLoader.prototype = {
 						case 'VERTEX':
 							for ( var key in vertices ) {
 
-								var id =  vertices[ key ];
+								var id = vertices[ key ];
 
 								switch ( key ) {
 
@@ -2198,7 +2195,7 @@ THREE.ColladaLoader.prototype = {
 
 			library.kinematicsModels[ xml.getAttribute( 'id' ) ] = data;
 
-		};
+		}
 
 		function buildKinematicsModel( data ) {
 
@@ -2266,7 +2263,7 @@ THREE.ColladaLoader.prototype = {
 		function parseKinematicsJointParameter( xml, data ) {
 
 			var data = {
-				sid:  xml.getAttribute( 'sid' ),
+				sid: xml.getAttribute( 'sid' ),
 				name: xml.getAttribute( 'name' ) || '',
 				axis: new THREE.Vector3(),
 				limits: {
@@ -2528,11 +2525,10 @@ THREE.ColladaLoader.prototype = {
 
 			function connect( jointIndex, visualElement ) {
 
-				var visualElementId = visualElement.getAttribute( 'id' );
 				var visualElementName = visualElement.getAttribute( 'name' );
 				var joint = kinematicsModel.joints[ jointIndex ];
 
-				visualScene.traverse( function( object ) {
+				visualScene.traverse( function ( object ) {
 
 					if ( object.name === visualElementName ) {
 
@@ -2547,7 +2543,7 @@ THREE.ColladaLoader.prototype = {
 
 				} );
 
-			};
+			}
 
 			var m0 = new THREE.Matrix4();
 
@@ -2555,7 +2551,7 @@ THREE.ColladaLoader.prototype = {
 
 				joints: kinematicsModel && kinematicsModel.joints,
 
-				getJointValue: function( jointIndex ) {
+				getJointValue: function ( jointIndex ) {
 
 					var jointData = jointMap[ jointIndex ];
 
@@ -2571,7 +2567,7 @@ THREE.ColladaLoader.prototype = {
 
 				},
 
-				setJointValue: function( jointIndex, value ) {
+				setJointValue: function ( jointIndex, value ) {
 
 					var jointData = jointMap[ jointIndex ];
 
@@ -2603,7 +2599,7 @@ THREE.ColladaLoader.prototype = {
 
 								// if there is a connection of the transform node with a joint, apply the joint value
 
-								if ( transform.sid && transform.sid.indexOf( jointIndex ) !== -1 ) {
+								if ( transform.sid && transform.sid.indexOf( jointIndex ) !== - 1 ) {
 
 									switch ( joint.type ) {
 
@@ -2705,7 +2701,7 @@ THREE.ColladaLoader.prototype = {
 						var array = parseFloats( child.textContent );
 						var vector = new THREE.Vector3().fromArray( array );
 						var angle = THREE.Math.degToRad( array[ 3 ] );
-						transforms.push({
+						transforms.push( {
 							sid: child.getAttribute( 'sid' ),
 							type: child.nodeName,
 							obj: vector,
@@ -2950,7 +2946,7 @@ THREE.ColladaLoader.prototype = {
 
 			// setup bone data from visual scene
 
-			root.traverse( function( object ) {
+			root.traverse( function ( object ) {
 
 				if ( object.isBone === true ) {
 

@@ -35,7 +35,7 @@ THREE.AMFLoader.prototype = {
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function( text ) {
+		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 
@@ -59,7 +59,7 @@ THREE.AMFLoader.prototype = {
 
 				try {
 
-					zip = new JSZip( data );
+					zip = new JSZip( data ); // eslint-disable-line no-undef
 
 				} catch ( e ) {
 
@@ -154,7 +154,7 @@ THREE.AMFLoader.prototype = {
 
 					if ( matChildEl.attributes.type.value === 'name' ) {
 
-						matname = matChildEl.textContent;
+						matName = matChildEl.textContent;
 
 					}
 
@@ -465,7 +465,7 @@ THREE.AMFLoader.prototype = {
 					newGeometry.setIndex( volume.triangles );
 					newGeometry.addAttribute( 'position', vertices.clone() );
 
-					if( normals ) {
+					if ( normals ) {
 
 						newGeometry.addAttribute( 'normal', normals.clone() );
 
