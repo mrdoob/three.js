@@ -21,6 +21,10 @@ THREE.Mirror = function ( width, height, options ) {
 	var clipBias = options.clipBias !== undefined ? options.clipBias : 0.0;
 	var mirrorColor = options.color !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
 
+	var recursion = options.recursion !== undefined ? options.recursion : 0;
+
+	//
+
 	var mirrorPlane = new THREE.Plane();
 	var normal = new THREE.Vector3();
 	var mirrorWorldPosition = new THREE.Vector3();
@@ -111,6 +115,14 @@ THREE.Mirror = function ( width, height, options ) {
 
 	scope.onBeforeRender = function ( renderer, scene, camera ) {
 
+		if ( 'recursion' in camera.userData ) {
+
+			if ( camera.userData.recursion === recursion ) return;
+
+			camera.userData.recursion ++;
+
+		}
+
 		mirrorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
 
@@ -150,6 +162,8 @@ THREE.Mirror = function ( width, height, options ) {
 
 		mirrorCamera.updateMatrixWorld();
 		mirrorCamera.updateProjectionMatrix();
+
+		mirrorCamera.userData.recursion = 0;
 
 		// Update the texture matrix
 		textureMatrix.set(
