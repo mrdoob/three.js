@@ -170,22 +170,6 @@ THREE.GLTFLoader = ( function () {
 
 				objects = {};
 
-			},
-
-			update: function ( scene, camera ) {
-
-				for ( var name in objects ) {
-
-					var object = objects[ name ];
-
-					if ( object.update ) {
-
-						object.update( scene, camera );
-
-					}
-
-				}
-
 			}
 
 		};
@@ -1270,9 +1254,9 @@ THREE.GLTFLoader = ( function () {
 
 			var scenes = [];
 
-			for ( var name in dependencies.scenes ) {
+			for ( var i = 0; i < dependencies.scenes.length; i ++ ) {
 
-				scenes.push( dependencies.scenes[ name ] );
+				scenes.push( dependencies.scenes[ i ] );
 
 			}
 
@@ -1280,18 +1264,22 @@ THREE.GLTFLoader = ( function () {
 
 			var cameras = [];
 
-			for ( var name in dependencies.cameras ) {
+			dependencies.cameras = dependencies.cameras || [];
 
-				var camera = dependencies.cameras[ name ];
+			for ( var i = 0; i < dependencies.cameras.length; i ++ ) {
+
+				var camera = dependencies.cameras[ i ];
 				cameras.push( camera );
 
 			}
 
 			var animations = [];
 
-			for ( var name in dependencies.animations ) {
+			dependencies.animations = dependencies.animations || [];
 
-				animations.push( dependencies.animations[ name ] );
+			for ( var i = 0; i < dependencies.animations.length; i ++ ) {
+
+				animations.push( dependencies.animations[ i ] );
 
 			}
 
@@ -1693,7 +1681,11 @@ THREE.GLTFLoader = ( function () {
 
 				// Normal map textures use OpenGL conventions:
 				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
-				_material.normalScale.x = - _material.normalScale.x;
+				if ( _material.normalScale ) {
+
+					_material.normalScale.x = - _material.normalScale.x;
+
+				}
 
 				if ( material.extras ) _material.userData = material.extras;
 
@@ -1814,10 +1806,10 @@ THREE.GLTFLoader = ( function () {
 
 				return scope.loadGeometries( primitives ).then( function ( geometries ) {
 
-					for ( var name in primitives ) {
+					for ( var i = 0; i < primitives.length; i ++ ) {
 
-						var primitive = primitives[ name ];
-						var geometry = geometries[ name ];
+						var primitive = primitives[ i ];
+						var geometry = geometries[ i ];
 
 						var material = primitive.material === undefined
 							? createDefaultMaterial()
@@ -1892,7 +1884,7 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						mesh.name = group.name + '_' + name;
+						mesh.name = group.name + '_' + i;
 
 						if ( primitive.targets !== undefined ) {
 
@@ -1998,9 +1990,9 @@ THREE.GLTFLoader = ( function () {
 
 				var tracks = [];
 
-				for ( var channelId in animation.channels ) {
+				for ( var i = 0; i < animation.channels.length; i ++ ) {
 
-					var channel = animation.channels[ channelId ];
+					var channel = animation.channels[ i ];
 					var sampler = animation.samplers[ channel.sampler ];
 
 					if ( sampler ) {
@@ -2081,10 +2073,10 @@ THREE.GLTFLoader = ( function () {
 							// KeyframeTrack.optimize() will modify given 'times' and 'values'
 							// buffers before creating a truncated copy to keep. Because buffers may
 							// be reused by other tracks, make copies here.
-							for ( var i = 0, il = targetNames.length; i < il; i ++ ) {
+							for ( var j = 0, jl = targetNames.length; j < jl; j ++ ) {
 
 								tracks.push( new TypedKeyframeTrack(
-									targetNames[ i ] + '.' + PATH_PROPERTIES[ target.path ],
+									targetNames[ j ] + '.' + PATH_PROPERTIES[ target.path ],
 									THREE.AnimationUtils.arraySlice( inputAccessor.array, 0 ),
 									THREE.AnimationUtils.arraySlice( outputAccessor.array, 0 ),
 									interpolation
@@ -2197,9 +2189,9 @@ THREE.GLTFLoader = ( function () {
 							// do not clone children as they will be replaced anyway
 							var clonedgroup = group.clone( false );
 
-							for ( var childrenId in group.children ) {
+							for ( var i = 0; i < group.children.length; i ++ ) {
 
-								var child = group.children[ childrenId ];
+								var child = group.children[ i ];
 								var originalChild = child;
 
 								// clone Mesh to add to _node
