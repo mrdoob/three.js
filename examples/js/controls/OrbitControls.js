@@ -46,7 +46,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// Set to true to enable damping (inertia)
 	// If damping is enabled, you must call controls.update() in your animation loop
 	this.enableDamping = false;
-	this.dampingFactor = 0.25;
+	this.rotateDampingFactor = 0.1;
+	this.panDampingFactor = 0.1;
 
 	// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 	// Set to false to disable zooming
@@ -59,6 +60,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Set to false to disable panning
 	this.enablePan = true;
+	this.panSpeed = 1.0;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
@@ -180,9 +182,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			if ( scope.enableDamping === true ) {
 
-				sphericalDelta.theta *= ( 1 - scope.dampingFactor );
-				sphericalDelta.phi *= ( 1 - scope.dampingFactor );
-				panOffset.multiplyScalar( 1 - scope.dampingFactor );
+				sphericalDelta.theta *= ( 1 - scope.rotateDampingFactor );
+				sphericalDelta.phi *= ( 1 - scope.rotateDampingFactor );
+				panOffset.multiplyScalar( 1 - scope.panDampingFactor );
 
 			} else {
 
@@ -303,7 +305,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		return function panLeft( distance, objectMatrix ) {
 
 			v.setFromMatrixColumn( objectMatrix, 0 ); // get X column of objectMatrix
-			v.multiplyScalar( - distance );
+			v.multiplyScalar( - distance * scope.panSpeed );
 
 			panOffset.add( v );
 
@@ -318,7 +320,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		return function panUp( distance, objectMatrix ) {
 
 			v.setFromMatrixColumn( objectMatrix, 1 ); // get Y column of objectMatrix
-			v.multiplyScalar( distance );
+			v.multiplyScalar( distance * scope.panSpeed );
 
 			panOffset.add( v );
 
@@ -1026,15 +1028,33 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 
 		get: function () {
 
-			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
-			return this.dampingFactor;
+			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .rotateDampingFactor instead.' );
+			return this.rotateDampingFactor;
 
 		},
 
 		set: function ( value ) {
 
-			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
-			this.dampingFactor = value;
+			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .rotateDampingFactor instead.' );
+			this.rotateDampingFactor = value;
+
+		}
+
+	},
+
+	dampingFactor: {
+
+		get: function () {
+
+			console.warn( 'THREE.OrbitControls: .dampingFactor has been renamed. Use .rotateDampingFactor instead.' );
+			return this.rotateDampingFactor;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.OrbitControls: .dampingFactor has been renamed. Use .rotateDampingFactor instead.' );
+			this.rotateDampingFactor = value;
 
 		}
 
