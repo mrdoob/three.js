@@ -46,8 +46,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// Set to true to enable damping (inertia)
 	// If damping is enabled, you must call controls.update() in your animation loop
 	this.enableDamping = false;
-	this.rotateDampingFactor = 0.1;
 	this.panDampingFactor = 0.1;
+	this.zoomDampingFactor = 0.1;
+	this.rotateDampingFactor = 0.1;
 
 	// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 	// Set to false to disable zooming
@@ -126,6 +127,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var offset = new THREE.Vector3();
 
+		var zoom = object.zoom;
+
 		// so camera.up is the orbit axis
 		var quat = new THREE.Quaternion().setFromUnitVectors( object.up, new THREE.Vector3( 0, 1, 0 ) );
 		var quatInverse = quat.clone().inverse();
@@ -163,7 +166,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			spherical.makeSafe();
 
 
-			spherical.radius *= scale;
+			spherical.radius *= ( 1 + scaleDelta );
 
 			// restrict radius to be between desired limits
 			spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
@@ -180,20 +183,36 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			scope.object.lookAt( scope.target );
 
+			if ( Math.abs( zoomDelta ) > EPS ) {//zoomDelta is only changed for orthographic camera
+				
+				zoom = Math.min( scope.maxZoom, Math.max( scope.minZoom, scope.object.zoom * ( 1 - zoomDelta ) ) );
+				
+				if ( zoom !== scope.object.zoom ) {
+
+					scope.object.zoom = zoom;
+					scope.object.updateProjectionMatrix();
+					zoomChanged = true;
+
+				}
+				
+			}
+
 			if ( scope.enableDamping === true ) {
 
 				sphericalDelta.theta *= ( 1 - scope.rotateDampingFactor );
 				sphericalDelta.phi *= ( 1 - scope.rotateDampingFactor );
 				panOffset.multiplyScalar( 1 - scope.panDampingFactor );
+				scaleDelta *= ( 1 - scope.zoomDampingFactor );
+				zoomDelta *= ( 1 - scope.zoomDampingFactor );
 
 			} else {
 
 				sphericalDelta.set( 0, 0, 0 );
 				panOffset.set( 0, 0, 0 );
+				scaleDelta = 0;
+				zoomDelta = 0;
 
 			}
-
-			scale = 1;
 
 			// update condition is:
 			// min(camera displacement, camera rotation in radians)^2 > EPS
@@ -258,7 +277,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var spherical = new THREE.Spherical();
 	var sphericalDelta = new THREE.Spherical();
 
-	var scale = 1;
+	var scaleDelta = 0;
+	var zoomDelta = 0;
 	var panOffset = new THREE.Vector3();
 	var zoomChanged = false;
 
@@ -282,7 +302,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function getZoomScale() {
 
-		return Math.pow( 0.95, scope.zoomSpeed );
+		return 0.05 * scope.zoomSpeed;
 
 	}
 
@@ -369,38 +389,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	function dollyIn( dollyScale ) {
+	function dolly( dollyScale, zoomOut ) {
 
 		if ( scope.object instanceof THREE.PerspectiveCamera ) {
 
-			scale /= dollyScale;
+			scaleDelta = zoomOut ? - dollyScale : dollyScale;
 
 		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
-			scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom * dollyScale ) );
-			scope.object.updateProjectionMatrix();
-			zoomChanged = true;
-
-		} else {
-
-			console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
-			scope.enableZoom = false;
-
-		}
-
-	}
-
-	function dollyOut( dollyScale ) {
-
-		if ( scope.object instanceof THREE.PerspectiveCamera ) {
-
-			scale *= dollyScale;
-
-		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
-
-			scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / dollyScale ) );
-			scope.object.updateProjectionMatrix();
-			zoomChanged = true;
+			zoomDelta = zoomOut ? - dollyScale : dollyScale;
 
 		} else {
 
@@ -468,15 +465,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
-		if ( dollyDelta.y > 0 ) {
-
-			dollyIn( getZoomScale() );
-
-		} else if ( dollyDelta.y < 0 ) {
-
-			dollyOut( getZoomScale() );
-
-		}
+		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
+		//the zoom happens per event, but while scrolling we call 1 event per gesture,
+		//much more happen for mousemove/touchmove. So they need to scale less.
+		dolly( getZoomScale() * ( scope.enableDamping ? 0.4 : 1 ), dollyDelta.y < 0 );
 
 		dollyStart.copy( dollyEnd );
 
@@ -510,15 +502,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// console.log( 'handleMouseWheel' );
 
-		if ( event.deltaY < 0 ) {
-
-			dollyOut( getZoomScale() );
-
-		} else if ( event.deltaY > 0 ) {
-
-			dollyIn( getZoomScale() );
-
-		}
+		dolly( getZoomScale(), event.deltaY < 0 );
 
 		scope.update();
 
@@ -617,15 +601,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
-		if ( dollyDelta.y > 0 ) {
-
-			dollyOut( getZoomScale() );
-
-		} else if ( dollyDelta.y < 0 ) {
-
-			dollyIn( getZoomScale() );
-
-		}
+		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
+		//the zoom happens per event, but while scrolling we call 1 event per gesture,
+		//much more happen for mousemove/touchmove. So they need to scale less.
+		dolly( getZoomScale() * ( scope.enableDamping ? 0.4 : 1 ), dollyDelta.y > 0 );
 
 		dollyStart.copy( dollyEnd );
 
@@ -770,7 +749,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		handleMouseWheel( event );
 
-		scope.dispatchEvent( startEvent ); // not sure why these are here...
+		scope.dispatchEvent( startEvent );
 		scope.dispatchEvent( endEvent );
 
 	}
