@@ -239,6 +239,13 @@ controls.mouseButtons = {
       Used internally by the [method:saveState] and [method:reset] methods.
     </div>
 
+    <h3>
+      [property:Float zoomDampingFactor]</h3>
+    <div>
+      The damping inertia for zoom, used if [property:Boolean enableDamping] is set to true.<br> Note that for this to work, you must
+      call [page:.update] () in your animation loop.
+    </div>
+
     <h3>[property:Float zoomSpeed]</h3>
     <div>
       Speed of zooming / dollying. Default is 1.
