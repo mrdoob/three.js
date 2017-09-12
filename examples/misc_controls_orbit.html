@@ -54,28 +54,6 @@
 
 			var update = true;
 
-			var params = {
-				enableDamping: false,
-				rotation: {
-					enableRotate: true,
-					autoRotate: false,
-					rotateDampingFactor: 0.1,
-					rotateSpeed: 1.0
-				},
-				pan: {
-					enablePan: true,
-					panSpeed: 1.0,
-					panDampingFactor: 0.1,
-				},
-				zoom: {
-					enableZoom: true,
-					zoomDampingFactor: 0.1,
-					zoomSpeed: 1.0,
-					maxDistance: 1000,
-					minDistance: 10					
-				}
-			};
-
 			init();
 			animate();
 
@@ -144,6 +122,8 @@
 				rotateFolder.add( controls, 'enableRotate' );
 				rotateFolder.add( controls, 'rotateSpeed', 0.1, 3.0 );
 				rotateFolder.add( controls, 'rotateDampingFactor', 0.01, 0.3 );
+				rotateFolder.add( controls, 'autoRotate' );
+				rotateFolder.add( controls, 'autoRotateSpeed', 0.1, 5.0 );
 				var panFolder = gui.addFolder( 'pan' );
 				panFolder.add( controls, 'enablePan' );
 				panFolder.add( controls, 'panSpeed', 0.1, 3.0 );
