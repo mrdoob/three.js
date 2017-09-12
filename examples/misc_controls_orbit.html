@@ -42,19 +42,42 @@
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var stats;
+			var gui;
 
 			var camera, controls, scene, renderer;
 
+			var update = true;
+
+			var params = {
+				enableDamping: false,
+				rotation: {
+					enableRotate: true,
+					autoRotate: false,
+					rotateDampingFactor: 0.1,
+					rotateSpeed: 1.0
+				},
+				pan: {
+					enablePan: true,
+					panSpeed: 1.0,
+					panDampingFactor: 0.1,
+				},
+				zoom: {
+					enableZoom: true,
+					zoomDampingFactor: 0.1,
+					zoomSpeed: 1.0,
+					maxDistance: 1000,
+					minDistance: 10					
+				}
+			};
+
 			init();
-			render(); // remove when using next line for animation loop (requestAnimationFrame)
-			//animate();
+			animate();
 
 			function init() {
 
@@ -73,8 +96,11 @@
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // remove when using animation loop
-				// enable animation loop when using damping or autorotation
+				controls.addEventListener( 'change', function () {
+					//Don't call a render here, but rather in the render loop.
+					update = true; 
+				} );
+				//Enable animation loop when using damping (or autorotation).
 				//controls.enableDamping = true;
 				//controls.rotateDampingFactor = 0.25;
 				controls.enableZoom = false;
@@ -111,8 +137,21 @@
 
 				//
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				gui = new dat.GUI();
+
+				gui.add( controls, 'enableDamping' );
+				var rotateFolder = gui.addFolder( 'rotation' );
+				rotateFolder.add( controls, 'enableRotate' );
+				rotateFolder.add( controls, 'rotateSpeed', 0.1, 3.0 );
+				rotateFolder.add( controls, 'rotateDampingFactor', 0.01, 0.3 );
+				var panFolder = gui.addFolder( 'pan' );
+				panFolder.add( controls, 'enablePan' );
+				panFolder.add( controls, 'panSpeed', 0.1, 3.0 );
+				panFolder.add( controls, 'panDampingFactor', 0.01, 0.3 );
+				var zoomFolder = gui.addFolder( 'zoom' );
+				zoomFolder.add( controls, 'enableZoom' );
+				zoomFolder.add( controls, 'zoomSpeed', 0.1, 3.0 );
+				zoomFolder.add( controls, 'zoomDampingFactor', 0.01, 0.3 );
 
 				//
 
@@ -135,9 +174,13 @@
 
 				controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 
-				stats.update();
+				if ( update ) {
 
-				render();
+					render();
+
+					update = false;
+
+				}
 
 			}
 
