@@ -1453,7 +1453,6 @@ function WebGLRenderer( parameters ) {
 				new Vector3(-portalToCamera.elements[8], -portalToCamera.elements[9], -portalToCamera.elements[10]),
 				new Vector3(portalToCamera.elements[12], portalToCamera.elements[13], portalToCamera.elements[14])
 			);
-			nearPlane.constant -= 0.01;
 			setProjectionNearPlane( portalCamera.projectionMatrix, nearPlane );
 
 			_infoRender.portals ++;
