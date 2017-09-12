@@ -37,6 +37,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -48,17 +49,14 @@
 			}
 
 			var container, stats;
-			var camera, scene, renderer;
-			var controls, water, sphere;
+			var camera, scene, renderer, light;
+			var controls, water, sphere, cubeMap;
 
 			var parameters = {
-				width: 2000,
-				height: 2000,
-				widthSegments: 250,
-				heightSegments: 250,
-				depth: 1500,
-				param: 4,
-				filterparam: 1
+				oceanSide: 2000,
+				size: 0.3,
+				distortionScale: 3.7,
+				alpha: 0.96
 			};
 
 			var waterNormals;
@@ -80,61 +78,106 @@
 				//
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0xaabbbb, 0.0001 );
+				scene.fog = new THREE.FogExp2( 0xaabbbb, 0.001 );
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.5, 3000000 );
-				camera.position.set( 2000, 750, 2000 );
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( 30, 30, 100 );
 
 				//
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.enablePan = false;
-				controls.minDistance = 1000.0;
-				controls.maxDistance = 5000.0;
 				controls.maxPolarAngle = Math.PI * 0.495;
-				controls.target.set( 0, 500, 0 );
-				controls.update();
+				controls.target.set( 0, 10, 0 );
+				controls.enablePan = false;
+				controls.minDistance = 40.0;
+				controls.maxDistance = 200.0;
+				camera.lookAt( controls.target );
 
-				scene.add( new THREE.AmbientLight( 0x444444 ) );
-
-				//
-
-				var light = new THREE.DirectionalLight( 0xffffbb, 1 );
-				light.position.set( - 1, 1, - 1 );
-				scene.add( light );
+				setLighting();
 
 				//
 
-				waterNormals = new THREE.TextureLoader().load( 'textures/waternormals.jpg' );
-				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
+				setWater();
 
-				water = new THREE.Water( renderer, camera, scene, {
-					textureWidth: 512,
-					textureHeight: 512,
-					waterNormals: waterNormals,
-					alpha: 	1.0,
-					sunDirection: light.position.clone().normalize(),
-					sunColor: 0xffffff,
-					waterColor: 0x001e0f,
-					distortionScale: 50.0,
-					fog: scene.fog != undefined
+				// 
+
+				setSkybox();
+
+				//
+
+				var geometry = new THREE.IcosahedronGeometry( 20, 4 );
+
+				for ( var i = 0, j = geometry.faces.length; i < j; i ++ ) {
+
+					geometry.faces[ i ].color.setHex( Math.random() * 0xffffff );
+
+				}
+
+				var material = new THREE.MeshPhongMaterial( {
+					vertexColors: THREE.FaceColors,
+					shininess: 100,
+					envMap: cubeMap,
+					side: THREE.DoubleSide
 				} );
 
+				sphere = new THREE.Mesh( geometry, material );
+				sphere.castShadow = true;
+				scene.add( sphere );
 
-				var mirrorMesh = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( parameters.width * 500, parameters.height * 500 ),
-					water.material
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				gui = new dat.GUI();
+
+				gui.add( parameters, 'distortionScale', 0, 8, 0.1 );
+				gui.add( parameters, 'size', 0.1, 10, 0.1 );
+				gui.add( parameters, 'alpha', 0.9, 1, .001 );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function setWater() {
+
+				water = new THREE.WaterMesh( 
+					parameters.oceanSide * 5, 
+					parameters.oceanSide * 5, 
+					renderer, 
+					camera, 
+					scene, 
+					{
+						textureWidth: 512,
+						textureHeight: 512,
+						waterNormals: new THREE.TextureLoader().load( 'textures/waternormals.jpg', function ( texture ) {
+							texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+						}),
+						alpha: 	parameters.alpha,
+						sunDirection: light.position.clone().normalize(),
+						sunColor: 0xffffff,
+						waterColor: 0x001e0f,
+						distortionScale: parameters.distortionScale,
+						fog: scene.fog != undefined
+					}
 				);
 
-				mirrorMesh.add( water );
-				mirrorMesh.rotation.x = - Math.PI * 0.5;
-				scene.add( mirrorMesh );
+				water.rotation.x = - Math.PI / 2;
+				water.receiveShadow = true;
 
-				// skybox
+				scene.add( water );
 
-				var cubeMap = new THREE.CubeTexture( [] );
+			}
+
+			function setSkybox() {
+
+				cubeMap = new THREE.CubeTexture( [] );
 				cubeMap.format = THREE.RGBFormat;
 
 				var loader = new THREE.ImageLoader();
@@ -172,44 +215,32 @@
 					fragmentShader: cubeShader.fragmentShader,
 					vertexShader: cubeShader.vertexShader,
 					uniforms: cubeShader.uniforms,
-					depthWrite: false,
 					side: THREE.BackSide
 				} );
 
 				var skyBox = new THREE.Mesh(
-					new THREE.BoxGeometry( 1000000, 1000000, 1000000 ),
+					new THREE.BoxGeometry( parameters.oceanSide * 5 + 100, parameters.oceanSide * 5 + 100, parameters.oceanSide * 5 + 100 ),
 					skyBoxMaterial
 				);
 
 				scene.add( skyBox );
 
-				//
+			}
 
-				var geometry = new THREE.IcosahedronGeometry( 400, 4 );
+			function setLighting() {
 
-				for ( var i = 0, j = geometry.faces.length; i < j; i ++ ) {
+				renderer.shadowMap.enabled = true;
 
-					geometry.faces[ i ].color.setHex( Math.random() * 0xffffff );
+				light = new THREE.DirectionalLight( 0xffffbb, 1 );
+				light.position.set( - 30, 30, - 30 );
+				light.castShadow = true;
+				light.shadow.camera.top = 45;
+				light.shadow.camera.right = 40;
+				light.shadow.camera.left = light.shadow.camera.bottom = -40;
+				light.shadow.camera.near = 1; 
+				light.shadow.camera.far = 200;
 
-				}
-
-				var material = new THREE.MeshPhongMaterial( {
-					vertexColors: THREE.FaceColors,
-					shininess: 100,
-					envMap: cubeMap
-				} );
-
-				sphere = new THREE.Mesh( geometry, material );
-				scene.add( sphere );
-
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
+				scene.add( light, new THREE.AmbientLight( 0x444444 ) );
 
 			}
 
@@ -222,8 +253,6 @@
 
 			}
 
-			//
-
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -234,14 +263,18 @@
 
 			function render() {
 
-				var time = performance.now() * 0.001;
+				var time = performance.now() * 0.003;
 
-				sphere.position.y = Math.sin( time ) * 500 + 250;
-				sphere.rotation.x = time * 0.5;
-				sphere.rotation.z = time * 0.51;
+				sphere.position.y = Math.sin( time ) * 2 + 5;
+				sphere.rotation.x = time * 0.1;
+				sphere.rotation.z = time * 0.11;
 
 				water.material.uniforms.time.value += 1.0 / 60.0;
+				water.material.uniforms.size.value = parameters.size;
+				water.material.uniforms.distortionScale.value = parameters.distortionScale;
+				water.material.uniforms.alpha.value = parameters.alpha;
 				water.render();
+
 				renderer.render( scene, camera );
 
 			}
