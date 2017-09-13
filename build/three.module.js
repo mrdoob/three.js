@@ -3640,6 +3640,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
+	this.center = new Vector2( 0, 0 );
 	this.rotation = 0;
 
 	this.matrixAutoUpdate = true;
@@ -7477,6 +7478,7 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
 			state.buffers.depth.setTest( material.depthTest );
 			state.buffers.depth.setMask( material.depthWrite );
+			state.buffers.color.setMask( material.colorWrite );
 
 			textures.setTexture2D( material.map || texture, 0 );
 
@@ -23049,7 +23051,9 @@ function WebGLRenderer( parameters ) {
 				var offset = uvScaleMap.offset;
 				var repeat = uvScaleMap.repeat;
 				var rotation = uvScaleMap.rotation;
-				uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
+				var center = uvScaleMap.center;
+
+				uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
 
 			}
 
@@ -23090,7 +23094,9 @@ function WebGLRenderer( parameters ) {
 				var offset = material.map.offset;
 				var repeat = material.map.repeat;
 				var rotation = material.map.rotation;
-				material.map.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
+				var center = material.map.center;
+
+				material.map.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
 
 			}
 
@@ -37888,20 +37894,20 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			function setValue_direct( buffer, offset ) {
 
-				this.node[ this.propertyName ] = buffer[ offset ];
+				this.targetObject[ this.propertyName ] = buffer[ offset ];
 
 			},
 
 			function setValue_direct_setNeedsUpdate( buffer, offset ) {
 
-				this.node[ this.propertyName ] = buffer[ offset ];
+				this.targetObject[ this.propertyName ] = buffer[ offset ];
 				this.targetObject.needsUpdate = true;
 
 			},
 
 			function setValue_direct_setMatrixWorldNeedsUpdate( buffer, offset ) {
 
-				this.node[ this.propertyName ] = buffer[ offset ];
+				this.targetObject[ this.propertyName ] = buffer[ offset ];
 				this.targetObject.matrixWorldNeedsUpdate = true;
 
 			}
