@@ -459,7 +459,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
-		var zoomSign = dollyDelta.y < 0 ? -1 : 1;
+		var zoomSign = dollyDelta.y < 0 ? -1 : dollyDelta.y > 0 ? 1 : 0;
 
 		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
 		//the zoom happens per event, but while scrolling we call 1 event per gesture,
@@ -498,7 +498,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// console.log( 'handleMouseWheel' );
 
-		var zoomSign = event.deltaY < 0 ? -1 : 1;
+		var zoomSign = event.deltaY < 0 ? -1 : event.deltaY > 0 ? 1 : 0;
 
 		dolly( 1 - Math.pow( 0.95, scope.zoomSpeed ), zoomSign );
 
@@ -599,7 +599,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
-		var zoomSign = dollyDelta.y > 0 ? -1 : 1;
+		var zoomSign = dollyDelta.y > 0 ? -1 : dollyDelta.y < 0 ? 1 : 0;
 
 		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
 		//the zoom happens per event, but while scrolling we call 1 event per gesture,
