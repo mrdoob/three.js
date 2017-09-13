@@ -34,7 +34,8 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - orbit controls example
+			<p><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - orbit controls example</p>
+			<p>No animate loop</p>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -42,20 +43,16 @@
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var gui;
-
 			var camera, controls, scene, renderer;
 
-			var update = true;
-
 			init();
-			animate();
+			render(); // remove when using next line for animation loop (requestAnimationFrame)
+			//animate();
 
 			function init() {
 
@@ -74,11 +71,8 @@
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', function () {
-					//Don't call a render here, but rather in the render loop.
-					update = true; 
-				} );
-				//Enable animation loop when using damping (or autorotation).
+				controls.addEventListener( 'change', render ); // remove when using animation loop
+				// enable animation loop when using damping or autorotation
 				//controls.enableDamping = true;
 				//controls.rotateDampingFactor = 0.25;
 				controls.enableZoom = false;
@@ -115,26 +109,6 @@
 
 				//
 
-				gui = new dat.GUI();
-
-				gui.add( controls, 'enableDamping' );
-				var rotateFolder = gui.addFolder( 'rotation' );
-				rotateFolder.add( controls, 'enableRotate' );
-				rotateFolder.add( controls, 'rotateSpeed', 0.1, 3.0 );
-				rotateFolder.add( controls, 'rotateDampingFactor', 0.01, 0.3 );
-				rotateFolder.add( controls, 'autoRotate' );
-				rotateFolder.add( controls, 'autoRotateSpeed', 0.1, 5.0 );
-				var panFolder = gui.addFolder( 'pan' );
-				panFolder.add( controls, 'enablePan' );
-				panFolder.add( controls, 'panSpeed', 0.1, 3.0 );
-				panFolder.add( controls, 'panDampingFactor', 0.01, 0.3 );
-				var zoomFolder = gui.addFolder( 'zoom' );
-				zoomFolder.add( controls, 'enableZoom' );
-				zoomFolder.add( controls, 'zoomSpeed', 0.1, 3.0 );
-				zoomFolder.add( controls, 'zoomDampingFactor', 0.01, 0.3 );
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -146,8 +120,6 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				update = true;//Let the render be called from the render loop, when the browser is ready.
-
 			}
 
 			function animate() {
@@ -156,13 +128,7 @@
 
 				controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 
-				if ( update ) {
-
-					render();
-
-					update = false;
-
-				}
+				render();
 
 			}
 
