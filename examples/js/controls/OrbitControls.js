@@ -383,15 +383,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	function dolly( dollyScale, zoomOut ) {
+	function dolly( dollyScale, zoomSign ) {
 
 		if ( scope.object instanceof THREE.PerspectiveCamera ) {
 
-			scaleDelta = zoomOut ? - dollyScale : dollyScale;
+			scaleDelta = zoomSign * dollyScale;
 
 		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
-			zoomDelta = zoomOut ? - dollyScale : dollyScale;
+			zoomDelta = zoomSign * dollyScale;
 
 		} else {
 
@@ -459,10 +459,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
+		var zoomSign = dollyDelta.y < 0 ? -1 : 1;
+
 		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
 		//the zoom happens per event, but while scrolling we call 1 event per gesture,
 		//much more happen for mousemove/touchmove. So they need to scale less.
-		dolly( 0.05 * scope.zoomSpeed * ( scope.enableDamping ? 0.4 : 1 ), dollyDelta.y < 0 );
+		dolly( 0.05 * scope.zoomSpeed * ( scope.enableDamping ? 0.4 : 1 ), zoomSign );
 
 		dollyStart.copy( dollyEnd );
 
@@ -496,7 +498,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// console.log( 'handleMouseWheel' );
 
-		dolly( 0.05 * scope.zoomSpeed, event.deltaY < 0 );
+		var zoomSign = event.deltaY < 0 ? -1 : 1;
+
+		dolly( 0.05 * scope.zoomSpeed, zoomSign );
 
 		scope.update();
 
@@ -595,10 +599,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
+		var zoomSign = dollyDelta.y > 0 ? -1 : 1;
+
 		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
 		//the zoom happens per event, but while scrolling we call 1 event per gesture,
 		//much more happen for mousemove/touchmove. So they need to scale less.
-		dolly( 0.05 * scope.zoomSpeed * ( scope.enableDamping ? 0.4 : 1 ), dollyDelta.y > 0 );
+		dolly( 0.05 * scope.zoomSpeed * ( scope.enableDamping ? 0.4 : 1 ), zoomSign );
 
 		dollyStart.copy( dollyEnd );
 
