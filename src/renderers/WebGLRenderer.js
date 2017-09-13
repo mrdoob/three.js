@@ -1994,7 +1994,9 @@ function WebGLRenderer( parameters ) {
 				var offset = uvScaleMap.offset;
 				var repeat = uvScaleMap.repeat;
 				var rotation = uvScaleMap.rotation;
-				uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
+				var center = uvScaleMap.center;
+
+				uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
 
 			}
 
@@ -2035,7 +2037,9 @@ function WebGLRenderer( parameters ) {
 				var offset = material.map.offset;
 				var repeat = material.map.repeat;
 				var rotation = material.map.rotation;
-				material.map.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
+				var center = material.map.center;
+
+				material.map.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
 
 			}
 

@@ -39,6 +39,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
+	this.center = new Vector2( 0, 0 );
 	this.rotation = 0;
 
 	this.matrixAutoUpdate = true;
