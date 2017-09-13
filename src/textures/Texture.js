@@ -4,12 +4,12 @@
  * @author szimek / https://github.com/szimek/
  */
 
-import { EventDispatcher } from '../core/EventDispatcher';
-import { UVMapping } from '../constants';
-import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
-import { _Math } from '../math/Math';
-import { Vector2 } from '../math/Vector2';
-import { Matrix3 } from '../math/Matrix3';
+import { EventDispatcher } from '../core/EventDispatcher.js';
+import { UVMapping } from '../constants.js';
+import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants.js';
+import { _Math } from '../math/Math.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Matrix3 } from '../math/Matrix3.js';
 
 var textureId = 0;
 

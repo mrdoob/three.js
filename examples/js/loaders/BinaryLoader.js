@@ -33,7 +33,7 @@ THREE.BinaryLoader.prototype = {
 		// todo: unify load API to for easier SceneLoader use
 
 		var texturePath = this.texturePath || THREE.Loader.prototype.extractUrlBase( url );
-		var binaryPath  = this.binaryPath || THREE.Loader.prototype.extractUrlBase( url );
+		var binaryPath = this.binaryPath || THREE.Loader.prototype.extractUrlBase( url );
 
 		// #1 load JS part via web worker
 
@@ -83,7 +83,7 @@ THREE.BinaryLoader.prototype = {
 
 	parse: function ( data, callback, texturePath, jsonMaterials ) {
 
-		var Model = function ( texturePath ) {
+		var Model = function () {
 
 			var scope = this,
 				currentOffset = 0,
@@ -110,17 +110,17 @@ THREE.BinaryLoader.prototype = {
 			*/
 			// buffers sizes
 
-			tri_size =  md.vertex_index_bytes * 3 + md.material_index_bytes;
+			tri_size = md.vertex_index_bytes * 3 + md.material_index_bytes;
 			quad_size = md.vertex_index_bytes * 4 + md.material_index_bytes;
 
-			len_tri_flat      = md.ntri_flat      * ( tri_size );
-			len_tri_smooth    = md.ntri_smooth    * ( tri_size + md.normal_index_bytes * 3 );
-			len_tri_flat_uv   = md.ntri_flat_uv   * ( tri_size + md.uv_index_bytes * 3 );
+			len_tri_flat = md.ntri_flat * ( tri_size );
+			len_tri_smooth = md.ntri_smooth * ( tri_size + md.normal_index_bytes * 3 );
+			len_tri_flat_uv = md.ntri_flat_uv * ( tri_size + md.uv_index_bytes * 3 );
 			len_tri_smooth_uv = md.ntri_smooth_uv * ( tri_size + md.normal_index_bytes * 3 + md.uv_index_bytes * 3 );
 
-			len_quad_flat      = md.nquad_flat      * ( quad_size );
-			len_quad_smooth    = md.nquad_smooth    * ( quad_size + md.normal_index_bytes * 4 );
-			len_quad_flat_uv   = md.nquad_flat_uv   * ( quad_size + md.uv_index_bytes * 4 );
+			len_quad_flat = md.nquad_flat * ( quad_size );
+			len_quad_smooth = md.nquad_smooth * ( quad_size + md.normal_index_bytes * 4 );
+			len_quad_flat_uv = md.nquad_flat_uv * ( quad_size + md.uv_index_bytes * 4 );
 
 			// read buffers
 
@@ -131,15 +131,15 @@ THREE.BinaryLoader.prototype = {
 
 			currentOffset += init_uvs( currentOffset );
 
-			start_tri_flat 		= currentOffset;
-			start_tri_smooth    = start_tri_flat    + len_tri_flat    + handlePadding( md.ntri_flat * 2 );
-			start_tri_flat_uv   = start_tri_smooth  + len_tri_smooth  + handlePadding( md.ntri_smooth * 2 );
+			start_tri_flat = currentOffset;
+			start_tri_smooth = start_tri_flat + len_tri_flat + handlePadding( md.ntri_flat * 2 );
+			start_tri_flat_uv = start_tri_smooth + len_tri_smooth + handlePadding( md.ntri_smooth * 2 );
 			start_tri_smooth_uv = start_tri_flat_uv + len_tri_flat_uv + handlePadding( md.ntri_flat_uv * 2 );
 
-			start_quad_flat     = start_tri_smooth_uv + len_tri_smooth_uv  + handlePadding( md.ntri_smooth_uv * 2 );
-			start_quad_smooth   = start_quad_flat     + len_quad_flat	   + handlePadding( md.nquad_flat * 2 );
-			start_quad_flat_uv  = start_quad_smooth   + len_quad_smooth    + handlePadding( md.nquad_smooth * 2 );
-			start_quad_smooth_uv = start_quad_flat_uv  + len_quad_flat_uv   + handlePadding( md.nquad_flat_uv * 2 );
+			start_quad_flat = start_tri_smooth_uv + len_tri_smooth_uv + handlePadding( md.ntri_smooth_uv * 2 );
+			start_quad_smooth = start_quad_flat + len_quad_flat	+ handlePadding( md.nquad_flat * 2 );
+			start_quad_flat_uv = start_quad_smooth + len_quad_smooth + handlePadding( md.nquad_smooth * 2 );
+			start_quad_smooth_uv = start_quad_flat_uv + len_quad_flat_uv + handlePadding( md.nquad_flat_uv * 2 );
 
 			// have to first process faces with uvs
 			// so that face and uv indices match
@@ -170,31 +170,31 @@ THREE.BinaryLoader.prototype = {
 
 				var metaData = {
 
-					'signature'               : parseString( data, offset,  12 ),
-					'header_bytes'            : parseUChar8( data, offset + 12 ),
+					'signature': parseString( data, offset, 12 ),
+					'header_bytes': parseUChar8( data, offset + 12 ),
 
-					'vertex_coordinate_bytes' : parseUChar8( data, offset + 13 ),
-					'normal_coordinate_bytes' : parseUChar8( data, offset + 14 ),
-					'uv_coordinate_bytes'     : parseUChar8( data, offset + 15 ),
+					'vertex_coordinate_bytes': parseUChar8( data, offset + 13 ),
+					'normal_coordinate_bytes': parseUChar8( data, offset + 14 ),
+					'uv_coordinate_bytes': parseUChar8( data, offset + 15 ),
 
-					'vertex_index_bytes'      : parseUChar8( data, offset + 16 ),
-					'normal_index_bytes'      : parseUChar8( data, offset + 17 ),
-					'uv_index_bytes'          : parseUChar8( data, offset + 18 ),
-					'material_index_bytes'    : parseUChar8( data, offset + 19 ),
+					'vertex_index_bytes': parseUChar8( data, offset + 16 ),
+					'normal_index_bytes': parseUChar8( data, offset + 17 ),
+					'uv_index_bytes': parseUChar8( data, offset + 18 ),
+					'material_index_bytes': parseUChar8( data, offset + 19 ),
 
-					'nvertices'    : parseUInt32( data, offset + 20 ),
-					'nnormals'     : parseUInt32( data, offset + 20 + 4 * 1 ),
-					'nuvs'         : parseUInt32( data, offset + 20 + 4 * 2 ),
+					'nvertices': parseUInt32( data, offset + 20 ),
+					'nnormals': parseUInt32( data, offset + 20 + 4 * 1 ),
+					'nuvs': parseUInt32( data, offset + 20 + 4 * 2 ),
 
-					'ntri_flat'      : parseUInt32( data, offset + 20 + 4 * 3 ),
-					'ntri_smooth'    : parseUInt32( data, offset + 20 + 4 * 4 ),
-					'ntri_flat_uv'   : parseUInt32( data, offset + 20 + 4 * 5 ),
-					'ntri_smooth_uv' : parseUInt32( data, offset + 20 + 4 * 6 ),
+					'ntri_flat': parseUInt32( data, offset + 20 + 4 * 3 ),
+					'ntri_smooth': parseUInt32( data, offset + 20 + 4 * 4 ),
+					'ntri_flat_uv': parseUInt32( data, offset + 20 + 4 * 5 ),
+					'ntri_smooth_uv': parseUInt32( data, offset + 20 + 4 * 6 ),
 
-					'nquad_flat'      : parseUInt32( data, offset + 20 + 4 * 7 ),
-					'nquad_smooth'    : parseUInt32( data, offset + 20 + 4 * 8 ),
-					'nquad_flat_uv'   : parseUInt32( data, offset + 20 + 4 * 9 ),
-					'nquad_smooth_uv' : parseUInt32( data, offset + 20 + 4 * 10 )
+					'nquad_flat': parseUInt32( data, offset + 20 + 4 * 7 ),
+					'nquad_smooth': parseUInt32( data, offset + 20 + 4 * 8 ),
+					'nquad_flat_uv': parseUInt32( data, offset + 20 + 4 * 9 ),
+					'nquad_smooth_uv': parseUInt32( data, offset + 20 + 4 * 10 )
 
 				};
 				/*
@@ -689,7 +689,7 @@ THREE.BinaryLoader.prototype = {
 		Model.prototype = Object.create( THREE.Geometry.prototype );
 		Model.prototype.constructor = Model;
 
-		var geometry = new Model( texturePath );
+		var geometry = new Model();
 		var materials = THREE.Loader.prototype.initMaterials( jsonMaterials, texturePath, this.crossOrigin );
 
 		callback( geometry, materials );

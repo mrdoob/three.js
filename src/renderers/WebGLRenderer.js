@@ -1,37 +1,36 @@
-import { REVISION, RGBAFormat, HalfFloatType, FloatType, ByteType, UnsignedByteType, FrontFaceDirectionCW, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, LinearToneMapping } from '../constants';
-import { _Math } from '../math/Math';
-import { Matrix4 } from '../math/Matrix4';
-import { DataTexture } from '../textures/DataTexture';
-import { WebGLUniforms } from './webgl/WebGLUniforms';
-import { UniformsLib } from './shaders/UniformsLib';
-import { UniformsUtils } from './shaders/UniformsUtils';
-import { ShaderLib } from './shaders/ShaderLib';
-import { WebGLFlareRenderer } from './webgl/WebGLFlareRenderer';
-import { WebGLSpriteRenderer } from './webgl/WebGLSpriteRenderer';
-import { WebGLShadowMap } from './webgl/WebGLShadowMap';
-import { WebGLAttributes } from './webgl/WebGLAttributes';
-import { WebGLBackground } from './webgl/WebGLBackground';
-import { WebGLRenderLists } from './webgl/WebGLRenderLists';
-import { WebGLMorphtargets } from './webgl/WebGLMorphtargets';
-import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer';
-import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer';
-import { WebGLGeometries } from './webgl/WebGLGeometries';
-import { WebGLLights } from './webgl/WebGLLights';
-import { WebGLObjects } from './webgl/WebGLObjects';
-import { WebGLPrograms } from './webgl/WebGLPrograms';
-import { WebGLTextures } from './webgl/WebGLTextures';
-import { WebGLProperties } from './webgl/WebGLProperties';
-import { WebGLState } from './webgl/WebGLState';
-import { WebGLCapabilities } from './webgl/WebGLCapabilities';
-import { WebVRManager } from './webvr/WebVRManager';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { WebGLExtensions } from './webgl/WebGLExtensions';
-import { Vector3 } from '../math/Vector3';
-// import { Sphere } from '../math/Sphere';
-import { WebGLClipping } from './webgl/WebGLClipping';
-import { Frustum } from '../math/Frustum';
-import { Vector4 } from '../math/Vector4';
-import { WebGLUtils } from './webgl/WebGLUtils';
+import { REVISION, RGBAFormat, HalfFloatType, FloatType, UnsignedByteType, FrontFaceDirectionCW, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, LinearToneMapping } from '../constants.js';
+import { _Math } from '../math/Math.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { DataTexture } from '../textures/DataTexture.js';
+import { WebGLUniforms } from './webgl/WebGLUniforms.js';
+import { UniformsLib } from './shaders/UniformsLib.js';
+import { UniformsUtils } from './shaders/UniformsUtils.js';
+import { ShaderLib } from './shaders/ShaderLib.js';
+import { WebGLFlareRenderer } from './webgl/WebGLFlareRenderer.js';
+import { WebGLSpriteRenderer } from './webgl/WebGLSpriteRenderer.js';
+import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
+import { WebGLAttributes } from './webgl/WebGLAttributes.js';
+import { WebGLBackground } from './webgl/WebGLBackground.js';
+import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
+import { WebGLMorphtargets } from './webgl/WebGLMorphtargets.js';
+import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
+import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
+import { WebGLGeometries } from './webgl/WebGLGeometries.js';
+import { WebGLLights } from './webgl/WebGLLights.js';
+import { WebGLObjects } from './webgl/WebGLObjects.js';
+import { WebGLPrograms } from './webgl/WebGLPrograms.js';
+import { WebGLTextures } from './webgl/WebGLTextures.js';
+import { WebGLProperties } from './webgl/WebGLProperties.js';
+import { WebGLState } from './webgl/WebGLState.js';
+import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
+import { WebVRManager } from './webvr/WebVRManager.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { WebGLExtensions } from './webgl/WebGLExtensions.js';
+import { Vector3 } from '../math/Vector3.js';
+import { WebGLClipping } from './webgl/WebGLClipping.js';
+import { Frustum } from '../math/Frustum.js';
+import { Vector4 } from '../math/Vector4.js';
+import { WebGLUtils } from './webgl/WebGLUtils.js';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -511,7 +510,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function onContextRestore( event ) {
+	function onContextRestore( /* event */ ) {
 
 		console.log( 'THREE.WebGLRenderer: Context Restored.' );
 
@@ -1229,7 +1228,7 @@ function WebGLRenderer( parameters ) {
 
 	function projectObject( object, camera, sortObjects ) {
 
-		if ( ! object.visible ) return;
+		if ( object.visible === false ) return;
 
 		var visible = object.layers.test( camera.layers );
 
@@ -1996,7 +1995,7 @@ function WebGLRenderer( parameters ) {
 				var repeat = uvScaleMap.repeat;
 				var rotation = uvScaleMap.rotation;
 				var center = uvScaleMap.center;
-				
+
 				uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
 
 			}

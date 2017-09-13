@@ -333,6 +333,10 @@ var list = {
 
 	"Examples": {
 
+		"Controls": {
+			"OrbitControls": "examples/controls/OrbitControls"
+		},
+
 		"Geometries": {
 			"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
 			"ConvexGeometry": "examples/geometries/ConvexGeometry",
@@ -351,6 +355,10 @@ var list = {
 			"PDBLoader": "examples/loaders/PDBLoader",
 			"SVGLoader": "examples/loaders/SVGLoader",
 			"TGALoader": "examples/loaders/TGALoader"
+		},
+
+		"Exporters": {
+			"GLTFExporter": "examples/exporters/GLTFExporter"
 		},
 
 		"Plugins": {
@@ -392,4 +400,4 @@ var list = {
 
 	}
 
-}
+};

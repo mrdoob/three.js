@@ -1426,7 +1426,7 @@
 						}
 						if ( 'color' in geometry.attributes ) {
 
-							for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++materialIndex ) {
+							for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++ materialIndex ) {
 
 								materials[ materialIndex ].vertexColors = THREE.VertexColors;
 
@@ -3659,7 +3659,9 @@
 					var nodeAttrs = match[ 2 ].split( ',' );
 
 					for ( var i = 0, l = nodeAttrs.length; i < l; i ++ ) {
+
 						nodeAttrs[ i ] = nodeAttrs[ i ].trim().replace( /^"/, '' ).replace( /"$/, '' );
+
 					}
 
 					this.parseNodeBegin( l, nodeName, nodeAttrs || null );
@@ -3925,7 +3927,9 @@
 			var props = propValue.split( '",' );
 
 			for ( var i = 0, l = props.length; i < l; i ++ ) {
+
 				props[ i ] = props[ i ].trim().replace( /^\"/, '' ).replace( /\s/, '_' );
+
 			}
 
 			var innerPropName = props[ 0 ];
@@ -4027,7 +4031,7 @@
 		 * @param {BinaryReader} reader
 		 * @returns {boolean}
 		 */
-		endOfContent: function( reader ) {
+		endOfContent: function ( reader ) {
 
 			// footer size: 160bytes + 16-byte alignment padding
 			// - 16bytes: magic
@@ -4039,7 +4043,7 @@
 			// - 16bytes: magic
 			if ( reader.size() % 16 === 0 ) {
 
-				return ( ( reader.getOffset() + 160 + 16 ) & ~0xf ) >= reader.size();
+				return ( ( reader.getOffset() + 160 + 16 ) & ~ 0xf ) >= reader.size();
 
 			} else {
 
@@ -4061,7 +4065,6 @@
 			// The first three data sizes depends on version.
 			var endOffset = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 			var numProperties = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
-			var propertyListLen = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 			var nameLen = reader.getUint8();
 			var name = reader.getString( nameLen );
 
@@ -4355,7 +4358,7 @@
 
 					}
 
-					var inflate = new Zlib.Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
+					var inflate = new Zlib.Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
 					var reader2 = new BinaryReader( inflate.decompress().buffer );
 
 					switch ( type ) {
@@ -4602,8 +4605,8 @@
 			// calculate negative value
 			if ( high & 0x80000000 ) {
 
-				high = ~high & 0xFFFFFFFF;
-				low = ~low & 0xFFFFFFFF;
+				high = ~ high & 0xFFFFFFFF;
+				low = ~ low & 0xFFFFFFFF;
 
 				if ( low === 0xFFFFFFFF ) high = ( high + 1 ) & 0xFFFFFFFF;
 
@@ -4731,7 +4734,7 @@
 			while ( size > 0 ) {
 
 				var value = this.getUint8();
-				size--;
+				size --;
 
 				if ( value === 0 ) break;
 
@@ -5092,7 +5095,7 @@
 
 		}
 
-		return -1;
+		return - 1;
 
 	}
 

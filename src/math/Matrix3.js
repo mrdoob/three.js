@@ -1,4 +1,4 @@
-import { Vector3 } from './Vector3';
+import { Vector3 } from './Vector3.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -80,8 +80,8 @@ Object.assign( Matrix3.prototype, {
 
 		this.set(
 
-			me[ 0 ], me[ 4 ], me[  8 ],
-			me[ 1 ], me[ 5 ], me[  9 ],
+			me[ 0 ], me[ 4 ], me[ 8 ],
+			me[ 1 ], me[ 5 ], me[ 9 ],
 			me[ 2 ], me[ 6 ], me[ 10 ]
 
 		);

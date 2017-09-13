@@ -104,8 +104,9 @@ var files = {
 		"webgl_loader_obj",
 		"webgl_loader_obj_mtl",
 		"webgl_loader_obj2",
-		"webgl_loader_obj2_ww",
-		"webgl_loader_obj2_ww_parallels",
+		"webgl_loader_obj2_meshspray",
+		"webgl_loader_obj2_options",
+		"webgl_loader_obj2_run_director",
 		"webgl_loader_nrrd",
 		"webgl_loader_pcd",
 		"webgl_loader_pdb",
@@ -292,8 +293,8 @@ var files = {
 	],
 	*/
 	"webaudio": [
-		"misc_sound",
-		"misc_sound_visualizer"
+		"webaudio_sandbox",
+		"webaudio_visualizer"
 	],
 	"webvr": [
 		"webvr_cubes",

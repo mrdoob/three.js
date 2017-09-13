@@ -1,8 +1,6 @@
-import { Vector4 } from '../../math/Vector4';
-import { Color } from '../../math/Color';
-import { Vector2 } from '../../math/Vector2';
-import { Matrix3 } from '../../math/Matrix3';
-import { DataTexture } from '../../textures/DataTexture';
+import { Color } from '../../math/Color.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { Matrix3 } from '../../math/Matrix3.js';
 
 /**
  * Uniforms library for shared webgl shaders
