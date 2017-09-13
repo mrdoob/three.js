@@ -1387,7 +1387,7 @@ function WebGLRenderer( parameters ) {
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-			// object.onBeforeRender( _this, scene, camera, geometry, material, group );
+			object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
 
 			if ( object.isImmediateRenderObject ) {
@@ -1405,7 +1405,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			// object.onAfterRender( _this, scene, camera, geometry, material, group );
+			object.onAfterRender( _this, scene, camera, geometry, material, group );
 
 		}
 
@@ -1669,15 +1669,9 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		console.log('>>>leftproj', camera.cameras[0].projectionMatrix.toArray().toString());
-		console.log('>>>leftprojworld', camera.cameras[0].matrixWorldInverse.toArray().toString());
-		p_uniforms.setValue( _gl, 'leftProjectionMatrix', camera.cameras[0].projectionMatrix );
-		p_uniforms.setValue( _gl, 'rightProjectionMatrix', camera.cameras[1].projectionMatrix );
-
 		if ( refreshProgram || camera !== _currentCamera ) {
 
 			if (camera.multiviewSupport) {
-				p_uniforms.setValue( _gl, 'projectionMatrix', camera.cameras[0].projectionMatrix );
 				p_uniforms.setValue( _gl, 'leftProjectionMatrix', camera.cameras[0].projectionMatrix );
 				p_uniforms.setValue( _gl, 'rightProjectionMatrix', camera.cameras[1].projectionMatrix );
 
@@ -1729,6 +1723,10 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+			p_uniforms.setValue( _gl, 'leftViewMatrix', camera.cameras[0].matrixWorldInverse );
+			p_uniforms.setValue( _gl, 'rightViewMatrix', camera.cameras[1].matrixWorldInverse );
+
+/*
 			if ( material.isMeshPhongMaterial ||
 				material.isMeshLambertMaterial ||
 				material.isMeshBasicMaterial ||
@@ -1752,11 +1750,8 @@ function WebGLRenderer( parameters ) {
 				p_uniforms.setValue( _gl, 'leftViewMatrix', camera.cameras[0].matrixWorldInverse );
 				p_uniforms.setValue( _gl, 'rightViewMatrix', camera.cameras[1].matrixWorldInverse );
 			}
-
+*/
 		}
-
-		p_uniforms.setValue( _gl, 'leftViewMatrix', camera.cameras[0].matrixWorldInverse );
-		p_uniforms.setValue( _gl, 'rightViewMatrix', camera.cameras[1].matrixWorldInverse );
 
 		// skinning uniforms must be set even if material didn't change
 		// auto-setting of texture unit for bone texture must go before other textures
@@ -1927,10 +1922,11 @@ function WebGLRenderer( parameters ) {
 
 
 		// common matrices
+/*
 		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
-
+*/
 		return program;
 
 	}
