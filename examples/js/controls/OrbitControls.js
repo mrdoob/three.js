@@ -464,7 +464,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
 		//the zoom happens per event, but while scrolling we call 1 event per gesture,
 		//much more happen for mousemove/touchmove. So they need to scale less.
-		dolly( 0.05 * scope.zoomSpeed * ( scope.enableDamping ? 0.4 : 1 ), zoomSign );
+		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * ( scope.enableDamping ? 0.4 : 1 ), zoomSign );
 
 		dollyStart.copy( dollyEnd );
 
@@ -500,7 +500,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var zoomSign = event.deltaY < 0 ? -1 : 1;
 
-		dolly( 0.05 * scope.zoomSpeed, zoomSign );
+		dolly( 1 - Math.pow( 0.95, scope.zoomSpeed ), zoomSign );
 
 		scope.update();
 
@@ -604,7 +604,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
 		//the zoom happens per event, but while scrolling we call 1 event per gesture,
 		//much more happen for mousemove/touchmove. So they need to scale less.
-		dolly( 0.05 * scope.zoomSpeed * ( scope.enableDamping ? 0.4 : 1 ), zoomSign );
+		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * ( scope.enableDamping ? 0.4 : 1 ), zoomSign );
 
 		dollyStart.copy( dollyEnd );
 
