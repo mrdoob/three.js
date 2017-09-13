@@ -149,10 +149,7 @@
 
 				water = new THREE.WaterMesh( 
 					parameters.oceanSide * 5, 
-					parameters.oceanSide * 5, 
-					renderer, 
-					camera, 
-					scene, 
+					parameters.oceanSide * 5,
 					{
 						textureWidth: 512,
 						textureHeight: 512,
@@ -273,7 +270,7 @@
 				water.material.uniforms.size.value = parameters.size;
 				water.material.uniforms.distortionScale.value = parameters.distortionScale;
 				water.material.uniforms.alpha.value = parameters.alpha;
-				water.render();
+				water.render( renderer, scene, camera );
 
 				renderer.render( scene, camera );
 
