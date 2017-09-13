@@ -460,11 +460,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
 		var zoomSign = dollyDelta.y < 0 ? -1 : dollyDelta.y > 0 ? 1 : 0;
-
-		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
-		//the zoom happens per event, but while scrolling we call 1 event per gesture,
-		//much more happen for mousemove/touchmove. So they need to scale less.
-		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * ( scope.enableDamping ? 0.4 : 1 ), zoomSign );
+		dolly( 1 - Math.pow( 0.95, scope.zoomSpeed ), zoomSign );
 
 		dollyStart.copy( dollyEnd );
 
@@ -500,7 +496,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var zoomSign = event.deltaY < 0 ? -1 : event.deltaY > 0 ? 1 : 0;
 
-		dolly( 1 - Math.pow( 0.95, scope.zoomSpeed ), zoomSign );
+		//1.5 : arbitrarily increase the zoom scale when zoom from mousewheel : the zoom happens
+		//per event, but while a gesture would call 10-15 events with mousemove/touchmove,
+		//scrolling we call 3-5. So it needs to scale more.
+		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * 1.5, zoomSign );
 
 		scope.update();
 
@@ -601,10 +600,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var zoomSign = dollyDelta.y > 0 ? -1 : dollyDelta.y < 0 ? 1 : 0;
 
-		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
-		//the zoom happens per event, but while scrolling we call 1 event per gesture,
-		//much more happen for mousemove/touchmove. So they need to scale less.
-		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * ( scope.enableDamping ? 0.4 : 1 ), zoomSign );
+		dolly( 1 - Math.pow( 0.95, scope.zoomSpeed ), zoomSign );
 
 		dollyStart.copy( dollyEnd );
 
