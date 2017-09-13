@@ -6,7 +6,7 @@ float punctualLightIntensityToIrradianceFactor( const in float lightDistance, co
 
 		// based upon Frostbite 3 Moving to Physically-based Rendering
 		// page 32, equation 26: E[window1]
-		// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
+		// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 		// this is intended to be used on spot and point lights who are represented as luminous intensity
 		// but who must be converted to luminous irradiance for surface lighting calculation
 		float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
