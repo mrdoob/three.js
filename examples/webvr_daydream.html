@@ -9,7 +9,7 @@
 		<style>
 			body {
 				font-family: Monospace;
-				background-color: #101010;
+				background-color: #999;
 				color: #fff;
 				margin: 0px;
 				overflow: hidden;
@@ -19,12 +19,47 @@
 			}
 		</style>
 	</head>
+
+
 	<body>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/vr/DaydreamController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
+
+
+		<script id="vertexShader" type="x-shader/x-vertex">#version 300 es
+			#extension GL_OVR_multiview2 : require
+			#define VIEW_ID gl_ViewID_OVR
+			layout(num_views=2) in;
+
+			uniform mat4 leftProjectionMatrix;
+	    uniform mat4 leftViewMatrix;
+	    uniform mat4 rightProjectionMatrix;
+	    uniform mat4 rightViewMatrix;
+
+			in vec3 position;
+
+			void main()	{
+
+				gl_Position = leftProjectionMatrix * leftViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">#version 300 es
+			precision mediump float;
+			out vec4 color;
+
+			void main()	{
+
+				color = vec4( 1.0, 1.0, 0.0, 1.0 );
+
+			}
+
+		</script>
 
 		<script>
 
@@ -44,8 +79,6 @@
 
 			var room;
 
-			var INTERSECTED;
-
 			init();
 			animate();
 
@@ -61,21 +94,37 @@
 				info.style.textAlign = 'center';
 				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - daydream';
 				container.appendChild( info );
-
+/*
 				var background = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/MilkyWay/' )
 					.load( [ 'dark-s_px.jpg', 'dark-s_nx.jpg', 'dark-s_py.jpg', 'dark-s_ny.jpg', 'dark-s_pz.jpg', 'dark-s_nz.jpg' ] );
 				background.format = THREE.RGBFormat;
-
+*/
 				scene = new THREE.Scene();
-				scene.background = background;
+	//			scene.background = background;
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+/*
+				var material = new THREE.RawShaderMaterial( {
+
+					uniforms: {
+						time: { value: 1.0 }
+					},
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+					side: THREE.DoubleSide,
+					transparent: true
+
+				} );
 
 				room = new THREE.Mesh(
 					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0x808080, wireframe: true } )
+					material
 				);
+				scene.add( room );
+*/
+
+				room = new THREE.Group();
 				scene.add( room );
 
 				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
@@ -84,15 +133,26 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
+				var geometry = new THREE.BoxGeometry( 0.3, 0.3, 0.3 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					var material = new THREE.RawShaderMaterial( {
+/*
+						uniforms: {
+							// time: { value: 1.0 }
+						},
+						*/
+						vertexShader: document.getElementById( 'vertexShader' ).textContent,
+						fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 
-					object.position.x = Math.random() * 4 - 2;
-					object.position.y = Math.random() * 4 - 2;
-					object.position.z = Math.random() * 4 - 2;
+					} );
+
+					var object = new THREE.Mesh( geometry, material );
+
+					object.position.x = Math.random() * 8 - 4;
+					object.position.y = Math.random() * 8 - 4;
+					object.position.z = Math.random() * 8 - 4;
 
 					object.rotation.x = Math.random() * 2 * Math.PI;
 					object.rotation.y = Math.random() * 2 * Math.PI;
@@ -135,24 +195,6 @@
 
 				//
 
-				gamepad = new THREE.DaydreamController();
-				gamepad.position.set( 0.25, - 0.5, 0 );
-				scene.add( gamepad );
-
-				//
-
-				var gamepadHelper = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( { linewidth: 4 } ) );
-				gamepadHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 10 ], 3 ) );
-				gamepad.add( gamepadHelper );
-
-				renderer.domElement.addEventListener( 'click', function ( event ) {
-
-					gamepadHelper.material.color.setHex( Math.random() * 0xffffff );
-
-				} );
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -176,36 +218,7 @@
 
 			function render() {
 
-				gamepad.update();
-
 				var delta = clock.getDelta() * 60;
-
-				// find intersections
-
-				raycaster.ray.origin.copy( gamepad.position );
-				raycaster.ray.direction.set( 0, 0, - 1 ).applyQuaternion( gamepad.quaternion );
-
-				var intersects = raycaster.intersectObjects( room.children );
-
-				if ( intersects.length > 0 ) {
-
-					if ( INTERSECTED != intersects[ 0 ].object ) {
-
-						if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-						INTERSECTED.material.emissive.setHex( 0xff0000 );
-
-					}
-
-				} else {
-
-					if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-					INTERSECTED = undefined;
-
-				}
 
 				// keep cubes inside room
 

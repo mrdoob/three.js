@@ -107,7 +107,13 @@ var WEBVR = {
 			button.textContent = 'ENTER VR';
 			button.onclick = function () {
 
-				display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: canvas } ] );
+				// @todo This should be detected
+				var attributes = {
+					depth: true,
+					multiview: true,
+				};
+
+				display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: canvas, attributes: attributes } ] );
 
 			};
 
