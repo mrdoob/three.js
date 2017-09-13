@@ -362,7 +362,6 @@ var list = {
 		},
 
 		"Plugins": {
-			"CombinedCamera": "examples/cameras/CombinedCamera",
 			"LookupTable": "examples/Lut",
 			"SpriteCanvasMaterial": "examples/SpriteCanvasMaterial"
 		},
