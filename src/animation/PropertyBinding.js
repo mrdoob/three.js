@@ -333,20 +333,20 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			function setValue_direct( buffer, offset ) {
 
-				this.node[ this.propertyName ] = buffer[ offset ];
+				this.targetObject[ this.propertyName ] = buffer[ offset ];
 
 			},
 
 			function setValue_direct_setNeedsUpdate( buffer, offset ) {
 
-				this.node[ this.propertyName ] = buffer[ offset ];
+				this.targetObject[ this.propertyName ] = buffer[ offset ];
 				this.targetObject.needsUpdate = true;
 
 			},
 
 			function setValue_direct_setMatrixWorldNeedsUpdate( buffer, offset ) {
 
-				this.node[ this.propertyName ] = buffer[ offset ];
+				this.targetObject[ this.propertyName ] = buffer[ offset ];
 				this.targetObject.matrixWorldNeedsUpdate = true;
 
 			}
