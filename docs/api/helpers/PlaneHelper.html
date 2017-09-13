@@ -20,8 +20,8 @@
 		<h2>Example</h2>
 
 		<code>
-		var plane = new THREE.Plane(new THREE.Vector3(1, 1, 0.2), 3);
-		helper = new THREE.PlaneHelper( plane, 1, 0xffff00 );
+		var plane = new THREE.Plane( new THREE.Vector3( 1, 1, 0.2 ), 3 );
+		var helper = new THREE.PlaneHelper( plane, 1, 0xffff00 );
 		scene.add( helper );
 		</code>
 
@@ -32,7 +32,7 @@
 		<h3>[name]( [page:Plane plane], [page:Float size], [page:Color hex] )</h3>
 		<div>
 		[page:Plane plane] --  the plane to visualize.<br />
-		[page:Float size] -- (optional) side length of plane helper. Default is 1.
+		[page:Float size] -- (optional) side length of plane helper. Default is 1.<br />
 		[page:Color color] --  (optional) the color of the helper. Default is 0xffff00.<br /><br />
 
 		Creates a new wireframe representation of the passed plane.
