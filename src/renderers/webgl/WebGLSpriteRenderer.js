@@ -225,6 +225,7 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
 			state.buffers.depth.setTest( material.depthTest );
 			state.buffers.depth.setMask( material.depthWrite );
+			state.buffers.color.setMask( material.colorWrite );
 
 			textures.setTexture2D( material.map || texture, 0 );
 
