@@ -297,13 +297,28 @@ THREE.WaterMesh = function ( width, height, options ) {
 
 	scope.add( waterMaterial );
 
-	scope.render = function ( renderer, scene, camera ) { 
+	scope.onBeforeRender = function ( renderer, scene, camera ) { 
 
 		scope.water.updateTextureMatrix( camera );
 
+		var currentRenderTarget = renderer.getRenderTarget();
+
+		var currentVrEnabled = renderer.vr.enabled;
+		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+
+		scope.visible = false;
+
+		renderer.vr.enabled = false; // Avoid camera modification and recursion
+		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
+
 		renderer.render( scene, scope.water.mirrorCamera, scope.water.renderTarget, true );
 
-		scope.material.visible = true;
+		scope.visible = true;
+
+		renderer.vr.enabled = currentVrEnabled;
+		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+
+		renderer.setRenderTarget( currentRenderTarget );
 
 	};
 	
