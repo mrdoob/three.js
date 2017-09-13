@@ -496,6 +496,7 @@ Object.assign( ObjectLoader.prototype, {
 
 				if ( data.offset !== undefined ) texture.offset.fromArray( data.offset );
 				if ( data.repeat !== undefined ) texture.repeat.fromArray( data.repeat );
+				if ( data.center !== undefined ) texture.center.fromArray( data.center );
 				if ( data.rotation !== undefined ) texture.rotation = data.rotation;
 
 				if ( data.wrap !== undefined ) {
