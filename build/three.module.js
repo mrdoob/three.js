@@ -11068,6 +11068,7 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 		if ( this.view === null ) {
 
 			this.view = {
+				enabled: true,
 				fullWidth: 1,
 				fullHeight: 1,
 				offsetX: 0,
@@ -11078,6 +11079,7 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 		}
 
+		this.view.enabled = true;
 		this.view.fullWidth = fullWidth;
 		this.view.fullHeight = fullHeight;
 		this.view.offsetX = x;
@@ -11091,7 +11093,12 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	clearViewOffset: function () {
 
-		this.view = null;
+		if ( this.view !== null ) {
+
+			this.view.enabled = false;
+
+		}
+
 		this.updateProjectionMatrix();
 
 	},
@@ -11108,7 +11115,7 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 		var top = cy + dy;
 		var bottom = cy - dy;
 
-		if ( this.view !== null ) {
+		if ( this.view !== null && this.view.enabled ) {
 
 			var zoomW = this.zoom / ( this.view.width / this.view.fullWidth );
 			var zoomH = this.zoom / ( this.view.height / this.view.fullHeight );
@@ -20400,6 +20407,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		if ( this.view === null ) {
 
 			this.view = {
+				enabled: true,
 				fullWidth: 1,
 				fullHeight: 1,
 				offsetX: 0,
@@ -20410,6 +20418,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 		}
 
+		this.view.enabled = true;
 		this.view.fullWidth = fullWidth;
 		this.view.fullHeight = fullHeight;
 		this.view.offsetX = x;
@@ -20423,7 +20432,12 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	clearViewOffset: function () {
 
-		this.view = null;
+		if ( this.view !== null ) {
+
+			this.view.enabled = false;
+
+		}
+
 		this.updateProjectionMatrix();
 
 	},
@@ -20438,7 +20452,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 			left = - 0.5 * width,
 			view = this.view;
 
-		if ( view !== null ) {
+		if ( this.view !== null && this.view.enabled ) {
 
 			var fullWidth = view.fullWidth,
 				fullHeight = view.fullHeight;
