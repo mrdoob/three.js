@@ -300,12 +300,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function getZoomScale() {
-
-		return 0.05 * scope.zoomSpeed;
-
-	}
-
 	function rotateLeft( angle ) {
 
 		sphericalDelta.theta -= angle;
@@ -468,7 +462,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
 		//the zoom happens per event, but while scrolling we call 1 event per gesture,
 		//much more happen for mousemove/touchmove. So they need to scale less.
-		dolly( getZoomScale() * ( scope.enableDamping ? 0.4 : 1 ), dollyDelta.y < 0 );
+		dolly( 0.05 * scope.zoomSpeed * ( scope.enableDamping ? 0.4 : 1 ), dollyDelta.y < 0 );
 
 		dollyStart.copy( dollyEnd );
 
@@ -502,7 +496,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// console.log( 'handleMouseWheel' );
 
-		dolly( getZoomScale(), event.deltaY < 0 );
+		dolly( 0.05 * scope.zoomSpeed, event.deltaY < 0 );
 
 		scope.update();
 
@@ -604,7 +598,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		//Arbitrary lower the zoom scale when damping enabled and zoom called from touch and move :
 		//the zoom happens per event, but while scrolling we call 1 event per gesture,
 		//much more happen for mousemove/touchmove. So they need to scale less.
-		dolly( getZoomScale() * ( scope.enableDamping ? 0.4 : 1 ), dollyDelta.y > 0 );
+		dolly( 0.05 * scope.zoomSpeed * ( scope.enableDamping ? 0.4 : 1 ), dollyDelta.y > 0 );
 
 		dollyStart.copy( dollyEnd );
 
