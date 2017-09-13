@@ -14,7 +14,7 @@
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
 
-THREE.Sky = function ( radius ) {
+THREE.Sky = function () {
 
 	var skyShader = THREE.Sky.SkyShader;
 
@@ -27,9 +27,7 @@ THREE.Sky = function ( radius ) {
 		side: THREE.BackSide
 	} );
 
-	var radius = radius !== undefined ? radius : 450000;
-
-	var skyGeo = new THREE.SphereBufferGeometry( radius, 32, 15 );
+	var skyGeo = new THREE.SphereBufferGeometry( 1, 32, 15 );
 	var skyMesh = new THREE.Mesh( skyGeo, skyMat );
 
 	// Expose variables
