@@ -352,7 +352,7 @@ var list = {
 			"MTLLoader": "examples/loaders/MTLLoader",
 			"OBJLoader": "examples/loaders/OBJLoader",
 			"OBJLoader2": "examples/loaders/OBJLoader2",
-			"WWOBJLoader2": "examples/loaders/WWOBJLoader2",
+			"LoaderSupport": "examples/loaders/LoaderSupport",
 			"PCDLoader": "examples/loaders/PCDLoader",
 			"PDBLoader": "examples/loaders/PDBLoader",
 			"SVGLoader": "examples/loaders/SVGLoader",
