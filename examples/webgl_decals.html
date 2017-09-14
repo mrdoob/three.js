@@ -202,6 +202,7 @@
 					intersection.point.copy( p );
 
 					var n = intersects[ 0 ].face.normal.clone();
+					n.transformDirection( mesh.matrixWorld );
 					n.multiplyScalar( 10 );
 					n.add( intersects[ 0 ].point );
 
