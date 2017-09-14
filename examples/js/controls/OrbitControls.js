@@ -319,7 +319,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		return function panLeft( distance, objectMatrix ) {
 
 			v.setFromMatrixColumn( objectMatrix, 0 ); // get X column of objectMatrix
-			v.multiplyScalar( - distance * scope.panSpeed );
+			v.multiplyScalar( - distance );
 
 			panOffset.add( v );
 
@@ -334,7 +334,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		return function panUp( distance, objectMatrix ) {
 
 			v.setFromMatrixColumn( objectMatrix, 1 ); // get Y column of objectMatrix
-			v.multiplyScalar( distance * scope.panSpeed );
+			v.multiplyScalar( distance );
 
 			panOffset.add( v );
 
@@ -475,7 +475,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		panEnd.set( event.clientX, event.clientY );
 
-		panDelta.subVectors( panEnd, panStart );
+		panDelta.subVectors( panEnd, panStart ).multiplyScalar( scope.panSpeed );
 
 		pan( panDelta.x, panDelta.y );
 
@@ -615,7 +615,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		panDelta.subVectors( panEnd, panStart );
+		panDelta.subVectors( panEnd, panStart ).multiplyScalar( scope.panSpeed );
 
 		pan( panDelta.x, panDelta.y );
 
