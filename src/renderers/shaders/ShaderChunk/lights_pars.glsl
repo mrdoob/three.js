@@ -282,7 +282,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		#elif defined( ENVMAP_TYPE_SPHERE )
 
-			vec3 reflectView = normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0,0.0,1.0 ) );
+			vec3 reflectView = normalize( reflectVec + vec3( 0.0,0.0,1.0 ) );
 
 			#ifdef TEXTURE_LOD_EXT
 
