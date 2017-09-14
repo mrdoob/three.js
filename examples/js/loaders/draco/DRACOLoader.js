@@ -28,7 +28,9 @@ THREE.DRACOLoader = function(dracoPath, dracoDecoderType, manager) {
         (dracoDecoderType !== undefined) ? dracoDecoderType : {};
     this.drawMode = THREE.TrianglesDrawMode;
     this.dracoSrcPath = (dracoPath !== undefined) ? dracoPath : './';
-    THREE.DRACOLoader.loadDracoDecoder(this);
+    if (typeof DracoDecoderModule === 'undefined') {
+      THREE.DRACOLoader.loadDracoDecoder(this);
+    }
 };
 
 THREE.DRACOLoader.prototype = {
