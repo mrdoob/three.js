@@ -166,7 +166,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			spherical.makeSafe();
 
 
-			spherical.radius *= ( 1 + scaleDelta );
+			spherical.radius *= ( 1 + distanceDelta );
 
 			// restrict radius to be between desired limits
 			spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
@@ -202,14 +202,14 @@ THREE.OrbitControls = function ( object, domElement ) {
 				sphericalDelta.theta *= ( 1 - scope.rotateDampingFactor );
 				sphericalDelta.phi *= ( 1 - scope.rotateDampingFactor );
 				panOffset.multiplyScalar( 1 - scope.panDampingFactor );
-				scaleDelta *= ( 1 - scope.zoomDampingFactor );
+				distanceDelta *= ( 1 - scope.zoomDampingFactor );
 				zoomDelta *= ( 1 - scope.zoomDampingFactor );
 
 			} else {
 
 				sphericalDelta.set( 0, 0, 0 );
 				panOffset.set( 0, 0, 0 );
-				scaleDelta = 0;
+				distanceDelta = 0;
 				zoomDelta = 0;
 
 			}
@@ -277,7 +277,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var spherical = new THREE.Spherical();
 	var sphericalDelta = new THREE.Spherical();
 
-	var scaleDelta = 0;
+	var distanceDelta = 0;
 	var zoomDelta = 0;
 	var panOffset = new THREE.Vector3();
 	var zoomChanged = false;
@@ -383,15 +383,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	function dolly( dollyScale, zoomSign ) {
+	function dolly( dollyDistance ) {
 
 		if ( scope.object instanceof THREE.PerspectiveCamera ) {
 
-			scaleDelta = zoomSign * dollyScale;
+			distanceDelta = dollyDistance;
 
 		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
-			zoomDelta = zoomSign * dollyScale;
+			zoomDelta = dollyDistance;
 
 		} else {
 
@@ -460,7 +460,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
 		var zoomSign = dollyDelta.y < 0 ? -1 : dollyDelta.y > 0 ? 1 : 0;
-		dolly( 1 - Math.pow( 0.95, scope.zoomSpeed ), zoomSign );
+
+		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
 
 		dollyStart.copy( dollyEnd );
 
@@ -499,7 +500,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		//1.5 : arbitrarily increase the zoom scale when zoom from mousewheel : the zoom happens
 		//per event, but while a gesture would call 10-15 events with mousemove/touchmove,
 		//scrolling we call 3-5. So it needs to scale more.
-		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * 1.5, zoomSign );
+		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * 1.5 * zoomSign );
 
 		scope.update();
 
@@ -600,7 +601,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var zoomSign = dollyDelta.y > 0 ? -1 : dollyDelta.y < 0 ? 1 : 0;
 
-		dolly( 1 - Math.pow( 0.95, scope.zoomSpeed ), zoomSign );
+		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
 
 		dollyStart.copy( dollyEnd );
 
