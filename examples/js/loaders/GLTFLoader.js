@@ -703,10 +703,18 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					var offset = uvScaleMap.offset;
-					var repeat = uvScaleMap.repeat;
+					if ( uvScaleMap.matrixAutoUpdate === true ) {
 
-					uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+						var offset = uvScaleMap.offset;
+						var repeat = uvScaleMap.repeat;
+						var rotation = uvScaleMap.rotation;
+						var center = uvScaleMap.center;
+
+						uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+
+					}
+
+					uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 				}
 
