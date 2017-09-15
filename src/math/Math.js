@@ -148,6 +148,12 @@ var _Math = {
 
 	},
 
+	previousPowerOfTwo: function ( value ) {
+
+		return Math.pow( 2, Math.floor( Math.log( value ) / Math.LN2 ) );
+
+	},
+
 	nextPowerOfTwo: function ( value ) {
 
 		value --;
