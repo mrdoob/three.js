@@ -106,6 +106,65 @@ var UniformsLib = {
 
 	},
 
+	lights: { // DEPRECATED: This is now longer required. Setting material.lights = true will now include the below uniforms automatically
+
+		/*ambientLightColor: { value: [] },
+		
+		directionalLights: { value: [], properties: {
+			direction: {},
+			color: {},
+		
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
+		} },
+		
+		directionalShadowMap: { value: [] },
+		directionalShadowMatrix: { value: [] },
+		
+		spotLights: { value: [], properties: {
+			color: {},
+			position: {},
+			direction: {},
+			distance: {},
+			coneCos: {},
+			penumbraCos: {},
+			decay: {},
+		
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
+		} },
+		
+		spotShadowMap: { value: [] },
+		spotShadowMatrix: { value: [] },
+		
+		pointLights: { value: [], properties: {
+			color: {},
+			position: {},
+			decay: {},
+			distance: {},
+		
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {},
+			shadowCameraNear: {},
+			shadowCameraFar: {}
+		} },
+		
+		pointShadowMap: { value: [] },
+		pointShadowMatrix: { value: [] },
+		
+		hemisphereLights: { value: [], properties: {
+			direction: {},
+			skyColor: {},
+			groundColor: {}
+		} }*/
+	},
+
 	points: {
 
 		diffuse: { value: new Color( 0xeeeeee ) },
