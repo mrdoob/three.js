@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<div class="desc">Supporting classes for file loaders.</div>
+
+		<h2>Sub-Classes</h2>
+		[page:LoaderSupport.Builder]<br>
+		[page:LoaderSupport.LoadedMeshUserOverride]<br>
+		[page:LoaderSupport.Commons]<br>
+		[page:LoaderSupport.PrepData]<br>
+		[page:LoaderSupport.Callbacks]<br>
+		[page:LoaderSupport.WorkerDirector]<br>
+		[page:LoaderSupport.WorkerSupport]
+
+		<h2>Example</h2>
+
+		[example:webgl_loader_obj2_meshspray] - Example using [page:LoaderSupport.LoaderWorkerDirector] and [page:LoaderSupport.LoaderWorkerSupport].<br>
+
+		<h2>Classes</h2>
+		<br>
+
+		<a name="Builder"></a><h1>Builder</h1>
+		<h2>Constructor</h2>
+
+		<h3>Builder()</h3>
+		<div>
+			Builds one or many THREE.Mesh from one raw set of Arraybuffers, materialGroup descriptions and further parameters.
+			Supports vertex, vertexColor, normal, uv and index buffers.
+		</div>
+
+		<h2>Methods</h2>
+		TODO
+		<br>
+		<br>
+
+
+		<a name="LoadedMeshUserOverride"></a><h1>LoadedMeshUserOverride</h1>
+		<h2>Constructor</h2>
+
+		<h3>LoadedMeshUserOverride( [page:Boolean disregardMesh], [page:THREE.BufferGeometry bufferGeometry], [page:THREE.Material material] )</h3>
+		<div>
+			[page:Boolean disregardMesh] - Tell implementation to completely disregard this mesh<br>
+			[page:Boolean alteredMesh] - Tell implementation that mesh(es) have been altered or added
+		</div>
+		<div>
+			Object to return by callback onMeshAlter. Used to disregard a certain mesh or to return one to many meshes.
+		</div>
+
+		<h2>Methods</h2>
+		TODO
+		<br>
+		<br>
+
+
+		<h3>Commons()</h3>
+		<div>
+			Base class to be used by loaders.
+		</div>
+
+		<h2>Methods</h2>
+		TODO
+		<br>
+		<br>
+
+
+		<a name="PrepData"></a><h1>PrepData</h1>
+		<h2>Constructor</h2>
+
+		<h3>PrepData( [page:String modelName] )</h3>
+		<div>
+			[page:String modelName] - Overall name of the model
+		</div>
+		<div>
+			Configuration instructions to be used by run method.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null setStreamMeshesTo] ( [page:Object3D streamMeshesTo] )</h3>
+		<div>
+			[page:Object3D streamMeshesTo] - Object already attached to scenegraph where new meshes will be attached to
+		</div>
+		<div>
+			Set the node where the loaded objects will be attached directly.
+		</div>
+
+
+		<h3>[method:null setMaterialPerSmoothingGroup] ( [page:boolean materialPerSmoothingGroup] )</h3>
+		<div>
+			[page:boolean materialPerSmoothingGroup]
+		</div>
+		<div>
+			Tells whether a material shall be created per smoothing group.
+		</div>
+
+
+		<h3>[method:null setUseIndices]( [page:Boolean useIndices] )</h3>
+		<div>
+			[page:Boolean useIndices] - Default is false
+		</div>
+		<div>
+			Instructs loaders to create indexed [page:BufferGeometry].
+		</div>
+
+
+		<h3>[method:null setDisregardNormals]( [page:Boolean disregardNormals] )</h3>
+		<div>
+			[page:Boolean disregardNormals]
+		</div>
+		<div>
+			Tells whether normals should be completely disregarded and regenerated.
+		</div>
+
+
+		<h3>[method:Callbacks getCallbacks]()</h3>
+		<div>
+			Returns all callbacks as [page:LoaderSupport.Callbacks].
+		</div>
+
+
+		<h3>[method:null setCrossOrigin]( [page:String crossOrigin] )</h3>
+		<div>
+			[page:String crossOrigin] - CORS value
+		</div>
+		<div>
+			Sets the CORS string to be used.
+		</div>
+
+
+		<h3>[method:null addResource]( [page:LoaderSupport.ResourceDescriptor resource] )</h3>
+		<div>
+			[page:LoaderSupport.ResourceDescriptor resource]
+		</div>
+		<div>
+			Add a resource description.
+		</div>
+
+
+		<h3>[method:null setUseAsync]( [page:Boolean useAsync] )</h3>
+		<div>
+			[page:Boolean useAsync]
+		</div>
+		<div>
+			If true uses async loading with worker, if false loads data synchronously.
+		</div>
+		<br>
+		<br>
+
+
+		<a name="Callbacks"></a><h1>Callbacks</h1>
+		<h2>Constructor</h2>
+
+		<h3>Callbacks()</h3>
+		<div>
+			Callbacks utilized by loaders and builder.
+		</div>
+
+		<h2>Methods</h2>
+		TODO
+		<br>
+		<br>
+
+
+		<a name="WorkerDirector"></a><h1>WorkerDirector</h1>
+		<h2>Constructor</h2>
+
+		<h3>WorkerDirector( [page:String classDef], [page:LoaderSupport.ConsoleLogger logger] )</h3>
+		<div>
+			[page:String classDef] - Class definition to be used for construction<br>
+			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
+		</div>
+		<div>
+			Orchestrate loading of multiple OBJ files/data from an instruction queue with a configurable amount of workers (1-16).<br>
+			- Workflow:<br>
+			- prepareWorkers<br>
+			- enqueueForRun<br>
+			- processQueue<br>
+			- deregister
+		</div>
+
+
+		<h3>[method:null prepareWorkers]( [page:WWOBJLoader2.Callbacks globalCallbacks], [page:Number maxQueueSize], [page:Number maxWebWorkers] )</h3>
+		<div>
+			[page:LoaderSupport.Callbacks globalCallbacks] - Register global callbacks used by all web workers<br>
+			[page:Number maxQueueSize] - Set the maximum size of the instruction queue (1-1024)<br>
+			[page:Number maxWebWorkers] - Set the maximum amount of workers (1-16)
+		</div>
+		<div>
+			Create or destroy workers according limits. Set the name and register callbacks for dynamically created web workers.
+		</div>
+
+
+		<h3>[method:null enqueueForRun]( [page:LoaderSupport.PrepData runParams] )</h3>
+		<div>
+			[page:LoaderSupport.PrepData runParams]
+		</div>
+		<div>
+			Store run instructions in internal instructionQueue.
+		</div>
+
+
+		<h3>[method:null processQueue]()</h3>
+		<div>
+			Process the instructionQueue until it is depleted.
+		</div>
+
+
+		<h3>[method:null deregister]()</h3>
+		<div>
+			Terminate all workers.
+		</div>
+
+
+		<h3>[method:null getMaxQueueSize]()</h3>
+		<div>
+			Returns the maximum length of the instruction queue.
+		</div>
+
+
+		<h3>[method:null getMaxWebWorkers]()</h3>
+		<div>
+			Returns the maximum number of workers.
+		</div>
+
+
+		<h3>[method:null setCrossOrigin]( [page:String crossOrigin] )</h3>
+		<div>
+			[page:String crossOrigin] - CORS value
+		</div>
+		<div>
+			Sets the CORS string to be used.
+		</div>
+
+
+		<h3>WorkerSupport()</h3>
+		<div>
+			WorkerSupport
+		</div>
+
+		<h2>Methods</h2>
+		TODO
+		<br>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/LoaderSupport.js examples/js/loaders/LoaderSupport.js]
+
+	</body>
+</html>
