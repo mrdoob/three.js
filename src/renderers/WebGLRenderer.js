@@ -1326,14 +1326,16 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function renderObjects( renderList, scene, camera, overrideMaterial ) {
+	var frameData = new window.VRFrameData();
 
-		_gl.clearColor(1.0, 1.0, 0.0, 1.0);
-		_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT );
+	function renderObjects( renderList, scene, camera, overrideMaterial ) {
 
 		//-----------
 		var vrDevice = vr.getDevice();
 		if ( vrDevice && vrDevice.isPresenting ) {
+
+			vrDevice.getFrameData( frameData );
+
 
 			var views = vrDevice.getViews ? vrDevice.getViews() : [];
 			if ( views.length > 0 ) {
@@ -1344,7 +1346,7 @@ function WebGLRenderer( parameters ) {
 					var multiview = view.getAttributes().multiview;
 					var viewport = view.getViewport();
 
-					_gl.clearColor(1.0, 0.0, 0.0, 1.0);
+					_gl.clearColor(0.2, 0.2, 0.2, 1.0);
 
 					_gl.bindFramebuffer( _gl.FRAMEBUFFER, view.framebuffer );
 					_gl.viewport( viewport.x, viewport.y, viewport.width, viewport.height );
@@ -1355,14 +1357,6 @@ function WebGLRenderer( parameters ) {
 
 						camera.multiviewSupport = true;
 
-						/*
-            var projections = [ frameData.leftProjectionMatrix, frameData.rightProjectionMatrix ];
-            getStandingViewMatrix( viewMat, frameData.leftViewMatrix );
-            getStandingViewMatrix( viewMat2, frameData.rightViewMatrix );
-            var viewMats = [ viewMat, viewMat2 ];
-            // renderSceneView( projections, viewMats, frameData.pose, true );
-						*/
-						//renderSceneMultiView( scene, camera, geometry, material, group );
 						renderObjectsMultiview( renderList, scene, camera, overrideMaterial );
           	break;
           }
@@ -1402,6 +1396,7 @@ function WebGLRenderer( parameters ) {
 			} else {
 
 				_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
+
 
 			}
 
@@ -1603,11 +1598,10 @@ function WebGLRenderer( parameters ) {
 				// we might want to call this function with some ClippingGroup
 				// object instead of the material, once it becomes feasible
 				// (#8465, #8379)
-	/*			_clipping.setState(
+			_clipping.setState(
 					material.clippingPlanes, material.clipIntersection, material.clipShadows,
 					//!!!!!!!
 					camera.cameras[0], materialProperties, useCache );
-*/
 			}
 
 		}
@@ -1669,6 +1663,12 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+
+//		_gl.uniformMatrix4fv( p_uniforms.map['leftProjectionMatrix'].addr, false, frameData.leftProjectionMatrix );
+//		_gl.uniformMatrix4fv( p_uniforms.map['leftViewMatrix'].addr, false, frameData.leftViewMatrix );
+//		_gl.uniformMatrix4fv( p_uniforms.map['rightProjectionMatrix'].addr, false, frameData.rightProjectionMatrix );
+//		_gl.uniformMatrix4fv( p_uniforms.map['rightViewMatrix'].addr, false, frameData.rightViewMatrix );
+
 		if ( refreshProgram || camera !== _currentCamera ) {
 
 			if (camera.multiviewSupport) {
@@ -1680,14 +1680,14 @@ function WebGLRenderer( parameters ) {
 				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
 			}
-/*
+
 			if ( capabilities.logarithmicDepthBuffer ) {
 
 				p_uniforms.setValue( _gl, 'logDepthBufFC',
 					2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
 
 			}
-*/
+
 
 			// Avoid unneeded uniform updates per ArrayCamera's sub-camera
 
@@ -1715,7 +1715,7 @@ function WebGLRenderer( parameters ) {
 				var uCamPos = p_uniforms.map.cameraPosition;
 
 				if ( uCamPos !== undefined ) {
-					console.log('camPos', camera.matrixWorld.toArray().toString());
+
 					uCamPos.setValue( _gl,
 						_vector3.setFromMatrixPosition( camera.matrixWorld ) );
 
@@ -1723,10 +1723,6 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			p_uniforms.setValue( _gl, 'leftViewMatrix', camera.cameras[0].matrixWorldInverse );
-			p_uniforms.setValue( _gl, 'rightViewMatrix', camera.cameras[1].matrixWorldInverse );
-
-/*
 			if ( material.isMeshPhongMaterial ||
 				material.isMeshLambertMaterial ||
 				material.isMeshBasicMaterial ||
@@ -1750,7 +1746,7 @@ function WebGLRenderer( parameters ) {
 				p_uniforms.setValue( _gl, 'leftViewMatrix', camera.cameras[0].matrixWorldInverse );
 				p_uniforms.setValue( _gl, 'rightViewMatrix', camera.cameras[1].matrixWorldInverse );
 			}
-*/
+
 		}
 
 		// skinning uniforms must be set even if material didn't change
@@ -1920,13 +1916,15 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-
 		// common matrices
-/*
 		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
-*/
+
+		p_uniforms.setValue( _gl, 'leftViewMatrix', camera.cameras[0].matrixWorldInverse );
+		p_uniforms.setValue( _gl, 'rightViewMatrix', camera.cameras[1].matrixWorldInverse );
+
+
 		return program;
 
 	}

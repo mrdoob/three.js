@@ -28,7 +28,6 @@
 		<script src="js/vr/DaydreamController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
-
 		<script id="vertexShader" type="x-shader/x-vertex">#version 300 es
 			#extension GL_OVR_multiview2 : require
 			#define VIEW_ID gl_ViewID_OVR
@@ -38,12 +37,16 @@
 	    uniform mat4 leftViewMatrix;
 	    uniform mat4 rightProjectionMatrix;
 	    uniform mat4 rightViewMatrix;
+			uniform mat4 modelMatrix;
+			uniform mat4 modelViewMatrix;
 
 			in vec3 position;
 
 			void main()	{
 
-				gl_Position = leftProjectionMatrix * leftViewMatrix * vec4( position, 1.0 );
+				mat4 m = VIEW_ID == 0u ? (leftProjectionMatrix * leftViewMatrix) : (rightProjectionMatrix * rightViewMatrix);
+				m = modelViewMatrix * m;
+				gl_Position = m * vec4( position, 1.0 );
 
 			}
 
@@ -51,11 +54,12 @@
 
 		<script id="fragmentShader" type="x-shader/x-fragment">#version 300 es
 			precision mediump float;
-			out vec4 color;
+			out vec4 out_color;
+			uniform vec3 color;
 
 			void main()	{
 
-				color = vec4( 1.0, 1.0, 0.0, 1.0 );
+				out_color = vec4( color, 1.0 );
 
 			}
 
@@ -133,27 +137,31 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 0.3, 0.3, 0.3 );
+				var geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
+				//var geometry = new THREE.SphereGeometry( 1, 32, 32 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var material = new THREE.RawShaderMaterial( {
-/*
 						uniforms: {
-							// time: { value: 1.0 }
+							leftProjectionMatrix: { value: new THREE.Matrix4() },
+					    leftViewMatrix: { value: new THREE.Matrix4() },
+					    rightProjectionMatrix: { value: new THREE.Matrix4() },
+					    rightViewMatrix: { value: new THREE.Matrix4() },
+							modelMatrix: { value: new THREE.Matrix4() },
+							modelViewMatrix: { value: new THREE.Matrix4() },
+							color: { value: new THREE.Color( Math.random() * 0xffffff ) }
 						},
-						*/
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
 						fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 
 					} );
-
 					var object = new THREE.Mesh( geometry, material );
 
-					object.position.x = Math.random() * 8 - 4;
-					object.position.y = Math.random() * 8 - 4;
-					object.position.z = Math.random() * 8 - 4;
-
+					object.position.x = Math.random() * 4 - 2;
+					object.position.y = Math.random() * 4 - 2;
+					object.position.z = Math.random() * 4 - 2;
+/*
 					object.rotation.x = Math.random() * 2 * Math.PI;
 					object.rotation.y = Math.random() * 2 * Math.PI;
 					object.rotation.z = Math.random() * 2 * Math.PI;
@@ -166,7 +174,7 @@
 					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
 					object.userData.velocity.y = Math.random() * 0.01 - 0.005;
 					object.userData.velocity.z = Math.random() * 0.01 - 0.005;
-
+*/
 					room.add( object );
 
 				}
@@ -178,6 +186,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -217,7 +226,7 @@
 			}
 
 			function render() {
-
+/*
 				var delta = clock.getDelta() * 60;
 
 				// keep cubes inside room
@@ -254,7 +263,7 @@
 					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
 
 				}
-
+*/
 				renderer.render( scene, camera );
 
 			}
