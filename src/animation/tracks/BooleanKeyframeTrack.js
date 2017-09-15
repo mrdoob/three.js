@@ -1,6 +1,6 @@
-import { InterpolateDiscrete } from '../../constants';
-import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype';
-import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
+import { InterpolateDiscrete } from '../../constants.js';
+import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype.js';
+import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor.js';
 
 /**
  *
@@ -18,8 +18,7 @@ function BooleanKeyframeTrack( name, times, values ) {
 
 }
 
-BooleanKeyframeTrack.prototype =
-		Object.assign( Object.create( KeyframeTrackPrototype ), {
+BooleanKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
 
 	constructor: BooleanKeyframeTrack,
 

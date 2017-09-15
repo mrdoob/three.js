@@ -2,8 +2,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Cache } from './Cache';
-import { DefaultLoadingManager } from './LoadingManager';
+import { Cache } from './Cache.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 function FileLoader( manager ) {
 
@@ -64,9 +64,7 @@ Object.assign( FileLoader.prototype, {
 					case 'arraybuffer':
 					case 'blob':
 
-					 	response = new ArrayBuffer( data.length );
-
-						var view = new Uint8Array( response );
+						var view = new Uint8Array( data.length );
 
 						for ( var i = 0; i < data.length; i ++ ) {
 
@@ -76,7 +74,11 @@ Object.assign( FileLoader.prototype, {
 
 						if ( responseType === 'blob' ) {
 
-							response = new Blob( [ response ], { type: mimeType } );
+							response = new Blob( [ view.buffer ], { type: mimeType } );
+
+						} else {
+
+							response = view.buffer;
 
 						}
 
@@ -103,7 +105,7 @@ Object.assign( FileLoader.prototype, {
 
 				}
 
-				// Wait for next browser tick
+				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
 				window.setTimeout( function () {
 
 					if ( onLoad ) onLoad( response );
@@ -114,7 +116,7 @@ Object.assign( FileLoader.prototype, {
 
 			} catch ( error ) {
 
-				// Wait for next browser tick
+				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
 				window.setTimeout( function () {
 
 					if ( onError ) onError( error );

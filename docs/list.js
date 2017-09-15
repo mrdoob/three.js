@@ -183,12 +183,14 @@ var list = {
 			"ArrowHelper": "api/helpers/ArrowHelper",
 			"AxisHelper": "api/helpers/AxisHelper",
 			"BoxHelper": "api/helpers/BoxHelper",
+			"Box3Helper": "api/helpers/Box3Helper",
 			"CameraHelper": "api/helpers/CameraHelper",
 			"DirectionalLightHelper": "api/helpers/DirectionalLightHelper",
 			"FaceNormalsHelper": "api/helpers/FaceNormalsHelper",
 			"GridHelper": "api/helpers/GridHelper",
 			"PolarGridHelper": "api/helpers/PolarGridHelper",
 			"HemisphereLightHelper": "api/helpers/HemisphereLightHelper",
+			"PlaneHelper": "api/helpers/PlaneHelper",
 			"PointLightHelper": "api/helpers/PointLightHelper",
 			"RectAreaLightHelper": "api/helpers/RectAreaLightHelper",
 			"SkeletonHelper": "api/helpers/SkeletonHelper",
@@ -333,6 +335,10 @@ var list = {
 
 	"Examples": {
 
+		"Controls": {
+			"OrbitControls": "examples/controls/OrbitControls"
+		},
+
 		"Geometries": {
 			"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
 			"ConvexGeometry": "examples/geometries/ConvexGeometry",
@@ -346,11 +352,15 @@ var list = {
 			"MTLLoader": "examples/loaders/MTLLoader",
 			"OBJLoader": "examples/loaders/OBJLoader",
 			"OBJLoader2": "examples/loaders/OBJLoader2",
-			"WWOBJLoader2": "examples/loaders/WWOBJLoader2",
+			"LoaderSupport": "examples/loaders/LoaderSupport",
 			"PCDLoader": "examples/loaders/PCDLoader",
 			"PDBLoader": "examples/loaders/PDBLoader",
 			"SVGLoader": "examples/loaders/SVGLoader",
 			"TGALoader": "examples/loaders/TGALoader"
+		},
+
+		"Exporters": {
+			"GLTFExporter": "examples/exporters/GLTFExporter"
 		},
 
 		"Plugins": {
@@ -392,4 +402,4 @@ var list = {
 
 	}
 
-}
+};

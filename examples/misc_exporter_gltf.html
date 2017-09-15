@@ -263,16 +263,16 @@
 				// ---------------------------------------------------------------------
 				// Groups
 				// ---------------------------------------------------------------------
-				group1 = new THREE.Group();
+				var group1 = new THREE.Group();
 				group1.name = "Group";
 				scene1.add( group1 );
 
-				group2 = new THREE.Group();
+				var group2 = new THREE.Group();
 				group2.name = "subGroup";
 				group2.position.set( 0, 50, 0);
 				group1.add( group2 );
 
-				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
+				var object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
 				object2.name = "Cube in group";
 				object2.position.set( 0, 0, 400 );
 				group2.add( object2 );
@@ -399,7 +399,7 @@
 					pointsArray[ 3 * i + 2 ] = -50 + Math.random() * 100;
 				}
 
-				pointsGeo = new THREE.BufferGeometry();
+				var pointsGeo = new THREE.BufferGeometry();
 				pointsGeo.addAttribute( 'position', new THREE.BufferAttribute( pointsArray, 3 ) );
 
 				var pointsMaterial = new THREE.PointsMaterial( { color: 0xffff00, size: 5 } );

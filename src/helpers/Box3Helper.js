@@ -2,12 +2,12 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { LineSegments } from '../objects/LineSegments';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { BufferAttribute } from '../core/BufferAttribute';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Object3D } from '../core/Object3D';
+import { LineSegments } from '../objects/LineSegments.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Object3D } from '../core/Object3D.js';
 
 function Box3Helper( box, hex ) {
 

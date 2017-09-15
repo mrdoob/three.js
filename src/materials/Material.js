@@ -1,6 +1,6 @@
-import { EventDispatcher } from '../core/EventDispatcher';
-import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants';
-import { _Math } from '../math/Math';
+import { EventDispatcher } from '../core/EventDispatcher.js';
+import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants.js';
+import { _Math } from '../math/Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

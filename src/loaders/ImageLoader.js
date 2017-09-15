@@ -2,8 +2,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Cache } from './Cache';
-import { DefaultLoadingManager } from './LoadingManager';
+import { Cache } from './Cache.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 
 function ImageLoader( manager ) {

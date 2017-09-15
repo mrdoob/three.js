@@ -80,7 +80,7 @@ THREE.TGALoader.prototype = {
 				// Invalid type ?
 
 				default:
-					console.error( 'THREE.TGALoader: Invalid type "%s".',  header.image_type );
+					console.error( 'THREE.TGALoader: Invalid type "%s".', header.image_type );
 
 			}
 
@@ -94,7 +94,7 @@ THREE.TGALoader.prototype = {
 
 			// check image pixel size
 
-			if ( header.pixel_size !== 8  && header.pixel_size !== 16 &&
+			if ( header.pixel_size !== 8 && header.pixel_size !== 16 &&
 				header.pixel_size !== 24 && header.pixel_size !== 32 ) {
 
 				console.error( 'THREE.TGALoader: Invalid pixel size "%s".', header.pixel_size );
@@ -339,6 +339,7 @@ THREE.TGALoader.prototype = {
 				y_end;
 
 			switch ( ( header.flags & TGA_ORIGIN_MASK ) >> TGA_ORIGIN_SHIFT ) {
+
 				default:
 				case TGA_ORIGIN_UL:
 					x_start = 0;
@@ -381,20 +382,25 @@ THREE.TGALoader.prototype = {
 			if ( use_grey ) {
 
 				switch ( header.pixel_size ) {
+
 					case 8:
 						tgaGetImageDataGrey8bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
 						break;
+
 					case 16:
 						tgaGetImageDataGrey16bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
 						break;
+
 					default:
 						console.error( 'THREE.TGALoader: Format not supported.' );
 						break;
+
 				}
 
 			} else {
 
 				switch ( header.pixel_size ) {
+
 					case 8:
 						tgaGetImageData8bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image, palette );
 						break;
@@ -414,6 +420,7 @@ THREE.TGALoader.prototype = {
 					default:
 						console.error( 'THREE.TGALoader: Format not supported.' );
 						break;
+
 				}
 
 			}
@@ -428,19 +435,19 @@ THREE.TGALoader.prototype = {
 		// TGA constants
 
 		var TGA_TYPE_NO_DATA = 0,
-		TGA_TYPE_INDEXED = 1,
-		TGA_TYPE_RGB = 2,
-		TGA_TYPE_GREY = 3,
-		TGA_TYPE_RLE_INDEXED = 9,
-		TGA_TYPE_RLE_RGB = 10,
-		TGA_TYPE_RLE_GREY = 11,
+			TGA_TYPE_INDEXED = 1,
+			TGA_TYPE_RGB = 2,
+			TGA_TYPE_GREY = 3,
+			TGA_TYPE_RLE_INDEXED = 9,
+			TGA_TYPE_RLE_RGB = 10,
+			TGA_TYPE_RLE_GREY = 11,
 
-		TGA_ORIGIN_MASK = 0x30,
-		TGA_ORIGIN_SHIFT = 0x04,
-		TGA_ORIGIN_BL = 0x00,
-		TGA_ORIGIN_BR = 0x01,
-		TGA_ORIGIN_UL = 0x02,
-		TGA_ORIGIN_UR = 0x03;
+			TGA_ORIGIN_MASK = 0x30,
+			TGA_ORIGIN_SHIFT = 0x04,
+			TGA_ORIGIN_BL = 0x00,
+			TGA_ORIGIN_BR = 0x01,
+			TGA_ORIGIN_UL = 0x02,
+			TGA_ORIGIN_UR = 0x03;
 
 		if ( buffer.length < 19 ) console.error( 'THREE.TGALoader: Not enough data to contain header.' );
 
@@ -465,68 +472,68 @@ THREE.TGALoader.prototype = {
 
 			// check tga if it is valid format
 
-			tgaCheckHeader( header );
+		tgaCheckHeader( header );
 
-			if ( header.id_length + offset > buffer.length ) {
+		if ( header.id_length + offset > buffer.length ) {
 
-				console.error( 'THREE.TGALoader: No data.' );
+			console.error( 'THREE.TGALoader: No data.' );
 
-			}
+		}
 
-			// skip the needn't data
+		// skip the needn't data
 
-			offset += header.id_length;
+		offset += header.id_length;
 
-			// get targa information about RLE compression and palette
+		// get targa information about RLE compression and palette
 
-			var use_rle = false,
-				use_pal = false,
-				use_grey = false;
+		var use_rle = false,
+			use_pal = false,
+			use_grey = false;
 
-			switch ( header.image_type ) {
+		switch ( header.image_type ) {
 
-				case TGA_TYPE_RLE_INDEXED:
-					use_rle = true;
-					use_pal = true;
-					break;
+			case TGA_TYPE_RLE_INDEXED:
+				use_rle = true;
+				use_pal = true;
+				break;
 
-				case TGA_TYPE_INDEXED:
-					use_pal = true;
-					break;
+			case TGA_TYPE_INDEXED:
+				use_pal = true;
+				break;
 
-				case TGA_TYPE_RLE_RGB:
-					use_rle = true;
-					break;
+			case TGA_TYPE_RLE_RGB:
+				use_rle = true;
+				break;
 
-				case TGA_TYPE_RGB:
-					break;
+			case TGA_TYPE_RGB:
+				break;
 
-				case TGA_TYPE_RLE_GREY:
-					use_rle = true;
-					use_grey = true;
-					break;
+			case TGA_TYPE_RLE_GREY:
+				use_rle = true;
+				use_grey = true;
+				break;
 
-				case TGA_TYPE_GREY:
-					use_grey = true;
-					break;
+			case TGA_TYPE_GREY:
+				use_grey = true;
+				break;
 
-			}
+		}
 
-			//
+		//
 
-			var canvas = document.createElement( 'canvas' );
-			canvas.width = header.width;
-			canvas.height = header.height;
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = header.width;
+		canvas.height = header.height;
 
-			var context = canvas.getContext( '2d' );
-			var imageData = context.createImageData( header.width, header.height );
+		var context = canvas.getContext( '2d' );
+		var imageData = context.createImageData( header.width, header.height );
 
-			var result = tgaParse( use_rle, use_pal, header, offset, content );
-			var rgbaData = getTgaRGBA( imageData.data, header.width, header.height, result.pixel_data, result.palettes );
+		var result = tgaParse( use_rle, use_pal, header, offset, content );
+		var rgbaData = getTgaRGBA( imageData.data, header.width, header.height, result.pixel_data, result.palettes );
 
-			context.putImageData( imageData, 0, 0 );
+		context.putImageData( imageData, 0, 0 );
 
-			return canvas;
+		return canvas;
 
 	}
 

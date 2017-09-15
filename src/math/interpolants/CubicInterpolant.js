@@ -1,6 +1,6 @@
-import { ZeroCurvatureEnding } from '../../constants';
-import { Interpolant } from '../Interpolant';
-import { WrapAroundEnding, ZeroSlopeEnding } from '../../constants';
+import { ZeroCurvatureEnding } from '../../constants.js';
+import { Interpolant } from '../Interpolant.js';
+import { WrapAroundEnding, ZeroSlopeEnding } from '../../constants.js';
 
 /**
  * Fast and simple cubic spline interpolant.
@@ -14,13 +14,12 @@ import { WrapAroundEnding, ZeroSlopeEnding } from '../../constants';
 
 function CubicInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-	Interpolant.call(
-			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
-	this._weightPrev = -0;
-	this._offsetPrev = -0;
-	this._weightNext = -0;
-	this._offsetNext = -0;
+	this._weightPrev = - 0;
+	this._offsetPrev = - 0;
+	this._weightNext = - 0;
+	this._offsetNext = - 0;
 
 }
 
@@ -30,12 +29,12 @@ CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype
 
 	DefaultSettings_: {
 
-		endingStart: 	ZeroCurvatureEnding,
-		endingEnd:		ZeroCurvatureEnding
+		endingStart: ZeroCurvatureEnding,
+		endingEnd: ZeroCurvatureEnding
 
 	},
 
-	intervalChanged_: function( i1, t0, t1 ) {
+	intervalChanged_: function ( i1, t0, t1 ) {
 
 		var pp = this.parameterPositions,
 			iPrev = i1 - 2,
@@ -114,7 +113,7 @@ CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype
 
 	},
 
-	interpolate_: function( i1, t0, t, t1 ) {
+	interpolate_: function ( i1, t0, t, t1 ) {
 
 		var result = this.resultBuffer,
 			values = this.sampleValues,
@@ -130,10 +129,10 @@ CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype
 
 		// evaluate polynomials
 
-		var sP =     - wP   * ppp   +         2 * wP    * pp    -          wP   * p;
-		var s0 = ( 1 + wP ) * ppp   + (-1.5 - 2 * wP )  * pp    + ( -0.5 + wP ) * p     + 1;
-		var s1 = (-1 - wN ) * ppp   + ( 1.5 +   wN   )  * pp    +    0.5        * p;
-		var sN =       wN   * ppp   -           wN      * pp;
+		var sP = - wP * ppp + 2 * wP * pp - wP * p;
+		var s0 = ( 1 + wP ) * ppp + ( - 1.5 - 2 * wP ) * pp + ( - 0.5 + wP ) * p + 1;
+		var s1 = ( - 1 - wN ) * ppp + ( 1.5 + wN ) * pp + 0.5 * p;
+		var sN = wN * ppp - wN * pp;
 
 		// combine data linearly
 

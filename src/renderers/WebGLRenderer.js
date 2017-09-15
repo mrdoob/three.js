@@ -29,7 +29,6 @@ import { WebVRManager } from './webvr/WebVRManager';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { WebGLExtensions } from './webgl/WebGLExtensions';
 import { Vector3 } from '../math/Vector3';
-// import { Sphere } from '../math/Sphere';
 import { WebGLClipping } from './webgl/WebGLClipping';
 import { Frustum } from '../math/Frustum';
 import { Vector4 } from '../math/Vector4';
@@ -1256,7 +1255,7 @@ function WebGLRenderer( parameters ) {
 
 	function projectObject( renderData, object, camera, sortObjects ) {
 
-		if ( ! object.visible ) return;
+		if ( object.visible === false ) return;
 
 		var visible = object.layers.test( camera.layers );
 

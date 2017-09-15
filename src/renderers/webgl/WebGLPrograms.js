@@ -2,8 +2,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
-import { WebGLProgram } from './WebGLProgram';
+import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants.js';
+import { WebGLProgram } from './WebGLProgram.js';
 
 function WebGLPrograms( renderer, extensions, capabilities ) {
 

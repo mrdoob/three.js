@@ -1,4 +1,4 @@
-import { Object3D } from '../core/Object3D';
+import { Object3D } from '../core/Object3D.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/

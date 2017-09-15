@@ -997,7 +997,7 @@ THREE.GLTFExporter.prototype = {
 		if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
 
 			outputJSON.buffers[ 0 ].byteLength = blob.size;
-			objectURL = URL.createObjectURL( blob );
+			var objectURL = URL.createObjectURL( blob );
 
 			var reader = new window.FileReader();
 			reader.readAsDataURL( blob );
