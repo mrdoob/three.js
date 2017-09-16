@@ -268,28 +268,25 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					}
 
-				} else {
+				} else if ( position !== undefined ) {
 
 					// non-indexed buffer geometry
-					
-					if ( position ) {
 
-						for ( i = 0, l = position.count; i < l; i += 3 ) {
+					for ( i = 0, l = position.count; i < l; i += 3 ) {
 
-							a = i;
-							b = i + 1;
-							c = i + 2;
+						a = i;
+						b = i + 1;
+						c = i + 2;
 
-							intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
-							if ( intersection ) {
+						if ( intersection ) {
 
-								intersection.index = a; // triangle number in positions buffer semantics
-								intersects.push( intersection );
-
-							}
+							intersection.index = a; // triangle number in positions buffer semantics
+							intersects.push( intersection );
 
 						}
+
 					}
 
 				}
