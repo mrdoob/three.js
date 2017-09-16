@@ -245,6 +245,8 @@ function WebGLRenderer( parameters ) {
 
 	var utils;
 
+	var portalCameras = {};
+
 	function initGLContext() {
 
 		extensions = new WebGLExtensions( _gl );
@@ -1438,7 +1440,14 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			var portalCamera = camera.clone(); //needs to be a separate instance for each iteration (due to deferred rendering/object instance caching?)
+			if ( !( camera.type in portalCameras ) ) {
+				var cameras = portalCameras[camera.type] = [];
+				for ( var i = 0; i < _this.maxPortalDepth; i ++ ) {
+					cameras.push( camera.clone() );
+				}
+			}
+			var portalCamera = portalCameras[camera.type][_this.currentPortalDepth];
+			portalCamera.copy(camera);
 
 			// ..then place the portal camera over the target and reverse it by this transform..
 			portalCamera.matrix.multiplyMatrices( targetMatrix, cameraToPortal );
