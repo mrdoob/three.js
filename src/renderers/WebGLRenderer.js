@@ -1447,7 +1447,7 @@ function WebGLRenderer( parameters ) {
 				}
 			}
 			var portalCamera = portalCameras[camera.type][_this.currentPortalDepth];
-			portalCamera.copy(camera);
+			portalCamera.copy(camera, false);
 
 			// ..then place the portal camera over the target and reverse it by this transform..
 			portalCamera.matrix.multiplyMatrices( targetMatrix, cameraToPortal );
