@@ -497,10 +497,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var zoomSign = event.deltaY < 0 ? -1 : event.deltaY > 0 ? 1 : 0;
 
-		//1.5 : arbitrarily increase the zoom scale when zoom from mousewheel : the zoom happens
-		//per event, but while a gesture would call 10-15 events with mousemove/touchmove,
-		//scrolling we call 3-5. So it needs to scale more.
-		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * 1.5 * zoomSign );
+		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
 
 		scope.update();
 
