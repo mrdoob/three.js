@@ -383,15 +383,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	function dolly( dollyDistance ) {
+	function assignZoom( zoomValue ) {
 
 		if ( scope.object instanceof THREE.PerspectiveCamera ) {
 
-			distanceDelta = dollyDistance;
+			distanceDelta = zoomValue;
 
 		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
-			zoomDelta = dollyDistance;
+			zoomDelta = zoomValue;
 
 		} else {
 
@@ -461,7 +461,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var zoomSign = dollyDelta.y < 0 ? -1 : dollyDelta.y > 0 ? 1 : 0;
 
-		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
+		assignZoom( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
 
 		dollyStart.copy( dollyEnd );
 
@@ -497,7 +497,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var zoomSign = event.deltaY < 0 ? -1 : event.deltaY > 0 ? 1 : 0;
 
-		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
+		assignZoom( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
 
 		scope.update();
 
@@ -598,7 +598,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var zoomSign = dollyDelta.y > 0 ? -1 : dollyDelta.y < 0 ? 1 : 0;
 
-		dolly( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
+		assignZoom( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
 
 		dollyStart.copy( dollyEnd );
 
