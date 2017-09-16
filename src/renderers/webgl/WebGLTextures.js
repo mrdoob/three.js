@@ -48,8 +48,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement ) {
 
 			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-			canvas.width = _Math.nearestPowerOfTwo( image.width );
-			canvas.height = _Math.nearestPowerOfTwo( image.height );
+			canvas.width = _Math.floorPowerOfTwo( image.width );
+			canvas.height = _Math.floorPowerOfTwo( image.height );
 
 			var context = canvas.getContext( '2d' );
 			context.drawImage( image, 0, 0, canvas.width, canvas.height );
