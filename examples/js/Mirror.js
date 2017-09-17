@@ -156,6 +156,9 @@ THREE.Mirror = function ( width, height, options ) {
 		mirrorCamera.up.reflect( normal );
 		mirrorCamera.lookAt( target );
 
+		mirrorCamera.fov = camera.fov;
+		mirrorCamera.zoom = camera.zoom;
+
 		mirrorCamera.aspect = camera.aspect;
 		mirrorCamera.near = camera.near;
 		mirrorCamera.far = camera.far;
