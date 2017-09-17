@@ -11,6 +11,7 @@ THREE.GLTFLoader = ( function () {
 	function GLTFLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		this.dracoLoader = null;
 
 	}
 
@@ -63,6 +64,12 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
+		setDRACOLoader: function ( dracoLoader ) {
+
+			this.dracoLoader = dracoLoader;
+
+		},
+
 		parse: function ( data, path, onLoad, onError ) {
 
 			var content;
@@ -107,6 +114,12 @@ THREE.GLTFLoader = ( function () {
 				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ) >= 0 ) {
 
 					extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
+
+				}
+
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ) >= 0 ) {
+
+					extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] = new GLTFDracoMeshCompressionExtension( this.dracoLoader );
 
 				}
 
@@ -182,6 +195,7 @@ THREE.GLTFLoader = ( function () {
 
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
+		KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
 		KHR_LIGHTS: 'KHR_lights',
 		KHR_MATERIALS_COMMON: 'KHR_materials_common',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness'
@@ -439,6 +453,46 @@ THREE.GLTFLoader = ( function () {
 		}
 
 	}
+
+	/**
+	 * DRACO Mesh Compression Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/pull/874
+	 *
+	 * TODO:
+	 * - Support additional (uncompressed) attributes in addition to those provided by Draco.
+	 * - Support fallback to uncompressed data if decoder is not unavailable.
+	 * - `primitive.attributes` should be passed to DRACOLoader, but isn't yet supported.
+	 */
+	function GLTFDracoMeshCompressionExtension ( dracoLoader ) {
+
+		if ( ! dracoLoader ) {
+
+			throw new Error( 'THREE.GLTFLoader: No DRACOLoader instance provided.' );
+
+		}
+
+		this.name = EXTENSIONS.KHR_DRACO_MESH_COMPRESSION;
+		this.dracoLoader = dracoLoader;
+
+	}
+
+	GLTFDracoMeshCompressionExtension.prototype.decodePrimitive = function ( primitive, parser ) {
+
+		var dracoLoader = this.dracoLoader;
+		var bufferViewIndex = primitive.extensions[ this.name ].bufferView;
+
+		return parser.getDependency( 'bufferView', bufferViewIndex ).then( function ( bufferView ) {
+
+			return new Promise( function ( resolve ) {
+
+				dracoLoader.decodeDracoFile( bufferView, resolve );
+
+			} );
+
+		} );
+
+	};
 
 	/**
 	 * Specular-Glossiness Extension
@@ -1380,6 +1434,15 @@ THREE.GLTFLoader = ( function () {
 
 		return _each( json.accessors, function ( accessor ) {
 
+			if ( accessor.bufferView === undefined ) {
+
+				// Ignore accessors without a bufferView, which may be used to declare
+				// runtime information about attributes coming from another source
+				// (e.g. Draco compression extension).
+				return null;
+
+			}
+
 			return parser.getDependency( 'bufferView', accessor.bufferView ).then( function ( bufferView ) {
 
 				var itemSize = WEBGL_TYPE_SIZES[ accessor.type ];
@@ -1707,6 +1770,9 @@ THREE.GLTFLoader = ( function () {
 
 	GLTFParser.prototype.loadGeometries = function ( primitives ) {
 
+		var parser = this;
+		var extensions = this.extensions;
+
 		return this._withDependencies( [
 
 			'accessors',
@@ -1714,6 +1780,12 @@ THREE.GLTFLoader = ( function () {
 		] ).then( function ( dependencies ) {
 
 			return _each( primitives, function ( primitive ) {
+
+				if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) {
+
+					return extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ].decodePrimitive( primitive, parser );
+
+				}
 
 				var geometry = new THREE.BufferGeometry();
 

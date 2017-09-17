@@ -43,6 +43,9 @@
 			<li>
 				KHR_lights (experimental)
 			</li>
+			<li>
+				KHR_draco_mesh_compression (experimental)
+			</li>
 		</ul>
 
 		<h2>Example</h2>
@@ -50,6 +53,9 @@
 		<code>
 		// Instantiate a loader
 		var loader = new THREE.GLTFLoader();
+
+		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
+		loader.setDRACOLoader( new THREE.DRACOLoader( undefined, {type: 'js'} ) );
 
 		// Load a glTF resource
 		loader.load( 'models/gltf/duck/duck.gltf', function ( gltf ) {
@@ -101,6 +107,11 @@
 		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
 		<div>
 		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</div>
+
+		<h3>[method:null setDRACOLoader]( [page:DRACOLoader dracoLoader] )</h3>
+		<div>
+		[page:DRACOLoader dracoLoader] — Instance of THREE.DRACOLoader, to be used for decoding assets compressed with the KHR_draco_mesh_compression extension.
 		</div>
 
 		<h3>[method:null parse]( [page:Object json], [page:Function callBack], [page:String path] )</h3>
