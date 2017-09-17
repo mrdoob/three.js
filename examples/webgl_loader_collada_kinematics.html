@@ -37,7 +37,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/libs/tween.min.js"></script>
-		<script src="js/loaders/ColladaLoader2.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -57,7 +57,6 @@
 			var tweenParameters = {};
 
 			var loader = new THREE.ColladaLoader();
-			loader.options.convertUpAxis = true;
 			// loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
 			loader.load( './models/collada/abb_irb52_7_120.dae', function ( collada ) {
 
