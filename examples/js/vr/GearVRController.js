@@ -34,11 +34,7 @@ THREE.GearVRController = function () {
 
 	this.setSkyBox = function ( skyBox ) {
 
-		if ( 'SamsungChangeSky' in window ) {
-
-			window.SamsungChangeSky( skyBox );
-
-		}
+		window.SamsungChangeSky( skyBox );
 
 	};
 

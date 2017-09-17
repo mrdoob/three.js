@@ -133,7 +133,12 @@
 					up: 'textures/gear_vr_skybox/A.jpg',
 					down: 'textures/gear_vr_skybox/F.jpg'
 				};
-				controller.setSkyBox( skyBox );
+
+				if ( 'SamsungChangeSky' in window ) {
+
+					controller.setSkyBox( skyBox );
+
+				}
 
 				var MTL = new THREE.MTLLoader();
 
