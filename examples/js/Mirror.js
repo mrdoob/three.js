@@ -156,12 +156,11 @@ THREE.Mirror = function ( width, height, options ) {
 		mirrorCamera.up.reflect( normal );
 		mirrorCamera.lookAt( target );
 
-		mirrorCamera.aspect = camera.aspect;
-		mirrorCamera.near = camera.near;
+		mirrorCamera.updateMatrixWorld();
+
 		mirrorCamera.far = camera.far;
 
-		mirrorCamera.updateMatrixWorld();
-		mirrorCamera.updateProjectionMatrix();
+		mirrorCamera.projectionMatrix.copy( camera.projectionMatrix );
 
 		mirrorCamera.userData.recursion = 0;
 
