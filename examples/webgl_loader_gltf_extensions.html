@@ -90,11 +90,13 @@
 				<option value="glTF-Embedded">None (Embedded)</option>
 				<option value="glTF-Binary">None (Binary)</option>
 				<option value="glTF-pbrSpecularGlossiness">Specular-Glossiness (PBR)</option>
+				<option value="glTF-Draco">Draco (Compressed)</option>
 			</select>
 		</div>
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/draco/DRACOLoader.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
@@ -203,6 +205,10 @@
 				}
 
 				loader = new THREE.GLTFLoader();
+
+				var dracoLoader = new THREE.DRACOLoader();
+				dracoLoader.setDecoderPath( 'js/loaders/draco/' );
+				loader.setDRACOLoader( dracoLoader );
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
@@ -475,7 +481,7 @@
 					addLights:true,
 					addGround:true,
 					shadows:true,
-					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-Draco']
 				},
 				{
 					name : "Rigged Simple",

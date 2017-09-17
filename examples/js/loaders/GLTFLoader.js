@@ -11,6 +11,7 @@ THREE.GLTFLoader = ( function () {
 	function GLTFLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		this.dracoLoader = null;
 
 	}
 
@@ -65,6 +66,12 @@ THREE.GLTFLoader = ( function () {
 
 			this.path = value;
 			return this;
+
+		},
+
+		setDRACOLoader: function ( dracoLoader ) {
+
+			this.dracoLoader = dracoLoader;
 
 		},
 
@@ -124,6 +131,12 @@ THREE.GLTFLoader = ( function () {
 				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ) >= 0 ) {
 
 					extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
+
+				}
+
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ) >= 0 ) {
+
+					extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] = new GLTFDracoMeshCompressionExtension( this.dracoLoader );
 
 				}
 
@@ -201,6 +214,7 @@ THREE.GLTFLoader = ( function () {
 
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
+		KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
 		KHR_LIGHTS: 'KHR_lights',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness'
 	};
@@ -356,6 +370,46 @@ THREE.GLTFLoader = ( function () {
 		}
 
 	}
+
+	/**
+	 * DRACO Mesh Compression Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/pull/874
+	 *
+	 * TODO:
+	 * - Support additional (uncompressed) attributes in addition to those provided by Draco.
+	 * - Support fallback to uncompressed data if decoder is not unavailable.
+	 * - `primitive.attributes` should be passed to DRACOLoader, but isn't yet supported.
+	 */
+	function GLTFDracoMeshCompressionExtension ( dracoLoader ) {
+
+		if ( ! dracoLoader ) {
+
+			throw new Error( 'THREE.GLTFLoader: No DRACOLoader instance provided.' );
+
+		}
+
+		this.name = EXTENSIONS.KHR_DRACO_MESH_COMPRESSION;
+		this.dracoLoader = dracoLoader;
+
+	}
+
+	GLTFDracoMeshCompressionExtension.prototype.decodePrimitive = function ( primitive, parser ) {
+
+		var dracoLoader = this.dracoLoader;
+		var bufferViewIndex = primitive.extensions[ this.name ].bufferView;
+
+		return parser.getDependency( 'bufferView', bufferViewIndex ).then( function ( bufferView ) {
+
+			return new Promise( function ( resolve ) {
+
+				dracoLoader.decodeDracoFile( bufferView, resolve );
+
+			} );
+
+		} );
+
+	};
 
 	/**
 	 * Specular-Glossiness Extension
@@ -1480,6 +1534,15 @@ THREE.GLTFLoader = ( function () {
 
 		var accessorDef = this.json.accessors[ accessorIndex ];
 
+		if ( accessorDef.bufferView === undefined && accessorDef.sparse === undefined ) {
+
+			// Ignore empty accessors, which may be used to declare runtime
+			// information about attributes coming from another source (e.g. Draco
+			// compression extension).
+			return null;
+
+		}
+
 		var pendingBufferViews = [];
 
 		if ( accessorDef.bufferView !== undefined ) {
@@ -1880,6 +1943,8 @@ THREE.GLTFLoader = ( function () {
 	 */
 	GLTFParser.prototype.loadGeometries = function ( primitives ) {
 
+		var parser = this;
+		var extensions = this.extensions;
 		var cache = this.primitiveCache;
 
 		return this.getDependencies( 'accessor' ).then( function ( accessors ) {
@@ -1893,88 +1958,97 @@ THREE.GLTFLoader = ( function () {
 				// See if we've already created this geometry
 				var cached = getCachedGeometry( cache, primitive );
 
+				var geometry;
+
 				if ( cached ) {
 
 					// Use the cached geometry if it exists
 					geometries.push( cached );
 
-				} else {
+					continue;
+
+				} else if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) {
+
+					// Use DRACO geometry if available
+					geometry = extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ].decodePrimitive( primitive, parser );
+
+				} else  {
 
 					// Otherwise create a new geometry
-					var geometry = new THREE.BufferGeometry();
-
-					var attributes = primitive.attributes;
-
-					for ( var attributeId in attributes ) {
-
-						var attributeEntry = attributes[ attributeId ];
-
-						var bufferAttribute = accessors[ attributeEntry ];
-
-						switch ( attributeId ) {
-
-							case 'POSITION':
-
-								geometry.addAttribute( 'position', bufferAttribute );
-								break;
-
-							case 'NORMAL':
-
-								geometry.addAttribute( 'normal', bufferAttribute );
-								break;
-
-							case 'TEXCOORD_0':
-							case 'TEXCOORD0':
-							case 'TEXCOORD':
-
-								geometry.addAttribute( 'uv', bufferAttribute );
-								break;
-
-							case 'TEXCOORD_1':
-
-								geometry.addAttribute( 'uv2', bufferAttribute );
-								break;
-
-							case 'COLOR_0':
-							case 'COLOR0':
-							case 'COLOR':
-
-								geometry.addAttribute( 'color', bufferAttribute );
-								break;
-
-							case 'WEIGHTS_0':
-							case 'WEIGHT': // WEIGHT semantic deprecated.
-
-								geometry.addAttribute( 'skinWeight', bufferAttribute );
-								break;
-
-							case 'JOINTS_0':
-							case 'JOINT': // JOINT semantic deprecated.
-
-								geometry.addAttribute( 'skinIndex', bufferAttribute );
-								break;
-
-						}
-
-					}
-
-					if ( primitive.indices !== undefined ) {
-
-						geometry.setIndex( accessors[ primitive.indices ] );
-
-					}
-
-					// Cache this geometry
-					cache.push( {
-
-						primitive: primitive,
-						geometry: geometry
-
-					} );
-
-					geometries.push( geometry );
+					geometry = new THREE.BufferGeometry();
 
 				}
+
+				var attributes = primitive.attributes;
+
+				for ( var attributeId in attributes ) {
+
+					var attributeEntry = attributes[ attributeId ];
+
+					var bufferAttribute = accessors[ attributeEntry ];
+
+					switch ( attributeId ) {
+
+						case 'POSITION':
+
+							geometry.addAttribute( 'position', bufferAttribute );
+							break;
+
+						case 'NORMAL':
+
+							geometry.addAttribute( 'normal', bufferAttribute );
+							break;
+
+						case 'TEXCOORD_0':
+						case 'TEXCOORD0':
+						case 'TEXCOORD':
+
+							geometry.addAttribute( 'uv', bufferAttribute );
+							break;
+
+						case 'TEXCOORD_1':
+
+							geometry.addAttribute( 'uv2', bufferAttribute );
+							break;
+
+						case 'COLOR_0':
+						case 'COLOR0':
+						case 'COLOR':
+
+							geometry.addAttribute( 'color', bufferAttribute );
+							break;
+
+						case 'WEIGHTS_0':
+						case 'WEIGHT': // WEIGHT semantic deprecated.
+
+							geometry.addAttribute( 'skinWeight', bufferAttribute );
+							break;
+
+						case 'JOINTS_0':
+						case 'JOINT': // JOINT semantic deprecated.
+
+							geometry.addAttribute( 'skinIndex', bufferAttribute );
+							break;
+
+					}
+
+				}
+
+				if ( primitive.indices !== undefined ) {
+
+					geometry.setIndex( accessors[ primitive.indices ] );
+
+				}
+
+				// Cache this geometry
+				cache.push( {
+
+					primitive: primitive,
+					geometry: geometry
+
+				} );
+
+				geometries.push( geometry );
 
 			}
 
