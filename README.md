@@ -29,7 +29,7 @@ Alternatively see [how to build the library yourself](https://github.com/mrdoob/
 This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the document.body element. Finally, it animates the cube within the scene for the camera.
 
 ```javascript
-var scene, camera, renderer;
+var camera, scene, renderer;
 var geometry, material, mesh;
 
 init();
@@ -37,20 +37,19 @@ animate();
 
 function init() {
 
+	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+	camera.position.z = 1;
+
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-	camera.position.z = 1000;
-
-	geometry = new THREE.BoxGeometry( 200, 200, 200 );
-	material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+	geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+	material = new THREE.MeshNormalMaterial();
 
 	mesh = new THREE.Mesh( geometry, material );
 	scene.add( mesh );
 
-	renderer = new THREE.WebGLRenderer();
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
-
 	document.body.appendChild( renderer.domElement );
 
 }
@@ -67,7 +66,7 @@ function animate() {
 }
 ```
 
-If everything went well you should see [this](https://jsfiddle.net/hfj7gm6t/).
+If everything went well you should see [this](https://jsfiddle.net/f2Lommf5/).
 
 ### Change log ###
 
