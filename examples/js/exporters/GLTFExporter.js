@@ -2,9 +2,9 @@
  * @author fernandojsg / http://fernandojsg.com
  */
 
- //------------------------------------------------------------------------------
- // Constants
- //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Constants
+//------------------------------------------------------------------------------
 var WEBGL_CONSTANTS = {
 	POINTS: 0x0000,
 	LINES: 0x0001,
@@ -37,7 +37,7 @@ var THREE_TO_WEBGL = {
 	1006: WEBGL_CONSTANTS.LINEAR,
 	1007: WEBGL_CONSTANTS.LINEAR_MIPMAP_NEAREST,
 	1008: WEBGL_CONSTANTS.LINEAR_MIPMAP_LINEAR
- };
+};
 
 //------------------------------------------------------------------------------
 // GLTF Exporter
@@ -96,11 +96,11 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function equalArray( array1, array2 ) {
 
-			return ( array1.length === array2.length ) && array1.every( function( element, index ) {
+			return ( array1.length === array2.length ) && array1.every( function ( element, index ) {
 
 				return element === array2[ index ];
 
-			});
+			} );
 
 		}
 
@@ -118,9 +118,9 @@ THREE.GLTFExporter.prototype = {
 
 			};
 
-			for ( var i = 0; i < attribute.count; i++ ) {
+			for ( var i = 0; i < attribute.count; i ++ ) {
 
-				for ( var a = 0; a < attribute.itemSize; a++ ) {
+				for ( var a = 0; a < attribute.itemSize; a ++ ) {
 
 					var value = attribute.array[ i * attribute.itemSize + a ];
 					output.min[ a ] = Math.min( output.min[ a ], value );
@@ -131,6 +131,7 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			return output;
+
 		}
 
 		/**
@@ -141,7 +142,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processBuffer( attribute, componentType, start, count ) {
 
-			if ( !outputJSON.buffers ) {
+			if ( ! outputJSON.buffers ) {
 
 				outputJSON.buffers = [
 
@@ -164,9 +165,9 @@ THREE.GLTFExporter.prototype = {
 
 			var dataView = new DataView( new ArrayBuffer( byteLength ) );
 
-			for ( var i = start; i < start + count; i++ ) {
+			for ( var i = start; i < start + count; i ++ ) {
 
-				for (var a = 0; a < attribute.itemSize; a++ ) {
+				for ( var a = 0; a < attribute.itemSize; a ++ ) {
 
 					var value = attribute.array[ i * attribute.itemSize + a ];
 
@@ -195,6 +196,7 @@ THREE.GLTFExporter.prototype = {
 
 			// Always using just one buffer
 			return 0;
+
 		}
 
 		/**
@@ -206,7 +208,7 @@ THREE.GLTFExporter.prototype = {
 
 			var isVertexAttributes = componentType === WEBGL_CONSTANTS.FLOAT;
 
-			if ( !outputJSON.bufferViews ) {
+			if ( ! outputJSON.bufferViews ) {
 
 				outputJSON.bufferViews = [];
 
@@ -250,7 +252,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processAccessor( attribute, geometry ) {
 
-			if ( !outputJSON.accessors ) {
+			if ( ! outputJSON.accessors ) {
 
 				outputJSON.accessors = [];
 
@@ -293,8 +295,10 @@ THREE.GLTFExporter.prototype = {
 
 			// @TODO Indexed buffer geometry with drawRange not supported yet
 			if ( options.truncateDrawRange && geometry.index === null ) {
+
 				start = geometry.drawRange.start;
 				count = geometry.drawRange.count !== Infinity ? geometry.drawRange.count : attribute.count;
+
 			}
 
 			var bufferView = processBufferView( attribute, componentType, start, count );
@@ -330,7 +334,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( !outputJSON.images ) {
+			if ( ! outputJSON.images ) {
 
 				outputJSON.images = [];
 
@@ -365,7 +369,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processSampler( map ) {
 
-			if ( !outputJSON.samplers ) {
+			if ( ! outputJSON.samplers ) {
 
 				outputJSON.samplers = [];
 
@@ -393,7 +397,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processTexture( map ) {
 
-			if (!outputJSON.textures) {
+			if ( ! outputJSON.textures ) {
 
 				outputJSON.textures = [];
 
@@ -425,7 +429,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( !outputJSON.materials ) {
+			if ( ! outputJSON.materials ) {
 
 				outputJSON.materials = [];
 
@@ -439,7 +443,7 @@ THREE.GLTFExporter.prototype = {
 			}
 
 
-			if ( !( material instanceof THREE.MeshStandardMaterial ) ) {
+			if ( ! ( material instanceof THREE.MeshStandardMaterial ) ) {
 
 				console.warn( 'GLTFExporter: Currently just THREE.StandardMaterial is supported. Material conversion may lose information.' );
 
@@ -455,7 +459,7 @@ THREE.GLTFExporter.prototype = {
 			// pbrMetallicRoughness.baseColorFactor
 			var color = material.color.toArray().concat( [ material.opacity ] );
 
-			if ( !equalArray( color, [ 1, 1, 1, 1 ] ) ) {
+			if ( ! equalArray( color, [ 1, 1, 1, 1 ] ) ) {
 
 				gltfMaterial.pbrMetallicRoughness.baseColorFactor = color;
 
@@ -468,8 +472,8 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
-					gltfMaterial.pbrMetallicRoughness.metallicFactor = 0.5;
-					gltfMaterial.pbrMetallicRoughness.roughnessFactor = 0.5;
+				gltfMaterial.pbrMetallicRoughness.metallicFactor = 0.5;
+				gltfMaterial.pbrMetallicRoughness.roughnessFactor = 0.5;
 
 			}
 
@@ -493,7 +497,7 @@ THREE.GLTFExporter.prototype = {
 				// emissiveFactor
 				var emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
 
-				if ( !equalArray( emissive, [ 0, 0, 0 ] ) ) {
+				if ( ! equalArray( emissive, [ 0, 0, 0 ] ) ) {
 
 					gltfMaterial.emissiveFactor = emissive;
 
@@ -521,11 +525,11 @@ THREE.GLTFExporter.prototype = {
 
 				};
 
-				if ( material.normalScale.x !== -1 ) {
+				if ( material.normalScale.x !== - 1 ) {
 
 					if ( material.normalScale.x !== material.normalScale.y ) {
 
-						console.warn('GLTFExporter: Normal scale components are different, ignoring Y and exporting X');
+						console.warn( 'THREE.GLTFExporter: Normal scale components are different, ignoring Y and exporting X.' );
 
 					}
 
@@ -594,7 +598,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMesh( mesh ) {
 
-			if ( !outputJSON.meshes ) {
+			if ( ! outputJSON.meshes ) {
 
 				outputJSON.meshes = [];
 
@@ -623,7 +627,7 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
-				if ( !geometry.isBufferGeometry ) {
+				if ( ! geometry.isBufferGeometry ) {
 
 					var geometryTemp = new THREE.BufferGeometry();
 					geometryTemp.fromGeometry( geometry );
@@ -673,7 +677,6 @@ THREE.GLTFExporter.prototype = {
 
 			// We've just one primitive per mesh
 			var gltfAttributes = gltfMesh.primitives[ 0 ].attributes;
-			var attributes = geometry.attributes;
 
 			// Conversion between attributes names in threejs and gltf spec
 			var nameConversion = {
@@ -699,6 +702,7 @@ THREE.GLTFExporter.prototype = {
 			outputJSON.meshes.push( gltfMesh );
 
 			return outputJSON.meshes.length - 1;
+
 		}
 
 		/**
@@ -708,7 +712,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processCamera( camera ) {
 
-			if ( !outputJSON.cameras ) {
+			if ( ! outputJSON.cameras ) {
 
 				outputJSON.cameras = [];
 
@@ -755,6 +759,7 @@ THREE.GLTFExporter.prototype = {
 			outputJSON.cameras.push( gltfCamera );
 
 			return outputJSON.cameras.length - 1;
+
 		}
 
 		/**
@@ -771,7 +776,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( !outputJSON.nodes ) {
+			if ( ! outputJSON.nodes ) {
 
 				outputJSON.nodes = [];
 
@@ -785,19 +790,19 @@ THREE.GLTFExporter.prototype = {
 				var position = object.position.toArray();
 				var scale = object.scale.toArray();
 
-				if ( !equalArray( rotation, [ 0, 0, 0, 1 ] ) ) {
+				if ( ! equalArray( rotation, [ 0, 0, 0, 1 ] ) ) {
 
 					gltfNode.rotation = rotation;
 
 				}
 
-				if ( !equalArray( position, [ 0, 0, 0 ] ) ) {
+				if ( ! equalArray( position, [ 0, 0, 0 ] ) ) {
 
 					gltfNode.position = position;
 
 				}
 
-				if ( !equalArray( scale, [ 1, 1, 1 ] ) ) {
+				if ( ! equalArray( scale, [ 1, 1, 1 ] ) ) {
 
 					gltfNode.scale = scale;
 
@@ -806,7 +811,7 @@ THREE.GLTFExporter.prototype = {
 			} else {
 
 				object.updateMatrix();
-				if (! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
+				if ( ! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
 
 					gltfNode.matrix = object.matrix.elements;
 
@@ -826,9 +831,9 @@ THREE.GLTFExporter.prototype = {
 
 					gltfNode.extras = JSON.parse( JSON.stringify( object.userData ) );
 
-				} catch (e) {
+				} catch ( e ) {
 
-					throw new Error( 'GLTFExporter: userData can\'t be serialized' );
+					throw new Error( 'THREE.GLTFExporter: userData can\'t be serialized' );
 
 				}
 
@@ -889,7 +894,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processScene( scene ) {
 
-			if ( !outputJSON.scenes ) {
+			if ( ! outputJSON.scenes ) {
 
 				outputJSON.scenes = [];
 				outputJSON.scene = 0;
@@ -947,7 +952,7 @@ THREE.GLTFExporter.prototype = {
 			var scene = new THREE.Scene();
 			scene.name = 'AuxScene';
 
-			for ( var i = 0; i < objects.length; i++ ) {
+			for ( var i = 0; i < objects.length; i ++ ) {
 
 				// We push directly to children instead of calling `add` to prevent
 				// modify the .parent and break its original scene and hierarchy
@@ -965,7 +970,7 @@ THREE.GLTFExporter.prototype = {
 
 			var objectsWithoutScene = [];
 
-			for ( var i = 0; i < input.length; i++ ) {
+			for ( var i = 0; i < input.length; i ++ ) {
 
 				if ( input[ i ] instanceof THREE.Scene ) {
 
@@ -1011,7 +1016,7 @@ THREE.GLTFExporter.prototype = {
 
 		} else {
 
-			onDone ( outputJSON );
+			onDone( outputJSON );
 
 		}
 
