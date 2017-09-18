@@ -146,9 +146,9 @@ THREE.AMFLoader.prototype = {
 
 			var loadedMaterial = null;
 
-			for ( var i = 0; i < node.children.length; i ++ ) {
+			for ( var i = 0; i < node.childNodes.length; i ++ ) {
 
-				var matChildEl = node.children[ i ];
+				var matChildEl = node.childNodes[ i ];
 
 				if ( matChildEl.nodeName === 'metadata' && matChildEl.attributes.type !== undefined ) {
 
@@ -187,9 +187,9 @@ THREE.AMFLoader.prototype = {
 
 			var color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
 
-			for ( var i = 0; i < node.children.length; i ++ ) {
+			for ( var i = 0; i < node.childNodes.length; i ++ ) {
 
-				var matColor = node.children[ i ];
+				var matColor = node.childNodes[ i ];
 
 				if ( matColor.nodeName === 'r' ) {
 
@@ -371,13 +371,13 @@ THREE.AMFLoader.prototype = {
 		var amfScale = loadDocumentScale( xmlData );
 		var amfMaterials = {};
 		var amfObjects = {};
-		var children = xmlData.documentElement.children;
+		var childNodes = xmlData.documentElement.childNodes;
 
 		var i, j;
 
-		for ( i = 0; i < children.length; i ++ ) {
+		for ( i = 0; i < childNodes.length; i ++ ) {
 
-			var child = children[ i ];
+			var child = childNodes[ i ];
 
 			if ( child.nodeName === 'metadata' ) {
 
