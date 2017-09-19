@@ -63,7 +63,8 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	// all vertices should lie on a conceptual sphere with a given radius
 
-	appplyRadius( radius );
+	var maxRadius = computeMaxRadius() || 1;
+	applyScale( radius / maxRadius );
 
 	// finally, create the uv data
 
@@ -176,11 +177,11 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	}
 
-	function appplyRadius( radius ) {
+	function applyScale( s ) {
 
 		var vertex = new Vector3();
 
-		// iterate over the entire buffer and apply the radius to each vertex
+		// iterate over the entire buffer and apply the scaling to each vertex
 
 		for ( var i = 0; i < vertexBuffer.length; i += 3 ) {
 
@@ -188,7 +189,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 			vertex.y = vertexBuffer[ i + 1 ];
 			vertex.z = vertexBuffer[ i + 2 ];
 
-			vertex.normalize().multiplyScalar( radius );
+			vertex.multiplyScalar( s );
 
 			vertexBuffer[ i + 0 ] = vertex.x;
 			vertexBuffer[ i + 1 ] = vertex.y;
@@ -196,6 +197,23 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 		}
 
+	}
+
+	function computeMaxRadius() {
+
+		var vertex = new Vector3();
+		var maxRadius = 0;
+
+		for ( var i = 0; i < vertexBuffer.length; i += 3 ) {
+
+			vertex.x = vertexBuffer[ i + 0 ];
+			vertex.y = vertexBuffer[ i + 1 ];
+			vertex.z = vertexBuffer[ i + 2 ];
+
+			maxRadius = Math.max(maxRadius, vertex.length());
+		}
+
+		return maxRadius;
 	}
 
 	function generateUVs() {
