@@ -9,7 +9,6 @@ THREE.Mirror = function ( width, height, options ) {
 	var scope = this;
 
 	scope.name = 'mirror_' + scope.id;
-	scope.matrixNeedsUpdate = true;
 
 	options = options || {};
 
