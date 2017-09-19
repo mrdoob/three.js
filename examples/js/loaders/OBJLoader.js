@@ -416,6 +416,7 @@ THREE.OBJLoader = ( function () {
 								parseFloat( data[ 2 ] ),
 								parseFloat( data[ 3 ] )
 							);
+							break;
 						case 'vt':
 							state.uvs.push(
 								parseFloat( data[ 1 ] ),

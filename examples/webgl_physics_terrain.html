@@ -128,7 +128,7 @@
 
 						controls = new THREE.OrbitControls( camera );
 
-						var geometry = new THREE.PlaneBufferGeometry( 100, 100, terrainWidth - 1, terrainDepth - 1 );
+						var geometry = new THREE.PlaneBufferGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
 						geometry.rotateX( -Math.PI / 2 );
 
 						var vertices = geometry.attributes.position.array;

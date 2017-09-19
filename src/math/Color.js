@@ -1,4 +1,4 @@
-import { _Math } from './Math';
+import { _Math } from './Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -440,7 +440,7 @@ Object.assign( Color.prototype, {
 
 	},
 
-	sub: function( color ) {
+	sub: function ( color ) {
 
 		this.r = Math.max( 0, this.r - color.r );
 		this.g = Math.max( 0, this.g - color.g );

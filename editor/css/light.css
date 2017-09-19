@@ -106,11 +106,13 @@ select {
 		}
 
 		#menubar .menu .options {
-			position: absolute;
+			position: fixed;
 			display: none;
 			padding: 5px 0;
 			background: #eee;
 			width: 150px;
+			max-height: calc(100% - 80px);
+			overflow: auto;
 		}
 
 		#menubar .menu:hover .options {

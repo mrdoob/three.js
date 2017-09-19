@@ -22,13 +22,6 @@ var Editor = function () {
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
 
-		// vr
-
-		enterVR: new Signal(),
-
-		enteredVR: new Signal(),
-		exitedVR: new Signal(),
-
 		// actions
 
 		showModal: new Signal(),

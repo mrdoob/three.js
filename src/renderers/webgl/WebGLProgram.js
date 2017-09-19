@@ -2,10 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { WebGLUniforms } from './WebGLUniforms';
-import { WebGLShader } from './WebGLShader';
-import { ShaderChunk } from '../shaders/ShaderChunk';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding } from '../../constants';
+import { WebGLUniforms } from './WebGLUniforms.js';
+import { WebGLShader } from './WebGLShader.js';
+import { ShaderChunk } from '../shaders/ShaderChunk.js';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding } from '../../constants.js';
 
 var programIdCount = 0;
 
@@ -14,19 +14,19 @@ function getEncodingComponents( encoding ) {
 	switch ( encoding ) {
 
 		case LinearEncoding:
-			return [ 'Linear','( value )' ];
+			return [ 'Linear', '( value )' ];
 		case sRGBEncoding:
-			return [ 'sRGB','( value )' ];
+			return [ 'sRGB', '( value )' ];
 		case RGBEEncoding:
-			return [ 'RGBE','( value )' ];
+			return [ 'RGBE', '( value )' ];
 		case RGBM7Encoding:
-			return [ 'RGBM','( value, 7.0 )' ];
+			return [ 'RGBM', '( value, 7.0 )' ];
 		case RGBM16Encoding:
-			return [ 'RGBM','( value, 16.0 )' ];
+			return [ 'RGBM', '( value, 16.0 )' ];
 		case RGBDEncoding:
-			return [ 'RGBD','( value, 256.0 )' ];
+			return [ 'RGBD', '( value, 256.0 )' ];
 		case GammaEncoding:
-			return [ 'Gamma','( value, float( GAMMA_FACTOR ) )' ];
+			return [ 'Gamma', '( value, float( GAMMA_FACTOR ) )' ];
 		default:
 			throw new Error( 'unsupported encoding: ' + encoding );
 
@@ -112,7 +112,7 @@ function generateDefines( defines ) {
 
 }
 
-function fetchAttributeLocations( gl, program, identifiers ) {
+function fetchAttributeLocations( gl, program ) {
 
 	var attributes = {};
 
@@ -123,7 +123,7 @@ function fetchAttributeLocations( gl, program, identifiers ) {
 		var info = gl.getActiveAttrib( program, i );
 		var name = info.name;
 
-		// console.log("THREE.WebGLProgram: ACTIVE VERTEX ATTRIBUTE:", name, i );
+		// console.log( 'THREE.WebGLProgram: ACTIVE VERTEX ATTRIBUTE:', name, i );
 
 		attributes[ name ] = gl.getAttribLocation( program, name );
 
@@ -455,7 +455,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.flipSided ? '#define FLIP_SIDED' : '',
 
 			'#define NUM_CLIPPING_PLANES ' + parameters.numClippingPlanes,
-			'#define UNION_CLIPPING_PLANES ' + (parameters.numClippingPlanes - parameters.numClipIntersection),
+			'#define UNION_CLIPPING_PLANES ' + ( parameters.numClippingPlanes - parameters.numClipIntersection ),
 
 			parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 			parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
@@ -473,7 +473,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			'uniform vec3 cameraPosition;',
 
 			( parameters.toneMapping !== NoToneMapping ) ? "#define TONE_MAPPING" : '',
-			( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '',  // this code is required here because it is used by the toneMapping() function defined below
+			( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '', // this code is required here because it is used by the toneMapping() function defined below
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
 
 			parameters.dithering ? '#define DITHERING' : '',
@@ -624,7 +624,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	// free resource
 
-	this.destroy = function() {
+	this.destroy = function () {
 
 		gl.deleteProgram( program );
 		this.program = undefined;
@@ -636,7 +636,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	Object.defineProperties( this, {
 
 		uniforms: {
-			get: function() {
+			get: function () {
 
 				console.warn( 'THREE.WebGLProgram: .uniforms is now .getUniforms().' );
 				return this.getUniforms();
@@ -645,7 +645,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 		},
 
 		attributes: {
-			get: function() {
+			get: function () {
 
 				console.warn( 'THREE.WebGLProgram: .attributes is now .getAttributes().' );
 				return this.getAttributes();

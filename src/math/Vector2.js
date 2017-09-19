@@ -14,7 +14,7 @@ function Vector2( x, y ) {
 
 Object.defineProperties( Vector2.prototype, {
 
-	"width" : {
+	"width": {
 
 		get: function () {
 
@@ -30,7 +30,7 @@ Object.defineProperties( Vector2.prototype, {
 
 	},
 
-	"height" : {
+	"height": {
 
 		get: function () {
 
@@ -237,6 +237,18 @@ Object.assign( Vector2.prototype, {
 
 	},
 
+	applyMatrix3: function ( m ) {
+
+		var x = this.x, y = this.y;
+		var e = m.elements;
+
+		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ];
+		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ];
+
+		return this;
+
+	},
+
 	min: function ( v ) {
 
 		this.x = Math.min( this.x, v.x );
@@ -353,7 +365,7 @@ Object.assign( Vector2.prototype, {
 
 	},
 
-	lengthManhattan: function() {
+	lengthManhattan: function () {
 
 		return Math.abs( this.x ) + Math.abs( this.y );
 

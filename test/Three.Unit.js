@@ -35,6 +35,7 @@ export { PositionalAudio } from '../src/audio/PositionalAudio.js';
 
 
 //src/cameras
+export { ArrayCamera } from '../src/cameras/ArrayCamera.js';
 export { Camera } from '../src/cameras/Camera.js';
 export { CubeCamera } from '../src/cameras/CubeCamera.js';
 export { OrthographicCamera } from '../src/cameras/OrthographicCamera.js';
@@ -99,11 +100,13 @@ export * from '../src/geometries/Geometries.js';
 export { ArrowHelper } from '../src/helpers/ArrowHelper.js';
 export { AxisHelper } from '../src/helpers/AxisHelper.js';
 export { BoxHelper } from '../src/helpers/BoxHelper.js';
+export { Box3Helper } from '../src/helpers/Box3Helper.js';
 export { CameraHelper } from '../src/helpers/CameraHelper.js';
 export { DirectionalLightHelper } from '../src/helpers/DirectionalLightHelper.js';
 export { FaceNormalsHelper } from '../src/helpers/FaceNormalsHelper.js';
 export { GridHelper } from '../src/helpers/GridHelper.js';
 export { HemisphereLightHelper } from '../src/helpers/HemisphereLightHelper.js';
+export { PlaneHelper } from '../src/helpers/PlaneHelper.js';
 export { PointLightHelper } from '../src/helpers/PointLightHelper.js';
 export { PolarGridHelper } from '../src/helpers/PolarGridHelper.js';
 export { RectAreaLightHelper } from '../src/helpers/RectAreaLightHelper.js';
@@ -121,7 +124,6 @@ export { Light } from '../src/lights/Light.js';
 export { LightShadow } from '../src/lights/LightShadow.js';
 export { PointLight } from '../src/lights/PointLight.js';
 export { RectAreaLight } from '../src/lights/RectAreaLight.js';
-//export { RectAreaLightShadow } from '../src/lights/RectAreaLightShadow.js'; //Todo (tristan): Need to be fixed !
 export { SpotLight } from '../src/lights/SpotLight.js';
 export { SpotLightShadow } from '../src/lights/SpotLightShadow.js';
 
@@ -183,6 +185,7 @@ export { Bone } from '../src/objects/Bone.js';
 export { Group } from '../src/objects/Group.js';
 export { LensFlare } from '../src/objects/LensFlare.js';
 export { Line } from '../src/objects/Line.js';
+export { LineLoop } from '../src/objects/LineLoop.js';
 export { LineSegments } from '../src/objects/LineSegments.js';
 export { LOD } from '../src/objects/LOD.js';
 export { Mesh } from '../src/objects/Mesh.js';
@@ -205,25 +208,32 @@ export { UniformsLib } from '../src/renderers/shaders/UniformsLib.js';
 export { UniformsUtils } from '../src/renderers/shaders/UniformsUtils.js';
 
 //src/renderers/webgl
+export { WebGLAttributes } from '../src/renderers/webgl/WebGLAttributes.js';
+export { WebGLBackground } from '../src/renderers/webgl/WebGLBackground.js';
 export { WebGLBufferRenderer } from '../src/renderers/webgl/WebGLBufferRenderer.js';
 export { WebGLCapabilities } from '../src/renderers/webgl/WebGLCapabilities.js';
 export { WebGLClipping } from '../src/renderers/webgl/WebGLClipping.js';
 export { WebGLExtensions } from '../src/renderers/webgl/WebGLExtensions.js';
+export { WebGLFlareRenderer } from '../src/renderers/webgl/WebGLFlareRenderer.js';
 export { WebGLGeometries } from '../src/renderers/webgl/WebGLGeometries.js';
 export { WebGLIndexedBufferRenderer } from '../src/renderers/webgl/WebGLIndexedBufferRenderer.js';
 export { WebGLLights } from '../src/renderers/webgl/WebGLLights.js';
+export { WebGLMorphtargets } from '../src/renderers/webgl/WebGLMorphtargets.js';
 export { WebGLObjects } from '../src/renderers/webgl/WebGLObjects.js';
 export { WebGLProgram } from '../src/renderers/webgl/WebGLProgram.js';
+export { WebGLPrograms } from '../src/renderers/webgl/WebGLPrograms.js';
 export { WebGLProperties } from '../src/renderers/webgl/WebGLProperties.js';
+export { WebGLRenderLists } from '../src/renderers/webgl/WebGLRenderLists.js';
 export { WebGLShader } from '../src/renderers/webgl/WebGLShader.js';
 export { WebGLShadowMap } from '../src/renderers/webgl/WebGLShadowMap.js';
+export { WebGLSpriteRenderer } from '../src/renderers/webgl/WebGLSpriteRenderer.js';
 export { WebGLState } from '../src/renderers/webgl/WebGLState.js';
 export { WebGLTextures } from '../src/renderers/webgl/WebGLTextures.js';
 export { WebGLUniforms } from '../src/renderers/webgl/WebGLUniforms.js';
+export { WebGLUtils } from '../src/renderers/webgl/WebGLUtils.js';
 
-//src/renderers/webgl/plugins
-export { LensFlarePlugin } from '../src/renderers/webgl/plugins/LensFlarePlugin.js';
-export { SpritePlugin } from '../src/renderers/webgl/plugins/SpritePlugin.js';
+//src/renderers/webvr
+export { WebVRManager } from '../src/renderers/webvr/WebVRManager.js';
 
 
 //src/scenes

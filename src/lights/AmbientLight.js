@@ -1,4 +1,4 @@
-import { Light } from './Light';
+import { Light } from './Light.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

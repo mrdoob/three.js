@@ -126,7 +126,7 @@
 			renderer = new THREE.WebGLRenderer();
 
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
-				document.getElementById( "notSupported" ).style.display = "";
+				document.getElementById( 'notSupported' ).style.display = '';
 				return false;
 			}
 
@@ -138,8 +138,11 @@
 
 			scene = new THREE.Scene();
 
+			var circleGeometry = new THREE.CircleBufferGeometry( 1, 6 );
+
 			geometry = new THREE.InstancedBufferGeometry();
-			geometry.copy( new THREE.CircleBufferGeometry( 1, 6 ) );
+			geometry.index = circleGeometry.index;
+			geometry.attributes = circleGeometry.attributes;
 
 			var particleCount = 75000;
 
@@ -153,11 +156,11 @@
 
 			}
 
-			geometry.addAttribute( "translate", new THREE.InstancedBufferAttribute( translateArray, 3, 1 ) );
+			geometry.addAttribute( 'translate', new THREE.InstancedBufferAttribute( translateArray, 3, 1 ) );
 
 			material = new THREE.RawShaderMaterial( {
 				uniforms: {
-					map: { value: new THREE.TextureLoader().load( "textures/sprites/circle.png" ) },
+					map: { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
 					time: { value: 0.0 }
 				},
 				vertexShader: document.getElementById( 'vshader' ).textContent,

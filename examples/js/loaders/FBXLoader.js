@@ -185,12 +185,12 @@
 	/**
 	 * Parses map of images referenced in FBXTree.
 	 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
-	 * @returns {Map<number, string(image blob URL)>}
+	 * @returns {Map<number, string(image blob/data URL)>}
 	 */
 	function parseImages( FBXTree ) {
 
 		/**
-		 * @type {Map<number, string(image blob URL)>}
+		 * @type {Map<number, string(image blob/data URL)>}
 		 */
 		var imageMap = new Map();
 
@@ -220,12 +220,11 @@
 
 	/**
 	 * @param {videoNode} videoNode - Node to get texture image information from.
-	 * @returns {string} - image blob URL
+	 * @returns {string} - image blob/data URL
 	 */
 	function parseImage( videoNode ) {
 
-		var buffer = videoNode.properties.Content;
-		var array = new Uint8Array( buffer );
+		var content = videoNode.properties.Content;
 		var fileName = videoNode.properties.RelativeFilename || videoNode.properties.Filename;
 		var extension = fileName.slice( fileName.lastIndexOf( '.' ) + 1 ).toLowerCase();
 
@@ -260,7 +259,16 @@
 
 		}
 
-		return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+		if ( typeof content === 'string' ) {
+
+			return 'data:' + type + ';base64,' + content;
+
+		} else {
+
+			var array = new Uint8Array( content );
+			return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+
+		}
 
 	}
 
@@ -268,7 +276,7 @@
 	 * Parses map of textures referenced in FBXTree.
 	 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
 	 * @param {THREE.TextureLoader} loader
-	 * @param {Map<number, string(image blob URL)>} imageMap
+	 * @param {Map<number, string(image blob/data URL)>} imageMap
 	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 	 * @returns {Map<number, THREE.Texture>}
 	 */
@@ -298,7 +306,7 @@
 	/**
 	 * @param {textureNode} textureNode - Node to get texture information from.
 	 * @param {THREE.TextureLoader} loader
-	 * @param {Map<number, string(image blob URL)>} imageMap
+	 * @param {Map<number, string(image blob/data URL)>} imageMap
 	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 	 * @returns {THREE.Texture}
 	 */
@@ -345,7 +353,7 @@
 
 		var currentPath = loader.path;
 
-		if ( fileName.indexOf( 'blob:' ) === 0 ) {
+		if ( fileName.indexOf( 'blob:' ) === 0 || fileName.indexOf( 'data:' ) === 0 ) {
 
 			loader.setPath( undefined );
 
@@ -393,7 +401,7 @@
 			for ( var nodeID in materialNodes ) {
 
 				var material = parseMaterial( materialNodes[ nodeID ], textureMap, connections );
-				materialMap.set( parseInt( nodeID ), material );
+				if ( material !== null ) materialMap.set( parseInt( nodeID ), material );
 
 			}
 
@@ -423,6 +431,10 @@
 
 		}
 
+		// Seems like FBX can include unused materials which don't have any connections.
+		// Ignores them so far.
+		if ( ! connections.has( FBX_ID ) ) return null;
+
 		var children = connections.get( FBX_ID ).children;
 
 		var parameters = parseParameters( materialNode.properties, textureMap, children );
@@ -438,8 +450,8 @@
 				material = new THREE.MeshLambertMaterial();
 				break;
 			default:
-				console.warn( 'THREE.FBXLoader: No implementation given for material type %s in FBXLoader.js. Defaulting to basic material.', type );
-				material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+				console.warn( 'THREE.FBXLoader: No implementation given for material type %s in FBXLoader.js. Defaulting to standard material.', type );
+				material = new THREE.MeshStandardMaterial( { color: 0x3300ff } );
 				break;
 
 		}
@@ -1408,13 +1420,13 @@
 
 						} else {
 
-							material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+							material = new THREE.MeshStandardMaterial( { color: 0x3300ff } );
 							materials.push( material );
 
 						}
 						if ( 'color' in geometry.attributes ) {
 
-							for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++materialIndex ) {
+							for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++ materialIndex ) {
 
 								materials[ materialIndex ].vertexColors = THREE.VertexColors;
 
@@ -3619,32 +3631,37 @@
 
 			var split = text.split( '\n' );
 
-			for ( var line in split ) {
+			for ( var lineNum = 0, lineLength = split.length; lineNum < lineLength; lineNum ++ ) {
 
-				var l = split[ line ];
+				var l = split[ lineNum ];
 
-				// short cut
+				// skip comment line
 				if ( l.match( /^[\s\t]*;/ ) ) {
 
 					continue;
 
-				} // skip comment line
+				}
+
+				// skip empty line
 				if ( l.match( /^[\s\t]*$/ ) ) {
 
 					continue;
 
-				} // skip empty line
+				}
 
 				// beginning of node
 				var beginningOfNodeExp = new RegExp( '^\\t{' + this.currentIndent + '}(\\w+):(.*){', '' );
 				var match = l.match( beginningOfNodeExp );
+
 				if ( match ) {
 
 					var nodeName = match[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, '' );
 					var nodeAttrs = match[ 2 ].split( ',' );
 
 					for ( var i = 0, l = nodeAttrs.length; i < l; i ++ ) {
+
 						nodeAttrs[ i ] = nodeAttrs[ i ].trim().replace( /^"/, '' ).replace( /"$/, '' );
+
 					}
 
 					this.parseNodeBegin( l, nodeName, nodeAttrs || null );
@@ -3655,10 +3672,20 @@
 				// node's property
 				var propExp = new RegExp( '^\\t{' + ( this.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
 				var match = l.match( propExp );
+
 				if ( match ) {
 
 					var propName = match[ 1 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
 					var propValue = match[ 2 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
+
+					// for special case: base64 image data follows "Content: ," line
+					//	Content: ,
+					//	 "iVB..."
+					if ( propName === 'Content' && propValue === ',' ) {
+
+						propValue = split[ ++ lineNum ].replace( /"/g, '' ).trim();
+
+					}
 
 					this.parseNodeProperty( l, propName, propValue );
 					continue;
@@ -3667,6 +3694,7 @@
 
 				// end of node
 				var endOfNodeExp = new RegExp( '^\\t{' + ( this.currentIndent - 1 ) + '}}' );
+
 				if ( l.match( endOfNodeExp ) ) {
 
 					this.nodeEnd();
@@ -3899,7 +3927,9 @@
 			var props = propValue.split( '",' );
 
 			for ( var i = 0, l = props.length; i < l; i ++ ) {
+
 				props[ i ] = props[ i ].trim().replace( /^\"/, '' ).replace( /\s/, '_' );
+
 			}
 
 			var innerPropName = props[ 0 ];
@@ -4001,7 +4031,7 @@
 		 * @param {BinaryReader} reader
 		 * @returns {boolean}
 		 */
-		endOfContent: function( reader ) {
+		endOfContent: function ( reader ) {
 
 			// footer size: 160bytes + 16-byte alignment padding
 			// - 16bytes: magic
@@ -4013,7 +4043,7 @@
 			// - 16bytes: magic
 			if ( reader.size() % 16 === 0 ) {
 
-				return ( ( reader.getOffset() + 160 + 16 ) & ~0xf ) >= reader.size();
+				return ( ( reader.getOffset() + 160 + 16 ) & ~ 0xf ) >= reader.size();
 
 			} else {
 
@@ -4035,7 +4065,6 @@
 			// The first three data sizes depends on version.
 			var endOffset = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 			var numProperties = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
-			var propertyListLen = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 			var nameLen = reader.getUint8();
 			var name = reader.getString( nameLen );
 
@@ -4329,7 +4358,7 @@
 
 					}
 
-					var inflate = new Zlib.Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
+					var inflate = new Zlib.Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
 					var reader2 = new BinaryReader( inflate.decompress().buffer );
 
 					switch ( type ) {
@@ -4576,8 +4605,8 @@
 			// calculate negative value
 			if ( high & 0x80000000 ) {
 
-				high = ~high & 0xFFFFFFFF;
-				low = ~low & 0xFFFFFFFF;
+				high = ~ high & 0xFFFFFFFF;
+				low = ~ low & 0xFFFFFFFF;
 
 				if ( low === 0xFFFFFFFF ) high = ( high + 1 ) & 0xFFFFFFFF;
 
@@ -4705,7 +4734,7 @@
 			while ( size > 0 ) {
 
 				var value = this.getUint8();
-				size--;
+				size --;
 
 				if ( value === 0 ) break;
 
@@ -5066,7 +5095,7 @@
 
 		}
 
-		return -1;
+		return - 1;
 
 	}
 
