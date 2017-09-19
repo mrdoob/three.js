@@ -1467,7 +1467,7 @@ THREE.GLTFLoader = ( function () {
 
 			// Clean up resources and configure Texture.
 
-			if ( isObjectURL !== undefined ) {
+			if ( isObjectURL === true ) {
 
 				URL.revokeObjectURL( sourceURI );
 
