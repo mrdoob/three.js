@@ -1695,6 +1695,10 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
+				// emissiveTexture and baseColorTexture use sRGB encoding.
+				if ( _material.map ) _material.map.encoding = THREE.sRGBEncoding;
+				if ( _material.emissiveMap ) _material.emissiveMap.encoding = THREE.sRGBEncoding;
+
 				if ( material.extras ) _material.userData = material.extras;
 
 				return _material;
