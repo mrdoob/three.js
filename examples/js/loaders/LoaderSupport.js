@@ -8,14 +8,14 @@
 if ( THREE.LoaderSupport === undefined ) { THREE.LoaderSupport = {} }
 
 /**
- * Validation functions
+ * Validation functions.
  * @class
  */
 THREE.LoaderSupport.Validator = {
 	/**
 	 * If given input is null or undefined, false is returned otherwise true.
 	 *
-	 * @param input Anything
+	 * @param input Can be anything
 	 * @returns {boolean}
 	 */
 	isValid: function( input ) {
@@ -24,8 +24,8 @@ THREE.LoaderSupport.Validator = {
 	/**
 	 * If given input is null or undefined, the defaultValue is returned otherwise the given input.
 	 *
-	 * @param input Anything
-	 * @param defaultValue Anything
+	 * @param input Can be anything
+	 * @param defaultValue Can be anything
 	 * @returns {*}
 	 */
 	verifyInput: function( input, defaultValue ) {
@@ -35,8 +35,11 @@ THREE.LoaderSupport.Validator = {
 
 
 /**
- * Logging wrapper for console
+ * Logging wrapper for console.
  * @class
+ *
+ * @param {boolean} enabled=true Tell if logger is enabled.
+ * @param {boolean} debug=false Toggle debug logging.
  */
 THREE.LoaderSupport.ConsoleLogger = (function () {
 
@@ -46,7 +49,7 @@ THREE.LoaderSupport.ConsoleLogger = (function () {
 	}
 
 	/**
-	 * Enable or disable debug logging
+	 * Enable or disable debug logging.
 	 * @memberOf THREE.LoaderSupport.ConsoleLogger
 	 *
 	 * @param {boolean} debug True or False
@@ -56,7 +59,7 @@ THREE.LoaderSupport.ConsoleLogger = (function () {
 	};
 
 	/**
-	 * Returns if is enabled and debug
+	 * Returns if is enabled and debug.
 	 * @memberOf THREE.LoaderSupport.ConsoleLogger
 	 *
 	 * @returns {boolean}
@@ -66,7 +69,7 @@ THREE.LoaderSupport.ConsoleLogger = (function () {
 	};
 
 	/**
-	 * Enable or disable info, debug and time logging
+	 * Enable or disable info, debug and time logging.
 	 * @memberOf THREE.LoaderSupport.ConsoleLogger
 	 *
 	 * @param {boolean} enabled True or False
@@ -136,7 +139,7 @@ THREE.LoaderSupport.ConsoleLogger = (function () {
 	};
 
 	/**
-	 * Start time measurement with provided id.
+	 * Stop time measurement started with provided id.
 	 * @memberOf THREE.LoaderSupport.ConsoleLogger
 	 *
 	 * @param {string} id Time identification
@@ -184,7 +187,7 @@ THREE.LoaderSupport.Callbacks = (function () {
 	};
 
 	/**
-	 * Register callback function that is called once loading of the complete model is completed.
+	 * Register callback function that is called once loading of the complete OBJ file is completed.
 	 * @memberOf THREE.LoaderSupport.Callbacks
 	 *
 	 * @param {callback} callbackOnLoad Callback function for described functionality
@@ -262,10 +265,10 @@ THREE.LoaderSupport.Builder = (function () {
 	};
 
 	/**
-	 * Builds one or multiple meshes from the data described in the payload (buffers, params, material info,
+	 * Builds one or multiple meshes from the data described in the payload (buffers, params, material info.
 	 * @memberOf THREE.LoaderSupport.Builder
 	 *
-	 * @param {Object} payload buffers, params, materials
+	 * @param {Object} payload Raw mesh description (buffers, params, materials) used to build one to many meshes.
 	 * @returns {THREE.Mesh[]} mesh Array of {@link THREE.Mesh}
 	 */
 	Builder.prototype.buildMeshes = function ( payload ) {
@@ -451,6 +454,9 @@ THREE.LoaderSupport.Builder = (function () {
 /**
  * Base class to be used by loaders.
  * @class
+ *
+ * @param {THREE.LoaderSupport.ConsoleLogger} logger logger to be used
+ * @param {THREE.DefaultLoadingManager} [manager] The loadingManager for the loader to use. Default is {@link THREE.DefaultLoadingManager}
  */
 THREE.LoaderSupport.Commons = (function () {
 
@@ -563,13 +569,13 @@ THREE.LoaderSupport.Commons = (function () {
 	};
 
 	/**
-	 * Announce feedback which is give to the registered callbacks
+	 * Announce feedback which is give to the registered callbacks.
 	 * @memberOf THREE.LoaderSupport.Commons
 	 * @private
 	 *
-	 * @param {string} type
-	 * @param {string} text
-	 * @param {number} numericalValue
+	 * @param {string} type The type of event
+	 * @param {string} text Textual description of the event
+	 * @param {number} numericalValue Numerical value describing the progress
 	 */
 	Commons.prototype.onProgress = function ( type, text, numericalValue ) {
 		var content = Validator.isValid( text ) ? text: '';
@@ -616,6 +622,7 @@ THREE.LoaderSupport.LoadedMeshUserOverride = (function () {
 	 */
 	LoadedMeshUserOverride.prototype.addMesh = function ( mesh ) {
 		this.meshes.push( mesh );
+		this.alteredMesh = true;
 	};
 
 	/**
@@ -808,6 +815,11 @@ THREE.LoaderSupport.PrepData = (function () {
 	return PrepData;
 })();
 
+/**
+ * Default implementation of the WorkerRunner responsible for creation and configuration of the parser within the worker.
+ *
+ * @class
+ */
 THREE.LoaderSupport.WorkerRunnerRefImpl = (function () {
 
 	function WorkerRunnerRefImpl() {
@@ -818,6 +830,13 @@ THREE.LoaderSupport.WorkerRunnerRefImpl = (function () {
 		self.addEventListener( 'message', scopedRunner, false );
 	}
 
+	/**
+	 * Applies values from parameter object via set functions or via direct assignment.
+	 * @memberOf THREE.LoaderSupport.WorkerRunnerRefImpl
+	 *
+	 * @param {Object} parser The parser instance
+	 * @param {Object} params The parameter object
+	 */
 	WorkerRunnerRefImpl.prototype.applyProperties = function ( parser, params ) {
 		var property, funcName, values;
 		for ( property in params ) {
@@ -836,6 +855,12 @@ THREE.LoaderSupport.WorkerRunnerRefImpl = (function () {
 		}
 	};
 
+	/**
+	 * Configures the Parser implementation according the supplied configuration object.
+	 * @memberOf THREE.LoaderSupport.WorkerRunnerRefImpl
+	 *
+	 * @param {Object} payload Raw mesh description (buffers, params, materials) used to build one to many meshes.
+	 */
 	WorkerRunnerRefImpl.prototype.run = function ( payload ) {
 		var logger = new ConsoleLogger( payload.logger.enabled, payload.logger.debug );
 
@@ -876,6 +901,13 @@ THREE.LoaderSupport.WorkerRunnerRefImpl = (function () {
 	return WorkerRunnerRefImpl;
 })();
 
+/**
+ * This class provides means to transform existing parser code into a web worker. It defines a simple communication protocol
+ * which allows to configure the worker and receive raw mesh data during execution.
+ * @class
+ *
+ * @param {THREE.LoaderSupport.ConsoleLogger} logger logger to be used
+ */
 THREE.LoaderSupport.WorkerSupport = (function () {
 
 	var WORKER_SUPPORT_VERSION = '1.0.0';
@@ -902,6 +934,14 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 		};
 	}
 
+	/**
+	 * Validate the status of worker code and the derived worker.
+	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 *
+	 * @param {Function} functionCodeBuilder Function that is invoked with funcBuildObject and funcBuildSingelton that allows stringification of objects and singletons.
+	 * @param {boolean} forceWorkerReload Force re-build of the worker code.
+	 * @param {THREE.LoaderSupport.WorkerRunnerRefImpl} runnerImpl The default worker parser wrapper implementation (communication and execution). An extended class could be passed here.
+	 */
 	WorkerSupport.prototype.validate = function ( functionCodeBuilder, forceWorkerReload, runnerImpl ) {
 		this.running = false;
 		if ( forceWorkerReload ) {
@@ -970,6 +1010,10 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 		}
 	};
 
+	/**
+	 * Terminate the worker and the code.
+	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 */
 	WorkerSupport.prototype.terminateWorker = function () {
 		if ( Validator.isValid( this.worker ) ) {
 			this.worker.terminate();
@@ -978,6 +1022,13 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 		this.workerCode = null;
 	};
 
+	/**
+	 * Specify functions that should be build when new raw mesh data becomes available and when the parser is finished.
+	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 *
+	 * @param {Function} builder The builder function. Default is {@link THREE.LoaderSupport.Builder}.
+	 * @param {Function} onLoad The function that is called when parsing is complete.
+	 */
 	WorkerSupport.prototype.setCallbacks = function ( builder, onLoad ) {
 		this.callbacks = {
 			builder: builder,
@@ -1040,16 +1091,28 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 		return objectString;
 	};
 
+	/**
+	 * Request termination of worker once parser is finished.
+	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 *
+	 * @param {boolean} terminateRequested True or false.
+	 */
 	WorkerSupport.prototype.setTerminateRequested = function ( terminateRequested ) {
 		this.terminateRequested = terminateRequested === true;
 	};
 
-	WorkerSupport.prototype.run = function ( messageObject ) {
+	/**
+	 * Runs the parser with the provided configuration.
+	 * @memberOf THREE.LoaderSupport.WorkerSupport
+	 *
+	 * @param {Object} payload Raw mesh description (buffers, params, materials) used to build one to many meshes.
+	 */
+	WorkerSupport.prototype.run = function ( payload ) {
 		if ( ! Validator.isValid( this.callbacks.builder ) ) throw 'Unable to run as no "builder" callback is set.';
 		if ( ! Validator.isValid( this.callbacks.onLoad ) ) throw 'Unable to run as no "onLoad" callback is set.';
 		if ( Validator.isValid( this.worker ) ) {
 			this.running = true;
-			this.worker.postMessage( messageObject );
+			this.worker.postMessage( payload );
 		}
 	};
 
