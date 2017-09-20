@@ -81,6 +81,31 @@ function WebVRManager( renderer ) {
 
 	};
 
+	this.getViews = function () {
+
+		if ( device !== null && device.getViews ) {
+
+			return device.getViews() || [];
+
+		}
+
+		return [];
+
+	};
+
+	this.hasMultiviewSupport = function () {
+
+		var views = this.getViews();
+
+		if ( views.length > 0 ) {
+
+			return views[ 0 ].getAttributes().multiview;
+
+		}
+
+		return false;
+	};
+
 	this.getCamera = function ( camera ) {
 
 		if ( device === null ) return camera;

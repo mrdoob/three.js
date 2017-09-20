@@ -769,6 +769,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function updateRenderTargetMipmap( renderTarget ) {
 
 		var texture = renderTarget.texture;
+		if ( ! texture ) return;
+
 		var isTargetPowerOfTwo = isPowerOfTwo( renderTarget );
 
 		if ( textureNeedsGenerateMipmaps( texture, isTargetPowerOfTwo ) ) {

@@ -489,14 +489,13 @@ function WebGLUniforms( gl, program, renderer ) {
 	this.renderer = renderer;
 
 	var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
-	console.log('Uniforms!');
+
 	for ( var i = 0; i < n; ++ i ) {
 
 		var info = gl.getActiveUniform( program, i ),
 			path = info.name,
 			addr = gl.getUniformLocation( program, path );
 
-		console.log('uniform', path);
 		parseUniform( info, addr, this );
 
 	}

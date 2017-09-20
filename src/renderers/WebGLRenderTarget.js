@@ -72,7 +72,11 @@ Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
 
 		this.viewport.copy( source.viewport );
 
-		this.texture = source.texture.clone();
+		if ( source.texture ) {
+
+			this.texture = source.texture.clone();
+
+		}
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;

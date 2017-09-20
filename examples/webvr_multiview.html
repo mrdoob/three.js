@@ -188,6 +188,13 @@
 
 			//
 
+			WEBVR.attributes = {
+				depth: true,
+				multiview: true
+			};
+
+			console.log(WEBVR.attributes, WEBVR);
+
 			WEBVR.getVRDisplay( function ( display ) {
 
 				renderer.vr.setDevice( display );

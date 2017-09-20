@@ -7,6 +7,8 @@
 
 var WEBVR = {
 
+	attributes: {},
+
 	checkAvailability: function () {
 
 		return new Promise( function( resolve, reject ) {
@@ -105,14 +107,11 @@ var WEBVR = {
 		if ( display ) {
 
 			button.textContent = 'ENTER VR';
+
+			var attributes = this.attributes;
+
 			button.onclick = function () {
-
-				// @todo This should be detected
-				var attributes = {
-					depth: true,
-					multiview: true,
-				};
-
+				console.log(attributes);
 				display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: canvas, attributes: attributes } ] );
 
 			};
