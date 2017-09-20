@@ -291,20 +291,28 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 		prefixVertex = [
 
-			customDefines,
-
-			'\n'
+			customDefines
 
 		].filter( filterEmptyLine ).join( '\n' );
+
+		if ( prefixVertex.length > 0 ) {
+
+			prefixVertex += '\n';
+
+		}
 
 		prefixFragment = [
 
 			customExtensions,
-			customDefines,
-
-			'\n'
+			customDefines
 
 		].filter( filterEmptyLine ).join( '\n' );
+
+		if ( prefixFragment.length > 0 ) {
+
+			prefixFragment += '\n';
+
+		}
 
 	} else {
 
