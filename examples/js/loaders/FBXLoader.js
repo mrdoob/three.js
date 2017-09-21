@@ -4065,7 +4065,7 @@
 			// The first three data sizes depends on version.
 			var endOffset = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 			var numProperties = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
-			var propertyListLen = ( version >= 7400 ) ? reader.getUint32() : undefined;
+			var propertyListLen = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 			var nameLen = reader.getUint8();
 			var name = reader.getString( nameLen );
 
