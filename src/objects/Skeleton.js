@@ -1,5 +1,5 @@
-import { Matrix4 } from '../math/Matrix4';
-import { _Math } from '../math/Math';
+import { _Math } from '../math/Math.js';
+import { Matrix4 } from '../math/Matrix4.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/

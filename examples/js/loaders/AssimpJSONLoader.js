@@ -21,42 +21,44 @@ THREE.AssimpJSONLoader.prototype = {
 
 	constructor: THREE.AssimpJSONLoader,
 
+	crossOrigin: 'Anonymous',
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		this.texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : this.extractUrlBase( url );
+		var path = THREE.Loader.prototype.extractUrlBase( url );
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.load( url, function ( text ) {
 
-			var json = JSON.parse( text ), scene, metadata;
+			var json = JSON.parse( text );
+			var metadata = json.__metadata__;
 
-			// Check __metadata__ meta header if present
-			// This header is used to disambiguate between
-			// different JSON-based file formats.
-			metadata = json.__metadata__;
+			// check if __metadata__ meta header is present
+			// this header is used to disambiguate between different JSON-based file formats
+
 			if ( typeof metadata !== 'undefined' ) {
 
-				// Check if assimp2json at all
+				// check if assimp2json at all
+
 				if ( metadata.format !== 'assimp2json' ) {
 
-					onError( 'Not an assimp2json scene' );
+					onError( 'THREE.AssimpJSONLoader: Not an assimp2json scene.' );
 					return;
 
-				}
-				// Check major format version
-				else if ( metadata.version < 100 && metadata.version >= 200 ) {
+				// check major format version
 
-					onError( 'Unsupported assimp2json file format version' );
+				} else if ( metadata.version < 100 && metadata.version >= 200 ) {
+
+					onError( 'THREE.AssimpJSONLoader: Unsupported assimp2json file format version.' );
 					return;
 
 				}
 
 			}
 
-			scene = scope.parse( json );
-			onLoad( scene );
+			onLoad( scope.parse( json, path ) );
 
 		}, onProgress, onError );
 
@@ -68,251 +70,195 @@ THREE.AssimpJSONLoader.prototype = {
 
 	},
 
-	setTexturePath: function ( value ) {
+	parse: function ( json, path ) {
 
-		this.texturePath = value;
+		function parseList( json, handler ) {
 
-	},
+			var meshes = new Array( json.length );
 
-	extractUrlBase: function ( url ) {
+			for ( var i = 0; i < json.length; ++ i ) {
 
-		// from three/src/loaders/Loader.js
-		var parts = url.split( '/' );
-		parts.pop();
-		return ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
+				meshes[ i ] = handler.call( this, json[ i ] );
 
-	},
+			}
 
-	parse: function ( json ) {
-
-		var meshes = this.parseList ( json.meshes, this.parseMesh );
-		var materials = this.parseList ( json.materials, this.parseMaterial );
-		return this.parseObject( json, json.rootnode, meshes, materials );
-
-	},
-
-	parseList : function( json, handler ) {
-
-		var meshes = new Array( json.length );
-		for ( var i = 0; i < json.length; ++ i ) {
-
-			meshes[ i ] = handler.call( this, json[ i ] );
-
-		}
-		return meshes;
-
-	},
-
-	parseMesh : function( json ) {
-
-		var geometry = new THREE.BufferGeometry();
-
-		var i, l, face;
-
-		var indices = [];
-
-		var vertices = json.vertices || [];
-		var normals = json.normals || [];
-		var uvs = json.texturecoords || [];
-		var colors = json.colors || [];
-
-		uvs = uvs[ 0 ] || []; // only support for a single set of uvs
-
-		for ( i = 0, l = json.faces.length; i < l; i ++ ) {
-
-			face = json.faces[ i ];
-			indices.push( face[ 0 ], face[ 1 ], face[ 2 ] );
+			return meshes;
 
 		}
 
-		geometry.setIndex( indices );
-		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+		function parseMesh( json ) {
 
-		if ( normals.length > 0 ) {
+			var geometry = new THREE.BufferGeometry();
 
-			geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+			var i, l, face;
 
-		}
+			var indices = [];
 
-		if ( uvs.length > 0 ) {
+			var vertices = json.vertices || [];
+			var normals = json.normals || [];
+			var uvs = json.texturecoords || [];
+			var colors = json.colors || [];
 
-			geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+			uvs = uvs[ 0 ] || []; // only support for a single set of uvs
 
-		}
+			for ( i = 0, l = json.faces.length; i < l; i ++ ) {
 
-		if ( colors.length > 0 ) {
+				face = json.faces[ i ];
+				indices.push( face[ 0 ], face[ 1 ], face[ 2 ] );
 
-			geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+			}
 
-		}
+			geometry.setIndex( indices );
+			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
-		geometry.computeBoundingSphere();
+			if ( normals.length > 0 ) {
 
-		return geometry;
+				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
-	},
+			}
 
-	parseMaterial : function( json ) {
+			if ( uvs.length > 0 ) {
 
-		var mat = null;
-		var scope = this;
-		var i, prop, has_textures = [],
+				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
-		init_props = {
-			shading : THREE.SmoothShading
-		};
+			}
 
-		function toColor( value_arr ) {
+			if ( colors.length > 0 ) {
 
-			var col = new THREE.Color();
-			col.setRGB( value_arr[ 0 ], value_arr[ 1 ], value_arr[ 2 ] );
-			return col;
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-		}
+			}
 
-		function defaultTexture() {
+			geometry.computeBoundingSphere();
 
-			var im = new Image();
-			im.width = 1;
-			im.height = 1;
-			return new THREE.Texture( im );
+			return geometry;
 
 		}
 
-		for ( i in json.properties ) {
+		function parseMaterial( json ) {
 
-			prop = json.properties[ i ];
+			var material = new THREE.MeshPhongMaterial();
 
-			if ( prop.key === '$tex.file' ) {
+			for ( var i in json.properties ) {
 
-				// prop.semantic gives the type of the texture
-				// 1: diffuse
-				// 2: specular mao
-				// 5: height map (bumps)
-				// 6: normal map
-				// more values (i.e. emissive, environment) are known by assimp and may be relevant
-				if ( prop.semantic === 1 || prop.semantic === 5 || prop.semantic === 6 || prop.semantic === 2 ) {
+				var property = json.properties[ i ];
+				var key = property.key;
+				var value = property.value;
 
-					( function( semantic ) {
+				switch ( key ) {
 
-						var loader = new THREE.TextureLoader( scope.manager ),
-						keyname;
+					case '$tex.file': {
 
-						if ( semantic === 1 ) {
+						var semantic = property.semantic;
 
-							keyname = 'map';
+						// prop.semantic gives the type of the texture
+						// 1: diffuse
+						// 2: specular mao
+						// 5: height map (bumps)
+						// 6: normal map
+						// more values (i.e. emissive, environment) are known by assimp and may be relevant
 
-						} else if ( semantic === 5 ) {
+						if ( semantic === 1 || semantic === 2 || semantic === 5 || semantic === 6 ) {
 
-							keyname = 'bumpMap';
+							var keyname;
 
-						} else if ( semantic === 6 ) {
+							switch ( semantic ) {
 
-							keyname = 'normalMap';
-
-						} else if ( semantic === 2 ) {
-
-							keyname = 'specularMap';
-
-						}
-
-						has_textures.push( keyname );
-
-						loader.setCrossOrigin( this.crossOrigin );
-						var material_url = scope.texturePath + '/' + prop.value;
-						material_url = material_url.replace( /\\/g, '/' );
-						loader.load( material_url, function( tex ) {
-
-							if ( tex ) {
-
-								// TODO: read texture settings from assimp.
-								// Wrapping is the default, though.
-								tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-
-								mat[ keyname ] = tex;
-								mat.needsUpdate = true;
+								case 1:
+									keyname = 'map';
+									break;
+								case 2:
+									keyname = 'specularMap';
+									break;
+								case 5:
+									keyname = 'bumpMap';
+									break;
+								case 6:
+									keyname = 'normalMap';
+									break;
 
 							}
 
-						} );
+							var texture = textureLoader.load( value );
 
-					} )( prop.semantic );
+							// TODO: read texture settings from assimp.
+							// Wrapping is the default, though.
+
+							texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+							material[ keyname ] = texture;
+
+						}
+
+						break;
+
+					}
+
+					case '?mat.name':
+						material.name = value;
+						break;
+
+					case '$clr.diffuse':
+						material.color.fromArray( value );
+						break;
+
+					case '$clr.specular':
+						material.specular.fromArray( value );
+						break;
+
+					case '$clr.emissive':
+						material.emissive.fromArray( value );
+						break;
+
+					case '$mat.shininess':
+						material.shininess = value;
+						break;
+
+					case '$mat.shadingm':
+						// aiShadingMode_Flat
+						material.flatShading = ( value === 1 ) ? true : false;
+						break;
 
 				}
 
-			} else if ( prop.key === '?mat.name' ) {
+			}
 
-				init_props.name = prop.value;
+			return material;
 
-			} else if ( prop.key === '$clr.diffuse' ) {
+		}
 
-				init_props.color = toColor( prop.value );
+		function parseObject( json, node, meshes, materials ) {
 
-			} else if ( prop.key === '$clr.specular' ) {
+			var obj = new THREE.Object3D(),	i, idx;
 
-				init_props.specular = toColor( prop.value );
+			obj.name = node.name || '';
+			obj.matrix = new THREE.Matrix4().fromArray( node.transformation ).transpose();
+			obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
 
-			} else if ( prop.key === '$clr.emissive' ) {
+			for ( i = 0; node.meshes && i < node.meshes.length; i ++ ) {
 
-				init_props.emissive = toColor( prop.value );
-
-			} else if ( prop.key === '$mat.shadingm' ) {
-
-				// aiShadingMode_Flat
-				if ( prop.value === 1 ) {
-
-					init_props.shading = THREE.FlatShading;
-
-				}
-
-			} else if ( prop.key === '$mat.shininess' ) {
-
-				init_props.shininess = prop.value;
+				idx = node.meshes[ i ];
+				obj.add( new THREE.Mesh( meshes[ idx ], materials[ json.meshes[ idx ].materialindex ] ) );
 
 			}
 
-		}
+			for ( i = 0; node.children && i < node.children.length; i ++ ) {
 
-		// note: three.js does not like it when a texture is added after the geometry
-		// has been rendered once, see http://stackoverflow.com/questions/16531759/.
-		// for this reason we fill all slots upfront with default textures
-		if ( has_textures.length ) {
-
-			for ( i = has_textures.length - 1; i >= 0; -- i ) {
-
-				init_props[ has_textures[ i ]] = defaultTexture();
+				obj.add( parseObject( json, node.children[ i ], meshes, materials ) );
 
 			}
 
-		}
-
-		mat = new THREE.MeshPhongMaterial( init_props );
-		return mat;
-
-	},
-
-	parseObject : function( json, node, meshes, materials ) {
-
-		var obj = new THREE.Object3D(),	i, idx;
-
-		obj.name = node.name || "";
-		obj.matrix = new THREE.Matrix4().fromArray( node.transformation ).transpose();
-		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
-
-		for ( i = 0; node.meshes && i < node.meshes.length; ++ i ) {
-
-			idx = node.meshes[ i ];
-			obj.add( new THREE.Mesh( meshes[ idx ], materials[ json.meshes[ idx ].materialindex ] ) );
+			return obj;
 
 		}
 
-		for ( i = 0; node.children && i < node.children.length; ++ i ) {
+		var textureLoader = new THREE.TextureLoader( this.manager );
+		textureLoader.setPath( path ).setCrossOrigin( this.crossOrigin );
 
-			obj.add( this.parseObject( json, node.children[ i ], meshes, materials ) );
-
-		}
-
-		return obj;
+		var meshes = parseList( json.meshes, parseMesh );
+		var materials = parseList( json.materials, parseMaterial );
+		return parseObject( json, json.rootnode, meshes, materials );
 
 	}
+
 };

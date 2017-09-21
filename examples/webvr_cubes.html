@@ -4,8 +4,8 @@
 		<title>three.js webvr - cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-07-28 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-07-28" content="Ave6CPNUgSwHb3vCbyd55P/R7pfkwNniUJsYfSoUqI+l1X1BIOt6HfriVP0g2hmaG7Pp3qaUXuXdZeqGBmoMKg8AAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUwMTI2NzQwNX0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-10-09 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-10-09" content="AjrMPp+ZdEH97MOiKUzcpxLvh+B6I0CL55bPSbvQxL5ggVHl7X2dyEwTfXUgaMV7YLPOev4VZ4Uz+jMTsx3MPQEAAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUwNzU3MTAwOH0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -63,6 +63,7 @@
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				scene.add( camera );
@@ -120,10 +121,8 @@
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x505050 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				renderer.vr.enabled = true;
@@ -143,6 +142,8 @@
 
 				//
 
+				window.addEventListener( 'vrdisplaypointerrestricted', onPointerRestricted, false );
+				window.addEventListener( 'vrdisplaypointerunrestricted', onPointerUnrestricted, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -157,6 +158,22 @@
 
 				isMouseDown = false;
 
+			}
+
+			function onPointerRestricted() {
+				var pointerLockElement = renderer.domElement;
+				if ( pointerLockElement && typeof(pointerLockElement.requestPointerLock) === 'function' ) {
+					pointerLockElement.requestPointerLock();
+
+				}
+			}
+
+			function onPointerUnrestricted() {
+				var currentPointerLockElement = document.pointerLockElement;
+				var expectedPointerLockElement = renderer.domElement;
+				if ( currentPointerLockElement && currentPointerLockElement === expectedPointerLockElement && typeof(document.exitPointerLock) === 'function' ) {
+					document.exitPointerLock();
+				}
 			}
 
 			function onWindowResize() {

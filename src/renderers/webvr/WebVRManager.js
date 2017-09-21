@@ -2,10 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Matrix4 } from '../../math/Matrix4';
-import { Vector4 } from '../../math/Vector4';
-import { ArrayCamera } from '../../cameras/ArrayCamera';
-import { PerspectiveCamera } from '../../cameras/PerspectiveCamera';
+import { Matrix4 } from '../../math/Matrix4.js';
+import { Vector4 } from '../../math/Vector4.js';
+import { ArrayCamera } from '../../cameras/ArrayCamera.js';
+import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 
 function WebVRManager( renderer ) {
 
@@ -43,7 +43,7 @@ function WebVRManager( renderer ) {
 
 	function onVRDisplayPresentChange() {
 
-		if ( device.isPresenting ) {
+		if ( device !== null && device.isPresenting ) {
 
 			var eyeParameters = device.getEyeParameters( 'left' );
 			var renderWidth = eyeParameters.renderWidth;
@@ -128,6 +128,12 @@ function WebVRManager( renderer ) {
 
 		//
 
+		cameraL.near = camera.near;
+		cameraR.near = camera.near;
+
+		cameraL.far = camera.far;
+		cameraR.far = camera.far;
+
 		cameraVR.matrixWorld.copy( camera.matrixWorld );
 		cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
 
@@ -200,6 +206,12 @@ function WebVRManager( renderer ) {
 	this.submitFrame = function () {
 
 		if ( device && device.isPresenting ) device.submitFrame();
+
+	};
+
+	this.dispose = function () {
+
+		window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
 
 	};
 

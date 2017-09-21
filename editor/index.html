@@ -21,12 +21,13 @@
 		<script src="../examples/js/loaders/AMFLoader.js"></script>
 		<script src="../examples/js/loaders/AWDLoader.js"></script>
 		<script src="../examples/js/loaders/BabylonLoader.js"></script>
-		<script src="../examples/js/loaders/ColladaLoader2.js"></script>
+		<script src="../examples/js/loaders/ColladaLoader.js"></script>
 		<script src="../examples/js/loaders/FBXLoader.js"></script>
 		<script src="../examples/js/loaders/GLTFLoader.js"></script>
 		<script src="../examples/js/loaders/KMZLoader.js"></script>
 		<script src="../examples/js/loaders/MD2Loader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
+		<script src="../examples/js/loaders/MTLLoader.js"></script>
 		<script src="../examples/js/loaders/PlayCanvasLoader.js"></script>
 		<script src="../examples/js/loaders/PLYLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
@@ -39,6 +40,7 @@
 		<script src="../examples/js/loaders/ctm/ctm.js"></script>
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
+		<script src="../examples/js/exporters/GLTFExporter.js"></script>
 		<script src="../examples/js/exporters/STLExporter.js"></script>
 
 		<script src="../examples/js/renderers/Projector.js"></script>
@@ -83,8 +85,6 @@
 		<script src="js/Player.js"></script>
 		<script src="js/Script.js"></script>
 
-		<script src="../examples/js/effects/VREffect.js"></script>
-		<script src="../examples/js/controls/VRControls.js"></script>
 		<script src="../examples/js/vr/WebVR.js"></script>
 
 		<script src="js/Storage.js"></script>
@@ -389,51 +389,6 @@
 
 			}, false );
 			*/
-
-			// VR
-
-			var groupVR;
-
-			// TODO: Use editor.signals.enteredVR (WebVR 1.0)
-
-			editor.signals.enterVR.add( function () {
-
-				if ( groupVR === undefined ) {
-
-					groupVR = new THREE.HTMLGroup( viewport.dom );
-					editor.sceneHelpers.add( groupVR );
-
-					var mesh = new THREE.HTMLMesh( sidebar.dom );
-					mesh.position.set( 15, 0, 15 );
-					mesh.rotation.y = - 0.5;
-					groupVR.add( mesh );
-
-					var signals = editor.signals;
-
-					function updateTexture() {
-
-						mesh.material.map.update();
-
-					}
-
-					signals.objectSelected.add( updateTexture );
-					signals.objectAdded.add( updateTexture );
-					signals.objectChanged.add( updateTexture );
-					signals.objectRemoved.add( updateTexture );
-					signals.sceneGraphChanged.add( updateTexture );
-					signals.historyChanged.add( updateTexture );
-
-				}
-
-				groupVR.visible = true;
-
-			} );
-
-			editor.signals.exitedVR.add( function () {
-
-				if ( groupVR !== undefined ) groupVR.visible = false;
-
-			} );
 
 		</script>
 	</body>

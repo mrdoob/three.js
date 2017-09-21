@@ -202,6 +202,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	constructor: THREE.MTLLoader.MaterialCreator,
 
+	crossOrigin: 'Anonymous',
+
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
@@ -421,6 +423,12 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
+				case 'norm':
+
+					setMapForType( "normalMap", value );
+
+					break;
+
 				case 'map_bump':
 				case 'bump':
 
@@ -440,7 +448,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					break;
 
 				case 'd':
-					n = parseFloat(value);
+					n = parseFloat( value );
 
 					if ( n < 1 ) {
 
@@ -452,7 +460,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					break;
 
 				case 'tr':
-					n = parseFloat(value);
+					n = parseFloat( value );
 
 					if ( n > 0 ) {
 

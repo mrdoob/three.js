@@ -1,15 +1,15 @@
-import { Vector3 } from '../math/Vector3';
-import { Box3 } from '../math/Box3';
-import { EventDispatcher } from './EventDispatcher';
-import { BufferAttribute, Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from './BufferAttribute';
-import { Sphere } from '../math/Sphere';
-import { DirectGeometry } from './DirectGeometry';
-import { Object3D } from './Object3D';
-import { Matrix4 } from '../math/Matrix4';
-import { Matrix3 } from '../math/Matrix3';
-import { _Math } from '../math/Math';
-import { arrayMax } from '../utils';
-import { GeometryIdCount } from './Geometry';
+import { Vector3 } from '../math/Vector3.js';
+import { Box3 } from '../math/Box3.js';
+import { EventDispatcher } from './EventDispatcher.js';
+import { BufferAttribute, Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from './BufferAttribute.js';
+import { Sphere } from '../math/Sphere.js';
+import { DirectGeometry } from './DirectGeometry.js';
+import { Object3D } from './Object3D.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Matrix3 } from '../math/Matrix3.js';
+import { _Math } from '../math/Math.js';
+import { arrayMax } from '../utils.js';
+import { GeometryIdCount } from './Geometry.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -814,23 +814,27 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	normalizeNormals: function () {
 
-		var normals = this.attributes.normal;
+		var vector = new Vector3();
 
-		var x, y, z, n;
+		return function normalizeNormals() {
 
-		for ( var i = 0, il = normals.count; i < il; i ++ ) {
+			var normals = this.attributes.normal;
 
-			x = normals.getX( i );
-			y = normals.getY( i );
-			z = normals.getZ( i );
+			for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
-			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
+				vector.x = normals.getX( i );
+				vector.y = normals.getY( i );
+				vector.z = normals.getZ( i );
 
-			normals.setXYZ( i, x * n, y * n, z * n );
+				vector.normalize();
 
-		}
+				normals.setXYZ( i, vector.x, vector.y, vector.z );
 
-	},
+			}
+
+		};
+
+	}(),
 
 	toNonIndexed: function () {
 

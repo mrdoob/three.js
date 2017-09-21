@@ -1,14 +1,15 @@
-import { EventDispatcher } from '../core/EventDispatcher';
-import { UVMapping } from '../constants';
-import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
-import { _Math } from '../math/Math';
-import { Vector2 } from '../math/Vector2';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
  */
+
+import { EventDispatcher } from '../core/EventDispatcher.js';
+import { UVMapping } from '../constants.js';
+import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants.js';
+import { _Math } from '../math/Math.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Matrix3 } from '../math/Matrix3.js';
 
 var textureId = 0;
 
@@ -38,6 +39,11 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
+	this.center = new Vector2( 0, 0 );
+	this.rotation = 0;
+
+	this.matrixAutoUpdate = true;
+	this.matrix = new Matrix3();
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
@@ -102,6 +108,11 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
+		this.center.copy( source.center );
+		this.rotation = source.rotation;
+
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
+		this.matrix.copy( source.matrix );
 
 		this.generateMipmaps = source.generateMipmaps;
 		this.premultiplyAlpha = source.premultiplyAlpha;
@@ -125,7 +136,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 			var canvas;
 
-			if ( image.toDataURL !== undefined ) {
+			if ( image instanceof HTMLCanvasElement ) {
 
 				canvas = image;
 
@@ -135,7 +146,17 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 				canvas.width = image.width;
 				canvas.height = image.height;
 
-				canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
+				var context = canvas.getContext( '2d' );
+
+				if ( image instanceof ImageData ) {
+
+					context.putImageData( image, 0, 0 );
+
+				} else {
+
+					context.drawImage( image, 0, 0, image.width, image.height );
+
+				}
 
 			}
 
@@ -165,6 +186,9 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],
+			center: [ this.center.x, this.center.y ],
+			rotation: this.rotation,
+
 			wrap: [ this.wrapS, this.wrapT ],
 
 			minFilter: this.minFilter,
@@ -215,8 +239,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		if ( this.mapping !== UVMapping ) return;
 
-		uv.multiply( this.repeat );
-		uv.add( this.offset );
+		uv.applyMatrix3( this.matrix );
 
 		if ( uv.x < 0 || uv.x > 1 ) {
 

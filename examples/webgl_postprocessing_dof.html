@@ -93,8 +93,6 @@
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
-				renderer.sortObjects = false;
-
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
@@ -105,7 +103,7 @@
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
-				parameters = { color: 0xff1100, envMap: textureCube, shading: THREE.FlatShading };
+				parameters = { color: 0xff1100, envMap: textureCube };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
 
 				singleMaterial = false;
@@ -178,8 +176,8 @@
 
 				var effectController  = {
 
-					focus: 		1.0,
-					aperture:	0.025,
+					focus: 		500.0,
+					aperture:	5,
 					maxblur:	1.0
 
 				};
@@ -187,17 +185,18 @@
 				var matChanger = function( ) {
 
 					postprocessing.bokeh.uniforms[ "focus" ].value = effectController.focus;
-					postprocessing.bokeh.uniforms[ "aperture" ].value = effectController.aperture;
+					postprocessing.bokeh.uniforms[ "aperture" ].value = effectController.aperture * 0.00001;
 					postprocessing.bokeh.uniforms[ "maxblur" ].value = effectController.maxblur;
 
 				};
 
 				var gui = new dat.GUI();
-				gui.add( effectController, "focus", 0.0, 3.0, 0.025 ).onChange( matChanger );
-				gui.add( effectController, "aperture", 0.001, 0.2, 0.001 ).onChange( matChanger );
+				gui.add( effectController, "focus", 10.0, 3000.0, 10 ).onChange( matChanger );
+				gui.add( effectController, "aperture", 0, 10, 0.1 ).onChange( matChanger );
 				gui.add( effectController, "maxblur", 0.0, 3.0, 0.025 ).onChange( matChanger );
 				gui.close();
 
+				matChanger();
 			}
 
 			function onDocumentMouseMove( event ) {

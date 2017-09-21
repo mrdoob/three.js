@@ -112,7 +112,7 @@
 		<div>Object's parent in the [link:https://en.wikipedia.org/wiki/Scene_graph scene graph].</div>
 
 		<h3>[property:Vector3 position]</h3>
-		<div>The object's local position.</div>
+		<div>A [page:Vector3] representing the object's local position. Default is (0, 0, 0).</div>
 
 		<h3>[property:Quaternion quaternion]</h3>
 		<div>Object's local rotation as a [page:Quaternion Quaternion].</div>
@@ -287,11 +287,17 @@
 		Converts the vector from local space to world space.
 		</div>
 
-		<h3>[method:null lookAt]( [page:Vector3 vector] )</h3>
+		<h3>[method:null lookAt]( [page:Vector3 vector] )</br>
+		[method:null lookAt]( [page:Float x], [page:Float y], [page:Float z] )</h3>
 		<div>
 		vector - A vector representing a position in world space.<br /><br />
+		Optionally, the [page:.x x], [page:.y y] and [page:.z z] components of the world space position.<br /><br />
 
-		Rotates the object to face a point in world space.
+		Rotates the object to face a point in world space.<br /><br />
+
+		This method does not support objects with rotated and/or translated parent(s).
+		</div>
+
 		</div>
 
 		<h3>[method:Array raycast]( [page:Raycaster raycaster], [page:Array intersects] )</h3>

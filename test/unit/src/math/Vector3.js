@@ -235,6 +235,8 @@ QUnit.test( "setLength" , function( assert ) {
 	a = new THREE.Vector3( 0, 0, 0 );
 	assert.ok( a.length() == 0, "Passed!" );
 	a.setLength( y );
+	assert.ok( a.length() == 0, "Passed!" );
+	a.setLength();
 	assert.ok( isNaN( a.length() ), "Passed!" );
 
 });

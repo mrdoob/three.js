@@ -14,7 +14,7 @@
 
 		<div class="desc">
 			A material rendered with custom shaders. A shader is a small program written in
-			[link:https://www.khronos.org/files/opengles_shading_language.pdf_ES GLSL] that runs on the GPU.
+			[link:https://www.khronos.org/files/opengles_shading_language.pdf GLSL] that runs on the GPU.
 			You may want to use a custom shader if you need to:
 		<ul>
 			<li>implement an effect not included with any of the built-in [page:Material materials]</li>
@@ -40,7 +40,7 @@
 				must be used instead.
 			</li>
 			<li>
-				Built in attributes an uniforms are passed to the shaders along with your code.
+				Built in attributes and uniforms are passed to the shaders along with your code.
 				If you don't want the [page:WebGLProgram] to add anything to your shader code, you can use
 				[page:RawShaderMaterial] instead of this class.
 			</li>
@@ -296,7 +296,7 @@ this.defaultAttributeValues = {
 
 		<h3>[property:Object extensions]</h3>
 		<div>
-		An object with the folowing properties:
+		An object with the following properties:
 		<code>
 this.extensions = {
 	derivatives: false, // set to use derivatives
@@ -371,10 +371,9 @@ this.extensions = {
 		You should not need to access this property.
 		</div>
 
-		<h3>[property:Number shading]</h3>
+		<h3>[property:Boolean flatShading]</h3>
 		<div>
-		Define shading type, which determines whether normals are smoothed between vertices;
-		possible values are [page:Materials THREE.SmoothShading] or [page:Materials THREE.FlatShading]. Default is THREE.SmoothShading.
+		Define whether the material is rendered with flat shading. Default is false.
 		</div>
 
 

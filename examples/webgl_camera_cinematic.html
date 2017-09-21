@@ -53,8 +53,9 @@
 				camera.setLens(5);
         		camera.position.set(2, 1, 500);
 
-
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
+
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.3 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 0.35 );
@@ -78,11 +79,9 @@
 
 				raycaster = new THREE.Raycaster();
 
-				renderer = new THREE.WebGLRenderer({antialias:true});
-				renderer.setClearColor( 0xf0f0f0 );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				container.appendChild(renderer.domElement);
 
 				stats = new Stats();

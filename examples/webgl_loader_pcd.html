@@ -64,6 +64,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
 				camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.01, 40 );
 				camera.position.x = 0.4;
@@ -87,17 +88,13 @@
 
 				scene.add( camera );
 
-				var axisHelper = new THREE.AxisHelper( 0.1 );
-				scene.add( axisHelper );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				var loader = new THREE.PCDLoader();
-				loader.load( './models/pcd/Zaghetto.pcd', function ( mesh ) {
+				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( mesh ) {
 
 					scene.add( mesh );
 					var center = mesh.geometry.boundingSphere.center;
@@ -130,7 +127,7 @@
 
 			function keyboard ( ev ) {
 
-				var ZaghettoMesh = scene.getObjectByName( "Zaghetto.pcd" );
+				var ZaghettoMesh = scene.getObjectByName( 'Zaghetto.pcd' );
 
 				switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
 

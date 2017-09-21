@@ -96,16 +96,15 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
 
-				camera.position.x = -7;
-				camera.position.y = 5;
-				camera.position.z =  8;
+				camera.position.set( -7, 5, 8 );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.y = 2;
+				controls.target.set( 0, 2, 0 );
+				controls.update();
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xbfd1e5 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -133,7 +132,7 @@
 				scene.add( light );
 
 
-				container.innerHTML = "";
+				container.innerHTML = '';
 
 				container.appendChild( renderer.domElement );
 
@@ -473,8 +472,6 @@
 				updatePhysics( deltaTime );
 
 				processClick();
-
-				controls.update( deltaTime );
 
 				renderer.render( scene, camera );
 

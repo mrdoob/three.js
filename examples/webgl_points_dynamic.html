@@ -87,6 +87,7 @@
 				camera.position.set( 0, 700, 7000 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000104 );
 				scene.fog = new THREE.FogExp2( 0x000104, 0.0000675 );
 
 				camera.lookAt( scene.position );
@@ -123,11 +124,9 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				//

@@ -92,7 +92,8 @@
 					clipBias: 0.003,
 					textureWidth: WIDTH * window.devicePixelRatio,
 					textureHeight: HEIGHT * window.devicePixelRatio,
-					color: 0x777777
+					color: 0x777777,
+					recursion: 1
 				} );
 				groundMirror.rotateX( - Math.PI / 2 );
 				scene.add( groundMirror );
@@ -101,7 +102,8 @@
 					clipBias: 0.003,
 					textureWidth: WIDTH * window.devicePixelRatio,
 					textureHeight: HEIGHT * window.devicePixelRatio,
-					color: 0x889999
+					color: 0x889999,
+					recursion: 1
 				} );
 				verticalMirror.position.y = 35;
 				verticalMirror.position.z = -45;
@@ -127,7 +129,7 @@
 				sphereGroup.add( halfSphere );
 
 				var geometry = new THREE.IcosahedronGeometry( 5, 0 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, shading: THREE.FlatShading } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, flatShading: true } );
 				smallSphere = new THREE.Mesh( geometry, material );
 				scene.add(smallSphere);
 
@@ -194,8 +196,6 @@
 				);
 				smallSphere.rotation.y = ( Math.PI / 2 ) - timer * 0.1;
 				smallSphere.rotation.z = timer * 0.8;
-
-				cameraControls.update();
 
 				renderer.render(scene, camera);
 

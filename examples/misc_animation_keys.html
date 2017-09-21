@@ -70,7 +70,7 @@
 				//
 
 				var geometry = new THREE.BoxBufferGeometry( 5, 5, 5 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true } );
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
@@ -97,9 +97,12 @@
 				// COLOR
 				var colorKF = new THREE.ColorKeyframeTrack( '.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], THREE.InterpolateDiscrete );
 
+				// OPACITY
+				var opacityKF = new THREE.NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
+
 				// create an animation sequence with the tracks
 				// If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
-				var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaternionKF, colorKF ] );
+				var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF ] );
 
 				// setup the AnimationMixer
 				mixer = new THREE.AnimationMixer( mesh );
@@ -111,7 +114,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x000000, 0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
