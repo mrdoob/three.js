@@ -1,4 +1,6 @@
-
+/**
+ * @author servinlp
+ */
 
 THREE.GearVRController = function () {
 
@@ -31,12 +33,6 @@ THREE.GearVRController = function () {
 		}
 
 	}
-
-	this.setSkyBox = function ( skyBox ) {
-
-		window.SamsungChangeSky( skyBox );
-
-	};
 
 	this.setHand = function ( hand = 'right' ) {
 
