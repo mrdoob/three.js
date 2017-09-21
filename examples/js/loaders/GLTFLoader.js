@@ -1896,7 +1896,7 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						mesh.name = group.name + '_' + i;
+						mesh.name = group.name + ( i > 0 ? ( '_' + i ) : '' );
 
 						if ( primitive.targets !== undefined ) {
 
