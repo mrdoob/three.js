@@ -16,7 +16,14 @@ function DirectionalLight( color, intensity ) {
 	this.position.copy( Object3D.DefaultUp );
 	this.updateMatrix();
 
-	this.target = new Object3D();
+	//If lookAt is called after the target has been set to a different
+	//object in the scene, it will be reset to this internal target.
+	//This will prevent accidentally making changes to another object's position
+	var internalTarget = new Object3D();
+	internalTarget.name = this.uuid + '_target';
+	Object.defineProperty( this, 'internalTarget', { value: internalTarget } );
+
+	this.target = this.internalTarget;
 
 	this.shadow = new DirectionalLightShadow();
 
@@ -37,6 +44,33 @@ DirectionalLight.prototype = Object.assign( Object.create( Light.prototype ), {
 		this.shadow = source.shadow.clone();
 
 		return this;
+
+	},
+
+	lookAt( point ) {
+
+		//reset the target if it has been changed
+		if ( this.target.name !== this.uuid + '_target' ) {
+
+			this.target = this.internalTarget;
+
+		}
+
+		if ( point.isVector3 ) {
+
+			this.target.position.copy( point );
+			this.target.updateMatrixWorld();
+
+		}	else if ( point.isObject3D ) {
+
+			this.target.position.copy( point.position );
+			this.target.updateMatrixWorld();
+
+		}	else {
+
+			console.error( 'DirectionalLight.lookAt: the argument must be a Vector3 or Object3D' );
+
+		}
 
 	}
 
