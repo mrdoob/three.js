@@ -1197,59 +1197,6 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	/**
-	 * TODO(donmccurdy): Why is all this necessary, again?
-	 * @param {GLTF.Node} nodeDef
-	 * @param {THREE.Group} group
-	 * @param {Array<THREE.Object3D>} nodes
-	 * @param {Array<Object} skins
-	 */
-	function deepCloneMeshGroup( group ) {
-
-		// Clone group's children manually.
-		var clonedGroup = group.clone( false );
-
-		for ( var i = 0; i < group.children.length; i ++ ) {
-
-			var child = group.children[ i ];
-			var clonedChild;
-
-			switch ( child.type ) {
-
-				case 'LineSegments':
-					clonedChild = new THREE.LineSegments( child.geometry, child.material );
-					break;
-
-				case 'LineLoop':
-					clonedChild = new THREE.LineLoop( child.geometry, child.material );
-					break;
-
-				case 'Line':
-					clonedChild = new THREE.Line( child.geometry, child.material );
-					break;
-
-				case 'Points':
-					clonedChild = new THREE.Points( child.geometry, child.material );
-					break;
-
-				default:
-					clonedChild = new THREE.Mesh( child.geometry, child.material );
-					clonedChild.drawMode = child.drawMode;
-
-			}
-
-			clonedChild.morphTargetInfluences = child.morphTargetInfluences;
-			clonedChild.userData = child.userData;
-			clonedChild.name = child.name;
-
-			clonedGroup.add( clonedChild );
-
-		}
-
-		return clonedGroup;
-
-	}
-
 	/* GLTF PARSER */
 
 	function GLTFParser( json, extensions, options ) {
@@ -2202,7 +2149,7 @@ THREE.GLTFLoader = ( function () {
 
 				} else if ( nodeDef.mesh !== undefined ) {
 
-					return deepCloneMeshGroup( dependencies.meshes[ nodeDef.mesh ] );
+					return dependencies.meshes[ nodeDef.mesh ].clone();
 
 				} else if ( nodeDef.camera !== undefined ) {
 
