@@ -1807,12 +1807,9 @@ THREE.GLTFLoader = ( function () {
 
 		] ).then( function ( dependencies ) {
 
-			return _each( json.meshes, function ( meshDef ) {
+			return _each( json.meshes, function ( meshDef, meshIndex ) {
 
 				var group = new THREE.Group();
-
-				if ( meshDef.name !== undefined ) group.name = meshDef.name;
-				if ( meshDef.extras ) group.userData = meshDef.extras;
 
 				var primitives = meshDef.primitives || [];
 
@@ -1896,7 +1893,8 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						mesh.name = group.name + ( i > 0 ? ( '_' + i ) : '' );
+						mesh.name = meshDef.name || ( 'mesh_' + meshIndex );
+						mesh.name += i > 0 ? ( '_' + i ) : '';
 
 						if ( primitive.targets !== undefined ) {
 
