@@ -828,35 +828,61 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         layout = self.layout
 
-        ## Geometry {
-        row = layout.row()
-        row.label(text="GEOMETRY:")
+        ## Scene {
+        box = layout.box()
+        column = box.column(True)
+        row = column.row(True)
+        row.alignment = 'CENTER'
 
-        row = layout.row()
+        row.label(text="SCENE", icon="SCENE_DATA")
+
+        row = box.row()
+        row.prop(self.properties, 'option_export_scene')
+        row.prop(self.properties, 'option_materials')
+
+        #row = box.row()
+        #row.prop(self.properties, 'option_embed_geometry')
+
+        row = box.row()
+        row.prop(self.properties, 'option_lights')
+        row.prop(self.properties, 'option_cameras')
+
+        row = box.row()
+        row.prop(self.properties, 'option_hierarchy')
+
+        ## }
+
+
+        layout.separator()
+
+        ## Geometry {
+        box = layout.box()
+        column = box.column(True)
+        row = column.row(True)
+        row.alignment = 'CENTER'
+        row.label(text="GEOMETRY", icon="MESH_DATA")
+
+        row = box.row()
         row.prop(self.properties, 'option_vertices')
         col = row.column()
         col.prop(self.properties, 'option_faces')
         col.enabled = using_geometry
 
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_normals')
         row.prop(self.properties, 'option_uv_coords')
 
-        row = layout.row()
-        row.prop(self.properties, 'option_bones')
-        row.prop(self.properties, 'option_skinning')
-
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_extra_vgroups')
         row.enabled = not using_geometry
 
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_apply_modifiers')
 
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_geometry_type')
 
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_index_type')
 
         ## }
@@ -864,25 +890,63 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         layout.separator()
 
         ## Materials {
-        row = layout.row()
-        row.label(text="- Shading:")
+        box = layout.box()
+        box.label
+        row = box.row()
+        row.label(text="MATERIAL", icon="MATERIAL_DATA")
 
         row = layout.row()
         row.prop(self.properties, 'option_face_materials')
-        row.enabled = using_geometry
+            row.enabled = using_geometry
 
         row = layout.row()
         row.prop(self.properties, 'option_colors')
 
         row = layout.row()
         row.prop(self.properties, 'option_mix_colors')
+
+        ## }
+
+        layout.separator()
+
+        ## Textures {
+        box = layout.box()
+        box.label
+        row = box.row()
+        row.label(text="TEXTURE", icon="TEXTURE_DATA")
+        row = layout.row()
+        row.prop(self.properties, 'option_maps')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_export_textures')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_embed_textures')
+        row.enabled = self.properties.option_export_textures
+
+        row = layout.row()
+        row.prop(self.properties, 'option_texture_folder')
+        ## }
+
+        layout.separator()
+
+        ## Armature {
+        box = layout.box()
+        column = box.column(True)
+        row = column.row(True)
+        row.alignment = 'CENTER'
+        row.label(text="ARMATURE", icon="ARMATURE_DATA")
+
+        row = box.row()
+        row.prop(self.properties, 'option_bones')
+        row.prop(self.properties, 'option_skinning')
         ## }
 
         layout.separator()
 
         ## Animation {
         row = layout.row()
-        row.label(text="- Animation:")
+        row.label(text="ANIMATION", icon="POSE_DATA")
 
         row = layout.row()
         row.prop(self.properties, 'option_animation_morph')
@@ -919,43 +983,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         layout.separator()
 
-        ## Scene {
-        row = layout.row()
-        row.label(text="SCENE:")
-
-        row = layout.row()
-        row.prop(self.properties, 'option_export_scene')
-        row.prop(self.properties, 'option_materials')
-
-        #row = layout.row()
-        #row.prop(self.properties, 'option_embed_geometry')
-
-        row = layout.row()
-        row.prop(self.properties, 'option_lights')
-        row.prop(self.properties, 'option_cameras')
-        ## }
-
-        row = layout.row()
-        row.prop(self.properties, 'option_hierarchy')
-
-        layout.separator()
-
         ## Settings {
         row = layout.row()
-        row.label(text="SETTINGS:")
-
-        row = layout.row()
-        row.prop(self.properties, 'option_maps')
-
-        row = layout.row()
-        row.prop(self.properties, 'option_export_textures')
-
-        row = layout.row()
-        row.prop(self.properties, 'option_embed_textures')
-        row.enabled = self.properties.option_export_textures
-
-        row = layout.row()
-        row.prop(self.properties, 'option_texture_folder')
+        row.label(text="SETTINGS", icon="")
 
         row = layout.row()
         row.prop(self.properties, 'option_scale')
