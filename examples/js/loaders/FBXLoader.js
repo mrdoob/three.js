@@ -1453,7 +1453,7 @@
 						/* ***********
 						* Supported light types:
 						* DirectionalLight
-						*	PointLight
+						* PointLight
 						* SpotLight
 						*
 						* TODO: Support DirectionalLight and SpotLight targets
@@ -1480,8 +1480,6 @@
 							model = new THREE.Object3D();
 
 						} else {
-
-							// console.log( lightAttribute );
 
 							var type;
 
