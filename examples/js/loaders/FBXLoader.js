@@ -112,7 +112,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -1449,145 +1449,6 @@
 						}
 						break;
 
-					case 'Light':
-						/* ***********
-						* Supported light types:
-						* DirectionalLight
-						*	PointLight
-						* SpotLight
-						*
-						* TODO: Support DirectionalLight and SpotLight targets
-						************** */
-
-						var lightAttribute;
-
-						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
-
-							var childID = conns.children[ childrenIndex ].ID;
-
-							var attr = FBXTree.Objects.subNodes.NodeAttribute[ childID ];
-
-							if ( attr !== undefined && attr.properties !== undefined ) {
-
-								lightAttribute = attr.properties;
-
-							}
-
-						}
-
-						if ( lightAttribute === undefined ) {
-
-							model = new THREE.Object3D();
-
-						} else {
-
-							console.log( lightAttribute );
-
-							var type;
-
-							// LightType is undefined for Point lights
-							if ( lightAttribute.LightType === undefined ) {
-
-								type = '0';
-
-							} else {
-
-								type = lightAttribute.LightType.value;
-
-							}
-
-							var color = 0xffffff;
-
-							if ( lightAttribute.Color !== undefined ) {
-
-								var temp = lightAttribute.Color.value.split( ',' );
-
-								var r = parseInt( temp[ 0 ], 10 );
-								var g = parseInt( temp[ 1 ], 10 );
-								var b = parseInt( temp[ 1 ], 10 );
-
-								color = new THREE.Color( r, g, b );
-
-							}
-
-							var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
-
-							// light disabled
-							if ( lightAttribute.CastLightOnObject !== undefined && lightAttribute.CastLightOnObject.value === '0' ) {
-
-								intensity = 0;
-
-							}
-
-							var distance = 0;
-							if ( lightAttribute.FarAttenuationEnd !== undefined ) {
-
-								if ( lightAttribute.EnableFarAttenuation !== undefined && lightAttribute.EnableFarAttenuation.value === '0' ) {
-
-									distance = 0;
-
-								}	else {
-
-									distance = lightAttribute.FarAttenuationEnd.value / 1000;
-
-								}
-
-							}
-
-							// TODO
-							// could be calculated linearly from FarAttenuationStart to FarAttenuationEnd ?
-							var decay = 1;
-
-							switch ( type ) {
-
-								case '0': // Point
-									model = new THREE.PointLight( color, intensity, distance, decay );
-									break;
-
-								case '1': // Directional
-									model = new THREE.DirectionalLight( color, intensity );
-									break;
-
-								case '2': // Spot
-									var angle = Math.PI / 3;
-
-									if ( lightAttribute.InnerAngle !== undefined ) {
-
-										angle = THREE.Math.degToRad( lightAttribute.InnerAngle.value );
-
-									}
-
-									var penumbra = 0; // Falloff / Field
-									if ( lightAttribute.OuterAngle !== undefined ) {
-
-										// note: this is not correct - FBX calculates outer and inner angle in degrees
-										// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
-										// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-										penumbra = THREE.Math.degToRad( lightAttribute.OuterAngle.value );
-										penumbra = Math.max( penumbra, 1 );
-
-									}
-
-									model = new THREE.SpotLight( color, intensity, distance, angle, penumbra, decay );
-									break;
-
-								default:
-									console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType + ', defaulting to a THREE.PointLight.' );
-									model = new THREE.PointLight( color, intensity );
-									break;
-
-							}
-
-							if ( lightAttribute.CastShadows !== undefined && lightAttribute.CastShadows.value === '1' ) {
-
-								model.castShadow = true;
-
-							}
-
-						}
-
-						break;
-
 					case 'NurbsCurve':
 						var geometry = null;
 
@@ -1789,6 +1650,21 @@
 		var animations = parseAnimations( FBXTree, connections, sceneGraph );
 
 		addAnimations( sceneGraph, animations );
+
+    /*
+      parse ambient color - if it's not set to black (default), create an ambient light
+      Note: no way to set intensity, FBX only provides a color
+    */
+		var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
+		var r = ambientColor[ 0 ];
+		var g = ambientColor[ 1 ];
+		var b = ambientColor[ 2 ];
+		if ( r !== 0 || g !== 0 || b !== 0 ) {
+
+			var color = new THREE.Color( r, g, b );
+			sceneGraph.add( new THREE.AmbientLight( color ) );
+
+		}
 
 		return sceneGraph;
 
