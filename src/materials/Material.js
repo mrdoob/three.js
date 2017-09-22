@@ -162,6 +162,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
 		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
+		if ( this.emissiveIntensity !== 1) data.emissiveIntensity = this.emissiveIntensity;
+
 		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
 		if ( this.clearCoat !== undefined ) data.clearCoat = this.clearCoat;
@@ -222,6 +224,14 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		data.depthFunc = this.depthFunc;
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
+
+		// rotation (SpriteMaterial)
+		if ( this.rotation !== 0 ) data.rotation = this.rotation;
+
+		if ( this.linewidth !== 1 ) data.linewidth = this.linewidth;
+		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
+		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
+		if ( this.scale !== undefined ) data.scale = this.scale;
 
 		if ( this.dithering === true ) data.dithering = true;
 
