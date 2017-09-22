@@ -1449,6 +1449,146 @@
 						}
 						break;
 
+					case 'Light':
+						/* ***********
+						* Supported light types:
+						* DirectionalLight
+						* PointLight
+						* SpotLight
+						*
+						* TODO: Support DirectionalLight and SpotLight targets
+						************** */
+
+						var lightAttribute;
+
+						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+							var childID = conns.children[ childrenIndex ].ID;
+
+							var attr = FBXTree.Objects.subNodes.NodeAttribute[ childID ];
+
+							if ( attr !== undefined && attr.properties !== undefined ) {
+
+								lightAttribute = attr.properties;
+
+							}
+
+						}
+
+						if ( lightAttribute === undefined ) {
+
+							model = new THREE.Object3D();
+
+						} else {
+
+							var type;
+
+							// LightType can be undefined for Point lights
+							if ( lightAttribute.LightType === undefined ) {
+
+								type = 0;
+
+							} else {
+
+								type = lightAttribute.LightType.value;
+
+							}
+
+							var color = 0xffffff;
+
+							if ( lightAttribute.Color !== undefined ) {
+
+								var temp = lightAttribute.Color.value.split( ',' );
+
+								var r = parseFloat( temp[ 0 ] );
+								var g = parseFloat( temp[ 1 ] );
+								var b = parseFloat( temp[ 1 ] );
+
+								color = new THREE.Color( r, g, b );
+
+							}
+
+							var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
+
+							// light disabled
+							if ( lightAttribute.CastLightOnObject !== undefined && ( lightAttribute.CastLightOnObject.value === '0' || lightAttribute.CastLightOnObject.value === 0 ) ) {
+
+								intensity = 0;
+
+							}
+
+							var distance = 0;
+							if ( lightAttribute.FarAttenuationEnd !== undefined ) {
+
+								if ( lightAttribute.EnableFarAttenuation !== undefined && ( lightAttribute.EnableFarAttenuation.value === '0' || lightAttribute.EnableFarAttenuation.value === 0 ) ) {
+
+									distance = 0;
+
+								}	else {
+
+									distance = lightAttribute.FarAttenuationEnd.value / 1000;
+
+								}
+
+							}
+
+							// TODO
+							// could be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
+							var decay = 1;
+
+							switch ( type ) {
+
+								case '0': // Point
+								case 0:
+									model = new THREE.PointLight( color, intensity, distance, decay );
+									break;
+
+								case '1': // Directional
+								case 1:
+									model = new THREE.DirectionalLight( color, intensity );
+									break;
+
+								case '2': // Spot
+								case 2:
+									var angle = Math.PI / 3;
+
+									if ( lightAttribute.InnerAngle !== undefined ) {
+
+										angle = THREE.Math.degToRad( lightAttribute.InnerAngle.value );
+
+									}
+
+									var penumbra = 0;
+									if ( lightAttribute.OuterAngle !== undefined ) {
+
+										// TODO: this is not correct - FBX calculates outer and inner angle in degrees
+										// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
+										// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
+										penumbra = THREE.Math.degToRad( lightAttribute.OuterAngle.value );
+										penumbra = Math.max( penumbra, 1 );
+
+									}
+
+									model = new THREE.SpotLight( color, intensity, distance, angle, penumbra, decay );
+									break;
+
+								default:
+									console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType.value + ', defaulting to a THREE.PointLight.' );
+									model = new THREE.PointLight( color, intensity );
+									break;
+
+							}
+
+							if ( lightAttribute.CastShadows !== undefined && ( lightAttribute.CastShadows.value === '1' || lightAttribute.CastShadows.value === 1 ) ) {
+
+								model.castShadow = true;
+
+							}
+
+						}
+
+						break;
+
 					case 'NurbsCurve':
 						var geometry = null;
 
