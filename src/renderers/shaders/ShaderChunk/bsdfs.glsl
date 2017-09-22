@@ -191,7 +191,7 @@ vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in m
 	T2 = - cross( N, T1 ); // negated from paper; possibly due to a different assumed handedness of world coordinate system
 
 	// compute transform
-	mat3 mat = mInv * transposeMatrix3( mat3( T1, T2, N ) );
+	mat3 mat = mInv * transposeMat3( mat3( T1, T2, N ) );
 
 	// transform rect
 	vec3 coords[ 4 ];
