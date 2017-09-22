@@ -1541,14 +1541,17 @@
 							switch ( type ) {
 
 								case '0': // Point
+								case 0:
 									model = new THREE.PointLight( color, intensity, distance, decay );
 									break;
 
 								case '1': // Directional
+								case 1:
 									model = new THREE.DirectionalLight( color, intensity );
 									break;
 
 								case '2': // Spot
+								case 2:
 									var angle = Math.PI / 3;
 
 									if ( lightAttribute.InnerAngle !== undefined ) {
@@ -1572,7 +1575,7 @@
 									break;
 
 								default:
-									console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType + ', defaulting to a THREE.PointLight.' );
+									console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType.value + ', defaulting to a THREE.PointLight.' );
 									model = new THREE.PointLight( color, intensity );
 									break;
 
