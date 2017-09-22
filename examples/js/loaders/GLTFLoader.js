@@ -1807,12 +1807,9 @@ THREE.GLTFLoader = ( function () {
 
 		] ).then( function ( dependencies ) {
 
-			return _each( json.meshes, function ( meshDef ) {
+			return _each( json.meshes, function ( meshDef, meshIndex ) {
 
 				var group = new THREE.Group();
-
-				if ( meshDef.name !== undefined ) group.name = meshDef.name;
-				if ( meshDef.extras ) group.userData = meshDef.extras;
 
 				var primitives = meshDef.primitives || [];
 
@@ -1896,7 +1893,8 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						mesh.name = group.name + '_' + i;
+						mesh.name = meshDef.name || ( 'mesh_' + meshIndex );
+						mesh.name += i > 0 ? ( '_' + i ) : '';
 
 						if ( primitive.targets !== undefined ) {
 
@@ -2133,198 +2131,137 @@ THREE.GLTFLoader = ( function () {
 
 		} );
 
-		return _each( json.nodes, function ( node ) {
+		return scope._withDependencies( [
 
-			var matrix = new THREE.Matrix4();
+			'meshes',
+			'skins',
+			'cameras'
 
-			var _node = node.isBone === true ? new THREE.Bone() : new THREE.Object3D();
+		] ).then( function ( dependencies ) {
 
-			if ( node.name !== undefined ) {
+			return _each( json.nodes, function ( nodeDef ) {
 
-				_node.name = THREE.PropertyBinding.sanitizeNodeName( node.name );
+				if ( nodeDef.isBone === true ) {
 
-			}
+					return new THREE.Bone();
 
-			if ( node.extras ) _node.userData = node.extras;
+				} else if ( nodeDef.mesh !== undefined ) {
 
-			if ( node.matrix !== undefined ) {
+					return dependencies.meshes[ nodeDef.mesh ].clone();
 
-				matrix.fromArray( node.matrix );
-				_node.applyMatrix( matrix );
+				} else if ( nodeDef.camera !== undefined ) {
 
-			} else {
+					return dependencies.cameras[ nodeDef.camera ];
 
-				if ( node.translation !== undefined ) {
+				} else if ( nodeDef.extensions
+								 && nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS ]
+								 && nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS ].light !== undefined ) {
 
-					_node.position.fromArray( node.translation );
+					var lights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
+					return lights[ nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS ].light ];
 
-				}
+				} else {
 
-				if ( node.rotation !== undefined ) {
-
-					_node.quaternion.fromArray( node.rotation );
-
-				}
-
-				if ( node.scale !== undefined ) {
-
-					_node.scale.fromArray( node.scale );
+					return new THREE.Object3D();
 
 				}
 
-			}
+			} ).then( function ( __nodes ) {
 
-			return _node;
+				return _each( __nodes, function ( node, nodeIndex ) {
 
-		} ).then( function ( __nodes ) {
+					var nodeDef = json.nodes[ nodeIndex ];
 
-			return scope._withDependencies( [
+					if ( nodeDef.name !== undefined ) {
 
-				'meshes',
-				'skins',
-				'cameras'
+						node.name = THREE.PropertyBinding.sanitizeNodeName( nodeDef.name );
 
-			] ).then( function ( dependencies ) {
+					}
 
-				return _each( __nodes, function ( _node, nodeId ) {
+					if ( nodeDef.extras ) node.userData = nodeDef.extras;
 
-					var node = json.nodes[ nodeId ];
+					if ( nodeDef.matrix !== undefined ) {
 
-					var mesh = node.mesh;
+						var matrix = new THREE.Matrix4();
+						matrix.fromArray( nodeDef.matrix );
+						node.applyMatrix( matrix );
 
-					if ( mesh !== undefined ) {
+					} else {
 
-						var group = dependencies.meshes[ mesh ];
+						if ( nodeDef.translation !== undefined ) {
 
-						if ( group !== undefined ) {
+							node.position.fromArray( nodeDef.translation );
 
-							// do not clone children as they will be replaced anyway
-							var clonedgroup = group.clone( false );
+						}
 
-							for ( var i = 0; i < group.children.length; i ++ ) {
+						if ( nodeDef.rotation !== undefined ) {
 
-								var child = group.children[ i ];
-								var originalChild = child;
+							node.quaternion.fromArray( nodeDef.rotation );
 
-								// clone Mesh to add to _node
+						}
 
-								var originalMaterial = child.material;
-								var originalGeometry = child.geometry;
-								var originalInfluences = child.morphTargetInfluences;
-								var originalUserData = child.userData;
-								var originalName = child.name;
+						if ( nodeDef.scale !== undefined ) {
 
-								var material = originalMaterial;
-
-								switch ( child.type ) {
-
-									case 'LineSegments':
-										child = new THREE.LineSegments( originalGeometry, material );
-										break;
-
-									case 'LineLoop':
-										child = new THREE.LineLoop( originalGeometry, material );
-										break;
-
-									case 'Line':
-										child = new THREE.Line( originalGeometry, material );
-										break;
-
-									case 'Points':
-										child = new THREE.Points( originalGeometry, material );
-										break;
-
-									default:
-										child = new THREE.Mesh( originalGeometry, material );
-										child.drawMode = originalChild.drawMode;
-
-								}
-
-								child.castShadow = true;
-								child.morphTargetInfluences = originalInfluences;
-								child.userData = originalUserData;
-								child.name = originalName;
-
-								var skinEntry;
-
-								if ( node.skin !== undefined ) {
-
-									skinEntry = dependencies.skins[ node.skin ];
-
-								}
-
-								// Replace Mesh with SkinnedMesh in library
-								if ( skinEntry ) {
-
-									var geometry = originalGeometry;
-									material = originalMaterial;
-									material.skinning = true;
-
-									child = new THREE.SkinnedMesh( geometry, material );
-									child.castShadow = true;
-									child.userData = originalUserData;
-									child.name = originalName;
-
-									var bones = [];
-									var boneInverses = [];
-
-									for ( var i = 0, l = skinEntry.joints.length; i < l; i ++ ) {
-
-										var jointId = skinEntry.joints[ i ];
-										var jointNode = __nodes[ jointId ];
-
-										if ( jointNode ) {
-
-											bones.push( jointNode );
-
-											var m = skinEntry.inverseBindMatrices.array;
-											var mat = new THREE.Matrix4().fromArray( m, i * 16 );
-											boneInverses.push( mat );
-
-										} else {
-
-											console.warn( 'THREE.GLTFLoader: Joint "%s" could not be found.', jointId );
-
-										}
-
-									}
-
-									child.bind( new THREE.Skeleton( bones, boneInverses ), child.matrixWorld );
-
-								}
-
-								clonedgroup.add( child );
-
-							}
-
-							_node.add( clonedgroup );
-
-						} else {
-
-							console.warn( 'THREE.GLTFLoader: Could not find node "' + mesh + '".' );
+							node.scale.fromArray( nodeDef.scale );
 
 						}
 
 					}
 
-					if ( node.camera !== undefined ) {
+					if ( nodeDef.skin !== undefined ) {
 
-						var camera = dependencies.cameras[ node.camera ];
+						var skinnedMeshes = [];
 
-						_node.add( camera );
+						for ( var i = 0; i < node.children.length; i ++ ) {
+
+							var skinEntry = dependencies.skins[ nodeDef.skin ];
+
+							// Replace Mesh with SkinnedMesh.
+							var geometry = node.children[ i ].geometry;
+							var material = node.children[ i ].material;
+							material.skinning = true;
+
+							var child = new THREE.SkinnedMesh( geometry, material );
+							child.morphTargetInfluences = node.children[ i ].morphTargetInfluences;
+							child.userData = node.children[ i ].userData;
+							child.name = node.children[ i ].name;
+
+							var bones = [];
+							var boneInverses = [];
+
+							for ( var j = 0, l = skinEntry.joints.length; j < l; j ++ ) {
+
+								var jointId = skinEntry.joints[ j ];
+								var jointNode = __nodes[ jointId ];
+
+								if ( jointNode ) {
+
+									bones.push( jointNode );
+
+									var m = skinEntry.inverseBindMatrices.array;
+									var mat = new THREE.Matrix4().fromArray( m, j * 16 );
+									boneInverses.push( mat );
+
+								} else {
+
+									console.warn( 'THREE.GLTFLoader: Joint "%s" could not be found.', jointId );
+
+								}
+
+							}
+
+							child.bind( new THREE.Skeleton( bones, boneInverses ), child.matrixWorld );
+
+							skinnedMeshes.push( child );
+
+						}
+
+						node.remove.apply( node, node.children );
+						node.add.apply( node, skinnedMeshes );
 
 					}
 
-					if ( node.extensions
-							 && node.extensions[ EXTENSIONS.KHR_LIGHTS ]
-							 && node.extensions[ EXTENSIONS.KHR_LIGHTS ].light !== undefined ) {
-
-						var lights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
-						_node.add( lights[ node.extensions[ EXTENSIONS.KHR_LIGHTS ].light ] );
-
-					}
-
-					return _node;
+					return node;
 
 				} );
 
