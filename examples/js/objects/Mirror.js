@@ -239,3 +239,4 @@ THREE.Mirror = function ( width, height, options ) {
 };
 
 THREE.Mirror.prototype = Object.create( THREE.Mesh.prototype );
+THREE.Mirror.prototype.constructor = THREE.Mirror;
