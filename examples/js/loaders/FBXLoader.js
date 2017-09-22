@@ -1500,9 +1500,9 @@
 
 								var temp = lightAttribute.Color.value.split( ',' );
 
-								var r = parseInt( temp[ 0 ], 10 );
-								var g = parseInt( temp[ 1 ], 10 );
-								var b = parseInt( temp[ 1 ], 10 );
+								var r = parseFloat( temp[ 0 ] );
+								var g = parseFloat( temp[ 1 ] );
+								var b = parseFloat( temp[ 1 ] );
 
 								color = new THREE.Color( r, g, b );
 
