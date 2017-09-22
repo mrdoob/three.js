@@ -112,7 +112,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -1481,7 +1481,7 @@
 
 						} else {
 
-							console.log( lightAttribute );
+							// console.log( lightAttribute );
 
 							var type;
 
