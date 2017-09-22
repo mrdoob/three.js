@@ -1560,7 +1560,7 @@
 
 									}
 
-									var penumbra = 0; // Falloff / Field
+									var penumbra = 0;
 									if ( lightAttribute.OuterAngle !== undefined ) {
 
 										// TODO: this is not correct - FBX calculates outer and inner angle in degrees
