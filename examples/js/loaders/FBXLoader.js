@@ -1651,10 +1651,10 @@
 
 		addAnimations( sceneGraph, animations );
 
-    /*
-      parse ambient color - if it's not set to black (default), create an ambient light
-      Note: no way to set intensity, FBX only provides a color
-    */
+		/*
+			parse ambient color - if it's not set to black (default), create an ambient light
+			Note: no way to set intensity, FBX only provides a color
+		*/
 		var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
 		var r = ambientColor[ 0 ];
 		var g = ambientColor[ 1 ];
