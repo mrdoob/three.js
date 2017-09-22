@@ -39,8 +39,6 @@ function BufferGeometry() {
 
 }
 
-BufferGeometry.MaxIndex = 65535;
-
 Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	isBufferGeometry: true,
