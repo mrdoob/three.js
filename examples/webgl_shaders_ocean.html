@@ -33,7 +33,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WaterShader.js"></script>
+		<script src="js/objects/Water.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -54,9 +54,9 @@
 
 			var parameters = {
 				oceanSide: 2000,
-				size: 0.3,
+				size: 1.0,
 				distortionScale: 3.7,
-				alpha: 0.96
+				alpha: 1.0
 			};
 
 			var waterNormals;
@@ -101,13 +101,13 @@
 
 				setWater();
 
-				// 
+				//
 
 				setSkybox();
 
 				//
 
-				var geometry = new THREE.IcosahedronGeometry( 20, 4 );
+				var geometry = new THREE.IcosahedronGeometry( 20, 2 );
 
 				for ( var i = 0, j = geometry.faces.length; i < j; i ++ ) {
 
@@ -117,7 +117,7 @@
 
 				var material = new THREE.MeshPhongMaterial( {
 					vertexColors: THREE.FaceColors,
-					shininess: 100,
+					shininess: 10,
 					envMap: cubeMap,
 					side: THREE.DoubleSide
 				} );
@@ -147,8 +147,8 @@
 
 			function setWater() {
 
-				water = new THREE.WaterMesh( 
-					parameters.oceanSide * 5, 
+				water = new THREE.Water(
+					parameters.oceanSide * 5,
 					parameters.oceanSide * 5,
 					{
 						textureWidth: 512,
@@ -234,10 +234,10 @@
 				light.shadow.camera.top = 45;
 				light.shadow.camera.right = 40;
 				light.shadow.camera.left = light.shadow.camera.bottom = -40;
-				light.shadow.camera.near = 1; 
+				light.shadow.camera.near = 1;
 				light.shadow.camera.far = 200;
 
-				scene.add( light, new THREE.AmbientLight( 0x444444 ) );
+				scene.add( light, new THREE.AmbientLight( 0x888888 ) );
 
 			}
 
@@ -260,11 +260,11 @@
 
 			function render() {
 
-				var time = performance.now() * 0.003;
+				var time = performance.now() * 0.001;
 
-				sphere.position.y = Math.sin( time ) * 2 + 5;
-				sphere.rotation.x = time * 0.1;
-				sphere.rotation.z = time * 0.11;
+				sphere.position.y = Math.sin( time ) * 20 + 5;
+				sphere.rotation.x = time * 0.5;
+				sphere.rotation.z = time * 0.51;
 
 				water.material.uniforms.time.value += 1.0 / 60.0;
 				water.material.uniforms.size.value = parameters.size;
