@@ -1485,10 +1485,10 @@
 
 							var type;
 
-							// LightType is undefined for Point lights
+							// LightType can be undefined for Point lights
 							if ( lightAttribute.LightType === undefined ) {
 
-								type = '0';
+								type = 0;
 
 							} else {
 
@@ -1513,7 +1513,7 @@
 							var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
 
 							// light disabled
-							if ( lightAttribute.CastLightOnObject !== undefined && lightAttribute.CastLightOnObject.value === '0' ) {
+							if ( lightAttribute.CastLightOnObject !== undefined && ( lightAttribute.CastLightOnObject.value === '0' || lightAttribute.CastLightOnObject.value === 0 ) ) {
 
 								intensity = 0;
 
@@ -1522,7 +1522,7 @@
 							var distance = 0;
 							if ( lightAttribute.FarAttenuationEnd !== undefined ) {
 
-								if ( lightAttribute.EnableFarAttenuation !== undefined && lightAttribute.EnableFarAttenuation.value === '0' ) {
+								if ( lightAttribute.EnableFarAttenuation !== undefined && ( lightAttribute.EnableFarAttenuation.value === '0' || lightAttribute.EnableFarAttenuation.value === 0 ) ) {
 
 									distance = 0;
 
@@ -1535,7 +1535,7 @@
 							}
 
 							// TODO
-							// could be calculated linearly from FarAttenuationStart to FarAttenuationEnd ?
+							// could be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
 							var decay = 1;
 
 							switch ( type ) {
@@ -1563,7 +1563,7 @@
 									var penumbra = 0; // Falloff / Field
 									if ( lightAttribute.OuterAngle !== undefined ) {
 
-										// note: this is not correct - FBX calculates outer and inner angle in degrees
+										// TODO: this is not correct - FBX calculates outer and inner angle in degrees
 										// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
 										// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
 										penumbra = THREE.Math.degToRad( lightAttribute.OuterAngle.value );
@@ -1581,7 +1581,7 @@
 
 							}
 
-							if ( lightAttribute.CastShadows !== undefined && lightAttribute.CastShadows.value === '1' ) {
+							if ( lightAttribute.CastShadows !== undefined && ( lightAttribute.CastShadows.value === '1' || lightAttribute.CastShadows.value === 1 ) ) {
 
 								model.castShadow = true;
 
