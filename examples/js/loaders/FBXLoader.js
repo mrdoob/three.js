@@ -112,7 +112,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -1449,17 +1449,15 @@
 						}
 						break;
 
-					case 'Light':
+					case 'Camera':
 						/* ***********
 						* Supported light types:
-						* DirectionalLight
-						* PointLight
-						* SpotLight
+						* PerspectiveCamera
+						* OrthographicCamera
 						*
-						* TODO: Support DirectionalLight and SpotLight targets
+						* TODO: Support targets via camera.lookAt
 						************** */
-
-						var lightAttribute;
+						var cameraAttribute;
 
 						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
 
@@ -1469,119 +1467,75 @@
 
 							if ( attr !== undefined && attr.properties !== undefined ) {
 
-								lightAttribute = attr.properties;
+								cameraAttribute = attr.properties;
 
 							}
 
 						}
 
-						if ( lightAttribute === undefined ) {
+						if ( cameraAttribute === undefined ) {
 
 							model = new THREE.Object3D();
 
 						} else {
 
-							var type;
+							var type = 0;
+							if ( cameraAttribute.CameraProjectionType !== undefined && ( cameraAttribute.CameraProjectionType.value === '1' || cameraAttribute.CameraProjectionType.value === 1 ) ) {
 
-							// LightType can be undefined for Point lights
-							if ( lightAttribute.LightType === undefined ) {
-
-								type = 0;
-
-							} else {
-
-								type = lightAttribute.LightType.value;
+								type = 1;
 
 							}
 
-							var color = 0xffffff;
+							var nearClippingPlane = 1;
+							if ( cameraAttribute.NearPlane !== undefined ) {
 
-							if ( lightAttribute.Color !== undefined ) {
-
-								var temp = lightAttribute.Color.value.split( ',' );
-
-								var r = parseInt( temp[ 0 ], 10 );
-								var g = parseInt( temp[ 1 ], 10 );
-								var b = parseInt( temp[ 1 ], 10 );
-
-								color = new THREE.Color( r, g, b );
+								nearClippingPlane = cameraAttribute.NearPlane.value / 1000;
 
 							}
 
-							var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
+							var farClippingPlane = 1000;
+							if ( cameraAttribute.FarPlane !== undefined ) {
 
-							// light disabled
-							if ( lightAttribute.CastLightOnObject !== undefined && ( lightAttribute.CastLightOnObject.value === '0' || lightAttribute.CastLightOnObject.value === 0 ) ) {
-
-								intensity = 0;
+								farClippingPlane = cameraAttribute.FarPlane.value / 1000;
 
 							}
 
-							var distance = 0;
-							if ( lightAttribute.FarAttenuationEnd !== undefined ) {
 
-								if ( lightAttribute.EnableFarAttenuation !== undefined && ( lightAttribute.EnableFarAttenuation.value === '0' || lightAttribute.EnableFarAttenuation.value === 0 ) ) {
+							var width = window.innerWidth;
+							var height = window.innerHeight;
 
-									distance = 0;
+							if ( cameraAttribute.AspectWidth !== undefined && cameraAttribute.AspectHeight !== undefined ) {
 
-								}	else {
-
-									distance = lightAttribute.FarAttenuationEnd.value / 1000;
-
-								}
+								width = parseFloat( cameraAttribute.AspectWidth.value );
+								height = parseFloat( cameraAttribute.AspectHeight.value );
 
 							}
 
-							// TODO
-							// could be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
-							var decay = 1;
+							var aspect = width / height;
+
+							var fov = 45;
+							if ( cameraAttribute.FieldOfView !== undefined ) {
+
+								fov = parseFloat( cameraAttribute.FieldOfView.value );
+
+							}
 
 							switch ( type ) {
 
-								case '0': // Point
+								case '0': // Perspective
 								case 0:
-									model = new THREE.PointLight( color, intensity, distance, decay );
+									model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
 									break;
 
-								case '1': // Directional
+								case '1': // Orthographic
 								case 1:
-									model = new THREE.DirectionalLight( color, intensity );
-									break;
-
-								case '2': // Spot
-								case 2:
-									var angle = Math.PI / 3;
-
-									if ( lightAttribute.InnerAngle !== undefined ) {
-
-										angle = THREE.Math.degToRad( lightAttribute.InnerAngle.value );
-
-									}
-
-									var penumbra = 0;
-									if ( lightAttribute.OuterAngle !== undefined ) {
-
-										// TODO: this is not correct - FBX calculates outer and inner angle in degrees
-										// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
-										// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-										penumbra = THREE.Math.degToRad( lightAttribute.OuterAngle.value );
-										penumbra = Math.max( penumbra, 1 );
-
-									}
-
-									model = new THREE.SpotLight( color, intensity, distance, angle, penumbra, decay );
+									model = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
 									break;
 
 								default:
-									console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType.value + ', defaulting to a THREE.PointLight.' );
-									model = new THREE.PointLight( color, intensity );
+									console.warn( 'THREE.FBXLoader: Unknown camera type ' + type + '.' );
+									model = new THREE.Object3D();
 									break;
-
-							}
-
-							if ( lightAttribute.CastShadows !== undefined && ( lightAttribute.CastShadows.value === '1' || lightAttribute.CastShadows.value === 1 ) ) {
-
-								model.castShadow = true;
 
 							}
 
