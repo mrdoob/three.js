@@ -67,6 +67,9 @@
 
 				// Add Sky Mesh
 				sky = new THREE.Sky();
+				sky.mesh.scale.setScalar( 450000 );
+				sky.mesh.matrixAutoUpdate = false;//The sky is still (see https://threejs.org/docs/#manual/introduction/How-to-update-things)
+				sky.mesh.updateMatrixWorld();//So only compute its matrix now.
 				scene.add( sky.mesh );
 
 				// Add Sun Helper
