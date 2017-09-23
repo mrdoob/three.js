@@ -633,14 +633,14 @@ THREE.VRMLLoader.prototype = {
 
 				}
 
-				if ( 'AmbientLight' === data.nodeType ) {
+				if ( data.nodeType === 'AmbientLight' ) {
 
 					object = new THREE.AmbientLight( l_color, l_intensity );
 					object.visible = l_visible;
 
 					parent.add( object );
 
-				} else if ( 'PointLight' === data.nodeType ) {
+				} else if ( data.nodeType === 'PointLight' ) {
 
 					var l_distance = 0;
 
@@ -655,7 +655,7 @@ THREE.VRMLLoader.prototype = {
 
 					parent.add( object );
 
-				} else if ( 'SpotLight' === data.nodeType ) {
+				} else if ( data.nodeType === 'SpotLight' ) {
 
 					var l_intensity = 1;
 					var l_distance = 0;
@@ -680,7 +680,7 @@ THREE.VRMLLoader.prototype = {
 
 					parent.add( object );
 
-				} else if ( 'Transform' === data.nodeType || 'Group' === data.nodeType ) {
+				} else if ( data.nodeType === 'Transform' || data.nodeType === 'Group' ) {
 
 					object = new THREE.Object3D();
 
@@ -691,7 +691,7 @@ THREE.VRMLLoader.prototype = {
 
 					}
 
-					if ( undefined !== data[ 'translation' ] ) {
+					if ( data.translation !== undefined ) {
 
 						var t = data.translation;
 
@@ -699,7 +699,7 @@ THREE.VRMLLoader.prototype = {
 
 					}
 
-					if ( undefined !== data.rotation ) {
+					if ( data.rotation !== undefined ) {
 
 						var r = data.rotation;
 
@@ -707,7 +707,7 @@ THREE.VRMLLoader.prototype = {
 
 					}
 
-					if ( undefined !== data.scale ) {
+					if ( data.scale !== undefined ) {
 
 						var s = data.scale;
 
@@ -717,7 +717,7 @@ THREE.VRMLLoader.prototype = {
 
 					parent.add( object );
 
-				} else if ( 'Shape' === data.nodeType ) {
+				} else if ( data.nodeType === 'Shape' ) {
 
 					object = new THREE.Mesh();
 
@@ -731,7 +731,7 @@ THREE.VRMLLoader.prototype = {
 
 					parent.add( object );
 
-				} else if ( 'Background' === data.nodeType ) {
+				} else if ( data.nodeType === 'Background' ) {
 
 					var segments = 20;
 
@@ -774,25 +774,25 @@ THREE.VRMLLoader.prototype = {
 
 				} else if ( /geometry/.exec( data.string ) ) {
 
-					if ( 'Box' === data.nodeType ) {
+					if ( data.nodeType === 'Box' ) {
 
 						var s = data.size;
 
 						parent.geometry = new THREE.BoxBufferGeometry( s.x, s.y, s.z );
 
-					} else if ( 'Cylinder' === data.nodeType ) {
+					} else if ( data.nodeType === 'Cylinder' ) {
 
 						parent.geometry = new THREE.CylinderBufferGeometry( data.radius, data.radius, data.height );
 
-					} else if ( 'Cone' === data.nodeType ) {
+					} else if ( data.nodeType === 'Cone' ) {
 
 						parent.geometry = new THREE.CylinderBufferGeometry( data.topRadius, data.bottomRadius, data.height );
 
-					} else if ( 'Sphere' === data.nodeType ) {
+					} else if ( data.nodeType === 'Sphere' ) {
 
 						parent.geometry = new THREE.SphereBufferGeometry( data.radius );
 
-					} else if ( 'IndexedFaceSet' === data.nodeType ) {
+					} else if ( data.nodeType === 'IndexedFaceSet' ) {
 
 						var geometry = new THREE.BufferGeometry();
 
@@ -809,7 +809,7 @@ THREE.VRMLLoader.prototype = {
 
 							// uvs
 
-							if ( 'TextureCoordinate' === child.nodeType ) {
+							if ( child.nodeType === 'TextureCoordinate' ) {
 
 								if ( child.points ) {
 
@@ -826,7 +826,7 @@ THREE.VRMLLoader.prototype = {
 
 							// positions
 
-							if ( 'Coordinate' === child.nodeType ) {
+							if ( child.nodeType === 'Coordinate' ) {
 
 								if ( child.points ) {
 
@@ -880,6 +880,8 @@ THREE.VRMLLoader.prototype = {
 								skip = 0;
 
 								while ( indexes.length >= 3 && skip < ( indexes.length - 2 ) ) {
+
+									if ( data.ccw === undefined ) data.ccw = true; // ccw is true by default
 
 									var i1 = indexes[ 0 ];
 									var i2 = indexes[ skip + ( data.ccw ? 1 : 2 ) ];
@@ -959,11 +961,11 @@ THREE.VRMLLoader.prototype = {
 
 						var child = data.children[ i ];
 
-						if ( 'Material' === child.nodeType ) {
+						if ( child.nodeType === 'Material' ) {
 
 							var material = new THREE.MeshPhongMaterial();
 
-							if ( undefined !== child.diffuseColor ) {
+							if ( child.diffuseColor !== undefined ) {
 
 								var d = child.diffuseColor;
 
@@ -971,7 +973,7 @@ THREE.VRMLLoader.prototype = {
 
 							}
 
-							if ( undefined !== child.emissiveColor ) {
+							if ( child.emissiveColor !== undefined ) {
 
 								var e = child.emissiveColor;
 
@@ -979,7 +981,7 @@ THREE.VRMLLoader.prototype = {
 
 							}
 
-							if ( undefined !== child.specularColor ) {
+							if ( child.specularColor !== undefined ) {
 
 								var s = child.specularColor;
 
@@ -987,7 +989,7 @@ THREE.VRMLLoader.prototype = {
 
 							}
 
-							if ( undefined !== child.transparency ) {
+							if ( child.transparency !== undefined ) {
 
 								var t = child.transparency;
 
@@ -1010,7 +1012,7 @@ THREE.VRMLLoader.prototype = {
 
 						}
 
-						if ( 'ImageTexture' === child.nodeType ) {
+						if ( child.nodeType === 'ImageTexture' ) {
 
 							var textureName = /"([^"]+)"/.exec( child.children[ 0 ] );
 
