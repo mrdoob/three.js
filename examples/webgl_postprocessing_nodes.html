@@ -465,12 +465,12 @@
 						} );
 
 						break;
-						
+
 					case 'blur':
 
 						// PASS
 
-						var size = renderer.getSize();
+						var size = renderer.getDrawingBufferSize();
 
 						var blurScreen = new THREE.BlurNode( new THREE.ScreenNode() );
 						blurScreen.size = new THREE.Vector2( size.width, size.height );

@@ -24,7 +24,6 @@ import { WebGLProperties } from './webgl/WebGLProperties.js';
 import { WebGLState } from './webgl/WebGLState.js';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
 import { WebVRManager } from './webvr/WebVRManager.js';
-import { BufferGeometry } from '../core/BufferGeometry.js';
 import { WebGLExtensions } from './webgl/WebGLExtensions.js';
 import { Vector3 } from '../math/Vector3.js';
 import { WebGLClipping } from './webgl/WebGLClipping.js';
@@ -258,13 +257,8 @@ function WebGLRenderer( parameters ) {
 		extensions.get( 'OES_texture_half_float' );
 		extensions.get( 'OES_texture_half_float_linear' );
 		extensions.get( 'OES_standard_derivatives' );
+		extensions.get( 'OES_element_index_uint' );
 		extensions.get( 'ANGLE_instanced_arrays' );
-
-		if ( extensions.get( 'OES_element_index_uint' ) ) {
-
-			BufferGeometry.MaxIndex = 4294967296;
-
-		}
 
 		utils = new WebGLUtils( _gl, extensions );
 
