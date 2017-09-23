@@ -274,6 +274,12 @@
 
 					}
 
+					object.traverse( function ( node ) {
+
+						if ( node.isMesh ) node.castShadow = true;
+
+					} );
+
 					cameraIndex = 0;
 					cameras = [];
 					cameraNames = [];
@@ -332,7 +338,11 @@
 					scene.add( object );
 					onWindowResize();
 
-				});
+				}, undefined, function ( error ) {
+
+					console.error( error );
+
+				} );
 
 			orbitControls = new THREE.OrbitControls(defaultCamera, renderer.domElement);
 
