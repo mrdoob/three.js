@@ -340,7 +340,6 @@ var files = {
 	"canvas": [
 		"canvas_ascii_effect",
 		"canvas_camera_orthographic",
-		"canvas_camera_orthographic2",
 		"canvas_geometry_birds",
 		"canvas_geometry_cube",
 		"canvas_geometry_earth",
