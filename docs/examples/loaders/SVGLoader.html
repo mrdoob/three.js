@@ -11,9 +11,34 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading an <em>.svg</em> resource.</div>
+		<div class="desc">A loader for loading a <em>.svg</em> resource.<br >
+		<a href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">Scalabe Vector Graphics</a> is an XML-based vector image format for two-dimensional graphics with support for interactivity and animation.			
+		</div>
 
+		<h2>Example</h2>
+		
+		<code>
 
+		// instantiate the loader
+		var loader = new THREE.SVGLoader();
+		
+		// load a SVG resource
+		loader.load(
+			//	resource URL
+			'data/svgSample.svg',
+			// called when the resource is loaded.
+			function(doc){
+				scene.add( new THREE.SVGObject(doc) );				
+			},
+			// called when the loading failed with errors.
+			function(error){
+				console.log("Error loading SVG!");
+			}
+		);
+		</code>
+
+		[example:webgl_loader_svg]
+		
 		<h2>Constructor</h2>
 
 		<h3>[name]( [page:LoadingManager manager] )</h3>
@@ -31,10 +56,10 @@
 
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		[page:String url] — required<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:SVGDocument].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called when load errors.<br />
+		[page:String url] — A string containing the path/URL of the <em>.svg</em> file.<br />
+		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives the loaded [page:SVGDocument] as an argument.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
 		</div>
 		<div>
 		Begin loading from url and call onLoad with the response content.
