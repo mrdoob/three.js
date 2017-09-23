@@ -74,6 +74,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Mouse buttons
 	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+	
+	// For mouseout so you can keep on spinning no matter where you go with that mouse cursor
+	this.trackMouseOutsideScene = false;
 
 	// for reset
 	this.target0 = this.target.clone();
@@ -228,6 +231,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
+
+		if (this.trackMouseOutsideScene === false)
+			document.removeEventListener( 'mouseout', onMouseUp, false );
 
 		window.removeEventListener( 'keydown', onKeyDown, false );
 
@@ -701,6 +707,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 			document.addEventListener( 'mousemove', onMouseMove, false );
 			document.addEventListener( 'mouseup', onMouseUp, false );
 
+			if (this.trackMouseOutsideScene === false)
+				document.addEventListener( 'mouseout', onMouseUp, false );
+
 			scope.dispatchEvent( startEvent );
 
 		}
@@ -751,6 +760,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
+		
+		if (this.trackMouseOutsideScene === false)
+			document.removeEventListener( 'mouseout', onMouseUp, false );
 
 		scope.dispatchEvent( endEvent );
 
