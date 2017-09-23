@@ -636,14 +636,14 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         default=constants.EXPORT_OPTIONS[constants.ENABLE_PRECISION])
 
     option_round_value = IntProperty(
-        name="Precision",
+        name="",
         min=0,
         max=16,
         description="Floating point precision",
         default=constants.EXPORT_OPTIONS[constants.PRECISION])
 
     option_custom_properties = BoolProperty(
-        name="Custom Props",
+        name="Custom Properties",
         description="Export custom properties as userData",
         default=False)
 
@@ -849,9 +849,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = box.row()
         row.prop(self.properties, 'option_hierarchy')
-
         ## }
-
 
         layout.separator()
 
@@ -860,7 +858,14 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         column = box.column(True)
         row = column.row(True)
         row.alignment = 'CENTER'
+
         row.label(text="GEOMETRY", icon="MESH_DATA")
+
+        row = box.row()
+        row.prop(self.properties, 'option_geometry_type')
+
+        row = box.row()
+        row.prop(self.properties, 'option_index_type')
 
         row = box.row()
         row.prop(self.properties, 'option_vertices')
@@ -873,58 +878,50 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_uv_coords')
 
         row = box.row()
-        row.prop(self.properties, 'option_extra_vgroups')
-        row.enabled = not using_geometry
-
-        row = box.row()
         row.prop(self.properties, 'option_apply_modifiers')
 
         row = box.row()
-        row.prop(self.properties, 'option_geometry_type')
-
-        row = box.row()
-        row.prop(self.properties, 'option_index_type')
-
+        row.prop(self.properties, 'option_extra_vgroups')
+        row.enabled = not using_geometry
         ## }
 
         layout.separator()
 
         ## Materials {
         box = layout.box()
-        box.label
-        row = box.row()
+        column = box.column(True)
+        row = column.row(True)
+        row.alignment = 'CENTER'
         row.label(text="MATERIAL", icon="MATERIAL_DATA")
 
-        row = layout.row()
-        row.prop(self.properties, 'option_face_materials')
-            row.enabled = using_geometry
-
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_colors')
-
-        row = layout.row()
         row.prop(self.properties, 'option_mix_colors')
 
+        row = box.row()
+        row.prop(self.properties, 'option_face_materials')
+        row.enabled = using_geometry
         ## }
 
         layout.separator()
 
         ## Textures {
         box = layout.box()
-        box.label
-        row = box.row()
-        row.label(text="TEXTURE", icon="TEXTURE_DATA")
-        row = layout.row()
-        row.prop(self.properties, 'option_maps')
+        column = box.column(True)
+        row = column.row(True)
+        row.alignment = 'CENTER'
 
-        row = layout.row()
+        row.label(text="TEXTURE", icon="TEXTURE_DATA")
+
+        row = box.row()
+        row.prop(self.properties, 'option_maps')
         row.prop(self.properties, 'option_export_textures')
 
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_embed_textures')
         row.enabled = self.properties.option_export_textures
 
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_texture_folder')
         ## }
 
@@ -935,6 +932,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         column = box.column(True)
         row = column.row(True)
         row.alignment = 'CENTER'
+
         row.label(text="ARMATURE", icon="ARMATURE_DATA")
 
         row = box.row()
@@ -945,79 +943,67 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         layout.separator()
 
         ## Animation {
-        row = layout.row()
+        box = layout.box()
+        column = box.column(True)
+        row = column.row(True)
+        row.alignment = 'CENTER'
+
         row.label(text="ANIMATION", icon="POSE_DATA")
 
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_animation_morph')
-
-        row = layout.row()
         row.prop(self.properties, 'option_blend_shape')
 
-        row = layout.row()
+        row = box.row()
         row.label(text="Skeletal animations:")
-
-        row = layout.row()
         row.prop(self.properties, 'option_animation_skeletal')
 
-        row = layout.row()
-        row.label(text="Keyframe animations:")
-
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_keyframes')
 
-        layout.row()
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_influences')
 
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_frame_step')
 
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_frame_index_as_time')
 
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_embed_animation')
-
         ## }
 
         layout.separator()
 
         ## Settings {
-        row = layout.row()
-        row.label(text="SETTINGS", icon="")
+        box = layout.box()
+        column = box.column(True)
+        row = column.row(True)
+        row.alignment = 'CENTER'
 
-        row = layout.row()
+        row.label(text="SETTINGS", icon="SETTINGS")
+
+        row = box.row()
         row.prop(self.properties, 'option_scale')
 
-        layout.row()
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_round_off')
-        row = layout.row()
         row.prop(self.properties, 'option_round_value')
 
-        layout.row()
-        row = layout.row()
-        row.label(text="Custom Properties")
-
-        row = layout.row()
+        row = box.row()
         row.prop(self.properties, 'option_custom_properties')
 
-        layout.row()
-        row = layout.row()
-        row.label(text="Logging verbosity:")
+        row = box.row()
+        row.prop(self.properties, 'option_indent')
 
-        row = layout.row()
+        row = box.row()
+        row.label(text="Logging verbosity:")
         row.prop(self.properties, 'option_logging')
 
-        row = layout.row()
+        row = box.row()
         row.label(text="File compression format:")
-
-        row = layout.row()
         row.prop(self.properties, 'option_compression')
-
-        row = layout.row()
-        row.prop(self.properties, 'option_indent')
         ## }
 
         ## Operators {
