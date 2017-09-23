@@ -1377,76 +1377,98 @@
 
 				switch ( node.attrType ) {
 
-					case 'Mesh':
-						/**
-						 * @type {?THREE.BufferGeometry}
-						 */
-						var geometry = null;
-
-						/**
-						 * @type {THREE.MultiMaterial|THREE.Material}
-						 */
-						var material = null;
-
-						/**
-						 * @type {Array.<THREE.Material>}
-						 */
-						var materials = [];
+					case 'Camera':
+						/* ***********
+						* Supported light types:
+						* PerspectiveCamera
+						* OrthographicCamera
+						*
+						* TODO: Support targets via camera.lookAt
+						************** */
+						var cameraAttribute;
 
 						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
 
-							var child = conns.children[ childrenIndex ];
+							var childID = conns.children[ childrenIndex ].ID;
 
-							if ( geometryMap.has( child.ID ) ) {
+							var attr = FBXTree.Objects.subNodes.NodeAttribute[ childID ];
 
-								geometry = geometryMap.get( child.ID );
+							if ( attr !== undefined && attr.properties !== undefined ) {
 
-							}
-
-							if ( materialMap.has( child.ID ) ) {
-
-								materials.push( materialMap.get( child.ID ) );
+								cameraAttribute = attr.properties;
 
 							}
 
 						}
-						if ( materials.length > 1 ) {
 
-							material = materials;
+						if ( cameraAttribute === undefined ) {
 
-						} else if ( materials.length > 0 ) {
-
-							material = materials[ 0 ];
+							model = new THREE.Object3D();
 
 						} else {
 
-							material = new THREE.MeshStandardMaterial( { color: 0x3300ff } );
-							materials.push( material );
+							var type = 0;
+							if ( cameraAttribute.CameraProjectionType !== undefined && ( cameraAttribute.CameraProjectionType.value === '1' || cameraAttribute.CameraProjectionType.value === 1 ) ) {
 
-						}
-						if ( 'color' in geometry.attributes ) {
+								type = 1;
 
-							for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++ materialIndex ) {
+							}
 
-								materials[ materialIndex ].vertexColors = THREE.VertexColors;
+							var nearClippingPlane = 1;
+							if ( cameraAttribute.NearPlane !== undefined ) {
+
+								nearClippingPlane = cameraAttribute.NearPlane.value / 1000;
+
+							}
+
+							var farClippingPlane = 1000;
+							if ( cameraAttribute.FarPlane !== undefined ) {
+
+								farClippingPlane = cameraAttribute.FarPlane.value / 1000;
+
+							}
+
+
+							var width = window.innerWidth;
+							var height = window.innerHeight;
+
+							if ( cameraAttribute.AspectWidth !== undefined && cameraAttribute.AspectHeight !== undefined ) {
+
+								width = parseFloat( cameraAttribute.AspectWidth.value );
+								height = parseFloat( cameraAttribute.AspectHeight.value );
+
+							}
+
+							var aspect = width / height;
+
+							var fov = 45;
+							if ( cameraAttribute.FieldOfView !== undefined ) {
+
+								fov = parseFloat( cameraAttribute.FieldOfView.value );
+
+							}
+
+							switch ( type ) {
+
+								case '0': // Perspective
+								case 0:
+									model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
+									break;
+
+								case '1': // Orthographic
+								case 1:
+									model = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
+									break;
+
+								default:
+									console.warn( 'THREE.FBXLoader: Unknown camera type ' + type + '.' );
+									model = new THREE.Object3D();
+									break;
 
 							}
 
 						}
-						if ( geometry.FBX_Deformer ) {
 
-							for ( var materialsIndex = 0, materialsLength = materials.length; materialsIndex < materialsLength; ++ materialsIndex ) {
-
-								materials[ materialsIndex ].skinning = true;
-
-							}
-							model = new THREE.SkinnedMesh( geometry, material );
-
-						} else {
-
-							model = new THREE.Mesh( geometry, material );
-
-						}
 						break;
 
 					case 'Light':
@@ -1524,7 +1546,7 @@
 
 									distance = 0;
 
-								}	else {
+								} else {
 
 									distance = lightAttribute.FarAttenuationEnd.value / 1000;
 
@@ -1587,6 +1609,78 @@
 
 						}
 
+						break;
+
+					case 'Mesh':
+						/**
+						 * @type {?THREE.BufferGeometry}
+						 */
+						var geometry = null;
+
+						/**
+						 * @type {THREE.MultiMaterial|THREE.Material}
+						 */
+						var material = null;
+
+						/**
+						 * @type {Array.<THREE.Material>}
+						 */
+						var materials = [];
+
+						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+							var child = conns.children[ childrenIndex ];
+
+							if ( geometryMap.has( child.ID ) ) {
+
+								geometry = geometryMap.get( child.ID );
+
+							}
+
+							if ( materialMap.has( child.ID ) ) {
+
+								materials.push( materialMap.get( child.ID ) );
+
+							}
+
+						}
+						if ( materials.length > 1 ) {
+
+							material = materials;
+
+						} else if ( materials.length > 0 ) {
+
+							material = materials[ 0 ];
+
+						} else {
+
+							material = new THREE.MeshStandardMaterial( { color: 0x3300ff } );
+							materials.push( material );
+
+						}
+						if ( 'color' in geometry.attributes ) {
+
+							for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++ materialIndex ) {
+
+								materials[ materialIndex ].vertexColors = THREE.VertexColors;
+
+							}
+
+						}
+						if ( geometry.FBX_Deformer ) {
+
+							for ( var materialsIndex = 0, materialsLength = materials.length; materialsIndex < materialsLength; ++ materialsIndex ) {
+
+								materials[ materialsIndex ].skinning = true;
+
+							}
+							model = new THREE.SkinnedMesh( geometry, material );
+
+						} else {
+
+							model = new THREE.Mesh( geometry, material );
+
+						}
 						break;
 
 					case 'NurbsCurve':
