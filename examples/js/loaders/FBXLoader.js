@@ -4977,6 +4977,9 @@
 
 			}
 
+			// Manage UTF8 encoding
+			s = decodeURIComponent( escape( s ) );
+
 			this.skip( size );
 
 			return s;
