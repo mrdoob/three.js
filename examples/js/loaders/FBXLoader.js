@@ -1653,7 +1653,6 @@
 
 		/*
 			parse ambient color - if it's not set to black (default), create an ambient light
-			Note: no way to set intensity, FBX only provides a color
 		*/
 		var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
 		var r = ambientColor[ 0 ];
@@ -1662,7 +1661,7 @@
 		if ( r !== 0 || g !== 0 || b !== 0 ) {
 
 			var color = new THREE.Color( r, g, b );
-			sceneGraph.add( new THREE.AmbientLight( color ) );
+			sceneGraph.add( new THREE.AmbientLight( color, 1 ) );
 
 		}
 
