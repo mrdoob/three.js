@@ -1049,41 +1049,49 @@ THREE.VRMLLoader.prototype = {
 		var lines = data.split( '\n' );
 
 		// some lines do not have breaks
+
 		for ( var i = lines.length - 1; i > - 1; i -- ) {
 
-			// split lines with {..{ or {..[ - some have both
-			if ( /{.*[{\[]/.test( lines[ i ] ) ) {
+			var line = lines[ i ];
 
-				var parts = lines[ i ].split( '{' ).join( '{\n' ).split( '\n' );
+			// split lines with {..{ or {..[ - some have both
+			if ( /{.*[{\[]/.test( line ) ) {
+
+				var parts = line.split( '{' ).join( '{\n' ).split( '\n' );
 				parts.unshift( 1 );
 				parts.unshift( i );
 				lines.splice.apply( lines, parts );
 
-			} else if ( /\].*}/.test( lines[ i ] ) ) {
+			} else if ( /\].*}/.test( line ) ) {
 
 				// split lines with ]..}
-				var parts = lines[ i ].split( ']' ).join( ']\n' ).split( '\n' );
+				var parts = line.split( ']' ).join( ']\n' ).split( '\n' );
 				parts.unshift( 1 );
 				parts.unshift( i );
 				lines.splice.apply( lines, parts );
 
 			}
 
-			if ( /}.*}/.test( lines[ i ] ) ) {
+			if ( /}.*}/.test( line ) ) {
 
 				// split lines with }..}
-
-				var parts = lines[ i ].split( '}' ).join( '}\n' ).split( '\n' );
+				var parts = line.split( '}' ).join( '}\n' ).split( '\n' );
 				parts.unshift( 1 );
 				parts.unshift( i );
 				lines.splice.apply( lines, parts );
 
 			}
 
-			// force the parser to create Coordinate node for empty coords
-			// coord USE something -> coord USE something Coordinate {}
+			if ( /^\b[^\s]+\b$/.test( line.trim() ) ) {
 
-			if ( ( lines[ i ].indexOf( 'coord' ) > - 1 ) && ( lines[ i ].indexOf( '[' ) < 0 ) && ( lines[ i ].indexOf( '{' ) < 0 ) ) {
+				// prevent lines with single words like "coord" or "geometry", see #12209
+				lines[ i + 1 ] = line + ' ' + lines[ i + 1 ].trim();
+				lines.splice( i, 1 );
+
+			} else if ( ( line.indexOf( 'coord' ) > - 1 ) && ( line.indexOf( '[' ) < 0 ) && ( line.indexOf( '{' ) < 0 ) ) {
+
+				// force the parser to create Coordinate node for empty coords
+				// coord USE something -> coord USE something Coordinate {}
 
 				lines[ i ] += ' Coordinate {}';
 
