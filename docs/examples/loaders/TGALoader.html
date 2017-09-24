@@ -26,15 +26,21 @@
 			'textures/crate_grey8.tga'
 			// called when loading is completed
 			function ( texture ) {
+
 				console.log( 'Texture is loaded' );
+
 			},
 			// called when the loading is in progresses
 			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
 			},
 			// called when the loading failes
 			function ( error ) {
+
 				console.log( 'An error happened' );
+
 			}
 		);
 		

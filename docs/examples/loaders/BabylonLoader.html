@@ -27,15 +27,21 @@
 			'models/babylon/skull.babylon',
 			// called when resource is loaded
 			function ( object ) {
+
 				scene.add( object );
+
 			},
 			// called when loading is in progress
 			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
 			},
 			// called when loading has errors
 			function ( xhr ) {
+
 				console.log( 'An error happened' );
+
 			}
 		);
 		</code>

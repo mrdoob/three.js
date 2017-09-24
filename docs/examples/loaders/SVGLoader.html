@@ -18,21 +18,34 @@
 		<h2>Example</h2>
 		
 		<code>
+		// instantiate a loader
+		var loader = new THREE.PDBLoader();
 
-		// instantiate the loader
-		var loader = new THREE.SVGLoader();
-		
-		// load a SVG resource
+		// load a PDB resource
 		loader.load(
-			//	resource URL
-			'data/svgSample.svg',
-			// called when the resource is loaded.
-			function(doc){
-				scene.add( new THREE.SVGObject(doc) );				
+			// resource URL
+			'models/molecules/caffeine.pdb',
+			// called when the resource is loaded
+			function ( pdb ) {
+
+				var geometryAtoms = pdb.geometryAtoms;
+				var geometryBonds = pdb.geometryBonds;
+				var json = pdb.json;
+
+				console.log( 'This molecule has ' + json.atoms.length + ' atoms' );
+
 			},
-			// called when the loading failed with errors.
-			function(error){
-				console.log("Error loading SVG!");
+			// called when loading is in progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
 			}
 		);
 		</code>

@@ -46,32 +46,38 @@
 		<h2>Example</h2>
 
 		<code>
-		// Instantiate a loader
-		var loader = new THREE.GLTFLoader();
-
-		// Load a glTF resource
-		loader.load( 
-			// resource URL
-			'models/gltf/duck/duck.gltf', 
-			// called when the resource is loaded			
-			function ( gltf ) {
-				scene.add( gltf.scene );
-
-				gltf.animations; // Array&lt;THREE.AnimationClip&gt;
-				gltf.scene;      // THREE.Scene
-				gltf.scenes;     // Array&lt;THREE.Scene&gt;
-				gltf.cameras;    // Array&lt;THREE.Camera&gt;
-			},
-			// called when loading is in progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// called when loading has errors
-			function ( error ) {
-				console.log( 'An error happened' );
-			}
-		);
-		</code>
+			// Instantiate a loader
+			var loader = new THREE.GLTFLoader();
+	
+			// Load a glTF resource
+			loader.load(
+				// resource URL
+				'models/gltf/duck/duck.gltf',
+				// called when the resource is loaded
+				function ( gltf ) {
+	
+					scene.add( gltf.scene );
+	
+					gltf.animations; // Array&lt;THREE.AnimationClip&gt;
+					gltf.scene; // THREE.Scene
+					gltf.scenes; // Array&lt;THREE.Scene&gt;
+					gltf.cameras; // Array&lt;THREE.Camera&gt;
+	
+				},
+				// called when loading is in progresses
+				function ( xhr ) {
+	
+					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+	
+				},
+				// called when loading has errors
+				function ( error ) {
+	
+					console.log( 'An error happened' );
+	
+				}
+			);
+			</code>
 
 		[example:webgl_loader_gltf]
 
