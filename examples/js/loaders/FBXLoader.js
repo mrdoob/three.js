@@ -1379,11 +1379,9 @@
 
 					case 'Camera':
 						/* ***********
-						* Supported light types:
+						* Supported camera types:
 						* PerspectiveCamera
 						* OrthographicCamera
-						*
-						* TODO: Support targets via camera.lookAt
 						************** */
 						var cameraAttribute;
 
@@ -1477,8 +1475,6 @@
 						* DirectionalLight
 						* PointLight
 						* SpotLight
-						*
-						* TODO: Support DirectionalLight and SpotLight targets
 						************** */
 
 						var lightAttribute;
@@ -1755,6 +1751,47 @@
 
 			}
 
+			if ( 'LookAtProperty' in node.properties ) {
+
+				var conns = connections.get( model.FBX_ID );
+
+				for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+					var child = conns.children[ childrenIndex ];
+
+					if ( child.relationship === 'LookAtProperty' || child.relationship === ' "LookAtProperty' ) {
+
+						var lookAtTarget = FBXTree.Objects.subNodes.Model[ child.ID ];
+
+						if ( 'Lcl_Translation' in lookAtTarget.properties ) {
+
+							var pos = lookAtTarget.properties.Lcl_Translation.value.split( ',' ).map( function ( val ) {
+
+								return parseFloat( val );
+
+							} );
+
+							// DirectionalLight, SpotLight
+							if ( model.target !== undefined ) {
+
+								model.target.position.set( pos[ 0 ], pos[ 1 ], pos[ 2 ] );
+								sceneGraph.add( model.target );
+
+
+							} else { // Cameras and other Object3Ds
+
+								model.lookAt( new THREE.Vector3( pos[ 0 ], pos[ 1 ], pos[ 2 ] ) );
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
 			var conns = connections.get( model.FBX_ID );
 			for ( var parentIndex = 0; parentIndex < conns.parents.length; parentIndex ++ ) {
 
@@ -1884,6 +1921,20 @@
 		var animations = parseAnimations( FBXTree, connections, sceneGraph );
 
 		addAnimations( sceneGraph, animations );
+
+
+		// Parse ambient color - if it's not set to black (default), create an ambient light
+		var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
+		var r = ambientColor[ 0 ];
+		var g = ambientColor[ 1 ];
+		var b = ambientColor[ 2 ];
+
+		if ( r !== 0 || g !== 0 || b !== 0 ) {
+
+			var color = new THREE.Color( r, g, b );
+			sceneGraph.add( new THREE.AmbientLight( color, 1 ) );
+
+		}
 
 		return sceneGraph;
 
