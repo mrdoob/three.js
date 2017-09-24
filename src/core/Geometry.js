@@ -19,17 +19,11 @@ import { _Math } from '../math/Math.js';
  * @author bhouston / http://clara.io
  */
 
-var count = 0;
-
-function GeometryIdCount() {
-
-	return count ++;
-
-}
+var geometryId = 0; // Geometry uses even numbers as Id
 
 function Geometry() {
 
-	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
+	Object.defineProperty( this, 'id', { value: geometryId += 2 } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -1440,4 +1434,4 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 } );
 
 
-export { GeometryIdCount, Geometry };
+export { Geometry };
