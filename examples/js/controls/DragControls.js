@@ -75,7 +75,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			}
 
-			scope.dispatchEvent( { type: 'drag', object: _selected } );
+			scope.dispatchEvent( { type: 'drag', object: _selected, pointer: event } );
 
 			return;
 
@@ -93,7 +93,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _hovered !== object ) {
 
-				scope.dispatchEvent( { type: 'hoveron', object: object } );
+				scope.dispatchEvent( { type: 'hoveron', object: object, pointer: event } );
 
 				_domElement.style.cursor = 'pointer';
 				_hovered = object;
@@ -104,7 +104,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _hovered !== null ) {
 
-				scope.dispatchEvent( { type: 'hoveroff', object: _hovered } );
+				scope.dispatchEvent( { type: 'hoveroff', object: _hovered, pointer: event } );
 
 				_domElement.style.cursor = 'auto';
 				_hovered = null;
@@ -135,7 +135,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			_domElement.style.cursor = 'move';
 
-			scope.dispatchEvent( { type: 'dragstart', object: _selected } );
+			scope.dispatchEvent( { type: 'dragstart', object: _selected, pointer: event } );
 
 		}
 
@@ -148,7 +148,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		if ( _selected ) {
 
-			scope.dispatchEvent( { type: 'dragend', object: _selected } );
+			scope.dispatchEvent( { type: 'dragend', object: _selected, pointer: event } );
 
 			_selected = null;
 
@@ -178,7 +178,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			}
 
-			scope.dispatchEvent( { type: 'drag', object: _selected } );
+			scope.dispatchEvent( { type: 'drag', object: _selected, pointer: event } );
 
 			return;
 
@@ -214,7 +214,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			_domElement.style.cursor = 'move';
 
-			scope.dispatchEvent( { type: 'dragstart', object: _selected } );
+			scope.dispatchEvent( { type: 'dragstart', object: _selected, pointer: event } );
 
 		}
 
@@ -227,7 +227,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		if ( _selected ) {
 
-			scope.dispatchEvent( { type: 'dragend', object: _selected } );
+			scope.dispatchEvent( { type: 'dragend', object: _selected, pointer: event } );
 
 			_selected = null;
 

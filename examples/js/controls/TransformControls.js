@@ -633,10 +633,10 @@
 		}
 
 		var changeEvent = { type: "change" };
-		var mouseDownEvent = { type: "mouseDown" };
-		var mouseUpEvent = { type: "mouseUp", mode: _mode };
-		var objectChangeEvent = { type: "objectChange" };
-
+		var mouseDownEvent = { type: "mouseDown", pointer: null };
+		var mouseUpEvent = { type: "mouseUp", mode: _mode, pointer: null };
+		var objectChangeEvent = { type: "objectChange", pointer: null };
+		
 		var ray = new THREE.Raycaster();
 		var pointerVector = new THREE.Vector2();
 
@@ -856,6 +856,7 @@
 					event.preventDefault();
 					event.stopPropagation();
 
+					mouseDownEvent.pointer = pointer;
 					scope.dispatchEvent( mouseDownEvent );
 
 					scope.axis = intersect.object.name;
@@ -1092,6 +1093,11 @@
 
 			scope.update();
 			scope.dispatchEvent( changeEvent );
+				
+			objectChangeEvent.pointer = pointer;
+			objectChangeEvent.oldPosition = oldPosition;
+			objectChangeEvent.oldScale = oldScale;
+			objectChangeEvent.oldRotationMatrix = oldRotationMatrix;
 			scope.dispatchEvent( objectChangeEvent );
 
 		}
@@ -1105,6 +1111,7 @@
 			if ( _dragging && ( scope.axis !== null ) ) {
 
 				mouseUpEvent.mode = _mode;
+				mouseUpEvent.pointer = event;
 				scope.dispatchEvent( mouseUpEvent );
 
 			}
