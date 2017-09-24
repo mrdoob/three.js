@@ -1780,7 +1780,7 @@
 
 							} else { // Cameras and other Object3Ds
 
-								model.lookAt( pos[ 0 ], pos[ 1 ], pos[ 2 ] );
+								model.lookAt( new THREE.Vector3( pos[ 0 ], pos[ 1 ], pos[ 2 ] ) );
 
 							}
 
