@@ -3,7 +3,7 @@ vec3 packNormalToRGB( const in vec3 normal ) {
 }
 
 vec3 unpackRGBToNormal( const in vec3 rgb ) {
-	return 1.0 - 2.0 * rgb.xyz;
+	return 2.0 * rgb.xyz - 1.0;
 }
 
 const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
