@@ -729,9 +729,12 @@
 		}
 
 		if ( subNodes.LayerElementUV ) {
-
-			var uvInfo = getUVs( subNodes.LayerElementUV[ 0 ] );
-
+			var uvInfo = [];
+			var i = 0;
+			while ( subNodes.LayerElementUV[i] ){
+				uvInfo.push(getUVs( subNodes.LayerElementUV[ i ] ));
+				i++;
+			}
 		}
 
 		if ( subNodes.LayerElementColor ) {
@@ -872,9 +875,10 @@
 			}
 
 			if ( uvInfo ) {
-
-				vertex.uv.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo ) );
-
+				for (var i =0; i < uvInfo.length; i++){
+					uvTemp = new THREE.Vector2();
+					vertex.uv.push(uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[i] )));
+				}
 			}
 
 			if ( colorInfo ) {
@@ -927,10 +931,14 @@
 			geo.addAttribute( 'normal', new THREE.Float32BufferAttribute( bufferInfo.normalBuffer, 3 ) );
 
 		}
-		if ( bufferInfo.uvBuffer.length > 0 ) {
-
-			geo.addAttribute( 'uv', new THREE.Float32BufferAttribute( bufferInfo.uvBuffer, 2 ) );
-
+		if ( bufferInfo.uvBuffers.length > 0 ) {
+			for (var i=0; i < bufferInfo.uvBuffers.length; i++) {
+				var name = 'uv' + (i+1).toString();
+				if ( i == 0 ) {
+					name = 'uv';
+				}
+				geo.addAttribute( name, new THREE.Float32BufferAttribute( bufferInfo.uvBuffers[i], 2 ) );
+			}
 		}
 		if ( subNodes.LayerElementColor ) {
 
@@ -3650,10 +3658,10 @@
 		this.normal = new THREE.Vector3();
 
 		/**
-		 * UV coordinates of the vertex.
-		 * @type {THREE.Vector2}
+		 * Array of UV coordinates of the vertex.
+		 * @type {Array of THREE.Vector2}
 		 */
-		this.uv = new THREE.Vector2();
+		this.uv = [];
 
 		/**
 		 * Color of the vertex
@@ -3691,11 +3699,13 @@
 
 		},
 
-		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer ) {
+		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer ) {
 
 			this.position.toArray( vertexBuffer, vertexBuffer.length );
 			this.normal.toArray( normalBuffer, normalBuffer.length );
-			this.uv.toArray( uvBuffer, uvBuffer.length );
+			for (var i = 0; i < this.uv.length; i++){
+				this.uv[i].toArray(uvBuffers[i], uvBuffers[i].length);
+			}
 			this.color.toArray( colorBuffer, colorBuffer.length );
 			this.skinIndices.toArray( skinIndexBuffer, skinIndexBuffer.length );
 			this.skinWeights.toArray( skinWeightBuffer, skinWeightBuffer.length );
@@ -3732,14 +3742,13 @@
 
 		},
 
-		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer ) {
+		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer ) {
 
 			var vertices = this.vertices;
 
 			for ( var i = 0, l = vertices.length; i < l; ++ i ) {
 
-				vertices[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer );
-
+				vertices[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer );
 			}
 
 		}
@@ -3791,14 +3800,14 @@
 
 		},
 
-		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer, materialIndexBuffer ) {
+		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer, materialIndexBuffer ) {
 
 			var triangles = this.triangles;
 			var materialIndex = this.materialIndex;
 
 			for ( var i = 0, l = triangles.length; i < l; ++ i ) {
 
-				triangles[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer );
+				triangles[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer );
 				append( materialIndexBuffer, [ materialIndex, materialIndex, materialIndex ] );
 
 			}
@@ -3813,7 +3822,7 @@
 	function Geometry() {
 
 		/**
-		 * @type {{triangles: {vertices: {position: THREE.Vector3, normal: THREE.Vector3, uv: THREE.Vector2, skinIndices: THREE.Vector4, skinWeights: THREE.Vector4}[]}[], materialIndex: number}[]}
+		 * @type {{triangles: {vertices: {position: THREE.Vector3, normal: THREE.Vector3, uv: Array of THREE.Vector2, skinIndices: THREE.Vector4, skinWeights: THREE.Vector4}[]}[], materialIndex: number}[]}
 		 */
 		this.faces = [];
 
@@ -3827,31 +3836,32 @@
 	Object.assign( Geometry.prototype, {
 
 		/**
-		 * @returns	{{vertexBuffer: number[], normalBuffer: number[], uvBuffer: number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
+		 * @returns	{{vertexBuffer: number[], normalBuffer: number[], uvBuffers: Array of number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
 		 */
-		flattenToBuffers: function () {
+	 	flattenToBuffers: function () {
 
 			var vertexBuffer = [];
 			var normalBuffer = [];
-			var uvBuffer = [];
+			var uvBuffers = [];
 			var colorBuffer = [];
 			var skinIndexBuffer = [];
 			var skinWeightBuffer = [];
-
 			var materialIndexBuffer = [];
 
 			var faces = this.faces;
 
+			for (var i = 0; i < faces[0].triangles[0].vertices[0].uv.length; i++) {
+				uvBuffers.push([]);
+			}
+
 			for ( var i = 0, l = faces.length; i < l; ++ i ) {
-
-				faces[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffer, colorBuffer, skinIndexBuffer, skinWeightBuffer, materialIndexBuffer );
-
+				faces[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer, materialIndexBuffer );
 			}
 
 			return {
 				vertexBuffer: vertexBuffer,
 				normalBuffer: normalBuffer,
-				uvBuffer: uvBuffer,
+				uvBuffers: uvBuffers,
 				colorBuffer: colorBuffer,
 				skinIndexBuffer: skinIndexBuffer,
 				skinWeightBuffer: skinWeightBuffer,
@@ -3859,8 +3869,7 @@
 			};
 
 		}
-
-	} );
+ 	});
 
 	function TextParser() {}
 
