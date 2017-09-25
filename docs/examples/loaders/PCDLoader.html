@@ -11,8 +11,10 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for <em>PCD</em> files. Loads ascii and binary.
-			Compressed binary files are not supported.</div>
+		<div class="desc">A loader for loading a <em>.pcd</em> resource. <br />
+		Point Cloud Data is a file format for <a href="https://en.wikipedia.org/wiki/Point_Cloud_Library">Point Cloud Library</a>. <br />
+		Loader support ascii and binary. Compressed binary files are not supported.
+		</div>
 
 		<h2>Example</h2>
 
@@ -24,10 +26,24 @@
 		// load a resource
 		loader.load(
 			// resource URL
-			'pointcloud.pcd' ,
-			// Function when resource is loaded
+			'pointcloud.pcd',
+			// called when the resource is loaded
 			function ( mesh ) {
+
 				scene.add( mesh );
+
+			},
+			// called when loading is in progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
 			}
 		);
 		</code>
@@ -56,10 +72,10 @@
 
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		[page:String url] — required<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Object3D].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called when load errors.<br />
+		[page:String url] — A string containing the path/URL of the <em>.pcd</em> file.<br />
+		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
 		</div>
 		<div>
 		Begin loading from url and call onLoad with the parsed response content.

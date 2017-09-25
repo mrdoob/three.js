@@ -11,7 +11,12 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading an <em>.obj</em> resource.</div>
+		<div class="desc">A loader for loading a <em>.obj</em> resource.<br />
+		The <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ file format</a> is a simple data-format 
+		that represents 3D geometry in a human redeable format as, the position of each vertex, the UV position of 
+		each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of 
+		vertices, and texture vertices.
+		</div>
 
 
 		<h2>Example</h2>
@@ -24,9 +29,23 @@
 		loader.load(
 			// resource URL
 			'models/monster.obj',
-			// Function when resource is loaded
+			// called when resource is loaded
 			function ( object ) {
+
 				scene.add( object );
+
+			},
+			// called when loading is in progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
 			}
 		);
 		</code>
@@ -51,10 +70,10 @@
 
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		[page:String url] — A string representing the path to the obj file. Required.<br />
-		[page:Function onLoad] — A function to be called when the load completes. The function receives loaded [page:Object3D] as an argument.<br />
-		[page:Function onProgress] — A function to be called while the loading is in progress. The function receives a XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — A function to be called if the request fails. The function receives the error.<br />
+		[page:String url] — A string containing the path/URL of the <em>.obj</em> file.<br />
+		[page:Function onLoad] — (optional) A function to be called after the loading is successfully completed. The function receives the loaded [page:Object3D] as an argument.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The function receives a XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</div>
 		<div>
 		Begin loading from url and call onLoad with the parsed response content.
