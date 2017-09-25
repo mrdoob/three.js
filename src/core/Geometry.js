@@ -1,14 +1,14 @@
-import { EventDispatcher } from './EventDispatcher';
-import { Face3 } from './Face3';
-import { Matrix3 } from '../math/Matrix3';
-import { Sphere } from '../math/Sphere';
-import { Box3 } from '../math/Box3';
-import { Vector3 } from '../math/Vector3';
-import { Matrix4 } from '../math/Matrix4';
-import { Vector2 } from '../math/Vector2';
-import { Color } from '../math/Color';
-import { Object3D } from './Object3D';
-import { _Math } from '../math/Math';
+import { EventDispatcher } from './EventDispatcher.js';
+import { Face3 } from './Face3.js';
+import { Matrix3 } from '../math/Matrix3.js';
+import { Sphere } from '../math/Sphere.js';
+import { Box3 } from '../math/Box3.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Color } from '../math/Color.js';
+import { Object3D } from './Object3D.js';
+import { _Math } from '../math/Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -19,12 +19,11 @@ import { _Math } from '../math/Math';
  * @author bhouston / http://clara.io
  */
 
-var count = 0;
-function GeometryIdCount() { return count++; }
+var geometryId = 0; // Geometry uses even numbers as Id
 
 function Geometry() {
 
-	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
+	Object.defineProperty( this, 'id', { value: geometryId += 2 } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -1435,4 +1434,4 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 } );
 
 
-export { GeometryIdCount, Geometry };
+export { Geometry };

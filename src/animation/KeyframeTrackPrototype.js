@@ -1,9 +1,9 @@
-import { InterpolateLinear } from '../constants';
-import { AnimationUtils } from './AnimationUtils';
-import { InterpolateSmooth, InterpolateDiscrete } from '../constants';
-import { CubicInterpolant } from '../math/interpolants/CubicInterpolant';
-import { LinearInterpolant } from '../math/interpolants/LinearInterpolant';
-import { DiscreteInterpolant } from '../math/interpolants/DiscreteInterpolant';
+import { InterpolateLinear } from '../constants.js';
+import { AnimationUtils } from './AnimationUtils.js';
+import { InterpolateSmooth, InterpolateDiscrete } from '../constants.js';
+import { CubicInterpolant } from '../math/interpolants/CubicInterpolant.js';
+import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
+import { DiscreteInterpolant } from '../math/interpolants/DiscreteInterpolant.js';
 
 var KeyframeTrackPrototype;
 
@@ -16,22 +16,19 @@ KeyframeTrackPrototype = {
 
 	InterpolantFactoryMethodDiscrete: function ( result ) {
 
-		return new DiscreteInterpolant(
-				this.times, this.values, this.getValueSize(), result );
+		return new DiscreteInterpolant( this.times, this.values, this.getValueSize(), result );
 
 	},
 
 	InterpolantFactoryMethodLinear: function ( result ) {
 
-		return new LinearInterpolant(
-				this.times, this.values, this.getValueSize(), result );
+		return new LinearInterpolant( this.times, this.values, this.getValueSize(), result );
 
 	},
 
 	InterpolantFactoryMethodSmooth: function ( result ) {
 
-		return new CubicInterpolant(
-				this.times, this.values, this.getValueSize(), result );
+		return new CubicInterpolant( this.times, this.values, this.getValueSize(), result );
 
 	},
 
@@ -175,8 +172,7 @@ KeyframeTrackPrototype = {
 
 			var stride = this.getValueSize();
 			this.times = AnimationUtils.arraySlice( times, from, to );
-			this.values = AnimationUtils.
-					arraySlice( this.values, from * stride, to * stride );
+			this.values = AnimationUtils.arraySlice( this.values, from * stride, to * stride );
 
 		}
 

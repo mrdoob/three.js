@@ -10,7 +10,7 @@
  */
 
 
-var SetMaterialCommand = function ( object, newMaterial , slot) {
+var SetMaterialCommand = function ( object, newMaterial, materialSlot ) {
 
 	Command.call( this );
 
@@ -18,31 +18,25 @@ var SetMaterialCommand = function ( object, newMaterial , slot) {
 	this.name = 'New Material';
 
 	this.object = object;
+	this.materialSlot = materialSlot;
 
-	this.slot = slot;
-
-	var material = this.editor.getObjectMaterial( this.object, this.slot );
-
-	this.oldMaterial = material;
-
+	this.oldMaterial = this.editor.getObjectMaterial( object, materialSlot );
 	this.newMaterial = newMaterial;
-	
+
 };
 
 SetMaterialCommand.prototype = {
 
 	execute: function () {
-		
-		this.editor.setObjectMaterial( this.object, this.slot, this.newMaterial );
 
+		this.editor.setObjectMaterial( this.object, this.materialSlot, this.newMaterial );
 		this.editor.signals.materialChanged.dispatch( this.newMaterial );
 
 	},
 
 	undo: function () {
-		
-		this.editor.setObjectMaterial( this.object, this.slot, this.oldMaterial );
 
+		this.editor.setObjectMaterial( this.object, this.materialSlot, this.oldMaterial );
 		this.editor.signals.materialChanged.dispatch( this.oldMaterial );
 
 	},
@@ -66,7 +60,6 @@ SetMaterialCommand.prototype = {
 		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.oldMaterial = parseMaterial( json.oldMaterial );
 		this.newMaterial = parseMaterial( json.newMaterial );
-
 
 		function parseMaterial ( json ) {
 

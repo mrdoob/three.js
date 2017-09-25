@@ -246,14 +246,10 @@ NORMAL = 'normal'
 ITEM_SIZE = 'itemSize'
 ARRAY = 'array'
 
-FLOAT_32 = 'Float32Array'
-
 VISIBLE = 'visible'
 CAST_SHADOW = 'castShadow'
 RECEIVE_SHADOW = 'receiveShadow'
 QUAD = 'quad'
-
-USER_DATA = 'userData'
 
 MASK = {
     QUAD: 0,
@@ -357,7 +353,6 @@ THREE_PHONG = 'MeshPhongMaterial'
 
 INTENSITY = 'intensity'
 DISTANCE = 'distance'
-ASPECT = 'aspect'
 ANGLE = 'angle'
 DECAY = 'decayExponent'
 
@@ -392,3 +387,10 @@ DBG_COLORS = (0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee,
 DOUBLE_SIDED = 'doubleSided'
 
 EXPORT_SETTINGS_KEY = 'threeExportSettings'
+
+# flips vectors
+
+XZ_Y = "XZ_Y"
+X_ZY = "X_ZY"
+XYZ = "XYZ"
+_XY_Z = "_XY_Z"

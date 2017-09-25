@@ -1,6 +1,6 @@
-import { Material } from './Material';
-import { MultiplyOperation } from '../constants';
-import { Color } from '../math/Color';
+import { Material } from './Material.js';
+import { MultiplyOperation } from '../constants.js';
+import { Color } from '../math/Color.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

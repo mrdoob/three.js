@@ -1,4 +1,4 @@
-import { Vector3 } from './Vector3';
+import { Vector3 } from './Vector3.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -80,8 +80,8 @@ Object.assign( Matrix3.prototype, {
 
 		this.set(
 
-			me[ 0 ], me[ 4 ], me[  8 ],
-			me[ 1 ], me[ 5 ], me[  9 ],
+			me[ 0 ], me[ 4 ], me[ 8 ],
+			me[ 1 ], me[ 5 ], me[ 9 ],
 			me[ 2 ], me[ 6 ], me[ 10 ]
 
 		);
@@ -268,6 +268,63 @@ Object.assign( Matrix3.prototype, {
 		r[ 6 ] = m[ 2 ];
 		r[ 7 ] = m[ 5 ];
 		r[ 8 ] = m[ 8 ];
+
+		return this;
+
+	},
+
+	setUvTransform: function ( tx, ty, sx, sy, rotation, cx, cy ) {
+
+		var c = Math.cos( rotation );
+		var s = Math.sin( rotation );
+
+		this.set(
+			sx * c, sx * s, - sx * ( c * cx + s * cy ) + cx + tx,
+			- sy * s, sy * c, - sy * ( - s * cx + c * cy ) + cy + ty,
+			0, 0, 1
+		);
+
+	},
+
+	scale: function ( sx, sy ) {
+
+		var te = this.elements;
+
+		te[ 0 ] *= sx; te[ 3 ] *= sx; te[ 6 ] *= sx;
+		te[ 1 ] *= sy; te[ 4 ] *= sy; te[ 7 ] *= sy;
+
+		return this;
+
+	},
+
+	rotate: function ( theta ) {
+
+		var c = Math.cos( theta );
+		var s = Math.sin( theta );
+
+		var te = this.elements;
+
+		var a11 = te[ 0 ], a12 = te[ 3 ], a13 = te[ 6 ];
+		var a21 = te[ 1 ], a22 = te[ 4 ], a23 = te[ 7 ];
+
+		te[ 0 ] = c * a11 + s * a21;
+		te[ 3 ] = c * a12 + s * a22;
+		te[ 6 ] = c * a13 + s * a23;
+
+		te[ 1 ] = - s * a11 + c * a21;
+		te[ 4 ] = - s * a12 + c * a22;
+		te[ 7 ] = - s * a13 + c * a23;
+
+		return this;
+
+	},
+
+	translate: function ( tx, ty ) {
+
+		var te = this.elements;
+
+		te[ 0 ] += tx * te[ 2 ]; te[ 3 ] += tx * te[ 5 ]; te[ 6 ] += tx * te[ 8 ];
+		te[ 1 ] += ty * te[ 2 ]; te[ 4 ] += ty * te[ 5 ]; te[ 7 ] += ty * te[ 8 ];
 
 		return this;
 

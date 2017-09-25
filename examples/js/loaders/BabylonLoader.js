@@ -177,6 +177,7 @@ THREE.BabylonLoader.prototype = {
 					case 3:
 						light = new THREE.HemisphereLight();
 						break;
+
 				}
 
 				light.name = data.name;

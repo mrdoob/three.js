@@ -401,7 +401,7 @@
 			for ( var nodeID in materialNodes ) {
 
 				var material = parseMaterial( materialNodes[ nodeID ], textureMap, connections );
-				materialMap.set( parseInt( nodeID ), material );
+				if ( material !== null ) materialMap.set( parseInt( nodeID ), material );
 
 			}
 
@@ -431,6 +431,10 @@
 
 		}
 
+		// Seems like FBX can include unused materials which don't have any connections.
+		// Ignores them so far.
+		if ( ! connections.has( FBX_ID ) ) return null;
+
 		var children = connections.get( FBX_ID ).children;
 
 		var parameters = parseParameters( materialNode.properties, textureMap, children );
@@ -446,8 +450,8 @@
 				material = new THREE.MeshLambertMaterial();
 				break;
 			default:
-				console.warn( 'THREE.FBXLoader: No implementation given for material type %s in FBXLoader.js. Defaulting to basic material.', type );
-				material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+				console.warn( 'THREE.FBXLoader: No implementation given for material type %s in FBXLoader.js. Defaulting to standard material.', type );
+				material = new THREE.MeshStandardMaterial( { color: 0x3300ff } );
 				break;
 
 		}
@@ -1373,6 +1377,236 @@
 
 				switch ( node.attrType ) {
 
+					case 'Camera':
+						/* ***********
+						* Supported camera types:
+						* PerspectiveCamera
+						* OrthographicCamera
+						************** */
+						var cameraAttribute;
+
+						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+							var childID = conns.children[ childrenIndex ].ID;
+
+							var attr = FBXTree.Objects.subNodes.NodeAttribute[ childID ];
+
+							if ( attr !== undefined && attr.properties !== undefined ) {
+
+								cameraAttribute = attr.properties;
+
+							}
+
+						}
+
+						if ( cameraAttribute === undefined ) {
+
+							model = new THREE.Object3D();
+
+						} else {
+
+							var type = 0;
+							if ( cameraAttribute.CameraProjectionType !== undefined && ( cameraAttribute.CameraProjectionType.value === '1' || cameraAttribute.CameraProjectionType.value === 1 ) ) {
+
+								type = 1;
+
+							}
+
+							var nearClippingPlane = 1;
+							if ( cameraAttribute.NearPlane !== undefined ) {
+
+								nearClippingPlane = cameraAttribute.NearPlane.value / 1000;
+
+							}
+
+							var farClippingPlane = 1000;
+							if ( cameraAttribute.FarPlane !== undefined ) {
+
+								farClippingPlane = cameraAttribute.FarPlane.value / 1000;
+
+							}
+
+
+							var width = window.innerWidth;
+							var height = window.innerHeight;
+
+							if ( cameraAttribute.AspectWidth !== undefined && cameraAttribute.AspectHeight !== undefined ) {
+
+								width = parseFloat( cameraAttribute.AspectWidth.value );
+								height = parseFloat( cameraAttribute.AspectHeight.value );
+
+							}
+
+							var aspect = width / height;
+
+							var fov = 45;
+							if ( cameraAttribute.FieldOfView !== undefined ) {
+
+								fov = parseFloat( cameraAttribute.FieldOfView.value );
+
+							}
+
+							switch ( type ) {
+
+								case '0': // Perspective
+								case 0:
+									model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
+									break;
+
+								case '1': // Orthographic
+								case 1:
+									model = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
+									break;
+
+								default:
+									console.warn( 'THREE.FBXLoader: Unknown camera type ' + type + '.' );
+									model = new THREE.Object3D();
+									break;
+
+							}
+
+						}
+
+						break;
+
+					case 'Light':
+						/* ***********
+						* Supported light types:
+						* DirectionalLight
+						* PointLight
+						* SpotLight
+						************** */
+
+						var lightAttribute;
+
+						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+							var childID = conns.children[ childrenIndex ].ID;
+
+							var attr = FBXTree.Objects.subNodes.NodeAttribute[ childID ];
+
+							if ( attr !== undefined && attr.properties !== undefined ) {
+
+								lightAttribute = attr.properties;
+
+							}
+
+						}
+
+						if ( lightAttribute === undefined ) {
+
+							model = new THREE.Object3D();
+
+						} else {
+
+							var type;
+
+							// LightType can be undefined for Point lights
+							if ( lightAttribute.LightType === undefined ) {
+
+								type = 0;
+
+							} else {
+
+								type = lightAttribute.LightType.value;
+
+							}
+
+							var color = 0xffffff;
+
+							if ( lightAttribute.Color !== undefined ) {
+
+								var temp = lightAttribute.Color.value.split( ',' );
+
+								var r = parseFloat( temp[ 0 ] );
+								var g = parseFloat( temp[ 1 ] );
+								var b = parseFloat( temp[ 1 ] );
+
+								color = new THREE.Color( r, g, b );
+
+							}
+
+							var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
+
+							// light disabled
+							if ( lightAttribute.CastLightOnObject !== undefined && ( lightAttribute.CastLightOnObject.value === '0' || lightAttribute.CastLightOnObject.value === 0 ) ) {
+
+								intensity = 0;
+
+							}
+
+							var distance = 0;
+							if ( lightAttribute.FarAttenuationEnd !== undefined ) {
+
+								if ( lightAttribute.EnableFarAttenuation !== undefined && ( lightAttribute.EnableFarAttenuation.value === '0' || lightAttribute.EnableFarAttenuation.value === 0 ) ) {
+
+									distance = 0;
+
+								} else {
+
+									distance = lightAttribute.FarAttenuationEnd.value / 1000;
+
+								}
+
+							}
+
+							// TODO
+							// could be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
+							var decay = 1;
+
+							switch ( type ) {
+
+								case '0': // Point
+								case 0:
+									model = new THREE.PointLight( color, intensity, distance, decay );
+									break;
+
+								case '1': // Directional
+								case 1:
+									model = new THREE.DirectionalLight( color, intensity );
+									break;
+
+								case '2': // Spot
+								case 2:
+									var angle = Math.PI / 3;
+
+									if ( lightAttribute.InnerAngle !== undefined ) {
+
+										angle = THREE.Math.degToRad( lightAttribute.InnerAngle.value );
+
+									}
+
+									var penumbra = 0;
+									if ( lightAttribute.OuterAngle !== undefined ) {
+
+										// TODO: this is not correct - FBX calculates outer and inner angle in degrees
+										// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
+										// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
+										penumbra = THREE.Math.degToRad( lightAttribute.OuterAngle.value );
+										penumbra = Math.max( penumbra, 1 );
+
+									}
+
+									model = new THREE.SpotLight( color, intensity, distance, angle, penumbra, decay );
+									break;
+
+								default:
+									console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType.value + ', defaulting to a THREE.PointLight.' );
+									model = new THREE.PointLight( color, intensity );
+									break;
+
+							}
+
+							if ( lightAttribute.CastShadows !== undefined && ( lightAttribute.CastShadows.value === '1' || lightAttribute.CastShadows.value === 1 ) ) {
+
+								model.castShadow = true;
+
+							}
+
+						}
+
+						break;
+
 					case 'Mesh':
 						/**
 						 * @type {?THREE.BufferGeometry}
@@ -1416,13 +1650,13 @@
 
 						} else {
 
-							material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+							material = new THREE.MeshStandardMaterial( { color: 0x3300ff } );
 							materials.push( material );
 
 						}
 						if ( 'color' in geometry.attributes ) {
 
-							for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++materialIndex ) {
+							for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++ materialIndex ) {
 
 								materials[ materialIndex ].vertexColors = THREE.VertexColors;
 
@@ -1514,6 +1748,47 @@
 				var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
 				preRotations.multiply( currentRotation );
 				model.rotation.setFromQuaternion( preRotations, 'ZYX' );
+
+			}
+
+			if ( 'LookAtProperty' in node.properties ) {
+
+				var conns = connections.get( model.FBX_ID );
+
+				for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+					var child = conns.children[ childrenIndex ];
+
+					if ( child.relationship === 'LookAtProperty' || child.relationship === ' "LookAtProperty' ) {
+
+						var lookAtTarget = FBXTree.Objects.subNodes.Model[ child.ID ];
+
+						if ( 'Lcl_Translation' in lookAtTarget.properties ) {
+
+							var pos = lookAtTarget.properties.Lcl_Translation.value.split( ',' ).map( function ( val ) {
+
+								return parseFloat( val );
+
+							} );
+
+							// DirectionalLight, SpotLight
+							if ( model.target !== undefined ) {
+
+								model.target.position.set( pos[ 0 ], pos[ 1 ], pos[ 2 ] );
+								sceneGraph.add( model.target );
+
+
+							} else { // Cameras and other Object3Ds
+
+								model.lookAt( new THREE.Vector3( pos[ 0 ], pos[ 1 ], pos[ 2 ] ) );
+
+							}
+
+						}
+
+					}
+
+				}
 
 			}
 
@@ -1646,6 +1921,20 @@
 		var animations = parseAnimations( FBXTree, connections, sceneGraph );
 
 		addAnimations( sceneGraph, animations );
+
+
+		// Parse ambient color - if it's not set to black (default), create an ambient light
+		var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
+		var r = ambientColor[ 0 ];
+		var g = ambientColor[ 1 ];
+		var b = ambientColor[ 2 ];
+
+		if ( r !== 0 || g !== 0 || b !== 0 ) {
+
+			var color = new THREE.Color( r, g, b );
+			sceneGraph.add( new THREE.AmbientLight( color, 1 ) );
+
+		}
 
 		return sceneGraph;
 
@@ -3655,7 +3944,9 @@
 					var nodeAttrs = match[ 2 ].split( ',' );
 
 					for ( var i = 0, l = nodeAttrs.length; i < l; i ++ ) {
+
 						nodeAttrs[ i ] = nodeAttrs[ i ].trim().replace( /^"/, '' ).replace( /"$/, '' );
+
 					}
 
 					this.parseNodeBegin( l, nodeName, nodeAttrs || null );
@@ -3921,7 +4212,9 @@
 			var props = propValue.split( '",' );
 
 			for ( var i = 0, l = props.length; i < l; i ++ ) {
+
 				props[ i ] = props[ i ].trim().replace( /^\"/, '' ).replace( /\s/, '_' );
+
 			}
 
 			var innerPropName = props[ 0 ];
@@ -4023,7 +4316,7 @@
 		 * @param {BinaryReader} reader
 		 * @returns {boolean}
 		 */
-		endOfContent: function( reader ) {
+		endOfContent: function ( reader ) {
 
 			// footer size: 160bytes + 16-byte alignment padding
 			// - 16bytes: magic
@@ -4035,7 +4328,7 @@
 			// - 16bytes: magic
 			if ( reader.size() % 16 === 0 ) {
 
-				return ( ( reader.getOffset() + 160 + 16 ) & ~0xf ) >= reader.size();
+				return ( ( reader.getOffset() + 160 + 16 ) & ~ 0xf ) >= reader.size();
 
 			} else {
 
@@ -4351,7 +4644,7 @@
 
 					}
 
-					var inflate = new Zlib.Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
+					var inflate = new Zlib.Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
 					var reader2 = new BinaryReader( inflate.decompress().buffer );
 
 					switch ( type ) {
@@ -4598,8 +4891,8 @@
 			// calculate negative value
 			if ( high & 0x80000000 ) {
 
-				high = ~high & 0xFFFFFFFF;
-				low = ~low & 0xFFFFFFFF;
+				high = ~ high & 0xFFFFFFFF;
+				low = ~ low & 0xFFFFFFFF;
 
 				if ( low === 0xFFFFFFFF ) high = ( high + 1 ) & 0xFFFFFFFF;
 
@@ -4727,13 +5020,16 @@
 			while ( size > 0 ) {
 
 				var value = this.getUint8();
-				size--;
+				size --;
 
 				if ( value === 0 ) break;
 
 				s += String.fromCharCode( value );
 
 			}
+
+			// Manage UTF8 encoding
+			s = decodeURIComponent( escape( s ) );
 
 			this.skip( size );
 
@@ -5088,7 +5384,7 @@
 
 		}
 
-		return -1;
+		return - 1;
 
 	}
 

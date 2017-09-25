@@ -1,11 +1,11 @@
-import { Sphere } from '../math/Sphere';
-import { Ray } from '../math/Ray';
-import { Matrix4 } from '../math/Matrix4';
-import { Object3D } from '../core/Object3D';
-import { Vector3 } from '../math/Vector3';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { LineSegments } from './LineSegments';
+import { Sphere } from '../math/Sphere.js';
+import { Ray } from '../math/Ray.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Object3D } from '../core/Object3D.js';
+import { Vector3 } from '../math/Vector3.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { LineSegments } from './LineSegments.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -67,7 +67,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			var vEnd = new Vector3();
 			var interSegment = new Vector3();
 			var interRay = new Vector3();
-			var step = (this && this.isLineSegments) ? 2 : 1;
+			var step = ( this && this.isLineSegments ) ? 2 : 1;
 
 			if ( geometry.isBufferGeometry ) {
 

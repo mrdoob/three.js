@@ -1,4 +1,4 @@
-import { _Math } from './Math';
+import { _Math } from './Math.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -49,7 +49,7 @@ Object.assign( Spherical.prototype, {
 	},
 
 	// restrict phi to be betwee EPS and PI-EPS
-	makeSafe: function() {
+	makeSafe: function () {
 
 		var EPS = 0.000001;
 		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
@@ -58,7 +58,7 @@ Object.assign( Spherical.prototype, {
 
 	},
 
-	setFromVector3: function( vec3 ) {
+	setFromVector3: function ( vec3 ) {
 
 		this.radius = vec3.length();
 
