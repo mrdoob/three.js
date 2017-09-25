@@ -851,7 +851,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 						if ( ele[ '#text' ] ) {
 
-							var content = ele[ '#text' ].replace( /\n/g, ' ' ).split( ' ' ).filter( function ( el ) {
+							var content = ele[ '#text' ].split( /s+/ ).filter( function ( el ) {
 
 								if ( el !== '' ) return el;
 
@@ -871,6 +871,10 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 					if ( ele.attributes.type == 'Float32' ) {
 
 						var txt = new Float32Array( content );
+
+          } else if ( ele.attributes.type == 'Int32' ) {
+
+            var txt = new Int32Array( content );
 
 					} else if ( ele.attributes.type === 'Int64' ) {
 
@@ -959,7 +963,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					// If it has a DataArray in it
 
-					if ( section.DataArray ) {
+					if ( section && section.DataArray ) {
 
 						// Depending on the number of DataArrays
 
