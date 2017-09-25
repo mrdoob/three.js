@@ -804,7 +804,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 					} else {
 
 						if ( ele[ '#text' ] ) {
-							var content = ele[ '#text' ].replace( /\n/g, ' ' ).split( ' ' ).filter( function ( el, idx, arr ) {
+							var content = ele[ '#text' ].split(/\s+/).filter( function ( el, idx, arr ) {
 								if ( el !== '' ) return el;
 							} );
 						} else {
@@ -819,6 +819,10 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 					if ( ele.attributes.type == 'Float32' ) {
 
 						var txt = new Float32Array( content );
+
+          } else if ( ele.attributes.type == 'Int32' ) {
+
+						var txt = new Int32Array( content );
 
 					} else if ( ele.attributes.type === 'Int64' ) {
 						var txt = new Int32Array( content );
@@ -901,7 +905,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					// If it has a DataArray in it
 
-					if ( section.DataArray ) {
+					if ( section && section.DataArray ) {
 
 						// Depending on the number of DataArrays
 
