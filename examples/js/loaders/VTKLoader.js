@@ -851,7 +851,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 						if ( ele[ '#text' ] ) {
 
-							var content = ele[ '#text' ].split( /s+/ ).filter( function ( el ) {
+							var content = ele[ '#text' ].split( /\s+/ ).filter( function ( el ) {
 
 								if ( el !== '' ) return el;
 
@@ -872,9 +872,9 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 						var txt = new Float32Array( content );
 
-          } else if ( ele.attributes.type == 'Int32' ) {
+					} else if ( ele.attributes.type == 'Int32' ) {
 
-            var txt = new Int32Array( content );
+						var txt = new Int32Array( content );
 
 					} else if ( ele.attributes.type === 'Int64' ) {
 
