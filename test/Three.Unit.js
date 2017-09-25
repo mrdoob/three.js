@@ -50,7 +50,7 @@ export { Clock } from '../src/core/Clock.js';
 export { DirectGeometry } from '../src/core/DirectGeometry.js';
 export { EventDispatcher } from '../src/core/EventDispatcher.js';
 export { Face3 } from '../src/core/Face3.js';
-export { GeometryIdCount, Geometry } from '../src/core/Geometry.js';
+export { Geometry } from '../src/core/Geometry.js';
 export { InstancedBufferAttribute } from '../src/core/InstancedBufferAttribute.js';
 export { InstancedBufferGeometry } from '../src/core/InstancedBufferGeometry.js';
 export { InstancedInterleavedBuffer } from '../src/core/InstancedInterleavedBuffer.js';
