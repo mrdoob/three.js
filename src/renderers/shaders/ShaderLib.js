@@ -15,6 +15,7 @@ var ShaderLib = {
 	basic: {
 
 		uniforms: UniformsUtils.merge( [
+			UniformsLib.vr,
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,
@@ -31,6 +32,7 @@ var ShaderLib = {
 	lambert: {
 
 		uniforms: UniformsUtils.merge( [
+			UniformsLib.vr,
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,

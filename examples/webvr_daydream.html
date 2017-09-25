@@ -29,7 +29,7 @@
 		<script src="js/vr/WebVR.js"></script>
 		<script src="webgl-debug.js"></script>
 
-		<script id="vertexShader" type="x-shader/x-vertex">#version 300 es
+		<script id="vertexShader" type="x-shader/x-vertex">
 			#extension GL_OVR_multiview2 : require
 			#define VIEW_ID gl_ViewID_OVR
 			layout(num_views=2) in;
@@ -52,15 +52,15 @@
 			}
 
 		</script>
-
-		<script id="fragmentShader" type="x-shader/x-fragment">#version 300 es
+	<!-- #version 300 es -->
+		<script id="fragmentShader" type="x-shader/x-fragment">
 			precision mediump float;
-			out vec4 out_color;
+			// out vec4 out_color;
 			uniform vec3 color;
 
 			void main()	{
 
-				out_color = vec4( color, 1.0 );
+				gl_FragColor = vec4( color, 1.0 );
 
 			}
 
@@ -144,7 +144,7 @@
 				scene.add( light );
 
 				var geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
-				//var geometry = new THREE.SphereGeometry( 1, 32, 32 );
+				var geometry = new THREE.SphereGeometry( 0.2, 32, 32 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
@@ -162,6 +162,11 @@
 						fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 
 					} );
+					//var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
+					var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
+					//var material = new THREE.MeshStandardMaterial( { color: Math.random() * 0xffffff, roughness: Math.random(), metalness: Math.random() } );
+
+
 					var object = new THREE.Mesh( geometry, material );
 
 					object.position.x = Math.random() * 4 - 2;

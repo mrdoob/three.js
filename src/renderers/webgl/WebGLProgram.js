@@ -375,6 +375,12 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			'uniform mat3 normalMatrix;',
 			'uniform vec3 cameraPosition;',
 
+			'uniform bool isVRPresenting;',
+			'uniform mat4 leftViewMatrix;',
+			'uniform mat4 rightViewMatrix;',
+			'uniform mat4 leftProjectionMatrix;',
+			'uniform mat4 rightProjectionMatrix;',
+
 			'attribute vec3 position;',
 			'attribute vec3 normal;',
 			'attribute vec2 uv;',
@@ -516,8 +522,40 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	var vertexGlsl = prefixVertex + vertexShader;
 	var fragmentGlsl = prefixFragment + fragmentShader;
 
-	// console.log( '*VERTEX*', vertexGlsl );
-	// console.log( '*FRAGMENT*', fragmentGlsl );
+	// or force es3
+	if ( renderer.webgl2 ) {
+
+		//@todo Detect version and skip it
+		var gles3VS = `#define attribute in
+							#define varying out
+							#define texture2D texture
+							#extension GL_OVR_multiview2 : require
+							#define VIEW_ID gl_ViewID_OVR
+							layout(num_views=2) in;
+							#define GL2\n`;
+
+		var gles3PS = `#define varying in
+							out highp vec4 pc_fragColor;
+							#define gl_FragColor pc_fragColor
+							#define texture2D texture
+							#define textureCube texture
+							#define texture2DProj textureProj
+							#define texture2DLodEXT textureLod
+							#define texture2DProjLodEXT textureProjLod
+							#define textureCubeLodEXT textureLod
+							#define texture2DGradEXT textureGrad
+							#define texture2DProjGradEXT textureProjGrad
+							#define textureCubeGradEXT textureGrad
+
+							#define GL2\n`;
+
+		vertexGlsl = '#version 300 es\n' + gles3VS + vertexGlsl;
+		fragmentGlsl = '#version 300 es\n' + gles3PS + fragmentGlsl;
+
+	}
+
+//	console.log( '*VERTEX*', vertexGlsl );
+//	console.log( '*FRAGMENT*', fragmentGlsl );
 
 	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );

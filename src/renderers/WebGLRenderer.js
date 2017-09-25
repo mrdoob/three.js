@@ -266,6 +266,8 @@ function WebGLRenderer( parameters ) {
 		}
 		// _gl = WebGLDebugUtils.makeDebugContext(_gl, undefined, logGLCall);
 
+		this.webgl2 = true;
+
 		// Some experimental-webgl implementations do not have getShaderPrecisionFormat
 
 		if ( _gl.getShaderPrecisionFormat === undefined ) {
@@ -1439,11 +1441,11 @@ function WebGLRenderer( parameters ) {
 	function renderNonVRObjects( renderList, scene, camera, overrideMaterial ) {
 
 		if ( camera.isArrayCamera ) {
-			// console.log('>>>>>>>>>>>>>>>>>> Array Camera');
+			console.log('>>>>>>>>>>>>>>>>>> Array Camera');
 			renderObjectsArrayCamera( renderList, scene, camera, overrideMaterial );
 
 		} else {
-			// console.log('>>>>>>>>>>>>>>>>>> Non-array camera');
+			console.log('>>>>>>>>>>>>>>>>>> Non-array camera');
 
 			for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
@@ -1472,18 +1474,18 @@ function WebGLRenderer( parameters ) {
 
 			// Has multiview support
 			if ( views[ 0 ].getAttributes().multiview ) {
-				// console.log('>>>>>>>>>>>>>>>>>> Views & Multiview');
+				console.log('>>>>>>>>>>>>>>>>>> Views & Multiview');
 
 				// Views & Multiview
 				renderObjectsMultiview( renderList, scene, camera, overrideMaterial );
 
 			} else {
 				// Views
-				// console.log('>>>>>>>>>>>>>>>>>> Views & !Multiview');
+				console.log('>>>>>>>>>>>>>>>>>> Views & !Multiview');
 
 			}
 		} else {
-			// console.log('>>>>>>>>>>>>>>>>>> Array camera (no views)');
+			console.log('>>>>>>>>>>>>>>>>>> Array camera (no views)');
 
 			renderObjectsArrayCamera( renderList, scene, camera, overrideMaterial );
 
@@ -1627,8 +1629,10 @@ function WebGLRenderer( parameters ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
 
+				// @todo Check if VR to include UniformsLib.vr
 				materialProperties.shader = {
 					name: material.type,
+					//uniforms: UniformsUtils.clone( UniformsUtils.merge( [ UniformsLib.vr, shader.uniforms ] ) ),
 					uniforms: UniformsUtils.clone( shader.uniforms ),
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
@@ -1735,323 +1739,6 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function setProgram_( camera, fog, material, object ) {
-
-		_usedTextureUnits = 0;
-
-		var materialProperties = properties.get( material );
-
-		if ( _clippingEnabled ) {
-
-			if ( _localClippingEnabled || camera !== _currentCamera ) {
-
-				var useCache =
-					camera === _currentCamera &&
-					material.id === _currentMaterialId;
-
-				// we might want to call this function with some ClippingGroup
-				// object instead of the material, once it becomes feasible
-				// (#8465, #8379)
-				_clipping.setState(
-					material.clippingPlanes, material.clipIntersection, material.clipShadows,
-					camera, materialProperties, useCache );
-
-			}
-
-		}
-
-		if ( material.needsUpdate === false ) {
-
-			if ( materialProperties.program === undefined ) {
-
-				material.needsUpdate = true;
-
-			} else if ( material.fog && materialProperties.fog !== fog ) {
-
-				material.needsUpdate = true;
-
-			} else if ( material.lights && materialProperties.lightsHash !== lights.state.hash ) {
-
-				material.needsUpdate = true;
-
-			} else if ( materialProperties.numClippingPlanes !== undefined &&
-				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
-				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
-
-				material.needsUpdate = true;
-
-			}
-
-		}
-
-		if ( material.needsUpdate ) {
-
-			initMaterial( material, fog, object );
-			material.needsUpdate = false;
-
-		}
-
-		var refreshProgram = false;
-		var refreshMaterial = false;
-		var refreshLights = false;
-
-		var program = materialProperties.program,
-			p_uniforms = program.getUniforms(),
-			m_uniforms = materialProperties.shader.uniforms;
-
-		if ( state.useProgram( program.program ) ) {
-
-			refreshProgram = true;
-			refreshMaterial = true;
-			refreshLights = true;
-
-		}
-
-		if ( material.id !== _currentMaterialId ) {
-
-			_currentMaterialId = material.id;
-
-			refreshMaterial = true;
-
-		}
-
-		if ( refreshProgram || camera !== _currentCamera ) {
-
-			p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
-
-			if ( capabilities.logarithmicDepthBuffer ) {
-
-				p_uniforms.setValue( _gl, 'logDepthBufFC',
-					2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
-
-			}
-
-			// Avoid unneeded uniform updates per ArrayCamera's sub-camera
-
-			if ( _currentCamera !== ( _currentArrayCamera || camera ) ) {
-
-				_currentCamera = ( _currentArrayCamera || camera );
-
-				// lighting uniforms depend on the camera so enforce an update
-				// now, in case this material supports lights - or later, when
-				// the next material that does gets activated:
-
-				refreshMaterial = true;		// set to true on material change
-				refreshLights = true;		// remains set until update done
-
-			}
-
-			// load material specific uniforms
-			// (shader material also gets them for the sake of genericity)
-
-			if ( material.isShaderMaterial ||
-				material.isMeshPhongMaterial ||
-				material.isMeshStandardMaterial ||
-				material.envMap ) {
-
-				var uCamPos = p_uniforms.map.cameraPosition;
-
-				if ( uCamPos !== undefined ) {
-
-					uCamPos.setValue( _gl,
-						_vector3.setFromMatrixPosition( camera.matrixWorld ) );
-
-				}
-
-			}
-
-			if ( material.isMeshPhongMaterial ||
-				material.isMeshLambertMaterial ||
-				material.isMeshBasicMaterial ||
-				material.isMeshStandardMaterial ||
-				material.isShaderMaterial ||
-				material.skinning ) {
-
-				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
-
-			}
-
-		}
-
-		// skinning uniforms must be set even if material didn't change
-		// auto-setting of texture unit for bone texture must go before other textures
-		// not sure why, but otherwise weird things happen
-
-		if ( material.skinning ) {
-
-			p_uniforms.setOptional( _gl, object, 'bindMatrix' );
-			p_uniforms.setOptional( _gl, object, 'bindMatrixInverse' );
-
-			var skeleton = object.skeleton;
-
-			if ( skeleton ) {
-
-				var bones = skeleton.bones;
-
-				if ( capabilities.floatVertexTextures ) {
-
-					if ( skeleton.boneTexture === undefined ) {
-
-						// layout (1 matrix = 4 pixels)
-						//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
-						//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
-						//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
-						//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
-						//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
-
-
-						var size = Math.sqrt( bones.length * 4 ); // 4 pixels needed for 1 matrix
-						size = _Math.ceilPowerOfTwo( size );
-						size = Math.max( size, 4 );
-
-						var boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
-						boneMatrices.set( skeleton.boneMatrices ); // copy current values
-
-						var boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
-
-						skeleton.boneMatrices = boneMatrices;
-						skeleton.boneTexture = boneTexture;
-						skeleton.boneTextureSize = size;
-
-					}
-
-					p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture );
-					p_uniforms.setValue( _gl, 'boneTextureSize', skeleton.boneTextureSize );
-
-				} else {
-
-					p_uniforms.setOptional( _gl, skeleton, 'boneMatrices' );
-
-				}
-
-			}
-
-		}
-
-		if ( refreshMaterial ) {
-
-			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
-			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
-
-			if ( material.lights ) {
-
-				// the current material requires lighting info
-
-				// note: all lighting uniforms are always set correctly
-				// they simply reference the renderer's state for their
-				// values
-				//
-				// use the current material's .needsUpdate flags to set
-				// the GL state when required
-
-				markUniformsLightsNeedsUpdate( m_uniforms, refreshLights );
-
-			}
-
-			// refresh uniforms common to several materials
-
-			if ( fog && material.fog ) {
-
-				refreshUniformsFog( m_uniforms, fog );
-
-			}
-
-			if ( material.isMeshBasicMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-
-			} else if ( material.isMeshLambertMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-				refreshUniformsLambert( m_uniforms, material );
-
-			} else if ( material.isMeshPhongMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-
-				if ( material.isMeshToonMaterial ) {
-
-					refreshUniformsToon( m_uniforms, material );
-
-				} else {
-
-					refreshUniformsPhong( m_uniforms, material );
-
-				}
-
-			} else if ( material.isMeshStandardMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-
-				if ( material.isMeshPhysicalMaterial ) {
-
-					refreshUniformsPhysical( m_uniforms, material );
-
-				} else {
-
-					refreshUniformsStandard( m_uniforms, material );
-
-				}
-
-			} else if ( material.isMeshDepthMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-				refreshUniformsDepth( m_uniforms, material );
-
-			} else if ( material.isMeshDistanceMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-				refreshUniformsDistance( m_uniforms, material );
-
-			} else if ( material.isMeshNormalMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-				refreshUniformsNormal( m_uniforms, material );
-
-			} else if ( material.isLineBasicMaterial ) {
-
-				refreshUniformsLine( m_uniforms, material );
-
-				if ( material.isLineDashedMaterial ) {
-
-					refreshUniformsDash( m_uniforms, material );
-
-				}
-
-			} else if ( material.isPointsMaterial ) {
-
-				refreshUniformsPoints( m_uniforms, material );
-
-			} else if ( material.isShadowMaterial ) {
-
-				m_uniforms.color.value = material.color;
-				m_uniforms.opacity.value = material.opacity;
-
-			}
-
-			// RectAreaLight Texture
-			// TODO (mrdoob): Find a nicer implementation
-
-			if ( m_uniforms.ltcMat !== undefined ) m_uniforms.ltcMat.value = UniformsLib.LTC_MAT_TEXTURE;
-			if ( m_uniforms.ltcMag !== undefined ) m_uniforms.ltcMag.value = UniformsLib.LTC_MAG_TEXTURE;
-
-			WebGLUniforms.upload(
-				_gl, materialProperties.uniformsList, m_uniforms, _this );
-
-		}
-
-
-		// common matrices
-
-		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
-		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
-		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
-
-		return program;
-
-	}
-
-
 	function setProgram( camera, fog, material, object ) {
 
 		var multiviewSupport = vr.hasMultiviewSupport();
@@ -2135,12 +1822,16 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		var device = vr.getDevice();
+		p_uniforms.setValue( _gl, 'isVRPresenting', device && device.isPresenting );
+
 		if ( refreshProgram || camera !== _currentCamera ) {
 
 			if (multiviewSupport) {
 
 				p_uniforms.setValue( _gl, 'leftProjectionMatrix', camera.cameras[ 0 ].projectionMatrix );
 				p_uniforms.setValue( _gl, 'rightProjectionMatrix', camera.cameras[ 1 ].projectionMatrix );
+				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
 			} else {
 
@@ -2201,6 +1892,7 @@ function WebGLRenderer( parameters ) {
 
 					p_uniforms.setValue( _gl, 'leftViewMatrix', camera.cameras[ 0 ].matrixWorldInverse );
 					p_uniforms.setValue( _gl, 'rightViewMatrix', camera.cameras[ 1 ].matrixWorldInverse );
+					p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
 				} else {
 
@@ -2948,9 +2640,6 @@ function WebGLRenderer( parameters ) {
 			_currentFramebuffer = framebuffer;
 
 		}
-
-		//!!!!!! check if the fbo being used
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 		state.viewport( _currentViewport );
 		state.scissor( _currentScissor );

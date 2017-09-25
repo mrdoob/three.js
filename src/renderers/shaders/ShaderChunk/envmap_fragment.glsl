@@ -5,7 +5,7 @@
 		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );
 
 		// Transforming Normal Vectors with the Inverse Transformation
-		vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
+		vec3 worldNormal = inverseTransformDirection( normal, viewMatrixEye );
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
@@ -43,7 +43,7 @@
 
 		reflectVec = normalize( reflectVec );
 
-		vec3 reflectView = normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) );
+		vec3 reflectView = normalize( ( viewMatrixEye * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) );
 
 		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
 

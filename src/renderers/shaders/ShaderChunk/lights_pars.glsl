@@ -174,7 +174,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	vec3 getLightProbeIndirectIrradiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
 
-		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
+		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrixEye );
 
 		#ifdef ENVMAP_TYPE_CUBE
 
@@ -237,7 +237,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		#endif
 
-		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );
+		reflectVec = inverseTransformDirection( reflectVec, viewMatrixEye );
 
 		float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );
 
@@ -282,7 +282,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		#elif defined( ENVMAP_TYPE_SPHERE )
 
-			vec3 reflectView = normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0,0.0,1.0 ) );
+			vec3 reflectView = normalize( ( viewMatrixEye * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0,0.0,1.0 ) );
 
 			#ifdef TEXTURE_LOD_EXT
 

@@ -16,7 +16,7 @@ void main() {
 	vLineDistance = scale * lineDistance;
 
 	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-	gl_Position = projectionMatrix * mvPosition;
+	gl_Position = projectionMatrixEye * mvPosition;
 
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>
