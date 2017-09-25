@@ -11,7 +11,12 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading an <em>.obj</em> resource.</div>
+		<div class="desc">A loader for loading a <em>.obj</em> resource. <br />
+		The <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ file format</a> is a simple data-format 
+		that represents 3D geometry in a human redeable format as, the position of each vertex, the UV position of 
+		each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of 
+		vertices, and texture vertices.
+		</div>
 
 		<h2>Examples</h2>
 
@@ -67,15 +72,15 @@
 
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError], [page:Function onMeshAlter], [page:boolean useAsync] )</h3>
 		<div>
-			[page:String url] - URL of the file to load<br>
-			[page:Function onLoad] - Called after loading was successfully completed<br>
-			[page:Function onProgress] - Called to report progress of loading. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br>
-			[page:Function onError] - Called after an error occurred during loading.<br>
-			[page:Function onMeshAlter] - Called after a new mesh raw data becomes available to allow alteration<br>
-			[page:boolean useAsync] - If true uses async loading with worker, if false loads data synchronously
+			[page:String url] - A string containing the path/URL of the <em>.obj</em> file.<br>
+			[page:Function onLoad] - (optional) A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br>
+			[page:Function onProgress] - (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br>
+			[page:Function onError] - (optional) A function to be called if an error occurrs during loading. The function receives the error as an argument.<br>
+			[page:Function onMeshAlter] - (optional) A function to be called after a new mesh raw data becomes available for alteration.<br>
+			[page:boolean useAsync] - (optional) If true, uses async loading with worker, if false loads data synchronously.
 		</div>
 		<div>
-			Use this convenient method to load an OBJ file at the given URL. Per default the fileLoader uses an arraybuffer.
+			Use this convenient method to load an OBJ file at the given URL. By default the fileLoader uses an arraybuffer.
 		</div>
 
 
