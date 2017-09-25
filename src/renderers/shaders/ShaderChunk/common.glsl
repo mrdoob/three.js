@@ -73,7 +73,7 @@ vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 poi
 
 }
 
-mat3 transpose_t( const in mat3 v ) {
+mat3 transposeMat3( const in mat3 v ) {
 
 	mat3 tmp;
 	tmp[0] = vec3(v[0].x, v[1].x, v[2].x);
