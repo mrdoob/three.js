@@ -132,13 +132,9 @@
 
 				var loader = new THREE.TextureLoader();
 				var clothTexture = loader.load( 'textures/patterns/circuit_pattern.png' );
-				clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
-				clothTexture.offset.set( 0.1, 0.1 );
-				clothTexture.repeat.set( 0.5, 0.5 );
 				clothTexture.anisotropy = 16;
 
-				var clothMaterial = new THREE.MeshPhongMaterial( {
-					specular: 0x030303,
+				var clothMaterial = new THREE.MeshLambertMaterial( {
 					map: clothTexture,
 					side: THREE.DoubleSide,
 					alphaTest: 0.5
@@ -166,7 +162,7 @@
 				// sphere
 
 				var ballGeo = new THREE.SphereBufferGeometry( ballSize, 32, 16 );
-				var ballMaterial = new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
+				var ballMaterial = new THREE.MeshLambertMaterial();
 
 				sphere = new THREE.Mesh( ballGeo, ballMaterial );
 				sphere.castShadow = true;
@@ -180,7 +176,7 @@
 				groundTexture.repeat.set( 25, 25 );
 				groundTexture.anisotropy = 16;
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: groundTexture } );
+				var groundMaterial = new THREE.MeshLambertMaterial( { map: groundTexture } );
 
 				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
 				mesh.position.y = - 250;
@@ -191,7 +187,7 @@
 				// poles
 
 				var poleGeo = new THREE.BoxBufferGeometry( 5, 375, 5 );
-				var poleMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 100 } );
+				var poleMat = new THREE.MeshLambertMaterial();
 
 				var mesh = new THREE.Mesh( poleGeo, poleMat );
 				mesh.position.x = - 125;
@@ -282,7 +278,7 @@
 				var time = Date.now();
 
 				var windStrength = Math.cos( time / 7000 ) * 20 + 40;
-				
+
 				windForce.set( Math.sin( time / 2000 ), Math.cos( time / 3000 ), Math.sin( time / 1000 ) )
 				windForce.normalize()
 				windForce.multiplyScalar( windStrength );
