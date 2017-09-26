@@ -1923,7 +1923,7 @@
 		addAnimations( sceneGraph, animations );
 
 
-    // Parse ambient color - if it's not set to black (default), create an ambient light
+		// Parse ambient color - if it's not set to black (default), create an ambient light
 		if ( 'GlobalSettings' in FBXTree && 'AmbientColor' in FBXTree.GlobalSettings.properties ) {
 
 			var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
