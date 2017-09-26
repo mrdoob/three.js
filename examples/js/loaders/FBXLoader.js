@@ -729,12 +729,16 @@
 		}
 
 		if ( subNodes.LayerElementUV ) {
+
 			var uvInfo = [];
 			var i = 0;
-			while ( subNodes.LayerElementUV[i] ){
+			while ( subNodes.LayerElementUV[ i ] ){
+
 				uvInfo.push(getUVs( subNodes.LayerElementUV[ i ] ));
 				i++;
+
 			}
+
 		}
 
 		if ( subNodes.LayerElementColor ) {
@@ -875,10 +879,14 @@
 			}
 
 			if ( uvInfo ) {
-				for (var i =0; i < uvInfo.length; i++){
+
+				for ( var i = 0 ; i < uvInfo.length; i++ ) {
+
 					uvTemp = new THREE.Vector2();
-					vertex.uv.push(uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[i] )));
+					vertex.uv.push( uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[i] ) ) );
+
 				}
+
 			}
 
 			if ( colorInfo ) {
@@ -932,14 +940,22 @@
 
 		}
 		if ( bufferInfo.uvBuffers.length > 0 ) {
-			for (var i=0; i < bufferInfo.uvBuffers.length; i++) {
-				var name = 'uv' + (i+1).toString();
+
+			for ( var i = 0; i < bufferInfo.uvBuffers.length; i++ ) {
+
+				var name = 'uv' + ( i + 1 ).toString();
 				if ( i == 0 ) {
+
 					name = 'uv';
+
 				}
+
 				geo.addAttribute( name, new THREE.Float32BufferAttribute( bufferInfo.uvBuffers[i], 2 ) );
+
 			}
+
 		}
+
 		if ( subNodes.LayerElementColor ) {
 
 			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( bufferInfo.colorBuffer, 3 ) );
@@ -3703,8 +3719,10 @@
 
 			this.position.toArray( vertexBuffer, vertexBuffer.length );
 			this.normal.toArray( normalBuffer, normalBuffer.length );
-			for (var i = 0; i < this.uv.length; i++){
-				this.uv[i].toArray(uvBuffers[i], uvBuffers[i].length);
+			for ( var i = 0; i < this.uv.length; i++ ) {
+
+				this.uv[ i ].toArray( uvBuffers[ i ], uvBuffers[ i ].length );
+
 			}
 			this.color.toArray( colorBuffer, colorBuffer.length );
 			this.skinIndices.toArray( skinIndexBuffer, skinIndexBuffer.length );
@@ -3850,8 +3868,10 @@
 
 			var faces = this.faces;
 
-			for (var i = 0; i < faces[0].triangles[0].vertices[0].uv.length; i++) {
+			for ( var i = 0; i < faces[0].triangles[0].vertices[0].uv.length; i++ ) {
+
 				uvBuffers.push([]);
+
 			}
 
 			for ( var i = 0, l = faces.length; i < l; ++ i ) {
