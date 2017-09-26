@@ -1,3 +1,6 @@
+import commonjs from 'rollup-plugin-commonjs';
+import resolve from 'rollup-plugin-node-resolve';
+
 function glsl() {
 
 	return {
@@ -27,7 +30,9 @@ export default {
 	entry: 'src/Three.js',
 	indent: '\t',
 	plugins: [
-		glsl()
+		glsl(),
+		commonjs(),
+		resolve()
 	],
 	// sourceMap: true,
 	targets: [
