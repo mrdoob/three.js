@@ -108,7 +108,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		if ( this.isPlaying === true ) {
 
 			this.source.stop();
-			this.offset += this.context.currentTime - this.startTime;
+			this.offset += ( this.context.currentTime - this.startTime ) * this.playbackRate;
 			this.isPlaying = false;
 
 		}
