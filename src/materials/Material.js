@@ -162,7 +162,7 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
 		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
-		if ( this.emissiveIntensity !== 1) data.emissiveIntensity = this.emissiveIntensity;
+		if ( this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
 
 		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
