@@ -253,26 +253,26 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 			var geometry;
 			var stagger = 'point';
 
-			if ( colors.length == indices.length ) {
+			if ( colors.length === indices.length ) {
 
 				stagger = 'cell';
 
 			}
 
-			if ( stagger == 'point' ) {
+			if ( stagger === 'point' ) {
 
 				// Nodal. Use BufferGeometry
 				geometry = new THREE.BufferGeometry();
 				geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( indices ), 1 ) );
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
 
-				if ( colors.length == positions.length ) {
+				if ( colors.length === positions.length ) {
 
 					geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 
 				}
 
-				if ( normals.length == positions.length ) {
+				if ( normals.length === positions.length ) {
 
 					geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
 
@@ -309,7 +309,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 				}
 
-				if ( colors.length == numTriangles * 3 ) {
+				if ( colors.length === numTriangles * 3 ) {
 
 					for ( var i = 0; i < numTriangles; ++ i ) {
 
@@ -349,7 +349,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 				var index = start;
 				var c = buffer[ index ];
 				var s = [];
-				while ( c != 10 ) {
+				while ( c !== 10 ) {
 
 					s.push( String.fromCharCode( c ) );
 					index ++;
@@ -521,7 +521,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 			geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 			geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
 
-			if ( normals.length == points.length ) {
+			if ( normals.length === points.length ) {
 
 				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
@@ -562,7 +562,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 				// Create the return object
 				var obj = {};
 
-				if ( xml.nodeType == 1 ) { // element
+				if ( xml.nodeType === 1 ) { // element
 
 					// do attributes
 
@@ -583,7 +583,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					}
 
-				} else if ( xml.nodeType == 3 ) { // text
+				} else if ( xml.nodeType === 3 ) { // text
 
 					obj = xml.nodeValue.trim();
 
@@ -696,11 +696,11 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 				var numBytes = 0;
 
-				if ( json.attributes.header_type == 'UInt64' ) {
+				if ( json.attributes.header_type === 'UInt64' ) {
 
 					numBytes = 8;
 
-				}	else if ( json.attributes.header_type == 'UInt32' ) {
+				}	else if ( json.attributes.header_type === 'UInt32' ) {
 
 					numBytes = 4;
 
@@ -708,11 +708,11 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 
 				// Check the format
-				if ( ele.attributes.format == 'binary' && compressed ) {
+				if ( ele.attributes.format === 'binary' && compressed ) {
 
 					var rawData, content, byteData, blocks, cSizeStart, headerSize, padding, dataOffsets, currentOffset;
 
-					if ( ele.attributes.type == 'Float32' ) {
+					if ( ele.attributes.type === 'Float32' ) {
 
 						var txt = new Float32Array( );
 
@@ -779,7 +779,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						content = inflate.decompress();
 						content = content.buffer;
 
-						if ( ele.attributes.type == 'Float32' ) {
+						if ( ele.attributes.type === 'Float32' ) {
 
 							content = new Float32Array( content );
 							txt = Float32Concat( txt, content );
@@ -796,9 +796,9 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 					delete ele[ '#text' ];
 
 					// Get the content and optimize it
-					if ( ele.attributes.type == 'Float32' ) {
+					if ( ele.attributes.type === 'Float32' ) {
 
-						if ( ele.attributes.format == 'binary' ) {
+						if ( ele.attributes.format === 'binary' ) {
 
 							if ( ! compressed ) {
 
@@ -814,7 +814,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					} else if ( ele.attributes.type === 'Int64' ) {
 
-						if ( ele.attributes.format == 'binary' ) {
+						if ( ele.attributes.format === 'binary' ) {
 
 							if ( ! compressed ) {
 
@@ -838,7 +838,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 				} else {
 
-					if ( ele.attributes.format == 'binary' && ! compressed ) {
+					if ( ele.attributes.format === 'binary' && ! compressed ) {
 
 						var content = Base64toByteArray( ele[ '#text' ] );
 
@@ -868,11 +868,11 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 					delete ele[ '#text' ];
 
 					// Get the content and optimize it
-					if ( ele.attributes.type == 'Float32' ) {
+					if ( ele.attributes.type === 'Float32' ) {
 
 						var txt = new Float32Array( content );
 
-					} else if ( ele.attributes.type == 'Int32' ) {
+					} else if ( ele.attributes.type === 'Int32' ) {
 
 						var txt = new Int32Array( content );
 
@@ -880,7 +880,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 						var txt = new Int32Array( content );
 
-						if ( ele.attributes.format == 'binary' ) {
+						if ( ele.attributes.format === 'binary' ) {
 
 							txt = txt.filter( function ( el, idx ) {
 
@@ -892,7 +892,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					}
 
-				} // endif ( ele.attributes.format == 'binary' && compressed )
+				} // endif ( ele.attributes.format === 'binary' && compressed )
 
 				return txt;
 
@@ -1004,7 +1004,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 									for ( var i = 0, len = arr.length; i < len; i ++ ) {
 
-										if ( normalsName == arr[ i ].attributes.Name ) {
+										if ( normalsName === arr[ i ].attributes.Name ) {
 
 											var components = arr[ i ].attributes.NumberOfComponents;
 											normals = new Float32Array( numberOfPoints * components );
@@ -1152,7 +1152,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
 
-				if ( normals.length == points.length ) {
+				if ( normals.length === points.length ) {
 
 					geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
