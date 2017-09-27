@@ -305,7 +305,7 @@ var ShapeUtils = {
 
 					if ( ( inSeg1Pt1.x !== inSeg2Pt1.x ) ||
 						 ( inSeg1Pt1.y !== inSeg2Pt1.y ) )		return [];	// they are distinct  points
-					return [ inSeg1Pt1 ];                 						// they are the same point
+					return [ inSeg1Pt1 ];	// they are the same point
 
 				}
 				// segment#1  is a single point
