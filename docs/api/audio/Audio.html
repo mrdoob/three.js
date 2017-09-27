@@ -35,8 +35,8 @@
 		//Load a sound and set it as the Audio object's buffer
 		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
-			sound.setLoop(true);
-			sound.setVolume(0.5);
+			sound.setLoop( true );
+			sound.setVolume( 0.5 );
 			sound.play();
 		});
 		</code>
@@ -77,7 +77,10 @@
 		<div>Whether the audio is currently playing.</div>
 
 		<h3>[property:Number startTime]</h3>
-		<div>Point at which to start playback. Default is *0*.</div>
+		<div>The time at which the sound should begin to play. Same as the *when* paramter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is *0*.</div>
+
+		<h3>[property:Number offset]</h3>
+		<div>An offset to the time within the audio buffer that playback should begin. Same as the *offset* paramter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is *0*.</div>
 
 		<h3>[property:String source]</h3>
 		<div>An [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode AudioBufferSourceNode] created

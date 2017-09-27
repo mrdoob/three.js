@@ -1924,17 +1924,22 @@
 
 
 		// Parse ambient color - if it's not set to black (default), create an ambient light
-		var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
-		var r = ambientColor[ 0 ];
-		var g = ambientColor[ 1 ];
-		var b = ambientColor[ 2 ];
+		if ( 'GlobalSettings' in FBXTree && 'AmbientColor' in FBXTree.GlobalSettings.properties ) {
 
-		if ( r !== 0 || g !== 0 || b !== 0 ) {
+			var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
+			var r = ambientColor[ 0 ];
+			var g = ambientColor[ 1 ];
+			var b = ambientColor[ 2 ];
 
-			var color = new THREE.Color( r, g, b );
-			sceneGraph.add( new THREE.AmbientLight( color, 1 ) );
+			if ( r !== 0 || g !== 0 || b !== 0 ) {
+
+				var color = new THREE.Color( r, g, b );
+				sceneGraph.add( new THREE.AmbientLight( color, 1 ) );
+
+			}
 
 		}
+
 
 		return sceneGraph;
 
