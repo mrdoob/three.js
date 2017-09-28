@@ -880,10 +880,10 @@
 
 			if ( uvInfo ) {
 
-				for ( var i = 0; i < uvInfo.length; i ++ ) {
+				for ( var i = 0 ; i < uvInfo.length; i++ ) {
 
 					uvTemp = new THREE.Vector2();
-					vertex.uv.push( uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[ i ] ) ) );
+					vertex.uv.push( uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[i] ) ) );
 
 				}
 
