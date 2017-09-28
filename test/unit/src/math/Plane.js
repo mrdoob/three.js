@@ -188,3 +188,41 @@ QUnit.test( "applyMatrix4/translate", function( assert ) {
 	m.makeTranslation( 1, 1, 1 );
 	assert.ok( comparePlane( a.clone().applyMatrix4( m ), a.clone().translate( new THREE.Vector3( 1, 1, 1 ) ) ), "Passed!" );
 });
+
+QUnit.test( "equals", function ( assert ) {
+
+	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
+	var b = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 1 );
+	var c = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 0 );
+
+	assert.ok( a.normal.equals( b.normal ), "Normals: equal" );
+	assert.notOk( a.normal.equals( c.normal ), "Normals: not equal" );
+
+	assert.notStrictEqual( a.constant, b.constant, "Constants: not equal" );
+	assert.strictEqual( a.constant, c.constant, "Constants: equal" );
+
+	assert.notOk( a.equals( b ), "Planes: not equal" );
+	assert.notOk( a.equals( c ), "Planes: not equal" );
+
+	a.copy( b );
+	assert.ok( a.normal.equals( b.normal ), "Normals after copy(): equal" );
+	assert.strictEqual( a.constant, b.constant, "Constants after copy(): equal" );
+	assert.ok( a.equals( b ), "Planes after copy(): equal" );
+
+} );
+
+QUnit.test( "setFromCoplanarPoints", function ( assert ) {
+
+	var a = new THREE.Plane();
+	var v1 = new THREE.Vector3( 2.0, 0.5, 0.25 );
+	var v2 = new THREE.Vector3( 2.0, - 0.5, 1.25 );
+	var v3 = new THREE.Vector3( 2.0, - 3.5, 2.2 );
+	var normal = new THREE.Vector3( 1, 0, 0 );
+	var constant = - 2;
+
+	a.setFromCoplanarPoints( v1, v2, v3 );
+
+	assert.ok( a.normal.equals( normal ), "Check normal" );
+	assert.strictEqual( a.constant, constant, "Check constant" );
+
+} );

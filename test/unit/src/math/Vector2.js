@@ -262,3 +262,167 @@ QUnit.test( "equals" , function( assert ) {
 	assert.ok( a.equals( b ), "Passed!" );
 	assert.ok( b.equals( a ), "Passed!" );
 });
+
+QUnit.test( "setComponent/getComponent exceptions", function ( assert ) {
+
+	var a = new THREE.Vector2( 0, 0 );
+
+	assert.throws(
+		function () {
+
+			a.setComponent( 2, 0 );
+
+		},
+		/index is out of range/,
+		"setComponent with an out of range index throws Error"
+	);
+	assert.throws(
+		function () {
+
+			a.getComponent( 2 );
+
+		},
+		/index is out of range/,
+		"getComponent with an out of range index throws Error"
+	);
+
+} );
+
+QUnit.test( "lengthManhattan", function ( assert ) {
+
+	var a = new THREE.Vector2( x, 0 );
+	var b = new THREE.Vector2( 0, - y );
+	var c = new THREE.Vector2();
+
+	assert.strictEqual( a.lengthManhattan(), x, "Positive component" );
+	assert.strictEqual( b.lengthManhattan(), y, "Negative component" );
+	assert.strictEqual( c.lengthManhattan(), 0, "Empty component" );
+
+	a.set( x, y );
+	assert.strictEqual( a.lengthManhattan(), Math.abs( x ) + Math.abs( y ), "Two components" );
+
+} );
+
+QUnit.test( "properties", function ( assert ) {
+
+	var a = new THREE.Vector2( 0, 0 );
+	var width = 100;
+	var height = 200;
+
+	assert.ok( a.width = width, "Set width" );
+	assert.ok( a.height = height, "Set height" );
+
+	a.set( width, height );
+	assert.strictEqual( a.width, width, "Get width" );
+	assert.strictEqual( a.height, height, "Get height" );
+
+} );
+
+QUnit.test( "setScalar/addScalar/subScalar", function ( assert ) {
+
+	var a = new THREE.Vector2( 1, 1 );
+	var s = 3;
+
+	a.setScalar( s );
+	assert.strictEqual( a.x, s, "setScalar: check x" );
+	assert.strictEqual( a.y, s, "setScalar: check y" );
+
+	a.addScalar( s );
+	assert.strictEqual( a.x, 2 * s, "addScalar: check x" );
+	assert.strictEqual( a.y, 2 * s, "addScalar: check y" );
+
+	a.subScalar( 2 * s );
+	assert.strictEqual( a.x, 0, "subScalar: check x" );
+	assert.strictEqual( a.y, 0, "subScalar: check y" );
+
+} );
+
+QUnit.test( "addScaledVector", function ( assert ) {
+
+	var a = new THREE.Vector2( x, y );
+	var b = new THREE.Vector2( 2, 3 );
+	var s = 3;
+
+	a.addScaledVector( b, s );
+	assert.strictEqual( a.x, x + b.x * s, "Check x" );
+	assert.strictEqual( a.y, y + b.y * s, "Check y" );
+
+} );
+
+QUnit.test( "multiply/divide", function ( assert ) {
+
+	var a = new THREE.Vector2( x, y );
+	var b = new THREE.Vector2( 2 * x, 2 * y );
+	var c = new THREE.Vector2( 4 * x, 4 * y );
+
+	a.multiply( b );
+	assert.strictEqual( a.x, x * b.x, "multiply: check x" );
+	assert.strictEqual( a.y, y * b.y, "multiply: check y" );
+
+	b.divide( c );
+	assert.strictEqual( b.x, 0.5, "divide: check x" );
+	assert.strictEqual( b.y, 0.5, "divide: check y" );
+
+} );
+
+QUnit.test( "applyMatrix3", function ( assert ) {
+
+	var a = new THREE.Vector2( x, y );
+	var m = new THREE.Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
+
+	a.applyMatrix3( m );
+	assert.strictEqual( a.x, 18, "Check x" );
+	assert.strictEqual( a.y, 60, "Check y" );
+
+} );
+
+QUnit.test( "fromArray", function ( assert ) {
+
+	var a = new THREE.Vector2();
+	var array = [ 1, 2, 3, 4 ];
+
+	a.fromArray( array );
+	assert.strictEqual( a.x, 1, "No offset: check x" );
+	assert.strictEqual( a.y, 2, "No offset: check y" );
+
+	a.fromArray( array, 2 );
+	assert.strictEqual( a.x, 3, "With offset: check x" );
+	assert.strictEqual( a.y, 4, "With offset: check y" );
+
+} );
+
+QUnit.test( "toArray", function ( assert ) {
+
+	var a = new THREE.Vector2( x, y );
+
+	var array = a.toArray();
+	assert.strictEqual( array[ 0 ], x, "No array, no offset: check x" );
+	assert.strictEqual( array[ 1 ], y, "No array, no offset: check y" );
+
+	array = [];
+	a.toArray( array );
+	assert.strictEqual( array[ 0 ], x, "With array, no offset: check x" );
+	assert.strictEqual( array[ 1 ], y, "With array, no offset: check y" );
+
+	array = [];
+	a.toArray( array, 1 );
+	assert.strictEqual( array[ 0 ], undefined, "With array and offset: check [0]" );
+	assert.strictEqual( array[ 1 ], x, "With array and offset: check x" );
+	assert.strictEqual( array[ 2 ], y, "With array and offset: check y" );
+
+} );
+
+QUnit.test( "fromBufferAttribute", function ( assert ) {
+
+	var a = new THREE.Vector2();
+	var attr = new THREE.BufferAttribute( new Float32Array( [ 1, 2, 3, 4 ] ), 2 );
+
+	a.fromBufferAttribute( attr, 0 );
+	assert.strictEqual( a.x, 1, "Offset 0: check x" );
+	assert.strictEqual( a.y, 2, "Offset 0: check y" );
+
+	a.fromBufferAttribute( attr, 1 );
+	assert.strictEqual( a.x, 3, "Offset 1: check x" );
+	assert.strictEqual( a.y, 4, "Offset 1: check y" );
+
+} );

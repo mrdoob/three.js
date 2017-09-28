@@ -188,3 +188,31 @@ QUnit.test( "closestPointToPoint" , function( assert ) {
 	b0 = a.closestPointToPoint( new THREE.Vector3( 0, -2, 0 ) );
 	assert.ok( b0.equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
 });
+
+QUnit.test( "equals", function ( assert ) {
+
+	var a = new THREE.Triangle(
+		new THREE.Vector3( 1, 0, 0 ),
+		new THREE.Vector3( 0, 1, 0 ),
+		new THREE.Vector3( 0, 0, 1 )
+	);
+	var b = new THREE.Triangle(
+		new THREE.Vector3( 0, 0, 1 ),
+		new THREE.Vector3( 0, 1, 0 ),
+		new THREE.Vector3( 1, 0, 0 )
+	);
+	var c = new THREE.Triangle(
+		new THREE.Vector3( - 1, 0, 0 ),
+		new THREE.Vector3( 0, 1, 0 ),
+		new THREE.Vector3( 0, 0, 1 )
+	);
+
+	assert.ok( a.equals( a ), "a equals a" );
+	assert.notOk( a.equals( b ), "a does not equal b" );
+	assert.notOk( a.equals( c ), "a does not equal c" );
+	assert.notOk( b.equals( c ), "b does not equal c" );
+
+	a.copy( b );
+	assert.ok( a.equals( a ), "a equals b after copy()" );
+
+} );
