@@ -732,10 +732,10 @@
 
 			var uvInfo = [];
 			var i = 0;
-			while ( subNodes.LayerElementUV[ i ] ) {
+			while ( subNodes.LayerElementUV[ i ] ){
 
-				uvInfo.push( getUVs( subNodes.LayerElementUV[ i ] ) );
-				i ++;
+				uvInfo.push(getUVs( subNodes.LayerElementUV[ i ] ));
+				i++;
 
 			}
 
