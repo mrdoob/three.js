@@ -451,6 +451,32 @@ THREE.GLTFLoader = ( function () {
 
 			name: EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS,
 
+			specularGlossinessParams: [
+				'color',
+				'map',
+				'lightMap',
+				'lightMapIntensity',
+				'aoMap',
+				'aoMapIntensity',
+				'emissive',
+				'emissiveIntensity',
+				'emissiveMap',
+				'bumpMap',
+				'bumpScale',
+				'normalMap',
+				'displacementMap',
+				'displacementScale',
+				'displacementBias',
+				'specularMap',
+				'specular',
+				'glossinessMap',
+				'glossiness',
+				'alphaMap',
+				'envMap',
+				'envMapIntensity',
+				'refractionRatio',
+			],
+
 			getMaterialType: function () {
 
 				return THREE.ShaderMaterial;
@@ -626,6 +652,36 @@ THREE.GLTFLoader = ( function () {
 				material.extensions.derivatives = true;
 
 				return material;
+
+			},
+
+			/**
+			 * Clones a GLTFSpecularGlossinessMaterial instance. The ShaderMaterial.copy() method can
+			 * copy only properties it knows about or inherits, and misses many properties that would
+			 * normally be defined by MeshStandardMaterial.
+			 *
+			 * This method allows GLTFSpecularGlossinessMaterials to be cloned in the process of
+			 * loading a glTF model, but cloning later (e.g. by the user) would require these changes
+			 * AND also updating `.onBeforeRender` on the parent mesh.
+			 *
+			 * @param  {THREE.ShaderMaterial} source
+			 * @return {THREE.ShaderMaterial}
+			 */
+			cloneMaterial: function ( source ) {
+
+				var target = source.clone();
+
+				target.isGLTFSpecularGlossinessMaterial = true;
+
+				var params = this.specularGlossinessParams;
+
+				for ( var i = 0; i < params.length; i ++ ) {
+
+					target[ params[ i ] ] = source[ params[ i ] ];
+
+				}
+
+				return target;
 
 			},
 
@@ -1799,6 +1855,7 @@ THREE.GLTFLoader = ( function () {
 
 		var scope = this;
 		var json = this.json;
+		var extensions = this.extensions;
 
 		return this._withDependencies( [
 
@@ -1838,7 +1895,16 @@ THREE.GLTFLoader = ( function () {
 
 						if ( useVertexColors || useFlatShading ) {
 
-							material = material.clone();
+							if ( material.isGLTFSpecularGlossinessMaterial ) {
+
+								var specGlossExtension = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ];
+								material = specGlossExtension.cloneMaterial( material );
+
+							} else {
+
+								material = material.clone();
+
+							}
 
 						}
 
