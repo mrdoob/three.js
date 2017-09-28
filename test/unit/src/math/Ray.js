@@ -329,3 +329,63 @@ QUnit.test( "intersectBox" , function( assert ) {
 	assert.ok( f.intersectBox(box) == null, "Passed!" );
 
 });
+
+QUnit.test( "lookAt", function ( assert ) {
+
+	var a = new THREE.Ray( two3.clone(), one3.clone() );
+	var target = one3.clone();
+	var expected = target.sub( two3 ).normalize();
+
+	a.lookAt( target );
+	assert.ok( a.direction.equals( expected ), "Check if we're looking in the right direction" );
+
+} );
+
+QUnit.test( "intersectTriangle", function ( assert ) {
+
+	var ray = new THREE.Ray();
+	var a = new THREE.Vector3( 1, 1, 0 );
+	var b = new THREE.Vector3( 0, 1, 1 );
+	var c = new THREE.Vector3( 1, 0, 1 );
+	var intersect;
+
+	// DdN == 0
+	ray.set( ray.origin, zero3.clone() );
+	intersect = ray.intersectTriangle( a, b, c, false );
+	assert.strictEqual( intersect, null, "No intersection if direction == zero" );
+
+	// DdN > 0, backfaceCulling = true
+	ray.set( ray.origin, one3.clone() );
+	intersect = ray.intersectTriangle( a, b, c, true );
+	assert.strictEqual( intersect, null, "No intersection with backside faces if backfaceCulling is true" );
+
+	// DdN > 0
+	ray.set( ray.origin, one3.clone() );
+	intersect = ray.intersectTriangle( a, b, c, false );
+	assert.ok( Math.abs( intersect.x - 2 / 3 ) <= eps, "Successful intersection: check x" );
+	assert.ok( Math.abs( intersect.y - 2 / 3 ) <= eps, "Successful intersection: check y" );
+	assert.ok( Math.abs( intersect.z - 2 / 3 ) <= eps, "Successful intersection: check z" );
+
+	// DdN > 0, DdQxE2 < 0
+	b.multiplyScalar( - 1 );
+	intersect = ray.intersectTriangle( a, b, c, false );
+	assert.strictEqual( intersect, null, "No intersection" );
+
+	// DdN > 0, DdE1xQ < 0
+	a.multiplyScalar( - 1 );
+	intersect = ray.intersectTriangle( a, b, c, false );
+	assert.strictEqual( intersect, null, "No intersection" );
+
+	// DdN > 0, DdQxE2 + DdE1xQ > DdN
+	b.multiplyScalar( - 1 );
+	intersect = ray.intersectTriangle( a, b, c, false );
+	assert.strictEqual( intersect, null, "No intersection" );
+
+	// DdN < 0, QdN < 0
+	a.multiplyScalar( - 1 );
+	b.multiplyScalar( - 1 );
+	ray.direction.multiplyScalar( - 1 );
+	intersect = ray.intersectTriangle( a, b, c, false );
+	assert.strictEqual( intersect, null, "No intersection when looking in the wrong direction" );
+
+} );
