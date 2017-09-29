@@ -110,3 +110,63 @@ QUnit.test( "translate" , function( assert ) {
 	a.translate( one3.clone().negate() );
 	assert.ok( a.center.equals( zero3 ), "Passed!" );
 });
+
+QUnit.test( "setFromPoints", function ( assert ) {
+
+	var a = new THREE.Sphere();
+	var expectedCenter = new THREE.Vector3( 0.9330126941204071, 0, 0 );
+	var expectedRadius = 1.3676668773461689;
+	var optionalCenter = new THREE.Vector3( 1, 1, 1 );
+	var points = [
+		new THREE.Vector3( 1, 1, 0 ), new THREE.Vector3( 1, 1, 0 ),
+		new THREE.Vector3( 1, 1, 0 ), new THREE.Vector3( 1, 1, 0 ),
+		new THREE.Vector3( 1, 1, 0 ), new THREE.Vector3( 0.8660253882408142, 0.5, 0 ),
+		new THREE.Vector3( - 0, 0.5, 0.8660253882408142 ), new THREE.Vector3( 1.8660253882408142, 0.5, 0 ),
+		new THREE.Vector3( 0, 0.5, - 0.8660253882408142 ), new THREE.Vector3( 0.8660253882408142, 0.5, - 0 ),
+		new THREE.Vector3( 0.8660253882408142, - 0.5, 0 ), new THREE.Vector3( - 0, - 0.5, 0.8660253882408142 ),
+		new THREE.Vector3( 1.8660253882408142, - 0.5, 0 ), new THREE.Vector3( 0, - 0.5, - 0.8660253882408142 ),
+		new THREE.Vector3( 0.8660253882408142, - 0.5, - 0 ), new THREE.Vector3( - 0, - 1, 0 ),
+		new THREE.Vector3( - 0, - 1, 0 ), new THREE.Vector3( 0, - 1, 0 ),
+		new THREE.Vector3( 0, - 1, - 0 ), new THREE.Vector3( - 0, - 1, - 0 ),
+	];
+
+	a.setFromPoints( points );
+	assert.ok( Math.abs( a.center.x - expectedCenter.x ) <= eps, "Default center: check center.x" );
+	assert.ok( Math.abs( a.center.y - expectedCenter.y ) <= eps, "Default center: check center.y" );
+	assert.ok( Math.abs( a.center.z - expectedCenter.z ) <= eps, "Default center: check center.z" );
+	assert.ok( Math.abs( a.radius - expectedRadius ) <= eps, "Default center: check radius" );
+
+	expectedRadius = 2.5946195770400102;
+	a.setFromPoints( points, optionalCenter );
+	assert.ok( Math.abs( a.center.x - optionalCenter.x ) <= eps, "Optional center: check center.x" );
+	assert.ok( Math.abs( a.center.y - optionalCenter.y ) <= eps, "Optional center: check center.y" );
+	assert.ok( Math.abs( a.center.z - optionalCenter.z ) <= eps, "Optional center: check center.z" );
+	assert.ok( Math.abs( a.radius - expectedRadius ) <= eps, "Optional center: check radius" );
+
+} );
+
+QUnit.test( "intersectsBox", function ( assert ) {
+
+	var a = new THREE.Sphere();
+	var b = new THREE.Sphere( new THREE.Vector3( - 5, - 5, - 5 ) );
+	var box = new THREE.Box3( zero3, one3 );
+
+	assert.strictEqual( a.intersectsBox( box ), true, "Check default sphere" );
+	assert.strictEqual( b.intersectsBox( box ), false, "Check shifted sphere" );
+
+} );
+
+QUnit.test( "equals", function ( assert ) {
+
+	var a = new THREE.Sphere();
+	var b = new THREE.Sphere( new THREE.Vector3( 1, 0, 0 ) );
+	var c = new THREE.Sphere( new THREE.Vector3( 1, 0, 0 ), 1.0 );
+
+	assert.strictEqual( a.equals( b ), false, "a does not equal b" );
+	assert.strictEqual( a.equals( c ), false, "a does not equal c" );
+	assert.strictEqual( b.equals( c ), false, "b does not equal c" );
+
+	a.copy( b );
+	assert.strictEqual( a.equals( b ), true, "a equals b after copy()" );
+
+} );

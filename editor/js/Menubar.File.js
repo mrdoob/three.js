@@ -48,13 +48,19 @@ Menubar.File = function ( editor ) {
 
 	// Import
 
+	var form = document.createElement( 'form' );
+	form.style.display = 'none';
+	document.body.appendChild( form );
+
 	var fileInput = document.createElement( 'input' );
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', function ( event ) {
 
 		editor.loader.loadFile( fileInput.files[ 0 ] );
+		form.reset();
 
 	} );
+	form.appendChild( fileInput );
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
@@ -273,8 +279,6 @@ Menubar.File = function ( editor ) {
 
 			if ( vr ) {
 
-				includes.push( '<script src="js/VRControls.js"></script>' );
-				includes.push( '<script src="js/VREffect.js"></script>' );
 				includes.push( '<script src="js/WebVR.js"></script>' );
 
 			}
@@ -297,19 +301,7 @@ Menubar.File = function ( editor ) {
 
 		if ( vr ) {
 
-			loader.load( '../examples/js/controls/VRControls.js', function ( content ) {
-
-				zip.file( 'js/VRControls.js', content );
-
-			} );
-
-			loader.load( '../examples/js/effects/VREffect.js', function ( content ) {
-
-				zip.file( 'js/VREffect.js', content );
-
-			} );
-
-			loader.load( '../examples/js/WebVR.js', function ( content ) {
+			loader.load( '../examples/js/vr/WebVR.js', function ( content ) {
 
 				zip.file( 'js/WebVR.js', content );
 

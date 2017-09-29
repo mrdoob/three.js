@@ -3741,7 +3741,8 @@
 
 			this.position.toArray( vertexBuffer, vertexBuffer.length );
 			this.normal.toArray( normalBuffer, normalBuffer.length );
-			for ( var i = 0; i < this.uv.length; i ++ ) {
+
+      for ( var i = 0; i < this.uv.length; i ++ ) {
 
 				this.uv[ i ].toArray( uvBuffers[ i ], uvBuffers[ i ].length );
 
@@ -3790,7 +3791,7 @@
 
 				vertices[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer );
 
-}
+			}
 
 		}
 
@@ -3901,7 +3902,7 @@
 
 				faces[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer, materialIndexBuffer );
 
-}
+			}
 
 			return {
 				vertexBuffer: vertexBuffer,
@@ -3914,7 +3915,8 @@
 			};
 
 		}
- 	} );
+
+	} );
 
 	function TextParser() {}
 

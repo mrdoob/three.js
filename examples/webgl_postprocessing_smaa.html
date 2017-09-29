@@ -76,7 +76,7 @@
 				composer = new THREE.EffectComposer( renderer );
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
-				pass = new THREE.SMAAPass( window.innerWidth, window.innerHeight );
+				pass = new THREE.SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
 				pass.renderToScreen = true;
 				composer.addPass( pass );
 
@@ -95,8 +95,8 @@
 				renderer.setSize( width, height );
 
 				var pixelRatio = renderer.getPixelRatio();
-				var newWidth  = Math.floor( width / pixelRatio ) || 1;
-				var newHeight = Math.floor( height / pixelRatio ) || 1;
+				var newWidth  = Math.floor( width * pixelRatio ) || 1;
+				var newHeight = Math.floor( height * pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
 
 			}

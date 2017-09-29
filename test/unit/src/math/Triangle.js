@@ -96,10 +96,10 @@ QUnit.test( "normal" , function( assert ) {
 QUnit.test( "plane" , function( assert ) {
 	var a = new THREE.Triangle();
 
-	assert.ok( isNaN( a.plane().distanceToPoint( a.a ) ), "Passed!" );
-	assert.ok( isNaN( a.plane().distanceToPoint( a.b ) ), "Passed!" );
-	assert.ok( isNaN( a.plane().distanceToPoint( a.c ) ), "Passed!" );
-	assert.propEqual( a.plane().normal, {x: NaN, y: NaN, z: NaN}, "Passed!" );
+	assert.notOk( isNaN( a.plane().distanceToPoint( a.a ) ), "Passed!" );
+	assert.notOk( isNaN( a.plane().distanceToPoint( a.b ) ), "Passed!" );
+	assert.notOk( isNaN( a.plane().distanceToPoint( a.c ) ), "Passed!" );
+	assert.notPropEqual( a.plane().normal, { x: NaN, y: NaN, z: NaN }, "Passed!" );
 
 	a = new THREE.Triangle( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
 	assert.ok( a.plane().distanceToPoint( a.a ) == 0, "Passed!" );
@@ -188,3 +188,31 @@ QUnit.test( "closestPointToPoint" , function( assert ) {
 	b0 = a.closestPointToPoint( new THREE.Vector3( 0, -2, 0 ) );
 	assert.ok( b0.equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
 });
+
+QUnit.test( "equals", function ( assert ) {
+
+	var a = new THREE.Triangle(
+		new THREE.Vector3( 1, 0, 0 ),
+		new THREE.Vector3( 0, 1, 0 ),
+		new THREE.Vector3( 0, 0, 1 )
+	);
+	var b = new THREE.Triangle(
+		new THREE.Vector3( 0, 0, 1 ),
+		new THREE.Vector3( 0, 1, 0 ),
+		new THREE.Vector3( 1, 0, 0 )
+	);
+	var c = new THREE.Triangle(
+		new THREE.Vector3( - 1, 0, 0 ),
+		new THREE.Vector3( 0, 1, 0 ),
+		new THREE.Vector3( 0, 0, 1 )
+	);
+
+	assert.ok( a.equals( a ), "a equals a" );
+	assert.notOk( a.equals( b ), "a does not equal b" );
+	assert.notOk( a.equals( c ), "a does not equal c" );
+	assert.notOk( b.equals( c ), "b does not equal c" );
+
+	a.copy( b );
+	assert.ok( a.equals( a ), "a equals b after copy()" );
+
+} );

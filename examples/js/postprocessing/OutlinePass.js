@@ -186,7 +186,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 		function VisibilityChangeCallBack( object ) {
 
-			if ( object instanceof THREE.Mesh ) {
+			if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite ) {
 
 				var bFound = false;
 
@@ -249,6 +249,9 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		// Make selected objects invisible
 		this.changeVisibilityOfSelectedObjects( false );
 
+		var currentBackground = this.renderScene.background;
+		this.renderScene.background = null;
+
 		// 1. Draw Non Selected objects in the depth buffer
 		this.renderScene.overrideMaterial = this.depthMaterial;
 		renderer.render( this.renderScene, this.renderCamera, this.renderTargetDepthBuffer, true );
@@ -268,6 +271,8 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		renderer.render( this.renderScene, this.renderCamera, this.renderTargetMaskBuffer, true );
 		this.renderScene.overrideMaterial = null;
 		this.changeVisibilityOfNonSelectedObjects( true );
+
+		this.renderScene.background = currentBackground;
 
 		// 2. Downsample to Half resolution
 		this.quad.material = this.materialCopy;

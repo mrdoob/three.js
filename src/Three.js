@@ -84,7 +84,7 @@ export { AnimationClip } from './animation/AnimationClip.js';
 export { Uniform } from './core/Uniform.js';
 export { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 export { BufferGeometry } from './core/BufferGeometry.js';
-export { GeometryIdCount, Geometry } from './core/Geometry.js';
+export { Geometry } from './core/Geometry.js';
 export { InterleavedBufferAttribute } from './core/InterleavedBufferAttribute.js';
 export { InstancedInterleavedBuffer } from './core/InstancedInterleavedBuffer.js';
 export { InterleavedBuffer } from './core/InterleavedBuffer.js';

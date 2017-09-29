@@ -1,5 +1,5 @@
-import { Vector3 } from '../math/Vector3';
-import { Object3D } from '../core/Object3D';
+import { Vector3 } from '../math/Vector3.js';
+import { Object3D } from '../core/Object3D.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/

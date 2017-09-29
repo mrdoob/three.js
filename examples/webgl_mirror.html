@@ -35,7 +35,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Mirror.js"></script>
+		<script src="js/objects/Mirror.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
@@ -92,7 +92,8 @@
 					clipBias: 0.003,
 					textureWidth: WIDTH * window.devicePixelRatio,
 					textureHeight: HEIGHT * window.devicePixelRatio,
-					color: 0x777777
+					color: 0x777777,
+					recursion: 1
 				} );
 				groundMirror.rotateX( - Math.PI / 2 );
 				scene.add( groundMirror );
@@ -101,7 +102,8 @@
 					clipBias: 0.003,
 					textureWidth: WIDTH * window.devicePixelRatio,
 					textureHeight: HEIGHT * window.devicePixelRatio,
-					color: 0x889999
+					color: 0x889999,
+					recursion: 1
 				} );
 				verticalMirror.position.y = 35;
 				verticalMirror.position.z = -45;

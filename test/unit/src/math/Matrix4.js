@@ -18,6 +18,15 @@ var matrixEquals4 = function( a, b, tolerance ) {
 	return true;
 };
 
+// from Euler.js
+var eulerEquals = function ( a, b, tolerance ) {
+
+	tolerance = tolerance || 0.0001;
+	var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z );
+	return ( diff < tolerance );
+
+};
+
 QUnit.test( "constructor" , function( assert ) {
 	var a = new THREE.Matrix4();
 	assert.ok( a.determinant() == 1, "Passed!" );
@@ -367,3 +376,174 @@ QUnit.test( "compose/decompose", function( assert ) {
 		}
 	}
 });
+
+QUnit.test( "copyPosition", function ( assert ) {
+
+	var a = new THREE.Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
+	var b = new THREE.Matrix4().set( 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 16 );
+
+	assert.notOk( matrixEquals4( a, b ), "a and b initially not equal" );
+
+	b.copyPosition( a );
+	assert.ok( matrixEquals4( a, b ), "a and b equal after copyPosition()" );
+
+} );
+
+QUnit.test( "makeRotationFromEuler/extractRotation", function ( assert ) {
+
+	var testValues = [
+		new THREE.Euler( 0, 0, 0, "XYZ" ),
+		new THREE.Euler( 1, 0, 0, "XYZ" ),
+		new THREE.Euler( 0, 1, 0, "ZYX" ),
+		new THREE.Euler( 0, 0, 0.5, "YZX" ),
+		new THREE.Euler( 0, 0, - 0.5, "YZX" )
+	];
+
+	for ( var i = 0; i < testValues.length; i ++ ) {
+
+		var v = testValues[ i ];
+
+		var m = new THREE.Matrix4().makeRotationFromEuler( v );
+
+		var v2 = new THREE.Euler().setFromRotationMatrix( m, v.order );
+		var m2 = new THREE.Matrix4().makeRotationFromEuler( v2 );
+
+		assert.ok( matrixEquals4( m, m2, eps ), "makeRotationFromEuler #" + i + ": original and Euler-derived matrices are equal" );
+		assert.ok( eulerEquals( v, v2, eps ), "makeRotationFromEuler #" + i + ": original and matrix-derived Eulers are equal" );
+
+		var m3 = new THREE.Matrix4().extractRotation( m2 );
+		var v3 = new THREE.Euler().setFromRotationMatrix( m3, v.order );
+
+		assert.ok( matrixEquals4( m, m3, eps ), "extractRotation #" + i + ": original and extracted matrices are equal" );
+		assert.ok( eulerEquals( v, v3, eps ), "extractRotation #" + i + ": original and extracted Eulers are equal" );
+
+	}
+
+} );
+
+QUnit.test( "applyToBufferAttribute", function ( assert ) {
+
+	var a = new THREE.Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
+	var attr = new THREE.Float32BufferAttribute( [ 1, 2, 1, 3, 0, 3 ], 3 );
+	var expected = new THREE.Float32BufferAttribute( [
+		0.1666666716337204,	0.4444444477558136, 0.7222222089767456,
+		0.1599999964237213, 0.4399999976158142, 0.7200000286102295
+	], 3 );
+
+	var applied = a.applyToBufferAttribute( attr );
+
+	assert.strictEqual( expected.count, applied.count, "Applied buffer and expected buffer have the same number of entries" );
+
+	for ( var i = 0, l = expected.count; i < l; i ++ ) {
+
+		assert.ok( Math.abs( applied.getX( i ) - expected.getX( i ) ) <= eps, "Check x" );
+		assert.ok( Math.abs( applied.getY( i ) - expected.getY( i ) ) <= eps, "Check y" );
+		assert.ok( Math.abs( applied.getZ( i ) - expected.getZ( i ) ) <= eps, "Check z" );
+
+	}
+
+} );
+
+QUnit.test( "equals", function ( assert ) {
+
+	var a = new THREE.Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
+	var b = new THREE.Matrix4().set( 0, - 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
+
+	assert.notOk( a.equals( b ), "Check that a does not equal b" );
+	assert.notOk( b.equals( a ), "Check that b does not equal a" );
+
+	a.copy( b );
+	assert.ok( a.equals( b ), "Check that a equals b after copy()" );
+	assert.ok( b.equals( a ), "Check that b equals a after copy()" );
+
+} );
+
+QUnit.test( "toArray", function ( assert ) {
+
+	var a = new THREE.Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
+	var noOffset = [ 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16 ];
+	var withOffset = [ undefined, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16 ];
+
+	var array = a.toArray();
+	assert.deepEqual( array, noOffset, "No array, no offset" );
+
+	array = [];
+	a.toArray( array );
+	assert.deepEqual( array, noOffset, "With array, no offset" );
+
+	array = [];
+	a.toArray( array, 1 );
+	assert.deepEqual( array, withOffset, "With array, with offset" );
+
+} );
+
+QUnit.test( "getMaxScaleOnAxis", function ( assert ) {
+
+	var a = new THREE.Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
+	var expected = Math.sqrt( 3 * 3 + 7 * 7 + 11 * 11 );
+
+	assert.ok( Math.abs( a.getMaxScaleOnAxis() - expected ) <= eps, "Check result" );
+
+} );
+
+QUnit.test( "makeOrthographic", function ( assert ) {
+
+	var a = new THREE.Matrix4().makeOrthographic( - 1, 1, - 1, 1, 1, 100 );
+	var expected = new THREE.Matrix4().set(
+		1, 0, 0, 0,
+		0, - 1, 0, 0,
+		0, 0, - 2 / 99, - 101 / 99,
+		0, 0, 0, 1
+	);
+
+	assert.ok( matrixEquals4( a, expected ), "Check result" );
+
+} );
+
+QUnit.test( "makeRotationAxis", function ( assert ) {
+
+	var axis = new THREE.Vector3( 1.5, 0.0, 1.0 ).normalize();
+	var radians = THREE.Math.degToRad( 45 );
+	var a = new THREE.Matrix4().makeRotationAxis( axis, radians );
+
+	var expected = new THREE.Matrix4().set(
+		0.9098790095958609, - 0.39223227027636803, 0.13518148560620882, 0,
+		0.39223227027636803, 0.7071067811865476, - 0.588348405414552, 0,
+		0.13518148560620882, 0.588348405414552, 0.7972277715906868, 0,
+		0, 0, 0, 1
+	);
+
+	assert.ok( matrixEquals4( a, expected ), "Check numeric result" );
+
+} );
+
+QUnit.test( "lookAt", function ( assert ) {
+
+	var a = new THREE.Matrix4();
+	var expected = new THREE.Matrix4().identity();
+	var eye = new THREE.Vector3( 0, 0, 0 );
+	var target = new THREE.Vector3( 0, 1, - 1 );
+	var up = new THREE.Vector3( 0, 1, 0 );
+
+	a.lookAt( eye, target, up );
+	var rotation = new THREE.Euler().setFromRotationMatrix( a );
+	assert.numEqual( rotation.x * ( 180 / Math.PI ), 45, "Check the rotation" );
+
+	// eye and target are in the same position
+	eye.copy( target );
+	a.lookAt( eye, target, up );
+	assert.ok( matrixEquals4( a, expected ), "Check the result for eye == target" );
+
+	// up and z are parallel
+	eye.set( 0, 1, 0 );
+	target.set( 0, 0, 0 );
+	a.lookAt( eye, target, up );
+	expected.set(
+		1, 0, 0, 0,
+		0, 0.0001, 1, 0,
+		0, - 1, 0.0001, 0,
+		0, 0, 0, 1
+	);
+	assert.ok( matrixEquals4( a, expected ), "Check the result for when up and z are parallel" );
+
+} );

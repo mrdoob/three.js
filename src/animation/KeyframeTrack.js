@@ -1,12 +1,12 @@
-import { KeyframeTrackPrototype } from './KeyframeTrackPrototype';
-import { StringKeyframeTrack } from './tracks/StringKeyframeTrack';
-import { BooleanKeyframeTrack } from './tracks/BooleanKeyframeTrack';
-import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack';
-import { ColorKeyframeTrack } from './tracks/ColorKeyframeTrack';
-import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack';
-import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack';
-import { AnimationUtils } from './AnimationUtils';
-import { KeyframeTrackConstructor } from './KeyframeTrackConstructor';
+import { KeyframeTrackPrototype } from './KeyframeTrackPrototype.js';
+import { StringKeyframeTrack } from './tracks/StringKeyframeTrack.js';
+import { BooleanKeyframeTrack } from './tracks/BooleanKeyframeTrack.js';
+import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack.js';
+import { ColorKeyframeTrack } from './tracks/ColorKeyframeTrack.js';
+import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
+import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack.js';
+import { AnimationUtils } from './AnimationUtils.js';
+import { KeyframeTrackConstructor } from './KeyframeTrackConstructor.js';
 
 /**
  *
@@ -20,7 +20,7 @@ import { KeyframeTrackConstructor } from './KeyframeTrackConstructor';
 
 function KeyframeTrack( name, times, values, interpolation ) {
 
-	KeyframeTrackConstructor.apply( this, arguments );
+	KeyframeTrackConstructor.apply( this, name, times, values, interpolation );
 
 }
 
@@ -34,11 +34,11 @@ Object.assign( KeyframeTrack, {
 	// Serialization (in static context, because of constructor invocation
 	// and automatic invocation of .toJSON):
 
-	parse: function( json ) {
+	parse: function ( json ) {
 
-		if( json.type === undefined ) {
+		if ( json.type === undefined ) {
 
-			throw new Error( "track type undefined, can not parse" );
+			throw new Error( 'track type undefined, can not parse' );
 
 		}
 
@@ -63,14 +63,13 @@ Object.assign( KeyframeTrack, {
 		} else {
 
 			// by default, we assume a constructor compatible with the base
-			return new trackType(
-					json.name, json.times, json.values, json.interpolation );
+			return new trackType( json.name, json.times, json.values, json.interpolation );
 
 		}
 
 	},
 
-	toJSON: function( track ) {
+	toJSON: function ( track ) {
 
 		var trackType = track.constructor;
 
@@ -108,45 +107,45 @@ Object.assign( KeyframeTrack, {
 
 	},
 
-	_getTrackTypeForValueTypeName: function( typeName ) {
+	_getTrackTypeForValueTypeName: function ( typeName ) {
 
-		switch( typeName.toLowerCase() ) {
+		switch ( typeName.toLowerCase() ) {
 
-			case "scalar":
-			case "double":
-			case "float":
-			case "number":
-			case "integer":
+			case 'scalar':
+			case 'double':
+			case 'float':
+			case 'number':
+			case 'integer':
 
 				return NumberKeyframeTrack;
 
-			case "vector":
-			case "vector2":
-			case "vector3":
-			case "vector4":
+			case 'vector':
+			case 'vector2':
+			case 'vector3':
+			case 'vector4':
 
 				return VectorKeyframeTrack;
 
-			case "color":
+			case 'color':
 
 				return ColorKeyframeTrack;
 
-			case "quaternion":
+			case 'quaternion':
 
 				return QuaternionKeyframeTrack;
 
-			case "bool":
-			case "boolean":
+			case 'bool':
+			case 'boolean':
 
 				return BooleanKeyframeTrack;
 
-			case "string":
+			case 'string':
 
 				return StringKeyframeTrack;
 
 		}
 
-		throw new Error( "Unsupported typeName: " + typeName );
+		throw new Error( 'Unsupported typeName: ' + typeName );
 
 	}
 

@@ -1,13 +1,13 @@
-import { Loader } from './Loader';
-import { AnimationClip } from '../animation/AnimationClip';
-import { Vector3 } from '../math/Vector3';
-import { Vector4 } from '../math/Vector4';
-import { Color } from '../math/Color';
-import { Vector2 } from '../math/Vector2';
-import { Face3 } from '../core/Face3';
-import { Geometry } from '../core/Geometry';
-import { FileLoader } from './FileLoader';
-import { DefaultLoadingManager } from './LoadingManager';
+import { Loader } from './Loader.js';
+import { AnimationClip } from '../animation/AnimationClip.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector4 } from '../math/Vector4.js';
+import { Color } from '../math/Color.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Face3 } from '../core/Face3.js';
+import { Geometry } from '../core/Geometry.js';
+import { FileLoader } from './FileLoader.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

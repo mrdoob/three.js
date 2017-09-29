@@ -18,8 +18,6 @@ var files = {
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
-		"webgl_exporter_gltf2",
-		"webgl_exporter_obj",
 		"webgl_geometries",
 		"webgl_geometries2",
 		"webgl_geometry_colors",
@@ -92,7 +90,7 @@ var files = {
 		"webgl_loader_ctm_materials",
 		"webgl_loader_draco",
 		"webgl_loader_fbx",
-		"webgl_loader_gltf2",
+		"webgl_loader_gltf",
 		"webgl_loader_imagebitmap",
 		"webgl_loader_json_blender",
 		"webgl_loader_json_claraio",
@@ -106,8 +104,9 @@ var files = {
 		"webgl_loader_obj",
 		"webgl_loader_obj_mtl",
 		"webgl_loader_obj2",
-		"webgl_loader_obj2_ww",
-		"webgl_loader_obj2_ww_parallels",
+		"webgl_loader_obj2_meshspray",
+		"webgl_loader_obj2_options",
+		"webgl_loader_obj2_run_director",
 		"webgl_loader_nrrd",
 		"webgl_loader_pcd",
 		"webgl_loader_pdb",
@@ -162,6 +161,7 @@ var files = {
 		"webgl_materials_texture_hdr",
 		"webgl_materials_texture_manualmipmap",
 		"webgl_materials_texture_pvrtc",
+		"webgl_materials_texture_rotation",
 		"webgl_materials_texture_tga",
 		"webgl_materials_transparency",
 		"webgl_materials_variations_basic",
@@ -214,6 +214,7 @@ var files = {
 		"webgl_postprocessing_crossfade",
 		"webgl_postprocessing_dof",
 		"webgl_postprocessing_dof2",
+		"webgl_postprocessing_fxaa",
 		"webgl_postprocessing_glitch",
 		"webgl_postprocessing_godrays",
 		"webgl_postprocessing_masking",
@@ -222,9 +223,10 @@ var files = {
 		"webgl_postprocessing_nodes",
 		"webgl_postprocessing_outline",
 		"webgl_postprocessing_procedural",
-		"webgl_postprocessing_smaa",
-		"webgl_postprocessing_ssao",
 		"webgl_postprocessing_sao",
+		"webgl_postprocessing_smaa",
+		"webgl_postprocessing_sobel",
+		"webgl_postprocessing_ssao",
 		"webgl_postprocessing_taa",
 		"webgl_postprocessing_unreal_bloom",
 		"webgl_raycast_texture",
@@ -245,7 +247,6 @@ var files = {
 		"webgl_shadowmap_pointlight",
 		"webgl_shadowmap_viewer",
 		"webgl_shadowmesh",
-		"webgl_simple_gi",
 		"webgl_skinning_simple",
 		"webgl_sprites",
 		"webgl_sprites_nodes",
@@ -280,7 +281,8 @@ var files = {
 		"webgl_custom_attributes_points3",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
-		"webgl_shadowmap_pcss"
+		"webgl_shadowmap_pcss",
+		"webgl_simple_gi"
 	],
 	"webgl deferred": [
 		"webgldeferred_animation"
@@ -290,9 +292,14 @@ var files = {
 		"webgl2_sandbox"
 	],
 	*/
+	"webaudio": [
+		"webaudio_sandbox",
+		"webaudio_visualizer"
+	],
 	"webvr": [
 		"webvr_cubes",
 		"webvr_daydream",
+		"webvr_gearvr",
 		"webvr_panorama",
 		"webvr_rollercoaster",
 		"webvr_sandbox",
@@ -303,15 +310,6 @@ var files = {
 		"webvr_vive_paint",
 		"webvr_vive_sculpt"
 	],
-	"css3d": [
-		"css3d_molecules",
-		"css3d_panorama",
-		"css3d_panorama_deviceorientation",
-		"css3d_periodictable",
-		"css3d_sandbox",
-		"css3d_sprites",
-		"css3d_youtube"
-	],
 	"misc": [
 		"misc_animation_authoring",
 		"misc_animation_keys",
@@ -321,19 +319,27 @@ var files = {
 		"misc_controls_pointerlock",
 		"misc_controls_trackball",
 		"misc_controls_transform",
+		"misc_exporter_gltf",
+		"misc_exporter_obj",
 		"misc_fps",
 		"misc_lights_test",
 		"misc_lookat",
-		"misc_sound",
-		"misc_sound_visualizer",
 		"misc_ubiquity_test",
 		"misc_ubiquity_test2",
 		"misc_uv_tests"
 	],
+	"css3d": [
+		"css3d_molecules",
+		"css3d_panorama",
+		"css3d_panorama_deviceorientation",
+		"css3d_periodictable",
+		"css3d_sandbox",
+		"css3d_sprites",
+		"css3d_youtube"
+	],
 	"canvas": [
 		"canvas_ascii_effect",
 		"canvas_camera_orthographic",
-		"canvas_camera_orthographic2",
 		"canvas_geometry_birds",
 		"canvas_geometry_cube",
 		"canvas_geometry_earth",

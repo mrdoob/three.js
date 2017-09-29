@@ -38,7 +38,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/loaders/ColladaLoader2.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -75,7 +75,6 @@
 				// collada
 
 				var loader = new THREE.ColladaLoader( loadingManager );
-				loader.options.convertUpAxis = true;
 				loader.load( './models/collada/elf/elf.dae', function ( collada ) {
 
 					elf = collada.scene;

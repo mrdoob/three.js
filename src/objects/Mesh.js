@@ -1,14 +1,14 @@
-import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
-import { Sphere } from '../math/Sphere';
-import { Ray } from '../math/Ray';
-import { Matrix4 } from '../math/Matrix4';
-import { Object3D } from '../core/Object3D';
-import { Triangle } from '../math/Triangle';
-import { Face3 } from '../core/Face3';
-import { DoubleSide, BackSide, TrianglesDrawMode } from '../constants';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { BufferGeometry } from '../core/BufferGeometry';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Sphere } from '../math/Sphere.js';
+import { Ray } from '../math/Ray.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Object3D } from '../core/Object3D.js';
+import { Triangle } from '../math/Triangle.js';
+import { Face3 } from '../core/Face3.js';
+import { DoubleSide, BackSide, TrianglesDrawMode } from '../constants.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -49,6 +49,18 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		Object3D.prototype.copy.call( this, source );
 
 		this.drawMode = source.drawMode;
+
+		if ( source.morphTargetInfluences !== undefined ) {
+
+			this.morphTargetInfluences = source.morphTargetInfluences.slice();
+
+		}
+
+		if ( source.morphTargetDictionary !== undefined ) {
+
+			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
+
+		}
 
 		return this;
 
@@ -268,7 +280,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					}
 
-				} else {
+				} else if ( position !== undefined ) {
 
 					// non-indexed buffer geometry
 

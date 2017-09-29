@@ -7,8 +7,8 @@
  * }
  */
 
-import { Material } from './Material';
-import { Color } from '../math/Color';
+import { Material } from './Material.js';
+import { Color } from '../math/Color.js';
 
 function ShadowMaterial( parameters ) {
 
