@@ -249,7 +249,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		// Make selected objects invisible
 		this.changeVisibilityOfSelectedObjects( false );
 
-		var bg = this.renderScene.background;
+		var currentBackground = this.renderScene.background;
 		this.renderScene.background = null;
 
 		// 1. Draw Non Selected objects in the depth buffer
@@ -272,7 +272,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		this.renderScene.overrideMaterial = null;
 		this.changeVisibilityOfNonSelectedObjects( true );
 
-		this.renderScene.background = bg;
+		this.renderScene.background = currentBackground;
 
 		// 2. Downsample to Half resolution
 		this.quad.material = this.materialCopy;
