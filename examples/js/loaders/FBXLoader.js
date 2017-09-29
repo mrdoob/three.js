@@ -941,7 +941,7 @@
 		}
 		if ( bufferInfo.uvBuffers.length > 0 ) {
 
-			for ( var i = 0; i < bufferInfo.uvBuffers.length; i++ ) {
+			for ( var i = 0; i < bufferInfo.uvBuffers.length; i ++ ) {
 
 				var name = 'uv' + ( i + 1 ).toString();
 				if ( i == 0 ) {
@@ -950,7 +950,7 @@
 
 				}
 
-				geo.addAttribute( name, new THREE.Float32BufferAttribute( bufferInfo.uvBuffers[i], 2 ) );
+				geo.addAttribute( name, new THREE.Float32BufferAttribute( bufferInfo.uvBuffers[ i ], 2 ) );
 
 			}
 
@@ -1772,6 +1772,23 @@
 				var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
 				preRotations.multiply( currentRotation );
 				model.rotation.setFromQuaternion( preRotations, 'ZYX' );
+
+			}
+
+			// allow transformed pivots - see https://github.com/mrdoob/three.js/issues/11895
+			if ( 'GeometricTranslation' in node.properties ) {
+
+				var array = node.properties.GeometricTranslation.value;
+
+				model.traverse( function ( child ) {
+
+					if ( child.geometry ) {
+
+						child.geometry.translate( array[ 0 ], array[ 1 ], array[ 2 ] );
+
+					}
+
+				} );
 
 			}
 
@@ -3724,7 +3741,8 @@
 
 			this.position.toArray( vertexBuffer, vertexBuffer.length );
 			this.normal.toArray( normalBuffer, normalBuffer.length );
-			for ( var i = 0; i < this.uv.length; i++ ) {
+
+      for ( var i = 0; i < this.uv.length; i ++ ) {
 
 				this.uv[ i ].toArray( uvBuffers[ i ], uvBuffers[ i ].length );
 
@@ -3772,6 +3790,7 @@
 			for ( var i = 0, l = vertices.length; i < l; ++ i ) {
 
 				vertices[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer );
+
 			}
 
 		}
@@ -3873,14 +3892,16 @@
 
 			var faces = this.faces;
 
-			for ( var i = 0; i < faces[0].triangles[0].vertices[0].uv.length; i++ ) {
+			for ( var i = 0; i < faces[ 0 ].triangles[ 0 ].vertices[ 0 ].uv.length; i ++ ) {
 
-				uvBuffers.push([]);
+				uvBuffers.push( [] );
 
 			}
 
 			for ( var i = 0, l = faces.length; i < l; ++ i ) {
+
 				faces[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer, materialIndexBuffer );
+
 			}
 
 			return {
@@ -3894,7 +3915,8 @@
 			};
 
 		}
- 	});
+
+	} );
 
 	function TextParser() {}
 
