@@ -112,7 +112,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -420,7 +420,6 @@
 	 */
 	function parseMaterial( materialNode, textureMap, connections ) {
 
-		console.log( materialNode.properties );
 		var FBX_ID = materialNode.id;
 		var name = materialNode.attrName;
 		var type = materialNode.properties.ShadingModel;
@@ -439,7 +438,6 @@
 		var children = connections.get( FBX_ID ).children;
 
 		var parameters = parseParameters( materialNode.properties, textureMap, children );
-		console.log( 'parsedParams: ', parameters );
 
 		var material;
 
