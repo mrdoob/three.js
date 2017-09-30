@@ -1737,7 +1737,7 @@
 
 			}
 
-			model.name = node.attrName.replace( /:/, '' ).replace( /_/, '' ).replace( /-/, '' );
+			model.name = THREE.PropertyBinding.sanitizeNodeName( node.attrName );
 			model.FBX_ID = id;
 
 			modelArray.push( model );
