@@ -732,10 +732,10 @@
 
 			var uvInfo = [];
 			var i = 0;
-			while ( subNodes.LayerElementUV[ i ] ){
+			while ( subNodes.LayerElementUV[ i ] ) {
 
-				uvInfo.push(getUVs( subNodes.LayerElementUV[ i ] ));
-				i++;
+				uvInfo.push( getUVs( subNodes.LayerElementUV[ i ] ) );
+				i ++;
 
 			}
 
@@ -880,10 +880,11 @@
 
 			if ( uvInfo ) {
 
-				for ( var i = 0 ; i < uvInfo.length; i++ ) {
+				var uvTemp = new THREE.Vector2();
 
-					uvTemp = new THREE.Vector2();
-					vertex.uv.push( uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[i] ) ) );
+				for ( var i = 0; i < uvInfo.length; i ++ ) {
+
+					vertex.uv.push( uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[ i ] ) ) );
 
 				}
 
