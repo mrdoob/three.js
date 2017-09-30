@@ -479,6 +479,11 @@
 
 		var parameters = {};
 
+		if ( properties.BumpFactor ) {
+
+			parameters.bumpScale = parseFloat( properties.BumpFactor.value );
+
+		}
 		if ( properties.Diffuse ) {
 
 			parameters.color = parseColor( properties.Diffuse );
@@ -501,7 +506,7 @@
 		}
 		if ( properties.EmissiveFactor ) {
 
-			parameters.emissiveIntensity = properties.EmissiveFactor.value;
+			parameters.emissiveIntensity = parseFloat( properties.EmissiveFactor.value );
 
 		}
 		if ( properties.Opacity ) {
