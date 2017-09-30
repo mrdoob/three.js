@@ -112,7 +112,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -420,6 +420,7 @@
 	 */
 	function parseMaterial( materialNode, textureMap, connections ) {
 
+		console.log( materialNode.properties );
 		var FBX_ID = materialNode.id;
 		var name = materialNode.attrName;
 		var type = materialNode.properties.ShadingModel;
@@ -438,6 +439,7 @@
 		var children = connections.get( FBX_ID ).children;
 
 		var parameters = parseParameters( materialNode.properties, textureMap, children );
+		console.log( 'parsedParams: ', parameters );
 
 		var material;
 
@@ -479,6 +481,11 @@
 
 		var parameters = {};
 
+		if ( properties.BumpFactor ) {
+
+			parameters.bumpScale = parseFloat( properties.BumpFactor.value );
+
+		}
 		if ( properties.Diffuse ) {
 
 			parameters.color = parseColor( properties.Diffuse );
@@ -501,7 +508,7 @@
 		}
 		if ( properties.EmissiveFactor ) {
 
-			parameters.emissiveIntensity = properties.EmissiveFactor.value;
+			parameters.emissiveIntensity = parseFloat( properties.EmissiveFactor.value );
 
 		}
 		if ( properties.Opacity ) {
@@ -732,10 +739,10 @@
 
 			var uvInfo = [];
 			var i = 0;
-			while ( subNodes.LayerElementUV[ i ] ){
+			while ( subNodes.LayerElementUV[ i ] ) {
 
-				uvInfo.push(getUVs( subNodes.LayerElementUV[ i ] ));
-				i++;
+				uvInfo.push( getUVs( subNodes.LayerElementUV[ i ] ) );
+				i ++;
 
 			}
 
@@ -880,10 +887,10 @@
 
 			if ( uvInfo ) {
 
-				for ( var i = 0 ; i < uvInfo.length; i++ ) {
+				for ( var i = 0; i < uvInfo.length; i ++ ) {
 
 					uvTemp = new THREE.Vector2();
-					vertex.uv.push( uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[i] ) ) );
+					vertex.uv.push( uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[ i ] ) ) );
 
 				}
 
