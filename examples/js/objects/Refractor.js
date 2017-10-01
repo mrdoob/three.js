@@ -310,7 +310,7 @@ THREE.DefaultRefractionShader = {
 
 		'vec3 blendOverlay( vec3 base, vec3 blend ) {',
 
-		'	return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ),blendOverlay( base.b, blend.b ) );',
+		'	return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );',
 
 		'}',
 
