@@ -1730,7 +1730,7 @@
 						break;
 
 					default:
-						model = new THREE.Object3D();
+						model = new THREE.Group();
 						break;
 
 				}
