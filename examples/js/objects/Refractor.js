@@ -11,7 +11,9 @@ THREE.Refractor = function ( width, height, options ) {
 
 	var scope = this;
 
-	var color = options.color || new THREE.Color( 0x7f7f7f );
+	options = options || {};
+
+	var color = ( options.color !== undefined ) !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
