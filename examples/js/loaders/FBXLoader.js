@@ -489,6 +489,11 @@
 			parameters.color = parseColor( properties.Diffuse );
 
 		}
+		if ( properties.DisplacementFactor ) {
+
+			parameters.displacementScale = parseFloat( properties.DisplacementFactor );
+
+		}
 		if ( properties.Specular ) {
 
 			parameters.specular = parseColor( properties.Specular );
@@ -496,7 +501,7 @@
 		}
 		if ( properties.Shininess ) {
 
-			parameters.shininess = properties.Shininess.value;
+			parameters.shininess = parseFloat( properties.Shininess.value );
 
 		}
 		if ( properties.Emissive ) {
@@ -511,7 +516,7 @@
 		}
 		if ( properties.Opacity ) {
 
-			parameters.opacity = properties.Opacity.value;
+			parameters.opacity = parseFloat( properties.Opacity.value );
 
 		}
 		if ( parameters.opacity < 1.0 ) {
