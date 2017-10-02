@@ -243,7 +243,7 @@ THREE.Refractor = function ( width, height, options ) {
 
 		// update
 
-		updateRefractorPlane( camera );
+		updateRefractorPlane();
 
 		updateTextureMatrix( camera );
 
