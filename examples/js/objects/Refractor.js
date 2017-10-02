@@ -71,7 +71,7 @@ THREE.Refractor = function ( width, height, options ) {
 		var view = new THREE.Vector3();
 		var normal = new THREE.Vector3();
 
-		return function updateRefractorPlane( camera ) {
+		return function visible( camera ) {
 
 			refractorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
