@@ -112,7 +112,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -491,7 +491,13 @@
 		}
 		if ( properties.DisplacementFactor ) {
 
-			parameters.displacementScale = parseFloat( properties.DisplacementFactor );
+			parameters.displacementScale = parseFloat( properties.DisplacementFactor.value );
+
+		}
+		if ( properties.ReflectionFactor ) {
+
+			parameters.envMapIntensity = parseFloat( properties.ReflectionFactor.value );
+			parameters.reflectivity = parseFloat( properties.ReflectionFactor.value );
 
 		}
 		if ( properties.Specular ) {
@@ -559,6 +565,12 @@
 					parameters.normalMap = textureMap.get( relationship.ID );
 					break;
 
+				case 'ReflectionColor':
+				case ' "ReflectionColor':
+					parameters.envMap = textureMap.get( relationship.ID );
+					parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
+					break;
+
 				case 'SpecularColor':
 				case ' "SpecularColor':
 					parameters.specularMap = textureMap.get( relationship.ID );
@@ -568,11 +580,6 @@
 				case ' "TransparentColor':
 					parameters.alphaMap = textureMap.get( relationship.ID );
 					parameters.transparent = true;
-					break;
-
-				case 'ReflectionColor':
-				case ' "ReflectionColor':
-					console.warn( 'THREE.FBXLoader: Environment maps are currently not supported.' );
 					break;
 
 				case 'AmbientColor':
