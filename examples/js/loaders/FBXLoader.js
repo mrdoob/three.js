@@ -261,6 +261,12 @@
 
 		if ( typeof content === 'string' ) {
 
+			if ( content.slice( - 1 ) !== '=' ) {
+
+				content = content.slice( 0, - 1 );
+
+			}
+
 			return 'data:' + type + ';base64,' + content;
 
 		} else {
