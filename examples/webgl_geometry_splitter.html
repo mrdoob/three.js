@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>three.js webgl - teapot buffer geometry</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+	        color:            #ffffff;
+	        font-family:      Monospace;
+	        font-size:        13px;
+	        text-align:       center;
+	        font-weight:      bold;
+	        background-color: #000000;
+	        margin:           0px;
+	        overflow:         hidden;
+        }
+
+        #info {
+	        position:   absolute;
+	        padding:    10px;
+	        width:      100%;
+	        text-align: center;
+	        color:      #ffffff;
+        }
+
+        a { color: blue; }
+
+    </style>
+</head>
+<body>
+
+	<div id="info">
+	    <a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Geometry Splitter<br />
+		<p>"T" translate | "R" rotate | "S" toggle world/local space</p>
+	</div>
+
+	<div id="container"></div>
+
+	<script src="../build/three.js"></script>
+	<!--<script src="js/CurveExtras.js"></script>-->
+
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/Detector.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+	<script src='js/libs/dat.gui.min.js'></script>
+
+	<script src="js/controls/TransformControls.js"></script>
+	<script src='js/geometries/GeometrySplitter.js'></script>
+
+	<script>
+
+		////////////////////////////////////////////////////////////////////////////////
+		// Geometry Splitter demo
+		////////////////////////////////////////////////////////////////////////////////
+		/*global THREE, Detector, container, dat, window */
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+		// DEBUG ONLY
+		/*
+		function TriangleDownBufferGeometry( indices ) {
+
+			THREE.BufferGeometry.call( this );
+
+			var indices = indices || []
+
+			var vertices = [
+				- 1, 1, 0,
+				0, - 1, 0,
+				1, 1, 0
+			]
+
+			var normals = [
+				0, 0, 1,
+				0, 0, 1,
+				0, 0, 1,
+			]
+
+			this.setIndex( indices );
+			this.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+			this.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+			//			this.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+
+		}
+
+		TriangleDownBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+		TriangleDownBufferGeometry.prototype.constructor = TriangleDownBufferGeometry;
+
+		function TriangleUpBufferGeometry( indices ) {
+
+			THREE.BufferGeometry.call( this );
+
+			var indices = indices || []
+
+			var vertices = [
+				- 1, - 1, 0,
+				0, 1, 0,
+				1, - 1, 0,
+			]
+
+			var normals = [
+				0, 0, 1,
+				0, 0, 1,
+				0, 0, 1,
+			]
+
+			this.setIndex( indices );
+			this.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+			this.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+			//			this.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+
+		}
+
+		TriangleUpBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+		TriangleUpBufferGeometry.prototype.constructor = TriangleUpBufferGeometry;
+
+		function PlanInverseBufferGeometry() {
+
+			THREE.BufferGeometry.call( this );
+
+			var vertices = [
+				- 1, - 1, 0,
+				1, - 1, 0,
+				1, 1, 0,
+				- 1, 1, 0,
+			]
+
+			var normals = [
+				0, 0, 1,
+				0, 0, 1,
+				0, 0, 1,
+				0, 0, 1
+			]
+
+			var indices = [
+				//				0, 1, 3,
+				//				3, 1, 2,
+
+				0, 1, 2,
+				2, 3, 0,
+			]
+
+			this.setIndex( indices );
+			this.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+			this.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+
+		}
+
+		PlanInverseBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+		PlanInverseBufferGeometry.prototype.constructor = PlanInverseBufferGeometry;
+		*/
+
+		function ThreeApplication( container ) {
+
+			if ( ! container ) throw new Error( 'Three Application required a container' );
+
+			var self = this;
+
+			this.container = container;
+			this.screenWidth = window.innerWidth;
+			this.screenHeight = window.innerHeight;
+
+			this.geometry = undefined;
+			this.material = undefined;
+
+			this.vertexNormalHelper = undefined;
+			this.faceNormalHelper = undefined;
+			this.ghost = new THREE.Mesh();
+			this.ghostVertexNormalHelper = undefined;
+			this.ghostFaceNormalHelper = undefined;
+			this.arrowHelper = undefined;
+
+			(function init() {
+
+				initRenderer.call( self );
+				initCamera.call( self );
+				initScene.call( self );
+				initMesh.call( self );
+				initSplitter.call( self );
+				initDatGui.call( self );
+
+				self.update();
+
+			})()
+
+			function initRenderer() {
+
+				this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+				this.renderer.setPixelRatio( window.devicePixelRatio );
+				this.renderer.setSize( this.screenWidth, this.screenHeight );
+				this.renderer.shadowMap.enabled = true;
+				this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+				this.container.appendChild( this.renderer.domElement );
+
+			}
+
+			function initCamera() {
+
+				this.camera = new THREE.PerspectiveCamera( 45, this.getAspectRatio(), 0.001, 80000 );
+				this.camera.position.set( - 7, 7, 7 );
+
+				this.cameraControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+				this.cameraControls.addEventListener( 'change', this.renderApp.bind( this ) );
+
+			}
+
+			function initScene() {
+
+				// SCENE
+				this.scene = new THREE.Scene();
+				this.scene.background = new THREE.Color( 0x333333 );
+
+				// LIGHTS
+				this.ambientLight = new THREE.AmbientLight( 0xcccccc );
+				this.ambientLight.name = "AmbiantLight";
+				this.ambientLight.visible = false;
+				this.scene.add( this.ambientLight );
+
+				this.spotLightFront = new THREE.SpotLight( 0xffffff, 0.8, 75, 0.3, 0.1, 1.5 );
+				this.spotLightFront.name = "SpotLightFront";
+				this.spotLightFront.position.set( - 10, 10, 10 );
+				this.spotLightFront.castShadow = true;
+				this.spotLightFront.shadow.mapSize.width = 1024;
+				this.spotLightFront.shadow.mapSize.height = 1024;
+				this.spotLightFront.shadow.camera.near = 10;
+				this.spotLightFront.shadow.camera.far = 200;
+				this.scene.add( this.spotLightFront );
+
+				this.spotLightBack = new THREE.SpotLight( 0xffffff, 0.8, 75, 0.3, 0.1, 1.5 );
+				this.spotLightBack.name = "SpotLightBack";
+				this.spotLightBack.position.set( - 10, 10, - 10 );
+				this.spotLightBack.castShadow = true;
+				this.spotLightBack.shadow.mapSize.width = 1024;
+				this.spotLightBack.shadow.mapSize.height = 1024;
+				this.spotLightBack.shadow.camera.near = 10;
+				this.spotLightBack.shadow.camera.far = 200;
+				this.scene.add( this.spotLightBack );
+
+				// GROUND
+				this.ground = new THREE.Mesh(
+						new THREE.PlaneBufferGeometry( 50, 50 ),
+						new THREE.MeshPhongMaterial( { color: 0x808080 } )
+				);
+				this.ground.name = "Ground";
+				this.ground.position.y = - 3;
+				this.ground.rotateX( - 90 * DEG_TO_RAD );
+				this.ground.receiveShadow = true;
+				this.scene.add( this.ground );
+
+			}
+
+			function initMesh() {
+
+				this.mesh = new THREE.Mesh( this.geometry, this.material );
+				this.mesh.name = "OriginalMesh";
+
+				this.splittedMesh = undefined;
+
+			}
+
+			function initSplitter()  {
+
+				this.splitter = new THREE.GeometrySplitter( 4, 4, 1, 1 );
+				this.splitter.name = "TheSplitter";
+				this.scene.add( this.splitter );
+
+				this.splitterControl = new THREE.TransformControls( this.camera, this.renderer.domElement );
+				this.splitterControl.addEventListener( 'change', this.update.bind(this) );
+				this.splitterControl.addEventListener( 'change', this.renderApp.bind(this) );
+
+				this.splitterControl.attach( this.splitter );
+				this.scene.add( this.splitterControl );
+
+
+			}
+
+			function initDatGui() {
+
+				var GuiInterface = function () {
+
+
+					// Environment
+					this.useAmbiantLight = false;
+					this.useFrontSpotLight = true;
+					this.useBackSpotLight = true;
+					this.displayGround = true;
+
+					// Geometries
+//					this.curves = {
+//					    GrannyKnot: new THREE.Curves.GrannyKnot(),
+//					    HeartCurve: new THREE.Curves.HeartCurve( 3.5 ),
+//					    VivianiCurve: new THREE.Curves.VivianiCurve( 70 ),
+//					    KnotCurve: new THREE.Curves.KnotCurve(),
+//					    HelixCurve: new THREE.Curves.HelixCurve(),
+//					    TrefoilKnot: new THREE.Curves.TrefoilKnot(),
+//					    TorusKnot: new THREE.Curves.TorusKnot( 20 ),
+//					    CinquefoilKnot: new THREE.Curves.CinquefoilKnot( 20 ),
+//					}
+
+					this.basicGeometries = {
+
+						// DEBUG ONLY
+						/*
+						TriangleDown_012: new THREE.Geometry().fromBufferGeometry( new TriangleDownBufferGeometry( [ 0, 1, 2 ] ) ),
+						TriangleDown_012: new THREE.Geometry().fromBufferGeometry( new TriangleDownBufferGeometry( [ 0, 1, 2 ] ) ),
+						TriangleDown_021: new THREE.Geometry().fromBufferGeometry( new TriangleDownBufferGeometry( [ 0, 2, 1 ] ) ),
+						TriangleDown_102: new THREE.Geometry().fromBufferGeometry( new TriangleDownBufferGeometry( [ 1, 0, 2 ] ) ),
+						TriangleDown_120: new THREE.Geometry().fromBufferGeometry( new TriangleDownBufferGeometry( [ 1, 2, 0 ] ) ),
+						TriangleDown_201: new THREE.Geometry().fromBufferGeometry( new TriangleDownBufferGeometry( [ 2, 0, 1 ] ) ),
+						TriangleDown_210: new THREE.Geometry().fromBufferGeometry( new TriangleDownBufferGeometry( [ 2, 1, 0 ] ) ),
+
+						TriangleUp_012: new THREE.Geometry().fromBufferGeometry( new TriangleUpBufferGeometry( [ 0, 1, 2 ] ) ),
+						TriangleUp_012: new THREE.Geometry().fromBufferGeometry( new TriangleUpBufferGeometry( [ 0, 1, 2 ] ) ),
+						TriangleUp_021: new THREE.Geometry().fromBufferGeometry( new TriangleUpBufferGeometry( [ 0, 2, 1 ] ) ),
+						TriangleUp_102: new THREE.Geometry().fromBufferGeometry( new TriangleUpBufferGeometry( [ 1, 0, 2 ] ) ),
+						TriangleUp_120: new THREE.Geometry().fromBufferGeometry( new TriangleUpBufferGeometry( [ 1, 2, 0 ] ) ),
+						TriangleUp_201: new THREE.Geometry().fromBufferGeometry( new TriangleUpBufferGeometry( [ 2, 0, 1 ] ) ),
+						TriangleUp_210: new THREE.Geometry().fromBufferGeometry( new TriangleUpBufferGeometry( [ 2, 1, 0 ] ) ),
+
+						PlaneInverse: new THREE.Geometry().fromBufferGeometry( new PlanInverseBufferGeometry() ),
+						*/
+
+						Plane: new THREE.PlaneGeometry( 1, 1, 2 ),
+						Circle: new THREE.CircleGeometry( 1 ),
+						Ring: new THREE.RingGeometry( 1, 2 ),
+
+						Box: new THREE.BoxGeometry( 1, 1, 1 ),
+						Sphere: new THREE.SphereGeometry( 1 ),
+						Cone: new THREE.ConeGeometry( 1, 1 ),
+						Cylinder: new THREE.CylinderGeometry( 1, 1, 1 ),
+						Tube: new THREE.TubeGeometry( new THREE.LineCurve( new THREE.Vector3( 0, - 1, 0 ), new THREE.Vector3( 0, 1, 0 ) ), 1, 1, 3 ),
+						Torus: new THREE.TorusGeometry( 1, 0.7, 20, 20 ),
+						TorusKnot: new THREE.TorusKnotGeometry( 1, 0.1 ),
+
+						Tetrahedron: new THREE.TetrahedronGeometry(),
+						Icosahedron: new THREE.IcosahedronGeometry(),
+						Octahedron: new THREE.OctahedronGeometry(),
+						Dodecahedron: new THREE.DodecahedronGeometry(),
+
+						// Todo: Text: new THREE.TextGeometry( 'Three.js' )
+					}
+
+					this.bufferGeometries = {
+
+						Plane: new THREE.PlaneBufferGeometry( 1, 1 ),
+						Circle: new THREE.CircleBufferGeometry( 1 ),
+						Ring: new THREE.RingBufferGeometry( 1, 2 ),
+
+						Box: new THREE.BoxBufferGeometry( 1, 1, 1 ),
+						Sphere: new THREE.SphereBufferGeometry( 1 ),
+						Cone: new THREE.ConeBufferGeometry( 1, 1 ),
+						Cylinder: new THREE.CylinderBufferGeometry( 1, 1, 1 ),
+						Tube: new THREE.TubeBufferGeometry( new THREE.LineCurve( new THREE.Vector3( 0, - 1, 0 ), new THREE.Vector3( 0, 1, 0 ) ) ),
+						Torus: new THREE.TorusBufferGeometry( 1, 0.7, 20, 20 ),
+						TorusKnot: new THREE.TorusKnotBufferGeometry( 1, 0.1 ),
+
+						Tetrahedron: new THREE.TetrahedronBufferGeometry(),
+						Icosahedron: new THREE.IcosahedronBufferGeometry(),
+						Octahedron: new THREE.OctahedronBufferGeometry(),
+						Dodecahedron: new THREE.DodecahedronBufferGeometry(),
+
+						// Todo: Text: new THREE.TextGeometry( 'Three.js' )
+					}
+
+					this.geometry = 'TorusKnot';
+					this.useBufferGeometry = true;
+
+					// Materials
+					this.materials = {
+						Basic: new THREE.MeshBasicMaterial( { side: THREE.DoubleSide } ),
+						Depth: new THREE.MeshDepthMaterial( { side: THREE.DoubleSide } ),
+						Lambert: new THREE.MeshLambertMaterial( { side: THREE.DoubleSide } ),
+						Normal: new THREE.MeshNormalMaterial( { side: THREE.DoubleSide } ),
+						Phong: new THREE.MeshPhongMaterial( { side: THREE.DoubleSide } ),
+						Physical: new THREE.MeshPhysicalMaterial( { side: THREE.DoubleSide } ),
+						Standard: new THREE.MeshStandardMaterial( { side: THREE.DoubleSide } ),
+						Toon: new THREE.MeshToonMaterial( { side: THREE.DoubleSide } )
+					}
+
+					this.material = 'Normal';
+					this.displayWireFrame = false;
+
+					this.materialSides = {
+						Front: THREE.FrontSide,
+						Back: THREE.BackSide,
+						Double: THREE.DoubleSide,
+					}
+					this.materialSide = 'Double';
+					this.materialColor = '#dedede'
+
+					// Mesh
+					this.meshShadow = true;
+
+					// Helpers
+					this.displayGhost = true;
+					this.ghostOpacity = 0.1;
+					this.displayVertexNormalHelper = false;
+					this.displayFaceNormalHelper = false;
+				};
+
+				this.interface = new GuiInterface();
+
+				this.gui = new dat.GUI( {
+					width: 320
+				} );
+
+				var folderEnvironment = this.gui.addFolder( 'Environment' );
+				folderEnvironment.add( this.ambientLight, 'visible' ).name( "Ambiant light" );
+				folderEnvironment.add( this.spotLightFront, 'visible' ).name( "Front spot light" );
+				folderEnvironment.add( this.spotLightBack, 'visible' ).name( "Back spot light" );
+				folderEnvironment.add( this.ground, 'visible' ).name( "Display ground" );
+
+				var folderMesh = this.gui.addFolder( 'Mesh' );
+				folderMesh.add( this.interface, 'geometry', Object.keys( this.interface.basicGeometries ) ).name( "Geometry" ).onChange( this.update.bind( this ) );
+				folderMesh.add( this.interface, 'useBufferGeometry' ).name( "Use buffer geometry" ).onChange( this.update.bind( this ) );
+				folderMesh.add( this.interface, 'material', Object.keys( this.interface.materials ) ).name( "Materials" ).onChange( this.update.bind( this ) );
+				folderMesh.add( this.interface, 'displayWireFrame' ).name( "Wireframe" ).onChange( this.update.bind( this ) );
+				folderMesh.add( this.interface, 'meshShadow' ).name( "Shadow" ).onChange( this.update.bind( this ) );
+				folderMesh.add( this.interface, 'materialSide', Object.keys( this.interface.materialSides ) ).name( "Side" ).onChange( this.update.bind( this ) );
+				folderMesh.addColor( this.interface, 'materialColor' ).name( "Color" ).onChange( this.update.bind( this ) );
+
+				var folderHelper = this.gui.addFolder( 'Helpers' );
+//				folderHelper.add( this.ghost, 'visible' ).name( "Ghost" ).onChange( function ( visible ) {
+//
+//					self.ghost.visible = visible;
+//					self.ghostVertexNormalHelper.visible = visible;
+//					if ( this.ghostFaceNormalHelper !== undefined ) self.ghostFaceNormalHelper.visible = visible;
+//
+//				} );
+				folderHelper.add( this.interface, 'displayGhost' ).name( "Ghost" ).onChange( this.update.bind( this ) );
+				folderHelper.add( this.interface, 'ghostOpacity', 0, 1 ).name( "Ghost opacity" ).step( 0.01 ).onChange( this.update.bind( this ) );
+				folderHelper.add( this.interface, 'displayVertexNormalHelper' ).name( "Vertex normals" ).onChange( this.update.bind( this ) );
+				folderHelper.add( this.interface, 'displayFaceNormalHelper' ).name( "Face normals" ).listen().onChange( this.update.bind( this ) );
+
+				var folderSplitter = this.gui.addFolder( 'Splitter' );
+				folderSplitter.add( this.splitterControl, 'visible' ).name( "Controls visible" );
+
+				// Keep in mind to disable/enable - hide/show dat.gui controls
+				//
+				//			control.domElement.style.pointerEvents = "none"
+				//			control.domElement.children[ 0 ].disabled = true
+				//			control.domElement.addEventListener("click", function( event ) {
+				//
+				//				event.stopPropagation();
+				//				event.preventDefault();
+				//
+				//			}, true);
+				//
+				//			// For slider
+				//			control.domElement.style.pointerEvents = "none"
+				//			control.domElement.style.opacity = .5;
+			}
+
+		}
+
+		Object.assign( ThreeApplication.prototype, {
+
+			constructor: ThreeApplication,
+
+			// Updates
+			update: function () {
+
+				this.updateGui();
+
+				this.updateGeometry();
+				this.updateMaterial();
+				this.updateMesh();
+				this.updateSplitter();
+				this.updateHelper();
+
+			},
+
+			updateGui: function () {
+
+				if ( this.interface.useBufferGeometry && this.interface.displayFaceNormalHelper === true ) {
+
+					console.warn( "Buffer Geometry does not support face normal helper !" );
+					this.interface.displayFaceNormalHelper = false;
+
+				}
+
+			},
+
+			updateEnvironment: function () {},
+
+			updateGeometry: function () {
+
+				this.geometry = ( this.interface.useBufferGeometry ) ?
+						this.interface.bufferGeometries[ this.interface.geometry ].clone() :
+						this.interface.basicGeometries[ this.interface.geometry ].clone();
+
+			},
+
+			updateMaterial: function () {
+
+				this.material = this.interface.materials[ this.interface.material ].clone();
+				this.material.wireframe = this.interface.displayWireFrame;
+				this.material.side = this.interface.materialSides[ this.interface.materialSide ];
+				this.material.needsUpdate = true;
+				if( this.material.color !== undefined ) this.material.color = new THREE.Color(this.interface.materialColor);
+
+			},
+
+			updateMesh: function () {
+
+				if ( this.splittedMesh ) this.scene.remove( this.splittedMesh );
+				if ( this.mesh ) this.splitter.remove( this.mesh );
+
+				this.mesh.geometry = this.geometry;
+				this.mesh.material = this.material;
+				this.mesh.castShadow = this.interface.meshShadow;
+				this.mesh.updateMatrix();
+
+				this.splittedMesh = this.splitter.add( this.mesh );
+				this.scene.add( this.splittedMesh );
+
+			},
+
+			updateSplitter: function () {
+
+				this.splitter.update();
+
+			},
+
+			updateHelper: function () {
+
+				// Mesh helpers
+				this.updateVertexNormalsHelper();
+				this.updateFaceNormalsHelper();
+
+				// Ghost helpers
+				this.updateGhost();
+				this.updateGhostVertexNormalsHelper();
+				this.updateGhostFaceNormalsHelper();
+
+			},
+
+			updateVertexNormalsHelper: function () {
+
+				if ( this.vertexNormalHelper ) this.scene.remove( this.vertexNormalHelper );
+
+				this.vertexNormalHelper = new THREE.VertexNormalsHelper( this.splittedMesh, 0.1, 0xff00ff, 1 );
+				this.vertexNormalHelper.visible = this.interface.displayVertexNormalHelper
+				this.scene.add( this.vertexNormalHelper );
+
+			},
+
+			updateFaceNormalsHelper: function () {
+
+				if ( this.faceNormalHelper ) this.scene.remove( this.faceNormalHelper );
+				if ( this.interface.useBufferGeometry ) return;
+
+				this.faceNormalHelper = new THREE.FaceNormalsHelper( this.splittedMesh, 0.3, 0x00ffff, 1 );
+				this.faceNormalHelper.visible = this.interface.displayFaceNormalHelper
+				this.scene.add( this.faceNormalHelper );
+
+			},
+
+			updateGhost: function () {
+
+				if ( this.ghost ) this.scene.remove( this.ghost );
+
+				var ghostMaterial = this.material.clone();
+				ghostMaterial.transparent = true;
+				ghostMaterial.opacity = this.interface.ghostOpacity;
+				ghostMaterial.side = THREE.FrontSide;
+
+				this.ghost = new THREE.Mesh( this.geometry, ghostMaterial );
+				this.ghost.visible = this.interface.displayGhost;
+				this.scene.add( this.ghost );
+
+			},
+
+			updateGhostVertexNormalsHelper: function () {
+
+				if ( this.ghostVertexNormalHelper ) this.scene.remove( this.ghostVertexNormalHelper );
+
+				this.ghostVertexNormalHelper = new THREE.VertexNormalsHelper( this.ghost, 0.1, 0xff00ff, 1 );
+				this.ghostVertexNormalHelper.visible = ( this.interface.displayGhost && this.interface.displayVertexNormalHelper );
+				this.ghostVertexNormalHelper.material.transparent = true;
+				this.ghostVertexNormalHelper.material.opacity = this.interface.ghostOpacity;
+				this.scene.add( this.ghostVertexNormalHelper );
+
+			},
+
+			updateGhostFaceNormalsHelper: function () {
+
+				if ( this.ghostFaceNormalHelper ) this.scene.remove( this.ghostFaceNormalHelper );
+				if ( this.interface.useBufferGeometry ) return;
+
+				this.ghostFaceNormalHelper = new THREE.FaceNormalsHelper( this.ghost, 0.3, 0x00ffff, 1 );
+				this.ghostFaceNormalHelper.visible = ( this.interface.displayGhost && this.interface.displayFaceNormalHelper );
+				this.ghostFaceNormalHelper.material.transparent = true;
+				this.ghostFaceNormalHelper.material.opacity = this.interface.ghostOpacity;
+				this.scene.add( this.ghostFaceNormalHelper );
+
+			},
+
+			// Utils
+			getAspectRatio: function () {
+
+				return ( this.container.offsetHeight === 0 ) ? 1 : this.container.offsetWidth / this.container.offsetHeight;
+
+			},
+
+			resize: function () {
+
+				this.renderer.setSize( this.container.offsetWidth, this.container.offsetHeight, false );
+
+				this.camera.aspect = this.getAspectRatio();
+				this.camera.updateProjectionMatrix();
+
+			},
+
+			renderApp: function () {
+
+				this.splitterControl.update();
+				this.renderer.render( this.scene, this.camera );
+
+			},
+
+		} )
+
+		var DEG_TO_RAD = (Math.PI / 180);
+
+		var container = document.getElementById( 'container' );
+		var app = new ThreeApplication( container );
+		var stats = new Stats();
+		container.appendChild( stats.dom );
+
+		var resizeWindow = function () {
+
+			app.resize();
+			app.update();
+
+		};
+
+		var render = function () {
+
+			requestAnimationFrame( render );
+
+			app.renderApp();
+			stats.update();
+
+		};
+
+		window.addEventListener( 'resize', resizeWindow, false );
+
+		window.addEventListener( 'keydown', function ( event ) {
+
+			switch ( event.keyCode ) {
+
+				case 82: // R
+					app.splitterControl.setMode( "rotate" );
+					break;
+
+				case 83: // S
+					app.splitterControl.setSpace( app.splitterControl.space === "local" ? "world" : "local" );
+					break;
+
+				case 84: // T
+					app.splitterControl.setMode( "translate" );
+					break;
+
+
+			}
+
+		});
+
+		render();
+
+
+
+
+	</script>
+
+</body>
+</html>
