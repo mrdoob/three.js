@@ -11,11 +11,13 @@ THREE.Refractor = function ( width, height, options ) {
 
 	var scope = this;
 
-	var color = options.color || new THREE.Color( 0x7f7f7f );
+	options = options || {};
+
+	var color = ( options.color !== undefined ) !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
-	var shader = options.shader || THREE.DefaultRefractionShader;
+	var shader = options.shader || THREE.Refractor.RefractorShader;
 
 	//
 
@@ -69,7 +71,7 @@ THREE.Refractor = function ( width, height, options ) {
 		var view = new THREE.Vector3();
 		var normal = new THREE.Vector3();
 
-		return function updateRefractorPlane( camera ) {
+		return function visible( camera ) {
 
 			refractorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
@@ -241,7 +243,7 @@ THREE.Refractor = function ( width, height, options ) {
 
 		// update
 
-		updateRefractorPlane( camera );
+		updateRefractorPlane();
 
 		updateTextureMatrix( camera );
 
@@ -256,7 +258,7 @@ THREE.Refractor = function ( width, height, options ) {
 THREE.Refractor.prototype = Object.create( THREE.Mesh.prototype );
 THREE.Refractor.prototype.constructor = THREE.Refractor;
 
-THREE.DefaultRefractionShader = {
+THREE.Refractor.RefractorShader = {
 
 	uniforms: {
 
@@ -308,7 +310,7 @@ THREE.DefaultRefractionShader = {
 
 		'vec3 blendOverlay( vec3 base, vec3 blend ) {',
 
-		'	return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ),blendOverlay( base.b, blend.b ) );',
+		'	return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );',
 
 		'}',
 
