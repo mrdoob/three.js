@@ -16,7 +16,7 @@ THREE.Mirror = function ( width, height, options ) {
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
-	var shader = options.shader || THREE.DefaultMirrorShader;
+	var shader = options.shader || THREE.Mirror.MirrorShader;
 	var recursion = options.recursion !== undefined ? options.recursion : 0;
 
 	//
@@ -195,7 +195,7 @@ THREE.Mirror = function ( width, height, options ) {
 THREE.Mirror.prototype = Object.create( THREE.Mesh.prototype );
 THREE.Mirror.prototype.constructor = THREE.Mirror;
 
-THREE.DefaultMirrorShader = {
+THREE.Mirror.MirrorShader = {
 
 	uniforms: {
 

@@ -17,7 +17,7 @@ THREE.Refractor = function ( width, height, options ) {
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
-	var shader = options.shader || THREE.DefaultRefractionShader;
+	var shader = options.shader || THREE.Refractor.RefractorShader;
 
 	//
 
@@ -258,7 +258,7 @@ THREE.Refractor = function ( width, height, options ) {
 THREE.Refractor.prototype = Object.create( THREE.Mesh.prototype );
 THREE.Refractor.prototype.constructor = THREE.Refractor;
 
-THREE.DefaultRefractionShader = {
+THREE.Refractor.RefractorShader = {
 
 	uniforms: {
 
