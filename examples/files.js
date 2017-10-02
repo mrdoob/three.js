@@ -37,6 +37,7 @@ var files = {
 		"webgl_geometry_nurbs",
 		"webgl_geometry_shapes",
 		"webgl_geometry_spline_editor",
+		"webgl_geometry_splitter",
 		"webgl_geometry_teapot",
 		"webgl_geometry_terrain",
 		"webgl_geometry_terrain_fog",
