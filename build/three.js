@@ -39,7 +39,7 @@
 
 	}
 
-	if ( Function.prototype.name === undefined ) {
+	if ( 'name' in Function.prototype === false ) {
 
 		// Missing in IE
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
@@ -7795,7 +7795,7 @@
 			if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
 			if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
-			if ( this.emissiveIntensity !== 1) data.emissiveIntensity = this.emissiveIntensity;
+			if ( this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
 
 			if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 			if ( this.shininess !== undefined ) data.shininess = this.shininess;
@@ -21525,10 +21525,29 @@
 
 		// Clearing
 
-		this.getClearColor = background.getClearColor;
-		this.setClearColor = background.setClearColor;
-		this.getClearAlpha = background.getClearAlpha;
-		this.setClearAlpha = background.setClearAlpha;
+		this.getClearColor = function() {
+
+			return background.getClearColor();
+
+		};
+
+		this.setClearColor = function () {
+
+			background.setClearColor.apply( background, arguments );
+
+		};
+
+		this.getClearAlpha = function() {
+
+			return background.getClearAlpha();
+
+		};
+
+		this.setClearAlpha = function() {
+
+			background.setClearAlpha.apply( background, arguments );
+
+		};
 
 		this.clear = function ( color, depth, stencil ) {
 
@@ -25843,7 +25862,7 @@
 		var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
 		var vertices = [
-			- 1, t, 0,  	1, t, 0, 	- 1, - t, 0, 	1, - t, 0,
+			- 1, t, 0, 	1, t, 0, 	- 1, - t, 0, 	1, - t, 0,
 			 0, - 1, t, 	0, 1, t,	0, - 1, - t, 	0, 1, - t,
 			 t, 0, - 1, 	t, 0, 1, 	- t, 0, - 1, 	- t, 0, 1
 		];
@@ -25852,7 +25871,7 @@
 			 0, 11, 5, 	0, 5, 1, 	0, 1, 7, 	0, 7, 10, 	0, 10, 11,
 			 1, 5, 9, 	5, 11, 4,	11, 10, 2,	10, 7, 6,	7, 1, 8,
 			 3, 9, 4, 	3, 4, 2,	3, 2, 6,	3, 6, 8,	3, 8, 9,
-			 4, 9, 5,  	2, 4, 11,	6, 2, 10,	8, 6, 7,	9, 8, 1
+			 4, 9, 5, 	2, 4, 11,	6, 2, 10,	8, 6, 7,	9, 8, 1
 		];
 
 		PolyhedronBufferGeometry.call( this, vertices, indices, radius, detail );
@@ -26795,7 +26814,7 @@
 
 						if ( ( inSeg1Pt1.x !== inSeg2Pt1.x ) ||
 							 ( inSeg1Pt1.y !== inSeg2Pt1.y ) )		return [];	// they are distinct  points
-						return [ inSeg1Pt1 ];                 						// they are the same point
+						return [ inSeg1Pt1 ];	// they are the same point
 
 					}
 					// segment#1  is a single point
@@ -36980,6 +36999,7 @@
 		this.buffer = null;
 		this.loop = false;
 		this.startTime = 0;
+		this.offset = 0;
 		this.playbackRate = 1;
 		this.isPlaying = false;
 		this.hasPlaybackControl = true;
@@ -37043,7 +37063,8 @@
 			source.loop = this.loop;
 			source.onended = this.onEnded.bind( this );
 			source.playbackRate.setValueAtTime( this.playbackRate, this.startTime );
-			source.start( 0, this.startTime );
+			this.startTime = this.context.currentTime;
+			source.start( this.startTime, this.offset );
 
 			this.isPlaying = true;
 
@@ -37062,9 +37083,13 @@
 
 			}
 
-			this.source.stop();
-			this.startTime = this.context.currentTime;
-			this.isPlaying = false;
+			if ( this.isPlaying === true ) {
+
+				this.source.stop();
+				this.offset += ( this.context.currentTime - this.startTime ) * this.playbackRate;
+				this.isPlaying = false;
+
+			}
 
 			return this;
 
@@ -37080,7 +37105,7 @@
 			}
 
 			this.source.stop();
-			this.startTime = 0;
+			this.offset = 0;
 			this.isPlaying = false;
 
 			return this;
