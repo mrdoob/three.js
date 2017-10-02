@@ -314,7 +314,7 @@
 
 		var FBX_ID = textureNode.id;
 
-		var name = textureNode.name;
+		var name = textureNode.attrName;
 
 		var fileName;
 
@@ -528,14 +528,25 @@
 
 			switch ( type ) {
 
+				case 'Bump':
+				case ' "Bump':
+					parameters.bumpMap = textureMap.get( relationship.ID );
+					break;
+
 				case 'DiffuseColor':
 				case ' "DiffuseColor':
 					parameters.map = textureMap.get( relationship.ID );
 					break;
 
-				case 'Bump':
-				case ' "Bump':
-					parameters.bumpMap = textureMap.get( relationship.ID );
+				case 'DisplacementColor':
+				case ' "DisplacementColor':
+					parameters.displacementMap = textureMap.get( relationship.ID );
+					break;
+
+
+				case 'EmissiveColor':
+				case ' "EmissiveColor':
+					parameters.emissiveMap = textureMap.get( relationship.ID );
 					break;
 
 				case 'NormalMap':
@@ -543,12 +554,32 @@
 					parameters.normalMap = textureMap.get( relationship.ID );
 					break;
 
+				case 'SpecularColor':
+				case ' "SpecularColor':
+					parameters.specularMap = textureMap.get( relationship.ID );
+					break;
+
+				case 'TransparentColor':
+				case ' "TransparentColor':
+					parameters.alphaMap = textureMap.get( relationship.ID );
+					parameters.transparent = true;
+					break;
+
+				case 'ReflectionColor':
+				case ' "ReflectionColor':
+					console.warn( 'THREE.FBXLoader: Environment maps are currently not supported.' );
+					break;
+
 				case 'AmbientColor':
-				case 'EmissiveColor':
 				case ' "AmbientColor':
-				case ' "EmissiveColor':
+				case 'ShininessExponent': // AKA glossiness map
+				case ' "ShininessExponent':
+				case 'SpecularFactor': // AKA specularLevel
+				case ' "SpecularFactor':
+				case 'VectorDisplacementColor': // NOTE: Seems to be a copy of DisplacementColor
+				case ' "VectorDisplacementColor':
 				default:
-					console.warn( 'THREE.FBXLoader: Unknown texture application of type %s, skipping texture.', type );
+					console.warn( 'THREE.FBXLoader: %s map is not supported in three.js, skipping texture.', type );
 					break;
 
 			}
