@@ -97,7 +97,11 @@
 
 		splitMesh: function ( mesh ) {
 
+			this.splittedObjects[ mesh.uuid ].geometry.dispose();
+			this.splittedObjects[ mesh.uuid ].material.dispose();
+			
 			this.splittedObjects[ mesh.uuid ].geometry = this.split( mesh.geometry );
+			this.splittedObjects[ mesh.uuid ].material = mesh.material;
 
 			// OR
 
