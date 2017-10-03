@@ -1,6 +1,10 @@
 /**
  * @author Mugen87 / https://github.com/Mugen87
  *
+ * References:
+ *	http://www.valvesoftware.com/publications/2010/siggraph2010_vlachos_waterflow.pdf
+ * 	http://graphicsrunner.blogspot.de/2010/08/water-using-flow-maps.html
+ *
  */
 
 THREE.Water = function ( width, height, options ) {
@@ -19,13 +23,12 @@ THREE.Water = function ( width, height, options ) {
 	var clipBias = options.clipBias || 0;
 	var speed = options.speed || 0.03; // water flow speed
 	var reflectivity = options.reflectivity || 0.02; // water reflectivity
-	var segments = options.segments || 4; // the amount of segments of the water geometry
+	var scale = options.scale || 1;
 	var shader = options.shader || THREE.Water.WaterShader;
 
 	var textureLoader = new THREE.TextureLoader();
 
 	var flowMap = options.flowMap || textureLoader.load( 'textures/water/Water_1_M_Flow.jpg' );
-	var noiseMap = options.noiseMap || textureLoader.load( 'textures/water/Water_1_M_Noise.jpg' );
 	var normalMap0 = options.normalMap0 || textureLoader.load( 'textures/water/Water_1_M_Normal.jpg' );
 	var normalMap1 = options.normalMap1 || textureLoader.load( 'textures/water/Water_2_M_Normal.jpg' );
 
@@ -70,7 +73,6 @@ THREE.Water = function ( width, height, options ) {
 	this.material.uniforms.tReflectionMap.value = mirror.getRenderTarget().texture;
 	this.material.uniforms.tRefractionMap.value = refractor.getRenderTarget().texture;
 	this.material.uniforms.tFlowMap.value = flowMap;
-	this.material.uniforms.tNoiseMap.value = noiseMap;
 	this.material.uniforms.tNormalMap0.value = normalMap0;
 	this.material.uniforms.tNormalMap1.value = normalMap1;
 
@@ -85,7 +87,7 @@ THREE.Water = function ( width, height, options ) {
 	this.material.uniforms.config.value.x = 0; // flowMapOffset0
 	this.material.uniforms.config.value.y = halfCycle; // flowMapOffset1
 	this.material.uniforms.config.value.z = halfCycle; // halfCycle
-	this.material.uniforms.config.value.w = segments; // segments
+	this.material.uniforms.config.value.w = scale; // scale
 
 	// functions
 
@@ -192,11 +194,6 @@ THREE.Water.WaterShader = {
 			value: null
 		},
 
-		'tNoiseMap': {
-			type: 't',
-			value: null
-		},
-
 		'tNormalMap0': {
 			type: 't',
 			value: null
@@ -246,7 +243,6 @@ THREE.Water.WaterShader = {
 		'uniform sampler2D tReflectionMap;',
 		'uniform sampler2D tRefractionMap;',
 		'uniform sampler2D tFlowMap;',
-		'uniform sampler2D tNoiseMap;',
 		'uniform sampler2D tNormalMap0;',
 		'uniform sampler2D tNormalMap1;',
 
@@ -264,24 +260,16 @@ THREE.Water.WaterShader = {
 		'	float flowMapOffset0 = config.x;',
 		'	float flowMapOffset1 = config.y;',
 		'	float halfCycle = config.z;',
-		'	float segments = config.w;',
+		'	float scale = config.w;',
 
 		'	vec3 toEye = normalize( vToEye );',
 
 		// sample flow map
 		'	vec2 flow = texture2D( tFlowMap, vUv ).rg * 2.0 - 1.0;',
-		'	flow.r *= -1.0;',
-
-		// sample noise map
-		'	float cycleOffset = texture2D( tNoiseMap, vUv ).r;',
-
-		// calculate current phases
-		'	float phase0 = cycleOffset * 0.5 + flowMapOffset0;',
-		'	float phase1 = cycleOffset * 0.5 + flowMapOffset1;',
 
 		// sample normal maps
-		'	vec4 normalColor0 = texture2D( tNormalMap0, ( vUv * segments ) + flow * phase0 );',
-		'	vec4 normalColor1 = texture2D( tNormalMap1, ( vUv * segments ) + flow * phase1 );',
+		'	vec4 normalColor0 = texture2D( tNormalMap0, ( vUv * scale ) + flow * flowMapOffset0 );',
+		'	vec4 normalColor1 = texture2D( tNormalMap1, ( vUv * scale ) + flow * flowMapOffset1 );',
 
 		// linear interpolate to get the final normal color
 		'	float flowLerp = abs( halfCycle - flowMapOffset0 ) / halfCycle;',

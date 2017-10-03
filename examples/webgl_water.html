@@ -64,7 +64,7 @@
 			// camera
 
 			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			camera.position.set( 10, 7, - 15 );
+			camera.position.set( 10, 7, 15 );
 			camera.lookAt( scene.position );
 
 			// clock
@@ -102,7 +102,8 @@
 
 			water = new THREE.Water( 20, 20, {
 				textureWidth: 1024,
-				textureHeight: 1024
+				textureHeight: 1024,
+				scale: 4
 			} );
 
 			water.position.y = 1;
