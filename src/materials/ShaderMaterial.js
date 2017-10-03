@@ -54,6 +54,8 @@ function ShaderMaterial( parameters ) {
 		shaderTextureLOD: false // set to use shader texture LOD
 	};
 
+	this.unrollLoops = false; // set to use loop unrolling in the shader
+
 	// When rendered geometry doesn't include these attributes but the material does,
 	// use these default values in WebGL. This avoids errors when buffer data is missing.
 	this.defaultAttributeValues = {
@@ -107,6 +109,8 @@ ShaderMaterial.prototype.copy = function ( source ) {
 
 	this.extensions = source.extensions;
 
+	this.unrollLoops = source.unrollLoops;
+
 	return this;
 
 };
@@ -118,6 +122,8 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 	data.uniforms = this.uniforms;
 	data.vertexShader = this.vertexShader;
 	data.fragmentShader = this.fragmentShader;
+
+	data.unrollLoops = this.unrollLoops;
 
 	return data;
 
