@@ -17,18 +17,19 @@ THREE.Water = function ( width, height, options ) {
 
 	options = options || {};
 
-	var color = ( options.color !== undefined ) !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
+	var color = ( options.color !== undefined ) ? new THREE.Color( options.color ) : new THREE.Color( 0xffffff );
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
-	var speed = options.speed || 0.03; // water flow speed
+	var flowDirection = options.flowDirection || new THREE.Vector2( 1, 0 );
+	var flowSpeed = options.flowSpeed || 0.03; // water flow speed
 	var reflectivity = options.reflectivity || 0.02; // water reflectivity
 	var scale = options.scale || 1;
 	var shader = options.shader || THREE.Water.WaterShader;
 
 	var textureLoader = new THREE.TextureLoader();
 
-	var flowMap = options.flowMap || textureLoader.load( 'textures/water/Water_1_M_Flow.jpg' );
+	var flowMap = options.flowMap || undefined;
 	var normalMap0 = options.normalMap0 || textureLoader.load( 'textures/water/Water_1_M_Normal.jpg' );
 	var normalMap1 = options.normalMap1 || textureLoader.load( 'textures/water/Water_2_M_Normal.jpg' );
 
@@ -65,6 +66,23 @@ THREE.Water = function ( width, height, options ) {
 		transparent: true
 	} );
 
+	if ( flowMap !== undefined ) {
+
+		this.material.defines.USE_FLOWMAP = '';
+		this.material.uniforms.tFlowMap = {
+			type: 't',
+			value: flowMap
+		};
+
+	} else {
+
+		this.material.uniforms.flowDirection = {
+			type: 'v2',
+			value: flowDirection
+		};
+
+	}
+
 	// maps
 
 	normalMap0.wrapS = normalMap0.wrapT = THREE.RepeatWrapping;
@@ -72,7 +90,6 @@ THREE.Water = function ( width, height, options ) {
 
 	this.material.uniforms.tReflectionMap.value = mirror.getRenderTarget().texture;
 	this.material.uniforms.tRefractionMap.value = refractor.getRenderTarget().texture;
-	this.material.uniforms.tFlowMap.value = flowMap;
 	this.material.uniforms.tNormalMap0.value = normalMap0;
 	this.material.uniforms.tNormalMap1.value = normalMap1;
 
@@ -110,8 +127,8 @@ THREE.Water = function ( width, height, options ) {
 
 		var config = scope.material.uniforms.config;
 
-		config.value.x += speed * delta; // flowMapOffset0
-		config.value.y += speed * delta; // flowMapOffset1
+		config.value.x += flowSpeed * delta; // flowMapOffset0
+		config.value.y += flowSpeed * delta; // flowMapOffset1
 
 		// reset properties if necessary
 
@@ -189,11 +206,6 @@ THREE.Water.WaterShader = {
 			value: null
 		},
 
-		'tFlowMap': {
-			type: 't',
-			value: null
-		},
-
 		'tNormalMap0': {
 			type: 't',
 			value: null
@@ -242,9 +254,14 @@ THREE.Water.WaterShader = {
 
 		'uniform sampler2D tReflectionMap;',
 		'uniform sampler2D tRefractionMap;',
-		'uniform sampler2D tFlowMap;',
 		'uniform sampler2D tNormalMap0;',
 		'uniform sampler2D tNormalMap1;',
+
+		'#ifdef USE_FLOWMAP',
+		'	uniform sampler2D tFlowMap;',
+		'#else',
+		'	uniform vec2 flowDirection;',
+		'#endif',
 
 		'uniform vec3 color;',
 		'uniform float reflectivity;',
@@ -264,8 +281,14 @@ THREE.Water.WaterShader = {
 
 		'	vec3 toEye = normalize( vToEye );',
 
-		// sample flow map
-		'	vec2 flow = texture2D( tFlowMap, vUv ).rg * 2.0 - 1.0;',
+		// determine flow direction
+		'	vec2 flow;',
+		'	#ifdef USE_FLOWMAP',
+		'		flow = texture2D( tFlowMap, vUv ).rg * 2.0 - 1.0;',
+		'	#else',
+		'		flow = flowDirection;',
+		'	#endif',
+		'	flow.x *= - 1.0;',
 
 		// sample normal maps
 		'	vec4 normalColor0 = texture2D( tNormalMap0, ( vUv * scale ) + flow * flowMapOffset0 );',
