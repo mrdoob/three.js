@@ -1021,17 +1021,6 @@ THREE.AssimpLoader.prototype = {
 
 		};
 
-		var nameTexMapping = {
-
-			"$tex.ambient": "ambientMap",
-			"$clr.diffuse": "map",
-			"$clr.specular": "specMap",
-			"$clr.emissive": "emissive",
-			"$clr.transparent": "alphaMap",
-			"$clr.reflective": "reflectMap",
-
-		};
-
 		var nameTypeMapping = {
 
 			"?mat.name": "string",
