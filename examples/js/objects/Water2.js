@@ -17,7 +17,7 @@ THREE.Water = function ( width, height, options ) {
 
 	options = options || {};
 
-	var color = ( options.color !== undefined ) ? new THREE.Color( options.color ) : new THREE.Color( 0xffffff );
+	var color = ( options.color !== undefined ) ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
@@ -41,14 +41,12 @@ THREE.Water = function ( width, height, options ) {
 	// internal components
 
 	var mirror = new THREE.Mirror( width, height, {
-		color: color,
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
 		clipBias: clipBias
 	} );
 
 	var refractor = new THREE.Refractor( width, height, {
-		color: color,
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
 		clipBias: clipBias
