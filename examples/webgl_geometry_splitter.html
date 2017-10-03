@@ -278,7 +278,8 @@
 				this.splitterControl.attach( this.splitter );
 				this.scene.add( this.splitterControl );
 
-
+				this.splittedMesh = this.splitter.add( this.mesh );
+				this.scene.add( this.splittedMesh );
 			}
 
 			function initDatGui() {
@@ -493,14 +494,14 @@
 			updateGeometry: function () {
 
 				this.geometry = ( this.interface.useBufferGeometry ) ?
-						this.interface.bufferGeometries[ this.interface.geometry ].clone() :
-						this.interface.basicGeometries[ this.interface.geometry ].clone();
+						this.interface.bufferGeometries[ this.interface.geometry ] :
+						this.interface.basicGeometries[ this.interface.geometry ];
 
 			},
 
 			updateMaterial: function () {
 
-				this.material = this.interface.materials[ this.interface.material ].clone();
+				this.material = this.interface.materials[ this.interface.material ];
 				this.material.wireframe = this.interface.displayWireFrame;
 				this.material.side = this.interface.materialSides[ this.interface.materialSide ];
 				this.material.needsUpdate = true;
@@ -510,17 +511,11 @@
 
 			updateMesh: function () {
 
-				if ( this.splittedMesh ) this.scene.remove( this.splittedMesh );
-				if ( this.mesh ) this.splitter.remove( this.mesh );
-
 				this.mesh.geometry = this.geometry;
 				this.mesh.material = this.material;
 				this.mesh.castShadow = this.interface.meshShadow;
 				this.mesh.updateMatrix();
-
-				this.splittedMesh = this.splitter.add( this.mesh );
-				this.scene.add( this.splittedMesh );
-
+				
 			},
 
 			updateSplitter: function () {
@@ -544,7 +539,13 @@
 
 			updateVertexNormalsHelper: function () {
 
-				if ( this.vertexNormalHelper ) this.scene.remove( this.vertexNormalHelper );
+				if ( this.vertexNormalHelper ) {
+
+					this.vertexNormalHelper.geometry.dispose();
+					this.vertexNormalHelper.material.dispose();
+					this.scene.remove( this.vertexNormalHelper );
+
+				}
 
 				this.vertexNormalHelper = new THREE.VertexNormalsHelper( this.splittedMesh, 0.1, 0xff00ff, 1 );
 				this.vertexNormalHelper.visible = this.interface.displayVertexNormalHelper
@@ -554,7 +555,14 @@
 
 			updateFaceNormalsHelper: function () {
 
-				if ( this.faceNormalHelper ) this.scene.remove( this.faceNormalHelper );
+				if ( this.faceNormalHelper ) {
+
+					this.faceNormalHelper.geometry.dispose();
+					this.faceNormalHelper.material.dispose();
+					this.scene.remove( this.faceNormalHelper );
+
+				}
+
 				if ( this.interface.useBufferGeometry ) return;
 
 				this.faceNormalHelper = new THREE.FaceNormalsHelper( this.splittedMesh, 0.3, 0x00ffff, 1 );
@@ -580,7 +588,13 @@
 
 			updateGhostVertexNormalsHelper: function () {
 
-				if ( this.ghostVertexNormalHelper ) this.scene.remove( this.ghostVertexNormalHelper );
+				if ( this.ghostVertexNormalHelper ) {
+
+					this.ghostVertexNormalHelper.geometry.dispose();
+					this.ghostVertexNormalHelper.material.dispose();
+					this.scene.remove( this.ghostVertexNormalHelper );
+
+				}
 
 				this.ghostVertexNormalHelper = new THREE.VertexNormalsHelper( this.ghost, 0.1, 0xff00ff, 1 );
 				this.ghostVertexNormalHelper.visible = ( this.interface.displayGhost && this.interface.displayVertexNormalHelper );
@@ -592,7 +606,14 @@
 
 			updateGhostFaceNormalsHelper: function () {
 
-				if ( this.ghostFaceNormalHelper ) this.scene.remove( this.ghostFaceNormalHelper );
+				if ( this.ghostFaceNormalHelper ) {
+
+					this.ghostFaceNormalHelper.geometry.dispose();
+					this.ghostFaceNormalHelper.material.dispose();
+					this.scene.remove( this.ghostFaceNormalHelper );
+
+				}
+
 				if ( this.interface.useBufferGeometry ) return;
 
 				this.ghostFaceNormalHelper = new THREE.FaceNormalsHelper( this.ghost, 0.3, 0x00ffff, 1 );
