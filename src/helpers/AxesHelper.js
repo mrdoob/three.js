@@ -9,7 +9,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-function AxisHelper( size ) {
+function AxesHelper( size ) {
 
 	size = size || 1;
 
@@ -35,8 +35,8 @@ function AxisHelper( size ) {
 
 }
 
-AxisHelper.prototype = Object.create( LineSegments.prototype );
-AxisHelper.prototype.constructor = AxisHelper;
+AxesHelper.prototype = Object.create( LineSegments.prototype );
+AxesHelper.prototype.constructor = AxesHelper;
 
 
-export { AxisHelper };
+export { AxesHelper };

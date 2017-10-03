@@ -181,7 +181,7 @@ var list = {
 
 		"Helpers": {
 			"ArrowHelper": "api/helpers/ArrowHelper",
-			"AxisHelper": "api/helpers/AxisHelper",
+			"AxesHelper": "api/helpers/AxesHelper",
 			"BoxHelper": "api/helpers/BoxHelper",
 			"Box3Helper": "api/helpers/Box3Helper",
 			"CameraHelper": "api/helpers/CameraHelper",
