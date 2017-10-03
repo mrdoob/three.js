@@ -253,6 +253,12 @@ THREE.Refractor = function ( width, height, options ) {
 
 	};
 
+	this.getRenderTarget = function () {
+
+		return renderTarget;
+
+	};
+
 };
 
 THREE.Refractor.prototype = Object.create( THREE.Mesh.prototype );
