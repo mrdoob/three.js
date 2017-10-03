@@ -267,7 +267,12 @@
 				this.scene.add( this.splitter );
 
 				this.splitterControl = new THREE.TransformControls( this.camera, this.renderer.domElement );
-				this.splitterControl.addEventListener( 'change', this.update.bind(this) );
+				this.splitterControl.addEventListener( 'objectChange', function () {
+
+					this.updateSplitter.call(this);
+					this.updateHelper.call(this);
+
+				}.bind(this) );
 				this.splitterControl.addEventListener( 'change', this.renderApp.bind(this) );
 
 				this.splitterControl.attach( this.splitter );
