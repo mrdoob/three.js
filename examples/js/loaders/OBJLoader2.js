@@ -15,7 +15,7 @@ if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
  */
 THREE.OBJLoader2 = (function () {
 
-	var OBJLOADER2_VERSION = '2.0.0';
+	var OBJLOADER2_VERSION = '2.0.1';
 	var Commons = THREE.LoaderSupport.Commons;
 	var Validator = THREE.LoaderSupport.Validator;
 	var ConsoleLogger = THREE.LoaderSupport.ConsoleLogger;
@@ -398,32 +398,34 @@ THREE.OBJLoader2 = (function () {
 			this.totalBytes = length;
 			var buffer = new Array( 128 );
 			var bufferPointer = 0;
-			var slashesCount = 0;
+			var slashSpacePattern = new Array( 16 );
+			var slashSpacePatternPointer = 0;
 			var reachedFaces = false;
 			var code;
 			var word = '';
 			var i = 0;
-			for ( ; i < length; i ++ ) {
+			for ( ; i < length; i++ ) {
 
 				code = arrayBufferView[ i ];
 				switch ( code ) {
 					case Consts.CODE_SPACE:
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
+						slashSpacePattern[ slashSpacePatternPointer++ ] = 0;
 						word = '';
 						break;
 
 					case Consts.CODE_SLASH:
-						slashesCount ++;
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
+						slashSpacePattern[ slashSpacePatternPointer++ ] = 1;
 						word = '';
 						break;
 
 					case Consts.CODE_LF:
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
 						word = '';
-						reachedFaces = this.processLine( buffer, bufferPointer, slashesCount, reachedFaces, i );
+						reachedFaces = this.processLine( buffer, bufferPointer, slashSpacePattern, slashSpacePatternPointer, reachedFaces, i );
 						bufferPointer = 0;
-						slashesCount = 0;
+						slashSpacePatternPointer = 0;
 						break;
 
 					case Consts.CODE_CR:
@@ -452,32 +454,34 @@ THREE.OBJLoader2 = (function () {
 			this.totalBytes = length;
 			var buffer = new Array( 128 );
 			var bufferPointer = 0;
-			var slashesCount = 0;
+			var slashSpacePattern = new Array( 16 );
+			var slashSpacePatternPointer = 0;
 			var reachedFaces = false;
 			var char;
 			var word = '';
 			var i = 0;
-			for ( ; i < length; i ++ ) {
+			for ( ; i < length; i++ ) {
 
 				char = text[ i ];
 				switch ( char ) {
 					case Consts.STRING_SPACE:
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
+						slashSpacePattern[ slashSpacePatternPointer++ ] = 0;
 						word = '';
 						break;
 
 					case Consts.STRING_SLASH:
-						slashesCount ++;
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
+						slashSpacePattern[ slashSpacePatternPointer++ ] = 1;
 						word = '';
 						break;
 
 					case Consts.STRING_LF:
-						if ( word.length > 0 ) buffer[ bufferPointer ++ ] = word;
+						if ( word.length > 0 ) buffer[ bufferPointer++ ] = word;
 						word = '';
-						reachedFaces = this.processLine( buffer, bufferPointer, slashesCount, reachedFaces, i );
+						reachedFaces = this.processLine( buffer, bufferPointer, slashSpacePattern, slashSpacePatternPointer, reachedFaces, i );
 						bufferPointer = 0;
-						slashesCount = 0;
+						slashSpacePatternPointer = 0;
 						break;
 
 					case Consts.STRING_CR:
@@ -491,14 +495,45 @@ THREE.OBJLoader2 = (function () {
 			this.logger.logTimeEnd( 'OBJLoader2.Parser.parseText' );
 		};
 
-		Parser.prototype.processLine = function ( buffer, bufferPointer, slashesCount, reachedFaces, currentByte ) {
+		Parser.prototype.processLine = function ( buffer, bufferPointer, slashSpacePattern, slashSpacePatternPointer, reachedFaces, currentByte ) {
 			if ( bufferPointer < 1 ) return reachedFaces;
 
-			var bufferLength = bufferPointer - 1;
-			var concatBuffer;
+			var countSlashes = function ( slashSpacePattern, slashSpacePatternPointer ) {
+				var slashesCount = 0;
+				for ( var i = 0; i < slashSpacePatternPointer; i++ ) {
+					slashesCount += slashSpacePattern[ i ];
+				}
+				return slashesCount;
+			};
+
+			var concatStringBuffer = function ( buffer, bufferPointer, slashSpacePattern ) {
+				var concatBuffer = '';
+				if ( bufferPointer === 2 ) {
+
+					concatBuffer = buffer[ 1 ];
+
+				} else {
+
+					var bufferLength = bufferPointer - 1;
+					for ( var i = 1; i < bufferLength; i++ ) {
+
+						concatBuffer += buffer[ i ] + ( slashSpacePattern[ i ] === 0 ? ' ' : '/' );
+
+					}
+					concatBuffer += buffer[ bufferLength ];
+
+				}
+				return concatBuffer;
+			};
+
+			var flushStringBuffer = function ( buffer, bufferPointer ) {
+				for ( var i = 0; i < bufferPointer; i++ ) {
+					buffer[ i ] = '';
+				}
+			};
+
 			switch ( buffer[ 0 ] ) {
 				case Consts.LINE_V:
-
 					// object complete instance required if reached faces already (= reached next block of v)
 					if ( reachedFaces ) {
 
@@ -511,7 +546,7 @@ THREE.OBJLoader2 = (function () {
 						reachedFaces = false;
 
 					}
-					if ( bufferLength === 3 ) {
+					if ( bufferPointer === 4 ) {
 
 						this.rawMesh.pushVertex( buffer )
 
@@ -532,69 +567,51 @@ THREE.OBJLoader2 = (function () {
 
 				case Consts.LINE_F:
 					reachedFaces = true;
-					this.rawMesh.processFaces( buffer, bufferPointer, slashesCount );
+					this.rawMesh.processFaces( buffer, bufferPointer, countSlashes( slashSpacePattern, slashSpacePatternPointer ) );
 					break;
 
 				case Consts.LINE_L:
-					if ( bufferLength === slashesCount * 2 ) {
-
-						this.rawMesh.buildLineVvt( buffer );
-
-					} else {
-
-						this.rawMesh.buildLineV( buffer );
-
-					}
+					this.rawMesh.processLines( buffer, bufferPointer, countSlashes( slashSpacePattern, slashSpacePatternPointer ) );
 					break;
 
 				case Consts.LINE_S:
 					this.rawMesh.pushSmoothingGroup( buffer[ 1 ] );
-					this.flushStringBuffer( buffer, bufferPointer );
+					flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				case Consts.LINE_G:
-					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
-					this.processCompletedGroup( concatBuffer, currentByte );
-					this.flushStringBuffer( buffer, bufferPointer );
+					this.processCompletedGroup( concatStringBuffer( buffer, bufferPointer, slashSpacePattern ), currentByte );
+					flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				case Consts.LINE_O:
-					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
 					if ( this.rawMesh.vertices.length > 0 ) {
 
-						this.processCompletedObject( concatBuffer, null, currentByte );
+						this.processCompletedObject( concatStringBuffer( buffer, bufferPointer, slashSpacePattern ), null, currentByte );
 						reachedFaces = false;
 
 					} else {
 
-						this.rawMesh.pushObject( concatBuffer );
+						this.rawMesh.pushObject( concatStringBuffer( buffer, bufferPointer, slashSpacePattern ) );
 
 					}
-					this.flushStringBuffer( buffer, bufferPointer );
+					flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				case Consts.LINE_MTLLIB:
-					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
-					this.rawMesh.pushMtllib( concatBuffer );
-					this.flushStringBuffer( buffer, bufferPointer );
+					this.rawMesh.pushMtllib( concatStringBuffer( buffer, bufferPointer, slashSpacePattern ) );
+					flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				case Consts.LINE_USEMTL:
-					concatBuffer = bufferLength > 1 ? buffer.slice( 1, bufferPointer ).join( ' ' ) : buffer[ 1 ];
-					this.rawMesh.pushUsemtl( concatBuffer );
-					this.flushStringBuffer( buffer, bufferPointer );
+					this.rawMesh.pushUsemtl( concatStringBuffer( buffer, bufferPointer, slashSpacePattern ) );
+					flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				default:
 					break;
 			}
 			return reachedFaces;
-		};
-
-		Parser.prototype.flushStringBuffer = function ( buffer, bufferLength ) {
-			for ( var i = 0; i < bufferLength; i ++ ) {
-				buffer[ i ] = '';
-			}
 		};
 
 		Parser.prototype.createRawMeshReport = function ( rawMesh , inputObjectCount ) {
@@ -1103,19 +1120,27 @@ THREE.OBJLoader2 = (function () {
 		 * 0: "f vertex/uv		vertex/uv 		..."
 		 * 1: "f vertex			vertex 			..."
 		 */
-		RawMesh.prototype.buildLineVvt = function ( lineArray ) {
-			for ( var i = 1, length = lineArray.length; i < length; i ++ ) {
+		RawMesh.prototype.processLines = function ( buffer, bufferPointer, slashCount ) {
+			var i = 1;
+			var length;
+			var bufferLength = bufferPointer - 1;
 
-				this.vertices.push( parseInt( lineArray[ i ] ) );
-				this.uvs.push( parseInt( lineArray[ i ] ) );
+			if ( bufferLength === slashCount * 2 ) {
 
-			}
-		};
+				for ( length = bufferLength - 2; i < length; i += 2 ) {
 
-		RawMesh.prototype.buildLineV = function ( lineArray ) {
-			for ( var i = 1, length = lineArray.length; i < length; i++ ) {
+					this.vertices.push( parseInt( buffer[ i ] ) );
+					this.uvs.push( parseInt( buffer[ i + 1 ] ) );
 
-				this.vertices.push( parseInt( lineArray[ i ] ) );
+				}
+
+			} else {
+
+				for ( length = bufferLength - 1; i < length; i ++ ) {
+
+					this.vertices.push( parseInt( buffer[ i ] ) );
+
+				}
 
 			}
 		};
