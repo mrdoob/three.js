@@ -72,10 +72,14 @@ THREE.Water = function ( width, height, options ) {
 	// material
 
 	this.material = new THREE.ShaderMaterial( {
-		uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+		uniforms: THREE.UniformsUtils.merge( [
+			THREE.UniformsLib[ 'fog' ],
+			shader.uniforms
+		] ),
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
-		transparent: true
+		transparent: true,
+		fog: true
 	} );
 
 	if ( flowMap !== undefined ) {
@@ -242,6 +246,8 @@ THREE.Water.WaterShader = {
 
 	vertexShader: [
 
+		'#include <fog_pars_vertex>',
+
 		'uniform mat4 textureMatrix;',
 
 		'varying vec4 vCoord;',
@@ -256,13 +262,18 @@ THREE.Water.WaterShader = {
 		' vec4 worldPosition = modelMatrix * vec4( position, 1.0 );',
 		'	vToEye = cameraPosition - worldPosition.xyz;',
 
-		'	gl_Position = projectionMatrix * viewMatrix * worldPosition;',
+		'	vec4 mvPosition =  viewMatrix * worldPosition;', // used in fog_vertex
+		'	gl_Position = projectionMatrix * mvPosition;',
+
+		' #include <fog_vertex>',
 
 		'}'
 
 	].join( '\n' ),
 
 	fragmentShader: [
+
+		'#include <fog_pars_fragment>',
 
 		'uniform sampler2D tReflectionMap;',
 		'uniform sampler2D tRefractionMap;',
@@ -277,7 +288,6 @@ THREE.Water.WaterShader = {
 
 		'uniform vec3 color;',
 		'uniform float reflectivity;',
-
 		'uniform vec4 config;',
 
 		'varying vec4 vCoord;',
@@ -326,6 +336,10 @@ THREE.Water.WaterShader = {
 
 		// multiply water color with the mix of both textures
 		'	gl_FragColor = vec4( color, 1.0 ) * mix( refractColor, reflectColor, reflectance );',
+
+		'#include <tonemapping_fragment>',
+		'#include <encodings_fragment>',
+		'#include <fog_fragment>',
 
 		'}'
 
