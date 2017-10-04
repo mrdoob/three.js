@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js water</title>
+		<title>three.js - water</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -42,7 +42,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> water
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - water
 		</div>
 
 		<script>
@@ -72,7 +72,7 @@
 			// camera
 
 			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			camera.position.set( 10, 7, 15 );
+			camera.position.set( - 15, 7, 15 );
 			camera.lookAt( scene.position );
 
 			// clock
@@ -89,14 +89,15 @@
 			torusKnot.scale.set( 0.5, 0.5, 0.5 );
 			scene.add( torusKnot );
 
-			var textureLoader = new THREE.TextureLoader();
+			// ground
 
 			var groundGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
-			var groundMaterial = new THREE.MeshStandardMaterial( { roughness: 0.7 } );
+			var groundMaterial = new THREE.MeshStandardMaterial( { roughness: 0.8, metalness: 0.4 } );
 			var ground = new THREE.Mesh( groundGeometry, groundMaterial );
 			ground.rotation.x = Math.PI * - 0.5;
 			scene.add( ground );
 
+			var textureLoader = new THREE.TextureLoader();
 			textureLoader.load( 'textures/hardwood2_diffuse.jpg', function( map ) {
 				map.wrapS = THREE.RepeatWrapping;
 				map.wrapT = THREE.RepeatWrapping;
@@ -150,7 +151,7 @@
 			scene.add( ambientLight );
 
 			var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
-			directionalLight.position.set( 1, 1, - 1 );
+			directionalLight.position.set( - 1, 1, 1 );
 			scene.add( directionalLight );
 
 			// renderer

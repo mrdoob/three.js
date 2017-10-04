@@ -257,7 +257,8 @@ var files = {
 		"webgl_tonemapping",
 		"webgl_trails",
 		"webgl_video_panorama_equirectangular",
-		"webgl_water"
+		"webgl_water",
+		"webgl_water_flowmap"
 	],
 	"webgl / advanced": [
 		"webgl_buffergeometry",
