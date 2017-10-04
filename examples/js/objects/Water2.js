@@ -22,8 +22,8 @@ THREE.Water = function ( width, height, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var flowDirection = options.flowDirection || new THREE.Vector2( 1, 0 );
-	var flowSpeed = options.flowSpeed || 0.03; // water flow speed
-	var reflectivity = options.reflectivity || 0.02; // water reflectivity
+	var flowSpeed = options.flowSpeed || 0.03;
+	var reflectivity = options.reflectivity || 0.02;
 	var scale = options.scale || 1;
 	var shader = options.shader || THREE.Water.WaterShader;
 
@@ -39,6 +39,20 @@ THREE.Water = function ( width, height, options ) {
 	var clock = new THREE.Clock();
 
 	// internal components
+
+	if ( THREE.Mirror === undefined ) {
+
+		console.error( 'THREE.Water: Required component THREE.Mirror not found.' );
+		return;
+
+	}
+
+	if ( THREE.Refractor === undefined ) {
+
+		console.error( 'THREE.Water: Required component THREE.Refractor not found.' );
+		return;
+
+	}
 
 	var mirror = new THREE.Mirror( width, height, {
 		textureWidth: textureWidth,
@@ -214,14 +228,14 @@ THREE.Water.WaterShader = {
 			value: null
 		},
 
-		'config': {
-			type: 'v4',
-			value: new THREE.Vector4()
-		},
-
 		'textureMatrix': {
 			type: 'm4',
 			value: null
+		},
+
+		'config': {
+			type: 'v4',
+			value: new THREE.Vector4()
 		}
 
 	},
@@ -288,7 +302,7 @@ THREE.Water.WaterShader = {
 		'	#endif',
 		'	flow.x *= - 1.0;',
 
-		// sample normal maps
+		// sample normal maps (distort uvs with flowdata)
 		'	vec4 normalColor0 = texture2D( tNormalMap0, ( vUv * scale ) + flow * flowMapOffset0 );',
 		'	vec4 normalColor1 = texture2D( tNormalMap1, ( vUv * scale ) + flow * flowMapOffset1 );',
 
@@ -299,18 +313,18 @@ THREE.Water.WaterShader = {
 		// calculate normal vector
 		'	vec3 normal = normalize( vec3( normalColor.r * 2.0 - 1.0, normalColor.b,  normalColor.g * 2.0 - 1.0 ) );',
 
-		// fresnel effect
+		// calculate the fresnel term to blend reflection and refraction maps
 		'	float theta = max( dot( toEye, normal ), 0.0 );',
 		'	float reflectance = reflectivity + ( 1.0 - reflectivity ) * pow( ( 1.0 - theta ), 5.0 );',
 
-		// sample textures
+		// calculate final uv coords
 		'	vec3 coord = vCoord.xyz / vCoord.w;',
 		'	vec2 uv = coord.xy + coord.z * normal.xz * 0.05;',
 
 		'	vec4 reflectColor = texture2D( tReflectionMap, uv );',
 		'	vec4 refractColor = texture2D( tRefractionMap, uv );',
 
-		// multiply water color with the mix of both textures. then add lighting
+		// multiply water color with the mix of both textures
 		'	gl_FragColor = vec4( color, 1.0 ) * mix( refractColor, reflectColor, reflectance );',
 
 		'}'
