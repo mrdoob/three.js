@@ -5152,7 +5152,7 @@
 
 	}
 
-	StructuredUniform.prototype.setValue = function ( gl, value ) {
+	StructuredUniform.prototype.setValue = function ( gl, value, renderer ) {
 
 		// Note: Don't need an extra 'renderer' parameter, since samplers
 		// are not allowed in structured uniforms.
@@ -5162,7 +5162,7 @@
 		for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
 			var u = seq[ i ];
-			u.setValue( gl, value[ u.id ] );
+			u.setValue( gl, value[ u.id ], renderer );
 
 		}
 
@@ -42295,7 +42295,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function AxisHelper( size ) {
+	function AxesHelper( size ) {
 
 		size = size || 1;
 
@@ -42321,8 +42321,8 @@
 
 	}
 
-	AxisHelper.prototype = Object.create( LineSegments.prototype );
-	AxisHelper.prototype.constructor = AxisHelper;
+	AxesHelper.prototype = Object.create( LineSegments.prototype );
+	AxesHelper.prototype.constructor = AxesHelper;
 
 	/**
 	 * @author zz85 https://github.com/zz85
@@ -42864,6 +42864,13 @@
 	} );
 
 	//
+	function AxisHelper( size ) {
+
+		console.warn( 'THREE.AxisHelper has been renamed to THREE.AxesHelper.' );
+		return new AxesHelper( size );
+
+	}
+
 	function BoundingBoxHelper( object, color ) {
 
 		console.warn( 'THREE.BoundingBoxHelper has been deprecated. Creating a THREE.BoxHelper instead.' );
@@ -44277,7 +44284,7 @@
 	exports.Box3Helper = Box3Helper;
 	exports.PlaneHelper = PlaneHelper;
 	exports.ArrowHelper = ArrowHelper;
-	exports.AxisHelper = AxisHelper;
+	exports.AxesHelper = AxesHelper;
 	exports.CatmullRomCurve3 = CatmullRomCurve3;
 	exports.CubicBezierCurve3 = CubicBezierCurve3;
 	exports.QuadraticBezierCurve3 = QuadraticBezierCurve3;
@@ -44517,6 +44524,7 @@
 	exports.ClosedSplineCurve3 = ClosedSplineCurve3;
 	exports.SplineCurve3 = SplineCurve3;
 	exports.Spline = Spline;
+	exports.AxisHelper = AxisHelper;
 	exports.BoundingBoxHelper = BoundingBoxHelper;
 	exports.EdgesHelper = EdgesHelper;
 	exports.WireframeHelper = WireframeHelper;
