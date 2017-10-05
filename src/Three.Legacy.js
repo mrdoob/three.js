@@ -301,6 +301,7 @@ Object.assign( Spline.prototype, {
 } );
 
 //
+
 export function AxisHelper( size ) {
 
 	console.warn( 'THREE.AxisHelper has been renamed to THREE.AxesHelper.' );
