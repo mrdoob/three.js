@@ -139,34 +139,26 @@ THREE.Water = function ( width, height, options ) {
 
 	}
 
-	function updateFlow( delta ) {
+	function updateFlow() {
 
+		var delta = clock.getDelta();
 		var config = scope.material.uniforms.config;
 
 		config.value.x += flowSpeed * delta; // flowMapOffset0
-		config.value.y += flowSpeed * delta; // flowMapOffset1
+		config.value.y = config.value.x + halfCycle; // flowMapOffset1
 
-		// reset properties if necessary
+		// Important: The distance between offsets shold be always the value of "halfCycle".
+		// Moreover, both offsets should be in the range of [ 0, cycle ].
+		// This approach ensures a smooth water flow and avoids "reset" effects.
 
 		if ( config.value.x >= cycle ) {
 
 			config.value.x = 0;
+			config.value.y = halfCycle;
 
-			// avoid 'reset' effect when both offset are set to zero
+		} else if ( config.value.y >= cycle ) {
 
-			if ( config.value.y >= cycle ) {
-
-				config.value.y = halfCycle;
-
-				return;
-
-			}
-
-		}
-
-		if ( config.value.y >= cycle ) {
-
-			config.value.y = 0;
+			config.value.y = config.value.y - cycle;
 
 		}
 
@@ -176,10 +168,8 @@ THREE.Water = function ( width, height, options ) {
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
 
-		var delta = clock.getDelta();
-
 		updateTextureMatrix( camera );
-		updateFlow( delta );
+		updateFlow();
 
 		scope.visible = false;
 
