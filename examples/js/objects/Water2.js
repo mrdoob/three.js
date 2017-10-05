@@ -147,7 +147,7 @@ THREE.Water = function ( width, height, options ) {
 		config.value.x += flowSpeed * delta; // flowMapOffset0
 		config.value.y = config.value.x + halfCycle; // flowMapOffset1
 
-		// Important: The distance between offsets shold be always the value of "halfCycle".
+		// Important: The distance between offsets should be always the value of "halfCycle".
 		// Moreover, both offsets should be in the range of [ 0, cycle ].
 		// This approach ensures a smooth water flow and avoids "reset" effects.
 
