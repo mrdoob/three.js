@@ -63,9 +63,9 @@ THREE.Mirror = function ( width, height, options ) {
 	material.uniforms.color.value = color;
 	material.uniforms.textureMatrix.value = textureMatrix;
 
-	scope.material = material;
+	this.material = material;
 
-	scope.onBeforeRender = function ( renderer, scene, camera ) {
+	this.onBeforeRender = function ( renderer, scene, camera ) {
 
 		if ( 'recursion' in camera.userData ) {
 
@@ -187,6 +187,12 @@ THREE.Mirror = function ( width, height, options ) {
 		}
 
 		scope.visible = true;
+
+	};
+
+	this.getRenderTarget = function () {
+
+		return renderTarget;
 
 	};
 
