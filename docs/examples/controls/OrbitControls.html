@@ -30,7 +30,7 @@ document.body.appendChild( renderer.domElement );
 
 var scene = new THREE.Scene();
 
-var  camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
 var controls = new THREE.OrbitControls( camera );
 
@@ -74,13 +74,6 @@ function animate() {
       How fast to rotate around the target if [property:Boolean autoRotate] is true. Default is 2.0, which equates to 30 seconds
       per rotation at 60fps.<br> Note that if [property:Boolean autoRotate] is enabled, you must call [page:.update]
       () in your animation loop.
-    </div>
-
-    <h3>
-      [property:Float dampingFactor]</h3>
-    <div>
-      The damping inertia used if [property:Boolean enableDamping] is set to true.<br> Note that for this to work, you must
-      call [page:.update] () in your animation loop.
     </div>
 
     <h3>[property:HTMLDOMElement domElement]</h3>
@@ -201,9 +194,28 @@ controls.mouseButtons = {
       The camera ( or other object ) that is being controlled.
     </div>
 
+    <h3>
+      [property:Float panDampingFactor]</h3>
+    <div>
+      The damping inertia for pan, used if [property:Boolean enableDamping] is set to true.<br> Note that for this to work, you must
+      call [page:.update] () in your animation loop.
+    </div>
+
+    <h3>[property:Float panSpeed]</h3>
+    <div>
+      Speed of pan. Default is 1.
+    </div>
+
     <h3>[property:Vector3 position0]</h3>
     <div>
       Used internally by the [method:saveState] and [method:reset] methods.
+    </div>
+
+    <h3>
+      [property:Float rotateDampingFactor]</h3>
+    <div>
+      The damping inertia for rotation, used if [property:Boolean enableDamping] is set to true.<br> Note that for this to work, you must
+      call [page:.update] () in your animation loop.
     </div>
 
     <h3>[property:Float rotateSpeed]</h3>
@@ -225,6 +237,13 @@ controls.mouseButtons = {
     <h3>[property:Float zoom0]</h3>
     <div>
       Used internally by the [method:saveState] and [method:reset] methods.
+    </div>
+
+    <h3>
+      [property:Float zoomDampingFactor]</h3>
+    <div>
+      The damping inertia for zoom, used if [property:Boolean enableDamping] is set to true.<br> Note that for this to work, you must
+      call [page:.update] () in your animation loop.
     </div>
 
     <h3>[property:Float zoomSpeed]</h3>

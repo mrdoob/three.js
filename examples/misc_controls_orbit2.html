@@ -34,8 +34,8 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<p><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - orbit controls example</p>
-			<p>No animate loop</p>
+			<p><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - orbit controls example 2</p>
+			<p>with animate loop</p>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -43,16 +43,20 @@
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+			var gui;
+
 			var camera, controls, scene, renderer;
 
+			var update = true;
+
 			init();
-			render(); // remove when using next line for animation loop (requestAnimationFrame)
-			//animate();
+			animate();
 
 			function init() {
 
@@ -71,11 +75,7 @@
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // remove when using animation loop
-				// enable animation loop when using damping or autorotation
-				//controls.enableDamping = true;
-				//controls.rotateDampingFactor = 0.25;
-				controls.enableZoom = false;
+				controls.addEventListener( 'change', function () { update = true; } );
 
 				// world
 
@@ -109,6 +109,32 @@
 
 				//
 
+				gui = new dat.GUI();
+
+				gui.add( controls, 'enableDamping' );
+				var rotateFolder = gui.addFolder( 'rotation' );
+				rotateFolder.add( controls, 'enableRotate' );
+				rotateFolder.add( controls, 'autoRotate' );
+				rotateFolder.add( controls, 'autoRotateSpeed', 0.1, 5.0 );
+				rotateFolder.add( controls, 'rotateSpeed', 0.1, 3.0 );
+				rotateFolder.add( controls, 'rotateDampingFactor', 0.01, 0.3 );
+				rotateFolder.add( controls, 'minPolarAngle', 0, Math.PI );
+				rotateFolder.add( controls, 'maxPolarAngle', 0, Math.PI );
+				rotateFolder.add( controls, 'minAzimuthAngle', 0, Math.PI * 2 );
+				rotateFolder.add( controls, 'maxAzimuthAngle', 0, Math.PI * 2 );
+				var panFolder = gui.addFolder( 'pan' );
+				panFolder.add( controls, 'enablePan' );
+				panFolder.add( controls, 'panSpeed', 0.1, 3.0 );
+				panFolder.add( controls, 'panDampingFactor', 0.01, 0.3 );
+				var zoomFolder = gui.addFolder( 'zoom' );
+				zoomFolder.add( controls, 'enableZoom' );
+				zoomFolder.add( controls, 'zoomSpeed', 0.1, 3.0 );
+				zoomFolder.add( controls, 'zoomDampingFactor', 0.01, 0.3 );
+				zoomFolder.add( controls, 'minDistance', 0, 1000 );
+				zoomFolder.add( controls, 'maxDistance', 1, 1000 );
+
+				//
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -120,6 +146,8 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				update = true;
+
 			}
 
 			function animate() {
@@ -128,7 +156,13 @@
 
 				controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 
-				render();
+				if ( update ) {
+
+					render();
+
+					update = false;
+
+				}
 
 			}
 

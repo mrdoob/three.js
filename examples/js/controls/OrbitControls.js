@@ -46,7 +46,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// Set to true to enable damping (inertia)
 	// If damping is enabled, you must call controls.update() in your animation loop
 	this.enableDamping = false;
-	this.dampingFactor = 0.25;
+	this.panDampingFactor = 0.1;
+	this.zoomDampingFactor = 0.1;
+	this.rotateDampingFactor = 0.1;
 
 	// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 	// Set to false to disable zooming
@@ -59,6 +61,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Set to false to disable panning
 	this.enablePan = true;
+	this.panSpeed = 1.0;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
@@ -124,6 +127,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var offset = new THREE.Vector3();
 
+		var zoom = object.zoom;
+
 		// so camera.up is the orbit axis
 		var quat = new THREE.Quaternion().setFromUnitVectors( object.up, new THREE.Vector3( 0, 1, 0 ) );
 		var quatInverse = quat.clone().inverse();
@@ -161,7 +166,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			spherical.makeSafe();
 
 
-			spherical.radius *= scale;
+			spherical.radius *= ( 1 + distanceDelta );
 
 			// restrict radius to be between desired limits
 			spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
@@ -178,19 +183,36 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			scope.object.lookAt( scope.target );
 
+			if ( Math.abs( orthographicZoomDelta ) > EPS ) {//orthographicZoomDelta is only changed for orthographic camera
+				
+				zoom = Math.min( scope.maxZoom, Math.max( scope.minZoom, scope.object.zoom * ( 1 - orthographicZoomDelta ) ) );
+				
+				if ( zoom !== scope.object.zoom ) {
+
+					scope.object.zoom = zoom;
+					scope.object.updateProjectionMatrix();
+					zoomChanged = true;
+
+				}
+				
+			}
+
 			if ( scope.enableDamping === true ) {
 
-				sphericalDelta.theta *= ( 1 - scope.dampingFactor );
-				sphericalDelta.phi *= ( 1 - scope.dampingFactor );
+				sphericalDelta.theta *= ( 1 - scope.rotateDampingFactor );
+				sphericalDelta.phi *= ( 1 - scope.rotateDampingFactor );
+				panOffset.multiplyScalar( 1 - scope.panDampingFactor );
+				distanceDelta *= ( 1 - scope.zoomDampingFactor );
+				orthographicZoomDelta *= ( 1 - scope.zoomDampingFactor );
 
 			} else {
 
 				sphericalDelta.set( 0, 0, 0 );
+				panOffset.set( 0, 0, 0 );
+				distanceDelta = 0;
+				orthographicZoomDelta = 0;
 
 			}
-
-			scale = 1;
-			panOffset.set( 0, 0, 0 );
 
 			// update condition is:
 			// min(camera displacement, camera rotation in radians)^2 > EPS
@@ -255,7 +277,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var spherical = new THREE.Spherical();
 	var sphericalDelta = new THREE.Spherical();
 
-	var scale = 1;
+	var distanceDelta = 0;
+	var orthographicZoomDelta = 0;
 	var panOffset = new THREE.Vector3();
 	var zoomChanged = false;
 
@@ -267,19 +290,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var panEnd = new THREE.Vector2();
 	var panDelta = new THREE.Vector2();
 
-	var dollyStart = new THREE.Vector2();
-	var dollyEnd = new THREE.Vector2();
-	var dollyDelta = new THREE.Vector2();
+	var zoomStart = new THREE.Vector2();
+	var zoomEnd = new THREE.Vector2();
+	var zoomDelta = new THREE.Vector2();
 
 	function getAutoRotationAngle() {
 
 		return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
-
-	}
-
-	function getZoomScale() {
-
-		return Math.pow( 0.95, scope.zoomSpeed );
 
 	}
 
@@ -366,38 +383,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	function dollyIn( dollyScale ) {
+	function assignZoom( zoomValue ) {
 
 		if ( scope.object instanceof THREE.PerspectiveCamera ) {
 
-			scale /= dollyScale;
+			distanceDelta = zoomValue;
 
 		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
-			scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom * dollyScale ) );
-			scope.object.updateProjectionMatrix();
-			zoomChanged = true;
-
-		} else {
-
-			console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
-			scope.enableZoom = false;
-
-		}
-
-	}
-
-	function dollyOut( dollyScale ) {
-
-		if ( scope.object instanceof THREE.PerspectiveCamera ) {
-
-			scale *= dollyScale;
-
-		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
-
-			scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / dollyScale ) );
-			scope.object.updateProjectionMatrix();
-			zoomChanged = true;
+			orthographicZoomDelta = zoomValue;
 
 		} else {
 
@@ -424,7 +418,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleMouseDownDolly' );
 
-		dollyStart.set( event.clientX, event.clientY );
+		zoomStart.set( event.clientX, event.clientY );
 
 	}
 
@@ -461,21 +455,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleMouseMoveDolly' );
 
-		dollyEnd.set( event.clientX, event.clientY );
+		zoomEnd.set( event.clientX, event.clientY );
 
-		dollyDelta.subVectors( dollyEnd, dollyStart );
+		zoomDelta.subVectors( zoomEnd, zoomStart );
 
-		if ( dollyDelta.y > 0 ) {
+		var zoomSign = zoomDelta.y < 0 ? -1 : zoomDelta.y > 0 ? 1 : 0;
 
-			dollyIn( getZoomScale() );
+		assignZoom( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
 
-		} else if ( dollyDelta.y < 0 ) {
-
-			dollyOut( getZoomScale() );
-
-		}
-
-		dollyStart.copy( dollyEnd );
+		zoomStart.copy( zoomEnd );
 
 		scope.update();
 
@@ -487,7 +475,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		panEnd.set( event.clientX, event.clientY );
 
-		panDelta.subVectors( panEnd, panStart );
+		panDelta.subVectors( panEnd, panStart ).multiplyScalar( scope.panSpeed );
 
 		pan( panDelta.x, panDelta.y );
 
@@ -507,15 +495,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// console.log( 'handleMouseWheel' );
 
-		if ( event.deltaY < 0 ) {
+		var zoomSign = event.deltaY < 0 ? -1 : event.deltaY > 0 ? 1 : 0;
 
-			dollyOut( getZoomScale() );
-
-		} else if ( event.deltaY > 0 ) {
-
-			dollyIn( getZoomScale() );
-
-		}
+		assignZoom( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
 
 		scope.update();
 
@@ -568,7 +550,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var distance = Math.sqrt( dx * dx + dy * dy );
 
-		dollyStart.set( 0, distance );
+		zoomStart.set( 0, distance );
 
 	}
 
@@ -610,21 +592,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var distance = Math.sqrt( dx * dx + dy * dy );
 
-		dollyEnd.set( 0, distance );
+		zoomEnd.set( 0, distance );
 
-		dollyDelta.subVectors( dollyEnd, dollyStart );
+		zoomDelta.subVectors( zoomEnd, zoomStart );
 
-		if ( dollyDelta.y > 0 ) {
+		var zoomSign = zoomDelta.y > 0 ? -1 : zoomDelta.y < 0 ? 1 : 0;
 
-			dollyOut( getZoomScale() );
+		assignZoom( ( 1 - Math.pow( 0.95, scope.zoomSpeed ) ) * zoomSign );
 
-		} else if ( dollyDelta.y < 0 ) {
-
-			dollyIn( getZoomScale() );
-
-		}
-
-		dollyStart.copy( dollyEnd );
+		zoomStart.copy( zoomEnd );
 
 		scope.update();
 
@@ -636,7 +612,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		panDelta.subVectors( panEnd, panStart );
+		panDelta.subVectors( panEnd, panStart ).multiplyScalar( scope.panSpeed );
 
 		pan( panDelta.x, panDelta.y );
 
@@ -767,7 +743,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		handleMouseWheel( event );
 
-		scope.dispatchEvent( startEvent ); // not sure why these are here...
+		scope.dispatchEvent( startEvent );
 		scope.dispatchEvent( endEvent );
 
 	}
@@ -1025,15 +1001,33 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 
 		get: function () {
 
-			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
-			return this.dampingFactor;
+			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .rotateDampingFactor instead.' );
+			return this.rotateDampingFactor;
 
 		},
 
 		set: function ( value ) {
 
-			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
-			this.dampingFactor = value;
+			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .rotateDampingFactor instead.' );
+			this.rotateDampingFactor = value;
+
+		}
+
+	},
+
+	dampingFactor: {
+
+		get: function () {
+
+			console.warn( 'THREE.OrbitControls: .dampingFactor has been renamed. Use .rotateDampingFactor instead.' );
+			return this.rotateDampingFactor;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.OrbitControls: .dampingFactor has been renamed. Use .rotateDampingFactor instead.' );
+			this.rotateDampingFactor = value;
 
 		}
 
