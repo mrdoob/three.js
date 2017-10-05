@@ -255,7 +255,7 @@ THREE.Water.WaterShader = {
 		'	vec4 mvPosition =  viewMatrix * worldPosition;', // used in fog_vertex
 		'	gl_Position = projectionMatrix * mvPosition;',
 
-		' #include <fog_vertex>',
+		'	#include <fog_vertex>',
 
 		'}'
 
@@ -327,9 +327,9 @@ THREE.Water.WaterShader = {
 		// multiply water color with the mix of both textures
 		'	gl_FragColor = vec4( color, 1.0 ) * mix( refractColor, reflectColor, reflectance );',
 
-		'#include <tonemapping_fragment>',
-		'#include <encodings_fragment>',
-		'#include <fog_fragment>',
+		'	#include <tonemapping_fragment>',
+		'	#include <encodings_fragment>',
+		'	#include <fog_fragment>',
 
 		'}'
 
