@@ -35,7 +35,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/objects/Mirror.js"></script>
+		<script src="js/objects/Reflector.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
@@ -86,9 +86,9 @@
 
 				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 
-				// MIRROR planes
+				// reflector/mirror planes
 
-				var groundMirror = new THREE.Mirror( 100, 100, {
+				var groundMirror = new THREE.Reflector( 100, 100, {
 					clipBias: 0.003,
 					textureWidth: WIDTH * window.devicePixelRatio,
 					textureHeight: HEIGHT * window.devicePixelRatio,
@@ -98,7 +98,7 @@
 				groundMirror.rotateX( - Math.PI / 2 );
 				scene.add( groundMirror );
 
-				var verticalMirror = new THREE.Mirror( 60, 60, {
+				var verticalMirror = new THREE.Reflector( 60, 60, {
 					clipBias: 0.003,
 					textureWidth: WIDTH * window.devicePixelRatio,
 					textureHeight: HEIGHT * window.devicePixelRatio,

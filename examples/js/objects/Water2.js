@@ -40,9 +40,9 @@ THREE.Water = function ( width, height, options ) {
 
 	// internal components
 
-	if ( THREE.Mirror === undefined ) {
+	if ( THREE.Reflector === undefined ) {
 
-		console.error( 'THREE.Water: Required component THREE.Mirror not found.' );
+		console.error( 'THREE.Water: Required component THREE.Reflector not found.' );
 		return;
 
 	}
@@ -54,7 +54,7 @@ THREE.Water = function ( width, height, options ) {
 
 	}
 
-	var mirror = new THREE.Mirror( width, height, {
+	var reflector = new THREE.Reflector( width, height, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
 		clipBias: clipBias
@@ -66,7 +66,7 @@ THREE.Water = function ( width, height, options ) {
 		clipBias: clipBias
 	} );
 
-	mirror.matrixAutoUpdate = false;
+	reflector.matrixAutoUpdate = false;
 	refractor.matrixAutoUpdate = false;
 
 	// material
@@ -104,7 +104,7 @@ THREE.Water = function ( width, height, options ) {
 	normalMap0.wrapS = normalMap0.wrapT = THREE.RepeatWrapping;
 	normalMap1.wrapS = normalMap1.wrapT = THREE.RepeatWrapping;
 
-	this.material.uniforms.tReflectionMap.value = mirror.getRenderTarget().texture;
+	this.material.uniforms.tReflectionMap.value = reflector.getRenderTarget().texture;
 	this.material.uniforms.tRefractionMap.value = refractor.getRenderTarget().texture;
 	this.material.uniforms.tNormalMap0.value = normalMap0;
 	this.material.uniforms.tNormalMap1.value = normalMap1;
@@ -173,10 +173,10 @@ THREE.Water = function ( width, height, options ) {
 
 		scope.visible = false;
 
-		mirror.matrixWorld.copy( scope.matrixWorld );
+		reflector.matrixWorld.copy( scope.matrixWorld );
 		refractor.matrixWorld.copy( scope.matrixWorld );
 
-		mirror.onBeforeRender( renderer, scene, camera );
+		reflector.onBeforeRender( renderer, scene, camera );
 		refractor.onBeforeRender( renderer, scene, camera );
 
 		scope.visible = true;
