@@ -9,6 +9,6 @@ void main() {
 	#include <begin_vertex>
 	#include <project_vertex>
 
-	gl_Position.z = gl_Position.w;
+	gl_Position.z = gl_Position.w; // set z to camera.far
 
 }
