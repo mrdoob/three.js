@@ -46,7 +46,7 @@
 	<script src='js/libs/dat.gui.min.js'></script>
 
 	<script src="js/controls/TransformControls.js"></script>
-	<script src='js/geometries/GeometrySplitter.js'></script>
+	<script src='js/modifiers/SplitModifier.js'></script>
 
 	<script>
 
@@ -262,7 +262,7 @@
 
 			function initSplitter()  {
 
-				this.splitter = new THREE.GeometrySplitter( 4, 4, 1, 1 );
+				this.splitter = new THREE.SplitModifier( 4, 4, 1, 1 );
 				this.splitter.name = "TheSplitter";
 				this.scene.add( this.splitter );
 
@@ -370,7 +370,7 @@
 						// Todo: Text: new THREE.TextGeometry( 'Three.js' )
 					}
 
-					this.geometry = 'TorusKnot';
+					this.geometry = 'Box';
 					this.useBufferGeometry = true;
 
 					// Materials
@@ -386,7 +386,7 @@
 					}
 
 					this.material = 'Normal';
-					this.displayWireFrame = false;
+					this.displayWireFrame = true;
 
 					this.materialSides = {
 						Front: THREE.FrontSide,

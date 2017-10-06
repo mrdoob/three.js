@@ -12,7 +12,7 @@
 
 ( function () {
 
-	function GeometrySplitter( size ) {
+	function SplitModifier( size ) {
 
 		var size = size || 4;
 		var divisions = 1;
@@ -52,9 +52,9 @@
 
 	}
 
-	GeometrySplitter.prototype = Object.assign( Object.create( THREE.LineSegments.prototype ), {
+	SplitModifier.prototype = Object.assign( Object.create( THREE.LineSegments.prototype ), {
 
-		constructor: GeometrySplitter,
+		constructor: SplitModifier,
 
 		add: function ( object ) {
 
@@ -99,7 +99,7 @@
 
 			this.splittedObjects[ mesh.uuid ].geometry.dispose();
 			this.splittedObjects[ mesh.uuid ].material.dispose();
-			
+
 			this.splittedObjects[ mesh.uuid ].geometry = this.split( mesh.geometry );
 			this.splittedObjects[ mesh.uuid ].material = mesh.material;
 
@@ -1292,6 +1292,6 @@
 	} );
 
 	// Export
-	THREE.GeometrySplitter = GeometrySplitter;
+	THREE.SplitModifier = SplitModifier;
 
 } )();
