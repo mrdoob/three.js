@@ -92,9 +92,11 @@ Object.assign( Matrix3.prototype, {
 
 	applyToBufferAttribute: function () {
 
-		var v1 = new Vector3();
+		var v1;
 
 		return function applyToBufferAttribute( attribute ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
