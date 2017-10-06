@@ -1,4 +1,4 @@
-THREE.MirrorNode = function( mirror, camera, options ) {
+THREE.ReflectorNode = function( mirror, camera, options ) {
 
 	THREE.TempNode.call( this, 'v4' );
 
@@ -15,10 +15,10 @@ THREE.MirrorNode = function( mirror, camera, options ) {
 
 };
 
-THREE.MirrorNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.MirrorNode.prototype.constructor = THREE.MirrorNode;
+THREE.ReflectorNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.ReflectorNode.prototype.constructor = THREE.ReflectorNode;
 
-THREE.MirrorNode.prototype.generate = function( builder, output ) {
+THREE.ReflectorNode.prototype.generate = function( builder, output ) {
 
 	var material = builder.material;
 
@@ -37,7 +37,7 @@ THREE.MirrorNode.prototype.generate = function( builder, output ) {
 
 	} else {
 
-		console.warn( "THREE.MirrorNode is not compatible with " + builder.shader + " shader." );
+		console.warn( "THREE.ReflectorNode is not compatible with " + builder.shader + " shader." );
 
 		return builder.format( 'vec4(0.0)', this.type, output );
 

@@ -72,7 +72,7 @@
 		<script src="js/nodes/inputs/TextureNode.js"></script>
 		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
 		<script src="js/nodes/inputs/Matrix4Node.js"></script>
-		<script src="js/nodes/inputs/MirrorNode.js"></script>
+		<script src="js/nodes/inputs/ReflectorNode.js"></script>
 
 		<!-- Math -->
 		<script src="js/nodes/math/Math1Node.js"></script>
@@ -152,13 +152,13 @@
 
 				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 
-				// MIRROR planes
+				// mirror/refractor plane
 				var groundMirror = new THREE.ReflectorRTT( 100, 100, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
 
 				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
 				var maskFlip = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
 
-				var mirror = new THREE.MirrorNode( groundMirror );
+				var mirror = new THREE.ReflectorNode( groundMirror );
 
 				var normal = new THREE.TextureNode( decalNormal );
 				var normalXY = new THREE.SwitchNode( normal, 'xy' );
