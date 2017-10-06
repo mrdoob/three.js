@@ -6,12 +6,12 @@ THREE.MirrorNode = function( mirror, camera, options ) {
 
 	this.textureMatrix = new THREE.Matrix4Node( this.mirror.material.uniforms.textureMatrix.value );
 
-	this.worldPosition = new THREE.PositionNode( THREE.PositionNode.WORLD );
+	this.localPosition = new THREE.PositionNode( THREE.PositionNode.LOCAL );
 
-	this.coord = new THREE.OperatorNode( this.textureMatrix, this.worldPosition, THREE.OperatorNode.MUL );
+	this.coord = new THREE.OperatorNode( this.textureMatrix, this.localPosition, THREE.OperatorNode.MUL );
 	this.coordResult = new THREE.OperatorNode( null, this.coord, THREE.OperatorNode.ADD );
 
-	this.texture = new THREE.TextureNode( this.mirror.material.uniforms.mirrorSampler.value, this.coord, null, true );
+	this.texture = new THREE.TextureNode( this.mirror.material.uniforms.tDiffuse.value, this.coord, null, true );
 
 };
 
