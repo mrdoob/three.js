@@ -391,19 +391,36 @@ THREE.GLTFLoader = ( function () {
 
 		this.name = EXTENSIONS.KHR_DRACO_MESH_COMPRESSION;
 		this.dracoLoader = dracoLoader;
-
+                this.glTFNameToThreeJSName = {
+                  'POSITION' : 'position',
+                  'NORMAL' : 'normal',
+                  'TEXCOORD_0' : 'uv',
+                  'TEXCOORD0' : 'uv',
+                  'TEXCOORD' : 'uv',
+                  'TEXCOORD_1' : 'uv2',
+                  'COLOR_0' : 'color',
+                  'COLOR0' : 'color',
+                  'COLOR' : 'color',
+                  'WEIGHTS_0' : 'skinWeight',
+                  'JOINTS_0' : 'skinIndex'
+                };
 	}
 
 	GLTFDracoMeshCompressionExtension.prototype.decodePrimitive = function ( primitive, parser ) {
 
 		var dracoLoader = this.dracoLoader;
 		var bufferViewIndex = primitive.extensions[ this.name ].bufferView;
+                var attributesIdMap = primitive.extensions[ this.name ].attributes;
+                var attributeMap = {};
+                for (var attributeName in attributesIdMap) {
+                  attributeMap[this.glTFNameToThreeJSName[attributeName]] = attributesIdMap[attributeName];
+                }
 
 		return parser.getDependency( 'bufferView', bufferViewIndex ).then( function ( bufferView ) {
 
 			return new Promise( function ( resolve ) {
 
-				dracoLoader.decodeDracoFile( bufferView, resolve );
+				dracoLoader.decodeDracoFile( bufferView, resolve, attributeMap );
 
 			} );
 
