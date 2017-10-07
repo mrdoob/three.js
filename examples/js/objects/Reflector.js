@@ -2,11 +2,11 @@
  * @author Slayvin / http://slayvin.net
  */
 
-THREE.Mirror = function ( width, height, options ) {
+THREE.Reflector = function ( width, height, options ) {
 
 	THREE.Mesh.call( this, new THREE.PlaneBufferGeometry( width, height ) );
 
-	this.type = 'Mirror';
+	this.type = 'Reflector';
 
 	var scope = this;
 
@@ -16,14 +16,14 @@ THREE.Mirror = function ( width, height, options ) {
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
-	var shader = options.shader || THREE.Mirror.MirrorShader;
+	var shader = options.shader || THREE.Reflector.ReflectorShader;
 	var recursion = options.recursion !== undefined ? options.recursion : 0;
 
 	//
 
-	var mirrorPlane = new THREE.Plane();
+	var reflectorPlane = new THREE.Plane();
 	var normal = new THREE.Vector3();
-	var mirrorWorldPosition = new THREE.Vector3();
+	var reflectorWorldPosition = new THREE.Vector3();
 	var cameraWorldPosition = new THREE.Vector3();
 	var rotationMatrix = new THREE.Matrix4();
 	var lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
@@ -75,7 +75,7 @@ THREE.Mirror = function ( width, height, options ) {
 
 		}
 
-		mirrorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
+		reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
 
 		rotationMatrix.extractRotation( scope.matrixWorld );
@@ -83,14 +83,14 @@ THREE.Mirror = function ( width, height, options ) {
 		normal.set( 0, 0, 1 );
 		normal.applyMatrix4( rotationMatrix );
 
-		view.subVectors( mirrorWorldPosition, cameraWorldPosition );
+		view.subVectors( reflectorWorldPosition, cameraWorldPosition );
 
-		// Avoid rendering when mirror is facing away
+		// Avoid rendering when reflector is facing away
 
 		if ( view.dot( normal ) > 0 ) return;
 
 		view.reflect( normal ).negate();
-		view.add( mirrorWorldPosition );
+		view.add( reflectorWorldPosition );
 
 		rotationMatrix.extractRotation( camera.matrixWorld );
 
@@ -98,9 +98,9 @@ THREE.Mirror = function ( width, height, options ) {
 		lookAtPosition.applyMatrix4( rotationMatrix );
 		lookAtPosition.add( cameraWorldPosition );
 
-		target.subVectors( mirrorWorldPosition, lookAtPosition );
+		target.subVectors( reflectorWorldPosition, lookAtPosition );
 		target.reflect( normal ).negate();
-		target.add( mirrorWorldPosition );
+		target.add( reflectorWorldPosition );
 
 		virtualCamera.position.copy( view );
 		virtualCamera.up.set( 0, 1, 0 );
@@ -128,10 +128,10 @@ THREE.Mirror = function ( width, height, options ) {
 
 		// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 		// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
-		mirrorPlane.setFromNormalAndCoplanarPoint( normal, mirrorWorldPosition );
-		mirrorPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
+		reflectorPlane.setFromNormalAndCoplanarPoint( normal, reflectorWorldPosition );
+		reflectorPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
 
-		clipPlane.set( mirrorPlane.normal.x, mirrorPlane.normal.y, mirrorPlane.normal.z, mirrorPlane.constant );
+		clipPlane.set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant );
 
 		var projectionMatrix = virtualCamera.projectionMatrix;
 
@@ -198,10 +198,10 @@ THREE.Mirror = function ( width, height, options ) {
 
 };
 
-THREE.Mirror.prototype = Object.create( THREE.Mesh.prototype );
-THREE.Mirror.prototype.constructor = THREE.Mirror;
+THREE.Reflector.prototype = Object.create( THREE.Mesh.prototype );
+THREE.Reflector.prototype.constructor = THREE.Reflector;
 
-THREE.Mirror.MirrorShader = {
+THREE.Reflector.ReflectorShader = {
 
 	uniforms: {
 

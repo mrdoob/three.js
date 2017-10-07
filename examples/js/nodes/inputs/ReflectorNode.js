@@ -1,4 +1,4 @@
-THREE.MirrorNode = function( mirror, camera, options ) {
+THREE.ReflectorNode = function( mirror, camera, options ) {
 
 	THREE.TempNode.call( this, 'v4' );
 
@@ -6,19 +6,19 @@ THREE.MirrorNode = function( mirror, camera, options ) {
 
 	this.textureMatrix = new THREE.Matrix4Node( this.mirror.material.uniforms.textureMatrix.value );
 
-	this.worldPosition = new THREE.PositionNode( THREE.PositionNode.WORLD );
+	this.localPosition = new THREE.PositionNode( THREE.PositionNode.LOCAL );
 
-	this.coord = new THREE.OperatorNode( this.textureMatrix, this.worldPosition, THREE.OperatorNode.MUL );
+	this.coord = new THREE.OperatorNode( this.textureMatrix, this.localPosition, THREE.OperatorNode.MUL );
 	this.coordResult = new THREE.OperatorNode( null, this.coord, THREE.OperatorNode.ADD );
 
-	this.texture = new THREE.TextureNode( this.mirror.material.uniforms.mirrorSampler.value, this.coord, null, true );
+	this.texture = new THREE.TextureNode( this.mirror.material.uniforms.tDiffuse.value, this.coord, null, true );
 
 };
 
-THREE.MirrorNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.MirrorNode.prototype.constructor = THREE.MirrorNode;
+THREE.ReflectorNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.ReflectorNode.prototype.constructor = THREE.ReflectorNode;
 
-THREE.MirrorNode.prototype.generate = function( builder, output ) {
+THREE.ReflectorNode.prototype.generate = function( builder, output ) {
 
 	var material = builder.material;
 
@@ -37,7 +37,7 @@ THREE.MirrorNode.prototype.generate = function( builder, output ) {
 
 	} else {
 
-		console.warn( "THREE.MirrorNode is not compatible with " + builder.shader + " shader." );
+		console.warn( "THREE.ReflectorNode is not compatible with " + builder.shader + " shader." );
 
 		return builder.format( 'vec4(0.0)', this.type, output );
 
