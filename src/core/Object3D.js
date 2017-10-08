@@ -178,11 +178,11 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		var q1 = new Quaternion();
 		
-		return function rotateOnWorldAxis(axis, angle) {
+		return function rotateOnWorldAxis( axis, angle ) {
 		
-			q1.setFromAxisAngle(axis, angle);
+			q1.setFromAxisAngle( axis, angle );
 		
-			this.quaternion.premultiply(q1);
+			this.quaternion.premultiply( q1 );
 		
 			return this;
 		
