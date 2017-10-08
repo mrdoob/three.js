@@ -58,6 +58,13 @@
 
 		add: function ( object ) {
 
+			if ( ! object ) {
+
+				console.error( 'SplitModifier: Unable to split null or undefined Mesh !' );
+				return;
+
+			}
+
 //			THREE.Object3D.prototype.add.call( this, object );
 
 			this.originalObjects[ object.uuid ] = object;
@@ -97,11 +104,21 @@
 
 		splitMesh: function ( mesh ) {
 
-			this.splittedObjects[ mesh.uuid ].geometry.dispose();
-			this.splittedObjects[ mesh.uuid ].material.dispose();
+			var meshGeometry = this.splittedObjects[ mesh.uuid ].geometry;
+			if ( meshGeometry !== null && meshGeometry !== undefined ) {
 
-			this.splittedObjects[ mesh.uuid ].geometry = this.split( mesh.geometry );
-			this.splittedObjects[ mesh.uuid ].material = mesh.material;
+				this.splittedObjects[ mesh.uuid ].geometry.dispose();
+				this.splittedObjects[ mesh.uuid ].geometry = this.split( mesh.geometry );
+
+			}
+
+			var meshMaterial = this.splittedObjects[ mesh.uuid ].material;
+			if ( meshMaterial !== null && meshMaterial !== undefined ) {
+
+				this.splittedObjects[ mesh.uuid ].material.dispose();
+				this.splittedObjects[ mesh.uuid ].material = mesh.material;
+
+			}
 
 			// OR
 
