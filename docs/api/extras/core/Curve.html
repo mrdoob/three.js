@@ -31,13 +31,22 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Vector getPoint]( [page:Float t] )</h3>
-		<div>Returns a vector for point t of the curve where t is between 0 and 1. Must be implemented in the extending curve.</div>
-
-		<h3>[method:Vector getPointAt]( [page:Float u] )</h3>
+		<h3>[method:Vector getPoint]( [page:Float t], [page:Vector optionalTarget] )</h3>
 		<div>
-			Returns a vector for point at a relative position in curve according to arc length.
-			u is in the range [0, 1].
+			[page:Float t] - A position on the curve. Must be in the range [ 0, 1 ]. <br>
+			[page:Vector optionalTarget] — (optional) If specified, the result will be copied into this Vector,
+			otherwise a new Vector will be created. <br /><br />
+
+			Returns a vector for a given position on the curve.
+		</div>
+
+		<h3>[method:Vector getPointAt]( [page:Float u], [page:Vector optionalTarget] )</h3>
+		<div>
+			[page:Float u] - A position on the curve according to the arc length. Must be in the range [ 0, 1 ]. <br>
+			[page:Vector optionalTarget] — (optional) If specified, the result will be copied into this Vector,
+			otherwise a new Vector will be created. <br /><br />
+
+			Returns a vector for a given position on the curve according to the arc length.
 		</div>
 
 		<h3>[method:Array getPoints]( [page:Integer divisions] )</h3>

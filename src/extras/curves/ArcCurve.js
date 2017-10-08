@@ -10,5 +10,7 @@ function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 ArcCurve.prototype = Object.create( EllipseCurve.prototype );
 ArcCurve.prototype.constructor = ArcCurve;
 
+ArcCurve.prototype.isArcCurve = true;
+
 
 export { ArcCurve };

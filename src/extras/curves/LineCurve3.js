@@ -14,21 +14,32 @@ function LineCurve3( v1, v2 ) {
 LineCurve3.prototype = Object.create( Curve.prototype );
 LineCurve3.prototype.constructor = LineCurve3;
 
-LineCurve3.prototype.getPoint = function ( t ) {
+LineCurve3.prototype.isLineCurve3 = true;
+
+LineCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+
+	var point = optionalTarget || new Vector3();
 
 	if ( t === 1 ) {
 
-		return this.v2.clone();
+		point.copy( this.v2 );
+
+	} else {
+
+		point.copy( this.v2 ).sub( this.v1 );
+		point.multiplyScalar( t ).add( this.v1 );
 
 	}
 
-	var vector = new Vector3();
+	return point;
 
-	vector.subVectors( this.v2, this.v1 ); // diff
-	vector.multiplyScalar( t );
-	vector.add( this.v1 );
+};
 
-	return vector;
+// Line curve is linear, so we can overwrite default getPointAt
+
+LineCurve3.prototype.getPointAt = function ( u, optionalTarget ) {
+
+	return this.getPoint( u, optionalTarget );
 
 };
 

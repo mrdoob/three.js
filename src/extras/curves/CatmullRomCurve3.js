@@ -97,14 +97,18 @@ function CatmullRomCurve3( points ) {
 CatmullRomCurve3.prototype = Object.create( Curve.prototype );
 CatmullRomCurve3.prototype.constructor = CatmullRomCurve3;
 
-CatmullRomCurve3.prototype.getPoint = function ( t ) {
+CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
+
+CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+
+	var point = optionalTarget || new Vector3();
 
 	var points = this.points;
 	var l = points.length;
 
-	var point = ( l - ( this.closed ? 0 : 1 ) ) * t;
-	var intPoint = Math.floor( point );
-	var weight = point - intPoint;
+	var p = ( l - ( this.closed ? 0 : 1 ) ) * t;
+	var intPoint = Math.floor( p );
+	var weight = p - intPoint;
 
 	if ( this.closed ) {
 
@@ -172,7 +176,13 @@ CatmullRomCurve3.prototype.getPoint = function ( t ) {
 
 	}
 
-	return new Vector3( px.calc( weight ), py.calc( weight ), pz.calc( weight ) );
+	point.set(
+		px.calc( weight ),
+		py.calc( weight ),
+		pz.calc( weight )
+	);
+
+	return point;
 
 };
 

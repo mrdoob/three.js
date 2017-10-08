@@ -26,7 +26,9 @@ EllipseCurve.prototype.constructor = EllipseCurve;
 
 EllipseCurve.prototype.isEllipseCurve = true;
 
-EllipseCurve.prototype.getPoint = function ( t ) {
+EllipseCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+	var point = optionalTarget || new Vector2();
 
 	var twoPi = Math.PI * 2;
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
@@ -82,7 +84,7 @@ EllipseCurve.prototype.getPoint = function ( t ) {
 
 	}
 
-	return new Vector2( x, y );
+	return point.set( x, y );
 
 };
 

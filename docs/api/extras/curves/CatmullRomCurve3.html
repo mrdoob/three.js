@@ -50,6 +50,13 @@ var curveObject = new THREE.Line( geometry, material );
 		<h2>Properties</h2>
 		<div>See the base [page:Curve] class for common properties.</div>
 
+		<h3>[property:Boolean isCatmullRomCurve3]</h3>
+		<div>
+			Used to check whether this or derived classes are CatmullRomCurve3s. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</div>
+
 		<h3>[property:Array points]</h3>
 		<div>The array of array of [page:Vector3] points that define the curve.</div>
 
