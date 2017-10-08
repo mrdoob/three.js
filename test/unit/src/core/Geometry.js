@@ -104,3 +104,257 @@ function getGeometryByParams( x1, y1, z1, x2, y2, z2, x3, y3, z3 ) {
 function getGeometry() {
 	return getGeometryByParams( -0.5, 0, 0, 0.5, 0, 0, 0, 1, 0 );
 }
+
+QUnit.test( "applyMatrix", function ( assert ) {
+
+	var geometry = getGeometry();
+	geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
+	var m = new THREE.Matrix4();
+	var expectedVerts = [
+		new THREE.Vector3( 1.5, 3, 4 ),
+		new THREE.Vector3( 2.5, 3, 4 ),
+		new THREE.Vector3( 2, 3, 5 )
+	];
+	var v1, v2, v3;
+
+	m.makeRotationX( Math.PI / 2 );
+	m.setPosition( new THREE.Vector3( x, y, z ) );
+
+	geometry.applyMatrix( m );
+
+	v0 = geometry.vertices[ 0 ];
+	v1 = geometry.vertices[ 1 ];
+	v2 = geometry.vertices[ 2 ];
+	assert.ok(
+		Math.abs( v0.x - expectedVerts[ 0 ].x ) <= eps &&
+		Math.abs( v0.y - expectedVerts[ 0 ].y ) <= eps &&
+		Math.abs( v0.z - expectedVerts[ 0 ].z ) <= eps,
+		"First vertex is as expected"
+	);
+	assert.ok(
+		Math.abs( v1.x - expectedVerts[ 1 ].x ) <= eps &&
+		Math.abs( v1.y - expectedVerts[ 1 ].y ) <= eps &&
+		Math.abs( v1.z - expectedVerts[ 1 ].z ) <= eps,
+		"Second vertex is as expected"
+	);
+	assert.ok(
+		Math.abs( v2.x - expectedVerts[ 2 ].x ) <= eps &&
+		Math.abs( v2.y - expectedVerts[ 2 ].y ) <= eps &&
+		Math.abs( v2.z - expectedVerts[ 2 ].z ) <= eps,
+		"Third vertex is as expected"
+	);
+
+} );
+
+QUnit.test( "translate", function ( assert ) {
+
+	var a = getGeometry();
+	var expected = [
+		new THREE.Vector3( - 2.5, 3, - 4 ),
+		new THREE.Vector3( - 1.5, 3, - 4 ),
+		new THREE.Vector3( - 2, 4, - 4 )
+	];
+	var v;
+
+	a.translate( - x, y, - z );
+
+	for ( var i = 0; i < a.vertices.length; i ++ ) {
+
+		v = a.vertices[ i ];
+		assert.ok(
+			Math.abs( v.x - expected[ i ].x ) <= eps &&
+			Math.abs( v.y - expected[ i ].y ) <= eps &&
+			Math.abs( v.z - expected[ i ].z ) <= eps,
+			"Vertex #" + i + " was translated as expected"
+		);
+
+	}
+
+} );
+
+QUnit.test( "lookAt", function ( assert ) {
+
+	var a = getGeometry();
+	var expected = [
+		new THREE.Vector3( - 0.5, 0, 0 ),
+		new THREE.Vector3( 0.5, 0, 0 ),
+		new THREE.Vector3( 0, 0.5 * Math.sqrt( 2 ), 0.5 * Math.sqrt( 2 ) )
+	];
+
+	a.lookAt( new THREE.Vector3( 0, - 1, 1 ) );
+
+	for ( var i = 0; i < a.vertices.length; i ++ ) {
+
+		v = a.vertices[ i ];
+		assert.ok(
+			Math.abs( v.x - expected[ i ].x ) <= eps &&
+			Math.abs( v.y - expected[ i ].y ) <= eps &&
+			Math.abs( v.z - expected[ i ].z ) <= eps,
+			"Vertex #" + i + " was adjusted as expected"
+		);
+
+	}
+
+} );
+
+QUnit.test( "scale", function ( assert ) {
+
+	var a = getGeometry();
+	var expected = [
+		new THREE.Vector3( - 1, 0, 0 ),
+		new THREE.Vector3( 1, 0, 0 ),
+		new THREE.Vector3( 0, 3, 0 )
+	];
+	var v;
+
+	a.scale( 2, 3, 4 );
+
+	for ( var i = 0; i < a.vertices.length; i ++ ) {
+
+		v = a.vertices[ i ];
+		assert.ok(
+			Math.abs( v.x - expected[ i ].x ) <= eps &&
+			Math.abs( v.y - expected[ i ].y ) <= eps &&
+			Math.abs( v.z - expected[ i ].z ) <= eps,
+			"Vertex #" + i + " was scaled as expected"
+		);
+
+	}
+
+} );
+
+QUnit.test( "normalize (actual)", function ( assert ) {
+
+	var a = getGeometry();
+	var sqrt = 0.5 * Math.sqrt( 2 );
+	var expected = [
+		new THREE.Vector3( - sqrt, - sqrt, 0 ),
+		new THREE.Vector3( sqrt, - sqrt, 0 ),
+		new THREE.Vector3( 0, sqrt, 0 )
+	];
+	var v;
+
+	a.normalize();
+
+	for ( var i = 0; i < a.vertices.length; i ++ ) {
+
+		v = a.vertices[ i ];
+		assert.ok(
+			Math.abs( v.x - expected[ i ].x ) <= eps &&
+			Math.abs( v.y - expected[ i ].y ) <= eps &&
+			Math.abs( v.z - expected[ i ].z ) <= eps,
+			"Vertex #" + i + " was normalized as expected"
+		);
+
+	}
+
+} );
+
+QUnit.test( "toJSON", function ( assert ) {
+
+	var a = getGeometry();
+	var gold = {
+		"metadata": {
+			"version": 4.5,
+			"type": "Geometry",
+			"generator": "Geometry.toJSON"
+		},
+		"uuid": null,
+		"type": "Geometry",
+		"data": {
+			"vertices": [ - 0.5, 0, 0, 0.5, 0, 0, 0, 1, 0 ],
+			"normals": [ 0, 0, 1 ],
+			"faces": [ 50, 0, 1, 2, 0, 0, 0, 0, 0 ]
+		}
+	};
+	var json;
+
+	a.faces.push( new THREE.Face3( 0, 1, 2 ) );
+	a.computeFaceNormals();
+	a.computeVertexNormals();
+
+	json = a.toJSON();
+	json.uuid = null;
+	assert.deepEqual( json, gold, "Generated JSON is as expected" );
+
+} );
+
+QUnit.test( "mergeVertices", function ( assert ) {
+
+	var a = new THREE.Geometry();
+	var b = new THREE.BoxBufferGeometry( 1, 1, 1 );
+	var verts, faces, removed;
+
+	a.fromBufferGeometry( b );
+
+	removed = a.mergeVertices();
+	verts = a.vertices.length;
+	faces = a.faces.length;
+
+	assert.strictEqual( removed, 16, "Removed the expected number of vertices" );
+	assert.strictEqual( verts, 8, "Minimum number of vertices remaining" );
+	assert.strictEqual( faces, 12, "Minimum number of faces remaining" );
+
+} );
+
+QUnit.test( "sortFacesByMaterialIndex", function ( assert ) {
+
+	var box = new THREE.BoxBufferGeometry( 1, 1, 1 );
+	var a = new THREE.Geometry().fromBufferGeometry( box );
+	var expected = [ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5 ];
+
+	a.faces.reverse(); // a bit too simple probably, still missing stuff like checking new UVs
+	a.sortFacesByMaterialIndex();
+
+	var indices = [];
+
+	for ( var i = 0; i < a.faces.length; i ++ ) {
+
+		indices.push( a.faces[ i ].materialIndex );
+
+	}
+
+	assert.deepEqual( indices, expected, "Faces in correct order" );
+
+} );
+
+QUnit.test( "computeBoundingBox", function ( assert ) {
+
+	var a = new THREE.DodecahedronGeometry();
+
+	a.computeBoundingBox();
+	assert.strictEqual( a.boundingBox.isEmpty(), false, "Bounding box isn't empty" );
+
+	var allIn = true;
+	for ( var i = 0; i < a.vertices.length; i ++ ) {
+
+		if ( ! a.boundingBox.containsPoint( a.vertices[ i ] ) ) {
+
+			allIn = false;
+
+		}
+
+	}
+	assert.strictEqual( allIn, true, "All vertices are inside the box" );
+
+} );
+
+QUnit.test( "computeBoundingSphere", function ( assert ) {
+
+	var a = new THREE.DodecahedronGeometry();
+
+	a.computeBoundingSphere();
+
+	var allIn = true;
+	for ( var i = 0; i < a.vertices.length; i ++ ) {
+
+		if ( ! a.boundingSphere.containsPoint( a.vertices[ i ] ) ) {
+
+			allIn = false;
+
+		}
+
+	}
+	assert.strictEqual( allIn, true, "All vertices are inside the bounding sphere" );
+
+} );
