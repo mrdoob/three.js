@@ -117,3 +117,36 @@ function getObjectsToCheck() {
 function getSphere() {
 	return new THREE.Mesh( new THREE.SphereGeometry( 1, 100, 100 ) );
 }
+
+QUnit.test( "set", function ( assert ) {
+
+	var origin = new THREE.Vector3( 0, 0, 0 );
+	var direction = new THREE.Vector3( 0, 0, - 1 );
+	var a = new THREE.Raycaster( origin.clone(), direction.clone() );
+
+	assert.deepEqual( a.ray.origin, origin, "Origin is correct" );
+	assert.deepEqual( a.ray.direction, direction, "Direction is correct" );
+
+	origin.set( 1, 1, 1 );
+	direction.set( - 1, 0, 0 );
+	a.set( origin, direction );
+
+	assert.deepEqual( a.ray.origin, origin, "Origin was set correctly" );
+	assert.deepEqual( a.ray.direction, direction, "Direction was set correctly" );
+
+} );
+
+QUnit.test( "setFromCamera (Orthographic)", function ( assert ) {
+
+	var raycaster = new THREE.Raycaster();
+	var rayOrigin = raycaster.ray.origin;
+	var rayDirection = raycaster.ray.direction;
+	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1000 );
+	var expectedOrigin = new THREE.Vector3( 0, 0, 0 );
+	var expectedDirection = new THREE.Vector3( 0, 0, - 1 );
+
+	raycaster.setFromCamera( { x: 0, y: 0 }, camera );
+	assert.deepEqual( rayOrigin, expectedOrigin, "Ray origin has the right coordinates" );
+	assert.deepEqual( rayDirection, expectedDirection, "Camera and Ray are pointing towards -z" );
+
+} );

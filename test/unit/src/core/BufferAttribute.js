@@ -115,3 +115,125 @@ QUnit.test( "clone" , function( assert ) {
 		assert.ok( attr.array[i] === attrCopy.array[i], 'array item is equal' );
 	}
 });
+
+QUnit.test( "constructor exception", function ( assert ) {
+
+	assert.throws(
+		function () {
+
+			var a = new THREE.BufferAttribute( [ 1, 2, 3, 4 ], 2, false );
+
+		},
+		/array should be a Typed Array/,
+		"Calling constructor with a simple array throws Error"
+	);
+
+} );
+
+QUnit.test( "setArray", function ( assert ) {
+
+	var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+	var a = new THREE.BufferAttribute( f32a, 2, false );
+
+	a.setArray( f32a, 2 );
+
+	assert.strictEqual( a.count, 2, "Check item count" );
+	assert.strictEqual( a.array, f32a, "Check array" );
+
+	assert.throws(
+		function () {
+
+			a.setArray( [ 1, 2, 3, 4 ] );
+
+		},
+		/array should be a Typed Array/,
+		"Calling setArray with a simple array throws Error"
+	);
+
+} );
+
+QUnit.test( "copyArray", function ( assert ) {
+
+	var f32a = new Float32Array( [ 5, 6, 7, 8 ] );
+	var a = new THREE.BufferAttribute( new Float32Array( [ 1, 2, 3, 4 ] ), 2, false );
+
+	a.copyArray( f32a );
+
+	assert.deepEqual( a.array, f32a, "Check array has new values" );
+
+} );
+
+QUnit.test( "set", function ( assert ) {
+
+	var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+	var a = new THREE.BufferAttribute( f32a, 2, false );
+	var expected = new Float32Array( [ 9, 2, 8, 4 ] );
+
+	a.set( [ 9 ] );
+	a.set( [ 8 ], 2 );
+
+	assert.deepEqual( a.array, expected, "Check array has expected values" );
+
+} );
+
+QUnit.test( "set[X, Y, Z, W, XYZ, XYZW]/get[X, Y, Z, W]", function ( assert ) {
+
+	var f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8 ] );
+	var a = new THREE.BufferAttribute( f32a, 4, false );
+	var expected = new Float32Array( [ 1, 2, - 3, - 4, - 5, - 6, 7, 8 ] );
+
+	a.setX( 1, a.getX( 1 ) * - 1 );
+	a.setY( 1, a.getY( 1 ) * - 1 );
+	a.setZ( 0, a.getZ( 0 ) * - 1 );
+	a.setW( 0, a.getW( 0 ) * - 1 );
+
+	assert.deepEqual( a.array, expected, "Check all set* calls set the correct values" );
+
+} );
+
+QUnit.test( "setXY", function ( assert ) {
+
+	var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+	var a = new THREE.BufferAttribute( f32a, 2, false );
+	var expected = new Float32Array( [ - 1, - 2, 3, 4 ] );
+
+	a.setXY( 0, - 1, - 2 );
+
+	assert.deepEqual( a.array, expected, "Check for the correct values" );
+
+} );
+
+QUnit.test( "setXYZ", function ( assert ) {
+
+	var f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6 ] );
+	var a = new THREE.BufferAttribute( f32a, 3, false );
+	var expected = new Float32Array( [ 1, 2, 3, - 4, - 5, - 6 ] );
+
+	a.setXYZ( 1, - 4, - 5, - 6 );
+
+	assert.deepEqual( a.array, expected, "Check for the correct values" );
+
+} );
+
+QUnit.test( "setXYZW", function ( assert ) {
+
+	var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+	var a = new THREE.BufferAttribute( f32a, 4, false );
+	var expected = new Float32Array( [ - 1, - 2, - 3, - 4 ] );
+
+	a.setXYZW( 0, - 1, - 2, - 3, - 4 );
+
+	assert.deepEqual( a.array, expected, "Check for the correct values" );
+
+} );
+
+QUnit.test( "onUpload", function ( assert ) {
+
+	var a = new THREE.BufferAttribute();
+	var func = function () { };
+
+	a.onUpload( func );
+
+	assert.strictEqual( a.onUploadCallback, func, "Check callback was set properly" );
+
+} );
