@@ -503,7 +503,6 @@
 		}
 		if ( properties.ReflectionFactor ) {
 
-			parameters.envMapIntensity = parseFloat( properties.ReflectionFactor.value );
 			parameters.reflectivity = parseFloat( properties.ReflectionFactor.value );
 
 		}
