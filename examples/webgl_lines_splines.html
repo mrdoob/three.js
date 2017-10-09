@@ -100,8 +100,8 @@
 
 				for ( i = 0; i < points.length * subdivisions; i ++ ) {
 
-					var index = i / ( points.length * subdivisions );
-					spline.getPoint( index, point );
+					var t = i / ( points.length * subdivisions );
+					spline.getPoint( t, point );
 
 					position.push( point.x, point.y, point.z );
 

@@ -97,10 +97,8 @@
 
 				for ( i = 0; i < points.length * subdivisions; i ++ ) {
 
-					var index = i / ( points.length * subdivisions );
-					spline.getPoint( index, point );
-
-					geometry.vertices[ i ] = new THREE.Vector3( point.x, point.y, point.z );
+					var t = i / ( points.length * subdivisions );
+					geometry.vertices[ i ] = spline.getPoint( t );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
 					colors[ i ].setHSL( 0.6, 1.0, Math.max( 0, - point.x / 200 ) + 0.5 );
