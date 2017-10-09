@@ -1404,11 +1404,15 @@ THREE.GLTFLoader = ( function () {
 
 		var options = this.options;
 
-		return new Promise( function ( resolve ) {
+		return new Promise( function ( resolve, reject ) {
 
 			var loader = new THREE.FileLoader();
 			loader.setResponseType( 'arraybuffer' );
-			loader.load( resolveURL( bufferDef.uri, options.path ), resolve );
+			loader.load( resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
+
+				reject( new Error( 'THREE.GLTFLoader: Buffer "' + bufferDef.uri + '" not found.' ) );
+
+			} );
 
 		} );
 
