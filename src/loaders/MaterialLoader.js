@@ -81,7 +81,6 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 		if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;
 		if ( json.wireframeLinejoin !== undefined ) material.wireframeLinejoin = json.wireframeLinejoin;
-		if ( json.unrollLoops !== undefined ) material.unrollLoops = json.unrollLoops;
 
 		if ( json.rotation !== undefined ) material.rotation = json.rotation;
 

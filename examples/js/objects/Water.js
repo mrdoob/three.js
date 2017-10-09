@@ -188,8 +188,7 @@ THREE.Water = function ( width, height, options ) {
 		transparent: true,
 		lights: true,
 		side: side,
-		fog: fog,
-		unrollLoops: true
+		fog: fog
 	} );
 
 	material.uniforms.mirrorSampler.value = renderTarget.texture;
