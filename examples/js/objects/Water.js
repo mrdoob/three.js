@@ -182,6 +182,9 @@ THREE.Water = function ( width, height, options ) {
 	};
 
 	var material = new THREE.ShaderMaterial( {
+		defines: {
+			UNROLL_LOOPS: true
+		},
 		fragmentShader: mirrorShader.fragmentShader,
 		vertexShader: mirrorShader.vertexShader,
 		uniforms: THREE.UniformsUtils.clone( mirrorShader.uniforms ),
