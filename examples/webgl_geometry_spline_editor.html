@@ -353,8 +353,6 @@
 
 			function updateSplineOutline() {
 
-				var point = new THREE.Vector3();
-
 				for ( var k in splines ) {
 
 					var spline = splines[ k ];
@@ -365,8 +363,7 @@
 
 						var p = splineMesh.geometry.vertices[ i ];
 						var t = i /  ( ARC_SEGMENTS - 1 );
-						spline.getPoint( t, point )
-						p.copy( point );
+						spline.getPoint( t, p );
 
 					}
 

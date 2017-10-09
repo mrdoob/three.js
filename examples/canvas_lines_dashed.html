@@ -72,14 +72,11 @@
 
 				var spline = new THREE.CatmullRomCurve3( points );
 				var geometrySpline = new THREE.Geometry();
-				var point = new THREE.Vector3();
 
 				for ( var i = 0; i < points.length * subdivisions; i ++ ) {
 
-					var index = i / ( points.length * subdivisions );
-					spline.getPoint( index, point );
-
-					geometrySpline.vertices[ i ] = new THREE.Vector3( point.x, point.y, point.z );
+					var t = i / ( points.length * subdivisions );
+					geometrySpline.vertices[ i ] = spline.getPoint( t );
 
 				}
 
