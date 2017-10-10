@@ -254,14 +254,15 @@
 
 			default:
 
-				console.warn( 'FBXLoader: No support image type ' + extension );
+				console.warn( 'FBXLoader: Image type "' + extension + '" is not supported.' );
 				return;
 
 		}
 
 		if ( typeof content === 'string' ) {
 
-			// ASCII format sometimes adds an extra character to the end of the content string
+			// ASCII format sometimes an extra ',' gets added to the end of the content string
+			// TODO: Investigate why the parser is adding this character
 			if ( content.slice( - 1 ) === ',' ) {
 
 				content = content.slice( 0, - 1 );
@@ -457,8 +458,8 @@
 				material = new THREE.MeshLambertMaterial();
 				break;
 			default:
-				console.warn( 'THREE.FBXLoader: No implementation given for material type %s in FBXLoader.js. Defaulting to standard material.', type );
-				material = new THREE.MeshStandardMaterial( { color: 0x3300ff } );
+				console.warn( 'THREE.FBXLoader: unknown material type "%s". Defaulting to MeshPhongMaterial.', type );
+				material = new THREE.MeshPhongMaterial( { color: 0x3300ff } );
 				break;
 
 		}
