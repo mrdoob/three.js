@@ -51,6 +51,13 @@ var curveObject = new THREE.Line( geometry, material );
 		<h2>Properties</h2>
 		<div>See the base [page:Curve] class for common properties.</div>
 
+		<h3>[property:Boolean isCubicBezierCurve]</h3>
+		<div>
+			Used to check whether this or derived classes are CubicBezierCurves. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</div>
+
 		<h3>[property:Vector2 v0]</h3>
 		<div>The starting point.</div>
 

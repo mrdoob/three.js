@@ -1,3 +1,4 @@
+import { Vector2 } from '../../math/Vector2.js';
 import { Curve } from '../core/Curve.js';
 
 
@@ -15,16 +16,20 @@ LineCurve.prototype.constructor = LineCurve;
 
 LineCurve.prototype.isLineCurve = true;
 
-LineCurve.prototype.getPoint = function ( t ) {
+LineCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+	var point = optionalTarget || new Vector2();
 
 	if ( t === 1 ) {
 
-		return this.v2.clone();
+		point.copy( this.v2 );
+
+	} else {
+
+		point.copy( this.v2 ).sub( this.v1 );
+		point.multiplyScalar( t ).add( this.v1 );
 
 	}
-
-	var point = this.v2.clone().sub( this.v1 );
-	point.multiplyScalar( t ).add( this.v1 );
 
 	return point;
 
@@ -32,9 +37,9 @@ LineCurve.prototype.getPoint = function ( t ) {
 
 // Line curve is linear, so we can overwrite default getPointAt
 
-LineCurve.prototype.getPointAt = function ( u ) {
+LineCurve.prototype.getPointAt = function ( u, optionalTarget ) {
 
-	return this.getPoint( u );
+	return this.getPoint( u, optionalTarget );
 
 };
 
