@@ -2234,9 +2234,11 @@ THREE.GLTFLoader = ( function () {
 		// Object3D. Use the skins' joint references to mark bones.
 		for ( var skinIndex in skins ) {
 
-			for ( var jointIndex in skins[ skinIndex ].joints ) {
+			var joints = skins[ skinIndex ].joints;
 
-				nodes[ jointIndex ].isBone = true;
+			for ( var i = 0; i < joints.length; ++ i ) {
+
+				nodes[ joints[ i ] ].isBone = true;
 
 			}
 
