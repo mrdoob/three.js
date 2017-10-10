@@ -573,9 +573,17 @@ Object.assign( Vector4.prototype, {
 
 	},
 
-	equals: function ( v ) {
+	equals: function ( v, epsilon ) {
 
-		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
+		if ( epsilon === undefined ) {
+
+			return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
+
+		} else {
+
+			return ( ( Math.abs( v.x - this.x ) < epsilon ) && ( Math.abs( v.y - this.y ) < epsilon ) && ( Math.abs( v.z - this.z ) < epsilon ) && ( Math.abs( v.w - this.w ) < epsilon ) );
+
+		}
 
 	},
 

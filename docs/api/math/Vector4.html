@@ -151,8 +151,8 @@ var d = a.dot( b );
 		vector and [page:Vector4 v].
 		</div>
 
-		<h3>[method:Boolean equals]( [page:Vector4 v] )</h3>
-		<div>Checks for strict equality of this vector and [page:Vector4 v].</div>
+		<h3>[method:Boolean equals]( [page:Vector4 v], [page:Float epsilon] )</h3>
+		<div>Checks for strict equality of this vector and [page:Vector4 v]. If [page:Float epsilon] is given, the method performs a component-wise compare |x - y| < [page:Float epsilon].</div>
 
 		<h3>[method:Vector4 floor]()</h3>
 		<div>The components of the vector are rounded down to the nearest integer value.</div>

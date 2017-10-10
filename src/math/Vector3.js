@@ -683,9 +683,17 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	equals: function ( v ) {
+	equals: function ( v, epsilon ) {
 
-		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
+		if ( epsilon === undefined ) {
+
+			return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
+
+		} else {
+
+			return ( ( Math.abs( v.x - this.x ) < epsilon ) && ( Math.abs( v.y - this.y ) < epsilon ) && ( Math.abs( v.z - this.z ) < epsilon ) );
+
+		}
 
 	},
 
