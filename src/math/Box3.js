@@ -209,13 +209,11 @@ Object.assign( Box3.prototype, {
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
+		var scope, i, l;
+
 		var v1 = new Vector3();
 
-		var scope;
-
-		function traverse ( node ) {
-
-			var i, l;
+		function traverse( node ) {
 
 			var geometry = node.geometry;
 
