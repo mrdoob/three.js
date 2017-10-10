@@ -623,7 +623,7 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	distanceToManhattan: function ( v ) {
+	manhattanDistanceTo: function ( v ) {
 
 		return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y ) + Math.abs( this.z - v.z );
 
