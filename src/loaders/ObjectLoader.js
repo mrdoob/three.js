@@ -254,9 +254,13 @@ Object.assign( ObjectLoader.prototype, {
 						break;
 
 					case 'DodecahedronGeometry':
+					case 'DodecahedronBufferGeometry':
 					case 'IcosahedronGeometry':
+					case 'IcosahedronBufferGeometry':
 					case 'OctahedronGeometry':
+					case 'OctahedronBufferGeometry':
 					case 'TetrahedronGeometry':
+					case 'TetrahedronBufferGeometry':
 
 						geometry = new Geometries[ data.type ](
 							data.radius,
@@ -314,6 +318,18 @@ Object.assign( ObjectLoader.prototype, {
 							data.segments,
 							data.phiStart,
 							data.phiLength
+						);
+
+						break;
+
+					case 'PolyhedronGeometry':
+					case 'PolyhedronBufferGeometry':
+
+						geometry = new Geometries[ data.type ](
+							data.vertices,
+							data.indices,
+							data.radius,
+							data.details
 						);
 
 						break;
