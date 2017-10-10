@@ -38,7 +38,9 @@
 
 		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+
+			import { WebGL2Renderer } from '../src/renderers/WebGL2Renderer.js';
 
 			var statsEnabled = true;
 
@@ -113,7 +115,7 @@
 
 				}
 
-				renderer = new THREE.WebGL2Renderer();
+				renderer = new WebGL2Renderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
