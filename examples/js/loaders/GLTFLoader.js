@@ -760,18 +760,36 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					if ( uvScaleMap.matrixAutoUpdate === true ) {
+					var offset;
+					var repeat;
 
-						var offset = uvScaleMap.offset;
-						var repeat = uvScaleMap.repeat;
-						var rotation = uvScaleMap.rotation;
-						var center = uvScaleMap.center;
+					if ( uvScaleMap.matrix !== undefined ) {
 
-						uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+						// > r88.
+
+						if ( uvScaleMap.matrixAutoUpdate === true ) {
+
+							offset = uvScaleMap.offset;
+							repeat = uvScaleMap.repeat;
+							var rotation = uvScaleMap.rotation;
+							var center = uvScaleMap.center;
+
+							uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+
+						}
+
+						uniforms.uvTransform.value.copy( uvScaleMap.matrix );
+
+					} else {
+
+							// <= r87. Remove when reasonable.
+
+							offset = uvScaleMap.offset;
+							repeat = uvScaleMap.repeat;
+
+							uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
 					}
-
-					uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 				}
 
@@ -1137,6 +1155,9 @@ THREE.GLTFLoader = ( function () {
 
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#morph-targets
+	 *
+	 * TODO: Implement support for morph targets on TANGENT attribute.
+	 *
 	 * @param {THREE.Mesh} mesh
 	 * @param {GLTF.Mesh} meshDef
 	 * @param {GLTF.Primitive} primitiveDef
@@ -1192,11 +1213,18 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-			} else {
+			} else if ( geometry.attributes.position ) {
 
 				// Copying the original position not to affect the final position.
 				// See the formula above.
 				positionAttribute = geometry.attributes.position.clone();
+
+			}
+
+			if ( positionAttribute !== undefined ) {
+
+				positionAttribute.name = attributeName;
+				morphAttributes.position.push( positionAttribute );
 
 			}
 
@@ -1220,23 +1248,18 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-			} else {
+			} else if ( geometry.attributes.normal !== undefined ) {
 
 				normalAttribute = geometry.attributes.normal.clone();
 
 			}
 
-			if ( target.TANGENT !== undefined ) {
+			if ( normalAttribute !== undefined ) {
 
-				// TODO: implement
+				normalAttribute.name = attributeName;
+				morphAttributes.normal.push( normalAttribute );
 
 			}
-
-			positionAttribute.name = attributeName;
-			normalAttribute.name = attributeName;
-
-			morphAttributes.position.push( positionAttribute );
-			morphAttributes.normal.push( normalAttribute );
 
 		}
 
@@ -1671,7 +1694,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( alphaMode === ALPHA_MODES.MASK ) {
 
-				  materialParams.alphaTest = material.alphaCutoff || 0.5;
+					materialParams.alphaTest = material.alphaCutoff || 0.5;
 
 				}
 
@@ -1968,7 +1991,6 @@ THREE.GLTFLoader = ( function () {
 						}
 
 						mesh.name = meshDef.name || ( 'mesh_' + meshIndex );
-						mesh.name += i > 0 ? ( '_' + i ) : '';
 
 						if ( primitive.targets !== undefined ) {
 
@@ -1978,7 +2000,17 @@ THREE.GLTFLoader = ( function () {
 
 						if ( primitive.extras ) mesh.userData = primitive.extras;
 
-						group.add( mesh );
+						if ( primitives.length > 1 ) {
+
+							mesh.name += '_' + i;
+
+							group.add( mesh );
+
+						} else {
+
+							return mesh;
+
+						}
 
 					}
 
@@ -2193,6 +2225,9 @@ THREE.GLTFLoader = ( function () {
 		var nodes = json.nodes || [];
 		var skins = json.skins || [];
 
+		var meshReferences = {};
+		var meshUses = {};
+
 		// Nothing in the node definition indicates whether it is a Bone or an
 		// Object3D. Use the skins' joint references to mark bones.
 		skins.forEach( function ( skin ) {
@@ -2202,6 +2237,27 @@ THREE.GLTFLoader = ( function () {
 				nodes[ id ].isBone = true;
 
 			} );
+
+		} );
+
+		// Meshes can (and should) be reused by multiple nodes in a glTF asset. To
+		// avoid having more than one THREE.Mesh with the same name, count
+		// references and rename instances below.
+		//
+		// Example: CesiumMilkTruck sample model reuses "Wheel" meshes.
+		nodes.forEach( function ( nodeDef ) {
+
+			if ( nodeDef.mesh ) {
+
+				if ( meshReferences[ nodeDef.mesh ] === undefined ) {
+
+					meshReferences[ nodeDef.mesh ] = meshUses[ nodeDef.mesh ] = 0;
+
+				}
+
+				meshReferences[ nodeDef.mesh ]++;
+
+			}
 
 		} );
 
@@ -2221,7 +2277,15 @@ THREE.GLTFLoader = ( function () {
 
 				} else if ( nodeDef.mesh !== undefined ) {
 
-					return dependencies.meshes[ nodeDef.mesh ].clone();
+					var mesh = dependencies.meshes[ nodeDef.mesh ].clone();
+
+					if ( meshReferences[ nodeDef.mesh ] > 1 ) {
+
+						mesh.name += '_instance_' + meshUses[ nodeDef.mesh ]++;
+
+					}
+
+					return mesh;
 
 				} else if ( nodeDef.camera !== undefined ) {
 
@@ -2286,19 +2350,22 @@ THREE.GLTFLoader = ( function () {
 
 						var skinnedMeshes = [];
 
-						for ( var i = 0; i < node.children.length; i ++ ) {
+						var meshes = node.children.length > 0 ? node.children : [ node ];
 
+						for ( var i = 0; i < meshes.length; i ++ ) {
+
+							var mesh = meshes[ i ];
 							var skinEntry = dependencies.skins[ nodeDef.skin ];
 
 							// Replace Mesh with SkinnedMesh.
-							var geometry = node.children[ i ].geometry;
-							var material = node.children[ i ].material;
+							var geometry = mesh.geometry;
+							var material = mesh.material;
 							material.skinning = true;
 
-							var child = new THREE.SkinnedMesh( geometry, material );
-							child.morphTargetInfluences = node.children[ i ].morphTargetInfluences;
-							child.userData = node.children[ i ].userData;
-							child.name = node.children[ i ].name;
+							var skinnedMesh = new THREE.SkinnedMesh( geometry, material );
+							skinnedMesh.morphTargetInfluences = mesh.morphTargetInfluences;
+							skinnedMesh.userData = mesh.userData;
+							skinnedMesh.name = mesh.name;
 
 							var bones = [];
 							var boneInverses = [];
@@ -2324,14 +2391,22 @@ THREE.GLTFLoader = ( function () {
 
 							}
 
-							child.bind( new THREE.Skeleton( bones, boneInverses ), child.matrixWorld );
+							skinnedMesh.bind( new THREE.Skeleton( bones, boneInverses ), skinnedMesh.matrixWorld );
 
-							skinnedMeshes.push( child );
+							skinnedMeshes.push( skinnedMesh );
 
 						}
 
-						node.remove.apply( node, node.children );
-						node.add.apply( node, skinnedMeshes );
+						if ( node.children.length > 0 ) {
+
+							node.remove.apply( node, node.children );
+							node.add.apply( node, skinnedMeshes );
+
+						} else {
+
+							node = skinnedMeshes[ 0 ];
+
+						}
 
 					}
 
