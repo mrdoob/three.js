@@ -429,27 +429,22 @@ Object.assign( Vector2.prototype, {
 
 	},
 
-	equals: function () {
+	equals: function ( v, epsilon ) {
 
-		var v1 = new Vector2();
+		if ( epsilon === undefined ) {
 
-		return function equals( v, epsilon ) {
+			return ( ( v.x === this.x ) && ( v.y === this.y ) );
 
-			if ( epsilon === undefined ) {
+		} else {
 
-				return ( ( v.x === this.x ) && ( v.y === this.y ) );
+			var x = Math.abs( this.x - v.x );
+			var y = Math.abs( this.y - v.y );
 
-			} else {
+			return ( ( x < epsilon ) && ( y < epsilon ) );
 
-				v1.subVectors( this, v );
+		}
 
-				return ( ( Math.abs( v1.x ) < epsilon ) && ( Math.abs( v1.y ) < epsilon ) );
-
-			}
-
-		};
-
-	}(),
+	},
 
 	fromArray: function ( array, offset ) {
 
