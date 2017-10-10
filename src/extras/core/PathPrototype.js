@@ -109,7 +109,7 @@ var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 			// if a previous curve is present, attempt to join
 			var firstPoint = curve.getPoint( 0 );
 
-			if ( ! firstPoint.equals( this.currentPoint ) ) {
+			if ( firstPoint.distanceToManhattan( this.currentPoint ) > 0.00001 ) {
 
 				this.lineTo( firstPoint.x, firstPoint.y );
 
