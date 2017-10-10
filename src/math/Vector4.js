@@ -581,12 +581,7 @@ Object.assign( Vector4.prototype, {
 
 		} else {
 
-			var x = Math.abs( this.x - v.x );
-			var y = Math.abs( this.y - v.y );
-			var z = Math.abs( this.z - v.z );
-			var w = Math.abs( this.w - v.w );
-
-			return ( ( x < epsilon ) && ( y < epsilon ) && ( z < epsilon ) && ( w < epsilon ) );
+			return ( ( Math.abs( v.x - this.x ) < epsilon ) && ( Math.abs( v.y - this.y ) < epsilon ) && ( Math.abs( v.z - this.z ) < epsilon ) && ( Math.abs( v.w - this.w ) < epsilon ) );
 
 		}
 

@@ -437,10 +437,7 @@ Object.assign( Vector2.prototype, {
 
 		} else {
 
-			var x = Math.abs( this.x - v.x );
-			var y = Math.abs( this.y - v.y );
-
-			return ( ( x < epsilon ) && ( y < epsilon ) );
+			return ( ( Math.abs( v.x - this.x ) < epsilon ) && ( Math.abs( v.y - this.y ) < epsilon ) );
 
 		}
 
