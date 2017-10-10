@@ -261,8 +261,8 @@
 
 		if ( typeof content === 'string' ) {
 
-      // ASCII format sometimes an extra character get added to the end of the content string
-      // TODO: Investigate wht the parser is adding this character
+			// ASCII format sometimes an extra character get added to the end of the content string
+			// TODO: Investigate wht the parser is adding this character
 			if ( content.slice( - 1 ) === ',' ) {
 
 				content = content.slice( 0, - 1 );
