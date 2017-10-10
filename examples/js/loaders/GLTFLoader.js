@@ -2225,6 +2225,9 @@ THREE.GLTFLoader = ( function () {
 		var nodes = json.nodes || [];
 		var skins = json.skins || [];
 
+		var meshReferences = {};
+		var meshUses = {};
+
 		// Nothing in the node definition indicates whether it is a Bone or an
 		// Object3D. Use the skins' joint references to mark bones.
 		skins.forEach( function ( skin ) {
@@ -2234,6 +2237,27 @@ THREE.GLTFLoader = ( function () {
 				nodes[ id ].isBone = true;
 
 			} );
+
+		} );
+
+		// Meshes can (and should) be reused by multiple nodes in a glTF asset. To
+		// avoid having more than one THREE.Mesh with the same name, count
+		// references and rename instances below.
+		//
+		// Example: CesiumMilkTruck sample model reuses "Wheel" meshes.
+		nodes.forEach( function ( nodeDef ) {
+
+			if ( nodeDef.mesh ) {
+
+				if ( meshReferences[ nodeDef.mesh ] === undefined ) {
+
+					meshReferences[ nodeDef.mesh ] = meshUses[ nodeDef.mesh ] = 0;
+
+				}
+
+				meshReferences[ nodeDef.mesh ]++;
+
+			}
 
 		} );
 
@@ -2253,7 +2277,15 @@ THREE.GLTFLoader = ( function () {
 
 				} else if ( nodeDef.mesh !== undefined ) {
 
-					return dependencies.meshes[ nodeDef.mesh ].clone();
+					var mesh = dependencies.meshes[ nodeDef.mesh ].clone();
+
+					if ( meshReferences[ nodeDef.mesh ] > 1 ) {
+
+						mesh.name += '_instance_' + meshUses[ nodeDef.mesh ]++;
+
+					}
+
+					return mesh;
 
 				} else if ( nodeDef.camera !== undefined ) {
 
