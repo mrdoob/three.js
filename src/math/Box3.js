@@ -211,46 +211,40 @@ Object.assign( Box3.prototype, {
 
 		var v1 = new Vector3();
 
-		return function expandByObject( object ) {
+		var scope;
 
-			var scope = this;
+		function traverse ( node ) {
 
-			object.updateMatrixWorld( true );
+			var i, l;
 
-			object.traverse( function ( node ) {
+			var geometry = node.geometry;
 
-				var i, l;
+			if ( geometry !== undefined ) {
 
-				var geometry = node.geometry;
+				if ( geometry.isGeometry ) {
 
-				if ( geometry !== undefined ) {
+					var vertices = geometry.vertices;
 
-					if ( geometry.isGeometry ) {
+					for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
-						var vertices = geometry.vertices;
+						v1.copy( vertices[ i ] );
+						v1.applyMatrix4( node.matrixWorld );
 
-						for ( i = 0, l = vertices.length; i < l; i ++ ) {
+						scope.expandByPoint( v1 );
 
-							v1.copy( vertices[ i ] );
-							v1.applyMatrix4( node.matrixWorld );
+					}
+
+				} else if ( geometry.isBufferGeometry ) {
+
+					var attribute = geometry.attributes.position;
+
+					if ( attribute !== undefined ) {
+
+						for ( i = 0, l = attribute.count; i < l; i ++ ) {
+
+							v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
 
 							scope.expandByPoint( v1 );
-
-						}
-
-					} else if ( geometry.isBufferGeometry ) {
-
-						var attribute = geometry.attributes.position;
-
-						if ( attribute !== undefined ) {
-
-							for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-								v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-
-								scope.expandByPoint( v1 );
-
-							}
 
 						}
 
@@ -258,7 +252,17 @@ Object.assign( Box3.prototype, {
 
 				}
 
-			} );
+			}
+
+		}
+
+		return function expandByObject( object ) {
+
+			scope = this;
+
+			object.updateMatrixWorld( true );
+
+			object.traverse( traverse );
 
 			return this;
 
