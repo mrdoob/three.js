@@ -1291,6 +1291,9 @@ THREE.GLTFLoader = ( function () {
 		this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 
+		this.fileLoader = new THREE.FileLoader( this.options.manager );
+		this.fileLoader.setResponseType( 'arraybuffer' );
+
 	}
 
 	GLTFParser.prototype._withDependencies = function ( dependencies ) {
@@ -1411,6 +1414,7 @@ THREE.GLTFLoader = ( function () {
 	GLTFParser.prototype.loadBuffer = function ( bufferIndex ) {
 
 		var bufferDef = this.json.buffers[ bufferIndex ];
+		var loader = this.fileLoader;
 
 		if ( bufferDef.type && bufferDef.type !== 'arraybuffer' ) {
 
@@ -1429,8 +1433,6 @@ THREE.GLTFLoader = ( function () {
 
 		return new Promise( function ( resolve, reject ) {
 
-			var loader = new THREE.FileLoader();
-			loader.setResponseType( 'arraybuffer' );
 			loader.load( resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
 
 				reject( new Error( 'THREE.GLTFLoader: Buffer "' + bufferDef.uri + '" not found.' ) );
