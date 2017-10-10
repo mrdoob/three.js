@@ -573,11 +573,27 @@ Object.assign( Vector4.prototype, {
 
 	},
 
-	equals: function ( v ) {
+	equals: function () {
 
-		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
+		var v1 = new Vector4();
 
-	},
+		return function equals( v, epsilon ) {
+
+			if ( epsilon === undefined ) {
+
+				return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
+
+			} else {
+
+				v1.subVectors( this, v );
+
+				return ( ( v1.x < epsilon ) && ( v1.y < epsilon ) && ( v1.z < epsilon ) && ( v1.w < epsilon ) );
+
+			}
+
+		};
+
+	}(),
 
 	fromArray: function ( array, offset ) {
 

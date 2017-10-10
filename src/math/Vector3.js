@@ -683,11 +683,27 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	equals: function ( v ) {
+	equals: function () {
 
-		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
+		var v1 = new Vector3();
 
-	},
+		return function equals( v, epsilon ) {
+
+			if ( epsilon === undefined ) {
+
+				return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
+
+			} else {
+
+				v1.subVectors( this, v );
+
+				return ( ( v1.x < epsilon ) && ( v1.y < epsilon ) && ( v1.z < epsilon ) );
+
+			}
+
+		};
+
+	}(),
 
 	fromArray: function ( array, offset ) {
 
