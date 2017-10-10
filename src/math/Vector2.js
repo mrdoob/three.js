@@ -443,7 +443,7 @@ Object.assign( Vector2.prototype, {
 
 				v1.subVectors( this, v );
 
-				return ( ( v1.x < epsilon ) && ( v1.y < epsilon ) );
+				return ( ( Math.abs( v1.x ) < epsilon ) && ( Math.abs( v1.y ) < epsilon ) );
 
 			}
 

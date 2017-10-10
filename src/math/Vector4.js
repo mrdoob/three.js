@@ -587,7 +587,7 @@ Object.assign( Vector4.prototype, {
 
 				v1.subVectors( this, v );
 
-				return ( ( v1.x < epsilon ) && ( v1.y < epsilon ) && ( v1.z < epsilon ) && ( v1.w < epsilon ) );
+				return ( ( Math.abs( v1.x ) < epsilon ) && ( Math.abs( v1.y ) < epsilon ) && ( Math.abs( v1.z ) < epsilon ) && ( Math.abs( v1.w ) < epsilon ) );
 
 			}
 

@@ -697,7 +697,7 @@ Object.assign( Vector3.prototype, {
 
 				v1.subVectors( this, v );
 
-				return ( ( v1.x < epsilon ) && ( v1.y < epsilon ) && ( v1.z < epsilon ) );
+				return ( ( Math.abs( v1.x ) < epsilon ) && ( Math.abs( v1.y ) < epsilon ) && ( Math.abs( v1.z ) < epsilon ) );
 
 			}
 
