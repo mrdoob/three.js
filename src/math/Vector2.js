@@ -365,7 +365,7 @@ Object.assign( Vector2.prototype, {
 
 	},
 
-	lengthManhattan: function () {
+	manhattanLength: function () {
 
 		return Math.abs( this.x ) + Math.abs( this.y );
 

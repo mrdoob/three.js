@@ -666,6 +666,12 @@ Object.assign( Vector2.prototype, {
 		console.warn( 'THREE.Vector2: .distanceToManhattan() has been renamed to .manhattanDistanceTo().' );
 		return this.manhattanDistanceTo( v );
 
+	},
+	lengthManhattan: function () {
+
+		console.warn( 'THREE.Vector2: .lengthManhattan() has been renamed to .manhattanLength().' );
+		return this.manhattanLength();
+
 	}
 
 } );
@@ -717,6 +723,12 @@ Object.assign( Vector3.prototype, {
 		console.warn( 'THREE.Vector3: .distanceToManhattan() has been renamed to .manhattanDistanceTo().' );
 		return this.manhattanDistanceTo( v );
 
+	},
+	lengthManhattan: function () {
+
+		console.warn( 'THREE.Vector3: .lengthManhattan() has been renamed to .manhattanLength().' );
+		return this.manhattanLength();
+
 	}
 
 } );
@@ -727,6 +739,12 @@ Object.assign( Vector4.prototype, {
 
 		console.warn( 'THREE.Vector4: .fromAttribute() has been renamed to .fromBufferAttribute().' );
 		return this.fromBufferAttribute( attribute, index, offset );
+
+	},
+	lengthManhattan: function () {
+
+		console.warn( 'THREE.Vector4: .lengthManhattan() has been renamed to .manhattanLength().' );
+		return this.manhattanLength();
 
 	}
 
