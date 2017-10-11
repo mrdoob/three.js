@@ -128,7 +128,10 @@ function WebGLLights() {
 	var matrix42 = new Matrix4();
 
 	function setup( lights, shadows, camera ) {
-
+		if(!lights.length) {
+			return;
+		}
+		
 		var r = 0, g = 0, b = 0;
 
 		var directionalLength = 0;
