@@ -211,7 +211,6 @@ var list = {
 		"Lights / Shadows": {
 			"DirectionalLightShadow": "api/lights/shadows/DirectionalLightShadow",
 			"LightShadow": "api/lights/shadows/LightShadow",
-			"RectAreaLightShadow": "api/lights/shadows/RectAreaLightShadow",
 			"SpotLightShadow": "api/lights/shadows/SpotLightShadow"
 		},
 
