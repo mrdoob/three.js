@@ -112,7 +112,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -2054,6 +2054,55 @@
 		var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
 		var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
 
+		var fps = 30; // default framerate
+
+		if ( 'GlobalSettings' in FBXTree && 'TimeMode' in FBXTree.GlobalSettings.properties ) {
+
+			/* Autodesk time mode documentation can be found here:
+			*	http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/class_fbx_time.html,topicNumber=cpp_ref_class_fbx_time_html
+			*/
+			var timeModeEnum = [
+				30, // 0: eDefaultMode
+				120, // 1: eFrames120
+				100, // 2: eFrames100
+				60, // 3: eFrames60
+				50, // 4: eFrames50
+				48, // 5: eFrames48
+				30, // 6: eFrames30 (black and white NTSC )
+				30, // 7: eFrames30Drop
+				29.97, // 8: eNTSCDropFrame
+				29.97, // 90: eNTSCFullFrame
+				25, // 10: ePal ( PAL/SECAM )
+				24, // 11: eFrames24 (Film/Cinema)
+				1, // 12: eFrames1000 (use for date time))
+				23.976, // 13: eFilmFullFrame
+				30, // 14: eCustom: use GlobalSettings.properties.CustomFrameRate.value
+				96, // 15: eFrames96
+				72, // 16:  eFrames72
+				59.94, // 17: eFrames59dot94
+			];
+
+			var eMode = FBXTree.GlobalSettings.properties.TimeMode.value;
+
+			if ( eMode === 14 ) {
+
+				if ( 'CustomFrameRate' in FBXTree.GlobalSettings.properties ) {
+
+					fps = parseFloat( FBXTree.GlobalSettings.properties.CustomFrameRate.value );
+
+					fps = ( fps === - 1 ) ? 30 : fps;
+
+				}
+
+			} else if ( eMode <= 17 ) { // for future proofing - if more eModes get added, they will default to 30fps
+
+				fps = timeModeEnum[ eMode ];
+
+			}
+
+		}
+
+
 		/**
 		 * @type {{
 				 curves: Map<number, {
@@ -2427,7 +2476,7 @@
 			layers: {},
 			stacks: {},
 			length: 0,
-			fps: 30,
+			fps: fps,
 			frames: 0
 		};
 
@@ -2825,7 +2874,7 @@
 					name: rawStacks[ nodeID ].attrName,
 					layers: layers,
 					length: timestamps.max - timestamps.min,
-					frames: ( timestamps.max - timestamps.min ) * 30
+					frames: ( timestamps.max - timestamps.min ) * returnObject.fps
 				};
 
 			}
@@ -3585,7 +3634,7 @@
 			 */
 			var animationData = {
 				name: stack.name,
-				fps: 30,
+				fps: animations.fps,
 				length: stack.length,
 				hierarchy: []
 			};
