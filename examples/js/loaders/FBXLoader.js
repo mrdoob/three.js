@@ -112,7 +112,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -432,7 +432,7 @@
 		var name = materialNode.attrName;
 		var type = materialNode.properties.ShadingModel;
 
-		//Case where FBXs wrap shading model in property object.
+		//Case where FBX wraps shading model in property object.
 		if ( typeof type === 'object' ) {
 
 			type = type.value;
@@ -1280,7 +1280,7 @@
 
 		},
 
-		ByVertice: {
+		ByVertex: {
 
 			Direct: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
 
@@ -2009,7 +2009,7 @@
 		sceneGraph.updateMatrixWorld( true );
 
 		// Silly hack with the animation parsing.  We're gonna pretend the scene graph has a skeleton
-		// to attach animations to, since FBXs treat animations as animations for the entire scene,
+		// to attach animations to, since FBX treats animations as animations for the entire scene,
 		// not just for individual objects.
 		sceneGraph.skeleton = {
 			bones: modelArray
@@ -4156,7 +4156,7 @@
 				// 0.12490539252758,13.7450733184814,-0.454119384288788,0.09272.....
 				// 0.0836158767342567,13.5432004928589,-0.435397416353226,0.028.....
 				//
-				// these case the lines must contiue with previous line
+				// in these case the lines must continue from the previous line
 				if ( l.match( /^[^\s\t}]/ ) ) {
 
 					this.parseNodePropertyContinued( l );
