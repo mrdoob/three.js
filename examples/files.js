@@ -297,6 +297,7 @@ var files = {
 	*/
 	"webaudio": [
 		"webaudio_sandbox",
+		"webaudio_timing",
 		"webaudio_visualizer"
 	],
 	"webvr": [
