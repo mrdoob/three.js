@@ -1280,7 +1280,7 @@
 
 		},
 
-		ByVertex: {
+		ByVertice: {
 
 			Direct: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
 
