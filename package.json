@@ -31,8 +31,8 @@
     "build-test": "rollup -c test/rollup.unit.config.js",
     "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
     "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
-    "dev": "rollup -c -w -m inline",
-    "start": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev\" \"http-server\"",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server\"",
+    "start": "npm run dev",
     "lint": "eslint src",
     "test": "rollup -c test/rollup.unit.config.js -w",
     "editor": "electron ./editor/main.js"
