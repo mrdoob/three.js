@@ -6,14 +6,32 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				font-family: Monospace;
+				color: #eee;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
 				background-color: #000;
 				margin: 0px;
+				padding: 0px;
 				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+				color: #0080ff;
 			}
 		</style>
 	</head>
 	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - parametric geometries</div>
 
 		<script src="../build/three.js"></script>
 
@@ -34,8 +52,7 @@
 
 			function init() {
 
-				var container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				var container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.y = 400;
@@ -44,11 +61,12 @@
 
 				//
 
-				scene.add( new THREE.AmbientLight( 0x404040 ) );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 );
-				scene.add( light );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( pointLight );
+				scene.add( camera );
 
 				//
 
@@ -56,28 +74,26 @@
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
-				var materials = [
-					new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, side: THREE.DoubleSide } )
-				];
+				var material = new THREE.MeshPhongMaterial( { map: map, side: THREE.DoubleSide } );
 
 				//
 
 				var geometry, object;
 
 				geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.plane( 100, 100 ), 10, 10 );
-				object = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
+				geometry.center();
+				object = new THREE.Mesh( geometry, material );
 				object.position.set( - 200, 0, 200 );
 				scene.add( object );
 
 				geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, 20, 20 );
-				object = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
+				object = new THREE.Mesh( geometry, material );
 				object.position.set( 0, 0, 200 );
 				object.scale.multiplyScalar( 5 );
 				scene.add( object );
 
 				geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.mobius, 20, 20 );
-				object = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
+				object = new THREE.Mesh( geometry, material );
 				object.position.set( 200, 0, 200 );
 				object.scale.multiplyScalar( 30 );
 				scene.add( object );
@@ -90,22 +106,17 @@
 				var sphere = new THREE.ParametricGeometries.SphereGeometry( 50, 20, 10 );
 				var tube = new THREE.ParametricGeometries.TubeGeometry( GrannyKnot, 100, 3, 8, true, false );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( torus, materials );
+				object = new THREE.Mesh( torus, material );
 				object.position.set( - 200, 0, - 200 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( sphere, materials );
+				object = new THREE.Mesh( sphere, material );
 				object.position.set( 0, 0, - 200 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( tube, materials );
+				object = new THREE.Mesh( tube, material );
 				object.position.set( 200, 0, - 200 );
 				object.scale.multiplyScalar( 2 );
-				scene.add( object );
-				
-				//
-
-				object = new THREE.AxesHelper( 50 );
 				scene.add( object );
 
 				//
@@ -149,14 +160,16 @@
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+				scene.traverse( function( object ) {
 
-					var object = scene.children[ i ];
+					if ( object.isMesh === true ) {
 
-					object.rotation.x = timer * 5;
-					object.rotation.y = timer * 2.5;
+						object.rotation.x = timer * 5;
+						object.rotation.y = timer * 2.5;
 
-				}
+					}
+
+				} );
 
 				renderer.render( scene, camera );
 
