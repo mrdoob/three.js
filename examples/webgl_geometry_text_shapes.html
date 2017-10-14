@@ -117,9 +117,9 @@
 						var shape = shapes[ i ];
 
 						var points = shape.getPoints();
-						var geometry = new THREE.BufferGeometry();
-
-						geometry.setFromPoints( points ).translate( xMid, 0, 0 );
+						var geometry = new THREE.BufferGeometry().setFromPoints( points );
+						
+						geometry.translate( xMid, 0, 0 );
 
 						var lineMesh = new THREE.Line( geometry, matDark );
 						lineText.add( lineMesh );

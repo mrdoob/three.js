@@ -118,12 +118,9 @@
 					var points = shape.getPoints();
 					var spacedPoints = shape.getSpacedPoints( 50 );
 
-					var geometryPoints = new THREE.BufferGeometry();
-					geometryPoints.setFromPoints( points );
+					var geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
+					var geometrySpacedPoints = new THREE.BufferGeometry().setFromPoints( spacedPoints );
 
-					var geometrySpacedPoints = new THREE.BufferGeometry();
-					geometrySpacedPoints.setFromPoints( spacedPoints );
-					
 					// solid line
 
 					var line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: color, linewidth: 3 } ) );
