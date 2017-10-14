@@ -334,6 +334,23 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	},
 
+	setFromPoints: function ( points ) {
+
+		var position = [];
+
+		for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+			var point = points[ i ];
+			position.push( point.x, point.y, 0 );
+
+		}
+
+		this.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+
+		return this;
+
+	},
+
 	updateFromObject: function ( object ) {
 
 		var geometry = object.geometry;

@@ -29,15 +29,9 @@ var curve = new THREE.SplineCurve( [
 	new THREE.Vector2( 10, 0 )
 ] );
 
-var geometry = new THREE.Geometry();
 var points = curve.getPoints( 50 );
+var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-for ( var i = 0, l = points.length; i < l; i ++ ) {
-
-	var point = points[ i ];
-	geometry.vertices.push( new THREE.Vector3( point.x, point.y, 0 ) );
-
-}
 var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
 // Create the final object to add to the scene

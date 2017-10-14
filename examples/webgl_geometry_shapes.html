@@ -111,41 +111,19 @@
 
 				function addLineShape( shape, color, x, y, z, rx, ry, rz, s ) {
 
-					var geometryPoints = new THREE.BufferGeometry();
-					var geometrySpacedPoints = new THREE.BufferGeometry();
-
 					// lines
 
 					shape.autoClose = true;
+
 					var points = shape.getPoints();
 					var spacedPoints = shape.getSpacedPoints( 50 );
 
-					// points
+					var geometryPoints = new THREE.BufferGeometry();
+					geometryPoints.setFromPoints( points );
 
-					var position = [];
-
-					for ( var i = 0, l = points.length; i < l; i ++ ) {
-
-						var point = points[ i ];
-						position.push( point.x, point.y, 0 );
-
-					}
-
-					geometryPoints.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
-
-					// spaced points
-
-					position = [];
-
-					for ( var i = 0, l = spacedPoints.length; i < l; i ++ ) {
-
-						var point = spacedPoints[ i ];
-						position.push( point.x, point.y, 0 );
-
-					}
-
-					geometrySpacedPoints.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
-
+					var geometrySpacedPoints = new THREE.BufferGeometry();
+					geometrySpacedPoints.setFromPoints( spacedPoints );
+					
 					// solid line
 
 					var line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: color, linewidth: 3 } ) );
