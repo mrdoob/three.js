@@ -12,10 +12,10 @@
 		<h1>[name]</h1>
 
 		<div class="desc">A loader for loading a <em>.obj</em> resource. <br />
-		The <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ file format</a> is a simple data-format 
-		that represents 3D geometry in a human redeable format as, the position of each vertex, the UV position of 
-		each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of 
-		vertices, and texture vertices.
+			The <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ file format</a> is a simple data-format
+			that represents 3D geometry in a human redeable format as, the position of each vertex, the UV position of
+			each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of
+			vertices, and texture vertices.
 		</div>
 
 		<h2>Examples</h2>
@@ -40,9 +40,10 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<h3>[name]( [page:LoadingManager manager], [page:LoaderSupport.ConsoleLogger logger] )</h3>
 		<div>
 			[page:LoadingManager manager] - The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
 		</div>
 		<div>
 			Use [name] to load OBJ data from files or to parse OBJ data from arraybuffer or text.
@@ -73,7 +74,7 @@
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError], [page:Function onMeshAlter], [page:boolean useAsync] )</h3>
 		<div>
 			[page:String url] - A string containing the path/URL of the <em>.obj</em> file.<br>
-			[page:Function onLoad] - (optional) A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br>
+			[page:Function onLoad] - A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br>
 			[page:Function onProgress] - (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br>
 			[page:Function onError] - (optional) A function to be called if an error occurrs during loading. The function receives the error as an argument.<br>
 			[page:Function onMeshAlter] - (optional) A function to be called after a new mesh raw data becomes available for alteration.<br>

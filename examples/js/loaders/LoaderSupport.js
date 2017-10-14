@@ -714,17 +714,17 @@ THREE.LoaderSupport.Builder = (function () {
  * Base class to be used by loaders.
  * @class
  *
- * @param {THREE.LoaderSupport.ConsoleLogger} logger logger to be used
  * @param {THREE.DefaultLoadingManager} [manager] The loadingManager for the loader to use. Default is {@link THREE.DefaultLoadingManager}
+ * @param {THREE.LoaderSupport.ConsoleLogger} logger logger to be used
  */
 THREE.LoaderSupport.LoaderBase = (function () {
 
 	var Validator = THREE.LoaderSupport.Validator;
 	var ConsoleLogger = THREE.LoaderSupport.ConsoleLogger;
 
-	function LoaderBase( logger, manager ) {
-		this.logger = Validator.verifyInput( logger, new ConsoleLogger() );
+	function LoaderBase( manager, logger ) {
 		this.manager = Validator.verifyInput( manager, THREE.DefaultLoadingManager );
+		this.logger = Validator.verifyInput( logger, new ConsoleLogger() );
 
 		this.modelName = '';
 		this.instanceNo = 0;
@@ -1429,7 +1429,7 @@ THREE.LoaderSupport.WorkerDirector = (function () {
 	WorkerDirector.prototype._buildLoader = function ( instanceNo ) {
 		var classDef = this.workerDescription.classDef;
 		var loader = Object.create( classDef.prototype );
-		this.workerDescription.classDef.call( loader, this.logger );
+		this.workerDescription.classDef.call( loader, null, this.logger );
 
 		// verify that all required functions are implemented
 		if ( ! loader.hasOwnProperty( 'instanceNo' ) ) throw classDef.name + ' has no property "instanceNo".';

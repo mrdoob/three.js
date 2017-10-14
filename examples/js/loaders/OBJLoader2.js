@@ -12,6 +12,7 @@ if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
  * @class
  *
  * @param {THREE.DefaultLoadingManager} [manager] The loadingManager for the loader to use. Default is {@link THREE.DefaultLoadingManager}
+ * @param {THREE.LoaderSupport.ConsoleLogger} logger logger to be used
  */
 THREE.OBJLoader2 = (function () {
 
@@ -23,8 +24,8 @@ THREE.OBJLoader2 = (function () {
 	OBJLoader2.prototype = Object.create( THREE.LoaderSupport.LoaderBase.prototype );
 	OBJLoader2.prototype.constructor = OBJLoader2;
 
-	function OBJLoader2( logger, manager ) {
-		THREE.LoaderSupport.LoaderBase.call( this, logger, manager );
+	function OBJLoader2( manager, logger ) {
+		THREE.LoaderSupport.LoaderBase.call( this, manager, logger );
 		this.logger.logInfo( 'Using THREE.OBJLoader2 version: ' + OBJLOADER2_VERSION );
 
 		this.materialPerSmoothingGroup = false;
@@ -45,15 +46,15 @@ THREE.OBJLoader2 = (function () {
 	};
 
 	/**
-	 * Use this convenient method to load an OBJ file at the given URL. Per default the fileLoader uses an arraybuffer.
+	 * Use this convenient method to load an OBJ file at the given URL. By default the fileLoader uses an arraybuffer.
 	 * @memberOf THREE.OBJLoader2
 	 *
-	 * @param {string} url URL of the file to load
-	 * @param {callback} onLoad Called after loading was successfully completed
-	 * @param {callback} onProgress Called to report progress of loading. The argument will be the XMLHttpRequest instance, which contains {integer total} and {integer loaded} bytes.
-	 * @param {callback} onError Called after an error occurred during loading
-	 * @param {callback} onMeshAlter Called after a new mesh raw data becomes available to allow alteration
-	 * @param {boolean} useAsync If true uses async loading with worker, if false loads data synchronously
+	 * @param {string}  url A string containing the path/URL of the .obj file.
+	 * @param {callback} onLoad A function to be called after loading is successfully completed. The function receives loaded Object3D as an argument.
+	 * @param {callback} [onProgress] A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains total and Integer bytes.
+	 * @param {callback} [onError] A function to be called if an error occurs during loading. The function receives the error as an argument.
+	 * @param {callback} [onMeshAlter] A function to be called after a new mesh raw data becomes available for alteration.
+	 * @param {boolean} [useAsync] If true, uses async loading with worker, if false loads data synchronously.
 	 */
 	OBJLoader2.prototype.load = function ( url, onLoad, onProgress, onError, onMeshAlter, useAsync ) {
 		var scope = this;

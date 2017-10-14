@@ -91,8 +91,8 @@
 				MeshSpray.prototype = Object.create( THREE.LoaderSupport.LoaderBase.prototype );
 				MeshSpray.prototype.constructor = MeshSpray;
 
-				function MeshSpray( manager ) {
-					THREE.LoaderSupport.LoaderBase.call( this, manager );
+				function MeshSpray( manager, logger ) {
+					THREE.LoaderSupport.LoaderBase.call( this, manager, logger );
 					this.workerSupport = null;
 					this.logger = new ConsoleLogger();
 				};
