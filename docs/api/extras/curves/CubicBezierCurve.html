@@ -30,7 +30,16 @@ var curve = new THREE.CubicBezierCurve(
 
 var path = new THREE.Path( curve.getPoints( 50 ) );
 
-var geometry = path.createPointsGeometry( 50 );
+var geometry = new THREE.Geometry();
+var points = curve.getPoints( 50 );
+
+for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+	var point = points[ i ];
+	geometry.vertices.push( new THREE.Vector3( point.x, point.y, 0 ) );
+
+}
+
 var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
 // Create the final object to add to the scene
