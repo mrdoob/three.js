@@ -115,12 +115,22 @@
 					for ( var i = 0; i < shapes.length; i ++ ) {
 
 						var shape = shapes[ i ];
+						var points = shape.getPoints();
 
-						var lineGeometry = shape.createPointsGeometry();
+						var geometry = new THREE.BufferGeometry();
+						var position = [];
 
-						lineGeometry.translate( xMid, 0, 0 );
+						for ( var j = 0; j < points.length; j ++ ) {
 
-						var lineMesh = new THREE.Line( lineGeometry, matDark );
+							var point = points[ j ];
+							position.push( point.x, point.y, 0 );
+
+						}
+
+						geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+						geometry.translate( xMid, 0, 0 );
+
+						var lineMesh = new THREE.Line( geometry, matDark );
 						lineText.add( lineMesh );
 
 					}

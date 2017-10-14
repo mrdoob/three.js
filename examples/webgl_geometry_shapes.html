@@ -111,15 +111,44 @@
 
 				function addLineShape( shape, color, x, y, z, rx, ry, rz, s ) {
 
+					var geometryPoints = new THREE.BufferGeometry();
+					var geometrySpacedPoints = new THREE.BufferGeometry();
+
 					// lines
 
 					shape.autoClose = true;
-					var points = shape.createPointsGeometry();
-					var spacedPoints = shape.createSpacedPointsGeometry( 50 );
+					var points = shape.getPoints();
+					var spacedPoints = shape.getSpacedPoints( 50 );
+
+					// points
+
+					var position = [];
+
+					for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+						var point = points[ i ];
+						position.push( point.x, point.y, 0 );
+
+					}
+
+					geometryPoints.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+
+					// spaced points
+
+					position = [];
+
+					for ( var i = 0, l = spacedPoints.length; i < l; i ++ ) {
+
+						var point = spacedPoints[ i ];
+						position.push( point.x, point.y, 0 );
+
+					}
+
+					geometrySpacedPoints.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
 
 					// solid line
 
-					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 3 } ) );
+					var line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: color, linewidth: 3 } ) );
 					line.position.set( x, y, z - 25 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
@@ -127,7 +156,7 @@
 
 					// line from equidistance sampled points
 
-					var line = new THREE.Line( spacedPoints, new THREE.LineBasicMaterial( { color: color, linewidth: 3 } ) );
+					var line = new THREE.Line( geometrySpacedPoints, new THREE.LineBasicMaterial( { color: color, linewidth: 3 } ) );
 					line.position.set( x, y, z + 25 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
@@ -135,7 +164,7 @@
 
 					// vertices from real points
 
-					var particles = new THREE.Points( points, new THREE.PointsMaterial( { color: color, size: 4 } ) );
+					var particles = new THREE.Points( geometryPoints, new THREE.PointsMaterial( { color: color, size: 4 } ) );
 					particles.position.set( x, y, z + 75 );
 					particles.rotation.set( rx, ry, rz );
 					particles.scale.set( s, s, s );
@@ -143,7 +172,7 @@
 
 					// equidistance sampled points
 
-					var particles = new THREE.Points( spacedPoints, new THREE.PointsMaterial( { color: color, size: 4 } ) );
+					var particles = new THREE.Points( geometrySpacedPoints, new THREE.PointsMaterial( { color: color, size: 4 } ) );
 					particles.position.set( x, y, z + 125 );
 					particles.rotation.set( rx, ry, rz );
 					particles.scale.set( s, s, s );
