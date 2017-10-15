@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Mesh Spray - Worker based mesh spray</title>
+		<title>three.js webgl - Mesh Spray</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -88,11 +88,11 @@
 				var Validator = THREE.LoaderSupport.Validator;
 				var ConsoleLogger = THREE.LoaderSupport.ConsoleLogger;
 
-				MeshSpray.prototype = Object.create( THREE.LoaderSupport.Commons.prototype );
+				MeshSpray.prototype = Object.create( THREE.LoaderSupport.LoaderBase.prototype );
 				MeshSpray.prototype.constructor = MeshSpray;
 
-				function MeshSpray( manager ) {
-					THREE.LoaderSupport.Commons.call( this, manager );
+				function MeshSpray( manager, logger ) {
+					THREE.LoaderSupport.LoaderBase.call( this, manager, logger );
 					this.workerSupport = null;
 					this.logger = new ConsoleLogger();
 				};
@@ -116,7 +116,7 @@
 
 					var scope = this;
 					var scopeBuilderFunc = function ( payload ) {
-						var meshes = scope.builder.buildMeshes( payload );
+						var meshes = scope.builder.processPayload( payload );
 						var mesh;
 						for ( var i in meshes ) {
 							mesh = meshes[ i ];
@@ -148,24 +148,23 @@
 
 						return workerCode;
 					};
-					this.workerSupport.validate( buildCode, false );
+					var libs2Load = [ 'build/three.min.js' ];
+					this.workerSupport.validate( buildCode, false, libs2Load, '../' );
 					this.workerSupport.setCallbacks( scopeBuilderFunc, scopeFuncComplete );
 					this.workerSupport.run(
 						{
 							cmd: 'run',
 							params: {
-								debug: this.debug,
-								enableLogging: this.logger.enabled,
 								dimension: prepData.dimension,
 								quantity: prepData.quantity,
 								globalObjectCount: prepData.globalObjectCount
 							},
+							materials: {
+								serializedMaterials: this.builder.getMaterialsJSON()
+							},
 							logger: {
 								debug: this.logger.debug,
 								enabled: this.logger.enabled
-							},
-							materials: {
-								materialNames: this.builder.materialNames
 							},
 							buffers: {
 								input: null
@@ -185,21 +184,10 @@
 						this.quantity = 1;
 						this.callbackBuilder = null;
 						this.logger = logger;
+						this.serializedMaterials = null;
 					};
 
 					Parser.prototype.parse = function () {
-						var materialDescription;
-						var materialDescriptions = [];
-						var materialGroups = [];
-
-						materialDescription = {
-							name: 'Gen',
-							flat: false,
-							vertexColors: true,
-							default: true
-						};
-						materialDescriptions.push( materialDescription );
-
 						var baseTriangle = [ 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 0.0, -1.0, 1.0 ];
 						var vertices = [];
 						var colors = [];
@@ -263,6 +251,30 @@
 
 						}
 
+						/*
+						 * This demonstrates the usage of embedded three.js in the worker blob and
+						 * the serialization of materials back to the Builder outside the worker.
+						 *
+						 * This is not the most effective way, but outlining possibilities
+						 */
+						var materialName = 'vertexColorMaterial_double';
+						var vertexColorMaterialJson = this.serializedMaterials[ 'vertexColorMaterial' ];
+						var loader = new THREE.MaterialLoader();
+
+						var vertexColorMaterialDouble = loader.parse( vertexColorMaterialJson );
+						vertexColorMaterialDouble.name = materialName;
+						vertexColorMaterialDouble.side = THREE.DoubleSide;
+
+						var newSerializedMaterials = {};
+						newSerializedMaterials[ materialName ] = vertexColorMaterialDouble.toJSON();
+						var payload = {
+							cmd: 'materialData',
+							materials: {
+								serializedMaterials: newSerializedMaterials
+							}
+						};
+						this.callbackBuilder( payload );
+
 						this.globalObjectCount++;
 						this.callbackBuilder(
 							{
@@ -275,8 +287,8 @@
 								},
 								materials: {
 									multiMaterial: false,
-									materialDescriptions: materialDescriptions,
-									materialGroups: materialGroups
+									materialNames: [ materialName ],
+									materialGroups: []
 								},
 								buffers: {
 									vertices: vertexFA,
@@ -297,13 +309,20 @@
 					return Parser;
 				})();
 
+
+				Parser.prototype.setSerializedMaterials = function ( serializedMaterials ) {
+					if ( Validator.isValid( serializedMaterials ) ) {
+
+						this.serializedMaterials = serializedMaterials;
+
+					}
+				};
+
 				return MeshSpray;
 
 			})();
 
 			var MeshSprayApp = (function () {
-
-				var Validator = THREE.LoaderSupport.Validator;
 
 				function MeshSprayApp( elementToBindTo ) {
 					this.renderer = null;

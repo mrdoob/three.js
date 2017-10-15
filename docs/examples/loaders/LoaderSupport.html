@@ -20,7 +20,7 @@
 		[page:LoaderSupport.WorkerRunnerRefImpl]<br>
 		[page:LoaderSupport.WorkerDirector]<br>
 		[page:LoaderSupport.PrepData]<br>
-		[page:LoaderSupport.Commons]<br>
+		[page:LoaderSupport.LoaderBase]<br>
 		[page:LoaderSupport.Callbacks]<br>
 		[page:LoaderSupport.Validator]<br>
 		[page:LoaderSupport.ConsoleLogger]
@@ -54,12 +54,50 @@
 		</div>
 
 
-		<h3>[method:Array buildMeshes] (Object payload)</h3>
+		<h3>[method:Array processPayload] ( Object payload )</h3>
 		<div>
-			[page:Object payload] - Raw mesh description (buffers, params, materials) used to build one to many meshes.
+			[page:Object payload] - Raw Mesh or Material descriptions.
 		</div>
 		<div>
-			Builds one or multiple meshes from the data described in the payload (buffers, params, material info.
+			Delegates processing of the payload (mesh building or material update) to the corresponding functions (BW-compatibility).
+		</div>
+		<br>
+		<br>
+
+
+		<h3>[method:Array buildMeshes] ( Object meshPayload )</h3>
+		<div>
+			[page:Object meshPayload] - Raw mesh description (buffers, params, materials) used to build one to many meshes.
+		</div>
+		<div>
+			Builds one or multiple meshes from the data described in the payload (buffers, params, material info).
+		</div>
+		<br>
+		<br>
+
+
+		<h3>[method:null updateMaterials] ( Object materialPayload )</h3>
+		<div>
+			[page:Object materialPayload] - Material update instructions
+		</div>
+		<div>
+			Updates the materials with contained material objects (sync) or from alteration instructions (async).
+		</div>
+		<br>
+		<br>
+
+
+		<h3>[method:Object getMaterialsJSON] ()</h3>
+		<div>
+			Returns the mapping object of material name and corresponding jsonified material.
+		</div>
+		<br>
+		<br>
+
+
+		<h3>[method:Object getMaterials] ()</h3>
+		<div>
+			Returns the mapping object of material name and corresponding material.
 		</div>
 		<br>
 		<br>
@@ -118,10 +156,12 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null validate] ( [page:Function functionCodeBuilder], [page:Boolean forceWorkerReload], [page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] )</h3>
+		<h3>[method:null validate] ( [page:Function functionCodeBuilder], [page:Boolean forceWorkerReload], Array of [page:String libLocations], [page:String libPath], [page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] )</h3>
 		<div>
-			[page:Function functionCodeBuilder] - Function that is invoked with funcBuildObject and funcBuildSingelton that allows stringification of objects and singletons.
-			[page:Boolean forceWorkerReload] - Force re-build of the worker code.
+			[page:Function functionCodeBuilder] - Function that is invoked with funcBuildObject and funcBuildSingelton that allows stringification of objects and singletons.<br>
+			[page:Boolean forceWorkerReload] - Force re-build of the worker code.<br>
+			Array of [page:String libLocations] - URL of libraries that shall be added to worker code relative to libPath.<br>
+			[page:String libPath] - Base path used for loading libraries.<br>
 			[page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] - The default worker parser wrapper implementation (communication and execution). An extended class could be passed here.
 		</div>
 		<div>
@@ -146,7 +186,7 @@
 
 		<h3>[method:null setCallbacks] ( [page:Function builder], [page:Function onLoad] )</h3>
 		<div>
-			[page:Function builder] - The builder function. Default is [page:LoaderSupport.Builder].
+			[page:Function builder] - The builder function. Default is [page:LoaderSupport.Builder].<br>
 			[page:Function onLoad] - The function that is called when parsing is complete.
 		</div>
 		<div>
@@ -178,7 +218,7 @@
 
 		<h3>[method:null applyProperties] ( [page:Object parser], [page:Object params] )</h3>
 		<div>
-			[page:Object parser] - The parser instance
+			[page:Object parser] - The parser instance<br>
 			[page:Object params] - The parameter object
 		</div>
 		<div>
@@ -355,13 +395,13 @@
 		<br>
 
 
-		<a name="Commons"></a><h1>Commons</h1>
+		<a name="LoaderBase"></a><h1>LoaderBase</h1>
 		<h2>Constructor</h2>
 
-		<h3>Commons( [page:LoaderSupport.ConsoleLogger logger], [page:LoadingManager manager] )</h3>
+		<h3>LoaderBase( [page:LoadingManager manager], [page:LoaderSupport.ConsoleLogger logger] )</h3>
 		<div>
-			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
 			[page:LoadingManager manager] - The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
 		</div>
 		<div>
 			Base class to be used by loaders.
