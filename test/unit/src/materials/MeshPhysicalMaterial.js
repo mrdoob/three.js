@@ -1,6 +1,14 @@
 /**
- * @author TristanVALCKE / https://github.com/TristanVALCKE
+ * @author TristanVALCKE / https://github.com/Itee
  */
+/* global module, test */
 
-//Todo
-console.warn("Todo: Unit tests of MeshPhysicalMaterial")
+module.todo( 'MeshPhysicalMaterial', () => {
+
+	test( 'write me !', assert => {
+
+		assert.ok( false, "everything's gonna be alright" );
+
+	} );
+
+} );

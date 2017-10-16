@@ -1,5 +1,5 @@
 /**
- * @author TristanVALCKE / https://github.com/TristanVALCKE
+ * @author TristanVALCKE / https://github.com/Itee
  */
 
 QUnit.module( 'PropertyBinding' );
