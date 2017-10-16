@@ -1,6 +1,138 @@
 /**
- * @author TristanVALCKE / https://github.com/TristanVALCKE
+ * @author TristanVALCKE / https://github.com/Itee
  */
+/* global module, test */
 
-//Todo
-console.warn("Todo: Unit tests of Constants")
+module( "Constants", () => {
+
+	test( "default values", assert => {
+
+		assert.propEqual( THREE.MOUSE, { LEFT: 0, MIDDLE: 1, RIGHT: 2 }, 'THREE.MOUSE equal { LEFT: 0, MIDDLE: 1, RIGHT: 2 }' );
+		assert.equal( THREE.CullFaceNone, 0, 'THREE.CullFaceNone equal 0' );
+		assert.equal( THREE.CullFaceBack, 1, 'THREE.CullFaceBack equal 1' );
+		assert.equal( THREE.CullFaceFront, 2, 'THREE.CullFaceFront is equal to 2' );
+		assert.equal( THREE.CullFaceFrontBack, 3, 'THREE.CullFaceFrontBack is equal to 3' );
+		assert.equal( THREE.FrontFaceDirectionCW, 0, 'THREE.FrontFaceDirectionCW is equal to 0' );
+		assert.equal( THREE.FrontFaceDirectionCCW, 1, 'THREE.FrontFaceDirectionCCW is equal to 1' );
+		assert.equal( THREE.BasicShadowMap, 0, 'THREE.BasicShadowMap is equal to 0' );
+		assert.equal( THREE.PCFShadowMap, 1, 'THREE.PCFShadowMap is equal to 1' );
+		assert.equal( THREE.PCFSoftShadowMap, 2, 'THREE.PCFSoftShadowMap is equal to 2' );
+		assert.equal( THREE.FrontSide, 0, 'THREE.FrontSide is equal to 0' );
+		assert.equal( THREE.BackSide, 1, 'THREE.BackSide is equal to 1' );
+		assert.equal( THREE.DoubleSide, 2, 'THREE.DoubleSide is equal to 2' );
+		assert.equal( THREE.FlatShading, 1, 'THREE.FlatShading is equal to 1' );
+		assert.equal( THREE.SmoothShading, 2, 'THREE.SmoothShading is equal to 2' );
+		assert.equal( THREE.NoColors, 0, 'THREE.NoColors is equal to 0' );
+		assert.equal( THREE.FaceColors, 1, 'THREE.FaceColors is equal to 1' );
+		assert.equal( THREE.VertexColors, 2, 'THREE.VertexColors is equal to 2' );
+		assert.equal( THREE.NoBlending, 0, 'THREE.NoBlending is equal to 0' );
+		assert.equal( THREE.NormalBlending, 1, 'THREE.NormalBlending is equal to 1' );
+		assert.equal( THREE.AdditiveBlending, 2, 'THREE.AdditiveBlending is equal to 2' );
+		assert.equal( THREE.SubtractiveBlending, 3, 'THREE.SubtractiveBlending is equal to 3' );
+		assert.equal( THREE.MultiplyBlending, 4, 'THREE.MultiplyBlending is equal to 4' );
+		assert.equal( THREE.CustomBlending, 5, 'THREE.CustomBlending is equal to 5' );
+		assert.equal( THREE.AddEquation, 100, 'THREE.AddEquation is equal to 100' );
+		assert.equal( THREE.SubtractEquation, 101, 'THREE.SubtractEquation is equal to 101' );
+		assert.equal( THREE.ReverseSubtractEquation, 102, 'THREE.ReverseSubtractEquation is equal to 102' );
+		assert.equal( THREE.MinEquation, 103, 'THREE.MinEquation is equal to 103' );
+		assert.equal( THREE.MaxEquation, 104, 'THREE.MaxEquation is equal to 104' );
+		assert.equal( THREE.ZeroFactor, 200, 'THREE.ZeroFactor is equal to 200' );
+		assert.equal( THREE.OneFactor, 201, 'THREE.OneFactor is equal to 201' );
+		assert.equal( THREE.SrcColorFactor, 202, 'THREE.SrcColorFactor is equal to 202' );
+		assert.equal( THREE.OneMinusSrcColorFactor, 203, 'THREE.OneMinusSrcColorFactor is equal to 203' );
+		assert.equal( THREE.SrcAlphaFactor, 204, 'THREE.SrcAlphaFactor is equal to 204' );
+		assert.equal( THREE.OneMinusSrcAlphaFactor, 205, 'THREE.OneMinusSrcAlphaFactor is equal to 205' );
+		assert.equal( THREE.DstAlphaFactor, 206, 'THREE.DstAlphaFactor is equal to 206' );
+		assert.equal( THREE.OneMinusDstAlphaFactor, 207, 'THREE.OneMinusDstAlphaFactor is equal to 207' );
+		assert.equal( THREE.DstColorFactor, 208, 'THREE.DstColorFactor is equal to 208' );
+		assert.equal( THREE.OneMinusDstColorFactor, 209, 'THREE.OneMinusDstColorFactor is equal to 209' );
+		assert.equal( THREE.SrcAlphaSaturateFactor, 210, 'THREE.SrcAlphaSaturateFactor is equal to 210' );
+		assert.equal( THREE.NeverDepth, 0, 'THREE.NeverDepth is equal to 0' );
+		assert.equal( THREE.AlwaysDepth, 1, 'THREE.AlwaysDepth is equal to 1' );
+		assert.equal( THREE.LessDepth, 2, 'THREE.LessDepth is equal to 2' );
+		assert.equal( THREE.LessEqualDepth, 3, 'THREE.LessEqualDepth is equal to 3' );
+		assert.equal( THREE.EqualDepth, 4, 'THREE.EqualDepth is equal to 4' );
+		assert.equal( THREE.GreaterEqualDepth, 5, 'THREE.GreaterEqualDepth is equal to 5' );
+		assert.equal( THREE.GreaterDepth, 6, 'THREE.GreaterDepth is equal to 6' );
+		assert.equal( THREE.NotEqualDepth, 7, 'THREE.NotEqualDepth is equal to 7' );
+		assert.equal( THREE.MultiplyOperation, 0, 'THREE.MultiplyOperation is equal to 0' );
+		assert.equal( THREE.MixOperation, 1, 'THREE.MixOperation is equal to 1' );
+		assert.equal( THREE.AddOperation, 2, 'THREE.AddOperation is equal to 2' );
+		assert.equal( THREE.NoToneMapping, 0, 'THREE.NoToneMapping is equal to 0' );
+		assert.equal( THREE.LinearToneMapping, 1, 'THREE.LinearToneMapping is equal to 1' );
+		assert.equal( THREE.ReinhardToneMapping, 2, 'THREE.ReinhardToneMapping is equal to 2' );
+		assert.equal( THREE.Uncharted2ToneMapping, 3, 'THREE.Uncharted2ToneMapping is equal to 3' );
+		assert.equal( THREE.CineonToneMapping, 4, 'THREE.CineonToneMapping is equal to 4' );
+		assert.equal( THREE.UVMapping, 300, 'THREE.UVMapping is equal to 300' );
+		assert.equal( THREE.CubeReflectionMapping, 301, 'THREE.CubeReflectionMapping is equal to 301' );
+		assert.equal( THREE.CubeRefractionMapping, 302, 'THREE.CubeRefractionMapping is equal to 302' );
+		assert.equal( THREE.EquirectangularReflectionMapping, 303, 'THREE.EquirectangularReflectionMapping is equal to 303' );
+		assert.equal( THREE.EquirectangularRefractionMapping, 304, 'THREE.EquirectangularRefractionMapping is equal to 304' );
+		assert.equal( THREE.SphericalReflectionMapping, 305, 'THREE.SphericalReflectionMapping is equal to 305' );
+		assert.equal( THREE.CubeUVReflectionMapping, 306, 'THREE.CubeUVReflectionMapping is equal to 306' );
+		assert.equal( THREE.CubeUVRefractionMapping, 307, 'THREE.CubeUVRefractionMapping is equal to 307' );
+		assert.equal( THREE.RepeatWrapping, 1000, 'THREE.RepeatWrapping is equal to 1000' );
+		assert.equal( THREE.ClampToEdgeWrapping, 1001, 'THREE.ClampToEdgeWrapping is equal to 1001' );
+		assert.equal( THREE.MirroredRepeatWrapping, 1002, 'THREE.MirroredRepeatWrapping is equal to 1002' );
+		assert.equal( THREE.NearestFilter, 1003, 'THREE.NearestFilter is equal to 1003' );
+		assert.equal( THREE.NearestMipMapNearestFilter, 1004, 'THREE.NearestMipMapNearestFilter is equal to 1004' );
+		assert.equal( THREE.NearestMipMapLinearFilter, 1005, 'THREE.NearestMipMapLinearFilter is equal to 1005' );
+		assert.equal( THREE.LinearFilter, 1006, 'THREE.LinearFilter is equal to 1006' );
+		assert.equal( THREE.LinearMipMapNearestFilter, 1007, 'THREE.LinearMipMapNearestFilter is equal to 1007' );
+		assert.equal( THREE.LinearMipMapLinearFilter, 1008, 'THREE.LinearMipMapLinearFilter is equal to 1008' );
+		assert.equal( THREE.UnsignedByteType, 1009, 'THREE.UnsignedByteType is equal to 1009' );
+		assert.equal( THREE.ByteType, 1010, 'THREE.ByteType is equal to 1010' );
+		assert.equal( THREE.ShortType, 1011, 'THREE.ShortType is equal to 1011' );
+		assert.equal( THREE.UnsignedShortType, 1012, 'THREE.UnsignedShortType is equal to 1012' );
+		assert.equal( THREE.IntType, 1013, 'THREE.IntType is equal to 1013' );
+		assert.equal( THREE.UnsignedIntType, 1014, 'THREE.UnsignedIntType is equal to 1014' );
+		assert.equal( THREE.FloatType, 1015, 'THREE.FloatType is equal to 1015' );
+		assert.equal( THREE.HalfFloatType, 1016, 'THREE.HalfFloatType is equal to 1016' );
+		assert.equal( THREE.UnsignedShort4444Type, 1017, 'THREE.UnsignedShort4444Type is equal to 1017' );
+		assert.equal( THREE.UnsignedShort5551Type, 1018, 'THREE.UnsignedShort5551Type is equal to 1018' );
+		assert.equal( THREE.UnsignedShort565Type, 1019, 'THREE.UnsignedShort565Type is equal to 1019' );
+		assert.equal( THREE.UnsignedInt248Type, 1020, 'THREE.UnsignedInt248Type is equal to 1020' );
+		assert.equal( THREE.AlphaFormat, 1021, 'THREE.AlphaFormat is equal to 1021' );
+		assert.equal( THREE.RGBFormat, 1022, 'THREE.RGBFormat is equal to 1022' );
+		assert.equal( THREE.RGBAFormat, 1023, 'THREE.RGBAFormat is equal to 1023' );
+		assert.equal( THREE.LuminanceFormat, 1024, 'THREE.LuminanceFormat is equal to 1024' );
+		assert.equal( THREE.LuminanceAlphaFormat, 1025, 'THREE.LuminanceAlphaFormat is equal to 1025' );
+		assert.equal( THREE.RGBEFormat, THREE.RGBAFormat, 'THREE.RGBEFormat is equal to THREE.RGBAFormat' );
+		assert.equal( THREE.DepthFormat, 1026, 'THREE.DepthFormat is equal to 1026' );
+		assert.equal( THREE.DepthStencilFormat, 1027, 'THREE.DepthStencilFormat is equal to 1027' );
+		assert.equal( THREE.RGB_S3TC_DXT1_Format, 2001, 'THREE.RGB_S3TC_DXT1_Format is equal to 2001' );
+		assert.equal( THREE.RGBA_S3TC_DXT1_Format, 2002, 'THREE.RGBA_S3TC_DXT1_Format is equal to 2002' );
+		assert.equal( THREE.RGBA_S3TC_DXT3_Format, 2003, 'THREE.RGBA_S3TC_DXT3_Format is equal to 2003' );
+		assert.equal( THREE.RGBA_S3TC_DXT5_Format, 2004, 'THREE.RGBA_S3TC_DXT5_Format is equal to 2004' );
+		assert.equal( THREE.RGB_PVRTC_4BPPV1_Format, 2100, 'THREE.RGB_PVRTC_4BPPV1_Format is equal to 2100' );
+		assert.equal( THREE.RGB_PVRTC_2BPPV1_Format, 2101, 'THREE.RGB_PVRTC_2BPPV1_Format is equal to 2101' );
+		assert.equal( THREE.RGBA_PVRTC_4BPPV1_Format, 2102, 'THREE.RGBA_PVRTC_4BPPV1_Format is equal to 2102' );
+		assert.equal( THREE.RGBA_PVRTC_2BPPV1_Format, 2103, 'THREE.RGBA_PVRTC_2BPPV1_Format is equal to 2103' );
+		assert.equal( THREE.RGB_ETC1_Format, 2151, 'THREE.RGB_ETC1_Format is equal to 2151' );
+		assert.equal( THREE.LoopOnce, 2200, 'THREE.LoopOnce is equal to 2200' );
+		assert.equal( THREE.LoopRepeat, 2201, 'THREE.LoopRepeat is equal to 2201' );
+		assert.equal( THREE.LoopPingPong, 2202, 'THREE.LoopPingPong is equal to 2202' );
+		assert.equal( THREE.InterpolateDiscrete, 2300, 'THREE.InterpolateDiscrete is equal to 2300' );
+		assert.equal( THREE.InterpolateLinear, 2301, 'THREE.InterpolateLinear is equal to 2301' );
+		assert.equal( THREE.InterpolateSmooth, 2302, 'THREE.InterpolateSmooth is equal to 2302' );
+		assert.equal( THREE.ZeroCurvatureEnding, 2400, 'THREE.ZeroCurvatureEnding is equal to 2400' );
+		assert.equal( THREE.ZeroSlopeEnding, 2401, 'THREE.ZeroSlopeEnding is equal to 2401' );
+		assert.equal( THREE.WrapAroundEnding, 2402, 'THREE.WrapAroundEnding is equal to 2402' );
+		assert.equal( THREE.TrianglesDrawMode, 0, 'THREE.TrianglesDrawMode is equal to 0' );
+		assert.equal( THREE.TriangleStripDrawMode, 1, 'THREE.TriangleStripDrawMode is equal to 1' );
+		assert.equal( THREE.TriangleFanDrawMode, 2, 'THREE.TriangleFanDrawMode is equal to 2' );
+		assert.equal( THREE.LinearEncoding, 3000, 'THREE.LinearEncoding is equal to 3000' );
+		assert.equal( THREE.sRGBEncoding, 3001, 'THREE.sRGBEncoding is equal to 3001' );
+		assert.equal( THREE.GammaEncoding, 3007, 'THREE.GammaEncoding is equal to 3007' );
+		assert.equal( THREE.RGBEEncoding, 3002, 'THREE.RGBEEncoding is equal to 3002' );
+		assert.equal( THREE.LogLuvEncoding, 3003, 'THREE.LogLuvEncoding is equal to 3003' );
+		assert.equal( THREE.RGBM7Encoding, 3004, 'THREE.RGBM7Encoding is equal to 3004' );
+		assert.equal( THREE.RGBM16Encoding, 3005, 'THREE.RGBM16Encoding is equal to 3005' );
+		assert.equal( THREE.RGBDEncoding, 3006, 'THREE.RGBDEncoding is equal to 3006' );
+		assert.equal( THREE.BasicDepthPacking, 3200, 'THREE.BasicDepthPacking is equal to 3200' );
+		assert.equal( THREE.RGBADepthPacking, 3201, 'THREE.RGBADepthPacking is equal to 3201' );
+
+	} );
+
+} );
+
