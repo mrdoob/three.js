@@ -1825,7 +1825,7 @@
 
 				} else if ( value === 6 ) {
 
-					console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Object rotations may not display correctly.' );
+					console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
 
 				}
 
