@@ -17,7 +17,7 @@
  *
  * Needs Support:
  * 	Indexed Buffers
- * 	PreRotation support.
+ * 	Euler rotation order
  */
 
 ( function () {
@@ -1800,6 +1800,36 @@
 			var model = modelArray[ modelArrayIndex ];
 
 			var node = ModelNode[ model.FBX_ID ];
+
+			// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
+			if ( 'RotationOrder' in node.properties ) {
+
+				var enums = [
+					'XYZ', // default
+					'XZY',
+					'YZX',
+					'ZXY',
+					'YXZ',
+					'ZYX',
+					'SphericXYZ',
+				];
+
+				var value = parseInt( node.properties.RotationOrder.value, 10 );
+
+				if ( value > 0 && value < 6 ) {
+
+					// model.rotation.order = enums[ value ];
+
+					// Note: Euler order other than XYZ is currently not supported, so just display a warning for now
+					console.warn( 'THREE.FBXLoader: unsupported Euler Order: %s. Currently only XYZ order is supported. Animations and rotations may be incorrect.', enums[ value ] );
+
+				} else if ( value === 6 ) {
+
+					console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Object rotations may not display correctly.' );
+
+				}
+
+			}
 
 			if ( 'Lcl_Translation' in node.properties ) {
 
