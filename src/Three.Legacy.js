@@ -247,7 +247,7 @@ Object.assign( CurvePath.prototype, {
 
 	createPointsGeometry: function ( divisions ) {
 
-		console.warn( 'THREE.CurvePath: .createPointsGeometry() has been removed.' );
+		console.warn( 'THREE.CurvePath: .createPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
 
 		// generate geometry from path points (for Line or Points objects)
 
@@ -258,7 +258,7 @@ Object.assign( CurvePath.prototype, {
 
 	createSpacedPointsGeometry: function ( divisions ) {
 
-		console.warn( 'THREE.CurvePath: .createSpacedPointsGeometry() has been removed.' );
+		console.warn( 'THREE.CurvePath: .createSpacedPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
 
 		// generate geometry from equidistant sampling along the path
 
@@ -269,7 +269,7 @@ Object.assign( CurvePath.prototype, {
 
 	createGeometry: function ( points ) {
 
-		console.warn( 'THREE.CurvePath: .createGeometry() has been removed.' );
+		console.warn( 'THREE.CurvePath: .createGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
 
 		var geometry = new Geometry();
 
