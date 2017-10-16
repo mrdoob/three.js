@@ -40,11 +40,11 @@
 
 	// HeartCurve
 
-	function HeartCurve( s ) {
+	function HeartCurve( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.scale = ( s === undefined ) ? 5 : s;
+		this.scale = ( scale === undefined ) ? 5 : scale;
 
 	}
 
@@ -67,11 +67,11 @@
 
 	// Viviani's Curve
 
-	function VivianiCurve( radius ) {
+	function VivianiCurve( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.radius = radius;
+		this.scale = ( scale === undefined ) ? 70 : scale;
 
 	}
 
@@ -83,7 +83,7 @@
 		var point = optionalTarget || new THREE.Vector3();
 
 		t = t * 4 * Math.PI; // normalized to 0..1
-		var a = this.radius / 2;
+		var a = this.scale / 2;
 
 		var x = a * ( 1 + Math.cos( t ) );
 		var y = a * Math.sin( t );
@@ -151,11 +151,11 @@
 
 	// TrefoilKnot
 
-	function TrefoilKnot( s ) {
+	function TrefoilKnot( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.scale = ( s === undefined ) ? 10 : s;
+		this.scale = ( scale === undefined ) ? 10 : scale;
 
 	}
 
@@ -178,11 +178,11 @@
 
 	// TorusKnot
 
-	function TorusKnot( s ) {
+	function TorusKnot( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.scale = ( s === undefined ) ? 10 : s;
+		this.scale = ( scale === undefined ) ? 10 : scale;
 
 	}
 
@@ -208,11 +208,11 @@
 
 	// CinquefoilKnot
 
-	function CinquefoilKnot( s ) {
+	function CinquefoilKnot( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.scale = ( s === undefined ) ? 10 : s;
+		this.scale = ( scale === undefined ) ? 10 : scale;
 
 	}
 
@@ -238,11 +238,11 @@
 
 	// TrefoilPolynomialKnot
 
-	function TrefoilPolynomialKnot( s ) {
+	function TrefoilPolynomialKnot( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.scale = ( s === undefined ) ? 10 : s;
+		this.scale = ( scale === undefined ) ? 10 : scale;
 
 	}
 
@@ -272,11 +272,11 @@
 
 	// FigureEightPolynomialKnot
 
-	function FigureEightPolynomialKnot( s ) {
+	function FigureEightPolynomialKnot( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.scale = ( s === undefined ) ? 1 : s;
+		this.scale = ( scale === undefined ) ? 1 : scale;
 
 	}
 
@@ -299,11 +299,11 @@
 
 	// DecoratedTorusKnot4a
 
-	function DecoratedTorusKnot4a( s ) {
+	function DecoratedTorusKnot4a( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.scale = ( s === undefined ) ? 40 : s;
+		this.scale = ( scale === undefined ) ? 40 : scale;
 
 	}
 
@@ -326,11 +326,11 @@
 
 	// DecoratedTorusKnot4b
 
-	function DecoratedTorusKnot4b( s ) {
+	function DecoratedTorusKnot4b( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.scale = ( s === undefined ) ? 40 : s;
+		this.scale = ( scale === undefined ) ? 40 : scale;
 
 	}
 
@@ -353,11 +353,11 @@
 
 	// DecoratedTorusKnot5a
 
-	function DecoratedTorusKnot5a( s ) {
+	function DecoratedTorusKnot5a( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.scale = ( s === undefined ) ? 40 : s;
+		this.scale = ( scale === undefined ) ? 40 : scale;
 
 	}
 
@@ -380,11 +380,11 @@
 
 	// DecoratedTorusKnot5c
 
-	function DecoratedTorusKnot5c( s ) {
+	function DecoratedTorusKnot5c( scale ) {
 
 		THREE.Curve.call( this );
 
-		this.scale = ( s === undefined ) ? 40 : s;
+		this.scale = ( scale === undefined ) ? 40 : scale;
 
 	}
 
