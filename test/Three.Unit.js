@@ -1,252 +1,271 @@
-
 //src
-import '../src/polyfills.js';
-export * from '../src/constants.js';
-export * from '../src/Three.Legacy.js';
-export * from '../src/utils.js';
+import '../src/polyfills';
+import '../src/constants';
+import '../src/Three.Legacy';
+import '../src/utils';
+
 
 //src/animation
-export { AnimationAction } from '../src/animation/AnimationAction.js';
-export { AnimationClip } from '../src/animation/AnimationClip.js';
-export { AnimationMixer } from '../src/animation/AnimationMixer.js';
-export { AnimationObjectGroup } from '../src/animation/AnimationObjectGroup.js';
-export { AnimationUtils } from '../src/animation/AnimationUtils.js';
-export { KeyframeTrack } from '../src/animation/KeyframeTrack.js';
-export { KeyframeTrackConstructor } from '../src/animation/KeyframeTrackConstructor.js';
-export { KeyframeTrackPrototype } from '../src/animation/KeyframeTrackPrototype.js';
-export { PropertyBinding } from '../src/animation/PropertyBinding.js';
-export { PropertyMixer } from '../src/animation/PropertyMixer.js';
+import './unit/src/animation/AnimationAction';
+import './unit/src/animation/AnimationClip';
+import './unit/src/animation/AnimationMixer';
+import './unit/src/animation/AnimationObjectGroup';
+import './unit/src/animation/AnimationUtils';
+import './unit/src/animation/KeyframeTrack';
+import './unit/src/animation/KeyframeTrackConstructor';
+import './unit/src/animation/KeyframeTrackPrototype';
+import './unit/src/animation/PropertyBinding';
+import './unit/src/animation/PropertyMixer';
+
 
 //src/animation/tracks
-export { BooleanKeyframeTrack } from '../src/animation/tracks/BooleanKeyframeTrack.js';
-export { ColorKeyframeTrack } from '../src/animation/tracks/ColorKeyframeTrack.js';
-export { NumberKeyframeTrack } from '../src/animation/tracks/NumberKeyframeTrack.js';
-export { QuaternionKeyframeTrack } from '../src/animation/tracks/QuaternionKeyframeTrack.js';
-export { StringKeyframeTrack } from '../src/animation/tracks/StringKeyframeTrack.js';
-export { VectorKeyframeTrack } from '../src/animation/tracks/VectorKeyframeTrack.js';
+import './unit/src/animation/tracks/BooleanKeyframeTrack';
+import './unit/src/animation/tracks/ColorKeyframeTrack';
+import './unit/src/animation/tracks/NumberKeyframeTrack';
+import './unit/src/animation/tracks/QuaternionKeyframeTrack';
+import './unit/src/animation/tracks/StringKeyframeTrack';
+import './unit/src/animation/tracks/VectorKeyframeTrack';
 
 
 //src/audio
-export { Audio } from '../src/audio/Audio.js';
-export { AudioAnalyser } from '../src/audio/AudioAnalyser.js';
-export { AudioContext } from '../src/audio/AudioContext.js';
-export { AudioListener } from '../src/audio/AudioListener.js';
-export { PositionalAudio } from '../src/audio/PositionalAudio.js';
+import './unit/src/audio/Audio';
+import './unit/src/audio/AudioAnalyser';
+import './unit/src/audio/AudioContext';
+import './unit/src/audio/AudioListener';
+import './unit/src/audio/PositionalAudio';
 
 
 //src/cameras
-export { ArrayCamera } from '../src/cameras/ArrayCamera.js';
-export { Camera } from '../src/cameras/Camera.js';
-export { CubeCamera } from '../src/cameras/CubeCamera.js';
-export { OrthographicCamera } from '../src/cameras/OrthographicCamera.js';
-export { PerspectiveCamera } from '../src/cameras/PerspectiveCamera.js';
-export { StereoCamera } from '../src/cameras/StereoCamera.js';
+import './unit/src/cameras/Camera';
+import './unit/src/cameras/CubeCamera';
+import './unit/src/cameras/OrthographicCamera';
+import './unit/src/cameras/PerspectiveCamera';
+import './unit/src/cameras/StereoCamera';
 
 
 //src/core
-export * from '../src/core/BufferAttribute.js';
-export { BufferGeometry } from '../src/core/BufferGeometry.js';
-export { Clock } from '../src/core/Clock.js';
-export { DirectGeometry } from '../src/core/DirectGeometry.js';
-export { EventDispatcher } from '../src/core/EventDispatcher.js';
-export { Face3 } from '../src/core/Face3.js';
-export { Geometry } from '../src/core/Geometry.js';
-export { InstancedBufferAttribute } from '../src/core/InstancedBufferAttribute.js';
-export { InstancedBufferGeometry } from '../src/core/InstancedBufferGeometry.js';
-export { InstancedInterleavedBuffer } from '../src/core/InstancedInterleavedBuffer.js';
-export { InterleavedBuffer } from '../src/core/InterleavedBuffer.js';
-export { InterleavedBufferAttribute } from '../src/core/InterleavedBufferAttribute.js';
-export { Layers } from '../src/core/Layers.js';
-export { Object3D } from '../src/core/Object3D.js';
-export { Raycaster } from '../src/core/Raycaster.js';
-export { Uniform } from '../src/core/Uniform.js';
+import './unit/src/core/BufferAttribute';
+import './unit/src/core/BufferGeometry';
+import './unit/src/core/Clock';
+import './unit/src/core/DirectGeometry';
+import './unit/src/core/EventDispatcher';
+import './unit/src/core/Face3';
+import './unit/src/core/Geometry';
+import './unit/src/core/InstancedBufferAttribute';
+import './unit/src/core/InstancedBufferGeometry';
+import './unit/src/core/InstancedInterleavedBuffer';
+import './unit/src/core/InterleavedBuffer';
+import './unit/src/core/InterleavedBufferAttribute';
+import './unit/src/core/Layers';
+import './unit/src/core/Object3D';
+import './unit/src/core/Raycaster';
+import './unit/src/core/Uniform';
 
 
 //src/extras
-export { SceneUtils } from '../src/extras/SceneUtils.js';
-export { ShapeUtils } from '../src/extras/ShapeUtils.js';
+import './unit/src/extras/SceneUtils';
+import './unit/src/extras/ShapeUtils';
 
 //src/extras/core
-export { Curve } from '../src/extras/core/Curve.js';
-export { CurvePath } from '../src/extras/core/CurvePath.js';
-export { Font } from '../src/extras/core/Font.js';
-export * from '../src/extras/core/Interpolations.js';
-export { Path } from '../src/extras/core/Path.js';
-export { PathPrototype } from '../src/extras/core/PathPrototype.js';
-export { Shape } from '../src/extras/core/Shape.js';
-export { ShapePath } from '../src/extras/core/ShapePath.js';
+import './unit/src/extras/core/Curve';
+import './unit/src/extras/core/CurvePath';
+import './unit/src/extras/core/Font';
+import './unit/src/extras/core/Interpolations';
+import './unit/src/extras/core/Path';
+import './unit/src/extras/core/PathPrototype';
+import './unit/src/extras/core/Shape';
+import './unit/src/extras/core/ShapePath';
 
 //src/extras/curves
-export { ArcCurve } from '../src/extras/curves/ArcCurve.js';
-export { CatmullRomCurve3 } from '../src/extras/curves/CatmullRomCurve3.js';
-export { CubicBezierCurve } from '../src/extras/curves/CubicBezierCurve.js';
-export { CubicBezierCurve3 } from '../src/extras/curves/CubicBezierCurve3.js';
-export { EllipseCurve } from '../src/extras/curves/EllipseCurve.js';
-export { LineCurve } from '../src/extras/curves/LineCurve.js';
-export { LineCurve3 } from '../src/extras/curves/LineCurve3.js';
-export { QuadraticBezierCurve } from '../src/extras/curves/QuadraticBezierCurve.js';
-export { QuadraticBezierCurve3 } from '../src/extras/curves/QuadraticBezierCurve3.js';
-export { SplineCurve } from '../src/extras/curves/SplineCurve.js';
+import './unit/src/extras/curves/ArcCurve';
+import './unit/src/extras/curves/CatmullRomCurve3';
+import './unit/src/extras/curves/CubicBezierCurve';
+import './unit/src/extras/curves/CubicBezierCurve3';
+import './unit/src/extras/curves/EllipseCurve';
+import './unit/src/extras/curves/LineCurve';
+import './unit/src/extras/curves/LineCurve3';
+import './unit/src/extras/curves/QuadraticBezierCurve';
+import './unit/src/extras/curves/QuadraticBezierCurve3';
+import './unit/src/extras/curves/SplineCurve';
 
 //src/extras/objects
-export { ImmediateRenderObject } from '../src/extras/objects/ImmediateRenderObject.js';
+import './unit/src/extras/objects/ImmediateRenderObject';
 
 
 //src/geometries
-export * from '../src/geometries/Geometries.js';
+import './unit/src/geometries/BoxGeometry.tests';
+import './unit/src/geometries/CircleGeometry.tests';
+import './unit/src/geometries/CylinderGeometry.tests';
+import './unit/src/geometries/DodecahedronGeometry.tests';
+import './unit/src/geometries/EdgesGeometry.tests';
+import './unit/src/geometries/ExtrudeGeometry.tests';
+import './unit/src/geometries/IcosahedronGeometry.tests';
+import './unit/src/geometries/LatheGeometry.tests';
+import './unit/src/geometries/OctahedronGeometry.tests';
+import './unit/src/geometries/ParametricGeometry.tests';
+import './unit/src/geometries/PlaneGeometry.tests';
+import './unit/src/geometries/PolyhedronGeometry.tests';
+import './unit/src/geometries/RingGeometry.tests';
+import './unit/src/geometries/ShapeGeometry.tests';
+import './unit/src/geometries/SphereGeometry.tests';
+import './unit/src/geometries/TetrahedronGeometry.tests';
+import './unit/src/geometries/TextGeometry.tests';
+import './unit/src/geometries/TorusGeometry.tests';
+import './unit/src/geometries/TorusKnotGeometry.tests';
+import './unit/src/geometries/TubeGeometry.tests';
+import './unit/src/geometries/WireframeGeometry.tests';
 
 
 //src/helpers
-export { ArrowHelper } from '../src/helpers/ArrowHelper.js';
-export { AxesHelper } from '../src/helpers/AxesHelper.js';
-export { BoxHelper } from '../src/helpers/BoxHelper.js';
-export { Box3Helper } from '../src/helpers/Box3Helper.js';
-export { CameraHelper } from '../src/helpers/CameraHelper.js';
-export { DirectionalLightHelper } from '../src/helpers/DirectionalLightHelper.js';
-export { FaceNormalsHelper } from '../src/helpers/FaceNormalsHelper.js';
-export { GridHelper } from '../src/helpers/GridHelper.js';
-export { HemisphereLightHelper } from '../src/helpers/HemisphereLightHelper.js';
-export { PlaneHelper } from '../src/helpers/PlaneHelper.js';
-export { PointLightHelper } from '../src/helpers/PointLightHelper.js';
-export { PolarGridHelper } from '../src/helpers/PolarGridHelper.js';
-export { RectAreaLightHelper } from '../src/helpers/RectAreaLightHelper.js';
-export { SkeletonHelper } from '../src/helpers/SkeletonHelper.js';
-export { SpotLightHelper } from '../src/helpers/SpotLightHelper.js';
-export { VertexNormalsHelper } from '../src/helpers/VertexNormalsHelper.js';
+import './unit/src/helpers/ArrowHelper';
+import './unit/src/helpers/AxesHelper';
+import './unit/src/helpers/BoxHelper.tests';
+import './unit/src/helpers/CameraHelper';
+import './unit/src/helpers/DirectionalLightHelper';
+import './unit/src/helpers/FaceNormalsHelper';
+import './unit/src/helpers/GridHelper';
+import './unit/src/helpers/HemisphereLightHelper';
+//import './unit/src/helpers/PlaneHelper';
+import './unit/src/helpers/PointLightHelper';
+import './unit/src/helpers/PolarGridHelper';
+import './unit/src/helpers/RectAreaLightHelper';
+import './unit/src/helpers/SkeletonHelper';
+import './unit/src/helpers/SpotLightHelper';
+import './unit/src/helpers/VertexNormalsHelper';
 
 
 //src/lights
-export { AmbientLight } from '../src/lights/AmbientLight.js';
-export { DirectionalLight } from '../src/lights/DirectionalLight.js';
-export { DirectionalLightShadow } from '../src/lights/DirectionalLightShadow.js';
-export { HemisphereLight } from '../src/lights/HemisphereLight.js';
-export { Light } from '../src/lights/Light.js';
-export { LightShadow } from '../src/lights/LightShadow.js';
-export { PointLight } from '../src/lights/PointLight.js';
-export { RectAreaLight } from '../src/lights/RectAreaLight.js';
-export { SpotLight } from '../src/lights/SpotLight.js';
-export { SpotLightShadow } from '../src/lights/SpotLightShadow.js';
+import './unit/src/lights/AmbientLight.tests';
+import './unit/src/lights/DirectionalLight.tests';
+import './unit/src/lights/DirectionalLightShadow';
+import './unit/src/lights/HemisphereLight.tests';
+import './unit/src/lights/Light';
+import './unit/src/lights/LightShadow';
+import './unit/src/lights/PointLight.tests';
+import './unit/src/lights/RectAreaLight.tests';
+import './unit/src/lights/SpotLight.tests';
+import './unit/src/lights/SpotLightShadow';
 
 
 //src/loaders
-export { AnimationLoader } from '../src/loaders/AnimationLoader.js';
-export { AudioLoader } from '../src/loaders/AudioLoader.js';
-export { BufferGeometryLoader } from '../src/loaders/BufferGeometryLoader.js';
-export { Cache } from '../src/loaders/Cache.js';
-export { CompressedTextureLoader } from '../src/loaders/CompressedTextureLoader.js';
-export { CubeTextureLoader } from '../src/loaders/CubeTextureLoader.js';
-export { DataTextureLoader } from '../src/loaders/DataTextureLoader.js';
-export { DefaultLoadingManager, LoadingManager } from '../src/loaders/LoadingManager.js';
-export { FileLoader } from '../src/loaders/FileLoader.js';
-export { FontLoader } from '../src/loaders/FontLoader.js';
-export { ImageLoader } from '../src/loaders/ImageLoader.js';
-export { JSONLoader } from '../src/loaders/JSONLoader.js';
-export { Loader } from '../src/loaders/Loader.js';
-export { MaterialLoader } from '../src/loaders/MaterialLoader.js';
-export { ObjectLoader } from '../src/loaders/ObjectLoader.js';
-export { TextureLoader } from '../src/loaders/TextureLoader.js';
+import './unit/src/loaders/AnimationLoader';
+import './unit/src/loaders/AudioLoader';
+import './unit/src/loaders/BufferGeometryLoader';
+import './unit/src/loaders/Cache';
+import './unit/src/loaders/CompressedTextureLoader';
+import './unit/src/loaders/CubeTextureLoader';
+import './unit/src/loaders/DataTextureLoader';
+import './unit/src/loaders/LoadingManager';
+import './unit/src/loaders/FileLoader';
+import './unit/src/loaders/FontLoader';
+import './unit/src/loaders/ImageLoader';
+import './unit/src/loaders/JSONLoader';
+import './unit/src/loaders/Loader';
+import './unit/src/loaders/MaterialLoader';
+import './unit/src/loaders/ObjectLoader';
+import './unit/src/loaders/TextureLoader';
 
 
 //src/materials
-export * from '../src/materials/Materials.js';
+//import './unit/materials/Materials';
 
 
 //src/math
-export { _Math as Math } from '../src/math/Math.js';
-export { Box2 } from '../src/math/Box2.js';
-export { Box3 } from '../src/math/Box3.js';
-export { Color } from '../src/math/Color.js';
-export { Cylindrical } from '../src/math/Cylindrical.js';
-export { Euler } from '../src/math/Euler.js';
-export { Frustum } from '../src/math/Frustum.js';
-export { Interpolant } from '../src/math/Interpolant.js';
-export { Line3 } from '../src/math/Line3.js';
-export { Matrix3 } from '../src/math/Matrix3.js';
-export { Matrix4 } from '../src/math/Matrix4.js';
-export { Plane } from '../src/math/Plane.js';
-export { Quaternion } from '../src/math/Quaternion.js';
-export { Ray } from '../src/math/Ray.js';
-export { Sphere } from '../src/math/Sphere.js';
-export { Spherical } from '../src/math/Spherical.js';
-export { Triangle } from '../src/math/Triangle.js';
-export { Vector2 } from '../src/math/Vector2.js';
-export { Vector3 } from '../src/math/Vector3.js';
-export { Vector4 } from '../src/math/Vector4.js';
+import './unit/src/math/Math';
+import './unit/src/math/Box2';
+import './unit/src/math/Box3';
+import './unit/src/math/Color';
+import './unit/src/math/Cylindrical';
+import './unit/src/math/Euler';
+import './unit/src/math/Frustum';
+import './unit/src/math/Interpolant';
+import './unit/src/math/Line3';
+import './unit/src/math/Matrix3';
+import './unit/src/math/Matrix4';
+import './unit/src/math/Plane';
+import './unit/src/math/Quaternion';
+import './unit/src/math/Ray';
+import './unit/src/math/Sphere';
+import './unit/src/math/Spherical';
+import './unit/src/math/Triangle';
+import './unit/src/math/Vector2';
+import './unit/src/math/Vector3';
+import './unit/src/math/Vector4';
 
 //src/math/interpolants
-export { CubicInterpolant } from '../src/math/interpolants/CubicInterpolant.js';
-export { DiscreteInterpolant } from '../src/math/interpolants/DiscreteInterpolant.js';
-export { LinearInterpolant } from '../src/math/interpolants/LinearInterpolant.js';
-export { QuaternionLinearInterpolant } from '../src/math/interpolants/QuaternionLinearInterpolant.js';
+import './unit/src/math/interpolants/CubicInterpolant';
+import './unit/src/math/interpolants/DiscreteInterpolant';
+import './unit/src/math/interpolants/LinearInterpolant';
+import './unit/src/math/interpolants/QuaternionLinearInterpolant';
 
 
 //src/objects
-export { Bone } from '../src/objects/Bone.js';
-export { Group } from '../src/objects/Group.js';
-export { LensFlare } from '../src/objects/LensFlare.js';
-export { Line } from '../src/objects/Line.js';
-export { LineLoop } from '../src/objects/LineLoop.js';
-export { LineSegments } from '../src/objects/LineSegments.js';
-export { LOD } from '../src/objects/LOD.js';
-export { Mesh } from '../src/objects/Mesh.js';
-export { Points } from '../src/objects/Points.js';
-export { Skeleton } from '../src/objects/Skeleton.js';
-export { SkinnedMesh } from '../src/objects/SkinnedMesh.js';
-export { Sprite } from '../src/objects/Sprite.js';
+import './unit/src/objects/Bone';
+import './unit/src/objects/Group';
+import './unit/src/objects/LensFlare';
+import './unit/src/objects/Line';
+//import './unit/src/objects/LineLoop';
+import './unit/src/objects/LineSegments';
+import './unit/src/objects/LOD';
+import './unit/src/objects/Mesh';
+import './unit/src/objects/Points';
+import './unit/src/objects/Skeleton';
+import './unit/src/objects/SkinnedMesh';
+import './unit/src/objects/Sprite';
 
 
 //src/renderers
-export { WebGL2Renderer } from '../src/renderers/WebGL2Renderer.js';
-export { WebGLRenderer } from '../src/renderers/WebGLRenderer.js';
-export { WebGLRenderTarget } from '../src/renderers/WebGLRenderTarget.js';
-export { WebGLRenderTargetCube } from '../src/renderers/WebGLRenderTargetCube.js';
+import './unit/src/renderers/WebGL2Renderer';
+import './unit/src/renderers/WebGLRenderer';
+import './unit/src/renderers/WebGLRenderTarget';
+import './unit/src/renderers/WebGLRenderTargetCube';
 
 //src/renderers/shaders
-export { ShaderChunk } from '../src/renderers/shaders/ShaderChunk.js';
-export { ShaderLib } from '../src/renderers/shaders/ShaderLib.js';
-export { UniformsLib } from '../src/renderers/shaders/UniformsLib.js';
-export { UniformsUtils } from '../src/renderers/shaders/UniformsUtils.js';
+import './unit/src/renderers/shaders/ShaderChunk';
+import './unit/src/renderers/shaders/ShaderLib';
+import './unit/src/renderers/shaders/UniformsLib';
+import './unit/src/renderers/shaders/UniformsUtils';
 
 //src/renderers/webgl
-export { WebGLAttributes } from '../src/renderers/webgl/WebGLAttributes.js';
-export { WebGLBackground } from '../src/renderers/webgl/WebGLBackground.js';
-export { WebGLBufferRenderer } from '../src/renderers/webgl/WebGLBufferRenderer.js';
-export { WebGLCapabilities } from '../src/renderers/webgl/WebGLCapabilities.js';
-export { WebGLClipping } from '../src/renderers/webgl/WebGLClipping.js';
-export { WebGLExtensions } from '../src/renderers/webgl/WebGLExtensions.js';
-export { WebGLFlareRenderer } from '../src/renderers/webgl/WebGLFlareRenderer.js';
-export { WebGLGeometries } from '../src/renderers/webgl/WebGLGeometries.js';
-export { WebGLIndexedBufferRenderer } from '../src/renderers/webgl/WebGLIndexedBufferRenderer.js';
-export { WebGLLights } from '../src/renderers/webgl/WebGLLights.js';
-export { WebGLMorphtargets } from '../src/renderers/webgl/WebGLMorphtargets.js';
-export { WebGLObjects } from '../src/renderers/webgl/WebGLObjects.js';
-export { WebGLProgram } from '../src/renderers/webgl/WebGLProgram.js';
-export { WebGLPrograms } from '../src/renderers/webgl/WebGLPrograms.js';
-export { WebGLProperties } from '../src/renderers/webgl/WebGLProperties.js';
-export { WebGLRenderLists } from '../src/renderers/webgl/WebGLRenderLists.js';
-export { WebGLShader } from '../src/renderers/webgl/WebGLShader.js';
-export { WebGLShadowMap } from '../src/renderers/webgl/WebGLShadowMap.js';
-export { WebGLSpriteRenderer } from '../src/renderers/webgl/WebGLSpriteRenderer.js';
-export { WebGLState } from '../src/renderers/webgl/WebGLState.js';
-export { WebGLTextures } from '../src/renderers/webgl/WebGLTextures.js';
-export { WebGLUniforms } from '../src/renderers/webgl/WebGLUniforms.js';
-export { WebGLUtils } from '../src/renderers/webgl/WebGLUtils.js';
+//import './unit/src/renderers/webgl/WebGLAttributes';
+//import './unit/src/renderers/webgl/WebGLBackground';
+import './unit/src/renderers/webgl/WebGLBufferRenderer';
+import './unit/src/renderers/webgl/WebGLCapabilities';
+import './unit/src/renderers/webgl/WebGLClipping';
+import './unit/src/renderers/webgl/WebGLExtensions';
+//import './unit/src/renderers/webgl/WebGLFlareRenderer';
+import './unit/src/renderers/webgl/WebGLGeometries';
+import './unit/src/renderers/webgl/WebGLIndexedBufferRenderer';
+import './unit/src/renderers/webgl/WebGLLights';
+//import './unit/src/renderers/webgl/WebGLMorphtargets';
+import './unit/src/renderers/webgl/WebGLObjects';
+import './unit/src/renderers/webgl/WebGLProgram';
+import './unit/src/renderers/webgl/WebGLPrograms';
+import './unit/src/renderers/webgl/WebGLProperties';
+//import './unit/src/renderers/webgl/WebGLRenderLists';
+import './unit/src/renderers/webgl/WebGLShader';
+import './unit/src/renderers/webgl/WebGLShadowMap';
+//import './unit/src/renderers/webgl/WebGLSpriteRenderer';
+import './unit/src/renderers/webgl/WebGLState';
+import './unit/src/renderers/webgl/WebGLTextures';
+import './unit/src/renderers/webgl/WebGLUniforms';
+//import './unit/src/renderers/webgl/WebGLUtils';
 
 //src/renderers/webvr
-export { WebVRManager } from '../src/renderers/webvr/WebVRManager.js';
+//import './unit/src/renderers/webvr/WebVRManager';
 
 
 //src/scenes
-export { Fog } from '../src/scenes/Fog.js';
-export { FogExp2 } from '../src/scenes/FogExp2.js';
-export { Scene } from '../src/scenes/Scene.js';
+import './unit/src/scenes/Fog';
+import './unit/src/scenes/FogExp2';
+import './unit/src/scenes/Scene';
 
 
 //src/textures
-export { CanvasTexture } from '../src/textures/CanvasTexture.js';
-export { CompressedTexture } from '../src/textures/CompressedTexture.js';
-export { CubeTexture } from '../src/textures/CubeTexture.js';
-export { DataTexture } from '../src/textures/DataTexture.js';
-export { DepthTexture } from '../src/textures/DepthTexture.js';
-export { Texture } from '../src/textures/Texture.js';
-export { VideoTexture } from '../src/textures/VideoTexture.js';
+import './unit/src/textures/CanvasTexture';
+import './unit/src/textures/CompressedTexture';
+import './unit/src/textures/CubeTexture';
+import './unit/src/textures/DataTexture';
+import './unit/src/textures/DepthTexture';
+import './unit/src/textures/Texture';
+import './unit/src/textures/VideoTexture';
