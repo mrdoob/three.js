@@ -390,7 +390,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lengthManhattan", ( assert ) => {
+		QUnit.test( "manhattanLength", ( assert ) => {
 
 			var a = new Vector4( x, 0, 0, 0 );
 			var b = new Vector4( 0, - y, 0, 0 );
@@ -398,15 +398,15 @@ export default QUnit.module( 'Maths', () => {
 			var d = new Vector4( 0, 0, 0, w );
 			var e = new Vector4( 0, 0, 0, 0 );
 
-			assert.ok( a.lengthManhattan() == x, "Positive x" );
-			assert.ok( b.lengthManhattan() == y, "Negative y" );
-			assert.ok( c.lengthManhattan() == z, "Positive z" );
-			assert.ok( d.lengthManhattan() == w, "Positive w" );
-			assert.ok( e.lengthManhattan() == 0, "Empty initialization" );
+			assert.ok( a.manhattanLength() == x, "Positive x" );
+			assert.ok( b.manhattanLength() == y, "Negative y" );
+			assert.ok( c.manhattanLength() == z, "Positive z" );
+			assert.ok( d.manhattanLength() == w, "Positive w" );
+			assert.ok( e.manhattanLength() == 0, "Empty initialization" );
 
 			a.set( x, y, z, w );
 			assert.ok(
-				a.lengthManhattan() == Math.abs( x ) + Math.abs( y ) + Math.abs( z ) + Math.abs( w ),
+				a.manhattanLength() == Math.abs( x ) + Math.abs( y ) + Math.abs( z ) + Math.abs( w ),
 				"All components"
 			);
 

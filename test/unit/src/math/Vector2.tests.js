@@ -14,7 +14,7 @@ import {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module( 'Vector3', () => {
+	QUnit.module( 'Vector2', () => {
 
 		QUnit.test( "constructor", ( assert ) => {
 
@@ -335,18 +335,18 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lengthManhattan", ( assert ) => {
+		QUnit.test( "manhattanLength", ( assert ) => {
 
 			var a = new Vector2( x, 0 );
 			var b = new Vector2( 0, - y );
 			var c = new Vector2();
 
-			assert.strictEqual( a.lengthManhattan(), x, "Positive component" );
-			assert.strictEqual( b.lengthManhattan(), y, "Negative component" );
-			assert.strictEqual( c.lengthManhattan(), 0, "Empty component" );
+			assert.strictEqual( a.manhattanLength(), x, "Positive component" );
+			assert.strictEqual( b.manhattanLength(), y, "Negative component" );
+			assert.strictEqual( c.manhattanLength(), 0, "Empty component" );
 
 			a.set( x, y );
-			assert.strictEqual( a.lengthManhattan(), Math.abs( x ) + Math.abs( y ), "Two components" );
+			assert.strictEqual( a.manhattanLength(), Math.abs( x ) + Math.abs( y ), "Two components" );
 
 		} );
 

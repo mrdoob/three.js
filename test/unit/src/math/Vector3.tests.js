@@ -467,20 +467,20 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lengthManhattan", ( assert ) => {
+		QUnit.test( "manhattanLength", ( assert ) => {
 
 			var a = new Vector3( x, 0, 0 );
 			var b = new Vector3( 0, - y, 0 );
 			var c = new Vector3( 0, 0, z );
 			var d = new Vector3();
 
-			assert.ok( a.lengthManhattan() == x, "Positive x" );
-			assert.ok( b.lengthManhattan() == y, "Negative y" );
-			assert.ok( c.lengthManhattan() == z, "Positive z" );
-			assert.ok( d.lengthManhattan() == 0, "Empty initialization" );
+			assert.ok( a.manhattanLength() == x, "Positive x" );
+			assert.ok( b.manhattanLength() == y, "Negative y" );
+			assert.ok( c.manhattanLength() == z, "Positive z" );
+			assert.ok( d.manhattanLength() == 0, "Empty initialization" );
 
 			a.set( x, y, z );
-			assert.ok( a.lengthManhattan() == Math.abs( x ) + Math.abs( y ) + Math.abs( z ), "All components" );
+			assert.ok( a.manhattanLength() == Math.abs( x ) + Math.abs( y ) + Math.abs( z ), "All components" );
 
 		} );
 
