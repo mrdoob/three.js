@@ -67,7 +67,7 @@ export default QUnit.module( 'Maths', () => {
 
 		// Tests
 
-		QUnit.test( "copySampleValue_", function ( assert ) {
+		QUnit.test( "copySampleValue_", ( assert ) => {
 
 			var interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
 
@@ -77,7 +77,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "evaluate -> intervalChanged_ / interpolate_", function ( assert ) {
+		QUnit.test( "evaluate -> intervalChanged_ / interpolate_", ( assert ) => {
 
 			var actual, expect;
 
@@ -292,7 +292,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "evaulate -> beforeStart_ [once]", function ( assert ) {
+		QUnit.test( "evaulate -> beforeStart_ [once]", ( assert ) => {
 
 			var actual, expect;
 
@@ -345,7 +345,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "evaluate -> beforeStart_ [twice]", function ( assert ) {
+		QUnit.test( "evaluate -> beforeStart_ [twice]", ( assert ) => {
 
 			var actual, expect;
 
@@ -397,7 +397,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "evaluate -> afterEnd_ [once]", function ( assert ) {
+		QUnit.test( "evaluate -> afterEnd_ [once]", ( assert ) => {
 
 			var actual, expect;
 
@@ -450,7 +450,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "evaluate -> afterEnd_ [twice]", function ( assert ) {
+		QUnit.test( "evaluate -> afterEnd_ [twice]", ( assert ) => {
 
 			var actual, expect;
 

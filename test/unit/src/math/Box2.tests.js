@@ -18,7 +18,7 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Box2', () => {
 
-		QUnit.test( "constructor", function ( assert ) {
+		QUnit.test( "constructor", ( assert ) => {
 
 			var a = new Box2();
 			assert.ok( a.min.equals( posInf2 ), "Passed!" );
@@ -34,7 +34,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), one2.clone() );
 			var b = new Box2().copy( a );
@@ -49,7 +49,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Box2();
 
@@ -59,7 +59,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromPoints", function ( assert ) {
+		QUnit.test( "setFromPoints", ( assert ) => {
 
 			var a = new Box2();
 
@@ -76,7 +76,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "empty/makeEmpty", function ( assert ) {
+		QUnit.test( "empty/makeEmpty", ( assert ) => {
 
 			var a = new Box2();
 
@@ -90,7 +90,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getCenter", function ( assert ) {
+		QUnit.test( "getCenter", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 
@@ -102,7 +102,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getSize", function ( assert ) {
+		QUnit.test( "getSize", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 
@@ -113,7 +113,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "expandByPoint", function ( assert ) {
+		QUnit.test( "expandByPoint", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 
@@ -129,7 +129,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "expandByVector", function ( assert ) {
+		QUnit.test( "expandByVector", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 
@@ -142,7 +142,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "expandByScalar", function ( assert ) {
+		QUnit.test( "expandByScalar", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 
@@ -155,7 +155,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "containsPoint", function ( assert ) {
+		QUnit.test( "containsPoint", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 
@@ -169,7 +169,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "containsBox", function ( assert ) {
+		QUnit.test( "containsBox", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var b = new Box2( zero2.clone(), one2.clone() );
@@ -185,7 +185,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getParameter", function ( assert ) {
+		QUnit.test( "getParameter", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), one2.clone() );
 			var b = new Box2( one2.clone().negate(), one2.clone() );
@@ -199,7 +199,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clampPoint", function ( assert ) {
+		QUnit.test( "clampPoint", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var b = new Box2( one2.clone().negate(), one2.clone() );
@@ -216,7 +216,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceToPoint", function ( assert ) {
+		QUnit.test( "distanceToPoint", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var b = new Box2( one2.clone().negate(), one2.clone() );
@@ -233,7 +233,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsBox", function ( assert ) {
+		QUnit.test( "intersectsBox", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var b = new Box2( zero2.clone(), one2.clone() );
@@ -254,7 +254,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersect", function ( assert ) {
+		QUnit.test( "intersect", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var b = new Box2( zero2.clone(), one2.clone() );
@@ -269,7 +269,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "union", function ( assert ) {
+		QUnit.test( "union", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var b = new Box2( zero2.clone(), one2.clone() );
@@ -282,7 +282,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "translate", function ( assert ) {
+		QUnit.test( "translate", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var b = new Box2( zero2.clone(), one2.clone() );

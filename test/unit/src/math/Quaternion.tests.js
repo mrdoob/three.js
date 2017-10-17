@@ -39,7 +39,7 @@ export default QUnit.module( 'Maths', () => {
 
 		};
 
-		QUnit.test( "constructor", function ( assert ) {
+		QUnit.test( "constructor", ( assert ) => {
 
 			var a = new Quaternion();
 			assert.ok( a.x == 0, "Passed!" );
@@ -55,7 +55,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 			var b = new Quaternion().copy( a );
@@ -74,7 +74,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Quaternion();
 			assert.ok( a.x == 0, "Passed!" );
@@ -90,7 +90,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromAxisAngle", function ( assert ) {
+		QUnit.test( "setFromAxisAngle", ( assert ) => {
 
 			// TODO: find cases to validate.
 			// assert.ok( true, "Passed!" );
@@ -114,7 +114,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromEuler/setFromQuaternion", function ( assert ) {
+		QUnit.test( "setFromEuler/setFromQuaternion", ( assert ) => {
 
 			var angles = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
 
@@ -133,7 +133,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromEuler/setFromRotationMatrix", function ( assert ) {
+		QUnit.test( "setFromEuler/setFromRotationMatrix", ( assert ) => {
 
 			// ensure euler conversion for Quaternion matches that of Matrix4
 			for ( var i = 0; i < orders.length; i ++ ) {
@@ -148,7 +148,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "normalize/length/lengthSq", function ( assert ) {
+		QUnit.test( "normalize/length/lengthSq", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 			var b = new Quaternion( - x, - y, - z, - w );
@@ -168,7 +168,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "inverse/conjugate", function ( assert ) {
+		QUnit.test( "inverse/conjugate", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 
@@ -183,7 +183,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiplyQuaternions/multiply", function ( assert ) {
+		QUnit.test( "multiplyQuaternions/multiply", ( assert ) => {
 
 			var angles = [ new Euler( 1, 0, 0 ), new Euler( 0, 1, 0 ), new Euler( 0, 0, 1 ) ];
 
@@ -205,7 +205,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiplyVector3", function ( assert ) {
+		QUnit.test( "multiplyVector3", ( assert ) => {
 
 			var angles = [ new Euler( 1, 0, 0 ), new Euler( 0, 1, 0 ), new Euler( 0, 0, 1 ) ];
 
@@ -229,7 +229,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", function ( assert ) {
+		QUnit.test( "equals", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 			var b = new Quaternion( - x, - y, - z, - w );
@@ -374,19 +374,19 @@ export default QUnit.module( 'Maths', () => {
 
 		}
 
-		QUnit.test( "slerp", function ( assert ) {
+		QUnit.test( "slerp", ( assert ) => {
 
 			slerpTestSkeleton( doSlerpObject, Number.EPSILON, assert );
 
 		} );
 
-		QUnit.test( "slerpFlat", function ( assert ) {
+		QUnit.test( "slerpFlat", ( assert ) => {
 
 			slerpTestSkeleton( doSlerpArray, Number.EPSILON, assert );
 
 		} );
 
-		QUnit.test( "properties", function ( assert ) {
+		QUnit.test( "properties", ( assert ) => {
 
 			assert.expect( 8 );
 
@@ -409,7 +409,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "inverse", function ( assert ) {
+		QUnit.test( "inverse", ( assert ) => {
 
 			assert.expect( 6 );
 
@@ -429,7 +429,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "premultiply", function ( assert ) {
+		QUnit.test( "premultiply", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 			var b = new Quaternion( 2 * x, - y, - 2 * z, w );
@@ -443,7 +443,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "toArray", function ( assert ) {
+		QUnit.test( "toArray", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 
@@ -470,7 +470,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromUnitVectors", function ( assert ) {
+		QUnit.test( "setFromUnitVectors", ( assert ) => {
 
 			var a = new Quaternion();
 			var b = new Vector3( 1, 0, 0 );
@@ -485,7 +485,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromRotationMatrix", function ( assert ) {
+		QUnit.test( "setFromRotationMatrix", ( assert ) => {
 
 			// contrived examples purely to please the god of code coverage...
 			// match conditions in various 'else [if]' blocks

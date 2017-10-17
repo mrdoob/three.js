@@ -21,7 +21,7 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Ray', () => {
 
-		QUnit.test( "constructor/equals", function ( assert ) {
+		QUnit.test( "constructor/equals", ( assert ) => {
 
 			var a = new Ray();
 			assert.ok( a.origin.equals( zero3 ), "Passed!" );
@@ -33,7 +33,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy/equals", function ( assert ) {
+		QUnit.test( "copy/equals", ( assert ) => {
 
 			var a = new Ray( zero3.clone(), one3.clone() );
 			var b = new Ray().copy( a );
@@ -48,7 +48,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Ray();
 
@@ -58,7 +58,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "at", function ( assert ) {
+		QUnit.test( "at", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -68,7 +68,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "recast/clone", function ( assert ) {
+		QUnit.test( "recast/clone", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -88,7 +88,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "closestPointToPoint", function ( assert ) {
+		QUnit.test( "closestPointToPoint", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -106,7 +106,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceToPoint", function ( assert ) {
+		QUnit.test( "distanceToPoint", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -124,7 +124,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceSqToPoint", function ( assert ) {
+		QUnit.test( "distanceSqToPoint", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -142,7 +142,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsSphere", function ( assert ) {
+		QUnit.test( "intersectsSphere", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			var b = new Sphere( zero3, 0.5 );
@@ -159,7 +159,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectSphere", function ( assert ) {
+		QUnit.test( "intersectSphere", ( assert ) => {
 
 			var TOL = 0.0001;
 
@@ -218,7 +218,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsPlane", function ( assert ) {
+		QUnit.test( "intersectsPlane", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -244,7 +244,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectPlane", function ( assert ) {
+		QUnit.test( "intersectPlane", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -270,7 +270,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyMatrix4", function ( assert ) {
+		QUnit.test( "applyMatrix4", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			var m = new Matrix4();
@@ -296,7 +296,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceSqToSegment", function ( assert ) {
+		QUnit.test( "distanceSqToSegment", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			var ptOnLine = new Vector3();
@@ -333,7 +333,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectBox", function ( assert ) {
+		QUnit.test( "intersectBox", ( assert ) => {
 
 			var TOL = 0.0001;
 
@@ -371,7 +371,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lookAt", function ( assert ) {
+		QUnit.test( "lookAt", ( assert ) => {
 
 			var a = new Ray( two3.clone(), one3.clone() );
 			var target = one3.clone();
@@ -382,7 +382,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectTriangle", function ( assert ) {
+		QUnit.test( "intersectTriangle", ( assert ) => {
 
 			var ray = new Ray();
 			var a = new Vector3( 1, 1, 0 );

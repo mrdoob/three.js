@@ -48,7 +48,7 @@ export default QUnit.module( 'Maths', () => {
 
 		};
 
-		QUnit.test( "constructor", function ( assert ) {
+		QUnit.test( "constructor", ( assert ) => {
 
 			var a = new Matrix4();
 			assert.ok( a.determinant() == 1, "Passed!" );
@@ -75,7 +75,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			var b = new Matrix4().copy( a );
@@ -88,7 +88,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var b = new Matrix4();
 			assert.ok( b.determinant() == 1, "Passed!" );
@@ -113,7 +113,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "identity", function ( assert ) {
+		QUnit.test( "identity", ( assert ) => {
 
 			var b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -141,7 +141,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiplyMatrices", function ( assert ) {
+		QUnit.test( "multiplyMatrices", ( assert ) => {
 
 			// Reference:
 			//
@@ -184,7 +184,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiplyScalar", function ( assert ) {
+		QUnit.test( "multiplyScalar", ( assert ) => {
 
 			var b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -224,7 +224,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "determinant", function ( assert ) {
+		QUnit.test( "determinant", ( assert ) => {
 
 			var a = new Matrix4();
 			assert.ok( a.determinant() == 1, "Passed!" );
@@ -241,7 +241,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getInverse", function ( assert ) {
+		QUnit.test( "getInverse", ( assert ) => {
 
 			var identity = new Matrix4();
 
@@ -302,7 +302,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makeBasis/extractBasis", function ( assert ) {
+		QUnit.test( "makeBasis/extractBasis", ( assert ) => {
 
 			var identityBasis = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
 			var a = new Matrix4().makeBasis( identityBasis[ 0 ], identityBasis[ 1 ], identityBasis[ 2 ] );
@@ -341,7 +341,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "transpose", function ( assert ) {
+		QUnit.test( "transpose", ( assert ) => {
 
 			var a = new Matrix4();
 			var b = a.clone().transpose();
@@ -355,7 +355,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			var b = a.clone();
@@ -368,7 +368,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "compose/decompose", function ( assert ) {
+		QUnit.test( "compose/decompose", ( assert ) => {
 
 			var tValues = [
 				new Vector3(),
@@ -442,7 +442,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copyPosition", function ( assert ) {
+		QUnit.test( "copyPosition", ( assert ) => {
 
 			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			var b = new Matrix4().set( 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 16 );
@@ -454,7 +454,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makeRotationFromEuler/extractRotation", function ( assert ) {
+		QUnit.test( "makeRotationFromEuler/extractRotation", ( assert ) => {
 
 			var testValues = [
 				new Euler( 0, 0, 0, "XYZ" ),
@@ -486,7 +486,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyToBufferAttribute", function ( assert ) {
+		QUnit.test( "applyToBufferAttribute", ( assert ) => {
 
 			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			var attr = new Float32BufferAttribute( [ 1, 2, 1, 3, 0, 3 ], 3 );
@@ -509,7 +509,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", function ( assert ) {
+		QUnit.test( "equals", ( assert ) => {
 
 			var a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			var b = new Matrix4().set( 0, - 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
@@ -523,7 +523,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "toArray", function ( assert ) {
+		QUnit.test( "toArray", ( assert ) => {
 
 			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			var noOffset = [ 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16 ];
@@ -542,7 +542,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getMaxScaleOnAxis", function ( assert ) {
+		QUnit.test( "getMaxScaleOnAxis", ( assert ) => {
 
 			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			var expected = Math.sqrt( 3 * 3 + 7 * 7 + 11 * 11 );
@@ -551,7 +551,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makeOrthographic", function ( assert ) {
+		QUnit.test( "makeOrthographic", ( assert ) => {
 
 			var a = new Matrix4().makeOrthographic( - 1, 1, - 1, 1, 1, 100 );
 			var expected = new Matrix4().set(
@@ -565,7 +565,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makeRotationAxis", function ( assert ) {
+		QUnit.test( "makeRotationAxis", ( assert ) => {
 
 			var axis = new Vector3( 1.5, 0.0, 1.0 ).normalize();
 			var radians = Math.degToRad( 45 );
@@ -582,7 +582,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lookAt", function ( assert ) {
+		QUnit.test( "lookAt", ( assert ) => {
 
 			var a = new Matrix4();
 			var expected = new Matrix4().identity();

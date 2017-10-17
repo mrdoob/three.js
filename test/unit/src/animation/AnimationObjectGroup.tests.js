@@ -24,7 +24,7 @@ export default QUnit.module( "Animation", () => {
 			ParsedPathB = PropertyBinding.parseTrackName( PathB ),
 			ParsedPathC = PropertyBinding.parseTrackName( PathC );
 
-		QUnit.test( "smoke test", function ( assert ) {
+		QUnit.test( "smoke test", ( assert ) => {
 
 			var expect = function expect( testIndex, group, bindings, path, cached, roots ) {
 

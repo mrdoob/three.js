@@ -10,7 +10,7 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'InterleavedBufferAttribute', () => {
 
-		QUnit.test( "length and count", function ( assert ) {
+		QUnit.test( "length and count", ( assert ) => {
 
 			var buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 			var instance = new InterleavedBufferAttribute( buffer, 2, 0 );
@@ -19,7 +19,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setX", function ( assert ) {
+		QUnit.test( "setX", ( assert ) => {
 
 			var buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 			var instance = new InterleavedBufferAttribute( buffer, 2, 0 );

@@ -30,7 +30,7 @@ export default QUnit.module( 'Maths', () => {
 
 		};
 
-		QUnit.test( "constructor", function ( assert ) {
+		QUnit.test( "constructor", ( assert ) => {
 
 			var a = new Plane();
 			assert.ok( a.normal.x == 1, "Passed!" );
@@ -52,7 +52,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var a = new Plane( new Vector3( x, y, z ), w );
 			var b = new Plane().copy( a );
@@ -73,7 +73,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Plane();
 			assert.ok( a.normal.x == 1, "Passed!" );
@@ -89,7 +89,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setComponents", function ( assert ) {
+		QUnit.test( "setComponents", ( assert ) => {
 
 			var a = new Plane();
 			assert.ok( a.normal.x == 1, "Passed!" );
@@ -105,7 +105,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromNormalAndCoplanarPoint", function ( assert ) {
+		QUnit.test( "setFromNormalAndCoplanarPoint", ( assert ) => {
 
 			var normal = one3.clone().normalize();
 			var a = new Plane().setFromNormalAndCoplanarPoint( normal, zero3 );
@@ -115,7 +115,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "normalize", function ( assert ) {
+		QUnit.test( "normalize", ( assert ) => {
 
 			var a = new Plane( new Vector3( 2, 0, 0 ), 2 );
 
@@ -126,7 +126,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "negate/distanceToPoint", function ( assert ) {
+		QUnit.test( "negate/distanceToPoint", ( assert ) => {
 
 			var a = new Plane( new Vector3( 2, 0, 0 ), - 2 );
 
@@ -140,7 +140,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceToPoint", function ( assert ) {
+		QUnit.test( "distanceToPoint", ( assert ) => {
 
 			var a = new Plane( new Vector3( 2, 0, 0 ), - 2 );
 
@@ -150,7 +150,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceToSphere", function ( assert ) {
+		QUnit.test( "distanceToSphere", ( assert ) => {
 
 			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 
@@ -165,7 +165,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "isInterestionLine/intersectLine", function ( assert ) {
+		QUnit.test( "isInterestionLine/intersectLine", ( assert ) => {
 
 			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 
@@ -190,7 +190,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "projectPoint", function ( assert ) {
+		QUnit.test( "projectPoint", ( assert ) => {
 
 			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 
@@ -203,7 +203,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "coplanarPoint", function ( assert ) {
+		QUnit.test( "coplanarPoint", ( assert ) => {
 
 			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 			assert.ok( a.distanceToPoint( a.coplanarPoint() ) === 0, "Passed!" );
@@ -213,7 +213,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyMatrix4/translate", function ( assert ) {
+		QUnit.test( "applyMatrix4/translate", ( assert ) => {
 
 			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 
@@ -230,7 +230,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", function ( assert ) {
+		QUnit.test( "equals", ( assert ) => {
 
 			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 			var b = new Plane( new Vector3( 1, 0, 0 ), 1 );
@@ -252,7 +252,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromCoplanarPoints", function ( assert ) {
+		QUnit.test( "setFromCoplanarPoints", ( assert ) => {
 
 			var a = new Plane();
 			var v1 = new Vector3( 2.0, 0.5, 0.25 );

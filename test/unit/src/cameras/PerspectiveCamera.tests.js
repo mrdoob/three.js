@@ -34,7 +34,7 @@ export default QUnit.module( 'Cameras', () => {
 
 		};
 
-		QUnit.test( "updateProjectionMatrix", function ( assert ) {
+		QUnit.test( "updateProjectionMatrix", ( assert ) => {
 
 			var cam = new PerspectiveCamera( 75, 16 / 9, 0.1, 300.0 );
 
@@ -61,7 +61,7 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var near = 1,
 				far = 3,

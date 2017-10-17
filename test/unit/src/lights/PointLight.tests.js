@@ -25,7 +25,7 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( 'Standard light tests', function ( assert ) {
+		QUnit.test( 'Standard light tests', ( assert ) => {
 
 			runStdLightTests( assert, this.lights );
 

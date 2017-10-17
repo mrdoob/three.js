@@ -24,7 +24,7 @@ export default QUnit.module( 'Core', () => {
 
 		}
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var instanceMock1 = {};
 			var instanceMock2 = {};

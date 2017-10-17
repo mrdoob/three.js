@@ -221,25 +221,25 @@ export default QUnit.module( 'Geometries', () => {
 			new Vector3( 1, 1, 1 ),
 		];
 
-		QUnit.test( "singularity", function ( assert ) {
+		QUnit.test( "singularity", ( assert ) => {
 
 			testEdges( vertList, [ 1, 1, 1 ], 0, assert );
 
 		} );
 
-		QUnit.test( "needle", function ( assert ) {
+		QUnit.test( "needle", ( assert ) => {
 
 			testEdges( vertList, [ 0, 0, 1 ], 0, assert );
 
 		} );
 
-		QUnit.test( "single triangle", function ( assert ) {
+		QUnit.test( "single triangle", ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2 ], 3, assert );
 
 		} );
 
-		QUnit.test( "two isolated triangles", function ( assert ) {
+		QUnit.test( "two isolated triangles", ( assert ) => {
 
 			var vertList = [
 				new Vector3( 0, 0, 0 ),
@@ -254,37 +254,37 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.test( "two flat triangles", function ( assert ) {
+		QUnit.test( "two flat triangles", ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 2, 3 ], 4, assert );
 
 		} );
 
-		QUnit.test( "two flat triangles, inverted", function ( assert ) {
+		QUnit.test( "two flat triangles, inverted", ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 3, 2 ], 5, assert );
 
 		} );
 
-		QUnit.test( "two non-coplanar triangles", function ( assert ) {
+		QUnit.test( "two non-coplanar triangles", ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 4, 2 ], 5, assert );
 
 		} );
 
-		QUnit.test( "three triangles, coplanar first", function ( assert ) {
+		QUnit.test( "three triangles, coplanar first", ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 2, 3, 0, 4, 2 ], 7, assert );
 
 		} );
 
-		QUnit.test( "three triangles, coplanar last", function ( assert ) {
+		QUnit.test( "three triangles, coplanar last", ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 4, 2, 0, 2, 3 ], 6, assert ); // Should be 7
 
 		} );
 
-		QUnit.test( "tetrahedron", function ( assert ) {
+		QUnit.test( "tetrahedron", ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 1, 4, 0, 4, 2, 1, 2, 4 ], 6, assert );
 

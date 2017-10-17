@@ -38,7 +38,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.test( 'Standard geometry tests', function ( assert ) {
+		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
 			runStdGeometryTests( assert, this.geometries );
 
@@ -73,7 +73,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.test( 'Standard geometry tests', function ( assert ) {
+		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
 			runStdGeometryTests( assert, this.geometries );
 

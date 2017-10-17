@@ -9,7 +9,7 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'InstancedBufferAttribute', () => {
 
-		QUnit.test( "can be created", function ( assert ) {
+		QUnit.test( "can be created", ( assert ) => {
 
 			var instance = new InstancedBufferAttribute( new Float32Array( 10 ), 2 );
 			assert.ok( instance.meshPerAttribute === 1, "ok" );
@@ -19,7 +19,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			var instance = new InstancedBufferAttribute( array, 2, 123 );

@@ -59,7 +59,7 @@ export default QUnit.module( 'Maths', () => {
 
 		};
 
-		QUnit.test( "constructor/equals", function ( assert ) {
+		QUnit.test( "constructor/equals", ( assert ) => {
 
 			var a = new Euler();
 			assert.ok( a.equals( eulerZero ), "Passed!" );
@@ -68,7 +68,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone/copy/equals", function ( assert ) {
+		QUnit.test( "clone/copy/equals", ( assert ) => {
 
 			var a = eulerAxyz.clone();
 			assert.ok( a.equals( eulerAxyz ), "Passed!" );
@@ -82,7 +82,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set/setFromVector3/toVector3", function ( assert ) {
+		QUnit.test( "set/setFromVector3/toVector3", ( assert ) => {
 
 			var a = new Euler();
 
@@ -101,7 +101,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "Quaternion.setFromEuler/Euler.fromQuaternion", function ( assert ) {
+		QUnit.test( "Quaternion.setFromEuler/Euler.fromQuaternion", ( assert ) => {
 
 			var testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
 			for ( var i = 0; i < testValues.length; i ++ ) {
@@ -117,7 +117,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "Matrix4.setFromEuler/Euler.fromRotationMatrix", function ( assert ) {
+		QUnit.test( "Matrix4.setFromEuler/Euler.fromRotationMatrix", ( assert ) => {
 
 			var testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
 			for ( var i = 0; i < testValues.length; i ++ ) {
@@ -133,7 +133,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "reorder", function ( assert ) {
+		QUnit.test( "reorder", ( assert ) => {
 
 			var testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
 			for ( var i = 0; i < testValues.length; i ++ ) {
@@ -153,7 +153,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "gimbalLocalQuat", function ( assert ) {
+		QUnit.test( "gimbalLocalQuat", ( assert ) => {
 
 			// known problematic quaternions
 			var q1 = new Quaternion( 0.5207769385244341, - 0.4783214164122354, 0.520776938524434, 0.47832141641223547 );
@@ -173,7 +173,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set/get properties, check callbacks", function ( assert ) {
+		QUnit.test( "set/get properties, check callbacks", ( assert ) => {
 
 			var a = new Euler();
 			a.onChange( function () {
@@ -197,7 +197,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone/copy, check callbacks", function ( assert ) {
+		QUnit.test( "clone/copy, check callbacks", ( assert ) => {
 
 			assert.expect( 3 );
 
@@ -223,7 +223,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "toArray", function ( assert ) {
+		QUnit.test( "toArray", ( assert ) => {
 
 			var order = "YXZ";
 			var a = new Euler( x, y, z, order );
@@ -251,7 +251,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "fromArray", function ( assert ) {
+		QUnit.test( "fromArray", ( assert ) => {
 
 			assert.expect( 10 );
 

@@ -16,7 +16,7 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Triangle', () => {
 
-		QUnit.test( "constructor", function ( assert ) {
+		QUnit.test( "constructor", ( assert ) => {
 
 			var a = new Triangle();
 			assert.ok( a.a.equals( zero3 ), "Passed!" );
@@ -30,7 +30,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var a = new Triangle( one3.clone().negate(), one3.clone(), two3.clone() );
 			var b = new Triangle().copy( a );
@@ -48,7 +48,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromPointsAndIndices", function ( assert ) {
+		QUnit.test( "setFromPointsAndIndices", ( assert ) => {
 
 			var a = new Triangle();
 
@@ -60,7 +60,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Triangle();
 
@@ -71,7 +71,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "area", function ( assert ) {
+		QUnit.test( "area", ( assert ) => {
 
 			var a = new Triangle();
 
@@ -89,7 +89,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "midpoint", function ( assert ) {
+		QUnit.test( "midpoint", ( assert ) => {
 
 			var a = new Triangle();
 
@@ -103,7 +103,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "normal", function ( assert ) {
+		QUnit.test( "normal", ( assert ) => {
 
 			var a = new Triangle();
 
@@ -117,7 +117,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "plane", function ( assert ) {
+		QUnit.test( "plane", ( assert ) => {
 
 			var a = new Triangle();
 
@@ -144,7 +144,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "barycoordFromPoint", function ( assert ) {
+		QUnit.test( "barycoordFromPoint", ( assert ) => {
 
 			var a = new Triangle();
 
@@ -168,7 +168,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "containsPoint", function ( assert ) {
+		QUnit.test( "containsPoint", ( assert ) => {
 
 			var a = new Triangle();
 
@@ -192,7 +192,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "closestPointToPoint", function ( assert ) {
+		QUnit.test( "closestPointToPoint", ( assert ) => {
 
 			var a = new Triangle( new Vector3( - 1, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
 
@@ -229,7 +229,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", function ( assert ) {
+		QUnit.test( "equals", ( assert ) => {
 
 			var a = new Triangle(
 				new Vector3( 1, 0, 0 ),

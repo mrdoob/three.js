@@ -10,7 +10,7 @@ export default QUnit.module( 'Cameras', () => {
 
 	QUnit.module( 'Camera', () => {
 
-		QUnit.test( "lookAt", function ( assert ) {
+		QUnit.test( "lookAt", ( assert ) => {
 
 			var cam = new Camera();
 			cam.lookAt( new Vector3( 0, 1, - 1 ) );
@@ -19,7 +19,7 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var cam = new Camera();
 

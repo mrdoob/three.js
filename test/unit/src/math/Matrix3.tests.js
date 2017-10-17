@@ -55,7 +55,7 @@ export default QUnit.module( 'Maths', () => {
 
 		};
 
-		QUnit.test( "constructor", function ( assert ) {
+		QUnit.test( "constructor", ( assert ) => {
 
 			var a = new Matrix3();
 			assert.ok( a.determinant() == 1, "Passed!" );
@@ -75,7 +75,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			var b = new Matrix3().copy( a );
@@ -88,7 +88,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var b = new Matrix3();
 			assert.ok( b.determinant() == 1, "Passed!" );
@@ -106,7 +106,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "identity", function ( assert ) {
+		QUnit.test( "identity", ( assert ) => {
 
 			var b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -127,7 +127,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiplyMatrices", function ( assert ) {
+		QUnit.test( "multiplyMatrices", ( assert ) => {
 
 			// Reference:
 			//
@@ -162,7 +162,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiplyScalar", function ( assert ) {
+		QUnit.test( "multiplyScalar", ( assert ) => {
 
 			var b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -188,7 +188,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "determinant", function ( assert ) {
+		QUnit.test( "determinant", ( assert ) => {
 
 			var a = new Matrix3();
 			assert.ok( a.determinant() == 1, "Passed!" );
@@ -205,7 +205,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getInverse", function ( assert ) {
+		QUnit.test( "getInverse", ( assert ) => {
 
 			var identity = new Matrix3();
 			var identity4 = new Matrix4();
@@ -259,7 +259,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "transpose", function ( assert ) {
+		QUnit.test( "transpose", ( assert ) => {
 
 			var a = new Matrix3();
 			var b = a.clone().transpose();
@@ -273,7 +273,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			var b = a.clone();
@@ -286,7 +286,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyToBufferAttribute", function ( assert ) {
+		QUnit.test( "applyToBufferAttribute", ( assert ) => {
 
 			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			var attr = new Float32BufferAttribute( [ 1, 2, 1, 3, 0, 3 ], 3 );
@@ -298,7 +298,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiply/premultiply", function ( assert ) {
+		QUnit.test( "multiply/premultiply", ( assert ) => {
 
 			// both simply just wrap multiplyMatrices
 			var a = new Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
@@ -315,7 +315,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getNormalMatrix", function ( assert ) {
+		QUnit.test( "getNormalMatrix", ( assert ) => {
 
 			var a = new Matrix3();
 			var b = new Matrix4().set(
@@ -335,7 +335,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", function ( assert ) {
+		QUnit.test( "equals", ( assert ) => {
 
 			var a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			var b = new Matrix3().set( 0, - 1, 2, 3, 4, 5, 6, 7, 8 );
@@ -349,7 +349,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setUvTransform", function ( assert ) {
+		QUnit.test( "setUvTransform", ( assert ) => {
 
 			var a = new Matrix3().set(
 				0.1767766952966369, 0.17677669529663687, 0.32322330470336313,
@@ -391,7 +391,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "rotate", function ( assert ) {
+		QUnit.test( "rotate", ( assert ) => {
 
 			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			var expected = new Matrix3().set(
@@ -405,7 +405,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "scale", function ( assert ) {
+		QUnit.test( "scale", ( assert ) => {
 
 			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			var expected = new Matrix3().set(
@@ -419,7 +419,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "translate", function ( assert ) {
+		QUnit.test( "translate", ( assert ) => {
 
 			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			var expected = new Matrix3().set( 22, 26, 30, 53, 61, 69, 7, 8, 9 );
@@ -429,7 +429,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "toArray", function ( assert ) {
+		QUnit.test( "toArray", ( assert ) => {
 
 			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			var noOffset = [ 1, 4, 7, 2, 5, 8, 3, 6, 9 ];

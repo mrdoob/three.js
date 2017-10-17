@@ -30,7 +30,7 @@ export default QUnit.module( 'Core', () => {
 
 		}
 
-		QUnit.test( "clock with performance", function ( assert ) {
+		QUnit.test( "clock with performance", ( assert ) => {
 
 			mockPerformance();
 

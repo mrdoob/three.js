@@ -14,7 +14,7 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Spherical', () => {
 
-		QUnit.test( "constructor", function ( assert ) {
+		QUnit.test( "constructor", ( assert ) => {
 
 			var a = new Spherical();
 			var radius = 10.0;
@@ -32,7 +32,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Spherical();
 			var radius = 10.0;
@@ -46,7 +46,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var radius = 10.0;
 			var phi = Math.acos( - 0.5 );
@@ -61,7 +61,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var radius = 10.0;
 			var phi = Math.acos( - 0.5 );
@@ -76,7 +76,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makeSafe", function ( assert ) {
+		QUnit.test( "makeSafe", ( assert ) => {
 
 			var EPS = 0.000001; // from source
 			var tooLow = 0.0;
@@ -97,7 +97,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromVector3", function ( assert ) {
+		QUnit.test( "setFromVector3", ( assert ) => {
 
 			var a = new Spherical( 1, 1, 1 );
 			var b = new Vector3( 0, 0, 0 );

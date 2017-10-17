@@ -9,7 +9,7 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'InstancedInterleavedBuffer', () => {
 
-		QUnit.test( "can be created", function ( assert ) {
+		QUnit.test( "can be created", ( assert ) => {
 
 			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			var instance = new InstancedInterleavedBuffer( array, 3 );
@@ -18,7 +18,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			var instance = new InstancedInterleavedBuffer( array, 3 );

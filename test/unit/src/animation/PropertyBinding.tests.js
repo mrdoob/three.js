@@ -13,7 +13,7 @@ export default QUnit.module( 'Animation', () => {
 
 	QUnit.module( 'PropertyBinding', () => {
 
-		QUnit.test( 'parseTrackName', function ( assert ) {
+		QUnit.test( 'parseTrackName', ( assert ) => {
 
 			var paths = [
 
@@ -209,7 +209,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'sanitizeNodeName', function ( assert ) {
+		QUnit.test( 'sanitizeNodeName', ( assert ) => {
 
 			assert.equal(
 				PropertyBinding.sanitizeNodeName( 'valid-name-123_' ),
@@ -231,7 +231,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'setValue', function ( assert ) {
+		QUnit.test( 'setValue', ( assert ) => {
 
 			var paths = [
 				'.material.opacity',

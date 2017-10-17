@@ -12,7 +12,7 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Cylindrical', () => {
 
-		QUnit.test( "constructor", function ( assert ) {
+		QUnit.test( "constructor", ( assert ) => {
 
 			var a = new Cylindrical();
 			var radius = 10.0;
@@ -30,7 +30,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Cylindrical();
 			var radius = 10.0;
@@ -44,7 +44,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var radius = 10.0;
 			var theta = Math.PI;
@@ -59,7 +59,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var radius = 10.0;
 			var theta = Math.PI;
@@ -74,7 +74,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromVector3", function ( assert ) {
+		QUnit.test( "setFromVector3", ( assert ) => {
 
 			var a = new Cylindrical( 1, 1, 1 );
 			var b = new Vector3( 0, 0, 0 );

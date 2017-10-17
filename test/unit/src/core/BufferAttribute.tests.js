@@ -13,7 +13,7 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'BufferAttribute', () => {
 
-		QUnit.test( "count", function ( assert ) {
+		QUnit.test( "count", ( assert ) => {
 
 			assert.ok(
 				new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ).count === 2,
@@ -22,7 +22,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 );
 			attr.setDynamic( true );
@@ -38,7 +38,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copyAt", function ( assert ) {
+		QUnit.test( "copyAt", ( assert ) => {
 
 			var attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ), 3 );
 			var attr2 = new BufferAttribute( new Float32Array( 9 ), 3 );
@@ -56,7 +56,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copyColorsArray", function ( assert ) {
+		QUnit.test( "copyColorsArray", ( assert ) => {
 
 			var attr = new BufferAttribute( new Float32Array( 6 ), 3 );
 
@@ -71,7 +71,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copyIndicesArray", function ( assert ) {
+		QUnit.test( "copyIndicesArray", ( assert ) => {
 
 			var attr = new BufferAttribute( new Float32Array( 6 ), 3 );
 
@@ -94,7 +94,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copyVector2sArray", function ( assert ) {
+		QUnit.test( "copyVector2sArray", ( assert ) => {
 
 			var attr = new BufferAttribute( new Float32Array( 4 ), 2 );
 
@@ -109,7 +109,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copyVector3sArray", function ( assert ) {
+		QUnit.test( "copyVector3sArray", ( assert ) => {
 
 			var attr = new BufferAttribute( new Float32Array( 6 ), 2 );
 
@@ -124,7 +124,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copyVector4sArray", function ( assert ) {
+		QUnit.test( "copyVector4sArray", ( assert ) => {
 
 			var attr = new BufferAttribute( new Float32Array( 8 ), 2 );
 
@@ -139,7 +139,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 0.12, - 12 ] ), 2 );
 			var attrCopy = attr.clone();
@@ -153,7 +153,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "constructor exception", function ( assert ) {
+		QUnit.test( "constructor exception", ( assert ) => {
 
 			assert.throws(
 				function () {
@@ -167,7 +167,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setArray", function ( assert ) {
+		QUnit.test( "setArray", ( assert ) => {
 
 			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
 			var a = new BufferAttribute( f32a, 2, false );
@@ -189,7 +189,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copyArray", function ( assert ) {
+		QUnit.test( "copyArray", ( assert ) => {
 
 			var f32a = new Float32Array( [ 5, 6, 7, 8 ] );
 			var a = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4 ] ), 2, false );
@@ -200,7 +200,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
 			var a = new BufferAttribute( f32a, 2, false );
@@ -213,7 +213,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "set[X, Y, Z, W, XYZ, XYZW]/get[X, Y, Z, W]", function ( assert ) {
+		QUnit.test( "set[X, Y, Z, W, XYZ, XYZW]/get[X, Y, Z, W]", ( assert ) => {
 
 			var f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8 ] );
 			var a = new BufferAttribute( f32a, 4, false );
@@ -228,7 +228,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setXY", function ( assert ) {
+		QUnit.test( "setXY", ( assert ) => {
 
 			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
 			var a = new BufferAttribute( f32a, 2, false );
@@ -240,7 +240,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setXYZ", function ( assert ) {
+		QUnit.test( "setXYZ", ( assert ) => {
 
 			var f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6 ] );
 			var a = new BufferAttribute( f32a, 3, false );
@@ -252,7 +252,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setXYZW", function ( assert ) {
+		QUnit.test( "setXYZW", ( assert ) => {
 
 			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
 			var a = new BufferAttribute( f32a, 4, false );
@@ -264,7 +264,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "onUpload", function ( assert ) {
+		QUnit.test( "onUpload", ( assert ) => {
 
 			var a = new BufferAttribute();
 			var func = function () { };

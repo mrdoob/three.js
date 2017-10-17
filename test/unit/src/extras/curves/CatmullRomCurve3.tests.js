@@ -22,7 +22,7 @@ export default QUnit.module( 'Extras', () => {
 			];
 			/* eslint-enable */
 
-			QUnit.test( "catmullrom check", function ( assert ) {
+			QUnit.test( "catmullrom check", ( assert ) => {
 
 				var curve = new CatmullRomCurve3( positions );
 				curve.type = 'catmullrom';
@@ -57,7 +57,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "chordal basic check", function ( assert ) {
+			QUnit.test( "chordal basic check", ( assert ) => {
 
 				var curve = new CatmullRomCurve3( positions );
 
@@ -91,7 +91,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "centripetal basic check", function ( assert ) {
+			QUnit.test( "centripetal basic check", ( assert ) => {
 
 				var curve = new CatmullRomCurve3( positions );
 				curve.type = 'centripetal';
@@ -124,7 +124,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "closed catmullrom basic check", function ( assert ) {
+			QUnit.test( "closed catmullrom basic check", ( assert ) => {
 
 				var curve = new CatmullRomCurve3( positions );
 				curve.type = 'catmullrom';

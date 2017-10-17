@@ -9,7 +9,7 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'EventDispatcher', () => {
 
-		QUnit.test( "addEventListener", function ( assert ) {
+		QUnit.test( "addEventListener", ( assert ) => {
 
 			var eventDispatcher = new EventDispatcher();
 
@@ -26,7 +26,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "hasEventListener", function ( assert ) {
+		QUnit.test( "hasEventListener", ( assert ) => {
 
 			var eventDispatcher = new EventDispatcher();
 
@@ -38,7 +38,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "removeEventListener", function ( assert ) {
+		QUnit.test( "removeEventListener", ( assert ) => {
 
 			var eventDispatcher = new EventDispatcher();
 
@@ -61,7 +61,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "dispatchEvent", function ( assert ) {
+		QUnit.test( "dispatchEvent", ( assert ) => {
 
 			var eventDispatcher = new EventDispatcher();
 

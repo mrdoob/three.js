@@ -9,7 +9,7 @@ export default QUnit.module( 'Cameras', () => {
 
 	QUnit.module( 'OrthographicCamera', () => {
 
-		QUnit.test( "updateProjectionMatrix", function ( assert ) {
+		QUnit.test( "updateProjectionMatrix", ( assert ) => {
 
 			var left = - 1, right = 1, top = 1, bottom = - 1, near = 1, far = 3;
 			var cam = new OrthographicCamera( left, right, top, bottom, near, far );
@@ -32,7 +32,7 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var left = - 1.5, right = 1.5, top = 1, bottom = - 1, near = 0.1, far = 42;
 			var cam = new OrthographicCamera( left, right, top, bottom, near, far );

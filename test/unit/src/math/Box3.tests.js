@@ -27,7 +27,7 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Box3', () => {
 
-		QUnit.test( "constructor", function ( assert ) {
+		QUnit.test( "constructor", ( assert ) => {
 
 			var a = new Box3();
 			assert.ok( a.min.equals( posInf3 ), "Passed!" );
@@ -43,7 +43,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var b = new Box3().copy( a );
@@ -58,7 +58,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Box3();
 
@@ -68,7 +68,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromPoints", function ( assert ) {
+		QUnit.test( "setFromPoints", ( assert ) => {
 
 			var a = new Box3();
 
@@ -85,7 +85,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "empty/makeEmpty", function ( assert ) {
+		QUnit.test( "empty/makeEmpty", ( assert ) => {
 
 			var a = new Box3();
 
@@ -99,7 +99,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getCenter", function ( assert ) {
+		QUnit.test( "getCenter", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 
@@ -111,7 +111,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getSize", function ( assert ) {
+		QUnit.test( "getSize", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 
@@ -122,7 +122,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "expandByPoint", function ( assert ) {
+		QUnit.test( "expandByPoint", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 
@@ -138,7 +138,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "expandByVector", function ( assert ) {
+		QUnit.test( "expandByVector", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 
@@ -151,7 +151,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "expandByScalar", function ( assert ) {
+		QUnit.test( "expandByScalar", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 
@@ -164,7 +164,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "containsPoint", function ( assert ) {
+		QUnit.test( "containsPoint", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 
@@ -178,7 +178,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "containsBox", function ( assert ) {
+		QUnit.test( "containsBox", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( zero3.clone(), one3.clone() );
@@ -194,7 +194,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getParameter", function ( assert ) {
+		QUnit.test( "getParameter", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var b = new Box3( one3.clone().negate(), one3.clone() );
@@ -208,7 +208,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clampPoint", function ( assert ) {
+		QUnit.test( "clampPoint", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( one3.clone().negate(), one3.clone() );
@@ -225,7 +225,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceToPoint", function ( assert ) {
+		QUnit.test( "distanceToPoint", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( one3.clone().negate(), one3.clone() );
@@ -242,7 +242,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceToPoint", function ( assert ) {
+		QUnit.test( "distanceToPoint", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( one3.clone().negate(), one3.clone() );
@@ -259,7 +259,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsBox", function ( assert ) {
+		QUnit.test( "intersectsBox", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( zero3.clone(), one3.clone() );
@@ -280,7 +280,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsSphere", function ( assert ) {
+		QUnit.test( "intersectsSphere", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var b = new Sphere( zero3.clone(), 1 );
@@ -292,7 +292,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsPlane", function ( assert ) {
+		QUnit.test( "intersectsPlane", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var b = new Plane( new Vector3( 0, 1, 0 ), 1 );
@@ -305,7 +305,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getBoundingSphere", function ( assert ) {
+		QUnit.test( "getBoundingSphere", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( zero3.clone(), one3.clone() );
@@ -317,7 +317,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersect", function ( assert ) {
+		QUnit.test( "intersect", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( zero3.clone(), one3.clone() );
@@ -332,7 +332,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "union", function ( assert ) {
+		QUnit.test( "union", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( zero3.clone(), one3.clone() );
@@ -353,7 +353,7 @@ export default QUnit.module( 'Maths', () => {
 
 		};
 
-		QUnit.test( "applyMatrix4", function ( assert ) {
+		QUnit.test( "applyMatrix4", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( zero3.clone(), one3.clone() );
@@ -370,7 +370,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "translate", function ( assert ) {
+		QUnit.test( "translate", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( zero3.clone(), one3.clone() );
@@ -384,7 +384,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromCenterAndSize", function ( assert ) {
+		QUnit.test( "setFromCenterAndSize", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var b = a.clone();
@@ -406,7 +406,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromBufferAttribute", function ( assert ) {
+		QUnit.test( "setFromBufferAttribute", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var bigger = new BufferAttribute( new Float32Array( [
@@ -431,7 +431,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "expandByObject", function ( assert ) {
+		QUnit.test( "expandByObject", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var b = a.clone();
@@ -473,7 +473,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromObject/BufferGeometry", function ( assert ) {
+		QUnit.test( "setFromObject/BufferGeometry", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var object = new Mesh( new BoxBufferGeometry( 2, 2, 2 ) );

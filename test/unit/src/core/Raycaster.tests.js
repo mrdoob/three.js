@@ -14,7 +14,7 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'Raycaster', () => {
 
-		QUnit.test( "intersectObjects", function ( assert ) {
+		QUnit.test( "intersectObjects", ( assert ) => {
 
 			var raycaster = getRaycaster();
 			var objectsToCheck = getObjectsToCheck();
@@ -34,7 +34,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "intersectObject", function ( assert ) {
+		QUnit.test( "intersectObject", ( assert ) => {
 
 			var raycaster = getRaycaster();
 			var objectsToCheck = getObjectsToCheck();
@@ -54,7 +54,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setFromCamera", function ( assert ) {
+		QUnit.test( "setFromCamera", ( assert ) => {
 
 			var raycaster = new Raycaster();
 			var rayDirection = raycaster.ray.direction;
@@ -146,7 +146,7 @@ export default QUnit.module( 'Core', () => {
 
 		}
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var origin = new Vector3( 0, 0, 0 );
 			var direction = new Vector3( 0, 0, - 1 );
@@ -164,7 +164,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setFromCamera (Orthographic)", function ( assert ) {
+		QUnit.test( "setFromCamera (Orthographic)", ( assert ) => {
 
 			var raycaster = new Raycaster();
 			var rayOrigin = raycaster.ray.origin;

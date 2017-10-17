@@ -21,7 +21,7 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Line3', () => {
 
-		QUnit.test( "constructor/equals", function ( assert ) {
+		QUnit.test( "constructor/equals", ( assert ) => {
 
 			var a = new Line3();
 			assert.ok( a.start.equals( zero3 ), "Passed!" );
@@ -33,7 +33,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy/equals", function ( assert ) {
+		QUnit.test( "copy/equals", ( assert ) => {
 
 			var a = new Line3( zero3.clone(), one3.clone() );
 			var b = new Line3().copy( a );
@@ -48,7 +48,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Line3();
 
@@ -58,7 +58,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "at", function ( assert ) {
+		QUnit.test( "at", ( assert ) => {
 
 			var a = new Line3( one3.clone(), new Vector3( 1, 1, 2 ) );
 
@@ -69,7 +69,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "closestPointToPoint/closestPointToPointParameter", function ( assert ) {
+		QUnit.test( "closestPointToPoint/closestPointToPointParameter", ( assert ) => {
 
 			var a = new Line3( one3.clone(), new Vector3( 1, 1, 2 ) );
 
@@ -95,7 +95,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone/equal", function ( assert ) {
+		QUnit.test( "clone/equal", ( assert ) => {
 
 			var a = new Line3();
 			var b = new Line3( zero3, new Vector3( 1, 1, 1 ) );
@@ -114,7 +114,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distance", function ( assert ) {
+		QUnit.test( "distance", ( assert ) => {
 
 			var a = new Line3( zero3, zero3 );
 			var b = new Line3( zero3, one3 );
@@ -128,7 +128,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyMatrix4", function ( assert ) {
+		QUnit.test( "applyMatrix4", ( assert ) => {
 
 			var a = new Line3( zero3.clone(), two3.clone() );
 			var b = new Vector4( two3.x, two3.y, two3.z, 1 );

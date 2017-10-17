@@ -9,7 +9,7 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'Layers', () => {
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Layers();
 
@@ -24,7 +24,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "enable", function ( assert ) {
+		QUnit.test( "enable", ( assert ) => {
 
 			var a = new Layers();
 
@@ -46,7 +46,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "disable", function ( assert ) {
+		QUnit.test( "disable", ( assert ) => {
 
 			var a = new Layers();
 
@@ -68,7 +68,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "toggle", function ( assert ) {
+		QUnit.test( "toggle", ( assert ) => {
 
 			var a = new Layers();
 
@@ -90,7 +90,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "QUnit.test", function ( assert ) {
+		QUnit.test( "QUnit.test", ( assert ) => {
 
 			var a = new Layers();
 			var b = new Layers();

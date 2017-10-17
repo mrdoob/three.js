@@ -40,7 +40,7 @@ export default QUnit.module( 'Core', () => {
 
 		};
 
-		QUnit.test( "rotateX", function ( assert ) {
+		QUnit.test( "rotateX", ( assert ) => {
 
 			var obj = new Object3D();
 
@@ -51,7 +51,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "rotateY", function ( assert ) {
+		QUnit.test( "rotateY", ( assert ) => {
 
 			var obj = new Object3D();
 
@@ -62,7 +62,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "rotateZ", function ( assert ) {
+		QUnit.test( "rotateZ", ( assert ) => {
 
 			var obj = new Object3D();
 
@@ -73,7 +73,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "translateOnAxis", function ( assert ) {
+		QUnit.test( "translateOnAxis", ( assert ) => {
 
 			var obj = new Object3D();
 
@@ -89,7 +89,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "translateX", function ( assert ) {
+		QUnit.test( "translateX", ( assert ) => {
 
 			var obj = new Object3D();
 			obj.translateX( 1.234 );
@@ -98,7 +98,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "translateY", function ( assert ) {
+		QUnit.test( "translateY", ( assert ) => {
 
 			var obj = new Object3D();
 			obj.translateY( 1.234 );
@@ -107,7 +107,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "translateZ", function ( assert ) {
+		QUnit.test( "translateZ", ( assert ) => {
 
 			var obj = new Object3D();
 			obj.translateZ( 1.234 );
@@ -116,7 +116,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "lookAt", function ( assert ) {
+		QUnit.test( "lookAt", ( assert ) => {
 
 			var obj = new Object3D();
 			obj.lookAt( new Vector3( 0, - 1, 1 ) );
@@ -125,7 +125,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "getWorldRotation", function ( assert ) {
+		QUnit.test( "getWorldRotation", ( assert ) => {
 
 			var obj = new Object3D();
 
@@ -137,7 +137,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "getObjectById/getObjectByName/getObjectByProperty", function ( assert ) {
+		QUnit.test( "getObjectById/getObjectByName/getObjectByProperty", ( assert ) => {
 
 			var parent = new Object3D();
 			var childName = new Object3D();
@@ -158,7 +158,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setRotationFromAxisAngle", function ( assert ) {
+		QUnit.test( "setRotationFromAxisAngle", ( assert ) => {
 
 			var a = new Object3D();
 			var axis = new Vector3( 0, 1, 0 );
@@ -177,7 +177,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setRotationFromEuler", function ( assert ) {
+		QUnit.test( "setRotationFromEuler", ( assert ) => {
 
 			var a = new Object3D();
 			var rotation = new Euler( Math.degToRad( 45 ), 0, Math.PI );
@@ -188,7 +188,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setRotationFromQuaternion", function ( assert ) {
+		QUnit.test( "setRotationFromQuaternion", ( assert ) => {
 
 			var a = new Object3D();
 			var rotation = new Quaternion().setFromEuler( new Euler( Math.PI, 0, - Math.PI ) );
@@ -199,7 +199,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setRotationFromMatrix", function ( assert ) {
+		QUnit.test( "setRotationFromMatrix", ( assert ) => {
 
 			var a = new Object3D();
 			var m = new Matrix4();
@@ -213,7 +213,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var a = new Object3D();
 			var b = new Object3D();
@@ -268,7 +268,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var a;
 			var b = new Object3D();
@@ -283,7 +283,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "toJSON", function ( assert ) {
+		QUnit.test( "toJSON", ( assert ) => {
 
 			var a = new Object3D();
 			var child = new Object3D();
@@ -341,7 +341,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "add/remove", function ( assert ) {
+		QUnit.test( "add/remove", ( assert ) => {
 
 			var a = new Object3D();
 			var child1 = new Object3D();
@@ -375,7 +375,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "applyQuaternion", function ( assert ) {
+		QUnit.test( "applyQuaternion", ( assert ) => {
 
 			var a = new Object3D();
 			var sqrt = 0.5 * Math.sqrt( 2 );
@@ -394,7 +394,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "applyMatrix", function ( assert ) {
+		QUnit.test( "applyMatrix", ( assert ) => {
 
 			var a = new Object3D();
 			var m = new Matrix4();
@@ -416,7 +416,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "getWorldPosition", function ( assert ) {
+		QUnit.test( "getWorldPosition", ( assert ) => {
 
 			var a = new Object3D();
 			var b = new Object3D();
@@ -443,7 +443,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "getWorldScale", function ( assert ) {
+		QUnit.test( "getWorldScale", ( assert ) => {
 
 			var a = new Object3D();
 			var m = new Matrix4().makeScale( x, y, z );
@@ -455,7 +455,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "getWorldDirection", function ( assert ) {
+		QUnit.test( "getWorldDirection", ( assert ) => {
 
 			var a = new Object3D();
 			var expected = new Vector3( 0, - 0.5 * Math.sqrt( 2 ), 0.5 * Math.sqrt( 2 ) );
@@ -473,7 +473,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "traverse/traverseVisible/traverseAncestors", function ( assert ) {
+		QUnit.test( "traverse/traverseVisible/traverseAncestors", ( assert ) => {
 
 			var a = new Object3D();
 			var b = new Object3D();

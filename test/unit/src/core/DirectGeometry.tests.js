@@ -13,7 +13,7 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'DirectGeometry', () => {
 
-		QUnit.test( "computeGroups", function ( assert ) {
+		QUnit.test( "computeGroups", ( assert ) => {
 
 			var a = new DirectGeometry();
 			var b = new Geometry();
@@ -37,7 +37,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "fromGeometry", function ( assert ) {
+		QUnit.test( "fromGeometry", ( assert ) => {
 
 			var a = new DirectGeometry();
 

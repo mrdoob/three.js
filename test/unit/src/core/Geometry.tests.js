@@ -22,7 +22,7 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'Geometry', () => {
 
-		QUnit.test( "rotateX", function ( assert ) {
+		QUnit.test( "rotateX", ( assert ) => {
 
 			var geometry = getGeometry();
 
@@ -38,7 +38,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "rotateY", function ( assert ) {
+		QUnit.test( "rotateY", ( assert ) => {
 
 			var geometry = getGeometry();
 
@@ -54,7 +54,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "rotateZ", function ( assert ) {
+		QUnit.test( "rotateZ", ( assert ) => {
 
 			var geometry = getGeometry();
 
@@ -70,7 +70,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "fromBufferGeometry", function ( assert ) {
+		QUnit.test( "fromBufferGeometry", ( assert ) => {
 
 			var bufferGeometry = new BufferGeometry();
 			bufferGeometry.addAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ), 3 ) );
@@ -104,7 +104,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "normalize", function ( assert ) {
+		QUnit.test( "normalize", ( assert ) => {
 
 			var geometry = getGeometry();
 			geometry.computeLineDistances();
@@ -137,7 +137,7 @@ export default QUnit.module( 'Core', () => {
 
 		}
 
-		QUnit.test( "applyMatrix", function ( assert ) {
+		QUnit.test( "applyMatrix", ( assert ) => {
 
 			var geometry = getGeometry();
 			geometry.faces.push( new Face3( 0, 1, 2 ) );
@@ -178,7 +178,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "translate", function ( assert ) {
+		QUnit.test( "translate", ( assert ) => {
 
 			var a = getGeometry();
 			var expected = [
@@ -204,7 +204,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "lookAt", function ( assert ) {
+		QUnit.test( "lookAt", ( assert ) => {
 
 			var a = getGeometry();
 			var expected = [
@@ -229,7 +229,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "scale", function ( assert ) {
+		QUnit.test( "scale", ( assert ) => {
 
 			var a = getGeometry();
 			var expected = [
@@ -255,7 +255,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "normalize (actual)", function ( assert ) {
+		QUnit.test( "normalize (actual)", ( assert ) => {
 
 			var a = getGeometry();
 			var sqrt = 0.5 * Math.sqrt( 2 );
@@ -282,7 +282,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "toJSON", function ( assert ) {
+		QUnit.test( "toJSON", ( assert ) => {
 
 			var a = getGeometry();
 			var gold = {
@@ -311,7 +311,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "mergeVertices", function ( assert ) {
+		QUnit.test( "mergeVertices", ( assert ) => {
 
 			var a = new Geometry();
 			var b = new BoxBufferGeometry( 1, 1, 1 );
@@ -329,7 +329,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "sortFacesByMaterialIndex", function ( assert ) {
+		QUnit.test( "sortFacesByMaterialIndex", ( assert ) => {
 
 			var box = new BoxBufferGeometry( 1, 1, 1 );
 			var a = new Geometry().fromBufferGeometry( box );
@@ -350,7 +350,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "computeBoundingBox", function ( assert ) {
+		QUnit.test( "computeBoundingBox", ( assert ) => {
 
 			var a = new DodecahedronGeometry();
 
@@ -371,7 +371,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "computeBoundingSphere", function ( assert ) {
+		QUnit.test( "computeBoundingSphere", ( assert ) => {
 
 			var a = new DodecahedronGeometry();
 

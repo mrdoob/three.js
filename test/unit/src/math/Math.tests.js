@@ -25,7 +25,7 @@ export default QUnit.module( 'Maths', () => {
 		 If x is positive and not +0, the result is +1.
 		 */
 
-		QUnit.test( "Math.sign/polyfill", function ( assert ) {
+		QUnit.test( "Math.sign/polyfill", ( assert ) => {
 
 			assert.ok( isNaN( Math.sign( NaN ) ), "If x is NaN<NaN>, the result is NaN." );
 			assert.ok( isNaN( Math.sign( new Vector3() ) ), "If x is NaN<object>, the result is NaN." );
@@ -50,7 +50,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "generateUUID", function ( assert ) {
+		QUnit.test( "generateUUID", ( assert ) => {
 
 			var a = Math.generateUUID();
 			var regex = /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{12}/i;
@@ -60,7 +60,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clamp", function ( assert ) {
+		QUnit.test( "clamp", ( assert ) => {
 
 			assert.strictEqual( Math.clamp( 0.5, 0, 1 ), 0.5, "Value already within limits" );
 			assert.strictEqual( Math.clamp( 0, 0, 1 ), 0, "Value equal to one limit" );
@@ -69,7 +69,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "euclideanModulo", function ( assert ) {
+		QUnit.test( "euclideanModulo", ( assert ) => {
 
 			assert.ok( isNaN( Math.euclideanModulo( 6, 0 ) ), "Division by zero returns NaN" );
 			assert.strictEqual( Math.euclideanModulo( 6, 1 ), 0, "Divison by trivial divisor" );
@@ -80,7 +80,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "mapLinear", function ( assert ) {
+		QUnit.test( "mapLinear", ( assert ) => {
 
 			assert.strictEqual( Math.mapLinear( 0.5, 0, 1, 0, 10 ), 5, "Value within range" );
 			assert.strictEqual( Math.mapLinear( 0.0, 0, 1, 0, 10 ), 0, "Value equal to lower boundary" );
@@ -88,7 +88,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "smoothstep", function ( assert ) {
+		QUnit.test( "smoothstep", ( assert ) => {
 
 			assert.strictEqual( Math.smoothstep( - 1, 0, 2 ), 0, "Value lower than minimum" );
 			assert.strictEqual( Math.smoothstep( 0, 0, 2 ), 0, "Value equal to minimum" );
@@ -100,7 +100,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "randInt", function ( assert ) {
+		QUnit.test( "randInt", ( assert ) => {
 
 			var low = 1, high = 3;
 			var a = Math.randInt( low, high );
@@ -110,7 +110,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "randFloat", function ( assert ) {
+		QUnit.test( "randFloat", ( assert ) => {
 
 			var low = 1, high = 3;
 			var a = Math.randFloat( low, high );
@@ -120,7 +120,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "randFloatSpread", function ( assert ) {
+		QUnit.test( "randFloatSpread", ( assert ) => {
 
 			var a = Math.randFloatSpread( 3 );
 
@@ -129,7 +129,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "degToRad", function ( assert ) {
+		QUnit.test( "degToRad", ( assert ) => {
 
 			assert.strictEqual( Math.degToRad( 0 ), 0, "0 degrees" );
 			assert.strictEqual( Math.degToRad( 90 ), Math.PI / 2, "90 degrees" );
@@ -138,7 +138,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "radToDeg", function ( assert ) {
+		QUnit.test( "radToDeg", ( assert ) => {
 
 			assert.strictEqual( Math.radToDeg( 0 ), 0, "0 radians" );
 			assert.strictEqual( Math.radToDeg( Math.PI / 2 ), 90, "Math.PI / 2 radians" );
@@ -147,7 +147,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "isPowerOfTwo", function ( assert ) {
+		QUnit.test( "isPowerOfTwo", ( assert ) => {
 
 			assert.strictEqual( Math.isPowerOfTwo( 0 ), false, "0 is not a PoT" );
 			assert.strictEqual( Math.isPowerOfTwo( 1 ), true, "1 is a PoT" );
@@ -157,7 +157,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "ceilPowerOfTwo", function ( assert ) {
+		QUnit.test( "ceilPowerOfTwo", ( assert ) => {
 
 			assert.strictEqual( Math.ceilPowerOfTwo( 1 ), 1, "Closest higher PoT to 1 is 1" );
 			assert.strictEqual( Math.ceilPowerOfTwo( 3 ), 4, "Closest higher PoT to 3 is 4" );
@@ -165,7 +165,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "floorPowerOfTwo", function ( assert ) {
+		QUnit.test( "floorPowerOfTwo", ( assert ) => {
 
 			assert.strictEqual( Math.floorPowerOfTwo( 1 ), 1, "Closest lower PoT to 1 is 1" );
 			assert.strictEqual( Math.floorPowerOfTwo( 3 ), 2, "Closest lower PoT to 3 is 2" );

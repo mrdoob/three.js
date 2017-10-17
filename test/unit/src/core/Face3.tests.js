@@ -11,7 +11,7 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'Face3', () => {
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var instance = new Face3( 0, 1, 2, new Vector3( 0, 1, 0 ), new Color( 0.25, 0.5, 0.75 ), 2 );
 			var copiedInstance = instance.copy( instance );
@@ -21,7 +21,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var instance = new Face3( 0, 1, 2,
 				[ new Vector3( 0, 1, 0 ), new Vector3( 1, 0, 1 ) ],
@@ -34,7 +34,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var instance = new Face3( 0, 1, 2, new Vector3( 0, 1, 0 ), new Color( 0.25, 0.5, 0.75 ), 2 );
 			var copiedInstance = instance.clone();

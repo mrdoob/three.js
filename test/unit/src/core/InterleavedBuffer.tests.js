@@ -24,7 +24,7 @@ export default QUnit.module( 'Core', () => {
 
 		}
 
-		QUnit.test( "count", function ( assert ) {
+		QUnit.test( "count", ( assert ) => {
 
 			var instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 
@@ -32,7 +32,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copy", function ( assert ) {
+		QUnit.test( "copy", ( assert ) => {
 
 			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			var instance = new InterleavedBuffer( array, 3 );
@@ -42,7 +42,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			var instance = new InterleavedBuffer( array, 3 );
@@ -52,7 +52,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 
@@ -61,7 +61,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "needsUpdate", function ( assert ) {
+		QUnit.test( "needsUpdate", ( assert ) => {
 
 			var a = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4 ], 2 ) );
 
@@ -71,7 +71,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setArray", function ( assert ) {
+		QUnit.test( "setArray", ( assert ) => {
 
 			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
 			var f32b = new Float32Array( [] );
@@ -99,7 +99,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copyAt", function ( assert ) {
+		QUnit.test( "copyAt", ( assert ) => {
 
 			var a = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ), 3 );
 			var b = new InterleavedBuffer( new Float32Array( 9 ), 3 );
@@ -113,7 +113,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "onUpload", function ( assert ) {
+		QUnit.test( "onUpload", ( assert ) => {
 
 			var a = new InterleavedBuffer();
 			var func = function () { };

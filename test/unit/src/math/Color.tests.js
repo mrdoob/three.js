@@ -11,7 +11,7 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Color', () => {
 
-		QUnit.test( "constructor", function ( assert ) {
+		QUnit.test( "constructor", ( assert ) => {
 
 			var c = new Color();
 			assert.ok( c.r, "Red: " + c.r );
@@ -20,7 +20,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "rgb constructor", function ( assert ) {
+		QUnit.test( "rgb constructor", ( assert ) => {
 
 			var c = new Color( 1, 1, 1 );
 			assert.ok( c.r == 1, "Passed" );
@@ -29,7 +29,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copyHex", function ( assert ) {
+		QUnit.test( "copyHex", ( assert ) => {
 
 			var c = new Color();
 			var c2 = new Color( 0xF5FFFA );
@@ -38,7 +38,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copyColorString", function ( assert ) {
+		QUnit.test( "copyColorString", ( assert ) => {
 
 			var c = new Color();
 			var c2 = new Color( 'ivory' );
@@ -47,7 +47,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setRGB", function ( assert ) {
+		QUnit.test( "setRGB", ( assert ) => {
 
 			var c = new Color();
 			c.setRGB( 1, 0.2, 0.1 );
@@ -57,7 +57,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copyGammaToLinear", function ( assert ) {
+		QUnit.test( "copyGammaToLinear", ( assert ) => {
 
 			var c = new Color();
 			var c2 = new Color();
@@ -69,7 +69,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copyLinearToGamma", function ( assert ) {
+		QUnit.test( "copyLinearToGamma", ( assert ) => {
 
 			var c = new Color();
 			var c2 = new Color();
@@ -81,7 +81,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "convertGammaToLinear", function ( assert ) {
+		QUnit.test( "convertGammaToLinear", ( assert ) => {
 
 			var c = new Color();
 			c.setRGB( 0.3, 0.5, 0.9 );
@@ -92,7 +92,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "convertLinearToGamma", function ( assert ) {
+		QUnit.test( "convertLinearToGamma", ( assert ) => {
 
 			var c = new Color();
 			c.setRGB( 4, 9, 16 );
@@ -103,7 +103,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setWithNum", function ( assert ) {
+		QUnit.test( "setWithNum", ( assert ) => {
 
 			var c = new Color();
 			c.set( 0xFF0000 );
@@ -113,7 +113,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setWithString", function ( assert ) {
+		QUnit.test( "setWithString", ( assert ) => {
 
 			var c = new Color();
 			c.set( 'silver' );
@@ -121,7 +121,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", function ( assert ) {
+		QUnit.test( "clone", ( assert ) => {
 
 			var c = new Color( 'teal' );
 			var c2 = c.clone();
@@ -129,7 +129,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lerp", function ( assert ) {
+		QUnit.test( "lerp", ( assert ) => {
 
 			var c = new Color();
 			var c2 = new Color();
@@ -141,7 +141,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleRGBRed", function ( assert ) {
+		QUnit.test( "setStyleRGBRed", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'rgb(255,0,0)' );
@@ -151,7 +151,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleRGBARed", function ( assert ) {
+		QUnit.test( "setStyleRGBARed", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'rgba(255,0,0,0.5)' );
@@ -161,7 +161,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleRGBRedWithSpaces", function ( assert ) {
+		QUnit.test( "setStyleRGBRedWithSpaces", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'rgb( 255 , 0,   0 )' );
@@ -171,7 +171,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleRGBARedWithSpaces", function ( assert ) {
+		QUnit.test( "setStyleRGBARedWithSpaces", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'rgba( 255,  0,  0  , 1 )' );
@@ -181,7 +181,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleRGBPercent", function ( assert ) {
+		QUnit.test( "setStyleRGBPercent", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'rgb(100%,50%,10%)' );
@@ -191,7 +191,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleRGBAPercent", function ( assert ) {
+		QUnit.test( "setStyleRGBAPercent", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'rgba(100%,50%,10%, 0.5)' );
@@ -201,7 +201,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleRGBPercentWithSpaces", function ( assert ) {
+		QUnit.test( "setStyleRGBPercentWithSpaces", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'rgb( 100% ,50%  , 10% )' );
@@ -211,7 +211,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleRGBAPercentWithSpaces", function ( assert ) {
+		QUnit.test( "setStyleRGBAPercentWithSpaces", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'rgba( 100% ,50%  ,  10%, 0.5 )' );
@@ -221,7 +221,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleHSLRed", function ( assert ) {
+		QUnit.test( "setStyleHSLRed", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'hsl(360,100%,50%)' );
@@ -231,7 +231,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleHSLARed", function ( assert ) {
+		QUnit.test( "setStyleHSLARed", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'hsla(360,100%,50%,0.5)' );
@@ -241,7 +241,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleHSLRedWithSpaces", function ( assert ) {
+		QUnit.test( "setStyleHSLRedWithSpaces", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'hsl(360,  100% , 50% )' );
@@ -251,7 +251,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleHSLARedWithSpaces", function ( assert ) {
+		QUnit.test( "setStyleHSLARedWithSpaces", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'hsla( 360,  100% , 50%,  0.5 )' );
@@ -261,7 +261,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleHexSkyBlue", function ( assert ) {
+		QUnit.test( "setStyleHexSkyBlue", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( '#87CEEB' );
@@ -269,7 +269,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleHexSkyBlueMixed", function ( assert ) {
+		QUnit.test( "setStyleHexSkyBlueMixed", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( '#87cEeB' );
@@ -277,7 +277,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleHex2Olive", function ( assert ) {
+		QUnit.test( "setStyleHex2Olive", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( '#F00' );
@@ -285,7 +285,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleHex2OliveMixed", function ( assert ) {
+		QUnit.test( "setStyleHex2OliveMixed", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( '#f00' );
@@ -293,7 +293,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyleColorName", function ( assert ) {
+		QUnit.test( "setStyleColorName", ( assert ) => {
 
 			var c = new Color();
 			c.setStyle( 'powderblue' );
@@ -301,7 +301,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getHex", function ( assert ) {
+		QUnit.test( "getHex", ( assert ) => {
 
 			var c = new Color( 'red' );
 			var res = c.getHex();
@@ -309,7 +309,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setHex", function ( assert ) {
+		QUnit.test( "setHex", ( assert ) => {
 
 			var c = new Color();
 			c.setHex( 0xFA8072 );
@@ -317,7 +317,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getHexString", function ( assert ) {
+		QUnit.test( "getHexString", ( assert ) => {
 
 			var c = new Color( 'tomato' );
 			var res = c.getHexString();
@@ -325,7 +325,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getStyle", function ( assert ) {
+		QUnit.test( "getStyle", ( assert ) => {
 
 			var c = new Color( 'plum' );
 			var res = c.getStyle();
@@ -333,7 +333,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getHSL", function ( assert ) {
+		QUnit.test( "getHSL", ( assert ) => {
 
 			var c = new Color( 0x80ffff );
 			var hsl = c.getHSL();
@@ -344,7 +344,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setHSL", function ( assert ) {
+		QUnit.test( "setHSL", ( assert ) => {
 
 			var c = new Color();
 			c.setHSL( 0.75, 1.0, 0.25 );
@@ -356,7 +356,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", function ( assert ) {
+		QUnit.test( "set", ( assert ) => {
 
 			var a = new Color();
 			var b = new Color( 0.5, 0, 0 );
@@ -374,7 +374,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "offsetHSL", function ( assert ) {
+		QUnit.test( "offsetHSL", ( assert ) => {
 
 			var a = new Color( "hsl(120,50%,50%)" );
 			var b = new Color( 0.36, 0.84, 0.648 );
@@ -387,7 +387,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "add", function ( assert ) {
+		QUnit.test( "add", ( assert ) => {
 
 			var a = new Color( 0x0000FF );
 			var b = new Color( 0xFF0000 );
@@ -399,7 +399,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "addScalar", function ( assert ) {
+		QUnit.test( "addScalar", ( assert ) => {
 
 			var a = new Color( 0.1, 0.0, 0.0 );
 			var b = new Color( 0.6, 0.5, 0.5 );
@@ -410,7 +410,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "sub", function ( assert ) {
+		QUnit.test( "sub", ( assert ) => {
 
 			var a = new Color( 0x0000CC );
 			var b = new Color( 0xFF0000 );
@@ -424,7 +424,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiply", function ( assert ) {
+		QUnit.test( "multiply", ( assert ) => {
 
 			var a = new Color( 1, 0, 0.5 );
 			var b = new Color( 0.5, 1, 0.5 );
@@ -435,7 +435,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiplyScalar", function ( assert ) {
+		QUnit.test( "multiplyScalar", ( assert ) => {
 
 			var a = new Color( 0.25, 0, 0.5 );
 			var b = new Color( 0.5, 0, 1 );
@@ -445,7 +445,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", function ( assert ) {
+		QUnit.test( "equals", ( assert ) => {
 
 			var a = new Color( 0.5, 0.0, 1.0 );
 			var b = new Color( 0.5, 1.0, 0.0 );
@@ -467,7 +467,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "fromArray", function ( assert ) {
+		QUnit.test( "fromArray", ( assert ) => {
 
 			var a = new Color();
 			var array = [ 0.5, 0.6, 0.7, 0, 1, 0 ];
@@ -484,7 +484,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "toArray", function ( assert ) {
+		QUnit.test( "toArray", ( assert ) => {
 
 			var r = 0.5, g = 1.0, b = 0.0;
 			var a = new Color( r, g, b );
@@ -509,7 +509,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "toJSON", function ( assert ) {
+		QUnit.test( "toJSON", ( assert ) => {
 
 			var a = new Color( 0.0, 0.0, 0.0 );
 			var b = new Color( 0.0, 0.5, 0.0 );
