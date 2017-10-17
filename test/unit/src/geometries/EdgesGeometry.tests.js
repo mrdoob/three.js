@@ -102,7 +102,6 @@ function addDrawCalls( geometry ) {
 
 	var numTris = geometry.index.count / 3;
 
-	var offset = 0;
 	for ( var i = 0; i < numTris; i ++ ) {
 
 		var start = i * 3;

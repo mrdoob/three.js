@@ -6,7 +6,9 @@
 
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Vector4 } from '../../../../src/math/Vector4';
+import { Matrix3 } from '../../../../src/math/Matrix3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
+import { Spherical } from '../../../../src/math/Spherical';
 import { Quaternion } from '../../../../src/math/Quaternion';
 import { Euler } from '../../../../src/math/Euler';
 import { Cylindrical } from '../../../../src/math/Cylindrical';
@@ -31,7 +33,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.y == 0, "Passed!" );
 			assert.ok( a.z == 0, "Passed!" );
 
-			a = new Vector3( x, y, z );
+			var a = new Vector3( x, y, z );
 			assert.ok( a.x === x, "Passed!" );
 			assert.ok( a.y === y, "Passed!" );
 			assert.ok( a.z === z, "Passed!" );
@@ -208,7 +210,7 @@ export default QUnit.module( 'Maths', () => {
 			var result = a.dot( b );
 			assert.ok( result == ( - x * x - y * y - z * z ), "Passed!" );
 
-			result = a.dot( c );
+			var result = a.dot( c );
 			assert.ok( result == 0, "Passed!" );
 
 		} );
@@ -281,7 +283,7 @@ export default QUnit.module( 'Maths', () => {
 			a.setLength( y );
 			assert.ok( a.length() == y, "Passed!" );
 
-			a = new Vector3( 0, 0, 0 );
+			var a = new Vector3( 0, 0, 0 );
 			assert.ok( a.length() == 0, "Passed!" );
 			a.setLength( y );
 			assert.ok( a.length() == 0, "Passed!" );
@@ -419,14 +421,14 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.y == b.y / b.w, "Passed!" );
 			assert.ok( a.z == b.z / b.w, "Passed!" );
 
-			m = new Matrix4().makeTranslation( 3, 2, 1 );
+			var m = new Matrix4().makeTranslation( 3, 2, 1 );
 			a.applyMatrix4( m );
 			b.applyMatrix4( m );
 			assert.ok( a.x == b.x / b.w, "Passed!" );
 			assert.ok( a.y == b.y / b.w, "Passed!" );
 			assert.ok( a.z == b.z / b.w, "Passed!" );
 
-			m = new Matrix4().set(
+			var m = new Matrix4().set(
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
@@ -768,13 +770,13 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( array[ 1 ], y, "No array, no offset: check y" );
 			assert.strictEqual( array[ 2 ], z, "No array, no offset: check z" );
 
-			array = [];
+			var array = [];
 			a.toArray( array );
 			assert.strictEqual( array[ 0 ], x, "With array, no offset: check x" );
 			assert.strictEqual( array[ 1 ], y, "With array, no offset: check y" );
 			assert.strictEqual( array[ 2 ], z, "With array, no offset: check z" );
 
-			array = [];
+			var array = [];
 			a.toArray( array, 1 );
 			assert.strictEqual( array[ 0 ], undefined, "With array and offset: check [0]" );
 			assert.strictEqual( array[ 1 ], x, "With array and offset: check x" );

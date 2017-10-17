@@ -47,7 +47,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.z == 0, "Passed!" );
 			assert.ok( a.w == 1, "Passed!" );
 
-			a = new Quaternion( x, y, z, w );
+			var a = new Quaternion( x, y, z, w );
 			assert.ok( a.x === x, "Passed!" );
 			assert.ok( a.y === y, "Passed!" );
 			assert.ok( a.z === z, "Passed!" );
@@ -93,7 +93,7 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "setFromAxisAngle", function ( assert ) {
 
 			// TODO: find cases to validate.
-			assert.ok( true, "Passed!" );
+			// assert.ok( true, "Passed!" );
 
 			var zero = new Quaternion();
 
@@ -453,14 +453,14 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( array[ 2 ], z, "No array, no offset: check z" );
 			assert.strictEqual( array[ 3 ], w, "No array, no offset: check w" );
 
-			array = [];
+			var array = [];
 			a.toArray( array );
 			assert.strictEqual( array[ 0 ], x, "With array, no offset: check x" );
 			assert.strictEqual( array[ 1 ], y, "With array, no offset: check y" );
 			assert.strictEqual( array[ 2 ], z, "With array, no offset: check z" );
 			assert.strictEqual( array[ 3 ], w, "With array, no offset: check w" );
 
-			array = [];
+			var array = [];
 			a.toArray( array, 1 );
 			assert.strictEqual( array[ 0 ], undefined, "With array and offset: check [0]" );
 			assert.strictEqual( array[ 1 ], x, "With array and offset: check x" );
@@ -501,9 +501,9 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( a.z - expected.z ) <= eps, "m11 > m22 && m11 > m33: check z" );
 			assert.ok( Math.abs( a.w - expected.w ) <= eps, "m11 > m22 && m11 > m33: check w" );
 
-			q = new Quaternion( - 1, - 2, 1, - 1 ).normalize();
+			var q = new Quaternion( - 1, - 2, 1, - 1 ).normalize();
 			m.makeRotationFromQuaternion( q );
-			expected = new Vector4( 0.37796447300922714, 0.7559289460184544, - 0.37796447300922714, 0.37796447300922714 );
+			var expected = new Vector4( 0.37796447300922714, 0.7559289460184544, - 0.37796447300922714, 0.37796447300922714 );
 
 			a.setFromRotationMatrix( m );
 			assert.ok( Math.abs( a.x - expected.x ) <= eps, "m22 > m33: check x" );

@@ -18,7 +18,7 @@ export default QUnit.module( 'Renderers', () => {
 			} );
 
 		} );
-		
+
 	} );
 
 } );

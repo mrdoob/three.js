@@ -5,6 +5,8 @@
 /* global QUnit */
 
 import { Vector2 } from '../../../../src/math/Vector2';
+import { Matrix3 } from '../../../../src/math/Matrix3';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import {
 	x,
 	y
@@ -20,7 +22,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.x == 0, "Passed!" );
 			assert.ok( a.y == 0, "Passed!" );
 
-			a = new Vector2( x, y );
+			var a = new Vector2( x, y );
 			assert.ok( a.x === x, "Passed!" );
 			assert.ok( a.y === y, "Passed!" );
 
@@ -200,7 +202,7 @@ export default QUnit.module( 'Maths', () => {
 			var result = a.dot( b );
 			assert.ok( result == ( - x * x - y * y ), "Passed!" );
 
-			result = a.dot( c );
+			var result = a.dot( c );
 			assert.ok( result == 0, "Passed!" );
 
 		} );
@@ -262,7 +264,7 @@ export default QUnit.module( 'Maths', () => {
 			a.setLength( y );
 			assert.ok( a.length() == y, "Passed!" );
 
-			a = new Vector2( 0, 0 );
+			var a = new Vector2( 0, 0 );
 			assert.ok( a.length() == 0, "Passed!" );
 			a.setLength( y );
 			assert.ok( a.length() == 0, "Passed!" );
@@ -444,12 +446,12 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( array[ 0 ], x, "No array, no offset: check x" );
 			assert.strictEqual( array[ 1 ], y, "No array, no offset: check y" );
 
-			array = [];
+			var array = [];
 			a.toArray( array );
 			assert.strictEqual( array[ 0 ], x, "With array, no offset: check x" );
 			assert.strictEqual( array[ 1 ], y, "With array, no offset: check y" );
 
-			array = [];
+			var array = [];
 			a.toArray( array, 1 );
 			assert.strictEqual( array[ 0 ], undefined, "With array and offset: check [0]" );
 			assert.strictEqual( array[ 1 ], x, "With array and offset: check x" );

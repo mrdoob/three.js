@@ -23,7 +23,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.theta, 0, "Default values: check theta" );
 			assert.strictEqual( a.y, 0, "Default values: check y" );
 
-			a = new Cylindrical( radius, theta, y );
+			var a = new Cylindrical( radius, theta, y );
 			assert.strictEqual( a.radius, radius, "Custom values: check radius" );
 			assert.strictEqual( a.theta, theta, "Custom values: check theta" );
 			assert.strictEqual( a.y, y, "Custom values: check y" );

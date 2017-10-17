@@ -25,7 +25,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.phi, 0, "Default values: check phi" );
 			assert.strictEqual( a.theta, 0, "Default values: check theta" );
 
-			a = new Spherical( radius, phi, theta );
+			var a = new Spherical( radius, phi, theta );
 			assert.strictEqual( a.radius, radius, "Custom values: check radius" );
 			assert.strictEqual( a.phi, phi, "Custom values: check phi" );
 			assert.strictEqual( a.theta, theta, "Custom values: check theta" );

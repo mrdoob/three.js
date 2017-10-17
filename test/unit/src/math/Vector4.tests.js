@@ -5,13 +5,8 @@
 /* global QUnit */
 
 import { Vector4 } from '../../../../src/math/Vector4';
-import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
-import { Quaternion } from '../../../../src/math/Quaternion';
-import { Euler } from '../../../../src/math/Euler';
-import { Cylindrical } from '../../../../src/math/Cylindrical';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera';
 import {
 	x,
 	y,
@@ -32,7 +27,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.z == 0, "Passed!" );
 			assert.ok( a.w == 1, "Passed!" );
 
-			a = new Vector4( x, y, z, w );
+			var a = new Vector4( x, y, z, w );
 			assert.ok( a.x === x, "Passed!" );
 			assert.ok( a.y === y, "Passed!" );
 			assert.ok( a.z === z, "Passed!" );
@@ -233,7 +228,7 @@ export default QUnit.module( 'Maths', () => {
 			var result = a.dot( b );
 			assert.ok( result == ( - x * x - y * y - z * z - w * w ), "Passed!" );
 
-			result = a.dot( c );
+			var result = a.dot( c );
 			assert.ok( result == 0, "Passed!" );
 
 		} );
@@ -318,7 +313,7 @@ export default QUnit.module( 'Maths', () => {
 			a.setLength( y );
 			assert.ok( a.length() == y, "Passed!" );
 
-			a = new Vector4( 0, 0, 0, 0 );
+			var a = new Vector4( 0, 0, 0, 0 );
 			assert.ok( a.length() == 0, "Passed!" );
 			a.setLength( y );
 			assert.ok( a.length() == 0, "Passed!" );
@@ -542,14 +537,14 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( array[ 2 ], z, "No array, no offset: check z" );
 			assert.strictEqual( array[ 3 ], w, "No array, no offset: check w" );
 
-			array = [];
+			var array = [];
 			a.toArray( array );
 			assert.strictEqual( array[ 0 ], x, "With array, no offset: check x" );
 			assert.strictEqual( array[ 1 ], y, "With array, no offset: check y" );
 			assert.strictEqual( array[ 2 ], z, "With array, no offset: check z" );
 			assert.strictEqual( array[ 3 ], w, "With array, no offset: check w" );
 
-			array = [];
+			var array = [];
 			a.toArray( array, 1 );
 			assert.strictEqual( array[ 0 ], undefined, "With array and offset: check [0]" );
 			assert.strictEqual( array[ 1 ], x, "With array and offset: check x" );

@@ -4,7 +4,10 @@
  */
 /* global QUnit */
 
-import { IcosahedronGeometry, IcosahedronBufferGeometry } from '../../../../src/geometries/IcosahedronGeometry';
+import {
+	IcosahedronGeometry,
+	IcosahedronBufferGeometry
+} from '../../../../src/geometries/IcosahedronGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -25,11 +28,11 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.test( 'Standard geometry tests', function( assert ) {
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
 
 			runStdGeometryTests( assert, this.geometries );
 
-		});
+		} );
 
 	} );
 
@@ -50,11 +53,11 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.test( 'Standard geometry tests', function( assert ) {
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
 
 			runStdGeometryTests( assert, this.geometries );
 
-		});
+		} );
 
 	} );
 

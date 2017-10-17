@@ -53,7 +53,7 @@ export default QUnit.module( 'Maths', () => {
 			var p4 = new Plane( unit3, 4 );
 			var p5 = new Plane( unit3, 5 );
 
-			a = new Frustum( p0, p1, p2, p3, p4, p5 );
+			var a = new Frustum( p0, p1, p2, p3, p4, p5 );
 			assert.ok( a.planes[ 0 ].equals( p0 ), "Passed!" );
 			assert.ok( a.planes[ 1 ].equals( p1 ), "Passed!" );
 			assert.ok( a.planes[ 2 ].equals( p2 ), "Passed!" );

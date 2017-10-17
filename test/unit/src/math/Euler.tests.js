@@ -212,11 +212,11 @@ export default QUnit.module( 'Maths', () => {
 			b.onChange( cb );
 
 			// clone doesn't trigger onChange
-			a = b.clone();
+			var a = b.clone();
 			assert.ok( a.equals( b ), "clone: check if a equals b" );
 
 			// copy triggers onChange once
-			a = new Euler( 1, 2, 3, "ZXY" );
+			var a = new Euler( 1, 2, 3, "ZXY" );
 			a.onChange( cb );
 			a.copy( b );
 			assert.ok( a.equals( b ), "copy: check if a equals b" );
@@ -234,14 +234,14 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( array[ 2 ], z, "No array, no offset: check z" );
 			assert.strictEqual( array[ 3 ], order, "No array, no offset: check order" );
 
-			array = [];
+			var array = [];
 			a.toArray( array );
 			assert.strictEqual( array[ 0 ], x, "With array, no offset: check x" );
 			assert.strictEqual( array[ 1 ], y, "With array, no offset: check y" );
 			assert.strictEqual( array[ 2 ], z, "With array, no offset: check z" );
 			assert.strictEqual( array[ 3 ], order, "With array, no offset: check order" );
 
-			array = [];
+			var array = [];
 			a.toArray( array, 1 );
 			assert.strictEqual( array[ 0 ], undefined, "With array and offset: check [0]" );
 			assert.strictEqual( array[ 1 ], x, "With array and offset: check x" );
@@ -270,9 +270,9 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.z, z, "No order: check z" );
 			assert.strictEqual( a.order, "XYZ", "No order: check order" );
 
-			a = new Euler();
+			var a = new Euler();
+			var array = [ x, y, z, "ZXY" ];
 			a.onChange( cb );
-			array = [ x, y, z, "ZXY" ];
 			a.fromArray( array );
 			assert.strictEqual( a.x, x, "With order: check x" );
 			assert.strictEqual( a.y, y, "With order: check y" );

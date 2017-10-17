@@ -1,5 +1,6 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
  */
 /* global QUnit */
 

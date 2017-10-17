@@ -265,7 +265,7 @@ export default QUnit.module( 'Maths', () => {
 			var b = a.clone().transpose();
 			assert.ok( matrixEquals3( a, b ), "Passed!" );
 
-			b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
+			var b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			var c = b.clone().transpose();
 			assert.ok( ! matrixEquals3( b, c ), "Passed!" );
 			c.transpose();
@@ -438,11 +438,11 @@ export default QUnit.module( 'Maths', () => {
 			var array = a.toArray();
 			assert.deepEqual( array, noOffset, "No array, no offset" );
 
-			array = [];
+			var array = [];
 			a.toArray( array );
 			assert.deepEqual( array, noOffset, "With array, no offset" );
 
-			array = [];
+			var array = [];
 			a.toArray( array, 1 );
 			assert.deepEqual( array, withOffset, "With array, with offset" );
 

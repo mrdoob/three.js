@@ -3,11 +3,21 @@
  */
 /* global QUnit */
 
-QUnit.module.todo( 'LinearInterpolant', () => {
+import { LinearInterpolant } from '../../../../../src/math/interpolants/LinearInterpolant';
 
-	QUnit.test( 'write me !', ( assert ) => {
+export default QUnit.module( 'Maths', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module( 'Interpolants', () => {
+
+		QUnit.module.todo( 'LinearInterpolant', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 

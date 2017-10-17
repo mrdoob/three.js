@@ -33,11 +33,11 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.min.equals( posInf3 ), "Passed!" );
 			assert.ok( a.max.equals( negInf3 ), "Passed!" );
 
-			a = new Box3( zero3.clone(), zero3.clone() );
+			var a = new Box3( zero3.clone(), zero3.clone() );
 			assert.ok( a.min.equals( zero3 ), "Passed!" );
 			assert.ok( a.max.equals( zero3 ), "Passed!" );
 
-			a = new Box3( zero3.clone(), one3.clone() );
+			var a = new Box3( zero3.clone(), one3.clone() );
 			assert.ok( a.min.equals( zero3 ), "Passed!" );
 			assert.ok( a.max.equals( one3 ), "Passed!" );
 
@@ -105,7 +105,7 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( a.getCenter().equals( zero3 ), "Passed!" );
 
-			a = new Box3( zero3.clone(), one3.clone() );
+			var a = new Box3( zero3.clone(), one3.clone() );
 			var midpoint = one3.clone().multiplyScalar( 0.5 );
 			assert.ok( a.getCenter().equals( midpoint ), "Passed!" );
 
@@ -117,7 +117,7 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( a.getSize().equals( zero3 ), "Passed!" );
 
-			a = new Box3( zero3.clone(), one3.clone() );
+			var a = new Box3( zero3.clone(), one3.clone() );
 			assert.ok( a.getSize().equals( one3 ), "Passed!" );
 
 		} );

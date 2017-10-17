@@ -4,7 +4,10 @@
  */
 /* global QUnit */
 
-import { CircleGeometry, CircleBufferGeometry } from '../../../../src/geometries/CircleGeometry';
+import {
+	CircleGeometry,
+	CircleBufferGeometry
+} from '../../../../src/geometries/CircleGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -36,7 +39,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 	} );
-	
+
 	QUnit.module( 'CircleBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {

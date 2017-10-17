@@ -27,7 +27,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.center.equals( zero3 ), "Passed!" );
 			assert.ok( a.radius == 0, "Passed!" );
 
-			a = new Sphere( one3.clone(), 1 );
+			var a = new Sphere( one3.clone(), 1 );
 			assert.ok( a.center.equals( one3 ), "Passed!" );
 			assert.ok( a.radius == 1, "Passed!" );
 
@@ -176,7 +176,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( a.center.z - expectedCenter.z ) <= eps, "Default center: check center.z" );
 			assert.ok( Math.abs( a.radius - expectedRadius ) <= eps, "Default center: check radius" );
 
-			expectedRadius = 2.5946195770400102;
+			var expectedRadius = 2.5946195770400102;
 			a.setFromPoints( points, optionalCenter );
 			assert.ok( Math.abs( a.center.x - optionalCenter.x ) <= eps, "Optional center: check center.x" );
 			assert.ok( Math.abs( a.center.y - optionalCenter.y ) <= eps, "Optional center: check center.y" );

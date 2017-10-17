@@ -347,7 +347,7 @@ export default QUnit.module( 'Maths', () => {
 			var b = a.clone().transpose();
 			assert.ok( matrixEquals4( a, b ), "Passed!" );
 
-			b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+			var b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			var c = b.clone().transpose();
 			assert.ok( ! matrixEquals4( b, c ), "Passed!" );
 			c.transpose();
@@ -420,13 +420,18 @@ export default QUnit.module( 'Maths', () => {
 
 						var m2 = new Matrix4().compose( t2, r2, s2 );
 
+						/*
+						// debug code
 						var matrixIsSame = matrixEquals4( m, m2 );
-						/* debug code
-						 if( ! matrixIsSame ) {
-						 console.log( t, s, r );
-						 console.log( t2, s2, r2 );
-						 console.log( m, m2 );
-						 }*/
+						if ( ! matrixIsSame ) {
+
+							console.log( t, s, r );
+							console.log( t2, s2, r2 );
+							console.log( m, m2 );
+
+						}
+						*/
+
 						assert.ok( matrixEquals4( m, m2 ), "Passed!" );
 
 					}
@@ -527,11 +532,11 @@ export default QUnit.module( 'Maths', () => {
 			var array = a.toArray();
 			assert.deepEqual( array, noOffset, "No array, no offset" );
 
-			array = [];
+			var array = [];
 			a.toArray( array );
 			assert.deepEqual( array, noOffset, "With array, no offset" );
 
-			array = [];
+			var array = [];
 			a.toArray( array, 1 );
 			assert.deepEqual( array, withOffset, "With array, with offset" );
 

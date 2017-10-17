@@ -27,7 +27,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.origin.equals( zero3 ), "Passed!" );
 			assert.ok( a.direction.equals( zero3 ), "Passed!" );
 
-			a = new Ray( two3.clone(), one3.clone() );
+			var a = new Ray( two3.clone(), one3.clone() );
 			assert.ok( a.origin.equals( two3 ), "Passed!" );
 			assert.ok( a.direction.equals( one3 ), "Passed!" );
 
@@ -277,7 +277,7 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
 
-			a = new Ray( zero3.clone(), new Vector3( 0, 0, 1 ) );
+			var a = new Ray( zero3.clone(), new Vector3( 0, 0, 1 ) );
 			m.makeRotationZ( Math.PI );
 			assert.ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
 
@@ -313,9 +313,9 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( distSqr - 20 ) < 0.0001, "Passed!" );
 
 			//segment behind the ray
-			v0 = new Vector3( - 50, - 50, - 50 ); // just a far away point
-			v1 = new Vector3( - 3, - 5, - 4 );
-			distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+			var v0 = new Vector3( - 50, - 50, - 50 ); // just a far away point
+			var v1 = new Vector3( - 3, - 5, - 4 );
+			var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
 			assert.ok( ptOnSegment.distanceTo( v1 ) < 0.0001, "Passed!" );
 			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
@@ -323,9 +323,9 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( distSqr - 77 ) < 0.0001, "Passed!" );
 
 			//exact intersection between the ray and the segment
-			v0 = new Vector3( - 50, - 50, - 50 );
-			v1 = new Vector3( 50, 50, 50 );
-			distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+			var v0 = new Vector3( - 50, - 50, - 50 );
+			var v1 = new Vector3( 50, 50, 50 );
+			var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
 			assert.ok( ptOnSegment.distanceTo( one3 ) < 0.0001, "Passed!" );
 			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );

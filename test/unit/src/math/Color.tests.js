@@ -494,13 +494,13 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( array[ 1 ], g, "No array, no offset: check g" );
 			assert.strictEqual( array[ 2 ], b, "No array, no offset: check b" );
 
-			array = [];
+			var array = [];
 			a.toArray( array );
 			assert.strictEqual( array[ 0 ], r, "With array, no offset: check r" );
 			assert.strictEqual( array[ 1 ], g, "With array, no offset: check g" );
 			assert.strictEqual( array[ 2 ], b, "With array, no offset: check b" );
 
-			array = [];
+			var array = [];
 			a.toArray( array, 1 );
 			assert.strictEqual( array[ 0 ], undefined, "With array and offset: check [0]" );
 			assert.strictEqual( array[ 1 ], r, "With array and offset: check r" );

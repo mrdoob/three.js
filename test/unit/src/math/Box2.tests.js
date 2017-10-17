@@ -24,11 +24,11 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.min.equals( posInf2 ), "Passed!" );
 			assert.ok( a.max.equals( negInf2 ), "Passed!" );
 
-			a = new Box2( zero2.clone(), zero2.clone() );
+			var a = new Box2( zero2.clone(), zero2.clone() );
 			assert.ok( a.min.equals( zero2 ), "Passed!" );
 			assert.ok( a.max.equals( zero2 ), "Passed!" );
 
-			a = new Box2( zero2.clone(), one2.clone() );
+			var a = new Box2( zero2.clone(), one2.clone() );
 			assert.ok( a.min.equals( zero2 ), "Passed!" );
 			assert.ok( a.max.equals( one2 ), "Passed!" );
 
@@ -96,7 +96,7 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( a.getCenter().equals( zero2 ), "Passed!" );
 
-			a = new Box2( zero2, one2 );
+			var a = new Box2( zero2, one2 );
 			var midpoint = one2.clone().multiplyScalar( 0.5 );
 			assert.ok( a.getCenter().equals( midpoint ), "Passed!" );
 
@@ -108,7 +108,7 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( a.getSize().equals( zero2 ), "Passed!" );
 
-			a = new Box2( zero2.clone(), one2.clone() );
+			var a = new Box2( zero2.clone(), one2.clone() );
 			assert.ok( a.getSize().equals( one2 ), "Passed!" );
 
 		} );

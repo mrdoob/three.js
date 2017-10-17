@@ -3,11 +3,21 @@
  */
 /* global QUnit */
 
-QUnit.module.todo( 'CubicInterpolant', () => {
+import { CubicInterpolant } from '../../../../../src/math/interpolants/CubicInterpolant';
 
-	QUnit.test( 'write me !', ( assert ) => {
+export default QUnit.module( 'Maths', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module( 'Interpolants', () => {
+
+		QUnit.module.todo( 'CubicInterpolant', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 

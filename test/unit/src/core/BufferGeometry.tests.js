@@ -164,7 +164,6 @@ export default QUnit.module( 'Core', () => {
 			geometry.center();
 
 			var pos = geometry.attributes.position.array;
-			var bb = geometry.boundingBox;
 
 			// the boundingBox should go from (-1, -1, -1) to (4, 4, 4) so it has a size of (5, 5, 5)
 			// after centering it the vertices should be placed between (-2.5, -2.5, -2.5) and (2.5, 2.5, 2.5)
@@ -238,7 +237,7 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( bb.min.x === - 4 && bb.min.y === - 20 && bb.min.z === - 3.5, "min values are set correctly" );
 			assert.ok( bb.max.x === 13 && bb.max.y === 5 && bb.max.z === 6, "max values are set correctly" );
 
-			bb = getBBForVertices( [ - 1, - 1, - 1 ] );
+			var bb = getBBForVertices( [ - 1, - 1, - 1 ] );
 
 			assert.ok( bb.min.x === bb.max.x && bb.min.y === bb.max.y && bb.min.z === bb.max.z, "since there is only one vertex, max and min are equal" );
 			assert.ok( bb.min.x === - 1 && bb.min.y === - 1 && bb.min.z === - 1, "since there is only one vertex, min and max are this vertex" );
@@ -683,7 +682,7 @@ export default QUnit.module( 'Core', () => {
 			);
 
 			// indexed geometry
-			a = new BufferGeometry();
+			var a = new BufferGeometry();
 			a.addAttribute( "position", position );
 			a.setIndex( index );
 			a.computeVertexNormals();
@@ -817,11 +816,11 @@ export default QUnit.module( 'Core', () => {
 			// setFromObject with a Mesh as object
 			lineGeo.faces.push( new Face3( 0, 1, 2 ) );
 			var lineMesh = new Mesh( lineGeo );
-			geometry = new BufferGeometry().setFromObject( lineMesh );
+			var geometry = new BufferGeometry().setFromObject( lineMesh );
 
 			// no colors
-			pos = geometry.attributes.position.array;
-			v = lineGeo.vertices;
+			var pos = geometry.attributes.position.array;
+			var v = lineGeo.vertices;
 
 			assert.notStrictEqual( pos, undefined, "Mesh: position attribute exists" );
 			assert.strictEqual( v.length * 3, pos.length, "Mesh: vertex arrays have the same size" );

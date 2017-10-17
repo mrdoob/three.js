@@ -3,11 +3,21 @@
  */
 /* global QUnit */
 
-QUnit.module.todo( 'DiscreteInterpolant', () => {
+import { DiscreteInterpolant } from '../../../../../src/math/interpolants/DiscreteInterpolant';
 
-	QUnit.test( 'write me !', ( assert ) => {
+export default QUnit.module( 'Maths', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module( 'Interpolants', () => {
+
+		QUnit.module.todo( 'DiscreteInterpolant', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 

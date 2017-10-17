@@ -27,7 +27,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.start.equals( zero3 ), "Passed!" );
 			assert.ok( a.end.equals( zero3 ), "Passed!" );
 
-			a = new Line3( two3.clone(), one3.clone() );
+			var a = new Line3( two3.clone(), one3.clone() );
 			assert.ok( a.start.equals( two3 ), "Passed!" );
 			assert.ok( a.end.equals( one3 ), "Passed!" );
 
@@ -105,7 +105,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.notOk( a.equals( c ), "Check a and c aren't equal" );
 			assert.notOk( b.equals( c ), "Check b and c aren't equal" );
 
-			a = b.clone();
+			var a = b.clone();
 			assert.ok( a.equals( b ), "Check a and b are equal after clone()" );
 			assert.notOk( a.equals( c ), "Check a and c aren't equal after clone()" );
 

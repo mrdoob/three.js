@@ -38,13 +38,13 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.normal.z == 0, "Passed!" );
 			assert.ok( a.constant == 0, "Passed!" );
 
-			a = new Plane( one3.clone(), 0 );
+			var a = new Plane( one3.clone(), 0 );
 			assert.ok( a.normal.x == 1, "Passed!" );
 			assert.ok( a.normal.y == 1, "Passed!" );
 			assert.ok( a.normal.z == 1, "Passed!" );
 			assert.ok( a.constant == 0, "Passed!" );
 
-			a = new Plane( one3.clone(), 1 );
+			var a = new Plane( one3.clone(), 1 );
 			assert.ok( a.normal.x == 1, "Passed!" );
 			assert.ok( a.normal.y == 1, "Passed!" );
 			assert.ok( a.normal.z == 1, "Passed!" );
@@ -173,17 +173,17 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.intersectsLine( l1 ), "Passed!" );
 			assert.ok( a.intersectLine( l1 ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
 
-			a = new Plane( new Vector3( 1, 0, 0 ), - 3 );
+			var a = new Plane( new Vector3( 1, 0, 0 ), - 3 );
 
 			assert.ok( a.intersectsLine( l1 ), "Passed!" );
 			assert.ok( a.intersectLine( l1 ).equals( new Vector3( 3, 0, 0 ) ), "Passed!" );
 
-			a = new Plane( new Vector3( 1, 0, 0 ), - 11 );
+			var a = new Plane( new Vector3( 1, 0, 0 ), - 11 );
 
 			assert.ok( ! a.intersectsLine( l1 ), "Passed!" );
 			assert.ok( a.intersectLine( l1 ) === undefined, "Passed!" );
 
-			a = new Plane( new Vector3( 1, 0, 0 ), 11 );
+			var a = new Plane( new Vector3( 1, 0, 0 ), 11 );
 
 			assert.ok( ! a.intersectsLine( l1 ), "Passed!" );
 			assert.ok( a.intersectLine( l1 ) === undefined, "Passed!" );
@@ -197,7 +197,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.projectPoint( new Vector3( 10, 0, 0 ) ).equals( zero3 ), "Passed!" );
 			assert.ok( a.projectPoint( new Vector3( - 10, 0, 0 ) ).equals( zero3 ), "Passed!" );
 
-			a = new Plane( new Vector3( 0, 1, 0 ), - 1 );
+			var a = new Plane( new Vector3( 0, 1, 0 ), - 1 );
 			assert.ok( a.projectPoint( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
 			assert.ok( a.projectPoint( new Vector3( 0, 1, 0 ) ).equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
 
@@ -208,7 +208,7 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 			assert.ok( a.distanceToPoint( a.coplanarPoint() ) === 0, "Passed!" );
 
-			a = new Plane( new Vector3( 0, 1, 0 ), - 1 );
+			var a = new Plane( new Vector3( 0, 1, 0 ), - 1 );
 			assert.ok( a.distanceToPoint( a.coplanarPoint() ) === 0, "Passed!" );
 
 		} );
@@ -222,7 +222,7 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( comparePlane( a.clone().applyMatrix4( m ), new Plane( new Vector3( 0, 1, 0 ), 0 ) ), "Passed!" );
 
-			a = new Plane( new Vector3( 0, 1, 0 ), - 1 );
+			var a = new Plane( new Vector3( 0, 1, 0 ), - 1 );
 			assert.ok( comparePlane( a.clone().applyMatrix4( m ), new Plane( new Vector3( - 1, 0, 0 ), - 1 ) ), "Passed!" );
 
 			m.makeTranslation( 1, 1, 1 );

@@ -3,32 +3,17 @@
  */
 /* global QUnit */
 
-import { LineBasicMaterial } from '../../../../src/materials/LineBasicMaterial';
+import { MeshDepthMaterial } from '../../../../src/materials/MeshDepthMaterial';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'LineBasicMaterial', () => {
+	QUnit.module.todo( 'MeshDepthMaterial', () => {
 
 		QUnit.test( 'write me !', ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-
-	} );
-
-} );
-
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
-/* global QUnit */
-
-QUnit.module.todo( 'MeshDepthMaterial', () => {
-
-	QUnit.test( 'write me !', ( assert ) => {
-
-		assert.ok( false, "everything's gonna be alright" );
 
 	} );
 
