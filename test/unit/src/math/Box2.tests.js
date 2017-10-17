@@ -12,7 +12,7 @@ import {
 	zero2,
 	one2,
 	two2
-} from './Constants';
+} from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 

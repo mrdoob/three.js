@@ -5,7 +5,7 @@
 /* global QUnit */
 
 import { Color } from '../../../../src/math/Color';
-import { eps } from './Constants';
+import { eps } from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 

@@ -8,7 +8,7 @@ import { Spherical } from '../../../../src/math/Spherical';
 import { Vector3 } from '../../../../src/math/Vector3';
 import {
 	eps
-} from './Constants';
+} from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 

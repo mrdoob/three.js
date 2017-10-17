@@ -8,7 +8,7 @@ import { Vector2 } from '../../../../src/math/Vector2';
 import {
 	x,
 	y
-} from './Constants';
+} from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 

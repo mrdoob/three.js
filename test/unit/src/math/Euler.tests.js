@@ -7,7 +7,7 @@ import { Euler } from '../../../../src/math/Euler';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Quaternion } from '../../../../src/math/Quaternion';
 import { Vector3 } from '../../../../src/math/Vector3';
-import { x, y, z } from './Constants';
+import { x, y, z } from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 

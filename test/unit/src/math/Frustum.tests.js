@@ -13,7 +13,7 @@ import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Box3 } from '../../../../src/math/Box3';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
-import { zero3, one3 } from './Constants';
+import { zero3, one3 } from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 

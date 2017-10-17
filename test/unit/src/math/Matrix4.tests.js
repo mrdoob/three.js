@@ -9,7 +9,7 @@ import { Vector3 } from '../../../../src/math/Vector3';
 import { Euler } from '../../../../src/math/Euler';
 import { Quaternion } from '../../../../src/math/Quaternion';
 import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { eps } from './Constants';
+import { eps } from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 

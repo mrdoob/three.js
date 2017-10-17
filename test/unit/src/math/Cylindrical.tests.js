@@ -6,7 +6,7 @@
 
 import { Cylindrical } from '../../../../src/math/Cylindrical';
 import { Vector3 } from '../../../../src/math/Vector3';
-import { eps } from './Constants';
+import { eps } from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 

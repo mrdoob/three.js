@@ -14,7 +14,7 @@ import {
 	z,
 	w,
 	eps
-} from '../math/Constants';
+} from '../math/Constants.tests';
 
 export default QUnit.module( 'Core', () => {
 

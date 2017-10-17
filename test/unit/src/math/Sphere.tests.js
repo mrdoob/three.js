@@ -15,7 +15,7 @@ import {
 	one3,
 	two3,
 	eps
-} from './Constants';
+} from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 

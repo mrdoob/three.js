@@ -9,7 +9,7 @@ import {
 	x,
 	y,
 	z
-} from '../math/Constants';
+} from '../math/Constants.tests';
 
 export default QUnit.module( 'Core', () => {
 
