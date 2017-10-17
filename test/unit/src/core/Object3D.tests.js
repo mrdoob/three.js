@@ -180,7 +180,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "setRotationFromEuler", ( assert ) => {
 
 			var a = new Object3D();
-			var rotation = new Euler( Math.degToRad( 45 ), 0, Math.PI );
+			var rotation = new Euler( ( 45 / RadToDeg ), 0, Math.PI );
 			var expected = rotation.clone(); // bit obvious
 
 			a.setRotationFromEuler( rotation );
