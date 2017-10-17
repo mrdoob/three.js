@@ -227,10 +227,10 @@
 
 		<h3>[property:Boolean shadowMap.autoUpdate]</h3>
 		<div>Enables automatic updates to the shadows in the scene. Default is *true*.</div>
-		<div>If you do not require dynamic lighting / shadows, you may set this to false after the first *render* call.</div>
+		<div>If you do not require dynamic lighting / shadows, you may set this to *false* when the renderer is instantiated.</div>
 
 		<h3>[property:Boolean shadowMap.needsUpdate]</h3>
-		<div>When set to *true*, shadow maps in the scene will updated in the next *render* call. Default is *false*. </div>
+		<div>When set to *true*, shadow maps in the scene will be updated in the next *render* call. Default is *false*. </div>
 		<div>If you have disabled automatic updates to shadow maps (*shadowMap.autoUpdate = false*), you will need to set this to *true* and then make a render call to update the shadows in your scene.</div>
 
 		<h3>[property:Integer shadowMap.type]</h3>
