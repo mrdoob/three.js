@@ -2,7 +2,7 @@
  * @author moraxy / https://github.com/moraxy
  */
 
-QUnit.module( "Light" );
+QUnit.module( "AmbientLight" );
 
 QUnit.test( "Standard Light tests", function ( assert ) {
 
@@ -12,10 +12,10 @@ QUnit.test( "Standard Light tests", function ( assert ) {
 	};
 
 	var lights = [
-		new THREE.Light( parameters.color ),
-		new THREE.Light( parameters.color, parameters.intensity )
+		new THREE.AmbientLight( parameters.color ),
+		new THREE.AmbientLight( parameters.color, parameters.intensity )
 	];
 
-	runStdLightTests( lights, true );
+	runStdLightTests( lights );
 
 } );
