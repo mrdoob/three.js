@@ -112,74 +112,78 @@ Object.assign( FileLoader.prototype, {
 
 		} else {
 
-			return Cache.retrieve(url, function(_onLoad, _onProgress, _onError) {
+			return Cache.retrieve( url, function ( _onLoad, _onProgress, _onError ) {
 
 				var request = new XMLHttpRequest();
-				request.open('GET', url, true);
+				request.open( 'GET', url, true );
 
-				request.addEventListener('load', function (event) {
+				request.addEventListener( 'load', function ( event ) {
 
 					var response = event.target.response;
 
-					if (this.status === 200) {
+					if ( this.status === 200 ) {
 
-						_onLoad(response);
+						_onLoad( response );
 
-						scope.manager.itemEnd(url);
+						scope.manager.itemEnd( url );
 
-					} else if (this.status === 0) {
+					} else if ( this.status === 0 ) {
 
 						// Some browsers return HTTP Status 0 when using non-http protocol
 						// e.g. 'file://' or 'data://'. Handle as success.
 
-						console.warn('THREE.FileLoader: HTTP Status 0 received.');
+						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-						_onLoad(response);
+						_onLoad( response );
 
-						scope.manager.itemEnd(url);
+						scope.manager.itemEnd( url );
 
 					} else {
 
-						_onError(event);
+						_onError( event );
 
-						scope.manager.itemEnd(url);
-						scope.manager.itemError(url);
+						scope.manager.itemEnd( url );
+						scope.manager.itemError( url );
 
 					}
 
-				}, false);
+				}, false );
 
 
-				request.addEventListener('progress', function (event) {
+				request.addEventListener( 'progress', function ( event ) {
 
-					_onProgress(event);
+					_onProgress( event );
 
-				}, false);
+				}, false );
 
 
-				request.addEventListener('error', function (event) {
+				request.addEventListener( 'error', function ( event ) {
 
-					_onError(event);
+					_onError( event );
 
-					scope.manager.itemEnd(url);
-					scope.manager.itemError(url);
+					scope.manager.itemEnd( url );
+					scope.manager.itemError( url );
 
-				}, false);
+				}, false );
 
-				if (scope.responseType !== undefined) request.responseType = scope.responseType;
-				if (scope.withCredentials !== undefined) request.withCredentials = scope.withCredentials;
+				if ( scope.responseType !== undefined ) request.responseType = scope.responseType;
+				if ( scope.withCredentials !== undefined ) request.withCredentials = scope.withCredentials;
 
-				if (request.overrideMimeType) request.overrideMimeType(scope.mimeType !== undefined ? scope.mimeType : 'text/plain');
+				if ( request.overrideMimeType ) request.overrideMimeType( scope.mimeType !== undefined ? scope.mimeType : 'text/plain' );
 
-				for (var header in scope.requestHeader) {
+				for ( var header in scope.requestHeader ) {
 
-					request.setRequestHeader(header, scope.requestHeader[header]);
+					request.setRequestHeader( header, scope.requestHeader[ header ] );
+
 				}
 
-				request.send(null);
+				request.send( null );
 				scope.manager.itemStart( url );
-			}, onLoad, onProgress, onError);
+
+			}, onLoad, onProgress, onError );
+
 		}
+
 	},
 
 	setPath: function ( value ) {
