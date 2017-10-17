@@ -5,7 +5,7 @@
 
 import { HemisphereLightHelper } from '../../../../src/helpers/HemisphereLightHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'HemisphereLightHelper', () => {
 

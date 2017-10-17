@@ -5,7 +5,7 @@
 
 import { MeshPhongMaterial } from '../../../../src/materials/MeshPhongMaterial';
 
-export default QUnit.module.todo( 'Materials', () => {
+export default QUnit.module( 'Materials', () => {
 
 	QUnit.module.todo( 'MeshPhongMaterial', () => {
 

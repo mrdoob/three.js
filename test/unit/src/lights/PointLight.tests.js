@@ -6,9 +6,9 @@
 
 import { PointLight } from '../../../../src/lights/PointLight';
 
-export default QUnit.module.todo( 'Lights', () => {
+export default QUnit.module( 'Lights', () => {
 
-	QUnit.module.todo( 'PointLight', ( hooks ) => {
+	QUnit.module( 'PointLight', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

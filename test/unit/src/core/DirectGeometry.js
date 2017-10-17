@@ -7,6 +7,7 @@ import { DirectGeometry } from '../../../../src/core/DirectGeometry';
 import { JSONLoader } from '../../../../src/loaders/JSONLoader';
 import { Vector2 } from '../../../../src/math/Vector2';
 import { Face3 } from '../../../../src/core/Face3';
+import { Geometry } from '../../../../src/core/Geometry';
 
 export default QUnit.module( 'Core', () => {
 

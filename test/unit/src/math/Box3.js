@@ -23,7 +23,7 @@ import {
 	two3
 } from './Constants';
 
-export default QUnit.module.todo( 'Maths', () => {
+export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Box3', () => {
 

@@ -5,7 +5,7 @@
 
 import { MultiMaterial } from '../../../../src/materials/MultiMaterial';
 
-export default QUnit.module.todo( 'Materials', () => {
+export default QUnit.module( 'Materials', () => {
 
 	QUnit.module.todo( 'MultiMaterial', () => {
 

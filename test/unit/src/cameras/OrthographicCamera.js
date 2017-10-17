@@ -7,7 +7,7 @@ import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera';
 
 export default QUnit.module( 'Cameras', () => {
 
-	QUnit.module.todo( 'OrthographicCamera', () => {
+	QUnit.module( 'OrthographicCamera', () => {
 
 		QUnit.test( "updateProjectionMatrix", function ( assert ) {
 
@@ -29,7 +29,7 @@ export default QUnit.module( 'Cameras', () => {
 			assert.ok( pMatrix[ 12 ] === - ( ( right + left ) / ( right - left ) ), "m[3,0] === -(r+l/r-l)" );
 			assert.ok( pMatrix[ 13 ] === - ( ( top + bottom ) / ( top - bottom ) ), "m[3,1] === -(t+b/b-t)" );
 			assert.ok( pMatrix[ 14 ] === - ( ( far + near ) / ( far - near ) ), "m[3,2] === -(f+n/f-n)" );
-			
+
 		} );
 
 		QUnit.test( "clone", function ( assert ) {

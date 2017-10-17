@@ -7,9 +7,9 @@
 import { Color } from '../../../../src/math/Color';
 import { eps } from './Constants';
 
-export default QUnit.module.todo( 'Maths', () => {
+export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Color', () => {
+	QUnit.module( 'Color', () => {
 
 		QUnit.test( "constructor", function ( assert ) {
 

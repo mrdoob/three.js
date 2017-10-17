@@ -5,7 +5,7 @@
 
 import { Light } from '../../../../src/lights/Light';
 
-export default QUnit.module.todo( 'Lights', () => {
+export default QUnit.module( 'Lights', () => {
 
 	QUnit.module.todo( 'Light', () => {
 

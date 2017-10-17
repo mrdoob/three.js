@@ -5,7 +5,7 @@
 
 import { MeshPhysicalMaterial } from '../../../../src/materials/MeshPhysicalMaterial';
 
-export default QUnit.module.todo( 'Materials', () => {
+export default QUnit.module( 'Materials', () => {
 
 	QUnit.module.todo( 'MeshPhysicalMaterial', () => {
 

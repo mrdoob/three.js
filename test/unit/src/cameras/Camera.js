@@ -8,7 +8,7 @@ import { Vector3 } from '../../../../src/math/Vector3';
 
 export default QUnit.module( 'Cameras', () => {
 
-	QUnit.module.todo( 'Camera', () => {
+	QUnit.module( 'Camera', () => {
 
 		QUnit.test( "lookAt", function ( assert ) {
 

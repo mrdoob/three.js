@@ -4,12 +4,12 @@
  */
 /* global QUnit */
 
-import { Math } from '../../../../src/math/Math';
+import { _Math as Math } from '../../../../src/math/Math';
 import { Vector3 } from '../../../../src/math/Vector3';
 
-export default QUnit.module.todo( 'Maths', () => {
+export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Math', () => {
+	QUnit.module( 'Math', () => {
 
 		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
 		//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-math.sign

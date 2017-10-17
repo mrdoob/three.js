@@ -5,7 +5,7 @@
 
 import { Points } from '../../../../src/objects/Points';
 
-export default QUnit.module.todo( 'Objects', () => {
+export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'Points', () => {
 

@@ -5,7 +5,7 @@
 
 import { GridHelper } from '../../../../src/helpers/GridHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'GridHelper', () => {
 

@@ -5,9 +5,9 @@
 
 import { SplineCurve } from '../../../../../src/extras/curves/SplineCurve';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'Curves', () => {
+	QUnit.module( 'Curves', () => {
 
 		QUnit.module.todo( 'SplineCurve', () => {
 

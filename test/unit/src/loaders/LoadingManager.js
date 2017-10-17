@@ -5,7 +5,7 @@
 
 import { LoadingManager } from '../../../../src/loaders/LoadingManager';
 
-export default QUnit.module.todo( 'Loaders', () => {
+export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'LoadingManager', () => {
 

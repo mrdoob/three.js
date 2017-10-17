@@ -5,6 +5,11 @@
 
 import { Uniform } from '../../../../src/core/Uniform';
 import { Vector3 } from '../../../../src/math/Vector3';
+import {
+	x,
+	y,
+	z
+} from '../math/Constants';
 
 export default QUnit.module( 'Core', () => {
 
@@ -30,8 +35,8 @@ export default QUnit.module( 'Core', () => {
 
 			assert.strictEqual( b.value, a.value, "clone() with simple values works" );
 
-			a = new Uniform( new Vector3( 1, 2, 3 ) );
-			b = a.clone();
+			var a = new Uniform( new Vector3( 1, 2, 3 ) );
+			var b = a.clone();
 
 			assert.ok( b.value.equals( a.value ), "clone() with complex values works" );
 

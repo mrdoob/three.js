@@ -5,7 +5,7 @@
 
 import { CanvasTexture } from '../../../../src/textures/CanvasTexture';
 
-export default QUnit.module.todo( 'Textures', () => {
+export default QUnit.module( 'Textures', () => {
 
 	QUnit.module.todo( 'CanvasTexture', () => {
 

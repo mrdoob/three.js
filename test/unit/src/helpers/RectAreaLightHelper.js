@@ -5,7 +5,7 @@
 
 import { RectAreaLightHelper } from '../../../../src/helpers/RectAreaLightHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'RectAreaLightHelper', () => {
 

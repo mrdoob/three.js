@@ -4,6 +4,9 @@
 /* global QUnit */
 
 import { PropertyBinding } from '../../../../src/animation/PropertyBinding';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { Mesh } from '../../../../src/objects/Mesh';
+import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
 
 export default QUnit.module( 'Animation', () => {
 
@@ -193,7 +196,7 @@ export default QUnit.module( 'Animation', () => {
 				]
 			];
 
-			paths.forEach( function ( path, i ) {
+			paths.forEach( function ( path ) {
 
 				assert.smartEqual(
 					PropertyBinding.parseTrackName( path[ 0 ] ),
@@ -202,6 +205,7 @@ export default QUnit.module( 'Animation', () => {
 				);
 
 			} );
+
 		} );
 
 		QUnit.test( 'sanitizeNodeName', function ( assert ) {
@@ -233,7 +237,7 @@ export default QUnit.module( 'Animation', () => {
 				'.material[opacity]'
 			];
 
-			paths.forEach( function ( path, i ) {
+			paths.forEach( function ( path ) {
 
 				var originalValue = 0;
 				var expectedValue = 1;

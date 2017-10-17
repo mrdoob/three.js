@@ -5,7 +5,7 @@
 
 import { DirectionalLightHelper } from '../../../../src/helpers/DirectionalLightHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'DirectionalLightHelper', () => {
 

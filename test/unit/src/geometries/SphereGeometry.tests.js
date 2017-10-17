@@ -9,9 +9,9 @@ import {
 	SphereBufferGeometry
 } from '../../../../src/geometries/SphereGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'SphereGeometry', ( hooks ) => {
+	QUnit.module( 'SphereGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 
@@ -46,7 +46,7 @@ export default QUnit.module.todo( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'SphereBufferGeometry', ( hooks ) => {
+	QUnit.module( 'SphereBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

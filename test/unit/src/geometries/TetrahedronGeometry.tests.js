@@ -9,9 +9,9 @@ import {
 	TetrahedronBufferGeometry
 } from '../../../../src/geometries/TetrahedronGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'TetrahedronGeometry', ( hooks ) => {
+	QUnit.module( 'TetrahedronGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 
@@ -41,7 +41,7 @@ export default QUnit.module.todo( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'SphereBufferGeometry', ( hooks ) => {
+	QUnit.module( 'SphereBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

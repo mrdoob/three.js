@@ -9,9 +9,9 @@ import {
 	TorusBufferGeometry
 } from '../../../../src/geometries/TorusGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'TorusGeometry', ( hooks ) => {
+	QUnit.module( 'TorusGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 
@@ -42,7 +42,7 @@ export default QUnit.module.todo( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'TorusBufferGeometry', ( hooks ) => {
+	QUnit.module( 'TorusBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

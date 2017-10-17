@@ -4,16 +4,33 @@
 /* global QUnit */
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
+import { JSONLoader } from '../../../../src/loaders/JSONLoader';
+import { arrayMax } from '../../../../src/utils';
+import { DirectGeometry } from '../../../../src/core/DirectGeometry';
+import {
+	BufferAttribute,
+	Uint16BufferAttribute,
+	Uint32BufferAttribute,
+	Float32BufferAttribute
+} from '../../../../src/core/BufferAttribute';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
+import { Sphere } from '../../../../src/math/Sphere';
+import { Vector2 } from '../../../../src/math/Vector2';
 import { Geometry } from '../../../../src/core/Geometry';
+import { Face3 } from '../../../../src/core/Face3';
+import { Mesh } from '../../../../src/objects/Mesh';
 import { Color } from '../../../../src/math/Color';
 import { LineSegments as Line } from '../../../../src/objects/LineSegments.js';
+import {
+	x,
+	y,
+	z
+} from '../math/Constants';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'BufferGeometry', () => {
+	QUnit.module( 'BufferGeometry', () => {
 
 		var DegToRad = Math.PI / 180;
 

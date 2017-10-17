@@ -9,9 +9,9 @@ import {
 	RingBufferGeometry
 } from '../../../../src/geometries/RingGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'RingGeometry', ( hooks ) => {
+	QUnit.module( 'RingGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 
@@ -44,7 +44,7 @@ export default QUnit.module.todo( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'RingBufferGeometry', ( hooks ) => {
+	QUnit.module( 'RingBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

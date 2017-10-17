@@ -5,7 +5,7 @@
 
 import { DepthTexture } from '../../../../src/textures/DepthTexture';
 
-export default QUnit.module.todo( 'Textures', () => {
+export default QUnit.module( 'Textures', () => {
 
 	QUnit.module.todo( 'DepthTexture', () => {
 

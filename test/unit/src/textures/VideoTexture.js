@@ -5,7 +5,7 @@
 
 import { VideoTexture } from '../../../../src/textures/VideoTexture';
 
-export default QUnit.module.todo( 'Textures', () => {
+export default QUnit.module( 'Textures', () => {
 
 	QUnit.module.todo( 'VideoTexture', () => {
 

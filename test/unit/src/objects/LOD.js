@@ -5,7 +5,7 @@
 
 import { LOD } from '../../../../src/objects/LOD';
 
-export default QUnit.module.todo( 'Objects', () => {
+export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'LOD', () => {
 

@@ -3,13 +3,13 @@
  */
 /* global QUnit */
 
-import { UniformsUils } from '../../../../../src/renderers/shaders/UniformsUils';
+import { UniformsUtils } from '../../../../../src/renderers/shaders/UniformsUtils';
 
 export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'Shaders', () => {
 
-		QUnit.module.todo( 'UniformsUils', () => {
+		QUnit.module.todo( 'UniformsUtils', () => {
 
 			QUnit.test( 'write me !', ( assert ) => {
 

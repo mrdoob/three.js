@@ -8,7 +8,7 @@ import {
 	TextBufferGeometry
 } from '../../../../src/geometries/TextGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module.todo( 'TextGeometry', ( hooks ) => {
 

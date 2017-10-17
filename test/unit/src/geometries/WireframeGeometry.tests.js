@@ -5,7 +5,7 @@
 
 import { WireframeGeometry } from '../../../../src/geometries/WireframeGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module.todo( 'WireframeGeometry', ( hooks ) => {
 

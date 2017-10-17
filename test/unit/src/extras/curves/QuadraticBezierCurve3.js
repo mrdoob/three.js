@@ -5,9 +5,9 @@
 
 import { QuadraticBezierCurve } from '../../../../../src/extras/curves/QuadraticBezierCurve';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'Curves', () => {
+	QUnit.module( 'Curves', () => {
 
 		QUnit.module.todo( 'QuadraticBezierCurve', () => {
 

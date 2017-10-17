@@ -9,9 +9,9 @@ import { Quaternion } from '../../../../src/math/Quaternion';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { x, y, z } from './Constants';
 
-export default QUnit.module.todo( 'Maths', () => {
+export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Euler', () => {
+	QUnit.module( 'Euler', () => {
 
 		var eulerZero = new Euler( 0, 0, 0, "XYZ" );
 		var eulerAxyz = new Euler( 1, 0, 0, "XYZ" );

@@ -8,9 +8,9 @@ import { Cylindrical } from '../../../../src/math/Cylindrical';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { eps } from './Constants';
 
-export default QUnit.module.todo( 'Maths', () => {
+export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Cylindrical', () => {
+	QUnit.module( 'Cylindrical', () => {
 
 		QUnit.test( "constructor", function ( assert ) {
 

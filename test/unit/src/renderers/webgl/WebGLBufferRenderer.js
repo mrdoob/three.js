@@ -3,13 +3,13 @@
  */
 /* global QUnit */
 
-import { WebGLBufferRender } from '../../../../../src/renderers/webgl/WebGLBufferRender';
+import { WebGLBufferRenderer } from '../../../../../src/renderers/webgl/WebGLBufferRenderer';
 
 export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module.todo( 'WebGLBufferRender', () => {
+		QUnit.module.todo( 'WebGLBufferRenderer', () => {
 
 			QUnit.test( 'write me !', ( assert ) => {
 

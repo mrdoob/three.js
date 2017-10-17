@@ -6,9 +6,9 @@
 
 import { HemisphereLight } from '../../../../src/lights/HemisphereLight';
 
-export default QUnit.module.todo( 'Lights', () => {
+export default QUnit.module( 'Lights', () => {
 
-	QUnit.module.todo( 'HemisphereLight', ( hooks ) => {
+	QUnit.module( 'HemisphereLight', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

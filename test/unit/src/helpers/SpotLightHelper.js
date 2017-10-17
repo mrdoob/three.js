@@ -5,7 +5,7 @@
 
 import { SpotLightHelper } from '../../../../src/helpers/SpotLightHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'SpotLightHelper', () => {
 

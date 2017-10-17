@@ -8,7 +8,7 @@ import {
 	PolyhedronBufferGeometry
 } from '../../../../src/geometries/PolyhedronGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module.todo( 'PolyhedronGeometry', ( hooks ) => {
 

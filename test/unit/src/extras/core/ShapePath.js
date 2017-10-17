@@ -5,9 +5,9 @@
 
 import { ShapePath } from '../../../../../src/extras/core/ShapePath';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'Core', () => {
+	QUnit.module( 'Core', () => {
 
 		QUnit.module.todo( 'ShapePath', () => {
 

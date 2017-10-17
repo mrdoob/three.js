@@ -5,9 +5,9 @@
 
 import { PathPrototype } from '../../../../../src/extras/core/PathPrototype';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'Core', () => {
+	QUnit.module( 'Core', () => {
 
 		QUnit.module.todo( 'PathPrototype', () => {
 

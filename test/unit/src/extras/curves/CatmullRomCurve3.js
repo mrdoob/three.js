@@ -6,11 +6,11 @@
 import { CatmullRomCurve3 } from '../../../../../src/extras/curves/CatmullRomCurve3';
 import { Vector3 } from '../../../../../src/math/Vector3';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'Curves', () => {
+	QUnit.module( 'Curves', () => {
 
-		QUnit.module.todo( 'CatmullRomCurve3', () => {
+		QUnit.module( 'CatmullRomCurve3', () => {
 
 			/* eslint-disable */
 			var positions = [

@@ -8,6 +8,13 @@ import { Vector3 } from '../../../../src/math/Vector3';
 import { Euler } from '../../../../src/math/Euler';
 import { Quaternion } from '../../../../src/math/Quaternion';
 import { Matrix4 } from '../../../../src/math/Matrix4';
+import {
+	x,
+	y,
+	z,
+	w,
+	eps
+} from '../math/Constants';
 
 export default QUnit.module( 'Core', () => {
 
@@ -162,7 +169,7 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after rotation" );
 
 			axis.set( 1, 0, 0 );
-			angle = 0;
+			var angle = 0;
 			expected.set( 0, 0, 0 );
 
 			a.setRotationFromAxisAngle( axis, angle );
@@ -494,7 +501,7 @@ export default QUnit.module( 'Core', () => {
 			} );
 			assert.deepEqual( names, expectedNormal, "Traversed objects in expected order" );
 
-			names = [];
+			var names = [];
 			a.traverseVisible( function ( obj ) {
 
 				names.push( obj.name );
@@ -502,7 +509,7 @@ export default QUnit.module( 'Core', () => {
 			} );
 			assert.deepEqual( names, expectedVisible, "Traversed visible objects in expected order" );
 
-			names = [];
+			var names = [];
 			c.traverseAncestors( function ( obj ) {
 
 				names.push( obj.name );

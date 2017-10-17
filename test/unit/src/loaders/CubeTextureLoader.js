@@ -5,7 +5,7 @@
 
 import { CubeTextureLoader } from '../../../../src/loaders/CubeTextureLoader';
 
-export default QUnit.module.todo( 'Loaders', () => {
+export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'CubeTextureLoader', () => {
 

@@ -5,7 +5,7 @@
 
 import { Line } from '../../../../src/objects/Line';
 
-export default QUnit.module.todo( 'Objects', () => {
+export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'Line', () => {
 

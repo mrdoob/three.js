@@ -5,7 +5,7 @@
 
 import { CameraHelper } from '../../../../src/helpers/CameraHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'CameraHelper', () => {
 

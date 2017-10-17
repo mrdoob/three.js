@@ -5,7 +5,7 @@
 
 import { FogExp2 } from '../../../../src/scenes/FogExp2';
 
-export default QUnit.module.todo( 'FoxExp2', () => {
+export default QUnit.module( 'FoxExp2', () => {
 
 	QUnit.module.todo( 'Scene', () => {
 

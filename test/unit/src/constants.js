@@ -5,7 +5,7 @@
 
 import * as Constants from '../../../src/constants';
 
-export default QUnit.module.todo( 'Constants', () => {
+export default QUnit.module( 'Constants', () => {
 
 	QUnit.test( "default values", ( assert ) => {
 

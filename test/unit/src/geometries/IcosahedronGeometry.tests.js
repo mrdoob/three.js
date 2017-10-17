@@ -6,9 +6,9 @@
 
 import { IcosahedronGeometry, IcosahedronBufferGeometry } from '../../../../src/geometries/IcosahedronGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'IcosahedronGeometry', ( hooks ) => {
+	QUnit.module( 'IcosahedronGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 
@@ -33,7 +33,7 @@ export default QUnit.module.todo( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'IcosahedronBufferGeometry', ( hooks ) => {
+	QUnit.module( 'IcosahedronBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

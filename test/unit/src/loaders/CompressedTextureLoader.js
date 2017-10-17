@@ -5,7 +5,7 @@
 
 import { CompressedTextureLoader } from '../../../../src/loaders/CompressedTextureLoader';
 
-export default QUnit.module.todo( 'Loaders', () => {
+export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'CompressedTextureLoader', () => {
 

@@ -9,9 +9,9 @@ import {
 	PlaneBufferGeometry
 } from '../../../../src/geometries/PlaneGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'PlaneGeometry', ( hooks ) => {
+	QUnit.module( 'PlaneGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 
@@ -40,7 +40,7 @@ export default QUnit.module.todo( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'PlaneBufferGeometry', ( hooks ) => {
+	QUnit.module( 'PlaneBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

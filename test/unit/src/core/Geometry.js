@@ -6,9 +6,17 @@
 import { Geometry } from '../../../../src/core/Geometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry';
+import { DodecahedronGeometry } from '../../../../src/geometries/DodecahedronGeometry';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Face3 } from '../../../../src/core/Face3';
+import {
+	x,
+	y,
+	z,
+	eps
+} from '../math/Constants';
 
 export default QUnit.module( 'Core', () => {
 
@@ -139,7 +147,7 @@ export default QUnit.module( 'Core', () => {
 				new Vector3( 2.5, 3, 4 ),
 				new Vector3( 2, 3, 5 )
 			];
-			var v1, v2, v3;
+			var v0, v1, v2;
 
 			m.makeRotationX( Math.PI / 2 );
 			m.setPosition( new Vector3( x, y, z ) );
@@ -209,7 +217,7 @@ export default QUnit.module( 'Core', () => {
 
 			for ( var i = 0; i < a.vertices.length; i ++ ) {
 
-				v = a.vertices[ i ];
+				var v = a.vertices[ i ];
 				assert.ok(
 					Math.abs( v.x - expected[ i ].x ) <= eps &&
 					Math.abs( v.y - expected[ i ].y ) <= eps &&

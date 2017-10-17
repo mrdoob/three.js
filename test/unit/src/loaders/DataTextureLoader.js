@@ -5,7 +5,7 @@
 
 import { DataTextureLoader } from '../../../../src/loaders/DataTextureLoader';
 
-export default QUnit.module.todo( 'Loaders', () => {
+export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'DataTextureLoader', () => {
 

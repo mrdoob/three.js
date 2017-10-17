@@ -30,8 +30,8 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( instance.data.array[ 0 ] === 123 &&
 				instance.data.array[ 3 ] === 321, "x was calculated correct based on index and default offset" );
 
-			buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
-			instance = new InterleavedBufferAttribute( buffer, 2, 1 );
+			var buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
+			var instance = new InterleavedBufferAttribute( buffer, 2, 1 );
 
 			instance.setX( 0, 123 );
 			instance.setX( 1, 321 );

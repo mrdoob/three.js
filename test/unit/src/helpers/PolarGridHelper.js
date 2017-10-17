@@ -5,7 +5,7 @@
 
 import { PolarGridHelper } from '../../../../src/helpers/PolarGridHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'PolarGridHelper', () => {
 

@@ -9,9 +9,9 @@ import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
 import { SphereGeometry } from '../../../../src/geometries/SphereGeometry';
 import { Mesh } from '../../../../src/objects/Mesh';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'BoxHelper', ( hooks ) => {
+	QUnit.module( 'BoxHelper', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

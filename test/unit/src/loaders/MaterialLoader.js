@@ -5,7 +5,7 @@
 
 import { MaterialLoader } from '../../../../src/loaders/MaterialLoader';
 
-export default QUnit.module.todo( 'Loaders', () => {
+export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'MaterialLoader', () => {
 

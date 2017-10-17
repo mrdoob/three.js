@@ -5,7 +5,7 @@
 
 import { ArrowHelper } from '../../../../src/helpers/ArrowHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'ArrowHelper', () => {
 

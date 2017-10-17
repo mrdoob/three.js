@@ -9,9 +9,9 @@ import {
 	OctahedronBufferGeometry
 } from '../../../../src/geometries/OctahedronGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'OctahedronGeometry', ( hooks ) => {
+	QUnit.module( 'OctahedronGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 
@@ -36,7 +36,7 @@ export default QUnit.module.todo( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'OctahedronBufferGeometry', ( hooks ) => {
+	QUnit.module( 'OctahedronBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

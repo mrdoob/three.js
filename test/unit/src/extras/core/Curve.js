@@ -5,9 +5,9 @@
 
 import { Curve } from '../../../../../src/extras/core/Curve';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'Core', () => {
+	QUnit.module( 'Core', () => {
 
 		QUnit.module.todo( 'Curve', () => {
 

@@ -5,9 +5,9 @@
 
 import { LineCurve } from '../../../../../src/extras/curves/LineCurve';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'Curves', () => {
+	QUnit.module( 'Curves', () => {
 
 		QUnit.module.todo( 'LineCurve', () => {
 

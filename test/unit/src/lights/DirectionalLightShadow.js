@@ -5,7 +5,7 @@
 
 import { DirectionalLightShadow } from '../../../../src/lights/DirectionalLightShadow';
 
-export default QUnit.module.todo( 'Lights', () => {
+export default QUnit.module( 'Lights', () => {
 
 	QUnit.module.todo( 'DirectionalLightShadow', () => {
 

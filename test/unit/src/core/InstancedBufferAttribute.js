@@ -14,7 +14,7 @@ export default QUnit.module( 'Core', () => {
 			var instance = new InstancedBufferAttribute( new Float32Array( 10 ), 2 );
 			assert.ok( instance.meshPerAttribute === 1, "ok" );
 
-			instance = new InstancedBufferAttribute( new Float32Array( 10 ), 2, 123 );
+			var instance = new InstancedBufferAttribute( new Float32Array( 10 ), 2, 123 );
 			assert.ok( instance.meshPerAttribute === 123, "ok" );
 
 		} );

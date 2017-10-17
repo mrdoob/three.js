@@ -5,7 +5,7 @@
 
 import { FontLoader } from '../../../../src/loaders/FontLoader';
 
-export default QUnit.module.todo( 'Loaders', () => {
+export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'FontLoader', () => {
 

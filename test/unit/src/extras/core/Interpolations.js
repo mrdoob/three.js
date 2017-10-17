@@ -3,11 +3,11 @@
  */
 /* global QUnit */
 
-import { Interpolations } from '../../../../../src/extras/core/Interpolations';
+import { CatmullRom, QuadraticBezier, CubicBezier } from '../../../../../src/extras/core/Interpolations';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'Core', () => {
+	QUnit.module( 'Core', () => {
 
 		QUnit.module.todo( 'Interpolations', () => {
 

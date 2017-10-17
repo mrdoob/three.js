@@ -8,7 +8,7 @@ import {
 	TubeBufferGeometry
 } from '../../../../src/geometries/TubeGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module.todo( 'TubeGeometry', ( hooks ) => {
 

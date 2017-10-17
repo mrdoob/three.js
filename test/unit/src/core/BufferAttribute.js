@@ -4,10 +4,14 @@
 /* global QUnit */
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
+import { Color } from '../../../../src/math/Color';
+import { Vector2 } from '../../../../src/math/Vector2';
+import { Vector3 } from '../../../../src/math/Vector3';
+import { Vector4 } from '../../../../src/math/Vector4';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'BufferAttribute', () => {
+	QUnit.module( 'BufferAttribute', () => {
 
 		QUnit.test( "count", function ( assert ) {
 
@@ -142,7 +146,9 @@ export default QUnit.module( 'Core', () => {
 
 			assert.ok( attr.array.length === attrCopy.array.length, 'attribute was cloned' );
 			for ( var i = 0; i < attr.array.length; i ++ ) {
+
 				assert.ok( attr.array[ i ] === attrCopy.array[ i ], 'array item is equal' );
+
 			}
 
 		} );

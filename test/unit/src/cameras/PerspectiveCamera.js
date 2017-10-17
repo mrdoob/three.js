@@ -8,7 +8,7 @@ import { Matrix4 } from '../../../../src/math/Matrix4';
 
 export default QUnit.module( 'Cameras', () => {
 
-	QUnit.module.todo( 'PerspectiveCamera', () => {
+	QUnit.module( 'PerspectiveCamera', () => {
 
 		// see e.g. math/Matrix4.js
 		var matrixEquals4 = function ( a, b, tolerance ) {
@@ -65,8 +65,6 @@ export default QUnit.module( 'Cameras', () => {
 
 			var near = 1,
 				far = 3,
-				bottom = - 1,
-				top = 1,
 				aspect = 16 / 9,
 				fov = 90;
 

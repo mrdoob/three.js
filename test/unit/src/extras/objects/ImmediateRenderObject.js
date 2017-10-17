@@ -5,9 +5,9 @@
 
 import { ImmediateRenderObject } from '../../../../../src/extras/objects/ImmediateRenderObject';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'Objects', () => {
+	QUnit.module( 'Objects', () => {
 
 		QUnit.module.todo( 'ImmediateRenderObject', () => {
 

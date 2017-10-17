@@ -5,7 +5,7 @@
 
 import { ExtrudeGeometry, ExtrudeBufferGeometry } from '../../../../src/geometries/ExtrudeGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module.todo( 'ExtrudeGeometry', () => {
 

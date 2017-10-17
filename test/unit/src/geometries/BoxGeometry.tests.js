@@ -9,9 +9,9 @@ import {
 	BoxBufferGeometry
 } from '../../../../src/geometries/BoxGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'BoxGeometry', ( hooks ) => {
+	QUnit.module( 'BoxGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 
@@ -40,7 +40,7 @@ export default QUnit.module.todo( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'BoxBufferGeometry', ( hooks ) => {
+	QUnit.module( 'BoxBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

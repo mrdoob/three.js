@@ -6,7 +6,9 @@
 import { Raycaster } from '../../../../src/core/Raycaster';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Mesh } from '../../../../src/objects/Mesh';
+import { SphereGeometry } from '../../../../src/geometries/SphereGeometry';
 import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera';
+import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera';
 
 export default QUnit.module( 'Core', () => {
 
@@ -88,16 +90,14 @@ export default QUnit.module( 'Core', () => {
 
 		function checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert ) {
 
-			assert.ok( refVector.x - rayDirection.x <= Number.EPSILON &&
-				refVector.y - rayDirection.y <= Number.EPSILON &&
-				refVector.z - rayDirection.z <= Number.EPSILON,
-				"camera is pointing to the same direction as expected" );
+			assert.ok( refVector.x - rayDirection.x <= Number.EPSILON && refVector.y - rayDirection.y <= Number.EPSILON && refVector.z - rayDirection.z <= Number.EPSILON, "camera is pointing to" +
+				" the same direction as expected" );
 
 		}
 
 		function getRaycaster() {
 
-			return raycaster = new Raycaster(
+			return new Raycaster(
 				new Vector3( 0, 0, 0 ),
 				new Vector3( 0, 0, - 1 ),
 				1,

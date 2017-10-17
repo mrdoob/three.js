@@ -5,7 +5,7 @@
 
 import { PointLightHelper } from '../../../../src/helpers/PointLightHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'PointLightHelper', () => {
 

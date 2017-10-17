@@ -5,7 +5,7 @@
 
 import { AxesHelper } from '../../../../src/helpers/AxesHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'AxesHelper', () => {
 

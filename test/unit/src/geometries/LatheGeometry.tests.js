@@ -8,9 +8,9 @@ import {
 	LatheBufferGeometry
 } from '../../../../src/geometries/LatheGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'LatheGeometry', ( hooks ) => {
+	QUnit.module( 'LatheGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 
@@ -30,7 +30,7 @@ export default QUnit.module.todo( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'LatheBufferGeometry', ( hooks ) => {
+	QUnit.module( 'LatheBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

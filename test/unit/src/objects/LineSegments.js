@@ -5,7 +5,7 @@
 
 import { LineSegments } from '../../../../src/objects/LineSegments';
 
-export default QUnit.module.todo( 'Objects', () => {
+export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'LineSegments', () => {
 

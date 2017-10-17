@@ -5,7 +5,7 @@
 
 import { VertexNormalsHelper } from '../../../../src/helpers/VertexNormalsHelper';
 
-export default QUnit.module.todo( 'Helpers', () => {
+export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'VertexNormalsHelper', () => {
 

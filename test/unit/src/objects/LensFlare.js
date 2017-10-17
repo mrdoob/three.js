@@ -5,7 +5,7 @@
 
 import { LensFlare } from '../../../../src/objects/LensFlare';
 
-export default QUnit.module.todo( 'Objects', () => {
+export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'LensFlare', () => {
 

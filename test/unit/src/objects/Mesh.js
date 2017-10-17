@@ -5,7 +5,7 @@
 
 import { Mesh } from '../../../../src/objects/Mesh';
 
-export default QUnit.module.todo( 'Objects', () => {
+export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'Mesh', () => {
 

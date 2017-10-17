@@ -5,7 +5,7 @@
 
 import { Fog } from '../../../../src/scenes/Fog';
 
-export default QUnit.module.todo( 'Fog', () => {
+export default QUnit.module( 'Fog', () => {
 
 	QUnit.module.todo( 'Scene', () => {
 

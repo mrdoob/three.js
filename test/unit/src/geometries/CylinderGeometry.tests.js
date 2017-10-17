@@ -6,9 +6,9 @@
 
 import { CylinderGeometry, CylinderBufferGeometry } from '../../../../src/geometries/CylinderGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'CylinderGeometry', ( hooks ) => {
+	QUnit.module( 'CylinderGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 
@@ -45,7 +45,7 @@ export default QUnit.module.todo( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'CylinderBufferGeometry', ( hooks ) => {
+	QUnit.module( 'CylinderBufferGeometry', ( hooks ) => {
 
 		hooks.beforeEach( function () {
 

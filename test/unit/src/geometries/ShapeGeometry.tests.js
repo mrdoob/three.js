@@ -8,7 +8,7 @@ import {
 	ShapeBufferGeometry
 } from '../../../../src/geometries/ShapeGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module.todo( 'ShapeGeometry', ( hooks ) => {
 

@@ -5,7 +5,7 @@
 
 import { DataTexture } from '../../../../src/textures/DataTexture';
 
-export default QUnit.module.todo( 'Textures', () => {
+export default QUnit.module( 'Textures', () => {
 
 	QUnit.module.todo( 'DataTexture', () => {
 

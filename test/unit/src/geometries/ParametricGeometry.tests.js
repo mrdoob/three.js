@@ -8,7 +8,7 @@ import {
 	ParametricBufferGeometry
 } from '../../../../src/geometries/ParametricGeometry';
 
-export default QUnit.module.todo( 'Geometries', () => {
+export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module.todo( 'ParametricGeometry', ( hooks ) => {
 

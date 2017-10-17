@@ -4,6 +4,8 @@
 /* global QUnit */
 
 import { Face3 } from '../../../../src/core/Face3';
+import { Color } from '../../../../src/math/Color';
+import { Vector3 } from '../../../../src/math/Vector3';
 
 export default QUnit.module( 'Core', () => {
 

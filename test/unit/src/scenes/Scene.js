@@ -5,7 +5,7 @@
 
 import { Scene } from '../../../../src/scenes/Scene';
 
-export default QUnit.module.todo( 'Scenes', () => {
+export default QUnit.module( 'Scenes', () => {
 
 	QUnit.module.todo( 'Scene', () => {
 

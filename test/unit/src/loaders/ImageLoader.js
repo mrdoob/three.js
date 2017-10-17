@@ -5,7 +5,7 @@
 
 import { ImageLoader } from '../../../../src/loaders/ImageLoader';
 
-export default QUnit.module.todo( 'Loaders', () => {
+export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'ImageLoader', () => {
 

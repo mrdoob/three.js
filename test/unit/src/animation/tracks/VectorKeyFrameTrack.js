@@ -3,13 +3,13 @@
  */
 /* global QUnit */
 
-import { VectorKeyFrameTrack } from '../../../../../src/animation/tracks/VectorKeyframeTrack';
+import { VectorKeyframeTrack } from '../../../../../src/animation/tracks/VectorKeyframeTrack';
 
 export default QUnit.module( 'Animation', () => {
 
 	QUnit.module( 'Tracks', () => {
 
-		QUnit.module.todo( 'VectorKeyFrameTrack', () => {
+		QUnit.module.todo( 'VectorKeyframeTrack', () => {
 
 			QUnit.test( 'write me !', ( assert ) => {
 

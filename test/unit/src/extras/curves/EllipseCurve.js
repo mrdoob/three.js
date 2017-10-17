@@ -5,9 +5,9 @@
 
 import { EllipseCurve } from '../../../../../src/extras/curves/EllipseCurve';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'Curves', () => {
+	QUnit.module( 'Curves', () => {
 
 		QUnit.module.todo( 'EllipseCurve', () => {
 

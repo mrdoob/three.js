@@ -5,7 +5,7 @@
 
 import { Sprite } from '../../../../src/objects/Sprite';
 
-export default QUnit.module.todo( 'Objects', () => {
+export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'Sprite', () => {
 

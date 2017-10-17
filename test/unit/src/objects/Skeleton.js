@@ -5,7 +5,7 @@
 
 import { Skeleton } from '../../../../src/objects/Skeleton';
 
-export default QUnit.module.todo( 'Objects', () => {
+export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'Skeleton', () => {
 
