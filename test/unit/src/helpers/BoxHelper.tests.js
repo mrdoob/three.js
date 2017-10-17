@@ -13,6 +13,7 @@ export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module( 'BoxHelper', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -36,13 +37,13 @@ export default QUnit.module( 'Helpers', () => {
 			var sphereBoxHelper = new BoxHelper( sphere );
 
 			// Note that unlike what I'd like to, these doesn't check the equivalency of the two generated geometries
-			this.geometries = [ boxHelper.geometry, sphereBoxHelper.geometry ];
+			geometries = [ boxHelper.geometry, sphereBoxHelper.geometry ];
 
 		} );
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
