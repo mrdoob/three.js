@@ -13,6 +13,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'PlaneGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -22,7 +23,7 @@ export default QUnit.module( 'Geometries', () => {
 				heightSegments: 5
 			};
 
-			this.geometries = [
+			geometries = [
 				new PlaneGeometry(),
 				new PlaneGeometry( parameters.width ),
 				new PlaneGeometry( parameters.width, parameters.height ),
@@ -34,7 +35,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
@@ -42,6 +43,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'PlaneBufferGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -51,7 +53,7 @@ export default QUnit.module( 'Geometries', () => {
 				heightSegments: 5
 			};
 
-			this.geometries = [
+			geometries = [
 				new PlaneBufferGeometry(),
 				new PlaneBufferGeometry( parameters.width ),
 				new PlaneBufferGeometry( parameters.width, parameters.height ),
@@ -63,7 +65,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 

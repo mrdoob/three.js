@@ -95,13 +95,13 @@ export default QUnit.module( 'Core', () => {
 			var a = new Layers();
 			var b = new Layers();
 
-			assert.ok( a.QUnit.test( b ), "Start out true" );
+			assert.ok( a.test( b ), "Start out true" );
 
 			a.set( 1 );
-			assert.notOk( a.QUnit.test( b ), "Set channel 1 in a and fail the QUnit.test" );
+			assert.notOk( a.test( b ), "Set channel 1 in a and fail the QUnit.test" );
 
 			b.toggle( 1 );
-			assert.ok( a.QUnit.test( b ), "Toggle channel 1 in b and pass again" );
+			assert.ok( a.test( b ), "Toggle channel 1 in b and pass again" );
 
 		} );
 

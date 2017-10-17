@@ -12,11 +12,12 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'LatheGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {};
 
-			this.geometries = [
+			geometries = [
 				new LatheGeometry()
 			];
 
@@ -24,7 +25,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
@@ -32,11 +33,12 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'LatheBufferGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {};
 
-			this.geometries = [
+			geometries = [
 				new LatheBufferGeometry()
 			];
 
@@ -44,7 +46,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 

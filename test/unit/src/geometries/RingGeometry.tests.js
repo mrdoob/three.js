@@ -13,6 +13,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'RingGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -24,7 +25,7 @@ export default QUnit.module( 'Geometries', () => {
 				thetaLength: 2.0
 			};
 
-			this.geometries = [
+			geometries = [
 				new RingGeometry(),
 				new RingGeometry( parameters.innerRadius ),
 				new RingGeometry( parameters.innerRadius, parameters.outerRadius ),
@@ -38,7 +39,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
@@ -46,6 +47,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'RingBufferGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -57,7 +59,7 @@ export default QUnit.module( 'Geometries', () => {
 				thetaLength: 2.0
 			};
 
-			this.geometries = [
+			geometries = [
 				new RingBufferGeometry(),
 				new RingBufferGeometry( parameters.innerRadius ),
 				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius ),
@@ -71,7 +73,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 

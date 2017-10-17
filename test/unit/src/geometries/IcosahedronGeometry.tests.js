@@ -13,6 +13,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'IcosahedronGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -20,7 +21,7 @@ export default QUnit.module( 'Geometries', () => {
 				detail: undefined
 			};
 
-			this.geometries = [
+			geometries = [
 				new IcosahedronGeometry(),
 				new IcosahedronGeometry( parameters.radius ),
 				new IcosahedronGeometry( parameters.radius, parameters.detail ),
@@ -30,7 +31,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
@@ -38,6 +39,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'IcosahedronBufferGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -45,7 +47,7 @@ export default QUnit.module( 'Geometries', () => {
 				detail: undefined
 			};
 
-			this.geometries = [
+			geometries = [
 				new IcosahedronBufferGeometry(),
 				new IcosahedronBufferGeometry( parameters.radius ),
 				new IcosahedronBufferGeometry( parameters.radius, parameters.detail ),
@@ -55,7 +57,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 

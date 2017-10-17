@@ -4,12 +4,16 @@
  */
 /* global QUnit */
 
-import { CylinderGeometry, CylinderBufferGeometry } from '../../../../src/geometries/CylinderGeometry';
+import {
+	CylinderGeometry,
+	CylinderBufferGeometry
+} from '../../../../src/geometries/CylinderGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'CylinderGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -23,7 +27,7 @@ export default QUnit.module( 'Geometries', () => {
 				thetaLength: 2.0,
 			};
 
-			this.geometries = [
+			geometries = [
 				new CylinderGeometry(),
 				new CylinderGeometry( parameters.radiusTop ),
 				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom ),
@@ -39,7 +43,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
@@ -47,6 +51,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'CylinderBufferGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -60,7 +65,7 @@ export default QUnit.module( 'Geometries', () => {
 				thetaLength: 2.0,
 			};
 
-			this.geometries = [
+			geometries = [
 				new CylinderBufferGeometry(),
 				new CylinderBufferGeometry( parameters.radiusTop ),
 				new CylinderBufferGeometry( parameters.radiusTop, parameters.radiusBottom ),
@@ -76,7 +81,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 

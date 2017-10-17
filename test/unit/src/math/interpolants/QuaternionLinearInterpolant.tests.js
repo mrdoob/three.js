@@ -3,13 +3,13 @@
  */
 /* global QUnit */
 
-import { QuanternionLinearInterpolant } from '../../../../../src/math/interpolants/QuanternionLinearInterpolant';
+import { QuaternionLinearInterpolant } from '../../../../../src/math/interpolants/QuaternionLinearInterpolant';
 
 export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Interpolants', () => {
 
-		QUnit.module.todo( 'QuanternionLinearInterpolant', () => {
+		QUnit.module.todo( 'QuaternionLinearInterpolant', () => {
 
 			QUnit.test( 'write me !', ( assert ) => {
 

@@ -10,6 +10,7 @@ export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'RectAreaLight', ( hooks ) => {
 
+		var lights = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -17,7 +18,7 @@ export default QUnit.module( 'Lights', () => {
 				intensity: 0.5
 			};
 
-			this.lights = [
+			lights = [
 				new RectAreaLight( parameters.color ),
 				new RectAreaLight( parameters.color, parameters.intensity ),
 				new RectAreaLight( parameters.color, parameters.intensity, 5.0 ),
@@ -29,7 +30,7 @@ export default QUnit.module( 'Lights', () => {
 
 		QUnit.test( 'Standard light tests', ( assert ) => {
 
-			runStdLightTests( assert, this.lights );
+			runStdLightTests( assert, lights );
 
 		} );
 

@@ -13,6 +13,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'BoxGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -24,7 +25,7 @@ export default QUnit.module( 'Geometries', () => {
 				depthSegments: 4
 			};
 
-			this.geometries = [
+			geometries = [
 				new BoxGeometry(),
 				new BoxGeometry( parameters.width, parameters.height, parameters.depth ),
 				new BoxGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments )
@@ -34,7 +35,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
@@ -42,6 +43,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'BoxBufferGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -53,7 +55,7 @@ export default QUnit.module( 'Geometries', () => {
 				depthSegments: 4
 			};
 
-			this.geometries = [
+			geometries = [
 				new BoxBufferGeometry(),
 				new BoxBufferGeometry( parameters.width, parameters.height, parameters.depth ),
 				new BoxBufferGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments )
@@ -63,7 +65,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 

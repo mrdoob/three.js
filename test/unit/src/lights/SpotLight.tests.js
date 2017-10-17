@@ -10,6 +10,7 @@ export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'SpotLight', ( hooks ) => {
 
+		var lights = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -21,7 +22,7 @@ export default QUnit.module( 'Lights', () => {
 				decay: 2
 			};
 
-			this.lights = [
+			lights = [
 				new SpotLight( parameters.color ),
 				new SpotLight( parameters.color, parameters.intensity ),
 				new SpotLight( parameters.color, parameters.intensity, parameters.distance ),
@@ -34,7 +35,7 @@ export default QUnit.module( 'Lights', () => {
 
 		QUnit.test( 'Standard light tests', ( assert ) => {
 
-			runStdLightTests( assert, this.lights );
+			runStdLightTests( assert, lights );
 
 		} );
 

@@ -13,6 +13,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'TetrahedronGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -20,7 +21,7 @@ export default QUnit.module( 'Geometries', () => {
 				detail: undefined
 			};
 
-			this.geometries = [
+			geometries = [
 				new TetrahedronGeometry(),
 				new TetrahedronGeometry( parameters.radius ),
 				new TetrahedronGeometry( parameters.radius, parameters.widthSegments ),
@@ -35,7 +36,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
@@ -43,6 +44,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'SphereBufferGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -50,7 +52,7 @@ export default QUnit.module( 'Geometries', () => {
 				detail: undefined
 			};
 
-			this.geometries = [
+			geometries = [
 				new TetrahedronBufferGeometry(),
 				new TetrahedronBufferGeometry( parameters.radius ),
 				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments ),
@@ -65,7 +67,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 

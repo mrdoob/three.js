@@ -10,13 +10,14 @@ export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'ArrowHelper', ( hooks ) => {
 
+		var lights = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
 				color: 0xaaaaaa
 			};
 
-			this.lights = [
+			lights = [
 				new AmbientLight(),
 				new AmbientLight( parameters.color )
 			];
@@ -25,7 +26,7 @@ export default QUnit.module( 'Lights', () => {
 
 		QUnit.test( 'Standard light tests', ( assert ) => {
 
-			runStdLightTests( assert, this.lights );
+			runStdLightTests( assert, lights );
 
 		} );
 

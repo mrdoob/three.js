@@ -13,6 +13,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'SphereGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -24,7 +25,7 @@ export default QUnit.module( 'Geometries', () => {
 				q: 2
 			};
 
-			this.geometries = [
+			geometries = [
 				new TorusKnotGeometry(),
 				new TorusKnotGeometry( parameters.radius ),
 				new TorusKnotGeometry( parameters.radius, parameters.tube ),
@@ -37,7 +38,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
@@ -45,6 +46,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'TorusKnotBufferGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -56,7 +58,7 @@ export default QUnit.module( 'Geometries', () => {
 				q: 2
 			};
 
-			this.geometries = [
+			geometries = [
 				new TorusKnotBufferGeometry(),
 				new TorusKnotBufferGeometry( parameters.radius ),
 				new TorusKnotBufferGeometry( parameters.radius, parameters.tube ),
@@ -69,7 +71,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 

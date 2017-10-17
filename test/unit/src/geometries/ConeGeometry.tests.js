@@ -12,11 +12,12 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'ConeGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {};
 
-			this.geometries = [
+			geometries = [
 				new ConeGeometry()
 			];
 
@@ -24,7 +25,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
@@ -32,11 +33,12 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'ConeBufferGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {};
 
-			this.geometries = [
+			geometries = [
 				new ConeBufferGeometry()
 			];
 
@@ -44,7 +46,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 

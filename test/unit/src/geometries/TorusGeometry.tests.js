@@ -13,6 +13,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'TorusGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -23,7 +24,7 @@ export default QUnit.module( 'Geometries', () => {
 				arc: 2.0,
 			};
 
-			this.geometries = [
+			geometries = [
 				new TorusGeometry(),
 				new TorusGeometry( parameters.radius ),
 				new TorusGeometry( parameters.radius, parameters.tube ),
@@ -36,7 +37,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
@@ -44,6 +45,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'TorusBufferGeometry', ( hooks ) => {
 
+		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -54,7 +56,7 @@ export default QUnit.module( 'Geometries', () => {
 				arc: 2.0,
 			};
 
-			this.geometries = [
+			geometries = [
 				new TorusBufferGeometry(),
 				new TorusBufferGeometry( parameters.radius ),
 				new TorusBufferGeometry( parameters.radius, parameters.tube ),
@@ -67,7 +69,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
-			runStdGeometryTests( assert, this.geometries );
+			runStdGeometryTests( assert, geometries );
 
 		} );
 
