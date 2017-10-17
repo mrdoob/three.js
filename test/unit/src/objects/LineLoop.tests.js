@@ -3,11 +3,11 @@
  */
 /* global QUnit */
 
-import { MultiMaterial } from '../../../../src/materials/MultiMaterial';
+import { LineLoop } from '../../../../src/objects/LineLoop';
 
-export default QUnit.module( 'Materials', () => {
+export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'MultiMaterial', () => {
+	QUnit.module.todo( 'LineLoop', () => {
 
 		QUnit.test( 'write me !', ( assert ) => {
 
