@@ -24,65 +24,47 @@ Object.assign( ImageLoader.prototype, {
 
 		var scope = this;
 
-		var cached = Cache.get( url );
+		return Cache.retrieve(url, function(_onLoad, _onProgress, _onError) {
 
-		if ( cached !== undefined ) {
+			var image = document.createElementNS('http://www.w3.org/1999/xhtml', 'img');
 
-			scope.manager.itemStart( url );
+			image.addEventListener('load', function () {
 
-			setTimeout( function () {
+				_onLoad(this);
 
-				if ( onLoad ) onLoad( cached );
+				scope.manager.itemEnd(url);
 
-				scope.manager.itemEnd( url );
+			}, false);
 
-			}, 0 );
+			/*
+			image.addEventListener( 'progress', function ( event ) {
 
-			return cached;
+				if ( onProgress ) onProgress( event );
 
-		}
+			}, false );
+			*/
 
-		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+			image.addEventListener('error', function (event) {
 
-		image.addEventListener( 'load', function () {
+				_onError(event);
 
-			Cache.add( url, this );
+				scope.manager.itemEnd(url);
+				scope.manager.itemError(url);
 
-			if ( onLoad ) onLoad( this );
+			}, false);
 
-			scope.manager.itemEnd( url );
+			if (url.substr(0, 5) !== 'data:') {
 
-		}, false );
+				if (scope.crossOrigin !== undefined) image.crossOrigin = scope.crossOrigin;
 
-		/*
-		image.addEventListener( 'progress', function ( event ) {
+			}
 
-			if ( onProgress ) onProgress( event );
+			scope.manager.itemStart(url);
 
-		}, false );
-		*/
+			image.src = url;
 
-		image.addEventListener( 'error', function ( event ) {
-
-			if ( onError ) onError( event );
-
-			scope.manager.itemEnd( url );
-			scope.manager.itemError( url );
-
-		}, false );
-
-		if ( url.substr( 0, 5 ) !== 'data:' ) {
-
-			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
-
-		}
-
-		scope.manager.itemStart( url );
-
-		image.src = url;
-
-		return image;
-
+			return image;
+		}, onLoad, onProgress, onError);
 	},
 
 	setCrossOrigin: function ( value ) {
