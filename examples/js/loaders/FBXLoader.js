@@ -386,17 +386,13 @@
 		texture.wrapS = valueU === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 		texture.wrapT = valueV === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 
-		if ( textureNode.properties.Scaling ) {
+		if ( 'Scaling' in textureNode.properties ) {
 
 			values = textureNode.properties.Scaling.value;
 
 			if ( typeof values === 'string' ) {
 
-				values = values.split( ',' ).map( function( number ) {
-
-					return parseFloat( number );
-
-				} );
+				values = parseFloatArray( values );
 
 			}
 
