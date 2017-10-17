@@ -99,7 +99,7 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.RGBAFormat, 1023, 'RGBAFormat is equal to 1023' );
 		assert.equal( Constants.LuminanceFormat, 1024, 'LuminanceFormat is equal to 1024' );
 		assert.equal( Constants.LuminanceAlphaFormat, 1025, 'LuminanceAlphaFormat is equal to 1025' );
-		assert.equal( Constants.RGBEFormat, RGBAFormat, 'RGBEFormat is equal to RGBAFormat' );
+		assert.equal( Constants.RGBEFormat, Constants.RGBAFormat, 'RGBEFormat is equal to RGBAFormat' );
 		assert.equal( Constants.DepthFormat, 1026, 'DepthFormat is equal to 1026' );
 		assert.equal( Constants.DepthStencilFormat, 1027, 'DepthStencilFormat is equal to 1027' );
 		assert.equal( Constants.RGB_S3TC_DXT1_Format, 2001, 'RGB_S3TC_DXT1_Format is equal to 2001' );
