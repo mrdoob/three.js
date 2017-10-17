@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'Fog', () => {
+import { Fog } from '../../../../src/scenes/Fog';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Fog', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'Scene', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

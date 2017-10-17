@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'PositionalAudio', () => {
+import { PositionalAudio } from '../../../../src/audio/PositionalAudio.js';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Audios', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'PositionalAudio', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

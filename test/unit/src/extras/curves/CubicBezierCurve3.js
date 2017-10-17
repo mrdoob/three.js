@@ -1,13 +1,23 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'CubicBezierCurve3', () => {
+import { CubicBezierCurve3 } from '../../../../../src/extras/curves/CubicBezierCurve3';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Extras', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'Curves', () => {
+
+		QUnit.module.todo( 'CubicBezierCurve3', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 

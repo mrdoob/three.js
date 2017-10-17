@@ -1,152 +1,187 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
  */
+/* global QUnit */
 
-QUnit.module( "Raycaster" );
+import { Raycaster } from '../../../../src/core/Raycaster';
+import { Vector3 } from '../../../../src/math/Vector3';
+import { Mesh } from '../../../../src/objects/Mesh';
+import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera';
 
-QUnit.test( "intersectObjects" , function( assert ) {
-	var raycaster = getRaycaster();
-	var objectsToCheck = getObjectsToCheck();
+export default QUnit.module( 'Core', () => {
 
-	assert.ok( raycaster.intersectObjects( objectsToCheck ).length === 1,
-		"no recursive search should lead to one hit" );
+	QUnit.module( 'Raycaster', () => {
 
-	assert.ok( raycaster.intersectObjects( objectsToCheck, true ).length === 3,
-		"recursive search should lead to three hits" );
+		QUnit.test( "intersectObjects", function ( assert ) {
 
-	var intersections = raycaster.intersectObjects( objectsToCheck, true );
-	for ( var i = 0; i < intersections.length - 1; i++ ) {
+			var raycaster = getRaycaster();
+			var objectsToCheck = getObjectsToCheck();
 
-	  assert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, "intersections are sorted" );
+			assert.ok( raycaster.intersectObjects( objectsToCheck ).length === 1,
+				"no recursive search should lead to one hit" );
 
-	}
-});
+			assert.ok( raycaster.intersectObjects( objectsToCheck, true ).length === 3,
+				"recursive search should lead to three hits" );
 
-QUnit.test( "intersectObject" , function( assert ) {
-	var raycaster = getRaycaster();
-	var objectsToCheck = getObjectsToCheck();
+			var intersections = raycaster.intersectObjects( objectsToCheck, true );
+			for ( var i = 0; i < intersections.length - 1; i ++ ) {
 
-	assert.ok( raycaster.intersectObject( objectsToCheck[ 0 ] ).length === 1,
-		"no recursive search should lead to one hit" );
+				assert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, "intersections are sorted" );
 
-	assert.ok( raycaster.intersectObject( objectsToCheck[ 0 ], true ).length === 3,
-		"recursive search should lead to three hits" );
+			}
 
-	var intersections = raycaster.intersectObject( objectsToCheck[ 0 ], true );
-	for ( var i = 0; i < intersections.length - 1; i++ ) {
+		} );
 
-	  assert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, "intersections are sorted" );
+		QUnit.test( "intersectObject", function ( assert ) {
 
-	}
-});
+			var raycaster = getRaycaster();
+			var objectsToCheck = getObjectsToCheck();
 
-QUnit.test( "setFromCamera" , function( assert ) {
-	var raycaster = new THREE.Raycaster();
-	var rayDirection = raycaster.ray.direction;
-	var camera = new THREE.PerspectiveCamera( 90, 1, 1, 1000 );
+			assert.ok( raycaster.intersectObject( objectsToCheck[ 0 ] ).length === 1,
+				"no recursive search should lead to one hit" );
 
-	raycaster.setFromCamera( { x : 0, y: 0 }, camera );
-	assert.ok( rayDirection.x === 0, rayDirection.y === 0, rayDirection.z === -1,
-		"camera is looking straight to -z and so does the ray in the middle of the screen" );
+			assert.ok( raycaster.intersectObject( objectsToCheck[ 0 ], true ).length === 3,
+				"recursive search should lead to three hits" );
 
-	var step = 0.1;
+			var intersections = raycaster.intersectObject( objectsToCheck[ 0 ], true );
+			for ( var i = 0; i < intersections.length - 1; i ++ ) {
 
-	for ( var x = -1; x <= 1; x += step ) {
+				assert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, "intersections are sorted" );
 
-		for ( var y = -1; y <= 1; y += step ) {
+			}
 
-			raycaster.setFromCamera( { x, y }, camera );
+		} );
 
-			var refVector = new THREE.Vector3( x, y, -1 ).normalize();
+		QUnit.test( "setFromCamera", function ( assert ) {
 
-			checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert );
+			var raycaster = new Raycaster();
+			var rayDirection = raycaster.ray.direction;
+			var camera = new PerspectiveCamera( 90, 1, 1, 1000 );
+
+			raycaster.setFromCamera( {
+				x: 0,
+				y: 0
+			}, camera );
+			assert.ok( rayDirection.x === 0, rayDirection.y === 0, rayDirection.z === - 1,
+				"camera is looking straight to -z and so does the ray in the middle of the screen" );
+
+			var step = 0.1;
+
+			for ( var x = - 1; x <= 1; x += step ) {
+
+				for ( var y = - 1; y <= 1; y += step ) {
+
+					raycaster.setFromCamera( {
+						x,
+						y
+					}, camera );
+
+					var refVector = new Vector3( x, y, - 1 ).normalize();
+
+					checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert );
+
+				}
+
+			}
+
+		} );
+
+		function checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert ) {
+
+			assert.ok( refVector.x - rayDirection.x <= Number.EPSILON &&
+				refVector.y - rayDirection.y <= Number.EPSILON &&
+				refVector.z - rayDirection.z <= Number.EPSILON,
+				"camera is pointing to the same direction as expected" );
 
 		}
 
-	}
-});
+		function getRaycaster() {
 
-function checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert ) {
-	assert.ok( refVector.x - rayDirection.x <= Number.EPSILON &&
-			refVector.y - rayDirection.y <= Number.EPSILON &&
-			refVector.z - rayDirection.z <= Number.EPSILON,
-			"camera is pointing to the same direction as expected" );
-}
+			return raycaster = new Raycaster(
+				new Vector3( 0, 0, 0 ),
+				new Vector3( 0, 0, - 1 ),
+				1,
+				100
+			);
 
-function getRaycaster() {
-	return raycaster = new THREE.Raycaster(
-		new THREE.Vector3( 0, 0, 0 ),
-		new THREE.Vector3( 0, 0, -1 ),
-		1,
-		100
-	);
-}
+		}
 
-function getObjectsToCheck() {
-	var objects = [];
+		function getObjectsToCheck() {
 
-	var sphere1 = getSphere();
-	sphere1.position.set( 0, 0, -10 );
-	sphere1.name = 1;
-	objects.push( sphere1 );
+			var objects = [];
 
-	var sphere11 = getSphere();
-	sphere11.position.set( 0, 0, 1 );
-	sphere11.name = 11;
-	sphere1.add( sphere11 );
+			var sphere1 = getSphere();
+			sphere1.position.set( 0, 0, - 10 );
+			sphere1.name = 1;
+			objects.push( sphere1 );
 
-	var sphere12 = getSphere();
-	sphere12.position.set( 0, 0, -1 );
-	sphere12.name = 12;
-	sphere1.add( sphere12 );
+			var sphere11 = getSphere();
+			sphere11.position.set( 0, 0, 1 );
+			sphere11.name = 11;
+			sphere1.add( sphere11 );
 
-	var sphere2 = getSphere();
-	sphere2.position.set( -5, 0, -5 );
-	sphere2.name = 2;
-	objects.push( sphere2 );
+			var sphere12 = getSphere();
+			sphere12.position.set( 0, 0, - 1 );
+			sphere12.name = 12;
+			sphere1.add( sphere12 );
 
-	for ( var i = 0; i < objects.length; i++ ) {
+			var sphere2 = getSphere();
+			sphere2.position.set( - 5, 0, - 5 );
+			sphere2.name = 2;
+			objects.push( sphere2 );
 
-		objects[ i ].updateMatrixWorld();
+			for ( var i = 0; i < objects.length; i ++ ) {
 
-	}
+				objects[ i ].updateMatrixWorld();
 
-	return objects;
-}
+			}
 
-function getSphere() {
-	return new THREE.Mesh( new THREE.SphereGeometry( 1, 100, 100 ) );
-}
+			return objects;
 
-QUnit.test( "set", function ( assert ) {
+		}
 
-	var origin = new THREE.Vector3( 0, 0, 0 );
-	var direction = new THREE.Vector3( 0, 0, - 1 );
-	var a = new THREE.Raycaster( origin.clone(), direction.clone() );
+		function getSphere() {
 
-	assert.deepEqual( a.ray.origin, origin, "Origin is correct" );
-	assert.deepEqual( a.ray.direction, direction, "Direction is correct" );
+			return new Mesh( new SphereGeometry( 1, 100, 100 ) );
 
-	origin.set( 1, 1, 1 );
-	direction.set( - 1, 0, 0 );
-	a.set( origin, direction );
+		}
 
-	assert.deepEqual( a.ray.origin, origin, "Origin was set correctly" );
-	assert.deepEqual( a.ray.direction, direction, "Direction was set correctly" );
+		QUnit.test( "set", function ( assert ) {
 
-} );
+			var origin = new Vector3( 0, 0, 0 );
+			var direction = new Vector3( 0, 0, - 1 );
+			var a = new Raycaster( origin.clone(), direction.clone() );
 
-QUnit.test( "setFromCamera (Orthographic)", function ( assert ) {
+			assert.deepEqual( a.ray.origin, origin, "Origin is correct" );
+			assert.deepEqual( a.ray.direction, direction, "Direction is correct" );
 
-	var raycaster = new THREE.Raycaster();
-	var rayOrigin = raycaster.ray.origin;
-	var rayDirection = raycaster.ray.direction;
-	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1000 );
-	var expectedOrigin = new THREE.Vector3( 0, 0, 0 );
-	var expectedDirection = new THREE.Vector3( 0, 0, - 1 );
+			origin.set( 1, 1, 1 );
+			direction.set( - 1, 0, 0 );
+			a.set( origin, direction );
 
-	raycaster.setFromCamera( { x: 0, y: 0 }, camera );
-	assert.deepEqual( rayOrigin, expectedOrigin, "Ray origin has the right coordinates" );
-	assert.deepEqual( rayDirection, expectedDirection, "Camera and Ray are pointing towards -z" );
+			assert.deepEqual( a.ray.origin, origin, "Origin was set correctly" );
+			assert.deepEqual( a.ray.direction, direction, "Direction was set correctly" );
+
+		} );
+
+		QUnit.test( "setFromCamera (Orthographic)", function ( assert ) {
+
+			var raycaster = new Raycaster();
+			var rayOrigin = raycaster.ray.origin;
+			var rayDirection = raycaster.ray.direction;
+			var camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1000 );
+			var expectedOrigin = new Vector3( 0, 0, 0 );
+			var expectedDirection = new Vector3( 0, 0, - 1 );
+
+			raycaster.setFromCamera( {
+				x: 0,
+				y: 0
+			}, camera );
+			assert.deepEqual( rayOrigin, expectedOrigin, "Ray origin has the right coordinates" );
+			assert.deepEqual( rayDirection, expectedDirection, "Camera and Ray are pointing towards -z" );
+
+		} );
+
+	} );
 
 } );

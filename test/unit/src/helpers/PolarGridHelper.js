@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'PolarGridHelper', () => {
+import { PolarGridHelper } from '../../../../src/helpers/PolarGridHelper';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Helpers', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'PolarGridHelper', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

@@ -1,34 +1,61 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { DodecahedronGeometry, DodecahedronBufferGeometry } from '../../../../src/geometries/DodecahedronGeometry';
 
-	var parameters = {
-		radius: 10,
-		detail: undefined
-	};
+export default QUnit.module.todo( 'Geometries', () => {
 
-	var geometries;
+	QUnit.module.todo( 'CircleGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - DodecahedronGeometry", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				radius: 10,
+				detail: undefined
+			};
 
-			geometries = [
-
-				new THREE.DodecahedronGeometry(),
-				new THREE.DodecahedronGeometry( parameters.radius ),
-				new THREE.DodecahedronGeometry( parameters.radius, parameters.detail ),
-
+			this.geometries = [
+				new DodecahedronGeometry(),
+				new DodecahedronGeometry( parameters.radius ),
+				new DodecahedronGeometry( parameters.radius, parameters.detail ),
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+			runStdGeometryTests( assert, this.geometries );
 
-		runStdGeometryTests( assert, geometries );
+		} );
 
-	});
+	} );
 
-})();
+	QUnit.module.todo( 'CircleBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				radius: 10,
+				detail: undefined
+			};
+
+			this.geometries = [
+				new DodecahedronBufferGeometry(),
+				new DodecahedronBufferGeometry( parameters.radius ),
+				new DodecahedronBufferGeometry( parameters.radius, parameters.detail ),
+			];
+
+		} );
+
+		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+} );

@@ -1,10 +1,52 @@
-/* global module, test */
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ */
+/* global QUnit */
 
-module.todo( 'LatheGeometry', () => {
+import {
+	LatheGeometry,
+	LatheBufferGeometry
+} from '../../../../src/geometries/LatheGeometry';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Geometries', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'LatheGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {};
+
+			this.geometries = [
+				new LatheGeometry()
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+	QUnit.module.todo( 'LatheBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {};
+
+			this.geometries = [
+				new LatheBufferGeometry()
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
 
 	} );
 

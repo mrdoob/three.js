@@ -1,13 +1,23 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'UniformsUils', () => {
+import { UniformsUils } from '../../../../../src/renderers/shaders/UniformsUils';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Renderers', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module( 'Shaders', () => {
+
+		QUnit.module.todo( 'UniformsUils', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 

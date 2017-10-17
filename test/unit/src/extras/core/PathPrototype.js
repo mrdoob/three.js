@@ -1,13 +1,23 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'PathPrototype', () => {
+import { PathPrototype } from '../../../../../src/extras/core/PathPrototype';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Extras', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'Core', () => {
+
+		QUnit.module.todo( 'PathPrototype', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 

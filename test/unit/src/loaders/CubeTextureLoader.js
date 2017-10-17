@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'CubeTextureLoader', () => {
+import { CubeTextureLoader } from '../../../../src/loaders/CubeTextureLoader';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Loaders', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'CubeTextureLoader', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

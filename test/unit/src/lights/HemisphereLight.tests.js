@@ -1,35 +1,38 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { HemisphereLight } from '../../../../src/lights/HemisphereLight';
 
-	var parameters = {
-		skyColor: 0x123456,
-		groundColor: 0xabc012,
-		intensity: 0.6
-	};
+export default QUnit.module.todo( 'Lights', () => {
 
-	var lights;
+	QUnit.module.todo( 'HemisphereLight', ( hooks ) => {
 
-	QUnit.module( "Lights - HemisphereLight", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				skyColor: 0x123456,
+				groundColor: 0xabc012,
+				intensity: 0.6
+			};
 
-			lights = [
-
-				new THREE.HemisphereLight( parameters.skyColor ),
-				new THREE.HemisphereLight( parameters.skyColor, parameters.groundColor ),
-				new THREE.HemisphereLight( parameters.skyColor, parameters.groundColor, parameters.intensity ),
-
+			this.lights = [
+				new HemisphereLight(),
+				new HemisphereLight( parameters.skyColor ),
+				new HemisphereLight( parameters.skyColor, parameters.groundColor ),
+				new HemisphereLight( parameters.skyColor, parameters.groundColor, parameters.intensity ),
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard light tests', function ( assert ) {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			runStdLightTests( assert, this.lights );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+	} );
 
-})();
+} );

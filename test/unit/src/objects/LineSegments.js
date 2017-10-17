@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'LineSegments', () => {
+import { LineSegments } from '../../../../src/objects/LineSegments';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Objects', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'LineSegments', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

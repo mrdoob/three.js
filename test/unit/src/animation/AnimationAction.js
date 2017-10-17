@@ -1,28 +1,35 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'AnimationAction', () => {
+import { AnimationAction } from '../../../../src/animation/AnimationAction';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Animation', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'AnimationAction', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 
 } );
 
+
 //QUnit.module( "AnimationAction" );
 //
 //QUnit.test( "Instancing", function( assert ) {
 //
-//    var mixer = new THREE.AnimationMixer();
-//    var clip = new THREE.AnimationClip();
+//    var mixer = new AnimationMixer();
+//    var clip = new AnimationClip();
 //
 //    assert.throws(
 //        function() {
-//            new THREE.AnimationAction()
+//            new AnimationAction()
 //        },
 //        new Error("Mixer can't be null or undefined !"),
 //        "raised error instance about undefined or null mixer"
@@ -30,13 +37,13 @@ module.todo( 'AnimationAction', () => {
 //
 //    assert.throws(
 //        function() {
-//            new THREE.AnimationAction(mixer)
+//            new AnimationAction(mixer)
 //        },
 //        new Error("Clip can't be null or undefined !"),
 //        "raised error instance about undefined or null clip"
 //    );
 //
-//    var animationAction = new THREE.AnimationAction(mixer, clip);
+//    var animationAction = new AnimationAction(mixer, clip);
 //    assert.ok( animationAction, "animationAction instanciated" );
 //
 //} );

@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'FoxExp2', () => {
+import { FogExp2 } from '../../../../src/scenes/FogExp2';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'FoxExp2', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'Scene', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

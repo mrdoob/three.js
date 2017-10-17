@@ -1,34 +1,64 @@
-(function() {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import {
+	OctahedronGeometry,
+	OctahedronBufferGeometry
+} from '../../../../src/geometries/OctahedronGeometry';
 
-	var parameters = {
-		radius: 10,
-		detail: undefined
-	};
+export default QUnit.module.todo( 'Geometries', () => {
 
-	var geometries;
+	QUnit.module.todo( 'OctahedronGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - OctahedronGeometry", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				radius: 10,
+				detail: undefined
+			};
 
-			geometries = [
-
-				new THREE.OctahedronGeometry(),
-				new THREE.OctahedronGeometry( parameters.radius ),
-				new THREE.OctahedronGeometry( parameters.radius, parameters.detail ),
-
+			this.geometries = [
+				new OctahedronGeometry(),
+				new OctahedronGeometry( parameters.radius ),
+				new OctahedronGeometry( parameters.radius, parameters.detail ),
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+			runStdGeometryTests( assert, this.geometries );
 
-		runStdGeometryTests( assert, geometries );
+		} );
 
-	});
+	} );
 
-})();
+	QUnit.module.todo( 'OctahedronBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				radius: 10,
+				detail: undefined
+			};
+
+			this.geometries = [
+				new OctahedronBufferGeometry(),
+				new OctahedronBufferGeometry( parameters.radius ),
+				new OctahedronBufferGeometry( parameters.radius, parameters.detail ),
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+} );

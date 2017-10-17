@@ -1,13 +1,23 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'WebGLIndexedBufferRenderer', () => {
+import { WebGLIndexedBufferRenderer } from '../../../../../src/renderers/webgl/WebGLIndexedBufferRenderer';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Renderers', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module( 'WebGL', () => {
+
+		QUnit.module.todo( 'WebGLIndexedBufferRenderer', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 

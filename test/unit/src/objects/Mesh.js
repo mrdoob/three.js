@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'Mesh', () => {
+import { Mesh } from '../../../../src/objects/Mesh';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Objects', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'Mesh', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

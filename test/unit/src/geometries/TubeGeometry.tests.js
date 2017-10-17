@@ -1,10 +1,52 @@
-/* global module, test */
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ */
+/* global QUnit */
 
-module.todo( 'NumberKeyframeTrack', () => {
+import {
+	TubeGeometry,
+	TubeBufferGeometry
+} from '../../../../src/geometries/TubeGeometry';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Geometries', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'TubeGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {};
+
+			this.geometries = [
+				new TubeGeometry()
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+	QUnit.module.todo( 'TubeBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {};
+
+			this.geometries = [
+				new TubeBufferGeometry()
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
 
 	} );
 

@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'ImageLoader', () => {
+import { ImageLoader } from '../../../../src/loaders/ImageLoader';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Loaders', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'ImageLoader', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

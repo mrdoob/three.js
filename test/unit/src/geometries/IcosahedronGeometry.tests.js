@@ -1,34 +1,61 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { IcosahedronGeometry, IcosahedronBufferGeometry } from '../../../../src/geometries/IcosahedronGeometry';
 
-	var parameters = {
-		radius: 10,
-		detail: undefined
-	};
+export default QUnit.module.todo( 'Geometries', () => {
 
-	var geometries;
+	QUnit.module.todo( 'IcosahedronGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - IcosahedronGeometry", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				radius: 10,
+				detail: undefined
+			};
 
-			geometries = [
-
-				new THREE.IcosahedronGeometry(),
-				new THREE.IcosahedronGeometry( parameters.radius ),
-				new THREE.IcosahedronGeometry( parameters.radius, parameters.detail ),
-
+			this.geometries = [
+				new IcosahedronGeometry(),
+				new IcosahedronGeometry( parameters.radius ),
+				new IcosahedronGeometry( parameters.radius, parameters.detail ),
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard geometry tests', function( assert ) {
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+			runStdGeometryTests( assert, this.geometries );
 
-		runStdGeometryTests( assert, geometries );
+		});
 
-	});
+	} );
 
-})();
+	QUnit.module.todo( 'IcosahedronBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				radius: 10,
+				detail: undefined
+			};
+
+			this.geometries = [
+				new IcosahedronBufferGeometry(),
+				new IcosahedronBufferGeometry( parameters.radius ),
+				new IcosahedronBufferGeometry( parameters.radius, parameters.detail ),
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		});
+
+	} );
+
+} );

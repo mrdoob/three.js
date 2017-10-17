@@ -1,10 +1,52 @@
-/* global module, test */
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ */
+/* global QUnit */
 
-module.todo( 'PolyhedronGeometry', () => {
+import {
+	PolyhedronGeometry,
+	PolyhedronBufferGeometry
+} from '../../../../src/geometries/PolyhedronGeometry';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Geometries', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'PolyhedronGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {};
+
+			this.geometries = [
+				new PolyhedronGeometry()
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+	QUnit.module.todo( 'PolyhedronBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {};
+
+			this.geometries = [
+				new PolyhedronBufferGeometry()
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
 
 	} );
 

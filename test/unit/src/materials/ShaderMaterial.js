@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'ShaderMaterial', () => {
+import { ShaderMaterial } from '../../../../src/materials/ShaderMaterial';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Materials', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'ShaderMaterial', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

@@ -1,13 +1,23 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'WebGLTextures', () => {
+import { WebGLTextures } from '../../../../../src/renderers/webgl/WebGLTextures';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Renderers', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module( 'WebGL', () => {
+
+		QUnit.module.todo( 'WebGLTextures', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 

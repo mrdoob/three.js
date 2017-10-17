@@ -1,258 +1,267 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
+/* global QUnit */
 
-QUnit.module( 'PropertyBinding' );
+import { PropertyBinding } from '../../../../src/animation/PropertyBinding';
 
-QUnit.test( 'parseTrackName' , function( assert ) {
+export default QUnit.module( 'Animation', () => {
 
-	var paths = [
+	QUnit.module( 'PropertyBinding', () => {
 
-		[
-			'.property',
-			{
-				nodeName: undefined,
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: undefined
-			}
-		],
+		QUnit.test( 'parseTrackName', function ( assert ) {
 
-		[
-			'nodeName.property',
-			{
-				nodeName: 'nodeName',
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: undefined
-			}
-		],
+			var paths = [
 
-		[
-			'a.property',
-			{
-				nodeName: 'a',
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: undefined
-			}
-		],
+				[
+					'.property',
+					{
+						nodeName: undefined,
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: undefined
+					}
+				],
 
-		[
-			'no.de.Name.property',
-			{
-				nodeName: 'no.de.Name',
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: undefined
-			}
-		],
+				[
+					'nodeName.property',
+					{
+						nodeName: 'nodeName',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: undefined
+					}
+				],
 
-		[
-			'no.d-e.Name.property',
-			{
-				nodeName: 'no.d-e.Name',
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: undefined
-			}
-		],
+				[
+					'a.property',
+					{
+						nodeName: 'a',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: undefined
+					}
+				],
 
-		[
-			'nodeName.property[accessor]',
-			{
-				nodeName: 'nodeName',
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: 'accessor'
-			}
-		],
+				[
+					'no.de.Name.property',
+					{
+						nodeName: 'no.de.Name',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: undefined
+					}
+				],
 
-		[
-			'nodeName.material.property[accessor]',
-			{
-				nodeName: 'nodeName',
-				objectName: 'material',
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: 'accessor'
-			}
-		],
+				[
+					'no.d-e.Name.property',
+					{
+						nodeName: 'no.d-e.Name',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: undefined
+					}
+				],
 
-		[
-			'no.de.Name.material.property',
-			{
-				nodeName: 'no.de.Name',
-				objectName: 'material',
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: undefined
-			}
-		],
+				[
+					'nodeName.property[accessor]',
+					{
+						nodeName: 'nodeName',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: 'accessor'
+					}
+				],
 
-		[
-			'no.de.Name.material[materialIndex].property',
-			{
-				nodeName: 'no.de.Name',
-				objectName: 'material',
-				objectIndex: 'materialIndex',
-				propertyName: 'property',
-				propertyIndex: undefined
-			}
-		],
+				[
+					'nodeName.material.property[accessor]',
+					{
+						nodeName: 'nodeName',
+						objectName: 'material',
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: 'accessor'
+					}
+				],
 
-		[
-			'uuid.property[accessor]',
-			{
-				nodeName: 'uuid',
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: 'accessor'
-			}
-		],
+				[
+					'no.de.Name.material.property',
+					{
+						nodeName: 'no.de.Name',
+						objectName: 'material',
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: undefined
+					}
+				],
 
-		[
-			'uuid.objectName[objectIndex].propertyName[propertyIndex]',
-			{
-				nodeName: 'uuid',
-				objectName: 'objectName',
-				objectIndex: 'objectIndex',
-				propertyName: 'propertyName',
-				propertyIndex: 'propertyIndex'
-			}
-		],
+				[
+					'no.de.Name.material[materialIndex].property',
+					{
+						nodeName: 'no.de.Name',
+						objectName: 'material',
+						objectIndex: 'materialIndex',
+						propertyName: 'property',
+						propertyIndex: undefined
+					}
+				],
 
-		[
-			'parentName/nodeName.property',
-			{
-				// directoryName is currently unused.
-				nodeName: 'nodeName',
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: undefined
-			}
-		],
+				[
+					'uuid.property[accessor]',
+					{
+						nodeName: 'uuid',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: 'accessor'
+					}
+				],
 
-		[
-			'parentName/no.de.Name.property',
-			{
-				// directoryName is currently unused.
-				nodeName: 'no.de.Name',
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: undefined
-			}
-		],
+				[
+					'uuid.objectName[objectIndex].propertyName[propertyIndex]',
+					{
+						nodeName: 'uuid',
+						objectName: 'objectName',
+						objectIndex: 'objectIndex',
+						propertyName: 'propertyName',
+						propertyIndex: 'propertyIndex'
+					}
+				],
 
-		[
-			'parentName/parentName/nodeName.property[index]',
-			{
-				// directoryName is currently unused.
-				nodeName: 'nodeName',
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'property',
-				propertyIndex: 'index'
-			}
-		],
+				[
+					'parentName/nodeName.property',
+					{
+						// directoryName is currently unused.
+						nodeName: 'nodeName',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: undefined
+					}
+				],
 
-		[
-			'.bone[Armature.DEF_cog].position',
-			{
-				nodeName: undefined,
-				objectName: 'bone',
-				objectIndex: 'Armature.DEF_cog',
-				propertyName: 'position',
-				propertyIndex: undefined
-			}
-		],
+				[
+					'parentName/no.de.Name.property',
+					{
+						// directoryName is currently unused.
+						nodeName: 'no.de.Name',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: undefined
+					}
+				],
 
-		[
-			'scene:helium_balloon_model:helium_balloon_model.position',
-			{
-				nodeName: 'helium_balloon_model',
-				objectName: undefined,
-				objectIndex: undefined,
-				propertyName: 'position',
-				propertyIndex: undefined
-			}
-		]
-	];
+				[
+					'parentName/parentName/nodeName.property[index]',
+					{
+						// directoryName is currently unused.
+						nodeName: 'nodeName',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'property',
+						propertyIndex: 'index'
+					}
+				],
 
-	paths.forEach( function ( path, i ) {
+				[
+					'.bone[Armature.DEF_cog].position',
+					{
+						nodeName: undefined,
+						objectName: 'bone',
+						objectIndex: 'Armature.DEF_cog',
+						propertyName: 'position',
+						propertyIndex: undefined
+					}
+				],
 
-		assert.smartEqual(
-			THREE.PropertyBinding.parseTrackName( path[ 0 ] ),
-			path[ 1 ],
-			'Parses track name: ' +  path[ 0 ]
-		);
+				[
+					'scene:helium_balloon_model:helium_balloon_model.position',
+					{
+						nodeName: 'helium_balloon_model',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: 'position',
+						propertyIndex: undefined
+					}
+				]
+			];
 
-	} );
-});
+			paths.forEach( function ( path, i ) {
 
-QUnit.test( 'sanitizeNodeName' , function( assert ) {
+				assert.smartEqual(
+					PropertyBinding.parseTrackName( path[ 0 ] ),
+					path[ 1 ],
+					'Parses track name: ' + path[ 0 ]
+				);
 
-	assert.equal(
-		THREE.PropertyBinding.sanitizeNodeName( 'valid-name-123_' ),
-		'valid-name-123_',
-		'Leaves valid name intact.'
-	);
+			} );
+		} );
 
-	assert.equal(
-		THREE.PropertyBinding.sanitizeNodeName( 'space separated name 123_ -' ),
-		'space_separated_name_123__-',
-		'Replaces spaces with underscores.'
-	);
+		QUnit.test( 'sanitizeNodeName', function ( assert ) {
 
-	assert.equal(
-		THREE.PropertyBinding.sanitizeNodeName( '"invalid" name %123%_' ),
-		'invalid_name_123_',
-		'Strips invalid characters.'
-	);
+			assert.equal(
+				PropertyBinding.sanitizeNodeName( 'valid-name-123_' ),
+				'valid-name-123_',
+				'Leaves valid name intact.'
+			);
 
-} );
+			assert.equal(
+				PropertyBinding.sanitizeNodeName( 'space separated name 123_ -' ),
+				'space_separated_name_123__-',
+				'Replaces spaces with underscores.'
+			);
 
-QUnit.test( 'setValue', function( assert ) {
+			assert.equal(
+				PropertyBinding.sanitizeNodeName( '"invalid" name %123%_' ),
+				'invalid_name_123_',
+				'Strips invalid characters.'
+			);
 
-	var paths = [
-		'.material.opacity',
-		'.material[opacity]'
-	];
+		} );
 
-	paths.forEach( function ( path, i ) {
+		QUnit.test( 'setValue', function ( assert ) {
 
-		var originalValue = 0;
-		var expectedValue = 1;
+			var paths = [
+				'.material.opacity',
+				'.material[opacity]'
+			];
 
-		var geometry = new THREE.BoxGeometry();
-		var material = new THREE.MeshBasicMaterial();
-		material.opacity = originalValue;
-		var mesh = new THREE.Mesh( geometry, material );
+			paths.forEach( function ( path, i ) {
 
-		var binding = new THREE.PropertyBinding( mesh, path, null );
-		binding.bind();
+				var originalValue = 0;
+				var expectedValue = 1;
 
-		assert.equal(
-			material.opacity,
-			originalValue,
-			'Sets property of material with "' + path + '" (pre-setValue)'
-		);
+				var geometry = new BoxGeometry();
+				var material = new MeshBasicMaterial();
+				material.opacity = originalValue;
+				var mesh = new Mesh( geometry, material );
 
-		binding.setValue( [ expectedValue ], 0 );
-		assert.equal(
-			material.opacity,
-			expectedValue,
-			'Sets property of material with "' + path + '" (post-setValue)'
-		);
+				var binding = new PropertyBinding( mesh, path, null );
+				binding.bind();
+
+				assert.equal(
+					material.opacity,
+					originalValue,
+					'Sets property of material with "' + path + '" (pre-setValue)'
+				);
+
+				binding.setValue( [ expectedValue ], 0 );
+				assert.equal(
+					material.opacity,
+					expectedValue,
+					'Sets property of material with "' + path + '" (post-setValue)'
+				);
+
+			} );
+
+		} );
 
 	} );
 

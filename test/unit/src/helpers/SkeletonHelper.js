@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'SkeletonHelper', () => {
+import { SkeletonHelper } from '../../../../src/helpers/SkeletonHelper';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Helpers', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'SkeletonHelper', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

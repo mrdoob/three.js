@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'SpritMaterial', () => {
+import { SpritMaterial } from '../../../../src/materials/SpritMaterial';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Materials', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'SpritMaterial', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

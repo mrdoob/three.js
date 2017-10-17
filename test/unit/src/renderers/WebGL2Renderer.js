@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'WebGL2Renderer', () => {
+import { WebGL2Renderer } from '../../../../src/renderers/WebGL2Renderer';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Renderers', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'WebGL2Renderer', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

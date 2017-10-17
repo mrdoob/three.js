@@ -1,10 +1,52 @@
-/* global module, test */
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ */
+/* global QUnit */
 
-module.todo( 'ParametricGeometry', () => {
+import {
+	ParametricGeometry,
+	ParametricBufferGeometry
+} from '../../../../src/geometries/ParametricGeometry';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Geometries', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'ParametricGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {};
+
+			this.geometries = [
+				new ParametricGeometry()
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+	QUnit.module.todo( 'ParametricBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {};
+
+			this.geometries = [
+				new ParametricBufferGeometry()
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
 
 	} );
 

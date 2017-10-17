@@ -1,14 +1,21 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'AnimationUtils', () => {
+import { AnimationUtils } from '../../../../src/animation/AnimationUtils';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Animation', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'AnimationUtils', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 
 } );
+

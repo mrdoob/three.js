@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'SceneUtils', () => {
+import { SceneUtils } from '../../../../src/extras/SceneUtils';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Extras', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'SceneUtils', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

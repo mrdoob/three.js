@@ -1,11 +1,11 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'LinearInterpolant', () => {
+QUnit.module.todo( 'LinearInterpolant', () => {
 
-	test( 'write me !', assert => {
+	QUnit.test( 'write me !', ( assert ) => {
 
 		assert.ok( false, "everything's gonna be alright" );
 

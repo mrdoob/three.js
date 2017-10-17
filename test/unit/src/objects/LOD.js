@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'LOD', () => {
+import { LOD } from '../../../../src/objects/LOD';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Objects', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'LOD', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'DataTexture', () => {
+import { DataTexture } from '../../../../src/textures/DataTexture';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Textures', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'DataTexture', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

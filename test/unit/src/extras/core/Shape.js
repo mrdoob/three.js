@@ -1,13 +1,23 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'Shape', () => {
+import { Shape } from '../../../../../src/extras/core/Shape';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Extras', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'Core', () => {
+
+		QUnit.module.todo( 'Shape', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 

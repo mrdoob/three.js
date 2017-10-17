@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'BufferGeometryLoader', () => {
+import { BufferGeometryLoader } from '../../../../src/loaders/BufferGeometryLoader';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Loaders', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'BufferGeometryLoader', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

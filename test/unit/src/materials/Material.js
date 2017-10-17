@@ -1,11 +1,32 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'Material', () => {
+import { LineBasicMaterial } from '../../../../src/materials/LineBasicMaterial';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Materials', () => {
+
+	QUnit.module.todo( 'LineBasicMaterial', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+	} );
+
+} );
+
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ */
+/* global QUnit */
+
+QUnit.module.todo( 'Material', () => {
+
+	QUnit.test( 'write me !', ( assert ) => {
 
 		assert.ok( false, "everything's gonna be alright" );
 

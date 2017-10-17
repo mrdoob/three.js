@@ -1,28 +1,36 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { DirectionalLight } from '../../../../src/lights/DirectionalLight';
 
-	var lights;
+export default QUnit.module.todo( 'Lights', () => {
 
-	QUnit.module( "Lights - DirectionalLight", {
+	QUnit.module.todo( 'DirectionalLight', ( hooks ) => {
 
-		beforeEach: function() {
+		hooks.beforeEach( function () {
 
-			lights = [
+			const parameters = {
+				color: 0xaaaaaa,
+				intensity: 0.8
+			};
 
-				new THREE.DirectionalLight( 0xaaaaaa ),
-				new THREE.DirectionalLight( 0xaaaaaa, 0.8 ),
-
+			this.lights = [
+				new DirectionalLight(),
+				new DirectionalLight( parameters.color ),
+				new DirectionalLight( parameters.color, parameters.intensity )
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard light tests', function ( assert ) {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			runStdLightTests( assert, this.lights );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+	} );
 
-})();
+} );

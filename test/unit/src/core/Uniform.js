@@ -1,32 +1,42 @@
 /**
  * @author moraxy / https://github.com/moraxy
  */
+/* global QUnit */
 
-QUnit.module( "Uniform" );
+import { Uniform } from '../../../../src/core/Uniform';
+import { Vector3 } from '../../../../src/math/Vector3';
 
-QUnit.test( "constructor", function ( assert ) {
+export default QUnit.module( 'Core', () => {
 
-	var a;
-	var b = new THREE.Vector3( x, y, z );
+	QUnit.module( 'Uniform', () => {
 
-	a = new THREE.Uniform( 5 );
-	assert.strictEqual( a.value, 5, "New constructor works with simple values" );
+		QUnit.test( "constructor", function ( assert ) {
 
-	a = new THREE.Uniform( b );
-	assert.ok( a.value.equals( b ), "New constructor works with complex values" );
+			var a;
+			var b = new Vector3( x, y, z );
 
-} );
+			a = new Uniform( 5 );
+			assert.strictEqual( a.value, 5, "New constructor works with simple values" );
 
-QUnit.test( "clone", function ( assert ) {
+			a = new Uniform( b );
+			assert.ok( a.value.equals( b ), "New constructor works with complex values" );
 
-	var a = new THREE.Uniform( 23 );
-	var b = a.clone();
+		} );
 
-	assert.strictEqual( b.value, a.value, "clone() with simple values works" );
+		QUnit.test( "clone", function ( assert ) {
 
-	a = new THREE.Uniform( new THREE.Vector3( 1, 2, 3 ) );
-	b = a.clone();
+			var a = new Uniform( 23 );
+			var b = a.clone();
 
-	assert.ok( b.value.equals( a.value ), "clone() with complex values works" );
+			assert.strictEqual( b.value, a.value, "clone() with simple values works" );
+
+			a = new Uniform( new Vector3( 1, 2, 3 ) );
+			b = a.clone();
+
+			assert.ok( b.value.equals( a.value ), "clone() with complex values works" );
+
+		} );
+
+	} );
 
 } );

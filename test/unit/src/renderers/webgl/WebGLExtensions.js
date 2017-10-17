@@ -1,13 +1,23 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'WebGLExtensions', () => {
+import { WebGLExtensions } from '../../../../../src/renderers/webgl/WebGLExtensions';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Renderers', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module( 'WebGL', () => {
+
+		QUnit.module.todo( 'WebGLExtensions', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 

@@ -1,14 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'AudioAnalyser', () => {
+import { AudioAnalyser } from '../../../../src/audio/AudioAnalyser.js';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Audios', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'AudioAnalyser', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
-
 } );

@@ -1,34 +1,74 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import {
+	TetrahedronGeometry,
+	TetrahedronBufferGeometry
+} from '../../../../src/geometries/TetrahedronGeometry';
 
-	var parameters = {
-		radius: 10,
-		detail: undefined
-	};
+export default QUnit.module.todo( 'Geometries', () => {
 
-	var geometries;
+	QUnit.module.todo( 'TetrahedronGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - TetrahedronGeometry", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				radius: 10,
+				detail: undefined
+			};
 
-			geometries = [
-
-				new THREE.TetrahedronGeometry(),
-				new THREE.TetrahedronGeometry( parameters.radius ),
-				new THREE.TetrahedronGeometry( parameters.radius, parameters.detail ),
-
+			this.geometries = [
+				new TetrahedronGeometry(),
+				new TetrahedronGeometry( parameters.radius ),
+				new TetrahedronGeometry( parameters.radius, parameters.widthSegments ),
+				new TetrahedronGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments ),
+				new TetrahedronGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart ),
+				new TetrahedronGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
+				new TetrahedronGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
+				new TetrahedronGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+			runStdGeometryTests( assert, this.geometries );
 
-		runStdGeometryTests( assert, geometries );
+		} );
 
-	});
+	} );
 
-})();
+	QUnit.module.todo( 'SphereBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				radius: 10,
+				detail: undefined
+			};
+
+			this.geometries = [
+				new TetrahedronBufferGeometry(),
+				new TetrahedronBufferGeometry( parameters.radius ),
+				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments ),
+				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments ),
+				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart ),
+				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
+				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
+				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+} );

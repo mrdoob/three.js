@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'AudioContext', () => {
+import { AudioContext } from '../../../../src/audio/AudioContext.js';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Audios', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'AudioContext', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

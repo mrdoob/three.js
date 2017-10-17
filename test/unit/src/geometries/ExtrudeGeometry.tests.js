@@ -1,10 +1,29 @@
-/* global module, test */
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ */
+/* global QUnit */
 
-module.todo( 'ExtrudeGeometry', () => {
+import { ExtrudeGeometry, ExtrudeBufferGeometry } from '../../../../src/geometries/ExtrudeGeometry';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Geometries', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'ExtrudeGeometry', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+	} );
+
+	QUnit.module.todo( 'ExtrudeBufferGeometry', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

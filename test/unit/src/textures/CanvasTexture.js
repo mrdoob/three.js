@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'CanvasTexture', () => {
+import { CanvasTexture } from '../../../../src/textures/CanvasTexture';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Textures', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'CanvasTexture', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

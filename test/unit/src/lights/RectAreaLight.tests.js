@@ -1,38 +1,38 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { RectAreaLight } from '../../../../src/lights/RectAreaLight';
 
-	var parameters = {
-		color: 0xaaaaaa,
-		intensity: 0.5,
-	};
+export default QUnit.module.todo( 'Lights', () => {
 
-	var lights;
+	QUnit.module.todo( 'RectAreaLight', ( hooks ) => {
 
-	// TODO (abelnation): verify this works
+		hooks.beforeEach( function () {
 
-	QUnit.module( "Lights - RectAreaLight", {
+			const parameters = {
+				color: 0xaaaaaa,
+				intensity: 0.5
+			};
 
-		beforeEach: function() {
-
-			lights = [
-
-				new THREE.RectAreaLight( parameters.color ),
-				new THREE.RectAreaLight( parameters.color, parameters.intensity ),
-				new THREE.RectAreaLight( parameters.color, parameters.intensity, 5.0 ),
-				new THREE.RectAreaLight( parameters.color, parameters.intensity, 5.0, 20.0 ),
-				new THREE.RectAreaLight( parameters.color, parameters.intensity, undefined, 20.0 ),
-
+			this.lights = [
+				new RectAreaLight( parameters.color ),
+				new RectAreaLight( parameters.color, parameters.intensity ),
+				new RectAreaLight( parameters.color, parameters.intensity, 5.0 ),
+				new RectAreaLight( parameters.color, parameters.intensity, 5.0, 20.0 ),
+				new RectAreaLight( parameters.color, parameters.intensity, undefined, 20.0 ),
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard light tests', function ( assert ) {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			runStdLightTests( assert, this.lights );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+	} );
 
-})();
+} );

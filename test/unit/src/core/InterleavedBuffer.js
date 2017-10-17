@@ -1,108 +1,129 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
  */
+/* global QUnit */
 
-QUnit.module( "InterleavedBuffer" );
+import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer';
 
-function checkInstanceAgainstCopy( instance, copiedInstance, assert ) {
-	assert.ok( copiedInstance instanceof THREE.InterleavedBuffer, "the clone has the correct type" );
+export default QUnit.module( 'Core', () => {
 
-	for ( var i = 0; i < instance.array.length; i++ ) {
-		assert.ok( copiedInstance.array[i] === instance.array[i], "array was copied" );
-	}
+	QUnit.module( 'InterleavedBuffer', () => {
 
-	assert.ok( copiedInstance.stride === instance.stride, "stride was copied" );
-	assert.ok( copiedInstance.dynamic === true, "dynamic was copied" );
-}
+		function checkInstanceAgainstCopy( instance, copiedInstance, assert ) {
 
-QUnit.test( "count", function( assert ) {
-	var instance = new THREE.InterleavedBuffer( new Float32Array( [1, 2, 3, 7, 8 ,9] ), 3 );
+			assert.ok( copiedInstance instanceof InterleavedBuffer, "the clone has the correct type" );
 
-	assert.equal( instance.count, 2, "count is calculated via array length / stride" );
-});
+			for ( var i = 0; i < instance.array.length; i ++ ) {
 
-QUnit.test( "copy" , function( assert ) {
-	var array = new Float32Array( [1, 2, 3, 7, 8 ,9] );
-	var instance = new THREE.InterleavedBuffer( array, 3 );
-	instance.setDynamic( true );
+				assert.ok( copiedInstance.array[ i ] === instance.array[ i ], "array was copied" );
 
-	checkInstanceAgainstCopy(instance, instance.copy( instance ), assert );
-});
+			}
 
-QUnit.test( "clone" , function( assert ) {
-	var array = new Float32Array( [1, 2, 3, 7, 8 ,9] );
-	var instance = new THREE.InterleavedBuffer( array, 3 );
-	instance.setDynamic( true );
+			assert.ok( copiedInstance.stride === instance.stride, "stride was copied" );
+			assert.ok( copiedInstance.dynamic === true, "dynamic was copied" );
 
-	checkInstanceAgainstCopy( instance, instance.clone(), assert );
-});
+		}
 
-QUnit.test( "set" , function( assert ) {
-	var instance = new THREE.InterleavedBuffer( new Float32Array( [1, 2, 3, 7, 8 ,9] ), 3 );
+		QUnit.test( "count", function ( assert ) {
 
-	instance.set( [0, -1] );
-	assert.ok( instance.array[0] === 0 && instance.array[1] === -1, "replace at first by default" );
-});
+			var instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 
-QUnit.test( "needsUpdate", function ( assert ) {
+			assert.equal( instance.count, 2, "count is calculated via array length / stride" );
 
-	var a = new THREE.InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4 ], 2 ) );
+		} );
 
-	a.needsUpdate = true;
+		QUnit.test( "copy", function ( assert ) {
 
-	assert.strictEqual( a.version, 1, "Check version increased" );
+			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
+			var instance = new InterleavedBuffer( array, 3 );
+			instance.setDynamic( true );
 
-} );
+			checkInstanceAgainstCopy( instance, instance.copy( instance ), assert );
 
-QUnit.test( "setArray", function ( assert ) {
+		} );
 
-	var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
-	var f32b = new Float32Array( [ ] );
-	var a = new THREE.InterleavedBuffer( f32a, 2, false );
+		QUnit.test( "clone", function ( assert ) {
 
-	a.setArray( f32a );
+			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
+			var instance = new InterleavedBuffer( array, 3 );
+			instance.setDynamic( true );
 
-	assert.strictEqual( a.count, 2, "Check item count for non-empty array" );
-	assert.strictEqual( a.array, f32a, "Check array itself" );
+			checkInstanceAgainstCopy( instance, instance.clone(), assert );
 
-	a.setArray( f32b );
+		} );
 
-	assert.strictEqual( a.count, 0, "Check item count for empty array" );
-	assert.strictEqual( a.array, f32b, "Check array itself" );
+		QUnit.test( "set", function ( assert ) {
 
-	assert.throws(
-		function () {
+			var instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 
-			a.setArray( [ 1, 2, 3, 4 ] );
+			instance.set( [ 0, - 1 ] );
+			assert.ok( instance.array[ 0 ] === 0 && instance.array[ 1 ] === - 1, "replace at first by default" );
 
-		},
-		/array should be a Typed Array/,
-		"Calling setArray with a non-typed array throws Error"
-	);
+		} );
 
-} );
+		QUnit.test( "needsUpdate", function ( assert ) {
 
-QUnit.test( "copyAt", function ( assert ) {
+			var a = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4 ], 2 ) );
 
-	var a = new THREE.InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ), 3 );
-	var b = new THREE.InterleavedBuffer( new Float32Array( 9 ), 3 );
-	var expected = new Float32Array( [ 4, 5, 6, 7, 8, 9, 1, 2, 3 ] );
+			a.needsUpdate = true;
 
-	b.copyAt( 1, a, 2 );
-	b.copyAt( 0, a, 1 );
-	b.copyAt( 2, a, 0 );
+			assert.strictEqual( a.version, 1, "Check version increased" );
 
-	assert.deepEqual( b.array, expected, "Check the right values were replaced" );
+		} );
 
-} );
+		QUnit.test( "setArray", function ( assert ) {
 
-QUnit.test( "onUpload", function ( assert ) {
+			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+			var f32b = new Float32Array( [] );
+			var a = new InterleavedBuffer( f32a, 2, false );
 
-	var a = new THREE.InterleavedBuffer();
-	var func = function () { };
+			a.setArray( f32a );
 
-	a.onUpload( func );
+			assert.strictEqual( a.count, 2, "Check item count for non-empty array" );
+			assert.strictEqual( a.array, f32a, "Check array itself" );
 
-	assert.strictEqual( a.onUploadCallback, func, "Check callback was set properly" );
+			a.setArray( f32b );
+
+			assert.strictEqual( a.count, 0, "Check item count for empty array" );
+			assert.strictEqual( a.array, f32b, "Check array itself" );
+
+			assert.throws(
+				function () {
+
+					a.setArray( [ 1, 2, 3, 4 ] );
+
+				},
+				/array should be a Typed Array/,
+				"Calling setArray with a non-typed array throws Error"
+			);
+
+		} );
+
+		QUnit.test( "copyAt", function ( assert ) {
+
+			var a = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ), 3 );
+			var b = new InterleavedBuffer( new Float32Array( 9 ), 3 );
+			var expected = new Float32Array( [ 4, 5, 6, 7, 8, 9, 1, 2, 3 ] );
+
+			b.copyAt( 1, a, 2 );
+			b.copyAt( 0, a, 1 );
+			b.copyAt( 2, a, 0 );
+
+			assert.deepEqual( b.array, expected, "Check the right values were replaced" );
+
+		} );
+
+		QUnit.test( "onUpload", function ( assert ) {
+
+			var a = new InterleavedBuffer();
+			var func = function () { };
+
+			a.onUpload( func );
+
+			assert.strictEqual( a.onUploadCallback, func, "Check callback was set properly" );
+
+		} );
+
+	} );
 
 } );

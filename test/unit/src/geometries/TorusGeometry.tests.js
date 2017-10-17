@@ -1,40 +1,76 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import {
+	TorusGeometry,
+	TorusBufferGeometry
+} from '../../../../src/geometries/TorusGeometry';
 
-	var parameters = {
-		radius: 10,
-		tube: 20,
-		radialSegments: 30,
-		tubularSegments: 10,
-		arc: 2.0,
-	};
+export default QUnit.module.todo( 'Geometries', () => {
 
-	var geometries;
+	QUnit.module.todo( 'TorusGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - TorusGeometry", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				radius: 10,
+				tube: 20,
+				radialSegments: 30,
+				tubularSegments: 10,
+				arc: 2.0,
+			};
 
-			geometries = [
-
-				new THREE.TorusGeometry(),
-				new THREE.TorusGeometry( parameters.radius ),
-				new THREE.TorusGeometry( parameters.radius, parameters.tube ),
-				new THREE.TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments ),
-				new THREE.TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments ),
-				new THREE.TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments, parameters.arc ),
-
+			this.geometries = [
+				new TorusGeometry(),
+				new TorusGeometry( parameters.radius ),
+				new TorusGeometry( parameters.radius, parameters.tube ),
+				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments ),
+				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments ),
+				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments, parameters.arc ),
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+			runStdGeometryTests( assert, this.geometries );
 
-		runStdGeometryTests( assert, geometries );
+		} );
 
-	});
+	} );
 
-})();
+	QUnit.module.todo( 'TorusBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				radius: 10,
+				tube: 20,
+				radialSegments: 30,
+				tubularSegments: 10,
+				arc: 2.0,
+			};
+
+			this.geometries = [
+				new TorusBufferGeometry(),
+				new TorusBufferGeometry( parameters.radius ),
+				new TorusBufferGeometry( parameters.radius, parameters.tube ),
+				new TorusBufferGeometry( parameters.radius, parameters.tube, parameters.radialSegments ),
+				new TorusBufferGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments ),
+				new TorusBufferGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments, parameters.arc ),
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+} );

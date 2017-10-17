@@ -1,38 +1,56 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
  */
+/* global QUnit */
 
-QUnit.module( "Clock" );
+import { Clock } from '../../../../src/core/Clock';
 
-function mockPerformance() {
-	self.performance = {
-		deltaTime: 0,
+export default QUnit.module( 'Core', () => {
 
-		next: function( delta ) {
-			this.deltaTime += delta;
-		},
+	QUnit.module( 'Clock', () => {
 
-		now: function() {
-			return this.deltaTime;
+		function mockPerformance() {
+
+			self.performance = {
+				deltaTime: 0,
+
+				next: function ( delta ) {
+
+					this.deltaTime += delta;
+
+				},
+
+				now: function () {
+
+					return this.deltaTime;
+
+				}
+
+			};
+
 		}
-	};
-}
 
-QUnit.test( "clock with performance", function( assert ) {
-	mockPerformance();
+		QUnit.test( "clock with performance", function ( assert ) {
 
-	var clock = new THREE.Clock( false );
+			mockPerformance();
 
-	clock.start();
+			var clock = new Clock( false );
 
-	self.performance.next( 123 );
-	assert.numEqual( clock.getElapsedTime(), 0.123, "okay" );
+			clock.start();
 
-	self.performance.next( 100 );
-	assert.numEqual( clock.getElapsedTime(), 0.223, "okay" );
+			self.performance.next( 123 );
+			assert.numEqual( clock.getElapsedTime(), 0.123, "okay" );
 
-	clock.stop();
+			self.performance.next( 100 );
+			assert.numEqual( clock.getElapsedTime(), 0.223, "okay" );
 
-	self.performance.next( 1000 );
-	assert.numEqual( clock.getElapsedTime(), 0.223, "don't update time if the clock was stopped" );
-});
+			clock.stop();
+
+			self.performance.next( 1000 );
+			assert.numEqual( clock.getElapsedTime(), 0.223, "don't update time if the clock was stopped" );
+
+		} );
+
+	} );
+
+} );

@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'SpotLightShadow', () => {
+import { SpotLightShadow } from '../../../../src/lights/SpotLightShadow';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Lights', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'SpotLightShadow', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

@@ -1,10 +1,52 @@
-/* global module, test */
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ */
+/* global QUnit */
 
-module.todo( 'ShapeGeometry', () => {
+import {
+	ShapeGeometry,
+	ShapeBufferGeometry
+} from '../../../../src/geometries/ShapeGeometry';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Geometries', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'ShapeGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {};
+
+			this.geometries = [
+				new ShapeGeometry()
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+	QUnit.module.todo( 'ShapeBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {};
+
+			this.geometries = [
+				new ShapeBufferGeometry()
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
 
 	} );
 

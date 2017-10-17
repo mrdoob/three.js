@@ -1,107 +1,121 @@
 /**
  * @author moraxy / https://github.com/moraxy
+ * @author TristanVALCKE / https://github.com/Itee
  */
+/* global QUnit */
 
-QUnit.module( "Spherical" );
+import { Spherical } from '../../../../src/math/Spherical';
+import { Vector3 } from '../../../../src/math/Vector3';
+import {
+	eps
+} from './Constants';
 
-QUnit.test( "constructor", function ( assert ) {
+export default QUnit.module( 'Maths', () => {
 
-	var a = new THREE.Spherical();
-	var radius = 10.0;
-	var phi = Math.acos( - 0.5 );
-	var theta = Math.sqrt( Math.PI ) * phi;
+	QUnit.module( 'Spherical', () => {
 
-	assert.strictEqual( a.radius, 1.0, "Default values: check radius" );
-	assert.strictEqual( a.phi, 0, "Default values: check phi" );
-	assert.strictEqual( a.theta, 0, "Default values: check theta" );
+		QUnit.test( "constructor", function ( assert ) {
 
-	a = new THREE.Spherical( radius, phi, theta );
-	assert.strictEqual( a.radius, radius, "Custom values: check radius" );
-	assert.strictEqual( a.phi, phi, "Custom values: check phi" );
-	assert.strictEqual( a.theta, theta, "Custom values: check theta" );
+			var a = new Spherical();
+			var radius = 10.0;
+			var phi = Math.acos( - 0.5 );
+			var theta = Math.sqrt( Math.PI ) * phi;
 
-} );
+			assert.strictEqual( a.radius, 1.0, "Default values: check radius" );
+			assert.strictEqual( a.phi, 0, "Default values: check phi" );
+			assert.strictEqual( a.theta, 0, "Default values: check theta" );
 
-QUnit.test( "set", function ( assert ) {
+			a = new Spherical( radius, phi, theta );
+			assert.strictEqual( a.radius, radius, "Custom values: check radius" );
+			assert.strictEqual( a.phi, phi, "Custom values: check phi" );
+			assert.strictEqual( a.theta, theta, "Custom values: check theta" );
 
-	var a = new THREE.Spherical();
-	var radius = 10.0;
-	var phi = Math.acos( - 0.5 );
-	var theta = Math.sqrt( Math.PI ) * phi;
+		} );
 
-	a.set( radius, phi, theta );
-	assert.strictEqual( a.radius, radius, "Check radius" );
-	assert.strictEqual( a.phi, phi, "Check phi" );
-	assert.strictEqual( a.theta, theta, "Check theta" );
+		QUnit.test( "set", function ( assert ) {
 
-} );
+			var a = new Spherical();
+			var radius = 10.0;
+			var phi = Math.acos( - 0.5 );
+			var theta = Math.sqrt( Math.PI ) * phi;
 
-QUnit.test( "clone", function ( assert ) {
+			a.set( radius, phi, theta );
+			assert.strictEqual( a.radius, radius, "Check radius" );
+			assert.strictEqual( a.phi, phi, "Check phi" );
+			assert.strictEqual( a.theta, theta, "Check theta" );
 
-	var radius = 10.0;
-	var phi = Math.acos( - 0.5 );
-	var theta = Math.sqrt( Math.PI ) * phi;
-	var a = new THREE.Spherical( radius, phi, theta );
-	var b = a.clone();
+		} );
 
-	assert.propEqual( a, b, "Check a and b are equal after clone()" );
+		QUnit.test( "clone", function ( assert ) {
 
-	a.radius = 2.0;
-	assert.notPropEqual( a, b, "Check a and b are not equal after modification" );
+			var radius = 10.0;
+			var phi = Math.acos( - 0.5 );
+			var theta = Math.sqrt( Math.PI ) * phi;
+			var a = new Spherical( radius, phi, theta );
+			var b = a.clone();
 
-} );
+			assert.propEqual( a, b, "Check a and b are equal after clone()" );
 
-QUnit.test( "copy", function ( assert ) {
+			a.radius = 2.0;
+			assert.notPropEqual( a, b, "Check a and b are not equal after modification" );
 
-	var radius = 10.0;
-	var phi = Math.acos( - 0.5 );
-	var theta = Math.sqrt( Math.PI ) * phi;
-	var a = new THREE.Spherical( radius, phi, theta );
-	var b = new THREE.Spherical().copy( a );
+		} );
 
-	assert.propEqual( a, b, "Check a and b are equal after copy()" );
+		QUnit.test( "copy", function ( assert ) {
 
-	a.radius = 2.0;
-	assert.notPropEqual( a, b, "Check a and b are not equal after modification" );
+			var radius = 10.0;
+			var phi = Math.acos( - 0.5 );
+			var theta = Math.sqrt( Math.PI ) * phi;
+			var a = new Spherical( radius, phi, theta );
+			var b = new Spherical().copy( a );
 
-} );
+			assert.propEqual( a, b, "Check a and b are equal after copy()" );
 
-QUnit.test( "makeSafe", function ( assert ) {
+			a.radius = 2.0;
+			assert.notPropEqual( a, b, "Check a and b are not equal after modification" );
 
-	var EPS = 0.000001; // from source
-	var tooLow = 0.0;
-	var tooHigh = Math.PI;
-	var justRight = 1.5;
-	var a = new THREE.Spherical( 1, tooLow, 0 );
+		} );
 
-	a.makeSafe();
-	assert.strictEqual( a.phi, EPS, "Check if small values are set to EPS" );
+		QUnit.test( "makeSafe", function ( assert ) {
 
-	a.set( 1, tooHigh, 0 );
-	a.makeSafe();
-	assert.strictEqual( a.phi, Math.PI - EPS, "Check if high values are set to (Math.PI - EPS)" );
+			var EPS = 0.000001; // from source
+			var tooLow = 0.0;
+			var tooHigh = Math.PI;
+			var justRight = 1.5;
+			var a = new Spherical( 1, tooLow, 0 );
 
-	a.set( 1, justRight, 0 );
-	a.makeSafe();
-	assert.strictEqual( a.phi, justRight, "Check that valid values don't get changed" );
+			a.makeSafe();
+			assert.strictEqual( a.phi, EPS, "Check if small values are set to EPS" );
 
-} );
+			a.set( 1, tooHigh, 0 );
+			a.makeSafe();
+			assert.strictEqual( a.phi, Math.PI - EPS, "Check if high values are set to (Math.PI - EPS)" );
 
-QUnit.test( "setFromVector3", function ( assert ) {
+			a.set( 1, justRight, 0 );
+			a.makeSafe();
+			assert.strictEqual( a.phi, justRight, "Check that valid values don't get changed" );
 
-	var a = new THREE.Spherical( 1, 1, 1 );
-	var b = new THREE.Vector3( 0, 0, 0 );
-	var c = new THREE.Vector3( Math.PI, 1, - Math.PI );
-	var expected = new THREE.Spherical( 4.554032147688322, 1.3494066171539107, 2.356194490192345 );
+		} );
 
-	a.setFromVector3( b );
-	assert.strictEqual( a.radius, 0, "Zero-length vector: check radius" );
-	assert.strictEqual( a.phi, 0, "Zero-length vector: check phi" );
-	assert.strictEqual( a.theta, 0, "Zero-length vector: check theta" );
+		QUnit.test( "setFromVector3", function ( assert ) {
 
-	a.setFromVector3( c );
-	assert.ok( Math.abs( a.radius - expected.radius ) <= eps, "Normal vector: check radius" );
-	assert.ok( Math.abs( a.phi - expected.phi ) <= eps, "Normal vector: check phi" );
-	assert.ok( Math.abs( a.theta - expected.theta ) <= eps, "Normal vector: check theta" );
+			var a = new Spherical( 1, 1, 1 );
+			var b = new Vector3( 0, 0, 0 );
+			var c = new Vector3( Math.PI, 1, - Math.PI );
+			var expected = new Spherical( 4.554032147688322, 1.3494066171539107, 2.356194490192345 );
+
+			a.setFromVector3( b );
+			assert.strictEqual( a.radius, 0, "Zero-length vector: check radius" );
+			assert.strictEqual( a.phi, 0, "Zero-length vector: check phi" );
+			assert.strictEqual( a.theta, 0, "Zero-length vector: check theta" );
+
+			a.setFromVector3( c );
+			assert.ok( Math.abs( a.radius - expected.radius ) <= eps, "Normal vector: check radius" );
+			assert.ok( Math.abs( a.phi - expected.phi ) <= eps, "Normal vector: check phi" );
+			assert.ok( Math.abs( a.theta - expected.theta ) <= eps, "Normal vector: check theta" );
+
+		} );
+
+	} );
 
 } );

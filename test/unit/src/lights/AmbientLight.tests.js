@@ -1,27 +1,34 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { AmbientLight } from '../../../../src/lights/AmbientLight';
 
-	var lights;
+export default QUnit.module.todo( 'Lights', () => {
 
-	QUnit.module( "Lights - AmbientLight", {
+	QUnit.module.todo( 'ArrowHelper', ( hooks ) => {
 
-		beforeEach: function() {
+		hooks.beforeEach( function () {
 
-			lights = [
+			const parameters = {
+				color: 0xaaaaaa
+			};
 
-				new THREE.AmbientLight( 0xaaaaaa ),
-
+			this.lights = [
+				new AmbientLight(),
+				new AmbientLight( parameters.color )
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard light tests', function ( assert ) {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			runStdLightTests( assert, this.lights );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+	} );
 
-})();
+} );

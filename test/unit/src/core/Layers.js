@@ -1,101 +1,110 @@
 /**
  * @author moraxy / https://github.com/moraxy
  */
+/* global QUnit */
 
-QUnit.module( "Layers" );
+import { Layers } from '../../../../src/core/Layers';
 
-QUnit.test( "set", function ( assert ) {
+export default QUnit.module( 'Core', () => {
 
-	var a = new THREE.Layers();
+	QUnit.module( 'Layers', () => {
 
-	a.set( 0 );
-	assert.strictEqual( a.mask, 1, "Set channel 0" );
+		QUnit.test( "set", function ( assert ) {
 
-	a.set( 1 );
-	assert.strictEqual( a.mask, 2, "Set channel 1" );
+			var a = new Layers();
 
-	a.set( 2 );
-	assert.strictEqual( a.mask, 4, "Set channel 2" );
+			a.set( 0 );
+			assert.strictEqual( a.mask, 1, "Set channel 0" );
 
-} );
+			a.set( 1 );
+			assert.strictEqual( a.mask, 2, "Set channel 1" );
 
-QUnit.test( "enable", function ( assert ) {
+			a.set( 2 );
+			assert.strictEqual( a.mask, 4, "Set channel 2" );
 
-	var a = new THREE.Layers();
+		} );
 
-	a.set( 0 );
-	a.enable( 0 );
-	assert.strictEqual( a.mask, 1, "Enable channel 0 with mask 0" );
+		QUnit.test( "enable", function ( assert ) {
 
-	a.set( 0 );
-	a.enable( 1 );
-	assert.strictEqual( a.mask, 3, "Enable channel 1 with mask 0" );
+			var a = new Layers();
 
-	a.set( 1 );
-	a.enable( 0 );
-	assert.strictEqual( a.mask, 3, "Enable channel 0 with mask 1" );
+			a.set( 0 );
+			a.enable( 0 );
+			assert.strictEqual( a.mask, 1, "Enable channel 0 with mask 0" );
 
-	a.set( 1 );
-	a.enable( 1 );
-	assert.strictEqual( a.mask, 2, "Enable channel 1 with mask 1" );
+			a.set( 0 );
+			a.enable( 1 );
+			assert.strictEqual( a.mask, 3, "Enable channel 1 with mask 0" );
 
-} );
+			a.set( 1 );
+			a.enable( 0 );
+			assert.strictEqual( a.mask, 3, "Enable channel 0 with mask 1" );
 
-QUnit.test( "disable", function ( assert ) {
+			a.set( 1 );
+			a.enable( 1 );
+			assert.strictEqual( a.mask, 2, "Enable channel 1 with mask 1" );
 
-	var a = new THREE.Layers();
+		} );
 
-	a.set( 0 );
-	a.disable( 0 );
-	assert.strictEqual( a.mask, 0, "Disable channel 0 with mask 0" );
+		QUnit.test( "disable", function ( assert ) {
 
-	a.set( 0 );
-	a.disable( 1 );
-	assert.strictEqual( a.mask, 1, "Disable channel 1 with mask 0" );
+			var a = new Layers();
 
-	a.set( 1 );
-	a.disable( 0 );
-	assert.strictEqual( a.mask, 2, "Disable channel 0 with mask 1" );
+			a.set( 0 );
+			a.disable( 0 );
+			assert.strictEqual( a.mask, 0, "Disable channel 0 with mask 0" );
 
-	a.set( 1 );
-	a.disable( 1 );
-	assert.strictEqual( a.mask, 0, "Disable channel 1 with mask 1" );
+			a.set( 0 );
+			a.disable( 1 );
+			assert.strictEqual( a.mask, 1, "Disable channel 1 with mask 0" );
 
-} );
+			a.set( 1 );
+			a.disable( 0 );
+			assert.strictEqual( a.mask, 2, "Disable channel 0 with mask 1" );
 
-QUnit.test( "toggle", function ( assert ) {
+			a.set( 1 );
+			a.disable( 1 );
+			assert.strictEqual( a.mask, 0, "Disable channel 1 with mask 1" );
 
-	var a = new THREE.Layers();
+		} );
 
-	a.set( 0 );
-	a.toggle( 0 );
-	assert.strictEqual( a.mask, 0, "Toggle channel 0 with mask 0" );
+		QUnit.test( "toggle", function ( assert ) {
 
-	a.set( 0 );
-	a.toggle( 1 );
-	assert.strictEqual( a.mask, 3, "Toggle channel 1 with mask 0" );
+			var a = new Layers();
 
-	a.set( 1 );
-	a.toggle( 0 );
-	assert.strictEqual( a.mask, 3, "Toggle channel 0 with mask 1" );
+			a.set( 0 );
+			a.toggle( 0 );
+			assert.strictEqual( a.mask, 0, "Toggle channel 0 with mask 0" );
 
-	a.set( 1 );
-	a.toggle( 1 );
-	assert.strictEqual( a.mask, 0, "Toggle channel 1 with mask 1" );
+			a.set( 0 );
+			a.toggle( 1 );
+			assert.strictEqual( a.mask, 3, "Toggle channel 1 with mask 0" );
 
-} );
+			a.set( 1 );
+			a.toggle( 0 );
+			assert.strictEqual( a.mask, 3, "Toggle channel 0 with mask 1" );
 
-QUnit.test( "test", function ( assert ) {
+			a.set( 1 );
+			a.toggle( 1 );
+			assert.strictEqual( a.mask, 0, "Toggle channel 1 with mask 1" );
 
-	var a = new THREE.Layers();
-	var b = new THREE.Layers();
+		} );
 
-	assert.ok( a.test( b ), "Start out true" );
+		QUnit.test( "QUnit.test", function ( assert ) {
 
-	a.set( 1 );
-	assert.notOk( a.test( b ), "Set channel 1 in a and fail the test" );
+			var a = new Layers();
+			var b = new Layers();
 
-	b.toggle( 1 );
-	assert.ok( a.test( b ), "Toggle channel 1 in b and pass again" );
+			assert.ok( a.QUnit.test( b ), "Start out true" );
+
+			a.set( 1 );
+			assert.notOk( a.QUnit.test( b ), "Set channel 1 in a and fail the QUnit.test" );
+
+			b.toggle( 1 );
+			assert.ok( a.QUnit.test( b ), "Toggle channel 1 in b and pass again" );
+
+		} );
+
+	} );
 
 } );

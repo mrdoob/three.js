@@ -1,41 +1,43 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { SpotLight } from '../../../../src/lights/SpotLight';
 
-	var parameters = {
-		color: 0xaaaaaa,
-		intensity: 0.5,
-		distance: 100,
-		angle: 0.8,
-		exponent: 8,
-		decay: 2
-	};
+export default QUnit.module.todo( 'Lights', () => {
 
-	var lights;
+	QUnit.module.todo( 'SpotLight', ( hooks ) => {
 
-	QUnit.module( "Lights - SpotLight", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				color: 0xaaaaaa,
+				intensity: 0.5,
+				distance: 100,
+				angle: 0.8,
+				penumbra: 8,
+				decay: 2
+			};
 
-			lights = [
-
-				new THREE.SpotLight( parameters.color ),
-				new THREE.SpotLight( parameters.color, parameters.intensity ),
-				new THREE.SpotLight( parameters.color, parameters.intensity, parameters.distance ),
-				new THREE.SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle ),
-				new THREE.SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle, parameters.exponent ),
-				new THREE.SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle, parameters.exponent, parameters.decay ),
-
+			this.lights = [
+				new SpotLight( parameters.color ),
+				new SpotLight( parameters.color, parameters.intensity ),
+				new SpotLight( parameters.color, parameters.intensity, parameters.distance ),
+				new SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle ),
+				new SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle, parameters.penumbra ),
+				new SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle, parameters.penumbra, parameters.decay ),
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard light tests', function ( assert ) {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			runStdLightTests( assert, this.lights );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+	} );
 
-})();
+} );

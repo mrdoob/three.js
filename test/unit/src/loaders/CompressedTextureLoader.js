@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'CompressedTextureLoader', () => {
+import { CompressedTextureLoader } from '../../../../src/loaders/CompressedTextureLoader';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Loaders', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'CompressedTextureLoader', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

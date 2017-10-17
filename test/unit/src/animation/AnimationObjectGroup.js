@@ -1,107 +1,116 @@
 /**
  * @author tschw
  */
+/* global QUnit */
 
-QUnit.module( "AnimationObjectGroup" );
+import { AnimationObjectGroup } from '../../../../src/animation/AnimationObjectGroup';
+import { Object3D } from '../../../../src/core/Object3D';
+import { PropertyBinding } from '../../../../src/animation/PropertyBinding';
 
-var ObjectA = new THREE.Object3D(),
-	ObjectB = new THREE.Object3D(),
-	ObjectC = new THREE.Object3D(),
+export default QUnit.module( "Animation", () => {
 
-	PathA = 'object.position',
-	PathB = 'object.rotation',
-	PathC = 'object.scale',
+	QUnit.module( "AnimationObjectGroup", () => {
 
-	ParsedPathA = THREE.PropertyBinding.parseTrackName( PathA ),
-	ParsedPathB = THREE.PropertyBinding.parseTrackName( PathB ),
-	ParsedPathC = THREE.PropertyBinding.parseTrackName( PathC );
+		var ObjectA = new Object3D(),
+			ObjectB = new Object3D(),
+			ObjectC = new Object3D(),
 
+			PathA = 'object.position',
+			PathB = 'object.rotation',
+			PathC = 'object.scale',
 
-QUnit.test( "smoke test", function( assert ) {
+			ParsedPathA = PropertyBinding.parseTrackName( PathA ),
+			ParsedPathB = PropertyBinding.parseTrackName( PathB ),
+			ParsedPathC = PropertyBinding.parseTrackName( PathC );
 
-	var expect = function expect( testIndex, group, bindings, path, cached, roots ) {
+		QUnit.test( "smoke test", function ( assert ) {
 
-		var rootNodes = [], pathsOk = true, nodesOk = true;
+			var expect = function expect( testIndex, group, bindings, path, cached, roots ) {
 
-		for ( var i = group.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
+				var rootNodes = [], pathsOk = true, nodesOk = true;
 
-			if ( bindings[ i ].path !== path ) pathsOk = false;
-			rootNodes.push( bindings[ i ].rootNode );
+				for ( var i = group.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
-		}
+					if ( bindings[ i ].path !== path ) pathsOk = false;
+					rootNodes.push( bindings[ i ].rootNode );
 
-		for ( var i = 0, n = roots.length; i !== n; ++ i ) {
+				}
 
-			if ( rootNodes.indexOf( roots[ i ] ) === -1 ) nodesOk = false;
+				for ( var i = 0, n = roots.length; i !== n; ++ i ) {
 
-		}
+					if ( rootNodes.indexOf( roots[ i ] ) === - 1 ) nodesOk = false;
 
-		assert.ok( pathsOk, testIndex + " paths" );
-		assert.ok( nodesOk, testIndex + " nodes");
-		assert.ok( group.nCachedObjects_ === cached, testIndex + " cache size" );
-		assert.ok( bindings.length - group.nCachedObjects_ === roots.length, testIndex + " object count" );
+				}
 
-	};
+				assert.ok( pathsOk, QUnit.testIndex + " paths" );
+				assert.ok( nodesOk, QUnit.testIndex + " nodes" );
+				assert.ok( group.nCachedObjects_ === cached, QUnit.testIndex + " cache size" );
+				assert.ok( bindings.length - group.nCachedObjects_ === roots.length, QUnit.testIndex + " object count" );
 
-	// initial state
+			};
 
-	var groupA = new THREE.AnimationObjectGroup();
-	assert.ok( groupA instanceof THREE.AnimationObjectGroup, "constructor (w/o args)" );
+			// initial state
 
-	var bindingsAA = groupA.subscribe_( PathA, ParsedPathA );
-	expect( 0, groupA, bindingsAA, PathA, 0, [] );
+			var groupA = new AnimationObjectGroup();
+			assert.ok( groupA instanceof AnimationObjectGroup, "constructor (w/o args)" );
 
-	var groupB = new THREE.AnimationObjectGroup( ObjectA, ObjectB );
-	assert.ok( groupB instanceof THREE.AnimationObjectGroup, "constructor (with args)" );
+			var bindingsAA = groupA.subscribe_( PathA, ParsedPathA );
+			expect( 0, groupA, bindingsAA, PathA, 0, [] );
 
-	var bindingsBB = groupB.subscribe_( PathB, ParsedPathB );
-	expect( 1, groupB, bindingsBB, PathB, 0, [ ObjectA, ObjectB ] );
+			var groupB = new AnimationObjectGroup( ObjectA, ObjectB );
+			assert.ok( groupB instanceof AnimationObjectGroup, "constructor (with args)" );
 
-	// add
+			var bindingsBB = groupB.subscribe_( PathB, ParsedPathB );
+			expect( 1, groupB, bindingsBB, PathB, 0, [ ObjectA, ObjectB ] );
 
-	groupA.add( ObjectA, ObjectB );
-	expect( 2, groupA, bindingsAA, PathA, 0, [ ObjectA, ObjectB ] );
+			// add
 
-	groupB.add( ObjectC );
-	expect( 3, groupB, bindingsBB, PathB, 0, [ ObjectA, ObjectB, ObjectC ] );
+			groupA.add( ObjectA, ObjectB );
+			expect( 2, groupA, bindingsAA, PathA, 0, [ ObjectA, ObjectB ] );
 
-	// remove
+			groupB.add( ObjectC );
+			expect( 3, groupB, bindingsBB, PathB, 0, [ ObjectA, ObjectB, ObjectC ] );
 
-	groupA.remove( ObjectA, ObjectC );
-	expect( 4, groupA, bindingsAA, PathA, 1, [ ObjectB ] );
+			// remove
 
-	groupB.remove( ObjectA, ObjectB, ObjectC );
-	expect( 5, groupB, bindingsBB, PathB, 3, [] );
+			groupA.remove( ObjectA, ObjectC );
+			expect( 4, groupA, bindingsAA, PathA, 1, [ ObjectB ] );
 
-	// subscribe after re-add
+			groupB.remove( ObjectA, ObjectB, ObjectC );
+			expect( 5, groupB, bindingsBB, PathB, 3, [] );
 
-	groupA.add( ObjectC );
-	expect( 6, groupA, bindingsAA, PathA, 1, [ ObjectB, ObjectC ] );
-	var bindingsAC = groupA.subscribe_( PathC, ParsedPathC );
-	expect( 7, groupA, bindingsAC, PathC, 1, [ ObjectB, ObjectC ] );
+			// subscribe after re-add
 
-	// re-add after subscribe
+			groupA.add( ObjectC );
+			expect( 6, groupA, bindingsAA, PathA, 1, [ ObjectB, ObjectC ] );
+			var bindingsAC = groupA.subscribe_( PathC, ParsedPathC );
+			expect( 7, groupA, bindingsAC, PathC, 1, [ ObjectB, ObjectC ] );
 
-	var bindingsBC = groupB.subscribe_( PathC, ParsedPathC );
-	groupB.add( ObjectA, ObjectB );
-	expect( 8, groupB, bindingsBB, PathB, 1, [ ObjectA, ObjectB ] );
+			// re-add after subscribe
 
-	// unsubscribe
+			var bindingsBC = groupB.subscribe_( PathC, ParsedPathC );
+			groupB.add( ObjectA, ObjectB );
+			expect( 8, groupB, bindingsBB, PathB, 1, [ ObjectA, ObjectB ] );
 
-	var copyOfBindingsBC = bindingsBC.slice();
-	groupB.unsubscribe_( PathC );
-	groupB.add( ObjectC );
-	assert.deepEqual( bindingsBC, copyOfBindingsBC, "no more update after unsubscribe" );
+			// unsubscribe
 
-	// uncache active
+			var copyOfBindingsBC = bindingsBC.slice();
+			groupB.unsubscribe_( PathC );
+			groupB.add( ObjectC );
+			assert.deepEqual( bindingsBC, copyOfBindingsBC, "no more update after unsubscribe" );
 
-	groupB.uncache( ObjectA );
-	expect( 9, groupB, bindingsBB, PathB, 0, [ ObjectB, ObjectC ] );
+			// uncache active
 
-	// uncache cached
+			groupB.uncache( ObjectA );
+			expect( 9, groupB, bindingsBB, PathB, 0, [ ObjectB, ObjectC ] );
 
-	groupA.uncache( ObjectA );
-	expect( 10, groupA, bindingsAC, PathC, 0, [ ObjectB, ObjectC ] );
+			// uncache cached
+
+			groupA.uncache( ObjectA );
+			expect( 10, groupA, bindingsAC, PathC, 0, [ ObjectB, ObjectC ] );
+
+		} );
+
+	} );
 
 } );
-

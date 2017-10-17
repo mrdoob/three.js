@@ -1,36 +1,51 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { BoxHelper } from '../../../../src/helpers/BoxHelper';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { SphereGeometry } from '../../../../src/geometries/SphereGeometry';
+import { Mesh } from '../../../../src/objects/Mesh';
 
-	var parameters = {
-		diameter: 10
-	};
+export default QUnit.module.todo( 'Helpers', () => {
 
-	var geometries;
+	QUnit.module.todo( 'BoxHelper', ( hooks ) => {
 
-	QUnit.module( "Extras - Helpers - BoxHelper", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
-			var greenMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+			const parameters = {
+				radius: 10,
+				widthSegments: 20,
+				heightSegments: 30,
+				phiStart: 0.5,
+				phiLength: 1.0,
+				thetaStart: 0.4,
+				thetaLength: 2.0,
+			};
 
 			// Test with a normal cube and a box helper
-			var boxGeometry = new THREE.BoxGeometry( parameters.diameter );
-			var box = new THREE.Mesh( boxGeometry, greenMaterial );
-			var boxHelper = new THREE.BoxHelper( box );
+			var boxGeometry = new BoxGeometry( parameters.diameter );
+			var box = new Mesh( boxGeometry );
+			var boxHelper = new BoxHelper( box );
 
 			// The same should happen with a comparable sphere
-			var sphereGeometry = new THREE.SphereGeometry( parameters.diameter / 2 );
-			var sphere = new THREE.Mesh( sphereGeometry, greenMaterial );
-			var sphereBoxHelper = new THREE.BoxHelper( sphere );
+			var sphereGeometry = new SphereGeometry( parameters.diameter / 2 );
+			var sphere = new Mesh( sphereGeometry );
+			var sphereBoxHelper = new BoxHelper( sphere );
 
 			// Note that unlike what I'd like to, these doesn't check the equivalency of the two generated geometries
-			geometries = [ boxHelper.geometry, sphereBoxHelper.geometry ];
-		}
+			this.geometries = [ boxHelper.geometry, sphereBoxHelper.geometry ];
 
-	});
+		} );
 
-	QUnit.test( "standard geometry tests", function( assert ) {
-		runStdGeometryTests( assert, geometries );
-	});
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
 
-})();
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+} );

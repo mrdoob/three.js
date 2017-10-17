@@ -1,44 +1,84 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import {
+	SphereGeometry,
+	SphereBufferGeometry
+} from '../../../../src/geometries/SphereGeometry';
 
-	var parameters = {
-		radius: 10,
-		widthSegments: 20,
-		heightSegments: 30,
-		phiStart: 0.5,
-		phiLength: 1.0,
-		thetaStart: 0.4,
-		thetaLength: 2.0,
-	};
+export default QUnit.module.todo( 'Geometries', () => {
 
-	var geometries;
+	QUnit.module.todo( 'SphereGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - SphereGeometry", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				radius: 10,
+				widthSegments: 20,
+				heightSegments: 30,
+				phiStart: 0.5,
+				phiLength: 1.0,
+				thetaStart: 0.4,
+				thetaLength: 2.0,
+			};
 
-			geometries = [
-
-				new THREE.SphereGeometry(),
-				new THREE.SphereGeometry( parameters.radius ),
-				new THREE.SphereGeometry( parameters.radius, parameters.widthSegments ),
-				new THREE.SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments ),
-				new THREE.SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart ),
-				new THREE.SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
-				new THREE.SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
-				new THREE.SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
-
+			this.geometries = [
+				new SphereGeometry(),
+				new SphereGeometry( parameters.radius ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+			runStdGeometryTests( assert, this.geometries );
 
-		runStdGeometryTests( assert, geometries );
+		} );
 
-	});
+	} );
 
-})();
+	QUnit.module.todo( 'SphereBufferGeometry', ( hooks ) => {
+
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				radius: 10,
+				widthSegments: 20,
+				heightSegments: 30,
+				phiStart: 0.5,
+				phiLength: 1.0,
+				thetaStart: 0.4,
+				thetaLength: 2.0,
+			};
+
+			this.geometries = [
+				new SphereBufferGeometry(),
+				new SphereBufferGeometry( parameters.radius ),
+				new SphereBufferGeometry( parameters.radius, parameters.widthSegments ),
+				new SphereBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments ),
+				new SphereBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart ),
+				new SphereBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
+				new SphereBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
+				new SphereBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
+			];
+
+		} );
+
+		QUnit.test( 'Standard geometry tests', function ( assert ) {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+} );

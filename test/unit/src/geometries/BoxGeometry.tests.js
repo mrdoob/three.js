@@ -1,38 +1,72 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import {
+	BoxGeometry,
+	BoxBufferGeometry
+} from '../../../../src/geometries/BoxGeometry';
 
-	var parameters = {
-		width: 10,
-		height: 20,
-		depth: 30,
-		widthSegments: 2,
-		heightSegments: 3,
-		depthSegments: 4
-	};
+export default QUnit.module.todo( 'Geometries', () => {
 
-	var geometries;
-	var box, cube, boxWithSegments;
+	QUnit.module.todo( 'BoxGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - BoxGeometry", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				width: 10,
+				height: 20,
+				depth: 30,
+				widthSegments: 2,
+				heightSegments: 3,
+				depthSegments: 4
+			};
 
-			box = new THREE.BoxGeometry( parameters.width, parameters.height, parameters.depth );
-			cube = new THREE.CubeGeometry( parameters.width, parameters.height, parameters.depth );
-			boxWithSegments = new THREE.BoxGeometry( parameters.width, parameters.height, parameters.depth,
-													parameters.widthSegments, parameters.heightSegments, parameters.depthSegments );
+			this.geometries = [
+				new BoxGeometry(),
+				new BoxGeometry( parameters.width, parameters.height, parameters.depth ),
+				new BoxGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments )
+			];
 
-			geometries = [ box, cube, boxWithSegments ];
+		} );
 
-		}
+		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
 
-	});
+			runStdGeometryTests( assert, this.geometries );
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+		} );
 
-		runStdGeometryTests( assert, geometries );
+	} );
 
-	});
+	QUnit.module.todo( 'BoxBufferGeometry', ( hooks ) => {
 
-})();
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				width: 10,
+				height: 20,
+				depth: 30,
+				widthSegments: 2,
+				heightSegments: 3,
+				depthSegments: 4
+			};
+
+			this.geometries = [
+				new BoxBufferGeometry(),
+				new BoxBufferGeometry( parameters.width, parameters.height, parameters.depth ),
+				new BoxBufferGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments )
+			];
+
+		} );
+
+		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+} );

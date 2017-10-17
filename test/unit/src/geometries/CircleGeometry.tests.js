@@ -1,38 +1,69 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { CircleGeometry, CircleBufferGeometry } from '../../../../src/geometries/CircleGeometry';
 
-	var parameters = {
-		radius: 10,
-		segments: 20,
-		thetaStart: 0.1,
-		thetaLength: 0.2
-	};
+export default QUnit.module.todo( 'Geometries', () => {
 
-	var geometries;
+	QUnit.module.todo( 'CircleGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - CircleGeometry", {
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				radius: 10,
+				segments: 20,
+				thetaStart: 0.1,
+				thetaLength: 0.2
+			};
 
-			geometries = [
-
-				new THREE.CircleGeometry(),
-				new THREE.CircleGeometry( parameters.radius ),
-				new THREE.CircleGeometry( parameters.radius, parameters.segments ),
-				new THREE.CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart ),
-				new THREE.CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart, parameters.thetaLength ),
-
+			this.geometries = [
+				new CircleGeometry(),
+				new CircleGeometry( parameters.radius ),
+				new CircleGeometry( parameters.radius, parameters.segments ),
+				new CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart ),
+				new CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart, parameters.thetaLength ),
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+			runStdGeometryTests( assert, this.geometries );
 
-		runStdGeometryTests( assert, geometries );
+		} );
 
-	});
+	} );
+	
+	QUnit.module.todo( 'CircleBufferGeometry', ( hooks ) => {
 
-})();
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				radius: 10,
+				segments: 20,
+				thetaStart: 0.1,
+				thetaLength: 0.2
+			};
+
+			this.geometries = [
+				new CircleBufferGeometry(),
+				new CircleBufferGeometry( parameters.radius ),
+				new CircleBufferGeometry( parameters.radius, parameters.segments ),
+				new CircleBufferGeometry( parameters.radius, parameters.segments, parameters.thetaStart ),
+				new CircleBufferGeometry( parameters.radius, parameters.segments, parameters.thetaStart, parameters.thetaLength ),
+			];
+
+		} );
+
+		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
+
+			runStdGeometryTests( assert, this.geometries );
+
+		} );
+
+	} );
+
+} );

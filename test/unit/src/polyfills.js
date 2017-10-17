@@ -1,11 +1,13 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'Polyfills', () => {
+import '../../../src/polyfills';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Polyfills', () => {
+
+	QUnit.test( 'write me !', ( assert ) => {
 
 		assert.ok( false, "everything's gonna be alright" );
 

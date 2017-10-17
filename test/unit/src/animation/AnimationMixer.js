@@ -1,13 +1,19 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'AnimationMixer', () => {
+import { AnimationMixer } from '../../../../src/animation/AnimationMixer';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Animation', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'AnimationMixer', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

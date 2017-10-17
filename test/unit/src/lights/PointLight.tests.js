@@ -1,27 +1,36 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import { PointLight } from '../../../../src/lights/PointLight';
 
-	var lights;
+export default QUnit.module.todo( 'Lights', () => {
 
-	QUnit.module( "Lights - PointLight", {
+	QUnit.module.todo( 'PointLight', ( hooks ) => {
 
-		beforeEach: function() {
+		hooks.beforeEach( function () {
 
-			lights = [
+			const parameters = {
+				color: 0xaaaaaa,
+				intensity: 0.8
+			};
 
-				new THREE.PointLight( 0xaaaaaa ),
-
+			this.lights = [
+				new PointLight(),
+				new PointLight( parameters.color ),
+				new PointLight( parameters.color, parameters.intensity )
 			];
 
-		}
+		} );
 
-	});
+		QUnit.test( 'Standard light tests', function ( assert ) {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			runStdLightTests( assert, this.lights );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+	} );
 
-})();
+} );

@@ -1,16 +1,20 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'AxesHelper', () => {
+import { AxesHelper } from '../../../../src/helpers/AxesHelper';
 
-	test( 'write me !', assert => {
+export default QUnit.module.todo( 'Helpers', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'AxesHelper', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 
 } );
-//Todo
-console.warn("Todo: Unit tests of AxisHelper")

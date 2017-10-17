@@ -1,14 +1,24 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'ShaderChunk', () => {
+import { ShaderChunk } from '../../../../../src/renderers/shaders/ShaderChunk';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Renderers', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module( 'Shaders', () => {
 
+		QUnit.module.todo( 'ShaderChunk', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
+		
 	} );
 
 } );

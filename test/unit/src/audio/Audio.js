@@ -1,14 +1,20 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'Audio', () => {
+import { Audio } from '../../../../src/audio/Audio';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Audios', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module.todo( 'Audio', () => {
+
+		QUnit.test( 'write me !', ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
-
+	
 } );

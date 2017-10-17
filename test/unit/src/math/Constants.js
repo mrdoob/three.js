@@ -2,23 +2,26 @@
  * @author bhouston / http://exocortex.com
  */
 
-var x = 2;
-var y = 3;
-var z = 4;
-var w = 5;
+import { Vector2 } from '../../../../src/math/Vector2';
+import { Vector3 } from '../../../../src/math/Vector3';
 
-var negInf2 = new THREE.Vector2( -Infinity, -Infinity );
-var posInf2 = new THREE.Vector2( Infinity, Infinity );
+export const x = 2;
+export const y = 3;
+export const z = 4;
+export const w = 5;
 
-var zero2 = new THREE.Vector2();
-var one2 = new THREE.Vector2( 1, 1 );
-var two2 = new THREE.Vector2( 2, 2 );
+export const negInf2 = new Vector2( - Infinity, - Infinity );
+export const posInf2 = new Vector2( Infinity, Infinity );
 
-var negInf3 = new THREE.Vector3( -Infinity, -Infinity, -Infinity );
-var posInf3 = new THREE.Vector3( Infinity, Infinity, Infinity );
+export const zero2 = new Vector2();
+export const one2 = new Vector2( 1, 1 );
+export const two2 = new Vector2( 2, 2 );
 
-var zero3 = new THREE.Vector3();
-var one3 = new THREE.Vector3( 1, 1, 1 );
-var two3 = new THREE.Vector3( 2, 2, 2 );
+export const negInf3 = new Vector3( - Infinity, - Infinity, - Infinity );
+export const posInf3 = new Vector3( Infinity, Infinity, Infinity );
 
-var eps = 0.0001;
+export const zero3 = new Vector3();
+export const one3 = new Vector3( 1, 1, 1 );
+export const two3 = new Vector3( 2, 2, 2 );
+
+export const eps = 0.0001;

@@ -1,13 +1,23 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
  */
-/* global module, test */
+/* global QUnit */
 
-module.todo( 'StringKeyframeTrack', () => {
+import { StringKeyframeTrack } from '../../../../../src/animation/tracks/StringKeyframeTrack';
 
-	test( 'write me !', assert => {
+export default QUnit.module( 'Animation', () => {
 
-		assert.ok( false, "everything's gonna be alright" );
+	QUnit.module( 'Tracks', () => {
+
+		QUnit.module.todo( 'StringKeyframeTrack', () => {
+
+			QUnit.test( 'write me !', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+		} );
 
 	} );
 
