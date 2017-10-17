@@ -3,11 +3,11 @@
  */
 /* global QUnit */
 
-import { SpritMaterial } from '../../../../src/materials/SpritMaterial';
+import { SpriteMaterial } from '../../../../src/materials/SpriteMaterial';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'SpritMaterial', () => {
+	QUnit.module.todo( 'SpriteMaterial', () => {
 
 		QUnit.test( 'write me !', ( assert ) => {
 
