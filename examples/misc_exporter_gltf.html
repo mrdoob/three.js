@@ -32,6 +32,7 @@
 			<label><input id="option_trs" name="trs" type="checkbox"/>TRS</label>
 			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
 			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label>
+			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -48,13 +49,22 @@
 				var options = {
 					trs: document.getElementById('option_trs').checked,
 					onlyVisible: document.getElementById('option_visible').checked,
-					truncateDrawRange: document.getElementById('option_drawrange').checked
-				}
+					truncateDrawRange: document.getElementById('option_drawrange').checked,
+					binary: document.getElementById('option_binary').checked
+				};
 				gltfExporter.parse( input, function( result ) {
 
-					var output = JSON.stringify( result, null, 2 );
-					console.log( output );
-					saveString( output, 'scene.gltf' );
+					if ( result instanceof ArrayBuffer ) {
+
+						saveArrayBuffer( result, 'scene.glb' );
+
+					} else {
+
+						var output = JSON.stringify( result, null, 2 );
+						console.log( output );
+						saveString( output, 'scene.gltf' );
+
+					}
 
 				}, options );
 
@@ -98,7 +108,7 @@
 			function save( blob, filename ) {
 
 				link.href = URL.createObjectURL( blob );
-				link.download = filename || 'data.json';
+				link.download = filename;
 				link.click();
 
 				// URL.revokeObjectURL( url ); breaks Firefox...
@@ -108,6 +118,13 @@
 			function saveString( text, filename ) {
 
 				save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+			}
+
+
+			function saveArrayBuffer( buffer, filename ) {
+
+				save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
 
 			}
 

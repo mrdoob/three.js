@@ -54,6 +54,7 @@ THREE.GLTFExporter.prototype = {
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
 	 *                          trs: Exports position, rotation and scale instead of matrix
+	 *                          binary: Exports `.glb` as ArrayBuffer, instead of `.gltf` as JSON
 	 */
 	parse: function ( input, onDone, options ) {
 
@@ -101,6 +102,33 @@ THREE.GLTFExporter.prototype = {
 				return element === array2[ index ];
 
 			} );
+
+		}
+
+		/**
+		 * Converts a string to an ArrayBuffer.
+		 * @param  {string} text
+		 * @return {ArrayBuffer}
+		 */
+		function stringToArrayBuffer( text ) {
+
+			if ( window.TextEncoder !== undefined ) {
+
+				return new TextEncoder().encode( text ).buffer;
+
+			}
+
+			var buffer = new ArrayBuffer( text.length * 2 ); // 2 bytes per character.
+
+			var bufferView = new Uint16Array( buffer );
+
+			for ( var i = 0; i < text.length; ++ i ) {
+
+				bufferView[ i ] = text.charCodeAt( i );
+
+			}
+
+			return buffer;
 
 		}
 
@@ -1002,17 +1030,77 @@ THREE.GLTFExporter.prototype = {
 		if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
 
 			outputJSON.buffers[ 0 ].byteLength = blob.size;
-			var objectURL = URL.createObjectURL( blob );
 
 			var reader = new window.FileReader();
-			reader.readAsDataURL( blob );
-			reader.onloadend = function () {
 
-				var base64data = reader.result;
-				outputJSON.buffers[ 0 ].uri = base64data;
-				onDone( outputJSON );
+			if ( options.binary === true ) {
 
-			};
+				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+
+				var GLB_HEADER_BYTES = 12;
+				var GLB_HEADER_MAGIC = 0x46546C67;
+				var GLB_VERSION = 2;
+
+				var GLB_CHUNK_PREFIX_BYTES = 8;
+				var GLB_CHUNK_TYPE_JSON = 0x4E4F534A;
+				var GLB_CHUNK_TYPE_BIN = 0x004E4942;
+
+				reader.readAsArrayBuffer( blob );
+				reader.onloadend = function () {
+
+					// Binary chunk.
+					var binaryChunk = reader.result;
+					var binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+					binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
+					binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
+
+					// JSON chunk.
+					delete outputJSON.buffers[ 0 ].uri; // Omitted URI indicates use of binary chunk.
+					var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ) );
+					var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
+					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
+
+					// GLB header.
+					var header = new ArrayBuffer( GLB_HEADER_BYTES );
+					var headerView = new DataView( header );
+					headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
+					headerView.setUint32( 4, GLB_VERSION, true );
+					var totalByteLength = GLB_HEADER_BYTES
+						+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
+						+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
+					headerView.setUint32( 8, totalByteLength, true );
+
+					var glbBlob = new Blob( [
+						header,
+						jsonChunkPrefix,
+						jsonChunk,
+						binaryChunkPrefix,
+						binaryChunk
+					], { type: 'application/octet-stream' } );
+
+					var glbReader = new window.FileReader();
+					glbReader.readAsArrayBuffer( glbBlob );
+					glbReader.onloadend = function () {
+
+						onDone( glbReader.result );
+
+					};
+
+				};
+
+			} else {
+
+				reader.readAsDataURL( blob );
+				reader.onloadend = function () {
+
+					var base64data = reader.result;
+					outputJSON.buffers[ 0 ].uri = base64data;
+					onDone( outputJSON );
+
+				};
+
+			}
 
 		} else {
 
