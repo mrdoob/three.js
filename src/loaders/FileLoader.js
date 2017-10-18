@@ -123,7 +123,11 @@ Object.assign( FileLoader.prototype, {
 
 					if ( this.status === 200 ) {
 
-						_onLoad( response );
+						if( _onLoad !== undefined ) {
+
+							_onLoad( response );
+
+						}
 
 						scope.manager.itemEnd( url );
 
@@ -134,13 +138,21 @@ Object.assign( FileLoader.prototype, {
 
 						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-						_onLoad( response );
+						if( _onLoad !== undefined ) {
+
+							_onLoad( response );
+
+						}
 
 						scope.manager.itemEnd( url );
 
 					} else {
 
-						_onError( event );
+						if( _onError !== undefined ) {
+
+							_onError( event );
+
+						}
 
 						scope.manager.itemEnd( url );
 						scope.manager.itemError( url );
@@ -152,14 +164,22 @@ Object.assign( FileLoader.prototype, {
 
 				request.addEventListener( 'progress', function ( event ) {
 
-					_onProgress( event );
+					if( _onProgress !== undefined) {
+
+						_onProgress( event );
+
+					}
 
 				}, false );
 
 
 				request.addEventListener( 'error', function ( event ) {
 
-					_onError( event );
+					if( _onError !== undefined ) {
+
+						_onError( event );
+
+					}
 
 					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
