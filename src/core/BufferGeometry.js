@@ -341,7 +341,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 		for ( var i = 0, l = points.length; i < l; i ++ ) {
 
 			var point = points[ i ];
-			position.push( point.x, point.y, 0 );
+			position.push( point.x, point.y, point.z || 0 );
 
 		}
 
