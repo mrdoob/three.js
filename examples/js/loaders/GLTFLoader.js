@@ -1350,7 +1350,7 @@ THREE.GLTFLoader = ( function () {
 			return parser.getDependency( 'bufferView', accessor.bufferView ).then( function ( bufferView ) {
 
 				var itemSize = WEBGL_TYPE_SIZES[ accessor.type ];
-				var TypedArray = THREE.WEBGL_TO_THREE[ accessor.componentType ];
+				var TypedArray = THREE.WebGLUtils.fromGL[ accessor.componentType ];
 
 				// For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
 				var elementBytes = TypedArray.BYTES_PER_ELEMENT;
@@ -1444,24 +1444,24 @@ THREE.GLTFLoader = ( function () {
 
 			if ( textureDef.name !== undefined ) texture.name = textureDef.name;
 
-			texture.format = textureDef.format !== undefined ? THREE.WEBGL_TO_THREE[ textureDef.format ] : THREE.RGBAFormat;
+			texture.format = textureDef.format !== undefined ? THREE.WebGLUtils.fromGL[ textureDef.format ] : THREE.RGBAFormat;
 
-			if ( textureDef.internalFormat !== undefined && texture.format !== THREE.WEBGL_TO_THREE[ textureDef.internalFormat ] ) {
+			if ( textureDef.internalFormat !== undefined && texture.format !== THREE.WebGLUtils.fromGL[ textureDef.internalFormat ] ) {
 
 				console.warn( 'THREE.GLTFLoader: Three.js does not support texture internalFormat which is different from texture format. ' +
 											'internalFormat will be forced to be the same value as format.' );
 
 			}
 
-			texture.type = textureDef.type !== undefined ? THREE.WEBGL_TO_THREE[ textureDef.type ] : THREE.UnsignedByteType;
+			texture.type = textureDef.type !== undefined ? THREE.WebGLUtils.fromGL[ textureDef.type ] : THREE.UnsignedByteType;
 
 			var samplers = json.samplers || {};
 			var sampler = samplers[ textureDef.sampler ] || {};
 
-			texture.magFilter = THREE.WEBGL_TO_THREE[ sampler.magFilter ] || THREE.LinearFilter;
-			texture.minFilter = THREE.WEBGL_TO_THREE[ sampler.minFilter ] || THREE.LinearMipMapLinearFilter;
-			texture.wrapS = THREE.WEBGL_TO_THREE[ sampler.wrapS ] || THREE.RepeatWrapping;
-			texture.wrapT = THREE.WEBGL_TO_THREE[ sampler.wrapT ] || THREE.RepeatWrapping;
+			texture.magFilter = THREE.WebGLUtils.fromGL[ sampler.magFilter ] || THREE.LinearFilter;
+			texture.minFilter = THREE.WebGLUtils.fromGL[ sampler.minFilter ] || THREE.LinearMipMapLinearFilter;
+			texture.wrapS = THREE.WebGLUtils.fromGL[ sampler.wrapS ] || THREE.RepeatWrapping;
+			texture.wrapT = THREE.WebGLUtils.fromGL[ sampler.wrapT ] || THREE.RepeatWrapping;
 
 			return texture;
 

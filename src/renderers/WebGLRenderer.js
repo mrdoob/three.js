@@ -29,7 +29,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { WebGLClipping } from './webgl/WebGLClipping.js';
 import { Frustum } from '../math/Frustum.js';
 import { Vector4 } from '../math/Vector4.js';
-import { WebGLUtils } from './webgl/WebGLUtils';
+import { WebGLUtils } from './webgl/WebGLUtils.js';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -257,12 +257,6 @@ function WebGLRenderer( parameters ) {
 		extensions.get( 'OES_standard_derivatives' );
 		extensions.get( 'OES_element_index_uint' );
 		extensions.get( 'ANGLE_instanced_arrays' );
-
-		if ( extensions.get( 'OES_element_index_uint' ) ) {
-
-			BufferGeometry.MaxIndex = 4294967296;
-
-		}
 
 		capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 

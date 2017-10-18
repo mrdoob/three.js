@@ -368,10 +368,10 @@ THREE.GLTFExporter.prototype = {
 
 			var gltfSampler = {
 
-				magFilter: THREE.WebGLUtils.toGL[ map.magFilter ],
-				minFilter: THREE.WebGLUtils.toGL[ map.minFilter ],
-				wrapS: THREE.WebGLUtils.toGL[ map.wrapS ],
-				wrapT: THREE.WebGLUtils.toGL[ map.wrapT ]
+				magFilter: THREE.WebGLUtils.toGL( map.magFilter ),
+				minFilter: THREE.WebGLUtils.toGL( map.minFilter ),
+				wrapS: THREE.WebGLUtils.toGL( map.wrapS ),
+				wrapT: THREE.WebGLUtils.toGL( map.wrapT)
 
 			};
 
