@@ -377,9 +377,9 @@ UI.Select = function () {
 UI.Select.prototype = Object.create( UI.Element.prototype );
 UI.Select.prototype.constructor = UI.Select;
 
-UI.Select.prototype.setMultiple = function ( boolean ) {
+UI.Select.prototype.setMultiple = function ( multiple ) {
 
-	this.dom.multiple = boolean;
+	this.dom.multiple = multiple;
 
 	return this;
 
@@ -432,7 +432,7 @@ UI.Select.prototype.setValue = function ( value ) {
 
 // Checkbox
 
-UI.Checkbox = function ( boolean ) {
+UI.Checkbox = function ( checked ) {
 
 	UI.Element.call( this );
 
@@ -443,7 +443,7 @@ UI.Checkbox = function ( boolean ) {
 	dom.type = 'checkbox';
 
 	this.dom = dom;
-	this.setValue( boolean );
+	this.setValue( checked );
 
 	return this;
 
