@@ -388,7 +388,7 @@
 
 		if ( 'Scaling' in textureNode.properties ) {
 
-			values = textureNode.properties.Scaling.value;
+			var values = textureNode.properties.Scaling.value;
 
 			if ( typeof values === 'string' ) {
 
