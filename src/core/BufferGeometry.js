@@ -345,7 +345,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		this.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 
 		return this;
 
