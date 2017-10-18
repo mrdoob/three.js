@@ -10,12 +10,15 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'TextGeometry', ( hooks ) => {
+	QUnit.module( 'TextGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {};
+			// TODO: we cannot load any font from Threejs package :S
+			const parameters = {
+				font: undefined
+			};
 
 			geometries = [
 				new TextGeometry()
@@ -31,7 +34,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'TextBufferGeometry', ( hooks ) => {
+	QUnit.module( 'TextBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

@@ -7,7 +7,7 @@ import { Box3Helper } from '../../../../src/helpers/Box3Helper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module( 'Box3Helper', () => {
+	QUnit.module.todo( 'Box3Helper', () => {
 
 		QUnit.test( 'write me !', ( assert ) => {
 
