@@ -15,10 +15,16 @@ export default QUnit.module( 'Geometries', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {};
+			const parameters = {
+				points: [],
+				segments: 0,
+				phiStart: 0,
+				phiLength: 0
+			};
 
 			geometries = [
-				new LatheGeometry()
+				//				new LatheGeometry(), // Todo: error for undefined point
+				new LatheGeometry( parameters.points )
 			];
 
 		} );
@@ -36,10 +42,16 @@ export default QUnit.module( 'Geometries', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {};
+			const parameters = {
+				points: [],
+				segments: 0,
+				phiStart: 0,
+				phiLength: 0
+			};
 
 			geometries = [
-				new LatheBufferGeometry()
+				//				new LatheBufferGeometry(), // Todo: error for undefined point
+				new LatheBufferGeometry( parameters.points )
 			];
 
 		} );
