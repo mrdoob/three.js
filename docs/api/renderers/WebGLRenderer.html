@@ -185,6 +185,12 @@
 			</li>
 		</ul>
 		</div>
+		<div>By default these data are reset at each render calls, but when using the composer or mirrors it can be preferred to reset them with a custom pattern :
+		<code>
+		renderer.info.autoReset = false;
+		renderer.info.reset();
+		</code>
+		</div>
 
 		<h3>[property:Boolean localClippingEnabled]</h3>
 		<div>Defines whether the renderer respects object-level clipping planes. Default is *false*.</div>
