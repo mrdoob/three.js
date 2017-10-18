@@ -238,6 +238,7 @@
 				break;
 
 			case 'jpg':
+			case 'jpeg':
 
 				type = 'image/jpeg';
 				break;
