@@ -921,6 +921,21 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	},
 
+	setFromPoints: function ( points ) {
+
+		this.vertices = [];
+
+		for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+			var point = points[ i ];
+			this.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
+
+		}
+
+		return this;
+
+	},
+
 	sortFacesByMaterialIndex: function () {
 
 		var faces = this.faces;

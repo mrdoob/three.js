@@ -27,8 +27,8 @@ var curve = new THREE.CatmullRomCurve3( [
 	new THREE.Vector3( 10, 0, 10 )
 ] );
 
-var geometry = new THREE.Geometry();
-geometry.vertices = curve.getPoints( 50 );
+var points = curve.getPoints( 50 );
+var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
 var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
