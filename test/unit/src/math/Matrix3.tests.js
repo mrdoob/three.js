@@ -214,16 +214,16 @@ export default QUnit.module( 'Maths', () => {
 			var c = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
 			b.getInverse( a, false );
-			assert.ok( matrixEquals3( a, identity ), "Passed!" );
+			assert.ok( matrixEquals3( a, identity ), "Matrix a is identity matrix" );
 
 			try {
 
 				b.getInverse( c, true );
-				assert.ok( false, "Passed!" ); // should never get here.
+				assert.ok( false, "Should never get here !" ); // should never get here.
 
 			} catch ( err ) {
 
-				assert.ok( true, "Passed!" );
+				assert.ok( true, "Passed: " + err );
 
 			}
 
@@ -238,7 +238,7 @@ export default QUnit.module( 'Maths', () => {
 				new Matrix4().makeScale( 1 / 8, 1 / 2, 1 / 3 )
 			];
 
-			for ( var i = 0, il = QUnit.testMatrices.length; i < il; i ++ ) {
+			for ( var i = 0, il = testMatrices.length; i < il; i ++ ) {
 
 				var m = testMatrices[ i ];
 
