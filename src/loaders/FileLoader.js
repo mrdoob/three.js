@@ -23,7 +23,7 @@ Object.assign( FileLoader.prototype, {
 
 		var cached = Cache.get( url );
 
-		if ( cached !== undefined ) {
+		if ( cached !== undefined && ! cached.loaderSubscriptions ) {
 
 			scope.manager.itemStart( url );
 
@@ -36,6 +36,19 @@ Object.assign( FileLoader.prototype, {
 			}, 0 );
 
 			return cached;
+
+		}
+
+		// If file is already in process of loading, wait for it to load.
+		if ( cached !== undefined && cached.loaderSubscriptions ) {
+
+			cached.loaderSubscriptions.push( function () {
+
+				scope.load( url, onLoad, onProgress, onError );
+
+			} );
+
+			return;
 
 		}
 
@@ -128,7 +141,12 @@ Object.assign( FileLoader.prototype, {
 
 		} else {
 
+			var loaderSubscriptions = [];
 			var request = new XMLHttpRequest();
+
+			// Allow other file loaders to wait and subscribe on this request.
+			Cache.add( url, { loaderSubscriptions: loaderSubscriptions } );
+
 			request.open( 'GET', url, true );
 
 			request.addEventListener( 'load', function ( event ) {
@@ -160,6 +178,13 @@ Object.assign( FileLoader.prototype, {
 
 					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
+
+				}
+
+				// Tell other requests for the same file that the file has finished loading.
+				for ( var i = 0; i < loaderSubscriptions.length; i ++ ) {
+
+					loaderSubscriptions[ i ]( response );
 
 				}
 
