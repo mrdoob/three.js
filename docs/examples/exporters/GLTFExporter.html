@@ -72,16 +72,17 @@ exporter.parse( [ scene1, object1, object2, scene2 ], ...)
 			</code>
 		</ul>
 
-		[page:Function onCompleted] — Will be called when the export completes. The argument will be the generated glTF JSON.<br />
+		[page:Function onCompleted] — Will be called when the export completes. The argument will be the generated glTF JSON or binary ArrayBuffer.<br />
 		[page:Options options] - Export options<br />
 		<ul>
 			<li>trs - bool. Export position, rotation and scale instead of matrix per node. Default is false</li>
 			<li>onlyVisible - bool. Export only visible objects. Default is true.</li>
 			<li>truncateDrawRange - bool. Export just the attributes within the drawRange, if defined, instead of exporting the whole array. Default is true.</li>
+			<li>binary - bool. Export in binary (.glb) format, returning an ArrayBuffer. Default is false.</li>
 		</ul>
 		</div>
 		<div>
-		Generates a glTF output (JSON) with from the input (Scene or Objects)
+		Generates a .gltf (JSON) or .glb (binary) output from the input (Scene or Objects)
 		</div>
 
 		<h2>Source</h2>
