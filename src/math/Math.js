@@ -25,7 +25,8 @@ var _Math = {
 
 				}
 
-				uuid[ i ] = chars[ ( rnd >> i ) & 0xf ];
+				rnd >>= 1;
+				uuid[ i ] = chars[ rnd & 0xf ];
 			}
 
 			return uuid.join( '' );
