@@ -6,14 +6,15 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 	var scope = this;
 
-	var isLoading = false, itemsLoaded = 0, itemsTotal = 0;
+	var isLoading = false;
+	var itemsLoaded = 0;
+	var itemsTotal = 0;
+	var resourceTransform = undefined;
 
 	this.onStart = undefined;
 	this.onLoad = onLoad;
 	this.onProgress = onProgress;
 	this.onError = onError;
-
-	this.resourceTransform = undefined;
 
 	this.itemStart = function ( url ) {
 
@@ -69,9 +70,9 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 	this.resolveResourceURL = function ( url ) {
 
-		if ( this.resourceTransform ) {
+		if ( resourceTransform ) {
 
-			return this.resourceTransform( url );
+			return resourceTransform( url );
 
 		}
 
@@ -81,7 +82,7 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 	this.setResourceTransform = function ( transform ) {
 
-		this.resourceTransform = transform;
+		resourceTransform = transform;
 
 	};
 
