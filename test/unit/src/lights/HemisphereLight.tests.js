@@ -1,6 +1,6 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
+ * @author moraxy / https://github.com/moraxy
  */
 /* global QUnit */
 

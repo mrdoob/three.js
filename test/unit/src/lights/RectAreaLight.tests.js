@@ -1,6 +1,6 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
+ * @author moraxy / https://github.com/moraxy
  */
 /* global QUnit */
 
@@ -15,15 +15,16 @@ export default QUnit.module( 'Lights', () => {
 
 			const parameters = {
 				color: 0xaaaaaa,
-				intensity: 0.5
+				intensity: 0.5,
+				width: 100,
+				height: 50
 			};
 
 			lights = [
 				new RectAreaLight( parameters.color ),
 				new RectAreaLight( parameters.color, parameters.intensity ),
-				new RectAreaLight( parameters.color, parameters.intensity, 5.0 ),
-				new RectAreaLight( parameters.color, parameters.intensity, 5.0, 20.0 ),
-				new RectAreaLight( parameters.color, parameters.intensity, undefined, 20.0 ),
+				new RectAreaLight( parameters.color, parameters.intensity, parameters.width ),
+				new RectAreaLight( parameters.color, parameters.intensity, parameters.width, parameters.height )
 			];
 
 		} );

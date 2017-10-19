@@ -1,6 +1,6 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
+ * @author moraxy / https://github.com/moraxy
  */
 /* global QUnit */
 
@@ -14,12 +14,14 @@ export default QUnit.module( 'Lights', () => {
 		hooks.beforeEach( function () {
 
 			const parameters = {
-				color: 0xaaaaaa
+				color: 0xaaaaaa,
+				intensity: 0.5
 			};
 
 			lights = [
 				new AmbientLight(),
-				new AmbientLight( parameters.color )
+				new AmbientLight( parameters.color ),
+				new AmbientLight( parameters.color, parameters.intensity )
 			];
 
 		} );

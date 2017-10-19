@@ -1,6 +1,6 @@
 /**
  * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
+ * @author moraxy / https://github.com/moraxy
  */
 /* global QUnit */
 
@@ -36,6 +36,21 @@ export default QUnit.module( 'Lights', () => {
 		QUnit.test( 'Standard light tests', ( assert ) => {
 
 			runStdLightTests( assert, lights );
+
+		} );
+
+		QUnit.test( "power", function ( assert ) {
+
+			var a = new SpotLight( 0xaaaaaa );
+
+			a.intensity = 100;
+			assert.numEqual( a.power, 100 * Math.PI, "Correct power for an intensity of 100" );
+
+			a.intensity = 40;
+			assert.numEqual( a.power, 40 * Math.PI, "Correct power for an intensity of 40" );
+
+			a.power = 100;
+			assert.numEqual( a.intensity, 100 / Math.PI, "Correct intensity for a power of 100" );
 
 		} );
 
