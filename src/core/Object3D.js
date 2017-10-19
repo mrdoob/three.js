@@ -21,7 +21,33 @@ function Object3D() {
 
 	Object.defineProperty( this, 'id', { value: object3DId ++ } );
 
-	this.uuid = _Math.generateUUID();
+	this._uuid = undefined;
+
+	Object.defineProperties( this, {
+
+		uuid: {
+
+			get: function () {
+
+				if ( this._uuid === undefined ) {
+
+					this._uuid = _Math.generateUUID();
+
+				}
+
+				return this._uuid;
+
+			},
+
+			set: function ( value ) {
+
+				this._uuid = value;
+
+			}
+
+		}
+
+	} );
 
 	this.name = '';
 	this.type = 'Object3D';

@@ -17,7 +17,33 @@ import { _Math } from '../math/Math.js';
 */
 function WebGLRenderTarget( width, height, options ) {
 
-	this.uuid = _Math.generateUUID();
+	this._uuid = undefined;
+
+	Object.defineProperties( this, {
+
+		uuid: {
+
+			get: function () {
+
+				if ( this._uuid === undefined ) {
+
+					this._uuid = _Math.generateUUID();
+
+				}
+
+				return this._uuid;
+
+			},
+
+			set: function ( value ) {
+
+				this._uuid = value;
+
+			}
+
+		}
+
+	} );
 
 	this.width = width;
 	this.height = height;

@@ -4,7 +4,33 @@
 
 THREE.GLNode = function( type ) {
 
-	this.uuid = THREE.Math.generateUUID();
+	this._uuid = undefined;
+
+	Object.defineProperties( this, {
+
+		uuid: {
+
+			get: function () {
+
+				if ( this._uuid === undefined ) {
+
+					this._uuid = THREE.Math.generateUUID();
+
+				}
+
+				return this._uuid;
+
+			},
+
+			set: function ( value ) {
+
+				this._uuid = value;
+
+			}
+
+		}
+
+	} );
 
 	this.allows = {};
 	this.requestUpdate = false;

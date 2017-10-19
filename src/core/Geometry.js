@@ -25,7 +25,33 @@ function Geometry() {
 
 	Object.defineProperty( this, 'id', { value: geometryId += 2 } );
 
-	this.uuid = _Math.generateUUID();
+	this._uuid = undefined;
+
+	Object.defineProperties( this, {
+
+		uuid: {
+
+			get: function () {
+
+				if ( this._uuid === undefined ) {
+
+					this._uuid = _Math.generateUUID();
+
+				}
+
+				return this._uuid;
+
+			},
+
+			set: function ( value ) {
+
+				this._uuid = value;
+
+			}
+
+		}
+
+	} );
 
 	this.name = '';
 	this.type = 'Geometry';
