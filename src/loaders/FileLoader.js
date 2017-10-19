@@ -21,24 +21,6 @@ Object.assign( FileLoader.prototype, {
 
 		var scope = this;
 
-		var cached = Cache.get( url );
-
-		if ( cached !== undefined ) {
-
-			scope.manager.itemStart( url );
-
-			setTimeout( function () {
-
-				if ( onLoad ) onLoad( cached );
-
-				scope.manager.itemEnd( url );
-
-			}, 0 );
-
-			return cached;
-
-		}
-
 		// Check for data: URI
 		var dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
 		var dataUriRegexResult = url.match( dataUriRegex );
@@ -130,80 +112,97 @@ Object.assign( FileLoader.prototype, {
 
 		} else {
 
-			var request = new XMLHttpRequest();
-			request.open( 'GET', url, true );
+			return Cache.retrieve( url, function ( _onLoad, _onProgress, _onError ) {
 
-			request.addEventListener( 'load', function ( event ) {
+				var request = new XMLHttpRequest();
+				request.open( 'GET', url, true );
 
-				var response = event.target.response;
+				request.addEventListener( 'load', function ( event ) {
 
-				Cache.add( url, response );
+					var response = event.target.response;
 
-				if ( this.status === 200 ) {
+					if ( this.status === 200 ) {
 
-					if ( onLoad ) onLoad( response );
+						if( _onLoad !== undefined ) {
 
-					scope.manager.itemEnd( url );
+							_onLoad( response );
 
-				} else if ( this.status === 0 ) {
+						}
 
-					// Some browsers return HTTP Status 0 when using non-http protocol
-					// e.g. 'file://' or 'data://'. Handle as success.
+						scope.manager.itemEnd( url );
 
-					console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+					} else if ( this.status === 0 ) {
 
-					if ( onLoad ) onLoad( response );
+						// Some browsers return HTTP Status 0 when using non-http protocol
+						// e.g. 'file://' or 'data://'. Handle as success.
 
-					scope.manager.itemEnd( url );
+						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-				} else {
+						if( _onLoad !== undefined ) {
 
-					if ( onError ) onError( event );
+							_onLoad( response );
+
+						}
+
+						scope.manager.itemEnd( url );
+
+					} else {
+
+						if( _onError !== undefined ) {
+
+							_onError( event );
+
+						}
+
+						scope.manager.itemEnd( url );
+						scope.manager.itemError( url );
+
+					}
+
+				}, false );
+
+
+				request.addEventListener( 'progress', function ( event ) {
+
+					if( _onProgress !== undefined) {
+
+						_onProgress( event );
+
+					}
+
+				}, false );
+
+
+				request.addEventListener( 'error', function ( event ) {
+
+					if( _onError !== undefined ) {
+
+						_onError( event );
+
+					}
 
 					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
 
-				}
-
-			}, false );
-
-			if ( onProgress !== undefined ) {
-
-				request.addEventListener( 'progress', function ( event ) {
-
-					onProgress( event );
-
 				}, false );
 
-			}
+				if ( scope.responseType !== undefined ) request.responseType = scope.responseType;
+				if ( scope.withCredentials !== undefined ) request.withCredentials = scope.withCredentials;
 
-			request.addEventListener( 'error', function ( event ) {
+				if ( request.overrideMimeType ) request.overrideMimeType( scope.mimeType !== undefined ? scope.mimeType : 'text/plain' );
 
-				if ( onError ) onError( event );
+				for ( var header in scope.requestHeader ) {
 
-				scope.manager.itemEnd( url );
-				scope.manager.itemError( url );
+					request.setRequestHeader( header, scope.requestHeader[ header ] );
 
-			}, false );
+				}
 
-			if ( this.responseType !== undefined ) request.responseType = this.responseType;
-			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
+				request.send( null );
+				scope.manager.itemStart( url );
 
-			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
-
-			for ( var header in this.requestHeader ) {
-
-				request.setRequestHeader( header, this.requestHeader[ header ] );
-
-			}
-
-			request.send( null );
+			}, onLoad, onProgress, onError );
 
 		}
-
-		scope.manager.itemStart( url );
-
-		return request;
 
 	},
 
