@@ -5,6 +5,8 @@
 import { Cache } from './Cache';
 import { DefaultLoadingManager } from './LoadingManager';
 
+var currentlyLoadingFiles = {};
+
 function FileLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
@@ -23,7 +25,7 @@ Object.assign( FileLoader.prototype, {
 
 		var cached = Cache.get( url );
 
-		if ( cached !== undefined && ! cached.loaderSubscriptions ) {
+		if ( cached !== undefined ) {
 
 			scope.manager.itemStart( url );
 
@@ -40,9 +42,9 @@ Object.assign( FileLoader.prototype, {
 		}
 
 		// If file is already in process of loading, wait for it to load.
-		if ( cached !== undefined && cached.loaderSubscriptions ) {
+		if ( currentlyLoadingFiles[ url ] !== undefined ) {
 
-			cached.loaderSubscriptions.push( function () {
+			currentlyLoadingFiles[ url ].push( function () {
 
 				scope.load( url, onLoad, onProgress, onError );
 
@@ -141,11 +143,14 @@ Object.assign( FileLoader.prototype, {
 
 		} else {
 
-			var loaderSubscriptions = [];
 			var request = new XMLHttpRequest();
 
-			// Allow other file loaders to wait and subscribe on this request.
-			Cache.add( url, { loaderSubscriptions: loaderSubscriptions } );
+			if ( Cache.enabled ) {
+
+				// Allow other file loaders to wait and subscribe on this request.
+				currentlyLoadingFiles[ url ] = [];
+
+			}
 
 			request.open( 'GET', url, true );
 
@@ -181,10 +186,18 @@ Object.assign( FileLoader.prototype, {
 
 				}
 
-				// Tell other requests for the same file that the file has finished loading.
-				for ( var i = 0; i < loaderSubscriptions.length; i ++ ) {
+				if ( Cache.enabled ) {
 
-					loaderSubscriptions[ i ]( response );
+					var duplicateRequests = currentlyLoadingFiles[ url ];
+
+					delete currentlyLoadingFiles[ url ];
+
+					// Tell other requests for the same file that the file has finished loading.
+					for ( var i = 0; i < duplicateRequests.length; i ++ ) {
+
+						duplicateRequests[i]( response );
+
+					}
 
 				}
 
