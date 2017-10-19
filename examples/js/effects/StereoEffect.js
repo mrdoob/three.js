@@ -9,6 +9,8 @@ THREE.StereoEffect = function ( renderer ) {
 
 	var _stereo = new THREE.StereoCamera();
 	_stereo.aspect = 0.5;
+	_stereo.cameraL.name = 'L';
+	_stereo.cameraR.name = 'R';
 
 	this.setEyeSeparation = function ( eyeSep ) {
 
@@ -37,10 +39,14 @@ THREE.StereoEffect = function ( renderer ) {
 
 		renderer.setScissor( 0, 0, size.width / 2, size.height );
 		renderer.setViewport( 0, 0, size.width / 2, size.height );
+		_stereo.cameraL.updateProjectionMatrix();
+		_stereo.cameraL.position.set( this.eyeSep, 0, 3 );
 		renderer.render( scene, _stereo.cameraL );
 
 		renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
 		renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
+		_stereo.cameraR.updateProjectionMatrix();
+		_stereo.cameraR.position.set( this.eyeSep, 0, 3 );
 		renderer.render( scene, _stereo.cameraR );
 
 		renderer.setScissorTest( false );
