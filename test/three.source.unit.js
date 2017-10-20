@@ -1,3 +1,7 @@
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ */
+
 //src
 import './unit/src/constants.tests';
 import './unit/src/polyfills.tests';
@@ -11,8 +15,6 @@ import './unit/src/animation/AnimationMixer.tests';
 import './unit/src/animation/AnimationObjectGroup.tests';
 import './unit/src/animation/AnimationUtils.tests';
 import './unit/src/animation/KeyframeTrack.tests';
-import './unit/src/animation/KeyframeTrackConstructor.tests';
-import './unit/src/animation/KeyframeTrackPrototype.tests';
 import './unit/src/animation/PropertyBinding.tests';
 import './unit/src/animation/PropertyMixer.tests';
 
