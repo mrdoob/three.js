@@ -70,9 +70,13 @@ scene.add( helper );
 		 The light's view of the world. This is used to generate a depth map of the scene; objects behind
 		 other objects from the light's perspective will be in shadow.<br /><br />
 
-		 The default is a  [page:PerspectiveCamera] with [page:PerspectiveCamera.fov fov] of 90,
-	  [page:PerspectiveCamera.aspect aspect] of 1, [page:PerspectiveCamera.near near]
-		clipping plane at 0.5 and	[page:PerspectiveCamera.far far] clipping plane at 500.
+		 The default is a  [page:PerspectiveCamera] with [page:PerspectiveCamera.near near] clipping plane at 0.5.
+		 The [page:PerspectiveCamera.fov fov] will track the [page:SpotLight.angle angle] property of the owning
+		 [page:SpotLight SpotLight] via the [page:SpotLightShadow.update update] method. Similarly, the 
+		 [page:PerspectiveCamera.aspect aspect] property will the track aspect of the
+		 [page:LightShadow.mapSize mapSize]. If the [page:SpotLight.distance distance] property of the light is 
+		 set, the [page:PerspectiveCamera.far far] clipping plane will track that, otherwise it defaults to 500.
+		 
 	 </div>
 
 	 <h3>[property:Boolean isSpotLightShadow]</h3>
