@@ -112,7 +112,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -2023,17 +2023,20 @@
 		//world positions.
 		sceneGraph.updateMatrixWorld( true );
 
-		// Silly hack with the animation parsing.  We're gonna pretend the scene graph has a skeleton
-		// to attach animations to, since FBX treats animations as animations for the entire scene,
-		// not just for individual objects.
-		sceneGraph.skeleton = {
-			bones: modelArray
-		};
+		if ( 'Takes' in FBXTree ) {
 
-		var animations = parseAnimations( FBXTree, connections, sceneGraph );
+			// Silly hack with the animation parsing.  We're gonna pretend the scene graph has a skeleton
+			// to attach animations to, since FBX treats animations as animations for the entire scene,
+			// not just for individual objects.
+			sceneGraph.skeleton = {
+				bones: modelArray
+			};
 
-		addAnimations( sceneGraph, animations );
+			var animations = parseAnimations( FBXTree, connections, sceneGraph );
 
+			addAnimations( sceneGraph, animations );
+
+		}
 
 		// Parse ambient color - if it's not set to black (default), create an ambient light
 		if ( 'GlobalSettings' in FBXTree && 'AmbientColor' in FBXTree.GlobalSettings.properties ) {
