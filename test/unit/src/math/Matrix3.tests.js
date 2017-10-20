@@ -30,7 +30,7 @@ function matrixEquals3( a, b, tolerance ) {
 
 	return true;
 
-};
+}
 
 function toMatrix4( m3 ) {
 
@@ -49,7 +49,7 @@ function toMatrix4( m3 ) {
 
 	return result;
 
-};
+}
 
 export default QUnit.module( 'Maths', () => {
 
@@ -77,7 +77,11 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMatrix3", ( assert ) => {} );
+		QUnit.test( "isMatrix3", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "set", ( assert ) => {
 
@@ -144,7 +148,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromMatrix4", ( assert ) => {} );
+		QUnit.test( "setFromMatrix4", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "applyToBufferAttribute", ( assert ) => {
 
@@ -341,7 +349,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "transposeIntoArray", ( assert ) => {} );
+		QUnit.test( "transposeIntoArray", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "setUvTransform", ( assert ) => {
 
@@ -437,7 +449,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "fromArray", ( assert ) => {} );
+		QUnit.test( "fromArray", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "toArray", ( assert ) => {
 

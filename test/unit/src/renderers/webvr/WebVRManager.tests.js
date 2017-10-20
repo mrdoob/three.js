@@ -12,20 +12,48 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebVRManager', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "getDevice", ( assert ) => {} );
+			QUnit.test( "getDevice", ( assert ) => {
 
-			QUnit.test( "setDevice", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "getCamera", ( assert ) => {} );
+			} );
 
-			QUnit.test( "getStandingMatrix", ( assert ) => {} );
+			QUnit.test( "setDevice", ( assert ) => {
 
-			QUnit.test( "submitFrame", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "dispose", ( assert ) => {} );
+			} );
+
+			QUnit.test( "getCamera", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "getStandingMatrix", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "submitFrame", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "dispose", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

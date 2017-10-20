@@ -12,38 +12,102 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLCapabilities', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "getMaxAnisotropy", ( assert ) => {} );
+			QUnit.test( "getMaxAnisotropy", ( assert ) => {
 
-			QUnit.test( "getMaxPrecision", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "precision", ( assert ) => {} );
+			} );
 
-			QUnit.test( "logarithmicDepthBuffer", ( assert ) => {} );
+			QUnit.test( "getMaxPrecision", ( assert ) => {
 
-			QUnit.test( "maxTextures", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "maxVertexTextures", ( assert ) => {} );
+			} );
 
-			QUnit.test( "maxTextureSize", ( assert ) => {} );
+			QUnit.test( "precision", ( assert ) => {
 
-			QUnit.test( "maxCubemapSize", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "maxAttributes", ( assert ) => {} );
+			} );
 
-			QUnit.test( "maxVertexUniforms", ( assert ) => {} );
+			QUnit.test( "logarithmicDepthBuffer", ( assert ) => {
 
-			QUnit.test( "maxVaryings", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "maxFragmentUniforms", ( assert ) => {} );
+			} );
 
-			QUnit.test( "vertexTextures", ( assert ) => {} );
+			QUnit.test( "maxTextures", ( assert ) => {
 
-			QUnit.test( "floatFragmentTextures", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "floatVertexTextures", ( assert ) => {} );
+			} );
+
+			QUnit.test( "maxVertexTextures", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "maxTextureSize", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "maxCubemapSize", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "maxAttributes", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "maxVertexUniforms", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "maxVaryings", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "maxFragmentUniforms", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "vertexTextures", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "floatFragmentTextures", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "floatVertexTextures", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

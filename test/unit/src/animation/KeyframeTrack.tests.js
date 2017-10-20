@@ -12,43 +12,115 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module.todo( 'KeyframeTrack', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// STATIC STUFF
-		QUnit.test( "parse", ( assert ) => {} );
+		QUnit.test( "parse", ( assert ) => {
 
-		QUnit.test( "toJSON", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "_getTrackTypeForValueTypeName", ( assert ) => {} );
+		} );
+
+		QUnit.test( "toJSON", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "_getTrackTypeForValueTypeName", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "TimeBufferType", ( assert ) => {} );
+		QUnit.test( "TimeBufferType", ( assert ) => {
 
-		QUnit.test( "ValueBufferType", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "DefaultInterpolation", ( assert ) => {} );
+		} );
 
-		QUnit.test( "InterpolantFactoryMethodDiscrete", ( assert ) => {} );
+		QUnit.test( "ValueBufferType", ( assert ) => {
 
-		QUnit.test( "InterpolantFactoryMethodLinear", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "InterpolantFactoryMethodSmooth", ( assert ) => {} );
+		} );
 
-		QUnit.test( "setInterpolation", ( assert ) => {} );
+		QUnit.test( "DefaultInterpolation", ( assert ) => {
 
-		QUnit.test( "getInterpolation", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "getValueSize", ( assert ) => {} );
+		} );
 
-		QUnit.test( "shift", ( assert ) => {} );
+		QUnit.test( "InterpolantFactoryMethodDiscrete", ( assert ) => {
 
-		QUnit.test( "scale", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "trim", ( assert ) => {} );
+		} );
 
-		QUnit.test( "validate", ( assert ) => {} );
+		QUnit.test( "InterpolantFactoryMethodLinear", ( assert ) => {
 
-		QUnit.test( "optimize", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "InterpolantFactoryMethodSmooth", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setInterpolation", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getInterpolation", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getValueSize", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "shift", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "scale", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "trim", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "validate", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "optimize", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

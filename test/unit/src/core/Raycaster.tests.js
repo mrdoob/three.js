@@ -73,10 +73,18 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Raycaster', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "linePrecision", ( assert ) => {} );
+		QUnit.test( "linePrecision", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "set", ( assert ) => {
 

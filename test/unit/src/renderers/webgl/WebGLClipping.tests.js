@@ -12,16 +12,36 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLClipping', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "init", ( assert ) => {} );
+			QUnit.test( "init", ( assert ) => {
 
-			QUnit.test( "beginShadows", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "endShadows", ( assert ) => {} );
+			} );
 
-			QUnit.test( "setState", ( assert ) => {} );
+			QUnit.test( "beginShadows", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "endShadows", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "setState", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

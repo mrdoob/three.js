@@ -12,28 +12,72 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module.todo( 'PathPrototype', () => {
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {} );
+			QUnit.test( "Extending", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "fromPoints", ( assert ) => {} );
+			QUnit.test( "fromPoints", ( assert ) => {
 
-			QUnit.test( "moveTo", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "lineTo", ( assert ) => {} );
+			} );
 
-			QUnit.test( "quadraticCurveTo", ( assert ) => {} );
+			QUnit.test( "moveTo", ( assert ) => {
 
-			QUnit.test( "bezierCurveTo", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "splineThru", ( assert ) => {} );
+			} );
 
-			QUnit.test( "arc", ( assert ) => {} );
+			QUnit.test( "lineTo", ( assert ) => {
 
-			QUnit.test( "absarc", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "ellipse", ( assert ) => {} );
+			} );
 
-			QUnit.test( "absellipse", ( assert ) => {} );
+			QUnit.test( "quadraticCurveTo", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "bezierCurveTo", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "splineThru", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "arc", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "absarc", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "ellipse", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "absellipse", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

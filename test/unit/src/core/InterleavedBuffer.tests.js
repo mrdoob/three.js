@@ -25,7 +25,11 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PROPERTIES
 		QUnit.test( "needsUpdate", ( assert ) => {
@@ -39,7 +43,11 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isInterleavedBuffer", ( assert ) => {} );
+		QUnit.test( "isInterleavedBuffer", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "setArray", ( assert ) => {
 
@@ -69,7 +77,11 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setDynamic", ( assert ) => {} );
+		QUnit.test( "setDynamic", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "copy", ( assert ) => {
 

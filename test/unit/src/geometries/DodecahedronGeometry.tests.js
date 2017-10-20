@@ -30,10 +30,18 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// OTHERS
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
@@ -63,10 +71,18 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// OTHERS
 		QUnit.test( 'Standard geometry tests', ( assert ) => {

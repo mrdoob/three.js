@@ -10,17 +10,37 @@ export default QUnit.module( 'Fog', () => {
 	QUnit.module.todo( 'Scene', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isFog", ( assert ) => {} );
+		QUnit.test( "isFog", ( assert ) => {
 
-		QUnit.test( "clone", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "toJSON", ( assert ) => {} );
+		} );
+
+		QUnit.test( "clone", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "toJSON", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

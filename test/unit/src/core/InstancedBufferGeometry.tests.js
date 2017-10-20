@@ -25,10 +25,18 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
 		QUnit.test( "copy", ( assert ) => {
@@ -68,7 +76,11 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {} );
+		QUnit.test( "clone", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

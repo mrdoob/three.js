@@ -10,22 +10,54 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module.todo( 'Material', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMaterial", ( assert ) => {} );
+		QUnit.test( "isMaterial", ( assert ) => {
 
-		QUnit.test( "onBeforeCompile", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "setValues", ( assert ) => {} );
+		} );
 
-		QUnit.test( "toJSON", ( assert ) => {} );
+		QUnit.test( "onBeforeCompile", ( assert ) => {
 
-		QUnit.test( "clone", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "copy", ( assert ) => {} );
+		} );
 
-		QUnit.test( "dispose", ( assert ) => {} );
+		QUnit.test( "setValues", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "toJSON", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "clone", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "dispose", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

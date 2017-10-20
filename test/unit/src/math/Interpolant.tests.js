@@ -68,15 +68,31 @@ export default QUnit.module( 'Maths', () => {
 		// Tests
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "evaluate", ( assert ) => {} );
+		QUnit.test( "evaluate", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PRIVATE STUFF
-		QUnit.test( "DefaultSettings_", ( assert ) => {} );
+		QUnit.test( "DefaultSettings_", ( assert ) => {
 
-		QUnit.test( "getSettings_", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getSettings_", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "copySampleValue_", ( assert ) => {
 

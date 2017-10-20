@@ -10,16 +10,36 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module.todo( 'Skeleton', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "calculateInverses", ( assert ) => {} );
+		QUnit.test( "calculateInverses", ( assert ) => {
 
-		QUnit.test( "pose", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "update", ( assert ) => {} );
+		} );
 
-		QUnit.test( "clone", ( assert ) => {} );
+		QUnit.test( "pose", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "update", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "clone", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

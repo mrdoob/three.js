@@ -10,15 +10,31 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module.todo( 'LineDashedMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isLineDashedMaterial", ( assert ) => {} );
+		QUnit.test( "isLineDashedMaterial", ( assert ) => {
 
-		QUnit.test( "copy", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

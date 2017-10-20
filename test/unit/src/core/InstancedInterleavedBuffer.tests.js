@@ -10,7 +10,11 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'InstancedInterleavedBuffer', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -23,7 +27,11 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isInstancedInterleavedBuffer", ( assert ) => {} );
+		QUnit.test( "isInstancedInterleavedBuffer", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "copy", ( assert ) => {
 

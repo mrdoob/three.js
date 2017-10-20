@@ -49,7 +49,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lerp", ( assert ) => {} );
+		QUnit.test( "lerp", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "smoothstep", ( assert ) => {
 
@@ -63,7 +67,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "smootherstep", ( assert ) => {} );
+		QUnit.test( "smootherstep", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "randInt", ( assert ) => {
 

@@ -10,13 +10,29 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module.todo( 'Cache', () => {
 
 		// PUBLIC STUFF
-		QUnit.test( "add", ( assert ) => {} );
+		QUnit.test( "add", ( assert ) => {
 
-		QUnit.test( "get", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "remove", ( assert ) => {} );
+		} );
 
-		QUnit.test( "clear", ( assert ) => {} );
+		QUnit.test( "get", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "remove", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "clear", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

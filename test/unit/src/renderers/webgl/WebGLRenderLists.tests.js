@@ -12,12 +12,24 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLRenderLists', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
-			
-			// PUBLIC STUFF
-			QUnit.test( "get", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
 
-			QUnit.test( "dispose", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			// PUBLIC STUFF
+			QUnit.test( "get", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "dispose", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

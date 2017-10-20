@@ -12,16 +12,36 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLIndexedBufferRenderer', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "setMode", ( assert ) => {} );
+			QUnit.test( "setMode", ( assert ) => {
 
-			QUnit.test( "setIndex", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "render", ( assert ) => {} );
+			} );
 
-			QUnit.test( "renderInstances", ( assert ) => {} );
+			QUnit.test( "setIndex", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "render", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "renderInstances", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

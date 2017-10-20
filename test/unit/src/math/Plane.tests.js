@@ -54,7 +54,11 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isPlane", ( assert ) => {} );
+		QUnit.test( "isPlane", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "set", ( assert ) => {
 
@@ -114,7 +118,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {} );
+		QUnit.test( "clone", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "copy", ( assert ) => {
 
@@ -225,9 +233,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsBox", ( assert ) => {} );
+		QUnit.test( "intersectsBox", ( assert ) => {
 
-		QUnit.test( "intersectsSphere", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "intersectsSphere", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "coplanarPoint", ( assert ) => {
 

@@ -10,13 +10,25 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module.todo( 'Points', () => {
 
 		// INHERITANCE
-		QUnit.test( "isPoints", ( assert ) => {} );
+		QUnit.test( "isPoints", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "raycast", ( assert ) => {} );
+		QUnit.test( "raycast", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "clone", ( assert ) => {} );
+		QUnit.test( "clone", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

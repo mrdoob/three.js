@@ -29,7 +29,11 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isColor", ( assert ) => {} );
+		QUnit.test( "isColor", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "set", ( assert ) => {
 
@@ -49,7 +53,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setScalar", ( assert ) => {} );
+		QUnit.test( "setScalar", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "setHex", ( assert ) => {
 
@@ -59,7 +67,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setRGB", ( assert ) => {} );
+		QUnit.test( "setRGB", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "setHSL", ( assert ) => {
 
@@ -73,7 +85,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyle", ( assert ) => {} );
+		QUnit.test( "setStyle", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "clone", ( assert ) => {
 
@@ -83,7 +99,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {} );
+		QUnit.test( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "copyGammaToLinear", ( assert ) => {
 
@@ -191,7 +211,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "addColors", ( assert ) => {} );
+		QUnit.test( "addColors", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "addScalar", ( assert ) => {
 

@@ -35,7 +35,11 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isRay", ( assert ) => {} );
+		QUnit.test( "isRay", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "set", ( assert ) => {
 
@@ -270,7 +274,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceToPlane", ( assert ) => {} );
+		QUnit.test( "distanceToPlane", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "intersectPlane", ( assert ) => {
 
@@ -362,7 +370,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsBox", ( assert ) => {} );
+		QUnit.test( "intersectsBox", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "intersectTriangle", ( assert ) => {
 
@@ -439,7 +451,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", ( assert ) => {} );
+		QUnit.test( "equals", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

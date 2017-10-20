@@ -218,13 +218,29 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "x", ( assert ) => {} );
+		QUnit.test( "x", ( assert ) => {
 
-		QUnit.test( "y", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "z", ( assert ) => {} );
+		} );
 
-		QUnit.test( "w", ( assert ) => {} );
+		QUnit.test( "y", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "z", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "w", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
 		QUnit.test( "set", ( assert ) => {
@@ -243,7 +259,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {} );
+		QUnit.test( "clone", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "copy", ( assert ) => {
 
@@ -400,7 +420,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "dot", ( assert ) => {} );
+		QUnit.test( "dot", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "normalize/length/lengthSq", ( assert ) => {
 
@@ -458,7 +482,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "slerp", ( assert ) => {} );
+		QUnit.test( "slerp", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "equals", ( assert ) => {
 
@@ -480,7 +508,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "fromArray", ( assert ) => {} );
+		QUnit.test( "fromArray", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "toArray", ( assert ) => {
 
@@ -509,9 +541,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "onChange", ( assert ) => {} );
+		QUnit.test( "onChange", ( assert ) => {
 
-		QUnit.test( "onChangeCallback", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "onChangeCallback", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// OTHERS
 		QUnit.test( "multiplyVector3", ( assert ) => {

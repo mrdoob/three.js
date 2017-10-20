@@ -79,11 +79,23 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getCenter", ( assert ) => {} );
+		QUnit.test( "getCenter", ( assert ) => {
 
-		QUnit.test( "delta", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "distanceSq", ( assert ) => {} );
+		} );
+
+		QUnit.test( "delta", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "distanceSq", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "distance", ( assert ) => {
 
@@ -174,7 +186,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", ( assert ) => {} );
+		QUnit.test( "equals", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

@@ -12,9 +12,17 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'UniformsLib', () => {
 
 			// PUBLIC STUFF
-			QUnit.test( "merge", ( assert ) => {} );
+			QUnit.test( "merge", ( assert ) => {
 
-			QUnit.test( "clone", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "clone", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

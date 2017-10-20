@@ -44,13 +44,25 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Geometry', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isGeometry", ( assert ) => {} );
+		QUnit.test( "isGeometry", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "applyMatrix", ( assert ) => {
 
@@ -252,7 +264,11 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "center", ( assert ) => {} );
+		QUnit.test( "center", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "normalize", ( assert ) => {
 
@@ -293,15 +309,35 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "computeFaceNormals", ( assert ) => {} );
+		QUnit.test( "computeFaceNormals", ( assert ) => {
 
-		QUnit.test( "computeVertexNormals", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "computeFlatVertexNormals", ( assert ) => {} );
+		} );
 
-		QUnit.test( "computeMorphNormals", ( assert ) => {} );
+		QUnit.test( "computeVertexNormals", ( assert ) => {
 
-		QUnit.test( "computeLineDistances", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "computeFlatVertexNormals", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "computeMorphNormals", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "computeLineDistances", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "computeBoundingBox", ( assert ) => {
 
@@ -344,9 +380,17 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "merge", ( assert ) => {} );
+		QUnit.test( "merge", ( assert ) => {
 
-		QUnit.test( "mergeMesh", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "mergeMesh", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "mergeVertices", ( assert ) => {
 
@@ -416,11 +460,23 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {} );
+		QUnit.test( "clone", ( assert ) => {
 
-		QUnit.test( "copy", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "dispose", ( assert ) => {} );
+		} );
+
+		QUnit.test( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "dispose", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

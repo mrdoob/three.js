@@ -12,10 +12,18 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLShadowMap', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "render", ( assert ) => {} );
+			QUnit.test( "render", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

@@ -12,30 +12,78 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module.todo( 'Curve', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "getPoint", ( assert ) => {} );
+			QUnit.test( "getPoint", ( assert ) => {
 
-			QUnit.test( "getPointAt", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "getPoints", ( assert ) => {} );
+			} );
 
-			QUnit.test( "getSpacedPoints", ( assert ) => {} );
+			QUnit.test( "getPointAt", ( assert ) => {
 
-			QUnit.test( "getLength", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "getLengths", ( assert ) => {} );
+			} );
 
-			QUnit.test( "updateArcLengths", ( assert ) => {} );
+			QUnit.test( "getPoints", ( assert ) => {
 
-			QUnit.test( "getUtoTmapping", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "getTangent", ( assert ) => {} );
+			} );
 
-			QUnit.test( "getTangentAt", ( assert ) => {} );
+			QUnit.test( "getSpacedPoints", ( assert ) => {
 
-			QUnit.test( "computeFrenetFrames", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "getLength", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "getLengths", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "updateArcLengths", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "getUtoTmapping", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "getTangent", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "getTangentAt", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "computeFrenetFrames", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

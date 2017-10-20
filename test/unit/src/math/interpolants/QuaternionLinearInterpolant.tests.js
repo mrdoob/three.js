@@ -12,13 +12,25 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.module.todo( 'QuaternionLinearInterpolant', () => {
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {} );
+			QUnit.test( "Extending", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PRIVATE STUFF
-			QUnit.test( "interpolate_", ( assert ) => {} );
+			QUnit.test( "interpolate_", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

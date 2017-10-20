@@ -10,10 +10,18 @@ export default QUnit.module( 'Renderers', () => {
 	QUnit.module.todo( 'WebGLRenderer', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "PrayForUs", ( assert ) => {} );
+		QUnit.test( "PrayForUs", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 
 	} );

@@ -12,7 +12,11 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'InterleavedBufferAttribute', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PROPERTIES
 		QUnit.test( "count", ( assert ) => {
@@ -24,7 +28,11 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "array", ( assert ) => {} );
+		QUnit.test( "array", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
 		// setY, setZ and setW are calculated in the same way so not QUnit.testing this
@@ -52,25 +60,65 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setY", ( assert ) => {} );
+		QUnit.test( "setY", ( assert ) => {
 
-		QUnit.test( "setZ", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "setW", ( assert ) => {} );
+		} );
 
-		QUnit.test( "getX", ( assert ) => {} );
+		QUnit.test( "setZ", ( assert ) => {
 
-		QUnit.test( "getY", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "getZ", ( assert ) => {} );
+		} );
 
-		QUnit.test( "getW", ( assert ) => {} );
+		QUnit.test( "setW", ( assert ) => {
 
-		QUnit.test( "setXY", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "setXYZ", ( assert ) => {} );
+		} );
 
-		QUnit.test( "setXYZW", ( assert ) => {} );
+		QUnit.test( "getX", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getY", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getZ", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getW", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setXY", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setXYZ", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setXYZW", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

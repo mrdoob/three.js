@@ -10,14 +10,30 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module.todo( 'MaterialLoader', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "load", ( assert ) => {} );
+		QUnit.test( "load", ( assert ) => {
 
-		QUnit.test( "setTextures", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "parse", ( assert ) => {} );
+		} );
+
+		QUnit.test( "setTextures", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "parse", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

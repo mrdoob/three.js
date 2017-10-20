@@ -14,12 +14,24 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module( 'PropertyBinding', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// STATIC STUFF
-		QUnit.test( "Composite", ( assert ) => {} );
+		QUnit.test( "Composite", ( assert ) => {
 
-		QUnit.test( "create", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "create", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( 'sanitizeNodeName', ( assert ) => {
 
@@ -239,18 +251,42 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( "findNode", ( assert ) => {} );
+		QUnit.test( "findNode", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "BindingType", ( assert ) => {} );
+		QUnit.test( "BindingType", ( assert ) => {
 
-		QUnit.test( "Versioning", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "GetterByBindingType", ( assert ) => {} );
+		} );
 
-		QUnit.test( "SetterByBindingTypeAndVersioning", ( assert ) => {} );
+		QUnit.test( "Versioning", ( assert ) => {
 
-		QUnit.test( "getValue", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "GetterByBindingType", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "SetterByBindingTypeAndVersioning", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getValue", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( 'setValue', ( assert ) => {
 
@@ -289,14 +325,30 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( "bind", ( assert ) => {} );
+		QUnit.test( "bind", ( assert ) => {
 
-		QUnit.test( "unbind", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "unbind", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// OTHERS
-		QUnit.test( "_getValue_unavailable", ( assert ) => {} );
+		QUnit.test( "_getValue_unavailable", ( assert ) => {
 
-		QUnit.test( "_setValue_unavailable", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "_setValue_unavailable", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

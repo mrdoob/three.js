@@ -12,13 +12,25 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module.todo( 'ArcCurve', () => {
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {} );
+			QUnit.test( "Extending", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "isArcCurve", ( assert ) => {} );
+			QUnit.test( "isArcCurve", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

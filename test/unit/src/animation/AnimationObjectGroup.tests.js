@@ -25,21 +25,49 @@ export default QUnit.module( "Animation", () => {
 			ParsedPathC = PropertyBinding.parseTrackName( PathC );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PRIVATE STUFF
-		QUnit.test( "subscribe_", ( assert ) => {} ); // Todo: Naming guys -_-'
+		QUnit.test( "subscribe_", ( assert ) => {
 
-		QUnit.test( "unsubscribe_", ( assert ) => {} ); // Todo: Naming guys -_-'
+			assert.ok( false, "everything's gonna be alright" );
+
+		} ); // Todo: Naming guys -_-'
+
+		QUnit.test( "unsubscribe_", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} ); // Todo: Naming guys -_-'
 
 		// PUBLIC STUFF
-		QUnit.test( "isAnimationObjectGroup", ( assert ) => {} );
+		QUnit.test( "isAnimationObjectGroup", ( assert ) => {
 
-		QUnit.test( "add", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "remove", ( assert ) => {} );
+		} );
 
-		QUnit.test( "uncache", ( assert ) => {} );
+		QUnit.test( "add", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "remove", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "uncache", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// OTHERS
 		QUnit.test( "smoke test", ( assert ) => {

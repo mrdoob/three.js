@@ -10,22 +10,62 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module.todo( 'LOD', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PROPERTIES
-		QUnit.test( "levels", ( assert ) => {} );
+		QUnit.test( "levels", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isLOD", ( assert ) => {} );
-		QUnit.test( "copy", ( assert ) => {} );
-		QUnit.test( "addLevel", ( assert ) => {} );
-		QUnit.test( "getObjectForDistance", ( assert ) => {} );
-		QUnit.test( "raycast", ( assert ) => {} );
-		QUnit.test( "update", ( assert ) => {} );
-		QUnit.test( "toJSON", ( assert ) => {} );
+		QUnit.test( "isLOD", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "addLevel", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "getObjectForDistance", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "raycast", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "update", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "toJSON", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

@@ -10,13 +10,29 @@ export default QUnit.module( 'Extras', () => {
 	QUnit.module.todo( 'ShapeUtils', () => {
 
 		// PUBLIC STUFF
-		QUnit.test( "area", ( assert ) => {} );
+		QUnit.test( "area", ( assert ) => {
 
-		QUnit.test( "triangulate", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "triangulateShape", ( assert ) => {} );
+		} );
 
-		QUnit.test( "isClockWise", ( assert ) => {} );
+		QUnit.test( "triangulate", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "triangulateShape", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "isClockWise", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

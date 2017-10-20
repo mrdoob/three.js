@@ -34,10 +34,18 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PROPERTIES
 		QUnit.test( "power", ( assert ) => {
@@ -56,9 +64,17 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isSpotLight", ( assert ) => {} );
+		QUnit.test( "isSpotLight", ( assert ) => {
 
-		QUnit.test( "copy", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// OTHERS
 		QUnit.test( 'Standard light tests', ( assert ) => {

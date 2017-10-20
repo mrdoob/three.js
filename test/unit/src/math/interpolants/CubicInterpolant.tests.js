@@ -12,17 +12,37 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.module.todo( 'CubicInterpolant', () => {
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {} );
+			QUnit.test( "Extending", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PRIVATE STUFF
-			QUnit.test( "DefaultSettings_", ( assert ) => {} );
+			QUnit.test( "DefaultSettings_", ( assert ) => {
 
-			QUnit.test( "intervalChanged_", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "interpolate_", ( assert ) => {} );
+			} );
+
+			QUnit.test( "intervalChanged_", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "interpolate_", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

@@ -12,14 +12,30 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLBufferRenderer', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "setMode", ( assert ) => {} );
+			QUnit.test( "setMode", ( assert ) => {
 
-			QUnit.test( "render", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "renderInstances", ( assert ) => {} );
+			} );
+
+			QUnit.test( "render", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "renderInstances", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

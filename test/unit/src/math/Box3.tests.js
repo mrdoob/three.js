@@ -53,7 +53,11 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isBox3", ( assert ) => {} );
+		QUnit.test( "isBox3", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "set", ( assert ) => {
 
@@ -65,7 +69,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromArray", ( assert ) => {} );
+		QUnit.test( "setFromArray", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "setFromBufferAttribute", ( assert ) => {
 
@@ -144,7 +152,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {} );
+		QUnit.test( "clone", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "copy", ( assert ) => {
 
@@ -175,7 +187,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "isEmpty", ( assert ) => {} );
+		QUnit.test( "isEmpty", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "getCenter", ( assert ) => {
 
@@ -479,7 +495,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", ( assert ) => {} );
+		QUnit.test( "equals", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

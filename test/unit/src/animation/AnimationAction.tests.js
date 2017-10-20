@@ -43,66 +43,186 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// PRIVATE STUFF
-		QUnit.test( "_update", ( assert ) => {} );
+		QUnit.test( "_update", ( assert ) => {
 
-		QUnit.test( "_updateWeight", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "_updateTimeScale", ( assert ) => {} );
+		} );
 
-		QUnit.test( "_updateTime", ( assert ) => {} );
+		QUnit.test( "_updateWeight", ( assert ) => {
 
-		QUnit.test( "_setEndings", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "_scheduleFading", ( assert ) => {} );
+		} );
+
+		QUnit.test( "_updateTimeScale", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "_updateTime", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "_setEndings", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "_scheduleFading", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "play", ( assert ) => {} );
+		QUnit.test( "play", ( assert ) => {
 
-		QUnit.test( "stop", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "reset", ( assert ) => {} );
+		} );
 
-		QUnit.test( "isRunning", ( assert ) => {} );
+		QUnit.test( "stop", ( assert ) => {
 
-		QUnit.test( "isScheduled", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "startAt", ( assert ) => {} );
+		} );
 
-		QUnit.test( "setLoop", ( assert ) => {} );
+		QUnit.test( "reset", ( assert ) => {
 
-		QUnit.test( "setEffectiveWeight", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "getEffectiveWeight", ( assert ) => {} );
+		} );
 
-		QUnit.test( "fadeIn", ( assert ) => {} );
+		QUnit.test( "isRunning", ( assert ) => {
 
-		QUnit.test( "fadeOut", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "crossFadeFrom", ( assert ) => {} );
+		} );
 
-		QUnit.test( "crossFadeTo", ( assert ) => {} );
+		QUnit.test( "isScheduled", ( assert ) => {
 
-		QUnit.test( "stopFading", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "setEffectiveTimeScale", ( assert ) => {} );
+		} );
 
-		QUnit.test( "getEffectiveTimeScale", ( assert ) => {} );
+		QUnit.test( "startAt", ( assert ) => {
 
-		QUnit.test( "setDuration", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "syncWith", ( assert ) => {} );
+		} );
 
-		QUnit.test( "halt", ( assert ) => {} );
+		QUnit.test( "setLoop", ( assert ) => {
 
-		QUnit.test( "warp", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "stopWarping", ( assert ) => {} );
+		} );
 
-		QUnit.test( "getMixer", ( assert ) => {} );
+		QUnit.test( "setEffectiveWeight", ( assert ) => {
 
-		QUnit.test( "getClip", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "getRoot", ( assert ) => {} );
+		} );
+
+		QUnit.test( "getEffectiveWeight", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "fadeIn", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "fadeOut", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "crossFadeFrom", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "crossFadeTo", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "stopFading", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setEffectiveTimeScale", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getEffectiveTimeScale", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setDuration", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "syncWith", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "halt", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "warp", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "stopWarping", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getMixer", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getClip", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getRoot", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

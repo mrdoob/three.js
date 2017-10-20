@@ -10,7 +10,11 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'InstancedBufferAttribute', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

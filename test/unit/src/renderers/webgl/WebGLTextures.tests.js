@@ -12,14 +12,38 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLTextures', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "setTexture2D", ( assert ) => {} );
-			QUnit.test( "setTextureCube", ( assert ) => {} );
-			QUnit.test( "setTextureCubeDynamic", ( assert ) => {} );
-			QUnit.test( "setupRenderTarget", ( assert ) => {} );
-			QUnit.test( "updateRenderTargetMipmap", ( assert ) => {} );
+			QUnit.test( "setTexture2D", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+			QUnit.test( "setTextureCube", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+			QUnit.test( "setTextureCubeDynamic", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+			QUnit.test( "setupRenderTarget", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+			QUnit.test( "updateRenderTargetMipmap", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

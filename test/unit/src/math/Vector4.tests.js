@@ -37,7 +37,11 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isVector4", ( assert ) => {} );
+		QUnit.test( "isVector4", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "set", ( assert ) => {
 
@@ -55,21 +59,53 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setScalar", ( assert ) => {} );
+		QUnit.test( "setScalar", ( assert ) => {
 
-		QUnit.test( "setX", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "setY", ( assert ) => {} );
+		} );
 
-		QUnit.test( "setZ", ( assert ) => {} );
+		QUnit.test( "setX", ( assert ) => {
 
-		QUnit.test( "setW", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "setComponent", ( assert ) => {} );
+		} );
 
-		QUnit.test( "getComponent", ( assert ) => {} );
+		QUnit.test( "setY", ( assert ) => {
 
-		QUnit.test( "clone", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setZ", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setW", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setComponent", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getComponent", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "clone", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "copy", ( assert ) => {
 
@@ -111,9 +147,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "addScalar", ( assert ) => {} );
+		QUnit.test( "addScalar", ( assert ) => {
 
-		QUnit.test( "addVectors", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "addVectors", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "addScaledVector", ( assert ) => {
 
@@ -148,11 +192,23 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "subScalar", ( assert ) => {} );
+		QUnit.test( "subScalar", ( assert ) => {
 
-		QUnit.test( "subVectors", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "multiplyScalar", ( assert ) => {} );
+		} );
+
+		QUnit.test( "subVectors", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "multiplyScalar", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "applyMatrix4", ( assert ) => {
 
@@ -198,17 +254,41 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "divideScalar", ( assert ) => {} );
+		QUnit.test( "divideScalar", ( assert ) => {
 
-		QUnit.test( "setAxisAngleFromQuaternion", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "setAxisAngleFromRotationMatrix", ( assert ) => {} );
+		} );
 
-		QUnit.test( "min", ( assert ) => {} );
+		QUnit.test( "setAxisAngleFromQuaternion", ( assert ) => {
 
-		QUnit.test( "max", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "clamp", ( assert ) => {} );
+		} );
+
+		QUnit.test( "setAxisAngleFromRotationMatrix", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "min", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "max", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "clamp", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "clampScalar", ( assert ) => {
 
@@ -223,15 +303,35 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clampLength", ( assert ) => {} );
+		QUnit.test( "clampLength", ( assert ) => {
 
-		QUnit.test( "floor", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "ceil", ( assert ) => {} );
+		} );
 
-		QUnit.test( "round", ( assert ) => {} );
+		QUnit.test( "floor", ( assert ) => {
 
-		QUnit.test( "roundToZero", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "ceil", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "round", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "roundToZero", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "negate", ( assert ) => {
 
@@ -259,9 +359,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lengthSq", ( assert ) => {} );
+		QUnit.test( "lengthSq", ( assert ) => {
 
-		QUnit.test( "length", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "length", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "manhattanLength", ( assert ) => {
 
@@ -327,9 +435,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lerp", ( assert ) => {} );
+		QUnit.test( "lerp", ( assert ) => {
 
-		QUnit.test( "lerpVectors", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "lerpVectors", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "equals", ( assert ) => {
 

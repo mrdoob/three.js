@@ -12,18 +12,42 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLBackground', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "getClearColor", ( assert ) => {} );
+			QUnit.test( "getClearColor", ( assert ) => {
 
-			QUnit.test( "setClearColor", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "getClearAlpha", ( assert ) => {} );
+			} );
 
-			QUnit.test( "setClearAlpha", ( assert ) => {} );
+			QUnit.test( "setClearColor", ( assert ) => {
 
-			QUnit.test( "render", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "getClearAlpha", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "setClearAlpha", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "render", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

@@ -5,7 +5,7 @@
 /* global QUnit */
 
 import { CubicBezierCurve } from '../../../../../src/extras/curves/CubicBezierCurve';
-import { Vector2 } from '../../../../../src/math/Vector2'
+import { Vector2 } from '../../../../../src/math/Vector2';
 
 export default QUnit.module( 'Extras', () => {
 
@@ -26,15 +26,31 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {} );
+			QUnit.test( "Extending", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "isCubicBezierCurve", ( assert ) => {} );
+			QUnit.test( "isCubicBezierCurve", ( assert ) => {
 
-			QUnit.test( "getPoint", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "getPoint", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// OTHERS
 			QUnit.test( "Simple curve", ( assert ) => {

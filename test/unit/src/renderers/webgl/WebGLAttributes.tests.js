@@ -12,14 +12,30 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLAttributes', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "get", ( assert ) => {} );
+			QUnit.test( "get", ( assert ) => {
 
-			QUnit.test( "remove", ( assert ) => {} );
+				assert.ok( false, "everything's gonna be alright" );
 
-			QUnit.test( "update", ( assert ) => {} );
+			} );
+
+			QUnit.test( "remove", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
+
+			QUnit.test( "update", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

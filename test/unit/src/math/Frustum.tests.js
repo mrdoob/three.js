@@ -31,7 +31,7 @@ function planeEquals( a, b, tolerance ) {
 export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Frustum', () => {
-		
+
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
 
@@ -246,7 +246,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsSphere", ( assert ) => {} );
+		QUnit.test( "intersectsSphere", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "intersectsBox", ( assert ) => {
 
@@ -265,7 +269,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "containsPoint", ( assert ) => {} );
+		QUnit.test( "containsPoint", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

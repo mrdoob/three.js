@@ -79,7 +79,11 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMatrix4", ( assert ) => {} );
+		QUnit.test( "isMatrix4", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "set", ( assert ) => {
 
@@ -211,7 +215,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "extractRotation", ( assert ) => {} );
+		QUnit.test( "extractRotation", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "makeRotationFromEuler/extractRotation", ( assert ) => {
 
@@ -276,9 +284,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiply", ( assert ) => {} );
+		QUnit.test( "multiply", ( assert ) => {
 
-		QUnit.test( "premultiply", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "premultiply", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "multiplyMatrices", ( assert ) => {
 
@@ -417,7 +433,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setPosition", ( assert ) => {} );
+		QUnit.test( "setPosition", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "getInverse", ( assert ) => {
 
@@ -480,7 +500,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "scale", ( assert ) => {} );
+		QUnit.test( "scale", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "getMaxScaleOnAxis", ( assert ) => {
 
@@ -491,13 +515,29 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makeTranslation", ( assert ) => {} );
+		QUnit.test( "makeTranslation", ( assert ) => {
 
-		QUnit.test( "makeRotationX", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "makeRotationY", ( assert ) => {} );
+		} );
 
-		QUnit.test( "makeRotationZ", ( assert ) => {} );
+		QUnit.test( "makeRotationX", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "makeRotationY", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "makeRotationZ", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "makeRotationAxis", ( assert ) => {
 
@@ -516,9 +556,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makeScale", ( assert ) => {} );
+		QUnit.test( "makeScale", ( assert ) => {
 
-		QUnit.test( "makeShear", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "makeShear", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "compose/decompose", ( assert ) => {
 
@@ -594,7 +642,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makePerspective", ( assert ) => {} );
+		QUnit.test( "makePerspective", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "makeOrthographic", ( assert ) => {
 
@@ -624,7 +676,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "fromArray", ( assert ) => {} );
+		QUnit.test( "fromArray", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "toArray", ( assert ) => {
 

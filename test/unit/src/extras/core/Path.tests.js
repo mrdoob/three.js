@@ -12,7 +12,11 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module.todo( 'Path', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {} );
+			QUnit.test( "Instancing", ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
+
+			} );
 
 		} );
 

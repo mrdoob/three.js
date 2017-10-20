@@ -10,14 +10,30 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module.todo( 'FontLoader', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "load", ( assert ) => {} );
+		QUnit.test( "load", ( assert ) => {
 
-		QUnit.test( "parse", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "setPath", ( assert ) => {} );
+		} );
+
+		QUnit.test( "parse", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setPath", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

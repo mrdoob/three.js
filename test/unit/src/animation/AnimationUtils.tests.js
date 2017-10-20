@@ -8,19 +8,43 @@ import { AnimationUtils } from '../../../../src/animation/AnimationUtils';
 export default QUnit.module( 'Animation', () => {
 
 	QUnit.module.todo( 'AnimationUtils', () => {
-		
+
 		// PUBLIC STUFF
-		QUnit.test( "arraySlice", ( assert ) => {} );
+		QUnit.test( "arraySlice", ( assert ) => {
 
-		QUnit.test( "convertArray", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "isTypedArray", ( assert ) => {} );
+		} );
 
-		QUnit.test( "getKeyframeOrder", ( assert ) => {} );
+		QUnit.test( "convertArray", ( assert ) => {
 
-		QUnit.test( "sortedArray", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "flattenJSON", ( assert ) => {} );
+		} );
+
+		QUnit.test( "isTypedArray", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getKeyframeOrder", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "sortedArray", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "flattenJSON", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

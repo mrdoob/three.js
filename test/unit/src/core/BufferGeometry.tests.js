@@ -127,13 +127,25 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'BufferGeometry', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isBufferGeometry", ( assert ) => {} );
+		QUnit.test( "isBufferGeometry", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "setIndex/getIndex", ( assert ) => {
 
@@ -155,7 +167,11 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "getAttribute", ( assert ) => {} );
+		QUnit.test( "getAttribute", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 		QUnit.test( "add / delete Attribute", ( assert ) => {
 
 			var geometry = new BufferGeometry();
@@ -198,7 +214,11 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( a.groups.length, 0, "Check groups were deleted correctly" );
 
 		} );
-		QUnit.test( "clearGroups", ( assert ) => {} );
+		QUnit.test( "clearGroups", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "setDrawRange", ( assert ) => {
 
@@ -684,7 +704,11 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "computeFaceNormals", ( assert ) => {} );
+		QUnit.test( "computeFaceNormals", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "computeVertexNormals", ( assert ) => {
 
@@ -798,7 +822,11 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "normalizeNormals", ( assert ) => {} );
+		QUnit.test( "normalizeNormals", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "toNonIndexed", ( assert ) => {
 
@@ -936,7 +964,11 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "dispose", ( assert ) => {} );
+		QUnit.test( "dispose", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

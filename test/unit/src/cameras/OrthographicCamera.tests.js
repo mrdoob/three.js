@@ -11,19 +11,43 @@ export default QUnit.module( 'Cameras', () => {
 	QUnit.module( 'OrthographicCamera', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isOrthographicCamera", ( assert ) => {} );
+		QUnit.test( "isOrthographicCamera", ( assert ) => {
 
-		QUnit.test( "copy", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "setViewOffset", ( assert ) => {} );
+		} );
 
-		QUnit.test( "clearViewOffset", ( assert ) => {} );
+		QUnit.test( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "setViewOffset", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "clearViewOffset", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "updateProjectionMatrix", ( assert ) => {
 
@@ -48,8 +72,12 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		QUnit.test( "toJSON", ( assert ) => {} );
-		
+		QUnit.test( "toJSON", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
 		// OTHERS
 		// TODO: no no no clone is a camera methods that relied to copy method
 		QUnit.test( "clone", ( assert ) => {

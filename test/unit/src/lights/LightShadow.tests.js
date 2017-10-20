@@ -12,7 +12,11 @@ export default QUnit.module( 'Lights', () => {
 	QUnit.module.todo( 'LightShadow', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
 		QUnit.test( "clone/copy", ( assert ) => {
@@ -37,7 +41,11 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( "toJSON", ( assert ) => {} );
+		QUnit.test( "toJSON", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

@@ -10,18 +10,50 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module.todo( 'Mesh', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {} );
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMesh", ( assert ) => {} );
-		QUnit.test( "setDrawMode", ( assert ) => {} );
-		QUnit.test( "copy", ( assert ) => {} );
-		QUnit.test( "updateMorphTargets", ( assert ) => {} );
-		QUnit.test( "raycast", ( assert ) => {} );
-		QUnit.test( "clone", ( assert ) => {} );
+		QUnit.test( "isMesh", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "setDrawMode", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "updateMorphTargets", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "raycast", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+		QUnit.test( "clone", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 
 	} );

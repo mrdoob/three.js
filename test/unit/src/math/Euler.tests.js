@@ -70,21 +70,49 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// STATIC STUFF
-		QUnit.test( "RotationOrders", ( assert ) => {} );
+		QUnit.test( "RotationOrders", ( assert ) => {
 
-		QUnit.test( "DefaultOrder", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "DefaultOrder", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PROPERTIES STUFF
-		QUnit.test( "x", ( assert ) => {} );
+		QUnit.test( "x", ( assert ) => {
 
-		QUnit.test( "y", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "z", ( assert ) => {} );
+		} );
 
-		QUnit.test( "order", ( assert ) => {} );
+		QUnit.test( "y", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "z", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "order", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isEuler", ( assert ) => {} );
+		QUnit.test( "isEuler", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		QUnit.test( "set/setFromVector3/toVector3", ( assert ) => {
 
@@ -279,9 +307,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "onChange", ( assert ) => {} );
+		QUnit.test( "onChange", ( assert ) => {
 
-		QUnit.test( "onChangeCallback", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "onChangeCallback", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// OTHERS
 		QUnit.test( "gimbalLocalQuat", ( assert ) => {

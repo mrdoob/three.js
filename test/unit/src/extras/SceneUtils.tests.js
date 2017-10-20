@@ -10,11 +10,23 @@ export default QUnit.module.todo( 'Extras', () => {
 	QUnit.module.todo( 'SceneUtils', () => {
 
 		// PUBLIC STUFF
-		QUnit.test( "createMultiMaterialObject", ( assert ) => {} );
+		QUnit.test( "createMultiMaterialObject", ( assert ) => {
 
-		QUnit.test( "detach", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "attach", ( assert ) => {} );
+		} );
+
+		QUnit.test( "detach", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "attach", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

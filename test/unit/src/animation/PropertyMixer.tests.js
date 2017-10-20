@@ -10,23 +10,55 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module.todo( 'PropertyMixer', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PRIVATE STUFF
-		QUnit.test( "_select", ( assert ) => {} );
+		QUnit.test( "_select", ( assert ) => {
 
-		QUnit.test( "_slerp", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "_lerp", ( assert ) => {} );
+		} );
+
+		QUnit.test( "_slerp", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "_lerp", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "accumulate", ( assert ) => {} );
+		QUnit.test( "accumulate", ( assert ) => {
 
-		QUnit.test( "apply", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
 
-		QUnit.test( "saveOriginalState", ( assert ) => {} );
+		} );
 
-		QUnit.test( "restoreOriginalState", ( assert ) => {} );
+		QUnit.test( "apply", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "saveOriginalState", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "restoreOriginalState", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 

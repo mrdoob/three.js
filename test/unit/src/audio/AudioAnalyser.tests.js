@@ -10,12 +10,24 @@ export default QUnit.module( 'Audios', () => {
 	QUnit.module.todo( 'AudioAnalyser', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {} );
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "getFrequencyData", ( assert ) => {} );
+		QUnit.test( "getFrequencyData", ( assert ) => {
 
-		QUnit.test( "getAverageFrequency", ( assert ) => {} );
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.test( "getAverageFrequency", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
 
 	} );
 
