@@ -57,6 +57,8 @@ function Material() {
 	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
+	this.alphaToCoverage = false;
+
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
 	this.visible = true;
@@ -238,6 +240,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 
+		if ( this.alphaToCoverage === true ) data.alphaToCoverage = this.alphaToCoverage;
+
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
@@ -325,6 +329,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 		this.alphaTest = source.alphaTest;
 		this.premultipliedAlpha = source.premultipliedAlpha;
+
+		this.alphaToCoverage = source.alphaToCoverage;
 
 		this.overdraw = source.overdraw;
 

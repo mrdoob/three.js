@@ -665,6 +665,10 @@ function WebGLState( gl, extensions, utils ) {
 
 		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
+		material.alphaToCoverage === true
+			? enable( gl.SAMPLE_ALPHA_TO_COVERAGE )
+			: disable( gl.SAMPLE_ALPHA_TO_COVERAGE );
+
 	}
 
 	//
