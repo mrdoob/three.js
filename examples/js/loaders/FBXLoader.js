@@ -238,6 +238,7 @@
 				break;
 
 			case 'jpg':
+			case 'jpeg':
 
 				type = 'image/jpeg';
 				break;
@@ -385,6 +386,21 @@
 
 		texture.wrapS = valueU === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 		texture.wrapT = valueV === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+
+		if ( 'Scaling' in textureNode.properties ) {
+
+			var values = textureNode.properties.Scaling.value;
+
+			if ( typeof values === 'string' ) {
+
+				values = parseFloatArray( values );
+
+			}
+
+			texture.repeat.x = values[ 0 ];
+			texture.repeat.y = values[ 1 ];
+
+		}
 
 		loader.setPath( currentPath );
 
@@ -935,10 +951,9 @@
 
 			if ( uvInfo ) {
 
-				var uvTemp = new THREE.Vector2();
-
 				for ( var i = 0; i < uvInfo.length; i ++ ) {
 
+					var uvTemp = new THREE.Vector2();
 					vertex.uv.push( uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[ i ] ) ) );
 
 				}

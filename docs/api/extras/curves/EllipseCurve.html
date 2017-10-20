@@ -28,8 +28,9 @@ var curve = new THREE.EllipseCurve(
 	0                 // aRotation
 );
 
-var path = new THREE.Path( curve.getPoints( 50 ) );
-var geometry = path.createPointsGeometry( 50 );
+var points = curve.getPoints( 50 );
+var geometry = new THREE.BufferGeometry().setFromPoints( points );
+
 var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
 // Create the final object to add to the scene

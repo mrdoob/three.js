@@ -5,6 +5,8 @@
 import { Cache } from './Cache.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
+var loading = {};
+
 function FileLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
@@ -36,6 +38,20 @@ Object.assign( FileLoader.prototype, {
 			}, 0 );
 
 			return cached;
+
+		}
+
+		// Check if request is duplicate
+
+		if ( loading[ url ] !== undefined ) {
+
+			loading[ url ].push( function () {
+
+				scope.load( url, onLoad, onProgress, onError );
+
+			} );
+
+			return;
 
 		}
 
@@ -130,7 +146,12 @@ Object.assign( FileLoader.prototype, {
 
 		} else {
 
+			// Initialise array for duplicate requests
+
+			loading[ url ] = [];
+
 			var request = new XMLHttpRequest();
+
 			request.open( 'GET', url, true );
 
 			request.addEventListener( 'load', function ( event ) {
@@ -164,6 +185,18 @@ Object.assign( FileLoader.prototype, {
 					scope.manager.itemError( url );
 
 				}
+
+				// Clean up duplicate requests.
+
+				var callbacks = loading[ url ];
+
+				for ( var i = 0; i < callbacks.length; i ++ ) {
+
+					callbacks[ i ]( response );
+
+				}
+
+				delete loading[ url ];
 
 			}, false );
 

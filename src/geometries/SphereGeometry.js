@@ -53,7 +53,7 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 		thetaLength: thetaLength
 	};
 
-	radius = radius || 50;
+	radius = radius || 1;
 
 	widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
 	heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
