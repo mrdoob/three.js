@@ -33,7 +33,7 @@ function compareBox( a, b, threshold ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module( 'Box3', () => {
+	QUnit.module.todo( 'Box3', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

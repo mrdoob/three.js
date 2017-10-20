@@ -11,7 +11,7 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'RingGeometry', ( hooks ) => {
+	QUnit.module.todo( 'RingGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -60,7 +60,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module( 'RingBufferGeometry', ( hooks ) => {
+	QUnit.module.todo( 'RingBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

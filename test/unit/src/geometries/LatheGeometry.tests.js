@@ -10,7 +10,7 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'LatheGeometry', ( hooks ) => {
+	QUnit.module.todo( 'LatheGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -52,7 +52,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module( 'LatheBufferGeometry', ( hooks ) => {
+	QUnit.module.todo( 'LatheBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

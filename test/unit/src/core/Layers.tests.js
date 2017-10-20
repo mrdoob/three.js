@@ -7,7 +7,7 @@ import { Layers } from '../../../../src/core/Layers';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'Layers', () => {
+	QUnit.module.todo( 'Layers', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

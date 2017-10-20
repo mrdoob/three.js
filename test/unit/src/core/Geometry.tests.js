@@ -41,7 +41,7 @@ function getGeometry() {
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'Geometry', () => {
+	QUnit.module.todo( 'Geometry', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {

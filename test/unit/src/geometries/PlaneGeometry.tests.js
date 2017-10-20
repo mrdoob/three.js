@@ -11,7 +11,7 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'PlaneGeometry', ( hooks ) => {
+	QUnit.module.todo( 'PlaneGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -56,7 +56,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module( 'PlaneBufferGeometry', ( hooks ) => {
+	QUnit.module.todo( 'PlaneBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

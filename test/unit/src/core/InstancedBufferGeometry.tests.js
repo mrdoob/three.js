@@ -8,7 +8,7 @@ import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'InstancedBufferGeometry', () => {
+	QUnit.module.todo( 'InstancedBufferGeometry', () => {
 
 		function createClonableMock() {
 

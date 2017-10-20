@@ -8,7 +8,7 @@ import { DirectionalLight } from '../../../../src/lights/DirectionalLight';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module( 'DirectionalLight', ( hooks ) => {
+	QUnit.module.todo( 'DirectionalLight', ( hooks ) => {
 
 		var lights = undefined;
 		hooks.beforeEach( function () {

@@ -70,7 +70,7 @@ function getSphere() {
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'Raycaster', () => {
+	QUnit.module.todo( 'Raycaster', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

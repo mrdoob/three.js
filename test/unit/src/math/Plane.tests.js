@@ -28,7 +28,7 @@ function comparePlane( a, b, threshold ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module( 'Plane', () => {
+	QUnit.module.todo( 'Plane', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

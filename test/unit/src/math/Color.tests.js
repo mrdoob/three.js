@@ -9,7 +9,7 @@ import { eps } from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module( 'Color', () => {
+	QUnit.module.todo( 'Color', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

@@ -10,7 +10,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module( 'LineCurve', ( hooks ) => {
+		QUnit.module.todo( 'LineCurve', ( hooks ) => {
 
 			let _points = undefined;
 			let _curve = undefined;

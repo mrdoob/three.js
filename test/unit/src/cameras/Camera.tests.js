@@ -9,7 +9,7 @@ import { Vector3 } from '../../../../src/math/Vector3';
 
 export default QUnit.module( 'Cameras', () => {
 
-	QUnit.module( 'Camera', () => {
+	QUnit.module.todo( 'Camera', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {

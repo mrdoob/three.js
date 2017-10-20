@@ -211,7 +211,7 @@ function initDebug() {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'EdgesGeometry', () => {
+	QUnit.module.todo( 'EdgesGeometry', () => {
 
 		var vertList = [
 			new Vector3( 0, 0, 0 ),

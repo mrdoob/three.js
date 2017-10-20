@@ -8,7 +8,7 @@ import { EventDispatcher } from '../../../../src/core/EventDispatcher';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'EventDispatcher', () => {
+	QUnit.module.todo( 'EventDispatcher', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

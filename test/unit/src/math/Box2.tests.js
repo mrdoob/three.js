@@ -16,7 +16,7 @@ import {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module( 'Box2', () => {
+	QUnit.module.todo( 'Box2', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

@@ -13,7 +13,7 @@ import {
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'Uniform', () => {
+	QUnit.module.todo( 'Uniform', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

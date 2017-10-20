@@ -8,7 +8,7 @@ import { Clock } from '../../../../src/core/Clock';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'Clock', () => {
+	QUnit.module.todo( 'Clock', () => {
 
 		function mockPerformance() {
 

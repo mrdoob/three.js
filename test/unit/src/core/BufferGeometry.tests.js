@@ -124,7 +124,7 @@ function compareUvs( uvs, u ) {
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'BufferGeometry', () => {
+	QUnit.module.todo( 'BufferGeometry', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {

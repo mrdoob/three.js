@@ -12,7 +12,7 @@ import {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module( 'Spherical', () => {
+	QUnit.module.todo( 'Spherical', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

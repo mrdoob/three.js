@@ -57,7 +57,7 @@ function quatEquals( a, b, tolerance ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module( 'Euler', () => {
+	QUnit.module.todo( 'Euler', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

@@ -11,7 +11,7 @@ import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
 
 export default QUnit.module( 'Animation', () => {
 
-	QUnit.module( 'PropertyBinding', () => {
+	QUnit.module.todo( 'PropertyBinding', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

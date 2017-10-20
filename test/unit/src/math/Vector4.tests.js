@@ -17,7 +17,7 @@ import {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module( 'Vector4', () => {
+	QUnit.module.todo( 'Vector4', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

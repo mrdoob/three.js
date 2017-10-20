@@ -10,7 +10,7 @@ import { ObjectLoader } from '../../../../src/loaders/ObjectLoader';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module( 'SpotLightShadow', () => {
+	QUnit.module.todo( 'SpotLightShadow', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {

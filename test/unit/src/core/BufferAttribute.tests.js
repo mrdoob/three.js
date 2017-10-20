@@ -11,7 +11,7 @@ import { Vector4 } from '../../../../src/math/Vector4';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'BufferAttribute', () => {
+	QUnit.module.todo( 'BufferAttribute', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -299,7 +299,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module( 'Int8BufferAttribute', () => {
+	QUnit.module.todo( 'Int8BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {
@@ -317,7 +317,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module( 'Uint8BufferAttribute', () => {
+	QUnit.module.todo( 'Uint8BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {
@@ -335,7 +335,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module( 'Uint8ClampedBufferAttribute', () => {
+	QUnit.module.todo( 'Uint8ClampedBufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {
@@ -353,7 +353,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module( 'Int16BufferAttribute', () => {
+	QUnit.module.todo( 'Int16BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {
@@ -371,7 +371,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module( 'Uint16BufferAttribute', () => {
+	QUnit.module.todo( 'Uint16BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {
@@ -389,7 +389,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module( 'Int32BufferAttribute', () => {
+	QUnit.module.todo( 'Int32BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {
@@ -407,7 +407,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module( 'Uint32BufferAttribute', () => {
+	QUnit.module.todo( 'Uint32BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {
@@ -425,7 +425,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module( 'Float32BufferAttribute', () => {
+	QUnit.module.todo( 'Float32BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {
@@ -443,7 +443,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module( 'Float64BufferAttribute', () => {
+	QUnit.module.todo( 'Float64BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {

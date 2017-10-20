@@ -7,7 +7,7 @@ import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'InterleavedBuffer', () => {
+	QUnit.module.todo( 'InterleavedBuffer', () => {
 
 		function checkInstanceAgainstCopy( instance, copiedInstance, assert ) {
 

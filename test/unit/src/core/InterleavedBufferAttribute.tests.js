@@ -9,7 +9,7 @@ import { InterleavedBufferAttribute } from '../../../../src/core/InterleavedBuff
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'InterleavedBufferAttribute', () => {
+	QUnit.module.todo( 'InterleavedBufferAttribute', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

@@ -6,7 +6,7 @@
 import '../../../src/polyfills';
 import { Vector3 } from '../../../src/math/Vector3';
 
-export default QUnit.module( 'Polyfills', () => {
+export default QUnit.module.todo( 'Polyfills', () => {
 
 	// PUBLIC STUFF
 	QUnit.test( "Number.EPSILON", ( assert ) => {

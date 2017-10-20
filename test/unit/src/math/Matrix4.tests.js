@@ -48,7 +48,7 @@ function eulerEquals( a, b, tolerance ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module( 'Matrix4', () => {
+	QUnit.module.todo( 'Matrix4', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

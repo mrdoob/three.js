@@ -8,7 +8,7 @@ import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera';
 
 export default QUnit.module( 'Cameras', () => {
 
-	QUnit.module( 'OrthographicCamera', () => {
+	QUnit.module.todo( 'OrthographicCamera', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {

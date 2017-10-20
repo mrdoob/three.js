@@ -11,7 +11,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module( 'CatmullRomCurve3', () => {
+		QUnit.module.todo( 'CatmullRomCurve3', () => {
 
 			/* eslint-disable */
 			var positions = [

@@ -8,7 +8,7 @@ import { SpotLight } from '../../../../src/lights/SpotLight';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module( 'SpotLight', ( hooks ) => {
+	QUnit.module.todo( 'SpotLight', ( hooks ) => {
 
 		var lights = undefined;
 		hooks.beforeEach( function () {

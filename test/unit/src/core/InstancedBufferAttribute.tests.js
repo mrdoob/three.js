@@ -7,7 +7,7 @@ import { InstancedBufferAttribute } from '../../../../src/core/InstancedBufferAt
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'InstancedBufferAttribute', () => {
+	QUnit.module.todo( 'InstancedBufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.test( "Extending", ( assert ) => {

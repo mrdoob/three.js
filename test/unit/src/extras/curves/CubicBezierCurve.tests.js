@@ -11,7 +11,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module( 'CubicBezierCurve', ( hooks ) => {
+		QUnit.module.todo( 'CubicBezierCurve', ( hooks ) => {
 
 			let curve = undefined;
 			hooks.before( function () {

@@ -8,7 +8,7 @@ import { AmbientLight } from '../../../../src/lights/AmbientLight';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module( 'ArrowHelper', ( hooks ) => {
+	QUnit.module.todo( 'ArrowHelper', ( hooks ) => {
 
 		var lights = undefined;
 		hooks.beforeEach( function () {

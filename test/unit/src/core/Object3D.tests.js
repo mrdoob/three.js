@@ -19,7 +19,7 @@ import {
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'Object3D', () => {
+	QUnit.module.todo( 'Object3D', () => {
 
 		var RadToDeg = 180 / Math.PI;
 
