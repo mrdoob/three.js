@@ -119,8 +119,9 @@
 		
 		if ( this.scene ) {
 			
-			this.visualGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-			this.visualMaterial = new THREE.MeshBasicMaterial( { color: 0xFF0066, wireframe: true, wireframeLinewidth: 1 } );
+			var helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ) ), 0xff0066 );
+			this.visualGeometry = helper.geometry;
+			this.visualMaterial = helper.material;
 			
 		}
 		
@@ -773,7 +774,7 @@
 		
 		if ( this.tree.scene ) {
 			
-			this.visual = new THREE.Mesh( this.tree.visualGeometry, this.tree.visualMaterial );
+			this.visual = new THREE.LineSegments( this.tree.visualGeometry, this.tree.visualMaterial );
 			this.visual.scale.set( this.radiusOverlap * 2, this.radiusOverlap * 2, this.radiusOverlap * 2 );
 			this.visual.position.copy( this.position );
 			this.tree.scene.add( this.visual );
