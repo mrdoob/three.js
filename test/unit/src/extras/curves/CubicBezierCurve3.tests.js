@@ -25,7 +25,19 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "Simple curve", function ( assert ) {
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
+
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
+
+			// PUBLIC STUFF
+			QUnit.test( "isCubicBezierCurve3", ( assert ) => {} );
+
+			QUnit.test( "getPoint", ( assert ) => {} );
+			
+			// OTHERS
+			QUnit.test( "Simple curve", ( assert ) => {
 
 				var expectedPoints = [
 					new Vector3( - 10, 0, 2 ),
@@ -52,7 +64,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getLength/getLengths", function ( assert ) {
+			QUnit.test( "getLength/getLengths", ( assert ) => {
 
 				var length = curve.getLength();
 				var expectedLength = 39.58103024989427;
@@ -78,7 +90,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getPointAt", function ( assert ) {
+			QUnit.test( "getPointAt", ( assert ) => {
 
 				var expectedPoints = [
 					new Vector3( - 10, 0, 2 ),
@@ -98,7 +110,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getTangent/getTangentAt", function ( assert ) {
+			QUnit.test( "getTangent/getTangentAt", ( assert ) => {
 
 				var expectedTangents = [
 					new Vector3( 0.3138715439944244, 0.9411440474105875, 0.12542940601858074 ),
@@ -154,7 +166,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getUtoTmapping", function ( assert ) {
+			QUnit.test( "getUtoTmapping", ( assert ) => {
 
 				var start = curve.getUtoTmapping( 0, 0 );
 				var end = curve.getUtoTmapping( 0, curve.getLength() );
@@ -168,7 +180,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getSpacedPoints", function ( assert ) {
+			QUnit.test( "getSpacedPoints", ( assert ) => {
 
 				var expectedPoints = [
 					new Vector3( - 10, 0, 2 ),
@@ -186,7 +198,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "computeFrenetFrames", function ( assert ) {
+			QUnit.test( "computeFrenetFrames", ( assert ) => {
 
 				var expected = {
 					binormals: [

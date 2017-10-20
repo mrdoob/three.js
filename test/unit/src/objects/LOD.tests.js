@@ -9,11 +9,23 @@ export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'LOD', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PROPERTIES
+		QUnit.test( "levels", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isLOD", ( assert ) => {} );
+		QUnit.test( "copy", ( assert ) => {} );
+		QUnit.test( "addLevel", ( assert ) => {} );
+		QUnit.test( "getObjectForDistance", ( assert ) => {} );
+		QUnit.test( "raycast", ( assert ) => {} );
+		QUnit.test( "update", ( assert ) => {} );
+		QUnit.test( "toJSON", ( assert ) => {} );
 
 	} );
 

@@ -1,5 +1,6 @@
 /**
  * @author zz85 / http://joshuakoo.com
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -22,6 +23,18 @@ export default QUnit.module( 'Extras', () => {
 			];
 			/* eslint-enable */
 
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
+
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
+
+			// PUBLIC STUFF
+			QUnit.test( "isCatmullRomCurve3", ( assert ) => {} );
+
+			QUnit.test( "getPoint", ( assert ) => {} );
+
+			// OTHERS
 			QUnit.test( "catmullrom check", ( assert ) => {
 
 				var curve = new CatmullRomCurve3( positions );
@@ -161,7 +174,7 @@ export default QUnit.module( 'Extras', () => {
 			//
 			// curve.type = 'catmullrom'; only from here on
 			//
-			QUnit.test( "getLength/getLengths", function ( assert ) {
+			QUnit.test( "getLength/getLengths", ( assert ) => {
 
 				var curve = new THREE.CatmullRomCurve3( positions );
 				curve.type = 'catmullrom';
@@ -190,7 +203,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getPointAt", function ( assert ) {
+			QUnit.test( "getPointAt", ( assert ) => {
 
 				var curve = new THREE.CatmullRomCurve3( positions );
 				curve.type = 'catmullrom';
@@ -213,7 +226,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getTangent/getTangentAt", function ( assert ) {
+			QUnit.test( "getTangent/getTangentAt", ( assert ) => {
 
 				var curve = new THREE.CatmullRomCurve3( positions );
 				curve.type = 'catmullrom';
@@ -272,7 +285,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "computeFrenetFrames", function ( assert ) {
+			QUnit.test( "computeFrenetFrames", ( assert ) => {
 
 				var curve = new THREE.CatmullRomCurve3( positions );
 				curve.type = 'catmullrom';
@@ -311,7 +324,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getUtoTmapping", function ( assert ) {
+			QUnit.test( "getUtoTmapping", ( assert ) => {
 
 				var curve = new THREE.CatmullRomCurve3( positions );
 				curve.type = 'catmullrom';
@@ -328,7 +341,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getSpacedPoints", function ( assert ) {
+			QUnit.test( "getSpacedPoints", ( assert ) => {
 
 				var curve = new THREE.CatmullRomCurve3( positions );
 				curve.type = 'catmullrom';

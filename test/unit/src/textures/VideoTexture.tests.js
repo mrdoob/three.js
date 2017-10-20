@@ -9,11 +9,14 @@ export default QUnit.module( 'Textures', () => {
 
 	QUnit.module.todo( 'VideoTexture', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isVideoTexture", ( assert ) => {} );
 
 	} );
 

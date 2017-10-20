@@ -11,11 +11,31 @@ export default QUnit.module( 'Extras', () => {
 
 		QUnit.module.todo( 'Curve', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// PUBLIC STUFF
+			QUnit.test( "getPoint", ( assert ) => {} );
 
-			} );
+			QUnit.test( "getPointAt", ( assert ) => {} );
+
+			QUnit.test( "getPoints", ( assert ) => {} );
+
+			QUnit.test( "getSpacedPoints", ( assert ) => {} );
+
+			QUnit.test( "getLength", ( assert ) => {} );
+
+			QUnit.test( "getLengths", ( assert ) => {} );
+
+			QUnit.test( "updateArcLengths", ( assert ) => {} );
+
+			QUnit.test( "getUtoTmapping", ( assert ) => {} );
+
+			QUnit.test( "getTangent", ( assert ) => {} );
+
+			QUnit.test( "getTangentAt", ( assert ) => {} );
+
+			QUnit.test( "computeFrenetFrames", ( assert ) => {} );
 
 		} );
 

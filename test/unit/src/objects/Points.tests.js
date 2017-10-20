@@ -9,11 +9,14 @@ export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'Points', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "isPoints", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "raycast", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "clone", ( assert ) => {} );
 
 	} );
 

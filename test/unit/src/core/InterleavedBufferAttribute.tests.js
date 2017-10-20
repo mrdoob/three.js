@@ -1,5 +1,6 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -10,7 +11,11 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'InterleavedBufferAttribute', () => {
 
-		QUnit.test( "length and count", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PROPERTIES
+		QUnit.test( "count", ( assert ) => {
 
 			var buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 			var instance = new InterleavedBufferAttribute( buffer, 2, 0 );
@@ -19,6 +24,11 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "array", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		// setY, setZ and setW are calculated in the same way so not QUnit.testing this
+		// TODO: ( you can't be sure that will be the case in future, or a mistake was introduce in one off them ! )
 		QUnit.test( "setX", ( assert ) => {
 
 			var buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
@@ -42,7 +52,25 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// setY, setZ and setW are calculated in the same way so not QUnit.testing this
+		QUnit.test( "setY", ( assert ) => {} );
+
+		QUnit.test( "setZ", ( assert ) => {} );
+
+		QUnit.test( "setW", ( assert ) => {} );
+
+		QUnit.test( "getX", ( assert ) => {} );
+
+		QUnit.test( "getY", ( assert ) => {} );
+
+		QUnit.test( "getZ", ( assert ) => {} );
+
+		QUnit.test( "getW", ( assert ) => {} );
+
+		QUnit.test( "setXY", ( assert ) => {} );
+
+		QUnit.test( "setXYZ", ( assert ) => {} );
+
+		QUnit.test( "setXYZW", ( assert ) => {} );
 
 	} );
 

@@ -21,7 +21,8 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Sphere', () => {
 
-		QUnit.test( "constructor", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Sphere();
 			assert.ok( a.center.equals( zero3 ), "Passed!" );
@@ -32,6 +33,57 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.radius == 1, "Passed!" );
 
 		} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isSphere", ( assert ) => {} );
+
+		QUnit.test( "set", ( assert ) => {
+
+			var a = new Sphere();
+			assert.ok( a.center.equals( zero3 ), "Passed!" );
+			assert.ok( a.radius == 0, "Passed!" );
+
+			a.set( one3, 1 );
+			assert.ok( a.center.equals( one3 ), "Passed!" );
+			assert.ok( a.radius == 1, "Passed!" );
+
+		} );
+
+		QUnit.test( "setFromPoints", ( assert ) => {
+
+			var a = new Sphere();
+			var expectedCenter = new Vector3( 0.9330126941204071, 0, 0 );
+			var expectedRadius = 1.3676668773461689;
+			var optionalCenter = new Vector3( 1, 1, 1 );
+			var points = [
+				new Vector3( 1, 1, 0 ), new Vector3( 1, 1, 0 ),
+				new Vector3( 1, 1, 0 ), new Vector3( 1, 1, 0 ),
+				new Vector3( 1, 1, 0 ), new Vector3( 0.8660253882408142, 0.5, 0 ),
+				new Vector3( - 0, 0.5, 0.8660253882408142 ), new Vector3( 1.8660253882408142, 0.5, 0 ),
+				new Vector3( 0, 0.5, - 0.8660253882408142 ), new Vector3( 0.8660253882408142, 0.5, - 0 ),
+				new Vector3( 0.8660253882408142, - 0.5, 0 ), new Vector3( - 0, - 0.5, 0.8660253882408142 ),
+				new Vector3( 1.8660253882408142, - 0.5, 0 ), new Vector3( 0, - 0.5, - 0.8660253882408142 ),
+				new Vector3( 0.8660253882408142, - 0.5, - 0 ), new Vector3( - 0, - 1, 0 ),
+				new Vector3( - 0, - 1, 0 ), new Vector3( 0, - 1, 0 ),
+				new Vector3( 0, - 1, - 0 ), new Vector3( - 0, - 1, - 0 ),
+			];
+
+			a.setFromPoints( points );
+			assert.ok( Math.abs( a.center.x - expectedCenter.x ) <= eps, "Default center: check center.x" );
+			assert.ok( Math.abs( a.center.y - expectedCenter.y ) <= eps, "Default center: check center.y" );
+			assert.ok( Math.abs( a.center.z - expectedCenter.z ) <= eps, "Default center: check center.z" );
+			assert.ok( Math.abs( a.radius - expectedRadius ) <= eps, "Default center: check radius" );
+
+			var expectedRadius = 2.5946195770400102;
+			a.setFromPoints( points, optionalCenter );
+			assert.ok( Math.abs( a.center.x - optionalCenter.x ) <= eps, "Optional center: check center.x" );
+			assert.ok( Math.abs( a.center.y - optionalCenter.y ) <= eps, "Optional center: check center.y" );
+			assert.ok( Math.abs( a.center.z - optionalCenter.z ) <= eps, "Optional center: check center.z" );
+			assert.ok( Math.abs( a.radius - expectedRadius ) <= eps, "Optional center: check radius" );
+
+		} );
+
+		QUnit.test( "clone", ( assert ) => {} );
 
 		QUnit.test( "copy", ( assert ) => {
 
@@ -46,18 +98,6 @@ export default QUnit.module( 'Maths', () => {
 			a.radius = 0;
 			assert.ok( b.center.equals( one3 ), "Passed!" );
 			assert.ok( b.radius == 1, "Passed!" );
-
-		} );
-
-		QUnit.test( "set", ( assert ) => {
-
-			var a = new Sphere();
-			assert.ok( a.center.equals( zero3 ), "Passed!" );
-			assert.ok( a.radius == 0, "Passed!" );
-
-			a.set( one3, 1 );
-			assert.ok( a.center.equals( one3 ), "Passed!" );
-			assert.ok( a.radius == 1, "Passed!" );
 
 		} );
 
@@ -97,6 +137,17 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( a.intersectsSphere( b ), "Passed!" );
 			assert.ok( ! a.intersectsSphere( c ), "Passed!" );
+
+		} );
+
+		QUnit.test( "intersectsBox", ( assert ) => {
+
+			var a = new Sphere();
+			var b = new Sphere( new Vector3( - 5, - 5, - 5 ) );
+			var box = new Box3( zero3, one3 );
+
+			assert.strictEqual( a.intersectsBox( box ), true, "Check default sphere" );
+			assert.strictEqual( b.intersectsBox( box ), false, "Check shifted sphere" );
 
 		} );
 
@@ -148,51 +199,6 @@ export default QUnit.module( 'Maths', () => {
 
 			a.translate( one3.clone().negate() );
 			assert.ok( a.center.equals( zero3 ), "Passed!" );
-
-		} );
-
-		QUnit.test( "setFromPoints", ( assert ) => {
-
-			var a = new Sphere();
-			var expectedCenter = new Vector3( 0.9330126941204071, 0, 0 );
-			var expectedRadius = 1.3676668773461689;
-			var optionalCenter = new Vector3( 1, 1, 1 );
-			var points = [
-				new Vector3( 1, 1, 0 ), new Vector3( 1, 1, 0 ),
-				new Vector3( 1, 1, 0 ), new Vector3( 1, 1, 0 ),
-				new Vector3( 1, 1, 0 ), new Vector3( 0.8660253882408142, 0.5, 0 ),
-				new Vector3( - 0, 0.5, 0.8660253882408142 ), new Vector3( 1.8660253882408142, 0.5, 0 ),
-				new Vector3( 0, 0.5, - 0.8660253882408142 ), new Vector3( 0.8660253882408142, 0.5, - 0 ),
-				new Vector3( 0.8660253882408142, - 0.5, 0 ), new Vector3( - 0, - 0.5, 0.8660253882408142 ),
-				new Vector3( 1.8660253882408142, - 0.5, 0 ), new Vector3( 0, - 0.5, - 0.8660253882408142 ),
-				new Vector3( 0.8660253882408142, - 0.5, - 0 ), new Vector3( - 0, - 1, 0 ),
-				new Vector3( - 0, - 1, 0 ), new Vector3( 0, - 1, 0 ),
-				new Vector3( 0, - 1, - 0 ), new Vector3( - 0, - 1, - 0 ),
-			];
-
-			a.setFromPoints( points );
-			assert.ok( Math.abs( a.center.x - expectedCenter.x ) <= eps, "Default center: check center.x" );
-			assert.ok( Math.abs( a.center.y - expectedCenter.y ) <= eps, "Default center: check center.y" );
-			assert.ok( Math.abs( a.center.z - expectedCenter.z ) <= eps, "Default center: check center.z" );
-			assert.ok( Math.abs( a.radius - expectedRadius ) <= eps, "Default center: check radius" );
-
-			var expectedRadius = 2.5946195770400102;
-			a.setFromPoints( points, optionalCenter );
-			assert.ok( Math.abs( a.center.x - optionalCenter.x ) <= eps, "Optional center: check center.x" );
-			assert.ok( Math.abs( a.center.y - optionalCenter.y ) <= eps, "Optional center: check center.y" );
-			assert.ok( Math.abs( a.center.z - optionalCenter.z ) <= eps, "Optional center: check center.z" );
-			assert.ok( Math.abs( a.radius - expectedRadius ) <= eps, "Optional center: check radius" );
-
-		} );
-
-		QUnit.test( "intersectsBox", ( assert ) => {
-
-			var a = new Sphere();
-			var b = new Sphere( new Vector3( - 5, - 5, - 5 ) );
-			var box = new Box3( zero3, one3 );
-
-			assert.strictEqual( a.intersectsBox( box ), true, "Check default sphere" );
-			assert.strictEqual( b.intersectsBox( box ), false, "Check shifted sphere" );
 
 		} );
 

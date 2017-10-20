@@ -9,11 +9,14 @@ export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'Cache', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// PUBLIC STUFF
+		QUnit.test( "add", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		QUnit.test( "get", ( assert ) => {} );
 
-		} );
+		QUnit.test( "remove", ( assert ) => {} );
+
+		QUnit.test( "clear", ( assert ) => {} );
 
 	} );
 

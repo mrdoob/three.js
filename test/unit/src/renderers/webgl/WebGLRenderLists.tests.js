@@ -11,11 +11,13 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'WebGLRenderLists', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
+			
+			// PUBLIC STUFF
+			QUnit.test( "get", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
-
-			} );
+			QUnit.test( "dispose", ( assert ) => {} );
 
 		} );
 

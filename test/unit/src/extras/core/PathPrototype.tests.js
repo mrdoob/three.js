@@ -11,11 +11,29 @@ export default QUnit.module( 'Extras', () => {
 
 		QUnit.module.todo( 'PathPrototype', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// PUBLIC STUFF
+			QUnit.test( "fromPoints", ( assert ) => {} );
 
-			} );
+			QUnit.test( "moveTo", ( assert ) => {} );
+
+			QUnit.test( "lineTo", ( assert ) => {} );
+
+			QUnit.test( "quadraticCurveTo", ( assert ) => {} );
+
+			QUnit.test( "bezierCurveTo", ( assert ) => {} );
+
+			QUnit.test( "splineThru", ( assert ) => {} );
+
+			QUnit.test( "arc", ( assert ) => {} );
+
+			QUnit.test( "absarc", ( assert ) => {} );
+
+			QUnit.test( "ellipse", ( assert ) => {} );
+
+			QUnit.test( "absellipse", ( assert ) => {} );
 
 		} );
 

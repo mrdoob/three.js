@@ -11,11 +11,10 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'UniformsLib', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// PUBLIC STUFF
+			QUnit.test( "merge", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
-
-			} );
+			QUnit.test( "clone", ( assert ) => {} );
 
 		} );
 

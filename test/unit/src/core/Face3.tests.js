@@ -1,5 +1,6 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -11,6 +12,10 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'Face3', () => {
 
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
 		QUnit.test( "copy", ( assert ) => {
 
 			var instance = new Face3( 0, 1, 2, new Vector3( 0, 1, 0 ), new Color( 0.25, 0.5, 0.75 ), 2 );
@@ -21,7 +26,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.test( "copy (more)", ( assert ) => {
 
 			var instance = new Face3( 0, 1, 2,
 				[ new Vector3( 0, 1, 0 ), new Vector3( 1, 0, 1 ) ],

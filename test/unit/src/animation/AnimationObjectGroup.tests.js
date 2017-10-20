@@ -10,7 +10,7 @@ import { PropertyBinding } from '../../../../src/animation/PropertyBinding';
 
 export default QUnit.module( "Animation", () => {
 
-	QUnit.module( "AnimationObjectGroup", () => {
+	QUnit.module.todo( "AnimationObjectGroup", () => {
 
 		var ObjectA = new Object3D(),
 			ObjectB = new Object3D(),
@@ -24,6 +24,24 @@ export default QUnit.module( "Animation", () => {
 			ParsedPathB = PropertyBinding.parseTrackName( PathB ),
 			ParsedPathC = PropertyBinding.parseTrackName( PathC );
 
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PRIVATE STUFF
+		QUnit.test( "subscribe_", ( assert ) => {} ); // Todo: Naming guys -_-'
+
+		QUnit.test( "unsubscribe_", ( assert ) => {} ); // Todo: Naming guys -_-'
+
+		// PUBLIC STUFF
+		QUnit.test( "isAnimationObjectGroup", ( assert ) => {} );
+
+		QUnit.test( "add", ( assert ) => {} );
+
+		QUnit.test( "remove", ( assert ) => {} );
+
+		QUnit.test( "uncache", ( assert ) => {} );
+
+		// OTHERS
 		QUnit.test( "smoke test", ( assert ) => {
 
 			var expect = function expect( testIndex, group, bindings, path, cached, roots ) {

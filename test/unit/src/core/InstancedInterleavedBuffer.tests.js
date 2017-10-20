@@ -9,7 +9,11 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'InstancedInterleavedBuffer', () => {
 
-		QUnit.test( "can be created", ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			var instance = new InstancedInterleavedBuffer( array, 3 );
@@ -17,6 +21,9 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( instance.meshPerAttribute === 1, "ok" );
 
 		} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isInstancedInterleavedBuffer", ( assert ) => {} );
 
 		QUnit.test( "copy", ( assert ) => {
 

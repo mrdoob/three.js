@@ -30,13 +30,14 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			runStdLightTests( assert, lights );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
-
-		QUnit.test( "Power", function ( assert ) {
+		// PROPERTIES
+		QUnit.test( "power", ( assert ) => {
 
 			var a = new PointLight( 0xaaaaaa );
 
@@ -50,6 +51,19 @@ export default QUnit.module( 'Lights', () => {
 			assert.numEqual( a.intensity, 100 / ( 4 * Math.PI ), "Correct intensity for a power of 100" );
 
 		} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isPointLight", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
+
+		// OTHERS
+		QUnit.test( 'Standard light tests', ( assert ) => {
+
+			runStdLightTests( assert, lights );
+
+		} );
+
 
 	} );
 

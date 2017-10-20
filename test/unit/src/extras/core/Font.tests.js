@@ -11,11 +11,13 @@ export default QUnit.module( 'Extras', () => {
 
 		QUnit.module.todo( 'Font', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// PUBLIC STUFF
+			QUnit.test( "isFont", ( assert ) => {} );
 
-			} );
+			QUnit.test( "generateShapes", ( assert ) => {} );
 
 		} );
 

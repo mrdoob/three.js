@@ -11,11 +11,17 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'WebGLIndexedBufferRenderer', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// PUBLIC STUFF
+			QUnit.test( "setMode", ( assert ) => {} );
 
-			} );
+			QUnit.test( "setIndex", ( assert ) => {} );
+
+			QUnit.test( "render", ( assert ) => {} );
+
+			QUnit.test( "renderInstances", ( assert ) => {} );
 
 		} );
 

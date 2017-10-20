@@ -11,11 +11,18 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.module.todo( 'CubicInterpolant', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-			} );
+			// PRIVATE STUFF
+			QUnit.test( "DefaultSettings_", ( assert ) => {} );
+
+			QUnit.test( "intervalChanged_", ( assert ) => {} );
+
+			QUnit.test( "interpolate_", ( assert ) => {} );
 
 		} );
 

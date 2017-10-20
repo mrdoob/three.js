@@ -23,11 +23,20 @@ import {
 	two3
 } from './Constants.tests';
 
+function compareBox( a, b, threshold ) {
+
+	threshold = threshold || 0.0001;
+	return ( a.min.distanceTo( b.min ) < threshold &&
+	a.max.distanceTo( b.max ) < threshold );
+
+}
+
 export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Box3', () => {
 
-		QUnit.test( "constructor", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Box3();
 			assert.ok( a.min.equals( posInf3 ), "Passed!" );
@@ -43,20 +52,8 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
-
-			var a = new Box3( zero3.clone(), one3.clone() );
-			var b = new Box3().copy( a );
-			assert.ok( b.min.equals( zero3 ), "Passed!" );
-			assert.ok( b.max.equals( one3 ), "Passed!" );
-
-			// ensure that it is a true copy
-			a.min = zero3;
-			a.max = one3;
-			assert.ok( b.min.equals( zero3 ), "Passed!" );
-			assert.ok( b.max.equals( one3 ), "Passed!" );
-
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isBox3", ( assert ) => {} );
 
 		QUnit.test( "set", ( assert ) => {
 
@@ -65,6 +62,33 @@ export default QUnit.module( 'Maths', () => {
 			a.set( zero3, one3 );
 			assert.ok( a.min.equals( zero3 ), "Passed!" );
 			assert.ok( a.max.equals( one3 ), "Passed!" );
+
+		} );
+
+		QUnit.test( "setFromArray", ( assert ) => {} );
+
+		QUnit.test( "setFromBufferAttribute", ( assert ) => {
+
+			var a = new Box3( zero3.clone(), one3.clone() );
+			var bigger = new BufferAttribute( new Float32Array( [
+				- 2, - 2, - 2, 2, 2, 2, 1.5, 1.5, 1.5, 0, 0, 0
+			] ), 3 );
+			var smaller = new BufferAttribute( new Float32Array( [
+				- 0.5, - 0.5, - 0.5, 0.5, 0.5, 0.5, 0, 0, 0
+			] ), 3 );
+			var newMin = new Vector3( - 2, - 2, - 2 );
+			var newMax = new Vector3( 2, 2, 2 );
+
+			a.setFromBufferAttribute( bigger );
+			assert.ok( a.min.equals( newMin ), "Bigger box: correct new minimum" );
+			assert.ok( a.max.equals( newMax ), "Bigger box: correct new maximum" );
+
+			newMin.set( - 0.5, - 0.5, - 0.5 );
+			newMax.set( 0.5, 0.5, 0.5 );
+
+			a.setFromBufferAttribute( smaller );
+			assert.ok( a.min.equals( newMin ), "Smaller box: correct new minimum" );
+			assert.ok( a.max.equals( newMax ), "Smaller box: correct new maximum" );
 
 		} );
 
@@ -85,6 +109,58 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "setFromCenterAndSize", ( assert ) => {
+
+			var a = new Box3( zero3.clone(), one3.clone() );
+			var b = a.clone();
+			var newCenter = one3;
+			var newSize = two3;
+
+			a.setFromCenterAndSize( a.getCenter(), a.getSize() );
+			assert.ok( a.equals( b ), "Same values: no changes" );
+
+			a.setFromCenterAndSize( newCenter, a.getSize() );
+			assert.ok( a.getCenter().equals( newCenter ), "Move center: correct new center" );
+			assert.ok( a.getSize().equals( b.getSize() ), "Move center: no change in size" );
+			assert.notOk( a.equals( b ), "Move center: no longer equal to old values" );
+
+			a.setFromCenterAndSize( a.getCenter(), newSize );
+			assert.ok( a.getCenter().equals( newCenter ), "Resize: no change to center" );
+			assert.ok( a.getSize().equals( newSize ), "Resize: correct new size" );
+			assert.notOk( a.equals( b ), "Resize: no longer equal to old values" );
+
+		} );
+
+		QUnit.test( "setFromObject/BufferGeometry", ( assert ) => {
+
+			var a = new Box3( zero3.clone(), one3.clone() );
+			var object = new Mesh( new BoxBufferGeometry( 2, 2, 2 ) );
+			var child = new Mesh( new BoxBufferGeometry( 1, 1, 1 ) );
+			object.add( child );
+
+			a.setFromObject( object );
+			assert.ok( a.min.equals( new Vector3( - 1, - 1, - 1 ) ), "Correct new minimum" );
+			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Correct new maximum" );
+
+		} );
+
+		QUnit.test( "clone", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {
+
+			var a = new Box3( zero3.clone(), one3.clone() );
+			var b = new Box3().copy( a );
+			assert.ok( b.min.equals( zero3 ), "Passed!" );
+			assert.ok( b.max.equals( one3 ), "Passed!" );
+
+			// ensure that it is a true copy
+			a.min = zero3;
+			a.max = one3;
+			assert.ok( b.min.equals( zero3 ), "Passed!" );
+			assert.ok( b.max.equals( one3 ), "Passed!" );
+
+		} );
+
 		QUnit.test( "empty/makeEmpty", ( assert ) => {
 
 			var a = new Box3();
@@ -98,6 +174,8 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.isEmpty(), "Passed!" );
 
 		} );
+
+		QUnit.test( "isEmpty", ( assert ) => {} );
 
 		QUnit.test( "getCenter", ( assert ) => {
 
@@ -164,6 +242,48 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "expandByObject", ( assert ) => {
+
+			var a = new Box3( zero3.clone(), one3.clone() );
+			var b = a.clone();
+			var bigger = new Mesh( new BoxGeometry( 2, 2, 2 ) );
+			var smaller = new Mesh( new BoxGeometry( 0.5, 0.5, 0.5 ) );
+			var child = new Mesh( new BoxGeometry( 1, 1, 1 ) );
+
+			// just a bigger box to begin with
+			a.expandByObject( bigger );
+			assert.ok( a.min.equals( new Vector3( - 1, - 1, - 1 ) ), "Bigger box: correct new minimum" );
+			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Bigger box: correct new maximum" );
+
+			// a translated, bigger box
+			a.copy( b );
+			bigger.translateX( 2 );
+			a.expandByObject( bigger );
+			assert.ok( a.min.equals( new Vector3( 0, - 1, - 1 ) ), "Translated, bigger box: correct new minimum" );
+			assert.ok( a.max.equals( new Vector3( 3, 1, 1 ) ), "Translated, bigger box: correct new maximum" );
+
+			// a translated, bigger box with child
+			a.copy( b );
+			bigger.add( child );
+			a.expandByObject( bigger );
+			assert.ok( a.min.equals( new Vector3( 0, - 1, - 1 ) ), "Translated, bigger box with child: correct new minimum" );
+			assert.ok( a.max.equals( new Vector3( 3, 1, 1 ) ), "Translated, bigger box with child: correct new maximum" );
+
+			// a translated, bigger box with a translated child
+			a.copy( b );
+			child.translateX( 2 );
+			a.expandByObject( bigger );
+			assert.ok( a.min.equals( new Vector3( 0, - 1, - 1 ) ), "Translated, bigger box with translated child: correct new minimum" );
+			assert.ok( a.max.equals( new Vector3( 4.5, 1, 1 ) ), "Translated, bigger box with translated child: correct new maximum" );
+
+			// a smaller box
+			a.copy( b );
+			a.expandByObject( smaller );
+			assert.ok( a.min.equals( new Vector3( - 0.25, - 0.25, - 0.25 ) ), "Smaller box: correct new minimum" );
+			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Smaller box: correct new maximum" );
+
+		} );
+
 		QUnit.test( "containsPoint", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
@@ -205,57 +325,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.getParameter( new Vector3( - 1, - 1, - 1 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
 			assert.ok( b.getParameter( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0.5, 0.5, 0.5 ) ), "Passed!" );
 			assert.ok( b.getParameter( new Vector3( 1, 1, 1 ) ).equals( new Vector3( 1, 1, 1 ) ), "Passed!" );
-
-		} );
-
-		QUnit.test( "clampPoint", ( assert ) => {
-
-			var a = new Box3( zero3.clone(), zero3.clone() );
-			var b = new Box3( one3.clone().negate(), one3.clone() );
-
-			assert.ok( a.clampPoint( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
-			assert.ok( a.clampPoint( new Vector3( 1, 1, 1 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
-			assert.ok( a.clampPoint( new Vector3( - 1, - 1, - 1 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
-
-			assert.ok( b.clampPoint( new Vector3( 2, 2, 2 ) ).equals( new Vector3( 1, 1, 1 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector3( 1, 1, 1 ) ).equals( new Vector3( 1, 1, 1 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector3( - 1, - 1, - 1 ) ).equals( new Vector3( - 1, - 1, - 1 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector3( - 2, - 2, - 2 ) ).equals( new Vector3( - 1, - 1, - 1 ) ), "Passed!" );
-
-		} );
-
-		QUnit.test( "distanceToPoint", ( assert ) => {
-
-			var a = new Box3( zero3.clone(), zero3.clone() );
-			var b = new Box3( one3.clone().negate(), one3.clone() );
-
-			assert.ok( a.distanceToPoint( new Vector3( 0, 0, 0 ) ) == 0, "Passed!" );
-			assert.ok( a.distanceToPoint( new Vector3( 1, 1, 1 ) ) == Math.sqrt( 3 ), "Passed!" );
-			assert.ok( a.distanceToPoint( new Vector3( - 1, - 1, - 1 ) ) == Math.sqrt( 3 ), "Passed!" );
-
-			assert.ok( b.distanceToPoint( new Vector3( 2, 2, 2 ) ) == Math.sqrt( 3 ), "Passed!" );
-			assert.ok( b.distanceToPoint( new Vector3( 1, 1, 1 ) ) == 0, "Passed!" );
-			assert.ok( b.distanceToPoint( new Vector3( 0, 0, 0 ) ) == 0, "Passed!" );
-			assert.ok( b.distanceToPoint( new Vector3( - 1, - 1, - 1 ) ) == 0, "Passed!" );
-			assert.ok( b.distanceToPoint( new Vector3( - 2, - 2, - 2 ) ) == Math.sqrt( 3 ), "Passed!" );
-
-		} );
-
-		QUnit.test( "distanceToPoint", ( assert ) => {
-
-			var a = new Box3( zero3.clone(), zero3.clone() );
-			var b = new Box3( one3.clone().negate(), one3.clone() );
-
-			assert.ok( a.distanceToPoint( new Vector3( 0, 0, 0 ) ) == 0, "Passed!" );
-			assert.ok( a.distanceToPoint( new Vector3( 1, 1, 1 ) ) == Math.sqrt( 3 ), "Passed!" );
-			assert.ok( a.distanceToPoint( new Vector3( - 1, - 1, - 1 ) ) == Math.sqrt( 3 ), "Passed!" );
-
-			assert.ok( b.distanceToPoint( new Vector3( 2, 2, 2 ) ) == Math.sqrt( 3 ), "Passed!" );
-			assert.ok( b.distanceToPoint( new Vector3( 1, 1, 1 ) ) == 0, "Passed!" );
-			assert.ok( b.distanceToPoint( new Vector3( 0, 0, 0 ) ) == 0, "Passed!" );
-			assert.ok( b.distanceToPoint( new Vector3( - 1, - 1, - 1 ) ) == 0, "Passed!" );
-			assert.ok( b.distanceToPoint( new Vector3( - 2, - 2, - 2 ) ) == Math.sqrt( 3 ), "Passed!" );
 
 		} );
 
@@ -305,6 +374,40 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "clampPoint", ( assert ) => {
+
+			var a = new Box3( zero3.clone(), zero3.clone() );
+			var b = new Box3( one3.clone().negate(), one3.clone() );
+
+			assert.ok( a.clampPoint( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+			assert.ok( a.clampPoint( new Vector3( 1, 1, 1 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+			assert.ok( a.clampPoint( new Vector3( - 1, - 1, - 1 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+
+			assert.ok( b.clampPoint( new Vector3( 2, 2, 2 ) ).equals( new Vector3( 1, 1, 1 ) ), "Passed!" );
+			assert.ok( b.clampPoint( new Vector3( 1, 1, 1 ) ).equals( new Vector3( 1, 1, 1 ) ), "Passed!" );
+			assert.ok( b.clampPoint( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+			assert.ok( b.clampPoint( new Vector3( - 1, - 1, - 1 ) ).equals( new Vector3( - 1, - 1, - 1 ) ), "Passed!" );
+			assert.ok( b.clampPoint( new Vector3( - 2, - 2, - 2 ) ).equals( new Vector3( - 1, - 1, - 1 ) ), "Passed!" );
+
+		} );
+
+		QUnit.test( "distanceToPoint", ( assert ) => {
+
+			var a = new Box3( zero3.clone(), zero3.clone() );
+			var b = new Box3( one3.clone().negate(), one3.clone() );
+
+			assert.ok( a.distanceToPoint( new Vector3( 0, 0, 0 ) ) == 0, "Passed!" );
+			assert.ok( a.distanceToPoint( new Vector3( 1, 1, 1 ) ) == Math.sqrt( 3 ), "Passed!" );
+			assert.ok( a.distanceToPoint( new Vector3( - 1, - 1, - 1 ) ) == Math.sqrt( 3 ), "Passed!" );
+
+			assert.ok( b.distanceToPoint( new Vector3( 2, 2, 2 ) ) == Math.sqrt( 3 ), "Passed!" );
+			assert.ok( b.distanceToPoint( new Vector3( 1, 1, 1 ) ) == 0, "Passed!" );
+			assert.ok( b.distanceToPoint( new Vector3( 0, 0, 0 ) ) == 0, "Passed!" );
+			assert.ok( b.distanceToPoint( new Vector3( - 1, - 1, - 1 ) ) == 0, "Passed!" );
+			assert.ok( b.distanceToPoint( new Vector3( - 2, - 2, - 2 ) ) == Math.sqrt( 3 ), "Passed!" );
+
+		} );
+
 		QUnit.test( "getBoundingSphere", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
@@ -345,14 +448,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		var compareBox = function ( a, b, threshold ) {
-
-			threshold = threshold || 0.0001;
-			return ( a.min.distanceTo( b.min ) < threshold &&
-			a.max.distanceTo( b.max ) < threshold );
-
-		};
-
 		QUnit.test( "applyMatrix4", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
@@ -384,107 +479,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromCenterAndSize", ( assert ) => {
-
-			var a = new Box3( zero3.clone(), one3.clone() );
-			var b = a.clone();
-			var newCenter = one3;
-			var newSize = two3;
-
-			a.setFromCenterAndSize( a.getCenter(), a.getSize() );
-			assert.ok( a.equals( b ), "Same values: no changes" );
-
-			a.setFromCenterAndSize( newCenter, a.getSize() );
-			assert.ok( a.getCenter().equals( newCenter ), "Move center: correct new center" );
-			assert.ok( a.getSize().equals( b.getSize() ), "Move center: no change in size" );
-			assert.notOk( a.equals( b ), "Move center: no longer equal to old values" );
-
-			a.setFromCenterAndSize( a.getCenter(), newSize );
-			assert.ok( a.getCenter().equals( newCenter ), "Resize: no change to center" );
-			assert.ok( a.getSize().equals( newSize ), "Resize: correct new size" );
-			assert.notOk( a.equals( b ), "Resize: no longer equal to old values" );
-
-		} );
-
-		QUnit.test( "setFromBufferAttribute", ( assert ) => {
-
-			var a = new Box3( zero3.clone(), one3.clone() );
-			var bigger = new BufferAttribute( new Float32Array( [
-				- 2, - 2, - 2, 2, 2, 2, 1.5, 1.5, 1.5, 0, 0, 0
-			] ), 3 );
-			var smaller = new BufferAttribute( new Float32Array( [
-				- 0.5, - 0.5, - 0.5, 0.5, 0.5, 0.5, 0, 0, 0
-			] ), 3 );
-			var newMin = new Vector3( - 2, - 2, - 2 );
-			var newMax = new Vector3( 2, 2, 2 );
-
-			a.setFromBufferAttribute( bigger );
-			assert.ok( a.min.equals( newMin ), "Bigger box: correct new minimum" );
-			assert.ok( a.max.equals( newMax ), "Bigger box: correct new maximum" );
-
-			newMin.set( - 0.5, - 0.5, - 0.5 );
-			newMax.set( 0.5, 0.5, 0.5 );
-
-			a.setFromBufferAttribute( smaller );
-			assert.ok( a.min.equals( newMin ), "Smaller box: correct new minimum" );
-			assert.ok( a.max.equals( newMax ), "Smaller box: correct new maximum" );
-
-		} );
-
-		QUnit.test( "expandByObject", ( assert ) => {
-
-			var a = new Box3( zero3.clone(), one3.clone() );
-			var b = a.clone();
-			var bigger = new Mesh( new BoxGeometry( 2, 2, 2 ) );
-			var smaller = new Mesh( new BoxGeometry( 0.5, 0.5, 0.5 ) );
-			var child = new Mesh( new BoxGeometry( 1, 1, 1 ) );
-
-			// just a bigger box to begin with
-			a.expandByObject( bigger );
-			assert.ok( a.min.equals( new Vector3( - 1, - 1, - 1 ) ), "Bigger box: correct new minimum" );
-			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Bigger box: correct new maximum" );
-
-			// a translated, bigger box
-			a.copy( b );
-			bigger.translateX( 2 );
-			a.expandByObject( bigger );
-			assert.ok( a.min.equals( new Vector3( 0, - 1, - 1 ) ), "Translated, bigger box: correct new minimum" );
-			assert.ok( a.max.equals( new Vector3( 3, 1, 1 ) ), "Translated, bigger box: correct new maximum" );
-
-			// a translated, bigger box with child
-			a.copy( b );
-			bigger.add( child );
-			a.expandByObject( bigger );
-			assert.ok( a.min.equals( new Vector3( 0, - 1, - 1 ) ), "Translated, bigger box with child: correct new minimum" );
-			assert.ok( a.max.equals( new Vector3( 3, 1, 1 ) ), "Translated, bigger box with child: correct new maximum" );
-
-			// a translated, bigger box with a translated child
-			a.copy( b );
-			child.translateX( 2 );
-			a.expandByObject( bigger );
-			assert.ok( a.min.equals( new Vector3( 0, - 1, - 1 ) ), "Translated, bigger box with translated child: correct new minimum" );
-			assert.ok( a.max.equals( new Vector3( 4.5, 1, 1 ) ), "Translated, bigger box with translated child: correct new maximum" );
-
-			// a smaller box
-			a.copy( b );
-			a.expandByObject( smaller );
-			assert.ok( a.min.equals( new Vector3( - 0.25, - 0.25, - 0.25 ) ), "Smaller box: correct new minimum" );
-			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Smaller box: correct new maximum" );
-
-		} );
-
-		QUnit.test( "setFromObject/BufferGeometry", ( assert ) => {
-
-			var a = new Box3( zero3.clone(), one3.clone() );
-			var object = new Mesh( new BoxBufferGeometry( 2, 2, 2 ) );
-			var child = new Mesh( new BoxBufferGeometry( 1, 1, 1 ) );
-			object.add( child );
-
-			a.setFromObject( object );
-			assert.ok( a.min.equals( new Vector3( - 1, - 1, - 1 ) ), "Correct new minimum" );
-			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Correct new maximum" );
-
-		} );
+		QUnit.test( "equals", ( assert ) => {} );
 
 	} );
 

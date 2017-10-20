@@ -9,11 +9,11 @@ export default QUnit.module( 'Cameras', () => {
 
 	QUnit.module.todo( 'CubeCamera', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
 	} );
 

@@ -1,5 +1,6 @@
 /**
  * @author moraxy / https://github.com/moraxy
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -13,6 +14,10 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'DirectGeometry', () => {
 
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
 		QUnit.test( "computeGroups", ( assert ) => {
 
 			var a = new DirectGeometry();

@@ -29,6 +29,20 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isRectAreaLight", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
+
+		QUnit.test( "toJSON", ( assert ) => {} );
+
+		// OTHERS
 		QUnit.test( 'Standard light tests', ( assert ) => {
 
 			runStdLightTests( assert, lights );

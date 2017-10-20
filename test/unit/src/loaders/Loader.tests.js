@@ -9,11 +9,20 @@ export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'Loader', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// STATIC STUFF
+		QUnit.test( "Handlers.add", ( assert ) => {} );
 
-		} );
+		QUnit.test( "Handlers.get", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "extractUrlBase", ( assert ) => {} );
+
+		QUnit.test( "initMaterials", ( assert ) => {} );
+
+		QUnit.test( "createMaterial", ( assert ) => {} );
 
 	} );
 

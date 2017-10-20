@@ -21,7 +21,8 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Ray', () => {
 
-		QUnit.test( "constructor/equals", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Ray();
 			assert.ok( a.origin.equals( zero3 ), "Passed!" );
@@ -33,20 +34,8 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy/equals", ( assert ) => {
-
-			var a = new Ray( zero3.clone(), one3.clone() );
-			var b = new Ray().copy( a );
-			assert.ok( b.origin.equals( zero3 ), "Passed!" );
-			assert.ok( b.direction.equals( one3 ), "Passed!" );
-
-			// ensure that it is a true copy
-			a.origin = zero3;
-			a.direction = one3;
-			assert.ok( b.origin.equals( zero3 ), "Passed!" );
-			assert.ok( b.direction.equals( one3 ), "Passed!" );
-
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isRay", ( assert ) => {} );
 
 		QUnit.test( "set", ( assert ) => {
 
@@ -55,16 +44,6 @@ export default QUnit.module( 'Maths', () => {
 			a.set( one3, one3 );
 			assert.ok( a.origin.equals( one3 ), "Passed!" );
 			assert.ok( a.direction.equals( one3 ), "Passed!" );
-
-		} );
-
-		QUnit.test( "at", ( assert ) => {
-
-			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
-
-			assert.ok( a.at( 0 ).equals( one3 ), "Passed!" );
-			assert.ok( a.at( - 1 ).equals( new Vector3( 1, 1, 0 ) ), "Passed!" );
-			assert.ok( a.at( 1 ).equals( new Vector3( 1, 1, 2 ) ), "Passed!" );
 
 		} );
 
@@ -85,6 +64,42 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( d.equals( a ), "Passed!" );
 			assert.ok( ! e.equals( d ), "Passed!" );
 			assert.ok( e.equals( c ), "Passed!" );
+
+		} );
+
+		QUnit.test( "copy/equals", ( assert ) => {
+
+			var a = new Ray( zero3.clone(), one3.clone() );
+			var b = new Ray().copy( a );
+			assert.ok( b.origin.equals( zero3 ), "Passed!" );
+			assert.ok( b.direction.equals( one3 ), "Passed!" );
+
+			// ensure that it is a true copy
+			a.origin = zero3;
+			a.direction = one3;
+			assert.ok( b.origin.equals( zero3 ), "Passed!" );
+			assert.ok( b.direction.equals( one3 ), "Passed!" );
+
+		} );
+
+		QUnit.test( "at", ( assert ) => {
+
+			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
+
+			assert.ok( a.at( 0 ).equals( one3 ), "Passed!" );
+			assert.ok( a.at( - 1 ).equals( new Vector3( 1, 1, 0 ) ), "Passed!" );
+			assert.ok( a.at( 1 ).equals( new Vector3( 1, 1, 2 ) ), "Passed!" );
+
+		} );
+
+		QUnit.test( "lookAt", ( assert ) => {
+
+			var a = new Ray( two3.clone(), one3.clone() );
+			var target = one3.clone();
+			var expected = target.sub( two3 ).normalize();
+
+			a.lookAt( target );
+			assert.ok( a.direction.equals( expected ), "Check if we're looking in the right direction" );
 
 		} );
 
@@ -142,20 +157,40 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsSphere", ( assert ) => {
+		QUnit.test( "distanceSqToSegment", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
-			var b = new Sphere( zero3, 0.5 );
-			var c = new Sphere( zero3, 1.5 );
-			var d = new Sphere( one3, 0.1 );
-			var e = new Sphere( two3, 0.1 );
-			var f = new Sphere( two3, 1 );
+			var ptOnLine = new Vector3();
+			var ptOnSegment = new Vector3();
 
-			assert.ok( ! a.intersectsSphere( b ), "Passed!" );
-			assert.ok( ! a.intersectsSphere( c ), "Passed!" );
-			assert.ok( a.intersectsSphere( d ), "Passed!" );
-			assert.ok( ! a.intersectsSphere( e ), "Passed!" );
-			assert.ok( ! a.intersectsSphere( f ), "Passed!" );
+			//segment in front of the ray
+			var v0 = new Vector3( 3, 5, 50 );
+			var v1 = new Vector3( 50, 50, 50 ); // just a far away point
+			var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+
+			assert.ok( ptOnSegment.distanceTo( v0 ) < 0.0001, "Passed!" );
+			assert.ok( ptOnLine.distanceTo( new Vector3( 1, 1, 50 ) ) < 0.0001, "Passed!" );
+			// ((3-1) * (3-1) + (5-1) * (5-1) = 4 + 16 = 20
+			assert.ok( Math.abs( distSqr - 20 ) < 0.0001, "Passed!" );
+
+			//segment behind the ray
+			var v0 = new Vector3( - 50, - 50, - 50 ); // just a far away point
+			var v1 = new Vector3( - 3, - 5, - 4 );
+			var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+
+			assert.ok( ptOnSegment.distanceTo( v1 ) < 0.0001, "Passed!" );
+			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
+			// ((-3-1) * (-3-1) + (-5-1) * (-5-1) + (-4-1) + (-4-1) = 16 + 36 + 25 = 77
+			assert.ok( Math.abs( distSqr - 77 ) < 0.0001, "Passed!" );
+
+			//exact intersection between the ray and the segment
+			var v0 = new Vector3( - 50, - 50, - 50 );
+			var v1 = new Vector3( 50, 50, 50 );
+			var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+
+			assert.ok( ptOnSegment.distanceTo( one3 ) < 0.0001, "Passed!" );
+			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
+			assert.ok( distSqr < 0.0001, "Passed!" );
 
 		} );
 
@@ -218,31 +253,24 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsPlane", ( assert ) => {
+		QUnit.test( "intersectsSphere", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
+			var b = new Sphere( zero3, 0.5 );
+			var c = new Sphere( zero3, 1.5 );
+			var d = new Sphere( one3, 0.1 );
+			var e = new Sphere( two3, 0.1 );
+			var f = new Sphere( two3, 1 );
 
-			// parallel plane in front of the ray
-			var b = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), one3.clone().sub( new Vector3( 0, 0, - 1 ) ) );
-			assert.ok( a.intersectsPlane( b ), "Passed!" );
-
-			// parallel plane coincident with origin
-			var c = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), one3.clone().sub( new Vector3( 0, 0, 0 ) ) );
-			assert.ok( a.intersectsPlane( c ), "Passed!" );
-
-			// parallel plane behind the ray
-			var d = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), one3.clone().sub( new Vector3( 0, 0, 1 ) ) );
-			assert.ok( ! a.intersectsPlane( d ), "Passed!" );
-
-			// perpendical ray that overlaps exactly
-			var e = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), one3 );
-			assert.ok( a.intersectsPlane( e ), "Passed!" );
-
-			// perpendical ray that doesn't overlap
-			var f = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), zero3 );
-			assert.ok( ! a.intersectsPlane( f ), "Passed!" );
+			assert.ok( ! a.intersectsSphere( b ), "Passed!" );
+			assert.ok( ! a.intersectsSphere( c ), "Passed!" );
+			assert.ok( a.intersectsSphere( d ), "Passed!" );
+			assert.ok( ! a.intersectsSphere( e ), "Passed!" );
+			assert.ok( ! a.intersectsSphere( f ), "Passed!" );
 
 		} );
+
+		QUnit.test( "distanceToPlane", ( assert ) => {} );
 
 		QUnit.test( "intersectPlane", ( assert ) => {
 
@@ -270,66 +298,29 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyMatrix4", ( assert ) => {
+		QUnit.test( "intersectsPlane", ( assert ) => {
 
 			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
-			var m = new Matrix4();
 
-			assert.ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
+			// parallel plane in front of the ray
+			var b = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), one3.clone().sub( new Vector3( 0, 0, - 1 ) ) );
+			assert.ok( a.intersectsPlane( b ), "Passed!" );
 
-			var a = new Ray( zero3.clone(), new Vector3( 0, 0, 1 ) );
-			m.makeRotationZ( Math.PI );
-			assert.ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
+			// parallel plane coincident with origin
+			var c = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), one3.clone().sub( new Vector3( 0, 0, 0 ) ) );
+			assert.ok( a.intersectsPlane( c ), "Passed!" );
 
-			m.makeRotationX( Math.PI );
-			var b = a.clone();
-			b.direction.negate();
-			var a2 = a.clone().applyMatrix4( m );
-			assert.ok( a2.origin.distanceTo( b.origin ) < 0.0001, "Passed!" );
-			assert.ok( a2.direction.distanceTo( b.direction ) < 0.0001, "Passed!" );
+			// parallel plane behind the ray
+			var d = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), one3.clone().sub( new Vector3( 0, 0, 1 ) ) );
+			assert.ok( ! a.intersectsPlane( d ), "Passed!" );
 
-			a.origin = new Vector3( 0, 0, 1 );
-			b.origin = new Vector3( 0, 0, - 1 );
-			var a2 = a.clone().applyMatrix4( m );
-			assert.ok( a2.origin.distanceTo( b.origin ) < 0.0001, "Passed!" );
-			assert.ok( a2.direction.distanceTo( b.direction ) < 0.0001, "Passed!" );
+			// perpendical ray that overlaps exactly
+			var e = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), one3 );
+			assert.ok( a.intersectsPlane( e ), "Passed!" );
 
-		} );
-
-		QUnit.test( "distanceSqToSegment", ( assert ) => {
-
-			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
-			var ptOnLine = new Vector3();
-			var ptOnSegment = new Vector3();
-
-			//segment in front of the ray
-			var v0 = new Vector3( 3, 5, 50 );
-			var v1 = new Vector3( 50, 50, 50 ); // just a far away point
-			var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
-
-			assert.ok( ptOnSegment.distanceTo( v0 ) < 0.0001, "Passed!" );
-			assert.ok( ptOnLine.distanceTo( new Vector3( 1, 1, 50 ) ) < 0.0001, "Passed!" );
-			// ((3-1) * (3-1) + (5-1) * (5-1) = 4 + 16 = 20
-			assert.ok( Math.abs( distSqr - 20 ) < 0.0001, "Passed!" );
-
-			//segment behind the ray
-			var v0 = new Vector3( - 50, - 50, - 50 ); // just a far away point
-			var v1 = new Vector3( - 3, - 5, - 4 );
-			var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
-
-			assert.ok( ptOnSegment.distanceTo( v1 ) < 0.0001, "Passed!" );
-			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
-			// ((-3-1) * (-3-1) + (-5-1) * (-5-1) + (-4-1) + (-4-1) = 16 + 36 + 25 = 77
-			assert.ok( Math.abs( distSqr - 77 ) < 0.0001, "Passed!" );
-
-			//exact intersection between the ray and the segment
-			var v0 = new Vector3( - 50, - 50, - 50 );
-			var v1 = new Vector3( 50, 50, 50 );
-			var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
-
-			assert.ok( ptOnSegment.distanceTo( one3 ) < 0.0001, "Passed!" );
-			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
-			assert.ok( distSqr < 0.0001, "Passed!" );
+			// perpendical ray that doesn't overlap
+			var f = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), zero3 );
+			assert.ok( ! a.intersectsPlane( f ), "Passed!" );
 
 		} );
 
@@ -371,16 +362,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lookAt", ( assert ) => {
-
-			var a = new Ray( two3.clone(), one3.clone() );
-			var target = one3.clone();
-			var expected = target.sub( two3 ).normalize();
-
-			a.lookAt( target );
-			assert.ok( a.direction.equals( expected ), "Check if we're looking in the right direction" );
-
-		} );
+		QUnit.test( "intersectsBox", ( assert ) => {} );
 
 		QUnit.test( "intersectTriangle", ( assert ) => {
 
@@ -430,6 +412,34 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( intersect, null, "No intersection when looking in the wrong direction" );
 
 		} );
+
+		QUnit.test( "applyMatrix4", ( assert ) => {
+
+			var a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
+			var m = new Matrix4();
+
+			assert.ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
+
+			var a = new Ray( zero3.clone(), new Vector3( 0, 0, 1 ) );
+			m.makeRotationZ( Math.PI );
+			assert.ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
+
+			m.makeRotationX( Math.PI );
+			var b = a.clone();
+			b.direction.negate();
+			var a2 = a.clone().applyMatrix4( m );
+			assert.ok( a2.origin.distanceTo( b.origin ) < 0.0001, "Passed!" );
+			assert.ok( a2.direction.distanceTo( b.direction ) < 0.0001, "Passed!" );
+
+			a.origin = new Vector3( 0, 0, 1 );
+			b.origin = new Vector3( 0, 0, - 1 );
+			var a2 = a.clone().applyMatrix4( m );
+			assert.ok( a2.origin.distanceTo( b.origin ) < 0.0001, "Passed!" );
+			assert.ok( a2.direction.distanceTo( b.direction ) < 0.0001, "Passed!" );
+
+		} );
+
+		QUnit.test( "equals", ( assert ) => {} );
 
 	} );
 

@@ -1,5 +1,6 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -39,6 +40,124 @@ export default QUnit.module( 'Core', () => {
 			);
 
 		};
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// STATIC STUFF
+		QUnit.test( "DefaultUp", ( assert ) => {} );
+
+		QUnit.test( "DefaultMatrixAutoUpdate", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isObject3D", ( assert ) => {} );
+
+		QUnit.test( "onBeforeRender", ( assert ) => {} );
+
+		QUnit.test( "onAfterRender", ( assert ) => {} );
+
+		QUnit.test( "applyMatrix", ( assert ) => {
+
+			var a = new Object3D();
+			var m = new Matrix4();
+			var expectedPos = new Vector3( x, y, z );
+			var expectedQuat = new Quaternion( 0.5 * Math.sqrt( 2 ), 0, 0, 0.5 * Math.sqrt( 2 ) );
+
+			m.makeRotationX( Math.PI / 2 );
+			m.setPosition( new Vector3( x, y, z ) );
+
+			a.applyMatrix( m );
+
+			assert.deepEqual( a.position, expectedPos, "Position has the expected values" );
+			assert.ok(
+				Math.abs( a.quaternion.x - expectedQuat.x ) <= eps &&
+				Math.abs( a.quaternion.y - expectedQuat.y ) <= eps &&
+				Math.abs( a.quaternion.z - expectedQuat.z ) <= eps,
+				"Quaternion has the expected values"
+			);
+
+		} );
+
+		QUnit.test( "applyQuaternion", ( assert ) => {
+
+			var a = new Object3D();
+			var sqrt = 0.5 * Math.sqrt( 2 );
+			var quat = new Quaternion( 0, sqrt, 0, sqrt );
+			var expected = new Quaternion( sqrt / 2, sqrt / 2, 0, 0 );
+
+			a.quaternion.set( 0.25, 0.25, 0.25, 0.25 );
+			a.applyQuaternion( quat );
+
+			assert.ok(
+				Math.abs( a.quaternion.x - expected.x ) <= eps &&
+				Math.abs( a.quaternion.y - expected.y ) <= eps &&
+				Math.abs( a.quaternion.z - expected.z ) <= eps,
+				"Quaternion has the expected values"
+			);
+
+		} );
+
+		QUnit.test( "setRotationFromAxisAngle", ( assert ) => {
+
+			var a = new Object3D();
+			var axis = new Vector3( 0, 1, 0 );
+			var angle = Math.PI;
+			var expected = new Euler( - Math.PI, 0, - Math.PI );
+
+			a.setRotationFromAxisAngle( axis, angle );
+			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after rotation" );
+
+			axis.set( 1, 0, 0 );
+			var angle = 0;
+			expected.set( 0, 0, 0 );
+
+			a.setRotationFromAxisAngle( axis, angle );
+			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after zeroing" );
+
+		} );
+
+		QUnit.test( "setRotationFromEuler", ( assert ) => {
+
+			var a = new Object3D();
+			var rotation = new Euler( ( 45 / RadToDeg ), 0, Math.PI );
+			var expected = rotation.clone(); // bit obvious
+
+			a.setRotationFromEuler( rotation );
+			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after rotation" );
+
+		} );
+
+		QUnit.test( "setRotationFromMatrix", ( assert ) => {
+
+			var a = new Object3D();
+			var m = new Matrix4();
+			var eye = new Vector3( 0, 0, 0 );
+			var target = new Vector3( 0, 1, - 1 );
+			var up = new Vector3( 0, 1, 0 );
+
+			m.lookAt( eye, target, up );
+			a.setRotationFromMatrix( m );
+			assert.numEqual( a.getWorldRotation().x * RadToDeg, 45, "Correct rotation angle" );
+
+		} );
+
+		QUnit.test( "setRotationFromQuaternion", ( assert ) => {
+
+			var a = new Object3D();
+			var rotation = new Quaternion().setFromEuler( new Euler( Math.PI, 0, - Math.PI ) );
+			var expected = new Euler( Math.PI, 0, - Math.PI );
+
+			a.setRotationFromQuaternion( rotation );
+			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after rotation" );
+
+		} );
+
+		QUnit.test( "rotateOnAxis", ( assert ) => {} );
+
+		QUnit.test( "rotateOnWorldAxis", ( assert ) => {} );
 
 		QUnit.test( "rotateX", ( assert ) => {
 
@@ -116,6 +235,10 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "localToWorld", ( assert ) => {} );
+
+		QUnit.test( "worldToLocal", ( assert ) => {} );
+
 		QUnit.test( "lookAt", ( assert ) => {
 
 			var obj = new Object3D();
@@ -125,15 +248,37 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "getWorldRotation", ( assert ) => {
+		QUnit.test( "add/remove", ( assert ) => {
 
-			var obj = new Object3D();
+			var a = new Object3D();
+			var child1 = new Object3D();
+			var child2 = new Object3D();
 
-			obj.lookAt( new Vector3( 0, - 1, 1 ) );
-			assert.numEqual( obj.getWorldRotation().x * RadToDeg, 45, "x is equal" );
+			assert.strictEqual( a.children.length, 0, "Starts with no children" );
 
-			obj.lookAt( new Vector3( 1, 0, 0 ) );
-			assert.numEqual( obj.getWorldRotation().y * RadToDeg, 90, "y is equal" );
+			a.add( child1 );
+			assert.strictEqual( a.children.length, 1, "The first child was added" );
+			assert.strictEqual( a.children[ 0 ], child1, "It's the right one" );
+
+			a.add( child2 );
+			assert.strictEqual( a.children.length, 2, "The second child was added" );
+			assert.strictEqual( a.children[ 1 ], child2, "It's the right one" );
+			assert.strictEqual( a.children[ 0 ], child1, "The first one is still there" );
+
+			a.remove( child1 );
+			assert.strictEqual( a.children.length, 1, "The first child was removed" );
+			assert.strictEqual( a.children[ 0 ], child2, "The second one is still there" );
+
+			a.add( child1 );
+			a.remove( child1, child2 );
+			assert.strictEqual( a.children.length, 0, "Both children were removed at once" );
+
+			child1.add( child2 );
+			assert.strictEqual( child1.children.length, 1, "The second child was added to the first one" );
+			a.add( child2 );
+			assert.strictEqual( a.children.length, 1, "The second one was added to the parent (no remove)" );
+			assert.strictEqual( a.children[ 0 ], child2, "The second one is now the parent's child again" );
+			assert.strictEqual( child1.children.length, 0, "The first one no longer has any children" );
 
 		} );
 
@@ -158,130 +303,128 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setRotationFromAxisAngle", ( assert ) => {
-
-			var a = new Object3D();
-			var axis = new Vector3( 0, 1, 0 );
-			var angle = Math.PI;
-			var expected = new Euler( - Math.PI, 0, - Math.PI );
-
-			a.setRotationFromAxisAngle( axis, angle );
-			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after rotation" );
-
-			axis.set( 1, 0, 0 );
-			var angle = 0;
-			expected.set( 0, 0, 0 );
-
-			a.setRotationFromAxisAngle( axis, angle );
-			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after zeroing" );
-
-		} );
-
-		QUnit.test( "setRotationFromEuler", ( assert ) => {
-
-			var a = new Object3D();
-			var rotation = new Euler( ( 45 / RadToDeg ), 0, Math.PI );
-			var expected = rotation.clone(); // bit obvious
-
-			a.setRotationFromEuler( rotation );
-			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after rotation" );
-
-		} );
-
-		QUnit.test( "setRotationFromQuaternion", ( assert ) => {
-
-			var a = new Object3D();
-			var rotation = new Quaternion().setFromEuler( new Euler( Math.PI, 0, - Math.PI ) );
-			var expected = new Euler( Math.PI, 0, - Math.PI );
-
-			a.setRotationFromQuaternion( rotation );
-			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after rotation" );
-
-		} );
-
-		QUnit.test( "setRotationFromMatrix", ( assert ) => {
-
-			var a = new Object3D();
-			var m = new Matrix4();
-			var eye = new Vector3( 0, 0, 0 );
-			var target = new Vector3( 0, 1, - 1 );
-			var up = new Vector3( 0, 1, 0 );
-
-			m.lookAt( eye, target, up );
-			a.setRotationFromMatrix( m );
-			assert.numEqual( a.getWorldRotation().x * RadToDeg, 45, "Correct rotation angle" );
-
-		} );
-
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.test( "getWorldPosition", ( assert ) => {
 
 			var a = new Object3D();
 			var b = new Object3D();
-			var child = new Object3D();
-			var childChild = new Object3D();
+			var expectedSingle = new Vector3( x, y, z );
+			var expectedParent = new Vector3( x, y, 0 );
+			var expectedChild = new Vector3( x, y, 7 + ( z - z ) );
 
-			a.name = "original";
-			b.name = "to-be-copied";
+			a.translateX( x );
+			a.translateY( y );
+			a.translateZ( z );
 
-			b.position.set( x, y, z );
-			b.quaternion.set( x, y, z, w );
-			b.scale.set( 2, 3, 4 );
-
-			// bogus QUnit.test values
-			b.matrix.set( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 );
-			b.matrixWorld.set( 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 );
-
-			b.matrixAutoUpdate = false;
-			b.matrixWorldNeedsUpdate = true;
-
-			b.layers.mask = 2;
-			b.visible = false;
-
-			b.castShadow = true;
-			b.receiveShadow = true;
-
-			b.frustumCulled = false;
-			b.renderOrder = 1;
-
-			b.userData[ "foo" ] = "bar";
-
-			child.add( childChild );
-			b.add( child );
-
-			assert.notDeepEqual( a, b, "Objects are not equal pre-copy()" );
-			a.copy( b, true );
-
-			// check they're all unique instances
-			assert.ok(
-				a.uuid !== b.uuid &&
-				a.children[ 0 ].uuid !== b.children[ 0 ].uuid &&
-				a.children[ 0 ].children[ 0 ].uuid !== b.children[ 0 ].children[ 0 ].uuid,
-				"UUIDs are all different"
+			assert.deepEqual(
+				a.getWorldPosition(), expectedSingle,
+				"WorldPosition as expected for single object"
 			);
 
-			// and now fix that
-			a.uuid = b.uuid;
-			a.children[ 0 ].uuid = b.children[ 0 ].uuid;
-			a.children[ 0 ].children[ 0 ].uuid = b.children[ 0 ].children[ 0 ].uuid;
+			// translate child and then parent
+			b.translateZ( 7 );
+			a.add( b );
+			a.translateZ( - z );
 
-			assert.deepEqual( a, b, "Objects are equal post-copy()" );
+			assert.deepEqual( a.getWorldPosition(), expectedParent, "WorldPosition as expected for parent" );
+			assert.deepEqual( b.getWorldPosition(), expectedChild, "WorldPosition as expected for child" );
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.test( "getWorldQuaternion", ( assert ) => {} );
 
-			var a;
+		QUnit.test( "getWorldRotation", ( assert ) => {
+
+			var obj = new Object3D();
+
+			obj.lookAt( new Vector3( 0, - 1, 1 ) );
+			assert.numEqual( obj.getWorldRotation().x * RadToDeg, 45, "x is equal" );
+
+			obj.lookAt( new Vector3( 1, 0, 0 ) );
+			assert.numEqual( obj.getWorldRotation().y * RadToDeg, 90, "y is equal" );
+
+		} );
+
+		QUnit.test( "getWorldScale", ( assert ) => {
+
+			var a = new Object3D();
+			var m = new Matrix4().makeScale( x, y, z );
+			var expected = new Vector3( x, y, z );
+
+			a.applyMatrix( m );
+
+			assert.deepEqual( a.getWorldScale(), expected, "WorldScale as expected" );
+
+		} );
+
+		QUnit.test( "getWorldDirection", ( assert ) => {
+
+			var a = new Object3D();
+			var expected = new Vector3( 0, - 0.5 * Math.sqrt( 2 ), 0.5 * Math.sqrt( 2 ) );
+			var dir;
+
+			a.lookAt( new Vector3( 0, - 1, 1 ) );
+			dir = a.getWorldDirection();
+
+			assert.ok(
+				Math.abs( dir.x - expected.x ) <= eps &&
+				Math.abs( dir.y - expected.y ) <= eps &&
+				Math.abs( dir.z - expected.z ) <= eps,
+				"Direction has the expected values"
+			);
+
+		} );
+
+		QUnit.test( "raycast", ( assert ) => {} );
+
+		QUnit.test( "traverse/traverseVisible/traverseAncestors", ( assert ) => {
+
+			var a = new Object3D();
 			var b = new Object3D();
+			var c = new Object3D();
+			var d = new Object3D();
+			var names = [];
+			var expectedNormal = [ "parent", "child", "childchild 1", "childchild 2" ];
+			var expectedVisible = [ "parent", "child", "childchild 2" ];
+			var expectedAncestors = [ "child", "parent" ];
 
-			assert.strictEqual( a, undefined, "Undefined pre-clone()" );
+			a.name = "parent";
+			b.name = "child";
+			c.name = "childchild 1";
+			c.visible = false;
+			d.name = "childchild 2";
 
-			a = b.clone();
-			assert.notStrictEqual( a, b, "Defined but seperate instances post-clone()" );
+			b.add( c );
+			b.add( d );
+			a.add( b );
 
-			a.uuid = b.uuid;
-			assert.deepEqual( a, b, "But identical properties" );
+			a.traverse( function ( obj ) {
+
+				names.push( obj.name );
+
+			} );
+			assert.deepEqual( names, expectedNormal, "Traversed objects in expected order" );
+
+			var names = [];
+			a.traverseVisible( function ( obj ) {
+
+				names.push( obj.name );
+
+			} );
+			assert.deepEqual( names, expectedVisible, "Traversed visible objects in expected order" );
+
+			var names = [];
+			c.traverseAncestors( function ( obj ) {
+
+				names.push( obj.name );
+
+			} );
+			assert.deepEqual( names, expectedAncestors, "Traversed ancestors in expected order" );
 
 		} );
+
+		QUnit.test( "updateMatrix", ( assert ) => {} );
+
+		QUnit.test( "updateMatrixWorld", ( assert ) => {} );
 
 		QUnit.test( "toJSON", ( assert ) => {
 
@@ -341,181 +484,73 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "add/remove", ( assert ) => {
+		QUnit.test( "clone", ( assert ) => {
 
-			var a = new Object3D();
-			var child1 = new Object3D();
-			var child2 = new Object3D();
+			var a;
+			var b = new Object3D();
 
-			assert.strictEqual( a.children.length, 0, "Starts with no children" );
+			assert.strictEqual( a, undefined, "Undefined pre-clone()" );
 
-			a.add( child1 );
-			assert.strictEqual( a.children.length, 1, "The first child was added" );
-			assert.strictEqual( a.children[ 0 ], child1, "It's the right one" );
+			a = b.clone();
+			assert.notStrictEqual( a, b, "Defined but seperate instances post-clone()" );
 
-			a.add( child2 );
-			assert.strictEqual( a.children.length, 2, "The second child was added" );
-			assert.strictEqual( a.children[ 1 ], child2, "It's the right one" );
-			assert.strictEqual( a.children[ 0 ], child1, "The first one is still there" );
-
-			a.remove( child1 );
-			assert.strictEqual( a.children.length, 1, "The first child was removed" );
-			assert.strictEqual( a.children[ 0 ], child2, "The second one is still there" );
-
-			a.add( child1 );
-			a.remove( child1, child2 );
-			assert.strictEqual( a.children.length, 0, "Both children were removed at once" );
-
-			child1.add( child2 );
-			assert.strictEqual( child1.children.length, 1, "The second child was added to the first one" );
-			a.add( child2 );
-			assert.strictEqual( a.children.length, 1, "The second one was added to the parent (no remove)" );
-			assert.strictEqual( a.children[ 0 ], child2, "The second one is now the parent's child again" );
-			assert.strictEqual( child1.children.length, 0, "The first one no longer has any children" );
+			a.uuid = b.uuid;
+			assert.deepEqual( a, b, "But identical properties" );
 
 		} );
 
-		QUnit.test( "applyQuaternion", ( assert ) => {
-
-			var a = new Object3D();
-			var sqrt = 0.5 * Math.sqrt( 2 );
-			var quat = new Quaternion( 0, sqrt, 0, sqrt );
-			var expected = new Quaternion( sqrt / 2, sqrt / 2, 0, 0 );
-
-			a.quaternion.set( 0.25, 0.25, 0.25, 0.25 );
-			a.applyQuaternion( quat );
-
-			assert.ok(
-				Math.abs( a.quaternion.x - expected.x ) <= eps &&
-				Math.abs( a.quaternion.y - expected.y ) <= eps &&
-				Math.abs( a.quaternion.z - expected.z ) <= eps,
-				"Quaternion has the expected values"
-			);
-
-		} );
-
-		QUnit.test( "applyMatrix", ( assert ) => {
-
-			var a = new Object3D();
-			var m = new Matrix4();
-			var expectedPos = new Vector3( x, y, z );
-			var expectedQuat = new Quaternion( 0.5 * Math.sqrt( 2 ), 0, 0, 0.5 * Math.sqrt( 2 ) );
-
-			m.makeRotationX( Math.PI / 2 );
-			m.setPosition( new Vector3( x, y, z ) );
-
-			a.applyMatrix( m );
-
-			assert.deepEqual( a.position, expectedPos, "Position has the expected values" );
-			assert.ok(
-				Math.abs( a.quaternion.x - expectedQuat.x ) <= eps &&
-				Math.abs( a.quaternion.y - expectedQuat.y ) <= eps &&
-				Math.abs( a.quaternion.z - expectedQuat.z ) <= eps,
-				"Quaternion has the expected values"
-			);
-
-		} );
-
-		QUnit.test( "getWorldPosition", ( assert ) => {
+		QUnit.test( "copy", ( assert ) => {
 
 			var a = new Object3D();
 			var b = new Object3D();
-			var expectedSingle = new Vector3( x, y, z );
-			var expectedParent = new Vector3( x, y, 0 );
-			var expectedChild = new Vector3( x, y, 7 + ( z - z ) );
+			var child = new Object3D();
+			var childChild = new Object3D();
 
-			a.translateX( x );
-			a.translateY( y );
-			a.translateZ( z );
+			a.name = "original";
+			b.name = "to-be-copied";
 
-			assert.deepEqual(
-				a.getWorldPosition(), expectedSingle,
-				"WorldPosition as expected for single object"
-			);
+			b.position.set( x, y, z );
+			b.quaternion.set( x, y, z, w );
+			b.scale.set( 2, 3, 4 );
 
-			// translate child and then parent
-			b.translateZ( 7 );
-			a.add( b );
-			a.translateZ( - z );
+			// bogus QUnit.test values
+			b.matrix.set( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 );
+			b.matrixWorld.set( 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 );
 
-			assert.deepEqual( a.getWorldPosition(), expectedParent, "WorldPosition as expected for parent" );
-			assert.deepEqual( b.getWorldPosition(), expectedChild, "WorldPosition as expected for child" );
+			b.matrixAutoUpdate = false;
+			b.matrixWorldNeedsUpdate = true;
 
-		} );
+			b.layers.mask = 2;
+			b.visible = false;
 
-		QUnit.test( "getWorldScale", ( assert ) => {
+			b.castShadow = true;
+			b.receiveShadow = true;
 
-			var a = new Object3D();
-			var m = new Matrix4().makeScale( x, y, z );
-			var expected = new Vector3( x, y, z );
+			b.frustumCulled = false;
+			b.renderOrder = 1;
 
-			a.applyMatrix( m );
+			b.userData[ "foo" ] = "bar";
 
-			assert.deepEqual( a.getWorldScale(), expected, "WorldScale as expected" );
+			child.add( childChild );
+			b.add( child );
 
-		} );
+			assert.notDeepEqual( a, b, "Objects are not equal pre-copy()" );
+			a.copy( b, true );
 
-		QUnit.test( "getWorldDirection", ( assert ) => {
-
-			var a = new Object3D();
-			var expected = new Vector3( 0, - 0.5 * Math.sqrt( 2 ), 0.5 * Math.sqrt( 2 ) );
-			var dir;
-
-			a.lookAt( new Vector3( 0, - 1, 1 ) );
-			dir = a.getWorldDirection();
-
+			// check they're all unique instances
 			assert.ok(
-				Math.abs( dir.x - expected.x ) <= eps &&
-				Math.abs( dir.y - expected.y ) <= eps &&
-				Math.abs( dir.z - expected.z ) <= eps,
-				"Direction has the expected values"
+				a.uuid !== b.uuid &&
+				a.children[ 0 ].uuid !== b.children[ 0 ].uuid &&
+				a.children[ 0 ].children[ 0 ].uuid !== b.children[ 0 ].children[ 0 ].uuid,
+				"UUIDs are all different"
 			);
 
-		} );
+			// and now fix that
+			a.uuid = b.uuid;
+			a.children[ 0 ].uuid = b.children[ 0 ].uuid;
+			a.children[ 0 ].children[ 0 ].uuid = b.children[ 0 ].children[ 0 ].uuid;
 
-		QUnit.test( "traverse/traverseVisible/traverseAncestors", ( assert ) => {
-
-			var a = new Object3D();
-			var b = new Object3D();
-			var c = new Object3D();
-			var d = new Object3D();
-			var names = [];
-			var expectedNormal = [ "parent", "child", "childchild 1", "childchild 2" ];
-			var expectedVisible = [ "parent", "child", "childchild 2" ];
-			var expectedAncestors = [ "child", "parent" ];
-
-			a.name = "parent";
-			b.name = "child";
-			c.name = "childchild 1";
-			c.visible = false;
-			d.name = "childchild 2";
-
-			b.add( c );
-			b.add( d );
-			a.add( b );
-
-			a.traverse( function ( obj ) {
-
-				names.push( obj.name );
-
-			} );
-			assert.deepEqual( names, expectedNormal, "Traversed objects in expected order" );
-
-			var names = [];
-			a.traverseVisible( function ( obj ) {
-
-				names.push( obj.name );
-
-			} );
-			assert.deepEqual( names, expectedVisible, "Traversed visible objects in expected order" );
-
-			var names = [];
-			c.traverseAncestors( function ( obj ) {
-
-				names.push( obj.name );
-
-			} );
-			assert.deepEqual( names, expectedAncestors, "Traversed ancestors in expected order" );
+			assert.deepEqual( a, b, "Objects are equal post-copy()" );
 
 		} );
 

@@ -11,11 +11,8 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'WebGLShader', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
-
-				assert.ok( false, "everything's gonna be alright" );
-
-			} );
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
 		} );
 

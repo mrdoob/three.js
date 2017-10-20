@@ -9,11 +9,18 @@ export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'Sprite', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isSprite", ( assert ) => {} );
+		
+		QUnit.test( "raycast", ( assert ) => {} );
+		
+		QUnit.test( "clone", ( assert ) => {} );
 
 	} );
 

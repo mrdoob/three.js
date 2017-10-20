@@ -9,11 +9,24 @@ export default QUnit.module( 'Textures', () => {
 
 	QUnit.module.todo( 'Texture', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// PROPERTIES
+		QUnit.test( "needsUpdate", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isTexture", ( assert ) => {} );
+
+		QUnit.test( "clone", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
+
+		QUnit.test( "toJSON", ( assert ) => {} );
+
+		QUnit.test( "dispose", ( assert ) => {} );
+
+		QUnit.test( "transformUv", ( assert ) => {} );
 
 	} );
 

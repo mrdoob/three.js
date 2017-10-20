@@ -9,11 +9,18 @@ export default QUnit.module( 'FoxExp2', () => {
 
 	QUnit.module.todo( 'Scene', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isFogExp2", ( assert ) => {} );
+
+		QUnit.test( "clone", ( assert ) => {} );
+
+		QUnit.test( "toJSON", ( assert ) => {} );
 
 	} );
 

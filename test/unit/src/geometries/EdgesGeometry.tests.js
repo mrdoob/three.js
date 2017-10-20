@@ -221,6 +221,13 @@ export default QUnit.module( 'Geometries', () => {
 			new Vector3( 1, 1, 1 ),
 		];
 
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// OTHERS
 		QUnit.test( "singularity", ( assert ) => {
 
 			testEdges( vertList, [ 1, 1, 1 ], 0, assert );

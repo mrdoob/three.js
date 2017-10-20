@@ -1,5 +1,6 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -9,6 +10,10 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'EventDispatcher', () => {
 
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
 		QUnit.test( "addEventListener", ( assert ) => {
 
 			var eventDispatcher = new EventDispatcher();

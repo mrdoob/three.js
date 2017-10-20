@@ -12,7 +12,8 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Cylindrical', () => {
 
-		QUnit.test( "constructor", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Cylindrical();
 			var radius = 10.0;
@@ -30,6 +31,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		// PUBLIC STUFF
 		QUnit.test( "set", ( assert ) => {
 
 			var a = new Cylindrical();

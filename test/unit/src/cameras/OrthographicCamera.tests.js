@@ -1,5 +1,6 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -8,6 +9,21 @@ import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera';
 export default QUnit.module( 'Cameras', () => {
 
 	QUnit.module( 'OrthographicCamera', () => {
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isOrthographicCamera", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
+
+		QUnit.test( "setViewOffset", ( assert ) => {} );
+
+		QUnit.test( "clearViewOffset", ( assert ) => {} );
 
 		QUnit.test( "updateProjectionMatrix", ( assert ) => {
 
@@ -32,6 +48,10 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
+		QUnit.test( "toJSON", ( assert ) => {} );
+		
+		// OTHERS
+		// TODO: no no no clone is a camera methods that relied to copy method
 		QUnit.test( "clone", ( assert ) => {
 
 			var left = - 1.5, right = 1.5, top = 1, bottom = - 1, near = 0.1, far = 42;

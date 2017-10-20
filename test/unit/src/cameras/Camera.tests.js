@@ -1,5 +1,6 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -10,14 +11,20 @@ export default QUnit.module( 'Cameras', () => {
 
 	QUnit.module( 'Camera', () => {
 
-		QUnit.test( "lookAt", ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			var cam = new Camera();
-			cam.lookAt( new Vector3( 0, 1, - 1 ) );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.numEqual( cam.rotation.x * ( 180 / Math.PI ), 45, "x is equal" );
+		// PUBLIC STUFF
+		QUnit.test( "isCamera", ( assert ) => {} );
 
-		} );
+		QUnit.test( "copy", ( assert ) => {} );
+
+		QUnit.test( "getWorldDirection", ( assert ) => {} );
+
+		QUnit.test( "updateMatrixWorld", ( assert ) => {} );
 
 		QUnit.test( "clone", ( assert ) => {
 
@@ -29,8 +36,22 @@ export default QUnit.module( 'Cameras', () => {
 
 			var clonedCam = cam.clone();
 
+			// TODO: Uuuummmhhh DO NOT relie equality on object methods !
+			// TODO: What's append if matrix.equal is wrongly implemented ???
+			// TODO: this MUST be check by assert
 			assert.ok( cam.matrixWorldInverse.equals( clonedCam.matrixWorldInverse ), "matrixWorldInverse is equal" );
 			assert.ok( cam.projectionMatrix.equals( clonedCam.projectionMatrix ), "projectionMatrix is equal" );
+
+		} );
+
+		// OTHERS
+		// TODO: this should not be here !!! This is Object3D stuff !!!
+		QUnit.test( "lookAt", ( assert ) => {
+
+			var cam = new Camera();
+			cam.lookAt( new Vector3( 0, 1, - 1 ) );
+
+			assert.numEqual( cam.rotation.x * ( 180 / Math.PI ), 45, "x is equal" );
 
 		} );
 

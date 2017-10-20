@@ -9,11 +9,10 @@ export default QUnit.module( 'Audios', () => {
 
 	QUnit.module.todo( 'AudioContext', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// PUBLIC STUFF
+		QUnit.test( "getContext", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
+		QUnit.test( "setContext", ( assert ) => {} );
 
 	} );
 

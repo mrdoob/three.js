@@ -9,6 +9,10 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'Layers', () => {
 
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
 		QUnit.test( "set", ( assert ) => {
 
 			var a = new Layers();
@@ -46,28 +50,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "disable", ( assert ) => {
-
-			var a = new Layers();
-
-			a.set( 0 );
-			a.disable( 0 );
-			assert.strictEqual( a.mask, 0, "Disable channel 0 with mask 0" );
-
-			a.set( 0 );
-			a.disable( 1 );
-			assert.strictEqual( a.mask, 1, "Disable channel 1 with mask 0" );
-
-			a.set( 1 );
-			a.disable( 0 );
-			assert.strictEqual( a.mask, 2, "Disable channel 0 with mask 1" );
-
-			a.set( 1 );
-			a.disable( 1 );
-			assert.strictEqual( a.mask, 0, "Disable channel 1 with mask 1" );
-
-		} );
-
 		QUnit.test( "toggle", ( assert ) => {
 
 			var a = new Layers();
@@ -90,7 +72,29 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "QUnit.test", ( assert ) => {
+		QUnit.test( "disable", ( assert ) => {
+
+			var a = new Layers();
+
+			a.set( 0 );
+			a.disable( 0 );
+			assert.strictEqual( a.mask, 0, "Disable channel 0 with mask 0" );
+
+			a.set( 0 );
+			a.disable( 1 );
+			assert.strictEqual( a.mask, 1, "Disable channel 1 with mask 0" );
+
+			a.set( 1 );
+			a.disable( 0 );
+			assert.strictEqual( a.mask, 2, "Disable channel 0 with mask 1" );
+
+			a.set( 1 );
+			a.disable( 1 );
+			assert.strictEqual( a.mask, 0, "Disable channel 1 with mask 1" );
+
+		} );
+
+		QUnit.test( "test", ( assert ) => {
 
 			var a = new Layers();
 			var b = new Layers();

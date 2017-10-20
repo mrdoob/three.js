@@ -11,11 +11,12 @@ export default QUnit.module( 'Extras', () => {
 
 		QUnit.module.todo( 'Interpolations', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// PUBLIC STUFF
+			QUnit.test( "CatmullRom", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			QUnit.test( "QuadraticBezier", ( assert ) => {} );
 
-			} );
+			QUnit.test( "CubicBezier", ( assert ) => {} );
 
 		} );
 

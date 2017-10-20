@@ -9,57 +9,58 @@ import { Quaternion } from '../../../../src/math/Quaternion';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { x, y, z } from './Constants.tests';
 
+const eulerZero = new Euler( 0, 0, 0, "XYZ" );
+const eulerAxyz = new Euler( 1, 0, 0, "XYZ" );
+const eulerAzyx = new Euler( 0, 1, 0, "ZYX" );
+
+function matrixEquals4( a, b, tolerance ) {
+
+	tolerance = tolerance || 0.0001;
+	if ( a.elements.length != b.elements.length ) {
+
+		return false;
+
+	}
+
+	for ( var i = 0, il = a.elements.length; i < il; i ++ ) {
+
+		var delta = a.elements[ i ] - b.elements[ i ];
+		if ( delta > tolerance ) {
+
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+}
+
+function eulerEquals( a, b, tolerance ) {
+
+	tolerance = tolerance || 0.0001;
+	var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z );
+
+	return ( diff < tolerance );
+
+}
+
+function quatEquals( a, b, tolerance ) {
+
+	tolerance = tolerance || 0.0001;
+	var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z ) + Math.abs( a.w - b.w );
+
+	return ( diff < tolerance );
+
+}
+
 export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Euler', () => {
 
-		var eulerZero = new Euler( 0, 0, 0, "XYZ" );
-		var eulerAxyz = new Euler( 1, 0, 0, "XYZ" );
-		var eulerAzyx = new Euler( 0, 1, 0, "ZYX" );
-
-		var matrixEquals4 = function ( a, b, tolerance ) {
-
-			tolerance = tolerance || 0.0001;
-			if ( a.elements.length != b.elements.length ) {
-
-				return false;
-
-			}
-
-			for ( var i = 0, il = a.elements.length; i < il; i ++ ) {
-
-				var delta = a.elements[ i ] - b.elements[ i ];
-				if ( delta > tolerance ) {
-
-					return false;
-
-				}
-
-			}
-
-			return true;
-
-		};
-
-		var eulerEquals = function ( a, b, tolerance ) {
-
-			tolerance = tolerance || 0.0001;
-			var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z );
-
-			return ( diff < tolerance );
-
-		};
-
-		var quatEquals = function ( a, b, tolerance ) {
-
-			tolerance = tolerance || 0.0001;
-			var diff = Math.abs( a.x - b.x ) + Math.abs( a.y - b.y ) + Math.abs( a.z - b.z ) + Math.abs( a.w - b.w );
-
-			return ( diff < tolerance );
-
-		};
-
-		QUnit.test( "constructor/equals", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Euler();
 			assert.ok( a.equals( eulerZero ), "Passed!" );
@@ -68,19 +69,22 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone/copy/equals", ( assert ) => {
+		// STATIC STUFF
+		QUnit.test( "RotationOrders", ( assert ) => {} );
 
-			var a = eulerAxyz.clone();
-			assert.ok( a.equals( eulerAxyz ), "Passed!" );
-			assert.ok( ! a.equals( eulerZero ), "Passed!" );
-			assert.ok( ! a.equals( eulerAzyx ), "Passed!" );
+		QUnit.test( "DefaultOrder", ( assert ) => {} );
 
-			a.copy( eulerAzyx );
-			assert.ok( a.equals( eulerAzyx ), "Passed!" );
-			assert.ok( ! a.equals( eulerAxyz ), "Passed!" );
-			assert.ok( ! a.equals( eulerZero ), "Passed!" );
+		// PROPERTIES STUFF
+		QUnit.test( "x", ( assert ) => {} );
 
-		} );
+		QUnit.test( "y", ( assert ) => {} );
+
+		QUnit.test( "z", ( assert ) => {} );
+
+		QUnit.test( "order", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isEuler", ( assert ) => {} );
 
 		QUnit.test( "set/setFromVector3/toVector3", ( assert ) => {
 
@@ -98,6 +102,20 @@ export default QUnit.module( 'Maths', () => {
 
 			var c = b.toVector3();
 			assert.ok( c.equals( vec ), "Passed!" );
+
+		} );
+
+		QUnit.test( "clone/copy/equals", ( assert ) => {
+
+			var a = eulerAxyz.clone();
+			assert.ok( a.equals( eulerAxyz ), "Passed!" );
+			assert.ok( ! a.equals( eulerZero ), "Passed!" );
+			assert.ok( ! a.equals( eulerAzyx ), "Passed!" );
+
+			a.copy( eulerAzyx );
+			assert.ok( a.equals( eulerAzyx ), "Passed!" );
+			assert.ok( ! a.equals( eulerAxyz ), "Passed!" );
+			assert.ok( ! a.equals( eulerZero ), "Passed!" );
 
 		} );
 
@@ -150,26 +168,6 @@ export default QUnit.module( 'Maths', () => {
 				assert.ok( quatEquals( q, q3 ), "Passed!" );
 
 			}
-
-		} );
-
-		QUnit.test( "gimbalLocalQuat", ( assert ) => {
-
-			// known problematic quaternions
-			var q1 = new Quaternion( 0.5207769385244341, - 0.4783214164122354, 0.520776938524434, 0.47832141641223547 );
-			var q2 = new Quaternion( 0.11284905712620674, 0.6980437630368944, - 0.11284905712620674, 0.6980437630368944 );
-
-			var eulerOrder = "ZYX";
-
-			// create Euler directly from a Quaternion
-			var eViaQ1 = new Euler().setFromQuaternion( q1, eulerOrder ); // there is likely a bug here
-
-			// create Euler from Quaternion via an intermediate Matrix4
-			var mViaQ1 = new Matrix4().makeRotationFromQuaternion( q1 );
-			var eViaMViaQ1 = new Euler().setFromRotationMatrix( mViaQ1, eulerOrder );
-
-			// the results here are different
-			assert.ok( eulerEquals( eViaQ1, eViaMViaQ1 ), "Passed!" ); // this result is correct
 
 		} );
 
@@ -278,6 +276,31 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.y, y, "With order: check y" );
 			assert.strictEqual( a.z, z, "With order: check z" );
 			assert.strictEqual( a.order, "ZXY", "With order: check order" );
+
+		} );
+
+		QUnit.test( "onChange", ( assert ) => {} );
+
+		QUnit.test( "onChangeCallback", ( assert ) => {} );
+
+		// OTHERS
+		QUnit.test( "gimbalLocalQuat", ( assert ) => {
+
+			// known problematic quaternions
+			var q1 = new Quaternion( 0.5207769385244341, - 0.4783214164122354, 0.520776938524434, 0.47832141641223547 );
+			var q2 = new Quaternion( 0.11284905712620674, 0.6980437630368944, - 0.11284905712620674, 0.6980437630368944 );
+
+			var eulerOrder = "ZYX";
+
+			// create Euler directly from a Quaternion
+			var eViaQ1 = new Euler().setFromQuaternion( q1, eulerOrder ); // there is likely a bug here
+
+			// create Euler from Quaternion via an intermediate Matrix4
+			var mViaQ1 = new Matrix4().makeRotationFromQuaternion( q1 );
+			var eViaMViaQ1 = new Euler().setFromRotationMatrix( mViaQ1, eulerOrder );
+
+			// the results here are different
+			assert.ok( eulerEquals( eViaQ1, eViaMViaQ1 ), "Passed!" ); // this result is correct
 
 		} );
 

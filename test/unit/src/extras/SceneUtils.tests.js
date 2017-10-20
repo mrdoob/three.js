@@ -9,11 +9,12 @@ export default QUnit.module.todo( 'Extras', () => {
 
 	QUnit.module.todo( 'SceneUtils', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// PUBLIC STUFF
+		QUnit.test( "createMultiMaterialObject", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		QUnit.test( "detach", ( assert ) => {} );
 
-		} );
+		QUnit.test( "attach", ( assert ) => {} );
 
 	} );
 

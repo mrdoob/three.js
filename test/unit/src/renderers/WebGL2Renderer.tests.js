@@ -9,11 +9,19 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module.todo( 'WebGL2Renderer', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// PUBLIC STUFF
+		QUnit.test( "domElement", ( assert ) => {} );
 
-		} );
+		QUnit.test( "clear", ( assert ) => {} );
+
+		QUnit.test( "setPixelRatio", ( assert ) => {} );
+
+		QUnit.test( "setSize", ( assert ) => {} );
+
+		QUnit.test( "render", ( assert ) => {} );
 
 	} );
 

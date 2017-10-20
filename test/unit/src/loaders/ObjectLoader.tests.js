@@ -9,11 +9,29 @@ export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'ObjectLoader', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// PUBLIC STUFF
+		QUnit.test( "load", ( assert ) => {} );
 
-		} );
+		QUnit.test( "setTexturePath", ( assert ) => {} );
+
+		QUnit.test( "setCrossOrigin", ( assert ) => {} );
+
+		QUnit.test( "parse", ( assert ) => {} );
+
+		QUnit.test( "parseGeometries", ( assert ) => {} );
+
+		QUnit.test( "parseMaterials", ( assert ) => {} );
+
+		QUnit.test( "parseAnimations", ( assert ) => {} );
+
+		QUnit.test( "parseImages", ( assert ) => {} );
+
+		QUnit.test( "parseTextures", ( assert ) => {} );
+
+		QUnit.test( "parseObject", ( assert ) => {} );
 
 	} );
 

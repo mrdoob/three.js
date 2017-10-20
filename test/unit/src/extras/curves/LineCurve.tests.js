@@ -27,7 +27,53 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "Simple curve", function ( assert ) {
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
+
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
+
+			// PUBLIC STUFF
+			QUnit.test( "isLineCurve", ( assert ) => {} );
+
+			QUnit.test( "getPoint", ( assert ) => {} );
+
+			QUnit.test( "getPointAt", ( assert ) => {
+
+				var curve = new LineCurve( _points[ 0 ], _points[ 3 ] );
+
+				var expectedPoints = [
+					new Vector2( 0, 0 ),
+					new Vector2( - 2.4, 1.5 ),
+					new Vector2( - 4, 2.5 ),
+					new Vector2( - 8, 5 )
+				];
+
+				var points = [
+					curve.getPointAt( 0 ),
+					curve.getPointAt( 0.3 ),
+					curve.getPointAt( 0.5 ),
+					curve.getPointAt( 1 )
+				];
+
+				assert.deepEqual( points, expectedPoints, "Correct points" );
+
+			} );
+
+			QUnit.test( "getTangent", ( assert ) => {
+
+				var curve = _curve;
+
+				var tangent = curve.getTangent( 0 );
+				var expectedTangent = Math.sqrt( 0.5 );
+
+				assert.numEqual( tangent.x, expectedTangent, "tangent.x correct" );
+				assert.numEqual( tangent.y, expectedTangent, "tangent.y correct" );
+
+			} );
+
+			// OTHERS
+			QUnit.test( "Simple curve", ( assert ) => {
 
 				var curve = _curve;
 
@@ -63,7 +109,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getLength/getLengths", function ( assert ) {
+			QUnit.test( "getLength/getLengths", ( assert ) => {
 
 				var curve = _curve;
 
@@ -92,41 +138,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getPointAt", function ( assert ) {
-
-				var curve = new LineCurve( _points[ 0 ], _points[ 3 ] );
-
-				var expectedPoints = [
-					new Vector2( 0, 0 ),
-					new Vector2( - 2.4, 1.5 ),
-					new Vector2( - 4, 2.5 ),
-					new Vector2( - 8, 5 )
-				];
-
-				var points = [
-					curve.getPointAt( 0 ),
-					curve.getPointAt( 0.3 ),
-					curve.getPointAt( 0.5 ),
-					curve.getPointAt( 1 )
-				];
-
-				assert.deepEqual( points, expectedPoints, "Correct points" );
-
-			} );
-
-			QUnit.test( "getTangent", function ( assert ) {
-
-				var curve = _curve;
-
-				var tangent = curve.getTangent( 0 );
-				var expectedTangent = Math.sqrt( 0.5 );
-
-				assert.numEqual( tangent.x, expectedTangent, "tangent.x correct" );
-				assert.numEqual( tangent.y, expectedTangent, "tangent.y correct" );
-
-			} );
-
-			QUnit.test( "getUtoTmapping", function ( assert ) {
+			QUnit.test( "getUtoTmapping", ( assert ) => {
 
 				var curve = _curve;
 
@@ -140,7 +152,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getSpacedPoints", function ( assert ) {
+			QUnit.test( "getSpacedPoints", ( assert ) => {
 
 				var curve = _curve;
 

@@ -11,11 +11,14 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.module.todo( 'DiscreteInterpolant', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-			} );
+			// PRIVATE STUFF
+			QUnit.test( "interpolate_", ( assert ) => {} );
 
 		} );
 

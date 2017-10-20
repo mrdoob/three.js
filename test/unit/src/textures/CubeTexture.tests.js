@@ -9,11 +9,17 @@ export default QUnit.module( 'Textures', () => {
 
 	QUnit.module.todo( 'CubeTexture', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PROPERTIES
+		QUnit.test( "images", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isCubeTexture", ( assert ) => {} );
 
 	} );
 

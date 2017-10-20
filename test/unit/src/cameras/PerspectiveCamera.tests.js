@@ -1,5 +1,6 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -34,6 +35,31 @@ export default QUnit.module( 'Cameras', () => {
 
 		};
 
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isPerspectiveCamera", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
+
+		QUnit.test( "setFocalLength", ( assert ) => {} );
+
+		QUnit.test( "getFocalLength", ( assert ) => {} );
+
+		QUnit.test( "getEffectiveFOV", ( assert ) => {} );
+
+		QUnit.test( "getFilmWidth", ( assert ) => {} );
+
+		QUnit.test( "getFilmHeight", ( assert ) => {} );
+
+		QUnit.test( "setViewOffset", ( assert ) => {} );
+
+		QUnit.test( "clearViewOffset", ( assert ) => {} );
+
 		QUnit.test( "updateProjectionMatrix", ( assert ) => {
 
 			var cam = new PerspectiveCamera( 75, 16 / 9, 0.1, 300.0 );
@@ -61,6 +87,10 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
+		QUnit.test( "toJSON", ( assert ) => {} );
+
+		// OTHERS
+		// TODO: no no no clone is a camera methods that relied to copy method
 		QUnit.test( "clone", ( assert ) => {
 
 			var near = 1,

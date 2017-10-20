@@ -11,11 +11,17 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'WebGLClipping', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// PUBLIC STUFF
+			QUnit.test( "init", ( assert ) => {} );
 
-			} );
+			QUnit.test( "beginShadows", ( assert ) => {} );
+
+			QUnit.test( "endShadows", ( assert ) => {} );
+
+			QUnit.test( "setState", ( assert ) => {} );
 
 		} );
 

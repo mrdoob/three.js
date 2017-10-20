@@ -9,11 +9,33 @@ export default QUnit.module( 'Audios', () => {
 
 	QUnit.module.todo( 'PositionalAudio', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "getOutput", ( assert ) => {} );
+
+		QUnit.test( "getRefDistance", ( assert ) => {} );
+
+		QUnit.test( "setRefDistance", ( assert ) => {} );
+
+		QUnit.test( "getRolloffFactor", ( assert ) => {} );
+
+		QUnit.test( "setRolloffFactor", ( assert ) => {} );
+
+		QUnit.test( "getDistanceModel", ( assert ) => {} );
+
+		QUnit.test( "setDistanceModel", ( assert ) => {} );
+
+		QUnit.test( "getMaxDistance", ( assert ) => {} );
+
+		QUnit.test( "setMaxDistance", ( assert ) => {} );
+
+		QUnit.test( "updateMatrixWorld", ( assert ) => {} );
+
 
 	} );
 

@@ -25,7 +25,19 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "Simple curve", function ( assert ) {
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
+
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
+
+			// PUBLIC STUFF
+			QUnit.test( "isEllipseCurve", ( assert ) => {} );
+
+			QUnit.test( "getPoint", ( assert ) => {} );
+			
+			// OTHERS
+			QUnit.test( "Simple curve", ( assert ) => {
 
 				var expectedPoints = [
 					new Vector2( 10, 0 ),
@@ -48,7 +60,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getLength/getLengths", function ( assert ) {
+			QUnit.test( "getLength/getLengths", ( assert ) => {
 
 				var length = curve.getLength();
 				var expectedLength = 62.829269247282795;
@@ -75,7 +87,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getPoint/getPointAt", function ( assert ) {
+			QUnit.test( "getPoint/getPointAt", ( assert ) => {
 
 				var testValues = [ 0, 0.3, 0.5, 0.7, 1 ];
 
@@ -97,7 +109,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getTangent", function ( assert ) {
+			QUnit.test( "getTangent", ( assert ) => {
 
 				var expectedTangents = [
 					new Vector2( - 0.000314159260186071, 0.9999999506519786 ),
@@ -126,7 +138,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getUtoTmapping", function ( assert ) {
+			QUnit.test( "getUtoTmapping", ( assert ) => {
 
 				var start = curve.getUtoTmapping( 0, 0 );
 				var end = curve.getUtoTmapping( 0, curve.getLength() );
@@ -140,7 +152,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getSpacedPoints", function ( assert ) {
+			QUnit.test( "getSpacedPoints", ( assert ) => {
 
 				var expectedPoints = [
 					new Vector2( 10, 0 ),

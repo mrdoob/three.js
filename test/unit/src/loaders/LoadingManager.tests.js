@@ -9,11 +9,23 @@ export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'LoadingManager', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// PUBLIC STUFF
+		QUnit.test( "onStart", ( assert ) => {} );
 
-		} );
+		QUnit.test( "onLoad", ( assert ) => {} );
+
+		QUnit.test( "onProgress", ( assert ) => {} );
+
+		QUnit.test( "onError", ( assert ) => {} );
+
+		QUnit.test( "itemStart", ( assert ) => {} );
+
+		QUnit.test( "itemEnd", ( assert ) => {} );
+
+		QUnit.test( "itemError", ( assert ) => {} );
 
 	} );
 

@@ -9,11 +9,17 @@ export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'Skeleton', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// PUBLIC STUFF
+		QUnit.test( "calculateInverses", ( assert ) => {} );
 
-		} );
+		QUnit.test( "pose", ( assert ) => {} );
+
+		QUnit.test( "update", ( assert ) => {} );
+
+		QUnit.test( "clone", ( assert ) => {} );
 
 	} );
 

@@ -10,7 +10,14 @@ export default QUnit.module( 'Lights', () => {
 
 	QUnit.module.todo( 'DirectionalLightShadow', () => {
 
-		QUnit.test( "clone/copy", function ( assert ) {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// OTHERS
+		QUnit.test( "clone/copy", ( assert ) => {
 
 			var a = new DirectionalLightShadow();
 			var b = new DirectionalLightShadow();
@@ -32,7 +39,7 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( "toJSON", function ( assert ) {
+		QUnit.test( "toJSON", ( assert ) => {
 
 			var light = new DirectionalLight();
 			var shadow = new DirectionalLightShadow();

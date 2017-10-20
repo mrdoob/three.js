@@ -13,14 +13,50 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'BufferAttribute', () => {
 
-		QUnit.test( "count", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
-			assert.ok(
-				new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ).count === 2,
-				'count is equal to the number of chunks'
+			assert.throws(
+				function () {
+
+					var a = new BufferAttribute( [ 1, 2, 3, 4 ], 2, false );
+
+				},
+				/array should be a Typed Array/,
+				"Calling constructor with a simple array throws Error"
 			);
 
 		} );
+
+		// PROPERTIES
+		QUnit.test( "needsUpdate", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isBufferAttribute", ( assert ) => {} );
+
+		QUnit.test( "setArray", ( assert ) => {
+
+			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+			var a = new BufferAttribute( f32a, 2, false );
+
+			a.setArray( f32a, 2 );
+
+			assert.strictEqual( a.count, 2, "Check item count" );
+			assert.strictEqual( a.array, f32a, "Check array" );
+
+			assert.throws(
+				function () {
+
+					a.setArray( [ 1, 2, 3, 4 ] );
+
+				},
+				/array should be a Typed Array/,
+				"Calling setArray with a simple array throws Error"
+			);
+
+		} );
+
+		QUnit.test( "setDynamic", ( assert ) => {} );
 
 		QUnit.test( "copy", ( assert ) => {
 
@@ -53,6 +89,17 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( i2[ 0 ] === i[ 3 ] && i2[ 1 ] === i[ 4 ] && i2[ 2 ] === i[ 5 ], 'chunck copied to correct place' );
 			assert.ok( i2[ 3 ] === i[ 6 ] && i2[ 4 ] === i[ 7 ] && i2[ 5 ] === i[ 8 ], 'chunck copied to correct place' );
 			assert.ok( i2[ 6 ] === i[ 0 ] && i2[ 7 ] === i[ 1 ] && i2[ 8 ] === i[ 2 ], 'chunck copied to correct place' );
+
+		} );
+
+		QUnit.test( "copyArray", ( assert ) => {
+
+			var f32a = new Float32Array( [ 5, 6, 7, 8 ] );
+			var a = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4 ] ), 2, false );
+
+			a.copyArray( f32a );
+
+			assert.deepEqual( a.array, f32a, "Check array has new values" );
 
 		} );
 
@@ -139,67 +186,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
-
-			var attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 0.12, - 12 ] ), 2 );
-			var attrCopy = attr.clone();
-
-			assert.ok( attr.array.length === attrCopy.array.length, 'attribute was cloned' );
-			for ( var i = 0; i < attr.array.length; i ++ ) {
-
-				assert.ok( attr.array[ i ] === attrCopy.array[ i ], 'array item is equal' );
-
-			}
-
-		} );
-
-		QUnit.test( "constructor exception", ( assert ) => {
-
-			assert.throws(
-				function () {
-
-					var a = new BufferAttribute( [ 1, 2, 3, 4 ], 2, false );
-
-				},
-				/array should be a Typed Array/,
-				"Calling constructor with a simple array throws Error"
-			);
-
-		} );
-
-		QUnit.test( "setArray", ( assert ) => {
-
-			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
-			var a = new BufferAttribute( f32a, 2, false );
-
-			a.setArray( f32a, 2 );
-
-			assert.strictEqual( a.count, 2, "Check item count" );
-			assert.strictEqual( a.array, f32a, "Check array" );
-
-			assert.throws(
-				function () {
-
-					a.setArray( [ 1, 2, 3, 4 ] );
-
-				},
-				/array should be a Typed Array/,
-				"Calling setArray with a simple array throws Error"
-			);
-
-		} );
-
-		QUnit.test( "copyArray", ( assert ) => {
-
-			var f32a = new Float32Array( [ 5, 6, 7, 8 ] );
-			var a = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4 ] ), 2, false );
-
-			a.copyArray( f32a );
-
-			assert.deepEqual( a.array, f32a, "Check array has new values" );
-
-		} );
-
 		QUnit.test( "set", ( assert ) => {
 
 			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
@@ -212,7 +198,7 @@ export default QUnit.module( 'Core', () => {
 			assert.deepEqual( a.array, expected, "Check array has expected values" );
 
 		} );
-
+		
 		QUnit.test( "set[X, Y, Z, W, XYZ, XYZW]/get[X, Y, Z, W]", ( assert ) => {
 
 			var f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8 ] );
@@ -274,6 +260,120 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( a.onUploadCallback, func, "Check callback was set properly" );
 
 		} );
+
+		QUnit.test( "clone", ( assert ) => {
+
+			var attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 0.12, - 12 ] ), 2 );
+			var attrCopy = attr.clone();
+
+			assert.ok( attr.array.length === attrCopy.array.length, 'attribute was cloned' );
+			for ( var i = 0; i < attr.array.length; i ++ ) {
+
+				assert.ok( attr.array[ i ] === attrCopy.array[ i ], 'array item is equal' );
+
+			}
+
+		} );
+
+		// OTHERS
+		QUnit.test( "count", ( assert ) => {
+
+			assert.ok(
+				new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ).count === 2,
+				'count is equal to the number of chunks'
+			);
+
+		} );
+
+	} );
+
+	QUnit.module( 'Int8BufferAttribute', () => {
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+	} );
+
+	QUnit.module( 'Uint8BufferAttribute', () => {
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+	} );
+
+	QUnit.module( 'Uint8ClampedBufferAttribute', () => {
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+	} );
+
+	QUnit.module( 'Int16BufferAttribute', () => {
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+	} );
+
+	QUnit.module( 'Uint16BufferAttribute', () => {
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+	} );
+
+	QUnit.module( 'Int32BufferAttribute', () => {
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+	} );
+
+	QUnit.module( 'Uint32BufferAttribute', () => {
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+	} );
+
+	QUnit.module( 'Float32BufferAttribute', () => {
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+	} );
+
+	QUnit.module( 'Float64BufferAttribute', () => {
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
 	} );
 

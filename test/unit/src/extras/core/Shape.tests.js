@@ -11,11 +11,18 @@ export default QUnit.module( 'Extras', () => {
 
 		QUnit.module.todo( 'Shape', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-			} );
+			// PUBLIC STUFF
+			QUnit.test( "getPointsHoles", ( assert ) => {} );
+
+			QUnit.test( "extractAllPoints", ( assert ) => {} );
+
+			QUnit.test( "extractPoints", ( assert ) => {} );
 
 		} );
 

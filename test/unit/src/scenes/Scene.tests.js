@@ -9,11 +9,18 @@ export default QUnit.module( 'Scenes', () => {
 
 	QUnit.module.todo( 'Scene', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isScene", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
+
+		QUnit.test( "toJSON", ( assert ) => {} );
 
 	} );
 

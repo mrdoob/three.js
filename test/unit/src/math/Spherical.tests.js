@@ -14,7 +14,8 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Spherical', () => {
 
-		QUnit.test( "constructor", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Spherical();
 			var radius = 10.0;
@@ -31,6 +32,9 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.theta, theta, "Custom values: check theta" );
 
 		} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isSpherical", ( assert ) => {} );
 
 		QUnit.test( "set", ( assert ) => {
 

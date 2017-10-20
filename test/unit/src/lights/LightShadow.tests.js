@@ -5,13 +5,17 @@
 /* global QUnit */
 
 import { LightShadow } from '../../../../src/lights/LightShadow';
-import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera'
+import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera';
 
 export default QUnit.module( 'Lights', () => {
 
 	QUnit.module.todo( 'LightShadow', () => {
 
-		QUnit.test( "clone/copy", function ( assert ) {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "clone/copy", ( assert ) => {
 
 			var a = new LightShadow( new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 			var b = new LightShadow( new OrthographicCamera( - 3, 3, 3, - 3, 0.3, 300 ) );
@@ -32,6 +36,8 @@ export default QUnit.module( 'Lights', () => {
 			assert.notDeepEqual( a, b, "Shadows are different again after change" );
 
 		} );
+
+		QUnit.test( "toJSON", ( assert ) => {} );
 
 	} );
 

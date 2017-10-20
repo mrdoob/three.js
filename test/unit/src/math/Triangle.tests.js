@@ -16,7 +16,8 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Triangle', () => {
 
-		QUnit.test( "constructor", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Triangle();
 			assert.ok( a.a.equals( zero3 ), "Passed!" );
@@ -29,6 +30,39 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.c.equals( two3 ), "Passed!" );
 
 		} );
+
+		// STATIC STUFF
+		QUnit.test( "normal", ( assert ) => {} );
+
+		QUnit.test( "barycoordFromPoint", ( assert ) => {} );
+
+		QUnit.test( "containsPoint", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "set", ( assert ) => {
+
+			var a = new Triangle();
+
+			a.set( one3.clone().negate(), one3, two3 );
+			assert.ok( a.a.equals( one3.clone().negate() ), "Passed!" );
+			assert.ok( a.b.equals( one3 ), "Passed!" );
+			assert.ok( a.c.equals( two3 ), "Passed!" );
+
+		} );
+
+		QUnit.test( "setFromPointsAndIndices", ( assert ) => {
+
+			var a = new Triangle();
+
+			var points = [ one3, one3.clone().negate(), two3 ];
+			a.setFromPointsAndIndices( points, 1, 0, 2 );
+			assert.ok( a.a.equals( one3.clone().negate() ), "Passed!" );
+			assert.ok( a.b.equals( one3 ), "Passed!" );
+			assert.ok( a.c.equals( two3 ), "Passed!" );
+
+		} );
+
+		QUnit.test( "clone", ( assert ) => {} );
 
 		QUnit.test( "copy", ( assert ) => {
 
@@ -45,29 +79,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.a.equals( one3.clone().negate() ), "Passed!" );
 			assert.ok( b.b.equals( one3 ), "Passed!" );
 			assert.ok( b.c.equals( two3 ), "Passed!" );
-
-		} );
-
-		QUnit.test( "setFromPointsAndIndices", ( assert ) => {
-
-			var a = new Triangle();
-
-			var points = [ one3, one3.clone().negate(), two3 ];
-			a.setFromPointsAndIndices( points, 1, 0, 2 );
-			assert.ok( a.a.equals( one3.clone().negate() ), "Passed!" );
-			assert.ok( a.b.equals( one3 ), "Passed!" );
-			assert.ok( a.c.equals( two3 ), "Passed!" );
-
-		} );
-
-		QUnit.test( "set", ( assert ) => {
-
-			var a = new Triangle();
-
-			a.set( one3.clone().negate(), one3, two3 );
-			assert.ok( a.a.equals( one3.clone().negate() ), "Passed!" );
-			assert.ok( a.b.equals( one3 ), "Passed!" );
-			assert.ok( a.c.equals( two3 ), "Passed!" );
 
 		} );
 

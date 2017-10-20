@@ -19,7 +19,8 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Vector4', () => {
 
-		QUnit.test( "constructor", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Vector4();
 			assert.ok( a.x == 0, "Passed!" );
@@ -34,6 +35,41 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.w === w, "Passed!" );
 
 		} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isVector4", ( assert ) => {} );
+
+		QUnit.test( "set", ( assert ) => {
+
+			var a = new Vector4();
+			assert.ok( a.x == 0, "Passed!" );
+			assert.ok( a.y == 0, "Passed!" );
+			assert.ok( a.z == 0, "Passed!" );
+			assert.ok( a.w == 1, "Passed!" );
+
+			a.set( x, y, z, w );
+			assert.ok( a.x == x, "Passed!" );
+			assert.ok( a.y == y, "Passed!" );
+			assert.ok( a.z == z, "Passed!" );
+			assert.ok( a.w == w, "Passed!" );
+
+		} );
+
+		QUnit.test( "setScalar", ( assert ) => {} );
+
+		QUnit.test( "setX", ( assert ) => {} );
+
+		QUnit.test( "setY", ( assert ) => {} );
+
+		QUnit.test( "setZ", ( assert ) => {} );
+
+		QUnit.test( "setW", ( assert ) => {} );
+
+		QUnit.test( "setComponent", ( assert ) => {} );
+
+		QUnit.test( "getComponent", ( assert ) => {} );
+
+		QUnit.test( "clone", ( assert ) => {} );
 
 		QUnit.test( "copy", ( assert ) => {
 
@@ -56,61 +92,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", ( assert ) => {
-
-			var a = new Vector4();
-			assert.ok( a.x == 0, "Passed!" );
-			assert.ok( a.y == 0, "Passed!" );
-			assert.ok( a.z == 0, "Passed!" );
-			assert.ok( a.w == 1, "Passed!" );
-
-			a.set( x, y, z, w );
-			assert.ok( a.x == x, "Passed!" );
-			assert.ok( a.y == y, "Passed!" );
-			assert.ok( a.z == z, "Passed!" );
-			assert.ok( a.w == w, "Passed!" );
-
-		} );
-
-		QUnit.test( "setX,setY,setZ,setW", ( assert ) => {
-
-			var a = new Vector4();
-			assert.ok( a.x == 0, "Passed!" );
-			assert.ok( a.y == 0, "Passed!" );
-			assert.ok( a.z == 0, "Passed!" );
-			assert.ok( a.w == 1, "Passed!" );
-
-			a.setX( x );
-			a.setY( y );
-			a.setZ( z );
-			a.setW( w );
-
-			assert.ok( a.x == x, "Passed!" );
-			assert.ok( a.y == y, "Passed!" );
-			assert.ok( a.z == z, "Passed!" );
-			assert.ok( a.w == w, "Passed!" );
-
-		} );
-
-		QUnit.test( "setComponent,getComponent", ( assert ) => {
-
-			var a = new Vector4();
-			assert.ok( a.x == 0, "Passed!" );
-			assert.ok( a.y == 0, "Passed!" );
-			assert.ok( a.z == 0, "Passed!" );
-			assert.ok( a.w == 1, "Passed!" );
-
-			a.setComponent( 0, 1 );
-			a.setComponent( 1, 2 );
-			a.setComponent( 2, 3 );
-			a.setComponent( 3, 4 );
-			assert.ok( a.getComponent( 0 ) == 1, "Passed!" );
-			assert.ok( a.getComponent( 1 ) == 2, "Passed!" );
-			assert.ok( a.getComponent( 2 ) == 3, "Passed!" );
-			assert.ok( a.getComponent( 3 ) == 4, "Passed!" );
-
-		} );
-
 		QUnit.test( "add", ( assert ) => {
 
 			var a = new Vector4( x, y, z, w );
@@ -127,6 +108,24 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( c.y == - 2 * y, "Passed!" );
 			assert.ok( c.z == - 2 * z, "Passed!" );
 			assert.ok( c.w == - 2 * w, "Passed!" );
+
+		} );
+
+		QUnit.test( "addScalar", ( assert ) => {} );
+
+		QUnit.test( "addVectors", ( assert ) => {} );
+
+		QUnit.test( "addScaledVector", ( assert ) => {
+
+			var a = new Vector4( x, y, z, w );
+			var b = new Vector4( 6, 7, 8, 9 );
+			var s = 3;
+
+			a.addScaledVector( b, s );
+			assert.strictEqual( a.x, x + b.x * s, "Check x" );
+			assert.strictEqual( a.y, y + b.y * s, "Check y" );
+			assert.strictEqual( a.z, z + b.z * s, "Check z" );
+			assert.strictEqual( a.w, w + b.w * s, "Check w" );
 
 		} );
 
@@ -149,307 +148,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiply/divide", ( assert ) => {
+		QUnit.test( "subScalar", ( assert ) => {} );
 
-			var a = new Vector4( x, y, z, w );
-			var b = new Vector4( - x, - y, - z, - w );
+		QUnit.test( "subVectors", ( assert ) => {} );
 
-			a.multiplyScalar( - 2 );
-			assert.ok( a.x == x * - 2, "Passed!" );
-			assert.ok( a.y == y * - 2, "Passed!" );
-			assert.ok( a.z == z * - 2, "Passed!" );
-			assert.ok( a.w == w * - 2, "Passed!" );
-
-			b.multiplyScalar( - 2 );
-			assert.ok( b.x == 2 * x, "Passed!" );
-			assert.ok( b.y == 2 * y, "Passed!" );
-			assert.ok( b.z == 2 * z, "Passed!" );
-			assert.ok( b.w == 2 * w, "Passed!" );
-
-			a.divideScalar( - 2 );
-			assert.ok( a.x == x, "Passed!" );
-			assert.ok( a.y == y, "Passed!" );
-			assert.ok( a.z == z, "Passed!" );
-			assert.ok( a.w == w, "Passed!" );
-
-			b.divideScalar( - 2 );
-			assert.ok( b.x == - x, "Passed!" );
-			assert.ok( b.y == - y, "Passed!" );
-			assert.ok( b.z == - z, "Passed!" );
-			assert.ok( b.w == - w, "Passed!" );
-
-		} );
-
-		QUnit.test( "min/max/clamp", ( assert ) => {
-
-			var a = new Vector4( x, y, z, w );
-			var b = new Vector4( - x, - y, - z, - w );
-			var c = new Vector4();
-
-			c.copy( a ).min( b );
-			assert.ok( c.x == - x, "Passed!" );
-			assert.ok( c.y == - y, "Passed!" );
-			assert.ok( c.z == - z, "Passed!" );
-			assert.ok( c.w == - w, "Passed!" );
-
-			c.copy( a ).max( b );
-			assert.ok( c.x == x, "Passed!" );
-			assert.ok( c.y == y, "Passed!" );
-			assert.ok( c.z == z, "Passed!" );
-			assert.ok( c.w == w, "Passed!" );
-
-			c.set( - 2 * x, 2 * y, - 2 * z, 2 * w );
-			c.clamp( b, a );
-			assert.ok( c.x == - x, "Passed!" );
-			assert.ok( c.y == y, "Passed!" );
-			assert.ok( c.z == - z, "Passed!" );
-			assert.ok( c.w == w, "Passed!" );
-
-		} );
-
-		QUnit.test( "negate", ( assert ) => {
-
-			var a = new Vector4( x, y, z, w );
-
-			a.negate();
-			assert.ok( a.x == - x, "Passed!" );
-			assert.ok( a.y == - y, "Passed!" );
-			assert.ok( a.z == - z, "Passed!" );
-			assert.ok( a.w == - w, "Passed!" );
-
-		} );
-
-		QUnit.test( "dot", ( assert ) => {
-
-			var a = new Vector4( x, y, z, w );
-			var b = new Vector4( - x, - y, - z, - w );
-			var c = new Vector4( 0, 0, 0, 0 );
-
-			var result = a.dot( b );
-			assert.ok( result == ( - x * x - y * y - z * z - w * w ), "Passed!" );
-
-			var result = a.dot( c );
-			assert.ok( result == 0, "Passed!" );
-
-		} );
-
-		QUnit.test( "length/lengthSq", ( assert ) => {
-
-			var a = new Vector4( x, 0, 0, 0 );
-			var b = new Vector4( 0, - y, 0, 0 );
-			var c = new Vector4( 0, 0, z, 0 );
-			var d = new Vector4( 0, 0, 0, w );
-			var e = new Vector4( 0, 0, 0, 0 );
-
-			assert.ok( a.length() == x, "Passed!" );
-			assert.ok( a.lengthSq() == x * x, "Passed!" );
-			assert.ok( b.length() == y, "Passed!" );
-			assert.ok( b.lengthSq() == y * y, "Passed!" );
-			assert.ok( c.length() == z, "Passed!" );
-			assert.ok( c.lengthSq() == z * z, "Passed!" );
-			assert.ok( d.length() == w, "Passed!" );
-			assert.ok( d.lengthSq() == w * w, "Passed!" );
-			assert.ok( e.length() == 0, "Passed!" );
-			assert.ok( e.lengthSq() == 0, "Passed!" );
-
-			a.set( x, y, z, w );
-			assert.ok( a.length() == Math.sqrt( x * x + y * y + z * z + w * w ), "Passed!" );
-			assert.ok( a.lengthSq() == ( x * x + y * y + z * z + w * w ), "Passed!" );
-
-		} );
-
-		QUnit.test( "normalize", ( assert ) => {
-
-			var a = new Vector4( x, 0, 0, 0 );
-			var b = new Vector4( 0, - y, 0, 0 );
-			var c = new Vector4( 0, 0, z, 0 );
-			var d = new Vector4( 0, 0, 0, - w );
-
-			a.normalize();
-			assert.ok( a.length() == 1, "Passed!" );
-			assert.ok( a.x == 1, "Passed!" );
-
-			b.normalize();
-			assert.ok( b.length() == 1, "Passed!" );
-			assert.ok( b.y == - 1, "Passed!" );
-
-			c.normalize();
-			assert.ok( c.length() == 1, "Passed!" );
-			assert.ok( c.z == 1, "Passed!" );
-
-			d.normalize();
-			assert.ok( d.length() == 1, "Passed!" );
-			assert.ok( d.w == - 1, "Passed!" );
-
-		} );
-
-		/*
-		 QUnit.test( "distanceTo/distanceToSquared", function() {
-		 var a = new Vector4( x, 0, 0, 0 );
-		 var b = new Vector4( 0, -y, 0, 0 );
-		 var c = new Vector4( 0, 0, z, 0 );
-		 var d = new Vector4( 0, 0, 0, -w );
-		 var e = new Vector4();
-
-		 ok( a.distanceTo( e ) == x, "Passed!" );
-		 ok( a.distanceToSquared( e ) == x*x, "Passed!" );
-
-		 ok( b.distanceTo( e ) == y, "Passed!" );
-		 ok( b.distanceToSquared( e ) == y*y, "Passed!" );
-
-		 ok( c.distanceTo( e ) == z, "Passed!" );
-		 ok( c.distanceToSquared( e ) == z*z, "Passed!" );
-
-		 ok( d.distanceTo( e ) == w, "Passed!" );
-		 ok( d.distanceToSquared( e ) == w*w, "Passed!" );
-		 });
-		 */
-
-		QUnit.test( "setLength", ( assert ) => {
-
-			var a = new Vector4( x, 0, 0, 0 );
-
-			assert.ok( a.length() == x, "Passed!" );
-			a.setLength( y );
-			assert.ok( a.length() == y, "Passed!" );
-
-			var a = new Vector4( 0, 0, 0, 0 );
-			assert.ok( a.length() == 0, "Passed!" );
-			a.setLength( y );
-			assert.ok( a.length() == 0, "Passed!" );
-			a.setLength();
-			assert.ok( isNaN( a.length() ), "Passed!" );
-
-		} );
-
-		QUnit.test( "lerp/clone", ( assert ) => {
-
-			var a = new Vector4( x, 0, z, 0 );
-			var b = new Vector4( 0, - y, 0, - w );
-
-			assert.ok( a.lerp( a, 0 ).equals( a.lerp( a, 0.5 ) ), "Passed!" );
-			assert.ok( a.lerp( a, 0 ).equals( a.lerp( a, 1 ) ), "Passed!" );
-
-			assert.ok( a.clone().lerp( b, 0 ).equals( a ), "Passed!" );
-
-			assert.ok( a.clone().lerp( b, 0.5 ).x == x * 0.5, "Passed!" );
-			assert.ok( a.clone().lerp( b, 0.5 ).y == - y * 0.5, "Passed!" );
-			assert.ok( a.clone().lerp( b, 0.5 ).z == z * 0.5, "Passed!" );
-			assert.ok( a.clone().lerp( b, 0.5 ).w == - w * 0.5, "Passed!" );
-
-			assert.ok( a.clone().lerp( b, 1 ).equals( b ), "Passed!" );
-
-		} );
-
-		QUnit.test( "equals", ( assert ) => {
-
-			var a = new Vector4( x, 0, z, 0 );
-			var b = new Vector4( 0, - y, 0, - w );
-
-			assert.ok( a.x != b.x, "Passed!" );
-			assert.ok( a.y != b.y, "Passed!" );
-			assert.ok( a.z != b.z, "Passed!" );
-			assert.ok( a.w != b.w, "Passed!" );
-
-			assert.ok( ! a.equals( b ), "Passed!" );
-			assert.ok( ! b.equals( a ), "Passed!" );
-
-			a.copy( b );
-			assert.ok( a.x == b.x, "Passed!" );
-			assert.ok( a.y == b.y, "Passed!" );
-			assert.ok( a.z == b.z, "Passed!" );
-			assert.ok( a.w == b.w, "Passed!" );
-
-			assert.ok( a.equals( b ), "Passed!" );
-			assert.ok( b.equals( a ), "Passed!" );
-
-		} );
-
-		QUnit.test( "setComponent/getComponent exceptions", ( assert ) => {
-
-			var a = new Vector4();
-
-			assert.throws(
-				function () {
-
-					a.setComponent( 4, 0 );
-
-				},
-				/index is out of range/,
-				"setComponent with an out of range index throws Error"
-			);
-			assert.throws(
-				function () {
-
-					a.getComponent( 4 );
-
-				},
-				/index is out of range/,
-				"getComponent with an out of range index throws Error"
-			);
-
-		} );
-
-		QUnit.test( "manhattanLength", ( assert ) => {
-
-			var a = new Vector4( x, 0, 0, 0 );
-			var b = new Vector4( 0, - y, 0, 0 );
-			var c = new Vector4( 0, 0, z, 0 );
-			var d = new Vector4( 0, 0, 0, w );
-			var e = new Vector4( 0, 0, 0, 0 );
-
-			assert.ok( a.manhattanLength() == x, "Positive x" );
-			assert.ok( b.manhattanLength() == y, "Negative y" );
-			assert.ok( c.manhattanLength() == z, "Positive z" );
-			assert.ok( d.manhattanLength() == w, "Positive w" );
-			assert.ok( e.manhattanLength() == 0, "Empty initialization" );
-
-			a.set( x, y, z, w );
-			assert.ok(
-				a.manhattanLength() == Math.abs( x ) + Math.abs( y ) + Math.abs( z ) + Math.abs( w ),
-				"All components"
-			);
-
-		} );
-
-		QUnit.test( "setScalar/addScalar/subScalar", ( assert ) => {
-
-			var a = new Vector4();
-			var s = 3;
-
-			a.setScalar( s );
-			assert.strictEqual( a.x, s, "setScalar: check x" );
-			assert.strictEqual( a.y, s, "setScalar: check y" );
-			assert.strictEqual( a.z, s, "setScalar: check z" );
-			assert.strictEqual( a.w, s, "setScalar: check w" );
-
-			a.addScalar( s );
-			assert.strictEqual( a.x, 2 * s, "addScalar: check x" );
-			assert.strictEqual( a.y, 2 * s, "addScalar: check y" );
-			assert.strictEqual( a.z, 2 * s, "addScalar: check z" );
-			assert.strictEqual( a.w, 2 * s, "addScalar: check w" );
-
-			a.subScalar( 2 * s );
-			assert.strictEqual( a.x, 0, "subScalar: check x" );
-			assert.strictEqual( a.y, 0, "subScalar: check y" );
-			assert.strictEqual( a.z, 0, "subScalar: check z" );
-			assert.strictEqual( a.w, 0, "subScalar: check w" );
-
-		} );
-
-		QUnit.test( "addScaledVector", ( assert ) => {
-
-			var a = new Vector4( x, y, z, w );
-			var b = new Vector4( 6, 7, 8, 9 );
-			var s = 3;
-
-			a.addScaledVector( b, s );
-			assert.strictEqual( a.x, x + b.x * s, "Check x" );
-			assert.strictEqual( a.y, y + b.y * s, "Check y" );
-			assert.strictEqual( a.z, z + b.z * s, "Check z" );
-			assert.strictEqual( a.w, w + b.w * s, "Check w" );
-
-		} );
+		QUnit.test( "multiplyScalar", ( assert ) => {} );
 
 		QUnit.test( "applyMatrix4", ( assert ) => {
 
@@ -495,6 +198,18 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "divideScalar", ( assert ) => {} );
+
+		QUnit.test( "setAxisAngleFromQuaternion", ( assert ) => {} );
+
+		QUnit.test( "setAxisAngleFromRotationMatrix", ( assert ) => {} );
+
+		QUnit.test( "min", ( assert ) => {} );
+
+		QUnit.test( "max", ( assert ) => {} );
+
+		QUnit.test( "clamp", ( assert ) => {} );
+
 		QUnit.test( "clampScalar", ( assert ) => {
 
 			var a = new Vector4( - 0.1, 0.01, 0.5, 1.5 );
@@ -505,6 +220,138 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( a.y - clamped.y ) <= eps, "Check y" );
 			assert.ok( Math.abs( a.z - clamped.z ) <= eps, "Check z" );
 			assert.ok( Math.abs( a.w - clamped.w ) <= eps, "Check w" );
+
+		} );
+
+		QUnit.test( "clampLength", ( assert ) => {} );
+
+		QUnit.test( "floor", ( assert ) => {} );
+
+		QUnit.test( "ceil", ( assert ) => {} );
+
+		QUnit.test( "round", ( assert ) => {} );
+
+		QUnit.test( "roundToZero", ( assert ) => {} );
+
+		QUnit.test( "negate", ( assert ) => {
+
+			var a = new Vector4( x, y, z, w );
+
+			a.negate();
+			assert.ok( a.x == - x, "Passed!" );
+			assert.ok( a.y == - y, "Passed!" );
+			assert.ok( a.z == - z, "Passed!" );
+			assert.ok( a.w == - w, "Passed!" );
+
+		} );
+
+		QUnit.test( "dot", ( assert ) => {
+
+			var a = new Vector4( x, y, z, w );
+			var b = new Vector4( - x, - y, - z, - w );
+			var c = new Vector4( 0, 0, 0, 0 );
+
+			var result = a.dot( b );
+			assert.ok( result == ( - x * x - y * y - z * z - w * w ), "Passed!" );
+
+			var result = a.dot( c );
+			assert.ok( result == 0, "Passed!" );
+
+		} );
+
+		QUnit.test( "lengthSq", ( assert ) => {} );
+
+		QUnit.test( "length", ( assert ) => {} );
+
+		QUnit.test( "manhattanLength", ( assert ) => {
+
+			var a = new Vector4( x, 0, 0, 0 );
+			var b = new Vector4( 0, - y, 0, 0 );
+			var c = new Vector4( 0, 0, z, 0 );
+			var d = new Vector4( 0, 0, 0, w );
+			var e = new Vector4( 0, 0, 0, 0 );
+
+			assert.ok( a.manhattanLength() == x, "Positive x" );
+			assert.ok( b.manhattanLength() == y, "Negative y" );
+			assert.ok( c.manhattanLength() == z, "Positive z" );
+			assert.ok( d.manhattanLength() == w, "Positive w" );
+			assert.ok( e.manhattanLength() == 0, "Empty initialization" );
+
+			a.set( x, y, z, w );
+			assert.ok(
+				a.manhattanLength() == Math.abs( x ) + Math.abs( y ) + Math.abs( z ) + Math.abs( w ),
+				"All components"
+			);
+
+		} );
+
+		QUnit.test( "normalize", ( assert ) => {
+
+			var a = new Vector4( x, 0, 0, 0 );
+			var b = new Vector4( 0, - y, 0, 0 );
+			var c = new Vector4( 0, 0, z, 0 );
+			var d = new Vector4( 0, 0, 0, - w );
+
+			a.normalize();
+			assert.ok( a.length() == 1, "Passed!" );
+			assert.ok( a.x == 1, "Passed!" );
+
+			b.normalize();
+			assert.ok( b.length() == 1, "Passed!" );
+			assert.ok( b.y == - 1, "Passed!" );
+
+			c.normalize();
+			assert.ok( c.length() == 1, "Passed!" );
+			assert.ok( c.z == 1, "Passed!" );
+
+			d.normalize();
+			assert.ok( d.length() == 1, "Passed!" );
+			assert.ok( d.w == - 1, "Passed!" );
+
+		} );
+
+		QUnit.test( "setLength", ( assert ) => {
+
+			var a = new Vector4( x, 0, 0, 0 );
+
+			assert.ok( a.length() == x, "Passed!" );
+			a.setLength( y );
+			assert.ok( a.length() == y, "Passed!" );
+
+			var a = new Vector4( 0, 0, 0, 0 );
+			assert.ok( a.length() == 0, "Passed!" );
+			a.setLength( y );
+			assert.ok( a.length() == 0, "Passed!" );
+			a.setLength();
+			assert.ok( isNaN( a.length() ), "Passed!" );
+
+		} );
+
+		QUnit.test( "lerp", ( assert ) => {} );
+
+		QUnit.test( "lerpVectors", ( assert ) => {} );
+
+		QUnit.test( "equals", ( assert ) => {
+
+			var a = new Vector4( x, 0, z, 0 );
+			var b = new Vector4( 0, - y, 0, - w );
+
+			assert.ok( a.x != b.x, "Passed!" );
+			assert.ok( a.y != b.y, "Passed!" );
+			assert.ok( a.z != b.z, "Passed!" );
+			assert.ok( a.w != b.w, "Passed!" );
+
+			assert.ok( ! a.equals( b ), "Passed!" );
+			assert.ok( ! b.equals( a ), "Passed!" );
+
+			a.copy( b );
+			assert.ok( a.x == b.x, "Passed!" );
+			assert.ok( a.y == b.y, "Passed!" );
+			assert.ok( a.z == b.z, "Passed!" );
+			assert.ok( a.w == b.w, "Passed!" );
+
+			assert.ok( a.equals( b ), "Passed!" );
+			assert.ok( b.equals( a ), "Passed!" );
 
 		} );
 
@@ -570,6 +417,191 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.y, 6, "Offset 1: check y" );
 			assert.strictEqual( a.z, 7, "Offset 1: check z" );
 			assert.strictEqual( a.w, 8, "Offset 1: check w" );
+
+		} );
+
+		// TODO (Itee) refactor/split
+		QUnit.test( "setX,setY,setZ,setW", ( assert ) => {
+
+			var a = new Vector4();
+			assert.ok( a.x == 0, "Passed!" );
+			assert.ok( a.y == 0, "Passed!" );
+			assert.ok( a.z == 0, "Passed!" );
+			assert.ok( a.w == 1, "Passed!" );
+
+			a.setX( x );
+			a.setY( y );
+			a.setZ( z );
+			a.setW( w );
+
+			assert.ok( a.x == x, "Passed!" );
+			assert.ok( a.y == y, "Passed!" );
+			assert.ok( a.z == z, "Passed!" );
+			assert.ok( a.w == w, "Passed!" );
+
+		} );
+		QUnit.test( "setComponent,getComponent", ( assert ) => {
+
+			var a = new Vector4();
+			assert.ok( a.x == 0, "Passed!" );
+			assert.ok( a.y == 0, "Passed!" );
+			assert.ok( a.z == 0, "Passed!" );
+			assert.ok( a.w == 1, "Passed!" );
+
+			a.setComponent( 0, 1 );
+			a.setComponent( 1, 2 );
+			a.setComponent( 2, 3 );
+			a.setComponent( 3, 4 );
+			assert.ok( a.getComponent( 0 ) == 1, "Passed!" );
+			assert.ok( a.getComponent( 1 ) == 2, "Passed!" );
+			assert.ok( a.getComponent( 2 ) == 3, "Passed!" );
+			assert.ok( a.getComponent( 3 ) == 4, "Passed!" );
+
+		} );
+		QUnit.test( "setComponent/getComponent exceptions", ( assert ) => {
+
+			var a = new Vector4();
+
+			assert.throws(
+				function () {
+
+					a.setComponent( 4, 0 );
+
+				},
+				/index is out of range/,
+				"setComponent with an out of range index throws Error"
+			);
+			assert.throws(
+				function () {
+
+					a.getComponent( 4 );
+
+				},
+				/index is out of range/,
+				"getComponent with an out of range index throws Error"
+			);
+
+		} );
+		QUnit.test( "setScalar/addScalar/subScalar", ( assert ) => {
+
+			var a = new Vector4();
+			var s = 3;
+
+			a.setScalar( s );
+			assert.strictEqual( a.x, s, "setScalar: check x" );
+			assert.strictEqual( a.y, s, "setScalar: check y" );
+			assert.strictEqual( a.z, s, "setScalar: check z" );
+			assert.strictEqual( a.w, s, "setScalar: check w" );
+
+			a.addScalar( s );
+			assert.strictEqual( a.x, 2 * s, "addScalar: check x" );
+			assert.strictEqual( a.y, 2 * s, "addScalar: check y" );
+			assert.strictEqual( a.z, 2 * s, "addScalar: check z" );
+			assert.strictEqual( a.w, 2 * s, "addScalar: check w" );
+
+			a.subScalar( 2 * s );
+			assert.strictEqual( a.x, 0, "subScalar: check x" );
+			assert.strictEqual( a.y, 0, "subScalar: check y" );
+			assert.strictEqual( a.z, 0, "subScalar: check z" );
+			assert.strictEqual( a.w, 0, "subScalar: check w" );
+
+		} );
+		QUnit.test( "multiply/divide", ( assert ) => {
+
+			var a = new Vector4( x, y, z, w );
+			var b = new Vector4( - x, - y, - z, - w );
+
+			a.multiplyScalar( - 2 );
+			assert.ok( a.x == x * - 2, "Passed!" );
+			assert.ok( a.y == y * - 2, "Passed!" );
+			assert.ok( a.z == z * - 2, "Passed!" );
+			assert.ok( a.w == w * - 2, "Passed!" );
+
+			b.multiplyScalar( - 2 );
+			assert.ok( b.x == 2 * x, "Passed!" );
+			assert.ok( b.y == 2 * y, "Passed!" );
+			assert.ok( b.z == 2 * z, "Passed!" );
+			assert.ok( b.w == 2 * w, "Passed!" );
+
+			a.divideScalar( - 2 );
+			assert.ok( a.x == x, "Passed!" );
+			assert.ok( a.y == y, "Passed!" );
+			assert.ok( a.z == z, "Passed!" );
+			assert.ok( a.w == w, "Passed!" );
+
+			b.divideScalar( - 2 );
+			assert.ok( b.x == - x, "Passed!" );
+			assert.ok( b.y == - y, "Passed!" );
+			assert.ok( b.z == - z, "Passed!" );
+			assert.ok( b.w == - w, "Passed!" );
+
+		} );
+		QUnit.test( "min/max/clamp", ( assert ) => {
+
+			var a = new Vector4( x, y, z, w );
+			var b = new Vector4( - x, - y, - z, - w );
+			var c = new Vector4();
+
+			c.copy( a ).min( b );
+			assert.ok( c.x == - x, "Passed!" );
+			assert.ok( c.y == - y, "Passed!" );
+			assert.ok( c.z == - z, "Passed!" );
+			assert.ok( c.w == - w, "Passed!" );
+
+			c.copy( a ).max( b );
+			assert.ok( c.x == x, "Passed!" );
+			assert.ok( c.y == y, "Passed!" );
+			assert.ok( c.z == z, "Passed!" );
+			assert.ok( c.w == w, "Passed!" );
+
+			c.set( - 2 * x, 2 * y, - 2 * z, 2 * w );
+			c.clamp( b, a );
+			assert.ok( c.x == - x, "Passed!" );
+			assert.ok( c.y == y, "Passed!" );
+			assert.ok( c.z == - z, "Passed!" );
+			assert.ok( c.w == w, "Passed!" );
+
+		} );
+		QUnit.test( "length/lengthSq", ( assert ) => {
+
+			var a = new Vector4( x, 0, 0, 0 );
+			var b = new Vector4( 0, - y, 0, 0 );
+			var c = new Vector4( 0, 0, z, 0 );
+			var d = new Vector4( 0, 0, 0, w );
+			var e = new Vector4( 0, 0, 0, 0 );
+
+			assert.ok( a.length() == x, "Passed!" );
+			assert.ok( a.lengthSq() == x * x, "Passed!" );
+			assert.ok( b.length() == y, "Passed!" );
+			assert.ok( b.lengthSq() == y * y, "Passed!" );
+			assert.ok( c.length() == z, "Passed!" );
+			assert.ok( c.lengthSq() == z * z, "Passed!" );
+			assert.ok( d.length() == w, "Passed!" );
+			assert.ok( d.lengthSq() == w * w, "Passed!" );
+			assert.ok( e.length() == 0, "Passed!" );
+			assert.ok( e.lengthSq() == 0, "Passed!" );
+
+			a.set( x, y, z, w );
+			assert.ok( a.length() == Math.sqrt( x * x + y * y + z * z + w * w ), "Passed!" );
+			assert.ok( a.lengthSq() == ( x * x + y * y + z * z + w * w ), "Passed!" );
+
+		} );
+		QUnit.test( "lerp/clone", ( assert ) => {
+
+			var a = new Vector4( x, 0, z, 0 );
+			var b = new Vector4( 0, - y, 0, - w );
+
+			assert.ok( a.lerp( a, 0 ).equals( a.lerp( a, 0.5 ) ), "Passed!" );
+			assert.ok( a.lerp( a, 0 ).equals( a.lerp( a, 1 ) ), "Passed!" );
+
+			assert.ok( a.clone().lerp( b, 0 ).equals( a ), "Passed!" );
+
+			assert.ok( a.clone().lerp( b, 0.5 ).x == x * 0.5, "Passed!" );
+			assert.ok( a.clone().lerp( b, 0.5 ).y == - y * 0.5, "Passed!" );
+			assert.ok( a.clone().lerp( b, 0.5 ).z == z * 0.5, "Passed!" );
+			assert.ok( a.clone().lerp( b, 0.5 ).w == - w * 0.5, "Passed!" );
+
+			assert.ok( a.clone().lerp( b, 1 ).equals( b ), "Passed!" );
 
 		} );
 

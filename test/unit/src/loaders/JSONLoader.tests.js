@@ -9,11 +9,15 @@ export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module.todo( 'JSONLoader', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// PUBLIC STUFF
+		QUnit.test( "load", ( assert ) => {} );
 
-		} );
+		QUnit.test( "setTexturePath", ( assert ) => {} );
+
+		QUnit.test( "parse", ( assert ) => {} );
 
 	} );
 

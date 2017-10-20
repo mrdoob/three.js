@@ -9,11 +9,16 @@ export default QUnit.module( 'Materials', () => {
 
 	QUnit.module.todo( 'PointsMaterial', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isPointsMaterial", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
 
 	} );
 

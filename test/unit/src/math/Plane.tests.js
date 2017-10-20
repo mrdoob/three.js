@@ -18,19 +18,20 @@ import {
 	one3
 } from './Constants.tests';
 
+function comparePlane( a, b, threshold ) {
+
+	threshold = threshold || 0.0001;
+	return ( a.normal.distanceTo( b.normal ) < threshold &&
+	Math.abs( a.constant - b.constant ) < threshold );
+
+}
+
 export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Plane', () => {
 
-		var comparePlane = function ( a, b, threshold ) {
-
-			threshold = threshold || 0.0001;
-			return ( a.normal.distanceTo( b.normal ) < threshold &&
-			Math.abs( a.constant - b.constant ) < threshold );
-
-		};
-
-		QUnit.test( "constructor", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Plane();
 			assert.ok( a.normal.x == 1, "Passed!" );
@@ -52,26 +53,8 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
-
-			var a = new Plane( new Vector3( x, y, z ), w );
-			var b = new Plane().copy( a );
-			assert.ok( b.normal.x == x, "Passed!" );
-			assert.ok( b.normal.y == y, "Passed!" );
-			assert.ok( b.normal.z == z, "Passed!" );
-			assert.ok( b.constant == w, "Passed!" );
-
-			// ensure that it is a true copy
-			a.normal.x = 0;
-			a.normal.y = - 1;
-			a.normal.z = - 2;
-			a.constant = - 3;
-			assert.ok( b.normal.x == x, "Passed!" );
-			assert.ok( b.normal.y == y, "Passed!" );
-			assert.ok( b.normal.z == z, "Passed!" );
-			assert.ok( b.constant == w, "Passed!" );
-
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isPlane", ( assert ) => {} );
 
 		QUnit.test( "set", ( assert ) => {
 
@@ -112,6 +95,45 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( a.normal.equals( normal ), "Passed!" );
 			assert.ok( a.constant == 0, "Passed!" );
+
+		} );
+
+		QUnit.test( "setFromCoplanarPoints", ( assert ) => {
+
+			var a = new Plane();
+			var v1 = new Vector3( 2.0, 0.5, 0.25 );
+			var v2 = new Vector3( 2.0, - 0.5, 1.25 );
+			var v3 = new Vector3( 2.0, - 3.5, 2.2 );
+			var normal = new Vector3( 1, 0, 0 );
+			var constant = - 2;
+
+			a.setFromCoplanarPoints( v1, v2, v3 );
+
+			assert.ok( a.normal.equals( normal ), "Check normal" );
+			assert.strictEqual( a.constant, constant, "Check constant" );
+
+		} );
+
+		QUnit.test( "clone", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {
+
+			var a = new Plane( new Vector3( x, y, z ), w );
+			var b = new Plane().copy( a );
+			assert.ok( b.normal.x == x, "Passed!" );
+			assert.ok( b.normal.y == y, "Passed!" );
+			assert.ok( b.normal.z == z, "Passed!" );
+			assert.ok( b.constant == w, "Passed!" );
+
+			// ensure that it is a true copy
+			a.normal.x = 0;
+			a.normal.y = - 1;
+			a.normal.z = - 2;
+			a.constant = - 3;
+			assert.ok( b.normal.x == x, "Passed!" );
+			assert.ok( b.normal.y == y, "Passed!" );
+			assert.ok( b.normal.z == z, "Passed!" );
+			assert.ok( b.constant == w, "Passed!" );
 
 		} );
 
@@ -165,6 +187,19 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "projectPoint", ( assert ) => {
+
+			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
+
+			assert.ok( a.projectPoint( new Vector3( 10, 0, 0 ) ).equals( zero3 ), "Passed!" );
+			assert.ok( a.projectPoint( new Vector3( - 10, 0, 0 ) ).equals( zero3 ), "Passed!" );
+
+			var a = new Plane( new Vector3( 0, 1, 0 ), - 1 );
+			assert.ok( a.projectPoint( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
+			assert.ok( a.projectPoint( new Vector3( 0, 1, 0 ) ).equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
+
+		} );
+
 		QUnit.test( "isInterestionLine/intersectLine", ( assert ) => {
 
 			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
@@ -190,18 +225,9 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "projectPoint", ( assert ) => {
+		QUnit.test( "intersectsBox", ( assert ) => {} );
 
-			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
-
-			assert.ok( a.projectPoint( new Vector3( 10, 0, 0 ) ).equals( zero3 ), "Passed!" );
-			assert.ok( a.projectPoint( new Vector3( - 10, 0, 0 ) ).equals( zero3 ), "Passed!" );
-
-			var a = new Plane( new Vector3( 0, 1, 0 ), - 1 );
-			assert.ok( a.projectPoint( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
-			assert.ok( a.projectPoint( new Vector3( 0, 1, 0 ) ).equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
-
-		} );
+		QUnit.test( "intersectsSphere", ( assert ) => {} );
 
 		QUnit.test( "coplanarPoint", ( assert ) => {
 
@@ -249,22 +275,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.normal.equals( b.normal ), "Normals after copy(): equal" );
 			assert.strictEqual( a.constant, b.constant, "Constants after copy(): equal" );
 			assert.ok( a.equals( b ), "Planes after copy(): equal" );
-
-		} );
-
-		QUnit.test( "setFromCoplanarPoints", ( assert ) => {
-
-			var a = new Plane();
-			var v1 = new Vector3( 2.0, 0.5, 0.25 );
-			var v2 = new Vector3( 2.0, - 0.5, 1.25 );
-			var v3 = new Vector3( 2.0, - 3.5, 2.2 );
-			var normal = new Vector3( 1, 0, 0 );
-			var constant = - 2;
-
-			a.setFromCoplanarPoints( v1, v2, v3 );
-
-			assert.ok( a.normal.equals( normal ), "Check normal" );
-			assert.strictEqual( a.constant, constant, "Check constant" );
 
 		} );
 

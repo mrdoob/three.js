@@ -27,7 +27,41 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "Simple curve", function ( assert ) {
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
+
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
+
+			// PUBLIC STUFF
+			QUnit.test( "isCatmullRomCurve3", ( assert ) => {} );
+
+			QUnit.test( "getPoint", ( assert ) => {} );
+
+			QUnit.test( "getPointAt", ( assert ) => {
+
+				var curve = new LineCurve3( _points[ 0 ], _points[ 3 ] );
+
+				var expectedPoints = [
+					new Vector3( 0, 0, 0 ),
+					new Vector3( - 2.4, 1.5, - 2.1 ),
+					new Vector3( - 4, 2.5, - 3.5 ),
+					new Vector3( - 8, 5, - 7 )
+				];
+
+				var points = [
+					curve.getPointAt( 0 ),
+					curve.getPointAt( 0.3 ),
+					curve.getPointAt( 0.5 ),
+					curve.getPointAt( 1 )
+				];
+
+				assert.deepEqual( points, expectedPoints, "Correct getPointAt points" );
+
+			} );
+
+			// OTHERS
+			QUnit.test( "Simple curve", ( assert ) => {
 
 				var curve = _curve;
 
@@ -63,7 +97,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getLength/getLengths", function ( assert ) {
+			QUnit.test( "getLength/getLengths", ( assert ) => {
 
 				var curve = _curve;
 
@@ -92,29 +126,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getPointAt", function ( assert ) {
-
-				var curve = new LineCurve3( _points[ 0 ], _points[ 3 ] );
-
-				var expectedPoints = [
-					new Vector3( 0, 0, 0 ),
-					new Vector3( - 2.4, 1.5, - 2.1 ),
-					new Vector3( - 4, 2.5, - 3.5 ),
-					new Vector3( - 8, 5, - 7 )
-				];
-
-				var points = [
-					curve.getPointAt( 0 ),
-					curve.getPointAt( 0.3 ),
-					curve.getPointAt( 0.5 ),
-					curve.getPointAt( 1 )
-				];
-
-				assert.deepEqual( points, expectedPoints, "Correct getPointAt points" );
-
-			} );
-
-			QUnit.test( "getTangent/getTangentAt", function ( assert ) {
+			QUnit.test( "getTangent/getTangentAt", ( assert ) => {
 
 				var curve = _curve;
 
@@ -133,7 +145,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "computeFrenetFrames", function ( assert ) {
+			QUnit.test( "computeFrenetFrames", ( assert ) => {
 
 				var curve = _curve;
 
@@ -155,7 +167,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getUtoTmapping", function ( assert ) {
+			QUnit.test( "getUtoTmapping", ( assert ) => {
 
 				var curve = _curve;
 
@@ -169,7 +181,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getSpacedPoints", function ( assert ) {
+			QUnit.test( "getSpacedPoints", ( assert ) => {
 
 				var curve = _curve;
 

@@ -9,11 +9,23 @@ export default QUnit.module( 'Materials', () => {
 
 	QUnit.module.todo( 'Material', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// PUBLIC STUFF
+		QUnit.test( "isMaterial", ( assert ) => {} );
 
-		} );
+		QUnit.test( "onBeforeCompile", ( assert ) => {} );
+
+		QUnit.test( "setValues", ( assert ) => {} );
+
+		QUnit.test( "toJSON", ( assert ) => {} );
+
+		QUnit.test( "clone", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
+
+		QUnit.test( "dispose", ( assert ) => {} );
 
 	} );
 

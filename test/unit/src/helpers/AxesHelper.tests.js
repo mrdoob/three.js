@@ -9,11 +9,11 @@ export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'AxesHelper', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
 	} );
 

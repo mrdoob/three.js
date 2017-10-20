@@ -67,6 +67,17 @@ export default QUnit.module( 'Maths', () => {
 
 		// Tests
 
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "evaluate", ( assert ) => {} );
+
+		// PRIVATE STUFF
+		QUnit.test( "DefaultSettings_", ( assert ) => {} );
+
+		QUnit.test( "getSettings_", ( assert ) => {} );
+
 		QUnit.test( "copySampleValue_", ( assert ) => {
 
 			var interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );

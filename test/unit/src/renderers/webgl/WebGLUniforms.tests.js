@@ -11,11 +11,17 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'WebGLUniforms', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// PUBLIC STUFF
+			QUnit.test( "setValue", ( assert ) => {} );
 
-			} );
+			QUnit.test( "setOptional", ( assert ) => {} );
+
+			QUnit.test( "upload", ( assert ) => {} );
+
+			QUnit.test( "seqWithValue", ( assert ) => {} );
 
 		} );
 

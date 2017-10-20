@@ -33,7 +33,14 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// OTHERS
+		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
 			runStdGeometryTests( assert, geometries );
 
@@ -63,7 +70,14 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.test( 'standard geometry QUnit.tests', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// OTHERS
+		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
 			runStdGeometryTests( assert, geometries );
 

@@ -11,11 +11,19 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'WebGLBackground', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// PUBLIC STUFF
+			QUnit.test( "getClearColor", ( assert ) => {} );
 
-			} );
+			QUnit.test( "setClearColor", ( assert ) => {} );
+
+			QUnit.test( "getClearAlpha", ( assert ) => {} );
+
+			QUnit.test( "setClearAlpha", ( assert ) => {} );
+
+			QUnit.test( "render", ( assert ) => {} );
 
 		} );
 

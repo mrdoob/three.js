@@ -11,11 +11,20 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'WebGLProgram', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// PROPERTIES
+			QUnit.test( "uniforms", ( assert ) => {} );
+			
+			QUnit.test( "attributes", ( assert ) => {} );
 
-			} );
+			// PUBLIC STUFF
+			QUnit.test( "getUniforms", ( assert ) => {} );
+			
+			QUnit.test( "getAttributes", ( assert ) => {} );
+			
+			QUnit.test( "destroy", ( assert ) => {} );
 
 		} );
 

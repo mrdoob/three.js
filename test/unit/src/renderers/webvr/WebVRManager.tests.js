@@ -11,11 +11,21 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'WebVRManager', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// PUBLIC STUFF
+			QUnit.test( "getDevice", ( assert ) => {} );
 
-			} );
+			QUnit.test( "setDevice", ( assert ) => {} );
+
+			QUnit.test( "getCamera", ( assert ) => {} );
+
+			QUnit.test( "getStandingMatrix", ( assert ) => {} );
+
+			QUnit.test( "submitFrame", ( assert ) => {} );
+
+			QUnit.test( "dispose", ( assert ) => {} );
 
 		} );
 

@@ -12,7 +12,19 @@ export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'SpotLightShadow', () => {
 
-		QUnit.test( "clone/copy", function ( assert ) {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isSpotLightShadow", ( assert ) => {} );
+
+		QUnit.test( "update", ( assert ) => {} );
+
+		// OTHERS
+		QUnit.test( "clone/copy", ( assert ) => {
 
 			var a = new SpotLightShadow();
 			var b = new SpotLightShadow();
@@ -34,7 +46,7 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( "toJSON", function ( assert ) {
+		QUnit.test( "toJSON", ( assert ) => {
 
 			var light = new SpotLight();
 			var shadow = new SpotLightShadow();

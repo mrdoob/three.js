@@ -9,11 +9,20 @@ export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'LensFlare', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isLensFlare", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
+
+		QUnit.test( "add", ( assert ) => {} );
+
+		QUnit.test( "updateLensFlares", ( assert ) => {} );
 
 	} );
 

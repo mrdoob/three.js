@@ -9,11 +9,22 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module.todo( 'WebGLRenderTarget', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isWebGLRenderTarget", ( assert ) => {} );
+
+		QUnit.test( "setSize", ( assert ) => {} );
+
+		QUnit.test( "clone", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
+
+		QUnit.test( "dispose", ( assert ) => {} );
 
 	} );
 

@@ -9,11 +9,14 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module.todo( 'ShapeUtils', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// PUBLIC STUFF
+		QUnit.test( "area", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		QUnit.test( "triangulate", ( assert ) => {} );
 
-		} );
+		QUnit.test( "triangulateShape", ( assert ) => {} );
+
+		QUnit.test( "isClockWise", ( assert ) => {} );
 
 	} );
 

@@ -11,11 +11,34 @@ export default QUnit.module( 'Extras', () => {
 
 		QUnit.module.todo( 'CurvePath', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
 
-				assert.ok( false, "everything's gonna be alright" );
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
 
-			} );
+			// PUBLIC STUFF
+			QUnit.test( "add", ( assert ) => {} );
+
+			QUnit.test( "closePath", ( assert ) => {} );
+
+			QUnit.test( "getPoint", ( assert ) => {} );
+
+			QUnit.test( "getLength", ( assert ) => {} );
+
+			QUnit.test( "updateArcLengths", ( assert ) => {} );
+
+			QUnit.test( "getCurveLengths", ( assert ) => {} );
+
+			QUnit.test( "getSpacedPoints", ( assert ) => {} );
+
+			QUnit.test( "getPoints", ( assert ) => {} );
+
+			QUnit.test( "createPointsGeometry", ( assert ) => {} );
+
+			QUnit.test( "createSpacedPointsGeometry", ( assert ) => {} );
+
+			QUnit.test( "createGeometry", ( assert ) => {} );
 
 		} );
 

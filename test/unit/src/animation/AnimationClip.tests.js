@@ -9,11 +9,28 @@ export default QUnit.module( 'Animation', () => {
 
 	QUnit.module.todo( 'AnimationClip', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// STATIC STUFF
+		QUnit.test( "parse", ( assert ) => {} );
 
-		} );
+		QUnit.test( "toJSON", ( assert ) => {} );
+
+		QUnit.test( "CreateFromMorphTargetSequence", ( assert ) => {} );
+
+		QUnit.test( "findByName", ( assert ) => {} );
+
+		QUnit.test( "CreateClipsFromMorphTargetSequences", ( assert ) => {} );
+
+		QUnit.test( "parseAnimation", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "resetDuration", ( assert ) => {} );
+
+		QUnit.test( "trim", ( assert ) => {} );
+
+		QUnit.test( "optimize", ( assert ) => {} );
 
 	} );
 

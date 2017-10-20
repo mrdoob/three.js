@@ -9,11 +9,15 @@ export default QUnit.module( 'Objects', () => {
 
 	QUnit.module.todo( 'LineLoop', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "isLineLoop", ( assert ) => {} );
+
 
 	} );
 

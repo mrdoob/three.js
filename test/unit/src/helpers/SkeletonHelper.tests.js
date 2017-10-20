@@ -9,11 +9,15 @@ export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module.todo( 'SkeletonHelper', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "updateMatrixWorld", ( assert ) => {} );
+
 
 	} );
 

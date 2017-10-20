@@ -1,5 +1,6 @@
 /**
  * @author simonThiele / https://github.com/simonThiele
+ * @author TristanVALCKE / https://github.com/Itee
  */
 /* global QUnit */
 
@@ -30,6 +31,19 @@ export default QUnit.module( 'Core', () => {
 
 		}
 
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "start", ( assert ) => {} );
+
+		QUnit.test( "stop", ( assert ) => {} );
+
+		QUnit.test( "getElapsedTime", ( assert ) => {} );
+
+		QUnit.test( "getDelta", ( assert ) => {} );
+
+		// OTHERS
 		QUnit.test( "clock with performance", ( assert ) => {
 
 			mockPerformance();

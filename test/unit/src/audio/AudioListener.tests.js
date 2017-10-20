@@ -9,11 +9,26 @@ export default QUnit.module( 'Audios', () => {
 
 	QUnit.module.todo( 'AudioListener', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-		} );
+		// PUBLIC STUFF
+		QUnit.test( "getInput", ( assert ) => {} );
+
+		QUnit.test( "removeFilter", ( assert ) => {} );
+
+		QUnit.test( "getFilter", ( assert ) => {} );
+
+		QUnit.test( "setFilter", ( assert ) => {} );
+
+		QUnit.test( "getMasterVolume", ( assert ) => {} );
+
+		QUnit.test( "setMasterVolume", ( assert ) => {} );
+
+		QUnit.test( "updateMatrixWorld", ( assert ) => {} );
 
 	} );
 

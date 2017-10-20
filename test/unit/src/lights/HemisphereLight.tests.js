@@ -28,6 +28,18 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isHemisphereLight", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {} );
+
+		// OTHERS
 		QUnit.test( 'Standard light tests', ( assert ) => {
 
 			runStdLightTests( assert, lights );

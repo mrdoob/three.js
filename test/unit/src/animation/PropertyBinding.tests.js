@@ -13,6 +13,36 @@ export default QUnit.module( 'Animation', () => {
 
 	QUnit.module( 'PropertyBinding', () => {
 
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// STATIC STUFF
+		QUnit.test( "Composite", ( assert ) => {} );
+
+		QUnit.test( "create", ( assert ) => {} );
+
+		QUnit.test( 'sanitizeNodeName', ( assert ) => {
+
+			assert.equal(
+				PropertyBinding.sanitizeNodeName( 'valid-name-123_' ),
+				'valid-name-123_',
+				'Leaves valid name intact.'
+			);
+
+			assert.equal(
+				PropertyBinding.sanitizeNodeName( 'space separated name 123_ -' ),
+				'space_separated_name_123__-',
+				'Replaces spaces with underscores.'
+			);
+
+			assert.equal(
+				PropertyBinding.sanitizeNodeName( '"invalid" name %123%_' ),
+				'invalid_name_123_',
+				'Strips invalid characters.'
+			);
+
+		} );
+
 		QUnit.test( 'parseTrackName', ( assert ) => {
 
 			var paths = [
@@ -209,27 +239,18 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'sanitizeNodeName', ( assert ) => {
+		QUnit.test( "findNode", ( assert ) => {} );
 
-			assert.equal(
-				PropertyBinding.sanitizeNodeName( 'valid-name-123_' ),
-				'valid-name-123_',
-				'Leaves valid name intact.'
-			);
+		// PUBLIC STUFF
+		QUnit.test( "BindingType", ( assert ) => {} );
 
-			assert.equal(
-				PropertyBinding.sanitizeNodeName( 'space separated name 123_ -' ),
-				'space_separated_name_123__-',
-				'Replaces spaces with underscores.'
-			);
+		QUnit.test( "Versioning", ( assert ) => {} );
 
-			assert.equal(
-				PropertyBinding.sanitizeNodeName( '"invalid" name %123%_' ),
-				'invalid_name_123_',
-				'Strips invalid characters.'
-			);
+		QUnit.test( "GetterByBindingType", ( assert ) => {} );
 
-		} );
+		QUnit.test( "SetterByBindingTypeAndVersioning", ( assert ) => {} );
+
+		QUnit.test( "getValue", ( assert ) => {} );
 
 		QUnit.test( 'setValue', ( assert ) => {
 
@@ -267,6 +288,15 @@ export default QUnit.module( 'Animation', () => {
 			} );
 
 		} );
+
+		QUnit.test( "bind", ( assert ) => {} );
+
+		QUnit.test( "unbind", ( assert ) => {} );
+
+		// OTHERS
+		QUnit.test( "_getValue_unavailable", ( assert ) => {} );
+
+		QUnit.test( "_setValue_unavailable", ( assert ) => {} );
 
 	} );
 

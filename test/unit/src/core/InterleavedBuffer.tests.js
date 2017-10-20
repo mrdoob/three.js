@@ -24,43 +24,10 @@ export default QUnit.module( 'Core', () => {
 
 		}
 
-		QUnit.test( "count", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			var instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
-
-			assert.equal( instance.count, 2, "count is calculated via array length / stride" );
-
-		} );
-
-		QUnit.test( "copy", ( assert ) => {
-
-			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
-			var instance = new InterleavedBuffer( array, 3 );
-			instance.setDynamic( true );
-
-			checkInstanceAgainstCopy( instance, instance.copy( instance ), assert );
-
-		} );
-
-		QUnit.test( "clone", ( assert ) => {
-
-			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
-			var instance = new InterleavedBuffer( array, 3 );
-			instance.setDynamic( true );
-
-			checkInstanceAgainstCopy( instance, instance.clone(), assert );
-
-		} );
-
-		QUnit.test( "set", ( assert ) => {
-
-			var instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
-
-			instance.set( [ 0, - 1 ] );
-			assert.ok( instance.array[ 0 ] === 0 && instance.array[ 1 ] === - 1, "replace at first by default" );
-
-		} );
-
+		// PROPERTIES
 		QUnit.test( "needsUpdate", ( assert ) => {
 
 			var a = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4 ], 2 ) );
@@ -70,6 +37,9 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( a.version, 1, "Check version increased" );
 
 		} );
+
+		// PUBLIC STUFF
+		QUnit.test( "isInterleavedBuffer", ( assert ) => {} );
 
 		QUnit.test( "setArray", ( assert ) => {
 
@@ -99,6 +69,18 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "setDynamic", ( assert ) => {} );
+
+		QUnit.test( "copy", ( assert ) => {
+
+			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
+			var instance = new InterleavedBuffer( array, 3 );
+			instance.setDynamic( true );
+
+			checkInstanceAgainstCopy( instance, instance.copy( instance ), assert );
+
+		} );
+
 		QUnit.test( "copyAt", ( assert ) => {
 
 			var a = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ), 3 );
@@ -113,6 +95,25 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "set", ( assert ) => {
+
+			var instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
+
+			instance.set( [ 0, - 1 ] );
+			assert.ok( instance.array[ 0 ] === 0 && instance.array[ 1 ] === - 1, "replace at first by default" );
+
+		} );
+
+		QUnit.test( "clone", ( assert ) => {
+
+			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
+			var instance = new InterleavedBuffer( array, 3 );
+			instance.setDynamic( true );
+
+			checkInstanceAgainstCopy( instance, instance.clone(), assert );
+
+		} );
+
 		QUnit.test( "onUpload", ( assert ) => {
 
 			var a = new InterleavedBuffer();
@@ -121,6 +122,15 @@ export default QUnit.module( 'Core', () => {
 			a.onUpload( func );
 
 			assert.strictEqual( a.onUploadCallback, func, "Check callback was set properly" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( "count", ( assert ) => {
+
+			var instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
+
+			assert.equal( instance.count, 2, "count is calculated via array length / stride" );
 
 		} );
 

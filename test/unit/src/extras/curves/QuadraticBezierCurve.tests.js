@@ -23,7 +23,19 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "Simple curve", function ( assert ) {
+			// INHERITANCE
+			QUnit.test( "Extending", ( assert ) => {} );
+
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
+
+			// PUBLIC STUFF
+			QUnit.test( "isQuadraticBezierCurve", ( assert ) => {} );
+
+			QUnit.test( "getPoint", ( assert ) => {} );
+
+			// OTHERS
+			QUnit.test( "Simple curve", ( assert ) => {
 
 				var curve = _curve;
 
@@ -52,7 +64,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getLength/getLengths", function ( assert ) {
+			QUnit.test( "getLength/getLengths", ( assert ) => {
 
 				var curve = _curve;
 
@@ -80,7 +92,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getPointAt", function ( assert ) {
+			QUnit.test( "getPointAt", ( assert ) => {
 
 				var curve = _curve;
 
@@ -102,7 +114,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getTangent/getTangentAt", function ( assert ) {
+			QUnit.test( "getTangent/getTangentAt", ( assert ) => {
 
 				var curve = _curve;
 
@@ -160,7 +172,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getUtoTmapping", function ( assert ) {
+			QUnit.test( "getUtoTmapping", ( assert ) => {
 
 				var curve = _curve;
 
@@ -176,7 +188,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( "getSpacedPoints", function ( assert ) {
+			QUnit.test( "getSpacedPoints", ( assert ) => {
 
 				var curve = _curve;
 

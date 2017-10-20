@@ -15,24 +15,25 @@ import { Mesh } from '../../../../src/objects/Mesh';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
 import { zero3, one3 } from './Constants.tests';
 
+const unit3 = new Vector3( 1, 0, 0 );
+
+function planeEquals( a, b, tolerance ) {
+
+	tolerance = tolerance || 0.0001;
+
+	if ( a.normal.distanceTo( b.normal ) > tolerance ) return false;
+	if ( Math.abs( a.constant - b.constant ) > tolerance ) return false;
+
+	return true;
+
+}
+
 export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Frustum', () => {
-
-		var unit3 = new Vector3( 1, 0, 0 );
-
-		var planeEquals = function ( a, b, tolerance ) {
-
-			tolerance = tolerance || 0.0001;
-
-			if ( a.normal.distanceTo( b.normal ) > tolerance ) return false;
-			if ( Math.abs( a.constant - b.constant ) > tolerance ) return false;
-
-			return true;
-
-		};
-
-		QUnit.test( "constructor", ( assert ) => {
+		
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Frustum();
 
@@ -60,6 +61,52 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.planes[ 3 ].equals( p3 ), "Passed!" );
 			assert.ok( a.planes[ 4 ].equals( p4 ), "Passed!" );
 			assert.ok( a.planes[ 5 ].equals( p5 ), "Passed!" );
+
+		} );
+
+		// PUBLIC STUFF
+		QUnit.test( "set", ( assert ) => {
+
+			var a = new Frustum();
+			var p0 = new Plane( unit3, - 1 );
+			var p1 = new Plane( unit3, 1 );
+			var p2 = new Plane( unit3, 2 );
+			var p3 = new Plane( unit3, 3 );
+			var p4 = new Plane( unit3, 4 );
+			var p5 = new Plane( unit3, 5 );
+
+			a.set( p0, p1, p2, p3, p4, p5 );
+
+			assert.ok( a.planes[ 0 ].equals( p0 ), "Check plane #0" );
+			assert.ok( a.planes[ 1 ].equals( p1 ), "Check plane #1" );
+			assert.ok( a.planes[ 2 ].equals( p2 ), "Check plane #2" );
+			assert.ok( a.planes[ 3 ].equals( p3 ), "Check plane #3" );
+			assert.ok( a.planes[ 4 ].equals( p4 ), "Check plane #4" );
+			assert.ok( a.planes[ 5 ].equals( p5 ), "Check plane #5" );
+
+		} );
+
+		QUnit.test( "clone", ( assert ) => {
+
+			var p0 = new Plane( unit3, - 1 );
+			var p1 = new Plane( unit3, 1 );
+			var p2 = new Plane( unit3, 2 );
+			var p3 = new Plane( unit3, 3 );
+			var p4 = new Plane( unit3, 4 );
+			var p5 = new Plane( unit3, 5 );
+
+			var b = new Frustum( p0, p1, p2, p3, p4, p5 );
+			var a = b.clone();
+			assert.ok( a.planes[ 0 ].equals( p0 ), "Passed!" );
+			assert.ok( a.planes[ 1 ].equals( p1 ), "Passed!" );
+			assert.ok( a.planes[ 2 ].equals( p2 ), "Passed!" );
+			assert.ok( a.planes[ 3 ].equals( p3 ), "Passed!" );
+			assert.ok( a.planes[ 4 ].equals( p4 ), "Passed!" );
+			assert.ok( a.planes[ 5 ].equals( p5 ), "Passed!" );
+
+			// ensure it is a true copy by modifying source
+			a.planes[ 0 ].copy( p1 );
+			assert.ok( b.planes[ 0 ].equals( p0 ), "Passed!" );
 
 		} );
 
@@ -157,51 +204,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
-
-			var p0 = new Plane( unit3, - 1 );
-			var p1 = new Plane( unit3, 1 );
-			var p2 = new Plane( unit3, 2 );
-			var p3 = new Plane( unit3, 3 );
-			var p4 = new Plane( unit3, 4 );
-			var p5 = new Plane( unit3, 5 );
-
-			var b = new Frustum( p0, p1, p2, p3, p4, p5 );
-			var a = b.clone();
-			assert.ok( a.planes[ 0 ].equals( p0 ), "Passed!" );
-			assert.ok( a.planes[ 1 ].equals( p1 ), "Passed!" );
-			assert.ok( a.planes[ 2 ].equals( p2 ), "Passed!" );
-			assert.ok( a.planes[ 3 ].equals( p3 ), "Passed!" );
-			assert.ok( a.planes[ 4 ].equals( p4 ), "Passed!" );
-			assert.ok( a.planes[ 5 ].equals( p5 ), "Passed!" );
-
-			// ensure it is a true copy by modifying source
-			a.planes[ 0 ].copy( p1 );
-			assert.ok( b.planes[ 0 ].equals( p0 ), "Passed!" );
-
-		} );
-
-		QUnit.test( "set", ( assert ) => {
-
-			var a = new Frustum();
-			var p0 = new Plane( unit3, - 1 );
-			var p1 = new Plane( unit3, 1 );
-			var p2 = new Plane( unit3, 2 );
-			var p3 = new Plane( unit3, 3 );
-			var p4 = new Plane( unit3, 4 );
-			var p5 = new Plane( unit3, 5 );
-
-			a.set( p0, p1, p2, p3, p4, p5 );
-
-			assert.ok( a.planes[ 0 ].equals( p0 ), "Check plane #0" );
-			assert.ok( a.planes[ 1 ].equals( p1 ), "Check plane #1" );
-			assert.ok( a.planes[ 2 ].equals( p2 ), "Check plane #2" );
-			assert.ok( a.planes[ 3 ].equals( p3 ), "Check plane #3" );
-			assert.ok( a.planes[ 4 ].equals( p4 ), "Check plane #4" );
-			assert.ok( a.planes[ 5 ].equals( p5 ), "Check plane #5" );
-
-		} );
-
 		QUnit.test( "intersectsObject", ( assert ) => {
 
 			var m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
@@ -244,6 +246,8 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "intersectsSphere", ( assert ) => {} );
+
 		QUnit.test( "intersectsBox", ( assert ) => {
 
 			var m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
@@ -260,6 +264,8 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( intersects, "Successful intersection" );
 
 		} );
+
+		QUnit.test( "containsPoint", ( assert ) => {} );
 
 	} );
 

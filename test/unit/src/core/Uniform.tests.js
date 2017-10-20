@@ -15,7 +15,8 @@ export default QUnit.module( 'Core', () => {
 
 	QUnit.module( 'Uniform', () => {
 
-		QUnit.test( "constructor", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a;
 			var b = new Vector3( x, y, z );
@@ -28,6 +29,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		// PUBLIC STUFF
 		QUnit.test( "clone", ( assert ) => {
 
 			var a = new Uniform( 23 );

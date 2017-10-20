@@ -41,6 +41,18 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
+		QUnit.test( "update", ( assert ) => {} );
+
+		QUnit.test( "setFromObject", ( assert ) => {} );
+
+		// OTHERS
 		QUnit.test( 'Standard geometry tests', ( assert ) => {
 
 			runStdGeometryTests( assert, geometries );

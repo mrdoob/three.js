@@ -9,11 +9,13 @@ export default QUnit.module( 'Audios', () => {
 
 	QUnit.module.todo( 'AudioAnalyser', () => {
 
-		QUnit.test( 'write me !', ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
 
-			assert.ok( false, "everything's gonna be alright" );
+		// PUBLIC STUFF
+		QUnit.test( "getFrequencyData", ( assert ) => {} );
 
-		} );
+		QUnit.test( "getAverageFrequency", ( assert ) => {} );
 
 	} );
 

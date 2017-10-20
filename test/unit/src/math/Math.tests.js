@@ -10,6 +10,7 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Math', () => {
 
+		// PUBLIC STUFF
 		QUnit.test( "generateUUID", ( assert ) => {
 
 			var a = ThreeMath.generateUUID();
@@ -48,6 +49,8 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "lerp", ( assert ) => {} );
+
 		QUnit.test( "smoothstep", ( assert ) => {
 
 			assert.strictEqual( ThreeMath.smoothstep( - 1, 0, 2 ), 0, "Value lower than minimum" );
@@ -59,6 +62,8 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( ThreeMath.smoothstep( 3, 0, 2 ), 1, "Value highter than maximum" );
 
 		} );
+
+		QUnit.test( "smootherstep", ( assert ) => {} );
 
 		QUnit.test( "randInt", ( assert ) => {
 

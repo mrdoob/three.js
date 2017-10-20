@@ -21,7 +21,8 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Line3', () => {
 
-		QUnit.test( "constructor/equals", ( assert ) => {
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
 			var a = new Line3();
 			assert.ok( a.start.equals( zero3 ), "Passed!" );
@@ -29,6 +30,17 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Line3( two3.clone(), one3.clone() );
 			assert.ok( a.start.equals( two3 ), "Passed!" );
+			assert.ok( a.end.equals( one3 ), "Passed!" );
+
+		} );
+
+		// PUBLIC STUFF
+		QUnit.test( "set", ( assert ) => {
+
+			var a = new Line3();
+
+			a.set( one3, one3 );
+			assert.ok( a.start.equals( one3 ), "Passed!" );
 			assert.ok( a.end.equals( one3 ), "Passed!" );
 
 		} );
@@ -48,13 +60,42 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "set", ( assert ) => {
+		QUnit.test( "clone/equal", ( assert ) => {
 
 			var a = new Line3();
+			var b = new Line3( zero3, new Vector3( 1, 1, 1 ) );
+			var c = new Line3( zero3, new Vector3( 1, 1, 0 ) );
 
-			a.set( one3, one3 );
-			assert.ok( a.start.equals( one3 ), "Passed!" );
-			assert.ok( a.end.equals( one3 ), "Passed!" );
+			assert.notOk( a.equals( b ), "Check a and b aren't equal" );
+			assert.notOk( a.equals( c ), "Check a and c aren't equal" );
+			assert.notOk( b.equals( c ), "Check b and c aren't equal" );
+
+			var a = b.clone();
+			assert.ok( a.equals( b ), "Check a and b are equal after clone()" );
+			assert.notOk( a.equals( c ), "Check a and c aren't equal after clone()" );
+
+			a.set( zero3, zero3 );
+			assert.notOk( a.equals( b ), "Check a and b are not equal after modification" );
+
+		} );
+
+		QUnit.test( "getCenter", ( assert ) => {} );
+
+		QUnit.test( "delta", ( assert ) => {} );
+
+		QUnit.test( "distanceSq", ( assert ) => {} );
+
+		QUnit.test( "distance", ( assert ) => {
+
+			var a = new Line3( zero3, zero3 );
+			var b = new Line3( zero3, one3 );
+			var c = new Line3( one3.clone().negate(), one3 );
+			var d = new Line3( two3.clone().multiplyScalar( - 2 ), two3.clone().negate() );
+
+			assert.numEqual( a.distance(), 0, "Check distance for zero-length line" );
+			assert.numEqual( b.distance(), Math.sqrt( 3 ), "Check distance for simple line" );
+			assert.numEqual( c.distance(), Math.sqrt( 12 ), "Check distance for negative to positive endpoints" );
+			assert.numEqual( d.distance(), Math.sqrt( 12 ), "Check distance for negative to negative endpoints" );
 
 		} );
 
@@ -95,39 +136,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone/equal", ( assert ) => {
-
-			var a = new Line3();
-			var b = new Line3( zero3, new Vector3( 1, 1, 1 ) );
-			var c = new Line3( zero3, new Vector3( 1, 1, 0 ) );
-
-			assert.notOk( a.equals( b ), "Check a and b aren't equal" );
-			assert.notOk( a.equals( c ), "Check a and c aren't equal" );
-			assert.notOk( b.equals( c ), "Check b and c aren't equal" );
-
-			var a = b.clone();
-			assert.ok( a.equals( b ), "Check a and b are equal after clone()" );
-			assert.notOk( a.equals( c ), "Check a and c aren't equal after clone()" );
-
-			a.set( zero3, zero3 );
-			assert.notOk( a.equals( b ), "Check a and b are not equal after modification" );
-
-		} );
-
-		QUnit.test( "distance", ( assert ) => {
-
-			var a = new Line3( zero3, zero3 );
-			var b = new Line3( zero3, one3 );
-			var c = new Line3( one3.clone().negate(), one3 );
-			var d = new Line3( two3.clone().multiplyScalar( - 2 ), two3.clone().negate() );
-
-			assert.numEqual( a.distance(), 0, "Check distance for zero-length line" );
-			assert.numEqual( b.distance(), Math.sqrt( 3 ), "Check distance for simple line" );
-			assert.numEqual( c.distance(), Math.sqrt( 12 ), "Check distance for negative to positive endpoints" );
-			assert.numEqual( d.distance(), Math.sqrt( 12 ), "Check distance for negative to negative endpoints" );
-
-		} );
-
 		QUnit.test( "applyMatrix4", ( assert ) => {
 
 			var a = new Line3( zero3.clone(), two3.clone() );
@@ -165,6 +173,8 @@ export default QUnit.module( 'Maths', () => {
 			assert.numEqual( a.end.z, b.z / b.w, "Both: check end.z" );
 
 		} );
+
+		QUnit.test( "equals", ( assert ) => {} );
 
 	} );
 

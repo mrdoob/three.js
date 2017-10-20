@@ -11,11 +11,11 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'WebGLMorphtargets', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
-
-				assert.ok( false, "everything's gonna be alright" );
-
-			} );
+			// INSTANCING
+			QUnit.test( "Instancing", ( assert ) => {} );
+			
+			// PUBLIC STUFF
+			QUnit.test( "update", ( assert ) => {} );
 
 		} );
 

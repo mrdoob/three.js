@@ -24,6 +24,13 @@ export default QUnit.module( 'Core', () => {
 
 		}
 
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {} );
+
+		// PUBLIC STUFF
 		QUnit.test( "copy", ( assert ) => {
 
 			var instanceMock1 = {};
@@ -60,6 +67,8 @@ export default QUnit.module( 'Core', () => {
 			assert.equal( copiedInstance.groups[ 1 ].materialIndex, instanceMock2, "group was copied" );
 
 		} );
+
+		QUnit.test( "clone", ( assert ) => {} );
 
 	} );
 

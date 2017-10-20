@@ -8,6 +8,11 @@ import { Vector3 } from '../../../src/math/Vector3';
 
 export default QUnit.module( 'Polyfills', () => {
 
+	// PUBLIC STUFF
+	QUnit.test( "Number.EPSILON", ( assert ) => {} );
+
+	QUnit.test( "Number.isInteger", ( assert ) => {} );
+
 	//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
 	//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-math.sign
 	/*
@@ -45,5 +50,9 @@ export default QUnit.module( 'Polyfills', () => {
 		}
 
 	} );
+
+	QUnit.test( "'name' in Function.prototype", ( assert ) => {} );
+
+	QUnit.test( "Object.assign", ( assert ) => {} );
 
 } );
