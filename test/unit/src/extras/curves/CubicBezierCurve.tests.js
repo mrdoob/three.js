@@ -47,7 +47,7 @@ export default QUnit.module( 'Extras', () => {
 					new Vector2( 10, 0 )
 				];
 
-				const points = curve.getPoints( expectedPoints.length - 1 );
+				var points = curve.getPoints( expectedPoints.length - 1 );
 
 				assert.strictEqual( points.length, expectedPoints.length, "Correct number of points" );
 				assert.deepEqual( points, expectedPoints, "Correct points calculated" );
@@ -57,7 +57,7 @@ export default QUnit.module( 'Extras', () => {
 					curve.v3, curve.v2, curve.v1, curve.v0
 				);
 
-				const points = curveRev.getPoints( expectedPoints.length - 1 );
+				var points = curveRev.getPoints( expectedPoints.length - 1 );
 
 				assert.strictEqual( points.length, expectedPoints.length, "Reversed: Correct number of points" );
 				assert.deepEqual( points, expectedPoints.reverse(), "Reversed: Correct points curve" );
@@ -112,7 +112,7 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( "getTangent/getTangentAt", ( assert ) => {
 
-				const expectedTangents = [
+				var expectedTangents = [
 					new Vector2( 0.316370061632252, 0.9486358543207215 ),
 					new Vector2( 0.838961283088303, 0.5441911111721949 ),
 					new Vector2( 1, 0 ),
@@ -120,7 +120,7 @@ export default QUnit.module( 'Extras', () => {
 					new Vector2( - 0.5546041767829665, - 0.8321142992972107 )
 				];
 
-				const tangents = [
+				var tangents = [
 					curve.getTangent( 0 ),
 					curve.getTangent( 0.25 ),
 					curve.getTangent( 0.5 ),
@@ -139,7 +139,7 @@ export default QUnit.module( 'Extras', () => {
 
 				//
 
-				const expectedTangents = [
+				var expectedTangents = [
 					new Vector2( 0.316370061632252, 0.9486358543207215 ),
 					new Vector2( 0.7794223085548987, 0.6264988945935596 ),
 					new Vector2( 0.988266153082452, 0.15274164681452052 ),
@@ -147,7 +147,7 @@ export default QUnit.module( 'Extras', () => {
 					new Vector2( - 0.5546041767829665, - 0.8321142992972107 )
 				];
 
-				const tangents = [
+				var tangents = [
 					curve.getTangentAt( 0 ),
 					curve.getTangentAt( 0.25 ),
 					curve.getTangentAt( 0.5 ),
