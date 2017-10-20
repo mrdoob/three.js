@@ -3,14 +3,14 @@
  */
 /* global QUnit */
 
-import { QuadraticBezierCurve } from '../../../../../src/extras/curves/QuadraticBezierCurve';
+import { QuadraticBezierCurve3 } from '../../../../../src/extras/curves/QuadraticBezierCurve3';
 import { Vector3 } from '../../../../../src/math/Vector3';
 
 export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module.todo( 'QuadraticBezierCurve', ( hooks ) => {
+		QUnit.module.todo( 'QuadraticBezierCurve3', ( hooks ) => {
 
 			let _curve = undefined;
 			hooks.before( function () {
