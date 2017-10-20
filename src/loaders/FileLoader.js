@@ -5,6 +5,8 @@
 import { Cache } from './Cache.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
+var currentlyLoadingFiles = {};
+
 function FileLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
@@ -36,6 +38,19 @@ Object.assign( FileLoader.prototype, {
 			}, 0 );
 
 			return cached;
+
+		}
+
+		// If file is already in process of loading, wait for it to load.
+		if ( currentlyLoadingFiles[ url ] !== undefined ) {
+
+			currentlyLoadingFiles[ url ].push( function () {
+
+				scope.load( url, onLoad, onProgress, onError );
+
+			} );
+
+			return;
 
 		}
 
@@ -131,6 +146,14 @@ Object.assign( FileLoader.prototype, {
 		} else {
 
 			var request = new XMLHttpRequest();
+
+			if ( Cache.enabled ) {
+
+				// Allow other file loaders to wait and subscribe on this request.
+				currentlyLoadingFiles[ url ] = [];
+
+			}
+
 			request.open( 'GET', url, true );
 
 			request.addEventListener( 'load', function ( event ) {
@@ -162,6 +185,21 @@ Object.assign( FileLoader.prototype, {
 
 					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
+
+				}
+
+				if ( Cache.enabled ) {
+
+					var duplicateRequests = currentlyLoadingFiles[ url ];
+
+					delete currentlyLoadingFiles[ url ];
+
+					// Tell other requests for the same file that the file has finished loading.
+					for ( var i = 0; i < duplicateRequests.length; i ++ ) {
+
+						duplicateRequests[i]( response );
+
+					}
 
 				}
 
