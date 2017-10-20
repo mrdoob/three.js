@@ -5,7 +5,7 @@
 import { Cache } from './Cache.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
 
-var currentlyLoadingFiles = {};
+var loading = {};
 
 function FileLoader( manager ) {
 
@@ -41,10 +41,11 @@ Object.assign( FileLoader.prototype, {
 
 		}
 
-		// If file is already in process of loading, wait for it to load.
-		if ( currentlyLoadingFiles[ url ] !== undefined ) {
+		// Check if request is duplicate
 
-			currentlyLoadingFiles[ url ].push( function () {
+		if ( loading[ url ] !== undefined ) {
+
+			loading[ url ].push( function () {
 
 				scope.load( url, onLoad, onProgress, onError );
 
@@ -145,14 +146,11 @@ Object.assign( FileLoader.prototype, {
 
 		} else {
 
+			// Initialise array for duplicate requests
+
+			loading[ url ] = [];
+
 			var request = new XMLHttpRequest();
-
-			if ( Cache.enabled ) {
-
-				// Allow other file loaders to wait and subscribe on this request.
-				currentlyLoadingFiles[ url ] = [];
-
-			}
 
 			request.open( 'GET', url, true );
 
@@ -188,20 +186,17 @@ Object.assign( FileLoader.prototype, {
 
 				}
 
-				if ( Cache.enabled ) {
+				// Clean up duplicate requests.
 
-					var duplicateRequests = currentlyLoadingFiles[ url ];
+				var callbacks = loading[ url ];
 
-					delete currentlyLoadingFiles[ url ];
+				for ( var i = 0; i < callbacks.length; i ++ ) {
 
-					// Tell other requests for the same file that the file has finished loading.
-					for ( var i = 0; i < duplicateRequests.length; i ++ ) {
-
-						duplicateRequests[i]( response );
-
-					}
+					callbacks[ i ]( response );
 
 				}
+
+				delete loading[ url ];
 
 			}, false );
 
