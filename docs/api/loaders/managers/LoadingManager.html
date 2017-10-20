@@ -121,22 +121,22 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setResourceTransform]( [page:Function callback] )</h3>
+		<h3>[method:null setURLModifier]( [page:Function callback] )</h3>
 		<div>
-		[page:Function callback] — transform callback. Called with [page:String url] argument, and
+		[page:Function callback] — URL modifier callback. Called with [page:String url] argument, and
 		must return [page:String resolvedURL].<br /><br />
 
-		If provided, the transform callback will be passed each resource URL before a request is sent.
-		The callback may return the original URL, or a new URL to override loading behavior. This
+		If provided, the callback will be passed each resource URL before a request is sent. The
+		callback may return the original URL, or a new URL to override loading behavior. This
 		behavior can be used to load assets from .ZIP files, drag-and-drop APIs, and Data URIs.
 		</div>
 
-		<h3>[method:String resolveResourceURL]( [page:String url] )</h3>
+		<h3>[method:String resolveURL]( [page:String url] )</h3>
 		<div>
 		[page:String url] — the url to load<br /><br />
 
-		Given a URL, uses the resource transform callback (if any) and returns a resolved URL. If no
-		transform is set, returns the original URL.
+		Given a URL, uses the URL modifier callback (if any) and returns a resolved URL. If no
+		URL modifier is set, returns the original URL.
 		</div>
 
 		<br /><br />

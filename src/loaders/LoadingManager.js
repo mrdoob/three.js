@@ -9,7 +9,7 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	var isLoading = false;
 	var itemsLoaded = 0;
 	var itemsTotal = 0;
-	var resourceTransform = undefined;
+	var urlModifier = undefined;
 
 	this.onStart = undefined;
 	this.onLoad = onLoad;
@@ -68,11 +68,11 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 	};
 
-	this.resolveResourceURL = function ( url ) {
+	this.resolveURL = function ( url ) {
 
-		if ( resourceTransform ) {
+		if ( urlModifier ) {
 
-			return resourceTransform( url );
+			return urlModifier( url );
 
 		}
 
@@ -80,9 +80,9 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 	};
 
-	this.setResourceTransform = function ( transform ) {
+	this.setURLModifier = function ( transform ) {
 
-		resourceTransform = transform;
+		urlModifier = transform;
 
 	};
 
