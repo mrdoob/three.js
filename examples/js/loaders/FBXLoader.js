@@ -2082,7 +2082,7 @@
 
 				if ( 'CustomFrameRate' in FBXTree.GlobalSettings.properties ) {
 
-					fps = parseFloat( FBXTree.GlobalSettings.properties.CustomFrameRate.value );
+					fps = FBXTree.GlobalSettings.properties.CustomFrameRate.value;
 
 					fps = ( fps === - 1 ) ? 30 : fps;
 
