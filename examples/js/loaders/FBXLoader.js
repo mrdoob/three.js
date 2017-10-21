@@ -563,56 +563,44 @@
 			switch ( type ) {
 
 				case 'Bump':
-				case ' "Bump':
 					parameters.bumpMap = textureMap.get( relationship.ID );
 					break;
 
 				case 'DiffuseColor':
-				case ' "DiffuseColor':
 					parameters.map = textureMap.get( relationship.ID );
 					break;
 
 				case 'DisplacementColor':
-				case ' "DisplacementColor':
 					parameters.displacementMap = textureMap.get( relationship.ID );
 					break;
 
 
 				case 'EmissiveColor':
-				case ' "EmissiveColor':
 					parameters.emissiveMap = textureMap.get( relationship.ID );
 					break;
 
 				case 'NormalMap':
-				case ' "NormalMap':
 					parameters.normalMap = textureMap.get( relationship.ID );
 					break;
 
 				case 'ReflectionColor':
-				case ' "ReflectionColor':
 					parameters.envMap = textureMap.get( relationship.ID );
 					parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
 					break;
 
 				case 'SpecularColor':
-				case ' "SpecularColor':
 					parameters.specularMap = textureMap.get( relationship.ID );
 					break;
 
 				case 'TransparentColor':
-				case ' "TransparentColor':
 					parameters.alphaMap = textureMap.get( relationship.ID );
 					parameters.transparent = true;
 					break;
 
 				case 'AmbientColor':
-				case ' "AmbientColor':
 				case 'ShininessExponent': // AKA glossiness map
-				case ' "ShininessExponent':
 				case 'SpecularFactor': // AKA specularLevel
-				case ' "SpecularFactor':
 				case 'VectorDisplacementColor': // NOTE: Seems to be a copy of DisplacementColor
-				case ' "VectorDisplacementColor':
 				default:
 					console.warn( 'THREE.FBXLoader: %s map is not supported in three.js, skipping texture.', type );
 					break;
@@ -4313,10 +4301,17 @@
 			if ( propName === 'C' ) {
 
 				var connProps = propValue.split( ',' ).slice( 1 );
+
 				var from = parseInt( connProps[ 0 ] );
 				var to = parseInt( connProps[ 1 ] );
 
 				var rest = propValue.split( ',' ).slice( 3 );
+
+				rest = rest.map( function ( elem ) {
+
+					return elem.trim().replace( /^"/, '' );
+
+				} );
 
 				propName = 'connections';
 				propValue = [ from, to ];
