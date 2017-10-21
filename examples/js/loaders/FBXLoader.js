@@ -112,7 +112,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -391,12 +391,6 @@
 
 			var values = textureNode.properties.Scaling.value;
 
-			if ( typeof values === 'string' ) {
-
-				values = parseFloatArray( values );
-
-			}
-
 			texture.repeat.x = values[ 0 ];
 			texture.repeat.y = values[ 1 ];
 
@@ -505,7 +499,7 @@
 
 		if ( properties.BumpFactor ) {
 
-			parameters.bumpScale = parseFloat( properties.BumpFactor.value );
+			parameters.bumpScale = properties.BumpFactor.value;
 
 		}
 		if ( properties.Diffuse ) {
@@ -515,12 +509,12 @@
 		}
 		if ( properties.DisplacementFactor ) {
 
-			parameters.displacementScale = parseFloat( properties.DisplacementFactor.value );
+			parameters.displacementScale = properties.DisplacementFactor.value;
 
 		}
 		if ( properties.ReflectionFactor ) {
 
-			parameters.reflectivity = parseFloat( properties.ReflectionFactor.value );
+			parameters.reflectivity = properties.ReflectionFactor.value;
 
 		}
 		if ( properties.Specular ) {
@@ -530,7 +524,7 @@
 		}
 		if ( properties.Shininess ) {
 
-			parameters.shininess = parseFloat( properties.Shininess.value );
+			parameters.shininess = properties.Shininess.value;
 
 		}
 		if ( properties.Emissive ) {
@@ -1501,7 +1495,7 @@
 						} else {
 
 							var type = 0;
-							if ( cameraAttribute.CameraProjectionType !== undefined && ( cameraAttribute.CameraProjectionType.value === '1' || cameraAttribute.CameraProjectionType.value === 1 ) ) {
+							if ( cameraAttribute.CameraProjectionType !== undefined && cameraAttribute.CameraProjectionType.value === 1 ) {
 
 								type = 1;
 
@@ -1527,8 +1521,8 @@
 
 							if ( cameraAttribute.AspectWidth !== undefined && cameraAttribute.AspectHeight !== undefined ) {
 
-								width = parseFloat( cameraAttribute.AspectWidth.value );
-								height = parseFloat( cameraAttribute.AspectHeight.value );
+								width = cameraAttribute.AspectWidth.value;
+								height = cameraAttribute.AspectHeight.value;
 
 							}
 
@@ -1537,19 +1531,17 @@
 							var fov = 45;
 							if ( cameraAttribute.FieldOfView !== undefined ) {
 
-								fov = parseFloat( cameraAttribute.FieldOfView.value );
+								fov = cameraAttribute.FieldOfView.value;
 
 							}
 
 							switch ( type ) {
 
-								case '0': // Perspective
-								case 0:
+								case 0: // Perspective
 									model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
 									break;
 
-								case '1': // Orthographic
-								case 1:
+								case 1: // Orthographic
 									model = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
 									break;
 
@@ -1624,7 +1616,7 @@
 							var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
 
 							// light disabled
-							if ( lightAttribute.CastLightOnObject !== undefined && ( lightAttribute.CastLightOnObject.value === '0' || lightAttribute.CastLightOnObject.value === 0 ) ) {
+							if ( lightAttribute.CastLightOnObject !== undefined && lightAttribute.CastLightOnObject.value === 0 ) {
 
 								intensity = 0;
 
@@ -1633,7 +1625,7 @@
 							var distance = 0;
 							if ( lightAttribute.FarAttenuationEnd !== undefined ) {
 
-								if ( lightAttribute.EnableFarAttenuation !== undefined && ( lightAttribute.EnableFarAttenuation.value === '0' || lightAttribute.EnableFarAttenuation.value === 0 ) ) {
+								if ( lightAttribute.EnableFarAttenuation !== undefined && lightAttribute.EnableFarAttenuation.value === 0 ) {
 
 									distance = 0;
 
@@ -1651,18 +1643,15 @@
 
 							switch ( type ) {
 
-								case '0': // Point
-								case 0:
+								case 0: // Point
 									model = new THREE.PointLight( color, intensity, distance, decay );
 									break;
 
-								case '1': // Directional
-								case 1:
+								case 1: // Directional
 									model = new THREE.DirectionalLight( color, intensity );
 									break;
 
-								case '2': // Spot
-								case 2:
+								case 2: // Spot
 									var angle = Math.PI / 3;
 
 									if ( lightAttribute.InnerAngle !== undefined ) {
@@ -1692,7 +1681,7 @@
 
 							}
 
-							if ( lightAttribute.CastShadows !== undefined && ( lightAttribute.CastShadows.value === '1' || lightAttribute.CastShadows.value === 1 ) ) {
+							if ( lightAttribute.CastShadows !== undefined && lightAttribute.CastShadows.value === 1 ) {
 
 								model.castShadow = true;
 
@@ -1818,13 +1807,13 @@
 
 			if ( 'Lcl_Translation' in node.properties ) {
 
-				model.position.fromArray( parseFloatArray( node.properties.Lcl_Translation.value ) );
+				model.position.fromArray( node.properties.Lcl_Translation.value );
 
 			}
 
 			if ( 'Lcl_Rotation' in node.properties ) {
 
-				var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( degreeToRadian );
+				var rotation = node.properties.Lcl_Rotation.value.map( degreeToRadian );
 				rotation.push( 'ZYX' );
 				model.rotation.fromArray( rotation );
 
@@ -1832,7 +1821,7 @@
 
 			if ( 'Lcl_Scaling' in node.properties ) {
 
-				model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
+				model.scale.fromArray( node.properties.Lcl_Scaling.value );
 
 			}
 
@@ -1877,11 +1866,7 @@
 
 						if ( 'Lcl_Translation' in lookAtTarget.properties ) {
 
-							var pos = lookAtTarget.properties.Lcl_Translation.value.split( ',' ).map( function ( val ) {
-
-								return parseFloat( val );
-
-							} );
+							var pos = lookAtTarget.properties.Lcl_Translation.value;
 
 							// DirectionalLight, SpotLight
 							if ( model.target !== undefined ) {
@@ -4186,7 +4171,6 @@
 
 		parseNodeBegin: function ( line, nodeName, nodeAttrs ) {
 
-			// var nodeName = match[1];
 			var node = { 'name': nodeName, properties: {}, 'subNodes': {} };
 			var attrs = this.parseNodeAttr( nodeAttrs );
 			var currentNode = this.getCurrentNode();
@@ -4196,11 +4180,9 @@
 
 				this.allNodes.add( nodeName, node );
 
-			} else {
+			} else { // a subnode
 
-				// a subnode
-
-				// already exists subnode, then append it
+				// if the subnode already exists, append it
 				if ( nodeName in currentNode.subNodes ) {
 
 					var tmp = currentNode.subNodes[ nodeName ];
@@ -4245,6 +4227,7 @@
 				}
 
 			}
+
 
 			// for this		  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 			// NodeAttribute: 1001463072, "NodeAttribute::", "LimbNode" {
@@ -4295,8 +4278,8 @@
 			var currentNode = this.getCurrentNode();
 			var parentName = currentNode.name;
 
-			// special case parent node's is like "Properties70"
-			// these children nodes must treat with careful
+			// special case where the parent node is something like "Properties70"
+			// these children nodes must treated carefully
 			if ( parentName !== undefined ) {
 
 				var propMatch = parentName.match( /Properties(\d)+/ );
@@ -4309,7 +4292,7 @@
 
 			}
 
-			// special case Connections
+			// Connections
 			if ( propName === 'C' ) {
 
 				var connProps = propValue.split( ',' ).slice( 1 );
@@ -4330,7 +4313,7 @@
 
 			}
 
-			// special case Connections
+			// Node
 			if ( propName === 'Node' ) {
 
 				var id = parseInt( propValue );
@@ -4355,7 +4338,6 @@
 
 			} else {
 
-				// console.log( propName + ":  " + propValue );
 				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
 
 					currentNode.properties[ propName ].push( propValue );
@@ -4405,19 +4387,27 @@
 			}
 			*/
 
-			// cast value in its type
+			// cast value to its type
 			switch ( innerPropType1 ) {
 
 				case 'int':
+				case 'enum':
+				case 'bool':
+				case 'ULongLong':
 					innerPropValue = parseInt( innerPropValue );
 					break;
 
 				case 'double':
+				case 'Number':
+				case 'FieldOfView':
 					innerPropValue = parseFloat( innerPropValue );
 					break;
 
 				case 'ColorRGB':
 				case 'Vector3D':
+				case 'Lcl_Translation':
+				case 'Lcl_Rotation':
+				case 'Lcl_Scaling':
 					innerPropValue = parseFloatArray( innerPropValue );
 					break;
 
@@ -4666,12 +4656,6 @@
 					} else {
 
 						innerPropValue = node.propertyList[ 4 ];
-
-					}
-
-					if ( innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
-
-						innerPropValue = innerPropValue.toString();
 
 					}
 
