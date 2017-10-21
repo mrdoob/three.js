@@ -128,6 +128,12 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function generateId() {
+
+			return 'three_default_' + ( count ++ );
+
+		}
+
 		function isEmpty( object ) {
 
 			return Object.keys( object ).length === 0;
@@ -2727,7 +2733,7 @@ THREE.ColladaLoader.prototype = {
 			var data = {
 				name: xml.getAttribute( 'name' ),
 				type: xml.getAttribute( 'type' ),
-				id: xml.getAttribute( 'id' ),
+				id: xml.getAttribute( 'id' ) || generateId(),
 				sid: xml.getAttribute( 'sid' ),
 				matrix: new THREE.Matrix4(),
 				nodes: [],
@@ -2749,13 +2755,8 @@ THREE.ColladaLoader.prototype = {
 
 					case 'node':
 
-						if ( child.hasAttribute( 'id' ) ) {
-
-							data.nodes.push( child.getAttribute( 'id' ) );
-							parseNode( child );
-
-						}
-
+						data.nodes.push( child.getAttribute( 'id' ) || generateId() );
+						parseNode( child );
 						break;
 
 					case 'instance_camera':
@@ -2814,11 +2815,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			if ( xml.hasAttribute( 'id' ) ) {
-
-				library.nodes[ xml.getAttribute( 'id' ) ] = data;
-
-			}
+			library.nodes[ data.id ] = data;
 
 			return data;
 
@@ -3345,6 +3342,7 @@ THREE.ColladaLoader.prototype = {
 
 		var animations = [];
 		var kinematics = {};
+		var count = 0;
 
 		//
 
