@@ -2725,6 +2725,26 @@ THREE.ColladaLoader.prototype = {
 
 		// nodes
 
+		function prepareNodes( xml ) {
+
+			var elements = xml.getElementsByTagName( 'node' );
+
+			// ensure all node elements have id attributes
+
+			for ( var i = 0; i < elements.length; i ++ ) {
+
+				var element = elements[ i ];
+
+				if ( element.hasAttribute( 'id' ) === false ) {
+
+					element.setAttribute( 'id', generateId() );
+
+				}
+
+			}
+
+		}
+
 		var matrix = new THREE.Matrix4();
 		var vector = new THREE.Vector3();
 
@@ -2733,7 +2753,7 @@ THREE.ColladaLoader.prototype = {
 			var data = {
 				name: xml.getAttribute( 'name' ),
 				type: xml.getAttribute( 'type' ),
-				id: xml.getAttribute( 'id' ) || generateId(),
+				id: xml.getAttribute( 'id' ),
 				sid: xml.getAttribute( 'sid' ),
 				matrix: new THREE.Matrix4(),
 				nodes: [],
@@ -2754,8 +2774,7 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'node':
-
-						data.nodes.push( child.getAttribute( 'id' ) || generateId() );
+						data.nodes.push( child.getAttribute( 'id' ) );
 						parseNode( child );
 						break;
 
@@ -3216,6 +3235,8 @@ THREE.ColladaLoader.prototype = {
 				name: xml.getAttribute( 'name' ),
 				children: []
 			};
+
+			prepareNodes( xml );
 
 			var elements = getElementsByTagName( xml, 'node' );
 
