@@ -2,7 +2,7 @@
  * @author thespite / http://clicktorelease.com/
  */
 
-function detectCreateImageBitmap() {
+function detectCreateImageBitmap ( optionsList ) {
 
 	var url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 
@@ -21,12 +21,19 @@ function detectCreateImageBitmap() {
 
 		} ).then( function ( blob ) {
 
-			Promise.all( [
-				createImageBitmap( blob, { imageOrientation: 'none', premultiplyAlpha: 'none' } ),
-				createImageBitmap( blob, { imageOrientation: 'flipY', premultiplyAlpha: 'none' } ),
-				createImageBitmap( blob, { imageOrientation: 'none', premultiplyAlpha: 'premultiply' } ),
-				createImageBitmap( blob, { imageOrientation: 'flipY', premultiplyAlpha: 'premultiply' } )
-			] ).then( function () {
+			var pendingImages = [];
+
+			for ( var i = 0; i < optionsList.length; i ++ ) {
+
+				var pendingImage = optionsList[ i ] === undefined
+					? createImageBitmap( blob )
+					: createImageBitmap( blob, optionsList[ i ] );
+
+				pendingImages.push( pendingImage );
+
+			}
+
+			Promise.all( pendingImages ).then( function () {
 
 				resolve();
 
@@ -42,22 +49,26 @@ function detectCreateImageBitmap() {
 
 }
 
-var canUseImageBitmap = detectCreateImageBitmap();
-canUseImageBitmap.then( function () {
+var canUseImageBitmap = detectCreateImageBitmap( [ undefined ] );
 
-	console.log( 'THREE.ImageBitmapLoader: createImageBitmap() supported.' );
-
-} ).catch( function () {
-
-	console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
-
-} );
+var canUseImageBitmapOptions = detectCreateImageBitmap( [
+	{ imageOrientation: 'none', premultiplyAlpha: 'none' },
+	{ imageOrientation: 'flipY', premultiplyAlpha: 'none' },
+	{ imageOrientation: 'none', premultiplyAlpha: 'premultiply' },
+	{ imageOrientation: 'flipY', premultiplyAlpha: 'premultiply' }
+] );
 
 
 THREE.ImageBitmapLoader = function ( manager ) {
 
+	canUseImageBitmap.catch( function () {
+
+		console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+
+	} );
+
 	this.manager = manager !== undefined ? manager : THREE.DefaultLoadingManager;
-	this.options = {};
+	this.options = undefined;
 
 };
 
@@ -66,6 +77,12 @@ THREE.ImageBitmapLoader.prototype = {
 	constructor: THREE.ImageBitmapLoader,
 
 	setOptions: function setOptions( options ) {
+
+		canUseImageBitmapOptions.catch( function () {
+
+			console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() options not supported.' );
+
+		} );
 
 		this.options = options;
 		return this;
@@ -102,15 +119,17 @@ THREE.ImageBitmapLoader.prototype = {
 
 			return res.blob();
 
-		} ).then( function ( res ) {
+		} ).then( function ( blob ) {
 
-			return createImageBitmap( res, scope.options );
+			return scope.options === undefined
+				? createImageBitmap( blob )
+				: createImageBitmap( blob, scope.options );
 
-		} ).then( function ( res ) {
+		} ).then( function ( imageBitmap ) {
 
-			THREE.Cache.add( url, res );
+			THREE.Cache.add( url, imageBitmap );
 
-			if ( onLoad ) onLoad( res );
+			if ( onLoad ) onLoad( imageBitmap );
 
 			scope.manager.itemEnd( url );
 
