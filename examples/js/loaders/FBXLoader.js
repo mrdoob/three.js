@@ -1859,17 +1859,13 @@
 
 					var child = conns.children[ childrenIndex ];
 
-					if ( child.relationship === 'LookAtProperty' || child.relationship === ' "LookAtProperty' ) {
+					if ( child.relationship === 'LookAtProperty' ) {
 
 						var lookAtTarget = FBXTree.Objects.subNodes.Model[ child.ID ];
 
 						if ( 'Lcl_Translation' in lookAtTarget.properties ) {
 
-							var pos = lookAtTarget.properties.Lcl_Translation.value.split( ',' ).map( function ( val ) {
-
-								return parseFloat( val );
-
-							} );
+							var pos = lookAtTarget.properties.Lcl_Translation.value;
 
 							// DirectionalLight, SpotLight
 							if ( model.target !== undefined ) {
