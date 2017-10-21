@@ -1865,7 +1865,11 @@
 
 						if ( 'Lcl_Translation' in lookAtTarget.properties ) {
 
-							var pos = lookAtTarget.properties.Lcl_Translation.value;
+							var pos = lookAtTarget.properties.Lcl_Translation.value.split( ',' ).map( function ( val ) {
+
+								return parseFloat( val );
+
+							} );
 
 							// DirectionalLight, SpotLight
 							if ( model.target !== undefined ) {
@@ -4297,7 +4301,6 @@
 			if ( propName === 'C' ) {
 
 				var connProps = propValue.split( ',' ).slice( 1 );
-
 				var from = parseInt( connProps[ 0 ] );
 				var to = parseInt( connProps[ 1 ] );
 
