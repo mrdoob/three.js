@@ -74,14 +74,22 @@ THREE.GLTFLoader = ( function () {
 
 				extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
 				content = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
+				var json = JSON.parse( content );
 
 			} else {
 
-				content = convertUint8ArrayToString( new Uint8Array( data ) );
+				try {
+
+					var json = JSON.parse( data );
+
+				} catch ( e ) {
+
+					content = convertUint8ArrayToString( new Uint8Array( data ) );
+					var json = JSON.parse( content );
+
+				}
 
 			}
-
-			var json = JSON.parse( content );
 
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
