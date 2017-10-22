@@ -1745,7 +1745,7 @@
 
 						} else {
 
-							material = new THREE.MeshPhongdMaterial( { color: 0xcccccc } );
+							material = new THREE.MeshPhongMaterial( { color: 0xcccccc } );
 							materials.push( material );
 
 						}
