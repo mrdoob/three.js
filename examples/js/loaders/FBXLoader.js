@@ -2515,6 +2515,7 @@
 			if ( nodeID.match( /\d+/ ) ) {
 
 				var animationNode = parseAnimationNode( FBXTree, rawNodes[ nodeID ], connections, sceneGraph );
+
 				animationCurveNodes.push( animationNode );
 
 			}
@@ -3687,6 +3688,7 @@
 
 						if ( node.name === bone.name ) {
 
+							// if( node.name === 'RightArmRoll' ) console.log( generateKey( animations, animationNode, bone, frame ) )
 							node.keys.push( generateKey( animations, animationNode, bone, frame ) );
 
 						}
@@ -3718,6 +3720,8 @@
 			scl: bone.scale.toArray()
 		};
 
+		euler.setFromQuaternion( bone.quaternion, 'ZYX', false );
+
 		if ( animationNode === undefined ) return key;
 
 		try {
@@ -3730,12 +3734,31 @@
 
 			if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
 
-				var rotationX = animationNode.R.curves.x.values[ frame ];
-				var rotationY = animationNode.R.curves.y.values[ frame ];
-				var rotationZ = animationNode.R.curves.z.values[ frame ];
+				// Only update the euler's values if rotation is defined for the axis on this frame
+				// other stay with the previously defined value
+				if ( animationNode.R.curves.x.values[ frame ] ) {
 
-				quaternion.setFromEuler( euler.set( rotationX, rotationY, rotationZ, 'ZYX' ) );
+					euler.x = animationNode.R.curves.x.values[ frame ];
+
+				}
+
+				if ( animationNode.R.curves.y.values[ frame ] ) {
+
+					euler.y = animationNode.R.curves.y.values[ frame ];
+
+				}
+
+				if ( animationNode.R.curves.z.values[ frame ] ) {
+
+					euler.z = animationNode.R.curves.z.values[ frame ];
+
+				}
+
+				quaternion.setFromEuler( euler );
 				key.rot = quaternion.toArray();
+
+
+
 
 			}
 
