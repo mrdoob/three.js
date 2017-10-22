@@ -1932,22 +1932,24 @@
 		// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
 		sceneGraph.updateMatrixWorld( true );
 
-		// Put skeleton into bind pose.
-		var BindPoseNode = FBXTree.Objects.subNodes.Pose;
-		for ( var nodeID in BindPoseNode ) {
+		var worldMatrices = new Map();
 
-			if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
+    // Put skeleton into bind pose.
+		if ( 'Pose' in FBXTree.Objects.subNodes ) {
 
-				BindPoseNode = BindPoseNode[ nodeID ];
-				break;
+			var BindPoseNode = FBXTree.Objects.subNodes.Pose;
+			for ( var nodeID in BindPoseNode ) {
+
+				if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
+
+					BindPoseNode = BindPoseNode[ nodeID ];
+					break;
+
+				}
 
 			}
 
-		}
-		if ( BindPoseNode ) {
-
 			var PoseNode = BindPoseNode.subNodes.PoseNode;
-			var worldMatrices = new Map();
 
 			for ( var PoseNodeIndex = 0, PoseNodeLength = PoseNode.length; PoseNodeIndex < PoseNodeLength; ++ PoseNodeIndex ) {
 
