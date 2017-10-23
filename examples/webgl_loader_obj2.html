@@ -137,6 +137,9 @@
 					this.scene.add( helper );
 				};
 
+                var material = new THREE.MeshBasicMaterial( { vertexColors:
+                    true, color: 0xFFFFFF } );
+
 				OBJLoader2Example.prototype.initContent = function () {
 					var modelName = 'female02';
 					this._reportProgress( 'Loading: ' + modelName );
@@ -144,20 +147,25 @@
 					var scope = this;
 					var objLoader = new THREE.OBJLoader2();
 					var callbackOnLoad = function ( event ) {
+
+                        event.detail.loaderRootNode.traverse( function( node ) {
+                            node.material = material;
+                        });
+
 						scope.scene.add( event.detail.loaderRootNode );
 						console.log( 'Loading complete: ' + event.detail.modelName );
 						scope._reportProgress( '' );
 					};
 
-					var onLoadMtl = function ( materials ) {
+					// var onLoadMtl = function ( materials ) {
 						objLoader.setModelName( modelName );
-						objLoader.setMaterials( materials );
+						// objLoader.setMaterials( materials );
 						objLoader.setUseIndices( true );
-						objLoader.setDisregardNormals( false );
+						objLoader.setDisregardNormals( true );
 						objLoader.getLogger().setDebug( true );
-						objLoader.load( 'obj/female02/female02.obj', callbackOnLoad, null, null, null, false );
-					};
-					objLoader.loadMtl( 'obj/female02/female02.mtl', 'female02.mtl', null, onLoadMtl );
+						objLoader.load( 'models/tree/full.obj', callbackOnLoad, null, null, null, false );
+					//};
+					// objLoader.loadMtl( 'obj/female02/female02.mtl', 'female02.mtl', null, onLoadMtl );
 				};
 
 				OBJLoader2Example.prototype._reportProgress = function( content ) {
