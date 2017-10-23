@@ -4755,29 +4755,38 @@
 
 			switch ( type ) {
 
-				case 'F':
-					return reader.getFloat32();
+				case 'C':
+					return reader.getBoolean();
 
 				case 'D':
 					return reader.getFloat64();
 
-				case 'L':
-					return reader.getInt64();
+				case 'F':
+					return reader.getFloat32();
 
 				case 'I':
 					return reader.getInt32();
 
+				case 'L':
+					return reader.getInt64();
+
+				case 'R':
+					var length = reader.getUint32();
+					return reader.getArrayBuffer( length );
+
+				case 'S':
+					var length = reader.getUint32();
+					return reader.getString( length );
+
 				case 'Y':
 					return reader.getInt16();
 
-				case 'C':
-					return reader.getBoolean();
-
-				case 'f':
-				case 'd':
-				case 'l':
-				case 'i':
 				case 'b':
+				case 'c':
+				case 'd':
+				case 'f':
+				case 'i':
+				case 'l':
 
 					var arrayLength = reader.getUint32();
 					var encoding = reader.getUint32(); // 0: non-compressed, 1: compressed
@@ -4787,20 +4796,21 @@
 
 						switch ( type ) {
 
-							case 'f':
-								return reader.getFloat32Array( arrayLength );
+							case 'b':
+							case 'c':
+								return reader.getBooleanArray( arrayLength );
 
 							case 'd':
 								return reader.getFloat64Array( arrayLength );
 
-							case 'l':
-								return reader.getInt64Array( arrayLength );
+							case 'f':
+								return reader.getFloat32Array( arrayLength );
 
 							case 'i':
 								return reader.getInt32Array( arrayLength );
 
-							case 'b':
-								return reader.getBooleanArray( arrayLength );
+							case 'l':
+								return reader.getInt64Array( arrayLength );
 
 						}
 
@@ -4817,30 +4827,24 @@
 
 					switch ( type ) {
 
-						case 'f':
-							return reader2.getFloat32Array( arrayLength );
+
+						case 'b':
+						case 'c':
+							return reader2.getBooleanArray( arrayLength );
 
 						case 'd':
 							return reader2.getFloat64Array( arrayLength );
 
-						case 'l':
-							return reader2.getInt64Array( arrayLength );
+						case 'f':
+							return reader2.getFloat32Array( arrayLength );
 
 						case 'i':
 							return reader2.getInt32Array( arrayLength );
 
-						case 'b':
-							return reader2.getBooleanArray( arrayLength );
+						case 'l':
+							return reader2.getInt64Array( arrayLength );
 
 					}
-
-				case 'S':
-					var length = reader.getUint32();
-					return reader.getString( length );
-
-				case 'R':
-					var length = reader.getUint32();
-					return reader.getArrayBuffer( length );
 
 				default:
 					throw new Error( 'THREE.FBXLoader: Unknown property type ' + type );
