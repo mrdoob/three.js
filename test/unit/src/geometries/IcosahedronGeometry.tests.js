@@ -1,34 +1,96 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import {
+	IcosahedronGeometry,
+	IcosahedronBufferGeometry
+} from '../../../../src/geometries/IcosahedronGeometry';
 
-	var parameters = {
-		radius: 10,
-		detail: undefined
-	};
+export default QUnit.module( 'Geometries', () => {
 
-	var geometries;
+	QUnit.module.todo( 'IcosahedronGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - IcosahedronGeometry", {
+		var geometries = undefined;
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				radius: 10,
+				detail: undefined
+			};
 
 			geometries = [
-
-				new THREE.IcosahedronGeometry(),
-				new THREE.IcosahedronGeometry( parameters.radius ),
-				new THREE.IcosahedronGeometry( parameters.radius, parameters.detail ),
-
+				new IcosahedronGeometry(),
+				new IcosahedronGeometry( parameters.radius ),
+				new IcosahedronGeometry( parameters.radius, parameters.detail ),
 			];
 
-		}
+		} );
 
-	});
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+			assert.ok( false, "everything's gonna be alright" );
 
-		runStdGeometryTests( assert, geometries );
+		} );
 
-	});
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
 
-})();
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard geometry tests', ( assert ) => {
+
+			runStdGeometryTests( assert, geometries );
+
+		} );
+
+	} );
+
+	QUnit.module.todo( 'IcosahedronBufferGeometry', ( hooks ) => {
+
+		var geometries = undefined;
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				radius: 10,
+				detail: undefined
+			};
+
+			geometries = [
+				new IcosahedronBufferGeometry(),
+				new IcosahedronBufferGeometry( parameters.radius ),
+				new IcosahedronBufferGeometry( parameters.radius, parameters.detail ),
+			];
+
+		} );
+
+		// INHERITANCE
+		QUnit.test( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// INSTANCING
+		QUnit.test( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard geometry tests', ( assert ) => {
+
+			runStdGeometryTests( assert, geometries );
+
+		} );
+
+	} );
+
+} );
