@@ -57,7 +57,6 @@ function WebGLRenderList() {
 	function init() {
 
 		renderItemsIndex = 0;
-		renderItems.length = 0;
 
 		opaque.length = 0;
 		transparent.length = 0;
