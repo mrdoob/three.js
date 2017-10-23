@@ -1914,7 +1914,7 @@
 
 		var worldMatrices = new Map();
 
-    // Put skeleton into bind pose.
+		// Put skeleton into bind pose.
 		if ( 'Pose' in FBXTree.Objects.subNodes ) {
 
 			var BindPoseNode = FBXTree.Objects.subNodes.Pose;
