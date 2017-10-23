@@ -56,6 +56,21 @@ function WebGLRenderList() {
 
 	function init() {
 
+		// clear references from renderItems not to keep the references of already disposed objects
+
+		for ( var i = 0; i < renderItemsIndex; i ++ ) {
+
+			var renderItem = renderItems[ i ];
+
+			renderItem.id = null;
+			renderItem.object = null;
+			renderItem.geometry = null
+			renderItem.material = null;
+			renderItem.program = null;
+			renderItem.group = null;
+
+		}
+
 		renderItemsIndex = 0;
 
 		opaque.length = 0;
