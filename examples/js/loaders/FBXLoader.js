@@ -4136,7 +4136,7 @@
 					//	 "iVB..."
 					if ( propName === 'Content' && propValue === ',' ) {
 
-            propValue = split[ ++ lineNum ].replace( /"/g, '' ).replace( /,$/, '' ).trim();
+						propValue = split[ ++ lineNum ].replace( /"/g, '' ).replace( /,$/, '' ).trim();
 
 					}
 
