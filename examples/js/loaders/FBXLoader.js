@@ -1036,6 +1036,27 @@
 
 		}
 
+		// the loop above doesn't add the last group, do that here.
+		if ( geo.groups.length > 0 ) {
+
+			var lastGroup = geo.groups[ geo.groups.length - 1 ];
+			var lastIndex = lastGroup.start + lastGroup.count;
+
+			if ( lastIndex !== materialIndexBuffer.length ) {
+
+				geo.addGroup( lastIndex, materialIndexBuffer.length - lastIndex, prevMaterialIndex );
+
+			}
+
+		}
+
+		// catch case where the whole geometry has a single non-zero index
+		if ( geo.groups.length === 0 && materialIndexBuffer[ 0 ] !== 0 ) {
+
+			geo.addGroup( 0, materialIndexBuffer.length, materialIndexBuffer[ 0 ] );
+
+		}
+
 		return geo;
 
 	}
