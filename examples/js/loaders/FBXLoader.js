@@ -112,7 +112,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -683,8 +683,8 @@
 				index: i,
 				indices: [],
 				weights: [],
-				transform: parseMatrixArray( subDeformerNode.subNodes.Transform.properties.a ),
-				transformLink: parseMatrixArray( subDeformerNode.subNodes.TransformLink.properties.a ),
+				transform: subDeformerNode.subNodes.Transform.properties.a,
+				transformLink: subDeformerNode.subNodes.TransformLink.properties.a,
 				linkMode: subDeformerNode.properties.Mode
 			};
 
@@ -1953,7 +1953,7 @@
 
 				var node = PoseNode[ PoseNodeIndex ];
 
-				var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
+				var rawMatWrd = node.subNodes.Matrix.properties.a;
 
 				worldMatrices.set( parseInt( node.id ), rawMatWrd );
 
@@ -1981,6 +1981,7 @@
 
 				}
 				var mat = worldMatrices.get( bone.FBX_ID );
+				console.log( worldMatrices )
 				bone.matrixWorld.copy( mat );
 
 			}
@@ -4582,8 +4583,22 @@
 						subNodes[ node.name ] = node;
 
 						// Later phase expects single property array is in node.properties.a as String.
-						// TODO: optimize
-						node.properties.a = value.toString();
+            // TODO: optimize
+            // console.log( value )
+						// console.log( node.name );
+
+						switch ( node.name ) {
+
+							case 'Matrix':
+							case 'TransformLink':
+							case 'Transform':
+								node.properties.a = new THREE.Matrix4().fromArray( value );
+
+							default:
+								node.properties.a = value.toString();
+
+						}
+
 
 					} else {
 
@@ -5499,11 +5514,11 @@
 
 	}
 
-	function parseMatrixArray( floatString ) {
+	// function parseMatrixArray( floatString ) {
 
-		return new THREE.Matrix4().fromArray( parseFloatArray( floatString ) );
+	// 	return new THREE.Matrix4().fromArray( parseFloatArray( floatString ) );
 
-	}
+	// }
 
 	/**
 	 * Converts ArrayBuffer to String.
