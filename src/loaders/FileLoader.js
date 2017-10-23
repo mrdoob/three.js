@@ -178,7 +178,8 @@ Object.assign( FileLoader.prototype, {
 
 					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
-						if ( callbacks[ i ].onLoad ) callbacks[ i ].onLoad( response );
+						var callback = callbacks[ i ];
+						if ( callback.onLoad ) callback.onLoad( response );
 
 					}
 
@@ -193,7 +194,8 @@ Object.assign( FileLoader.prototype, {
 
 					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
-						if ( callbacks[ i ].onLoad ) callbacks[ i ].onLoad( response );
+						var callback = callbacks[ i ];
+						if ( callback.onLoad ) callback.onLoad( response );
 
 					}
 
@@ -203,7 +205,8 @@ Object.assign( FileLoader.prototype, {
 
 					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
-						if ( callbacks[ i ].onError ) callbacks[ i ].onError( event );
+						var callback = callbacks[ i ];
+						if ( callback.onError ) callback.onError( event );
 
 					}
 
@@ -220,7 +223,8 @@ Object.assign( FileLoader.prototype, {
 
 				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					if ( callbacks[ i ].onProgress ) callbacks[ i ].onProgress( event );
+					var callback = callbacks[ i ];
+					if ( callback.onProgress ) callback.onProgress( event );
 
 				}
 
@@ -232,7 +236,8 @@ Object.assign( FileLoader.prototype, {
 
 				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					if ( callbacks[ i ].onError ) callbacks[ i ].onError( event );
+					var callback = callbacks[ i ];
+					if ( callback.onError ) callback.onError( event );
 
 				}
 
