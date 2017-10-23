@@ -103,7 +103,7 @@ function WebGLRenderList() {
 
 	function finish() {
 
-		// clear references from renderItems not to keep the references of already disposed objects
+		// clear references from renderItems not to keep the references to already disposed objects
 
 		for ( var i = renderItemsIndex, il = renderItems.length; i < il; i ++ ) {
 
