@@ -45,9 +45,11 @@ Object.assign( FileLoader.prototype, {
 
 		if ( loading[ url ] !== undefined ) {
 
-			loading[ url ].push( function () {
+			loading[ url ].push( {
 
-				scope.load( url, onLoad, onProgress, onError );
+				onLoad: onLoad,
+				onProgress: onProgress,
+				onError: onError
 
 			} );
 
@@ -150,6 +152,14 @@ Object.assign( FileLoader.prototype, {
 
 			loading[ url ] = [];
 
+			loading[ url ].push( {
+
+				onLoad: onLoad,
+				onProgress: onProgress,
+				onError: onError
+
+			} );
+
 			var request = new XMLHttpRequest();
 
 			request.open( 'GET', url, true );
@@ -160,9 +170,17 @@ Object.assign( FileLoader.prototype, {
 
 				Cache.add( url, response );
 
+				var callbacks = loading[ url ];
+
+				delete loading[ url ];
+
 				if ( this.status === 200 ) {
 
-					if ( onLoad ) onLoad( response );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						if ( callbacks[ i ].onLoad ) callbacks[ i ].onLoad( response );
+
+					}
 
 					scope.manager.itemEnd( url );
 
@@ -173,46 +191,50 @@ Object.assign( FileLoader.prototype, {
 
 					console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-					if ( onLoad ) onLoad( response );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						if ( callbacks[ i ].onLoad ) callbacks[ i ].onLoad( response );
+
+					}
 
 					scope.manager.itemEnd( url );
 
 				} else {
 
-					if ( onError ) onError( event );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						if ( callbacks[ i ].onError ) callbacks[ i ].onError( event );
+
+					}
 
 					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
 
 				}
 
-				// Clean up duplicate requests.
+			}, false );
+
+			request.addEventListener( 'progress', function ( event ) {
 
 				var callbacks = loading[ url ];
 
-				for ( var i = 0; i < callbacks.length; i ++ ) {
+				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					callbacks[ i ]( response );
+					if ( callbacks[ i ].onProgress ) callbacks[ i ].onProgress( event );
 
 				}
 
-				delete loading[ url ];
-
 			}, false );
-
-			if ( onProgress !== undefined ) {
-
-				request.addEventListener( 'progress', function ( event ) {
-
-					onProgress( event );
-
-				}, false );
-
-			}
 
 			request.addEventListener( 'error', function ( event ) {
 
-				if ( onError ) onError( event );
+				var callbacks = loading[ url ];
+
+				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+					if ( callbacks[ i ].onError ) callbacks[ i ].onError( event );
+
+				}
 
 				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
