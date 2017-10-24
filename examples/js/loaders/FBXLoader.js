@@ -112,7 +112,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -329,7 +329,7 @@
 			fileName = imageMap.get( children[ 0 ].ID );
 
 		} else if ( relativeFilePath !== undefined && relativeFilePath[ 0 ] !== '/' &&
-				relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
+			relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
 
 			// use textureNode.properties.RelativeFilename
 			// if it exists and it doesn't seem an absolute path
@@ -657,8 +657,8 @@
 				index: i,
 				indices: [],
 				weights: [],
-				transform: subDeformerNode.subNodes.Transform.properties.a,
-				transformLink: subDeformerNode.subNodes.TransformLink.properties.a,
+				transform: parseMatrixArray( subDeformerNode.subNodes.Transform.properties.a ),
+				transformLink: parseMatrixArray( subDeformerNode.subNodes.TransformLink.properties.a ),
 				linkMode: subDeformerNode.properties.Mode
 			};
 
@@ -1935,7 +1935,7 @@
 
 				var node = PoseNode[ PoseNodeIndex ];
 
-				var rawMatWrd = node.subNodes.Matrix.properties.a;
+				var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
 
 				worldMatrices.set( parseInt( node.id ), rawMatWrd );
 
@@ -1963,7 +1963,6 @@
 
 				}
 				var mat = worldMatrices.get( bone.FBX_ID );
-				console.log( worldMatrices )
 				bone.matrixWorld.copy( mat );
 
 			}
@@ -3895,7 +3894,7 @@
 
 			for ( var i = 0; i < this.vertices.length; ++ i ) {
 
-				 this.vertices[ i ].copy( returnVar.vertices[ i ] );
+				this.vertices[ i ].copy( returnVar.vertices[ i ] );
 
 			}
 
@@ -4000,7 +3999,7 @@
 		/**
 		 * @returns	{{vertexBuffer: number[], normalBuffer: number[], uvBuffers: Array of number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
 		 */
-	 	flattenToBuffers: function () {
+		flattenToBuffers: function () {
 
 			var vertexBuffer = [];
 			var normalBuffer = [];
@@ -4038,7 +4037,7 @@
 
 	} );
 
-	function TextParser() {}
+	function TextParser() { }
 
 	Object.assign( TextParser.prototype, {
 
@@ -4467,7 +4466,7 @@
 	// Binary format specification:
 	//   https://code.blender.org/2013/08/fbx-binary-file-format-specification/
 	//   https://wiki.rogiken.org/specifications/file-format/fbx/ (more detail but Japanese)
-	function BinaryParser() {}
+	function BinaryParser() { }
 
 	Object.assign( BinaryParser.prototype, {
 
@@ -4593,22 +4592,8 @@
 						subNodes[ node.name ] = node;
 
 						// Later phase expects single property array is in node.properties.a as String.
-            // TODO: optimize
-            // console.log( value )
-						// console.log( node.name );
-
-						switch ( node.name ) {
-
-							case 'Matrix':
-							case 'TransformLink':
-							case 'Transform':
-								node.properties.a = new THREE.Matrix4().fromArray( value );
-
-							default:
-								node.properties.a = value.toString();
-
-						}
-
+						// TODO: optimize
+						node.properties.a = value.toString();
 
 					} else {
 
@@ -4680,7 +4665,7 @@
 					if ( innerPropType1.indexOf( 'Lcl ' ) === 0 ) innerPropType1 = innerPropType1.replace( 'Lcl ', 'Lcl_' );
 
 					if ( innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' ||
-						 innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
+						innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
 
 						innerPropValue = [
 							node.propertyList[ 4 ],
@@ -5239,7 +5224,7 @@
 	} );
 
 
-	function FBXTree() {}
+	function FBXTree() { }
 
 	Object.assign( FBXTree.prototype, {
 
@@ -5336,8 +5321,8 @@
 
 			} else {
 
-				this.__cache_search_connection_children[ id ] = [ ];
-				return [ ];
+				this.__cache_search_connection_children[ id ] = [];
+				return [];
 
 			}
 
@@ -5522,11 +5507,11 @@
 
 	}
 
-	// function parseMatrixArray( floatString ) {
+	function parseMatrixArray( floatString ) {
 
-	// 	return new THREE.Matrix4().fromArray( parseFloatArray( floatString ) );
+		return new THREE.Matrix4().fromArray( parseFloatArray( floatString ) );
 
-	// }
+	}
 
 	/**
 	 * Converts ArrayBuffer to String.
