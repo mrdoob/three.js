@@ -3715,7 +3715,7 @@
 			if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
 
 				// Only update the euler's values if rotation is defined for the axis on this frame
-				// other stay with the previously defined value
+				// otherwise stay with the previous value
 				if ( animationNode.R.curves.x.values[ frame ] ) {
 
 					euler.x = animationNode.R.curves.x.values[ frame ];
