@@ -262,14 +262,6 @@
 
 		if ( typeof content === 'string' ) {
 
-			// ASCII format sometimes an extra ',' gets added to the end of the content string
-			// TODO: Investigate why the parser is adding this character
-			if ( content.slice( - 1 ) === ',' ) {
-
-				content = content.slice( 0, - 1 );
-
-			}
-
 			return 'data:' + type + ';base64,' + content;
 
 		} else {
@@ -391,12 +383,6 @@
 
 			var values = textureNode.properties.Scaling.value;
 
-			if ( typeof values === 'string' ) {
-
-				values = parseFloatArray( values );
-
-			}
-
 			texture.repeat.x = values[ 0 ];
 			texture.repeat.y = values[ 1 ];
 
@@ -505,7 +491,7 @@
 
 		if ( properties.BumpFactor ) {
 
-			parameters.bumpScale = parseFloat( properties.BumpFactor.value );
+			parameters.bumpScale = properties.BumpFactor.value;
 
 		}
 		if ( properties.Diffuse ) {
@@ -515,12 +501,12 @@
 		}
 		if ( properties.DisplacementFactor ) {
 
-			parameters.displacementScale = parseFloat( properties.DisplacementFactor.value );
+			parameters.displacementScale = properties.DisplacementFactor.value;
 
 		}
 		if ( properties.ReflectionFactor ) {
 
-			parameters.reflectivity = parseFloat( properties.ReflectionFactor.value );
+			parameters.reflectivity = properties.ReflectionFactor.value;
 
 		}
 		if ( properties.Specular ) {
@@ -530,7 +516,7 @@
 		}
 		if ( properties.Shininess ) {
 
-			parameters.shininess = parseFloat( properties.Shininess.value );
+			parameters.shininess = properties.Shininess.value;
 
 		}
 		if ( properties.Emissive ) {
@@ -563,56 +549,44 @@
 			switch ( type ) {
 
 				case 'Bump':
-				case ' "Bump':
 					parameters.bumpMap = textureMap.get( relationship.ID );
 					break;
 
 				case 'DiffuseColor':
-				case ' "DiffuseColor':
 					parameters.map = textureMap.get( relationship.ID );
 					break;
 
 				case 'DisplacementColor':
-				case ' "DisplacementColor':
 					parameters.displacementMap = textureMap.get( relationship.ID );
 					break;
 
 
 				case 'EmissiveColor':
-				case ' "EmissiveColor':
 					parameters.emissiveMap = textureMap.get( relationship.ID );
 					break;
 
 				case 'NormalMap':
-				case ' "NormalMap':
 					parameters.normalMap = textureMap.get( relationship.ID );
 					break;
 
 				case 'ReflectionColor':
-				case ' "ReflectionColor':
 					parameters.envMap = textureMap.get( relationship.ID );
 					parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
 					break;
 
 				case 'SpecularColor':
-				case ' "SpecularColor':
 					parameters.specularMap = textureMap.get( relationship.ID );
 					break;
 
 				case 'TransparentColor':
-				case ' "TransparentColor':
 					parameters.alphaMap = textureMap.get( relationship.ID );
 					parameters.transparent = true;
 					break;
 
 				case 'AmbientColor':
-				case ' "AmbientColor':
 				case 'ShininessExponent': // AKA glossiness map
-				case ' "ShininessExponent':
 				case 'SpecularFactor': // AKA specularLevel
-				case ' "SpecularFactor':
 				case 'VectorDisplacementColor': // NOTE: Seems to be a copy of DisplacementColor
-				case ' "VectorDisplacementColor':
 				default:
 					console.warn( 'THREE.FBXLoader: %s map is not supported in three.js, skipping texture.', type );
 					break;
@@ -1062,6 +1036,27 @@
 
 		}
 
+		// the loop above doesn't add the last group, do that here.
+		if ( geo.groups.length > 0 ) {
+
+			var lastGroup = geo.groups[ geo.groups.length - 1 ];
+			var lastIndex = lastGroup.start + lastGroup.count;
+
+			if ( lastIndex !== materialIndexBuffer.length ) {
+
+				geo.addGroup( lastIndex, materialIndexBuffer.length - lastIndex, prevMaterialIndex );
+
+			}
+
+		}
+
+		// catch case where the whole geometry has a single non-zero index
+		if ( geo.groups.length === 0 && materialIndexBuffer[ 0 ] !== 0 ) {
+
+			geo.addGroup( 0, materialIndexBuffer.length, materialIndexBuffer[ 0 ] );
+
+		}
+
 		return geo;
 
 	}
@@ -1501,7 +1496,7 @@
 						} else {
 
 							var type = 0;
-							if ( cameraAttribute.CameraProjectionType !== undefined && ( cameraAttribute.CameraProjectionType.value === '1' || cameraAttribute.CameraProjectionType.value === 1 ) ) {
+							if ( cameraAttribute.CameraProjectionType !== undefined && cameraAttribute.CameraProjectionType.value === 1 ) {
 
 								type = 1;
 
@@ -1527,8 +1522,8 @@
 
 							if ( cameraAttribute.AspectWidth !== undefined && cameraAttribute.AspectHeight !== undefined ) {
 
-								width = parseFloat( cameraAttribute.AspectWidth.value );
-								height = parseFloat( cameraAttribute.AspectHeight.value );
+								width = cameraAttribute.AspectWidth.value;
+								height = cameraAttribute.AspectHeight.value;
 
 							}
 
@@ -1537,19 +1532,17 @@
 							var fov = 45;
 							if ( cameraAttribute.FieldOfView !== undefined ) {
 
-								fov = parseFloat( cameraAttribute.FieldOfView.value );
+								fov = cameraAttribute.FieldOfView.value;
 
 							}
 
 							switch ( type ) {
 
-								case '0': // Perspective
-								case 0:
+								case 0: // Perspective
 									model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
 									break;
 
-								case '1': // Orthographic
-								case 1:
+								case 1: // Orthographic
 									model = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
 									break;
 
@@ -1611,20 +1604,14 @@
 
 							if ( lightAttribute.Color !== undefined ) {
 
-								var temp = lightAttribute.Color.value.split( ',' );
-
-								var r = parseFloat( temp[ 0 ] );
-								var g = parseFloat( temp[ 1 ] );
-								var b = parseFloat( temp[ 1 ] );
-
-								color = new THREE.Color( r, g, b );
+								color = parseColor( lightAttribute.Color.value );
 
 							}
 
 							var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
 
 							// light disabled
-							if ( lightAttribute.CastLightOnObject !== undefined && ( lightAttribute.CastLightOnObject.value === '0' || lightAttribute.CastLightOnObject.value === 0 ) ) {
+							if ( lightAttribute.CastLightOnObject !== undefined && lightAttribute.CastLightOnObject.value === 0 ) {
 
 								intensity = 0;
 
@@ -1633,7 +1620,7 @@
 							var distance = 0;
 							if ( lightAttribute.FarAttenuationEnd !== undefined ) {
 
-								if ( lightAttribute.EnableFarAttenuation !== undefined && ( lightAttribute.EnableFarAttenuation.value === '0' || lightAttribute.EnableFarAttenuation.value === 0 ) ) {
+								if ( lightAttribute.EnableFarAttenuation !== undefined && lightAttribute.EnableFarAttenuation.value === 0 ) {
 
 									distance = 0;
 
@@ -1651,18 +1638,15 @@
 
 							switch ( type ) {
 
-								case '0': // Point
-								case 0:
+								case 0: // Point
 									model = new THREE.PointLight( color, intensity, distance, decay );
 									break;
 
-								case '1': // Directional
-								case 1:
+								case 1: // Directional
 									model = new THREE.DirectionalLight( color, intensity );
 									break;
 
-								case '2': // Spot
-								case 2:
+								case 2: // Spot
 									var angle = Math.PI / 3;
 
 									if ( lightAttribute.InnerAngle !== undefined ) {
@@ -1692,7 +1676,7 @@
 
 							}
 
-							if ( lightAttribute.CastShadows !== undefined && ( lightAttribute.CastShadows.value === '1' || lightAttribute.CastShadows.value === 1 ) ) {
+							if ( lightAttribute.CastShadows !== undefined && lightAttribute.CastShadows.value === 1 ) {
 
 								model.castShadow = true;
 
@@ -1745,7 +1729,7 @@
 
 						} else {
 
-							material = new THREE.MeshStandardMaterial( { color: 0x3300ff } );
+							material = new THREE.MeshPhongMaterial( { color: 0xcccccc } );
 							materials.push( material );
 
 						}
@@ -1818,13 +1802,13 @@
 
 			if ( 'Lcl_Translation' in node.properties ) {
 
-				model.position.fromArray( parseFloatArray( node.properties.Lcl_Translation.value ) );
+				model.position.fromArray( node.properties.Lcl_Translation.value );
 
 			}
 
 			if ( 'Lcl_Rotation' in node.properties ) {
 
-				var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( degreeToRadian );
+				var rotation = node.properties.Lcl_Rotation.value.map( degreeToRadian );
 				rotation.push( 'ZYX' );
 				model.rotation.fromArray( rotation );
 
@@ -1832,7 +1816,7 @@
 
 			if ( 'Lcl_Scaling' in node.properties ) {
 
-				model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
+				model.scale.fromArray( node.properties.Lcl_Scaling.value );
 
 			}
 
@@ -1871,17 +1855,13 @@
 
 					var child = conns.children[ childrenIndex ];
 
-					if ( child.relationship === 'LookAtProperty' || child.relationship === ' "LookAtProperty' ) {
+					if ( child.relationship === 'LookAtProperty' ) {
 
 						var lookAtTarget = FBXTree.Objects.subNodes.Model[ child.ID ];
 
 						if ( 'Lcl_Translation' in lookAtTarget.properties ) {
 
-							var pos = lookAtTarget.properties.Lcl_Translation.value.split( ',' ).map( function ( val ) {
-
-								return parseFloat( val );
-
-							} );
+							var pos = lookAtTarget.properties.Lcl_Translation.value;
 
 							// DirectionalLight, SpotLight
 							if ( model.target !== undefined ) {
@@ -1932,22 +1912,24 @@
 		// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
 		sceneGraph.updateMatrixWorld( true );
 
+		var worldMatrices = new Map();
+
 		// Put skeleton into bind pose.
-		var BindPoseNode = FBXTree.Objects.subNodes.Pose;
-		for ( var nodeID in BindPoseNode ) {
+		if ( 'Pose' in FBXTree.Objects.subNodes ) {
 
-			if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
+			var BindPoseNode = FBXTree.Objects.subNodes.Pose;
+			for ( var nodeID in BindPoseNode ) {
 
-				BindPoseNode = BindPoseNode[ nodeID ];
-				break;
+				if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
+
+					BindPoseNode = BindPoseNode[ nodeID ];
+					break;
+
+				}
 
 			}
 
-		}
-		if ( BindPoseNode ) {
-
 			var PoseNode = BindPoseNode.subNodes.PoseNode;
-			var worldMatrices = new Map();
 
 			for ( var PoseNodeIndex = 0, PoseNodeLength = PoseNode.length; PoseNodeIndex < PoseNodeLength; ++ PoseNodeIndex ) {
 
@@ -2104,7 +2086,7 @@
 
 				if ( 'CustomFrameRate' in FBXTree.GlobalSettings.properties ) {
 
-					fps = parseFloat( FBXTree.GlobalSettings.properties.CustomFrameRate.value );
+					fps = FBXTree.GlobalSettings.properties.CustomFrameRate.value;
 
 					fps = ( fps === - 1 ) ? 30 : fps;
 
@@ -3719,6 +3701,8 @@
 
 		if ( animationNode === undefined ) return key;
 
+		euler.setFromQuaternion( bone.quaternion, 'ZYX', false );
+
 		try {
 
 			if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
@@ -3729,11 +3713,26 @@
 
 			if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
 
-				var rotationX = animationNode.R.curves.x.values[ frame ];
-				var rotationY = animationNode.R.curves.y.values[ frame ];
-				var rotationZ = animationNode.R.curves.z.values[ frame ];
+				// Only update the euler's values if rotation is defined for the axis on this frame
+				if ( animationNode.R.curves.x.values[ frame ] ) {
 
-				quaternion.setFromEuler( euler.set( rotationX, rotationY, rotationZ, 'ZYX' ) );
+					euler.x = animationNode.R.curves.x.values[ frame ];
+
+				}
+
+				if ( animationNode.R.curves.y.values[ frame ] ) {
+
+					euler.y = animationNode.R.curves.y.values[ frame ];
+
+				}
+
+				if ( animationNode.R.curves.z.values[ frame ] ) {
+
+					euler.z = animationNode.R.curves.z.values[ frame ];
+
+				}
+
+				quaternion.setFromEuler( euler );
 				key.rot = quaternion.toArray();
 
 			}
@@ -4145,7 +4144,7 @@
 					//	 "iVB..."
 					if ( propName === 'Content' && propValue === ',' ) {
 
-						propValue = split[ ++ lineNum ].replace( /"/g, '' ).trim();
+						propValue = split[ ++ lineNum ].replace( /"/g, '' ).replace( /,$/, '' ).trim();
 
 					}
 
@@ -4187,7 +4186,6 @@
 
 		parseNodeBegin: function ( line, nodeName, nodeAttrs ) {
 
-			// var nodeName = match[1];
 			var node = { 'name': nodeName, properties: {}, 'subNodes': {} };
 			var attrs = this.parseNodeAttr( nodeAttrs );
 			var currentNode = this.getCurrentNode();
@@ -4197,11 +4195,9 @@
 
 				this.allNodes.add( nodeName, node );
 
-			} else {
+			} else { // a subnode
 
-				// a subnode
-
-				// already exists subnode, then append it
+				// if the subnode already exists, append it
 				if ( nodeName in currentNode.subNodes ) {
 
 					var tmp = currentNode.subNodes[ nodeName ];
@@ -4246,6 +4242,7 @@
 				}
 
 			}
+
 
 			// for this		  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 			// NodeAttribute: 1001463072, "NodeAttribute::", "LimbNode" {
@@ -4296,8 +4293,8 @@
 			var currentNode = this.getCurrentNode();
 			var parentName = currentNode.name;
 
-			// special case parent node's is like "Properties70"
-			// these children nodes must treat with careful
+			// special case where the parent node is something like "Properties70"
+			// these children nodes must treated carefully
 			if ( parentName !== undefined ) {
 
 				var propMatch = parentName.match( /Properties(\d)+/ );
@@ -4310,7 +4307,7 @@
 
 			}
 
-			// special case Connections
+			// Connections
 			if ( propName === 'C' ) {
 
 				var connProps = propValue.split( ',' ).slice( 1 );
@@ -4318,6 +4315,12 @@
 				var to = parseInt( connProps[ 1 ] );
 
 				var rest = propValue.split( ',' ).slice( 3 );
+
+				rest = rest.map( function ( elem ) {
+
+					return elem.trim().replace( /^"/, '' );
+
+				} );
 
 				propName = 'connections';
 				propValue = [ from, to ];
@@ -4331,7 +4334,7 @@
 
 			}
 
-			// special case Connections
+			// Node
 			if ( propName === 'Node' ) {
 
 				var id = parseInt( propValue );
@@ -4356,7 +4359,6 @@
 
 			} else {
 
-				// console.log( propName + ":  " + propValue );
 				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
 
 					currentNode.properties[ propName ].push( propValue );
@@ -4406,19 +4408,27 @@
 			}
 			*/
 
-			// cast value in its type
+			// cast value to its type
 			switch ( innerPropType1 ) {
 
 				case 'int':
+				case 'enum':
+				case 'bool':
+				case 'ULongLong':
 					innerPropValue = parseInt( innerPropValue );
 					break;
 
 				case 'double':
+				case 'Number':
+				case 'FieldOfView':
 					innerPropValue = parseFloat( innerPropValue );
 					break;
 
 				case 'ColorRGB':
 				case 'Vector3D':
+				case 'Lcl_Translation':
+				case 'Lcl_Rotation':
+				case 'Lcl_Scaling':
 					innerPropValue = parseFloatArray( innerPropValue );
 					break;
 
@@ -4684,12 +4694,6 @@
 
 					}
 
-					if ( innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
-
-						innerPropValue = innerPropValue.toString();
-
-					}
-
 					// this will be copied to parent. see above.
 					properties[ innerPropName ] = {
 
@@ -4778,29 +4782,38 @@
 
 			switch ( type ) {
 
-				case 'F':
-					return reader.getFloat32();
+				case 'C':
+					return reader.getBoolean();
 
 				case 'D':
 					return reader.getFloat64();
 
-				case 'L':
-					return reader.getInt64();
+				case 'F':
+					return reader.getFloat32();
 
 				case 'I':
 					return reader.getInt32();
 
+				case 'L':
+					return reader.getInt64();
+
+				case 'R':
+					var length = reader.getUint32();
+					return reader.getArrayBuffer( length );
+
+				case 'S':
+					var length = reader.getUint32();
+					return reader.getString( length );
+
 				case 'Y':
 					return reader.getInt16();
 
-				case 'C':
-					return reader.getBoolean();
-
-				case 'f':
-				case 'd':
-				case 'l':
-				case 'i':
 				case 'b':
+				case 'c':
+				case 'd':
+				case 'f':
+				case 'i':
+				case 'l':
 
 					var arrayLength = reader.getUint32();
 					var encoding = reader.getUint32(); // 0: non-compressed, 1: compressed
@@ -4810,20 +4823,21 @@
 
 						switch ( type ) {
 
-							case 'f':
-								return reader.getFloat32Array( arrayLength );
+							case 'b':
+							case 'c':
+								return reader.getBooleanArray( arrayLength );
 
 							case 'd':
 								return reader.getFloat64Array( arrayLength );
 
-							case 'l':
-								return reader.getInt64Array( arrayLength );
+							case 'f':
+								return reader.getFloat32Array( arrayLength );
 
 							case 'i':
 								return reader.getInt32Array( arrayLength );
 
-							case 'b':
-								return reader.getBooleanArray( arrayLength );
+							case 'l':
+								return reader.getInt64Array( arrayLength );
 
 						}
 
@@ -4840,30 +4854,24 @@
 
 					switch ( type ) {
 
-						case 'f':
-							return reader2.getFloat32Array( arrayLength );
+
+						case 'b':
+						case 'c':
+							return reader2.getBooleanArray( arrayLength );
 
 						case 'd':
 							return reader2.getFloat64Array( arrayLength );
 
-						case 'l':
-							return reader2.getInt64Array( arrayLength );
+						case 'f':
+							return reader2.getFloat32Array( arrayLength );
 
 						case 'i':
 							return reader2.getInt32Array( arrayLength );
 
-						case 'b':
-							return reader2.getBooleanArray( arrayLength );
+						case 'l':
+							return reader2.getInt64Array( arrayLength );
 
 					}
-
-				case 'S':
-					var length = reader.getUint32();
-					return reader.getString( length );
-
-				case 'R':
-					var length = reader.getUint32();
-					return reader.getArrayBuffer( length );
 
 				default:
 					throw new Error( 'THREE.FBXLoader: Unknown property type ' + type );
