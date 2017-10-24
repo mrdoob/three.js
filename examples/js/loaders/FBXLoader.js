@@ -1808,7 +1808,7 @@
 
 			if ( 'Lcl_Rotation' in node.properties ) {
 
-				var rotation = node.properties.Lcl_Rotation.value.map( degreeToRadian );
+				var rotation = node.properties.Lcl_Rotation.value.map( THREE.Math.degToRad );
 				rotation.push( 'ZYX' );
 				model.rotation.fromArray( rotation );
 
@@ -1822,7 +1822,7 @@
 
 			if ( 'PreRotation' in node.properties ) {
 
-				var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( DEG2RAD ), 'ZYX' );
+				var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 ), 'ZYX' );
 				preRotations = new THREE.Quaternion().setFromEuler( preRotations );
 				var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
 				preRotations.multiply( currentRotation );
@@ -2654,9 +2654,9 @@
 
 				}
 
-				curves.x.values = curves.x.values.map( degreeToRadian );
-				curves.y.values = curves.y.values.map( degreeToRadian );
-				curves.z.values = curves.z.values.map( degreeToRadian );
+				curves.x.values = curves.x.values.map( THREE.Math.degToRad );
+				curves.y.values = curves.y.values.map( THREE.Math.degToRad );
+				curves.z.values = curves.z.values.map( THREE.Math.degToRad );
 
 				if ( curveNode.preRotations !== null ) {
 
@@ -5544,21 +5544,6 @@
 		return s;
 
 	}
-
-	/**
-	 * Converts number from degrees into radians.
-	 * @param {number} value
-	 * @returns {number}
-	 */
-	function degreeToRadian( value ) {
-
-		return value * DEG2RAD;
-
-	}
-
-	var DEG2RAD = Math.PI / 180;
-
-	//
 
 	function findIndex( array, func ) {
 
