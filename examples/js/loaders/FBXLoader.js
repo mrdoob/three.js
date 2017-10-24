@@ -4383,7 +4383,6 @@
 			// already exists in properties, then append this
 			if ( propName in currentNode.properties ) {
 
-				// console.log( "duped entry found\nkey: " + propName + "\nvalue: " + propValue );
 				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
 
 					currentNode.properties[ propName ].push( propValue );
@@ -4630,7 +4629,6 @@
 						node.properties[ node.name ] = node.propertyList[ 0 ];
 						subNodes[ node.name ] = node;
 
-						// Later phase expects single property array is in node.properties.a as String.
 						switch ( node.name ) {
 
 							case 'Matrix':
@@ -4639,35 +4637,9 @@
 								node.properties.a = new THREE.Matrix4().fromArray( value );
 								break;
 
-							// case 'ColorIndex':
-							// case 'Colors':
-							// case 'KeyAttrDataFloat':
-							// case 'KnotVector':
-							// case 'Points':
 							default:
 								node.properties.a = value;
 								break;
-
-
-              // TODO: parseNumberArray
-							// case 'KeyTime':
-							// case 'KeyValueFloat':
-							// case 'Normals':
-							// case 'UV':
-              // case 'Vertices':
-							// case 'Weights':
-
-              // // TODO: parseNumberArray
-              // // case 'Materials':
-							// case 'NormalIndex':
-							// case 'NormalsIndex':
-              // // case 'PolygonVertexIndex':
-							// // case 'UVIndex':
-							// 	node.properties.a = value;
-							// 	break;
-
-							// default:
-							// 	node.properties.a = value.toString();
 
 						}
 
@@ -5524,6 +5496,7 @@
 	 * Parses comma separated list of numbers and returns them in an array.
 	 * If an array is passed just return it - this is because the TextParser sometimes
 	 * returns strings instead of arrays, while the BinaryParser always returns arrays
+	 * TODO: this function should only need to be called from inside the TextParser
 	 * @example
 	 * // Returns [ 5.6, 9.4, 2.5, 1.4 ]
 	 * parseNumberArray( "5.6,9.4,2.5,1.4" )
