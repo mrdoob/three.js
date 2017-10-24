@@ -112,7 +112,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -4328,7 +4328,7 @@
 						propValue = parseNumberArray( propValue );
 						break;
 
-					// TODO: parseNumberArray
+					// TODO: for the following properties this check is not catching all occurences
 					// case 'KeyTime':
 					// case 'Normals':
 					// case 'UV':
@@ -4336,11 +4336,9 @@
 					// case 'KeyValueFloat':
 					// case 'Weights':
 
-					// // TODO: parseNumberArray
 					// case 'Materials':
 					// case 'PolygonVertexIndex':
 					// case 'UVIndex':
-
 
 				}
 
@@ -4392,8 +4390,6 @@
 
 				} else {
 
-					console.log( currentNode.properties[ propName ], propValue )
-
 					currentNode.properties[ propName ] += propValue;
 
 				}
@@ -4401,6 +4397,7 @@
 			} else {
 
 				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
+
 
 					currentNode.properties[ propName ].push( propValue );
 
@@ -5569,12 +5566,6 @@
 		return new THREE.Color().fromArray( property.value );
 
 	}
-
-	// function parseMatrixArray( floatString ) {
-
-	// 	return new THREE.Matrix4().fromArray( parseNumberArray( floatString ) );
-
-	// }
 
 	/**
 	 * Converts ArrayBuffer to String.
