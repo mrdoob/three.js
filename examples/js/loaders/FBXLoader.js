@@ -1821,7 +1821,7 @@
 
 			if ( 'PreRotation' in node.properties ) {
 
-				var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 ), 'ZYX' );
+				var preRotations = new THREE.Euler().fromArray( node.properties.PreRotation.value.map( THREE.Math.degToRad ), 'ZYX' );
 				preRotations = new THREE.Quaternion().setFromEuler( preRotations );
 				var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
 				preRotations.multiply( currentRotation );
