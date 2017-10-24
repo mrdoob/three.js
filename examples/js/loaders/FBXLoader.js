@@ -2495,7 +2495,6 @@
 			if ( nodeID.match( /\d+/ ) ) {
 
 				var animationNode = parseAnimationNode( FBXTree, rawNodes[ nodeID ], connections, sceneGraph );
-
 				animationCurveNodes.push( animationNode );
 
 			}
@@ -3668,7 +3667,6 @@
 
 						if ( node.name === bone.name ) {
 
-							// if( node.name === 'RightArmRoll' ) console.log( generateKey( animations, animationNode, bone, frame ) )
 							node.keys.push( generateKey( animations, animationNode, bone, frame ) );
 
 						}
@@ -3736,9 +3734,6 @@
 
 				quaternion.setFromEuler( euler );
 				key.rot = quaternion.toArray();
-
-
-
 
 			}
 
