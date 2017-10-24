@@ -1963,7 +1963,6 @@
 
 				}
 				var mat = worldMatrices.get( bone.FBX_ID );
-				console.log( worldMatrices )
 				bone.matrixWorld.copy( mat );
 
 			}
@@ -4307,6 +4306,42 @@
 
 			}
 
+			if ( propName === 'a' ) {
+
+				switch ( parentName ) {
+
+					case 'Matrix':
+					case 'TransformLink':
+					case 'Transform':
+						propValue = new THREE.Matrix4().fromArray( parseFloatArray( propValue ) );
+						break;
+
+            // // TODO: ParseFloatArray
+            // case 'ColorIndex':
+            // case 'Colors':
+            // case 'KeyAttrDataFloat':
+            // case 'KeyTime':
+            // case 'KeyValueFloat':
+            // case 'KnotVector':
+            // case 'Normals':
+            // case 'Points':
+            // case 'UV':
+            // case 'Vertices':
+            // case 'Weights':
+            //   break;
+
+            // // TODO: ParseIntArray
+            // case 'Materials':
+            // case 'NormalIndex':
+            // case 'NormalsIndex':
+            // case 'PolygonVertexIndex':
+            // case 'UVIndex':
+            //   break;
+
+				}
+
+			}
+
 			// Connections
 			if ( propName === 'C' ) {
 
@@ -4593,16 +4628,35 @@
 						subNodes[ node.name ] = node;
 
 						// Later phase expects single property array is in node.properties.a as String.
-            // TODO: optimize
-            // console.log( value )
-						// console.log( node.name );
-
 						switch ( node.name ) {
 
 							case 'Matrix':
 							case 'TransformLink':
 							case 'Transform':
 								node.properties.a = new THREE.Matrix4().fromArray( value );
+								break;
+
+              // // TODO: ParseFloatArray
+              // case 'ColorIndex':
+              // case 'Colors':
+              // case 'KeyAttrDataFloat':
+              // case 'KeyTime':
+              // case 'KeyValueFloat':
+              // case 'KnotVector':
+              // case 'Normals':
+              // case 'Points':
+              // case 'UV':
+              // case 'Vertices':
+              // case 'Weights':
+              //   break;
+
+              // // TODO: ParseIntArray
+              // case 'Materials':
+              // case 'NormalIndex':
+              // case 'NormalsIndex':
+              // case 'PolygonVertexIndex':
+              // case 'UVIndex':
+              //   break;
 
 							default:
 								node.properties.a = value.toString();
