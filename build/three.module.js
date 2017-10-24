@@ -10355,23 +10355,23 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 	}(),
 
 	rotateOnWorldAxis: function () {
-		
+
 		// rotate object on axis in world space
 		// axis is assumed to be normalized
 		// method assumes no rotated parent
 
 		var q1 = new Quaternion();
-		
+
 		return function rotateOnWorldAxis( axis, angle ) {
-		
+
 			q1.setFromAxisAngle( axis, angle );
-		
+
 			this.quaternion.premultiply( q1 );
-		
+
 			return this;
-		
+
 		};
-		
+
 	}(),
 
 	rotateX: function () {
@@ -21578,7 +21578,7 @@ function WebGLRenderer( parameters ) {
 
 	// Clearing
 
-	this.getClearColor = function() {
+	this.getClearColor = function () {
 
 		return background.getClearColor();
 
@@ -21590,13 +21590,13 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.getClearAlpha = function() {
+	this.getClearAlpha = function () {
 
 		return background.getClearAlpha();
 
 	};
 
-	this.setClearAlpha = function() {
+	this.setClearAlpha = function () {
 
 		background.setClearAlpha.apply( background, arguments );
 
@@ -30292,9 +30292,11 @@ Object.assign( FileLoader.prototype, {
 
 		if ( loading[ url ] !== undefined ) {
 
-			loading[ url ].push( function () {
+			loading[ url ].push( {
 
-				scope.load( url, onLoad, onProgress, onError );
+				onLoad: onLoad,
+				onProgress: onProgress,
+				onError: onError
 
 			} );
 
@@ -30397,6 +30399,14 @@ Object.assign( FileLoader.prototype, {
 
 			loading[ url ] = [];
 
+			loading[ url ].push( {
+
+				onLoad: onLoad,
+				onProgress: onProgress,
+				onError: onError
+
+			} );
+
 			var request = new XMLHttpRequest();
 
 			request.open( 'GET', url, true );
@@ -30407,9 +30417,18 @@ Object.assign( FileLoader.prototype, {
 
 				Cache.add( url, response );
 
+				var callbacks = loading[ url ];
+
+				delete loading[ url ];
+
 				if ( this.status === 200 ) {
 
-					if ( onLoad ) onLoad( response );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						var callback = callbacks[ i ];
+						if ( callback.onLoad ) callback.onLoad( response );
+
+					}
 
 					scope.manager.itemEnd( url );
 
@@ -30420,46 +30439,54 @@ Object.assign( FileLoader.prototype, {
 
 					console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-					if ( onLoad ) onLoad( response );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						var callback = callbacks[ i ];
+						if ( callback.onLoad ) callback.onLoad( response );
+
+					}
 
 					scope.manager.itemEnd( url );
 
 				} else {
 
-					if ( onError ) onError( event );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						var callback = callbacks[ i ];
+						if ( callback.onError ) callback.onError( event );
+
+					}
 
 					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
 
 				}
 
-				// Clean up duplicate requests.
+			}, false );
+
+			request.addEventListener( 'progress', function ( event ) {
 
 				var callbacks = loading[ url ];
 
-				for ( var i = 0; i < callbacks.length; i ++ ) {
+				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					callbacks[ i ]( response );
+					var callback = callbacks[ i ];
+					if ( callback.onProgress ) callback.onProgress( event );
 
 				}
 
-				delete loading[ url ];
-
 			}, false );
-
-			if ( onProgress !== undefined ) {
-
-				request.addEventListener( 'progress', function ( event ) {
-
-					onProgress( event );
-
-				}, false );
-
-			}
 
 			request.addEventListener( 'error', function ( event ) {
 
-				if ( onError ) onError( event );
+				var callbacks = loading[ url ];
+
+				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+					var callback = callbacks[ i ];
+					if ( callback.onError ) callback.onError( event );
+
+				}
 
 				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
