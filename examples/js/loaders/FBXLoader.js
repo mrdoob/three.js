@@ -1017,43 +1017,47 @@
 
 		}
 
-		// Convert the material indices of each vertex into rendering groups on the geometry.
+		if ( materialInfo.mappingType !== 'AllSame' ) {
 
-		var materialIndexBuffer = bufferInfo.materialIndexBuffer;
-		var prevMaterialIndex = materialIndexBuffer[ 0 ];
-		var startIndex = 0;
+			// Convert the material indices of each vertex into rendering groups on the geometry.
+			var materialIndexBuffer = bufferInfo.materialIndexBuffer;
+			var prevMaterialIndex = materialIndexBuffer[ 0 ];
+			var startIndex = 0;
 
-		for ( var i = 0; i < materialIndexBuffer.length; ++ i ) {
+			for ( var i = 0; i < materialIndexBuffer.length; ++ i ) {
 
-			if ( materialIndexBuffer[ i ] !== prevMaterialIndex ) {
+				if ( materialIndexBuffer[ i ] !== prevMaterialIndex ) {
 
-				geo.addGroup( startIndex, i - startIndex, prevMaterialIndex );
+					geo.addGroup( startIndex, i - startIndex, prevMaterialIndex );
 
-				prevMaterialIndex = materialIndexBuffer[ i ];
-				startIndex = i;
+					prevMaterialIndex = materialIndexBuffer[ i ];
+					startIndex = i;
 
-			}
-
-		}
-
-		// the loop above doesn't add the last group, do that here.
-		if ( geo.groups.length > 0 ) {
-
-			var lastGroup = geo.groups[ geo.groups.length - 1 ];
-			var lastIndex = lastGroup.start + lastGroup.count;
-
-			if ( lastIndex !== materialIndexBuffer.length ) {
-
-				geo.addGroup( lastIndex, materialIndexBuffer.length - lastIndex, prevMaterialIndex );
+				}
 
 			}
 
-		}
+			// the loop above doesn't add the last group, do that here.
+			if ( geo.groups.length > 0 ) {
 
-		// catch case where the whole geometry has a single non-zero index
-		if ( geo.groups.length === 0 && materialIndexBuffer[ 0 ] !== 0 ) {
+				var lastGroup = geo.groups[ geo.groups.length - 1 ];
+				var lastIndex = lastGroup.start + lastGroup.count;
 
-			geo.addGroup( 0, materialIndexBuffer.length, materialIndexBuffer[ 0 ] );
+				if ( lastIndex !== materialIndexBuffer.length ) {
+
+					geo.addGroup( lastIndex, materialIndexBuffer.length - lastIndex, prevMaterialIndex );
+
+				}
+
+			}
+
+			// case where there are multiple materials but the whole geometry is only
+			// using one of them
+			if ( geo.groups.length === 0 ) {
+
+				geo.addGroup( 0, materialIndexBuffer.length, materialIndexBuffer[ 0 ] );
+
+			}
 
 		}
 
