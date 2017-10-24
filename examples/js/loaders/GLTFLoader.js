@@ -70,26 +70,28 @@ THREE.GLTFLoader = ( function () {
 
 			var magic = convertUint8ArrayToString( new Uint8Array( data, 0, 4 ) );
 
-			if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
+			if ( typeof data === 'string' ) {
 
-				extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
-				content = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
-				var json = JSON.parse( content );
+					content = data;
 
 			} else {
 
-				try {
+				var magic = convertUint8ArrayToString( new Uint8Array( data, 0, 4 ) );
 
-					var json = JSON.parse( data );
+				if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
 
-				} catch ( e ) {
+					extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
+					content = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
+
+				} else {
 
 					content = convertUint8ArrayToString( new Uint8Array( data ) );
-					var json = JSON.parse( content );
 
 				}
 
 			}
+
+				var json = JSON.parse( content );
 
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
