@@ -16,7 +16,7 @@ if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
  */
 THREE.OBJLoader2 = (function () {
 
-	var OBJLOADER2_VERSION = '2.1.0';
+	var OBJLOADER2_VERSION = '2.1.1';
 	var LoaderBase = THREE.LoaderSupport.LoaderBase;
 	var Validator = THREE.LoaderSupport.Validator;
 	var ConsoleLogger = THREE.LoaderSupport.ConsoleLogger;
@@ -254,12 +254,10 @@ THREE.OBJLoader2 = (function () {
 		var buildCode = function ( funcBuildObject, funcBuildSingelton ) {
 			var workerCode = '';
 			workerCode += '/**\n';
-			workerCode += '  * This code was constructed by OBJLoader2 buildWorkerCode.\n';
+			workerCode += '  * This code was constructed by OBJLoader2 buildCode.\n';
 			workerCode += '  */\n\n';
 			workerCode += funcBuildSingelton( 'LoaderBase', 'LoaderBase', LoaderBase );
 			workerCode += funcBuildObject( 'Consts', Consts );
-			workerCode += funcBuildObject( 'Validator', Validator );
-			workerCode += funcBuildSingelton( 'ConsoleLogger', 'ConsoleLogger', ConsoleLogger );
 			workerCode += funcBuildSingelton( 'Parser', 'Parser', Parser );
 			workerCode += funcBuildSingelton( 'RawMesh', 'RawMesh', RawMesh );
 			workerCode += funcBuildSingelton( 'RawMeshSubGroup', 'RawMeshSubGroup', RawMeshSubGroup );
@@ -278,7 +276,6 @@ THREE.OBJLoader2 = (function () {
 		}
 		this.workerSupport.run(
 			{
-				cmd: 'run',
 				params: {
 					useAsync: true,
 					materialPerSmoothingGroup: this.materialPerSmoothingGroup,
@@ -293,8 +290,9 @@ THREE.OBJLoader2 = (function () {
 					// in async case only material names are supplied to parser
 					materials: materialNames
 				},
-				buffers: {
-					input: content
+				data: {
+					input: content,
+					options: null
 				}
 			},
 			[ content.buffer ]
@@ -561,7 +559,7 @@ THREE.OBJLoader2 = (function () {
 							throw 'Vertex Colors were detected, but vertex count and color count do not match!';
 
 						}
-						this.processCompletedObject( null, this.rawMesh.groupName, currentByte );
+						this.processCompletedObject( this.rawMesh.objectName, this.rawMesh.groupName, currentByte );
 						reachedFaces = false;
 
 					}
@@ -600,20 +598,13 @@ THREE.OBJLoader2 = (function () {
 
 				case Consts.LINE_G:
 					this.processCompletedGroup( concatStringBuffer( buffer, bufferPointer, slashSpacePattern ), currentByte );
+					reachedFaces = false;
 					flushStringBuffer( buffer, bufferPointer );
 					break;
 
 				case Consts.LINE_O:
-					if ( this.rawMesh.vertices.length > 0 ) {
-
-						this.processCompletedObject( concatStringBuffer( buffer, bufferPointer, slashSpacePattern ), null, currentByte );
+					this.processCompletedObject( concatStringBuffer( buffer, bufferPointer, slashSpacePattern ), this.rawMesh.groupName, currentByte );
 						reachedFaces = false;
-
-					} else {
-
-						this.rawMesh.pushObject( concatStringBuffer( buffer, bufferPointer, slashSpacePattern ) );
-
-					}
 					flushStringBuffer( buffer, bufferPointer );
 					break;
 
@@ -656,9 +647,15 @@ THREE.OBJLoader2 = (function () {
 				this.buildMesh( result, currentByte );
 				var progressBytesPercent = currentByte / this.totalBytes;
 				this.callbackProgress( 'Completed object: ' + objectName + ' Total progress: ' + ( progressBytesPercent * 100 ).toFixed( 2 ) + '%', progressBytesPercent );
+			this.rawMesh = this.rawMesh.newInstanceFromObject( objectName, groupName );
+
+			} else {
+
+				// if a object was set that did not lead to object creation in finalize, then the object name has to be updated
+				this.rawMesh.pushObject( objectName );
 
 			}
-			this.rawMesh = this.rawMesh.newInstanceFromObject( objectName, groupName );
+
 		};
 
 		Parser.prototype.processCompletedGroup = function ( groupName, currentByte ) {
