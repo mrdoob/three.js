@@ -1132,11 +1132,11 @@
 
 		var mappingType = ColorNode.properties.MappingInformationType;
 		var referenceType = ColorNode.properties.ReferenceInformationType;
-		var buffer = parseFloatArray( ColorNode.subNodes.Colors.properties.a );
+		var buffer = ColorNode.subNodes.Colors.properties.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
-			indexBuffer = parseFloatArray( ColorNode.subNodes.ColorIndex.properties.a );
+			indexBuffer = ColorNode.subNodes.ColorIndex.properties.a;
 
 		}
 
@@ -1360,9 +1360,9 @@
 
 		var degree = order - 1;
 
-		var knots = parseFloatArray( geometryNode.subNodes.KnotVector.properties.a );
+		var knots = geometryNode.subNodes.KnotVector.properties.a;
 		var controlPoints = [];
-		var pointsValues = parseFloatArray( geometryNode.subNodes.Points.properties.a );
+		var pointsValues = geometryNode.subNodes.Points.properties.a;
 
 		for ( var i = 0, l = pointsValues.length; i < l; i += 4 ) {
 
@@ -3013,10 +3013,10 @@
 			id: animationCurve.id,
 			internalID: animationCurve.id,
 			times: parseFloatArray( animationCurve.subNodes.KeyTime.properties.a ).map( convertFBXTimeToSeconds ),
-			values: parseFloatArray( animationCurve.subNodes.KeyValueFloat.properties.a ),
+			values: animationCurve.subNodes.KeyValueFloat.properties.a,
 
 			attrFlag: parseIntArray( animationCurve.subNodes.KeyAttrFlags.properties.a ),
-			attrData: parseFloatArray( animationCurve.subNodes.KeyAttrDataFloat.properties.a )
+			attrData: animationCurve.subNodes.KeyAttrDataFloat.properties.a,
 		};
 
 	}
@@ -4316,27 +4316,29 @@
 						propValue = new THREE.Matrix4().fromArray( parseFloatArray( propValue ) );
 						break;
 
-            // // TODO: ParseFloatArray
-            // case 'ColorIndex':
-            // case 'Colors':
-            // case 'KeyAttrDataFloat':
-            // case 'KeyTime':
-            // case 'KeyValueFloat':
-            // case 'KnotVector':
-            // case 'Normals':
-            // case 'Points':
-            // case 'UV':
-            // case 'Vertices':
-            // case 'Weights':
-            //   break;
+					case 'ColorIndex':
+					case 'Colors':
+					case 'KeyAttrDataFloat':
+					case 'KeyValueFloat':
+					case 'KnotVector':
+					case 'Points':
+						propValue = parseFloatArray( propValue );
+						break;
 
-            // // TODO: ParseIntArray
-            // case 'Materials':
-            // case 'NormalIndex':
-            // case 'NormalsIndex':
-            // case 'PolygonVertexIndex':
-            // case 'UVIndex':
-            //   break;
+					// TODO: ParseFloatArray
+					// case 'KeyTime':
+					// case 'Normals':
+					// case 'UV':
+					// case 'Vertices':
+					// case 'Weights':
+
+					// // TODO: ParseIntArray
+					// case 'Materials':
+					// case 'NormalIndex':
+					// case 'NormalsIndex':
+					// case 'PolygonVertexIndex':
+					// case 'UVIndex':
+					//   break;
 
 				}
 
@@ -4636,19 +4638,22 @@
 								node.properties.a = new THREE.Matrix4().fromArray( value );
 								break;
 
-              // // TODO: ParseFloatArray
-              // case 'ColorIndex':
-              // case 'Colors':
-              // case 'KeyAttrDataFloat':
-              // case 'KeyTime':
-              // case 'KeyValueFloat':
-              // case 'KnotVector':
-              // case 'Normals':
-              // case 'Points':
-              // case 'UV':
+							case 'ColorIndex':
+              case 'Colors':
+              case 'KeyAttrDataFloat':
+              case 'KeyValueFloat':
+              case 'KnotVector':
+              case 'Points':
+								node.properties.a = value;
+								break;
+
+
+              // TODO: ParseFloatArray
+							// case 'KeyTime':
+							// case 'Normals':
+							// case 'UV':
               // case 'Vertices':
-              // case 'Weights':
-              //   break;
+							// case 'Weights':
 
               // // TODO: ParseIntArray
               // case 'Materials':
