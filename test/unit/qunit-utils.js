@@ -243,33 +243,62 @@ function runStdGeometryTests( assert, geometries ) {
 //
 
 // Run common light tests.
-function runStdLightTests( assert, lights ) {
+function runStdLightTests( lights ) {
 
-	for ( var i = 0, l = lights.length; i < l; i++ ) {
+	for ( var i = 0, l = lights.length; i < l; i ++ ) {
 
-		var light = lights[i];
+		var light = lights[ i ];
 
-		// Clone
-		checkLightClone( light );
+		// copy and clone
+		checkLightCopyClone( light );
 
-		// json round trip
-		checkLightJsonRoundtrip( light );
+		// THREE.Light doesn't get parsed by ObjectLoader as it's only
+		// used as an abstract base class - so we skip the JSON tests
+		if ( light.type !== "Light" ) {
+
+			// json round trip
+			checkLightJsonRoundtrip( light );
+
+		}
+
 	}
 
 }
 
+function checkLightCopyClone( light ) {
 
-function checkLightClone( light ) {
+	// copy
+	var newLight = new light.constructor( 0xc0ffee );
+	newLight.copy( light );
+
+	QUnit.assert.notEqual( newLight.uuid, light.uuid, "Copied light's UUID differs from original" );
+	QUnit.assert.notEqual( newLight.id, light.id, "Copied light's id differs from original" );
+	QUnit.assert.smartEqual( newLight, light, "Copied light is equal to original" );
+
+	// real copy?
+	newLight.color.setHex( 0xc0ffee );
+	QUnit.assert.notStrictEqual(
+		newLight.color.getHex(), light.color.getHex(), "Copied light is independent from original"
+	);
 
 	// Clone
-	var copy = light.clone();
-	QUnit.assert.notEqual( copy.uuid, light.uuid, "clone uuid should differ from original" );
-	QUnit.assert.notEqual( copy.id, light.id, "clone id should differ from original" );
-	QUnit.assert.smartEqual( copy, light, "clone is equal to original" );
+	var clone = light.clone(); // better get a new var
+	QUnit.assert.notEqual( clone.uuid, light.uuid, "Cloned light's UUID differs from original" );
+	QUnit.assert.notEqual( clone.id, light.id, "Clone light's id differs from original" );
+	QUnit.assert.smartEqual( clone, light, "Clone light is equal to original" );
 
+	// real clone?
+	clone.color.setHex( 0xc0ffee );
+	QUnit.assert.notStrictEqual(
+		clone.color.getHex(), light.color.getHex(), "Clone light is independent from original"
+	);
 
-	// json round trip with clone
-	checkLightJsonRoundtrip( copy );
+	if ( light.type !== "Light" ) {
+
+		// json round trip with clone
+		checkLightJsonRoundtrip( clone );
+
+	}
 
 }
 

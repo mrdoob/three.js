@@ -437,7 +437,7 @@ function WebGLRenderer( parameters ) {
 
 	// Clearing
 
-	this.getClearColor = function() {
+	this.getClearColor = function () {
 
 		return background.getClearColor();
 
@@ -449,13 +449,13 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.getClearAlpha = function() {
+	this.getClearAlpha = function () {
 
 		return background.getClearAlpha();
 
 	};
 
-	this.setClearAlpha = function() {
+	this.setClearAlpha = function () {
 
 		background.setClearAlpha.apply( background, arguments );
 

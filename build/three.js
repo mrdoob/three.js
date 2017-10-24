@@ -838,7 +838,7 @@
 
 		},
 
-		lengthManhattan: function () {
+		manhattanLength: function () {
 
 			return Math.abs( this.x ) + Math.abs( this.y );
 
@@ -875,7 +875,7 @@
 
 		},
 
-		distanceToManhattan: function ( v ) {
+		manhattanDistanceTo: function ( v ) {
 
 			return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y );
 
@@ -2984,7 +2984,7 @@
 
 		},
 
-		lengthManhattan: function () {
+		manhattanLength: function () {
 
 			return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
 
@@ -3111,7 +3111,7 @@
 
 		},
 
-		distanceToManhattan: function ( v ) {
+		manhattanDistanceTo: function ( v ) {
 
 			return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y ) + Math.abs( this.z - v.z );
 
@@ -4458,7 +4458,7 @@
 
 		},
 
-		lengthManhattan: function () {
+		manhattanLength: function () {
 
 			return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z ) + Math.abs( this.w );
 
@@ -10361,23 +10361,23 @@
 		}(),
 
 		rotateOnWorldAxis: function () {
-			
+
 			// rotate object on axis in world space
 			// axis is assumed to be normalized
 			// method assumes no rotated parent
 
 			var q1 = new Quaternion();
-			
+
 			return function rotateOnWorldAxis( axis, angle ) {
-			
+
 				q1.setFromAxisAngle( axis, angle );
-			
+
 				this.quaternion.premultiply( q1 );
-			
+
 				return this;
-			
+
 			};
-			
+
 		}(),
 
 		rotateX: function () {
@@ -12162,6 +12162,21 @@
 
 		},
 
+		setFromPoints: function ( points ) {
+
+			this.vertices = [];
+
+			for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+				var point = points[ i ];
+				this.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
+
+			}
+
+			return this;
+
+		},
+
 		sortFacesByMaterialIndex: function () {
 
 			var faces = this.faces;
@@ -13704,6 +13719,23 @@
 
 		},
 
+		setFromPoints: function ( points ) {
+
+			var position = [];
+
+			for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+				var point = points[ i ];
+				position.push( point.x, point.y, point.z || 0 );
+
+			}
+
+			this.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+
+			return this;
+
+		},
+
 		updateFromObject: function ( object ) {
 
 			var geometry = object.geometry;
@@ -14519,6 +14551,10 @@
 
 		var scope = this;
 
+		width = width || 1;
+		height = height || 1;
+		depth = depth || 1;
+
 		// segments
 
 		widthSegments = Math.floor( widthSegments ) || 1;
@@ -14704,6 +14740,9 @@
 			widthSegments: widthSegments,
 			heightSegments: heightSegments
 		};
+
+		width = width || 1;
+		height = height || 1;
 
 		var width_half = width / 2;
 		var height_half = height / 2;
@@ -21545,7 +21584,7 @@
 
 		// Clearing
 
-		this.getClearColor = function() {
+		this.getClearColor = function () {
 
 			return background.getClearColor();
 
@@ -21557,13 +21596,13 @@
 
 		};
 
-		this.getClearAlpha = function() {
+		this.getClearAlpha = function () {
 
 			return background.getClearAlpha();
 
 		};
 
-		this.setClearAlpha = function() {
+		this.setClearAlpha = function () {
 
 			background.setClearAlpha.apply( background, arguments );
 
@@ -24434,7 +24473,7 @@
 
 					var sw = this.geometry.skinWeights[ i ];
 
-					scale = 1.0 / sw.lengthManhattan();
+					scale = 1.0 / sw.manhattanLength();
 
 					if ( scale !== Infinity ) {
 
@@ -24461,7 +24500,7 @@
 					vec.z = skinWeight.getZ( i );
 					vec.w = skinWeight.getW( i );
 
-					scale = 1.0 / vec.lengthManhattan();
+					scale = 1.0 / vec.manhattanLength();
 
 					if ( scale !== Infinity ) {
 
@@ -26257,8 +26296,8 @@
 			q: q
 		};
 
-		radius = radius || 100;
-		tube = tube || 40;
+		radius = radius || 1;
+		tube = tube || 0.4;
 		tubularSegments = Math.floor( tubularSegments ) || 64;
 		radialSegments = Math.floor( radialSegments ) || 8;
 		p = p || 2;
@@ -26439,8 +26478,8 @@
 			arc: arc
 		};
 
-		radius = radius || 100;
-		tube = tube || 40;
+		radius = radius || 1;
+		tube = tube || 0.4;
 		radialSegments = Math.floor( radialSegments ) || 8;
 		tubularSegments = Math.floor( tubularSegments ) || 6;
 		arc = arc || Math.PI * 2;
@@ -28151,7 +28190,7 @@
 			thetaLength: thetaLength
 		};
 
-		radius = radius || 50;
+		radius = radius || 1;
 
 		widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
 		heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
@@ -28293,8 +28332,8 @@
 			thetaLength: thetaLength
 		};
 
-		innerRadius = innerRadius || 20;
-		outerRadius = outerRadius || 50;
+		innerRadius = innerRadius || 0.5;
+		outerRadius = outerRadius || 1;
 
 		thetaStart = thetaStart !== undefined ? thetaStart : 0;
 		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
@@ -28896,9 +28935,9 @@
 
 		var scope = this;
 
-		radiusTop = radiusTop !== undefined ? radiusTop : 20;
-		radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
-		height = height !== undefined ? height : 100;
+		radiusTop = radiusTop !== undefined ? radiusTop : 1;
+		radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
+		height = height || 1;
 
 		radialSegments = Math.floor( radialSegments ) || 8;
 		heightSegments = Math.floor( heightSegments ) || 1;
@@ -29245,7 +29284,7 @@
 			thetaLength: thetaLength
 		};
 
-		radius = radius || 50;
+		radius = radius || 1;
 		segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
 		thetaStart = thetaStart !== undefined ? thetaStart : 0;
@@ -30219,6 +30258,8 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
+	var loading = {};
+
 	function FileLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
@@ -30250,6 +30291,22 @@
 				}, 0 );
 
 				return cached;
+
+			}
+
+			// Check if request is duplicate
+
+			if ( loading[ url ] !== undefined ) {
+
+				loading[ url ].push( {
+
+					onLoad: onLoad,
+					onProgress: onProgress,
+					onError: onError
+
+				} );
+
+				return;
 
 			}
 
@@ -30344,7 +30401,20 @@
 
 			} else {
 
+				// Initialise array for duplicate requests
+
+				loading[ url ] = [];
+
+				loading[ url ].push( {
+
+					onLoad: onLoad,
+					onProgress: onProgress,
+					onError: onError
+
+				} );
+
 				var request = new XMLHttpRequest();
+
 				request.open( 'GET', url, true );
 
 				request.addEventListener( 'load', function ( event ) {
@@ -30353,9 +30423,18 @@
 
 					Cache.add( url, response );
 
+					var callbacks = loading[ url ];
+
+					delete loading[ url ];
+
 					if ( this.status === 200 ) {
 
-						if ( onLoad ) onLoad( response );
+						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+							var callback = callbacks[ i ];
+							if ( callback.onLoad ) callback.onLoad( response );
+
+						}
 
 						scope.manager.itemEnd( url );
 
@@ -30366,13 +30445,23 @@
 
 						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-						if ( onLoad ) onLoad( response );
+						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+							var callback = callbacks[ i ];
+							if ( callback.onLoad ) callback.onLoad( response );
+
+						}
 
 						scope.manager.itemEnd( url );
 
 					} else {
 
-						if ( onError ) onError( event );
+						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+							var callback = callbacks[ i ];
+							if ( callback.onError ) callback.onError( event );
+
+						}
 
 						scope.manager.itemEnd( url );
 						scope.manager.itemError( url );
@@ -30381,19 +30470,29 @@
 
 				}, false );
 
-				if ( onProgress !== undefined ) {
+				request.addEventListener( 'progress', function ( event ) {
 
-					request.addEventListener( 'progress', function ( event ) {
+					var callbacks = loading[ url ];
 
-						onProgress( event );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					}, false );
+						var callback = callbacks[ i ];
+						if ( callback.onProgress ) callback.onProgress( event );
 
-				}
+					}
+
+				}, false );
 
 				request.addEventListener( 'error', function ( event ) {
 
-					if ( onError ) onError( event );
+					var callbacks = loading[ url ];
+
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						var callback = callbacks[ i ];
+						if ( callback.onError ) callback.onError( event );
+
+					}
 
 					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
@@ -35726,43 +35825,6 @@
 			}
 
 			return points;
-
-		},
-
-		/**************************************************************
-		 *	Create Geometries Helpers
-		 **************************************************************/
-
-		/// Generate geometry from path points (for Line or Points objects)
-
-		createPointsGeometry: function ( divisions ) {
-
-			var pts = this.getPoints( divisions );
-			return this.createGeometry( pts );
-
-		},
-
-		// Generate geometry from equidistant sampling along the path
-
-		createSpacedPointsGeometry: function ( divisions ) {
-
-			var pts = this.getSpacedPoints( divisions );
-			return this.createGeometry( pts );
-
-		},
-
-		createGeometry: function ( points ) {
-
-			var geometry = new Geometry();
-
-			for ( var i = 0, l = points.length; i < l; i ++ ) {
-
-				var point = points[ i ];
-				geometry.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
-
-			}
-
-			return geometry;
 
 		}
 
@@ -42899,6 +42961,51 @@
 
 	//
 
+	Object.assign( CurvePath.prototype, {
+
+		createPointsGeometry: function ( divisions ) {
+
+			console.warn( 'THREE.CurvePath: .createPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
+
+			// generate geometry from path points (for Line or Points objects)
+
+			var pts = this.getPoints( divisions );
+			return this.createGeometry( pts );
+
+		},
+
+		createSpacedPointsGeometry: function ( divisions ) {
+
+			console.warn( 'THREE.CurvePath: .createSpacedPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
+
+			// generate geometry from equidistant sampling along the path
+
+			var pts = this.getSpacedPoints( divisions );
+			return this.createGeometry( pts );
+
+		},
+
+		createGeometry: function ( points ) {
+
+			console.warn( 'THREE.CurvePath: .createGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
+
+			var geometry = new Geometry();
+
+			for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+				var point = points[ i ];
+				geometry.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
+
+			}
+
+			return geometry;
+
+		}
+
+	} );
+
+	//
+
 	function ClosedSplineCurve3( points ) {
 
 		console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
@@ -43314,8 +43421,20 @@
 
 		fromAttribute: function ( attribute, index, offset ) {
 
-			console.error( 'THREE.Vector2: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+			console.warn( 'THREE.Vector2: .fromAttribute() has been renamed to .fromBufferAttribute().' );
 			return this.fromBufferAttribute( attribute, index, offset );
+
+		},
+		distanceToManhattan: function ( v ) {
+
+			console.warn( 'THREE.Vector2: .distanceToManhattan() has been renamed to .manhattanDistanceTo().' );
+			return this.manhattanDistanceTo( v );
+
+		},
+		lengthManhattan: function () {
+
+			console.warn( 'THREE.Vector2: .lengthManhattan() has been renamed to .manhattanLength().' );
+			return this.manhattanLength();
 
 		}
 
@@ -43359,8 +43478,20 @@
 		},
 		fromAttribute: function ( attribute, index, offset ) {
 
-			console.error( 'THREE.Vector3: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+			console.warn( 'THREE.Vector3: .fromAttribute() has been renamed to .fromBufferAttribute().' );
 			return this.fromBufferAttribute( attribute, index, offset );
+
+		},
+		distanceToManhattan: function ( v ) {
+
+			console.warn( 'THREE.Vector3: .distanceToManhattan() has been renamed to .manhattanDistanceTo().' );
+			return this.manhattanDistanceTo( v );
+
+		},
+		lengthManhattan: function () {
+
+			console.warn( 'THREE.Vector3: .lengthManhattan() has been renamed to .manhattanLength().' );
+			return this.manhattanLength();
 
 		}
 
@@ -43370,8 +43501,14 @@
 
 		fromAttribute: function ( attribute, index, offset ) {
 
-			console.error( 'THREE.Vector4: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+			console.warn( 'THREE.Vector4: .fromAttribute() has been renamed to .fromBufferAttribute().' );
 			return this.fromBufferAttribute( attribute, index, offset );
+
+		},
+		lengthManhattan: function () {
+
+			console.warn( 'THREE.Vector4: .lengthManhattan() has been renamed to .manhattanLength().' );
+			return this.manhattanLength();
 
 		}
 

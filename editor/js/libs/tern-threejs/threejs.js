@@ -924,32 +924,8 @@
           "!type": "boolean",
           "!doc": "todo"
         },
-        "getWrapPoints": {
-          "!type": "fn(oldPts: todo, path: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createPointsGeometry": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "todo"
-        },
-        "addWrapPath": {
-          "!type": "fn(bendpath: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createGeometry": {
-          "!type": "fn(points: todo) -> todo",
-          "!doc": "todo"
-        },
         "add": {
           "!type": "fn(curve: todo) -> todo",
-          "!doc": "todo"
-        },
-        "getTransformedSpacedPoints": {
-          "!type": "fn(segments: todo, bends: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createSpacedPointsGeometry": {
-          "!type": "fn(divisions: todo) -> todo",
           "!doc": "todo"
         },
         "closePath": {
@@ -961,14 +937,6 @@
           "!doc": "todo"
         },
         "getCurveLengths": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        },
-        "getTransformedPoints": {
-          "!type": "fn(segments: todo, bends: todo) -> todo",
-          "!doc": "todo"
-        },
-        "checkConnection": {
           "!type": "fn() -> todo",
           "!doc": "todo"
         }
