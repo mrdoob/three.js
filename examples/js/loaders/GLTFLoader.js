@@ -91,7 +91,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-				var json = JSON.parse( content );
+			var json = JSON.parse( content );
 
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
