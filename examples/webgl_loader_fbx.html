@@ -1,197 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<title>three.js webgl - FBX loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
 
-<head>
-  <title>three.js webgl - FBX loader</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <style>
-    body {
-      font-family: Monospace;
-      background-color: #000;
-      color: #fff;
-      margin: 0px;
-      overflow: hidden;
-    }
+	<body>
+		<div id="info">
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader test
+		</div>
 
-    #info {
-      color: #fff;
-      position: absolute;
-      top: 10px;
-      width: 100%;
-      text-align: center;
-      z-index: 100;
-      display: block;
-    }
+		<script src="../build/three.js"></script>
 
-    #info a,
-    .button {
-      color: #f00;
-      font-weight: bold;
-      text-decoration: underline;
-      cursor: pointer
-    }
-  </style>
-</head>
+		<script src="js/controls/OrbitControls.js"></script>
 
-<body>
-  <div id="info">
-    <a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader test
-  </div>
+		<script src="js/curves/NURBSCurve.js"></script>
+		<script src="js/curves/NURBSUtils.js"></script>
+		<script src="js/loaders/FBXLoader.js"></script>
 
-  <script src="../build/three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-  <script src="js/controls/OrbitControls.js"></script>
+		<script>
 
-  <script src="js/curves/NURBSCurve.js"></script>
-  <script src="js/curves/NURBSUtils.js"></script>
-  <script src="js/loaders/FBXLoader.js"></script>
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-  <script src="js/Detector.js"></script>
-  <script src="js/libs/stats.min.js"></script>
-  <script src="js/libs/inflate.min.js"></script>
+			var container, stats, controls;
+			var camera, scene, renderer, light;
 
-  <script>
+			var clock = new THREE.Clock();
 
-    var container, stats, controls;
-    var camera, scene, renderer, light;
+			var mixers = [];
 
-    var clock = new THREE.Clock();
+			init();
 
-    var mixers = [];
+			function init() {
 
-    init();
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-    function init() {
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 
-      container = document.createElement('div');
-      document.body.appendChild(container);
+				scene = new THREE.Scene();
 
-      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+				// grid
+				var gridHelper = new THREE.GridHelper( 28, 28, 0x303030, 0x303030 );
+				gridHelper.position.set( 0, - 0.04, 0 );
+				scene.add( gridHelper );
 
-      scene = new THREE.Scene();
+				// stats
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-      // grid
-      var gridHelper = new THREE.GridHelper(28, 28, 0x303030, 0x303030);
-      gridHelper.position.set(0, - 0.04, 0);
-      scene.add(gridHelper);
+				// model
+				var manager = new THREE.LoadingManager();
+				manager.onProgress = function( item, loaded, total ) {
 
-      // stats
-      stats = new Stats();
-      container.appendChild(stats.dom);
+					console.log( item, loaded, total );
 
-      // model
-      var manager = new THREE.LoadingManager();
-      manager.onProgress = function (item, loaded, total) {
+				};
 
-        // console.log( item, loaded, total );
+				var onProgress = function( xhr ) {
 
-      };
+					if ( xhr.lengthComputable ) {
 
-      var onProgress = function (xhr) {
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
-        if (xhr.lengthComputable) {
+					}
 
-          var percentComplete = xhr.loaded / xhr.total * 100;
-          // console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+				};
 
-        }
+				var onError = function( xhr ) {
 
-      };
+					console.error( xhr );
 
-      var onError = function (xhr) {
+				};
 
-        console.error(xhr);
+				var loader = new THREE.FBXLoader( manager );
+				loader.load( 'models/fbx/xsi_man_skinning.fbx', function( object ) {
 
-      };
+					object.mixer = new THREE.AnimationMixer( object );
+					mixers.push( object.mixer );
 
-      var loader = new THREE.FBXLoader(manager);
-      // loader.load('models/fbx/ASCIIandBinary/defeat.bin.fbx', function (object) {
-      // loader.load('models/fbx/ASCIIandBinary/defeat.fbx', function (object) {
-      // loader.load('models/fbx/ASCIIandBinary/defeat_30fps.fbx', function (object) {
-      loader.load('models/fbx/ASCIIandBinary/nao_ball.bin.fbx', function (object) {
-      // loader.load('models/fbx/ASCIIandBinary/nao_ball.fbx', function (object) {
+					var action = object.mixer.clipAction( object.animations[ 0 ] );
+					action.play();
 
-        if (object.animations[0]) {
-          object.mixer = new THREE.AnimationMixer(object);
-          mixers.push(object.mixer);
+					scene.add( object );
 
-          var action = object.mixer.clipAction(object.animations[0]);
-          action.play();
-        }
 
-        console.log(object);
-        object.scale.multiplyScalar(0.1);
-        scene.add(object);
+				}, onProgress, onError );
 
+				loader.load( 'models/fbx/nurbs.fbx', function( object ) {
 
-      }, onProgress, onError);
+					scene.add( object );
 
-      renderer = new THREE.WebGLRenderer();
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setClearColor(0xffffff, 1.0)
-      container.appendChild(renderer.domElement);
+				}, onProgress, onError );
 
-      // controls, camera
-      controls = new THREE.OrbitControls(camera, renderer.domElement);
-      controls.target.set(0, 12, 0);
-      camera.position.set(2, 18, 28);
-      controls.update();
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-      window.addEventListener('resize', onWindowResize, false);
+				// controls, camera
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 12, 0 );
+				camera.position.set( 2, 18, 28 );
+				controls.update();
 
-      light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
-      light.position.set(0, 1, 0);
-      scene.add(light);
+				window.addEventListener( 'resize', onWindowResize, false );
 
-      light = new THREE.DirectionalLight(0xffffff, 1.0);
-      light.position.set(0, 1, 0);
-      scene.add(light);
+				light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
+				light.position.set(0, 1, 0);
+				scene.add(light);
 
-      animate();
+				light = new THREE.DirectionalLight(0xffffff, 1.0);
+				light.position.set(0, 1, 0);
+				scene.add(light);
 
-    }
+				animate();
 
-    function onWindowResize() {
+			}
 
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
+			function onWindowResize() {
 
-      renderer.setSize(window.innerWidth, window.innerHeight);
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
-    }
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-    //
+			}
 
-    function animate() {
+			//
 
-      requestAnimationFrame(animate);
+			function animate() {
 
-      if (mixers.length > 0) {
+				requestAnimationFrame( animate );
 
-        for (var i = 0; i < mixers.length; i++) {
+				if ( mixers.length > 0 ) {
 
-          mixers[i].update(clock.getDelta());
+					for ( var i = 0; i < mixers.length; i ++ ) {
 
-        }
+						mixers[ i ].update( clock.getDelta() );
 
-      }
+					}
 
-      stats.update();
+				}
 
-      render();
+				stats.update();
 
-    }
+				render();
 
-    function render() {
+			}
 
-      renderer.render(scene, camera);
+			function render() {
 
-    }
+				renderer.render( scene, camera );
 
-  </script>
+			}
 
-</body>
+		</script>
 
+	</body>
 </html>
