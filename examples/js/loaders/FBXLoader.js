@@ -328,8 +328,7 @@
 
 			fileName = imageMap.get( children[ 0 ].ID );
 
-		} else if ( relativeFilePath !== undefined && relativeFilePath[ 0 ] !== '/' &&
-			relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
+		} else if ( relativeFilePath !== undefined && relativeFilePath[ 0 ] !== '/' && relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
 
 			// use textureNode.properties.RelativeFilename
 			// if it exists and it doesn't seem an absolute path
@@ -4037,7 +4036,7 @@
 
 	} );
 
-	function TextParser() { }
+	function TextParser() {}
 
 	Object.assign( TextParser.prototype, {
 
@@ -4466,7 +4465,7 @@
 	// Binary format specification:
 	//   https://code.blender.org/2013/08/fbx-binary-file-format-specification/
 	//   https://wiki.rogiken.org/specifications/file-format/fbx/ (more detail but Japanese)
-	function BinaryParser() { }
+	function BinaryParser() {}
 
 	Object.assign( BinaryParser.prototype, {
 
@@ -4664,8 +4663,7 @@
 					if ( innerPropName.indexOf( 'Lcl ' ) === 0 ) innerPropName = innerPropName.replace( 'Lcl ', 'Lcl_' );
 					if ( innerPropType1.indexOf( 'Lcl ' ) === 0 ) innerPropType1 = innerPropType1.replace( 'Lcl ', 'Lcl_' );
 
-					if ( innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' ||
-						innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
+					if ( innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' || innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
 
 						innerPropValue = [
 							node.propertyList[ 4 ],
@@ -5224,7 +5222,7 @@
 	} );
 
 
-	function FBXTree() { }
+	function FBXTree() {}
 
 	Object.assign( FBXTree.prototype, {
 
@@ -5321,8 +5319,8 @@
 
 			} else {
 
-				this.__cache_search_connection_children[ id ] = [];
-				return [];
+				this.__cache_search_connection_children[ id ] = [ ];
+				return [ ];
 
 			}
 
