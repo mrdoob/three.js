@@ -3698,9 +3698,9 @@
 			scl: bone.scale.toArray()
 		};
 
-		euler.setFromQuaternion( bone.quaternion, 'ZYX', false );
-
 		if ( animationNode === undefined ) return key;
+
+		euler.setFromQuaternion( bone.quaternion, 'ZYX', false );
 
 		try {
 
@@ -3713,7 +3713,6 @@
 			if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
 
 				// Only update the euler's values if rotation is defined for the axis on this frame
-				// otherwise stay with the previous value
 				if ( animationNode.R.curves.x.values[ frame ] ) {
 
 					euler.x = animationNode.R.curves.x.values[ frame ];
