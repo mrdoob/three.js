@@ -3700,6 +3700,8 @@
 
 		if ( animationNode === undefined ) return key;
 
+		euler.setFromQuaternion( bone.quaternion, 'ZYX', false );
+
 		try {
 
 			if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
@@ -3710,11 +3712,26 @@
 
 			if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
 
-				var rotationX = animationNode.R.curves.x.values[ frame ];
-				var rotationY = animationNode.R.curves.y.values[ frame ];
-				var rotationZ = animationNode.R.curves.z.values[ frame ];
+				// Only update the euler's values if rotation is defined for the axis on this frame
+				if ( animationNode.R.curves.x.values[ frame ] ) {
 
-				quaternion.setFromEuler( euler.set( rotationX, rotationY, rotationZ, 'ZYX' ) );
+					euler.x = animationNode.R.curves.x.values[ frame ];
+
+				}
+
+				if ( animationNode.R.curves.y.values[ frame ] ) {
+
+					euler.y = animationNode.R.curves.y.values[ frame ];
+
+				}
+
+				if ( animationNode.R.curves.z.values[ frame ] ) {
+
+					euler.z = animationNode.R.curves.z.values[ frame ];
+
+				}
+
+				quaternion.setFromEuler( euler );
 				key.rot = quaternion.toArray();
 
 			}
