@@ -328,8 +328,7 @@
 
 			fileName = imageMap.get( children[ 0 ].ID );
 
-		} else if ( relativeFilePath !== undefined && relativeFilePath[ 0 ] !== '/' &&
-				relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
+		} else if ( relativeFilePath !== undefined && relativeFilePath[ 0 ] !== '/' && relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
 
 			// use textureNode.properties.RelativeFilename
 			// if it exists and it doesn't seem an absolute path
@@ -1812,7 +1811,7 @@
 
 			if ( 'Lcl_Rotation' in node.properties ) {
 
-				var rotation = node.properties.Lcl_Rotation.value.map( degreeToRadian );
+				var rotation = node.properties.Lcl_Rotation.value.map( THREE.Math.degToRad );
 				rotation.push( 'ZYX' );
 				model.rotation.fromArray( rotation );
 
@@ -1826,7 +1825,7 @@
 
 			if ( 'PreRotation' in node.properties ) {
 
-				var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( DEG2RAD ), 'ZYX' );
+				var preRotations = new THREE.Euler().fromArray( node.properties.PreRotation.value.map( THREE.Math.degToRad ), 'ZYX' );
 				preRotations = new THREE.Quaternion().setFromEuler( preRotations );
 				var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
 				preRotations.multiply( currentRotation );
@@ -2659,9 +2658,9 @@
 
 				}
 
-				curves.x.values = curves.x.values.map( degreeToRadian );
-				curves.y.values = curves.y.values.map( degreeToRadian );
-				curves.z.values = curves.z.values.map( degreeToRadian );
+				curves.x.values = curves.x.values.map( THREE.Math.degToRad );
+				curves.y.values = curves.y.values.map( THREE.Math.degToRad );
+				curves.z.values = curves.z.values.map( THREE.Math.degToRad );
 
 				if ( curveNode.preRotations !== null ) {
 
@@ -3899,7 +3898,7 @@
 
 			for ( var i = 0; i < this.vertices.length; ++ i ) {
 
-				 this.vertices[ i ].copy( returnVar.vertices[ i ] );
+				this.vertices[ i ].copy( returnVar.vertices[ i ] );
 
 			}
 
@@ -4004,7 +4003,7 @@
 		/**
 		 * @returns	{{vertexBuffer: number[], normalBuffer: number[], uvBuffers: Array of number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
 		 */
-	 	flattenToBuffers: function () {
+		flattenToBuffers: function () {
 
 			var vertexBuffer = [];
 			var normalBuffer = [];
@@ -4717,8 +4716,7 @@
 					if ( innerPropName.indexOf( 'Lcl ' ) === 0 ) innerPropName = innerPropName.replace( 'Lcl ', 'Lcl_' );
 					if ( innerPropType1.indexOf( 'Lcl ' ) === 0 ) innerPropType1 = innerPropType1.replace( 'Lcl ', 'Lcl_' );
 
-					if ( innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' ||
-						 innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
+					if ( innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' || innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
 
 						innerPropValue = [
 							node.propertyList[ 4 ],
@@ -5575,21 +5573,6 @@
 		return s;
 
 	}
-
-	/**
-	 * Converts number from degrees into radians.
-	 * @param {number} value
-	 * @returns {number}
-	 */
-	function degreeToRadian( value ) {
-
-		return value * DEG2RAD;
-
-	}
-
-	var DEG2RAD = Math.PI / 180;
-
-	//
 
 	function findIndex( array, func ) {
 
