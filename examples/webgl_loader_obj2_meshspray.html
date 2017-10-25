@@ -140,10 +140,8 @@
 					var buildCode = function ( funcBuildObject, funcBuildSingelton ) {
 						var workerCode = '';
 						workerCode += '/**\n';
-						workerCode += '  * This code was constructed by MeshSpray buildWorkerCode.\n';
+						workerCode += '  * This code was constructed by MeshSpray buildCode.\n';
 						workerCode += '  */\n\n';
-						workerCode += funcBuildObject( 'Validator', Validator );
-						workerCode += funcBuildSingelton( 'ConsoleLogger', 'ConsoleLogger', ConsoleLogger );
 						workerCode += funcBuildSingelton( 'Parser', 'Parser', Parser );
 
 						return workerCode;
@@ -153,7 +151,6 @@
 					this.workerSupport.setCallbacks( scopeBuilderFunc, scopeFuncComplete );
 					this.workerSupport.run(
 						{
-							cmd: 'run',
 							params: {
 								dimension: prepData.dimension,
 								quantity: prepData.quantity,
@@ -166,8 +163,9 @@
 								debug: this.logger.debug,
 								enabled: this.logger.enabled
 							},
-							buffers: {
-								input: null
+							data: {
+								input: null,
+								options: null
 							}
 						}
 					);
