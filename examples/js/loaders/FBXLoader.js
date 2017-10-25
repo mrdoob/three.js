@@ -656,15 +656,15 @@
 				index: i,
 				indices: [],
 				weights: [],
-				transform: subDeformerNode.subNodes.Transform.properties.a,
-				transformLink: subDeformerNode.subNodes.TransformLink.properties.a,
+				transform: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.Transform.properties.a ),
+				transformLink: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.TransformLink.properties.a ),
 				linkMode: subDeformerNode.properties.Mode
 			};
 
 			if ( 'Indexes' in subDeformerNode.subNodes ) {
 
-				subDeformer.indices = parseNumberArray( subDeformerNode.subNodes.Indexes.properties.a );
-				subDeformer.weights = parseNumberArray( subDeformerNode.subNodes.Weights.properties.a );
+				subDeformer.indices = subDeformerNode.subNodes.Indexes.properties.a;
+				subDeformer.weights = subDeformerNode.subNodes.Weights.properties.a;
 
 			}
 
@@ -763,8 +763,8 @@
 
 		// First, each index is going to be its own vertex.
 
-		var vertexBuffer = parseNumberArray( subNodes.Vertices.properties.a );
-		var indexBuffer = parseNumberArray( subNodes.PolygonVertexIndex.properties.a );
+		var vertexBuffer = subNodes.Vertices.properties.a;
+		var indexBuffer = subNodes.PolygonVertexIndex.properties.a;
 
 		if ( subNodes.LayerElementNormal ) {
 
@@ -1016,7 +1016,7 @@
 
 		}
 
-		if ( materialInfo.mappingType !== 'AllSame' ) {
+		if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
 
 			// Convert the material indices of each vertex into rendering groups on the geometry.
 			var materialIndexBuffer = bufferInfo.materialIndexBuffer;
@@ -1073,13 +1073,13 @@
 
 		var mappingType = NormalNode.properties.MappingInformationType;
 		var referenceType = NormalNode.properties.ReferenceInformationType;
-		var buffer = parseNumberArray( NormalNode.subNodes.Normals.properties.a );
+		var buffer = NormalNode.subNodes.Normals.properties.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
 			if ( 'NormalIndex' in NormalNode.subNodes ) {
 
-				indexBuffer = parseNumberArray( NormalNode.subNodes.NormalIndex.properties.a );
+				indexBuffer = NormalNode.subNodes.NormalIndex.properties.a;
 
 			} else if ( 'NormalsIndex' in NormalNode.subNodes ) {
 
@@ -1108,11 +1108,11 @@
 
 		var mappingType = UVNode.properties.MappingInformationType;
 		var referenceType = UVNode.properties.ReferenceInformationType;
-		var buffer = parseNumberArray( UVNode.subNodes.UV.properties.a );
+		var buffer = UVNode.subNodes.UV.properties.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
-			indexBuffer = parseNumberArray( UVNode.subNodes.UVIndex.properties.a );
+			indexBuffer = UVNode.subNodes.UVIndex.properties.a;
 
 		}
 
@@ -1175,7 +1175,7 @@
 
 		}
 
-		var materialIndexBuffer = parseNumberArray( MaterialNode.subNodes.Materials.properties.a );
+		var materialIndexBuffer = MaterialNode.subNodes.Materials.properties.a;
 
 		// Since materials are stored as indices, there's a bit of a mismatch between FBX and what
 		// we expect.  So we create an intermediate buffer that points to the index in the buffer,
@@ -1938,7 +1938,7 @@
 
 				var node = PoseNode[ PoseNodeIndex ];
 
-				var rawMatWrd = node.subNodes.Matrix.properties.a;
+				var rawMatWrd = new THREE.Matrix4().fromArray( node.subNodes.Matrix.properties.a );
 
 				worldMatrices.set( parseInt( node.id ), rawMatWrd );
 
@@ -3016,10 +3016,10 @@
 			version: null,
 			id: animationCurve.id,
 			internalID: animationCurve.id,
-			times: parseNumberArray( animationCurve.subNodes.KeyTime.properties.a ).map( convertFBXTimeToSeconds ),
-			values: parseNumberArray( animationCurve.subNodes.KeyValueFloat.properties.a ),
+			times: animationCurve.subNodes.KeyTime.properties.a.map( convertFBXTimeToSeconds ),
+			values: animationCurve.subNodes.KeyValueFloat.properties.a,
 
-			attrFlag: parseNumberArray( animationCurve.subNodes.KeyAttrFlags.properties.a ),
+			attrFlag: animationCurve.subNodes.KeyAttrFlags.properties.a,
 			attrData: animationCurve.subNodes.KeyAttrDataFloat.properties.a,
 		};
 
@@ -4166,15 +4166,8 @@
 
 				}
 
-				// for special case,
-				//
-				//	  Vertices: *8670 {
-				//		  a: 0.0356229953467846,13.9599733352661,-0.399196773.....(snip)
-				// -0.0612030513584614,13.960485458374,-0.409748703241348,-0.10.....
-				// 0.12490539252758,13.7450733184814,-0.454119384288788,0.09272.....
-				// 0.0836158767342567,13.5432004928589,-0.435397416353226,0.028.....
-				//
-				// in these case the lines must continue from the previous line
+				// large arrays are split over multiple lines terminated with a ',' character
+				// if this is encountered the line needs to be joined to the previous line
 				if ( l.match( /^[^\s\t}]/ ) ) {
 
 					this.parseNodePropertyContinued( l );
@@ -4310,43 +4303,6 @@
 
 			}
 
-			// ...parentName.properties.a
-			if ( propName === 'a' ) {
-
-				switch ( parentName ) {
-
-					case 'Matrix':
-					case 'TransformLink':
-					case 'Transform':
-						propValue = new THREE.Matrix4().fromArray( parseNumberArray( propValue ) );
-						break;
-
-					case 'ColorIndex':
-					case 'Colors':
-					case 'KeyAttrDataFloat':
-					case 'KnotVector':
-					case 'NormalIndex':
-					case 'NormalsIndex':
-					case 'Points':
-						propValue = parseNumberArray( propValue );
-						break;
-
-					// TODO: for the following properties this check is not catching all occurences
-					// case 'KeyTime':
-					// case 'Normals':
-					// case 'UV':
-					// case 'Vertices':
-					// case 'KeyValueFloat':
-					// case 'Weights':
-
-					// case 'Materials':
-					// case 'PolygonVertexIndex':
-					// case 'UVIndex':
-
-				}
-
-			}
-
 			// Connections
 			if ( propName === 'C' ) {
 
@@ -4400,7 +4356,6 @@
 
 				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
 
-
 					currentNode.properties[ propName ].push( propValue );
 
 				} else {
@@ -4413,12 +4368,27 @@
 
 			this.setCurrentProp( currentNode.properties, propName );
 
+			// convert string to array, unless it ends in ',' in which case more will be added to it
+			if ( propName === 'a' && propValue.slice( - 1 ) !== ',' ) {
+
+				currentNode.properties.a = parseNumberArray( propValue );
+
+			}
+
 		},
 
-		// TODO:
 		parseNodePropertyContinued: function ( line ) {
 
 			this.currentProp[ this.currentPropName ] += line;
+
+			// if the line doesn't end in ',' we have reached the end of the property value
+			// so convert the string to an array
+			if ( line.slice( - 1 ) !== ',' ) {
+
+				var currentNode = this.getCurrentNode();
+				currentNode.properties.a = parseNumberArray( currentNode.properties.a );
+
+			}
 
 		},
 
@@ -4623,29 +4593,10 @@
 
 					if ( Array.isArray( value ) ) {
 
-						// node represents
-						//	Vertices: *3 {
-						//		a: 0.01, 0.02, 0.03
-						//	}
-						// of text format here.
-
 						node.properties[ node.name ] = node.propertyList[ 0 ];
 						subNodes[ node.name ] = node;
 
-						switch ( node.name ) {
-
-							case 'Matrix':
-							case 'TransformLink':
-							case 'Transform':
-								node.properties.a = new THREE.Matrix4().fromArray( value );
-								break;
-
-							default:
-								node.properties.a = value;
-								break;
-
-						}
-
+						node.properties.a = value;
 
 					} else {
 
@@ -5505,8 +5456,6 @@
 	 * @returns {number[]}
 	 */
 	function parseNumberArray( value ) {
-
-		if ( Array.isArray( value ) ) return value;
 
 		var array = value.split( ',' );
 
