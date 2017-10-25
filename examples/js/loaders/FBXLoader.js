@@ -657,15 +657,15 @@
 				index: i,
 				indices: [],
 				weights: [],
-				transform: parseMatrixArray( subDeformerNode.subNodes.Transform.properties.a ),
-				transformLink: parseMatrixArray( subDeformerNode.subNodes.TransformLink.properties.a ),
+				transform: subDeformerNode.subNodes.Transform.properties.a,
+				transformLink: subDeformerNode.subNodes.TransformLink.properties.a,
 				linkMode: subDeformerNode.properties.Mode
 			};
 
 			if ( 'Indexes' in subDeformerNode.subNodes ) {
 
-				subDeformer.indices = parseIntArray( subDeformerNode.subNodes.Indexes.properties.a );
-				subDeformer.weights = parseFloatArray( subDeformerNode.subNodes.Weights.properties.a );
+				subDeformer.indices = parseNumberArray( subDeformerNode.subNodes.Indexes.properties.a );
+				subDeformer.weights = parseNumberArray( subDeformerNode.subNodes.Weights.properties.a );
 
 			}
 
@@ -764,8 +764,8 @@
 
 		// First, each index is going to be its own vertex.
 
-		var vertexBuffer = parseFloatArray( subNodes.Vertices.properties.a );
-		var indexBuffer = parseIntArray( subNodes.PolygonVertexIndex.properties.a );
+		var vertexBuffer = parseNumberArray( subNodes.Vertices.properties.a );
+		var indexBuffer = parseNumberArray( subNodes.PolygonVertexIndex.properties.a );
 
 		if ( subNodes.LayerElementNormal ) {
 
@@ -1070,17 +1070,17 @@
 
 		var mappingType = NormalNode.properties.MappingInformationType;
 		var referenceType = NormalNode.properties.ReferenceInformationType;
-		var buffer = parseFloatArray( NormalNode.subNodes.Normals.properties.a );
+		var buffer = parseNumberArray( NormalNode.subNodes.Normals.properties.a );
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
 			if ( 'NormalIndex' in NormalNode.subNodes ) {
 
-				indexBuffer = parseIntArray( NormalNode.subNodes.NormalIndex.properties.a );
+				indexBuffer = parseNumberArray( NormalNode.subNodes.NormalIndex.properties.a );
 
 			} else if ( 'NormalsIndex' in NormalNode.subNodes ) {
 
-				indexBuffer = parseIntArray( NormalNode.subNodes.NormalsIndex.properties.a );
+				indexBuffer = NormalNode.subNodes.NormalsIndex.properties.a;
 
 			}
 
@@ -1105,11 +1105,11 @@
 
 		var mappingType = UVNode.properties.MappingInformationType;
 		var referenceType = UVNode.properties.ReferenceInformationType;
-		var buffer = parseFloatArray( UVNode.subNodes.UV.properties.a );
+		var buffer = parseNumberArray( UVNode.subNodes.UV.properties.a );
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
-			indexBuffer = parseIntArray( UVNode.subNodes.UVIndex.properties.a );
+			indexBuffer = parseNumberArray( UVNode.subNodes.UVIndex.properties.a );
 
 		}
 
@@ -1132,11 +1132,11 @@
 
 		var mappingType = ColorNode.properties.MappingInformationType;
 		var referenceType = ColorNode.properties.ReferenceInformationType;
-		var buffer = parseFloatArray( ColorNode.subNodes.Colors.properties.a );
+		var buffer = ColorNode.subNodes.Colors.properties.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
-			indexBuffer = parseFloatArray( ColorNode.subNodes.ColorIndex.properties.a );
+			indexBuffer = ColorNode.subNodes.ColorIndex.properties.a;
 
 		}
 
@@ -1172,7 +1172,7 @@
 
 		}
 
-		var materialIndexBuffer = parseIntArray( MaterialNode.subNodes.Materials.properties.a );
+		var materialIndexBuffer = parseNumberArray( MaterialNode.subNodes.Materials.properties.a );
 
 		// Since materials are stored as indices, there's a bit of a mismatch between FBX and what
 		// we expect.  So we create an intermediate buffer that points to the index in the buffer,
@@ -1360,9 +1360,9 @@
 
 		var degree = order - 1;
 
-		var knots = parseFloatArray( geometryNode.subNodes.KnotVector.properties.a );
+		var knots = geometryNode.subNodes.KnotVector.properties.a;
 		var controlPoints = [];
-		var pointsValues = parseFloatArray( geometryNode.subNodes.Points.properties.a );
+		var pointsValues = geometryNode.subNodes.Points.properties.a;
 
 		for ( var i = 0, l = pointsValues.length; i < l; i += 4 ) {
 
@@ -1935,7 +1935,7 @@
 
 				var node = PoseNode[ PoseNodeIndex ];
 
-				var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
+				var rawMatWrd = node.subNodes.Matrix.properties.a;
 
 				worldMatrices.set( parseInt( node.id ), rawMatWrd );
 
@@ -2616,6 +2616,7 @@
 
 			}
 			returnObject.curves.get( id )[ curveNode.attr ] = curveNode;
+
 			if ( curveNode.attr === 'R' ) {
 
 				var curves = curveNode.curves;
@@ -3012,11 +3013,11 @@
 			version: null,
 			id: animationCurve.id,
 			internalID: animationCurve.id,
-			times: parseFloatArray( animationCurve.subNodes.KeyTime.properties.a ).map( convertFBXTimeToSeconds ),
-			values: parseFloatArray( animationCurve.subNodes.KeyValueFloat.properties.a ),
+			times: parseNumberArray( animationCurve.subNodes.KeyTime.properties.a ).map( convertFBXTimeToSeconds ),
+			values: parseNumberArray( animationCurve.subNodes.KeyValueFloat.properties.a ),
 
-			attrFlag: parseIntArray( animationCurve.subNodes.KeyAttrFlags.properties.a ),
-			attrData: parseFloatArray( animationCurve.subNodes.KeyAttrDataFloat.properties.a )
+			attrFlag: parseNumberArray( animationCurve.subNodes.KeyAttrFlags.properties.a ),
+			attrData: animationCurve.subNodes.KeyAttrDataFloat.properties.a,
 		};
 
 	}
@@ -4306,6 +4307,43 @@
 
 			}
 
+			// ...parentName.properties.a
+			if ( propName === 'a' ) {
+
+				switch ( parentName ) {
+
+					case 'Matrix':
+					case 'TransformLink':
+					case 'Transform':
+						propValue = new THREE.Matrix4().fromArray( parseNumberArray( propValue ) );
+						break;
+
+					case 'ColorIndex':
+					case 'Colors':
+					case 'KeyAttrDataFloat':
+					case 'KnotVector':
+					case 'NormalIndex':
+					case 'NormalsIndex':
+					case 'Points':
+						propValue = parseNumberArray( propValue );
+						break;
+
+					// TODO: for the following properties this check is not catching all occurences
+					// case 'KeyTime':
+					// case 'Normals':
+					// case 'UV':
+					// case 'Vertices':
+					// case 'KeyValueFloat':
+					// case 'Weights':
+
+					// case 'Materials':
+					// case 'PolygonVertexIndex':
+					// case 'UVIndex':
+
+				}
+
+			}
+
 			// Connections
 			if ( propName === 'C' ) {
 
@@ -4345,7 +4383,6 @@
 			// already exists in properties, then append this
 			if ( propName in currentNode.properties ) {
 
-				// console.log( "duped entry found\nkey: " + propName + "\nvalue: " + propValue );
 				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
 
 					currentNode.properties[ propName ].push( propValue );
@@ -4359,6 +4396,7 @@
 			} else {
 
 				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
+
 
 					currentNode.properties[ propName ].push( propValue );
 
@@ -4428,7 +4466,7 @@
 				case 'Lcl_Translation':
 				case 'Lcl_Rotation':
 				case 'Lcl_Scaling':
-					innerPropValue = parseFloatArray( innerPropValue );
+					innerPropValue = parseNumberArray( innerPropValue );
 					break;
 
 			}
@@ -4591,9 +4629,20 @@
 						node.properties[ node.name ] = node.propertyList[ 0 ];
 						subNodes[ node.name ] = node;
 
-						// Later phase expects single property array is in node.properties.a as String.
-						// TODO: optimize
-						node.properties.a = value.toString();
+						switch ( node.name ) {
+
+							case 'Matrix':
+							case 'TransformLink':
+							case 'Transform':
+								node.properties.a = new THREE.Matrix4().fromArray( value );
+								break;
+
+							default:
+								node.properties.a = value;
+								break;
+
+						}
+
 
 					} else {
 
@@ -5444,40 +5493,24 @@
 	}
 
 	/**
-	 * Parses comma separated list of float numbers and returns them in an array.
+	 * Parses comma separated list of numbers and returns them in an array.
+	 * If an array is passed just return it - this is because the TextParser sometimes
+	 * returns strings instead of arrays, while the BinaryParser always returns arrays
+	 * TODO: this function should only need to be called from inside the TextParser
 	 * @example
 	 * // Returns [ 5.6, 9.4, 2.5, 1.4 ]
-	 * parseFloatArray( "5.6,9.4,2.5,1.4" )
+	 * parseNumberArray( "5.6,9.4,2.5,1.4" )
 	 * @returns {number[]}
 	 */
-	function parseFloatArray( string ) {
+	function parseNumberArray( value ) {
 
-		var array = string.split( ',' );
+		if ( Array.isArray( value ) ) return value;
+
+		var array = value.split( ',' );
 
 		for ( var i = 0, l = array.length; i < l; i ++ ) {
 
 			array[ i ] = parseFloat( array[ i ] );
-
-		}
-
-		return array;
-
-	}
-
-	/**
-	 * Parses comma separated list of int numbers and returns them in an array.
-	 * @example
-	 * // Returns [ 5, 8, 2, 3 ]
-	 * parseFloatArray( "5,8,2,3" )
-	 * @returns {number[]}
-	 */
-	function parseIntArray( string ) {
-
-		var array = string.split( ',' );
-
-		for ( var i = 0, l = array.length; i < l; i ++ ) {
-
-			array[ i ] = parseInt( array[ i ] );
 
 		}
 
@@ -5504,12 +5537,6 @@
 	function parseColor( property ) {
 
 		return new THREE.Color().fromArray( property.value );
-
-	}
-
-	function parseMatrixArray( floatString ) {
-
-		return new THREE.Matrix4().fromArray( parseFloatArray( floatString ) );
 
 	}
 
