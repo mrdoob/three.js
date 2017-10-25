@@ -68,11 +68,9 @@ THREE.GLTFLoader = ( function () {
 			var content;
 			var extensions = {};
 
-			var magic = convertUint8ArrayToString( new Uint8Array( data, 0, 4 ) );
-
 			if ( typeof data === 'string' ) {
 
-					content = data;
+				content = data;
 
 			} else {
 
