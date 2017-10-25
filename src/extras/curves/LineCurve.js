@@ -6,8 +6,8 @@ function LineCurve( v1, v2 ) {
 
 	Curve.call( this );
 
-	this.v1 = v1;
-	this.v2 = v2;
+	this.v1 = v1 || new Vector2();
+	this.v2 = v2 || new Vector2();
 
 }
 
@@ -48,6 +48,17 @@ LineCurve.prototype.getTangent = function ( /* t */ ) {
 	var tangent = this.v2.clone().sub( this.v1 );
 
 	return tangent.normalize();
+
+};
+
+LineCurve.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.v1.copy( source.v1 );
+	this.v2.copy( source.v2 );
+
+	return this;
 
 };
 

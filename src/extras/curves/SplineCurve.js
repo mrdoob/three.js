@@ -7,7 +7,7 @@ function SplineCurve( points /* array of Vector2 */ ) {
 
 	Curve.call( this );
 
-	this.points = ( points === undefined ) ? [] : points;
+	this.points = points || [];
 
 }
 
@@ -39,5 +39,22 @@ SplineCurve.prototype.getPoint = function ( t, optionalTarget ) {
 	return point;
 
 };
+
+SplineCurve.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+
+		var point = source.points[ i ];
+
+		this.points.push( point.clone() );
+
+	}
+
+	return this;
+
+};
+
 
 export { SplineCurve };

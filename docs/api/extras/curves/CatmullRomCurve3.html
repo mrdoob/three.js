@@ -41,10 +41,12 @@ var curveObject = new THREE.Line( geometry, material );
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Array points] )</h3>
-		<div>points – An array of [page:Vector3] points</div>
-
-
+		<h3>[name]( [page:Array points], [page:Boolean closed], [page:Float tension] )</h3>
+		<div>
+			points – An array of [page:Vector3] points<br/>
+			closed – Whether the curve is closed. Default is *false*.
+			tension – Tension of the curve. Default is *false*.
+		</div>
 
 
 		<h2>Properties</h2>
@@ -58,10 +60,10 @@ var curveObject = new THREE.Line( geometry, material );
 		</div>
 
 		<h3>[property:Array points]</h3>
-		<div>The array of array of [page:Vector3] points that define the curve.</div>
+		<div>The array of [page:Vector3] points that define the curve. It needs at least two entries.</div>
 
 		<h3>[property:Boolean closed]</h3>
-		<div>The curve will loop back onto itself when this is true. False by default</div>
+		<div>The curve will loop back onto itself when this is true.</div>
 
 		<h3>[property:String type]</h3>
 		<div>Possible values are `centripetal` (default), `chordal` and `catmullrom`.</div>
