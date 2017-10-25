@@ -656,8 +656,8 @@
 				index: i,
 				indices: [],
 				weights: [],
-				transform: parseMatrixArray( subDeformerNode.subNodes.Transform.properties.a ),
-				transformLink: parseMatrixArray( subDeformerNode.subNodes.TransformLink.properties.a ),
+				transform: subDeformerNode.subNodes.Transform.properties.a,
+				transformLink: subDeformerNode.subNodes.TransformLink.properties.a,
 				linkMode: subDeformerNode.properties.Mode
 			};
 
@@ -1938,7 +1938,7 @@
 
 				var node = PoseNode[ PoseNodeIndex ];
 
-				var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
+				var rawMatWrd = node.subNodes.Matrix.properties.a;
 
 				worldMatrices.set( parseInt( node.id ), rawMatWrd );
 
