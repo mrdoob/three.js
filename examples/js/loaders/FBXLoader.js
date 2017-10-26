@@ -644,10 +644,6 @@
 				return parseNurbsGeometry( geometryNode );
 				break;
 
-			default:
-				console.error( 'FBXLoader: Unsupported geometry type %s', geometryNode.attrType );
-				return THREE.BufferGeometry();
-
 		}
 
 	}
@@ -675,9 +671,7 @@
 
 		var subNodes = geometryNode.subNodes;
 
-		// Each index represents a vertex.
 		var vertexBuffer = subNodes.Vertices.properties.a;
-
 		var indexBuffer = subNodes.PolygonVertexIndex.properties.a;
 
 		var vertexB = [];
@@ -685,6 +679,8 @@
 		var colorsB = [];
 		var uvsB = [];
 		var materialsB = [];
+		var weightsB = [];
+		var weightsIndicesB = [];
 
 		if ( subNodes.LayerElementNormal ) {
 
@@ -716,8 +712,6 @@
 		if ( subNodes.LayerElementMaterial ) {
 
 			var materialInfo = getMaterials( subNodes.LayerElementMaterial[ 0 ] );
-
-			// console.log( materialInfo)
 
 		}
 
@@ -792,11 +786,14 @@
 
 				if ( weightTable[ vertexIndex ] !== undefined ) {
 
+					// always gets here
+
 					var array = weightTable[ vertexIndex ];
 
 					for ( var j = 0, jl = array.length; j < jl; j ++ ) {
 
 						weights.push( array[ j ].weight );
+
 						weightIndices.push( array[ j ].id );
 
 					}
@@ -842,6 +839,7 @@
 
 				}
 
+				// if the weight array is shorter than 4 pad with 0s
 				for ( var i = weights.length; i < 4; ++ i ) {
 
 					weights[ i ] = 0;
@@ -851,6 +849,13 @@
 
 				vertex.skinWeights.fromArray( weights );
 				vertex.skinIndices.fromArray( weightIndices );
+
+				for ( var i = 0; i < 4; ++ i ) {
+
+					weightsB.push( weights[ i ] )
+					weightsIndicesB.push(weightIndices[ i ] )
+
+				}
 
 			}
 
@@ -990,10 +995,6 @@
 
         if( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
 
-					var materi = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo );
-
-          face.materialIndex = materi[ 0 ];
-
           var materialIndex = getData(polygonVertexIndex, polygonIndex, vertexIndex, materialInfo)[0];
 
           for (var i = 2; i < faceLength; i++) {
@@ -1023,16 +1024,16 @@
 
 		// console.log(geometry)
 
-		// console.log( 'original', bufferInfo.materialIndexBuffer );
-		// console.log( 'new', materialsB );
+		console.log('original', bufferInfo.skinIndexBuffer); //skinWeightBuffer
+		console.log( 'new', weightsIndicesB );
 
-		// var is_same = (bufferInfo.materialIndexBuffer.length == materialsB.length) && bufferInfo.materialIndexBuffer.every( function ( element, index ) {
+		var is_same = (bufferInfo.skinIndexBuffer.length == weightsB.length) && bufferInfo.skinIndexBuffer.every( function ( element, index ) {
 
-		// 	return element === materialsB[ index ];
+			return element === weightsB[ index ];
 
-		// } );
+		} );
 
-		// console.log( is_same );
+		console.log( is_same );
 
 
 		var geo = new THREE.BufferGeometry();
@@ -3021,42 +3022,15 @@
 	// Vertex class used in internal Geometry representation
 	function Vertex() {
 
-		this.position = new THREE.Vector3();
-		this.normal = new THREE.Vector3();
-		this.uv = [];
-		this.color = new THREE.Vector3();
-		this.skinIndices = new THREE.Vector4( 0, 0, 0, 0 );
-		this.skinWeights = new THREE.Vector4( 0, 0, 0, 0 );
+		this.skinIndices = new THREE.Vector4();
+		this.skinWeights = new THREE.Vector4();
 
 	}
 
 	Object.assign( Vertex.prototype, {
 
-		copy: function ( target ) {
+		flattenToBuffers: function ( skinIndexBuffer, skinWeightBuffer ) {
 
-			var returnVar = target || new Vertex();
-
-			returnVar.position.copy( this.position );
-			returnVar.normal.copy( this.normal );
-			returnVar.uv.copy( this.uv );
-			returnVar.skinIndices.copy( this.skinIndices );
-			returnVar.skinWeights.copy( this.skinWeights );
-
-			return returnVar;
-
-		},
-
-		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer ) {
-
-			this.position.toArray( vertexBuffer, vertexBuffer.length );
-			this.normal.toArray( normalBuffer, normalBuffer.length );
-
-			for ( var i = 0; i < this.uv.length; i ++ ) {
-
-				this.uv[ i ].toArray( uvBuffers[ i ], uvBuffers[ i ].length );
-
-			}
-			this.color.toArray( colorBuffer, colorBuffer.length );
 			this.skinIndices.toArray( skinIndexBuffer, skinIndexBuffer.length );
 			this.skinWeights.toArray( skinWeightBuffer, skinWeightBuffer.length );
 
@@ -3073,27 +3047,13 @@
 
 	Object.assign( Triangle.prototype, {
 
-		copy: function ( target ) {
-
-			var returnVar = target || new Triangle();
-
-			for ( var i = 0; i < this.vertices.length; ++ i ) {
-
-				this.vertices[ i ].copy( returnVar.vertices[ i ] );
-
-			}
-
-			return returnVar;
-
-		},
-
-		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer ) {
+		flattenToBuffers: function ( skinIndexBuffer, skinWeightBuffer ) {
 
 			var vertices = this.vertices;
 
 			for ( var i = 0, l = vertices.length; i < l; ++ i ) {
 
-				vertices[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer );
+				vertices[ i ].flattenToBuffers( skinIndexBuffer, skinWeightBuffer );
 
 			}
 
@@ -3105,27 +3065,10 @@
 	function Face() {
 
 		this.triangles = [];
-		this.materialIndex = 0;
 
 	}
 
 	Object.assign( Face.prototype, {
-
-		copy: function ( target ) {
-
-			var returnVar = target || new Face();
-
-			for ( var i = 0; i < this.triangles.length; ++ i ) {
-
-				this.triangles[ i ].copy( returnVar.triangles[ i ] );
-
-			}
-
-			returnVar.materialIndex = this.materialIndex;
-
-			return returnVar;
-
-		},
 
 		genTrianglesFromVertices: function ( vertexArray ) {
 
@@ -3141,15 +3084,13 @@
 
 		},
 
-		flattenToBuffers: function ( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer, materialIndexBuffer ) {
+		flattenToBuffers: function ( skinIndexBuffer, skinWeightBuffer ) {
 
 			var triangles = this.triangles;
-			var materialIndex = this.materialIndex;
 
 			for ( var i = 0, l = triangles.length; i < l; ++ i ) {
 
-				triangles[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer );
-        append( materialIndexBuffer, [ materialIndex, materialIndex, materialIndex ] );
+				triangles[ i ].flattenToBuffers( skinIndexBuffer, skinWeightBuffer );
 
 			}
 
@@ -3169,36 +3110,20 @@
 
 		flattenToBuffers: function () {
 
-			var vertexBuffer = [];
-			var normalBuffer = [];
-			var uvBuffers = [];
-			var colorBuffer = [];
 			var skinIndexBuffer = [];
 			var skinWeightBuffer = [];
-			var materialIndexBuffer = [];
 
 			var faces = this.faces;
 
-			for ( var i = 0; i < faces[ 0 ].triangles[ 0 ].vertices[ 0 ].uv.length; i ++ ) {
-
-				uvBuffers.push( [] );
-
-			}
-
 			for ( var i = 0, l = faces.length; i < l; ++ i ) {
 
-				faces[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer, materialIndexBuffer );
+				faces[ i ].flattenToBuffers( skinIndexBuffer, skinWeightBuffer );
 
 			}
 
 			return {
-				// vertexBuffer: vertexBuffer,
-				// normalBuffer: normalBuffer,
-				// uvBuffers: uvBuffers,
-				// colorBuffer: colorBuffer,
 				skinIndexBuffer: skinIndexBuffer,
 				skinWeightBuffer: skinWeightBuffer,
-				// materialIndexBuffer: materialIndexBuffer
 			};
 
 		}
