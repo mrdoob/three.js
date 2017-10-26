@@ -667,9 +667,10 @@
 
 		var subNodes = geometryNode.subNodes;
 
-		var vertexBuffer = subNodes.Vertices.properties.a;
-		var indexBuffer = subNodes.PolygonVertexIndex.properties.a;
+		var vertexPositions = subNodes.Vertices.properties.a;
+		var vertexIndices = subNodes.PolygonVertexIndex.properties.a;
 
+		// create arrays to hold the final data used to build the buffergeometry
 		var vertexB = [];
 		var normalB = [];
 		var colorsB = [];
@@ -678,12 +679,21 @@
 		var weightsB = [];
 		var weightsIndicesB = [];
 
+		if ( subNodes.LayerElementColor ) {
+
+			var colorInfo = getColors( subNodes.LayerElementColor[ 0 ] );
+
+		}
+
+		if ( subNodes.LayerElementMaterial ) {
+
+			var materialInfo = getMaterials( subNodes.LayerElementMaterial[ 0 ] );
+
+		}
+
 		if ( subNodes.LayerElementNormal ) {
 
 			var normalInfo = getNormals( subNodes.LayerElementNormal[ 0 ] );
-			var normalBuffer = normalInfo.buffer;
-
-			// console.log( normalInfo )
 
 		}
 
@@ -700,18 +710,6 @@
 
 		}
 
-		if ( subNodes.LayerElementColor ) {
-
-			var colorInfo = getColors( subNodes.LayerElementColor[ 0 ] );
-			var colorBuffer = colorInfo.buffer;
-
-		}
-
-		if ( subNodes.LayerElementMaterial ) {
-
-			var materialInfo = getMaterials( subNodes.LayerElementMaterial[ 0 ] );
-
-		}
 
 		var weightTable = {};
 
@@ -742,22 +740,21 @@
 
 		}
 
-		var faceVertexBuffer = [];
 		var polygonIndex = 0;
 		var faceLength = 0;
 		var displayedWeightsWarning = false;
 
+		// these will hold data for a single face
 		var vertexPositionIndexes = [];
 		var faceNormals = [];
 		var faceColors = [];
 		var faceUVs = [];
-    var faceMaterials = [];
-    var faceWeights = [];
-    var faceWeightIndices = [];
+		var faceWeights = [];
+		var faceWeightIndices = [];
 
-		for ( var polygonVertexIndex = 0; polygonVertexIndex < indexBuffer.length; polygonVertexIndex ++ ) {
+		for ( var polygonVertexIndex = 0; polygonVertexIndex < vertexIndices.length; polygonVertexIndex ++ ) {
 
-			var vertexIndex = indexBuffer[ polygonVertexIndex ];
+			var vertexIndex = vertexIndices[ polygonVertexIndex ];
 
 			var endOfFace = false;
 
@@ -771,7 +768,7 @@
 			if ( vertexIndex < 0 ) {
 
 				vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
-				indexBuffer[ polygonVertexIndex ] = vertexIndex;
+				vertexIndices[ polygonVertexIndex ] = vertexIndex;
 				endOfFace = true;
 
 			}
@@ -780,6 +777,14 @@
 			var weights = [];
 
 			vertexPositionIndexes.push( vertexIndex * 3, vertexIndex * 3 + 1, vertexIndex * 3 + 2 );
+
+			if ( colorInfo ) {
+
+				var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, colorInfo );
+
+				faceColors.push( data[ 0 ], data[ 1 ], data[ 2 ] );
+
+			}
 
 			if ( deformer ) {
 
@@ -846,8 +851,8 @@
 
 				for ( var i = 0; i < 4; ++ i ) {
 
-					faceWeights.push( weights[ i ] )
-					faceWeightIndices.push(weightIndices[ i ] )
+					faceWeights.push( weights[ i ] );
+					faceWeightIndices.push( weightIndices[ i ] );
 
 				}
 
@@ -867,89 +872,82 @@
 
 					var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[ i ] );
 
-					if( faceUVs[i] === undefined ) faceUVs[ i ] = [];
+					if ( faceUVs[ i ] === undefined ) faceUVs[ i ] = [];
 
 					faceUVs[ i ].push(
-						data[ 0 ],
-						data[ 1 ],
-					);
+              data[ 0 ],
+              data[ 1 ]
+            );
 
 				}
 
 			}
 
-			if ( colorInfo ) {
-
-				var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, colorInfo );
-
-				vertex.color.fromArray( data );
-
-				faceColors.push( data[ 0 ], data[ 1 ], data[ 2 ] );
-
-			}
-
-
 			faceLength ++;
 
+			// we have reached the end of a face - it may have 4 sides though
+			// in which case the data is split into to represent 3 sides faces
 			if ( endOfFace ) {
 
 				for ( var i = 2; i < faceLength; i ++ ) {
 
 					vertexB.push(
-						vertexBuffer[ vertexPositionIndexes[ 0 ] ],
-						vertexBuffer[ vertexPositionIndexes[ 1 ] ],
-						vertexBuffer[ vertexPositionIndexes[ 2 ] ],
+						vertexPositions[ vertexPositionIndexes[ 0 ] ],
+						vertexPositions[ vertexPositionIndexes[ 1 ] ],
+						vertexPositions[ vertexPositionIndexes[ 2 ] ],
 
-						vertexBuffer[ vertexPositionIndexes[ ( i - 1 ) * 3 ] ],
-						vertexBuffer[ vertexPositionIndexes[ ( i - 1 ) * 3 + 1 ] ],
-						vertexBuffer[ vertexPositionIndexes[ ( i - 1 ) * 3 + 2 ] ],
+						vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 ] ],
+						vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 1 ] ],
+						vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 2 ] ],
 
-						vertexBuffer[ vertexPositionIndexes[ i * 3 ] ],
-						vertexBuffer[ vertexPositionIndexes[ i * 3 + 1 ] ],
-						vertexBuffer[ vertexPositionIndexes[ i * 3 + 2 ] ]
+						vertexPositions[ vertexPositionIndexes[ i * 3 ] ],
+						vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ],
+						vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ]
           );
 
-        }
+				}
 
-        if ( deformer ) {
+				if ( deformer ) {
 
-          for (var i = 2; i < faceLength; i++) {
-            weightsB.push(
-              faceWeights[0],
-              faceWeights[1],
-              faceWeights[2],
-              faceWeights[3],
+					for ( var i = 2; i < faceLength; i ++ ) {
 
-              faceWeights[(i - 1) * 4],
-              faceWeights[(i - 1) * 4 + 1],
-              faceWeights[(i - 1) * 4 + 2],
-              faceWeights[(i - 1) * 4 + 3],
+						weightsB.push(
+              faceWeights[ 0 ],
+              faceWeights[ 1 ],
+              faceWeights[ 2 ],
+              faceWeights[ 3 ],
 
-              faceWeights[i * 4],
-              faceWeights[i * 4 + 1],
-              faceWeights[i * 4 + 2],
-              faceWeights[i * 4 + 3]
+              faceWeights[ ( i - 1 ) * 4 ],
+              faceWeights[ ( i - 1 ) * 4 + 1 ],
+              faceWeights[ ( i - 1 ) * 4 + 2 ],
+              faceWeights[ ( i - 1 ) * 4 + 3 ],
+
+              faceWeights[ i * 4 ],
+              faceWeights[ i * 4 + 1 ],
+              faceWeights[ i * 4 + 2 ],
+              faceWeights[ i * 4 + 3 ]
             );
 
-            weightsIndicesB.push(
-              faceWeightIndices[0],
-              faceWeightIndices[1],
-              faceWeightIndices[2],
-              faceWeightIndices[3],
+						weightsIndicesB.push(
+              faceWeightIndices[ 0 ],
+              faceWeightIndices[ 1 ],
+              faceWeightIndices[ 2 ],
+              faceWeightIndices[ 3 ],
 
-              faceWeightIndices[(i - 1) * 4],
-              faceWeightIndices[(i - 1) * 4 + 1],
-              faceWeightIndices[(i - 1) * 4 + 2],
-              faceWeightIndices[(i - 1) * 4 + 3],
+              faceWeightIndices[ ( i - 1 ) * 4 ],
+              faceWeightIndices[ ( i - 1 ) * 4 + 1 ],
+              faceWeightIndices[ ( i - 1 ) * 4 + 2 ],
+              faceWeightIndices[ ( i - 1 ) * 4 + 3 ],
 
-              faceWeightIndices[i * 4],
-              faceWeightIndices[i * 4 + 1],
-              faceWeightIndices[i * 4 + 2],
-              faceWeightIndices[i * 4 + 3]
+              faceWeightIndices[ i * 4 ],
+              faceWeightIndices[ i * 4 + 1 ],
+              faceWeightIndices[ i * 4 + 2 ],
+              faceWeightIndices[ i * 4 + 3 ]
             );
-          }
 
-        }
+					}
+
+				}
 
 				if ( normalInfo ) {
 
@@ -975,22 +973,22 @@
 
 				if ( uvInfo ) {
 
-					for (var j = 0; j < uvInfo.length; j++) {
+					for ( var j = 0; j < uvInfo.length; j ++ ) {
 
-						if ( uvsB[ j ] === undefined) uvsB[ j ] = [];
+						if ( uvsB[ j ] === undefined ) uvsB[ j ] = [];
 
-						for ( var i = 2; i < faceLength; i++ ) {
+						for ( var i = 2; i < faceLength; i ++ ) {
 
-							uvsB[j].push(
+							uvsB[ j ].push(
 
-								faceUVs[j][ 0],
-								faceUVs[j][ 1],
+								faceUVs[ j ][ 0 ],
+								faceUVs[ j ][ 1 ],
 
-								faceUVs[j][ ( i - 1 ) * 2 ],
-								faceUVs[j][ ( i - 1 ) * 2 + 1 ],
+								faceUVs[ j ][ ( i - 1 ) * 2 ],
+								faceUVs[ j ][ ( i - 1 ) * 2 + 1 ],
 
-								faceUVs[j][ i * 2 ],
-								faceUVs[j][ i * 2 + 1 ],
+								faceUVs[ j ][ i * 2 ],
+								faceUVs[ j ][ i * 2 + 1 ]
 
 							);
 
@@ -1022,29 +1020,34 @@
 
 				}
 
-        if( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
+				if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
 
-          var materialIndex = getData(polygonVertexIndex, polygonIndex, vertexIndex, materialInfo)[0];
+					var materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo )[ 0 ];
 
-          for (var i = 2; i < faceLength; i++) {
+					for ( var i = 2; i < faceLength; i ++ ) {
 
-            materialsB.push(materialIndex, materialIndex, materialIndex);
+						materialsB.push(
+							materialIndex,
+							materialIndex,
+							materialIndex
+						);
 
-          }
+					}
+
 				}
 
-				faceVertexBuffer = [];
 				polygonIndex ++;
 
 				endOfFace = false;
+				faceLength = 0;
+
+				// reset arrays for the next face
 				vertexPositionIndexes = [];
 				faceNormals = [];
 				faceColors = [];
 				faceUVs = [];
-        faceMaterials = [];
-        faceWeights = [];
-        faceWeightIndices = [];
-				faceLength = 0;
+    		faceWeights = [];
+    		faceWeightIndices = [];
 
 			}
 
@@ -1052,7 +1055,24 @@
 
 		var geo = new THREE.BufferGeometry();
 		geo.name = geometryNode.name;
+
 		geo.addAttribute( 'position', new THREE.Float32BufferAttribute( vertexB, 3 ) );
+
+		if ( colorsB.length > 0 ) {
+
+			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsB, 3 ) );
+
+		}
+
+		if ( deformer ) {
+
+			geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( weightsIndicesB, 4 ) );
+
+			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( weightsB, 4 ) );
+
+			geo.FBX_Deformer = deformer;
+
+		}
 
 		if ( normalB.length > 0 ) {
 
@@ -1076,26 +1096,10 @@
 
 		}
 
-		if ( colorsB.length > 0 ) {
-
-			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( colorB, 3 ) );
-
-		}
-
-		if ( deformer ) {
-
-			geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( weightsIndicesB, 4 ) );
-
-			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( weightsB, 4 ) );
-
-			geo.FBX_Deformer = deformer;
-
-		}
-
 		if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
 
 			// Convert the material indices of each vertex into rendering groups on the geometry.
-      var materialIndexBuffer = materialsB;
+			var materialIndexBuffer = materialsB;
 			var prevMaterialIndex = materialIndexBuffer[ 0 ];
 			var startIndex = 0;
 
@@ -3516,7 +3520,10 @@
 			// The first three data sizes depends on version.
 			var endOffset = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 			var numProperties = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+
+			// note: do not remove this even if you get a linter warning as it moves the buffer forward
 			var propertyListLen = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+
 			var nameLen = reader.getUint8();
 			var name = reader.getString( nameLen );
 
