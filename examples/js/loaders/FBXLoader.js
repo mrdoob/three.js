@@ -112,7 +112,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -764,11 +764,18 @@
 		// First, each index is going to be its own vertex.
 
 		var vertexBuffer = subNodes.Vertices.properties.a;
+
 		var indexBuffer = subNodes.PolygonVertexIndex.properties.a;
+
+		var vertexB = [];
+		var indexB = [];
+		var normalB = [];
+		var uvsB = [];
 
 		if ( subNodes.LayerElementNormal ) {
 
 			var normalInfo = getNormals( subNodes.LayerElementNormal[ 0 ] );
+			var normalBuffer = normalInfo.buffer;
 
 		}
 
@@ -828,7 +835,11 @@
 
 		var faceVertexBuffer = [];
 		var polygonIndex = 0;
+		var faceLength = 0;
 		var displayedWeightsWarning = false;
+
+		var vertexPositionIndexes = [];
+		var faceNormals = [];
 
 		for ( var polygonVertexIndex = 0; polygonVertexIndex < indexBuffer.length; polygonVertexIndex ++ ) {
 
@@ -836,9 +847,16 @@
 
 			var endOfFace = false;
 
+      // Face index and vertex index arrays are combined in a single array
+      // A cube with quad faces looks like this:
+      // PolygonVertexIndex: *24 {
+      //  a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
+      //  }
+      // Negative numbers mark the end of a face - first face here is 0, 1, 3, -3
+      // to find index of last vertex multiply by -1 and subtract 1: -3 * - 1 - 1 = 2
 			if ( vertexIndex < 0 ) {
 
-				vertexIndex = vertexIndex ^ - 1;
+				vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
 				indexBuffer[ polygonVertexIndex ] = vertexIndex;
 				endOfFace = true;
 
@@ -848,7 +866,7 @@
 			var weightIndices = [];
 			var weights = [];
 
-			vertex.position.fromArray( vertexBuffer, vertexIndex * 3 );
+			vertexPositionIndexes.push( vertexIndex * 3, vertexIndex * 3 + 1, vertexIndex * 3 + 2 );
 
 			if ( deformer ) {
 
@@ -918,7 +936,9 @@
 
 			if ( normalInfo ) {
 
-				vertex.normal.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, normalInfo ) );
+				var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, normalInfo );
+
+				faceNormals.push( data[ 0 ], data[ 1 ], data[ 2 ] );
 
 			}
 
@@ -941,10 +961,53 @@
 
 			faceVertexBuffer.push( vertex );
 
+			faceLength ++;
+
 			if ( endOfFace ) {
 
 				var face = new Face();
 				face.genTrianglesFromVertices( faceVertexBuffer );
+
+				for ( var i = 2; i < faceLength; i ++ ) {
+
+					vertexB.push(
+						vertexBuffer[ vertexPositionIndexes[ 0 ] ],
+						vertexBuffer[ vertexPositionIndexes[ 1 ] ],
+						vertexBuffer[ vertexPositionIndexes[ 2 ] ],
+
+						vertexBuffer[ vertexPositionIndexes[ ( i - 1 ) * 3 ] ],
+						vertexBuffer[ vertexPositionIndexes[ ( i - 1 ) * 3 + 1 ] ],
+						vertexBuffer[ vertexPositionIndexes[ ( i - 1 ) * 3 + 2 ] ],
+
+						vertexBuffer[ vertexPositionIndexes[ i * 3 ] ],
+						vertexBuffer[ vertexPositionIndexes[ i * 3 + 1 ] ],
+						vertexBuffer[ vertexPositionIndexes[ i * 3 + 2 ] ]
+					);
+
+				}
+
+				if ( normalInfo ) {
+
+					for ( var i = 2; i < faceLength; i ++ ) {
+
+						normalB.push(
+							faceNormals[ 0 ],
+							faceNormals[ 1 ],
+							faceNormals[ 2 ],
+
+							faceNormals[ ( i - 1 ) * 3 ],
+							faceNormals[ ( i - 1 ) * 3 + 1 ],
+							faceNormals[ ( i - 1 ) * 3 + 2 ],
+
+							faceNormals[ i * 3 ],
+							faceNormals[ i * 3 + 1 ],
+							faceNormals[ i * 3 + 2 ]
+						);
+
+					}
+
+
+				}
 
 				if ( materialInfo !== undefined ) {
 
@@ -964,6 +1027,9 @@
 				polygonIndex ++;
 
 				endOfFace = false;
+				vertexPositionIndexes = [];
+				faceNormals = [];
+				faceLength = 0;
 
 			}
 
@@ -974,13 +1040,27 @@
 		 */
 		var bufferInfo = geometry.flattenToBuffers();
 
+		// console.log(geometry)
+
+		// console.log( normalB );
+		// console.log( bufferInfo.normalBuffer );
+
+		// var is_same = ( normalB.length == bufferInfo.normalBuffer.length ) && normalB.every( function ( element, index ) {
+
+		// 	return element === bufferInfo.normalBuffer[ index ];
+
+		// } );
+
+		// console.log( is_same );
+
+
 		var geo = new THREE.BufferGeometry();
 		geo.name = geometryNode.name;
-		geo.addAttribute( 'position', new THREE.Float32BufferAttribute( bufferInfo.vertexBuffer, 3 ) );
+		geo.addAttribute( 'position', new THREE.Float32BufferAttribute( vertexB, 3 ) );
 
 		if ( bufferInfo.normalBuffer.length > 0 ) {
 
-			geo.addAttribute( 'normal', new THREE.Float32BufferAttribute( bufferInfo.normalBuffer, 3 ) );
+			geo.addAttribute( 'normal', new THREE.Float32BufferAttribute( normalB, 3 ) );
 
 		}
 		if ( bufferInfo.uvBuffers.length > 0 ) {
