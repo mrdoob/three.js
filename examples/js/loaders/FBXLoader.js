@@ -640,7 +640,7 @@
 				return parseMeshGeometry( geometryNode, relationships, deformers );
 				break;
 
-      case 'NurbsCurve':
+			case 'NurbsCurve':
 				return parseNurbsGeometry( geometryNode );
 				break;
 
