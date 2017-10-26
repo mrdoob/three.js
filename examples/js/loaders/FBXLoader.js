@@ -717,7 +717,7 @@
 
 			var materialInfo = getMaterials( subNodes.LayerElementMaterial[ 0 ] );
 
-			console.log( materialInfo)
+			// console.log( materialInfo)
 
 		}
 
@@ -897,7 +897,7 @@
 			if ( endOfFace ) {
 
 				var face = new Face();
-				face.genTrianglesFromVertices( faceVertexBuffer );
+        face.genTrianglesFromVertices( faceVertexBuffer );
 
 				for ( var i = 2; i < faceLength; i ++ ) {
 
@@ -913,7 +913,7 @@
 						vertexBuffer[ vertexPositionIndexes[ i * 3 ] ],
 						vertexBuffer[ vertexPositionIndexes[ i * 3 + 1 ] ],
 						vertexBuffer[ vertexPositionIndexes[ i * 3 + 2 ] ]
-					);
+          );
 
 				}
 
@@ -988,20 +988,19 @@
 
 				}
 
-				if ( materialInfo !== undefined ) {
+        if( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
 
-					var materials = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo );
+					var materi = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo );
 
-					console.log( materials)
-					face.materialIndex = materials[ 0 ];
-					materialsB.push( materials[ 0 ] )
+          face.materialIndex = materi[ 0 ];
 
-				} else {
+          var materialIndex = getData(polygonVertexIndex, polygonIndex, vertexIndex, materialInfo)[0];
 
-					// if the mapping type is 'AllSame' then materialInfo is undefined and all faces use index 0
-					face.materialIndex = 0;
-					materialsB.push( 0 );
+          for (var i = 2; i < faceLength; i++) {
 
+            materialsB.push(materialIndex, materialIndex, materialIndex);
+
+          }
 				}
 
 				geometry.faces.push( face );
@@ -1024,16 +1023,16 @@
 
 		// console.log(geometry)
 
-		// console.log( bufferInfo.materialIndexBuffer );
-		// console.log( materialsB );
+		// console.log( 'original', bufferInfo.materialIndexBuffer );
+		// console.log( 'new', materialsB );
 
-		var is_same = (bufferInfo.materialIndexBuffer.length == materialsB.length) && bufferInfo.materialIndexBuffer.every( function ( element, index ) {
+		// var is_same = (bufferInfo.materialIndexBuffer.length == materialsB.length) && bufferInfo.materialIndexBuffer.every( function ( element, index ) {
 
-			return element === materialsB[ index ];
+		// 	return element === materialsB[ index ];
 
-		} );
+		// } );
 
-		console.log( is_same );
+		// console.log( is_same );
 
 
 		var geo = new THREE.BufferGeometry();
@@ -1081,7 +1080,7 @@
 		if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
 
 			// Convert the material indices of each vertex into rendering groups on the geometry.
-			var materialIndexBuffer = bufferInfo.materialIndexBuffer;
+      var materialIndexBuffer = materialsB;
 			var prevMaterialIndex = materialIndexBuffer[ 0 ];
 			var startIndex = 0;
 
@@ -3150,7 +3149,7 @@
 			for ( var i = 0, l = triangles.length; i < l; ++ i ) {
 
 				triangles[ i ].flattenToBuffers( vertexBuffer, normalBuffer, uvBuffers, colorBuffer, skinIndexBuffer, skinWeightBuffer );
-				append( materialIndexBuffer, [ materialIndex, materialIndex, materialIndex ] );
+        append( materialIndexBuffer, [ materialIndex, materialIndex, materialIndex ] );
 
 			}
 
@@ -3195,11 +3194,11 @@
 			return {
 				// vertexBuffer: vertexBuffer,
 				// normalBuffer: normalBuffer,
-				uvBuffers: uvBuffers,
+				// uvBuffers: uvBuffers,
 				// colorBuffer: colorBuffer,
 				skinIndexBuffer: skinIndexBuffer,
 				skinWeightBuffer: skinWeightBuffer,
-				materialIndexBuffer: materialIndexBuffer
+				// materialIndexBuffer: materialIndexBuffer
 			};
 
 		}
