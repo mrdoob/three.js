@@ -656,15 +656,15 @@
 				index: i,
 				indices: [],
 				weights: [],
-				transform: parseMatrixArray( subDeformerNode.subNodes.Transform.properties.a ),
-				transformLink: parseMatrixArray( subDeformerNode.subNodes.TransformLink.properties.a ),
+				transform: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.Transform.properties.a ),
+				transformLink: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.TransformLink.properties.a ),
 				linkMode: subDeformerNode.properties.Mode
 			};
 
 			if ( 'Indexes' in subDeformerNode.subNodes ) {
 
-				subDeformer.indices = parseIntArray( subDeformerNode.subNodes.Indexes.properties.a );
-				subDeformer.weights = parseFloatArray( subDeformerNode.subNodes.Weights.properties.a );
+				subDeformer.indices = subDeformerNode.subNodes.Indexes.properties.a;
+				subDeformer.weights = subDeformerNode.subNodes.Weights.properties.a;
 
 			}
 
@@ -763,8 +763,8 @@
 
 		// First, each index is going to be its own vertex.
 
-		var vertexBuffer = parseFloatArray( subNodes.Vertices.properties.a );
-		var indexBuffer = parseIntArray( subNodes.PolygonVertexIndex.properties.a );
+		var vertexBuffer = subNodes.Vertices.properties.a;
+		var indexBuffer = subNodes.PolygonVertexIndex.properties.a;
 
 		if ( subNodes.LayerElementNormal ) {
 
@@ -1016,43 +1016,47 @@
 
 		}
 
-		// Convert the material indices of each vertex into rendering groups on the geometry.
+		if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
 
-		var materialIndexBuffer = bufferInfo.materialIndexBuffer;
-		var prevMaterialIndex = materialIndexBuffer[ 0 ];
-		var startIndex = 0;
+			// Convert the material indices of each vertex into rendering groups on the geometry.
+			var materialIndexBuffer = bufferInfo.materialIndexBuffer;
+			var prevMaterialIndex = materialIndexBuffer[ 0 ];
+			var startIndex = 0;
 
-		for ( var i = 0; i < materialIndexBuffer.length; ++ i ) {
+			for ( var i = 0; i < materialIndexBuffer.length; ++ i ) {
 
-			if ( materialIndexBuffer[ i ] !== prevMaterialIndex ) {
+				if ( materialIndexBuffer[ i ] !== prevMaterialIndex ) {
 
-				geo.addGroup( startIndex, i - startIndex, prevMaterialIndex );
+					geo.addGroup( startIndex, i - startIndex, prevMaterialIndex );
 
-				prevMaterialIndex = materialIndexBuffer[ i ];
-				startIndex = i;
+					prevMaterialIndex = materialIndexBuffer[ i ];
+					startIndex = i;
 
-			}
-
-		}
-
-		// the loop above doesn't add the last group, do that here.
-		if ( geo.groups.length > 0 ) {
-
-			var lastGroup = geo.groups[ geo.groups.length - 1 ];
-			var lastIndex = lastGroup.start + lastGroup.count;
-
-			if ( lastIndex !== materialIndexBuffer.length ) {
-
-				geo.addGroup( lastIndex, materialIndexBuffer.length - lastIndex, prevMaterialIndex );
+				}
 
 			}
 
-		}
+			// the loop above doesn't add the last group, do that here.
+			if ( geo.groups.length > 0 ) {
 
-		// catch case where the whole geometry has a single non-zero index
-		if ( geo.groups.length === 0 && materialIndexBuffer[ 0 ] !== 0 ) {
+				var lastGroup = geo.groups[ geo.groups.length - 1 ];
+				var lastIndex = lastGroup.start + lastGroup.count;
 
-			geo.addGroup( 0, materialIndexBuffer.length, materialIndexBuffer[ 0 ] );
+				if ( lastIndex !== materialIndexBuffer.length ) {
+
+					geo.addGroup( lastIndex, materialIndexBuffer.length - lastIndex, prevMaterialIndex );
+
+				}
+
+			}
+
+			// case where there are multiple materials but the whole geometry is only
+			// using one of them
+			if ( geo.groups.length === 0 ) {
+
+				geo.addGroup( 0, materialIndexBuffer.length, materialIndexBuffer[ 0 ] );
+
+			}
 
 		}
 
@@ -1069,17 +1073,17 @@
 
 		var mappingType = NormalNode.properties.MappingInformationType;
 		var referenceType = NormalNode.properties.ReferenceInformationType;
-		var buffer = parseFloatArray( NormalNode.subNodes.Normals.properties.a );
+		var buffer = NormalNode.subNodes.Normals.properties.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
 			if ( 'NormalIndex' in NormalNode.subNodes ) {
 
-				indexBuffer = parseIntArray( NormalNode.subNodes.NormalIndex.properties.a );
+				indexBuffer = NormalNode.subNodes.NormalIndex.properties.a;
 
 			} else if ( 'NormalsIndex' in NormalNode.subNodes ) {
 
-				indexBuffer = parseIntArray( NormalNode.subNodes.NormalsIndex.properties.a );
+				indexBuffer = NormalNode.subNodes.NormalsIndex.properties.a;
 
 			}
 
@@ -1104,11 +1108,11 @@
 
 		var mappingType = UVNode.properties.MappingInformationType;
 		var referenceType = UVNode.properties.ReferenceInformationType;
-		var buffer = parseFloatArray( UVNode.subNodes.UV.properties.a );
+		var buffer = UVNode.subNodes.UV.properties.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
-			indexBuffer = parseIntArray( UVNode.subNodes.UVIndex.properties.a );
+			indexBuffer = UVNode.subNodes.UVIndex.properties.a;
 
 		}
 
@@ -1131,11 +1135,11 @@
 
 		var mappingType = ColorNode.properties.MappingInformationType;
 		var referenceType = ColorNode.properties.ReferenceInformationType;
-		var buffer = parseFloatArray( ColorNode.subNodes.Colors.properties.a );
+		var buffer = ColorNode.subNodes.Colors.properties.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
-			indexBuffer = parseFloatArray( ColorNode.subNodes.ColorIndex.properties.a );
+			indexBuffer = ColorNode.subNodes.ColorIndex.properties.a;
 
 		}
 
@@ -1171,7 +1175,7 @@
 
 		}
 
-		var materialIndexBuffer = parseIntArray( MaterialNode.subNodes.Materials.properties.a );
+		var materialIndexBuffer = MaterialNode.subNodes.Materials.properties.a;
 
 		// Since materials are stored as indices, there's a bit of a mismatch between FBX and what
 		// we expect.  So we create an intermediate buffer that points to the index in the buffer,
@@ -1359,9 +1363,9 @@
 
 		var degree = order - 1;
 
-		var knots = parseFloatArray( geometryNode.subNodes.KnotVector.properties.a );
+		var knots = geometryNode.subNodes.KnotVector.properties.a;
 		var controlPoints = [];
-		var pointsValues = parseFloatArray( geometryNode.subNodes.Points.properties.a );
+		var pointsValues = geometryNode.subNodes.Points.properties.a;
 
 		for ( var i = 0, l = pointsValues.length; i < l; i += 4 ) {
 
@@ -1807,7 +1811,7 @@
 
 			if ( 'Lcl_Rotation' in node.properties ) {
 
-				var rotation = node.properties.Lcl_Rotation.value.map( degreeToRadian );
+				var rotation = node.properties.Lcl_Rotation.value.map( THREE.Math.degToRad );
 				rotation.push( 'ZYX' );
 				model.rotation.fromArray( rotation );
 
@@ -1821,7 +1825,7 @@
 
 			if ( 'PreRotation' in node.properties ) {
 
-				var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( DEG2RAD ), 'ZYX' );
+				var preRotations = new THREE.Euler().fromArray( node.properties.PreRotation.value.map( THREE.Math.degToRad ), 'ZYX' );
 				preRotations = new THREE.Quaternion().setFromEuler( preRotations );
 				var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
 				preRotations.multiply( currentRotation );
@@ -1934,7 +1938,7 @@
 
 				var node = PoseNode[ PoseNodeIndex ];
 
-				var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
+				var rawMatWrd = new THREE.Matrix4().fromArray( node.subNodes.Matrix.properties.a );
 
 				worldMatrices.set( parseInt( node.id ), rawMatWrd );
 
@@ -2615,6 +2619,7 @@
 
 			}
 			returnObject.curves.get( id )[ curveNode.attr ] = curveNode;
+
 			if ( curveNode.attr === 'R' ) {
 
 				var curves = curveNode.curves;
@@ -2653,9 +2658,9 @@
 
 				}
 
-				curves.x.values = curves.x.values.map( degreeToRadian );
-				curves.y.values = curves.y.values.map( degreeToRadian );
-				curves.z.values = curves.z.values.map( degreeToRadian );
+				curves.x.values = curves.x.values.map( THREE.Math.degToRad );
+				curves.y.values = curves.y.values.map( THREE.Math.degToRad );
+				curves.z.values = curves.z.values.map( THREE.Math.degToRad );
 
 				if ( curveNode.preRotations !== null ) {
 
@@ -3011,11 +3016,11 @@
 			version: null,
 			id: animationCurve.id,
 			internalID: animationCurve.id,
-			times: parseFloatArray( animationCurve.subNodes.KeyTime.properties.a ).map( convertFBXTimeToSeconds ),
-			values: parseFloatArray( animationCurve.subNodes.KeyValueFloat.properties.a ),
+			times: animationCurve.subNodes.KeyTime.properties.a.map( convertFBXTimeToSeconds ),
+			values: animationCurve.subNodes.KeyValueFloat.properties.a,
 
-			attrFlag: parseIntArray( animationCurve.subNodes.KeyAttrFlags.properties.a ),
-			attrData: parseFloatArray( animationCurve.subNodes.KeyAttrDataFloat.properties.a )
+			attrFlag: animationCurve.subNodes.KeyAttrFlags.properties.a,
+			attrData: animationCurve.subNodes.KeyAttrDataFloat.properties.a,
 		};
 
 	}
@@ -4161,15 +4166,8 @@
 
 				}
 
-				// for special case,
-				//
-				//	  Vertices: *8670 {
-				//		  a: 0.0356229953467846,13.9599733352661,-0.399196773.....(snip)
-				// -0.0612030513584614,13.960485458374,-0.409748703241348,-0.10.....
-				// 0.12490539252758,13.7450733184814,-0.454119384288788,0.09272.....
-				// 0.0836158767342567,13.5432004928589,-0.435397416353226,0.028.....
-				//
-				// in these case the lines must continue from the previous line
+				// large arrays are split over multiple lines terminated with a ',' character
+				// if this is encountered the line needs to be joined to the previous line
 				if ( l.match( /^[^\s\t}]/ ) ) {
 
 					this.parseNodePropertyContinued( l );
@@ -4344,7 +4342,6 @@
 			// already exists in properties, then append this
 			if ( propName in currentNode.properties ) {
 
-				// console.log( "duped entry found\nkey: " + propName + "\nvalue: " + propValue );
 				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
 
 					currentNode.properties[ propName ].push( propValue );
@@ -4371,12 +4368,27 @@
 
 			this.setCurrentProp( currentNode.properties, propName );
 
+			// convert string to array, unless it ends in ',' in which case more will be added to it
+			if ( propName === 'a' && propValue.slice( - 1 ) !== ',' ) {
+
+				currentNode.properties.a = parseNumberArray( propValue );
+
+			}
+
 		},
 
-		// TODO:
 		parseNodePropertyContinued: function ( line ) {
 
 			this.currentProp[ this.currentPropName ] += line;
+
+			// if the line doesn't end in ',' we have reached the end of the property value
+			// so convert the string to an array
+			if ( line.slice( - 1 ) !== ',' ) {
+
+				var currentNode = this.getCurrentNode();
+				currentNode.properties.a = parseNumberArray( currentNode.properties.a );
+
+			}
 
 		},
 
@@ -4427,7 +4439,7 @@
 				case 'Lcl_Translation':
 				case 'Lcl_Rotation':
 				case 'Lcl_Scaling':
-					innerPropValue = parseFloatArray( innerPropValue );
+					innerPropValue = parseNumberArray( innerPropValue );
 					break;
 
 			}
@@ -4581,18 +4593,10 @@
 
 					if ( Array.isArray( value ) ) {
 
-						// node represents
-						//	Vertices: *3 {
-						//		a: 0.01, 0.02, 0.03
-						//	}
-						// of text format here.
-
 						node.properties[ node.name ] = node.propertyList[ 0 ];
 						subNodes[ node.name ] = node;
 
-						// Later phase expects single property array is in node.properties.a as String.
-						// TODO: optimize
-						node.properties.a = value.toString();
+						node.properties.a = value;
 
 					} else {
 
@@ -5232,6 +5236,141 @@
 
 		},
 
+<<<<<<< HEAD
+=======
+		searchConnectionParent: function ( id ) {
+
+			if ( this.__cache_search_connection_parent === undefined ) {
+
+				this.__cache_search_connection_parent = [];
+
+			}
+
+			if ( this.__cache_search_connection_parent[ id ] !== undefined ) {
+
+				return this.__cache_search_connection_parent[ id ];
+
+			} else {
+
+				this.__cache_search_connection_parent[ id ] = [];
+
+			}
+
+			var conns = this.Connections.properties.connections;
+
+			var results = [];
+			for ( var i = 0; i < conns.length; ++ i ) {
+
+				if ( conns[ i ][ 0 ] == id ) {
+
+					// 0 means scene root
+					var res = conns[ i ][ 1 ] === 0 ? - 1 : conns[ i ][ 1 ];
+					results.push( res );
+
+				}
+
+			}
+
+			if ( results.length > 0 ) {
+
+				append( this.__cache_search_connection_parent[ id ], results );
+				return results;
+
+			} else {
+
+				this.__cache_search_connection_parent[ id ] = [ - 1 ];
+				return [ - 1 ];
+
+			}
+
+		},
+
+		searchConnectionChildren: function ( id ) {
+
+			if ( this.__cache_search_connection_children === undefined ) {
+
+				this.__cache_search_connection_children = [];
+
+			}
+
+			if ( this.__cache_search_connection_children[ id ] !== undefined ) {
+
+				return this.__cache_search_connection_children[ id ];
+
+			} else {
+
+				this.__cache_search_connection_children[ id ] = [];
+
+			}
+
+			var conns = this.Connections.properties.connections;
+
+			var res = [];
+			for ( var i = 0; i < conns.length; ++ i ) {
+
+				if ( conns[ i ][ 1 ] == id ) {
+
+					// 0 means scene root
+					res.push( conns[ i ][ 0 ] === 0 ? - 1 : conns[ i ][ 0 ] );
+					// there may more than one kid, then search to the end
+
+				}
+
+			}
+
+			if ( res.length > 0 ) {
+
+				append( this.__cache_search_connection_children[ id ], res );
+				return res;
+
+			} else {
+
+				this.__cache_search_connection_children[ id ] = [ ];
+				return [ ];
+
+			}
+
+		},
+
+		searchConnectionType: function ( id, to ) {
+
+			var key = id + ',' + to; // TODO: to hash
+			if ( this.__cache_search_connection_type === undefined ) {
+
+				this.__cache_search_connection_type = {};
+
+			}
+
+			if ( this.__cache_search_connection_type[ key ] !== undefined ) {
+
+				return this.__cache_search_connection_type[ key ];
+
+			} else {
+
+				this.__cache_search_connection_type[ key ] = '';
+
+			}
+
+			var conns = this.Connections.properties.connections;
+
+			for ( var i = 0; i < conns.length; ++ i ) {
+
+				if ( conns[ i ][ 0 ] == id && conns[ i ][ 1 ] == to ) {
+
+					// 0 means scene root
+					this.__cache_search_connection_type[ key ] = conns[ i ][ 2 ];
+					return conns[ i ][ 2 ];
+
+				}
+
+			}
+
+			this.__cache_search_connection_type[ id ] = null;
+			return null;
+
+		}
+
+>>>>>>> upstream/dev
 	} );
 
 
@@ -5310,40 +5449,22 @@
 	}
 
 	/**
-	 * Parses comma separated list of float numbers and returns them in an array.
+	 * Parses comma separated list of numbers and returns them in an array.
+	 * If an array is passed just return it - this is because the TextParser sometimes
+	 * returns strings instead of arrays, while the BinaryParser always returns arrays
+	 * TODO: this function should only need to be called from inside the TextParser
 	 * @example
 	 * // Returns [ 5.6, 9.4, 2.5, 1.4 ]
-	 * parseFloatArray( "5.6,9.4,2.5,1.4" )
+	 * parseNumberArray( "5.6,9.4,2.5,1.4" )
 	 * @returns {number[]}
 	 */
-	function parseFloatArray( string ) {
+	function parseNumberArray( value ) {
 
-		var array = string.split( ',' );
+		var array = value.split( ',' );
 
 		for ( var i = 0, l = array.length; i < l; i ++ ) {
 
 			array[ i ] = parseFloat( array[ i ] );
-
-		}
-
-		return array;
-
-	}
-
-	/**
-	 * Parses comma separated list of int numbers and returns them in an array.
-	 * @example
-	 * // Returns [ 5, 8, 2, 3 ]
-	 * parseFloatArray( "5,8,2,3" )
-	 * @returns {number[]}
-	 */
-	function parseIntArray( string ) {
-
-		var array = string.split( ',' );
-
-		for ( var i = 0, l = array.length; i < l; i ++ ) {
-
-			array[ i ] = parseInt( array[ i ] );
 
 		}
 
@@ -5370,12 +5491,6 @@
 	function parseColor( property ) {
 
 		return new THREE.Color().fromArray( property.value );
-
-	}
-
-	function parseMatrixArray( floatString ) {
-
-		return new THREE.Matrix4().fromArray( parseFloatArray( floatString ) );
 
 	}
 
@@ -5410,21 +5525,6 @@
 		return s;
 
 	}
-
-	/**
-	 * Converts number from degrees into radians.
-	 * @param {number} value
-	 * @returns {number}
-	 */
-	function degreeToRadian( value ) {
-
-		return value * DEG2RAD;
-
-	}
-
-	var DEG2RAD = Math.PI / 180;
-
-	//
 
 	function findIndex( array, func ) {
 
