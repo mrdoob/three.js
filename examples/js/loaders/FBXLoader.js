@@ -3898,7 +3898,7 @@
 
 			for ( var i = 0; i < this.vertices.length; ++ i ) {
 
-				this.vertices[ i ].copy( returnVar.verthis.vertices[ i ].copy( returnVar.vertices[ i ] );
+				this.vertices[ i ].copy( returnVar.vertices[ i ] );
 
 			}
 
