@@ -163,6 +163,10 @@
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
+			// Use Command instead of Ctrl on Mac
+			var modifierKey = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0 ?
+				"metaKey" : "ctrlKey";
+
 			Number.prototype.format = function (){
 				return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 			};
@@ -311,14 +315,11 @@
 
 					case 90: // Register Ctrl-Z for Undo, Ctrl-Shift-Z for Redo
 
-						var isMac = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
-						var modifierKey = isMac ? event.metaKey : event.ctrlKey;
-
-						if ( modifierKey && event.shiftKey ) {
+						if ( event[modifierKey] && event.shiftKey ) {
 
 							editor.redo();
 
-						} else if ( modifierKey ) {
+						} else if ( event[modifierKey] ) {
 
 							editor.undo();
 
