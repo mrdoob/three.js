@@ -122,11 +122,9 @@ THREE.GLTFLoader = ( function () {
 
 			console.time( 'GLTFLoader' );
 
-			if ( path === undefined ) path = this.path !== undefined ? this.path : '';
-
 			var parser = new GLTFParser( json, extensions, {
 
-				path: path,
+				path: path || this.path || '',
 				crossOrigin: this.crossOrigin,
 				manager: this.manager
 
