@@ -539,6 +539,7 @@ Object.assign( Vector3.prototype, {
 
 		}
 
+		if ( v === this ) v = v.clone();
 		var x = this.x, y = this.y, z = this.z;
 
 		this.x = y * v.z - z * v.y;
