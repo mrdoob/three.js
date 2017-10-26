@@ -50,8 +50,9 @@
 
 				try {
 
+					console.time( 'parse: ' );
 					var scene = self.parse( buffer, resourceDirectory );
-
+					console.timeEnd( 'parse: ' );
 					onLoad( scene );
 
 				} catch ( error ) {
@@ -898,19 +899,17 @@
 
 				for ( var i = 2; i < faceLength; i ++ ) {
 
-					vertexB.push(
-						vertexPositions[ vertexPositionIndexes[ 0 ] ],
-						vertexPositions[ vertexPositionIndexes[ 1 ] ],
-						vertexPositions[ vertexPositionIndexes[ 2 ] ],
+					vertexB.push(	vertexPositions[ vertexPositionIndexes[ 0 ] ] );
+					vertexB.push(	vertexPositions[ vertexPositionIndexes[ 1 ] ] );
+					vertexB.push(	vertexPositions[ vertexPositionIndexes[ 2 ] ] );
 
-						vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 ] ],
-						vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 1 ] ],
-						vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 2 ] ],
+					vertexB.push(	vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 ] ] );
+					vertexB.push(	vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 1 ] ] );
+					vertexB.push(	vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 2 ] ] );
 
-						vertexPositions[ vertexPositionIndexes[ i * 3 ] ],
-						vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ],
-						vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ]
-					);
+					vertexB.push(	vertexPositions[ vertexPositionIndexes[ i * 3 ] ] );
+					vertexB.push(	vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ] );
+					vertexB.push(	vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ] );
 
 				}
 
@@ -918,39 +917,35 @@
 
 					for ( var i = 2; i < faceLength; i ++ ) {
 
-						weightsB.push(
-							faceWeights[ 0 ],
-							faceWeights[ 1 ],
-							faceWeights[ 2 ],
-							faceWeights[ 3 ],
+						weightsB.push(	faceWeights[ 0 ] );
+						weightsB.push( faceWeights[ 1 ] );
+						weightsB.push( faceWeights[ 2 ] );
+						weightsB.push( faceWeights[ 3 ] );
 
-							faceWeights[ ( i - 1 ) * 4 ],
-							faceWeights[ ( i - 1 ) * 4 + 1 ],
-							faceWeights[ ( i - 1 ) * 4 + 2 ],
-							faceWeights[ ( i - 1 ) * 4 + 3 ],
+						weightsB.push( faceWeights[ ( i - 1 ) * 4 ] );
+						weightsB.push( faceWeights[ ( i - 1 ) * 4 + 1 ] );
+						weightsB.push( faceWeights[ ( i - 1 ) * 4 + 2 ] );
+						weightsB.push( faceWeights[ ( i - 1 ) * 4 + 3 ] );
 
-							faceWeights[ i * 4 ],
-							faceWeights[ i * 4 + 1 ],
-							faceWeights[ i * 4 + 2 ],
-							faceWeights[ i * 4 + 3 ]
-            );
+						weightsB.push( faceWeights[ i * 4 ] );
+						weightsB.push( faceWeights[ i * 4 + 1 ] );
+						weightsB.push( faceWeights[ i * 4 + 2 ] );
+						weightsB.push( faceWeights[ i * 4 + 3 ] );
 
-						weightsIndicesB.push(
-							faceWeightIndices[ 0 ],
-							faceWeightIndices[ 1 ],
-							faceWeightIndices[ 2 ],
-							faceWeightIndices[ 3 ],
+						weightsIndicesB.push(	faceWeightIndices[ 0 ] );
+						weightsIndicesB.push(	faceWeightIndices[ 1 ] );
+						weightsIndicesB.push(	faceWeightIndices[ 2 ] );
+						weightsIndicesB.push(	faceWeightIndices[ 3 ] );
 
-							faceWeightIndices[ ( i - 1 ) * 4 ],
-							faceWeightIndices[ ( i - 1 ) * 4 + 1 ],
-							faceWeightIndices[ ( i - 1 ) * 4 + 2 ],
-							faceWeightIndices[ ( i - 1 ) * 4 + 3 ],
+						weightsIndicesB.push(	faceWeightIndices[ ( i - 1 ) * 4 ] );
+						weightsIndicesB.push(	faceWeightIndices[ ( i - 1 ) * 4 + 1 ] );
+						weightsIndicesB.push(	faceWeightIndices[ ( i - 1 ) * 4 + 2 ] );
+						weightsIndicesB.push(	faceWeightIndices[ ( i - 1 ) * 4 + 3 ] );
 
-							faceWeightIndices[ i * 4 ],
-							faceWeightIndices[ i * 4 + 1 ],
-							faceWeightIndices[ i * 4 + 2 ],
-							faceWeightIndices[ i * 4 + 3 ]
-						);
+						weightsIndicesB.push(	faceWeightIndices[ i * 4 ] );
+						weightsIndicesB.push(	faceWeightIndices[ i * 4 + 1 ] );
+						weightsIndicesB.push(	faceWeightIndices[ i * 4 + 2 ] );
+						weightsIndicesB.push(	faceWeightIndices[ i * 4 + 3 ] );
 
 					}
 
@@ -960,19 +955,17 @@
 
 					for ( var i = 2; i < faceLength; i ++ ) {
 
-						normalB.push(
-							faceNormals[ 0 ],
-							faceNormals[ 1 ],
-							faceNormals[ 2 ],
+						normalB.push(	faceNormals[ 0 ] );
+						normalB.push(	faceNormals[ 1 ] );
+						normalB.push(	faceNormals[ 2 ] );
 
-							faceNormals[ ( i - 1 ) * 3 ],
-							faceNormals[ ( i - 1 ) * 3 + 1 ],
-							faceNormals[ ( i - 1 ) * 3 + 2 ],
+						normalB.push(	faceNormals[ ( i - 1 ) * 3 ] );
+						normalB.push(	faceNormals[ ( i - 1 ) * 3 + 1 ] );
+						normalB.push(	faceNormals[ ( i - 1 ) * 3 + 2 ] );
 
-							faceNormals[ i * 3 ],
-							faceNormals[ i * 3 + 1 ],
-							faceNormals[ i * 3 + 2 ]
-						);
+						normalB.push(	faceNormals[ i * 3 ] );
+						normalB.push(	faceNormals[ i * 3 + 1 ] );
+						normalB.push(	faceNormals[ i * 3 + 2 ] );
 
 					}
 
@@ -986,18 +979,14 @@
 
 						for ( var i = 2; i < faceLength; i ++ ) {
 
-							uvsB[ j ].push(
+							uvsB[ j ].push( faceUVs[ j ][ 0 ] );
+							uvsB[ j ].push( faceUVs[ j ][ 1 ] );
 
-								faceUVs[ j ][ 0 ],
-								faceUVs[ j ][ 1 ],
+							uvsB[ j ].push(	faceUVs[ j ][ ( i - 1 ) * 2 ] );
+							uvsB[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 + 1 ] );
 
-								faceUVs[ j ][ ( i - 1 ) * 2 ],
-								faceUVs[ j ][ ( i - 1 ) * 2 + 1 ],
-
-								faceUVs[ j ][ i * 2 ],
-								faceUVs[ j ][ i * 2 + 1 ]
-
-							);
+							uvsB[ j ].push(	faceUVs[ j ][ i * 2 ] );
+							uvsB[ j ].push(	faceUVs[ j ][ i * 2 + 1 ] );
 
 						}
 
@@ -1009,19 +998,18 @@
 
 					for ( var i = 2; i < faceLength; i ++ ) {
 
-						colorsB.push(
-							faceColors[ 0 ],
-							faceColors[ 1 ],
-							faceColors[ 2 ],
 
-							faceColors[ ( i - 1 ) * 3 ],
-							faceColors[ ( i - 1 ) * 3 + 1 ],
-							faceColors[ ( i - 1 ) * 3 + 2 ],
+						colorsB.push(	faceColors[ 0 ] );
+						colorsB.push(	faceColors[ 1 ] );
+						colorsB.push(	faceColors[ 2 ] );
 
-							faceColors[ i * 3 ],
-							faceColors[ i * 3 + 1 ],
-							faceColors[ i * 3 + 2 ]
-						);
+						colorsB.push(	faceColors[ ( i - 1 ) * 3 ] );
+						colorsB.push(	faceColors[ ( i - 1 ) * 3 + 1 ] );
+						colorsB.push(	faceColors[ ( i - 1 ) * 3 + 2 ] );
+
+						colorsB.push(	faceColors[ i * 3 ] );
+						colorsB.push(	faceColors[ i * 3 + 1 ] );
+						colorsB.push(	faceColors[ i * 3 + 2 ] );
 
 					}
 
@@ -1033,11 +1021,9 @@
 
 					for ( var i = 2; i < faceLength; i ++ ) {
 
-						materialsB.push(
-							materialIndex,
-							materialIndex,
-							materialIndex
-						);
+						materialsB.push(	materialIndex );
+						materialsB.push(	materialIndex );
+						materialsB.push(	materialIndex );
 
 					}
 
@@ -1077,6 +1063,7 @@
 
 			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( weightsB, 4 ) );
 
+			// used later to bind the skeleton to the model
 			geo.FBX_Deformer = deformer;
 
 		}
