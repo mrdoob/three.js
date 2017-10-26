@@ -897,17 +897,17 @@
 
 				for ( var i = 2; i < faceLength; i ++ ) {
 
-					vertexBuffer.push(	vertexPositions[ vertexPositionIndexes[ 0 ] ] );
-					vertexBuffer.push(	vertexPositions[ vertexPositionIndexes[ 1 ] ] );
-					vertexBuffer.push(	vertexPositions[ vertexPositionIndexes[ 2 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 0 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 1 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 2 ] ] );
 
-					vertexBuffer.push(	vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 ] ] );
-					vertexBuffer.push(	vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 1 ] ] );
-					vertexBuffer.push(	vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 2 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 1 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 2 ] ] );
 
-					vertexBuffer.push(	vertexPositions[ vertexPositionIndexes[ i * 3 ] ] );
-					vertexBuffer.push(	vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ] );
-					vertexBuffer.push(	vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ] );
 
 				}
 
@@ -915,7 +915,7 @@
 
 					for ( var i = 2; i < faceLength; i ++ ) {
 
-						vertexWeightsBuffer.push(	faceWeights[ 0 ] );
+						vertexWeightsBuffer.push( faceWeights[ 0 ] );
 						vertexWeightsBuffer.push( faceWeights[ 1 ] );
 						vertexWeightsBuffer.push( faceWeights[ 2 ] );
 						vertexWeightsBuffer.push( faceWeights[ 3 ] );
@@ -930,20 +930,20 @@
 						vertexWeightsBuffer.push( faceWeights[ i * 4 + 2 ] );
 						vertexWeightsBuffer.push( faceWeights[ i * 4 + 3 ] );
 
-						weightsIndicesBuffer.push(	faceWeightIndices[ 0 ] );
-						weightsIndicesBuffer.push(	faceWeightIndices[ 1 ] );
-						weightsIndicesBuffer.push(	faceWeightIndices[ 2 ] );
-						weightsIndicesBuffer.push(	faceWeightIndices[ 3 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ 0 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ 1 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ 2 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ 3 ] );
 
-						weightsIndicesBuffer.push(	faceWeightIndices[ ( i - 1 ) * 4 ] );
-						weightsIndicesBuffer.push(	faceWeightIndices[ ( i - 1 ) * 4 + 1 ] );
-						weightsIndicesBuffer.push(	faceWeightIndices[ ( i - 1 ) * 4 + 2 ] );
-						weightsIndicesBuffer.push(	faceWeightIndices[ ( i - 1 ) * 4 + 3 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ ( i - 1 ) * 4 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ ( i - 1 ) * 4 + 1 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ ( i - 1 ) * 4 + 2 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ ( i - 1 ) * 4 + 3 ] );
 
-						weightsIndicesBuffer.push(	faceWeightIndices[ i * 4 ] );
-						weightsIndicesBuffer.push(	faceWeightIndices[ i * 4 + 1 ] );
-						weightsIndicesBuffer.push(	faceWeightIndices[ i * 4 + 2 ] );
-						weightsIndicesBuffer.push(	faceWeightIndices[ i * 4 + 3 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ i * 4 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ i * 4 + 1 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ i * 4 + 2 ] );
+						weightsIndicesBuffer.push( faceWeightIndices[ i * 4 + 3 ] );
 
 					}
 
@@ -953,17 +953,17 @@
 
 					for ( var i = 2; i < faceLength; i ++ ) {
 
-						normalBuffer.push(	faceNormals[ 0 ] );
-						normalBuffer.push(	faceNormals[ 1 ] );
-						normalBuffer.push(	faceNormals[ 2 ] );
+						normalBuffer.push( faceNormals[ 0 ] );
+						normalBuffer.push( faceNormals[ 1 ] );
+						normalBuffer.push( faceNormals[ 2 ] );
 
-						normalBuffer.push(	faceNormals[ ( i - 1 ) * 3 ] );
-						normalBuffer.push(	faceNormals[ ( i - 1 ) * 3 + 1 ] );
-						normalBuffer.push(	faceNormals[ ( i - 1 ) * 3 + 2 ] );
+						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 ] );
+						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 + 1 ] );
+						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 + 2 ] );
 
-						normalBuffer.push(	faceNormals[ i * 3 ] );
-						normalBuffer.push(	faceNormals[ i * 3 + 1 ] );
-						normalBuffer.push(	faceNormals[ i * 3 + 2 ] );
+						normalBuffer.push( faceNormals[ i * 3 ] );
+						normalBuffer.push( faceNormals[ i * 3 + 1 ] );
+						normalBuffer.push( faceNormals[ i * 3 + 2 ] );
 
 					}
 
@@ -980,11 +980,11 @@
 							uvsBuffer[ j ].push( faceUVs[ j ][ 0 ] );
 							uvsBuffer[ j ].push( faceUVs[ j ][ 1 ] );
 
-							uvsBuffer[ j ].push(	faceUVs[ j ][ ( i - 1 ) * 2 ] );
+							uvsBuffer[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 ] );
 							uvsBuffer[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 + 1 ] );
 
-							uvsBuffer[ j ].push(	faceUVs[ j ][ i * 2 ] );
-							uvsBuffer[ j ].push(	faceUVs[ j ][ i * 2 + 1 ] );
+							uvsBuffer[ j ].push( faceUVs[ j ][ i * 2 ] );
+							uvsBuffer[ j ].push( faceUVs[ j ][ i * 2 + 1 ] );
 
 						}
 
@@ -997,17 +997,17 @@
 					for ( var i = 2; i < faceLength; i ++ ) {
 
 
-						colorsBuffer.push(	faceColors[ 0 ] );
-						colorsBuffer.push(	faceColors[ 1 ] );
-						colorsBuffer.push(	faceColors[ 2 ] );
+						colorsBuffer.push( faceColors[ 0 ] );
+						colorsBuffer.push( faceColors[ 1 ] );
+						colorsBuffer.push( faceColors[ 2 ] );
 
-						colorsBuffer.push(	faceColors[ ( i - 1 ) * 3 ] );
-						colorsBuffer.push(	faceColors[ ( i - 1 ) * 3 + 1 ] );
-						colorsBuffer.push(	faceColors[ ( i - 1 ) * 3 + 2 ] );
+						colorsBuffer.push( faceColors[ ( i - 1 ) * 3 ] );
+						colorsBuffer.push( faceColors[ ( i - 1 ) * 3 + 1 ] );
+						colorsBuffer.push( faceColors[ ( i - 1 ) * 3 + 2 ] );
 
-						colorsBuffer.push(	faceColors[ i * 3 ] );
-						colorsBuffer.push(	faceColors[ i * 3 + 1 ] );
-						colorsBuffer.push(	faceColors[ i * 3 + 2 ] );
+						colorsBuffer.push( faceColors[ i * 3 ] );
+						colorsBuffer.push( faceColors[ i * 3 + 1 ] );
+						colorsBuffer.push( faceColors[ i * 3 + 2 ] );
 
 					}
 
@@ -1019,9 +1019,9 @@
 
 					for ( var i = 2; i < faceLength; i ++ ) {
 
-						materialIndexBuffer.push(	materialIndex );
-						materialIndexBuffer.push(	materialIndex );
-						materialIndexBuffer.push(	materialIndex );
+						materialIndexBuffer.push( materialIndex );
+						materialIndexBuffer.push( materialIndex );
+						materialIndexBuffer.push( materialIndex );
 
 					}
 
