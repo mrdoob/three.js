@@ -311,11 +311,14 @@
 
 					case 90: // Register Ctrl-Z for Undo, Ctrl-Shift-Z for Redo
 
-						if ( event.ctrlKey && event.shiftKey ) {
+						var isMac = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
+						var modifierKey = isMac ? event.metaKey : event.ctrlKey;
+
+						if ( modifierKey && event.shiftKey ) {
 
 							editor.redo();
 
-						} else if ( event.ctrlKey ) {
+						} else if ( modifierKey ) {
 
 							editor.undo();
 
