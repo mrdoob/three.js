@@ -640,13 +640,9 @@
 				return parseMeshGeometry( geometryNode, relationships, deformers );
 				break;
 
-			case 'NurbsCurve':
+      case 'NurbsCurve':
 				return parseNurbsGeometry( geometryNode );
 				break;
-
-			default:
-				console.error( 'FBXLoader: Unsupported geometry type %s', geometryNode.attrType );
-				return THREE.BufferGeometry();
 
 		}
 
