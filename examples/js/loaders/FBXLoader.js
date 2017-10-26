@@ -98,7 +98,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -644,6 +644,10 @@
 				return parseNurbsGeometry( geometryNode );
 				break;
 
+			default:
+				console.error( 'FBXLoader: Unsupported geometry type %s', geometryNode.attrType );
+				return THREE.BufferGeometry();
+
 		}
 
 	}
@@ -758,13 +762,13 @@
 
 			var endOfFace = false;
 
-      // Face index and vertex index arrays are combined in a single array
-      // A cube with quad faces looks like this:
-      // PolygonVertexIndex: *24 {
-      //  a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
-      //  }
-      // Negative numbers mark the end of a face - first face here is 0, 1, 3, -3
-      // to find index of last vertex multiply by -1 and subtract 1: -3 * - 1 - 1 = 2
+			// Face index and vertex index arrays are combined in a single array
+			// A cube with quad faces looks like this:
+			// PolygonVertexIndex: *24 {
+			//  a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
+			//  }
+			// Negative numbers mark the end of a face - first face here is 0, 1, 3, -3
+			// to find index of last vertex multiply by -1 and subtract 1: -3 * - 1 - 1 = 2
 			if ( vertexIndex < 0 ) {
 
 				vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
@@ -795,7 +799,6 @@
 					for ( var j = 0, jl = array.length; j < jl; j ++ ) {
 
 						weights.push( array[ j ].weight );
-
 						weightIndices.push( array[ j ].id );
 
 					}
@@ -872,12 +875,16 @@
 
 					var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[ i ] );
 
-					if ( faceUVs[ i ] === undefined ) faceUVs[ i ] = [];
+					if ( faceUVs[ i ] === undefined ) {
+
+						faceUVs[ i ] = [];
+
+					}
 
 					faceUVs[ i ].push(
-              data[ 0 ],
-              data[ 1 ]
-            );
+						data[ 0 ],
+						data[ 1 ]
+					);
 
 				}
 
@@ -903,7 +910,7 @@
 						vertexPositions[ vertexPositionIndexes[ i * 3 ] ],
 						vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ],
 						vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ]
-          );
+					);
 
 				}
 
@@ -912,38 +919,38 @@
 					for ( var i = 2; i < faceLength; i ++ ) {
 
 						weightsB.push(
-              faceWeights[ 0 ],
-              faceWeights[ 1 ],
-              faceWeights[ 2 ],
-              faceWeights[ 3 ],
+							faceWeights[ 0 ],
+							faceWeights[ 1 ],
+							faceWeights[ 2 ],
+							faceWeights[ 3 ],
 
-              faceWeights[ ( i - 1 ) * 4 ],
-              faceWeights[ ( i - 1 ) * 4 + 1 ],
-              faceWeights[ ( i - 1 ) * 4 + 2 ],
-              faceWeights[ ( i - 1 ) * 4 + 3 ],
+							faceWeights[ ( i - 1 ) * 4 ],
+							faceWeights[ ( i - 1 ) * 4 + 1 ],
+							faceWeights[ ( i - 1 ) * 4 + 2 ],
+							faceWeights[ ( i - 1 ) * 4 + 3 ],
 
-              faceWeights[ i * 4 ],
-              faceWeights[ i * 4 + 1 ],
-              faceWeights[ i * 4 + 2 ],
-              faceWeights[ i * 4 + 3 ]
+							faceWeights[ i * 4 ],
+							faceWeights[ i * 4 + 1 ],
+							faceWeights[ i * 4 + 2 ],
+							faceWeights[ i * 4 + 3 ]
             );
 
 						weightsIndicesB.push(
-              faceWeightIndices[ 0 ],
-              faceWeightIndices[ 1 ],
-              faceWeightIndices[ 2 ],
-              faceWeightIndices[ 3 ],
+							faceWeightIndices[ 0 ],
+							faceWeightIndices[ 1 ],
+							faceWeightIndices[ 2 ],
+							faceWeightIndices[ 3 ],
 
-              faceWeightIndices[ ( i - 1 ) * 4 ],
-              faceWeightIndices[ ( i - 1 ) * 4 + 1 ],
-              faceWeightIndices[ ( i - 1 ) * 4 + 2 ],
-              faceWeightIndices[ ( i - 1 ) * 4 + 3 ],
+							faceWeightIndices[ ( i - 1 ) * 4 ],
+							faceWeightIndices[ ( i - 1 ) * 4 + 1 ],
+							faceWeightIndices[ ( i - 1 ) * 4 + 2 ],
+							faceWeightIndices[ ( i - 1 ) * 4 + 3 ],
 
-              faceWeightIndices[ i * 4 ],
-              faceWeightIndices[ i * 4 + 1 ],
-              faceWeightIndices[ i * 4 + 2 ],
-              faceWeightIndices[ i * 4 + 3 ]
-            );
+							faceWeightIndices[ i * 4 ],
+							faceWeightIndices[ i * 4 + 1 ],
+							faceWeightIndices[ i * 4 + 2 ],
+							faceWeightIndices[ i * 4 + 3 ]
+						);
 
 					}
 
