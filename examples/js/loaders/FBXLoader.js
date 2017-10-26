@@ -2744,7 +2744,23 @@
 
 			if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
 
-				key.pos = [ animationNode.T.curves.x.values[ frame ], animationNode.T.curves.y.values[ frame ], animationNode.T.curves.z.values[ frame ] ];
+				if ( animationNode.T.curves.x.values[ frame ] ) {
+
+					key.pos[ 0 ] = animationNode.T.curves.x.values[ frame ];
+
+				}
+
+				if ( animationNode.T.curves.y.values[ frame ] ) {
+
+					key.pos[ 1 ] = animationNode.T.curves.y.values[ frame ];
+
+				}
+
+				if ( animationNode.T.curves.z.values[ frame ] ) {
+
+					key.pos[ 2 ] = animationNode.T.curves.z.values[ frame ];
+
+				}
 
 			}
 
@@ -2776,7 +2792,23 @@
 
 			if ( hasCurve( animationNode, 'S' ) && hasKeyOnFrame( animationNode.S, frame ) ) {
 
-				key.scl = [ animationNode.S.curves.x.values[ frame ], animationNode.S.curves.y.values[ frame ], animationNode.S.curves.z.values[ frame ] ];
+				if ( animationNode.T.curves.x.values[ frame ] ) {
+
+					key.scl[ 0 ] = animationNode.S.curves.x.values[ frame ];
+
+				}
+
+				if ( animationNode.T.curves.y.values[ frame ] ) {
+
+					key.scl[ 1 ] = animationNode.S.curves.y.values[ frame ];
+
+				}
+
+				if ( animationNode.T.curves.z.values[ frame ] ) {
+
+					key.scl[ 2 ] = animationNode.S.curves.z.values[ frame ];
+
+				}
 
 			}
 
