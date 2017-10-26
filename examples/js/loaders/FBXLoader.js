@@ -768,9 +768,10 @@
 		var indexBuffer = subNodes.PolygonVertexIndex.properties.a;
 
 		var vertexB = [];
-		var indexB = [];
 		var normalB = [];
+		var colorsB = [];
 		var uvsB = [];
+		var materialsB = [];
 
 		if ( subNodes.LayerElementNormal ) {
 
@@ -795,12 +796,15 @@
 		if ( subNodes.LayerElementColor ) {
 
 			var colorInfo = getColors( subNodes.LayerElementColor[ 0 ] );
+			var colorBuffer = colorInfo.buffer;
 
 		}
 
 		if ( subNodes.LayerElementMaterial ) {
 
 			var materialInfo = getMaterials( subNodes.LayerElementMaterial[ 0 ] );
+
+			console.log( materialInfo)
 
 		}
 
@@ -840,6 +844,9 @@
 
 		var vertexPositionIndexes = [];
 		var faceNormals = [];
+		var faceColors = [];
+		var faceUVs = [];
+		var faceMaterials = [];
 
 		for ( var polygonVertexIndex = 0; polygonVertexIndex < indexBuffer.length; polygonVertexIndex ++ ) {
 
@@ -946,8 +953,14 @@
 
 				for ( var i = 0; i < uvInfo.length; i ++ ) {
 
-					var uvTemp = new THREE.Vector2();
-					vertex.uv.push( uvTemp.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[ i ] ) ) );
+					var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[ i ] );
+
+					if( faceUVs[i] === undefined ) faceUVs[ i ] = [];
+
+					faceUVs[ i ].push(
+						data[ 0 ],
+						data[ 1 ],
+					);
 
 				}
 
@@ -955,7 +968,12 @@
 
 			if ( colorInfo ) {
 
-				vertex.color.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, colorInfo ) );
+				// TODO: find file to test this
+				var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, colorInfo );
+
+				vertex.color.fromArray( data );
+
+				faceColors.push( data[ 0 ], data[ 1 ], data[ 2 ] );
 
 			}
 
@@ -1006,19 +1024,71 @@
 
 					}
 
+				}
+
+				if ( uvInfo ) {
+
+					for (var j = 0; j < uvInfo.length; j++) {
+
+						if ( uvsB[ j ] === undefined) uvsB[ j ] = [];
+
+						for ( var i = 2; i < faceLength; i++ ) {
+
+							uvsB[j].push(
+
+								faceUVs[j][ 0],
+								faceUVs[j][ 1],
+
+								faceUVs[j][ ( i - 1 ) * 2 ],
+								faceUVs[j][ ( i - 1 ) * 2 + 1 ],
+
+								faceUVs[j][ i * 2 ],
+								faceUVs[j][ i * 2 + 1 ],
+
+							);
+
+						}
+
+					}
+
+				}
+
+				if ( colorInfo ) {
+
+					for ( var i = 2; i < faceLength; i ++ ) {
+
+						colorsB.push(
+							faceColors[ 0 ],
+							faceColors[ 1 ],
+							faceColors[ 2 ],
+
+							faceColors[ ( i - 1 ) * 3 ],
+							faceColors[ ( i - 1 ) * 3 + 1 ],
+							faceColors[ ( i - 1 ) * 3 + 2 ],
+
+							faceColors[ i * 3 ],
+							faceColors[ i * 3 + 1 ],
+							faceColors[ i * 3 + 2 ]
+						);
+
+					}
 
 				}
 
 				if ( materialInfo !== undefined ) {
 
 					var materials = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo );
+
+					console.log( materials)
 					face.materialIndex = materials[ 0 ];
+					materialsB.push( materials[ 0 ] )
 
 				} else {
 
 					// Seems like some models don't have materialInfo(subNodes.LayerElementMaterial).
 					// Set 0 in such a case.
 					face.materialIndex = 0;
+					materialsB.push( 0 );
 
 				}
 
@@ -1029,6 +1099,9 @@
 				endOfFace = false;
 				vertexPositionIndexes = [];
 				faceNormals = [];
+				faceColors = [];
+				faceUVs = [];
+				faceMaterials = [];
 				faceLength = 0;
 
 			}
@@ -1042,30 +1115,30 @@
 
 		// console.log(geometry)
 
-		// console.log( normalB );
-		// console.log( bufferInfo.normalBuffer );
+		// console.log( bufferInfo.materialIndexBuffer );
+		// console.log( materialsB );
 
-		// var is_same = ( normalB.length == bufferInfo.normalBuffer.length ) && normalB.every( function ( element, index ) {
+		var is_same = (bufferInfo.materialIndexBuffer.length == materialsB.length) && bufferInfo.materialIndexBuffer.every( function ( element, index ) {
 
-		// 	return element === bufferInfo.normalBuffer[ index ];
+			return element === materialsB[ index ];
 
-		// } );
+		} );
 
-		// console.log( is_same );
+		console.log( is_same );
 
 
 		var geo = new THREE.BufferGeometry();
 		geo.name = geometryNode.name;
 		geo.addAttribute( 'position', new THREE.Float32BufferAttribute( vertexB, 3 ) );
 
-		if ( bufferInfo.normalBuffer.length > 0 ) {
+		if ( normalB.length > 0 ) {
 
 			geo.addAttribute( 'normal', new THREE.Float32BufferAttribute( normalB, 3 ) );
 
 		}
-		if ( bufferInfo.uvBuffers.length > 0 ) {
+		if ( uvsB.length > 0 ) {
 
-			for ( var i = 0; i < bufferInfo.uvBuffers.length; i ++ ) {
+			for ( var i = 0; i < uvsB.length; i ++ ) {
 
 				var name = 'uv' + ( i + 1 ).toString();
 				if ( i == 0 ) {
@@ -1074,15 +1147,15 @@
 
 				}
 
-				geo.addAttribute( name, new THREE.Float32BufferAttribute( bufferInfo.uvBuffers[ i ], 2 ) );
+				geo.addAttribute( name, new THREE.Float32BufferAttribute( uvsB[ i ], 2 ) );
 
 			}
 
 		}
 
-		if ( subNodes.LayerElementColor ) {
+		if ( colorsB.length > 0 ) {
 
-			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( bufferInfo.colorBuffer, 3 ) );
+			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( colorB, 3 ) );
 
 		}
 
@@ -4108,10 +4181,10 @@
 			}
 
 			return {
-				vertexBuffer: vertexBuffer,
-				normalBuffer: normalBuffer,
+				// vertexBuffer: vertexBuffer,
+				// normalBuffer: normalBuffer,
 				uvBuffers: uvBuffers,
-				colorBuffer: colorBuffer,
+				// colorBuffer: colorBuffer,
 				skinIndexBuffer: skinIndexBuffer,
 				skinWeightBuffer: skinWeightBuffer,
 				materialIndexBuffer: materialIndexBuffer
