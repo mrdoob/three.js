@@ -24,7 +24,7 @@ THREE.GLTFLoader = ( function () {
 
 			var scope = this;
 
-			var path = this.path && ( typeof this.path === 'string' ) ? this.path : THREE.Loader.prototype.extractUrlBase( url );
+			var path = this.path !== undefined ? this.path : THREE.Loader.prototype.extractUrlBase( url );
 
 			var loader = new THREE.FileLoader( scope.manager );
 
@@ -122,9 +122,11 @@ THREE.GLTFLoader = ( function () {
 
 			console.time( 'GLTFLoader' );
 
+			if ( path === undefined ) path = this.path !== undefined ? this.path : '';
+
 			var parser = new GLTFParser( json, extensions, {
 
-				path: path || this.path,
+				path: path,
 				crossOrigin: this.crossOrigin,
 				manager: this.manager
 
@@ -1117,7 +1119,7 @@ THREE.GLTFLoader = ( function () {
 		}
 
 		// Relative URL
-		return ( path || '' ) + url;
+		return path + url;
 
 	}
 
