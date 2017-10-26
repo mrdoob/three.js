@@ -663,11 +663,7 @@
 	}
 
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.subNodes.Geometry
-	// Uses an intermediate custom Geometry() object to generate the geometry
-	// then flattens details into buffers
 	function genGeometry( geometryNode, deformer ) {
-
-		var geometry = new Geometry();
 
 		var subNodes = geometryNode.subNodes;
 
@@ -686,6 +682,8 @@
 
 			var normalInfo = getNormals( subNodes.LayerElementNormal[ 0 ] );
 			var normalBuffer = normalInfo.buffer;
+
+			// console.log( normalInfo )
 
 		}
 
@@ -753,7 +751,9 @@
 		var faceNormals = [];
 		var faceColors = [];
 		var faceUVs = [];
-		var faceMaterials = [];
+    var faceMaterials = [];
+    var faceWeights = [];
+    var faceWeightIndices = [];
 
 		for ( var polygonVertexIndex = 0; polygonVertexIndex < indexBuffer.length; polygonVertexIndex ++ ) {
 
@@ -776,7 +776,6 @@
 
 			}
 
-			var vertex = new Vertex();
 			var weightIndices = [];
 			var weights = [];
 
@@ -785,8 +784,6 @@
 			if ( deformer ) {
 
 				if ( weightTable[ vertexIndex ] !== undefined ) {
-
-					// always gets here
 
 					var array = weightTable[ vertexIndex ];
 
@@ -847,13 +844,10 @@
 
 				}
 
-				vertex.skinWeights.fromArray( weights );
-				vertex.skinIndices.fromArray( weightIndices );
-
 				for ( var i = 0; i < 4; ++ i ) {
 
-					weightsB.push( weights[ i ] )
-					weightsIndicesB.push(weightIndices[ i ] )
+					faceWeights.push( weights[ i ] )
+					faceWeightIndices.push(weightIndices[ i ] )
 
 				}
 
@@ -886,7 +880,6 @@
 
 			if ( colorInfo ) {
 
-				// TODO: find file to test this
 				var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, colorInfo );
 
 				vertex.color.fromArray( data );
@@ -895,14 +888,10 @@
 
 			}
 
-			faceVertexBuffer.push( vertex );
 
 			faceLength ++;
 
 			if ( endOfFace ) {
-
-				var face = new Face();
-        face.genTrianglesFromVertices( faceVertexBuffer );
 
 				for ( var i = 2; i < faceLength; i ++ ) {
 
@@ -920,7 +909,47 @@
 						vertexBuffer[ vertexPositionIndexes[ i * 3 + 2 ] ]
           );
 
-				}
+        }
+
+        if ( deformer ) {
+
+          for (var i = 2; i < faceLength; i++) {
+            weightsB.push(
+              faceWeights[0],
+              faceWeights[1],
+              faceWeights[2],
+              faceWeights[3],
+
+              faceWeights[(i - 1) * 4],
+              faceWeights[(i - 1) * 4 + 1],
+              faceWeights[(i - 1) * 4 + 2],
+              faceWeights[(i - 1) * 4 + 3],
+
+              faceWeights[i * 4],
+              faceWeights[i * 4 + 1],
+              faceWeights[i * 4 + 2],
+              faceWeights[i * 4 + 3]
+            );
+
+            weightsIndicesB.push(
+              faceWeightIndices[0],
+              faceWeightIndices[1],
+              faceWeightIndices[2],
+              faceWeightIndices[3],
+
+              faceWeightIndices[(i - 1) * 4],
+              faceWeightIndices[(i - 1) * 4 + 1],
+              faceWeightIndices[(i - 1) * 4 + 2],
+              faceWeightIndices[(i - 1) * 4 + 3],
+
+              faceWeightIndices[i * 4],
+              faceWeightIndices[i * 4 + 1],
+              faceWeightIndices[i * 4 + 2],
+              faceWeightIndices[i * 4 + 3]
+            );
+          }
+
+        }
 
 				if ( normalInfo ) {
 
@@ -1004,7 +1033,6 @@
           }
 				}
 
-				geometry.faces.push( face );
 				faceVertexBuffer = [];
 				polygonIndex ++;
 
@@ -1013,28 +1041,14 @@
 				faceNormals = [];
 				faceColors = [];
 				faceUVs = [];
-				faceMaterials = [];
+        faceMaterials = [];
+        faceWeights = [];
+        faceWeightIndices = [];
 				faceLength = 0;
 
 			}
 
 		}
-
-		var bufferInfo = geometry.flattenToBuffers();
-
-		// console.log(geometry)
-
-		console.log('original', bufferInfo.skinIndexBuffer); //skinWeightBuffer
-		console.log( 'new', weightsIndicesB );
-
-		var is_same = (bufferInfo.skinIndexBuffer.length == weightsB.length) && bufferInfo.skinIndexBuffer.every( function ( element, index ) {
-
-			return element === weightsB[ index ];
-
-		} );
-
-		console.log( is_same );
-
 
 		var geo = new THREE.BufferGeometry();
 		geo.name = geometryNode.name;
@@ -1070,9 +1084,9 @@
 
 		if ( deformer ) {
 
-			geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( bufferInfo.skinIndexBuffer, 4 ) );
+			geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( weightsIndicesB, 4 ) );
 
-			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( bufferInfo.skinWeightBuffer, 4 ) );
+			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( weightsB, 4 ) );
 
 			geo.FBX_Deformer = deformer;
 
@@ -3018,117 +3032,6 @@
 		return curve.values[ frame ] !== undefined;
 
 	}
-
-	// Vertex class used in internal Geometry representation
-	function Vertex() {
-
-		this.skinIndices = new THREE.Vector4();
-		this.skinWeights = new THREE.Vector4();
-
-	}
-
-	Object.assign( Vertex.prototype, {
-
-		flattenToBuffers: function ( skinIndexBuffer, skinWeightBuffer ) {
-
-			this.skinIndices.toArray( skinIndexBuffer, skinIndexBuffer.length );
-			this.skinWeights.toArray( skinWeightBuffer, skinWeightBuffer.length );
-
-		}
-
-	} );
-
-	// Triangle class used in internal Geometry representation
-	function Triangle() {
-
-		this.vertices = [];
-
-	}
-
-	Object.assign( Triangle.prototype, {
-
-		flattenToBuffers: function ( skinIndexBuffer, skinWeightBuffer ) {
-
-			var vertices = this.vertices;
-
-			for ( var i = 0, l = vertices.length; i < l; ++ i ) {
-
-				vertices[ i ].flattenToBuffers( skinIndexBuffer, skinWeightBuffer );
-
-			}
-
-		}
-
-	} );
-
-	// Face class used in internal Geometry representation
-	function Face() {
-
-		this.triangles = [];
-
-	}
-
-	Object.assign( Face.prototype, {
-
-		genTrianglesFromVertices: function ( vertexArray ) {
-
-			for ( var i = 2; i < vertexArray.length; ++ i ) {
-
-				var triangle = new Triangle();
-				triangle.vertices[ 0 ] = vertexArray[ 0 ];
-				triangle.vertices[ 1 ] = vertexArray[ i - 1 ];
-				triangle.vertices[ 2 ] = vertexArray[ i ];
-				this.triangles.push( triangle );
-
-			}
-
-		},
-
-		flattenToBuffers: function ( skinIndexBuffer, skinWeightBuffer ) {
-
-			var triangles = this.triangles;
-
-			for ( var i = 0, l = triangles.length; i < l; ++ i ) {
-
-				triangles[ i ].flattenToBuffers( skinIndexBuffer, skinWeightBuffer );
-
-			}
-
-		}
-
-	} );
-
-	// Geometry class as intermediary in converting FBXTree.Objects.subNodes.Geometry node to THREE.BufferGeometry
-	function Geometry() {
-
-		this.faces = [];
-		this.skeleton = null;
-
-	}
-
-	Object.assign( Geometry.prototype, {
-
-		flattenToBuffers: function () {
-
-			var skinIndexBuffer = [];
-			var skinWeightBuffer = [];
-
-			var faces = this.faces;
-
-			for ( var i = 0, l = faces.length; i < l; ++ i ) {
-
-				faces[ i ].flattenToBuffers( skinIndexBuffer, skinWeightBuffer );
-
-			}
-
-			return {
-				skinIndexBuffer: skinIndexBuffer,
-				skinWeightBuffer: skinWeightBuffer,
-			};
-
-		}
-
-	} );
 
 	// parse an FBX file in ASCII format
 	function TextParser() {}
