@@ -3027,13 +3027,7 @@
 
 			}
 
-			var x = this.x, y = this.y, z = this.z;
-
-			this.x = y * v.z - z * v.y;
-			this.y = z * v.x - x * v.z;
-			this.z = x * v.y - y * v.x;
-
-			return this;
+			return this.crossVectors( this, v );
 
 		},
 
@@ -6235,7 +6229,7 @@
 
 	var tonemapping_fragment = "#if defined( TONE_MAPPING )\n  gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );\n#endif\n";
 
-	var tonemapping_pars_fragment = "#define saturate(a) clamp( a, 0.0, 1.0 )\nuniform float toneMappingExposure;\nuniform float toneMappingWhitePoint;\nvec3 LinearToneMapping( vec3 color ) {\n\treturn toneMappingExposure * color;\n}\nvec3 ReinhardToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( color / ( vec3( 1.0 ) + color ) );\n}\n#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )\nvec3 Uncharted2ToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( toneMappingWhitePoint ) ) );\n}\nvec3 OptimizedCineonToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\tcolor = max( vec3( 0.0 ), color - 0.004 );\n\treturn pow( ( color * ( 6.2 * color + 0.5 ) ) / ( color * ( 6.2 * color + 1.7 ) + 0.06 ), vec3( 2.2 ) );\n}\n";
+	var tonemapping_pars_fragment = "uniform float toneMappingExposure;\nuniform float toneMappingWhitePoint;\nvec3 LinearToneMapping( vec3 color ) {\n\treturn toneMappingExposure * color;\n}\nvec3 ReinhardToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( color / ( vec3( 1.0 ) + color ) );\n}\n#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )\nvec3 Uncharted2ToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( toneMappingWhitePoint ) ) );\n}\nvec3 OptimizedCineonToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\tcolor = max( vec3( 0.0 ), color - 0.004 );\n\treturn pow( ( color * ( 6.2 * color + 0.5 ) ) / ( color * ( 6.2 * color + 1.7 ) + 0.06 ), vec3( 2.2 ) );\n}\n";
 
 	var uv_pars_fragment = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\n\tvarying vec2 vUv;\n#endif";
 
@@ -25046,6 +25040,8 @@
 
 		function update() {
 
+			var video = scope.image;
+
 			if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
 
 				scope.needsUpdate = true;
@@ -35241,6 +35237,8 @@
 
 	function Curve() {
 
+		this.type = 'Curve';
+
 		this.arcLengthDivisions = 200;
 
 	}
@@ -35586,6 +35584,8 @@
 
 		Curve.call( this );
 
+		this.type = 'LineCurve';
+
 		this.v1 = v1;
 		this.v2 = v2;
 
@@ -35645,8 +35645,9 @@
 
 		Curve.call( this );
 
-		this.curves = [];
+		this.type = 'CurvePath';
 
+		this.curves = [];
 		this.autoClose = false; // Automatically closes the path
 
 	}
@@ -35834,6 +35835,8 @@
 
 		Curve.call( this );
 
+		this.type = 'EllipseCurve';
+
 		this.aX = aX;
 		this.aY = aY;
 
@@ -35920,6 +35923,8 @@
 
 		Curve.call( this );
 
+		this.type = 'SplineCurve';
+
 		this.points = ( points === undefined ) ? [] : points;
 
 	}
@@ -35957,6 +35962,8 @@
 
 		Curve.call( this );
 
+		this.type = 'CubicBezierCurve';
+
 		this.v0 = v0;
 		this.v1 = v1;
 		this.v2 = v2;
@@ -35987,6 +35994,8 @@
 	function QuadraticBezierCurve( v0, v1, v2 ) {
 
 		Curve.call( this );
+
+		this.type = 'QuadraticBezierCurve';
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -36142,6 +36151,9 @@
 	function Path( points ) {
 
 		CurvePath.call( this );
+
+		this.type = 'Path';
+
 		this.currentPoint = new Vector2();
 
 		if ( points ) {
@@ -36169,6 +36181,8 @@
 	function Shape() {
 
 		Path.apply( this, arguments );
+
+		this.type = 'Shape';
 
 		this.holes = [];
 
@@ -36219,6 +36233,8 @@
 	 **/
 
 	function ShapePath() {
+
+		this.type = 'ShapePath';
 
 		this.subPaths = [];
 		this.currentPath = null;
@@ -36494,6 +36510,8 @@
 	 */
 
 	function Font( data ) {
+
+		this.type = 'Font';
 
 		this.data = data;
 
@@ -42533,10 +42551,13 @@
 
 		Curve.call( this );
 
+		this.type = 'CatmullRomCurve3';
+
 		if ( points.length < 2 ) console.warn( 'THREE.CatmullRomCurve3: Points array needs at least two entries.' );
 
 		this.points = points || [];
 		this.closed = false;
+		this.curveType = 'centripetal';
 
 	}
 
@@ -42596,10 +42617,10 @@
 
 		}
 
-		if ( this.type === undefined || this.type === 'centripetal' || this.type === 'chordal' ) {
+		if ( this.curveType === 'centripetal' || this.curveType === 'chordal' ) {
 
 			// init Centripetal / Chordal Catmull-Rom
-			var pow = this.type === 'chordal' ? 0.5 : 0.25;
+			var pow = this.curveType === 'chordal' ? 0.5 : 0.25;
 			var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
 			var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
 			var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
@@ -42613,7 +42634,7 @@
 			py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
 			pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
 
-		} else if ( this.type === 'catmullrom' ) {
+		} else if ( this.curveType === 'catmullrom' ) {
 
 			var tension = this.tension !== undefined ? this.tension : 0.5;
 			px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
@@ -42635,6 +42656,8 @@
 	function CubicBezierCurve3( v0, v1, v2, v3 ) {
 
 		Curve.call( this );
+
+		this.type = 'CubicBezierCurve3';
 
 		this.v0 = v0;
 		this.v1 = v1;
@@ -42668,6 +42691,8 @@
 
 		Curve.call( this );
 
+		this.type = 'QuadraticBezierCurve3';
+
 		this.v0 = v0;
 		this.v1 = v1;
 		this.v2 = v2;
@@ -42698,6 +42723,8 @@
 	function LineCurve3( v1, v2 ) {
 
 		Curve.call( this );
+
+		this.type = 'LineCurve3';
 
 		this.v1 = v1;
 		this.v2 = v2;
@@ -42739,6 +42766,8 @@
 	function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
 		EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+
+		this.type = 'ArcCurve';
 
 	}
 
