@@ -8,17 +8,17 @@
  * Supports:
  * 	Mesh Generation (Positional Data)
  * 	Normal Data (Per Vertex Drawing Instance)
- *  UV Data (Per Vertex Drawing Instance)
- *  Skinning
- *  Animation
+ *	UV Data (Per Vertex Drawing Instance)
+ *	Skinning
+ *	Animation
  * 	- Separated Animations based on stacks.
  * 	- Skeletal & Non-Skeletal Animations
- *  NURBS (Open, Closed and Periodic forms)
+ *	NURBS (Open, Closed and Periodic forms)
  *
  * Needs Support:
  * 	Indexed Buffers
  * 	PreRotation support.
- *  Euler rotation order
+ *	Euler rotation order
  *
  * FBX format references:
  * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
@@ -608,7 +608,7 @@
 
 	}
 
-  // Parse nodes in FBXTree.Objects.subNodes.Geometry
+	// Parse nodes in FBXTree.Objects.subNodes.Geometry
 	function parseGeometries( FBXTree, connections, deformers ) {
 
 		var geometryMap = new Map();
@@ -631,7 +631,7 @@
 
 	}
 
-  // Parse single node in FBXTree.Objects.subNodes.Geometry
+	// Parse single node in FBXTree.Objects.subNodes.Geometry
 	function parseGeometry( geometryNode, relationships, deformers ) {
 
 		switch ( geometryNode.attrType ) {
@@ -1071,7 +1071,7 @@
 		var materialIndexBuffer = MaterialNode.subNodes.Materials.properties.a;
 
 		// Since materials are stored as indices, there's a bit of a mismatch between FBX and what
-		// we expect.  So we create an intermediate buffer that points to the index in the buffer,
+		// we expect.So we create an intermediate buffer that points to the index in the buffer,
 		// for conforming with the other functions we've written for other data.
 		var materialIndices = [];
 
@@ -1817,7 +1817,7 @@
 		//Skeleton is now bound, return objects to starting world positions.
 		sceneGraph.updateMatrixWorld( true );
 
-		// Silly hack with the animation parsing.  We're gonna pretend the scene graph has a skeleton
+		// Silly hack with the animation parsing. We're gonna pretend the scene graph has a skeleton
 		// to attach animations to, since FBX treats animations as animations for the entire scene,
 		// not just for individual objects.
 		sceneGraph.skeleton = {
@@ -1886,7 +1886,7 @@
 				23.976, // 13: eFilmFullFrame
 				30, // 14: eCustom: use GlobalSettings.properties.CustomFrameRate.value
 				96, // 15: eFrames96
-				72, // 16:  eFrames72
+				72, // 16: eFrames72
 				59.94, // 17: eFrames59dot94
 			];
 
@@ -3218,7 +3218,7 @@
 			}
 
 
-			// for this		  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+			// for this	↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 			// NodeAttribute: 1001463072, "NodeAttribute::", "LimbNode" {
 			if ( nodeAttrs ) {
 
@@ -3482,7 +3482,7 @@
 			// footer size: 160bytes + 16-byte alignment padding
 			// - 16bytes: magic
 			// - padding til 16-byte alignment (at least 1byte?)
-			//   (seems like some exporters embed fixed 15 or 16bytes?)
+			//	(seems like some exporters embed fixed 15 or 16bytes?)
 			// - 4bytes: magic
 			// - 4bytes: version
 			// - 120bytes: zero
