@@ -19,6 +19,13 @@
  * 	Indexed Buffers
  * 	PreRotation support.
  *  Euler rotation order
+ *
+ * FBX format references:
+ * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
+ *
+ * 	Binary format specification:
+ *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
+ *		https://wiki.rogiken.org/specifications/file-format/fbx/ (more detail but Japanese)
  */
 
 ( function () {
@@ -91,7 +98,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -3443,9 +3450,6 @@
 	} );
 
 	// Parse an FBX file in Binary format
-	// Binary format specification:
-	// https://code.blender.org/2013/08/fbx-binary-file-format-specification/
-	// https://wiki.rogiken.org/specifications/file-format/fbx/ (more detail but Japanese)
 	function BinaryParser() {}
 
 	Object.assign( BinaryParser.prototype, {
