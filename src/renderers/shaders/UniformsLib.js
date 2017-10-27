@@ -15,6 +15,7 @@ var UniformsLib = {
 
 		map: { value: null },
 		uvTransform: { value: new Matrix3() },
+		offsetRepeatAlpha: { value: new Vector4( 0, 0, 1, 1 ) },
 
 		alphaMap: { value: null },
 

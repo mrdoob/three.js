@@ -79,6 +79,9 @@ import tonemapping_pars_fragment from './ShaderChunk/tonemapping_pars_fragment.g
 import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl';
 import uv_pars_vertex from './ShaderChunk/uv_pars_vertex.glsl';
 import uv_vertex from './ShaderChunk/uv_vertex.glsl';
+import uv_alpha_pars_fragment from './ShaderChunk/uv_alpha_pars_fragment.glsl';
+import uv_alpha_pars_vertex from './ShaderChunk/uv_alpha_pars_vertex.glsl';
+import uv_alpha_vertex from './ShaderChunk/uv_alpha_vertex.glsl';
 import uv2_pars_fragment from './ShaderChunk/uv2_pars_fragment.glsl';
 import uv2_pars_vertex from './ShaderChunk/uv2_pars_vertex.glsl';
 import uv2_vertex from './ShaderChunk/uv2_vertex.glsl';
@@ -191,6 +194,9 @@ export var ShaderChunk = {
 	uv_pars_fragment: uv_pars_fragment,
 	uv_pars_vertex: uv_pars_vertex,
 	uv_vertex: uv_vertex,
+	uv_alpha_pars_fragment: uv_alpha_pars_fragment,
+	uv_alpha_pars_vertex: uv_alpha_pars_vertex,
+	uv_alpha_vertex: uv_alpha_vertex,
 	uv2_pars_fragment: uv2_pars_fragment,
 	uv2_pars_vertex: uv2_pars_vertex,
 	uv2_vertex: uv2_vertex,

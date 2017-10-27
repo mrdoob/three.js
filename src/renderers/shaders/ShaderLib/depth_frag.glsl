@@ -7,6 +7,7 @@
 #include <common>
 #include <packing>
 #include <uv_pars_fragment>
+#include <uv_alpha_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <logdepthbuf_pars_fragment>

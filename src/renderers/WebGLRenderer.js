@@ -2013,7 +2013,14 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
+		if ( material.alphaMap ) {
+
+			var offset = material.alphaMap.offset;
+			var repeat = material.alphaMap.repeat;
+
+			uniforms.offsetRepeatAlpha.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+		}uniforms.uvTransform.value .copy( uvScaleMap.matrix );
 
 		}
 
@@ -2057,6 +2064,15 @@ function WebGLRenderer( parameters ) {
 			}
 
 			uniforms.uvTransform.value.copy( material.map.matrix );
+
+		}
+
+		if ( material.alphaMap ) {
+
+			var offset = material.alphaMap.offset;
+			var repeat = material.alphaMap.repeat;
+
+			uniforms.offsetRepeatAlpha.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
 		}
 

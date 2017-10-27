@@ -1765,13 +1765,15 @@ THREE.ShaderDeferred = {
 
 		vertexShader: [
 
-			"#include <uv_pars_vertex>",
-			"#include <morphtarget_pars_vertex>",
+      "#include <uv_pars_vertex>",
+      "#include <uv_alpha_pars_vertex>",
+      "#include <morphtarget_pars_vertex>",
 			"#include <skinning_pars_vertex>",
 
 			"void main() {",
 
 			"#include <uv_vertex>",
+			"#include <uv_alpha_vertex>",
 			"#include <begin_vertex>",
 			"#include <beginnormal_vertex>",
 			"#include <skinbase_vertex>",
@@ -1793,6 +1795,7 @@ THREE.ShaderDeferred = {
 			"uniform float shininess;",
 
 			"#include <uv_pars_fragment>",
+			"#include <uv_alpha_pars_fragment>",
 			"#include <map_pars_fragment>",
 			THREE.DeferredShaderChunk[ "packVector3" ],
 
@@ -2421,6 +2424,7 @@ THREE.ShaderDeferred = {
 		vertexShader: [
 
 			"#include <uv_pars_vertex>",
+			"#include <uv_alpha_pars_vertex>",
 			"#include <morphtarget_pars_vertex>",
 			"#include <skinning_pars_vertex>",
 
@@ -2453,6 +2457,7 @@ THREE.ShaderDeferred = {
 			"uniform float viewWidth;",
 
 			"#include <uv_pars_fragment>",
+			"#include <uv_alpha_pars_fragment>",
 			"#include <map_pars_fragment>",
 
 			THREE.DeferredShaderChunk[ "unpackFloat" ],
