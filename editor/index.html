@@ -163,6 +163,8 @@
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
+			const IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
+
 			Number.prototype.format = function (){
 				return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 			};
@@ -311,13 +313,17 @@
 
 					case 90: // Register Ctrl-Z for Undo, Ctrl-Shift-Z for Redo
 
-						if ( event.ctrlKey && event.shiftKey ) {
+						if ( IS_MAC ? event.metaKey : event.ctrlKey ) {
 
-							editor.redo();
+							if ( event.shiftKey ) {
 
-						} else if ( event.ctrlKey ) {
+								editor.redo();
 
-							editor.undo();
+							} else {
+
+								editor.undo();
+
+							}
 
 						}
 
