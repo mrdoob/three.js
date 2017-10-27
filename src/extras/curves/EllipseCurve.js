@@ -8,16 +8,16 @@ function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockw
 
 	this.type = 'EllipseCurve';
 
-	this.aX = aX;
-	this.aY = aY;
+	this.aX = aX || 0;
+	this.aY = aY || 0;
 
-	this.xRadius = xRadius;
-	this.yRadius = yRadius;
+	this.xRadius = xRadius || 1;
+	this.yRadius = yRadius || 1;
 
-	this.aStartAngle = aStartAngle;
-	this.aEndAngle = aEndAngle;
+	this.aStartAngle = aStartAngle || 0;
+	this.aEndAngle = aEndAngle || 2 * Math.PI;
 
-	this.aClockwise = aClockwise;
+	this.aClockwise = aClockwise || false;
 
 	this.aRotation = aRotation || 0;
 
