@@ -6,6 +6,8 @@ function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockw
 
 	Curve.call( this );
 
+	this.type = 'EllipseCurve';
+
 	this.aX = aX;
 	this.aY = aY;
 

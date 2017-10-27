@@ -3,4 +3,4 @@
  */
 
 //Todo
-console.warn("Todo: Unit tests of AxisHelper")
+console.warn("Todo: Unit tests of AxesHelper")

@@ -19,6 +19,7 @@ THREE.OBJLoader = ( function () {
 
 			vertices : [],
 			normals  : [],
+			colors   : [],
 			uvs      : [],
 
 			materialLibraries : [],
@@ -50,6 +51,7 @@ THREE.OBJLoader = ( function () {
 					geometry : {
 						vertices : [],
 						normals  : [],
+						colors   : [],
 						uvs      : []
 					},
 					materials : [],
@@ -226,6 +228,17 @@ THREE.OBJLoader = ( function () {
 
 			},
 
+			addColor: function ( a, b, c ) {
+
+				var src = this.colors;
+				var dst = this.object.geometry.colors;
+
+				dst.push( src[ a + 0 ], src[ a + 1 ], src[ a + 2 ] );
+				dst.push( src[ b + 0 ], src[ b + 1 ], src[ b + 2 ] );
+				dst.push( src[ c + 0 ], src[ c + 1 ], src[ c + 2 ] );
+
+			},
+
 			addUV: function ( a, b, c ) {
 
 				var src = this.uvs;
@@ -278,6 +291,12 @@ THREE.OBJLoader = ( function () {
 					ic = na === nc ? ia : this.parseNormalIndex( nc, nLen );
 
 					this.addNormal( ia, ib, ic );
+
+				}
+
+				if ( this.colors.length > 0 ) {
+
+					this.addColor( ia, ib, ic );
 
 				}
 
@@ -409,6 +428,14 @@ THREE.OBJLoader = ( function () {
 								parseFloat( data[ 2 ] ),
 								parseFloat( data[ 3 ] )
 							);
+							if ( data.length === 8 ) {
+								state.colors.push(
+									parseFloat( data[ 4 ] ),
+									parseFloat( data[ 5 ] ),
+									parseFloat( data[ 6 ] )
+
+								);
+							}
 							break;
 						case 'vn':
 							state.normals.push(
@@ -585,6 +612,12 @@ THREE.OBJLoader = ( function () {
 				} else {
 
 					buffergeometry.computeVertexNormals();
+
+				}
+
+				if ( geometry.colors.length > 0 ) {
+
+					buffergeometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( geometry.colors ), 3 ) );
 
 				}
 

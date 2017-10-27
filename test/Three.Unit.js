@@ -98,7 +98,7 @@ export * from '../src/geometries/Geometries.js';
 
 //src/helpers
 export { ArrowHelper } from '../src/helpers/ArrowHelper.js';
-export { AxisHelper } from '../src/helpers/AxisHelper.js';
+export { AxesHelper } from '../src/helpers/AxesHelper.js';
 export { BoxHelper } from '../src/helpers/BoxHelper.js';
 export { Box3Helper } from '../src/helpers/Box3Helper.js';
 export { CameraHelper } from '../src/helpers/CameraHelper.js';
