@@ -13,6 +13,7 @@
 #endif
 
 #include <uv_pars_vertex>
+#include <uv_alpha_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>

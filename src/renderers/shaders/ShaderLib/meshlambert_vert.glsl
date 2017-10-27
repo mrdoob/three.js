@@ -10,6 +10,7 @@ varying vec3 vLightFront;
 
 #include <common>
 #include <uv_pars_vertex>
+#include <uv_alpha_pars_vertex>
 #include <uv2_pars_vertex>
 #include <envmap_pars_vertex>
 #include <bsdfs>
