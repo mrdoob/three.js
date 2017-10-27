@@ -83,7 +83,7 @@ function CubicPoly() {
 var tmp = new Vector3();
 var px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
 
-function CatmullRomCurve3( points, closed, tension ) {
+function CatmullRomCurve3( points, closed, curveType, tension ) {
 
 	Curve.call( this );
 
@@ -91,8 +91,8 @@ function CatmullRomCurve3( points, closed, tension ) {
 
 	this.points = points || [];
 	this.closed = closed || false;
+	this.curveType = curveType || 'centripetal';
 	this.tension = tension || 0.5;
-	this.curveType = 'centripetal';
 
 }
 
@@ -200,6 +200,7 @@ CatmullRomCurve3.prototype.copy = function ( source ) {
 	}
 
 	this.closed = source.closed;
+	this.curveType = source.curveType;
 	this.tension = source.tension;
 
 	return this;
