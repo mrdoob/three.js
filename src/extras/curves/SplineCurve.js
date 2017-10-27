@@ -46,6 +46,8 @@ SplineCurve.prototype.copy = function ( source ) {
 
 	Curve.prototype.copy.call( this, source );
 
+	this.points = [];
+
 	for ( var i = 0, l = source.points.length; i < l; i ++ ) {
 
 		var point = source.points[ i ];
