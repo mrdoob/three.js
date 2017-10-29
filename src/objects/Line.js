@@ -54,8 +54,8 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 			sphere.copy( geometry.boundingSphere );
-			sphere.applyMatrix4( matrixWorld );
-			sphere.radius += precision;
+      sphere.radius += precision;
+      sphere.applyMatrix4( matrixWorld );
 
 			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
