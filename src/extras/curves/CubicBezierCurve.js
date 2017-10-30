@@ -9,10 +9,10 @@ function CubicBezierCurve( v0, v1, v2, v3 ) {
 
 	this.type = 'CubicBezierCurve';
 
-	this.v0 = v0;
-	this.v1 = v1;
-	this.v2 = v2;
-	this.v3 = v3;
+	this.v0 = v0 || new Vector2();
+	this.v1 = v1 || new Vector2();
+	this.v2 = v2 || new Vector2();
+	this.v3 = v3 || new Vector2();
 
 }
 
@@ -33,6 +33,19 @@ CubicBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
 	);
 
 	return point;
+
+};
+
+CubicBezierCurve.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.v0.copy( source.v0 );
+	this.v1.copy( source.v1 );
+	this.v2.copy( source.v2 );
+	this.v3.copy( source.v3 );
+
+	return this;
 
 };
 
