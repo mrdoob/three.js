@@ -122,9 +122,19 @@ Editor.prototype = {
 
 		this.signals.sceneGraphChanged.active = false;
 
-		while ( scene.children.length > 0 ) {
+		if ( scene.children.length === 0 ) {
 
-			this.addObject( scene.children[ 0 ] );
+			// provide default lighting if the scene is empty
+
+			this.addDefaultLighting();
+
+		} else {
+
+			while ( scene.children.length > 0 ) {
+
+				this.addObject( scene.children[ 0 ] );
+
+			}
 
 		}
 
@@ -234,6 +244,15 @@ Editor.prototype = {
 	addTexture: function ( texture ) {
 
 		this.textures[ texture.uuid ] = texture;
+
+	},
+
+	addDefaultLighting: function () {
+
+		var directionalLight = new THREE.DirectionalLight();
+		directionalLight.name = 'Directional Light';
+		directionalLight.position.set( 0, 10, 10 );
+		this.addObject( directionalLight );
 
 	},
 
