@@ -1025,11 +1025,9 @@ THREE.GLTFLoader = ( function () {
 
 				if ( value ) {
 
-					fns.push( value );
-
 					if ( value instanceof Promise ) {
 
-						value.then( function ( key, value ) {
+						value = value.then( function ( key, value ) {
 
 							results[ key ] = value;
 
@@ -1040,6 +1038,8 @@ THREE.GLTFLoader = ( function () {
 						results[ idx ] = value;
 
 					}
+
+					fns.push( value );
 
 				}
 
@@ -1057,11 +1057,9 @@ THREE.GLTFLoader = ( function () {
 
 					if ( value ) {
 
-						fns.push( value );
-
 						if ( value instanceof Promise ) {
 
-							value.then( function ( key, value ) {
+							value = value.then( function ( key, value ) {
 
 								results[ key ] = value;
 
@@ -1072,6 +1070,8 @@ THREE.GLTFLoader = ( function () {
 							results[ key ] = value;
 
 						}
+
+						fns.push( value );
 
 					}
 
