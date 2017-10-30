@@ -285,6 +285,23 @@ Menubar.File = function ( editor ) {
 
 			content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
 
+			var editButton = '';
+
+			if ( editor.config.getKey( 'project/editable' ) ) {
+
+				editButton = `
+			var button = document.createElement( 'a' );
+			button.href = 'https://threejs.org/editor/#file=' + location.href.split( '/' ).slice( 0, - 1 ).join( '/' ) + '/app.json';
+			button.style.cssText = 'position: absolute; bottom: 20px; right: 20px; padding: 7px 10px 6px 10px; color: #fff; border: 1px solid #fff; text-decoration: none;';
+			button.target = '_blank';
+			button.textContent = 'EDIT';
+			document.body.appendChild( button );
+				`;
+
+			}
+
+			content = content.replace( '/* edit button */', editButton );
+
 			zip.file( 'index.html', content );
 
 		} );
