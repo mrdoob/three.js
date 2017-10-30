@@ -2751,7 +2751,7 @@ THREE.ColladaLoader.prototype = {
 		function parseNode( xml ) {
 
 			var data = {
-				name: xml.getAttribute( 'name' ),
+				name: xml.getAttribute( 'name' ) || '',
 				type: xml.getAttribute( 'type' ),
 				id: xml.getAttribute( 'id' ),
 				sid: xml.getAttribute( 'sid' ),
@@ -3111,7 +3111,6 @@ THREE.ColladaLoader.prototype = {
 
 				for ( var i = 0; i < objects.length; i ++ ) {
 
-					objects[ i ].name = ( type === 'JOINT' ) ? data.sid : data.name;
 					object.add( objects[ i ] );
 
 				}
