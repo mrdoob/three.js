@@ -2751,7 +2751,7 @@ THREE.ColladaLoader.prototype = {
 		function parseNode( xml ) {
 
 			var data = {
-				name: xml.getAttribute( 'name' ),
+				name: xml.getAttribute( 'name' ) || '',
 				type: xml.getAttribute( 'type' ),
 				id: xml.getAttribute( 'id' ),
 				sid: xml.getAttribute( 'sid' ),
