@@ -3111,6 +3111,7 @@ THREE.ColladaLoader.prototype = {
 
 				for ( var i = 0; i < objects.length; i ++ ) {
 
+					objects[ i ].name = ( type === 'JOINT' ) ? data.sid : data.name;
 					object.add( objects[ i ] );
 
 				}
