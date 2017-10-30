@@ -216,22 +216,19 @@ Menubar.Add = function ( editor ) {
 
 		var points = [
 			new THREE.Vector2( 0, 0 ),
-			new THREE.Vector2( 4, 0 ),
-			new THREE.Vector2( 3.5, 0.5 ),
-			new THREE.Vector2( 1, 0.75 ),
-			new THREE.Vector2( 0.8, 1 ),
-			new THREE.Vector2( 0.8, 4 ),
-			new THREE.Vector2( 1, 4.2 ),
-			new THREE.Vector2( 1.4, 4.8 ),
-			new THREE.Vector2( 2, 5 ),
-			new THREE.Vector2( 2.5, 5.4 ),
-			new THREE.Vector2( 3, 12 )
+			new THREE.Vector2( 0.4, 0 ),
+			new THREE.Vector2( 0.35, 0.05 ),
+			new THREE.Vector2( 0.1, 0.075 ),
+			new THREE.Vector2( 0.08, 0.1 ),
+			new THREE.Vector2( 0.08, 0.4 ),
+			new THREE.Vector2( 0.1, 0.42 ),
+			new THREE.Vector2( 0.14, 0.48 ),
+			new THREE.Vector2( 0.2, 0.5 ),
+			new THREE.Vector2( 0.25, 0.54 ),
+			new THREE.Vector2( 0.3, 1.2 )
 		];
-		var segments = 20;
-		var phiStart = 0;
-		var phiLength = 2 * Math.PI;
 
-		var geometry = new THREE.LatheBufferGeometry( points, segments, phiStart, phiLength );
+		var geometry = new THREE.LatheBufferGeometry( points, 12, 0, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { side: THREE.DoubleSide } ) );
 		mesh.name = 'Lathe ' + ( ++ meshCount );
 
