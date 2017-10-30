@@ -55,7 +55,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			inverseMatrix.getInverse( matrixWorld );
 			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
-			var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+			var localThreshold = 3 * threshold / ( this.scale.x + this.scale.y + this.scale.z );
 			var localThresholdSq = localThreshold * localThreshold;
 			var position = new Vector3();
 
