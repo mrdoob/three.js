@@ -236,6 +236,8 @@ Object.assign( FileLoader.prototype, {
 
 				var callbacks = loading[ url ];
 
+				delete loading[ url ];
+
 				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
 					var callback = callbacks[ i ];
