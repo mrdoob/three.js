@@ -56,7 +56,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Plane' );
 	option.onClick( function () {
 
-		var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+		var geometry = new THREE.PlaneBufferGeometry( 1, 1, 1, 1 );
 		var material = new THREE.MeshStandardMaterial();
 		var mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Plane ' + ( ++ meshCount );
@@ -73,7 +73,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Box' );
 	option.onClick( function () {
 
-		var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+		var geometry = new THREE.BoxBufferGeometry( 1, 1, 1, 1, 1, 1 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Box ' + ( ++ meshCount );
 
@@ -89,10 +89,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Circle' );
 	option.onClick( function () {
 
-		var radius = 1;
-		var segments = 32;
-
-		var geometry = new THREE.CircleBufferGeometry( radius, segments );
+		var geometry = new THREE.CircleBufferGeometry( 1, 8, 0, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Circle ' + ( ++ meshCount );
 
@@ -108,14 +105,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Cylinder' );
 	option.onClick( function () {
 
-		var radiusTop = 1;
-		var radiusBottom = 1;
-		var height = 2;
-		var radiusSegments = 32;
-		var heightSegments = 1;
-		var openEnded = false;
-
-		var geometry = new THREE.CylinderBufferGeometry( radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded );
+		var geometry = new THREE.CylinderBufferGeometry( 1, 1, 1, 8, 1, false, 0, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Cylinder ' + ( ++ meshCount );
 
@@ -131,15 +121,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Sphere' );
 	option.onClick( function () {
 
-		var radius = 1;
-		var widthSegments = 32;
-		var heightSegments = 16;
-		var phiStart = 0;
-		var phiLength = Math.PI * 2;
-		var thetaStart = 0;
-		var thetaLength = Math.PI;
-
-		var geometry = new THREE.SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
+		var geometry = new THREE.SphereBufferGeometry( 1, 8, 6, 0, Math.PI * 2, 0, Math.PI );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Sphere ' + ( ++ meshCount );
 
@@ -155,10 +137,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Icosahedron' );
 	option.onClick( function () {
 
-		var radius = 1;
-		var detail = 2;
-
-		var geometry = new THREE.IcosahedronGeometry( radius, detail );
+		var geometry = new THREE.IcosahedronGeometry( 1, 0 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
@@ -174,13 +153,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'Torus' );
 	option.onClick( function () {
 
-		var radius = 2;
-		var tube = 1;
-		var radialSegments = 32;
-		var tubularSegments = 12;
-		var arc = Math.PI * 2;
-
-		var geometry = new THREE.TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc );
+		var geometry = new THREE.TorusBufferGeometry( 1, 0.4, 8, 6, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Torus ' + ( ++ meshCount );
 
@@ -196,14 +169,7 @@ Menubar.Add = function ( editor ) {
 	option.setTextContent( 'TorusKnot' );
 	option.onClick( function () {
 
-		var radius = 2;
-		var tube = 0.8;
-		var tubularSegments = 64;
-		var radialSegments = 12;
-		var p = 2;
-		var q = 3;
-
-		var geometry = new THREE.TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q );
+		var geometry = new THREE.TorusKnotBufferGeometry( 1, 0.4, 64, 8, 2, 3 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'TorusKnot ' + ( ++ meshCount );
 
