@@ -122,19 +122,9 @@ Editor.prototype = {
 
 		this.signals.sceneGraphChanged.active = false;
 
-		if ( scene.children.length === 0 ) {
+		while ( scene.children.length > 0 ) {
 
-			// provide default lighting if the scene is empty
-
-			this.addDefaultLighting();
-
-		} else {
-
-			while ( scene.children.length > 0 ) {
-
-				this.addObject( scene.children[ 0 ] );
-
-			}
+			this.addObject( scene.children[ 0 ] );
 
 		}
 
