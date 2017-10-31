@@ -116,7 +116,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 		setClearColor: function ( color, alpha ) {
 
 			clearColor.set( color );
-			clearAlpha = alpha !== undefined ? alpha : 1;
+			clearAlpha = alpha !== undefined ? alpha : clearAlpha;
 			setClear( clearColor, clearAlpha );
 
 		},
