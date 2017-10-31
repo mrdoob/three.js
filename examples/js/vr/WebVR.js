@@ -89,23 +89,22 @@ var WEBVR = {
 
 		} else {
 
-			var error = document.createElement( 'div' );
-			error.style.position = 'absolute';
-			error.style.left = 'calc(50% - 150px)';
-			error.style.bottom = '20px';
-			error.style.width = '300px';
-			error.style.fontFamily = 'sans-serif';
-			error.style.fontSize = '16px';
-			error.style.fontStyle = 'normal';
-			error.style.lineHeight = '26px';
-			error.style.backgroundColor = '#fff';
-			error.style.color = '#000';
-			error.style.padding = '10px';
-			error.style.textAlign = 'center';
-			error.style.zIndex = '999';
-			error.innerHTML = 'Your browser does not support WebVR. Check <a href="https://webvr.info">webvr.info</a> for assistance.';
+			var message = document.createElement( 'div' );
+			message.style.position = 'absolute';
+			message.style.left = 'calc(50% - 90px)';
+			message.style.bottom = '20px';
+			message.style.width = '180px';
+			message.style.fontFamily = 'sans-serif';
+			message.style.fontSize = '13px';
+			message.style.fontStyle = 'normal';
+			message.style.backgroundColor = '#fff';
+			message.style.color = '#000';
+			message.style.padding = '12px 6px';
+			message.style.textAlign = 'center';
+			message.style.zIndex = '999';
+			message.innerHTML = '<a href="https://webvr.info">WEBVR</a> NOT SUPPORTED';
 
-			return error;
+			return message;
 
 		}
 
