@@ -19,6 +19,9 @@ var WEBVR = {
 
 			button.textContent = 'ENTER VR';
 
+			button.onmouseenter = function () { button.style.opacity = '1.0'; };
+			button.onmouseleave = function () { button.style.opacity = '0.5'; };
+
 		}
 
 		function showVRNotFound() {
@@ -31,23 +34,33 @@ var WEBVR = {
 
 			button.textContent = 'VR NOT FOUND';
 
+			button.onmouseenter = null;
+			button.onmouseleave = null;
+
+		}
+
+		function stylizeElement( element ) {
+
+			element.style.position = 'absolute';
+			element.style.bottom = '20px';
+			element.style.padding = '12px 6px';
+			element.style.border = '1px solid #fff';
+			element.style.borderRadius = '4px';
+			element.style.background = 'transparent';
+			element.style.color = '#fff';
+			element.style.font = 'normal 13px sans-serif';
+			element.style.textAlign = 'center';
+			element.style.opacity = '0.5';
+			element.style.zIndex = '999';
+
 		}
 
 		if ( 'getVRDisplays' in navigator ) {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
-			button.style.position = 'absolute';
-			button.style.bottom = '20px';
-			button.style.border = '1px solid #fff';
-			button.style.padding = '12px 6px';
-			button.style.backgroundColor = 'transparent';
-			button.style.color = '#fff';
-			button.style.fontFamily = 'sans-serif';
-			button.style.fontSize = '13px';
-			button.style.fontStyle = 'normal';
-			button.style.textAlign = 'center';
-			button.style.zIndex = '999';
+
+			stylizeElement( button );
 
 			window.addEventListener( 'vrdisplayconnect', function ( event ) {
 
@@ -87,20 +100,14 @@ var WEBVR = {
 
 		} else {
 
-			var message = document.createElement( 'div' );
-			message.style.position = 'absolute';
+			var message = document.createElement( 'a' );
+			message.href = 'https://webvr.info';
+			message.innerHTML = 'WEBVR NOT SUPPORTED';
 			message.style.left = 'calc(50% - 90px)';
-			message.style.bottom = '20px';
 			message.style.width = '180px';
-			message.style.fontFamily = 'sans-serif';
-			message.style.fontSize = '13px';
-			message.style.fontStyle = 'normal';
-			message.style.backgroundColor = '#fff';
-			message.style.color = '#000';
-			message.style.padding = '12px 6px';
-			message.style.textAlign = 'center';
-			message.style.zIndex = '999';
-			message.innerHTML = '<a href="https://webvr.info">WEBVR</a> NOT SUPPORTED';
+			message.style.textDecoration = 'none';
+
+			stylizeElement( message );
 
 			return message;
 
