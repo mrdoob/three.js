@@ -48,6 +48,8 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "fromGeometry", ( assert ) => {
 
+			assert.timeout( 1000 );
+
 			var a = new DirectGeometry();
 
 			var asyncDone = assert.async(); // tell QUnit when we're done with async stuff
@@ -237,7 +239,16 @@ export default QUnit.module( 'Core', () => {
 
 				asyncDone();
 
-			} );
+			}, onProgress, onError );
+
+			function onProgress() {}
+
+			function onError( error ) {
+
+				console.error( error );
+				asyncDone();
+
+			}
 
 		} );
 

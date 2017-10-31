@@ -7,6 +7,8 @@ QUnit.module( "Serialization" );
 
 QUnit.test( "Test Serialization", function( assert ) {
 
+	assert.timeout( 1000 );
+
 	// setup
 	var editor = new Editor();
 	var done = assert.async();

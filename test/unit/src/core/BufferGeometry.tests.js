@@ -547,6 +547,8 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "fromGeometry/fromDirectGeometry", ( assert ) => {
 
+			assert.timeout( 1000 );
+
 			var a = new BufferGeometry();
 			// BoxGeometry is a bit too simple but works fine in a pinch
 			// var b = new BoxGeometry( 1, 1, 1 );
