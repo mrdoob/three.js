@@ -9,7 +9,7 @@ var WEBVR = {
 
 	createButton: function ( renderer ) {
 
-		function showEnterVR() {
+		function showEnterVR( display ) {
 
 			button.style.display = '';
 
@@ -21,6 +21,14 @@ var WEBVR = {
 
 			button.onmouseenter = function () { button.style.opacity = '1.0'; };
 			button.onmouseleave = function () { button.style.opacity = '0.5'; };
+
+			button.onclick = function () {
+
+				display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: renderer.domElement } ] );
+
+			};
+
+			renderer.vr.setDevice( display );
 
 		}
 
@@ -36,6 +44,10 @@ var WEBVR = {
 
 			button.onmouseenter = null;
 			button.onmouseleave = null;
+
+			button.onclick = null;
+
+			renderer.vr.setDevice( null );
 
 		}
 
@@ -64,17 +76,7 @@ var WEBVR = {
 
 			window.addEventListener( 'vrdisplayconnect', function ( event ) {
 
-				showEnterVR();
-
-				var display = event.display;
-
-				button.onclick = function () {
-
-					display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: renderer.domElement } ] );
-
-				};
-
-				renderer.vr.setDevice( display );
+				showEnterVR( event.display );
 
 			}, false );
 
@@ -82,19 +84,20 @@ var WEBVR = {
 
 				showVRNotFound();
 
-				button.onclick = null;
-
-				renderer.vr.setDevice( null );
-
 			}, false );
 
 			window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
 
-				var display = event.display;
-
-				button.textContent = display.isPresenting ? 'EXIT VR' : 'ENTER VR';
+				button.textContent = event.display.isPresenting ? 'EXIT VR' : 'ENTER VR';
 
 			}, false );
+
+			navigator.getVRDisplays()
+				.then( function ( displays ) {
+
+					if ( displays.length > 0 ) showEnterVR( displays[ 0 ] );
+
+				} );
 
 			return button;
 
@@ -103,6 +106,7 @@ var WEBVR = {
 			var message = document.createElement( 'a' );
 			message.href = 'https://webvr.info';
 			message.innerHTML = 'WEBVR NOT SUPPORTED';
+
 			message.style.left = 'calc(50% - 90px)';
 			message.style.width = '180px';
 			message.style.textDecoration = 'none';
