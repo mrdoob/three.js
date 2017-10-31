@@ -11,6 +11,8 @@ var WEBVR = {
 
 		function showEnterVR() {
 
+			button.style.display = '';
+
 			button.style.cursor = 'pointer';
 			button.style.left = 'calc(50% - 50px)';
 			button.style.width = '100px';
@@ -20,6 +22,8 @@ var WEBVR = {
 		}
 
 		function showVRNotFound() {
+
+			button.style.display = '';
 
 			button.style.cursor = 'auto';
 			button.style.left = 'calc(50% - 75px)';
@@ -32,6 +36,7 @@ var WEBVR = {
 		if ( 'getVRDisplays' in navigator ) {
 
 			var button = document.createElement( 'button' );
+			button.style.display = 'none';
 			button.style.position = 'absolute';
 			button.style.bottom = '20px';
 			button.style.border = '1px solid #fff';
@@ -44,15 +49,11 @@ var WEBVR = {
 			button.style.textAlign = 'center';
 			button.style.zIndex = '999';
 
-			showVRNotFound();
-
 			window.addEventListener( 'vrdisplayconnect', function ( event ) {
 
-				console.log( event.display.isConnected );
+				showEnterVR();
 
 				var display = event.display;
-
-				showEnterVR();
 
 				button.onclick = function () {
 
@@ -65,9 +66,6 @@ var WEBVR = {
 			}, false );
 
 			window.addEventListener( 'vrdisplaydisconnect', function ( event ) {
-
-				console.log( event );
-				console.log( event.display.isConnected );
 
 				showVRNotFound();
 
