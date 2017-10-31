@@ -22170,7 +22170,7 @@
 
 			var device = vr.getDevice();
 			
-			if ( device && device.isConnected ) {
+			if ( device && device.isPresenting ) {
 
 				device.requestAnimationFrame( loop );
 
@@ -22190,7 +22190,7 @@
 
 			var device = vr.getDevice();
 			
-			if ( device && device.isConnected ) {
+			if ( device && device.isPresenting ) {
 
 				device.requestAnimationFrame( loop );
 

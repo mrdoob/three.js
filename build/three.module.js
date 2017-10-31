@@ -22164,7 +22164,7 @@ function WebGLRenderer( parameters ) {
 
 		var device = vr.getDevice();
 		
-		if ( device && device.isConnected ) {
+		if ( device && device.isPresenting ) {
 
 			device.requestAnimationFrame( loop );
 
@@ -22184,7 +22184,7 @@ function WebGLRenderer( parameters ) {
 
 		var device = vr.getDevice();
 		
-		if ( device && device.isConnected ) {
+		if ( device && device.isPresenting ) {
 
 			device.requestAnimationFrame( loop );
 
