@@ -1481,6 +1481,7 @@ THREE.GLTFLoader = ( function () {
 				var elementBytes = TypedArray.BYTES_PER_ELEMENT;
 				var itemBytes = elementBytes * itemSize;
 				var byteStride = json.bufferViews[ accessor.bufferView ].byteStride;
+				var normalized = accessor.normalized === true;
 				var array;
 
 				// The buffer is not interleaved if the stride is the item size in bytes.
@@ -1492,13 +1493,13 @@ THREE.GLTFLoader = ( function () {
 					// Integer parameters to IB/IBA are in array elements, not bytes.
 					var ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
 
-					return new THREE.InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes );
+					return new THREE.InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes, normalized );
 
 				} else {
 
 					array = new TypedArray( bufferView, accessor.byteOffset, accessor.count * itemSize );
 
-					return new THREE.BufferAttribute( array, itemSize );
+					return new THREE.BufferAttribute( array, itemSize, normalized );
 
 				}
 
