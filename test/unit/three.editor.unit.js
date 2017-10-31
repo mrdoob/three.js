@@ -1167,7 +1167,7 @@
 		option.setTextContent( 'Plane' );
 		option.onClick( function () {
 
-			var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+			var geometry = new THREE.PlaneBufferGeometry( 1, 1, 1, 1 );
 			var material = new THREE.MeshStandardMaterial();
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.name = 'Plane ' + ( ++ meshCount );
@@ -1184,7 +1184,7 @@
 		option.setTextContent( 'Box' );
 		option.onClick( function () {
 
-			var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+			var geometry = new THREE.BoxBufferGeometry( 1, 1, 1, 1, 1, 1 );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 			mesh.name = 'Box ' + ( ++ meshCount );
 
@@ -1200,10 +1200,7 @@
 		option.setTextContent( 'Circle' );
 		option.onClick( function () {
 
-			var radius = 1;
-			var segments = 32;
-
-			var geometry = new THREE.CircleBufferGeometry( radius, segments );
+			var geometry = new THREE.CircleBufferGeometry( 1, 8, 0, Math.PI * 2 );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 			mesh.name = 'Circle ' + ( ++ meshCount );
 
@@ -1219,14 +1216,7 @@
 		option.setTextContent( 'Cylinder' );
 		option.onClick( function () {
 
-			var radiusTop = 1;
-			var radiusBottom = 1;
-			var height = 2;
-			var radiusSegments = 32;
-			var heightSegments = 1;
-			var openEnded = false;
-
-			var geometry = new THREE.CylinderBufferGeometry( radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded );
+			var geometry = new THREE.CylinderBufferGeometry( 1, 1, 1, 8, 1, false, 0, Math.PI * 2 );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 			mesh.name = 'Cylinder ' + ( ++ meshCount );
 
@@ -1242,15 +1232,7 @@
 		option.setTextContent( 'Sphere' );
 		option.onClick( function () {
 
-			var radius = 1;
-			var widthSegments = 32;
-			var heightSegments = 16;
-			var phiStart = 0;
-			var phiLength = Math.PI * 2;
-			var thetaStart = 0;
-			var thetaLength = Math.PI;
-
-			var geometry = new THREE.SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
+			var geometry = new THREE.SphereBufferGeometry( 1, 8, 6, 0, Math.PI * 2, 0, Math.PI );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 			mesh.name = 'Sphere ' + ( ++ meshCount );
 
@@ -1266,10 +1248,7 @@
 		option.setTextContent( 'Icosahedron' );
 		option.onClick( function () {
 
-			var radius = 1;
-			var detail = 2;
-
-			var geometry = new THREE.IcosahedronGeometry( radius, detail );
+			var geometry = new THREE.IcosahedronGeometry( 1, 0 );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 			mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
@@ -1285,13 +1264,7 @@
 		option.setTextContent( 'Torus' );
 		option.onClick( function () {
 
-			var radius = 2;
-			var tube = 1;
-			var radialSegments = 32;
-			var tubularSegments = 12;
-			var arc = Math.PI * 2;
-
-			var geometry = new THREE.TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc );
+			var geometry = new THREE.TorusBufferGeometry( 1, 0.4, 8, 6, Math.PI * 2 );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 			mesh.name = 'Torus ' + ( ++ meshCount );
 
@@ -1307,14 +1280,7 @@
 		option.setTextContent( 'TorusKnot' );
 		option.onClick( function () {
 
-			var radius = 2;
-			var tube = 0.8;
-			var tubularSegments = 64;
-			var radialSegments = 12;
-			var p = 2;
-			var q = 3;
-
-			var geometry = new THREE.TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q );
+			var geometry = new THREE.TorusKnotBufferGeometry( 1, 0.4, 64, 8, 2, 3 );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 			mesh.name = 'TorusKnot ' + ( ++ meshCount );
 
@@ -1361,22 +1327,19 @@
 
 			var points = [
 				new THREE.Vector2( 0, 0 ),
-				new THREE.Vector2( 4, 0 ),
-				new THREE.Vector2( 3.5, 0.5 ),
-				new THREE.Vector2( 1, 0.75 ),
-				new THREE.Vector2( 0.8, 1 ),
-				new THREE.Vector2( 0.8, 4 ),
-				new THREE.Vector2( 1, 4.2 ),
-				new THREE.Vector2( 1.4, 4.8 ),
-				new THREE.Vector2( 2, 5 ),
-				new THREE.Vector2( 2.5, 5.4 ),
-				new THREE.Vector2( 3, 12 )
+				new THREE.Vector2( 0.4, 0 ),
+				new THREE.Vector2( 0.35, 0.05 ),
+				new THREE.Vector2( 0.1, 0.075 ),
+				new THREE.Vector2( 0.08, 0.1 ),
+				new THREE.Vector2( 0.08, 0.4 ),
+				new THREE.Vector2( 0.1, 0.42 ),
+				new THREE.Vector2( 0.14, 0.48 ),
+				new THREE.Vector2( 0.2, 0.5 ),
+				new THREE.Vector2( 0.25, 0.54 ),
+				new THREE.Vector2( 0.3, 1.2 )
 			];
-			var segments = 20;
-			var phiStart = 0;
-			var phiLength = 2 * Math.PI;
 
-			var geometry = new THREE.LatheBufferGeometry( points, segments, phiStart, phiLength );
+			var geometry = new THREE.LatheBufferGeometry( points, 12, 0, Math.PI * 2 );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { side: THREE.DoubleSide } ) );
 			mesh.name = 'Lathe ' + ( ++ meshCount );
 
@@ -2141,6 +2104,23 @@
 				}
 
 				content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
+
+				var editButton = '';
+
+				if ( editor.config.getKey( 'project/editable' ) ) {
+
+					editButton = `
+			var button = document.createElement( 'a' );
+			button.href = 'https://threejs.org/editor/#file=' + location.href.split( '/' ).slice( 0, - 1 ).join( '/' ) + '/app.json';
+			button.style.cssText = 'position: absolute; bottom: 20px; right: 20px; padding: 7px 10px 6px 10px; color: #fff; border: 1px solid #fff; text-decoration: none;';
+			button.target = '_blank';
+			button.textContent = 'EDIT';
+			document.body.appendChild( button );
+				`;
+
+				}
+
+				content = content.replace( '/* edit button */', editButton );
 
 				zip.file( 'index.html', content );
 
@@ -6381,13 +6361,26 @@
 
 		container.add( rendererPropertiesRow );
 
+		// Editable
+
+		var editableRow = new UI.Row();
+		var editable = new UI.Checkbox( config.getKey( 'project/editable' ) ).setLeft( '100px' ).onChange( function () {
+
+			config.setKey( 'project/editable', this.getValue() );
+
+		} );
+
+		editableRow.add( new UI.Text( 'Editable' ).setWidth( '90px' ) );
+		editableRow.add( editable );
+
+		container.add( editableRow );
+
 		// VR
 
 		var vrRow = new UI.Row();
 		var vr = new UI.Checkbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
 
 			config.setKey( 'project/vr', this.getValue() );
-			// updateRenderer();
 
 		} );
 

@@ -4,8 +4,6 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-	console.log("TADA");
-
 	QUnit.module( "Source", () => {
 
 	var REVISION = '88dev';
@@ -384,35 +382,37 @@
 		generateUUID: function () {
 
 			// http://www.broofa.com/Tools/Math.uuid.htm
+			// Replaced .join with string concatenation (@takahirox)
 
 			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split( '' );
-			var uuid = new Array( 36 );
 			var rnd = 0, r;
 
 			return function generateUUID() {
+
+				var uuid = '';
 
 				for ( var i = 0; i < 36; i ++ ) {
 
 					if ( i === 8 || i === 13 || i === 18 || i === 23 ) {
 
-						uuid[ i ] = '-';
+						uuid += '-';
 
 					} else if ( i === 14 ) {
 
-						uuid[ i ] = '4';
+						uuid += '4';
 
 					} else {
 
 						if ( rnd <= 0x02 ) rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0;
 						r = rnd & 0xf;
 						rnd = rnd >> 4;
-						uuid[ i ] = chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
+						uuid += chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
 
 					}
 
 				}
 
-				return uuid.join( '' );
+				return uuid;
 
 			};
 
@@ -2594,13 +2594,7 @@
 
 			}
 
-			var x = this.x, y = this.y, z = this.z;
-
-			this.x = y * v.z - z * v.y;
-			this.y = z * v.x - x * v.z;
-			this.z = x * v.y - y * v.x;
-
-			return this;
+			return this.crossVectors( this, v );
 
 		},
 
@@ -8883,23 +8877,23 @@
 		}(),
 
 		rotateOnWorldAxis: function () {
-			
+
 			// rotate object on axis in world space
 			// axis is assumed to be normalized
 			// method assumes no rotated parent
 
 			var q1 = new Quaternion();
-			
+
 			return function rotateOnWorldAxis( axis, angle ) {
-			
+
 				q1.setFromAxisAngle( axis, angle );
-			
+
 				this.quaternion.premultiply( q1 );
-			
+
 				return this;
-			
+
 			};
-			
+
 		}(),
 
 		rotateX: function () {
@@ -12469,6 +12463,21 @@
 
 		},
 
+		setFromPoints: function ( points ) {
+
+			this.vertices = [];
+
+			for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+				var point = points[ i ];
+				this.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
+
+			}
+
+			return this;
+
+		},
+
 		sortFacesByMaterialIndex: function () {
 
 			var faces = this.faces;
@@ -14551,6 +14560,23 @@
 				}
 
 			}
+
+			return this;
+
+		},
+
+		setFromPoints: function ( points ) {
+
+			var position = [];
+
+			for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+				var point = points[ i ];
+				position.push( point.x, point.y, point.z || 0 );
+
+			}
+
+			this.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 
 			return this;
 
@@ -20902,7 +20928,10 @@
 
 		var scope = this;
 
-		var isLoading = false, itemsLoaded = 0, itemsTotal = 0;
+		var isLoading = false;
+		var itemsLoaded = 0;
+		var itemsTotal = 0;
+		var urlModifier = undefined;
 
 		this.onStart = undefined;
 		this.onLoad = onLoad;
@@ -20961,6 +20990,24 @@
 
 		};
 
+		this.resolveURL = function ( url ) {
+
+			if ( urlModifier ) {
+
+				return urlModifier( url );
+
+			}
+
+			return url;
+
+		};
+
+		this.setURLModifier = function ( transform ) {
+
+			urlModifier = transform;
+
+		};
+
 	}
 
 	var DefaultLoadingManager = new LoadingManager();
@@ -20968,6 +21015,8 @@
 	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
+
+	var loading = {};
 
 	function FileLoader( manager ) {
 
@@ -20982,6 +21031,8 @@
 			if ( url === undefined ) url = '';
 
 			if ( this.path !== undefined ) url = this.path + url;
+
+			url = this.manager.resolveURL( url );
 
 			var scope = this;
 
@@ -21000,6 +21051,22 @@
 				}, 0 );
 
 				return cached;
+
+			}
+
+			// Check if request is duplicate
+
+			if ( loading[ url ] !== undefined ) {
+
+				loading[ url ].push( {
+
+					onLoad: onLoad,
+					onProgress: onProgress,
+					onError: onError
+
+				} );
+
+				return;
 
 			}
 
@@ -21094,7 +21161,20 @@
 
 			} else {
 
+				// Initialise array for duplicate requests
+
+				loading[ url ] = [];
+
+				loading[ url ].push( {
+
+					onLoad: onLoad,
+					onProgress: onProgress,
+					onError: onError
+
+				} );
+
 				var request = new XMLHttpRequest();
+
 				request.open( 'GET', url, true );
 
 				request.addEventListener( 'load', function ( event ) {
@@ -21103,9 +21183,18 @@
 
 					Cache.add( url, response );
 
+					var callbacks = loading[ url ];
+
+					delete loading[ url ];
+
 					if ( this.status === 200 ) {
 
-						if ( onLoad ) onLoad( response );
+						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+							var callback = callbacks[ i ];
+							if ( callback.onLoad ) callback.onLoad( response );
+
+						}
 
 						scope.manager.itemEnd( url );
 
@@ -21116,13 +21205,23 @@
 
 						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-						if ( onLoad ) onLoad( response );
+						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+							var callback = callbacks[ i ];
+							if ( callback.onLoad ) callback.onLoad( response );
+
+						}
 
 						scope.manager.itemEnd( url );
 
 					} else {
 
-						if ( onError ) onError( event );
+						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+							var callback = callbacks[ i ];
+							if ( callback.onError ) callback.onError( event );
+
+						}
 
 						scope.manager.itemEnd( url );
 						scope.manager.itemError( url );
@@ -21131,19 +21230,31 @@
 
 				}, false );
 
-				if ( onProgress !== undefined ) {
+				request.addEventListener( 'progress', function ( event ) {
 
-					request.addEventListener( 'progress', function ( event ) {
+					var callbacks = loading[ url ];
 
-						onProgress( event );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					}, false );
+						var callback = callbacks[ i ];
+						if ( callback.onProgress ) callback.onProgress( event );
 
-				}
+					}
+
+				}, false );
 
 				request.addEventListener( 'error', function ( event ) {
 
-					if ( onError ) onError( event );
+					var callbacks = loading[ url ];
+
+					delete loading[ url ];
+
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						var callback = callbacks[ i ];
+						if ( callback.onError ) callback.onError( event );
+
+					}
 
 					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
@@ -22628,6 +22739,8 @@
 			if ( url === undefined ) url = '';
 
 			if ( this.path !== undefined ) url = this.path + url;
+
+			url = this.manager.resolveURL( url );
 
 			var scope = this;
 
@@ -28010,7 +28123,7 @@
 			thetaLength: thetaLength
 		};
 
-		radius = radius || 50;
+		radius = radius || 1;
 
 		widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
 		heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
@@ -29182,6 +29295,8 @@
 
 	function Curve() {
 
+		this.type = 'Curve';
+
 		this.arcLengthDivisions = 200;
 
 	}
@@ -29519,6 +29634,20 @@
 				binormals: binormals
 			};
 
+		},
+
+		clone: function () {
+
+			return new this.constructor().copy( this );
+
+		},
+
+		copy: function ( source ) {
+
+			this.arcLengthDivisions = source.arcLengthDivisions;
+
+			return this;
+
 		}
 
 	} );
@@ -29618,8 +29747,10 @@
 
 		Curve.call( this );
 
-		this.v1 = v1;
-		this.v2 = v2;
+		this.type = 'LineCurve';
+
+		this.v1 = v1 || new Vector2();
+		this.v2 = v2 || new Vector2();
 
 	}
 
@@ -29663,6 +29794,17 @@
 
 	};
 
+	LineCurve.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+
+		return this;
+
+	};
+
 	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
 	 *
@@ -29677,8 +29819,9 @@
 
 		Curve.call( this );
 
-		this.curves = [];
+		this.type = 'CurvePath';
 
+		this.curves = [];
 		this.autoClose = false; // Automatically closes the path
 
 	}
@@ -29857,43 +30000,6 @@
 			}
 
 			return points;
-
-		},
-
-		/**************************************************************
-		 *	Create Geometries Helpers
-		 **************************************************************/
-
-		/// Generate geometry from path points (for Line or Points objects)
-
-		createPointsGeometry: function ( divisions ) {
-
-			var pts = this.getPoints( divisions );
-			return this.createGeometry( pts );
-
-		},
-
-		// Generate geometry from equidistant sampling along the path
-
-		createSpacedPointsGeometry: function ( divisions ) {
-
-			var pts = this.getSpacedPoints( divisions );
-			return this.createGeometry( pts );
-
-		},
-
-		createGeometry: function ( points ) {
-
-			var geometry = new Geometry();
-
-			for ( var i = 0, l = points.length; i < l; i ++ ) {
-
-				var point = points[ i ];
-				geometry.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
-
-			}
-
-			return geometry;
 
 		}
 
@@ -30081,16 +30187,18 @@
 
 		Curve.call( this );
 
-		this.aX = aX;
-		this.aY = aY;
+		this.type = 'EllipseCurve';
 
-		this.xRadius = xRadius;
-		this.yRadius = yRadius;
+		this.aX = aX || 0;
+		this.aY = aY || 0;
 
-		this.aStartAngle = aStartAngle;
-		this.aEndAngle = aEndAngle;
+		this.xRadius = xRadius || 1;
+		this.yRadius = yRadius || 1;
 
-		this.aClockwise = aClockwise;
+		this.aStartAngle = aStartAngle || 0;
+		this.aEndAngle = aEndAngle || 2 * Math.PI;
+
+		this.aClockwise = aClockwise || false;
 
 		this.aRotation = aRotation || 0;
 
@@ -30163,11 +30271,34 @@
 
 	};
 
+	EllipseCurve.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.aX = source.aX;
+		this.aY = source.aY;
+
+		this.xRadius = source.xRadius;
+		this.yRadius = source.yRadius;
+
+		this.aStartAngle = source.aStartAngle;
+		this.aEndAngle = source.aEndAngle;
+
+		this.aClockwise = source.aClockwise;
+
+		this.aRotation = source.aRotation;
+
+		return this;
+
+	};
+
 	function SplineCurve( points /* array of Vector2 */ ) {
 
 		Curve.call( this );
 
-		this.points = ( points === undefined ) ? [] : points;
+		this.type = 'SplineCurve';
+
+		this.points = points || [];
 
 	}
 
@@ -30200,14 +30331,34 @@
 
 	};
 
+	SplineCurve.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.points = [];
+
+		for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+
+			var point = source.points[ i ];
+
+			this.points.push( point.clone() );
+
+		}
+
+		return this;
+
+	};
+
 	function CubicBezierCurve( v0, v1, v2, v3 ) {
 
 		Curve.call( this );
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
-		this.v3 = v3;
+		this.type = 'CubicBezierCurve';
+
+		this.v0 = v0 || new Vector2();
+		this.v1 = v1 || new Vector2();
+		this.v2 = v2 || new Vector2();
+		this.v3 = v3 || new Vector2();
 
 	}
 
@@ -30231,13 +30382,28 @@
 
 	};
 
+	CubicBezierCurve.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v0.copy( source.v0 );
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+		this.v3.copy( source.v3 );
+
+		return this;
+
+	};
+
 	function QuadraticBezierCurve( v0, v1, v2 ) {
 
 		Curve.call( this );
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
+		this.type = 'QuadraticBezierCurve';
+
+		this.v0 = v0 || new Vector2();
+		this.v1 = v1 || new Vector2();
+		this.v2 = v2 || new Vector2();
 
 	}
 
@@ -30258,6 +30424,18 @@
 		);
 
 		return point;
+
+	};
+
+	QuadraticBezierCurve.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v0.copy( source.v0 );
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+
+		return this;
 
 	};
 
@@ -30389,6 +30567,9 @@
 	function Path( points ) {
 
 		CurvePath.call( this );
+
+		this.type = 'Path';
+
 		this.currentPoint = new Vector2();
 
 		if ( points ) {
@@ -30416,6 +30597,8 @@
 	function Shape() {
 
 		Path.apply( this, arguments );
+
+		this.type = 'Shape';
 
 		this.holes = [];
 
@@ -30466,6 +30649,8 @@
 	 **/
 
 	function ShapePath() {
+
+		this.type = 'ShapePath';
 
 		this.subPaths = [];
 		this.currentPath = null;
@@ -30741,6 +30926,8 @@
 	 */
 
 	function Font( data ) {
+
+		this.type = 'Font';
 
 		this.data = data;
 
@@ -31329,14 +31516,16 @@
 	var py = new CubicPoly();
 	var pz = new CubicPoly();
 
-	function CatmullRomCurve3( points ) {
+	function CatmullRomCurve3( points, closed, curveType, tension ) {
 
 		Curve.call( this );
 
-		if ( points.length < 2 ) console.warn( 'THREE.CatmullRomCurve3: Points array needs at least two entries.' );
+		this.type = 'CatmullRomCurve3';
 
 		this.points = points || [];
-		this.closed = false;
+		this.closed = closed || false;
+		this.curveType = curveType || 'centripetal';
+		this.tension = tension || 0.5;
 
 	}
 
@@ -31396,10 +31585,10 @@
 
 		}
 
-		if ( this.type === undefined || this.type === 'centripetal' || this.type === 'chordal' ) {
+		if ( this.curveType === 'centripetal' || this.curveType === 'chordal' ) {
 
 			// init Centripetal / Chordal Catmull-Rom
-			var pow = this.type === 'chordal' ? 0.5 : 0.25;
+			var pow = this.curveType === 'chordal' ? 0.5 : 0.25;
 			var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
 			var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
 			var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
@@ -31413,12 +31602,11 @@
 			py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
 			pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
 
-		} else if ( this.type === 'catmullrom' ) {
+		} else if ( this.curveType === 'catmullrom' ) {
 
-			var tension = this.tension !== undefined ? this.tension : 0.5;
-			px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
-			py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, tension );
-			pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, tension );
+			px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, this.tension );
+			py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, this.tension );
+			pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, this.tension );
 
 		}
 
@@ -31429,6 +31617,28 @@
 		);
 
 		return point;
+
+	};
+
+	CatmullRomCurve3.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.points = [];
+
+		for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+
+			var point = source.points[ i ];
+
+			this.points.push( point.clone() );
+
+		}
+
+		this.closed = source.closed;
+		this.curveType = source.curveType;
+		this.tension = source.tension;
+
+		return this;
 
 	};
 
@@ -32038,10 +32248,12 @@
 
 		Curve.call( this );
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
-		this.v3 = v3;
+		this.type = 'CubicBezierCurve3';
+
+		this.v0 = v0 || new Vector3();
+		this.v1 = v1 || new Vector3();
+		this.v2 = v2 || new Vector3();
+		this.v3 = v3 || new Vector3();
 
 	}
 
@@ -32063,6 +32275,19 @@
 		);
 
 		return point;
+
+	};
+
+	CubicBezierCurve3.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v0.copy( source.v0 );
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+		this.v3.copy( source.v3 );
+
+		return this;
 
 	};
 
@@ -32716,8 +32941,10 @@
 
 		Curve.call( this );
 
-		this.v1 = v1;
-		this.v2 = v2;
+		this.type = 'LineCurve3';
+
+		this.v1 = v1 || new Vector3();
+		this.v2 = v2 || new Vector3();
 
 	}
 
@@ -32750,6 +32977,17 @@
 	LineCurve3.prototype.getPointAt = function ( u, optionalTarget ) {
 
 		return this.getPoint( u, optionalTarget );
+
+	};
+
+	LineCurve3.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+
+		return this;
 
 	};
 
@@ -33207,9 +33445,11 @@
 
 		Curve.call( this );
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
+		this.type = 'QuadraticBezierCurve3';
+
+		this.v0 = v0 || new Vector3();
+		this.v1 = v1 || new Vector3();
+		this.v2 = v2 || new Vector3();
 
 	}
 
@@ -33231,6 +33471,18 @@
 		);
 
 		return point;
+
+	};
+
+	QuadraticBezierCurve3.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v0.copy( source.v0 );
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+
+		return this;
 
 	};
 
@@ -33873,7 +34125,7 @@
 			thetaLength: thetaLength
 		};
 
-		radius = radius || 50;
+		radius = radius || 1;
 		segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
 		thetaStart = thetaStart !== undefined ? thetaStart : 0;
@@ -34095,16 +34347,16 @@
 
 		var scope = this;
 
-		radiusTop = radiusTop !== undefined ? radiusTop : 20;
-		radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
-		height = height !== undefined ? height : 100;
+		radiusTop = radiusTop !== undefined ? radiusTop : 1;
+		radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
+		height = height || 1;
 
 		radialSegments = Math.floor( radialSegments ) || 8;
 		heightSegments = Math.floor( heightSegments ) || 1;
 
 		openEnded = openEnded !== undefined ? openEnded : false;
 		thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-		thetaLength = thetaLength !== undefined ? thetaLength : 2.0 * Math.PI;
+		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
 		// buffers
 
@@ -35847,7 +36099,7 @@
 
 	var tonemapping_fragment = "#if defined( TONE_MAPPING )\r\n\r\n  gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );\r\n\r\n#endif\r\n";
 
-	var tonemapping_pars_fragment = "#define saturate(a) clamp( a, 0.0, 1.0 )\r\n\r\nuniform float toneMappingExposure;\r\nuniform float toneMappingWhitePoint;\r\n\r\n// exposure only\r\nvec3 LinearToneMapping( vec3 color ) {\r\n\r\n\treturn toneMappingExposure * color;\r\n\r\n}\r\n\r\n// source: https://www.cs.utah.edu/~reinhard/cdrom/\r\nvec3 ReinhardToneMapping( vec3 color ) {\r\n\r\n\tcolor *= toneMappingExposure;\r\n\treturn saturate( color / ( vec3( 1.0 ) + color ) );\r\n\r\n}\r\n\r\n// source: http://filmicgames.com/archives/75\r\n#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )\r\nvec3 Uncharted2ToneMapping( vec3 color ) {\r\n\r\n\t// John Hable's filmic operator from Uncharted 2 video game\r\n\tcolor *= toneMappingExposure;\r\n\treturn saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( toneMappingWhitePoint ) ) );\r\n\r\n}\r\n\r\n// source: http://filmicgames.com/archives/75\r\nvec3 OptimizedCineonToneMapping( vec3 color ) {\r\n\r\n\t// optimized filmic operator by Jim Hejl and Richard Burgess-Dawson\r\n\tcolor *= toneMappingExposure;\r\n\tcolor = max( vec3( 0.0 ), color - 0.004 );\r\n\treturn pow( ( color * ( 6.2 * color + 0.5 ) ) / ( color * ( 6.2 * color + 1.7 ) + 0.06 ), vec3( 2.2 ) );\r\n\r\n}\r\n";
+	var tonemapping_pars_fragment = "#ifndef saturate\r\n\t#define saturate(a) clamp( a, 0.0, 1.0 )\r\n#endif\r\n\r\nuniform float toneMappingExposure;\r\nuniform float toneMappingWhitePoint;\r\n\r\n// exposure only\r\nvec3 LinearToneMapping( vec3 color ) {\r\n\r\n\treturn toneMappingExposure * color;\r\n\r\n}\r\n\r\n// source: https://www.cs.utah.edu/~reinhard/cdrom/\r\nvec3 ReinhardToneMapping( vec3 color ) {\r\n\r\n\tcolor *= toneMappingExposure;\r\n\treturn saturate( color / ( vec3( 1.0 ) + color ) );\r\n\r\n}\r\n\r\n// source: http://filmicgames.com/archives/75\r\n#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )\r\nvec3 Uncharted2ToneMapping( vec3 color ) {\r\n\r\n\t// John Hable's filmic operator from Uncharted 2 video game\r\n\tcolor *= toneMappingExposure;\r\n\treturn saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( toneMappingWhitePoint ) ) );\r\n\r\n}\r\n\r\n// source: http://filmicgames.com/archives/75\r\nvec3 OptimizedCineonToneMapping( vec3 color ) {\r\n\r\n\t// optimized filmic operator by Jim Hejl and Richard Burgess-Dawson\r\n\tcolor *= toneMappingExposure;\r\n\tcolor = max( vec3( 0.0 ), color - 0.004 );\r\n\treturn pow( ( color * ( 6.2 * color + 0.5 ) ) / ( color * ( 6.2 * color + 1.7 ) + 0.06 ), vec3( 2.2 ) );\r\n\r\n}\r\n";
 
 	var uv_pars_fragment = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )\r\n\r\n\tvarying vec2 vUv;\r\n\r\n#endif";
 
@@ -43129,7 +43381,7 @@
 
 		// Clearing
 
-		this.getClearColor = function() {
+		this.getClearColor = function () {
 
 			return background.getClearColor();
 
@@ -43141,13 +43393,13 @@
 
 		};
 
-		this.getClearAlpha = function() {
+		this.getClearAlpha = function () {
 
 			return background.getClearAlpha();
 
 		};
 
-		this.setClearAlpha = function() {
+		this.setClearAlpha = function () {
 
 			background.setClearAlpha.apply( background, arguments );
 
@@ -43716,7 +43968,19 @@
 		function start() {
 
 			if ( isAnimating ) return;
-			( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+			var device = vr.getDevice();
+			
+			if ( device && device.isPresenting ) {
+
+				device.requestAnimationFrame( loop );
+
+			} else {
+
+				window.requestAnimationFrame( loop );
+
+			}
+
 			isAnimating = true;
 
 		}
@@ -43724,7 +43988,18 @@
 		function loop( time ) {
 
 			if ( onAnimationFrame !== null ) onAnimationFrame( time );
-			( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+			var device = vr.getDevice();
+			
+			if ( device && device.isPresenting ) {
+
+				device.requestAnimationFrame( loop );
+
+			} else {
+
+				window.requestAnimationFrame( loop );
+
+			}
 
 		}
 
@@ -47425,8 +47700,8 @@
 			thetaLength: thetaLength
 		};
 
-		innerRadius = innerRadius || 20;
-		outerRadius = outerRadius || 50;
+		innerRadius = innerRadius || 0.5;
+		outerRadius = outerRadius || 1;
 
 		thetaStart = thetaStart !== undefined ? thetaStart : 0;
 		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
@@ -48352,8 +48627,8 @@
 			arc: arc
 		};
 
-		radius = radius || 100;
-		tube = tube || 40;
+		radius = radius || 1;
+		tube = tube || 0.4;
 		radialSegments = Math.floor( radialSegments ) || 8;
 		tubularSegments = Math.floor( tubularSegments ) || 6;
 		arc = arc || Math.PI * 2;
@@ -48596,8 +48871,8 @@
 			q: q
 		};
 
-		radius = radius || 100;
-		tube = tube || 40;
+		radius = radius || 1;
+		tube = tube || 0.4;
 		tubularSegments = Math.floor( tubularSegments ) || 64;
 		radialSegments = Math.floor( radialSegments ) || 8;
 		p = p || 2;
