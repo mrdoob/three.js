@@ -47,7 +47,16 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]()</h3>
+		<h3>[name]( [page:Array points] )</h3>
+		<div>
+		points -- (optional) array of [page:Vector2 Vector2s].<br /><br />
+
+		Creates a Shape from the points. The first point defines the offset, then successive points
+		are added to the [page:CurvePath.curves curves] array as [page:LineCurve LineCurves].<br /><br />
+
+		If no points are specified, an empty shape is created and the [page:.currentPoint] is set to
+		the origin.
+		</div>
 
 
 		<h2>Properties</h2>

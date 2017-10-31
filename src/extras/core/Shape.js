@@ -12,9 +12,9 @@ import { Path } from './Path.js';
 // STEP 3a - Extract points from each shape, turn to vertices
 // STEP 3b - Triangulate each shape, add faces.
 
-function Shape() {
+function Shape( points ) {
 
-	Path.apply( this, arguments );
+	Path.call( this, points );
 
 	this.type = 'Shape';
 
@@ -56,6 +56,24 @@ Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 	extractPoints: function ( divisions ) {
 
 		return this.extractAllPoints( divisions );
+
+	},
+
+	copy: function ( source ) {
+
+		Path.prototype.copy.call( this, source );
+
+		this.holes = [];
+
+		for ( var i = 0, l = source.holes.length; i < l; i ++ ) {
+
+			var hole = source.holes[ i ];
+
+			this.holes.push( hole.clone() );
+
+		}
+
+		return this;
 
 	}
 

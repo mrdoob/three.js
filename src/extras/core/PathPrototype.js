@@ -122,6 +122,16 @@ var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 		var lastPoint = curve.getPoint( 1 );
 		this.currentPoint.copy( lastPoint );
 
+	},
+
+	copy: function ( source ) {
+
+		CurvePath.prototype.copy.call( this, source );
+
+		this.currentPoint.copy( source.currentPoint );
+
+		return this;
+
 	}
 
 } );
