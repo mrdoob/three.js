@@ -62,11 +62,7 @@ function WebVRManager( renderer ) {
 
 	}
 
-	if ( typeof window !== 'undefined' ) {
-
-		window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
-
-	}
+	renderer.domElement.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
 	//
 
@@ -215,7 +211,7 @@ function WebVRManager( renderer ) {
 
 	this.dispose = function () {
 
-		window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
+		renderer.domElement.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
 
 	};
 
