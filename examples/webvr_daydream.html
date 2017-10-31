@@ -28,14 +28,6 @@
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var clock = new THREE.Clock();
 
 			var container;
@@ -120,18 +112,12 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
 				renderer.vr.enabled = true;
+				container.appendChild( renderer.domElement );
 
 				//
 
-				WEBVR.getVRDisplay( function ( device ) {
-
-					renderer.vr.setDevice( device );
-					document.body.appendChild( WEBVR.getButton( device, renderer.domElement ) );
-
-				} );
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				//
 

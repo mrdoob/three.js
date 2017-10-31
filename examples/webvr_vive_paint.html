@@ -29,14 +29,6 @@
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
@@ -133,13 +125,14 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				container.appendChild( renderer.domElement );
-
+				renderer.shadowMap.enabled = true;
 				renderer.vr.enabled = true;
 				renderer.vr.standing = true;
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				// controllers
 
@@ -181,14 +174,6 @@
 
 					pivot.material = pivot.material.clone();
 					controller2.add( controller.clone() );
-
-				} );
-
-				WEBVR.getVRDisplay( function ( display ) {
-
-					renderer.vr.setDevice( display );
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
 				} );
 
