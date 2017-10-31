@@ -1024,7 +1024,10 @@ function WebGLRenderer( parameters ) {
 	function start() {
 
 		if ( isAnimating ) return;
-		( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+		var device = vr.getDevice();
+		( ( device && device.isConnected ) || window ).requestAnimationFrame( loop );
+
 		isAnimating = true;
 
 	}
@@ -1032,7 +1035,9 @@ function WebGLRenderer( parameters ) {
 	function loop( time ) {
 
 		if ( onAnimationFrame !== null ) onAnimationFrame( time );
-		( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+		var device = vr.getDevice();
+		( ( device && device.isConnected ) || window ).requestAnimationFrame( loop );
 
 	}
 
