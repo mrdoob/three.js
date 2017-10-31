@@ -40,9 +40,9 @@ Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
 	},
 
-	// Get points of shape and holes (keypoints based on segments parameter)
+	// get points of shape and holes (keypoints based on segments parameter)
 
-	extractAllPoints: function ( divisions ) {
+	extractPoints: function ( divisions ) {
 
 		return {
 
@@ -50,12 +50,6 @@ Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 			holes: this.getPointsHoles( divisions )
 
 		};
-
-	},
-
-	extractPoints: function ( divisions ) {
-
-		return this.extractAllPoints( divisions );
 
 	},
 
