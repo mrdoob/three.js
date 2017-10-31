@@ -8,13 +8,13 @@ import { LineCurve } from '../curves/LineCurve.js';
 
 var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
-	fromPoints: function ( vectors ) {
+	setFromPoints: function ( points ) {
 
-		this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
+		this.moveTo( points[ 0 ].x, points[ 0 ].y );
 
-		for ( var i = 1, l = vectors.length; i < l; i ++ ) {
+		for ( var i = 1, l = points.length; i < l; i ++ ) {
 
-			this.lineTo( vectors[ i ].x, vectors[ i ].y );
+			this.lineTo( points[ i ].x, points[ i ].y );
 
 		}
 
@@ -121,6 +121,16 @@ var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
 		var lastPoint = curve.getPoint( 1 );
 		this.currentPoint.copy( lastPoint );
+
+	},
+
+	copy: function ( source ) {
+
+		CurvePath.prototype.copy.call( this, source );
+
+		this.currentPoint.copy( source.currentPoint );
+
+		return this;
 
 	}
 
