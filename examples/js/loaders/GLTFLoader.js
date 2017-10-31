@@ -93,8 +93,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
-				onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' ) );
-				return;
+				throw new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' );
 
 			}
 
