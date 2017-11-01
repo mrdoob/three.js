@@ -35,7 +35,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/Mirror.js"></script>
+		<script src="js/objects/Reflector.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
@@ -86,13 +86,25 @@
 
 				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 
-				// MIRROR planes
+				// reflector/mirror planes
 
-				var groundMirror = new THREE.Mirror( 100, 100, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color: 0x777777 } );
+				var groundMirror = new THREE.Reflector( 100, 100, {
+					clipBias: 0.003,
+					textureWidth: WIDTH * window.devicePixelRatio,
+					textureHeight: HEIGHT * window.devicePixelRatio,
+					color: 0x777777,
+					recursion: 1
+				} );
 				groundMirror.rotateX( - Math.PI / 2 );
 				scene.add( groundMirror );
 
-				var verticalMirror = new THREE.Mirror( 60, 60, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color:0x889999 } );
+				var verticalMirror = new THREE.Reflector( 60, 60, {
+					clipBias: 0.003,
+					textureWidth: WIDTH * window.devicePixelRatio,
+					textureHeight: HEIGHT * window.devicePixelRatio,
+					color: 0x889999,
+					recursion: 1
+				} );
 				verticalMirror.position.y = 35;
 				verticalMirror.position.z = -45;
 				scene.add( verticalMirror );
@@ -117,7 +129,7 @@
 				sphereGroup.add( halfSphere );
 
 				var geometry = new THREE.IcosahedronGeometry( 5, 0 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, shading: THREE.FlatShading } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, flatShading: true } );
 				smallSphere = new THREE.Mesh( geometry, material );
 				scene.add(smallSphere);
 
@@ -184,8 +196,6 @@
 				);
 				smallSphere.rotation.y = ( Math.PI / 2 ) - timer * 0.1;
 				smallSphere.rotation.z = timer * 0.8;
-
-				cameraControls.update();
 
 				renderer.render(scene, camera);
 

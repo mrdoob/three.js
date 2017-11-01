@@ -123,7 +123,6 @@
 				canvas = document.getElementById( 'c' );
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
-				renderer.setClearColor( 0xffffff, 1 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 
 				views = document.querySelectorAll( '.view' );
@@ -131,6 +130,7 @@
 				for ( var n = 0 ; n < views.length ; n++ ) {
 
 					var scene = new THREE.Scene();
+					scene.background = new THREE.Color( 0xffffff );
 
 					var geometry = new THREE.Geometry();
 					var geometry0 = new THREE.Geometry();

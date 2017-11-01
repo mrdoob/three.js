@@ -13,19 +13,6 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			#edit {
-				position: absolute;
-				bottom: 20px;
-				right: 20px;
-				padding: 8px;
-				text-decoration: none;
-				background-color: #fff;
-				color: #555;
-				opacity: 0.5;
-			}
-			#edit:hover {
-				opacity: 1;
-			}
 		</style>
 	</head>
 	<body ontouchstart="">
@@ -47,18 +34,8 @@
 				window.addEventListener( 'resize', function () {
 					player.setSize( window.innerWidth, window.innerHeight );
 				} );
-
-				if ( location.search === '?edit' ) {
-					var button = document.createElement( 'a' );
-					button.id = 'edit';
-					button.href = 'https://threejs.org/editor/#file=' + location.href.split( '/' ).slice( 0, - 1 ).join( '/' ) + '/app.json';
-					button.target = '_blank';
-					button.textContent = 'EDIT';
-					document.body.appendChild( button );
-				}
-
 			} );
-
+			/* edit button */
 		</script>
 	</body>
 </html>

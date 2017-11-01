@@ -1,8 +1,8 @@
-import { Texture } from './Texture';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
+
+import { Texture } from './Texture.js';
 
 function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
@@ -14,7 +14,7 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	function update() {
 
-		requestAnimationFrame( update );
+		var video = scope.image;
 
 		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
 
@@ -22,9 +22,11 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 		}
 
+		requestAnimationFrame( update );
+
 	}
 
-	update();
+	requestAnimationFrame( update );
 
 }
 

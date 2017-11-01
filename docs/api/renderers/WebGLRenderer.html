@@ -152,7 +152,7 @@
 		various WebGL extensions are supported.
 		</div>
 
-		<h3>[property:Boolean gammaFactor]</h3>
+		<h3>[property:Float gammaFactor]</h3>
 		<div>Default is *2*. </div>
 
 
@@ -224,6 +224,14 @@
 
 		<h3>[property:Boolean shadowMap.enabled]</h3>
 		<div>If set, use shadow maps in the scene. Default is *false*.</div>
+
+		<h3>[property:Boolean shadowMap.autoUpdate]</h3>
+		<div>Enables automatic updates to the shadows in the scene. Default is *true*.</div>
+		<div>If you do not require dynamic lighting / shadows, you may set this to *false* when the renderer is instantiated.</div>
+
+		<h3>[property:Boolean shadowMap.needsUpdate]</h3>
+		<div>When set to *true*, shadow maps in the scene will be updated in the next *render* call. Default is *false*. </div>
+		<div>If you have disabled automatic updates to shadow maps (*shadowMap.autoUpdate = false*), you will need to set this to *true* and then make a render call to update the shadows in your scene.</div>
 
 		<h3>[property:Integer shadowMap.type]</h3>
 		<div>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</div>
@@ -352,6 +360,9 @@
 
 		<h3>[method:Number getMaxAnisotropy]()</h3>
 		<div>This returns the anisotropy level of the textures.</div>
+
+		<h3>[method:Object getDrawingBufferSize]()</h3>
+		<div>Returns an object containing the width and height of the renderer's drawing buffer, in pixels.</div>
 
 		<h3>[method:number getPixelRatio]()</h3>
 		<div>Returns current device pixel ratio used.</div>

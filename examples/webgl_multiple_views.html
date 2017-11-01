@@ -58,7 +58,7 @@
 					top: 0,
 					width: 0.5,
 					height: 1.0,
-					background: new THREE.Color().setRGB( 0.5, 0.5, 0.7 ),
+					background: new THREE.Color( 0.5, 0.5, 0.7 ),
 					eye: [ 0, 300, 1800 ],
 					up: [ 0, 1, 0 ],
 					fov: 30,
@@ -73,7 +73,7 @@
 					top: 0.5,
 					width: 0.5,
 					height: 0.5,
-					background: new THREE.Color().setRGB( 0.7, 0.5, 0.5 ),
+					background: new THREE.Color( 0.7, 0.5, 0.5 ),
 					eye: [ 0, 1800, 0 ],
 					up: [ 0, 0, 1 ],
 					fov: 45,
@@ -88,7 +88,7 @@
 					top: 0,
 					width: 0.5,
 					height: 0.5,
-					background: new THREE.Color().setRGB( 0.5, 0.7, 0.7 ),
+					background: new THREE.Color( 0.5, 0.7, 0.7 ),
 					eye: [ 1400, 800, 1400 ],
 					up: [ 0, 1, 0 ],
 					fov: 60,
@@ -203,8 +203,8 @@
 
 				var materials = [
 
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0 } ),
-					new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } ),
+					new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } )
 
 				];
 

@@ -62,30 +62,34 @@
 
 			function init() {
 
-				scene = new THREE.Scene();
-				scene.add( new THREE.AmbientLight( 0x999999 ) );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.6 );
-				pointLight.position.set( 80, 90, 150 );
-				scene.add( pointLight );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
+
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 
 				// Z is up for objects intended to be 3D printed.
 
 				camera.up.set( 0, 0, 1 );
-				camera.position.set( -80, -90, 150 );
-
-				//camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
-
+				camera.position.set( - 80, - 90, 150 );
 				scene.add( camera );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x333333 );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+				controls.minDistance = 50;
+				controls.maxDistance = 300;
+				controls.enablePan = false;
+				controls.target.set( 80, 65, 20 );
+				controls.update();
 
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( pointLight );
 				var loader = new THREE.ThreeMFLoader();
 				loader.load( './models/3mf/cube_gears.3mf', function ( object ) {
 
@@ -93,11 +97,6 @@
 					render();
 
 				} );
-
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
-				controls.target.set( 80, 65, 35 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

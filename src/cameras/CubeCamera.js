@@ -1,8 +1,8 @@
-import { Object3D } from '../core/Object3D';
-import { WebGLRenderTargetCube } from '../renderers/WebGLRenderTargetCube';
-import { LinearFilter, RGBFormat } from '../constants';
-import { Vector3 } from '../math/Vector3';
-import { PerspectiveCamera } from './PerspectiveCamera';
+import { Object3D } from '../core/Object3D.js';
+import { WebGLRenderTargetCube } from '../renderers/WebGLRenderTargetCube.js';
+import { LinearFilter, RGBFormat } from '../constants.js';
+import { Vector3 } from '../math/Vector3.js';
+import { PerspectiveCamera } from './PerspectiveCamera.js';
 
 /**
  * Camera for rendering cube maps
@@ -54,7 +54,7 @@ function CubeCamera( near, far, cubeResolution ) {
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
 	this.renderTarget.texture.name = "CubeCamera";
 
-	this.updateCubeMap = function ( renderer, scene ) {
+	this.update = function ( renderer, scene ) {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
 
@@ -82,6 +82,23 @@ function CubeCamera( near, far, cubeResolution ) {
 
 		renderTarget.activeCubeFace = 5;
 		renderer.render( scene, cameraNZ, renderTarget );
+
+		renderer.setRenderTarget( null );
+
+	};
+
+	this.clear = function ( renderer, color, depth, stencil ) {
+
+		var renderTarget = this.renderTarget;
+
+		for ( var i = 0; i < 6; i ++ ) {
+
+			renderTarget.activeCubeFace = i;
+			renderer.setRenderTarget( renderTarget );
+
+			renderer.clear( color, depth, stencil );
+
+		}
 
 		renderer.setRenderTarget( null );
 

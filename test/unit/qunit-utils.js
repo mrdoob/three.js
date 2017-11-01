@@ -5,14 +5,24 @@
 QUnit.assert.success = function( message ) {
 
 	// Equivalent to assert( true, message );
-	QUnit.assert.push( true, undefined, undefined, message );
+	this.pushResult( {
+		result: true,
+		actual: undefined,
+		expected: undefined,
+		message: message
+	} );
 
 };
 
 QUnit.assert.fail = function( message ) {
 
 	// Equivalent to assert( false, message );
-	QUnit.assert.push( false, undefined, undefined, message );
+	this.pushResult( {
+		result: false,
+		actual: undefined,
+		expected: undefined,
+		message: message
+	} );
 
 };
 
@@ -20,7 +30,12 @@ QUnit.assert.numEqual = function( actual, expected, message ) {
 
 	var diff = Math.abs(actual - expected);
 	message = message || ( actual + " should be equal to " + expected );
-	QUnit.assert.push( diff < 0.1, actual, expected, message );
+	this.pushResult( {
+		result: diff < 0.1,
+		actual: actual,
+		expected: expected,
+		message: message
+	} );
 
 };
 
@@ -29,7 +44,12 @@ QUnit.assert.equalKey = function( obj, ref, key ) {
 	var actual = obj[key];
 	var expected = ref[key];
 	var message = actual + ' should be equal to ' + expected + ' for key "' + key + '"';
-	QUnit.assert.push( actual == expected, actual, expected, message );
+	this.pushResult( {
+		result: actual == expected,
+		actual: actual,
+		expected: expected,
+		message: message
+	} );
 
 };
 
@@ -40,7 +60,12 @@ QUnit.assert.smartEqual = function( actual, expected, message ) {
 	var same = cmp.areEqual(actual, expected);
 	var msg = cmp.getDiagnostic() || message;
 
-	QUnit.assert.push( same, actual, expected, msg );
+	this.pushResult( {
+		result: same,
+		actual: actual,
+		expected: expected,
+		message: msg
+	} );
 
 };
 
@@ -76,7 +101,6 @@ function getDifferingProp( geometryA, geometryB, excludedProperties) {
 	var geometryKeys = Object.keys( geometryA );
 	var cloneKeys = Object.keys( geometryB );
 
-	var keysWhichAreNotChecked = [ 'parameters', 'widthSegments', 'heightSegments', 'depthSegments' ];
 	var differingProp = undefined;
 
 	for ( var i = 0, l = geometryKeys.length; i < l; i++ ) {
@@ -100,7 +124,7 @@ function getDifferingProp( geometryA, geometryB, excludedProperties) {
 // Compare json file with its source geometry.
 function checkGeometryJsonWriting( geom, json ) {
 
-	QUnit.assert.equal( json.metadata.version, "4.4", "check metadata version" );
+	QUnit.assert.equal( json.metadata.version, "4.5", "check metadata version" );
 	QUnit.assert.equalKey( geom, json, 'type' );
 	QUnit.assert.equalKey( geom, json, 'uuid' );
 	QUnit.assert.equal( json.id, undefined, "should not persist id" );
@@ -219,40 +243,69 @@ function runStdGeometryTests( assert, geometries ) {
 //
 
 // Run common light tests.
-function runStdLightTests( assert, lights ) {
+function runStdLightTests( lights ) {
 
-	for ( var i = 0, l = lights.length; i < l; i++ ) {
+	for ( var i = 0, l = lights.length; i < l; i ++ ) {
 
-		var light = lights[i];
+		var light = lights[ i ];
 
-		// Clone
-		checkLightClone( light );
+		// copy and clone
+		checkLightCopyClone( light );
 
-		// json round trip
-		checkLightJsonRoundtrip( light );
+		// THREE.Light doesn't get parsed by ObjectLoader as it's only
+		// used as an abstract base class - so we skip the JSON tests
+		if ( light.type !== "Light" ) {
+
+			// json round trip
+			checkLightJsonRoundtrip( light );
+
+		}
+
 	}
 
 }
 
+function checkLightCopyClone( light ) {
 
-function checkLightClone( light ) {
+	// copy
+	var newLight = new light.constructor( 0xc0ffee );
+	newLight.copy( light );
+
+	QUnit.assert.notEqual( newLight.uuid, light.uuid, "Copied light's UUID differs from original" );
+	QUnit.assert.notEqual( newLight.id, light.id, "Copied light's id differs from original" );
+	QUnit.assert.smartEqual( newLight, light, "Copied light is equal to original" );
+
+	// real copy?
+	newLight.color.setHex( 0xc0ffee );
+	QUnit.assert.notStrictEqual(
+		newLight.color.getHex(), light.color.getHex(), "Copied light is independent from original"
+	);
 
 	// Clone
-	var copy = light.clone();
-	QUnit.assert.notEqual( copy.uuid, light.uuid, "clone uuid should differ from original" );
-	QUnit.assert.notEqual( copy.id, light.id, "clone id should differ from original" );
-	QUnit.assert.smartEqual( copy, light, "clone is equal to original" );
+	var clone = light.clone(); // better get a new var
+	QUnit.assert.notEqual( clone.uuid, light.uuid, "Cloned light's UUID differs from original" );
+	QUnit.assert.notEqual( clone.id, light.id, "Clone light's id differs from original" );
+	QUnit.assert.smartEqual( clone, light, "Clone light is equal to original" );
 
+	// real clone?
+	clone.color.setHex( 0xc0ffee );
+	QUnit.assert.notStrictEqual(
+		clone.color.getHex(), light.color.getHex(), "Clone light is independent from original"
+	);
 
-	// json round trip with clone
-	checkLightJsonRoundtrip( copy );
+	if ( light.type !== "Light" ) {
+
+		// json round trip with clone
+		checkLightJsonRoundtrip( clone );
+
+	}
 
 }
 
 // Compare json file with its source Light.
 function checkLightJsonWriting( light, json ) {
 
-	QUnit.assert.equal( json.metadata.version, "4.4", "check metadata version" );
+	QUnit.assert.equal( json.metadata.version, "4.5", "check metadata version" );
 
 	var object = json.object;
 	QUnit.assert.equalKey( light, object, 'type' );

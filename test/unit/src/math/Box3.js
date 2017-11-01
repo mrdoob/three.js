@@ -311,3 +311,105 @@ QUnit.test( "translate" , function( assert ) {
 	assert.ok( d.clone().translate( one3 ).equals( b ), "Passed!" );
 	assert.ok( b.clone().translate( one3.clone().negate() ).equals( d ), "Passed!" );
 });
+
+QUnit.test( "setFromCenterAndSize", function ( assert ) {
+
+	var a = new THREE.Box3( zero3.clone(), one3.clone() );
+	var b = a.clone();
+	var newCenter = one3;
+	var newSize = two3;
+
+	a.setFromCenterAndSize( a.getCenter(), a.getSize() );
+	assert.ok( a.equals( b ), "Same values: no changes" );
+
+	a.setFromCenterAndSize( newCenter, a.getSize() );
+	assert.ok( a.getCenter().equals( newCenter ), "Move center: correct new center" );
+	assert.ok( a.getSize().equals( b.getSize() ), "Move center: no change in size" );
+	assert.notOk( a.equals( b ), "Move center: no longer equal to old values" );
+
+	a.setFromCenterAndSize( a.getCenter(), newSize );
+	assert.ok( a.getCenter().equals( newCenter ), "Resize: no change to center" );
+	assert.ok( a.getSize().equals( newSize ), "Resize: correct new size" );
+	assert.notOk( a.equals( b ), "Resize: no longer equal to old values" );
+
+} );
+
+QUnit.test( "setFromBufferAttribute", function ( assert ) {
+
+	var a = new THREE.Box3( zero3.clone(), one3.clone() );
+	var bigger = new THREE.BufferAttribute( new Float32Array( [
+		 - 2, - 2, - 2, 2, 2, 2, 1.5, 1.5, 1.5, 0, 0, 0
+	] ), 3 );
+	var smaller = new THREE.BufferAttribute( new Float32Array( [
+		 - 0.5, - 0.5, - 0.5, 0.5, 0.5, 0.5, 0, 0, 0
+	] ), 3 );
+	var newMin = new THREE.Vector3( - 2, - 2, - 2 );
+	var newMax = new THREE.Vector3( 2, 2, 2 );
+
+	a.setFromBufferAttribute( bigger );
+	assert.ok( a.min.equals( newMin ), "Bigger box: correct new minimum" );
+	assert.ok( a.max.equals( newMax ), "Bigger box: correct new maximum" );
+
+	newMin.set( - 0.5, - 0.5, - 0.5 );
+	newMax.set( 0.5, 0.5, 0.5 );
+
+	a.setFromBufferAttribute( smaller );
+	assert.ok( a.min.equals( newMin ), "Smaller box: correct new minimum" );
+	assert.ok( a.max.equals( newMax ), "Smaller box: correct new maximum" );
+
+} );
+
+QUnit.test( "expandByObject", function ( assert ) {
+
+	var a = new THREE.Box3( zero3.clone(), one3.clone() );
+	var b = a.clone();
+	var bigger = new THREE.Mesh( new THREE.BoxGeometry( 2, 2, 2 ) );
+	var smaller = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.5 ) );
+	var child = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ) );
+
+	// just a bigger box to begin with
+	a.expandByObject( bigger );
+	assert.ok( a.min.equals( new THREE.Vector3( - 1, - 1, - 1 ) ), "Bigger box: correct new minimum" );
+	assert.ok( a.max.equals( new THREE.Vector3( 1, 1, 1 ) ), "Bigger box: correct new maximum" );
+
+	// a translated, bigger box
+	a.copy( b );
+	bigger.translateX( 2 );
+	a.expandByObject( bigger );
+	assert.ok( a.min.equals( new THREE.Vector3( 0, - 1, - 1 ) ), "Translated, bigger box: correct new minimum" );
+	assert.ok( a.max.equals( new THREE.Vector3( 3, 1, 1 ) ), "Translated, bigger box: correct new maximum" );
+
+	// a translated, bigger box with child
+	a.copy( b );
+	bigger.add( child );
+	a.expandByObject( bigger );
+	assert.ok( a.min.equals( new THREE.Vector3( 0, - 1, - 1 ) ), "Translated, bigger box with child: correct new minimum" );
+	assert.ok( a.max.equals( new THREE.Vector3( 3, 1, 1 ) ), "Translated, bigger box with child: correct new maximum" );
+
+	// a translated, bigger box with a translated child
+	a.copy( b );
+	child.translateX( 2 );
+	a.expandByObject( bigger );
+	assert.ok( a.min.equals( new THREE.Vector3( 0, - 1, - 1 ) ), "Translated, bigger box with translated child: correct new minimum" );
+	assert.ok( a.max.equals( new THREE.Vector3( 4.5, 1, 1 ) ), "Translated, bigger box with translated child: correct new maximum" );
+
+	// a smaller box
+	a.copy( b );
+	a.expandByObject( smaller );
+	assert.ok( a.min.equals( new THREE.Vector3( - 0.25, - 0.25, - 0.25 ) ), "Smaller box: correct new minimum" );
+	assert.ok( a.max.equals( new THREE.Vector3( 1, 1, 1 ) ), "Smaller box: correct new maximum" );
+
+} );
+
+QUnit.test( "setFromObject/BufferGeometry", function ( assert ) {
+
+	var a = new THREE.Box3( zero3.clone(), one3.clone() );
+	var object = new THREE.Mesh( new THREE.BoxBufferGeometry( 2, 2, 2 ) );
+	var child = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ) );
+	object.add( child );
+
+	a.setFromObject( object );
+	assert.ok( a.min.equals( new THREE.Vector3( - 1, - 1, - 1 ) ), "Correct new minimum" );
+	assert.ok( a.max.equals( new THREE.Vector3( 1, 1, 1 ) ), "Correct new maximum" );
+
+} );

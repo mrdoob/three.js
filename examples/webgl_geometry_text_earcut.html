@@ -97,7 +97,7 @@
 				return grouped;
 
 			};
-			
+
 		</script>
 
 		<script>
@@ -196,6 +196,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
 
 				// LIGHTS
@@ -240,8 +241,8 @@
 				}
 
 				materials = [
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), // front
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ) // side
+					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+					new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
 				];
 
 				group = new THREE.Group();
@@ -262,7 +263,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -421,7 +421,7 @@
 
 			function createText() {
 
-				textGeo = new THREE.TextBufferGeometry( text, {
+				textGeo = new THREE.TextGeometry( text, {
 
 					font: font,
 

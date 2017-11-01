@@ -4,8 +4,8 @@
 		<title>three.js webvr - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR, origin = https://threejs.org, expires = 2017-06-13 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR" data-expires="2017-06-13" content="ApAQvHfiHMQB7SmRhfvCUX61adJaTA6pAu0Ry439jjeipa5lGm1RcTQynFoHGGcaSJkWfMOv7qK6pwSUb95ClQgAAABKeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUiIsImV4cGlyeSI6MTQ5NzMxMjAwMH0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-11-14 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-11-14" content="ArBMPtmfrwfw86hMJs4EG/pLjENp0J9EhNnzQVrHeXXMYSDNM/FPZEwZ1etrwiLAW4kNVrzXz5J7OBtFGNhVgQ0AAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUxMDYxNzYwMH0=">
 		<style>
 			body {
 				margin: 0px;
@@ -17,33 +17,28 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
-		<script src="js/Mirror.js"></script>
+		<script src="js/objects/Reflector.js"></script>
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var camera, scene, renderer;
-			var effect, controls;
 
-			var mirror;
+			var reflector;
 
 			init();
 			animate();
 
 			function init() {
 
+				var background = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/MilkyWay/' )
+					.load( [ 'dark-s_px.jpg', 'dark-s_nx.jpg', 'dark-s_py.jpg', 'dark-s_ny.jpg', 'dark-s_pz.jpg', 'dark-s_nz.jpg' ] );
+				background.format = THREE.RGBFormat;
+
 				scene = new THREE.Scene();
+				scene.background = background;
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				scene.add( camera );
@@ -90,12 +85,15 @@
 
 				//
 
-				mirror = new THREE.Mirror( 1.4, 1.4, { textureWidth: window.innerWidth, textureHeight: window.innerHeight } );
-				mirror.position.x = 1;
-				mirror.position.y = 0.5;
-				mirror.position.z = -3;
-				mirror.rotation.y = - Math.PI / 4;
-				scene.add( mirror );
+				reflector = new THREE.Reflector( 1.4, 1.4, {
+					textureWidth: window.innerWidth * window.devicePixelRatio,
+					textureHeight: window.innerHeight * window.devicePixelRatio
+				} );
+				reflector.position.x = 1;
+				reflector.position.y = 0.5;
+				reflector.position.z = -3;
+				reflector.rotation.y = - Math.PI / 4;
+				scene.add( reflector );
 
 				var geometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
 				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
@@ -103,27 +101,18 @@
 				mesh.position.z = - 0.07;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
-				mirror.add( mesh );
+				reflector.add( mesh );
 
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x101010 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				renderer.vr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				//
-
-				controls = new THREE.VRControls( camera );
-				effect = new THREE.VREffect( renderer );
-
-				WEBVR.getVRDisplay( function ( display ) {
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-				} );
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				//
 
@@ -136,14 +125,13 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
 			function animate() {
 
-				effect.requestAnimationFrame( animate );
-				render();
+				renderer.animate( render );
 
 			}
 
@@ -154,9 +142,7 @@
 				mesh.rotation.x = time * 2;
 				mesh.rotation.y = time * 5;
 
-				controls.update();
-
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

@@ -32,10 +32,13 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:DirectionalLight light], [page:Number size] )</h3>
+		<h3>[name]( [page:DirectionalLight light], [page:Number size], [page:Hex color] )</h3>
 		<div>
-		[page:DirectionalLight light]-- The light to be visualized. <br />
-		[page:Number size] -- (optional) dimensions of the plane. Default is *1*.<br /><br />
+			[page:DirectionalLight light]-- The light to be visualized. <br /><br />
+
+			[page:Number size] -- (optional) dimensions of the plane. Default is *1*.<br /><br />
+			
+			[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light.
 		</div>
 
 
@@ -58,6 +61,11 @@
 			light's [page:Object3D.matrixWorld matrixWorld].
 		</div>
 
+		<h3>[property:hex color]</h3>
+		<div>
+			The color parameter passed in the constructor. Default is *undefined*. If this is changed, 
+			the helper's color will update the next time [page:.update update] is called.
+		</div>
 
 
 		<h2>Methods</h2>

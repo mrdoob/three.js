@@ -11,35 +11,37 @@ var _Math = {
 	generateUUID: function () {
 
 		// http://www.broofa.com/Tools/Math.uuid.htm
+		// Replaced .join with string concatenation (@takahirox)
 
 		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split( '' );
-		var uuid = new Array( 36 );
 		var rnd = 0, r;
 
 		return function generateUUID() {
+
+			var uuid = '';
 
 			for ( var i = 0; i < 36; i ++ ) {
 
 				if ( i === 8 || i === 13 || i === 18 || i === 23 ) {
 
-					uuid[ i ] = '-';
+					uuid += '-';
 
 				} else if ( i === 14 ) {
 
-					uuid[ i ] = '4';
+					uuid += '4';
 
 				} else {
 
 					if ( rnd <= 0x02 ) rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0;
 					r = rnd & 0xf;
 					rnd = rnd >> 4;
-					uuid[ i ] = chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
+					uuid += chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
 
 				}
 
 			}
 
-			return uuid.join( '' );
+			return uuid;
 
 		};
 
@@ -142,23 +144,15 @@ var _Math = {
 
 	},
 
-	nearestPowerOfTwo: function ( value ) {
+	ceilPowerOfTwo: function ( value ) {
 
-		return Math.pow( 2, Math.round( Math.log( value ) / Math.LN2 ) );
+		return Math.pow( 2, Math.ceil( Math.log( value ) / Math.LN2 ) );
 
 	},
 
-	nextPowerOfTwo: function ( value ) {
+	floorPowerOfTwo: function ( value ) {
 
-		value --;
-		value |= value >> 1;
-		value |= value >> 2;
-		value |= value >> 4;
-		value |= value >> 8;
-		value |= value >> 16;
-		value ++;
-
-		return value;
+		return Math.pow( 2, Math.floor( Math.log( value ) / Math.LN2 ) );
 
 	}
 

@@ -1,20 +1,20 @@
-import { CurvePath } from './CurvePath';
-import { EllipseCurve } from '../curves/EllipseCurve';
-import { SplineCurve } from '../curves/SplineCurve';
-import { Vector2 } from '../../math/Vector2';
-import { CubicBezierCurve } from '../curves/CubicBezierCurve';
-import { QuadraticBezierCurve } from '../curves/QuadraticBezierCurve';
-import { LineCurve } from '../curves/LineCurve';
+import { CurvePath } from './CurvePath.js';
+import { EllipseCurve } from '../curves/EllipseCurve.js';
+import { SplineCurve } from '../curves/SplineCurve.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { CubicBezierCurve } from '../curves/CubicBezierCurve.js';
+import { QuadraticBezierCurve } from '../curves/QuadraticBezierCurve.js';
+import { LineCurve } from '../curves/LineCurve.js';
 
 var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
-	fromPoints: function ( vectors ) {
+	setFromPoints: function ( points ) {
 
-		this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
+		this.moveTo( points[ 0 ].x, points[ 0 ].y );
 
-		for ( var i = 1, l = vectors.length; i < l; i ++ ) {
+		for ( var i = 1, l = points.length; i < l; i ++ ) {
 
-			this.lineTo( vectors[ i ].x, vectors[ i ].y );
+			this.lineTo( points[ i ].x, points[ i ].y );
 
 		}
 
@@ -121,6 +121,16 @@ var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
 		var lastPoint = curve.getPoint( 1 );
 		this.currentPoint.copy( lastPoint );
+
+	},
+
+	copy: function ( source ) {
+
+		CurvePath.prototype.copy.call( this, source );
+
+		this.currentPoint.copy( source.currentPoint );
+
+		return this;
 
 	}
 

@@ -348,3 +348,130 @@ QUnit.test( "slerpFlat" , function( assert ) {
 	slerpTestSkeleton( doSlerpArray, Number.EPSILON, assert );
 
 } );
+
+QUnit.test( "properties", function ( assert ) {
+
+	assert.expect( 8 );
+
+	var a = new THREE.Quaternion();
+	a.onChange( function () {
+
+		assert.ok( true, "onChange called" );
+
+	} );
+
+	a.x = x;
+	a.y = y;
+	a.z = z;
+	a.w = w;
+
+	assert.strictEqual( a.x, x, "Check x" );
+	assert.strictEqual( a.y, y, "Check y" );
+	assert.strictEqual( a.z, z, "Check z" );
+	assert.strictEqual( a.w, w, "Check w" );
+
+} );
+
+QUnit.test( "inverse", function ( assert ) {
+
+	assert.expect( 6 );
+
+	var a = new THREE.Quaternion( x, y, z, w );
+	var inverted = new THREE.Quaternion( - 0.2721655269759087, - 0.408248290463863, - 0.5443310539518174, 0.6804138174397717 );
+	a.onChange( function () {
+
+		assert.ok( true, "onChange called" );
+
+	} );
+
+	a.inverse();
+	assert.ok( Math.abs( a.x - inverted.x ) <= eps, "Check x" );
+	assert.ok( Math.abs( a.y - inverted.y ) <= eps, "Check y" );
+	assert.ok( Math.abs( a.z - inverted.z ) <= eps, "Check z" );
+	assert.ok( Math.abs( a.w - inverted.w ) <= eps, "Check w" );
+
+} );
+
+QUnit.test( "premultiply", function ( assert ) {
+
+	var a = new THREE.Quaternion( x, y, z, w );
+	var b = new THREE.Quaternion( 2 * x, - y, - 2 * z, w );
+	var expected = new THREE.Quaternion( 42, - 32, - 2, 58 );
+
+	a.premultiply( b );
+	assert.ok( Math.abs( a.x - expected.x ) <= eps, "Check x" );
+	assert.ok( Math.abs( a.y - expected.y ) <= eps, "Check y" );
+	assert.ok( Math.abs( a.z - expected.z ) <= eps, "Check z" );
+	assert.ok( Math.abs( a.w - expected.w ) <= eps, "Check w" );
+
+} );
+
+QUnit.test( "toArray", function ( assert ) {
+
+	var a = new THREE.Quaternion( x, y, z, w );
+
+	var array = a.toArray();
+	assert.strictEqual( array[ 0 ], x, "No array, no offset: check x" );
+	assert.strictEqual( array[ 1 ], y, "No array, no offset: check y" );
+	assert.strictEqual( array[ 2 ], z, "No array, no offset: check z" );
+	assert.strictEqual( array[ 3 ], w, "No array, no offset: check w" );
+
+	array = [];
+	a.toArray( array );
+	assert.strictEqual( array[ 0 ], x, "With array, no offset: check x" );
+	assert.strictEqual( array[ 1 ], y, "With array, no offset: check y" );
+	assert.strictEqual( array[ 2 ], z, "With array, no offset: check z" );
+	assert.strictEqual( array[ 3 ], w, "With array, no offset: check w" );
+
+	array = [];
+	a.toArray( array, 1 );
+	assert.strictEqual( array[ 0 ], undefined, "With array and offset: check [0]" );
+	assert.strictEqual( array[ 1 ], x, "With array and offset: check x" );
+	assert.strictEqual( array[ 2 ], y, "With array and offset: check y" );
+	assert.strictEqual( array[ 3 ], z, "With array and offset: check z" );
+	assert.strictEqual( array[ 4 ], w, "With array and offset: check w" );
+
+} );
+
+QUnit.test( "setFromUnitVectors", function ( assert ) {
+
+	var a = new THREE.Quaternion();
+	var b = new THREE.Vector3( 1, 0, 0 );
+	var c = new THREE.Vector3( 0, 1, 0 );
+	var expected = new THREE.Quaternion( 0, 0, Math.sqrt( 2 ) / 2, Math.sqrt( 2 ) / 2 );
+
+	a.setFromUnitVectors( b, c );
+	assert.ok( Math.abs( a.x - expected.x ) <= eps, "Check x" );
+	assert.ok( Math.abs( a.y - expected.y ) <= eps, "Check y" );
+	assert.ok( Math.abs( a.z - expected.z ) <= eps, "Check z" );
+	assert.ok( Math.abs( a.w - expected.w ) <= eps, "Check w" );
+
+} );
+
+QUnit.test( "setFromRotationMatrix", function ( assert ) {
+
+	// contrived examples purely to please the god of code coverage...
+	// match conditions in various 'else [if]' blocks
+
+	var a = new THREE.Quaternion();
+	var q = new THREE.Quaternion( - 9, - 2, 3, - 4 ).normalize();
+	var m = new THREE.Matrix4().makeRotationFromQuaternion( q );
+	var expected = new THREE.Vector4( 0.8581163303210332, 0.19069251784911848, - 0.2860387767736777, 0.38138503569823695 );
+
+	a.setFromRotationMatrix( m );
+	assert.ok( Math.abs( a.x - expected.x ) <= eps, "m11 > m22 && m11 > m33: check x" );
+	assert.ok( Math.abs( a.y - expected.y ) <= eps, "m11 > m22 && m11 > m33: check y" );
+	assert.ok( Math.abs( a.z - expected.z ) <= eps, "m11 > m22 && m11 > m33: check z" );
+	assert.ok( Math.abs( a.w - expected.w ) <= eps, "m11 > m22 && m11 > m33: check w" );
+
+	q = new THREE.Quaternion( - 1, - 2, 1, - 1 ).normalize();
+	m.makeRotationFromQuaternion( q );
+	expected = new THREE.Vector4( 0.37796447300922714, 0.7559289460184544, - 0.37796447300922714, 0.37796447300922714 );
+
+	a.setFromRotationMatrix( m );
+	assert.ok( Math.abs( a.x - expected.x ) <= eps, "m22 > m33: check x" );
+	assert.ok( Math.abs( a.y - expected.y ) <= eps, "m22 > m33: check y" );
+	assert.ok( Math.abs( a.z - expected.z ) <= eps, "m22 > m33: check z" );
+	assert.ok( Math.abs( a.w - expected.w ) <= eps, "m22 > m33: check w" );
+
+} );

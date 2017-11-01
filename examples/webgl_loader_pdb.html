@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<title>three.js webgl - molecules</title>
 		<meta charset="utf-8">
@@ -96,13 +96,12 @@
 				"Salt": "nacl.pdb",
 				"YBCO superconductor": "ybco.pdb",
 				"Buckyball": "buckyball.pdb",
-				//"Diamond": "diamond.pdb",
 				"Graphite": "graphite.pdb"
 			};
 
 			var loader = new THREE.PDBLoader();
 
-			var menu = document.getElementById( "menu" );
+			var menu = document.getElementById( 'menu' );
 
 			init();
 			animate();
@@ -110,6 +109,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1000;
@@ -129,7 +129,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x050505 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
@@ -149,7 +148,7 @@
 
 				//
 
-				loadMolecule( "models/molecules/caffeine.pdb" );
+				loadMolecule( 'models/molecules/caffeine.pdb' );
 				createMenu();
 
 				//
@@ -178,7 +177,7 @@
 					button.innerHTML = m;
 					menu.appendChild( button );
 
-					var url = "models/molecules/" +  MOLECULES[ m ];
+					var url = 'models/molecules/' +  MOLECULES[ m ];
 
 					button.addEventListener( 'click', generateButtonCallback( url ), false );
 
@@ -197,16 +196,20 @@
 
 				}
 
-				loader.load( url, function ( geometry, geometryBonds, json ) {
+				loader.load( url, function ( pdb ) {
+
+					var geometryAtoms = pdb.geometryAtoms;
+					var geometryBonds = pdb.geometryBonds;
+					var json = pdb.json;
 
 					var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 					var sphereGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
 
-					var offset = geometry.center();
+					var offset = geometryAtoms.center();
 					geometryBonds.translate( offset.x, offset.y, offset.z );
 
-					var positions = geometry.getAttribute( 'position' );
-					var colors = geometry.getAttribute( 'color' );
+					var positions = geometryAtoms.getAttribute( 'position' );
+					var colors = geometryAtoms.getAttribute( 'color' );
 
 					var position = new THREE.Vector3();
 					var color = new THREE.Color();
@@ -220,8 +223,6 @@
 						color.r = colors.getX( i );
 						color.g = colors.getY( i );
 						color.b = colors.getZ( i );
-
-						var element = geometry.elements[ i ];
 
 						var material = new THREE.MeshPhongMaterial( { color: color } );
 
@@ -272,17 +273,6 @@
 					}
 
 					render();
-
-				}, function ( xhr ) {
-
-					if ( xhr.lengthComputable ) {
-
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
-
-					}
-
-				}, function ( xhr ) {
 
 				} );
 

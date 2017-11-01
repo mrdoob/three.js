@@ -166,7 +166,7 @@
 					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 1, - 1 ),
 
-					//shading: THREE.FlatShading,
+					//flatShading: true,
 
 					side: THREE.DoubleSide
 				} );
@@ -199,7 +199,7 @@
 					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 1, - 1 ),
 
-					//shading: THREE.FlatShading,
+					//flatShading: true,
 
 					side: THREE.DoubleSide
 				} );
@@ -255,9 +255,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controlsOrtho.update();
-				controlsPerspective.update();
 
 				stats.begin();
 				render();

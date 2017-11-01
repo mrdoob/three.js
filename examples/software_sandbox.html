@@ -110,9 +110,8 @@
 
 				for ( var i = 0; i < points.length * n_sub; i ++ ) {
 
-					var index = i / ( points.length * n_sub );
-
-					vertices[ i ] = spline.getPoint( index );
+					var t = i / ( points.length * n_sub );
+					vertices[ i ] = spline.getPoint( t );
 					colors[ i ] = new THREE.Color( 0x88aaff );
 
 				}
@@ -126,7 +125,6 @@
 				scene.add( line );
 
 				renderer = new THREE.SoftwareRenderer();
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

@@ -6,6 +6,31 @@ QUnit.module( "BufferGeometry" );
 
 var DegToRad = Math.PI / 180;
 
+var bufferAttributeEquals = function ( a, b, tolerance ) {
+
+	tolerance = tolerance || 0.0001;
+
+	if ( a.count !== b.count || a.itemSize !== b.itemSize ) {
+
+		return false;
+
+	}
+
+	for ( var i = 0, il = a.count * a.itemSize; i < il; i ++ ) {
+
+		var delta = a[ i ] - b[ i ];
+		if ( delta > tolerance ) {
+
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+};
+
 QUnit.test( "add / delete Attribute", function( assert ) {
 	var geometry = new THREE.BufferGeometry();
 	var attributeName = "position";
@@ -309,3 +334,504 @@ QUnit.test( "copy" , function( assert ) {
 		}
 	});
 });
+
+QUnit.test( "setIndex/getIndex", function ( assert ) {
+
+	var a = new THREE.BufferGeometry();
+	var uint16 = [ 1, 2, 3 ];
+	var uint32 = [ 65535, 65536, 65537 ];
+	var str = "foo";
+
+	a.setIndex( uint16 );
+	assert.ok( a.getIndex() instanceof THREE.Uint16BufferAttribute, "Index has the right type" );
+	assert.deepEqual( a.getIndex().array, new Uint16Array( uint16 ), "Small index gets stored correctly" );
+
+	a.setIndex( uint32 );
+	assert.ok( a.getIndex() instanceof THREE.Uint32BufferAttribute, "Index has the right type" );
+	assert.deepEqual( a.getIndex().array, new Uint32Array( uint32 ), "Large index gets stored correctly" );
+
+	a.setIndex( str );
+	assert.strictEqual( a.getIndex(), str, "Weird index gets stored correctly" );
+
+} );
+
+QUnit.test( "addGroup", function ( assert ) {
+
+	var a = new THREE.BufferGeometry();
+	var expected = [
+		{ start: 0, count: 1, materialIndex: 0 },
+		{ start: 1, count: 2, materialIndex: 2 }
+	];
+
+	a.addGroup( 0, 1, 0 );
+	a.addGroup( 1, 2, 2 );
+
+	assert.deepEqual( a.groups, expected, "Check groups were stored correctly and in order" );
+
+	a.clearGroups();
+	assert.strictEqual( a.groups.length, 0, "Check groups were deleted correctly" );
+
+} );
+
+QUnit.test( "setDrawRange", function ( assert ) {
+
+	var a = new THREE.BufferGeometry();
+
+	a.setDrawRange( 1.0, 7 );
+
+	assert.deepEqual( a.drawRange, { start: 1, count: 7 }, "Check draw range was stored correctly" );
+
+} );
+
+QUnit.test( "lookAt", function ( assert ) {
+
+	var a = new THREE.BufferGeometry();
+	var vertices = new Float32Array( [
+		- 1.0, - 1.0, 1.0,
+		1.0, - 1.0, 1.0,
+		1.0, 1.0, 1.0,
+
+		1.0, 1.0, 1.0,
+		- 1.0, 1.0, 1.0,
+		- 1.0, - 1.0, 1.0
+	] );
+	a.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+
+	var sqrt = Math.sqrt( 2 );
+	var expected = new Float32Array( [
+		1, 0, - sqrt,
+		- 1, 0, - sqrt,
+		- 1, sqrt, 0,
+
+		- 1, sqrt, 0,
+		1, sqrt, 0,
+		1, 0, - sqrt
+	] );
+
+	a.lookAt( new THREE.Vector3( 0, 1, - 1 ) );
+
+	assert.ok( bufferAttributeEquals( a.attributes.position.array, expected ), "Rotation is correct" );
+
+} );
+
+QUnit.test( "fromGeometry/fromDirectGeometry", function ( assert ) {
+
+	var a = new THREE.BufferGeometry();
+	// BoxGeometry is a bit too simple but works fine in a pinch
+	// var b = new THREE.BoxGeometry( 1, 1, 1 );
+	// b.mergeVertices();
+	// b.computeVertexNormals();
+	// b.computeBoundingBox();
+	// b.computeBoundingSphere();
+	var asyncDone = assert.async(); // tell QUnit we're done with asserts
+
+	var loader = new THREE.JSONLoader();
+	loader.load( "../../examples/models/skinned/simple/simple.js", function ( modelGeometry ) {
+
+		a.fromGeometry( modelGeometry );
+
+		var attr;
+		var geometry = new THREE.DirectGeometry().fromGeometry( modelGeometry );
+
+		var positions = new Float32Array( geometry.vertices.length * 3 );
+		attr = new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices );
+		assert.ok( bufferAttributeEquals( a.attributes.position, attr ), "Vertices are identical" );
+
+		if ( geometry.normals.length > 0 ) {
+
+			var normals = new Float32Array( geometry.normals.length * 3 );
+			attr = new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals );
+			assert.ok( bufferAttributeEquals( a.attributes.normal, attr ), "Normals are identical" );
+
+		}
+
+		if ( geometry.colors.length > 0 ) {
+
+			var colors = new Float32Array( geometry.colors.length * 3 );
+			attr = new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors );
+			assert.ok( bufferAttributeEquals( a.attributes.color, attr ), "Colors are identical" );
+
+		}
+
+		if ( geometry.uvs.length > 0 ) {
+
+			var uvs = new Float32Array( geometry.uvs.length * 2 );
+			attr = new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs );
+			assert.ok( bufferAttributeEquals( a.attributes.uv, attr ), "UVs are identical" );
+
+		}
+
+		if ( geometry.uvs2.length > 0 ) {
+
+			var uvs2 = new Float32Array( geometry.uvs2.length * 2 );
+			attr = new THREE.BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 );
+			assert.ok( bufferAttributeEquals( a.attributes.uv2, attr ), "UV2s are identical" );
+
+		}
+
+		if ( geometry.indices.length > 0 ) {
+
+			var TypeArray = THREE.arrayMax( geometry.indices ) > 65535 ? Uint32Array : Uint16Array;
+			var indices = new TypeArray( geometry.indices.length * 3 );
+			attr = new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices );
+			assert.ok( bufferAttributeEquals( a.indices, attr ), "Indices are identical" );
+
+		}
+
+		// groups
+		assert.deepEqual( a.groups, geometry.groups, "Groups are identical" );
+
+		// morphs
+		if ( geometry.morphTargets !== undefined ) {
+
+			for ( var name in geometry.morphTargets ) {
+
+				var morphTargets = geometry.morphTargets[ name ];
+
+				for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
+
+					var morphTarget = morphTargets[ i ];
+
+					attr = new THREE.Float32BufferAttribute( morphTarget.length * 3, 3 );
+					attr.copyVector3sArray( morphTarget );
+
+					assert.ok(
+						bufferAttributeEquals( a.morphAttributes[ name ][ i ], attr ),
+						"MorphTargets #" + i + " are identical"
+					);
+
+				}
+
+			}
+
+		}
+
+		// skinning
+		if ( geometry.skinIndices.length > 0 ) {
+
+			attr = new THREE.Float32BufferAttribute( geometry.skinIndices.length * 4, 4 );
+			attr.copyVector4sArray( geometry.skinIndices );
+			assert.ok( bufferAttributeEquals( a.attributes.skinIndex, attr ), "SkinIndices are identical" );
+
+		}
+
+		if ( geometry.skinWeights.length > 0 ) {
+
+			attr = new THREE.Float32BufferAttribute( geometry.skinWeights.length * 4, 4 );
+			attr.copyVector4sArray( geometry.skinWeights );
+			assert.ok( bufferAttributeEquals( a.attributes.skinWeight, attr ), "SkinWeights are identical" );
+
+		}
+
+		// TODO
+		// DirectGeometry doesn't actually copy boundingSphere and boundingBox yet,
+		// so they're always null
+		if ( geometry.boundingSphere !== null ) {
+
+			assert.ok( a.boundingSphere.equals( geometry.boundingSphere ), "BoundingSphere is identical" );
+
+		}
+
+		if ( geometry.boundingBox !== null ) {
+
+			assert.ok( a.boundingBox.equals( geometry.boundingBox ), "BoundingBox is identical" );
+
+		}
+
+		asyncDone();
+
+	} );
+
+} );
+
+QUnit.test( "clone", function ( assert ) {
+
+	var a = new THREE.BufferGeometry();
+	a.addAttribute( "attribute1", new THREE.BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
+	a.addAttribute( "attribute2", new THREE.BufferAttribute( new Float32Array( [ 0, 1, 3, 5, 6 ] ), 1 ) );
+	a.addGroup( 0, 1, 2 );
+	a.computeBoundingBox();
+	a.computeBoundingSphere();
+	a.setDrawRange( 0, 1 );
+	var b = a.clone();
+
+	assert.notEqual( a, b, "A new object was created" );
+	assert.notEqual( a.id, b.id, "New object has a different GUID" );
+
+	assert.strictEqual(
+		Object.keys( a.attributes ).count, Object.keys( b.attributes ).count,
+		"Both objects have the same amount of attributes"
+	);
+	assert.ok(
+		bufferAttributeEquals( a.getAttribute( "attribute1" ), b.getAttribute( "attribute1" ) ),
+		"First attributes buffer is identical"
+	);
+	assert.ok(
+		bufferAttributeEquals( a.getAttribute( "attribute2" ), b.getAttribute( "attribute2" ) ),
+		"Second attributes buffer is identical"
+	);
+
+	assert.deepEqual( a.groups, b.groups, "Groups are identical" );
+
+	assert.ok( a.boundingBox.equals( b.boundingBox ), "BoundingBoxes are equal" );
+	assert.ok( a.boundingSphere.equals( b.boundingSphere ), "BoundingSpheres are equal" );
+
+	assert.strictEqual( a.drawRange.start, b.drawRange.start, "DrawRange start is identical" );
+	assert.strictEqual( a.drawRange.count, b.drawRange.count, "DrawRange count is identical" );
+
+} );
+
+QUnit.test( "computeVertexNormals (indexed)", function ( assert ) {
+
+	var sqrt = 0.5 * Math.sqrt( 2 );
+	var normal = new THREE.BufferAttribute( new Float32Array( [
+		- 1, 0, 0, - 1, 0, 0, - 1, 0, 0,
+		sqrt, sqrt, 0, sqrt, sqrt, 0, sqrt, sqrt, 0,
+		- 1, 0, 0
+	] ), 3 );
+	var position = new THREE.BufferAttribute( new Float32Array( [
+		0.5, 0.5, 0.5, 0.5, 0.5, - 0.5, 0.5, - 0.5, 0.5,
+		0.5, - 0.5, - 0.5, - 0.5, 0.5, - 0.5, - 0.5, 0.5, 0.5,
+		- 0.5, - 0.5, - 0.5
+	] ), 3 );
+	var index = new THREE.BufferAttribute( new Uint16Array( [
+		0, 2, 1, 2, 3, 1, 4, 6, 5, 6, 7, 5
+	] ), 1 );
+
+	var a = new THREE.BufferGeometry();
+	a.addAttribute( "position", position );
+	a.computeVertexNormals();
+	assert.ok(
+		bufferAttributeEquals( normal, a.getAttribute( "normal" ) ),
+		"Regular geometry: first computed normals are correct"
+	);
+
+	// a second time to see if the existing normals get properly deleted
+	a.computeVertexNormals();
+	assert.ok(
+		bufferAttributeEquals( normal, a.getAttribute( "normal" ) ),
+		"Regular geometry: second computed normals are correct"
+	);
+
+	// indexed geometry
+	a = new THREE.BufferGeometry();
+	a.addAttribute( "position", position );
+	a.setIndex( index );
+	a.computeVertexNormals();
+	assert.ok( bufferAttributeEquals( normal, a.getAttribute( "normal" ) ), "Indexed geometry: computed normals are correct" );
+
+} );
+
+QUnit.test( "toJSON", function ( assert ) {
+
+	var index = new THREE.BufferAttribute( new Uint16Array( [ 0, 1, 2, 3 ] ), 1 );
+	var attribute1 = new THREE.BufferAttribute( new Uint16Array( [ 1, 3, 5, 7 ] ), 1 );
+	var a = new THREE.BufferGeometry();
+	a.name = "JSONtest";
+	// a.parameters = { "placeholder": 0 };
+	a.addAttribute( "attribute1", attribute1 );
+	a.setIndex( index );
+	a.addGroup( 0, 1, 2 );
+	a.boundingSphere = new THREE.Sphere( new THREE.Vector3( x, y, z ), 0.5 );
+	var j = a.toJSON();
+
+	var gold = {
+		"metadata": { "version": 4.5, "type": "BufferGeometry", "generator": "BufferGeometry.toJSON" },
+		"uuid": a.uuid,
+		"type": "BufferGeometry",
+		"name": "JSONtest",
+		"data": {
+			"attributes": {
+				"attribute1": {
+					"itemSize": 1,
+					"type": "Uint16Array",
+					"array": [ 1, 3, 5, 7 ],
+					"normalized": false
+				}
+			},
+			"index": { "type": "Uint16Array", "array": [ 0, 1, 2, 3 ] },
+			"groups": [ { "start": 0, "count": 1, "materialIndex": 2 } ],
+			"boundingSphere": { "center": [ 2, 3, 4 ], "radius": 0.5 }
+		}
+	};
+
+	assert.deepEqual( j, gold, "Generated JSON is as expected" );
+
+} );
+
+function comparePositions( pos, v ) {
+
+	return (
+		pos[ 0 ] === v[ 0 ].x && pos[ 1 ] === v[ 0 ].y && pos[ 2 ] === v[ 0 ].z &&
+		pos[ 3 ] === v[ 1 ].x && pos[ 4 ] === v[ 1 ].y && pos[ 5 ] === v[ 1 ].z &&
+		pos[ 6 ] === v[ 2 ].x && pos[ 7 ] === v[ 2 ].y && pos[ 8 ] === v[ 2 ].z
+	);
+
+}
+
+function compareColors( col, c ) {
+
+	return (
+		col[ 0 ] === c[ 0 ].r && col[ 1 ] === c[ 0 ].g && col[ 2 ] === c[ 0 ].b &&
+		col[ 3 ] === c[ 1 ].r && col[ 4 ] === c[ 1 ].g && col[ 5 ] === c[ 1 ].b &&
+		col[ 6 ] === c[ 2 ].r && col[ 7 ] === c[ 2 ].g && col[ 8 ] === c[ 2 ].b
+	);
+
+}
+
+function compareUvs( uvs, u ) {
+
+	return (
+		uvs[ 0 ] === u[ 0 ].x && uvs[ 1 ] === u[ 0 ].y &&
+		uvs[ 2 ] === u[ 1 ].x && uvs[ 3 ] === u[ 1 ].y &&
+		uvs[ 4 ] === u[ 2 ].x && uvs[ 5 ] === u[ 2 ].y
+	);
+
+}
+
+QUnit.test( "setFromObject (more)", function ( assert ) {
+
+	var lineGeo = new THREE.Geometry();
+	lineGeo.vertices.push(
+		new THREE.Vector3( - 10, 0, 0 ),
+		new THREE.Vector3( 0, 10, 0 ),
+		new THREE.Vector3( 10, 0, 0 )
+	);
+
+	lineGeo.colors.push(
+		new THREE.Color( 1, 0, 0 ),
+		new THREE.Color( 0, 1, 0 ),
+		new THREE.Color( 0, 0, 1 )
+	);
+
+	lineGeo.computeBoundingBox();
+	lineGeo.computeBoundingSphere();
+
+	var line = new THREE.Line( lineGeo );
+	var geometry = new THREE.BufferGeometry().setFromObject( line );
+
+	assert.ok( geometry.boundingBox.equals( lineGeo.boundingBox ), "BoundingBox was set correctly" );
+	assert.ok( geometry.boundingSphere.equals( lineGeo.boundingSphere ), "BoundingSphere was set correctly" );
+
+	var pos = geometry.attributes.position.array;
+	var col = geometry.attributes.color.array;
+	var v = lineGeo.vertices;
+	var c = lineGeo.colors;
+
+	// adapted from setFromObject test (way up)
+	assert.notStrictEqual( pos, undefined, "Position attribute exists" );
+	assert.strictEqual( v.length * 3, pos.length, "Vertex arrays have the same size" );
+	assert.strictEqual( geometry.attributes.position.count, 3, "Correct number of vertices" );
+	assert.ok( comparePositions( pos, v ), "Positions are identical" );
+
+	assert.notStrictEqual( col, undefined, "Color attribute exists" );
+	assert.strictEqual( c.length * 3, col.length, "Color arrays have the same size" );
+	assert.strictEqual( geometry.attributes.color.count, 3, "Correct number of colors" );
+	assert.ok( compareColors( col, c ), "Colors are identical" );
+
+	// setFromObject with a Mesh as object
+	lineGeo.faces.push( new THREE.Face3( 0, 1, 2 ) );
+	var lineMesh = new THREE.Mesh( lineGeo );
+	geometry = new THREE.BufferGeometry().setFromObject( lineMesh );
+
+	// no colors
+	pos = geometry.attributes.position.array;
+	v = lineGeo.vertices;
+
+	assert.notStrictEqual( pos, undefined, "Mesh: position attribute exists" );
+	assert.strictEqual( v.length * 3, pos.length, "Mesh: vertex arrays have the same size" );
+	assert.strictEqual( geometry.attributes.position.count, 3, "Mesh: correct number of vertices" );
+	assert.ok( comparePositions( pos, v ), "Mesh: positions are identical" );
+
+} );
+
+QUnit.test( "updateFromObject", function ( assert ) {
+
+	var geo = new THREE.Geometry();
+
+	geo.vertices.push(
+		new THREE.Vector3( - 10, 0, 0 ),
+		new THREE.Vector3( 0, 10, 0 ),
+		new THREE.Vector3( 10, 0, 0 )
+	);
+
+	geo.faces.push( new THREE.Face3( 0, 1, 2 ) );
+
+	geo.faces[ 0 ].vertexColors.push(
+		new THREE.Color( 1, 0, 0 ),
+		new THREE.Color( 0, 1, 0 ),
+		new THREE.Color( 0, 0, 1 )
+	);
+
+	geo.faceVertexUvs[ 0 ] = [[
+		new THREE.Vector2( 0, 0 ),
+		new THREE.Vector2( 1, 0 ),
+		new THREE.Vector2( 1, 1 )
+	]];
+
+	geo.computeFaceNormals();
+	geo.computeVertexNormals();
+
+	geo.verticesNeedUpdate = true;
+	geo.normalsNeedUpdate = true;
+	geo.colorsNeedUpdate = true;
+	geo.uvsNeedUpdate = true;
+	geo.groupsNeedUpdate = true;
+
+	var mesh = new THREE.Mesh( geo );
+	var geometry = new THREE.BufferGeometry();
+
+	geometry.updateFromObject( mesh ); // first call to create the underlying structure (DirectGeometry)
+	geometry.updateFromObject( mesh ); // second time to actually go thru the motions and update
+
+	var pos = geometry.attributes.position.array;
+	var col = geometry.attributes.color.array;
+	var norm = geometry.attributes.normal.array;
+	var uvs = geometry.attributes.uv.array;
+	var v = geo.vertices;
+	var c = geo.faces[ 0 ].vertexColors;
+	var n = geo.faces[ 0 ].vertexNormals;
+	var u = geo.faceVertexUvs[ 0 ][ 0 ];
+
+	assert.notStrictEqual( pos, undefined, "Position attribute exists" );
+	assert.strictEqual( v.length * 3, pos.length, "Both arrays have the same size" );
+	assert.strictEqual( geometry.attributes.position.count, v.length, "Correct number of vertices" );
+	assert.ok( comparePositions( pos, v ), "Positions are identical" );
+
+	assert.notStrictEqual( col, undefined, "Color attribute exists" );
+	assert.strictEqual( c.length * 3, col.length, "Both arrays have the same size" );
+	assert.strictEqual( geometry.attributes.color.count, c.length, "Correct number of colors" );
+	assert.ok( compareColors( col, c ), "Colors are identical" );
+
+	assert.notStrictEqual( norm, undefined, "Normal attribute exists" );
+	assert.strictEqual( n.length * 3, norm.length, "Both arrays have the same size" );
+	assert.strictEqual( geometry.attributes.normal.count, n.length, "Correct number of normals" );
+	assert.ok( comparePositions( norm, n ), "Normals are identical" );
+
+	assert.notStrictEqual( uvs, undefined, "UV attribute exists" );
+	assert.strictEqual( u.length * 2, uvs.length, "Both arrays have the same size" );
+	assert.strictEqual( geometry.attributes.uv.count, u.length, "Correct number of UV coordinates" );
+	assert.ok( compareUvs( uvs, u ), "UVs are identical" );
+
+} );
+
+QUnit.test( "toNonIndexed", function ( assert ) {
+
+	var geometry = new THREE.BufferGeometry();
+	var vertices = new Float32Array( [
+		0.5, 0.5, 0.5, 0.5, 0.5, - 0.5, 0.5, - 0.5, 0.5, 0.5, - 0.5, - 0.5
+	] );
+	var index = new THREE.BufferAttribute( new Uint16Array( [ 0, 2, 1, 2, 3, 1 ] ) );
+	var expected = new Float32Array( [
+		0.5, 0.5, 0.5, 0.5, - 0.5, 0.5, 0.5, 0.5, - 0.5,
+		0.5, - 0.5, 0.5, 0.5, - 0.5, - 0.5, 0.5, 0.5, - 0.5
+	] );
+
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	geometry.setIndex( index );
+
+	var nonIndexed = geometry.toNonIndexed();
+
+	assert.deepEqual( nonIndexed.getAttribute( "position" ).array, expected, "Expected vertices" );
+
+} );

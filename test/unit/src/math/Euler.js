@@ -132,3 +132,111 @@ QUnit.test( "gimbalLocalQuat" , function( assert ) {
 	assert.ok( eulerEquals( eViaQ1, eViaMViaQ1 ), "Passed!" );  // this result is correct
 
 });
+
+QUnit.test( "set/get properties, check callbacks", function ( assert ) {
+
+	var a = new THREE.Euler();
+	a.onChange( function () {
+
+		assert.step( "set: onChange called" );
+
+	} );
+
+	assert.expect( 8 );
+
+	// should be 4 calls to onChangeCallback
+	a.x = 1;
+	a.y = 2;
+	a.z = 3;
+	a.order = "ZYX";
+
+	assert.strictEqual( a.x, 1, "get: check x" );
+	assert.strictEqual( a.y, 2, "get: check y" );
+	assert.strictEqual( a.z, 3, "get: check z" );
+	assert.strictEqual( a.order, "ZYX", "get: check order" );
+
+} );
+
+QUnit.test( "clone/copy, check callbacks", function ( assert ) {
+
+	assert.expect( 3 );
+
+	var a = new THREE.Euler( 1, 2, 3, "ZXY" );
+	var b = new THREE.Euler( 4, 5, 6, "XZY" );
+	var cb = function () {
+
+		assert.step( "onChange called" );
+
+	};
+	a.onChange( cb );
+	b.onChange( cb );
+
+	// clone doesn't trigger onChange
+	a = b.clone();
+	assert.ok( a.equals( b ), "clone: check if a equals b" );
+
+	// copy triggers onChange once
+	a = new THREE.Euler( 1, 2, 3, "ZXY" );
+	a.onChange( cb );
+	a.copy( b );
+	assert.ok( a.equals( b ), "copy: check if a equals b" );
+
+} );
+
+QUnit.test( "toArray", function ( assert ) {
+
+	var order = "YXZ";
+	var a = new THREE.Euler( x, y, z, order );
+
+	var array = a.toArray();
+	assert.strictEqual( array[ 0 ], x, "No array, no offset: check x" );
+	assert.strictEqual( array[ 1 ], y, "No array, no offset: check y" );
+	assert.strictEqual( array[ 2 ], z, "No array, no offset: check z" );
+	assert.strictEqual( array[ 3 ], order, "No array, no offset: check order" );
+
+	array = [];
+	a.toArray( array );
+	assert.strictEqual( array[ 0 ], x, "With array, no offset: check x" );
+	assert.strictEqual( array[ 1 ], y, "With array, no offset: check y" );
+	assert.strictEqual( array[ 2 ], z, "With array, no offset: check z" );
+	assert.strictEqual( array[ 3 ], order, "With array, no offset: check order" );
+
+	array = [];
+	a.toArray( array, 1 );
+	assert.strictEqual( array[ 0 ], undefined, "With array and offset: check [0]" );
+	assert.strictEqual( array[ 1 ], x, "With array and offset: check x" );
+	assert.strictEqual( array[ 2 ], y, "With array and offset: check y" );
+	assert.strictEqual( array[ 3 ], z, "With array and offset: check z" );
+	assert.strictEqual( array[ 4 ], order, "With array and offset: check order" );
+
+} );
+
+QUnit.test( "fromArray", function ( assert ) {
+
+	assert.expect( 10 );
+
+	var a = new THREE.Euler();
+	var array = [ x, y, z ];
+	var cb = function () {
+
+		assert.step( "onChange called" );
+
+	};
+	a.onChange( cb );
+
+	a.fromArray( array );
+	assert.strictEqual( a.x, x, "No order: check x" );
+	assert.strictEqual( a.y, y, "No order: check y" );
+	assert.strictEqual( a.z, z, "No order: check z" );
+	assert.strictEqual( a.order, "XYZ", "No order: check order" );
+
+	a = new THREE.Euler();
+	a.onChange( cb );
+	array = [ x, y, z, "ZXY" ];
+	a.fromArray( array );
+	assert.strictEqual( a.x, x, "With order: check x" );
+	assert.strictEqual( a.y, y, "With order: check y" );
+	assert.strictEqual( a.z, z, "With order: check z" );
+	assert.strictEqual( a.order, "ZXY", "With order: check order" );
+
+} );

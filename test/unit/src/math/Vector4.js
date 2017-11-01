@@ -275,6 +275,8 @@ QUnit.test( "setLength" , function( assert ) {
 	a = new THREE.Vector4( 0, 0, 0, 0 );
 	assert.ok( a.length() == 0, "Passed!" );
 	a.setLength( y );
+	assert.ok( a.length() == 0, "Passed!" );
+	a.setLength();
 	assert.ok( isNaN( a.length() ), "Passed!" );
 });
 
@@ -316,3 +318,211 @@ QUnit.test( "equals" , function( assert ) {
 	assert.ok( a.equals( b ), "Passed!" );
 	assert.ok( b.equals( a ), "Passed!" );
 });
+
+QUnit.test( "setComponent/getComponent exceptions", function ( assert ) {
+
+	var a = new THREE.Vector4();
+
+	assert.throws(
+		function () {
+
+			a.setComponent( 4, 0 );
+
+		},
+		/index is out of range/,
+		"setComponent with an out of range index throws Error"
+	);
+	assert.throws(
+		function () {
+
+			a.getComponent( 4 );
+
+		},
+		/index is out of range/,
+		"getComponent with an out of range index throws Error"
+	);
+
+} );
+
+QUnit.test( "lengthManhattan", function ( assert ) {
+
+	var a = new THREE.Vector4( x, 0, 0, 0 );
+	var b = new THREE.Vector4( 0, - y, 0, 0 );
+	var c = new THREE.Vector4( 0, 0, z, 0 );
+	var d = new THREE.Vector4( 0, 0, 0, w );
+	var e = new THREE.Vector4( 0, 0, 0, 0 );
+
+	assert.ok( a.lengthManhattan() == x, "Positive x" );
+	assert.ok( b.lengthManhattan() == y, "Negative y" );
+	assert.ok( c.lengthManhattan() == z, "Positive z" );
+	assert.ok( d.lengthManhattan() == w, "Positive w" );
+	assert.ok( e.lengthManhattan() == 0, "Empty initialization" );
+
+	a.set( x, y, z, w );
+	assert.ok(
+		a.lengthManhattan() == Math.abs( x ) + Math.abs( y ) + Math.abs( z ) + Math.abs( w ),
+		"All components"
+	);
+
+} );
+
+QUnit.test( "setScalar/addScalar/subScalar", function ( assert ) {
+
+	var a = new THREE.Vector4();
+	var s = 3;
+
+	a.setScalar( s );
+	assert.strictEqual( a.x, s, "setScalar: check x" );
+	assert.strictEqual( a.y, s, "setScalar: check y" );
+	assert.strictEqual( a.z, s, "setScalar: check z" );
+	assert.strictEqual( a.w, s, "setScalar: check w" );
+
+	a.addScalar( s );
+	assert.strictEqual( a.x, 2 * s, "addScalar: check x" );
+	assert.strictEqual( a.y, 2 * s, "addScalar: check y" );
+	assert.strictEqual( a.z, 2 * s, "addScalar: check z" );
+	assert.strictEqual( a.w, 2 * s, "addScalar: check w" );
+
+	a.subScalar( 2 * s );
+	assert.strictEqual( a.x, 0, "subScalar: check x" );
+	assert.strictEqual( a.y, 0, "subScalar: check y" );
+	assert.strictEqual( a.z, 0, "subScalar: check z" );
+	assert.strictEqual( a.w, 0, "subScalar: check w" );
+
+} );
+
+QUnit.test( "addScaledVector", function ( assert ) {
+
+	var a = new THREE.Vector4( x, y, z, w );
+	var b = new THREE.Vector4( 6, 7, 8, 9 );
+	var s = 3;
+
+	a.addScaledVector( b, s );
+	assert.strictEqual( a.x, x + b.x * s, "Check x" );
+	assert.strictEqual( a.y, y + b.y * s, "Check y" );
+	assert.strictEqual( a.z, z + b.z * s, "Check z" );
+	assert.strictEqual( a.w, w + b.w * s, "Check w" );
+
+} );
+
+QUnit.test( "applyMatrix4", function ( assert ) {
+
+	var a = new THREE.Vector4( x, y, z, w );
+	var m = new THREE.Matrix4().makeRotationX( Math.PI );
+	var expected = new THREE.Vector4( 2, - 3, - 4, 5 );
+
+	a.applyMatrix4( m );
+	assert.ok( Math.abs( a.x - expected.x ) <= eps, "Rotation matrix: check x" );
+	assert.ok( Math.abs( a.y - expected.y ) <= eps, "Rotation matrix: check y" );
+	assert.ok( Math.abs( a.z - expected.z ) <= eps, "Rotation matrix: check z" );
+	assert.ok( Math.abs( a.w - expected.w ) <= eps, "Rotation matrix: check w" );
+
+	a.set( x, y, z, w );
+	m.makeTranslation( 5, 7, 11 );
+	expected.set( 27, 38, 59, 5 );
+
+	a.applyMatrix4( m );
+	assert.ok( Math.abs( a.x - expected.x ) <= eps, "Translation matrix: check x" );
+	assert.ok( Math.abs( a.y - expected.y ) <= eps, "Translation matrix: check y" );
+	assert.ok( Math.abs( a.z - expected.z ) <= eps, "Translation matrix: check z" );
+	assert.ok( Math.abs( a.w - expected.w ) <= eps, "Translation matrix: check w" );
+
+	a.set( x, y, z, w );
+	m.set( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0 );
+	expected.set( 2, 3, 4, 4 );
+
+	a.applyMatrix4( m );
+	assert.ok( Math.abs( a.x - expected.x ) <= eps, "Custom matrix: check x" );
+	assert.ok( Math.abs( a.y - expected.y ) <= eps, "Custom matrix: check y" );
+	assert.ok( Math.abs( a.z - expected.z ) <= eps, "Custom matrix: check z" );
+	assert.ok( Math.abs( a.w - expected.w ) <= eps, "Custom matrix: check w" );
+
+	a.set( x, y, z, w );
+	m.set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
+	expected.set( 68, 224, 442, 664 );
+
+	a.applyMatrix4( m );
+	assert.ok( Math.abs( a.x - expected.x ) <= eps, "Bogus matrix: check x" );
+	assert.ok( Math.abs( a.y - expected.y ) <= eps, "Bogus matrix: check y" );
+	assert.ok( Math.abs( a.z - expected.z ) <= eps, "Bogus matrix: check z" );
+	assert.ok( Math.abs( a.w - expected.w ) <= eps, "Bogus matrix: check w" );
+
+} );
+
+QUnit.test( "clampScalar", function ( assert ) {
+
+	var a = new THREE.Vector4( - 0.1, 0.01, 0.5, 1.5 );
+	var clamped = new THREE.Vector4( 0.1, 0.1, 0.5, 1.0 );
+
+	a.clampScalar( 0.1, 1.0 );
+	assert.ok( Math.abs( a.x - clamped.x ) <= eps, "Check x" );
+	assert.ok( Math.abs( a.y - clamped.y ) <= eps, "Check y" );
+	assert.ok( Math.abs( a.z - clamped.z ) <= eps, "Check z" );
+	assert.ok( Math.abs( a.w - clamped.w ) <= eps, "Check w" );
+
+} );
+
+QUnit.test( "fromArray", function ( assert ) {
+
+	var a = new THREE.Vector4();
+	var array = [ 1, 2, 3, 4, 5, 6, 7, 8 ];
+
+	a.fromArray( array );
+	assert.strictEqual( a.x, 1, "No offset: check x" );
+	assert.strictEqual( a.y, 2, "No offset: check y" );
+	assert.strictEqual( a.z, 3, "No offset: check z" );
+	assert.strictEqual( a.w, 4, "No offset: check w" );
+
+	a.fromArray( array, 4 );
+	assert.strictEqual( a.x, 5, "With offset: check x" );
+	assert.strictEqual( a.y, 6, "With offset: check y" );
+	assert.strictEqual( a.z, 7, "With offset: check z" );
+	assert.strictEqual( a.w, 8, "With offset: check w" );
+
+} );
+
+QUnit.test( "toArray", function ( assert ) {
+
+	var a = new THREE.Vector4( x, y, z, w );
+
+	var array = a.toArray();
+	assert.strictEqual( array[ 0 ], x, "No array, no offset: check x" );
+	assert.strictEqual( array[ 1 ], y, "No array, no offset: check y" );
+	assert.strictEqual( array[ 2 ], z, "No array, no offset: check z" );
+	assert.strictEqual( array[ 3 ], w, "No array, no offset: check w" );
+
+	array = [];
+	a.toArray( array );
+	assert.strictEqual( array[ 0 ], x, "With array, no offset: check x" );
+	assert.strictEqual( array[ 1 ], y, "With array, no offset: check y" );
+	assert.strictEqual( array[ 2 ], z, "With array, no offset: check z" );
+	assert.strictEqual( array[ 3 ], w, "With array, no offset: check w" );
+
+	array = [];
+	a.toArray( array, 1 );
+	assert.strictEqual( array[ 0 ], undefined, "With array and offset: check [0]" );
+	assert.strictEqual( array[ 1 ], x, "With array and offset: check x" );
+	assert.strictEqual( array[ 2 ], y, "With array and offset: check y" );
+	assert.strictEqual( array[ 3 ], z, "With array and offset: check z" );
+	assert.strictEqual( array[ 4 ], w, "With array and offset: check w" );
+
+} );
+
+QUnit.test( "fromBufferAttribute", function ( assert ) {
+
+	var a = new THREE.Vector4();
+	var attr = new THREE.BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8 ] ), 4 );
+
+	a.fromBufferAttribute( attr, 0 );
+	assert.strictEqual( a.x, 1, "Offset 0: check x" );
+	assert.strictEqual( a.y, 2, "Offset 0: check y" );
+	assert.strictEqual( a.z, 3, "Offset 0: check z" );
+	assert.strictEqual( a.w, 4, "Offset 0: check w" );
+
+	a.fromBufferAttribute( attr, 1 );
+	assert.strictEqual( a.x, 5, "Offset 1: check x" );
+	assert.strictEqual( a.y, 6, "Offset 1: check y" );
+	assert.strictEqual( a.z, 7, "Offset 1: check z" );
+	assert.strictEqual( a.w, 8, "Offset 1: check w" );
+
+} );

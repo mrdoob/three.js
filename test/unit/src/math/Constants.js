@@ -20,3 +20,5 @@ var posInf3 = new THREE.Vector3( Infinity, Infinity, Infinity );
 var zero3 = new THREE.Vector3();
 var one3 = new THREE.Vector3( 1, 1, 1 );
 var two3 = new THREE.Vector3( 2, 2, 2 );
+
+var eps = 0.0001;

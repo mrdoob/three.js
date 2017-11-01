@@ -77,7 +77,7 @@ THREE.GPUParticleSystem = function( options ) {
 			'	v.y = ( velocity.y - 0.5 ) * 3.0;',
 			'	v.z = ( velocity.z - 0.5 ) * 3.0;',
 
-			'	newPosition = positionStart + ( v * 10.0 ) * ( uTime - startTime );',
+			'	newPosition = positionStart + ( v * 10.0 ) * timeElapsed;',
 
 			'	vec3 noise = texture2D( tNoise, vec2( newPosition.x * 0.015 + ( uTime * 0.05 ), newPosition.y * 0.02 + ( uTime * 0.015 ) ) ).rgb;',
 			'	vec3 noiseVel = ( noise.rgb - 0.5 ) * 30.0;',
@@ -461,13 +461,14 @@ THREE.GPUParticleContainer = function( maxParticles, particleSystem ) {
 				sizeAttribute.updateRange.offset = 0;
 				lifeTimeAttribute.updateRange.offset = 0;
 
-				positionStartAttribute.updateRange.count = positionStartAttribute.count;
-				startTimeAttribute.updateRange.count = startTimeAttribute.count;
-				velocityAttribute.updateRange.count = velocityAttribute.count;
-				turbulenceAttribute.updateRange.count = turbulenceAttribute.count;
-				colorAttribute.updateRange.count = colorAttribute.count;
-				sizeAttribute.updateRange.count = sizeAttribute.count;
-				lifeTimeAttribute.updateRange.count = lifeTimeAttribute.count;
+				// Use -1 to update the entire buffer, see #11476
+				positionStartAttribute.updateRange.count = -1;
+				startTimeAttribute.updateRange.count = -1;
+				velocityAttribute.updateRange.count = -1;
+				turbulenceAttribute.updateRange.count = -1;
+				colorAttribute.updateRange.count = -1;
+				sizeAttribute.updateRange.count = -1;
+				lifeTimeAttribute.updateRange.count = -1;
 
 			}
 

@@ -11,27 +11,46 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading an <em>.obj</em> resource.</div>
+		<div class="desc">A loader for loading a <em>.obj</em> resource.<br />
+		The <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ file format</a> is a simple data-format 
+		that represents 3D geometry in a human redeable format as, the position of each vertex, the UV position of 
+		each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of 
+		vertices, and texture vertices.
+		</div>
 
 
-				<h2>Example</h2>
+		<h2>Example</h2>
 
-				<code>
-				// instantiate a loader
-				var loader = new THREE.OBJLoader();
+		<code>
+		// instantiate a loader
+		var loader = new THREE.OBJLoader();
 
-				// load a resource
-				loader.load(
-					// resource URL
-					'models/monster.obj',
-					// Function when resource is loaded
-					function ( object ) {
-						scene.add( object );
-					}
-				);
-				</code>
+		// load a resource
+		loader.load(
+			// resource URL
+			'models/monster.obj',
+			// called when resource is loaded
+			function ( object ) {
 
-				[example:webgl_loader_obj]
+				scene.add( object );
+
+			},
+			// called when loading is in progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+		[example:webgl_loader_obj]
 
 
 		<h2>Constructor</h2>
@@ -51,10 +70,10 @@
 
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		[page:String url] — required<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Object3D].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called when load errors.<br />
+		[page:String url] — A string containing the path/URL of the <em>.obj</em> file.<br />
+		[page:Function onLoad] — (optional) A function to be called after the loading is successfully completed. The function receives the loaded [page:Object3D] as an argument.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The function receives a XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</div>
 		<div>
 		Begin loading from url and call onLoad with the parsed response content.
@@ -67,7 +86,7 @@
 		<div>
 		Returns an [page:Object3D]. It contains the parsed meshes as [page:Mesh] and lines as [page:LineSegments].<br />
 		All geometry is created as [page:BufferGeometry]. Default materials are created as [page:MeshPhongMaterial].<br />
-		If an <em>obj</em> object or group uses multiple materials while declaring faces geometry groups and an array of materials are used.
+		If an <em>obj</em> object or group uses multiple materials while declaring faces, geometry groups and an array of materials are used.
 		</div>
 
 		<h2>Source</h2>
