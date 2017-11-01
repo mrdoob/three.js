@@ -95,7 +95,15 @@ var WEBVR = {
 			navigator.getVRDisplays()
 				.then( function ( displays ) {
 
-					if ( displays.length > 0 ) showEnterVR( displays[ 0 ] );
+					if ( displays.length > 0 ) {
+
+						showEnterVR( displays[ 0 ] );
+
+					} else {
+
+						showVRNotFound();
+
+					}
 
 				} );
 
