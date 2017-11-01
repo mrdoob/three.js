@@ -175,7 +175,6 @@ THREE.XLoader.prototype = {
 	parseASCII: function () {
 
 		var scope = this;
-		var baseDir = "";
 		if ( scope.url.lastIndexOf( "/" ) > 0 ) {
 
 			scope.baseDir = scope.url.substr( 0, scope.url.lastIndexOf( "/" ) + 1 );
