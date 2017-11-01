@@ -354,7 +354,8 @@ var list = {
 			"PCDLoader": "examples/loaders/PCDLoader",
 			"PDBLoader": "examples/loaders/PDBLoader",
 			"SVGLoader": "examples/loaders/SVGLoader",
-			"TGALoader": "examples/loaders/TGALoader"
+			"TGALoader": "examples/loaders/TGALoader",
+			"PRWMLoader": "examples/loaders/PRWMLoader"
 		},
 
 		"Exporters": {
