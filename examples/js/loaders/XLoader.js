@@ -601,7 +601,7 @@ THREE.XLoader.prototype = {
 
 	},
 
-	endElement: function ( line ) {
+	endElement: function () {
 
 		var scope = this;
 		if ( scope.nowReadMode == THREE.XLoader.XfileLoadMode.Mesh ) {
@@ -753,7 +753,7 @@ THREE.XLoader.prototype = {
 
 	},
 
-	beginMeshNormal: function ( line ) {
+	beginMeshNormal: function () {
 
 		var scope = this;
 		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Normal_V_init;
@@ -1000,7 +1000,7 @@ THREE.XLoader.prototype = {
 
 	},
 
-	readBoneInit: function ( line ) {
+	readBoneInit: function () {
 
 		var scope = this;
 		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Weit_init;
