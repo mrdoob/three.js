@@ -1438,7 +1438,7 @@ THREE.GLTFLoader = ( function () {
 
 			loader.load( resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
 
-				reject( new Error( 'THREE.GLTFLoader: Buffer "' + bufferDef.uri + '" not found.' ) );
+				reject( new Error( 'THREE.GLTFLoader: Failed to load buffer "' + bufferDef.uri + '".' ) );
 
 			} );
 
