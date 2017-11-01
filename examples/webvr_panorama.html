@@ -23,14 +23,6 @@
 
 		<script>
 
-		WEBVR.checkAvailability().catch( function( message ) {
-
-			document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-		} );
-
-		//
-
 		var camera;
 		var renderer;
 		var scene;
@@ -43,22 +35,17 @@
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.vr.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
-			renderer.vr.enabled = true;
+			document.body.appendChild( WEBVR.createButton( renderer ) );
+
+			//
 
 			scene = new THREE.Scene();
 
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 1000 );
 			camera.layers.enable( 1 );
-
-			WEBVR.getVRDisplay( function ( display ) {
-
-				renderer.vr.setDevice( display );
-
-				document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-			} );
 
 			var geometry = new THREE.CubeGeometry( 100, 100, 100 );
 			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe_stereo.jpg", 12 );

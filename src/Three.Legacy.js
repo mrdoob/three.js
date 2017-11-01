@@ -25,6 +25,7 @@ import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform.js';
 import { Curve } from './extras/core/Curve.js';
 import { CurvePath } from './extras/core/CurvePath.js';
+import { Path } from './extras/core/Path.js';
 import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 import { AxesHelper } from './helpers/AxesHelper.js';
 import { BoxHelper } from './helpers/BoxHelper.js';
@@ -281,6 +282,19 @@ Object.assign( CurvePath.prototype, {
 		}
 
 		return geometry;
+
+	}
+
+} );
+
+//
+
+Object.assign( Path.prototype, {
+
+	fromPoints: function ( points ) {
+
+		console.warn( 'THREE.Path: .fromPoints() has been renamed to .setFromPoints().' );
+		this.setFromPoints( points );
 
 	}
 
@@ -684,6 +698,12 @@ Object.assign( Ray.prototype, {
 
 Object.assign( Shape.prototype, {
 
+	extractAllPoints: function ( divisions ) {
+
+		console.warn( 'THREE.Shape: .extractAllPoints() has been removed. Use .extractPoints() instead.' );
+		return this.extractPoints( divisions );
+
+	},
 	extrude: function ( options ) {
 
 		console.warn( 'THREE.Shape: .extrude() has been removed. Use ExtrudeGeometry() instead.' );

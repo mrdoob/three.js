@@ -197,6 +197,26 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		return points;
 
+	},
+
+	copy: function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.curves = [];
+
+		for ( var i = 0, l = source.curves.length; i < l; i ++ ) {
+
+			var curve = source.curves[ i ];
+
+			this.curves.push( curve.clone() );
+
+		}
+
+		this.autoClose = source.autoClose;
+
+		return this;
+
 	}
 
 } );

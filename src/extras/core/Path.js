@@ -18,7 +18,7 @@ function Path( points ) {
 
 	if ( points ) {
 
-		this.fromPoints( points );
+		this.setFromPoints( points );
 
 	}
 

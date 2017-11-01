@@ -120,14 +120,15 @@
 		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</div>
 
-		<h3>[method:null parse]( [page:Object json], [page:Function callBack], [page:String path] )</h3>
+		<h3>[method:null parse]( [page:ArrayBuffer data], [page:String path], [page:Function onLoad], [page:Function onError] )</h3>
 		<div>
-		[page:Object json] — <em>JSON</em> object to parse.<br />
-		[page:Function callBack] — Will be called when parse completes.<br />
+		[page:ArrayBuffer data] — glTF asset to parse, as an ArrayBuffer or <em>JSON</em> string.<br />
 		[page:String path] — The base path from which to find subsequent glTF resources such as textures and .bin data files.<br />
+		[page:Function onLoad] — A function to be called when parse completes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</div>
 		<div>
-		Parse a glTF-based <em>JSON</em> structure and fire [page:Function callback] when complete. The argument to [page:Function callback] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], and .[page:Array animations].
+		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], and .[page:Array animations].
 		</div>
 
 		<h2>Source</h2>

@@ -23,14 +23,6 @@
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var camera, scene, renderer;
 
 			var reflector;
@@ -117,19 +109,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				renderer.vr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				renderer.vr.enabled = true;
-
-				//
-
-				WEBVR.getVRDisplay( function ( display ) {
-
-					renderer.vr.setDevice( display );
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-				} );
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				//
 

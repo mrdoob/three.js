@@ -22161,7 +22161,19 @@ function WebGLRenderer( parameters ) {
 	function start() {
 
 		if ( isAnimating ) return;
-		( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+		var device = vr.getDevice();
+		
+		if ( device && device.isPresenting ) {
+
+			device.requestAnimationFrame( loop );
+
+		} else {
+
+			window.requestAnimationFrame( loop );
+
+		}
+
 		isAnimating = true;
 
 	}
@@ -22169,7 +22181,18 @@ function WebGLRenderer( parameters ) {
 	function loop( time ) {
 
 		if ( onAnimationFrame !== null ) onAnimationFrame( time );
-		( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+		var device = vr.getDevice();
+		
+		if ( device && device.isPresenting ) {
+
+			device.requestAnimationFrame( loop );
+
+		} else {
+
+			window.requestAnimationFrame( loop );
+
+		}
 
 	}
 
@@ -28936,7 +28959,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	openEnded = openEnded !== undefined ? openEnded : false;
 	thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-	thetaLength = thetaLength !== undefined ? thetaLength : 2.0 * Math.PI;
+	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
 	// buffers
 
@@ -30501,6 +30524,8 @@ Object.assign( FileLoader.prototype, {
 			request.addEventListener( 'error', function ( event ) {
 
 				var callbacks = loading[ url ];
+
+				delete loading[ url ];
 
 				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
@@ -35597,6 +35622,20 @@ Object.assign( Curve.prototype, {
 			binormals: binormals
 		};
 
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
+	copy: function ( source ) {
+
+		this.arcLengthDivisions = source.arcLengthDivisions;
+
+		return this;
+
 	}
 
 } );
@@ -35607,8 +35646,8 @@ function LineCurve( v1, v2 ) {
 
 	this.type = 'LineCurve';
 
-	this.v1 = v1;
-	this.v2 = v2;
+	this.v1 = v1 || new Vector2();
+	this.v2 = v2 || new Vector2();
 
 }
 
@@ -35649,6 +35688,17 @@ LineCurve.prototype.getTangent = function ( /* t */ ) {
 	var tangent = this.v2.clone().sub( this.v1 );
 
 	return tangent.normalize();
+
+};
+
+LineCurve.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.v1.copy( source.v1 );
+	this.v2.copy( source.v2 );
+
+	return this;
 
 };
 
@@ -35858,16 +35908,16 @@ function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockw
 
 	this.type = 'EllipseCurve';
 
-	this.aX = aX;
-	this.aY = aY;
+	this.aX = aX || 0;
+	this.aY = aY || 0;
 
-	this.xRadius = xRadius;
-	this.yRadius = yRadius;
+	this.xRadius = xRadius || 1;
+	this.yRadius = yRadius || 1;
 
-	this.aStartAngle = aStartAngle;
-	this.aEndAngle = aEndAngle;
+	this.aStartAngle = aStartAngle || 0;
+	this.aEndAngle = aEndAngle || 2 * Math.PI;
 
-	this.aClockwise = aClockwise;
+	this.aClockwise = aClockwise || false;
 
 	this.aRotation = aRotation || 0;
 
@@ -35940,13 +35990,34 @@ EllipseCurve.prototype.getPoint = function ( t, optionalTarget ) {
 
 };
 
+EllipseCurve.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.aX = source.aX;
+	this.aY = source.aY;
+
+	this.xRadius = source.xRadius;
+	this.yRadius = source.yRadius;
+
+	this.aStartAngle = source.aStartAngle;
+	this.aEndAngle = source.aEndAngle;
+
+	this.aClockwise = source.aClockwise;
+
+	this.aRotation = source.aRotation;
+
+	return this;
+
+};
+
 function SplineCurve( points /* array of Vector2 */ ) {
 
 	Curve.call( this );
 
 	this.type = 'SplineCurve';
 
-	this.points = ( points === undefined ) ? [] : points;
+	this.points = points || [];
 
 }
 
@@ -35979,16 +36050,34 @@ SplineCurve.prototype.getPoint = function ( t, optionalTarget ) {
 
 };
 
+SplineCurve.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.points = [];
+
+	for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+
+		var point = source.points[ i ];
+
+		this.points.push( point.clone() );
+
+	}
+
+	return this;
+
+};
+
 function CubicBezierCurve( v0, v1, v2, v3 ) {
 
 	Curve.call( this );
 
 	this.type = 'CubicBezierCurve';
 
-	this.v0 = v0;
-	this.v1 = v1;
-	this.v2 = v2;
-	this.v3 = v3;
+	this.v0 = v0 || new Vector2();
+	this.v1 = v1 || new Vector2();
+	this.v2 = v2 || new Vector2();
+	this.v3 = v3 || new Vector2();
 
 }
 
@@ -36012,15 +36101,28 @@ CubicBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
 
 };
 
+CubicBezierCurve.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.v0.copy( source.v0 );
+	this.v1.copy( source.v1 );
+	this.v2.copy( source.v2 );
+	this.v3.copy( source.v3 );
+
+	return this;
+
+};
+
 function QuadraticBezierCurve( v0, v1, v2 ) {
 
 	Curve.call( this );
 
 	this.type = 'QuadraticBezierCurve';
 
-	this.v0 = v0;
-	this.v1 = v1;
-	this.v2 = v2;
+	this.v0 = v0 || new Vector2();
+	this.v1 = v1 || new Vector2();
+	this.v2 = v2 || new Vector2();
 
 }
 
@@ -36041,6 +36143,18 @@ QuadraticBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
 	);
 
 	return point;
+
+};
+
+QuadraticBezierCurve.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.v0.copy( source.v0 );
+	this.v1.copy( source.v1 );
+	this.v2.copy( source.v2 );
+
+	return this;
 
 };
 
@@ -42568,17 +42682,16 @@ var px = new CubicPoly();
 var py = new CubicPoly();
 var pz = new CubicPoly();
 
-function CatmullRomCurve3( points ) {
+function CatmullRomCurve3( points, closed, curveType, tension ) {
 
 	Curve.call( this );
 
 	this.type = 'CatmullRomCurve3';
 
-	if ( points.length < 2 ) console.warn( 'THREE.CatmullRomCurve3: Points array needs at least two entries.' );
-
 	this.points = points || [];
-	this.closed = false;
-	this.curveType = 'centripetal';
+	this.closed = closed || false;
+	this.curveType = curveType || 'centripetal';
+	this.tension = tension || 0.5;
 
 }
 
@@ -42657,10 +42770,9 @@ CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
 	} else if ( this.curveType === 'catmullrom' ) {
 
-		var tension = this.tension !== undefined ? this.tension : 0.5;
-		px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
-		py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, tension );
-		pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, tension );
+		px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, this.tension );
+		py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, this.tension );
+		pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, this.tension );
 
 	}
 
@@ -42674,16 +42786,38 @@ CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
 };
 
+CatmullRomCurve3.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.points = [];
+
+	for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+
+		var point = source.points[ i ];
+
+		this.points.push( point.clone() );
+
+	}
+
+	this.closed = source.closed;
+	this.curveType = source.curveType;
+	this.tension = source.tension;
+
+	return this;
+
+};
+
 function CubicBezierCurve3( v0, v1, v2, v3 ) {
 
 	Curve.call( this );
 
 	this.type = 'CubicBezierCurve3';
 
-	this.v0 = v0;
-	this.v1 = v1;
-	this.v2 = v2;
-	this.v3 = v3;
+	this.v0 = v0 || new Vector3();
+	this.v1 = v1 || new Vector3();
+	this.v2 = v2 || new Vector3();
+	this.v3 = v3 || new Vector3();
 
 }
 
@@ -42708,15 +42842,28 @@ CubicBezierCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
 };
 
+CubicBezierCurve3.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.v0.copy( source.v0 );
+	this.v1.copy( source.v1 );
+	this.v2.copy( source.v2 );
+	this.v3.copy( source.v3 );
+
+	return this;
+
+};
+
 function QuadraticBezierCurve3( v0, v1, v2 ) {
 
 	Curve.call( this );
 
 	this.type = 'QuadraticBezierCurve3';
 
-	this.v0 = v0;
-	this.v1 = v1;
-	this.v2 = v2;
+	this.v0 = v0 || new Vector3();
+	this.v1 = v1 || new Vector3();
+	this.v2 = v2 || new Vector3();
 
 }
 
@@ -42741,14 +42888,26 @@ QuadraticBezierCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
 };
 
+QuadraticBezierCurve3.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.v0.copy( source.v0 );
+	this.v1.copy( source.v1 );
+	this.v2.copy( source.v2 );
+
+	return this;
+
+};
+
 function LineCurve3( v1, v2 ) {
 
 	Curve.call( this );
 
 	this.type = 'LineCurve3';
 
-	this.v1 = v1;
-	this.v2 = v2;
+	this.v1 = v1 || new Vector3();
+	this.v2 = v2 || new Vector3();
 
 }
 
@@ -42781,6 +42940,17 @@ LineCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 LineCurve3.prototype.getPointAt = function ( u, optionalTarget ) {
 
 	return this.getPoint( u, optionalTarget );
+
+};
+
+LineCurve3.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.v1.copy( source.v1 );
+	this.v2.copy( source.v2 );
+
+	return this;
 
 };
 

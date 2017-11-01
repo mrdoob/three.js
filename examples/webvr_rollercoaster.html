@@ -29,20 +29,15 @@
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.vr.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
-			renderer.vr.enabled = true;
+			document.body.appendChild( WEBVR.createButton( renderer ) );
+
+			//
 
 			var scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xf0f0ff );
@@ -185,16 +180,6 @@
 			scene.add( mesh );
 
 			funfairs.push( mesh );
-
-			//
-
-			WEBVR.getVRDisplay( function ( display ) {
-
-				renderer.vr.setDevice( display );
-
-				document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-			} );
 
 			//
 
