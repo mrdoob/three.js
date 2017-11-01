@@ -78,7 +78,17 @@ THREE.GLTFLoader = ( function () {
 
 				if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
 
-					extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
+					try {
+
+						extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
+
+					} catch ( error ) {
+
+						onError( error );
+						return;
+
+					}
+
 					content = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
 
 				} else {
