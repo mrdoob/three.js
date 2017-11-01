@@ -167,7 +167,8 @@ THREE.XLoader.prototype = {
 
 	parseBinary: function ( data ) {
 
-		return parseASCII( String.fromCharCode.apply( null, data ) );
+		var scope = this;
+		return scope.parseASCII( String.fromCharCode.apply( null, data ) );
 
 	},
 
