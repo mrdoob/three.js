@@ -3560,7 +3560,6 @@
 
 					if ( Array.isArray( value ) ) {
 
-						node.properties[ node.name ] = node.propertyList[ 0 ];
 						subNodes[ node.name ] = node;
 
 						node.properties.a = value;
