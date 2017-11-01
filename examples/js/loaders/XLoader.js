@@ -1004,7 +1004,7 @@ THREE.XLoader.prototype = {
 
 		var scope = this;
 		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Weit_init;
-		scope.BoneInf = new XboneInf();
+		scope.BoneInf = new THREE.XLoader.XboneInf();
 
 	},
 
