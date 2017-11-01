@@ -99,9 +99,9 @@
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
 		[page:String url] — A string containing the path/URL of the <em>.gltf</em> or <em>.glb</em> file.<br />
-		[page:Function onLoad] — (optional) A function to be called after the loading is successfully completed. The function receives the loaded JSON response returned from [page:Function parse].<br />
+		[page:Function onLoad] — A function to be called after the loading is successfully completed. The function receives the loaded JSON response returned from [page:Function parse].<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
+		[page:Function onError] — A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</div>
 		<div>
 		Begin loading from url and call the callback function with the parsed response content.
@@ -125,7 +125,7 @@
 		[page:ArrayBuffer data] — glTF asset to parse, as an ArrayBuffer or <em>JSON</em> string.<br />
 		[page:String path] — The base path from which to find subsequent glTF resources such as textures and .bin data files.<br />
 		[page:Function onLoad] — A function to be called when parse completes.<br />
-		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
+		[page:Function onError] — A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</div>
 		<div>
 		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], and .[page:Array animations].
