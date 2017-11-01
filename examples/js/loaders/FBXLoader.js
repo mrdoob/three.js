@@ -1915,7 +1915,7 @@
 
 				var rawMatWrd = new THREE.Matrix4().fromArray( node.subNodes.Matrix.properties.a );
 
-				worldMatrices.set( parseInt( node.id ), rawMatWrd );
+				worldMatrices.set( parseInt( node.properties.Node ), rawMatWrd );
 
 			}
 
