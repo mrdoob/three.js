@@ -373,7 +373,6 @@ THREE.XLoader.prototype = {
 
 	getPlaneStr: function ( _str ) {
 
-		var scope = this;
 		var firstDbl = _str.indexOf( '"' ) + 1;
 		var dbl2 = _str.indexOf( '"', firstDbl );
 		return _str.substr( firstDbl, dbl2 - firstDbl );
