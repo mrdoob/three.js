@@ -1421,7 +1421,7 @@ THREE.GLTFLoader = ( function () {
 
 		if ( bufferDef.type && bufferDef.type !== 'arraybuffer' ) {
 
-			throw new Error( 'THREE.GLTFLoader: %s buffer type is not supported.', bufferDef.type );
+			throw new Error( 'THREE.GLTFLoader: ' + bufferDef.type + ' buffer type is not supported.' );
 
 		}
 
