@@ -1205,8 +1205,6 @@ THREE.XLoader.prototype = {
 			scope.loadingXdata.FrameInfo_Raw[ nowFrameName ].Geometry.groupsNeedUpdate = true;
 			var putBones = [];
 			var BoneInverse = [];
-			var BoneDics = [];
-			var rootBone = new THREE.Bone();
 			if ( scope.loadingXdata.FrameInfo_Raw[ nowFrameName ].BoneInfs != null && scope.loadingXdata.FrameInfo_Raw[ nowFrameName ].BoneInfs.length ) {
 
 				var keys = Object.keys( scope.loadingXdata.FrameInfo_Raw );
@@ -1344,7 +1342,6 @@ THREE.XLoader.prototype = {
 
 		var scope = this;
 		var i = scope.nowReaded;
-		var keys = Object.keys( scope.loadingXdata.FrameInfo_Raw );
 		var tgtModel = null;
 		for ( var m = 0; m < scope.loadingXdata.FrameInfo.length; m ++ ) {
 
