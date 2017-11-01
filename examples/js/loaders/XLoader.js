@@ -231,14 +231,12 @@ THREE.XLoader.prototype = {
 	getNextSection: function ( _offset, _start, _end ) {
 
 		var scope = this;
-		var find = scope.data.indexOf( "{", _offset );
 		return [ scope.data.substr( _offset, _start - _offset ).trim(), scope.data.substr( _start + 1, _end - _start - 1 ) ];
 
 	},
 
 	getNextSection2: function ( _obj, _offset, _start, _end ) {
 
-		var find = _obj.indexOf( "{", _offset );
 		return [ _obj.substr( _offset, _start - _offset ).trim(), _obj.substr( _start + 1, _end - _start - 1 ) ];
 
 	},
