@@ -702,7 +702,6 @@ THREE.XLoader.prototype = {
 		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Geometry = new THREE.Geometry();
 		scope.geoStartLv = scope.elementLv;
 		scope.nowReadMode = THREE.XLoader.XfileLoadMode.Vartex_init;
-		Bones = [];
 		scope.loadingXdata.FrameInfo_Raw[scope.nowFrameName].Materials = [];
 
 	},
