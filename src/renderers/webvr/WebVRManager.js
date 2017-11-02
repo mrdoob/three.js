@@ -72,6 +72,7 @@ function WebVRManager( renderer ) {
 
 	this.enabled = false;
 	this.standing = false;
+	this.submitFrameEnabled = true;
 
 	this.getDevice = function () {
 

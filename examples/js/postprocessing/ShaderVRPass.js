@@ -3,18 +3,15 @@
  */
 
 /**
- * @params {VRDisplay} vrDisplay
  * @params {THREE.ShaderPass} passLeft - ShaderPass instance for left eye sight.
  *                                       passLeft is also used for non presenting mode.
  * @params {THREE.ShaderPass} passRight - ShaderPass instance for right eye sight.
  *                                        If this isn't specified, passLeft will
  *                                        also be used for right eye sight.
  */
-THREE.ShaderVRPass = function ( vrDisplay, passLeft, passRight ) {
+THREE.ShaderVRPass = function ( passLeft, passRight ) {
 
 	THREE.Pass.call( this );
-
-	this.vrDisplay = vrDisplay;
 
 	// using the parameter of passLeft so far
 	this.enabled = passLeft.enabled;
@@ -110,12 +107,14 @@ THREE.ShaderVRPass.prototype = Object.assign( Object.create( THREE.Pass.prototyp
 
 	render: function( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		if ( this.vrDisplay.isPresenting ) {
+		if ( renderer.vr.enabled === true && renderer.vr.getDevice() && renderer.vr.getDevice().isPresenting ) {
 
 			this.materialSeparate.uniforms.tDiffuse.value = readBuffer.texture;
 			this.quad.material = this.materialSeparate;
 
 			// 1. exports left/right half from the original
+
+			renderer.vr.enabled = false;
 
 			for ( var i = 0; i < 2; i ++ ) {
 
@@ -140,8 +139,11 @@ THREE.ShaderVRPass.prototype = Object.assign( Object.create( THREE.Pass.prototyp
 				var pass = this.passes.length >= 2 ? this.passes[ i ] : this.passes[ 0 ];
 
 				var currentRenderToScreen = pass.renderToScreen;
+
 				pass.renderToScreen = false;
+
 				pass.render( renderer, this.renderTargetsSecond[ i ], this.renderTargetsFirst[ i ], delta, maskActive );
+
 				pass.renderToScreen = currentRenderToScreen;
 
 				// seems like this's necessary?
@@ -167,13 +169,13 @@ THREE.ShaderVRPass.prototype = Object.assign( Object.create( THREE.Pass.prototyp
 
 				renderer.render( this.scene, this.camera );
 
-				this.vrDisplay.submitFrame();
-
 			} else {
 
 				renderer.render( this.scene, this.camera, writeBuffer, this.clear );
 
 			}
+
+			renderer.vr.enabled = true;
 
 			this.needsSwap = true;
 
@@ -182,6 +184,7 @@ THREE.ShaderVRPass.prototype = Object.assign( Object.create( THREE.Pass.prototyp
 			// using passLeft for non presenting mode
 			var pass = this.passes[ 0 ];
 			var currentRenderToScreen = pass.renderToScreen;
+
 			pass.renderToScreen = this.renderToScreen;
 			pass.render( renderer, writeBuffer, readBuffer, delta, maskActive );
 			pass.renderToScreen = currentRenderToScreen;

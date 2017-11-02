@@ -6,9 +6,14 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
+				font-family: Monospace;
+				background-color: #101010;
+				color: #fff;
 				margin: 0px;
-				background-color: #000000;
 				overflow: hidden;
+			}
+			a {
+				color: #f00;
 			}
 		</style>
 	</head>
@@ -17,70 +22,32 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/DigitalGlitch.js"></script>
+		<script src="js/shaders/LuminosityHighPassShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/GlitchPass.js"></script>
+		<script src="js/postprocessing/UnrealBloomPass.js"></script>
 
 		<script src="js/postprocessing/ShaderVRPass.js"></script>
 
 		<script src="js/vr/WebVR.js"></script>
-		<script src="js/vr/WebVRCamera.js"></script>
-		<script src="js/controls/VRControls.js"></script>
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
 			var camera, dummy, scene, renderer, composer;
 			var object, light;
-			var controls, vrdisplay;
-
-			WEBVR.getVRDisplay( function ( display ) {
-
-				vrdisplay = display;
-
-				document.body.appendChild( WEBVR.getButton( vrdisplay, renderer.domElement ) );
-
-				// camera
-
-				dummy.remove( camera );
-				camera = new THREE.WebVRCamera( vrdisplay, renderer );
-				camera.enableSubmitFrame( false ); // disables because it's invoked by ShaderVRPass
-				dummy.add( camera );
-
-				// control
-
-				controls = new THREE.VRControls( camera );
-				controls.setVRDisplay( vrdisplay );
-
-				// composer
-
-				composer = new THREE.EffectComposer( renderer );
-				composer.setSize( window.innerWidth, window.innerHeight );
-
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
-				composer.addPass( new THREE.ShaderVRPass( vrdisplay, new THREE.GlitchPass() ) );
-
-				composer.passes[ composer.passes.length - 1 ].renderToScreen = true;
-
-				window.addEventListener( 'vrdisplaypresentchange', onWindowResize, false );
-
-				onWindowResize();
-
-			} );
 
 			// renderer
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.vr.enabled = true;
 			document.body.appendChild( renderer.domElement );
+
+			document.body.appendChild( WEBVR.createButton( renderer ) );
 
 			// scene
 			scene = new THREE.Scene();
@@ -94,6 +61,24 @@
 
 			scene.add( dummy );
 
+			// composer
+
+			composer = new THREE.EffectComposer( renderer );
+			composer.setSize( window.innerWidth, window.innerHeight );
+
+			composer.addPass( new THREE.RenderPass( scene, camera ) );
+
+			composer.addPass( new THREE.ShaderVRPass( new THREE.UnrealBloomPass(
+
+				new THREE.Vector2( window.innerWidth, window.innerHeight ),
+				1.0, 0.7, 0.1
+
+			) ) );
+
+			composer.addPass( new THREE.ShaderVRPass( new THREE.GlitchPass() ) );
+
+			composer.passes[ composer.passes.length - 1 ].renderToScreen = true;
+
 			// object
 			object = new THREE.Object3D();
 			scene.add( object );
@@ -102,7 +87,7 @@
 
 			for ( var i = 0; i < 100; i ++ ) {
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random(), shading: THREE.FlatShading } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random(), flatShading: true } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
 				mesh.position.multiplyScalar( Math.random() * 400 );
@@ -120,6 +105,7 @@
 			scene.add( light );
 
 			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
 			onWindowResize();
 
@@ -131,35 +117,25 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				if ( vrdisplay !== undefined ) composer.setSize( window.innerWidth, window.innerHeight );
+				composer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onVRDisplayPresentChange() {
+
+				var size = renderer.getDrawingBufferSize();
+				composer.setSize( size.width, size.height );
 
 			}
 
 			function animate() {
 
-				if ( vrdisplay !== undefined ) {
-
-					vrdisplay.requestAnimationFrame( animate );
-					controls.update();
-
-				} else {
-
-					requestAnimationFrame( animate );
-
-				}
+				requestAnimationFrame( animate );
 
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;
 
-				if ( vrdisplay !== undefined ) {
-
-					composer.render();
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
+				composer.render();
 
 			}
 

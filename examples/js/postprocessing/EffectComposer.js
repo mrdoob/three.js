@@ -79,6 +79,10 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		var pass, i, il = this.passes.length;
 
+		var currentSubmitFrameEnabled = this.renderer.vr.submitFrameEnabled;
+
+		this.renderer.vr.submitFrameEnabled = false;
+
 		for ( i = 0; i < il; i ++ ) {
 
 			pass = this.passes[ i ];
@@ -87,6 +91,12 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			pass.update( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
+
+			if ( pass.renderToScreen === true && this.renderer.vr.enabled === true ) {
+
+				this.renderer.vr.submitFrame();
+
+			}
 
 			if ( pass.needsSwap ) {
 
@@ -121,6 +131,8 @@ Object.assign( THREE.EffectComposer.prototype, {
 			}
 
 		}
+
+		this.renderer.vr.submitFrameEnabled = currentSubmitFrameEnabled;
 
 	},
 
