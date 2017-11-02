@@ -9,6 +9,12 @@ Sidebar.Controls = function ( editor ) {
 
 	const IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
 
+	var isValidKeyBinding = function ( key ) {
+
+		return key.match( /^[A-Za-z0-9]$/i );
+
+	};
+
 	var container = new UI.Panel();
 	container.add( new UI.Text( 'CONTROLS' ) );
 
@@ -29,17 +35,37 @@ Sidebar.Controls = function ( editor ) {
 
 		let controlInput = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-			config.setKey( configName, controlInput.getValue()[ 0 ] );
+			if( isValidKeyBinding( controlInput.getValue() ) ) {
+
+				config.setKey( configName, controlInput.getValue()[ 0 ] );
+
+			}
 
 		} );
+
+		// Automatically highlight when selecting an input field
 		controlInput.dom.addEventListener( 'focus', function () {
 
 			controlInput.dom.select();
 
 		} );
-		controlInput.dom.addEventListener( 'keyup', function () {
 
-			if(event.key.match(/^[A-Za-z0-9]+$/i)) {
+		// If the value of the input field is invalid, revert the input field
+		// to contain the key binding stored in config
+		controlInput.dom.addEventListener( 'blur', function () {
+
+			if( ! isValidKeyBinding( controlInput.getValue() ) ) {
+
+				controlInput.setValue( config.getKey( configName ) );
+
+			}
+
+		} );
+
+		// If a valid key binding character is entered, blur the input field
+		controlInput.dom.addEventListener( 'keyup', function ( event ) {
+
+			if( isValidKeyBinding( event.key ) ) {
 
 				controlInput.dom.blur();
 
