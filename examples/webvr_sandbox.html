@@ -19,21 +19,13 @@
 
 		<script src="js/vr/WebVR.js"></script>
 
-		<script src="js/Mirror.js"></script>
+		<script src="js/objects/Reflector.js"></script>
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var camera, scene, renderer;
 
-			var mirror;
+			var reflector;
 
 			init();
 			animate();
@@ -93,15 +85,15 @@
 
 				//
 
-				mirror = new THREE.Mirror( 1.4, 1.4, {
+				reflector = new THREE.Reflector( 1.4, 1.4, {
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio
 				} );
-				mirror.position.x = 1;
-				mirror.position.y = 0.5;
-				mirror.position.z = -3;
-				mirror.rotation.y = - Math.PI / 4;
-				scene.add( mirror );
+				reflector.position.x = 1;
+				reflector.position.y = 0.5;
+				reflector.position.z = -3;
+				reflector.rotation.y = - Math.PI / 4;
+				scene.add( reflector );
 
 				var geometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
 				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
@@ -109,7 +101,7 @@
 				mesh.position.z = - 0.07;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
-				mirror.add( mesh );
+				reflector.add( mesh );
 
 				//
 
@@ -117,19 +109,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				renderer.vr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				renderer.vr.enabled = true;
-
-				//
-
-				WEBVR.getVRDisplay( function ( display ) {
-
-					renderer.vr.setDevice( display );
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-				} );
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				//
 

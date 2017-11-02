@@ -169,6 +169,23 @@ m.elements = [ 11, 21, 31,
 		<h3>[method:Matrix3 setFromMatrix4]( [page:Matrix4 m] )</h3>
 		<div>Set this matrx to the upper 3x3 matrix of the Matrix4 [page:Matrix4 m].</div>
 
+		<h3>
+			[method:Matrix3 setUvTransform](
+			[page:Float tx], [page:Float ty], [page:Float sx], [page:Float sy],
+			[page:Float rotation], [page:Float cx], [page:Float cy] )
+		</h3>
+		<div>
+		[page:Float tx] - offset x<br />
+		[page:Float ty] - offset y<br />
+		[page:Float sx] - repeat x<br />
+		[page:Float sy] - repeat y<br />
+		[page:Float rotation] - rotation (in radians)<br />
+		[page:Float cx] - center x of rotation<br />
+		[page:Float cy] - center y of rotation<br /><br />
+
+		Sets the UV transform matrix from offset, repeat, rotation, and center.
+		</div>
+
 		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
 		[page:Array array] - (optional) array to store the resulting vector in. If not given a new array will be created.<br />

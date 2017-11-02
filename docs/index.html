@@ -320,7 +320,7 @@
 				if(hash) {
 
 					iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
-					subtitle = ' - ' + titles[ splitHash[ 0 ] ] + splitHash[ 1 ];
+					subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' - ';
 
 				} else {
 
@@ -330,7 +330,7 @@
 				}
 
 				document.body.replaceChild( iframe, oldIframe );
-				document.title = 'three.js docs' + subtitle;
+				document.title = subtitle + 'three.js docs';
 
 			}
 

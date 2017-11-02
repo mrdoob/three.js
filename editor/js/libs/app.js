@@ -24,21 +24,12 @@ var APP = {
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 
-			if ( json.project.gammaInput ) renderer.gammaInput = true;
-			if ( json.project.gammaOutput ) renderer.gammaOutput = true;
+			var project = json.project;
 
-			if ( json.project.shadows ) {
-
-				renderer.shadowMap.enabled = true;
-				// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-			}
-
-			if ( json.project.vr ) {
-
-				renderer.vr.enabled = true;
-
-			}
+			if ( project.gammaInput ) renderer.gammaInput = true;
+			if ( project.gammaOutput ) renderer.gammaOutput = true;
+			if ( project.shadows ) renderer.shadowMap.enabled = true;
+			if ( project.vr ) renderer.vr.enabled = true;
 
 			dom.appendChild( renderer.domElement );
 
@@ -122,18 +113,7 @@ var APP = {
 
 			if ( renderer.vr.enabled ) {
 
-				WEBVR.checkAvailability().catch( function( message ) {
-
-					dom.appendChild( WEBVR.getMessageContainer( message ) );
-
-				} );
-
-				WEBVR.getVRDisplay( function ( device ) {
-
-					renderer.vr.setDevice( device );
-					dom.appendChild( WEBVR.getButton( device, renderer.domElement ) );
-
-				} );
+				dom.appendChild( WEBVR.createButton( renderer ) );
 
 			}
 

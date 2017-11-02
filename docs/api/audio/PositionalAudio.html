@@ -33,9 +33,9 @@
 		//Load a sound and set it as the PositionalAudio object's buffer
 		var audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/song.ogg', function( buffer ) {
-			sound1.setBuffer( buffer );
-			sound1.setRefDistance( 20 );
-			sound1.play();
+			sound.setBuffer( buffer );
+			sound.setRefDistance( 20 );
+			sound.play();
 		});
 
 		//Create an object for the sound to play from
@@ -110,12 +110,12 @@
 
 		<h3>[method:PannerNode getMaxDistance]()</h3>
 		<div>
-		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.distanceModel].
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
 		</div>
 
 		<h3>[method:PannerNode setMaxDistance]( [page:Number value] )</h3>
 		<div>
-		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.distanceModel].
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
 		</div>
 
 		<h2>Source</h2>

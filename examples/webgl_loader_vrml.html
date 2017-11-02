@@ -21,7 +21,12 @@
 				z-index: 100;
 				display:block;
 			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			#info a, .button {
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
+			}
 		</style>
 	</head>
 
@@ -49,8 +54,6 @@
 
 			var camera, controls, scene, renderer;
 
-			var cross;
-
 			init();
 			animate();
 
@@ -60,9 +63,6 @@
 				camera.position.z = 6;
 
 				controls = new THREE.OrbitControls( camera );
-
-				controls.rotateSpeed = 5.0;
-				controls.zoomSpeed = 5;
 
 				scene = new THREE.Scene();
 				scene.add( camera );
