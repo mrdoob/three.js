@@ -1710,7 +1710,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( alphaMode === ALPHA_MODES.MASK ) {
 
-					materialParams.alphaTest = material.alphaCutoff || 0.5;
+					materialParams.alphaTest = material.alphaCutoff !== undefined ? material.alphaCutoff : 0.5;
 
 				}
 
