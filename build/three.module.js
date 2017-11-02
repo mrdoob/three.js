@@ -181,7 +181,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '88dev';
+var REVISION = '88';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -20804,7 +20804,11 @@ function WebVRManager( renderer ) {
 
 	this.dispose = function () {
 
-		window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
+		if ( typeof window !== 'undefined' ) {
+
+			window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
+
+		}
 
 	};
 
@@ -35898,6 +35902,26 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		return points;
 
+	},
+
+	copy: function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.curves = [];
+
+		for ( var i = 0, l = source.curves.length; i < l; i ++ ) {
+
+			var curve = source.curves[ i ];
+
+			this.curves.push( curve.clone() );
+
+		}
+
+		this.autoClose = source.autoClose;
+
+		return this;
+
 	}
 
 } );
@@ -36160,13 +36184,13 @@ QuadraticBezierCurve.prototype.copy = function ( source ) {
 
 var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
-	fromPoints: function ( vectors ) {
+	setFromPoints: function ( points ) {
 
-		this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
+		this.moveTo( points[ 0 ].x, points[ 0 ].y );
 
-		for ( var i = 1, l = vectors.length; i < l; i ++ ) {
+		for ( var i = 1, l = points.length; i < l; i ++ ) {
 
-			this.lineTo( vectors[ i ].x, vectors[ i ].y );
+			this.lineTo( points[ i ].x, points[ i ].y );
 
 		}
 
@@ -36274,6 +36298,16 @@ var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 		var lastPoint = curve.getPoint( 1 );
 		this.currentPoint.copy( lastPoint );
 
+	},
+
+	copy: function ( source ) {
+
+		CurvePath.prototype.copy.call( this, source );
+
+		this.currentPoint.copy( source.currentPoint );
+
+		return this;
+
 	}
 
 } );
@@ -36293,7 +36327,7 @@ function Path( points ) {
 
 	if ( points ) {
 
-		this.fromPoints( points );
+		this.setFromPoints( points );
 
 	}
 
@@ -36313,9 +36347,9 @@ PathPrototype.constructor = Path;
 // STEP 3a - Extract points from each shape, turn to vertices
 // STEP 3b - Triangulate each shape, add faces.
 
-function Shape() {
+function Shape( points ) {
 
-	Path.apply( this, arguments );
+	Path.call( this, points );
 
 	this.type = 'Shape';
 
@@ -36341,9 +36375,9 @@ Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
 	},
 
-	// Get points of shape and holes (keypoints based on segments parameter)
+	// get points of shape and holes (keypoints based on segments parameter)
 
-	extractAllPoints: function ( divisions ) {
+	extractPoints: function ( divisions ) {
 
 		return {
 
@@ -36354,9 +36388,21 @@ Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
 	},
 
-	extractPoints: function ( divisions ) {
+	copy: function ( source ) {
 
-		return this.extractAllPoints( divisions );
+		Path.prototype.copy.call( this, source );
+
+		this.holes = [];
+
+		for ( var i = 0, l = source.holes.length; i < l; i ++ ) {
+
+			var hole = source.holes[ i ];
+
+			this.holes.push( hole.clone() );
+
+		}
+
+		return this;
 
 	}
 
@@ -43226,6 +43272,19 @@ Object.assign( CurvePath.prototype, {
 
 //
 
+Object.assign( Path.prototype, {
+
+	fromPoints: function ( points ) {
+
+		console.warn( 'THREE.Path: .fromPoints() has been renamed to .setFromPoints().' );
+		this.setFromPoints( points );
+
+	}
+
+} );
+
+//
+
 function ClosedSplineCurve3( points ) {
 
 	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
@@ -43622,6 +43681,12 @@ Object.assign( Ray.prototype, {
 
 Object.assign( Shape.prototype, {
 
+	extractAllPoints: function ( divisions ) {
+
+		console.warn( 'THREE.Shape: .extractAllPoints() has been removed. Use .extractPoints() instead.' );
+		return this.extractPoints( divisions );
+
+	},
 	extrude: function ( options ) {
 
 		console.warn( 'THREE.Shape: .extrude() has been removed. Use ExtrudeGeometry() instead.' );
