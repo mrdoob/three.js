@@ -37,6 +37,15 @@ Sidebar.Controls = function ( editor ) {
 			controlInput.dom.select();
 
 		} );
+		controlInput.dom.addEventListener( 'keyup', function () {
+
+			if(event.key.match(/^[A-Za-z0-9]+$/i)) {
+
+				controlInput.dom.blur();
+
+			}
+
+		} );
 
 		if( config.getKey( configName ) !== undefined ) {
 
