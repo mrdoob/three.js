@@ -78,7 +78,17 @@ THREE.GLTFLoader = ( function () {
 
 				if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
 
-					extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
+					try {
+
+						extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
+
+					} catch ( error ) {
+
+						if ( onError ) onError( error );
+						return;
+
+					}
+
 					content = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
 
 				} else {
@@ -93,7 +103,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
-				onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' ) );
+				if ( onError ) onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' ) );
 				return;
 
 			}
