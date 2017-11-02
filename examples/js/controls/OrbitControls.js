@@ -316,10 +316,14 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		return function panUp( distance, objectMatrix ) {
 
-			v.setFromMatrixColumn( objectMatrix, 1 ); // get Y column of objectMatrix
+			//v.setFromMatrixColumn( objectMatrix, 1 ); // get Y column of objectMatrix
+			v.setFromMatrixColumn( objectMatrix, 2 ); // get Z column of objectMatrix
 			v.multiplyScalar( distance );
-
-			panOffset.add( v );
+  
+			//panOffset.add( v );
+			//Y axis dosen't change
+			panOffset.x -=v.x;
+			panOffset.z -= v.z;
 
 		};
 
@@ -447,9 +451,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// rotating across whole screen goes 360 degrees around
 		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
-
+                
+		//Y axix dosen't change
 		// rotating up and down along whole screen attempts to go 360, but limited to 180
-		rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
+		//rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
 
 		rotateStart.copy( rotateEnd );
 
