@@ -22,8 +22,8 @@ var Config = function ( name ) {
 		'settings/history': false,
 
 		'controls/translate': 'w',
-		'controls/rotate': 'r',
-		'controls/scale': 'w'
+		'controls/rotate': 'e',
+		'controls/scale': 'r'
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

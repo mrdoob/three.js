@@ -7,6 +7,8 @@ Sidebar.Controls = function ( editor ) {
 	var config = editor.config;
 	var signals = editor.signals;
 
+	const IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
+
 	var container = new UI.Panel();
 	container.add( new UI.Text( 'CONTROLS' ) );
 
@@ -48,6 +50,65 @@ Sidebar.Controls = function ( editor ) {
 		container.add( controlRow );
 
 	}
+
+	document.addEventListener( 'keydown', function ( event ) {
+
+		switch ( event.key ) {
+
+			case 'Backspace':
+
+				event.preventDefault(); // prevent browser back
+
+			case 'Delete':
+
+				var object = editor.selected;
+
+				if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
+
+				var parent = object.parent;
+				if ( parent !== null ) editor.execute( new RemoveObjectCommand( object ) );
+
+				break;
+
+			case 'z': // Register Ctrl/Command-Z for Undo
+
+				if ( IS_MAC ? event.metaKey : event.ctrlKey ) {
+
+					editor.undo();
+
+				}
+
+				break;
+
+			case 'Z': // Register Ctrl/Command-Shift-Z for Redo
+
+				if ( IS_MAC ? event.metaKey : event.ctrlKey ) {
+
+					editor.redo();
+
+				}
+
+			case editor.config.getKey( 'controls/translate' ): // Translation transform mode
+
+				editor.signals.transformModeChanged.dispatch( 'translate' );
+
+				break;
+
+			case editor.config.getKey( 'controls/rotate' ): // Rotation transform mode
+
+				editor.signals.transformModeChanged.dispatch( 'rotate' );
+
+				break;
+
+			case editor.config.getKey( 'controls/scale' ): // Scaling transform mode
+
+				editor.signals.transformModeChanged.dispatch( 'scale' );
+
+				break;
+
+		}
+
+	}, false );
 
 	return container;
 
