@@ -67,8 +67,12 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
+				var userHead = new THREE.Group();
+				userHead.position.set( 0, 1.6, 0 );
+				scene.add( userHead );
+
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
-				scene.add( camera );
+				userHead.add( camera );
 
 				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
 				var material = new THREE.MeshStandardMaterial( {
@@ -129,7 +133,6 @@
 				renderer.gammaOutput = true;
 				renderer.shadowMap.enabled = true;
 				renderer.vr.enabled = true;
-				renderer.vr.standing = true;
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( WEBVR.createButton( renderer ) );

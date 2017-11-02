@@ -310,7 +310,6 @@ var files = {
 		"webvr_video",
 		"webvr_vive",
 		"webvr_vive_dragging",
-		"webvr_vive_camerarig",
 		"webvr_vive_paint",
 		"webvr_vive_sculpt"
 	],
