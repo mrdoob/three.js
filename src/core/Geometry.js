@@ -224,8 +224,8 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
-		var skinIndex = attributes.skinIndex !== undefined ? attributes.skinIndex.array : undefined;
-		var skinWeight = attributes.skinWeight !== undefined ? attributes.skinWeight.array : undefined;
+		var skinIndices = attributes.skinIndex !== undefined ? attributes.skinIndex.array : undefined;
+		var skinWeights = attributes.skinWeight !== undefined ? attributes.skinWeight.array : undefined;
 
 		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
 
@@ -261,15 +261,15 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 			}
 
-			if ( skinIndex !== undefined ) {
+			if ( skinIndices !== undefined ) {
 
-				scope.skinIndices.push( new Vector4( skinIndex[ k ], skinIndex[ k + 1 ], skinIndex[ k + 2 ], skinIndex[ k + 3 ] ) );
+				scope.skinIndices.push( new Vector4( skinIndices[ k ], skinIndices[ k + 1 ], skinIndices[ k + 2 ], skinIndices[ k + 3 ] ) );
 
 			}
 
-			if ( skinWeight !== undefined ) {
+			if ( skinWeights !== undefined ) {
 
-				scope.skinWeights.push( new Vector4( skinWeight[ k ], skinWeight[ k + 1 ], skinWeight[ k + 2 ], skinWeight[ k + 3 ] ) );
+				scope.skinWeights.push( new Vector4( skinWeights[ k ], skinWeights[ k + 1 ], skinWeights[ k + 2 ], skinWeights[ k + 3 ] ) );
 
 			}
 
