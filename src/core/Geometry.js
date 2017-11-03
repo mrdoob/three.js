@@ -3,9 +3,10 @@ import { Face3 } from './Face3.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { Sphere } from '../math/Sphere.js';
 import { Box3 } from '../math/Box3.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Matrix4 } from '../math/Matrix4.js';
 import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector4 } from '../math/Vector4.js';
+import { Matrix4 } from '../math/Matrix4.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from './Object3D.js';
 import { _Math } from '../math/Math.js';
@@ -223,6 +224,8 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
+		var skinIndex = attributes.skinIndex !== undefined ? attributes.skinIndex.array : undefined;
+		var skinWeight = attributes.skinWeight !== undefined ? attributes.skinWeight.array : undefined;
 
 		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
 
@@ -230,7 +233,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		var tempUVs = [];
 		var tempUVs2 = [];
 
-		for ( var i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
+		for ( var i = 0, j = 0, k = 0; i < positions.length; i += 3, j += 2, k += 4 ) {
 
 			scope.vertices.push( new Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] ) );
 
@@ -255,6 +258,18 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 			if ( uvs2 !== undefined ) {
 
 				tempUVs2.push( new Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
+
+			}
+
+			if ( skinIndex !== undefined ) {
+
+				scope.skinIndices.push( new Vector4( skinIndex[ k ], skinIndex[ k + 1 ], skinIndex[ k + 2 ], skinIndex[ k + 3 ] ) );
+
+			}
+
+			if ( skinWeight !== undefined ) {
+
+				scope.skinWeights.push( new Vector4( skinWeight[ k ], skinWeight[ k + 1 ], skinWeight[ k + 2 ], skinWeight[ k + 3 ] ) );
 
 			}
 
