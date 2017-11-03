@@ -2242,13 +2242,13 @@ THREE.GLTFLoader = ( function () {
 
 		// Nothing in the node definition indicates whether it is a Bone or an
 		// Object3D. Use the skins' joint references to mark bones.
-		for ( var i =  0; i < skins.length; i ++ ) {
+		for ( var skinIndex =  0; skinIndex < skins.length; skinIndex ++ ) {
 
-			var joints = skins[ i ].joints;
+			var joints = skins[ skinIndex ].joints;
 
-			for ( var j = 0; j < joints.length; ++ j ) {
+			for ( var i = 0; i < joints.length; ++ i ) {
 
-				nodes[ joints[ j ] ].isBone = true;
+				nodes[ joints[ i ] ].isBone = true;
 
 			}
 
@@ -2259,9 +2259,9 @@ THREE.GLTFLoader = ( function () {
 		// references and rename instances below.
 		//
 		// Example: CesiumMilkTruck sample model reuses "Wheel" meshes.
-		for ( var i =  0; i < nodes.length; i ++ ) {
+		for ( var nodeIndex =  0; nodeIndex < nodes.length; nodeIndex ++ ) {
 
-			var nodeDef = nodes[ i ];
+			var nodeDef = nodes[ nodeIndex ];
 
 			if ( nodeDef.mesh !== undefined ) {
 
