@@ -1197,7 +1197,7 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		if ( vr.enabled ) {
+		if ( vr.enabled && vr.autoSubmitFrame ) {
 
 			vr.submitFrame();
 

@@ -79,9 +79,9 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		var pass, i, il = this.passes.length;
 
-		var currentSubmitFrameEnabled = this.renderer.vr.submitFrameEnabled;
+		var currentAutoSubmitFrame = this.renderer.vr.autoSubmitFrame;
 
-		this.renderer.vr.submitFrameEnabled = false;
+		this.renderer.vr.autoSubmitFrame = false;
 
 		for ( i = 0; i < il; i ++ ) {
 
@@ -132,7 +132,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		}
 
-		this.renderer.vr.submitFrameEnabled = currentSubmitFrameEnabled;
+		this.renderer.vr.autoSubmitFrame = currentAutoSubmitFrame;
 
 	},
 
