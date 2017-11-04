@@ -306,8 +306,6 @@ var files = {
 		"webvr_gearvr",
 		"webvr_panorama",
 		"webvr_postprocessing",
-		"webvr_postprocessing2",
-		"webvr_postprocessing3",
 		"webvr_rollercoaster",
 		"webvr_sandbox",
 		"webvr_video",
