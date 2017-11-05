@@ -37,5 +37,4 @@ QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.
 
 } );
 
-
 export { QuaternionKeyframeTrack };
