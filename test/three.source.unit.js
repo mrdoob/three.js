@@ -73,7 +73,6 @@ import './unit/src/extras/core/CurvePath.tests';
 import './unit/src/extras/core/Font.tests';
 import './unit/src/extras/core/Interpolations.tests';
 import './unit/src/extras/core/Path.tests';
-import './unit/src/extras/core/PathPrototype.tests';
 import './unit/src/extras/core/Shape.tests';
 import './unit/src/extras/core/ShapePath.tests';
 
