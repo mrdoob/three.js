@@ -35,5 +35,4 @@ BooleanKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.pro
 
 } );
 
-
 export { BooleanKeyframeTrack };
