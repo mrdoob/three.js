@@ -26,13 +26,8 @@ import { AnimationUtils } from './AnimationUtils.js';
 
 function KeyframeTrack( name, times, values, interpolation ) {
 
-	if ( name === undefined ) throw new Error( 'track name is undefined' );
-
-	if ( times === undefined || times.length === 0 ) {
-
-		throw new Error( 'no keyframes in track named ' + name );
-
-	}
+	if ( name === undefined ) throw new Error( 'THREE.KeyframeTrack: track name is undefined' );
+	if ( times === undefined || times.length === 0 ) throw new Error( 'THREE.KeyframeTrack: no keyframes in track named ' + name );
 
 	this.name = name;
 
@@ -57,7 +52,7 @@ Object.assign( KeyframeTrack, {
 
 		if ( json.type === undefined ) {
 
-			throw new Error( 'track type undefined, can not parse' );
+			throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
 
 		}
 
@@ -164,7 +159,7 @@ Object.assign( KeyframeTrack, {
 
 		}
 
-		throw new Error( 'Unsupported typeName: ' + typeName );
+		throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
 
 	}
 
@@ -244,7 +239,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 			}
 
-			console.warn( 'THREE.KeyframeTrackPrototype:', message );
+			console.warn( 'THREE.KeyframeTrack:', message );
 			return;
 
 		}
@@ -363,7 +358,7 @@ Object.assign( KeyframeTrack.prototype, {
 		var valueSize = this.getValueSize();
 		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
 
-			console.error( 'THREE.KeyframeTrackPrototype: Invalid value size in track.', this );
+			console.error( 'THREE.KeyframeTrack: Invalid value size in track.', this );
 			valid = false;
 
 		}
@@ -375,7 +370,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 		if ( nKeys === 0 ) {
 
-			console.error( 'THREE.KeyframeTrackPrototype: Track is empty.', this );
+			console.error( 'THREE.KeyframeTrack: Track is empty.', this );
 			valid = false;
 
 		}
@@ -388,7 +383,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
 
-				console.error( 'THREE.KeyframeTrackPrototype: Time is not a valid number.', this, i, currTime );
+				console.error( 'THREE.KeyframeTrack: Time is not a valid number.', this, i, currTime );
 				valid = false;
 				break;
 
@@ -396,7 +391,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 			if ( prevTime !== null && prevTime > currTime ) {
 
-				console.error( 'THREE.KeyframeTrackPrototype: Out of order keys.', this, i, currTime, prevTime );
+				console.error( 'THREE.KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
 				valid = false;
 				break;
 
@@ -416,7 +411,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 					if ( isNaN( value ) ) {
 
-						console.error( 'THREE.KeyframeTrackPrototype: Value is not a valid number.', this, i, value );
+						console.error( 'THREE.KeyframeTrack: Value is not a valid number.', this, i, value );
 						valid = false;
 						break;
 
