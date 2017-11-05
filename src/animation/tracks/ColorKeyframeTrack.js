@@ -26,11 +26,9 @@ ColorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.proto
 
 	// DefaultInterpolation is inherited
 
-
 	// Note: Very basic implementation and nothing special yet.
 	// However, this is the place for color space parameterization.
 
 } );
-
 
 export { ColorKeyframeTrack };
