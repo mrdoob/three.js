@@ -29,6 +29,8 @@ function Path( points ) {
 
 Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
 
+	constructor: Path,
+
 	setFromPoints: function ( points ) {
 
 		this.moveTo( points[ 0 ].x, points[ 0 ].y );
