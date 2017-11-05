@@ -28,5 +28,4 @@ VectorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prot
 
 } );
 
-
 export { VectorKeyframeTrack };
