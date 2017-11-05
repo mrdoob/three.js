@@ -1482,7 +1482,28 @@ THREE.GLTFLoader = ( function () {
 
 		return _each( json.accessors, function ( accessor ) {
 
-			return parser.getDependency( 'bufferView', accessor.bufferView ).then( function ( bufferView ) {
+			var pendingBufferViews = [];
+
+			if ( accessor.bufferView !== undefined ) {
+
+				pendingBufferViews.push( parser.getDependency( 'bufferView', accessor.bufferView ) );
+
+			} else {
+
+				pendingBufferViews.push( null );
+
+			}
+
+			if ( accessor.sparse !== undefined ) {
+
+				pendingBufferViews.push( parser.getDependency( 'bufferView', accessor.sparse.indices.bufferView ) );
+				pendingBufferViews.push( parser.getDependency( 'bufferView', accessor.sparse.values.bufferView ) );
+
+			}
+
+			return Promise.all( pendingBufferViews ).then( function ( bufferViews ) {
+
+				var bufferView = bufferViews[ 0 ];
 
 				var itemSize = WEBGL_TYPE_SIZES[ accessor.type ];
 				var TypedArray = WEBGL_COMPONENT_TYPES[ accessor.componentType ];
@@ -1492,7 +1513,7 @@ THREE.GLTFLoader = ( function () {
 				var itemBytes = elementBytes * itemSize;
 				var byteStride = json.bufferViews[ accessor.bufferView ].byteStride;
 				var normalized = accessor.normalized === true;
-				var array;
+				var array, bufferAttribute;
 
 				// The buffer is not interleaved if the stride is the item size in bytes.
 				if ( byteStride && byteStride !== itemBytes ) {
@@ -1503,15 +1524,54 @@ THREE.GLTFLoader = ( function () {
 					// Integer parameters to IB/IBA are in array elements, not bytes.
 					var ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
 
-					return new THREE.InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes, normalized );
+					bufferAttribute = new THREE.InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes, normalized );
 
 				} else {
 
-					array = new TypedArray( bufferView, accessor.byteOffset, accessor.count * itemSize );
+					if ( bufferView === null ) {
 
-					return new THREE.BufferAttribute( array, itemSize, normalized );
+						array = new TypedArray( accessor.count * itemSize );
+
+					} else {
+
+						array = new TypedArray( bufferView, accessor.byteOffset, accessor.count * itemSize );
+
+					}
+
+					bufferAttribute = new THREE.BufferAttribute( array, itemSize, normalized );
 
 				}
+
+				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#sparse-accessors
+				if ( accessor.sparse !== undefined ) {
+
+					var TypedIndicesArray = WEBGL_COMPONENT_TYPES[ accessor.sparse.indices.componentType ];
+
+					var sparseIndices = new TypedIndicesArray( bufferViews[ 1 ] );
+					var sparseValues = new TypedArray( bufferViews[ 2 ] );
+
+					if ( bufferView !== null ) {
+
+						// Avoid modifying the original ArrayBuffer, if the bufferView wasn't initialized with zeroes.
+						bufferAttribute.setArray( bufferAttribute.array.slice() );
+
+					}
+
+					for ( var i = 0; i < sparseIndices.length; i++ ) {
+
+						var index = sparseIndices[ i ];
+
+						bufferAttribute.setX( index, sparseValues[ i * itemSize ] );
+						if ( itemSize >= 2 ) bufferAttribute.setY( index, sparseValues[ i * itemSize + 1 ] );
+						if ( itemSize >= 3 ) bufferAttribute.setZ( index, sparseValues[ i * itemSize + 2 ] );
+						if ( itemSize >= 4 ) bufferAttribute.setW( index, sparseValues[ i * itemSize + 3 ] );
+						if ( itemSize >= 5 ) throw new Error( 'THREE.GLTFLoader: Unsupported itemSize in sparse BufferAttribute.' );
+
+					}
+
+				}
+
+				return bufferAttribute;
 
 			} );
 
