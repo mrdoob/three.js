@@ -539,10 +539,10 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	}
 
 	gl.linkProgram( program );
-	// seems like intel drivers like to report string fill with spaces.
-	var programLog = gl.getProgramInfoLog( program ).trim();
-	var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-	var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+
+	var programLog = gl.getProgramInfoLog( program ).replace(/\0/g, '').trim();
+	var vertexLog = gl.getShaderInfoLog( glVertexShader ).replace(/\0/g, '').trim();
+	var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).replace(/\0/g, '').trim();
 
 	var runnable = true;
 	var haveDiagnostics = true;
