@@ -42,6 +42,106 @@ THREE.MTLLoader.prototype = {
 	},
 
 	/**
+	 * Loads a MTL asset from files (MTL file + optional map files)
+	 *
+	 * @param {Array} files - An array of Files, MTL + optional map files (File API)
+	 * @param {Function} [onLoad] - Callback invoked with the loaded object.
+	 * @param {Function} [onError] - Callback for errors.
+	 *
+	 */
+	loadByFiles: function ( files, onLoad, onError ) {
+
+		var scope = this;
+		var mtlFile;
+		var file;
+
+		var filesToLoad = 0;
+		var filesLoaded = 0;
+
+		scope.filemap = {};
+
+		for ( var i = 0; i < files.length; i ++ ) {
+
+			file = files[ i ];
+
+			if ( file.name.substr( - 4, 4 ) === '.mtl' ) { // file ends with '.mtl'
+
+				mtlFile = file;
+
+			} else {
+
+				scope.filemap[ file.name ] = file;
+
+			}
+
+		}
+
+		filesToLoad = Object.keys( scope.filemap ).length;
+
+		try {
+
+			// Map the files to their name
+			if ( filesToLoad > 0 ) {
+
+				var readFile = function ( name ) {
+
+					var reader = new FileReader();
+					reader.onload = function ( event ) {
+
+						var dataUrl = event.target.result;
+						scope.filemap[ name ] = dataUrl;
+						filesLoaded ++;
+
+						if ( filesLoaded === filesToLoad ) {
+
+							scope.readMTLFile( mtlFile, onLoad );
+
+						}
+
+					};
+
+					reader.readAsDataURL( scope.filemap[ name ] );
+
+				};
+
+				for ( var f in scope.filemap ) {
+
+					readFile( f );
+
+				}
+
+			} else {
+
+				scope.readMTLFile( mtlFile, onLoad );
+
+			}
+
+		} catch ( error ) {
+
+			onError( error );
+
+		}
+
+	},
+
+	readMTLFile: function ( mtlFile, onLoad ) {
+
+		var scope = this;
+
+		var mtlReader = new FileReader();
+
+		mtlReader.onload = function ( event ) {
+
+			var text = event.target.result;
+			onLoad( scope.parse( text ) );
+
+		};
+
+		mtlReader.readAsText( mtlFile );
+
+	},
+
+	/**
 	 * Set base path for resolving references.
 	 * If set this path will be prepended to each loaded and found reference.
 	 *
@@ -151,7 +251,15 @@ THREE.MTLLoader.prototype = {
 
 				} else {
 
-					info[ key ] = value;
+					if ( this.filemap && this.filemap[ value ] ) {
+
+						info[ key ] = this.filemap[ value ]; // We have a file (Data URL) for this value
+
+					} else {
+
+						info[ key ] = value;
+
+					}
 
 				}
 
@@ -367,9 +475,37 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		function setMapForType( mapType, value ) {
 
 			if ( params[ mapType ] ) return; // Keep the first encountered texture
+			var map;
+			var texParams = {
+				offset: {
+					x: 0,
+					y: 0
+				},
+				scale: {
+					x: 1,
+					y: 1
+				}
+			};
 
-			var texParams = scope.getTextureParams( value, params );
-			var map = scope.loadTexture( resolveURL( scope.baseUrl, texParams.url ) );
+			if ( value.substr( 0, 11 ) === 'data:image/' ) { // Data URL
+
+				var img = new Image();
+				map = new THREE.Texture( img );
+
+				img.onload = function () {
+
+					map.needsUpdate = true;
+
+				};
+
+				img.src = value;
+
+			} else { // URL
+
+				texParams = scope.getTextureParams( value, params );
+				map = scope.loadTexture( resolveURL( scope.baseUrl, texParams.url ) );
+
+			}
 
 			map.repeat.copy( texParams.scale );
 			map.offset.copy( texParams.offset );
