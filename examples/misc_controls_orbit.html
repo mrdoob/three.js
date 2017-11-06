@@ -88,8 +88,9 @@
 			var clock = new THREE.Clock();
 
 			init();
-			// render();
-			animate(); // remove when using previous line for animation loop (requestAnimationFrame)
+
+			// render(); // add this when using controls.addEventListener( 'change', render ) for animation loop
+			animate(); // remove when using event listener for animation loop
 
 			function init() {
 
@@ -110,13 +111,18 @@
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-				// only update the scene when controls change - this can be used to increase performance
-				// but is only suitable if the scene is static (not updated each frame)
+				// for static scenes this method can be used instead of animate() to control the render loop
 				// controls.addEventListener( 'change', render );
 
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = 0.05;
+
+				controls.rotateSpeed = 0.25;
+
 				controls.enableDamping = true;
-				controls.dampingFactor = 0.25;
+				controls.dampingFactor = 0.1;
 				// controls.enableZoom = false;
+				// controls.enablePan = false;
 
 				dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( -1, 0, 1 ).normalize();
@@ -275,24 +281,6 @@
 				meshPlanet.rotation.y += rotationSpeed * delta;
 				meshClouds.rotation.y += 1.25 * rotationSpeed * delta;
 
-				// slow down as we approach the surface
-
-				dPlanet = camera.position.length();
-
-				dMoonVec.subVectors( camera.position, meshMoon.position );
-				dMoon = dMoonVec.length();
-
-				if ( dMoon < dPlanet ) {
-
-					d = ( dMoon - radius * moonScale * 1.01 );
-
-				} else {
-
-					d = ( dPlanet - radius * 1.01 );
-
-				}
-
-				controls.movementSpeed = 0.33 * d;
 				controls.update( delta );
 
 				composer.render( delta );
