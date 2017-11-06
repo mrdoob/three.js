@@ -46,15 +46,6 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FilmShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -234,18 +225,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				// postprocessing
-
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectFilm = new THREE.FilmPass( 0.35, 0.75, 2048, false );
-
-				effectFilm.renderToScreen = true;
-
-				composer = new THREE.EffectComposer( renderer );
-
-				composer.addPass( renderModel );
-				composer.addPass( effectFilm );
-
 			}
 
 			function onWindowResize( event ) {
@@ -283,7 +262,7 @@
 
 				controls.update( delta );
 
-				composer.render( delta );
+				renderer.render( scene, camera );
 
 			}
 
