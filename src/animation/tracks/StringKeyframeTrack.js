@@ -1,3 +1,7 @@
+import { InterpolateDiscrete } from '../../constants.js';
+import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype.js';
+import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor.js';
+
 /**
  *
  * A Track that interpolates Strings
@@ -8,24 +12,26 @@
  * @author tschw
  */
 
-THREE.StringKeyframeTrack = function ( name, times, values, interpolation ) {
+function StringKeyframeTrack( name, times, values, interpolation ) {
 
-	THREE.KeyframeTrack.call( this, name, times, values, interpolation );
+	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-};
+}
 
-THREE.StringKeyframeTrack.prototype =
-		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+StringKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrackPrototype ), {
 
-	constructor: THREE.StringKeyframeTrack,
+	constructor: StringKeyframeTrack,
 
 	ValueTypeName: 'string',
 	ValueBufferType: Array,
 
-	DefaultInterpolation: THREE.InterpolateDiscrete,
+	DefaultInterpolation: InterpolateDiscrete,
 
 	InterpolantFactoryMethodLinear: undefined,
 
 	InterpolantFactoryMethodSmooth: undefined
 
 } );
+
+
+export { StringKeyframeTrack };

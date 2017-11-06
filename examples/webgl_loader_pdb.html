@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<title>three.js webgl - molecules</title>
 		<meta charset="utf-8">
@@ -69,12 +69,12 @@
 		<script src="js/renderers/CSS2DRenderer.js"></script>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js webgl</a> - molecules</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - molecules</div>
 		<div id="menu"></div>
 
 		<script>
 
-			var camera, scene, renderer, labelsRenderer;
+			var camera, scene, renderer, labelRenderer;
 			var controls;
 
 			var root;
@@ -96,13 +96,12 @@
 				"Salt": "nacl.pdb",
 				"YBCO superconductor": "ybco.pdb",
 				"Buckyball": "buckyball.pdb",
-				//"Diamond": "diamond.pdb",
 				"Graphite": "graphite.pdb"
 			};
 
 			var loader = new THREE.PDBLoader();
 
-			var menu = document.getElementById( "menu" );
+			var menu = document.getElementById( 'menu' );
 
 			init();
 			animate();
@@ -110,6 +109,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1000;
@@ -129,7 +129,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x050505 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
@@ -149,7 +148,7 @@
 
 				//
 
-				loadMolecule( "models/molecules/caffeine.pdb" );
+				loadMolecule( 'models/molecules/caffeine.pdb' );
 				createMenu();
 
 				//
@@ -178,7 +177,7 @@
 					button.innerHTML = m;
 					menu.appendChild( button );
 
-					var url = "models/molecules/" +  MOLECULES[ m ];
+					var url = 'models/molecules/' +  MOLECULES[ m ];
 
 					button.addEventListener( 'click', generateButtonCallback( url ), false );
 
@@ -197,19 +196,33 @@
 
 				}
 
-				loader.load( url, function ( geometry, geometryBonds, json ) {
+				loader.load( url, function ( pdb ) {
 
-					var boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-					var sphereGeometry = new THREE.IcosahedronGeometry( 1, 2 );
+					var geometryAtoms = pdb.geometryAtoms;
+					var geometryBonds = pdb.geometryBonds;
+					var json = pdb.json;
 
-					var offset = geometry.center();
+					var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+					var sphereGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
+
+					var offset = geometryAtoms.center();
 					geometryBonds.translate( offset.x, offset.y, offset.z );
 
-					for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+					var positions = geometryAtoms.getAttribute( 'position' );
+					var colors = geometryAtoms.getAttribute( 'color' );
 
-						var position = geometry.vertices[ i ];
-						var color = geometry.colors[ i ];
-						var element = geometry.elements[ i ];
+					var position = new THREE.Vector3();
+					var color = new THREE.Color();
+
+					for ( var i = 0; i < positions.count; i ++ ) {
+
+						position.x = positions.getX( i );
+						position.y = positions.getY( i );
+						position.z = positions.getZ( i );
+
+						color.r = colors.getX( i );
+						color.g = colors.getY( i );
+						color.b = colors.getZ( i );
 
 						var material = new THREE.MeshPhongMaterial( { color: color } );
 
@@ -232,10 +245,20 @@
 
 					}
 
-					for ( var i = 0; i < geometryBonds.vertices.length; i += 2 ) {
+					positions = geometryBonds.getAttribute( 'position' );
 
-						var start = geometryBonds.vertices[ i ];
-						var end = geometryBonds.vertices[ i + 1 ];
+					var start = new THREE.Vector3();
+					var end = new THREE.Vector3();
+
+					for ( var i = 0; i < positions.count; i += 2 ) {
+
+						start.x = positions.getX( i );
+						start.y = positions.getY( i );
+						start.z = positions.getZ( i );
+
+						end.x = positions.getX( i + 1 );
+						end.y = positions.getY( i + 1 );
+						end.z = positions.getZ( i + 1 );
 
 						start.multiplyScalar( 75 );
 						end.multiplyScalar( 75 );
@@ -250,17 +273,6 @@
 					}
 
 					render();
-
-				}, function ( xhr ) {
-
-					if ( xhr.lengthComputable ) {
-
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
-
-					}
-
-				}, function ( xhr ) {
 
 				} );
 

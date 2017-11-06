@@ -1,3 +1,5 @@
+import { Path } from './Path.js';
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Defines a 2d shape plane using paths.
@@ -9,33 +11,19 @@
 // STEP 3a - Extract points from each shape, turn to vertices
 // STEP 3b - Triangulate each shape, add faces.
 
-THREE.Shape = function () {
+function Shape( points ) {
 
-	THREE.Path.apply( this, arguments );
+	Path.call( this, points );
+
+	this.type = 'Shape';
 
 	this.holes = [];
 
-};
+}
 
-THREE.Shape.prototype = Object.assign( Object.create( THREE.Path.prototype ), {
+Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
-	constructor: THREE.Shape,
-
-	// Convenience method to return ExtrudeGeometry
-
-	extrude: function ( options ) {
-
-		return new THREE.ExtrudeGeometry( this, options );
-
-	},
-
-	// Convenience method to return ShapeGeometry
-
-	makeGeometry: function ( options ) {
-
-		return new THREE.ShapeGeometry( this, options );
-
-	},
+	constructor: Shape,
 
 	getPointsHoles: function ( divisions ) {
 
@@ -51,9 +39,9 @@ THREE.Shape.prototype = Object.assign( Object.create( THREE.Path.prototype ), {
 
 	},
 
-	// Get points of shape and holes (keypoints based on segments parameter)
+	// get points of shape and holes (keypoints based on segments parameter)
 
-	extractAllPoints: function ( divisions ) {
+	extractPoints: function ( divisions ) {
 
 		return {
 
@@ -64,10 +52,25 @@ THREE.Shape.prototype = Object.assign( Object.create( THREE.Path.prototype ), {
 
 	},
 
-	extractPoints: function ( divisions ) {
+	copy: function ( source ) {
 
-		return this.extractAllPoints( divisions );
+		Path.prototype.copy.call( this, source );
+
+		this.holes = [];
+
+		for ( var i = 0, l = source.holes.length; i < l; i ++ ) {
+
+			var hole = source.holes[ i ];
+
+			this.holes.push( hole.clone() );
+
+		}
+
+		return this;
 
 	}
 
 } );
+
+
+export { Shape };

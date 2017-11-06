@@ -37,8 +37,8 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl raymarching example -
-			reflect by <a href="https://github.com/gam0022" target="_blank">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank">article in Japanese</a>)
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raymarching example -
+			reflect by <a href="https://github.com/gam0022" target="_blank" rel="noopener">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank" rel="noopener">article in Japanese</a>)
 		</div>
 
 		<script id="fragment_shader" type="x-shader/x-fragment">
@@ -266,7 +266,7 @@
 
 				},
 				freeCamera: false,
-				resolution: '512',
+				resolution: '512'
 			};
 
 			init();
@@ -282,9 +282,9 @@
 				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
 					uniforms: {
-						resolution: { type: 'v2', value: new THREE.Vector2( 512, 512 ) },
-						cameraPos: { type: 'v3', value: camera.getWorldPosition() },
-						cameraDir: { type: 'v3', value: camera.getWorldDirection() },
+						resolution: { value: new THREE.Vector2( 512, 512 ) },
+						cameraPos:  { value: camera.getWorldPosition() },
+						cameraDir:  { value: camera.getWorldDirection() }
 					},
 					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader' ).textContent

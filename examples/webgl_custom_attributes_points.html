@@ -28,7 +28,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example - particles</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - custom attributes example - particles</div>
 		<div id="container"></div>
 
 		<script src="../build/three.js"></script>
@@ -141,9 +141,9 @@
 			var material = new THREE.ShaderMaterial( {
 
 				uniforms: {
-					amplitude: { type: "f", value: 1.0 },
-					color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-					texture:   { type: "t", value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
+					amplitude: { value: 1.0 },
+					color:     { value: new THREE.Color( 0xffffff ) },
+					texture:   { value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
 				},
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,

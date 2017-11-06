@@ -5,35 +5,32 @@ function Transition ( sceneA, sceneB ) {
 	this.cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10, 10 );
 
 	this.textures = [];
+
+	var loader = new THREE.TextureLoader();
+
 	for ( var i = 0; i < 6; i ++ )
-		this.textures[ i ] = new THREE.TextureLoader().load( 'textures/transition/transition' + ( i + 1 ) + '.png' );
+		this.textures[ i ] = loader.load( 'textures/transition/transition' + ( i + 1 ) + '.png' );
 
 	this.quadmaterial = new THREE.ShaderMaterial( {
 
 		uniforms: {
 
 			tDiffuse1: {
-				type: "t",
 				value: null
 			},
 			tDiffuse2: {
-				type: "t",
 				value: null
 			},
 			mixRatio: {
-				type: "f",
 				value: 0.0
 			},
 			threshold: {
-				type: "f",
 				value: 0.1
 			},
 			useTexture: {
-				type: "i",
-				value: 1,
+				value: 1
 			},
 			tMixTexture: {
-				type: "t",
 				value: this.textures[ 0 ]
 			}
 		},
@@ -85,7 +82,7 @@ function Transition ( sceneA, sceneB ) {
 
 	} );
 
-	quadgeometry = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+	var quadgeometry = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
 
 	this.quad = new THREE.Mesh( quadgeometry, this.quadmaterial );
 	this.scene.add( this.quad );

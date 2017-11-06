@@ -32,7 +32,7 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain + fog demo <br />(left click: forward, right click: backward)</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain + fog demo <br />(left click: forward, right click: backward)</div>
 
 		<script src="../build/three.js"></script>
 
@@ -77,9 +77,10 @@
 				controls.lookSpeed = 0.1;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xefd1b5 );
 				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
 
-				data = generateHeight( worldWidth, worldDepth );
+				var data = generateHeight( worldWidth, worldDepth );
 
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
@@ -102,7 +103,6 @@
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xefd1b5 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

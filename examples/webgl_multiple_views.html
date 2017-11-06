@@ -23,7 +23,6 @@
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
@@ -32,7 +31,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - multiple views - webgl</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple views - webgl</div>
 
 		<script src="../build/three.js"></script>
 
@@ -56,10 +55,10 @@
 			var views = [
 				{
 					left: 0,
-					bottom: 0,
+					top: 0,
 					width: 0.5,
 					height: 1.0,
-					background: new THREE.Color().setRGB( 0.5, 0.5, 0.7 ),
+					background: new THREE.Color( 0.5, 0.5, 0.7 ),
 					eye: [ 0, 300, 1800 ],
 					up: [ 0, 1, 0 ],
 					fov: 30,
@@ -71,10 +70,10 @@
 				},
 				{
 					left: 0.5,
-					bottom: 0,
+					top: 0.5,
 					width: 0.5,
 					height: 0.5,
-					background: new THREE.Color().setRGB( 0.7, 0.5, 0.5 ),
+					background: new THREE.Color( 0.7, 0.5, 0.5 ),
 					eye: [ 0, 1800, 0 ],
 					up: [ 0, 0, 1 ],
 					fov: 45,
@@ -86,10 +85,10 @@
 				},
 				{
 					left: 0.5,
-					bottom: 0.5,
+					top: 0,
 					width: 0.5,
 					height: 0.5,
-					background: new THREE.Color().setRGB( 0.5, 0.7, 0.7 ),
+					background: new THREE.Color( 0.5, 0.7, 0.7 ),
 					eye: [ 1400, 800, 1400 ],
 					up: [ 0, 1, 0 ],
 					fov: 60,
@@ -111,14 +110,11 @@
 				for (var ii =  0; ii < views.length; ++ii ) {
 
 					var view = views[ii];
-					camera = new THREE.PerspectiveCamera( view.fov, window.innerWidth / window.innerHeight, 1, 10000 );
-					camera.position.x = view.eye[ 0 ];
-					camera.position.y = view.eye[ 1 ];
-					camera.position.z = view.eye[ 2 ];
-					camera.up.x = view.up[ 0 ];
-					camera.up.y = view.up[ 1 ];
-					camera.up.z = view.up[ 2 ];
+					var camera = new THREE.PerspectiveCamera( view.fov, window.innerWidth / window.innerHeight, 1, 10000 );
+					camera.position.fromArray( view.eye );
+					camera.up.fromArray( view.up );
 					view.camera = camera;
+
 				}
 
 				scene = new THREE.Scene();
@@ -207,8 +203,8 @@
 
 				var materials = [
 
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0 } ),
-					new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } ),
+					new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } )
 
 				];
 
@@ -273,17 +269,18 @@
 
 				for ( var ii = 0; ii < views.length; ++ii ) {
 
-					view = views[ii];
-					camera = view.camera;
+					var view = views[ii];
+					var camera = view.camera;
 
 					view.updateCamera( camera, scene, mouseX, mouseY );
 
 					var left   = Math.floor( windowWidth  * view.left );
-					var bottom = Math.floor( windowHeight * view.bottom );
+					var top    = Math.floor( windowHeight * view.top );
 					var width  = Math.floor( windowWidth  * view.width );
 					var height = Math.floor( windowHeight * view.height );
-					renderer.setViewport( left, bottom, width, height );
-					renderer.setScissor( left, bottom, width, height );
+
+					renderer.setViewport( left, top, width, height );
+					renderer.setScissor( left, top, width, height );
 					renderer.setScissorTest( true );
 					renderer.setClearColor( view.background );
 
@@ -291,6 +288,7 @@
 					camera.updateProjectionMatrix();
 
 					renderer.render( scene, camera );
+
 				}
 
 			}

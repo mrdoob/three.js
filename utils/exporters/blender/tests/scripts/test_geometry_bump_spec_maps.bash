@@ -4,5 +4,5 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$DIR/setup_test_env.bash"
 
 blender --background $BLEND/planeA.blend --python $PYSCRIPT -- \
-    $JSON --vertices --faces --faceMaterials --uvs --maps --copyTextures
+    $JSON --vertices --faces --faceMaterials --uvs --maps --exportTextures --geometryType Geometry
 makereview $@ --tag $(tagname)

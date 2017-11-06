@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		An object with various functions to assist with animations, used internally.
+		</div>
+
+
+		<h2>Methods</h2>
+
+
+		<h3>[method:Array arraySlice]( array, from, to )</h3>
+		<div>
+		This is the same as  Array.prototype.slice, but also works on typed arrays.
+		</div>
+
+		<h3>[method:Array convertArray]( array, type, forceClone )</h3>
+		<div>
+		Converts an array to a specific type.
+		</div>
+
+		<h3>[method:Array flattenJSON]( jsonKeys, times, values, valuePropertyName  )</h3>
+		<div>
+		Used for parsing AOS keyframe formats.
+		</div>
+
+		<h3>[method:Array getKeyframeOrder]( times )</h3>
+		<div>
+		Returns an array by which times and values can be sorted.
+		</div>
+
+		<h3>[method:Boolean isTypedArray]( object )</h3>
+		<div>
+		Returns *true* if the object is a typed array.
+		</div>
+
+		<h3>[method:Array sortedArray]( values, stride, order )</h3>
+		<div>
+		Sorts the array previously returned by [page:AnimationUtils.getKeyframeOrder getKeyframeOrder].
+		</div>
+
+
+		<h2>Source</h2>
+
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

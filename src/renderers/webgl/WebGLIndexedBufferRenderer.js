@@ -1,8 +1,8 @@
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
+function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 	var mode;
 
@@ -12,31 +12,24 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	}
 
-	var type, size;
+	var type, bytesPerElement;
 
-	function setIndex( index ) {
+	function setIndex( value ) {
 
-		if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
-
-			type = _gl.UNSIGNED_INT;
-			size = 4;
-
-		} else {
-
-			type = _gl.UNSIGNED_SHORT;
-			size = 2;
-
-		}
+		type = value.type;
+		bytesPerElement = value.bytesPerElement;
 
 	}
 
 	function render( start, count ) {
 
-		_gl.drawElements( mode, count, type, start * size );
+		gl.drawElements( mode, count, type, start * bytesPerElement );
 
-		_infoRender.calls ++;
-		_infoRender.vertices += count;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+		infoRender.calls ++;
+		infoRender.vertices += count;
+
+		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
+		else if ( mode === gl.POINTS ) infoRender.points += count;
 
 	}
 
@@ -46,21 +39,29 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		if ( extension === null ) {
 
-			console.error( 'THREE.WebGLBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+			console.error( 'THREE.WebGLIndexedBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 			return;
 
 		}
 
-		extension.drawElementsInstancedANGLE( mode, count, type, start * size, geometry.maxInstancedCount );
+		extension.drawElementsInstancedANGLE( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
 
-		_infoRender.calls ++;
-		_infoRender.vertices += count * geometry.maxInstancedCount;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += geometry.maxInstancedCount * count / 3;
+		infoRender.calls ++;
+		infoRender.vertices += count * geometry.maxInstancedCount;
+
+		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
+		else if ( mode === gl.POINTS ) infoRender.points += geometry.maxInstancedCount * count;
+
 	}
+
+	//
 
 	this.setMode = setMode;
 	this.setIndex = setIndex;
 	this.render = render;
 	this.renderInstances = renderInstances;
 
-};
+}
+
+
+export { WebGLIndexedBufferRenderer };

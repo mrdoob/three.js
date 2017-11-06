@@ -6,36 +6,32 @@ var APP = {
 
 	Player: function () {
 
-		var scope = this;
-
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
 
-		var vr, controls, effect;
-
 		var events = {};
 
-		this.dom = undefined;
+		var dom = document.createElement( 'div' );
+
+		this.dom = dom;
 
 		this.width = 500;
 		this.height = 500;
 
 		this.load = function ( json ) {
 
-			vr = json.project.vr;
-
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 
-			if ( json.project.shadows ) {
+			var project = json.project;
 
-				renderer.shadowMap.enabled = true;
-				// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			if ( project.gammaInput ) renderer.gammaInput = true;
+			if ( project.gammaOutput ) renderer.gammaOutput = true;
+			if ( project.shadows ) renderer.shadowMap.enabled = true;
+			if ( project.vr ) renderer.vr.enabled = true;
 
-			}
-
-			this.dom = renderer.domElement;
+			dom.appendChild( renderer.domElement );
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -115,39 +111,9 @@ var APP = {
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
 
-			if ( vr === true ) {
+			if ( renderer.vr.enabled ) {
 
-				if ( camera.parent === null ) {
-
-					// camera needs to be in the scene so camera2 matrix updates
-
-					scene.add( camera );
-
-				}
-
-				var camera2 = camera.clone();
-				camera.add( camera2 );
-
-				camera = camera2;
-
-				controls = new THREE.VRControls( camera );
-				effect = new THREE.VREffect( renderer );
-
-				document.addEventListener( 'keyup', function ( event ) {
-
-					switch ( event.keyCode ) {
-						case 90:
-							controls.zeroSensor();
-							break;
-					}
-
-				} );
-
-				this.dom.addEventListener( 'dblclick', function () {
-
-					effect.setFullScreen( true );
-
-				} );
+				dom.appendChild( WEBVR.createButton( renderer ) );
 
 			}
 
@@ -161,15 +127,21 @@ var APP = {
 
 		this.setSize = function ( width, height ) {
 
-			if ( renderer._fullScreen ) return;
-
 			this.width = width;
 			this.height = height;
 
-			camera.aspect = this.width / this.height;
-			camera.updateProjectionMatrix();
+			if ( camera ) {
 
-			renderer.setSize( width, height );
+				camera.aspect = this.width / this.height;
+				camera.updateProjectionMatrix();
+
+			}
+
+			if ( renderer ) {
+
+				renderer.setSize( width, height );
+
+			}
 
 		};
 
@@ -183,11 +155,9 @@ var APP = {
 
 		}
 
-		var prevTime, request;
+		var prevTime;
 
 		function animate( time ) {
-
-			request = requestAnimationFrame( animate );
 
 			try {
 
@@ -199,22 +169,15 @@ var APP = {
 
 			}
 
-			if ( vr === true ) {
-
-				controls.update();
-				effect.render( scene, camera );
-
-			} else {
-
-				renderer.render( scene, camera );
-
-			}
+			renderer.render( scene, camera );
 
 			prevTime = time;
 
 		}
 
 		this.play = function () {
+
+			prevTime = performance.now();
 
 			document.addEventListener( 'keydown', onDocumentKeyDown );
 			document.addEventListener( 'keyup', onDocumentKeyUp );
@@ -227,8 +190,7 @@ var APP = {
 
 			dispatch( events.start, arguments );
 
-			request = requestAnimationFrame( animate );
-			prevTime = performance.now();
+			renderer.animate( animate );
 
 		};
 
@@ -245,7 +207,23 @@ var APP = {
 
 			dispatch( events.stop, arguments );
 
-			cancelAnimationFrame( request );
+			renderer.animate( null );
+
+		};
+
+		this.dispose = function () {
+
+			while ( dom.children.length ) {
+
+				dom.removeChild( dom.firstChild );
+
+			}
+
+			renderer.dispose();
+
+			camera = undefined;
+			scene = undefined;
+			renderer = undefined;
 
 		};
 

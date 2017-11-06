@@ -1,22 +1,24 @@
+import { LinearFilter } from '../constants.js';
+import { FileLoader } from './FileLoader.js';
+import { CompressedTexture } from '../textures/CompressedTexture.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  *
  * Abstract Base class to block based textures loader (dds, pvr, ...)
  */
 
-THREE.CompressedTextureLoader = function ( manager ) {
+function CompressedTextureLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 	// override in sub classes
 	this._parser = null;
 
-};
+}
 
-
-THREE.CompressedTextureLoader.prototype = {
-
-	constructor: THREE.CompressedTextureLoader,
+Object.assign( CompressedTextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -24,10 +26,10 @@ THREE.CompressedTextureLoader.prototype = {
 
 		var images = [];
 
-		var texture = new THREE.CompressedTexture();
+		var texture = new CompressedTexture();
 		texture.image = images;
 
-		var loader = new THREE.XHRLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 
@@ -49,7 +51,7 @@ THREE.CompressedTextureLoader.prototype = {
 				if ( loaded === 6 ) {
 
 					if ( texDatas.mipmapCount === 1 )
-						texture.minFilter = THREE.LinearFilter;
+						texture.minFilter = LinearFilter;
 
 					texture.format = texDatas.format;
 					texture.needsUpdate = true;
@@ -86,7 +88,7 @@ THREE.CompressedTextureLoader.prototype = {
 
 					for ( var f = 0; f < faces; f ++ ) {
 
-						images[ f ] = { mipmaps : [] };
+						images[ f ] = { mipmaps: [] };
 
 						for ( var i = 0; i < texDatas.mipmapCount; i ++ ) {
 
@@ -109,7 +111,7 @@ THREE.CompressedTextureLoader.prototype = {
 
 				if ( texDatas.mipmapCount === 1 ) {
 
-					texture.minFilter = THREE.LinearFilter;
+					texture.minFilter = LinearFilter;
 
 				}
 
@@ -129,7 +131,11 @@ THREE.CompressedTextureLoader.prototype = {
 	setPath: function ( value ) {
 
 		this.path = value;
+		return this;
 
 	}
 
-};
+} );
+
+
+export { CompressedTextureLoader };

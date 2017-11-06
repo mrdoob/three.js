@@ -14,6 +14,7 @@ uniform float opacity;
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <aomap_pars_fragment>
+#include <lightmap_pars_fragment>
 #include <envmap_pars_fragment>
 #include <fog_pars_fragment>
 #include <specularmap_pars_fragment>
@@ -33,13 +34,23 @@ void main() {
 	#include <alphatest_fragment>
 	#include <specularmap_fragment>
 
-	ReflectedLight reflectedLight;
-	reflectedLight.directDiffuse = vec3( 0.0 );
-	reflectedLight.directSpecular = vec3( 0.0 );
-	reflectedLight.indirectDiffuse = diffuseColor.rgb;
-	reflectedLight.indirectSpecular = vec3( 0.0 );
+	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
 
+	// accumulation (baked indirect lighting only)
+	#ifdef USE_LIGHTMAP
+
+		reflectedLight.indirectDiffuse += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
+
+	#else
+
+		reflectedLight.indirectDiffuse += vec3( 1.0 );
+
+	#endif
+
+	// modulation
 	#include <aomap_fragment>
+
+	reflectedLight.indirectDiffuse *= diffuseColor.rgb;
 
 	vec3 outgoingLight = reflectedLight.indirectDiffuse;
 

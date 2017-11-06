@@ -39,8 +39,8 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl bump mapping without tangents using <a href="http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html">Morten Mikkelsen's</a> method -
-			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a> head
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl bump mapping without tangents using <a href="http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html">Morten Mikkelsen's</a> method -
+			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -85,6 +85,7 @@
 				camera.position.z = 1200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x060708 );
 
 				// LIGHTS
 
@@ -111,12 +112,6 @@
 
 				var mapHeight = new THREE.TextureLoader().load( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
-				mapHeight.anisotropy = 4;
-				mapHeight.repeat.set( 0.998, 0.998 );
-				mapHeight.offset.set( 0.001, 0.001 );
-				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
-				mapHeight.format = THREE.RGBFormat;
-
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0x552811,
 					specular: 0x222222,
@@ -129,7 +124,6 @@
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x060708 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -176,12 +170,9 @@
 
 			function onWindowResize( event ) {
 
-				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight;
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 			}

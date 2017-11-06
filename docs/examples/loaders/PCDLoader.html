@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for loading a <em>.pcd</em> resource. <br />
+		Point Cloud Data is a file format for <a href="https://en.wikipedia.org/wiki/Point_Cloud_Library">Point Cloud Library</a>. <br />
+		Loader support ascii and binary. Compressed binary files are not supported.
+		</div>
+
+		<h2>Example</h2>
+
+		<code>
+
+		// instantiate a loader
+		var loader = new THREE.PCDLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'pointcloud.pcd',
+			// called when the resource is loaded
+			function ( mesh ) {
+
+				scene.add( mesh );
+
+			},
+			// called when loading is in progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+		[example:webgl_loader_pcd]
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>[page:Boolean littleEndian]</h3>
+		<div>
+		Default value is true.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — A string containing the path/URL of the <em>.pcd</em> file.<br />
+		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
+		</div>
+		<div>
+		Begin loading from url and call onLoad with the parsed response content.
+		</div>
+
+		<h3>[method:Object3D parse]( [page:Arraybuffer data],[page:String url] )</h3>
+		<div>
+		[page:Arraybuffer data] — The binary structure to parse.
+		</div>
+		<div>
+		[page:String url] — The file name or file url.
+		</div>
+		<div>
+		Parse an <em>pcd</em> binary structure and return an [page:Object3D].<br />
+		The object is converted to [page:Points] with a [page:BufferGeometry] and a [page:PointsMaterial].
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/PCDLoader.js examples/js/loaders/PCDLoader.js]
+	</body>
+</html>

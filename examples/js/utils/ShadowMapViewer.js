@@ -39,7 +39,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		x: 10,
 		y: 10,
 		width: 256,
-		height: 256,
+		height: 256
 	};
 
 	var camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10 );
@@ -170,7 +170,9 @@ THREE.ShadowMapViewer = function ( light ) {
 			 camera.right = window.innerWidth / 2;
 			 camera.top = window.innerHeight / 2;
 			 camera.bottom = window.innerHeight / - 2;
+			 camera.updateProjectionMatrix();
 
+			 this.update();
 		}
 
 	};

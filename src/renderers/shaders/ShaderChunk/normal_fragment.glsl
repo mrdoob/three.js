@@ -12,7 +12,7 @@
 
 	#ifdef DOUBLE_SIDED
 
-		normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );
+		normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 
 	#endif
 

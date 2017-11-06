@@ -1,35 +1,62 @@
+import { Vector4 } from '../math/Vector4.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Color } from '../math/Color.js';
+import { _Math } from '../math/Math.js';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferAttribute = function ( array, itemSize, normalized ) {
+function BufferAttribute( array, itemSize, normalized ) {
 
-	this.uuid = THREE.Math.generateUUID();
+	if ( Array.isArray( array ) ) {
+
+		throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+	}
+
+	this.uuid = _Math.generateUUID();
+	this.name = '';
 
 	this.array = array;
 	this.itemSize = itemSize;
+	this.count = array !== undefined ? array.length / itemSize : 0;
+	this.normalized = normalized === true;
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
 
+	this.onUploadCallback = function () {};
+
 	this.version = 0;
-	this.normalized = normalized === true;
 
-};
+}
 
-THREE.BufferAttribute.prototype = {
+Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
 
-	constructor: THREE.BufferAttribute,
-
-	get count() {
-
-		return this.array.length / this.itemSize;
-
-	},
-
-	set needsUpdate( value ) {
+	set: function ( value ) {
 
 		if ( value === true ) this.version ++;
+
+	}
+
+} );
+
+Object.assign( BufferAttribute.prototype, {
+
+	isBufferAttribute: true,
+
+	setArray: function ( array ) {
+
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		this.count = array !== undefined ? array.length / this.itemSize : 0;
+		this.array = array;
 
 	},
 
@@ -45,6 +72,8 @@ THREE.BufferAttribute.prototype = {
 
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
+		this.count = source.count;
+		this.normalized = source.normalized;
 
 		this.dynamic = source.dynamic;
 
@@ -86,7 +115,7 @@ THREE.BufferAttribute.prototype = {
 			if ( color === undefined ) {
 
 				console.warn( 'THREE.BufferAttribute.copyColorsArray(): color is undefined', i );
-				color = new THREE.Color();
+				color = new Color();
 
 			}
 
@@ -129,7 +158,7 @@ THREE.BufferAttribute.prototype = {
 			if ( vector === undefined ) {
 
 				console.warn( 'THREE.BufferAttribute.copyVector2sArray(): vector is undefined', i );
-				vector = new THREE.Vector2();
+				vector = new Vector2();
 
 			}
 
@@ -153,7 +182,7 @@ THREE.BufferAttribute.prototype = {
 			if ( vector === undefined ) {
 
 				console.warn( 'THREE.BufferAttribute.copyVector3sArray(): vector is undefined', i );
-				vector = new THREE.Vector3();
+				vector = new Vector3();
 
 			}
 
@@ -178,7 +207,7 @@ THREE.BufferAttribute.prototype = {
 			if ( vector === undefined ) {
 
 				console.warn( 'THREE.BufferAttribute.copyVector4sArray(): vector is undefined', i );
-				vector = new THREE.Vector4();
+				vector = new Vector4();
 
 			}
 
@@ -295,76 +324,124 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	onUpload: function ( callback ) {
+
+		this.onUploadCallback = callback;
+
+		return this;
+
+	},
+
 	clone: function () {
 
-		return new this.constructor().copy( this );
+		return new this.constructor( this.array, this.itemSize ).copy( this );
 
 	}
 
-};
+} );
 
 //
 
-THREE.Int8Attribute = function ( array, itemSize ) {
+function Int8BufferAttribute( array, itemSize, normalized ) {
 
-	return new THREE.BufferAttribute( new Int8Array( array ), itemSize );
+	BufferAttribute.call( this, new Int8Array( array ), itemSize, normalized );
 
-};
+}
 
-THREE.Uint8Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Uint8Array( array ), itemSize );
-
-};
-
-THREE.Uint8ClampedAttribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Uint8ClampedArray( array ), itemSize );
-
-};
-
-THREE.Int16Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Int16Array( array ), itemSize );
-
-};
-
-THREE.Uint16Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Uint16Array( array ), itemSize );
-
-};
-
-THREE.Int32Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Int32Array( array ), itemSize );
-
-};
-
-THREE.Uint32Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Uint32Array( array ), itemSize );
-
-};
-
-THREE.Float32Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Float32Array( array ), itemSize );
-
-};
-
-THREE.Float64Attribute = function ( array, itemSize ) {
-
-	return new THREE.BufferAttribute( new Float64Array( array ), itemSize );
-
-};
+Int8BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+Int8BufferAttribute.prototype.constructor = Int8BufferAttribute;
 
 
-// Deprecated
+function Uint8BufferAttribute( array, itemSize, normalized ) {
 
-THREE.DynamicBufferAttribute = function ( array, itemSize ) {
+	BufferAttribute.call( this, new Uint8Array( array ), itemSize, normalized );
 
-	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
-	return new THREE.BufferAttribute( array, itemSize ).setDynamic( true );
+}
 
+Uint8BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+Uint8BufferAttribute.prototype.constructor = Uint8BufferAttribute;
+
+
+function Uint8ClampedBufferAttribute( array, itemSize, normalized ) {
+
+	BufferAttribute.call( this, new Uint8ClampedArray( array ), itemSize, normalized );
+
+}
+
+Uint8ClampedBufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+Uint8ClampedBufferAttribute.prototype.constructor = Uint8ClampedBufferAttribute;
+
+
+function Int16BufferAttribute( array, itemSize, normalized ) {
+
+	BufferAttribute.call( this, new Int16Array( array ), itemSize, normalized );
+
+}
+
+Int16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+Int16BufferAttribute.prototype.constructor = Int16BufferAttribute;
+
+
+function Uint16BufferAttribute( array, itemSize, normalized ) {
+
+	BufferAttribute.call( this, new Uint16Array( array ), itemSize, normalized );
+
+}
+
+Uint16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+Uint16BufferAttribute.prototype.constructor = Uint16BufferAttribute;
+
+
+function Int32BufferAttribute( array, itemSize, normalized ) {
+
+	BufferAttribute.call( this, new Int32Array( array ), itemSize, normalized );
+
+}
+
+Int32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+Int32BufferAttribute.prototype.constructor = Int32BufferAttribute;
+
+
+function Uint32BufferAttribute( array, itemSize, normalized ) {
+
+	BufferAttribute.call( this, new Uint32Array( array ), itemSize, normalized );
+
+}
+
+Uint32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+Uint32BufferAttribute.prototype.constructor = Uint32BufferAttribute;
+
+
+function Float32BufferAttribute( array, itemSize, normalized ) {
+
+	BufferAttribute.call( this, new Float32Array( array ), itemSize, normalized );
+
+}
+
+Float32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+Float32BufferAttribute.prototype.constructor = Float32BufferAttribute;
+
+
+function Float64BufferAttribute( array, itemSize, normalized ) {
+
+	BufferAttribute.call( this, new Float64Array( array ), itemSize, normalized );
+
+}
+
+Float64BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+Float64BufferAttribute.prototype.constructor = Float64BufferAttribute;
+
+//
+
+export {
+	Float64BufferAttribute,
+	Float32BufferAttribute,
+	Uint32BufferAttribute,
+	Int32BufferAttribute,
+	Uint16BufferAttribute,
+	Int16BufferAttribute,
+	Uint8ClampedBufferAttribute,
+	Uint8BufferAttribute,
+	Int8BufferAttribute,
+	BufferAttribute
 };

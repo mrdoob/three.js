@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ShaderPass = function( shader, textureID ) {
+THREE.ShaderPass = function ( shader, textureID ) {
 
 	THREE.Pass.call( this );
 
@@ -14,8 +14,7 @@ THREE.ShaderPass = function( shader, textureID ) {
 
 		this.material = shader;
 
-	}
-	else if ( shader ) {
+	} else if ( shader ) {
 
 		this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -34,6 +33,7 @@ THREE.ShaderPass = function( shader, textureID ) {
 	this.scene = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };

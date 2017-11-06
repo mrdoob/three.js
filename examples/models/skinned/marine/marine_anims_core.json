@@ -51541,7 +51541,7 @@
         "vertexColors":0,
         "name":"MaleMarineC",
         "type":"MeshPhongMaterial",
-        "uuid":"CB03D851-DD70-39D9-879D-B50FD9EA22B2",        
+        "uuid":"CB03D851-DD70-39D9-879D-B50FD9EA22B2",
         "map":"57C8C518-0CD0-3866-88FE-BBB14474EBD7",
         "transparent":false,
         "depthTest":true,
@@ -51549,7 +51549,8 @@
         "shininess":9,
         "emissive":0,
         "depthWrite":true,
-        "specular":3223857
+        "specular":3223857,
+        "skinning":true
     }],
     "object":{
         "children":[{

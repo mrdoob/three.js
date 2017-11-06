@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:LightShadow] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			This is used internally by [page:DirectionalLight DirectionalLights] for calculating shadows.<br /><br />
+
+			Unlike the other shadow classes, this uses an [page:OrthographicCamera] to calculate the shadows,
+			rather than a [page:PerspectiveCamera]. This is because light rays from a [page:DirectionalLight]
+			are parallel.
+		</div>
+
+		<h2>Example</h2>
+		<div>
+			<code>
+//Create a WebGLRenderer and turn on shadows in the renderer
+var renderer = new THREE.WebGLRenderer();
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
+//Create a DirectionalLight and turn on shadows for the light
+var light = new THREE.DirectionalLight( 0xffffff, 1, 100 );
+light.position.set( 0, 1, 0 ); 			//default; light shining from top
+light.castShadow = true;            // default false
+scene.add( light );
+
+//Set up shadow properties for the light
+light.shadow.mapSize.width = 512;  // default
+light.shadow.mapSize.height = 512; // default
+light.shadow.camera.near = 0.5;    // default
+light.shadow.camera.far = 500;     // default
+
+//Create a sphere that cast shadows (but does not receive them)
+var sphereGeometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+sphere.castShadow = true; //default is false
+sphere.receiveShadow = false; //default
+scene.add( sphere );
+
+//Create a plane that receives shadows (but does not cast them)
+var planeGeometry = new THREE.PlaneBufferGeometry( 20, 20, 32, 32 );
+var planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
+var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+plane.receiveShadow = true;
+scene.add( plane );
+
+//Create a helper for the shadow camera (optional)
+var helper = new THREE.CameraHelper( light.shadow.camera );
+scene.add( helper );
+			</code>
+		</div>
+
+		<h2>Constructor</h2>
+		<h3>[name]( )</h3>
+		<div>
+			Creates a new [name]. This is not intended to be called directly - it is called
+			internally by [page:DirectionalLight].
+		</div>
+
+		<h2>Properties</h2>
+		<div>
+			See the base [page:LightShadow LightShadow] class for common properties.
+		</div>
+
+		<h3>[property:Camera camera]</h3>
+		<div>
+			The light's view of the world. This is used to generate a depth map of the scene; objects behind
+			other objects from the light's perspective will be in shadow.<br /><br />
+
+			The default is an [page:OrthographicCamera] with [page:OrthographicCamera.left left] and
+			[page:OrthographicCamera.bottom bottom] set to -5,  [page:OrthographicCamera.right right]
+			and  [page:OrthographicCamera.top top] set to 5, the [page:OrthographicCamera.near near]
+			clipping plane at 0.5 and the [page:OrthographicCamera.far far] clipping plane at 500.
+		</div>
+
+
+		<h2>Methods</h2>
+		<div>
+			See the base [page:LightShadow LightShadow] class for common methods.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+	</body>
+</html>

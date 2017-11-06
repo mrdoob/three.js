@@ -65,7 +65,8 @@
 
 			function init() {
 
-				renderer.setClearColor( 'rgb(0,150,255)' );
+				scene.background = new THREE.Color( 0x0096ff );
+
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.getElementById( "container" ).appendChild( renderer.domElement );
@@ -163,7 +164,7 @@
 
 				// YELLOW PYRAMID and PYRAMID'S SHADOW
 				var pyramidGeometry = new THREE.CylinderGeometry( 0, 0.5, 2, 4 );
-				var pyramidMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, shading: THREE.FlatShading, shininess: 0 } );
+				var pyramidMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, flatShading: true, shininess: 0 } );
 				pyramid = new THREE.Mesh( pyramidGeometry, pyramidMaterial );
 				pyramid.position.set( - 4, 1, 2 );
 				scene.add( pyramid );
@@ -235,8 +236,9 @@
 
 				if ( useDirectionalLight ) {
 
-					renderer.setClearColor( 'rgb(0,150,255)' );
-					groundMesh.material.color.set( 'rgb(0,130,0)' );
+					scene.background.setHex( 0x0096ff );
+
+					groundMesh.material.color.setHex( 0x008200 );
 					sunLight.position.set( 5, 7, - 1 );
 					sunLight.lookAt( scene.position );
 
@@ -256,8 +258,9 @@
 
 				} else {
 
-					renderer.setClearColor( 'rgb(0,0,0)' );
-					groundMesh.material.color.set( 'rgb(150,150,150)' );
+					scene.background.setHex( 0x000000 );
+
+					groundMesh.material.color.setHex( 0x969696 );
 
 					sunLight.position.set( 0, 6, - 2 );
 					sunLight.lookAt( scene.position );

@@ -85,7 +85,7 @@ THREE.VolumeSlice = function( volume, index, axis ) {
 	 */
 
 
-}
+};
 
 THREE.VolumeSlice.prototype = {
 
@@ -214,4 +214,4 @@ THREE.VolumeSlice.prototype = {
 
 	}
 
-}
+};

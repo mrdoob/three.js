@@ -1,7 +1,6 @@
 /**
  * @author arodic / https://github.com/arodic
  */
- /*jshint sub:true*/
 
 ( function () {
 
@@ -83,8 +82,6 @@
 
 
 	THREE.TransformGizmo = function () {
-
-		var scope = this;
 
 		this.init = function () {
 
@@ -234,13 +231,13 @@
 		arrowGeometry.merge( mesh.geometry, mesh.matrix );
 
 		var lineXGeometry = new THREE.BufferGeometry();
-		lineXGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  1, 0, 0 ], 3 ) );
+		lineXGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  1, 0, 0 ], 3 ) );
 
 		var lineYGeometry = new THREE.BufferGeometry();
-		lineYGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  0, 1, 0 ], 3 ) );
+		lineYGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  0, 1, 0 ], 3 ) );
 
 		var lineZGeometry = new THREE.BufferGeometry();
-		lineZGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  0, 0, 1 ], 3 ) );
+		lineZGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  0, 0, 1 ], 3 ) );
 
 		this.handleGizmos = {
 
@@ -373,7 +370,7 @@
 
 			}
 
-			geometry.addAttribute( 'position', new THREE.Float32Attribute( vertices, 3 ) );
+			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 			return geometry;
 
 		};
@@ -421,7 +418,7 @@
 			],
 
 			XYZE: [
-				[ new THREE.Mesh( new THREE.Geometry() ) ]// TODO
+				[ new THREE.Mesh() ]// TODO
 			]
 
 		};
@@ -441,13 +438,6 @@
 		this.update = function ( rotation, eye2 ) {
 
 			THREE.TransformGizmo.prototype.update.apply( this, arguments );
-
-			var group = {
-
-				handles: this[ "handles" ],
-				pickers: this[ "pickers" ],
-
-			};
 
 			var tempMatrix = new THREE.Matrix4();
 			var worldRotation = new THREE.Euler( 0, 0, 1 );
@@ -517,13 +507,13 @@
 		arrowGeometry.merge( mesh.geometry, mesh.matrix );
 
 		var lineXGeometry = new THREE.BufferGeometry();
-		lineXGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  1, 0, 0 ], 3 ) );
+		lineXGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  1, 0, 0 ], 3 ) );
 
 		var lineYGeometry = new THREE.BufferGeometry();
-		lineYGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  0, 1, 0 ], 3 ) );
+		lineYGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  0, 1, 0 ], 3 ) );
 
 		var lineZGeometry = new THREE.BufferGeometry();
-		lineZGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  0, 0, 1 ], 3 ) );
+		lineZGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  0, 0, 1 ], 3 ) );
 
 		this.handleGizmos = {
 
@@ -626,7 +616,6 @@
 
 		var _mode = "translate";
 		var _dragging = false;
-		var _plane = "XY";
 		var _gizmo = {
 
 			"translate": new THREE.TransformGizmoTranslate(),
@@ -800,7 +789,15 @@
 			this.position.copy( worldPosition );
 			this.scale.set( scale, scale, scale );
 
-			eye.copy( camPosition ).sub( worldPosition ).normalize();
+			if ( camera instanceof THREE.PerspectiveCamera ) {
+
+				eye.copy( camPosition ).sub( worldPosition ).normalize();
+
+			} else if ( camera instanceof THREE.OrthographicCamera ) {
+
+				eye.copy( camPosition ).normalize();
+
+			}
 
 			if ( scope.space === "local" ) {
 
@@ -1101,17 +1098,32 @@
 
 		function onPointerUp( event ) {
 
+			event.preventDefault(); // Prevent MouseEvent on mobile
+
 			if ( event.button !== undefined && event.button !== 0 ) return;
 
 			if ( _dragging && ( scope.axis !== null ) ) {
 
 				mouseUpEvent.mode = _mode;
-				scope.dispatchEvent( mouseUpEvent )
+				scope.dispatchEvent( mouseUpEvent );
 
 			}
 
 			_dragging = false;
-			onPointerHover( event );
+
+			if ( 'TouchEvent' in window && event instanceof TouchEvent ) {
+
+				// Force "rollover"
+
+				scope.axis = null;
+				scope.update();
+				scope.dispatchEvent( changeEvent );
+
+			} else {
+
+				onPointerHover( event );
+
+			}
 
 		}
 

@@ -37,7 +37,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - anisotropic texture filtering example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - anisotropic texture filtering example
 		</div>
 
 		<div id="lbl_left" class="lbl">
@@ -86,10 +86,12 @@
 				camera.position.z = 1500;
 
 				scene1 = new THREE.Scene();
-				scene2 = new THREE.Scene();
-
+				scene1.background = new THREE.Color( 0xf2f7ff );
 				scene1.fog = new THREE.Fog( 0xf2f7ff, 1, 25000 );
-				scene2.fog = scene1.fog;
+
+				scene2 = new THREE.Scene();
+				scene2.background = new THREE.Color( 0xf2f7ff );
+				scene2.fog = new THREE.Fog( 0xf2f7ff, 1, 25000 );
 
 				scene1.add( new THREE.AmbientLight( 0xeef0ff ) );
 				scene2.add( new THREE.AmbientLight( 0xeef0ff ) );
@@ -151,7 +153,6 @@
 
 				// RENDERER
 
-				renderer.setClearColor( scene1.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;

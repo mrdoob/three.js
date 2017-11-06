@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Math = {
+var _Math = {
 
 	DEG2RAD: Math.PI / 180,
 	RAD2DEG: 180 / Math.PI,
@@ -11,35 +11,37 @@ THREE.Math = {
 	generateUUID: function () {
 
 		// http://www.broofa.com/Tools/Math.uuid.htm
+		// Replaced .join with string concatenation (@takahirox)
 
 		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split( '' );
-		var uuid = new Array( 36 );
 		var rnd = 0, r;
 
-		return function () {
+		return function generateUUID() {
+
+			var uuid = '';
 
 			for ( var i = 0; i < 36; i ++ ) {
 
 				if ( i === 8 || i === 13 || i === 18 || i === 23 ) {
 
-					uuid[ i ] = '-';
+					uuid += '-';
 
 				} else if ( i === 14 ) {
 
-					uuid[ i ] = '4';
+					uuid += '4';
 
 				} else {
 
 					if ( rnd <= 0x02 ) rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0;
 					r = rnd & 0xf;
 					rnd = rnd >> 4;
-					uuid[ i ] = chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
+					uuid += chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
 
 				}
 
 			}
 
-			return uuid.join( '' );
+			return uuid;
 
 		};
 
@@ -68,6 +70,14 @@ THREE.Math = {
 
 	},
 
+	// https://en.wikipedia.org/wiki/Linear_interpolation
+
+	lerp: function ( x, y, t ) {
+
+		return ( 1 - t ) * x + t * y;
+
+	},
+
 	// http://en.wikipedia.org/wiki/Smoothstep
 
 	smoothstep: function ( x, min, max ) {
@@ -89,13 +99,6 @@ THREE.Math = {
 		x = ( x - min ) / ( max - min );
 
 		return x * x * x * ( x * ( x * 6 - 15 ) + 10 );
-
-	},
-
-	random16: function () {
-
-		console.warn( 'THREE.Math.random16() has been deprecated. Use Math.random() instead.' );
-		return Math.random();
 
 	},
 
@@ -125,13 +128,13 @@ THREE.Math = {
 
 	degToRad: function ( degrees ) {
 
-		return degrees * THREE.Math.DEG2RAD;
+		return degrees * _Math.DEG2RAD;
 
 	},
 
 	radToDeg: function ( radians ) {
 
-		return radians * THREE.Math.RAD2DEG;
+		return radians * _Math.RAD2DEG;
 
 	},
 
@@ -141,24 +144,19 @@ THREE.Math = {
 
 	},
 
-	nearestPowerOfTwo: function ( value ) {
+	ceilPowerOfTwo: function ( value ) {
 
-		return Math.pow( 2, Math.round( Math.log( value ) / Math.LN2 ) );
+		return Math.pow( 2, Math.ceil( Math.log( value ) / Math.LN2 ) );
 
 	},
 
-	nextPowerOfTwo: function ( value ) {
+	floorPowerOfTwo: function ( value ) {
 
-		value --;
-		value |= value >> 1;
-		value |= value >> 2;
-		value |= value >> 4;
-		value |= value >> 8;
-		value |= value >> 16;
-		value ++;
-
-		return value;
+		return Math.pow( 2, Math.floor( Math.log( value ) / Math.LN2 ) );
 
 	}
 
 };
+
+
+export { _Math };
