@@ -4,8 +4,6 @@
 /* global QUnit */
 
 import { KeyframeTrack } from '../../../../src/animation/KeyframeTrack';
-import { KeyframeTrackConstructor } from '../../../../src/animation/KeyframeTrackConstructor'; // Todo: why so pain ?
-import { KeyframeTrackPrototype } from '../../../../src/animation/KeyframeTrackPrototype'; // Todo: why so pain ?
 
 export default QUnit.module( 'Animation', () => {
 
