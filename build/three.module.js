@@ -181,7 +181,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '88';
+var REVISION = '89dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -317,44 +317,24 @@ var _Math = {
 	DEG2RAD: Math.PI / 180,
 	RAD2DEG: 180 / Math.PI,
 
-	generateUUID: function () {
+	generateUUID: ( function () {
 
-		// http://www.broofa.com/Tools/Math.uuid.htm
-		// Replaced .join with string concatenation (@takahirox)
+		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
+		
+		var lut = []; for (var i=0; i<256; i++) { lut[i] = (i<16?'0':'')+(i).toString(16); }
+		
+		return function () {
+			var d0 = Math.random()*0xffffffff|0;
+			var d1 = Math.random()*0xffffffff|0;
+			var d2 = Math.random()*0xffffffff|0;
+			var d3 = Math.random()*0xffffffff|0;
+			return lut[d0&0xff]+lut[d0>>8&0xff]+lut[d0>>16&0xff]+lut[d0>>24&0xff]+'-'+
+				lut[d1&0xff]+lut[d1>>8&0xff]+'-'+lut[d1>>16&0x0f|0x40]+lut[d1>>24&0xff]+'-'+
+				lut[d2&0x3f|0x80]+lut[d2>>8&0xff]+'-'+lut[d2>>16&0xff]+lut[d2>>24&0xff]+
+				lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
+		}
 
-		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split( '' );
-		var rnd = 0, r;
-
-		return function generateUUID() {
-
-			var uuid = '';
-
-			for ( var i = 0; i < 36; i ++ ) {
-
-				if ( i === 8 || i === 13 || i === 18 || i === 23 ) {
-
-					uuid += '-';
-
-				} else if ( i === 14 ) {
-
-					uuid += '4';
-
-				} else {
-
-					if ( rnd <= 0x02 ) rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0;
-					r = rnd & 0xf;
-					rnd = rnd >> 4;
-					uuid += chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
-
-				}
-
-			}
-
-			return uuid;
-
-		};
-
-	}(),
+	} )(),
 
 	clamp: function ( value, min, max ) {
 
@@ -36182,7 +36162,30 @@ QuadraticBezierCurve.prototype.copy = function ( source ) {
 
 };
 
-var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
+/**
+ * @author zz85 / http://www.lab4games.net/zz85/blog
+ * Creates free form 2d path using series of points, lines or curves.
+ **/
+
+function Path( points ) {
+
+	CurvePath.call( this );
+
+	this.type = 'Path';
+
+	this.currentPoint = new Vector2();
+
+	if ( points ) {
+
+		this.setFromPoints( points );
+
+	}
+
+}
+
+Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
+
+	constructor: Path,
 
 	setFromPoints: function ( points ) {
 
@@ -36314,30 +36317,6 @@ var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
- * Creates free form 2d path using series of points, lines or curves.
- **/
-
-function Path( points ) {
-
-	CurvePath.call( this );
-
-	this.type = 'Path';
-
-	this.currentPoint = new Vector2();
-
-	if ( points ) {
-
-		this.setFromPoints( points );
-
-	}
-
-}
-
-Path.prototype = PathPrototype;
-PathPrototype.constructor = Path;
-
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
  * Defines a 2d shape plane using paths.
  **/
 
@@ -36357,7 +36336,7 @@ function Shape( points ) {
 
 }
 
-Shape.prototype = Object.assign( Object.create( PathPrototype ), {
+Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 	constructor: Shape,
 

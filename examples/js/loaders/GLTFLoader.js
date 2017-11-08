@@ -78,7 +78,17 @@ THREE.GLTFLoader = ( function () {
 
 				if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
 
-					extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
+					try {
+
+						extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
+
+					} catch ( error ) {
+
+						if ( onError ) onError( error );
+						return;
+
+					}
+
 					content = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
 
 				} else {
@@ -93,7 +103,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
-				onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' ) );
+				if ( onError ) onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' ) );
 				return;
 
 			}
@@ -1700,7 +1710,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( alphaMode === ALPHA_MODES.MASK ) {
 
-					materialParams.alphaTest = material.alphaCutoff || 0.5;
+					materialParams.alphaTest = material.alphaCutoff !== undefined ? material.alphaCutoff : 0.5;
 
 				}
 
@@ -2232,7 +2242,7 @@ THREE.GLTFLoader = ( function () {
 
 		// Nothing in the node definition indicates whether it is a Bone or an
 		// Object3D. Use the skins' joint references to mark bones.
-		for ( var skinIndex in skins ) {
+		for ( var skinIndex =  0; skinIndex < skins.length; skinIndex ++ ) {
 
 			var joints = skins[ skinIndex ].joints;
 
@@ -2249,7 +2259,7 @@ THREE.GLTFLoader = ( function () {
 		// references and rename instances below.
 		//
 		// Example: CesiumMilkTruck sample model reuses "Wheel" meshes.
-		for ( var nodeIndex in nodes ) {
+		for ( var nodeIndex =  0; nodeIndex < nodes.length; nodeIndex ++ ) {
 
 			var nodeDef = nodes[ nodeIndex ];
 

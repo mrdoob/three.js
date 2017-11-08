@@ -55,7 +55,13 @@
         <div>parameters is an optional object with properties defining the renderer's behaviour. The constructor also accepts no parameters at all. In all cases, it will assume sane defaults when parameters are missing.</div>
 
 		<div>
-		canvas — A [page:Canvas] where the renderer draws its output.
+		[page:DOMElement canvas] - A [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas]
+		where the renderer draws its output.
+		This corresponds to the [page:CanvasRenderer.domElement domElement] property below.
+		If not passed in here, a new canvas element will be created.<br />
+
+		[page:Boolean alpha] - whether the canvas contains an alpha (transparency) buffer or not.
+	  Default is *false*.
 		</div>
 
 
