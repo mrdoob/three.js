@@ -59,8 +59,6 @@ if ( Object.assign === undefined ) {
 
 		Object.assign = function ( target ) {
 
-			'use strict';
-
 			if ( target === undefined || target === null ) {
 
 				throw new TypeError( 'Cannot convert undefined or null to object' );
@@ -36774,13 +36772,7 @@ Object.assign( Font.prototype, {
 								cpx0 = laste.x;
 								cpy0 = laste.y;
 
-								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
-
-									var t = i2 / divisions;
-									QuadraticBezier( t, cpx0, cpx1, cpx );
-									QuadraticBezier( t, cpy0, cpy1, cpy );
-
-								}
+								
 
 							}
 
@@ -36804,13 +36796,7 @@ Object.assign( Font.prototype, {
 								cpx0 = laste.x;
 								cpy0 = laste.y;
 
-								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
-
-									var t = i2 / divisions;
-									CubicBezier( t, cpx0, cpx1, cpx2, cpx );
-									CubicBezier( t, cpy0, cpy1, cpy2, cpy );
-
-								}
+								
 
 							}
 
