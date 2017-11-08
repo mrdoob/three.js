@@ -326,9 +326,9 @@
 		generateUUID: ( function () {
 
 			// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
-			
-			var lut = []; for (var i=0; i<256; i++) { lut[i] = (i<16?'0':'')+(i).toString(16); }
-			
+
+			var lut = []; for (var i=0; i<256; i++) { lut[i] = (i<16?'0':'')+(i).toString(16).toUpperCase(); }
+
 			return function () {
 				var d0 = Math.random()*0xffffffff|0;
 				var d1 = Math.random()*0xffffffff|0;
