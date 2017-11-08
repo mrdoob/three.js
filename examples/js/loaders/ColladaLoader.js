@@ -1759,6 +1759,10 @@ THREE.ColladaLoader.prototype = {
 			};
 
 			var mesh = getElementsByTagName( xml, 'mesh' )[ 0 ];
+			
+			if (!mesh) {
+				return;
+			}
 
 			for ( var i = 0; i < mesh.childNodes.length; i ++ ) {
 
