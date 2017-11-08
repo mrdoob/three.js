@@ -11,7 +11,7 @@ Sidebar.Controls = function ( editor ) {
 
 	var isValidKeyBinding = function ( key ) {
 
-		return key.match( /^[A-Za-z0-9]$/i );
+		return key.match( /^[A-Za-z0-9]$/i ); // Can't use z currently due to undo/redo
 
 	};
 
@@ -27,7 +27,7 @@ Sidebar.Controls = function ( editor ) {
 		'scale'
 	];
 
-	for ( var i = 0; i < controlNames.length; i++ ) {
+	for ( var i = 0; i < controlNames.length; i ++ ) {
 
 		let name = controlNames[ i ];
 		let configName = 'controls/' + name;
@@ -35,7 +35,7 @@ Sidebar.Controls = function ( editor ) {
 
 		let controlInput = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-			if( isValidKeyBinding( controlInput.getValue() ) ) {
+			if ( isValidKeyBinding( controlInput.getValue() ) ) {
 
 				config.setKey( configName, controlInput.getValue()[ 0 ] );
 
@@ -54,7 +54,7 @@ Sidebar.Controls = function ( editor ) {
 		// to contain the key binding stored in config
 		controlInput.dom.addEventListener( 'blur', function () {
 
-			if( ! isValidKeyBinding( controlInput.getValue() ) ) {
+			if ( ! isValidKeyBinding( controlInput.getValue() ) ) {
 
 				controlInput.setValue( config.getKey( configName ) );
 
@@ -65,7 +65,7 @@ Sidebar.Controls = function ( editor ) {
 		// If a valid key binding character is entered, blur the input field
 		controlInput.dom.addEventListener( 'keyup', function ( event ) {
 
-			if( isValidKeyBinding( event.key ) ) {
+			if ( isValidKeyBinding( event.key ) ) {
 
 				controlInput.dom.blur();
 
@@ -73,7 +73,7 @@ Sidebar.Controls = function ( editor ) {
 
 		} );
 
-		if( config.getKey( configName ) !== undefined ) {
+		if ( config.getKey( configName ) !== undefined ) {
 
 			controlInput.setValue( config.getKey( configName ) );
 
@@ -105,23 +105,25 @@ Sidebar.Controls = function ( editor ) {
 
 				break;
 
-			case 'z': // Register Ctrl/Command-Z for Undo
+			case 'z': // Register Ctrl/Command-Z for Undo and Ctrl/Command-Shift-Z for Redo
+			case 'Z': // Safari and Firefox register lowercase z when Ctrl-Shift-Z is pressed
 
 				if ( IS_MAC ? event.metaKey : event.ctrlKey ) {
 
-					editor.undo();
+					if ( event.shiftKey ) {
+
+						editor.redo();
+
+					}					else {
+
+						event.preventDefault(); // Prevent Safari reopen last tab
+						editor.undo();
+
+					}
 
 				}
 
 				break;
-
-			case 'Z': // Register Ctrl/Command-Shift-Z for Redo
-
-				if ( IS_MAC ? event.metaKey : event.ctrlKey ) {
-
-					editor.redo();
-
-				}
 
 			case editor.config.getKey( 'controls/translate' ): // Translation transform mode
 
