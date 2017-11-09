@@ -23,6 +23,8 @@
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/DigitalGlitch.js"></script>
 		<script src="js/shaders/LuminosityHighPassShader.js"></script>
+		<script src="js/shaders/FilmShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -31,28 +33,40 @@
 		<script src="js/postprocessing/GlitchPass.js"></script>
 		<script src="js/postprocessing/UnrealBloomPass.js"></script>
 
-		<script src="js/postprocessing/ShaderVRPass.js"></script>
-
 		<script src="js/vr/WebVR.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
+			var container, stats;
+
 			var camera, dummy, scene, renderer, composer;
-			var object, light;
+			var group, light;
+
+			// stats
+			stats = new Stats();
 
 			// renderer
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.vr.enabled = true;
-			document.body.appendChild( renderer.domElement );
 
-			document.body.appendChild( WEBVR.createButton( renderer ) );
+			// container
+			container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			container.appendChild( renderer.domElement );
+			container.appendChild( WEBVR.createButton( renderer ) );
+			container.appendChild( stats.dom );
 
 			// scene
 			scene = new THREE.Scene();
 			scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
 
+			// camera
 			camera = new THREE.PerspectiveCamera();
 
 			dummy = new THREE.Camera();
@@ -62,26 +76,20 @@
 			scene.add( dummy );
 
 			// composer
-
 			composer = new THREE.EffectComposer( renderer );
 			composer.setSize( window.innerWidth, window.innerHeight );
 
 			composer.addPass( new THREE.RenderPass( scene, camera ) );
-
-			composer.addPass( new THREE.ShaderVRPass( new THREE.UnrealBloomPass(
-
-				new THREE.Vector2( window.innerWidth, window.innerHeight ),
-				1.0, 0.7, 0.1
-
-			) ) );
-
-			composer.addPass( new THREE.ShaderVRPass( new THREE.GlitchPass() ) );
+			composer.addPass( new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.0, 0.7, 0.1 ) );
+			composer.addPass( new THREE.ShaderPass( THREE.FilmShader ) );
+			composer.addPass( new THREE.GlitchPass() );
+			composer.addPass( new THREE.ShaderPass( THREE.FXAAShader ) );
 
 			composer.passes[ composer.passes.length - 1 ].renderToScreen = true;
 
 			// object
-			object = new THREE.Object3D();
-			scene.add( object );
+			group = new THREE.Group();
+			scene.add( group );
 
 			var geometry = new THREE.SphereGeometry( 1, 4, 4 );
 
@@ -93,7 +101,7 @@
 				mesh.position.multiplyScalar( Math.random() * 400 );
 				mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50;
-				object.add( mesh );
+				group.add( mesh );
 
 			}
 
@@ -109,7 +117,77 @@
 
 			onWindowResize();
 
+			initGui();
 			animate();
+
+			function initGui() {
+
+				function updateComposer() {
+
+					var passes = composer.passes;
+
+					passes[ 1 ].enabled = api.Bloom;
+					passes[ 2 ].enabled = api.Film;
+					passes[ 3 ].enabled = api.Glitch;
+					passes[ 4 ].enabled = api.FXAA;
+
+					var found = false;
+
+					for ( var i = passes.length - 1; i > 0; i -- ) {
+
+						var pass = passes[ i ];
+
+						if ( ! found && pass.enabled ) {
+
+							pass.renderToScreen = true;
+							found = true;
+
+						} else {
+
+							pass.renderToScreen = false;
+
+						}
+
+					}
+
+					passes[ 0 ].renderToScreen = ! found;
+
+				}
+
+				var api = {
+					'Bloom': true,
+					'Film': true,
+					'Glitch': true,
+					'FXAA': true
+				};
+
+				var gui = new dat.GUI();
+
+				gui.add( api, 'Bloom' ).onChange( function () {
+
+					updateComposer();
+
+				} );
+
+				gui.add( api, 'Film' ).onChange( function () {
+
+					updateComposer();
+
+				} );
+
+				gui.add( api, 'Glitch' ).onChange( function () {
+
+					updateComposer();
+
+				} );
+
+				gui.add( api, 'FXAA' ).onChange( function () {
+
+					updateComposer();
+
+				} );
+
+			}
 
 			function onWindowResize() {
 
@@ -123,8 +201,17 @@
 
 			function onVRDisplayPresentChange() {
 
-				var size = renderer.getDrawingBufferSize();
-				composer.setSize( size.width, size.height );
+				if ( renderer.vr.getDevice() && renderer.vr.getDevice().isPresenting ) {
+
+					stats.dom.style.display = 'none';
+					document.getElementsByClassName('dg ac')[ 0 ].style.display = 'none';
+
+				} else {
+
+					stats.dom.style.display = '';
+					document.getElementsByClassName('dg ac')[ 0 ].style.display = '';
+
+				}
 
 			}
 
@@ -132,10 +219,14 @@
 
 				requestAnimationFrame( animate );
 
-				object.rotation.x += 0.005;
-				object.rotation.y += 0.01;
+				stats.begin();
+
+				group.rotation.x += 0.005;
+				group.rotation.y += 0.01;
 
 				composer.render();
+
+				stats.end();
 
 			}
 
