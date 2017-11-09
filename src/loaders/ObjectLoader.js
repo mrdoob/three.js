@@ -123,14 +123,10 @@ Object.assign( ObjectLoader.prototype, {
 
 	parse: function ( json, onLoad ) {
 
+		var scope = this;
+
 		var geometries = this.parseGeometries( json.geometries );
-
-		var images = this.parseImages( json.images, function () {
-
-			if ( onLoad !== undefined ) onLoad( object );
-
-		} );
-
+		var images = this.parseImages( json.images );
 		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 
