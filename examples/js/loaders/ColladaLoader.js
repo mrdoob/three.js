@@ -18,15 +18,22 @@ THREE.ColladaLoader.prototype = {
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-
-		var path = THREE.Loader.prototype.extractUrlBase( url );
-
+		
+                scope.path = scope.path === undefined ? THREE.Loader.prototype.extractUrlBase( url ) : scope.path; 
+		
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text, path ) );
 
 		}, onProgress, onError );
+
+	},
+	
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	},
 
