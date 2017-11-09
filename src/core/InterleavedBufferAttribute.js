@@ -6,7 +6,33 @@ import { _Math } from '../math/Math.js';
 
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
-	this.uuid = _Math.generateUUID();
+	this._uuid = undefined;
+
+	Object.defineProperties( this, {
+
+		uuid: {
+
+			get: function () {
+
+				if ( this._uuid === undefined ) {
+
+					this._uuid = _Math.generateUUID();
+
+				}
+
+				return this._uuid;
+
+			},
+
+			set: function ( value ) {
+
+				this._uuid = value;
+
+			}
+
+		}
+
+	} );
 
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
