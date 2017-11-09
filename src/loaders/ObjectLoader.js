@@ -440,7 +440,7 @@ Object.assign( ObjectLoader.prototype, {
 		if ( json !== undefined && json.length > 0 ) {
 
 			var loader = new ImageLoader( scope.manager );
-			loader.setCrossOrigin( this.crossOrigin );
+			loader.setCrossOrigin( scope.crossOrigin );
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
