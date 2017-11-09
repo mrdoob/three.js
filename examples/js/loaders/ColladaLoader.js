@@ -1760,6 +1760,7 @@ THREE.ColladaLoader.prototype = {
 
 			var mesh = getElementsByTagName( xml, 'mesh' )[ 0 ];
 			
+			// the following tags inside geometry are not supported yet (see https://github.com/mrdoob/three.js/pull/12606): convex_mesh, spline, brep
 			if ( mesh === undefined ) return;
 
 			for ( var i = 0; i < mesh.childNodes.length; i ++ ) {
