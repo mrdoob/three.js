@@ -371,11 +371,12 @@ Object.assign( ObjectLoader.prototype, {
 
 	parseMaterials: function ( json, textures ) {
 
+		var scope = this;
 		var materials = {};
 
 		if ( json !== undefined ) {
 
-			var loader = new MaterialLoader();
+			var loader = new MaterialLoader( scope.manager );
 			loader.setTextures( textures );
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
