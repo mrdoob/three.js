@@ -434,7 +434,7 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			var loader = new ImageLoader( manager );
+			var loader = new ImageLoader( scope.manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
@@ -442,7 +442,7 @@ Object.assign( ObjectLoader.prototype, {
 				var image = json[ i ];
 				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
 
-				images[ image.uuid ] = loadImage( path );
+				images[ image.uuid ] = loader.load( path );
 
 			}
 
