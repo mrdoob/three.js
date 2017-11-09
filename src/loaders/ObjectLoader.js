@@ -154,12 +154,13 @@ Object.assign( ObjectLoader.prototype, {
 
 	parseGeometries: function ( json ) {
 
+		var scope = this;
 		var geometries = {};
 
 		if ( json !== undefined ) {
 
-			var geometryLoader = new JSONLoader();
-			var bufferGeometryLoader = new BufferGeometryLoader();
+			var geometryLoader = new JSONLoader( scope.manager );
+			var bufferGeometryLoader = new BufferGeometryLoader( scope.manager );
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
