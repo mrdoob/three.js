@@ -427,31 +427,12 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parseImages: function ( json, onLoad ) {
+	parseImages: function ( json ) {
 
 		var scope = this;
 		var images = {};
 
-		function loadImage( url ) {
-
-			scope.manager.itemStart( url );
-
-			return loader.load( url, function () {
-
-				scope.manager.itemEnd( url );
-
-			}, undefined, function () {
-
-				scope.manager.itemEnd( url );
-				scope.manager.itemError( url );
-
-			} );
-
-		}
-
 		if ( json !== undefined && json.length > 0 ) {
-
-			var manager = new LoadingManager( onLoad );
 
 			var loader = new ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
