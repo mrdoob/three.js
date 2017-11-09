@@ -138,9 +138,18 @@ Object.assign( ObjectLoader.prototype, {
 
 		}
 
-		if ( json.images === undefined || json.images.length === 0 ) {
+		// fix #12601
+		// Wrap LoadingManager onLoad methods with ObjectLoader onLoad callback,
+		// allow proper callback call order
+		if ( onLoad !== undefined ) {
 
-			if ( onLoad !== undefined ) onLoad( object );
+			var loadingManagerOnLoad = scope.manager.onLoad;
+			scope.manager.onLoad = function warpedOnLoad() {
+
+				onLoad( object );
+				loadingManagerOnLoad();
+
+			};
 
 		}
 
