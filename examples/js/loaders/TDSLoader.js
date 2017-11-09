@@ -46,6 +46,8 @@ THREE.TDSLoader.prototype = {
 		var loader = new THREE.FileLoader( this.manager );
 
 		loader.setResponseType( 'arraybuffer' );
+		
+		loader.setPath( this.path );
 
 		loader.load( url, function ( data ) {
 
@@ -567,7 +569,7 @@ THREE.TDSLoader.prototype = {
 		var next = this.nextChunk( data, chunk );
 		var texture = {};
 
-		var loader = new THREE.TextureLoader();
+		var loader = new THREE.TextureLoader( this.manager );
 		loader.setPath( this.path );
 
 		while ( next !== 0 ) {
