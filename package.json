@@ -56,7 +56,7 @@
     "eslint-config-mdcs": "^4.2.2",
     "google-closure-compiler": "^20170521.0.0",
     "qunitjs": "^2.4.0",
-    "rollup": "^0.43.0",
+    "rollup": "^0.51.0",
     "rollup-watch": "^4.0.0",
     "serve": "^6.3.1",
     "uglify-js": "^3.0.23"
