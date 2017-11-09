@@ -23,7 +23,8 @@ var Config = function ( name ) {
 
 		'controls/translate': 'w',
 		'controls/rotate': 'e',
-		'controls/scale': 'r'
+		'controls/scale': 'r',
+		'controls/undo': 'z'
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

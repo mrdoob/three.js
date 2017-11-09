@@ -24,7 +24,8 @@ Sidebar.Controls = function ( editor ) {
 	var controlNames = [
 		'translate',
 		'rotate',
-		'scale'
+		'scale',
+		'undo'
 	];
 
 	for ( var i = 0; i < controlNames.length; i ++ ) {
@@ -105,26 +106,6 @@ Sidebar.Controls = function ( editor ) {
 
 				break;
 
-			case 'z': // Register Ctrl/Command-Z for Undo and Ctrl/Command-Shift-Z for Redo
-			case 'Z': // Safari and Firefox register lowercase z when Ctrl-Shift-Z is pressed
-
-				if ( IS_MAC ? event.metaKey : event.ctrlKey ) {
-
-					if ( event.shiftKey ) {
-
-						editor.redo();
-
-					}					else {
-
-						event.preventDefault(); // Prevent Safari reopen last tab
-						editor.undo();
-
-					}
-
-				}
-
-				break;
-
 			case editor.config.getKey( 'controls/translate' ): // Translation transform mode
 
 				editor.signals.transformModeChanged.dispatch( 'translate' );
@@ -140,6 +121,27 @@ Sidebar.Controls = function ( editor ) {
 			case editor.config.getKey( 'controls/scale' ): // Scaling transform mode
 
 				editor.signals.transformModeChanged.dispatch( 'scale' );
+
+				break;
+
+			case editor.config.getKey( 'controls/undo' ).toLowerCase(): // Register Ctrl/Command-Z for Undo and Ctrl/Command-Shift-Z for Redo
+			case editor.config.getKey( 'controls/undo' ).toUpperCase(): // Safari and Firefox register lowercase z when Ctrl-Shift-Z is pressed
+
+				if ( IS_MAC ? event.metaKey : event.ctrlKey ) {
+
+					event.preventDefault(); // Prevent browser specific hotkeys
+
+					if ( event.shiftKey ) {
+
+						editor.redo();
+
+					} else {
+
+						editor.undo();
+
+					}
+
+				}
 
 				break;
 
