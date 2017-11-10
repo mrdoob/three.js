@@ -19,7 +19,7 @@ THREE.ColladaLoader.prototype = {
 
 		var scope = this;
 		
-                scope.path = scope.path === undefined ? THREE.Loader.prototype.extractUrlBase( url ) : scope.path; 
+                var path = scope.path === undefined ? THREE.Loader.prototype.extractUrlBase( url ) : scope.path; 
 		
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
