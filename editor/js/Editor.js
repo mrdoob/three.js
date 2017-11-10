@@ -237,6 +237,15 @@ Editor.prototype = {
 
 	},
 
+	addDefaultLighting: function () {
+
+		var directionalLight = new THREE.DirectionalLight();
+		directionalLight.name = 'Directional Light';
+		directionalLight.position.set( 0, 10, 10 );
+		this.addObject( directionalLight );
+
+	},
+
 	//
 
 	addHelper: function () {
