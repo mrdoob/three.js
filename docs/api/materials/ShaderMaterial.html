@@ -386,14 +386,14 @@ this.extensions = {
 		<div>
 			An object of the form:
 			<code>
-{ "uniform1": { value: 1.0 }, "uniform2": { value: 2 } }
+{ "uniform1": { value: 1.0, needsUpdate: true }, "uniform2": { value: 2, needsUpdate: true } }
 			</code>
 		specifying the uniforms to be passed to the shader code; keys are uniform names, values are definitions of the form
 		<code>
 		{ value: 1.0 }
 		</code>
 		where *value* is the value of the uniform. Names must match the name of the uniform,
-		as defined in the GLSL code. Note that uniforms are refreshed on every frame,
+		as defined in the GLSL code. Note that uniforms are refreshed on every frame if *needsUpdate* isn't set to *false*,
 		so updating the value of the uniform will immediately update the value available to the GLSL code.
 		</div>
 
