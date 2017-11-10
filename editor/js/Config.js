@@ -21,10 +21,10 @@ var Config = function ( name ) {
 
 		'settings/history': false,
 
-		'controls/translate': 'w',
-		'controls/rotate': 'e',
-		'controls/scale': 'r',
-		'controls/undo': 'z'
+		'settings/controls/translate': 'w',
+		'settings/controls/rotate': 'e',
+		'settings/controls/scale': 'r',
+		'settings/controls/undo': 'z'
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

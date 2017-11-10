@@ -31,7 +31,7 @@ Sidebar.Controls = function ( editor ) {
 	for ( var i = 0; i < controlNames.length; i ++ ) {
 
 		let name = controlNames[ i ];
-		let configName = 'controls/' + name;
+		let configName = 'settings/controls/' + name;
 		let controlRow = new UI.Row();
 
 		let controlInput = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
@@ -106,26 +106,26 @@ Sidebar.Controls = function ( editor ) {
 
 				break;
 
-			case editor.config.getKey( 'controls/translate' ): // Translation transform mode
+			case editor.config.getKey( 'settings/controls/translate' ): // Translation transform mode
 
 				editor.signals.transformModeChanged.dispatch( 'translate' );
 
 				break;
 
-			case editor.config.getKey( 'controls/rotate' ): // Rotation transform mode
+			case editor.config.getKey( 'settings/controls/rotate' ): // Rotation transform mode
 
 				editor.signals.transformModeChanged.dispatch( 'rotate' );
 
 				break;
 
-			case editor.config.getKey( 'controls/scale' ): // Scaling transform mode
+			case editor.config.getKey( 'settings/controls/scale' ): // Scaling transform mode
 
 				editor.signals.transformModeChanged.dispatch( 'scale' );
 
 				break;
 
-			case editor.config.getKey( 'controls/undo' ).toLowerCase(): // Register Ctrl/Command-Z for Undo and Ctrl/Command-Shift-Z for Redo
-			case editor.config.getKey( 'controls/undo' ).toUpperCase(): // Safari and Firefox register lowercase z when Ctrl-Shift-Z is pressed
+			case editor.config.getKey( 'settings/controls/undo' ).toLowerCase(): // Register Ctrl/Command-Z for Undo and Ctrl/Command-Shift-Z for Redo
+			case editor.config.getKey( 'settings/controls/undo' ).toUpperCase(): // Safari and Firefox register lowercase z when Ctrl-Shift-Z is pressed
 
 				if ( IS_MAC ? event.metaKey : event.ctrlKey ) {
 
