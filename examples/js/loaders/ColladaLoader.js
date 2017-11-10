@@ -18,9 +18,9 @@ THREE.ColladaLoader.prototype = {
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-		
-                var path = scope.path === undefined ? THREE.Loader.prototype.extractUrlBase( url ) : scope.path; 
-		
+
+		var path = scope.path === undefined ? THREE.Loader.prototype.extractUrlBase( url ) : scope.path;
+
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
@@ -29,7 +29,7 @@ THREE.ColladaLoader.prototype = {
 		}, onProgress, onError );
 
 	},
-	
+
 	setPath: function ( value ) {
 
 		this.path = value;
