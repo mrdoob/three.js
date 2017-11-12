@@ -85,7 +85,8 @@
 
 				//
 
-				reflector = new THREE.Reflector( 1.4, 1.4, {
+				var geometry = new THREE.PlaneBufferGeometry( 1.4, 1.4 );
+				reflector = new THREE.Reflector( geometry, {
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio
 				} );
