@@ -39,7 +39,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/EarthControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -57,13 +57,10 @@
 			//animate();
 
 			function init() {
-				var earth = {
-					radius: 6400,
-					lon: 2.333333,
-					lat: 48.866667,
-					sphere: new THREE.Mesh(),
-					render: render
-				}
+				var radius = 6400;
+				var longitude = 2.333333;
+				var latitude = 48.866667;
+
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xcccccc );
 
@@ -74,19 +71,78 @@
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 100000);
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 100000 );
 				camera.position.z = 10000;
 
-				controls = new THREE.EarthControls( camera, renderer.domElement, earth );
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				controls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
+
+				controls.panLeft = function() {
+
+					var r = radius;
+					return function panLeft( distance, objectMatrix ) {
+
+						var latDelta = - Math.sin( controls.getAzimuthalAngle() ) *
+							( distance / 4000 ) * 180 / Math.PI;
+						var lonDelta = Math.cos( controls.getAzimuthalAngle() ) *
+							( distance / ( r * Math.cos( latitude * Math.PI / 180 ) ) ) * 180 / Math.PI;
+
+						longitude -= lonDelta;
+
+						if ( latitude + latDelta < 80 && latitude + latDelta > - 80 )
+							latitude += latDelta;
+						longitude = ( longitude + 540 ) % 360 - 180;
+						controls.updatePlanet();
+	
+					};
+
+				}();
+
+				controls.panUp = function() {
+
+					var r = radius;
+					return function panUp( distance, objectMatrix ) {
+
+						var lonDelta = Math.sin( controls.getAzimuthalAngle() ) *
+							( distance / ( r * Math.cos( latitude * Math.PI / 180 ) ) ) * 180 / Math.PI;
+						var latDelta = Math.cos( controls.getAzimuthalAngle() ) *
+							( distance / r ) * 180 / Math.PI;
+		
+						longitude -= lonDelta;
+
+						if (latitude + latDelta < 80 && latitude + latDelta > -80)
+							latitude += latDelta;
+						longitude = ( longitude + 360 ) % 360;
+						controls.updatePlanet();
+
+					};
+
+				}();
+
+				controls.updatePlanet = function() {
+
+					return function update() {
+
+						sphere.rotation.set(
+							latitude * Math.PI / 180,
+							( 270 - longitude ) * Math.PI / 180,
+							0
+						);
+						render();
+
+					}
+
+				}();
+
 				controls.addEventListener( 'change', render ); // remove when using animation loop
 				// enable animation loop when using damping or autorotation
 				//controls.enableDamping = true;
 				//controls.dampingFactor = 0.25;
-				// controls.enableZoom = false;
 
 				// world
 
-				var geometry = new THREE.SphereGeometry( earth.radius, 24, 24 );
+				var geometry = new THREE.SphereGeometry( radius, 24, 24 );
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xffffff,
 					shininess: 200
@@ -95,20 +151,21 @@
 				textureLoader.load(
 					'textures/planets/earth_atmos_4096.jpg',
 					function( tex ) {
-				    	material.map = tex;
+						material.map = tex;
 						material.needsUpdate = true;
 						render();
 					}
 				);
+
 				var earthCenter = new THREE.Object3D();
-				earthCenter.position.set(0, 0, -earth.radius);
+				earthCenter.position.set(0, 0, -radius);
 				scene.add( earthCenter );
 
-				// var sphere = new THREE.Mesh( geometry, material );
-				var sphere = earth.sphere;
+				var sphere = new THREE.Mesh();
 				sphere.geometry = geometry;
 				sphere.material = material;
 				earthCenter.add( sphere );
+				controls.updatePlanet();
 
 				// lights
 
