@@ -7,9 +7,9 @@
  * @author Jonas Wagner / http://29a.ch/ && http://29a.ch/slides/2012/webglwater/ : Water shader explanations in WebGL
  */
 
-THREE.Water = function ( width, height, options ) {
+THREE.Water = function ( geometry, options ) {
 
-	THREE.Mesh.call( this, new THREE.PlaneBufferGeometry( width, height ) );
+	THREE.Mesh.call( this, geometry );
 
 	var scope = this;
 
