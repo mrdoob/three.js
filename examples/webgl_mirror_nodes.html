@@ -153,7 +153,8 @@
 				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 
 				// reflector/mirror plane
-				var groundMirror = new THREE.ReflectorRTT( 100, 100, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var groundMirror = new THREE.ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
 
 				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
 				var maskFlip = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
