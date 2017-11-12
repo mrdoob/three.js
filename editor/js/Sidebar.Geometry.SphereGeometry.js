@@ -44,7 +44,7 @@ Sidebar.Geometry.SphereGeometry = function ( editor, object ) {
 	// phiStart
 
 	var phiStartRow = new UI.Row();
-	var phiStart = new UI.Number( parameters.phiStart ).onChange( update );
+	var phiStart = new UI.Number( parameters.phiStart * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	phiStartRow.add( new UI.Text( 'Phi start' ).setWidth( '90px' ) );
 	phiStartRow.add( phiStart );
@@ -54,7 +54,7 @@ Sidebar.Geometry.SphereGeometry = function ( editor, object ) {
 	// phiLength
 
 	var phiLengthRow = new UI.Row();
-	var phiLength = new UI.Number( parameters.phiLength ).onChange( update );
+	var phiLength = new UI.Number( parameters.phiLength * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	phiLengthRow.add( new UI.Text( 'Phi length' ).setWidth( '90px' ) );
 	phiLengthRow.add( phiLength );
@@ -64,7 +64,7 @@ Sidebar.Geometry.SphereGeometry = function ( editor, object ) {
 	// thetaStart
 
 	var thetaStartRow = new UI.Row();
-	var thetaStart = new UI.Number( parameters.thetaStart ).onChange( update );
+	var thetaStart = new UI.Number( parameters.thetaStart * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	thetaStartRow.add( new UI.Text( 'Theta start' ).setWidth( '90px' ) );
 	thetaStartRow.add( thetaStart );
@@ -74,7 +74,7 @@ Sidebar.Geometry.SphereGeometry = function ( editor, object ) {
 	// thetaLength
 
 	var thetaLengthRow = new UI.Row();
-	var thetaLength = new UI.Number( parameters.thetaLength ).onChange( update );
+	var thetaLength = new UI.Number( parameters.thetaLength * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	thetaLengthRow.add( new UI.Text( 'Theta length' ).setWidth( '90px' ) );
 	thetaLengthRow.add( thetaLength );
@@ -90,10 +90,10 @@ Sidebar.Geometry.SphereGeometry = function ( editor, object ) {
 			radius.getValue(),
 			widthSegments.getValue(),
 			heightSegments.getValue(),
-			phiStart.getValue(),
-			phiLength.getValue(),
-			thetaStart.getValue(),
-			thetaLength.getValue()
+			phiStart.getValue() * THREE.Math.DEG2RAD,
+			phiLength.getValue() * THREE.Math.DEG2RAD,
+			thetaStart.getValue() * THREE.Math.DEG2RAD,
+			thetaLength.getValue() * THREE.Math.DEG2RAD
 		) ) );
 
 	}

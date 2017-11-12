@@ -27,7 +27,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean demo
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -41,12 +41,7 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) {
-
-				Detector.addGetWebGLMessage();
-				document.getElementById( 'container' ).innerHTML = "";
-
-			}
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
 			var camera, scene, renderer, light;
@@ -58,8 +53,6 @@
 				distortionScale: 3.7,
 				alpha: 1.0
 			};
-
-			var waterNormals;
 
 			init();
 			animate();
@@ -73,6 +66,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -87,15 +81,18 @@
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = Math.PI * 0.495;
-				controls.target.set( 0, 10, 0 );
-				controls.enablePan = false;
-				controls.minDistance = 40.0;
-				controls.maxDistance = 200.0;
-				camera.lookAt( controls.target );
+				light = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				light.position.set( - 30, 30, 30 );
+				light.castShadow = true;
+				light.shadow.camera.top = 45;
+				light.shadow.camera.right = 40;
+				light.shadow.camera.left = light.shadow.camera.bottom = -40;
+				light.shadow.camera.near = 1;
+				light.shadow.camera.far = 200;
+				scene.add( light );
 
-				setLighting();
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
 
 				//
 
@@ -128,6 +125,16 @@
 
 				//
 
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI * 0.495;
+				controls.target.set( 0, 10, 0 );
+				controls.enablePan = false;
+				controls.minDistance = 40.0;
+				controls.maxDistance = 200.0;
+				camera.lookAt( controls.target );
+
+				//
+
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
@@ -156,12 +163,12 @@
 						waterNormals: new THREE.TextureLoader().load( 'textures/waternormals.jpg', function ( texture ) {
 							texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 						}),
-						alpha: 	parameters.alpha,
+						alpha: parameters.alpha,
 						sunDirection: light.position.clone().normalize(),
 						sunColor: 0xffffff,
 						waterColor: 0x001e0f,
 						distortionScale: parameters.distortionScale,
-						fog: scene.fog != undefined
+						fog: scene.fog !== undefined
 					}
 				);
 
@@ -174,36 +181,14 @@
 
 			function setSkybox() {
 
-				cubeMap = new THREE.CubeTexture( [] );
-				cubeMap.format = THREE.RGBFormat;
+				var cubeTextureLoader = new THREE.CubeTextureLoader();
+				cubeTextureLoader.setPath( 'textures/cube/skyboxsun25deg/' );
 
-				var loader = new THREE.ImageLoader();
-				loader.load( 'textures/skyboxsun25degtest.png', function ( image ) {
-
-					var getSide = function ( x, y ) {
-
-						var size = 1024;
-
-						var canvas = document.createElement( 'canvas' );
-						canvas.width = size;
-						canvas.height = size;
-
-						var context = canvas.getContext( '2d' );
-						context.drawImage( image, - x * size, - y * size );
-
-						return canvas;
-
-					};
-
-					cubeMap.images[ 0 ] = getSide( 2, 1 ); // px
-					cubeMap.images[ 1 ] = getSide( 0, 1 ); // nx
-					cubeMap.images[ 2 ] = getSide( 1, 0 ); // py
-					cubeMap.images[ 3 ] = getSide( 1, 2 ); // ny
-					cubeMap.images[ 4 ] = getSide( 1, 1 ); // pz
-					cubeMap.images[ 5 ] = getSide( 3, 1 ); // nz
-					cubeMap.needsUpdate = true;
-
-				} );
+				cubeMap = cubeTextureLoader.load( [
+					'px.jpg', 'nx.jpg',
+					'py.jpg', 'ny.jpg',
+					'pz.jpg', 'nz.jpg',
+				] );
 
 				var cubeShader = THREE.ShaderLib[ 'cube' ];
 				cubeShader.uniforms[ 'tCube' ].value = cubeMap;
@@ -215,29 +200,14 @@
 					side: THREE.BackSide
 				} );
 
-				var skyBox = new THREE.Mesh(
-					new THREE.BoxGeometry( parameters.oceanSide * 5 + 100, parameters.oceanSide * 5 + 100, parameters.oceanSide * 5 + 100 ),
-					skyBoxMaterial
-				);
+				var skyBoxGeometry = new THREE.BoxBufferGeometry(
+					parameters.oceanSide * 5 + 100,
+					parameters.oceanSide * 5 + 100,
+					parameters.oceanSide * 5 + 100 );
+
+				var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 
 				scene.add( skyBox );
-
-			}
-
-			function setLighting() {
-
-				renderer.shadowMap.enabled = true;
-
-				light = new THREE.DirectionalLight( 0xffffbb, 1 );
-				light.position.set( - 30, 30, - 30 );
-				light.castShadow = true;
-				light.shadow.camera.top = 45;
-				light.shadow.camera.right = 40;
-				light.shadow.camera.left = light.shadow.camera.bottom = -40;
-				light.shadow.camera.near = 1;
-				light.shadow.camera.far = 200;
-
-				scene.add( light, new THREE.AmbientLight( 0x888888 ) );
 
 			}
 
