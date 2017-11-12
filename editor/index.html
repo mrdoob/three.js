@@ -315,6 +315,8 @@
 
 						if ( IS_MAC ? event.metaKey : event.ctrlKey ) {
 
+							event.preventDefault(); // Prevent Safari from opening/closing tabs
+
 							if ( event.shiftKey ) {
 
 								editor.redo();

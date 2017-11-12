@@ -1,4 +1,3 @@
-import { PathPrototype } from './PathPrototype.js';
 import { Path } from './Path.js';
 
 /**
@@ -22,7 +21,7 @@ function Shape( points ) {
 
 }
 
-Shape.prototype = Object.assign( Object.create( PathPrototype ), {
+Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 	constructor: Shape,
 

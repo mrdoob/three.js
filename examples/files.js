@@ -315,6 +315,7 @@ var files = {
 	],
 	"misc": [
 		"misc_animation_authoring",
+		"misc_animation_groups",
 		"misc_animation_keys",
 		"misc_controls_deviceorientation",
 		"misc_controls_fly",

@@ -219,6 +219,13 @@ THREE.AssimpJSONLoader.prototype = {
 						material.flatShading = ( value === 1 ) ? true : false;
 						break;
 
+					case '$mat.opacity':
+						if ( value < 1 ) {
+							material.opacity = value;
+							material.transparent = true;
+						}
+						break;
+
 				}
 
 			}

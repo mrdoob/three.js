@@ -16,20 +16,6 @@ Menubar.Add = function ( editor ) {
 	options.setClass( 'options' );
 	container.add( options );
 
-	//
-
-	var meshCount = 0;
-	var lightCount = 0;
-	var cameraCount = 0;
-
-	editor.signals.editorCleared.add( function () {
-
-		meshCount = 0;
-		lightCount = 0;
-		cameraCount = 0;
-
-	} );
-
 	// Group
 
 	var option = new UI.Row();
@@ -38,7 +24,7 @@ Menubar.Add = function ( editor ) {
 	option.onClick( function () {
 
 		var mesh = new THREE.Group();
-		mesh.name = 'Group ' + ( ++ meshCount );
+		mesh.name = 'Group';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -59,7 +45,7 @@ Menubar.Add = function ( editor ) {
 		var geometry = new THREE.PlaneBufferGeometry( 1, 1, 1, 1 );
 		var material = new THREE.MeshStandardMaterial();
 		var mesh = new THREE.Mesh( geometry, material );
-		mesh.name = 'Plane ' + ( ++ meshCount );
+		mesh.name = 'Plane';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -75,7 +61,7 @@ Menubar.Add = function ( editor ) {
 
 		var geometry = new THREE.BoxBufferGeometry( 1, 1, 1, 1, 1, 1 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
-		mesh.name = 'Box ' + ( ++ meshCount );
+		mesh.name = 'Box';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -91,7 +77,7 @@ Menubar.Add = function ( editor ) {
 
 		var geometry = new THREE.CircleBufferGeometry( 1, 8, 0, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
-		mesh.name = 'Circle ' + ( ++ meshCount );
+		mesh.name = 'Circle';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -107,7 +93,7 @@ Menubar.Add = function ( editor ) {
 
 		var geometry = new THREE.CylinderBufferGeometry( 1, 1, 1, 8, 1, false, 0, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
-		mesh.name = 'Cylinder ' + ( ++ meshCount );
+		mesh.name = 'Cylinder';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -123,7 +109,7 @@ Menubar.Add = function ( editor ) {
 
 		var geometry = new THREE.SphereBufferGeometry( 1, 8, 6, 0, Math.PI * 2, 0, Math.PI );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
-		mesh.name = 'Sphere ' + ( ++ meshCount );
+		mesh.name = 'Sphere';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -139,7 +125,7 @@ Menubar.Add = function ( editor ) {
 
 		var geometry = new THREE.IcosahedronGeometry( 1, 0 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
-		mesh.name = 'Icosahedron ' + ( ++ meshCount );
+		mesh.name = 'Icosahedron';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -155,7 +141,7 @@ Menubar.Add = function ( editor ) {
 
 		var geometry = new THREE.TorusBufferGeometry( 1, 0.4, 8, 6, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
-		mesh.name = 'Torus ' + ( ++ meshCount );
+		mesh.name = 'Torus';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -171,7 +157,7 @@ Menubar.Add = function ( editor ) {
 
 		var geometry = new THREE.TorusKnotBufferGeometry( 1, 0.4, 64, 8, 2, 3 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
-		mesh.name = 'TorusKnot ' + ( ++ meshCount );
+		mesh.name = 'TorusKnot';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -198,7 +184,7 @@ Menubar.Add = function ( editor ) {
 
 		var geometry = new THREE.TeapotBufferGeometry( size, segments, bottom, lid, body, fitLid, blinnScale );
 		var mesh = new THREE.Mesh( geometry, material );
-		mesh.name = 'Teapot ' + ( ++ meshCount );
+		mesh.name = 'Teapot';
 
 		editor.addObject( mesh );
 		editor.select( mesh );
@@ -230,7 +216,7 @@ Menubar.Add = function ( editor ) {
 
 		var geometry = new THREE.LatheBufferGeometry( points, 12, 0, Math.PI * 2 );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { side: THREE.DoubleSide } ) );
-		mesh.name = 'Lathe ' + ( ++ meshCount );
+		mesh.name = 'Lathe';
 
 		editor.execute( new AddObjectCommand( mesh ) );
 
@@ -245,7 +231,7 @@ Menubar.Add = function ( editor ) {
 	option.onClick( function () {
 
 		var sprite = new THREE.Sprite( new THREE.SpriteMaterial() );
-		sprite.name = 'Sprite ' + ( ++ meshCount );
+		sprite.name = 'Sprite';
 
 		editor.execute( new AddObjectCommand( sprite ) );
 
@@ -268,7 +254,7 @@ Menubar.Add = function ( editor ) {
 		var distance = 0;
 
 		var light = new THREE.PointLight( color, intensity, distance );
-		light.name = 'PointLight ' + ( ++ lightCount );
+		light.name = 'PointLight';
 
 		editor.execute( new AddObjectCommand( light ) );
 
@@ -289,8 +275,8 @@ Menubar.Add = function ( editor ) {
 		var penumbra = 0;
 
 		var light = new THREE.SpotLight( color, intensity, distance, angle, penumbra );
-		light.name = 'SpotLight ' + ( ++ lightCount );
-		light.target.name = 'SpotLight ' + ( lightCount ) + ' Target';
+		light.name = 'SpotLight';
+		light.target.name = 'SpotLight Target';
 
 		light.position.set( 5, 10, 7.5 );
 
@@ -310,8 +296,8 @@ Menubar.Add = function ( editor ) {
 		var intensity = 1;
 
 		var light = new THREE.DirectionalLight( color, intensity );
-		light.name = 'DirectionalLight ' + ( ++ lightCount );
-		light.target.name = 'DirectionalLight ' + ( lightCount ) + ' Target';
+		light.name = 'DirectionalLight';
+		light.target.name = 'DirectionalLight Target';
 
 		light.position.set( 5, 10, 7.5 );
 
@@ -332,7 +318,7 @@ Menubar.Add = function ( editor ) {
 		var intensity = 1;
 
 		var light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
-		light.name = 'HemisphereLight ' + ( ++ lightCount );
+		light.name = 'HemisphereLight';
 
 		light.position.set( 0, 10, 0 );
 
@@ -351,7 +337,7 @@ Menubar.Add = function ( editor ) {
 		var color = 0x222222;
 
 		var light = new THREE.AmbientLight( color );
-		light.name = 'AmbientLight ' + ( ++ lightCount );
+		light.name = 'AmbientLight';
 
 		editor.execute( new AddObjectCommand( light ) );
 
@@ -370,7 +356,7 @@ Menubar.Add = function ( editor ) {
 	option.onClick( function() {
 
 		var camera = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
-		camera.name = 'PerspectiveCamera ' + ( ++ cameraCount );
+		camera.name = 'PerspectiveCamera';
 
 		editor.execute( new AddObjectCommand( camera ) );
 
