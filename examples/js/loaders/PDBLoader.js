@@ -175,7 +175,7 @@ THREE.PDBLoader.prototype = {
 
 				}
 
-				atoms[index] = [ x, y, z, CPK[ e ], capitalize( e ) ];
+				atoms[ index ] = [ x, y, z, CPK[ e ], capitalize( e ) ];
 
 				if ( histogram[ e ] === undefined ) {
 
