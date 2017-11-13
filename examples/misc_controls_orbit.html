@@ -6,35 +6,41 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #000;
+				background:#000;
+				color: #eee;
+				padding:0;
+				margin:0;
+				font-weight:bold;
+				overflow:hidden;
+
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
-				font-weight: bold;
-
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
 			}
 
 			#info {
-				color:#000;
 				position: absolute;
 				top: 0px; width: 100%;
 				padding: 5px;
-
+				z-index:100;
 			}
 
 			a {
-				color: red;
+
+				color: #0080ff;
 			}
+
+			b { color:orange }
 		</style>
 	</head>
 
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - orbit controls example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - earth [orbit controls]<br/><br/>
+			<b>Mouse Controls </b> Rotate: left. Pan: right. Zoom: Middle / scroll <br>
+			<b>Touch Controls </b> Rotate: touch. Pan: 3 finger swipe. Zoom: Pinch <br>
+			<b>Keyboard Controls </b> Pan: arrow keys
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -48,84 +54,192 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var stats;
+			var radius = 6371;
+			var tilt = 0.41;
+			var rotationSpeed = 0.02;
 
+			var cloudsScale = 1.005;
+			var moonScale = 0.23;
+
+			var MARGIN = 0;
+			var SCREEN_HEIGHT = window.innerHeight - MARGIN * 2;
+			var SCREEN_WIDTH  = window.innerWidth;
+
+			var container, stats;
 			var camera, controls, scene, renderer;
+			var geometry, meshPlanet, meshClouds, meshMoon;
+			var dirLight, pointLight, ambientLight;
+
+			var composer;
+
+			var textureLoader = new THREE.TextureLoader();
+
+			var d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
+
+			var clock = new THREE.Clock();
 
 			init();
-			render(); // remove when using next line for animation loop (requestAnimationFrame)
-			//animate();
+
+			// render(); // add this when using controls.addEventListener( 'change', render ) for animation loop
+			animate(); // remove when using event listener for animation loop
 
 			function init() {
 
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7 );
+				camera.position.z = radius * 5;
+
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xcccccc );
-				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+				scene.fog = new THREE.FogExp2( 0x000000, 0.00000025 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 500;
-
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // remove when using animation loop
-				// enable animation loop when using damping or autorotation
-				//controls.enableDamping = true;
-				//controls.dampingFactor = 0.25;
-				controls.enableZoom = false;
 
-				// world
+				// for static scenes this method can be used instead of animate() to control the render loop
+				// controls.addEventListener( 'change', render );
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = 0.05;
 
-				for ( var i = 0; i < 500; i ++ ) {
+				controls.rotateSpeed = 0.25;
 
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
-					mesh.updateMatrix();
-					mesh.matrixAutoUpdate = false;
-					scene.add( mesh );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.1;
+				// controls.enableZoom = false;
+				// controls.enablePan = false;
+
+				dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( -1, 0, 1 ).normalize();
+				scene.add( dirLight );
+
+				var materialNormalMap = new THREE.MeshPhongMaterial( {
+
+					specular: 0x333333,
+					shininess: 15,
+					map: textureLoader.load( "textures/planets/earth_atmos_2048.jpg" ),
+					specularMap: textureLoader.load( "textures/planets/earth_specular_2048.jpg" ),
+					normalMap: textureLoader.load( "textures/planets/earth_normal_2048.jpg" ),
+					normalScale: new THREE.Vector2( 0.85, 0.85 )
+
+				} );
+
+				// planet
+
+				geometry = new THREE.SphereGeometry( radius, 100, 50 );
+
+				meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
+				meshPlanet.rotation.y = 0;
+				meshPlanet.rotation.z = tilt;
+				scene.add( meshPlanet );
+
+				// clouds
+
+				var materialClouds = new THREE.MeshLambertMaterial( {
+
+					map: textureLoader.load( "textures/planets/earth_clouds_1024.png" ),
+					transparent: true
+
+				} );
+
+				meshClouds = new THREE.Mesh( geometry, materialClouds );
+				meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
+				meshClouds.rotation.z = tilt;
+				scene.add( meshClouds );
+
+				// moon
+
+				var materialMoon = new THREE.MeshPhongMaterial( {
+
+					map: textureLoader.load( "textures/planets/moon_1024.jpg" )
+
+				} );
+
+				meshMoon = new THREE.Mesh( geometry, materialMoon );
+				meshMoon.position.set( radius * 5, 0, 0 );
+				meshMoon.scale.set( moonScale, moonScale, moonScale );
+				scene.add( meshMoon );
+
+				// stars
+
+				var i, r = radius, starsGeometry = [ new THREE.Geometry(), new THREE.Geometry() ];
+
+				for ( i = 0; i < 250; i ++ ) {
+
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 2 - 1;
+					vertex.y = Math.random() * 2 - 1;
+					vertex.z = Math.random() * 2 - 1;
+					vertex.multiplyScalar( r );
+
+					starsGeometry[ 0 ].vertices.push( vertex );
 
 				}
 
-				// lights
+				for ( i = 0; i < 1500; i ++ ) {
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 1, 1, 1 );
-				scene.add( light );
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 2 - 1;
+					vertex.y = Math.random() * 2 - 1;
+					vertex.z = Math.random() * 2 - 1;
+					vertex.multiplyScalar( r );
 
-				var light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( -1, -1, -1 );
-				scene.add( light );
+					starsGeometry[ 1 ].vertices.push( vertex );
 
-				var light = new THREE.AmbientLight( 0x222222 );
-				scene.add( light );
+				}
 
-				//
+				var stars;
+				var starsMaterials = [
+					new THREE.PointsMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
+				];
+
+				for ( i = 10; i < 30; i ++ ) {
+
+					stars = new THREE.Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
+
+					stars.rotation.x = Math.random() * 6;
+					stars.rotation.y = Math.random() * 6;
+					stars.rotation.z = Math.random() * 6;
+					stars.scale.setScalar( i * 10 );
+
+					stars.matrixAutoUpdate = false;
+					stars.updateMatrix();
+
+					scene.add( stars );
+
+				}
+
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
+
 
 			}
 
-			function onWindowResize() {
+			function onWindowResize( event ) {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+				SCREEN_HEIGHT = window.innerHeight;
+				SCREEN_WIDTH  = window.innerWidth;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer.reset();
 
 			}
 
@@ -133,15 +247,21 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
-
-				stats.update();
-
 				render();
+				stats.update();
 
 			}
 
 			function render() {
+
+				// rotate the planet and clouds
+
+				var delta = clock.getDelta();
+
+				meshPlanet.rotation.y += rotationSpeed * delta;
+				meshClouds.rotation.y += 1.25 * rotationSpeed * delta;
+
+				controls.update( delta );
 
 				renderer.render( scene, camera );
 
