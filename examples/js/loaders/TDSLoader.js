@@ -43,11 +43,13 @@ THREE.TDSLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.FileLoader( this.manager );
+		var path = scope.path === undefined ? THREE.Loader.prototype.extractUrlBase( url ) : scope.path;
+		
+		var loader = new THREE.FileLoader( scope.manager );
 
 		loader.setResponseType( 'arraybuffer' );
 		
-		loader.setPath( this.path );
+		loader.setPath( path );
 
 		loader.load( url, function ( data ) {
 
