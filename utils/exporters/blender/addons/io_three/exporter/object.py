@@ -1,6 +1,6 @@
 from .. import constants, logger
 from . import base_classes, api
-
+from bpy import data
 
 class Object(base_classes.BaseNode):
     """Class that wraps an object node"""
@@ -145,10 +145,13 @@ class Object(base_classes.BaseNode):
             logger.info("Export Transform Animation for %s", self.node)
             if self._scene:
                 # only when exporting scene
-                tracks = api.object.animated_xform(self.node, self.options)
-                merge = self._scene[constants.ANIMATION][0][constants.KEYFRAMES]
-                for track in tracks:
-                    merge.append(track)
+                i = 0
+                for action in data.actions:
+                    tracks = api.object.animated_xform(self.node, self.options, i)
+                    merge = self._scene[constants.ANIMATION][i][constants.KEYFRAMES]
+                    for track in tracks:
+                        merge.append(track)
+                    i += 1
 
         if self.options.get(constants.HIERARCHY, False):
             for child in api.object.children(self.node, self.scene.valid_types):
