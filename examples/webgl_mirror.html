@@ -73,7 +73,7 @@
 				scene = new THREE.Scene();
 
 				// camera
-				camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.set( 0, 75, 160 );
 
 				cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -88,7 +88,7 @@
 
 				// reflectors/mirrors
 
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var geometry = new THREE.CircleBufferGeometry( 40, 64 );
 				var groundMirror = new THREE.Reflector( geometry, {
 					clipBias: 0.003,
 					textureWidth: WIDTH * window.devicePixelRatio,
@@ -96,10 +96,11 @@
 					color: 0x777777,
 					recursion: 1
 				} );
+				groundMirror.position.y = 0.5;
 				groundMirror.rotateX( - Math.PI / 2 );
 				scene.add( groundMirror );
 
-				var geometry = new THREE.CircleBufferGeometry( 40, 6 );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				var verticalMirror = new THREE.Reflector( geometry, {
 					clipBias: 0.003,
 					textureWidth: WIDTH * window.devicePixelRatio,
@@ -108,7 +109,7 @@
 					recursion: 1
 				} );
 				verticalMirror.position.y = 50;
-				verticalMirror.position.z = -45;
+				verticalMirror.position.z = - 50;
 				scene.add( verticalMirror );
 
 
@@ -141,10 +142,9 @@
 				planeTop.rotateX( Math.PI / 2 );
 				scene.add( planeTop );
 
-				var planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
-				planeBack.position.z = -50;
-				planeBack.position.y = 50;
-				scene.add( planeBack );
+				var planeBottom = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
+				planeBottom.rotateX( - Math.PI / 2 );
+				scene.add( planeBottom );
 
 				var planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x7f7fff } ) );
 				planeFront.position.z = 50;
