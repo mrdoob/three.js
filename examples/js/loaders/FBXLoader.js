@@ -2224,32 +2224,39 @@
 		for ( var nodeID in rawLayers ) {
 
 			var layer = [];
-			var children = connections.get( parseInt( nodeID ) ).children;
 
-			for ( var childIndex = 0; childIndex < children.length; childIndex ++ ) {
+			var connection = connections.get( parseInt( nodeID ) );
 
-				// Skip lockInfluenceWeights
-				if ( tmpMap.has( children[ childIndex ].ID ) ) {
+			if ( connection !== undefined ) {
 
-					var curveNode = tmpMap.get( children[ childIndex ].ID );
-					var boneID = curveNode.containerBoneID;
-					if ( layer[ boneID ] === undefined ) {
+				var children = connection.children;
 
-						layer[ boneID ] = {
-							T: null,
-							R: null,
-							S: null
-						};
+				for ( var childIndex = 0; childIndex < children.length; childIndex ++ ) {
+
+					// Skip lockInfluenceWeights
+					if ( tmpMap.has( children[ childIndex ].ID ) ) {
+
+						var curveNode = tmpMap.get( children[ childIndex ].ID );
+						var boneID = curveNode.containerBoneID;
+						if ( layer[ boneID ] === undefined ) {
+
+							layer[ boneID ] = {
+								T: null,
+								R: null,
+								S: null
+							};
+
+						}
+
+						layer[ boneID ][ curveNode.attr ] = curveNode;
 
 					}
 
-					layer[ boneID ][ curveNode.attr ] = curveNode;
-
 				}
 
-			}
+				returnObject.layers[ nodeID ] = layer;
 
-			returnObject.layers[ nodeID ] = layer;
+			}
 
 		}
 

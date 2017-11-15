@@ -2,7 +2,7 @@
  * @author thespite / http://clicktorelease.com/
  */
 
-function detectCreateImageBitmap ( optionsList ) {
+function detectCreateImageBitmap( optionsList ) {
 
 	var url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 

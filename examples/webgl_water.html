@@ -109,7 +109,9 @@
 
 			// water
 
-			water = new THREE.Water( 20, 20, {
+			var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+
+			water = new THREE.Water( waterGeometry, {
 				color: params.color,
 				scale: params.scale,
 				flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
