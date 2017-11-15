@@ -1589,7 +1589,7 @@
 
 							if ( lightAttribute.Color !== undefined ) {
 
-								color = parseColor( lightAttribute.Color.value );
+								color = parseColor( lightAttribute.Color );
 
 							}
 
@@ -3910,7 +3910,15 @@
 
 	function parseColor( property ) {
 
-		return new THREE.Color().fromArray( property.value );
+		var color = new THREE.Color();
+
+		if ( property.type === 'Color' ) {
+
+			return color.setScalar( property.value );
+
+		}
+
+		return color.fromArray( property.value );
 
 	}
 
