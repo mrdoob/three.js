@@ -3903,13 +3903,17 @@
 
 	function parseColor( property ) {
 
+		var color = new THREE.Color();
+
 		if ( property.type === 'Color' ) {
 
-			return new THREE.Color( property.value, property.value, property.value );
+			return color.setScalar( property.value );
+
+		} else {
+
+			return color.fromArray( property.value );
 
 		}
-
-		return new THREE.Color().fromArray( property.value );
 
 	}
 
