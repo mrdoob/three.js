@@ -7,9 +7,9 @@
  *
  */
 
-THREE.Water = function ( width, height, options ) {
+THREE.Water = function ( geometry, options ) {
 
-	THREE.Mesh.call( this, new THREE.PlaneBufferGeometry( width, height ) );
+	THREE.Mesh.call( this, geometry );
 
 	this.type = 'Water';
 
@@ -54,13 +54,13 @@ THREE.Water = function ( width, height, options ) {
 
 	}
 
-	var reflector = new THREE.Reflector( width, height, {
+	var reflector = new THREE.Reflector( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
 		clipBias: clipBias
 	} );
 
-	var refractor = new THREE.Refractor( width, height, {
+	var refractor = new THREE.Refractor( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
 		clipBias: clipBias

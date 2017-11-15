@@ -154,9 +154,10 @@
 
 			function setWater() {
 
+				var waterGeometry = new THREE.PlaneBufferGeometry( parameters.oceanSide * 5, parameters.oceanSide * 5 );
+
 				water = new THREE.Water(
-					parameters.oceanSide * 5,
-					parameters.oceanSide * 5,
+					waterGeometry,
 					{
 						textureWidth: 512,
 						textureHeight: 512,

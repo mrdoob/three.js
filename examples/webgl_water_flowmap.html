@@ -86,9 +86,10 @@
 
 			// water
 
+			var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
 			var flowMap = textureLoader.load( 'textures/water/Water_1_M_Flow.jpg' );
 
-			water = new THREE.Water( 20, 20, {
+			water = new THREE.Water( waterGeometry, {
 				scale: 2,
 				textureWidth: 1024,
 				textureHeight: 1024,
