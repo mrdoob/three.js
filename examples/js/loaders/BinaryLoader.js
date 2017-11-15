@@ -245,17 +245,7 @@ THREE.BinaryLoader.prototype = {
 
 			function parseString( data, offset, length ) {
 
-				var charArray = new Uint8Array( data, offset, length );
-
-				var text = "";
-
-				for ( var i = 0; i < length; i ++ ) {
-
-					text += String.fromCharCode( charArray[ i ] );
-
-				}
-
-				return text;
+				return THREE.Loader.decodeText( new Uint8Array( data, offset, length ) );
 
 			}
 

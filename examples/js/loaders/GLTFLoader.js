@@ -77,7 +77,7 @@ THREE.GLTFLoader = ( function () {
 
 			} else {
 
-				var magic = convertUint8ArrayToString( new Uint8Array( data, 0, 4 ) );
+				var magic = THREE.Loader.decodeText( new Uint8Array( data, 0, 4 ) );
 
 				if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
 
@@ -96,7 +96,7 @@ THREE.GLTFLoader = ( function () {
 
 				} else {
 
-					content = convertUint8ArrayToString( new Uint8Array( data ) );
+					content = THREE.Loader.decodeText( new Uint8Array( data ) );
 
 				}
 
@@ -410,7 +410,7 @@ THREE.GLTFLoader = ( function () {
 		var headerView = new DataView( data, 0, BINARY_EXTENSION_HEADER_LENGTH );
 
 		this.header = {
-			magic: convertUint8ArrayToString( new Uint8Array( data.slice( 0, 4 ) ) ),
+			magic: THREE.Loader.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
 			version: headerView.getUint32( 4, true ),
 			length: headerView.getUint32( 8, true )
 		};
@@ -439,7 +439,7 @@ THREE.GLTFLoader = ( function () {
 			if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.JSON ) {
 
 				var contentArray = new Uint8Array( data, BINARY_EXTENSION_HEADER_LENGTH + chunkIndex, chunkLength );
-				this.content = convertUint8ArrayToString( contentArray );
+				this.content = THREE.Loader.decodeText( contentArray );
 
 			} else if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.BIN ) {
 
@@ -1032,29 +1032,6 @@ THREE.GLTFLoader = ( function () {
 
 		// Relative URL
 		return path + url;
-
-	}
-
-	function convertUint8ArrayToString( array ) {
-
-		if ( window.TextDecoder !== undefined ) {
-
-			return new TextDecoder().decode( array );
-
-		}
-
-		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
-		// throws a "maximum call stack size exceeded" error for large arrays.
-
-		var s = '';
-
-		for ( var i = 0, il = array.length; i < il; i ++ ) {
-
-			s += String.fromCharCode( array[ i ] );
-
-		}
-
-		return s;
 
 	}
 
