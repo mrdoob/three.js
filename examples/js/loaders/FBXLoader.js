@@ -3916,11 +3916,9 @@
 
 			return color.setScalar( property.value );
 
-		} else {
-
-			return color.fromArray( property.value );
-
 		}
+
+		return color.fromArray( property.value );
 
 	}
 
