@@ -666,7 +666,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 	function convertUint8ArrayToString( array ) {
 
-		if ( window.TextDecoder !== undefined ) {
+		if ( typeof TextDecoder !== 'undefined' ) {
 
 			return new TextDecoder().decode( array );
 

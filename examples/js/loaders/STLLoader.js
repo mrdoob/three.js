@@ -268,7 +268,7 @@ THREE.STLLoader.prototype = {
 
 				var array_buffer = new Uint8Array( buffer );
 
-				if ( window.TextDecoder !== undefined ) {
+				if ( typeof TextDecoder !== 'undefined' ) {
 
 					return new TextDecoder().decode( array_buffer );
 

@@ -3930,7 +3930,7 @@
 
 		var array = new Uint8Array( buffer, from, to );
 
-		if ( window.TextDecoder !== undefined ) {
+		if ( typeof TextDecoder !== 'undefined' ) {
 
 			return new TextDecoder().decode( array );
 
