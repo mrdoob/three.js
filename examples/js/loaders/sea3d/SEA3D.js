@@ -279,7 +279,7 @@ SEA3D.Stream.prototype.readUTF8 = function ( len ) {
 
 	var buffer = this.readBytes( len );
 
-	if ( window.TextDecoder ) {
+	if ( typeof TextDecoder !== 'undefined' ) {
 
 		return new TextDecoder().decode( buffer );
 

@@ -88,7 +88,7 @@ THREE.ThreeMFLoader.prototype = {
 
 			}
 
-			if ( window.TextDecoder === undefined ) {
+			if ( typeof TextDecoder !== 'undefined' ) {
 
 				console.error( 'THREE.ThreeMFLoader: TextDecoder not present. Please use a TextDecoder polyfill.' );
 				return null;

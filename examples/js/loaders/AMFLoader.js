@@ -87,7 +87,7 @@ THREE.AMFLoader.prototype = {
 
 			}
 
-			if ( window.TextDecoder === undefined ) {
+			if ( typeof TextDecoder !== 'undefined' ) {
 
 				console.log( 'THREE.AMFLoader: TextDecoder not present. Please use TextDecoder polyfill.' );
 				return null;
