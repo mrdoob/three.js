@@ -63,7 +63,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			inverseMatrix.getInverse( matrixWorld );
 			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
-			var localPrecision = 3 * precision / ( this.scale.x + this.scale.y + this.scale.z );
+			var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 			var localPrecisionSq = localPrecision * localPrecision;
 
 			var vStart = new Vector3();
