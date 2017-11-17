@@ -38,7 +38,6 @@
 
 			var camera, scene, renderer, stats;
 			var pointLight, pointLight2;
-			var torusKnot;
 
 			init();
 			animate();
@@ -66,6 +65,31 @@
 					var sphere = new THREE.Mesh( geometry, material );
 					pointLight.add( sphere );
 
+					var texture = new THREE.CanvasTexture( generateTexture() );
+					texture.magFilter = THREE.NearestFilter;
+					texture.wrapT = THREE.RepeatWrapping;
+					texture.repeat.set( 1, 3.5 );
+
+					var geometry = new THREE.SphereGeometry( 2, 32, 8 );
+					var material = new THREE.MeshPhongMaterial( {
+						side: THREE.DoubleSide,
+						alphaMap: texture,
+						alphaTest: 0.5,
+						transparent: true
+					} );
+
+					var sphere = new THREE.Mesh( geometry, material );
+					sphere.castShadow = true;
+					sphere.receiveShadow = true;
+					pointLight.add( sphere );
+
+					// custom distance material
+					var distanceMaterial = new THREE.MeshDistanceMaterial( {
+						alphaMap: material.alphaMap,
+						alphaTest: material.alphaTest
+					} );
+					sphere.customDistanceMaterial = distanceMaterial;
+
 					return pointLight;
 
 				}
@@ -75,36 +99,6 @@
 
 				pointLight2 = createLight( 0xff0000 );
 				scene.add( pointLight2 );
-
-				//
-
-				var geometry = new THREE.TorusKnotGeometry( 14, 1, 150, 20 );
-
-				var texture = new THREE.CanvasTexture( generateTexture() );
-				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-				texture.repeat.set( 32, 1 );
-
-				var material = new THREE.MeshPhongMaterial( {
-					color: 0xff0000,
-					shininess: 100,
-					specular: 0x222222,
-					alphaMap: texture, // alphaMap uses the g channel
-					alphaTest: 0.5,
-					side: THREE.DoubleSide
-				} );
-
-				torusKnot = new THREE.Mesh( geometry, material );
-				torusKnot.position.set( 0, 5, 0 );
-				torusKnot.castShadow = true;
-				torusKnot.receiveShadow = true;
-				scene.add( torusKnot );
-
-				// custom distance material
-				var distanceMaterial = new THREE.MeshDistanceMaterial( {
-					alphaMap: material.alphaMap,
-					alphaTest: material.alphaTest
-				} );
-				torusKnot.customDistanceMaterial = distanceMaterial;
 
 				//
 
@@ -157,30 +151,12 @@
 			function generateTexture() {
 
 				var canvas = document.createElement( 'canvas' );
-				canvas.width = 256;
-				canvas.height = 256;
+				canvas.width = 2;
+				canvas.height = 2;
 
 				var context = canvas.getContext( '2d' );
-				var image = context.getImageData( 0, 0, 256, 256 );
-
-				var x = 0, y = 0, cvalue;
-
-				for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
-
-					x = j % 256;				// pixel col
-					y = ( x == 0 ) ? y + 1 : y;	// pixel row
-
-					// diagonal stripes
-					cvalue = Math.floor( ( x + y ) / 32 ) % 2;
-
-					image.data[ i + 0 ] = 255 * cvalue;
-					image.data[ i + 1 ] = 255 * cvalue;
-					image.data[ i + 2 ] = 255 * cvalue;
-					image.data[ i + 3 ] = 255;
-
-				}
-
-				context.putImageData( image, 0, 0 );
+				context.fillStyle = 'white';
+				context.fillRect( 0, 1, 2, 1 );
 
 				return canvas;
 
@@ -197,17 +173,21 @@
 
 				var time = performance.now() * 0.001;
 
-				pointLight.position.x = Math.sin( time ) * 9;
-				pointLight.position.y = Math.sin( time * 1.1 ) * 9 + 5;
-				pointLight.position.z = Math.sin( time * 1.2 ) * 9;
+				pointLight.position.x = Math.sin( time * 0.6 ) * 9;
+				pointLight.position.y = Math.sin( time * 0.7 ) * 9 + 5;
+				pointLight.position.z = Math.sin( time * 0.8 ) * 9;
+
+				pointLight.rotation.x = time;
+				pointLight.rotation.z = time;
 
 				time += 10000;
 
-				pointLight2.position.x = Math.sin( time ) * 9;
-				pointLight2.position.y = Math.sin( time * 1.1 ) * 9 + 5;
-				pointLight2.position.z = Math.sin( time * 1.2 ) * 9;
+				pointLight2.position.x = Math.sin( time * 0.6 ) * 9;
+				pointLight2.position.y = Math.sin( time * 0.7 ) * 9 + 5;
+				pointLight2.position.z = Math.sin( time * 0.8 ) * 9;
 
-				torusKnot.rotation.y = time * 0.1;
+				pointLight2.rotation.x = time;
+				pointLight2.rotation.z = time;
 
 				renderer.render( scene, camera );
 
