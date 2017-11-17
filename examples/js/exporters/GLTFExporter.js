@@ -371,16 +371,16 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
-			canvas.width = map.image.width;
-			canvas.height = map.image.height;
-			var ctx = canvas.getContext( '2d' );
-			ctx.drawImage( map.image, 0, 0 );
-
 			var mimeType = map.format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
 			var gltfImage = {mimeType: mimeType};
 
 			if ( options.embedImages ) {
+
+				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
+				canvas.width = map.image.width;
+				canvas.height = map.image.height;
+				var ctx = canvas.getContext( '2d' );
+				ctx.drawImage( map.image, 0, 0 );
 
 				// @TODO Embed in { bufferView } if options.binary set.
 
