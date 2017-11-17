@@ -10,7 +10,7 @@ from . import (
     io,
     api
 )
-from bpy import context
+from bpy import context, data
 
 class Scene(base_classes.BaseScene):
     """Class that handles the contruction of a Three scene"""
@@ -33,11 +33,12 @@ class Scene(base_classes.BaseScene):
         self.__init_animation()
 
     def __init_animation(self):
-        self[constants.ANIMATION].append({
-            constants.NAME: "default",
-            constants.FPS : context.scene.render.fps,
-            constants.KEYFRAMES: []
-        });
+        for action in data.actions:
+            self[constants.ANIMATION].append({
+                constants.NAME: action.name,
+                constants.FPS : context.scene.render.fps,
+                constants.KEYFRAMES: []
+            });
         pass
 
     @property
