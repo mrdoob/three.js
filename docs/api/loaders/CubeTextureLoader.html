@@ -80,7 +80,17 @@ scene.background = new THREE.CubeTextureLoader()
 		[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>
-		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
+		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.<br />
+		Images are projected on cube faces in the order:<br />
+		0 (px): face towards -X<br />
+		1 (nx): face towards +X<br />
+		2 (py): face towards +Y<br />
+		3 (ny): face towards -Y<br />
+		4 (pz): face towards +Z<br />
+		5 (nz): face towards -Z<br />
+		This is by convention, since cube maps are specified by WebGL (and three.js) in a coordinate system
+			in which positive-x is to the right when looking up the positive-z axis -- in other words, in a left-handed coordinate system.
+			Three.js otherwise uses a right-handed coordinate system, so environment maps used in three.js appear to have px and nx swapped.
 		</div>
 
 		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
