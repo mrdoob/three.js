@@ -43,9 +43,10 @@ THREE.TDSLoader.prototype = {
 
 		var scope = this;
 
+		var path = this.path;
 		if ( this.path === "" )	{
 
-			this.path = THREE.Loader.prototype.extractUrlBase( url );
+			path = THREE.Loader.prototype.extractUrlBase( url );
 
 		}
 
@@ -53,7 +54,7 @@ THREE.TDSLoader.prototype = {
 
 		loader.setResponseType( 'arraybuffer' );
 
-		loader.setPath( this.path );
+		loader.setPath( path );
 
 		loader.load( url, function ( data ) {
 
