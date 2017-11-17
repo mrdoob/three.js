@@ -181,6 +181,7 @@ var files = {
 		"webgl_morphtargets",
 		"webgl_morphtargets_horse",
 		"webgl_morphtargets_human",
+		"webgl_morphtargets_sphere",
 		"webgl_multiple_canvases_circle",
 		"webgl_multiple_canvases_complex",
 		"webgl_multiple_canvases_grid",
