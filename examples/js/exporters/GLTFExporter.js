@@ -370,14 +370,20 @@ THREE.GLTFExporter.prototype = {
 
 			var gltfImage = {};
 
+			var canvas = document.createElement( 'canvas' );
+			canvas.width = map.image.width;
+			canvas.height = map.image.height;
+			var ctx = canvas.getContext( '2d' );
+			ctx.drawImage( map.image, 0, 0 );
+			var format = map.format === THREE.RGBAFormat ? 'image/png' : 'image/jpg';
+
 			if ( options.embedImages ) {
 
 				// @TODO { bufferView, mimeType }
 
 			} else {
 
-				// @TODO base64 based on options
-				gltfImage.uri = map.image.src;
+				gltfImage.uri = canvas.toDataURL( format );
 
 			}
 
