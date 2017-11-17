@@ -12,7 +12,21 @@
 		
 		<h1>[name]</h1>
 
-		<div class="desc">Creates a cube texture made up of six images.</div>
+		<div class="desc">
+			Creates a cube texture made up of six images.<br /><br />
+
+			Images are projected on cube faces in the order:<br /><br />
+
+			0 (px): face towards -X<br />
+			1 (nx): face towards +X<br />
+			2 (py): face towards +Y<br />
+			3 (ny): face towards -Y<br />
+			4 (pz): face towards +Z<br />
+			5 (nz): face towards -Z<br /><br />
+
+			Note the apparently reversed (left-handed) projection of the X faces.
+			This is by convention.
+		</div>
 
 		<h2>Example</h2>
 
