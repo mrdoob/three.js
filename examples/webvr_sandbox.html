@@ -40,11 +40,15 @@
 				scene = new THREE.Scene();
 				scene.background = background;
 
+				var user = new THREE.Group();
+				user.position.set( 0, 0.75, 0 );
+				scene.add( user );
+
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
-				scene.add( camera );
+				user.add( camera );
 
 				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
-				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2 } );
+				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = 0.75;
 				mesh.position.z = - 2;
@@ -53,7 +57,7 @@
 				scene.add( mesh );
 
 				var geometry = new THREE.BoxGeometry( 1.5, 0.1, 1.5 );
-				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
+				var material = new THREE.MeshPhongMaterial();
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 0.2;
 				mesh.position.z = - 2;
@@ -107,6 +111,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
