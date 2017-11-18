@@ -48,38 +48,48 @@
 		<code>
 			// Instantiate a loader
 			var loader = new THREE.GLTFLoader();
-	
+
 			// Load a glTF resource
 			loader.load(
 				// resource URL
 				'models/gltf/duck/duck.gltf',
 				// called when the resource is loaded
 				function ( gltf ) {
-	
+
 					scene.add( gltf.scene );
-	
+
 					gltf.animations; // Array&lt;THREE.AnimationClip&gt;
 					gltf.scene; // THREE.Scene
 					gltf.scenes; // Array&lt;THREE.Scene&gt;
 					gltf.cameras; // Array&lt;THREE.Camera&gt;
-	
+
 				},
 				// called when loading is in progresses
 				function ( xhr ) {
-	
+
 					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-	
+
 				},
 				// called when loading has errors
 				function ( error ) {
-	
+
 					console.log( 'An error happened' );
-	
+
 				}
 			);
 			</code>
 
 		[example:webgl_loader_gltf]
+
+		<h2>Browser compatibility</h2>
+
+		<p>GLTFLoader relies on ES6 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promises</a>,
+		which are not supported in IE11. To use the loader in IE11, you must
+		<a href="https://github.com/stefanpenner/es6-promise">include a polyfill</a>
+		providing a Promise replacement.</p>
+
+		<br>
+		<hr>
 
 		<h2>Constructor</h2>
 
