@@ -1067,9 +1067,7 @@ THREE.GLTFExporter.prototype = {
 
 					// JSON chunk.
 					delete outputJSON.buffers[ 0 ].uri; // Omitted URI indicates use of binary chunk.
-					var jsonString = JSON.stringify( outputJSON );
-					jsonString += '    '.substr(0, 4 - jsonString.length % 4); // Pad to 4-byte boundary.
-					var jsonChunk = stringToArrayBuffer( jsonString );
+					var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ) );
 					var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
 					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
 					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
