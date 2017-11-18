@@ -14,10 +14,16 @@ function ImageBitmapLoader( manager ) {
 
 	}
 
+	if ( typeof fetch === 'undefined' ) {
+
+		console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
+
+	}
+
 	this.manager = manager !== undefined ? manager : DefaultLoadingManager;
 	this.options = undefined;
 
-};
+}
 
 ImageBitmapLoader.prototype = {
 
@@ -84,7 +90,7 @@ ImageBitmapLoader.prototype = {
 
 	},
 
-	setCrossOrigin: function ( value ) {
+	setCrossOrigin: function ( /* value */ ) {
 
 		return this;
 
