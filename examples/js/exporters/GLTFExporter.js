@@ -521,7 +521,7 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
 
-					index: processTexture( material.map )
+					index: processTexture( material.map )
 
 				};
 
@@ -547,7 +547,7 @@ THREE.GLTFExporter.prototype = {
 
 					gltfMaterial.emissiveTexture = {
 
-						index: processTexture( material.emissiveMap )
+						index: processTexture( material.emissiveMap )
 
 					};
 
@@ -560,7 +560,7 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.normalTexture = {
 
-					index: processTexture( material.normalMap )
+					index: processTexture( material.normalMap )
 
 				};
 
@@ -583,7 +583,7 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.occlusionTexture = {
 
-					index: processTexture( material.aoMap )
+					index: processTexture( material.aoMap )
 
 				};
 
@@ -596,11 +596,11 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			// alphaMode
-			if ( material.transparent ) {
+			if ( material.transparent || material.alphaTest > 0.0 ) {
 
-				gltfMaterial.alphaMode = 'MASK'; // @FIXME We should detect MASK or BLEND
+				gltfMaterial.alphaMode = material.opacity < 1.0 ? 'BLEND' : 'MASK';
 
-				if ( material.alphaTest !== 0.5 ) {
+				if ( material.alphaTest > 0.0 ) {
 
 					gltfMaterial.alphaCutoff = material.alphaTest;
 
@@ -1067,7 +1067,9 @@ THREE.GLTFExporter.prototype = {
 
 					// JSON chunk.
 					delete outputJSON.buffers[ 0 ].uri; // Omitted URI indicates use of binary chunk.
-					var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ) );
+					var jsonString = JSON.stringify( outputJSON );
+					jsonString += '    '.substr(0, 4 - jsonString.length % 4); // Pad to 4-byte boundary.
+					var jsonChunk = stringToArrayBuffer( jsonString );
 					var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
 					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
 					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
