@@ -101,7 +101,7 @@
 				scene.add( reflector );
 
 				var geometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
-				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
+				var material = new THREE.MeshPhongMaterial();
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.z = - 0.07;
 				mesh.castShadow = true;
