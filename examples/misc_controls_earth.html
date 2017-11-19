@@ -78,6 +78,7 @@
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				controls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
+				controls.maxPolarAngle = 11 * Math.PI / 24; // radians
 
 				controls.panLeft = function() {
 
