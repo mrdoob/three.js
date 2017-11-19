@@ -48,20 +48,19 @@ THREE.STLLoader.prototype = {
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
-		    try {
+			try {
 
 				onLoad( scope.parse( text ) );
 
 			} catch ( exception ) {
 
-		        if ( onError ) {
+				if ( onError ) {
 
-		            onError( exception );
+					onError( exception );
 
 				}
 
-		    }
-
+			}
 
 		}, onProgress, onError );
 
