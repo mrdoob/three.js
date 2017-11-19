@@ -1412,7 +1412,7 @@
 
 	}
 
-// create the main THREE.Group() to be returned by the loader
+	// create the main THREE.Group() to be returned by the loader
 	function parseScene( FBXTree, connections, deformers, geometryMap, materialMap ) {
 
 		var sceneGraph = new THREE.Group();
@@ -1462,7 +1462,7 @@
 
 	}
 
-			// parse nodes in FBXTree.Objects.subNodes.Model
+	// parse nodes in FBXTree.Objects.subNodes.Model
 	function parseModels( FBXTree, deformers, geometryMap, materialMap, connections ) {
 
 		var modelMap = new Map();
@@ -1489,8 +1489,8 @@
 						model = new THREE.Bone();
 						deformer.bones[ subDeformer.index ] = model;
 
-									// seems like we need this not to make non-connected bone, maybe?
-									// TODO: confirm
+						// seems like we need this not to make non-connected bone, maybe?
+						// TODO: confirm
 						if ( model2 !== null ) model.add( model2 );
 
 					}
@@ -1534,7 +1534,7 @@
 
 	}
 
-			// create a THREE.PerspectiveCamera or THREE.OrthographicCamera
+	// create a THREE.PerspectiveCamera or THREE.OrthographicCamera
 	function createCamera( FBXTree, conns ) {
 
 		var model;
@@ -1624,7 +1624,7 @@
 
 	}
 
-			// Create a THREE.DirectionalLight, THREE.PointLight or THREE.SpotLight
+	// Create a THREE.DirectionalLight, THREE.PointLight or THREE.SpotLight
 	function createLight( FBXTree, conns ) {
 
 		var model;
@@ -1652,7 +1652,7 @@
 
 			var type;
 
-					// LightType can be undefined for Point lights
+			// LightType can be undefined for Point lights
 			if ( lightAttribute.LightType === undefined ) {
 
 				type = 0;
@@ -1673,7 +1673,7 @@
 
 			var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
 
-					// light disabled
+			// light disabled
 			if ( lightAttribute.CastLightOnObject !== undefined && lightAttribute.CastLightOnObject.value === 0 ) {
 
 				intensity = 0;
@@ -1695,7 +1695,7 @@
 
 			}
 
-					// TODO: could this be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
+			// TODO: could this be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
 			var decay = 1;
 
 			switch ( type ) {
@@ -1720,9 +1720,9 @@
 					var penumbra = 0;
 					if ( lightAttribute.OuterAngle !== undefined ) {
 
-								// TODO: this is not correct - FBX calculates outer and inner angle in degrees
-								// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
-								// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
+						// TODO: this is not correct - FBX calculates outer and inner angle in degrees
+						// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
+						// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
 						penumbra = THREE.Math.degToRad( lightAttribute.OuterAngle.value );
 						penumbra = Math.max( penumbra, 1 );
 
@@ -2051,7 +2051,9 @@
 		// to attach animations to, since FBX treats animations as animations for the entire scene,
 		// not just for individual objects.
 		sceneGraph.skeleton = {
+
 			bones: Array.from( modelMap.values() ),
+
 		};
 
 	}
