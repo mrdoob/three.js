@@ -180,7 +180,7 @@
 				var id = parseInt( nodeID );
 
 				// check whether the file name is used by another videoNode
-				// and if so keep a record of both ids to as a duplicate pair [ id1, id2 ]
+				// and if so keep a record of both ids as a duplicate pair [ id1, id2 ]
 				if ( videoNode.properties.fileName in names ) {
 
 					duplicates.push( [ id, names[ videoNode.properties.fileName ] ] );
@@ -204,6 +204,8 @@
 
 		// check each duplicate pair - if only one is in the image map then
 		// create an entry for the other id containing the same image data
+		// Note: it seems to be possible for entries to have the same file name but different
+		// content, we won't overwrite these
 		duplicates.forEach( function ( duplicatePair ) {
 
 			if ( imageMap.has( duplicatePair[ 0 ] ) && ! imageMap.has( duplicatePair[ 1 ] ) ) {
