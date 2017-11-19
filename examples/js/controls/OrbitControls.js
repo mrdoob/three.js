@@ -4,6 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author erich666 / http://erichaines.com
+ * @author cigone
  */
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
@@ -52,7 +53,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// Set to false to disable zooming
 	this.enableZoom = true;
 	this.zoomSpeed = 1.0;
-	this.keyDollySpeed = 1.4; // zoom scale per arrow key pus
+	this.keyDollySpeed = 1.4; // zoom scale per arrow key push
 	
 	// Set to false to disable rotating
 	this.enableRotate = true;
