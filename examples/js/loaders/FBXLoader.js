@@ -661,7 +661,6 @@
 
 	}
 
-
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.subNodes.Geometry
 	function genGeometry( geometryNode, deformer ) {
 
@@ -883,9 +882,9 @@
 					}
 
 					faceUVs[ i ].push(
-										data[ 0 ],
-										data[ 1 ]
-									);
+						data[ 0 ],
+						data[ 1 ]
+					);
 
 				}
 
