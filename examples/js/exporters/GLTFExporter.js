@@ -380,6 +380,14 @@ THREE.GLTFExporter.prototype = {
 				canvas.width = map.image.width;
 				canvas.height = map.image.height;
 				var ctx = canvas.getContext( '2d' );
+
+				if ( map.flipY === true ) {
+
+					ctx.translate( 0, map.image.height );
+					ctx.scale( 1, -1 );
+
+				}
+
 				ctx.drawImage( map.image, 0, 0 );
 
 				// @TODO Embed in { bufferView } if options.binary set.
