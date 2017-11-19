@@ -1804,6 +1804,7 @@
 				materials[ materialsIndex ].skinning = true;
 
 			}
+
 			model = new THREE.SkinnedMesh( geometry, material );
 
 		} else {
@@ -1832,13 +1833,13 @@
 
 		}
 
-				// FBX does not list materials for Nurbs lines, so we'll just put our own in here.
+		// FBX does not list materials for Nurbs lines, so we'll just put our own in here.
 		var material = new THREE.LineBasicMaterial( { color: 0x3300ff, linewidth: 1 } );
 		return new THREE.Line( geometry, material );
 
 	}
 
-			// Parse ambient color in FBXTree.GlobalSettings.properties - if it's not set to black (default), create an ambient light
+	// Parse ambient color in FBXTree.GlobalSettings.properties - if it's not set to black (default), create an ambient light
 	function createAmbientLight( FBXTree, sceneGraph ) {
 
 		if ( 'GlobalSettings' in FBXTree && 'AmbientColor' in FBXTree.GlobalSettings.properties ) {
@@ -1859,7 +1860,7 @@
 
 	}
 
-			// parse the model node for transform details and apply them to the model
+	// parse the model node for transform details and apply them to the model
 	function setModelTransforms( FBXTree, model, modelNode, connections, sceneGraph ) {
 
 		if ( 'Lcl_Translation' in modelNode.properties ) {
@@ -1896,7 +1897,7 @@
 
 		}
 
-				// allow transformed pivots - see https://github.com/mrdoob/three.js/issues/11895
+		// allow transformed pivots - see https://github.com/mrdoob/three.js/issues/11895
 		if ( 'GeometricTranslation' in modelNode.properties ) {
 
 			var array = modelNode.properties.GeometricTranslation.value;
@@ -1929,7 +1930,7 @@
 
 						var pos = lookAtTarget.properties.Lcl_Translation.value;
 
-											// DirectionalLight, SpotLight
+						// DirectionalLight, SpotLight
 						if ( model.target !== undefined ) {
 
 							model.target.position.set( pos[ 0 ], pos[ 1 ], pos[ 2 ] );
@@ -1954,12 +1955,12 @@
 
 	function bindSkeleton( FBXTree, deformers, geometryMap, modelMap, connections, sceneGraph ) {
 
-				// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
+		// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
 		sceneGraph.updateMatrixWorld( true );
 
 		var worldMatrices = new Map();
 
-				// Put skeleton into bind pose.
+		// Put skeleton into bind pose.
 		if ( 'Pose' in FBXTree.Objects.subNodes ) {
 
 			var BindPoseNode = FBXTree.Objects.subNodes.Pose;
@@ -2009,7 +2010,7 @@
 
 			}
 
-							// Now that skeleton is in bind pose, bind to model.
+			// Now that skeleton is in bind pose, bind to model.
 			deformer.skeleton = new THREE.Skeleton( deformer.bones );
 
 			var conns = connections.get( deformer.FBX_ID );
@@ -2043,12 +2044,12 @@
 
 		}
 
-				//Skeleton is now bound, return objects to starting world positions.
+		//Skeleton is now bound, return objects to starting world positions.
 		sceneGraph.updateMatrixWorld( true );
 
-				// Silly hack with the animation parsing. We're gonna pretend the scene graph has a skeleton
-				// to attach animations to, since FBX treats animations as animations for the entire scene,
-				// not just for individual objects.
+		// Silly hack with the animation parsing. We're gonna pretend the scene graph has a skeleton
+		// to attach animations to, since FBX treats animations as animations for the entire scene,
+		// not just for individual objects.
 		sceneGraph.skeleton = {
 			bones: Array.from( modelMap.values() ),
 		};
