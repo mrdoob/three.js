@@ -1412,459 +1412,25 @@
 
 	}
 
-
-	// parse nodes in FBXTree.Objects.subNodes.Model and generate a THREE.Group
+// create the main THREE.Group() to be returned by the loader
 	function parseScene( FBXTree, connections, deformers, geometryMap, materialMap ) {
 
 		var sceneGraph = new THREE.Group();
 
-		var ModelNode = FBXTree.Objects.subNodes.Model;
+		var modelMap = parseModels( FBXTree, deformers, geometryMap, materialMap, connections );
 
-		var modelArray = [];
+		var modelNodes = FBXTree.Objects.subNodes.Model;
 
-		var modelMap = new Map();
+		modelMap.forEach( function ( model ) {
 
-		for ( var nodeID in ModelNode ) {
+			var modelNode = modelNodes[ model.FBX_ID ];
 
-			var id = parseInt( nodeID );
-			var node = ModelNode[ nodeID ];
-			var conns = connections.get( id );
-			var model = null;
-
-			for ( var i = 0; i < conns.parents.length; ++ i ) {
-
-				for ( var FBX_ID in deformers ) {
-
-					var deformer = deformers[ FBX_ID ];
-					var subDeformers = deformer.map;
-					var subDeformer = subDeformers[ conns.parents[ i ].ID ];
-
-					if ( subDeformer ) {
-
-						var model2 = model;
-						model = new THREE.Bone();
-						deformer.bones[ subDeformer.index ] = model;
-
-						// seems like we need this not to make non-connected bone, maybe?
-						// TODO: confirm
-						if ( model2 !== null ) model.add( model2 );
-
-					}
-
-				}
-
-			}
-
-			if ( ! model ) {
-
-				switch ( node.attrType ) {
-
-					// create a THREE.PerspectiveCamera or THREE.OrthographicCamera
-					case 'Camera':
-
-						var cameraAttribute;
-
-						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
-
-							var childID = conns.children[ childrenIndex ].ID;
-
-							var attr = FBXTree.Objects.subNodes.NodeAttribute[ childID ];
-
-							if ( attr !== undefined && attr.properties !== undefined ) {
-
-								cameraAttribute = attr.properties;
-
-							}
-
-						}
-
-						if ( cameraAttribute === undefined ) {
-
-							model = new THREE.Object3D();
-
-						} else {
-
-							var type = 0;
-							if ( cameraAttribute.CameraProjectionType !== undefined && cameraAttribute.CameraProjectionType.value === 1 ) {
-
-								type = 1;
-
-							}
-
-							var nearClippingPlane = 1;
-							if ( cameraAttribute.NearPlane !== undefined ) {
-
-								nearClippingPlane = cameraAttribute.NearPlane.value / 1000;
-
-							}
-
-							var farClippingPlane = 1000;
-							if ( cameraAttribute.FarPlane !== undefined ) {
-
-								farClippingPlane = cameraAttribute.FarPlane.value / 1000;
-
-							}
-
-
-							var width = window.innerWidth;
-							var height = window.innerHeight;
-
-							if ( cameraAttribute.AspectWidth !== undefined && cameraAttribute.AspectHeight !== undefined ) {
-
-								width = cameraAttribute.AspectWidth.value;
-								height = cameraAttribute.AspectHeight.value;
-
-							}
-
-							var aspect = width / height;
-
-							var fov = 45;
-							if ( cameraAttribute.FieldOfView !== undefined ) {
-
-								fov = cameraAttribute.FieldOfView.value;
-
-							}
-
-							switch ( type ) {
-
-								case 0: // Perspective
-									model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
-									break;
-
-								case 1: // Orthographic
-									model = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
-									break;
-
-								default:
-									console.warn( 'THREE.FBXLoader: Unknown camera type ' + type + '.' );
-									model = new THREE.Object3D();
-									break;
-
-							}
-
-						}
-
-						break;
-
-
-					// Create a THREE.DirectionalLight, THREE.PointLight or THREE.SpotLight
-					case 'Light':
-
-						var lightAttribute;
-
-						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
-
-							var childID = conns.children[ childrenIndex ].ID;
-
-							var attr = FBXTree.Objects.subNodes.NodeAttribute[ childID ];
-
-							if ( attr !== undefined && attr.properties !== undefined ) {
-
-								lightAttribute = attr.properties;
-
-							}
-
-						}
-
-						if ( lightAttribute === undefined ) {
-
-							model = new THREE.Object3D();
-
-						} else {
-
-							var type;
-
-							// LightType can be undefined for Point lights
-							if ( lightAttribute.LightType === undefined ) {
-
-								type = 0;
-
-							} else {
-
-								type = lightAttribute.LightType.value;
-
-							}
-
-							var color = 0xffffff;
-
-							if ( lightAttribute.Color !== undefined ) {
-
-								color = parseColor( lightAttribute.Color );
-
-							}
-
-							var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
-
-							// light disabled
-							if ( lightAttribute.CastLightOnObject !== undefined && lightAttribute.CastLightOnObject.value === 0 ) {
-
-								intensity = 0;
-
-							}
-
-							var distance = 0;
-							if ( lightAttribute.FarAttenuationEnd !== undefined ) {
-
-								if ( lightAttribute.EnableFarAttenuation !== undefined && lightAttribute.EnableFarAttenuation.value === 0 ) {
-
-									distance = 0;
-
-								} else {
-
-									distance = lightAttribute.FarAttenuationEnd.value / 1000;
-
-								}
-
-							}
-
-							// TODO: could this be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
-							var decay = 1;
-
-							switch ( type ) {
-
-								case 0: // Point
-									model = new THREE.PointLight( color, intensity, distance, decay );
-									break;
-
-								case 1: // Directional
-									model = new THREE.DirectionalLight( color, intensity );
-									break;
-
-								case 2: // Spot
-									var angle = Math.PI / 3;
-
-									if ( lightAttribute.InnerAngle !== undefined ) {
-
-										angle = THREE.Math.degToRad( lightAttribute.InnerAngle.value );
-
-									}
-
-									var penumbra = 0;
-									if ( lightAttribute.OuterAngle !== undefined ) {
-
-										// TODO: this is not correct - FBX calculates outer and inner angle in degrees
-										// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
-										// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-										penumbra = THREE.Math.degToRad( lightAttribute.OuterAngle.value );
-										penumbra = Math.max( penumbra, 1 );
-
-									}
-
-									model = new THREE.SpotLight( color, intensity, distance, angle, penumbra, decay );
-									break;
-
-								default:
-									console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType.value + ', defaulting to a THREE.PointLight.' );
-									model = new THREE.PointLight( color, intensity );
-									break;
-
-							}
-
-							if ( lightAttribute.CastShadows !== undefined && lightAttribute.CastShadows.value === 1 ) {
-
-								model.castShadow = true;
-
-							}
-
-						}
-
-						break;
-
-					case 'Mesh':
-
-						var geometry = null;
-						var material = null;
-						var materials = [];
-
-						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
-
-							var child = conns.children[ childrenIndex ];
-
-							if ( geometryMap.has( child.ID ) ) {
-
-								geometry = geometryMap.get( child.ID );
-
-							}
-
-							if ( materialMap.has( child.ID ) ) {
-
-								materials.push( materialMap.get( child.ID ) );
-
-							}
-
-						}
-						if ( materials.length > 1 ) {
-
-							material = materials;
-
-						} else if ( materials.length > 0 ) {
-
-							material = materials[ 0 ];
-
-						} else {
-
-							material = new THREE.MeshPhongMaterial( { color: 0xcccccc } );
-							materials.push( material );
-
-						}
-						if ( 'color' in geometry.attributes ) {
-
-							for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++ materialIndex ) {
-
-								materials[ materialIndex ].vertexColors = THREE.VertexColors;
-
-							}
-
-						}
-						if ( geometry.FBX_Deformer ) {
-
-							for ( var materialsIndex = 0, materialsLength = materials.length; materialsIndex < materialsLength; ++ materialsIndex ) {
-
-								materials[ materialsIndex ].skinning = true;
-
-							}
-							model = new THREE.SkinnedMesh( geometry, material );
-
-						} else {
-
-							model = new THREE.Mesh( geometry, material );
-
-						}
-						break;
-
-					case 'NurbsCurve':
-						var geometry = null;
-
-						for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
-
-							var child = conns.children[ childrenIndex ];
-
-							if ( geometryMap.has( child.ID ) ) {
-
-								geometry = geometryMap.get( child.ID );
-
-							}
-
-						}
-
-						// FBX does not list materials for Nurbs lines, so we'll just put our own in here.
-						material = new THREE.LineBasicMaterial( { color: 0x3300ff, linewidth: 5 } );
-						model = new THREE.Line( geometry, material );
-						break;
-
-					default:
-						model = new THREE.Group();
-						break;
-
-				}
-
-			}
-
-			model.name = THREE.PropertyBinding.sanitizeNodeName( node.attrName );
-			model.FBX_ID = id;
-
-			modelArray.push( model );
-			modelMap.set( id, model );
-
-		}
-
-		for ( var modelArrayIndex = 0, modelArrayLength = modelArray.length; modelArrayIndex < modelArrayLength; ++ modelArrayIndex ) {
-
-			var model = modelArray[ modelArrayIndex ];
-
-			var node = ModelNode[ model.FBX_ID ];
-
-			if ( 'Lcl_Translation' in node.properties ) {
-
-				model.position.fromArray( node.properties.Lcl_Translation.value );
-
-			}
-
-			if ( 'Lcl_Rotation' in node.properties ) {
-
-				var rotation = node.properties.Lcl_Rotation.value.map( THREE.Math.degToRad );
-				rotation.push( 'ZYX' );
-				model.rotation.fromArray( rotation );
-
-			}
-
-			if ( 'Lcl_Scaling' in node.properties ) {
-
-				model.scale.fromArray( node.properties.Lcl_Scaling.value );
-
-			}
-
-			if ( 'PreRotation' in node.properties ) {
-
-				var array = node.properties.PreRotation.value.map( THREE.Math.degToRad );
-				array[ 3 ] = 'ZYX';
-
-				var preRotations = new THREE.Euler().fromArray( array );
-
-				preRotations = new THREE.Quaternion().setFromEuler( preRotations );
-				var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
-				preRotations.multiply( currentRotation );
-				model.rotation.setFromQuaternion( preRotations, 'ZYX' );
-
-			}
-
-			// allow transformed pivots - see https://github.com/mrdoob/three.js/issues/11895
-			if ( 'GeometricTranslation' in node.properties ) {
-
-				var array = node.properties.GeometricTranslation.value;
-
-				model.traverse( function ( child ) {
-
-					if ( child.geometry ) {
-
-						child.geometry.translate( array[ 0 ], array[ 1 ], array[ 2 ] );
-
-					}
-
-				} );
-
-			}
-
-			if ( 'LookAtProperty' in node.properties ) {
-
-				var conns = connections.get( model.FBX_ID );
-
-				for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
-
-					var child = conns.children[ childrenIndex ];
-
-					if ( child.relationship === 'LookAtProperty' ) {
-
-						var lookAtTarget = FBXTree.Objects.subNodes.Model[ child.ID ];
-
-						if ( 'Lcl_Translation' in lookAtTarget.properties ) {
-
-							var pos = lookAtTarget.properties.Lcl_Translation.value;
-
-							// DirectionalLight, SpotLight
-							if ( model.target !== undefined ) {
-
-								model.target.position.set( pos[ 0 ], pos[ 1 ], pos[ 2 ] );
-								sceneGraph.add( model.target );
-
-
-							} else { // Cameras and other Object3Ds
-
-								model.lookAt( new THREE.Vector3( pos[ 0 ], pos[ 1 ], pos[ 2 ] ) );
-
-							}
-
-						}
-
-					}
-
-				}
-
-			}
+			setModelTransforms( FBXTree, model, modelNode, connections, sceneGraph );
 
 			var conns = connections.get( model.FBX_ID );
 			for ( var parentIndex = 0; parentIndex < conns.parents.length; parentIndex ++ ) {
 
+				var modelArray = Array.from( modelMap.values() );
 				var pIndex = findIndex( modelArray, function ( mod ) {
 
 					return mod.FBX_ID === conns.parents[ parentIndex ].ID;
@@ -1884,15 +1450,516 @@
 
 			}
 
+		} );
+
+		bindSkeleton( FBXTree, deformers, geometryMap, modelMap, connections, sceneGraph );
+
+		addAnimations( FBXTree, connections, sceneGraph );
+
+		createAmbientLight( FBXTree, sceneGraph );
+
+		return sceneGraph;
+
+	}
+
+			// parse nodes in FBXTree.Objects.subNodes.Model
+	function parseModels( FBXTree, deformers, geometryMap, materialMap, connections ) {
+
+		var modelMap = new Map();
+		var modelNodes = FBXTree.Objects.subNodes.Model;
+
+		for ( var nodeID in modelNodes ) {
+
+			var id = parseInt( nodeID );
+			var node = modelNodes[ nodeID ];
+			var conns = connections.get( id );
+			var model = null;
+
+			for ( var i = 0; i < conns.parents.length; ++ i ) {
+
+				for ( var FBX_ID in deformers ) {
+
+					var deformer = deformers[ FBX_ID ];
+					var subDeformers = deformer.map;
+					var subDeformer = subDeformers[ conns.parents[ i ].ID ];
+
+					if ( subDeformer ) {
+
+						var model2 = model;
+						model = new THREE.Bone();
+						deformer.bones[ subDeformer.index ] = model;
+
+									// seems like we need this not to make non-connected bone, maybe?
+									// TODO: confirm
+						if ( model2 !== null ) model.add( model2 );
+
+					}
+
+				}
+
+			}
+
+			if ( ! model ) {
+
+				switch ( node.attrType ) {
+
+					case 'Camera':
+						model = createCamera( FBXTree, conns );
+						break;
+					case 'Light':
+						model = createLight( FBXTree, conns );
+						break;
+					case 'Mesh':
+						model = createMesh( FBXTree, conns, geometryMap, materialMap );
+						break;
+					case 'NurbsCurve':
+						model = createCurve( conns, geometryMap );
+						break;
+					default:
+						model = new THREE.Group();
+						break;
+
+				}
+
+			}
+
+			model.name = THREE.PropertyBinding.sanitizeNodeName( node.attrName );
+			model.FBX_ID = id;
+
+			modelMap.set( id, model );
+
 		}
 
+		return modelMap;
 
-		// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
+	}
+
+			// create a THREE.PerspectiveCamera or THREE.OrthographicCamera
+	function createCamera( FBXTree, conns ) {
+
+		var model;
+		var cameraAttribute;
+
+		for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+			var childID = conns.children[ childrenIndex ].ID;
+
+			var attr = FBXTree.Objects.subNodes.NodeAttribute[ childID ];
+
+			if ( attr !== undefined && attr.properties !== undefined ) {
+
+				cameraAttribute = attr.properties;
+
+			}
+
+		}
+
+		if ( cameraAttribute === undefined ) {
+
+			model = new THREE.Object3D();
+
+		} else {
+
+			var type = 0;
+			if ( cameraAttribute.CameraProjectionType !== undefined && cameraAttribute.CameraProjectionType.value === 1 ) {
+
+				type = 1;
+
+			}
+
+			var nearClippingPlane = 1;
+			if ( cameraAttribute.NearPlane !== undefined ) {
+
+				nearClippingPlane = cameraAttribute.NearPlane.value / 1000;
+
+			}
+
+			var farClippingPlane = 1000;
+			if ( cameraAttribute.FarPlane !== undefined ) {
+
+				farClippingPlane = cameraAttribute.FarPlane.value / 1000;
+
+			}
+
+
+			var width = window.innerWidth;
+			var height = window.innerHeight;
+
+			if ( cameraAttribute.AspectWidth !== undefined && cameraAttribute.AspectHeight !== undefined ) {
+
+				width = cameraAttribute.AspectWidth.value;
+				height = cameraAttribute.AspectHeight.value;
+
+			}
+
+			var aspect = width / height;
+
+			var fov = 45;
+			if ( cameraAttribute.FieldOfView !== undefined ) {
+
+				fov = cameraAttribute.FieldOfView.value;
+
+			}
+
+			switch ( type ) {
+
+				case 0: // Perspective
+					model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
+					break;
+
+				case 1: // Orthographic
+					model = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
+					break;
+
+				default:
+					console.warn( 'THREE.FBXLoader: Unknown camera type ' + type + '.' );
+					model = new THREE.Object3D();
+					break;
+
+			}
+
+		}
+
+		return model;
+
+	}
+
+			// Create a THREE.DirectionalLight, THREE.PointLight or THREE.SpotLight
+	function createLight( FBXTree, conns ) {
+
+		var model;
+		var lightAttribute;
+
+		for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+			var childID = conns.children[ childrenIndex ].ID;
+
+			var attr = FBXTree.Objects.subNodes.NodeAttribute[ childID ];
+
+			if ( attr !== undefined && attr.properties !== undefined ) {
+
+				lightAttribute = attr.properties;
+
+			}
+
+		}
+
+		if ( lightAttribute === undefined ) {
+
+			model = new THREE.Object3D();
+
+		} else {
+
+			var type;
+
+					// LightType can be undefined for Point lights
+			if ( lightAttribute.LightType === undefined ) {
+
+				type = 0;
+
+			} else {
+
+				type = lightAttribute.LightType.value;
+
+			}
+
+			var color = 0xffffff;
+
+			if ( lightAttribute.Color !== undefined ) {
+
+				color = parseColor( lightAttribute.Color );
+
+			}
+
+			var intensity = ( lightAttribute.Intensity === undefined ) ? 1 : lightAttribute.Intensity.value / 100;
+
+					// light disabled
+			if ( lightAttribute.CastLightOnObject !== undefined && lightAttribute.CastLightOnObject.value === 0 ) {
+
+				intensity = 0;
+
+			}
+
+			var distance = 0;
+			if ( lightAttribute.FarAttenuationEnd !== undefined ) {
+
+				if ( lightAttribute.EnableFarAttenuation !== undefined && lightAttribute.EnableFarAttenuation.value === 0 ) {
+
+					distance = 0;
+
+				} else {
+
+					distance = lightAttribute.FarAttenuationEnd.value / 1000;
+
+				}
+
+			}
+
+					// TODO: could this be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
+			var decay = 1;
+
+			switch ( type ) {
+
+				case 0: // Point
+					model = new THREE.PointLight( color, intensity, distance, decay );
+					break;
+
+				case 1: // Directional
+					model = new THREE.DirectionalLight( color, intensity );
+					break;
+
+				case 2: // Spot
+					var angle = Math.PI / 3;
+
+					if ( lightAttribute.InnerAngle !== undefined ) {
+
+						angle = THREE.Math.degToRad( lightAttribute.InnerAngle.value );
+
+					}
+
+					var penumbra = 0;
+					if ( lightAttribute.OuterAngle !== undefined ) {
+
+								// TODO: this is not correct - FBX calculates outer and inner angle in degrees
+								// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
+								// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
+						penumbra = THREE.Math.degToRad( lightAttribute.OuterAngle.value );
+						penumbra = Math.max( penumbra, 1 );
+
+					}
+
+					model = new THREE.SpotLight( color, intensity, distance, angle, penumbra, decay );
+					break;
+
+				default:
+					console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType.value + ', defaulting to a THREE.PointLight.' );
+					model = new THREE.PointLight( color, intensity );
+					break;
+
+			}
+
+			if ( lightAttribute.CastShadows !== undefined && lightAttribute.CastShadows.value === 1 ) {
+
+				model.castShadow = true;
+
+			}
+
+		}
+
+		return model;
+
+	}
+
+	function createMesh( FBXTree, conns, geometryMap, materialMap ) {
+
+		var model;
+		var geometry = null;
+		var material = null;
+		var materials = [];
+
+		for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+			var child = conns.children[ childrenIndex ];
+
+			if ( geometryMap.has( child.ID ) ) {
+
+				geometry = geometryMap.get( child.ID );
+
+			}
+
+			if ( materialMap.has( child.ID ) ) {
+
+				materials.push( materialMap.get( child.ID ) );
+
+			}
+
+		}
+		if ( materials.length > 1 ) {
+
+			material = materials;
+
+		} else if ( materials.length > 0 ) {
+
+			material = materials[ 0 ];
+
+		} else {
+
+			material = new THREE.MeshPhongMaterial( { color: 0xcccccc } );
+			materials.push( material );
+
+		}
+		if ( 'color' in geometry.attributes ) {
+
+			for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++ materialIndex ) {
+
+				materials[ materialIndex ].vertexColors = THREE.VertexColors;
+
+			}
+
+		}
+		if ( geometry.FBX_Deformer ) {
+
+			for ( var materialsIndex = 0, materialsLength = materials.length; materialsIndex < materialsLength; ++ materialsIndex ) {
+
+				materials[ materialsIndex ].skinning = true;
+
+			}
+			model = new THREE.SkinnedMesh( geometry, material );
+
+		} else {
+
+			model = new THREE.Mesh( geometry, material );
+
+		}
+
+		return model;
+
+	}
+
+	function createCurve( conns, geometryMap ) {
+
+		var geometry = null;
+
+		for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+			var child = conns.children[ childrenIndex ];
+
+			if ( geometryMap.has( child.ID ) ) {
+
+				geometry = geometryMap.get( child.ID );
+
+			}
+
+		}
+
+				// FBX does not list materials for Nurbs lines, so we'll just put our own in here.
+		var material = new THREE.LineBasicMaterial( { color: 0x3300ff, linewidth: 1 } );
+		return new THREE.Line( geometry, material );
+
+	}
+
+			// Parse ambient color in FBXTree.GlobalSettings.properties - if it's not set to black (default), create an ambient light
+	function createAmbientLight( FBXTree, sceneGraph ) {
+
+		if ( 'GlobalSettings' in FBXTree && 'AmbientColor' in FBXTree.GlobalSettings.properties ) {
+
+			var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
+			var r = ambientColor[ 0 ];
+			var g = ambientColor[ 1 ];
+			var b = ambientColor[ 2 ];
+
+			if ( r !== 0 || g !== 0 || b !== 0 ) {
+
+				var color = new THREE.Color( r, g, b );
+				sceneGraph.add( new THREE.AmbientLight( color, 1 ) );
+
+			}
+
+		}
+
+	}
+
+			// parse the model node for transform details and apply them to the model
+	function setModelTransforms( FBXTree, model, modelNode, connections, sceneGraph ) {
+
+		if ( 'Lcl_Translation' in modelNode.properties ) {
+
+			model.position.fromArray( modelNode.properties.Lcl_Translation.value );
+
+		}
+
+		if ( 'Lcl_Rotation' in modelNode.properties ) {
+
+			var rotation = modelNode.properties.Lcl_Rotation.value.map( THREE.Math.degToRad );
+			rotation.push( 'ZYX' );
+			model.rotation.fromArray( rotation );
+
+		}
+
+		if ( 'Lcl_Scaling' in modelNode.properties ) {
+
+			model.scale.fromArray( modelNode.properties.Lcl_Scaling.value );
+
+		}
+
+		if ( 'PreRotation' in modelNode.properties ) {
+
+			var array = modelNode.properties.PreRotation.value.map( THREE.Math.degToRad );
+			array[ 3 ] = 'ZYX';
+
+			var preRotations = new THREE.Euler().fromArray( array );
+
+			preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+			var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
+			preRotations.multiply( currentRotation );
+			model.rotation.setFromQuaternion( preRotations, 'ZYX' );
+
+		}
+
+				// allow transformed pivots - see https://github.com/mrdoob/three.js/issues/11895
+		if ( 'GeometricTranslation' in modelNode.properties ) {
+
+			var array = modelNode.properties.GeometricTranslation.value;
+
+			model.traverse( function ( child ) {
+
+				if ( child.geometry ) {
+
+					child.geometry.translate( array[ 0 ], array[ 1 ], array[ 2 ] );
+
+				}
+
+			} );
+
+		}
+
+		if ( 'LookAtProperty' in modelNode.properties ) {
+
+			var conns = connections.get( model.FBX_ID );
+
+			for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+				var child = conns.children[ childrenIndex ];
+
+				if ( child.relationship === 'LookAtProperty' ) {
+
+					var lookAtTarget = FBXTree.Objects.subNodes.Model[ child.ID ];
+
+					if ( 'Lcl_Translation' in lookAtTarget.properties ) {
+
+						var pos = lookAtTarget.properties.Lcl_Translation.value;
+
+											// DirectionalLight, SpotLight
+						if ( model.target !== undefined ) {
+
+							model.target.position.set( pos[ 0 ], pos[ 1 ], pos[ 2 ] );
+							sceneGraph.add( model.target );
+
+
+						} else { // Cameras and other Object3Ds
+
+							model.lookAt( new THREE.Vector3( pos[ 0 ], pos[ 1 ], pos[ 2 ] ) );
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	function bindSkeleton( FBXTree, deformers, geometryMap, modelMap, connections, sceneGraph ) {
+
+				// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
 		sceneGraph.updateMatrixWorld( true );
 
 		var worldMatrices = new Map();
 
-		// Put skeleton into bind pose.
+				// Put skeleton into bind pose.
 		if ( 'Pose' in FBXTree.Objects.subNodes ) {
 
 			var BindPoseNode = FBXTree.Objects.subNodes.Pose;
@@ -1942,7 +2009,7 @@
 
 			}
 
-			// Now that skeleton is in bind pose, bind to model.
+							// Now that skeleton is in bind pose, bind to model.
 			deformer.skeleton = new THREE.Skeleton( deformer.bones );
 
 			var conns = connections.get( deformer.FBX_ID );
@@ -1976,39 +2043,15 @@
 
 		}
 
-		//Skeleton is now bound, return objects to starting world positions.
+				//Skeleton is now bound, return objects to starting world positions.
 		sceneGraph.updateMatrixWorld( true );
 
-		// Silly hack with the animation parsing. We're gonna pretend the scene graph has a skeleton
-		// to attach animations to, since FBX treats animations as animations for the entire scene,
-		// not just for individual objects.
+				// Silly hack with the animation parsing. We're gonna pretend the scene graph has a skeleton
+				// to attach animations to, since FBX treats animations as animations for the entire scene,
+				// not just for individual objects.
 		sceneGraph.skeleton = {
-			bones: modelArray
+			bones: Array.from( modelMap.values() ),
 		};
-
-		var animations = parseAnimations( FBXTree, connections, sceneGraph );
-
-		addAnimations( sceneGraph, animations );
-
-
-		// Parse ambient color - if it's not set to black (default), create an ambient light
-		if ( 'GlobalSettings' in FBXTree && 'AmbientColor' in FBXTree.GlobalSettings.properties ) {
-
-			var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
-			var r = ambientColor[ 0 ];
-			var g = ambientColor[ 1 ];
-			var b = ambientColor[ 2 ];
-
-			if ( r !== 0 || g !== 0 || b !== 0 ) {
-
-				var color = new THREE.Color( r, g, b );
-				sceneGraph.add( new THREE.AmbientLight( color, 1 ) );
-
-			}
-
-		}
-
-		return sceneGraph;
 
 	}
 
@@ -2456,11 +2499,13 @@
 
 	}
 
-	function addAnimations( group, animations ) {
+	function addAnimations( FBXTree, connections, sceneGraph ) {
 
-		if ( group.animations === undefined ) {
+		var animations = parseAnimations( FBXTree, connections, sceneGraph );
 
-			group.animations = [];
+		if ( sceneGraph.animations === undefined ) {
+
+			sceneGraph.animations = [];
 
 		}
 
@@ -2477,7 +2522,7 @@
 				hierarchy: []
 			};
 
-			var bones = group.skeleton.bones;
+			var bones = sceneGraph.skeleton.bones;
 
 			for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
 
@@ -2518,7 +2563,7 @@
 
 			}
 
-			group.animations.push( THREE.AnimationClip.parseAnimation( animationData, bones ) );
+			sceneGraph.animations.push( THREE.AnimationClip.parseAnimation( animationData, bones ) );
 
 		}
 
