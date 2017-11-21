@@ -8,9 +8,11 @@
 
 THREE.GLTFLoader = ( function () {
 
-	function GLTFLoader( manager ) {
+	function GLTFLoader( manager, options ) {
 
+		options = options || {};
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		this.deduplicateGeometry = options.deduplicateGeometry !== false;
 
 	}
 
@@ -139,7 +141,8 @@ THREE.GLTFLoader = ( function () {
 
 				path: path || this.path || '',
 				crossOrigin: this.crossOrigin,
-				manager: this.manager
+				manager: this.manager,
+				deduplicateGeometry: this.deduplicateGeometry
 
 			} );
 
@@ -1365,6 +1368,7 @@ THREE.GLTFLoader = ( function () {
 
 		// BufferGeometry caching
 		this.primitiveCache = [];
+		this.deduplicateGeometry = Boolean(this.options.deduplicateGeometry);
 
 		this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
@@ -1875,6 +1879,7 @@ THREE.GLTFLoader = ( function () {
 	GLTFParser.prototype.loadGeometries = function ( primitives ) {
 
 		var cache = this.primitiveCache;
+		var deduplicateGeometry = this.deduplicateGeometry;
 
 		return this._withDependencies( [
 
@@ -1885,7 +1890,7 @@ THREE.GLTFLoader = ( function () {
 			return _each( primitives, function ( primitive ) {
 
 				// See if we've already created this geometry
-				var cached = getCachedGeometry( cache, primitive );
+				var cached = deduplicateGeometry ? getCachedGeometry( cache, primitive ) : null;
 
 				if (cached) {
 
@@ -1959,12 +1964,16 @@ THREE.GLTFLoader = ( function () {
 				}
 
 				// Cache this geometry
-				cache.push( {
+				if ( deduplicateGeometry ) {
 
-					primitive: primitive,
-					geometry: geometry
+					cache.push( {
 
-				} );
+						primitive: primitive,
+						geometry: geometry
+
+					} );
+
+				}
 
 				return geometry;
 
