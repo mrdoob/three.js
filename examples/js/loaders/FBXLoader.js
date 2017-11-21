@@ -1808,6 +1808,8 @@
 
 			}
 
+
+			// rotated pivots - note: rotation must be applied before translation here
 			if ( 'GeometricRotation' in node.properties ) {
 
 				var array = node.properties.GeometricRotation.value.map( THREE.Math.degToRad );
@@ -1826,7 +1828,7 @@
 
 			}
 
-			// allow transformed pivots - see https://github.com/mrdoob/three.js/issues/11895
+			// translated pivots
 			if ( 'GeometricTranslation' in node.properties ) {
 
 				var array = node.properties.GeometricTranslation.value;
