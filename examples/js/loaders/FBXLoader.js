@@ -2500,8 +2500,6 @@
 
 			}
 
-			var prevKey = null;
-
 			for ( var frame = 0; frame <= stack.frames; frame ++ ) {
 
 				for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
@@ -2517,23 +2515,7 @@
 
 						if ( node.name === bone.name ) {
 
-							var newKey = generateKey( animations, animationNode, bone, frame, prevKey );
-
-							// push first key
-							if ( prevKey === null ) {
-
-								node.keys.push( newKey );
-
-							}
-
-							// For subsequent keys, if the key is identical to the last key then skip it
-							else if ( ! prevKey.equals( newKey ) ) {
-
-								node.keys.push( newKey );
-
-							}
-
-							prevKey = newKey;
+							node.keys.push( generateKey( animations, animationNode, bone, frame ) );
 
 						}
 
@@ -2552,22 +2534,15 @@
 	var euler = new THREE.Euler();
 	var quaternion = new THREE.Quaternion();
 
-	function generateKey( animations, animationNode, bone, frame, prevKey ) {
+	function generateKey( animations, animationNode, bone, frame ) {
 
 		var key = {
+
 			time: frame / animations.fps,
 			pos: bone.position.toArray(),
 			rot: bone.quaternion.toArray(),
 			scl: bone.scale.toArray(),
-			equals: function ( k ) {
 
-				var posEqual = arraysAreEqual( this.pos, k.pos );
-				var rotEqual = arraysAreEqual( this.rot, k.rot );
-				var sclEqual = arraysAreEqual( this.scl, k.scl );
-
-				return posEqual && rotEqual && sclEqual;
-
-			},
 		};
 
 		if ( animationNode === undefined ) return key;
@@ -4013,17 +3988,6 @@
 		}
 
 		return a;
-
-	}
-
-	function arraysAreEqual( a, b ) {
-
-		return a.reduce( function ( current, val, i ) {
-
-			if ( current === false ) return current;
-			return val === b[ i ];
-
-		} );
 
 	}
 
