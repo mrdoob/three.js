@@ -1808,6 +1808,24 @@
 
 			}
 
+			if ( 'GeometricRotation' in node.properties ) {
+
+				var array = node.properties.GeometricRotation.value.map( THREE.Math.degToRad );
+
+				model.traverse( function ( child ) {
+
+					if ( child.geometry ) {
+
+						child.geometry.rotateX( array[ 0 ] );
+						child.geometry.rotateY( array[ 1 ] );
+						child.geometry.rotateZ( array[ 2 ] );
+
+					}
+
+				} );
+
+			}
+
 			// allow transformed pivots - see https://github.com/mrdoob/three.js/issues/11895
 			if ( 'GeometricTranslation' in node.properties ) {
 
