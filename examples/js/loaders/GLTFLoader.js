@@ -1298,6 +1298,60 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
+	function isPrimitiveEqual ( a, b ) {
+
+		if ( a.indices !== b.indices ) {
+
+			return false;
+
+		}
+
+		var attribA = a.attributes || {};
+		var attribB = b.attributes || {};
+		var keysA = Object.keys(attribA);
+		var keysB = Object.keys(attribB);
+		var i;
+
+		for ( i = 0; i < keysA.length; i++ ) {
+
+			var key = keysA[i];
+
+			if ( attribA[key] !== attribB[key] ) {
+
+				return false;
+
+			}
+		}
+
+		for ( i = 0; i < keysB.length; i++ ) {
+
+			var key = keysB[i];
+
+			if ( attribA[key] !== attribB[key] ) {
+
+				return false;
+
+			}
+		}
+
+		return true;
+	}
+
+	function getCachedGeometry ( cache, newPrimitive ) {
+
+		for ( var i = 0; i < cache.length; i++ ) {
+			var cached = cache[i];
+
+			if ( isPrimitiveEqual( cached.primitive, newPrimitive ) ) {
+
+				return cached.geometry;
+
+			}
+		}
+
+		return null;
+	}
+
 	/* GLTF PARSER */
 
 	function GLTFParser( json, extensions, options ) {
@@ -1308,6 +1362,9 @@ THREE.GLTFLoader = ( function () {
 
 		// loader object cache
 		this.cache = new GLTFRegistry();
+
+		// BufferGeometry caching
+		this.primitiveCache = [];
 
 		this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
@@ -1817,6 +1874,8 @@ THREE.GLTFLoader = ( function () {
 
 	GLTFParser.prototype.loadGeometries = function ( primitives ) {
 
+		var cache = this.primitiveCache;
+
 		return this._withDependencies( [
 
 			'accessors',
@@ -1824,6 +1883,15 @@ THREE.GLTFLoader = ( function () {
 		] ).then( function ( dependencies ) {
 
 			return _each( primitives, function ( primitive ) {
+
+				// See if we've already created this geometry
+				var cached = getCachedGeometry( cache, primitive );
+
+				if (cached) {
+
+					return cached;
+
+				}
 
 				var geometry = new THREE.BufferGeometry();
 
@@ -1889,6 +1957,14 @@ THREE.GLTFLoader = ( function () {
 					geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
 				}
+
+				// Cache this geometry
+				cache.push( {
+
+					primitive: primitive,
+					geometry: geometry
+
+				} );
 
 				return geometry;
 
