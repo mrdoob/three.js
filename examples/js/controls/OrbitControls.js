@@ -4,6 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author erich666 / http://erichaines.com
+ * @author cigone
  */
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
@@ -52,7 +53,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// Set to false to disable zooming
 	this.enableZoom = true;
 	this.zoomSpeed = 1.0;
-
+	this.keyDollySpeed = 1.4; // zoom scale per arrow key push
+	
 	// Set to false to disable rotating
 	this.enableRotate = true;
 	this.rotateSpeed = 1.0;
@@ -70,7 +72,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.enableKeys = true;
 
 	// The four arrow keys
-	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, MINUS: 54, PLUS: 61 };
 
 	// Mouse buttons
 	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
@@ -295,7 +297,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	var panLeft = function () {
+	this.panLeft = function () {
 
 		var v = new THREE.Vector3();
 
@@ -310,7 +312,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	var panUp = function () {
+	this.panUp = function () {
 
 		var v = new THREE.Vector3();
 
@@ -345,14 +347,14 @@ THREE.OrbitControls = function ( object, domElement ) {
 				targetDistance *= Math.tan( ( scope.object.fov / 2 ) * Math.PI / 180.0 );
 
 				// we actually don't use screenWidth, since perspective camera is fixed to screen height
-				panLeft( 2 * deltaX * targetDistance / element.clientHeight, scope.object.matrix );
-				panUp( 2 * deltaY * targetDistance / element.clientHeight, scope.object.matrix );
+				scope.panLeft( 2 * deltaX * targetDistance / element.clientHeight, scope.object.matrix );
+				scope.panUp( 2 * deltaY * targetDistance / element.clientHeight, scope.object.matrix );
 
 			} else if ( scope.object.isOrthographicCamera ) {
 
 				// orthographic
-				panLeft( deltaX * ( scope.object.right - scope.object.left ) / scope.object.zoom / element.clientWidth, scope.object.matrix );
-				panUp( deltaY * ( scope.object.top - scope.object.bottom ) / scope.object.zoom / element.clientHeight, scope.object.matrix );
+				scope.panLeft( deltaX * ( scope.object.right - scope.object.left ) / scope.object.zoom / element.clientWidth, scope.object.matrix );
+				scope.panUp( deltaY * ( scope.object.top - scope.object.bottom ) / scope.object.zoom / element.clientHeight, scope.object.matrix );
 
 			} else {
 
@@ -546,7 +548,14 @@ THREE.OrbitControls = function ( object, domElement ) {
 				pan( - scope.keyPanSpeed, 0 );
 				scope.update();
 				break;
-
+			case scope.keys.MINUS:
+				dollyOut(scope.keyDollySpeed);
+				scope.update();
+				break;
+			 case scope.keys.PLUS:
+				dollyIn(scope.keyDollySpeed);
+				scope.update();
+				break;
 		}
 
 	}
