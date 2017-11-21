@@ -2654,15 +2654,9 @@
 
 		return AXES.every( function ( key ) {
 
-			return isKeyExistOnFrame( attributeNode.curves[ key ], frame );
+			return attributeNode.curves[ key ].values[ frame ] !== undefined;
 
 		} );
-
-	}
-
-	function isKeyExistOnFrame( curve, frame ) {
-
-		return curve.values[ frame ] !== undefined;
 
 	}
 
