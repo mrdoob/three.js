@@ -2549,83 +2549,74 @@
 
 		euler.setFromQuaternion( bone.quaternion, 'ZYX', false );
 
-		try {
 
-			if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
+		if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
 
-				if ( animationNode.T.curves.x.values[ frame ] ) {
+			if ( animationNode.T.curves.x.values[ frame ] ) {
 
-					key.pos[ 0 ] = animationNode.T.curves.x.values[ frame ];
-
-				}
-
-				if ( animationNode.T.curves.y.values[ frame ] ) {
-
-					key.pos[ 1 ] = animationNode.T.curves.y.values[ frame ];
-
-				}
-
-				if ( animationNode.T.curves.z.values[ frame ] ) {
-
-					key.pos[ 2 ] = animationNode.T.curves.z.values[ frame ];
-
-				}
+				key.pos[ 0 ] = animationNode.T.curves.x.values[ frame ];
 
 			}
 
-			if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
+			if ( animationNode.T.curves.y.values[ frame ] ) {
 
-				// Only update the euler's values if rotation is defined for the axis on this frame
-				if ( animationNode.R.curves.x.values[ frame ] ) {
-
-					euler.x = animationNode.R.curves.x.values[ frame ];
-
-				}
-
-				if ( animationNode.R.curves.y.values[ frame ] ) {
-
-					euler.y = animationNode.R.curves.y.values[ frame ];
-
-				}
-
-				if ( animationNode.R.curves.z.values[ frame ] ) {
-
-					euler.z = animationNode.R.curves.z.values[ frame ];
-
-				}
-
-				quaternion.setFromEuler( euler );
-				key.rot = quaternion.toArray();
+				key.pos[ 1 ] = animationNode.T.curves.y.values[ frame ];
 
 			}
 
-			if ( hasCurve( animationNode, 'S' ) && hasKeyOnFrame( animationNode.S, frame ) ) {
+			if ( animationNode.T.curves.z.values[ frame ] ) {
 
-				if ( animationNode.T.curves.x.values[ frame ] ) {
-
-					key.scl[ 0 ] = animationNode.S.curves.x.values[ frame ];
-
-				}
-
-				if ( animationNode.T.curves.y.values[ frame ] ) {
-
-					key.scl[ 1 ] = animationNode.S.curves.y.values[ frame ];
-
-				}
-
-				if ( animationNode.T.curves.z.values[ frame ] ) {
-
-					key.scl[ 2 ] = animationNode.S.curves.z.values[ frame ];
-
-				}
+				key.pos[ 2 ] = animationNode.T.curves.z.values[ frame ];
 
 			}
 
-		} catch ( error ) {
+		}
 
-			// Curve is not fully plotted.
-			console.log( 'THREE.FBXLoader: ', bone );
-			console.log( 'THREE.FBXLoader: ', error );
+		if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
+
+			// Only update the euler's values if rotation is defined for the axis on this frame
+			if ( animationNode.R.curves.x.values[ frame ] ) {
+
+				euler.x = animationNode.R.curves.x.values[ frame ];
+
+			}
+
+			if ( animationNode.R.curves.y.values[ frame ] ) {
+
+				euler.y = animationNode.R.curves.y.values[ frame ];
+
+			}
+
+			if ( animationNode.R.curves.z.values[ frame ] ) {
+
+				euler.z = animationNode.R.curves.z.values[ frame ];
+
+			}
+
+			quaternion.setFromEuler( euler );
+			key.rot = quaternion.toArray();
+
+		}
+
+		if ( hasCurve( animationNode, 'S' ) && hasKeyOnFrame( animationNode.S, frame ) ) {
+
+			if ( animationNode.T.curves.x.values[ frame ] ) {
+
+				key.scl[ 0 ] = animationNode.S.curves.x.values[ frame ];
+
+			}
+
+			if ( animationNode.T.curves.y.values[ frame ] ) {
+
+				key.scl[ 1 ] = animationNode.S.curves.y.values[ frame ];
+
+			}
+
+			if ( animationNode.T.curves.z.values[ frame ] ) {
+
+				key.scl[ 2 ] = animationNode.S.curves.z.values[ frame ];
+
+			}
 
 		}
 
