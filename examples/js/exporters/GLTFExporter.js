@@ -734,7 +734,35 @@ THREE.GLTFExporter.prototype = {
 
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
-				gltfAttributes[ attributeName ] = processAccessor( attribute, geometry );
+
+				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
+
+					gltfAttributes[ attributeName ] = processAccessor( attribute, geometry );
+
+				}
+
+			}
+
+			// Morph targets
+			if ( mesh.morphTargetInfluences !== undefined && mesh.morphTargetInfluences.length > 0 ) {
+
+				gltfMesh.primitives[ 0 ].targets = [];
+
+				for ( var i = 0; i < mesh.morphTargetInfluences.length; ++ i ) {
+
+					var target = {};
+
+					for ( var attributeName in geometry.morphAttributes ) {
+
+						var attribute = geometry.morphAttributes[ attributeName ][ i ];
+						attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
+						target[ attributeName ] = processAccessor( attribute, geometry );
+
+					}
+
+					gltfMesh.primitives[ 0 ].targets.push( target );
+
+				}
 
 			}
 
