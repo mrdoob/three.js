@@ -1545,10 +1545,14 @@ THREE.GLTFLoader = ( function () {
 				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#sparse-accessors
 				if ( accessor.sparse !== undefined ) {
 
-					var TypedIndicesArray = WEBGL_COMPONENT_TYPES[ accessor.sparse.indices.componentType ];
+					var itemSizeIndices = WEBGL_TYPE_SIZES.SCALAR;
+					var TypedArrayIndices = WEBGL_COMPONENT_TYPES[ accessor.sparse.indices.componentType ];
 
-					var sparseIndices = new TypedIndicesArray( bufferViews[ 1 ] );
-					var sparseValues = new TypedArray( bufferViews[ 2 ] );
+					var byteOffsetIndices = accessor.sparse.indices.byteOffset || 0;
+					var byteOffsetValues = accessor.sparse.values.byteOffset || 0;
+
+					var sparseIndices = new TypedArrayIndices( bufferViews[ 1 ], byteOffsetIndices, accessor.sparse.count * itemSizeIndices );
+					var sparseValues = new TypedArray( bufferViews[ 2 ], byteOffsetValues, accessor.sparse.count * itemSize );
 
 					if ( bufferView !== null ) {
 
