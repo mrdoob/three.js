@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @author Kyle-Larson https://github.com/Kyle-Larson
  * @author Takahiro https://github.com/takahirox
  *
@@ -3204,8 +3204,9 @@
 			while ( ! this.endOfContent( reader ) ) {
 
 				var node = this.parseNode( reader, version );
-				if ( node !== null ) allNodes.add( node.name, node );
-
+				if ( node === null ) break;
+                		allNodes.add( node.name, node );
+                
 			}
 
 			return allNodes;
