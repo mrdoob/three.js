@@ -103,6 +103,7 @@ var list = {
 		},
 
 		"Extras": {
+			"Earcut": "api/extras/Earcut",
 			"SceneUtils": "api/extras/SceneUtils",
 			"ShapeUtils": "api/extras/ShapeUtils"
 		},
