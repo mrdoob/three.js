@@ -158,7 +158,6 @@
 
 	}
 
-
 	// Parses map of images referenced in FBXTree.Objects.subNodes.Video
 	// Images can either be referenced externally or embedded in the file
 	// These images are connected to textures in FBXTree.Objects.subNodes.Textures
@@ -270,29 +269,61 @@
 	// Parse individual node in FBXTree.Objects.subNodes.Texture
 	function parseTexture( textureNode, loader, imageMap, connections ) {
 
-		var FBX_ID = textureNode.id;
+		var texture = loadTexture( textureNode, loader, imageMap, connections );
 
-		var name = textureNode.attrName;
+		texture.FBX_ID = textureNode.id;
+
+		texture.name = textureNode.attrName;
+
+		var wrapModeU = textureNode.properties.WrapModeU;
+		var wrapModeV = textureNode.properties.WrapModeV;
+
+		var valueU = wrapModeU !== undefined ? wrapModeU.value : 0;
+		var valueV = wrapModeV !== undefined ? wrapModeV.value : 0;
+
+		// http://download.autodesk.com/us/fbx/SDKdocs/FBX_SDK_Help/files/fbxsdkref/class_k_fbx_texture.html#889640e63e2e681259ea81061b85143a
+		// 0: repeat(default), 1: clamp
+
+		texture.wrapS = valueU === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+		texture.wrapT = valueV === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+
+		if ( 'Scaling' in textureNode.properties ) {
+
+			var values = textureNode.properties.Scaling.value;
+
+			texture.repeat.x = values[ 0 ];
+			texture.repeat.y = values[ 1 ];
+
+		}
+
+		return texture;
+
+	}
+
+	// load a texture specified as a blob or data URI, or via an external URL using THREE.TextureLoader
+	function loadTexture( textureNode, loader, imageMap, connections ) {
 
 		var fileName;
 
 		var filePath = textureNode.properties.FileName;
 		var relativeFilePath = textureNode.properties.RelativeFilename;
 
-		var children = connections.get( FBX_ID ).children;
+		var children = connections.get( textureNode.id ).children;
 
+		// embedded texture
 		if ( children !== undefined && children.length > 0 && imageMap.has( children[ 0 ].ID ) ) {
 
 			fileName = imageMap.get( children[ 0 ].ID );
 
-		} else if ( relativeFilePath !== undefined && relativeFilePath[ 0 ] !== '/' && relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
-
-			// use textureNode.properties.RelativeFilename
-			// if it exists and it doesn't seem an absolute path
+		}
+		// check that relative path is not an actually an absolute path and if so use it to load texture
+		else if ( relativeFilePath !== undefined && relativeFilePath[ 0 ] !== '/' && relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
 
 			fileName = relativeFilePath;
 
-		} else {
+		}
+		// texture specified by absolute path
+		else {
 
 			var split = filePath.split( /[\\\/]/ );
 
@@ -317,36 +348,12 @@
 		}
 
 		var texture = loader.load( fileName );
-		texture.name = name;
-		texture.FBX_ID = FBX_ID;
-
-		var wrapModeU = textureNode.properties.WrapModeU;
-		var wrapModeV = textureNode.properties.WrapModeV;
-
-		var valueU = wrapModeU !== undefined ? wrapModeU.value : 0;
-		var valueV = wrapModeV !== undefined ? wrapModeV.value : 0;
-
-		// http://download.autodesk.com/us/fbx/SDKdocs/FBX_SDK_Help/files/fbxsdkref/class_k_fbx_texture.html#889640e63e2e681259ea81061b85143a
-		// 0: repeat(default), 1: clamp
-
-		texture.wrapS = valueU === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-		texture.wrapT = valueV === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-
-		if ( 'Scaling' in textureNode.properties ) {
-
-			var values = textureNode.properties.Scaling.value;
-
-			texture.repeat.x = values[ 0 ];
-			texture.repeat.y = values[ 1 ];
-
-		}
 
 		loader.setPath( currentPath );
 
 		return texture;
 
 	}
-
 
 	// Parse nodes in FBXTree.Objects.subNodes.Material
 	function parseMaterials( FBXTree, textureMap, connections ) {
@@ -358,7 +365,7 @@
 			var materialNodes = FBXTree.Objects.subNodes.Material;
 			for ( var nodeID in materialNodes ) {
 
-				var material = parseMaterial( materialNodes[ nodeID ], textureMap, connections );
+				var material = parseMaterial( FBXTree, materialNodes[ nodeID ], textureMap, connections );
 				if ( material !== null ) materialMap.set( parseInt( nodeID ), material );
 
 			}
@@ -372,7 +379,7 @@
 	// Parse single node in FBXTree.Objects.subNodes.Material
 	// Materials are connected to texture maps in FBXTree.Objects.subNodes.Textures
 	// FBX format currently only supports Lambert and Phong shading models
-	function parseMaterial( materialNode, textureMap, connections ) {
+	function parseMaterial( FBXTree, materialNode, textureMap, connections ) {
 
 		var FBX_ID = materialNode.id;
 		var name = materialNode.attrName;
@@ -390,7 +397,7 @@
 
 		var children = connections.get( FBX_ID ).children;
 
-		var parameters = parseParameters( materialNode.properties, textureMap, children );
+		var parameters = parseParameters( FBXTree, materialNode.properties, textureMap, children, connections );
 
 		var material;
 
@@ -418,7 +425,7 @@
 
 	// Parse FBX material and return parameters suitable for a three.js material
 	// Also parse the texture map and return any textures associated with the material
-	function parseParameters( properties, textureMap, childrenRelationships ) {
+	function parseParameters( FBXTree, properties, textureMap, childrenRelationships, connections ) {
 
 		var parameters = {};
 
@@ -486,33 +493,33 @@
 					break;
 
 				case 'DiffuseColor':
-					parameters.map = textureMap.get( relationship.ID );
+					parameters.map = getTexture( FBXTree, textureMap, relationship.ID, connections );
 					break;
 
 				case 'DisplacementColor':
-					parameters.displacementMap = textureMap.get( relationship.ID );
+					parameters.displacementMap = getTexture( FBXTree, textureMap, relationship.ID, connections );
 					break;
 
 
 				case 'EmissiveColor':
-					parameters.emissiveMap = textureMap.get( relationship.ID );
+					parameters.emissiveMap = getTexture( FBXTree, textureMap, relationship.ID, connections );
 					break;
 
 				case 'NormalMap':
-					parameters.normalMap = textureMap.get( relationship.ID );
+					parameters.normalMap = getTexture( FBXTree, textureMap, relationship.ID, connections );
 					break;
 
 				case 'ReflectionColor':
-					parameters.envMap = textureMap.get( relationship.ID );
+					parameters.envMap = getTexture( FBXTree, textureMap, relationship.ID, connections );
 					parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
 					break;
 
 				case 'SpecularColor':
-					parameters.specularMap = textureMap.get( relationship.ID );
+					parameters.specularMap = getTexture( FBXTree, textureMap, relationship.ID, connections );
 					break;
 
 				case 'TransparentColor':
-					parameters.alphaMap = textureMap.get( relationship.ID );
+					parameters.alphaMap = getTexture( FBXTree, textureMap, relationship.ID, connections );
 					parameters.transparent = true;
 					break;
 
@@ -529,6 +536,21 @@
 		}
 
 		return parameters;
+
+	}
+
+	// get a texture from the textureMap for use by a material.
+	function getTexture( FBXTree, textureMap, id, connections ) {
+
+		// if the texture is a layered texture, just use the first layer and issue a warning
+		if ( 'LayeredTexture' in FBXTree.Objects.subNodes && id in FBXTree.Objects.subNodes.LayeredTexture ) {
+
+			console.warn( 'THREE.FBXLoader: layered textures are not supported in three.js. Discarding all but first layer.' );
+			id = connections.get( id ).children[ 0 ].ID;
+
+		}
+
+		return textureMap.get( id );
 
 	}
 
@@ -2376,7 +2398,7 @@
 				var model = rawModels[ returnObject.containerID.toString() ];
 				if ( 'PreRotation' in model.properties ) {
 
-					returnObject.preRotations = parseVector3( model.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
+					returnObject.preRotations = new THREE.Vector3().fromArray( model.properties.PreRotation.value ).multiplyScalar( Math.PI / 180 );
 
 				}
 				break;
