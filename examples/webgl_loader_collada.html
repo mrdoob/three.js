@@ -47,7 +47,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats, clock;
-			var camera, scene, renderer, elf;
+			var camera, scene, renderer, elf, elf2;
 
 			init();
 			animate();
@@ -69,6 +69,7 @@
 				var loadingManager = new THREE.LoadingManager( function() {
 
 					scene.add( elf );
+					scene.add( elf2 );
 
 				} );
 
@@ -77,7 +78,18 @@
 				var loader = new THREE.ColladaLoader( loadingManager );
 				loader.load( './models/collada/elf/elf.dae', function ( collada ) {
 
-					elf = collada.scene;
+					elf = collada.scene.children[ 0 ];
+					elf.position.set ( 3, 0, 0 );
+					elf.rotation.set ( 0, 0, 0 );
+
+					elf2 = collada.scene.children[ 0 ].clone();
+					elf2.position.set ( - 3, 0, 0 );
+					elf2.rotation.set ( 0, 0, 0 );
+
+					// ----------------------------------------
+					elf2.scale.x *= -1;
+					elf2.frontFaceCW = true;
+					// ----------------------------------------
 
 				} );
 
@@ -132,7 +144,8 @@
 
 				if ( elf !== undefined ) {
 
-					elf.rotation.z += delta * 0.5;
+					elf.rotation.y += delta * 0.5;
+					elf2.rotation.y -= delta * 0.5;
 
 				}
 
