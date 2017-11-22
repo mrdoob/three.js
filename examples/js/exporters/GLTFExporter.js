@@ -73,6 +73,13 @@ THREE.GLTFExporter.prototype = {
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
 
+		if ( options.animations.length > 0 ) {
+
+			// Only TRS properties, and not matrices, may be targeted by animation.
+			options.trs = true;
+
+		}
+
 		var outputJSON = {
 
 			asset: {
@@ -87,6 +94,7 @@ THREE.GLTFExporter.prototype = {
 		var byteOffset = 0;
 		var dataViews = [];
 		var nodeMap = {};
+		var skins = [];
 		var cachedData = {
 
 			images: {},
@@ -300,14 +308,15 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var types = [
+			var types = {
 
-				'SCALAR',
-				'VEC2',
-				'VEC3',
-				'VEC4'
+				1: 'SCALAR',
+				2: 'VEC2',
+				3: 'VEC3',
+				4: 'VEC4',
+				16: 'MAT4'
 
-			];
+			};
 
 			var componentType;
 
@@ -364,7 +373,7 @@ THREE.GLTFExporter.prototype = {
 				count: count,
 				max: minMax.max,
 				min: minMax.min,
-				type: types[ attribute.itemSize - 1 ]
+				type: types[ attribute.itemSize ]
 
 			};
 
@@ -887,10 +896,19 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
+				var inputItemSize = 1;
+				var outputItemSize = track.values.length / track.times.length;
+
+				if ( trackProperty === PATH_PROPERTIES.morphTargetInfluences ) {
+
+					outputItemSize /= trackNode.morphTargetInfluences.length;
+
+				}
+
 				samplers.push( {
 
-					input: processAccessor( new THREE.BufferAttribute( track.times, 1 ) ),
-					output: processAccessor( new THREE.BufferAttribute( track.values, 1 ) ),
+					input: processAccessor( new THREE.BufferAttribute( track.times, inputItemSize ) ),
+					output: processAccessor( new THREE.BufferAttribute( track.values, outputItemSize ) ),
 					interpolation: track.interpolation === THREE.InterpolateDiscrete ? 'STEP' : 'LINEAR'
 
 				} );
@@ -916,6 +934,46 @@ THREE.GLTFExporter.prototype = {
 			} );
 
 			return outputJSON.animations.length - 1;
+
+		}
+
+		function processSkin( object ) {
+
+			var node = outputJSON.nodes[ nodeMap[ object.uuid ] ];
+
+			var skeleton = object.skeleton;
+			var rootJoint = object.skeleton.bones[ 0 ];
+
+			if ( rootJoint === undefined ) return null;
+
+			var joints = [];
+			var inverseBindMatrices = new Float32Array( skeleton.bones.length * 16 );
+
+			for ( var i = 0; i < skeleton.bones.length; ++ i ) {
+
+				joints.push( nodeMap[ skeleton.bones[ i ].uuid ] );
+
+				skeleton.boneInverses[ i ].toArray( inverseBindMatrices, i * 16 );
+
+			}
+
+			if ( outputJSON.skins === undefined ) {
+
+				outputJSON.skins = [];
+
+			}
+
+			outputJSON.skins.push( {
+
+				inverseBindMatrices: processAccessor( new THREE.BufferAttribute( inverseBindMatrices, 16 ) ),
+				joints: joints,
+				skeleton: nodeMap[ rootJoint.uuid ]
+
+			} );
+
+			var skinIndex = node.skin = outputJSON.skins.length - 1;
+
+			return skinIndex;
 
 		}
 
@@ -955,7 +1013,7 @@ THREE.GLTFExporter.prototype = {
 
 				if ( ! equalArray( position, [ 0, 0, 0 ] ) ) {
 
-					gltfNode.position = position;
+					gltfNode.translation = position;
 
 				}
 
@@ -1005,6 +1063,12 @@ THREE.GLTFExporter.prototype = {
 			} else if ( object instanceof THREE.Camera ) {
 
 				gltfNode.camera = processCamera( object );
+
+			}
+
+			if ( object instanceof THREE.SkinnedMesh ) {
+
+				skins.push( object );
 
 			}
 
@@ -1146,6 +1210,12 @@ THREE.GLTFExporter.prototype = {
 			if ( objectsWithoutScene.length > 0 ) {
 
 				processObjects( objectsWithoutScene );
+
+			}
+
+			for ( var i = 0; i < skins.length; ++ i ) {
+
+				processSkin( skins[ i ] );
 
 			}
 
