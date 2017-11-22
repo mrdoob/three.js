@@ -1255,10 +1255,14 @@
 	}
 
 	// Functions use the infoObject and given indices to return value array of geometry.
-	// infoObject can be materialInfo, normalInfo, UVInfo or colorInfo
-	// polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
-	// polygonIndex - Index of polygon in geometry.
-	// vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+	// Parameters:
+	// 	- polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
+	// 	- polygonIndex - Index of polygon in geometry.
+	// 	- vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+	// 	- infoObject: can be materialInfo, normalInfo, UVInfo or colorInfo
+	// Index type:
+	//	- Direct: index is same as polygonVertexIndex
+	//	- IndexToDirect: infoObject has it's own set of indices
 	var dataArray = [];
 
 	var GetData = {
