@@ -2077,13 +2077,9 @@
 		var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
 		var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
 
-		var returnObject = {
-			curves: new Map(),
-			layers: {},
-			stacks: {},
-			length: 0,
+		var animations = {
+			takes: {},
 			fps: getFrameRate( FBXTree ),
-			frames: 0
 		};
 
 		var animationCurveNodes = [];
@@ -2117,6 +2113,7 @@
 
 				var animationCurve = parseAnimationCurve( rawCurves[ nodeID ] );
 
+				// seems like this check would be necessary?
 				if ( ! connections.has( animationCurve.id ) ) continue;
 
 				animationCurves.push( animationCurve );
@@ -2151,14 +2148,6 @@
 		}
 
 		tmpMap.forEach( function ( curveNode ) {
-
-			var id = curveNode.containerBoneID;
-			if ( ! returnObject.curves.has( id ) ) {
-
-				returnObject.curves.set( id, { T: null, R: null, S: null } );
-
-			}
-			returnObject.curves.get( id )[ curveNode.attr ] = curveNode;
 
 			if ( curveNode.attr === 'R' ) {
 
@@ -2225,6 +2214,8 @@
 
 		} );
 
+		var layersMap = new Map();
+
 		for ( var nodeID in rawLayers ) {
 
 			var layer = [];
@@ -2258,7 +2249,7 @@
 
 				}
 
-				returnObject.layers[ nodeID ] = layer;
+				layersMap.set( parseInt( nodeID ), layer );
 
 			}
 
@@ -2272,7 +2263,7 @@
 
 			for ( var childIndex = 0; childIndex < children.length; ++ childIndex ) {
 
-				var currentLayer = returnObject.layers[ children[ childIndex ].ID ];
+				var currentLayer = layersMap.get( children[ childIndex ].ID );
 
 				if ( currentLayer !== undefined ) {
 
@@ -2297,18 +2288,18 @@
 			// Do we have an animation clip with actual length?
 			if ( timestamps.max > timestamps.min ) {
 
-				returnObject.stacks[ nodeID ] = {
+				animations.takes[ nodeID ] = {
 					name: rawStacks[ nodeID ].attrName,
 					layers: layers,
 					length: timestamps.max - timestamps.min,
-					frames: ( timestamps.max - timestamps.min ) * returnObject.fps
+					frames: ( timestamps.max - timestamps.min ) * animations.fps
 				};
 
 			}
 
 		}
 
-		return returnObject;
+		return animations;
 
 	}
 
@@ -2525,16 +2516,16 @@
 
 		}
 
-		var stacks = animations.stacks;
+		var takes = animations.takes;
 
-		for ( var key in stacks ) {
+		for ( var key in takes ) {
 
-			var stack = stacks[ key ];
+			var take = takes[ key ];
 
 			var animationData = {
-				name: stack.name,
+				name: take.name,
 				fps: animations.fps,
-				length: stack.length,
+				length: take.length,
 				hierarchy: []
 			};
 
@@ -2554,14 +2545,14 @@
 
 			}
 
-			for ( var frame = 0; frame <= stack.frames; frame ++ ) {
+			for ( var frame = 0; frame <= take.frames; frame ++ ) {
 
 				for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
 
 					var bone = bones[ bonesIndex ];
 					var boneIndex = bonesIndex;
 
-					var animationNode = stack.layers[ 0 ][ boneIndex ];
+					var animationNode = take.layers[ 0 ][ boneIndex ];
 
 					for ( var hierarchyIndex = 0, hierarchyLength = animationData.hierarchy.length; hierarchyIndex < hierarchyLength; ++ hierarchyIndex ) {
 
