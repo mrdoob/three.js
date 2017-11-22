@@ -1290,10 +1290,14 @@
 	}
 
 	// Functions use the infoObject and given indices to return value array of geometry.
-	// infoObject can be materialInfo, normalInfo, UVInfo or colorInfo
-	// polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
-	// polygonIndex - Index of polygon in geometry.
-	// vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+	// Parameters:
+	// 	- polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
+	// 	- polygonIndex - Index of polygon in geometry.
+	// 	- vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+	// 	- infoObject: can be materialInfo, normalInfo, UVInfo or colorInfo
+	// Index type:
+	//	- Direct: index is same as polygonVertexIndex
+	//	- IndexToDirect: infoObject has it's own set of indices
 	var dataArray = [];
 
 	var GetData = {
@@ -1937,7 +1941,26 @@
 
 		}
 
-		// allow transformed pivots - see https://github.com/mrdoob/three.js/issues/11895
+		// rotated pivots - note: rotation must be applied before translation here
+		if ( 'GeometricRotation' in modelNode.properties  ) {
+
+			var array = modelNode.properties.GeometricRotation.value.map( THREE.Math.degToRad );
+
+			model.traverse( function ( child ) {
+
+				if ( child.geometry ) {
+
+					child.geometry.rotateX( array[ 0 ] );
+					child.geometry.rotateY( array[ 1 ] );
+					child.geometry.rotateZ( array[ 2 ] );
+
+				}
+
+			} );
+
+		}
+
+		// translated pivots
 		if ( 'GeometricTranslation' in modelNode.properties ) {
 
 			var array = modelNode.properties.GeometricTranslation.value;
