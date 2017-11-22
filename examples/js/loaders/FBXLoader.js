@@ -1876,6 +1876,8 @@
 
 			model.position.fromArray( modelNode.properties.Lcl_Translation.value );
 
+		}
+
 		if ( 'Lcl_Rotation' in modelNode.properties ) {
 
 			var rotation = modelNode.properties.Lcl_Rotation.value.map( THREE.Math.degToRad );
@@ -1905,9 +1907,9 @@
 		}
 
 		// rotated pivots - note: rotation must be applied before translation here
-		if ( 'GeometricRotation' in node.properties ) {
+		if ( 'GeometricRotation' in modelNode.properties  ) {
 
-			var array = node.properties.GeometricRotation.value.map( THREE.Math.degToRad );
+			var array = modelNode.properties.GeometricRotation.value.map( THREE.Math.degToRad );
 
 			model.traverse( function ( child ) {
 
@@ -1924,9 +1926,9 @@
 		}
 
 		// translated pivots
-		if ( 'GeometricTranslation' in node.properties ) {
+		if ( 'GeometricTranslation' in modelNode.properties ) {
 
-			var array = node.properties.GeometricTranslation.value;
+			var array = modelNode.properties.GeometricTranslation.value;
 
 			model.traverse( function ( child ) {
 
