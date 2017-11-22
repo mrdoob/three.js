@@ -36,15 +36,7 @@
 		x, y  components of a polygon.<br /><br />
 
 		Used internally by [page:Path Path],
-		[page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeBufferGeometry ShapeBufferGeometry].
-		</div>
-
-		<h3>[method:null triangulate]( contour, indices )</h3>
-		<div>
-		vertices -- flat array of vertices like [ x0,y0, x1,y1, x2,y2, ... ].<br />
-		holeIndices -- array of hole indices.<br /><br />
-
-		Performs a polygon triangulation based on earcut. The implementation is a port of [link:https://github.com/mapbox/earcut mapbox/earcut].
+		[page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeGeometry ShapeGeometry].
 		</div>
 
 		<h3>[method:null triangulateShape]( contour, holes )</h3>
@@ -52,7 +44,7 @@
 		contour -- 2D polygon.<br />
 		holes -- array of holes<br /><br />
 
-		Used by [page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeBufferGeometry ShapeBufferGeometry] to calculate faces in shapes with holes.
+		Used internally by [page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeGeometry ShapeGeometry] to calculate faces in shapes with holes.
 		</div>
 
 		<h2>Source</h2>
