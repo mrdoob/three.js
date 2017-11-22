@@ -121,9 +121,9 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var buffer = new ArrayBuffer( text.length * 2 ); // 2 bytes per character.
+			var buffer = new ArrayBuffer( text.length );
 
-			var bufferView = new Uint16Array( buffer );
+			var bufferView = new Uint8Array( buffer );
 
 			for ( var i = 0; i < text.length; ++ i ) {
 
