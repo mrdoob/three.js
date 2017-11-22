@@ -1808,26 +1808,6 @@
 
 			}
 
-
-			// rotated pivots - note: rotation must be applied before translation here
-			if ( 'GeometricRotation' in node.properties ) {
-
-				var array = node.properties.GeometricRotation.value.map( THREE.Math.degToRad );
-
-				model.traverse( function ( child ) {
-
-					if ( child.geometry ) {
-
-						child.geometry.rotateX( array[ 0 ] );
-						child.geometry.rotateY( array[ 1 ] );
-						child.geometry.rotateZ( array[ 2 ] );
-
-					}
-
-				} );
-
-			}
-
 			// translated pivots
 			if ( 'GeometricTranslation' in node.properties ) {
 
