@@ -158,14 +158,16 @@
 
 	}
 
-	// Parses map of images referenced in FBXTree.Objects.subNodes.Video
-	// Images can either be referenced externally or embedded in the file
+	// Parse FBXTree.Objects.subNodes.Video for embedded image data
 	// These images are connected to textures in FBXTree.Objects.subNodes.Textures
 	// via FBXTree.Connections. Note that images can be duplicated here, in which case only one
-	// will will have a .Content field
+	// may have a .Content field - we'll check for this and duplicate the data in the imageMap
 	function parseImages( FBXTree ) {
 
 		var imageMap = new Map();
+
+		var names = {};
+		var duplicates = [];
 
 		if ( 'Video' in FBXTree.Objects.subNodes ) {
 
@@ -175,17 +177,50 @@
 
 				var videoNode = videoNodes[ nodeID ];
 
+				var id = parseInt( nodeID );
+
+				// check whether the file name is used by another videoNode
+				// and if so keep a record of both ids as a duplicate pair [ id1, id2 ]
+				if ( videoNode.properties.fileName in names ) {
+
+					duplicates.push( [ id, names[ videoNode.properties.fileName ] ] );
+
+				}
+
+				names[ videoNode.properties.fileName ] = id;
+
 				// raw image data is in videoNode.properties.Content
-				if ( 'Content' in videoNode.properties ) {
+				if ( 'Content' in videoNode.properties && videoNode.properties.Content !== '' ) {
 
 					var image = parseImage( videoNodes[ nodeID ] );
-					imageMap.set( parseInt( nodeID ), image );
+
+					imageMap.set( id, image );
 
 				}
 
 			}
 
 		}
+
+		// check each duplicate pair - if only one is in the image map then
+		// create an entry for the other id containing the same image data
+		// Note: it seems to be possible for entries to have the same file name but different
+		// content, we won't overwrite these
+		duplicates.forEach( function ( duplicatePair ) {
+
+			if ( imageMap.has( duplicatePair[ 0 ] ) && ! imageMap.has( duplicatePair[ 1 ] ) ) {
+
+				var image = imageMap.get( duplicatePair[ 0 ] );
+				imageMap.set( duplicatePair[ 1 ], image );
+
+			} else if ( imageMap.has( duplicatePair[ 1 ] ) && ! imageMap.has( duplicatePair[ 0 ] ) ) {
+
+				var image = imageMap.get( duplicatePair[ 1 ] );
+				imageMap.set( duplicatePair[ 0 ], image );
+
+			}
+
+		} );
 
 		return imageMap;
 
@@ -230,11 +265,11 @@
 
 		}
 
-		if ( typeof content === 'string' ) {
+		if ( typeof content === 'string' ) { // ASCII format
 
 			return 'data:' + type + ';base64,' + content;
 
-		} else {
+		} else { // Binary Format
 
 			var array = new Uint8Array( content );
 			return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
