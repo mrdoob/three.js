@@ -15,7 +15,7 @@ import { ShaderLib } from '../shaders/ShaderLib.js';
 function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 	var clearColor = new Color( 0x000000 );
-	var clearAlpha = 0;
+	var clearAlpha = 1;
 
 	var planeCamera, planeMesh;
 	var boxMesh;
@@ -116,7 +116,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 		setClearColor: function ( color, alpha ) {
 
 			clearColor.set( color );
-			clearAlpha = alpha !== undefined ? alpha : 1;
+			clearAlpha = alpha !== undefined ? alpha : clearAlpha;
 			setClear( clearColor, clearAlpha );
 
 		},
