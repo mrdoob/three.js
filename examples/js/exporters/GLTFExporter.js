@@ -883,6 +883,7 @@ THREE.GLTFExporter.prototype = {
 				if ( ! trackNode || ! trackProperty ) {
 
 					console.warn( 'THREE.GLTFExporter: Could not export animation track "%s".', track.name );
+					return null;
 
 				}
 
@@ -1040,7 +1041,9 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.nodes.push( gltfNode );
 
-			return outputJSON.nodes.length - 1;
+			var nodeIndex = nodeMap[ object.uuid ] = outputJSON.nodes.length - 1;
+
+			return nodeIndex;
 
 		}
 
@@ -1084,7 +1087,6 @@ THREE.GLTFExporter.prototype = {
 					if ( node !== null ) {
 
 						nodes.push( node );
-						nodeMap[ child.uuid ] = node;
 
 					}
 
