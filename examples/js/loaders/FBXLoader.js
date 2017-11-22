@@ -731,7 +731,6 @@
 
 		}
 
-
 		var weightTable = {};
 
 		if ( deformer ) {
@@ -831,7 +830,7 @@
 
 					}
 
-					var WIndex = [ 0, 0, 0, 0 ];
+					var wIndex = [ 0, 0, 0, 0 ];
 					var Weight = [ 0, 0, 0, 0 ];
 
 					weights.forEach( function ( weight, weightIndex ) {
@@ -846,8 +845,8 @@
 								comparedWeightArray[ comparedWeightIndex ] = currentWeight;
 								currentWeight = comparedWeight;
 
-								var tmp = WIndex[ comparedWeightIndex ];
-								WIndex[ comparedWeightIndex ] = currentIndex;
+								var tmp = wIndex[ comparedWeightIndex ];
+								wIndex[ comparedWeightIndex ] = currentIndex;
 								currentIndex = tmp;
 
 							}
@@ -856,7 +855,7 @@
 
 					} );
 
-					weightIndices = WIndex;
+					weightIndices = wIndex;
 					weights = Weight;
 
 				}
@@ -886,6 +885,12 @@
 
 			}
 
+			if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
+
+				var materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo )[ 0 ];
+
+			}
+
 			if ( uvInfo ) {
 
 				for ( var i = 0; i < uvInfo.length; i ++ ) {
@@ -910,7 +915,7 @@
 			faceLength ++;
 
 			// we have reached the end of a face - it may have 4 sides though
-			// in which case the data is split into to represent 3 sides faces
+			// in which case the data is split to represent two 3 sided faces
 			if ( endOfFace ) {
 
 				for ( var i = 2; i < faceLength; i ++ ) {
@@ -927,11 +932,7 @@
 					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ] );
 					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ] );
 
-				}
-
-				if ( deformer ) {
-
-					for ( var i = 2; i < faceLength; i ++ ) {
+					if ( deformer ) {
 
 						vertexWeightsBuffer.push( faceWeights[ 0 ] );
 						vertexWeightsBuffer.push( faceWeights[ 1 ] );
@@ -965,55 +966,7 @@
 
 					}
 
-				}
-
-				if ( normalInfo ) {
-
-					for ( var i = 2; i < faceLength; i ++ ) {
-
-						normalBuffer.push( faceNormals[ 0 ] );
-						normalBuffer.push( faceNormals[ 1 ] );
-						normalBuffer.push( faceNormals[ 2 ] );
-
-						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 ] );
-						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 + 1 ] );
-						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 + 2 ] );
-
-						normalBuffer.push( faceNormals[ i * 3 ] );
-						normalBuffer.push( faceNormals[ i * 3 + 1 ] );
-						normalBuffer.push( faceNormals[ i * 3 + 2 ] );
-
-					}
-
-				}
-
-				if ( uvInfo ) {
-
-					for ( var j = 0; j < uvInfo.length; j ++ ) {
-
-						if ( uvsBuffer[ j ] === undefined ) uvsBuffer[ j ] = [];
-
-						for ( var i = 2; i < faceLength; i ++ ) {
-
-							uvsBuffer[ j ].push( faceUVs[ j ][ 0 ] );
-							uvsBuffer[ j ].push( faceUVs[ j ][ 1 ] );
-
-							uvsBuffer[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 ] );
-							uvsBuffer[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 + 1 ] );
-
-							uvsBuffer[ j ].push( faceUVs[ j ][ i * 2 ] );
-							uvsBuffer[ j ].push( faceUVs[ j ][ i * 2 + 1 ] );
-
-						}
-
-					}
-
-				}
-
-				if ( colorInfo ) {
-
-					for ( var i = 2; i < faceLength; i ++ ) {
-
+					if ( colorInfo ) {
 
 						colorsBuffer.push( faceColors[ 0 ] );
 						colorsBuffer.push( faceColors[ 1 ] );
@@ -1029,17 +982,46 @@
 
 					}
 
-				}
-
-				if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
-
-					var materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo )[ 0 ];
-
-					for ( var i = 2; i < faceLength; i ++ ) {
+					if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
 
 						materialIndexBuffer.push( materialIndex );
 						materialIndexBuffer.push( materialIndex );
 						materialIndexBuffer.push( materialIndex );
+
+					}
+
+					if ( normalInfo ) {
+
+						normalBuffer.push( faceNormals[ 0 ] );
+						normalBuffer.push( faceNormals[ 1 ] );
+						normalBuffer.push( faceNormals[ 2 ] );
+
+						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 ] );
+						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 + 1 ] );
+						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 + 2 ] );
+
+						normalBuffer.push( faceNormals[ i * 3 ] );
+						normalBuffer.push( faceNormals[ i * 3 + 1 ] );
+						normalBuffer.push( faceNormals[ i * 3 + 2 ] );
+
+					}
+
+					if ( uvInfo ) {
+
+						for ( var j = 0; j < uvInfo.length; j ++ ) {
+
+							if ( uvsBuffer[ j ] === undefined ) uvsBuffer[ j ] = [];
+
+							uvsBuffer[ j ].push( faceUVs[ j ][ 0 ] );
+							uvsBuffer[ j ].push( faceUVs[ j ][ 1 ] );
+
+							uvsBuffer[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 ] );
+							uvsBuffer[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 + 1 ] );
+
+							uvsBuffer[ j ].push( faceUVs[ j ][ i * 2 ] );
+							uvsBuffer[ j ].push( faceUVs[ j ][ i * 2 + 1 ] );
+
+						}
 
 					}
 
@@ -1152,6 +1134,7 @@
 		return geo;
 
 	}
+
 
 	// Parse normal from FBXTree.Objects.subNodes.Geometry.subNodes.LayerElementNormal if it exists
 	function getNormals( NormalNode ) {
