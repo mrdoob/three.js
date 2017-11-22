@@ -11,35 +11,28 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A loader for loading an [page:Image].
+			A loader for loading an [page:Image] as an [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap]. An ImageBitmap provides an asynchronous and resource efficient pathway to prepare textures for rendering in WebGL.
 
-			This uses the [page:FileLoader] internally for loading files, and is used internally by the
-			[page:CubeTextureLoader], [page:ObjectLoader] and [page:TextureLoader].
 		</div>
 
 		<h2>Example</h2>
 
 		<div>
-			[example:webgl_loader_obj WebGL / loader / obj]<br />
-			[example:webgl_shaders_ocean WebGL / shaders / ocean]
+			[example:webgl_loader_imagebitmap WebGL / loader / ImageBitmap]
 		</div>
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.ImageLoader();
+		var loader = new THREE.ImageBitmapLoader();
 
 		// load a image resource
 		loader.load(
 			// resource URL
 			'textures/skyboxsun25degtest.png',
 			// Function when resource is loaded
-			function ( image ) {
-				// do something with it
-
-				// like drawing a part of it on a canvas
-				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( '2d' );
-				context.drawImage( image, 100, 100 );
+			function ( imageBitmap ) {
+				var texture = new THREE.CanvasTexture( imageBitmap );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
 			},
 			// Function called when download progresses
 			function ( xhr ) {
@@ -64,16 +57,13 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:String crossOrigin]</h3>
-		<div>
-		If set, assigns the [link:https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes crossOrigin]
-	 attribute of the image to the value of *crossOrigin*, prior to starting the load. Default is *undefined*.
-		</div>
-
 		<h3>[property:LoadingManager manager]</h3>
 		<div>
 			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
 		</div>
+
+		<h3>[property:String options]</h3>
+		<div>An optional object that sets options for the internally used [link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap] factory method. Default is *undefined*.</div>
 
 		<h3>[property:String path]</h3>
 		<div>The base path from which files will be loaded. See [page:.setPath]. Default is *undefined*.</div>
@@ -89,17 +79,23 @@
 		[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>
-		Begin loading from url and return the [page:Image image] object that will contain the data.
+		Begin loading from url and return the [page:ImageBitmap image] object that will contain the data.
 		</div>
 
-		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
-		<div>Set the [page:.crossOrigin] attribute.</div>
+		<h3>[method:ImageBitmapLoader setCrossOrigin]()</h3>
+		<div>This method exists for compatibility reasons and implements no logic. It ensures that [name] has a similar interface like [page:ImageLoader].</div>
 
-		<h3>[method:FileLoader setPath]( [page:String path] )</h3>
+		<h3>[method:ImageBitmapLoader setOptions]( [page:Object options] )</h3>
 		<div>
-			Set the base path or URL from which to load files. This can be useful if
+			Sets the options object for [link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap].
+		</div>
+
+		<h3>[method:ImageBitmapLoader setPath]( [page:String path] )</h3>
+		<div>
+			Sets the base path or URL from which to load files. This can be useful if
 			you are loading many images from the same directory.
 		</div>
+
 
 		<h2>Source</h2>
 
