@@ -1255,12 +1255,14 @@
 	}
 
 	// Functions use the infoObject and given indices to return value array of geometry.
-	// infoObject can be materialInfo, normalInfo, UVInfo or colorInfo
-	// polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
-	// polygonIndex - Index of polygon in geometry.
-	// vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
-	var dataArray = [];
-
+	// Parameters:
+	// 	- polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
+	// 	- polygonIndex - Index of polygon in geometry.
+	// 	- vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
+	// 	- infoObject: can be materialInfo, normalInfo, UVInfo or colorInfo
+	// Index type:
+	//	- Direct: index is same as polygonVertexIndex
+	//	- IndexToDirect: infoObject has it's own set of indices
 	var GetData = {
 
 		ByPolygonVertex: {
@@ -1270,8 +1272,7 @@
 				var from = ( polygonVertexIndex * infoObject.dataSize );
 				var to = ( polygonVertexIndex * infoObject.dataSize ) + infoObject.dataSize;
 
-				// return infoObject.buffer.slice( from, to );
-				return slice( dataArray, infoObject.buffer, from, to );
+				return infoObject.buffer.slice( from, to );
 
 			},
 
@@ -1281,8 +1282,7 @@
 				var from = ( index * infoObject.dataSize );
 				var to = ( index * infoObject.dataSize ) + infoObject.dataSize;
 
-				// return infoObject.buffer.slice( from, to );
-				return slice( dataArray, infoObject.buffer, from, to );
+				return infoObject.buffer.slice( from, to );
 
 			}
 
@@ -1295,8 +1295,7 @@
 				var from = polygonIndex * infoObject.dataSize;
 				var to = polygonIndex * infoObject.dataSize + infoObject.dataSize;
 
-				// return infoObject.buffer.slice( from, to );
-				return slice( dataArray, infoObject.buffer, from, to );
+				return infoObject.buffer.slice( from, to );
 
 			},
 
@@ -1306,8 +1305,7 @@
 				var from = index * infoObject.dataSize;
 				var to = index * infoObject.dataSize + infoObject.dataSize;
 
-				// return infoObject.buffer.slice( from, to );
-				return slice( dataArray, infoObject.buffer, from, to );
+				return infoObject.buffer.slice( from, to );
 
 			}
 
@@ -1320,8 +1318,7 @@
 				var from = ( vertexIndex * infoObject.dataSize );
 				var to = ( vertexIndex * infoObject.dataSize ) + infoObject.dataSize;
 
-				// return infoObject.buffer.slice( from, to );
-				return slice( dataArray, infoObject.buffer, from, to );
+				return infoObject.buffer.slice( from, to );
 
 			}
 
@@ -1334,8 +1331,7 @@
 				var from = infoObject.indices[ 0 ] * infoObject.dataSize;
 				var to = infoObject.indices[ 0 ] * infoObject.dataSize + infoObject.dataSize;
 
-				// return infoObject.buffer.slice( from, to );
-				return slice( dataArray, infoObject.buffer, from, to );
+				return infoObject.buffer.slice( from, to );
 
 			}
 
@@ -2995,7 +2991,8 @@
 
 				propName = 'connections';
 				propValue = [ from, to ];
-				append( propValue, rest );
+
+				propValue = propValue.concat( rest );
 
 				if ( currentNode.properties[ propName ] === undefined ) {
 
@@ -4010,28 +4007,6 @@
 		}
 
 		return - 1;
-
-	}
-
-	function append( a, b ) {
-
-		for ( var i = 0, j = a.length, l = b.length; i < l; i ++, j ++ ) {
-
-			a[ j ] = b[ i ];
-
-		}
-
-	}
-
-	function slice( a, b, from, to ) {
-
-		for ( var i = from, j = 0; i < to; i ++, j ++ ) {
-
-			a[ j ] = b[ i ];
-
-		}
-
-		return a;
 
 	}
 
