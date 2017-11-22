@@ -16,9 +16,8 @@
  *	NURBS (Open, Closed and Periodic forms)
  *
  * Needs Support:
- * 	Indexed Buffers
- * 	PreRotation support.
  *	Euler rotation order
+ *
  *
  * FBX format references:
  * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
@@ -2122,10 +2121,13 @@
 	}
 
 	// Parses animation information from nodes in
-	// FBXTree.Objects.subNodes.AnimationCurve ( connected to AnimationCurveNode )
-	// FBXTree.Objects.subNodes.AnimationCurveNode ( connected to AnimationLayer and an animated property in some other node )
-	// FBXTree.Objects.subNodes.AnimationLayer ( connected to AnimationStack )
+	// FBXTree.Objects.subNodes.AnimationCurve: child of an AnimationCurveNode, holds the raw animation data (e.g. x axis rotation )
+	// FBXTree.Objects.subNodes.AnimationCurveNode: child of an AnimationLayer and connected to whichever node is being animated
+	// FBXTree.Objects.subNodes.AnimationLayer: child of an AnimationStack
 	// FBXTree.Objects.subNodes.AnimationStack
+	// Multiple animation takes are stored in AnimationLayer and AnimationStack
+	// Note: There is also FBXTree.Takes, however this seems to be left over from an older version of the
+	// format and is no longer used
 	function parseAnimations( FBXTree, connections, sceneGraph ) {
 
 		var rawNodes = FBXTree.Objects.subNodes.AnimationCurveNode;
@@ -2133,61 +2135,9 @@
 		var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
 		var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
 
-		var fps = 30; // default framerate
-
-		if ( 'GlobalSettings' in FBXTree && 'TimeMode' in FBXTree.GlobalSettings.properties ) {
-
-			/* Autodesk time mode documentation can be found here:
-			*	http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/class_fbx_time.html,topicNumber=cpp_ref_class_fbx_time_html
-			*/
-			var timeModeEnum = [
-				30, // 0: eDefaultMode
-				120, // 1: eFrames120
-				100, // 2: eFrames100
-				60, // 3: eFrames60
-				50, // 4: eFrames50
-				48, // 5: eFrames48
-				30, // 6: eFrames30 (black and white NTSC )
-				30, // 7: eFrames30Drop
-				29.97, // 8: eNTSCDropFrame
-				29.97, // 90: eNTSCFullFrame
-				25, // 10: ePal ( PAL/SECAM )
-				24, // 11: eFrames24 (Film/Cinema)
-				1, // 12: eFrames1000 (use for date time))
-				23.976, // 13: eFilmFullFrame
-				30, // 14: eCustom: use GlobalSettings.properties.CustomFrameRate.value
-				96, // 15: eFrames96
-				72, // 16: eFrames72
-				59.94, // 17: eFrames59dot94
-			];
-
-			var eMode = FBXTree.GlobalSettings.properties.TimeMode.value;
-
-			if ( eMode === 14 ) {
-
-				if ( 'CustomFrameRate' in FBXTree.GlobalSettings.properties ) {
-
-					fps = FBXTree.GlobalSettings.properties.CustomFrameRate.value;
-
-					fps = ( fps === - 1 ) ? 30 : fps;
-
-				}
-
-			} else if ( eMode <= 17 ) { // for future proofing - if more eModes get added, they will default to 30fps
-
-				fps = timeModeEnum[ eMode ];
-
-			}
-
-		}
-
-		var returnObject = {
-			curves: new Map(),
-			layers: {},
-			stacks: {},
-			length: 0,
-			fps: fps,
-			frames: 0
+		var animations = {
+			takes: {},
+			fps: getFrameRate( FBXTree ),
 		};
 
 		var animationCurveNodes = [];
@@ -2195,7 +2145,7 @@
 
 			if ( nodeID.match( /\d+/ ) ) {
 
-				var animationNode = parseAnimationNode( FBXTree, rawNodes[ nodeID ], connections, sceneGraph );
+				var animationNode = parseAnimationCurveNode( FBXTree, rawNodes[ nodeID ], connections, sceneGraph );
 				animationCurveNodes.push( animationNode );
 
 			}
@@ -2256,14 +2206,6 @@
 		}
 
 		tmpMap.forEach( function ( curveNode ) {
-
-			var id = curveNode.containerBoneID;
-			if ( ! returnObject.curves.has( id ) ) {
-
-				returnObject.curves.set( id, { T: null, R: null, S: null } );
-
-			}
-			returnObject.curves.get( id )[ curveNode.attr ] = curveNode;
 
 			if ( curveNode.attr === 'R' ) {
 
@@ -2330,6 +2272,8 @@
 
 		} );
 
+		var layersMap = new Map();
+
 		for ( var nodeID in rawLayers ) {
 
 			var layer = [];
@@ -2363,7 +2307,7 @@
 
 				}
 
-				returnObject.layers[ nodeID ] = layer;
+				layersMap.set( parseInt( nodeID ), layer );
 
 			}
 
@@ -2377,7 +2321,7 @@
 
 			for ( var childIndex = 0; childIndex < children.length; ++ childIndex ) {
 
-				var currentLayer = returnObject.layers[ children[ childIndex ].ID ];
+				var currentLayer = layersMap.get( children[ childIndex ].ID );
 
 				if ( currentLayer !== undefined ) {
 
@@ -2402,22 +2346,22 @@
 			// Do we have an animation clip with actual length?
 			if ( timestamps.max > timestamps.min ) {
 
-				returnObject.stacks[ nodeID ] = {
+				animations.takes[ nodeID ] = {
 					name: rawStacks[ nodeID ].attrName,
 					layers: layers,
 					length: timestamps.max - timestamps.min,
-					frames: ( timestamps.max - timestamps.min ) * returnObject.fps
+					frames: ( timestamps.max - timestamps.min ) * animations.fps
 				};
 
 			}
 
 		}
 
-		return returnObject;
+		return animations;
 
 	}
 
-	function parseAnimationNode( FBXTree, animationCurveNode, connections, sceneGraph ) {
+	function parseAnimationCurveNode( FBXTree, animationCurveNode, connections, sceneGraph ) {
 
 		var rawModels = FBXTree.Objects.subNodes.Model;
 
@@ -2483,6 +2427,7 @@
 				returnObject.containerBoneID = boneID;
 				returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
 				var model = rawModels[ returnObject.containerID.toString() ];
+
 				if ( 'PreRotation' in model.properties ) {
 
 					returnObject.preRotations = new THREE.Vector3().fromArray( model.properties.PreRotation.value ).multiplyScalar( Math.PI / 180 );
@@ -2510,6 +2455,60 @@
 			attrFlag: animationCurve.subNodes.KeyAttrFlags.properties.a,
 			attrData: animationCurve.subNodes.KeyAttrDataFloat.properties.a,
 		};
+
+	}
+
+	function getFrameRate( FBXTree ) {
+
+		var fps = 30; // default framerate
+
+		if ( 'GlobalSettings' in FBXTree && 'TimeMode' in FBXTree.GlobalSettings.properties ) {
+
+			/* Autodesk time mode documentation can be found here:
+			*	http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/class_fbx_time.html,topicNumber=cpp_ref_class_fbx_time_html
+			*/
+			var timeModeEnum = [
+				30, // 0: eDefaultMode
+				120, // 1: eFrames120
+				100, // 2: eFrames100
+				60, // 3: eFrames60
+				50, // 4: eFrames50
+				48, // 5: eFrames48
+				30, // 6: eFrames30 (black and white NTSC )
+				30, // 7: eFrames30Drop
+				29.97, // 8: eNTSCDropFrame
+				29.97, // 90: eNTSCFullFrame
+				25, // 10: ePal ( PAL/SECAM )
+				24, // 11: eFrames24 (Film/Cinema)
+				1, // 12: eFrames1000 (use for date time))
+				23.976, // 13: eFilmFullFrame
+				30, // 14: eCustom: use GlobalSettings.properties.CustomFrameRate.value
+				96, // 15: eFrames96
+				72, // 16: eFrames72
+				59.94, // 17: eFrames59dot94
+			];
+
+			var eMode = FBXTree.GlobalSettings.properties.TimeMode.value;
+
+			if ( eMode === 14 ) {
+
+				if ( 'CustomFrameRate' in FBXTree.GlobalSettings.properties ) {
+
+					fps = FBXTree.GlobalSettings.properties.CustomFrameRate.value;
+
+					fps = ( fps === - 1 ) ? 30 : fps;
+
+				}
+
+			} else if ( eMode <= 17 ) { // for future proofing - if more eModes get added, they will default to 30fps
+
+				fps = timeModeEnum[ eMode ];
+
+			}
+
+		}
+
+		return fps;
 
 	}
 
@@ -2575,16 +2574,16 @@
 
 		}
 
-		var stacks = animations.stacks;
+		var takes = animations.takes;
 
-		for ( var key in stacks ) {
+		for ( var key in takes ) {
 
-			var stack = stacks[ key ];
+			var take = takes[ key ];
 
 			var animationData = {
-				name: stack.name,
+				name: take.name,
 				fps: animations.fps,
-				length: stack.length,
+				length: take.length,
 				hierarchy: []
 			};
 
@@ -2604,14 +2603,14 @@
 
 			}
 
-			for ( var frame = 0; frame <= stack.frames; frame ++ ) {
+			for ( var frame = 0; frame <= take.frames; frame ++ ) {
 
 				for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
 
 					var bone = bones[ bonesIndex ];
 					var boneIndex = bonesIndex;
 
-					var animationNode = stack.layers[ 0 ][ boneIndex ];
+					var animationNode = take.layers[ 0 ][ boneIndex ];
 
 					for ( var hierarchyIndex = 0, hierarchyLength = animationData.hierarchy.length; hierarchyIndex < hierarchyLength; ++ hierarchyIndex ) {
 
@@ -2641,93 +2640,86 @@
 	function generateKey( animations, animationNode, bone, frame ) {
 
 		var key = {
+
 			time: frame / animations.fps,
 			pos: bone.position.toArray(),
 			rot: bone.quaternion.toArray(),
-			scl: bone.scale.toArray()
+			scl: bone.scale.toArray(),
+
 		};
 
 		if ( animationNode === undefined ) return key;
 
 		euler.setFromQuaternion( bone.quaternion, 'ZYX', false );
 
-		try {
 
-			if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
+		if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
 
-				if ( animationNode.T.curves.x.values[ frame ] ) {
+			if ( animationNode.T.curves.x.values[ frame ] ) {
 
-					key.pos[ 0 ] = animationNode.T.curves.x.values[ frame ];
-
-				}
-
-				if ( animationNode.T.curves.y.values[ frame ] ) {
-
-					key.pos[ 1 ] = animationNode.T.curves.y.values[ frame ];
-
-				}
-
-				if ( animationNode.T.curves.z.values[ frame ] ) {
-
-					key.pos[ 2 ] = animationNode.T.curves.z.values[ frame ];
-
-				}
+				key.pos[ 0 ] = animationNode.T.curves.x.values[ frame ];
 
 			}
 
-			if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
+			if ( animationNode.T.curves.y.values[ frame ] ) {
 
-				// Only update the euler's values if rotation is defined for the axis on this frame
-				if ( animationNode.R.curves.x.values[ frame ] ) {
-
-					euler.x = animationNode.R.curves.x.values[ frame ];
-
-				}
-
-				if ( animationNode.R.curves.y.values[ frame ] ) {
-
-					euler.y = animationNode.R.curves.y.values[ frame ];
-
-				}
-
-				if ( animationNode.R.curves.z.values[ frame ] ) {
-
-					euler.z = animationNode.R.curves.z.values[ frame ];
-
-				}
-
-				quaternion.setFromEuler( euler );
-				key.rot = quaternion.toArray();
+				key.pos[ 1 ] = animationNode.T.curves.y.values[ frame ];
 
 			}
 
-			if ( hasCurve( animationNode, 'S' ) && hasKeyOnFrame( animationNode.S, frame ) ) {
+			if ( animationNode.T.curves.z.values[ frame ] ) {
 
-				if ( animationNode.T.curves.x.values[ frame ] ) {
-
-					key.scl[ 0 ] = animationNode.S.curves.x.values[ frame ];
-
-				}
-
-				if ( animationNode.T.curves.y.values[ frame ] ) {
-
-					key.scl[ 1 ] = animationNode.S.curves.y.values[ frame ];
-
-				}
-
-				if ( animationNode.T.curves.z.values[ frame ] ) {
-
-					key.scl[ 2 ] = animationNode.S.curves.z.values[ frame ];
-
-				}
+				key.pos[ 2 ] = animationNode.T.curves.z.values[ frame ];
 
 			}
 
-		} catch ( error ) {
+		}
 
-			// Curve is not fully plotted.
-			console.log( 'THREE.FBXLoader: ', bone );
-			console.log( 'THREE.FBXLoader: ', error );
+		if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
+
+			// Only update the euler's values if rotation is defined for the axis on this frame
+			if ( animationNode.R.curves.x.values[ frame ] ) {
+
+				euler.x = animationNode.R.curves.x.values[ frame ];
+
+			}
+
+			if ( animationNode.R.curves.y.values[ frame ] ) {
+
+				euler.y = animationNode.R.curves.y.values[ frame ];
+
+			}
+
+			if ( animationNode.R.curves.z.values[ frame ] ) {
+
+				euler.z = animationNode.R.curves.z.values[ frame ];
+
+			}
+
+			quaternion.setFromEuler( euler );
+			key.rot = quaternion.toArray();
+
+		}
+
+		if ( hasCurve( animationNode, 'S' ) && hasKeyOnFrame( animationNode.S, frame ) ) {
+
+			if ( animationNode.T.curves.x.values[ frame ] ) {
+
+				key.scl[ 0 ] = animationNode.S.curves.x.values[ frame ];
+
+			}
+
+			if ( animationNode.T.curves.y.values[ frame ] ) {
+
+				key.scl[ 1 ] = animationNode.S.curves.y.values[ frame ];
+
+			}
+
+			if ( animationNode.T.curves.z.values[ frame ] ) {
+
+				key.scl[ 2 ] = animationNode.S.curves.z.values[ frame ];
+
+			}
 
 		}
 
@@ -2765,15 +2757,9 @@
 
 		return AXES.every( function ( key ) {
 
-			return isKeyExistOnFrame( attributeNode.curves[ key ], frame );
+			return attributeNode.curves[ key ].values[ frame ] !== undefined;
 
 		} );
-
-	}
-
-	function isKeyExistOnFrame( curve, frame ) {
-
-		return curve.values[ frame ] !== undefined;
 
 	}
 
