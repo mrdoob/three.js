@@ -60,7 +60,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xcccccc );
-				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.00002 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -69,32 +69,36 @@
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.up.set(0, 0, 1);
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
+				controls.maxPolarAngle = 23 * Math.PI / 48; // radians
 				controls.addEventListener( 'change', render ); // remove when using animation loop
 				// enable animation loop when using damping or autorotation
 				//controls.enableDamping = true;
 				//controls.dampingFactor = 0.25;
-				controls.enableZoom = false;
 
 				// world
-
-				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
-
-				for ( var i = 0; i < 500; i ++ ) {
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
-					mesh.updateMatrix();
-					mesh.matrixAutoUpdate = false;
-					scene.add( mesh );
-
-				}
+				var geometry = new THREE.PlaneGeometry( 1000, 1000, 2, 2 );
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xffffff,
+					shininess: 200
+				} );
+				textureLoader = new THREE.TextureLoader();
+				textureLoader.load(
+					'textures/land_ocean_ice_cloud_2048.jpg',
+					function( tex ) {
+						material.map = tex;
+						material.needsUpdate = true;
+						render();
+					}
+				);
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.set(0, 0, -1);
+				scene.add( mesh );
 
 				// lights
 
