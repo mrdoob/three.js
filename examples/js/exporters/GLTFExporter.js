@@ -600,7 +600,8 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.alphaMode = material.opacity < 1.0 ? 'BLEND' : 'MASK';
 
-				if ( material.alphaTest > 0.0 ) {
+				// Write alphaCutoff if it's non-zero and different from the default (0.5).
+				if ( material.alphaTest > 0.0 && material.alphaTest !== 0.5 ) {
 
 					gltfMaterial.alphaCutoff = material.alphaTest;
 
