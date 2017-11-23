@@ -4,8 +4,8 @@
 		<title>three.js webvr - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-11-14 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-11-14" content="ArBMPtmfrwfw86hMJs4EG/pLjENp0J9EhNnzQVrHeXXMYSDNM/FPZEwZ1etrwiLAW4kNVrzXz5J7OBtFGNhVgQ0AAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUxMDYxNzYwMH0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2017-12-16 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2017-12-16" content="AvEXeg7kY84HQ60ApBlqf6zPqClJwEy499YltannXHd+qIIN8ibQQFbHDkKL/Na/L7ha4VOqsjsGHhFpI6HYfgAAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxMzQ0NjE5Nn0=">
 		<style>
 			body {
 				margin: 0px;
@@ -22,14 +22,6 @@
 		<script src="js/objects/Reflector.js"></script>
 
 		<script>
-
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
 
 			var camera, scene, renderer;
 
@@ -48,11 +40,15 @@
 				scene = new THREE.Scene();
 				scene.background = background;
 
+				var user = new THREE.Group();
+				user.position.set( 0, 0.75, 0 );
+				scene.add( user );
+
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
-				scene.add( camera );
+				user.add( camera );
 
 				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
-				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2 } );
+				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = 0.75;
 				mesh.position.z = - 2;
@@ -61,7 +57,7 @@
 				scene.add( mesh );
 
 				var geometry = new THREE.BoxGeometry( 1.5, 0.1, 1.5 );
-				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
+				var material = new THREE.MeshPhongMaterial();
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 0.2;
 				mesh.position.z = - 2;
@@ -93,7 +89,8 @@
 
 				//
 
-				reflector = new THREE.Reflector( 1.4, 1.4, {
+				var geometry = new THREE.PlaneBufferGeometry( 1.4, 1.4 );
+				reflector = new THREE.Reflector( geometry, {
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio
 				} );
@@ -104,7 +101,7 @@
 				scene.add( reflector );
 
 				var geometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
-				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
+				var material = new THREE.MeshPhongMaterial();
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.z = - 0.07;
 				mesh.castShadow = true;
@@ -114,22 +111,14 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				renderer.vr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				renderer.vr.enabled = true;
-
-				//
-
-				WEBVR.getVRDisplay( function ( display ) {
-
-					renderer.vr.setDevice( display );
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-				} );
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				//
 

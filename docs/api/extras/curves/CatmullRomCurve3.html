@@ -41,10 +41,13 @@ var curveObject = new THREE.Line( geometry, material );
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Array points] )</h3>
-		<div>points – An array of [page:Vector3] points</div>
-
-
+		<h3>[name]( [page:Array points], [page:Boolean closed], [page:String curveType], [page:Float tension] )</h3>
+		<div>
+			points – An array of [page:Vector3] points<br/>
+			closed – Whether the curve is closed. Default is *false*.<br/>
+			curveType – Type of the curve. Default is *centripetal*.<br/>
+			tension – Tension of the curve. Default is *0.5*.
+		</div>
 
 
 		<h2>Properties</h2>
@@ -58,16 +61,16 @@ var curveObject = new THREE.Line( geometry, material );
 		</div>
 
 		<h3>[property:Array points]</h3>
-		<div>The array of array of [page:Vector3] points that define the curve.</div>
+		<div>The array of [page:Vector3] points that define the curve. It needs at least two entries.</div>
 
 		<h3>[property:Boolean closed]</h3>
-		<div>The curve will loop back onto itself when this is true. False by default</div>
+		<div>The curve will loop back onto itself when this is true.</div>
 
-		<h3>[property:String type]</h3>
-		<div>Possible values are `centripetal` (default), `chordal` and `catmullrom`.</div>
+		<h3>[property:String curveType]</h3>
+		<div>Possible values are *centripetal*, *chordal* and *catmullrom*.</div>
 
 		<h3>[property:float tension]</h3>
-		<div>When [page:.type] is `catmullrom`, defines catmullrom's tension. Defaults is *0.5*.</div>
+		<div>When [page:.type] is *catmullrom*, defines catmullrom's tension.</div>
 
 
 		<h2>Methods</h2>

@@ -33,9 +33,9 @@
 		//Load a sound and set it as the PositionalAudio object's buffer
 		var audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/song.ogg', function( buffer ) {
-			sound1.setBuffer( buffer );
-			sound1.setRefDistance( 20 );
-			sound1.play();
+			sound.setBuffer( buffer );
+			sound.setRefDistance( 20 );
+			sound.play();
 		});
 
 		//Create an object for the sound to play from

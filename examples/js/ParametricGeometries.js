@@ -241,7 +241,7 @@ THREE.ParametricGeometries.SphereGeometry = function ( size, u, v ) {
 
 	}
 
-	THREE.ParametricGeometry.call( this, sphere, u, v, ! true );
+	THREE.ParametricGeometry.call( this, sphere, u, v );
 
 };
 

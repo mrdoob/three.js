@@ -61,7 +61,8 @@ THREE.GLTFExporter.prototype = {
 		var DEFAULT_OPTIONS = {
 			trs: false,
 			onlyVisible: true,
-			truncateDrawRange: true
+			truncateDrawRange: true,
+			embedImages: true
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
@@ -85,6 +86,8 @@ THREE.GLTFExporter.prototype = {
 			materials: {}
 
 		};
+
+		var cachedCanvas;
 
 		/**
 		 * Compare two arrays
@@ -118,9 +121,9 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var buffer = new ArrayBuffer( text.length * 2 ); // 2 bytes per character.
+			var buffer = new ArrayBuffer( text.length );
 
-			var bufferView = new Uint16Array( buffer );
+			var bufferView = new Uint8Array( buffer );
 
 			for ( var i = 0; i < text.length; ++ i ) {
 
@@ -368,15 +371,31 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var gltfImage = {};
+			var mimeType = map.format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
+			var gltfImage = {mimeType: mimeType};
 
 			if ( options.embedImages ) {
 
-				// @TODO { bufferView, mimeType }
+				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
+				canvas.width = map.image.width;
+				canvas.height = map.image.height;
+				var ctx = canvas.getContext( '2d' );
+
+				if ( map.flipY === true ) {
+
+					ctx.translate( 0, map.image.height );
+					ctx.scale( 1, -1 );
+
+				}
+
+				ctx.drawImage( map.image, 0, 0 );
+
+				// @TODO Embed in { bufferView } if options.binary set.
+
+				gltfImage.uri = canvas.toDataURL( mimeType );
 
 			} else {
 
-				// @TODO base64 based on options
 				gltfImage.uri = map.image.src;
 
 			}

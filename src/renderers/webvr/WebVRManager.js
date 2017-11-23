@@ -14,6 +14,8 @@ function WebVRManager( renderer ) {
 	var device = null;
 	var frameData = null;
 
+	var poseTarget = null;
+
 	if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
 		frameData = new window.VRFrameData();
@@ -85,6 +87,12 @@ function WebVRManager( renderer ) {
 
 	};
 
+	this.setPoseTarget = function ( object ) {
+
+		if ( object !== undefined ) poseTarget = object;
+
+	};
+
 	this.getCamera = function ( camera ) {
 
 		if ( device === null ) return camera;
@@ -97,24 +105,35 @@ function WebVRManager( renderer ) {
 		//
 
 		var pose = frameData.pose;
+		var poseObject;
 
-		if ( pose.position !== null ) {
+		if ( poseTarget !== null ) {
 
-			camera.position.fromArray( pose.position );
+			poseObject = poseTarget;
 
 		} else {
 
-			camera.position.set( 0, 0, 0 );
+			poseObject = camera;
+
+		}
+
+		if ( pose.position !== null ) {
+
+			poseObject.position.fromArray( pose.position );
+
+		} else {
+
+			poseObject.position.set( 0, 0, 0 );
 
 		}
 
 		if ( pose.orientation !== null ) {
 
-			camera.quaternion.fromArray( pose.orientation );
+			poseObject.quaternion.fromArray( pose.orientation );
 
 		}
 
-		camera.updateMatrixWorld();
+		poseObject.updateMatrixWorld();
 
 		var stageParameters = device.stageParameters;
 
@@ -215,7 +234,11 @@ function WebVRManager( renderer ) {
 
 	this.dispose = function () {
 
-		window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
+		if ( typeof window !== 'undefined' ) {
+
+			window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
+
+		}
 
 	};
 

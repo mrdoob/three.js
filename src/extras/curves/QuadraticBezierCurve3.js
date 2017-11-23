@@ -7,9 +7,11 @@ function QuadraticBezierCurve3( v0, v1, v2 ) {
 
 	Curve.call( this );
 
-	this.v0 = v0;
-	this.v1 = v1;
-	this.v2 = v2;
+	this.type = 'QuadraticBezierCurve3';
+
+	this.v0 = v0 || new Vector3();
+	this.v1 = v1 || new Vector3();
+	this.v2 = v2 || new Vector3();
 
 }
 
@@ -31,6 +33,18 @@ QuadraticBezierCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 	);
 
 	return point;
+
+};
+
+QuadraticBezierCurve3.prototype.copy = function ( source ) {
+
+	Curve.prototype.copy.call( this, source );
+
+	this.v0.copy( source.v0 );
+	this.v1.copy( source.v1 );
+	this.v2.copy( source.v2 );
+
+	return this;
 
 };
 

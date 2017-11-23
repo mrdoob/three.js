@@ -21,6 +21,8 @@ Object.assign( FileLoader.prototype, {
 
 		if ( this.path !== undefined ) url = this.path + url;
 
+		url = this.manager.resolveURL( url );
+
 		var scope = this;
 
 		var cached = Cache.get( url );
@@ -233,6 +235,8 @@ Object.assign( FileLoader.prototype, {
 			request.addEventListener( 'error', function ( event ) {
 
 				var callbacks = loading[ url ];
+
+				delete loading[ url ];
 
 				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 

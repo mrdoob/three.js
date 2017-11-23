@@ -103,6 +103,7 @@ var list = {
 		},
 
 		"Extras": {
+			"Earcut": "api/extras/Earcut",
 			"SceneUtils": "api/extras/SceneUtils",
 			"ShapeUtils": "api/extras/ShapeUtils"
 		},
@@ -224,6 +225,7 @@ var list = {
 			"DataTextureLoader": "api/loaders/DataTextureLoader",
 			"FileLoader": "api/loaders/FileLoader",
 			"FontLoader": "api/loaders/FontLoader",
+			"ImageBitmapLoader": "api/loaders/ImageBitmapLoader",
 			"ImageLoader": "api/loaders/ImageLoader",
 			"JSONLoader": "api/loaders/JSONLoader",
 			"Loader": "api/loaders/Loader",
@@ -354,7 +356,8 @@ var list = {
 			"PCDLoader": "examples/loaders/PCDLoader",
 			"PDBLoader": "examples/loaders/PDBLoader",
 			"SVGLoader": "examples/loaders/SVGLoader",
-			"TGALoader": "examples/loaders/TGALoader"
+			"TGALoader": "examples/loaders/TGALoader",
+			"PRWMLoader": "examples/loaders/PRWMLoader"
 		},
 
 		"Exporters": {

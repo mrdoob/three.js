@@ -805,44 +805,6 @@
       "prototype": {},
       "!doc": "Contains handy functions geometry manipulations."
     },
-    "ImageUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/ImageUtils",
-      "prototype": {
-        "crossOrigin": {
-          "!type": "string",
-          "!doc": "The crossOrigin string to implement CORS for loading the image from a different domain that allows CORS."
-        },
-        "generateDataTexture": {
-          "!type": "fn(width: number, height: number, color: number) -> +THREE.DataTexture",
-          "!doc": "Generates a texture of a single color. It is a DataTexture with format, RGBFormat."
-        },
-        "parseDDS": {
-          "!type": "fn(buffer: string, loadMipmaps: boolean) -> +THREE.CompressedTexture",
-          "!doc": "Parses a DDS Image from the string into a CompressedTexture."
-        },
-        "loadCompressedTexture": {
-          "!type": "fn(url: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadTexture": {
-          "!type": "fn(url: string, mapping: UVMapping, onLoad: function, onError: function) -> todo",
-          "!doc": "todo"
-        },
-        "getNormalMap": {
-          "!type": "fn(image: todo, depth: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadCompressedTextureCube": {
-          "!type": "fn(array: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadTextureCube": {
-          "!type": "fn(array: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "A Helper class to ease the loading of images of different types."
-    },
     "SceneUtils": {
       "!url": "http://threejs.org/docs/#Reference/extras/SceneUtils",
       "prototype": {
@@ -960,7 +922,7 @@
           "!type": "array",
           "!doc": "The possible actions that define the path."
         },
-        "fromPoints": {
+        "setFromPoints": {
           "!type": "fn(vectors) -> todo",
           "!doc": "Adds to the Path from the points. The first vector defines the offset. After that the lines get defined."
         },
@@ -1012,23 +974,7 @@
           "!type": "array",
           "!doc": "todo"
         },
-        "makeGeometry": {
-          "!type": "fn(options: todo) -> todo",
-          "!doc": "Convenience method to return ShapeGeometry"
-        },
-        "extractAllPoints": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "Get points of shape and holes (keypoints based on segments parameter)"
-        },
-        "extrude": {
-          "!type": "fn(options: todo) -> todo",
-          "!doc": "Convenience method to return ExtrudeGeometry"
-        },
         "extractPoints": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "todo"
-        },
-        "extractAllSpacedPoints": {
           "!type": "fn(divisions: todo) -> todo",
           "!doc": "todo"
         },
@@ -1036,10 +982,6 @@
           "!type": "fn(divisions: todo) -> todo",
           "!doc": "Get points of holes"
         },
-        "getSpacedPointsHoles": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "Get points of holes (spaced by regular distance)"
-        }
       },
       "!doc": "Defines a 2d shape plane using paths.",
       "!type": "fn()"
@@ -5157,7 +5099,7 @@
         },
         "image": {
           "!type": "Image",
-          "!doc": "An Image object, typically created using the ImageUtils or [page:ImageLoader ImageLoader] classes. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
+          "!doc": "An Image object, typically created using the [page:ImageLoader ImageLoader] class. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
         },
         "mapping": {
           "!type": "object",

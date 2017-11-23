@@ -39,6 +39,8 @@ import { Matrix4 } from '../../math/Matrix4.js';
 
 function Curve() {
 
+	this.type = 'Curve';
+
 	this.arcLengthDivisions = 200;
 
 }
@@ -375,6 +377,20 @@ Object.assign( Curve.prototype, {
 			normals: normals,
 			binormals: binormals
 		};
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
+	copy: function ( source ) {
+
+		this.arcLengthDivisions = source.arcLengthDivisions;
+
+		return this;
 
 	}
 

@@ -156,10 +156,9 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null validate] ( [page:Function functionCodeBuilder], [page:Boolean forceWorkerReload], Array of [page:String libLocations], [page:String libPath], [page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] )</h3>
+		<h3>[method:null validate] ( [page:Function functionCodeBuilder], Array of [page:String libLocations], [page:String libPath], [page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] )</h3>
 		<div>
 			[page:Function functionCodeBuilder] - Function that is invoked with funcBuildObject and funcBuildSingelton that allows stringification of objects and singletons.<br>
-			[page:Boolean forceWorkerReload] - Force re-build of the worker code.<br>
 			Array of [page:String libLocations] - URL of libraries that shall be added to worker code relative to libPath.<br>
 			[page:String libPath] - Base path used for loading libraries.<br>
 			[page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] - The default worker parser wrapper implementation (communication and execution). An extended class could be passed here.
@@ -175,12 +174,6 @@
 		</div>
 		<div>
 			Request termination of worker once parser is finished.
-		</div>
-
-
-		<h3>[method:null terminateWorker] ()</h3>
-		<div>
-			Terminate the worker and the code.
 		</div>
 
 
@@ -251,7 +244,7 @@
 			- prepareWorkers<br>
 			- enqueueForRun<br>
 			- processQueue<br>
-			- deregister
+			- tearDown
 		</div>
 
 
@@ -283,7 +276,10 @@
 		</div>
 
 
-		<h3>[method:null deregister]()</h3>
+		<h3>[method:null tearDown]( [page:Function callbackOnFinishedProcessing] )</h3>
+		<div>
+			[page:Function callbackOnFinishedProcessing] - Function called once all workers finished processing.
+		</div>
 		<div>
 			Terminate all workers.
 		</div>
@@ -298,6 +294,11 @@
 		<h3>[method:null getMaxWebWorkers]()</h3>
 		<div>
 			Returns the maximum number of workers.
+		</div>
+
+		<h3>[method:Boolean isRunning]()</h3>
+		<div>
+			Returns if any workers are running.
 		</div>
 
 
@@ -520,6 +521,14 @@
 		<div>
 			Register callback function that is called once loading of the complete OBJ file is completed.
 		</div>
+
+		<h3>[method:null setCallbackOnLoadMaterials]( [page:Function callbackOnLoadMaterials] )</h3>
+		<div>
+			[page:Function callbackOnLoadMaterials] - Callback function for described functionality
+		</div>
+		<div>
+			Register callback function that is called when materials have been loaded.
+		</div>
 		<br>
 		<br>
 
@@ -535,7 +544,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null isValid]( [page:Object input] )</h3>
+		<h3>[method:Boolean isValid]( [page:Object input] )</h3>
 		<div>
 			[page:Object input] - Can be anything
 		</div>
