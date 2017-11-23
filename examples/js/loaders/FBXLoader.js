@@ -2203,10 +2203,10 @@
 					if ( curveNodesMap.has( children[ childIndex ].ID ) ) {
 
 						var curveNode = curveNodesMap.get( children[ childIndex ].ID );
-						var boneID = curveNode.containerBoneID;
-						if ( layer[ boneID ] === undefined ) {
+						var modelID = curveNode.containerModelID;
+						if ( layer[ modelID ] === undefined ) {
 
-							layer[ boneID ] = {
+							layer[ modelID ] = {
 								T: null,
 								R: null,
 								S: null
@@ -2214,7 +2214,7 @@
 
 						}
 
-						layer[ boneID ][ curveNode.attr ] = curveNode;
+						layer[ modelID ][ curveNode.attr ] = curveNode;
 
 					}
 
@@ -2285,7 +2285,7 @@
 
 			id: animationCurveNode.id,
 			attr: animationCurveNode.attrName,
-			containerBoneID: - 1,
+			containerModelID: - 1,
 			curves: {
 				x: null,
 				y: null,
@@ -2310,7 +2310,7 @@
 
 			if ( modelID > - 1 ) {
 
-				returnObject.containerBoneID = modelID;
+				returnObject.containerModelID = modelID;
 
 				var model = rawModels[ containerIndices[ containerIndicesIndex ].ID.toString() ];
 
@@ -2452,7 +2452,7 @@
 
 	function addAnimations( FBXTree, connections, sceneGraph, modelMap ) {
 
-		// create a flattened array of all bones and models in the scene
+		// create a flattened array of all models and bones in the scene
 		var modelsArray = Array.from( modelMap.values() );
 
 		sceneGraph.animations = [];
@@ -2531,21 +2531,20 @@
 	var euler = new THREE.Euler();
 	var quaternion = new THREE.Quaternion();
 
-	function generateKey( fps, animationNode, bone, frame ) {
+	function generateKey( fps, animationNode, model, frame ) {
 
 		var key = {
 
 			time: frame / fps,
-			pos: bone.position.toArray(),
-			rot: bone.quaternion.toArray(),
-			scl: bone.scale.toArray(),
+			pos: model.position.toArray(),
+			rot: model.quaternion.toArray(),
+			scl: model.scale.toArray(),
 
 		};
 
 		if ( animationNode === undefined ) return key;
 
-		euler.setFromQuaternion( bone.quaternion, 'ZYX', false );
-
+		euler.setFromQuaternion( model.quaternion, 'ZYX', false );
 
 		if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
 
