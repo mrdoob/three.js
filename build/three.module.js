@@ -44800,6 +44800,18 @@ Object.assign( WebVRManager.prototype, {
 
 } );
 
+Object.defineProperties( WebVRManager.prototype, {
+
+	standing: {
+		set: function ( value ) {
+
+			console.warn( 'THREE.WebVRManager: .standing has been removed.' );
+
+		}
+	}
+
+} );
+
 //
 
 Audio.prototype.load = function ( file ) {
