@@ -68,6 +68,7 @@ import { Skeleton } from './objects/Skeleton.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
+import { WebVRManager } from './renderers/webvr/WebVRManager.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
 
@@ -1528,6 +1529,18 @@ Object.defineProperties( WebGLRenderTarget.prototype, {
 			this.texture.generateMipmaps = value;
 
 		}
+	}
+
+} );
+
+//
+
+Object.assign( WebVRManager.prototype, {
+
+	getStandingMatrix: function () {
+
+		console.warn( 'THREE.WebVRManager: .getStandingMatrix() has been removed.' );
+
 	}
 
 } );
