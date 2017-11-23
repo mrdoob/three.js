@@ -2302,15 +2302,15 @@
 
 		for ( var containerIndicesIndex = containerIndices.length - 1; containerIndicesIndex >= 0; -- containerIndicesIndex ) {
 
-			var boneID = findIndex( modelsArray, function ( bone ) {
+			var modelID = findIndex( modelsArray, function ( model ) {
 
-				return bone.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
+				return model.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
 
 			} );
 
-			if ( boneID > - 1 ) {
+			if ( modelID > - 1 ) {
 
-				returnObject.containerBoneID = boneID;
+				returnObject.containerBoneID = modelID;
 
 				var model = rawModels[ containerIndices[ containerIndicesIndex ].ID.toString() ];
 
