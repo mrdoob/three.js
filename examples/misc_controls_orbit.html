@@ -81,24 +81,26 @@
 				//controls.enableDamping = true;
 				//controls.dampingFactor = 0.25;
 
+
 				// world
-				var geometry = new THREE.PlaneGeometry( 1000, 1000, 2, 2 );
-				var material = new THREE.MeshPhongMaterial( {
-					color: 0xffffff,
-					shininess: 200
-				} );
+
 				textureLoader = new THREE.TextureLoader();
 				textureLoader.load(
 					'textures/land_ocean_ice_cloud_2048.jpg',
 					function( tex ) {
-						material.map = tex;
-						material.needsUpdate = true;
+						var geometry = new THREE.PlaneGeometry( 1000, 1000, 2, 2 );
+						var material = new THREE.MeshPhongMaterial( {
+							map: tex,
+							color: 0xffffff,
+							shininess: 200,
+							needsUpdate: true
+						} );
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.position.set(0, 0, -1);
+						scene.add( mesh );
 						render();
 					}
 				);
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.set(0, 0, -1);
-				scene.add( mesh );
 
 				// lights
 
