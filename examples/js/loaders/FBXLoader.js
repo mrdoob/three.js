@@ -1497,7 +1497,7 @@
 
 		bindSkeleton( FBXTree, deformers, geometryMap, modelMap, connections, sceneGraph );
 
-		addAnimations( FBXTree, connections, sceneGraph );
+		addAnimations( FBXTree, connections, sceneGraph, modelMap );
 
 		createAmbientLight( FBXTree, sceneGraph );
 
@@ -2109,15 +2109,6 @@
 		//Skeleton is now bound, return objects to starting world positions.
 		sceneGraph.updateMatrixWorld( true );
 
-		// Silly hack with the animation parsing. We're gonna pretend the scene graph has a skeleton
-		// to attach animations to, since FBX treats animations as animations for the entire scene,
-		// not just for individual objects.
-		sceneGraph.skeleton = {
-
-			bones: Array.from( modelMap.values() ),
-
-		};
-
 	}
 
 	// Parses animation information from nodes in
@@ -2128,122 +2119,98 @@
 	// Multiple animation takes are stored in AnimationLayer and AnimationStack
 	// Note: There is also FBXTree.Takes, however this seems to be left over from an older version of the
 	// format and is no longer used
-	function parseAnimations( FBXTree, connections, sceneGraph ) {
+	function parseAnimations( FBXTree, connections, modelsArray ) {
 
-		var rawNodes = FBXTree.Objects.subNodes.AnimationCurveNode;
 		var rawCurves = FBXTree.Objects.subNodes.AnimationCurve;
+		var rawCurveNodes = FBXTree.Objects.subNodes.AnimationCurveNode;
 		var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
 		var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
+
+		// since the actual transformation data is stored in FBXTree.Objects.subNodes.AnimationCurve,
+		// if this is undefined we can safely assume there are no animations
+		if ( FBXTree.Objects.subNodes.AnimationCurve === undefined ) return undefined;
 
 		var animations = {
 			takes: {},
 			fps: getFrameRate( FBXTree ),
 		};
 
-		var animationCurveNodes = [];
-		for ( var nodeID in rawNodes ) {
+		var curveNodesMap = new Map();
+
+		for ( var nodeID in rawCurveNodes ) {
 
 			if ( nodeID.match( /\d+/ ) ) {
 
-				var animationNode = parseAnimationCurveNode( FBXTree, rawNodes[ nodeID ], connections, sceneGraph );
-				animationCurveNodes.push( animationNode );
+				var animationNode = parseAnimationCurveNode( FBXTree, rawCurveNodes[ nodeID ], connections, modelsArray );
+
+				if ( animationNode !== null ) {
+
+					curveNodesMap.set( animationNode.id, animationNode );
+
+				}
 
 			}
 
 		}
 
-		var tmpMap = new Map();
-		for ( var animationCurveNodeIndex = 0; animationCurveNodeIndex < animationCurveNodes.length; ++ animationCurveNodeIndex ) {
-
-			if ( animationCurveNodes[ animationCurveNodeIndex ] === null ) {
-
-				continue;
-
-			}
-			tmpMap.set( animationCurveNodes[ animationCurveNodeIndex ].id, animationCurveNodes[ animationCurveNodeIndex ] );
-
-		}
-
-		var animationCurves = [];
 		for ( nodeID in rawCurves ) {
 
 			if ( nodeID.match( /\d+/ ) ) {
 
 				var animationCurve = parseAnimationCurve( rawCurves[ nodeID ] );
 
-				// seems like this check would be necessary?
-				if ( ! connections.has( animationCurve.id ) ) continue;
+				var conns = connections.get( animationCurve.id );
 
-				animationCurves.push( animationCurve );
+				if ( conns !== undefined ) {
 
-				var firstParentConn = connections.get( animationCurve.id ).parents[ 0 ];
-				var firstParentID = firstParentConn.ID;
-				var firstParentRelationship = firstParentConn.relationship;
-				var axis = '';
+					var firstParentConn = conns.parents[ 0 ];
+					var firstParentID = firstParentConn.ID;
+					var firstParentRelationship = firstParentConn.relationship;
+					var axis = '';
 
-				if ( firstParentRelationship.match( /X/ ) ) {
+					if ( firstParentRelationship.match( /X/ ) ) {
 
-					axis = 'x';
+						axis = 'x';
 
-				} else if ( firstParentRelationship.match( /Y/ ) ) {
+					} else if ( firstParentRelationship.match( /Y/ ) ) {
 
-					axis = 'y';
+						axis = 'y';
 
-				} else if ( firstParentRelationship.match( /Z/ ) ) {
+					} else if ( firstParentRelationship.match( /Z/ ) ) {
 
-					axis = 'z';
+						axis = 'z';
 
-				} else {
+					} else {
 
-					continue;
+						continue;
+
+					}
+
+					curveNodesMap.get( firstParentID ).curves[ axis ] = animationCurve;
 
 				}
-
-				tmpMap.get( firstParentID ).curves[ axis ] = animationCurve;
 
 			}
 
 		}
 
-		tmpMap.forEach( function ( curveNode ) {
+		var emptyCurve = {
+
+			times: [ 0.0 ],
+			values: [ 0.0 ]
+
+		};
+
+		// loop over rotation values, convert to radians and add any pre rotation
+		curveNodesMap.forEach( function ( curveNode ) {
 
 			if ( curveNode.attr === 'R' ) {
 
 				var curves = curveNode.curves;
 
-				// Some FBX files have an AnimationCurveNode
-				// which isn't any connected to any AnimationCurve.
-				// Setting animation parameter for them here.
-
-				if ( curves.x === null ) {
-
-					curves.x = {
-						version: null,
-						times: [ 0.0 ],
-						values: [ 0.0 ]
-					};
-
-				}
-
-				if ( curves.y === null ) {
-
-					curves.y = {
-						version: null,
-						times: [ 0.0 ],
-						values: [ 0.0 ]
-					};
-
-				}
-
-				if ( curves.z === null ) {
-
-					curves.z = {
-						version: null,
-						times: [ 0.0 ],
-						values: [ 0.0 ]
-					};
-
-				}
+				if ( curves.x === null ) curves.x = emptyCurve;
+				if ( curves.y === null ) curves.y = emptyCurve;
+				if ( curves.z === null ) curves.z = emptyCurve;
 
 				curves.x.values = curves.x.values.map( THREE.Math.degToRad );
 				curves.y.values = curves.y.values.map( THREE.Math.degToRad );
@@ -2251,10 +2218,14 @@
 
 				if ( curveNode.preRotations !== null ) {
 
-					var preRotations = new THREE.Euler().setFromVector3( curveNode.preRotations, 'ZYX' );
+					var preRotations = curveNode.preRotations.map( THREE.Math.degToRad );
+					preRotations.push( 'ZYX' );
+					preRotations = new THREE.Euler().fromArray( preRotations );
 					preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+
 					var frameRotation = new THREE.Euler();
 					var frameRotationQuaternion = new THREE.Quaternion();
+
 					for ( var frame = 0; frame < curves.x.times.length; ++ frame ) {
 
 						frameRotation.set( curves.x.values[ frame ], curves.y.values[ frame ], curves.z.values[ frame ], 'ZYX' );
@@ -2287,13 +2258,13 @@
 				for ( var childIndex = 0; childIndex < children.length; childIndex ++ ) {
 
 					// Skip lockInfluenceWeights
-					if ( tmpMap.has( children[ childIndex ].ID ) ) {
+					if ( curveNodesMap.has( children[ childIndex ].ID ) ) {
 
-						var curveNode = tmpMap.get( children[ childIndex ].ID );
-						var boneID = curveNode.containerBoneID;
-						if ( layer[ boneID ] === undefined ) {
+						var curveNode = curveNodesMap.get( children[ childIndex ].ID );
+						var modelID = curveNode.containerModelID;
+						if ( layer[ modelID ] === undefined ) {
 
-							layer[ boneID ] = {
+							layer[ modelID ] = {
 								T: null,
 								R: null,
 								S: null
@@ -2301,7 +2272,7 @@
 
 						}
 
-						layer[ boneID ][ curveNode.attr ] = curveNode;
+						layer[ modelID ][ curveNode.attr ] = curveNode;
 
 					}
 
@@ -2347,10 +2318,12 @@
 			if ( timestamps.max > timestamps.min ) {
 
 				animations.takes[ nodeID ] = {
+
 					name: rawStacks[ nodeID ].attrName,
 					layers: layers,
 					length: timestamps.max - timestamps.min,
 					frames: ( timestamps.max - timestamps.min ) * animations.fps
+
 				};
 
 			}
@@ -2361,7 +2334,8 @@
 
 	}
 
-	function parseAnimationCurveNode( FBXTree, animationCurveNode, connections, sceneGraph ) {
+	// parse a node in FBXTree.Objects.subNodes.AnimationCurveNode
+	function parseAnimationCurveNode( FBXTree, animationCurveNode, connections, modelsArray ) {
 
 		var rawModels = FBXTree.Objects.subNodes.Model;
 
@@ -2369,68 +2343,40 @@
 
 			id: animationCurveNode.id,
 			attr: animationCurveNode.attrName,
-			internalID: animationCurveNode.id,
-			attrX: false,
-			attrY: false,
-			attrZ: false,
-			containerBoneID: - 1,
-			containerID: - 1,
+			containerModelID: - 1,
 			curves: {
 				x: null,
 				y: null,
 				z: null
 			},
-			preRotations: null
+			preRotations: null,
 
 		};
 
-		if ( returnObject.attr.match( /S|R|T/ ) ) {
-
-			for ( var attributeKey in animationCurveNode.properties ) {
-
-				if ( attributeKey.match( /X/ ) ) {
-
-					returnObject.attrX = true;
-
-				}
-				if ( attributeKey.match( /Y/ ) ) {
-
-					returnObject.attrY = true;
-
-				}
-				if ( attributeKey.match( /Z/ ) ) {
-
-					returnObject.attrZ = true;
-
-				}
-
-			}
-
-		} else {
-
-			return null;
-
-		}
+		if ( returnObject.attr.match( /S|R|T/ ) === null ) return null;
 
 		var conns = connections.get( returnObject.id );
 		var containerIndices = conns.parents;
 
 		for ( var containerIndicesIndex = containerIndices.length - 1; containerIndicesIndex >= 0; -- containerIndicesIndex ) {
 
-			var boneID = findIndex( sceneGraph.skeleton.bones, function ( bone ) {
+			var modelID = findIndex( modelsArray, function ( model ) {
 
-				return bone.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
+				return model.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
 
 			} );
-			if ( boneID > - 1 ) {
 
-				returnObject.containerBoneID = boneID;
-				returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
-				var model = rawModels[ returnObject.containerID.toString() ];
+			if ( modelID > - 1 ) {
 
+				returnObject.containerModelID = modelID;
+
+				var model = rawModels[ containerIndices[ containerIndicesIndex ].ID.toString() ];
+
+				// if the animated model is pre rotated, we'll have to apply the prerotations to every
+				// animation value as well
 				if ( 'PreRotation' in model.properties ) {
 
-					returnObject.preRotations = new THREE.Vector3().fromArray( model.properties.PreRotation.value ).multiplyScalar( Math.PI / 180 );
+					returnObject.preRotations = model.properties.PreRotation.value;
 
 				}
 				break;
@@ -2443,17 +2389,15 @@
 
 	}
 
+	// parse single node in FBXTree.Objects.subNodes.AnimationCurve
 	function parseAnimationCurve( animationCurve ) {
 
 		return {
-			version: null,
+
 			id: animationCurve.id,
-			internalID: animationCurve.id,
 			times: animationCurve.subNodes.KeyTime.properties.a.map( convertFBXTimeToSeconds ),
 			values: animationCurve.subNodes.KeyValueFloat.properties.a,
 
-			attrFlag: animationCurve.subNodes.KeyAttrFlags.properties.a,
-			attrData: animationCurve.subNodes.KeyAttrDataFloat.properties.a,
 		};
 
 	}
@@ -2564,63 +2508,71 @@
 
 	}
 
-	function addAnimations( FBXTree, connections, sceneGraph ) {
+	function addAnimations( FBXTree, connections, sceneGraph, modelMap ) {
 
-		var animations = parseAnimations( FBXTree, connections, sceneGraph );
+		// create a flattened array of all models and bones in the scene
+		var modelsArray = Array.from( modelMap.values() );
 
-		if ( sceneGraph.animations === undefined ) {
+		sceneGraph.animations = [];
 
-			sceneGraph.animations = [];
+		var animations = parseAnimations( FBXTree, connections, modelsArray );
+
+		if ( animations === undefined ) return;
+
+		// Silly hack with the animation parsing. We're gonna pretend the scene graph has a skeleton
+		// to attach animations to, since FBX treats animations as animations for the entire scene,
+		// not just for individual objects.
+		sceneGraph.skeleton = {
+
+			bones: modelsArray,
+
+		};
+
+		for ( var key in animations.takes ) {
+
+			var take = animations.takes[ key ];
+
+			var clip = addTake( take, animations.fps, modelsArray );
+
+			sceneGraph.animations.push( clip );
 
 		}
 
-		var takes = animations.takes;
+	}
 
-		for ( var key in takes ) {
+	function addTake( take, fps, modelsArray ) {
 
-			var take = takes[ key ];
+		var animationData = {
+			name: take.name,
+			fps: fps,
+			length: take.length,
+			hierarchy: []
+		};
 
-			var animationData = {
-				name: take.name,
-				fps: animations.fps,
-				length: take.length,
-				hierarchy: []
-			};
+		animationData.hierarchy = modelsArray.map( ( model ) => {
 
-			var bones = sceneGraph.skeleton.bones;
+			return { name: model.name, keys: [] };
 
-			for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
+		} );
 
-				var bone = bones[ bonesIndex ];
 
-				var name = bone.name.replace( /.*:/, '' );
-				var parentIndex = findIndex( bones, function ( parentBone ) {
+		// fill empty keys with animation data
+		// this just loops over all frames and assumes that the animation has been baked at one keyframe per frame
+		for ( var frame = 0; frame <= take.frames; frame ++ ) {
 
-					return bone.parent === parentBone;
+			for ( var i = 0, length = modelsArray.length; i < length; ++ i ) {
 
-				} );
-				animationData.hierarchy.push( { parent: parentIndex, name: name, keys: [] } );
+				var model = modelsArray[ i ];
 
-			}
+				var animationNode = take.layers[ 0 ][ i ];
 
-			for ( var frame = 0; frame <= take.frames; frame ++ ) {
+				for ( var hierarchyIndex = 0, hierarchyLength = animationData.hierarchy.length; hierarchyIndex < hierarchyLength; ++ hierarchyIndex ) {
 
-				for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
+					var node = animationData.hierarchy[ hierarchyIndex ];
 
-					var bone = bones[ bonesIndex ];
-					var boneIndex = bonesIndex;
+					if ( node.name === model.name ) {
 
-					var animationNode = take.layers[ 0 ][ boneIndex ];
-
-					for ( var hierarchyIndex = 0, hierarchyLength = animationData.hierarchy.length; hierarchyIndex < hierarchyLength; ++ hierarchyIndex ) {
-
-						var node = animationData.hierarchy[ hierarchyIndex ];
-
-						if ( node.name === bone.name ) {
-
-							node.keys.push( generateKey( animations, animationNode, bone, frame ) );
-
-						}
+						node.keys.push( generateKey( fps, animationNode, model, frame ) );
 
 					}
 
@@ -2628,30 +2580,29 @@
 
 			}
 
-			sceneGraph.animations.push( THREE.AnimationClip.parseAnimation( animationData, bones ) );
-
 		}
+
+		return THREE.AnimationClip.parseAnimation( animationData, modelsArray );
 
 	}
 
 	var euler = new THREE.Euler();
 	var quaternion = new THREE.Quaternion();
 
-	function generateKey( animations, animationNode, bone, frame ) {
+	function generateKey( fps, animationNode, model, frame ) {
 
 		var key = {
 
-			time: frame / animations.fps,
-			pos: bone.position.toArray(),
-			rot: bone.quaternion.toArray(),
-			scl: bone.scale.toArray(),
+			time: frame / fps,
+			pos: model.position.toArray(),
+			rot: model.quaternion.toArray(),
+			scl: model.scale.toArray(),
 
 		};
 
 		if ( animationNode === undefined ) return key;
 
-		euler.setFromQuaternion( bone.quaternion, 'ZYX', false );
-
+		euler.setFromQuaternion( model.quaternion, 'ZYX', false );
 
 		if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
 
