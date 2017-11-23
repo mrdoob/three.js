@@ -22,8 +22,6 @@ THREE.TDSLoader = function ( manager ) {
 	this.materials = [];
 	this.meshes = [];
 
-	this.path = undefined;
-
 };
 
 THREE.TDSLoader.prototype = {
@@ -44,24 +42,11 @@ THREE.TDSLoader.prototype = {
 		var scope = this;
 
 
-		var path;
-		if ( this.path === undefined ) {
-
-			path = THREE.Loader.prototype.extractUrlBase( url );
-			url = url.replace( path, '' );
-
-		} else {
-
-			path = this.path;
-
-		}
-
+		var path = this.path !== undefined ? this.path : THREE.Loader.prototype.extractUrlBase( url );
 
 		var loader = new THREE.FileLoader( this.manager );
 
 		loader.setResponseType( 'arraybuffer' );
-
-		loader.setPath( path );
 
 		loader.load( url, function ( data ) {
 
