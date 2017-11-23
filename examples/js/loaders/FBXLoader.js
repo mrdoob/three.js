@@ -2063,45 +2063,37 @@
 	// format and is no longer used
 	function parseAnimations( FBXTree, connections, modelsArray ) {
 
-		var rawNodes = FBXTree.Objects.subNodes.AnimationCurveNode;
 		var rawCurves = FBXTree.Objects.subNodes.AnimationCurve;
+		var rawCurveNodes = FBXTree.Objects.subNodes.AnimationCurveNode;
 		var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
 		var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
 
-		// since the actual transformation data is stored in rawCurves, if this is undefined we
-		// can safely assume there are no animations
-		if ( rawCurves === undefined ) return undefined;
+		// since the actual transformation data is stored in FBXTree.Objects.subNodes.AnimationCurve,
+		// if this is undefined we can safely assume there are no animations
+		if ( FBXTree.Objects.subNodes.AnimationCurve === undefined ) return undefined;
 
 		var animations = {
 			takes: {},
 			fps: getFrameRate( FBXTree ),
 		};
 
-		var animationCurveNodes = [];
-		for ( var nodeID in rawNodes ) {
+		var curveNodesMap = new Map();
+
+		for ( var nodeID in rawCurveNodes ) {
 
 			if ( nodeID.match( /\d+/ ) ) {
 
-				var animationNode = parseAnimationCurveNode( FBXTree, rawNodes[ nodeID ], connections, modelsArray );
-				animationCurveNodes.push( animationNode );
+				var animationNode = parseAnimationCurveNode( FBXTree, rawCurveNodes[ nodeID ], connections, modelsArray );
+
+				if ( animationNode !== null ) {
+
+					curveNodesMap.set( animationNode.id, animationNode );
+
+				}
 
 			}
 
 		}
-
-		var tmpMap = new Map();
-		for ( var animationCurveNodeIndex = 0; animationCurveNodeIndex < animationCurveNodes.length; ++ animationCurveNodeIndex ) {
-
-			if ( animationCurveNodes[ animationCurveNodeIndex ] === null ) {
-
-				continue;
-
-			}
-			tmpMap.set( animationCurveNodes[ animationCurveNodeIndex ].id, animationCurveNodes[ animationCurveNodeIndex ] );
-
-		}
-
-		var animationCurves = [];
 
 		for ( nodeID in rawCurves ) {
 
@@ -2109,46 +2101,50 @@
 
 				var animationCurve = parseAnimationCurve( rawCurves[ nodeID ] );
 
-				animationCurves.push( animationCurve );
+				var conns = connections.get( animationCurve.id );
 
-				var firstParentConn = connections.get( animationCurve.id ).parents[ 0 ];
-				var firstParentID = firstParentConn.ID;
-				var firstParentRelationship = firstParentConn.relationship;
-				var axis = '';
+				if ( conns !== undefined ) {
 
-				if ( firstParentRelationship.match( /X/ ) ) {
+					var firstParentConn = conns.parents[ 0 ];
+					var firstParentID = firstParentConn.ID;
+					var firstParentRelationship = firstParentConn.relationship;
+					var axis = '';
 
-					axis = 'x';
+					if ( firstParentRelationship.match( /X/ ) ) {
 
-				} else if ( firstParentRelationship.match( /Y/ ) ) {
+						axis = 'x';
 
-					axis = 'y';
+					} else if ( firstParentRelationship.match( /Y/ ) ) {
 
-				} else if ( firstParentRelationship.match( /Z/ ) ) {
+						axis = 'y';
 
-					axis = 'z';
+					} else if ( firstParentRelationship.match( /Z/ ) ) {
 
-				} else {
+						axis = 'z';
 
-					continue;
+					} else {
+
+						continue;
+
+					}
+
+					curveNodesMap.get( firstParentID ).curves[ axis ] = animationCurve;
 
 				}
-
-				tmpMap.get( firstParentID ).curves[ axis ] = animationCurve;
 
 			}
 
 		}
+
 		var emptyCurve = {
 
-			version: null,
 			times: [ 0.0 ],
 			values: [ 0.0 ]
 
 		};
 
 		// loop over rotation values, convert to radians and add any pre rotation
-		tmpMap.forEach( function ( curveNode ) {
+		curveNodesMap.forEach( function ( curveNode ) {
 
 			if ( curveNode.attr === 'R' ) {
 
@@ -2164,7 +2160,9 @@
 
 				if ( curveNode.preRotations !== null ) {
 
-					var preRotations = new THREE.Euler().setFromVector3( curveNode.preRotations, 'ZYX' );
+					var preRotations = curveNode.preRotations.map( THREE.Math.degToRad );
+					preRotations.push( 'ZYX' );
+					preRotations = new THREE.Euler().fromArray( preRotations );
 					preRotations = new THREE.Quaternion().setFromEuler( preRotations );
 
 					var frameRotation = new THREE.Euler();
@@ -2202,9 +2200,9 @@
 				for ( var childIndex = 0; childIndex < children.length; childIndex ++ ) {
 
 					// Skip lockInfluenceWeights
-					if ( tmpMap.has( children[ childIndex ].ID ) ) {
+					if ( curveNodesMap.has( children[ childIndex ].ID ) ) {
 
-						var curveNode = tmpMap.get( children[ childIndex ].ID );
+						var curveNode = curveNodesMap.get( children[ childIndex ].ID );
 						var boneID = curveNode.containerBoneID;
 						if ( layer[ boneID ] === undefined ) {
 
@@ -2262,10 +2260,12 @@
 			if ( timestamps.max > timestamps.min ) {
 
 				animations.takes[ nodeID ] = {
+
 					name: rawStacks[ nodeID ].attrName,
 					layers: layers,
 					length: timestamps.max - timestamps.min,
 					frames: ( timestamps.max - timestamps.min ) * animations.fps
+
 				};
 
 			}
@@ -2276,6 +2276,7 @@
 
 	}
 
+	// parse a node in FBXTree.Objects.subNodes.AnimationCurveNode
 	function parseAnimationCurveNode( FBXTree, animationCurveNode, connections, modelsArray ) {
 
 		var rawModels = FBXTree.Objects.subNodes.Model;
@@ -2284,48 +2285,17 @@
 
 			id: animationCurveNode.id,
 			attr: animationCurveNode.attrName,
-			internalID: animationCurveNode.id,
-			attrX: false,
-			attrY: false,
-			attrZ: false,
 			containerBoneID: - 1,
-			containerID: - 1,
 			curves: {
 				x: null,
 				y: null,
 				z: null
 			},
-			preRotations: null
+			preRotations: null,
 
 		};
 
-		if ( returnObject.attr.match( /S|R|T/ ) ) {
-
-			for ( var attributeKey in animationCurveNode.properties ) {
-
-				if ( attributeKey.match( /X/ ) ) {
-
-					returnObject.attrX = true;
-
-				}
-				if ( attributeKey.match( /Y/ ) ) {
-
-					returnObject.attrY = true;
-
-				}
-				if ( attributeKey.match( /Z/ ) ) {
-
-					returnObject.attrZ = true;
-
-				}
-
-			}
-
-		} else {
-
-			return null;
-
-		}
+		if ( returnObject.attr.match( /S|R|T/ ) === null ) return null;
 
 		var conns = connections.get( returnObject.id );
 		var containerIndices = conns.parents;
@@ -2337,15 +2307,18 @@
 				return bone.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
 
 			} );
+
 			if ( boneID > - 1 ) {
 
 				returnObject.containerBoneID = boneID;
-				returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
-				var model = rawModels[ returnObject.containerID.toString() ];
 
+				var model = rawModels[ containerIndices[ containerIndicesIndex ].ID.toString() ];
+
+				// if the animated model is pre rotated, we'll have to apply the prerotations to every
+				// animation value as well
 				if ( 'PreRotation' in model.properties ) {
 
-					returnObject.preRotations = new THREE.Vector3().fromArray( model.properties.PreRotation.value ).multiplyScalar( Math.PI / 180 );
+					returnObject.preRotations = model.properties.PreRotation.value;
 
 				}
 				break;
@@ -2358,17 +2331,15 @@
 
 	}
 
+	// parse single node in FBXTree.Objects.subNodes.AnimationCurve
 	function parseAnimationCurve( animationCurve ) {
 
 		return {
-			version: null,
+
 			id: animationCurve.id,
-			internalID: animationCurve.id,
 			times: animationCurve.subNodes.KeyTime.properties.a.map( convertFBXTimeToSeconds ),
 			values: animationCurve.subNodes.KeyValueFloat.properties.a,
 
-			attrFlag: animationCurve.subNodes.KeyAttrFlags.properties.a,
-			attrData: animationCurve.subNodes.KeyAttrDataFloat.properties.a,
 		};
 
 	}
