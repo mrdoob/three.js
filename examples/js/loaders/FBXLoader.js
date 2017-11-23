@@ -1906,6 +1906,36 @@
 	// parse the model node for transform details and apply them to the model
 	function setModelTransforms( FBXTree, model, modelNode, connections, sceneGraph ) {
 
+		// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
+		if ( 'RotationOrder' in modelNode.properties ) {
+
+			var enums = [
+				'XYZ', // default
+				'XZY',
+				'YZX',
+				'ZXY',
+				'YXZ',
+				'ZYX',
+				'SphericXYZ',
+			];
+
+			var value = parseInt( modelNode.properties.RotationOrder.value, 10 );
+
+			if ( value > 0 && value < 6 ) {
+
+				// model.rotation.order = enums[ value ];
+
+				// Note: Euler order other than XYZ is currently not supported, so just display a warning for now
+				console.warn( 'THREE.FBXLoader: unsupported Euler Order: %s. Currently only XYZ order is supported. Animations and rotations may be incorrect.', enums[ value ] );
+
+			} else if ( value === 6 ) {
+
+				console.warn( 'THREE.FBXLoader: unsupported Euler Order: Spherical XYZ. Animations and rotations may be incorrect.' );
+
+			}
+
+		}
+
 		if ( 'Lcl_Translation' in modelNode.properties ) {
 
 			model.position.fromArray( modelNode.properties.Lcl_Translation.value );
@@ -1941,7 +1971,7 @@
 		}
 
 		// rotated pivots - note: rotation must be applied before translation here
-		if ( 'GeometricRotation' in modelNode.properties  ) {
+		if ( 'GeometricRotation' in modelNode.properties ) {
 
 			var array = modelNode.properties.GeometricRotation.value.map( THREE.Math.degToRad );
 
@@ -3947,12 +3977,6 @@
 		}
 
 		return array;
-
-	}
-
-	function parseVector3( property ) {
-
-		return new THREE.Vector3().fromArray( property.value );
 
 	}
 
