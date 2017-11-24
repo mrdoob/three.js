@@ -39,6 +39,13 @@ var THREE_TO_WEBGL = {
 	1008: WEBGL_CONSTANTS.LINEAR_MIPMAP_LINEAR
 };
 
+var PATH_PROPERTIES = {
+	scale: 'scale',
+	position: 'translation',
+	quaternion: 'rotation',
+	morphTargetInfluences: 'weights'
+};
+
 //------------------------------------------------------------------------------
 // GLTF Exporter
 //------------------------------------------------------------------------------
@@ -53,8 +60,6 @@ THREE.GLTFExporter.prototype = {
 	 * @param  {THREE.Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
-	 *                          trs: Exports position, rotation and scale instead of matrix
-	 *                          binary: Exports `.glb` as ArrayBuffer, instead of `.gltf` as JSON
 	 */
 	parse: function ( input, onDone, options ) {
 
@@ -62,10 +67,18 @@ THREE.GLTFExporter.prototype = {
 			trs: false,
 			onlyVisible: true,
 			truncateDrawRange: true,
-			embedImages: true
+			embedImages: true,
+			animations: []
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
+
+		if ( options.animations.length > 0 ) {
+
+			// Only TRS properties, and not matrices, may be targeted by animation.
+			options.trs = true;
+
+		}
 
 		var outputJSON = {
 
@@ -80,6 +93,8 @@ THREE.GLTFExporter.prototype = {
 
 		var byteOffset = 0;
 		var dataViews = [];
+		var nodeMap = {};
+		var skins = [];
 		var cachedData = {
 
 			images: {},
@@ -136,8 +151,8 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
-		 * Get the min and he max vectors from the given attribute
-		 * @param  {THREE.WebGLAttribute} attribute Attribute to find the min/max
+		 * Get the min and max vectors from the given attribute
+		 * @param  {THREE.BufferAttribute} attribute Attribute to find the min/max
 		 * @return {Object} Object containing the `min` and `max` values (As an array of attribute.itemSize components)
 		 */
 		function getMinMax( attribute ) {
@@ -232,12 +247,14 @@ THREE.GLTFExporter.prototype = {
 
 		/**
 		 * Process and generate a BufferView
-		 * @param  {[type]} data [description]
-		 * @return {[type]}      [description]
+		 * @param  {THREE.BufferAttribute} data
+		 * @param  {number} componentType
+		 * @param  {number} start
+		 * @param  {number} count
+		 * @param  {number} target (Optional) Target usage of the BufferView
+		 * @return {Object}
 		 */
-		function processBufferView( data, componentType, start, count ) {
-
-			var isVertexAttributes = componentType === WEBGL_CONSTANTS.FLOAT;
+		function processBufferView( data, componentType, start, count, target ) {
 
 			if ( ! outputJSON.bufferViews ) {
 
@@ -255,10 +272,11 @@ THREE.GLTFExporter.prototype = {
 				buffer: processBuffer( data, componentType, start, count ),
 				byteOffset: byteOffset,
 				byteLength: byteLength,
-				byteStride: data.itemSize * componentSize,
-				target: isVertexAttributes ? WEBGL_CONSTANTS.ARRAY_BUFFER : WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER
+				byteStride: data.itemSize * componentSize
 
 			};
+
+			if ( target !== undefined ) gltfBufferView.target = target;
 
 			byteOffset += byteLength;
 
@@ -278,7 +296,8 @@ THREE.GLTFExporter.prototype = {
 
 		/**
 		 * Process attribute to generate an accessor
-		 * @param  {THREE.WebGLAttribute} attribute Attribute to process
+		 * @param  {THREE.BufferAttribute} attribute Attribute to process
+		 * @param  {THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
 		 * @return {Integer}           Index of the processed accessor on the "accessors" array
 		 */
 		function processAccessor( attribute, geometry ) {
@@ -289,14 +308,15 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var types = [
+			var types = {
 
-				'SCALAR',
-				'VEC2',
-				'VEC3',
-				'VEC4'
+				1: 'SCALAR',
+				2: 'VEC2',
+				3: 'VEC3',
+				4: 'VEC4',
+				16: 'MAT4'
 
-			];
+			};
 
 			var componentType;
 
@@ -325,14 +345,25 @@ THREE.GLTFExporter.prototype = {
 			var count = attribute.count;
 
 			// @TODO Indexed buffer geometry with drawRange not supported yet
-			if ( options.truncateDrawRange && geometry.index === null ) {
+			if ( options.truncateDrawRange && geometry !== undefined && geometry.index === null ) {
 
 				start = geometry.drawRange.start;
 				count = geometry.drawRange.count !== Infinity ? geometry.drawRange.count : attribute.count;
 
 			}
 
-			var bufferView = processBufferView( attribute, componentType, start, count );
+			var bufferViewTarget;
+
+			// If geometry isn't provided, don't infer the target usage of the bufferView. For
+			// animation samplers, target must not be set.
+			if ( geometry !== undefined ) {
+
+				var isVertexAttributes = componentType === WEBGL_CONSTANTS.FLOAT;
+				bufferViewTarget = isVertexAttributes ? WEBGL_CONSTANTS.ARRAY_BUFFER : WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER;
+
+			}
+
+			var bufferView = processBufferView( attribute, componentType, start, count, bufferViewTarget );
 
 			var gltfAccessor = {
 
@@ -342,7 +373,7 @@ THREE.GLTFExporter.prototype = {
 				count: count,
 				max: minMax.max,
 				min: minMax.min,
-				type: types[ attribute.itemSize - 1 ]
+				type: types[ attribute.itemSize ]
 
 			};
 
@@ -743,7 +774,35 @@ THREE.GLTFExporter.prototype = {
 
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
-				gltfAttributes[ attributeName ] = processAccessor( attribute, geometry );
+
+				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
+
+					gltfAttributes[ attributeName ] = processAccessor( attribute, geometry );
+
+				}
+
+			}
+
+			// Morph targets
+			if ( mesh.morphTargetInfluences !== undefined && mesh.morphTargetInfluences.length > 0 ) {
+
+				gltfMesh.primitives[ 0 ].targets = [];
+
+				for ( var i = 0; i < mesh.morphTargetInfluences.length; ++ i ) {
+
+					var target = {};
+
+					for ( var attributeName in geometry.morphAttributes ) {
+
+						var attribute = geometry.morphAttributes[ attributeName ][ i ];
+						attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
+						target[ attributeName ] = processAccessor( attribute, geometry );
+
+					}
+
+					gltfMesh.primitives[ 0 ].targets.push( target );
+
+				}
 
 			}
 
@@ -811,6 +870,123 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
+		 * Creates glTF animation entry from AnimationClip object.
+		 *
+		 * Status:
+		 * - Only properties listed in PATH_PROPERTIES may be animated.
+		 * - Only LINEAR and STEP interpolation currently supported.
+		 *
+		 * @param {THREE.AnimationClip} clip
+		 * @param {THREE.Object3D} root
+		 * @return {number}
+		 */
+		function processAnimation ( clip, root ) {
+
+			if ( ! outputJSON.animations ) {
+
+				outputJSON.animations = [];
+
+			}
+
+			var channels = [];
+			var samplers = [];
+
+			for ( var i = 0; i < clip.tracks.length; ++ i ) {
+
+				var track = clip.tracks[ i ];
+				var trackBinding = THREE.PropertyBinding.parseTrackName( track.name );
+				var trackNode = THREE.PropertyBinding.findNode( root, trackBinding.nodeName );
+				var trackProperty = PATH_PROPERTIES[ trackBinding.propertyName ];
+
+				if ( ! trackNode || ! trackProperty ) {
+
+					console.warn( 'THREE.GLTFExporter: Could not export animation track "%s".', track.name );
+					return null;
+
+				}
+
+				var inputItemSize = 1;
+				var outputItemSize = track.values.length / track.times.length;
+
+				if ( trackProperty === PATH_PROPERTIES.morphTargetInfluences ) {
+
+					outputItemSize /= trackNode.morphTargetInfluences.length;
+
+				}
+
+				samplers.push( {
+
+					input: processAccessor( new THREE.BufferAttribute( track.times, inputItemSize ) ),
+					output: processAccessor( new THREE.BufferAttribute( track.values, outputItemSize ) ),
+					interpolation: track.interpolation === THREE.InterpolateDiscrete ? 'STEP' : 'LINEAR'
+
+				} );
+
+				channels.push( {
+
+					sampler: samplers.length - 1,
+					target: {
+						node: nodeMap[ trackNode.uuid ],
+						path: trackProperty
+					}
+
+				} );
+
+			}
+
+			outputJSON.animations.push( {
+
+				name: clip.name || 'clip_' + outputJSON.animations.length,
+				samplers: samplers,
+				channels: channels
+
+			} );
+
+			return outputJSON.animations.length - 1;
+
+		}
+
+		function processSkin( object ) {
+
+			var node = outputJSON.nodes[ nodeMap[ object.uuid ] ];
+
+			var skeleton = object.skeleton;
+			var rootJoint = object.skeleton.bones[ 0 ];
+
+			if ( rootJoint === undefined ) return null;
+
+			var joints = [];
+			var inverseBindMatrices = new Float32Array( skeleton.bones.length * 16 );
+
+			for ( var i = 0; i < skeleton.bones.length; ++ i ) {
+
+				joints.push( nodeMap[ skeleton.bones[ i ].uuid ] );
+
+				skeleton.boneInverses[ i ].toArray( inverseBindMatrices, i * 16 );
+
+			}
+
+			if ( outputJSON.skins === undefined ) {
+
+				outputJSON.skins = [];
+
+			}
+
+			outputJSON.skins.push( {
+
+				inverseBindMatrices: processAccessor( new THREE.BufferAttribute( inverseBindMatrices, 16 ) ),
+				joints: joints,
+				skeleton: nodeMap[ rootJoint.uuid ]
+
+			} );
+
+			var skinIndex = node.skin = outputJSON.skins.length - 1;
+
+			return skinIndex;
+
+		}
+
+		/**
 		 * Process Object3D node
 		 * @param  {THREE.Object3D} node Object3D to processNode
 		 * @return {Integer}      Index of the node in the nodes list
@@ -846,7 +1022,7 @@ THREE.GLTFExporter.prototype = {
 
 				if ( ! equalArray( position, [ 0, 0, 0 ] ) ) {
 
-					gltfNode.position = position;
+					gltfNode.translation = position;
 
 				}
 
@@ -899,6 +1075,12 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			if ( object instanceof THREE.SkinnedMesh ) {
+
+				skins.push( object );
+
+			}
+
 			if ( object.children.length > 0 ) {
 
 				var children = [];
@@ -932,7 +1114,9 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.nodes.push( gltfNode );
 
-			return outputJSON.nodes.length - 1;
+			var nodeIndex = nodeMap[ object.uuid ] = outputJSON.nodes.length - 1;
+
+			return nodeIndex;
 
 		}
 
@@ -1035,6 +1219,18 @@ THREE.GLTFExporter.prototype = {
 			if ( objectsWithoutScene.length > 0 ) {
 
 				processObjects( objectsWithoutScene );
+
+			}
+
+			for ( var i = 0; i < skins.length; ++ i ) {
+
+				processSkin( skins[ i ] );
+
+			}
+
+			for ( var i = 0; i < options.animations.length; ++ i ) {
+
+				processAnimation( options.animations[ i ], input[ 0 ] );
 
 			}
 
