@@ -49,9 +49,7 @@
 
 				try {
 
-					console.time( 'parse: ' );
 					var scene = self.parse( buffer, resourceDirectory );
-					console.timeEnd( 'parse: ' );
 					onLoad( scene );
 
 				} catch ( error ) {
