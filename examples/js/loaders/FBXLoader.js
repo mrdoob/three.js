@@ -348,7 +348,6 @@
 
 		var children = connections.get( textureNode.id ).children;
 
-		// embedded texture
 		if ( children !== undefined && children.length > 0 && imageMap.has( children[ 0 ].ID ) ) {
 
 			fileName = imageMap.get( children[ 0 ].ID );
@@ -807,19 +806,17 @@
 		var faceWeights = [];
 		var faceWeightIndices = [];
 
-		for ( var polygonVertexIndex = 0; polygonVertexIndex < vertexIndices.length; polygonVertexIndex ++ ) {
-
-			var vertexIndex = vertexIndices[ polygonVertexIndex ];
+		vertexIndices.forEach( function ( vertexIndex, polygonVertexIndex ) {
 
 			var endOfFace = false;
 
-			// Face index and vertex index arrays are combined in a single array
-			// A cube with quad faces looks like this:
-			// PolygonVertexIndex: *24 {
-			//  a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
-			//  }
-			// Negative numbers mark the end of a face - first face here is 0, 1, 3, -3
-			// to find index of last vertex multiply by -1 and subtract 1: -3 * - 1 - 1 = 2
+						// Face index and vertex index arrays are combined in a single array
+						// A cube with quad faces looks like this:
+						// PolygonVertexIndex: *24 {
+						//  a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
+						//  }
+						// Negative numbers mark the end of a face - first face here is 0, 1, 3, -3
+						// to find index of last vertex multiply by -1 and subtract 1: -3 * - 1 - 1 = 2
 			if ( vertexIndex < 0 ) {
 
 				vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
@@ -845,14 +842,13 @@
 
 				if ( weightTable[ vertexIndex ] !== undefined ) {
 
-					var array = weightTable[ vertexIndex ];
+					weightTable[ vertexIndex ].forEach( function ( wt ) {
 
-					for ( var j = 0; j < array.length; j ++ ) {
+						weights.push( wt.weight );
+						weightIndices.push( wt.id );
 
-						weights.push( array[ j ].weight );
-						weightIndices.push( array[ j ].id );
+					} );
 
-					}
 
 				}
 
@@ -896,10 +892,10 @@
 				}
 
 				// if the weight array is shorter than 4 pad with 0s
-				for ( var i = weights.length; i < 4; ++ i ) {
+				while ( weights.length < 4 ) {
 
-					weights[ i ] = 0;
-					weightIndices[ i ] = 0;
+					weights.push( 0 );
+					weightIndices.push( 0 );
 
 				}
 
@@ -928,9 +924,9 @@
 
 			if ( uvInfo ) {
 
-				for ( var i = 0; i < uvInfo.length; i ++ ) {
+				uvInfo.forEach( function ( uv, i ) {
 
-					var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, uvInfo[ i ] );
+					var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, uv );
 
 					if ( faceUVs[ i ] === undefined ) {
 
@@ -938,12 +934,10 @@
 
 					}
 
-					faceUVs[ i ].push(
-						data[ 0 ],
-						data[ 1 ]
-					);
+					faceUVs[ i ].push( data[ 0 ] );
+					faceUVs[ i ].push( data[ 1 ] );
 
-				}
+				} );
 
 			}
 
@@ -1067,7 +1061,7 @@
 				endOfFace = false;
 				faceLength = 0;
 
-				// reset arrays for the next face
+							// reset arrays for the next face
 				vertexPositionIndexes = [];
 				faceNormals = [];
 				faceColors = [];
@@ -1077,7 +1071,7 @@
 
 			}
 
-		}
+		} );
 
 		var geo = new THREE.BufferGeometry();
 		geo.name = geometryNode.name;
@@ -2751,93 +2745,56 @@
 			this.currentProp = [];
 			this.currentPropName = '';
 
+			var self = this;
+
 			var split = text.split( '\n' );
 
-			for ( var lineNum = 0; lineNum < split.length; lineNum ++ ) {
+			split.forEach( function ( line, i ) {
 
-				var l = split[ lineNum ];
+				var matchComment = line.match( /^[\s\t]*;/ );
+				var matchEmpty = line.match( /^[\s\t]*$/ );
 
-				// skip comment line
-				if ( l.match( /^[\s\t]*;/ ) ) {
+				if ( matchComment || matchEmpty ) return;
 
-					continue;
+				var matchBeginning = line.match( '^\\t{' + self.currentIndent + '}(\\w+):(.*){', '' );
+				var matchProperty = line.match( '^\\t{' + ( self.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
+				var matchEnd = line.match( '^\\t{' + ( self.currentIndent - 1 ) + '}}' );
 
-				}
+				if ( matchBeginning ) {
 
-				// skip empty line
-				if ( l.match( /^[\s\t]*$/ ) ) {
+					self.parseNodeBegin( line, matchBeginning );
 
-					continue;
+				} else if ( matchProperty ) {
 
-				}
+					self.parseNodeProperty( line, matchProperty, split[ ++ i ] );
 
-				// beginning of node
-				var beginningOfNodeExp = new RegExp( '^\\t{' + this.currentIndent + '}(\\w+):(.*){', '' );
-				var match = l.match( beginningOfNodeExp );
+				} else if ( matchEnd ) {
 
-				if ( match ) {
+					self.nodeEnd();
 
-					var nodeName = match[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, '' );
+				} else if ( line.match( /^[^\s\t}]/ ) ) {
 
-					var nodeAttrs = match[ 2 ].split( ',' ).map( function ( attr ) {
-
-						return attr.trim().replace( /^"/, '' ).replace( /"$/, '' );
-
-					} );
-
-					this.parseNodeBegin( l, nodeName, nodeAttrs || null );
-					continue;
+					// large arrays are split over multiple lines terminated with a ',' character
+					// if this is encountered the line needs to be joined to the previous line
+					self.parseNodePropertyContinued( line );
 
 				}
 
-				// node's property
-				var propExp = new RegExp( '^\\t{' + ( this.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
-				var match = l.match( propExp );
-
-				if ( match ) {
-
-					var propName = match[ 1 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
-					var propValue = match[ 2 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
-
-					// for special case: base64 image data follows "Content: ," line
-					//	Content: ,
-					//	 "iVB..."
-					if ( propName === 'Content' && propValue === ',' ) {
-
-						propValue = split[ ++ lineNum ].replace( /"/g, '' ).replace( /,$/, '' ).trim();
-
-					}
-
-					this.parseNodeProperty( l, propName, propValue );
-					continue;
-
-				}
-
-				// end of node
-				var endOfNodeExp = new RegExp( '^\\t{' + ( this.currentIndent - 1 ) + '}}' );
-
-				if ( l.match( endOfNodeExp ) ) {
-
-					this.nodeEnd();
-					continue;
-
-				}
-
-				// large arrays are split over multiple lines terminated with a ',' character
-				// if this is encountered the line needs to be joined to the previous line
-				if ( l.match( /^[^\s\t}]/ ) ) {
-
-					this.parseNodePropertyContinued( l );
-
-				}
-
-			}
+			} );
 
 			return this.allNodes;
 
 		},
 
-		parseNodeBegin: function ( line, nodeName, nodeAttrs ) {
+		parseNodeBegin: function ( line, property ) {
+
+			var nodeName = property[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, '' );
+
+			var nodeAttrs = property[ 2 ].split( ',' ).map( function ( attr ) {
+
+				return attr.trim().replace( /^"/, '' ).replace( /"$/, '' );
+
+			} );
 
 			var node = { 'name': nodeName, properties: {}, 'subNodes': {} };
 			var attrs = this.parseNodeAttr( nodeAttrs );
@@ -2938,7 +2895,19 @@
 
 		},
 
-		parseNodeProperty: function ( line, propName, propValue ) {
+		parseNodeProperty: function ( line, property, contentLine ) {
+
+			var propName = property[ 1 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
+			var propValue = property[ 2 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
+
+			// for special case: base64 image data follows "Content: ," line
+			//	Content: ,
+			//	 "iVB..."
+			if ( propName === 'Content' && propValue === ',' ) {
+
+				propValue = contentLine.replace( /"/g, '' ).replace( /,$/, '' ).trim();
+
+			}
 
 			var currentNode = this.getCurrentNode();
 			var parentName = currentNode.name;
@@ -3919,13 +3888,11 @@
 	// Used internally by the TextParser
 	function parseNumberArray( value ) {
 
-		var array = value.split( ',' );
+		var array = value.split( ',' ).map( function ( val ) {
 
-		for ( var i = 0, l = array.length; i < l; i ++ ) {
+			return parseFloat( val );
 
-			array[ i ] = parseFloat( array[ i ] );
-
-		}
+		} );
 
 		return array;
 
