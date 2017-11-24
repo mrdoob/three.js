@@ -529,7 +529,7 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.pbrMetallicRoughness.baseColorTexture = {
 
-					index: processTexture( material.map )
+					index: processTexture( material.map )
 
 				};
 
@@ -555,7 +555,7 @@ THREE.GLTFExporter.prototype = {
 
 					gltfMaterial.emissiveTexture = {
 
-						index: processTexture( material.emissiveMap )
+						index: processTexture( material.emissiveMap )
 
 					};
 
@@ -568,7 +568,7 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.normalTexture = {
 
-					index: processTexture( material.normalMap )
+					index: processTexture( material.normalMap )
 
 				};
 
@@ -591,7 +591,7 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.occlusionTexture = {
 
-					index: processTexture( material.aoMap )
+					index: processTexture( material.aoMap )
 
 				};
 
@@ -604,11 +604,12 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			// alphaMode
-			if ( material.transparent ) {
+			if ( material.transparent || material.alphaTest > 0.0 ) {
 
-				gltfMaterial.alphaMode = 'MASK'; // @FIXME We should detect MASK or BLEND
+				gltfMaterial.alphaMode = material.opacity < 1.0 ? 'BLEND' : 'MASK';
 
-				if ( material.alphaTest !== 0.5 ) {
+				// Write alphaCutoff if it's non-zero and different from the default (0.5).
+				if ( material.alphaTest > 0.0 && material.alphaTest !== 0.5 ) {
 
 					gltfMaterial.alphaCutoff = material.alphaTest;
 
