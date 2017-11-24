@@ -1015,7 +1015,7 @@ THREE.GLTFLoader = ( function () {
 
 	/* UTILITY FUNCTIONS */
 
-	function _each( object, callback, thisObj ) {
+	function _each( object, callback ) {
 
 		if ( ! object ) {
 
@@ -1034,7 +1034,7 @@ THREE.GLTFLoader = ( function () {
 
 			for ( var idx = 0; idx < length; idx ++ ) {
 
-				var value = callback.call( thisObj || this, object[ idx ], idx );
+				var value = callback( object[ idx ], idx );
 
 				if ( value ) {
 
@@ -1066,7 +1066,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( object.hasOwnProperty( key ) ) {
 
-					var value = callback.call( thisObj || this, object[ key ], key );
+					var value = callback( object[ key ], key );
 
 					if ( value ) {
 
