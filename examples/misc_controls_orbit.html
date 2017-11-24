@@ -74,7 +74,6 @@
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
 				controls.maxPolarAngle = 23 * Math.PI / 48; // radians
 				controls.addEventListener( 'change', render ); // remove when using animation loop
 				// enable animation loop when using damping or autorotation
