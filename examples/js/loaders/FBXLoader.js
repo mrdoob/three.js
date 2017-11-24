@@ -810,13 +810,13 @@
 
 			var endOfFace = false;
 
-						// Face index and vertex index arrays are combined in a single array
-						// A cube with quad faces looks like this:
-						// PolygonVertexIndex: *24 {
-						//  a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
-						//  }
-						// Negative numbers mark the end of a face - first face here is 0, 1, 3, -3
-						// to find index of last vertex multiply by -1 and subtract 1: -3 * - 1 - 1 = 2
+			// Face index and vertex index arrays are combined in a single array
+			// A cube with quad faces looks like this:
+			// PolygonVertexIndex: *24 {
+			//  a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
+			//  }
+			// Negative numbers mark the end of a face - first face here is 0, 1, 3, -3
+			// to find index of last vertex multiply by -1 and subtract 1: -3 * - 1 - 1 = 2
 			if ( vertexIndex < 0 ) {
 
 				vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
@@ -1061,7 +1061,7 @@
 				endOfFace = false;
 				faceLength = 0;
 
-							// reset arrays for the next face
+				// reset arrays for the next face
 				vertexPositionIndexes = [];
 				faceNormals = [];
 				faceColors = [];
