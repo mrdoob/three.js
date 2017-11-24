@@ -1324,7 +1324,6 @@ THREE.GLTFLoader = ( function () {
 		for ( var i = 0; i < dependencies.length; i ++ ) {
 
 			var dependency = dependencies[ i ];
-			var fnName = 'load' + dependency.charAt( 0 ).toUpperCase() + dependency.slice( 1 );
 
 			var cached = this.cache.get( dependency );
 
@@ -1332,8 +1331,9 @@ THREE.GLTFLoader = ( function () {
 
 				_dependencies[ dependency ] = cached;
 
-			} else if ( this[ fnName ] ) {
+			} else {
 
+				var fnName = 'load' + dependency.charAt( 0 ).toUpperCase() + dependency.slice( 1 );
 				var fn = this[ fnName ]();
 				this.cache.add( dependency, fn );
 
@@ -1897,8 +1897,6 @@ THREE.GLTFLoader = ( function () {
 
 					var attributeEntry = attributes[ attributeId ];
 
-					if ( attributeEntry === undefined ) return;
-
 					var bufferAttribute = dependencies.accessors[ attributeEntry ];
 
 					switch ( attributeId ) {
@@ -2347,8 +2345,7 @@ THREE.GLTFLoader = ( function () {
 		return scope._withDependencies( [
 
 			'meshes',
-			'skins',
-			'cameras'
+			'skins'
 
 		] ).then( function ( dependencies ) {
 
