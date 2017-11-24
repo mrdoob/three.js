@@ -2161,23 +2161,21 @@
 		if ( FBXTree.Objects.subNodes.AnimationCurve === undefined ) return undefined;
 
 		var animations = {
+
 			takes: {},
 			fps: getFrameRate( FBXTree ),
+
 		};
 
 		var curveNodesMap = new Map();
 
 		for ( var nodeID in rawCurveNodes ) {
 
-			if ( nodeID.match( /\d+/ ) ) {
+			var animationNode = parseAnimationCurveNode( FBXTree, rawCurveNodes[ nodeID ], connections, modelsArray );
 
-				var animationNode = parseAnimationCurveNode( FBXTree, rawCurveNodes[ nodeID ], connections, modelsArray );
+			if ( animationNode !== null ) {
 
-				if ( animationNode !== null ) {
-
-					curveNodesMap.set( animationNode.id, animationNode );
-
-				}
+				curveNodesMap.set( animationNode.id, animationNode );
 
 			}
 
@@ -2185,40 +2183,36 @@
 
 		for ( nodeID in rawCurves ) {
 
-			if ( nodeID.match( /\d+/ ) ) {
+			var animationCurve = parseAnimationCurve( rawCurves[ nodeID ] );
 
-				var animationCurve = parseAnimationCurve( rawCurves[ nodeID ] );
+			var conns = connections.get( animationCurve.id );
 
-				var conns = connections.get( animationCurve.id );
+			if ( conns !== undefined ) {
 
-				if ( conns !== undefined ) {
+				var firstParentConn = conns.parents[ 0 ];
+				var firstParentID = firstParentConn.ID;
+				var firstParentRelationship = firstParentConn.relationship;
+				var axis = '';
 
-					var firstParentConn = conns.parents[ 0 ];
-					var firstParentID = firstParentConn.ID;
-					var firstParentRelationship = firstParentConn.relationship;
-					var axis = '';
+				if ( firstParentRelationship.match( /X/ ) ) {
 
-					if ( firstParentRelationship.match( /X/ ) ) {
+					axis = 'x';
 
-						axis = 'x';
+				} else if ( firstParentRelationship.match( /Y/ ) ) {
 
-					} else if ( firstParentRelationship.match( /Y/ ) ) {
+					axis = 'y';
 
-						axis = 'y';
+				} else if ( firstParentRelationship.match( /Z/ ) ) {
 
-					} else if ( firstParentRelationship.match( /Z/ ) ) {
+					axis = 'z';
 
-						axis = 'z';
+				} else {
 
-					} else {
-
-						continue;
-
-					}
-
-					curveNodesMap.get( firstParentID ).curves[ axis ] = animationCurve;
+					continue;
 
 				}
+
+				curveNodesMap.get( firstParentID ).curves[ axis ] = animationCurve;
 
 			}
 
@@ -2291,10 +2285,11 @@
 					if ( curveNodesMap.has( children[ childIndex ].ID ) ) {
 
 						var curveNode = curveNodesMap.get( children[ childIndex ].ID );
-						var modelID = curveNode.containerModelID;
-						if ( layer[ modelID ] === undefined ) {
+						var modelIndex = curveNode.modelIndex;
 
-							layer[ modelID ] = {
+						if ( layer[ modelIndex ] === undefined ) {
+
+							layer[ modelIndex ] = {
 								T: null,
 								R: null,
 								S: null
@@ -2302,7 +2297,7 @@
 
 						}
 
-						layer[ modelID ][ curveNode.attr ] = curveNode;
+						layer[ modelIndex ][ curveNode.attr ] = curveNode;
 
 					}
 
@@ -2373,7 +2368,7 @@
 
 			id: animationCurveNode.id,
 			attr: animationCurveNode.attrName,
-			containerModelID: - 1,
+			modelIndex: - 1,
 			curves: {
 				x: null,
 				y: null,
@@ -2385,30 +2380,32 @@
 
 		if ( returnObject.attr.match( /S|R|T/ ) === null ) return null;
 
-		var conns = connections.get( returnObject.id );
-		var containerIndices = conns.parents;
+		// get a list of parents - one of these will be the model being animated by this curve
+		var parents = connections.get( returnObject.id ).parents;
 
-		for ( var containerIndicesIndex = containerIndices.length - 1; containerIndicesIndex >= 0; -- containerIndicesIndex ) {
+		for ( var i = parents.length - 1; i >= 0; -- i ) {
 
-			var modelID = findIndex( modelsArray, function ( model ) {
+			// the index of the model in the modelsArray
+			var modelIndex = findIndex( modelsArray, function ( model ) {
 
-				return model.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
+				return model.FBX_ID === parents[ i ].ID;
 
 			} );
 
-			if ( modelID > - 1 ) {
+			if ( modelIndex > - 1 ) {
 
-				returnObject.containerModelID = modelID;
+				returnObject.modelIndex = modelIndex;
 
-				var model = rawModels[ containerIndices[ containerIndicesIndex ].ID.toString() ];
+				var model = rawModels[ parents[ i ].ID.toString() ];
 
-				// if the animated model is pre rotated, we'll have to apply the prerotations to every
+				//if the animated model is pre rotated, we'll have to apply the pre rotations to every
 				// animation value as well
 				if ( 'PreRotation' in model.properties ) {
 
 					returnObject.preRotations = model.properties.PreRotation.value;
 
 				}
+
 				break;
 
 			}
@@ -2579,38 +2576,21 @@
 			hierarchy: []
 		};
 
-		animationData.hierarchy = modelsArray.map( ( model ) => {
+		animationData.hierarchy = modelsArray.map( ( model, i ) => {
 
-			return { name: model.name, keys: [] };
+			var keys = [];
 
-		} );
-
-
-		// fill empty keys with animation data
-		// this just loops over all frames and assumes that the animation has been baked at one keyframe per frame
-		for ( var frame = 0; frame <= take.frames; frame ++ ) {
-
-			for ( var i = 0, length = modelsArray.length; i < length; ++ i ) {
-
-				var model = modelsArray[ i ];
+			// note: assumes that the animation has been baked at one keyframe per frame
+			for ( var frame = 0; frame <= take.frames; frame ++ ) {
 
 				var animationNode = take.layers[ 0 ][ i ];
-
-				for ( var hierarchyIndex = 0, hierarchyLength = animationData.hierarchy.length; hierarchyIndex < hierarchyLength; ++ hierarchyIndex ) {
-
-					var node = animationData.hierarchy[ hierarchyIndex ];
-
-					if ( node.name === model.name ) {
-
-						node.keys.push( generateKey( fps, animationNode, model, frame ) );
-
-					}
-
-				}
+				keys.push( generateKey( fps, animationNode, model, frame ) );
 
 			}
 
-		}
+			return { name: model.name, keys: keys };
+
+		} );
 
 		return THREE.AnimationClip.parseAnimation( animationData, modelsArray );
 
