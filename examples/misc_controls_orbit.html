@@ -70,14 +70,16 @@
 				container.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 500;
+				camera.position.set( 400, 200, 0 );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // remove when using animation loop
 				// enable animation loop when using damping or autorotation
 				//controls.enableDamping = true;
 				//controls.dampingFactor = 0.25;
-				controls.enableZoom = false;
+				controls.minDistance = 100;
+				controls.maxDistance = 500
+				controls.maxPolarAngle = Math.PI / 2;
 
 				// world
 
@@ -88,7 +90,7 @@
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
+					mesh.position.y = 0;
 					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
@@ -133,7 +135,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
+				//controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
 
 				stats.update();
 
