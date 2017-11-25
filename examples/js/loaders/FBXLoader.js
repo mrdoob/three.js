@@ -96,7 +96,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -675,7 +675,7 @@
 			for ( var nodeID in geometryNodes ) {
 
 				var relationships = connections.get( parseInt( nodeID ) );
-				var geo = parseGeometry( geometryNodes[ nodeID ], relationships, deformers );
+				var geo = parseGeometry( FBXTree, relationships, geometryNodes[ nodeID ], deformers );
 				geometryMap.set( parseInt( nodeID ), geo );
 
 			}
@@ -687,12 +687,12 @@
 	}
 
 	// Parse single node in FBXTree.Objects.subNodes.Geometry
-	function parseGeometry( geometryNode, relationships, deformers ) {
+	function parseGeometry( FBXTree, relationships, geometryNode, deformers ) {
 
 		switch ( geometryNode.attrType ) {
 
 			case 'Mesh':
-				return parseMeshGeometry( geometryNode, relationships, deformers );
+				return parseMeshGeometry( FBXTree, relationships, geometryNode, deformers );
 				break;
 
 			case 'NurbsCurve':
@@ -704,7 +704,7 @@
 	}
 
 	// Parse single node mesh geometry in FBXTree.Objects.subNodes.Geometry
-	function parseMeshGeometry( geometryNode, relationships, deformers ) {
+	function parseMeshGeometry( FBXTree, relationships, geometryNode, deformers ) {
 
 		for ( var i = 0; i < relationships.children.length; ++ i ) {
 
@@ -713,12 +713,47 @@
 
 		}
 
-		return genGeometry( geometryNode, deformer );
+		var modelNodes = relationships.parents.map( function ( parent ) {
+
+			var modelNode = FBXTree.Objects.subNodes.Model[ parent.ID ];
+
+			return modelNode;
+
+		} );
+
+		// don't create geometry if it is not associated with any models
+		if ( modelNodes.length === 0 ) return;
+
+		var preTransform = new THREE.Matrix4();
+
+		// TODO: if there is more than one model associated with the geometry, AND the models have
+		// different geometric transforms, then this will cause problems
+		// if ( modelNodes.length > 1 ) { }
+
+		// For now just assume one model and get the preRotations from that
+		var modelNode = modelNodes[ 0 ];
+
+		if ( 'GeometricRotation' in modelNode.properties ) {
+
+			var array = modelNode.properties.GeometricRotation.value.map( THREE.Math.degToRad );
+			array[ 3 ] = 'ZYX';
+
+			preTransform.makeRotationFromEuler( new THREE.Euler().fromArray( array ) );
+
+		}
+
+		if ( 'GeometricTranslation' in modelNode.properties ) {
+
+			preTransform.setPosition( new THREE.Vector3().fromArray( modelNode.properties.GeometricTranslation.value ) );
+
+		}
+
+		return genGeometry( FBXTree, relationships, geometryNode, deformer, preTransform );
 
 	}
 
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.subNodes.Geometry
-	function genGeometry( geometryNode, deformer ) {
+	function genGeometry( FBXTree, relationships, geometryNode, deformer, preTransform ) {
 
 		var subNodes = geometryNode.subNodes;
 
@@ -1081,7 +1116,11 @@
 		var geo = new THREE.BufferGeometry();
 		geo.name = geometryNode.name;
 
-		geo.addAttribute( 'position', new THREE.Float32BufferAttribute( vertexBuffer, 3 ) );
+		var positionAttribute = new THREE.Float32BufferAttribute( vertexBuffer, 3 );
+
+		preTransform.applyToBufferAttribute( positionAttribute );
+
+		geo.addAttribute( 'position', positionAttribute );
 
 		if ( colorsBuffer.length > 0 ) {
 
@@ -1967,42 +2006,6 @@
 			var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
 			preRotations.multiply( currentRotation );
 			model.rotation.setFromQuaternion( preRotations, 'ZYX' );
-
-		}
-
-		// rotated pivots - note: rotation must be applied before translation here
-		if ( 'GeometricRotation' in modelNode.properties ) {
-
-			var array = modelNode.properties.GeometricRotation.value.map( THREE.Math.degToRad );
-
-			model.traverse( function ( child ) {
-
-				if ( child.geometry ) {
-
-					child.geometry.rotateX( array[ 0 ] );
-					child.geometry.rotateY( array[ 1 ] );
-					child.geometry.rotateZ( array[ 2 ] );
-
-				}
-
-			} );
-
-		}
-
-		// translated pivots
-		if ( 'GeometricTranslation' in modelNode.properties ) {
-
-			var array = modelNode.properties.GeometricTranslation.value;
-
-			model.traverse( function ( child ) {
-
-				if ( child.geometry ) {
-
-					child.geometry.translate( array[ 0 ], array[ 1 ], array[ 2 ] );
-
-				}
-
-			} );
 
 		}
 
