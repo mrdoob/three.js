@@ -56,6 +56,42 @@
 			render(); // remove when using next line for animation loop (requestAnimationFrame)
 			//animate();
 
+			function originAxes( radius, height ) {
+				
+				// static originAxes() {
+				let origin = new THREE.Object3D();
+
+				//radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight, openEnded
+				let ge3 = new THREE.CylinderGeometry( radius, radius, height, 4, 1 );
+				let axeXMesh = new THREE.Mesh( ge3,
+					new THREE.MeshBasicMaterial( {
+						color: Math.random() * 0xffffff
+					} )
+				);
+				axeXMesh.rotation.set( 0, 0, Math.PI / 2 );
+				axeXMesh.position.setX( height / 2 );
+				origin.add( axeXMesh );
+				let axeYMesh = new THREE.Mesh( ge3,
+					new THREE.MeshBasicMaterial( {
+						color: Math.random() * 0xffffff,
+						opacity: 0.7
+					} )
+				);
+				axeYMesh.position.setY( height / 2 );
+				origin.add( axeYMesh );
+				let axeZMesh = new THREE.Mesh( ge3,
+					new THREE.MeshBasicMaterial( {
+						color: Math.random() * 0xffffff,
+						opacity: 0.7
+					} )
+				);
+				axeZMesh.rotation.set( Math.PI / 2, 0, 0 );
+				axeZMesh.position.setZ( height / 2 );
+				origin.add( axeZMesh );
+				return origin;
+
+			}
+
 			function init() {
 
 				scene = new THREE.Scene();
@@ -100,6 +136,11 @@
 						render();
 					}
 				);
+
+				// target axes
+				axes = originAxes( 5, 200 );
+				axes.position.set( 0, 0, 1 );
+				scene.add(axes);
 
 				// lights
 
@@ -149,6 +190,12 @@
 			function render() {
 
 				renderer.render( scene, camera );
+
+				if (typeof axes !== "undefined") {
+					axes.position.setX( controls.target.x );
+					axes.position.setY( controls.target.y );
+					axes.position.setZ( controls.target.z );
+				}
 
 			}
 
