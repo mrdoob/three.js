@@ -53,7 +53,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var renderer = new THREE.WebGLRenderer();
+			var renderer = new THREE.WebGLRenderer( { antialias: true } );
 			var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -112,12 +112,12 @@
 
 				}
 
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.antialias = true;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();

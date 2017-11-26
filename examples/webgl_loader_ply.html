@@ -71,6 +71,7 @@
 				cameraTarget = new THREE.Vector3( 0, -0.1, 0 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x72645b );
 				scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
 
 
@@ -94,7 +95,7 @@
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, shading: THREE.FlatShading } );
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.2;
@@ -113,7 +114,7 @@
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, shading: THREE.FlatShading } );
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = - 0.2;
@@ -138,7 +139,6 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

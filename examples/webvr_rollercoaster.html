@@ -4,8 +4,8 @@
 		<title>three.js webvr - roller coaster</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR, origin = https://threejs.org, expires = 2017-06-13 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR" data-expires="2017-06-13" content="ApAQvHfiHMQB7SmRhfvCUX61adJaTA6pAu0Ry439jjeipa5lGm1RcTQynFoHGGcaSJkWfMOv7qK6pwSUb95ClQgAAABKeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUiIsImV4cGlyeSI6MTQ5NzMxMjAwMH0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2017-12-16 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2017-12-16" content="AvEXeg7kY84HQ60ApBlqf6zPqClJwEy499YltannXHd+qIIN8ibQQFbHDkKL/Na/L7ha4VOqsjsGHhFpI6HYfgAAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxMzQ0NjE5Nn0=">
 		<style>
 			body {
 				margin: 0px;
@@ -25,27 +25,22 @@
 
 		<script src="js/RollerCoaster.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
+			var renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.vr.enabled = true;
+			document.body.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
+			document.body.appendChild( WEBVR.createButton( renderer ) );
 
 			//
 
-			var renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0xf0f0ff );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
-
 			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xf0f0ff );
 
 			var light = new THREE.HemisphereLight( 0xfff0f0, 0x606066 );
 			light.position.set( 1, 1, 1 );
@@ -165,7 +160,8 @@
 
 			var geometry = new THREE.CylinderBufferGeometry( 10, 10, 5, 15 );
 			var material = new THREE.MeshLambertMaterial( {
-				color: 0xff8080, shading: THREE.FlatShading
+				color: 0xff8080,
+				//flatShading: true // Lambert does not support flat shading
 			} );
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - 80, 10, - 70 );
@@ -176,7 +172,8 @@
 
 			var geometry = new THREE.CylinderBufferGeometry( 5, 6, 4, 10 );
 			var material = new THREE.MeshLambertMaterial( {
-				color: 0x8080ff, shading: THREE.FlatShading
+				color: 0x8080ff,
+				//flatShading: true // Lambert does not support flat shading
 			} );
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( 50, 2, 30 );
@@ -186,25 +183,16 @@
 
 			//
 
-			var controls = new THREE.VRControls( camera );
-			var effect = new THREE.VREffect( renderer );
+			window.addEventListener( 'resize', onWindowResize, false );
 
-			WEBVR.getVRDisplay( function ( display ) {
-
-				document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-			} );
-
-			//
-
-			window.addEventListener( 'resize', function () {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			}, false );
+			}
 
 			//
 
@@ -218,10 +206,9 @@
 
 			var prevTime = performance.now();
 
-			function animate( time ) {
+			function render() {
 
-				effect.requestAnimationFrame( animate );
-
+				var time = performance.now();
 				var delta = time - prevTime;
 
 				for ( var i = 0; i < funfairs.length; i ++ ) {
@@ -249,15 +236,13 @@
 
 				//
 
-				controls.update();
-
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 				prevTime = time;
 
 			}
 
-			effect.requestAnimationFrame( animate );
+			renderer.animate( render );
 
 		</script>
 

@@ -29,10 +29,13 @@ scene.add( helper );
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([page:HemisphereLight light], [page:Number sphereSize])</h3>
+		<h3>[name]( [page:HemisphereLight light], [page:Number sphereSize], [page:Hex color] )</h3>
 		<div>
-		[page:HemisphereLight light] -- The light being visualized. <br />
-		[page:Number size] -- The size of the mesh used to visualize the light.
+			[page:HemisphereLight light] -- The light being visualized. <br /><br />
+
+			[page:Number size] -- The size of the mesh used to visualize the light.<br /><br />
+			
+			[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light.
 		</div>
 
 
@@ -49,6 +52,12 @@ scene.add( helper );
 		<div>
 			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
 			hemisphereLight's [page:Object3D.matrixWorld matrixWorld].
+		</div>
+
+		<h3>[property:hex color]</h3>
+		<div>
+			 The color parameter passed in the constructor. Default is *undefined*. If this is changed, the helper's color will update
+			the next time [page:.update update] is called.
 		</div>
 
 

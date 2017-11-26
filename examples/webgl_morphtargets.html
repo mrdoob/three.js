@@ -66,6 +66,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
 
 				var light = new THREE.PointLight( 0xff2200 );
@@ -135,10 +136,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x222222 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				//

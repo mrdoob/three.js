@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.StandardNode = function() {
+THREE.StandardNode = function () {
 
 	THREE.GLNode.call( this );
 
@@ -15,14 +15,14 @@ THREE.StandardNode = function() {
 THREE.StandardNode.prototype = Object.create( THREE.GLNode.prototype );
 THREE.StandardNode.prototype.constructor = THREE.StandardNode;
 
-THREE.StandardNode.prototype.build = function( builder ) {
+THREE.StandardNode.prototype.build = function ( builder ) {
 
 	var material = builder.material;
 	var code;
 
 	material.define( 'PHYSICAL' );
 
-	if ( !this.clearCoat && !this.clearCoatRoughness ) material.define( 'STANDARD' );
+	if ( ! this.clearCoat && ! this.clearCoatRoughness ) material.define( 'STANDARD' );
 
 	material.define( 'ALPHATEST', '0.0' );
 
@@ -32,7 +32,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache : 'transform' } ) : undefined;
+		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache: 'transform' } ) : undefined;
 
 		material.mergeUniform( THREE.UniformsUtils.merge( [
 
@@ -50,21 +50,24 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 			"#endif",
 
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "fog_pars_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ]
+			"#include <common>",
+			"#include <fog_pars_vertex>",
+			"#include <morphtarget_pars_vertex>",
+			"#include <skinning_pars_vertex>",
+			"#include <shadowmap_pars_vertex>",
+			"#include <logdepthbuf_pars_vertex>"
 
 		].join( "\n" ) );
 
 		var output = [
-			THREE.ShaderChunk[ "beginnormal_vertex" ],
-			THREE.ShaderChunk[ "morphnormal_vertex" ],
-			THREE.ShaderChunk[ "skinbase_vertex" ],
-			THREE.ShaderChunk[ "skinnormal_vertex" ],
-			THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			"#include <beginnormal_vertex>",
+			"#include <morphnormal_vertex>",
+			"#include <skinbase_vertex>",
+			"#include <skinnormal_vertex>",
+			"#include <defaultnormal_vertex>",
+			"#include <logdepthbuf_pars_vertex>",
+			"#include <logdepthbuf_pars_vertex>",
+			"#include <logdepthbuf_pars_vertex>",
 
 			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
 
@@ -72,8 +75,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 			"#endif",
 
-			THREE.ShaderChunk[ "begin_vertex" ],
-			THREE.ShaderChunk[ "fog_vertex" ]        
+			"#include <begin_vertex>"
 		];
 
 		if ( transform ) {
@@ -86,15 +88,16 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		}
 
 		output.push(
-			THREE.ShaderChunk[ "morphtarget_vertex" ],
-			THREE.ShaderChunk[ "skinning_vertex" ],
-			THREE.ShaderChunk[ "project_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+			"#include <morphtarget_vertex>",
+			"#include <skinning_vertex>",
+			"#include <project_vertex>",
+			"#include <fog_vertex>",
+			"#include <logdepthbuf_vertex>",
 
 			"	vViewPosition = - mvPosition.xyz;",
 
-			THREE.ShaderChunk[ "worldpos_vertex" ],
-			THREE.ShaderChunk[ "shadowmap_vertex" ]
+			"#include <worldpos_vertex>",
+			"#include <shadowmap_vertex>"
 		);
 
 		code = output.join( "\n" );
@@ -104,64 +107,64 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		// blur textures for PBR effect
 
 		var requires = {
-			bias : new THREE.RoughnessToBlinnExponentNode(),
-			offsetU : 0,
-			offsetV : 0
+			bias: new THREE.RoughnessToBlinnExponentNode(),
+			offsetU: 0,
+			offsetV: 0
 		};
 
-		var useClearCoat = !material.isDefined( 'STANDARD' );
-		
+		var useClearCoat = ! material.isDefined( 'STANDARD' );
+
 		// parse all nodes to reuse generate codes
 
-		this.color.parse( builder, { slot : 'color' } );
+		this.color.parse( builder, { slot: 'color' } );
 		this.roughness.parse( builder );
 		this.metalness.parse( builder );
 
 		if ( this.alpha ) this.alpha.parse( builder );
-		
+
 		if ( this.normal ) this.normal.parse( builder );
 		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
-		
-		if (this.clearCoat) this.clearCoat.parse( builder );
-		if (this.clearCoatRoughness) this.clearCoatRoughness.parse( builder );
-		
+
+		if ( this.clearCoat ) this.clearCoat.parse( builder );
+		if ( this.clearCoatRoughness ) this.clearCoatRoughness.parse( builder );
+
 		if ( this.reflectivity ) this.reflectivity.parse( builder );
 
-		if ( this.light ) this.light.parse( builder, { cache : 'light' } );
+		if ( this.light ) this.light.parse( builder, { cache: 'light' } );
 
 		if ( this.ao ) this.ao.parse( builder );
 		if ( this.ambient ) this.ambient.parse( builder );
 		if ( this.shadow ) this.shadow.parse( builder );
-		if ( this.emissive ) this.emissive.parse( builder, { slot : 'emissive' } );
+		if ( this.emissive ) this.emissive.parse( builder, { slot: 'emissive' } );
 
-		if ( this.environment ) this.environment.parse( builder, { cache : 'env', requires : requires, slot : 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+		if ( this.environment ) this.environment.parse( builder, { cache: 'env', requires: requires, slot: 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 
 		// build code
 
-		var color = this.color.buildCode( builder, 'c', { slot : 'color' } );
+		var color = this.color.buildCode( builder, 'c', { slot: 'color' } );
 		var roughness = this.roughness.buildCode( builder, 'fv1' );
 		var metalness = this.metalness.buildCode( builder, 'fv1' );
 
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
-		
+
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
 		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
-		
+
 		var clearCoat = this.clearCoat ? this.clearCoat.buildCode( builder, 'fv1' ) : undefined;
 		var clearCoatRoughness = this.clearCoatRoughness ? this.clearCoatRoughness.buildCode( builder, 'fv1' ) : undefined;
-		
+
 		var reflectivity = this.reflectivity ? this.reflectivity.buildCode( builder, 'fv1' ) : undefined;
 
-		var light = this.light ? this.light.buildCode( builder, 'v3', { cache : 'light' } ) : undefined;
+		var light = this.light ? this.light.buildCode( builder, 'v3', { cache: 'light' } ) : undefined;
 
 		var ao = this.ao ? this.ao.buildCode( builder, 'fv1' ) : undefined;
 		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
 		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
-		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot : 'emissive' } ) : undefined;
+		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot: 'emissive' } ) : undefined;
 
-		var environment = this.environment ? this.environment.buildCode( builder, 'c', { cache : 'env', requires : requires, slot : 'environment' } ) : undefined;
+		var environment = this.environment ? this.environment.buildCode( builder, 'c', { cache: 'env', requires: requires, slot: 'environment' } ) : undefined;
 
-		var clearCoatEnv = useClearCoat && environment ? this.environment.buildCode( builder, 'c', { cache : 'clearCoat', requires : requires, slot : 'environment' } ) : undefined;
+		var clearCoatEnv = useClearCoat && environment ? this.environment.buildCode( builder, 'c', { cache: 'clearCoat', requires: requires, slot: 'environment' } ) : undefined;
 
 		material.requestAttribs.transparent = alpha != undefined;
 
@@ -175,29 +178,29 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 			"#endif",
 
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "fog_pars_fragment" ],
-			THREE.ShaderChunk[ "bsdfs" ],
-			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "lights_physical_pars_fragment" ],
-			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ]
+			"#include <common>",
+			"#include <fog_pars_fragment>",
+			"#include <bsdfs>",
+			"#include <lights_pars>",
+			"#include <lights_physical_pars_fragment>",
+			"#include <shadowmap_pars_fragment>",
+			"#include <logdepthbuf_pars_fragment>",
+			"#include <logdepthbuf_vertex>"
 		].join( "\n" ) );
 
 		var output = [
 				// prevent undeclared normal
-				THREE.ShaderChunk[ "normal_flip" ],
-				THREE.ShaderChunk[ "normal_fragment" ],
+			"	#include <normal_fragment>",
 
 				// prevent undeclared material
 			"	PhysicalMaterial material;",
 			"	material.diffuseColor = vec3( 1.0 );",
 
-				color.code,
+			color.code,
 			"	vec3 diffuseColor = " + color.result + ";",
 			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 
-				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+			"#include <logdepthbuf_fragment>",
 
 			roughness.code,
 			"	float roughnessFactor = " + roughness.result + ";",
@@ -240,33 +243,33 @@ THREE.StandardNode.prototype.build = function( builder ) {
 			// accumulation
 			'material.specularRoughness = clamp( roughnessFactor, DEFAULT_SPECULAR_COEFFICIENT, 1.0 );' // disney's remapping of [ 0, 1 ] roughness to [ 0.001, 1 ]
 		);
-		
-		if (clearCoat) {
-			
+
+		if ( clearCoat ) {
+
 			output.push(
 				clearCoat.code,
 				'material.clearCoat = saturate( ' + clearCoat.result + ' );'
 			);
-			
-		} else if (useClearCoat) {
-			
+
+		} else if ( useClearCoat ) {
+
 			output.push( 'material.clearCoat = 0.0;' );
-			
+
 		}
-		
-		if (clearCoatRoughness) {
-			
+
+		if ( clearCoatRoughness ) {
+
 			output.push(
 				clearCoatRoughness.code,
 				'material.clearCoatRoughness = clamp( ' + clearCoatRoughness.result + ', DEFAULT_SPECULAR_COEFFICIENT, 1.0 );'
 			);
-			
-		} else if (useClearCoat) {
-			
+
+		} else if ( useClearCoat ) {
+
 			output.push( 'material.clearCoatRoughness = 0.0;' );
-			
+
 		}
-		
+
 		if ( reflectivity ) {
 
 			output.push(
@@ -283,7 +286,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		}
 
 		output.push(
-			THREE.ShaderChunk[ "lights_template" ]
+			"#include <lights_template>"
 		);
 
 		if ( light ) {
@@ -347,7 +350,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 			output.push( environment.code );
 
-			if (clearCoatEnv) {
+			if ( clearCoatEnv ) {
 
 				output.push(
 					clearCoatEnv.code,
@@ -356,7 +359,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 			} else {
 
-				output.push("vec3 clearCoatRadiance = vec3( 0.0 );");
+				output.push( "vec3 clearCoatRadiance = vec3( 0.0 );" );
 
 			}
 
@@ -377,10 +380,10 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		}
 
 		output.push(
-			THREE.ShaderChunk[ "premultiplied_alpha_fragment" ],
-			THREE.ShaderChunk[ "tonemapping_fragment" ],
-			THREE.ShaderChunk[ "encodings_fragment" ],
-			THREE.ShaderChunk[ "fog_fragment" ]
+			"#include <premultiplied_alpha_fragment>",
+			"#include <tonemapping_fragment>",
+			"#include <encodings_fragment>",
+			"#include <fog_fragment>"
 		);
 
 		code = output.join( "\n" );

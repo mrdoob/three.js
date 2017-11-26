@@ -6,7 +6,7 @@ float punctualLightIntensityToIrradianceFactor( const in float lightDistance, co
 
 		// based upon Frostbite 3 Moving to Physically-based Rendering
 		// page 32, equation 26: E[window1]
-		// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
+		// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 		// this is intended to be used on spot and point lights who are represented as luminous intensity
 		// but who must be converted to luminous irradiance for surface lighting calculation
 		float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
@@ -37,6 +37,7 @@ vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
 	// float fresnel = pow( 1.0 - dotLH, 5.0 );
 
 	// Optimized variant (presented by Epic at SIGGRAPH '13)
+	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
 	float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );
 
 	return ( 1.0 - specularColor ) * fresnel + specularColor;
@@ -48,7 +49,8 @@ vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
 // alpha is "roughness squared" in Disney’s reparameterization
 float G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {
 
-	// geometry term = G(l)⋅G(v) / 4(n⋅l)(n⋅v)
+	// geometry term (normalized) = G(l)⋅G(v) / 4(n⋅l)(n⋅v)
+	// also see #12151
 
 	float a2 = pow2( alpha );
 
@@ -59,8 +61,8 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 
 } // validated
 
-// Moving Frostbite to Physically Based Rendering 2.0 - page 12, listing 2
-// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
+// Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
+// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
 
 	float a2 = pow2( alpha );
@@ -70,6 +72,7 @@ float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const i
 	float gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
 
 	return 0.5 / max( gv + gl, EPSILON );
+
 }
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
@@ -188,7 +191,7 @@ vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in m
 	T2 = - cross( N, T1 ); // negated from paper; possibly due to a different assumed handedness of world coordinate system
 
 	// compute transform
-	mat3 mat = mInv * transpose( mat3( T1, T2, N ) );
+	mat3 mat = mInv * transposeMat3( mat3( T1, T2, N ) );
 
 	// transform rect
 	vec3 coords[ 4 ];

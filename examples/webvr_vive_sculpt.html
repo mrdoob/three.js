@@ -4,6 +4,8 @@
 		<title>three.js webvr - htc vive - sculpt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2017-12-16 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2017-12-16" content="AvEXeg7kY84HQ60ApBlqf6zPqClJwEy499YltannXHd+qIIN8ibQQFbHDkKL/Na/L7ha4VOqsjsGHhFpI6HYfgAAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxMzQ0NjE5Nn0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -21,8 +23,6 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/ViveController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
@@ -31,17 +31,8 @@
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var container;
 			var camera, scene, renderer;
-			var effect, controls;
 			var controller1, controller2;
 
 			var blob, vector;
@@ -68,8 +59,12 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
+				var user = new THREE.Group();
+				user.position.set( 0, 1.6, 0 );
+				scene.add( user );
+
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
-				scene.add( camera );
+				user.add( camera );
 
 				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
 				var material = new THREE.MeshStandardMaterial( {
@@ -118,24 +113,21 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
-				renderer.shadowMap.enabled = true;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.VRControls( camera );
-				controls.standing = true;
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				// controllers
 
 				controller1 = new THREE.ViveController( 0 );
-				controller1.standingMatrix = controls.getStandingMatrix();
-				scene.add( controller1 );
+				user.add( controller1 );
 
 				controller2 = new THREE.ViveController( 1 );
-				controller2.standingMatrix = controls.getStandingMatrix();
-				scene.add( controller2 );
+				user.add( controller2 );
 
 				var loader = new THREE.OBJLoader();
 				loader.setPath( 'models/obj/vive-controller/' );
@@ -163,14 +155,6 @@
 
 					controller1.add( controller.clone() );
 					controller2.add( controller.clone() );
-
-				} );
-
-				effect = new THREE.VREffect( renderer );
-
-				WEBVR.getVRDisplay( function ( display ) {
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
 				} );
 
@@ -223,7 +207,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -231,8 +215,7 @@
 
 			function animate() {
 
-				effect.requestAnimationFrame( animate );
-				render();
+				renderer.animate( render );
 
 			}
 
@@ -329,9 +312,7 @@
 
 				updateBlob();
 
-				controls.update();
-
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

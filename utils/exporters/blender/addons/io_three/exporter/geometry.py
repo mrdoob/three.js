@@ -238,7 +238,8 @@ class Geometry(base_classes.BaseNode):
             index = self.get(constants.INDEX)
             if index is not None:
                 data[constants.INDEX] = index
-            data[constants.ATTRIBUTES] = self.get(constants.ATTRIBUTES)
+            data[constants.ATTRIBUTES] = self.get(constants.ATTRIBUTES)           
+            data[constants.GROUPS] = self.get(constants.GROUPS)
             return {constants.DATA: data}
 
         components = [constants.VERTICES, constants.FACES,
@@ -341,7 +342,7 @@ class Geometry(base_classes.BaseNode):
             metadata[constants.FACES] = faces
 
     def _scene_format(self):
-        """Format the output for Scene compatability
+        """Format the output for Scene compatibility
 
         :rtype: dict
 
@@ -358,7 +359,7 @@ class Geometry(base_classes.BaseNode):
             data.update(self._component_data())
             draw_calls = self.get(constants.DRAW_CALLS)
             if draw_calls is not None:
-                geometry_data[constants.DRAW_CALLS] = draw_calls
+                data[constants.DRAW_CALLS] = draw_calls
 
         return data
 
@@ -445,6 +446,8 @@ class Geometry(base_classes.BaseNode):
             assert(len(attrib_data_in) > 0)
             array, item_size = attrib_data_in[0]
             i, n = 0, len(array) / item_size
+
+
             while i < n:
 
                 vertex_data = ()
@@ -485,6 +488,60 @@ class Geometry(base_classes.BaseNode):
                     base_vertex += len(indexed)
                     indexed.clear()
                     flush_req = False
+
+
+            #manthrax: Adding group support for multiple materials
+            #index_threshold = indices_per_face*100
+            face_materials = api.mesh.buffer_face_material(self.node,self.options)
+            logger.info("Face material list length:%d",len(face_materials))
+            logger.info("Drawcall parameters count:%s item_size=%s",n,item_size)
+            assert((len(face_materials)*3)==n)
+            #Re-index the index buffer by material
+            used_material_indexes = {}
+            #Get lists of faces indices per material
+            for idx, mat_index in enumerate(face_materials):
+                if used_material_indexes.get(mat_index) is None:
+                    used_material_indexes[mat_index] = [idx]
+                else:
+                    used_material_indexes[mat_index].append(idx)
+
+            logger.info("# Faces by material:%s",str(used_material_indexes))
+
+            #manthrax: build new index list from lists of faces by material, and build the draw groups at the same time...
+            groups = []
+            new_index = []
+            print("Mat index:",str(used_material_indexes))
+
+            for mat_index in used_material_indexes:
+                face_array=used_material_indexes[mat_index]
+                print("Mat index:",str(mat_index),str(face_array))
+
+                print( dir(self.node) )
+
+                group = {
+                    'start': len(new_index),
+                    'count': len(face_array)*3,
+                    'materialIndex': mat_index
+                }
+                groups.append(group)
+
+                for fi in range(len(face_array)):
+                    prim_index = face_array[fi]
+                    prim_index = prim_index * 3
+                    new_index.extend([index_data[prim_index],index_data[prim_index+1],index_data[prim_index+2]])
+
+            if len(groups) > 0:
+                index_data = new_index
+                self[constants.GROUPS]=groups
+            #else:
+            #    self[constants.GROUPS]=[{
+            #    'start':0,
+            #    'count':n,
+            #   'materialIndex':0
+            #}]
+            #manthrax: End group support
+
+
 
             for i, key in enumerate(attrib_keys):
                 array = attrib_data_out[i][0]

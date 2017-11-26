@@ -7,9 +7,9 @@
 		<style>
 			body {
 				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
 
 				background-color: #000;
 				margin: 0px;
@@ -83,7 +83,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = textureCube;
-				
+
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				var hdrCubeRenderTarget = null;
 
@@ -96,7 +96,7 @@
 					pmremCubeUVPacker.update( renderer );
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-					 
+
 					// Materials
 
 					var cubeWidth = 400;
@@ -147,7 +147,7 @@
 
 				function addLabel( name, location ) {
 
-					var textGeo = new THREE.TextGeometry( name, {
+					var textGeo = new THREE.TextBufferGeometry( name, {
 
 						font: font,
 
@@ -205,8 +205,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

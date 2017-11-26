@@ -14,7 +14,7 @@
 
 		<div class="desc">
 		Create a smooth 2d spline curve from a series of points. Internally this uses
-		[page:CurveUtils.interpolate] to create the curve.
+		[page:Interpolations.CatmullRom] to create the curve.
 		</div>
 
 		<h2>Example</h2>
@@ -29,9 +29,9 @@ var curve = new THREE.SplineCurve( [
 	new THREE.Vector2( 10, 0 )
 ] );
 
-var path = new THREE.Path( curve.getPoints( 50 ) );
+var points = curve.getPoints( 50 );
+var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-var geometry = path.createPointsGeometry( 50 );
 var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
 // Create the final object to add to the scene
@@ -47,6 +47,13 @@ var splineObject = new THREE.Line( geometry, material );
 
 		<h2>Properties</h2>
 		<div>See the base [page:Curve] class for common properties.</div>
+
+		<h3>[property:Boolean isSplineCurve]</h3>
+		<div>
+			Used to check whether this or derived classes are SplineCurves. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</div>
 
 		<h3>[property:Array points]</h3>
 		<div>The array of [page:Vector3] points that define the curve.</div>

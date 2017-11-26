@@ -2,15 +2,16 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
-import { WebGLProgram } from './WebGLProgram';
+import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants.js';
+import { WebGLProgram } from './WebGLProgram.js';
 
-function WebGLPrograms( renderer, capabilities ) {
+function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	var programs = [];
 
 	var shaderIDs = {
 		MeshDepthMaterial: 'depth',
+		MeshDistanceMaterial: 'distanceRGBA',
 		MeshNormalMaterial: 'normal',
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
@@ -20,7 +21,8 @@ function WebGLPrograms( renderer, capabilities ) {
 		MeshPhysicalMaterial: 'physical',
 		LineBasicMaterial: 'basic',
 		LineDashedMaterial: 'dashed',
-		PointsMaterial: 'points'
+		PointsMaterial: 'points',
+		ShadowMaterial: 'shadow'
 	};
 
 	var parameterNames = [
@@ -103,7 +105,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 	}
 
-	this.getParameters = function ( material, lights, fog, nClipPlanes, nClipIntersection, object ) {
+	this.getParameters = function ( material, lights, shadows, fog, nClipPlanes, nClipIntersection, object ) {
 
 		var shaderID = shaderIDs[ material.type ];
 
@@ -111,7 +113,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		// (not to blow over maxLights budget)
 
 		var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
-		var precision = renderer.getPrecision();
+		var precision = capabilities.precision;
 
 		if ( material.precision !== null ) {
 
@@ -162,7 +164,7 @@ function WebGLPrograms( renderer, capabilities ) {
 			useFog: material.fog,
 			fogExp: ( fog && fog.isFogExp2 ),
 
-			flatShading: material.shading === FlatShading,
+			flatShading: material.flatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
@@ -187,7 +189,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 			dithering: material.dithering,
 
-			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
+			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 
 			toneMapping: renderer.toneMapping,
@@ -239,13 +241,15 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		}
 
+		array.push( material.onBeforeCompile.toString() );
+
 		array.push( renderer.gammaOutput );
 
 		return array.join();
 
 	};
 
-	this.acquireProgram = function ( material, parameters, code ) {
+	this.acquireProgram = function ( material, shader, parameters, code ) {
 
 		var program;
 
@@ -267,7 +271,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, code, material, parameters );
+			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters );
 			programs.push( program );
 
 		}

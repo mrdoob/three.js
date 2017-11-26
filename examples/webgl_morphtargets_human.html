@@ -71,6 +71,7 @@
 				camera.position.set( 2000, 5000, 5000 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				// LIGHTS
 
@@ -89,7 +90,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -122,6 +122,7 @@
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 3000, 0 );
+				controls.update();
 
 				controls.addEventListener( 'change', render );
 
@@ -210,8 +211,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
 
 				render();
 

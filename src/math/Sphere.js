@@ -1,5 +1,5 @@
-import { Box3 } from './Box3';
-import { Vector3 } from './Vector3';
+import { Box3 } from './Box3.js';
+import { Vector3 } from './Vector3.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -107,15 +107,7 @@ Object.assign( Sphere.prototype, {
 
 	intersectsPlane: function ( plane ) {
 
-		// We use the following equation to compute the signed distance from
-		// the center of the sphere to the plane.
-		//
-		// distance = q * n - d
-		//
-		// If this distance is greater than the radius of the sphere,
-		// then there is no intersection.
-
-		return Math.abs( this.center.dot( plane.normal ) - plane.constant ) <= this.radius;
+		return Math.abs( plane.distanceToPoint( this.center ) ) <= this.radius;
 
 	},
 

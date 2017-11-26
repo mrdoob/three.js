@@ -37,8 +37,8 @@ scene.add( light );
 //Set up shadow properties for the light
 light.shadow.mapSize.width = 512;  // default
 light.shadow.mapSize.height = 512; // default
-light.shadow.camera.near = 0.5;       // default
-light.shadow.camera.far = 500      // default
+light.shadow.camera.near = 0.5;    // default
+light.shadow.camera.far = 500;     // default
 
 //Create a sphere that cast shadows (but does not receive them)
 var sphereGeometry = new THREE.SphereBufferGeometry( 5, 32, 32 );

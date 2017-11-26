@@ -29,8 +29,12 @@ scene.add( helper );
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:RectAreaLight light] )</h3>
-		<div>[page:RectAreaLight light] -- The light being visualized.</div>
+		<h3>[name]( [page:RectAreaLight light], [page:Hex color] )</h3>
+		<div>
+			[page:RectAreaLight light] -- The light being visualized.<br /><br />
+
+			[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light.
+		</div>
 
 
 		<h2>Properties</h2>
@@ -38,6 +42,12 @@ scene.add( helper );
 
 		<h3>[property:RectAreaLight light]</h3>
 		<div>Reference to the RectAreaLight being visualized.</div>
+
+		<h3>[property:hex color]</h3>
+		<div>
+						 The color parameter passed in the constructor. Default is *undefined*. If this is changed, the helper's color will update
+						the next time [page:.update update] is called.
+		</div>
 
 
 		<h2>Methods</h2>

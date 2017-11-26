@@ -465,12 +465,12 @@
 						} );
 
 						break;
-						
+
 					case 'blur':
 
 						// PASS
 
-						var size = renderer.getSize();
+						var size = renderer.getDrawingBufferSize();
 
 						var blurScreen = new THREE.BlurNode( new THREE.ScreenNode() );
 						blurScreen.size = new THREE.Vector2( size.width, size.height );
@@ -521,7 +521,7 @@
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0x888888 + ( Math.random() * 0x888888 ), shading: THREE.FlatShading } );
+					var material = new THREE.MeshPhongMaterial( { color: 0x888888 + ( Math.random() * 0x888888 ), flatShading: true } );
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
 					mesh.position.multiplyScalar( Math.random() * 400 );

@@ -75,7 +75,7 @@ m.elements = [ 11, 21, 31, 41,
 		and internally all calculations are performed using column-major ordering. However, as the actual ordering
 		makes no difference mathematically and most people are used to thinking about matrices in row-major order,
 		the three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
-		code, you'll have to take the [link: https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
+		code, you'll have to take the [link:https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
 		</div>
 
 
@@ -260,7 +260,7 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		[link:https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion here].
 		The rest of the matrix is set to the identity. So, given [page:Quaternion q] = w + xi + yj + zk, the resulting matrix will be:
 		<code>
-1-2y²-2z²    2xy-2zw    2xz-2yw    0
+1-2y²-2z²    2xy-2zw    2xz+2yw    0
 2xy+2zw      1-2x²-2z²  2yz-2xw    0
 2xz-2yw      2yz+2xw    1-2x²-2y²  0
 0            0          0          1

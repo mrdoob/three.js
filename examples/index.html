@@ -87,7 +87,7 @@
 				overflow: auto;
 			}
 
-			#button {
+			#viewSrcButton {
 				position: fixed;
 				bottom: 20px;
 				right: 20px;
@@ -97,7 +97,7 @@
 				opacity: 0.7;
 			}
 
-			#button:hover {
+			#viewSrcButton:hover {
 				cursor: pointer;
 				opacity: 1;
 			}
@@ -277,19 +277,36 @@
 		var container = document.createElement( 'div' );
 		content.appendChild( container );
 
-		var button = document.createElement( 'div' );
-		button.id = 'button';
-		button.textContent = 'View source';
-		button.addEventListener( 'click', function ( event ) {
-
-			window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
-
-		}, false );
-		button.style.display = 'none';
-		document.body.appendChild( button );
+		var viewSrcButton = document.createElement( 'a' );
+		viewSrcButton.id = 'viewSrcButton';
+		viewSrcButton.target = '_blank';
+		viewSrcButton.textContent = 'View source';
+		viewSrcButton.style.display = 'none';
+		document.body.appendChild( viewSrcButton );
 
 		var links = {};
 		var selected = null;
+
+		function createLink( file ) {
+
+			var link = document.createElement( 'a' );
+			link.className = 'link';
+			link.href = file + '.html';
+			link.textContent = getName( file );
+			link.setAttribute( 'target', 'viewer' );
+			link.addEventListener( 'click', function ( event ) {
+
+				if ( event.button === 0 ) {
+
+					selectFile( file );
+
+				}
+
+			} );
+
+			return link;
+
+		}
 
 		for ( var key in files ) {
 
@@ -302,29 +319,12 @@
 
 			for ( var i = 0; i < section.length; i ++ ) {
 
-				( function ( file ) {
+				var file = section[ i ];
 
-					var name = getName( file );
+				var link = createLink( file );
+				container.appendChild( link );
 
-					var link = document.createElement( 'a' );
-					link.className = 'link';
-					link.textContent = name;
-					link.href = file + '.html';
-					link.setAttribute( 'target', 'viewer' );
-					link.addEventListener( 'click', function ( event ) {
-
-						if ( event.button === 0 ) {
-
-							selectFile( file );
-
-						}
-
-					} );
-					container.appendChild( link );
-
-					links[ file ] = link;
-
-				} )( section[ i ] );
+				links[ file ] = link;
 
 			}
 
@@ -346,10 +346,14 @@
 			window.location.hash = file;
 			viewer.focus();
 
-			button.style.display = '';
 			panel.classList.toggle( 'collapsed' );
 
 			selected = file;
+
+			// Reveal "View source" button and set attributes to this example
+			viewSrcButton.style.display = '';
+			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
+			viewSrcButton.title = 'View source code for ' + getName(selected) + ' on GitHub';
 
 		}
 

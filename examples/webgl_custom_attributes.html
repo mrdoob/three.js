@@ -101,6 +101,7 @@
 			camera.position.z = 300;
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x050505 );
 
 			uniforms = {
 
@@ -140,7 +141,6 @@
 			scene.add( sphere );
 
 			renderer = new THREE.WebGLRenderer();
-			renderer.setClearColor( 0x050505 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 

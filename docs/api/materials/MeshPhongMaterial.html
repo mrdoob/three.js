@@ -15,8 +15,8 @@
 		<div class="desc">
 			A material for shiny surfaces with specular highlights.<br /><br />
 
-			The uses a non-physically based [link:https://en.wikipedia.org/wiki/Blinn-Phong_shading_model Blinn-Phong]
-			model	for calculating reflectance. Unlike the Lambertian model used in the [page:MeshLambertMaterial]
+			The material uses a non-physically based [link:https://en.wikipedia.org/wiki/Blinn-Phong_shading_model Blinn-Phong]
+			model for calculating reflectance. Unlike the Lambertian model used in the [page:MeshLambertMaterial]
 			this can simulate shiny surfaces with specular highlights (such as varnished wood).<br /><br />
 
 			Shading is calculated using a [link:https://en.wikipedia.org/wiki/Phong_shading Phong] shading model.
@@ -73,7 +73,9 @@
 		</div>
 
 		<h3>[property:Texture aoMap]</h3>
-		<div>The red channel of this texture is used as the ambient occlusion map. Default is null. The aoMap requires a second set of UVs.</div>
+		<div>The red channel of this texture is used as the ambient occlusion map. Default is null. 
+		The aoMap requires a second set of UVs, and consequently will ignore the [page:Texture repeat]
+		and [page:Texture offset] Texture properties.</div>
 
 		<h3>[property:Float aoMapIntensity]</h3>
 		<div>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</div>
@@ -151,7 +153,9 @@
 
 
 		<h3>[property:Texture lightMap]</h3>
-		<div>The light map. Default is null. The lightMap requires a second set of UVs.</div>
+		<div>The light map. Default is null. The lightMap requires a second set of UVs, 
+		and consequently will ignore the [page:Texture repeat] and [page:Texture offset] 
+		Texture properties.</div>
 
 		<h3>[property:Float lightMapIntensity]</h3>
 		<div>Intensity of the baked light. Default is 1.</div>
@@ -182,10 +186,17 @@
 
 
 		<h3>[property:Float reflectivity]</h3>
-		<div>How much the environment map affects the surface; also see [page:.combine].</div>
+		<div>
+			How much the environment map affects the surface; also see [page:.combine]. 
+			The default value is 1 and the valid range is between 0 (no reflections) and 1 (full reflections).
+		</div>
 
 		<h3>[property:Float refractionRatio]</h3>
-		<div>The index of refraction for an environment map using [page:Textures THREE.CubeRefractionMapping]. Default is *0.98*.</div>
+		<div>
+			The index of refraction (IOR) of air (approximately 1) divided by the index of refraction of the material.
+			It is used with environment mapping modes [page:Textures THREE.CubeRefractionMapping] and [page:Textures THREE.EquirectangularRefractionMapping].
+			The refraction ratio should not exceed 1. Default is *0.98*.
+		</div>
 
 		<h3>[property:Float shininess]</h3>
 		<div>How shiny the [page:.specular] highlight is; a higher value gives a sharper highlight. Default is *30*.</div>

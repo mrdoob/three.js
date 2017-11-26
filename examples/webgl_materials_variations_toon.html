@@ -7,9 +7,9 @@
 		<style>
 			body {
 				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
 
 				background-color: #000;
 				margin: 0px;
@@ -78,7 +78,7 @@
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
-				var shininess = 50, specular = 0x333333, bumpScale = 1, shading = THREE.SmoothShading;
+				var shininess = 50, specular = 0x333333, bumpScale = 1;
 
 				var materials = [];
 
@@ -100,7 +100,7 @@
 						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
 							// basic monochromatic energy preservation
-							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 ).multiplyScalar( 1 - beta * 0.2 );
+							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 ).multiplyScalar( 1 - beta * 0.2 );
 
 							var material = new THREE.MeshToonMaterial( {
 								map: imgTexture,
@@ -110,7 +110,6 @@
 								specular: specularColor,
 								reflectivity: beta,
 								shininess: specularShininess,
-								shading: THREE.SmoothShading,
 								envMap: alphaIndex % 2 === 0 ? null : reflectionCube
 							} );
 
@@ -130,7 +129,7 @@
 
 				function addLabel( name, location ) {
 
-					var textGeo = new THREE.TextGeometry( name, {
+					var textGeo = new THREE.TextBufferGeometry( name, {
 
 						font: font,
 
@@ -188,8 +187,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -4,6 +4,7 @@ var list = {
 
 		"Getting Started": {
 			"Creating a scene": "manual/introduction/Creating-a-scene",
+			"Import via modules": "manual/introduction/Import-via-modules",
 			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
 			"How to run things locally": "manual/introduction/How-to-run-thing-locally",
 			"Drawing Lines": "manual/introduction/Drawing-lines",
@@ -102,7 +103,7 @@ var list = {
 		},
 
 		"Extras": {
-			"CurveUtils": "api/extras/CurveUtils",
+			"Earcut": "api/extras/Earcut",
 			"SceneUtils": "api/extras/SceneUtils",
 			"ShapeUtils": "api/extras/ShapeUtils"
 		},
@@ -111,6 +112,7 @@ var list = {
 			"Curve": "api/extras/core/Curve",
 			"CurvePath": "api/extras/core/CurvePath",
 			"Font": "api/extras/core/Font",
+			"Interpolations": "api/extras/core/Interpolations",
 			"Path": "api/extras/core/Path",
 			"Shape": "api/extras/core/Shape",
 			"ShapePath": "api/extras/core/ShapePath"
@@ -131,7 +133,6 @@ var list = {
 
 		"Extras / Objects": {
 			"ImmediateRenderObject": "api/extras/objects/ImmediateRenderObject",
-			"MorphBlendMesh": "api/extras/objects/MorphBlendMesh"
 		},
 
 		"Geometries": {
@@ -168,6 +169,7 @@ var list = {
 			"SphereGeometry": "api/geometries/SphereGeometry",
 			"TetrahedronBufferGeometry": "api/geometries/TetrahedronBufferGeometry",
 			"TetrahedronGeometry": "api/geometries/TetrahedronGeometry",
+			"TextBufferGeometry": "api/geometries/TextBufferGeometry",
 			"TextGeometry": "api/geometries/TextGeometry",
 			"TorusBufferGeometry": "api/geometries/TorusBufferGeometry",
 			"TorusGeometry": "api/geometries/TorusGeometry",
@@ -180,14 +182,16 @@ var list = {
 
 		"Helpers": {
 			"ArrowHelper": "api/helpers/ArrowHelper",
-			"AxisHelper": "api/helpers/AxisHelper",
+			"AxesHelper": "api/helpers/AxesHelper",
 			"BoxHelper": "api/helpers/BoxHelper",
+			"Box3Helper": "api/helpers/Box3Helper",
 			"CameraHelper": "api/helpers/CameraHelper",
 			"DirectionalLightHelper": "api/helpers/DirectionalLightHelper",
 			"FaceNormalsHelper": "api/helpers/FaceNormalsHelper",
 			"GridHelper": "api/helpers/GridHelper",
 			"PolarGridHelper": "api/helpers/PolarGridHelper",
 			"HemisphereLightHelper": "api/helpers/HemisphereLightHelper",
+			"PlaneHelper": "api/helpers/PlaneHelper",
 			"PointLightHelper": "api/helpers/PointLightHelper",
 			"RectAreaLightHelper": "api/helpers/RectAreaLightHelper",
 			"SkeletonHelper": "api/helpers/SkeletonHelper",
@@ -208,7 +212,6 @@ var list = {
 		"Lights / Shadows": {
 			"DirectionalLightShadow": "api/lights/shadows/DirectionalLightShadow",
 			"LightShadow": "api/lights/shadows/LightShadow",
-			"RectAreaLightShadow": "api/lights/shadows/RectAreaLightShadow",
 			"SpotLightShadow": "api/lights/shadows/SpotLightShadow"
 		},
 
@@ -222,6 +225,7 @@ var list = {
 			"DataTextureLoader": "api/loaders/DataTextureLoader",
 			"FileLoader": "api/loaders/FileLoader",
 			"FontLoader": "api/loaders/FontLoader",
+			"ImageBitmapLoader": "api/loaders/ImageBitmapLoader",
 			"ImageLoader": "api/loaders/ImageLoader",
 			"JSONLoader": "api/loaders/JSONLoader",
 			"Loader": "api/loaders/Loader",
@@ -332,27 +336,35 @@ var list = {
 
 	"Examples": {
 
+		"Controls": {
+			"OrbitControls": "examples/controls/OrbitControls"
+		},
+
 		"Geometries": {
 			"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
-			"ConvexGeometry": "examples/geometries/ConvexGeometry"
+			"ConvexGeometry": "examples/geometries/ConvexGeometry",
+			"DecalGeometry": "examples/geometries/DecalGeometry"
 		},
 
 		"Loaders": {
 			"BabylonLoader": "examples/loaders/BabylonLoader",
-			"ColladaLoader": "examples/loaders/ColladaLoader",
-			"GLTF2Loader": "examples/loaders/GLTF2Loader",
+			"GLTFLoader": "examples/loaders/GLTFLoader",
 			"MTLLoader": "examples/loaders/MTLLoader",
 			"OBJLoader": "examples/loaders/OBJLoader",
 			"OBJLoader2": "examples/loaders/OBJLoader2",
-			"WWOBJLoader2": "examples/loaders/WWOBJLoader2",
+			"LoaderSupport": "examples/loaders/LoaderSupport",
 			"PCDLoader": "examples/loaders/PCDLoader",
 			"PDBLoader": "examples/loaders/PDBLoader",
 			"SVGLoader": "examples/loaders/SVGLoader",
-			"TGALoader": "examples/loaders/TGALoader"
+			"TGALoader": "examples/loaders/TGALoader",
+			"PRWMLoader": "examples/loaders/PRWMLoader"
+		},
+
+		"Exporters": {
+			"GLTFExporter": "examples/exporters/GLTFExporter"
 		},
 
 		"Plugins": {
-			"CombinedCamera": "examples/cameras/CombinedCamera",
 			"LookupTable": "examples/Lut",
 			"SpriteCanvasMaterial": "examples/SpriteCanvasMaterial"
 		},
@@ -390,4 +402,4 @@ var list = {
 
 	}
 
-}
+};

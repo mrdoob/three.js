@@ -4,8 +4,8 @@
 		<title>three.js webvr - cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR, origin = https://threejs.org, expires = 2017-06-13 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR" data-expires="2017-06-13" content="ApAQvHfiHMQB7SmRhfvCUX61adJaTA6pAu0Ry439jjeipa5lGm1RcTQynFoHGGcaSJkWfMOv7qK6pwSUb95ClQgAAABKeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUiIsImV4cGlyeSI6MTQ5NzMxMjAwMH0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2017-12-16 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2017-12-16" content="AvEXeg7kY84HQ60ApBlqf6zPqClJwEy499YltannXHd+qIIN8ibQQFbHDkKL/Na/L7ha4VOqsjsGHhFpI6HYfgAAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxMzQ0NjE5Nn0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -23,25 +23,14 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
-
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
 
 			var clock = new THREE.Clock();
 
 			var container;
 			var camera, scene, raycaster, renderer;
-			var effect, controls;
 
 			var room;
 			var isMouseDown = false;
@@ -66,6 +55,7 @@
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				scene.add( camera );
@@ -123,29 +113,24 @@
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x505050 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
-
-				controls = new THREE.VRControls( camera );
-				effect = new THREE.VREffect( renderer );
-
-				WEBVR.getVRDisplay( function ( display ) {
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-				} );
 
 				renderer.domElement.addEventListener( 'mousedown', onMouseDown, false );
 				renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
 				renderer.domElement.addEventListener( 'touchstart', onMouseDown, false );
 				renderer.domElement.addEventListener( 'touchend', onMouseUp, false );
 
+				window.addEventListener( 'resize', onWindowResize, false );
+
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'vrdisplaypointerrestricted', onPointerRestricted, false );
+				window.addEventListener( 'vrdisplaypointerunrestricted', onPointerUnrestricted, false );
+
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 			}
 
@@ -161,12 +146,28 @@
 
 			}
 
+			function onPointerRestricted() {
+				var pointerLockElement = renderer.domElement;
+				if ( pointerLockElement && typeof(pointerLockElement.requestPointerLock) === 'function' ) {
+					pointerLockElement.requestPointerLock();
+
+				}
+			}
+
+			function onPointerUnrestricted() {
+				var currentPointerLockElement = document.pointerLockElement;
+				var expectedPointerLockElement = renderer.domElement;
+				if ( currentPointerLockElement && currentPointerLockElement === expectedPointerLockElement && typeof(document.exitPointerLock) === 'function' ) {
+					document.exitPointerLock();
+				}
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -174,8 +175,7 @@
 
 			function animate() {
 
-				effect.requestAnimationFrame( animate );
-				render();
+				renderer.animate( render );
 
 			}
 
@@ -261,8 +261,7 @@
 
 				}
 
-				controls.update();
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

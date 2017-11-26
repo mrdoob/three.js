@@ -2,10 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Vector3 } from '../math/Vector3';
-import { Quaternion } from '../math/Quaternion';
-import { Object3D } from '../core/Object3D';
-import { AudioContext } from './AudioContext';
+import { Vector3 } from '../math/Vector3.js';
+import { Quaternion } from '../math/Quaternion.js';
+import { Object3D } from '../core/Object3D.js';
+import { AudioContext } from './AudioContext.js';
 
 function AudioListener() {
 

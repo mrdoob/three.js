@@ -4,8 +4,8 @@
 		<title>three.js webvr - daydream</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR, origin = https://threejs.org, expires = 2017-06-13 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR" data-expires="2017-06-13" content="ApAQvHfiHMQB7SmRhfvCUX61adJaTA6pAu0Ry439jjeipa5lGm1RcTQynFoHGGcaSJkWfMOv7qK6pwSUb95ClQgAAABKeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUiIsImV4cGlyeSI6MTQ5NzMxMjAwMH0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2017-12-16 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2017-12-16" content="AvEXeg7kY84HQ60ApBlqf6zPqClJwEy499YltannXHd+qIIN8ibQQFbHDkKL/Na/L7ha4VOqsjsGHhFpI6HYfgAAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxMzQ0NjE5Nn0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -25,23 +25,14 @@
 
 		<script src="js/vr/DaydreamController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
-		<script src="js/vr/WebVRCamera.js"></script>
 
 		<script>
-
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
 
 			var clock = new THREE.Clock();
 
 			var container;
 			var camera, scene, ray, raycaster, renderer;
-			var gamepad, vrdisplay;
+			var gamepad;
 
 			var room;
 
@@ -63,8 +54,13 @@
 				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - daydream';
 				container.appendChild( info );
 
+				var background = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/MilkyWay/' )
+					.load( [ 'dark-s_px.jpg', 'dark-s_nx.jpg', 'dark-s_py.jpg', 'dark-s_ny.jpg', 'dark-s_pz.jpg', 'dark-s_nz.jpg' ] );
+				background.format = THREE.RGBFormat;
+
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x505050 );
+				scene.background = background;
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 
@@ -116,23 +112,12 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				//
 
-				WEBVR.getVRDisplay( function ( display ) {
-
-					if ( display !== undefined ) {
-
-						vrdisplay = display;
-						camera = new THREE.WebVRCamera( display, renderer );
-
-					}
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-				} );
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				//
 
@@ -171,14 +156,13 @@
 
 			function animate() {
 
-				gamepad.update();
-				render();
-
-				( vrdisplay ? vrdisplay : window ).requestAnimationFrame( animate );
+				renderer.animate( render );
 
 			}
 
 			function render() {
+
+				gamepad.update();
 
 				var delta = clock.getDelta() * 60;
 

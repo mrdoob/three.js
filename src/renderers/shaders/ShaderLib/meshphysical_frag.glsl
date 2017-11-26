@@ -59,7 +59,6 @@ void main() {
 	#include <alphatest_fragment>
 	#include <roughnessmap_fragment>
 	#include <metalnessmap_fragment>
-	#include <normal_flip>
 	#include <normal_fragment>
 	#include <emissivemap_fragment>
 

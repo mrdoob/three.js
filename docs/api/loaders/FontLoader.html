@@ -22,9 +22,7 @@
 
 		<div>
 		[example:webgl_geometry_text_shapes geometry / text / shapes ]<br/>
-		[example:webgl_geometry_text geometry / text ]<br />
-		[example:webgl_geometry_text_earcut geometry / text / earcut]<br />
-		[example:webgl_geometry_text_pnltri geometry / text / pnltri]<br />
+		[example:webgl_geometry_text geometry / text ]
 		</div>
 
 		<code>
@@ -63,6 +61,8 @@
 			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
 		</div>
 
+		<h3>[property:String path]</h3>
+		<div>The base path from which fonts will be loaded. See [page:.setPath]. Default is *undefined*.</div>
 
 		<h2>Methods</h2>
 
@@ -81,6 +81,12 @@
 		<div>
 		[page:Object json] — The <em>JSON</em> structure to parse.<br /><br />
 		Parse a <em>JSON</em> structure and return a [page:Font].
+		</div>
+
+		<h3>[method:FontLoader setPath]( [page:String path] )</h3>
+		<div>
+			Set the base path or URL from which to load fonts. This can be useful if
+			you are loading many fonts from the same directory.
 		</div>
 
 		<h2>Source</h2>

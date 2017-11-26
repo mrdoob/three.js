@@ -23,18 +23,59 @@ function glsl() {
 
 }
 
-export default {
-	entry: 'test/Three.Unit.js',
-	indent: '\t',
-	plugins: [
-		glsl()
-	],
-	// sourceMap: true,
-	targets: [
-		{
-			format: 'umd',
-			moduleName: 'THREE',
-			dest: 'test/unit/three.unit.js'
-		}
-	]
-};
+export default [
+	// editor unit conf
+	{
+		entry: 'test/three.editor.unit.js',
+		indent: '\t',
+		plugins: [
+			glsl()
+		],
+		// sourceMap: true,
+		targets: [
+			{
+				format: 'umd',
+				moduleName: 'THREE',
+				dest: 'test/unit/three.editor.unit.js',
+				intro: 'QUnit.module( "Editor", () => {',
+				outro: '} );',
+			}
+		]
+	},
+	// example unit conf
+	{
+		entry: 'test/three.example.unit.js',
+		indent: '\t',
+		plugins: [
+			glsl()
+		],
+		// sourceMap: true,
+		targets: [
+			{
+				format: 'umd',
+				moduleName: 'THREE',
+				dest: 'test/unit/three.example.unit.js',
+				intro: 'QUnit.module( "Example", () => {',
+				outro: '} );',
+			}
+		]
+	},
+	// source unit conf
+	{
+		entry: 'test/three.source.unit.js',
+		indent: '\t',
+		plugins: [
+			glsl()
+		],
+		// sourceMap: true,
+		targets: [
+			{
+				format: 'umd',
+				moduleName: 'THREE',
+				dest: 'test/unit/three.source.unit.js',
+				intro: 'QUnit.module( "Source", () => {',
+				outro: '} );',
+			}
+		]
+	},
+];

@@ -1,6 +1,5 @@
-import { InterpolateDiscrete } from '../../constants';
-import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype';
-import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
+import { InterpolateDiscrete } from '../../constants.js';
+import { KeyframeTrack } from '../KeyframeTrack.js';
 
 /**
  *
@@ -14,12 +13,11 @@ import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
 
 function StringKeyframeTrack( name, times, values, interpolation ) {
 
-	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
+	KeyframeTrack.call( this, name, times, values, interpolation );
 
 }
 
-StringKeyframeTrack.prototype =
-		Object.assign( Object.create( KeyframeTrackPrototype ), {
+StringKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
 
 	constructor: StringKeyframeTrack,
 
@@ -33,6 +31,5 @@ StringKeyframeTrack.prototype =
 	InterpolantFactoryMethodSmooth: undefined
 
 } );
-
 
 export { StringKeyframeTrack };

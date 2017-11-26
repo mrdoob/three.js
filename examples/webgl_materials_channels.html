@@ -63,6 +63,12 @@
 				side: 'double'
 			};
 
+			var sides = {
+				'front': THREE.FrontSide,
+				'back': THREE.BackSide,
+				'double': THREE.DoubleSide
+			};
+
 			var cameraOrtho, cameraPerspective;
 			var controlsOrtho, controlsPerspective;
 
@@ -166,7 +172,7 @@
 					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 1, - 1 ),
 
-					//shading: THREE.FlatShading,
+					//flatShading: true,
 
 					side: THREE.DoubleSide
 				} );
@@ -199,7 +205,7 @@
 					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 1, - 1 ),
 
-					//shading: THREE.FlatShading,
+					//flatShading: true,
 
 					side: THREE.DoubleSide
 				} );
@@ -256,9 +262,6 @@
 
 				requestAnimationFrame( animate );
 
-				controlsOrtho.update();
-				controlsPerspective.update();
-
 				stats.begin();
 				render();
 				stats.end();
@@ -280,7 +283,7 @@
 
 					}
 
-					if ( params.side !== material.side ) {
+					if ( sides[ params.side ] !== material.side ) {
 
 						switch ( params.side ) {
 

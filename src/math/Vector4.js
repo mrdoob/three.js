@@ -254,15 +254,15 @@ Object.assign( Vector4.prototype, {
 
 		if ( s < 0.0001 ) {
 
-			 this.x = 1;
-			 this.y = 0;
-			 this.z = 0;
+			this.x = 1;
+			this.y = 0;
+			this.z = 0;
 
 		} else {
 
-			 this.x = q.x / s;
-			 this.y = q.y / s;
-			 this.z = q.z / s;
+			this.x = q.x / s;
+			this.y = q.y / s;
+			this.z = q.z / s;
 
 		}
 
@@ -424,7 +424,7 @@ Object.assign( Vector4.prototype, {
 
 	clamp: function ( min, max ) {
 
-		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+		// assumes min < max, componentwise
 
 		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
 		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
@@ -437,10 +437,16 @@ Object.assign( Vector4.prototype, {
 
 	clampScalar: function () {
 
-		var min = new Vector4();
-		var max = new Vector4();
+		var min, max;
 
 		return function clampScalar( minVal, maxVal ) {
+
+			if ( min === undefined ) {
+
+				min = new Vector4();
+				max = new Vector4();
+
+			}
 
 			min.set( minVal, minVal, minVal, minVal );
 			max.set( maxVal, maxVal, maxVal, maxVal );
@@ -450,6 +456,14 @@ Object.assign( Vector4.prototype, {
 		};
 
 	}(),
+
+	clampLength: function ( min, max ) {
+
+		var length = this.length();
+
+		return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
+
+	},
 
 	floor: function () {
 
@@ -524,7 +538,7 @@ Object.assign( Vector4.prototype, {
 
 	},
 
-	lengthManhattan: function () {
+	manhattanLength: function () {
 
 		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z ) + Math.abs( this.w );
 
@@ -532,13 +546,13 @@ Object.assign( Vector4.prototype, {
 
 	normalize: function () {
 
-		return this.divideScalar( this.length() );
+		return this.divideScalar( this.length() || 1 );
 
 	},
 
 	setLength: function ( length ) {
 
-		return this.multiplyScalar( length / this.length() );
+		return this.normalize().multiplyScalar( length );
 
 	},
 

@@ -59,6 +59,8 @@
 
 	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
 
+		float shadow = 1.0;
+
 		shadowCoord.xyz /= shadowCoord.w;
 		shadowCoord.z += shadowBias;
 
@@ -83,7 +85,7 @@
 			float dx1 = + texelSize.x * shadowRadius;
 			float dy1 = + texelSize.y * shadowRadius;
 
-			return (
+			shadow = (
 				texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
 				texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
 				texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
@@ -104,7 +106,7 @@
 			float dx1 = + texelSize.x * shadowRadius;
 			float dy1 = + texelSize.y * shadowRadius;
 
-			return (
+			shadow = (
 				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
 				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
 				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
@@ -118,13 +120,13 @@
 
 		#else // no percentage-closer filtering:
 
-			return texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
+			shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
 
 		#endif
 
 		}
 
-		return 1.0;
+		return shadow;
 
 	}
 
@@ -199,18 +201,20 @@
 
 	}
 
-	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+	float getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {
 
 		vec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );
 
 		// for point lights, the uniform @vShadowCoord is re-purposed to hold
-		// the distance from the light to the world-space position of the fragment.
+		// the vector from the light to the world-space position of the fragment.
 		vec3 lightToPosition = shadowCoord.xyz;
+
+		// dp = normalized distance from light to fragment position
+		float dp = ( length( lightToPosition ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear ); // need to clamp?
+		dp += shadowBias;
 
 		// bd3D = base direction 3D
 		vec3 bd3D = normalize( lightToPosition );
-		// dp = distance from light to fragment position
-		float dp = ( length( lightToPosition ) - shadowBias ) / 1000.0;
 
 		#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )
 

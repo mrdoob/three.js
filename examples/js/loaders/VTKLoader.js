@@ -1,7 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Alex Pletzer
- * 
+ *
  * Updated on 22.03.2017
  * VTK header is now parsed and used to extract all the compressed data
  * @author Andrii Iudin https://github.com/andreyyudin
@@ -9,7 +9,7 @@
  * @author Sriram Somasundharam https://github.com/raamssundar
  */
 
-THREE.VTKLoader = function( manager ) {
+THREE.VTKLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
@@ -23,7 +23,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function( text ) {
+		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 
@@ -253,26 +253,26 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 			var geometry;
 			var stagger = 'point';
 
-			if ( colors.length == indices.length ) {
+			if ( colors.length === indices.length ) {
 
 				stagger = 'cell';
 
 			}
 
-			if ( stagger == 'point' ) {
+			if ( stagger === 'point' ) {
 
 				// Nodal. Use BufferGeometry
 				geometry = new THREE.BufferGeometry();
 				geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( indices ), 1 ) );
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
 
-				if ( colors.length == positions.length ) {
+				if ( colors.length === positions.length ) {
 
 					geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 
 				}
 
-				if ( normals.length == positions.length ) {
+				if ( normals.length === positions.length ) {
 
 					geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
 
@@ -286,7 +286,6 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 				var numTriangles = indices.length / 3;
 				var numPoints = positions.length / 3;
-				var va, vb, vc;
 				var face;
 				var ia, ib, ic;
 				var x, y, z;
@@ -310,7 +309,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 				}
 
-				if ( colors.length == numTriangles * 3 ) {
+				if ( colors.length === numTriangles * 3 ) {
 
 					for ( var i = 0; i < numTriangles; ++ i ) {
 
@@ -332,9 +331,9 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		function parseBinary( data ) {
 
-			var count, pointIndex, i, numberOfPoints, pt, s;
-			var buffer = new Uint8Array ( data );
-			var dataView = new DataView ( data );
+			var count, pointIndex, i, numberOfPoints, s;
+			var buffer = new Uint8Array( data );
+			var dataView = new DataView( data );
 
 			// Points and normals, by default, are empty
 			var points = [];
@@ -350,18 +349,18 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 				var index = start;
 				var c = buffer[ index ];
 				var s = [];
-				while ( c != 10 ) {
+				while ( c !== 10 ) {
 
-					s.push ( String.fromCharCode ( c ) );
+					s.push( String.fromCharCode( c ) );
 					index ++;
 					c = buffer[ index ];
 
 				}
 
 				return { start: start,
-						end: index,
-						next: index + 1,
-						parsedString: s.join( '' ) };
+					end: index,
+					next: index + 1,
+					parsedString: s.join( '' ) };
 
 			}
 
@@ -370,14 +369,14 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 			while ( true ) {
 
 				// Get a string
-				state = findString ( buffer, index );
+				state = findString( buffer, index );
 				line = state.parsedString;
 
-				if ( line.indexOf ( 'POINTS' ) === 0 ) {
+				if ( line.indexOf( 'POINTS' ) === 0 ) {
 
-					vtk.push ( line );
+					vtk.push( line );
 					// Add the points
-					numberOfPoints = parseInt ( line.split( ' ' )[ 1 ], 10 );
+					numberOfPoints = parseInt( line.split( ' ' )[ 1 ], 10 );
 
 					// Each point is 3 4-byte floats
 					count = numberOfPoints * 4 * 3;
@@ -396,10 +395,10 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
-				} else if ( line.indexOf ( 'TRIANGLE_STRIPS' ) === 0 ) {
+				} else if ( line.indexOf( 'TRIANGLE_STRIPS' ) === 0 ) {
 
-					var numberOfStrips = parseInt ( line.split( ' ' )[ 1 ], 10 );
-					var size = parseInt ( line.split ( ' ' )[ 2 ], 10 );
+					var numberOfStrips = parseInt( line.split( ' ' )[ 1 ], 10 );
+					var size = parseInt( line.split( ' ' )[ 2 ], 10 );
 					// 4 byte integers
 					count = size * 4;
 
@@ -415,7 +414,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						pointIndex += 4;
 						for ( s = 0; s < indexCount; s ++ ) {
 
-							strip.push ( dataView.getInt32( pointIndex, false ) );
+							strip.push( dataView.getInt32( pointIndex, false ) );
 							pointIndex += 4;
 
 						}
@@ -444,10 +443,10 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
-				} else if ( line.indexOf ( 'POLYGONS' ) === 0 ) {
+				} else if ( line.indexOf( 'POLYGONS' ) === 0 ) {
 
-					var numberOfStrips = parseInt ( line.split( ' ' )[ 1 ], 10 );
-					var size = parseInt ( line.split ( ' ' )[ 2 ], 10 );
+					var numberOfStrips = parseInt( line.split( ' ' )[ 1 ], 10 );
+					var size = parseInt( line.split( ' ' )[ 2 ], 10 );
 					// 4 byte integers
 					count = size * 4;
 
@@ -463,11 +462,11 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						pointIndex += 4;
 						for ( s = 0; s < indexCount; s ++ ) {
 
-							strip.push ( dataView.getInt32( pointIndex, false ) );
+							strip.push( dataView.getInt32( pointIndex, false ) );
 							pointIndex += 4;
 
 						}
-						var i0 = strip[ 0 ];
+
 						// divide the polygon in n-2 triangle
 						for ( var j = 1; j < indexCount - 1; j ++ ) {
 
@@ -481,12 +480,12 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
-				} else if ( line.indexOf ( 'POINT_DATA' ) === 0 ) {
+				} else if ( line.indexOf( 'POINT_DATA' ) === 0 ) {
 
-					numberOfPoints = parseInt ( line.split( ' ' )[ 1 ], 10 );
+					numberOfPoints = parseInt( line.split( ' ' )[ 1 ], 10 );
 
 					// Grab the next line
-					state = findString ( buffer, state.next );
+					state = findString( buffer, state.next );
 
 					// Now grab the binary data
 					count = numberOfPoints * 4 * 3;
@@ -522,7 +521,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 			geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 			geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
 
-			if ( normals.length == points.length ) {
+			if ( normals.length === points.length ) {
 
 				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
@@ -532,24 +531,26 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
-		function Float32Concat(first, second) {
-		    var firstLength = first.length,
-		        result = new Float32Array(firstLength + second.length);
+		function Float32Concat( first, second ) {
 
-		    result.set(first);
-		    result.set(second, firstLength);
+		    var firstLength = first.length, result = new Float32Array( firstLength + second.length );
+
+		    result.set( first );
+		    result.set( second, firstLength );
 
 		    return result;
+
 		}
 
-		function Int32Concat(first, second) {
-		    var firstLength = first.length,
-		        result = new Int32Array(firstLength + second.length);
+		function Int32Concat( first, second ) {
 
-		    result.set(first);
-		    result.set(second, firstLength);
+		    var firstLength = first.length, result = new Int32Array( firstLength + second.length );
+
+		    result.set( first );
+		    result.set( second, firstLength );
 
 		    return result;
+
 		}
 
 		function parseXML( stringFile ) {
@@ -561,7 +562,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 				// Create the return object
 				var obj = {};
 
-				if ( xml.nodeType == 1 ) { // element
+				if ( xml.nodeType === 1 ) { // element
 
 					// do attributes
 
@@ -582,7 +583,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					}
 
-				} else if ( xml.nodeType == 3 ) { // text
+				} else if ( xml.nodeType === 3 ) { // text
 
 					obj = xml.nodeValue.trim();
 
@@ -596,7 +597,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						var item = xml.childNodes.item( i );
 						var nodeName = item.nodeName;
 
-						if ( typeof( obj[ nodeName ] ) === 'undefined' ) {
+						if ( typeof obj[ nodeName ] === 'undefined' ) {
 
 							var tmp = xmlToJson( item );
 
@@ -604,7 +605,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 						} else {
 
-							if ( typeof( obj[ nodeName ].push ) === 'undefined' ) {
+							if ( typeof obj[ nodeName ].push === 'undefined' ) {
 
 								var old = obj[ nodeName ];
 								obj[ nodeName ] = [ old ];
@@ -692,122 +693,102 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 			}
 
 			function parseDataArray( ele, compressed ) {
+
 				var numBytes = 0;
-				if ( json.attributes.header_type == 'UInt64' )
+
+				if ( json.attributes.header_type === 'UInt64' ) {
+
 					numBytes = 8;
-				else if( json.attributes.header_type == 'UInt32' )
+
+				}	else if ( json.attributes.header_type === 'UInt32' ) {
+
 					numBytes = 4;
 
+				}
+
+
 				// Check the format
-				if ( ele.attributes.format == 'binary' && compressed ) {
-						var rawData, content, byteData, blocks, cSizeStart, headerSize, padding, dataOffsets, currentOffset;
+				if ( ele.attributes.format === 'binary' && compressed ) {
 
-						if ( ele.attributes.type == 'Float32' ) {
-							var txt = new Float32Array( );
-						} else if ( ele.attributes.type === 'Int64' ) {
-							var txt = new Int32Array( );
+					var rawData, content, byteData, blocks, cSizeStart, headerSize, padding, dataOffsets, currentOffset;
+
+					if ( ele.attributes.type === 'Float32' ) {
+
+						var txt = new Float32Array( );
+
+					} else if ( ele.attributes.type === 'Int64' ) {
+
+						var txt = new Int32Array( );
+
+					}
+
+					// VTP data with the header has the following structure:
+					// [#blocks][#u-size][#p-size][#c-size-1][#c-size-2]...[#c-size-#blocks][DATA]
+					//
+					// Each token is an integer value whose type is specified by "header_type" at the top of the file (UInt32 if no type specified). The token meanings are:
+					// [#blocks] = Number of blocks
+					// [#u-size] = Block size before compression
+					// [#p-size] = Size of last partial block (zero if it not needed)
+					// [#c-size-i] = Size in bytes of block i after compression
+					//
+					// The [DATA] portion stores contiguously every block appended together. The offset from the beginning of the data section to the beginning of a block is
+					// computed by summing the compressed block sizes from preceding blocks according to the header.
+
+					rawData = ele[ '#text' ];
+
+					byteData = Base64toByteArray( rawData );
+
+					blocks = byteData[ 0 ];
+					for ( var i = 1; i < numBytes - 1; i ++ ) {
+
+						blocks = blocks | ( byteData[ i ] << ( i * numBytes ) );
+
+					}
+
+					headerSize = ( blocks + 3 ) * numBytes;
+					padding = ( ( headerSize % 3 ) > 0 ) ? 3 - ( headerSize % 3 ) : 0;
+					headerSize = headerSize + padding;
+
+					dataOffsets = [];
+					currentOffset = headerSize;
+					dataOffsets.push( currentOffset );
+
+					// Get the blocks sizes after the compression.
+					// There are three blocks before c-size-i, so we skip 3*numBytes
+					cSizeStart = 3 * numBytes;
+
+					for ( var i = 0; i < blocks; i ++ ) {
+
+						var currentBlockSize = byteData[ i * numBytes + cSizeStart ];
+
+						for ( var j = 1; j < numBytes - 1; j ++ ) {
+
+							// Each data point consists of 8 bytes regardless of the header type
+							currentBlockSize = currentBlockSize | ( byteData[ i * numBytes + cSizeStart + j ] << ( j * 8 ) );
+
 						}
 
-						// VTP data with the header has the following structure:
-						// [#blocks][#u-size][#p-size][#c-size-1][#c-size-2]...[#c-size-#blocks][DATA]
-						//
-						// Each token is an integer value whose type is specified by "header_type" at the top of the file (UInt32 if no type specified). The token meanings are:
-						// [#blocks] = Number of blocks
-						// [#u-size] = Block size before compression
-						// [#p-size] = Size of last partial block (zero if it not needed)
-						// [#c-size-i] = Size in bytes of block i after compression
-						//
-						// The [DATA] portion stores contiguously every block appended together. The offset from the beginning of the data section to the beginning of a block is 
-						// computed by summing the compressed block sizes from preceding blocks according to the header. 
-
-						rawData = ele[ '#text' ];
-
-						byteData = Base64toByteArray( rawData );
-
-						blocks = byteData[0]
-						for ( var i = 1; i<numBytes-1; i++ ) {
-							blocks = blocks | ( byteData[i] << (i*numBytes) );
-						}
-
-						headerSize = (blocks + 3) * numBytes;
-						padding = ( (headerSize % 3) > 0 ) ? 3 - (headerSize % 3) : 0;
-						headerSize = headerSize + padding;
-						
-						dataOffsets = [];
-						currentOffset = headerSize;
+						currentOffset = currentOffset + currentBlockSize;
 						dataOffsets.push( currentOffset );
 
-						// Get the blocks sizes after the compression.
-						// There are three blocks before c-size-i, so we skip 3*numBytes
-						cSizeStart = 3*numBytes;
-						for ( var i = 0; i<blocks; i++ ) {
-							var currentBlockSize = byteData[i*numBytes + cSizeStart];
-							for ( var j = 1; j<numBytes-1; j++ ) {
-								currentBlockSize = currentBlockSize | ( byteData[i*numBytes + cSizeStart + j] << (j*numBytes) );
-							}
-							
-							currentOffset = currentOffset + currentBlockSize;
-							dataOffsets.push( currentOffset );
-						}
+					}
 
-						for ( var i=0; i<dataOffsets.length-1; i++ ) {
-							var inflate = new Zlib.Inflate( byteData.slice( dataOffsets[i], dataOffsets[i+1] ), { resize: true, verify: true } );
-							content = inflate.decompress();
-							content = content.buffer;
+					for ( var i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-							if ( ele.attributes.type == 'Float32' ) {
-								content = new Float32Array( content );
-								txt = Float32Concat(txt, content);
-							} else if ( ele.attributes.type === 'Int64' ) {
-								content = new Int32Array( content );
-								txt = Int32Concat(txt, content);
-							}
-						}
+						var inflate = new Zlib.Inflate( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ), { resize: true, verify: true } ); // eslint-disable-line no-undef
+						content = inflate.decompress();
+						content = content.buffer;
 
-						delete ele[ '#text' ];
+						if ( ele.attributes.type === 'Float32' ) {
 
-						// Get the content and optimize it
-						if ( ele.attributes.type == 'Float32' ) {
-							if ( ele.attributes.format == 'binary' ) {
-								if ( ! compressed ) {
-									txt = txt.filter( function( el, idx, arr ) {
-										if ( idx !== 0 ) return true;
-									} );
-								}
-							}
+							content = new Float32Array( content );
+							txt = Float32Concat( txt, content );
 
 						} else if ( ele.attributes.type === 'Int64' ) {
-							if ( ele.attributes.format == 'binary' ) {
-								if ( ! compressed ) {
-									txt = txt.filter( function ( el, idx, arr ) {
-										if ( idx !== 0 ) return true;
-									} );
-								}
 
-								txt = txt.filter( function ( el, idx, arr ) {
-									if ( idx % 2 !== 1 ) return true;
-								} );
-							}
-						}
+							content = new Int32Array( content );
+							txt = Int32Concat( txt, content );
 
-				} else {
-					if ( ele.attributes.format == 'binary' && ! compressed ) {
-
-						var content = Base64toByteArray( ele[ '#text' ] );
-
-						//  VTP data for the uncompressed case has the following structure:
-						// [#bytes][DATA]
-						// where "[#bytes]" is an integer value specifying the number of bytes in the block of data following it.
-						content = content.slice(numBytes).buffer;
-
-					} else {
-
-						if ( ele[ '#text' ] ) {
-							var content = ele[ '#text' ].replace( /\n/g, ' ' ).split( ' ' ).filter( function ( el, idx, arr ) {
-								if ( el !== '' ) return el;
-							} );
-						} else {
-							var content = new Int32Array( 0 ).buffer;
 						}
 
 					}
@@ -815,21 +796,103 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 					delete ele[ '#text' ];
 
 					// Get the content and optimize it
-					if ( ele.attributes.type == 'Float32' ) {
+					if ( ele.attributes.type === 'Float32' ) {
+
+						if ( ele.attributes.format === 'binary' ) {
+
+							if ( ! compressed ) {
+
+								txt = txt.filter( function ( el, idx ) {
+
+									if ( idx !== 0 ) return true;
+
+								} );
+
+							}
+
+						}
+
+					} else if ( ele.attributes.type === 'Int64' ) {
+
+						if ( ele.attributes.format === 'binary' ) {
+
+							if ( ! compressed ) {
+
+								txt = txt.filter( function ( el, idx ) {
+
+									if ( idx !== 0 ) return true;
+
+								} );
+
+							}
+
+							txt = txt.filter( function ( el, idx ) {
+
+								if ( idx % 2 !== 1 ) return true;
+
+							} );
+
+						}
+
+					}
+
+				} else {
+
+					if ( ele.attributes.format === 'binary' && ! compressed ) {
+
+						var content = Base64toByteArray( ele[ '#text' ] );
+
+						//  VTP data for the uncompressed case has the following structure:
+						// [#bytes][DATA]
+						// where "[#bytes]" is an integer value specifying the number of bytes in the block of data following it.
+						content = content.slice( numBytes ).buffer;
+
+					} else {
+
+						if ( ele[ '#text' ] ) {
+
+							var content = ele[ '#text' ].split( /\s+/ ).filter( function ( el ) {
+
+								if ( el !== '' ) return el;
+
+							} );
+
+						} else {
+
+							var content = new Int32Array( 0 ).buffer;
+
+						}
+
+					}
+
+					delete ele[ '#text' ];
+
+					// Get the content and optimize it
+					if ( ele.attributes.type === 'Float32' ) {
 
 						var txt = new Float32Array( content );
 
-					} else if ( ele.attributes.type === 'Int64' ) {
+					} else if ( ele.attributes.type === 'Int32' ) {
+
 						var txt = new Int32Array( content );
 
-						if ( ele.attributes.format == 'binary' ) {
-							txt = txt.filter( function ( el, idx, arr ) {
+					} else if ( ele.attributes.type === 'Int64' ) {
+
+						var txt = new Int32Array( content );
+
+						if ( ele.attributes.format === 'binary' ) {
+
+							txt = txt.filter( function ( el, idx ) {
+
 								if ( idx % 2 !== 1 ) return true;
+
 							} );
+
 						}
+
 					}
 
-				} // endif ( ele.attributes.format == 'binary' && compressed )
+				} // endif ( ele.attributes.format === 'binary' && compressed )
 
 				return txt;
 
@@ -855,10 +918,10 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 				try {
 
-					dom = new ActiveXObject( 'Microsoft.XMLDOM' );
+					dom = new ActiveXObject( 'Microsoft.XMLDOM' ); // eslint-disable-line no-undef
 					dom.async = false;
 
-					if ( ! dom.loadXML( xml ) ) {
+					if ( ! dom.loadXML( /* xml */ ) ) {
 
 						throw new Error( dom.parseError.reason + dom.parseError.srcText );
 
@@ -900,7 +963,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					// If it has a DataArray in it
 
-					if ( section.DataArray ) {
+					if ( section && section.DataArray ) {
 
 						// Depending on the number of DataArrays
 
@@ -919,10 +982,13 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						while ( dataArrayIndex < numberOfDataArrays ) {
 
 							// Parse the DataArray
-							if ( ('#text' in arr[ dataArrayIndex ]) && (arr[ dataArrayIndex ][ '#text' ].length > 0) ) {
+							if ( ( '#text' in arr[ dataArrayIndex ] ) && ( arr[ dataArrayIndex ][ '#text' ].length > 0 ) ) {
+
 								arr[ dataArrayIndex ].text = parseDataArray( arr[ dataArrayIndex ], compressed );
+
 							}
-								dataArrayIndex ++;
+
+							dataArrayIndex ++;
 
 						}
 
@@ -938,7 +1004,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 									for ( var i = 0, len = arr.length; i < len; i ++ ) {
 
-										if ( normalsName == arr[ i ].attributes.Name ) {
+										if ( normalsName === arr[ i ].attributes.Name ) {
 
 											var components = arr[ i ].attributes.NumberOfComponents;
 											normals = new Float32Array( numberOfPoints * components );
@@ -984,13 +1050,13 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 									var indicesIndex = 0;
 
-									for ( var i = 0,len = numberOfStrips; i < len; i ++ ) {
+									for ( var i = 0, len = numberOfStrips; i < len; i ++ ) {
 
 										var strip = [];
 
 										for ( var s = 0, len1 = offset[ i ], len0 = 0; s < len1 - len0; s ++ ) {
 
-											strip.push ( connectivity[ s ] );
+											strip.push( connectivity[ s ] );
 
 											if ( i > 0 ) len0 = offset[ i - 1 ];
 
@@ -1037,7 +1103,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 									var size = numberOfPolys + connectivity.length;
 									indices = new Uint32Array( 3 * size - 9 * numberOfPolys );
 									var indicesIndex = 0, connectivityIndex = 0;
-									var i = 0,len = numberOfPolys, len0 = 0;
+									var i = 0, len = numberOfPolys, len0 = 0;
 
 									while ( i < len ) {
 
@@ -1086,7 +1152,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
 
-				if ( normals.length == points.length ) {
+				if ( normals.length === points.length ) {
 
 					geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 

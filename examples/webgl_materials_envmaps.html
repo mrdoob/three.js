@@ -118,12 +118,12 @@
 
 				// Skybox
 
-				cubeMesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), cubeMaterial );
+				cubeMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), cubeMaterial );
 				sceneCube.add( cubeMesh );
 
 				//
 
-				var geometry = new THREE.SphereGeometry( 400.0, 24, 24 );
+				var geometry = new THREE.SphereBufferGeometry( 400.0, 48, 24 );
 				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 
@@ -207,8 +207,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-
-				controls.update();
 
 			}
 

@@ -73,6 +73,7 @@
 				// scene
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				var ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
@@ -86,7 +87,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.OutlineEffect( renderer );

@@ -1,7 +1,5 @@
-import { Curve } from './Curve';
-import { Vector3 } from '../../math/Vector3';
-import { Geometry } from '../../core/Geometry';
-import { LineCurve } from '../curves/LineCurve';
+import { Curve } from './Curve.js';
+import { LineCurve } from '../curves/LineCurve.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -17,8 +15,9 @@ function CurvePath() {
 
 	Curve.call( this );
 
-	this.curves = [];
+	this.type = 'CurvePath';
 
+	this.curves = [];
 	this.autoClose = false; // Automatically closes the path
 
 }
@@ -170,14 +169,14 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
 			var curve = curves[ i ];
-			var resolution = (curve && curve.isEllipseCurve) ? divisions * 2
-				: (curve && curve.isLineCurve) ? 1
-				: (curve && curve.isSplineCurve) ? divisions * curve.points.length
-				: divisions;
+			var resolution = ( curve && curve.isEllipseCurve ) ? divisions * 2
+				: ( curve && curve.isLineCurve ) ? 1
+					: ( curve && curve.isSplineCurve ) ? divisions * curve.points.length
+						: divisions;
 
 			var pts = curve.getPoints( resolution );
 
-			for ( var j = 0; j < pts.length; j++ ) {
+			for ( var j = 0; j < pts.length; j ++ ) {
 
 				var point = pts[ j ];
 
@@ -190,7 +189,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		}
 
-		if ( this.autoClose && points.length > 1 && !points[ points.length - 1 ].equals( points[ 0 ] ) ) {
+		if ( this.autoClose && points.length > 1 && ! points[ points.length - 1 ].equals( points[ 0 ] ) ) {
 
 			points.push( points[ 0 ] );
 
@@ -200,40 +199,23 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 	},
 
-	/**************************************************************
-	 *	Create Geometries Helpers
-	 **************************************************************/
+	copy: function ( source ) {
 
-	/// Generate geometry from path points (for Line or Points objects)
+		Curve.prototype.copy.call( this, source );
 
-	createPointsGeometry: function ( divisions ) {
+		this.curves = [];
 
-		var pts = this.getPoints( divisions );
-		return this.createGeometry( pts );
+		for ( var i = 0, l = source.curves.length; i < l; i ++ ) {
 
-	},
+			var curve = source.curves[ i ];
 
-	// Generate geometry from equidistant sampling along the path
-
-	createSpacedPointsGeometry: function ( divisions ) {
-
-		var pts = this.getSpacedPoints( divisions );
-		return this.createGeometry( pts );
-
-	},
-
-	createGeometry: function ( points ) {
-
-		var geometry = new Geometry();
-
-		for ( var i = 0, l = points.length; i < l; i ++ ) {
-
-			var point = points[ i ];
-			geometry.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
+			this.curves.push( curve.clone() );
 
 		}
 
-		return geometry;
+		this.autoClose = source.autoClose;
+
+		return this;
 
 	}
 

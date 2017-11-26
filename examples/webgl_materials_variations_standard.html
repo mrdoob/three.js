@@ -7,9 +7,9 @@
 		<style>
 			body {
 				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
 
 				background-color: #000;
 				margin: 0px;
@@ -80,7 +80,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = textureCube;
-				
+
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				var hdrCubeRenderTarget = null;
 
@@ -101,7 +101,7 @@
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					var shininess = 50, specular = 0x333333, bumpScale = 1, shading = THREE.SmoothShading;
+					var shininess = 50, specular = 0x333333, bumpScale = 1;
 
 					var materials = [];
 
@@ -109,7 +109,7 @@
 					var numberOfSphersPerSide = 5;
 					var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
 					var stepSize = 1.0 / numberOfSphersPerSide;
-					
+
 					var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
 					var index = 0;
@@ -121,7 +121,7 @@
 							for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
 								// basic monochromatic energy preservation
-								var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 );
+								var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 );
 
 								var material = new THREE.MeshStandardMaterial( {
 									map: imgTexture,
@@ -130,8 +130,7 @@
 									color: diffuseColor,
 									metalness: beta,
 									roughness: 1.0 - alpha,
-									shading: THREE.SmoothShading,
-									envMap: index % 2 === 0 ? null : hdrCubeRenderTarget.texture						
+									envMap: index % 2 === 0 ? null : hdrCubeRenderTarget.texture
 								} );
 
 								index ++;
@@ -145,9 +144,9 @@
 								scene.add( mesh );
 
 							}
-							
+
 						}
-						
+
 						index ++;
 
 					}
@@ -155,7 +154,7 @@
 
 				function addLabel( name, location ) {
 
-					var textGeo = new THREE.TextGeometry( name, {
+					var textGeo = new THREE.TextBufferGeometry( name, {
 
 						font: font,
 
@@ -213,8 +212,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
