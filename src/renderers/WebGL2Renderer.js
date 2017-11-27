@@ -17,13 +17,13 @@ function WebGL2Renderer( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
 		_context = parameters.context !== undefined ? parameters.context : null,
 
-    		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
-    		_depth = parameters.depth !== undefined ? parameters.depth : true,
-    		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
-    		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
-    		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
-    		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
-    		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default';
+		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
+		_depth = parameters.depth !== undefined ? parameters.depth : true,
+		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
+		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
+		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
+		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
+		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default';
 
 	// initialize
 
@@ -38,7 +38,7 @@ function WebGL2Renderer( parameters ) {
 			antialias: _antialias,
 			premultipliedAlpha: _premultipliedAlpha,
 			preserveDrawingBuffer: _preserveDrawingBuffer,
-			powerPreference: _powerPreference,
+			powerPreference: _powerPreference
 		};
 
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );

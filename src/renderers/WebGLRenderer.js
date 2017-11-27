@@ -201,7 +201,7 @@ function WebGLRenderer( parameters ) {
 			antialias: _antialias,
 			premultipliedAlpha: _premultipliedAlpha,
 			preserveDrawingBuffer: _preserveDrawingBuffer,
-			powerPreference: _powerPreference,
+			powerPreference: _powerPreference
 		};
 
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
