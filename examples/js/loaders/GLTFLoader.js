@@ -8,11 +8,9 @@
 
 THREE.GLTFLoader = ( function () {
 
-	function GLTFLoader( manager, options ) {
+	function GLTFLoader( manager ) {
 
-		options = options || {};
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-		this.deduplicateGeometry = options.deduplicateGeometry !== false;
 
 	}
 
@@ -142,7 +140,6 @@ THREE.GLTFLoader = ( function () {
 				path: path || this.path || '',
 				crossOrigin: this.crossOrigin,
 				manager: this.manager,
-				deduplicateGeometry: this.deduplicateGeometry
 
 			} );
 
@@ -1314,22 +1311,16 @@ THREE.GLTFLoader = ( function () {
 		var attribB = b.attributes || {};
 		var keysA = Object.keys(attribA);
 		var keysB = Object.keys(attribB);
-		var i;
 
-		for ( i = 0; i < keysA.length; i++ ) {
+		if ( keysA.length !== keysB.length ) {
 
-			var key = keysA[i];
+			return false;
 
-			if ( attribA[key] !== attribB[key] ) {
-
-				return false;
-
-			}
 		}
 
-		for ( i = 0; i < keysB.length; i++ ) {
+		for ( var i = 0; i < keysA.length; i++ ) {
 
-			var key = keysB[i];
+			var key = keysA[i];
 
 			if ( attribA[key] !== attribB[key] ) {
 
@@ -1369,7 +1360,6 @@ THREE.GLTFLoader = ( function () {
 
 		// BufferGeometry caching
 		this.primitiveCache = [];
-		this.deduplicateGeometry = Boolean(this.options.deduplicateGeometry);
 
 		this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
@@ -1944,7 +1934,6 @@ THREE.GLTFLoader = ( function () {
 	GLTFParser.prototype.loadGeometries = function ( primitives ) {
 
 		var cache = this.primitiveCache;
-		var deduplicateGeometry = this.deduplicateGeometry;
 
 		return this._withDependencies( [
 
@@ -1955,7 +1944,7 @@ THREE.GLTFLoader = ( function () {
 			return _each( primitives, function ( primitive ) {
 
 				// See if we've already created this geometry
-				var cached = deduplicateGeometry ? getCachedGeometry( cache, primitive ) : null;
+				var cached = getCachedGeometry( cache, primitive );
 
 				if (cached) {
 
@@ -2027,16 +2016,12 @@ THREE.GLTFLoader = ( function () {
 				}
 
 				// Cache this geometry
-				if ( deduplicateGeometry ) {
+				cache.push( {
 
-					cache.push( {
+					primitive: primitive,
+					geometry: geometry
 
-						primitive: primitive,
-						geometry: geometry
-
-					} );
-
-				}
+				} );
 
 				return geometry;
 
