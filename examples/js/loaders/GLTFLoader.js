@@ -111,6 +111,8 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
+			this.onAssetRead( json.asset );
+
 			if ( json.extensionsUsed ) {
 
 				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_LIGHTS ) >= 0 ) {
@@ -158,7 +160,9 @@ THREE.GLTFLoader = ( function () {
 
 			}, onError );
 
-		}
+		},
+
+		onAssetRead: function ( assetValue ) { }
 
 	};
 
