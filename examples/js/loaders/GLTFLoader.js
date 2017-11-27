@@ -108,7 +108,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
-				if ( onError ) onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' ) );
+				if ( onError ) onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported. Use LegacyGLTFLoader instead.' ) );
 				return;
 
 			}
@@ -424,7 +424,7 @@ THREE.GLTFLoader = ( function () {
 
 		} else if ( this.header.version < 2.0 ) {
 
-			throw new Error( 'THREE.GLTFLoader: Legacy binary file detected. Use GLTFLoader instead.' );
+			throw new Error( 'THREE.GLTFLoader: Legacy binary file detected. Use LegacyGLTFLoader instead.' );
 
 		}
 
@@ -532,6 +532,7 @@ THREE.GLTFLoader = ( function () {
 					'vec3 specularFactor = specular;',
 					'#ifdef USE_SPECULARMAP',
 					'	vec4 texelSpecular = texture2D( specularMap, vUv );',
+					'	texelSpecular = sRGBToLinear( texelSpecular );',
 					'	// reads channel RGB, compatible with a glTF Specular-Glossiness (RGBA) texture',
 					'	specularFactor *= texelSpecular.rgb;',
 					'#endif'
@@ -1018,7 +1019,7 @@ THREE.GLTFLoader = ( function () {
 
 	/* UTILITY FUNCTIONS */
 
-	function _each( object, callback, thisObj ) {
+	function _each( object, callback ) {
 
 		if ( ! object ) {
 
@@ -1037,7 +1038,7 @@ THREE.GLTFLoader = ( function () {
 
 			for ( var idx = 0; idx < length; idx ++ ) {
 
-				var value = callback.call( thisObj || this, object[ idx ], idx );
+				var value = callback( object[ idx ], idx );
 
 				if ( value ) {
 
@@ -1069,7 +1070,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( object.hasOwnProperty( key ) ) {
 
-					var value = callback.call( thisObj || this, object[ key ], key );
+					var value = callback( object[ key ], key );
 
 					if ( value ) {
 
@@ -1385,7 +1386,6 @@ THREE.GLTFLoader = ( function () {
 		for ( var i = 0; i < dependencies.length; i ++ ) {
 
 			var dependency = dependencies[ i ];
-			var fnName = 'load' + dependency.charAt( 0 ).toUpperCase() + dependency.slice( 1 );
 
 			var cached = this.cache.get( dependency );
 
@@ -1393,8 +1393,9 @@ THREE.GLTFLoader = ( function () {
 
 				_dependencies[ dependency ] = cached;
 
-			} else if ( this[ fnName ] ) {
+			} else {
 
+				var fnName = 'load' + dependency.charAt( 0 ).toUpperCase() + dependency.slice( 1 );
 				var fn = this[ fnName ]();
 				this.cache.add( dependency, fn );
 
@@ -1546,7 +1547,28 @@ THREE.GLTFLoader = ( function () {
 
 		return _each( json.accessors, function ( accessor ) {
 
-			return parser.getDependency( 'bufferView', accessor.bufferView ).then( function ( bufferView ) {
+			var pendingBufferViews = [];
+
+			if ( accessor.bufferView !== undefined ) {
+
+				pendingBufferViews.push( parser.getDependency( 'bufferView', accessor.bufferView ) );
+
+			} else {
+
+				pendingBufferViews.push( null );
+
+			}
+
+			if ( accessor.sparse !== undefined ) {
+
+				pendingBufferViews.push( parser.getDependency( 'bufferView', accessor.sparse.indices.bufferView ) );
+				pendingBufferViews.push( parser.getDependency( 'bufferView', accessor.sparse.values.bufferView ) );
+
+			}
+
+			return Promise.all( pendingBufferViews ).then( function ( bufferViews ) {
+
+				var bufferView = bufferViews[ 0 ];
 
 				var itemSize = WEBGL_TYPE_SIZES[ accessor.type ];
 				var TypedArray = WEBGL_COMPONENT_TYPES[ accessor.componentType ];
@@ -1556,7 +1578,7 @@ THREE.GLTFLoader = ( function () {
 				var itemBytes = elementBytes * itemSize;
 				var byteStride = json.bufferViews[ accessor.bufferView ].byteStride;
 				var normalized = accessor.normalized === true;
-				var array;
+				var array, bufferAttribute;
 
 				// The buffer is not interleaved if the stride is the item size in bytes.
 				if ( byteStride && byteStride !== itemBytes ) {
@@ -1567,15 +1589,58 @@ THREE.GLTFLoader = ( function () {
 					// Integer parameters to IB/IBA are in array elements, not bytes.
 					var ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
 
-					return new THREE.InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes, normalized );
+					bufferAttribute = new THREE.InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes, normalized );
 
 				} else {
 
-					array = new TypedArray( bufferView, accessor.byteOffset, accessor.count * itemSize );
+					if ( bufferView === null ) {
 
-					return new THREE.BufferAttribute( array, itemSize, normalized );
+						array = new TypedArray( accessor.count * itemSize );
+
+					} else {
+
+						array = new TypedArray( bufferView, accessor.byteOffset, accessor.count * itemSize );
+
+					}
+
+					bufferAttribute = new THREE.BufferAttribute( array, itemSize, normalized );
 
 				}
+
+				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#sparse-accessors
+				if ( accessor.sparse !== undefined ) {
+
+					var itemSizeIndices = WEBGL_TYPE_SIZES.SCALAR;
+					var TypedArrayIndices = WEBGL_COMPONENT_TYPES[ accessor.sparse.indices.componentType ];
+
+					var byteOffsetIndices = accessor.sparse.indices.byteOffset || 0;
+					var byteOffsetValues = accessor.sparse.values.byteOffset || 0;
+
+					var sparseIndices = new TypedArrayIndices( bufferViews[ 1 ], byteOffsetIndices, accessor.sparse.count * itemSizeIndices );
+					var sparseValues = new TypedArray( bufferViews[ 2 ], byteOffsetValues, accessor.sparse.count * itemSize );
+
+					if ( bufferView !== null ) {
+
+						// Avoid modifying the original ArrayBuffer, if the bufferView wasn't initialized with zeroes.
+						bufferAttribute.setArray( bufferAttribute.array.slice() );
+
+					}
+
+					for ( var i = 0; i < sparseIndices.length; i++ ) {
+
+						var index = sparseIndices[ i ];
+
+						bufferAttribute.setX( index, sparseValues[ i * itemSize ] );
+						if ( itemSize >= 2 ) bufferAttribute.setY( index, sparseValues[ i * itemSize + 1 ] );
+						if ( itemSize >= 3 ) bufferAttribute.setZ( index, sparseValues[ i * itemSize + 2 ] );
+						if ( itemSize >= 4 ) bufferAttribute.setW( index, sparseValues[ i * itemSize + 3 ] );
+						if ( itemSize >= 5 ) throw new Error( 'THREE.GLTFLoader: Unsupported itemSize in sparse BufferAttribute.' );
+
+					}
+
+				}
+
+				return bufferAttribute;
 
 			} );
 
@@ -1905,8 +1970,6 @@ THREE.GLTFLoader = ( function () {
 				for ( var attributeId in attributes ) {
 
 					var attributeEntry = attributes[ attributeId ];
-
-					if ( attributeEntry === undefined ) return;
 
 					var bufferAttribute = dependencies.accessors[ attributeEntry ];
 
@@ -2368,8 +2431,7 @@ THREE.GLTFLoader = ( function () {
 		return scope._withDependencies( [
 
 			'meshes',
-			'skins',
-			'cameras'
+			'skins'
 
 		] ).then( function ( dependencies ) {
 

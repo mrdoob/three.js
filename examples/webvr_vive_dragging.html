@@ -143,13 +143,11 @@
 				// controllers
 
 				controller1 = new THREE.ViveController( 0 );
-				controller1.standingMatrix = renderer.vr.getStandingMatrix();
 				controller1.addEventListener( 'triggerdown', onTriggerDown );
 				controller1.addEventListener( 'triggerup', onTriggerUp );
 				user.add( controller1 );
 
 				controller2 = new THREE.ViveController( 1 );
-				controller2.standingMatrix = renderer.vr.getStandingMatrix();
 				controller2.addEventListener( 'triggerdown', onTriggerDown );
 				controller2.addEventListener( 'triggerup', onTriggerUp );
 				user.add( controller2 );

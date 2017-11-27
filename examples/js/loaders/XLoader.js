@@ -725,6 +725,11 @@
 			key: '_makeBoneFrom_CurrentFrame',
 			value: function _makeBoneFrom_CurrentFrame() {
 
+				if ( ! this._currentFrame.FrameTransformMatrix ) {
+
+					return;
+
+				}
 				var b = new THREE.Bone();
 				b.name = this._currentFrame.name;
 				b.applyMatrix( this._currentFrame.FrameTransformMatrix );
@@ -1315,19 +1320,19 @@
 					}
 					var bufferGeometry = new THREE.BufferGeometry().fromGeometry( this._currentGeo.Geometry );
 					bufferGeometry.bones = putBones;
-					mesh = new THREE.SkinnedMesh( bufferGeometry, new THREE.MultiMaterial( this._currentGeo.Materials ) );
+					mesh = new THREE.SkinnedMesh( bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
 					mesh.skeleton.boneInverses = offsetList;
 
 				} else {
 
 					var _bufferGeometry = new THREE.BufferGeometry().fromGeometry( this._currentGeo.Geometry );
-					mesh = new THREE.Mesh( _bufferGeometry, new THREE.MultiMaterial( this._currentGeo.Materials ) );
+					mesh = new THREE.Mesh( _bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
 
 				}
 				mesh.name = this._currentGeo.name;
 				var worldBaseMx = new THREE.Matrix4();
 				var currentMxFrame = this._currentGeo.baseFrame.putBone;
-				if ( currentMxFrame.parent ) {
+				if ( currentMxFrame && currentMxFrame.parent ) {
 
 					while ( true ) {
 
@@ -1343,9 +1348,9 @@
 						}
 
 					}
+					mesh.applyMatrix( worldBaseMx );
 
 				}
-				mesh.applyMatrix( worldBaseMx );
 				this.Meshes.push( mesh );
 
 			}

@@ -37,12 +37,6 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( "getStandingMatrix", ( assert ) => {
-
-				assert.ok( false, "everything's gonna be alright" );
-
-			} );
-
 			QUnit.test( "submitFrame", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );

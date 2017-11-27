@@ -42,8 +42,6 @@ var files = {
 		"webgl_geometry_terrain_fog",
 		"webgl_geometry_terrain_raycast",
 		"webgl_geometry_text",
-		"webgl_geometry_text_earcut",
-		"webgl_geometry_text_pnltri",
 		"webgl_geometry_text_shapes",
 		"webgl_gpgpu_birds",
 		"webgl_gpgpu_water",

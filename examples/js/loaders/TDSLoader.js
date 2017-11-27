@@ -22,8 +22,6 @@ THREE.TDSLoader = function ( manager ) {
 	this.materials = [];
 	this.meshes = [];
 
-	this.path = "";
-
 };
 
 THREE.TDSLoader.prototype = {
@@ -43,13 +41,16 @@ THREE.TDSLoader.prototype = {
 
 		var scope = this;
 
+
+		var path = this.path !== undefined ? this.path : THREE.Loader.prototype.extractUrlBase( url );
+
 		var loader = new THREE.FileLoader( this.manager );
 
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data ) );
+			onLoad( scope.parse( data, path ) );
 
 		}, onProgress, onError );
 
@@ -63,14 +64,14 @@ THREE.TDSLoader.prototype = {
 	 * @param {String} path Path for external resources.
 	 * @return {Object3D} Group loaded from 3ds file.
 	 */
-	parse: function ( arraybuffer ) {
+	parse: function ( arraybuffer, path ) {
 
 		this.group = new THREE.Group();
 		this.position = 0;
 		this.materials = [];
 		this.meshes = [];
 
-		this.readFile( arraybuffer );
+		this.readFile( arraybuffer, path );
 
 		for ( var i = 0; i < this.meshes.length; i ++ ) {
 
@@ -88,7 +89,7 @@ THREE.TDSLoader.prototype = {
 	 * @method readFile
 	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
 	 */
-	readFile: function ( arraybuffer ) {
+	readFile: function ( arraybuffer, path ) {
 
 		var data = new DataView( arraybuffer );
 		var chunk = this.readChunk( data );
@@ -107,7 +108,7 @@ THREE.TDSLoader.prototype = {
 				} else if ( next === MDATA ) {
 
 					this.resetPosition( data );
-					this.readMeshData( data );
+					this.readMeshData( data, path );
 
 				} else {
 
@@ -131,7 +132,7 @@ THREE.TDSLoader.prototype = {
 	 * @method readMeshData
 	 * @param {Dataview} data Dataview in use.
 	 */
-	readMeshData: function ( data ) {
+	readMeshData: function ( data, path ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
@@ -159,7 +160,7 @@ THREE.TDSLoader.prototype = {
 
 				this.debugMessage( 'Material' );
 				this.resetPosition( data );
-				this.readMaterialEntry( data );
+				this.readMaterialEntry( data, path );
 
 			} else {
 
@@ -215,7 +216,7 @@ THREE.TDSLoader.prototype = {
 	 * @method readMaterialEntry
 	 * @param {Dataview} data Dataview in use.
 	 */
-	readMaterialEntry: function ( data ) {
+	readMaterialEntry: function ( data, path ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
@@ -274,25 +275,25 @@ THREE.TDSLoader.prototype = {
 
 				this.debugMessage( '   ColorMap' );
 				this.resetPosition( data );
-				material.map = this.readMap( data );
+				material.map = this.readMap( data, path );
 
 			} else if ( next === MAT_BUMPMAP ) {
 
 				this.debugMessage( '   BumpMap' );
 				this.resetPosition( data );
-				material.bumpMap = this.readMap( data );
+				material.bumpMap = this.readMap( data, path );
 
 			} else if ( next === MAT_OPACMAP ) {
 
 				this.debugMessage( '   OpacityMap' );
 				this.resetPosition( data );
-				material.alphaMap = this.readMap( data );
+				material.alphaMap = this.readMap( data, path );
 
 			} else if ( next === MAT_SPECMAP ) {
 
 				this.debugMessage( '   SpecularMap' );
 				this.resetPosition( data );
-				material.specularMap = this.readMap( data );
+				material.specularMap = this.readMap( data, path );
 
 			} else {
 
@@ -561,14 +562,14 @@ THREE.TDSLoader.prototype = {
 	 * @param {Dataview} data Dataview in use.
 	 * @return {Texture} Texture read from this data chunk.
 	 */
-	readMap: function ( data ) {
+	readMap: function ( data, path ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
 		var texture = {};
 
-		var loader = new THREE.TextureLoader();
-		loader.setPath( this.path );
+		var loader = new THREE.TextureLoader( this.manager );
+		loader.setPath( path );
 
 		while ( next !== 0 ) {
 
@@ -577,7 +578,7 @@ THREE.TDSLoader.prototype = {
 				var name = this.readString( data, 128 );
 				texture = loader.load( name );
 
-				this.debugMessage( '      File: ' + this.path + name );
+				this.debugMessage( '      File: ' + path + name );
 
 			} else if ( next === MAT_MAP_UOFFSET ) {
 
@@ -898,11 +899,7 @@ THREE.TDSLoader.prototype = {
 	 */
 	setPath: function ( path ) {
 
-		if ( path !== undefined ) {
-
-			this.path = path;
-
-		}
+		this.path = path;
 
 		return this;
 

@@ -48,6 +48,7 @@
 			camera.layers.enable( 1 );
 
 			var geometry = new THREE.CubeGeometry( 100, 100, 100 );
+			geometry.scale( 1, 1, - 1 );
 			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe_stereo.jpg", 12 );
 
 			var materials = [];
@@ -59,7 +60,6 @@
 			}
 
 			var skyBox = new THREE.Mesh( geometry, materials );
-			skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
 			skyBox.layers.set( 1 );
 			scene.add( skyBox );
 
@@ -73,7 +73,6 @@
 			}
 
 			var skyBoxR = new THREE.Mesh( geometry, materialsR );
-			skyBoxR.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
 			skyBoxR.layers.set( 2 );
 			scene.add( skyBoxR );
 
