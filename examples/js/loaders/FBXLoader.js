@@ -1,6 +1,7 @@
 /**
  * @author Kyle-Larson https://github.com/Kyle-Larson
  * @author Takahiro https://github.com/takahirox
+ * @author Lewy Blue https://github.com/looeee
  *
  * Loader loads FBX file and generates Group representing FBX scene.
  * Requires FBX file to be >= 7.0 and in ASCII or to be any version in Binary format.
@@ -1824,7 +1825,7 @@
 		var material = null;
 		var materials = [];
 
-		// get geometry and materials[ s ] from connections
+		// get geometry and materials(s) from connections
 		relationships.children.forEach( function ( child ) {
 
 			if ( geometryMap.has( child.ID ) ) {
