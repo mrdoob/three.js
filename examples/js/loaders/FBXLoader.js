@@ -605,8 +605,8 @@
 
 				if ( deformerNode.attrType === 'Skin' ) {
 
-					var conns = connections.get( parseInt( nodeID ) );
-					var skeleton = parseSkeleton( conns, DeformerNodes );
+					var relationships = connections.get( parseInt( nodeID ) );
+					var skeleton = parseSkeleton( relationships, DeformerNodes );
 					skeleton.FBX_ID = parseInt( nodeID );
 
 					deformers[ nodeID ] = skeleton;
@@ -709,7 +709,9 @@
 
 		var deformer = relationships.children.reduce( function ( deformer, child ) {
 
-			if ( deformers[ child.ID ] !== undefined ) return deformers[ child.ID ];
+			if ( deformers[ child.ID ] !== undefined ) deformer = deformers[ child.ID ];
+
+			return deformer;
 
 		}, null );
 
@@ -1498,23 +1500,12 @@
 
 			setModelTransforms( FBXTree, model, modelNode, connections, sceneGraph );
 
-			var parents = connections.get( model.FBX_ID ).parents;
+			var parentConnections = connections.get( model.FBX_ID ).parents;
 
-			parents.forEach( function ( parent ) {
+			parentConnections.forEach( function ( connection ) {
 
-				var modelArray = Array.from( modelMap.values() );
-
-				var pIndex = modelArray.map( function ( model ) {
-
-					return model.FBX_ID;
-
-				} ).indexOf( parent.ID );
-
-				if ( pIndex > - 1 ) {
-
-					modelArray[ pIndex ].add( model );
-
-				}
+				var parent = modelMap.get( connection.ID );
+				if ( parent !== undefined ) parent.add( model );
 
 			} );
 
@@ -1546,10 +1537,11 @@
 
 			var id = parseInt( nodeID );
 			var node = modelNodes[ nodeID ];
-			var conns = connections.get( id );
+			var relationships = connections.get( id );
 			var model = null;
 
-			conns.parents.forEach( function ( parent ) {
+			// create bones
+			relationships.parents.forEach( function ( parent ) {
 
 				for ( var FBX_ID in deformers ) {
 
@@ -1563,9 +1555,14 @@
 						model = new THREE.Bone();
 						deformer.bones[ subDeformer.index ] = model;
 
-						// seems like we need this not to make non-connected bone, maybe?
-						// TODO: confirm
-						if ( model2 !== null ) model.add( model2 );
+						// In cases where a bone is shared between multiple meshes
+						// model will already be defined and we'll hit this case
+						// TODO: currently doesn't work correctly
+						if ( model2 !== null ) {
+
+							model.add( model2 );
+
+						}
 
 					}
 
@@ -1578,16 +1575,16 @@
 				switch ( node.attrType ) {
 
 					case 'Camera':
-						model = createCamera( FBXTree, conns );
+						model = createCamera( FBXTree, relationships );
 						break;
 					case 'Light':
-						model = createLight( FBXTree, conns );
+						model = createLight( FBXTree, relationships );
 						break;
 					case 'Mesh':
-						model = createMesh( FBXTree, conns, geometryMap, materialMap );
+						model = createMesh( FBXTree, relationships, geometryMap, materialMap );
 						break;
 					case 'NurbsCurve':
-						model = createCurve( conns, geometryMap );
+						model = createCurve( relationships, geometryMap );
 						break;
 					default:
 						model = new THREE.Group();
@@ -1609,12 +1606,12 @@
 	}
 
 	// create a THREE.PerspectiveCamera or THREE.OrthographicCamera
-	function createCamera( FBXTree, conns ) {
+	function createCamera( FBXTree, relationships ) {
 
 		var model;
 		var cameraAttribute;
 
-		conns.children.forEach( function ( child ) {
+		relationships.children.forEach( function ( child ) {
 
 			var attr = FBXTree.Objects.subNodes.NodeAttribute[ child.ID ];
 
@@ -1697,12 +1694,12 @@
 	}
 
 	// Create a THREE.DirectionalLight, THREE.PointLight or THREE.SpotLight
-	function createLight( FBXTree, conns ) {
+	function createLight( FBXTree, relationships ) {
 
 		var model;
 		var lightAttribute;
 
-		conns.children.forEach( function ( child ) {
+		relationships.children.forEach( function ( child ) {
 
 			var attr = FBXTree.Objects.subNodes.NodeAttribute[ child.ID ];
 
@@ -1820,14 +1817,15 @@
 
 	}
 
-	function createMesh( FBXTree, conns, geometryMap, materialMap ) {
+	function createMesh( FBXTree, relationships, geometryMap, materialMap ) {
 
 		var model;
 		var geometry = null;
 		var material = null;
 		var materials = [];
 
-		conns.children.forEach( function ( child ) {
+		// get geometry and materials[ s ] from connections
+		relationships.children.forEach( function ( child ) {
 
 			if ( geometryMap.has( child.ID ) ) {
 
@@ -1888,15 +1886,13 @@
 
 	}
 
-	function createCurve( conns, geometryMap ) {
+	function createCurve( relationships, geometryMap ) {
 
-		var geometry = conns.children.reduce( function ( geo, child ) {
+		var geometry = relationships.children.reduce( function ( geo, child ) {
 
-			if ( geometryMap.has( child.ID ) ) {
+			if ( geometryMap.has( child.ID ) ) geo = geometryMap.get( child.ID );
 
-				return geometryMap.get( child.ID );
-
-			}
+			return geo;
 
 		}, null );
 
@@ -2084,21 +2080,22 @@
 			// Now that skeleton is in bind pose, bind to model.
 			deformer.skeleton = new THREE.Skeleton( deformer.bones );
 
-			var conns = connections.get( deformer.FBX_ID );
-			var parents = conns.parents;
+			var relationships = connections.get( deformer.FBX_ID );
+			var parents = relationships.parents;
 
 			parents.forEach( function ( parent ) {
 
 				if ( geometryMap.has( parent.ID ) ) {
 
 					var geoID = parent.ID;
-					var geoConns = connections.get( geoID );
+					var georelationships = connections.get( geoID );
 
-					geoConns.parents.forEach( function ( geoConnParent ) {
+					georelationships.parents.forEach( function ( geoConnParent ) {
 
 						if ( modelMap.has( geoConnParent.ID ) ) {
 
 							var model = modelMap.get( geoConnParent.ID );
+
 							model.bind( deformer.skeleton, model.matrixWorld );
 
 						}
@@ -2183,12 +2180,12 @@
 
 			};
 
-			var conns = connections.get( animationCurve.id );
+			var relationships = connections.get( animationCurve.id );
 
-			if ( conns !== undefined ) {
+			if ( relationships !== undefined ) {
 
-				var animationCurveID = conns.parents[ 0 ].ID;
-				var animationCurveRelationship = conns.parents[ 0 ].relationship;
+				var animationCurveID = relationships.parents[ 0 ].ID;
+				var animationCurveRelationship = relationships.parents[ 0 ].relationship;
 				var axis = '';
 
 				if ( animationCurveRelationship.match( /X/ ) ) {
@@ -2245,7 +2242,13 @@
 
 						if ( layerCurveNodes[ i ] === undefined ) {
 
-							var modelID = connections.get( child.ID ).parents[ 1 ].ID;
+							var modelID;
+
+							connections.get( child.ID ).parents.forEach( function ( parent ) {
+
+								if ( parent.relationship !== undefined ) modelID = parent.ID;
+
+							} );
 
 							var rawModel = FBXTree.Objects.subNodes.Model[ modelID.toString() ];
 
