@@ -1124,6 +1124,10 @@ function WebGLRenderer( parameters ) {
 
 		//
 
+		textures.updateVideoTextures();
+
+		//
+
 		if ( _clippingEnabled ) _clipping.beginShadows();
 
 		shadowMap.render( shadowsArray, scene, camera );
