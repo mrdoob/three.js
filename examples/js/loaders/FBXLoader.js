@@ -2046,9 +2046,7 @@
 					var poseNode = BindPoseNode[ nodeID ].subNodes.PoseNode;
 
 					var rawMatWrd = new THREE.Matrix4().fromArray( poseNode.subNodes.Matrix.properties.a );
-					worldMatrices.set( parseInt( poseNode.properties.Node ), rawMatWrd )
-
-
+					worldMatrices.set( parseInt( poseNode.properties.Node ), rawMatWrd );
 
 				}
 
