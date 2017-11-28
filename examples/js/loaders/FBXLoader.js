@@ -2043,10 +2043,23 @@
 
 				if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
 
-					var poseNode = BindPoseNode[ nodeID ].subNodes.PoseNode;
+					var poseNodes = BindPoseNode[ nodeID ].subNodes.PoseNode;
 
-					var rawMatWrd = new THREE.Matrix4().fromArray( poseNode.subNodes.Matrix.properties.a );
-					worldMatrices.set( parseInt( poseNode.properties.Node ), rawMatWrd );
+					if ( Array.isArray( poseNodes ) ) {
+
+						poseNodes.forEach( function ( node ) {
+
+							var rawMatWrd = new THREE.Matrix4().fromArray( node.subNodes.Matrix.properties.a );
+							worldMatrices.set( parseInt( node.properties.Node ), rawMatWrd );
+
+						} );
+
+					} else {
+
+						var rawMatWrd = new THREE.Matrix4().fromArray( poseNodes.subNodes.Matrix.properties.a );
+						worldMatrices.set( parseInt( poseNodes.properties.Node ), rawMatWrd );
+
+					}
 
 				}
 
