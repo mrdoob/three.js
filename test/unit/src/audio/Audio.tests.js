@@ -10,129 +10,129 @@ export default QUnit.module( 'Audios', () => {
 	QUnit.module.todo( 'Audio', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "getOutput", ( assert ) => {
+		QUnit.todo( "getOutput", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setNodeSource", ( assert ) => {
+		QUnit.todo( "setNodeSource", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setBuffer", ( assert ) => {
+		QUnit.todo( "setBuffer", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "play", ( assert ) => {
+		QUnit.todo( "play", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "pause", ( assert ) => {
+		QUnit.todo( "pause", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "stop", ( assert ) => {
+		QUnit.todo( "stop", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "connect", ( assert ) => {
+		QUnit.todo( "connect", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "disconnect", ( assert ) => {
+		QUnit.todo( "disconnect", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getFilters", ( assert ) => {
+		QUnit.todo( "getFilters", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setFilters", ( assert ) => {
+		QUnit.todo( "setFilters", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getFilter", ( assert ) => {
+		QUnit.todo( "getFilter", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setFilter", ( assert ) => {
+		QUnit.todo( "setFilter", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setPlaybackRate", ( assert ) => {
+		QUnit.todo( "setPlaybackRate", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getPlaybackRate", ( assert ) => {
+		QUnit.todo( "getPlaybackRate", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "onEnded", ( assert ) => {
+		QUnit.todo( "onEnded", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getLoop", ( assert ) => {
+		QUnit.todo( "getLoop", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setLoop", ( assert ) => {
+		QUnit.todo( "setLoop", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getVolume", ( assert ) => {
+		QUnit.todo( "getVolume", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setVolume", ( assert ) => {
+		QUnit.todo( "setVolume", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

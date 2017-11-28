@@ -10,33 +10,33 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module.todo( 'Sprite', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isSprite", ( assert ) => {
+		QUnit.todo( "isSprite", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "raycast", ( assert ) => {
+		QUnit.todo( "raycast", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -12,7 +12,7 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLShader', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

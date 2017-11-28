@@ -12,44 +12,44 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module.todo( 'ShapePath', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "moveTo", ( assert ) => {
+			QUnit.todo( "moveTo", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "lineTo", ( assert ) => {
+			QUnit.todo( "lineTo", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "quadraticCurveTo", ( assert ) => {
+			QUnit.todo( "quadraticCurveTo", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "bezierCurveTo", ( assert ) => {
+			QUnit.todo( "bezierCurveTo", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "splineThru", ( assert ) => {
+			QUnit.todo( "splineThru", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "toShapes", ( assert ) => {
+			QUnit.todo( "toShapes", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

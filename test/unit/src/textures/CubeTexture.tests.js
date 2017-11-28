@@ -10,28 +10,28 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module.todo( 'CubeTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( "images", ( assert ) => {
+		QUnit.todo( "images", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isCubeTexture", ( assert ) => {
+		QUnit.todo( "isCubeTexture", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

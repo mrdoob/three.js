@@ -12,26 +12,26 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLGeometries', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "get", ( assert ) => {
+			QUnit.todo( "get", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "update", ( assert ) => {
+			QUnit.todo( "update", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getWireframeAttribute", ( assert ) => {
+			QUnit.todo( "getWireframeAttribute", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

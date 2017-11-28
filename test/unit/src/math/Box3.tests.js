@@ -187,7 +187,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "isEmpty", ( assert ) => {
+		QUnit.todo( "isEmpty", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

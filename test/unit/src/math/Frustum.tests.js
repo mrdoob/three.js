@@ -246,7 +246,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsSphere", ( assert ) => {
+		QUnit.todo( "intersectsSphere", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -269,7 +269,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "containsPoint", ( assert ) => {
+		QUnit.todo( "containsPoint", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

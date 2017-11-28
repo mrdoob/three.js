@@ -12,14 +12,14 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.module.todo( 'CubicInterpolant', () => {
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {
+			QUnit.todo( "Extending", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

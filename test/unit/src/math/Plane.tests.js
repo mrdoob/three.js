@@ -54,7 +54,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isPlane", ( assert ) => {
+		QUnit.todo( "isPlane", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -118,7 +118,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -233,13 +233,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsBox", ( assert ) => {
+		QUnit.todo( "intersectsBox", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "intersectsSphere", ( assert ) => {
+		QUnit.todo( "intersectsSphere", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

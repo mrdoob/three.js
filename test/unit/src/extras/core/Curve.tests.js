@@ -12,74 +12,74 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module.todo( 'Curve', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "getPoint", ( assert ) => {
+			QUnit.todo( "getPoint", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getPointAt", ( assert ) => {
+			QUnit.todo( "getPointAt", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getPoints", ( assert ) => {
+			QUnit.todo( "getPoints", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getSpacedPoints", ( assert ) => {
+			QUnit.todo( "getSpacedPoints", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getLength", ( assert ) => {
+			QUnit.todo( "getLength", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getLengths", ( assert ) => {
+			QUnit.todo( "getLengths", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "updateArcLengths", ( assert ) => {
+			QUnit.todo( "updateArcLengths", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getUtoTmapping", ( assert ) => {
+			QUnit.todo( "getUtoTmapping", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getTangent", ( assert ) => {
+			QUnit.todo( "getTangent", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getTangentAt", ( assert ) => {
+			QUnit.todo( "getTangentAt", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "computeFrenetFrames", ( assert ) => {
+			QUnit.todo( "computeFrenetFrames", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

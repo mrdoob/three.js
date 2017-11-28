@@ -12,19 +12,19 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module.todo( 'Interpolations', () => {
 
 			// PUBLIC STUFF
-			QUnit.test( "CatmullRom", ( assert ) => {
+			QUnit.todo( "CatmullRom", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "QuadraticBezier", ( assert ) => {
+			QUnit.todo( "QuadraticBezier", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "CubicBezier", ( assert ) => {
+			QUnit.todo( "CubicBezier", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

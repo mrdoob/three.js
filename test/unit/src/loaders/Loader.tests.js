@@ -10,39 +10,39 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module.todo( 'Loader', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// STATIC STUFF
-		QUnit.test( "Handlers.add", ( assert ) => {
+		QUnit.todo( "Handlers.add", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "Handlers.get", ( assert ) => {
+		QUnit.todo( "Handlers.get", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "extractUrlBase", ( assert ) => {
+		QUnit.todo( "extractUrlBase", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "initMaterials", ( assert ) => {
+		QUnit.todo( "initMaterials", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "createMaterial", ( assert ) => {
+		QUnit.todo( "createMaterial", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

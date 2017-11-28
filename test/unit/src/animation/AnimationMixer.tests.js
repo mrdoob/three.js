@@ -10,63 +10,63 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module.todo( 'AnimationMixer', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "clipAction", ( assert ) => {
+		QUnit.todo( "clipAction", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "existingAction", ( assert ) => {
+		QUnit.todo( "existingAction", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "stopAllAction", ( assert ) => {
+		QUnit.todo( "stopAllAction", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "update", ( assert ) => {
+		QUnit.todo( "update", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getRoot", ( assert ) => {
+		QUnit.todo( "getRoot", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "uncacheClip", ( assert ) => {
+		QUnit.todo( "uncacheClip", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "uncacheRoot", ( assert ) => {
+		QUnit.todo( "uncacheRoot", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "uncacheAction", ( assert ) => {
+		QUnit.todo( "uncacheAction", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

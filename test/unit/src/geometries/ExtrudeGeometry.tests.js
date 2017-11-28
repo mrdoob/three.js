@@ -10,14 +10,14 @@ export default QUnit.module( 'Geometries', () => {
 	QUnit.module.todo( 'ExtrudeGeometry', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -28,43 +28,43 @@ export default QUnit.module( 'Geometries', () => {
 	QUnit.module.todo( 'ExtrudeBufferGeometry', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// STATIC STUFF
-		QUnit.test( "WorldUVGenerator.generateTopUV", ( assert ) => {
+		QUnit.todo( "WorldUVGenerator.generateTopUV", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "WorldUVGenerator.generateSideWallUV", ( assert ) => {
+		QUnit.todo( "WorldUVGenerator.generateSideWallUV", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// OTHERS
-		QUnit.test( "getArrays", ( assert ) => {
+		QUnit.todo( "getArrays", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "addShapeList", ( assert ) => {
+		QUnit.todo( "addShapeList", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "addShape", ( assert ) => {
+		QUnit.todo( "addShape", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

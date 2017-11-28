@@ -10,50 +10,50 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module.todo( 'Material', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMaterial", ( assert ) => {
+		QUnit.todo( "isMaterial", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "onBeforeCompile", ( assert ) => {
+		QUnit.todo( "onBeforeCompile", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setValues", ( assert ) => {
+		QUnit.todo( "setValues", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "toJSON", ( assert ) => {
+		QUnit.todo( "toJSON", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "dispose", ( assert ) => {
+		QUnit.todo( "dispose", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -42,27 +42,27 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "update", ( assert ) => {
+		QUnit.todo( "update", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setFromObject", ( assert ) => {
+		QUnit.todo( "setFromObject", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

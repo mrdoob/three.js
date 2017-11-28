@@ -11,7 +11,7 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module.todo( 'ShaderChunk', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			QUnit.todo( 'write me !', ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

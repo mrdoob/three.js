@@ -34,7 +34,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isSpherical", ( assert ) => {
+		QUnit.todo( "isSpherical", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -24,27 +24,27 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {
+			QUnit.todo( "Extending", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "isQuadraticBezierCurve3", ( assert ) => {
+			QUnit.todo( "isQuadraticBezierCurve3", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getPoint", ( assert ) => {
+			QUnit.todo( "getPoint", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

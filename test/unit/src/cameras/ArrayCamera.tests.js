@@ -10,21 +10,21 @@ export default QUnit.module( 'Cameras', () => {
 	QUnit.module.todo( 'ArrayCamera', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isArrayCamera", ( assert ) => {
+		QUnit.todo( "isArrayCamera", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

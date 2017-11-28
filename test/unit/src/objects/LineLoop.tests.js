@@ -10,21 +10,21 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module.todo( 'LineLoop', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isLineLoop", ( assert ) => {
+		QUnit.todo( "isLineLoop", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

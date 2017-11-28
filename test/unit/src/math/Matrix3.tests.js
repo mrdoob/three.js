@@ -77,7 +77,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMatrix3", ( assert ) => {
+		QUnit.todo( "isMatrix3", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -148,7 +148,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromMatrix4", ( assert ) => {
+		QUnit.todo( "setFromMatrix4", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -349,7 +349,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "transposeIntoArray", ( assert ) => {
+		QUnit.todo( "transposeIntoArray", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -449,7 +449,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "fromArray", ( assert ) => {
+		QUnit.todo( "fromArray", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

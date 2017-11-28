@@ -10,21 +10,21 @@ export default QUnit.module( 'Helpers', () => {
 	QUnit.module.todo( 'SkeletonHelper', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "updateMatrixWorld", ( assert ) => {
+		QUnit.todo( "updateMatrixWorld", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

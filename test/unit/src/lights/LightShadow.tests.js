@@ -12,7 +12,7 @@ export default QUnit.module( 'Lights', () => {
 	QUnit.module.todo( 'LightShadow', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -41,7 +41,7 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( "toJSON", ( assert ) => {
+		QUnit.todo( "toJSON", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

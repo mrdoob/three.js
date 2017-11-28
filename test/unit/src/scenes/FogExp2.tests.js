@@ -10,33 +10,33 @@ export default QUnit.module( 'FoxExp2', () => {
 	QUnit.module.todo( 'Scene', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isFogExp2", ( assert ) => {
+		QUnit.todo( "isFogExp2", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "toJSON", ( assert ) => {
+		QUnit.todo( "toJSON", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

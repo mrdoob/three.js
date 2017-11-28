@@ -10,33 +10,33 @@ export default QUnit.module( 'Scenes', () => {
 	QUnit.module.todo( 'Scene', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isScene", ( assert ) => {
+		QUnit.todo( "isScene", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "toJSON", ( assert ) => {
+		QUnit.todo( "toJSON", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

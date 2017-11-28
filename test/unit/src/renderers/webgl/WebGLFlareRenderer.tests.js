@@ -12,14 +12,14 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLFlareRenderer', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "render", ( assert ) => {
+			QUnit.todo( "render", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

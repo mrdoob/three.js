@@ -10,58 +10,58 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module.todo( 'LOD', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( "levels", ( assert ) => {
+		QUnit.todo( "levels", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isLOD", ( assert ) => {
+		QUnit.todo( "isLOD", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "addLevel", ( assert ) => {
+		QUnit.todo( "addLevel", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "getObjectForDistance", ( assert ) => {
+		QUnit.todo( "getObjectForDistance", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "raycast", ( assert ) => {
+		QUnit.todo( "raycast", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "update", ( assert ) => {
+		QUnit.todo( "update", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "toJSON", ( assert ) => {
+		QUnit.todo( "toJSON", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

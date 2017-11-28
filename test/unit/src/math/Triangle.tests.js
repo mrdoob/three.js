@@ -32,19 +32,19 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// STATIC STUFF
-		QUnit.test( "normal", ( assert ) => {
+		QUnit.todo( "normal", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "barycoordFromPoint", ( assert ) => {
+		QUnit.todo( "barycoordFromPoint", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "containsPoint", ( assert ) => {
+		QUnit.todo( "containsPoint", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -74,7 +74,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -10,27 +10,27 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module.todo( 'MeshDistanceMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMeshDistanceMaterial", ( assert ) => {
+		QUnit.todo( "isMeshDistanceMaterial", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

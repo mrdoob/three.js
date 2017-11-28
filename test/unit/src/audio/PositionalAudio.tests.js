@@ -10,75 +10,75 @@ export default QUnit.module( 'Audios', () => {
 	QUnit.module.todo( 'PositionalAudio', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "getOutput", ( assert ) => {
+		QUnit.todo( "getOutput", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getRefDistance", ( assert ) => {
+		QUnit.todo( "getRefDistance", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setRefDistance", ( assert ) => {
+		QUnit.todo( "setRefDistance", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getRolloffFactor", ( assert ) => {
+		QUnit.todo( "getRolloffFactor", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setRolloffFactor", ( assert ) => {
+		QUnit.todo( "setRolloffFactor", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getDistanceModel", ( assert ) => {
+		QUnit.todo( "getDistanceModel", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setDistanceModel", ( assert ) => {
+		QUnit.todo( "setDistanceModel", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getMaxDistance", ( assert ) => {
+		QUnit.todo( "getMaxDistance", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setMaxDistance", ( assert ) => {
+		QUnit.todo( "setMaxDistance", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "updateMatrixWorld", ( assert ) => {
+		QUnit.todo( "updateMatrixWorld", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

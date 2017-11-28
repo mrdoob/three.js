@@ -10,32 +10,32 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module.todo( 'PropertyMixer', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "accumulate", ( assert ) => {
+		QUnit.todo( "accumulate", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "apply", ( assert ) => {
+		QUnit.todo( "apply", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "saveOriginalState", ( assert ) => {
+		QUnit.todo( "saveOriginalState", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "restoreOriginalState", ( assert ) => {
+		QUnit.todo( "restoreOriginalState", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

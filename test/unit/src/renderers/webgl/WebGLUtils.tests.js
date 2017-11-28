@@ -12,14 +12,14 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLUtils', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "convert", ( assert ) => {
+			QUnit.todo( "convert", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

@@ -12,20 +12,20 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module.todo( 'WebGLLights', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "setup", ( assert ) => {
+			QUnit.todo( "setup", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "state", ( assert ) => {
+			QUnit.todo( "state", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

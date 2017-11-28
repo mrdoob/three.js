@@ -10,14 +10,14 @@ export default QUnit.module( 'Cameras', () => {
 	QUnit.module.todo( 'StereoCamera', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "update", ( assert ) => {
+		QUnit.todo( "update", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -10,14 +10,14 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module.todo( 'DataTextureLoader', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "load", ( assert ) => {
+		QUnit.todo( "load", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

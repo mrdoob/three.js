@@ -49,7 +49,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lerp", ( assert ) => {
+		QUnit.todo( "lerp", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -67,7 +67,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "smootherstep", ( assert ) => {
+		QUnit.todo( "smootherstep", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

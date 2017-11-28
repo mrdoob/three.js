@@ -10,63 +10,63 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module.todo( 'AnimationClip', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// STATIC STUFF
-		QUnit.test( "parse", ( assert ) => {
+		QUnit.todo( "parse", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "toJSON", ( assert ) => {
+		QUnit.todo( "toJSON", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "CreateFromMorphTargetSequence", ( assert ) => {
+		QUnit.todo( "CreateFromMorphTargetSequence", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "findByName", ( assert ) => {
+		QUnit.todo( "findByName", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "CreateClipsFromMorphTargetSequences", ( assert ) => {
+		QUnit.todo( "CreateClipsFromMorphTargetSequences", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "parseAnimation", ( assert ) => {
+		QUnit.todo( "parseAnimation", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "resetDuration", ( assert ) => {
+		QUnit.todo( "resetDuration", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "trim", ( assert ) => {
+		QUnit.todo( "trim", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "optimize", ( assert ) => {
+		QUnit.todo( "optimize", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

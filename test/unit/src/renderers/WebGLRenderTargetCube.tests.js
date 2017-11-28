@@ -10,14 +10,14 @@ export default QUnit.module( 'Renderers', () => {
 	QUnit.module.todo( 'WebGLRenderTargetCube', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isWebGLRenderTargetCube", ( assert ) => {
+		QUnit.todo( "isWebGLRenderTargetCube", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

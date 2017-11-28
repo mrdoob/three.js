@@ -10,51 +10,51 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module.todo( 'Texture', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( "needsUpdate", ( assert ) => {
+		QUnit.todo( "needsUpdate", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isTexture", ( assert ) => {
+		QUnit.todo( "isTexture", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "toJSON", ( assert ) => {
+		QUnit.todo( "toJSON", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "dispose", ( assert ) => {
+		QUnit.todo( "dispose", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "transformUv", ( assert ) => {
+		QUnit.todo( "transformUv", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
