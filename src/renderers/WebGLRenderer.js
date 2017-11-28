@@ -204,6 +204,8 @@ function WebGLRenderer( parameters ) {
 			powerPreference: _powerPreference
 		};
 
+		// event listeners must be registered before WebGL context is created, see #12753
+
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
