@@ -16,25 +16,6 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		// PRIVATE STUFF
-		QUnit.test( "_select", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "_slerp", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "_lerp", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
 		// PUBLIC STUFF
 		QUnit.test( "accumulate", ( assert ) => {
 

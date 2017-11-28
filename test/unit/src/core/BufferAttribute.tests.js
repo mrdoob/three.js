@@ -11,7 +11,7 @@ import { Vector4 } from '../../../../src/math/Vector4';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'BufferAttribute', () => {
+	QUnit.module( 'BufferAttribute', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -29,14 +29,14 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( "needsUpdate", ( assert ) => {
+		QUnit.todo( "needsUpdate", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isBufferAttribute", ( assert ) => {
+		QUnit.todo( "isBufferAttribute", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -64,7 +64,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setDynamic", ( assert ) => {
+		QUnit.todo( "setDynamic", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

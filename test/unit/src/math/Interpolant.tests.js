@@ -82,18 +82,6 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PRIVATE STUFF
-		QUnit.test( "DefaultSettings_", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "getSettings_", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
 		QUnit.test( "copySampleValue_", ( assert ) => {
 
 			var interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );

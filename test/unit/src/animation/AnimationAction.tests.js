@@ -42,43 +42,6 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		// PRIVATE STUFF
-		QUnit.test( "_update", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "_updateWeight", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "_updateTimeScale", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "_updateTime", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "_setEndings", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "_scheduleFading", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
 		// PUBLIC STUFF
 		QUnit.test( "play", ( assert ) => {
 

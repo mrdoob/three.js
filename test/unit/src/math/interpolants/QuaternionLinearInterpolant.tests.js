@@ -25,13 +25,6 @@ export default QUnit.module( 'Maths', () => {
 
 			} );
 
-			// PRIVATE STUFF
-			QUnit.test( "interpolate_", ( assert ) => {
-
-				assert.ok( false, "everything's gonna be alright" );
-
-			} );
-
 		} );
 
 	} );
