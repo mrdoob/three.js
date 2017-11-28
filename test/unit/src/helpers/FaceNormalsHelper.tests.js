@@ -7,7 +7,7 @@ import { FaceNormalsHelper } from '../../../../src/helpers/FaceNormalsHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'FaceNormalsHelper', () => {
+	QUnit.module( 'FaceNormalsHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

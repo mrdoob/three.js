@@ -9,7 +9,7 @@ export default QUnit.module( 'Animation', () => {
 
 	QUnit.module( 'Tracks', () => {
 
-		QUnit.module.todo( 'NumberKeyframeTrack', () => {
+		QUnit.module( 'NumberKeyframeTrack', () => {
 
 			QUnit.todo( 'write me !', ( assert ) => {
 

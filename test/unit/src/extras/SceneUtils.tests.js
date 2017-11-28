@@ -5,9 +5,9 @@
 
 import { SceneUtils } from '../../../../src/extras/SceneUtils';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'SceneUtils', () => {
+	QUnit.module( 'SceneUtils', () => {
 
 		// PUBLIC STUFF
 		QUnit.todo( "createMultiMaterialObject", ( assert ) => {

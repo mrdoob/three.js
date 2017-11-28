@@ -7,7 +7,7 @@ import { Scene } from '../../../../src/scenes/Scene';
 
 export default QUnit.module( 'Scenes', () => {
 
-	QUnit.module.todo( 'Scene', () => {
+	QUnit.module( 'Scene', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

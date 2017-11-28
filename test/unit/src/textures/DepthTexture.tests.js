@@ -7,7 +7,7 @@ import { DepthTexture } from '../../../../src/textures/DepthTexture';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module.todo( 'DepthTexture', () => {
+	QUnit.module( 'DepthTexture', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

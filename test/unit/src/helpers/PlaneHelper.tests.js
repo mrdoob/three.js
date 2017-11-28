@@ -7,7 +7,7 @@ import { PlaneHelper } from '../../../../src/helpers/PlaneHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'PlaneHelper', () => {
+	QUnit.module( 'PlaneHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

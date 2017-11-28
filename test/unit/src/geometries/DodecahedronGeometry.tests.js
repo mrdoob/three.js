@@ -11,7 +11,7 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'CircleGeometry', ( hooks ) => {
+	QUnit.module( 'CircleGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -52,7 +52,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'CircleBufferGeometry', ( hooks ) => {
+	QUnit.module( 'CircleBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

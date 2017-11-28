@@ -7,7 +7,7 @@ import { AxesHelper } from '../../../../src/helpers/AxesHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'AxesHelper', () => {
+	QUnit.module( 'AxesHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

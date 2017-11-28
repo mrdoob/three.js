@@ -7,7 +7,7 @@ import { FogExp2 } from '../../../../src/scenes/FogExp2';
 
 export default QUnit.module( 'FoxExp2', () => {
 
-	QUnit.module.todo( 'Scene', () => {
+	QUnit.module( 'Scene', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

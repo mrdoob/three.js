@@ -7,7 +7,7 @@ import { Light } from '../../../../src/lights/Light';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module.todo( 'Light', ( hooks ) => {
+	QUnit.module( 'Light', ( hooks ) => {
 
 		var lights = undefined;
 		hooks.beforeEach( function () {

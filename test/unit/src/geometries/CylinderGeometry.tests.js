@@ -11,7 +11,7 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'CylinderGeometry', ( hooks ) => {
+	QUnit.module( 'CylinderGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -64,7 +64,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'CylinderBufferGeometry', ( hooks ) => {
+	QUnit.module( 'CylinderBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

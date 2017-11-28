@@ -7,7 +7,7 @@ import { DirectionalLightHelper } from '../../../../src/helpers/DirectionalLight
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'DirectionalLightHelper', () => {
+	QUnit.module( 'DirectionalLightHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

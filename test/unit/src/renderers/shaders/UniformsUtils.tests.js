@@ -9,7 +9,7 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'Shaders', () => {
 
-		QUnit.module.todo( 'UniformsUtils', () => {
+		QUnit.module( 'UniformsUtils', () => {
 
 			QUnit.todo( 'write me !', ( assert ) => {
 

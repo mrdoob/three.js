@@ -7,7 +7,7 @@ import { CubeTexture } from '../../../../src/textures/CubeTexture';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module.todo( 'CubeTexture', () => {
+	QUnit.module( 'CubeTexture', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

@@ -7,7 +7,7 @@ import { BufferGeometryLoader } from '../../../../src/loaders/BufferGeometryLoad
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'BufferGeometryLoader', () => {
+	QUnit.module( 'BufferGeometryLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

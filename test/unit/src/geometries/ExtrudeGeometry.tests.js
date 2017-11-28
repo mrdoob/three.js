@@ -7,7 +7,7 @@ import { ExtrudeGeometry, ExtrudeBufferGeometry } from '../../../../src/geometri
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'ExtrudeGeometry', () => {
+	QUnit.module( 'ExtrudeGeometry', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
@@ -25,7 +25,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'ExtrudeBufferGeometry', () => {
+	QUnit.module( 'ExtrudeBufferGeometry', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

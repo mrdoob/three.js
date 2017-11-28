@@ -7,7 +7,7 @@ import { MeshLambertMaterial } from '../../../../src/materials/MeshLambertMateri
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'MeshLambertMaterial', () => {
+	QUnit.module( 'MeshLambertMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

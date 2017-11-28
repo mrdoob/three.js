@@ -7,7 +7,7 @@ import { SpotLightHelper } from '../../../../src/helpers/SpotLightHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'SpotLightHelper', () => {
+	QUnit.module( 'SpotLightHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

@@ -7,7 +7,7 @@ import { LineSegments } from '../../../../src/objects/LineSegments';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'LineSegments', () => {
+	QUnit.module( 'LineSegments', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

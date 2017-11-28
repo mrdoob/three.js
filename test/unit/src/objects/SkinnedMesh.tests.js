@@ -7,7 +7,7 @@ import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'SkinnedMesh', () => {
+	QUnit.module( 'SkinnedMesh', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

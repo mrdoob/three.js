@@ -19,7 +19,7 @@ import {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Line3', () => {
+	QUnit.module( 'Line3', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

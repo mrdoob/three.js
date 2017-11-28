@@ -7,7 +7,7 @@ import { ObjectLoader } from '../../../../src/loaders/ObjectLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'ObjectLoader', () => {
+	QUnit.module( 'ObjectLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

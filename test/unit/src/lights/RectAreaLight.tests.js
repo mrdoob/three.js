@@ -8,7 +8,7 @@ import { RectAreaLight } from '../../../../src/lights/RectAreaLight';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module.todo( 'RectAreaLight', ( hooks ) => {
+	QUnit.module( 'RectAreaLight', ( hooks ) => {
 
 		var lights = undefined;
 		hooks.beforeEach( function () {

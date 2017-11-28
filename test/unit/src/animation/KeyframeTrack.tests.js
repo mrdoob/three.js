@@ -7,7 +7,7 @@ import { KeyframeTrack } from '../../../../src/animation/KeyframeTrack';
 
 export default QUnit.module( 'Animation', () => {
 
-	QUnit.module.todo( 'KeyframeTrack', () => {
+	QUnit.module( 'KeyframeTrack', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

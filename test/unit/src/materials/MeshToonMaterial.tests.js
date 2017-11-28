@@ -7,7 +7,7 @@ import { MeshToonMaterial } from '../../../../src/materials/MeshToonMaterial';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'MeshToonMaterial', () => {
+	QUnit.module( 'MeshToonMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

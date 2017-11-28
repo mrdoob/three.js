@@ -30,7 +30,7 @@ function planeEquals( a, b, tolerance ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Frustum', () => {
+	QUnit.module( 'Frustum', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

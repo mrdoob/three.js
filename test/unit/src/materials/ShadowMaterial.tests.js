@@ -7,7 +7,7 @@ import { ShadowMaterial } from '../../../../src/materials/ShadowMaterial';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'LineBasicMaterial', () => {
+	QUnit.module( 'LineBasicMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

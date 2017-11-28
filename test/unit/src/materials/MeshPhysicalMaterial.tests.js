@@ -7,7 +7,7 @@ import { MeshPhysicalMaterial } from '../../../../src/materials/MeshPhysicalMate
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'MeshPhysicalMaterial', () => {
+	QUnit.module( 'MeshPhysicalMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

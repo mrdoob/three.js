@@ -7,7 +7,7 @@ import { DataTexture } from '../../../../src/textures/DataTexture';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module.todo( 'DataTexture', () => {
+	QUnit.module( 'DataTexture', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

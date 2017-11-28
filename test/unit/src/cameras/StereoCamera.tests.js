@@ -7,7 +7,7 @@ import { StereoCamera } from '../../../../src/cameras/StereoCamera';
 
 export default QUnit.module( 'Cameras', () => {
 
-	QUnit.module.todo( 'StereoCamera', () => {
+	QUnit.module( 'StereoCamera', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

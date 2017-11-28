@@ -7,7 +7,7 @@ import { WebGLRenderTarget } from '../../../../src/renderers/WebGLRenderTarget';
 
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module.todo( 'WebGLRenderTarget', () => {
+	QUnit.module( 'WebGLRenderTarget', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

@@ -7,7 +7,7 @@ import { LoadingManager } from '../../../../src/loaders/LoadingManager';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'LoadingManager', () => {
+	QUnit.module( 'LoadingManager', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

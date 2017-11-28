@@ -7,7 +7,7 @@ import { CompressedTextureLoader } from '../../../../src/loaders/CompressedTextu
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'CompressedTextureLoader', () => {
+	QUnit.module( 'CompressedTextureLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

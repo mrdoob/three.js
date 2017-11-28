@@ -9,7 +9,7 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module.todo( 'WebGLCapabilities', () => {
+		QUnit.module( 'WebGLCapabilities', () => {
 
 			// INSTANCING
 			QUnit.todo( "Instancing", ( assert ) => {

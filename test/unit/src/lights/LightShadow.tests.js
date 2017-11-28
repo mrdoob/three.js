@@ -9,7 +9,7 @@ import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module.todo( 'LightShadow', () => {
+	QUnit.module( 'LightShadow', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

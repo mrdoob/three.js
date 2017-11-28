@@ -7,7 +7,7 @@ import { PositionalAudio } from '../../../../src/audio/PositionalAudio.js';
 
 export default QUnit.module( 'Audios', () => {
 
-	QUnit.module.todo( 'PositionalAudio', () => {
+	QUnit.module( 'PositionalAudio', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

@@ -9,7 +9,7 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Interpolants', () => {
 
-		QUnit.module.todo( 'LinearInterpolant', () => {
+		QUnit.module( 'LinearInterpolant', () => {
 
 			// INHERITANCE
 			QUnit.todo( "Extending", ( assert ) => {

@@ -7,7 +7,7 @@ import { VertexNormalsHelper } from '../../../../src/helpers/VertexNormalsHelper
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'VertexNormalsHelper', () => {
+	QUnit.module( 'VertexNormalsHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

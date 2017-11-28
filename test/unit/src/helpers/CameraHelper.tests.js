@@ -7,7 +7,7 @@ import { CameraHelper } from '../../../../src/helpers/CameraHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'CameraHelper', () => {
+	QUnit.module( 'CameraHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

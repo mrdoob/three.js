@@ -7,7 +7,7 @@ import { CompressedTexture } from '../../../../src/textures/CompressedTexture';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module.todo( 'CompressedTexture', () => {
+	QUnit.module( 'CompressedTexture', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

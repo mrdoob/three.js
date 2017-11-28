@@ -7,7 +7,7 @@ import { LineBasicMaterial } from '../../../../src/materials/LineBasicMaterial';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'LineBasicMaterial', () => {
+	QUnit.module( 'LineBasicMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

@@ -7,7 +7,7 @@ import { DataTextureLoader } from '../../../../src/loaders/DataTextureLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'DataTextureLoader', () => {
+	QUnit.module( 'DataTextureLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

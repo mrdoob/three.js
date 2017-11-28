@@ -7,7 +7,7 @@ import { ImageLoader } from '../../../../src/loaders/ImageLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'ImageLoader', () => {
+	QUnit.module( 'ImageLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

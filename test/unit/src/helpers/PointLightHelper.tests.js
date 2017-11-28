@@ -7,7 +7,7 @@ import { PointLightHelper } from '../../../../src/helpers/PointLightHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'PointLightHelper', () => {
+	QUnit.module( 'PointLightHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

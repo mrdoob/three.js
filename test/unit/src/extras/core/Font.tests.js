@@ -9,7 +9,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Core', () => {
 
-		QUnit.module.todo( 'Font', () => {
+		QUnit.module( 'Font', () => {
 
 			// INSTANCING
 			QUnit.todo( "Instancing", ( assert ) => {

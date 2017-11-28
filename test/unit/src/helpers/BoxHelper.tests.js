@@ -11,7 +11,7 @@ import { Mesh } from '../../../../src/objects/Mesh';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'BoxHelper', ( hooks ) => {
+	QUnit.module( 'BoxHelper', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

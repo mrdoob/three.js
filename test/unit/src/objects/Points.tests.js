@@ -7,7 +7,7 @@ import { Points } from '../../../../src/objects/Points';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'Points', () => {
+	QUnit.module( 'Points', () => {
 
 		// INHERITANCE
 		QUnit.todo( "isPoints", ( assert ) => {

@@ -7,7 +7,7 @@ import { AnimationMixer } from '../../../../src/animation/AnimationMixer';
 
 export default QUnit.module( 'Animation', () => {
 
-	QUnit.module.todo( 'AnimationMixer', () => {
+	QUnit.module( 'AnimationMixer', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

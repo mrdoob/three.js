@@ -7,7 +7,7 @@ import { Mesh } from '../../../../src/objects/Mesh';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'Mesh', () => {
+	QUnit.module( 'Mesh', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

@@ -7,7 +7,7 @@ import { WebGL2Renderer } from '../../../../src/renderers/WebGL2Renderer';
 
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module.todo( 'WebGL2Renderer', () => {
+	QUnit.module( 'WebGL2Renderer', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

@@ -9,7 +9,7 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'Shaders', () => {
 
-		QUnit.module.todo( 'UniformsLib', () => {
+		QUnit.module( 'UniformsLib', () => {
 
 			// PUBLIC STUFF
 			QUnit.todo( "merge", ( assert ) => {

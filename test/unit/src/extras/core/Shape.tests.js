@@ -9,7 +9,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Core', () => {
 
-		QUnit.module.todo( 'Shape', () => {
+		QUnit.module( 'Shape', () => {
 
 			// INHERITANCE
 			QUnit.todo( "Extending", ( assert ) => {

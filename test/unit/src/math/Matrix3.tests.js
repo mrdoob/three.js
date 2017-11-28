@@ -53,7 +53,7 @@ function toMatrix4( m3 ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Matrix3', () => {
+	QUnit.module( 'Matrix3', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

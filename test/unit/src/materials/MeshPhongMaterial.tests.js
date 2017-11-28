@@ -7,7 +7,7 @@ import { MeshPhongMaterial } from '../../../../src/materials/MeshPhongMaterial';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'MeshPhongMaterial', () => {
+	QUnit.module( 'MeshPhongMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

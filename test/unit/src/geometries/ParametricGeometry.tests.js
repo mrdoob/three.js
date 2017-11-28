@@ -10,7 +10,7 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'ParametricGeometry', ( hooks ) => {
+	QUnit.module( 'ParametricGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -46,7 +46,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'ParametricBufferGeometry', ( hooks ) => {
+	QUnit.module( 'ParametricBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

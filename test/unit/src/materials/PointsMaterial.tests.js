@@ -7,7 +7,7 @@ import { PointsMaterial } from '../../../../src/materials/PointsMaterial';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'PointsMaterial', () => {
+	QUnit.module( 'PointsMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

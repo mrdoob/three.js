@@ -7,7 +7,7 @@ import { RectAreaLightHelper } from '../../../../src/helpers/RectAreaLightHelper
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'RectAreaLightHelper', () => {
+	QUnit.module( 'RectAreaLightHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

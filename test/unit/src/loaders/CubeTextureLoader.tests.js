@@ -7,7 +7,7 @@ import { CubeTextureLoader } from '../../../../src/loaders/CubeTextureLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'CubeTextureLoader', () => {
+	QUnit.module( 'CubeTextureLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

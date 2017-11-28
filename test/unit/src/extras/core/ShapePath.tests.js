@@ -9,7 +9,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Core', () => {
 
-		QUnit.module.todo( 'ShapePath', () => {
+		QUnit.module( 'ShapePath', () => {
 
 			// INSTANCING
 			QUnit.todo( "Instancing", ( assert ) => {

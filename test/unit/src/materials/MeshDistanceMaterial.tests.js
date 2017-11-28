@@ -7,7 +7,7 @@ import { MeshDistanceMaterial } from '../../../../src/materials/MeshDistanceMate
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'MeshDistanceMaterial', () => {
+	QUnit.module( 'MeshDistanceMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

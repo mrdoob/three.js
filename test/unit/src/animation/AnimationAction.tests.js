@@ -9,7 +9,7 @@ import { AnimationClip } from '../../../../src/animation/AnimationClip';
 
 export default QUnit.module( 'Animation', () => {
 
-	QUnit.module.todo( 'AnimationAction', () => {
+	QUnit.module( 'AnimationAction', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

@@ -7,7 +7,7 @@ import { LensFlare } from '../../../../src/objects/LensFlare';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'LensFlare', () => {
+	QUnit.module( 'LensFlare', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

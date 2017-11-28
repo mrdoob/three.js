@@ -7,7 +7,7 @@ import { WireframeGeometry } from '../../../../src/geometries/WireframeGeometry'
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'WireframeGeometry', ( hooks ) => {
+	QUnit.module( 'WireframeGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

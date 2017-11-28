@@ -10,7 +10,7 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'ConeGeometry', ( hooks ) => {
+	QUnit.module( 'ConeGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -46,7 +46,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'ConeBufferGeometry', ( hooks ) => {
+	QUnit.module( 'ConeBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

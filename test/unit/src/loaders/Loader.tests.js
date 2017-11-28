@@ -7,7 +7,7 @@ import { Loader } from '../../../../src/loaders/Loader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'Loader', () => {
+	QUnit.module( 'Loader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

@@ -7,7 +7,7 @@ import { CanvasTexture } from '../../../../src/textures/CanvasTexture';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module.todo( 'CanvasTexture', () => {
+	QUnit.module( 'CanvasTexture', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

@@ -7,7 +7,7 @@ import { Cache } from '../../../../src/loaders/Cache';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'Cache', () => {
+	QUnit.module( 'Cache', () => {
 
 		// PUBLIC STUFF
 		QUnit.todo( "add", ( assert ) => {

@@ -7,7 +7,7 @@ import { MeshDepthMaterial } from '../../../../src/materials/MeshDepthMaterial';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'MeshDepthMaterial', () => {
+	QUnit.module( 'MeshDepthMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

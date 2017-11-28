@@ -7,7 +7,7 @@ import { Group } from '../../../../src/objects/Group';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'Group', () => {
+	QUnit.module( 'Group', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

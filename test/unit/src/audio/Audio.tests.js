@@ -7,7 +7,7 @@ import { Audio } from '../../../../src/audio/Audio';
 
 export default QUnit.module( 'Audios', () => {
 
-	QUnit.module.todo( 'Audio', () => {
+	QUnit.module( 'Audio', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

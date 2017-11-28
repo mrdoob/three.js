@@ -7,7 +7,7 @@ import { AudioListener } from '../../../../src/audio/AudioListener.js';
 
 export default QUnit.module( 'Audios', () => {
 
-	QUnit.module.todo( 'AudioListener', () => {
+	QUnit.module( 'AudioListener', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

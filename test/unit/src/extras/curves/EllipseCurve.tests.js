@@ -10,7 +10,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module.todo( 'EllipseCurve', ( hooks ) => {
+		QUnit.module( 'EllipseCurve', ( hooks ) => {
 
 			let curve = undefined;
 			hooks.before( function () {

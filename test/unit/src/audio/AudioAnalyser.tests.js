@@ -7,7 +7,7 @@ import { AudioAnalyser } from '../../../../src/audio/AudioAnalyser.js';
 
 export default QUnit.module( 'Audios', () => {
 
-	QUnit.module.todo( 'AudioAnalyser', () => {
+	QUnit.module( 'AudioAnalyser', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

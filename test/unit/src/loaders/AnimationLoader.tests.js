@@ -7,7 +7,7 @@ import { AnimationLoader } from '../../../../src/loaders/AnimationLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'AnimationLoader', () => {
+	QUnit.module( 'AnimationLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

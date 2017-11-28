@@ -7,7 +7,7 @@ import { FileLoader } from '../../../../src/loaders/FileLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'FileLoader', () => {
+	QUnit.module( 'FileLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

@@ -7,7 +7,7 @@ import { LOD } from '../../../../src/objects/LOD';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'LOD', () => {
+	QUnit.module( 'LOD', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

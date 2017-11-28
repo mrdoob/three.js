@@ -7,7 +7,7 @@ import { MaterialLoader } from '../../../../src/loaders/MaterialLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'MaterialLoader', () => {
+	QUnit.module( 'MaterialLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

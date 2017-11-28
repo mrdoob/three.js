@@ -9,7 +9,7 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module.todo( 'WebVRManager', () => {
+		QUnit.module( 'WebVRManager', () => {
 
 			// INSTANCING
 			QUnit.todo( "Instancing", ( assert ) => {

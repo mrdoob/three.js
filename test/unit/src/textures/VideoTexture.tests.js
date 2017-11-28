@@ -7,7 +7,7 @@ import { VideoTexture } from '../../../../src/textures/VideoTexture';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module.todo( 'VideoTexture', () => {
+	QUnit.module( 'VideoTexture', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

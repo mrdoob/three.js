@@ -10,7 +10,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module.todo( 'QuadraticBezierCurve3', ( hooks ) => {
+		QUnit.module( 'QuadraticBezierCurve3', ( hooks ) => {
 
 			let _curve = undefined;
 			hooks.before( function () {

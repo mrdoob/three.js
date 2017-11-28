@@ -7,7 +7,7 @@ import { JSONLoader } from '../../../../src/loaders/JSONLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'JSONLoader', () => {
+	QUnit.module( 'JSONLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

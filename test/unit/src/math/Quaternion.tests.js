@@ -162,7 +162,7 @@ function slerpTestSkeleton( doSlerp, maxError, assert ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Quaternion', () => {
+	QUnit.module( 'Quaternion', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

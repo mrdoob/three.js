@@ -10,7 +10,7 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'PolyhedronGeometry', ( hooks ) => {
+	QUnit.module( 'PolyhedronGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -46,7 +46,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'PolyhedronBufferGeometry', ( hooks ) => {
+	QUnit.module( 'PolyhedronBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

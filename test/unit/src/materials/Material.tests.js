@@ -7,7 +7,7 @@ import { Material } from '../../../../src/materials/Material';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'Material', () => {
+	QUnit.module( 'Material', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

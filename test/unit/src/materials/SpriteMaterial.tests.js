@@ -7,7 +7,7 @@ import { SpriteMaterial } from '../../../../src/materials/SpriteMaterial';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'SpriteMaterial', () => {
+	QUnit.module( 'SpriteMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

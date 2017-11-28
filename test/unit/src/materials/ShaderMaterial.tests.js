@@ -7,7 +7,7 @@ import { ShaderMaterial } from '../../../../src/materials/ShaderMaterial';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'ShaderMaterial', () => {
+	QUnit.module( 'ShaderMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

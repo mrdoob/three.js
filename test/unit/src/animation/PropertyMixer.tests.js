@@ -7,7 +7,7 @@ import { PropertyMixer } from '../../../../src/animation/PropertyMixer';
 
 export default QUnit.module( 'Animation', () => {
 
-	QUnit.module.todo( 'PropertyMixer', () => {
+	QUnit.module( 'PropertyMixer', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

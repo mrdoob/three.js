@@ -8,7 +8,7 @@ import { Interpolant } from '../../../../src/math/Interpolant';
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Interpolant', () => {
+	QUnit.module( 'Interpolant', () => {
 
 		// Since this is an abstract base class, we have to make it concrete in order
 		// to QUnit.test its functionality...

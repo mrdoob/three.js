@@ -10,7 +10,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module.todo( 'SplineCurve', ( hooks ) => {
+		QUnit.module( 'SplineCurve', ( hooks ) => {
 
 			let _curve = undefined;
 			hooks.before( function () {

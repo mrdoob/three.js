@@ -7,7 +7,7 @@ import { ShapeUtils } from '../../../../src/extras/ShapeUtils';
 
 export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'ShapeUtils', () => {
+	QUnit.module( 'ShapeUtils', () => {
 
 		// PUBLIC STUFF
 		QUnit.todo( "area", ( assert ) => {

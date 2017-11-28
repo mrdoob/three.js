@@ -7,7 +7,7 @@ import { ArrowHelper } from '../../../../src/helpers/ArrowHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'ArrowHelper', () => {
+	QUnit.module( 'ArrowHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

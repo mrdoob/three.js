@@ -7,7 +7,7 @@ import { AudioLoader } from '../../../../src/loaders/AudioLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'AudioLoader', () => {
+	QUnit.module( 'AudioLoader', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

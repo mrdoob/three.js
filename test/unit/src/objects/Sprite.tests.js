@@ -7,7 +7,7 @@ import { Sprite } from '../../../../src/objects/Sprite';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'Sprite', () => {
+	QUnit.module( 'Sprite', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

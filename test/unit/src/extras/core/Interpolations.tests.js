@@ -9,7 +9,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Core', () => {
 
-		QUnit.module.todo( 'Interpolations', () => {
+		QUnit.module( 'Interpolations', () => {
 
 			// PUBLIC STUFF
 			QUnit.todo( "CatmullRom", ( assert ) => {

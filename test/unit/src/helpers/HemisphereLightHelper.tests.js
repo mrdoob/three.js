@@ -7,7 +7,7 @@ import { HemisphereLightHelper } from '../../../../src/helpers/HemisphereLightHe
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'HemisphereLightHelper', () => {
+	QUnit.module( 'HemisphereLightHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

@@ -7,7 +7,7 @@ import { Fog } from '../../../../src/scenes/Fog';
 
 export default QUnit.module( 'Fog', () => {
 
-	QUnit.module.todo( 'Scene', () => {
+	QUnit.module( 'Scene', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

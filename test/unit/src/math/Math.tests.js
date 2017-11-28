@@ -8,7 +8,7 @@ import { _Math as ThreeMath } from '../../../../src/math/Math';
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Math', () => {
+	QUnit.module( 'Math', () => {
 
 		// PUBLIC STUFF
 		QUnit.test( "generateUUID", ( assert ) => {

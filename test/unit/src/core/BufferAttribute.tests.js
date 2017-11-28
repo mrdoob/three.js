@@ -299,7 +299,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module.todo( 'Int8BufferAttribute', () => {
+	QUnit.module( 'Int8BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
@@ -317,7 +317,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module.todo( 'Uint8BufferAttribute', () => {
+	QUnit.module( 'Uint8BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
@@ -335,7 +335,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module.todo( 'Uint8ClampedBufferAttribute', () => {
+	QUnit.module( 'Uint8ClampedBufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
@@ -353,7 +353,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module.todo( 'Int16BufferAttribute', () => {
+	QUnit.module( 'Int16BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
@@ -371,7 +371,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module.todo( 'Uint16BufferAttribute', () => {
+	QUnit.module( 'Uint16BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
@@ -389,7 +389,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module.todo( 'Int32BufferAttribute', () => {
+	QUnit.module( 'Int32BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
@@ -407,7 +407,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module.todo( 'Uint32BufferAttribute', () => {
+	QUnit.module( 'Uint32BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
@@ -425,7 +425,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module.todo( 'Float32BufferAttribute', () => {
+	QUnit.module( 'Float32BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
@@ -443,7 +443,7 @@ export default QUnit.module( 'Core', () => {
 
 	} );
 
-	QUnit.module.todo( 'Float64BufferAttribute', () => {
+	QUnit.module( 'Float64BufferAttribute', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

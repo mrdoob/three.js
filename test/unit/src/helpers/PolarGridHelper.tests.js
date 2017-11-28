@@ -7,7 +7,7 @@ import { PolarGridHelper } from '../../../../src/helpers/PolarGridHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'PolarGridHelper', () => {
+	QUnit.module( 'PolarGridHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

@@ -10,7 +10,7 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'TubeGeometry', ( hooks ) => {
+	QUnit.module( 'TubeGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -46,7 +46,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'TubeBufferGeometry', ( hooks ) => {
+	QUnit.module( 'TubeBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {

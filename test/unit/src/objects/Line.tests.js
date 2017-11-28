@@ -7,7 +7,7 @@ import { Line } from '../../../../src/objects/Line';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'Line', () => {
+	QUnit.module( 'Line', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

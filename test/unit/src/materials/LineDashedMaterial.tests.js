@@ -7,7 +7,7 @@ import { LineDashedMaterial } from '../../../../src/materials/LineDashedMaterial
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'LineDashedMaterial', () => {
+	QUnit.module( 'LineDashedMaterial', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

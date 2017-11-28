@@ -7,7 +7,7 @@ import { WebGLRenderTargetCube } from '../../../../src/renderers/WebGLRenderTarg
 
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module.todo( 'WebGLRenderTargetCube', () => {
+	QUnit.module( 'WebGLRenderTargetCube', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {

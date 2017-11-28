@@ -9,7 +9,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module.todo( 'ArcCurve', () => {
+		QUnit.module( 'ArcCurve', () => {
 
 			// INHERITANCE
 			QUnit.todo( "Extending", ( assert ) => {

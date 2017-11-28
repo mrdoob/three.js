@@ -7,7 +7,7 @@ import { ArrayCamera } from '../../../../src/cameras/ArrayCamera';
 
 export default QUnit.module( 'Cameras', () => {
 
-	QUnit.module.todo( 'ArrayCamera', () => {
+	QUnit.module( 'ArrayCamera', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

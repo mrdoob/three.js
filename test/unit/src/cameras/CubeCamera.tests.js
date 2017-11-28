@@ -7,7 +7,7 @@ import { CubeCamera } from '../../../../src/cameras/CubeCamera';
 
 export default QUnit.module( 'Cameras', () => {
 
-	QUnit.module.todo( 'CubeCamera', () => {
+	QUnit.module( 'CubeCamera', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

@@ -9,7 +9,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Core', () => {
 
-		QUnit.module.todo( 'Curve', () => {
+		QUnit.module( 'Curve', () => {
 
 			// INSTANCING
 			QUnit.todo( "Instancing", ( assert ) => {

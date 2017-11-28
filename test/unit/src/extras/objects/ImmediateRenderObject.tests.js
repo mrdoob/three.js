@@ -9,7 +9,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Objects', () => {
 
-		QUnit.module.todo( 'ImmediateRenderObject', () => {
+		QUnit.module( 'ImmediateRenderObject', () => {
 
 			// INHERITANCE
 			QUnit.todo( "Extending", ( assert ) => {

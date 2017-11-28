@@ -7,7 +7,7 @@ import { GridHelper } from '../../../../src/helpers/GridHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'GridHelper', () => {
+	QUnit.module( 'GridHelper', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
