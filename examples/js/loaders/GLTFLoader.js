@@ -2080,7 +2080,19 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						Object.assign(mesh.userData, JSON.parse(JSON.stringify(meshDef.extras)), JSON.parse(JSON.stringify(primitive.extras)));
+						if ( meshDef.extras !== undefined ) mesh.userData = meshDef.extras;
+
+						if ( primitive.extras !== undefined ) {
+
+						  mesh.userData = mesh.userData || {};
+
+						  for ( var key in primitive.extras ) {
+
+							if ( mesh.userData[ key ] === undefined ) mesh.userData[ key ] = primitive.extras[ key ];
+
+						  }
+
+						}
 
 						if ( primitives.length > 1 ) {
 
