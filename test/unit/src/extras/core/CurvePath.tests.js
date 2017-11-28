@@ -9,84 +9,84 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Core', () => {
 
-		QUnit.module.todo( 'CurvePath', () => {
+		QUnit.module( 'CurvePath', () => {
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {
+			QUnit.todo( "Extending", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "add", ( assert ) => {
+			QUnit.todo( "add", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "closePath", ( assert ) => {
+			QUnit.todo( "closePath", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getPoint", ( assert ) => {
+			QUnit.todo( "getPoint", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getLength", ( assert ) => {
+			QUnit.todo( "getLength", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "updateArcLengths", ( assert ) => {
+			QUnit.todo( "updateArcLengths", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getCurveLengths", ( assert ) => {
+			QUnit.todo( "getCurveLengths", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getSpacedPoints", ( assert ) => {
+			QUnit.todo( "getSpacedPoints", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getPoints", ( assert ) => {
+			QUnit.todo( "getPoints", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "createPointsGeometry", ( assert ) => {
+			QUnit.todo( "createPointsGeometry", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "createSpacedPointsGeometry", ( assert ) => {
+			QUnit.todo( "createSpacedPointsGeometry", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "createGeometry", ( assert ) => {
+			QUnit.todo( "createGeometry", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

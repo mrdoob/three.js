@@ -7,24 +7,24 @@ import { LineSegments } from '../../../../src/objects/LineSegments';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'LineSegments', () => {
+	QUnit.module( 'LineSegments', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isLineSegments", ( assert ) => {
+		QUnit.todo( "isLineSegments", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

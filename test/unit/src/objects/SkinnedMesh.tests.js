@@ -7,54 +7,54 @@ import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'SkinnedMesh', () => {
+	QUnit.module( 'SkinnedMesh', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isSkinnedMesh", ( assert ) => {
+		QUnit.todo( "isSkinnedMesh", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "initBones", ( assert ) => {
+		QUnit.todo( "initBones", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "bind", ( assert ) => {
+		QUnit.todo( "bind", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "pose", ( assert ) => {
+		QUnit.todo( "pose", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "normalizeSkinWeights", ( assert ) => {
+		QUnit.todo( "normalizeSkinWeights", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "updateMatrixWorld", ( assert ) => {
+		QUnit.todo( "updateMatrixWorld", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

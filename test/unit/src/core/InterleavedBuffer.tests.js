@@ -7,7 +7,7 @@ import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'InterleavedBuffer', () => {
+	QUnit.module( 'InterleavedBuffer', () => {
 
 		function checkInstanceAgainstCopy( instance, copiedInstance, assert ) {
 
@@ -25,7 +25,7 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -43,7 +43,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isInterleavedBuffer", ( assert ) => {
+		QUnit.todo( "isInterleavedBuffer", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -77,7 +77,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setDynamic", ( assert ) => {
+		QUnit.todo( "setDynamic", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

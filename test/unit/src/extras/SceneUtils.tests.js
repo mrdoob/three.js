@@ -5,24 +5,24 @@
 
 import { SceneUtils } from '../../../../src/extras/SceneUtils';
 
-export default QUnit.module.todo( 'Extras', () => {
+export default QUnit.module( 'Extras', () => {
 
-	QUnit.module.todo( 'SceneUtils', () => {
+	QUnit.module( 'SceneUtils', () => {
 
 		// PUBLIC STUFF
-		QUnit.test( "createMultiMaterialObject", ( assert ) => {
+		QUnit.todo( "createMultiMaterialObject", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "detach", ( assert ) => {
+		QUnit.todo( "detach", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "attach", ( assert ) => {
+		QUnit.todo( "attach", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

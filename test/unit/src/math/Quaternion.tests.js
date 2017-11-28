@@ -162,7 +162,7 @@ function slerpTestSkeleton( doSlerp, maxError, assert ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Quaternion', () => {
+	QUnit.module( 'Quaternion', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -218,25 +218,25 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "x", ( assert ) => {
+		QUnit.todo( "x", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "y", ( assert ) => {
+		QUnit.todo( "y", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "z", ( assert ) => {
+		QUnit.todo( "z", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "w", ( assert ) => {
+		QUnit.todo( "w", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -259,7 +259,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -420,7 +420,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "dot", ( assert ) => {
+		QUnit.todo( "dot", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -482,7 +482,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "slerp", ( assert ) => {
+		QUnit.todo( "slerp", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -508,7 +508,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "fromArray", ( assert ) => {
+		QUnit.todo( "fromArray", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -541,13 +541,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "onChange", ( assert ) => {
+		QUnit.todo( "onChange", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "onChangeCallback", ( assert ) => {
+		QUnit.todo( "onChangeCallback", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
