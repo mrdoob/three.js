@@ -202,6 +202,11 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
+		if ( typeof update === 'string' || update instanceof String ) {
+
+			throw new Error( 'THREE.Quaternion: .setFromEuler() no longer accepts order as the second parameter.' );
+		}
+
 		var x = euler._x, y = euler._y, z = euler._z, order = euler.order;
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
