@@ -8,6 +8,9 @@ import {
 	TubeBufferGeometry
 } from '../../../../src/geometries/TubeGeometry';
 
+import {LineCurve3} from '../../../../src/extras/curves/LineCurve3'
+import {Vector3} from '../../../../src/math/Vector3'
+
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'TubeGeometry', ( hooks ) => {
@@ -15,10 +18,10 @@ export default QUnit.module( 'Geometries', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {};
+            var path = new LineCurve3(new Vector3(0, 0, 0), new Vector3(0, 1, 0));
 
 			geometries = [
-				new TubeGeometry()
+				new TubeGeometry(path)
 			];
 
 		} );
@@ -50,11 +53,10 @@ export default QUnit.module( 'Geometries', () => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
-
-			const parameters = {};
+            var path = new LineCurve3(new Vector3(0, 0, 0), new Vector3(0, 1, 0));
 
 			geometries = [
-				new TubeBufferGeometry()
+				new TubeBufferGeometry(path)
 			];
 
 		} );
