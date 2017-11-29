@@ -17,13 +17,13 @@ export default QUnit.module( 'Geometries', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-            var triangleShape = new Shape();
-            triangleShape.moveTo( 0, -1 );
-            triangleShape.lineTo( 1, 1 );
-            triangleShape.lineTo( -1, 1 );
+			var triangleShape = new Shape();
+			triangleShape.moveTo( 0, - 1 );
+			triangleShape.lineTo( 1, 1 );
+			triangleShape.lineTo( - 1, 1 );
 
 			geometries = [
-				new ShapeGeometry(triangleShape)
+				new ShapeGeometry( triangleShape )
 			];
 
 		} );
@@ -56,13 +56,13 @@ export default QUnit.module( 'Geometries', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-            var triangleShape = new Shape();
-            triangleShape.moveTo( 0, -1 );
-            triangleShape.lineTo( 1, 1 );
-            triangleShape.lineTo( -1, 1 );
+			var triangleShape = new Shape();
+			triangleShape.moveTo( 0, - 1 );
+			triangleShape.lineTo( 1, 1 );
+			triangleShape.lineTo( - 1, 1 );
 
 			geometries = [
-				new ShapeBufferGeometry(triangleShape)
+				new ShapeBufferGeometry( triangleShape )
 			];
 
 		} );

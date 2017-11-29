@@ -15,16 +15,16 @@ export default QUnit.module( 'Geometries', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-            var vertices = [
-                1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
-            ];
+			var vertices = [
+				1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
+			];
 
-            var indices = [
-                2, 1, 0, 	0, 3, 2,	1, 3, 0,	2, 3, 1
-            ];
+			var indices = [
+				2, 1, 0, 	0, 3, 2,	1, 3, 0,	2, 3, 1
+			];
 
 			geometries = [
-				new PolyhedronGeometry(vertices, indices)
+				new PolyhedronGeometry( vertices, indices )
 			];
 
 		} );
@@ -57,16 +57,16 @@ export default QUnit.module( 'Geometries', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-            var vertices = [
-                1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
-            ];
+			var vertices = [
+				1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
+			];
 
-            var indices = [
-                2, 1, 0, 	0, 3, 2,	1, 3, 0,	2, 3, 1
-            ];
+			var indices = [
+				2, 1, 0, 	0, 3, 2,	1, 3, 0,	2, 3, 1
+			];
 
 			geometries = [
-				new PolyhedronBufferGeometry(vertices, indices)
+				new PolyhedronBufferGeometry( vertices, indices )
 			];
 
 		} );

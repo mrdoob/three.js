@@ -18,10 +18,10 @@ export default QUnit.module( 'Geometries', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-            var path = new LineCurve3(new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+			var path = new LineCurve3( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ) );
 
 			geometries = [
-				new TubeGeometry(path)
+				new TubeGeometry( path )
 			];
 
 		} );
@@ -53,10 +53,11 @@ export default QUnit.module( 'Geometries', () => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
-            var path = new LineCurve3(new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+
+			var path = new LineCurve3( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ) );
 
 			geometries = [
-				new TubeBufferGeometry(path)
+				new TubeBufferGeometry( path )
 			];
 
 		} );
