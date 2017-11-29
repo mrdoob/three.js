@@ -23,7 +23,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "copy", ( assert ) => {
 
 			var instance = new Face3( 0, 1, 2, new Vector3( 0, 1, 0 ), new Color( 0.25, 0.5, 0.75 ), 2 );
-			var copiedInstance = instance.copy( instance );
+			var copiedInstance = new Face3().copy( instance );
 
 			checkCopy( copiedInstance, assert );
 			checkVertexAndColors( copiedInstance, assert );
@@ -36,7 +36,7 @@ export default QUnit.module( 'Core', () => {
 				[ new Vector3( 0, 1, 0 ), new Vector3( 1, 0, 1 ) ],
 				[ new Color( 0.25, 0.5, 0.75 ), new Color( 1, 0, 0.4 ) ],
 				2 );
-			var copiedInstance = instance.copy( instance );
+			var copiedInstance = new Face3().copy( instance );
 
 			checkCopy( copiedInstance, assert );
 			checkVertexAndColorArrays( copiedInstance, assert );
