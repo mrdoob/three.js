@@ -1014,6 +1014,8 @@ THREE.GLTFLoader = ( function () {
 		BLEND: 'BLEND'
 	};
 
+	/* UTILITY FUNCTIONS */
+
 	function resolveURL( url, path ) {
 
 		// Invalid URL
