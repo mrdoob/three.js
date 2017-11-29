@@ -70,17 +70,17 @@ function getSphere() {
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'Raycaster', () => {
+	QUnit.module( 'Raycaster', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "linePrecision", ( assert ) => {
+		QUnit.todo( "linePrecision", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

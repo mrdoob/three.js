@@ -19,7 +19,7 @@ import {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Ray', () => {
+	QUnit.module( 'Ray', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -35,7 +35,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isRay", ( assert ) => {
+		QUnit.todo( "isRay", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -274,7 +274,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceToPlane", ( assert ) => {
+		QUnit.todo( "distanceToPlane", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -370,7 +370,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "intersectsBox", ( assert ) => {
+		QUnit.todo( "intersectsBox", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -451,7 +451,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", ( assert ) => {
+		QUnit.todo( "equals", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -165,11 +165,9 @@
 				// controllers
 
 				controller1 = new THREE.ViveController( 0 );
-				controller1.standingMatrix = renderer.vr.getStandingMatrix();
 				user.add( controller1 );
 
 				controller2 = new THREE.ViveController( 1 );
-				controller2.standingMatrix = renderer.vr.getStandingMatrix();
 				user.add( controller2 );
 
 				var loader = new THREE.OBJLoader();

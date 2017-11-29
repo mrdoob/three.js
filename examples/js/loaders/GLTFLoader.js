@@ -106,7 +106,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
-				if ( onError ) onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' ) );
+				if ( onError ) onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported. Use LegacyGLTFLoader instead.' ) );
 				return;
 
 			}
@@ -421,7 +421,7 @@ THREE.GLTFLoader = ( function () {
 
 		} else if ( this.header.version < 2.0 ) {
 
-			throw new Error( 'THREE.GLTFLoader: Legacy binary file detected. Use GLTFLoader instead.' );
+			throw new Error( 'THREE.GLTFLoader: Legacy binary file detected. Use LegacyGLTFLoader instead.' );
 
 		}
 
@@ -529,6 +529,7 @@ THREE.GLTFLoader = ( function () {
 					'vec3 specularFactor = specular;',
 					'#ifdef USE_SPECULARMAP',
 					'	vec4 texelSpecular = texture2D( specularMap, vUv );',
+					'	texelSpecular = sRGBToLinear( texelSpecular );',
 					'	// reads channel RGB, compatible with a glTF Specular-Glossiness (RGBA) texture',
 					'	specularFactor *= texelSpecular.rgb;',
 					'#endif'
@@ -1015,7 +1016,7 @@ THREE.GLTFLoader = ( function () {
 
 	/* UTILITY FUNCTIONS */
 
-	function _each( object, callback, thisObj ) {
+	function _each( object, callback ) {
 
 		if ( ! object ) {
 
@@ -1034,7 +1035,7 @@ THREE.GLTFLoader = ( function () {
 
 			for ( var idx = 0; idx < length; idx ++ ) {
 
-				var value = callback.call( thisObj || this, object[ idx ], idx );
+				var value = callback( object[ idx ], idx );
 
 				if ( value ) {
 
@@ -1066,7 +1067,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( object.hasOwnProperty( key ) ) {
 
-					var value = callback.call( thisObj || this, object[ key ], key );
+					var value = callback( object[ key ], key );
 
 					if ( value ) {
 
@@ -1324,7 +1325,6 @@ THREE.GLTFLoader = ( function () {
 		for ( var i = 0; i < dependencies.length; i ++ ) {
 
 			var dependency = dependencies[ i ];
-			var fnName = 'load' + dependency.charAt( 0 ).toUpperCase() + dependency.slice( 1 );
 
 			var cached = this.cache.get( dependency );
 
@@ -1332,8 +1332,9 @@ THREE.GLTFLoader = ( function () {
 
 				_dependencies[ dependency ] = cached;
 
-			} else if ( this[ fnName ] ) {
+			} else {
 
+				var fnName = 'load' + dependency.charAt( 0 ).toUpperCase() + dependency.slice( 1 );
 				var fn = this[ fnName ]();
 				this.cache.add( dependency, fn );
 
@@ -1897,8 +1898,6 @@ THREE.GLTFLoader = ( function () {
 
 					var attributeEntry = attributes[ attributeId ];
 
-					if ( attributeEntry === undefined ) return;
-
 					var bufferAttribute = dependencies.accessors[ attributeEntry ];
 
 					switch ( attributeId ) {
@@ -2347,8 +2346,7 @@ THREE.GLTFLoader = ( function () {
 		return scope._withDependencies( [
 
 			'meshes',
-			'skins',
-			'cameras'
+			'skins'
 
 		] ).then( function ( dependencies ) {
 

@@ -7,10 +7,10 @@ import { InstancedInterleavedBuffer } from '../../../../src/core/InstancedInterl
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'InstancedInterleavedBuffer', () => {
+	QUnit.module( 'InstancedInterleavedBuffer', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -27,7 +27,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isInstancedInterleavedBuffer", ( assert ) => {
+		QUnit.todo( "isInstancedInterleavedBuffer", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

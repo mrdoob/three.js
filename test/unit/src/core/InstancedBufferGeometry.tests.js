@@ -8,7 +8,7 @@ import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'InstancedBufferGeometry', () => {
+	QUnit.module( 'InstancedBufferGeometry', () => {
 
 		function createClonableMock() {
 
@@ -25,14 +25,14 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -76,7 +76,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

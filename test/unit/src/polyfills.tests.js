@@ -6,16 +6,16 @@
 import '../../../src/polyfills';
 import { Vector3 } from '../../../src/math/Vector3';
 
-export default QUnit.module.todo( 'Polyfills', () => {
+export default QUnit.module( 'Polyfills', () => {
 
 	// PUBLIC STUFF
-	QUnit.test( "Number.EPSILON", ( assert ) => {
+	QUnit.todo( "Number.EPSILON", ( assert ) => {
 
 		assert.ok( false, "everything's gonna be alright" );
 
 	} );
 
-	QUnit.test( "Number.isInteger", ( assert ) => {
+	QUnit.todo( "Number.isInteger", ( assert ) => {
 
 		assert.ok( false, "everything's gonna be alright" );
 
@@ -59,13 +59,13 @@ export default QUnit.module.todo( 'Polyfills', () => {
 
 	} );
 
-	QUnit.test( "'name' in Function.prototype", ( assert ) => {
+	QUnit.todo( "'name' in Function.prototype", ( assert ) => {
 
 		assert.ok( false, "everything's gonna be alright" );
 
 	} );
 
-	QUnit.test( "Object.assign", ( assert ) => {
+	QUnit.todo( "Object.assign", ( assert ) => {
 
 		assert.ok( false, "everything's gonna be alright" );
 

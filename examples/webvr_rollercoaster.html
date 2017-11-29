@@ -55,7 +55,7 @@
 			// environment
 
 			var geometry = new THREE.PlaneBufferGeometry( 500, 500, 15, 15 );
-			geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+			geometry.rotateX( - Math.PI / 2 );
 
 			var positions = geometry.attributes.position.array;
 			var vertex = new THREE.Vector3();

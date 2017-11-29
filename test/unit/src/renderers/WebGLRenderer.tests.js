@@ -7,17 +7,17 @@ import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer';
 
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module.todo( 'WebGLRenderer', () => {
+	QUnit.module( 'WebGLRenderer', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "PrayForUs", ( assert ) => {
+		QUnit.todo( "PrayForUs", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

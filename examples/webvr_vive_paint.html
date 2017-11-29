@@ -142,13 +142,11 @@
 				// controllers
 
 				controller1 = new THREE.PaintViveController( 0 );
-				controller1.standingMatrix = renderer.vr.getStandingMatrix();
 				controller1.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				user.add( controller1 );
 
 				controller2 = new THREE.PaintViveController( 1 );
-				controller2.standingMatrix = renderer.vr.getStandingMatrix();
 				controller2.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				user.add( controller2 );

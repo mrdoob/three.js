@@ -10,10 +10,10 @@ import { Vector3 } from '../../../../src/math/Vector3';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'Face3', () => {
+	QUnit.module( 'Face3', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
