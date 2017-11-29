@@ -319,18 +319,26 @@ var _Math = {
 
 		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
 
-		var lut = []; for (var i=0; i<256; i++) { lut[i] = (i<16?'0':'')+(i).toString(16).toUpperCase(); }
+		var lut = [];
+
+		for ( var i = 0; i < 256; i ++ ) {
+
+			lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 ).toUpperCase();
+
+		}
 
 		return function () {
-			var d0 = Math.random()*0xffffffff|0;
-			var d1 = Math.random()*0xffffffff|0;
-			var d2 = Math.random()*0xffffffff|0;
-			var d3 = Math.random()*0xffffffff|0;
-			return lut[d0&0xff]+lut[d0>>8&0xff]+lut[d0>>16&0xff]+lut[d0>>24&0xff]+'-'+
-				lut[d1&0xff]+lut[d1>>8&0xff]+'-'+lut[d1>>16&0x0f|0x40]+lut[d1>>24&0xff]+'-'+
-				lut[d2&0x3f|0x80]+lut[d2>>8&0xff]+'-'+lut[d2>>16&0xff]+lut[d2>>24&0xff]+
-				lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
-		}
+
+			var d0 = Math.random() * 0xffffffff | 0;
+			var d1 = Math.random() * 0xffffffff | 0;
+			var d2 = Math.random() * 0xffffffff | 0;
+			var d3 = Math.random() * 0xffffffff | 0;
+			return lut[ d0 & 0xff ] + lut[ d0 >> 8 & 0xff ] + lut[ d0 >> 16 & 0xff ] + lut[ d0 >> 24 & 0xff ] + '-' +
+				lut[ d1 & 0xff ] + lut[ d1 >> 8 & 0xff ] + '-' + lut[ d1 >> 16 & 0x0f | 0x40 ] + lut[ d1 >> 24 & 0xff ] + '-' +
+				lut[ d2 & 0x3f | 0x80 ] + lut[ d2 >> 8 & 0xff ] + '-' + lut[ d2 >> 16 & 0xff ] + lut[ d2 >> 24 & 0xff ] +
+				lut[ d3 & 0xff ] + lut[ d3 >> 8 & 0xff ] + lut[ d3 >> 16 & 0xff ] + lut[ d3 >> 24 & 0xff ];
+
+		};
 
 	} )(),
 
@@ -19904,13 +19912,16 @@ function WebGLState( gl, extensions, utils ) {
 
 	}
 
-	function setMaterial( material ) {
+	function setMaterial( material, frontFaceCW ) {
 
 		material.side === DoubleSide
 			? disable( gl.CULL_FACE )
 			: enable( gl.CULL_FACE );
 
-		setFlipSided( material.side === BackSide );
+		var flipSided = ( material.side === BackSide );
+		if ( frontFaceCW ) flipSided = ! flipSided;
+
+		setFlipSided( flipSided );
 
 		material.transparent === true
 			? setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )
@@ -21785,7 +21796,9 @@ function WebGLRenderer( parameters ) {
 
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
-		state.setMaterial( material );
+		var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+
+		state.setMaterial( material, frontFaceCW );
 
 		var program = setProgram( camera, fog, material, object );
 		var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
@@ -22530,7 +22543,9 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isImmediateRenderObject ) {
 
-			state.setMaterial( material );
+			var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+
+			state.setMaterial( material, frontFaceCW );
 
 			var program = setProgram( camera, scene.fog, material, object );
 
@@ -25013,7 +25028,9 @@ function Group() {
 
 Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	constructor: Group
+	constructor: Group,
+
+	isGroup: true
 
 } );
 
@@ -28197,7 +28214,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		this.setIndex( indicesArray );
 		this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
-		this.addAttribute( 'uv', new Float32BufferAttribute( options.arrays.uv, 2 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
 
 	}
 
@@ -44803,7 +44820,7 @@ Object.assign( WebVRManager.prototype, {
 Object.defineProperties( WebVRManager.prototype, {
 
 	standing: {
-		set: function ( value ) {
+		set: function ( /* value */ ) {
 
 			console.warn( 'THREE.WebVRManager: .standing has been removed.' );
 
