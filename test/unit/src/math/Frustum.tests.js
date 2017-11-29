@@ -13,7 +13,7 @@ import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Box3 } from '../../../../src/math/Box3';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
-import { zero3, one3 } from './Constants.tests';
+import { zero3, one3, eps } from './Constants.tests';
 
 const unit3 = new Vector3( 1, 0, 0 );
 
@@ -262,7 +262,8 @@ export default QUnit.module( 'Maths', () => {
 			intersects = a.intersectsBox( box );
 			assert.notOk( intersects, "No intersection" );
 
-			box.translate( - 1, - 1, - 1 );
+			// add eps so that we prevent box touching the frustum, which might intersect depending on floating point numerics
+			box.translate( new Vector3( - 1 - eps, - 1 - eps, - 1 - eps ) );
 
 			intersects = a.intersectsBox( box );
 			assert.ok( intersects, "Successful intersection" );
