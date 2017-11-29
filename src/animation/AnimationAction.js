@@ -13,6 +13,10 @@ import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, L
 
 function AnimationAction( mixer, clip, localRoot ) {
 
+	if ( ! mixer ) throw new Error( "Mixer can't be null or undefined !" );
+
+	if ( ! clip ) throw new Error( "Clip can't be null or undefined !" );
+
 	this._mixer = mixer;
 	this._clip = clip;
 	this._localRoot = localRoot || null;

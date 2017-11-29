@@ -15,7 +15,7 @@ export default QUnit.module( 'Animation', () => {
 		QUnit.test( "Instancing", ( assert ) => {
 
 			var mixer = new AnimationMixer();
-			var clip = new AnimationClip();
+			var clip = new AnimationClip( "nonname", - 1, [] );
 
 			assert.throws(
 				function () {
