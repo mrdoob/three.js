@@ -377,6 +377,10 @@ def restore_export_settings(properties, settings):
     properties.option_indent = settings.get(
         constants.INDENT,
         constants.EXPORT_OPTIONS[constants.INDENT])
+    
+    properties.option_flip_axes = settings.get(
+        constants.FLIP_AXES,
+        constants.EXPORT_OPTIONS[constants.FLIP_AXES])
 
     properties.option_export_textures = settings.get(
         constants.EXPORT_TEXTURES,
@@ -476,6 +480,7 @@ def set_settings(properties):
         constants.LOGGING: properties.option_logging,
         constants.COMPRESSION: properties.option_compression,
         constants.INDENT: properties.option_indent,
+        constants.FLIP_AXES: properties.option_flip_axes,
         constants.EXPORT_TEXTURES: properties.option_export_textures,
         constants.EMBED_TEXTURES: properties.option_embed_textures,
         constants.TEXTURE_FOLDER: properties.option_texture_folder,
@@ -754,6 +759,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name="Indent JSON",
         description="Disable this to reduce the file size",
         default=constants.EXPORT_OPTIONS[constants.INDENT])
+    
+    option_flip_axes = BoolProperty(
+        name="Flip axes",
+        description="Flip XYZ to XZ-Y",
+        default=constants.EXPORT_OPTIONS[constants.FLIP_AXES])
 
     option_compression = EnumProperty(
         name="",
@@ -996,6 +1006,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = box.row()
         row.prop(self.properties, 'option_indent')
+
+        row = box.row()
+        row.prop(self.properties, 'option_flip_axes')
 
         row = box.row()
         row.label(text="Logging verbosity:")
