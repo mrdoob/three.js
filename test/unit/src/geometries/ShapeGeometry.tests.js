@@ -8,7 +8,7 @@ import {
 	ShapeBufferGeometry
 } from '../../../../src/geometries/ShapeGeometry';
 
-import {Shape} from '../../../../src/extras/core/Shape';
+import { Shape } from '../../../../src/extras/core/Shape';
 
 export default QUnit.module( 'Geometries', () => {
 
