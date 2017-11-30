@@ -1083,7 +1083,7 @@ THREE.GLTFLoader = ( function () {
 	 * @param {THREE.Mesh} mesh
 	 * @param {GLTF.Mesh} meshDef
 	 * @param {GLTF.Primitive} primitiveDef
-	 * @param {Array} accessors
+	 * @param {Array<THREE.BufferAttribute>} accessors
 	 */
 	function addMorphTargets( mesh, meshDef, primitiveDef, accessors ) {
 
@@ -1371,7 +1371,7 @@ THREE.GLTFLoader = ( function () {
 	GLTFParser.prototype.getMultiDependencies = function ( types ) {
 
 		var results = {};
-		var fns = [];
+		var pendings = [];
 
 		for ( var i = 0, il = types.length; i < il; i ++ ) {
 
@@ -1384,11 +1384,11 @@ THREE.GLTFLoader = ( function () {
 
 			}.bind( this, type + ( type === 'mesh' ? 'es' : 's' ) ) );
 
-			fns.push( value );
+			pendings.push( value );
 
 		}
 
-		return Promise.all( fns ).then( function () {
+		return Promise.all( pendings ).then( function () {
 
 			return results;
 
@@ -1455,7 +1455,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#accessors
 	 * @param {number} accessorIndex
-	 * @return {Promise<THREE.(Interleaved)BufferAttribute>}
+	 * @return {Promise<THREE.BufferAttribute|THREE.InterleavedBufferAttribute>}
 	 */
 	GLTFParser.prototype.loadAccessor = function ( accessorIndex ) {
 
@@ -1943,7 +1943,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#meshes
 	 * @param {number} meshIndex
-	 * @return {Promise<THREE.(Skinned)Material>}
+	 * @return {Promise<THREE.Mesh|THREE.SkinnedMesh>}
 	 */
 	GLTFParser.prototype.loadMesh = function ( meshIndex ) {
 
