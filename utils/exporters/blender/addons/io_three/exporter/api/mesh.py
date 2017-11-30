@@ -639,6 +639,7 @@ def blend_shapes(mesh, options):
     """
     logger.debug("mesh.blend_shapes(%s, %s)", mesh, options)
     manifest = []
+    need_flip_axes = options.get(constants.FLIP_AXES, True)
     if mesh.shape_keys:
         logger.info("mesh.blend_shapes -- there's shape keys")
         key_blocks = mesh.shape_keys.key_blocks
@@ -647,7 +648,7 @@ def blend_shapes(mesh, options):
             morph = []
             for d in key_blocks[key].data:
                 co = d.co
-                morph.extend([co.x, co.y, co.z])
+                morph.extend([co.x, co.z, -co.y] if need_flip_axes else [co.x, co.y, co.z])
             manifest.append({
                 constants.NAME: key,
                 constants.VERTICES: morph
