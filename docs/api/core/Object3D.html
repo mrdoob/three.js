@@ -240,41 +240,37 @@
 		Searches through the object's children and returns the first with a property that matches the value given.
 		</div>
 
-		<h3>[method:Vector3 getWorldPosition]( [page:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 getWorldPosition]( [page:Vector3 target] )</h3>
 		<div>
-		optionalTarget — (optional) target to set the result. Otherwise, a new [page:Vector3] is instantiated. <br /><br />
+		[page:Vector3 target] — the result will be copied into this Vector3. <br /><br />
 
 		Returns a vector representing the position of the object in world space.
 		</div>
 
-		<h3>[method:Quaternion getWorldQuaternion]( [page:Quaternion optionalTarget] )</h3>
+		<h3>[method:Quaternion getWorldQuaternion]( [page:Quaternion target] )</h3>
 		<div>
-		optionalTarget — (optional) if specified, the result will be copied into this Quaternion,
-		otherwise a new Quaternion will be created. <br /><br />
+		[page:Quaternion target] — the result will be copied into this Quaternion. <br /><br />
 
 		Returns a quaternion representing the rotation of the object in world space.
 		</div>
 
-		<h3>[method:Euler getWorldRotation]( [page:Euler optionalTarget] )</h3>
+		<h3>[method:Euler getWorldRotation]( [page:Euler target] )</h3>
 		<div>
-		optionalTarget — (optional) if specified, the result will be copied into this Euler,
-		otherwise a new Euler will be created. <br /><br />
+		[page:Euler target] — the result will be copied into this Euler. <br /><br />
 
 		Returns the euler angles representing the rotation of the object in world space.
 		</div>
 
-		<h3>[method:Vector3 getWorldScale]( [page:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 getWorldScale]( [page:Vector3 target] )</h3>
 		<div>
-		[page:Vector3 optionalTarget] — (optional) if specified, the result will be copied into this Vector3,
-		otherwise a new Vector3 will be created. <br /><br />
+		[page:Vector3 target] — the result will be copied into this Vector3. <br /><br />
 
 		Returns a vector of the scaling factors applied to the object for each axis in world space.
 		</div>
 
-		<h3>[method:Vector3 getWorldDirection]( [page:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 getWorldDirection]( [page:Vector3 target] )</h3>
 		<div>
-		[page:Vector3 optionalTarget] — (optional) if specified, the result will be copied into this Vector3,
-		otherwise a new Vector3 will be created. <br /><br />
+		[page:Vector3 target] — the result will be copied into this Vector3. <br /><br />
 
 		Returns a vector representing the direction of object's positive z-axis in world space.
 		</div>
