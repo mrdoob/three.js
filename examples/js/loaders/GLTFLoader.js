@@ -1342,14 +1342,24 @@ THREE.GLTFLoader = ( function () {
 	 */
 	GLTFParser.prototype.getDependencies = function ( type ) {
 
-		var parser = this;
-		var defs = this.json[ type + ( type === 'mesh' ? 'es' : 's' ) ] || [];
+		var dependencies = this.cache.get( type );
 
-		return Promise.all( defs.map( function ( def, index ) {
+		if ( ! dependencies ) {
 
-			return parser.getDependency( type, index );
+			var parser = this;
+			var defs = this.json[ type + ( type === 'mesh' ? 'es' : 's' ) ] || [];
 
-		} ) );
+			dependencies = Promise.all( defs.map( function ( def, index ) {
+
+				return parser.getDependency( type, index );
+
+			} ) );
+
+			this.cache.add( type, dependencies );
+
+		}
+
+		return dependencies;
 
 	};
 
