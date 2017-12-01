@@ -319,18 +319,26 @@ var _Math = {
 
 		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
 
-		var lut = []; for (var i=0; i<256; i++) { lut[i] = (i<16?'0':'')+(i).toString(16).toUpperCase(); }
+		var lut = [];
+
+		for ( var i = 0; i < 256; i ++ ) {
+
+			lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 ).toUpperCase();
+
+		}
 
 		return function () {
-			var d0 = Math.random()*0xffffffff|0;
-			var d1 = Math.random()*0xffffffff|0;
-			var d2 = Math.random()*0xffffffff|0;
-			var d3 = Math.random()*0xffffffff|0;
-			return lut[d0&0xff]+lut[d0>>8&0xff]+lut[d0>>16&0xff]+lut[d0>>24&0xff]+'-'+
-				lut[d1&0xff]+lut[d1>>8&0xff]+'-'+lut[d1>>16&0x0f|0x40]+lut[d1>>24&0xff]+'-'+
-				lut[d2&0x3f|0x80]+lut[d2>>8&0xff]+'-'+lut[d2>>16&0xff]+lut[d2>>24&0xff]+
-				lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
-		}
+
+			var d0 = Math.random() * 0xffffffff | 0;
+			var d1 = Math.random() * 0xffffffff | 0;
+			var d2 = Math.random() * 0xffffffff | 0;
+			var d3 = Math.random() * 0xffffffff | 0;
+			return lut[ d0 & 0xff ] + lut[ d0 >> 8 & 0xff ] + lut[ d0 >> 16 & 0xff ] + lut[ d0 >> 24 & 0xff ] + '-' +
+				lut[ d1 & 0xff ] + lut[ d1 >> 8 & 0xff ] + '-' + lut[ d1 >> 16 & 0x0f | 0x40 ] + lut[ d1 >> 24 & 0xff ] + '-' +
+				lut[ d2 & 0x3f | 0x80 ] + lut[ d2 >> 8 & 0xff ] + '-' + lut[ d2 >> 16 & 0xff ] + lut[ d2 >> 24 & 0xff ] +
+				lut[ d3 & 0xff ] + lut[ d3 >> 8 & 0xff ] + lut[ d3 >> 16 & 0xff ] + lut[ d3 >> 24 & 0xff ];
+
+		};
 
 	} )(),
 
@@ -18429,6 +18437,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory ) {
 
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof window.WebGL2RenderingContext );
+	var _videoTextures = {};
 
 	//
 
@@ -18523,8 +18532,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		deallocateTexture( texture );
 
-		infoMemory.textures --;
+		if ( texture.isVideoTexture ) {
 
+			delete _videoTextures[ texture.id ];
+
+		}
+
+		infoMemory.textures --;
 
 	}
 
@@ -18825,6 +18839,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			texture.addEventListener( 'dispose', onTextureDispose );
 
 			textureProperties.__webglTexture = _gl.createTexture();
+
+			if ( texture.isVideoTexture ) {
+
+				_videoTextures[ texture.id ] = texture;
+
+			}
 
 			infoMemory.textures ++;
 
@@ -19207,11 +19227,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function updateVideoTextures() {
+
+		for ( var id in _videoTextures ) {
+
+			_videoTextures[ id ].update();
+
+		}
+
+	}
+
 	this.setTexture2D = setTexture2D;
 	this.setTextureCube = setTextureCube;
 	this.setTextureCubeDynamic = setTextureCubeDynamic;
 	this.setupRenderTarget = setupRenderTarget;
 	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
+	this.updateVideoTextures = updateVideoTextures;
 
 }
 
@@ -21162,7 +21193,8 @@ function WebGLRenderer( parameters ) {
 		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
-		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false;
+		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
+		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default';
 
 	var lightsArray = [];
 	var shadowsArray = [];
@@ -21308,8 +21340,14 @@ function WebGLRenderer( parameters ) {
 			stencil: _stencil,
 			antialias: _antialias,
 			premultipliedAlpha: _premultipliedAlpha,
-			preserveDrawingBuffer: _preserveDrawingBuffer
+			preserveDrawingBuffer: _preserveDrawingBuffer,
+			powerPreference: _powerPreference
 		};
+
+		// event listeners must be registered before WebGL context is created, see #12753
+
+		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
+		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
 		_gl = _context || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
 
@@ -21338,9 +21376,6 @@ function WebGLRenderer( parameters ) {
 			};
 
 		}
-
-		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
-		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
 	} catch ( error ) {
 
@@ -22230,6 +22265,10 @@ function WebGLRenderer( parameters ) {
 			currentRenderList.sort();
 
 		}
+
+		//
+
+		textures.updateVideoTextures();
 
 		//
 
@@ -25013,7 +25052,9 @@ function Group() {
 
 Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	constructor: Group
+	constructor: Group,
+
+	isGroup: true
 
 } );
 
@@ -25026,29 +25067,29 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.generateMipmaps = false;
-
-	var scope = this;
-
-	function update() {
-
-		var video = scope.image;
-
-		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
-
-			scope.needsUpdate = true;
-
-		}
-
-		requestAnimationFrame( update );
-
-	}
-
-	requestAnimationFrame( update );
+	this.needsUpdate = true;
 
 }
 
-VideoTexture.prototype = Object.create( Texture.prototype );
-VideoTexture.prototype.constructor = VideoTexture;
+VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
+
+	constructor: VideoTexture,
+
+	isVideoTexture: true,
+
+	update: function () {
+
+		var video = this.image;
+
+		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+
+			this.needsUpdate = true;
+
+		}
+
+	}
+
+} );
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -28197,7 +28238,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		this.setIndex( indicesArray );
 		this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
-		this.addAttribute( 'uv', new Float32BufferAttribute( options.arrays.uv, 2 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
 
 	}
 
@@ -44803,7 +44844,7 @@ Object.assign( WebVRManager.prototype, {
 Object.defineProperties( WebVRManager.prototype, {
 
 	standing: {
-		set: function ( value ) {
+		set: function ( /* value */ ) {
 
 			console.warn( 'THREE.WebVRManager: .standing has been removed.' );
 
