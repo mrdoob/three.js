@@ -150,16 +150,12 @@ Object.assign( Matrix4.prototype, {
 
 	}(),
 
-	makeRotationFromEuler: function ( euler, order ) {
+	makeRotationFromEuler: function ( euler ) {
 
 		if ( ! ( euler && euler.isEuler ) ) {
 
 			console.error( 'THREE.Matrix4: .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 
-		}
-		if ( order ) {
-
-			throw new Error( 'THREE.Matrix4: .makeRotationFromEuler() no longer accepts order as the second parameter.' );
 		}
 
 		var te = this.elements;
