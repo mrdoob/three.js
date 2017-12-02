@@ -1984,10 +1984,13 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
+					// If the material will be modified later on, clone it now.
 					var useVertexColors = geometry.attributes.color !== undefined;
 					var useFlatShading = geometry.attributes.normal === undefined;
+					var useSkinning = meshDef.isSkinnedMesh === true;
+					var useMorphTargets = primitive.targets !== undefined;
 
-					if ( useVertexColors || useFlatShading ) {
+					if ( useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
 
 						if ( material.isGLTFSpecularGlossinessMaterial ) {
 
@@ -2022,7 +2025,7 @@ THREE.GLTFLoader = ( function () {
 						primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ||
 						primitive.mode === undefined ) {
 
-						if ( meshDef.isSkinnedMesh === true ) {
+						if ( useSkinning ) {
 
 							mesh = new THREE.SkinnedMesh( geometry, material );
 							material.skinning = true;
@@ -2067,7 +2070,7 @@ THREE.GLTFLoader = ( function () {
 
 					mesh.name = meshDef.name || ( 'mesh_' + meshIndex );
 
-					if ( primitive.targets !== undefined ) {
+					if ( useMorphTargets ) {
 
 						addMorphTargets( mesh, meshDef, primitive, dependencies.accessors );
 
