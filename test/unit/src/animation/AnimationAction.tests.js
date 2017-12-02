@@ -17,26 +17,6 @@ export default QUnit.module( 'Animation', () => {
 			var mixer = new AnimationMixer();
 			var clip = new AnimationClip( "nonname", - 1, [] );
 
-			assert.throws(
-				function () {
-
-					new AnimationAction();
-
-				},
-				new Error( "Mixer can't be null or undefined !" ),
-				"raised error instance about undefined or null mixer"
-			);
-
-			assert.throws(
-				function () {
-
-					new AnimationAction( mixer );
-
-				},
-				new Error( "Clip can't be null or undefined !" ),
-				"raised error instance about undefined or null clip"
-			);
-
 			var animationAction = new AnimationAction( mixer, clip );
 			assert.ok( animationAction, "animationAction instanciated" );
 
