@@ -11,21 +11,34 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
+			"Interleaved" means that multiple types of data (position, color etc.) are packed into a single array buffer.
+			Organizing geometry data in this way improves memory locality. By keeping vertex data close together, it is more likely
+			that also caches (e.g. pre-transform vertex cache) store logically related data together. This leads to more cache hits and a better performance.
+			<br/><br/>
+			An introduction into interleaved arrays can be found here: [link:https://blog.tojicode.com/2011/05/interleaved-array-basics.html Interleaved array basics]
 		</div>
+
+		<h2>Example</h2>
+
+		<div>[example:webgl_buffergeometry_points_interleaved webgl / buffergeometry / points / interleaved]</div>
 
 		<h2>Constructor</h2>
 		<h3>[name]( [page:TypedArray array], [page:Integer stride] )</h3>
 		<div>
+			[page:TypedArray array] -- A typed array with a shared buffer. Stores the geometry data.<br/>
+			[page:Integer stride] -- How far apart is the start of each vertex.
 		</div>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Array array]</h3>
 		<div>
+			 A typed array with a shared buffer. Stores the geometry data.
 		</div>
 
 		<h3>[property:Integer stride]</h3>
 		<div>
+			How far apart is the start of each vertex.
 		</div>
 
 		<h3>[property:Integer count]</h3>
@@ -45,7 +58,7 @@
 
 		<h3>[property:Number updateRange.offset]</h3>
 		<div>
-		DEfault is *0*.
+		Default is *0*.
 		</div>
 
 		<h3>[property:Number updateRange.count]</h3>
@@ -82,19 +95,23 @@
 
 		<h3>[method:InterleavedBuffer copy]( source ) </h3>
 		<div>
-		 Copy the array, count, stride and value of dynamic to this.
+		 Copies another [name] to this [name].
 		</div>
 
 		<h3>[method:InterleavedBuffer copyAt]( index1, attribute, index2 ) </h3>
-		<div>
-		</div>
+		<div>Copies data from attribute[index2] to [page:InterleavedBuffer.array array][index1].</div>
 
 		<h3>[method:InterleavedBuffer set]( value, offset ) </h3>
 		<div>
+			value - The source (typed) array.<br/>
+			offset - The offset into the target array at which to begin writing values from the source array. Default is *0*.<br/><br />
+
+			Stores multiple values in the buffer, reading input values from a specified array.
 		</div>
 
-		<h3>[method:InterleavedBuffer clone]( index, x, y ) </h3>
+		<h3>[method:InterleavedBuffer clone]() </h3>
 		<div>
+			Creates a clone of this [name].
 		</div>
 
 		<h2>Source</h2>

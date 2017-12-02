@@ -36,16 +36,18 @@
 		<div>
 			The value of [page:InterleavedBufferAttribute.data data].count.
 
-			If the buffer is storing a 3-component vector (such as a position, normal, or color),
-			then this will count the number of such vectors stored.
+			If the buffer is storing a 3-component item (such as a position, normal, or color),
+			then this will count the number of such items stored.
 		</div>
 
 		<h3>[property:Integer itemSize]</h3>
 		<div>
+			How many values make up each item.
 		</div>
 
 		<h3>[property:Integer offset]</h3>
 		<div>
+			The offset in the underlying array buffer where an item starts.
 		</div>
 
 		<h3>[property:Boolean normalized]</h3>
@@ -60,55 +62,38 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null getX]( index ) </h3>
-		<div>
+		<h3>[method:Number getX]( index ) </h3>
+		<div>Returns the x component of the item at the given index.</div>
 
-		</div>
+		<h3>[method:Number getY]( index ) </h3>
+		<div>Returns the y component of the item at the given index.</div>
 
-		<h3>[method:null getY]( index ) </h3>
-		<div>
+		<h3>[method:Number getZ]( index ) </h3>
+		<div>Returns the z component of the item at the given index.</div>
 
-		</div>
-
-		<h3>[method:null getZ]( index ) </h3>
-		<div>
-
-		</div>
-
-		<h3>[method:null getW]( index ) </h3>
-		<div>
-
-		</div>
+		<h3>[method:Number getW]( index ) </h3>
+		<div>Returns the w component of the item at the given index.</div>
 
 		<h3>[method:null setX]( index, x ) </h3>
-		<div>
-
-		</div>
+		<div>Sets the x component of the item at the given index.</div>
 
 		<h3>[method:null setY]( index, y ) </h3>
-		<div>
-
-		</div>
+		<div>Sets the y component of the item at the given index.</div>
 
 		<h3>[method:null setZ]( index, z ) </h3>
-		<div>
+		<div>Sets the z component of the item at the given index.</div>
 
-		</div>
+		<h3>[method:null setW]( index, w ) </h3>
+		<div>Sets the w component of the item at the given index.</div>
 
 		<h3>[method:null setXY]( index, x, y ) </h3>
-		<div>
-
-		</div>
+		<div>Sets the x and y components of the item at the given index.</div>
 
 		<h3>[method:null setXYZ]( index, x, y, z ) </h3>
-		<div>
-
-		</div>
+		<div>Sets the x, y and z components of the item at the given index.</div>
 
 		<h3>[method:null setXYZW]( index, x, y, z, w ) </h3>
-		<div>
-
-		</div>
+		<div>Sets the x, y, z and w components of the item at the given index.</div>
 
 
 
