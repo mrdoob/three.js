@@ -295,7 +295,7 @@
 				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
 					uniforms: {
-						resolution: { value: new THREE.Vector2( 512, 512 ) },
+						resolution: { value: new THREE.Vector2( canvas.width, canvas.height ) },
 						cameraWorldMatrix: { value: camera.matrixWorld },
 						cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse( camera.projectionMatrix ) }
 					},
