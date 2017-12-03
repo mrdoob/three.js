@@ -280,7 +280,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( 512, 512 );
+				renderer.setSize( config.resolution, config.resolution );
 
 				canvas = renderer.domElement;
 				canvas.addEventListener( 'mousemove', onMouseMove );
