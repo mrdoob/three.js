@@ -181,7 +181,7 @@
 
 				if ( abs(dist) < EPS ) {
 
-					normal = getNormal(pos);
+					normal = getNormal( pos );
 					float diffuse = clamp( dot( lightDir, normal ), 0.1, 1.0 );
 					float specular = pow( clamp( dot( reflect( lightDir, normal ), ray ), 0.0, 1.0 ), 10.0 );
 					float shadow = getShadow( pos + normal * OFFSET, lightDir );
@@ -290,7 +290,7 @@
 				// Scene
 				scene = new THREE.Scene();
 				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
-				camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ) );
+				camera.lookAt( new THREE.Vector3( 0.0, - 0.3, 1.0 ) );
 
 				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
@@ -353,10 +353,11 @@
 
 				if ( camera.position.y < 0 ) camera.position.y = 0;
 
-				material.uniforms.resolution.value = new THREE.Vector2( canvas.width, canvas.height );
+				material.uniforms.resolution.value.set( canvas.width, canvas.height );
+
 
 				material.uniforms.cameraWorldMatrix.value = camera.matrixWorld;
-				material.uniforms.cameraProjectionMatrixInverse.value = new THREE.Matrix4().getInverse( camera.projectionMatrix );
+				material.uniforms.cameraProjectionMatrixInverse.value.getInverse( camera.projectionMatrix );
 
 				renderer.render( scene, camera );
 
