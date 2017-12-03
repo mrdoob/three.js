@@ -201,7 +201,7 @@
 
 			void main(void) {
 
-				// fragment position
+				// screen position
 				vec2 screenPos = ( gl_FragCoord.xy * 2.0 - resolution ) / min( resolution.x, resolution.y );
 
 				// convert ray direction from screen coordinate to world coordinate
@@ -211,6 +211,7 @@
 				// camera position
 				vec3 cPos = cameraPosition;
 
+				// cast ray
 				vec3 color = vec3( 0.0 );
 				vec3 pos, normal;
 				bool hit;
