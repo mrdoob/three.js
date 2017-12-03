@@ -46,15 +46,19 @@
 			precision highp float;
 
 			uniform vec2 resolution;
-			uniform vec3 cameraPos;
-			uniform vec3 cameraDir;
+
+			uniform mat4 viewMatrix;
+			uniform vec3 cameraPosition;
+
+			uniform mat4 cameraWorldMatrix;
+			uniform mat4 cameraProjectionMatrixInverse;
 
 			const float EPS = 0.01;
 			const float OFFSET = EPS * 100.0;
 			const vec3 lightDir = vec3( -0.48666426339228763, 0.8111071056538127, -0.3244428422615251 );
 
 			// distance functions
-			vec3 onRep( vec3 p, float interval ) {
+			vec3 opRep( vec3 p, float interval ) {
 
 				vec2 q = mod( p.xz, interval ) - interval * 0.5;
 				return vec3( q.x, p.y, q.y );
@@ -63,7 +67,7 @@
 
 			float sphereDist( vec3 p, float r ) {
 
-				return length( onRep( p, 3.0 ) ) - r;
+				return length( opRep( p, 3.0 ) ) - r;
 
 			}
 
@@ -155,18 +159,18 @@
 
 			}
 
-			vec3 getRayColor( vec3 origin, vec3 ray, out vec3 p, out vec3 normal, out bool hit ) {
+			vec3 getRayColor( vec3 origin, vec3 ray, out vec3 pos, out vec3 normal, out bool hit ) {
 
 				// marching loop
 				float dist;
 				float depth = 0.0;
-				p = origin;
+				pos = origin;
 
 				for ( int i = 0; i < 64; i++ ){
 
-					dist = sceneDist( p );
+					dist = sceneDist( pos );
 					depth += dist;
-					p = origin + depth * ray;
+					pos = origin + depth * ray;
 
 					if ( abs(dist) < EPS ) break;
 
@@ -177,11 +181,11 @@
 
 				if ( abs(dist) < EPS ) {
 
-					normal = getNormal(p);
+					normal = getNormal( pos );
 					float diffuse = clamp( dot( lightDir, normal ), 0.1, 1.0 );
 					float specular = pow( clamp( dot( reflect( lightDir, normal ), ray ), 0.0, 1.0 ), 10.0 );
-					float shadow = getShadow( p + normal * OFFSET, lightDir );
-					color = ( sceneColor( p ).rgb * diffuse + vec3( 0.8 ) * specular ) * max( 0.5, shadow );
+					float shadow = getShadow( pos + normal * OFFSET, lightDir );
+					color = ( sceneColor( pos ).rgb * diffuse + vec3( 0.8 ) * specular ) * max( 0.5, shadow );
 
 					hit = true;
 
@@ -197,34 +201,34 @@
 
 			void main(void) {
 
-				// fragment position
-				vec2 p = ( gl_FragCoord.xy * 2.0 - resolution ) / min( resolution.x, resolution.y );
+				// screen position
+				vec2 screenPos = ( gl_FragCoord.xy * 2.0 - resolution ) / min( resolution.x, resolution.y );
 
-				// camera and ray
-				vec3 cPos  = cameraPos;
-				vec3 cDir  = cameraDir;
-				vec3 cSide = normalize( cross( cDir, vec3( 0.0, 1.0 ,0.0 ) ) );
-				vec3 cUp   = normalize( cross( cSide, cDir ) );
-				float targetDepth = 1.3;
-				vec3 ray = normalize( cSide * p.x + cUp * p.y + cDir * targetDepth );
+				// convert ray direction from screen coordinate to world coordinate
+				vec3 ray = (cameraWorldMatrix * cameraProjectionMatrixInverse * vec4( screenPos.xy, 1.0, 1.0 )).xyz;
+				ray = normalize( ray );
 
+				// camera position
+				vec3 cPos = cameraPosition;
+
+				// cast ray
 				vec3 color = vec3( 0.0 );
-				vec3 q, normal;
+				vec3 pos, normal;
 				bool hit;
 				float alpha = 1.0;
 
 				for ( int i = 0; i < 3; i++ ) {
 
-					color += alpha * getRayColor( cPos, ray, q, normal, hit );
+					color += alpha * getRayColor( cPos, ray, pos, normal, hit );
 					alpha *= 0.3;
 					ray = normalize( reflect( ray, normal ) );
-					cPos = q + normal * OFFSET;
+					cPos = pos + normal * OFFSET;
 
 					if ( !hit ) break;
 
 				}
 
-				gl_FragColor = vec4(color, 1.0);
+				gl_FragColor = vec4( color, 1.0 );
 
 			}
 
@@ -250,7 +254,7 @@
 
 		<script>
 
-			var camera, dummyCamera, scene, controls, renderer;
+			var camera, scene, controls, renderer;
 			var geometry, material, mesh;
 			var mouse = new THREE.Vector2( 0.5, 0.5 );
 			var canvas;
@@ -261,7 +265,7 @@
 			var config = {
 				saveImage: function() {
 
-					renderer.render( scene, dummyCamera );
+					renderer.render( scene, camera );
 					window.open( canvas.toDataURL() );
 
 				},
@@ -274,40 +278,42 @@
 
 			function init() {
 
-				scene = new THREE.Scene();
-				camera = new THREE.Camera();
-				dummyCamera = new THREE.Camera();
-				camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ) );
-
-				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
-				material = new THREE.RawShaderMaterial( {
-					uniforms: {
-						resolution: { value: new THREE.Vector2( 512, 512 ) },
-						cameraPos:  { value: camera.getWorldPosition() },
-						cameraDir:  { value: camera.getWorldDirection() }
-					},
-					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
-					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
-				} );
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( 512, 512 );
+				renderer.setSize( config.resolution, config.resolution );
 
 				canvas = renderer.domElement;
 				canvas.addEventListener( 'mousemove', onMouseMove );
 				window.addEventListener( 'resize', onWindowResize );
 				document.body.appendChild( canvas );
 
-				controls = new THREE.FlyControls( camera, canvas );
+				// Scene
+				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
+				camera.lookAt( new THREE.Vector3( 0.0, - 0.3, 1.0 ) );
 
+				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
+				material = new THREE.RawShaderMaterial( {
+					uniforms: {
+						resolution: { value: new THREE.Vector2( canvas.width, canvas.height ) },
+						cameraWorldMatrix: { value: camera.matrixWorld },
+						cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse( camera.projectionMatrix ) }
+					},
+					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
+					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
+				} );
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.frustumCulled = false;
+				scene.add( mesh );
+
+				// Controls
+				controls = new THREE.FlyControls( camera, canvas );
 				controls.autoForward = true;
 				controls.dragToLook = false;
 				controls.rollSpeed = Math.PI / 12;
 				controls.movementSpeed = 0.5;
 
+				// GUI
 				var gui = new dat.GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
 				gui.add( config, 'freeCamera' ).name( 'Free Camera' );
@@ -347,10 +353,10 @@
 
 				if ( camera.position.y < 0 ) camera.position.y = 0;
 
-				material.uniforms.resolution.value = new THREE.Vector2( canvas.width, canvas.height );
-				material.uniforms.cameraPos.value = camera.getWorldPosition();
-				material.uniforms.cameraDir.value = camera.getWorldDirection();
-				renderer.render( scene, dummyCamera );
+				material.uniforms.resolution.value.set( canvas.width, canvas.height );
+				material.uniforms.cameraProjectionMatrixInverse.value.getInverse( camera.projectionMatrix );
+
+				renderer.render( scene, camera );
 
 				stats.end();
 				requestAnimationFrame( render );
