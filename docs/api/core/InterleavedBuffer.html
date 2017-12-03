@@ -11,9 +11,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			"Interleaved" means that multiple types of data (position, color etc.) are packed into a single array buffer.
-			Organizing geometry data in this way improves memory locality. By keeping vertex data close together, it is more likely
-			that also caches (e.g. pre-transform vertex cache) store logically related data together. This leads to more cache hits and a better performance.
+			"Interleaved" means that multiple attributes, possibly of different types, (e.g., position, normal, uv, color) are packed into a single array buffer.
 			<br/><br/>
 			An introduction into interleaved arrays can be found here: [link:https://blog.tojicode.com/2011/05/interleaved-array-basics.html Interleaved array basics]
 		</div>
