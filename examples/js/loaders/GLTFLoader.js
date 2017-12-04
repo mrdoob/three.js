@@ -2064,7 +2064,7 @@ THREE.GLTFLoader = ( function () {
 
 					} else {
 
-						throw new Error( 'THREE.GLTFLoader: Primitive mode unsupported: ', primitive.mode );
+						throw new Error( 'THREE.GLTFLoader: Primitive mode unsupported: ' + primitive.mode );
 
 					}
 
