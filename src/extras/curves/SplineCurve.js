@@ -81,6 +81,8 @@ SplineCurve.prototype.fromJSON = function ( json ) {
 
 	Curve.prototype.fromJSON.call( this, json );
 
+	this.points = [];
+
 	for ( var i = 0, l = json.points.length; i < l; i ++ ) {
 
 		var point = json.points[ i ];

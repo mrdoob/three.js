@@ -242,6 +242,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 		Curve.prototype.fromJSON.call( this, json );
 
 		this.autoClose = json.autoClose;
+		this.curves = [];
 
 		for ( var i = 0, l = json.curves.length; i < l; i ++ ) {
 

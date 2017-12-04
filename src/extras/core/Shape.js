@@ -91,6 +91,8 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		Path.prototype.fromJSON.call( this, json );
 
+		this.holes = [];
+
 		for ( var i = 0, l = json.holes.length; i < l; i ++ ) {
 
 			var hole = json.holes[ i ];
