@@ -31,6 +31,7 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LOD } from '../objects/LOD.js';
 import { Mesh } from '../objects/Mesh.js';
 import { SkinnedMesh } from '../objects/SkinnedMesh.js';
+import { Shape } from '../extras/core/Shape.js';
 import { Fog } from '../scenes/Fog.js';
 import { FogExp2 } from '../scenes/FogExp2.js';
 import { HemisphereLight } from '../lights/HemisphereLight.js';
@@ -330,6 +331,26 @@ Object.assign( ObjectLoader.prototype, {
 							data.indices,
 							data.radius,
 							data.details
+						);
+
+						break;
+
+					case 'ShapeGeometry':
+					case 'ShapeBufferGeometry':
+
+						var shapes = [];
+
+						for ( var i = 0, l = data.shapes.length; i < l; i ++ ) {
+
+							var shape = data.shapes[ i ];
+
+							shapes.push( new Shape().fromJSON( shape ) );
+
+						}
+
+						geometry = new Geometries[ data.type ](
+							shapes,
+							data.curveSegments
 						);
 
 						break;

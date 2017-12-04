@@ -68,6 +68,38 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		return this;
 
+	},
+
+	toJSON: function () {
+
+		var data = Path.prototype.toJSON.call( this );
+
+		data.holes = [];
+
+		for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
+
+			var hole = this.holes[ i ];
+			data.holes.push( hole.toJSON() );
+
+		}
+
+		return data;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		Path.prototype.fromJSON.call( this, json );
+
+		for ( var i = 0, l = json.holes.length; i < l; i ++ ) {
+
+			var hole = json.holes[ i ];
+			this.holes.push( new Path().fromJSON( hole ) );
+
+		}
+
+		return this;
+
 	}
 
 } );

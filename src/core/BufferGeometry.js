@@ -923,6 +923,32 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			}
 
+			// ShapeBufferGeometry
+
+			if ( data.type === 'ShapeBufferGeometry' ) {
+
+				var shapes = parameters.shapes;
+
+				data.shapes = [];
+
+				if ( Array.isArray( shapes ) === false ) {
+
+					data.shapes.push( shapes.toJSON() );
+
+				} else {
+
+					for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+
+						var shape = shapes[ i ];
+
+						data.shapes.push( shape.toJSON() );
+
+					}
+
+				}
+
+			}
+
 			return data;
 
 		}
