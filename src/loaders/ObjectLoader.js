@@ -342,9 +342,9 @@ Object.assign( ObjectLoader.prototype, {
 
 						for ( var i = 0, l = data.shapes.length; i < l; i ++ ) {
 
-							var shape = data.shapes[ i ];
+							var shape = new Shape().fromJSON( data.shapes[ i ] );
 
-							shapes.push( new Shape().fromJSON( shape ) );
+							shapes.push( shape );
 
 						}
 
