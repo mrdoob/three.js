@@ -202,10 +202,13 @@
 			void main(void) {
 
 				// screen position
-				vec2 screenPos = ( gl_FragCoord.xy * 2.0 - resolution ) / min( resolution.x, resolution.y );
+				vec2 screenPos = ( gl_FragCoord.xy * 2.0 - resolution ) / resolution;
 
-				// convert ray direction from screen coordinate to world coordinate
-				vec3 ray = (cameraWorldMatrix * cameraProjectionMatrixInverse * vec4( screenPos.xy, 1.0, 1.0 )).xyz;
+				// ray direction in normalized device coordinate
+				vec4 ndcRay = vec4( screenPos.xy, 1.0, 1.0 );
+
+				// convert ray direction from normalized device coordinate to world coordinate
+				vec3 ray = ( cameraWorldMatrix * cameraProjectionMatrixInverse * ndcRay ).xyz;
 				ray = normalize( ray );
 
 				// camera position
@@ -370,6 +373,9 @@
 					renderer.setSize( config.resolution, config.resolution );
 
 				}
+
+				camera.aspect = canvas.width / canvas.height;
+				camera.updateProjectionMatrix();
 
 			}
 
