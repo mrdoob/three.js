@@ -257,7 +257,6 @@
 			var camera, scene, controls, renderer;
 			var geometry, material, mesh;
 			var mouse = new THREE.Vector2( 0.5, 0.5 );
-			var tmp = new THREE.Vector3();
 			var canvas;
 			var stats;
 
@@ -292,7 +291,6 @@
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
-				camera.lookAt( 0.0, - 0.3, 1.0 );
 
 				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
@@ -310,27 +308,15 @@
 
 				// Controls
 				controls = new THREE.FlyControls( camera, canvas );
-				controls.autoForward = true;
 				controls.dragToLook = false;
 				controls.rollSpeed = Math.PI / 12;
-				controls.movementSpeed = 0.5;
+				controls.movementSpeed = 1;
 
 				// GUI
 				var gui = new dat.GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
 				gui.add( config, 'freeCamera' ).name( 'Free Camera' );
-				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( function ( value ) {
-
-					if ( value !== 'full' ) {
-
-						canvas.width = value;
-						canvas.height = value;
-
-					}
-
-					onWindowResize();
-
-				} );
+				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( onWindowResize );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -349,8 +335,8 @@
 
 				} else {
 
-					camera.position.set( mouse.x - 0.5, mouse.y * 4, timestamp * 0.001 );
-					camera.lookAt( tmp.set( 0.0, - 0.3, 1.0 ).add( camera.position ) );
+					camera.position.set( mouse.x * 2 - 1, mouse.y * 4, timestamp * 0.001 );
+					camera.rotation.set( 0.25, - Math.PI, 0 );
 
 				}
 
@@ -368,8 +354,8 @@
 
 			function onMouseMove( e ) {
 
-				mouse.x = e.offsetX / canvas.width;
-				mouse.y = e.offsetY / canvas.height;
+				mouse.x = e.clientX / window.innerWidth;
+				mouse.y = e.clientY / window.innerHeight;
 
 			}
 
@@ -377,12 +363,13 @@
 
 				if ( config.resolution === 'full' ) {
 
-					canvas.width = window.innerWidth;
-					canvas.height = window.innerHeight;
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+				} else {
+
+					renderer.setSize( config.resolution, config.resolution );
 
 				}
-
-				renderer.setSize( canvas.width, canvas.height );
 
 			}
 
