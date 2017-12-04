@@ -345,8 +345,6 @@
 
 				if ( camera.position.y < 0 ) camera.position.y = 0;
 
-				material.uniforms.resolution.value.set( canvas.width, canvas.height );
-				material.uniforms.cameraProjectionMatrixInverse.value.getInverse( camera.projectionMatrix );
 
 				renderer.render( scene, camera );
 
@@ -376,6 +374,9 @@
 
 				camera.aspect = canvas.width / canvas.height;
 				camera.updateProjectionMatrix();
+
+				material.uniforms.resolution.value.set( canvas.width, canvas.height );
+				material.uniforms.cameraProjectionMatrixInverse.value.getInverse( camera.projectionMatrix );
 
 			}
 
