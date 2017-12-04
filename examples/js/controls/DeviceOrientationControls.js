@@ -9,15 +9,16 @@ THREE.DeviceOrientationControls = function( object ) {
 
 	var scope = this;
 
-	this.object = object;
-	this.object.rotation.reorder( "YXZ" );
+	scope.object = object;
+	scope.object.rotation.reorder( "YXZ" );
 
-	this.enabled = true;
+	scope.enabled = true;
 
-	this.deviceOrientation = {};
-	this.screenOrientation = 0;
+	scope.deviceOrientation = {};
+	scope.alphaOffset = THREE.Math.degToRad( 90 );
 
-	this.alphaOffset = 0; // radians
+	scope.screenOrientation = window.orientation || 0;
+	if( scope.screenOrientation === 0 || scope.screenOrientation === -90 ) scope.alphaOffset *= -1.0;
 
 	var onDeviceOrientationChangeEvent = function( event ) {
 
