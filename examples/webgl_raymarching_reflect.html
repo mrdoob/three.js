@@ -257,13 +257,14 @@
 			var camera, scene, controls, renderer;
 			var geometry, material, mesh;
 			var mouse = new THREE.Vector2( 0.5, 0.5 );
+			var tmp = new THREE.Vector3();
 			var canvas;
 			var stats;
 
 			var clock = new THREE.Clock();
 
 			var config = {
-				saveImage: function() {
+				saveImage: function () {
 
 					renderer.render( scene, camera );
 					window.open( canvas.toDataURL() );
@@ -289,8 +290,9 @@
 
 				// Scene
 				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
-				camera.lookAt( new THREE.Vector3( 0.0, - 0.3, 1.0 ) );
+				camera.lookAt( 0.0, - 0.3, 1.0 );
 
 				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
@@ -317,7 +319,7 @@
 				var gui = new dat.GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
 				gui.add( config, 'freeCamera' ).name( 'Free Camera' );
-				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( function( value ) {
+				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( function ( value ) {
 
 					if ( value !== 'full' ) {
 
@@ -325,6 +327,7 @@
 						canvas.height = value;
 
 					}
+
 					onWindowResize();
 
 				} );
@@ -347,7 +350,7 @@
 				} else {
 
 					camera.position.set( mouse.x - 0.5, mouse.y * 4, timestamp * 0.001 );
-					camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ).add( camera.position ) );
+					camera.lookAt( tmp.set( 0.0, - 0.3, 1.0 ).add( camera.position ) );
 
 				}
 
