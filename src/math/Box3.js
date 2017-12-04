@@ -468,12 +468,6 @@ Object.assign( Box3.prototype, {
 
 	translate: function ( offset ) {
 
-		if ( ! offset.isVector3 ) {
-
-			throw new Error( 'THREE.Box3: .translate() expects a Vector3.' );
-
-		}
-
 		this.min.add( offset );
 		this.max.add( offset );
 
