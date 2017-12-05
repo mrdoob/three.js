@@ -931,11 +931,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 				data.shapes = [];
 
-				if ( Array.isArray( shapes ) === false ) {
-
-					data.shapes.push( shapes.uuid );
-
-				} else {
+				if ( Array.isArray( shapes ) ) {
 
 					for ( var i = 0, l = shapes.length; i < l; i ++ ) {
 
@@ -944,6 +940,10 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 						data.shapes.push( shape.uuid );
 
 					}
+
+				} else {
+
+					data.shapes.push( shapes.uuid );
 
 				}
 
