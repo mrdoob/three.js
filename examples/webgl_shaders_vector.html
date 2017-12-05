@@ -22,7 +22,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
 		</div>
 		<script src="../build/three.js"></script>
 		<script src="./js/controls/OrbitControls.js"></script>
@@ -110,8 +110,10 @@
 
 				controls = new THREE.OrbitControls( camera );
 				controls.target.set( 0, 100, 0 );
+				controls.update();
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				var theText = "&"; // i % & j b 8
 
@@ -125,9 +127,9 @@
 					wireframe: true
 				} );
 
-				textShapes = font.generateShapes( theText, 180, 2 );
+				var textShapes = font.generateShapes( theText, 180, 2 );
 
-				text3d = new THREE.ShapeGeometry( textShapes );
+				var text3d = new THREE.ShapeGeometry( textShapes );
 
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
@@ -138,9 +140,9 @@
 
 				//
 
-				vA = new THREE.Vector2();
-				vB = new THREE.Vector2();
-				vDot = new THREE.Vector2();
+				var vA = new THREE.Vector2();
+				var vB = new THREE.Vector2();
+				var vDot = new THREE.Vector2();
 
 				function processShape(path, reverse) {
 
@@ -156,7 +158,7 @@
 					pts2.push( path[0].getPoint(0) );
 
 					for (var i=0; i < path.length; i++) {
-						curve = path[i];
+						var curve = path[i];
 						if (curve instanceof THREE.LineCurve) {
 							pts.push( curve.v2 );
 							pts2.push( curve.v2 );
@@ -196,16 +198,21 @@
 					};
 				}
 
+				var pts, pts2;
 				var subshape;
+				var convexhullShape;
+				var solidShape;
 				var convexhullShapeGroup = [];
 				var solidShapeGroup = [];
 
 				var beziers = [], invert = [];
+				var process;
+				var hole;
 
 				for (var s=0;s<textShapes.length;s++) {
 
 					subshape = textShapes[s];
-					var process = processShape(subshape.curves);
+					process = processShape(subshape.curves);
 
 					pts = process.pts;
 					pts2 = process.pts2;
@@ -236,10 +243,10 @@
 
 				} // end of subshape
 
-				bezierGeometry = new THREE.Geometry();
+				var bezierGeometry = new THREE.Geometry();
 
 				for (var i=0;i<beziers.length;i++) {
-					p = beziers[i];
+					var p = beziers[i];
 					bezierGeometry.vertices.push( new THREE.Vector3(p.x, p.y, 0) );
 				}
 
@@ -256,7 +263,7 @@
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
-				text1 = new THREE.Mesh( text3d, textMaterial );
+				var text1 = new THREE.Mesh( text3d, textMaterial );
 
 				text1.position.x = centerOffset + 150;
 
@@ -266,7 +273,7 @@
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
-				text2 = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: new THREE.Color(1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
+				var text2 = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: new THREE.Color(1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
 				text2.position.x = centerOffset + 150;
 				group.add( text2 );
 
@@ -276,11 +283,11 @@
 				bezierGeometry.computeVertexNormals();
 
 				bezierGeometry = new THREE.BufferGeometry().fromGeometry( bezierGeometry );
-				bezierGeometry.addAttribute( 'invert', new THREE.Float32Attribute( invert, 1 ) );
+				bezierGeometry.addAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
 
 				//
 
-				newMaterial = new THREE.ShaderMaterial({
+				var newMaterial = new THREE.ShaderMaterial({
 					uniforms: {
 						color: { value: new THREE.Color(0.45 * 0xffffff) }
 					},
@@ -319,7 +326,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -356,7 +362,6 @@
 
 			function render() {
 
-				controls.update();
 				renderer.render( scene, camera );
 
 			}

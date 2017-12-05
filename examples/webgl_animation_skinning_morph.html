@@ -39,7 +39,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - clip system
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - clip system
 		- knight by <a href="http://vimeo.com/36113323">apendua</a>
 			<div id="meminfo"></div>
 		</div>
@@ -88,7 +88,7 @@
 				camera.position.z = 2200;
 
 				scene = new THREE.Scene();
-
+				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
 
 				scene.add( camera );
@@ -131,7 +131,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
@@ -154,7 +153,7 @@
 				var loader = new THREE.JSONLoader();
 				loader.load( "models/skinned/knight.js", function ( geometry, materials ) {
 
-					createScene( geometry, materials, 0, FLOOR, -300, 60 )
+					createScene( geometry, materials, 0, FLOOR, -300, 60 );
 
 					// GUI
 
@@ -215,7 +214,7 @@
 
 				}
 
-				mesh = new THREE.SkinnedMesh( geometry, new THREE.MultiMaterial( materials ) );
+				mesh = new THREE.SkinnedMesh( geometry, materials );
 				mesh.name = "Knight Mesh";
 				mesh.position.set( x, y - bb.min.y * s, z );
 				mesh.scale.set( s, s, s );
@@ -225,7 +224,7 @@
 				mesh.receiveShadow = true;
 
 
-				mesh2 = new THREE.SkinnedMesh( geometry, new THREE.MultiMaterial( materials ) );
+				mesh2 = new THREE.SkinnedMesh( geometry, materials );
 				mesh2.name = "Lil' Bro Mesh";
 				mesh2.position.set( x - 240, y - bb.min.y * s, z + 500 );
 				mesh2.scale.set( s / 2, s / 2, s / 2 );
@@ -606,7 +605,7 @@
 					folder.add( API, 'uncache clip' );
 					folder.add( API, 'uncache action' );
 
-				}
+				};
 
 				memoryControl( gui, mixer,
 						[ bonesClip, facesClip ], [ mesh, mesh2 ] );
@@ -655,8 +654,9 @@
 				camera.lookAt( scene.position );
 
 				if( mixer ) {
+
 					mixer.update( delta );
-					helper.update();
+
 				}
 
 				renderer.render( scene, camera );

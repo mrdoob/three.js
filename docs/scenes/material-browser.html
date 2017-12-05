@@ -44,13 +44,13 @@
 
 			var gui = new dat.GUI();
 			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 50 );
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 10, 50 );
 			camera.position.z = 30;
 
 			var renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setClearColor( 0x000000 );
+			renderer.setClearColor( 0x000000, 1 );
 			document.body.appendChild( renderer.domElement );
 
 			var ambientLight = new THREE.AmbientLight( 0x000000 );

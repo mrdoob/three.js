@@ -40,7 +40,7 @@ THREE.JoinNode.prototype.getNumElements = function() {
 
 THREE.JoinNode.prototype.getType = function( builder ) {
 
-	return builder.getFormatByLength( this.getNumElements() );
+	return builder.getFormatFromLength( this.getNumElements() );
 
 };
 
@@ -56,13 +56,13 @@ THREE.JoinNode.prototype.generate = function( builder, output ) {
 
 	for ( var i = 0; i < length; i ++ ) {
 
-		var elm = this[ inputs[ i ]];
+		var elm = this[ inputs[ i ] ];
 
 		outputs.push( elm ? elm.build( builder, 'fv1' ) : '0.' );
 
 	}
 
-	var code = builder.getFormatConstructor( length ) + '(' + outputs.join( ',' ) + ')';
+	var code = ( length > 1 ? builder.getConstructorFromLength( length ) : '' ) + '(' + outputs.join( ',' ) + ')';
 
 	return builder.format( code, type, output );
 

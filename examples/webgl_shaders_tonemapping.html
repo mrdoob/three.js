@@ -25,8 +25,8 @@
 	<body>
 		<div id="d">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank">three.js</a> webgl demo :
-				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank">Sean Ward</a> :
+				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl demo :
+				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank" rel="noopener">Sean Ward</a> :
 
 			</div>
 			<div class="label" style="position: absolute;left: 12%;bottom: 10%;">Low Dynamic Range</div>
@@ -62,13 +62,13 @@
 
 			var container;
 
-			var bloomPass, adaptToneMappingPass;
+			var bloomPass, adaptToneMappingPass, ldrToneMappingPass, hdrToneMappingPass;
 			var params;
 
 			var camera, scene, renderer, dynamicHdrEffectComposer, hdrEffectComposer, ldrEffectComposer;
 			var cameraCube, sceneCube;
 			var cameraBG, debugScene;
-			var adaptiveLuminanceMat, currentLuminanceRT, previousLuminanceMat;
+			var adaptiveLuminanceMat, currentLuminanceRT, currentLuminanceMat, previousLuminanceMat;
 
 			var directionalLight;
 
@@ -94,7 +94,7 @@
 					middleGrey: 0.04,
 					maxLuminance: 16,
 
-					adaptionRate: 2.0,
+					adaptionRate: 2.0
 				};
 
 				container = document.createElement( 'div' );
@@ -190,7 +190,7 @@
 
 						"}"
 
-					].join("\n"),
+					].join("\n")
 				};
 
 				var earthAtmoMat = new THREE.ShaderMaterial( atmoShader );
@@ -298,7 +298,7 @@
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
-					depthTest: false,
+					depthTest: false
 					// color: 0xffffff
 					// blending: THREE.NoBlending
 				} );
@@ -350,8 +350,6 @@
 
 				container.appendChild( renderer.domElement );
 
-				var extensions = new THREE.WebGLExtensions( renderer.getContext() );
-
 				// var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
 
@@ -359,7 +357,7 @@
 				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				ldrEffectComposer = new THREE.EffectComposer( renderer, regularRenderTarget );
 
-				if ( extensions.get('OES_texture_half_float_linear') ) {
+				if ( renderer.extensions.get('OES_texture_half_float_linear') ) {
 					parameters.type = THREE.FloatType;
 				}
 				var hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );

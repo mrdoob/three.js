@@ -1,5 +1,5 @@
-import { Material } from './Material';
-import { Color } from '../math/Color';
+import { Material } from './Material.js';
+import { Color } from '../math/Color.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -34,6 +34,7 @@ function SpriteMaterial( parameters ) {
 
 SpriteMaterial.prototype = Object.create( Material.prototype );
 SpriteMaterial.prototype.constructor = SpriteMaterial;
+SpriteMaterial.prototype.isSpriteMaterial = true;
 
 SpriteMaterial.prototype.copy = function ( source ) {
 

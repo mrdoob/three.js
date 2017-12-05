@@ -25,8 +25,7 @@ THREE.GLNode.prototype.generate = function( builder ) {
 
 		code += 'gl_Position = ' + data.result + ';';
 
-	}
-	else {
+	} else {
 
 		code += 'gl_FragColor = ' + data.result + ';';
 

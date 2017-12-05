@@ -20,11 +20,10 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 				var min = this.map[ j ][ 0 ];
 				var max = this.map[ j + 1 ][ 0 ];
 
-				var color = new THREE.Color( 0xffffff );
 				var minColor = new THREE.Color( 0xffffff ).setHex( this.map[ j ][ 1 ] );
 				var maxColor = new THREE.Color( 0xffffff ).setHex( this.map[ j + 1 ][ 1 ] );
 
-				color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
+				var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
 				this.lut.push( color );
 
@@ -158,10 +157,9 @@ THREE.Lut.prototype = {
 
 		this.legend.texture = new THREE.Texture( this.legend.canvas );
 
-		imageData = this.legend.ctx.getImageData( 0, 0, 1, this.n );
+		var imageData = this.legend.ctx.getImageData( 0, 0, 1, this.n );
 
-		data = imageData.data;
-		len = data.length;
+		var data = imageData.data;
 
 		this.map = THREE.ColorMapKeywords[ this.mapname ];
 
@@ -177,10 +175,11 @@ THREE.Lut.prototype = {
 
 					var min = this.map[ j - 1 ][ 0 ];
 					var max = this.map[ j ][ 0 ];
-					var color = new THREE.Color( 0xffffff );
+
 					var minColor = new THREE.Color( 0xffffff ).setHex( this.map[ j - 1 ][ 1 ] );
 					var maxColor = new THREE.Color( 0xffffff ).setHex( this.map[ j ][ 1 ] );
-					color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
+
+					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
 					data[ k * 4 ] = Math.round( color.r * 255 );
 					data[ k * 4 + 1 ] = Math.round( color.g * 255 );

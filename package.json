@@ -1,33 +1,41 @@
 {
   "name": "three",
-  "version": "0.79.0",
+  "version": "0.88.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
+  "repository": "mrdoob/three.js",
+  "jsnext:main": "build/three.module.js",
+  "module": "build/three.module.js",
   "files": [
     "package.json",
+    "bower.json",
     "LICENSE",
     "README.md",
     "build/three.js",
     "build/three.min.js",
+    "build/three.module.js",
     "src",
     "examples/js",
-    "examples/fonts",
-    "bower.json"
+    "examples/fonts"
   ],
   "directories": {
     "doc": "docs",
     "example": "examples",
     "test": "test"
   },
+  "eslintConfig": {
+    "extends": "mdcs"
+  },
   "scripts": {
     "build": "rollup -c",
-    "build-min": "rollup -c && uglifyjs build/three.js -cm > build/three.min.js",
-    "dev": "rollup -c -w",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mrdoob/three.js"
+    "build-test": "rollup -c test/rollup.unit.config.js -w",
+    "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
+    "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --port 8080\"",
+    "start": "npm run dev",
+    "lint": "eslint src",
+    "test": "qunit test/unit/three.source.unit.js",
+    "editor": "electron ./editor/main.js"
   },
   "keywords": [
     "three",
@@ -42,10 +50,15 @@
   },
   "homepage": "http://threejs.org/",
   "devDependencies": {
-    "argparse": "^1.0.3",
-    "chokidar-cli": "1.2.0",
-    "jscs": "^1.13.1",
-    "rollup": "^0.34.8",
-    "uglify-js": "^2.6.0"
+    "concurrently": "^3.5.0",
+    "electron": "1.7.8",
+    "eslint": "^4.1.1",
+    "eslint-config-mdcs": "^4.2.2",
+    "google-closure-compiler": "^20170521.0.0",
+    "qunitjs": "^2.4.0",
+    "rollup": "^0.51.0",
+    "rollup-watch": "^4.0.0",
+    "serve": "^6.3.1",
+    "uglify-js": "^3.0.23"
   }
 }

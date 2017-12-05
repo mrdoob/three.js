@@ -29,7 +29,7 @@ Menubar.View = function ( editor ) {
 
 		} else {
 
-			alert( 'WebVR nor available' );
+			alert( 'WebVR not available' );
 
 		}
 

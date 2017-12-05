@@ -134,7 +134,7 @@ THREE.SimplifyModifier = function() {
 		}
 
 		// we average the cost of collapsing at this vertex
-		v.collapseCost = v.totalCost / v.costCount
+		v.collapseCost = v.totalCost / v.costCount;
 		// v.collapseCost = v.minCost;
 
 	}
@@ -349,7 +349,7 @@ THREE.SimplifyModifier = function() {
 
 	Vertex.prototype.addUniqueNeighbor = function( vertex ) {
 		pushIfUnique(this.neighbors, vertex);
-	}
+	};
 
 	Vertex.prototype.removeIfNonNeighbor = function( n ) {
 
@@ -365,7 +365,7 @@ THREE.SimplifyModifier = function() {
 		}
 
 		neighbors.splice( offset, 1 );
-	}
+	};
 
 	THREE.SimplifyModifier.prototype.modify = function( geometry, count ) {
 
@@ -458,4 +458,4 @@ THREE.SimplifyModifier = function() {
 
 		return newGeo;
 	};
-})()
+})();

@@ -52,6 +52,8 @@ class Object(base_classes.BaseNode):
         self[constants.DISTANCE] = 0;
 
         lightType = self[constants.TYPE]
+
+        # TODO (abelnation): handle Area lights
         if lightType == constants.SPOT_LIGHT:
             self[constants.ANGLE] = api.light.angle(self.data)
             self[constants.DECAY] = api.light.falloff(self.data)
@@ -88,14 +90,26 @@ class Object(base_classes.BaseNode):
 
         if self.options.get(constants.MATERIALS):
             logger.info("Parsing materials for %s", self.node)
-            material_name = api.object.material(self.node)
-            if material_name:
-                logger.info("Material found %s", material_name)
-                material_inst = self.scene.material(material_name)
-                self[constants.MATERIAL] = material_inst[constants.UUID]
-            else:
-                logger.info("%s has no materials", self.node)
 
+
+            material_names = api.object.material(self.node) #manthrax: changes for multimaterial start here
+            if material_names:
+
+                logger.info("Got material names for this object:%s",str(material_names));
+
+                materialArray = [self.scene.material(objname)[constants.UUID] for objname in material_names]
+                if len(materialArray) == 0:  # If no materials.. dont export a material entry
+                    materialArray = None
+                elif len(materialArray) == 1: # If only one material, export material UUID singly, not as array
+                    materialArray = materialArray[0]
+                # else export array of material uuids
+                self[constants.MATERIAL] = materialArray
+
+                logger.info("Materials:%s",str(self[constants.MATERIAL]));
+            else:
+                logger.info("%s has no materials", self.node) #manthrax: end multimaterial
+
+        # TODO (abelnation): handle Area lights
         casts_shadow = (constants.MESH,
                         constants.DIRECTIONAL_LIGHT,
                         constants.SPOT_LIGHT)
@@ -113,6 +127,7 @@ class Object(base_classes.BaseNode):
         camera = (constants.PERSPECTIVE_CAMERA,
                   constants.ORTHOGRAPHIC_CAMERA)
 
+        # TODO (abelnation): handle Area lights
         lights = (constants.AMBIENT_LIGHT,
                   constants.DIRECTIONAL_LIGHT,
                   constants.POINT_LIGHT,

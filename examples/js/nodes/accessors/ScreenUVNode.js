@@ -22,8 +22,7 @@ THREE.ScreenUVNode.prototype.generate = function( builder, output ) {
 
 		result = '(gl_FragCoord.xy/' + this.resolution.build( builder, 'v2' ) + ')';
 
-	}
-	else {
+	} else {
 
 		console.warn( "THREE.ScreenUVNode is not compatible with " + builder.shader + " shader." );
 

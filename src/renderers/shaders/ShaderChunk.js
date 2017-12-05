@@ -28,8 +28,11 @@ import envmap_fragment from './ShaderChunk/envmap_fragment.glsl';
 import envmap_pars_fragment from './ShaderChunk/envmap_pars_fragment.glsl';
 import envmap_pars_vertex from './ShaderChunk/envmap_pars_vertex.glsl';
 import envmap_vertex from './ShaderChunk/envmap_vertex.glsl';
+import fog_vertex from './ShaderChunk/fog_vertex.glsl';
+import fog_pars_vertex from './ShaderChunk/fog_pars_vertex.glsl';
 import fog_fragment from './ShaderChunk/fog_fragment.glsl';
 import fog_pars_fragment from './ShaderChunk/fog_pars_fragment.glsl';
+import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.glsl';
 import lightmap_fragment from './ShaderChunk/lightmap_fragment.glsl';
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl';
 import lights_lambert_vertex from './ShaderChunk/lights_lambert_vertex.glsl';
@@ -52,12 +55,13 @@ import metalnessmap_pars_fragment from './ShaderChunk/metalnessmap_pars_fragment
 import morphnormal_vertex from './ShaderChunk/morphnormal_vertex.glsl';
 import morphtarget_pars_vertex from './ShaderChunk/morphtarget_pars_vertex.glsl';
 import morphtarget_vertex from './ShaderChunk/morphtarget_vertex.glsl';
-import normal_flip from './ShaderChunk/normal_flip.glsl';
 import normal_fragment from './ShaderChunk/normal_fragment.glsl';
 import normalmap_pars_fragment from './ShaderChunk/normalmap_pars_fragment.glsl';
 import packing from './ShaderChunk/packing.glsl';
 import premultiplied_alpha_fragment from './ShaderChunk/premultiplied_alpha_fragment.glsl';
 import project_vertex from './ShaderChunk/project_vertex.glsl';
+import dithering_fragment from './ShaderChunk/dithering_fragment.glsl';
+import dithering_pars_fragment from './ShaderChunk/dithering_pars_fragment.glsl';
 import roughnessmap_fragment from './ShaderChunk/roughnessmap_fragment.glsl';
 import roughnessmap_pars_fragment from './ShaderChunk/roughnessmap_pars_fragment.glsl';
 import shadowmap_pars_fragment from './ShaderChunk/shadowmap_pars_fragment.glsl';
@@ -136,8 +140,11 @@ export var ShaderChunk = {
 	envmap_pars_fragment: envmap_pars_fragment,
 	envmap_pars_vertex: envmap_pars_vertex,
 	envmap_vertex: envmap_vertex,
+	fog_vertex: fog_vertex,
+	fog_pars_vertex: fog_pars_vertex,
 	fog_fragment: fog_fragment,
 	fog_pars_fragment: fog_pars_fragment,
+	gradientmap_pars_fragment: gradientmap_pars_fragment,
 	lightmap_fragment: lightmap_fragment,
 	lightmap_pars_fragment: lightmap_pars_fragment,
 	lights_lambert_vertex: lights_lambert_vertex,
@@ -160,12 +167,13 @@ export var ShaderChunk = {
 	morphnormal_vertex: morphnormal_vertex,
 	morphtarget_pars_vertex: morphtarget_pars_vertex,
 	morphtarget_vertex: morphtarget_vertex,
-	normal_flip: normal_flip,
 	normal_fragment: normal_fragment,
 	normalmap_pars_fragment: normalmap_pars_fragment,
 	packing: packing,
 	premultiplied_alpha_fragment: premultiplied_alpha_fragment,
 	project_vertex: project_vertex,
+	dithering_fragment: dithering_fragment,
+	dithering_pars_fragment: dithering_pars_fragment,
 	roughnessmap_fragment: roughnessmap_fragment,
 	roughnessmap_pars_fragment: roughnessmap_pars_fragment,
 	shadowmap_pars_fragment: shadowmap_pars_fragment,

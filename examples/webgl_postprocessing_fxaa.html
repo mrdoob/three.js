@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - FXAA 3.11</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #61443e;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				/* background-color: #bfd1e5; */
+				background-color: #ffffff;
+				margin: 0px;
+			}
+
+			a {	color: #a06851;	}
+
+			canvas {
+				margin: 20px;
+				margin-top: 40px;
+			}
+
+		</style>
+	</head>
+	<body>
+
+        <div id="info">
+            <p><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FXAA example </p>
+            <p>original image (left) - FXAA 3.11 post-processing antialiasing (right)</p>
+			<p>Image source: <a href="https://github.com/mattdesl/glsl-fxaa" target="_blank" rel="noopener">glsl-fxaa by mattdesl</a></p>
+        </div>
+
+		<div id="container"></div>
+
+
+		<script src="../build/three.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+
+		<script src="js/Detector.js"></script>
+
+		<script>
+
+			( function closure() {
+
+				'use strict';
+
+				if ( ! Detector.webgl ) {
+					Detector.addGetWebGLMessage();
+				}
+
+				var loader = new THREE.TextureLoader();
+				loader.load( "textures/fxaa_scene.png", function onLoad( texture ) {
+					var image = texture.image;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+
+					var fxaaMaterial = new THREE.ShaderMaterial( THREE.FXAAShader );
+					fxaaMaterial.uniforms.tDiffuse.value = texture;
+					fxaaMaterial.uniforms.resolution.value.x = 1 / image.naturalWidth;
+					fxaaMaterial.uniforms.resolution.value.y = 1 / image.naturalHeight;
+
+					var basicMaterial = new THREE.MeshBasicMaterial( { map: texture } );
+
+					var plane = new THREE.PlaneBufferGeometry( 1, 1 );
+
+					var quad1 = new THREE.Mesh( plane, basicMaterial );
+					var quad2 = new THREE.Mesh( plane, fxaaMaterial );
+					var scene1 = new THREE.Scene();
+					var scene2 = new THREE.Scene();
+					scene1.add( quad1 );
+					scene2.add( quad2 );
+
+					var camera = new THREE.OrthographicCamera( -0.5, 0.5, 0.5, -0.5, -0.5, 0.5 );
+
+					var container = document.getElementById( 'container' );
+
+
+					var renderer1 = new THREE.WebGLRenderer();
+					renderer1.setPixelRatio( window.devicePixelRatio );
+					renderer1.setSize( image.naturalWidth, image.naturalHeight );
+					container.appendChild( renderer1.domElement );
+
+					var renderer2 = new THREE.WebGLRenderer();
+					renderer2.setPixelRatio( window.devicePixelRatio );
+					renderer2.setSize( image.naturalWidth, image.naturalHeight );
+					container.appendChild( renderer2.domElement );
+
+					renderer1.render( scene1, camera );
+					renderer2.render( scene2, camera );
+				});
+			})();
+
+		</script>
+	</body>
+</html>

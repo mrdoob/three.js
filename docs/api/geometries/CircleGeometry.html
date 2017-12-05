@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">CircleGeometry is a simple shape of Euclidean geometry.  It is contructed from a number of triangular segments that are oriented around a central point and extend as far out as a given radius.  It is built counter-clockwise from a start angle and a given central angle.  It can also be used to create regular polygons, where the number of segments determines the number of sides.
+		</div>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#CircleGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Example</h2>
+
+		<code>
+		var geometry = new THREE.CircleGeometry( 5, 32 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var circle = new THREE.Mesh( geometry, material );
+		scene.add( circle );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]([page:Float radius], [page:Integer segments], [page:Float thetaStart], [page:Float thetaLength])</h3>
+		<div>
+		radius — Radius of the circle, default = 1.<br />
+		segments — Number of segments (triangles), minimum = 3, default = 8.<br />
+		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
+		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete circle.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

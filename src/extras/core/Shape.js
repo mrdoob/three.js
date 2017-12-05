@@ -1,7 +1,4 @@
-import { PathPrototype } from './PathPrototype';
-import { ShapeGeometry } from '../geometries/ShapeGeometry';
-import { ExtrudeGeometry } from '../geometries/ExtrudeGeometry';
-import { Path } from './Path';
+import { Path } from './Path.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -14,33 +11,19 @@ import { Path } from './Path';
 // STEP 3a - Extract points from each shape, turn to vertices
 // STEP 3b - Triangulate each shape, add faces.
 
-function Shape() {
+function Shape( points ) {
 
-	Path.apply( this, arguments );
+	Path.call( this, points );
+
+	this.type = 'Shape';
 
 	this.holes = [];
 
 }
 
-Shape.prototype = Object.assign( Object.create( PathPrototype ), {
+Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 	constructor: Shape,
-
-	// Convenience method to return ExtrudeGeometry
-
-	extrude: function ( options ) {
-
-		return new ExtrudeGeometry( this, options );
-
-	},
-
-	// Convenience method to return ShapeGeometry
-
-	makeGeometry: function ( options ) {
-
-		return new ShapeGeometry( this, options );
-
-	},
 
 	getPointsHoles: function ( divisions ) {
 
@@ -56,9 +39,9 @@ Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
 	},
 
-	// Get points of shape and holes (keypoints based on segments parameter)
+	// get points of shape and holes (keypoints based on segments parameter)
 
-	extractAllPoints: function ( divisions ) {
+	extractPoints: function ( divisions ) {
 
 		return {
 
@@ -69,9 +52,21 @@ Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
 	},
 
-	extractPoints: function ( divisions ) {
+	copy: function ( source ) {
 
-		return this.extractAllPoints( divisions );
+		Path.prototype.copy.call( this, source );
+
+		this.holes = [];
+
+		for ( var i = 0, l = source.holes.length; i < l; i ++ ) {
+
+			var hole = source.holes[ i ];
+
+			this.holes.push( hole.clone() );
+
+		}
+
+		return this;
 
 	}
 

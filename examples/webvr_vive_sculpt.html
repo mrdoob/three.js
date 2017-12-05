@@ -1,0 +1,321 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webvr - htc vive - sculpt</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2017-12-16 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2017-12-16" content="AvEXeg7kY84HQ60ApBlqf6zPqClJwEy499YltannXHd+qIIN8ibQQFbHDkKL/Na/L7ha4VOqsjsGHhFpI6HYfgAAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxMzQ0NjE5Nn0=">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #101010;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			a {
+				color: #f00;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/vr/ViveController.js"></script>
+		<script src="js/vr/WebVR.js"></script>
+
+		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/MarchingCubes.js"></script>
+
+		<script>
+
+			var container;
+			var camera, scene, renderer;
+			var controller1, controller2;
+
+			var blob, vector;
+
+			var points = [];
+
+			init();
+			initBlob();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - htc vive - sculpt';
+				container.appendChild( info );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				var user = new THREE.Group();
+				user.position.set( 0, 1.6, 0 );
+				scene.add( user );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
+				user.add( camera );
+
+				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0x444444,
+					roughness: 1.0,
+					metalness: 0.0
+				} );
+				var table = new THREE.Mesh( geometry, material );
+				table.position.y = 0.35;
+				table.position.z = 0.85;
+				table.castShadow = true;
+				table.receiveShadow = true;
+				scene.add( table );
+
+				var geometry = new THREE.PlaneGeometry( 4, 4 );
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0x222222,
+					roughness: 1.0,
+					metalness: 0.0
+				} );
+				var floor = new THREE.Mesh( geometry, material );
+				floor.rotation.x = - Math.PI / 2;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				scene.add( new THREE.GridHelper( 20, 40, 0x111111, 0x111111 ) );
+
+				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 6, 0 );
+				light.castShadow = true;
+				light.shadow.camera.top = 2;
+				light.shadow.camera.bottom = -2;
+				light.shadow.camera.right = 2;
+				light.shadow.camera.left = -2;
+				light.shadow.mapSize.set( 4096, 4096 );
+
+				scene.add( light );
+
+				// scene.add( new THREE.DirectionalLightHelper( light ) );
+				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
+				renderer.vr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( WEBVR.createButton( renderer ) );
+
+				// controllers
+
+				controller1 = new THREE.ViveController( 0 );
+				user.add( controller1 );
+
+				controller2 = new THREE.ViveController( 1 );
+				user.add( controller2 );
+
+				var loader = new THREE.OBJLoader();
+				loader.setPath( 'models/obj/vive-controller/' );
+				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+
+					var loader = new THREE.TextureLoader();
+					loader.setPath( 'models/obj/vive-controller/' );
+
+					var controller = object.children[ 0 ];
+					controller.material.map = loader.load( 'onepointfive_texture.png' );
+					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
+					controller.castShadow = true;
+					controller.receiveShadow = true;
+
+					// var pivot = new THREE.Mesh( new THREE.BoxGeometry( 0.01, 0.01, 0.01 ) );
+					var pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.002, 2 ), blob.material );
+					pivot.name = 'pivot';
+					pivot.position.y = -0.016;
+					pivot.position.z = -0.043;
+					pivot.rotation.x = Math.PI / 5.5;
+					controller.add( pivot );
+
+					var range = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.03, 3 ), new THREE.MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
+					pivot.add( range );
+
+					controller1.add( controller.clone() );
+					controller2.add( controller.clone() );
+
+				} );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function initBlob() {
+
+				/*
+				var path = "textures/cube/SwedishRoyalCastle/";
+				var format = '.jpg';
+				var urls = [
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
+
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				*/
+
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0xffffff,
+					// envMap: reflectionCube,
+					roughness: 0.9,
+					metalness: 0.0
+				} );
+
+				blob = new THREE.MarchingCubes( 64, material, true );
+				blob.position.y = 1;
+				scene.add( blob );
+
+				initPoints();
+
+			}
+
+			function initPoints() {
+
+				points = [
+					{ position: new THREE.Vector3(), strength: - 0.08, subtract: 10 },
+					{ position: new THREE.Vector3(), strength:   0.04, subtract: 10 }
+				];
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				renderer.animate( render );
+
+			}
+
+			function transformPoint( vector ) {
+
+				vector.x = ( vector.x + 1.0 ) / 2.0;
+				vector.y = ( vector.y / 2.0 );
+				vector.z = ( vector.z + 1.0 ) / 2.0;
+
+			}
+
+			function handleController( controller, id ) {
+
+				controller.update();
+
+				var pivot = controller.getObjectByName( 'pivot' );
+
+				if ( pivot ) {
+
+					var matrix = pivot.matrixWorld;
+
+					points[ id ].position.setFromMatrixPosition( matrix );
+					transformPoint( points[ id ].position );
+
+					if ( controller.getButtonState( 'thumbpad' ) ) {
+
+						blob.material.color.setHex( Math.random() * 0xffffff );
+
+					}
+
+					if ( controller.getButtonState( 'trigger' ) ) {
+
+						var strength = points[ id ].strength / 2;
+
+						var vector = new THREE.Vector3().setFromMatrixPosition( matrix );
+
+						transformPoint( vector );
+
+						points.push( { position: vector, strength: strength, subtract: 10 } );
+
+					}
+
+					if ( id === 0 && controller.getButtonState( 'grips' ) ) {
+
+						if ( points.length > 2 ) {
+
+							points.shift();
+							points.shift();
+
+							updateBlob();
+
+							var geometry = blob.generateGeometry();
+							var mesh = new THREE.Mesh( geometry, blob.material.clone() );
+							mesh.position.y = 1;
+							mesh.castShadow = true;
+							mesh.receiveShadow = true;
+							scene.add( mesh );
+
+							initPoints();
+
+						}
+
+					}
+
+					if ( id === 1 && controller.getButtonState( 'grips' ) ) {
+
+						points[ id ].strength = ( Math.sin( performance.now() / 1000 ) + 1.5 ) / 20.0;
+
+					}
+
+				}
+
+			}
+
+			function updateBlob() {
+
+				blob.reset();
+
+				for ( var i = 0; i < points.length; i ++ ) {
+
+					var point = points[ i ];
+					var position = point.position;
+
+					blob.addBall( position.x, position.y, position.z, point.strength, point.subtract );
+
+				}
+
+			}
+
+			function render() {
+
+				handleController( controller1, 0 );
+				handleController( controller2, 1 );
+
+				updateBlob();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

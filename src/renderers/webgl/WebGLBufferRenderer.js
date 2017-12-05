@@ -1,8 +1,8 @@
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
+function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 	var mode;
 
@@ -14,15 +14,17 @@ function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
 
 	function render( start, count ) {
 
-		_gl.drawArrays( mode, start, count );
+		gl.drawArrays( mode, start, count );
 
-		_infoRender.calls ++;
-		_infoRender.vertices += count;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+		infoRender.calls ++;
+		infoRender.vertices += count;
+
+		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
+		else if ( mode === gl.POINTS ) infoRender.points += count;
 
 	}
 
-	function renderInstances( geometry ) {
+	function renderInstances( geometry, start, count ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -35,9 +37,7 @@ function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
 
 		var position = geometry.attributes.position;
 
-		var count = 0;
-
-		if ( (position && position.isInterleavedBufferAttribute) ) {
+		if ( position.isInterleavedBufferAttribute ) {
 
 			count = position.data.count;
 
@@ -45,17 +45,19 @@ function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
 
 		} else {
 
-			count = position.count;
-
-			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
+			extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
 
 		}
 
-		_infoRender.calls ++;
-		_infoRender.vertices += count * geometry.maxInstancedCount;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += geometry.maxInstancedCount * count / 3;
+		infoRender.calls ++;
+		infoRender.vertices += count * geometry.maxInstancedCount;
+
+		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
+		else if ( mode === gl.POINTS ) infoRender.points += geometry.maxInstancedCount * count;
 
 	}
+
+	//
 
 	this.setMode = setMode;
 	this.render = render;

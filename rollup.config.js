@@ -1,35 +1,44 @@
-import * as fs from 'fs';
+function glsl() {
 
-var outro = `
-Object.defineProperty( exports, 'AudioContext', {
-	get: function () {
-		return exports.getAudioContext();
-	}
-});`;
-
-function glsl () {
 	return {
-		transform ( code, id ) {
-			if ( !/\.glsl$/.test( id ) ) return;
 
-			return 'export default ' + JSON.stringify(
+		transform( code, id ) {
+
+			if ( /\.glsl$/.test( id ) === false ) return;
+
+			var transformedCode = 'export default ' + JSON.stringify(
 				code
-					.replace( /[ \t]*\/\/.*\n/g, '' )
-					.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' )
-					.replace( /\n{2,}/g, '\n' )
+					.replace( /[ \t]*\/\/.*\n/g, '' ) // remove //
+					.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
+					.replace( /\n{2,}/g, '\n' ) // # \n+ to \n
 			) + ';';
+			return {
+				code: transformedCode,
+				map: { mappings: '' }
+			};
+
 		}
+
 	};
+
 }
 
 export default {
-	entry: 'src/Three.js',
-	dest: 'build/three.js',
-	moduleName: 'THREE',
-	format: 'umd',
+	input: 'src/Three.js',
+	indent: '\t',
 	plugins: [
 		glsl()
 	],
-
-	outro: outro
+	// sourceMap: true,
+	output: [
+		{
+			format: 'umd',
+			name: 'THREE',
+			file: 'build/three.js'
+		},
+		{
+			format: 'es',
+			file: 'build/three.module.js'
+		}
+	]
 };

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for loading a <em>.pdb</em> resource.<br>
+		The <a href="http://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format)">Protein Data Bank</a> file format is a textual file describing the three-dimensional structures of molecules.
+		</div>
+
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.PDBLoader();
+
+		// load a PDB resource
+		loader.load(
+			// resource URL
+			'models/molecules/caffeine.pdb',
+			// called when the resource is loaded
+			function ( pdb ) {
+
+				var geometryAtoms = pdb.geometryAtoms;
+				var geometryBonds = pdb.geometryBonds;
+				var json = pdb.json;
+
+				console.log( 'This molecule has ' + json.atoms.length + ' atoms' );
+
+			},
+			// called when loading is in progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+		[example:webgl_loader_pdb]
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+		<h2>Properties</h2>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — A string containing the path/URL of the <em>.pdb</em> file.<br />
+		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives the object having the following properties. [page:BufferGeometry geometryAtoms], [page:BufferGeometry geometryBonds] and the [page:Object JSON] structure.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
+		</div>
+		<div>
+		Begin loading from url and call onLoad with the parsed response content.
+		</div>
+
+		<h3>[method:Object parse]( [page:String text] )</h3>
+		<div>
+		[page:String text] — The textual <em>pdb</em> structure to parse.
+		</div>
+		<div>
+		Parse a <em>pdb</em> text and return a <em>JSON</em> structure.<br />
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/PDBLoader.js examples/js/loaders/PDBLoader.js]
+	</body>
+</html>

@@ -30,6 +30,7 @@
 			var container, stats;
 
 			var camera, controls, scene, renderer;
+			var effect;
 
 			var sphere, plane;
 
@@ -61,6 +62,7 @@
 				controls = new THREE.TrackballControls( camera );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				var light = new THREE.PointLight( 0xffffff );
 				light.position.set( 500, 500, 500 );
@@ -81,7 +83,6 @@
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( width, height );
 				// container.appendChild( renderer.domElement );
 

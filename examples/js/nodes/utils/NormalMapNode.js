@@ -31,8 +31,7 @@ THREE.NormalMapNode.prototype.generate = function( builder, output ) {
 			this.value.coord.build( builder, 'v2' ) + ',' +
 			this.scale.build( builder, 'v2' ) + ')', this.getType( builder ), output );
 
-	}
-	else {
+	} else {
 
 		console.warn( "THREE.NormalMapNode is not compatible with " + builder.shader + " shader." );
 

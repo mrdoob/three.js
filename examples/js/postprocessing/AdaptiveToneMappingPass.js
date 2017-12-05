@@ -44,16 +44,17 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		uniforms: THREE.UniformsUtils.clone( THREE.LuminosityShader.uniforms ),
 		vertexShader: THREE.LuminosityShader.vertexShader,
 		fragmentShader: THREE.LuminosityShader.fragmentShader,
-		blending: THREE.NoBlending,
+		blending: THREE.NoBlending
 	} );
 
 	this.adaptLuminanceShader = {
 		defines: {
-			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 ),
+			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 )
 		},
 		uniforms: {
 			"lastLum": { value: null },
 			"currentLum": { value: null },
+			"minLuminance": { value: 0.01 },
 			"delta": { value: 0.016 },
 			"tau": { value: 1.0 }
 		},
@@ -72,6 +73,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 			"uniform sampler2D lastLum;",
 			"uniform sampler2D currentLum;",
+			"uniform float minLuminance;",
 			"uniform float delta;",
 			"uniform float tau;",
 
@@ -80,8 +82,8 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 				"vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );",
 				"vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );",
 
-				"float fLastLum = lastLum.r;",
-				"float fCurrentLum = currentLum.r;",
+				"float fLastLum = max( minLuminance, lastLum.r );",
+				"float fCurrentLum = max( minLuminance, currentLum.r );",
 
 				//The adaption seems to work better in extreme lighting differences
 				//if the input luminance is squared.
@@ -90,8 +92,8 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 				// Adapt the luminance using Pattanaik's technique
 				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
 				// "fAdaptedLum = sqrt(fAdaptedLum);",
-				"gl_FragColor = vec4( vec3( fAdaptedLum ), 1.0 );",
-			"}",
+				"gl_FragColor.r = fAdaptedLum;",
+			"}"
 		].join( '\n' )
 	};
 
@@ -119,6 +121,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
@@ -164,7 +167,16 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 		this.quad.material = this.materialToneMap;
 		this.materialToneMap.uniforms.tDiffuse.value = readBuffer.texture;
-		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+
+		if ( this.renderToScreen ) {
+
+			renderer.render( this.scene, this.camera );
+
+		} else {
+
+			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+
+		}
 
 	},
 
@@ -190,14 +202,17 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat }; // was RGB format. changed to RGBA format. see discussion in #8415 / #8450
 
 		this.luminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.luminanceRT.texture.name = "AdaptiveToneMappingPass.l";
 		this.luminanceRT.texture.generateMipmaps = false;
 
 		this.previousLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.previousLuminanceRT.texture.name = "AdaptiveToneMappingPass.pl";
 		this.previousLuminanceRT.texture.generateMipmaps = false;
 
 		// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
 		pars.minFilter = THREE.LinearMipMapLinearFilter;
 		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.currentLuminanceRT.texture.name = "AdaptiveToneMappingPass.cl";
 
 		if ( this.adaptive ) {
 
@@ -240,6 +255,17 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		if ( rate ) {
 
 			this.materialAdaptiveLum.uniforms.tau.value = Math.abs( rate );
+
+		}
+
+	},
+
+	setMinLuminance: function( minLum ) {
+
+		if ( minLum ) {
+
+			this.materialToneMap.uniforms.minLuminance.value = minLum;
+			this.materialAdaptiveLum.uniforms.minLuminance.value = minLum;
 
 		}
 

@@ -28,7 +28,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - custom attributes example</div>
 		<div id="container"></div>
 
 		<script src="js/Detector.js"></script>
@@ -95,6 +95,7 @@
 			camera.position.z = 400;
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x050505 );
 
 			uniforms = {
 
@@ -139,13 +140,13 @@
 
 			var buffergeometry = new THREE.BufferGeometry();
 
-			var position = new THREE.Float32Attribute( vertices.length * 3, 3 ).copyVector3sArray( vertices );
-			buffergeometry.addAttribute( 'position', position )
+			var position = new THREE.Float32BufferAttribute( vertices.length * 3, 3 ).copyVector3sArray( vertices );
+			buffergeometry.addAttribute( 'position', position );
 
-			var displacement = new THREE.Float32Attribute( vertices.length * 3, 3 );
+			var displacement = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
 			buffergeometry.addAttribute( 'displacement', displacement );
 
-			var customColor = new THREE.Float32Attribute( vertices.length * 3, 3 );
+			var customColor = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
 			buffergeometry.addAttribute( 'customColor', customColor );
 
 			var color = new THREE.Color( 0xffffff );
@@ -162,7 +163,6 @@
 			scene.add( object );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0x050505 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
