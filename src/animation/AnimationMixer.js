@@ -27,7 +27,9 @@ function AnimationMixer( root ) {
 
 }
 
-Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
+AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+	
+	constructor: AnimationMixer,
 
 	_bindAction: function ( action, prototypeAction ) {
 
