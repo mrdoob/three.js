@@ -147,7 +147,7 @@ function WebVRManager( renderer ) {
 		cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 		cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
 
-		var parent = camera.parent;
+		var parent = poseObject.parent;
 
 		if ( parent !== null ) {
 
