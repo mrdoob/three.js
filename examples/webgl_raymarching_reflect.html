@@ -250,7 +250,7 @@
 		</script>
 
 		<script src="../build/three.js"></script>
-		<script src="js/controls/FlyControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -310,10 +310,10 @@
 				scene.add( mesh );
 
 				// Controls
-				controls = new THREE.FlyControls( camera, canvas );
-				controls.dragToLook = false;
-				controls.rollSpeed = Math.PI / 12;
-				controls.movementSpeed = 1;
+				controls = new THREE.OrbitControls( camera, canvas );
+				//controls.dragToLook = false;
+				//controls.rollSpeed = Math.PI / 12;
+				//controls.movementSpeed = 1;
 
 				// GUI
 				var gui = new dat.GUI();
