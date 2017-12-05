@@ -20708,17 +20708,7 @@
 			//
 
 			var pose = frameData.pose;
-			var poseObject;
-
-			if ( poseTarget !== null ) {
-
-				poseObject = poseTarget;
-
-			} else {
-
-				poseObject = camera;
-
-			}
+			var poseObject = poseTarget !== null ? poseTarget : camera;
 
 			if ( pose.position !== null ) {
 
@@ -20754,7 +20744,7 @@
 			cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 			cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
 
-			var parent = camera.parent;
+			var parent = poseObject.parent;
 
 			if ( parent !== null ) {
 
