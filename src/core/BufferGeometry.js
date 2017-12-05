@@ -1213,4 +1213,5 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 } );
 
+
 export { BufferGeometry };
