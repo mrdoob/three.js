@@ -2150,6 +2150,8 @@ THREE.GLTFLoader = ( function () {
 
 			var primitives = meshDef.primitives;
 
+			var modesUsed = {};
+
 			return scope.loadGeometries( primitives ).then( function ( geometries ) {
 
 				for ( var i = 0, il = primitives.length; i < il; i ++ ) {
@@ -2313,21 +2315,76 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					if ( primitives.length > 1 ) {
+					if ( primitives.length === 1 ) return mesh;
 
-						mesh.name += '_' + i;
+					mesh.name += '_' + i;
 
-						group.add( mesh );
+					group.add( mesh );
 
-					} else {
-
-						return mesh;
-
-					}
+					modesUsed[ primitive.Mode ] = true;
 
 				}
 
-				return group;
+				// TODO(donmccurdy): Does this work if it's not a THREE.Mesh?
+				if ( ! group.children[ 0 ].isMesh ) return group;
+				if ( Object.keys( modesUsed ).length > 1 ) return group;
+				if ( THREE.BufferGeometryUtils === undefined ) return group;
+
+				var mergedGeometry = new THREE.BufferGeometry();
+				var materials = [];
+				var attributes = {};
+				var attributesUsed = Object.keys( group.children[ 0 ].geometry.attributes ).sort().join( '|' );
+				var offset = 0;
+
+				for ( var j = 0, jl = group.children.length; j < jl; ++ j ) {
+
+					var childGeometry = group.children[ j ].geometry;
+
+					if ( childGeometry.index ) childGeometry = childGeometry.toNonIndexed();
+
+					var childAttributesUsed = Object.keys( childGeometry.attributes ).sort().join( '|' );
+
+					if ( attributesUsed !== childAttributesUsed ) {
+						console.log('bailing');
+						return group;
+					}
+
+					for ( var name in childGeometry.attributes ) {
+
+						if ( attributes[ name ] === undefined ) attributes[ name ] = [];
+
+						attributes[ name ].push( childGeometry.attributes[ name ] );
+
+					}
+
+					// TODO(donmccurdy): Keep track of primitive .extras?
+
+					// TODO(donmccurdy): Reuse materials.
+					materials.push( group.children[ j ].material );
+					mergedGeometry.addGroup( offset, childGeometry.attributes.position.count, j );
+					offset += childGeometry.attributes.position.count;
+
+				}
+
+				for ( var name in attributes ) {
+
+					var mergedAttribute = THREE.BufferGeometryUtils.mergeBufferAttributes( attributes[ name ] );
+
+					if ( ! mergedAttribute ) return group;
+
+					mergedGeometry.addAttribute( name, mergedAttribute );
+
+				}
+
+				var mergedMesh = group.children[ 0 ].isSkinnedMesh
+					? new THREE.SkinnedMesh( mergedGeometry, materials )
+					: new THREE.Mesh( mergedGeometry, materials );
+
+				if ( meshDef.name !== undefined ) mergedMesh.name = meshDef.name;
+				if ( meshDef.extras !== undefined ) mergedMesh.userData = meshDef.extras;
+				// TODO(donmccurdy): Spec gloss... morph targets ... siiighh.
+
+				return mergedMesh;
 
 			} );
 
