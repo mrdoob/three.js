@@ -42,7 +42,7 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 		} );
 
 		// Automatically highlight when selecting an input field
-		shortcutInput.dom.addEventListener( 'focus', function () {
+		shortcutInput.dom.addEventListener( 'click', function () {
 
 			shortcutInput.dom.select();
 
