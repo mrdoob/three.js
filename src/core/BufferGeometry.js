@@ -1213,6 +1213,4 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 } );
 
-BufferGeometry.MaxIndex = 65535;
-
 export { BufferGeometry };
