@@ -1,4 +1,5 @@
 import { Path } from './Path.js';
+import { _Math } from '../../math/Math.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -14,6 +15,8 @@ import { Path } from './Path.js';
 function Shape( points ) {
 
 	Path.call( this, points );
+
+	this.uuid = _Math.generateUUID();
 
 	this.type = 'Shape';
 
@@ -74,6 +77,7 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		var data = Path.prototype.toJSON.call( this );
 
+		data.uuid = this.uuid;
 		data.holes = [];
 
 		for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
@@ -91,6 +95,7 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		Path.prototype.fromJSON.call( this, json );
 
+		this.uuid = json.uuid;
 		this.holes = [];
 
 		for ( var i = 0, l = json.holes.length; i < l; i ++ ) {

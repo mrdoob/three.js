@@ -124,7 +124,8 @@ Object.assign( ObjectLoader.prototype, {
 
 	parse: function ( json, onLoad ) {
 
-		var geometries = this.parseGeometries( json.geometries );
+		var shapes = this.parseShape( json.shapes );
+		var geometries = this.parseGeometries( json.geometries, shapes );
 
 		var images = this.parseImages( json.images, function () {
 
@@ -153,7 +154,27 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parseGeometries: function ( json ) {
+	parseShape: function ( json ) {
+
+		var shapes = {};
+
+		if ( json !== undefined ) {
+
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
+
+				var shape = new Shape().fromJSON( json[ i ] );
+
+				shapes[ shape.uuid ] = shape;
+
+			}
+
+		}
+
+		return shapes;
+
+	},
+
+	parseGeometries: function ( json, shapes ) {
 
 		var geometries = {};
 
@@ -338,18 +359,18 @@ Object.assign( ObjectLoader.prototype, {
 					case 'ShapeGeometry':
 					case 'ShapeBufferGeometry':
 
-						var shapes = [];
+						var geometryShapes = [];
 
 						for ( var i = 0, l = data.shapes.length; i < l; i ++ ) {
 
-							var shape = new Shape().fromJSON( data.shapes[ i ] );
+							var shape = shapes[ data.shapes[ i ] ];
 
-							shapes.push( shape );
+							geometryShapes.push( shape );
 
 						}
 
 						geometry = new Geometries[ data.type ](
-							shapes,
+							geometryShapes,
 							data.curveSegments
 						);
 

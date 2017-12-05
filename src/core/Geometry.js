@@ -1019,7 +1019,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 				if ( Array.isArray( shapes ) === false ) {
 
-					data.shapes.push( shapes.toJSON() );
+					data.shapes.push( shapes.uuid );
 
 				} else {
 
@@ -1027,7 +1027,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 						var shape = shapes[ i ];
 
-						data.shapes.push( shape.toJSON() );
+						data.shapes.push( shape.uuid );
 
 					}
 
