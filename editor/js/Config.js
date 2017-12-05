@@ -19,7 +19,12 @@ var Config = function ( name ) {
 
 		'project/vr': false,
 
-		'settings/history': false
+		'settings/history': false,
+
+		'settings/controls/translate': 'w',
+		'settings/controls/rotate': 'e',
+		'settings/controls/scale': 'r',
+		'settings/controls/undo': 'z'
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {
