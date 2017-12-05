@@ -12,7 +12,7 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	var scope = this;
 
-	// fires when the first frame of the media has finished loading.
+	// fires when the first frame of the media has finished loading (now there are valid texture data)
 
 	video.addEventListener( 'loadeddata', function () {
 
