@@ -185,7 +185,7 @@ THREE.BufferGeometryUtils = {
 	},
 
 	/**
-	 * @param  {Array<THREE.BufferAttribute>} attributes
+	 * @param {Array<THREE.BufferAttribute>} attributes
 	 * @return {THREE.BufferAttribute}
 	 */
 	mergeBufferAttributes: function ( attributes ) {
