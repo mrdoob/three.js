@@ -1943,7 +1943,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#meshes
 	 * @param {number} meshIndex
-	 * @return {Promise<THREE.Mesh|THREE.SkinnedMesh>}
+	 * @return {Promise<THREE.Group|THREE.Mesh|THREE.SkinnedMesh>}
 	 */
 	GLTFParser.prototype.loadMesh = function ( meshIndex ) {
 
@@ -2064,7 +2064,7 @@ THREE.GLTFLoader = ( function () {
 
 					} else {
 
-						throw new Error( 'THREE.GLTFLoader: Primitive mode unsupported: ', primitive.mode );
+						throw new Error( 'THREE.GLTFLoader: Primitive mode unsupported: ' + primitive.mode );
 
 					}
 
