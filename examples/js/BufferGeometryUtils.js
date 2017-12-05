@@ -182,6 +182,51 @@ THREE.BufferGeometryUtils = {
 
 		}
 
+	},
+
+	/**
+	 * @param  {Array<THREE.BufferAttribute>} attributes
+	 * @return {THREE.BufferAttribute}
+	 */
+	mergeBufferAttributes: function ( attributes ) {
+
+		var TypedArray;
+		var itemSize;
+		var normalized;
+		var arrayLength = 0;
+
+		for ( var i = 0; i < attributes.length; ++ i ) {
+
+			var attribute = attributes[ i ];
+
+			if ( attribute.isInterleavedBufferAttribute ) return null;
+
+			if ( TypedArray === undefined ) TypedArray = attribute.array.constructor;
+			if ( TypedArray !== attribute.array.constructor ) return null;
+
+			if ( itemSize === undefined ) itemSize = attribute.itemSize;
+			if ( itemSize !== attribute.itemSize ) return null;
+
+			if ( normalized === undefined ) normalized = attribute.normalized;
+			if ( normalized !== attribute.normalized ) return null;
+
+			arrayLength += attribute.array.length;
+
+		}
+
+		var array = new TypedArray( arrayLength );
+		var offset = 0;
+
+		for ( var j = 0; j < attributes.length; ++ j ) {
+
+			array.set( attributes[ j ].array, offset );
+
+			offset += attributes[ j ].array.length;
+
+		}
+
+		return new THREE.BufferAttribute( array, itemSize, normalized );
+
 	}
 
 };
