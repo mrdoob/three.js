@@ -114,7 +114,7 @@ export default QUnit.module( 'Core', () => {
 				x: 0,
 				y: 0
 			}, camera );
-			assert.ok( rayDirection.x === 0, rayDirection.y === 0, rayDirection.z === - 1,
+			assert.ok( rayDirection.x === 0 && rayDirection.y === 0 && rayDirection.z === - 1,
 				"camera is looking straight to -z and so does the ray in the middle of the screen" );
 
 			var step = 0.1;

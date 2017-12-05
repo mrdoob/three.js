@@ -24,12 +24,7 @@ export default QUnit.module( 'Geometries', () => {
 			geometries = [
 				new TetrahedronGeometry(),
 				new TetrahedronGeometry( parameters.radius ),
-				new TetrahedronGeometry( parameters.radius, parameters.widthSegments ),
-				new TetrahedronGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments ),
-				new TetrahedronGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart ),
-				new TetrahedronGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
-				new TetrahedronGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
-				new TetrahedronGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
+				new TetrahedronGeometry( parameters.radius, parameters.detail )
 			];
 
 		} );
@@ -70,12 +65,7 @@ export default QUnit.module( 'Geometries', () => {
 			geometries = [
 				new TetrahedronBufferGeometry(),
 				new TetrahedronBufferGeometry( parameters.radius ),
-				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments ),
-				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments ),
-				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart ),
-				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
-				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
-				new TetrahedronBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
+				new TetrahedronBufferGeometry( parameters.radius, parameters.detail )
 			];
 
 		} );
