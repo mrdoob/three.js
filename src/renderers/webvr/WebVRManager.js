@@ -101,17 +101,7 @@ function WebVRManager( renderer ) {
 		//
 
 		var pose = frameData.pose;
-		var poseObject;
-
-		if ( poseTarget !== null ) {
-
-			poseObject = poseTarget;
-
-		} else {
-
-			poseObject = camera;
-
-		}
+		var poseObject = poseTarget !== null ? poseTarget : camera;
 
 		if ( pose.position !== null ) {
 
