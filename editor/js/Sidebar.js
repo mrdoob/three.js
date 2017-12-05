@@ -41,8 +41,7 @@ var Sidebar = function ( editor ) {
 
 	var settings = new UI.Span().add(
 		new Sidebar.Settings( editor ),
-		new Sidebar.History( editor ),
-		new Sidebar.Controls( editor )
+		new Sidebar.History( editor )
 	);
 	container.add( settings );
 
