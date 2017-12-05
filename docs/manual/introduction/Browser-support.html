@@ -13,57 +13,21 @@
 	<h2>Overview</h2>
 	<div>
 		<p>
-			<strong>TL;DR</strong> three.js supports most modern browsers, including Internet Explorer 11 and above.</p>
+			Three.js can use WebGL to render your scenes on all modern browsers. For older browsers, especially Internet Explorer 10 and below, you may have to fallback to one of the other renderers (CSS2DRenderer, CSS3DRenderer, SVGRenderer, CanvasRenderer). Additionally, you may have to include some polyfills, especially if you are using files from the /examples folder.
+		</p>
 		<p>
-			three.js provides WebGL, Canvas, SVG and CSS renderers. Different renderers may have different requirements of compatibility.
-			In theory, three.js works on all browsers that support WebGL: Google Chrome 9+, Firefox 4+, Opera 15+, Safari
-			5.1+, Internet Explorer 11 and Microsoft Edge. More infomation can be found at
-			<a href="https://caniuse.com/#feat=webgl" target="_blank">Can I use WebGL?</a>.
+			Note: if you don't need to support these old browsers, then it is not recommended to use the other renderers as they are slower and support less features than the WebGLRenderer.
 		</p>
 	</div>
 
-	<h2>Internet Explorer Compatibily</h2>
+	<h2>Browsers that support WebGL</h2>
 	<div>
 		<p>
-			It is strongly recommended to upgrade older versions of IE to IE11. If you still need to support IE9, you can use CanvasRenderer
-			instead. Note that CanvasRenderer only supports a small subset of WebGLRenderer's features.
+			Google Chrome 9+, Firefox 4+, Opera 15+, Safari 5.1+, Internet Explorer 11 and Microsoft Edge. You can find which browsers support WebGL at <a href="https://caniuse.com/#feat=webgl" target="_blank">Can I use WebGL?</a>.
 		</p>
-		<p>
-			For Internet Explorer, the table below lists avaiable renderers.
-		</p>
-		<table>
-			<thead>
-				<tr>
-					<th>Renderer</th>
-					<th>IE Version</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>WebGLRenderer</td>
-					<td>IE11+</td>
-				</tr>
-				<tr>
-					<td>CanvasRenderer</td>
-					<td>IE9+</td>
-				</tr>
-				<tr>
-					<td>SVGRenderer</td>
-					<td>IE9+</td>
-				</tr>
-				<tr>
-					<td>CSS3DRenderer</td>
-					<td>IE10+</td>
-				</tr>
-				<tr>
-					<td>CSS2DRenderer</td>
-					<td>IE9+</td>
-				</tr>
-			</tbody>
-		</table>
 	</div>
 
-	<h2>Part of ECMAScript Language Features or Web APIs Used in three.js</h2>
+	<h2>JavaScript Language Features or Web APIs Used in three.js</h2>
 	<div>
 		<p>
 			Here are some features used in three.js. Some of them may require additional polyfills.
@@ -98,29 +62,14 @@
 					<td>FileLoader, etc.</td>
 				</tr>
 				<tr>
-					<td>performance</td>
-					<td>Source</td>
-					<td>Clock, etc.</td>
-				</tr>
-				<tr>
-					<td>requestAnimationFrame</td>
-					<td>Source</td>
-					<td>WebGLRenderer, VideoTexture, etc.</td>
-				</tr>
-				<tr>
 					<td>Promise</td>
 					<td>Examples</td>
-					<td>GLTFLoader, GLTF2Loader, WEBVR, etc.</td>
+					<td>GLTFLoader, GLTF2Loader, WebVR, VREffect, etc.</td>
 				</tr>
 				<tr>
 					<td>Fetch</td>
 					<td>Examples</td>
 					<td>ImageBitmapLoader, etc.</td>
-				</tr>
-				<tr>
-					<td>Web Workers</td>
-					<td>Examples</td>
-					<td>WWOBJLoader2, etc.</td>
 				</tr>
 				<tr>
 					<td>File API</td>
@@ -133,14 +82,9 @@
 					<td>GLTFLoader, etc.</td>
 				</tr>
 				<tr>
-					<td>TextEncoder & TextDecoder</td>
-					<td>Examples</td>
-					<td>FBXLoader, GLTFLoader, PCDLoaderetc, STLLoader, etc.</td>
-				</tr>
-				<tr>
 					<td>Pointer Lock API</td>
 					<td>Examples</td>
-					<td>PointerLockControls, etc.</td>
+					<td>PointerLockControls</td>
 				</tr>
 			</tbody>
 		</table>
@@ -152,8 +96,6 @@
 		<ul>
 			<li>Typed Arrays</li>
 			<li>Blob</li>
-			<li>performance</li>
-			<li>requestAnimationFrame</li>
 		</ul>
 	</div>
 
@@ -170,13 +112,7 @@
 				<a href="https://github.com/stefanpenner/es6-promise/" target="_blank">ES6-Promise</a>
 			</li>
 			<li>
-				<a href="https://github.com/eligrey/Blob.js" target="_blank">Blob.js</a>
-			</li>
-			<li>
-				<a href="https://gist.github.com/paulirish/5438650" target="_blank">performance</a>
-			</li>
-			<li>
-				<a href="https://gist.github.com/paulirish/1579671" target="_blank">requestAnimationFrame</a>
+				<a href="https://github.com/github/fetch" target="_blank">fetch</a>
 			</li>
 		</ul>
 	</div>
