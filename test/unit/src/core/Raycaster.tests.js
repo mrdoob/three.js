@@ -70,17 +70,17 @@ function getSphere() {
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'Raycaster', () => {
+	QUnit.module( 'Raycaster', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "linePrecision", ( assert ) => {
+		QUnit.todo( "linePrecision", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -114,7 +114,7 @@ export default QUnit.module( 'Core', () => {
 				x: 0,
 				y: 0
 			}, camera );
-			assert.ok( rayDirection.x === 0, rayDirection.y === 0, rayDirection.z === - 1,
+			assert.ok( rayDirection.x === 0 && rayDirection.y === 0 && rayDirection.z === - 1,
 				"camera is looking straight to -z and so does the ray in the middle of the screen" );
 
 			var step = 0.1;

@@ -7,71 +7,71 @@ import { ObjectLoader } from '../../../../src/loaders/ObjectLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'ObjectLoader', () => {
+	QUnit.module( 'ObjectLoader', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "load", ( assert ) => {
+		QUnit.todo( "load", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setTexturePath", ( assert ) => {
+		QUnit.todo( "setTexturePath", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setCrossOrigin", ( assert ) => {
+		QUnit.todo( "setCrossOrigin", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "parse", ( assert ) => {
+		QUnit.todo( "parse", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "parseGeometries", ( assert ) => {
+		QUnit.todo( "parseGeometries", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "parseMaterials", ( assert ) => {
+		QUnit.todo( "parseMaterials", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "parseAnimations", ( assert ) => {
+		QUnit.todo( "parseAnimations", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "parseImages", ( assert ) => {
+		QUnit.todo( "parseImages", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "parseTextures", ( assert ) => {
+		QUnit.todo( "parseTextures", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "parseObject", ( assert ) => {
+		QUnit.todo( "parseObject", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -16,7 +16,7 @@ import {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Box2', () => {
+	QUnit.module( 'Box2', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -63,13 +63,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromCenterAndSize", ( assert ) => {
+		QUnit.todo( "setFromCenterAndSize", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -104,7 +104,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "isEmpty", ( assert ) => {
+		QUnit.todo( "isEmpty", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -316,7 +316,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", ( assert ) => {
+		QUnit.todo( "equals", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

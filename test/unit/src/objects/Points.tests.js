@@ -7,24 +7,24 @@ import { Points } from '../../../../src/objects/Points';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'Points', () => {
+	QUnit.module( 'Points', () => {
 
 		// INHERITANCE
-		QUnit.test( "isPoints", ( assert ) => {
+		QUnit.todo( "isPoints", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "raycast", ( assert ) => {
+		QUnit.todo( "raycast", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

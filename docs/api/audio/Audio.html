@@ -21,18 +21,21 @@
 
 		<h2>Example</h2>
 
-		<div>[example:misc_sound misc / sound ]</div>
+		<div>
+			[example:webaudio_sandbox webaudio / sandbox ]</br>
+			[example:webaudio_visualizer webaudio / visualizer ]
+		</div>
+
 		<code>
-		//Create an AudioListener and add it to the camera
+		// create an AudioListener and add it to the camera
 		var listener = new THREE.AudioListener();
 		camera.add( listener );
 
 		// create a global audio source
 		var sound = new THREE.Audio( listener );
 
+		// load a sound and set it as the Audio object's buffer
 		var audioLoader = new THREE.AudioLoader();
-
-		//Load a sound and set it as the Audio object's buffer
 		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
 			sound.setLoop( true );

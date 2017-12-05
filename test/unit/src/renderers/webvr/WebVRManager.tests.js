@@ -9,41 +9,41 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module.todo( 'WebVRManager', () => {
+		QUnit.module( 'WebVRManager', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "getDevice", ( assert ) => {
+			QUnit.todo( "getDevice", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "setDevice", ( assert ) => {
+			QUnit.todo( "setDevice", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getCamera", ( assert ) => {
+			QUnit.todo( "getCamera", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "submitFrame", ( assert ) => {
+			QUnit.todo( "submitFrame", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "dispose", ( assert ) => {
+			QUnit.todo( "dispose", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

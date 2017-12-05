@@ -33,7 +33,7 @@ function compareBox( a, b, threshold ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Box3', () => {
+	QUnit.module( 'Box3', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -53,7 +53,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isBox3", ( assert ) => {
+		QUnit.todo( "isBox3", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -69,7 +69,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setFromArray", ( assert ) => {
+		QUnit.todo( "setFromArray", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -152,7 +152,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -187,7 +187,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "isEmpty", ( assert ) => {
+		QUnit.todo( "isEmpty", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -495,7 +495,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", ( assert ) => {
+		QUnit.todo( "equals", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

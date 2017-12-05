@@ -171,6 +171,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
 
 				if (sceneInfo.shadows) {
 					renderer.shadowMap.enabled = true;

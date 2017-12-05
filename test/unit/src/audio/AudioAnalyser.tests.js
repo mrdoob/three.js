@@ -7,23 +7,23 @@ import { AudioAnalyser } from '../../../../src/audio/AudioAnalyser.js';
 
 export default QUnit.module( 'Audios', () => {
 
-	QUnit.module.todo( 'AudioAnalyser', () => {
+	QUnit.module( 'AudioAnalyser', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "getFrequencyData", ( assert ) => {
+		QUnit.todo( "getFrequencyData", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getAverageFrequency", ( assert ) => {
+		QUnit.todo( "getAverageFrequency", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

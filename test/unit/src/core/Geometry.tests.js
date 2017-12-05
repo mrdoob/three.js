@@ -41,24 +41,24 @@ function getGeometry() {
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'Geometry', () => {
+	QUnit.module( 'Geometry', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isGeometry", ( assert ) => {
+		QUnit.todo( "isGeometry", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -264,7 +264,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "center", ( assert ) => {
+		QUnit.todo( "center", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -309,31 +309,31 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "computeFaceNormals", ( assert ) => {
+		QUnit.todo( "computeFaceNormals", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "computeVertexNormals", ( assert ) => {
+		QUnit.todo( "computeVertexNormals", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "computeFlatVertexNormals", ( assert ) => {
+		QUnit.todo( "computeFlatVertexNormals", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "computeMorphNormals", ( assert ) => {
+		QUnit.todo( "computeMorphNormals", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "computeLineDistances", ( assert ) => {
+		QUnit.todo( "computeLineDistances", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -380,13 +380,13 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "merge", ( assert ) => {
+		QUnit.todo( "merge", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "mergeMesh", ( assert ) => {
+		QUnit.todo( "mergeMesh", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -460,19 +460,19 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "dispose", ( assert ) => {
+		QUnit.todo( "dispose", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
