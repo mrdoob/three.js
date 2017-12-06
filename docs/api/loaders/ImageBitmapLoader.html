@@ -29,17 +29,18 @@
 		loader.load(
 			// resource URL
 			'textures/skyboxsun25degtest.png',
-			// Function when resource is loaded
+
+			// onLoad callback
 			function ( imageBitmap ) {
 				var texture = new THREE.CanvasTexture( imageBitmap );
 				var material = new THREE.MeshBasicMaterial( { map: texture } );
 			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
+
+			// onProgress callback currently not supported
+			undefined,
+
+			// onError callback
+			function ( err ) {
 				console.log( 'An error happened' );
 			}
 		);

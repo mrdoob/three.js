@@ -240,21 +240,21 @@ function runStdGeometryTests( assert, geometries ) {
 //
 
 // Run common light tests.
-function runStdLightTests( lights ) {
+function runStdLightTests( assert, lights ) {
 
 	for ( var i = 0, l = lights.length; i < l; i ++ ) {
 
 		var light = lights[ i ];
 
 		// copy and clone
-		checkLightCopyClone( light );
+		checkLightCopyClone( assert, light );
 
 		// THREE.Light doesn't get parsed by ObjectLoader as it's only
 		// used as an abstract base class - so we skip the JSON tests
 		if ( light.type !== "Light" ) {
 
 			// json round trip
-			checkLightJsonRoundtrip( light );
+			checkLightJsonRoundtrip( assert, light );
 
 		}
 
@@ -262,7 +262,7 @@ function runStdLightTests( lights ) {
 
 }
 
-function checkLightCopyClone( light ) {
+function checkLightCopyClone( assert, light ) {
 
 	// copy
 	var newLight = new light.constructor( 0xc0ffee );
@@ -293,39 +293,39 @@ function checkLightCopyClone( light ) {
 	if ( light.type !== "Light" ) {
 
 		// json round trip with clone
-		checkLightJsonRoundtrip( clone );
+		checkLightJsonRoundtrip( assert, clone );
 
 	}
 
 }
 
 // Compare json file with its source Light.
-function checkLightJsonWriting( light, json ) {
+function checkLightJsonWriting( assert, light, json ) {
 
-	QUnit.assert.equal( json.metadata.version, "4.5", "check metadata version" );
+	assert.equal( json.metadata.version, "4.5", "check metadata version" );
 
 	var object = json.object;
-	QUnit.assert.equalKey( light, object, 'type' );
-	QUnit.assert.equalKey( light, object, 'uuid' );
-	QUnit.assert.equal( object.id, undefined, "should not persist id" );
+	assert.equalKey( light, object, 'type' );
+	assert.equalKey( light, object, 'uuid' );
+	assert.equal( object.id, undefined, "should not persist id" );
 
 }
 
 // Check parsing and reconstruction of json Light
-function checkLightJsonReading( json, light ) {
+function checkLightJsonReading( assert, json, light ) {
 
 	var loader = new THREE.ObjectLoader();
 	var outputLight = loader.parse( json );
 
-	QUnit.assert.smartEqual( outputLight, light, 'Reconstruct Light from ObjectLoader' );
+	assert.smartEqual( outputLight, light, 'Reconstruct Light from ObjectLoader' );
 
 }
 
 // Verify light -> json -> light
-function checkLightJsonRoundtrip( light ) {
+function checkLightJsonRoundtrip( assert, light ) {
 
 	var json = light.toJSON();
-	checkLightJsonWriting( light, json );
-	checkLightJsonReading( json, light );
+	checkLightJsonWriting( assert, light, json );
+	checkLightJsonReading( assert, json, light );
 
 }

@@ -38,7 +38,8 @@
 		loader.load(
 			// resource URL
 			'audio/ambient_ocean.ogg',
-			// Function when resource is loaded
+
+			// onLoad callback
 			function ( audioBuffer ) {
 				// set the audio object buffer to the loaded object
 				oceanAmbientSound.setBuffer( audioBuffer );
@@ -46,12 +47,14 @@
 				// play the audio
 				oceanAmbientSound.play();
 			},
-			// Function called when download progresses
+
+			// onProgress callback
 			function ( xhr ) {
 				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
 			},
-			// Function called when download errors
-			function ( xhr ) {
+
+			// onError callback
+			function ( err ) {
 				console.log( 'An error happened' );
 			}
 		);

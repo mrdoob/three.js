@@ -325,18 +325,26 @@
 
 			// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
 
-			var lut = []; for (var i=0; i<256; i++) { lut[i] = (i<16?'0':'')+(i).toString(16).toUpperCase(); }
+			var lut = [];
+
+			for ( var i = 0; i < 256; i ++ ) {
+
+				lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 ).toUpperCase();
+
+			}
 
 			return function () {
-				var d0 = Math.random()*0xffffffff|0;
-				var d1 = Math.random()*0xffffffff|0;
-				var d2 = Math.random()*0xffffffff|0;
-				var d3 = Math.random()*0xffffffff|0;
-				return lut[d0&0xff]+lut[d0>>8&0xff]+lut[d0>>16&0xff]+lut[d0>>24&0xff]+'-'+
-					lut[d1&0xff]+lut[d1>>8&0xff]+'-'+lut[d1>>16&0x0f|0x40]+lut[d1>>24&0xff]+'-'+
-					lut[d2&0x3f|0x80]+lut[d2>>8&0xff]+'-'+lut[d2>>16&0xff]+lut[d2>>24&0xff]+
-					lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
-			}
+
+				var d0 = Math.random() * 0xffffffff | 0;
+				var d1 = Math.random() * 0xffffffff | 0;
+				var d2 = Math.random() * 0xffffffff | 0;
+				var d3 = Math.random() * 0xffffffff | 0;
+				return lut[ d0 & 0xff ] + lut[ d0 >> 8 & 0xff ] + lut[ d0 >> 16 & 0xff ] + lut[ d0 >> 24 & 0xff ] + '-' +
+					lut[ d1 & 0xff ] + lut[ d1 >> 8 & 0xff ] + '-' + lut[ d1 >> 16 & 0x0f | 0x40 ] + lut[ d1 >> 24 & 0xff ] + '-' +
+					lut[ d2 & 0x3f | 0x80 ] + lut[ d2 >> 8 & 0xff ] + '-' + lut[ d2 >> 16 & 0xff ] + lut[ d2 >> 24 & 0xff ] +
+					lut[ d3 & 0xff ] + lut[ d3 >> 8 & 0xff ] + lut[ d3 >> 16 & 0xff ] + lut[ d3 >> 24 & 0xff ];
+
+			};
 
 		} )(),
 
@@ -18435,6 +18443,7 @@
 	function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory ) {
 
 		var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof window.WebGL2RenderingContext );
+		var _videoTextures = {};
 
 		//
 
@@ -18529,8 +18538,13 @@
 
 			deallocateTexture( texture );
 
-			infoMemory.textures --;
+			if ( texture.isVideoTexture ) {
 
+				delete _videoTextures[ texture.id ];
+
+			}
+
+			infoMemory.textures --;
 
 		}
 
@@ -18831,6 +18845,12 @@
 				texture.addEventListener( 'dispose', onTextureDispose );
 
 				textureProperties.__webglTexture = _gl.createTexture();
+
+				if ( texture.isVideoTexture ) {
+
+					_videoTextures[ texture.id ] = texture;
+
+				}
 
 				infoMemory.textures ++;
 
@@ -19213,11 +19233,22 @@
 
 		}
 
+		function updateVideoTextures() {
+
+			for ( var id in _videoTextures ) {
+
+				_videoTextures[ id ].update();
+
+			}
+
+		}
+
 		this.setTexture2D = setTexture2D;
 		this.setTextureCube = setTextureCube;
 		this.setTextureCubeDynamic = setTextureCubeDynamic;
 		this.setupRenderTarget = setupRenderTarget;
 		this.updateRenderTargetMipmap = updateRenderTargetMipmap;
+		this.updateVideoTextures = updateVideoTextures;
 
 	}
 
@@ -19910,13 +19941,16 @@
 
 		}
 
-		function setMaterial( material ) {
+		function setMaterial( material, frontFaceCW ) {
 
 			material.side === DoubleSide
 				? disable( gl.CULL_FACE )
 				: enable( gl.CULL_FACE );
 
-			setFlipSided( material.side === BackSide );
+			var flipSided = ( material.side === BackSide );
+			if ( frontFaceCW ) flipSided = ! flipSided;
+
+			setFlipSided( flipSided );
 
 			material.transparent === true
 				? setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )
@@ -20674,17 +20708,7 @@
 			//
 
 			var pose = frameData.pose;
-			var poseObject;
-
-			if ( poseTarget !== null ) {
-
-				poseObject = poseTarget;
-
-			} else {
-
-				poseObject = camera;
-
-			}
+			var poseObject = poseTarget !== null ? poseTarget : camera;
 
 			if ( pose.position !== null ) {
 
@@ -20720,7 +20744,7 @@
 			cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 			cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
 
-			var parent = camera.parent;
+			var parent = poseObject.parent;
 
 			if ( parent !== null ) {
 
@@ -21168,7 +21192,8 @@
 			_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 			_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 			_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
-			_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false;
+			_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
+			_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default';
 
 		var lightsArray = [];
 		var shadowsArray = [];
@@ -21314,8 +21339,14 @@
 				stencil: _stencil,
 				antialias: _antialias,
 				premultipliedAlpha: _premultipliedAlpha,
-				preserveDrawingBuffer: _preserveDrawingBuffer
+				preserveDrawingBuffer: _preserveDrawingBuffer,
+				powerPreference: _powerPreference
 			};
+
+			// event listeners must be registered before WebGL context is created, see #12753
+
+			_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
+			_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
 			_gl = _context || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
 
@@ -21344,9 +21375,6 @@
 				};
 
 			}
-
-			_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
-			_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
 		} catch ( error ) {
 
@@ -21791,7 +21819,9 @@
 
 		this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
-			state.setMaterial( material );
+			var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+
+			state.setMaterial( material, frontFaceCW );
 
 			var program = setProgram( camera, fog, material, object );
 			var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
@@ -22239,6 +22269,10 @@
 
 			//
 
+			textures.updateVideoTextures();
+
+			//
+
 			if ( _clippingEnabled ) _clipping.beginShadows();
 
 			shadowMap.render( shadowsArray, scene, camera );
@@ -22536,7 +22570,9 @@
 
 			if ( object.isImmediateRenderObject ) {
 
-				state.setMaterial( material );
+				var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+
+				state.setMaterial( material, frontFaceCW );
 
 				var program = setProgram( camera, scene.fog, material, object );
 
@@ -25019,7 +25055,9 @@
 
 	Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-		constructor: Group
+		constructor: Group,
+
+		isGroup: true
 
 	} );
 
@@ -25033,28 +25071,40 @@
 
 		this.generateMipmaps = false;
 
+		// Set needsUpdate when first frame is ready
+
 		var scope = this;
 
-		function update() {
+		function onLoaded() {
 
-			var video = scope.image;
-
-			if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
-
-				scope.needsUpdate = true;
-
-			}
-
-			requestAnimationFrame( update );
+			video.removeEventListener( 'loadeddata', onLoaded, false );
+			scope.needsUpdate = true;
 
 		}
 
-		requestAnimationFrame( update );
+		video.addEventListener( 'loadeddata', onLoaded, false );
 
 	}
 
-	VideoTexture.prototype = Object.create( Texture.prototype );
-	VideoTexture.prototype.constructor = VideoTexture;
+	VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
+
+		constructor: VideoTexture,
+
+		isVideoTexture: true,
+
+		update: function () {
+
+			var video = this.image;
+
+			if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+
+				this.needsUpdate = true;
+
+			}
+
+		}
+
+	} );
 
 	/**
 	 * @author alteredq / http://alteredqualia.com/
@@ -28203,7 +28253,7 @@
 
 			this.setIndex( indicesArray );
 			this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
-			this.addAttribute( 'uv', new Float32BufferAttribute( options.arrays.uv, 2 ) );
+			this.addAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
 
 		}
 
@@ -44809,7 +44859,7 @@
 	Object.defineProperties( WebVRManager.prototype, {
 
 		standing: {
-			set: function ( value ) {
+			set: function ( /* value */ ) {
 
 				console.warn( 'THREE.WebVRManager: .standing has been removed.' );
 
