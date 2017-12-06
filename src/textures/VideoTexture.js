@@ -10,17 +10,18 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	this.generateMipmaps = false;
 
+	// Set needsUpdate when first frame is ready
+
 	var scope = this;
 
-	// fires when the first frame of the media has finished loading (now there are valid texture data)
-
-	video.addEventListener( 'loadeddata', function onLoaded() {
-
-		scope.needsUpdate = true;
+	function onLoaded() {
 
 		video.removeEventListener( 'loadeddata', onLoaded, false );
+		scope.needsUpdate = true;
 
-	}, false );
+	}
+
+	video.addEventListener( 'loadeddata', onLoaded, false );
 
 }
 
