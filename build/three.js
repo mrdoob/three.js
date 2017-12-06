@@ -25070,7 +25070,19 @@
 		Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 		this.generateMipmaps = false;
-		this.needsUpdate = true;
+
+		// Set needsUpdate when first frame is ready
+
+		var scope = this;
+
+		function onLoaded() {
+
+			video.removeEventListener( 'loadeddata', onLoaded, false );
+			scope.needsUpdate = true;
+
+		}
+
+		video.addEventListener( 'loadeddata', onLoaded, false );
 
 	}
 
