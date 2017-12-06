@@ -64,7 +64,7 @@ NUMERIC = {
 JSON = 'json'
 EXTENSION = '.%s' % JSON
 INDENT = 'indent'
-FLIP_AXES = 'flip_axes'
+Z_UP = 'z_up'
 
 
 MATERIALS = 'materials'
@@ -181,7 +181,7 @@ EXPORT_OPTIONS = {
     GEOMETRY_TYPE: BUFFER_GEOMETRY,
     INFLUENCES_PER_VERTEX: 2,
     INDENT: True,
-    FLIP_AXES: True
+    Z_UP: True
 }
 
 
