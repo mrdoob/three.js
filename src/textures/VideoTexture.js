@@ -9,7 +9,18 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.generateMipmaps = false;
-	this.needsUpdate = true;
+
+	var scope = this;
+
+	// fires when the first frame of the media has finished loading (now there are valid texture data)
+
+	video.addEventListener( 'loadeddata', function onLoaded() {
+
+		scope.needsUpdate = true;
+
+		video.removeEventListener( 'loadeddata', onLoaded, false );
+
+	}, false );
 
 }
 
