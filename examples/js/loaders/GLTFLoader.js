@@ -2076,7 +2076,8 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					if ( primitive.extras ) mesh.userData = primitive.extras;
+					if ( meshDef.extras !== undefined ) mesh.userData = meshDef.extras;
+					if ( primitive.extras !== undefined ) mesh.geometry.userData = primitive.extras;
 
 					// for Specular-Glossiness.
 					if ( material.isGLTFSpecularGlossinessMaterial === true ) {
