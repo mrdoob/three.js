@@ -50,7 +50,10 @@
 
 				try {
 
-					var scene = self.parse( buffer, resourceDirectory );
+          console.time( 'p' );
+          var scene = self.parse( buffer, resourceDirectory );
+          console.timeEnd( 'p' );
+
 					onLoad( scene );
 
 				} catch ( error ) {
@@ -97,7 +100,7 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -639,16 +642,16 @@
 				index: i,
 				indices: [],
 				weights: [],
-				transform: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.Transform.properties.a ),
-				transformLink: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.TransformLink.properties.a ),
+				transform: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.Transform.a ),
+				transformLink: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.TransformLink.a ),
 				linkMode: subDeformerNode.properties.Mode,
 
 			};
 
 			if ( 'Indexes' in subDeformerNode.subNodes ) {
 
-				subDeformer.indices = subDeformerNode.subNodes.Indexes.properties.a;
-				subDeformer.weights = subDeformerNode.subNodes.Weights.properties.a;
+				subDeformer.indices = subDeformerNode.subNodes.Indexes.a;
+				subDeformer.weights = subDeformerNode.subNodes.Weights.a;
 
 			}
 
@@ -760,8 +763,8 @@
 
 		var subNodes = geometryNode.subNodes;
 
-		var vertexPositions = subNodes.Vertices.properties.a;
-		var vertexIndices = subNodes.PolygonVertexIndex.properties.a;
+		var vertexPositions = subNodes.Vertices.a;
+		var vertexIndices = subNodes.PolygonVertexIndex.a;
 
 		// create arrays to hold the final data used to build the buffergeometry
 		var vertexBuffer = [];
@@ -1212,17 +1215,17 @@
 
 		var mappingType = NormalNode.properties.MappingInformationType;
 		var referenceType = NormalNode.properties.ReferenceInformationType;
-		var buffer = NormalNode.subNodes.Normals.properties.a;
+		var buffer = NormalNode.subNodes.Normals.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
 			if ( 'NormalIndex' in NormalNode.subNodes ) {
 
-				indexBuffer = NormalNode.subNodes.NormalIndex.properties.a;
+				indexBuffer = NormalNode.subNodes.NormalIndex.a;
 
 			} else if ( 'NormalsIndex' in NormalNode.subNodes ) {
 
-				indexBuffer = NormalNode.subNodes.NormalsIndex.properties.a;
+				indexBuffer = NormalNode.subNodes.NormalsIndex.a;
 
 			}
 
@@ -1243,11 +1246,11 @@
 
 		var mappingType = UVNode.properties.MappingInformationType;
 		var referenceType = UVNode.properties.ReferenceInformationType;
-		var buffer = UVNode.subNodes.UV.properties.a;
+		var buffer = UVNode.subNodes.UV.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
-			indexBuffer = UVNode.subNodes.UVIndex.properties.a;
+			indexBuffer = UVNode.subNodes.UVIndex.a;
 
 		}
 
@@ -1266,11 +1269,11 @@
 
 		var mappingType = ColorNode.properties.MappingInformationType;
 		var referenceType = ColorNode.properties.ReferenceInformationType;
-		var buffer = ColorNode.subNodes.Colors.properties.a;
+		var buffer = ColorNode.subNodes.Colors.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
 
-			indexBuffer = ColorNode.subNodes.ColorIndex.properties.a;
+			indexBuffer = ColorNode.subNodes.ColorIndex.a;
 
 		}
 
@@ -1302,7 +1305,7 @@
 
 		}
 
-		var materialIndexBuffer = MaterialNode.subNodes.Materials.properties.a;
+		var materialIndexBuffer = MaterialNode.subNodes.Materials.a;
 
 		// Since materials are stored as indices, there's a bit of a mismatch between FBX and what
 		// we expect.So we create an intermediate buffer that points to the index in the buffer,
@@ -1439,9 +1442,9 @@
 
 		var degree = order - 1;
 
-		var knots = geometryNode.subNodes.KnotVector.properties.a;
+		var knots = geometryNode.subNodes.KnotVector.a;
 		var controlPoints = [];
-		var pointsValues = geometryNode.subNodes.Points.properties.a;
+		var pointsValues = geometryNode.subNodes.Points.a;
 
 		for ( var i = 0, l = pointsValues.length; i < l; i += 4 ) {
 
@@ -2049,14 +2052,14 @@
 
 						poseNodes.forEach( function ( node ) {
 
-							var rawMatWrd = new THREE.Matrix4().fromArray( node.subNodes.Matrix.properties.a );
+							var rawMatWrd = new THREE.Matrix4().fromArray( node.subNodes.Matrix.a );
 							worldMatrices.set( parseInt( node.properties.Node ), rawMatWrd );
 
 						} );
 
 					} else {
 
-						var rawMatWrd = new THREE.Matrix4().fromArray( poseNodes.subNodes.Matrix.properties.a );
+						var rawMatWrd = new THREE.Matrix4().fromArray( poseNodes.subNodes.Matrix.a );
 						worldMatrices.set( parseInt( poseNodes.properties.Node ), rawMatWrd );
 
 					}
@@ -2164,9 +2167,9 @@
 
 				};
 
-			}
+				curveNodesMap.set( curveNode.id, curveNode );
 
-			curveNodesMap.set( curveNode.id, curveNode );
+			}
 
 		}
 
@@ -2174,7 +2177,7 @@
 
 	}
 
-	// parse nodes in  FBXTree.Objects.subNodes.AnimationCurve and connect them up to
+	// parse nodes in FBXTree.Objects.subNodes.AnimationCurve and connect them up to
 	// previously parsed AnimationCurveNodes. Each AnimationCurve holds data for a single animated
 	// axis ( e.g. times and values of x rotation)
 	function parseAnimationCurves( FBXTree, connections, curveNodesMap ) {
@@ -2186,8 +2189,8 @@
 			var animationCurve = {
 
 				id: rawCurves[ nodeID ].id,
-				times: rawCurves[ nodeID ].subNodes.KeyTime.properties.a.map( convertFBXTimeToSeconds ),
-				values: rawCurves[ nodeID ].subNodes.KeyValueFloat.properties.a,
+				times: rawCurves[ nodeID ].subNodes.KeyTime.a.map( convertFBXTimeToSeconds ),
+				values: rawCurves[ nodeID ].subNodes.KeyValueFloat.a,
 
 			};
 
@@ -2614,7 +2617,7 @@
 
 				} else if ( matchEnd ) {
 
-					self.nodeEnd();
+					self.popStack();
 
 				} else if ( line.match( /^[^\s\t}]/ ) ) {
 
@@ -2640,8 +2643,10 @@
 
 			} );
 
-			var node = { 'name': nodeName, properties: {}, 'subNodes': {} };
+
+			var node = { name: nodeName, properties: {}, subNodes: {} };
 			var attrs = this.parseNodeAttr( nodeAttrs );
+
 			var currentNode = this.getCurrentNode();
 
 			// a top node
@@ -2687,7 +2692,7 @@
 					currentNode.subNodes[ nodeName ] = {};
 					currentNode.subNodes[ nodeName ][ attrs.id ] = node;
 
-				} else {
+				} else if ( nodeName !== 'Properties70' ) {
 
 					currentNode.subNodes[ nodeName ] = node;
 
@@ -2696,15 +2701,12 @@
 			}
 
 
-			// for this	↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-			// NodeAttribute: 1001463072, "NodeAttribute::", "LimbNode" {
-			if ( nodeAttrs ) {
+			if ( typeof attrs.id === 'number' ) node.id = attrs.id;
+			if ( attrs.name !== '' ) node.attrName = attrs.name;
+			if ( attrs.type !== '' ) node.attrType = attrs.type;
 
-				node.id = attrs.id;
-				node.attrName = attrs.name;
-				node.attrType = attrs.type;
 
-			}
+
 
 			this.pushStack( node );
 
@@ -2809,27 +2811,18 @@
 			// already exists in properties, then append this
 			if ( propName in currentNode.properties ) {
 
+				// connections
 				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
 
 					currentNode.properties[ propName ].push( propValue );
 
-				} else {
-
-					currentNode.properties[ propName ] += propValue;
-
-				}
+			  }
 
 			} else {
 
-				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
 
-					currentNode.properties[ propName ].push( propValue );
-
-				} else {
-
-					currentNode.properties[ propName ] = propValue;
-
-				}
+				if ( propName !== 'a' ) currentNode.properties[ propName ] = propValue;
+				else currentNode.a = propValue;
 
 			}
 
@@ -2838,7 +2831,7 @@
 			// convert string to array, unless it ends in ',' in which case more will be added to it
 			if ( propName === 'a' && propValue.slice( - 1 ) !== ',' ) {
 
-				currentNode.properties.a = parseNumberArray( propValue );
+				currentNode.a = parseNumberArray( propValue );
 
 			}
 
@@ -2846,14 +2839,15 @@
 
 		parseNodePropertyContinued: function ( line ) {
 
-			this.currentProp[ this.currentPropName ] += line;
+			var currentNode = this.getCurrentNode();
+
+			currentNode.a += line;
 
 			// if the line doesn't end in ',' we have reached the end of the property value
 			// so convert the string to an array
 			if ( line.slice( - 1 ) !== ',' ) {
 
-				var currentNode = this.getCurrentNode();
-				currentNode.properties.a = parseNumberArray( currentNode.properties.a );
+				currentNode.a = parseNumberArray( currentNode.a );
 
 			}
 
@@ -2914,12 +2908,6 @@
 			};
 
 			this.setCurrentProp( this.getPrevNode().properties, innerPropName );
-
-		},
-
-		nodeEnd: function () {
-
-			this.popStack();
 
 		},
 
@@ -3037,7 +3025,7 @@
 
 						subNodes[ node.name ] = node;
 
-						node.properties.a = value;
+						node.a = value;
 
 					} else {
 
@@ -3056,7 +3044,8 @@
 
 					node.propertyList.forEach( function ( property, i ) {
 
-						array[ i - 1 ] = property;
+						// first Connection is FBX type (OO, OP, etc.). We'll discard these
+						if ( i !== 0 ) array.push( property );
 
 					} );
 
@@ -3143,7 +3132,7 @@
 
 				} else {
 
-					if ( node.id === '' ) {
+					if ( node.id === undefined ) {
 
 						if ( ! Array.isArray( subNodes[ node.name ] ) ) {
 
@@ -3153,24 +3142,9 @@
 
 						subNodes[ node.name ].push( node );
 
-					} else {
+					} else if ( subNodes[ node.name ][ node.id ] === undefined ) {
 
-						if ( subNodes[ node.name ][ node.id ] === undefined ) {
-
-							subNodes[ node.name ][ node.id ] = node;
-
-						} else {
-
-							// conflict id. irregular?
-							if ( ! Array.isArray( subNodes[ node.name ][ node.id ] ) ) {
-
-								subNodes[ node.name ][ node.id ] = [ subNodes[ node.name ][ node.id ] ];
-
-							}
-
-							subNodes[ node.name ][ node.id ].push( node );
-
-						}
+						subNodes[ node.name ][ node.id ] = node;
 
 					}
 
@@ -3178,18 +3152,21 @@
 
 			}
 
-			return {
+			var node = {
 
 				singleProperty: isSingleProperty,
-				id: id,
-				attrName: attrName,
-				attrType: attrType,
-				name: name,
-				properties: properties,
 				propertyList: propertyList, // raw property list used by parent
 				subNodes: subNodes
 
 			};
+
+			if ( Object.keys( properties ).length !== 0 ) node.properties = properties;
+			if ( typeof id === 'number' ) node.id = id;
+			if ( attrName !== '' ) node.attrName = attrName;
+			if ( attrType !== '' ) node.attrType = attrType;
+			if ( name !== '' ) node.name = name;
+
+			return node;
 
 		},
 
