@@ -50,9 +50,9 @@
 
 				try {
 
-          console.time( 'p' );
-          var scene = self.parse( buffer, resourceDirectory );
-          console.timeEnd( 'p' );
+					console.time( 'p' );
+					var scene = self.parse( buffer, resourceDirectory );
+					console.timeEnd( 'p' );
 
 					onLoad( scene );
 
@@ -124,7 +124,7 @@
 
 		if ( 'Connections' in FBXTree ) {
 
-			var rawConnections = FBXTree.Connections.properties.connections;
+			var rawConnections = FBXTree.Connections.connections;
 
 			rawConnections.forEach( function ( rawConnection ) {
 
@@ -187,16 +187,16 @@
 
 				// check whether the file name is used by another videoNode
 				// and if so keep a record of both ids as a duplicate pair [ id1, id2 ]
-				if ( videoNode.properties.fileName in names ) {
+				if ( videoNode.fileName in names ) {
 
-					duplicates.push( [ id, names[ videoNode.properties.fileName ] ] );
+					duplicates.push( [ id, names[ videoNode.fileName ] ] );
 
 				}
 
-				names[ videoNode.properties.fileName ] = id;
+				names[ videoNode.fileName ] = id;
 
-				// raw image data is in videoNode.properties.Content
-				if ( 'Content' in videoNode.properties && videoNode.properties.Content !== '' ) {
+				// raw image data is in videoNode.Content
+				if ( 'Content' in videoNode && videoNode.Content !== '' ) {
 
 					var image = parseImage( videoNodes[ nodeID ] );
 
@@ -233,11 +233,11 @@
 
 	}
 
-	// Parse embedded image data in FBXTree.Video.properties.Content
+	// Parse embedded image data in FBXTree.Video.Content
 	function parseImage( videoNode ) {
 
-		var content = videoNode.properties.Content;
-		var fileName = videoNode.properties.RelativeFilename || videoNode.properties.Filename;
+		var content = videoNode.Content;
+		var fileName = videoNode.RelativeFilename || videoNode.Filename;
 		var extension = fileName.slice( fileName.lastIndexOf( '.' ) + 1 ).toLowerCase();
 
 		var type;
@@ -317,8 +317,8 @@
 
 		texture.name = textureNode.attrName;
 
-		var wrapModeU = textureNode.properties.WrapModeU;
-		var wrapModeV = textureNode.properties.WrapModeV;
+		var wrapModeU = textureNode.WrapModeU;
+		var wrapModeV = textureNode.WrapModeV;
 
 		var valueU = wrapModeU !== undefined ? wrapModeU.value : 0;
 		var valueV = wrapModeV !== undefined ? wrapModeV.value : 0;
@@ -329,9 +329,9 @@
 		texture.wrapS = valueU === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 		texture.wrapT = valueV === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 
-		if ( 'Scaling' in textureNode.properties ) {
+		if ( 'Scaling' in textureNode ) {
 
-			var values = textureNode.properties.Scaling.value;
+			var values = textureNode.Scaling.value;
 
 			texture.repeat.x = values[ 0 ];
 			texture.repeat.y = values[ 1 ];
@@ -347,8 +347,8 @@
 
 		var fileName;
 
-		var filePath = textureNode.properties.FileName;
-		var relativeFilePath = textureNode.properties.RelativeFilename;
+		var filePath = textureNode.FileName;
+		var relativeFilePath = textureNode.RelativeFilename;
 
 		var children = connections.get( textureNode.id ).children;
 
@@ -424,7 +424,7 @@
 
 		var FBX_ID = materialNode.id;
 		var name = materialNode.attrName;
-		var type = materialNode.properties.ShadingModel;
+		var type = materialNode.ShadingModel;
 
 		//Case where FBX wraps shading model in property object.
 		if ( typeof type === 'object' ) {
@@ -436,7 +436,7 @@
 		// Ignore unused materials which don't have any connections.
 		if ( ! connections.has( FBX_ID ) ) return null;
 
-		var parameters = parseParameters( FBXTree, materialNode.properties, textureMap, FBX_ID, connections );
+		var parameters = parseParameters( FBXTree, materialNode, textureMap, FBX_ID, connections );
 
 		var material;
 
@@ -644,7 +644,7 @@
 				weights: [],
 				transform: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.Transform.a ),
 				transformLink: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.TransformLink.a ),
-				linkMode: subDeformerNode.properties.Mode,
+				linkMode: subDeformerNode.Mode,
 
 			};
 
@@ -739,18 +739,18 @@
 		// For now just assume one model and get the preRotations from that
 		var modelNode = modelNodes[ 0 ];
 
-		if ( 'GeometricRotation' in modelNode.properties ) {
+		if ( 'GeometricRotation' in modelNode ) {
 
-			var array = modelNode.properties.GeometricRotation.value.map( THREE.Math.degToRad );
+			var array = modelNode.GeometricRotation.value.map( THREE.Math.degToRad );
 			array[ 3 ] = 'ZYX';
 
 			preTransform.makeRotationFromEuler( new THREE.Euler().fromArray( array ) );
 
 		}
 
-		if ( 'GeometricTranslation' in modelNode.properties ) {
+		if ( 'GeometricTranslation' in modelNode ) {
 
-			preTransform.setPosition( new THREE.Vector3().fromArray( modelNode.properties.GeometricTranslation.value ) );
+			preTransform.setPosition( new THREE.Vector3().fromArray( modelNode.GeometricTranslation.value ) );
 
 		}
 
@@ -1213,8 +1213,8 @@
 	// Parse normal from FBXTree.Objects.subNodes.Geometry.subNodes.LayerElementNormal if it exists
 	function getNormals( NormalNode ) {
 
-		var mappingType = NormalNode.properties.MappingInformationType;
-		var referenceType = NormalNode.properties.ReferenceInformationType;
+		var mappingType = NormalNode.MappingInformationType;
+		var referenceType = NormalNode.ReferenceInformationType;
 		var buffer = NormalNode.subNodes.Normals.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
@@ -1244,8 +1244,8 @@
 	// Parse UVs from FBXTree.Objects.subNodes.Geometry.subNodes.LayerElementUV if it exists
 	function getUVs( UVNode ) {
 
-		var mappingType = UVNode.properties.MappingInformationType;
-		var referenceType = UVNode.properties.ReferenceInformationType;
+		var mappingType = UVNode.MappingInformationType;
+		var referenceType = UVNode.ReferenceInformationType;
 		var buffer = UVNode.subNodes.UV.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
@@ -1267,8 +1267,8 @@
 	// Parse Vertex Colors from FBXTree.Objects.subNodes.Geometry.subNodes.LayerElementColor if it exists
 	function getColors( ColorNode ) {
 
-		var mappingType = ColorNode.properties.MappingInformationType;
-		var referenceType = ColorNode.properties.ReferenceInformationType;
+		var mappingType = ColorNode.MappingInformationType;
+		var referenceType = ColorNode.ReferenceInformationType;
 		var buffer = ColorNode.subNodes.Colors.a;
 		var indexBuffer = [];
 		if ( referenceType === 'IndexToDirect' ) {
@@ -1290,8 +1290,8 @@
 	// Parse mapping and material data in FBXTree.Objects.subNodes.Geometry.subNodes.LayerElementMaterial if it exists
 	function getMaterials( MaterialNode ) {
 
-		var mappingType = MaterialNode.properties.MappingInformationType;
-		var referenceType = MaterialNode.properties.ReferenceInformationType;
+		var mappingType = MaterialNode.MappingInformationType;
+		var referenceType = MaterialNode.ReferenceInformationType;
 
 		if ( mappingType === 'NoMappingInformation' ) {
 
@@ -1431,11 +1431,11 @@
 
 		}
 
-		var order = parseInt( geometryNode.properties.Order );
+		var order = parseInt( geometryNode.Order );
 
 		if ( isNaN( order ) ) {
 
-			console.error( 'THREE.FBXLoader: Invalid Order %s given for geometry ID: %s', geometryNode.properties.Order, geometryNode.id );
+			console.error( 'THREE.FBXLoader: Invalid Order %s given for geometry ID: %s', geometryNode.Order, geometryNode.id );
 			return new THREE.BufferGeometry();
 
 		}
@@ -1454,11 +1454,11 @@
 
 		var startKnot, endKnot;
 
-		if ( geometryNode.properties.Form === 'Closed' ) {
+		if ( geometryNode.Form === 'Closed' ) {
 
 			controlPoints.push( controlPoints[ 0 ] );
 
-		} else if ( geometryNode.properties.Form === 'Periodic' ) {
+		} else if ( geometryNode.Form === 'Periodic' ) {
 
 			startKnot = degree;
 			endKnot = knots.length - 1 - startKnot;
@@ -1619,9 +1619,9 @@
 
 			var attr = FBXTree.Objects.subNodes.NodeAttribute[ child.ID ];
 
-			if ( attr !== undefined && attr.properties !== undefined ) {
+			if ( attr !== undefined ) {
 
-				cameraAttribute = attr.properties;
+				cameraAttribute = attr;
 
 			}
 
@@ -1707,9 +1707,9 @@
 
 			var attr = FBXTree.Objects.subNodes.NodeAttribute[ child.ID ];
 
-			if ( attr !== undefined && attr.properties !== undefined ) {
+			if ( attr !== undefined ) {
 
-				lightAttribute = attr.properties;
+				lightAttribute = attr;
 
 			}
 
@@ -1906,12 +1906,12 @@
 
 	}
 
-	// Parse ambient color in FBXTree.GlobalSettings.properties - if it's not set to black (default), create an ambient light
+	// Parse ambient color in FBXTree.GlobalSettings - if it's not set to black (default), create an ambient light
 	function createAmbientLight( FBXTree, sceneGraph ) {
 
-		if ( 'GlobalSettings' in FBXTree && 'AmbientColor' in FBXTree.GlobalSettings.properties ) {
+		if ( 'GlobalSettings' in FBXTree && 'AmbientColor' in FBXTree.GlobalSettings ) {
 
-			var ambientColor = FBXTree.GlobalSettings.properties.AmbientColor.value;
+			var ambientColor = FBXTree.GlobalSettings.AmbientColor.value;
 			var r = ambientColor[ 0 ];
 			var g = ambientColor[ 1 ];
 			var b = ambientColor[ 2 ];
@@ -1931,7 +1931,7 @@
 	function setModelTransforms( FBXTree, model, modelNode, connections, sceneGraph ) {
 
 		// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
-		if ( 'RotationOrder' in modelNode.properties ) {
+		if ( 'RotationOrder' in modelNode ) {
 
 			var enums = [
 				'XYZ', // default
@@ -1943,7 +1943,7 @@
 				'SphericXYZ',
 			];
 
-			var value = parseInt( modelNode.properties.RotationOrder.value, 10 );
+			var value = parseInt( modelNode.RotationOrder.value, 10 );
 
 			if ( value > 0 && value < 6 ) {
 
@@ -1960,29 +1960,29 @@
 
 		}
 
-		if ( 'Lcl_Translation' in modelNode.properties ) {
+		if ( 'Lcl_Translation' in modelNode ) {
 
-			model.position.fromArray( modelNode.properties.Lcl_Translation.value );
+			model.position.fromArray( modelNode.Lcl_Translation.value );
 
 		}
 
-		if ( 'Lcl_Rotation' in modelNode.properties ) {
+		if ( 'Lcl_Rotation' in modelNode ) {
 
-			var rotation = modelNode.properties.Lcl_Rotation.value.map( THREE.Math.degToRad );
+			var rotation = modelNode.Lcl_Rotation.value.map( THREE.Math.degToRad );
 			rotation.push( 'ZYX' );
 			model.rotation.fromArray( rotation );
 
 		}
 
-		if ( 'Lcl_Scaling' in modelNode.properties ) {
+		if ( 'Lcl_Scaling' in modelNode ) {
 
-			model.scale.fromArray( modelNode.properties.Lcl_Scaling.value );
+			model.scale.fromArray( modelNode.Lcl_Scaling.value );
 
 		}
 
-		if ( 'PreRotation' in modelNode.properties ) {
+		if ( 'PreRotation' in modelNode ) {
 
-			var array = modelNode.properties.PreRotation.value.map( THREE.Math.degToRad );
+			var array = modelNode.PreRotation.value.map( THREE.Math.degToRad );
 			array[ 3 ] = 'ZYX';
 
 			var preRotations = new THREE.Euler().fromArray( array );
@@ -1994,7 +1994,7 @@
 
 		}
 
-		if ( 'LookAtProperty' in modelNode.properties ) {
+		if ( 'LookAtProperty' in modelNode ) {
 
 			var children = connections.get( model.FBX_ID ).children;
 
@@ -2004,9 +2004,9 @@
 
 					var lookAtTarget = FBXTree.Objects.subNodes.Model[ child.ID ];
 
-					if ( 'Lcl_Translation' in lookAtTarget.properties ) {
+					if ( 'Lcl_Translation' in lookAtTarget ) {
 
-						var pos = lookAtTarget.properties.Lcl_Translation.value;
+						var pos = lookAtTarget.Lcl_Translation.value;
 
 						// DirectionalLight, SpotLight
 						if ( model.target !== undefined ) {
@@ -2053,14 +2053,14 @@
 						poseNodes.forEach( function ( node ) {
 
 							var rawMatWrd = new THREE.Matrix4().fromArray( node.subNodes.Matrix.a );
-							worldMatrices.set( parseInt( node.properties.Node ), rawMatWrd );
+							worldMatrices.set( parseInt( node.Node ), rawMatWrd );
 
 						} );
 
 					} else {
 
 						var rawMatWrd = new THREE.Matrix4().fromArray( poseNodes.subNodes.Matrix.a );
-						worldMatrices.set( parseInt( poseNodes.properties.Node ), rawMatWrd );
+						worldMatrices.set( parseInt( poseNodes.Node ), rawMatWrd );
 
 					}
 
@@ -2275,15 +2275,15 @@
 
 							};
 
-							if ( 'Lcl_Translation' in rawModel.properties ) node.initialPosition = rawModel.properties.Lcl_Translation.value;
+							if ( 'Lcl_Translation' in rawModel ) node.initialPosition = rawModel.Lcl_Translation.value;
 
-							if ( 'Lcl_Rotation' in rawModel.properties ) node.initialRotation = rawModel.properties.Lcl_Rotation.value;
+							if ( 'Lcl_Rotation' in rawModel ) node.initialRotation = rawModel.Lcl_Rotation.value;
 
-							if ( 'Lcl_Scaling' in rawModel.properties ) node.initialScale = rawModel.properties.Lcl_Scaling.value;
+							if ( 'Lcl_Scaling' in rawModel ) node.initialScale = rawModel.Lcl_Scaling.value;
 
 							// if the animated model is pre rotated, we'll have to apply the pre rotations to every
 							// animation value as well
-							if ( 'PreRotation' in rawModel.properties ) node.preRotations = rawModel.properties.PreRotation.value;
+							if ( 'PreRotation' in rawModel ) node.preRotations = rawModel.PreRotation.value;
 
 							layerCurveNodes[ i ] = node;
 
@@ -2791,9 +2791,9 @@
 				propValue = [ from, to ];
 				append( propValue, rest );
 
-				if ( currentNode.properties[ propName ] === undefined ) {
+				if ( currentNode[ propName ] === undefined ) {
 
-					currentNode.properties[ propName ] = [];
+					currentNode[ propName ] = [];
 
 				}
 
@@ -2803,30 +2803,30 @@
 			if ( propName === 'Node' ) {
 
 				var id = parseInt( propValue );
-				currentNode.properties.id = id;
+				// currentNode.properties.id = id;
 				currentNode.id = id;
 
 			}
 
 			// already exists in properties, then append this
-			if ( propName in currentNode.properties ) {
+			if ( propName in currentNode ) {
 
 				// connections
-				if ( Array.isArray( currentNode.properties[ propName ] ) ) {
+				if ( Array.isArray( currentNode[ propName ] ) ) {
 
-					currentNode.properties[ propName ].push( propValue );
+					currentNode[ propName ].push( propValue );
 
-			  }
+				}
 
 			} else {
 
 
-				if ( propName !== 'a' ) currentNode.properties[ propName ] = propValue;
+				if ( propName !== 'a' ) currentNode[ propName ] = propValue;
 				else currentNode.a = propValue;
 
 			}
 
-			this.setCurrentProp( currentNode.properties, propName );
+			this.setCurrentProp( currentNode, propName );
 
 			// convert string to array, unless it ends in ',' in which case more will be added to it
 			if ( propName === 'a' && propValue.slice( - 1 ) !== ',' ) {
@@ -2898,7 +2898,7 @@
 			}
 
 			// CAUTION: these props must append to parent's parent
-			this.getPrevNode().properties[ innerPropName ] = {
+			this.getPrevNode()[ innerPropName ] = {
 
 				'type': innerPropType1,
 				'type2': innerPropType2,
@@ -2907,7 +2907,7 @@
 
 			};
 
-			this.setCurrentProp( this.getPrevNode().properties, innerPropName );
+			this.setCurrentProp( this.getPrevNode(), innerPropName );
 
 		},
 
@@ -3027,6 +3027,8 @@
 
 						node.a = value;
 
+						// console.log(  subNodes )
+
 					} else {
 
 						properties[ node.name ] = value;
@@ -3065,11 +3067,13 @@
 				// move child node's properties to this node.
 				if ( node.name === 'Properties70' ) {
 
-					var keys = Object.keys( node.properties );
+					var keys = Object.keys( node );
+					// var keys = Object.keys( node.properties );
 
 					keys.forEach( function ( key ) {
 
-						properties[ key ] = node.properties[ key ];
+						properties[ key ] = node[ key ];
+						// properties[ key ] = node.properties[ key ];
 
 					} );
 
@@ -3156,11 +3160,14 @@
 
 				singleProperty: isSingleProperty,
 				propertyList: propertyList, // raw property list used by parent
-				subNodes: subNodes
 
 			};
 
-			if ( Object.keys( properties ).length !== 0 ) node.properties = properties;
+			if ( node.subNodes === undefined ) node.subNodes = {};
+
+			Object.assign( node, properties );
+			Object.assign( node.subNodes, subNodes );
+
 			if ( typeof id === 'number' ) node.id = id;
 			if ( attrName !== '' ) node.attrName = attrName;
 			if ( attrType !== '' ) node.attrType = attrType;
