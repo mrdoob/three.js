@@ -7,60 +7,60 @@ import { AudioListener } from '../../../../src/audio/AudioListener.js';
 
 export default QUnit.module( 'Audios', () => {
 
-	QUnit.module.todo( 'AudioListener', () => {
+	QUnit.module( 'AudioListener', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "getInput", ( assert ) => {
+		QUnit.todo( "getInput", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "removeFilter", ( assert ) => {
+		QUnit.todo( "removeFilter", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getFilter", ( assert ) => {
+		QUnit.todo( "getFilter", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setFilter", ( assert ) => {
+		QUnit.todo( "setFilter", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getMasterVolume", ( assert ) => {
+		QUnit.todo( "getMasterVolume", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setMasterVolume", ( assert ) => {
+		QUnit.todo( "setMasterVolume", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "updateMatrixWorld", ( assert ) => {
+		QUnit.todo( "updateMatrixWorld", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

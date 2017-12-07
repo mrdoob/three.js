@@ -7,24 +7,24 @@ import { DepthTexture } from '../../../../src/textures/DepthTexture';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module.todo( 'DepthTexture', () => {
+	QUnit.module( 'DepthTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isDepthTexture", ( assert ) => {
+		QUnit.todo( "isDepthTexture", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

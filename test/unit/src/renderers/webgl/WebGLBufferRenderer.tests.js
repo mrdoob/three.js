@@ -9,29 +9,29 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module.todo( 'WebGLBufferRenderer', () => {
+		QUnit.module( 'WebGLBufferRenderer', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "setMode", ( assert ) => {
+			QUnit.todo( "setMode", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "render", ( assert ) => {
+			QUnit.todo( "render", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "renderInstances", ( assert ) => {
+			QUnit.todo( "renderInstances", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

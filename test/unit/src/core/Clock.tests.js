@@ -8,7 +8,7 @@ import { Clock } from '../../../../src/core/Clock';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'Clock', () => {
+	QUnit.module( 'Clock', () => {
 
 		function mockPerformance() {
 
@@ -32,32 +32,32 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "start", ( assert ) => {
+		QUnit.todo( "start", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "stop", ( assert ) => {
+		QUnit.todo( "stop", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getElapsedTime", ( assert ) => {
+		QUnit.todo( "getElapsedTime", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getDelta", ( assert ) => {
+		QUnit.todo( "getDelta", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

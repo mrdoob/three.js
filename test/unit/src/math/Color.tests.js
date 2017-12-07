@@ -9,7 +9,7 @@ import { eps } from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Color', () => {
+	QUnit.module( 'Color', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -29,7 +29,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isColor", ( assert ) => {
+		QUnit.todo( "isColor", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -53,7 +53,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setScalar", ( assert ) => {
+		QUnit.todo( "setScalar", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -67,7 +67,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setRGB", ( assert ) => {
+		QUnit.todo( "setRGB", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -85,7 +85,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setStyle", ( assert ) => {
+		QUnit.todo( "setStyle", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -99,7 +99,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -211,7 +211,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "addColors", ( assert ) => {
+		QUnit.todo( "addColors", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
