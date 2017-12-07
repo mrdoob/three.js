@@ -42,7 +42,7 @@
 
 			var self = this;
 
-			var resourceDirectory = THREE.Loader.prototype.extractUrlBase( url );
+			var resourceDirectory = THREE.LoaderUtils.extractUrlBase( url );
 
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setResponseType( 'arraybuffer' );
@@ -3630,7 +3630,7 @@
 
 		getString: function ( size ) {
 
-			var s = THREE.Loader.decodeText( this.getUint8Array( size ) );
+			var s = THREE.LoaderUtils.decodeText( this.getUint8Array( size ) );
 
 			this.skip( size );
 
@@ -3748,7 +3748,7 @@
 		if ( from === undefined ) from = 0;
 		if ( to === undefined ) to = buffer.byteLength;
 
-		return THREE.Loader.decodeText( new Uint8Array( buffer, from, to ) );
+		return THREE.LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) );
 
 	}
 

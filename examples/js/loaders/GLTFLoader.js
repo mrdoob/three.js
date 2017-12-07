@@ -24,7 +24,7 @@ THREE.GLTFLoader = ( function () {
 
 			var scope = this;
 
-			var path = this.path !== undefined ? this.path : THREE.Loader.prototype.extractUrlBase( url );
+			var path = this.path !== undefined ? this.path : THREE.LoaderUtils.extractUrlBase( url );
 
 			var loader = new THREE.FileLoader( scope.manager );
 
@@ -77,7 +77,7 @@ THREE.GLTFLoader = ( function () {
 
 			} else {
 
-				var magic = THREE.Loader.decodeText( new Uint8Array( data, 0, 4 ) );
+				var magic = THREE.LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
 
 				if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
 
@@ -96,7 +96,7 @@ THREE.GLTFLoader = ( function () {
 
 				} else {
 
-					content = THREE.Loader.decodeText( new Uint8Array( data ) );
+					content = THREE.LoaderUtils.decodeText( new Uint8Array( data ) );
 
 				}
 
@@ -410,7 +410,7 @@ THREE.GLTFLoader = ( function () {
 		var headerView = new DataView( data, 0, BINARY_EXTENSION_HEADER_LENGTH );
 
 		this.header = {
-			magic: THREE.Loader.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
+			magic: THREE.LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
 			version: headerView.getUint32( 4, true ),
 			length: headerView.getUint32( 8, true )
 		};
@@ -439,7 +439,7 @@ THREE.GLTFLoader = ( function () {
 			if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.JSON ) {
 
 				var contentArray = new Uint8Array( data, BINARY_EXTENSION_HEADER_LENGTH + chunkIndex, chunkLength );
-				this.content = THREE.Loader.decodeText( contentArray );
+				this.content = THREE.LoaderUtils.decodeText( contentArray );
 
 			} else if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.BIN ) {
 

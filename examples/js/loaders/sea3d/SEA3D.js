@@ -277,7 +277,7 @@ SEA3D.Stream.prototype.readMatrix = function () {
 
 SEA3D.Stream.prototype.readUTF8 = function ( len ) {
 
-	return THREE.Loader.decodeText( new Uint8Array( this.readBytes( len ) ) );
+	return THREE.LoaderUtils.decodeText( new Uint8Array( this.readBytes( len ) ) );
 
 };
 

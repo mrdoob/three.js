@@ -23,7 +23,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			var scope = this;
 
-			var path = this.path && ( typeof this.path === "string" ) ? this.path : THREE.Loader.prototype.extractUrlBase( url );
+			var path = this.path && ( typeof this.path === "string" ) ? this.path : THREE.LoaderUtils.extractUrlBase( url );
 
 			var loader = new THREE.FileLoader( scope.manager );
 
@@ -54,7 +54,7 @@ THREE.LegacyGLTFLoader = ( function () {
 			var content;
 			var extensions = {};
 
-			var magic = THREE.Loader.decodeText( new Uint8Array( data, 0, 4 ) );
+			var magic = THREE.LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
 
 			if ( magic === BINARY_EXTENSION_HEADER_DEFAULTS.magic ) {
 
@@ -63,7 +63,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			} else {
 
-				content = THREE.Loader.decodeText( new Uint8Array( data ) );
+				content = THREE.LoaderUtils.decodeText( new Uint8Array( data ) );
 
 			}
 
@@ -358,7 +358,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		var headerView = new DataView( data, 0, BINARY_EXTENSION_HEADER_LENGTH );
 
 		var header = {
-			magic: THREE.Loader.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
+			magic: THREE.LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
 			version: headerView.getUint32( 4, true ),
 			length: headerView.getUint32( 8, true ),
 			contentLength: headerView.getUint32( 12, true ),
@@ -380,7 +380,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		var contentArray = new Uint8Array( data, BINARY_EXTENSION_HEADER_LENGTH, header.contentLength );
 
 		this.header = header;
-		this.content = THREE.Loader.decodeText( contentArray );
+		this.content = THREE.LoaderUtils.decodeText( contentArray );
 		this.body = data.slice( BINARY_EXTENSION_HEADER_LENGTH + header.contentLength, header.length );
 
 	}
@@ -390,7 +390,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		var bufferView = bufferViews[ shader.extensions[ EXTENSIONS.KHR_BINARY_GLTF ].bufferView ];
 		var array = new Uint8Array( bufferView );
 
-		return THREE.Loader.decodeText( array );
+		return THREE.LoaderUtils.decodeText( array );
 
 	};
 
@@ -398,7 +398,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		var metadata = source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ];
 		var bufferView = bufferViews[ metadata.bufferView ];
-		var stringData = THREE.Loader.decodeText( new Uint8Array( bufferView ) );
+		var stringData = THREE.LoaderUtils.decodeText( new Uint8Array( bufferView ) );
 
 		return 'data:' + metadata.mimeType + ';base64,' + btoa( stringData );
 

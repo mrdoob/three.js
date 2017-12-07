@@ -86,7 +86,7 @@ THREE.AMFLoader.prototype = {
 
 			}
 
-			var fileText = THREE.Loader.decodeText( view );
+			var fileText = THREE.LoaderUtils.decodeText( view );
 			var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
 
 			if ( xmlData.documentElement.nodeName.toLowerCase() !== 'amf' ) {

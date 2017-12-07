@@ -278,7 +278,7 @@ THREE.STLLoader.prototype = {
 
 			if ( typeof buffer !== 'string' ) {
 
-				return THREE.Loader.decodeText( new Uint8Array( buffer ) );
+				return THREE.LoaderUtils.decodeText( new Uint8Array( buffer ) );
 
 			}
 

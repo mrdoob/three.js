@@ -370,7 +370,7 @@
 
 				if ( typeof buf !== "string" ) {
 
-					return THREE.Loader.decodeText( new Uint8Array( buf ) );
+					return THREE.LoaderUtils.decodeText( new Uint8Array( buf ) );
 
 				} else {
 
@@ -393,7 +393,7 @@
 			key: '_parseBinary',
 			value: function _parseBinary( data ) {
 
-				return this._parseASCII( THREE.Loader.decodeText( new Uint8Array( data ) ) );
+				return this._parseASCII( THREE.LoaderUtils.decodeText( new Uint8Array( data ) ) );
 
 			}
 		}, {
