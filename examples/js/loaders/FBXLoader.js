@@ -103,9 +103,9 @@
 			var images = parseImages( FBXTree );
 			var textures = parseTextures( FBXTree, new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ), images, connections );
 			var materials = parseMaterials( FBXTree, textures, connections );
-			var deformers = parseDeformers( FBXTree, connections );
-			var geometryMap = parseGeometries( FBXTree, connections, deformers );
-			var sceneGraph = parseScene( FBXTree, connections, deformers, geometryMap, materials );
+			var skeletons = parseDeformers( FBXTree, connections );
+			var geometryMap = parseGeometries( FBXTree, connections, skeletons );
+			var sceneGraph = parseScene( FBXTree, connections, skeletons, geometryMap, materials );
 
 			return sceneGraph;
 
@@ -310,7 +310,7 @@
 
 		var texture = loadTexture( textureNode, loader, imageMap, connections );
 
-		texture.FBX_ID = textureNode.id;
+		texture.ID = textureNode.id;
 
 		texture.name = textureNode.attrName;
 
@@ -419,7 +419,7 @@
 	// FBX format currently only supports Lambert and Phong shading models
 	function parseMaterial( FBXTree, materialNode, textureMap, connections ) {
 
-		var FBX_ID = materialNode.id;
+		var ID = materialNode.id;
 		var name = materialNode.attrName;
 		var type = materialNode.properties.ShadingModel;
 
@@ -431,9 +431,9 @@
 		}
 
 		// Ignore unused materials which don't have any connections.
-		if ( ! connections.has( FBX_ID ) ) return null;
+		if ( ! connections.has( ID ) ) return null;
 
-		var parameters = parseParameters( FBXTree, materialNode.properties, textureMap, FBX_ID, connections );
+		var parameters = parseParameters( FBXTree, materialNode.properties, textureMap, ID, connections );
 
 		var material;
 
@@ -461,7 +461,7 @@
 
 	// Parse FBX material and return parameters suitable for a three.js material
 	// Also parse the texture map and return any textures associated with the material
-	function parseParameters( FBXTree, properties, textureMap, FBX_ID, connections ) {
+	function parseParameters( FBXTree, properties, textureMap, ID, connections ) {
 
 
 		var parameters = {};
@@ -517,7 +517,7 @@
 
 		}
 
-		connections.get( FBX_ID ).children.forEach( function ( child ) {
+		connections.get( ID ).children.forEach( function ( child ) {
 
 			var type = child.relationship;
 
@@ -594,7 +594,7 @@
 	// Generates map of Skeleton-like objects for use later when generating and binding skeletons.
 	function parseDeformers( FBXTree, connections ) {
 
-		var deformers = {};
+		var skeletons = {};
 
 		if ( 'Deformer' in FBXTree.Objects.subNodes ) {
 
@@ -607,10 +607,14 @@
 				if ( deformerNode.attrType === 'Skin' ) {
 
 					var relationships = connections.get( parseInt( nodeID ) );
-					var skeleton = parseSkeleton( relationships, DeformerNodes );
-					skeleton.FBX_ID = parseInt( nodeID );
 
-					deformers[ nodeID ] = skeleton;
+					var skeleton = parseSkeleton( relationships, DeformerNodes );
+					skeleton.ID = nodeID;
+
+					if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: skeleton attached to more than one geometry is not supported.' );
+					skeleton.geometryID = relationships.parents[ 0 ].ID;
+
+					skeletons[ nodeID ] = skeleton;
 
 				}
 
@@ -618,47 +622,49 @@
 
 		}
 
-		return deformers;
+		return skeletons;
 
 	}
 
 	// Parse single nodes in FBXTree.Objects.subNodes.Deformer
-	// Generates a "Skeleton Representation" of FBX nodes based on an FBX Skin Deformer's connections
-	// and an object containing SubDeformer nodes.
-	function parseSkeleton( connections, DeformerNodes ) {
+	// The top level deformer nodes have type 'Skin' and subDeformer nodes have type 'Cluster'
+	// Each skin node represents a skeleton and each cluster node represents a bone
+	function parseSkeleton( connections, deformerNodes ) {
 
-		var subDeformers = {};
+		var rawBones = [];
 
-		connections.children.forEach( function ( child, i ) {
+		connections.children.forEach( function ( child ) {
 
-			var subDeformerNode = DeformerNodes[ child.ID ];
+			var subDeformerNode = deformerNodes[ child.ID ];
 
-			var subDeformer = {
+			if ( subDeformerNode.attrType !== 'Cluster' ) return;
 
-				FBX_ID: child.ID,
-				index: i,
+			var rawBone = {
+
+				ID: child.ID,
 				indices: [],
 				weights: [],
 				transform: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.Transform.properties.a ),
-				transformLink: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.TransformLink.properties.a ),
-				linkMode: subDeformerNode.properties.Mode,
+
+				//currently not used
+				// transformLink: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.TransformLink.properties.a ),
 
 			};
 
 			if ( 'Indexes' in subDeformerNode.subNodes ) {
 
-				subDeformer.indices = subDeformerNode.subNodes.Indexes.properties.a;
-				subDeformer.weights = subDeformerNode.subNodes.Weights.properties.a;
+				rawBone.indices = subDeformerNode.subNodes.Indexes.properties.a;
+				rawBone.weights = subDeformerNode.subNodes.Weights.properties.a;
 
 			}
 
-			subDeformers[ child.ID ] = subDeformer;
+			rawBones.push( rawBone );
 
 		} );
 
 		return {
 
-			map: subDeformers,
+			rawBones: rawBones,
 			bones: []
 
 		};
@@ -666,7 +672,7 @@
 	}
 
 	// Parse nodes in FBXTree.Objects.subNodes.Geometry
-	function parseGeometries( FBXTree, connections, deformers ) {
+	function parseGeometries( FBXTree, connections, skeletons ) {
 
 		var geometryMap = new Map();
 
@@ -677,7 +683,7 @@
 			for ( var nodeID in geometryNodes ) {
 
 				var relationships = connections.get( parseInt( nodeID ) );
-				var geo = parseGeometry( FBXTree, relationships, geometryNodes[ nodeID ], deformers );
+				var geo = parseGeometry( FBXTree, relationships, geometryNodes[ nodeID ], skeletons );
 				geometryMap.set( parseInt( nodeID ), geo );
 
 			}
@@ -689,12 +695,12 @@
 	}
 
 	// Parse single node in FBXTree.Objects.subNodes.Geometry
-	function parseGeometry( FBXTree, relationships, geometryNode, deformers ) {
+	function parseGeometry( FBXTree, relationships, geometryNode, skeletons ) {
 
 		switch ( geometryNode.attrType ) {
 
 			case 'Mesh':
-				return parseMeshGeometry( FBXTree, relationships, geometryNode, deformers );
+				return parseMeshGeometry( FBXTree, relationships, geometryNode, skeletons );
 				break;
 
 			case 'NurbsCurve':
@@ -706,26 +712,24 @@
 	}
 
 	// Parse single node mesh geometry in FBXTree.Objects.subNodes.Geometry
-	function parseMeshGeometry( FBXTree, relationships, geometryNode, deformers ) {
-
-		var deformer = relationships.children.reduce( function ( deformer, child ) {
-
-			if ( deformers[ child.ID ] !== undefined ) deformer = deformers[ child.ID ];
-
-			return deformer;
-
-		}, null );
+	function parseMeshGeometry( FBXTree, relationships, geometryNode, skeletons ) {
 
 		var modelNodes = relationships.parents.map( function ( parent ) {
 
-			var modelNode = FBXTree.Objects.subNodes.Model[ parent.ID ];
-
-			return modelNode;
+			return FBXTree.Objects.subNodes.Model[ parent.ID ];
 
 		} );
 
 		// don't create geometry if it is not associated with any models
 		if ( modelNodes.length === 0 ) return;
+
+		var skeleton = relationships.children.reduce( function ( skeleton, child ) {
+
+			if ( skeletons[ child.ID ] !== undefined ) skeleton = skeletons[ child.ID ];
+
+			return skeleton;
+
+		}, null );
 
 		var preTransform = new THREE.Matrix4();
 
@@ -751,12 +755,12 @@
 
 		}
 
-		return genGeometry( FBXTree, relationships, geometryNode, deformer, preTransform );
+		return genGeometry( FBXTree, relationships, geometryNode, skeleton, preTransform );
 
 	}
 
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.subNodes.Geometry
-	function genGeometry( FBXTree, relationships, geometryNode, deformer, preTransform ) {
+	function genGeometry( FBXTree, relationships, geometryNode, skeleton, preTransform ) {
 
 		var subNodes = geometryNode.subNodes;
 
@@ -805,30 +809,25 @@
 
 		var weightTable = {};
 
-		if ( deformer ) {
+		if ( skeleton !== null ) {
 
-			var subDeformers = deformer.map;
+			skeleton.rawBones.forEach( function ( rawBone, i ) {
 
-			for ( var key in subDeformers ) {
-
-				var subDeformer = subDeformers[ key ];
-
-				subDeformer.indices.forEach( function ( index, i ) {
-
-					var weight = subDeformer.weights[ i ];
+				// loop over the bone's vertex indices and weights
+				rawBone.indices.forEach( function ( index, j ) {
 
 					if ( weightTable[ index ] === undefined ) weightTable[ index ] = [];
 
 					weightTable[ index ].push( {
 
-						id: subDeformer.index,
-						weight: weight
+						id: i,
+						weight: rawBone.weights[ j ],
 
 					} );
 
 				} );
 
-			}
+			} );
 
 		}
 
@@ -876,7 +875,7 @@
 
 			}
 
-			if ( deformer ) {
+			if ( skeleton ) {
 
 				if ( weightTable[ vertexIndex ] !== undefined ) {
 
@@ -999,7 +998,7 @@
 					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ] );
 					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ] );
 
-					if ( deformer ) {
+					if ( skeleton ) {
 
 						vertexWeightsBuffer.push( faceWeights[ 0 ] );
 						vertexWeightsBuffer.push( faceWeights[ 1 ] );
@@ -1126,14 +1125,14 @@
 
 		}
 
-		if ( deformer ) {
+		if ( skeleton ) {
 
 			geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( weightsIndicesBuffer, 4 ) );
 
 			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( vertexWeightsBuffer, 4 ) );
 
 			// used later to bind the skeleton to the model
-			geo.FBX_Deformer = deformer;
+			geo.FBX_Deformer = skeleton;
 
 		}
 
@@ -1487,21 +1486,20 @@
 	}
 
 	// create the main THREE.Group() to be returned by the loader
-	function parseScene( FBXTree, connections, deformers, geometryMap, materialMap ) {
+	function parseScene( FBXTree, connections, skeletons, geometryMap, materialMap ) {
 
 		var sceneGraph = new THREE.Group();
 
-		var modelMap = parseModels( FBXTree, deformers, geometryMap, materialMap, connections );
+		var modelMap = parseModels( FBXTree, skeletons, geometryMap, materialMap, connections );
 
 		var modelNodes = FBXTree.Objects.subNodes.Model;
 
 		modelMap.forEach( function ( model ) {
 
-			var modelNode = modelNodes[ model.FBX_ID ];
+			var modelNode = modelNodes[ model.ID ];
+			setLookAtProperties( FBXTree, model, modelNode, connections, sceneGraph );
 
-			setModelTransforms( FBXTree, model, modelNode, connections, sceneGraph );
-
-			var parentConnections = connections.get( model.FBX_ID ).parents;
+			var parentConnections = connections.get( model.ID ).parents;
 
 			parentConnections.forEach( function ( connection ) {
 
@@ -1516,9 +1514,11 @@
 
 			}
 
+
 		} );
 
-		bindSkeleton( FBXTree, deformers, geometryMap, modelMap, connections, sceneGraph );
+
+		bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections, sceneGraph );
 
 		addAnimations( FBXTree, connections, sceneGraph, modelMap );
 
@@ -1529,7 +1529,7 @@
 	}
 
 	// parse nodes in FBXTree.Objects.subNodes.Model
-	function parseModels( FBXTree, deformers, geometryMap, materialMap, connections ) {
+	function parseModels( FBXTree, skeletons, geometryMap, materialMap, connections ) {
 
 		var modelMap = new Map();
 		var modelNodes = FBXTree.Objects.subNodes.Model;
@@ -1539,37 +1539,8 @@
 			var id = parseInt( nodeID );
 			var node = modelNodes[ nodeID ];
 			var relationships = connections.get( id );
-			var model = null;
 
-			// create bones
-			relationships.parents.forEach( function ( parent ) {
-
-				for ( var FBX_ID in deformers ) {
-
-					var deformer = deformers[ FBX_ID ];
-					var subDeformers = deformer.map;
-					var subDeformer = subDeformers[ parent.ID ];
-
-					if ( subDeformer ) {
-
-						var model2 = model;
-						model = new THREE.Bone();
-						deformer.bones[ subDeformer.index ] = model;
-
-						// In cases where a bone is shared between multiple meshes
-						// model will already be defined and we'll hit this case
-						// TODO: currently doesn't work correctly
-						if ( model2 !== null ) {
-
-							model.add( model2 );
-
-						}
-
-					}
-
-				}
-
-			} );
+			var model = buildSkeleton( relationships, skeletons );
 
 			if ( ! model ) {
 
@@ -1587,6 +1558,8 @@
 					case 'NurbsCurve':
 						model = createCurve( relationships, geometryMap );
 						break;
+					case 'LimbNode':
+					case 'Null':
 					default:
 						model = new THREE.Group();
 						break;
@@ -1595,14 +1568,59 @@
 
 			}
 
-			model.name = THREE.PropertyBinding.sanitizeNodeName( node.attrName );
-			model.FBX_ID = id;
+			if ( model ) {
 
-			modelMap.set( id, model );
+				setModelTransforms( FBXTree, model, node );
+
+				model.name = THREE.PropertyBinding.sanitizeNodeName( node.attrName );
+				model.ID = id;
+
+				modelMap.set( id, model );
+
+			}
 
 		}
 
 		return modelMap;
+
+	}
+
+	function buildSkeleton( relationships, skeletons ) {
+
+		var model = null;
+
+		relationships.parents.forEach( function ( parent ) {
+
+			for ( var ID in skeletons ) {
+
+				var skeleton = skeletons[ ID ];
+
+				skeleton.rawBones.forEach( function ( rawBone, i ) {
+
+					if ( rawBone.ID === parent.ID ) {
+
+						var model2 = model;
+						model = new THREE.Bone();
+						skeleton.bones[ i ] = model;
+
+						// In cases where a bone is shared between multiple meshes
+						// model will already be defined and we'll hit this case
+						// TODO: currently doesn't work correctly
+						if ( model2 !== null ) {
+
+							model.add( model2 );
+
+						}
+
+					}
+
+				} );
+
+			}
+
+		} );
+
+		return model;
 
 	}
 
@@ -1924,8 +1942,46 @@
 
 	}
 
+	function setLookAtProperties( FBXTree, model, modelNode, connections, sceneGraph ) {
+
+		if ( 'LookAtProperty' in modelNode.properties ) {
+
+			var children = connections.get( model.ID ).children;
+
+			children.forEach( function ( child ) {
+
+				if ( child.relationship === 'LookAtProperty' ) {
+
+					var lookAtTarget = FBXTree.Objects.subNodes.Model[ child.ID ];
+
+					if ( 'Lcl_Translation' in lookAtTarget.properties ) {
+
+						var pos = lookAtTarget.properties.Lcl_Translation.value;
+
+						// DirectionalLight, SpotLight
+						if ( model.target !== undefined ) {
+
+							model.target.position.fromArray( pos );
+							sceneGraph.add( model.target );
+
+						} else { // Cameras and other Object3Ds
+
+							model.lookAt( new THREE.Vector3().fromArray( pos ) );
+
+						}
+
+					}
+
+				}
+
+			} );
+
+		}
+
+	}
+
 	// parse the model node for transform details and apply them to the model
-	function setModelTransforms( FBXTree, model, modelNode, connections, sceneGraph ) {
+	function setModelTransforms( FBXTree, model, modelNode ) {
 
 		// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
 		if ( 'RotationOrder' in modelNode.properties ) {
@@ -1991,43 +2047,9 @@
 
 		}
 
-		if ( 'LookAtProperty' in modelNode.properties ) {
-
-			var children = connections.get( model.FBX_ID ).children;
-
-			children.forEach( function ( child ) {
-
-				if ( child.relationship === 'LookAtProperty' ) {
-
-					var lookAtTarget = FBXTree.Objects.subNodes.Model[ child.ID ];
-
-					if ( 'Lcl_Translation' in lookAtTarget.properties ) {
-
-						var pos = lookAtTarget.properties.Lcl_Translation.value;
-
-						// DirectionalLight, SpotLight
-						if ( model.target !== undefined ) {
-
-							model.target.position.fromArray( pos );
-							sceneGraph.add( model.target );
-
-						} else { // Cameras and other Object3Ds
-
-							model.lookAt( new THREE.Vector3().fromArray( pos ) );
-
-						}
-
-					}
-
-				}
-
-			} );
-
-		}
-
 	}
 
-	function bindSkeleton( FBXTree, deformers, geometryMap, modelMap, connections, sceneGraph ) {
+	function bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections, sceneGraph ) {
 
 		// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
 		sceneGraph.updateMatrixWorld( true );
@@ -2067,47 +2089,38 @@
 
 		}
 
-		for ( var FBX_ID in deformers ) {
+		for ( var ID in skeletons ) {
 
-			var deformer = deformers[ FBX_ID ];
-			var subDeformers = deformer.map;
+			var skeleton = skeletons[ ID ];
 
-			for ( var key in subDeformers ) {
+			skeleton.bones.forEach( function ( bone ) {
 
-				var subDeformer = subDeformers[ key ];
-				var subDeformerIndex = subDeformer.index;
+				if ( worldMatrices.has( bone.ID ) ) {
 
-				var bone = deformer.bones[ subDeformerIndex ];
-				if ( ! worldMatrices.has( bone.FBX_ID ) ) {
-
-					break;
+					var mat = worldMatrices.get( bone.ID );
+					bone.matrixWorld.copy( mat );
 
 				}
-				var mat = worldMatrices.get( bone.FBX_ID );
-				bone.matrixWorld.copy( mat );
 
-			}
+			} );
 
 			// Now that skeleton is in bind pose, bind to model.
-			deformer.skeleton = new THREE.Skeleton( deformer.bones );
-
-			var relationships = connections.get( deformer.FBX_ID );
-			var parents = relationships.parents;
+			var parents = connections.get( parseInt( skeleton.ID ) ).parents;
 
 			parents.forEach( function ( parent ) {
 
 				if ( geometryMap.has( parent.ID ) ) {
 
 					var geoID = parent.ID;
-					var georelationships = connections.get( geoID );
+					var geoRelationships = connections.get( geoID );
 
-					georelationships.parents.forEach( function ( geoConnParent ) {
+					geoRelationships.parents.forEach( function ( geoConnParent ) {
 
 						if ( modelMap.has( geoConnParent.ID ) ) {
 
 							var model = modelMap.get( geoConnParent.ID );
 
-							model.bind( deformer.skeleton, model.matrixWorld );
+							model.bind( new THREE.Skeleton( skeleton.bones ), model.matrixWorld );
 
 						}
 
