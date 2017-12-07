@@ -89,13 +89,13 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 
 		switch ( event.key.toLowerCase() ) {
 
-			case 'Backspace':
+			case 'backspace':
 
 				event.preventDefault(); // prevent browser back
 
-				break;
+				// fall-through
 
-			case 'Delete':
+			case 'delete':
 
 				var object = editor.selected;
 
