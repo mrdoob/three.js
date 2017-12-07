@@ -1591,21 +1591,6 @@
 
 			}
 		}, {
-			key: '_readFinalize',
-			value: function _readFinalize() {
-
-				if ( this.options.zflag ) {
-
-					for ( var i = 0; i < this.Meshes.length; i ++ ) {
-
-						this.Meshes[ i ].scale.set( - 1, 1, 1 );
-
-					}
-
-				}
-
-			}
-		}, {
 			key: '_ParseMatrixData',
 			value: function _ParseMatrixData( targetMatrix, data ) {
 
