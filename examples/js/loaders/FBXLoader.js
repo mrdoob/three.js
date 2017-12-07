@@ -758,8 +758,6 @@
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
 	function genGeometry( FBXTree, relationships, geometryNode, deformer, preTransform ) {
 
-		var subNodes = geometryNode;
-
 		var vertexPositions = geometryNode.Vertices.a;
 		var vertexIndices = geometryNode.PolygonVertexIndex.a;
 
