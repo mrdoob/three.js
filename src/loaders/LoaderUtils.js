@@ -39,4 +39,3 @@ var LoaderUtils = {
 };
 
 export { LoaderUtils };
-
