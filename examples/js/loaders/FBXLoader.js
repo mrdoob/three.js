@@ -1559,7 +1559,7 @@
 					case 'NurbsCurve':
 						model = createCurve( relationships, geometryMap );
 						break;
-					case 'LimbNode': // usually associated with a bone, however if one was not created we'll make a Group instead
+					case 'LimbNode': // usually associated with a Bone, however if a Bone was not created we'll make a Group instead
 					case 'Null':
 					default:
 						model = new THREE.Group();
@@ -1982,8 +1982,6 @@
 
 	// parse the model node for transform details and apply them to the model
 	function setModelTransforms( FBXTree, model, modelNode ) {
-
-		// console.log( modelNode, model )
 
 		// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
 		if ( 'RotationOrder' in modelNode.properties ) {
