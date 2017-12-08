@@ -196,17 +196,19 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		vertices = vertices.reverse();
 
-		// Maybe we should also check if holes are in the opposite direction, just to be safe ...
+	}
 
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+	// Maybe we should also check if holes are in the opposite direction, just to be safe ...
 
-			ahole = holes[ h ];
+	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
-			if ( ShapeUtils.isClockWise( ahole ) ) {
+		ahole = holes[ h ];
+		
+		reverse = ShapeUtils.isClockWise( ahole );
 
-				holes[ h ] = ahole.reverse();
+		if ( reverse ) {
 
-			}
+			holes[ h ] = ahole.reverse();
 
 		}
 
