@@ -463,7 +463,6 @@
 	// Also parse the texture map and return any textures associated with the material
 	function parseParameters( FBXTree, properties, textureMap, ID, connections ) {
 
-
 		var parameters = {};
 
 		if ( properties.BumpFactor ) {
@@ -644,10 +643,12 @@
 				ID: child.ID,
 				indices: [],
 				weights: [],
+
+				// the global initial transform of the geometry node this bone is connected to
 				transform: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.Transform.properties.a ),
 
-				//currently not used
-				// transformLink: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.TransformLink.properties.a ),
+				// the global initial transform of this bone
+				transformLink: new THREE.Matrix4().fromArray( subDeformerNode.subNodes.TransformLink.properties.a ),
 
 			};
 
@@ -1540,7 +1541,7 @@
 			var node = modelNodes[ nodeID ];
 			var relationships = connections.get( id );
 
-			var model = buildSkeleton( relationships, skeletons );
+			var model = buildSkeleton( relationships, skeletons, id, node.attrName );
 
 			if ( ! model ) {
 
@@ -1558,7 +1559,7 @@
 					case 'NurbsCurve':
 						model = createCurve( relationships, geometryMap );
 						break;
-					case 'LimbNode':
+					case 'LimbNode': // usually associated with a bone, however if one was not created we'll make a Group instead
 					case 'Null':
 					default:
 						model = new THREE.Group();
@@ -1566,18 +1567,13 @@
 
 				}
 
-			}
-
-			if ( model ) {
-
-				setModelTransforms( FBXTree, model, node );
-
 				model.name = THREE.PropertyBinding.sanitizeNodeName( node.attrName );
 				model.ID = id;
 
-				modelMap.set( id, model );
-
 			}
+
+			setModelTransforms( FBXTree, model, node );
+			modelMap.set( id, model );
 
 		}
 
@@ -1585,9 +1581,9 @@
 
 	}
 
-	function buildSkeleton( relationships, skeletons ) {
+	function buildSkeleton( relationships, skeletons, id, name ) {
 
-		var model = null;
+		var bone = null;
 
 		relationships.parents.forEach( function ( parent ) {
 
@@ -1599,16 +1595,20 @@
 
 					if ( rawBone.ID === parent.ID ) {
 
-						var model2 = model;
-						model = new THREE.Bone();
-						skeleton.bones[ i ] = model;
+						var subBone = bone;
+						bone = new THREE.Bone();
+
+						// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
+						bone.name = THREE.PropertyBinding.sanitizeNodeName( name );
+						bone.ID = id;
+
+						skeleton.bones[ i ] = bone;
 
 						// In cases where a bone is shared between multiple meshes
-						// model will already be defined and we'll hit this case
-						// TODO: currently doesn't work correctly
-						if ( model2 !== null ) {
+						// duplicate the bone here and and it as a child of the first bone
+						if ( subBone !== null ) {
 
-							model.add( model2 );
+							bone.add( subBone );
 
 						}
 
@@ -1620,7 +1620,7 @@
 
 		} );
 
-		return model;
+		return bone;
 
 	}
 
@@ -1983,6 +1983,8 @@
 	// parse the model node for transform details and apply them to the model
 	function setModelTransforms( FBXTree, model, modelNode ) {
 
+		// console.log( modelNode, model )
+
 		// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
 		if ( 'RotationOrder' in modelNode.properties ) {
 
@@ -2093,12 +2095,19 @@
 
 			var skeleton = skeletons[ ID ];
 
-			skeleton.bones.forEach( function ( bone ) {
+			skeleton.bones.forEach( function ( bone, i ) {
 
+				// if the bone's initial transform is set in a poseNode, copy that
 				if ( worldMatrices.has( bone.ID ) ) {
 
 					var mat = worldMatrices.get( bone.ID );
 					bone.matrixWorld.copy( mat );
+
+				}
+				// otherwise use the transform from the rawBone
+				else {
+
+					bone.matrixWorld.copy( skeleton.rawBones[ i ].transformLink )
 
 				}
 
