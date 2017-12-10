@@ -20,7 +20,7 @@ THREE.ThreeMFLoader.prototype = {
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer ) );
+			scope.parse( buffer ).then( onLoad ).catch( onError );
 
 		}, onProgress, onError );
 
@@ -47,113 +47,129 @@ THREE.ThreeMFLoader.prototype = {
 			var texturesParts = {};
 			var otherParts = {};
 
-			try {
-
-				zip = new JSZip( data ); // eslint-disable-line no-undef
-
-			} catch ( e ) {
-
-				if ( e instanceof ReferenceError ) {
-
-					console.error( 'THREE.ThreeMFLoader: jszip missing and file is compressed.' );
-					return null;
-
-				}
-
-			}
-
-			for ( file in zip.files ) {
-
-				if ( file.match( /\.rels$/ ) ) {
-
-					relsName = file;
-
-				} else if ( file.match( /^3D\/.*\.model$/ ) ) {
-
-					modelPartNames.push( file );
-
-				} else if ( file.match( /^3D\/Metadata\/.*\.xml$/ ) ) {
-
-					printTicketPartNames.push( file );
-
-				} else if ( file.match( /^3D\/Textures\/.*/ ) ) {
-
-					texturesPartNames.push( file );
-
-				} else if ( file.match( /^3D\/Other\/.*/ ) ) {
-
-					otherPartNames.push( file );
-
-				}
-
-			}
-
 			if ( window.TextDecoder === undefined ) {
 
-				console.error( 'THREE.ThreeMFLoader: TextDecoder not present. Please use a TextDecoder polyfill.' );
-				return null;
+				return Promise.reject( new Error( 'THREE.ThreeMFLoader: TextDecoder not present. Please use a TextDecoder polyfill.' ) );
 
 			}
 
-			var relsView = new DataView( zip.file( relsName ).asArrayBuffer() );
-			var relsFileText = new TextDecoder( 'utf-8' ).decode( relsView );
-			rels = parseRelsXml( relsFileText );
+			if ( JSZip === undefined ) {
 
-			for ( var i = 0; i < modelPartNames.length; i ++ ) {
+				return Promise.reject( new Error( 'THREE.ThreeMFLoader: jszip missing and file is compressed.' ) );
 
-				var modelPart = modelPartNames[ i ];
-				var view = new DataView( zip.file( modelPart ).asArrayBuffer() );
+			}
 
-				var fileText = new TextDecoder( 'utf-8' ).decode( view );
-				var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
+			zip = new JSZip(); // eslint-disable-line no-undef
 
-				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
+			return zip.loadAsync( data ).then( function ( zip ) {
 
-					console.error( 'THREE.ThreeMFLoader: Error loading 3MF - no 3MF document found: ', modelPart );
+				for ( file in zip.files ) {
 
-				}
+					if ( file.match( /\.rels$/ ) ) {
 
-				var modelNode = xmlData.querySelector( 'model' );
-				var extensions = {};
+						relsName = file;
 
-				for ( var i = 0; i < modelNode.attributes.length; i ++ ) {
+					} else if ( file.match( /^3D\/.*\.model$/ ) ) {
 
-					var attr = modelNode.attributes[ i ];
-					if ( attr.name.match( /^xmlns:(.+)$/ ) ) {
+						modelPartNames.push( file );
 
-						extensions[ attr.value ] = RegExp.$1;
+					} else if ( file.match( /^3D\/Metadata\/.*\.xml$/ ) ) {
+
+						printTicketPartNames.push( file );
+
+					} else if ( file.match( /^3D\/Textures\/.*/ ) ) {
+
+						texturesPartNames.push( file );
+
+					} else if ( file.match( /^3D\/Other\/.*/ ) ) {
+
+						otherPartNames.push( file );
 
 					}
 
 				}
 
-				var modelData = parseModelNode( modelNode );
-				modelData[ 'xml' ] = modelNode;
+				return zip.file( relsName ).async( 'arraybuffer' );
 
-				if ( 0 < Object.keys( extensions ).length ) {
+			} ).then( function ( buffer ) {
 
-					modelData[ 'extensions' ] = extensions;
+				var relsView = new DataView( buffer );
+				var relsFileText = new TextDecoder( 'utf-8' ).decode( relsView );
+				rels = parseRelsXml( relsFileText );
+
+				var pendings = [];
+
+				for ( var i = 0; i < modelPartNames.length; i ++ ) {
+
+					var modelPart = modelPartNames[ i ];
+
+					pendings.push( zip.file( modelPart ).async( 'arraybuffer' ).then( function ( modelPart, buffer ) {
+
+						var view = new DataView( buffer );
+
+						var fileText = new TextDecoder( 'utf-8' ).decode( view );
+						var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
+
+						if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
+
+							return Promise.reject( 'THREE.ThreeMFLoader: Error loading 3MF - no 3MF document found: ' + modelPart );
+
+						}
+
+						var modelNode = xmlData.querySelector( 'model' );
+						var extensions = {};
+
+						for ( var i = 0; i < modelNode.attributes.length; i ++ ) {
+
+							var attr = modelNode.attributes[ i ];
+							if ( attr.name.match( /^xmlns:(.+)$/ ) ) {
+
+								extensions[ attr.value ] = RegExp.$1;
+
+							}
+
+						}
+
+						var modelData = parseModelNode( modelNode );
+						modelData[ 'xml' ] = modelNode;
+
+						if ( 0 < Object.keys( extensions ).length ) {
+
+							modelData[ 'extensions' ] = extensions;
+
+						}
+
+						modelParts[ modelPart ] = modelData;
+
+					}.bind( this, modelPart ) ) );
 
 				}
 
-				modelParts[ modelPart ] = modelData;
+				for ( var i = 0; i < texturesPartNames.length; i ++ ) {
 
-			}
+					var texturesPartName = texturesPartNames[ i ];
 
-			for ( var i = 0; i < texturesPartNames.length; i ++ ) {
+					pendings.push( zip.file( texturesPartName ).async( 'binarystring' ).then( function ( texturesPartName, content ) {
 
-				var texturesPartName = texturesPartNames[ i ];
-				texturesParts[ texturesPartName ] = zip.file( texturesPartName ).asBinary();
+						texturesParts[ texturesPartName ] = content;
 
-			}
+					}.bind( this, texturesPartName ) ) );
 
-			return {
-				rels: rels,
-				model: modelParts,
-				printTicket: printTicketParts,
-				texture: texturesParts,
-				other: otherParts
-			};
+				}
+
+				return Promise.all( pendings ).then( function () {
+
+					return {
+						rels: rels,
+						model: modelParts,
+						printTicket: printTicketParts,
+						texture: texturesParts,
+						other: otherParts
+					};
+
+				} );
+
+			} );
 
 		}
 
@@ -597,10 +613,13 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		var data3mf = loadDocument( data );
-		var meshes = buildMeshes( data3mf );
+		return loadDocument( data ).then( function ( data3mf ) {
 
-		return build( meshes, data3mf[ 'rels' ], data3mf );
+			var meshes = buildMeshes( data3mf );
+
+			return build( meshes, data3mf[ 'rels' ], data3mf );
+
+		} );
 
 	},
 
