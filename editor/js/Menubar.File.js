@@ -272,7 +272,11 @@ Menubar.File = function ( editor ) {
 
 		var manager = new THREE.LoadingManager( function () {
 
-			save( zip.generate( { type: 'blob' } ), ( title !== '' ? title : 'untitled' ) + '.zip' );
+			zip.generateAsync( { type: 'blob' } ).then( function ( blob ) {
+
+				save( blob, ( title !== '' ? title : 'untitled' ) + '.zip' );
+
+			} );
 
 		} );
 

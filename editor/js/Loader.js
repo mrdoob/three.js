@@ -434,17 +434,34 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					var zip = new JSZip( contents );
+					var zip = new JSZip();
 
 					// BLOCKS
 
-					if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
+					zip.loadAsync( contents ).then( function ( zip ) {
 
-						var materials = new THREE.MTLLoader().parse( zip.file( 'materials.mtl' ).asText() );
-						var object = new THREE.OBJLoader().setMaterials( materials ).parse( zip.file( 'model.obj' ).asText() );
+						if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
+
+							var pendings = [];
+
+							pendings.push( zip.file( 'materials.mtl' ).async( 'text' ) );
+							pendings.push( zip.file( 'model.obj' ).async( 'text' ) );
+
+							return Promise.all( pendings );
+
+						}
+
+						return null;
+
+					} ).then( function ( texts ) {
+
+						if ( texts === null ) return;
+
+						var materials = new THREE.MTLLoader().parse( texts[ 0 ] );
+						var object = new THREE.OBJLoader().setMaterials( materials ).parse( texts[ 1 ] );
 						editor.execute( new AddObjectCommand( object ) );
 
-					}
+					} );
 
 				}, false );
 				reader.readAsBinaryString( file );
