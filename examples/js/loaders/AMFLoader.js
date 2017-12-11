@@ -59,7 +59,7 @@ THREE.AMFLoader.prototype = {
 
 					console.log( 'THREE.AMFLoader: Loading Zip' );
 
-					if ( JSZip === undefined ) {
+					if ( typeof JSZip === 'undefined' ) {
 
 						return Promise.reject( new Error( 'THREE.AMFLoader: jszip missing and file is compressed.' ) );
 

@@ -28,7 +28,7 @@ THREE.KMZLoader.prototype = {
 
 	parse: function ( data ) {
 
-		if ( JSZip === undefined ) {
+		if ( typeof JSZip === 'undefined' ) {
 
 			return Promise.reject( new Error( 'THREE.ThreeKMZLoader: jszip missing and file is compressed.' ) );
 

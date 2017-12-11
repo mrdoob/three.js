@@ -53,7 +53,7 @@ THREE.ThreeMFLoader.prototype = {
 
 			}
 
-			if ( JSZip === undefined ) {
+			if ( typeof JSZip === 'undefined' ) {
 
 				return Promise.reject( new Error( 'THREE.ThreeMFLoader: jszip missing and file is compressed.' ) );
 
