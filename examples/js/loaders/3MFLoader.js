@@ -28,6 +28,32 @@ THREE.ThreeMFLoader.prototype = {
 
 	parse: function ( data ) {
 
+		if ( typeof JSZip === 'undefined' ) {
+
+			var error =  new Error( 'THREE.ThreeMFLoader: jszip missing and file is compressed.' );
+
+			if ( typeof Promise === 'undefined' ) {
+
+				throw error;
+
+			} else {
+
+				return Promise.reject( error );
+
+			}
+
+		}
+
+		// Use JSZip.external.Promise instead of global Promise for IE11.
+		// Seems like JSZip.external.Promise === Promise is true on Promise support browser.
+		var promise = JSZip.external.Promise;
+
+		if ( window.TextDecoder === undefined ) {
+
+			return promise.reject( new Error( 'THREE.ThreeMFLoader: TextDecoder not present. Please use a TextDecoder polyfill.' ) );
+
+		}
+
 		var scope = this;
 
 		function loadDocument( data ) {
@@ -46,18 +72,6 @@ THREE.ThreeMFLoader.prototype = {
 			var printTicketParts = {};
 			var texturesParts = {};
 			var otherParts = {};
-
-			if ( window.TextDecoder === undefined ) {
-
-				return Promise.reject( new Error( 'THREE.ThreeMFLoader: TextDecoder not present. Please use a TextDecoder polyfill.' ) );
-
-			}
-
-			if ( typeof JSZip === 'undefined' ) {
-
-				return Promise.reject( new Error( 'THREE.ThreeMFLoader: jszip missing and file is compressed.' ) );
-
-			}
 
 			zip = new JSZip(); // eslint-disable-line no-undef
 
@@ -112,7 +126,7 @@ THREE.ThreeMFLoader.prototype = {
 
 						if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
 
-							return Promise.reject( 'THREE.ThreeMFLoader: Error loading 3MF - no 3MF document found: ' + modelPart );
+							return promise.reject( 'THREE.ThreeMFLoader: Error loading 3MF - no 3MF document found: ' + modelPart );
 
 						}
 
@@ -157,7 +171,7 @@ THREE.ThreeMFLoader.prototype = {
 
 				}
 
-				return Promise.all( pendings ).then( function () {
+				return promise.all( pendings ).then( function () {
 
 					return {
 						rels: rels,

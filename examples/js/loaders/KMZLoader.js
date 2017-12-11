@@ -30,13 +30,27 @@ THREE.KMZLoader.prototype = {
 
 		if ( typeof JSZip === 'undefined' ) {
 
-			return Promise.reject( new Error( 'THREE.ThreeKMZLoader: jszip missing and file is compressed.' ) );
+			var error =  new Error( 'THREE.KMZLoader: jszip missing and file is compressed.' );
+
+			if ( typeof Promise === 'undefined' ) {
+
+				throw error;
+
+			} else {
+
+				return Promise.reject( error );
+
+			}
 
 		}
 
+		// Use JSZip.external.Promise instead of global Promise for IE11.
+		// Seems like JSZip.external.Promise === Promise is true on Promise support browser.
+		var promise = JSZip.external.Promise;
+
 		if ( THREE.ColladaLoader === undefined ) {
 
-			return Promise.reject( new Error( 'THREE.ThreeKMZLoader: THREE.ColladaLoader missing.' ) );
+			return promise.reject( new Error( 'THREE.KMZLoader: THREE.ColladaLoader missing.' ) );
 
 		}
 
@@ -64,7 +78,7 @@ THREE.KMZLoader.prototype = {
 
 			}
 
-			return Promise.reject( 'KMZLoader: Couldn\'t find .dae file.' );
+			return promise.reject( 'KMZLoader: Couldn\'t find .dae file.' );
 
 		} ).then( function ( text ) {
 
@@ -93,7 +107,7 @@ THREE.KMZLoader.prototype = {
 
 				}
 
-				return Promise.resolve();
+				return promise.resolve();
 
 			}
 
@@ -110,7 +124,7 @@ THREE.KMZLoader.prototype = {
 
 			}
 
-			return Promise.all( pendings ).then( function () {
+			return promise.all( pendings ).then( function () {
 
 				return collada;
 

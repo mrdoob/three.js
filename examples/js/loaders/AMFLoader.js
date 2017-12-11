@@ -45,60 +45,79 @@ THREE.AMFLoader.prototype = {
 
 	parse: function ( data ) {
 
-		function loadDocument( data ) {
+		var promise;
 
-			return new Promise( function ( resolve, reject ) {
+		if ( typeof Promise !== 'undefined' ) {
 
-				var view = new DataView( data );
-				var magic = String.fromCharCode( view.getUint8( 0 ), view.getUint8( 1 ) );
+			promise = Promise;
 
-				if ( magic === 'PK' ) {
+		} else if ( typeof JSZip !== 'undefined' ) {
 
-					var zip = null;
-					var file = null;
+			// for IE11 with JSZip
+			promise = JSZip.external.Promise;
 
-					console.log( 'THREE.AMFLoader: Loading Zip' );
+		} else {
 
-					if ( typeof JSZip === 'undefined' ) {
+			throw new Error( 'THREE.AMFLoader: requires Promise. Use Promise polyfill.' );
 
-						return Promise.reject( new Error( 'THREE.AMFLoader: jszip missing and file is compressed.' ) );
+		}
 
-					}
+		function loadView( data ) {
 
-					zip = new JSZip(); // eslint-disable-line no-undef
+			var view = new DataView( data );
+			var magic = String.fromCharCode( view.getUint8( 0 ), view.getUint8( 1 ) );
 
-					zip.loadAsync( data ).then( function ( zip ) {
+			if ( magic === 'PK' ) {
 
-						for ( file in zip.files ) {
+				var zip = null;
+				var file = null;
 
-							if ( file.toLowerCase().substr( - 4 ) === '.amf' ) {
+				console.log( 'THREE.AMFLoader: Loading Zip' );
 
-								break;
+				if ( typeof JSZip === 'undefined' ) {
 
-							}
-
-						}
-
-						console.log( 'THREE.AMFLoader: Trying to load file asset: ' + file );
-						return zip.file( file ).async( 'arraybuffer' );
-
-					} ).then( function ( buffer ) {
-
-						resolve( new DataView( buffer ) );
-
-					} );
-
-				} else {
-
-					resolve( view );
+					return promise.reject( new Error( 'THREE.AMFLoader: jszip missing and file is compressed.' ) );
 
 				}
 
-			} ).then( function ( view ) {
+				zip = new JSZip(); // eslint-disable-line no-undef
+
+				return zip.loadAsync( data ).then( function ( zip ) {
+
+					for ( file in zip.files ) {
+
+						if ( file.toLowerCase().substr( - 4 ) === '.amf' ) {
+
+							break;
+
+						}
+
+					}
+
+					console.log( 'THREE.AMFLoader: Trying to load file asset: ' + file );
+					return zip.file( file ).async( 'arraybuffer' );
+
+				} ).then( function ( buffer ) {
+
+					return new DataView( buffer );
+
+				} );
+
+			} else {
+
+				return promise.resolve( view );
+
+			}
+
+		}
+
+		function loadDocument( data ) {
+
+			return loadView( data ).then( function ( view ) {
 
 				if ( window.TextDecoder === undefined ) {
 
-					return Promise.reject( 'THREE.AMFLoader: TextDecoder not present. Please use TextDecoder polyfill.' );
+					return promise.reject( 'THREE.AMFLoader: TextDecoder not present. Please use TextDecoder polyfill.' );
 
 				}
 
@@ -107,7 +126,7 @@ THREE.AMFLoader.prototype = {
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'amf' ) {
 
-					return Promise.reject( 'THREE.AMFLoader: Error loading AMF - no AMF document found.' );
+					return promise.reject( 'THREE.AMFLoader: Error loading AMF - no AMF document found.' );
 
 				}
 
