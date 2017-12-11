@@ -3430,12 +3430,6 @@ THREE.ColladaLoader.prototype = {
 
 		var scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
 
-		if ( asset.upAxis === 'Z_UP' ) {
-
-			scene.rotation.x = - Math.PI / 2;
-
-		}
-
 		scene.scale.multiplyScalar( asset.unit );
 
 		console.timeEnd( 'THREE.ColladaLoader' );
