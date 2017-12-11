@@ -447,7 +447,10 @@ var Loader = function ( editor ) {
 							pendings.push( zip.file( 'materials.mtl' ).async( 'text' ) );
 							pendings.push( zip.file( 'model.obj' ).async( 'text' ) );
 
-							return Promise.all( pendings );
+							// Use JSZip.external.Promise instead of global Promise for IE11 here.
+							// Seems JSZip.external.Promise is Promise for Promise-support browser and
+							// Polyfill Promise for non-Promise-support browser.
+							return JSZip.external.Promise.all( pendings );
 
 						}
 
