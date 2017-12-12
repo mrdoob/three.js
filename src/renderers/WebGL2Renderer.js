@@ -52,11 +52,11 @@ function WebGL2Renderer( parameters ) {
 
 			if ( _canvas.getContext( 'webgl2' ) !== null ) {
 
-				throw 'Error creating WebGL2 context with your selected attributes.';
+				throw new Error( 'Error creating WebGL2 context with your selected attributes.' );
 
 			} else {
 
-				throw 'Error creating WebGL2 context.';
+				throw new Error( 'Error creating WebGL2 context.' );
 
 			}
 
@@ -64,7 +64,7 @@ function WebGL2Renderer( parameters ) {
 
 	} catch ( error ) {
 
-		console.error( 'THREE.WebGL2Renderer: ' + error );
+		console.error( 'THREE.WebGL2Renderer: ' + error.message );
 
 	}
 
