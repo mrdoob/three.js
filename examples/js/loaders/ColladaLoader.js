@@ -1632,6 +1632,8 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
+			console.warn( 'THREE.ColladaLoader: Couldn\'t find camera with ID:', id );
+
 			return null;
 
 		}
@@ -1764,6 +1766,8 @@ THREE.ColladaLoader.prototype = {
 				return getBuild( data, buildLight );
 
 			}
+
+			console.warn( 'THREE.ColladaLoader: Couldn\'t find light with ID:', id );
 
 			return null;
 
