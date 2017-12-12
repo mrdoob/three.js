@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - KMZ</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: skyblue }
+			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
+			.highlight { background:orange; color:#fff; }
+
+			span {
+				display: inline-block;
+				width: 60px;
+				float: left;
+				text-align: center;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<a href="https://developers.google.com/kml/documentation/kmzarchives" target="_blank" rel="noopener">KMZ File format</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/loaders/KMZLoader.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/libs/jszip.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer;
+
+			init();
+
+			function init() {
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x999999 );
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0.5, 1.0, 0.5 ).normalize();
+
+				scene.add( light );
+
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
+
+				camera.position.y = 5;
+				camera.position.z = 10;
+
+				scene.add( camera );
+
+				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
+				scene.add( grid );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				var loader = new THREE.KMZLoader();
+				loader.load( './models/kmz/Box.kmz', function ( kmz ) {
+
+					kmz.scene.position.y = 0.5;
+					scene.add( kmz.scene );
+					render();
+
+				} );
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
