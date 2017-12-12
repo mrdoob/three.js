@@ -40,7 +40,7 @@ function WebGLRenderTarget( width, height, options ) {
 }
 
 WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-	
+
 	constructor: WebGLRenderTarget,
 
 	isWebGLRenderTarget: true,

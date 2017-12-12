@@ -59,7 +59,7 @@ function Geometry() {
 }
 
 Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-	
+
 	constructor: Geometry,
 
 	isGeometry: true,

@@ -41,7 +41,7 @@ function BufferGeometry() {
 }
 
 BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-	
+
 	constructor: BufferGeometry,
 
 	isBufferGeometry: true,

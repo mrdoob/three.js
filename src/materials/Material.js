@@ -68,7 +68,7 @@ function Material() {
 }
 
 Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-	
+
 	constructor: Material,
 
 	isMaterial: true,
