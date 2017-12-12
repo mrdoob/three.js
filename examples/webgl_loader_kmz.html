@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - AMF</title>
+		<title>three.js webgl - KMZ</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -39,13 +39,12 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<a href="http://amf.wikispaces.com" target="_blank" rel="noopener">AMF File format</a>
-			<div>AMF loader test by <a href="https://github.com/tamarintech" target="_blank" rel="noopener">tamarintech</a></div>
-			<div>Rook manufacturing file from <a href="http://amf.wikispaces.com/AMF+test+files" target="_blank" rel="noopener">AMF test files</a></div>
+			<a href="https://developers.google.com/kml/documentation/kmzarchives" target="_blank" rel="noopener">KMZ File format</a>
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/loaders/AMFLoader.js"></script>
+		<script src="js/loaders/KMZLoader.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -65,21 +64,19 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x999999 );
 
-				scene.add( new THREE.AmbientLight( 0x999999 ) );
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0.5, 1.0, 0.5 ).normalize();
+
+				scene.add( light );
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 
-				// Z is up for objects intended to be 3D printed.
-
-				camera.up.set( 0, 0, 1 );
-				camera.position.set( 0, -9, 6 );
-
-				camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
+				camera.position.y = 5;
+				camera.position.z = 10;
 
 				scene.add( camera );
 
 				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
-				grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
 				scene.add( grid );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -87,17 +84,17 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new THREE.AMFLoader();
-				loader.load( './models/amf/rook.amf', function ( amfobject ) {
+				var loader = new THREE.KMZLoader();
+				loader.load( './models/kmz/Box.kmz', function ( kmz ) {
 
-					scene.add( amfobject );
+					kmz.scene.position.y = 0.5;
+					scene.add( kmz.scene );
 					render();
 
 				} );
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
-				controls.target.set( 0, 1.2, 2 );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
