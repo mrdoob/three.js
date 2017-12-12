@@ -439,17 +439,7 @@
 
 				if ( typeof buf !== "string" ) {
 
-					var array_buffer = new Uint8Array( buf );
-					var str = '';
-					for ( var i = 0; i < buf.byteLength; i ++ ) {
-
-						str += String.fromCharCode( array_buffer[ i ] );
-
-					}
-
-					return str;
-					// fixme : if decodeText merged, this line enable.
-					// return THREE.Loader.decodeText( new Uint8Array( buf ) );
+					return THREE.LoaderUtils.decodeText( new Uint8Array( buf ) );
 
 				} else {
 
@@ -472,7 +462,7 @@
 			key: '_parseBinary',
 			value: function _parseBinary( data ) {
 
-				return this._parseASCII( String.fromCharCode.apply( null, data ) );
+				return this._parseASCII( THREE.LoaderUtils.decodeText( new Uint8Array( data ) ) );
 
 			}
 		}, {
