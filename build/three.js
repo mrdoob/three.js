@@ -3645,17 +3645,7 @@
 	Texture.DEFAULT_IMAGE = undefined;
 	Texture.DEFAULT_MAPPING = UVMapping;
 
-	Object.defineProperty( Texture.prototype, "needsUpdate", {
-
-		set: function ( value ) {
-
-			if ( value === true ) this.version ++;
-
-		}
-
-	} );
-
-	Object.assign( Texture.prototype, EventDispatcher.prototype, {
+	Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		constructor: Texture,
 
@@ -3895,6 +3885,16 @@
 				uv.y = 1 - uv.y;
 
 			}
+
+		}
+
+	} );
+
+	Object.defineProperty( Texture.prototype, "needsUpdate", {
+
+		set: function ( value ) {
+
+			if ( value === true ) this.version ++;
 
 		}
 
@@ -4562,7 +4562,9 @@
 
 	}
 
-	Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
+	WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		
+		constructor: WebGLRenderTarget,
 
 		isWebGLRenderTarget: true,
 
@@ -7682,7 +7684,9 @@
 
 	}
 
-	Object.assign( Material.prototype, EventDispatcher.prototype, {
+	Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		
+		constructor: Material,
 
 		isMaterial: true,
 
@@ -10270,7 +10274,9 @@
 	Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 	Object3D.DefaultMatrixAutoUpdate = true;
 
-	Object.assign( Object3D.prototype, EventDispatcher.prototype, {
+	Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		
+		constructor: Object3D,
 
 		isObject3D: true,
 
@@ -11281,7 +11287,9 @@
 
 	}
 
-	Object.assign( Geometry.prototype, EventDispatcher.prototype, {
+	Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		
+		constructor: Geometry,
 
 		isGeometry: true,
 
@@ -13407,7 +13415,9 @@
 
 	}
 
-	Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
+	BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		
+		constructor: BufferGeometry,
 
 		isBufferGeometry: true,
 
@@ -21354,11 +21364,11 @@
 
 				if ( _canvas.getContext( 'webgl' ) !== null ) {
 
-					throw 'Error creating WebGL context with your selected attributes.';
+					throw new Error( 'Error creating WebGL context with your selected attributes.' );
 
 				} else {
 
-					throw 'Error creating WebGL context.';
+					throw new Error( 'Error creating WebGL context.' );
 
 				}
 
@@ -21378,7 +21388,7 @@
 
 		} catch ( error ) {
 
-			console.error( 'THREE.WebGLRenderer: ' + error );
+			console.error( 'THREE.WebGLRenderer: ' + error.message );
 
 		}
 
@@ -30694,7 +30704,7 @@
 
 				request.addEventListener( 'load', function ( event ) {
 
-					var response = event.target.response;
+					var response = this.response;
 
 					Cache.add( url, response );
 
@@ -33769,18 +33779,6 @@
 	Object.assign( Loader.prototype, {
 
 		crossOrigin: undefined,
-
-		extractUrlBase: function ( url ) {
-
-			var parts = url.split( '/' );
-
-			if ( parts.length === 1 ) return './';
-
-			parts.pop();
-
-			return parts.join( '/' ) + '/';
-
-		},
 
 		initMaterials: function ( materials, texturePath, crossOrigin ) {
 
@@ -37251,6 +37249,54 @@
 
 	} );
 
+	/**
+	 * @author Don McCurdy / https://www.donmccurdy.com
+	 */
+
+	var LoaderUtils = {
+
+		decodeText: function ( array ) {
+
+			if ( typeof TextDecoder !== 'undefined' ) {
+
+				return new TextDecoder().decode( array );
+
+			}
+
+			// Avoid the String.fromCharCode.apply(null, array) shortcut, which
+			// throws a "maximum call stack size exceeded" error for large arrays.
+
+			var s = '';
+
+			for ( var i = 0, il = array.length; i < il; i ++ ) {
+
+				// Implicitly assumes little-endian.
+				s += String.fromCharCode( array[ i ] );
+
+			}
+
+			return s;
+
+		},
+
+		extractUrlBase: function ( url ) {
+
+			var parts = url.split( '/' );
+
+			if ( parts.length === 1 ) return './';
+
+			parts.pop();
+
+			return parts.join( '/' ) + '/';
+
+		}
+
+	};
+
+	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 */
+
 	var context;
 
 	var AudioContext = {
@@ -40056,7 +40102,9 @@
 
 	}
 
-	Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
+	AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		
+		constructor: AnimationMixer,
 
 		_bindAction: function ( action, prototypeAction ) {
 
@@ -43716,6 +43764,17 @@
 
 	//
 
+	Object.assign( Loader.prototype, {
+
+		extractUrlBase: function ( url ) {
+
+			console.warn( 'THREE.Loader: .extractUrlBase() has been deprecated. Use THREE.LoaderUtils.extractUrlBase() instead.' );
+			return LoaderUtils.extractUrlBase( url );
+
+		}
+
+	} );
+
 	function XHRLoader( manager ) {
 
 		console.warn( 'THREE.XHRLoader has been renamed to THREE.FileLoader.' );
@@ -45065,6 +45124,7 @@
 	exports.FontLoader = FontLoader;
 	exports.FileLoader = FileLoader;
 	exports.Loader = Loader;
+	exports.LoaderUtils = LoaderUtils;
 	exports.Cache = Cache;
 	exports.AudioLoader = AudioLoader;
 	exports.SpotLightShadow = SpotLightShadow;
