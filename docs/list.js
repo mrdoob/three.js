@@ -230,6 +230,7 @@ var list = {
 			"ImageLoader": "api/loaders/ImageLoader",
 			"JSONLoader": "api/loaders/JSONLoader",
 			"Loader": "api/loaders/Loader",
+			"LoaderUtils": "api/loaders/LoaderUtils",
 			"MaterialLoader": "api/loaders/MaterialLoader",
 			"ObjectLoader": "api/loaders/ObjectLoader",
 			"TextureLoader": "api/loaders/TextureLoader"

@@ -1814,10 +1814,6 @@
         "initMaterials": {
           "!type": "fn(materials: [], texturePath: string) -> []",
           "!doc": "Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials."
-        },
-        "extractUrlBase": {
-          "!type": "fn(url: string) -> string",
-          "!doc": "Extract the base from the URL."
         }
       },
       "!doc": "Base class for implementing loaders.",
