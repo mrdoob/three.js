@@ -48,12 +48,6 @@ THREE.ThreeMFLoader.prototype = {
 		// Seems like JSZip.external.Promise === Promise is true on Promise support browser.
 		var promise = JSZip.external.Promise;
 
-		if ( window.TextDecoder === undefined ) {
-
-			return promise.reject( new Error( 'THREE.ThreeMFLoader: TextDecoder not present. Please use a TextDecoder polyfill.' ) );
-
-		}
-
 		var scope = this;
 
 		function loadDocument( data ) {
@@ -107,8 +101,8 @@ THREE.ThreeMFLoader.prototype = {
 
 			} ).then( function ( buffer ) {
 
-				var relsView = new DataView( buffer );
-				var relsFileText = new TextDecoder( 'utf-8' ).decode( relsView );
+				var relsView = new Uint8Array( buffer );
+				var relsFileText = THREE.LoaderUtils.decodeText( relsView );
 				rels = parseRelsXml( relsFileText );
 
 				var pendings = [];
@@ -119,9 +113,9 @@ THREE.ThreeMFLoader.prototype = {
 
 					pendings.push( zip.file( modelPart ).async( 'arraybuffer' ).then( function ( modelPart, buffer ) {
 
-						var view = new DataView( buffer );
+						var view = new Uint8Array( buffer );
 
-						var fileText = new TextDecoder( 'utf-8' ).decode( view );
+						var fileText = THREE.LoaderUtils.decodeText( view );
 						var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
 
 						if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {

@@ -271,12 +271,18 @@ THREE.GLTFExporter.prototype = {
 
 				buffer: processBuffer( data, componentType, start, count ),
 				byteOffset: byteOffset,
-				byteLength: byteLength,
-				byteStride: data.itemSize * componentSize
+				byteLength: byteLength
 
 			};
 
 			if ( target !== undefined ) gltfBufferView.target = target;
+
+			if ( target === WEBGL_CONSTANTS.ARRAY_BUFFER ) {
+
+				// Only define byteStride for vertex attributes.
+				gltfBufferView.byteStride = data.itemSize * componentSize;
+
+			}
 
 			byteOffset += byteLength;
 

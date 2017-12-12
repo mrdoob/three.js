@@ -74,7 +74,7 @@ Object.defineProperty( Texture.prototype, "needsUpdate", {
 
 } );
 
-Object.assign( Texture.prototype, EventDispatcher.prototype, {
+Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	constructor: Texture,
 

@@ -215,11 +215,11 @@ function WebGLRenderer( parameters ) {
 
 			if ( _canvas.getContext( 'webgl' ) !== null ) {
 
-				throw 'Error creating WebGL context with your selected attributes.';
+				throw new Error( 'Error creating WebGL context with your selected attributes.' );
 
 			} else {
 
-				throw 'Error creating WebGL context.';
+				throw new Error( 'Error creating WebGL context.' );
 
 			}
 
@@ -239,7 +239,7 @@ function WebGLRenderer( parameters ) {
 
 	} catch ( error ) {
 
-		console.error( 'THREE.WebGLRenderer: ' + error );
+		console.error( 'THREE.WebGLRenderer: ' + error.message );
 
 	}
 

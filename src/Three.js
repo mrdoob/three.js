@@ -46,6 +46,7 @@ export { ImageBitmapLoader } from './loaders/ImageBitmapLoader.js';
 export { FontLoader } from './loaders/FontLoader.js';
 export { FileLoader } from './loaders/FileLoader.js';
 export { Loader } from './loaders/Loader.js';
+export { LoaderUtils } from './loaders/LoaderUtils.js';
 export { Cache } from './loaders/Cache.js';
 export { AudioLoader } from './loaders/AudioLoader.js';
 export { SpotLightShadow } from './lights/SpotLightShadow.js';

@@ -14,7 +14,6 @@
  *
  * Materials now supported, material colors supported
  * Zip support, requires jszip
- * TextDecoder polyfill required by some browsers (particularly IE, Edge)
  * No constellation support (yet)!
  *
  */
@@ -115,13 +114,7 @@ THREE.AMFLoader.prototype = {
 
 			return loadView( data ).then( function ( view ) {
 
-				if ( window.TextDecoder === undefined ) {
-
-					return promise.reject( 'THREE.AMFLoader: TextDecoder not present. Please use TextDecoder polyfill.' );
-
-				}
-
-				var fileText = new TextDecoder( 'utf-8' ).decode( view );
+				var fileText = THREE.LoaderUtils.decodeText( view );
 				var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'amf' ) {
