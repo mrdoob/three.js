@@ -64,16 +64,6 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 Texture.DEFAULT_IMAGE = undefined;
 Texture.DEFAULT_MAPPING = UVMapping;
 
-Object.defineProperty( Texture.prototype, "needsUpdate", {
-
-	set: function ( value ) {
-
-		if ( value === true ) this.version ++;
-
-	}
-
-} );
-
 Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	constructor: Texture,
@@ -314,6 +304,16 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			uv.y = 1 - uv.y;
 
 		}
+
+	}
+
+} );
+
+Object.defineProperty( Texture.prototype, "needsUpdate", {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
 
 	}
 
