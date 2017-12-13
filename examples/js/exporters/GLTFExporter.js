@@ -94,7 +94,7 @@ THREE.GLTFExporter.prototype = {
 		};
 
 		var byteOffset = 0;
-		var dataViews = [];
+		var buffers = [];
 		var nodeMap = {};
 		var skins = [];
 		var cachedData = {
@@ -103,6 +103,9 @@ THREE.GLTFExporter.prototype = {
 			textures: {}
 
 		};
+
+		// Counter for pending asynchronous tasks.
+		var numPending = 0;
 
 		var cachedCanvas;
 
@@ -264,8 +267,7 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			// We just use one buffer
-			// TODO(donmccurdy): This isn't a DataView now.
-			dataViews.push( buffer );
+			buffers.push( buffer );
 
 			// Always using just one buffer
 			return 0;
@@ -304,8 +306,8 @@ THREE.GLTFExporter.prototype = {
 
 				for ( var a = 0; a < attribute.itemSize; a ++ ) {
 
-					// TODO(donmccurdy): Fails on InterleavedBufferAttribute, and could
-					// probably be faster for normal BufferAttribute.
+					// @TODO Fails on InterleavedBufferAttribute, and could probably be
+					// optimized for normal BufferAttribute.
 					var value = attribute.array[ i * attribute.itemSize + a ];
 
 					if ( componentType === WEBGL_CONSTANTS.FLOAT ) {
@@ -362,11 +364,11 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
-		 * Process and generate a BufferView from an image.
-		 * @param {ImageData} data
+		 * Process and generate a BufferView from an image Blob.
+		 * @param {Blob} blob
 		 * @return {number}
 		 */
-		function processBufferViewImage ( image ) {
+		function processBufferViewImage ( blob ) {
 
 			if ( ! outputJSON.bufferViews ) {
 
@@ -374,17 +376,29 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var byteLength = image.data.buffer.byteLength;
+			var bufferView = { buffer: null, byteOffset: null, byteLength: null };
 
-			outputJSON.bufferViews.push( {
+			var reader = new window.FileReader();
+			reader.readAsArrayBuffer( blob );
+			reader.addEventListener('loadend', function () {
 
-				buffer: processBuffer( image.data.buffer ),
-				byteOffset: byteOffset,
-				byteLength: byteLength
+				var buffer = reader.result;
+				var byteLength = buffer.byteLength;
+
+				// Update the allocated BufferView.
+				bufferView.buffer = processBuffer( buffer );
+				bufferView.byteOffset = byteOffset;
+				bufferView.byteLength = byteLength;
+
+				byteOffset += byteLength;
+
+				next();
 
 			} );
 
-			byteOffset += byteLength;
+			numPending++;
+
+			outputJSON.bufferViews.push( bufferView );
 
 			return outputJSON.bufferViews.length - 1;
 
@@ -526,8 +540,15 @@ THREE.GLTFExporter.prototype = {
 
 				if ( options.binary === true ) {
 
-					var imageData = ctx.getImageData( 0, 0, canvas.width, canvas.height );
-					gltfImage.bufferView = processBufferViewImage( imageData );
+					numPending++;
+
+					canvas.toBlob( function ( blob ) {
+
+						gltfImage.bufferView = processBufferViewImage( blob );
+
+						next();
+
+					}, mimeType );
 
 				} else {
 
@@ -1487,16 +1508,20 @@ THREE.GLTFExporter.prototype = {
 
 		}
 
-		processInput( input );
+		function next () {
 
-		// Generate buffer
-		// Create a new blob with all the dataviews from the buffers
-		var blob = new Blob( dataViews, { type: 'application/octet-stream' } );
+			if ( --numPending > 0 ) return;
 
-		// Update the bytlength of the only main buffer and update the uri with the base64 representation of it
-		if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
+			// Generate buffer
+			// Create a new blob with all the buffers
+			var blob = new Blob( buffers, { type: 'application/octet-stream' } );
 
-			outputJSON.buffers[ 0 ].byteLength = blob.size;
+			// Update the bytlength of the only main buffer and update the uri with the base64 representation of it
+			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
+
+				outputJSON.buffers[ 0 ].byteLength = blob.size;
+
+			}
 
 			var reader = new window.FileReader();
 
@@ -1556,24 +1581,32 @@ THREE.GLTFExporter.prototype = {
 
 				};
 
+				} else {
+
+					reader.readAsDataURL( blob );
+					reader.addEventListener( 'loadend', function () {
+
+						var base64data = reader.result;
+						outputJSON.buffers[ 0 ].uri = base64data;
+						onDone( outputJSON );
+
+					} );
+
+				}
+
 			} else {
 
-				reader.readAsDataURL( blob );
-				reader.onloadend = function () {
-
-					var base64data = reader.result;
-					outputJSON.buffers[ 0 ].uri = base64data;
-					onDone( outputJSON );
-
-				};
+				onDone( outputJSON );
 
 			}
 
-		} else {
-
-			onDone( outputJSON );
-
 		}
+
+		numPending++;
+
+		processInput( input );
+
+		next();
 
 	}
 
