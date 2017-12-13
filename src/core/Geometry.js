@@ -1009,32 +1009,6 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 			}
 
-			// ShapeGeometry
-
-			if ( data.type === 'ShapeGeometry' ) {
-
-				var shapes = parameters.shapes;
-
-				data.shapes = [];
-
-				if ( Array.isArray( shapes ) ) {
-
-					for ( var i = 0, l = shapes.length; i < l; i ++ ) {
-
-						var shape = shapes[ i ];
-
-						data.shapes.push( shape.uuid );
-
-					}
-
-				} else {
-
-					data.shapes.push( shapes.uuid );
-
-				}
-
-			}
-
 			return data;
 
 		}
