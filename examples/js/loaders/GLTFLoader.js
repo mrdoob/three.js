@@ -1177,6 +1177,54 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
+	function isPrimitiveEqual ( a, b ) {
+
+		if ( a.indices !== b.indices ) {
+
+			return false;
+
+		}
+
+		var attribA = a.attributes || {};
+		var attribB = b.attributes || {};
+		var keysA = Object.keys(attribA);
+		var keysB = Object.keys(attribB);
+
+		if ( keysA.length !== keysB.length ) {
+
+			return false;
+
+		}
+
+		for ( var i = 0; i < keysA.length; i++ ) {
+
+			var key = keysA[i];
+
+			if ( attribA[key] !== attribB[key] ) {
+
+				return false;
+
+			}
+		}
+
+		return true;
+	}
+
+	function getCachedGeometry ( cache, newPrimitive ) {
+
+		for ( var i = 0; i < cache.length; i++ ) {
+			var cached = cache[i];
+
+			if ( isPrimitiveEqual( cached.primitive, newPrimitive ) ) {
+
+				return cached.geometry;
+
+			}
+		}
+
+		return null;
+	}
+
 	/* GLTF PARSER */
 
 	function GLTFParser( json, extensions, options ) {
@@ -1187,6 +1235,9 @@ THREE.GLTFLoader = ( function () {
 
 		// loader object cache
 		this.cache = new GLTFRegistry();
+
+		// BufferGeometry caching
+		this.primitiveCache = [];
 
 		this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
@@ -1838,6 +1889,8 @@ THREE.GLTFLoader = ( function () {
 	 */
 	GLTFParser.prototype.loadGeometries = function ( primitives ) {
 
+		var cache = this.primitiveCache;
+
 		return this.getDependencies( 'accessor' ).then( function ( accessors ) {
 
 			var geometries = [];
@@ -1846,71 +1899,91 @@ THREE.GLTFLoader = ( function () {
 
 				var primitive = primitives[ i ];
 
-				var geometry = new THREE.BufferGeometry();
+				// See if we've already created this geometry
+				var cached = getCachedGeometry( cache, primitive );
 
-				var attributes = primitive.attributes;
+				if (cached) {
 
-				for ( var attributeId in attributes ) {
+					// Use the cached geometry if it exists
+					geometries.push(cached);
 
-					var attributeEntry = attributes[ attributeId ];
+				} else {
 
-					var bufferAttribute = accessors[ attributeEntry ];
+					// Otherwise create a new geometry
+					var geometry = new THREE.BufferGeometry();
 
-					switch ( attributeId ) {
+					var attributes = primitive.attributes;
 
-						case 'POSITION':
+					for ( var attributeId in attributes ) {
 
-							geometry.addAttribute( 'position', bufferAttribute );
-							break;
+						var attributeEntry = attributes[ attributeId ];
 
-						case 'NORMAL':
+						var bufferAttribute = accessors[ attributeEntry ];
 
-							geometry.addAttribute( 'normal', bufferAttribute );
-							break;
+						switch ( attributeId ) {
 
-						case 'TEXCOORD_0':
-						case 'TEXCOORD0':
-						case 'TEXCOORD':
+							case 'POSITION':
 
-							geometry.addAttribute( 'uv', bufferAttribute );
-							break;
+								geometry.addAttribute( 'position', bufferAttribute );
+								break;
 
-						case 'TEXCOORD_1':
+							case 'NORMAL':
 
-							geometry.addAttribute( 'uv2', bufferAttribute );
-							break;
+								geometry.addAttribute( 'normal', bufferAttribute );
+								break;
 
-						case 'COLOR_0':
-						case 'COLOR0':
-						case 'COLOR':
+							case 'TEXCOORD_0':
+							case 'TEXCOORD0':
+							case 'TEXCOORD':
 
-							geometry.addAttribute( 'color', bufferAttribute );
-							break;
+								geometry.addAttribute( 'uv', bufferAttribute );
+								break;
 
-						case 'WEIGHTS_0':
-						case 'WEIGHT': // WEIGHT semantic deprecated.
+							case 'TEXCOORD_1':
 
-							geometry.addAttribute( 'skinWeight', bufferAttribute );
-							break;
+								geometry.addAttribute( 'uv2', bufferAttribute );
+								break;
 
-						case 'JOINTS_0':
-						case 'JOINT': // JOINT semantic deprecated.
+							case 'COLOR_0':
+							case 'COLOR0':
+							case 'COLOR':
 
-							geometry.addAttribute( 'skinIndex', bufferAttribute );
-							break;
+								geometry.addAttribute( 'color', bufferAttribute );
+								break;
+
+							case 'WEIGHTS_0':
+							case 'WEIGHT': // WEIGHT semantic deprecated.
+
+								geometry.addAttribute( 'skinWeight', bufferAttribute );
+								break;
+
+							case 'JOINTS_0':
+							case 'JOINT': // JOINT semantic deprecated.
+
+								geometry.addAttribute( 'skinIndex', bufferAttribute );
+								break;
+
+						}
 
 					}
 
+					if ( primitive.indices !== undefined ) {
+
+						geometry.setIndex( accessors[ primitive.indices ] );
+
+					}
+
+					// Cache this geometry
+					cache.push( {
+
+						primitive: primitive,
+						geometry: geometry
+
+					} );
+
+					geometries.push( geometry );
+
 				}
-
-				if ( primitive.indices !== undefined ) {
-
-					geometry.setIndex( accessors[ primitive.indices ] );
-
-				}
-
-				geometries.push( geometry );
-
 			}
 
 			return geometries;
