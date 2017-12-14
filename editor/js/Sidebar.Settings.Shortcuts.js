@@ -149,7 +149,7 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 
 				if ( editor.selected !== null ) {
 
-					editor.focusById( editor.selected.id );
+					editor.focus( editor.selected );
 
 				}
 
