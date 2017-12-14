@@ -1187,8 +1187,8 @@ THREE.GLTFLoader = ( function () {
 
 		var attribA = a.attributes || {};
 		var attribB = b.attributes || {};
-		var keysA = Object.keys(attribA);
-		var keysB = Object.keys(attribB);
+		var keysA = Object.keys( attribA );
+		var keysB = Object.keys( attribB );
 
 		if ( keysA.length !== keysB.length ) {
 
@@ -1196,33 +1196,38 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		for ( var i = 0; i < keysA.length; i++ ) {
+		for ( var i = 0, il = keysA.length; i < il; i ++ ) {
 
-			var key = keysA[i];
+			var key = keysA[ i ];
 
-			if ( attribA[key] !== attribB[key] ) {
+			if ( attribA[ key ] !== attribB[ key ] ) {
 
 				return false;
 
 			}
+
 		}
 
 		return true;
+
 	}
 
-	function getCachedGeometry ( cache, newPrimitive ) {
+	function getCachedGeometry( cache, newPrimitive ) {
 
-		for ( var i = 0; i < cache.length; i++ ) {
-			var cached = cache[i];
+		for ( var i = 0, il = cache.length; i < il; i ++ ) {
+
+			var cached = cache[ i ];
 
 			if ( isPrimitiveEqual( cached.primitive, newPrimitive ) ) {
 
 				return cached.geometry;
 
 			}
+
 		}
 
 		return null;
+
 	}
 
 	/* GLTF PARSER */
@@ -1572,7 +1577,7 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				for ( var i = 0, il = sparseIndices.length; i < il; i++ ) {
+				for ( var i = 0, il = sparseIndices.length; i < il; i ++ ) {
 
 					var index = sparseIndices[ i ];
 
@@ -1902,10 +1907,10 @@ THREE.GLTFLoader = ( function () {
 				// See if we've already created this geometry
 				var cached = getCachedGeometry( cache, primitive );
 
-				if (cached) {
+				if ( cached ) {
 
 					// Use the cached geometry if it exists
-					geometries.push(cached);
+					geometries.push( cached );
 
 				} else {
 
