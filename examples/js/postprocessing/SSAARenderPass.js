@@ -19,6 +19,7 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 
 	this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
 	this.unbiased = true;
+	this.clear = true;
 
 	// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
 	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
@@ -66,6 +67,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 	setSize: function ( width, height ) {
 
 		if ( this.sampleRenderTarget )	this.sampleRenderTarget.setSize( width, height );
+		if ( this.resultRenderTarget )	this.resultRenderTarget.setSize( width, height );
 
 	},
 
@@ -75,6 +77,13 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
 			this.sampleRenderTarget.texture.name = "SSAARenderPass.sample";
+
+		}
+
+		if ( ! this.resultRenderTarget ) {
+
+			this.resultRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
+			this.resultRenderTarget.texture.name = "SSAARenderPass.result";
 
 		}
 
@@ -128,9 +137,19 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			}
 
-			renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : writeBuffer, ( i === 0 ) );
+			renderer.render( this.scene2, this.camera2, this.resultRenderTarget, ( i === 0 ) );
 
 		}
+
+		// Render the sampled stuff on top of the canvas or the writeBuffer
+		this.copyMaterial.blending = THREE.NormalBlending;
+
+		this.copyUniforms[ "tDiffuse" ].value = this.resultRenderTarget.texture;
+		this.copyUniforms[ "opacity" ].value = 1.0;
+
+		renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : writeBuffer, this.clear );
+
+		this.copyMaterial.blending = THREE.AdditiveBlending;
 
 		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
 
