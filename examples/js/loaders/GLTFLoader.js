@@ -1781,19 +1781,19 @@ THREE.GLTFLoader = ( function () {
 
 		var alphaMode = materialDef.alphaMode || ALPHA_MODES.OPAQUE;
 
-		if ( alphaMode !== ALPHA_MODES.OPAQUE ) {
+		if ( alphaMode === ALPHA_MODES.BLEND ) {
 
 			materialParams.transparent = true;
+
+		} else {
+
+			materialParams.transparent = false;
 
 			if ( alphaMode === ALPHA_MODES.MASK ) {
 
 				materialParams.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
 
 			}
-
-		} else {
-
-			materialParams.transparent = false;
 
 		}
 
