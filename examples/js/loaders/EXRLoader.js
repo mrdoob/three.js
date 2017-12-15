@@ -294,7 +294,11 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	// we should be passed the scanline offset table, start reading pixel data
 
-	var byteArray = new Float32Array( EXRHeader.dataWindow.xMax * EXRHeader.dataWindow.yMax * 4 );
+	var width = EXRHeader.dataWindow.xMax - EXRHeader.dataWindow.xMin + 1;
+	var height = EXRHeader.dataWindow.yMax - EXRHeader.dataWindow.yMin + 1;
+	var numChannels = EXRHeader.channels.length;
+
+	var byteArray = new Float32Array( width * height * numChannels );
 
 	var channelOffsets = {
 		R: 0,
@@ -303,7 +307,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		A: 3
 	};
 
-	for ( var y = 0; y < EXRHeader.dataWindow.yMax + 1; y ++ ) {
+	for ( var y = 0; y < height; y ++ ) {
 
 		var y_scanline = parseUint32( buffer, offset );
 		var dataSize = parseUint32( buffer, offset );
@@ -311,12 +315,12 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
 			if ( EXRHeader.channels[ channelID ].pixelType == 1 ) {
 			 // HALF
-				for ( var x = 0; x < EXRHeader.dataWindow.xMax + 1; x ++ ) {
+				for ( var x = 0; x < width; x ++ ) {
 
 					var val = parseFloat16( buffer, offset );
 					var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
 
-					byteArray[ ( ( ( EXRHeader.dataWindow.yMax - y_scanline ) * ( EXRHeader.dataWindow.xMax * 4 ) ) + ( x * 4 ) ) + cOff ] = val;
+					byteArray[ ( ( ( width - y_scanline ) * ( height * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
 
 				}
 
@@ -332,8 +336,8 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	return {
 		header: EXRHeader,
-		width: EXRHeader.dataWindow.xMax,
-		height: EXRHeader.dataWindow.yMax,
+		width: width,
+		height: height,
 		data: byteArray,
 		format: THREE.RGBAFormat,
 		type: THREE.FloatType

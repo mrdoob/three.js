@@ -39,6 +39,8 @@
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/EXRLoader.js"></script>
 
+		<script src="js/libs/dat.gui.min.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -58,7 +60,7 @@
 
 				// Perform tone-mapping
 				float Y = dot(vec4(0.30, 0.59, 0.11, 0.0), color);
-				float YD = exposure * (exposure/brightMax + 1.0) / (exposure + 1.0);
+				float YD = exposure * (exposure / brightMax + 1.0) / (exposure + 1.0);
 				color *= YD;
 
 				gl_FragColor = vec4( color.xyz, 1.0 );
@@ -85,16 +87,16 @@
 
 		<script>
 
+			var params = {
+				exposure: 1.0,
+			};
+
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
 
 			var camera, scene, renderer;
 			var materialHDR, quad, gamma, exposure;
-
-			var sign = 1, rate = 1;
-
-			var clock = new THREE.Clock();
 
 			init();
 
@@ -109,15 +111,18 @@
 
 				var loader = new THREE.EXRLoader();
 
-				var texture = loader.load( "textures/latlng_env_uncompressed.exr", function( texture, textureData ){
+				var texture = loader.load( "textures/uncompressed.exr", function( texture, textureData ){
 					console.log( textureData.header ); // exr header
+
+					texture.minFilter = THREE.NearestFilter;
+					texture.magFilter = THREE.NearestFilter;
 
 					materialHDR = new THREE.ShaderMaterial( {
 
 						uniforms: {
 							tDiffuse:  { value: texture },
 							exposure:  { value: 1.0 },
-							brightMax: { value: 20.0 }
+							brightMax: { value: 18.0 }
 							},
 						vertexShader: getText( 'vs-hdr' ),
 						fragmentShader: getText( 'fs-hdr' )
@@ -129,21 +134,22 @@
 					scene.add( quad );
 					animate();
 				} );
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.NearestFilter;
-
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				var gui = new dat.GUI();
+
+				gui.add( params, 'exposure', 0.1, 5 );
+				gui.open();
 
 			}
 
@@ -177,25 +183,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta() * 5;
-
-				if ( materialHDR.uniforms.exposure.value > 0 || materialHDR.uniforms.exposure.value < 1 ) {
-
-					rate = 0.25;
-
-				} else {
-
-					rate = 1;
-
-				}
-
-				if ( materialHDR.uniforms.exposure.value > 5 || materialHDR.uniforms.exposure.value <= 0 ) {
-
-					sign *= -1;
-
-				}
-
-				materialHDR.uniforms.exposure.value += sign * rate * delta;
+				materialHDR.uniforms.exposure.value = params.exposure;
 
 				renderer.render( scene, camera );
 
