@@ -15,7 +15,7 @@ THREE.EXRLoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
 
 THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
-	var parseNullTerminatedString = function( buffer, offset ) {
+	function parseNullTerminatedString( buffer, offset ) {
 
 		var uintBuffer = new Uint8Array( buffer );
 		var endOffset = 0;
@@ -36,7 +36,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseFixedLengthString = function( buffer, offset, size ) {
+	function parseFixedLengthString( buffer, offset, size ) {
 
 		var stringValue = new TextDecoder().decode(
 			new Uint8Array( buffer ).slice( offset.value, offset.value + size )
@@ -48,7 +48,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseUlong = function( buffer, offset ) {
+	function parseUlong( buffer, offset ) {
 
 		var uLong = new DataView( buffer.slice( offset.value, offset.value + 4 ) ).getUint32( 0, true );
 
@@ -58,7 +58,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseUint32 = function( buffer, offset ) {
+	function parseUint32( buffer, offset ) {
 
 		var Uint32 = new DataView( buffer.slice( offset.value, offset.value + 4 ) ).getUint32( 0, true );
 
@@ -68,7 +68,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseUint8 = function( buffer, offset ) {
+	function parseUint8( buffer, offset ) {
 
 		var Uint8 = new DataView( buffer.slice( offset.value, offset.value + 1 ) ).getUint8( 0, true );
 
@@ -78,7 +78,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseFloat32 = function( buffer, offset ) {
+	function parseFloat32( buffer, offset ) {
 
 		var float = new DataView( buffer.slice( offset.value, offset.value + 4 ) ).getFloat32( 0, true );
 
@@ -89,7 +89,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 	}
 
 	// https://stackoverflow.com/questions/5678432/decompressing-half-precision-floats-in-javascript
-	var decodeFloat16 = function( binary ) {
+	function decodeFloat16( binary ) {
 
 		var exponent = ( binary & 0x7C00 ) >> 10,
 		fraction = binary & 0x03FF;
@@ -106,7 +106,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseFloat16 = function( buffer, offset ) {
+	function parseFloat16( buffer, offset ) {
 
 		var float = new DataView( buffer.slice( offset.value, offset.value + 2 ) ).getUint16( 0, true );
 
@@ -116,7 +116,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseChlist = function( buffer, offset, size ) {
+	function parseChlist( buffer, offset, size ) {
 
 		var startOffset = offset.value;
 		var channels = [];
@@ -146,7 +146,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseChromaticities = function( buffer, offset ) {
+	function parseChromaticities( buffer, offset ) {
 
 		var redX = parseFloat32( buffer, offset );
 		var redY = parseFloat32( buffer, offset );
@@ -161,7 +161,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseCompression = function( buffer, offset ) {
+	function parseCompression( buffer, offset ) {
 
 		var compressionCodes = [
 			'NO_COMPRESSION',
@@ -174,7 +174,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseBox2i = function( buffer, offset ) {
+	function parseBox2i( buffer, offset ) {
 
 		var xMin = parseUint32( buffer, offset );
 		var yMin = parseUint32( buffer, offset );
@@ -185,7 +185,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseLineOrder = function( buffer, offset ) {
+	function parseLineOrder( buffer, offset ) {
 
 		var lineOrders = [
 			'INCREASING_Y'
@@ -197,7 +197,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseV2f = function( buffer, offset ) {
+	function parseV2f( buffer, offset ) {
 
 		var x = parseFloat32( buffer, offset );
 		var y = parseFloat32( buffer, offset );
@@ -206,7 +206,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var parseValue = function( buffer, offset, type, size ) {
+	function parseValue( buffer, offset, type, size ) {
 
 		if ( type == 'string' || type == 'iccProfile' ) {
 
