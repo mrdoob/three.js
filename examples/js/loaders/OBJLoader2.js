@@ -1348,12 +1348,11 @@ THREE.OBJLoader2 = (function () {
 	 * @memberOf THREE.OBJLoader2
 	 *
 	 * @param {string} url URL to the file
-	 * @param {string} name The name of the object
 	 * @param {Object} content The file content as arraybuffer or text
 	 * @param {function} callbackOnLoad
 	 * @param {string} [crossOrigin] CORS value
 	 */
-	OBJLoader2.prototype.loadMtl = function ( url, name, content, callbackOnLoad, crossOrigin ) {
+	OBJLoader2.prototype.loadMtl = function ( url, content, callbackOnLoad, crossOrigin ) {
 		var resource = new THREE.LoaderSupport.ResourceDescriptor( url, 'MTL' );
 		resource.setContent( content );
 		this._loadMtl( resource, callbackOnLoad, crossOrigin );
