@@ -994,7 +994,6 @@ THREE.GLTFLoader = ( function () {
 	};
 
 	var INTERPOLATION = {
-		CATMULLROMSPLINE: THREE.InterpolateSmooth,
 		CUBICSPLINE: THREE.InterpolateSmooth,
 		LINEAR: THREE.InterpolateLinear,
 		STEP: THREE.InterpolateDiscrete
@@ -2297,9 +2296,33 @@ THREE.GLTFLoader = ( function () {
 
 						var targetName = node.name ? node.name : node.uuid;
 
-						if ( sampler.interpolation === 'CATMULLROMSPLINE' ) {
+						if ( sampler.interpolation === 'CUBICSPLINE' ) {
 
-							console.warn( 'THREE.GLTFLoader: CATMULLROMSPLINE interpolation is not supported. Using CUBICSPLINE instead.' );
+							var itemSize = outputAccessor.itemSize;
+							var TypedArray = outputAccessor.array.constructor;
+							var outputAccessorValues = new TypedArray( outputAccessor.count * itemSize / 3 );
+
+							// Layout of keyframe output values for CUBICSPLINE animations:
+							//
+							//   [ inTangent1, splineVertex1, outTangent1, inTangent2, splineVertex2, ... ]
+							//
+							// THREE.KeyframeTrack infers tangents from the spline vertices when interpolating:
+							// those values are extracted below. This still guarantees smooth curves, but does
+							// throw away more precise information in the tangents. In the future, consider
+							// re-sampling at a higher framerate using the tangents provided.
+							//
+							// See: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#appendix-c-spline-interpolation
+
+							for ( var j = 0, jl = outputAccessor.count; j < jl; j += 3 ) {
+
+								outputAccessorValues[ j / 3 ] = outputAccessor.getX( j + 1 );
+								if ( itemSize > 1 ) outputAccessorValues[ j / 3 + 1 ] = outputAccessor.getY( j + 1 );
+								if ( itemSize > 2 ) outputAccessorValues[ j / 3 + 2 ] = outputAccessor.getZ( j + 1 );
+								if ( itemSize > 3 ) outputAccessorValues[ j / 3 + 3 ] = outputAccessor.getW( j + 1 );
+
+							}
+
+							outputAccessor = new THREE.BufferAttribute( outputAccessorValues, itemSize / 3, outputAccessor.normalized );
 
 						}
 
