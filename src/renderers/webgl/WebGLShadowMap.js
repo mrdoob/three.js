@@ -396,6 +396,18 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			if ( object.castShadow && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
 
+				var type = object.geometry.type;
+				
+				if ( object.isMesh && ( type === 'PlaneGeometry' || type === 'PlaneBufferGeometry' ) ) {
+
+					scope.renderReverseSided = false;
+
+				} else {
+
+					scope.renderReverseSided = true;
+
+				}
+
 				object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
 				var geometry = _objects.update( object );
