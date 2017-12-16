@@ -272,7 +272,7 @@
 					window.open( canvas.toDataURL() );
 
 				},
-				freeCamera: false,
+				orbitControls: false,
 				resolution: '512'
 			};
 
@@ -311,14 +311,11 @@
 
 				// Controls
 				controls = new THREE.OrbitControls( camera, canvas );
-				//controls.dragToLook = false;
-				//controls.rollSpeed = Math.PI / 12;
-				//controls.movementSpeed = 1;
 
 				// GUI
 				var gui = new dat.GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
-				gui.add( config, 'freeCamera' ).name( 'Free Camera' );
+				gui.add( config, 'orbitControls' ).name( 'Orbit Controls' );
 				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( onWindowResize );
 
 				stats = new Stats();
@@ -332,7 +329,7 @@
 
 				stats.begin();
 
-				if ( config.freeCamera ) {
+				if ( config.orbitControls ) {
 
 					controls.update( delta );
 
@@ -342,9 +339,6 @@
 					camera.rotation.set( 0.25, - Math.PI, 0 );
 
 				}
-
-				if ( camera.position.y < 0 ) camera.position.y = 0;
-
 
 				renderer.render( scene, camera );
 
