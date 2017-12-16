@@ -2560,6 +2560,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.updateLights = function ( camera ) {
+
+		lights.setup( lightsArray, shadowsArray, camera );
+
+	};
+
 }
 
 

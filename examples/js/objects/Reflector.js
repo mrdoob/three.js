@@ -168,6 +168,8 @@ THREE.Reflector = function ( geometry, options ) {
 
 		renderer.setRenderTarget( currentRenderTarget );
 
+		renderer.updateLights( camera ); // rebuild light uniforms, see #12883
+
 		// Restore viewport
 
 		var bounds = camera.bounds;
