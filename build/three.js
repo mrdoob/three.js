@@ -4563,7 +4563,7 @@
 	}
 
 	WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-		
+
 		constructor: WebGLRenderTarget,
 
 		isWebGLRenderTarget: true,
@@ -7685,7 +7685,7 @@
 	}
 
 	Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-		
+
 		constructor: Material,
 
 		isMaterial: true,
@@ -10275,7 +10275,7 @@
 	Object3D.DefaultMatrixAutoUpdate = true;
 
 	Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-		
+
 		constructor: Object3D,
 
 		isObject3D: true,
@@ -11288,7 +11288,7 @@
 	}
 
 	Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-		
+
 		constructor: Geometry,
 
 		isGeometry: true,
@@ -13416,7 +13416,7 @@
 	}
 
 	BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-		
+
 		constructor: BufferGeometry,
 
 		isBufferGeometry: true,
@@ -30530,6 +30530,7 @@
 		this.setURLModifier = function ( transform ) {
 
 			urlModifier = transform;
+			return this;
 
 		};
 
@@ -34051,6 +34052,50 @@
 	} );
 
 	/**
+	 * @author Don McCurdy / https://www.donmccurdy.com
+	 */
+
+	var LoaderUtils = {
+
+		decodeText: function ( array ) {
+
+			if ( typeof TextDecoder !== 'undefined' ) {
+
+				return new TextDecoder().decode( array );
+
+			}
+
+			// Avoid the String.fromCharCode.apply(null, array) shortcut, which
+			// throws a "maximum call stack size exceeded" error for large arrays.
+
+			var s = '';
+
+			for ( var i = 0, il = array.length; i < il; i ++ ) {
+
+				// Implicitly assumes little-endian.
+				s += String.fromCharCode( array[ i ] );
+
+			}
+
+			return s;
+
+		},
+
+		extractUrlBase: function ( url ) {
+
+			var parts = url.split( '/' );
+
+			if ( parts.length === 1 ) return './';
+
+			parts.pop();
+
+			return parts.join( '/' ) + '/';
+
+		}
+
+	};
+
+	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author alteredq / http://alteredqualia.com/
 	 */
@@ -34076,7 +34121,7 @@
 
 			var scope = this;
 
-			var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : Loader.prototype.extractUrlBase( url );
+			var texturePath = this.texturePath && ( typeof this.texturePath === 'string' ) ? this.texturePath : LoaderUtils.extractUrlBase( url );
 
 			var loader = new FileLoader( this.manager );
 			loader.setWithCredentials( this.withCredentials );
@@ -37250,50 +37295,6 @@
 	} );
 
 	/**
-	 * @author Don McCurdy / https://www.donmccurdy.com
-	 */
-
-	var LoaderUtils = {
-
-		decodeText: function ( array ) {
-
-			if ( typeof TextDecoder !== 'undefined' ) {
-
-				return new TextDecoder().decode( array );
-
-			}
-
-			// Avoid the String.fromCharCode.apply(null, array) shortcut, which
-			// throws a "maximum call stack size exceeded" error for large arrays.
-
-			var s = '';
-
-			for ( var i = 0, il = array.length; i < il; i ++ ) {
-
-				// Implicitly assumes little-endian.
-				s += String.fromCharCode( array[ i ] );
-
-			}
-
-			return s;
-
-		},
-
-		extractUrlBase: function ( url ) {
-
-			var parts = url.split( '/' );
-
-			if ( parts.length === 1 ) return './';
-
-			parts.pop();
-
-			return parts.join( '/' ) + '/';
-
-		}
-
-	};
-
-	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
@@ -40103,7 +40104,7 @@
 	}
 
 	AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-		
+
 		constructor: AnimationMixer,
 
 		_bindAction: function ( action, prototypeAction ) {

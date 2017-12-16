@@ -4557,7 +4557,7 @@ function WebGLRenderTarget( width, height, options ) {
 }
 
 WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-	
+
 	constructor: WebGLRenderTarget,
 
 	isWebGLRenderTarget: true,
@@ -7679,7 +7679,7 @@ function Material() {
 }
 
 Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-	
+
 	constructor: Material,
 
 	isMaterial: true,
@@ -10269,7 +10269,7 @@ Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
 Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-	
+
 	constructor: Object3D,
 
 	isObject3D: true,
@@ -11282,7 +11282,7 @@ function Geometry() {
 }
 
 Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-	
+
 	constructor: Geometry,
 
 	isGeometry: true,
@@ -13410,7 +13410,7 @@ function BufferGeometry() {
 }
 
 BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-	
+
 	constructor: BufferGeometry,
 
 	isBufferGeometry: true,
@@ -30524,6 +30524,7 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	this.setURLModifier = function ( transform ) {
 
 		urlModifier = transform;
+		return this;
 
 	};
 
@@ -34045,6 +34046,50 @@ Object.assign( Loader.prototype, {
 } );
 
 /**
+ * @author Don McCurdy / https://www.donmccurdy.com
+ */
+
+var LoaderUtils = {
+
+	decodeText: function ( array ) {
+
+		if ( typeof TextDecoder !== 'undefined' ) {
+
+			return new TextDecoder().decode( array );
+
+		}
+
+		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
+		// throws a "maximum call stack size exceeded" error for large arrays.
+
+		var s = '';
+
+		for ( var i = 0, il = array.length; i < il; i ++ ) {
+
+			// Implicitly assumes little-endian.
+			s += String.fromCharCode( array[ i ] );
+
+		}
+
+		return s;
+
+	},
+
+	extractUrlBase: function ( url ) {
+
+		var parts = url.split( '/' );
+
+		if ( parts.length === 1 ) return './';
+
+		parts.pop();
+
+		return parts.join( '/' ) + '/';
+
+	}
+
+};
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
@@ -34070,7 +34115,7 @@ Object.assign( JSONLoader.prototype, {
 
 		var scope = this;
 
-		var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : Loader.prototype.extractUrlBase( url );
+		var texturePath = this.texturePath && ( typeof this.texturePath === 'string' ) ? this.texturePath : LoaderUtils.extractUrlBase( url );
 
 		var loader = new FileLoader( this.manager );
 		loader.setWithCredentials( this.withCredentials );
@@ -37244,50 +37289,6 @@ Object.assign( FontLoader.prototype, {
 } );
 
 /**
- * @author Don McCurdy / https://www.donmccurdy.com
- */
-
-var LoaderUtils = {
-
-	decodeText: function ( array ) {
-
-		if ( typeof TextDecoder !== 'undefined' ) {
-
-			return new TextDecoder().decode( array );
-
-		}
-
-		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
-		// throws a "maximum call stack size exceeded" error for large arrays.
-
-		var s = '';
-
-		for ( var i = 0, il = array.length; i < il; i ++ ) {
-
-			// Implicitly assumes little-endian.
-			s += String.fromCharCode( array[ i ] );
-
-		}
-
-		return s;
-
-	},
-
-	extractUrlBase: function ( url ) {
-
-		var parts = url.split( '/' );
-
-		if ( parts.length === 1 ) return './';
-
-		parts.pop();
-
-		return parts.join( '/' ) + '/';
-
-	}
-
-};
-
-/**
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -40097,7 +40098,7 @@ function AnimationMixer( root ) {
 }
 
 AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
-	
+
 	constructor: AnimationMixer,
 
 	_bindAction: function ( action, prototypeAction ) {
