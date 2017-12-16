@@ -676,7 +676,6 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 			if ( parameters !== undefined && parameters.shapes !== undefined ) {
 
 				var shapes = parameters.shapes;
-				var uuids = [];
 
 				if ( Array.isArray( shapes ) ) {
 
