@@ -8,6 +8,7 @@
  * @class THREE.GCodeLoader
  * @param {Manager} manager Loading manager.
  * @author tentone
+ * @author joewalnes
  */
 THREE.GCodeLoader = function(manager)
 {
