@@ -1,20 +1,20 @@
 "use strict";
 
 /**
- * GCodeLoader is used to load gcode files usually used for 3D printing or CNC applications.
+ * THREE.GCodeLoader is used to load gcode files usually used for 3D printing or CNC applications.
  *
  * Gcode files are composed by commands used by machines to create objects.
  *
- * @class GCodeLoader
+ * @class THREE.GCodeLoader
  * @param {Manager} manager Loading manager.
  * @author tentone
  */
-function GCodeLoader(manager)
+THREE.GCodeLoader = function(manager)
 {
 	this.manager = (manager !== undefined) ? manager : THREE.DefaultLoadingManager;
 }
 
-GCodeLoader.prototype.load = function(url, onLoad, onProgress, onError)
+THREE.GCodeLoader.prototype.load = function(url, onLoad, onProgress, onError)
 {
 	var self = this;
 
@@ -28,7 +28,7 @@ GCodeLoader.prototype.load = function(url, onLoad, onProgress, onError)
 	}, onProgress, onError);
 };
 
-GCodeLoader.prototype.parse = function(data)
+THREE.GCodeLoader.prototype.parse = function(data)
 {
 	var currentState = {x:0, y:0, z:0, e:0, f:0, extruding:false};
 	var currentLayer = undefined;
@@ -149,7 +149,7 @@ GCodeLoader.prototype.parse = function(data)
 		//G2/G3 - Arc Movement (G2 clock wise and G3 counter clock wise)
 		else if(cmd === "G2" || cmd === "G3")
 		{
-			console.warn("GCodeLoader: Arc command not supported");
+			console.warn("THREE.GCodeLoader: Arc command not supported");
 		}
 		//G90: Set to Absolute Positioning
 		else if(cmd === "G90")
@@ -173,7 +173,7 @@ GCodeLoader.prototype.parse = function(data)
 		}
 		else
 		{
-			console.warn("GCodeLoader: Command not supported:" + cmd);
+			console.warn("THREE.GCodeLoader: Command not supported:" + cmd);
 		}
 	}
 
