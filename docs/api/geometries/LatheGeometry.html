@@ -12,7 +12,7 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Creates meshes with axial symmetry like vases. The lathe rotates around the Y axis.</div>
+		<div class="desc">Creates meshes with axial symmetry like vases. The lathe axis of rotation is the y-axis.</div>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#LatheGeometry"></iframe>
 
@@ -49,7 +49,7 @@
 
 		<h3>[name]([page:Array points], [page:Integer segments], [page:Float phiStart], [page:Float phiLength])</h3>
 		<div>
-		points — Array of Vector2s. The x-coordinate of each point must be greater than zero.<br />
+		points — Array of Vector2s. The x-coordinate of each point should be greater than or equal to zero.<br />
 		segments — the number of circumference segments to generate. Default is 12.<br />
 		phiStart — the starting angle in radians. Default is 0.<br />
 		phiLength — the radian (0 to 2PI) range of the lathed section 2PI is a closed lathe, less than 2PI is a portion. Default is 2PI.
