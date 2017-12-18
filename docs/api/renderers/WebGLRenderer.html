@@ -51,7 +51,10 @@
 		Default is *true*.<br />
 
 		[page:Boolean preserveDrawingBuffer] - whether to preserve the buffers until manually cleared
-	  or overwritten. Default is *false*.<br />
+		or overwritten. Default is *false*.<br />
+		
+		[page:String powerPreference] - Provides a hint to the user agent indicating what configuration
+		of GPU is suitable for this WebGL context. Can be *"high-performance"*, *"low-power"* or *"default"*. Default is *"default"*.<br />
 
 		[page:Boolean depth] - whether the drawing buffer has a
 		[link:https://en.wikipedia.org/wiki/Z-buffering depth buffer] of at least 16 bits.
@@ -129,7 +132,7 @@
 		<h3>[property:WebGLRenderingContext context]</h3>
 		<div>
 		The renderer obtains a [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext] context
-		  from its [page:WebGLRenderer.domElement domElement][page:WebGLRenderer.domElement domElement] by default, using
+		  from its [page:WebGLRenderer.domElement domElement] by default, using
 			[link:https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement/getContext HTMLCanvasElement.getContext]().<br /><br />
 
 		You can create this manually, however it must correspond to the

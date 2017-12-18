@@ -36,28 +36,6 @@ THREE.PCDLoader.prototype = {
 
 	parse: function ( data, url ) {
 
-		function binaryToStr( data ) {
-
-			var charArray = new Uint8Array( data );
-
-			if ( window.TextDecoder !== undefined ) {
-
-				return new TextDecoder().decode( charArray );
-
-			}
-
-			var text = '';
-
-			for ( var i = 0, l = data.byteLength; i < l; i ++ ) {
-
-				text += String.fromCharCode( charArray[ i ] );
-
-			}
-
-			return text;
-
-		}
-
 		function parseHeader( data ) {
 
 			var PCDheader = {};
@@ -167,7 +145,7 @@ THREE.PCDLoader.prototype = {
 
 		}
 
-		var textData = binaryToStr( data );
+		var textData = THREE.LoaderUtils.decodeText( data );
 
 		// parse header (always ascii format)
 

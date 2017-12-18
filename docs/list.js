@@ -5,6 +5,7 @@ var list = {
 		"Getting Started": {
 			"Creating a scene": "manual/introduction/Creating-a-scene",
 			"Import via modules": "manual/introduction/Import-via-modules",
+			"Browser support": "manual/introduction/Browser-support",
 			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
 			"How to run things locally": "manual/introduction/How-to-run-thing-locally",
 			"Drawing Lines": "manual/introduction/Drawing-lines",
@@ -103,6 +104,7 @@ var list = {
 		},
 
 		"Extras": {
+			"Earcut": "api/extras/Earcut",
 			"SceneUtils": "api/extras/SceneUtils",
 			"ShapeUtils": "api/extras/ShapeUtils"
 		},
@@ -174,8 +176,8 @@ var list = {
 			"TorusGeometry": "api/geometries/TorusGeometry",
 			"TorusKnotBufferGeometry": "api/geometries/TorusKnotBufferGeometry",
 			"TorusKnotGeometry": "api/geometries/TorusKnotGeometry",
-			"TubeGeometry": "api/geometries/TubeGeometry",
 			"TubeBufferGeometry": "api/geometries/TubeBufferGeometry",
+			"TubeGeometry": "api/geometries/TubeGeometry",
 			"WireframeGeometry": "api/geometries/WireframeGeometry"
 		},
 
@@ -224,9 +226,11 @@ var list = {
 			"DataTextureLoader": "api/loaders/DataTextureLoader",
 			"FileLoader": "api/loaders/FileLoader",
 			"FontLoader": "api/loaders/FontLoader",
+			"ImageBitmapLoader": "api/loaders/ImageBitmapLoader",
 			"ImageLoader": "api/loaders/ImageLoader",
 			"JSONLoader": "api/loaders/JSONLoader",
 			"Loader": "api/loaders/Loader",
+			"LoaderUtils": "api/loaders/LoaderUtils",
 			"MaterialLoader": "api/loaders/MaterialLoader",
 			"ObjectLoader": "api/loaders/ObjectLoader",
 			"TextureLoader": "api/loaders/TextureLoader"
