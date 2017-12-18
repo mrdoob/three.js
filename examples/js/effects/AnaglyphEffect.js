@@ -27,6 +27,19 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 			0.0001224992738571018,	-0.009558862075209618,		 0.567823588848114		// b out
 
 	] );
+	
+	var _invertRedCyan = false;
+	var _invertRedCyanChanged = false;
+	
+	Object.defineProperty(this, 'invertRedCyan', {
+		set: function (newVal) {
+				_invertRedCyan = newVal;
+				_invertRedCyanChanged = true;
+			},
+		get: function () {
+			return _invertRedCyan;
+		}
+	});
 
 	var _camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
@@ -50,7 +63,9 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 			"mapRight": { value: _renderTargetR.texture },
 
 			"colorMatrixLeft": { value: this.colorMatrixLeft },
-			"colorMatrixRight": { value: this.colorMatrixRight }
+			"colorMatrixRight": { value: this.colorMatrixRight },
+			
+			"invertRedCyan": {value: _invertRedCyan}
 
 		},
 
@@ -75,6 +90,8 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 			"uniform mat3 colorMatrixLeft;",
 			"uniform mat3 colorMatrixRight;",
+			
+			"uniform bool invertRedCyan;",
 
 			// These functions implement sRGB linearization and gamma correction
 
@@ -99,6 +116,12 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 			"	vec4 colorL = lin( texture2D( mapLeft, uv ) );",
 			"	vec4 colorR = lin( texture2D( mapRight, uv ) );",
+			
+			"	if (invertRedCyan) {",
+			"		vec4 tmp = colorR;",
+			"		colorR = colorL;",
+			"		colorL = tmp;",
+			"	}",
 
 			"	vec3 color = clamp(",
 			"			colorMatrixLeft * colorL.rgb +",
@@ -129,6 +152,12 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 	};
 
 	this.render = function ( scene, camera ) {
+
+		if (_invertRedCyanChanged) {
+			_invertRedCyanChanged = false;
+			_material.uniforms.invertRedCyan.value = _invertRedCyan;
+		}
+
 
 		scene.updateMatrixWorld();
 
