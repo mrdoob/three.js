@@ -1361,7 +1361,7 @@ THREE.OBJLoader2 = (function () {
 
 				var onError = function ( event ) {
 					var output = 'Error occurred while downloading "' + resource.url + '"';
-					this.logger.logError( output + ': ' + event );
+					scope.logger.logError( output + ': ' + event );
 					throw output;
 				};
 
