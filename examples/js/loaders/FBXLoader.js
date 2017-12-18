@@ -2105,7 +2105,7 @@
 				// otherwise use the transform from the rawBone
 				else {
 
-					bone.matrixWorld.copy( skeleton.rawBones[ i ].transformLink )
+					bone.matrixWorld.copy( skeleton.rawBones[ i ].transformLink );
 
 				}
 

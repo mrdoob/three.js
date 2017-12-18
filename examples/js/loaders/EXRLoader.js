@@ -92,12 +92,12 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 	function decodeFloat16( binary ) {
 
 		var exponent = ( binary & 0x7C00 ) >> 10,
-		fraction = binary & 0x03FF;
+			fraction = binary & 0x03FF;
 
 		return ( binary >> 15 ? - 1 : 1 ) * (
-				exponent ?
+			exponent ?
 				(
-						exponent === 0x1F ?
+					exponent === 0x1F ?
 						fraction ? NaN : Infinity :
 						Math.pow( 2, exponent - 15 ) * ( 1 + fraction / 0x400 )
 				) :
@@ -313,8 +313,10 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		var dataSize = parseUint32( buffer, offset );
 
 		for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
+
 			if ( EXRHeader.channels[ channelID ].pixelType == 1 ) {
-			 // HALF
+
+				// HALF
 				for ( var x = 0; x < width; x ++ ) {
 
 					var val = parseFloat16( buffer, offset );
