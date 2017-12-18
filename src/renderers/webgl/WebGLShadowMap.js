@@ -92,6 +92,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 	this.type = PCFShadowMap;
 
 	this.renderReverseSided = true;
+	this.planesCastShadows = false;
 	this.renderSingleSided = true;
 
 	this.render = function ( lights, scene, camera ) {
@@ -360,8 +361,27 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		if ( scope.renderReverseSided ) {
 
-			if ( side === FrontSide ) side = BackSide;
-			else if ( side === BackSide ) side = FrontSide;
+			// if planes don't cast shadows (default), render them reverse sided like previous versions of Three
+			if ( ! scope.planesCastShadows ) {
+
+				if ( side === FrontSide ) side = BackSide;
+				else if ( side === BackSide ) side = FrontSide;
+
+			}
+			else {
+
+				var type = geometry.type;
+				var isPlane = object.isMesh && ( type === 'PlaneGeometry' || type === 'PlaneBufferGeometry' );
+
+				// if planes cast shadows, don't render them reverse sided
+				if ( ! isPlane ) {
+
+					if ( side === FrontSide ) side = BackSide;
+					else if ( side === BackSide ) side = FrontSide;
+
+				}
+
+			}
 
 		}
 
