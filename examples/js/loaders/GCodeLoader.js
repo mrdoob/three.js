@@ -14,6 +14,8 @@ THREE.GCodeLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
+	this.splitLayer = false;
+
 };
 
 THREE.GCodeLoader.prototype.load = function ( url, onLoad, onProgress, onError ) {
@@ -31,12 +33,12 @@ THREE.GCodeLoader.prototype.load = function ( url, onLoad, onProgress, onError )
 
 THREE.GCodeLoader.prototype.parse = function ( data ) {
 
-	var currentState = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false };
+	var state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
+	var layers = [];
+
 	var currentLayer = undefined;
-	var relative = false;
 
 	var box = new THREE.Box3();
-	var layers = [];
 	
 	var pathMaterial = new THREE.LineBasicMaterial( { color: 0xFFFF00 } );
 	pathMaterial.name = 'path';
@@ -46,53 +48,43 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 	function newLayer( line ) {
 
-		currentLayer = { lines: [], currentLayer: layers.length, z: line.z };
+		currentLayer = { vertex: [], pathVertex: [], z: line.z };
 		layers.push( currentLayer );
 
-	}
-
-	function getLineGroup( line ) {
-
-		if ( currentLayer === undefined ) {
-
-			newLayer( line );
-
-		}
-
-		var grouptype = line.extruding ? 1 : 0;
-
-		if ( currentLayer.lines[ grouptype ] === undefined ) {
-
-			currentLayer.lines[ grouptype ] = {
-
-				type: grouptype,
-				feed: line.e,
-				extruding: line.extruding,
-				vertex: [],
-				material: line.extruding ? extrudingMaterial : pathMaterial,
-				segmentCount: 0
-				
-			};
-
-		}
-
-		return currentLayer.lines[ grouptype ];
 	}
 
 	//Create lie segment between p1 and p2
 	function addSegment( p1, p2 ) {
 
-		var group = getLineGroup( p2 );
+		if ( currentLayer === undefined ) {
 
-		group.segmentCount ++;
-		group.vertex.push(p1.x);
-		group.vertex.push(p1.y);
-		group.vertex.push(p1.z);
-		group.vertex.push(p2.x);
-		group.vertex.push(p2.y);
-		group.vertex.push(p2.z);
+			newLayer( p1 );
 
-		if ( p2.extruding ) {
+		}
+
+		if(line.extruding) {
+
+			currentLayer.vertex.push(p1.x);
+			currentLayer.vertex.push(p1.y);
+			currentLayer.vertex.push(p1.z);
+			currentLayer.vertex.push(p2.x);
+			currentLayer.vertex.push(p2.y);
+			currentLayer.vertex.push(p2.z);
+
+		}
+
+		else {
+
+			currentLayer.pathVertex.push(p1.x);
+			currentLayer.pathVertex.push(p1.y);
+			currentLayer.pathVertex.push(p1.z);
+			currentLayer.pathVertex.push(p2.x);
+			currentLayer.pathVertex.push(p2.y);
+			currentLayer.pathVertex.push(p2.z);
+			
+		}
+
+		if ( line.extruding ) {
 
 			box.min.set( Math.min( box.min.x, p2.x ), Math.min( box.min.y, p2.y ), Math.min( box.min.z, p2.z ) );
 			box.max.set( Math.max( box.max.x, p2.x ), Math.max( box.max.y, p2.y ), Math.max( box.max.z, p2.z ) );
@@ -103,13 +95,13 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 	function delta( v1, v2 ) {
 
-		return relative ? v2 : v2 - v1;
+		return state.relative ? v2 : v2 - v1;
 
 	}
 
 	function absolute ( v1, v2 ) {
 
-		return relative ? v1 + v2 : v2;
+		return state.relative ? v1 + v2 : v2;
 
 	}
 
@@ -138,17 +130,17 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 		if ( cmd === 'G0' || cmd === 'G1' ) {
 
 			var line = {
-				x: args.x !== undefined ? absolute( currentState.x, args.x ) : currentState.x,
-				y: args.y !== undefined ? absolute( currentState.y, args.y ) : currentState.y,
-				z: args.z !== undefined ? absolute( currentState.z, args.z ) : currentState.z,
-				e: args.e !== undefined ? absolute( currentState.e, args.e ) : currentState.e,
-				f: args.f !== undefined ? absolute( currentState.f, args.f ) : currentState.f,
+				x: args.x !== undefined ? absolute( state.x, args.x ) : state.x,
+				y: args.y !== undefined ? absolute( state.y, args.y ) : state.y,
+				z: args.z !== undefined ? absolute( state.z, args.z ) : state.z,
+				e: args.e !== undefined ? absolute( state.e, args.e ) : state.e,
+				f: args.f !== undefined ? absolute( state.f, args.f ) : state.f,
 			};
 
 			//Layer change detection is or made by watching Z, it's made by watching when we extrude at a new Z position
-			if ( delta( currentState.e, line.e ) > 0 ) {
+			if ( delta( state.e, line.e ) > 0 ) {
 
-				line.extruding = delta( currentState.e, line.e ) > 0;
+				line.extruding = delta( state.e, line.e ) > 0;
 
 				if ( currentLayer == undefined || line.z != currentLayer.z ) {
 
@@ -158,8 +150,8 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 			}
 
-			addSegment( currentState, line );
-			currentState = line;
+			addSegment( state, line );
+			state = line;
 		}
 		//G2/G3 - Arc Movement ( G2 clock wise and G3 counter clock wise )
 		else if ( cmd === 'G2' || cmd === 'G3' ) {
@@ -169,24 +161,24 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 		//G90: Set to Absolute Positioning
 		else if ( cmd === 'G90' ) {
 
-			relative = false;
+			state.relative = false;
 
 		}
-		//G91: Set to Relative Positioning
+		//G91: Set to state.relative Positioning
 		else if ( cmd === 'G91' ) {
 
-			relative = true;
+			state.relative = true;
 
 		}
 		//G92: Set Position
 		else if ( cmd === 'G92' ) {
 
-			var line = currentState;
+			var line = state;
 			line.x = args.x !== undefined ? args.x : line.x;
 			line.y = args.y !== undefined ? args.y : line.y;
 			line.z = args.z !== undefined ? args.z : line.z;
 			line.e = args.e !== undefined ? args.e : line.e;
-			currentState = line;
+			state = line;
 
 		}
 		else {
@@ -196,30 +188,46 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 		}
 	}
 
+	function addObject(vertex, extruding) {
+
+		var geometry = new THREE.BufferGeometry();
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertex ), 3 ) );
+
+		var segments = new THREE.LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
+		segments.name = 'layer' + i;
+		object.add( segments );
+
+	}
+
 	var object = new THREE.Object3D();
 	object.name = 'gcode';
 
-	for ( var i = 0; i < layers.length; i ++ ) {
+	if( this.splitLayer ) {
 
-		var layer = layers[ i ];
+		for ( var i = 0; i < layers.length; i ++ ) {
 
-		for ( var j = 0; j < layer.lines.length; j ++ ) {
-
-			var line = layer.lines[ j ];
-
-			if ( line !== undefined ) {
-
-				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( line.vertex ), 3 ) );
-
-				var segments = new THREE.LineSegments( geometry, line.material );
-				segments.name = 'layer' + i;
-				object.add( segments );
-
-			}
+			var layer = layers[ i ];
+			addObject( layer.vertex, true );
+			addObject( layer.pathVertex, false );
 
 		}
 
+	}
+	else {
+
+		var vertex = [], pathVertex = [];
+
+		for ( var i = 0; i < layers.length; i ++ ) {
+
+			var layer = layers[ i ];
+
+			vertex = vertex.concat(layer.vertex);
+			pathVertex = pathVertex.concat(layer.pathVertex);
+
+		}
+
+		addObject( vertex, true );
+		addObject( pathVertex, false );
 	}
 
 	object.rotation.set( -Math.PI / 2, 0, 0 );
