@@ -32,7 +32,7 @@ THREE.GCodeLoader.prototype.load = function ( url, onLoad, onProgress, onError )
 
 THREE.GCodeLoader.prototype.parse = function ( data ) {
 
-	var currentState = { x:0, y:0, z:0, e:0, f:0, extruding:false };
+	var currentState = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false };
 	var currentLayer = undefined;
 	var relative = false;
 
