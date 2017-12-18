@@ -39,11 +39,11 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 	var currentLayer = undefined;
 
 	var box = new THREE.Box3();
-	
-	var pathMaterial = new THREE.LineBasicMaterial( { color: 0xFFFF00 } );
+
+	var pathMaterial = new THREE.LineBasicMaterial( { color: 0xFF0000 } );
 	pathMaterial.name = 'path';
 
-	var extrudingMaterial = new THREE.LineBasicMaterial( { color: 0xFFFFFF } );
+	var extrudingMaterial = new THREE.LineBasicMaterial( { color: 0x00FF00 } );
 	extrudingMaterial.name = 'extruded';
 
 	function newLayer( line ) {
@@ -62,33 +62,23 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 		}
 
-		if(line.extruding) {
+		if ( line.extruding ) {
 
-			currentLayer.vertex.push(p1.x);
-			currentLayer.vertex.push(p1.y);
-			currentLayer.vertex.push(p1.z);
-			currentLayer.vertex.push(p2.x);
-			currentLayer.vertex.push(p2.y);
-			currentLayer.vertex.push(p2.z);
+			currentLayer.vertex.push( p1.x, p1.y, p1.z );
+			currentLayer.vertex.push( p2.x, p2.y, p2.z );
 
-		}
+		} else {
 
-		else {
+			currentLayer.pathVertex.push( p1.x, p1.y, p1.z );
+			currentLayer.pathVertex.push( p2.x, p2.y, p2.z );
 
-			currentLayer.pathVertex.push(p1.x);
-			currentLayer.pathVertex.push(p1.y);
-			currentLayer.pathVertex.push(p1.z);
-			currentLayer.pathVertex.push(p2.x);
-			currentLayer.pathVertex.push(p2.y);
-			currentLayer.pathVertex.push(p2.z);
-			
 		}
 
 		if ( line.extruding ) {
 
 			box.min.set( Math.min( box.min.x, p2.x ), Math.min( box.min.y, p2.y ), Math.min( box.min.z, p2.z ) );
 			box.max.set( Math.max( box.max.x, p2.x ), Math.max( box.max.y, p2.y ), Math.max( box.max.z, p2.z ) );
-		
+
 		}
 
 	}
@@ -108,22 +98,23 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 	var lines = data.replace( /;.+/g,'' ).split( '\n' );
 
 	for ( var i = 0; i < lines.length; i ++ ) {
+
 		var tokens = lines[ i ].split( ' ' );
-		var cmd = tokens[0].toUpperCase();
+		var cmd = tokens[ 0 ].toUpperCase();
 
 		//Argumments
 		var args = {};
-		tokens.splice( 1 ).forEach( function ( token ) { 
+		tokens.splice( 1 ).forEach( function ( token ) {
 
-			if ( token[0] !== undefined ) {
+			if ( token[ 0 ] !== undefined ) {
 
-				var key = token[0].toLowerCase(); 
-				var value = parseFloat( token.substring( 1 ) ); 
+				var key = token[ 0 ].toLowerCase();
+				var value = parseFloat( token.substring( 1 ) );
 				args[ key ] = value;
 
 			}
 
-		} ); 
+		} );
 
 		//Process commands
 		//G0/G1 – Linear Movement
@@ -152,27 +143,25 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 			addSegment( state, line );
 			state = line;
-		}
-		//G2/G3 - Arc Movement ( G2 clock wise and G3 counter clock wise )
-		else if ( cmd === 'G2' || cmd === 'G3' ) {
 
+		} else if ( cmd === 'G2' || cmd === 'G3' ) {
+
+			//G2/G3 - Arc Movement ( G2 clock wise and G3 counter clock wise )
 			console.warn( 'THREE.GCodeLoader: Arc command not supported' );
-		}
-		//G90: Set to Absolute Positioning
-		else if ( cmd === 'G90' ) {
 
+		} else if ( cmd === 'G90' ) {
+
+			//G90: Set to Absolute Positioning
 			state.relative = false;
 
-		}
-		//G91: Set to state.relative Positioning
-		else if ( cmd === 'G91' ) {
+		} else if ( cmd === 'G91' ) {
 
+			//G91: Set to state.relative Positioning
 			state.relative = true;
 
-		}
-		//G92: Set Position
-		else if ( cmd === 'G92' ) {
+		} else if ( cmd === 'G92' ) {
 
+			//G92: Set Position
 			var line = state;
 			line.x = args.x !== undefined ? args.x : line.x;
 			line.y = args.y !== undefined ? args.y : line.y;
@@ -180,18 +169,18 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 			line.e = args.e !== undefined ? args.e : line.e;
 			state = line;
 
-		}
-		else {
+		} else {
 
 			console.warn( 'THREE.GCodeLoader: Command not supported:' + cmd );
 
 		}
+
 	}
 
-	function addObject(vertex, extruding) {
+	function addObject( vertex, extruding ) {
 
 		var geometry = new THREE.BufferGeometry();
-		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertex ), 3 ) );
+		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertex, 3 ) );
 
 		var segments = new THREE.LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
 		segments.name = 'layer' + i;
@@ -199,10 +188,10 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 	}
 
-	var object = new THREE.Object3D();
+	var object = new THREE.Group();
 	object.name = 'gcode';
 
-	if( this.splitLayer ) {
+	if ( this.splitLayer ) {
 
 		for ( var i = 0; i < layers.length; i ++ ) {
 
@@ -212,8 +201,7 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 		}
 
-	}
-	else {
+	} else {
 
 		var vertex = [], pathVertex = [];
 
@@ -221,16 +209,18 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 			var layer = layers[ i ];
 
-			vertex = vertex.concat(layer.vertex);
-			pathVertex = pathVertex.concat(layer.pathVertex);
+			vertex = vertex.concat( layer.vertex );
+			pathVertex = pathVertex.concat( layer.pathVertex );
 
 		}
 
 		addObject( vertex, true );
 		addObject( pathVertex, false );
+
 	}
 
-	object.rotation.set( -Math.PI / 2, 0, 0 );
+	object.rotation.set( - Math.PI / 2, 0, 0 );
 
 	return object;
+
 };
