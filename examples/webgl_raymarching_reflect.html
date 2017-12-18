@@ -263,8 +263,6 @@
 			var canvas;
 			var stats;
 
-			var clock = new THREE.Clock();
-
 			var config = {
 				saveImage: function () {
 
@@ -325,13 +323,11 @@
 
 			function render( timestamp ) {
 
-				var delta = clock.getDelta();
-
 				stats.begin();
 
 				if ( config.orbitControls ) {
 
-					controls.update( delta );
+					controls.update();
 
 				} else {
 
