@@ -2317,10 +2317,10 @@ THREE.GLTFLoader = ( function () {
 
 							for ( var j = 0, jl = outputAccessor.count; j < jl; j += 3 ) {
 
-								outputAccessorValues[ j / 3 ] = outputAccessor.getX( j + 1 );
-								if ( itemSize > 1 ) outputAccessorValues[ j / 3 + 1 ] = outputAccessor.getY( j + 1 );
-								if ( itemSize > 2 ) outputAccessorValues[ j / 3 + 2 ] = outputAccessor.getZ( j + 1 );
-								if ( itemSize > 3 ) outputAccessorValues[ j / 3 + 3 ] = outputAccessor.getW( j + 1 );
+								outputAccessorValues[ j * itemSize / 3 ] = outputAccessor.getX( j + 1 );
+								if ( itemSize > 1 ) outputAccessorValues[ j * itemSize / 3 + 1 ] = outputAccessor.getY( j + 1 );
+								if ( itemSize > 2 ) outputAccessorValues[ j * itemSize / 3 + 2 ] = outputAccessor.getZ( j + 1 );
+								if ( itemSize > 3 ) outputAccessorValues[ j * itemSize / 3 + 3 ] = outputAccessor.getW( j + 1 );
 
 							}
 
