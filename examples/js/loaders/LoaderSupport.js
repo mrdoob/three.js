@@ -277,7 +277,7 @@ THREE.LoaderSupport.ResourceDescriptor = (function () {
 		if ( urlParts.length < 2 ) {
 
 			this.path = null;
-			this.name = this.name = url;
+			this.name = url;
 			this.url = url;
 
 		} else {
@@ -989,7 +989,7 @@ THREE.LoaderSupport.WorkerRunnerRefImpl = (function () {
  */
 THREE.LoaderSupport.WorkerSupport = (function () {
 
-	var WORKER_SUPPORT_VERSION = '2.0.0';
+	var WORKER_SUPPORT_VERSION = '2.0.1';
 
 	var Validator = THREE.LoaderSupport.Validator;
 
@@ -1110,7 +1110,15 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 		LoaderWorker.prototype._postMessage = function () {
 			if ( Validator.isValid( this.queuedMessage ) && Validator.isValid( this.worker ) ) {
 
-				this.worker.postMessage( this.queuedMessage );
+				if ( this.queuedMessage.data.input instanceof ArrayBuffer ) {
+
+					this.worker.postMessage( this.queuedMessage, [ this.queuedMessage.data.input ] );
+
+				} else {
+
+					this.worker.postMessage( this.queuedMessage );
+
+				}
 
 			}
 		};
