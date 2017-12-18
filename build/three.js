@@ -185,7 +185,7 @@
 
 	} );
 
-	var REVISION = '89dev';
+	var REVISION = '89';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 	var CullFaceNone = 0;
 	var CullFaceBack = 1;
@@ -10804,7 +10804,8 @@
 					geometries: {},
 					materials: {},
 					textures: {},
-					images: {}
+					images: {},
+					shapes: {}
 				};
 
 				output.metadata = {
@@ -10847,6 +10848,30 @@
 			if ( this.geometry !== undefined ) {
 
 				object.geometry = serialize( meta.geometries, this.geometry );
+
+				var parameters = this.geometry.parameters;
+
+				if ( parameters !== undefined && parameters.shapes !== undefined ) {
+
+					var shapes = parameters.shapes;
+
+					if ( Array.isArray( shapes ) ) {
+
+						for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+
+							var shape = shapes[ i ];
+
+							serialize( meta.shapes, shape );
+
+						}
+
+					} else {
+
+						serialize( meta.shapes, shapes );
+
+					}
+
+				}
 
 			}
 
@@ -10892,11 +10917,13 @@
 				var materials = extractFromCache( meta.materials );
 				var textures = extractFromCache( meta.textures );
 				var images = extractFromCache( meta.images );
+				var shapes = extractFromCache( meta.shapes );
 
 				if ( geometries.length > 0 ) output.geometries = geometries;
 				if ( materials.length > 0 ) output.materials = materials;
 				if ( textures.length > 0 ) output.textures = textures;
 				if ( images.length > 0 ) output.images = images;
+				if ( shapes.length > 0 ) output.shapes = shapes;
 
 			}
 
@@ -28903,6 +28930,16 @@
 	ShapeGeometry.prototype = Object.create( Geometry.prototype );
 	ShapeGeometry.prototype.constructor = ShapeGeometry;
 
+	ShapeGeometry.prototype.toJSON = function () {
+
+		var data = Geometry.prototype.toJSON.call( this );
+
+		var shapes = this.parameters.shapes;
+
+		return toJSON( shapes, data );
+
+	};
+
 	// ShapeBufferGeometry
 
 	function ShapeBufferGeometry( shapes, curveSegments ) {
@@ -29037,6 +29074,42 @@
 
 	ShapeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	ShapeBufferGeometry.prototype.constructor = ShapeBufferGeometry;
+
+	ShapeBufferGeometry.prototype.toJSON = function () {
+
+		var data = BufferGeometry.prototype.toJSON.call( this );
+
+		var shapes = this.parameters.shapes;
+
+		return toJSON( shapes, data );
+
+	};
+
+	//
+
+	function toJSON( shapes, data ) {
+
+		data.shapes = [];
+
+		if ( Array.isArray( shapes ) ) {
+
+			for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+
+				var shape = shapes[ i ];
+
+				data.shapes.push( shape.uuid );
+
+			}
+
+		} else {
+
+			data.shapes.push( shapes.uuid );
+
+		}
+
+		return data;
+
+	}
 
 	/**
 	 * @author WestLangley / http://github.com/WestLangley
@@ -31292,6 +31365,2009 @@
 		setPath: function ( value ) {
 
 			this.path = value;
+			return this;
+
+		}
+
+	} );
+
+	/**
+	 * @author zz85 / http://www.lab4games.net/zz85/blog
+	 * Extensible curve object
+	 *
+	 * Some common of curve methods:
+	 * .getPoint( t, optionalTarget ), .getTangent( t )
+	 * .getPointAt( u, optionalTarget ), .getTangentAt( u )
+	 * .getPoints(), .getSpacedPoints()
+	 * .getLength()
+	 * .updateArcLengths()
+	 *
+	 * This following curves inherit from THREE.Curve:
+	 *
+	 * -- 2D curves --
+	 * THREE.ArcCurve
+	 * THREE.CubicBezierCurve
+	 * THREE.EllipseCurve
+	 * THREE.LineCurve
+	 * THREE.QuadraticBezierCurve
+	 * THREE.SplineCurve
+	 *
+	 * -- 3D curves --
+	 * THREE.CatmullRomCurve3
+	 * THREE.CubicBezierCurve3
+	 * THREE.LineCurve3
+	 * THREE.QuadraticBezierCurve3
+	 *
+	 * A series of curves can be represented as a THREE.CurvePath.
+	 *
+	 **/
+
+	/**************************************************************
+	 *	Abstract Curve base class
+	 **************************************************************/
+
+	function Curve() {
+
+		this.type = 'Curve';
+
+		this.arcLengthDivisions = 200;
+
+	}
+
+	Object.assign( Curve.prototype, {
+
+		// Virtual base class method to overwrite and implement in subclasses
+		//	- t [0 .. 1]
+
+		getPoint: function ( /* t, optionalTarget */ ) {
+
+			console.warn( 'THREE.Curve: .getPoint() not implemented.' );
+			return null;
+
+		},
+
+		// Get point at relative position in curve according to arc length
+		// - u [0 .. 1]
+
+		getPointAt: function ( u, optionalTarget ) {
+
+			var t = this.getUtoTmapping( u );
+			return this.getPoint( t, optionalTarget );
+
+		},
+
+		// Get sequence of points using getPoint( t )
+
+		getPoints: function ( divisions ) {
+
+			if ( divisions === undefined ) divisions = 5;
+
+			var points = [];
+
+			for ( var d = 0; d <= divisions; d ++ ) {
+
+				points.push( this.getPoint( d / divisions ) );
+
+			}
+
+			return points;
+
+		},
+
+		// Get sequence of points using getPointAt( u )
+
+		getSpacedPoints: function ( divisions ) {
+
+			if ( divisions === undefined ) divisions = 5;
+
+			var points = [];
+
+			for ( var d = 0; d <= divisions; d ++ ) {
+
+				points.push( this.getPointAt( d / divisions ) );
+
+			}
+
+			return points;
+
+		},
+
+		// Get total curve arc length
+
+		getLength: function () {
+
+			var lengths = this.getLengths();
+			return lengths[ lengths.length - 1 ];
+
+		},
+
+		// Get list of cumulative segment lengths
+
+		getLengths: function ( divisions ) {
+
+			if ( divisions === undefined ) divisions = this.arcLengthDivisions;
+
+			if ( this.cacheArcLengths &&
+				( this.cacheArcLengths.length === divisions + 1 ) &&
+				! this.needsUpdate ) {
+
+				return this.cacheArcLengths;
+
+			}
+
+			this.needsUpdate = false;
+
+			var cache = [];
+			var current, last = this.getPoint( 0 );
+			var p, sum = 0;
+
+			cache.push( 0 );
+
+			for ( p = 1; p <= divisions; p ++ ) {
+
+				current = this.getPoint( p / divisions );
+				sum += current.distanceTo( last );
+				cache.push( sum );
+				last = current;
+
+			}
+
+			this.cacheArcLengths = cache;
+
+			return cache; // { sums: cache, sum: sum }; Sum is in the last element.
+
+		},
+
+		updateArcLengths: function () {
+
+			this.needsUpdate = true;
+			this.getLengths();
+
+		},
+
+		// Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant
+
+		getUtoTmapping: function ( u, distance ) {
+
+			var arcLengths = this.getLengths();
+
+			var i = 0, il = arcLengths.length;
+
+			var targetArcLength; // The targeted u distance value to get
+
+			if ( distance ) {
+
+				targetArcLength = distance;
+
+			} else {
+
+				targetArcLength = u * arcLengths[ il - 1 ];
+
+			}
+
+			// binary search for the index with largest value smaller than target u distance
+
+			var low = 0, high = il - 1, comparison;
+
+			while ( low <= high ) {
+
+				i = Math.floor( low + ( high - low ) / 2 ); // less likely to overflow, though probably not issue here, JS doesn't really have integers, all numbers are floats
+
+				comparison = arcLengths[ i ] - targetArcLength;
+
+				if ( comparison < 0 ) {
+
+					low = i + 1;
+
+				} else if ( comparison > 0 ) {
+
+					high = i - 1;
+
+				} else {
+
+					high = i;
+					break;
+
+					// DONE
+
+				}
+
+			}
+
+			i = high;
+
+			if ( arcLengths[ i ] === targetArcLength ) {
+
+				return i / ( il - 1 );
+
+			}
+
+			// we could get finer grain at lengths, or use simple interpolation between two points
+
+			var lengthBefore = arcLengths[ i ];
+			var lengthAfter = arcLengths[ i + 1 ];
+
+			var segmentLength = lengthAfter - lengthBefore;
+
+			// determine where we are between the 'before' and 'after' points
+
+			var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
+
+			// add that fractional amount to t
+
+			var t = ( i + segmentFraction ) / ( il - 1 );
+
+			return t;
+
+		},
+
+		// Returns a unit vector tangent at t
+		// In case any sub curve does not implement its tangent derivation,
+		// 2 points a small delta apart will be used to find its gradient
+		// which seems to give a reasonable approximation
+
+		getTangent: function ( t ) {
+
+			var delta = 0.0001;
+			var t1 = t - delta;
+			var t2 = t + delta;
+
+			// Capping in case of danger
+
+			if ( t1 < 0 ) t1 = 0;
+			if ( t2 > 1 ) t2 = 1;
+
+			var pt1 = this.getPoint( t1 );
+			var pt2 = this.getPoint( t2 );
+
+			var vec = pt2.clone().sub( pt1 );
+			return vec.normalize();
+
+		},
+
+		getTangentAt: function ( u ) {
+
+			var t = this.getUtoTmapping( u );
+			return this.getTangent( t );
+
+		},
+
+		computeFrenetFrames: function ( segments, closed ) {
+
+			// see http://www.cs.indiana.edu/pub/techreports/TR425.pdf
+
+			var normal = new Vector3();
+
+			var tangents = [];
+			var normals = [];
+			var binormals = [];
+
+			var vec = new Vector3();
+			var mat = new Matrix4();
+
+			var i, u, theta;
+
+			// compute the tangent vectors for each segment on the curve
+
+			for ( i = 0; i <= segments; i ++ ) {
+
+				u = i / segments;
+
+				tangents[ i ] = this.getTangentAt( u );
+				tangents[ i ].normalize();
+
+			}
+
+			// select an initial normal vector perpendicular to the first tangent vector,
+			// and in the direction of the minimum tangent xyz component
+
+			normals[ 0 ] = new Vector3();
+			binormals[ 0 ] = new Vector3();
+			var min = Number.MAX_VALUE;
+			var tx = Math.abs( tangents[ 0 ].x );
+			var ty = Math.abs( tangents[ 0 ].y );
+			var tz = Math.abs( tangents[ 0 ].z );
+
+			if ( tx <= min ) {
+
+				min = tx;
+				normal.set( 1, 0, 0 );
+
+			}
+
+			if ( ty <= min ) {
+
+				min = ty;
+				normal.set( 0, 1, 0 );
+
+			}
+
+			if ( tz <= min ) {
+
+				normal.set( 0, 0, 1 );
+
+			}
+
+			vec.crossVectors( tangents[ 0 ], normal ).normalize();
+
+			normals[ 0 ].crossVectors( tangents[ 0 ], vec );
+			binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
+
+
+			// compute the slowly-varying normal and binormal vectors for each segment on the curve
+
+			for ( i = 1; i <= segments; i ++ ) {
+
+				normals[ i ] = normals[ i - 1 ].clone();
+
+				binormals[ i ] = binormals[ i - 1 ].clone();
+
+				vec.crossVectors( tangents[ i - 1 ], tangents[ i ] );
+
+				if ( vec.length() > Number.EPSILON ) {
+
+					vec.normalize();
+
+					theta = Math.acos( _Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+
+					normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
+
+				}
+
+				binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
+
+			}
+
+			// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
+
+			if ( closed === true ) {
+
+				theta = Math.acos( _Math.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
+				theta /= segments;
+
+				if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ segments ] ) ) > 0 ) {
+
+					theta = - theta;
+
+				}
+
+				for ( i = 1; i <= segments; i ++ ) {
+
+					// twist a little...
+					normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
+					binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
+
+				}
+
+			}
+
+			return {
+				tangents: tangents,
+				normals: normals,
+				binormals: binormals
+			};
+
+		},
+
+		clone: function () {
+
+			return new this.constructor().copy( this );
+
+		},
+
+		copy: function ( source ) {
+
+			this.arcLengthDivisions = source.arcLengthDivisions;
+
+			return this;
+
+		},
+
+		toJSON: function () {
+
+			var data = {
+				metadata: {
+					version: 4.5,
+					type: 'Curve',
+					generator: 'Curve.toJSON'
+				}
+			};
+
+			data.arcLengthDivisions = this.arcLengthDivisions;
+			data.type = this.type;
+
+			return data;
+
+		},
+
+		fromJSON: function ( json ) {
+
+			this.arcLengthDivisions = json.arcLengthDivisions;
+
+			return this;
+
+		}
+
+	} );
+
+	function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
+
+		Curve.call( this );
+
+		this.type = 'EllipseCurve';
+
+		this.aX = aX || 0;
+		this.aY = aY || 0;
+
+		this.xRadius = xRadius || 1;
+		this.yRadius = yRadius || 1;
+
+		this.aStartAngle = aStartAngle || 0;
+		this.aEndAngle = aEndAngle || 2 * Math.PI;
+
+		this.aClockwise = aClockwise || false;
+
+		this.aRotation = aRotation || 0;
+
+	}
+
+	EllipseCurve.prototype = Object.create( Curve.prototype );
+	EllipseCurve.prototype.constructor = EllipseCurve;
+
+	EllipseCurve.prototype.isEllipseCurve = true;
+
+	EllipseCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+		var point = optionalTarget || new Vector2();
+
+		var twoPi = Math.PI * 2;
+		var deltaAngle = this.aEndAngle - this.aStartAngle;
+		var samePoints = Math.abs( deltaAngle ) < Number.EPSILON;
+
+		// ensures that deltaAngle is 0 .. 2 PI
+		while ( deltaAngle < 0 ) deltaAngle += twoPi;
+		while ( deltaAngle > twoPi ) deltaAngle -= twoPi;
+
+		if ( deltaAngle < Number.EPSILON ) {
+
+			if ( samePoints ) {
+
+				deltaAngle = 0;
+
+			} else {
+
+				deltaAngle = twoPi;
+
+			}
+
+		}
+
+		if ( this.aClockwise === true && ! samePoints ) {
+
+			if ( deltaAngle === twoPi ) {
+
+				deltaAngle = - twoPi;
+
+			} else {
+
+				deltaAngle = deltaAngle - twoPi;
+
+			}
+
+		}
+
+		var angle = this.aStartAngle + t * deltaAngle;
+		var x = this.aX + this.xRadius * Math.cos( angle );
+		var y = this.aY + this.yRadius * Math.sin( angle );
+
+		if ( this.aRotation !== 0 ) {
+
+			var cos = Math.cos( this.aRotation );
+			var sin = Math.sin( this.aRotation );
+
+			var tx = x - this.aX;
+			var ty = y - this.aY;
+
+			// Rotate the point about the center of the ellipse.
+			x = tx * cos - ty * sin + this.aX;
+			y = tx * sin + ty * cos + this.aY;
+
+		}
+
+		return point.set( x, y );
+
+	};
+
+	EllipseCurve.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.aX = source.aX;
+		this.aY = source.aY;
+
+		this.xRadius = source.xRadius;
+		this.yRadius = source.yRadius;
+
+		this.aStartAngle = source.aStartAngle;
+		this.aEndAngle = source.aEndAngle;
+
+		this.aClockwise = source.aClockwise;
+
+		this.aRotation = source.aRotation;
+
+		return this;
+
+	};
+
+
+	EllipseCurve.prototype.toJSON = function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.aX = this.aX;
+		data.aY = this.aY;
+
+		data.xRadius = this.xRadius;
+		data.yRadius = this.yRadius;
+
+		data.aStartAngle = this.aStartAngle;
+		data.aEndAngle = this.aEndAngle;
+
+		data.aClockwise = this.aClockwise;
+
+		data.aRotation = this.aRotation;
+
+		return data;
+
+	};
+
+	EllipseCurve.prototype.fromJSON = function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.aX = json.aX;
+		this.aY = json.aY;
+
+		this.xRadius = json.xRadius;
+		this.yRadius = json.yRadius;
+
+		this.aStartAngle = json.aStartAngle;
+		this.aEndAngle = json.aEndAngle;
+
+		this.aClockwise = json.aClockwise;
+
+		this.aRotation = json.aRotation;
+
+		return this;
+
+	};
+
+	function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
+
+		EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+
+		this.type = 'ArcCurve';
+
+	}
+
+	ArcCurve.prototype = Object.create( EllipseCurve.prototype );
+	ArcCurve.prototype.constructor = ArcCurve;
+
+	ArcCurve.prototype.isArcCurve = true;
+
+	/**
+	 * @author zz85 https://github.com/zz85
+	 *
+	 * Centripetal CatmullRom Curve - which is useful for avoiding
+	 * cusps and self-intersections in non-uniform catmull rom curves.
+	 * http://www.cemyuksel.com/research/catmullrom_param/catmullrom.pdf
+	 *
+	 * curve.type accepts centripetal(default), chordal and catmullrom
+	 * curve.tension is used for catmullrom which defaults to 0.5
+	 */
+
+
+	/*
+	Based on an optimized c++ solution in
+	 - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
+	 - http://ideone.com/NoEbVM
+
+	This CubicPoly class could be used for reusing some variables and calculations,
+	but for three.js curve use, it could be possible inlined and flatten into a single function call
+	which can be placed in CurveUtils.
+	*/
+
+	function CubicPoly() {
+
+		var c0 = 0, c1 = 0, c2 = 0, c3 = 0;
+
+		/*
+		 * Compute coefficients for a cubic polynomial
+		 *   p(s) = c0 + c1*s + c2*s^2 + c3*s^3
+		 * such that
+		 *   p(0) = x0, p(1) = x1
+		 *  and
+		 *   p'(0) = t0, p'(1) = t1.
+		 */
+		function init( x0, x1, t0, t1 ) {
+
+			c0 = x0;
+			c1 = t0;
+			c2 = - 3 * x0 + 3 * x1 - 2 * t0 - t1;
+			c3 = 2 * x0 - 2 * x1 + t0 + t1;
+
+		}
+
+		return {
+
+			initCatmullRom: function ( x0, x1, x2, x3, tension ) {
+
+				init( x1, x2, tension * ( x2 - x0 ), tension * ( x3 - x1 ) );
+
+			},
+
+			initNonuniformCatmullRom: function ( x0, x1, x2, x3, dt0, dt1, dt2 ) {
+
+				// compute tangents when parameterized in [t1,t2]
+				var t1 = ( x1 - x0 ) / dt0 - ( x2 - x0 ) / ( dt0 + dt1 ) + ( x2 - x1 ) / dt1;
+				var t2 = ( x2 - x1 ) / dt1 - ( x3 - x1 ) / ( dt1 + dt2 ) + ( x3 - x2 ) / dt2;
+
+				// rescale tangents for parametrization in [0,1]
+				t1 *= dt1;
+				t2 *= dt1;
+
+				init( x1, x2, t1, t2 );
+
+			},
+
+			calc: function ( t ) {
+
+				var t2 = t * t;
+				var t3 = t2 * t;
+				return c0 + c1 * t + c2 * t2 + c3 * t3;
+
+			}
+
+		};
+
+	}
+
+	//
+
+	var tmp = new Vector3();
+	var px = new CubicPoly();
+	var py = new CubicPoly();
+	var pz = new CubicPoly();
+
+	function CatmullRomCurve3( points, closed, curveType, tension ) {
+
+		Curve.call( this );
+
+		this.type = 'CatmullRomCurve3';
+
+		this.points = points || [];
+		this.closed = closed || false;
+		this.curveType = curveType || 'centripetal';
+		this.tension = tension || 0.5;
+
+	}
+
+	CatmullRomCurve3.prototype = Object.create( Curve.prototype );
+	CatmullRomCurve3.prototype.constructor = CatmullRomCurve3;
+
+	CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
+
+	CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+
+		var point = optionalTarget || new Vector3();
+
+		var points = this.points;
+		var l = points.length;
+
+		var p = ( l - ( this.closed ? 0 : 1 ) ) * t;
+		var intPoint = Math.floor( p );
+		var weight = p - intPoint;
+
+		if ( this.closed ) {
+
+			intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
+
+		} else if ( weight === 0 && intPoint === l - 1 ) {
+
+			intPoint = l - 2;
+			weight = 1;
+
+		}
+
+		var p0, p1, p2, p3; // 4 points
+
+		if ( this.closed || intPoint > 0 ) {
+
+			p0 = points[ ( intPoint - 1 ) % l ];
+
+		} else {
+
+			// extrapolate first point
+			tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
+			p0 = tmp;
+
+		}
+
+		p1 = points[ intPoint % l ];
+		p2 = points[ ( intPoint + 1 ) % l ];
+
+		if ( this.closed || intPoint + 2 < l ) {
+
+			p3 = points[ ( intPoint + 2 ) % l ];
+
+		} else {
+
+			// extrapolate last point
+			tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
+			p3 = tmp;
+
+		}
+
+		if ( this.curveType === 'centripetal' || this.curveType === 'chordal' ) {
+
+			// init Centripetal / Chordal Catmull-Rom
+			var pow = this.curveType === 'chordal' ? 0.5 : 0.25;
+			var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
+			var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
+			var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
+
+			// safety check for repeated points
+			if ( dt1 < 1e-4 ) dt1 = 1.0;
+			if ( dt0 < 1e-4 ) dt0 = dt1;
+			if ( dt2 < 1e-4 ) dt2 = dt1;
+
+			px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
+			py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
+			pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
+
+		} else if ( this.curveType === 'catmullrom' ) {
+
+			px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, this.tension );
+			py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, this.tension );
+			pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, this.tension );
+
+		}
+
+		point.set(
+			px.calc( weight ),
+			py.calc( weight ),
+			pz.calc( weight )
+		);
+
+		return point;
+
+	};
+
+	CatmullRomCurve3.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.points = [];
+
+		for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+
+			var point = source.points[ i ];
+
+			this.points.push( point.clone() );
+
+		}
+
+		this.closed = source.closed;
+		this.curveType = source.curveType;
+		this.tension = source.tension;
+
+		return this;
+
+	};
+
+	CatmullRomCurve3.prototype.toJSON = function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.points = [];
+
+		for ( var i = 0, l = this.points.length; i < l; i ++ ) {
+
+			var point = this.points[ i ];
+			data.points.push( point.toArray() );
+
+		}
+
+		data.closed = this.closed;
+		data.curveType = this.curveType;
+		data.tension = this.tension;
+
+		return data;
+
+	};
+
+	CatmullRomCurve3.prototype.fromJSON = function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.points = [];
+
+		for ( var i = 0, l = json.points.length; i < l; i ++ ) {
+
+			var point = json.points[ i ];
+			this.points.push( new Vector3().fromArray( point ) );
+
+		}
+
+		this.closed = json.closed;
+		this.curveType = json.curveType;
+		this.tension = json.tension;
+
+		return this;
+
+	};
+
+	/**
+	 * @author zz85 / http://www.lab4games.net/zz85/blog
+	 *
+	 * Bezier Curves formulas obtained from
+	 * http://en.wikipedia.org/wiki/Bézier_curve
+	 */
+
+	function CatmullRom( t, p0, p1, p2, p3 ) {
+
+		var v0 = ( p2 - p0 ) * 0.5;
+		var v1 = ( p3 - p1 ) * 0.5;
+		var t2 = t * t;
+		var t3 = t * t2;
+		return ( 2 * p1 - 2 * p2 + v0 + v1 ) * t3 + ( - 3 * p1 + 3 * p2 - 2 * v0 - v1 ) * t2 + v0 * t + p1;
+
+	}
+
+	//
+
+	function QuadraticBezierP0( t, p ) {
+
+		var k = 1 - t;
+		return k * k * p;
+
+	}
+
+	function QuadraticBezierP1( t, p ) {
+
+		return 2 * ( 1 - t ) * t * p;
+
+	}
+
+	function QuadraticBezierP2( t, p ) {
+
+		return t * t * p;
+
+	}
+
+	function QuadraticBezier( t, p0, p1, p2 ) {
+
+		return QuadraticBezierP0( t, p0 ) + QuadraticBezierP1( t, p1 ) +
+			QuadraticBezierP2( t, p2 );
+
+	}
+
+	//
+
+	function CubicBezierP0( t, p ) {
+
+		var k = 1 - t;
+		return k * k * k * p;
+
+	}
+
+	function CubicBezierP1( t, p ) {
+
+		var k = 1 - t;
+		return 3 * k * k * t * p;
+
+	}
+
+	function CubicBezierP2( t, p ) {
+
+		return 3 * ( 1 - t ) * t * t * p;
+
+	}
+
+	function CubicBezierP3( t, p ) {
+
+		return t * t * t * p;
+
+	}
+
+	function CubicBezier( t, p0, p1, p2, p3 ) {
+
+		return CubicBezierP0( t, p0 ) + CubicBezierP1( t, p1 ) + CubicBezierP2( t, p2 ) +
+			CubicBezierP3( t, p3 );
+
+	}
+
+	function CubicBezierCurve( v0, v1, v2, v3 ) {
+
+		Curve.call( this );
+
+		this.type = 'CubicBezierCurve';
+
+		this.v0 = v0 || new Vector2();
+		this.v1 = v1 || new Vector2();
+		this.v2 = v2 || new Vector2();
+		this.v3 = v3 || new Vector2();
+
+	}
+
+	CubicBezierCurve.prototype = Object.create( Curve.prototype );
+	CubicBezierCurve.prototype.constructor = CubicBezierCurve;
+
+	CubicBezierCurve.prototype.isCubicBezierCurve = true;
+
+	CubicBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+		var point = optionalTarget || new Vector2();
+
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+
+		point.set(
+			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+			CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
+		);
+
+		return point;
+
+	};
+
+	CubicBezierCurve.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v0.copy( source.v0 );
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+		this.v3.copy( source.v3 );
+
+		return this;
+
+	};
+
+	CubicBezierCurve.prototype.toJSON = function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.v0 = this.v0.toArray();
+		data.v1 = this.v1.toArray();
+		data.v2 = this.v2.toArray();
+		data.v3 = this.v3.toArray();
+
+		return data;
+
+	};
+
+	CubicBezierCurve.prototype.fromJSON = function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.v0.fromArray( json.v0 );
+		this.v1.fromArray( json.v1 );
+		this.v2.fromArray( json.v2 );
+		this.v3.fromArray( json.v3 );
+
+		return this;
+
+	};
+
+	function CubicBezierCurve3( v0, v1, v2, v3 ) {
+
+		Curve.call( this );
+
+		this.type = 'CubicBezierCurve3';
+
+		this.v0 = v0 || new Vector3();
+		this.v1 = v1 || new Vector3();
+		this.v2 = v2 || new Vector3();
+		this.v3 = v3 || new Vector3();
+
+	}
+
+	CubicBezierCurve3.prototype = Object.create( Curve.prototype );
+	CubicBezierCurve3.prototype.constructor = CubicBezierCurve3;
+
+	CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
+
+	CubicBezierCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+
+		var point = optionalTarget || new Vector3();
+
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+
+		point.set(
+			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+			CubicBezier( t, v0.y, v1.y, v2.y, v3.y ),
+			CubicBezier( t, v0.z, v1.z, v2.z, v3.z )
+		);
+
+		return point;
+
+	};
+
+	CubicBezierCurve3.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v0.copy( source.v0 );
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+		this.v3.copy( source.v3 );
+
+		return this;
+
+	};
+
+	CubicBezierCurve3.prototype.toJSON = function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.v0 = this.v0.toArray();
+		data.v1 = this.v1.toArray();
+		data.v2 = this.v2.toArray();
+		data.v3 = this.v3.toArray();
+
+		return data;
+
+	};
+
+	CubicBezierCurve3.prototype.fromJSON = function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.v0.fromArray( json.v0 );
+		this.v1.fromArray( json.v1 );
+		this.v2.fromArray( json.v2 );
+		this.v3.fromArray( json.v3 );
+
+		return this;
+
+	};
+
+	function LineCurve( v1, v2 ) {
+
+		Curve.call( this );
+
+		this.type = 'LineCurve';
+
+		this.v1 = v1 || new Vector2();
+		this.v2 = v2 || new Vector2();
+
+	}
+
+	LineCurve.prototype = Object.create( Curve.prototype );
+	LineCurve.prototype.constructor = LineCurve;
+
+	LineCurve.prototype.isLineCurve = true;
+
+	LineCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+		var point = optionalTarget || new Vector2();
+
+		if ( t === 1 ) {
+
+			point.copy( this.v2 );
+
+		} else {
+
+			point.copy( this.v2 ).sub( this.v1 );
+			point.multiplyScalar( t ).add( this.v1 );
+
+		}
+
+		return point;
+
+	};
+
+	// Line curve is linear, so we can overwrite default getPointAt
+
+	LineCurve.prototype.getPointAt = function ( u, optionalTarget ) {
+
+		return this.getPoint( u, optionalTarget );
+
+	};
+
+	LineCurve.prototype.getTangent = function ( /* t */ ) {
+
+		var tangent = this.v2.clone().sub( this.v1 );
+
+		return tangent.normalize();
+
+	};
+
+	LineCurve.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+
+		return this;
+
+	};
+
+	LineCurve.prototype.toJSON = function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.v1 = this.v1.toArray();
+		data.v2 = this.v2.toArray();
+
+		return data;
+
+	};
+
+	LineCurve.prototype.fromJSON = function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.v1.fromArray( json.v1 );
+		this.v2.fromArray( json.v2 );
+
+		return this;
+
+	};
+
+	function LineCurve3( v1, v2 ) {
+
+		Curve.call( this );
+
+		this.type = 'LineCurve3';
+
+		this.v1 = v1 || new Vector3();
+		this.v2 = v2 || new Vector3();
+
+	}
+
+	LineCurve3.prototype = Object.create( Curve.prototype );
+	LineCurve3.prototype.constructor = LineCurve3;
+
+	LineCurve3.prototype.isLineCurve3 = true;
+
+	LineCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+
+		var point = optionalTarget || new Vector3();
+
+		if ( t === 1 ) {
+
+			point.copy( this.v2 );
+
+		} else {
+
+			point.copy( this.v2 ).sub( this.v1 );
+			point.multiplyScalar( t ).add( this.v1 );
+
+		}
+
+		return point;
+
+	};
+
+	// Line curve is linear, so we can overwrite default getPointAt
+
+	LineCurve3.prototype.getPointAt = function ( u, optionalTarget ) {
+
+		return this.getPoint( u, optionalTarget );
+
+	};
+
+	LineCurve3.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+
+		return this;
+
+	};
+
+	LineCurve3.prototype.toJSON = function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.v1 = this.v1.toArray();
+		data.v2 = this.v2.toArray();
+
+		return data;
+
+	};
+
+	LineCurve3.prototype.fromJSON = function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.v1.fromArray( json.v1 );
+		this.v2.fromArray( json.v2 );
+
+		return this;
+
+	};
+
+	function QuadraticBezierCurve( v0, v1, v2 ) {
+
+		Curve.call( this );
+
+		this.type = 'QuadraticBezierCurve';
+
+		this.v0 = v0 || new Vector2();
+		this.v1 = v1 || new Vector2();
+		this.v2 = v2 || new Vector2();
+
+	}
+
+	QuadraticBezierCurve.prototype = Object.create( Curve.prototype );
+	QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
+
+	QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
+
+	QuadraticBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+		var point = optionalTarget || new Vector2();
+
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
+
+		point.set(
+			QuadraticBezier( t, v0.x, v1.x, v2.x ),
+			QuadraticBezier( t, v0.y, v1.y, v2.y )
+		);
+
+		return point;
+
+	};
+
+	QuadraticBezierCurve.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v0.copy( source.v0 );
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+
+		return this;
+
+	};
+
+	QuadraticBezierCurve.prototype.toJSON = function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.v0 = this.v0.toArray();
+		data.v1 = this.v1.toArray();
+		data.v2 = this.v2.toArray();
+
+		return data;
+
+	};
+
+	QuadraticBezierCurve.prototype.fromJSON = function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.v0.fromArray( json.v0 );
+		this.v1.fromArray( json.v1 );
+		this.v2.fromArray( json.v2 );
+
+		return this;
+
+	};
+
+	function QuadraticBezierCurve3( v0, v1, v2 ) {
+
+		Curve.call( this );
+
+		this.type = 'QuadraticBezierCurve3';
+
+		this.v0 = v0 || new Vector3();
+		this.v1 = v1 || new Vector3();
+		this.v2 = v2 || new Vector3();
+
+	}
+
+	QuadraticBezierCurve3.prototype = Object.create( Curve.prototype );
+	QuadraticBezierCurve3.prototype.constructor = QuadraticBezierCurve3;
+
+	QuadraticBezierCurve3.prototype.isQuadraticBezierCurve3 = true;
+
+	QuadraticBezierCurve3.prototype.getPoint = function ( t, optionalTarget ) {
+
+		var point = optionalTarget || new Vector3();
+
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
+
+		point.set(
+			QuadraticBezier( t, v0.x, v1.x, v2.x ),
+			QuadraticBezier( t, v0.y, v1.y, v2.y ),
+			QuadraticBezier( t, v0.z, v1.z, v2.z )
+		);
+
+		return point;
+
+	};
+
+	QuadraticBezierCurve3.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.v0.copy( source.v0 );
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
+
+		return this;
+
+	};
+
+	QuadraticBezierCurve3.prototype.toJSON = function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.v0 = this.v0.toArray();
+		data.v1 = this.v1.toArray();
+		data.v2 = this.v2.toArray();
+
+		return data;
+
+	};
+
+	QuadraticBezierCurve3.prototype.fromJSON = function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.v0.fromArray( json.v0 );
+		this.v1.fromArray( json.v1 );
+		this.v2.fromArray( json.v2 );
+
+		return this;
+
+	};
+
+	function SplineCurve( points /* array of Vector2 */ ) {
+
+		Curve.call( this );
+
+		this.type = 'SplineCurve';
+
+		this.points = points || [];
+
+	}
+
+	SplineCurve.prototype = Object.create( Curve.prototype );
+	SplineCurve.prototype.constructor = SplineCurve;
+
+	SplineCurve.prototype.isSplineCurve = true;
+
+	SplineCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+		var point = optionalTarget || new Vector2();
+
+		var points = this.points;
+		var p = ( points.length - 1 ) * t;
+
+		var intPoint = Math.floor( p );
+		var weight = p - intPoint;
+
+		var p0 = points[ intPoint === 0 ? intPoint : intPoint - 1 ];
+		var p1 = points[ intPoint ];
+		var p2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
+		var p3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
+
+		point.set(
+			CatmullRom( weight, p0.x, p1.x, p2.x, p3.x ),
+			CatmullRom( weight, p0.y, p1.y, p2.y, p3.y )
+		);
+
+		return point;
+
+	};
+
+	SplineCurve.prototype.copy = function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.points = [];
+
+		for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+
+			var point = source.points[ i ];
+
+			this.points.push( point.clone() );
+
+		}
+
+		return this;
+
+	};
+
+	SplineCurve.prototype.toJSON = function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.points = [];
+
+		for ( var i = 0, l = this.points.length; i < l; i ++ ) {
+
+			var point = this.points[ i ];
+			data.points.push( point.toArray() );
+
+		}
+
+		return data;
+
+	};
+
+	SplineCurve.prototype.fromJSON = function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.points = [];
+
+		for ( var i = 0, l = json.points.length; i < l; i ++ ) {
+
+			var point = json.points[ i ];
+			this.points.push( new Vector2().fromArray( point ) );
+
+		}
+
+		return this;
+
+	};
+
+
+
+	var Curves = Object.freeze({
+		ArcCurve: ArcCurve,
+		CatmullRomCurve3: CatmullRomCurve3,
+		CubicBezierCurve: CubicBezierCurve,
+		CubicBezierCurve3: CubicBezierCurve3,
+		EllipseCurve: EllipseCurve,
+		LineCurve: LineCurve,
+		LineCurve3: LineCurve3,
+		QuadraticBezierCurve: QuadraticBezierCurve,
+		QuadraticBezierCurve3: QuadraticBezierCurve3,
+		SplineCurve: SplineCurve
+	});
+
+	/**
+	 * @author zz85 / http://www.lab4games.net/zz85/blog
+	 *
+	 **/
+
+	/**************************************************************
+	 *	Curved Path - a curve path is simply a array of connected
+	 *  curves, but retains the api of a curve
+	 **************************************************************/
+
+	function CurvePath() {
+
+		Curve.call( this );
+
+		this.type = 'CurvePath';
+
+		this.curves = [];
+		this.autoClose = false; // Automatically closes the path
+
+	}
+
+	CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
+
+		constructor: CurvePath,
+
+		add: function ( curve ) {
+
+			this.curves.push( curve );
+
+		},
+
+		closePath: function () {
+
+			// Add a line curve if start and end of lines are not connected
+			var startPoint = this.curves[ 0 ].getPoint( 0 );
+			var endPoint = this.curves[ this.curves.length - 1 ].getPoint( 1 );
+
+			if ( ! startPoint.equals( endPoint ) ) {
+
+				this.curves.push( new LineCurve( endPoint, startPoint ) );
+
+			}
+
+		},
+
+		// To get accurate point with reference to
+		// entire path distance at time t,
+		// following has to be done:
+
+		// 1. Length of each sub path have to be known
+		// 2. Locate and identify type of curve
+		// 3. Get t for the curve
+		// 4. Return curve.getPointAt(t')
+
+		getPoint: function ( t ) {
+
+			var d = t * this.getLength();
+			var curveLengths = this.getCurveLengths();
+			var i = 0;
+
+			// To think about boundaries points.
+
+			while ( i < curveLengths.length ) {
+
+				if ( curveLengths[ i ] >= d ) {
+
+					var diff = curveLengths[ i ] - d;
+					var curve = this.curves[ i ];
+
+					var segmentLength = curve.getLength();
+					var u = segmentLength === 0 ? 0 : 1 - diff / segmentLength;
+
+					return curve.getPointAt( u );
+
+				}
+
+				i ++;
+
+			}
+
+			return null;
+
+			// loop where sum != 0, sum > d , sum+1 <d
+
+		},
+
+		// We cannot use the default THREE.Curve getPoint() with getLength() because in
+		// THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
+		// getPoint() depends on getLength
+
+		getLength: function () {
+
+			var lens = this.getCurveLengths();
+			return lens[ lens.length - 1 ];
+
+		},
+
+		// cacheLengths must be recalculated.
+		updateArcLengths: function () {
+
+			this.needsUpdate = true;
+			this.cacheLengths = null;
+			this.getCurveLengths();
+
+		},
+
+		// Compute lengths and cache them
+		// We cannot overwrite getLengths() because UtoT mapping uses it.
+
+		getCurveLengths: function () {
+
+			// We use cache values if curves and cache array are same length
+
+			if ( this.cacheLengths && this.cacheLengths.length === this.curves.length ) {
+
+				return this.cacheLengths;
+
+			}
+
+			// Get length of sub-curve
+			// Push sums into cached array
+
+			var lengths = [], sums = 0;
+
+			for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
+
+				sums += this.curves[ i ].getLength();
+				lengths.push( sums );
+
+			}
+
+			this.cacheLengths = lengths;
+
+			return lengths;
+
+		},
+
+		getSpacedPoints: function ( divisions ) {
+
+			if ( divisions === undefined ) divisions = 40;
+
+			var points = [];
+
+			for ( var i = 0; i <= divisions; i ++ ) {
+
+				points.push( this.getPoint( i / divisions ) );
+
+			}
+
+			if ( this.autoClose ) {
+
+				points.push( points[ 0 ] );
+
+			}
+
+			return points;
+
+		},
+
+		getPoints: function ( divisions ) {
+
+			divisions = divisions || 12;
+
+			var points = [], last;
+
+			for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
+
+				var curve = curves[ i ];
+				var resolution = ( curve && curve.isEllipseCurve ) ? divisions * 2
+					: ( curve && curve.isLineCurve ) ? 1
+						: ( curve && curve.isSplineCurve ) ? divisions * curve.points.length
+							: divisions;
+
+				var pts = curve.getPoints( resolution );
+
+				for ( var j = 0; j < pts.length; j ++ ) {
+
+					var point = pts[ j ];
+
+					if ( last && last.equals( point ) ) continue; // ensures no consecutive points are duplicates
+
+					points.push( point );
+					last = point;
+
+				}
+
+			}
+
+			if ( this.autoClose && points.length > 1 && ! points[ points.length - 1 ].equals( points[ 0 ] ) ) {
+
+				points.push( points[ 0 ] );
+
+			}
+
+			return points;
+
+		},
+
+		copy: function ( source ) {
+
+			Curve.prototype.copy.call( this, source );
+
+			this.curves = [];
+
+			for ( var i = 0, l = source.curves.length; i < l; i ++ ) {
+
+				var curve = source.curves[ i ];
+
+				this.curves.push( curve.clone() );
+
+			}
+
+			this.autoClose = source.autoClose;
+
+			return this;
+
+		},
+
+		toJSON: function () {
+
+			var data = Curve.prototype.toJSON.call( this );
+
+			data.autoClose = this.autoClose;
+			data.curves = [];
+
+			for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
+
+				var curve = this.curves[ i ];
+				data.curves.push( curve.toJSON() );
+
+			}
+
+			return data;
+
+		},
+
+		fromJSON: function ( json ) {
+
+			Curve.prototype.fromJSON.call( this, json );
+
+			this.autoClose = json.autoClose;
+			this.curves = [];
+
+			for ( var i = 0, l = json.curves.length; i < l; i ++ ) {
+
+				var curve = json.curves[ i ];
+				this.curves.push( new Curves[ curve.type ]().fromJSON( curve ) );
+
+			}
+
+			return this;
+
+		}
+
+	} );
+
+	/**
+	 * @author zz85 / http://www.lab4games.net/zz85/blog
+	 * Creates free form 2d path using series of points, lines or curves.
+	 **/
+
+	function Path( points ) {
+
+		CurvePath.call( this );
+
+		this.type = 'Path';
+
+		this.currentPoint = new Vector2();
+
+		if ( points ) {
+
+			this.setFromPoints( points );
+
+		}
+
+	}
+
+	Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
+
+		constructor: Path,
+
+		setFromPoints: function ( points ) {
+
+			this.moveTo( points[ 0 ].x, points[ 0 ].y );
+
+			for ( var i = 1, l = points.length; i < l; i ++ ) {
+
+				this.lineTo( points[ i ].x, points[ i ].y );
+
+			}
+
+		},
+
+		moveTo: function ( x, y ) {
+
+			this.currentPoint.set( x, y ); // TODO consider referencing vectors instead of copying?
+
+		},
+
+		lineTo: function ( x, y ) {
+
+			var curve = new LineCurve( this.currentPoint.clone(), new Vector2( x, y ) );
+			this.curves.push( curve );
+
+			this.currentPoint.set( x, y );
+
+		},
+
+		quadraticCurveTo: function ( aCPx, aCPy, aX, aY ) {
+
+			var curve = new QuadraticBezierCurve(
+				this.currentPoint.clone(),
+				new Vector2( aCPx, aCPy ),
+				new Vector2( aX, aY )
+			);
+
+			this.curves.push( curve );
+
+			this.currentPoint.set( aX, aY );
+
+		},
+
+		bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
+
+			var curve = new CubicBezierCurve(
+				this.currentPoint.clone(),
+				new Vector2( aCP1x, aCP1y ),
+				new Vector2( aCP2x, aCP2y ),
+				new Vector2( aX, aY )
+			);
+
+			this.curves.push( curve );
+
+			this.currentPoint.set( aX, aY );
+
+		},
+
+		splineThru: function ( pts /*Array of Vector*/ ) {
+
+			var npts = [ this.currentPoint.clone() ].concat( pts );
+
+			var curve = new SplineCurve( npts );
+			this.curves.push( curve );
+
+			this.currentPoint.copy( pts[ pts.length - 1 ] );
+
+		},
+
+		arc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
+
+			var x0 = this.currentPoint.x;
+			var y0 = this.currentPoint.y;
+
+			this.absarc( aX + x0, aY + y0, aRadius,
+				aStartAngle, aEndAngle, aClockwise );
+
+		},
+
+		absarc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
+
+			this.absellipse( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+
+		},
+
+		ellipse: function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
+
+			var x0 = this.currentPoint.x;
+			var y0 = this.currentPoint.y;
+
+			this.absellipse( aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
+
+		},
+
+		absellipse: function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
+
+			var curve = new EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
+
+			if ( this.curves.length > 0 ) {
+
+				// if a previous curve is present, attempt to join
+				var firstPoint = curve.getPoint( 0 );
+
+				if ( ! firstPoint.equals( this.currentPoint ) ) {
+
+					this.lineTo( firstPoint.x, firstPoint.y );
+
+				}
+
+			}
+
+			this.curves.push( curve );
+
+			var lastPoint = curve.getPoint( 1 );
+			this.currentPoint.copy( lastPoint );
+
+		},
+
+		copy: function ( source ) {
+
+			CurvePath.prototype.copy.call( this, source );
+
+			this.currentPoint.copy( source.currentPoint );
+
+			return this;
+
+		},
+
+		toJSON: function () {
+
+			var data = CurvePath.prototype.toJSON.call( this );
+
+			data.currentPoint = this.currentPoint.toArray();
+
+			return data;
+
+		},
+
+		fromJSON: function ( json ) {
+
+			CurvePath.prototype.fromJSON.call( this, json );
+
+			this.currentPoint.fromArray( json.currentPoint );
+
+			return this;
+
+		}
+
+	} );
+
+	/**
+	 * @author zz85 / http://www.lab4games.net/zz85/blog
+	 * Defines a 2d shape plane using paths.
+	 **/
+
+	// STEP 1 Create a path.
+	// STEP 2 Turn path into shape.
+	// STEP 3 ExtrudeGeometry takes in Shape/Shapes
+	// STEP 3a - Extract points from each shape, turn to vertices
+	// STEP 3b - Triangulate each shape, add faces.
+
+	function Shape( points ) {
+
+		Path.call( this, points );
+
+		this.uuid = _Math.generateUUID();
+
+		this.type = 'Shape';
+
+		this.holes = [];
+
+	}
+
+	Shape.prototype = Object.assign( Object.create( Path.prototype ), {
+
+		constructor: Shape,
+
+		getPointsHoles: function ( divisions ) {
+
+			var holesPts = [];
+
+			for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
+
+				holesPts[ i ] = this.holes[ i ].getPoints( divisions );
+
+			}
+
+			return holesPts;
+
+		},
+
+		// get points of shape and holes (keypoints based on segments parameter)
+
+		extractPoints: function ( divisions ) {
+
+			return {
+
+				shape: this.getPoints( divisions ),
+				holes: this.getPointsHoles( divisions )
+
+			};
+
+		},
+
+		copy: function ( source ) {
+
+			Path.prototype.copy.call( this, source );
+
+			this.holes = [];
+
+			for ( var i = 0, l = source.holes.length; i < l; i ++ ) {
+
+				var hole = source.holes[ i ];
+
+				this.holes.push( hole.clone() );
+
+			}
+
+			return this;
+
+		},
+
+		toJSON: function () {
+
+			var data = Path.prototype.toJSON.call( this );
+
+			data.uuid = this.uuid;
+			data.holes = [];
+
+			for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
+
+				var hole = this.holes[ i ];
+				data.holes.push( hole.toJSON() );
+
+			}
+
+			return data;
+
+		},
+
+		fromJSON: function ( json ) {
+
+			Path.prototype.fromJSON.call( this, json );
+
+			this.uuid = json.uuid;
+			this.holes = [];
+
+			for ( var i = 0, l = json.holes.length; i < l; i ++ ) {
+
+				var hole = json.holes[ i ];
+				this.holes.push( new Path().fromJSON( hole ) );
+
+			}
+
 			return this;
 
 		}
@@ -34728,7 +36804,8 @@
 
 		parse: function ( json, onLoad ) {
 
-			var geometries = this.parseGeometries( json.geometries );
+			var shapes = this.parseShape( json.shapes );
+			var geometries = this.parseGeometries( json.geometries, shapes );
 
 			var images = this.parseImages( json.images, function () {
 
@@ -34757,7 +36834,27 @@
 
 		},
 
-		parseGeometries: function ( json ) {
+		parseShape: function ( json ) {
+
+			var shapes = {};
+
+			if ( json !== undefined ) {
+
+				for ( var i = 0, l = json.length; i < l; i ++ ) {
+
+					var shape = new Shape().fromJSON( json[ i ] );
+
+					shapes[ shape.uuid ] = shape;
+
+				}
+
+			}
+
+			return shapes;
+
+		},
+
+		parseGeometries: function ( json, shapes ) {
 
 			var geometries = {};
 
@@ -34935,6 +37032,26 @@
 								data.indices,
 								data.radius,
 								data.details
+							);
+
+							break;
+
+						case 'ShapeGeometry':
+						case 'ShapeBufferGeometry':
+
+							var geometryShapes = [];
+
+							for ( var i = 0, l = data.shapes.length; i < l; i ++ ) {
+
+								var shape = shapes[ data.shapes[ i ] ];
+
+								geometryShapes.push( shape );
+
+							}
+
+							geometry = new Geometries[ data.type ](
+								geometryShapes,
+								data.curveSegments
 							);
 
 							break;
@@ -35554,1243 +37671,6 @@
 		}
 
 	};
-
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 *
-	 * Bezier Curves formulas obtained from
-	 * http://en.wikipedia.org/wiki/Bézier_curve
-	 */
-
-	function CatmullRom( t, p0, p1, p2, p3 ) {
-
-		var v0 = ( p2 - p0 ) * 0.5;
-		var v1 = ( p3 - p1 ) * 0.5;
-		var t2 = t * t;
-		var t3 = t * t2;
-		return ( 2 * p1 - 2 * p2 + v0 + v1 ) * t3 + ( - 3 * p1 + 3 * p2 - 2 * v0 - v1 ) * t2 + v0 * t + p1;
-
-	}
-
-	//
-
-	function QuadraticBezierP0( t, p ) {
-
-		var k = 1 - t;
-		return k * k * p;
-
-	}
-
-	function QuadraticBezierP1( t, p ) {
-
-		return 2 * ( 1 - t ) * t * p;
-
-	}
-
-	function QuadraticBezierP2( t, p ) {
-
-		return t * t * p;
-
-	}
-
-	function QuadraticBezier( t, p0, p1, p2 ) {
-
-		return QuadraticBezierP0( t, p0 ) + QuadraticBezierP1( t, p1 ) +
-			QuadraticBezierP2( t, p2 );
-
-	}
-
-	//
-
-	function CubicBezierP0( t, p ) {
-
-		var k = 1 - t;
-		return k * k * k * p;
-
-	}
-
-	function CubicBezierP1( t, p ) {
-
-		var k = 1 - t;
-		return 3 * k * k * t * p;
-
-	}
-
-	function CubicBezierP2( t, p ) {
-
-		return 3 * ( 1 - t ) * t * t * p;
-
-	}
-
-	function CubicBezierP3( t, p ) {
-
-		return t * t * t * p;
-
-	}
-
-	function CubicBezier( t, p0, p1, p2, p3 ) {
-
-		return CubicBezierP0( t, p0 ) + CubicBezierP1( t, p1 ) + CubicBezierP2( t, p2 ) +
-			CubicBezierP3( t, p3 );
-
-	}
-
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * Extensible curve object
-	 *
-	 * Some common of curve methods:
-	 * .getPoint( t, optionalTarget ), .getTangent( t )
-	 * .getPointAt( u, optionalTarget ), .getTangentAt( u )
-	 * .getPoints(), .getSpacedPoints()
-	 * .getLength()
-	 * .updateArcLengths()
-	 *
-	 * This following curves inherit from THREE.Curve:
-	 *
-	 * -- 2D curves --
-	 * THREE.ArcCurve
-	 * THREE.CubicBezierCurve
-	 * THREE.EllipseCurve
-	 * THREE.LineCurve
-	 * THREE.QuadraticBezierCurve
-	 * THREE.SplineCurve
-	 *
-	 * -- 3D curves --
-	 * THREE.CatmullRomCurve3
-	 * THREE.CubicBezierCurve3
-	 * THREE.LineCurve3
-	 * THREE.QuadraticBezierCurve3
-	 *
-	 * A series of curves can be represented as a THREE.CurvePath.
-	 *
-	 **/
-
-	/**************************************************************
-	 *	Abstract Curve base class
-	 **************************************************************/
-
-	function Curve() {
-
-		this.type = 'Curve';
-
-		this.arcLengthDivisions = 200;
-
-	}
-
-	Object.assign( Curve.prototype, {
-
-		// Virtual base class method to overwrite and implement in subclasses
-		//	- t [0 .. 1]
-
-		getPoint: function ( /* t, optionalTarget */ ) {
-
-			console.warn( 'THREE.Curve: .getPoint() not implemented.' );
-			return null;
-
-		},
-
-		// Get point at relative position in curve according to arc length
-		// - u [0 .. 1]
-
-		getPointAt: function ( u, optionalTarget ) {
-
-			var t = this.getUtoTmapping( u );
-			return this.getPoint( t, optionalTarget );
-
-		},
-
-		// Get sequence of points using getPoint( t )
-
-		getPoints: function ( divisions ) {
-
-			if ( divisions === undefined ) divisions = 5;
-
-			var points = [];
-
-			for ( var d = 0; d <= divisions; d ++ ) {
-
-				points.push( this.getPoint( d / divisions ) );
-
-			}
-
-			return points;
-
-		},
-
-		// Get sequence of points using getPointAt( u )
-
-		getSpacedPoints: function ( divisions ) {
-
-			if ( divisions === undefined ) divisions = 5;
-
-			var points = [];
-
-			for ( var d = 0; d <= divisions; d ++ ) {
-
-				points.push( this.getPointAt( d / divisions ) );
-
-			}
-
-			return points;
-
-		},
-
-		// Get total curve arc length
-
-		getLength: function () {
-
-			var lengths = this.getLengths();
-			return lengths[ lengths.length - 1 ];
-
-		},
-
-		// Get list of cumulative segment lengths
-
-		getLengths: function ( divisions ) {
-
-			if ( divisions === undefined ) divisions = this.arcLengthDivisions;
-
-			if ( this.cacheArcLengths &&
-				( this.cacheArcLengths.length === divisions + 1 ) &&
-				! this.needsUpdate ) {
-
-				return this.cacheArcLengths;
-
-			}
-
-			this.needsUpdate = false;
-
-			var cache = [];
-			var current, last = this.getPoint( 0 );
-			var p, sum = 0;
-
-			cache.push( 0 );
-
-			for ( p = 1; p <= divisions; p ++ ) {
-
-				current = this.getPoint( p / divisions );
-				sum += current.distanceTo( last );
-				cache.push( sum );
-				last = current;
-
-			}
-
-			this.cacheArcLengths = cache;
-
-			return cache; // { sums: cache, sum: sum }; Sum is in the last element.
-
-		},
-
-		updateArcLengths: function () {
-
-			this.needsUpdate = true;
-			this.getLengths();
-
-		},
-
-		// Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant
-
-		getUtoTmapping: function ( u, distance ) {
-
-			var arcLengths = this.getLengths();
-
-			var i = 0, il = arcLengths.length;
-
-			var targetArcLength; // The targeted u distance value to get
-
-			if ( distance ) {
-
-				targetArcLength = distance;
-
-			} else {
-
-				targetArcLength = u * arcLengths[ il - 1 ];
-
-			}
-
-			// binary search for the index with largest value smaller than target u distance
-
-			var low = 0, high = il - 1, comparison;
-
-			while ( low <= high ) {
-
-				i = Math.floor( low + ( high - low ) / 2 ); // less likely to overflow, though probably not issue here, JS doesn't really have integers, all numbers are floats
-
-				comparison = arcLengths[ i ] - targetArcLength;
-
-				if ( comparison < 0 ) {
-
-					low = i + 1;
-
-				} else if ( comparison > 0 ) {
-
-					high = i - 1;
-
-				} else {
-
-					high = i;
-					break;
-
-					// DONE
-
-				}
-
-			}
-
-			i = high;
-
-			if ( arcLengths[ i ] === targetArcLength ) {
-
-				return i / ( il - 1 );
-
-			}
-
-			// we could get finer grain at lengths, or use simple interpolation between two points
-
-			var lengthBefore = arcLengths[ i ];
-			var lengthAfter = arcLengths[ i + 1 ];
-
-			var segmentLength = lengthAfter - lengthBefore;
-
-			// determine where we are between the 'before' and 'after' points
-
-			var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
-
-			// add that fractional amount to t
-
-			var t = ( i + segmentFraction ) / ( il - 1 );
-
-			return t;
-
-		},
-
-		// Returns a unit vector tangent at t
-		// In case any sub curve does not implement its tangent derivation,
-		// 2 points a small delta apart will be used to find its gradient
-		// which seems to give a reasonable approximation
-
-		getTangent: function ( t ) {
-
-			var delta = 0.0001;
-			var t1 = t - delta;
-			var t2 = t + delta;
-
-			// Capping in case of danger
-
-			if ( t1 < 0 ) t1 = 0;
-			if ( t2 > 1 ) t2 = 1;
-
-			var pt1 = this.getPoint( t1 );
-			var pt2 = this.getPoint( t2 );
-
-			var vec = pt2.clone().sub( pt1 );
-			return vec.normalize();
-
-		},
-
-		getTangentAt: function ( u ) {
-
-			var t = this.getUtoTmapping( u );
-			return this.getTangent( t );
-
-		},
-
-		computeFrenetFrames: function ( segments, closed ) {
-
-			// see http://www.cs.indiana.edu/pub/techreports/TR425.pdf
-
-			var normal = new Vector3();
-
-			var tangents = [];
-			var normals = [];
-			var binormals = [];
-
-			var vec = new Vector3();
-			var mat = new Matrix4();
-
-			var i, u, theta;
-
-			// compute the tangent vectors for each segment on the curve
-
-			for ( i = 0; i <= segments; i ++ ) {
-
-				u = i / segments;
-
-				tangents[ i ] = this.getTangentAt( u );
-				tangents[ i ].normalize();
-
-			}
-
-			// select an initial normal vector perpendicular to the first tangent vector,
-			// and in the direction of the minimum tangent xyz component
-
-			normals[ 0 ] = new Vector3();
-			binormals[ 0 ] = new Vector3();
-			var min = Number.MAX_VALUE;
-			var tx = Math.abs( tangents[ 0 ].x );
-			var ty = Math.abs( tangents[ 0 ].y );
-			var tz = Math.abs( tangents[ 0 ].z );
-
-			if ( tx <= min ) {
-
-				min = tx;
-				normal.set( 1, 0, 0 );
-
-			}
-
-			if ( ty <= min ) {
-
-				min = ty;
-				normal.set( 0, 1, 0 );
-
-			}
-
-			if ( tz <= min ) {
-
-				normal.set( 0, 0, 1 );
-
-			}
-
-			vec.crossVectors( tangents[ 0 ], normal ).normalize();
-
-			normals[ 0 ].crossVectors( tangents[ 0 ], vec );
-			binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
-
-
-			// compute the slowly-varying normal and binormal vectors for each segment on the curve
-
-			for ( i = 1; i <= segments; i ++ ) {
-
-				normals[ i ] = normals[ i - 1 ].clone();
-
-				binormals[ i ] = binormals[ i - 1 ].clone();
-
-				vec.crossVectors( tangents[ i - 1 ], tangents[ i ] );
-
-				if ( vec.length() > Number.EPSILON ) {
-
-					vec.normalize();
-
-					theta = Math.acos( _Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
-
-					normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
-
-				}
-
-				binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
-
-			}
-
-			// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
-
-			if ( closed === true ) {
-
-				theta = Math.acos( _Math.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
-				theta /= segments;
-
-				if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ segments ] ) ) > 0 ) {
-
-					theta = - theta;
-
-				}
-
-				for ( i = 1; i <= segments; i ++ ) {
-
-					// twist a little...
-					normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
-					binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
-
-				}
-
-			}
-
-			return {
-				tangents: tangents,
-				normals: normals,
-				binormals: binormals
-			};
-
-		},
-
-		clone: function () {
-
-			return new this.constructor().copy( this );
-
-		},
-
-		copy: function ( source ) {
-
-			this.arcLengthDivisions = source.arcLengthDivisions;
-
-			return this;
-
-		}
-
-	} );
-
-	function LineCurve( v1, v2 ) {
-
-		Curve.call( this );
-
-		this.type = 'LineCurve';
-
-		this.v1 = v1 || new Vector2();
-		this.v2 = v2 || new Vector2();
-
-	}
-
-	LineCurve.prototype = Object.create( Curve.prototype );
-	LineCurve.prototype.constructor = LineCurve;
-
-	LineCurve.prototype.isLineCurve = true;
-
-	LineCurve.prototype.getPoint = function ( t, optionalTarget ) {
-
-		var point = optionalTarget || new Vector2();
-
-		if ( t === 1 ) {
-
-			point.copy( this.v2 );
-
-		} else {
-
-			point.copy( this.v2 ).sub( this.v1 );
-			point.multiplyScalar( t ).add( this.v1 );
-
-		}
-
-		return point;
-
-	};
-
-	// Line curve is linear, so we can overwrite default getPointAt
-
-	LineCurve.prototype.getPointAt = function ( u, optionalTarget ) {
-
-		return this.getPoint( u, optionalTarget );
-
-	};
-
-	LineCurve.prototype.getTangent = function ( /* t */ ) {
-
-		var tangent = this.v2.clone().sub( this.v1 );
-
-		return tangent.normalize();
-
-	};
-
-	LineCurve.prototype.copy = function ( source ) {
-
-		Curve.prototype.copy.call( this, source );
-
-		this.v1.copy( source.v1 );
-		this.v2.copy( source.v2 );
-
-		return this;
-
-	};
-
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 *
-	 **/
-
-	/**************************************************************
-	 *	Curved Path - a curve path is simply a array of connected
-	 *  curves, but retains the api of a curve
-	 **************************************************************/
-
-	function CurvePath() {
-
-		Curve.call( this );
-
-		this.type = 'CurvePath';
-
-		this.curves = [];
-		this.autoClose = false; // Automatically closes the path
-
-	}
-
-	CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
-
-		constructor: CurvePath,
-
-		add: function ( curve ) {
-
-			this.curves.push( curve );
-
-		},
-
-		closePath: function () {
-
-			// Add a line curve if start and end of lines are not connected
-			var startPoint = this.curves[ 0 ].getPoint( 0 );
-			var endPoint = this.curves[ this.curves.length - 1 ].getPoint( 1 );
-
-			if ( ! startPoint.equals( endPoint ) ) {
-
-				this.curves.push( new LineCurve( endPoint, startPoint ) );
-
-			}
-
-		},
-
-		// To get accurate point with reference to
-		// entire path distance at time t,
-		// following has to be done:
-
-		// 1. Length of each sub path have to be known
-		// 2. Locate and identify type of curve
-		// 3. Get t for the curve
-		// 4. Return curve.getPointAt(t')
-
-		getPoint: function ( t ) {
-
-			var d = t * this.getLength();
-			var curveLengths = this.getCurveLengths();
-			var i = 0;
-
-			// To think about boundaries points.
-
-			while ( i < curveLengths.length ) {
-
-				if ( curveLengths[ i ] >= d ) {
-
-					var diff = curveLengths[ i ] - d;
-					var curve = this.curves[ i ];
-
-					var segmentLength = curve.getLength();
-					var u = segmentLength === 0 ? 0 : 1 - diff / segmentLength;
-
-					return curve.getPointAt( u );
-
-				}
-
-				i ++;
-
-			}
-
-			return null;
-
-			// loop where sum != 0, sum > d , sum+1 <d
-
-		},
-
-		// We cannot use the default THREE.Curve getPoint() with getLength() because in
-		// THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
-		// getPoint() depends on getLength
-
-		getLength: function () {
-
-			var lens = this.getCurveLengths();
-			return lens[ lens.length - 1 ];
-
-		},
-
-		// cacheLengths must be recalculated.
-		updateArcLengths: function () {
-
-			this.needsUpdate = true;
-			this.cacheLengths = null;
-			this.getCurveLengths();
-
-		},
-
-		// Compute lengths and cache them
-		// We cannot overwrite getLengths() because UtoT mapping uses it.
-
-		getCurveLengths: function () {
-
-			// We use cache values if curves and cache array are same length
-
-			if ( this.cacheLengths && this.cacheLengths.length === this.curves.length ) {
-
-				return this.cacheLengths;
-
-			}
-
-			// Get length of sub-curve
-			// Push sums into cached array
-
-			var lengths = [], sums = 0;
-
-			for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
-
-				sums += this.curves[ i ].getLength();
-				lengths.push( sums );
-
-			}
-
-			this.cacheLengths = lengths;
-
-			return lengths;
-
-		},
-
-		getSpacedPoints: function ( divisions ) {
-
-			if ( divisions === undefined ) divisions = 40;
-
-			var points = [];
-
-			for ( var i = 0; i <= divisions; i ++ ) {
-
-				points.push( this.getPoint( i / divisions ) );
-
-			}
-
-			if ( this.autoClose ) {
-
-				points.push( points[ 0 ] );
-
-			}
-
-			return points;
-
-		},
-
-		getPoints: function ( divisions ) {
-
-			divisions = divisions || 12;
-
-			var points = [], last;
-
-			for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
-
-				var curve = curves[ i ];
-				var resolution = ( curve && curve.isEllipseCurve ) ? divisions * 2
-					: ( curve && curve.isLineCurve ) ? 1
-						: ( curve && curve.isSplineCurve ) ? divisions * curve.points.length
-							: divisions;
-
-				var pts = curve.getPoints( resolution );
-
-				for ( var j = 0; j < pts.length; j ++ ) {
-
-					var point = pts[ j ];
-
-					if ( last && last.equals( point ) ) continue; // ensures no consecutive points are duplicates
-
-					points.push( point );
-					last = point;
-
-				}
-
-			}
-
-			if ( this.autoClose && points.length > 1 && ! points[ points.length - 1 ].equals( points[ 0 ] ) ) {
-
-				points.push( points[ 0 ] );
-
-			}
-
-			return points;
-
-		},
-
-		copy: function ( source ) {
-
-			Curve.prototype.copy.call( this, source );
-
-			this.curves = [];
-
-			for ( var i = 0, l = source.curves.length; i < l; i ++ ) {
-
-				var curve = source.curves[ i ];
-
-				this.curves.push( curve.clone() );
-
-			}
-
-			this.autoClose = source.autoClose;
-
-			return this;
-
-		}
-
-	} );
-
-	function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
-
-		Curve.call( this );
-
-		this.type = 'EllipseCurve';
-
-		this.aX = aX || 0;
-		this.aY = aY || 0;
-
-		this.xRadius = xRadius || 1;
-		this.yRadius = yRadius || 1;
-
-		this.aStartAngle = aStartAngle || 0;
-		this.aEndAngle = aEndAngle || 2 * Math.PI;
-
-		this.aClockwise = aClockwise || false;
-
-		this.aRotation = aRotation || 0;
-
-	}
-
-	EllipseCurve.prototype = Object.create( Curve.prototype );
-	EllipseCurve.prototype.constructor = EllipseCurve;
-
-	EllipseCurve.prototype.isEllipseCurve = true;
-
-	EllipseCurve.prototype.getPoint = function ( t, optionalTarget ) {
-
-		var point = optionalTarget || new Vector2();
-
-		var twoPi = Math.PI * 2;
-		var deltaAngle = this.aEndAngle - this.aStartAngle;
-		var samePoints = Math.abs( deltaAngle ) < Number.EPSILON;
-
-		// ensures that deltaAngle is 0 .. 2 PI
-		while ( deltaAngle < 0 ) deltaAngle += twoPi;
-		while ( deltaAngle > twoPi ) deltaAngle -= twoPi;
-
-		if ( deltaAngle < Number.EPSILON ) {
-
-			if ( samePoints ) {
-
-				deltaAngle = 0;
-
-			} else {
-
-				deltaAngle = twoPi;
-
-			}
-
-		}
-
-		if ( this.aClockwise === true && ! samePoints ) {
-
-			if ( deltaAngle === twoPi ) {
-
-				deltaAngle = - twoPi;
-
-			} else {
-
-				deltaAngle = deltaAngle - twoPi;
-
-			}
-
-		}
-
-		var angle = this.aStartAngle + t * deltaAngle;
-		var x = this.aX + this.xRadius * Math.cos( angle );
-		var y = this.aY + this.yRadius * Math.sin( angle );
-
-		if ( this.aRotation !== 0 ) {
-
-			var cos = Math.cos( this.aRotation );
-			var sin = Math.sin( this.aRotation );
-
-			var tx = x - this.aX;
-			var ty = y - this.aY;
-
-			// Rotate the point about the center of the ellipse.
-			x = tx * cos - ty * sin + this.aX;
-			y = tx * sin + ty * cos + this.aY;
-
-		}
-
-		return point.set( x, y );
-
-	};
-
-	EllipseCurve.prototype.copy = function ( source ) {
-
-		Curve.prototype.copy.call( this, source );
-
-		this.aX = source.aX;
-		this.aY = source.aY;
-
-		this.xRadius = source.xRadius;
-		this.yRadius = source.yRadius;
-
-		this.aStartAngle = source.aStartAngle;
-		this.aEndAngle = source.aEndAngle;
-
-		this.aClockwise = source.aClockwise;
-
-		this.aRotation = source.aRotation;
-
-		return this;
-
-	};
-
-	function SplineCurve( points /* array of Vector2 */ ) {
-
-		Curve.call( this );
-
-		this.type = 'SplineCurve';
-
-		this.points = points || [];
-
-	}
-
-	SplineCurve.prototype = Object.create( Curve.prototype );
-	SplineCurve.prototype.constructor = SplineCurve;
-
-	SplineCurve.prototype.isSplineCurve = true;
-
-	SplineCurve.prototype.getPoint = function ( t, optionalTarget ) {
-
-		var point = optionalTarget || new Vector2();
-
-		var points = this.points;
-		var p = ( points.length - 1 ) * t;
-
-		var intPoint = Math.floor( p );
-		var weight = p - intPoint;
-
-		var p0 = points[ intPoint === 0 ? intPoint : intPoint - 1 ];
-		var p1 = points[ intPoint ];
-		var p2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
-		var p3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
-
-		point.set(
-			CatmullRom( weight, p0.x, p1.x, p2.x, p3.x ),
-			CatmullRom( weight, p0.y, p1.y, p2.y, p3.y )
-		);
-
-		return point;
-
-	};
-
-	SplineCurve.prototype.copy = function ( source ) {
-
-		Curve.prototype.copy.call( this, source );
-
-		this.points = [];
-
-		for ( var i = 0, l = source.points.length; i < l; i ++ ) {
-
-			var point = source.points[ i ];
-
-			this.points.push( point.clone() );
-
-		}
-
-		return this;
-
-	};
-
-	function CubicBezierCurve( v0, v1, v2, v3 ) {
-
-		Curve.call( this );
-
-		this.type = 'CubicBezierCurve';
-
-		this.v0 = v0 || new Vector2();
-		this.v1 = v1 || new Vector2();
-		this.v2 = v2 || new Vector2();
-		this.v3 = v3 || new Vector2();
-
-	}
-
-	CubicBezierCurve.prototype = Object.create( Curve.prototype );
-	CubicBezierCurve.prototype.constructor = CubicBezierCurve;
-
-	CubicBezierCurve.prototype.isCubicBezierCurve = true;
-
-	CubicBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
-
-		var point = optionalTarget || new Vector2();
-
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
-
-		point.set(
-			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
-			CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
-		);
-
-		return point;
-
-	};
-
-	CubicBezierCurve.prototype.copy = function ( source ) {
-
-		Curve.prototype.copy.call( this, source );
-
-		this.v0.copy( source.v0 );
-		this.v1.copy( source.v1 );
-		this.v2.copy( source.v2 );
-		this.v3.copy( source.v3 );
-
-		return this;
-
-	};
-
-	function QuadraticBezierCurve( v0, v1, v2 ) {
-
-		Curve.call( this );
-
-		this.type = 'QuadraticBezierCurve';
-
-		this.v0 = v0 || new Vector2();
-		this.v1 = v1 || new Vector2();
-		this.v2 = v2 || new Vector2();
-
-	}
-
-	QuadraticBezierCurve.prototype = Object.create( Curve.prototype );
-	QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
-
-	QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
-
-	QuadraticBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
-
-		var point = optionalTarget || new Vector2();
-
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
-
-		point.set(
-			QuadraticBezier( t, v0.x, v1.x, v2.x ),
-			QuadraticBezier( t, v0.y, v1.y, v2.y )
-		);
-
-		return point;
-
-	};
-
-	QuadraticBezierCurve.prototype.copy = function ( source ) {
-
-		Curve.prototype.copy.call( this, source );
-
-		this.v0.copy( source.v0 );
-		this.v1.copy( source.v1 );
-		this.v2.copy( source.v2 );
-
-		return this;
-
-	};
-
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * Creates free form 2d path using series of points, lines or curves.
-	 **/
-
-	function Path( points ) {
-
-		CurvePath.call( this );
-
-		this.type = 'Path';
-
-		this.currentPoint = new Vector2();
-
-		if ( points ) {
-
-			this.setFromPoints( points );
-
-		}
-
-	}
-
-	Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
-
-		constructor: Path,
-
-		setFromPoints: function ( points ) {
-
-			this.moveTo( points[ 0 ].x, points[ 0 ].y );
-
-			for ( var i = 1, l = points.length; i < l; i ++ ) {
-
-				this.lineTo( points[ i ].x, points[ i ].y );
-
-			}
-
-		},
-
-		moveTo: function ( x, y ) {
-
-			this.currentPoint.set( x, y ); // TODO consider referencing vectors instead of copying?
-
-		},
-
-		lineTo: function ( x, y ) {
-
-			var curve = new LineCurve( this.currentPoint.clone(), new Vector2( x, y ) );
-			this.curves.push( curve );
-
-			this.currentPoint.set( x, y );
-
-		},
-
-		quadraticCurveTo: function ( aCPx, aCPy, aX, aY ) {
-
-			var curve = new QuadraticBezierCurve(
-				this.currentPoint.clone(),
-				new Vector2( aCPx, aCPy ),
-				new Vector2( aX, aY )
-			);
-
-			this.curves.push( curve );
-
-			this.currentPoint.set( aX, aY );
-
-		},
-
-		bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
-
-			var curve = new CubicBezierCurve(
-				this.currentPoint.clone(),
-				new Vector2( aCP1x, aCP1y ),
-				new Vector2( aCP2x, aCP2y ),
-				new Vector2( aX, aY )
-			);
-
-			this.curves.push( curve );
-
-			this.currentPoint.set( aX, aY );
-
-		},
-
-		splineThru: function ( pts /*Array of Vector*/ ) {
-
-			var npts = [ this.currentPoint.clone() ].concat( pts );
-
-			var curve = new SplineCurve( npts );
-			this.curves.push( curve );
-
-			this.currentPoint.copy( pts[ pts.length - 1 ] );
-
-		},
-
-		arc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
-
-			var x0 = this.currentPoint.x;
-			var y0 = this.currentPoint.y;
-
-			this.absarc( aX + x0, aY + y0, aRadius,
-				aStartAngle, aEndAngle, aClockwise );
-
-		},
-
-		absarc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
-
-			this.absellipse( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
-
-		},
-
-		ellipse: function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
-
-			var x0 = this.currentPoint.x;
-			var y0 = this.currentPoint.y;
-
-			this.absellipse( aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
-
-		},
-
-		absellipse: function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
-
-			var curve = new EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
-
-			if ( this.curves.length > 0 ) {
-
-				// if a previous curve is present, attempt to join
-				var firstPoint = curve.getPoint( 0 );
-
-				if ( ! firstPoint.equals( this.currentPoint ) ) {
-
-					this.lineTo( firstPoint.x, firstPoint.y );
-
-				}
-
-			}
-
-			this.curves.push( curve );
-
-			var lastPoint = curve.getPoint( 1 );
-			this.currentPoint.copy( lastPoint );
-
-		},
-
-		copy: function ( source ) {
-
-			CurvePath.prototype.copy.call( this, source );
-
-			this.currentPoint.copy( source.currentPoint );
-
-			return this;
-
-		}
-
-	} );
-
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * Defines a 2d shape plane using paths.
-	 **/
-
-	// STEP 1 Create a path.
-	// STEP 2 Turn path into shape.
-	// STEP 3 ExtrudeGeometry takes in Shape/Shapes
-	// STEP 3a - Extract points from each shape, turn to vertices
-	// STEP 3b - Triangulate each shape, add faces.
-
-	function Shape( points ) {
-
-		Path.call( this, points );
-
-		this.type = 'Shape';
-
-		this.holes = [];
-
-	}
-
-	Shape.prototype = Object.assign( Object.create( Path.prototype ), {
-
-		constructor: Shape,
-
-		getPointsHoles: function ( divisions ) {
-
-			var holesPts = [];
-
-			for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
-
-				holesPts[ i ] = this.holes[ i ].getPoints( divisions );
-
-			}
-
-			return holesPts;
-
-		},
-
-		// get points of shape and holes (keypoints based on segments parameter)
-
-		extractPoints: function ( divisions ) {
-
-			return {
-
-				shape: this.getPoints( divisions ),
-				holes: this.getPointsHoles( divisions )
-
-			};
-
-		},
-
-		copy: function ( source ) {
-
-			Path.prototype.copy.call( this, source );
-
-			this.holes = [];
-
-			for ( var i = 0, l = source.holes.length; i < l; i ++ ) {
-
-				var hole = source.holes[ i ];
-
-				this.holes.push( hole.clone() );
-
-			}
-
-			return this;
-
-		}
-
-	} );
 
 	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -43023,375 +43903,6 @@
 	AxesHelper.prototype.constructor = AxesHelper;
 
 	/**
-	 * @author zz85 https://github.com/zz85
-	 *
-	 * Centripetal CatmullRom Curve - which is useful for avoiding
-	 * cusps and self-intersections in non-uniform catmull rom curves.
-	 * http://www.cemyuksel.com/research/catmullrom_param/catmullrom.pdf
-	 *
-	 * curve.type accepts centripetal(default), chordal and catmullrom
-	 * curve.tension is used for catmullrom which defaults to 0.5
-	 */
-
-
-	/*
-	Based on an optimized c++ solution in
-	 - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
-	 - http://ideone.com/NoEbVM
-
-	This CubicPoly class could be used for reusing some variables and calculations,
-	but for three.js curve use, it could be possible inlined and flatten into a single function call
-	which can be placed in CurveUtils.
-	*/
-
-	function CubicPoly() {
-
-		var c0 = 0, c1 = 0, c2 = 0, c3 = 0;
-
-		/*
-		 * Compute coefficients for a cubic polynomial
-		 *   p(s) = c0 + c1*s + c2*s^2 + c3*s^3
-		 * such that
-		 *   p(0) = x0, p(1) = x1
-		 *  and
-		 *   p'(0) = t0, p'(1) = t1.
-		 */
-		function init( x0, x1, t0, t1 ) {
-
-			c0 = x0;
-			c1 = t0;
-			c2 = - 3 * x0 + 3 * x1 - 2 * t0 - t1;
-			c3 = 2 * x0 - 2 * x1 + t0 + t1;
-
-		}
-
-		return {
-
-			initCatmullRom: function ( x0, x1, x2, x3, tension ) {
-
-				init( x1, x2, tension * ( x2 - x0 ), tension * ( x3 - x1 ) );
-
-			},
-
-			initNonuniformCatmullRom: function ( x0, x1, x2, x3, dt0, dt1, dt2 ) {
-
-				// compute tangents when parameterized in [t1,t2]
-				var t1 = ( x1 - x0 ) / dt0 - ( x2 - x0 ) / ( dt0 + dt1 ) + ( x2 - x1 ) / dt1;
-				var t2 = ( x2 - x1 ) / dt1 - ( x3 - x1 ) / ( dt1 + dt2 ) + ( x3 - x2 ) / dt2;
-
-				// rescale tangents for parametrization in [0,1]
-				t1 *= dt1;
-				t2 *= dt1;
-
-				init( x1, x2, t1, t2 );
-
-			},
-
-			calc: function ( t ) {
-
-				var t2 = t * t;
-				var t3 = t2 * t;
-				return c0 + c1 * t + c2 * t2 + c3 * t3;
-
-			}
-
-		};
-
-	}
-
-	//
-
-	var tmp = new Vector3();
-	var px = new CubicPoly();
-	var py = new CubicPoly();
-	var pz = new CubicPoly();
-
-	function CatmullRomCurve3( points, closed, curveType, tension ) {
-
-		Curve.call( this );
-
-		this.type = 'CatmullRomCurve3';
-
-		this.points = points || [];
-		this.closed = closed || false;
-		this.curveType = curveType || 'centripetal';
-		this.tension = tension || 0.5;
-
-	}
-
-	CatmullRomCurve3.prototype = Object.create( Curve.prototype );
-	CatmullRomCurve3.prototype.constructor = CatmullRomCurve3;
-
-	CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
-
-	CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
-
-		var point = optionalTarget || new Vector3();
-
-		var points = this.points;
-		var l = points.length;
-
-		var p = ( l - ( this.closed ? 0 : 1 ) ) * t;
-		var intPoint = Math.floor( p );
-		var weight = p - intPoint;
-
-		if ( this.closed ) {
-
-			intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
-
-		} else if ( weight === 0 && intPoint === l - 1 ) {
-
-			intPoint = l - 2;
-			weight = 1;
-
-		}
-
-		var p0, p1, p2, p3; // 4 points
-
-		if ( this.closed || intPoint > 0 ) {
-
-			p0 = points[ ( intPoint - 1 ) % l ];
-
-		} else {
-
-			// extrapolate first point
-			tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
-			p0 = tmp;
-
-		}
-
-		p1 = points[ intPoint % l ];
-		p2 = points[ ( intPoint + 1 ) % l ];
-
-		if ( this.closed || intPoint + 2 < l ) {
-
-			p3 = points[ ( intPoint + 2 ) % l ];
-
-		} else {
-
-			// extrapolate last point
-			tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
-			p3 = tmp;
-
-		}
-
-		if ( this.curveType === 'centripetal' || this.curveType === 'chordal' ) {
-
-			// init Centripetal / Chordal Catmull-Rom
-			var pow = this.curveType === 'chordal' ? 0.5 : 0.25;
-			var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
-			var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
-			var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
-
-			// safety check for repeated points
-			if ( dt1 < 1e-4 ) dt1 = 1.0;
-			if ( dt0 < 1e-4 ) dt0 = dt1;
-			if ( dt2 < 1e-4 ) dt2 = dt1;
-
-			px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
-			py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
-			pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
-
-		} else if ( this.curveType === 'catmullrom' ) {
-
-			px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, this.tension );
-			py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, this.tension );
-			pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, this.tension );
-
-		}
-
-		point.set(
-			px.calc( weight ),
-			py.calc( weight ),
-			pz.calc( weight )
-		);
-
-		return point;
-
-	};
-
-	CatmullRomCurve3.prototype.copy = function ( source ) {
-
-		Curve.prototype.copy.call( this, source );
-
-		this.points = [];
-
-		for ( var i = 0, l = source.points.length; i < l; i ++ ) {
-
-			var point = source.points[ i ];
-
-			this.points.push( point.clone() );
-
-		}
-
-		this.closed = source.closed;
-		this.curveType = source.curveType;
-		this.tension = source.tension;
-
-		return this;
-
-	};
-
-	function CubicBezierCurve3( v0, v1, v2, v3 ) {
-
-		Curve.call( this );
-
-		this.type = 'CubicBezierCurve3';
-
-		this.v0 = v0 || new Vector3();
-		this.v1 = v1 || new Vector3();
-		this.v2 = v2 || new Vector3();
-		this.v3 = v3 || new Vector3();
-
-	}
-
-	CubicBezierCurve3.prototype = Object.create( Curve.prototype );
-	CubicBezierCurve3.prototype.constructor = CubicBezierCurve3;
-
-	CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
-
-	CubicBezierCurve3.prototype.getPoint = function ( t, optionalTarget ) {
-
-		var point = optionalTarget || new Vector3();
-
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
-
-		point.set(
-			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
-			CubicBezier( t, v0.y, v1.y, v2.y, v3.y ),
-			CubicBezier( t, v0.z, v1.z, v2.z, v3.z )
-		);
-
-		return point;
-
-	};
-
-	CubicBezierCurve3.prototype.copy = function ( source ) {
-
-		Curve.prototype.copy.call( this, source );
-
-		this.v0.copy( source.v0 );
-		this.v1.copy( source.v1 );
-		this.v2.copy( source.v2 );
-		this.v3.copy( source.v3 );
-
-		return this;
-
-	};
-
-	function QuadraticBezierCurve3( v0, v1, v2 ) {
-
-		Curve.call( this );
-
-		this.type = 'QuadraticBezierCurve3';
-
-		this.v0 = v0 || new Vector3();
-		this.v1 = v1 || new Vector3();
-		this.v2 = v2 || new Vector3();
-
-	}
-
-	QuadraticBezierCurve3.prototype = Object.create( Curve.prototype );
-	QuadraticBezierCurve3.prototype.constructor = QuadraticBezierCurve3;
-
-	QuadraticBezierCurve3.prototype.isQuadraticBezierCurve3 = true;
-
-	QuadraticBezierCurve3.prototype.getPoint = function ( t, optionalTarget ) {
-
-		var point = optionalTarget || new Vector3();
-
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
-
-		point.set(
-			QuadraticBezier( t, v0.x, v1.x, v2.x ),
-			QuadraticBezier( t, v0.y, v1.y, v2.y ),
-			QuadraticBezier( t, v0.z, v1.z, v2.z )
-		);
-
-		return point;
-
-	};
-
-	QuadraticBezierCurve3.prototype.copy = function ( source ) {
-
-		Curve.prototype.copy.call( this, source );
-
-		this.v0.copy( source.v0 );
-		this.v1.copy( source.v1 );
-		this.v2.copy( source.v2 );
-
-		return this;
-
-	};
-
-	function LineCurve3( v1, v2 ) {
-
-		Curve.call( this );
-
-		this.type = 'LineCurve3';
-
-		this.v1 = v1 || new Vector3();
-		this.v2 = v2 || new Vector3();
-
-	}
-
-	LineCurve3.prototype = Object.create( Curve.prototype );
-	LineCurve3.prototype.constructor = LineCurve3;
-
-	LineCurve3.prototype.isLineCurve3 = true;
-
-	LineCurve3.prototype.getPoint = function ( t, optionalTarget ) {
-
-		var point = optionalTarget || new Vector3();
-
-		if ( t === 1 ) {
-
-			point.copy( this.v2 );
-
-		} else {
-
-			point.copy( this.v2 ).sub( this.v1 );
-			point.multiplyScalar( t ).add( this.v1 );
-
-		}
-
-		return point;
-
-	};
-
-	// Line curve is linear, so we can overwrite default getPointAt
-
-	LineCurve3.prototype.getPointAt = function ( u, optionalTarget ) {
-
-		return this.getPoint( u, optionalTarget );
-
-	};
-
-	LineCurve3.prototype.copy = function ( source ) {
-
-		Curve.prototype.copy.call( this, source );
-
-		this.v1.copy( source.v1 );
-		this.v2.copy( source.v2 );
-
-		return this;
-
-	};
-
-	function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
-
-		EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
-
-		this.type = 'ArcCurve';
-
-	}
-
-	ArcCurve.prototype = Object.create( EllipseCurve.prototype );
-	ArcCurve.prototype.constructor = ArcCurve;
-
-	ArcCurve.prototype.isArcCurve = true;
-
-	/**
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
@@ -45217,16 +45728,6 @@
 	exports.PlaneHelper = PlaneHelper;
 	exports.ArrowHelper = ArrowHelper;
 	exports.AxesHelper = AxesHelper;
-	exports.CatmullRomCurve3 = CatmullRomCurve3;
-	exports.CubicBezierCurve3 = CubicBezierCurve3;
-	exports.QuadraticBezierCurve3 = QuadraticBezierCurve3;
-	exports.LineCurve3 = LineCurve3;
-	exports.ArcCurve = ArcCurve;
-	exports.EllipseCurve = EllipseCurve;
-	exports.SplineCurve = SplineCurve;
-	exports.CubicBezierCurve = CubicBezierCurve;
-	exports.QuadraticBezierCurve = QuadraticBezierCurve;
-	exports.LineCurve = LineCurve;
 	exports.Shape = Shape;
 	exports.Path = Path;
 	exports.ShapePath = ShapePath;
@@ -45305,6 +45806,16 @@
 	exports.Uint8BufferAttribute = Uint8BufferAttribute;
 	exports.Int8BufferAttribute = Int8BufferAttribute;
 	exports.BufferAttribute = BufferAttribute;
+	exports.ArcCurve = ArcCurve;
+	exports.CatmullRomCurve3 = CatmullRomCurve3;
+	exports.CubicBezierCurve = CubicBezierCurve;
+	exports.CubicBezierCurve3 = CubicBezierCurve3;
+	exports.EllipseCurve = EllipseCurve;
+	exports.LineCurve = LineCurve;
+	exports.LineCurve3 = LineCurve3;
+	exports.QuadraticBezierCurve = QuadraticBezierCurve;
+	exports.QuadraticBezierCurve3 = QuadraticBezierCurve3;
+	exports.SplineCurve = SplineCurve;
 	exports.REVISION = REVISION;
 	exports.MOUSE = MOUSE;
 	exports.CullFaceNone = CullFaceNone;
