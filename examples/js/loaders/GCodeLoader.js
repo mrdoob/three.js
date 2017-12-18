@@ -21,7 +21,6 @@ THREE.GCodeLoader.prototype.load = function ( url, onLoad, onProgress, onError )
 	var self = this;
 
 	var loader = new THREE.FileLoader( self.manager );
-	loader.setPath( this.path );
 	loader.load( url, function ( text ) {
 
 		onLoad( self.parse( text ) );
