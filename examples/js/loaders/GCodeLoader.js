@@ -14,7 +14,7 @@ THREE.GCodeLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
-}
+};
 
 THREE.GCodeLoader.prototype.load = function ( url, onLoad, onProgress, onError ) {
 
@@ -54,7 +54,9 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 	function getLineGroup( line ) {
 
 		if ( currentLayer === undefined ) {
+
 			newLayer( line );
+
 		}
 
 		var grouptype = line.extruding ? 1 : 0;
@@ -146,7 +148,9 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 				line.extruding = delta( currentState.e, line.e ) > 0;
 
 				if ( currentLayer == undefined || line.z != currentLayer.z ) {
+
 					newLayer( line );
+
 				}
 
 			}
@@ -193,6 +197,7 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 	object.name = 'gcode';
 
 	for ( var i = 0; i < layers.length; i ++ ) {
+
 		var layer = layers[ i ];
 
 		for ( var j = 0; j < layer.lines.length; j ++ ) {
@@ -200,11 +205,15 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 			var line = layer.lines[ j ];
 
 			if ( line !== undefined ) {
+
 				var segments = new THREE.LineSegments( line.geometry, line.material );
 				segments.name = 'layer' + i;
 				object.add( segments );
+
 			}
+
 		}
+
 	}
 
 	return object;
