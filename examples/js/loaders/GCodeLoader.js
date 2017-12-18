@@ -68,7 +68,7 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 				type: grouptype,
 				feed: line.e,
 				extruding: line.extruding,
-				geometry: new THREE.Geometry(),
+				vertex: [],
 				material: line.extruding ? extrudingMaterial : pathMaterial,
 				segmentCount: 0
 				
@@ -83,11 +83,14 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 	function addSegment( p1, p2 ) {
 
 		var group = getLineGroup( p2 );
-		var geometry = group.geometry;
-		
+
 		group.segmentCount ++;
-		geometry.vertices.push( new THREE.Vector3( p1.x, p1.y, p1.z ) );
-		geometry.vertices.push( new THREE.Vector3( p2.x, p2.y, p2.z ) );
+		group.vertex.push(p1.x);
+		group.vertex.push(p1.y);
+		group.vertex.push(p1.z);
+		group.vertex.push(p2.x);
+		group.vertex.push(p2.y);
+		group.vertex.push(p2.z);
 
 		if ( p2.extruding ) {
 
@@ -206,7 +209,10 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 			if ( line !== undefined ) {
 
-				var segments = new THREE.LineSegments( line.geometry, line.material );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( line.vertex ), 3 ) );
+
+				var segments = new THREE.LineSegments( geometry, line.material );
 				segments.name = 'layer' + i;
 				object.add( segments );
 
@@ -215,6 +221,8 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 		}
 
 	}
+
+	object.rotation.set( -Math.PI / 2, 0, 0 );
 
 	return object;
 };
