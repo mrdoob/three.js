@@ -38,8 +38,6 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 	var currentLayer = undefined;
 
-	var box = new THREE.Box3();
-
 	var pathMaterial = new THREE.LineBasicMaterial( { color: 0xFF0000 } );
 	pathMaterial.name = 'path';
 
@@ -71,13 +69,6 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 			currentLayer.pathVertex.push( p1.x, p1.y, p1.z );
 			currentLayer.pathVertex.push( p2.x, p2.y, p2.z );
-
-		}
-
-		if ( line.extruding ) {
-
-			box.min.set( Math.min( box.min.x, p2.x ), Math.min( box.min.y, p2.y ), Math.min( box.min.z, p2.z ) );
-			box.max.set( Math.max( box.max.x, p2.x ), Math.max( box.max.y, p2.y ), Math.max( box.max.z, p2.z ) );
 
 		}
 
