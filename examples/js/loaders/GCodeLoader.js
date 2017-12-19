@@ -80,13 +80,13 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 	}
 
-	function absolute ( v1, v2 ) {
+	function absolute( v1, v2 ) {
 
 		return state.relative ? v1 + v2 : v2;
 
 	}
 
-	var lines = data.replace( /;.+/g,'' ).split( '\n' );
+	var lines = data.replace( /;.+/g, '' ).split( '\n' );
 
 	for ( var i = 0; i < lines.length; i ++ ) {
 

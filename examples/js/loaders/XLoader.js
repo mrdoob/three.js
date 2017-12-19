@@ -201,8 +201,6 @@
 
 	};
 
-	"use strict";
-
 	var XLoader = function () {
 
 		function XLoader( manager, texloader ) {
