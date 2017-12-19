@@ -121,6 +121,12 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_LIGHTS_PBR ) >= 0 ) {
+
+					extensions[ EXTENSIONS.KHR_LIGHTS_PBR ] = new GLTFLightsPbrExtension( json );
+
+				}
+
 				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_COMMON ) >= 0 ) {
 
 					extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] = new GLTFMaterialsCommonExtension( json );
@@ -208,6 +214,7 @@ THREE.GLTFLoader = ( function () {
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
 		KHR_LIGHTS: 'KHR_lights',
+		KHR_LIGHTS_PBR: 'KHR_lights_pbr',
 		KHR_MATERIALS_COMMON: 'KHR_materials_common',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness'
 	};
@@ -272,6 +279,103 @@ THREE.GLTFLoader = ( function () {
 				if ( light.quadraticAttenuation !== undefined ) {
 
 					lightNode.decay = light.quadraticAttenuation;
+
+				}
+
+				if ( light.fallOffAngle !== undefined ) {
+
+					lightNode.angle = light.fallOffAngle;
+
+				}
+
+				if ( light.fallOffExponent !== undefined ) {
+
+					console.warn( 'THREE.GLTFLoader:: light.fallOffExponent not currently supported.' );
+
+				}
+
+				lightNode.name = light.name || ( 'light_' + lightId );
+				this.lights[ lightId ] = lightNode;
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Lights Pbr Extension
+	 *
+	 * Specification: PENDING
+	 */
+	function GLTFLightsPbrExtension( json ) {
+
+		this.name = EXTENSIONS.KHR_LIGHTS_PBR;
+
+		this.lights = {};
+
+		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_LIGHTS_PBR ] ) || {};
+		var lights = extension.lights || {};
+
+		for ( var lightId in lights ) {
+
+			var light = lights[ lightId ];
+			var lightNode;
+
+			var color = new THREE.Color().fromArray( light.color );
+
+			switch ( light.type ) {
+
+				case 'directional':
+					lightNode = new THREE.DirectionalLight( color );
+					lightNode.position.set( 0, 0, 1 );
+					break;
+
+				case 'area':
+					lightNode = new THREE.RectAreaLight( color );
+					// Actual transforms taken care of in the node building section.
+					lightNode.position.set( 0, 0, 0 );
+					lightNode.width = light.positional.width;
+					lightNode.height = light.positional.height ? light.positional.height : light.positional.width;
+					break;
+
+				case 'point':
+					lightNode = new THREE.PointLight( color );
+					break;
+
+				case 'spot':
+					lightNode = new THREE.SpotLight( color );
+					lightNode.position.set( 0, 0, 1 );
+					break;
+
+				case 'ambient':
+					lightNode = new THREE.AmbientLight( color );
+					break;
+
+			}
+
+			if ( lightNode ) {
+
+				if ( light.intensity !== undefined ) {
+
+					lightNode.intensity = light.intensity;
+
+				}
+
+				if ( light.linearAttenuation !== undefined ) {
+
+					lightNode.distance = 1 / light.linearAttenuation;
+
+				}
+
+				if ( light.quadraticAttenuation !== undefined ) {
+
+					lightNode.decay = light.quadraticAttenuation;
+
+				} else {
+
+					// Default to physically correct mode settings for realistic light falloff.
+					lightNode.decay = 2;
 
 				}
 
@@ -2459,6 +2563,13 @@ THREE.GLTFLoader = ( function () {
 
 				var lights = extensions[ EXTENSIONS.KHR_LIGHTS ].lights;
 				node = lights[ nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS ].light ];
+
+			} else if ( nodeDef.extensions
+					 && nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PBR ]
+					 && nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PBR ].light !== undefined ) {
+
+				var lights = extensions[ EXTENSIONS.KHR_LIGHTS_PBR ].lights;
+				node = lights[ nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PBR ].light ];
 
 			} else {
 
