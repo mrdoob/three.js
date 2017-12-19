@@ -902,9 +902,9 @@ THREE.GLTFLoader = ( function () {
 			for ( var i = 0; i !== stride; i ++ ) {
 
 				var p0 = values[ offset0 + i + stride ];        // splineVertex_k
-				var m0 = values[ offset0 + i + stride2 ] * td;  // (t_k+1 - t_k) * outTangent_k
+				var m0 = values[ offset0 + i + stride2 ] * td;  // outTangent_k * (t_k+1 - t_k)
 				var p1 = values[ offset1 + i + stride ];        // splineVertex_k+1
-				var m1 = values[ offset1 + i ] * td;            // (t_k+1 - t_k) * inTangent_k+1
+				var m1 = values[ offset1 + i ] * td;            // inTangent_k+1 * (t_k+1 - t_k)
 
 				result[ i ] = s0 * p0 + s1 * m0 + s2 * p1 + s3 * m1;
 
