@@ -78,9 +78,9 @@
 				closedSpline.closed = true;
 
 				var extrudeSettings = {
-					steps			: 100,
-					bevelEnabled	: false,
-					extrudePath		: closedSpline
+					steps: 100,
+					bevelEnabled: false,
+					extrudePath: closedSpline
 				};
 
 
@@ -158,14 +158,12 @@
 				var materials = [ material, material2 ];
 
 				var extrudeSettings = {
-					amount			: 20,
-					steps			: 1,
-					material		: 1,
-					extrudeMaterial : 0,
-					bevelEnabled	: true,
-					bevelThickness  : 2,
-					bevelSize       : 4,
-					bevelSegments   : 1
+					amount: 20,
+					steps: 1,
+					bevelEnabled: true,
+					bevelThickness: 2,
+					bevelSize: 4,
+					bevelSegments: 1
 				};
 
 				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
