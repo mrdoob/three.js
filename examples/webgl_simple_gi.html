@@ -30,7 +30,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - simple global illumination (<a href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm">article</a>)
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - simple global illumination (<a href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm">article</a>)
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -42,7 +42,9 @@
 
 			THREE.Mesh.prototype.clone = function () {
 
-				return new this.constructor( this.geometry.clone(), this.material.clone() ).copy( this );
+				var newMaterial = ( this.material.isMaterial ) ? this.material.clone() : this.material.slice();
+
+				return new this.constructor( this.geometry.clone(), newMaterial ).copy( this );
 
 			};
 
@@ -211,9 +213,8 @@
 				}
 
 				var geometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
-				var material = new THREE.MultiMaterial( materials );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, materials );
 				scene.add( mesh );
 
 				//
@@ -243,8 +244,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
 
 				renderer.render( scene, camera );
 

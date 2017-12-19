@@ -515,7 +515,7 @@ def _scale(bone, frame, action, armature_matrix):
     :param armature_matrix:
 
     """
-    scale = mathutils.Vector((0.0, 0.0, 0.0))
+    scale = mathutils.Vector((1.0, 1.0, 1.0))
 
     change = False
 

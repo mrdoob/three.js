@@ -86,7 +86,13 @@
 		<div>Optional name of the object (doesn't need to be unique). Default is an empty string.</div>
 
 		<h3>[property:Matrix3 normalMatrix]</h3>
-		<div>This is passed to the shader and used to calculate lighting for the object.</div>
+		<div>
+		This is passed to the shader and used to calculate lighting for the object. It is the transpose of the inverse of the upper left 3x3 sub-matrix of this object's modelViewMatrix.<br /><br />
+
+		The reason for this special matrix is that simply using the modelViewMatrix could result in a non-unit length of normals (on scaling) or in a non-perpendicular direction (on non-uniform scaling).<br /><br />
+
+		On the other hand the translation part of the modelViewMatrix is not relevant for the calculation of normals. Thus a Matrix3 is sufficient.
+		</div>
 
 		<h3>[property:function onAfterRender]</h3>
 		<div>
@@ -106,7 +112,7 @@
 		<div>Object's parent in the [link:https://en.wikipedia.org/wiki/Scene_graph scene graph].</div>
 
 		<h3>[property:Vector3 position]</h3>
-		<div>The object's local position.</div>
+		<div>A [page:Vector3] representing the object's local position. Default is (0, 0, 0).</div>
 
 		<h3>[property:Quaternion quaternion]</h3>
 		<div>Object's local rotation as a [page:Quaternion Quaternion].</div>
@@ -190,7 +196,10 @@
 		</div>
 
 		<h3>[method:null applyMatrix]( [page:Matrix4 matrix] )</h3>
-		<div>This updates the position, rotation and scale with the matrix.</div>
+		<div>Applies the matrix transform to the object and updates the object's position, rotation and scale.</div>
+
+		<h3>[method:Object3D applyQuaternion]( [page:Quaternion quaternion] )</h3>
+		<div>Applies the rotation represented by the quaternion to the object.</div>
 
 		<h3>[method:Object3D clone]( [page:Boolean recursive] )</h3>
 		<div>
@@ -278,11 +287,17 @@
 		Converts the vector from local space to world space.
 		</div>
 
-		<h3>[method:null lookAt]( [page:Vector3 vector] )</h3>
+		<h3>[method:null lookAt]( [page:Vector3 vector] )</br>
+		[method:null lookAt]( [page:Float x], [page:Float y], [page:Float z] )</h3>
 		<div>
 		vector - A vector representing a position in world space.<br /><br />
+		Optionally, the [page:.x x], [page:.y y] and [page:.z z] components of the world space position.<br /><br />
 
-		Rotates the object to face a point in world space.
+		Rotates the object to face a point in world space.<br /><br />
+
+		This method does not support objects with rotated and/or translated parent(s).
+		</div>
+
 		</div>
 
 		<h3>[method:Array raycast]( [page:Raycaster raycaster], [page:Array intersects] )</h3>
@@ -303,6 +318,15 @@
 		angle -- The angle in radians.<br /><br />
 
 		Rotate an object along an axis in object space. The axis is assumed to be normalized.
+		</div>
+
+		<h3>[method:Object3D rotateOnWorldAxis]( [page:Vector3 axis], [page:Float angle] )</h3>
+		<div>
+		axis -- A normalized vector in world space. <br />
+		angle -- The angle in radians.<br /><br />
+
+		Rotate an object along an axis in world space. The axis is assumed to be normalized.
+		Method Assumes no rotated parent.
 		</div>
 
 		<h3>[method:null rotateX]( [page:Float rad] )</h3>

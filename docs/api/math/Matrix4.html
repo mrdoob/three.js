@@ -29,23 +29,25 @@
 					[page:Object3D.matrix]: This stores the local transform of the object.
 				</li>
 				<li>
-					[page:Object3D.matrixWorld]: The global or world transform of the object. This is the objects transformation relative to its parent.
+					[page:Object3D.matrixWorld]: The global or world transform of the object. This is the object's transformation relative to its parent.
 					If the object has no parent, then this is identical to the local transform.
 				</li>
 				<li>
-					[page:Object3D.modelViewMatrix]:
+					[page:Object3D.modelViewMatrix]: This represents the object's transformation relative to the camera's coordinate system.
+					An object's modelViewMatrix is the object's matrixWorld pre-multiplied by the camera's matrixWorldInverse.
 				</li>
 			</ul>
 
-			[page:Camera Cameras] have two additional matrix4s:
+			[page:Camera Cameras] have two additional Matrix4s:
 			<ul>
 				<li>
-					[page:Object3D.matrixWorldInverse]: The inverse of the [page:Object3D.matrixWorld] described above.
+					[page:Camera.matrixWorldInverse]: The view matrix - the inverse of the Camera's [page:Object3D.matrixWorld matrixWorld].
 				</li>
 				<li>
-					[page:Object3D.projectionMatrix]:
+					[page:Camera.projectionMatrix]: Represents the information how to project the scene to clip space.
 				</li>
 			</ul>
+			Note: [page:Object3D.normalMatrix] is not a Matrix4, but a [page:Matrix3].
 		</div>
 
 		<h2>A Note on Row-Major and Column-Major Ordering</h2>
@@ -73,7 +75,7 @@ m.elements = [ 11, 21, 31, 41,
 		and internally all calculations are performed using column-major ordering. However, as the actual ordering
 		makes no difference mathematically and most people are used to thinking about matrices in row-major order,
 		the three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
-		code, you'll have to take the [link: https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
+		code, you'll have to take the [link:https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
 		</div>
 
 
@@ -166,7 +168,7 @@ m, n, o, p
 		then the [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] will be set to:
 		<code>
 xAxis = (a, e, i)
-yAxis = (d, f, j)
+yAxis = (b, f, j)
 zAxis = (c, g, k)
 		</code>
 		</div>
@@ -258,7 +260,7 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		[link:https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion here].
 		The rest of the matrix is set to the identity. So, given [page:Quaternion q] = w + xi + yj + zk, the resulting matrix will be:
 		<code>
-1-2y²-2z²    2xy-2zw    2xz-2yw    0
+1-2y²-2z²    2xy-2zw    2xz+2yw    0
 2xy+2zw      1-2x²-2z²  2yz-2xw    0
 2xz-2yw      2yz+2xw    1-2x²-2y²  0
 0            0          0          1
@@ -360,14 +362,6 @@ x, y, 1, 0,
 
 		<h3>[method:Matrix4 multiplyScalar]( [page:Float s] )</h3>
 		<div>Multiplies every component of the matrix by a scalar value [page:Float s].</div>
-
-		<h3>[method:Matrix4 multiplyToArray]( [page:Matrix4 a], [page:Matrix4 b], [page:Array r] )</h3>
-		<div>
-		Sets this matrix to [page:Matrix4 a] x [page:Matrix4 b] and stores the result into the flat array [page:Array r],
-		in [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] order.
-
-		[page:Array r] can be either a regular Array or a [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays TypedArray].
-		</div>
 
 		<h3>[method:Matrix4 premultiply]( [page:Matrix4 m] )</h3>
 		<div>Pre-multiplies this matrix by [page:Matrix4 m].</div>

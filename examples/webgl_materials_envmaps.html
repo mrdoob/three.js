@@ -31,7 +31,7 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl environment mapping example<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl environment mapping example<br/>
 			Equirectangular Map by <a href="http://gl.ict.usc.edu/Data/HighResProbes/">University of Southern California</a><br/>
 			Spherical Map by <a href="http://www.pauldebevec.com/Probes/">Paul Debevec</a>
 		</div>
@@ -118,12 +118,12 @@
 
 				// Skybox
 
-				cubeMesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), cubeMaterial );
+				cubeMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), cubeMaterial );
 				sceneCube.add( cubeMesh );
 
 				//
 
-				var geometry = new THREE.SphereGeometry( 400.0, 24, 24 );
+				var geometry = new THREE.SphereBufferGeometry( 400.0, 48, 24 );
 				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 
@@ -207,8 +207,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-
-				controls.update();
 
 			}
 

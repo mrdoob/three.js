@@ -1,4 +1,4 @@
-import { Vector3 } from './Vector3';
+import { Vector3 } from './Vector3.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -18,14 +18,13 @@ function Quaternion( x, y, z, w ) {
 
 Object.assign( Quaternion, {
 
-	slerp: function( qa, qb, qm, t ) {
+	slerp: function ( qa, qb, qm, t ) {
 
 		return qm.copy( qa ).slerp( qb, t );
 
 	},
 
-	slerpFlat: function(
-			dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
+	slerpFlat: function ( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
 
 		// fuzz-free, array-based Quaternion SLERP operation
 
@@ -91,7 +90,7 @@ Object.assign( Quaternion, {
 
 Object.defineProperties( Quaternion.prototype, {
 
-	"x" : {
+	x: {
 
 		get: function () {
 
@@ -108,7 +107,7 @@ Object.defineProperties( Quaternion.prototype, {
 
 	},
 
-	"y" : {
+	y: {
 
 		get: function () {
 
@@ -125,7 +124,7 @@ Object.defineProperties( Quaternion.prototype, {
 
 	},
 
-	"z" : {
+	z: {
 
 		get: function () {
 
@@ -142,7 +141,7 @@ Object.defineProperties( Quaternion.prototype, {
 
 	},
 
-	"w" : {
+	w: {
 
 		get: function () {
 
@@ -159,7 +158,7 @@ Object.defineProperties( Quaternion.prototype, {
 
 	}
 
-});
+} );
 
 Object.assign( Quaternion.prototype, {
 
@@ -197,7 +196,7 @@ Object.assign( Quaternion.prototype, {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( ( euler && euler.isEuler ) === false ) {
+		if ( ! ( euler && euler.isEuler ) ) {
 
 			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
@@ -349,8 +348,6 @@ Object.assign( Quaternion.prototype, {
 	},
 
 	setFromUnitVectors: function () {
-
-		// http://lolengine.net/blog/2014/02/24/quaternion-from-two-vectors-final
 
 		// assumes direction vectors vFrom and vTo are normalized
 

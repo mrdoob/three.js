@@ -1,7 +1,7 @@
-import { Quaternion } from './Quaternion';
-import { Vector3 } from './Vector3';
-import { Matrix4 } from './Matrix4';
-import { _Math } from './Math';
+import { Quaternion } from './Quaternion.js';
+import { Vector3 } from './Vector3.js';
+import { Matrix4 } from './Matrix4.js';
+import { _Math } from './Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -24,7 +24,7 @@ Euler.DefaultOrder = 'XYZ';
 
 Object.defineProperties( Euler.prototype, {
 
-	"x" : {
+	x: {
 
 		get: function () {
 
@@ -41,7 +41,7 @@ Object.defineProperties( Euler.prototype, {
 
 	},
 
-	"y" : {
+	y: {
 
 		get: function () {
 
@@ -58,7 +58,7 @@ Object.defineProperties( Euler.prototype, {
 
 	},
 
-	"z" : {
+	z: {
 
 		get: function () {
 
@@ -75,7 +75,7 @@ Object.defineProperties( Euler.prototype, {
 
 	},
 
-	"order" : {
+	order: {
 
 		get: function () {
 
@@ -92,7 +92,7 @@ Object.defineProperties( Euler.prototype, {
 
 	}
 
-});
+} );
 
 Object.assign( Euler.prototype, {
 

@@ -11,9 +11,8 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A two dimensional surface that extends infinitely in 3d space, defined by
-			a [link:https://en.wikipedia.org/wiki/Normal_(geometry) normal vector], and a
-			distance from the origin along the normal.
+			A two dimensional surface that extends infinitely in 3d space, represented in [link:http://mathworld.wolfram.com/HessianNormalForm.html Hessian normal form]
+			by a unit length normal vector and a constant.
 		</div>
 
 
@@ -22,10 +21,8 @@
 
 		<h3>[name]( [page:Vector3 normal], [page:Float constant] )</h3>
 		<div>
-		[page:Vector3 normal] - (optional) a [page:Vector3] defining the direction of the
-		plane. Default is *(1, 0, 0)*.<br />
-		[page:Float constant] - (optional) the negative distance from the origin to the plane along
-		 the [page:Vector3 normal] vector. Default is *0*.
+		[page:Vector3 normal] - (optional) a unit length [page:Vector3] defining the normal of the plane. Default is *(1, 0, 0)*.<br />
+		[page:Float constant] - (optional) the signed distance from the origin to the plane. Default is *0*.
 		</div>
 
 
@@ -68,10 +65,10 @@
 		</div>
 
 		<h3>[method:Float distanceToPoint]( [page:Vector3 point] )</h3>
-		<div>Returns the smallest distance from the [page:Vector3 point] to the plane.</div>
+		<div>Returns the signed distance from the [page:Vector3 point] to the plane.</div>
 
 		<h3>[method:Float distanceToSphere]( [page:Sphere sphere] )</h3>
-		<div>Returns the smallest distance from the [page:Sphere sphere] to the plane.</div>
+		<div>Returns the signed distance from the [page:Sphere sphere] to the plane.</div>
 
 		<h3>[method:Boolean equals]( [page:Plane plane] )</h3>
 		<div>
@@ -113,8 +110,7 @@
 
 		<h3>[method:Plane negate]()</h3>
 		<div>
-		Negates both the normal vector and constant, effectively mirroring the plane across
-		the origin.
+		Negates both the normal vector and the constant.
 		</div>
 
 		<h3>[method:Plane normalize]()</h3>
@@ -123,44 +119,31 @@
 			value accordingly.
 		</div>
 
-		<h3>[method:Vector3 orthoPoint]( [page:Vector3 point], [page:Vector3 optionalTarget] )</h3>
-		<div>
-		[page:Vector3 point] - [page:Vector3] <br />
-		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied
-		into this [page:Vector3], otherwise a new [page:Vector3] will be created.<br /><br />
-
-		Returns a vector in the same direction as the Plane's normal, but with magnitude
-		equal to the passed point's original distance to the plane.
-		</div>
-
 		<h3>[method:Vector3 projectPoint]( [page:Vector3 point], [page:Vector3 optionalTarget] )</h3>
 		<div>
 		[page:Vector3 point] - the [page:Vector3] to project onto the plane.<br />
 		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
 		otherwise a new [page:Vector3] will be created.<br /><br />
 
-		Projects a [page:Vector3 point] onto the plane. The projected point is the closest
-		 point on the plane to the passed point, so a line drawn from the projected point
-		 and the passed point would be orthogonal to the plane.
+		Projects a [page:Vector3 point] onto the plane.
 		</div>
 
 		<h3>[method:Plane set]( [page:Vector3 normal], [page:Float constant] )</h3>
 		<div>
-			[page:Vector3 normal] -  a [page:Vector3] defining the direction of the	plane.<br />
-			[page:Float constant] - (optional) the negative distance from the origin to the plane along
-			 the [page:Vector3 normal] vector. Default is *0*.<br /><br />
+			[page:Vector3 normal] - a unit length [page:Vector3] defining the normal of the plane.<br />
+			[page:Float constant] - the signed distance from the origin to the plane. Default is *0*.<br /><br />
 
 			 Sets the plane's [page:.normal normal] and [page:.constant constant] properties.
 		</div>
 
 		<h3>[method:Plane setComponents]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
 		<div>
-		[page:Float x] - x value of the normal vector.<br />
-		[page:Float y] - y value of the normal vector.<br />
-		[page:Float z] - z value of the normal vector.<br />
+		[page:Float x] - x value of the unit length normal vector.<br />
+		[page:Float y] - y value of the unit length normal vector.<br />
+		[page:Float z] - z value of the unit length normal vector.<br />
 		[page:Float w] - the value of the plane's [page:.constant constant] property.<br /><br />
 
-		Set the individual components that make up the plane.
+		Set the individual components that define the plane.
 		</div>
 
 		<h3>[method:Plane setFromCoplanarPoints]( [page:Vector3 a], [page:Vector3 b], [page:Vector3 c] )</h3>
@@ -169,13 +152,13 @@
 		 [page:Vector3 a] - second point on the plane.<br />
 		 [page:Vector3 a] - third point on the plane.<br /><br />
 
-		Defines the plane based on the 3 provided points. The winding order is counter
-		clockwise, and determines which direction the [page:.normal normal] will point.
+		Defines the plane based on the 3 provided points. The winding order is assumed to be counter-clockwise,
+		and determines the direction of the [page:.normal normal].
 		</div>
 
 		<h3>[method:Plane setFromNormalAndCoplanarPoint]( [page:Vector3 normal], [page:Vector3 point] ) [page:Vector3 this]</h3>
 		<div>
-		[page:Vector3 normal] - a [page:Vector3] defining the direction of the plane.<br />
+		[page:Vector3 normal] - a unit length [page:Vector3] defining the normal of the plane.<br />
 		[page:Vector3 point] - [page:Vector3]<br /><br />
 
 		Sets the plane's properties as defined by a [page:Vector3 normal] and an arbitrary coplanar [page:Vector3 point].
@@ -185,9 +168,8 @@
 		<div>
 		[page:Vector3 offset] - the amount to move the plane by.<br /><br />
 
-		Translates the plane the distance defined by the [page:Vector3 offset] vector.
-		Note that this only affects	the constant (distance from origin) and will not affect
-		the normal vector.
+		Translates the plane by the distance defined by the [page:Vector3 offset] vector.
+		Note that this only affects the plane constant and will not affect the normal vector.
 		</div>
 
 		<h2>Source</h2>

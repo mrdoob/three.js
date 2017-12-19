@@ -27,7 +27,7 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - FBXLoader test
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader test
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -36,7 +36,7 @@
 
 		<script src="js/curves/NURBSCurve.js"></script>
 		<script src="js/curves/NURBSUtils.js"></script>
-		<script src="js/loaders/FBXLoader2.js"></script>
+		<script src="js/loaders/FBXLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -120,7 +120,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000 );
 				container.appendChild( renderer.domElement );
 
 				// controls, camera

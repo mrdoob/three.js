@@ -33,10 +33,10 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl -
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl -
 		using <a href="http://code.google.com/p/js-openctm/">js-openctm</a> -
-		camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a> -
-		skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a>
+		camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank" rel="noopener">dskfnwn</a> -
+		skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -66,8 +66,6 @@
 			var mesh;
 
 			var textureCube;
-
-			var loader;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -150,12 +148,11 @@
 
 				// new way via CTMLoader and separate parts
 
-				loaderCTM = new THREE.CTMLoader();
-
 				var position = new THREE.Vector3( -105, -78, -30 );
 				var scale = new THREE.Vector3( 30, 30, 30 );
 
-				loaderCTM.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
+				var loader = new THREE.CTMLoader();
+				loader.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
 
 					hackMaterials( materials );
 
@@ -254,23 +251,6 @@
 
 			//
 
-			function createScene( geometry, materials, x, y, z, s ) {
-
-				geometry.center();
-
-				hackMaterials( materials );
-
-				var material = new THREE.MultiMaterial( materials );
-
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.set( x, y, z );
-				mesh.scale.set( s, s, s );
-				scene.add( mesh );
-
-			}
-
-			//
-
 			function onWindowResize( event ) {
 
 				SCREEN_WIDTH = window.innerWidth;
@@ -303,8 +283,6 @@
 			}
 
 			function render() {
-
-				controls.update();
 
 				renderer.render( scene, camera );
 

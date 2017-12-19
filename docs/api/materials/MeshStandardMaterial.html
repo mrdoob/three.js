@@ -13,7 +13,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A standard physically based material.<br /><br />
+			A standard physically based material, using Metallic-Roughness workflow.<br /><br />
 
 			Physically based rendering (PBR) has recently become the standard in many 3D applications, such as
 			[link:https://blogs.unity3d.com/2014/10/29/physically-based-shading-in-unity-5-a-primer/ Unity],
@@ -97,7 +97,9 @@
 		</div>
 
 		<h3>[property:Texture aoMap]</h3>
-		<div>The ambient occlusion map. Default is null.</div>
+		<div>The red channel of this texture is used as the ambient occlusion map. Default is null. 
+		The aoMap requires a second set of UVs, and consequently will ignore the [page:Texture repeat]
+		and [page:Texture offset] Texture properties.</div>
 
 		<h3>[property:Float aoMapIntensity]</h3>
 		<div>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</div>
@@ -164,7 +166,11 @@
 		<div>Intensity of the emissive light. Modulates the emissive color. Default is 1.</div>
 
 		<h3>[property:TextureCube envMap]</h3>
-		<div>The environment map. Default is null.</div>
+		<div>The environment map. Default is null.  Note that in order for the material roughness 
+		property to correctly blur out the environment map, the shader must have access to mipmaps 
+		of the env texture.  TextureCubes created with default settings are correctly configured; 
+		if adjusting texture parameters manually, ensure minFilter is set to one of the MipMap options, 
+		and that mip maps have not been otherwise forcibly disabled.</div>
 
 		<h3>[property:Float envMapIntensity]</h3>
 		<div>Scales the effect of the environment map by multiplying its color.</div>
@@ -178,7 +184,9 @@
 
 
 		<h3>[property:Texture lightMap]</h3>
-		<div>The light map. Default is null. The lightMap requires a second set of UVs.</div>
+		<div>The light map. Default is null. The lightMap requires a second set of UVs, 
+		and consequently will ignore the [page:Texture repeat] and [page:Texture offset] 
+		Texture properties.</div>
 
 		<h3>[property:Float lightMapIntensity]</h3>
 		<div>Intensity of the baked light. Default is 1.</div>
@@ -188,11 +196,13 @@
 
 		<h3>[property:Float metalness]</h3>
 		<div>
-		How much the material is like a metal. Non-metallic materials such as wood or stone use 0.0, metallic use 1.0, nothing in between. A value between 0.0 and 1.0 could be used for a rusty metal look.<br />
+			How much the material is like a metal. Non-metallic materials such as wood or stone use 0.0, metallic use 1.0, with nothing
+			(usually) in between. Default is 0.5. A value between 0.0 and 1.0 could be used for a rusty metal look. If metalnessMap is
+			also provided, both values are multiplied.
 		</div>
 
 		<h3>[property:Texture metalnessMap]</h3>
-		<div>The red channel of this texture is used to alter the metalness of the material.</div>
+		<div>The blue channel of this texture is used to alter the metalness of the material.</div>
 
 		<h3>[property:boolean morphNormals]</h3>
 		<div>
@@ -216,15 +226,20 @@
 		</div>
 
 		<h3>[property:Float refractionRatio]</h3>
-		<div>The index of refraction for an environment map using [page:Textures THREE.CubeRefractionMapping]. Default is *0.98*.</div>
+		<div>
+			The index of refraction (IOR) of air (approximately 1) divided by the index of refraction of the material.
+			It is used with environment mapping modes [page:Textures THREE.CubeRefractionMapping] and [page:Textures THREE.EquirectangularRefractionMapping].
+			The refraction ratio should not exceed 1. Default is *0.98*.
+		</div>
 
 		<h3>[property:Float roughness]</h3>
 		<div>
-		How rough the material appears. 0.0 means a smooth mirror reflection, 1.0 means fully diffuse.
+			How rough the material appears. 0.0 means a smooth mirror reflection, 1.0 means fully diffuse. Default is 0.5.
+			If roughnessMap is also provided, both values are multiplied.
 		</div>
 
 		<h3>[property:Texture roughnessMap]</h3>
-		<div>The red channel of this texture is used to alter the roughness of the material.</div>
+		<div>The green channel of this texture is used to alter the roughness of the material.</div>
 
 		<h3>[property:Boolean skinning]</h3>
 		<div>Define whether the material uses skinning. Default is false.</div>

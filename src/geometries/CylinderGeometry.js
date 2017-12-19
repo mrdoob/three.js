@@ -1,8 +1,15 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { Geometry } from '../core/Geometry';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector2 } from '../math/Vector2.js';
+
+// CylinderGeometry
 
 function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
@@ -29,14 +36,7 @@ function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heig
 CylinderGeometry.prototype = Object.create( Geometry.prototype );
 CylinderGeometry.prototype.constructor = CylinderGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
+// CylinderBufferGeometry
 
 function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
@@ -57,16 +57,16 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	var scope = this;
 
-	radiusTop = radiusTop !== undefined ? radiusTop : 20;
-	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
-	height = height !== undefined ? height : 100;
+	radiusTop = radiusTop !== undefined ? radiusTop : 1;
+	radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
+	height = height || 1;
 
 	radialSegments = Math.floor( radialSegments ) || 8;
 	heightSegments = Math.floor( heightSegments ) || 1;
 
 	openEnded = openEnded !== undefined ? openEnded : false;
 	thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-	thetaLength = thetaLength !== undefined ? thetaLength : 2.0 * Math.PI;
+	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
 	// buffers
 
@@ -78,7 +78,6 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 	// helper variables
 
 	var index = 0;
-	var indexOffset = 0;
 	var indexArray = [];
 	var halfHeight = height / 2;
 	var groupStart = 0;
@@ -312,5 +311,6 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 CylinderBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 CylinderBufferGeometry.prototype.constructor = CylinderBufferGeometry;
+
 
 export { CylinderGeometry, CylinderBufferGeometry };

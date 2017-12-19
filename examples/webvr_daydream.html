@@ -4,8 +4,8 @@
 		<title>three.js webvr - daydream</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR, origin = https://threejs.org, expires = 2017-03-13 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR" data-expires="2017-03-13" content="Any7HFKv+fkg+mBnJBBFIYyFbQgDyum3bNsVUXBInRDadbhafI6F0hXq/cStNqdi29167TYlkDuH/JE5ZZSI6gcAAABKeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUiIsImV4cGlyeSI6MTQ4OTQxNzU2OX0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-01-21 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-01-21" content="Ap+tmQjuEXRrzmu+ZuReB/eY8fZmTEOybJ2hME1RgEZAPzhZ4/IAKEHRebiTp6o4LoZOMBexL4GAL7flIkAUlQYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxNjUzODYxMX0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -23,26 +23,16 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/DaydreamController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
-			if ( WEBVR.isAvailable() === false ) {
-
-				document.body.appendChild( WEBVR.getMessage() );
-
-			}
-
-			//
-
 			var clock = new THREE.Clock();
 
 			var container;
 			var camera, scene, ray, raycaster, renderer;
-			var effect, controls, gamepad;
+			var gamepad;
 
 			var room;
 
@@ -61,17 +51,22 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank">three.js</a> webvr - daydream';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - daydream';
 				container.appendChild( info );
 
+				var background = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/MilkyWay/' )
+					.load( [ 'dark-s_px.jpg', 'dark-s_nx.jpg', 'dark-s_py.jpg', 'dark-s_ny.jpg', 'dark-s_pz.jpg', 'dark-s_nz.jpg' ] );
+				background.format = THREE.RGBFormat;
+
 				scene = new THREE.Scene();
+				scene.background = background;
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				scene.add( camera );
 
 				room = new THREE.Mesh(
 					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
+					new THREE.MeshBasicMaterial( { color: 0x808080, wireframe: true } )
 				);
 				scene.add( room );
 
@@ -115,31 +110,14 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x505050 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				//
 
-				controls = new THREE.VRControls( camera );
-				effect = new THREE.VREffect( renderer );
-
-				if ( navigator.getVRDisplays ) {
-
-					navigator.getVRDisplays()
-						.then( function ( displays ) {
-							effect.setVRDisplay( displays[ 0 ] );
-							controls.setVRDisplay( displays[ 0 ] );
-						} )
-						.catch( function () {
-							// no displays
-						} );
-
-					document.body.appendChild( WEBVR.getButton( effect ) );
-
-				}
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				//
 
@@ -153,6 +131,12 @@
 				gamepadHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 10 ], 3 ) );
 				gamepad.add( gamepadHelper );
 
+				renderer.domElement.addEventListener( 'click', function ( event ) {
+
+					gamepadHelper.material.color.setHex( Math.random() * 0xffffff );
+
+				} );
+
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -164,7 +148,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -172,13 +156,13 @@
 
 			function animate() {
 
-				effect.requestAnimationFrame( animate );
-				render();
-				gamepad.update();
+				renderer.animate( render );
 
 			}
 
 			function render() {
+
+				gamepad.update();
 
 				var delta = clock.getDelta() * 60;
 
@@ -215,8 +199,6 @@
 
 					var cube = room.children[ i ];
 
-					cube.userData.velocity.multiplyScalar( 1 - ( 0.001 * delta ) );
-
 					cube.position.add( cube.userData.velocity );
 
 					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
@@ -246,8 +228,7 @@
 
 				}
 
-				controls.update();
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

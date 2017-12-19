@@ -32,7 +32,7 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating...</div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - terrain demo. <a href="canvas_geometry_terrain.html">generate another</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - terrain demo. <a href="canvas_geometry_terrain.html">generate another</a></div>
 
 		<script src="../build/three.js"></script>
 
@@ -67,6 +67,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
 
 				var data = generateHeight( 1024, 1024 );
 				var texture = new THREE.CanvasTexture( generateTexture( data, 1024, 1024 ) );
@@ -88,7 +89,6 @@
 				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0xbfd1e5 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

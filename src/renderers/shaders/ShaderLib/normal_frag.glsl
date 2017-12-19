@@ -23,7 +23,6 @@ uniform float opacity;
 void main() {
 
 	#include <logdepthbuf_fragment>
-	#include <normal_flip>
 	#include <normal_fragment>
 
 	gl_FragColor = vec4( packNormalToRGB( normal ), opacity );

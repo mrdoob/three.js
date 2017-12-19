@@ -1,11 +1,11 @@
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector3 } from '../math/Vector3';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Mugen87 / https://github.com/Mugen87
  */
+
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
 
 function WireframeGeometry( geometry ) {
 
@@ -20,7 +20,7 @@ function WireframeGeometry( geometry ) {
 	// helper variables
 
 	var i, j, l, o, ol;
-	var edge = [ 0, 0 ], edges = {}, e;
+	var edge = [ 0, 0 ], edges = {}, e, edge1, edge2;
 	var key, keys = [ 'a', 'b', 'c' ];
 	var vertex;
 
@@ -38,11 +38,12 @@ function WireframeGeometry( geometry ) {
 
 			for ( j = 0; j < 3; j ++ ) {
 
-				edge[ 0 ] = face[ keys[ j ] ];
-				edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
-				edge.sort( sortFunction ); // sorting prevents duplicates
+				edge1 = face[ keys[ j ] ];
+				edge2 = face[ keys[ ( j + 1 ) % 3 ] ];
+				edge[ 0 ] = Math.min( edge1, edge2 ); // sorting prevents duplicates
+				edge[ 1 ] = Math.max( edge1, edge2 );
 
-				key = edge.toString();
+				key = edge[ 0 ] + ',' + edge[ 1 ];
 
 				if ( edges[ key ] === undefined ) {
 
@@ -103,11 +104,12 @@ function WireframeGeometry( geometry ) {
 
 					for ( j = 0; j < 3; j ++ ) {
 
-						edge[ 0 ] = indices.getX( i + j );
-						edge[ 1 ] = indices.getX( i + ( j + 1 ) % 3 );
-						edge.sort( sortFunction ); // sorting prevents duplicates
+						edge1 = indices.getX( i + j );
+						edge2 = indices.getX( i + ( j + 1 ) % 3 );
+						edge[ 0 ] = Math.min( edge1, edge2 ); // sorting prevents duplicates
+						edge[ 1 ] = Math.max( edge1, edge2 );
 
-						key = edge.toString();
+						key = edge[ 0 ] + ',' + edge[ 1 ];
 
 						if ( edges[ key ] === undefined ) {
 
@@ -167,14 +169,6 @@ function WireframeGeometry( geometry ) {
 	// build geometry
 
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-
-	// custom array sort function
-
-	function sortFunction( a, b ) {
-
-		return a - b;
-
-	}
 
 }
 

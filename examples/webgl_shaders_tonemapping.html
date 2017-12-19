@@ -25,8 +25,8 @@
 	<body>
 		<div id="d">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank">three.js</a> webgl demo :
-				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank">Sean Ward</a> :
+				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl demo :
+				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank" rel="noopener">Sean Ward</a> :
 
 			</div>
 			<div class="label" style="position: absolute;left: 12%;bottom: 10%;">Low Dynamic Range</div>
@@ -62,13 +62,13 @@
 
 			var container;
 
-			var bloomPass, adaptToneMappingPass;
+			var bloomPass, adaptToneMappingPass, ldrToneMappingPass, hdrToneMappingPass;
 			var params;
 
 			var camera, scene, renderer, dynamicHdrEffectComposer, hdrEffectComposer, ldrEffectComposer;
 			var cameraCube, sceneCube;
 			var cameraBG, debugScene;
-			var adaptiveLuminanceMat, currentLuminanceRT, previousLuminanceMat;
+			var adaptiveLuminanceMat, currentLuminanceRT, currentLuminanceMat, previousLuminanceMat;
 
 			var directionalLight;
 

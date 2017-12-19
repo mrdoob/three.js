@@ -49,7 +49,7 @@ object.updateMatrix();
 					You can however update the content of buffers.
 				</p>
 				<p>
-					This means that if you know an attribute of you BufferGeometry will grow, say the number of vertices,
+					This means that if you know an attribute of your BufferGeometry will grow, say the number of vertices,
 					you must pre-allocate a buffer large enough to hold any new vertices that may be created. Of
 					course, this also means that there will be a maximum size for your BufferGeometry - there is
 					no way to create a BufferGeometry that can efficiently be extended indefinitely.
@@ -69,14 +69,14 @@ var positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
 geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 // draw range
-drawCount = 2; // draw the first 2 points, only
+var drawCount = 2; // draw the first 2 points, only
 geometry.setDrawRange( 0, drawCount );
 
 // material
 var material = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 2 } );
 
 // line
-line = new THREE.Line( geometry,  material );
+var line = new THREE.Line( geometry,  material );
 scene.add( line );
 				</code>
 			 	<p>
@@ -85,7 +85,8 @@ scene.add( line );
 				<code>
 var positions = line.geometry.attributes.position.array;
 
-var x = y = z = index = 0;
+var x, y, z, index;
+x = y = z = index = 0;
 
 for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
 
@@ -117,7 +118,7 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 					[link:http://jsfiddle.net/w67tzfhx/ Here is a fiddle] showing an animated line which you can adapt to your use case.
 				</p>
 
-				<h4>Examples:</h4>
+				<h3>Examples:</h3>
 					[example:webgl_custom_attributes WebGL / custom / attributes]<br />
 					[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
 
@@ -127,10 +128,10 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 			<h3>[page:Geometry]</h3>
 			<div>
 				<p>
-					The following flag control updating of various geometry attributes. Set flags only
+					The following flags control updating of various geometry attributes. Set flags only
 					for attributes that you need to update, updates are costly. Once buffers
 					change, these flags reset automatically back to false. You need to keep setting them to
-					true if you wanna keep updating buffers. Note that this applies only to [page:Geometry]
+					true if you want to keep updating buffers. Note that this applies only to [page:Geometry]
 					and not to [page:BufferGeometry].
 				</p>
 				<code>
@@ -154,7 +155,7 @@ geometry.tangentsNeedUpdate = true;
 		geometry.dynamic = true;
 				</code>
 
-				<h4>Example:</h4>
+				<h3>Examples:</h3>
 					[example:webgl_geometry_dynamic WebGL / geometry / dynamic]<br />
 			</div>
 

@@ -1,12 +1,12 @@
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Geometry } from '../core/Geometry';
-import { _Math } from '../math/Math';
-
 /**
  * @author WestLangley / http://github.com/WestLangley
  * @author Mugen87 / https://github.com/Mugen87
  */
+
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Geometry } from '../core/Geometry.js';
+import { _Math } from '../math/Math.js';
 
 function EdgesGeometry( geometry, thresholdAngle ) {
 
@@ -27,7 +27,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 	// helper variables
 
 	var thresholdDot = Math.cos( _Math.DEG2RAD * thresholdAngle );
-	var edge = [ 0, 0 ], edges = {};
+	var edge = [ 0, 0 ], edges = {}, edge1, edge2;
 	var key, keys = [ 'a', 'b', 'c' ];
 
 	// prepare source geometry
@@ -59,11 +59,12 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 		for ( var j = 0; j < 3; j ++ ) {
 
-			edge[ 0 ] = face[ keys[ j ] ];
-			edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
-			edge.sort( sortFunction );
+			edge1 = face[ keys[ j ] ];
+			edge2 = face[ keys[ ( j + 1 ) % 3 ] ];
+			edge[ 0 ] = Math.min( edge1, edge2 );
+			edge[ 1 ] = Math.max( edge1, edge2 );
 
-			key = edge.toString();
+			key = edge[ 0 ] + ',' + edge[ 1 ];
 
 			if ( edges[ key ] === undefined ) {
 
@@ -102,14 +103,6 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 	// build geometry
 
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-
-	// custom array sort function
-
-	function sortFunction( a, b ) {
-
-		return a - b;
-
-	}
 
 }
 

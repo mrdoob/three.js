@@ -27,6 +27,12 @@ THREE.STLExporter.prototype = {
 					var geometry = object.geometry;
 					var matrixWorld = object.matrixWorld;
 
+					if ( geometry instanceof THREE.BufferGeometry ) {
+
+						geometry = new THREE.Geometry().fromBufferGeometry( geometry );
+
+					}
+
 					if ( geometry instanceof THREE.Geometry ) {
 
 						var vertices = geometry.vertices;

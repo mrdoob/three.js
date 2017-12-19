@@ -34,8 +34,8 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - (<span id="description">normal + ao + displacement + environment</span>) map demo.<br />
-			ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank">AMD GPU MeshMapper</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - (<span id="description">normal + ao + displacement + environment</span>) map demo.<br />
+			ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 
 			<div id="vt">displacement mapping requires vertex textures</div>
 		</div>
@@ -225,7 +225,7 @@
 				var loader = new THREE.OBJLoader();
 				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
 
-					geometry = group.children[ 0 ].geometry;
+					var geometry = group.children[ 0 ].geometry;
 					geometry.attributes.uv2 = geometry.attributes.uv;
 					geometry.center();
 
@@ -272,8 +272,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
 
 				stats.begin();
 				render();

@@ -23,7 +23,7 @@
 
 			var container, stats, controls;
 			var camera, scene, renderer, loader, clock, light;
-			var skinnedMesh, animation, groundMaterial, planeGeometry, mixer;
+			var skinnedMesh, animation, mixer;
 
 			init();
 			animate();
@@ -42,19 +42,20 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize(window.innerWidth, window.innerHeight);
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild(stats.dom);
+				container.appendChild( stats.dom );
 
-				groundMaterial = new THREE.MeshPhongMaterial( { emissive: 0xbbbbbb } );
-				planeGeometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
-				ground = new THREE.Mesh( planeGeometry, groundMaterial );
+				var geometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
+				var material = new THREE.MeshBasicMaterial( { emissive: 0xbbbbbb } );
+
+				var ground = new THREE.Mesh( geometry, material );
 				ground.position.set( 0, -5, 0 );
-				ground.rotation.x = -Math.PI/2;
+				ground.rotation.x = -Math.PI / 2;
 				scene.add( ground );
 
 				light = new THREE.HemisphereLight( 0xffffff, 0x003300, 1 );
@@ -63,19 +64,21 @@
 
 				loader.load( './models/skinned/simple/simple.js', function ( geometry, materials ) {
 
-					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MultiMaterial(materials));
-					skinnedMesh.scale.set( 1, 1, 1 );
+					for ( var k in materials ) {
 
-					// Note: We test the corresponding code path with this example -
-					// you shouldn't include the next line into your own code:
-					skinnedMesh.skeleton.useVertexTexture = false;
+						materials[ k ].skinning = true;
+
+					}
+
+					skinnedMesh = new THREE.SkinnedMesh( geometry, materials );
+					skinnedMesh.scale.set( 1, 1, 1 );
 
 					scene.add( skinnedMesh );
 
 					mixer = new THREE.AnimationMixer( skinnedMesh );
 					mixer.clipAction( skinnedMesh.geometry.animations[ 0 ] ).play();
 
-				});
+				} );
 
 			}
 
@@ -83,9 +86,7 @@
 
 				requestAnimationFrame( animate );
 
-				if( mixer ) mixer.update( clock.getDelta() );
-
-				controls.update();
+				if ( mixer ) mixer.update( clock.getDelta() );
 
 				render();
 				stats.update();

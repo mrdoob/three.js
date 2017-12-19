@@ -40,7 +40,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - splines Software demo
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - splines Software demo
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
@@ -69,7 +69,7 @@
 
 			function init() {
 
-				var i, n_sub, container;
+				var i, container;
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -87,30 +87,27 @@
 				var geometry = new THREE.Geometry(),
 				geometry2 = new THREE.Geometry(),
 				geometry3 = new THREE.Geometry(),
-				points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 ),
+				points = hilbert3D( new THREE.Vector3(), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 ),
 				colors = [], colors2 = [], colors3 = [];
 
-				n_sub = 6;
-
-				var position, index;
+				var subdivisions = 6;
 
 				var spline = new THREE.CatmullRomCurve3( points );
+				var point = new THREE.Vector3();
 
-				for ( i = 0; i < points.length * n_sub; i ++ ) {
+				for ( i = 0; i < points.length * subdivisions; i ++ ) {
 
-					index = i / ( points.length * n_sub );
-					position = spline.getPoint( index );
-
-					geometry.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
+					var t = i / ( points.length * subdivisions );
+					geometry.vertices[ i ] = spline.getPoint( t );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
-					colors[ i ].setHSL( 0.6, 1.0, Math.max( 0, - position.x / 200 ) + 0.5 );
+					colors[ i ].setHSL( 0.6, 1.0, Math.max( 0, - point.x / 200 ) + 0.5 );
 
 					colors2[ i ] = new THREE.Color( 0xffffff );
-					colors2[ i ].setHSL( 0.9, 1.0, Math.max( 0, - position.y / 200 ) + 0.5 );
+					colors2[ i ].setHSL( 0.9, 1.0, Math.max( 0, - point.y / 200 ) + 0.5 );
 
 					colors3[ i ] = new THREE.Color( 0xffffff );
-					colors3[ i ].setHSL( i / ( points.length * n_sub ), 1.0, 0.5 );
+					colors3[ i ].setHSL( i / ( points.length * subdivisions ), 1.0, 0.5 );
 
 				}
 

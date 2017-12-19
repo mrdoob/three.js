@@ -1,9 +1,3 @@
-import { Geometry } from '../core/Geometry';
-import { Vector2 } from '../math/Vector2';
-import { Face3 } from '../core/Face3';
-import { Vector3 } from '../math/Vector3';
-import { ShapeUtils } from '../extras/ShapeUtils';
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
@@ -26,26 +20,55 @@ import { ShapeUtils } from '../extras/ShapeUtils';
  *  UVGenerator: <Object> // object that provides UV generator functions
  *
  * }
- **/
+ */
+
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { ShapeUtils } from '../extras/ShapeUtils.js';
+
+// ExtrudeGeometry
 
 function ExtrudeGeometry( shapes, options ) {
-
-	if ( typeof( shapes ) === "undefined" ) {
-
-		shapes = [];
-		return;
-
-	}
 
 	Geometry.call( this );
 
 	this.type = 'ExtrudeGeometry';
 
+	this.parameters = {
+		shapes: shapes,
+		options: options
+	};
+
+	this.fromBufferGeometry( new ExtrudeBufferGeometry( shapes, options ) );
+	this.mergeVertices();
+
+}
+
+ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
+ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
+
+// ExtrudeBufferGeometry
+
+function ExtrudeBufferGeometry( shapes, options ) {
+
+	if ( typeof ( shapes ) === "undefined" ) {
+
+		return;
+
+	}
+
+	BufferGeometry.call( this );
+
+	this.type = 'ExtrudeBufferGeometry';
+
 	shapes = Array.isArray( shapes ) ? shapes : [ shapes ];
 
 	this.addShapeList( shapes, options );
 
-	this.computeFaceNormals();
+	this.computeVertexNormals();
 
 	// can't really use automatic vertex normals
 	// as then front and back sides get smoothed too
@@ -57,12 +80,32 @@ function ExtrudeGeometry( shapes, options ) {
 
 }
 
-ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
-ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
+ExtrudeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+ExtrudeBufferGeometry.prototype.constructor = ExtrudeBufferGeometry;
 
-ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
+ExtrudeBufferGeometry.prototype.getArrays = function () {
+
+	var positionAttribute = this.getAttribute( "position" );
+	var verticesArray = positionAttribute ? Array.prototype.slice.call( positionAttribute.array ) : [];
+
+	var uvAttribute = this.getAttribute( "uv" );
+	var uvArray = uvAttribute ? Array.prototype.slice.call( uvAttribute.array ) : [];
+
+	var IndexAttribute = this.index;
+	var indicesArray = IndexAttribute ? Array.prototype.slice.call( IndexAttribute.array ) : [];
+
+	return {
+		position: verticesArray,
+		uv: uvArray,
+		index: indicesArray
+	};
+
+};
+
+ExtrudeBufferGeometry.prototype.addShapeList = function ( shapes, options ) {
 
 	var sl = shapes.length;
+	options.arrays = this.getArrays();
 
 	for ( var s = 0; s < sl; s ++ ) {
 
@@ -71,9 +114,21 @@ ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
 
 	}
 
+	this.setIndex( options.arrays.index );
+	this.addAttribute( 'position', new Float32BufferAttribute( options.arrays.position, 3 ) );
+	this.addAttribute( 'uv', new Float32BufferAttribute( options.arrays.uv, 2 ) );
+
 };
 
-ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
+ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
+
+	var arrays = options.arrays ? options.arrays : this.getArrays();
+	var verticesArray = arrays.position;
+	var indicesArray = arrays.index;
+	var uvArray = arrays.uv;
+
+	var placeholder = [];
+
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
@@ -130,8 +185,6 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var ahole, h, hl; // looping of holes
 	var scope = this;
 
-	var shapesOffset = this.vertices.length;
-
 	var shapePoints = shape.extractPoints( curveSegments );
 
 	var vertices = shapePoints.shape;
@@ -156,8 +209,6 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			}
 
 		}
-
-		reverse = false; // If vertices are in order now, we shouldn't need to worry about them again (hopefully)!
 
 	}
 
@@ -202,13 +253,15 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		// inPt' is the intersection of the two lines parallel to the two
 		//  adjacent edges of inPt at a distance of 1 unit on the left side.
 
-		var v_trans_x, v_trans_y, shrink_by = 1;		// resulting translation vector for inPt
+		var v_trans_x, v_trans_y, shrink_by; // resulting translation vector for inPt
 
 		// good reading for geometry algorithms (here: line-line intersection)
 		// http://geomalgorithms.com/a05-_intersect-1.html
 
-		var v_prev_x = inPt.x - inPrev.x, v_prev_y = inPt.y - inPrev.y;
-		var v_next_x = inNext.x - inPt.x, v_next_y = inNext.y - inPt.y;
+		var v_prev_x = inPt.x - inPrev.x,
+			v_prev_y = inPt.y - inPrev.y;
+		var v_next_x = inNext.x - inPt.x,
+			v_next_y = inNext.y - inPt.y;
 
 		var v_prev_lensq = ( v_prev_x * v_prev_x + v_prev_y * v_prev_y );
 
@@ -234,9 +287,9 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			// scaling factor for v_prev to intersection point
 
-			var sf = (  ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
-						( ptNextShift_y - ptPrevShift_y ) * v_next_x    ) /
-					  ( v_prev_x * v_next_y - v_prev_y * v_next_x );
+			var sf = ( ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
+					( ptNextShift_y - ptPrevShift_y ) * v_next_x ) /
+				( v_prev_x * v_next_y - v_prev_y * v_next_x );
 
 			// vector from inPt to intersection point
 
@@ -248,7 +301,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
 			if ( v_trans_lensq <= 2 ) {
 
-				return	new Vector2( v_trans_x, v_trans_y );
+				return new Vector2( v_trans_x, v_trans_y );
 
 			} else {
 
@@ -260,7 +313,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			// handle special case of collinear edges
 
-			var direction_eq = false;		// assumes: opposite
+			var direction_eq = false; // assumes: opposite
 			if ( v_prev_x > Number.EPSILON ) {
 
 				if ( v_next_x > Number.EPSILON ) {
@@ -295,7 +348,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 				// console.log("Warning: lines are a straight sequence");
 				v_trans_x = - v_prev_y;
-				v_trans_y =  v_prev_x;
+				v_trans_y = v_prev_x;
 				shrink_by = Math.sqrt( v_prev_lensq );
 
 			} else {
@@ -309,7 +362,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-		return	new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
+		return new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
 
 	}
 
@@ -328,7 +381,8 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	var holesMovements = [], oneHoleMovements, verticesMovements = contourMovements.concat();
+	var holesMovements = [],
+		oneHoleMovements, verticesMovements = contourMovements.concat();
 
 	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
@@ -368,7 +422,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 
-			v( vert.x, vert.y,  - z );
+			v( vert.x, vert.y, - z );
 
 		}
 
@@ -383,7 +437,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
-				v( vert.x, vert.y,  - z );
+				v( vert.x, vert.y, - z );
 
 			}
 
@@ -457,7 +511,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	for ( b = bevelSegments - 1; b >= 0; b -- ) {
 
 		t = b / bevelSegments;
-		z = bevelThickness * Math.cos ( t * Math.PI / 2 );
+		z = bevelThickness * Math.cos( t * Math.PI / 2 );
 		bs = bevelSize * Math.sin( t * Math.PI / 2 );
 
 		// contract shape
@@ -465,7 +519,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		for ( i = 0, il = contour.length; i < il; i ++ ) {
 
 			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-			v( vert.x, vert.y,  amount + z );
+			v( vert.x, vert.y, amount + z );
 
 		}
 
@@ -482,7 +536,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 				if ( ! extrudeByPath ) {
 
-					v( vert.x, vert.y,  amount + z );
+					v( vert.x, vert.y, amount + z );
 
 				} else {
 
@@ -510,6 +564,8 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	/////  Internal functions
 
 	function buildLidFaces() {
+
+		var start = verticesArray.length / 3;
 
 		if ( bevelEnabled ) {
 
@@ -559,12 +615,15 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
+		scope.addGroup( start, verticesArray.length / 3 - start, options.material !== undefined ? options.material : 0 );
+
 	}
 
 	// Create faces for the z-sides of the shape
 
 	function buildSideFaces() {
 
+		var start = verticesArray.length / 3;
 		var layeroffset = 0;
 		sidewalls( contour, layeroffset );
 		layeroffset += contour.length;
@@ -578,6 +637,10 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			layeroffset += ahole.length;
 
 		}
+
+
+		scope.addGroup( start, verticesArray.length / 3 - start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1 );
+
 
 	}
 
@@ -594,7 +657,8 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			//console.log('b', i,j, i-1, k,vertices.length);
 
-			var s = 0, sl = steps  + bevelSegments * 2;
+			var s = 0,
+				sl = steps + bevelSegments * 2;
 
 			for ( s = 0; s < sl; s ++ ) {
 
@@ -606,7 +670,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 					c = layeroffset + k + slen2,
 					d = layeroffset + j + slen2;
 
-				f4( a, b, c, d, contour, s, sl, j, k );
+				f4( a, b, c, d );
 
 			}
 
@@ -614,41 +678,76 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-
 	function v( x, y, z ) {
 
-		scope.vertices.push( new Vector3( x, y, z ) );
+		placeholder.push( x );
+		placeholder.push( y );
+		placeholder.push( z );
 
 	}
+
 
 	function f3( a, b, c ) {
 
-		a += shapesOffset;
-		b += shapesOffset;
-		c += shapesOffset;
+		addVertex( a );
+		addVertex( b );
+		addVertex( c );
 
-		scope.faces.push( new Face3( a, b, c, null, null, 0 ) );
+		var nextIndex = verticesArray.length / 3;
+		var uvs = uvgen.generateTopUV( scope, verticesArray, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
 
-		var uvs = uvgen.generateTopUV( scope, a, b, c );
-
-		scope.faceVertexUvs[ 0 ].push( uvs );
+		addUV( uvs[ 0 ] );
+		addUV( uvs[ 1 ] );
+		addUV( uvs[ 2 ] );
 
 	}
 
-	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
+	function f4( a, b, c, d ) {
 
-		a += shapesOffset;
-		b += shapesOffset;
-		c += shapesOffset;
-		d += shapesOffset;
+		addVertex( a );
+		addVertex( b );
+		addVertex( d );
 
-		scope.faces.push( new Face3( a, b, d, null, null, 1 ) );
-		scope.faces.push( new Face3( b, c, d, null, null, 1 ) );
+		addVertex( b );
+		addVertex( c );
+		addVertex( d );
 
-		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
 
-		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
-		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
+		var nextIndex = verticesArray.length / 3;
+		var uvs = uvgen.generateSideWallUV( scope, verticesArray, nextIndex - 6, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
+
+		addUV( uvs[ 0 ] );
+		addUV( uvs[ 1 ] );
+		addUV( uvs[ 3 ] );
+
+		addUV( uvs[ 1 ] );
+		addUV( uvs[ 2 ] );
+		addUV( uvs[ 3 ] );
+
+	}
+
+	function addVertex( index ) {
+
+		indicesArray.push( verticesArray.length / 3 );
+		verticesArray.push( placeholder[ index * 3 + 0 ] );
+		verticesArray.push( placeholder[ index * 3 + 1 ] );
+		verticesArray.push( placeholder[ index * 3 + 2 ] );
+
+	}
+
+
+	function addUV( vector2 ) {
+
+		uvArray.push( vector2.x );
+		uvArray.push( vector2.y );
+
+	}
+
+	if ( ! options.arrays ) {
+
+		this.setIndex( indicesArray );
+		this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
 
 	}
 
@@ -656,47 +755,54 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 ExtrudeGeometry.WorldUVGenerator = {
 
-	generateTopUV: function ( geometry, indexA, indexB, indexC ) {
+	generateTopUV: function ( geometry, vertices, indexA, indexB, indexC ) {
 
-		var vertices = geometry.vertices;
-
-		var a = vertices[ indexA ];
-		var b = vertices[ indexB ];
-		var c = vertices[ indexC ];
+		var a_x = vertices[ indexA * 3 ];
+		var a_y = vertices[ indexA * 3 + 1 ];
+		var b_x = vertices[ indexB * 3 ];
+		var b_y = vertices[ indexB * 3 + 1 ];
+		var c_x = vertices[ indexC * 3 ];
+		var c_y = vertices[ indexC * 3 + 1 ];
 
 		return [
-			new Vector2( a.x, a.y ),
-			new Vector2( b.x, b.y ),
-			new Vector2( c.x, c.y )
+			new Vector2( a_x, a_y ),
+			new Vector2( b_x, b_y ),
+			new Vector2( c_x, c_y )
 		];
 
 	},
 
-	generateSideWallUV: function ( geometry, indexA, indexB, indexC, indexD ) {
+	generateSideWallUV: function ( geometry, vertices, indexA, indexB, indexC, indexD ) {
 
-		var vertices = geometry.vertices;
+		var a_x = vertices[ indexA * 3 ];
+		var a_y = vertices[ indexA * 3 + 1 ];
+		var a_z = vertices[ indexA * 3 + 2 ];
+		var b_x = vertices[ indexB * 3 ];
+		var b_y = vertices[ indexB * 3 + 1 ];
+		var b_z = vertices[ indexB * 3 + 2 ];
+		var c_x = vertices[ indexC * 3 ];
+		var c_y = vertices[ indexC * 3 + 1 ];
+		var c_z = vertices[ indexC * 3 + 2 ];
+		var d_x = vertices[ indexD * 3 ];
+		var d_y = vertices[ indexD * 3 + 1 ];
+		var d_z = vertices[ indexD * 3 + 2 ];
 
-		var a = vertices[ indexA ];
-		var b = vertices[ indexB ];
-		var c = vertices[ indexC ];
-		var d = vertices[ indexD ];
-
-		if ( Math.abs( a.y - b.y ) < 0.01 ) {
+		if ( Math.abs( a_y - b_y ) < 0.01 ) {
 
 			return [
-				new Vector2( a.x, 1 - a.z ),
-				new Vector2( b.x, 1 - b.z ),
-				new Vector2( c.x, 1 - c.z ),
-				new Vector2( d.x, 1 - d.z )
+				new Vector2( a_x, 1 - a_z ),
+				new Vector2( b_x, 1 - b_z ),
+				new Vector2( c_x, 1 - c_z ),
+				new Vector2( d_x, 1 - d_z )
 			];
 
 		} else {
 
 			return [
-				new Vector2( a.y, 1 - a.z ),
-				new Vector2( b.y, 1 - b.z ),
-				new Vector2( c.y, 1 - c.z ),
-				new Vector2( d.y, 1 - d.z )
+				new Vector2( a_y, 1 - a_z ),
+				new Vector2( b_y, 1 - b_z ),
+				new Vector2( c_y, 1 - c_z ),
+				new Vector2( d_y, 1 - d_z )
 			];
 
 		}
@@ -705,4 +811,4 @@ ExtrudeGeometry.WorldUVGenerator = {
 };
 
 
-export { ExtrudeGeometry };
+export { ExtrudeGeometry, ExtrudeBufferGeometry };

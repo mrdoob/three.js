@@ -15,7 +15,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy )</h3>
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
 
 		<h2>Example</h2>
 
@@ -114,7 +114,7 @@
 		<h3>[property:number format]</h3>
 		<div>
 		The default is [page:Textures THREE.RGBAFormat], although the [page:TextureLoader TextureLoader] will automatically
-		et this to [page:Textures THREE.RGBFormat] for JPG images. <br /><br />
+		set this to [page:Textures THREE.RGBFormat] for JPG images. <br /><br />
 
 		See the [page:Textures texture constants] page for details of other formats.
 		</div>
@@ -130,12 +130,46 @@
 		<h3>[property:Vector2 offset]</h3>
 		<div>
 		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
-		Typical range is *0.0* to *1.0*.
+		Typical range is *0.0* to *1.0*.  _Note:_ The offset property is a convenience modifier and only affects 
+		the Texture's application to the first set of UVs on a model.  If the Texture is used as a map requiring
+		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually 
+		assigned to achieve the desired offset.
 		</div>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<div>
-		How many times the texture is repeated across the surface, in each direction U and V.
+		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set 
+		greater than 1 in either direction, the corresponding Wrap parameter should also be set to 
+		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired 
+		tiling effect.  _Note:_ The repeat property is a convenience modifier and only affects 
+		the Texture's application to the first set of UVs on a model.  If the Texture is used as a map requiring
+		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually 
+		assigned to achieve the desired repetiton.
+		</div>
+
+		<h3>[property:number rotation]</h3>
+		<div>
+		How much the texture is rotated around the center point, in radians. Postive values are counter-clockwise. Default is *0*.
+		</div>
+
+		<h3>[property:Vector2 center]</h3>
+		<div>
+		Indicates where the center of rotation is. To rotate around the center point set this value to (0.5, 0.5). Default value is (0.0, 0.0).
+		</div>
+
+		<h3>[property:boolean matrixAutoUpdate]</h3>
+		<div>
+		Whether to update the texture's uv-transform [property:Matrix3 matrix] based on the [property:Vector2 offset],
+		[property:Vector2 repeat], and [property:number rotation] settings. True by default.
+		Set this to false if you are specifying the uv-transform matrix directly.
+		</div>
+
+		<h3>[property:Matrix3 matrix]</h3>
+		<div>
+		The uv-transform matrix for the texture. Updated by the renderer from the texture properties [property:Vector2 offset], [property:Vector2 repeat],
+		and [property:number rotation] when the texture's [property:boolean matrixAutoUpdate] property is true.
+		When [property:boolean matrixAutoUpdate] property is false, this matrix may be set manually.
+		Default is the indentity matrix.
 		</div>
 
 		<h3>[property:boolean generateMipmaps]</h3>

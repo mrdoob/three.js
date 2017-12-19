@@ -221,7 +221,7 @@ THREE.TimelinerController.prototype = {
 		for ( var i = 0, n = names.length; i !== n; ++ i ) {
 
 			var name = names[ i ],
-				track = tracks[ name ];
+				track = tracks[ name ],
 				data = channels[ name ];
 
 			this._setArray( track.times, data.times );

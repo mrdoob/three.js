@@ -92,6 +92,9 @@ m.elements = [ 11, 21, 31,
 		[link:https://en.wikipedia.org/wiki/Determinant determinant] of this matrix.
 		</div>
 
+		<h3>[method:Boolean equals]( [page:Matrix3 m] )</h3>
+		<div>Return true if this matrix and [page:Matrix3 m] are equal.</div>
+
 		<h3>[method:Matrix3 fromArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
 		[page:Array array] - the array to read the elements from.<br />
@@ -132,6 +135,12 @@ m.elements = [ 11, 21, 31,
 
 		</div>
 
+		<h3>[method:Matrix3 multiply]( [page:Matrix3 m] )</h3>
+		<div>Post-multiplies this matrix by [page:Matrix3 m].</div>
+
+		<h3>[method:Matrix3 multiplyMatrices]( [page:Matrix3 a], [page:Matrix3 b] )</h3>
+		<div>Sets this matrix to [page:Matrix3 a] x [page:Matrix3 b].</div>
+
 		<h3>[method:Matrix3 multiplyScalar]( [page:Float s] )</h3>
 		<div>Multiplies every component of the matrix by the scalar value *s*.</div>
 
@@ -154,8 +163,28 @@ m.elements = [ 11, 21, 31,
 		sequence of values.
 		</div>
 
+		<h3>[method:Matrix3 premultiply]( [page:Matrix3 m] )</h3>
+		<div>Pre-multiplies this matrix by [page:Matrix3 m].</div>
+
 		<h3>[method:Matrix3 setFromMatrix4]( [page:Matrix4 m] )</h3>
 		<div>Set this matrx to the upper 3x3 matrix of the Matrix4 [page:Matrix4 m].</div>
+
+		<h3>
+			[method:Matrix3 setUvTransform](
+			[page:Float tx], [page:Float ty], [page:Float sx], [page:Float sy],
+			[page:Float rotation], [page:Float cx], [page:Float cy] )
+		</h3>
+		<div>
+		[page:Float tx] - offset x<br />
+		[page:Float ty] - offset y<br />
+		[page:Float sx] - repeat x<br />
+		[page:Float sy] - repeat y<br />
+		[page:Float rotation] - rotation (in radians)<br />
+		[page:Float cx] - center x of rotation<br />
+		[page:Float cy] - center y of rotation<br /><br />
+
+		Sets the UV transform matrix from offset, repeat, rotation, and center.
+		</div>
 
 		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>

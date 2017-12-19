@@ -31,12 +31,13 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - mirror node-based
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - mirror node-based
 		</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/Mirror.js"></script>
+		<script src="js/objects/Reflector.js"></script>
+		<script src="js/objects/ReflectorRTT.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<!-- NodeLibrary -->
@@ -71,7 +72,7 @@
 		<script src="js/nodes/inputs/TextureNode.js"></script>
 		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
 		<script src="js/nodes/inputs/Matrix4Node.js"></script>
-		<script src="js/nodes/inputs/MirrorNode.js"></script>
+		<script src="js/nodes/inputs/ReflectorNode.js"></script>
 
 		<!-- Math -->
 		<script src="js/nodes/math/Math1Node.js"></script>
@@ -116,10 +117,9 @@
 			var clock = new THREE.Clock();
 
 			var cameraControls;
-			
+
 			var gui = new dat.GUI();
 
-			var groundMirror;
 			var sphereGroup, smallSphere;
 			var groundMirrorMaterial;
 
@@ -152,13 +152,14 @@
 
 				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 
-				// MIRROR planes
-				groundMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color: 0x777777 } );
+				// reflector/mirror plane
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var groundMirror = new THREE.ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
 
 				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
 				var maskFlip = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
 
-				var mirror = new THREE.MirrorNode( groundMirror );
+				var mirror = new THREE.ReflectorNode( groundMirror );
 
 				var normal = new THREE.TextureNode( decalNormal );
 				var normalXY = new THREE.SwitchNode( normal, 'xy' );
@@ -229,7 +230,7 @@
 				sphereGroup.add( halfSphere );
 
 				var geometry = new THREE.IcosahedronGeometry( 5, 0 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, shading: THREE.FlatShading } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, flatShading: true } );
 				smallSphere = new THREE.Mesh( geometry, material );
 				scene.add(smallSphere);
 
@@ -283,13 +284,6 @@
 
 			function render() {
 
-				// render (update) the mirrors
-				groundMirrorMaterial.visible = false;
-
-				groundMirror.render();
-
-				groundMirrorMaterial.visible = true;
-
 				renderer.render(scene, camera);
 
 			}
@@ -312,8 +306,6 @@
 				smallSphere.rotation.z = timer * 0.8;
 
 				groundMirrorMaterial.updateFrame( delta );
-
-				cameraControls.update();
 
 				render();
 			}

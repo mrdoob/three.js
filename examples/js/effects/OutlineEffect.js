@@ -93,27 +93,20 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	var vertexShaderChunk2 = [
 
 		"#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( TOON ) && ! defined( PHYSICAL )",
-
 		"	#ifndef USE_ENVMAP",
 		"		vec3 objectNormal = normalize( normal );",
-
-		"		#ifdef FLIP_SIDED",
-		"			objectNormal = -objectNormal;",
-		"		#endif",
-
 		"	#endif",
+		"#endif",
 
+		"#ifdef FLIP_SIDED",
+		"	objectNormal = -objectNormal;",
 		"#endif",
 
 		"#ifdef DECLARE_TRANSFORMED",
 		"	vec3 transformed = vec3( position );",
 		"#endif",
 
-		"#ifdef USE_SKINNING",
-		"	gl_Position = calculateOutline( gl_Position, objectNormal, skinned );",
-		"#else",
-		"	gl_Position = calculateOutline( gl_Position, objectNormal, vec4( transformed, 1.0 ) );",
-		"#endif",
+		"gl_Position = calculateOutline( gl_Position, objectNormal, vec4( transformed, 1.0 ) );",
 
 		"#include <fog_vertex>"
 
@@ -206,6 +199,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 			fragmentShader: fragmentShader,
 			side: THREE.BackSide,
 			//wireframe: true,
+			skinning: false,
 			morphTargets: false,
 			morphNormals: false,
 			fog: false
@@ -326,6 +320,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		var outlineParameters = originalMaterial.outlineParameters;
 
+		material.skinning = originalMaterial.skinning;
 		material.morphTargets = originalMaterial.morphTargets;
 		material.morphNormals = originalMaterial.morphNormals;
 		material.fog = originalMaterial.fog;

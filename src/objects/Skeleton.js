@@ -1,4 +1,4 @@
-import { Matrix4 } from '../math/Matrix4';
+import { Matrix4 } from '../math/Matrix4.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -8,8 +8,6 @@ import { Matrix4 } from '../math/Matrix4';
  */
 
 function Skeleton( bones, boneInverses ) {
-
-	this.identityMatrix = new Matrix4();
 
 	// copy the bone array
 
@@ -36,7 +34,7 @@ function Skeleton( bones, boneInverses ) {
 
 			this.boneInverses = [];
 
-			for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+			for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
 
 				this.boneInverses.push( new Matrix4() );
 
@@ -54,13 +52,13 @@ Object.assign( Skeleton.prototype, {
 
 		this.boneInverses = [];
 
-		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
 
 			var inverse = new Matrix4();
 
-			if ( this.bones[ b ] ) {
+			if ( this.bones[ i ] ) {
 
-				inverse.getInverse( this.bones[ b ].matrixWorld );
+				inverse.getInverse( this.bones[ i ].matrixWorld );
 
 			}
 
@@ -72,17 +70,17 @@ Object.assign( Skeleton.prototype, {
 
 	pose: function () {
 
-		var bone;
+		var bone, i, il;
 
 		// recover the bind-time world matrices
 
-		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+		for ( i = 0, il = this.bones.length; i < il; i ++ ) {
 
-			bone = this.bones[ b ];
+			bone = this.bones[ i ];
 
 			if ( bone ) {
 
-				bone.matrixWorld.getInverse( this.boneInverses[ b ] );
+				bone.matrixWorld.getInverse( this.boneInverses[ i ] );
 
 			}
 
@@ -90,9 +88,9 @@ Object.assign( Skeleton.prototype, {
 
 		// compute the local matrices, positions, rotations and scales
 
-		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+		for ( i = 0, il = this.bones.length; i < il; i ++ ) {
 
-			bone = this.bones[ b ];
+			bone = this.bones[ i ];
 
 			if ( bone ) {
 
@@ -118,6 +116,7 @@ Object.assign( Skeleton.prototype, {
 	update: ( function () {
 
 		var offsetMatrix = new Matrix4();
+		var identityMatrix = new Matrix4();
 
 		return function update() {
 
@@ -128,14 +127,14 @@ Object.assign( Skeleton.prototype, {
 
 			// flatten bone matrices to array
 
-			for ( var b = 0, bl = bones.length; b < bl; b ++ ) {
+			for ( var i = 0, il = bones.length; i < il; i ++ ) {
 
 				// compute the offset between the current and the original transform
 
-				var matrix = bones[ b ] ? bones[ b ].matrixWorld : this.identityMatrix;
+				var matrix = bones[ i ] ? bones[ i ].matrixWorld : identityMatrix;
 
-				offsetMatrix.multiplyMatrices( matrix, boneInverses[ b ] );
-				offsetMatrix.toArray( boneMatrices, b * 16 );
+				offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
+				offsetMatrix.toArray( boneMatrices, i * 16 );
 
 			}
 

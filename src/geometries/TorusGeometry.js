@@ -1,10 +1,15 @@
 /**
  * @author oosmoxiecode
  * @author mrdoob / http://mrdoob.com/
- * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { Geometry } from '../core/Geometry';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
+
+// TorusGeometry
 
 function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 
@@ -21,19 +26,14 @@ function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 	};
 
 	this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
+	this.mergeVertices();
 
 }
 
 TorusGeometry.prototype = Object.create( Geometry.prototype );
 TorusGeometry.prototype.constructor = TorusGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
+// TorusBufferGeometry
 
 function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 
@@ -49,8 +49,8 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 		arc: arc
 	};
 
-	radius = radius || 100;
-	tube = tube || 40;
+	radius = radius || 1;
+	tube = tube || 0.4;
 	radialSegments = Math.floor( radialSegments ) || 8;
 	tubularSegments = Math.floor( tubularSegments ) || 6;
 	arc = arc || Math.PI * 2;
@@ -137,5 +137,6 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 
 TorusBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;
+
 
 export { TorusGeometry, TorusBufferGeometry };

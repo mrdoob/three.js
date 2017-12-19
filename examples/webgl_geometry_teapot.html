@@ -31,7 +31,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - the Utah Teapot<br />
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - the Utah Teapot<br />
 			from <a href="https://www.udacity.com/course/interactive-3d-graphics--cs291">Udacity Interactive 3D Graphics</a>
 		</div>
 
@@ -81,7 +81,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				var canvasWidth = window.innerWidth;
@@ -99,7 +99,6 @@
 
 				// RENDERER
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xAAAAAA );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
 				renderer.gammaInput = true;
@@ -111,7 +110,6 @@
 
 				// CONTROLS
 				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
-				cameraControls.target.set( 0, 0, 0 );
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
@@ -135,18 +133,19 @@
 
 				wireMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } ) ;
 
-				flatMaterial = new THREE.MeshPhongMaterial( { color: materialColor, specular: 0x0, shading: THREE.FlatShading, side: THREE.DoubleSide } );
+				flatMaterial = new THREE.MeshPhongMaterial( { color: materialColor, specular: 0x000000, flatShading: true, side: THREE.DoubleSide } );
 
 				gouraudMaterial = new THREE.MeshLambertMaterial( { color: materialColor, side: THREE.DoubleSide } );
 
-				phongMaterial = new THREE.MeshPhongMaterial( { color: materialColor, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
+				phongMaterial = new THREE.MeshPhongMaterial( { color: materialColor, side: THREE.DoubleSide } );
 
-				texturedMaterial = new THREE.MeshPhongMaterial( { color: materialColor, map: textureMap, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
+				texturedMaterial = new THREE.MeshPhongMaterial( { color: materialColor, map: textureMap, side: THREE.DoubleSide } );
 
-				reflectiveMaterial = new THREE.MeshPhongMaterial( { color: materialColor, envMap: textureCube, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
+				reflectiveMaterial = new THREE.MeshPhongMaterial( { color: materialColor, envMap: textureCube, side: THREE.DoubleSide } );
 
 				// scene itself
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xAAAAAA );
 
 				scene.add( ambientLight );
 				scene.add( light );

@@ -49,9 +49,9 @@
 
 	<div id="container"></div>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> -
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		marching cubes -
-		[based on greggman's <a href="http://webglsamples.googlecode.com/hg/blob/blob.html">blob</a>, original code by Henrik Rydgård]
+		[based on greggman's <a href="https://webglsamples.org/blob/blob.html">blob</a>, original code by Henrik Rydgård]
 	</div>
 
 	<script src="../build/three.js"></script>
@@ -118,6 +118,7 @@
 			// SCENE
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x050505 );
 
 			// LIGHTS
 
@@ -154,7 +155,6 @@
 			// RENDERER
 
 			renderer = new THREE.WebGLRenderer();
-			renderer.setClearColor( 0x050505 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
@@ -183,7 +183,7 @@
 			renderer.autoClear = false;
 
 			var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
-			renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
+			var renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
 			effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
@@ -198,8 +198,6 @@
 			hblur.uniforms[ 'r' ].value = vblur.uniforms[ 'r' ].value = 0.5;
 
 			effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
-
-			composer = new THREE.EffectComposer( renderer, renderTarget );
 
 			var renderModel = new THREE.RenderPass( scene, camera );
 
@@ -315,7 +313,7 @@
 
 			"flat" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, flatShading: true } ),
 				h: 0, s: 0, l: 1
 			},
 
@@ -566,8 +564,6 @@
 
 			time += delta * effectController.speed * 0.5;
 
-			controls.update( delta );
-
 			// marching cubes
 
 			if ( effectController.resolution !== resolution ) {
@@ -595,7 +591,7 @@
 
 				} else if ( current_material === "hatching2" ) {
 
-					u = effect.material.uniforms;
+					var u = effect.material.uniforms;
 
 					u.uLineColor1.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 					u.uLineColor2.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );

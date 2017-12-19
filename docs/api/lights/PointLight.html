@@ -27,9 +27,7 @@
 			[example:webgl_lights_pointlights lights / pointlights ]<br />
 			[example:webgl_lights_pointlights2 lights / pointlights2 ]<br />
 			[example:webgldeferred_animation animation ]<br />
-			[example:webgldeferred_pointlights pointlights ]<br />
 			[example:webgl_effects_anaglyph effects / anaglyph ]<br />
-			[example:webgl_geometry_large_mesh geometry / large / mesh ]<br />
 			[example:webgl_geometry_text geometry / text ]<br />
 			[example:webgl_lensflares lensflares ]
 		</div>
@@ -84,11 +82,11 @@ scene.add( light );
 		<div>
 			The light's power.<br />
 			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, the luminous
-			power of the light measured in lumens. Default - *4PI*. <br /><br />
+			power of the light measured in lumens. Default is *4Math.PI*. <br /><br />
 
 			This is directly related to the [page:.intensity intensity] in the ratio
 			<code>
-				power = intensity * 4&Pi;
+				power = intensity * 4&pi;
 			</code>
 			and changing this will also change the intensity.
 		</div>

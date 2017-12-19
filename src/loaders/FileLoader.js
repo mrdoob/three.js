@@ -2,8 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Cache } from './Cache';
-import { DefaultLoadingManager } from './LoadingManager';
+import { Cache } from './Cache.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
+
+var loading = {};
 
 function FileLoader( manager ) {
 
@@ -18,6 +20,8 @@ Object.assign( FileLoader.prototype, {
 		if ( url === undefined ) url = '';
 
 		if ( this.path !== undefined ) url = this.path + url;
+
+		url = this.manager.resolveURL( url );
 
 		var scope = this;
 
@@ -36,6 +40,22 @@ Object.assign( FileLoader.prototype, {
 			}, 0 );
 
 			return cached;
+
+		}
+
+		// Check if request is duplicate
+
+		if ( loading[ url ] !== undefined ) {
+
+			loading[ url ].push( {
+
+				onLoad: onLoad,
+				onProgress: onProgress,
+				onError: onError
+
+			} );
+
+			return;
 
 		}
 
@@ -64,9 +84,7 @@ Object.assign( FileLoader.prototype, {
 					case 'arraybuffer':
 					case 'blob':
 
-					 	response = new ArrayBuffer( data.length );
-
-						var view = new Uint8Array( response );
+						var view = new Uint8Array( data.length );
 
 						for ( var i = 0; i < data.length; i ++ ) {
 
@@ -76,7 +94,11 @@ Object.assign( FileLoader.prototype, {
 
 						if ( responseType === 'blob' ) {
 
-							response = new Blob( [ response ], { type: mimeType } );
+							response = new Blob( [ view.buffer ], { type: mimeType } );
+
+						} else {
+
+							response = view.buffer;
 
 						}
 
@@ -103,7 +125,7 @@ Object.assign( FileLoader.prototype, {
 
 				}
 
-				// Wait for next browser tick
+				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
 				window.setTimeout( function () {
 
 					if ( onLoad ) onLoad( response );
@@ -114,11 +136,12 @@ Object.assign( FileLoader.prototype, {
 
 			} catch ( error ) {
 
-				// Wait for next browser tick
+				// Wait for next browser tick like standard XMLHttpRequest event dispatching does
 				window.setTimeout( function () {
 
 					if ( onError ) onError( error );
 
+					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
 
 				}, 0 );
@@ -127,18 +150,40 @@ Object.assign( FileLoader.prototype, {
 
 		} else {
 
+			// Initialise array for duplicate requests
+
+			loading[ url ] = [];
+
+			loading[ url ].push( {
+
+				onLoad: onLoad,
+				onProgress: onProgress,
+				onError: onError
+
+			} );
+
 			var request = new XMLHttpRequest();
+
 			request.open( 'GET', url, true );
 
 			request.addEventListener( 'load', function ( event ) {
 
-				var response = event.target.response;
+				var response = this.response;
 
 				Cache.add( url, response );
 
+				var callbacks = loading[ url ];
+
+				delete loading[ url ];
+
 				if ( this.status === 200 ) {
 
-					if ( onLoad ) onLoad( response );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						var callback = callbacks[ i ];
+						if ( callback.onLoad ) callback.onLoad( response );
+
+					}
 
 					scope.manager.itemEnd( url );
 
@@ -149,34 +194,58 @@ Object.assign( FileLoader.prototype, {
 
 					console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-					if ( onLoad ) onLoad( response );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+						var callback = callbacks[ i ];
+						if ( callback.onLoad ) callback.onLoad( response );
+
+					}
 
 					scope.manager.itemEnd( url );
 
 				} else {
 
-					if ( onError ) onError( event );
+					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
+						var callback = callbacks[ i ];
+						if ( callback.onError ) callback.onError( event );
+
+					}
+
+					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
 
 				}
 
 			}, false );
 
-			if ( onProgress !== undefined ) {
+			request.addEventListener( 'progress', function ( event ) {
 
-				request.addEventListener( 'progress', function ( event ) {
+				var callbacks = loading[ url ];
 
-					onProgress( event );
+				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
-				}, false );
+					var callback = callbacks[ i ];
+					if ( callback.onProgress ) callback.onProgress( event );
 
-			}
+				}
+
+			}, false );
 
 			request.addEventListener( 'error', function ( event ) {
 
-				if ( onError ) onError( event );
+				var callbacks = loading[ url ];
 
+				delete loading[ url ];
+
+				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+					var callback = callbacks[ i ];
+					if ( callback.onError ) callback.onError( event );
+
+				}
+
+				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
 
 			}, false );

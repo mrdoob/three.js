@@ -276,8 +276,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( _clearAlpha > 0 ) {
 
-				setBlending( THREE.NormalBlending );
 				setOpacity( 1 );
+				setBlending( THREE.NormalBlending );
 
 				setFillStyle( 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearAlpha + ')' );
 
@@ -315,7 +315,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( background && background.isColor ) {
 
-			setFillStyle( 'rgb(' + Math.floor( background.r * 255 ) + ',' + Math.floor( background.g * 255 ) + ',' + Math.floor( background.b * 255 ) + ')' );
+			setOpacity( 1 );
+			setBlending( THREE.NormalBlending );
+
+			setFillStyle( background.getStyle() );
 			_context.fillRect( 0, 0, _canvasWidth, _canvasHeight );
 
 		} else if ( this.autoClear === true ) {
@@ -517,7 +520,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var scaleX = element.scale.x * _canvasWidthHalf;
 		var scaleY = element.scale.y * _canvasHeightHalf;
 
-		var dist = 0.5 * Math.sqrt( scaleX * scaleX + scaleY * scaleY ); // allow for rotated sprite
+		var dist = Math.sqrt( scaleX * scaleX + scaleY * scaleY ); // allow for rotated sprite
 		_elemBox.min.set( v1.x - dist, v1.y - dist );
 		_elemBox.max.set( v1.x + dist, v1.y + dist );
 
@@ -591,6 +594,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_context.restore();
 
+		} else if ( material.isPointsMaterial ) {
+
+			setFillStyle( material.color.getStyle() );
+
+			_context.save();
+			_context.translate( v1.x, v1.y );
+			if ( material.rotation !== 0 ) _context.rotate( material.rotation );
+			_context.scale( scaleX * material.size, - scaleY * material.size );
+			_context.fillRect( - 0.5, - 0.5, 1, 1 );
+			_context.restore();
+
 		}
 
 		/* DEBUG
@@ -658,22 +672,20 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			}
 
+			if ( material.isLineDashedMaterial ) {
+
+				setLineDash( [ material.dashSize, material.gapSize ] );
+
+			}
+
 			_context.stroke();
 			_elemBox.expandByScalar( material.linewidth * 2 );
 
-		} else if ( material.isLineDashedMaterial ) {
+			if ( material.isLineDashedMaterial ) {
 
-			setLineWidth( material.linewidth );
-			setLineCap( material.linecap );
-			setLineJoin( material.linejoin );
-			setStrokeStyle( material.color.getStyle() );
-			setLineDash( [ material.dashSize, material.gapSize ] );
+				setLineDash( [] );
 
-			_context.stroke();
-
-			_elemBox.expandByScalar( material.linewidth * 2 );
-
-			setLineDash( [] );
+			}
 
 		}
 

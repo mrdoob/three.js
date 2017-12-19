@@ -1,4 +1,4 @@
-import { Ray } from '../math/Ray';
+import { Ray } from '../math/Ray.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -25,8 +25,10 @@ function Raycaster( origin, direction, near, far ) {
 	Object.defineProperties( this.params, {
 		PointCloud: {
 			get: function () {
+
 				console.warn( 'THREE.Raycaster: params.PointCloud has been renamed to params.Points.' );
 				return this.Points;
+
 			}
 		}
 	} );
@@ -73,12 +75,12 @@ Object.assign( Raycaster.prototype, {
 
 	setFromCamera: function ( coords, camera ) {
 
-		if ( (camera && camera.isPerspectiveCamera) ) {
+		if ( ( camera && camera.isPerspectiveCamera ) ) {
 
 			this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
 			this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
 
-		} else if ( (camera && camera.isOrthographicCamera) ) {
+		} else if ( ( camera && camera.isOrthographicCamera ) ) {
 
 			this.ray.origin.set( coords.x, coords.y, ( camera.near + camera.far ) / ( camera.near - camera.far ) ).unproject( camera ); // set origin in plane of camera
 			this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );

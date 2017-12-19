@@ -40,7 +40,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - color lines WebGL demo
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - color lines WebGL demo
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
@@ -86,7 +86,7 @@
 				container.appendChild( renderer.domElement );
 
 				var geometry3 = new THREE.Geometry(),
-					points = hilbert2D( new THREE.Vector3( 0,0,0 ), 400.0, 4, 0, 1, 2, 3, 4, 5, 6, 7 ),
+					points = hilbert2D( new THREE.Vector3( 0,0,0 ), 400.0, 4 ),
 					colors3 = [];
 
 				for ( i = 0; i < points.length; i ++ ) {

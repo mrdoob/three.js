@@ -30,7 +30,11 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
-		_domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+		_domElement.addEventListener( 'mouseup', onDocumentMouseCancel, false );
+		_domElement.addEventListener( 'mouseleave', onDocumentMouseCancel, false );
+		_domElement.addEventListener( 'touchmove', onDocumentTouchMove, false );
+		_domElement.addEventListener( 'touchstart', onDocumentTouchStart, false );
+		_domElement.addEventListener( 'touchend', onDocumentTouchEnd, false );
 
 	}
 
@@ -38,7 +42,11 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
-		_domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+		_domElement.removeEventListener( 'mouseup', onDocumentMouseCancel, false );
+		_domElement.removeEventListener( 'mouseleave', onDocumentMouseCancel, false );
+		_domElement.removeEventListener( 'touchmove', onDocumentTouchMove, false );
+		_domElement.removeEventListener( 'touchstart', onDocumentTouchStart, false );
+		_domElement.removeEventListener( 'touchend', onDocumentTouchEnd, false );
 
 	}
 
@@ -52,8 +60,10 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		event.preventDefault();
 
-		_mouse.x = ( event.clientX / _domElement.clientWidth ) * 2 - 1;
-		_mouse.y = - ( event.clientY / _domElement.clientHeight ) * 2 + 1;
+		var rect = _domElement.getBoundingClientRect();
+
+		_mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+		_mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
@@ -132,7 +142,86 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
-	function onDocumentMouseUp( event ) {
+	function onDocumentMouseCancel( event ) {
+
+		event.preventDefault();
+
+		if ( _selected ) {
+
+			scope.dispatchEvent( { type: 'dragend', object: _selected } );
+
+			_selected = null;
+
+		}
+
+		_domElement.style.cursor = 'auto';
+
+	}
+
+	function onDocumentTouchMove( event ) {
+
+		event.preventDefault();
+		event = event.changedTouches[ 0 ];
+
+		var rect = _domElement.getBoundingClientRect();
+
+		_mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+		_mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+
+		_raycaster.setFromCamera( _mouse, _camera );
+
+		if ( _selected && scope.enabled ) {
+
+			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
+
+				_selected.position.copy( _intersection.sub( _offset ) );
+
+			}
+
+			scope.dispatchEvent( { type: 'drag', object: _selected } );
+
+			return;
+
+		}
+
+	}
+
+	function onDocumentTouchStart( event ) {
+
+		event.preventDefault();
+		event = event.changedTouches[ 0 ];
+
+		var rect = _domElement.getBoundingClientRect();
+
+		_mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+		_mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+
+		_raycaster.setFromCamera( _mouse, _camera );
+
+		var intersects = _raycaster.intersectObjects( _objects );
+
+		if ( intersects.length > 0 ) {
+
+			_selected = intersects[ 0 ].object;
+
+			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _selected.position );
+
+			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
+
+				_offset.copy( _intersection ).sub( _selected.position );
+
+			}
+
+			_domElement.style.cursor = 'move';
+
+			scope.dispatchEvent( { type: 'dragstart', object: _selected } );
+
+		}
+
+
+	}
+
+	function onDocumentTouchEnd( event ) {
 
 		event.preventDefault();
 

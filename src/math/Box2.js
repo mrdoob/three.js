@@ -1,4 +1,4 @@
-import { Vector2 } from './Vector2';
+import { Vector2 } from './Vector2.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -155,7 +155,8 @@ Object.assign( Box2.prototype, {
 
 	intersectsBox: function ( box ) {
 
-		// using 6 splitting planes to rule out intersections.
+		// using 4 splitting planes to rule out intersections
+
 		return box.max.x < this.min.x || box.min.x > this.max.x ||
 			box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
 

@@ -16,19 +16,23 @@
 		<script src="../examples/js/controls/TransformControls.js"></script>
 
 		<script src="../examples/js/libs/jszip.min.js"></script>
+		<script src="../examples/js/libs/inflate.min.js"></script> <!-- FBX -->
+
 		<script src="../examples/js/loaders/AMFLoader.js"></script>
 		<script src="../examples/js/loaders/AWDLoader.js"></script>
 		<script src="../examples/js/loaders/BabylonLoader.js"></script>
-		<script src="../examples/js/loaders/ColladaLoader2.js"></script>
-		<script src="../examples/js/loaders/FBXLoader2.js"></script>
+		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script src="../examples/js/loaders/FBXLoader.js"></script>
 		<script src="../examples/js/loaders/GLTFLoader.js"></script>
 		<script src="../examples/js/loaders/KMZLoader.js"></script>
 		<script src="../examples/js/loaders/MD2Loader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
+		<script src="../examples/js/loaders/MTLLoader.js"></script>
 		<script src="../examples/js/loaders/PlayCanvasLoader.js"></script>
 		<script src="../examples/js/loaders/PLYLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
 		<script src="../examples/js/loaders/TGALoader.js"></script>
+		<script src="../examples/js/loaders/TDSLoader.js"></script>
 		<script src="../examples/js/loaders/UTF8Loader.js"></script>
 		<script src="../examples/js/loaders/VRMLLoader.js"></script>
 		<script src="../examples/js/loaders/VTKLoader.js"></script>
@@ -36,9 +40,8 @@
 		<script src="../examples/js/loaders/ctm/ctm.js"></script>
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
+		<script src="../examples/js/exporters/GLTFExporter.js"></script>
 		<script src="../examples/js/exporters/STLExporter.js"></script>
-
-		<script src="../examples/js/loaders/deprecated/SceneLoader.js"></script>
 
 		<script src="../examples/js/renderers/Projector.js"></script>
 		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
@@ -82,8 +85,6 @@
 		<script src="js/Player.js"></script>
 		<script src="js/Script.js"></script>
 
-		<script src="../examples/js/effects/VREffect.js"></script>
-		<script src="../examples/js/controls/VRControls.js"></script>
 		<script src="../examples/js/vr/WebVR.js"></script>
 
 		<script src="js/Storage.js"></script>
@@ -105,6 +106,7 @@
 		<script src="js/Sidebar.Scene.js"></script>
 		<script src="js/Sidebar.Project.js"></script>
 		<script src="js/Sidebar.Settings.js"></script>
+		<script src="js/Sidebar.Settings.Shortcuts.js"></script>
 		<script src="js/Sidebar.Properties.js"></script>
 		<script src="js/Sidebar.Object.js"></script>
 		<script src="js/Sidebar.Geometry.js"></script>
@@ -289,61 +291,6 @@
 
 			}, false );
 
-			document.addEventListener( 'keydown', function ( event ) {
-
-				switch ( event.keyCode ) {
-
-					case 8: // backspace
-
-						event.preventDefault(); // prevent browser back
-
-					case 46: // delete
-
-						var object = editor.selected;
-
-						if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
-
-						var parent = object.parent;
-						if ( parent !== null ) editor.execute( new RemoveObjectCommand( object ) );
-
-						break;
-
-					case 90: // Register Ctrl-Z for Undo, Ctrl-Shift-Z for Redo
-
-						if ( event.ctrlKey && event.shiftKey ) {
-
-							editor.redo();
-
-						} else if ( event.ctrlKey ) {
-
-							editor.undo();
-
-						}
-
-						break;
-
-					case 87: // Register W for translation transform mode
-
-						editor.signals.transformModeChanged.dispatch( 'translate' );
-
-						break;
-
-					case 69: // Register E for rotation transform mode
-
-						editor.signals.transformModeChanged.dispatch( 'rotate' );
-
-						break;
-
-					case 82: // Register R for scaling transform mode
-
-						editor.signals.transformModeChanged.dispatch( 'scale' );
-
-						break;
-
-				}
-
-			}, false );
-
 			function onWindowResize( event ) {
 
 				editor.signals.windowResize.dispatch();
@@ -388,51 +335,6 @@
 
 			}, false );
 			*/
-
-			// VR
-
-			var groupVR;
-
-			// TODO: Use editor.signals.enteredVR (WebVR 1.0)
-
-			editor.signals.enterVR.add( function () {
-
-				if ( groupVR === undefined ) {
-
-					groupVR = new THREE.HTMLGroup( viewport.dom );
-					editor.sceneHelpers.add( groupVR );
-
-					var mesh = new THREE.HTMLMesh( sidebar.dom );
-					mesh.position.set( 15, 0, 15 );
-					mesh.rotation.y = - 0.5;
-					groupVR.add( mesh );
-
-					var signals = editor.signals;
-
-					function updateTexture() {
-
-						mesh.material.map.update();
-
-					}
-
-					signals.objectSelected.add( updateTexture );
-					signals.objectAdded.add( updateTexture );
-					signals.objectChanged.add( updateTexture );
-					signals.objectRemoved.add( updateTexture );
-					signals.sceneGraphChanged.add( updateTexture );
-					signals.historyChanged.add( updateTexture );
-
-				}
-
-				groupVR.visible = true;
-
-			} );
-
-			editor.signals.exitedVR.add( function () {
-
-				if ( groupVR !== undefined ) groupVR.visible = false;
-
-			} );
 
 		</script>
 	</body>

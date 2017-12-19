@@ -1,4 +1,4 @@
-import { _Math } from '../math/Math';
+import { _Math } from '../math/Math.js';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -18,7 +18,7 @@ function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normal
 
 Object.defineProperties( InterleavedBufferAttribute.prototype, {
 
-	"count" : {
+	count: {
 
 		get: function () {
 
@@ -28,7 +28,7 @@ Object.defineProperties( InterleavedBufferAttribute.prototype, {
 
 	},
 
-	"array" : {
+	array: {
 
 		get: function () {
 

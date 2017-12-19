@@ -1,8 +1,16 @@
 /**
  * @author oosmoxiecode
+ * @author Mugen87 / https://github.com/Mugen87
+ *
+ * based on http://www.blackpawn.com/texts/pqtorus/
  */
 
-import { Geometry } from '../core/Geometry';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
+
+// TorusKnotGeometry
 
 function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
 
@@ -29,15 +37,7 @@ function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q,
 TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
 TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- * see: http://www.blackpawn.com/texts/pqtorus/
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
+// TorusKnotBufferGeometry
 
 function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
 
@@ -54,8 +54,8 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 		q: q
 	};
 
-	radius = radius || 100;
-	tube = tube || 40;
+	radius = radius || 1;
+	tube = tube || 0.4;
 	tubularSegments = Math.floor( tubularSegments ) || 64;
 	radialSegments = Math.floor( radialSegments ) || 8;
 	p = p || 2;
@@ -74,7 +74,6 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 	var vertex = new Vector3();
 	var normal = new Vector3();
-	var uv = new Vector2();
 
 	var P1 = new Vector3();
 	var P2 = new Vector3();
@@ -190,5 +189,6 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 TorusKnotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 TorusKnotBufferGeometry.prototype.constructor = TorusKnotBufferGeometry;
+
 
 export { TorusKnotGeometry, TorusKnotBufferGeometry };

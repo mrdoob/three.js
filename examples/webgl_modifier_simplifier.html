@@ -102,7 +102,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				info = document.createElement( 'div' );
+				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
 				info.style.top = '10px';
 				info.style.width = '100%';
@@ -114,6 +114,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				var light = new THREE.PointLight( 0xffffff, 1.5 );
 				light.position.set( 1000, 1000, 2000 );
@@ -124,12 +125,7 @@
 				addStuff( sphereGeometry );
 				addStuff( torusGeometry );
 
-
-
-
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -158,15 +154,13 @@
 
 			function animate() {
 
-				meshes.forEach( m => {
+				meshes.forEach( function( m ) {
 					m.rotation.x += 0.01;
 					m.rotation.y += 0.01;
 					m.rotation.z += 0.01;
-				})
+				} );
 
 				requestAnimationFrame( animate );
-
-				controls.update();
 
 				stats.begin();
 				render();

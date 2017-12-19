@@ -7,9 +7,9 @@
 		<style>
 			body {
 				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
 
 				background-color: #000;
 				margin: 0px;
@@ -26,10 +26,16 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Standard Material Variations by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Standard Material Variations by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.<br/><br/>
+		Note: Every second sphere has an IBL environment map on it.</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -60,14 +66,23 @@
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
 				//
+				var genCubeUrls = function( prefix, postfix ) {
+					return [
+						prefix + 'px' + postfix, prefix + 'nx' + postfix,
+						prefix + 'py' + postfix, prefix + 'ny' + postfix,
+						prefix + 'pz' + postfix, prefix + 'nz' + postfix
+					];
+				};
 
-				var reflectionCube = new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/SwedishRoyalCastle/' )
-					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-				reflectionCube.format = THREE.RGBFormat;
+				var textureCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/pisa/' )
+					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ] );
 
 				scene = new THREE.Scene();
-				scene.background = reflectionCube;
+				scene.background = textureCube;
+
+				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
+				var hdrCubeRenderTarget = null;
 
 				// Materials
 
@@ -76,54 +91,70 @@
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
-				var shininess = 50, specular = 0x333333, bumpScale = 1, shading = THREE.SmoothShading;
+				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
 
-				var materials = [];
+					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					pmremGenerator.update( renderer );
 
-				var cubeWidth = 400;
-				var numberOfSphersPerSide = 5;
-				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
-				var stepSize = 1.0 / numberOfSphersPerSide;
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
 
-				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
+					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-				for ( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
+					var shininess = 50, specular = 0x333333, bumpScale = 1;
 
-					for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
+					var materials = [];
 
-						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
+					var cubeWidth = 400;
+					var numberOfSphersPerSide = 5;
+					var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
+					var stepSize = 1.0 / numberOfSphersPerSide;
 
-							// basic monochromatic energy preservation
-							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 );
+					var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-							var material = new THREE.MeshStandardMaterial( {
-								map: imgTexture,
-								bumpMap: imgTexture,
-								bumpScale: bumpScale,
-								color: diffuseColor,
-								metalness: beta,
-								roughness: 1.0 - alpha,
-								shading: THREE.SmoothShading,
-								envMap: alphaIndex % 2 === 0 ? null : reflectionCube
-							} );
+					var index = 0;
 
-							var mesh = new THREE.Mesh( geometry, material );
+					for ( var alpha = 0; alpha <= 1.0; alpha += stepSize ) {
 
-							mesh.position.x = alpha * 400 - 200;
-							mesh.position.y = beta * 400 - 200;
-							mesh.position.z = gamma * 400 - 200;
+						for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
-							scene.add( mesh );
+							for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
+
+								// basic monochromatic energy preservation
+								var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 );
+
+								var material = new THREE.MeshStandardMaterial( {
+									map: imgTexture,
+									bumpMap: imgTexture,
+									bumpScale: bumpScale,
+									color: diffuseColor,
+									metalness: beta,
+									roughness: 1.0 - alpha,
+									envMap: index % 2 === 0 ? null : hdrCubeRenderTarget.texture
+								} );
+
+								index ++;
+
+								var mesh = new THREE.Mesh( geometry, material );
+
+								mesh.position.x = alpha * 400 - 200;
+								mesh.position.y = beta * 400 - 200;
+								mesh.position.z = gamma * 400 - 200;
+
+								scene.add( mesh );
+
+							}
 
 						}
 
-					}
+						index ++;
 
-				}
+					}
+				});
 
 				function addLabel( name, location ) {
 
-					var textGeo = new THREE.TextGeometry( name, {
+					var textGeo = new THREE.TextBufferGeometry( name, {
 
 						font: font,
 
@@ -172,6 +203,8 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.toneMapping = THREE.Uncharted2ToneMapping;
+				renderer.toneMappingExposure = 0.75;
 
 				//
 
@@ -179,8 +212,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -29,7 +29,7 @@
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">J&oacute;n Ragnarsson</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
 
 		<script src="../build/three.js"></script>
 
@@ -61,7 +61,7 @@
 				scene = new THREE.Scene();
 
 				var mesh = new THREE.Mesh( new THREE.SphereBufferGeometry( 500, 32, 16 ), new THREE.MeshBasicMaterial( { map: texture } ) );
-				mesh.scale.x = -1;
+				mesh.geometry.scale( - 1, 1, 1 );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -142,7 +142,10 @@
 
 			function onDocumentMouseWheel( event ) {
 
-				camera.fov += ( event.deltaY * 0.05 );
+				var fov = camera.fov + event.deltaY * 0.05;
+
+				camera.fov = THREE.Math.clamp( fov, 10, 75 );
+
 				camera.updateProjectionMatrix();
 
 			}
@@ -191,12 +194,12 @@
 				if ( count % 2 === 0 ) {
 
 					material.envMap = cubeCamera1.renderTarget.texture;
-					cubeCamera2.updateCubeMap( renderer, scene );
+					cubeCamera2.update( renderer, scene );
 
 				} else {
 
 					material.envMap = cubeCamera2.renderTarget.texture;
-					cubeCamera1.updateCubeMap( renderer, scene );
+					cubeCamera1.update( renderer, scene );
 
 				}
 

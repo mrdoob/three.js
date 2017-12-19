@@ -1,289 +1,359 @@
-THREE.DecalVertex = function( v, n ) {
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ * @author spite / https://github.com/spite
+ *
+ * You can use this geometry to create a decal mesh, that serves different kinds of purposes.
+ * e.g. adding unique details to models, performing dynamic visual environmental changes or covering seams.
+ *
+ * Constructor parameter:
+ *
+ * mesh — Any mesh object
+ * position — Position of the decal projector
+ * orientation — Orientation of the decal projector
+ * size — Size of the decal projector
+ *
+ * reference: http://blog.wolfire.com/2009/06/how-to-project-decals/
+ *
+ */
 
-	this.vertex = v;
-	this.normal = n;
+( function () {
 
-};
+	function DecalGeometry( mesh, position, orientation, size ) {
 
-THREE.DecalVertex.prototype.clone = function() {
+  	THREE.BufferGeometry.call( this );
 
-	return new THREE.DecalVertex( this.vertex.clone(), this.normal.clone() );
+  	this.type = 'DecalGeometry';
 
-};
+  	// buffers
 
-THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
+  	var vertices = [];
+  	var normals = [];
+  	var uvs = [];
 
-	THREE.Geometry.call( this );
+  	// helpers
 
-	if ( check === undefined ) check = null;
-	check = check || new THREE.Vector3( 1, 1, 1 );
+  	var plane = new THREE.Vector3();
 
-	this.uvs = [];
+  	// this matrix represents the transformation of the decal projector
 
-	this.cube = new THREE.Mesh( new THREE.BoxGeometry( dimensions.x, dimensions.y, dimensions.z ), new THREE.MeshBasicMaterial() );
-	this.cube.rotation.set( rotation.x, rotation.y, rotation.z );
-	this.cube.position.copy( position );
-	this.cube.scale.set( 1, 1, 1 );
-	this.cube.updateMatrix();
+  	var projectorMatrix = new THREE.Matrix4();
+  	projectorMatrix.makeRotationFromEuler( orientation );
+  	projectorMatrix.setPosition( position );
 
-	this.iCubeMatrix = ( new THREE.Matrix4() ).getInverse( this.cube.matrix );
+  	var projectorMatrixInverse = new THREE.Matrix4().getInverse( projectorMatrix );
 
-	this.faceIndices = [ 'a', 'b', 'c', 'd' ];
+  	// generate buffers
 
-	this.clipFace = function( inVertices, plane ) {
+  	generate();
 
-		var size = .5 * Math.abs( ( dimensions.clone() ).dot( plane ) );
+  	// build geometry
 
-		function clip( v0, v1, p ) {
+  	this.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+  	this.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+  	this.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
-			var d0 = v0.vertex.dot( p ) - size,
-				d1 = v1.vertex.dot( p ) - size;
+  	function generate() {
 
-			var s = d0 / ( d0 - d1 );
-			var v = new THREE.DecalVertex(
-				new THREE.Vector3(
-					v0.vertex.x + s * ( v1.vertex.x - v0.vertex.x ),
-					v0.vertex.y + s * ( v1.vertex.y - v0.vertex.y ),
-					v0.vertex.z + s * ( v1.vertex.z - v0.vertex.z )
-				),
-				new THREE.Vector3(
-					v0.normal.x + s * ( v1.normal.x - v0.normal.x ),
-					v0.normal.y + s * ( v1.normal.y - v0.normal.y ),
-					v0.normal.z + s * ( v1.normal.z - v0.normal.z )
-				)
-			);
+  		var i;
+  		var geometry = new THREE.BufferGeometry();
+  		var decalVertices = [];
 
-			// need to clip more values (texture coordinates)? do it this way:
-			//intersectpoint.value = a.value + s*(b.value-a.value);
+  		var vertex = new THREE.Vector3();
+  		var normal = new THREE.Vector3();
 
-			return v;
+  		// handle different geometry types
 
-		}
+  		if ( mesh.geometry.isGeometry ) {
 
-		if ( inVertices.length === 0 ) return [];
-		var outVertices = [];
+  			geometry.fromGeometry( mesh.geometry );
 
-		for ( var j = 0; j < inVertices.length; j += 3 ) {
+  		} else {
 
-			var v1Out, v2Out, v3Out, total = 0;
+  			geometry.copy( mesh.geometry );
 
-			var d1 = inVertices[ j + 0 ].vertex.dot( plane ) - size,
-				d2 = inVertices[ j + 1 ].vertex.dot( plane ) - size,
-				d3 = inVertices[ j + 2 ].vertex.dot( plane ) - size;
+  		}
 
-			v1Out = d1 > 0;
-			v2Out = d2 > 0;
-			v3Out = d3 > 0;
+  		var positionAttribute = geometry.attributes.position;
+  		var normalAttribute = geometry.attributes.normal;
 
-			total = ( v1Out ? 1 : 0 ) + ( v2Out ? 1 : 0 ) + ( v3Out ? 1 : 0 );
+  		// first, create an array of 'DecalVertex' objects
+  		// three consecutive 'DecalVertex' objects represent a single face
+  		//
+  		// this data structure will be later used to perform the clipping
 
-			switch ( total ) {
-				case 0: {
+  		if ( geometry.index !== null ) {
 
-					outVertices.push( inVertices[ j ] );
-					outVertices.push( inVertices[ j + 1 ] );
-					outVertices.push( inVertices[ j + 2 ] );
-					break;
+  			// indexed BufferGeometry
 
-				}
-				case 1: {
+  			var index = geometry.index;
 
-					var nV1, nV2, nV3, nV4;
-					if ( v1Out ) {
+  			for ( i = 0; i < index.count; i ++ ) {
 
-						nV1 = inVertices[ j + 1 ];
-						nV2 = inVertices[ j + 2 ];
-						nV3 = clip( inVertices[ j ], nV1, plane );
-						nV4 = clip( inVertices[ j ], nV2, plane );
+  				vertex.fromBufferAttribute( positionAttribute, index.getX( i ) );
+  				normal.fromBufferAttribute( normalAttribute, index.getX( i ) );
 
-					}
-					if ( v2Out ) {
+  				pushDecalVertex( decalVertices, vertex, normal );
 
-						nV1 = inVertices[ j ];
-						nV2 = inVertices[ j + 2 ];
-						nV3 = clip( inVertices[ j + 1 ], nV1, plane );
-						nV4 = clip( inVertices[ j + 1 ], nV2, plane );
+  			}
 
-						outVertices.push( nV3 );
-						outVertices.push( nV2.clone() );
-						outVertices.push( nV1.clone() );
+  		} else {
 
-						outVertices.push( nV2.clone() );
-						outVertices.push( nV3.clone() );
-						outVertices.push( nV4 );
-						break;
+  			// non-indexed BufferGeometry
 
-					}
-					if ( v3Out ) {
+  			for ( i = 0; i < positionAttribute.count; i ++ ) {
 
-						nV1 = inVertices[ j ];
-						nV2 = inVertices[ j + 1 ];
-						nV3 = clip( inVertices[ j + 2 ], nV1, plane );
-						nV4 = clip( inVertices[ j + 2 ], nV2, plane );
+  				vertex.fromBufferAttribute( positionAttribute, i );
+  				normal.fromBufferAttribute( normalAttribute, i );
 
-					}
+  				pushDecalVertex( decalVertices, vertex, normal );
 
-					outVertices.push( nV1.clone() );
-					outVertices.push( nV2.clone() );
-					outVertices.push( nV3 );
+  			}
 
-					outVertices.push( nV4 );
-					outVertices.push( nV3.clone() );
-					outVertices.push( nV2.clone() );
+  		}
 
-					break;
+  		// second, clip the geometry so that it doesn't extend out from the projector
 
-				}
-				case 2: {
+  		decalVertices = clipGeometry( decalVertices, plane.set( 1, 0, 0 ) );
+  		decalVertices = clipGeometry( decalVertices, plane.set( - 1, 0, 0 ) );
+  		decalVertices = clipGeometry( decalVertices, plane.set( 0, 1, 0 ) );
+  		decalVertices = clipGeometry( decalVertices, plane.set( 0, - 1, 0 ) );
+  		decalVertices = clipGeometry( decalVertices, plane.set( 0, 0, 1 ) );
+  		decalVertices = clipGeometry( decalVertices, plane.set( 0, 0, - 1 ) );
 
-					var nV1, nV2, nV3;
-					if ( ! v1Out ) {
+  		// third, generate final vertices, normals and uvs
 
-						nV1 = inVertices[ j ].clone();
-						nV2 = clip( nV1, inVertices[ j + 1 ], plane );
-						nV3 = clip( nV1, inVertices[ j + 2 ], plane );
-						outVertices.push( nV1 );
-						outVertices.push( nV2 );
-						outVertices.push( nV3 );
+  		for ( i = 0; i < decalVertices.length; i ++ ) {
 
-					}
-					if ( ! v2Out ) {
+  			var decalVertex = decalVertices[ i ];
 
-						nV1 = inVertices[ j + 1 ].clone();
-						nV2 = clip( nV1, inVertices[ j + 2 ], plane );
-						nV3 = clip( nV1, inVertices[ j ], plane );
-						outVertices.push( nV1 );
-						outVertices.push( nV2 );
-						outVertices.push( nV3 );
+  			// create texture coordinates (we are still in projector space)
 
-					}
-					if ( ! v3Out ) {
+  			uvs.push(
+  				0.5 + ( decalVertex.position.x / size.x ),
+  				0.5 + ( decalVertex.position.y / size.y )
+  			);
 
-						nV1 = inVertices[ j + 2 ].clone();
-						nV2 = clip( nV1, inVertices[ j ], plane );
-						nV3 = clip( nV1, inVertices[ j + 1 ], plane );
-						outVertices.push( nV1 );
-						outVertices.push( nV2 );
-						outVertices.push( nV3 );
+  			// transform the vertex back to world space
 
-					}
+  			decalVertex.position.applyMatrix4( projectorMatrix );
 
-					break;
+  			// now create vertex and normal buffer data
 
-				}
-				case 3: {
+  			vertices.push( decalVertex.position.x, decalVertex.position.y, decalVertex.position.z );
+  			normals.push( decalVertex.normal.x, decalVertex.normal.y, decalVertex.normal.z );
 
-					break;
+  		}
 
-				}
-			}
+  	}
 
-		}
+  	function pushDecalVertex( decalVertices, vertex, normal ) {
 
-		return outVertices;
+  		// transform the vertex to world space, then to projector space
+
+  		vertex.applyMatrix4( mesh.matrix );
+  		vertex.applyMatrix4( projectorMatrixInverse );
+
+  		decalVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );
+
+  	}
+
+  	function clipGeometry( inVertices, plane ) {
+
+  		var outVertices = [];
+
+  		var s = 0.5 * Math.abs( size.dot( plane ) );
+
+  		// a single iteration clips one face,
+  		// which consists of three consecutive 'DecalVertex' objects
+
+  		for ( var i = 0; i < inVertices.length; i += 3 ) {
+
+  			var v1Out, v2Out, v3Out, total = 0;
+  			var nV1, nV2, nV3, nV4;
+
+  			var d1 = inVertices[ i + 0 ].position.dot( plane ) - s;
+  			var d2 = inVertices[ i + 1 ].position.dot( plane ) - s;
+  			var d3 = inVertices[ i + 2 ].position.dot( plane ) - s;
+
+  			v1Out = d1 > 0;
+  			v2Out = d2 > 0;
+  			v3Out = d3 > 0;
+
+  			// calculate, how many vertices of the face lie outside of the clipping plane
+
+  			total = ( v1Out ? 1 : 0 ) + ( v2Out ? 1 : 0 ) + ( v3Out ? 1 : 0 );
+
+  			switch ( total ) {
+
+  				case 0: {
+
+  					// the entire face lies inside of the plane, no clipping needed
+
+  					outVertices.push( inVertices[ i ] );
+  					outVertices.push( inVertices[ i + 1 ] );
+  					outVertices.push( inVertices[ i + 2 ] );
+  					break;
+
+  				}
+
+  				case 1: {
+
+  					// one vertex lies outside of the plane, perform clipping
+
+  					if ( v1Out ) {
+
+  						nV1 = inVertices[ i + 1 ];
+  						nV2 = inVertices[ i + 2 ];
+  						nV3 = clip( inVertices[ i ], nV1, plane, s );
+  						nV4 = clip( inVertices[ i ], nV2, plane, s );
+
+  					}
+
+  					if ( v2Out ) {
+
+  						nV1 = inVertices[ i ];
+  						nV2 = inVertices[ i + 2 ];
+  						nV3 = clip( inVertices[ i + 1 ], nV1, plane, s );
+  						nV4 = clip( inVertices[ i + 1 ], nV2, plane, s );
+
+  						outVertices.push( nV3 );
+  						outVertices.push( nV2.clone() );
+  						outVertices.push( nV1.clone() );
+
+  						outVertices.push( nV2.clone() );
+  						outVertices.push( nV3.clone() );
+  						outVertices.push( nV4 );
+  						break;
+
+  					}
+
+  					if ( v3Out ) {
+
+  						nV1 = inVertices[ i ];
+  						nV2 = inVertices[ i + 1 ];
+  						nV3 = clip( inVertices[ i + 2 ], nV1, plane, s );
+  						nV4 = clip( inVertices[ i + 2 ], nV2, plane, s );
+
+  					}
+
+  					outVertices.push( nV1.clone() );
+  					outVertices.push( nV2.clone() );
+  					outVertices.push( nV3 );
+
+  					outVertices.push( nV4 );
+  					outVertices.push( nV3.clone() );
+  					outVertices.push( nV2.clone() );
+
+  					break;
+
+  				}
+
+  				case 2: {
+
+  					// two vertices lies outside of the plane, perform clipping
+
+  					if ( ! v1Out ) {
+
+  						nV1 = inVertices[ i ].clone();
+  						nV2 = clip( nV1, inVertices[ i + 1 ], plane, s );
+  						nV3 = clip( nV1, inVertices[ i + 2 ], plane, s );
+  						outVertices.push( nV1 );
+  						outVertices.push( nV2 );
+  						outVertices.push( nV3 );
+
+  					}
+
+  					if ( ! v2Out ) {
+
+  						nV1 = inVertices[ i + 1 ].clone();
+  						nV2 = clip( nV1, inVertices[ i + 2 ], plane, s );
+  						nV3 = clip( nV1, inVertices[ i ], plane, s );
+  						outVertices.push( nV1 );
+  						outVertices.push( nV2 );
+  						outVertices.push( nV3 );
+
+  					}
+
+  					if ( ! v3Out ) {
+
+  						nV1 = inVertices[ i + 2 ].clone();
+  						nV2 = clip( nV1, inVertices[ i ], plane, s );
+  						nV3 = clip( nV1, inVertices[ i + 1 ], plane, s );
+  						outVertices.push( nV1 );
+  						outVertices.push( nV2 );
+  						outVertices.push( nV3 );
+
+  					}
+
+  					break;
+
+  				}
+
+  				case 3: {
+
+  					// the entire face lies outside of the plane, so let's discard the corresponding vertices
+
+  					break;
+
+  				}
+
+  			}
+
+  		}
+
+  		return outVertices;
+
+  	}
+
+  	function clip( v0, v1, p, s ) {
+
+  		var d0 = v0.position.dot( p ) - s;
+  		var d1 = v1.position.dot( p ) - s;
+
+  		var s0 = d0 / ( d0 - d1 );
+
+  		var v = new DecalVertex(
+  			new THREE.Vector3(
+  				v0.position.x + s0 * ( v1.position.x - v0.position.x ),
+  				v0.position.y + s0 * ( v1.position.y - v0.position.y ),
+  				v0.position.z + s0 * ( v1.position.z - v0.position.z )
+  			),
+  			new THREE.Vector3(
+  				v0.normal.x + s0 * ( v1.normal.x - v0.normal.x ),
+  				v0.normal.y + s0 * ( v1.normal.y - v0.normal.y ),
+  				v0.normal.z + s0 * ( v1.normal.z - v0.normal.z )
+  			)
+  		);
+
+  		// need to clip more values (texture coordinates)? do it this way:
+  		// intersectpoint.value = a.value + s * ( b.value - a.value );
+
+  		return v;
+
+  	}
+
+	}
+
+	DecalGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+	DecalGeometry.prototype.constructor = DecalGeometry;
+
+	// helper
+
+	function DecalVertex( position, normal ) {
+
+		this.position = position;
+		this.normal = normal;
+
+	}
+
+	DecalVertex.prototype.clone = function () {
+
+		return new DecalVertex( this.position.clone(), this.normal.clone() );
 
 	};
 
-	this.pushVertex = function( vertices, id, n ) {
+	// export
 
-		var v = mesh.geometry.vertices[ id ].clone();
-		v.applyMatrix4( mesh.matrix );
-		v.applyMatrix4( this.iCubeMatrix );
-		vertices.push( new THREE.DecalVertex( v, n.clone() ) );
+	THREE.DecalGeometry = DecalGeometry;
 
-	};
-
-	this.computeDecal = function() {
-
-		var finalVertices = [];
-
-		for ( var i = 0; i < mesh.geometry.faces.length; i ++ ) {
-
-			var f = mesh.geometry.faces[ i ];
-			var vertices = [];
-
-			this.pushVertex( vertices, f[ this.faceIndices[ 0 ] ], f.vertexNormals[ 0 ] );
-			this.pushVertex( vertices, f[ this.faceIndices[ 1 ] ], f.vertexNormals[ 1 ] );
-			this.pushVertex( vertices, f[ this.faceIndices[ 2 ] ], f.vertexNormals[ 2 ] );
-
-			if ( check.x ) {
-
-				vertices = this.clipFace( vertices, new THREE.Vector3( 1, 0, 0 ) );
-				vertices = this.clipFace( vertices, new THREE.Vector3( - 1, 0, 0 ) );
-
-			}
-			if ( check.y ) {
-
-				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 1, 0 ) );
-				vertices = this.clipFace( vertices, new THREE.Vector3( 0, - 1, 0 ) );
-
-			}
-			if ( check.z ) {
-
-				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 0, 1 ) );
-				vertices = this.clipFace( vertices, new THREE.Vector3( 0, 0, - 1 ) );
-
-			}
-
-			for ( var j = 0; j < vertices.length; j ++ ) {
-
-				var v = vertices[ j ];
-
-				this.uvs.push( new THREE.Vector2(
-					.5 + ( v.vertex.x / dimensions.x ),
-					.5 + ( v.vertex.y / dimensions.y )
-				) );
-
-				vertices[ j ].vertex.applyMatrix4( this.cube.matrix );
-
-			}
-
-			if ( vertices.length === 0 ) continue;
-
-			finalVertices = finalVertices.concat( vertices );
-
-		}
-
-		for ( var k = 0; k < finalVertices.length; k += 3 ) {
-
-			this.vertices.push(
-				finalVertices[ k ].vertex,
-				finalVertices[ k + 1 ].vertex,
-				finalVertices[ k + 2 ].vertex
-			);
-
-			var f = new THREE.Face3(
-				k,
-				k + 1,
-				k + 2
-			);
-			f.vertexNormals.push( finalVertices[ k + 0 ].normal );
-			f.vertexNormals.push( finalVertices[ k + 1 ].normal );
-			f.vertexNormals.push( finalVertices[ k + 2 ].normal );
-
-			this.faces.push( f );
-
-			this.faceVertexUvs[ 0 ].push( [
-				this.uvs[ k ],
-				this.uvs[ k + 1 ],
-				this.uvs[ k + 2 ]
-			] );
-
-		}
-
-		this.verticesNeedUpdate = true;
-		this.elementsNeedUpdate = true;
-		this.morphTargetsNeedUpdate = true;
-		this.uvsNeedUpdate = true;
-		this.normalsNeedUpdate = true;
-		this.colorsNeedUpdate = true;
-		this.computeFaceNormals();
-
-	};
-
-	this.computeDecal();
-
-};
-
-THREE.DecalGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.DecalGeometry.prototype.constructor = THREE.DecalGeometry;
+} )();

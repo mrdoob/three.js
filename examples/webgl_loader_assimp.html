@@ -42,10 +42,10 @@
 <body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a>
-			<a href="https://github.com/Virtulous" target="_blank">Assimp File format</a>
-			<div>Assimp loader by <a href="https://virtulo.us" target="_blank">Virtulous</a></div>
-			<div>Octaminator model from <a href="http://opengameart.org/content/octaminator-engine-ready" target="_blank">Teh_Bucket and raymoohawk</a></div>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<a href="https://github.com/Virtulous" target="_blank" rel="noopener">Assimp File format</a>
+			<div>Assimp loader by <a href="https://virtulo.us" target="_blank" rel="noopener">Virtulous</a></div>
+			<div>Octaminator model from <a href="http://opengameart.org/content/octaminator-engine-ready" target="_blank" rel="noopener">Teh_Bucket and raymoohawk</a></div>
 		</div>
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/AssimpLoader.js"></script>
@@ -93,7 +93,7 @@
 			container.appendChild( stats.dom );
 
 			var loader = new THREE.AssimpLoader();
-			loader.load( "./models/assimp/octaminator/Octaminator.assimp", function ( err, result ) {
+			loader.load( './models/assimp/octaminator/Octaminator.assimp', function ( result ) {
 
 				var object = result.object;
 

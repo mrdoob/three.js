@@ -28,7 +28,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - dashed lines example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dashed lines example</div>
 		<div id="container"></div>
 
 		<script src="../build/three.js"></script>
@@ -58,7 +58,7 @@
 				camera.position.z = 150;
 
 				scene = new THREE.Scene();
-
+				scene.background = new THREE.Color( 0x111111 );
 				scene.fog = new THREE.Fog( 0x111111, 150, 200 );
 
 				root = new THREE.Object3D();
@@ -73,10 +73,8 @@
 
 				for ( var i = 0; i < points.length * subdivisions; i ++ ) {
 
-					var index = i / ( points.length * subdivisions );
-					var position = spline.getPoint( index );
-
-					geometrySpline.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
+					var t = i / ( points.length * subdivisions );
+					geometrySpline.vertices[ i ] = spline.getPoint( t );
 
 				}
 
@@ -96,7 +94,6 @@
 				scene.add( object );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x111111 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
@@ -187,7 +184,6 @@
 
 					var object = objects[ i ];
 
-					//object.rotation.x = 0.25 * time * ( i%2 == 1 ? 1 : -1);
 					object.rotation.x = 0.25 * time;
 					object.rotation.y = 0.25 * time;
 

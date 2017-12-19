@@ -1,5 +1,5 @@
-import { Material } from './Material';
-import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
+import { Material } from './Material.js';
+import { UniformsUtils } from '../renderers/shaders/UniformsUtils.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -16,6 +16,7 @@ import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
  *
  *  lights: <bool>,
  *
+ *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -42,6 +43,7 @@ function ShaderMaterial( parameters ) {
 	this.lights = false; // set to use scene lights
 	this.clipping = false; // set to use user-defined clipping planes
 
+	this.skinning = false; // set to use skinning attribute streams
 	this.morphTargets = false; // set to use morph targets
 	this.morphNormals = false; // set to use morph normals
 
@@ -97,6 +99,8 @@ ShaderMaterial.prototype.copy = function ( source ) {
 
 	this.lights = source.lights;
 	this.clipping = source.clipping;
+
+	this.skinning = source.skinning;
 
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;

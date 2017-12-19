@@ -48,13 +48,14 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/SSAOPass.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl screen space ambient occlusion example<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl screen space ambient occlusion example<br/>
 			shader by <a href="http://alteredqualia.com">alteredq</a>
 		</div>
 
@@ -64,11 +65,11 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 			var container, stats;
 			var camera, scene, renderer;
-			var depthMaterial, effectComposer, depthRenderTarget;
+			var effectComposer;
 			var ssaoPass;
 			var group;
-			var depthScale = 1.0;
-			var postprocessing = { enabled : true, renderMode: 0 }; // renderMode: 0('framebuffer'), 1('onlyAO')
+
+			var postprocessing = { enabled: true, onlyAO: false, radius: 32, aoClamp: 0.25, lumInfluence: 0.7 };
 
 			init();
 			animate();
@@ -79,8 +80,6 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				document.body.appendChild( container );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0xa0a0a0 );
-				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -88,11 +87,12 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
 
 				group = new THREE.Object3D();
 				scene.add( group );
 
-				var geometry = new THREE.IcosahedronGeometry( 5, 1 );
+				var geometry = new THREE.BoxGeometry( 10, 10, 10 );
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var material = new THREE.MeshBasicMaterial();
@@ -121,32 +121,23 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 				// Init gui
 				var gui = new dat.GUI();
-				gui.add( postprocessing, "enabled" ).onChange();
-				gui.add( postprocessing, "renderMode", { framebuffer: 0, onlyAO: 1 } ).onChange( renderModeChange ).listen();
+				gui.add( postprocessing, 'enabled' );
+
+				gui.add( postprocessing, 'onlyAO', false ).onChange( function( value ) { ssaoPass.onlyAO = value; } );
+
+				gui.add( postprocessing, 'radius' ).min( 0 ).max( 64 ).onChange( function( value ) { ssaoPass.radius = value; } );
+				
+				gui.add( postprocessing, 'aoClamp' ).min( 0 ).max( 1 ).onChange( function( value ) { ssaoPass.aoClamp = value; } );
+				
+				gui.add( postprocessing, 'lumInfluence' ).min( 0 ).max( 1 ).onChange( function( value ) { ssaoPass.lumInfluence = value; } );
+				
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-			}
-
-			function renderModeChange( value ) {
-
-				if ( value == 0 ) {
-
-					// framebuffer
-					ssaoPass.uniforms[ 'onlyAO' ].value = false;
-
-				} else if ( value == 1 ) {
-
-					// onlyAO
-					ssaoPass.uniforms[ 'onlyAO' ].value = true;
-
-				} else {
-
-					console.error( "Not define renderModeChange type: " + value );
-
-				}
+				onWindowResize();
 
 			}
+
 
 			function onWindowResize() {
 
@@ -158,14 +149,12 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				renderer.setSize( width, height );
 
 				// Resize renderTargets
-				ssaoPass.uniforms[ 'size' ].value.set( width, height );
+				ssaoPass.setSize( width, height );
 
 				var pixelRatio = renderer.getPixelRatio();
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
-				depthRenderTarget.setSize( newWidth, newHeight );
 				effectComposer.setSize( newWidth, newHeight );
-
 			}
 
 			function initPostprocessing() {
@@ -173,26 +162,9 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				// Setup render pass
 				var renderPass = new THREE.RenderPass( scene, camera );
 
-				// Setup depth pass
-				depthMaterial = new THREE.MeshDepthMaterial();
-				depthMaterial.depthPacking = THREE.RGBADepthPacking;
-				depthMaterial.blending = THREE.NoBlending;
-
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
-				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-				depthRenderTarget.texture.name = "SSAOShader.rt";
-
 				// Setup SSAO pass
-				ssaoPass = new THREE.ShaderPass( THREE.SSAOShader );
+				ssaoPass = new THREE.SSAOPass( scene, camera );
 				ssaoPass.renderToScreen = true;
-				//ssaoPass.uniforms[ "tDiffuse" ].value will be set by ShaderPass
-				ssaoPass.uniforms[ "tDepth" ].value = depthRenderTarget.texture;
-				ssaoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
-				ssaoPass.uniforms[ 'cameraNear' ].value = camera.near;
-				ssaoPass.uniforms[ 'cameraFar' ].value = camera.far;
-				ssaoPass.uniforms[ 'onlyAO' ].value = ( postprocessing.renderMode == 1 );
-				ssaoPass.uniforms[ 'aoClamp' ].value = 0.3;
-				ssaoPass.uniforms[ 'lumInfluence' ].value = 0.5;
 
 				// Add pass to effect composer
 				effectComposer = new THREE.EffectComposer( renderer );
@@ -219,12 +191,6 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 				if ( postprocessing.enabled ) {
 
-					// Render depth into depthRenderTarget
-					scene.overrideMaterial = depthMaterial;
-					renderer.render( scene, camera, depthRenderTarget, true );
-
-					// Render renderPass and SSAO shaderPass
-					scene.overrideMaterial = null;
 					effectComposer.render();
 
 				} else {

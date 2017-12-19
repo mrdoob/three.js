@@ -28,7 +28,7 @@ THREE.KMZLoader.prototype = {
 
 	parse: function ( data ) {
 
-		var zip = new JSZip( data );
+		var zip = new JSZip( data ); // eslint-disable-line no-undef
 
 		// console.log( zip );
 

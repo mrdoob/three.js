@@ -47,6 +47,7 @@
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				var material = new THREE.MeshNormalMaterial();
 
@@ -75,10 +76,9 @@
 				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
+				//renderer.sortObjects = false;
 
 				container.appendChild( renderer.domElement );
 

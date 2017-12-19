@@ -40,16 +40,16 @@
 				info.style.textAlign = 'center';
 				info.style.color = '#fff';
 				info.style.link = '#f80';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - geometry extrude shapes';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - geometry extrude shapes';
 				document.body.appendChild( info );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x222222 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 0, 500 );
@@ -74,7 +74,7 @@
 					new THREE.Vector3(  60, -100, -60 )
 				] );
 
-				closedSpline.type = 'catmullrom';
+				closedSpline.curveType = 'catmullrom';
 				closedSpline.closed = true;
 
 				var extrudeSettings = {
@@ -170,7 +170,7 @@
 
 				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
+				var mesh = new THREE.Mesh( geometry, materials );
 
 				mesh.position.set( 50, 100, 50 );
 

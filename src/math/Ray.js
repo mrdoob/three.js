@@ -1,4 +1,4 @@
-import { Vector3 } from './Vector3';
+import { Vector3 } from './Vector3.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -305,7 +305,7 @@ Object.assign( Ray.prototype, {
 
 		// Return if the ray never intersects the plane
 
-		return t >= 0 ? t :  null;
+		return t >= 0 ? t : null;
 
 	},
 
@@ -515,10 +515,8 @@ Object.assign( Ray.prototype, {
 
 	applyMatrix4: function ( matrix4 ) {
 
-		this.direction.add( this.origin ).applyMatrix4( matrix4 );
 		this.origin.applyMatrix4( matrix4 );
-		this.direction.sub( this.origin );
-		this.direction.normalize();
+		this.direction.transformDirection( matrix4 );
 
 		return this;
 

@@ -12,7 +12,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A low level class for loading resources with XmlHttpRequest, used internaly by most loaders.
+			A low level class for loading resources with XMLHttpRequest, used internaly by most loaders.
 			It can also be used directly to load any file type that does not have a loader.
 		</div>
 
@@ -22,29 +22,29 @@
 			[example:webgl_morphtargets_human WebGL / morphtargets / human]<br />
 		</div>
 		<code>
-var loader = new THREE.FileLoader();
+		var loader = new THREE.FileLoader();
 
-//load a text file a output the result to the console
-loader.load(
-    // resource URL
-    'example.txt',
+		//load a text file a output the result to the console
+		loader.load(
+			// resource URL
+			'example.txt',
 
-    // Function when resource is loaded
-    function ( data ) {
-        // output the text to the console
-        console.log( data )
-    },
+			// onLoad callback
+			function ( data ) {
+				// output the text to the console
+				console.log( data )
+			},
 
-    // Function called when download progresses
-    function ( xhr ) {
-        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-    },
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
 
-    // Function called when download errors
-    function ( xhr ) {
-        console.error( 'An error happened' );
-    }
-);
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+		);
 		</code>
 
 		<h2>Constructor</h2>
@@ -100,8 +100,8 @@ loader.load(
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 		[page:Function onLoad] — Will be called when loading completes. The argument will be the loaded response.<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance,
-			that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance,
+			which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
 		[page:Function onError] — Will be called if an error occurs.<br /><br />
 
 		Load the URL and pass the response to the onLoad function.

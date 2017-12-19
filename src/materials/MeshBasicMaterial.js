@@ -1,6 +1,6 @@
-import { Material } from './Material';
-import { MultiplyOperation } from '../constants';
-import { Color } from '../math/Color';
+import { Material } from './Material.js';
+import { MultiplyOperation } from '../constants.js';
+import { Color } from '../math/Color.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -26,13 +26,13 @@ import { Color } from '../math/Color';
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  shading: THREE.SmoothShading,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
+ *  skinning: <bool>,
  *  morphTargets: <bool>
  * }
  */
@@ -67,6 +67,7 @@ function MeshBasicMaterial( parameters ) {
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
 
+	this.skinning = false;
 	this.morphTargets = false;
 
 	this.lights = false;
@@ -108,6 +109,7 @@ MeshBasicMaterial.prototype.copy = function ( source ) {
 	this.wireframeLinecap = source.wireframeLinecap;
 	this.wireframeLinejoin = source.wireframeLinejoin;
 
+	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 
 	return this;

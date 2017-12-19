@@ -112,6 +112,7 @@
 
 					var material = materials[ 0 ];
 					material.emissive.set( 0x101010 );
+					material.skinning = true;
 					material.morphTargets = true;
 
 					var mesh = new THREE.SkinnedMesh( geometry, material );

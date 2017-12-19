@@ -35,8 +35,12 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:SpotLight light])</h3>
-		<div>light -- The [page:SpotLight] to be visualized.</div>
+		<h3>[name]( [page:SpotLight light], [page:Hex color] )</h3>
+		<div>
+			[page:SpotLight light] -- The [page:SpotLight] to be visualized. <br /><br/>
+			
+			[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light. 
+		</div>
 
 
 		<h2>Properties</h2>
@@ -44,7 +48,6 @@
 
 		<h3>[property:LineSegments cone]</h3>
 		<div>[page:LineSegments] used to visualize the light.</div>
-
 
 		<h3>[property:SpotLight light]</h3>
 		<div>Reference to the [page:SpotLight] being visualized.</div>
@@ -58,11 +61,16 @@
 			spotLight's [page:Object3D.matrixWorld matrixWorld].
 		</div>
 
+		<h3>[property:hex color]</h3>
+		<div>
+					 The color parameter passed in the constructor. Default is *undefined*. If this is changed, the helper's color will update
+					the next time [page:.update update] is called.
+		</div>
 
 		<h2>Methods</h2>
 		<div>See the base [page:Object3D] class for common methods.</div>
 
-		<h3>[method:null update]()</h3>
+		<h3>[method:null dispose]()</h3>
 		<div>Disposes of the light helper.</div>
 
 		<h3>[method:null update]()</h3>

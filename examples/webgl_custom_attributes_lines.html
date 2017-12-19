@@ -28,7 +28,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - custom attributes example</div>
 		<div id="container"></div>
 
 		<script src="js/Detector.js"></script>
@@ -95,6 +95,7 @@
 			camera.position.z = 400;
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x050505 );
 
 			uniforms = {
 
@@ -162,7 +163,6 @@
 			scene.add( object );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0x050505 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 

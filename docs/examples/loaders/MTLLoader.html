@@ -11,7 +11,10 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJMTLLoader] and [page:UTF8Loader].</div>
+		<div class="desc">A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJMTLLoader] and [page:UTF8Loader].<br />
+		The Material Template Library format (MTL) or .MTL File Format is a companion file format to .OBJ that describes surface shading
+		(material) properties of objects within one or more .OBJ files. 		
+		</div>
 
 		<h2>Constructor</h2>
 
@@ -23,7 +26,7 @@
 			Creates a new [name].
 		</div>
 
-		<!-- <h2>Properties</h2> -->
+		<h2>Properties</h2>
 
 
 		<h2>Methods</h2>
@@ -31,10 +34,10 @@
 
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-			[page:String url] — required<br />
-			[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:MTLLoaderMaterialCreator MTLLoader.MaterialCreator] instance.<br />
-			[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-			[page:Function onError] — Will be called when load errors.<br />
+			[page:String url] — A string containing the path/URL of the <em>.mtl</em> file.<br />
+			[page:Function onLoad] — (optional) A function to be called after the loading is successfully completed. The function receives the loaded [page:MTLLoaderMaterialCreator MTLLoader.MaterialCreator] instance.<br />
+			[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
+			[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
 		</div>
 		<div>
 			Begin loading from url and return the loaded material.

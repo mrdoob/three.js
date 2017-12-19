@@ -11,36 +11,85 @@
 		[page:Loader] &rarr;
 		<h1>[name]</h1>
 
-		<div class="desc">
-		A loader for loading a *gltf* resource in JSON format.
-		<br /><br />
-		The <a href="https://www.khronos.org/gltf">glTF file format</a> is a JSON file format to enable rapid delivery and loading of 3D content.
+		<div class="desc"> A loader for loading <em>glTF 2.0</em> resource. <br />
+		<a href="https://www.khronos.org/gltf">glTF</a> (GL Transmission Format) is an
+		<a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0">open format specification</a>
+		for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
+		or binary (.glb) format. External files store textures (.jpg, .png, ...) and additional binary
+		data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
+		textures, skins, skeletons, morph targets, animations, lights, and/or cameras.
 		</div>
 
-		<h2>Notes</h2>
+		<h2>Extensions</h2>
 
 		<div>
-		When using custom shaders provided within a glTF file [page:THREE.GLTFLoader.Shaders] should be updated on each render loop. See [example:webgl_loader_gltf] demo source code for example usage.
+		GLTFLoader supports the following glTF extensions:
 		</div>
+
+		<ul>
+			<li>
+				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_pbrSpecularGlossiness">
+					KHR_materials_pbrSpecularGlossiness
+				</a>
+			</li>
+			<li>
+				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_common">
+					KHR_materials_common
+				</a>
+				(experimental)
+			</li>
+			<li>
+				KHR_lights (experimental)
+			</li>
+		</ul>
 
 		<h2>Example</h2>
 
 		<code>
-		// instantiate a loader
-		var loader = new THREE.GLTFLoader();
+			// Instantiate a loader
+			var loader = new THREE.GLTFLoader();
 
-		// load a glTF resource
-		loader.load(
-			// resource URL
-			'models/gltf/duck/duck.json',
-			// Function when resource is loaded
-			function ( object ) {
-				scene.add( object.scene );
-			}
-		);
-		</code>
+			// Load a glTF resource
+			loader.load(
+				// resource URL
+				'models/gltf/duck/duck.gltf',
+				// called when the resource is loaded
+				function ( gltf ) {
+
+					scene.add( gltf.scene );
+
+					gltf.animations; // Array&lt;THREE.AnimationClip&gt;
+					gltf.scene; // THREE.Scene
+					gltf.scenes; // Array&lt;THREE.Scene&gt;
+					gltf.cameras; // Array&lt;THREE.Camera&gt;
+
+				},
+				// called when loading is in progresses
+				function ( xhr ) {
+
+					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+				},
+				// called when loading has errors
+				function ( error ) {
+
+					console.log( 'An error happened' );
+
+				}
+			);
+			</code>
 
 		[example:webgl_loader_gltf]
+
+		<h2>Browser compatibility</h2>
+
+		<p>GLTFLoader relies on ES6 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promises</a>,
+		which are not supported in IE11. To use the loader in IE11, you must
+		<a href="https://github.com/stefanpenner/es6-promise">include a polyfill</a>
+		providing a Promise replacement.</p>
+
+		<br>
+		<hr>
 
 		<h2>Constructor</h2>
 
@@ -59,10 +108,10 @@
 
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		[page:String url] — required<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded JSON response returned from [page:Function parse].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called when load errors.<br />
+		[page:String url] — A string containing the path/URL of the <em>.gltf</em> or <em>.glb</em> file.<br />
+		[page:Function onLoad] — A function to be called after the loading is successfully completed. The function receives the loaded JSON response returned from [page:Function parse].<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</div>
 		<div>
 		Begin loading from url and call the callback function with the parsed response content.
@@ -70,7 +119,7 @@
 
 		<h3>[method:null setPath]( [page:String path] )</h3>
 		<div>
-		[page:String path] — Base path for loading additional resources e.g. textures, GLSL shaders, .bin data.
+		[page:String path] — Base path for loading additional resources e.g. textures and .bin data.
 		</div>
 		<div>
 		Set the base path for additional resources.
@@ -81,14 +130,15 @@
 		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</div>
 
-		<h3>[method:null parse]( [page:Object json], [page:Function callBack], [page:String path] )</h3>
+		<h3>[method:null parse]( [page:ArrayBuffer data], [page:String path], [page:Function onLoad], [page:Function onError] )</h3>
 		<div>
-		[page:Object json] — <em>JSON</em> object to parse.<br />
-		[page:Function callBack] — Will be called when parse completes.<br />
-		[page:String path] — The base path from which to find subsequent glTF resources such as textures, GLSL shaders and .bin data files.<br />
+		[page:ArrayBuffer data] — glTF asset to parse, as an ArrayBuffer or <em>JSON</em> string.<br />
+		[page:String path] — The base path from which to find subsequent glTF resources such as textures and .bin data files.<br />
+		[page:Function onLoad] — A function to be called when parse completes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</div>
 		<div>
-		Parse a glTF-based <em>JSON</em> structure and fire [page:Function callback] when complete. The argument to [page:Function callback] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array cameras], .[page:Array animations] and .[page:Array shaders]
+		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], and .[page:Array animations].
 		</div>
 
 		<h2>Source</h2>

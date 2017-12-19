@@ -4,6 +4,8 @@
 		<title>three.js webvr - htc vive - dragging</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-01-21 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-01-21" content="Ap+tmQjuEXRrzmu+ZuReB/eY8fZmTEOybJ2hME1RgEZAPzhZ4/IAKEHRebiTp6o4LoZOMBexL4GAL7flIkAUlQYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxNjUzODYxMX0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -21,8 +23,6 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/ViveController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
@@ -30,17 +30,8 @@
 
 		<script>
 
-			if ( WEBVR.isAvailable() === false ) {
-
-				document.body.appendChild( WEBVR.getMessage() );
-
-			}
-
-			//
-
 			var container;
 			var camera, scene, renderer;
-			var effect, controls;
 			var controller1, controller2;
 
 			var raycaster, intersected = [];
@@ -61,14 +52,18 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - htc vive';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - htc vive';
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x808080 );
 
+				var user = new THREE.Group();
+				user.position.set( 0, 1.6, 0 );
+				scene.add( user );
+
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				scene.add( camera );
+				user.add( camera );
 
 				var geometry = new THREE.PlaneGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
@@ -137,27 +132,25 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.VRControls( camera );
-				controls.standing = true;
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				// controllers
 
 				controller1 = new THREE.ViveController( 0 );
-				controller1.standingMatrix = controls.getStandingMatrix();
 				controller1.addEventListener( 'triggerdown', onTriggerDown );
 				controller1.addEventListener( 'triggerup', onTriggerUp );
-				scene.add( controller1 );
+				user.add( controller1 );
 
 				controller2 = new THREE.ViveController( 1 );
-				controller2.standingMatrix = controls.getStandingMatrix();
 				controller2.addEventListener( 'triggerdown', onTriggerDown );
 				controller2.addEventListener( 'triggerup', onTriggerUp );
-				scene.add( controller2 );
+				user.add( controller2 );
 
 				var loader = new THREE.OBJLoader();
 				loader.setPath( 'models/obj/vive-controller/' );
@@ -190,17 +183,6 @@
 
 				raycaster = new THREE.Raycaster();
 
-
-				//
-
-				effect = new THREE.VREffect( renderer );
-
-				if ( WEBVR.isAvailable() === true ) {
-
-					document.body.appendChild( WEBVR.getButton( effect ) );
-
-				}
-
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -212,7 +194,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -312,8 +294,7 @@
 
 			function animate() {
 
-				effect.requestAnimationFrame( animate );
-				render();
+				renderer.animate( render );
 
 			}
 
@@ -322,14 +303,12 @@
 				controller1.update();
 				controller2.update();
 
-				controls.update();
-
 				cleanIntersected();
 
 				intersectObjects( controller1 );
 				intersectObjects( controller2 );
 
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

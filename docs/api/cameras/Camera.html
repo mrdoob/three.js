@@ -71,17 +71,13 @@
 
 		<h3>[method:Vector3 getWorldDirection]( [page:Vector3 optionalTarget] )</h3>
 		<div>
-		Returns a vector representing the direction in which the camera is looking,
-		in world space. If the [page:Vector3 optionalTarget] is set, returns a vector representing the direction
-		from the camera's position to the [page:Vector3 optionalTarget].
-		</div>
-
-		<h3>[method:null lookAt]( [page:Vector3 target] )</h3>
-		<div>
-		target — position in 3D space for the camera to point towards<br /><br />
-
-		This makes the camera look at the vector position in the global space as long as
-		the parent of this camera is the scene or at position (0,0,0).
+		Returns a [page:Vector3] representing the world space direction in which the camera is looking.<br /><br />
+		
+		Note: This is not the camera’s positive, but its negative z-axis, in contrast to
+		[page:Object3D.getWorldDirection getWorldDirection] of the base class (Object3D).<br /><br />
+		
+		If an [page:Vector3 optionalTarget] vector is specified, the result will be copied into this vector
+		(which can be reused in this way), otherwise a new vector will be created.
 		</div>
 
 		<h2>Source</h2>

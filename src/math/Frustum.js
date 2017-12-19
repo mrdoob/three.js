@@ -1,6 +1,6 @@
-import { Vector3 } from './Vector3';
-import { Sphere } from './Sphere';
-import { Plane } from './Plane';
+import { Vector3 } from './Vector3.js';
+import { Sphere } from './Sphere.js';
+import { Plane } from './Plane.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -147,7 +147,7 @@ Object.assign( Frustum.prototype, {
 
 			var planes = this.planes;
 
-			for ( var i = 0; i < 6 ; i ++ ) {
+			for ( var i = 0; i < 6; i ++ ) {
 
 				var plane = planes[ i ];
 
@@ -176,7 +176,7 @@ Object.assign( Frustum.prototype, {
 		};
 
 	}(),
-	
+
 	containsPoint: function ( point ) {
 
 		var planes = this.planes;

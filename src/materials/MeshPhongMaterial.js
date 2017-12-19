@@ -1,7 +1,7 @@
-import { Material } from './Material';
-import { MultiplyOperation } from '../constants';
-import { Vector2 } from '../math/Vector2';
-import { Color } from '../math/Color';
+import { Material } from './Material.js';
+import { MultiplyOperation } from '../constants.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Color } from '../math/Color.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -47,6 +47,7 @@ import { Color } from '../math/Color';
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
+ *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -98,6 +99,7 @@ function MeshPhongMaterial( parameters ) {
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
 
+	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
 
@@ -154,6 +156,7 @@ MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.wireframeLinecap = source.wireframeLinecap;
 	this.wireframeLinejoin = source.wireframeLinejoin;
 
+	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 

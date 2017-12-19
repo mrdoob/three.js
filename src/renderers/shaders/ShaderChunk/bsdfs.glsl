@@ -1,27 +1,28 @@
 float punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
-		if( decayExponent > 0.0 ) {
+	if( decayExponent > 0.0 ) {
 
 #if defined ( PHYSICALLY_CORRECT_LIGHTS )
 
-			// based upon Frostbite 3 Moving to Physically-based Rendering
-			// page 32, equation 26: E[window1]
-			// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
-			// this is intended to be used on spot and point lights who are represented as luminous intensity
-			// but who must be converted to luminous irradiance for surface lighting calculation
-			float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
-			float maxDistanceCutoffFactor = pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );
-			return distanceFalloff * maxDistanceCutoffFactor;
+		// based upon Frostbite 3 Moving to Physically-based Rendering
+		// page 32, equation 26: E[window1]
+		// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+		// this is intended to be used on spot and point lights who are represented as luminous intensity
+		// but who must be converted to luminous irradiance for surface lighting calculation
+		float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
+		float maxDistanceCutoffFactor = pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );
+		return distanceFalloff * maxDistanceCutoffFactor;
 
 #else
 
-			return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
+		return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
 
 #endif
 
-		}
+	}
 
-		return 1.0;
+	return 1.0;
+
 }
 
 vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
@@ -30,26 +31,26 @@ vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 
 } // validated
 
-
 vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {
 
 	// Original approximation by Christophe Schlick '94
-	//;float fresnel = pow( 1.0 - dotLH, 5.0 );
+	// float fresnel = pow( 1.0 - dotLH, 5.0 );
 
 	// Optimized variant (presented by Epic at SIGGRAPH '13)
+	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
 	float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );
 
 	return ( 1.0 - specularColor ) * fresnel + specularColor;
 
 } // validated
 
-
 // Microfacet Models for Refraction through Rough Surfaces - equation (34)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
 // alpha is "roughness squared" in Disney’s reparameterization
 float G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {
 
-	// geometry term = G(l)⋅G(v) / 4(n⋅l)(n⋅v)
+	// geometry term (normalized) = G(l)⋅G(v) / 4(n⋅l)(n⋅v)
+	// also see #12151
 
 	float a2 = pow2( alpha );
 
@@ -60,7 +61,8 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 
 } // validated
 
-// from page 12, listing 2 of http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
+// Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
+// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
 
 	float a2 = pow2( alpha );
@@ -70,9 +72,8 @@ float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const i
 	float gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
 
 	return 0.5 / max( gv + gl, EPSILON );
+
 }
-
-
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
@@ -86,7 +87,6 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 	return RECIPROCAL_PI * a2 / pow2( denom );
 
 }
-
 
 // GGX Distribution, Schlick Fresnel, GGX-Smith Visibility
 vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
@@ -110,29 +110,21 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 } // validated
 
-//
-// Rect Area Light BRDF Approximations
-//
+// Rect Area Light
 
 // Area light computation code adapted from:
-// http://blog.selfshadow.com/sandbox/ltc.html
-//
-// Based on paper:
 // Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
 // By: Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
+// https://drive.google.com/file/d/0BzvWIdpUpRx_d09ndGVjNVJzZjA/view
 // https://eheitzresearch.wordpress.com/415-2/
+// http://blog.selfshadow.com/sandbox/ltc.html
 
-vec2 ltcTextureCoords( const in GeometricContext geometry, const in float roughness ) {
+vec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {
 
 	const float LUT_SIZE  = 64.0;
-	const float LUT_SCALE = (LUT_SIZE - 1.0)/LUT_SIZE;
-	const float LUT_BIAS  = 0.5/LUT_SIZE;
+	const float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;
+	const float LUT_BIAS  = 0.5 / LUT_SIZE;
 
-	vec3 N = geometry.normal;
-	vec3 V = geometry.viewDir;
-	vec3 P = geometry.position;
-
-	// view angle on surface determines which LTC BRDF values we use
 	float theta = acos( dot( N, V ) );
 
 	// Parameterization of texture:
@@ -151,260 +143,84 @@ vec2 ltcTextureCoords( const in GeometricContext geometry, const in float roughn
 
 }
 
-void clipQuadToHorizon( inout vec3 L[5], out int n ) {
+// Real-Time Area Lighting: a Journey from Research to Production
+// By: Stephen Hill & Eric Heitz
+// http://advances.realtimerendering.com/s2016/s2016_ltc_rnd.pdf
+// An approximation for the form factor of a clipped rectangle.
+float LTC_ClippedSphereFormFactor( const in vec3 f ) {
 
-	// detect clipping config
-	int config = 0;
-	if ( L[0].z > 0.0 ) config += 1;
-	if ( L[1].z > 0.0 ) config += 2;
-	if ( L[2].z > 0.0 ) config += 4;
-	if ( L[3].z > 0.0 ) config += 8;
+	float l = length( f );
 
-	// clip
-	n = 0;
-
-	if ( config == 0 ) {
-
-		// clip all
-
-	} else if ( config == 1 ) {
-
-		// V1 clip V2 V3 V4
-		n = 3;
-		L[1] = -L[1].z * L[0] + L[0].z * L[1];
-		L[2] = -L[3].z * L[0] + L[0].z * L[3];
-
-	} else if ( config == 2 ) {
-
-		// V2 clip V1 V3 V4
-		n = 3;
-		L[0] = -L[0].z * L[1] + L[1].z * L[0];
-		L[2] = -L[2].z * L[1] + L[1].z * L[2];
-
-	} else if ( config == 3 ) {
-
-		// V1 V2 clip V3 V4
-		n = 4;
-		L[2] = -L[2].z * L[1] + L[1].z * L[2];
-		L[3] = -L[3].z * L[0] + L[0].z * L[3];
-
-	} else if ( config == 4 ) {
-
-		// V3 clip V1 V2 V4
-		n = 3;
-		L[0] = -L[3].z * L[2] + L[2].z * L[3];
-		L[1] = -L[1].z * L[2] + L[2].z * L[1];
-
-	} else if ( config == 5 ) {
-
-		// V1 V3 clip V2 V4) impossible
-		n = 0;
-
-	} else if ( config == 6 ) {
-
-		// V2 V3 clip V1 V4
-		n = 4;
-		L[0] = -L[0].z * L[1] + L[1].z * L[0];
-		L[3] = -L[3].z * L[2] + L[2].z * L[3];
-
-	} else if ( config == 7 ) {
-
-		// V1 V2 V3 clip V4
-		n = 5;
-		L[4] = -L[3].z * L[0] + L[0].z * L[3];
-		L[3] = -L[3].z * L[2] + L[2].z * L[3];
-
-	} else if ( config == 8 ) {
-
-		// V4 clip V1 V2 V3
-		n = 3;
-		L[0] = -L[0].z * L[3] + L[3].z * L[0];
-		L[1] = -L[2].z * L[3] + L[3].z * L[2];
-		L[2] =  L[3];
-
-	} else if ( config == 9 ) {
-
-		// V1 V4 clip V2 V3
-		n = 4;
-		L[1] = -L[1].z * L[0] + L[0].z * L[1];
-		L[2] = -L[2].z * L[3] + L[3].z * L[2];
-
-	} else if ( config == 10 ) {
-
-		// V2 V4 clip V1 V3) impossible
-		n = 0;
-
-	} else if ( config == 11 ) {
-
-		// V1 V2 V4 clip V3
-		n = 5;
-		L[4] = L[3];
-		L[3] = -L[2].z * L[3] + L[3].z * L[2];
-		L[2] = -L[2].z * L[1] + L[1].z * L[2];
-
-	} else if ( config == 12 ) {
-
-		// V3 V4 clip V1 V2
-		n = 4;
-		L[1] = -L[1].z * L[2] + L[2].z * L[1];
-		L[0] = -L[0].z * L[3] + L[3].z * L[0];
-
-	} else if ( config == 13 ) {
-
-		// V1 V3 V4 clip V2
-		n = 5;
-		L[4] = L[3];
-		L[3] = L[2];
-		L[2] = -L[1].z * L[2] + L[2].z * L[1];
-		L[1] = -L[1].z * L[0] + L[0].z * L[1];
-
-	} else if ( config == 14 ) {
-
-		// V2 V3 V4 clip V1
-		n = 5;
-		L[4] = -L[0].z * L[3] + L[3].z * L[0];
-		L[0] = -L[0].z * L[1] + L[1].z * L[0];
-
-	} else if ( config == 15 ) {
-
-		// V1 V2 V3 V4
-		n = 4;
-
-	}
-
-	if ( n == 3 )
-		L[3] = L[0];
-	if ( n == 4 )
-		L[4] = L[0];
+	return max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );
 
 }
 
-// Equation (11) of "Real-Time Polygonal-Light Shading with Linearly Transformed Cosines"
-float integrateLtcBrdfOverRectEdge( vec3 v1, vec3 v2 ) {
+// Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
+// also Real-Time Area Lighting: a Journey from Research to Production
+// http://advances.realtimerendering.com/s2016/s2016_ltc_rnd.pdf
+// Normalization by 2*PI is incorporated in this function itself.
+// theta/sin(theta) is approximated by rational polynomial
+vec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {
 
-	float cosTheta = dot( v1, v2 );
-	float theta = acos( cosTheta );
-	float res = cross( v1, v2 ).z * ( ( theta > 0.001 ) ? theta / sin( theta ) : 1.0 );
+	float x = dot( v1, v2 );
 
-	return res;
+	float y = abs( x );
+	float a = 0.86267 + (0.49788 + 0.01436 * y ) * y;
+	float b = 3.45068 + (4.18814 + y) * y;
+	float v = a / b;
+
+	float theta_sintheta = (x > 0.0) ? v : 0.5 * inversesqrt( 1.0 - x * x ) - v;
+
+	return cross( v1, v2 ) * theta_sintheta;
 
 }
 
-void initRectPoints( const in vec3 pos, const in vec3 halfWidth, const in vec3 halfHeight, out vec3 rectPoints[4] ) {
+vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {
 
-	rectPoints[0] = pos - halfWidth - halfHeight;
-	rectPoints[1] = pos + halfWidth - halfHeight;
-	rectPoints[2] = pos + halfWidth + halfHeight;
-	rectPoints[3] = pos - halfWidth + halfHeight;
+	// bail if point is on back side of plane of light
+	// assumes ccw winding order of light vertices
+	vec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];
+	vec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];
+	vec3 lightNormal = cross( v1, v2 );
 
-}
-
-vec3 integrateLtcBrdfOverRect( const in GeometricContext geometry, const in mat3 brdfMat, const in vec3 rectPoints[4] ) {
-
-	vec3 N = geometry.normal;
-	vec3 V = geometry.viewDir;
-	vec3 P = geometry.position;
+	if( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );
 
 	// construct orthonormal basis around N
 	vec3 T1, T2;
-	T1 = normalize(V - N * dot( V, N ));
-	// TODO (abelnation): I had to negate this cross product to get proper light.  Curious why sample code worked without negation
-	T2 = - cross( N, T1 );
+	T1 = normalize( V - N * dot( V, N ) );
+	T2 = - cross( N, T1 ); // negated from paper; possibly due to a different assumed handedness of world coordinate system
 
-	// rotate area light in (T1, T2, N) basis
-	mat3 brdfWrtSurface = brdfMat * transpose( mat3( T1, T2, N ) );
+	// compute transform
+	mat3 mat = mInv * transposeMat3( mat3( T1, T2, N ) );
 
-	// transformed rect relative to surface point
-	vec3 clippedRect[5];
-	clippedRect[0] = brdfWrtSurface * ( rectPoints[0] - P );
-	clippedRect[1] = brdfWrtSurface * ( rectPoints[1] - P );
-	clippedRect[2] = brdfWrtSurface * ( rectPoints[2] - P );
-	clippedRect[3] = brdfWrtSurface * ( rectPoints[3] - P );
+	// transform rect
+	vec3 coords[ 4 ];
+	coords[ 0 ] = mat * ( rectCoords[ 0 ] - P );
+	coords[ 1 ] = mat * ( rectCoords[ 1 ] - P );
+	coords[ 2 ] = mat * ( rectCoords[ 2 ] - P );
+	coords[ 3 ] = mat * ( rectCoords[ 3 ] - P );
 
-	// clip light rect to horizon, resulting in at most 5 points
-	// we do this because we are integrating the BRDF over the hemisphere centered on the surface points normal
-	int n;
-	clipQuadToHorizon(clippedRect, n);
+	// project rect onto sphere
+	coords[ 0 ] = normalize( coords[ 0 ] );
+	coords[ 1 ] = normalize( coords[ 1 ] );
+	coords[ 2 ] = normalize( coords[ 2 ] );
+	coords[ 3 ] = normalize( coords[ 3 ] );
 
-	// light is completely below horizon
-	if ( n == 0 )
-		return vec3( 0, 0, 0 );
+	// calculate vector form factor
+	vec3 vectorFormFactor = vec3( 0.0 );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );
 
-	// project clipped rect onto sphere
-	clippedRect[0] = normalize( clippedRect[0] );
-	clippedRect[1] = normalize( clippedRect[1] );
-	clippedRect[2] = normalize( clippedRect[2] );
-	clippedRect[3] = normalize( clippedRect[3] );
-	clippedRect[4] = normalize( clippedRect[4] );
+	// adjust for horizon clipping
+	vec3 result = vec3( LTC_ClippedSphereFormFactor( vectorFormFactor ) );
 
-	// integrate
-	// simplified integration only needs to be evaluated for each edge in the polygon
-	float sum = 0.0;
-	sum += integrateLtcBrdfOverRectEdge( clippedRect[0], clippedRect[1] );
-	sum += integrateLtcBrdfOverRectEdge( clippedRect[1], clippedRect[2] );
-	sum += integrateLtcBrdfOverRectEdge( clippedRect[2], clippedRect[3] );
-	if (n >= 4)
-		sum += integrateLtcBrdfOverRectEdge( clippedRect[3], clippedRect[4] );
-	if (n == 5)
-		sum += integrateLtcBrdfOverRectEdge( clippedRect[4], clippedRect[0] );
-
-	// TODO (abelnation): two-sided area light
-	// sum = twoSided ? abs(sum) : max(0.0, sum);
-	sum = max( 0.0, sum );
-	// sum = abs( sum );
-
-	vec3 Lo_i = vec3( sum, sum, sum );
-
-	return Lo_i;
+	return result;
 
 }
 
-vec3 Rect_Area_Light_Specular_Reflectance(
-		const in GeometricContext geometry,
-		const in vec3 lightPos, const in vec3 lightHalfWidth, const in vec3 lightHalfHeight,
-		const in float roughness,
-		const in sampler2D ltcMat, const in sampler2D ltcMag ) {
-
-	vec3 rectPoints[4];
-	initRectPoints( lightPos, lightHalfWidth, lightHalfHeight, rectPoints );
-
-	vec2 uv = ltcTextureCoords( geometry, roughness );
-
-	vec4 brdfLtcApproxParams, t;
-
-	brdfLtcApproxParams = texture2D( ltcMat, uv );
-	t = texture2D( ltcMat, uv );
-
-	float brdfLtcScalar = texture2D( ltcMag, uv ).a;
-
-	// inv(M) matrix referenced by equation (6) in paper
-	mat3 brdfLtcApproxMat = mat3(
-		vec3(   1,   0, t.y ),
-		vec3(   0, t.z,   0 ),
-		vec3( t.w,   0, t.x )
-	);
-
-	vec3 specularReflectance = integrateLtcBrdfOverRect( geometry, brdfLtcApproxMat, rectPoints );
-	specularReflectance *= brdfLtcScalar;
-
-	return specularReflectance;
-
-}
-
-vec3 Rect_Area_Light_Diffuse_Reflectance(
-		const in GeometricContext geometry,
-		const in vec3 lightPos, const in vec3 lightHalfWidth, const in vec3 lightHalfHeight ) {
-
-	vec3 rectPoints[4];
-	initRectPoints( lightPos, lightHalfWidth, lightHalfHeight, rectPoints );
-
-	mat3 diffuseBrdfMat = mat3(1);
-	vec3 diffuseReflectance = integrateLtcBrdfOverRect( geometry, diffuseBrdfMat, rectPoints );
-
-	return diffuseReflectance;
-
-}
-// End RectArea BRDF
+// End Rect Area Light
 
 // ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
 vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {

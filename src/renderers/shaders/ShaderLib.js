@@ -1,8 +1,8 @@
-import { ShaderChunk } from './ShaderChunk';
-import { UniformsUtils } from './UniformsUtils';
-import { Vector3 } from '../../math/Vector3';
-import { UniformsLib } from './UniformsLib';
-import { Color } from '../../math/Color';
+import { ShaderChunk } from './ShaderChunk.js';
+import { UniformsUtils } from './UniformsUtils.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { UniformsLib } from './UniformsLib.js';
+import { Color } from '../../math/Color.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -16,6 +16,8 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.fog
@@ -30,6 +32,8 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
@@ -49,6 +53,8 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
@@ -74,6 +80,7 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
+			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
@@ -87,7 +94,7 @@ var ShaderLib = {
 			{
 				emissive: { value: new Color( 0x000000 ) },
 				roughness: { value: 0.5 },
-				metalness: { value: 0 },
+				metalness: { value: 0.5 },
 				envMapIntensity: { value: 1 } // temporary
 			}
 		] ),
@@ -172,15 +179,10 @@ var ShaderLib = {
 
 	},
 
-	/* -------------------------------------------------------------------------
-	//	Cube map shader
-	 ------------------------------------------------------------------------- */
-
 	equirect: {
 
 		uniforms: {
 			tEquirect: { value: null },
-			tFlip: { value: - 1 }
 		},
 
 		vertexShader: ShaderChunk.equirect_vert,
@@ -190,12 +192,34 @@ var ShaderLib = {
 
 	distanceRGBA: {
 
-		uniforms: {
-			lightPos: { value: new Vector3() }
-		},
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.common,
+			UniformsLib.displacementmap,
+			{
+				referencePosition: { value: new Vector3() },
+				nearDistance: { value: 1 },
+				farDistance: { value: 1000 }
+			}
+		] ),
 
 		vertexShader: ShaderChunk.distanceRGBA_vert,
 		fragmentShader: ShaderChunk.distanceRGBA_frag
+
+	},
+
+	shadow: {
+
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.lights,
+			UniformsLib.fog,
+			{
+				color: { value: new Color( 0x00000 ) },
+				opacity: { value: 1.0 }
+			},
+		] ),
+
+		vertexShader: ShaderChunk.shadow_vert,
+		fragmentShader: ShaderChunk.shadow_frag
 
 	}
 

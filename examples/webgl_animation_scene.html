@@ -33,155 +33,123 @@
 		<div id="container"></div>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - scene animation - <a href="https://clara.io/view/96106133-2e99-40cf-8abd-64defd153e61">Three Gears Scene</a> courtesy of David Sarno</div>
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - scene animation - <a href="https://clara.io/view/96106133-2e99-40cf-8abd-64defd153e61">Three Gears Scene</a> courtesy of David Sarno
+		<br><br>camera orbit/zoom/pan with left/middle/right mouse button</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
-			var FLOOR = -250;
-
-			var container,stats;
-
-			var camera, scene, sceneAnimationClip;
-			var renderer;
-
-			var mesh, helper;
-
-			var mixer;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var scene, camera, controls, stats;
+			var renderer, mixer;
 
 			var clock = new THREE.Clock();
+			var url = 'models/json/scene-animation.json';
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
 
-			init();
-			animate();
-
-			function init() {
-
-				container = document.getElementById( 'container' );
-
-				camera = new THREE.PerspectiveCamera( 30, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-				camera.position.z = 150;
-
-				scene = new THREE.Scene();
-
-				scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
-
-				//scene.add( camera );
-
-				// GROUND
-
-				var geometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
-				var material = new THREE.MeshPhongMaterial( { emissive: 0x000000 } );
-
-				var ground = new THREE.Mesh( geometry, material );
-				ground.position.set( 0, FLOOR, 0 );
-				ground.rotation.x = -Math.PI/2;
-				/*scene.add( ground );*/
-
-				ground.receiveShadow = true;
+			var container = document.getElementById( 'container' );
 
 
-				// RENDERER
+			stats = new Stats();
+			container.appendChild( stats.dom );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
-
-				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-
-				renderer.shadowMap.enabled = true;
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+			container.appendChild( renderer.domElement );
 
 
-				// STATS
+			// Load a scene with objects, lights and camera from a JSON file
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+			new THREE.ObjectLoader().load( url, function ( loadedScene ) {
 
-				//
+				scene = loadedScene;
+				scene.background = new THREE.Color( 0xffffff );
 
-				var loader = new THREE.ObjectLoader();
-				loader.load( "models/json/scene-animation.json", function ( loadedScene ) {
+				// If the loaded file contains a perspective camera, use it with adjusted aspect ratio...
 
-					sceneAnimationClip = loadedScene.animations[0];
-					scene = loadedScene;
-					scene.add( camera );
-					scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
+				scene.traverse( function ( sceneChild ) {
 
-					mixer = new THREE.AnimationMixer( scene );
+					if ( sceneChild.type === 'PerspectiveCamera' ) {
 
-					mixer.clipAction( sceneAnimationClip ).play();
+						camera = sceneChild;
+						camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+						camera.updateProjectionMatrix();
+
+					}
 
 				} );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				// ... else create a new camera and use it in the loaded scene
 
-			}
+				if ( camera === undefined ) {
 
-			function onWindowResize() {
+					camera = new THREE.PerspectiveCamera( 30, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+					camera.position.set( - 200, 0, 200 );
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
+				}
+
+				controls = new THREE.OrbitControls( camera );
+
+				// Ground plane and fog: examples for applying additional children and new property values to the loaded scene
+
+				var geometry = new THREE.PlaneBufferGeometry( 20000, 20000 );
+				var material = new THREE.MeshPhongMaterial( { shininess: 0.1 } );
+				var ground = new THREE.Mesh( geometry, material );
+
+				ground.position.set( 0, - 250, 0 );
+				ground.rotation.x = - Math.PI / 2;
+
+				scene.add( ground );
+
+				scene.fog = new THREE.Fog( 0xffffff, 1000, 10000 );
+
+				// Initialization of the loaded animations
+
+				var animationClip = scene.animations[ 0 ];
+				mixer = new THREE.AnimationMixer( scene );
+				mixer.clipAction( animationClip ).play();
+
+				animate();
+
+			} );
+
+
+			window.onresize = function () {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			}
+			};
 
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
-
-			}
-
-			//
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-
 				render();
-				stats.update();
 
 			}
+
 
 			function render() {
 
 				var delta = 0.75 * clock.getDelta();
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y = THREE.Math.clamp( camera.position.y + ( - mouseY - camera.position.y ) * .05, 0, 1000 );
-
-				camera.lookAt( scene.position );
-
-				if( mixer ) {
-					//console.log( "updating mixer by " + delta );
-					mixer.update( delta );
-				}
+				mixer.update( delta );
+				stats.update();
 
 				renderer.render( scene, camera );
 
 			}
+
 
 		</script>
 

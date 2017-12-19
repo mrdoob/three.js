@@ -10,8 +10,9 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">Class for loading a <em>.tga</em> [page:DataTexture texture].</div>
-
+		<div class="desc">A loader for loading a <em>.tga</em> resource. <br />
+		<a href="https://en.wikipedia.org/wiki/Truevision_TGA">TGA</a> is a raster graphics, image file format.
+		</div>
 
 		<h2>Example</h2>
 
@@ -23,20 +24,26 @@
 		var texture = loader.load(
 			// resource URL
 			'textures/crate_grey8.tga'
-			// Function when resource is loaded
+			// called when loading is completed
 			function ( texture ) {
+
 				console.log( 'Texture is loaded' );
+
 			},
-			// Function called when download progresses
+			// called when the loading is in progresses
 			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
 			},
-			// Function called when download errors
-			function ( xhr ) {
+			// called when the loading failes
+			function ( error ) {
+
 				console.log( 'An error happened' );
+
 			}
 		);
-
+		
 		var material = new THREE.MeshPhongMaterial( {
 			color: 0xffffff,
 			map: texture
@@ -60,10 +67,10 @@
 
 		<h3>[method:DataTexture load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		[page:String url] — required<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:DataTexture].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called when load errors.<br />
+		[page:String url] — A string containing the path/URL of the <em>.tga</em> file. <br />
+		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives loaded [page:DataTexture] as an argument.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
 		</div>
 		<div>
 		Begin loading from url and pass the loaded [page:DataTexture texture] to onLoad. The [page:DataTexture texture] is also directly returned for immediate use (but may not be fully loaded).

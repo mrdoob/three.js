@@ -29,35 +29,35 @@
 		</div>
 
 		<code>
-var loader = new THREE.ObjectLoader();
+		var loader = new THREE.ObjectLoader();
 
-loader.load(
-    // resource URL
-    "models/json/example.json"
+		loader.load(
+			// resource URL
+			"models/json/example.json",
 
-    // pass the loaded data to the onLoad function.
-		//Here it is assumed to be an object
-    function ( obj ) {
-				//add the loaded object to the scene
-        scene.add( obj );
-    },
+			// onLoad callback
+			// Here the loaded data is assumed to be an object
+			function ( obj ) {
+				// Add the loaded object to the scene
+				scene.add( obj );
+			},
 
-    // Function called when download progresses
-    function ( xhr ) {
-        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-    },
+			// onProgress callback
+			function ( err ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
 
-    // Function called when download errors
-    function ( xhr ) {
-        console.error( 'An error happened' );
-    }
-);
+			// onError callback
+			function ( xhr ) {
+				console.error( 'An error happened' );
+			}
+		);
 
 
-// Alternatively, to parse a previously loaded JSON structure
-var object = loader.parse( a_json_object );
+		// Alternatively, to parse a previously loaded JSON structure
+		var object = loader.parse( a_json_object );
 
-scene.add( object );
+		scene.add( object );
 		</code>
 
 
@@ -99,7 +99,7 @@ scene.add( object );
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Object3D object].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
 		[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>

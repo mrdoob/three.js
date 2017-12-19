@@ -1,5 +1,5 @@
-import { Material } from './Material';
-import { BasicDepthPacking } from '../constants';
+import { Material } from './Material.js';
+import { BasicDepthPacking } from '../constants.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -32,6 +32,7 @@ function MeshDepthMaterial( parameters ) {
 
 	this.depthPacking = BasicDepthPacking;
 
+	this.skinning = false;
 	this.morphTargets = false;
 
 	this.map = null;
@@ -63,6 +64,7 @@ MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	this.depthPacking = source.depthPacking;
 
+	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 
 	this.map = source.map;

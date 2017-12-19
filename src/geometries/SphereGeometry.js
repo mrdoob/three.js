@@ -1,8 +1,15 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author benaadams / https://twitter.com/ben_a_adams
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { Geometry } from '../core/Geometry';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
+
+// SphereGeometry
 
 function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
@@ -21,20 +28,14 @@ function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLen
 	};
 
 	this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
+	this.mergeVertices();
 
 }
 
 SphereGeometry.prototype = Object.create( Geometry.prototype );
 SphereGeometry.prototype.constructor = SphereGeometry;
 
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
+// SphereBufferGeometry
 
 function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
@@ -52,7 +53,7 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 		thetaLength: thetaLength
 	};
 
-	radius = radius || 50;
+	radius = radius || 1;
 
 	widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
 	heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
@@ -146,5 +147,6 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 
 SphereBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;
+
 
 export { SphereGeometry, SphereBufferGeometry };

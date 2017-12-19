@@ -1,5 +1,4 @@
-import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype';
-import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
+import { KeyframeTrack } from '../KeyframeTrack.js';
 
 /**
  *
@@ -12,12 +11,11 @@ import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
 
 function NumberKeyframeTrack( name, times, values, interpolation ) {
 
-	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
+	KeyframeTrack.call( this, name, times, values, interpolation );
 
 }
 
-NumberKeyframeTrack.prototype =
-		Object.assign( Object.create( KeyframeTrackPrototype ), {
+NumberKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
 
 	constructor: NumberKeyframeTrack,
 
@@ -28,6 +26,5 @@ NumberKeyframeTrack.prototype =
 	// DefaultInterpolation is inherited
 
 } );
-
 
 export { NumberKeyframeTrack };

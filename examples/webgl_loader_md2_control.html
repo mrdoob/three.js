@@ -31,7 +31,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - MD2 Loader -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MD2 Loader -
 			Ogro by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=556">Magarnigal</a><br />
 			use arrows to control characters, mouse for camera
 		</div>
@@ -41,6 +41,7 @@
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src='js/loaders/MD2Loader.js'></script>
+		<script src='js/MorphBlendMesh.js'></script>
 		<script src='js/MD2CharacterComplex.js'></script>
 		<script src='js/Gyroscope.js'></script>
 
@@ -54,7 +55,8 @@
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container, camera, scene, renderer;
+			var container, stats;
+			var camera, scene, renderer;
 
 			var characters = [];
 			var nCharacters = 0;
@@ -88,6 +90,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 1000, 4000 );
 
 				scene.add( camera );
@@ -135,7 +138,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -163,6 +165,7 @@
 
 				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, 50, 0 );
+				cameraControls.update();
 
 				// CHARACTER
 
@@ -328,8 +331,6 @@
 			function render() {
 
 				var delta = clock.getDelta();
-
-				cameraControls.update( delta );
 
 				for ( var i = 0; i < nCharacters; i ++ ) {
 

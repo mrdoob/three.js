@@ -2,16 +2,17 @@
  * @author astrodud / http://astrodud.isgreat.org/
  * @author zz85 / https://github.com/zz85
  * @author bhouston / http://clara.io
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { Geometry } from '../core/Geometry';
+import { Geometry } from '../core/Geometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector2 } from '../math/Vector2.js';
+import { _Math } from '../math/Math.js';
 
-// points - to create a closed torus, one must use a set of points
-//    like so: [ a, b, c, d, a ], see first is the same as last.
-// segments - the number of circumference segments to create
-// phiStart - the starting radian
-// phiLength - the radian (0 to 2PI) range of the lathed section
-//    2PI is a closed lathe, less than 2PI is a portion.
+// LatheGeometry
 
 function LatheGeometry( points, segments, phiStart, phiLength ) {
 
@@ -34,15 +35,7 @@ function LatheGeometry( points, segments, phiStart, phiLength ) {
 LatheGeometry.prototype = Object.create( Geometry.prototype );
 LatheGeometry.prototype.constructor = LatheGeometry;
 
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
-import { _Math } from '../math/Math';
-
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
+// LatheBufferGeometry
 
 function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
@@ -189,5 +182,6 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 LatheBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 LatheBufferGeometry.prototype.constructor = LatheBufferGeometry;
+
 
 export { LatheGeometry, LatheBufferGeometry };
