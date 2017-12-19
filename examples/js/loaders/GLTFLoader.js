@@ -2051,6 +2051,7 @@ THREE.GLTFLoader = ( function () {
 					geometries.push( geometry );
 
 				}
+
 			}
 
 			return geometries;
