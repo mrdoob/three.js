@@ -870,51 +870,48 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-	GLTFCubicSplineInterpolant.prototype = Object.assign( Object.create( THREE.Interpolant.prototype ), {
+	GLTFCubicSplineInterpolant.prototype = Object.create( THREE.Interpolant.prototype );
+	GLTFCubicSplineInterpolant.prototype.constructor = GLTFCubicSplineInterpolant;
 
-		constructor: GLTFCubicSplineInterpolant,
+	GLTFCubicSplineInterpolant.prototype.interpolate_ = function ( i1, t0, t, t1 ) {
 
-		interpolate_: function ( i1, t0, t, t1 ) {
+		var result = this.resultBuffer;
+		var values = this.sampleValues;
+		var stride = this.valueSize;
 
-			var result = this.resultBuffer;
-			var values = this.sampleValues;
-			var stride = this.valueSize;
+		var stride2 = stride * 2;
+		var stride3 = stride * 3;
 
-			var stride2 = stride * 2;
-			var stride3 = stride * 3;
+		var td = t1 - t0;
 
-			var td = t1 - t0;
+		var p = ( t - t0 ) / td;
+		var pp = p * p;
+		var ppp = pp * p;
 
-			var p = ( t - t0 ) / td;
-			var pp = p * p;
-			var ppp = pp * p;
+		var offset1 = i1 * stride3;
+		var offset0 = offset1 - stride3;
 
-			var offset1 = i1 * stride3;
-			var offset0 = offset1 - stride3;
+		var s0 = 2 * ppp - 3 * pp + 1;
+		var s1 = ppp - 2 * pp + p;
+		var s2 = - 2 * ppp + 3 * pp;
+		var s3 = ppp - pp;
 
-			var s0 = 2 * ppp - 3 * pp + 1;
-			var s1 = ppp - 2 * pp + p;
-			var s2 = - 2 * ppp + 3 * pp;
-			var s3 = ppp - pp;
+		// Layout of keyframe output values for CUBICSPLINE animations:
+		//   [ inTangent_1, splineVertex_1, outTangent_1, inTangent_2, splineVertex_2, ... ]
+		for ( var i = 0; i !== stride; i ++ ) {
 
-			// Layout of keyframe output values for CUBICSPLINE animations:
-			//   [ inTangent_1, splineVertex_1, outTangent_1, inTangent_2, splineVertex_2, ... ]
-			for ( var i = 0; i !== stride; i ++ ) {
+			var p0 = values[ offset0 + i + stride ];        // splineVertex_k
+			var m0 = values[ offset0 + i + stride2 ] * td;  // outTangent_k * (t_k+1 - t_k)
+			var p1 = values[ offset1 + i + stride ];        // splineVertex_k+1
+			var m1 = values[ offset1 + i ] * td;            // inTangent_k+1 * (t_k+1 - t_k)
 
-				var p0 = values[ offset0 + i + stride ];        // splineVertex_k
-				var m0 = values[ offset0 + i + stride2 ] * td;  // outTangent_k * (t_k+1 - t_k)
-				var p1 = values[ offset1 + i + stride ];        // splineVertex_k+1
-				var m1 = values[ offset1 + i ] * td;            // inTangent_k+1 * (t_k+1 - t_k)
-
-				result[ i ] = s0 * p0 + s1 * m0 + s2 * p1 + s3 * m1;
-
-			}
-
-			return result;
+			result[ i ] = s0 * p0 + s1 * m0 + s2 * p1 + s3 * m1;
 
 		}
 
-	} );
+		return result;
+
+	};
 
 	/*********************************/
 	/********** INTERNALS ************/
@@ -2405,10 +2402,9 @@ THREE.GLTFLoader = ( function () {
 
 								track.createInterpolant = function ( result ) {
 
-									// The keyframes of a cubic spline in glTF have input and output values where
-									// each input value corresponds to three output values. Then 3rd arguments which
-									// specifies sampleSize needs to be this.getValueSize() / 3 where this.getValueSize()
-									// is this.values.length / this.times.length.
+									// A CUBICSPLINE keyframe in glTF has three output values for each input value,
+									// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
+									// must be divided by three to get the interpolant's sampleSize argument.
 
 									return new GLTFCubicSplineInterpolant( this.times, this.values, this.getValueSize() / 3, result );
 
