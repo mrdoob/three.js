@@ -42,19 +42,22 @@ float clearCoatDHRApprox( const in float roughness, const in float dotNL ) {
 
 		vec2 uv = LTC_Uv( normal, viewDir, roughness );
 
-		float norm = texture2D( ltcMag, uv ).a;
-
-		vec4 t = texture2D( ltcMat, uv );
+		vec4 t1 = texture2D( ltc_1, uv );
+		vec4 t2 = texture2D( ltc_2, uv );
 
 		mat3 mInv = mat3(
-			vec3(   1,   0, t.y ),
-			vec3(   0, t.z,   0 ),
-			vec3( t.w,   0, t.x )
+			vec3( t1.x, 0, t1.y ),
+			vec3(    0, 1,    0 ),
+			vec3( t1.z, 0, t1.w )
 		);
 
-		reflectedLight.directSpecular += lightColor * material.specularColor * norm * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords ); // no fresnel
+		// LTC Fresnel Approximation by Stephen Hill
+		// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf
+		vec3 fresnel = ( material.specularColor * t2.x + ( vec3( 1.0 ) - material.specularColor ) * t2.y );
 
-		reflectedLight.directDiffuse += lightColor * material.diffuseColor * LTC_Evaluate( normal, viewDir, position, mat3( 1 ), rectCoords );
+		reflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );
+
+		reflectedLight.directDiffuse += lightColor * material.diffuseColor * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );
 
 	}
 

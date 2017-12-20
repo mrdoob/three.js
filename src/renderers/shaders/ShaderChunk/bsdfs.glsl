@@ -112,12 +112,9 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 // Rect Area Light
 
-// Area light computation code adapted from:
 // Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
-// By: Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
-// https://drive.google.com/file/d/0BzvWIdpUpRx_d09ndGVjNVJzZjA/view
-// https://eheitzresearch.wordpress.com/415-2/
-// http://blog.selfshadow.com/sandbox/ltc.html
+// by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
+// code: https://github.com/selfshadow/ltc_code/
 
 vec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {
 
@@ -125,29 +122,21 @@ vec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {
 	const float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;
 	const float LUT_BIAS  = 0.5 / LUT_SIZE;
 
-	float theta = acos( dot( N, V ) );
+	float dotNV = saturate( dot( N, V ) );
 
-	// Parameterization of texture:
-	// sqrt(roughness) -> [0,1]
-	// theta -> [0, PI/2]
-	vec2 uv = vec2(
-		sqrt( saturate( roughness ) ),
-		saturate( theta / ( 0.5 * PI ) ) );
+	// texture parameterized by sqrt( GGX alpha ) and sqrt( 1 - cos( theta ) )
+	vec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );
 
-	// Ensure we don't have nonlinearities at the look-up table's edges
-	// see: http://http.developer.nvidia.com/GPUGems2/gpugems2_chapter24.html
-	//      "Shader Analysis" section
 	uv = uv * LUT_SCALE + LUT_BIAS;
 
 	return uv;
 
 }
 
-// Real-Time Area Lighting: a Journey from Research to Production
-// By: Stephen Hill & Eric Heitz
-// http://advances.realtimerendering.com/s2016/s2016_ltc_rnd.pdf
-// An approximation for the form factor of a clipped rectangle.
 float LTC_ClippedSphereFormFactor( const in vec3 f ) {
+
+	// Real-Time Area Lighting: a Journey from Research to Production (p.102)
+	// An approximation of the form factor of a horizon-clipped rectangle.
 
 	float l = length( f );
 
@@ -155,21 +144,18 @@ float LTC_ClippedSphereFormFactor( const in vec3 f ) {
 
 }
 
-// Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
-// also Real-Time Area Lighting: a Journey from Research to Production
-// http://advances.realtimerendering.com/s2016/s2016_ltc_rnd.pdf
-// Normalization by 2*PI is incorporated in this function itself.
-// theta/sin(theta) is approximated by rational polynomial
 vec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {
 
 	float x = dot( v1, v2 );
 
 	float y = abs( x );
-	float a = 0.86267 + (0.49788 + 0.01436 * y ) * y;
-	float b = 3.45068 + (4.18814 + y) * y;
+
+	// rational polynomial approximation to theta / sin( theta ) / 2PI
+	float a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;
+	float b = 3.4175940 + ( 4.1616724 + y ) * y;
 	float v = a / b;
 
-	float theta_sintheta = (x > 0.0) ? v : 0.5 * inversesqrt( 1.0 - x * x ) - v;
+    float theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;
 
 	return cross( v1, v2 ) * theta_sintheta;
 
@@ -188,7 +174,7 @@ vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in m
 	// construct orthonormal basis around N
 	vec3 T1, T2;
 	T1 = normalize( V - N * dot( V, N ) );
-	T2 = - cross( N, T1 ); // negated from paper; possibly due to a different assumed handedness of world coordinate system
+	T2 = - cross( N, T1 ); // negated from paper; possibly due to a different handedness of world coordinate system
 
 	// compute transform
 	mat3 mat = mInv * transposeMat3( mat3( T1, T2, N ) );
@@ -214,9 +200,28 @@ vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in m
 	vectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );
 
 	// adjust for horizon clipping
-	vec3 result = vec3( LTC_ClippedSphereFormFactor( vectorFormFactor ) );
+	float result = LTC_ClippedSphereFormFactor( vectorFormFactor );
 
-	return result;
+/*
+	// alternate method of adjusting for horizon clipping (see referece)
+	// refactoring required
+	float len = length( vectorFormFactor );
+	float z = vectorFormFactor.z / len;
+
+	const float LUT_SIZE  = 64.0;
+	const float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;
+	const float LUT_BIAS  = 0.5 / LUT_SIZE;
+
+	// tabulated horizon-clipped sphere, apparently...
+	vec2 uv = vec2( z * 0.5 + 0.5, len );
+	uv = uv * LUT_SCALE + LUT_BIAS;
+
+	float scale = texture2D( ltc_2, uv ).w;
+
+	float result = len * scale;
+*/
+
+	return vec3( result );
 
 }
 
