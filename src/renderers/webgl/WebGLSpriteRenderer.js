@@ -55,6 +55,7 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			uvScale: gl.getUniformLocation( program, 'uvScale' ),
 
 			rotation: gl.getUniformLocation( program, 'rotation' ),
+			pivot: gl.getUniformLocation( program, 'pivot' ),
 			scale: gl.getUniformLocation( program, 'scale' ),
 
 			color: gl.getUniformLocation( program, 'color' ),
@@ -171,6 +172,7 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 		// render all sprites
 
 		var scale = [];
+		var pivot = [];
 
 		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
 
@@ -188,6 +190,9 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 			scale[ 0 ] = spriteScale.x;
 			scale[ 1 ] = spriteScale.y;
+
+			pivot[ 0 ] = sprite.pivot.x;
+			pivot[ 1 ] = sprite.pivot.y;
 
 			var fogType = 0;
 
@@ -220,6 +225,7 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
 
 			gl.uniform1f( uniforms.rotation, material.rotation );
+			gl.uniform2fv( uniforms.pivot, pivot );
 			gl.uniform2fv( uniforms.scale, scale );
 
 			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
@@ -259,6 +265,7 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			'uniform mat4 modelViewMatrix;',
 			'uniform mat4 projectionMatrix;',
 			'uniform float rotation;',
+			'uniform vec2 pivot;',
 			'uniform vec2 scale;',
 			'uniform vec2 uvOffset;',
 			'uniform vec2 uvScale;',
@@ -273,7 +280,7 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 			'	vUV = uvOffset + uv * uvScale;',
 
-			'	vec2 alignedPosition = position * scale;',
+			'	vec2 alignedPosition = ( position - pivot ) * scale;',
 
 			'	vec2 rotatedPosition;',
 			'	rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;',
