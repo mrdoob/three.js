@@ -391,36 +391,29 @@ THREE.GLTFLoader = ( function () {
 
 		this.name = EXTENSIONS.KHR_DRACO_MESH_COMPRESSION;
 		this.dracoLoader = dracoLoader;
-		this.glTFNameToThreeJSName = {
-			'POSITION' : 'position',
-			'NORMAL' : 'normal',
-			'TEXCOORD_0' : 'uv',
-			'TEXCOORD0' : 'uv',
-			'TEXCOORD' : 'uv',
-			'TEXCOORD_1' : 'uv2',
-			'COLOR_0' : 'color',
-			'COLOR0' : 'color',
-			'COLOR' : 'color',
-			'WEIGHTS_0' : 'skinWeight',
-			'JOINTS_0' : 'skinIndex'
-		};
+
 	}
 
 	GLTFDracoMeshCompressionExtension.prototype.decodePrimitive = function ( primitive, parser ) {
 
 		var dracoLoader = this.dracoLoader;
 		var bufferViewIndex = primitive.extensions[ this.name ].bufferView;
-		var attributesIdMap = primitive.extensions[ this.name ].attributes;
-		var attributeMap = {};
-		for (var attributeName in attributesIdMap) {
-			attributeMap[this.glTFNameToThreeJSName[attributeName]] = attributesIdMap[attributeName];
+		var gltfAttributeMap = primitive.extensions[ this.name ].attributes;
+		var threeAttributeMap = {};
+
+		for ( var attributeName in gltfAttributeMap ) {
+
+			if ( !( attributeName in ATTRIBUTES ) ) continue;
+
+			threeAttributeMap[ ATTRIBUTES[ attributeName ] ] = gltfAttributeMap[ attributeName ];
+
 		}
 
 		return parser.getDependency( 'bufferView', bufferViewIndex ).then( function ( bufferView ) {
 
 			return new Promise( function ( resolve ) {
 
-				dracoLoader.decodeDracoFile( bufferView, resolve, attributeMap );
+				dracoLoader.decodeDracoFile( bufferView, resolve, threeAttributeMap );
 
 			} );
 
@@ -1011,6 +1004,22 @@ THREE.GLTFLoader = ( function () {
 		'MAT3': 9,
 		'MAT4': 16
 	};
+
+	var ATTRIBUTES = {
+		POSITION: 'position',
+		NORMAL: 'normal',
+		TEXCOORD_0: 'uv',
+		TEXCOORD0: 'uv', // deprecated
+		TEXCOORD: 'uv', // deprecated
+		TEXCOORD_1: 'uv2',
+		COLOR_0: 'color',
+		COLOR0: 'color', // deprecated
+		COLOR: 'color', // deprecated
+		WEIGHTS_0: 'skinWeight',
+		WEIGHT: 'skinWeight', // deprecated
+		JOINTS_0: 'skinIndex',
+		JOINT: 'skinIndex' // deprecated
+	}
 
 	var PATH_PROPERTIES = {
 		scale: 'scale',
@@ -1962,65 +1971,16 @@ THREE.GLTFLoader = ( function () {
 
 		var attributes = primitiveDef.attributes;
 
-		for ( var attributeId in attributes ) {
+		for ( var gltfAttributeName in attributes ) {
 
-			var attributeEntry = attributes[ attributeId ];
+			var threeAttributeName = ATTRIBUTES[ gltfAttributeName ];
+			var bufferAttribute = accessors[ attributes[ gltfAttributeName ] ];
 
-			var bufferAttribute = accessors[ attributeEntry ];
+			// Skip attributes already provided by e.g. Draco extension.
+			if ( !threeAttributeName ) continue;
+			if ( threeAttributeName in geometry.attributes ) continue;
 
-			// TODO(donmccurdy): Clean this up and try to break early.
-
-			switch ( attributeId ) {
-
-				case 'POSITION':
-
-					if ( 'position' in geometry.attributes ) break;
-					geometry.addAttribute( 'position', bufferAttribute );
-					break;
-
-				case 'NORMAL':
-
-					if ( 'normal' in geometry.attributes ) break;
-					geometry.addAttribute( 'normal', bufferAttribute );
-					break;
-
-				case 'TEXCOORD_0':
-				case 'TEXCOORD0':
-				case 'TEXCOORD':
-
-					if ( 'uv' in geometry.attributes ) break;
-					geometry.addAttribute( 'uv', bufferAttribute );
-					break;
-
-				case 'TEXCOORD_1':
-
-					if ( 'uv2' in geometry.attributes ) break;
-					geometry.addAttribute( 'uv2', bufferAttribute );
-					break;
-
-				case 'COLOR_0':
-				case 'COLOR0':
-				case 'COLOR':
-
-					if ( 'color' in geometry.attributes ) break;
-					geometry.addAttribute( 'color', bufferAttribute );
-					break;
-
-				case 'WEIGHTS_0':
-				case 'WEIGHT': // WEIGHT semantic deprecated.
-
-					if ( 'skinWeight' in geometry.attributes ) break;
-					geometry.addAttribute( 'skinWeight', bufferAttribute );
-					break;
-
-				case 'JOINTS_0':
-				case 'JOINT': // JOINT semantic deprecated.
-
-					if ( 'skinIndex' in geometry.attributes ) break;
-					geometry.addAttribute( 'skinIndex', bufferAttribute );
-					break;
-
-			}
+			geometry.addAttribute( threeAttributeName, bufferAttribute );
 
 		}
 
