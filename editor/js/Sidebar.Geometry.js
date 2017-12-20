@@ -138,6 +138,10 @@ Sidebar.Geometry = function ( editor ) {
 	var parameters = new UI.Span();
 	container.add( parameters );
 
+	// Keep track of the geometry type that we last used to
+	// populate parameters so that we avoid re-creating them
+	// when unnecessary.
+	var lastGeometryType = null;
 
 	//
 
@@ -158,16 +162,21 @@ Sidebar.Geometry = function ( editor ) {
 
 			//
 
-			parameters.clear();
+			var newGeometryType = geometry.type;
+			if (newGeometryType !== lastGeometryType) {
+				lastGeometryType = newGeometryType;
 
-			if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
+				parameters.clear();
 
-				parameters.add( new Sidebar.Geometry.Modifiers( editor, object ) );
+				if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
 
-			} else if ( Sidebar.Geometry[ geometry.type ] !== undefined ) {
+					parameters.add( new Sidebar.Geometry.Modifiers( editor, object ) );
 
-				parameters.add( new Sidebar.Geometry[ geometry.type ]( editor, object ) );
+				} else if ( Sidebar.Geometry[ geometry.type ] !== undefined ) {
 
+					parameters.add( new Sidebar.Geometry[ geometry.type ]( editor, object ) );
+
+				}
 			}
 
 		} else {

@@ -534,6 +534,25 @@ UI.Color.prototype.setHexValue = function ( hex ) {
 
 // Number
 
+UI.nudgeNumericValue = function ( originalValue, keyCode, shiftKeyDown ) {
+	var parsedValue = -1;
+	try {
+		parsedValue = parseFloat( originalValue );
+	} catch ( e ) {
+		return originalValue;
+	}
+
+	var direction = 0;
+	if (keyCode === 38) {
+		direction = 1;
+	} else if (keyCode === 40) {
+		direction = -1;
+	}
+
+	var nudgeAmount = shiftKeyDown ? 10 : 1;
+	return parsedValue + direction * nudgeAmount;
+}
+
 UI.Number = function ( number ) {
 
 	UI.Element.call( this );
@@ -543,14 +562,6 @@ UI.Number = function ( number ) {
 	var dom = document.createElement( 'input' );
 	dom.className = 'Number';
 	dom.value = '0.00';
-
-	dom.addEventListener( 'keydown', function ( event ) {
-
-		event.stopPropagation();
-
-		if ( event.keyCode === 13 ) dom.blur();
-
-	}, false );
 
 	this.value = 0;
 
@@ -573,6 +584,23 @@ UI.Number = function ( number ) {
 
 	var pointer = [ 0, 0 ];
 	var prevPointer = [ 0, 0 ];
+
+	dom.addEventListener( 'keydown', function ( event ) {
+
+		event.stopPropagation();
+
+		if ( event.keyCode === 13 ) {
+			dom.blur();
+		}
+
+		if ( event.keyCode === 38 || event.keyCode === 40 ) {
+			var nudgedValue = UI.nudgeNumericValue( scope.getValue(), event.keyCode, event.shiftKey )
+			scope.setValue( nudgedValue );
+			event.preventDefault();
+			dom.dispatchEvent( changeEvent );
+		};
+
+	}, false );
 
 	function onMouseDown( event ) {
 
@@ -730,12 +758,6 @@ UI.Integer = function ( number ) {
 	dom.className = 'Number';
 	dom.value = '0';
 
-	dom.addEventListener( 'keydown', function ( event ) {
-
-		event.stopPropagation();
-
-	}, false );
-
 	this.value = 0;
 
 	this.min = - Infinity;
@@ -755,6 +777,19 @@ UI.Integer = function ( number ) {
 
 	var pointer = [ 0, 0 ];
 	var prevPointer = [ 0, 0 ];
+
+	dom.addEventListener( 'keydown', function ( event ) {
+
+		event.stopPropagation();
+
+		if ( event.keyCode === 38 || event.keyCode === 40 ) {
+			var nudgedValue = UI.nudgeNumericValue( scope.getValue(), event.keyCode, event.shiftKey )
+			scope.setValue( nudgedValue );
+			event.preventDefault();
+			dom.dispatchEvent( changeEvent );
+		};
+
+	}, false );
 
 	function onMouseDown( event ) {
 
