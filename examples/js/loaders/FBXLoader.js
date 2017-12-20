@@ -3650,13 +3650,13 @@
 
 		getString: function ( size ) {
 
-			var a = new Uint8Array( size );
+			var a = new Uint8Array( this.getUint8Array( size ) );
 
-			for ( var i = 0; i < size; i ++ ) {
+			// for ( var i = 0; i < size; i ++ ) {
 
-				a[ i ] = this.getUint8();
+			// 	a[ i ] = this.getUint8();
 
-			}
+			// }
 
 			return THREE.LoaderUtils.decodeText( a );
 
