@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>three.js webgl - postprocessing - digital glitch</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                background-color: #000000;
+                margin: 0px;
+                overflow: hidden;
+                font-family:Monospace;
+                font-size:13px;
+                /*text-align:center;*/
+                font-weight: lighter;
+            }
+
+            a {
+                color: gray;
+                font-weight: bold;
+            }
+
+            #info {
+                color: gray;
+                position: absolute;
+                bottom: 0px;
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .dg.ac {
+                z-index: 1 !important;
+            }
+        </style>
+    </head>
+    <body>
+
+        <script src="../build/three.js"></script>
+
+        <script src="js/shaders/CopyShader.js"></script>
+        <script src="js/shaders/PixelShader.js"></script>
+        <script src="js/postprocessing/EffectComposer.js"></script>
+        <script src="js/postprocessing/RenderPass.js"></script>
+        <script src="js/postprocessing/ShaderPass.js"></script>
+        <script src="js/controls/TrackballControls.js"></script>
+        <script src='js/libs/dat.gui.min.js'></script>
+
+        <div id="container"></div>
+
+        <div id="info">
+            <a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - pixel shader example<br/>
+            shader by <a href="http://wongbryan.github.io">wongbryan</a>
+        </div>
+
+        <script>
+
+            var camera, scene, renderer, gui, composer;
+            var pixelPass, params;
+
+            var geomData = [], matData = [], group;
+
+            function updateGUI(){
+
+                pixelPass.uniforms.pixels.value = params.pixels;
+                pixelPass.uniforms.step.value = params.step;
+            }
+
+            function resize(){
+
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize( window.innerWidth, window.innerHeight );
+            
+            }
+
+            function init() {
+
+                var container = document.getElementById( 'container' );
+                renderer = new THREE.WebGLRenderer({antialias: true});
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCSoftShadowMap;
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( window.innerWidth, window.innerHeight);
+                renderer.setClearColor(0xbfe7ff);
+                container.appendChild( renderer.domElement );
+                
+                camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+                camera.position.set(0, 0, 30);
+                controls = new THREE.TrackballControls(camera, renderer.domElement);
+                controls.rotateSpeed = 2.0;
+                controls.panSpeed = 0.8;
+                controls.zoomSpeed = 1.5;
+
+                scene = new THREE.Scene();
+
+                var hemisphereLight = new THREE.HemisphereLight(0xfceafc, 0x000000, .8)
+
+                var shadowLight = new THREE.DirectionalLight(0xffffff, .5);
+
+                shadowLight.position.set(150, 75, 150);
+
+                shadowLight.castShadow = true;
+                shadowLight.shadow.camera.left = -75;
+                shadowLight.shadow.camera.right = 75;
+                shadowLight.shadow.camera.top = 75;
+                shadowLight.shadow.camera.bottom = -75;
+                shadowLight.shadow.camera.near = 1;
+                shadowLight.shadow.camera.far = 1000;
+
+                shadowLight.shadow.mapSize.width = 1024;
+                shadowLight.shadow.mapSize.height = 1024;
+
+                var shadowLight2 = shadowLight.clone();
+                shadowLight2.castShadow = false;
+                shadowLight2.intensity = .2;
+                shadowLight2.position.set(-150, 75, -150);
+
+                var shadowLight3 = shadowLight.clone();
+                shadowLight3.castShadow = false;
+                shadowLight3.intensity = .1;
+                shadowLight3.position.set(0, 125, 0);
+
+                scene.add(hemisphereLight);
+                scene.add(shadowLight);
+                scene.add(shadowLight2);
+                scene.add(shadowLight3);
+
+                geomData.push(new THREE.SphereGeometry(1, 64, 64));
+                geomData.push(new THREE.BoxGeometry(1, 1, 1,));
+                geomData.push(new THREE.ConeGeometry(1, 1, 32));
+                geomData.push(new THREE.TetrahedronGeometry(1));
+                geomData.push(new THREE.TorusKnotGeometry(1, .4));
+
+                matData.push(new THREE.MeshStandardMaterial({
+                    color: 0xd9486b,
+                    emissive: 0x790f15,
+                    roughness: .14,
+                    flatShading: false,
+                    metalness: .3
+                }));
+
+                matData.push(new THREE.MeshStandardMaterial({
+                    color: 0xb3f28b,
+                    emissive: 0x68841f,
+                    metalness: .5,
+                    flatShading: false,
+                    roughness: .06
+                }));
+
+                matData.push(new THREE.MeshStandardMaterial({
+                    color: 0xfcfa37,
+                    emissive: 0xbd4215,
+                    metalness: .5,
+                    flatShading: false,
+                    roughness: .06
+                }));
+
+                matData.push(new THREE.MeshStandardMaterial({
+                    color: 0x5c70fb,
+                    emissive: 0x1235ae,
+                    roughness: 0,
+                    flatShading: false,
+                    metalness: 0
+                }));
+
+                matData.push(new THREE.MeshStandardMaterial({
+                    color: 0xbe9a47,
+                    emissive: 0x676925,
+                    roughness: .16,
+                    flatShading: false,
+                    metalness: 0
+                }));
+
+                matData.push(new THREE.MeshStandardMaterial({
+                    color: 0xb3f28b,
+                    emissive: 0x68841f,
+                    metalness: .5,
+                    flatShading: false,
+                    roughness: .06
+                }));
+
+                var numShapes = 25;
+                group = new THREE.Group();
+
+                for(var i=0; i<numShapes; i++){
+
+                    var geom = geomData[Math.floor(Math.random()*geomData.length)];
+                    var mat = matData[Math.floor(Math.random()*matData.length)]
+                    var mesh = new THREE.Mesh( geom, mat );
+                    var s = 4+Math.random()*10;
+                    mesh.scale.set(s, s, s);
+
+                    mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
+                    mesh.position.multiplyScalar( Math.random() * 200 );
+                    mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+                    group.add( mesh );
+
+                }
+
+                scene.add(group);
+
+                composer = new THREE.EffectComposer(renderer);
+                composer.addPass(new THREE.RenderPass(scene, camera));
+
+                pixelPass = new THREE.ShaderPass(THREE.PixelShader);
+                pixelPass.renderToScreen = true;
+                composer.addPass(pixelPass);
+
+                window.addEventListener('resize', resize);
+
+                params = {
+                    pixels: 256,
+                    step: 2.5,
+                    postprocessing: true
+                }
+                var gui = new dat.GUI();
+                gui.add(params, 'pixels').min(12.0).max(512).step(5.0);
+                gui.add(params, 'step').min(1.0).max(5.0).step(.25);
+                gui.add(params, 'postprocessing')
+
+            }
+
+            function update(){
+                controls.update();
+                updateGUI();
+                group.rotation.y+=.0015;
+                group.rotation.z+=.001;
+            }
+
+            function animate(){
+                update();
+                if(params.postprocessing)
+                    composer.render();
+                else
+                    renderer.render(scene, camera);
+                window.requestAnimationFrame(animate);
+            }
+
+            init();
+            animate();
+
+        </script>
+    </body>
+</html>
