@@ -376,10 +376,7 @@ THREE.GLTFLoader = ( function () {
 	 *
 	 * Specification: https://github.com/KhronosGroup/glTF/pull/874
 	 *
-	 * TODO:
-	 * - Support additional uncompressed attributes alongside those provided by Draco.
-	 * - Support fallback to uncompressed data if decoder is not unavailable.
-	 * - `primitive.attributes` should be passed to DRACOLoader, but isn't yet supported.
+	 * TODO: Support fallback to uncompressed data if decoder is unavailable.
 	 */
 	function GLTFDracoMeshCompressionExtension ( dracoLoader ) {
 
