@@ -59,56 +59,57 @@
 
             var geomData = [], group;
 
-            function updateGUI(){
+            function updateGUI() {
 
                 pixelPass.uniforms.pixels.value = params.pixels;
                 pixelPass.uniforms.step.value = params.step;
+
             }
 
-            function resize(){
+            function resize() {
 
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize( window.innerWidth, window.innerHeight );
-            
+
             }
 
             function init() {
 
                 var container = document.getElementById( 'container' );
-                renderer = new THREE.WebGLRenderer({antialias: true});
+                renderer = new THREE.WebGLRenderer( { antialias: true } );
                 renderer.setPixelRatio( window.devicePixelRatio );
-                renderer.setSize( window.innerWidth, window.innerHeight);
-                renderer.setClearColor(0xbfe7ff);
+                renderer.setSize( window.innerWidth, window.innerHeight );
+                renderer.setClearColor( 0xbfe7ff );
                 container.appendChild( renderer.domElement );
-                
+
                 camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-                camera.position.set(0, 0, 30);
-                controls = new THREE.TrackballControls(camera, renderer.domElement);
+                camera.position.set( 0, 0, 30 );
+                controls = new THREE.TrackballControls( camera, renderer.domElement );
                 controls.rotateSpeed = 2.0;
                 controls.panSpeed = 0.8;
                 controls.zoomSpeed = 1.5;
 
                 scene = new THREE.Scene();
 
-                var hemisphereLight = new THREE.HemisphereLight(0xfceafc, 0x000000, .8)
+                var hemisphereLight = new THREE.HemisphereLight( 0xfceafc, 0x000000, .8 );
 
-                var shadowLight = new THREE.DirectionalLight(0xffffff, .5);
+                var shadowLight = new THREE.DirectionalLight( 0xffffff, .5 );
 
-                shadowLight.position.set(150, 75, 150);
+                shadowLight.position.set( 150, 75, 150 );
 
                 var shadowLight2 = shadowLight.clone();
                 shadowLight2.intensity = .2;
-                shadowLight2.position.set(-150, 75, -150);
+                shadowLight2.position.set( - 150, 75, - 150 );
 
                 var shadowLight3 = shadowLight.clone();
                 shadowLight3.intensity = .1;
-                shadowLight3.position.set(0, 125, 0);
+                shadowLight3.position.set( 0, 125, 0 );
 
-                scene.add(hemisphereLight);
-                scene.add(shadowLight);
-                scene.add(shadowLight2);
-                scene.add(shadowLight3);
+                scene.add( hemisphereLight );
+                scene.add( shadowLight );
+                scene.add( shadowLight2 );
+                scene.add( shadowLight3 );
 
                 geomData.push( new THREE.SphereGeometry( 1, 64, 64 ) );
                 geomData.push( new THREE.BoxGeometry( 1, 1, 1 ) );
@@ -119,13 +120,13 @@
                 var numShapes = 25;
                 group = new THREE.Group();
 
-                for(var i=0; i<numShapes; i++){
+                for ( var i = 0; i < numShapes; i ++ ) {
 
-                    var geom = geomData[Math.floor(Math.random()*geomData.length)];
-                    var mat = new THREE.MeshPhongMaterial( { color: 0xffffff * (.5 + .5*Math.random()) } );
+                    var geom = geomData[ Math.floor( Math.random() * geomData.length ) ];
+                    var mat = new THREE.MeshPhongMaterial( { color: 0xffffff * ( .5 + .5 * Math.random() ) } );
                     var mesh = new THREE.Mesh( geom, mat );
-                    var s = 4+Math.random()*10;
-                    mesh.scale.set(s, s, s);
+                    var s = 4 + Math.random() * 10;
+                    mesh.scale.set( s, s, s );
 
                     mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
                     mesh.position.multiplyScalar( Math.random() * 200 );
@@ -134,47 +135,52 @@
 
                 }
 
-                scene.add(group);
+                scene.add( group );
 
-                composer = new THREE.EffectComposer(renderer);
-                composer.addPass(new THREE.RenderPass(scene, camera));
+                composer = new THREE.EffectComposer( renderer );
+                composer.addPass( new THREE.RenderPass( scene, camera ) );
 
-                pixelPass = new THREE.ShaderPass(THREE.PixelShader);
+                pixelPass = new THREE.ShaderPass( THREE.PixelShader );
                 pixelPass.renderToScreen = true;
-                composer.addPass(pixelPass);
+                composer.addPass( pixelPass );
 
-                window.addEventListener('resize', resize);
+                window.addEventListener( 'resize', resize );
 
                 params = {
                     pixels: 256,
                     step: 2.5,
                     postprocessing: true
-                }
+                };
                 var gui = new dat.GUI();
-                gui.add(params, 'pixels').min(12.0).max(512).step(5.0);
-                gui.add(params, 'step').min(1.0).max(5.0).step(.25);
-                gui.add(params, 'postprocessing')
+                gui.add( params, 'pixels' ).min( 12.0 ).max( 512 ).step( 5.0 );
+                gui.add( params, 'step' ).min( 1.0 ).max( 5.0 ).step( .25 );
+                gui.add( params, 'postprocessing' );
 
             }
 
-            function update(){
+            function update() {
+
                 controls.update();
                 updateGUI();
-                group.rotation.y+=.0015;
-                group.rotation.z+=.001;
+                group.rotation.y += .0015;
+                group.rotation.z += .001;
+
             }
 
-            function animate(){
+            function animate() {
+
                 update();
-                if(params.postprocessing)
+                if ( params.postprocessing )
                     composer.render();
                 else
-                    renderer.render(scene, camera);
-                window.requestAnimationFrame(animate);
+                    renderer.render( scene, camera );
+                window.requestAnimationFrame( animate );
+
             }
 
             init();
             animate();
+
 
         </script>
     </body>
