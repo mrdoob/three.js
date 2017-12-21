@@ -24,7 +24,8 @@ var LoaderUtils = {
 
 		}
 
-		return s;
+		// Merges multi-byte utf-8 characters.
+		return decodeURIComponent( escape( s ) );
 
 	},
 
