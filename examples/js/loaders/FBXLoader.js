@@ -184,13 +184,13 @@
 
 				// check whether the file name is used by another videoNode
 				// and if so keep a record of both ids as a duplicate pair [ id1, id2 ]
-				if ( videoNode.properties.fileName in names ) {
+				if ( videoNode.properties.Filename in names ) {
 
-					duplicates.push( [ id, names[ videoNode.properties.fileName ] ] );
+					duplicates.push( [ id, names[ videoNode.properties.Filename ] ] );
 
 				}
 
-				names[ videoNode.properties.fileName ] = id;
+				names[ videoNode.properties.Filename ] = id;
 
 				// raw image data is in videoNode.properties.Content
 				if ( 'Content' in videoNode.properties && videoNode.properties.Content !== '' ) {
