@@ -3651,12 +3651,8 @@
 		getString: function ( size ) {
 
 			var a = new Uint8Array( this.getUint8Array( size ) );
-
-			// for ( var i = 0; i < size; i ++ ) {
-
-			// 	a[ i ] = this.getUint8();
-
-			// }
+			var nullByte = a.indexOf( 0 );
+			if ( nullByte >= 0 ) a = a.slice( 0, nullByte );
 
 			return THREE.LoaderUtils.decodeText( a );
 
