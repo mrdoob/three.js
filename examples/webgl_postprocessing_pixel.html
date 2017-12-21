@@ -59,6 +59,9 @@
 
             var geomData = [], group;
 
+            init();
+            animate();
+
             function updateGUI() {
 
                 pixelPass.uniforms.pixels.value = params.pixels;
@@ -123,7 +126,9 @@
                 for ( var i = 0; i < numShapes; i ++ ) {
 
                     var geom = geomData[ Math.floor( Math.random() * geomData.length ) ];
-                    var mat = new THREE.MeshPhongMaterial( { color: 0xffffff * ( .5 + .5 * Math.random() ) } );
+                    var color = new THREE.Color();
+                    color.setHSL( Math.random(), .7 + .2 * Math.random(), .5 + .1 * Math.random() );
+                    var mat = new THREE.MeshPhongMaterial( { color: color } );
                     var mesh = new THREE.Mesh( geom, mat );
                     var s = 4 + Math.random() * 10;
                     mesh.scale.set( s, s, s );
@@ -151,7 +156,7 @@
                     step: 2.5,
                     postprocessing: true
                 };
-                var gui = new dat.GUI();
+                gui = new dat.GUI();
                 gui.add( params, 'pixels' ).min( 12.0 ).max( 512 ).step( 5.0 );
                 gui.add( params, 'step' ).min( 1.0 ).max( 5.0 ).step( .25 );
                 gui.add( params, 'postprocessing' );
@@ -170,16 +175,20 @@
             function animate() {
 
                 update();
-                if ( params.postprocessing )
+
+                if ( params.postprocessing ) {
+
                     composer.render();
-                else
+
+                } else {
+
                     renderer.render( scene, camera );
+
+                }
+
                 window.requestAnimationFrame( animate );
 
             }
-
-            init();
-            animate();
 
         </script>
     </body>
