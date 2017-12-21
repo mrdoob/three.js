@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>three.js webgl - postprocessing - digital glitch</title>
+        <title>three.js webgl - postprocessing - pixel shader</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <style>
@@ -57,7 +57,7 @@
             var camera, scene, renderer, gui, composer;
             var pixelPass, params;
 
-            var geomData = [], matData = [], group;
+            var geomData = [], group;
 
             function updateGUI(){
 
@@ -131,61 +131,13 @@
                 geomData.push(new THREE.TetrahedronGeometry(1));
                 geomData.push(new THREE.TorusKnotGeometry(1, .4));
 
-                matData.push(new THREE.MeshStandardMaterial({
-                    color: 0xd9486b,
-                    emissive: 0x790f15,
-                    roughness: .14,
-                    flatShading: false,
-                    metalness: .3
-                }));
-
-                matData.push(new THREE.MeshStandardMaterial({
-                    color: 0xb3f28b,
-                    emissive: 0x68841f,
-                    metalness: .5,
-                    flatShading: false,
-                    roughness: .06
-                }));
-
-                matData.push(new THREE.MeshStandardMaterial({
-                    color: 0xfcfa37,
-                    emissive: 0xbd4215,
-                    metalness: .5,
-                    flatShading: false,
-                    roughness: .06
-                }));
-
-                matData.push(new THREE.MeshStandardMaterial({
-                    color: 0x5c70fb,
-                    emissive: 0x1235ae,
-                    roughness: 0,
-                    flatShading: false,
-                    metalness: 0
-                }));
-
-                matData.push(new THREE.MeshStandardMaterial({
-                    color: 0xbe9a47,
-                    emissive: 0x676925,
-                    roughness: .16,
-                    flatShading: false,
-                    metalness: 0
-                }));
-
-                matData.push(new THREE.MeshStandardMaterial({
-                    color: 0xb3f28b,
-                    emissive: 0x68841f,
-                    metalness: .5,
-                    flatShading: false,
-                    roughness: .06
-                }));
-
                 var numShapes = 25;
                 group = new THREE.Group();
 
                 for(var i=0; i<numShapes; i++){
 
                     var geom = geomData[Math.floor(Math.random()*geomData.length)];
-                    var mat = matData[Math.floor(Math.random()*matData.length)]
+                    var mat = new THREE.MeshPhongMaterial( { color: 0xffffff * (.5 + .5*Math.random()) } );
                     var mesh = new THREE.Mesh( geom, mat );
                     var s = 4+Math.random()*10;
                     mesh.scale.set(s, s, s);
