@@ -209,48 +209,40 @@ Object.assign( Box3.prototype, {
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
+		var scope, i, l;
+
 		var v1 = new Vector3();
 
-		return function expandByObject( object ) {
+		function traverse( node ) {
 
-			var scope = this;
+			var geometry = node.geometry;
 
-			object.updateMatrixWorld( true );
+			if ( geometry !== undefined ) {
 
-			object.traverse( function ( node ) {
+				if ( geometry.isGeometry ) {
 
-				var i, l;
+					var vertices = geometry.vertices;
 
-				var geometry = node.geometry;
+					for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
-				if ( geometry !== undefined ) {
+						v1.copy( vertices[ i ] );
+						v1.applyMatrix4( node.matrixWorld );
 
-					if ( geometry.isGeometry ) {
+						scope.expandByPoint( v1 );
 
-						var vertices = geometry.vertices;
+					}
 
-						for ( i = 0, l = vertices.length; i < l; i ++ ) {
+				} else if ( geometry.isBufferGeometry ) {
 
-							v1.copy( vertices[ i ] );
-							v1.applyMatrix4( node.matrixWorld );
+					var attribute = geometry.attributes.position;
+
+					if ( attribute !== undefined ) {
+
+						for ( i = 0, l = attribute.count; i < l; i ++ ) {
+
+							v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
 
 							scope.expandByPoint( v1 );
-
-						}
-
-					} else if ( geometry.isBufferGeometry ) {
-
-						var attribute = geometry.attributes.position;
-
-						if ( attribute !== undefined ) {
-
-							for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-								v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-
-								scope.expandByPoint( v1 );
-
-							}
 
 						}
 
@@ -258,7 +250,17 @@ Object.assign( Box3.prototype, {
 
 				}
 
-			} );
+			}
+
+		}
+
+		return function expandByObject( object ) {
+
+			scope = this;
+
+			object.updateMatrixWorld( true );
+
+			object.traverse( traverse );
 
 			return this;
 

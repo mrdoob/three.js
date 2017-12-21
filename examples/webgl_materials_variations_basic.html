@@ -7,9 +7,9 @@
 		<style>
 			body {
 				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
 
 				background-color: #000;
 				margin: 0px;
@@ -93,7 +93,7 @@
 
 						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
-							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 );
+							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 );
 
 							var material = new THREE.MeshBasicMaterial( {
 								map: imgTexture,

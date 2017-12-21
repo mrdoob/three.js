@@ -64,17 +64,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 Texture.DEFAULT_IMAGE = undefined;
 Texture.DEFAULT_MAPPING = UVMapping;
 
-Object.defineProperty( Texture.prototype, "needsUpdate", {
-
-	set: function ( value ) {
-
-		if ( value === true ) this.version ++;
-
-	}
-
-} );
-
-Object.assign( Texture.prototype, EventDispatcher.prototype, {
+Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	constructor: Texture,
 
@@ -126,7 +116,9 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 	toJSON: function ( meta ) {
 
-		if ( meta.textures[ this.uuid ] !== undefined ) {
+		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+
+		if ( ! isRootObject && meta.textures[ this.uuid ] !== undefined ) {
 
 			return meta.textures[ this.uuid ];
 
@@ -210,7 +202,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 			}
 
-			if ( meta.images[ image.uuid ] === undefined ) {
+			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
 				meta.images[ image.uuid ] = {
 					uuid: image.uuid,
@@ -223,7 +215,11 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		}
 
-		meta.textures[ this.uuid ] = output;
+		if ( ! isRootObject ) {
+
+			meta.textures[ this.uuid ] = output;
+
+		}
 
 		return output;
 
@@ -308,6 +304,16 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 			uv.y = 1 - uv.y;
 
 		}
+
+	}
+
+} );
+
+Object.defineProperty( Texture.prototype, "needsUpdate", {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
 
 	}
 

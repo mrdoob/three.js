@@ -24,7 +24,6 @@ import { WebGLProperties } from './webgl/WebGLProperties.js';
 import { WebGLState } from './webgl/WebGLState.js';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
 import { WebVRManager } from './webvr/WebVRManager.js';
-import { BufferGeometry } from '../core/BufferGeometry.js';
 import { WebGLExtensions } from './webgl/WebGLExtensions.js';
 import { Vector3 } from '../math/Vector3.js';
 import { WebGLClipping } from './webgl/WebGLClipping.js';
@@ -54,7 +53,8 @@ function WebGLRenderer( parameters ) {
 		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
-		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false;
+		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
+		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default';
 
 	var lightsArray = [];
 	var shadowsArray = [];
@@ -200,8 +200,14 @@ function WebGLRenderer( parameters ) {
 			stencil: _stencil,
 			antialias: _antialias,
 			premultipliedAlpha: _premultipliedAlpha,
-			preserveDrawingBuffer: _preserveDrawingBuffer
+			preserveDrawingBuffer: _preserveDrawingBuffer,
+			powerPreference: _powerPreference
 		};
+
+		// event listeners must be registered before WebGL context is created, see #12753
+
+		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
+		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
 		_gl = _context || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
 
@@ -209,11 +215,11 @@ function WebGLRenderer( parameters ) {
 
 			if ( _canvas.getContext( 'webgl' ) !== null ) {
 
-				throw 'Error creating WebGL context with your selected attributes.';
+				throw new Error( 'Error creating WebGL context with your selected attributes.' );
 
 			} else {
 
-				throw 'Error creating WebGL context.';
+				throw new Error( 'Error creating WebGL context.' );
 
 			}
 
@@ -231,12 +237,9 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
-		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
-
 	} catch ( error ) {
 
-		console.error( 'THREE.WebGLRenderer: ' + error );
+		console.error( 'THREE.WebGLRenderer: ' + error.message );
 
 	}
 
@@ -258,13 +261,8 @@ function WebGLRenderer( parameters ) {
 		extensions.get( 'OES_texture_half_float' );
 		extensions.get( 'OES_texture_half_float_linear' );
 		extensions.get( 'OES_standard_derivatives' );
+		extensions.get( 'OES_element_index_uint' );
 		extensions.get( 'ANGLE_instanced_arrays' );
-
-		if ( extensions.get( 'OES_element_index_uint' ) ) {
-
-			BufferGeometry.MaxIndex = 4294967296;
-
-		}
 
 		utils = new WebGLUtils( _gl, extensions );
 
@@ -443,10 +441,29 @@ function WebGLRenderer( parameters ) {
 
 	// Clearing
 
-	this.getClearColor = background.getClearColor;
-	this.setClearColor = background.setClearColor;
-	this.getClearAlpha = background.getClearAlpha;
-	this.setClearAlpha = background.setClearAlpha;
+	this.getClearColor = function () {
+
+		return background.getClearColor();
+
+	};
+
+	this.setClearColor = function () {
+
+		background.setClearColor.apply( background, arguments );
+
+	};
+
+	this.getClearAlpha = function () {
+
+		return background.getClearAlpha();
+
+	};
+
+	this.setClearAlpha = function () {
+
+		background.setClearAlpha.apply( background, arguments );
+
+	};
 
 	this.clear = function ( color, depth, stencil ) {
 
@@ -663,7 +680,9 @@ function WebGLRenderer( parameters ) {
 
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
-		state.setMaterial( material );
+		var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+
+		state.setMaterial( material, frontFaceCW );
 
 		var program = setProgram( camera, fog, material, object );
 		var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
@@ -1011,7 +1030,19 @@ function WebGLRenderer( parameters ) {
 	function start() {
 
 		if ( isAnimating ) return;
-		( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+		var device = vr.getDevice();
+
+		if ( device && device.isPresenting ) {
+
+			device.requestAnimationFrame( loop );
+
+		} else {
+
+			window.requestAnimationFrame( loop );
+
+		}
+
 		isAnimating = true;
 
 	}
@@ -1019,7 +1050,18 @@ function WebGLRenderer( parameters ) {
 	function loop( time ) {
 
 		if ( onAnimationFrame !== null ) onAnimationFrame( time );
-		( vr.getDevice() || window ).requestAnimationFrame( loop );
+
+		var device = vr.getDevice();
+
+		if ( device && device.isPresenting ) {
+
+			device.requestAnimationFrame( loop );
+
+		} else {
+
+			window.requestAnimationFrame( loop );
+
+		}
 
 	}
 
@@ -1085,6 +1127,10 @@ function WebGLRenderer( parameters ) {
 			currentRenderList.sort();
 
 		}
+
+		//
+
+		textures.updateVideoTextures();
 
 		//
 
@@ -1385,7 +1431,9 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isImmediateRenderObject ) {
 
-			state.setMaterial( material );
+			var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+
+			state.setMaterial( material, frontFaceCW );
 
 			var program = setProgram( camera, scene.fog, material, object );
 
@@ -1848,11 +1896,10 @@ function WebGLRenderer( parameters ) {
 			// RectAreaLight Texture
 			// TODO (mrdoob): Find a nicer implementation
 
-			if ( m_uniforms.ltcMat !== undefined ) m_uniforms.ltcMat.value = UniformsLib.LTC_MAT_TEXTURE;
-			if ( m_uniforms.ltcMag !== undefined ) m_uniforms.ltcMag.value = UniformsLib.LTC_MAG_TEXTURE;
+			if ( m_uniforms.ltc_1 !== undefined ) m_uniforms.ltc_1.value = UniformsLib.LTC_1;
+			if ( m_uniforms.ltc_2 !== undefined ) m_uniforms.ltc_2.value = UniformsLib.LTC_2;
 
-			WebGLUniforms.upload(
-				_gl, materialProperties.uniformsList, m_uniforms, _this );
+			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, _this );
 
 		}
 

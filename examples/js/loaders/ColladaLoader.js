@@ -19,7 +19,7 @@ THREE.ColladaLoader.prototype = {
 
 		var scope = this;
 
-		var path = THREE.Loader.prototype.extractUrlBase( url );
+		var path = scope.path === undefined ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
@@ -27,6 +27,12 @@ THREE.ColladaLoader.prototype = {
 			onLoad( scope.parse( text, path ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	},
 
@@ -125,6 +131,12 @@ THREE.ColladaLoader.prototype = {
 		function parseId( text ) {
 
 			return text.substring( 1 );
+
+		}
+
+		function generateId() {
+
+			return 'three_default_' + ( count ++ );
 
 		}
 
@@ -1612,7 +1624,17 @@ THREE.ColladaLoader.prototype = {
 
 		function getCamera( id ) {
 
-			return getBuild( library.cameras[ id ], buildCamera );
+			var data = library.cameras[ id ];
+
+			if ( data !== undefined ) {
+
+				return getBuild( data, buildCamera );
+
+			}
+
+			console.warn( 'THREE.ColladaLoader: Couldn\'t find camera with ID:', id );
+
+			return null;
 
 		}
 
@@ -1737,7 +1759,17 @@ THREE.ColladaLoader.prototype = {
 
 		function getLight( id ) {
 
-			return getBuild( library.lights[ id ], buildLight );
+			var data = library.lights[ id ];
+
+			if ( data !== undefined ) {
+
+				return getBuild( data, buildLight );
+
+			}
+
+			console.warn( 'THREE.ColladaLoader: Couldn\'t find light with ID:', id );
+
+			return null;
 
 		}
 
@@ -1753,6 +1785,9 @@ THREE.ColladaLoader.prototype = {
 			};
 
 			var mesh = getElementsByTagName( xml, 'mesh' )[ 0 ];
+
+			// the following tags inside geometry are not supported yet (see https://github.com/mrdoob/three.js/pull/12606): convex_mesh, spline, brep
+			if ( mesh === undefined ) return;
 
 			for ( var i = 0; i < mesh.childNodes.length; i ++ ) {
 
@@ -2719,13 +2754,33 @@ THREE.ColladaLoader.prototype = {
 
 		// nodes
 
+		function prepareNodes( xml ) {
+
+			var elements = xml.getElementsByTagName( 'node' );
+
+			// ensure all node elements have id attributes
+
+			for ( var i = 0; i < elements.length; i ++ ) {
+
+				var element = elements[ i ];
+
+				if ( element.hasAttribute( 'id' ) === false ) {
+
+					element.setAttribute( 'id', generateId() );
+
+				}
+
+			}
+
+		}
+
 		var matrix = new THREE.Matrix4();
 		var vector = new THREE.Vector3();
 
 		function parseNode( xml ) {
 
 			var data = {
-				name: xml.getAttribute( 'name' ),
+				name: xml.getAttribute( 'name' ) || '',
 				type: xml.getAttribute( 'type' ),
 				id: xml.getAttribute( 'id' ),
 				sid: xml.getAttribute( 'sid' ),
@@ -2748,14 +2803,8 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'node':
-
-						if ( child.hasAttribute( 'id' ) ) {
-
-							data.nodes.push( child.getAttribute( 'id' ) );
-							parseNode( child );
-
-						}
-
+						data.nodes.push( child.getAttribute( 'id' ) );
+						parseNode( child );
 						break;
 
 					case 'instance_camera':
@@ -2814,11 +2863,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			if ( xml.hasAttribute( 'id' ) ) {
-
-				library.nodes[ xml.getAttribute( 'id' ) ] = data;
-
-			}
+			library.nodes[ data.id ] = data;
 
 			return data;
 
@@ -3012,7 +3057,13 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0, l = instanceCameras.length; i < l; i ++ ) {
 
-				objects.push( getCamera( instanceCameras[ i ] ).clone() );
+				var instanceCamera = getCamera( instanceCameras[ i ] );
+
+				if ( instanceCamera !== null ) {
+
+					objects.push( instanceCamera.clone() );
+
+				}
 
 			}
 
@@ -3051,7 +3102,13 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0, l = instanceLights.length; i < l; i ++ ) {
 
-				objects.push( getLight( instanceLights[ i ] ).clone() );
+				var instanceLight = getLight( instanceLights[ i ] );
+
+				if ( instanceLight !== null ) {
+
+					objects.push( instanceLight.clone() );
+
+				}
 
 			}
 
@@ -3220,6 +3277,8 @@ THREE.ColladaLoader.prototype = {
 				children: []
 			};
 
+			prepareNodes( xml );
+
 			var elements = getElementsByTagName( xml, 'node' );
 
 			for ( var i = 0; i < elements.length; i ++ ) {
@@ -3345,6 +3404,7 @@ THREE.ColladaLoader.prototype = {
 
 		var animations = [];
 		var kinematics = {};
+		var count = 0;
 
 		//
 

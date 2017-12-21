@@ -54,7 +54,6 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 						side: BackSide,
 						depthTest: true,
 						depthWrite: false,
-						polygonOffset: true,
 						fog: false
 					} )
 				);
@@ -64,12 +63,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
-					var scale = camera.far;
-
-					this.matrixWorld.makeScale( scale, scale, scale );
 					this.matrixWorld.copyPosition( camera.matrixWorld );
-
-					this.material.polygonOffsetUnits = scale * 10;
 
 				};
 

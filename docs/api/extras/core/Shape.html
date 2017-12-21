@@ -47,11 +47,25 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]()</h3>
+		<h3>[name]( [page:Array points] )</h3>
+		<div>
+		points -- (optional) array of [page:Vector2 Vector2s].<br /><br />
+
+		Creates a Shape from the points. The first point defines the offset, then successive points
+		are added to the [page:CurvePath.curves curves] array as [page:LineCurve LineCurves].<br /><br />
+
+		If no points are specified, an empty shape is created and the [page:.currentPoint] is set to
+		the origin.
+		</div>
 
 
 		<h2>Properties</h2>
 		<div>See the base [page:Path] class for common properties.</div>
+
+		<h3>[property:String uuid]</h3>
+		<div>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this instance. This gets automatically assigned, so this shouldn't be edited.
+		</div>
 
 		<h3>[property:array holes]</h3>
 		<div>An array of [page:Path paths] that define the holes in the shape.</div>
@@ -59,7 +73,7 @@
 		<h2>Methods</h2>
 		<div>See the base [page:Path] class for common methods.</div>
 
-		<h3>[method:Array extractAllPoints]( [page:Integer divisions] )</h3>
+		<h3>[method:Array extractPoints]( [page:Integer divisions] )</h3>
 		<div>
 		divisions -- The fineness of the result.<br /><br />
 
@@ -72,10 +86,6 @@
 		</code>
 		where shape and holes are arrays of [page:Vector2 Vector2s].
 		</div>
-
-		<h3>[method:Object extractPoints]( [page:Integer divisions] )</h3>
-		<div>This is identical to [page:.extractAllPoints].</div>
-
 
 		<h3>[method:Array getPointsHoles]( [page:Integer divisions] )</h3>
 		<div>

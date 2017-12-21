@@ -18,7 +18,7 @@ THREE.AssimpLoader.prototype = {
 
 		var scope = this;
 
-		var path = THREE.Loader.prototype.extractUrlBase( url );
+		var path = THREE.LoaderUtils.extractUrlBase( url );
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
@@ -1018,17 +1018,6 @@ THREE.AssimpLoader.prototype = {
 			"$mat.reflectivity": "reflectivity",
 			"$mat.refracti": "refraction",
 			"$tex.file": "map"
-
-		};
-
-		var nameTexMapping = {
-
-			"$tex.ambient": "ambientMap",
-			"$clr.diffuse": "map",
-			"$clr.specular": "specMap",
-			"$clr.emissive": "emissive",
-			"$clr.transparent": "alphaMap",
-			"$clr.reflective": "reflectMap",
 
 		};
 

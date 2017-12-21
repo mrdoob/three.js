@@ -19,17 +19,11 @@ import { _Math } from '../math/Math.js';
  * @author bhouston / http://clara.io
  */
 
-var count = 0;
-
-function GeometryIdCount() {
-
-	return count ++;
-
-}
+var geometryId = 0; // Geometry uses even numbers as Id
 
 function Geometry() {
 
-	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
+	Object.defineProperty( this, 'id', { value: geometryId += 2 } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -64,7 +58,9 @@ function Geometry() {
 
 }
 
-Object.assign( Geometry.prototype, EventDispatcher.prototype, {
+Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+
+	constructor: Geometry,
 
 	isGeometry: true,
 
@@ -927,6 +923,21 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	},
 
+	setFromPoints: function ( points ) {
+
+		this.vertices = [];
+
+		for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+			var point = points[ i ];
+			this.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
+
+		}
+
+		return this;
+
+	},
+
 	sortFacesByMaterialIndex: function () {
 
 		var faces = this.faces;
@@ -1440,4 +1451,4 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 } );
 
 
-export { GeometryIdCount, Geometry };
+export { Geometry };

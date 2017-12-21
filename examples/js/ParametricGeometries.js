@@ -191,7 +191,9 @@ THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segments
 	TorusKnotCurve.prototype = Object.create( THREE.Curve.prototype );
 	TorusKnotCurve.prototype.constructor = TorusKnotCurve;
 
-	TorusKnotCurve.prototype.getPoint = function ( t ) {
+	TorusKnotCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+		var point = optionalTarget || new THREE.Vector3();
 
 		t *= Math.PI * 2;
 
@@ -201,7 +203,7 @@ THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segments
 		var y = ( 1 + r * Math.cos( q * t ) ) * Math.sin( p * t );
 		var z = r * Math.sin( q * t );
 
-		return new THREE.Vector3( x, y, z ).multiplyScalar( radius );
+		return point.set( x, y, z ).multiplyScalar( radius );
 
 	};
 
@@ -239,7 +241,7 @@ THREE.ParametricGeometries.SphereGeometry = function ( size, u, v ) {
 
 	}
 
-	THREE.ParametricGeometry.call( this, sphere, u, v, ! true );
+	THREE.ParametricGeometry.call( this, sphere, u, v );
 
 };
 

@@ -8,6 +8,7 @@ import { _Math } from '../../math/Math.js';
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory ) {
 
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof window.WebGL2RenderingContext );
+	var _videoTextures = {};
 
 	//
 
@@ -102,8 +103,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		deallocateTexture( texture );
 
-		infoMemory.textures --;
+		if ( texture.isVideoTexture ) {
 
+			delete _videoTextures[ texture.id ];
+
+		}
+
+		infoMemory.textures --;
 
 	}
 
@@ -404,6 +410,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			texture.addEventListener( 'dispose', onTextureDispose );
 
 			textureProperties.__webglTexture = _gl.createTexture();
+
+			if ( texture.isVideoTexture ) {
+
+				_videoTextures[ texture.id ] = texture;
+
+			}
 
 			infoMemory.textures ++;
 
@@ -786,11 +798,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function updateVideoTextures() {
+
+		for ( var id in _videoTextures ) {
+
+			_videoTextures[ id ].update();
+
+		}
+
+	}
+
 	this.setTexture2D = setTexture2D;
 	this.setTextureCube = setTextureCube;
 	this.setTextureCubeDynamic = setTextureCubeDynamic;
 	this.setupRenderTarget = setupRenderTarget;
 	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
+	this.updateVideoTextures = updateVideoTextures;
 
 }
 

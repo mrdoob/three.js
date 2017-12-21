@@ -48,7 +48,7 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 		thetaLength: thetaLength
 	};
 
-	radius = radius || 50;
+	radius = radius || 1;
 	segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;

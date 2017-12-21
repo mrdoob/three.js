@@ -496,7 +496,7 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	lengthManhattan: function () {
+	manhattanLength: function () {
 
 		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
 
@@ -539,13 +539,7 @@ Object.assign( Vector3.prototype, {
 
 		}
 
-		var x = this.x, y = this.y, z = this.z;
-
-		this.x = y * v.z - z * v.y;
-		this.y = z * v.x - x * v.z;
-		this.z = x * v.y - y * v.x;
-
-		return this;
+		return this.crossVectors( this, v );
 
 	},
 
@@ -623,7 +617,7 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	distanceToManhattan: function ( v ) {
+	manhattanDistanceTo: function ( v ) {
 
 		return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y ) + Math.abs( this.z - v.z );
 

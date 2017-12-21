@@ -47,7 +47,7 @@
 
 		<h3>[property:Vector3 max]</h3>
 		<div>
-			[page:Vector3] representing the lower upper (x, y, z) boundary of the box.<br />
+			[page:Vector3] representing the upper (x, y, z) boundary of the box.<br />
 			Default is ( - Infinity, - Infinity, - Infinity ).
 		</div>
 
@@ -244,7 +244,7 @@
 		<h3>[method:Box3 setFromCenterAndSize]( [page:Vector3 center], [page:Vector3 size] )</h3>
 		<div>
 		[page:Vector3 center] - Desired center position of the box ([page:Vector3]). <br>
-		[page:Vector3 size] - Desired x and y dimensions of the box ([page:Vector3]).<br /><br />
+		[page:Vector3 size] - Desired x, y and z dimensions of the box ([page:Vector3]).<br /><br />
 
 		Centers this box on [page:Vector3 center] and sets this box's width and height to the values specified
 		in [page:Vector3 size].
@@ -280,7 +280,7 @@
 		[page:Vector3 offset] - Direction and distance of offset.<br /><br />
 
 		Adds [page:Vector3 offset] to both the upper and lower bounds of this box, effectively moving this box
-		[page:Vector3 offset] units in 2D space.
+		[page:Vector3 offset] units in 3D space.
 		</div>
 
 		<h3>[method:Box3 union]( [page:Box3 box] )</h3>

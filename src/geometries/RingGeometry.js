@@ -51,8 +51,8 @@ function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegment
 		thetaLength: thetaLength
 	};
 
-	innerRadius = innerRadius || 20;
-	outerRadius = outerRadius || 50;
+	innerRadius = innerRadius || 0.5;
+	outerRadius = outerRadius || 1;
 
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;

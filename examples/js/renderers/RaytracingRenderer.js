@@ -78,9 +78,9 @@ THREE.RaytracingRenderer = function ( parameters ) {
 			worker.color = new THREE.Color().setHSL( Math.random() , 0.8, 0.8 ).getHexString();
 			pool.push( worker );
 
-			if ( renderering ) {
+			updateSettings( worker );
 
-				updateSettings( worker );
+			if ( renderering ) {
 
 				worker.postMessage( {
 					scene: sceneJSON,

@@ -9,16 +9,17 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { _Math } from '../math/Math.js';
 import { arrayMax } from '../utils.js';
-import { GeometryIdCount } from './Geometry.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  */
 
+var bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
+
 function BufferGeometry() {
 
-	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
+	Object.defineProperty( this, 'id', { value: bufferGeometryId += 2 } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -39,9 +40,9 @@ function BufferGeometry() {
 
 }
 
-BufferGeometry.MaxIndex = 65535;
+BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
-Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
+	constructor: BufferGeometry,
 
 	isBufferGeometry: true,
 
@@ -330,6 +331,23 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 			}
 
 		}
+
+		return this;
+
+	},
+
+	setFromPoints: function ( points ) {
+
+		var position = [];
+
+		for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+			var point = points[ i ];
+			position.push( point.x, point.y, point.z || 0 );
+
+		}
+
+		this.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 
 		return this;
 

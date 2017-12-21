@@ -16,8 +16,6 @@
 			This light gets emitted uniformly across the face a rectangular plane. This can be
 			used to simulate things like bright windows or strip lighting.<br /><br />
 
-			This light can cast shadows - see the [page:RectAreaLightShadow] page for details.<br /><br />
-
 			<em>NOTE:</em> this class is currently under active development and is probably not
 			production ready yet (as of r83). Check back in a month or two! And feel free to try it out in the meantime.
 		</div>
@@ -69,10 +67,6 @@ scene.add( rectLightHelper );
 
 		<h3>[property:Boolean castShadow]</h3>
 		<div>
-			If set to *true* light will cast dynamic shadows. *Warning*: This is expensive and
-			requires tweaking to get shadows looking right. See the [page:RectAreaLightShadow] for details.
-			The default is *false*.<br /><br />
-
 			<em>Note:</em> this is not yet implemented for this light type! (r83)
 		</div>
 
@@ -104,14 +98,6 @@ scene.add( rectLightHelper );
 		<div>
 			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
 		</div>
-
-		<h3>[property:RectAreaLightShadow shadow]</h3>
-		<div>
-			A [page:RectAreaLightShadow] used to calculate shadows for this light.<br /><br />
-
-			<em>Note:</em> this is not yet implemented for this light type! (r83)
-		</div>
-
 
 		<h3>[property:Object3D target]</h3>
 		<div>

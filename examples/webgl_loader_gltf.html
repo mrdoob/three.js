@@ -171,6 +171,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
 
 				if (sceneInfo.shadows) {
 					renderer.shadowMap.enabled = true;
@@ -274,6 +275,12 @@
 
 					}
 
+					object.traverse( function ( node ) {
+
+						if ( node.isMesh ) node.castShadow = true;
+
+					} );
+
 					cameraIndex = 0;
 					cameras = [];
 					cameraNames = [];
@@ -332,7 +339,11 @@
 					scene.add( object );
 					onWindowResize();
 
-				});
+				}, undefined, function ( error ) {
+
+					console.error( error );
+
+				} );
 
 			orbitControls = new THREE.OrbitControls(defaultCamera, renderer.domElement);
 
