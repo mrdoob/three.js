@@ -29,7 +29,7 @@ THREE.NodeLib = {
 
 	removeKeyword: function( name ) {
 
-		delete this.keywords[ node ];
+		delete this.keywords[ name ];
 
 	},
 
