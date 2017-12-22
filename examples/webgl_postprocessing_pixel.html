@@ -64,7 +64,7 @@
 
             function updateGUI() {
 
-                pixelPass.uniforms.pixels.value = params.pixels;
+                pixelPass.uniforms.pixelSize.value = params.pixelSize;
 
             }
 
@@ -145,18 +145,24 @@
                 composer = new THREE.EffectComposer( renderer );
                 composer.addPass( new THREE.RenderPass( scene, camera ) );
 
+                var res = new THREE.Vector2();
+                res.x = window.screen.width * window.devicePixelRatio;
+                res.y = window.screen.height * window.devicePixelRatio;
+
                 pixelPass = new THREE.ShaderPass( THREE.PixelShader );
                 pixelPass.renderToScreen = true;
                 composer.addPass( pixelPass );
 
+                pixelPass.uniforms.resolution.value = res;
+
                 window.addEventListener( 'resize', resize );
 
                 params = {
-                    pixels: 256,
+                    pixelSize: 128,
                     postprocessing: true
                 };
                 gui = new dat.GUI();
-                gui.add( params, 'pixels' ).min( 12.0 ).max( 256.0 ).step( 2.0 );
+                gui.add( params, 'pixelSize' ).min( 2 ).max( 256 ).step( 2 );
                 gui.add( params, 'postprocessing' );
 
             }

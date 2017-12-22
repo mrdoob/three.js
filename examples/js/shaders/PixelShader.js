@@ -9,7 +9,8 @@ THREE.PixelShader = {
 	uniforms: {
 
 		"tDiffuse": { value: null },
-		"pixels": { value: 2048. }
+		"resolution": { value: null },
+		"pixelSize": { value: 1. },
 
 	},
 
@@ -29,14 +30,15 @@ THREE.PixelShader = {
 	fragmentShader: [
 
 		"uniform sampler2D tDiffuse;",
-		"uniform float pixels;",
+		"uniform float pixelSize;",
+		"uniform vec2 resolution;",
 
 		"varying highp vec2 vUv;",
 
 		"void main(){",
 
-		"float dx = (1.0 / pixels);",
-		"float dy = (1.0 / pixels);",
+		"float dx = pixelSize * (1./resolution.x);",
+		"float dy = dx;",
 		"vec2 coord = vec2(dx * floor(vUv.x / dx), dy * floor(vUv.y / dy));",
 		"gl_FragColor = texture2D(tDiffuse, coord);",
 
