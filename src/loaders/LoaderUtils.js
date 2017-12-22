@@ -4,30 +4,38 @@
 
 var LoaderUtils = {
 
-	decodeText: function ( array ) {
+	decodeText: (function () {
 
-		if ( typeof TextDecoder !== 'undefined' ) {
+		var textDecoder;
 
-			return new TextDecoder().decode( array );
+		return function ( array ) {
 
-		}
+			if ( typeof TextDecoder !== 'undefined' ) {
 
-		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
-		// throws a "maximum call stack size exceeded" error for large arrays.
+				if ( !textDecoder ) textDecoder = new TextDecoder();
 
-		var s = '';
+				return textDecoder.decode( array );
 
-		for ( var i = 0, il = array.length; i < il; i ++ ) {
+			}
 
-			// Implicitly assumes little-endian.
-			s += String.fromCharCode( array[ i ] );
+			// Avoid the String.fromCharCode.apply(null, array) shortcut, which
+			// throws a "maximum call stack size exceeded" error for large arrays.
 
-		}
+			var s = '';
 
-		// Merges multi-byte utf-8 characters.
-		return decodeURIComponent( escape( s ) );
+			for ( var i = 0, il = array.length; i < il; i ++ ) {
 
-	},
+				// Implicitly assumes little-endian.
+				s += String.fromCharCode( array[ i ] );
+
+			}
+
+			// Merges multi-byte utf-8 characters.
+			return decodeURIComponent( escape( s ) );
+
+		};
+
+	}()),
 
 	extractUrlBase: function ( url ) {
 

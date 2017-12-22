@@ -3402,14 +3402,8 @@
 
 		getUint8Array: function ( size ) {
 
-			var a = [];
-
-			for ( var i = 0; i < size; i ++ ) {
-
-				a.push( this.getUint8() );
-
-			}
-
+			var a = new Uint8Array( this.dv.buffer, this.offset, size );
+			this.offset += size;
 			return a;
 
 		},
@@ -3650,7 +3644,7 @@
 
 		getString: function ( size ) {
 
-			var a = new Uint8Array( this.getUint8Array( size ) );
+			var a = this.getUint8Array( size );
 			var nullByte = a.indexOf( 0 );
 			if ( nullByte >= 0 ) a = a.slice( 0, nullByte );
 
