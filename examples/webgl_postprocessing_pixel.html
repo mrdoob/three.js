@@ -129,7 +129,7 @@
                     var geom = geomData[ Math.floor( Math.random() * geomData.length ) ];
                     var color = new THREE.Color();
                     color.setHSL( Math.random(), .7 + .2 * Math.random(), .5 + .1 * Math.random() );
-                    var mat = new THREE.MeshPhongMaterial( { color: color } );
+                    var mat = new THREE.MeshPhongMaterial( { color: color, shininess: 200 } );
                     var mesh = new THREE.Mesh( geom, mat );
                     var s = 4 + Math.random() * 10;
                     mesh.scale.set( s, s, s );
