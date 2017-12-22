@@ -161,6 +161,7 @@ var files = {
 		"webgl_materials_texture_anisotropy",
 		"webgl_materials_texture_canvas",
 		"webgl_materials_texture_compressed",
+		"webgl_materials_texture_ktx",
 		"webgl_materials_texture_filters",
 		"webgl_materials_texture_manualmipmap",
 		"webgl_materials_texture_rotation",
