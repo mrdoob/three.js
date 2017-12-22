@@ -96,18 +96,19 @@
                 scene = new THREE.Scene();
 
                 var hemisphereLight = new THREE.HemisphereLight( 0xfceafc, 0x000000, .8 );
+                scene.add( hemisphereLight );
 
                 var dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
-
                 dirLight.position.set( 150, 75, 150 );
+                scene.add( dirLight );
 
-                var dirLight2 = dirLight.clone();
-                dirLight2.intensity = .2;
+                var dirLight2 = new THREE.DirectionalLight( 0xffffff, .2 );
                 dirLight2.position.set( - 150, 75, - 150 );
+                scene.add( dirLight2 );
 
-                var dirLight3 = dirLight.clone();
-                dirLight3.intensity = .1;
+                var dirLight3 = new THREE.DirectionalLight( 0xffffff, .1 );
                 dirLight3.position.set( 0, 125, 0 );
+                scene.add( dirLight3 );
 
                 scene.add( hemisphereLight );
                 scene.add( dirLight );
