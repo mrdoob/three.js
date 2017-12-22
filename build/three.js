@@ -288,6 +288,20 @@
 	var RGBA_PVRTC_4BPPV1_Format = 2102;
 	var RGBA_PVRTC_2BPPV1_Format = 2103;
 	var RGB_ETC1_Format = 2151;
+	var RGBA_ASTC_4x4_Format = 37808;
+	var RGBA_ASTC_5x4_Format = 37809;
+	var RGBA_ASTC_5x5_Format = 37810;
+	var RGBA_ASTC_6x5_Format = 37811;
+	var RGBA_ASTC_6x6_Format = 37812;
+	var RGBA_ASTC_8x5_Format = 37813;
+	var RGBA_ASTC_8x6_Format = 37814;
+	var RGBA_ASTC_8x8_Format = 37815;
+	var RGBA_ASTC_10x5_Format = 37816;
+	var RGBA_ASTC_10x6_Format = 37817;
+	var RGBA_ASTC_10x8_Format = 37818;
+	var RGBA_ASTC_10x10_Format = 37819;
+	var RGBA_ASTC_12x10_Format = 37820;
+	var RGBA_ASTC_12x12_Format = 37821;
 	var LoopOnce = 2200;
 	var LoopRepeat = 2201;
 	var LoopPingPong = 2202;
@@ -21175,6 +21189,20 @@
 				extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
 
 				if ( extension !== null ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
+
+			}
+
+			if ( p === RGBA_ASTC_4x4_Format || p === RGBA_ASTC_5x4_Format || p === RGBA_ASTC_5x5_Format ||
+				p === RGBA_ASTC_6x5_Format || p === RGBA_ASTC_6x6_Format || p === RGBA_ASTC_8x5_Format ||
+				p === RGBA_ASTC_8x6_Format || p === RGBA_ASTC_8x8_Format || p === RGBA_ASTC_10x5_Format ||
+				p === RGBA_ASTC_10x6_Format || p === RGBA_ASTC_10x8_Format || p === RGBA_ASTC_10x10_Format ||
+				p === RGBA_ASTC_12x10_Format || p === RGBA_ASTC_12x12_Format ) {
+
+				extension = extensions.get( 'WEBGL_compressed_texture_astc' );
+
+				if ( extension !== null ) {
+					return p;
+				}
 
 			}
 
@@ -45919,6 +45947,20 @@
 	exports.RGBA_PVRTC_4BPPV1_Format = RGBA_PVRTC_4BPPV1_Format;
 	exports.RGBA_PVRTC_2BPPV1_Format = RGBA_PVRTC_2BPPV1_Format;
 	exports.RGB_ETC1_Format = RGB_ETC1_Format;
+	exports.RGBA_ASTC_4x4_Format = RGBA_ASTC_4x4_Format;
+	exports.RGBA_ASTC_5x4_Format = RGBA_ASTC_5x4_Format;
+	exports.RGBA_ASTC_5x5_Format = RGBA_ASTC_5x5_Format;
+	exports.RGBA_ASTC_6x5_Format = RGBA_ASTC_6x5_Format;
+	exports.RGBA_ASTC_6x6_Format = RGBA_ASTC_6x6_Format;
+	exports.RGBA_ASTC_8x5_Format = RGBA_ASTC_8x5_Format;
+	exports.RGBA_ASTC_8x6_Format = RGBA_ASTC_8x6_Format;
+	exports.RGBA_ASTC_8x8_Format = RGBA_ASTC_8x8_Format;
+	exports.RGBA_ASTC_10x5_Format = RGBA_ASTC_10x5_Format;
+	exports.RGBA_ASTC_10x6_Format = RGBA_ASTC_10x6_Format;
+	exports.RGBA_ASTC_10x8_Format = RGBA_ASTC_10x8_Format;
+	exports.RGBA_ASTC_10x10_Format = RGBA_ASTC_10x10_Format;
+	exports.RGBA_ASTC_12x10_Format = RGBA_ASTC_12x10_Format;
+	exports.RGBA_ASTC_12x12_Format = RGBA_ASTC_12x12_Format;
 	exports.LoopOnce = LoopOnce;
 	exports.LoopRepeat = LoopRepeat;
 	exports.LoopPingPong = LoopPingPong;
