@@ -140,6 +140,7 @@ THREE.CameraNode.prototype.updateFrame = function( delta ) {
 
 		case THREE.CameraNode.DEPTH:
 
+			var camera = this.camera
 			this.near.number = camera.near;
 			this.far.number = camera.far;
 
