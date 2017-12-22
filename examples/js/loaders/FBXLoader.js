@@ -3215,7 +3215,7 @@
 
 		parseProperty: function ( reader ) {
 
-			var type = reader.getChar();
+			var type = reader.getString(1);
 
 			switch ( type ) {
 
@@ -3370,28 +3370,6 @@
 
 		},
 
-		getInt8: function () {
-
-			var value = this.dv.getInt8( this.offset );
-			this.offset += 1;
-			return value;
-
-		},
-
-		getInt8Array: function ( size ) {
-
-			var a = [];
-
-			for ( var i = 0; i < size; i ++ ) {
-
-				a.push( this.getInt8() );
-
-			}
-
-			return a;
-
-		},
-
 		getUint8: function () {
 
 			var value = this.dv.getUint8( this.offset );
@@ -3400,61 +3378,11 @@
 
 		},
 
-		getUint8Array: function ( size ) {
-
-			var a = [];
-
-			for ( var i = 0; i < size; i ++ ) {
-
-				a.push( this.getUint8() );
-
-			}
-
-			return a;
-
-		},
-
 		getInt16: function () {
 
 			var value = this.dv.getInt16( this.offset, this.littleEndian );
 			this.offset += 2;
 			return value;
-
-		},
-
-		getInt16Array: function ( size ) {
-
-			var a = [];
-
-			for ( var i = 0; i < size; i ++ ) {
-
-				a.push( this.getInt16() );
-
-			}
-
-			return a;
-
-		},
-
-		getUint16: function () {
-
-			var value = this.dv.getUint16( this.offset, this.littleEndian );
-			this.offset += 2;
-			return value;
-
-		},
-
-		getUint16Array: function ( size ) {
-
-			var a = [];
-
-			for ( var i = 0; i < size; i ++ ) {
-
-				a.push( this.getUint16() );
-
-			}
-
-			return a;
 
 		},
 
@@ -3485,20 +3413,6 @@
 			var value = this.dv.getUint32( this.offset, this.littleEndian );
 			this.offset += 4;
 			return value;
-
-		},
-
-		getUint32Array: function ( size ) {
-
-			var a = [];
-
-			for ( var i = 0; i < size; i ++ ) {
-
-				a.push( this.getUint32() );
-
-			}
-
-			return a;
 
 		},
 
@@ -3576,20 +3490,6 @@
 
 		},
 
-		getUint64Array: function ( size ) {
-
-			var a = [];
-
-			for ( var i = 0; i < size; i ++ ) {
-
-				a.push( this.getUint64() );
-
-			}
-
-			return a;
-
-		},
-
 		getFloat32: function () {
 
 			var value = this.dv.getFloat32( this.offset, this.littleEndian );
@@ -3642,15 +3542,16 @@
 
 		},
 
-		getChar: function () {
-
-			return String.fromCharCode( this.getUint8() );
-
-		},
-
 		getString: function ( size ) {
 
-			var a = new Uint8Array( this.getUint8Array( size ) );
+			var a = new Uint8Array( size );
+
+			for ( var i = 0; i < size; i ++ ) {
+
+				a[ i ] = this.getUint8();
+
+			}
+
 			var nullByte = a.indexOf( 0 );
 			if ( nullByte >= 0 ) a = a.slice( 0, nullByte );
 
@@ -3762,7 +3663,6 @@
 
 	}
 
-	// Converts ArrayBuffer to String.
 	function convertArrayBufferToString( buffer, from, to ) {
 
 		if ( from === undefined ) from = 0;
