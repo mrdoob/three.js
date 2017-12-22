@@ -29,12 +29,12 @@ THREE.ShaderPass = function ( shader, textureID ) {
 
 	}
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene = new THREE.Scene();
+	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.scene2 = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
+	this.scene2.add( this.quad );
 
 };
 
@@ -54,11 +54,11 @@ THREE.ShaderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		if ( this.renderToScreen ) {
 
-			renderer.render( this.scene, this.camera );
+			renderer.render( this.scene2, this.camera2 );
 
 		} else {
 
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+			renderer.render( this.scene2, this.camera2, writeBuffer, this.clear );
 
 		}
 

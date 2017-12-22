@@ -117,12 +117,12 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		blending: THREE.NoBlending
 	} );
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
+	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.scene2  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
+	this.scene2.add( this.quad );
 
 };
 
@@ -148,7 +148,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			//Render the luminance of the current scene into a render target with mipmapping enabled
 			this.quad.material = this.materialLuminance;
 			this.materialLuminance.uniforms.tDiffuse.value = readBuffer.texture;
-			renderer.render( this.scene, this.camera, this.currentLuminanceRT );
+			renderer.render( this.scene2, this.camera2, this.currentLuminanceRT );
 
 			//Use the new luminance values, the previous luminance and the frame delta to
 			//adapt the luminance over time.
@@ -156,12 +156,12 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.materialAdaptiveLum.uniforms.delta.value = delta;
 			this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT.texture;
 			this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT.texture;
-			renderer.render( this.scene, this.camera, this.luminanceRT );
+			renderer.render( this.scene2, this.camera2, this.luminanceRT );
 
 			//Copy the new adapted luminance value so that it can be used by the next frame.
 			this.quad.material = this.materialCopy;
 			this.copyUniforms.tDiffuse.value = this.luminanceRT.texture;
-			renderer.render( this.scene, this.camera, this.previousLuminanceRT );
+			renderer.render( this.scene2, this.camera2, this.previousLuminanceRT );
 
 		}
 
@@ -170,11 +170,11 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 		if ( this.renderToScreen ) {
 
-			renderer.render( this.scene, this.camera );
+			renderer.render( this.scene2, this.camera2 );
 
 		} else {
 
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+			renderer.render( this.scene2, this.camera2, writeBuffer, this.clear );
 
 		}
 
@@ -225,9 +225,9 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		this.materialLuminance.needsUpdate = true;
 		this.materialAdaptiveLum.needsUpdate = true;
 		this.materialToneMap.needsUpdate = true;
-		// renderer.render( this.scene, this.camera, this.luminanceRT );
-		// renderer.render( this.scene, this.camera, this.previousLuminanceRT );
-		// renderer.render( this.scene, this.camera, this.currentLuminanceRT );
+		// renderer.render( this.scene2, this.camera2, this.luminanceRT );
+		// renderer.render( this.scene2, this.camera2, this.previousLuminanceRT );
+		// renderer.render( this.scene2, this.camera2, this.currentLuminanceRT );
 
 	},
 
