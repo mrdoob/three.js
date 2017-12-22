@@ -97,22 +97,22 @@
 
                 var hemisphereLight = new THREE.HemisphereLight( 0xfceafc, 0x000000, .8 );
 
-                var shadowLight = new THREE.DirectionalLight( 0xffffff, .5 );
+                var dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
 
-                shadowLight.position.set( 150, 75, 150 );
+                dirLight.position.set( 150, 75, 150 );
 
-                var shadowLight2 = shadowLight.clone();
-                shadowLight2.intensity = .2;
-                shadowLight2.position.set( - 150, 75, - 150 );
+                var dirLight2 = dirLight.clone();
+                dirLight2.intensity = .2;
+                dirLight2.position.set( - 150, 75, - 150 );
 
-                var shadowLight3 = shadowLight.clone();
-                shadowLight3.intensity = .1;
-                shadowLight3.position.set( 0, 125, 0 );
+                var dirLight3 = dirLight.clone();
+                dirLight3.intensity = .1;
+                dirLight3.position.set( 0, 125, 0 );
 
                 scene.add( hemisphereLight );
-                scene.add( shadowLight );
-                scene.add( shadowLight2 );
-                scene.add( shadowLight3 );
+                scene.add( dirLight );
+                scene.add( dirLight2 );
+                scene.add( dirLight3 );
 
                 geomData.push( new THREE.SphereGeometry( 1, 64, 64 ) );
                 geomData.push( new THREE.BoxGeometry( 1, 1, 1 ) );
