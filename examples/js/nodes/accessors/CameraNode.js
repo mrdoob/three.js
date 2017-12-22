@@ -52,11 +52,10 @@ THREE.CameraNode.prototype.setScope = function( scope ) {
 	this.scope = scope;
 
 	switch ( scope ) {
-			
-		var camera = this.camera
 
 		case THREE.CameraNode.DEPTH:
 
+			var camera = this.camera
 			this.near = new THREE.FloatNode( camera ? camera.near : 1 );
 			this.far = new THREE.FloatNode( camera ? camera.far : 1200 );
 
