@@ -52,6 +52,8 @@ THREE.CameraNode.prototype.setScope = function( scope ) {
 	this.scope = scope;
 
 	switch ( scope ) {
+			
+		var camera = this.camera
 
 		case THREE.CameraNode.DEPTH:
 
