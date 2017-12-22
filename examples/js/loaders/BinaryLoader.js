@@ -32,8 +32,8 @@ THREE.BinaryLoader.prototype = {
 
 		// todo: unify load API to for easier SceneLoader use
 
-		var texturePath = this.texturePath || THREE.Loader.prototype.extractUrlBase( url );
-		var binaryPath = this.binaryPath || THREE.Loader.prototype.extractUrlBase( url );
+		var texturePath = this.texturePath || THREE.LoaderUtils.extractUrlBase( url );
+		var binaryPath = this.binaryPath || THREE.LoaderUtils.extractUrlBase( url );
 
 		// #1 load JS part via web worker
 
@@ -245,17 +245,7 @@ THREE.BinaryLoader.prototype = {
 
 			function parseString( data, offset, length ) {
 
-				var charArray = new Uint8Array( data, offset, length );
-
-				var text = "";
-
-				for ( var i = 0; i < length; i ++ ) {
-
-					text += String.fromCharCode( charArray[ i ] );
-
-				}
-
-				return text;
+				return THREE.LoaderUtils.decodeText( new Uint8Array( data, offset, length ) );
 
 			}
 

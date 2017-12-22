@@ -163,7 +163,7 @@
 
             //download Model file
 
-            loader.load( [ 'models/xfile/SSR06_model.x', { zflag: false } ], function ( object ) {
+            loader.load( [ 'models/xfile/SSR06_model.x' ], function ( object ) {
 
                 for ( var i = 0; i < object.models.length; i ++ ) {
 
@@ -245,7 +245,7 @@
             } else {
 
                 var loader2 = new THREE.XLoader( manager, Texloader );
-                loader2.load( [ 'models/xfile/' + animeName + '.x', { zflag: false, putPos: false, putScl: false } ], function () {
+                loader2.load( [ 'models/xfile/' + animeName + '.x', { putPos: false, putScl: false } ], function () {
 
                     // !! important!
                     // associate divided model and animation.

@@ -20,9 +20,9 @@
 		<h2>Example</h2>
 
 		<code>
-var v1 = new THREE.Vector3();
-var v2 = new THREE.Vector3(1, 45, 6);
-var v3 = new THREE.Vector3(34, 34, 676);
+var v1 = new THREE.Vector2();
+var v2 = new THREE.Vector2(1, 45);
+var v3 = new THREE.Vector2(34, 34);
 
 var vectors = [v1, v2, v3];
 
@@ -94,14 +94,6 @@ var path = new THREE.Path(vectors);
 		<h3>[method:null bezierCurveTo]( [page:Float cp1X], [page:Float cp1Y], [page:Float cp2X], [page:Float cp2Y], [page:Float x], [page:Float y] )</h3>
 		<div>This creates a bezier curve from [page:.currentPoint] with (cp1X, cp1Y) and (cp2X, cp2Y) as control points and updates [page:.currentPoint] to x and y.</div>
 
-		<h3>[method:null fromPoints]( [page:Array vector2s] )</h3>
-		<div>
-			points --  array of [page:Vector2 Vector2s].<br /><br />
-
-			Points are added to the [page:CurvePath.curves curves]
-			array as [page:LineCurve LineCurves].
-		</div>
-
 		<h3>[method:null ellipse]( [page:Float x], [page:Float y], [page:Float xRadius], [page:Float yRadius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise], [page:Float rotation] )</h3>
 		<div>
 			x, y -- The center of the ellipse offset from the last call.<br />
@@ -125,6 +117,14 @@ var path = new THREE.Path(vectors);
 
 		<h3>[method:null quadraticCurveTo]( [page:Float cpX], [page:Float cpY], [page:Float x], [page:Float y] )</h3>
 		<div>Creates a quadratic curve from [page:.currentPoint] with cpX and cpY as control point and updates [page:.currentPoint] to x and y.</div>
+
+		<h3>[method:null setFromPoints]( [page:Array vector2s] )</h3>
+		<div>
+			points --  array of [page:Vector2 Vector2s].<br /><br />
+
+			Points are added to the [page:CurvePath.curves curves]
+			array as [page:LineCurve LineCurves].
+		</div>
 
 		<h3>[method:null splineThru] ( [page:Array points] ) </h3>
 		<div>

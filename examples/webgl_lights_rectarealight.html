@@ -61,7 +61,7 @@
 			var origin = new THREE.Object3D();
 
 			var matStdParams = {
-				roughness: 0.044676705160855, // calculated from shininess = 1000
+				roughness: 0.0,
 				metalness: 0.0
 			};
 
@@ -78,7 +78,7 @@
 			var mshStdSphere = new THREE.Mesh( geoSphere, matStdObjects );
 			var mshStdKnot = new THREE.Mesh( geoKnot, matStdObjects );
 
-			var amb = new THREE.AmbientLight( 0xffffff, 0.0 );
+			var amb = new THREE.AmbientLight( 0xffffff, 0.1 );
 
 			var rectLight;
 			var rectLightHelper;
@@ -125,7 +125,7 @@
 
 				camera.position.set( 0, 20, 35 );
 
-				rectLight = new THREE.RectAreaLight( 0xffffff, 500, 10, 10 );
+				rectLight = new THREE.RectAreaLight( 0xffffff, 200, 10, 10 );
 				rectLight.position.set( 5, 5, 0 );
 
 				// TODO: ensure RectAreaLight handles target param correctly
@@ -185,9 +185,10 @@
 				if ( param.motion ) {
 
 					update();
-					rectLightHelper.update();
 
 				}
+
+				rectLightHelper.update();
 
 				renderer.render( scene, camera );
 
@@ -197,7 +198,7 @@
 
 			function update() {
 
-				var t = ( Date.now() / 1000 );
+				var t = ( Date.now() / 2000 );
 
 				// move light in circle around center
 				// change light height with sine curve
@@ -263,13 +264,13 @@
 
 				} );
 
-				lightFolder.add( param, 'intensity', 0.0, 1000 ).onChange( function ( val ) {
+				lightFolder.add( param, 'intensity', 0.0, 400 ).onChange( function ( val ) {
 
 					rectLight.intensity = val;
 
 				} );
 
-				lightFolder.add( param, 'ambient', 0.0, 1 ).step( 0.01 ).onChange( function ( val ) {
+				lightFolder.add( param, 'ambient', 0.0, 0.2 ).step( 0.01 ).onChange( function ( val ) {
 
 					amb.intensity = val;
 

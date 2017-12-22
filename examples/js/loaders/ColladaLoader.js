@@ -19,7 +19,7 @@ THREE.ColladaLoader.prototype = {
 
 		var scope = this;
 
-		var path = scope.path === undefined ? THREE.Loader.prototype.extractUrlBase( url ) : scope.path;
+		var path = scope.path === undefined ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
@@ -1624,7 +1624,17 @@ THREE.ColladaLoader.prototype = {
 
 		function getCamera( id ) {
 
-			return getBuild( library.cameras[ id ], buildCamera );
+			var data = library.cameras[ id ];
+
+			if ( data !== undefined ) {
+
+				return getBuild( data, buildCamera );
+
+			}
+
+			console.warn( 'THREE.ColladaLoader: Couldn\'t find camera with ID:', id );
+
+			return null;
 
 		}
 
@@ -1749,7 +1759,17 @@ THREE.ColladaLoader.prototype = {
 
 		function getLight( id ) {
 
-			return getBuild( library.lights[ id ], buildLight );
+			var data = library.lights[ id ];
+
+			if ( data !== undefined ) {
+
+				return getBuild( data, buildLight );
+
+			}
+
+			console.warn( 'THREE.ColladaLoader: Couldn\'t find light with ID:', id );
+
+			return null;
 
 		}
 
@@ -3037,7 +3057,13 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0, l = instanceCameras.length; i < l; i ++ ) {
 
-				objects.push( getCamera( instanceCameras[ i ] ).clone() );
+				var instanceCamera = getCamera( instanceCameras[ i ] );
+
+				if ( instanceCamera !== null ) {
+
+					objects.push( instanceCamera.clone() );
+
+				}
 
 			}
 
@@ -3076,7 +3102,13 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0, l = instanceLights.length; i < l; i ++ ) {
 
-				objects.push( getLight( instanceLights[ i ] ).clone() );
+				var instanceLight = getLight( instanceLights[ i ] );
+
+				if ( instanceLight !== null ) {
+
+					objects.push( instanceLight.clone() );
+
+				}
 
 			}
 

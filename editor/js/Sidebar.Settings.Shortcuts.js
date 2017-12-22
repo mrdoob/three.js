@@ -18,7 +18,7 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 	var container = new UI.Div();
 	container.add( new UI.Break() );
 
-	var shortcuts = [ 'translate', 'rotate', 'scale', 'undo' ];
+	var shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
 
 	for ( var i = 0; i < shortcuts.length; i ++ ) {
 
@@ -89,13 +89,13 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 
 		switch ( event.key.toLowerCase() ) {
 
-			case 'Backspace':
+			case 'backspace':
 
 				event.preventDefault(); // prevent browser back
 
-				break;
+				// fall-through
 
-			case 'Delete':
+			case 'delete':
 
 				var object = editor.selected;
 
@@ -140,6 +140,16 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 						editor.undo();
 
 					}
+
+				}
+
+				break;
+
+			case config.getKey( 'settings/shortcuts/focus' ):
+
+				if ( editor.selected !== null ) {
+
+					editor.focus( editor.selected );
 
 				}
 

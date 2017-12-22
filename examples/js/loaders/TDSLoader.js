@@ -41,8 +41,7 @@ THREE.TDSLoader.prototype = {
 
 		var scope = this;
 
-
-		var path = this.path !== undefined ? this.path : THREE.Loader.prototype.extractUrlBase( url );
+		var path = this.path !== undefined ? this.path : THREE.LoaderUtils.extractUrlBase( url );
 
 		var loader = new THREE.FileLoader( this.manager );
 

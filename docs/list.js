@@ -176,8 +176,8 @@ var list = {
 			"TorusGeometry": "api/geometries/TorusGeometry",
 			"TorusKnotBufferGeometry": "api/geometries/TorusKnotBufferGeometry",
 			"TorusKnotGeometry": "api/geometries/TorusKnotGeometry",
-			"TubeGeometry": "api/geometries/TubeGeometry",
 			"TubeBufferGeometry": "api/geometries/TubeBufferGeometry",
+			"TubeGeometry": "api/geometries/TubeGeometry",
 			"WireframeGeometry": "api/geometries/WireframeGeometry"
 		},
 
@@ -230,6 +230,7 @@ var list = {
 			"ImageLoader": "api/loaders/ImageLoader",
 			"JSONLoader": "api/loaders/JSONLoader",
 			"Loader": "api/loaders/Loader",
+			"LoaderUtils": "api/loaders/LoaderUtils",
 			"MaterialLoader": "api/loaders/MaterialLoader",
 			"ObjectLoader": "api/loaders/ObjectLoader",
 			"TextureLoader": "api/loaders/TextureLoader"
