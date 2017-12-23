@@ -186,16 +186,16 @@
 
 				// check whether the file name is used by another videoNode
 				// and if so keep a record of both ids as a duplicate pair [ id1, id2 ]
-				if ( videoNode.FileName in names ) {
+				if ( videoNode.Filename in names ) {
 
-					duplicates.push( [ id, names[ videoNode.FileName ] ] );
+					duplicates.push( [ id, names[ videoNode.Filename ] ] );
 
 				}
 
-				names[ videoNode.FileName ] = id;
+				names[ videoNode.Filename ] = id;
 
 				// raw image data is in videoNode.Content
-				if ( 'Content' in videoNode && videoNode.Content !== '' ) {
+				if ( 'Content' in videoNode && videoNode.Content.byteLength > 0 ) {
 
 					var image = parseImage( videoNodes[ nodeID ] );
 
