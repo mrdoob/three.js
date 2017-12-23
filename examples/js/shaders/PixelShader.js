@@ -37,9 +37,8 @@ THREE.PixelShader = {
 
 		"void main(){",
 
-		"float dx = pixelSize * (1./resolution.x);",
-		"float dy = dx;",
-		"vec2 coord = vec2(dx * floor(vUv.x / dx), dy * floor(vUv.y / dy));",
+		"vec2 dxy = pixelSize / resolution;",
+		"vec2 coord = dxy * floor( vUv / dxy );",
 		"gl_FragColor = texture2D(tDiffuse, coord);",
 
 		"}"
