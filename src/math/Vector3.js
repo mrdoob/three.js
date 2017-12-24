@@ -13,9 +13,9 @@ import { Quaternion } from './Quaternion.js';
 
 function Vector3( x, y, z ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
+	this.x = parseFloat(x) || 0;
+	this.y = parseFloat(y) || 0;
+	this.z = parseFloat(z) || 0;
 
 }
 
@@ -25,9 +25,9 @@ Object.assign( Vector3.prototype, {
 
 	set: function ( x, y, z ) {
 
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.x = parseFloat(x);
+		this.y = parseFloat(y);
+		this.z = parseFloat(z);
 
 		return this;
 
@@ -45,7 +45,7 @@ Object.assign( Vector3.prototype, {
 
 	setX: function ( x ) {
 
-		this.x = x;
+		this.x = parseFloat(x);
 
 		return this;
 
@@ -53,7 +53,7 @@ Object.assign( Vector3.prototype, {
 
 	setY: function ( y ) {
 
-		this.y = y;
+		this.y = parseFloat(y);
 
 		return this;
 
@@ -61,7 +61,7 @@ Object.assign( Vector3.prototype, {
 
 	setZ: function ( z ) {
 
-		this.z = z;
+		this.z = parseFloat(z);
 
 		return this;
 
