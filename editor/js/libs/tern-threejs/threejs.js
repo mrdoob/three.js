@@ -4424,7 +4424,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised color."
         },
         "getMorphTargetIndexByName": {
           "!type": "fn(name: string) -> number",
@@ -4528,7 +4528,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised color."
         },
         "clone": {
           "!type": "fn() -> +THREE.PointCloud",
