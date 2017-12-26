@@ -42,6 +42,8 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 		itemsLoaded ++;
 
+		scope.dispatchEvent( { type: 'progress', url: url, loaded: itemsLoaded, total: itemsTotal } );
+
 		if ( scope.onProgress !== undefined ) {
 
 			scope.onProgress( url, itemsLoaded, itemsTotal );
