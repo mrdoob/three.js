@@ -5,7 +5,7 @@
 import { Audio } from './audio/Audio.js';
 import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
-import { CullFaceFront, CullFaceBack, FlatShading } from './constants.js';
+import { CullFace, FlatShading } from './constants.js';
 import {
 	Float64BufferAttribute,
 	Float32BufferAttribute,
