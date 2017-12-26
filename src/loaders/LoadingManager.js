@@ -54,6 +54,8 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 			isLoading = false;
 
+			scope.dispatchEvent( { type: 'end', url: url } );
+
 			if ( scope.onLoad !== undefined ) {
 
 				scope.onLoad();
