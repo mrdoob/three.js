@@ -22,6 +22,8 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 		itemsTotal ++;
 
+		scope.dispatchEvent( { type: 'start', url: url } );
+
 		if ( isLoading === false ) {
 
 			if ( scope.onStart !== undefined ) {
