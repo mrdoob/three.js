@@ -2,6 +2,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { EventDispatcher } from '../core/EventDispatcher'
+
 function LoadingManager( onLoad, onProgress, onError ) {
 
 	var scope = this;
@@ -89,7 +91,15 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 }
 
+LoadingManager.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+
+	constructor: LoadingManager
+
+} );
+
 var DefaultLoadingManager = new LoadingManager();
 
-
-export { DefaultLoadingManager, LoadingManager };
+export {
+	DefaultLoadingManager,
+	LoadingManager
+};
