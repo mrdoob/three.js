@@ -129,6 +129,7 @@ THREE.VRControls = function ( object, onError ) {
 				} else {
 
 					object.position.setY( object.position.y + this.userHeight );
+					standingMatrix.elements[ 13 ] = this.userHeight;
 
 				}
 
