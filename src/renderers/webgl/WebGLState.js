@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, DoubleSide, BackSide } from '../../constants.js';
+import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFace, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, DoubleSide, BackSide } from '../../constants.js';
 import { Vector4 } from '../../math/Vector4.js';
 
 function WebGLState( gl, extensions, utils ) {
@@ -384,7 +384,7 @@ function WebGLState( gl, extensions, utils ) {
 	depthBuffer.setFunc( LessEqualDepth );
 
 	setFlipSided( false );
-	setCullFace( CullFaceBack );
+	setCullFace( CullFace.Back );
 	enable( gl.CULL_FACE );
 
 	enable( gl.BLEND );
@@ -694,17 +694,17 @@ function WebGLState( gl, extensions, utils ) {
 
 	function setCullFace( cullFace ) {
 
-		if ( cullFace !== CullFaceNone ) {
+		if ( cullFace !== CullFace.None ) {
 
 			enable( gl.CULL_FACE );
 
 			if ( cullFace !== currentCullFace ) {
 
-				if ( cullFace === CullFaceBack ) {
+				if ( cullFace === CullFace.Back ) {
 
 					gl.cullFace( gl.BACK );
 
-				} else if ( cullFace === CullFaceFront ) {
+				} else if ( cullFace === CullFace.Front ) {
 
 					gl.cullFace( gl.FRONT );
 
