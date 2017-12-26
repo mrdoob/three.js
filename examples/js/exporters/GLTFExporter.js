@@ -798,13 +798,21 @@ THREE.GLTFExporter.prototype = {
 
 					var target = {};
 
+					var warned = false;
+
 					for ( var attributeName in geometry.morphAttributes ) {
 
 						// glTF 2.0 morph supports only POSITION/NORMAL/TANGENT.
-						//
-						// @TODO TANGENT support
+						// Three.js doesn't support TANGENT yet.
 
 						if ( attributeName !== 'position' && attributeName !== 'normal' ) {
+
+							if ( ! warned ) {
+
+								console.warn( 'GLTFExporter: Only POSITION and NORMAL morph are supported.' );
+								warned = true;
+
+							}
 
 							continue;
 
@@ -812,20 +820,18 @@ THREE.GLTFExporter.prototype = {
 
 						var attribute = geometry.morphAttributes[ attributeName ][ i ];
 
-						// Three.js morph attribute has absolute values
-						// while the one of glTF has relative values.
-						// So we convert here.
+						// Three.js morph attribute has absolute values while the one of glTF has relative values.
 						//
 						// glTF 2.0 Specification:
 						// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#morph-targets
 
 						var baseAttribute = geometry.attributes[ attributeName ];
 						// Clones attribute not to override
-						var attribute2 = attribute.clone();
+						var relativeAttribute = attribute.clone();
 
 						for ( var j = 0, jl = attribute.count; j < jl; j ++ ) {
 
-							attribute2.setXYZ(
+							relativeAttribute.setXYZ(
 								j,
 								attribute.getX( j ) - baseAttribute.getX( j ),
 								attribute.getY( j ) - baseAttribute.getY( j ),
@@ -834,7 +840,7 @@ THREE.GLTFExporter.prototype = {
 
 						}
 
-						target[ attributeName.toUpperCase() ] = processAccessor( attribute2, geometry );
+						target[ attributeName.toUpperCase() ] = processAccessor( relativeAttribute, geometry );
 
 					}
 
