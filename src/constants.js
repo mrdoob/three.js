@@ -1,9 +1,13 @@
 export var REVISION = '90dev';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
-export var CullFaceNone = 0;
-export var CullFaceBack = 1;
-export var CullFaceFront = 2;
-export var CullFaceFrontBack = 3;
+
+export var CullFace = Object.freeze( {
+	None: 0,
+	Back: 1,
+	Front: 2,
+	FrontBack: 3
+} );
+
 export var FrontFaceDirectionCW = 0;
 export var FrontFaceDirectionCCW = 1;
 export var BasicShadowMap = 0;
