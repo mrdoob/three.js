@@ -74,6 +74,74 @@ import { WebVRManager } from './renderers/webvr/WebVRManager.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
 
+//
+
+// [Itee] Todo: remove constant stuff below under r91
+
+// The basic export of constants is required for three.module.js continuity, but in such case the developer won't be able to be warn about the deprecation !
+// Due to the top level global state of these constants... That disable the ability to export any embedded warning. See below for the work around !
+export var CullFaceNone = 0;
+export var CullFaceBack = 1;
+export var CullFaceFront = 2;
+export var CullFaceFrontBack = 3;
+
+try {
+
+	// In case the global object THREE exist we override the default constants with getters to warn user
+	// The empty setter is required to avoid: TypeError: Cannot set property XXX of #<Object> which has only a getter
+	Object.defineProperties( THREE, {
+
+		'CullFaceNone': {
+			get: function () {
+
+				console.warn( "THREE.CullFaceNone is deprecated. Use THREE.CullFace.None instead." );
+				return 0;
+
+			},
+			set: function () {}
+		},
+		'CullFaceBack': {
+			get: function () {
+
+				console.warn( "THREE.CullFaceBack is deprecated. Use THREE.CullFace.Back instead." );
+				return 1;
+
+			},
+			set: function () {}
+		},
+		'CullFaceFront': {
+			get: function () {
+
+				console.warn( "THREE.CullFaceFront is deprecated. Use THREE.CullFace.Front instead." );
+				return 2;
+
+			},
+			set: function () {}
+		},
+		'CullFaceFrontBack': {
+			get: function () {
+
+				console.warn( "THREE.CullFaceFrontBack is deprecated. Use THREE.CullFace.FrontBack instead." );
+				return 3;
+
+			},
+			set: function () {}
+		}
+	} );
+
+} catch ( err ) {
+
+	// The work around will display all warning related to constants in case we are
+	// building Three with a different namespace or es6 module bundling
+	console.warn( "THREE.CullFaceNone is deprecated. Use THREE.CullFace.None instead." );
+	console.warn( "THREE.CullFaceBack is deprecated. Use THREE.CullFace.Back instead." );
+	console.warn( "THREE.CullFaceFront is deprecated. Use THREE.CullFace.Front instead." );
+	console.warn( "THREE.CullFaceFrontBack is deprecated. Use THREE.CullFace.FrontBack instead." );
+
+}
+
+//
+
 export { BoxGeometry as CubeGeometry };
 
 export function Face4( a, b, c, d, normal, color, materialIndex ) {
