@@ -112,13 +112,17 @@ Object.assign( PropertyBinding, {
 	 * @param  {string} name Node name to be sanitized.
 	 * @return {string}
 	 */
-	sanitizeNodeName: function ( name ) {
+	sanitizeNodeName: ( function () {
 
 		var reservedRe = new RegExp( '[' + RESERVED_CHARS_RE + ']', 'g' );
 
-		return name.replace( /\s/g, '_' ).replace( reservedRe, '' );
+		return function sanitizeNodeName ( name ) {
 
-	},
+			return name.replace( /\s/g, '_' ).replace( reservedRe, '' );
+
+		};
+
+	}() ),
 
 	parseTrackName: function () {
 
