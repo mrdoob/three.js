@@ -66,6 +66,8 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 	this.itemError = function ( url ) {
 
+		scope.dispatchEvent( { type: 'error', url: url } );
+
 		if ( scope.onError !== undefined ) {
 
 			scope.onError( url );
