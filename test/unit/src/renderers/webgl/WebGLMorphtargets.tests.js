@@ -9,17 +9,17 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module.todo( 'WebGLMorphtargets', () => {
+		QUnit.module( 'WebGLMorphtargets', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "update", ( assert ) => {
+			QUnit.todo( "update", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

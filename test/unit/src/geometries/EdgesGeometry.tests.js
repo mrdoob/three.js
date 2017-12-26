@@ -211,7 +211,7 @@ function initDebug() {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'EdgesGeometry', () => {
+	QUnit.module( 'EdgesGeometry', () => {
 
 		var vertList = [
 			new Vector3( 0, 0, 0 ),
@@ -222,14 +222,14 @@ export default QUnit.module( 'Geometries', () => {
 		];
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -69,18 +69,6 @@ Object.assign( Loader.prototype, {
 
 	crossOrigin: undefined,
 
-	extractUrlBase: function ( url ) {
-
-		var parts = url.split( '/' );
-
-		if ( parts.length === 1 ) return './';
-
-		parts.pop();
-
-		return parts.join( '/' ) + '/';
-
-	},
-
 	initMaterials: function ( materials, texturePath, crossOrigin ) {
 
 		var array = [];
@@ -350,6 +338,5 @@ Object.assign( Loader.prototype, {
 	} )()
 
 } );
-
 
 export { Loader };

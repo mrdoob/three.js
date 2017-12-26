@@ -42,6 +42,8 @@ Sidebar.Settings = function ( editor ) {
 
 	container.add( themeRow );
 
+	container.add( new Sidebar.Settings.Shortcuts( editor ) );
+
 	return container;
 
 };

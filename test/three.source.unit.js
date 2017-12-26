@@ -162,6 +162,7 @@ import './unit/src/loaders/FontLoader.tests';
 import './unit/src/loaders/ImageLoader.tests';
 import './unit/src/loaders/JSONLoader.tests';
 import './unit/src/loaders/Loader.tests';
+import './unit/src/loaders/LoaderUtils.tests';
 import './unit/src/loaders/LoadingManager.tests';
 import './unit/src/loaders/MaterialLoader.tests';
 import './unit/src/loaders/ObjectLoader.tests';

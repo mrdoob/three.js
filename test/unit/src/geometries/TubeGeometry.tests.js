@@ -8,30 +8,33 @@ import {
 	TubeBufferGeometry
 } from '../../../../src/geometries/TubeGeometry';
 
+import { LineCurve3 } from '../../../../src/extras/curves/LineCurve3'
+import { Vector3 } from '../../../../src/math/Vector3'
+
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'TubeGeometry', ( hooks ) => {
+	QUnit.module( 'TubeGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {};
+			var path = new LineCurve3( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ) );
 
 			geometries = [
-				new TubeGeometry()
+				new TubeGeometry( path )
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -46,28 +49,28 @@ export default QUnit.module( 'Geometries', () => {
 
 	} );
 
-	QUnit.module.todo( 'TubeBufferGeometry', ( hooks ) => {
+	QUnit.module( 'TubeBufferGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {};
+			var path = new LineCurve3( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ) );
 
 			geometries = [
-				new TubeBufferGeometry()
+				new TubeBufferGeometry( path )
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

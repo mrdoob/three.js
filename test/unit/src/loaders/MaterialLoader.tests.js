@@ -7,29 +7,29 @@ import { MaterialLoader } from '../../../../src/loaders/MaterialLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'MaterialLoader', () => {
+	QUnit.module( 'MaterialLoader', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "load", ( assert ) => {
+		QUnit.todo( "load", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setTextures", ( assert ) => {
+		QUnit.todo( "setTextures", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "parse", ( assert ) => {
+		QUnit.todo( "parse", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
