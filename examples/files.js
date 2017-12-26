@@ -173,7 +173,7 @@ var files = {
 		"webgl_materials_variations_physical",
 		"webgl_materials_variations_toon",
 		"webgl_materials_video",
-		"webgl_materials_video_camera",
+		"webgl_materials_video_webcam",
 		"webgl_materials_wireframe",
 		"webgl_mirror",
 		"webgl_mirror_nodes",
