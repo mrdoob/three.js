@@ -141,17 +141,14 @@ Object.assign( ObjectLoader.prototype, {
 		}
 
 		// fix #12601
-		// Wrap LoadingManager onLoad methods with ObjectLoader onLoad callback,
-		// allow proper callback call order
+		// Listen LoadingManager end event to allow proper onload callback call order
 		if ( onLoad !== undefined ) {
 
-			var loadingManagerOnLoad = scope.manager.onLoad;
-			scope.manager.onLoad = function warpedOnLoad() {
+			scope.manager.addEventListener('end', function  warpedOnLoad() {
 
 				onLoad( object );
-				loadingManagerOnLoad();
 
-			};
+			});
 
 		}
 
