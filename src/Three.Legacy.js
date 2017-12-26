@@ -1453,12 +1453,12 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 	cullFace: {
 		get: function () {
 
-			return this.renderReverseSided ? CullFaceFront : CullFaceBack;
+			return this.renderReverseSided ? CullFace.Front : CullFace.Back;
 
 		},
 		set: function ( cullFace ) {
 
-			var value = ( cullFace !== CullFaceBack );
+			var value = ( cullFace !== CullFace.Back );
 			console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. Set .shadowMap.renderReverseSided to " + value + "." );
 			this.renderReverseSided = value;
 
