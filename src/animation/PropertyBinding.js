@@ -143,7 +143,7 @@ Object.assign( PropertyBinding, {
 
 		var supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
-		return function ( trackName ) {
+		return function parseTrackName( trackName ) {
 
 			var matches = trackRe.exec( trackName );
 
