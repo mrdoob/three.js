@@ -204,29 +204,17 @@ Object.assign( PropertyBinding, {
 		// search into skeleton bones.
 		if ( root.skeleton ) {
 
-			var searchSkeleton = function ( skeleton ) {
+			var skeleton = root.skeleton;
 
-				for ( var i = 0; i < skeleton.bones.length; i ++ ) {
+			for ( var i = 0, il = skeleton.bones.length; i < il; i ++ ) {
 
-					var bone = skeleton.bones[ i ];
+				var bone = skeleton.bones[ i ];
 
-					if ( bone.name === nodeName ) {
+				if ( bone.name === nodeName ) {
 
-						return bone;
-
-					}
+					return bone;
 
 				}
-
-				return null;
-
-			};
-
-			var bone = searchSkeleton( root.skeleton );
-
-			if ( bone ) {
-
-				return bone;
 
 			}
 
