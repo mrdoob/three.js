@@ -904,6 +904,12 @@ THREE.GLTFExporter.prototype = {
 				var trackNode = THREE.PropertyBinding.findNode( root, trackBinding.nodeName );
 				var trackProperty = PATH_PROPERTIES[ trackBinding.propertyName ];
 
+				if ( trackBinding.objectName === 'bones' ) {
+
+					trackNode = THREE.PropertyBinding.findBone( trackNode, trackBinding.objectIndex );
+
+				}
+
 				if ( ! trackNode || ! trackProperty ) {
 
 					console.warn( 'THREE.GLTFExporter: Could not export animation track "%s".', track.name );
