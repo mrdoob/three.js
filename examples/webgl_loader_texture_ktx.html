@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js webgl - materials - compressed textures</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <style>
-        body {
-            margin: 0px;
-            background-color: #050505;
-            color: #fff;
-            overflow: hidden;
-        }
+	<title>three.js webgl - materials - compressed textures</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			margin: 0px;
+			background-color: #050505;
+			color: #fff;
+			overflow: hidden;
+		}
 
-        a { color: #e00 }
+		a { color: #e00 }
 
-        #info {
-            position: absolute;
-            top: 0px; width: 100%;
-            color: #ffffff;
-            padding: 5px;
-            font-family:Monospace;
-            font-size:13px;
-            text-align:center;
-            z-index:1000;
-        }
-    </style>
+		#info {
+			position: absolute;
+			top: 0px; width: 100%;
+			color: #ffffff;
+			padding: 5px;
+			font-family:Monospace;
+			font-size:13px;
+			text-align:center;
+			z-index:1000;
+		}
+	</style>
 </head>
 <body>
 
 <div id="info">
-    <a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed KTX textures -
-    <a href="http://opengameart.org/node/10505">Khronos Texture</a> is a lightweight file format for OpenGL
+	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed KTX textures -
+	<a href="http://opengameart.org/node/10505">Khronos Texture</a> is a lightweight file format for OpenGL
 </div>
 
 <script src="../build/three.js"></script>
@@ -41,19 +41,19 @@
 <script>
 
 	/*
-    This is how compressed textures are supposed to be used:
+	This is how compressed textures are supposed to be used:
 
-    best for desktop:
-    BC1(DXT1) - opaque textures
-    BC3(DXT5) - transparent textures with full alpha range
+	best for desktop:
+	BC1(DXT1) - opaque textures
+	BC3(DXT5) - transparent textures with full alpha range
 
-    best for iOS:
-    PVR2, PVR4 - opaque textures or alpha
+	best for iOS:
+	PVR2, PVR4 - opaque textures or alpha
 
-    best for Android:
-    ETC1 - opaque textures
-    ASTC_4x4, ASTC8x8 - transparent textures with full alpha range
-    */
+	best for Android:
+	ETC1 - opaque textures
+	ASTC_4x4, ASTC8x8 - transparent textures with full alpha range
+	*/
 
 	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
