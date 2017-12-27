@@ -273,15 +273,15 @@ var LuminanceAlphaFormat = 1025;
 var RGBEFormat = RGBAFormat;
 var DepthFormat = 1026;
 var DepthStencilFormat = 1027;
-var RGB_S3TC_DXT1_Format = 2001;
-var RGBA_S3TC_DXT1_Format = 2002;
-var RGBA_S3TC_DXT3_Format = 2003;
-var RGBA_S3TC_DXT5_Format = 2004;
-var RGB_PVRTC_4BPPV1_Format = 2100;
-var RGB_PVRTC_2BPPV1_Format = 2101;
-var RGBA_PVRTC_4BPPV1_Format = 2102;
-var RGBA_PVRTC_2BPPV1_Format = 2103;
-var RGB_ETC1_Format = 2151;
+var RGB_S3TC_DXT1_Format = 33776;
+var RGBA_S3TC_DXT1_Format = 33777;
+var RGBA_S3TC_DXT3_Format = 33778;
+var RGBA_S3TC_DXT5_Format = 33779;
+var RGB_PVRTC_4BPPV1_Format = 35840;
+var RGB_PVRTC_2BPPV1_Format = 35841;
+var RGBA_PVRTC_4BPPV1_Format = 35842;
+var RGBA_PVRTC_2BPPV1_Format = 35843;
+var RGB_ETC1_Format = 36196;
 var RGBA_ASTC_4x4_Format = 37808;
 var RGBA_ASTC_5x4_Format = 37809;
 var RGBA_ASTC_5x5_Format = 37810;
@@ -19831,7 +19831,8 @@ function WebGLState( gl, extensions, utils ) {
 
 			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
 			     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_etc1' ) ) {
+			     extensions.get( 'WEBGL_compressed_texture_etc1' ) ||
+			     extensions.get( 'WEBGL_compressed_texture_astc' ) ) {
 
 				var formats = gl.getParameter( gl.COMPRESSED_TEXTURE_FORMATS );
 
