@@ -1524,7 +1524,7 @@
 
 		bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections, sceneGraph );
 
-		addAnimations( FBXTree, connections, sceneGraph, modelMap );
+		addAnimations( FBXTree, connections, sceneGraph );
 
 		createAmbientLight( FBXTree, sceneGraph );
 
