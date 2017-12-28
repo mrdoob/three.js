@@ -8,6 +8,9 @@
  * @author tschw
  */
 
+// Characters [].:/ are reserved for track binding syntax.
+var RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
+
 function Composite( targetGroup, path, optionalParsedPath ) {
 
 	var parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
@@ -109,35 +112,47 @@ Object.assign( PropertyBinding, {
 	 * @param  {string} name Node name to be sanitized.
 	 * @return {string}
 	 */
-	sanitizeNodeName: function ( name ) {
+	sanitizeNodeName: ( function () {
 
-		return name.replace( /\s/g, '_' ).replace( /[^\w-]/g, '' );
+		var reservedRe = new RegExp( '[' + RESERVED_CHARS_RE + ']', 'g' );
 
-	},
+		return function sanitizeNodeName ( name ) {
+
+			return name.replace( /\s/g, '_' ).replace( reservedRe, '' );
+
+		};
+
+	}() ),
 
 	parseTrackName: function () {
 
+		// Attempts to allow node names from any language. ES5's `\w` regexp matches
+		// only latin characters, and the unicode \p{L} is not yet supported. So
+		// instead, we exclude reserved characters and match everything else.
+		var wordChar = '[^' + RESERVED_CHARS_RE + ']';
+		var wordCharOrDot = '[^' + RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
+
 		// Parent directories, delimited by '/' or ':'. Currently unused, but must
 		// be matched to parse the rest of the track name.
-		var directoryRe = /((?:[\w-]+[\/:])*)/;
+		var directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', wordChar );
 
 		// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
-		var nodeRe = /([\w-\.]+)?/;
+		var nodeRe = /(WCOD+)?/.source.replace( 'WCOD', wordCharOrDot );
 
-		// Object on target node, and accessor. Name may contain only word
+		// Object on target node, and accessor. May not contain reserved
 		// characters. Accessor may contain any character except closing bracket.
-		var objectRe = /(?:\.([\w-]+)(?:\[(.+)\])?)?/;
+		var objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', wordChar );
 
-		// Property and accessor. May contain only word characters. Accessor may
+		// Property and accessor. May not contain reserved characters. Accessor may
 		// contain any non-bracket characters.
-		var propertyRe = /\.([\w-]+)(?:\[(.+)\])?/;
+		var propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', wordChar );
 
 		var trackRe = new RegExp( ''
 			+ '^'
-			+ directoryRe.source
-			+ nodeRe.source
-			+ objectRe.source
-			+ propertyRe.source
+			+ directoryRe
+			+ nodeRe
+			+ objectRe
+			+ propertyRe
 			+ '$'
 		);
 
