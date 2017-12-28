@@ -29,8 +29,8 @@
 <body>
 
 <div id="info">
-	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed KTX textures -
-	<a href="http://opengameart.org/node/10505">Khronos Texture</a> is a lightweight file format for OpenGL
+	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed KTX textures<br />
+	<a href="https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/">Khronos Texture</a> is a lightweight file format for OpenGL
 </div>
 
 <script src="../build/three.js"></script>
@@ -70,11 +70,12 @@
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
 
-		var formats = {};
-		formats.pvrtc = renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' );
-		formats.s3tc = renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
-		formats.etc1 = renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
-		formats.astc = renderer.extensions.get( 'WEBGL_compressed_texture_astc' );
+		var formats = {
+			astc: renderer.extensions.get( 'WEBGL_compressed_texture_astc' ),
+			etc1: renderer.extensions.get( 'WEBGL_compressed_texture_etc1' ),
+			s3tc: renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' ),
+			pvrtc: renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
+		};
 
 		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 		camera.position.z = 1000;
