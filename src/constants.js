@@ -1,7 +1,7 @@
 export var REVISION = '90dev';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 
-export var CULLFACE = Object.freeze( {
+export var CullFace = Object.freeze( {
 	NONE: 0,
 	BACK: 1,
 	FRONT: 2,

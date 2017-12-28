@@ -10,10 +10,10 @@ export default QUnit.module( 'Constants', () => {
 	QUnit.test( "default values", ( assert ) => {
 
 		assert.propEqual( Constants.MOUSE, { LEFT: 0, MIDDLE: 1, RIGHT: 2 }, 'MOUSE equal { LEFT: 0, MIDDLE: 1, RIGHT: 2 }' );
-		assert.equal( Constants.CULLFACE.NONE, 0, 'CULLFACE.NONE equal 0' );
-		assert.equal( Constants.CULLFACE.BACK, 1, 'CULLFACE.BACK equal 1' );
-		assert.equal( Constants.CULLFACE.FRONT, 2, 'CULLFACE.FRONT is equal to 2' );
-		assert.equal( Constants.CULLFACE.FRONT_BACK, 3, 'CULLFACE.FRONT_BACK is equal to 3' );
+		assert.equal( Constants.CullFace.NONE, 0, 'CullFace.NONE equal 0' );
+		assert.equal( Constants.CullFace.BACK, 1, 'CullFace.BACK equal 1' );
+		assert.equal( Constants.CullFace.FRONT, 2, 'CullFace.FRONT is equal to 2' );
+		assert.equal( Constants.CullFace.FRONT_BACK, 3, 'CullFace.FRONT_BACK is equal to 3' );
 		assert.equal( Constants.FrontFaceDirectionCW, 0, 'FrontFaceDirectionCW is equal to 0' );
 		assert.equal( Constants.FrontFaceDirectionCCW, 1, 'FrontFaceDirectionCCW is equal to 1' );
 		assert.equal( Constants.BasicShadowMap, 0, 'BasicShadowMap is equal to 0' );
