@@ -1,11 +1,11 @@
 export var REVISION = '90dev';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 
-export var CullFace = Object.freeze( {
-	None: 0,
-	Back: 1,
-	Front: 2,
-	FrontBack: 3
+export var CULLFACE = Object.freeze( {
+	NONE: 0,
+	BACK: 1,
+	FRONT: 2,
+	FRONT_BACK: 3
 } );
 
 export var FrontFaceDirectionCW = 0;

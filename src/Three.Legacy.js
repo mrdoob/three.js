@@ -94,7 +94,7 @@ try {
 		'CullFaceNone': {
 			get: function () {
 
-				console.warn( "THREE.CullFaceNone is deprecated. Use THREE.CullFace.None instead." );
+				console.warn( "THREE.CullFaceNone is deprecated. Use THREE.CULLFACE.NONE instead." );
 				return 0;
 
 			},
@@ -103,7 +103,7 @@ try {
 		'CullFaceBack': {
 			get: function () {
 
-				console.warn( "THREE.CullFaceBack is deprecated. Use THREE.CullFace.Back instead." );
+				console.warn( "THREE.CullFaceBack is deprecated. Use THREE.CULLFACE.BACK instead." );
 				return 1;
 
 			},
@@ -112,7 +112,7 @@ try {
 		'CullFaceFront': {
 			get: function () {
 
-				console.warn( "THREE.CullFaceFront is deprecated. Use THREE.CullFace.Front instead." );
+				console.warn( "THREE.CullFaceFront is deprecated. Use THREE.CULLFACE.FRONT instead." );
 				return 2;
 
 			},
@@ -121,7 +121,7 @@ try {
 		'CullFaceFrontBack': {
 			get: function () {
 
-				console.warn( "THREE.CullFaceFrontBack is deprecated. Use THREE.CullFace.FrontBack instead." );
+				console.warn( "THREE.CullFaceFrontBack is deprecated. Use THREE.CULLFACE.FRONT_BACK instead." );
 				return 3;
 
 			},
@@ -133,10 +133,10 @@ try {
 
 	// The work around will display all warning related to constants in case we are
 	// building Three with a different namespace or es6 module bundling
-	console.warn( "THREE.CullFaceNone is deprecated. Use THREE.CullFace.None instead." );
-	console.warn( "THREE.CullFaceBack is deprecated. Use THREE.CullFace.Back instead." );
-	console.warn( "THREE.CullFaceFront is deprecated. Use THREE.CullFace.Front instead." );
-	console.warn( "THREE.CullFaceFrontBack is deprecated. Use THREE.CullFace.FrontBack instead." );
+	console.warn( "THREE.CullFaceNone is deprecated. Use THREE.CULLFACE.NONE instead." );
+	console.warn( "THREE.CullFaceBack is deprecated. Use THREE.CULLFACE.BACK instead." );
+	console.warn( "THREE.CullFaceFront is deprecated. Use THREE.CULLFACE.FRONT instead." );
+	console.warn( "THREE.CullFaceFrontBack is deprecated. Use THREE.CULLFACE.FRONT_BACK instead." );
 
 }
 
@@ -1453,12 +1453,12 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 	cullFace: {
 		get: function () {
 
-			return this.renderReverseSided ? CullFace.Front : CullFace.Back;
+			return this.renderReverseSided ? CULLFACE.FRONT : CULLFACE.BACK;
 
 		},
 		set: function ( cullFace ) {
 
-			var value = ( cullFace !== CullFace.Back );
+			var value = ( cullFace !== CULLFACE.BACK );
 			console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. Set .shadowMap.renderReverseSided to " + value + "." );
 			this.renderReverseSided = value;
 

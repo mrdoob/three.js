@@ -384,7 +384,7 @@ function WebGLState( gl, extensions, utils ) {
 	depthBuffer.setFunc( LessEqualDepth );
 
 	setFlipSided( false );
-	setCullFace( CullFace.Back );
+	setCullFace( CULLFACE.BACK );
 	enable( gl.CULL_FACE );
 
 	enable( gl.BLEND );
@@ -694,17 +694,17 @@ function WebGLState( gl, extensions, utils ) {
 
 	function setCullFace( cullFace ) {
 
-		if ( cullFace !== CullFace.None ) {
+		if ( cullFace !== CULLFACE.NONE ) {
 
 			enable( gl.CULL_FACE );
 
 			if ( cullFace !== currentCullFace ) {
 
-				if ( cullFace === CullFace.Back ) {
+				if ( cullFace === CULLFACE.BACK ) {
 
 					gl.cullFace( gl.BACK );
 
-				} else if ( cullFace === CullFace.Front ) {
+				} else if ( cullFace === CULLFACE.FRONT ) {
 
 					gl.cullFace( gl.FRONT );
 
