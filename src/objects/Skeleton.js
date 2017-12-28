@@ -154,7 +154,7 @@ Object.assign( Skeleton.prototype, {
 
 	},
 
-	findBoneByName: function ( name ) {
+	getBoneByName: function ( name ) {
 
 		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
 
@@ -168,7 +168,7 @@ Object.assign( Skeleton.prototype, {
 
 		}
 
-		return null;
+		return undefined;
 
 	}
 

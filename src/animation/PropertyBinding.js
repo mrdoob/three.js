@@ -219,9 +219,9 @@ Object.assign( PropertyBinding, {
 		// search into skeleton bones.
 		if ( root.skeleton ) {
 
-			var bone = root.skeleton.findBoneByName( nodeName );
+			var bone = root.skeleton.getBoneByName( nodeName );
 
-			if ( bone ) {
+			if ( bone !== undefined ) {
 
 				return bone;
 
