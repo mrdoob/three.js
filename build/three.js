@@ -27525,9 +27525,10 @@
 			//
 
 			var holeIndex = contour.length;
+
 			holes.forEach( removeDupEndPts );
 
-			for ( i = 0; i < holes.length; i ++ ) {
+			for ( var i = 0; i < holes.length; i ++ ) {
 
 				holeIndices.push( holeIndex );
 				holeIndex += holes[ i ].length;
@@ -37997,143 +37998,11 @@
 
 		generateShapes: function ( text, size, divisions ) {
 
-			function createPaths( text ) {
-
-				var chars = String( text ).split( '' );
-				var scale = size / data.resolution;
-				var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
-
-				var offsetX = 0, offsetY = 0;
-
-				var paths = [];
-
-				for ( var i = 0; i < chars.length; i ++ ) {
-
-					var char = chars[ i ];
-
-					if ( char === '\n' ) {
-
-						offsetX = 0;
-						offsetY -= line_height;
-
-					} else {
-
-						var ret = createPath( char, scale, offsetX, offsetY );
-						offsetX += ret.offsetX;
-						paths.push( ret.path );
-
-					}
-
-				}
-
-				return paths;
-
-			}
-
-			function createPath( c, scale, offsetX, offsetY ) {
-
-				var glyph = data.glyphs[ c ] || data.glyphs[ '?' ];
-
-				if ( ! glyph ) return;
-
-				var path = new ShapePath();
-
-				var pts = [];
-				var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
-
-				if ( glyph.o ) {
-
-					var outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
-
-					for ( var i = 0, l = outline.length; i < l; ) {
-
-						var action = outline[ i ++ ];
-
-						switch ( action ) {
-
-							case 'm': // moveTo
-
-								x = outline[ i ++ ] * scale + offsetX;
-								y = outline[ i ++ ] * scale + offsetY;
-
-								path.moveTo( x, y );
-
-								break;
-
-							case 'l': // lineTo
-
-								x = outline[ i ++ ] * scale + offsetX;
-								y = outline[ i ++ ] * scale + offsetY;
-
-								path.lineTo( x, y );
-
-								break;
-
-							case 'q': // quadraticCurveTo
-
-								cpx = outline[ i ++ ] * scale + offsetX;
-								cpy = outline[ i ++ ] * scale + offsetY;
-								cpx1 = outline[ i ++ ] * scale + offsetX;
-								cpy1 = outline[ i ++ ] * scale + offsetY;
-
-								path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
-
-								laste = pts[ pts.length - 1 ];
-
-								if ( laste ) {
-
-									cpx0 = laste.x;
-									cpy0 = laste.y;
-
-									
-
-								}
-
-								break;
-
-							case 'b': // bezierCurveTo
-
-								cpx = outline[ i ++ ] * scale + offsetX;
-								cpy = outline[ i ++ ] * scale + offsetY;
-								cpx1 = outline[ i ++ ] * scale + offsetX;
-								cpy1 = outline[ i ++ ] * scale + offsetY;
-								cpx2 = outline[ i ++ ] * scale + offsetX;
-								cpy2 = outline[ i ++ ] * scale + offsetY;
-
-								path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
-
-								laste = pts[ pts.length - 1 ];
-
-								if ( laste ) {
-
-									cpx0 = laste.x;
-									cpy0 = laste.y;
-
-									
-
-								}
-
-								break;
-
-						}
-
-					}
-
-				}
-
-				return { offsetX: glyph.ha * scale, path: path };
-
-			}
-
-			//
-
 			if ( size === undefined ) size = 100;
 			if ( divisions === undefined ) divisions = 4;
 
-			var data = this.data;
-
-			var paths = createPaths( text );
 			var shapes = [];
+			var paths = createPaths( text, size, divisions, this.data );
 
 			for ( var p = 0, pl = paths.length; p < pl; p ++ ) {
 
@@ -38146,6 +38015,134 @@
 		}
 
 	} );
+
+	function createPaths( text, size, divisions, data ) {
+
+		var chars = String( text ).split( '' );
+		var scale = size / data.resolution;
+		var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
+
+		var paths = [];
+
+		var offsetX = 0, offsetY = 0;
+
+		for ( var i = 0; i < chars.length; i ++ ) {
+
+			var char = chars[ i ];
+
+			if ( char === '\n' ) {
+
+				offsetX = 0;
+				offsetY -= line_height;
+
+			} else {
+
+				var ret = createPath( char, divisions, scale, offsetX, offsetY, data );
+				offsetX += ret.offsetX;
+				paths.push( ret.path );
+
+			}
+
+		}
+
+		return paths;
+
+	}
+
+	function createPath( char, divisions, scale, offsetX, offsetY, data ) {
+
+		var glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
+
+		if ( ! glyph ) return;
+
+		var path = new ShapePath();
+
+		var pts = [];
+		var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
+
+		if ( glyph.o ) {
+
+			var outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
+
+			for ( var i = 0, l = outline.length; i < l; ) {
+
+				var action = outline[ i ++ ];
+
+				switch ( action ) {
+
+					case 'm': // moveTo
+
+						x = outline[ i ++ ] * scale + offsetX;
+						y = outline[ i ++ ] * scale + offsetY;
+
+						path.moveTo( x, y );
+
+						break;
+
+					case 'l': // lineTo
+
+						x = outline[ i ++ ] * scale + offsetX;
+						y = outline[ i ++ ] * scale + offsetY;
+
+						path.lineTo( x, y );
+
+						break;
+
+					case 'q': // quadraticCurveTo
+
+						cpx = outline[ i ++ ] * scale + offsetX;
+						cpy = outline[ i ++ ] * scale + offsetY;
+						cpx1 = outline[ i ++ ] * scale + offsetX;
+						cpy1 = outline[ i ++ ] * scale + offsetY;
+
+						path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
+
+						laste = pts[ pts.length - 1 ];
+
+						if ( laste ) {
+
+							cpx0 = laste.x;
+							cpy0 = laste.y;
+
+							
+
+						}
+
+						break;
+
+					case 'b': // bezierCurveTo
+
+						cpx = outline[ i ++ ] * scale + offsetX;
+						cpy = outline[ i ++ ] * scale + offsetY;
+						cpx1 = outline[ i ++ ] * scale + offsetX;
+						cpy1 = outline[ i ++ ] * scale + offsetY;
+						cpx2 = outline[ i ++ ] * scale + offsetX;
+						cpy2 = outline[ i ++ ] * scale + offsetY;
+
+						path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
+
+						laste = pts[ pts.length - 1 ];
+
+						if ( laste ) {
+
+							cpx0 = laste.x;
+							cpy0 = laste.y;
+
+							
+
+						}
+
+						break;
+
+				}
+
+			}
+
+		}
+
+		return { offsetX: glyph.ha * scale, path: path };
+
+	}
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -39232,6 +39229,9 @@
 	 * @author tschw
 	 */
 
+	// Characters [].:/ are reserved for track binding syntax.
+	var RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
+
 	function Composite( targetGroup, path, optionalParsedPath ) {
 
 		var parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
@@ -39333,35 +39333,47 @@
 		 * @param  {string} name Node name to be sanitized.
 		 * @return {string}
 		 */
-		sanitizeNodeName: function ( name ) {
+		sanitizeNodeName: ( function () {
 
-			return name.replace( /\s/g, '_' ).replace( /[^\w-]/g, '' );
+			var reservedRe = new RegExp( '[' + RESERVED_CHARS_RE + ']', 'g' );
 
-		},
+			return function sanitizeNodeName ( name ) {
+
+				return name.replace( /\s/g, '_' ).replace( reservedRe, '' );
+
+			};
+
+		}() ),
 
 		parseTrackName: function () {
 
+			// Attempts to allow node names from any language. ES5's `\w` regexp matches
+			// only latin characters, and the unicode \p{L} is not yet supported. So
+			// instead, we exclude reserved characters and match everything else.
+			var wordChar = '[^' + RESERVED_CHARS_RE + ']';
+			var wordCharOrDot = '[^' + RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
+
 			// Parent directories, delimited by '/' or ':'. Currently unused, but must
 			// be matched to parse the rest of the track name.
-			var directoryRe = /((?:[\w-]+[\/:])*)/;
+			var directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', wordChar );
 
 			// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
-			var nodeRe = /([\w-\.]+)?/;
+			var nodeRe = /(WCOD+)?/.source.replace( 'WCOD', wordCharOrDot );
 
-			// Object on target node, and accessor. Name may contain only word
+			// Object on target node, and accessor. May not contain reserved
 			// characters. Accessor may contain any character except closing bracket.
-			var objectRe = /(?:\.([\w-]+)(?:\[(.+)\])?)?/;
+			var objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', wordChar );
 
-			// Property and accessor. May contain only word characters. Accessor may
+			// Property and accessor. May not contain reserved characters. Accessor may
 			// contain any non-bracket characters.
-			var propertyRe = /\.([\w-]+)(?:\[(.+)\])?/;
+			var propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', wordChar );
 
 			var trackRe = new RegExp( ''
 				+ '^'
-				+ directoryRe.source
-				+ nodeRe.source
-				+ objectRe.source
-				+ propertyRe.source
+				+ directoryRe
+				+ nodeRe
+				+ objectRe
+				+ propertyRe
 				+ '$'
 			);
 
