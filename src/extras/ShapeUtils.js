@@ -41,9 +41,10 @@ var ShapeUtils = {
 		//
 
 		var holeIndex = contour.length;
+
 		holes.forEach( removeDupEndPts );
 
-		for ( i = 0; i < holes.length; i ++ ) {
+		for ( var i = 0; i < holes.length; i ++ ) {
 
 			holeIndices.push( holeIndex );
 			holeIndex += holes[ i ].length;

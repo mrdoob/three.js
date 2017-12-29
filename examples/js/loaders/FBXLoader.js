@@ -1098,8 +1098,6 @@
 				}
 
 				polygonIndex ++;
-
-				endOfFace = false;
 				faceLength = 0;
 
 				// reset arrays for the next face
@@ -1524,7 +1522,7 @@
 
 		bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections, sceneGraph );
 
-		addAnimations( FBXTree, connections, sceneGraph, modelMap );
+		addAnimations( FBXTree, connections, sceneGraph );
 
 		createAmbientLight( FBXTree, sceneGraph );
 

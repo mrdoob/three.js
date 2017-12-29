@@ -396,7 +396,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processImage( map ) {
 
-			if ( cachedData.images[ map.uuid ] ) {
+			if ( cachedData.images[ map.uuid ] !== undefined ) {
 
 				return cachedData.images[ map.uuid ];
 
@@ -507,7 +507,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMaterial( material ) {
 
-			if ( cachedData.materials[ material.uuid ] ) {
+			if ( cachedData.materials[ material.uuid ] !== undefined ) {
 
 				return cachedData.materials[ material.uuid ];
 

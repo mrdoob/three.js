@@ -20,7 +20,7 @@ var _Math = {
 
 		}
 
-		return function () {
+		return function generateUUID() {
 
 			var d0 = Math.random() * 0xffffffff | 0;
 			var d1 = Math.random() * 0xffffffff | 0;
