@@ -116,7 +116,7 @@ Object.assign( PropertyBinding, {
 
 		var reservedRe = new RegExp( '[' + RESERVED_CHARS_RE + ']', 'g' );
 
-		return function sanitizeNodeName ( name ) {
+		return function sanitizeNodeName( name ) {
 
 			return name.replace( /\s/g, '_' ).replace( reservedRe, '' );
 
