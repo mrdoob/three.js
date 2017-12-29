@@ -266,28 +266,6 @@ Object.assign( PropertyBinding, {
 
 		return null;
 
-	},
-
-	findBone: function ( root, boneName ) {
-
-		var skeleton = root.skeleton;
-
-		if ( skeleton === undefined ) return null;
-
-		for ( var i = 0, il = skeleton.bones.length; i < il; i ++ ) {
-
-			var bone = skeleton.bones[ i ];
-
-			if ( bone.name === boneName ) {
-
-				return bone;
-
-			}
-
-		}
-
-		return null;
-
 	}
 
 } );
