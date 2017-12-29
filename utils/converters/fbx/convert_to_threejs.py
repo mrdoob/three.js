@@ -338,7 +338,6 @@ def generate_material_object(material):
         emissive  = getHex(material.Emissive.Get())
         opacity   = 1.0 - material.TransparencyFactor.Get()
         opacity   = 1.0 if opacity == 0 else opacity
-        opacity   = opacity
         transparent = False
         reflectivity = 1
 
@@ -363,7 +362,6 @@ def generate_material_object(material):
         specular  = getHex(material.Specular.Get())
         opacity   = 1.0 - material.TransparencyFactor.Get()
         opacity   = 1.0 if opacity == 0 else opacity
-        opacity   = opacity
         shininess = material.Shininess.Get()
         transparent = False
         reflectivity = 1
