@@ -396,7 +396,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processImage( map ) {
 
-			if ( cachedData.images[ map.uuid ] ) {
+			if ( cachedData.images[ map.uuid ] !== undefined ) {
 
 				return cachedData.images[ map.uuid ];
 
@@ -507,7 +507,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMaterial( material ) {
 
-			if ( cachedData.materials[ material.uuid ] ) {
+			if ( cachedData.materials[ material.uuid ] !== undefined ) {
 
 				return cachedData.materials[ material.uuid ];
 
@@ -903,6 +903,20 @@ THREE.GLTFExporter.prototype = {
 				var trackBinding = THREE.PropertyBinding.parseTrackName( track.name );
 				var trackNode = THREE.PropertyBinding.findNode( root, trackBinding.nodeName );
 				var trackProperty = PATH_PROPERTIES[ trackBinding.propertyName ];
+
+				if ( trackBinding.objectName === 'bones' ) {
+
+					if ( trackNode.isSkinnedMesh === true ) {
+
+						trackNode = trackNode.skeleton.getBoneByName( trackBinding.objectIndex );
+
+					} else {
+
+						trackNode = undefined;
+
+					}
+
+				}
 
 				if ( ! trackNode || ! trackProperty ) {
 
