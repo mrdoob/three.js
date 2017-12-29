@@ -904,9 +904,9 @@ THREE.GLTFExporter.prototype = {
 				var trackNode = THREE.PropertyBinding.findNode( root, trackBinding.nodeName );
 				var trackProperty = PATH_PROPERTIES[ trackBinding.propertyName ];
 
-				if ( trackBinding.objectName === 'bones' ) {
+				if ( trackBinding.objectName === 'bones' && trackNode.isSkinnedMesh === true ) {
 
-					trackNode = THREE.PropertyBinding.findBone( trackNode, trackBinding.objectIndex );
+					trackNode = trackNode.skeleton.getBoneByName( trackBinding.objectIndex );
 
 				}
 
