@@ -506,6 +506,11 @@ function WebGLRenderer( parameters ) {
 
 	this.dispose = function () {
 
+		transparentObjects = [];
+		transparentObjectsLastIndex = -1;
+		opaqueObjects = [];
+		opaqueObjectsLastIndex = -1;
+
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 

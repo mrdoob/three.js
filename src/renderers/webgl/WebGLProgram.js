@@ -540,9 +540,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	gl.linkProgram( program );
 
-	var programLog = gl.getProgramInfoLog( program );
-	var vertexLog = gl.getShaderInfoLog( glVertexShader );
-	var fragmentLog = gl.getShaderInfoLog( glFragmentShader );
+	var programLog = gl.getProgramInfoLog( program ).replace(/\0/g, '').trim();
+	var vertexLog = gl.getShaderInfoLog( glVertexShader ).replace(/\0/g, '').trim();
+	var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).replace(/\0/g, '').trim();
 
 	var runnable = true;
 	var haveDiagnostics = true;
