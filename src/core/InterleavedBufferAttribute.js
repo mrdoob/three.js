@@ -1,4 +1,3 @@
-import { BufferAttribute } from './BufferAttribute.js';
 import { _Math } from '../math/Math.js';
 
 /**
@@ -134,25 +133,6 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 		this.data.array[ index + 3 ] = w;
 
 		return this;
-
-	},
-
-	clone: function () {
-
-		var count = this.count;
-		var itemSize = this.itemSize;
-		var array = this.data.array.slice( 0, count * itemSize );
-
-		for ( var i = 0; i < count; ++ i ) {
-
-			array[ i ] = this.getX( i );
-			if ( itemSize >= 2 ) array[ i + 1 ] = this.getY( i );
-			if ( itemSize >= 3 ) array[ i + 2 ] = this.getZ( i );
-			if ( itemSize >= 4 ) array[ i + 3 ] = this.getW( i );
-
-		}
-
-		return new BufferAttribute( array, itemSize, this.normalized );
 
 	}
 
