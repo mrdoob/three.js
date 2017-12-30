@@ -305,7 +305,7 @@
 
 					for ( var j = 0; j < simpleShapes.length; j ++ ) {
 
-						simpleShape = simpleShapes[ j ];
+						var simpleShape = simpleShapes[ j ];
 						var shape3d = new THREE.ExtrudeBufferGeometry( simpleShape, {
 							amount: amount,
 							bevelEnabled: false
