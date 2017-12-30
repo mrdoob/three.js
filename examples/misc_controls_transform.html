@@ -27,6 +27,7 @@
 
 		<div id="info">
 		"W" translate | "E" rotate | "R" scale | "+" increase size | "-" decrease size<br />
+		<small>Toggle controls: "X", "Y", "Z", "Alt-X" (XY), "Alt-Y" (YZ), "Alt-Z" (XZ), "Alt-A" (XYZ), "G" (Gimbal), "Alt-G" (Gimbal)</small><br/>
 		Press "Q" to toggle world/local space, keep "Ctrl" down to snap to grid
 		</div>
 
@@ -111,6 +112,31 @@
 						case 189:
 						case 109: // -, _, num-
 							control.setSize( Math.max( control.size - 0.1, 0.1 ) );
+							break;
+											
+						case 65:
+						case 71:
+						case 88:
+						case 89:
+						case 90: // a, g, x, y, z
+							var gizmoType = control.getMode();
+
+							if ( event.altKey ) {
+
+								var gizmo = { 65: "XYZ", 71: "E", 88: "XY", 89: "YZ", 90: "XZ" }[event.keyCode];
+	
+							} else {
+
+								var gizmo = { 71:"XYZE", 88: "X", 89: "Y", 90: "Z" }[event.keyCode];
+
+							}
+
+							if ( gizmo ) {
+
+								control.setControl( gizmoType, gizmo, !control.getControl( gizmoType, gizmo ) );
+
+							}
+
 							break;
 
 					}
