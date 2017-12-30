@@ -745,6 +745,72 @@
 
 		};
 
+		this.setControlAll = function( gizmoType, value ) {
+
+			function setVisiblity( meshList, value ) {
+
+				for ( var mesh in meshList ) {
+
+					meshList[ mesh ].visible = value;
+
+				}
+
+			};
+
+			setVisiblity( _gizmo[ gizmoType ].handles.children, value );
+			setVisiblity( _gizmo[ gizmoType ].pickers.children, value );
+
+			this.update();
+			scope.dispatchEvent( changeEvent );
+
+		};
+
+		this.setControl = function( gizmoType, axes, value ) {
+
+			var axesArray = ( axes instanceof Array ) ? axes : [ axes ];
+
+			function setVisiblity( meshList, name, value ) {
+
+				for ( var mesh in meshList ) {
+
+					if (meshList[ mesh ].name === name) {
+
+						meshList[ mesh ].visible = value;
+
+					}
+
+				}
+
+			};
+
+			for ( var axis in axesArray) {
+
+				setVisiblity( _gizmo[ gizmoType ].handles.children, axesArray[ axis ], value );
+				setVisiblity( _gizmo[ gizmoType ].pickers.children, axesArray[ axis ], value );
+
+			}
+
+			this.update();
+			scope.dispatchEvent( changeEvent );
+
+		};
+
+		this.getControl = function( gizmoType, axis) {
+
+			var meshList = _gizmo[ gizmoType ].handles.children;
+
+			for ( var mesh in meshList ) {
+
+				if (meshList[ mesh ].name === axis) {
+
+					return meshList[ mesh ].visible;
+
+				}
+
+			}
+
+		};
+
 		this.setTranslationSnap = function ( translationSnap ) {
 
 			scope.translationSnap = translationSnap;
