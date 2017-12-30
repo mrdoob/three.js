@@ -60,7 +60,12 @@
 			var options;
 
 			var geometry = new THREE.BoxGeometry( 20, 20, 20 );
+			var OBJECT_COLOR = 0xffffff;
+			var OBJECT_COLOR_SELECTED = 0xff0000;
+			var OBJECT_COLOR_XOR = OBJECT_COLOR ^ OBJECT_COLOR_SELECTED;
+			
 			var transformControl;
+			var timeToLive = null;
 
 			var ARC_SEGMENTS = 200;
 			var splineMesh;
@@ -149,87 +154,58 @@
 				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
 
-				controls.addEventListener( 'start', function() {
-
-					cancelHideTransorm();
-
-				} );
-
-				controls.addEventListener( 'end', function() {
-
-					delayHideTransform();
-
-				} );
-
 				transformControl = new THREE.TransformControls( camera, renderer.domElement );
 				transformControl.addEventListener( 'change', render );
 				scene.add( transformControl );
-
-				// Hiding transform situation is a little in a mess :()
-				transformControl.addEventListener( 'change', function( e ) {
-
-					cancelHideTransorm();
-
-				} );
-
 				transformControl.addEventListener( 'mouseDown', function( e ) {
 
-					cancelHideTransorm();
+					setOldPositions();
 
 				} );
+				
+				transformControl.addEventListener( 'change', function( e ) {
 
-				transformControl.addEventListener( 'mouseUp', function( e ) {
-
-					delayHideTransform();
+					timeToLive = performance.now() + 2500;
 
 				} );
 
 				transformControl.addEventListener( 'objectChange', function( e ) {
 
+					if ( e.target.object.material.color.getHex() === OBJECT_COLOR ) {
+					
+						clearSelected();
+					
+					}
+					
+					adjustAllSelectedExcept( e.target.object, e.oldPosition, e.target.position);
 					updateSplineOutline();
 
 				} );
 
-				var dragcontrols = new THREE.DragControls( splineHelperObjects, camera, renderer.domElement ); //
+				var dragcontrols = new THREE.DragControls( splineHelperObjects, camera, renderer.domElement );
 				dragcontrols.enabled = false;
 				dragcontrols.addEventListener( 'hoveron', function ( event ) {
+				
+					if ( !event.pointer.ctrlKey ) {
+					
+						transformControl.attach( event.object );
 
-					transformControl.attach( event.object );
-					cancelHideTransorm();
-
+					}
+					
 				} );
 
-				dragcontrols.addEventListener( 'hoveroff', function ( event ) {
+				dragcontrols.addEventListener( 'dragstart', function ( event ) {
 
-					delayHideTransform();
+					if (event.pointer.ctrlKey) {
+					
+						if (event.pointer.buttons === 1) {
+						
+							event.object.material.color.setHex( event.object.material.color.getHex() ^ OBJECT_COLOR_XOR );
+						
+						}
+					}
 
 				} );
-
-				var hiding;
-
-				function delayHideTransform() {
-
-					cancelHideTransorm();
-					hideTransform();
-
-				}
-
-				function hideTransform() {
-
-					hiding = setTimeout( function() {
-
-						transformControl.detach( transformControl.object );
-
-					}, 2500 )
-
-				}
-
-				function cancelHideTransorm() {
-
-					if ( hiding ) clearTimeout( hiding );
-
-				}
-
 
 				/*******
 				 * Curves
@@ -303,7 +279,7 @@
 
 			function addSplineObject( position ) {
 
-				var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
+				var material = new THREE.MeshLambertMaterial( { color: OBJECT_COLOR } );
 				var object = new THREE.Mesh( geometry, material );
 
 				if ( position ) {
@@ -317,6 +293,9 @@
 					object.position.z = Math.random() * 800 - 400;
 
 				}
+				
+				object.oldPosition = new THREE.Vector3();
+				object.oldPosition.copy( object.position );
 
 				object.castShadow = true;
 				object.receiveShadow = true;
@@ -390,6 +369,40 @@
 
 			}
 
+			function clearSelected () {
+
+				for ( var i = 0; i < splinePointsLength; i ++ ) {
+
+					splineHelperObjects[ i ].material.color.setHex( OBJECT_COLOR );
+
+				}
+
+			}
+
+			function setOldPositions () {
+
+				for ( var i = 0; i < splinePointsLength; i ++ ) {
+
+						splineHelperObjects[ i ].oldPosition.copy( splineHelperObjects[ i ].position );
+
+				}
+
+			}
+
+			function adjustAllSelectedExcept( object, oldPosition, position) {
+
+				for ( var i = 0; i < splinePointsLength; i ++ ) {
+
+					if ( splineHelperObjects[ i ] !== object && splineHelperObjects[ i ].material.color.getHex() === OBJECT_COLOR_SELECTED ) {
+
+						splineHelperObjects[ i ].position.copy( splineHelperObjects[ i ].oldPosition ).add( position ).sub( oldPosition );
+
+					}
+
+				}
+
+			}
+
 			function load( new_positions ) {
 
 				while ( new_positions.length > positions.length ) {
@@ -419,6 +432,14 @@
 				requestAnimationFrame( animate );
 				render();
 				stats.update();
+
+				if ( timeToLive !== null && timeToLive < performance.now() ) {
+
+					transformControl.detach( transformControl.object );
+					timeToLive = null;
+
+				}
+
 				transformControl.update();
 
 			}
