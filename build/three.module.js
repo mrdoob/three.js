@@ -341,7 +341,7 @@ var _Math = {
 
 		}
 
-		return function () {
+		return function generateUUID() {
 
 			var d0 = Math.random() * 0xffffffff | 0;
 			var d1 = Math.random() * 0xffffffff | 0;
@@ -17311,13 +17311,11 @@ function WebGLLights() {
 
 				var uniforms = cache.get( light );
 
-				// (a) intensity controls irradiance of entire light
-				uniforms.color
-					.copy( color )
-					.multiplyScalar( intensity / ( light.width * light.height ) );
+				// (a) intensity is the total visible light emitted
+				//uniforms.color.copy( color ).multiplyScalar( intensity / ( light.width * light.height * Math.PI ) );
 
-				// (b) intensity controls the radiance per light area
-				// uniforms.color.copy( color ).multiplyScalar( intensity );
+				// (b) intensity is the brightness of the light
+				uniforms.color.copy( color ).multiplyScalar( intensity );
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 				uniforms.position.applyMatrix4( viewMatrix );
@@ -18044,9 +18042,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	gl.linkProgram( program );
 
-	var programLog = gl.getProgramInfoLog( program );
-	var vertexLog = gl.getShaderInfoLog( glVertexShader );
-	var fragmentLog = gl.getShaderInfoLog( glFragmentShader );
+	var programLog = gl.getProgramInfoLog( program ).trim();
+	var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
+	var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
 
 	var runnable = true;
 	var haveDiagnostics = true;
@@ -18487,7 +18485,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory ) {
 
-	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof window.WebGL2RenderingContext );
+	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 	var _videoTextures = {};
 
 	//
@@ -21196,7 +21194,9 @@ function WebGLUtils( gl, extensions ) {
 			extension = extensions.get( 'WEBGL_compressed_texture_astc' );
 
 			if ( extension !== null ) {
+
 				return p;
+
 			}
 
 		}
@@ -24406,6 +24406,24 @@ Object.assign( Skeleton.prototype, {
 	clone: function () {
 
 		return new Skeleton( this.bones, this.boneInverses );
+
+	},
+
+	getBoneByName: function ( name ) {
+
+		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
+
+			var bone = this.bones[ i ];
+
+			if ( bone.name === name ) {
+
+				return bone;
+
+			}
+
+		}
+
+		return undefined;
 
 	}
 
@@ -33794,21 +33812,11 @@ function RectAreaLight( color, intensity, width, height ) {
 
 	this.type = 'RectAreaLight';
 
-	this.position.set( 0, 1, 0 );
-	this.updateMatrix();
-
 	this.width = ( width !== undefined ) ? width : 10;
 	this.height = ( height !== undefined ) ? height : 10;
 
-	// TODO (abelnation): distance/decay
-
-	// TODO (abelnation): update method for RectAreaLight to update transform to lookat target
-
-	// TODO (abelnation): shadows
-
 }
 
-// TODO (abelnation): RectAreaLight update when light shape is changed
 RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	constructor: RectAreaLight,
@@ -36710,7 +36718,7 @@ Object.assign( JSONLoader.prototype, {
 
 		}
 
-		return function ( json, texturePath ) {
+		return function parse( json, texturePath ) {
 
 			if ( json.data !== undefined ) {
 
@@ -39331,7 +39339,7 @@ Object.assign( PropertyBinding, {
 
 		var reservedRe = new RegExp( '[' + RESERVED_CHARS_RE + ']', 'g' );
 
-		return function sanitizeNodeName ( name ) {
+		return function sanitizeNodeName( name ) {
 
 			return name.replace( /\s/g, '_' ).replace( reservedRe, '' );
 
@@ -39373,7 +39381,7 @@ Object.assign( PropertyBinding, {
 
 		var supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
-		return function ( trackName ) {
+		return function parseTrackName( trackName ) {
 
 			var matches = trackRe.exec( trackName );
 
@@ -39434,27 +39442,9 @@ Object.assign( PropertyBinding, {
 		// search into skeleton bones.
 		if ( root.skeleton ) {
 
-			var searchSkeleton = function ( skeleton ) {
+			var bone = root.skeleton.getBoneByName( nodeName );
 
-				for ( var i = 0; i < skeleton.bones.length; i ++ ) {
-
-					var bone = skeleton.bones[ i ];
-
-					if ( bone.name === nodeName ) {
-
-						return bone;
-
-					}
-
-				}
-
-				return null;
-
-			};
-
-			var bone = searchSkeleton( root.skeleton );
-
-			if ( bone ) {
+			if ( bone !== undefined ) {
 
 				return bone;
 
