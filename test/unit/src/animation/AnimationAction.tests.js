@@ -6,6 +6,7 @@
 import { AnimationAction } from '../../../../src/animation/AnimationAction';
 import { AnimationMixer } from '../../../../src/animation/AnimationMixer';
 import { AnimationClip } from '../../../../src/animation/AnimationClip';
+import { Object3D } from '../../../../src/core/Object3D';
 
 export default QUnit.module( 'Animation', () => {
 
@@ -23,21 +24,78 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "play", ( assert ) => {
+		QUnit.test( "play", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var mixer = new AnimationMixer( new Object3D() );
+			var clip = new AnimationClip( "nonname", - 1, [] );
+			var animationAction = new AnimationAction( mixer, clip );
+			var animationAction2 = animationAction.play();
+			assert.equal( animationAction, animationAction2, "AnimationAction.play can be chained." );
+
+			var UserException = function () {
+
+				this.message = "AnimationMixer must activate AnimationAction on play.";
+
+			};
+			mixer._activateAction = function ( action ) {
+
+				if ( action === animationAction ) {
+
+					throw new UserException();
+
+				}
+
+			};
+			assert.throws( () => {
+
+				animationAction.play();
+
+			}, new UserException() );
 
 		} );
 
-		QUnit.todo( "stop", ( assert ) => {
+		QUnit.test( "stop", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var mixer = new AnimationMixer( new Object3D() );
+			var clip = new AnimationClip( "nonname", - 1, [] );
+			var animationAction = new AnimationAction( mixer, clip );
+			var animationAction2 = animationAction.stop();
+			assert.equal( animationAction, animationAction2, "AnimationAction.stop can be chained." );
+
+			var UserException = function () {
+
+				this.message = "AnimationMixer must deactivate AnimationAction on stop.";
+
+			};
+			mixer._deactivateAction = function ( action ) {
+
+				if ( action === animationAction ) {
+
+					throw new UserException();
+
+				}
+
+			};
+			assert.throws( () => {
+
+				animationAction.stop();
+
+			}, new UserException() );
 
 		} );
 
-		QUnit.todo( "reset", ( assert ) => {
+		QUnit.test( "reset", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var mixer = new AnimationMixer( new Object3D() );
+			var clip = new AnimationClip( "nonname", - 1, [] );
+			var animationAction = new AnimationAction( mixer, clip );
+			var animationAction2 = animationAction.stop();
+			assert.equal( animationAction, animationAction2, "AnimationAction.reset can be chained." );
+			assert.equal( animationAction2.paused, false, "AnimationAction.reset() sets paused false" );
+			assert.equal( animationAction2.enabled, true, "AnimationAction.reset() sets enabled true" );
+			assert.equal( animationAction2.time, 0, "AnimationAction.reset() resets time." );
+			assert.equal( animationAction2._loopCount, - 1, "AnimationAction.reset() resets loopcount." );
+			assert.equal( animationAction2._startTime, null, "AnimationAction.reset() removes starttime." );
 
 		} );
 
