@@ -15,17 +15,20 @@
 				font-weight: lighter;
 			}
 
-			a {
-				color: gray;
-				font-weight: bold;
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display: block;
 			}
 
-			#info {
-				color: gray;
-				position: absolute;
-				bottom: 0px;
-				width: 100%;
-				padding: 15px;
+			#info a {
+				color: #f88;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer;
 			}
 
 			.dg.ac {
@@ -48,13 +51,12 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - pixel shader example<br/>
-			shader by <a href="http://wongbryan.github.io">wongbryan</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - pixel shader by <a href="http://wongbryan.github.io">wongbryan</a>
 		</div>
 
 		<script>
 
-			var camera, scene, renderer, gui, composer,controls;
+			var camera, scene, renderer, gui, composer, controls;
 			var pixelPass, params;
 
 			var group;
@@ -84,7 +86,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0xbfe7ff );
 				container.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -152,11 +153,11 @@
 				window.addEventListener( 'resize', resize );
 
 				params = {
-					pixelSize: 128,
+					pixelSize: 16,
 					postprocessing: true
 				};
 				gui = new dat.GUI();
-				gui.add( params, 'pixelSize' ).min( 2 ).max( 256 ).step( 2 );
+				gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
 				gui.add( params, 'postprocessing' );
 
 			}
