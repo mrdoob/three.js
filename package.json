@@ -34,7 +34,7 @@
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --port 8080\"",
     "start": "npm run dev",
     "lint": "eslint src",
-    "test": "npm run build-test && qunit test/unit/three.source.unit.js > report.txt",
+    "test": "npm run build-test && qunit test/unit/three.source.unit.js",
     "editor": "electron ./editor/main.js"
   },
   "keywords": [
