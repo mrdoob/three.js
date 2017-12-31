@@ -6,7 +6,21 @@
 import { AnimationAction } from '../../../../src/animation/AnimationAction';
 import { AnimationMixer } from '../../../../src/animation/AnimationMixer';
 import { AnimationClip } from '../../../../src/animation/AnimationClip';
+import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
 import { Object3D } from '../../../../src/core/Object3D';
+
+
+function createAnimation(){
+
+
+	var mixer = new AnimationMixer(new Object3D());
+	var track = new NumberKeyframeTrack( ".rotation[x]", [ 0, 1000 ], [ 0, 360 ] );
+	var clip = new AnimationClip( "clip1", 1000, [track] );
+
+	var animationAction = new AnimationAction( mixer, clip );
+	return { mixer :mixer,track:track,clip:clip,animationAction:animationAction};
+
+}
 
 export default QUnit.module( 'Animation', () => {
 
@@ -26,9 +40,7 @@ export default QUnit.module( 'Animation', () => {
 		// PUBLIC STUFF
 		QUnit.test( "play", ( assert ) => {
 
-			var mixer = new AnimationMixer( new Object3D() );
-			var clip = new AnimationClip( "nonname", - 1, [] );
-			var animationAction = new AnimationAction( mixer, clip );
+            var {mixer,animationAction} = createAnimation();
 			var animationAction2 = animationAction.play();
 			assert.equal( animationAction, animationAction2, "AnimationAction.play can be chained." );
 
@@ -56,9 +68,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( "stop", ( assert ) => {
 
-			var mixer = new AnimationMixer( new Object3D() );
-			var clip = new AnimationClip( "nonname", - 1, [] );
-			var animationAction = new AnimationAction( mixer, clip );
+            var {mixer,animationAction} = createAnimation();
 			var animationAction2 = animationAction.stop();
 			assert.equal( animationAction, animationAction2, "AnimationAction.stop can be chained." );
 
@@ -86,9 +96,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( "reset", ( assert ) => {
 
-			var mixer = new AnimationMixer( new Object3D() );
-			var clip = new AnimationClip( "nonname", - 1, [] );
-			var animationAction = new AnimationAction( mixer, clip );
+            var {mixer,animationAction} = createAnimation();
 			var animationAction2 = animationAction.stop();
 			assert.equal( animationAction, animationAction2, "AnimationAction.reset can be chained." );
 			assert.equal( animationAction2.paused, false, "AnimationAction.reset() sets paused false" );
@@ -99,9 +107,22 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( "isRunning", ( assert ) => {
+		QUnit.test( "isRunning", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+            var {mixer,animationAction} = createAnimation();
+			assert.notOk( animationAction.isRunning(), "When an animation is just made, it is not running." );
+            animationAction.play();
+			assert.ok( animationAction.isRunning(), "When an animation is started, it is running." );
+            animationAction.stop();
+			assert.notOk( animationAction.isRunning(), "When an animation is stopped, it is not running." );
+            animationAction.play();
+            animationAction.paused = true;
+			assert.notOk( animationAction.isRunning(), "When an animation is paused, it is not running." );
+            animationAction.paused = false;
+            animationAction.enabled = false;
+			assert.notOk( animationAction.isRunning(), "When an animation is not enabled, it is not running." );
+            animationAction.enabled = true;
+			assert.Ok( animationAction.isRunning(), "When an animation is enabled, it is running." );
 
 		} );
 
