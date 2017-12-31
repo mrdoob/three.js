@@ -1393,12 +1393,27 @@ THREE.ColladaLoader.prototype = {
 			function getTexture( textureObject ) {
 
 				var sampler = effect.profile.samplers[ textureObject.id ];
+				var image;
+
+				// get image
 
 				if ( sampler !== undefined ) {
 
 					var surface = effect.profile.surfaces[ sampler.source ];
+					image = getImage( surface.init_from );
 
-					var texture = textureLoader.load( getImage( surface.init_from ) );
+				} else {
+
+					console.warn( 'THREE.ColladaLoader: Undefined sampler. Access image directly (see #12530).' );
+					image = getImage( textureObject.id );
+
+				}
+
+				// create texture if image is avaiable
+
+				if ( image !== undefined ) {
+
+					var texture = textureLoader.load( image );
 
 					var extra = textureObject.extra;
 
@@ -1421,11 +1436,13 @@ THREE.ColladaLoader.prototype = {
 
 					return texture;
 
+				} else {
+
+					console.error( 'THREE.ColladaLoader: Unable to load texture with ID:', textureObject.id );
+
+					return null;
+
 				}
-
-				console.error( 'THREE.ColladaLoader: Undefined sampler', textureObject.id );
-
-				return null;
 
 			}
 
