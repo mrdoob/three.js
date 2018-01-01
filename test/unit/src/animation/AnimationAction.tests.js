@@ -41,7 +41,7 @@ export default QUnit.module( 'Animation', () => {
 		// PUBLIC STUFF
 		QUnit.test( "play", ( assert ) => {
 
-            var {mixer,animationAction} = createAnimation();
+			var {mixer,animationAction} = createAnimation();
 			var animationAction2 = animationAction.play();
 			assert.equal( animationAction, animationAction2, "AnimationAction.play can be chained." );
 
@@ -69,7 +69,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( "stop", ( assert ) => {
 
-            var {mixer,animationAction} = createAnimation();
+			var {mixer,animationAction} = createAnimation();
 			var animationAction2 = animationAction.stop();
 			assert.equal( animationAction, animationAction2, "AnimationAction.stop can be chained." );
 
@@ -97,7 +97,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( "reset", ( assert ) => {
 
-            var {mixer,animationAction} = createAnimation();
+			var {mixer,animationAction} = createAnimation();
 			var animationAction2 = animationAction.stop();
 			assert.equal( animationAction, animationAction2, "AnimationAction.reset can be chained." );
 			assert.equal( animationAction2.paused, false, "AnimationAction.reset() sets paused false" );
@@ -110,19 +110,19 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( "isRunning", ( assert ) => {
 
-            var {mixer,animationAction} = createAnimation();
+			var {mixer,animationAction} = createAnimation();
 			assert.notOk( animationAction.isRunning(), "When an animation is just made, it is not running." );
-            animationAction.play();
+			animationAction.play();
 			assert.ok( animationAction.isRunning(), "When an animation is started, it is running." );
-            animationAction.stop();
+			animationAction.stop();
 			assert.notOk( animationAction.isRunning(), "When an animation is stopped, it is not running." );
-            animationAction.play();
-            animationAction.paused = true;
+			animationAction.play();
+			animationAction.paused = true;
 			assert.notOk( animationAction.isRunning(), "When an animation is paused, it is not running." );
-            animationAction.paused = false;
-            animationAction.enabled = false;
+			animationAction.paused = false;
+			animationAction.enabled = false;
 			assert.notOk( animationAction.isRunning(), "When an animation is not enabled, it is not running." );
-            animationAction.enabled = true;
+			animationAction.enabled = true;
 			assert.ok( animationAction.isRunning(), "When an animation is enabled, it is running." );
 
 		} );
@@ -131,67 +131,67 @@ export default QUnit.module( 'Animation', () => {
 
 			var {mixer,animationAction} = createAnimation();
 			assert.notOk( animationAction.isScheduled(), "When an animation is just made, it is not scheduled." );
-            animationAction.play();
-            assert.ok( animationAction.isScheduled(), "When an animation is started, it is scheduled." );
-            mixer.update(1);
-            assert.ok( animationAction.isScheduled(), "When an animation is updated, it is scheduled." );
-            animationAction.stop();
-            assert.notOk( animationAction.isScheduled(), "When an animation is stopped, it isn't scheduled anymore." );
+			animationAction.play();
+			assert.ok( animationAction.isScheduled(), "When an animation is started, it is scheduled." );
+			mixer.update(1);
+			assert.ok( animationAction.isScheduled(), "When an animation is updated, it is scheduled." );
+			animationAction.stop();
+			assert.notOk( animationAction.isScheduled(), "When an animation is stopped, it isn't scheduled anymore." );
 
-           
+		   
 		} );
 
 		QUnit.test( "startAt", ( assert ) => {
 
 			var {mixer,animationAction} = createAnimation();
-            animationAction.startAt(2);
-            animationAction.play();
-            assert.notOk( animationAction.isRunning(), "When an animation is started at a specific time, it is not running." );
+			animationAction.startAt(2);
+			animationAction.play();
+			assert.notOk( animationAction.isRunning(), "When an animation is started at a specific time, it is not running." );
 			assert.ok( animationAction.isScheduled(), "When an animation is started at a specific time, it is scheduled." );
-            mixer.update(1);
-            assert.notOk( animationAction.isRunning(), "When an animation is started at a specific time and the interval is not passed, it is not running." );
+			mixer.update(1);
+			assert.notOk( animationAction.isRunning(), "When an animation is started at a specific time and the interval is not passed, it is not running." );
 			assert.ok( animationAction.isScheduled(), "When an animation is started at a specific time and the interval is not passed, it is scheduled." );
-            mixer.update(1);
-            assert.ok( animationAction.isRunning(), "When an animation is started at a specific time and the interval is passed, it is running." );
+			mixer.update(1);
+			assert.ok( animationAction.isRunning(), "When an animation is started at a specific time and the interval is passed, it is running." );
 			assert.ok( animationAction.isScheduled(), "When an animation is started at a specific time and the interval is passed, it is scheduled." );
-            animationAction.stop();
-            assert.notOk( animationAction.isRunning(), "When an animation is stopped, it is not running." );
+			animationAction.stop();
+			assert.notOk( animationAction.isRunning(), "When an animation is stopped, it is not running." );
 			assert.notOk( animationAction.isScheduled(), "When an animation is stopped, it is not scheduled." );
-            
+			
 
 		} );
 
 		QUnit.test( "setLoop LoopOnce", ( assert ) => {
 
 			var {mixer,animationAction} = createAnimation();
-            animationAction.setLoop(LoopOnce);
-            animationAction.play();
-            assert.ok( animationAction.isRunning(), "When an animation is started, it is running." );
+			animationAction.setLoop(LoopOnce);
+			animationAction.play();
+			assert.ok( animationAction.isRunning(), "When an animation is started, it is running." );
 			mixer.update(500);
-            assert.ok( animationAction.isRunning(), "When an animation is in the first loop, it is running." );
+			assert.ok( animationAction.isRunning(), "When an animation is in the first loop, it is running." );
 			mixer.update(500);
-            assert.notOk( animationAction.isRunning(), "When an animation is ended, it is not running." );
+			assert.notOk( animationAction.isRunning(), "When an animation is ended, it is not running." );
 			mixer.update(500);
-            assert.notOk( animationAction.isRunning(), "When an animation is ended, it is not running." );
+			assert.notOk( animationAction.isRunning(), "When an animation is ended, it is not running." );
 	
 		} );
 	
 		QUnit.test( "setLoop LoopRepeat", ( assert ) => {
 	
 			var {mixer,animationAction} = createAnimation();
-            animationAction.setLoop(LoopRepeat,3);
-            animationAction.play();
-            assert.ok( animationAction.isRunning(), "When an animation is started, it is running." );
+			animationAction.setLoop(LoopRepeat,3);
+			animationAction.play();
+			assert.ok( animationAction.isRunning(), "When an animation is started, it is running." );
 			mixer.update(500);
-            assert.ok( animationAction.isRunning(), "When an animation is in the first loop, it is running." );
+			assert.ok( animationAction.isRunning(), "When an animation is in the first loop, it is running." );
 			mixer.update(1000);
-            assert.ok( animationAction.isRunning(), "When an animation is in second loop when in looprepeat 3 times, it is running." );
+			assert.ok( animationAction.isRunning(), "When an animation is in second loop when in looprepeat 3 times, it is running." );
 			mixer.update(1000);
-            assert.ok( animationAction.isRunning(), "When an animation is in third loop when in looprepeat 3 times, it is running." );
+			assert.ok( animationAction.isRunning(), "When an animation is in third loop when in looprepeat 3 times, it is running." );
 			mixer.update(1000);
-            assert.notOk( animationAction.isRunning(), "When an animation ended his third loop when in looprepeat 3 times, it is not running anymore." );
+			assert.notOk( animationAction.isRunning(), "When an animation ended his third loop when in looprepeat 3 times, it is not running anymore." );
 			mixer.update(1000);
-            assert.notOk( animationAction.isRunning(), "When an animation ended his third loop when in looprepeat 3 times, it stays not running anymore." );
+			assert.notOk( animationAction.isRunning(), "When an animation ended his third loop when in looprepeat 3 times, it stays not running anymore." );
 			
 		} );
 
