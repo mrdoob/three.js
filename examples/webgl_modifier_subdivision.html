@@ -60,18 +60,18 @@
 			var geometriesParams = [
 
 				{ type: 'BoxGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] },
-				{ type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI*2 ] },
-				{ type: 'TorusKnotGeometry', args: [], scale:0.25, meshScale:4 },
-				{ type: 'SphereGeometry', args: [ 100, 3, 3 ], meshScale:2 },
-				{ type: 'IcosahedronGeometry', args: [ 100, 1 ], meshScale:2 },
+				{ type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI * 2 ] },
+				{ type: 'TorusKnotGeometry', args: [ 100, 30 ], scale: 0.25, meshScale: 4 },
+				{ type: 'SphereGeometry', args: [ 100, 3, 3 ], meshScale: 2 },
+				{ type: 'IcosahedronGeometry', args: [ 100, 1 ], meshScale: 2 },
 				{ type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} ,
-				{ type: 'OctahedronGeometry', args: [200, 0], meshScale:2 },
+				{ type: 'OctahedronGeometry', args: [200, 0], meshScale: 2 },
 				{ type: 'LatheGeometry', args: [ [
-					new THREE.Vector2(0,0),
-					new THREE.Vector2(50,50),
-					new THREE.Vector2(10,100),
-					new THREE.Vector2(50,150),
-					new THREE.Vector2(0,200) ] ]},
+					new THREE.Vector2( 0, 0 ),
+					new THREE.Vector2( 50, 50 ),
+					new THREE.Vector2( 10, 100 ),
+					new THREE.Vector2( 50, 150 ),
+					new THREE.Vector2( 0, 200 ) ] ]},
 				{ type: 'TextGeometry', args: ['&', {
 						size: 200,
 						height: 50,
