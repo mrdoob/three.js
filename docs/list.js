@@ -7,7 +7,7 @@ var list = {
 			"Import via modules": "manual/introduction/Import-via-modules",
 			"Browser support": "manual/introduction/Browser-support",
 			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
-			"How to run things locally": "manual/introduction/How-to-run-thing-locally",
+			"How to run things locally": "manual/introduction/How-to-run-things-locally",
 			"Drawing Lines": "manual/introduction/Drawing-lines",
 			"Creating Text": "manual/introduction/Creating-text",
 			"Migration Guide": "manual/introduction/Migration-guide",
