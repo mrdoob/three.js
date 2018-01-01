@@ -8,6 +8,7 @@ import { AnimationMixer } from '../../../../src/animation/AnimationMixer';
 import { AnimationClip } from '../../../../src/animation/AnimationClip';
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack';
 import { Object3D } from '../../../../src/core/Object3D';
+import { LoopOnce, LoopRepeat, LoopPingPong } from '../../../../src/constants';
 
 
 function createAnimation(){
@@ -160,10 +161,38 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( "setLoop", ( assert ) => {
+		QUnit.test( "setLoop LoopOnce", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
+			var {mixer,animationAction} = createAnimation();
+            animationAction.setLoop(LoopOnce);
+            animationAction.play();
+            assert.ok( animationAction.isRunning(), "When an animation is started, it is running." );
+			mixer.update(500);
+            assert.ok( animationAction.isRunning(), "When an animation is in the first loop, it is running." );
+			mixer.update(500);
+            assert.notOk( animationAction.isRunning(), "When an animation is ended, it is not running." );
+			mixer.update(500);
+            assert.notOk( animationAction.isRunning(), "When an animation is ended, it is not running." );
+	
+		} );
+	
+		QUnit.test( "setLoop LoopRepeat", ( assert ) => {
+	
+			var {mixer,animationAction} = createAnimation();
+            animationAction.setLoop(LoopRepeat,3);
+            animationAction.play();
+            assert.ok( animationAction.isRunning(), "When an animation is started, it is running." );
+			mixer.update(500);
+            assert.ok( animationAction.isRunning(), "When an animation is in the first loop, it is running." );
+			mixer.update(1000);
+            assert.ok( animationAction.isRunning(), "When an animation is in second loop when in looprepeat 3 times, it is running." );
+			mixer.update(1000);
+            assert.ok( animationAction.isRunning(), "When an animation is in third loop when in looprepeat 3 times, it is running." );
+			mixer.update(1000);
+            assert.notOk( animationAction.isRunning(), "When an animation ended his third loop when in looprepeat 3 times, it is not running anymore." );
+			mixer.update(1000);
+            assert.notOk( animationAction.isRunning(), "When an animation ended his third loop when in looprepeat 3 times, it stays not running anymore." );
+			
 		} );
 
 		QUnit.todo( "setEffectiveWeight", ( assert ) => {
