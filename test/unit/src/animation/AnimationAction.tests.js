@@ -122,19 +122,41 @@ export default QUnit.module( 'Animation', () => {
             animationAction.enabled = false;
 			assert.notOk( animationAction.isRunning(), "When an animation is not enabled, it is not running." );
             animationAction.enabled = true;
-			assert.Ok( animationAction.isRunning(), "When an animation is enabled, it is running." );
+			assert.ok( animationAction.isRunning(), "When an animation is enabled, it is running." );
 
 		} );
 
-		QUnit.todo( "isScheduled", ( assert ) => {
+		QUnit.test( "isScheduled", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var {mixer,animationAction} = createAnimation();
+			assert.notOk( animationAction.isScheduled(), "When an animation is just made, it is not scheduled." );
+            animationAction.play();
+            assert.ok( animationAction.isScheduled(), "When an animation is started, it is scheduled." );
+            mixer.update(1);
+            assert.ok( animationAction.isScheduled(), "When an animation is updated, it is scheduled." );
+            animationAction.stop();
+            assert.notOk( animationAction.isScheduled(), "When an animation is stopped, it isn't scheduled anymore." );
 
+           
 		} );
 
-		QUnit.todo( "startAt", ( assert ) => {
+		QUnit.test( "startAt", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var {mixer,animationAction} = createAnimation();
+            animationAction.startAt(2);
+            animationAction.play();
+            assert.notOk( animationAction.isRunning(), "When an animation is started at a specific time, it is not running." );
+			assert.ok( animationAction.isScheduled(), "When an animation is started at a specific time, it is scheduled." );
+            mixer.update(1);
+            assert.notOk( animationAction.isRunning(), "When an animation is started at a specific time and the interval is not passed, it is not running." );
+			assert.ok( animationAction.isScheduled(), "When an animation is started at a specific time and the interval is not passed, it is scheduled." );
+            mixer.update(1);
+            assert.ok( animationAction.isRunning(), "When an animation is started at a specific time and the interval is passed, it is running." );
+			assert.ok( animationAction.isScheduled(), "When an animation is started at a specific time and the interval is passed, it is scheduled." );
+            animationAction.stop();
+            assert.notOk( animationAction.isRunning(), "When an animation is stopped, it is not running." );
+			assert.notOk( animationAction.isScheduled(), "When an animation is stopped, it is not scheduled." );
+            
 
 		} );
 
