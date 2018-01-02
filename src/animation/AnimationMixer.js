@@ -617,6 +617,19 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
+	// reset all previously scheduled actions
+	resetAllAction: function () {
+
+		for ( var i = 0; i !== this._nActiveActions; ++ i ) {
+
+			this._actions[ i ].reset();
+
+		}
+
+		return this;
+
+	},
+
 	// advance the time and update apply the animation
 	update: function ( deltaTime ) {
 

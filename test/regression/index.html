@@ -1,0 +1,983 @@
+<!--
+
+/*
+** A test runner for webgl rendering test.
+**
+** These tests aim to catch webgl rendering regression early. Ideally we need to
+** run the tests every time before we submit a new PR for review. The tests
+** compare the rendering result of the new PR again an existing reference
+** rendering result. Usually we must make sure there is no unexpected mismatch
+** of rendering result before calling for a review. The reference rendering
+** result may be either stored in remote repo already, or generated locally.
+** Typically we generate local reference before making any new change. That will
+** be the baseline for the later changes. The rendering result is a set of
+** images taken as snapshots from webgl renderer canvas via the toDataURL API.
+** There are 2 comparers to decide whether images match. The 'Simple' comparer
+** strictly compare pixel by pixel. This is mostly used to compare against the
+** local reference result, as same case on a specific GPU and browser must
+** produce same images. The other one is the 'Fuzzy' comparer stolen from dEQP.
+** This one can be used to compare rendering result accross various GPUs and
+** browsers. But it's less sensitive to catch all potential regressions. The key
+** point for a testcase is always producing same images. That is to say we must
+** take snapshot on a fully loaded and fixed scene -- all resource loaded, same
+** animation time, same camera position, and same canvas size. With helper.js,
+** we can add a new testcase easily.
+**
+** How to run:
+**     1. Run 'npm run rendering-test'
+**     2. Visit 'localhost:8080/test/regression/' in browser
+**     3. Click the 'Baseline' button to generate reference images locally
+**     4. Make your changes to THREE.js, and run rendering-test again
+**     5. Click the 'Compare' button to compare with the baseline
+**     6. Review the diff images if any
+*/
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js / rendering tests </title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			height: 100%;
+		}
+
+		body {
+			background-color: #ffffff;
+			margin: 0px;
+			height: 100%;
+			color: #555;
+			font-family: 'inconsolata';
+			font-size: 15px;
+			line-height: 18px;
+			overflow: hidden;
+		}
+
+		h1 {
+			margin-top: 30px;
+			margin-bottom: 40px;
+			margin-left: 20px;
+			font-size: 25px;
+			font-weight: normal;
+		}
+
+		.folder {
+			margin-bottom: 1.5em;
+		}
+
+		.folderHeader {
+			white-space: nowrap;
+		}
+
+		#panel {
+			position: fixed;
+			left: 0px;
+			width: 310px;
+			height: 100%;
+			overflow: auto;
+			background: #fafafa;
+		}
+
+		#viewer {
+			position: absolute;
+			border: 0px;
+			left: 310px;
+			width: calc(100% - 310px);
+			height: 100%;
+			overflow: auto;
+		}
+
+		#buttonDiv {
+            position: fixed;
+            top: 40%;
+            z-index: 10;
+            overflow: auto;
+		}
+
+	</style>
+</head>
+
+<body>
+	<div id="panel">
+		<h1> Rendering Tests </h1>
+		<div id="buttonDiv">
+			<input type="button" value="Baseline" onclick="snapshot()">
+			<br/>
+			<br/>
+			<input type="button" value="Compare" onclick="compare()">
+		</div>
+		<div>
+			<ul id="testcases">
+			</ul>
+		</div>
+	</div>
+
+	<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
+
+	<script>
+
+		function loadScript( url, iframe, onload ) {
+
+			var scriptElement = iframe.contentDocument.createElement( 'script' );
+			scriptElement.src = url;
+			scriptElement.onload = onload;
+			scriptElement.onreadystatechange = onload;
+			iframe.contentDocument.body.appendChild( scriptElement );
+
+		}
+
+		function injectTestScript( url, iframe, onload ) {
+
+			loadScript( "../test/regression/helper.js", iframe, function () {
+
+				loadScript( url, iframe, onload );
+
+			} );
+
+		}
+
+
+		const TestSuccess = 0;
+		const TestFail = 1;
+
+		function TestCase( name, page, samples, comparer ) {
+
+			this.name = name;
+			this.page = page;
+			this.samples = samples;
+			this.comparer = comparer;
+			this.parent = null;
+
+		}
+
+		function TestGroup( name ) {
+
+			this.name = name;
+			this.children = [];
+			this.parent = null;
+
+		}
+		Object.assign( TestGroup.prototype, {
+			add: function ( child ) {
+
+				this.children.push( child );
+				child.parent = this;
+
+			},
+			remove: function ( child ) {
+
+				this.children.splice( this.children.indexOf( child ), 1 );
+				child.parent = null;
+
+			}
+		} );
+
+		function ImageComparer( threshold ) {
+
+			this.threshold = threshold;
+
+		}
+		Object.assign( ImageComparer.prototype, {
+			evaluate: function ( ref, cmp ) {
+
+				return null;
+
+			}
+		} );
+		ImageComparer.create = function ( config ) {
+
+			if ( config.name == "fuzzy" ) {
+
+				return new FuzzyImageComparer( config.threshold );
+
+			}
+			return new SimpleImageComparer( config.threshold );
+
+		};
+
+		function SimpleImageComparer( threshold ) {
+
+			ImageComparer.call( this, threshold );
+
+		}
+		SimpleImageComparer.prototype = Object.create( ImageComparer.prototype );
+		SimpleImageComparer.prototype.constructor = SimpleImageComparer;
+		SimpleImageComparer.prototype.evaluate = function ( ref, cmp ) {
+
+			var width = ref.width;
+			var height = ref.height;
+			var refData = ref.getContext( "2d" ).getImageData( 0, 0, width, height );
+			var cmpData = cmp.getContext( "2d" ).getImageData( 0, 0, width, height );
+			var diff = document.createElement( 'canvas' );
+			diff.width = width;
+			diff.height = height;
+			var ctx = diff.getContext( "2d" );
+			var diffData = ctx.createImageData( width, height );
+			var ok = true;
+			for ( var y = 0; y < height; y += 1 ) {
+
+				for ( var x = 0; x < width; x += 1 ) {
+
+					var r = ( y * width + x ) * 4;
+					var g = r + 1;
+					var b = r + 2;
+					var a = r + 3;
+					if ( Math.abs( cmpData.data[ r ] - refData.data[ r ] ) > this.threshold
+						|| Math.abs( cmpData.data[ g ] - refData.data[ g ] ) > this.threshold
+						|| Math.abs( cmpData.data[ b ] - refData.data[ b ] ) > this.threshold
+						|| Math.abs( cmpData.data[ a ] - refData.data[ a ] ) > this.threshold ) {
+
+						diffData.data[ r ] = 255;
+						diffData.data[ g ] = 0;
+						diffData.data[ b ] = 0;
+						diffData.data[ a ] = 255;
+						ok = false;
+
+					}
+
+				}
+
+			}
+			if ( ok === true ) {
+
+				return null;
+
+			} else {
+
+				ctx.putImageData( diffData, 0, 0 );
+				return diff;
+
+			}
+
+		};
+
+		// From https://github.com/KhronosGroup/WebGL/blob/master/sdk/tests/deqp/framework/common/tcuFuzzyImageCompare.js
+		function FuzzyImageComparer( threshold ) {
+
+			ImageComparer.call( this, threshold );
+
+		}
+		FuzzyImageComparer.prototype = Object.create( ImageComparer.prototype );
+		FuzzyImageComparer.prototype.constructor = FuzzyImageComparer;
+		FuzzyImageComparer.prototype.evaluate = function ( ref, cmp ) {
+
+			var width = ref.width;
+			var height = ref.height;
+			var refData = ref.getContext( "2d" ).getImageData( 0, 0, width, height );
+			var cmpData = cmp.getContext( "2d" ).getImageData( 0, 0, width, height );
+			var seed = 667;
+			function genRandomFloat() {
+
+				var x = Math.sin( seed += 1 ) * 100000;
+				return x - Math.floor( x );
+
+			}
+			function clamp( value, min, max ) {
+
+				return Math.min( Math.max( value, min ), max );
+
+			}
+			function filterImage( imageData ) {
+
+				kernel = [ 0.1, 0.8, 0.1 ];
+				var sum = [];
+				var hFilteredData = new Uint8ClampedArray( width * height * 4 );
+				for ( var j = 0; j < height; j += 1 ) {
+
+					for ( var i = 0; i < width; i += 1 ) {
+
+						sum[ 0 ] = sum[ 1 ] = sum[ 2 ] = sum[ 3 ] = 0;
+						for ( var k = 0; k < kernel.length; k += 1 ) {
+
+							var pixel = ( j * width + clamp( i + k - 1, 0, width - 1 ) ) * 4;
+							for ( var c = 0; c < 4; c += 1 ) {
+
+								sum[ c ] += imageData[ pixel + c ] * kernel[ k ];
+
+							}
+
+						}
+						var dest = ( i * height + j ) * 4;
+						for ( var c = 0; c < 4; c += 1 ) {
+
+							hFilteredData[ dest + c ] = sum[ c ];
+
+						}
+
+					}
+
+				}
+				var vFilteredData = new Uint8ClampedArray( width * height * 4 );
+				for ( var j = 0; j < height; j += 1 ) {
+
+					for ( var i = 0; i < width; i += 1 ) {
+
+						sum[ 0 ] = sum[ 1 ] = sum[ 2 ] = sum[ 3 ] = 0;
+						for ( var k = 0; k < kernel.length; k += 1 ) {
+
+							var pixel = ( i * height + clamp( j + k - 1, 0, height - 1 ) ) * 4;
+							for ( var c = 0; c < 4; c += 1 ) {
+
+								sum[ c ] += hFilteredData[ pixel + c ] * kernel[ k ];
+
+							}
+
+						}
+						var dest = ( j * width + i ) * 4;
+						for ( var c = 0; c < 4; c += 1 ) {
+
+							vFilteredData[ dest + c ] = sum[ c ];
+
+						}
+
+					}
+
+				}
+				return vFilteredData;
+
+			}
+			function compareToNeighbor( refImage, cmpImage, x, y ) {
+
+				var minErrThreshold = 4;
+				var minErr = 100;
+				function compareColors( ref, i, j, cmp, ii, jj ) {
+
+					pRef = ( j * width + i ) * 4;
+					pCmp = ( jj * width + ii ) * 4;
+					var r = Math.max( Math.abs( ref[ pRef ] - cmp[ pCmp ] ) - minErrThreshold, 0 );
+					var g = Math.max( Math.abs( ref[ pRef + 1 ] - cmp[ pCmp + 1 ] ) - minErrThreshold, 0 );
+					var b = Math.max( Math.abs( ref[ pRef + 2 ] - cmp[ pCmp + 2 ] ) - minErrThreshold, 0 );
+					var a = Math.max( Math.abs( ref[ pRef + 3 ] - cmp[ pCmp + 3 ] ) - minErrThreshold, 0 );
+					var scale = 1.0 / ( 255 - minErrThreshold );
+					var sqSum = ( r * r + g * g + b * b + a * a ) * ( scale * scale );
+					return Math.sqrt( sqSum );
+
+				}
+				minErr = Math.min( minErr, compareColors( refImage, x, y, cmpImage, x, y ) );
+				if ( minErr == 0.0 )
+					return minErr;
+				// Area around (x, y)
+				var s_coords =
+					[
+						[ - 1, - 1 ],
+						[ 0, - 1 ],
+						[ 1, - 1 ],
+						[ - 1, 0 ],
+						[ 1, 0 ],
+						[ - 1, 1 ],
+						[ 0, 1 ],
+						[ 1, 1 ]
+					];
+				var dx;
+				var dy;
+				for ( var d = 0; d < s_coords.length; d += 1 ) {
+
+					dx = x + s_coords[ d ][ 0 ];
+					dy = y + s_coords[ d ][ 1 ];
+					if ( dx < 0 || dx >= width || dy < 0 || dy > height )
+						continue;
+					minErr = Math.min( minErr, compareColors( refImage, x, y, cmpImage, dx, dy ) );
+					if ( minErr == 0.0 )
+						return minErr;
+					minErr = Math.min( minErr, compareColors( cmpImage, x, y, refImage, dx, dy ) );
+					if ( minErr == 0.0 )
+						return minErr;
+
+				}
+
+				function bilinearSample( src, u, v ) {
+
+					var x0 = Math.floor( u - 0.5 );
+					var x1 = x0 + 1;
+					var y0 = Math.floor( v - 0.5 );
+					var y1 = y0 + 1;
+					var i0 = clamp( x0, 0, width - 1 );
+					var i1 = clamp( x1, 0, width - 1 );
+					var j0 = clamp( y0, 0, height - 1 );
+					var j1 = clamp( y1, 0, height - 1 );
+					var a = ( u - 0.5 ) - Math.floor( u - 0.5 );
+					var b = ( v - 0.5 ) - Math.floor( v - 0.5 );
+					var p00 = ( i0 + j0 * width ) * 4;
+					var p10 = ( i1 + j0 * width ) * 4;
+					var p01 = ( i0 + j1 * width ) * 4;
+					var p11 = ( i1 + j1 * width ) * 4;
+
+					// Interpolate.
+					var f = new Uint8ClampedArray( 4 );
+					for ( var c = 0; c < 4; c += 1 ) {
+
+						f[ c ] = src[ p00 + c ] * ( 1.0 - a ) * ( 1.0 - b ) +
+							( src[ p10 + c ] * a * ( 1.0 - b ) ) +
+							( src[ p01 + c ] * ( 1.0 - a ) * b ) +
+							( src[ p11 + c ] * a * b );
+
+					}
+					return f;
+
+				}
+				// Random bilinear-interpolated samples around (x, y)
+				for ( var s = 0; s < 32; s += 1 ) {
+
+					dx = x + genRandomFloat() * 2.0 - 0.5;
+					dy = y + genRandomFloat() * 2.0 - 0.5;
+					var sample = bilinearSample( cmpImage, dx, dy );
+					minErr = Math.min( minErr, compareColors( refImage, x, y, sample, 0, 0 ) );
+					if ( minErr == 0.0 )
+						return minErr;
+					sample = bilinearSample( refImage, dx, dy );
+					minErr = Math.min( minErr, compareColors( cmpImage, x, y, sample, 0, 0 ) );
+					if ( minErr == 0.0 )
+						return minErr;
+
+				}
+				return minErr;
+
+			}
+
+			var refFilteredView = filterImage( refData.data );
+			var cmpFilteredView = filterImage( cmpData.data );
+			var errExp = 4;
+			var maxSampleSkip = 8;
+			var numSamples = 0;
+			var errSum = 0.0;
+			var diff = document.createElement( 'canvas' );
+			diff.width = width;
+			diff.height = height;
+			var ctx = diff.getContext( "2d" );
+			var diffData = ctx.createImageData( width, height );
+
+			// Clear error mask to green.
+			for ( var pixel = 0; pixel < width * height * 4; pixel += 1 ) {
+
+				diffData.data[ pixel ] = 0;
+				diffData.data[ pixel + 1 ] = 255;
+				diffData.data[ pixel + 2 ] = 0;
+				diffData.data[ pixel + 3 ] = 255;
+
+			}
+
+			for ( var y = 1; y < height - 1; y += 1 ) {
+
+				for ( var x = 1; x < width - 1; x += Math.round( genRandomFloat() * maxSampleSkip ) ) {
+
+					var err = compareToNeighbor( refFilteredView, cmpFilteredView, x, y );
+					err = Math.pow( err, errExp );
+					errSum += err;
+					numSamples += 1;
+
+					// Build error image.
+					var red = err * 500.0;
+					var pixel = ( y * width + x ) * 4;
+					var luma = 0.2126 * cmpData.data[ pixel ] + 0.7152 * cmpData.data[ pixel + 1 ] + 0.0722 * cmpData.data[ pixel + 2 ];
+					var rF = 0.7 + 0.3 * luma;
+					diffData.data[ pixel ] = red * rF * 255;
+					diffData.data[ pixel + 1 ] = ( 1.0 - red ) * rF * 255;
+					diffData.data[ pixel + 2 ] = 0;
+					diffData.data[ pixel + 3 ] = 255;
+
+				}
+
+			}
+
+			// Scale error sum based on number of samples taken
+			errSum *= ( ( width - 2 ) * ( height - 2 ) ) / numSamples;
+
+			if ( errSum <= this.threshold ) {
+
+				return null;
+
+			} else {
+
+				ctx.putImageData( diffData, 0, 0 );
+				return diff;
+
+			}
+
+		};
+
+		function TestRunner( testcases, viewer ) {
+
+			this._viewer = viewer;
+			this._casesToRun = testcases;
+			this._count = 0;
+			this._renderFrameCallback = null;
+
+			this.caseIndex = - 1;
+			this.frame = - 1;
+
+			this.resultPage = null;
+			this.result = [];
+
+		}
+		Object.assign( TestRunner.prototype, {
+			currentCase: function () {
+
+				if ( this.caseIndex === - 1 ) {
+
+					console.log( "No current test case." );
+					return null;
+
+				}
+				return this._casesToRun[ this.caseIndex ];
+
+			},
+
+			currentRefFilename: function () {
+
+				return "images/ref/" + this.currentCase().page + "_" + this.frame + ".png";
+
+			},
+
+			testSceneReady: function ( callback ) {
+
+				this.frame = - 1;
+				this._count = this.currentCase().samples;
+				this._renderFrameCallback = callback;
+				this.iterateFrame();
+
+			},
+
+			testFrameReady: function ( renderer ) {
+			},
+
+			_iterateCase: function () {
+
+				this.caseIndex += 1;
+				if ( this.caseIndex < this._casesToRun.length ) {
+
+					this.willRunCase();
+					this._viewer.src = "../../examples/" + this.currentCase().page + ".html";
+					var scope = this;
+					this._viewer.onload = function () {
+
+						injectTestScript( "../test/regression/" + scope.currentCase().page + ".js", scope._viewer, null );
+
+					};
+
+				} else {
+
+					console.log( "Done with all the testcases " );
+					this._viewer.src = this.resultPage;
+					this._viewer.onload = null;
+
+				}
+
+			},
+
+			iterateFrame: function () {
+
+				this.frame += 1;
+				if ( this.frame < this._count ) {
+
+					this.willRenderFrame();
+					this._renderFrameCallback( this.frame, this._count );
+
+				} else {
+
+					console.log( "Done with all frames of the test case: " + this.currentCase().name );
+					this._iterateCase();
+
+				}
+
+			},
+
+			uploadFrame: function ( canvas, destFileName, onDone ) {
+
+				var dataURL = canvas.toDataURL( "image/png" );
+				var fd = new FormData();
+				fd.append( "filename", destFileName );
+				fd.append( "imagedata", dataURL );
+				var xhr = new XMLHttpRequest();
+				xhr.open( 'POST', 'uploadImage', true );
+				xhr.onload = function () {
+
+					onDone( true );
+
+				};
+				xhr.onerror = function () {
+
+					onDone( false );
+
+				};
+				xhr.send( fd );
+
+			},
+
+			notify: function ( caseNo, frameNo, code, message ) {
+
+				var event = { caseNo: caseNo, frameNo: frameNo, code: code, message: message };
+				if ( this.onEvent ) {
+
+					this.onEvent( event );
+
+				}
+				console.log( event );
+
+			},
+
+			run: function () {
+
+				this._iterateCase();
+
+			}
+		} );
+
+
+		function TestRunnerForRef( testcases, viewer ) {
+
+			TestRunner.call( this, testcases, viewer );
+			this.resultPage = "ref_result.html";
+
+		}
+		TestRunnerForRef.prototype = Object.create( TestRunner.prototype );
+		TestRunnerForRef.prototype.constructor = TestRunnerForRef;
+		TestRunnerForRef.prototype.willRenderFrame = function () {
+		};
+		TestRunnerForRef.prototype.willRunCase = function () {
+		};
+		TestRunnerForRef.prototype.testFrameReady = function ( renderer ) {
+
+			var scope = this;
+			var canvas = renderer.domElement;
+			var caseIndex = scope.caseIndex;
+			var frame = scope.frame;
+			scope.uploadFrame( canvas, scope.currentRefFilename(), function ( result ) {
+
+				if ( result ) {
+
+					scope.notify( caseIndex, frame, TestSuccess, "Reference Frame was genarated successfully." );
+
+				} else {
+
+					scope.notify( caseIndex, frame, TestFail, "Failed to generate frame for reference." );
+
+				}
+				scope.iterateFrame();
+
+			} );
+
+		};
+
+
+		function TestRunnerForCmp( testcases, viewer, comparer ) {
+
+			TestRunner.call( this, testcases, viewer );
+			this._refCanvas = document.createElement( 'canvas' );
+			this._cmpCanvas = document.createElement( 'canvas' );
+			this._refLoaded = false;
+			this._cmpLoaded = false;
+			this._hasRefFrame = false;
+			this._defaultComparer = comparer;
+			this._currentComparer = null;
+
+			this.resultPage = "cmp_result.html";
+
+		}
+		TestRunnerForCmp.prototype = Object.create( TestRunner.prototype );
+		TestRunnerForCmp.prototype.constructor = TestRunnerForCmp;
+		TestRunnerForCmp.prototype.willRenderFrame = function () {
+
+			var scope = this;
+			var caseIndex = scope.caseIndex;
+			var frame = scope.frame;
+			scope._hasRefFrame = false;
+			scope._refLoaded = false;
+			scope._cmpLoaded = false;
+			var refImage = new Image();
+			refImage.onload = function () {
+
+				scope._hasRefFrame = true;
+				scope._refCanvas.width = refImage.width;
+				scope._refCanvas.height = refImage.height;
+				scope._refCanvas.getContext( "2d" ).drawImage( refImage, 0, 0 );
+				refImage = null;
+				scope._refLoaded = true;
+				if ( scope._cmpLoaded === true ) {
+
+					scope._verify();
+
+				}
+
+			};
+			refImage.onerror = function () {
+
+				scope._hasRefFrame = false;
+				refImage = null;
+				scope._refLoaded = true;
+				if ( scope._cmpLoaded === true ) {
+
+					scope.notify( scope.caseIndex, scope.frame, TestFail, "No reference frame to compare." );
+					scope.iterateFrame();
+
+				}
+
+			};
+			refImage.src = scope.currentRefFilename();
+
+		};
+
+		TestRunnerForCmp.prototype.willRunCase = function () {
+
+			this._currentComparer = this._defaultComparer;
+			if ( this.currentCase().comparer ) {
+
+				this._currentComparer = ImageComparer.create( this.currentCase().comparer );
+
+			}
+
+		};
+
+		TestRunnerForCmp.prototype.testFrameReady = function ( renderer ) {
+
+			var scope = this;
+			var caseIndex = scope.caseIndex;
+			var frame = scope.frame;
+			var canvas = renderer.domElement;
+			scope._cmpCanvas.width = canvas.width;
+			scope._cmpCanvas.height = canvas.height;
+			var cmpImage = new Image();
+			cmpImage.onload = function () {
+
+				scope._cmpCanvas.getContext( "2d" ).drawImage( cmpImage, 0, 0 );
+				cmpImage = null;
+
+				scope._cmpLoaded = true;
+				if ( scope._refLoaded === true ) {
+
+					if ( scope._hasRefFrame === true ) {
+
+						scope._verify();
+
+					} else {
+
+						scope.notify( caseIndex, frame, TestFail, "No reference frame to compare." );
+						scope.iterateFrame();
+
+					}
+
+				}
+
+			};
+			cmpImage.src = canvas.toDataURL( 'image/png' );
+
+		};
+
+		TestRunnerForCmp.prototype.getCmpFrame = function () {
+
+			return "images/cmp/" + this.currentCase().page + "_" + this.frame + ".png";
+
+		};
+
+		TestRunnerForCmp.prototype.getDiffFrame = function () {
+
+			return "images/diff/" + this.currentCase().page + "_" + this.frame + ".png";
+
+		};
+
+		TestRunnerForCmp.prototype._verify = function () {
+
+			if ( this._cmpCanvas.width !== this._refCanvas.width || this._cmpCanvas.height != this._refCanvas.height ) {
+
+				this.notify( this.caseIndex, this.frame, TestFail, "Different dimensions." );
+				this.iterateFrame();
+				return;
+
+			}
+			var diffCanvas = this._currentComparer.evaluate( this._refCanvas, this._cmpCanvas );
+			if ( diffCanvas === null ) {
+
+				this.notify( this.caseIndex, this.frame, TestSuccess, "Okay." );
+				this.iterateFrame();
+
+			} else {
+
+				var scope = this;
+				scope.uploadFrame( scope._cmpCanvas, scope.getCmpFrame(), function ( cmpFrameUploaded ) {
+
+					if ( cmpFrameUploaded === true ) {
+
+						scope.uploadFrame( diffCanvas, scope.getDiffFrame(), function ( diffFrameUploaded ) {
+
+							if ( diffFrameUploaded === true ) {
+
+								scope.notify( scope.caseIndex, scope.frame, TestFail, "The frame didn't match and was saved for review." );
+
+							} else {
+
+								scope.notify( scope.caseIndex, scope.frame, TestFail, "Failed to save the diff frame." );
+
+							}
+							scope.iterateFrame();
+
+						} );
+
+					} else {
+
+						scope.notify( scope.caseIndex, scope.frame, TestFail, "Failed to save the cmp frame." );
+						scope.iterateFrame();
+
+					}
+
+				} );
+
+			}
+
+		};
+
+	</script>
+
+	<script src="config.js"></script>
+
+	<script>
+
+		function displayTestcases( parent, test ) {
+
+			var li = document.createElement( "li" );
+			li.classList.add( "folder" );
+			parent.appendChild( li );
+			var div = document.createElement( "div" );
+			div.classList.add( "folderHeader" );
+			li.appendChild( div );
+			var check = document.createElement( "input" );
+			check.type = "checkbox";
+			test.view = check;
+			check.test = test;
+			check.onclick = function () {
+
+				function doCheck( test, checked ) {
+
+					test.view.checked = checked;
+					for ( var child in test.children ) {
+
+						doCheck( test.children[ child ], checked );
+
+					}
+
+				}
+				doCheck( this.test, this.checked );
+
+			};
+			div.appendChild( check );
+			var span = document.createElement( "span" );
+			span.textContent = test.name;
+			div.appendChild( span );
+
+			if ( test.children !== undefined ) {
+
+				var ul = document.createElement( "ul" );
+				li.appendChild( ul );
+				for ( var child in test.children ) {
+
+					displayTestcases( ul, test.children[ child ] );
+
+				}
+
+			}
+
+		}
+
+		displayTestcases( document.getElementById( "testcases" ), testRoot );
+
+
+		function collectTestcases( node, tests ) {
+
+			if ( node.children ) {
+
+				for ( var child in node.children ) {
+
+					collectTestcases( node.children[ child ], tests );
+
+				}
+
+			} else {
+
+				if ( node.view && node.view.checked ) {
+
+					tests.push( node );
+
+				}
+
+			}
+
+		}
+
+
+		var testRunner;
+		function snapshot() {
+
+			var selectedCases = [];
+			collectTestcases( testRoot, selectedCases );
+			testRunner = new TestRunnerForRef( selectedCases, document.getElementById( "viewer" ) );
+			testRunner.onEvent = function ( event ) {
+
+				if ( event.caseNo >= this.result.length ) {
+
+					var frames = [];
+					for ( var i = 0; i < selectedCases[ event.caseNo ].samples; i += 1 ) {
+
+						frames.push( null );
+
+					}
+					this.result.push( {
+						name: selectedCases[ event.caseNo ].name,
+						frames: frames
+					} );
+
+				}
+				this.result[ event.caseNo ].frames[ event.frameNo ] = this.currentRefFilename();
+
+			};
+			testRunner.run();
+
+		}
+
+		var defaultComparer = ImageComparer.create( comparerConfig );
+		function compare() {
+
+			var selectedCases = [];
+			collectTestcases( testRoot, selectedCases );
+			testRunner = new TestRunnerForCmp( selectedCases, document.getElementById( "viewer" ), defaultComparer );
+			testRunner.onEvent = function ( event ) {
+
+				if ( event.caseNo >= this.result.length ) {
+
+					var frames = [];
+					for ( var i = 0; i < selectedCases[ event.caseNo ].samples; i += 1 ) {
+
+						frames.push( { ref: null, cmp: null, diff: null } );
+
+					}
+					this.result.push( {
+						name: selectedCases[ event.caseNo ].name,
+						failed: false,
+						frames: frames
+					} );
+
+				}
+				this.result[ event.caseNo ].frames[ event.frameNo ].ref = this.currentRefFilename();
+				if ( event.code === TestFail ) {
+
+					this.result[ event.caseNo ].failed = true;
+					this.result[ event.caseNo ].frames[ event.frameNo ].cmp = this.getCmpFrame();
+					this.result[ event.caseNo ].frames[ event.frameNo ].diff = this.getDiffFrame();
+
+				}
+
+			};
+
+			testRunner.run();
+
+		}
+
+	</script>
+
+</body>
+
+</html>

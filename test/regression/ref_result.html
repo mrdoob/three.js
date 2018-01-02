@@ -1,0 +1,100 @@
+<!--
+
+/*
+** A simple page to view the reference images.
+*/
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>three.js / test result </title>
+    <meta charset="utf-8">
+    <style>
+        #largeView {
+            position: fixed;
+            top: 120px;
+            right: 0px;
+            z-index: 10;
+            overflow: auto;
+            display: none
+        }
+    </style>
+</head>
+
+<body>
+    <div id="view"></div>
+    <div id="largeView" onmouseout="hideLargeView();">
+        <img id="largeImage">
+    </div>
+
+    <script>
+
+        function showLargeView( url ) {
+
+            return function ( event ) {
+
+                document.getElementById( "largeImage" ).src = url;
+                document.getElementById( "largeView" ).style.display = "block";
+
+            };
+
+        }
+
+        function hideLargeView() {
+
+            document.getElementById( "largeView" ).style.display = "none";
+
+        }
+
+        if ( window.parent.testRunner ) {
+
+            var result = window.parent.testRunner.result;
+            var view = document.getElementById( "view" );
+            for ( var caseNo in result ) {
+
+                var caseDiv = document.createElement( "div" );
+                view.appendChild( caseDiv );
+                var testcase = document.createElement( "span" );
+                testcase.textContent = result[ caseNo ].name;
+                caseDiv.appendChild( testcase );
+
+                var frameDiv = document.createElement( "div" );
+                caseDiv.appendChild( frameDiv );
+                var frameTable = document.createElement( "table" );
+                frameDiv.appendChild( frameTable );
+
+                var frameNoTr = document.createElement( "tr" );
+                frameTable.appendChild( frameNoTr );
+                for ( var frameNo in result[ caseNo ].frames ) {
+
+                    var frameNoTh = document.createElement( "th" );
+                    frameNoTr.appendChild( frameNoTh );
+                    var no = document.createTextNode( frameNo );
+                    frameNoTh.appendChild( no );
+
+                }
+                var frameImageTr = document.createElement( "tr" );
+                frameTable.appendChild( frameImageTr );
+                for ( var frameNo in result[ caseNo ].frames ) {
+
+                    var frameImageTd = document.createElement( "td" );
+                    frameImageTr.appendChild( frameImageTd );
+                    frameImageTd.onmouseover = showLargeView( result[ caseNo ].frames[ frameNo ] );
+                    var ref = document.createElement( "img" );
+                    frameImageTd.appendChild( ref );
+                    ref.width = 40;
+                    ref.height = 30;
+                    ref.src = result[ caseNo ].frames[ frameNo ];
+
+                }
+
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>
