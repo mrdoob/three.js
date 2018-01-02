@@ -96,14 +96,13 @@ Object.assign( AnimationObjectGroup.prototype, {
 			parsedPaths = this._parsedPaths,
 			bindings = this._bindings,
 			nBindings = bindings.length,
-		    	knownObject = undefined;
+			knownObject = undefined;
 
 		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
 
 			var object = arguments[ i ],
 				uuid = object.uuid,
 				index = indicesByUUID[ uuid ];
-				
 
 			if ( index === undefined ) {
 
