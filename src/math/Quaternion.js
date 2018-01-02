@@ -394,8 +394,16 @@ Object.assign( Quaternion.prototype, {
 	}(),
 
 	inverse: function () {
-
-		return this.conjugate().normalize();
+		
+		var lenSq = this.lengthSq();
+		
+		this.conjugate();
+		this._x /= lenSq;
+		this._y /= lenSq;
+		this._z /= lenSq;
+		this._w /= lenSq;
+		
+		return this;
 
 	},
 
