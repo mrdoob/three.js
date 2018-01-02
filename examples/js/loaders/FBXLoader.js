@@ -163,14 +163,11 @@
 
 	// Parse FBXTree.Objects.Video for embedded image data
 	// These images are connected to textures in FBXTree.Objects.Textures
-	// via FBXTree.Connections. Note that images can be duplicated here, in which case only one
-	// may have a .Content field - we'll check for this and duplicate the data in the imageMap
+	// via FBXTree.Connections.
 	function parseImages( FBXTree ) {
 
-		var imageMap = new Map();
-
-		var names = {};
-		var duplicates = [];
+		var images = {};
+		var blobs = {};
 
 		if ( 'Video' in FBXTree.Objects ) {
 
@@ -182,22 +179,21 @@
 
 				var id = parseInt( nodeID );
 
-				// check whether the file name is used by another videoNode
-				// and if so keep a record of both ids as a duplicate pair [ id1, id2 ]
-				if ( videoNode.FileName in names ) {
-
-					duplicates.push( [ id, names[ videoNode.FileName ] ] );
-
-				}
-
-				names[ videoNode.FileName ] = id;
+				images[ id ] = videoNode.Filename;
 
 				// raw image data is in videoNode.Content
-				if ( 'Content' in videoNode && videoNode.Content !== '' ) {
+				if ( 'Content' in videoNode ) {
 
-					var image = parseImage( videoNodes[ nodeID ] );
+					var arrayBufferContent = ( videoNode.Content instanceof ArrayBuffer ) && ( videoNode.Content.byteLength > 0 );
+					var base64Content = ( typeof videoNode.Content === 'string' ) && ( videoNode.Content !== '' );
 
-					imageMap.set( id, image );
+					if ( arrayBufferContent || base64Content ) {
+
+						var image = parseImage( videoNodes[ nodeID ] );
+
+						blobs[ videoNode.Filename ] = image;
+
+					}
 
 				}
 
@@ -205,28 +201,16 @@
 
 		}
 
+		for ( var id in images ) {
 
-		// check each duplicate pair - if only one is in the image map then
-		// create an entry for the other id containing the same image data
-		// Note: it seems to be possible for entries to have the same file name but different
-		// content, we won't overwrite these
-		duplicates.forEach( function ( duplicatePair ) {
+			var filename = images[ id ];
 
-			if ( imageMap.has( duplicatePair[ 0 ] ) && ! imageMap.has( duplicatePair[ 1 ] ) ) {
+			if ( blobs[ filename ] !== undefined ) images[ id ] = blobs[ filename ];
+			else images[ id ] = images[ id ].split( '\\' ).pop();
 
-				var image = imageMap.get( duplicatePair[ 0 ] );
-				imageMap.set( duplicatePair[ 1 ], image );
+		}
 
-			} else if ( imageMap.has( duplicatePair[ 1 ] ) && ! imageMap.has( duplicatePair[ 0 ] ) ) {
-
-				var image = imageMap.get( duplicatePair[ 1 ] );
-				imageMap.set( duplicatePair[ 0 ], image );
-
-			}
-
-		} );
-
-		return imageMap;
+		return images;
 
 	}
 
@@ -285,7 +269,7 @@
 	// Parse nodes in FBXTree.Objects.Texture
 	// These contain details such as UV scaling, cropping, rotation etc and are connected
 	// to images in FBXTree.Objects.Video
-	function parseTextures( FBXTree, loader, imageMap, connections ) {
+	function parseTextures( FBXTree, loader, images, connections ) {
 
 		var textureMap = new Map();
 
@@ -294,7 +278,7 @@
 			var textureNodes = FBXTree.Objects.Texture;
 			for ( var nodeID in textureNodes ) {
 
-				var texture = parseTexture( textureNodes[ nodeID ], loader, imageMap, connections );
+				var texture = parseTexture( textureNodes[ nodeID ], loader, images, connections );
 				textureMap.set( parseInt( nodeID ), texture );
 
 			}
@@ -306,9 +290,9 @@
 	}
 
 	// Parse individual node in FBXTree.Objects.Texture
-	function parseTexture( textureNode, loader, imageMap, connections ) {
+	function parseTexture( textureNode, loader, images, connections ) {
 
-		var texture = loadTexture( textureNode, loader, imageMap, connections );
+		var texture = loadTexture( textureNode, loader, images, connections );
 
 		texture.ID = textureNode.id;
 
@@ -340,40 +324,15 @@
 	}
 
 	// load a texture specified as a blob or data URI, or via an external URL using THREE.TextureLoader
-	function loadTexture( textureNode, loader, imageMap, connections ) {
+	function loadTexture( textureNode, loader, images, connections ) {
 
 		var fileName;
 
-		var filePath = textureNode.FileName;
-		var relativeFilePath = textureNode.RelativeFilename;
-
 		var children = connections.get( textureNode.id ).children;
 
-		if ( children !== undefined && children.length > 0 && imageMap.has( children[ 0 ].ID ) ) {
+		if ( children !== undefined && children.length > 0 && images[ children[ 0 ].ID ] !== undefined ) {
 
-			fileName = imageMap.get( children[ 0 ].ID );
-
-		}
-		// check that relative path is not an actually an absolute path and if so use it to load texture
-		else if ( relativeFilePath !== undefined && relativeFilePath[ 0 ] !== '/' && relativeFilePath.match( /^[a-zA-Z]:/ ) === null ) {
-
-			fileName = relativeFilePath;
-
-		}
-		// texture specified by absolute path
-		else {
-
-			var split = filePath.split( /[\\\/]/ );
-
-			if ( split.length > 0 ) {
-
-				fileName = split[ split.length - 1 ];
-
-			} else {
-
-				fileName = filePath;
-
-			}
+			fileName = images[ children[ 0 ].ID ];
 
 		}
 
@@ -2396,21 +2355,21 @@
 
 		var tracks = [];
 
-		if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
+		if ( rawTracks.T !== undefined ) {
 
 			var positionTrack = generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, rawTracks.initialPosition, 'position' );
 			if ( positionTrack !== undefined ) tracks.push( positionTrack );
 
 		}
 
-		if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
+		if ( rawTracks.R !== undefined ) {
 
 			var rotationTrack = generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, rawTracks.initialRotation, rawTracks.preRotations );
 			if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
 
 		}
 
-		if ( rawTracks.S !== undefined && Object.keys( rawTracks.S.curves ).length > 0 ) {
+		if ( rawTracks.S !== undefined ) {
 
 			var scaleTrack = generateVectorTrack( rawTracks.modelName, rawTracks.S.curves, rawTracks.initialScale, 'scale' );
 			if ( scaleTrack !== undefined ) tracks.push( scaleTrack );
