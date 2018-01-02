@@ -44,6 +44,9 @@
 
 			};
 
+			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } );
+			var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+			var smoothMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } )
 
 			// Cube
 
@@ -183,7 +186,6 @@
 				if ( cube !== undefined ) {
 
 					geometry.dispose();
-					material.dispose();
 					smooth.dispose();
 
 					scene.remove( group );
@@ -211,8 +213,6 @@
 
 				updateInfo();
 
-				var faceABCD = "abcd";
-
 				// var TypedArrayHelper = function (size, registers, register_type, array_type, unit_size, accessors)
 				var colors = new TypedArrayHelper( 0, 1, THREE.Color, Float32Array, 3, [ 'r', 'g', 'b' ] );
 
@@ -230,16 +230,13 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 				mesh = new THREE.Mesh( geometry, material );
 				group.add( mesh );
 
-				var meshmaterials = [
-					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } ),
-					new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } )
-				];
+				cube = new THREE.Mesh( smooth, smoothMaterial );
+				var wireframe = new THREE.Mesh( smooth, wireframeMaterial );
+				cube.add( wireframe );
 
-				cube = THREE.SceneUtils.createMultiMaterialObject( smooth, meshmaterials );
 				cube.scale.setScalar( params.meshScale ? params.meshScale : 1 );
 				scene.add( cube );
 
