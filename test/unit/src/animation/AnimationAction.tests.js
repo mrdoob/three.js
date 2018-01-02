@@ -13,13 +13,19 @@ import { LoopOnce, LoopRepeat, LoopPingPong } from '../../../../src/constants';
 
 function createAnimation(){
 
-
-	var mixer = new AnimationMixer(new Object3D());
+    var root = new Object3D();
+	var mixer = new AnimationMixer(root);
 	var track = new NumberKeyframeTrack( ".rotation[x]", [ 0, 1000 ], [ 0, 360 ] );
 	var clip = new AnimationClip( "clip1", 1000, [track] );
 
-	var animationAction = new AnimationAction( mixer, clip );
-	return { mixer :mixer,track:track,clip:clip,animationAction:animationAction};
+    var animationAction = mixer.clipAction( clip );
+    return {
+        root: root,
+        mixer: mixer,
+        track: track,
+        clip: clip,
+        animationAction: animationAction
+    };
 
 }
 
@@ -298,21 +304,27 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( "getMixer", ( assert ) => {
+		QUnit.test( "getMixer", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "getClip", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+            var { mixer, animationAction } = createAnimation();
+            var mixer2 = animationAction.getMixer();
+            assert.equal( mixer, mixer2, "mixer should be returned by getMixer." );
 
 		} );
 
-		QUnit.todo( "getRoot", ( assert ) => {
+        QUnit.test("getClip", (assert) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+            var { clip, animationAction } = createAnimation();
+            var clip2 = animationAction.getClip();
+            assert.equal( clip, clip2, "clip should be returned by getClip." );
+
+		} );
+
+		QUnit.test( "getRoot", ( assert ) => {
+
+            var { root, animationAction } = createAnimation();
+            var root2 = animationAction.getRoot();
+            assert.equal(root, root2, "root should be returned by getRoot." );
 
 		} );
 
