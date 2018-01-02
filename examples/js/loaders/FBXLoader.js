@@ -100,9 +100,7 @@
 			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
-
 			var images = parseImages( FBXTree );
-
 			var textures = parseTextures( FBXTree, new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ), images, connections );
 			var materials = parseMaterials( FBXTree, textures, connections );
 			var skeletons = parseDeformers( FBXTree, connections );
@@ -1519,7 +1517,6 @@
 
 		} );
 
-
 		bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections, sceneGraph );
 
 		addAnimations( FBXTree, connections, sceneGraph );
@@ -2368,6 +2365,7 @@
 
 		if ( rawClips === undefined ) return;
 
+
 		for ( var key in rawClips ) {
 
 			var rawClip = rawClips[ key ];
@@ -2398,21 +2396,21 @@
 
 		var tracks = [];
 
-		if ( rawTracks.T !== undefined ) {
+		if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
 
 			var positionTrack = generateVectorTrack( rawTracks.modelName, rawTracks.T.curves, rawTracks.initialPosition, 'position' );
 			if ( positionTrack !== undefined ) tracks.push( positionTrack );
 
 		}
 
-		if ( rawTracks.R !== undefined ) {
+		if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
 
 			var rotationTrack = generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, rawTracks.initialRotation, rawTracks.preRotations );
 			if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
 
 		}
 
-		if ( rawTracks.S !== undefined ) {
+		if ( rawTracks.S !== undefined && Object.keys( rawTracks.S.curves ).length > 0 ) {
 
 			var scaleTrack = generateVectorTrack( rawTracks.modelName, rawTracks.S.curves, rawTracks.initialScale, 'scale' );
 			if ( scaleTrack !== undefined ) tracks.push( scaleTrack );
