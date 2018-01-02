@@ -111,7 +111,7 @@
 
 				var loader = new THREE.EXRLoader();
 
-				var texture = loader.load( "textures/uncompressed.exr", function( texture, textureData ){
+				var texture = loader.load( "textures/piz_compressed.exr", function( texture, textureData ){
 					console.log( textureData.header ); // exr header
 
 					texture.minFilter = THREE.NearestFilter;
