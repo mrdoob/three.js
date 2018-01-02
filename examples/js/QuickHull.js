@@ -573,7 +573,7 @@
 
 							distance = this.faces[ j ].distanceToPoint( vertex.point );
 
-							if ( distance > maxDistance ) {
+							if ( distance >= maxDistance ) {
 
 								maxDistance = distance;
 								maxFace = this.faces[ j ];
