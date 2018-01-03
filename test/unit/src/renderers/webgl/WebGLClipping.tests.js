@@ -9,35 +9,35 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module.todo( 'WebGLClipping', () => {
+		QUnit.module( 'WebGLClipping', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "init", ( assert ) => {
+			QUnit.todo( "init", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "beginShadows", ( assert ) => {
+			QUnit.todo( "beginShadows", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "endShadows", ( assert ) => {
+			QUnit.todo( "endShadows", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "setState", ( assert ) => {
+			QUnit.todo( "setState", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

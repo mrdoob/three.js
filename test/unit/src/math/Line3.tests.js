@@ -19,7 +19,7 @@ import {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Line3', () => {
+	QUnit.module( 'Line3', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -79,19 +79,19 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getCenter", ( assert ) => {
+		QUnit.todo( "getCenter", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "delta", ( assert ) => {
+		QUnit.todo( "delta", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "distanceSq", ( assert ) => {
+		QUnit.todo( "distanceSq", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -186,7 +186,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "equals", ( assert ) => {
+		QUnit.todo( "equals", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

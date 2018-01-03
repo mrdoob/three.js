@@ -106,6 +106,7 @@
 		<script src="js/Sidebar.Scene.js"></script>
 		<script src="js/Sidebar.Project.js"></script>
 		<script src="js/Sidebar.Settings.js"></script>
+		<script src="js/Sidebar.Settings.Shortcuts.js"></script>
 		<script src="js/Sidebar.Properties.js"></script>
 		<script src="js/Sidebar.Object.js"></script>
 		<script src="js/Sidebar.Geometry.js"></script>
@@ -162,8 +163,6 @@
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-
-			const IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
 
 			Number.prototype.format = function (){
 				return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
@@ -287,67 +286,6 @@
 				if ( event.dataTransfer.files.length > 0 ) {
 
 					editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
-
-				}
-
-			}, false );
-
-			document.addEventListener( 'keydown', function ( event ) {
-
-				switch ( event.keyCode ) {
-
-					case 8: // backspace
-
-						event.preventDefault(); // prevent browser back
-
-					case 46: // delete
-
-						var object = editor.selected;
-
-						if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
-
-						var parent = object.parent;
-						if ( parent !== null ) editor.execute( new RemoveObjectCommand( object ) );
-
-						break;
-
-					case 90: // Register Ctrl-Z for Undo, Ctrl-Shift-Z for Redo
-
-						if ( IS_MAC ? event.metaKey : event.ctrlKey ) {
-
-							event.preventDefault(); // Prevent Safari from opening/closing tabs
-
-							if ( event.shiftKey ) {
-
-								editor.redo();
-
-							} else {
-
-								editor.undo();
-
-							}
-
-						}
-
-						break;
-
-					case 87: // Register W for translation transform mode
-
-						editor.signals.transformModeChanged.dispatch( 'translate' );
-
-						break;
-
-					case 69: // Register E for rotation transform mode
-
-						editor.signals.transformModeChanged.dispatch( 'rotate' );
-
-						break;
-
-					case 82: // Register R for scaling transform mode
-
-						editor.signals.transformModeChanged.dispatch( 'scale' );
-
-						break;
 
 				}
 

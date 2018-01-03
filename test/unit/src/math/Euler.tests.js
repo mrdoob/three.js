@@ -57,7 +57,7 @@ function quatEquals( a, b, tolerance ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Euler', () => {
+	QUnit.module( 'Euler', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -70,45 +70,45 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// STATIC STUFF
-		QUnit.test( "RotationOrders", ( assert ) => {
+		QUnit.todo( "RotationOrders", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "DefaultOrder", ( assert ) => {
+		QUnit.todo( "DefaultOrder", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PROPERTIES STUFF
-		QUnit.test( "x", ( assert ) => {
+		QUnit.todo( "x", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "y", ( assert ) => {
+		QUnit.todo( "y", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "z", ( assert ) => {
+		QUnit.todo( "z", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "order", ( assert ) => {
+		QUnit.todo( "order", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isEuler", ( assert ) => {
+		QUnit.todo( "isEuler", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -307,13 +307,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "onChange", ( assert ) => {
+		QUnit.todo( "onChange", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "onChangeCallback", ( assert ) => {
+		QUnit.todo( "onChangeCallback", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

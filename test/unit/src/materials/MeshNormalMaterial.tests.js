@@ -7,30 +7,30 @@ import { MeshNormalMaterial } from '../../../../src/materials/MeshNormalMaterial
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'MeshNormalMaterial', () => {
+	QUnit.module( 'MeshNormalMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMeshNormalMaterial", ( assert ) => {
+		QUnit.todo( "isMeshNormalMaterial", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

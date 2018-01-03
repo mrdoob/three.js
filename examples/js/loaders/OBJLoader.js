@@ -656,6 +656,7 @@ THREE.OBJLoader = ( function () {
 
 							var materialLine = new THREE.LineBasicMaterial();
 							materialLine.copy( material );
+							materialLine.lights = false; // TOFIX
 							material = materialLine;
 
 						}

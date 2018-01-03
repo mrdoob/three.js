@@ -9,23 +9,23 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module.todo( 'WebGLRenderLists', () => {
+		QUnit.module( 'WebGLRenderLists', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "get", ( assert ) => {
+			QUnit.todo( "get", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "dispose", ( assert ) => {
+			QUnit.todo( "dispose", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

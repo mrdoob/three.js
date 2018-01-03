@@ -11,7 +11,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module.todo( 'CatmullRomCurve3', () => {
+		QUnit.module( 'CatmullRomCurve3', () => {
 
 			/* eslint-disable */
 			var positions = [
@@ -24,27 +24,27 @@ export default QUnit.module( 'Extras', () => {
 			/* eslint-enable */
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {
+			QUnit.todo( "Extending", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "isCatmullRomCurve3", ( assert ) => {
+			QUnit.todo( "isCatmullRomCurve3", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getPoint", ( assert ) => {
+			QUnit.todo( "getPoint", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

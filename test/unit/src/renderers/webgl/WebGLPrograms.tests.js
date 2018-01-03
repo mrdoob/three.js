@@ -9,41 +9,41 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module.todo( 'WebGLPrograms', () => {
+		QUnit.module( 'WebGLPrograms', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "getParameters", ( assert ) => {
+			QUnit.todo( "getParameters", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getProgramCode", ( assert ) => {
+			QUnit.todo( "getProgramCode", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "acquireProgram", ( assert ) => {
+			QUnit.todo( "acquireProgram", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "releaseProgram", ( assert ) => {
+			QUnit.todo( "releaseProgram", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "programs", ( assert ) => {
+			QUnit.todo( "programs", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

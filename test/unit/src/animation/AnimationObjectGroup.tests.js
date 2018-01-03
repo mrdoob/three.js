@@ -10,7 +10,7 @@ import { PropertyBinding } from '../../../../src/animation/PropertyBinding';
 
 export default QUnit.module( "Animation", () => {
 
-	QUnit.module.todo( "AnimationObjectGroup", () => {
+	QUnit.module( "AnimationObjectGroup", () => {
 
 		var ObjectA = new Object3D(),
 			ObjectB = new Object3D(),
@@ -25,45 +25,32 @@ export default QUnit.module( "Animation", () => {
 			ParsedPathC = PropertyBinding.parseTrackName( PathC );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-
-		// PRIVATE STUFF
-		QUnit.test( "subscribe_", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} ); // Todo: Naming guys -_-'
-
-		QUnit.test( "unsubscribe_", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} ); // Todo: Naming guys -_-'
 
 		// PUBLIC STUFF
-		QUnit.test( "isAnimationObjectGroup", ( assert ) => {
+		QUnit.todo( "isAnimationObjectGroup", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "add", ( assert ) => {
+		QUnit.todo( "add", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "remove", ( assert ) => {
+		QUnit.todo( "remove", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "uncache", ( assert ) => {
+		QUnit.todo( "uncache", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -8,7 +8,7 @@ import { DirectionalLight } from '../../../../src/lights/DirectionalLight';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module.todo( 'DirectionalLight', ( hooks ) => {
+	QUnit.module( 'DirectionalLight', ( hooks ) => {
 
 		var lights = undefined;
 		hooks.beforeEach( function () {
@@ -27,27 +27,27 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isDirectionalLight", ( assert ) => {
+		QUnit.todo( "isDirectionalLight", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

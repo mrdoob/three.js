@@ -7,7 +7,7 @@ import { WireframeGeometry } from '../../../../src/geometries/WireframeGeometry'
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module.todo( 'WireframeGeometry', ( hooks ) => {
+	QUnit.module( 'WireframeGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -21,14 +21,14 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

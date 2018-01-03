@@ -7,17 +7,17 @@ import { AxesHelper } from '../../../../src/helpers/AxesHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'AxesHelper', () => {
+	QUnit.module( 'AxesHelper', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

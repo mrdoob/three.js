@@ -22,29 +22,29 @@
 			[example:webgl_morphtargets_human WebGL / morphtargets / human]<br />
 		</div>
 		<code>
-var loader = new THREE.FileLoader();
+		var loader = new THREE.FileLoader();
 
-//load a text file a output the result to the console
-loader.load(
-    // resource URL
-    'example.txt',
+		//load a text file a output the result to the console
+		loader.load(
+			// resource URL
+			'example.txt',
 
-    // Function when resource is loaded
-    function ( data ) {
-        // output the text to the console
-        console.log( data )
-    },
+			// onLoad callback
+			function ( data ) {
+				// output the text to the console
+				console.log( data )
+			},
 
-    // Function called when download progresses
-    function ( xhr ) {
-        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-    },
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
 
-    // Function called when download errors
-    function ( xhr ) {
-        console.error( 'An error happened' );
-    }
-);
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+		);
 		</code>
 
 		<h2>Constructor</h2>

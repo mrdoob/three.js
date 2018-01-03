@@ -160,9 +160,15 @@ function slerpTestSkeleton( doSlerp, maxError, assert ) {
 
 }
 
+function changeEulerOrder( euler, order ) {
+
+	return new Euler( euler.x, euler.y, euler.z, order );
+
+}
+
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Quaternion', () => {
+	QUnit.module( 'Quaternion', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -218,25 +224,25 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "x", ( assert ) => {
+		QUnit.todo( "x", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "y", ( assert ) => {
+		QUnit.todo( "y", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "z", ( assert ) => {
+		QUnit.todo( "z", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "w", ( assert ) => {
+		QUnit.todo( "w", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -259,7 +265,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -332,8 +338,8 @@ export default QUnit.module( 'Maths', () => {
 			// ensure euler conversion for Quaternion matches that of Matrix4
 			for ( var i = 0; i < orders.length; i ++ ) {
 
-				var q = new Quaternion().setFromEuler( eulerAngles, orders[ i ] );
-				var m = new Matrix4().makeRotationFromEuler( eulerAngles, orders[ i ] );
+				var q = new Quaternion().setFromEuler( changeEulerOrder( eulerAngles, orders[ i ] ) );
+				var m = new Matrix4().makeRotationFromEuler( changeEulerOrder( eulerAngles, orders[ i ] ) );
 				var q2 = new Quaternion().setFromRotationMatrix( m );
 
 				assert.ok( qSub( q, q2 ).length() < 0.001, "Passed!" );
@@ -420,7 +426,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "dot", ( assert ) => {
+		QUnit.todo( "dot", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -450,15 +456,15 @@ export default QUnit.module( 'Maths', () => {
 
 			var angles = [ new Euler( 1, 0, 0 ), new Euler( 0, 1, 0 ), new Euler( 0, 0, 1 ) ];
 
-			var q1 = new Quaternion().setFromEuler( angles[ 0 ], "XYZ" );
-			var q2 = new Quaternion().setFromEuler( angles[ 1 ], "XYZ" );
-			var q3 = new Quaternion().setFromEuler( angles[ 2 ], "XYZ" );
+			var q1 = new Quaternion().setFromEuler( changeEulerOrder( angles[ 0 ], "XYZ" ) );
+			var q2 = new Quaternion().setFromEuler( changeEulerOrder( angles[ 1 ], "XYZ" ) );
+			var q3 = new Quaternion().setFromEuler( changeEulerOrder( angles[ 2 ], "XYZ" ) );
 
 			var q = new Quaternion().multiplyQuaternions( q1, q2 ).multiply( q3 );
 
-			var m1 = new Matrix4().makeRotationFromEuler( angles[ 0 ], "XYZ" );
-			var m2 = new Matrix4().makeRotationFromEuler( angles[ 1 ], "XYZ" );
-			var m3 = new Matrix4().makeRotationFromEuler( angles[ 2 ], "XYZ" );
+			var m1 = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ 0 ], "XYZ" ) );
+			var m2 = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ 1 ], "XYZ" ) );
+			var m3 = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ 2 ], "XYZ" ) );
 
 			var m = new Matrix4().multiplyMatrices( m1, m2 ).multiply( m3 );
 
@@ -482,7 +488,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "slerp", ( assert ) => {
+		QUnit.todo( "slerp", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -508,7 +514,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "fromArray", ( assert ) => {
+		QUnit.todo( "fromArray", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -541,13 +547,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "onChange", ( assert ) => {
+		QUnit.todo( "onChange", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "onChangeCallback", ( assert ) => {
+		QUnit.todo( "onChangeCallback", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -563,8 +569,8 @@ export default QUnit.module( 'Maths', () => {
 
 				for ( var j = 0; j < angles.length; j ++ ) {
 
-					var q = new Quaternion().setFromEuler( angles[ j ], orders[ i ] );
-					var m = new Matrix4().makeRotationFromEuler( angles[ j ], orders[ i ] );
+					var q = new Quaternion().setFromEuler( changeEulerOrder( angles[ j ], orders[ i ] ) );
+					var m = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ j ], orders[ i ] ) );
 
 					var v0 = new Vector3( 1, 0, 0 );
 					var qv = v0.clone().applyQuaternion( q );

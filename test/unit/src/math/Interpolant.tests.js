@@ -8,7 +8,7 @@ import { Interpolant } from '../../../../src/math/Interpolant';
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Interpolant', () => {
+	QUnit.module( 'Interpolant', () => {
 
 		// Since this is an abstract base class, we have to make it concrete in order
 		// to QUnit.test its functionality...
@@ -68,32 +68,20 @@ export default QUnit.module( 'Maths', () => {
 		// Tests
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "evaluate", ( assert ) => {
+		QUnit.todo( "evaluate", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PRIVATE STUFF
-		QUnit.test( "DefaultSettings_", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "getSettings_", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
 		QUnit.test( "copySampleValue_", ( assert ) => {
 
 			var interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );

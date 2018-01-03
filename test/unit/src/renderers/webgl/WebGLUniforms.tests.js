@@ -9,35 +9,35 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'WebGL', () => {
 
-		QUnit.module.todo( 'WebGLUniforms', () => {
+		QUnit.module( 'WebGLUniforms', () => {
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "setValue", ( assert ) => {
+			QUnit.todo( "setValue", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "setOptional", ( assert ) => {
+			QUnit.todo( "setOptional", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "upload", ( assert ) => {
+			QUnit.todo( "upload", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "seqWithValue", ( assert ) => {
+			QUnit.todo( "seqWithValue", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

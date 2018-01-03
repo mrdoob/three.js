@@ -224,7 +224,7 @@
 	</head>
 	<body>
 
-		<div id="panel" class="collapsed">
+		<div id="panel">
 			<h1><a href="http://threejs.org">three.js</a> / examples</h1>
 			<a id="expandButton" href="#">
 				<span></span>
@@ -260,8 +260,8 @@
 
 		var expandButton = document.getElementById( 'expandButton' );
 		expandButton.addEventListener( 'click', function ( event ) {
-			panel.classList.toggle( 'collapsed' );
 			event.preventDefault();
+			panel.classList.toggle( 'collapsed' );
 		} );
 
 		// iOS iframe auto-resize workaround
@@ -346,7 +346,7 @@
 			window.location.hash = file;
 			viewer.focus();
 
-			panel.classList.toggle( 'collapsed' );
+			panel.classList.add( 'collapsed' );
 
 			selected = file;
 

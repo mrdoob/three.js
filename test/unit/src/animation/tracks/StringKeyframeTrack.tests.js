@@ -9,9 +9,9 @@ export default QUnit.module( 'Animation', () => {
 
 	QUnit.module( 'Tracks', () => {
 
-		QUnit.module.todo( 'StringKeyframeTrack', () => {
+		QUnit.module( 'StringKeyframeTrack', () => {
 
-			QUnit.test( 'write me !', ( assert ) => {
+			QUnit.todo( 'write me !', ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

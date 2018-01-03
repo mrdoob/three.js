@@ -32,26 +32,26 @@
 		loader.load(
 			// resource URL
 			'textures/skyboxsun25degtest.png',
-			// Function when resource is loaded
-			function ( image ) {
-				// do something with it
 
-				// like drawing a part of it on a canvas
+			// onLoad callback
+			function ( image ) {
+				// use the image, e.g. draw part of it on a canvas
 				var canvas = document.createElement( 'canvas' );
 				var context = canvas.getContext( '2d' );
 				context.drawImage( image, 100, 100 );
 			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
-				console.log( 'An error happened' );
+
+			// onProgress callback currently not supported
+			undefined,
+
+			// onError callback
+			function () {
+				console.error( 'An error happened.' );
 			}
 		);
 		</code>
 
+		Please note three.js r84 dropped support for ImageLoader progress events. For an ImageLoader that supports progress events, see [link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-275785639 this thread].
 
 		<h2>Constructor</h2>
 

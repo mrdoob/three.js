@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - WWOBJLoader2</title>
+		<title>three.js webgl - OBJLoader2 usage options</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -178,7 +178,7 @@
 							}
 						);
 					};
-					objLoader.loadMtl( 'obj/female02/female02.mtl', 'female02.mtl', null, onLoadMtl );
+					objLoader.loadMtl( 'obj/female02/female02.mtl', null, onLoadMtl );
 				};
 
 
@@ -231,9 +231,10 @@
 					var onLoadMtl = function ( materials ) {
 						objLoader.setModelName( modelName );
 						objLoader.setMaterials( materials );
+						objLoader.setUseIndices( true );
 						objLoader.load( 'obj/male02/male02.obj', callbackOnLoad, null, null, null, false );
 					};
-					objLoader.loadMtl( 'obj/male02/male02.mtl', 'female02.mtl', null, onLoadMtl );
+					objLoader.loadMtl( 'obj/male02/male02.mtl', null, onLoadMtl );
 				};
 
 				WWOBJLoader2Example.prototype.useLoadAsync = function () {
@@ -243,6 +244,8 @@
 					var scope = this;
 					var objLoader = new THREE.OBJLoader2();
 					var callbackOnLoad = function ( event ) {
+						objLoader.workerSupport.setTerminateRequested( true );
+
 						var local = new THREE.Object3D();
 						local.name = 'Pivot_WaltHead';
 						local.position.set( -125, 50, 0 );
@@ -257,9 +260,10 @@
 					var onLoadMtl = function ( materials ) {
 						objLoader.setModelName( modelName );
 						objLoader.setMaterials( materials );
+						objLoader.terminateWorkerOnLoad = false;
 						objLoader.load( 'obj/walt/WaltHead.obj', callbackOnLoad, null, null, null, true );
 					};
-					objLoader.loadMtl( 'obj/walt//WaltHead.mtl', 'WaltHead.mtl', null, onLoadMtl );
+					objLoader.loadMtl( 'obj/walt/WaltHead.mtl', null, onLoadMtl );
 				};
 
 				WWOBJLoader2Example.prototype.useRunSync = function () {

@@ -10,7 +10,7 @@ import { eps } from './Constants.tests';
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Cylindrical', () => {
+	QUnit.module( 'Cylindrical', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {

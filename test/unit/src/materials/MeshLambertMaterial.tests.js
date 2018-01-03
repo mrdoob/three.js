@@ -7,30 +7,30 @@ import { MeshLambertMaterial } from '../../../../src/materials/MeshLambertMateri
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module.todo( 'MeshLambertMaterial', () => {
+	QUnit.module( 'MeshLambertMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMeshLambertMaterial", ( assert ) => {
+		QUnit.todo( "isMeshLambertMaterial", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

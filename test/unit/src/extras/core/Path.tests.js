@@ -9,78 +9,78 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Core', () => {
 
-		QUnit.module.todo( 'Path', () => {
+		QUnit.module( 'Path', () => {
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {
+			QUnit.todo( "Extending", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "fromPoints", ( assert ) => {
+			QUnit.todo( "fromPoints", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "moveTo", ( assert ) => {
+			QUnit.todo( "moveTo", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "lineTo", ( assert ) => {
+			QUnit.todo( "lineTo", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "quadraticCurveTo", ( assert ) => {
+			QUnit.todo( "quadraticCurveTo", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "bezierCurveTo", ( assert ) => {
+			QUnit.todo( "bezierCurveTo", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "splineThru", ( assert ) => {
+			QUnit.todo( "splineThru", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "arc", ( assert ) => {
+			QUnit.todo( "arc", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "absarc", ( assert ) => {
+			QUnit.todo( "absarc", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "ellipse", ( assert ) => {
+			QUnit.todo( "ellipse", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "absellipse", ( assert ) => {
+			QUnit.todo( "absellipse", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

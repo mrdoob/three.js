@@ -24,7 +24,7 @@ import {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Vector3', () => {
+	QUnit.module( 'Vector3', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -42,7 +42,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isVector3", ( assert ) => {
+		QUnit.todo( "isVector3", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -62,43 +62,43 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setScalar", ( assert ) => {
+		QUnit.todo( "setScalar", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setX", ( assert ) => {
+		QUnit.todo( "setX", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setY", ( assert ) => {
+		QUnit.todo( "setY", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setZ", ( assert ) => {
+		QUnit.todo( "setZ", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setComponent", ( assert ) => {
+		QUnit.todo( "setComponent", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getComponent", ( assert ) => {
+		QUnit.todo( "getComponent", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.todo( "clone", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -139,13 +139,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "addScalar", ( assert ) => {
+		QUnit.todo( "addScalar", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "addVectors", ( assert ) => {
+		QUnit.todo( "addVectors", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -181,25 +181,25 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "subScalar", ( assert ) => {
+		QUnit.todo( "subScalar", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "subVectors", ( assert ) => {
+		QUnit.todo( "subVectors", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "multiply", ( assert ) => {
+		QUnit.todo( "multiply", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "multiplyScalar", ( assert ) => {
+		QUnit.todo( "multiplyScalar", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -306,13 +306,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "project", ( assert ) => {
+		QUnit.todo( "project", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "unproject", ( assert ) => {
+		QUnit.todo( "unproject", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -331,31 +331,31 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "divide", ( assert ) => {
+		QUnit.todo( "divide", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "divideScalar", ( assert ) => {
+		QUnit.todo( "divideScalar", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "min", ( assert ) => {
+		QUnit.todo( "min", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "max", ( assert ) => {
+		QUnit.todo( "max", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "clamp", ( assert ) => {
+		QUnit.todo( "clamp", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -373,31 +373,31 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "clampLength", ( assert ) => {
+		QUnit.todo( "clampLength", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "floor", ( assert ) => {
+		QUnit.todo( "floor", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "ceil", ( assert ) => {
+		QUnit.todo( "ceil", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "round", ( assert ) => {
+		QUnit.todo( "round", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "roundToZero", ( assert ) => {
+		QUnit.todo( "roundToZero", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -428,13 +428,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lengthSq", ( assert ) => {
+		QUnit.todo( "lengthSq", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "length", ( assert ) => {
+		QUnit.todo( "length", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -494,13 +494,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "lerp", ( assert ) => {
+		QUnit.todo( "lerp", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "lerpVectors", ( assert ) => {
+		QUnit.todo( "lerpVectors", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -609,19 +609,19 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "distanceTo", ( assert ) => {
+		QUnit.todo( "distanceTo", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "distanceToSquared", ( assert ) => {
+		QUnit.todo( "distanceToSquared", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "manhattanDistanceTo", ( assert ) => {
+		QUnit.todo( "manhattanDistanceTo", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

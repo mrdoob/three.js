@@ -12,10 +12,10 @@ import { Geometry } from '../../../../src/core/Geometry';
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'DirectGeometry', () => {
+	QUnit.module( 'DirectGeometry', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

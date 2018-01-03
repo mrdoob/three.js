@@ -48,7 +48,7 @@ function eulerEquals( a, b, tolerance ) {
 
 export default QUnit.module( 'Maths', () => {
 
-	QUnit.module.todo( 'Matrix4', () => {
+	QUnit.module( 'Matrix4', () => {
 
 		// INSTANCING
 		QUnit.test( "Instancing", ( assert ) => {
@@ -79,7 +79,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isMatrix4", ( assert ) => {
+		QUnit.todo( "isMatrix4", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -215,7 +215,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "extractRotation", ( assert ) => {
+		QUnit.todo( "extractRotation", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -284,13 +284,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiply", ( assert ) => {
+		QUnit.todo( "multiply", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "premultiply", ( assert ) => {
+		QUnit.todo( "premultiply", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -433,7 +433,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "setPosition", ( assert ) => {
+		QUnit.todo( "setPosition", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -500,7 +500,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "scale", ( assert ) => {
+		QUnit.todo( "scale", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -515,25 +515,25 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makeTranslation", ( assert ) => {
+		QUnit.todo( "makeTranslation", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "makeRotationX", ( assert ) => {
+		QUnit.todo( "makeRotationX", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "makeRotationY", ( assert ) => {
+		QUnit.todo( "makeRotationY", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "makeRotationZ", ( assert ) => {
+		QUnit.todo( "makeRotationZ", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -556,13 +556,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makeScale", ( assert ) => {
+		QUnit.todo( "makeScale", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "makeShear", ( assert ) => {
+		QUnit.todo( "makeShear", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -642,7 +642,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "makePerspective", ( assert ) => {
+		QUnit.todo( "makePerspective", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -676,7 +676,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "fromArray", ( assert ) => {
+		QUnit.todo( "fromArray", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

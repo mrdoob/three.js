@@ -9,42 +9,42 @@ import { Vector3 } from '../../../../src/math/Vector3';
 
 export default QUnit.module( 'Cameras', () => {
 
-	QUnit.module.todo( 'Camera', () => {
+	QUnit.module( 'Camera', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isCamera", ( assert ) => {
+		QUnit.todo( "isCamera", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getWorldDirection", ( assert ) => {
+		QUnit.todo( "getWorldDirection", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "updateMatrixWorld", ( assert ) => {
+		QUnit.todo( "updateMatrixWorld", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

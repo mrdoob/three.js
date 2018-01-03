@@ -8,7 +8,7 @@ import { HemisphereLight } from '../../../../src/lights/HemisphereLight';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module.todo( 'HemisphereLight', ( hooks ) => {
+	QUnit.module( 'HemisphereLight', ( hooks ) => {
 
 		var lights = undefined;
 		hooks.beforeEach( function () {
@@ -29,27 +29,27 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isHemisphereLight", ( assert ) => {
+		QUnit.todo( "isHemisphereLight", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -8,7 +8,7 @@ import { SpotLight } from '../../../../src/lights/SpotLight';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module.todo( 'SpotLight', ( hooks ) => {
+	QUnit.module( 'SpotLight', ( hooks ) => {
 
 		var lights = undefined;
 		hooks.beforeEach( function () {
@@ -34,14 +34,14 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -64,13 +64,13 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isSpotLight", ( assert ) => {
+		QUnit.todo( "isSpotLight", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

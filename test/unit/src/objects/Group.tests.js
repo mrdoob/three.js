@@ -7,17 +7,17 @@ import { Group } from '../../../../src/objects/Group';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module.todo( 'Group', () => {
+	QUnit.module( 'Group', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

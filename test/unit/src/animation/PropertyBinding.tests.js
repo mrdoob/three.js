@@ -11,23 +11,23 @@ import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
 
 export default QUnit.module( 'Animation', () => {
 
-	QUnit.module.todo( 'PropertyBinding', () => {
+	QUnit.module( 'PropertyBinding', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// STATIC STUFF
-		QUnit.test( "Composite", ( assert ) => {
+		QUnit.todo( "Composite", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "create", ( assert ) => {
+		QUnit.todo( "create", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -42,15 +42,27 @@ export default QUnit.module( 'Animation', () => {
 			);
 
 			assert.equal(
+				PropertyBinding.sanitizeNodeName( '急須' ),
+				'急須',
+				'Leaves non-latin unicode characters intact.'
+			);
+
+			assert.equal(
 				PropertyBinding.sanitizeNodeName( 'space separated name 123_ -' ),
 				'space_separated_name_123__-',
 				'Replaces spaces with underscores.'
 			);
 
 			assert.equal(
-				PropertyBinding.sanitizeNodeName( '"invalid" name %123%_' ),
-				'invalid_name_123_',
-				'Strips invalid characters.'
+				PropertyBinding.sanitizeNodeName( '"Mátyás" %_* 😇' ),
+				'"Mátyás"_%_*_😇',
+				'Allows various punctuation and symbols.'
+			);
+
+			assert.equal(
+				PropertyBinding.sanitizeNodeName( '/invalid: name ^123.[_]' ),
+				'invalid_name_^123_',
+				'Strips reserved characters.'
 			);
 
 		} );
@@ -236,7 +248,30 @@ export default QUnit.module( 'Animation', () => {
 						propertyName: 'position',
 						propertyIndex: undefined
 					}
+				],
+
+				[
+					'急須.材料[零]',
+					{
+						nodeName: '急須',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: '材料',
+						propertyIndex: '零'
+					}
+				],
+
+				[
+					'📦.🎨[🔴]',
+					{
+						nodeName: '📦',
+						objectName: undefined,
+						objectIndex: undefined,
+						propertyName: '🎨',
+						propertyIndex: '🔴'
+					}
 				]
+
 			];
 
 			paths.forEach( function ( path ) {
@@ -251,38 +286,38 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( "findNode", ( assert ) => {
+		QUnit.todo( "findNode", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "BindingType", ( assert ) => {
+		QUnit.todo( "BindingType", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "Versioning", ( assert ) => {
+		QUnit.todo( "Versioning", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "GetterByBindingType", ( assert ) => {
+		QUnit.todo( "GetterByBindingType", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "SetterByBindingTypeAndVersioning", ( assert ) => {
+		QUnit.todo( "SetterByBindingTypeAndVersioning", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getValue", ( assert ) => {
+		QUnit.todo( "getValue", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -325,26 +360,13 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( "bind", ( assert ) => {
+		QUnit.todo( "bind", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "unbind", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		// OTHERS
-		QUnit.test( "_getValue_unavailable", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "_setValue_unavailable", ( assert ) => {
+		QUnit.todo( "unbind", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

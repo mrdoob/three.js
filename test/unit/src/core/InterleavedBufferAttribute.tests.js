@@ -9,10 +9,10 @@ import { InterleavedBufferAttribute } from '../../../../src/core/InterleavedBuff
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'InterleavedBufferAttribute', () => {
+	QUnit.module( 'InterleavedBufferAttribute', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -28,7 +28,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "array", ( assert ) => {
+		QUnit.todo( "array", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -60,61 +60,61 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setY", ( assert ) => {
+		QUnit.todo( "setY", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setZ", ( assert ) => {
+		QUnit.todo( "setZ", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setW", ( assert ) => {
+		QUnit.todo( "setW", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getX", ( assert ) => {
+		QUnit.todo( "getX", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getY", ( assert ) => {
+		QUnit.todo( "getY", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getZ", ( assert ) => {
+		QUnit.todo( "getZ", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "getW", ( assert ) => {
+		QUnit.todo( "getW", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setXY", ( assert ) => {
+		QUnit.todo( "setXY", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setXYZ", ( assert ) => {
+		QUnit.todo( "setXYZ", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setXYZW", ( assert ) => {
+		QUnit.todo( "setXYZW", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -7,47 +7,47 @@ import { FileLoader } from '../../../../src/loaders/FileLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'FileLoader', () => {
+	QUnit.module( 'FileLoader', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "load", ( assert ) => {
+		QUnit.todo( "load", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setPath", ( assert ) => {
+		QUnit.todo( "setPath", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setResponseType", ( assert ) => {
+		QUnit.todo( "setResponseType", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setWithCredentials", ( assert ) => {
+		QUnit.todo( "setWithCredentials", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setMimeType", ( assert ) => {
+		QUnit.todo( "setMimeType", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setRequestHeader", ( assert ) => {
+		QUnit.todo( "setRequestHeader", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

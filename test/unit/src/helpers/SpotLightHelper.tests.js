@@ -7,30 +7,30 @@ import { SpotLightHelper } from '../../../../src/helpers/SpotLightHelper';
 
 export default QUnit.module( 'Helpers', () => {
 
-	QUnit.module.todo( 'SpotLightHelper', () => {
+	QUnit.module( 'SpotLightHelper', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "dispose", ( assert ) => {
+		QUnit.todo( "dispose", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "update", ( assert ) => {
+		QUnit.todo( "update", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

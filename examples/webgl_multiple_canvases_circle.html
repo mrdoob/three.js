@@ -247,11 +247,11 @@
 
 				for ( var i = 0; i < noof_balls; i ++ ) { // create shadows
 
-					var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-					mesh.position.x = - ( noof_balls - 1 ) / 2 *400 + i * 400;
-					mesh.position.y = - 250;
-					mesh.rotation.x = - Math.PI / 2;
-					scene.add( mesh );
+					var shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+					shadowMesh.position.x = - ( noof_balls - 1 ) / 2 *400 + i * 400;
+					shadowMesh.position.y = - 250;
+					shadowMesh.rotation.x = - Math.PI / 2;
+					scene.add( shadowMesh );
 
 				}
 
@@ -283,17 +283,14 @@
 
 				}
 
-
-				var materials = [
-
-					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } ),
-					new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } )
-
-				];
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } );
+				var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
 				for ( var i = 0; i < noof_balls; i ++ ) { // create balls
 
-					var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry1, materials );
+					var mesh = new THREE.Mesh( geometry1, material );
+					var wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
+					mesh.add( wireframe );
 
 					mesh.position.x = - ( noof_balls - 1 ) / 2 *400 + i *400;
 					mesh.rotation.x = i * 0.5;

@@ -7,53 +7,53 @@ import { LoadingManager } from '../../../../src/loaders/LoadingManager';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'LoadingManager', () => {
+	QUnit.module( 'LoadingManager', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "onStart", ( assert ) => {
+		QUnit.todo( "onStart", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "onLoad", ( assert ) => {
+		QUnit.todo( "onLoad", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "onProgress", ( assert ) => {
+		QUnit.todo( "onProgress", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "onError", ( assert ) => {
+		QUnit.todo( "onError", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "itemStart", ( assert ) => {
+		QUnit.todo( "itemStart", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "itemEnd", ( assert ) => {
+		QUnit.todo( "itemEnd", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "itemError", ( assert ) => {
+		QUnit.todo( "itemError", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

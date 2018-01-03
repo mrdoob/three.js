@@ -9,36 +9,36 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Core', () => {
 
-		QUnit.module.todo( 'Shape', () => {
+		QUnit.module( 'Shape', () => {
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {
+			QUnit.todo( "Extending", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "getPointsHoles", ( assert ) => {
+			QUnit.todo( "getPointsHoles", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "extractAllPoints", ( assert ) => {
+			QUnit.todo( "extractAllPoints", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "extractPoints", ( assert ) => {
+			QUnit.todo( "extractPoints", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

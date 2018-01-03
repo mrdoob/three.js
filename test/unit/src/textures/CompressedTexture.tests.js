@@ -7,24 +7,24 @@ import { CompressedTexture } from '../../../../src/textures/CompressedTexture';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module.todo( 'CompressedTexture', () => {
+	QUnit.module( 'CompressedTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isCompressedTexture", ( assert ) => {
+		QUnit.todo( "isCompressedTexture", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

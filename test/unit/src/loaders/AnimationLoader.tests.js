@@ -7,23 +7,23 @@ import { AnimationLoader } from '../../../../src/loaders/AnimationLoader';
 
 export default QUnit.module( 'Loaders', () => {
 
-	QUnit.module.todo( 'AnimationLoader', () => {
+	QUnit.module( 'AnimationLoader', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "load", ( assert ) => {
+		QUnit.todo( "load", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "parse", ( assert ) => {
+		QUnit.todo( "parse", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -124,24 +124,24 @@ function compareUvs( uvs, u ) {
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'BufferGeometry', () => {
+	QUnit.module( 'BufferGeometry', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isBufferGeometry", ( assert ) => {
+		QUnit.todo( "isBufferGeometry", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -167,11 +167,12 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "getAttribute", ( assert ) => {
+		QUnit.todo( "getAttribute", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
+
 		QUnit.test( "add / delete Attribute", ( assert ) => {
 
 			var geometry = new BufferGeometry();
@@ -214,7 +215,7 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( a.groups.length, 0, "Check groups were deleted correctly" );
 
 		} );
-		QUnit.test( "clearGroups", ( assert ) => {
+		QUnit.todo( "clearGroups", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -706,7 +707,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "computeFaceNormals", ( assert ) => {
+		QUnit.todo( "computeFaceNormals", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -824,7 +825,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "normalizeNormals", ( assert ) => {
+		QUnit.todo( "normalizeNormals", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -966,7 +967,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "dispose", ( assert ) => {
+		QUnit.todo( "dispose", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

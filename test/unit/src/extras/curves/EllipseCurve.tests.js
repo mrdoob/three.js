@@ -10,7 +10,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module.todo( 'EllipseCurve', ( hooks ) => {
+		QUnit.module( 'EllipseCurve', ( hooks ) => {
 
 			let curve = undefined;
 			hooks.before( function () {
@@ -26,27 +26,27 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INHERITANCE
-			QUnit.test( "Extending", ( assert ) => {
+			QUnit.todo( "Extending", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// INSTANCING
-			QUnit.test( "Instancing", ( assert ) => {
+			QUnit.todo( "Instancing", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.test( "isEllipseCurve", ( assert ) => {
+			QUnit.todo( "isEllipseCurve", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "getPoint", ( assert ) => {
+			QUnit.todo( "getPoint", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

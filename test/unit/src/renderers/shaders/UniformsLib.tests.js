@@ -9,16 +9,16 @@ export default QUnit.module( 'Renderers', () => {
 
 	QUnit.module( 'Shaders', () => {
 
-		QUnit.module.todo( 'UniformsLib', () => {
+		QUnit.module( 'UniformsLib', () => {
 
 			// PUBLIC STUFF
-			QUnit.test( "merge", ( assert ) => {
+			QUnit.todo( "merge", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
-			QUnit.test( "clone", ( assert ) => {
+			QUnit.todo( "clone", ( assert ) => {
 
 				assert.ok( false, "everything's gonna be alright" );
 

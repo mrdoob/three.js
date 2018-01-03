@@ -13,27 +13,30 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			Create a non-positional ( global ) audio object.<br /><br />
-
-			This uses the [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
-
+			The [name] represents a virtual [link:https://developer.mozilla.org/de/docs/Web/API/AudioListener listener] of the all positional and non-positional audio effects in the scene.</br>
+			A three.js application usually creates a single instance of [name]. It is a mandatory construtor parameter for audios entities like [page:Audio Audio] and [page:PositionalAudio PositionalAudio].</br>
+			In most cases, the listener object is a child of the camera. So the 3D transformation of the camera represents the 3D transformation of the listener.
 		</div>
 
 
 		<h2>Example</h2>
 
-		<div>[example:misc_sound misc / sound ]</div>
+		<div>
+			[example:webaudio_sandbox webaudio / sandbox ]</br>
+			[example:webaudio_timing webaudio / timing ]</br>
+			[example:webaudio_visualizer webaudio / visualizer ]
+		</div>
+
 		<code>
-		//Create an AudioListener and add it to the camera
+		// create an AudioListener and add it to the camera
 		var listener = new THREE.AudioListener();
 		camera.add( listener );
 
 		// create a global audio source
 		var sound = new THREE.Audio( listener );
 
+		// load a sound and set it as the Audio object's buffer
 		var audioLoader = new THREE.AudioLoader();
-
-		//Load a sound and set it as the Audio object's buffer
 		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
 			sound.setLoop(true);

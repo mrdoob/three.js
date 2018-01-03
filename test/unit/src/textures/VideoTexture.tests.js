@@ -7,24 +7,24 @@ import { VideoTexture } from '../../../../src/textures/VideoTexture';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module.todo( 'VideoTexture', () => {
+	QUnit.module( 'VideoTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isVideoTexture", ( assert ) => {
+		QUnit.todo( "isVideoTexture", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

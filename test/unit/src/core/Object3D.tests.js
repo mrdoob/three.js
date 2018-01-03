@@ -19,7 +19,7 @@ import {
 
 export default QUnit.module( 'Core', () => {
 
-	QUnit.module.todo( 'Object3D', () => {
+	QUnit.module( 'Object3D', () => {
 
 		var RadToDeg = 180 / Math.PI;
 
@@ -42,46 +42,46 @@ export default QUnit.module( 'Core', () => {
 		};
 
 		// INHERITANCE
-		QUnit.test( "Extending", ( assert ) => {
+		QUnit.todo( "Extending", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// STATIC STUFF
-		QUnit.test( "DefaultUp", ( assert ) => {
+		QUnit.todo( "DefaultUp", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "DefaultMatrixAutoUpdate", ( assert ) => {
+		QUnit.todo( "DefaultMatrixAutoUpdate", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "isObject3D", ( assert ) => {
+		QUnit.todo( "isObject3D", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "onBeforeRender", ( assert ) => {
+		QUnit.todo( "onBeforeRender", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "onAfterRender", ( assert ) => {
+		QUnit.todo( "onAfterRender", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -183,13 +183,13 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "rotateOnAxis", ( assert ) => {
+		QUnit.todo( "rotateOnAxis", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "rotateOnWorldAxis", ( assert ) => {
+		QUnit.todo( "rotateOnWorldAxis", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -271,13 +271,13 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "localToWorld", ( assert ) => {
+		QUnit.todo( "localToWorld", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "worldToLocal", ( assert ) => {
+		QUnit.todo( "worldToLocal", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -374,7 +374,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "getWorldQuaternion", ( assert ) => {
+		QUnit.todo( "getWorldQuaternion", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -422,7 +422,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "raycast", ( assert ) => {
+		QUnit.todo( "raycast", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -474,13 +474,13 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "updateMatrix", ( assert ) => {
+		QUnit.todo( "updateMatrix", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "updateMatrixWorld", ( assert ) => {
+		QUnit.todo( "updateMatrixWorld", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

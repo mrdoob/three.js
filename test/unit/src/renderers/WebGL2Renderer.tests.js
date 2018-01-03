@@ -7,41 +7,41 @@ import { WebGL2Renderer } from '../../../../src/renderers/WebGL2Renderer';
 
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module.todo( 'WebGL2Renderer', () => {
+	QUnit.module( 'WebGL2Renderer', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "domElement", ( assert ) => {
+		QUnit.todo( "domElement", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "clear", ( assert ) => {
+		QUnit.todo( "clear", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setPixelRatio", ( assert ) => {
+		QUnit.todo( "setPixelRatio", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "setSize", ( assert ) => {
+		QUnit.todo( "setSize", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.test( "render", ( assert ) => {
+		QUnit.todo( "render", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
