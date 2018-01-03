@@ -608,6 +608,7 @@ THREE.OBJLoader = ( function () {
 				var geometry = object.geometry;
 				var materials = object.materials;
 				var isLine = ( geometry.type === 'Line' );
+				var hasVertexColors = false;
 
 				// Skip o/g line declarations that did not follow with any faces
 				if ( geometry.vertices.length === 0 ) continue;
@@ -628,6 +629,7 @@ THREE.OBJLoader = ( function () {
 
 				if ( geometry.colors.length > 0 ) {
 
+					hasVertexColors = true;
 					buffergeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( geometry.colors, 3 ) );
 
 				}
@@ -671,6 +673,7 @@ THREE.OBJLoader = ( function () {
 					}
 
 					material.flatShading = sourceMaterial.smooth ? false : true;
+					material.vertexColors = hasVertexColors ? THREE.VertexColors : THREE.NoColors;
 
 					createdMaterials.push( material );
 
