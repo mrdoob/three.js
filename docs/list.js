@@ -43,28 +43,23 @@ var list = {
 
 				"#URL": "api/animation/AnimationAction",
 				"clampWhenFinished": "AnimationAction.clampWhenFinished",
-				"enabled": "AnimationAction.enabled",
-				"loop": "AnimationAction.loop",
-				"paused": "AnimationAction.paused",
-				"repetitions": "AnimationAction.repetitions",
-				"time": "AnimationAction.time",
-				"timeScale": "AnimationAction.timeScale",
-				"weight": "AnimationAction.weight",
-				"zeroSlopeAtEnd": "AnimationAction.zeroSlopeAtEnd",
-				"zeroSlopeAtStart": "AnimationAction.zeroSlopeAtStart",
 				"crossFadeFrom": "AnimationAction.crossFadeFrom",
 				"crossFadeTo": "AnimationAction.crossFadeTo",
+				"enabled": "AnimationAction.enabled",
 				"fadeIn": "AnimationAction.fadeIn",
 				"fadeOut": "AnimationAction.fadeOut",
+				"getClip": "AnimationAction.getClip",
 				"getEffectiveTimeScale": "AnimationAction.getEffectiveTimeScale",
 				"getEffectiveWeight": "AnimationAction.getEffectiveWeight",
-				"getClip": "AnimationAction.getClip",
 				"getMixer": "AnimationAction.getMixer",
 				"getRoot": "AnimationAction.getRoot",
 				"halt": "AnimationAction.halt",
 				"isRunning": "AnimationAction.isRunning",
 				"isScheduled": "AnimationAction.isScheduled",
+				"loop": "AnimationAction.loop",
+				"paused": "AnimationAction.paused",
 				"play": "AnimationAction.play",
+				"repetitions": "AnimationAction.repetitions",
 				"reset": "AnimationAction.reset",
 				"setDuration": "AnimationAction.setDuration",
 				"setEffectiveTimeScale": "AnimationAction.setEffectiveTimeScale",
@@ -75,53 +70,58 @@ var list = {
 				"stopFading": "AnimationAction.stopFading",
 				"stopWarping": "AnimationAction.stopWarping",
 				"syncWith": "AnimationAction.syncWith",
-				"warp": "AnimationAction.warp"
+				"time": "AnimationAction.time",
+				"timeScale": "AnimationAction.timeScale",
+				"warp": "AnimationAction.warp",
+				"weight": "AnimationAction.weight",
+				"zeroSlopeAtEnd": "AnimationAction.zeroSlopeAtEnd",
+				"zeroSlopeAtStart": "AnimationAction.zeroSlopeAtStart"
 
 			},
 
 			"AnimationClip": {
 
 				"#URL": "api/animation/AnimationClip",
-				"duration": "AnimationClip.duration",
-				"name": "AnimationClip.name",
-				"tracks": "AnimationClip.tracks",
-				"uuid": "AnimationClip.uuid",
-				"optimize": "AnimationClip.optimize",
-				"resetDuration": "AnimationClip.resetDuration",
-				"trim": "AnimationClip.trim",
 				"CreateClipsFromMorphTargetSequences": "AnimationClip.CreateClipsFromMorphTargetSequences",
 				"CreateFromMorphTargetSequence": "AnimationClip.CreateFromMorphTargetSequence",
+				"duration": "AnimationClip.duration",
 				"findByName": "AnimationClip.findByName",
+				"name": "AnimationClip.name",
+				"optimize": "AnimationClip.optimize",
 				"parse": "AnimationClip.parse",
 				"parseAnimation": "AnimationClip.parseAnimation",
-				"toJSON": "AnimationClip.toJSON"
+				"resetDuration": "AnimationClip.resetDuration",
+				"toJSON": "AnimationClip.toJSON",
+				"tracks": "AnimationClip.tracks",
+				"trim": "AnimationClip.trim",
+				"uuid": "AnimationClip.uuid"
 
 			},
 
 			"AnimationMixer": {
 
 				"#URL": "api/animation/AnimationMixer",
-				"time": "AnimationMixer.time",
-				"timeScale": "AnimationMixer.timeScale",
 				"clipAction": "AnimationMixer.clipAction",
 				"existingAction": "AnimationMixer.existingAction",
 				"getRoot": "AnimationMixer.getRoot",
 				"stopAllAction": "AnimationMixer.stopAllAction",
-				"update": "AnimationMixer.update",
+				"time": "AnimationMixer.time",
+				"timeScale": "AnimationMixer.timeScale",
+				"uncacheAction": "AnimationMixer.uncacheAction",
 				"uncacheClip": "AnimationMixer.uncacheClip",
 				"uncacheRoot": "AnimationMixer.uncacheRoot",
-				"uncacheAction": "AnimationMixer.uncacheAction"
+				"update": "AnimationMixer.update"
 
 			},
 
 			"AnimationObjectGroup": {
 
 				"#URL": "api/animation/AnimationObjectGroup",
-				"stats": "AnimationObjectGroup.stats",
-				"uuid": "AnimationObjectGroup.uuid",
 				"add": "AnimationObjectGroup.add",
 				"remove": "AnimationObjectGroup.remove",
-				"uncache": "AnimationObjectGroup.uncache"
+				"stats": "AnimationObjectGroup.stats",
+				"uncache": "AnimationObjectGroup.uncache",
+				"uuid": "AnimationObjectGroup.uuid"
 
 			},
 
@@ -140,64 +140,64 @@ var list = {
 			"KeyframeTrack": {
 
 				"#URL": "api/animation/KeyframeTrack",
-				"name": "KeyframeTrack.name",
-				"times": "KeyframeTrack.times",
-				"values": "KeyframeTrack.values",
 				"DefaultInterpolation": "KeyframeTrack.DefaultInterpolation",
+				"InterpolantFactoryMethodDiscrete": "KeyframeTrack.InterpolantFactoryMethodDiscrete",
+				"InterpolantFactoryMethodLinear": "KeyframeTrack.InterpolantFactoryMethodLinear",
+				"InterpolantFactoryMethodSmooth": "KeyframeTrack.InterpolantFactoryMethodSmooth",
 				"TimeBufferType ": "KeyframeTrack.TimeBufferType ",
 				"ValueBufferType ": "KeyframeTrack.ValueBufferType ",
 				"createInterpolant": "KeyframeTrack.createInterpolant",
 				"getInterpolation": "KeyframeTrack.getInterpolation",
 				"getValueSize": "KeyframeTrack.getValueSize",
-				"InterpolantFactoryMethodDiscrete": "KeyframeTrack.InterpolantFactoryMethodDiscrete",
-				"InterpolantFactoryMethodLinear": "KeyframeTrack.InterpolantFactoryMethodLinear",
-				"InterpolantFactoryMethodSmooth": "KeyframeTrack.InterpolantFactoryMethodSmooth",
+				"name": "KeyframeTrack.name",
 				"optimize": "KeyframeTrack.optimize",
+				"parse": "KeyframeTrack.parse",
 				"scale": "KeyframeTrack.scale",
 				"setInterpolation": "KeyframeTrack.setInterpolation",
 				"shift": "KeyframeTrack.shift",
+				"times": "KeyframeTrack.times",
+				"toJSON": "KeyframeTrack.toJSON",
 				"trim": "KeyframeTrack.trim",
 				"validate": "KeyframeTrack.validate",
-				"parse": "KeyframeTrack.parse",
-				"toJSON": "KeyframeTrack.toJSON"
+				"values": "KeyframeTrack.values"
 
 			},
 
 			"PropertyBinding": {
 
 				"#URL": "api/animation/PropertyBinding",
-				"path": "PropertyBinding.path",
-				"parsedPath": "PropertyBinding.parsedPath",
-				"node": "PropertyBinding.node",
-				"rootNode": "PropertyBinding.rootNode",
 				"BindingType": "PropertyBinding.BindingType",
-				"Versioning": "PropertyBinding.Versioning",
+				"Composite": "PropertyBinding.Composite",
 				"GetterByBindingType": "PropertyBinding.GetterByBindingType",
 				"SetterByBindingTypeAndVersioning": "PropertyBinding.SetterByBindingTypeAndVersioning",
-				"getValue": "PropertyBinding.getValue",
-				"setValue": "PropertyBinding.setValue",
+				"Versioning": "PropertyBinding.Versioning",
 				"bind": "PropertyBinding.bind",
-				"unbind": "PropertyBinding.unbind",
-				"Composite": "PropertyBinding.Composite",
 				"create": "PropertyBinding.create",
+				"findNode": "PropertyBinding.findNode",
+				"getValue": "PropertyBinding.getValue",
+				"node": "PropertyBinding.node",
 				"parseTrackName": "PropertyBinding.parseTrackName",
-				"findNode": "PropertyBinding.findNode"
+				"parsedPath": "PropertyBinding.parsedPath",
+				"path": "PropertyBinding.path",
+				"rootNode": "PropertyBinding.rootNode",
+				"setValue": "PropertyBinding.setValue",
+				"unbind": "PropertyBinding.unbind"
 
 			},
 
 			"PropertyMixer": {
 
 				"#URL": "api/animation/PropertyMixer",
+				"accumulate": "PropertyMixer.accumulate",
+				"apply": "PropertyMixer.apply",
 				"binding": "PropertyMixer.binding",
 				"buffer": "PropertyMixer.buffer",
 				"cumulativeWeight": "PropertyMixer.cumulativeWeight",
-				"valueSize": "PropertyMixer.valueSize",
 				"referenceCount": "PropertyMixer.referenceCount",
-				"useCount": "PropertyMixer.useCount",
-				"accumulate": "PropertyMixer.accumulate",
-				"apply": "PropertyMixer.apply",
+				"restoreOriginalState": "PropertyMixer.restoreOriginalState",
 				"saveOriginalState": "PropertyMixer.saveOriginalState",
-				"restoreOriginalState": "PropertyMixer.restoreOriginalState"
+				"useCount": "PropertyMixer.useCount",
+				"valueSize": "PropertyMixer.valueSize"
 
 			}
 
@@ -208,17 +208,19 @@ var list = {
 
 			"BooleanKeyframeTrack": {
 
+				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/BooleanKeyframeTrack",
 				"DefaultInterpolation": "BooleanKeyframeTrack.DefaultInterpolation",
-				"ValueBufferType": "BooleanKeyframeTrack.ValueBufferType",
-				"ValueTypeName": "BooleanKeyframeTrack.ValueTypeName",
 				"InterpolantFactoryMethodLinear ": "BooleanKeyframeTrack.InterpolantFactoryMethodLinear ",
-				"InterpolantFactoryMethodSmooth ": "BooleanKeyframeTrack.InterpolantFactoryMethodSmooth "
+				"InterpolantFactoryMethodSmooth ": "BooleanKeyframeTrack.InterpolantFactoryMethodSmooth ",
+				"ValueBufferType": "BooleanKeyframeTrack.ValueBufferType",
+				"ValueTypeName": "BooleanKeyframeTrack.ValueTypeName"
 
 			},
 
 			"ColorKeyframeTrack": {
 
+				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/ColorKeyframeTrack",
 				"ValueTypeName": "ColorKeyframeTrack.ValueTypeName"
 
@@ -226,6 +228,7 @@ var list = {
 
 			"NumberKeyframeTrack": {
 
+				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/NumberKeyframeTrack",
 				"ValueTypeName": "NumberKeyframeTrack.ValueTypeName"
 
@@ -233,26 +236,29 @@ var list = {
 
 			"QuaternionKeyframeTrack": {
 
+				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/QuaternionKeyframeTrack",
 				"DefaultInterpolation": "QuaternionKeyframeTrack.DefaultInterpolation",
-				"ValueTypeName": "QuaternionKeyframeTrack.ValueTypeName",
-				"InterpolantFactoryMethodLinear": "QuaternionKeyframeTrack.InterpolantFactoryMethodLinear"
+				"InterpolantFactoryMethodLinear": "QuaternionKeyframeTrack.InterpolantFactoryMethodLinear",
+				"ValueTypeName": "QuaternionKeyframeTrack.ValueTypeName"
 
 			},
 
 			"StringKeyframeTrack": {
 
+				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/StringKeyframeTrack",
 				"DefaultInterpolation": "StringKeyframeTrack.DefaultInterpolation",
-				"ValueBufferType": "StringKeyframeTrack.ValueBufferType",
-				"ValueTypeName": "StringKeyframeTrack.ValueTypeName",
 				"InterpolantFactoryMethodLinear": "StringKeyframeTrack.InterpolantFactoryMethodLinear",
-				"InterpolantFactoryMethodSmooth": "StringKeyframeTrack.InterpolantFactoryMethodSmooth"
+				"InterpolantFactoryMethodSmooth": "StringKeyframeTrack.InterpolantFactoryMethodSmooth",
+				"ValueBufferType": "StringKeyframeTrack.ValueBufferType",
+				"ValueTypeName": "StringKeyframeTrack.ValueTypeName"
 
 			},
 
 			"VectorKeyframeTrack": {
 
+				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/VectorKeyframeTrack",
 				"ValueTypeName": "VectorKeyframeTrack.ValueTypeName"
 
@@ -265,30 +271,27 @@ var list = {
 
 			"Audio": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/audio/Audio",
 				"autoplay": "Audio.autoplay",
+				"connect": "Audio.connect",
 				"context": "Audio.context",
+				"disconnect": "Audio.disconnect",
 				"filters": "Audio.filters",
 				"gain": "Audio.gain",
-				"hasPlaybackControl": "Audio.hasPlaybackControl",
-				"playbackRate": "Audio.playbackRate",
-				"isPlaying": "Audio.isPlaying",
-				"startTime": "Audio.startTime",
-				"offset": "Audio.offset",
-				"source": "Audio.source",
-				"sourceType": "Audio.sourceType",
-				"type": "Audio.type",
-				"connect": "Audio.connect",
-				"disconnect": "Audio.disconnect",
 				"getFilter": "Audio.getFilter",
 				"getFilters": "Audio.getFilters",
 				"getLoop": "Audio.getLoop",
 				"getOutput": "Audio.getOutput",
 				"getPlaybackRate": "Audio.getPlaybackRate",
 				"getVolume": "Audio.getVolume",
-				"play": "Audio.play",
-				"pause": "Audio.pause",
+				"hasPlaybackControl": "Audio.hasPlaybackControl",
+				"isPlaying": "Audio.isPlaying",
+				"offset": "Audio.offset",
 				"onEnded": "Audio.onEnded",
+				"pause": "Audio.pause",
+				"play": "Audio.play",
+				"playbackRate": "Audio.playbackRate",
 				"setBuffer": "Audio.setBuffer",
 				"setFilter": "Audio.setFilter",
 				"setFilters": "Audio.setFilters",
@@ -296,7 +299,11 @@ var list = {
 				"setNodeSource": "Audio.setNodeSource",
 				"setPlaybackRate": "Audio.setPlaybackRate",
 				"setVolume": "Audio.setVolume",
-				"stop": "Audio.stop"
+				"source": "Audio.source",
+				"sourceType": "Audio.sourceType",
+				"startTime": "Audio.startTime",
+				"stop": "Audio.stop",
+				"type": "Audio.type"
 
 			},
 
@@ -304,10 +311,10 @@ var list = {
 
 				"#URL": "api/audio/AudioAnalyser",
 				"analyser": "AudioAnalyser.analyser",
-				"fftSize": "AudioAnalyser.fftSize",
 				"data": "AudioAnalyser.data",
-				"getFrequencyData": "AudioAnalyser.getFrequencyData",
-				"getAverageFrequency": "AudioAnalyser.getAverageFrequency"
+				"fftSize": "AudioAnalyser.fftSize",
+				"getAverageFrequency": "AudioAnalyser.getAverageFrequency",
+				"getFrequencyData": "AudioAnalyser.getFrequencyData"
 
 			},
 
@@ -321,32 +328,34 @@ var list = {
 
 			"AudioListener": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/audio/AudioListener",
 				"context": "AudioListener.context",
-				"gain": "AudioListener.gain",
 				"filter": "AudioListener.filter",
-				"getInput": "AudioListener.getInput",
-				"removeFilter": "AudioListener.removeFilter",
+				"gain": "AudioListener.gain",
 				"getFilter": "AudioListener.getFilter",
-				"setFilter": "AudioListener.setFilter",
+				"getInput": "AudioListener.getInput",
 				"getMasterVolume": "AudioListener.getMasterVolume",
+				"removeFilter": "AudioListener.removeFilter",
+				"setFilter": "AudioListener.setFilter",
 				"setMasterVolume": "AudioListener.setMasterVolume"
 
 			},
 
 			"PositionalAudio": {
 
+				"#PARENT": "Audio",
 				"#URL": "api/audio/PositionalAudio",
-				"panner": "PositionalAudio.panner",
+				"getDistanceModel": "PositionalAudio.getDistanceModel",
+				"getMaxDistance": "PositionalAudio.getMaxDistance",
 				"getOutput": "PositionalAudio.getOutput",
 				"getRefDistance": "PositionalAudio.getRefDistance",
-				"setRefDistance": "PositionalAudio.setRefDistance",
 				"getRolloffFactor": "PositionalAudio.getRolloffFactor",
-				"setRolloffFactor": "PositionalAudio.setRolloffFactor",
-				"getDistanceModel": "PositionalAudio.getDistanceModel",
+				"panner": "PositionalAudio.panner",
 				"setDistanceModel": "PositionalAudio.setDistanceModel",
-				"getMaxDistance": "PositionalAudio.getMaxDistance",
-				"setMaxDistance": "PositionalAudio.setMaxDistance"
+				"setMaxDistance": "PositionalAudio.setMaxDistance",
+				"setRefDistance": "PositionalAudio.setRefDistance",
+				"setRolloffFactor": "PositionalAudio.setRolloffFactor"
 
 			}
 
@@ -357,67 +366,71 @@ var list = {
 
 			"Camera": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/cameras/Camera",
+				"clone": "Camera.clone",
+				"copy": "Camera.copy",
+				"getWorldDirection": "Camera.getWorldDirection",
 				"isCamera": "Camera.isCamera",
 				"layers": "Camera.layers",
 				"matrixWorldInverse": "Camera.matrixWorldInverse",
-				"projectionMatrix": "Camera.projectionMatrix",
-				"clone": "Camera.clone",
-				"copy": "Camera.copy",
-				"getWorldDirection": "Camera.getWorldDirection"
+				"projectionMatrix": "Camera.projectionMatrix"
 
 			},
 
 			"CubeCamera": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/cameras/CubeCamera",
+				"clear": "CubeCamera.clear",
 				"renderTarget": "CubeCamera.renderTarget",
-				"update": "CubeCamera.update",
-				"clear": "CubeCamera.clear"
+				"update": "CubeCamera.update"
 
 			},
 
 			"OrthographicCamera": {
 
+				"#PARENT": "Camera",
 				"#URL": "api/cameras/OrthographicCamera",
 				"bottom": "OrthographicCamera.bottom",
+				"clearViewOffset": "OrthographicCamera.clearViewOffset",
 				"far": "OrthographicCamera.far",
 				"isOrthographicCamera": "OrthographicCamera.isOrthographicCamera",
 				"left": "OrthographicCamera.left",
 				"near": "OrthographicCamera.near",
 				"right": "OrthographicCamera.right",
-				"top": "OrthographicCamera.top",
-				"view": "OrthographicCamera.view",
-				"zoom": "OrthographicCamera.zoom",
 				"setViewOffset": "OrthographicCamera.setViewOffset",
-				"clearViewOffset": "OrthographicCamera.clearViewOffset",
+				"toJSON": "OrthographicCamera.toJSON",
+				"top": "OrthographicCamera.top",
 				"updateProjectionMatrix": "OrthographicCamera.updateProjectionMatrix",
-				"toJSON": "OrthographicCamera.toJSON"
+				"view": "OrthographicCamera.view",
+				"zoom": "OrthographicCamera.zoom"
 
 			},
 
 			"PerspectiveCamera": {
 
+				"#PARENT": "Camera",
 				"#URL": "api/cameras/PerspectiveCamera",
 				"aspect": "PerspectiveCamera.aspect",
+				"clearViewOffset": "PerspectiveCamera.clearViewOffset",
 				"far": "PerspectiveCamera.far",
 				"filmGauge": "PerspectiveCamera.filmGauge",
 				"filmOffset": "PerspectiveCamera.filmOffset",
 				"focus": "PerspectiveCamera.focus",
 				"fov": "PerspectiveCamera.fov",
-				"isPerspectiveCamera": "PerspectiveCamera.isPerspectiveCamera",
-				"near": "PerspectiveCamera.near",
-				"view": "PerspectiveCamera.view",
-				"zoom": "PerspectiveCamera.zoom",
-				"clearViewOffset": "PerspectiveCamera.clearViewOffset",
 				"getEffectiveFOV": "PerspectiveCamera.getEffectiveFOV",
 				"getFilmHeight": "PerspectiveCamera.getFilmHeight",
 				"getFilmWidth": "PerspectiveCamera.getFilmWidth",
 				"getFocalLength": "PerspectiveCamera.getFocalLength",
+				"isPerspectiveCamera": "PerspectiveCamera.isPerspectiveCamera",
+				"near": "PerspectiveCamera.near",
 				"setFocalLength": "PerspectiveCamera.setFocalLength",
 				"setViewOffset": "PerspectiveCamera.setViewOffset",
+				"toJSON": "PerspectiveCamera.toJSON",
 				"updateProjectionMatrix": "PerspectiveCamera.updateProjectionMatrix",
-				"toJSON": "PerspectiveCamera.toJSON"
+				"view": "PerspectiveCamera.view",
+				"zoom": "PerspectiveCamera.zoom"
 
 			},
 
@@ -425,9 +438,9 @@ var list = {
 
 				"#URL": "api/cameras/StereoCamera",
 				"aspect": "StereoCamera.aspect",
-				"eyeSep": "StereoCamera.eyeSep",
 				"cameraL": "StereoCamera.cameraL",
 				"cameraR": "StereoCamera.cameraR",
+				"eyeSep": "StereoCamera.eyeSep",
 				"update": "StereoCamera.update"
 
 			}
@@ -490,17 +503,6 @@ var list = {
 
 				"#URL": "api/core/BufferAttribute",
 				"array": "BufferAttribute.array",
-				"count": "BufferAttribute.count",
-				"dynamic": "BufferAttribute.dynamic",
-				"isBufferAttribute": "BufferAttribute.isBufferAttribute",
-				"itemSize": "BufferAttribute.itemSize",
-				"name": "BufferAttribute.name",
-				"needsUpdate": "BufferAttribute.needsUpdate",
-				"normalized": "BufferAttribute.normalized",
-				"onUploadCallback": "BufferAttribute.onUploadCallback",
-				"updateRange": "BufferAttribute.updateRange",
-				"uuid": "BufferAttribute.uuid",
-				"version": "BufferAttribute.version",
 				"clone": "BufferAttribute.clone",
 				"copyArray": "BufferAttribute.copyArray",
 				"copyAt": "BufferAttribute.copyAt",
@@ -509,70 +511,81 @@ var list = {
 				"copyVector2sArray": "BufferAttribute.copyVector2sArray",
 				"copyVector3sArray": "BufferAttribute.copyVector3sArray",
 				"copyVector4sArray": "BufferAttribute.copyVector4sArray",
+				"count": "BufferAttribute.count",
+				"dynamic": "BufferAttribute.dynamic",
+				"getW": "BufferAttribute.getW",
 				"getX": "BufferAttribute.getX",
 				"getY": "BufferAttribute.getY",
 				"getZ": "BufferAttribute.getZ",
-				"getW": "BufferAttribute.getW",
+				"isBufferAttribute": "BufferAttribute.isBufferAttribute",
+				"itemSize": "BufferAttribute.itemSize",
+				"name": "BufferAttribute.name",
+				"needsUpdate": "BufferAttribute.needsUpdate",
+				"normalized": "BufferAttribute.normalized",
 				"onUpload": "BufferAttribute.onUpload",
+				"onUploadCallback": "BufferAttribute.onUploadCallback",
 				"set": "BufferAttribute.set",
 				"setArray": "BufferAttribute.setArray",
 				"setDynamic": "BufferAttribute.setDynamic",
-				"setX": "BufferAttribute.setX",
-				"setY": "BufferAttribute.setY",
-				"setZ": "BufferAttribute.setZ",
 				"setW": "BufferAttribute.setW",
+				"setX": "BufferAttribute.setX",
 				"setXY": "BufferAttribute.setXY",
 				"setXYZ": "BufferAttribute.setXYZ",
-				"setXYZW": "BufferAttribute.setXYZW"
+				"setXYZW": "BufferAttribute.setXYZW",
+				"setY": "BufferAttribute.setY",
+				"setZ": "BufferAttribute.setZ",
+				"updateRange": "BufferAttribute.updateRange",
+				"uuid": "BufferAttribute.uuid",
+				"version": "BufferAttribute.version"
 
 			},
 
 			"BufferGeometry": {
 
 				"#URL": "api/core/BufferGeometry",
-				"attributes": "BufferGeometry.attributes",
-				"boundingBox": "BufferGeometry.boundingBox",
-				"boundingSphere": "BufferGeometry.boundingSphere",
-				"drawRange": "BufferGeometry.drawRange",
-				"groups": "BufferGeometry.groups",
-				"drawcalls": "BufferGeometry.drawcalls",
-				"id": "BufferGeometry.id",
-				"index": "BufferGeometry.index",
-				"isBufferGeometry": "BufferGeometry.isBufferGeometry",
-				"morphAttributes": "BufferGeometry.morphAttributes",
-				"name": "BufferGeometry.name",
-				"uuid": "BufferGeometry.uuid",
 				"addAttribute": "BufferGeometry.addAttribute",
 				"addGroup": "BufferGeometry.addGroup",
 				"applyMatrix": "BufferGeometry.applyMatrix",
+				"attributes": "BufferGeometry.attributes",
+				"boundingBox": "BufferGeometry.boundingBox",
+				"boundingSphere": "BufferGeometry.boundingSphere",
 				"center": "BufferGeometry.center",
-				"clone": "BufferGeometry.clone",
-				"copy": "BufferGeometry.copy",
 				"clearGroups": "BufferGeometry.clearGroups",
+				"clone": "BufferGeometry.clone",
 				"computeBoundingBox": "BufferGeometry.computeBoundingBox",
 				"computeBoundingSphere": "BufferGeometry.computeBoundingSphere",
 				"computeVertexNormals": "BufferGeometry.computeVertexNormals",
+				"copy": "BufferGeometry.copy",
 				"dispose": "BufferGeometry.dispose",
+				"drawRange": "BufferGeometry.drawRange",
+				"drawcalls": "BufferGeometry.drawcalls",
 				"fromDirectGeometry": "BufferGeometry.fromDirectGeometry",
 				"fromGeometry": "BufferGeometry.fromGeometry",
 				"getAttribute": "BufferGeometry.getAttribute",
 				"getIndex": "BufferGeometry.getIndex",
+				"groups": "BufferGeometry.groups",
+				"id": "BufferGeometry.id",
+				"index": "BufferGeometry.index",
+				"isBufferGeometry": "BufferGeometry.isBufferGeometry",
 				"lookAt": "BufferGeometry.lookAt",
 				"merge": "BufferGeometry.merge",
+				"morphAttributes": "BufferGeometry.morphAttributes",
+				"name": "BufferGeometry.name",
 				"normalizeNormals": "BufferGeometry.normalizeNormals",
 				"removeAttribute": "BufferGeometry.removeAttribute",
 				"rotateX": "BufferGeometry.rotateX",
 				"rotateY": "BufferGeometry.rotateY",
 				"rotateZ": "BufferGeometry.rotateZ",
 				"scale": "BufferGeometry.scale",
-				"setIndex": "BufferGeometry.setIndex",
 				"setDrawRange": "BufferGeometry.setDrawRange",
 				"setFromObject": "BufferGeometry.setFromObject",
 				"setFromPoints": "BufferGeometry.setFromPoints",
+				"setIndex": "BufferGeometry.setIndex",
 				"toJSON": "BufferGeometry.toJSON",
 				"toNonIndexed": "BufferGeometry.toNonIndexed",
 				"translate": "BufferGeometry.translate",
-				"updateFromObject": "BufferGeometry.updateFromObject"
+				"updateFromObject": "BufferGeometry.updateFromObject",
+				"uuid": "BufferGeometry.uuid"
 
 			},
 
@@ -580,45 +593,45 @@ var list = {
 
 				"#URL": "api/core/Clock",
 				"autoStart": "Clock.autoStart",
-				"startTime": "Clock.startTime",
-				"oldTime": "Clock.oldTime",
 				"elapsedTime": "Clock.elapsedTime",
+				"getDelta": "Clock.getDelta",
+				"getElapsedTime": "Clock.getElapsedTime",
+				"oldTime": "Clock.oldTime",
 				"running": "Clock.running",
 				"start": "Clock.start",
-				"stop": "Clock.stop",
-				"getElapsedTime": "Clock.getElapsedTime",
-				"getDelta": "Clock.getDelta"
+				"startTime": "Clock.startTime",
+				"stop": "Clock.stop"
 
 			},
 
 			"DirectGeometry": {
 
 				"#URL": "api/core/DirectGeometry",
-				"id": "DirectGeometry.id",
-				"name": "DirectGeometry.name",
-				"type": "DirectGeometry.type",
-				"indices": "DirectGeometry.indices",
-				"vertices": "DirectGeometry.vertices",
-				"normals": "DirectGeometry.normals",
-				"colors": "DirectGeometry.colors",
-				"uvs": "DirectGeometry.uvs",
-				"uvs2": "DirectGeometry.uvs2",
-				"groups": "DirectGeometry.groups",
-				"morphTargets": "DirectGeometry.morphTargets",
-				"skinWeights": "DirectGeometry.skinWeights",
-				"skinIndices": "DirectGeometry.skinIndices",
 				"boundingBox": "DirectGeometry.boundingBox",
 				"boundingSphere": "DirectGeometry.boundingSphere",
-				"verticesNeedUpdate": "DirectGeometry.verticesNeedUpdate",
-				"normalsNeedUpdate": "DirectGeometry.normalsNeedUpdate",
+				"colors": "DirectGeometry.colors",
 				"colorsNeedUpdate": "DirectGeometry.colorsNeedUpdate",
-				"uvsNeedUpdate": "DirectGeometry.uvsNeedUpdate",
-				"groupsNeedUpdate": "DirectGeometry.groupsNeedUpdate",
 				"computeBoundingBox": "DirectGeometry.computeBoundingBox",
 				"computeBoundingSphere": "DirectGeometry.computeBoundingSphere",
 				"computeGroups": "DirectGeometry.computeGroups",
 				"dispose": "DirectGeometry.dispose",
-				"fromGeometry": "DirectGeometry.fromGeometry"
+				"fromGeometry": "DirectGeometry.fromGeometry",
+				"groups": "DirectGeometry.groups",
+				"groupsNeedUpdate": "DirectGeometry.groupsNeedUpdate",
+				"id": "DirectGeometry.id",
+				"indices": "DirectGeometry.indices",
+				"morphTargets": "DirectGeometry.morphTargets",
+				"name": "DirectGeometry.name",
+				"normals": "DirectGeometry.normals",
+				"normalsNeedUpdate": "DirectGeometry.normalsNeedUpdate",
+				"skinIndices": "DirectGeometry.skinIndices",
+				"skinWeights": "DirectGeometry.skinWeights",
+				"type": "DirectGeometry.type",
+				"uvs": "DirectGeometry.uvs",
+				"uvs2": "DirectGeometry.uvs2",
+				"uvsNeedUpdate": "DirectGeometry.uvsNeedUpdate",
+				"vertices": "DirectGeometry.vertices",
+				"verticesNeedUpdate": "DirectGeometry.verticesNeedUpdate"
 
 			},
 
@@ -626,9 +639,9 @@ var list = {
 
 				"#URL": "api/core/EventDispatcher",
 				"addEventListener": "EventDispatcher.addEventListener",
+				"dispatchEvent": "EventDispatcher.dispatchEvent",
 				"hasEventListener": "EventDispatcher.hasEventListener",
-				"removeEventListener": "EventDispatcher.removeEventListener",
-				"dispatchEvent": "EventDispatcher.dispatchEvent"
+				"removeEventListener": "EventDispatcher.removeEventListener"
 
 			},
 
@@ -638,44 +651,26 @@ var list = {
 				"a": "Face3.a",
 				"b": "Face3.b",
 				"c": "Face3.c",
-				"normal": "Face3.normal",
-				"color": "Face3.color",
-				"vertexNormals": "Face3.vertexNormals",
-				"vertexColors": "Face3.vertexColors",
-				"materialIndex": "Face3.materialIndex",
 				"clone": "Face3.clone",
-				"copy": "Face3.copy"
+				"color": "Face3.color",
+				"copy": "Face3.copy",
+				"materialIndex": "Face3.materialIndex",
+				"normal": "Face3.normal",
+				"vertexColors": "Face3.vertexColors",
+				"vertexNormals": "Face3.vertexNormals"
 
 			},
 
 			"Geometry": {
 
 				"#URL": "api/core/Geometry",
+				"applyMatrix": "Geometry.applyMatrix",
 				"boundingBox": "Geometry.boundingBox",
 				"boundingSphere": "Geometry.boundingSphere",
-				"colors": "Geometry.colors",
-				"faces": "Geometry.faces",
-				"faceVertexUvs": "Geometry.faceVertexUvs",
-				"id": "Geometry.id",
-				"isGeometry": "Geometry.isGeometry",
-				"lineDistances": "Geometry.lineDistances",
-				"morphTargets": "Geometry.morphTargets",
-				"morphNormals": "Geometry.morphNormals",
-				"name": "Geometry.name",
-				"skinWeights": "Geometry.skinWeights",
-				"skinIndices": "Geometry.skinIndices",
-				"uuid": "Geometry.uuid",
-				"vertices": "Geometry.vertices",
-				"verticesNeedUpdate": "Geometry.verticesNeedUpdate",
-				"elementsNeedUpdate": "Geometry.elementsNeedUpdate",
-				"uvsNeedUpdate": "Geometry.uvsNeedUpdate",
-				"normalsNeedUpdate": "Geometry.normalsNeedUpdate",
-				"colorsNeedUpdate": "Geometry.colorsNeedUpdate",
-				"groupsNeedUpdate": "Geometry.groupsNeedUpdate",
-				"lineDistancesNeedUpdate": "Geometry.lineDistancesNeedUpdate",
-				"applyMatrix": "Geometry.applyMatrix",
 				"center": "Geometry.center",
 				"clone": "Geometry.clone",
+				"colors": "Geometry.colors",
+				"colorsNeedUpdate": "Geometry.colorsNeedUpdate",
 				"computeBoundingBox": "Geometry.computeBoundingBox",
 				"computeBoundingSphere": "Geometry.computeBoundingSphere",
 				"computeFaceNormals": "Geometry.computeFaceNormals",
@@ -685,45 +680,66 @@ var list = {
 				"computeVertexNormals": "Geometry.computeVertexNormals",
 				"copy": "Geometry.copy",
 				"dispose": "Geometry.dispose",
+				"elementsNeedUpdate": "Geometry.elementsNeedUpdate",
+				"faceVertexUvs": "Geometry.faceVertexUvs",
+				"faces": "Geometry.faces",
 				"fromBufferGeometry": "Geometry.fromBufferGeometry",
+				"groupsNeedUpdate": "Geometry.groupsNeedUpdate",
+				"id": "Geometry.id",
+				"isGeometry": "Geometry.isGeometry",
+				"lineDistances": "Geometry.lineDistances",
+				"lineDistancesNeedUpdate": "Geometry.lineDistancesNeedUpdate",
 				"lookAt": "Geometry.lookAt",
 				"merge": "Geometry.merge",
 				"mergeMesh": "Geometry.mergeMesh",
 				"mergeVertices": "Geometry.mergeVertices",
+				"morphNormals": "Geometry.morphNormals",
+				"morphTargets": "Geometry.morphTargets",
+				"name": "Geometry.name",
 				"normalize": "Geometry.normalize",
+				"normalsNeedUpdate": "Geometry.normalsNeedUpdate",
 				"rotateX": "Geometry.rotateX",
 				"rotateY": "Geometry.rotateY",
 				"rotateZ": "Geometry.rotateZ",
-				"setFromPoints": "Geometry.setFromPoints",
-				"sortFacesByMaterialIndex": "Geometry.sortFacesByMaterialIndex",
 				"scale": "Geometry.scale",
+				"setFromPoints": "Geometry.setFromPoints",
+				"skinIndices": "Geometry.skinIndices",
+				"skinWeights": "Geometry.skinWeights",
+				"sortFacesByMaterialIndex": "Geometry.sortFacesByMaterialIndex",
 				"toJSON": "Geometry.toJSON",
-				"translate": "Geometry.translate"
+				"translate": "Geometry.translate",
+				"uuid": "Geometry.uuid",
+				"uvsNeedUpdate": "Geometry.uvsNeedUpdate",
+				"vertices": "Geometry.vertices",
+				"verticesNeedUpdate": "Geometry.verticesNeedUpdate"
 
 			},
 
 			"InstancedBufferAttribute": {
 
+				"#PARENT": "BufferAttribute",
 				"#URL": "api/core/InstancedBufferAttribute",
-				"meshPerAttribute": "InstancedBufferAttribute.meshPerAttribute",
-				"isInstancedBufferAttribute": "InstancedBufferAttribute.isInstancedBufferAttribute"
+				"isInstancedBufferAttribute": "InstancedBufferAttribute.isInstancedBufferAttribute",
+				"meshPerAttribute": "InstancedBufferAttribute.meshPerAttribute"
 
 			},
 
 			"InstancedBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/core/InstancedBufferGeometry",
-				"maxInstancedCount": "InstancedBufferGeometry.maxInstancedCount",
+				"addGroup": "InstancedBufferGeometry.addGroup",
 				"isInstancedBufferGeometry": "InstancedBufferGeometry.isInstancedBufferGeometry",
-				"addGroup": "InstancedBufferGeometry.addGroup"
+				"maxInstancedCount": "InstancedBufferGeometry.maxInstancedCount"
 
 			},
 
 			"InstancedInterleavedBuffer": {
 
+				"#PARENT": "InterleavedBuffer",
 				"#URL": "api/core/InstancedInterleavedBuffer",
-				"meshPerAttribute": "InstancedInterleavedBuffer.meshPerAttribute",
-				"isInstancedInterleavedBuffer": "InstancedInterleavedBuffer.isInstancedInterleavedBuffer"
+				"isInstancedInterleavedBuffer": "InstancedInterleavedBuffer.isInstancedInterleavedBuffer",
+				"meshPerAttribute": "InstancedInterleavedBuffer.meshPerAttribute"
 
 			},
 
@@ -731,54 +747,54 @@ var list = {
 
 				"#URL": "api/core/InterleavedBuffer",
 				"array": "InterleavedBuffer.array",
-				"stride": "InterleavedBuffer.stride",
-				"count": "InterleavedBuffer.count",
-				"dynamic": "InterleavedBuffer.dynamic",
-				"updateRange": "InterleavedBuffer.updateRange",
-				"updateRange.offset": "InterleavedBuffer.updateRange.offset",
-				"updateRange.count": "InterleavedBuffer.updateRange.count",
-				"version": "InterleavedBuffer.version",
-				"isInterleavedBuffer": "InterleavedBuffer.isInterleavedBuffer",
-				"needsUpdate": "InterleavedBuffer.needsUpdate",
-				"setArray": "InterleavedBuffer.setArray",
-				"setDynamic": "InterleavedBuffer.setDynamic",
+				"clone": "InterleavedBuffer.clone",
 				"copy": "InterleavedBuffer.copy",
 				"copyAt": "InterleavedBuffer.copyAt",
+				"count": "InterleavedBuffer.count",
+				"dynamic": "InterleavedBuffer.dynamic",
+				"isInterleavedBuffer": "InterleavedBuffer.isInterleavedBuffer",
+				"needsUpdate": "InterleavedBuffer.needsUpdate",
 				"set": "InterleavedBuffer.set",
-				"clone": "InterleavedBuffer.clone"
+				"setArray": "InterleavedBuffer.setArray",
+				"setDynamic": "InterleavedBuffer.setDynamic",
+				"stride": "InterleavedBuffer.stride",
+				"updateRange": "InterleavedBuffer.updateRange",
+				"updateRange.count": "InterleavedBuffer.updateRange.count",
+				"updateRange.offset": "InterleavedBuffer.updateRange.offset",
+				"version": "InterleavedBuffer.version"
 
 			},
 
 			"InterleavedBufferAttribute": {
 
 				"#URL": "api/core/InterleavedBufferAttribute",
-				"data": "InterleavedBufferAttribute.data",
 				"array": "InterleavedBufferAttribute.array",
 				"count": "InterleavedBufferAttribute.count",
-				"itemSize": "InterleavedBufferAttribute.itemSize",
-				"offset": "InterleavedBufferAttribute.offset",
-				"normalized": "InterleavedBufferAttribute.normalized",
-				"isInterleavedBufferAttribute": "InterleavedBufferAttribute.isInterleavedBufferAttribute",
+				"data": "InterleavedBufferAttribute.data",
+				"getW": "InterleavedBufferAttribute.getW",
 				"getX": "InterleavedBufferAttribute.getX",
 				"getY": "InterleavedBufferAttribute.getY",
 				"getZ": "InterleavedBufferAttribute.getZ",
-				"getW": "InterleavedBufferAttribute.getW",
-				"setX": "InterleavedBufferAttribute.setX",
-				"setY": "InterleavedBufferAttribute.setY",
-				"setZ": "InterleavedBufferAttribute.setZ",
+				"isInterleavedBufferAttribute": "InterleavedBufferAttribute.isInterleavedBufferAttribute",
+				"itemSize": "InterleavedBufferAttribute.itemSize",
+				"normalized": "InterleavedBufferAttribute.normalized",
+				"offset": "InterleavedBufferAttribute.offset",
 				"setW": "InterleavedBufferAttribute.setW",
+				"setX": "InterleavedBufferAttribute.setX",
 				"setXY": "InterleavedBufferAttribute.setXY",
 				"setXYZ": "InterleavedBufferAttribute.setXYZ",
-				"setXYZW": "InterleavedBufferAttribute.setXYZW"
+				"setXYZW": "InterleavedBufferAttribute.setXYZW",
+				"setY": "InterleavedBufferAttribute.setY",
+				"setZ": "InterleavedBufferAttribute.setZ"
 
 			},
 
 			"Layers": {
 
 				"#URL": "api/core/Layers",
-				"mask": "Layers.mask",
 				"disable": "Layers.disable",
 				"enable": "Layers.enable",
+				"mask": "Layers.mask",
 				"set": "Layers.set",
 				"test": "Layers.test",
 				"toggle": "Layers.toggle"
@@ -788,12 +804,29 @@ var list = {
 			"Object3D": {
 
 				"#URL": "api/core/Object3D",
+				"DefaultMatrixAutoUpdate": "Object3D.DefaultMatrixAutoUpdate",
+				"DefaultUp": "Object3D.DefaultUp",
+				"add": "Object3D.add",
+				"applyMatrix": "Object3D.applyMatrix",
+				"applyQuaternion": "Object3D.applyQuaternion",
 				"castShadow": "Object3D.castShadow",
 				"children": "Object3D.children",
+				"clone": "Object3D.clone",
+				"copy": "Object3D.copy",
 				"frustumCulled": "Object3D.frustumCulled",
+				"getObjectById": "Object3D.getObjectById",
+				"getObjectByName": "Object3D.getObjectByName",
+				"getObjectByProperty": "Object3D.getObjectByProperty",
+				"getWorldDirection": "Object3D.getWorldDirection",
+				"getWorldPosition": "Object3D.getWorldPosition",
+				"getWorldQuaternion": "Object3D.getWorldQuaternion",
+				"getWorldRotation": "Object3D.getWorldRotation",
+				"getWorldScale": "Object3D.getWorldScale",
 				"id": "Object3D.id",
 				"isObject": "Object3D.isObject",
 				"layers": "Object3D.layers",
+				"localToWorld": "Object3D.localToWorld",
+				"lookAt": "Object3D.lookAt",
 				"matrix": "Object3D.matrix",
 				"matrixAutoUpdate": "Object3D.matrixAutoUpdate",
 				"matrixWorld": "Object3D.matrixWorld",
@@ -806,38 +839,17 @@ var list = {
 				"parent": "Object3D.parent",
 				"position": "Object3D.position",
 				"quaternion": "Object3D.quaternion",
-				"receiveShadow": "Object3D.receiveShadow",
-				"renderOrder": "Object3D.renderOrder",
-				"rotation": "Object3D.rotation",
-				"scale": "Object3D.scale",
-				"up": "Object3D.up",
-				"userData": "Object3D.userData",
-				"uuid": "Object3D.uuid",
-				"visible": "Object3D.visible",
-				"DefaultUp": "Object3D.DefaultUp",
-				"DefaultMatrixAutoUpdate": "Object3D.DefaultMatrixAutoUpdate",
-				"add": "Object3D.add",
-				"applyMatrix": "Object3D.applyMatrix",
-				"applyQuaternion": "Object3D.applyQuaternion",
-				"clone": "Object3D.clone",
-				"copy": "Object3D.copy",
-				"getObjectById": "Object3D.getObjectById",
-				"getObjectByName": "Object3D.getObjectByName",
-				"getObjectByProperty": "Object3D.getObjectByProperty",
-				"getWorldPosition": "Object3D.getWorldPosition",
-				"getWorldQuaternion": "Object3D.getWorldQuaternion",
-				"getWorldRotation": "Object3D.getWorldRotation",
-				"getWorldScale": "Object3D.getWorldScale",
-				"getWorldDirection": "Object3D.getWorldDirection",
-				"localToWorld": "Object3D.localToWorld",
-				"lookAt": "Object3D.lookAt",
 				"raycast": "Object3D.raycast",
+				"receiveShadow": "Object3D.receiveShadow",
 				"remove": "Object3D.remove",
+				"renderOrder": "Object3D.renderOrder",
 				"rotateOnAxis": "Object3D.rotateOnAxis",
 				"rotateOnWorldAxis": "Object3D.rotateOnWorldAxis",
 				"rotateX": "Object3D.rotateX",
 				"rotateY": "Object3D.rotateY",
 				"rotateZ": "Object3D.rotateZ",
+				"rotation": "Object3D.rotation",
+				"scale": "Object3D.scale",
 				"setRotationFromAxisAngle": "Object3D.setRotationFromAxisAngle",
 				"setRotationFromEuler": "Object3D.setRotationFromEuler",
 				"setRotationFromMatrix": "Object3D.setRotationFromMatrix",
@@ -848,10 +860,14 @@ var list = {
 				"translateY": "Object3D.translateY",
 				"translateZ": "Object3D.translateZ",
 				"traverse": "Object3D.traverse",
-				"traverseVisible": "Object3D.traverseVisible",
 				"traverseAncestors": "Object3D.traverseAncestors",
+				"traverseVisible": "Object3D.traverseVisible",
+				"up": "Object3D.up",
 				"updateMatrix": "Object3D.updateMatrix",
 				"updateMatrixWorld": "Object3D.updateMatrixWorld",
+				"userData": "Object3D.userData",
+				"uuid": "Object3D.uuid",
+				"visible": "Object3D.visible",
 				"worldToLocal": "Object3D.worldToLocal"
 
 			},
@@ -860,22 +876,22 @@ var list = {
 
 				"#URL": "api/core/Raycaster",
 				"far": "Raycaster.far",
+				"intersectObject": "Raycaster.intersectObject",
+				"intersectObjects": "Raycaster.intersectObjects",
 				"linePrecision": "Raycaster.linePrecision",
 				"near": "Raycaster.near",
 				"params": "Raycaster.params",
 				"ray": "Raycaster.ray",
 				"set": "Raycaster.set",
-				"setFromCamera": "Raycaster.setFromCamera",
-				"intersectObject": "Raycaster.intersectObject",
-				"intersectObjects": "Raycaster.intersectObjects"
+				"setFromCamera": "Raycaster.setFromCamera"
 
 			},
 
 			"Uniform": {
 
 				"#URL": "api/core/Uniform",
-				"value": "Uniform.value",
-				"clone": "Uniform.clone"
+				"clone": "Uniform.clone",
+				"value": "Uniform.value"
 
 			}
 
@@ -886,6 +902,7 @@ var list = {
 
 			"BufferAttribute Types": {
 
+				"#PARENT": "BufferAttribute",
 				"#URL": "api/core/bufferAttributeTypes/BufferAttributeTypes"
 
 			}
@@ -931,31 +948,32 @@ var list = {
 
 				"#URL": "api/extras/core/Curve",
 				"arcLengthDivisions": "Curve.arcLengthDivisions",
+				"clone": "Curve.clone",
+				"computeFrenetFrames": "Curve.computeFrenetFrames",
+				"copy": "Curve.copy",
+				"fromJSON": "Curve.fromJSON",
+				"getLength": "Curve.getLength",
+				"getLengths": "Curve.getLengths",
 				"getPoint": "Curve.getPoint",
 				"getPointAt": "Curve.getPointAt",
 				"getPoints": "Curve.getPoints",
 				"getSpacedPoints": "Curve.getSpacedPoints",
-				"getLength": "Curve.getLength",
-				"getLengths": "Curve.getLengths",
-				"updateArcLengths": "Curve.updateArcLengths",
-				"getUtoTmapping": "Curve.getUtoTmapping",
 				"getTangent": "Curve.getTangent",
 				"getTangentAt": "Curve.getTangentAt",
-				"computeFrenetFrames": "Curve.computeFrenetFrames",
-				"clone": "Curve.clone",
-				"copy": "Curve.copy",
+				"getUtoTmapping": "Curve.getUtoTmapping",
 				"toJSON": "Curve.toJSON",
-				"fromJSON": "Curve.fromJSON"
+				"updateArcLengths": "Curve.updateArcLengths"
 
 			},
 
 			"CurvePath": {
 
+				"#PARENT": "Curve",
 				"#URL": "api/extras/core/CurvePath",
-				"curves": "CurvePath.curves",
-				"autoClose": "CurvePath.autoClose",
 				"add": "CurvePath.add",
+				"autoClose": "CurvePath.autoClose",
 				"closePath": "CurvePath.closePath",
+				"curves": "CurvePath.curves",
 				"getCurveLengths": "CurvePath.getCurveLengths"
 
 			},
@@ -964,8 +982,8 @@ var list = {
 
 				"#URL": "api/extras/core/Font",
 				"data": "Font.data",
-				"isFont": "Font.isFont",
-				"generateShapes": "Font.generateShapes"
+				"generateShapes": "Font.generateShapes",
+				"isFont": "Font.isFont"
 
 			},
 
@@ -973,19 +991,20 @@ var list = {
 
 				"#URL": "api/extras/core/Interpolations",
 				"CatmullRom": "Interpolations.CatmullRom",
-				"QuadraticBezier": "Interpolations.QuadraticBezier",
-				"CubicBezier": "Interpolations.CubicBezier"
+				"CubicBezier": "Interpolations.CubicBezier",
+				"QuadraticBezier": "Interpolations.QuadraticBezier"
 
 			},
 
 			"Path": {
 
+				"#PARENT": "CurvePath",
 				"#URL": "api/extras/core/Path",
-				"currentPoint": "Path.currentPoint",
 				"absarc": "Path.absarc",
 				"absellipse": "Path.absellipse",
 				"arc": "Path.arc",
 				"bezierCurveTo": "Path.bezierCurveTo",
+				"currentPoint": "Path.currentPoint",
 				"ellipse": "Path.ellipse",
 				"lineTo": "Path.lineTo",
 				"moveTo": "Path.moveTo",
@@ -997,24 +1016,26 @@ var list = {
 
 			"Shape": {
 
+				"#PARENT": "Path",
 				"#URL": "api/extras/core/Shape",
-				"uuid": "Shape.uuid",
-				"holes": "Shape.holes",
 				"extractPoints": "Shape.extractPoints",
-				"getPointsHoles": "Shape.getPointsHoles"
+				"getPointsHoles": "Shape.getPointsHoles",
+				"holes": "Shape.holes",
+				"uuid": "Shape.uuid"
 
 			},
 
 			"ShapePath": {
 
+				"#PARENT": "CurvePath",
 				"#URL": "api/extras/core/ShapePath",
-				"subPaths": "ShapePath.subPaths",
-				"currentPath": "ShapePath.currentPath",
-				"moveTo": "ShapePath.moveTo",
-				"lineTo": "ShapePath.lineTo",
-				"quadraticCurveTo": "ShapePath.quadraticCurveTo",
 				"bezierCurveTo": "ShapePath.bezierCurveTo",
+				"currentPath": "ShapePath.currentPath",
+				"lineTo": "ShapePath.lineTo",
+				"moveTo": "ShapePath.moveTo",
+				"quadraticCurveTo": "ShapePath.quadraticCurveTo",
 				"splineThru": "ShapePath.splineThru",
+				"subPaths": "ShapePath.subPaths",
 				"toShapes": "ShapePath.toShapes"
 
 			}
@@ -1026,6 +1047,7 @@ var list = {
 
 			"ArcCurve": {
 
+				"#PARENT": "EllipseCurve",
 				"#URL": "api/extras/curves/ArcCurve",
 				"isArcCurve": "ArcCurve.isArcCurve"
 
@@ -1033,17 +1055,19 @@ var list = {
 
 			"CatmullRomCurve3": {
 
+				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/CatmullRomCurve3",
-				"isCatmullRomCurve3": "CatmullRomCurve3.isCatmullRomCurve3",
-				"points": "CatmullRomCurve3.points",
 				"closed": "CatmullRomCurve3.closed",
 				"curveType": "CatmullRomCurve3.curveType",
+				"isCatmullRomCurve3": "CatmullRomCurve3.isCatmullRomCurve3",
+				"points": "CatmullRomCurve3.points",
 				"tension": "CatmullRomCurve3.tension"
 
 			},
 
 			"CubicBezierCurve": {
 
+				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/CubicBezierCurve",
 				"isCubicBezierCurve": "CubicBezierCurve.isCubicBezierCurve",
 				"v0": "CubicBezierCurve.v0",
@@ -1055,6 +1079,7 @@ var list = {
 
 			"CubicBezierCurve3": {
 
+				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/CubicBezierCurve3",
 				"isCubicBezierCurve3": "CubicBezierCurve3.isCubicBezierCurve3",
 				"v0": "CubicBezierCurve3.v0",
@@ -1066,21 +1091,23 @@ var list = {
 
 			"EllipseCurve": {
 
+				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/EllipseCurve",
-				"isEllipseCurve": "EllipseCurve.isEllipseCurve",
+				"aClockwise": "EllipseCurve.aClockwise",
+				"aEndAngle": "EllipseCurve.aEndAngle",
+				"aRotation": "EllipseCurve.aRotation",
+				"aStartAngle": "EllipseCurve.aStartAngle",
 				"aX": "EllipseCurve.aX",
 				"aY": "EllipseCurve.aY",
+				"isEllipseCurve": "EllipseCurve.isEllipseCurve",
 				"xRadius": "EllipseCurve.xRadius",
-				"yRadius": "EllipseCurve.yRadius",
-				"aStartAngle": "EllipseCurve.aStartAngle",
-				"aEndAngle": "EllipseCurve.aEndAngle",
-				"aClockwise": "EllipseCurve.aClockwise",
-				"aRotation": "EllipseCurve.aRotation"
+				"yRadius": "EllipseCurve.yRadius"
 
 			},
 
 			"LineCurve": {
 
+				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/LineCurve",
 				"isLineCurve": "LineCurve.isLineCurve",
 				"v1": "LineCurve.v1",
@@ -1090,6 +1117,7 @@ var list = {
 
 			"LineCurve3": {
 
+				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/LineCurve3",
 				"isLineCurve3": "LineCurve3.isLineCurve3",
 				"v1": "LineCurve3.v1",
@@ -1099,6 +1127,7 @@ var list = {
 
 			"QuadraticBezierCurve": {
 
+				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/QuadraticBezierCurve",
 				"isQuadraticBezierCurve": "QuadraticBezierCurve.isQuadraticBezierCurve",
 				"v0": "QuadraticBezierCurve.v0",
@@ -1109,6 +1138,7 @@ var list = {
 
 			"QuadraticBezierCurve3": {
 
+				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/QuadraticBezierCurve3",
 				"isQuadraticBezierCurve3": "QuadraticBezierCurve3.isQuadraticBezierCurve3",
 				"v0": "QuadraticBezierCurve3.v0",
@@ -1119,6 +1149,7 @@ var list = {
 
 			"SplineCurve": {
 
+				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/SplineCurve",
 				"isSplineCurve": "SplineCurve.isSplineCurve",
 				"points": "SplineCurve.points"
@@ -1132,6 +1163,7 @@ var list = {
 
 			"ImmediateRenderObject": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/extras/objects/ImmediateRenderObject",
 				"render": "ImmediateRenderObject.render"
 
@@ -1144,54 +1176,63 @@ var list = {
 
 			"BoxBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/BoxBufferGeometry"
 
 			},
 
 			"BoxGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/BoxGeometry"
 
 			},
 
 			"CircleBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/CircleBufferGeometry"
 
 			},
 
 			"CircleGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/CircleGeometry"
 
 			},
 
 			"ConeBufferGeometry": {
 
+				"#PARENT": "CylinderBufferGeometry",
 				"#URL": "api/geometries/ConeBufferGeometry"
 
 			},
 
 			"ConeGeometry": {
 
+				"#PARENT": "CylinderGeometry",
 				"#URL": "api/geometries/ConeGeometry"
 
 			},
 
 			"CylinderBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/CylinderBufferGeometry"
 
 			},
 
 			"CylinderGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/CylinderGeometry"
 
 			},
 
 			"DodecahedronBufferGeometry": {
 
+				"#PARENT": "PolyhedronBufferGeometry",
 				"#URL": "api/geometries/DodecahedronBufferGeometry",
 				"parameters": "DodecahedronBufferGeometry.parameters"
 
@@ -1199,6 +1240,7 @@ var list = {
 
 			"DodecahedronGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/DodecahedronGeometry",
 				"parameters": "DodecahedronGeometry.parameters"
 
@@ -1206,28 +1248,32 @@ var list = {
 
 			"EdgesGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/EdgesGeometry"
 
 			},
 
 			"ExtrudeGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/ExtrudeGeometry",
-				"addShapeList": "ExtrudeGeometry.addShapeList",
-				"addShape": "ExtrudeGeometry.addShape"
+				"addShape": "ExtrudeGeometry.addShape",
+				"addShapeList": "ExtrudeGeometry.addShapeList"
 
 			},
 
 			"ExtrudeBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/ExtrudeBufferGeometry",
-				"addShapeList": "ExtrudeBufferGeometry.addShapeList",
-				"addShape": "ExtrudeBufferGeometry.addShape"
+				"addShape": "ExtrudeBufferGeometry.addShape",
+				"addShapeList": "ExtrudeBufferGeometry.addShapeList"
 
 			},
 
 			"IcosahedronBufferGeometry": {
 
+				"#PARENT": "PolyhedronBufferGeometry",
 				"#URL": "api/geometries/IcosahedronBufferGeometry",
 				"parameters": "IcosahedronBufferGeometry.parameters"
 
@@ -1235,6 +1281,7 @@ var list = {
 
 			"IcosahedronGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/IcosahedronGeometry",
 				"parameters": "IcosahedronGeometry.parameters"
 
@@ -1242,18 +1289,21 @@ var list = {
 
 			"LatheBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/LatheBufferGeometry"
 
 			},
 
 			"LatheGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/LatheGeometry"
 
 			},
 
 			"OctahedronBufferGeometry": {
 
+				"#PARENT": "PolyhedronBufferGeometry",
 				"#URL": "api/geometries/OctahedronBufferGeometry",
 				"parameters": "OctahedronBufferGeometry.parameters"
 
@@ -1261,6 +1311,7 @@ var list = {
 
 			"OctahedronGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/OctahedronGeometry",
 				"parameters": "OctahedronGeometry.parameters"
 
@@ -1268,30 +1319,35 @@ var list = {
 
 			"ParametricBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/ParametricBufferGeometry"
 
 			},
 
 			"ParametricGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/ParametricGeometry"
 
 			},
 
 			"PlaneBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/PlaneBufferGeometry"
 
 			},
 
 			"PlaneGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/PlaneGeometry"
 
 			},
 
 			"PolyhedronBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/PolyhedronBufferGeometry",
 				"parameters": "PolyhedronBufferGeometry.parameters"
 
@@ -1299,6 +1355,7 @@ var list = {
 
 			"PolyhedronGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/PolyhedronGeometry",
 				"parameters": "PolyhedronGeometry.parameters"
 
@@ -1306,42 +1363,49 @@ var list = {
 
 			"RingBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/RingBufferGeometry"
 
 			},
 
 			"RingGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/RingGeometry"
 
 			},
 
 			"ShapeBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/ShapeBufferGeometry"
 
 			},
 
 			"ShapeGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/ShapeGeometry"
 
 			},
 
 			"SphereBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/SphereBufferGeometry"
 
 			},
 
 			"SphereGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/SphereGeometry"
 
 			},
 
 			"TetrahedronBufferGeometry": {
 
+				"#PARENT": "PolyhedronBufferGeometry",
 				"#URL": "api/geometries/TetrahedronBufferGeometry",
 				"parameters": "TetrahedronBufferGeometry.parameters"
 
@@ -1349,6 +1413,7 @@ var list = {
 
 			"TetrahedronGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/TetrahedronGeometry",
 				"parameters": "TetrahedronGeometry.parameters"
 
@@ -1356,62 +1421,71 @@ var list = {
 
 			"TextBufferGeometry": {
 
+				"#PARENT": "ExtrudeBufferGeometry",
 				"#URL": "api/geometries/TextBufferGeometry"
 
 			},
 
 			"TextGeometry": {
 
+				"#PARENT": "ExtrudeGeometry",
 				"#URL": "api/geometries/TextGeometry"
 
 			},
 
 			"TorusBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/TorusBufferGeometry"
 
 			},
 
 			"TorusGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/TorusGeometry"
 
 			},
 
 			"TorusKnotBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/TorusKnotBufferGeometry"
 
 			},
 
 			"TorusKnotGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/TorusKnotGeometry"
 
 			},
 
 			"TubeBufferGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/TubeBufferGeometry",
-				"parameters": "TubeBufferGeometry.parameters",
-				"tangents": "TubeBufferGeometry.tangents",
+				"binormals": "TubeBufferGeometry.binormals",
 				"normals": "TubeBufferGeometry.normals",
-				"binormals": "TubeBufferGeometry.binormals"
+				"parameters": "TubeBufferGeometry.parameters",
+				"tangents": "TubeBufferGeometry.tangents"
 
 			},
 
 			"TubeGeometry": {
 
+				"#PARENT": "Geometry",
 				"#URL": "api/geometries/TubeGeometry",
-				"parameters": "TubeGeometry.parameters",
-				"tangents": "TubeGeometry.tangents",
+				"binormals": "TubeGeometry.binormals",
 				"normals": "TubeGeometry.normals",
-				"binormals": "TubeGeometry.binormals"
+				"parameters": "TubeGeometry.parameters",
+				"tangents": "TubeGeometry.tangents"
 
 			},
 
 			"WireframeGeometry": {
 
+				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/WireframeGeometry"
 
 			}
@@ -1423,31 +1497,35 @@ var list = {
 
 			"ArrowHelper": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/helpers/ArrowHelper",
-				"line": "ArrowHelper.line",
 				"cone": "ArrowHelper.cone",
+				"line": "ArrowHelper.line",
 				"setColor": "ArrowHelper.setColor",
-				"setLength": "ArrowHelper.setLength",
-				"setDirection": "ArrowHelper.setDirection"
+				"setDirection": "ArrowHelper.setDirection",
+				"setLength": "ArrowHelper.setLength"
 
 			},
 
 			"AxesHelper": {
 
+				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/AxesHelper"
 
 			},
 
 			"BoxHelper": {
 
+				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/BoxHelper",
-				"update": "BoxHelper.update",
-				"setFromObject": "BoxHelper.setFromObject"
+				"setFromObject": "BoxHelper.setFromObject",
+				"update": "BoxHelper.update"
 
 			},
 
 			"Box3Helper": {
 
+				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/Box3Helper",
 				"box": "Box3Helper.box",
 				"updateMatrixWorld": "Box3Helper.updateMatrixWorld"
@@ -1456,30 +1534,33 @@ var list = {
 
 			"CameraHelper": {
 
+				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/CameraHelper",
 				"camera": "CameraHelper.camera",
-				"pointMap": "CameraHelper.pointMap",
 				"matrix": "CameraHelper.matrix",
 				"matrixAutoUpdate": "CameraHelper.matrixAutoUpdate",
+				"pointMap": "CameraHelper.pointMap",
 				"update": "CameraHelper.update"
 
 			},
 
 			"DirectionalLightHelper": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/helpers/DirectionalLightHelper",
-				"lightPlane": "DirectionalLightHelper.lightPlane",
-				"light": "DirectionalLightHelper.light",
-				"matrix": "DirectionalLightHelper.matrix",
-				"matrixAutoUpdate": "DirectionalLightHelper.matrixAutoUpdate",
 				"color": "DirectionalLightHelper.color",
 				"dispose": "DirectionalLightHelper.dispose",
+				"light": "DirectionalLightHelper.light",
+				"lightPlane": "DirectionalLightHelper.lightPlane",
+				"matrix": "DirectionalLightHelper.matrix",
+				"matrixAutoUpdate": "DirectionalLightHelper.matrixAutoUpdate",
 				"update": "DirectionalLightHelper.update"
 
 			},
 
 			"FaceNormalsHelper": {
 
+				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/FaceNormalsHelper",
 				"matrixAutoUpdate": "FaceNormalsHelper.matrixAutoUpdate",
 				"object": "FaceNormalsHelper.object",
@@ -1490,30 +1571,34 @@ var list = {
 
 			"GridHelper": {
 
+				"#PARENT": "Line",
 				"#URL": "api/helpers/GridHelper"
 
 			},
 
 			"PolarGridHelper": {
 
+				"#PARENT": "Line",
 				"#URL": "api/helpers/PolarGridHelper"
 
 			},
 
 			"HemisphereLightHelper": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/helpers/HemisphereLightHelper",
+				"color": "HemisphereLightHelper.color",
+				"dispose": "HemisphereLightHelper.dispose",
 				"light": "HemisphereLightHelper.light",
 				"matrix": "HemisphereLightHelper.matrix",
 				"matrixAutoUpdate": "HemisphereLightHelper.matrixAutoUpdate",
-				"color": "HemisphereLightHelper.color",
-				"dispose": "HemisphereLightHelper.dispose",
 				"update": "HemisphereLightHelper.update"
 
 			},
 
 			"PlaneHelper": {
 
+				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/PlaneHelper",
 				"plane": "PlaneHelper.plane",
 				"size": "PlaneHelper.size",
@@ -1523,28 +1608,31 @@ var list = {
 
 			"PointLightHelper": {
 
+				"#PARENT": "Mesh",
 				"#URL": "api/helpers/PointLightHelper",
+				"color": "PointLightHelper.color",
+				"dispose": "PointLightHelper.dispose",
 				"light": "PointLightHelper.light",
 				"matrix": "PointLightHelper.matrix",
 				"matrixAutoUpdate": "PointLightHelper.matrixAutoUpdate",
-				"color": "PointLightHelper.color",
-				"dispose": "PointLightHelper.dispose",
 				"update": "PointLightHelper.update"
 
 			},
 
 			"RectAreaLightHelper": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/helpers/RectAreaLightHelper",
-				"light": "RectAreaLightHelper.light",
 				"color": "RectAreaLightHelper.color",
 				"dispose": "RectAreaLightHelper.dispose",
+				"light": "RectAreaLightHelper.light",
 				"update": "RectAreaLightHelper.update"
 
 			},
 
 			"SkeletonHelper": {
 
+				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/SkeletonHelper",
 				"bones": "SkeletonHelper.bones",
 				"root": "SkeletonHelper.root"
@@ -1553,19 +1641,21 @@ var list = {
 
 			"SpotLightHelper": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/helpers/SpotLightHelper",
+				"color": "SpotLightHelper.color",
 				"cone": "SpotLightHelper.cone",
+				"dispose": "SpotLightHelper.dispose",
 				"light": "SpotLightHelper.light",
 				"matrix": "SpotLightHelper.matrix",
 				"matrixAutoUpdate": "SpotLightHelper.matrixAutoUpdate",
-				"color": "SpotLightHelper.color",
-				"dispose": "SpotLightHelper.dispose",
 				"update": "SpotLightHelper.update"
 
 			},
 
 			"VertexNormalsHelper": {
 
+				"#PARENT": "Line",
 				"#URL": "api/helpers/VertexNormalsHelper",
 				"matrixAutoUpdate": "VertexNormalsHelper.matrixAutoUpdate",
 				"object": "VertexNormalsHelper.object",
@@ -1581,6 +1671,7 @@ var list = {
 
 			"AmbientLight": {
 
+				"#PARENT": "Light",
 				"#URL": "api/lights/AmbientLight",
 				"castShadow": "AmbientLight.castShadow",
 				"isAmbientLight": "AmbientLight.isAmbientLight"
@@ -1589,64 +1680,71 @@ var list = {
 
 			"DirectionalLight": {
 
+				"#PARENT": "Light",
 				"#URL": "api/lights/DirectionalLight",
 				"castShadow": "DirectionalLight.castShadow",
+				"copy": "DirectionalLight.copy",
 				"isDirectionalLight": "DirectionalLight.isDirectionalLight",
 				"position": "DirectionalLight.position",
 				"shadow": "DirectionalLight.shadow",
-				"target": "DirectionalLight.target",
-				"copy": "DirectionalLight.copy"
+				"target": "DirectionalLight.target"
 
 			},
 
 			"HemisphereLight": {
 
+				"#PARENT": "Light",
 				"#URL": "api/lights/HemisphereLight",
 				"castShadow": "HemisphereLight.castShadow",
 				"color": "HemisphereLight.color",
+				"copy": "HemisphereLight.copy",
 				"groundColor": "HemisphereLight.groundColor",
 				"isHemisphereLight": "HemisphereLight.isHemisphereLight",
-				"position": "HemisphereLight.position",
-				"copy": "HemisphereLight.copy"
+				"position": "HemisphereLight.position"
 
 			},
 
 			"Light": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/lights/Light",
 				"color": "Light.color",
+				"copy": "Light.copy",
 				"intensity": "Light.intensity",
 				"isLight": "Light.isLight",
-				"copy": "Light.copy",
 				"toJSON": "Light.toJSON"
 
 			},
 
 			"PointLight": {
 
+				"#PARENT": "Light",
 				"#URL": "api/lights/PointLight",
+				"copy": "PointLight.copy",
 				"decay": "PointLight.decay",
 				"distance": "PointLight.distance",
 				"isPointLight": "PointLight.isPointLight",
 				"power": "PointLight.power",
-				"shadow": "PointLight.shadow",
-				"copy": "PointLight.copy"
+				"shadow": "PointLight.shadow"
 
 			},
 
 			"RectAreaLight": {
 
+				"#PARENT": "Light",
 				"#URL": "api/lights/RectAreaLight",
-				"isRectAreaLight": "RectAreaLight.isRectAreaLight",
-				"copy": "RectAreaLight.copy"
+				"copy": "RectAreaLight.copy",
+				"isRectAreaLight": "RectAreaLight.isRectAreaLight"
 
 			},
 
 			"SpotLight": {
 
+				"#PARENT": "Light",
 				"#URL": "api/lights/SpotLight",
 				"angle": "SpotLight.angle",
 				"castShadow": "SpotLight.castShadow",
+				"copy": "SpotLight.copy",
 				"decay": "SpotLight.decay",
 				"distance": "SpotLight.distance",
 				"isSpotLight": "SpotLight.isSpotLight",
@@ -1654,8 +1752,7 @@ var list = {
 				"position": "SpotLight.position",
 				"power": "SpotLight.power",
 				"shadow": "SpotLight.shadow",
-				"target": "SpotLight.target",
-				"copy": "SpotLight.copy"
+				"target": "SpotLight.target"
 
 			}
 
@@ -1666,6 +1763,7 @@ var list = {
 
 			"DirectionalLightShadow": {
 
+				"#PARENT": "LightShadow",
 				"#URL": "api/lights/shadows/DirectionalLightShadow",
 				"camera": "DirectionalLightShadow.camera"
 
@@ -1674,20 +1772,21 @@ var list = {
 			"LightShadow": {
 
 				"#URL": "api/lights/shadows/LightShadow",
-				"camera": "LightShadow.camera",
 				"bias": "LightShadow.bias",
+				"camera": "LightShadow.camera",
+				"clone": "LightShadow.clone",
+				"copy": "LightShadow.copy",
 				"map": "LightShadow.map",
 				"mapSize": "LightShadow.mapSize",
 				"matrix": "LightShadow.matrix",
 				"radius": "LightShadow.radius",
-				"copy": "LightShadow.copy",
-				"clone": "LightShadow.clone",
 				"toJSON": "LightShadow.toJSON"
 
 			},
 
 			"SpotLightShadow": {
 
+				"#PARENT": "LightShadow",
 				"#URL": "api/lights/shadows/SpotLightShadow",
 				"camera": "SpotLightShadow.camera",
 				"isSpotLightShadow": "SpotLightShadow.isSpotLightShadow",
@@ -1703,8 +1802,8 @@ var list = {
 			"AnimationLoader": {
 
 				"#URL": "api/loaders/AnimationLoader",
-				"manager": "AnimationLoader.manager",
 				"load": "AnimationLoader.load",
+				"manager": "AnimationLoader.manager",
 				"parse": "AnimationLoader.parse"
 
 			},
@@ -1712,16 +1811,16 @@ var list = {
 			"AudioLoader": {
 
 				"#URL": "api/loaders/AudioLoader",
-				"manager": "AudioLoader.manager",
-				"load": "AudioLoader.load"
+				"load": "AudioLoader.load",
+				"manager": "AudioLoader.manager"
 
 			},
 
 			"BufferGeometryLoader": {
 
 				"#URL": "api/loaders/BufferGeometryLoader",
-				"manager": "BufferGeometryLoader.manager",
 				"load": "BufferGeometryLoader.load",
+				"manager": "BufferGeometryLoader.manager",
 				"parse": "BufferGeometryLoader.parse"
 
 			},
@@ -1729,21 +1828,21 @@ var list = {
 			"Cache": {
 
 				"#URL": "api/loaders/Cache",
+				"add": "Cache.add",
+				"clear": "Cache.clear",
 				"enabled": "Cache.enabled",
 				"files": "Cache.files",
-				"add": "Cache.add",
 				"get": "Cache.get",
-				"remove": "Cache.remove",
-				"clear": "Cache.clear"
+				"remove": "Cache.remove"
 
 			},
 
 			"CompressedTextureLoader": {
 
 				"#URL": "api/loaders/CompressedTextureLoader",
+				"load": "CompressedTextureLoader.load",
 				"manager": "CompressedTextureLoader.manager",
 				"path": "CompressedTextureLoader.path",
-				"load": "CompressedTextureLoader.load",
 				"setPath": "CompressedTextureLoader.setPath"
 
 			},
@@ -1752,9 +1851,9 @@ var list = {
 
 				"#URL": "api/loaders/CubeTextureLoader",
 				"crossOrigin": "CubeTextureLoader.crossOrigin",
+				"load": "CubeTextureLoader.load",
 				"manager": "CubeTextureLoader.manager",
 				"path": "CubeTextureLoader.path",
-				"load": "CubeTextureLoader.load",
 				"setCrossOrigin": "CubeTextureLoader.setCrossOrigin",
 				"setPath": "CubeTextureLoader.setPath"
 
@@ -1763,8 +1862,8 @@ var list = {
 			"DataTextureLoader": {
 
 				"#URL": "api/loaders/DataTextureLoader",
-				"manager": "DataTextureLoader.manager",
-				"load": "DataTextureLoader.load"
+				"load": "DataTextureLoader.load",
+				"manager": "DataTextureLoader.manager"
 
 			},
 
@@ -1772,26 +1871,26 @@ var list = {
 
 				"#URL": "api/loaders/FileLoader",
 				"cache": "FileLoader.cache",
+				"load": "FileLoader.load",
 				"manager": "FileLoader.manager",
 				"mimeType": "FileLoader.mimeType",
 				"path": "FileLoader.path",
 				"responseType": "FileLoader.responseType",
-				"withCredentials": "FileLoader.withCredentials",
-				"load": "FileLoader.load",
 				"setMimeType": "FileLoader.setMimeType",
 				"setPath": "FileLoader.setPath",
 				"setResponseType": "FileLoader.setResponseType",
-				"setWithCredentials": "FileLoader.setWithCredentials"
+				"setWithCredentials": "FileLoader.setWithCredentials",
+				"withCredentials": "FileLoader.withCredentials"
 
 			},
 
 			"FontLoader": {
 
 				"#URL": "api/loaders/FontLoader",
-				"manager": "FontLoader.manager",
-				"path": "FontLoader.path",
 				"load": "FontLoader.load",
+				"manager": "FontLoader.manager",
 				"parse": "FontLoader.parse",
+				"path": "FontLoader.path",
 				"setPath": "FontLoader.setPath"
 
 			},
@@ -1799,10 +1898,10 @@ var list = {
 			"ImageBitmapLoader": {
 
 				"#URL": "api/loaders/ImageBitmapLoader",
+				"load": "ImageBitmapLoader.load",
 				"manager": "ImageBitmapLoader.manager",
 				"options": "ImageBitmapLoader.options",
 				"path": "ImageBitmapLoader.path",
-				"load": "ImageBitmapLoader.load",
 				"setCrossOrigin": "ImageBitmapLoader.setCrossOrigin",
 				"setOptions": "ImageBitmapLoader.setOptions",
 				"setPath": "ImageBitmapLoader.setPath"
@@ -1813,9 +1912,9 @@ var list = {
 
 				"#URL": "api/loaders/ImageLoader",
 				"crossOrigin": "ImageLoader.crossOrigin",
+				"load": "ImageLoader.load",
 				"manager": "ImageLoader.manager",
 				"path": "ImageLoader.path",
-				"load": "ImageLoader.load",
 				"setCrossOrigin": "ImageLoader.setCrossOrigin",
 				"setPath": "ImageLoader.setPath"
 
@@ -1824,23 +1923,23 @@ var list = {
 			"JSONLoader": {
 
 				"#URL": "api/loaders/JSONLoader",
-				"manager": "JSONLoader.manager",
-				"withCredentials": "JSONLoader.withCredentials",
 				"load": "JSONLoader.load",
+				"manager": "JSONLoader.manager",
+				"parse": "JSONLoader.parse",
 				"setTexturePath": "JSONLoader.setTexturePath",
-				"parse": "JSONLoader.parse"
+				"withCredentials": "JSONLoader.withCredentials"
 
 			},
 
 			"Loader": {
 
 				"#URL": "api/loaders/Loader",
-				"onLoadStart": "Loader.onLoadStart",
-				"onLoadProgress": "Loader.onLoadProgress",
-				"onLoadComplete": "Loader.onLoadComplete",
-				"crossOrigin": "Loader.crossOrigin",
 				"createMaterial": "Loader.createMaterial",
-				"initMaterials": "Loader.initMaterials"
+				"crossOrigin": "Loader.crossOrigin",
+				"initMaterials": "Loader.initMaterials",
+				"onLoadComplete": "Loader.onLoadComplete",
+				"onLoadProgress": "Loader.onLoadProgress",
+				"onLoadStart": "Loader.onLoadStart"
 
 			},
 
@@ -1855,11 +1954,11 @@ var list = {
 			"MaterialLoader": {
 
 				"#URL": "api/loaders/MaterialLoader",
-				"manager": "MaterialLoader.manager",
-				"textures": "MaterialLoader.textures",
 				"load": "MaterialLoader.load",
+				"manager": "MaterialLoader.manager",
 				"parse": "MaterialLoader.parse",
-				"setTextures": "MaterialLoader.setTextures"
+				"setTextures": "MaterialLoader.setTextures",
+				"textures": "MaterialLoader.textures"
 
 			},
 
@@ -1867,18 +1966,18 @@ var list = {
 
 				"#URL": "api/loaders/ObjectLoader",
 				"crossOrigin": "ObjectLoader.crossOrigin",
-				"manager": "ObjectLoader.manager",
-				"texturePath": "ObjectLoader.texturePath",
 				"load": "ObjectLoader.load",
+				"manager": "ObjectLoader.manager",
 				"parse": "ObjectLoader.parse",
-				"parseGeometries": "ObjectLoader.parseGeometries",
-				"parseMaterials": "ObjectLoader.parseMaterials",
 				"parseAnimations": "ObjectLoader.parseAnimations",
+				"parseGeometries": "ObjectLoader.parseGeometries",
 				"parseImages": "ObjectLoader.parseImages",
-				"parseTextures": "ObjectLoader.parseTextures",
+				"parseMaterials": "ObjectLoader.parseMaterials",
 				"parseObject": "ObjectLoader.parseObject",
+				"parseTextures": "ObjectLoader.parseTextures",
 				"setCrossOrigin": "ObjectLoader.setCrossOrigin",
-				"setTexturePath": "ObjectLoader.setTexturePath"
+				"setTexturePath": "ObjectLoader.setTexturePath",
+				"texturePath": "ObjectLoader.texturePath"
 
 			},
 
@@ -1886,13 +1985,13 @@ var list = {
 
 				"#URL": "api/loaders/TextureLoader",
 				"crossOrigin": "TextureLoader.crossOrigin",
+				"load": "TextureLoader.load",
 				"manager": "TextureLoader.manager",
 				"path": "TextureLoader.path",
-				"withCredentials": "TextureLoader.withCredentials",
-				"load": "TextureLoader.load",
 				"setCrossOrigin": "TextureLoader.setCrossOrigin",
 				"setPath": "TextureLoader.setPath",
-				"setWithCredentials": "TextureLoader.setWithCredentials"
+				"setWithCredentials": "TextureLoader.setWithCredentials",
+				"withCredentials": "TextureLoader.withCredentials"
 
 			}
 
@@ -1910,15 +2009,15 @@ var list = {
 			"LoadingManager": {
 
 				"#URL": "api/loaders/managers/LoadingManager",
-				"onStart": "LoadingManager.onStart",
+				"itemEnd": "LoadingManager.itemEnd",
+				"itemError": "LoadingManager.itemError",
+				"itemStart": "LoadingManager.itemStart",
+				"onError": "LoadingManager.onError",
 				"onLoad": "LoadingManager.onLoad",
 				"onProgress": "LoadingManager.onProgress",
-				"onError": "LoadingManager.onError",
-				"setURLModifier": "LoadingManager.setURLModifier",
+				"onStart": "LoadingManager.onStart",
 				"resolveURL": "LoadingManager.resolveURL",
-				"itemStart": "LoadingManager.itemStart",
-				"itemEnd": "LoadingManager.itemEnd",
-				"itemError": "LoadingManager.itemError"
+				"setURLModifier": "LoadingManager.setURLModifier"
 
 			}
 
@@ -1929,18 +2028,20 @@ var list = {
 
 			"LineBasicMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/LineBasicMaterial",
 				"color": "LineBasicMaterial.color",
 				"isLineBasicMaterial": "LineBasicMaterial.isLineBasicMaterial",
 				"lights": "LineBasicMaterial.lights",
-				"linewidth": "LineBasicMaterial.linewidth",
 				"linecap": "LineBasicMaterial.linecap",
-				"linejoin": "LineBasicMaterial.linejoin"
+				"linejoin": "LineBasicMaterial.linejoin",
+				"linewidth": "LineBasicMaterial.linewidth"
 
 			},
 
 			"LineDashedMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/LineDashedMaterial",
 				"color": "LineDashedMaterial.color",
 				"dashSize": "LineDashedMaterial.dashSize",
@@ -1957,23 +2058,28 @@ var list = {
 				"#URL": "api/materials/Material",
 				"alphaTest": "Material.alphaTest",
 				"blendDst": "Material.blendDst",
-				"blending": "Material.blending",
 				"blendDstAlpha": "Material.blendDstAlpha",
 				"blendEquation": "Material.blendEquation",
 				"blendEquationAlpha": "Material.blendEquationAlpha",
 				"blendSrc": "Material.blendSrc",
 				"blendSrcAlpha": "Material.blendSrcAlpha",
+				"blending": "Material.blending",
 				"clipIntersection": "Material.clipIntersection",
-				"clippingPlanes": "Material.clippingPlanes",
 				"clipShadows": "Material.clipShadows",
+				"clippingPlanes": "Material.clippingPlanes",
+				"clone": "Material.clone",
 				"colorWrite": "Material.colorWrite",
-				"renderOrder": "Material.renderOrder",
+				"copy": "Material.copy",
 				"customDepthMaterial": "Material.customDepthMaterial",
 				"customDistanceMaterial": "Material.customDistanceMaterial",
 				"defines": "Material.defines",
 				"depthFunc": "Material.depthFunc",
 				"depthTest": "Material.depthTest",
 				"depthWrite": "Material.depthWrite",
+				"dispatchEvent": "Material.dispatchEvent",
+				"dispose": "Material.dispose",
+				"dithering": "Material.dithering",
+				"flatShading": "Material.flatShading",
 				"fog": "Material.fog",
 				"id": "Material.id",
 				"isMaterial": "Material.isMaterial",
@@ -1981,41 +2087,37 @@ var list = {
 				"name": "Material.name",
 				"needsUpdate": "Material.needsUpdate",
 				"opacity": "Material.opacity",
-				"transparent": "Material.transparent",
 				"overdraw": "Material.overdraw",
 				"polygonOffset": "Material.polygonOffset",
 				"polygonOffsetFactor": "Material.polygonOffsetFactor",
 				"polygonOffsetUnits": "Material.polygonOffsetUnits",
 				"precision": "Material.precision",
 				"premultipliedAlpha": "Material.premultipliedAlpha",
-				"dithering": "Material.dithering",
-				"flatShading": "Material.flatShading",
+				"renderOrder": "Material.renderOrder",
+				"setValues": "Material.setValues",
 				"side": "Material.side",
+				"toJSON": "Material.toJSON",
+				"transparent": "Material.transparent",
 				"type": "Material.type",
+				"update": "Material.update",
+				"userData": "Material.userData",
 				"uuid": "Material.uuid",
 				"vertexColors": "Material.vertexColors",
-				"visible": "Material.visible",
-				"userData": "Material.userData",
-				"clone": "Material.clone",
-				"copy": "Material.copy",
-				"dispose": "Material.dispose",
-				"setValues": "Material.setValues",
-				"toJSON": "Material.toJSON",
-				"update": "Material.update",
-				"dispatchEvent": "Material.dispatchEvent"
+				"visible": "Material.visible"
 
 			},
 
 			"MeshBasicMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/MeshBasicMaterial",
 				"alphaMap": "MeshBasicMaterial.alphaMap",
 				"aoMap": "MeshBasicMaterial.aoMap",
 				"aoMapIntensity": "MeshBasicMaterial.aoMapIntensity",
 				"color": "MeshBasicMaterial.color",
 				"combine": "MeshBasicMaterial.combine",
-				"isMeshBasicMaterial": "MeshBasicMaterial.isMeshBasicMaterial",
 				"envMap": "MeshBasicMaterial.envMap",
+				"isMeshBasicMaterial": "MeshBasicMaterial.isMeshBasicMaterial",
 				"lightMap": "MeshBasicMaterial.lightMap",
 				"lightMapIntensity": "MeshBasicMaterial.lightMapIntensity",
 				"lights": "MeshBasicMaterial.lights",
@@ -2034,12 +2136,13 @@ var list = {
 
 			"MeshDepthMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/MeshDepthMaterial",
 				"alphaMap": "MeshDepthMaterial.alphaMap",
 				"depthPacking": "MeshDepthMaterial.depthPacking",
+				"displacementBias": "MeshDepthMaterial.displacementBias",
 				"displacementMap": "MeshDepthMaterial.displacementMap",
 				"displacementScale": "MeshDepthMaterial.displacementScale",
-				"displacementBias": "MeshDepthMaterial.displacementBias",
 				"fog": "MeshDepthMaterial.fog",
 				"isMeshDepthMaterial": "MeshDepthMaterial.isMeshDepthMaterial",
 				"lights": "MeshDepthMaterial.lights",
@@ -2053,6 +2156,7 @@ var list = {
 
 			"MeshLambertMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/MeshLambertMaterial",
 				"alphaMap": "MeshLambertMaterial.alphaMap",
 				"aoMap": "MeshLambertMaterial.aoMap",
@@ -2060,8 +2164,8 @@ var list = {
 				"color": "MeshLambertMaterial.color",
 				"combine": "MeshLambertMaterial.combine",
 				"emissive": "MeshLambertMaterial.emissive",
-				"emissiveMap": "MeshLambertMaterial.emissiveMap",
 				"emissiveIntensity": "MeshLambertMaterial.emissiveIntensity",
+				"emissiveMap": "MeshLambertMaterial.emissiveMap",
 				"envMap": "MeshLambertMaterial.envMap",
 				"isMeshLambertMaterial": "MeshLambertMaterial.isMeshLambertMaterial",
 				"lightMap": "MeshLambertMaterial.lightMap",
@@ -2082,6 +2186,7 @@ var list = {
 
 			"MeshNormalMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/MeshNormalMaterial",
 				"fog": "MeshNormalMaterial.fog",
 				"isMeshNormalMaterial": "MeshNormalMaterial.isMeshNormalMaterial",
@@ -2094,6 +2199,7 @@ var list = {
 
 			"MeshPhongMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/MeshPhongMaterial",
 				"alphaMap": "MeshPhongMaterial.alphaMap",
 				"aoMap": "MeshPhongMaterial.aoMap",
@@ -2102,12 +2208,12 @@ var list = {
 				"bumpScale": "MeshPhongMaterial.bumpScale",
 				"color": "MeshPhongMaterial.color",
 				"combine": "MeshPhongMaterial.combine",
+				"displacementBias": "MeshPhongMaterial.displacementBias",
 				"displacementMap": "MeshPhongMaterial.displacementMap",
 				"displacementScale": "MeshPhongMaterial.displacementScale",
-				"displacementBias": "MeshPhongMaterial.displacementBias",
 				"emissive": "MeshPhongMaterial.emissive",
-				"emissiveMap": "MeshPhongMaterial.emissiveMap",
 				"emissiveIntensity": "MeshPhongMaterial.emissiveIntensity",
+				"emissiveMap": "MeshPhongMaterial.emissiveMap",
 				"envMap": "MeshPhongMaterial.envMap",
 				"isMeshPhongMaterial": "MeshPhongMaterial.isMeshPhongMaterial",
 				"lightMap": "MeshPhongMaterial.lightMap",
@@ -2132,17 +2238,19 @@ var list = {
 
 			"MeshPhysicalMaterial": {
 
+				"#PARENT": "MeshStandardMaterial",
 				"#URL": "api/materials/MeshPhysicalMaterial",
 				"clearCoat": "MeshPhysicalMaterial.clearCoat",
 				"clearCoatRoughness": "MeshPhysicalMaterial.clearCoatRoughness",
-				"isMeshPhysicalMaterial": "MeshPhysicalMaterial.isMeshPhysicalMaterial",
 				"defines": "MeshPhysicalMaterial.defines",
+				"isMeshPhysicalMaterial": "MeshPhysicalMaterial.isMeshPhysicalMaterial",
 				"reflectivity": "MeshPhysicalMaterial.reflectivity"
 
 			},
 
 			"MeshStandardMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/MeshStandardMaterial",
 				"alphaMap": "MeshStandardMaterial.alphaMap",
 				"aoMap": "MeshStandardMaterial.aoMap",
@@ -2151,12 +2259,12 @@ var list = {
 				"bumpScale": "MeshStandardMaterial.bumpScale",
 				"color": "MeshStandardMaterial.color",
 				"defines": "MeshStandardMaterial.defines",
+				"displacementBias": "MeshStandardMaterial.displacementBias",
 				"displacementMap": "MeshStandardMaterial.displacementMap",
 				"displacementScale": "MeshStandardMaterial.displacementScale",
-				"displacementBias": "MeshStandardMaterial.displacementBias",
 				"emissive": "MeshStandardMaterial.emissive",
-				"emissiveMap": "MeshStandardMaterial.emissiveMap",
 				"emissiveIntensity": "MeshStandardMaterial.emissiveIntensity",
+				"emissiveMap": "MeshStandardMaterial.emissiveMap",
 				"envMap": "MeshStandardMaterial.envMap",
 				"envMapIntensity": "MeshStandardMaterial.envMapIntensity",
 				"isMeshStandardMaterial": "MeshStandardMaterial.isMeshStandardMaterial",
@@ -2182,15 +2290,17 @@ var list = {
 
 			"MeshToonMaterial": {
 
+				"#PARENT": "MeshPhongMaterial",
 				"#URL": "api/materials/MeshToonMaterial",
+				"defines": "MeshToonMaterial.defines",
 				"gradientMap": "MeshToonMaterial.gradientMap",
-				"isMeshToonMaterial": "MeshToonMaterial.isMeshToonMaterial",
-				"defines": "MeshToonMaterial.defines"
+				"isMeshToonMaterial": "MeshToonMaterial.isMeshToonMaterial"
 
 			},
 
 			"PointsMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/PointsMaterial",
 				"color": "PointsMaterial.color",
 				"isPointsMaterial": "PointsMaterial.isPointsMaterial",
@@ -2203,6 +2313,7 @@ var list = {
 
 			"RawShaderMaterial": {
 
+				"#PARENT": "ShaderMaterial",
 				"#URL": "api/materials/RawShaderMaterial",
 				"isRawShaderMaterial": "RawShaderMaterial.isRawShaderMaterial"
 
@@ -2210,33 +2321,35 @@ var list = {
 
 			"ShaderMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/ShaderMaterial",
 				"clipping": "ShaderMaterial.clipping",
+				"clone": "ShaderMaterial.clone",
 				"defaultAttributeValues": "ShaderMaterial.defaultAttributeValues",
 				"defines": "ShaderMaterial.defines",
 				"extensions": "ShaderMaterial.extensions",
+				"flatShading": "ShaderMaterial.flatShading",
 				"fog": "ShaderMaterial.fog",
 				"fragmentShader": "ShaderMaterial.fragmentShader",
 				"index0AttributeName": "ShaderMaterial.index0AttributeName",
 				"isShaderMaterial": "ShaderMaterial.isShaderMaterial",
 				"lights": "ShaderMaterial.lights",
 				"linewidth": "ShaderMaterial.linewidth",
-				"morphTargets": "ShaderMaterial.morphTargets",
 				"morphNormals": "ShaderMaterial.morphNormals",
+				"morphTargets": "ShaderMaterial.morphTargets",
 				"program": "ShaderMaterial.program",
-				"flatShading": "ShaderMaterial.flatShading",
 				"skinning": "ShaderMaterial.skinning",
 				"uniforms": "ShaderMaterial.uniforms",
 				"vertexColors": "ShaderMaterial.vertexColors",
 				"vertexShader": "ShaderMaterial.vertexShader",
 				"wireframe": "ShaderMaterial.wireframe",
-				"wireframeLinewidth": "ShaderMaterial.wireframeLinewidth",
-				"clone": "ShaderMaterial.clone"
+				"wireframeLinewidth": "ShaderMaterial.wireframeLinewidth"
 
 			},
 
 			"ShadowMaterial": {
 
+				"#PARENT": "ShaderMaterial",
 				"#URL": "api/materials/ShadowMaterial",
 				"isShadowMaterial": "ShadowMaterial.isShadowMaterial",
 				"lights": "ShadowMaterial.lights",
@@ -2246,6 +2359,7 @@ var list = {
 
 			"SpriteMaterial": {
 
+				"#PARENT": "Material",
 				"#URL": "api/materials/SpriteMaterial",
 				"color": "SpriteMaterial.color",
 				"fog": "SpriteMaterial.fog",
@@ -2263,8 +2377,6 @@ var list = {
 			"Box2": {
 
 				"#URL": "api/math/Box2",
-				"min": "Box2.min",
-				"max": "Box2.max",
 				"clampPoint": "Box2.clampPoint",
 				"clone": "Box2.clone",
 				"containsBox": "Box2.containsBox",
@@ -2282,6 +2394,8 @@ var list = {
 				"intersectsBox": "Box2.intersectsBox",
 				"isEmpty": "Box2.isEmpty",
 				"makeEmpty": "Box2.makeEmpty",
+				"max": "Box2.max",
+				"min": "Box2.min",
 				"set": "Box2.set",
 				"setFromCenterAndSize": "Box2.setFromCenterAndSize",
 				"setFromPoints": "Box2.setFromPoints",
@@ -2293,9 +2407,6 @@ var list = {
 			"Box3": {
 
 				"#URL": "api/math/Box3",
-				"isBox3": "Box3.isBox3",
-				"min": "Box3.min",
-				"max": "Box3.max",
 				"applyMatrix4": "Box3.applyMatrix4",
 				"clampPoint": "Box3.clampPoint",
 				"clone": "Box3.clone",
@@ -2316,8 +2427,11 @@ var list = {
 				"intersectsBox": "Box3.intersectsBox",
 				"intersectsPlane": "Box3.intersectsPlane",
 				"intersectsSphere": "Box3.intersectsSphere",
+				"isBox3": "Box3.isBox3",
 				"isEmpty": "Box3.isEmpty",
 				"makeEmpty": "Box3.makeEmpty",
+				"max": "Box3.max",
+				"min": "Box3.min",
 				"set": "Box3.set",
 				"setFromArray": "Box3.setFromArray",
 				"setFromBufferAttribute": "Box3.setFromBufferAttribute",
@@ -2332,32 +2446,32 @@ var list = {
 			"Color": {
 
 				"#URL": "api/math/Color",
-				"isColor": "Color.isColor",
-				"r": "Color.r",
-				"g": "Color.g",
-				"b": "Color.b",
 				"add": "Color.add",
 				"addColors": "Color.addColors",
 				"addScalar": "Color.addScalar",
+				"b": "Color.b",
 				"clone": "Color.clone",
-				"copy": "Color.copy",
 				"convertGammaToLinear": "Color.convertGammaToLinear",
 				"convertLinearToGamma": "Color.convertLinearToGamma",
+				"copy": "Color.copy",
 				"copyGammaToLinear": "Color.copyGammaToLinear",
 				"copyLinearToGamma": "Color.copyLinearToGamma",
 				"equals": "Color.equals",
 				"fromArray": "Color.fromArray",
+				"g": "Color.g",
+				"getHSL": "Color.getHSL",
 				"getHex": "Color.getHex",
 				"getHexString": "Color.getHexString",
-				"getHSL": "Color.getHSL",
 				"getStyle": "Color.getStyle",
+				"isColor": "Color.isColor",
 				"lerp": "Color.lerp",
 				"multiply": "Color.multiply",
 				"multiplyScalar": "Color.multiplyScalar",
 				"offsetHSL": "Color.offsetHSL",
+				"r": "Color.r",
 				"set": "Color.set",
-				"setHex": "Color.setHex",
 				"setHSL": "Color.setHSL",
+				"setHex": "Color.setHex",
 				"setRGB": "Color.setRGB",
 				"setScalar": "Color.setScalar",
 				"setStyle": "Color.setStyle",
@@ -2369,44 +2483,43 @@ var list = {
 			"Cylindrical": {
 
 				"#URL": "api/math/Cylindrical",
-				"radius": "Cylindrical.radius",
-				"theta": "Cylindrical.theta",
-				"y": "Cylindrical.y",
 				"clone": "Cylindrical.clone",
 				"copy": "Cylindrical.copy",
+				"radius": "Cylindrical.radius",
 				"set": "Cylindrical.set",
-				"setFromVector3": "Cylindrical.setFromVector3"
+				"setFromVector3": "Cylindrical.setFromVector3",
+				"theta": "Cylindrical.theta",
+				"y": "Cylindrical.y"
 
 			},
 
 			"Euler": {
 
 				"#URL": "api/math/Euler",
-				"isEuler": "Euler.isEuler",
-				"order": "Euler.order",
-				"x": "Euler.x",
-				"y": "Euler.y",
-				"z": "Euler.z",
-				"copy": "Euler.copy",
 				"clone": "Euler.clone",
+				"copy": "Euler.copy",
 				"equals": "Euler.equals",
 				"fromArray": "Euler.fromArray",
+				"isEuler": "Euler.isEuler",
 				"onChange": "Euler.onChange",
 				"onChangeCallback": "Euler.onChangeCallback",
+				"order": "Euler.order",
 				"reorder": "Euler.reorder",
 				"set": "Euler.set",
-				"setFromRotationMatrix": "Euler.setFromRotationMatrix",
 				"setFromQuaternion": "Euler.setFromQuaternion",
+				"setFromRotationMatrix": "Euler.setFromRotationMatrix",
 				"setFromVector3": "Euler.setFromVector3",
 				"toArray": "Euler.toArray",
-				"toVector3": "Euler.toVector3"
+				"toVector3": "Euler.toVector3",
+				"x": "Euler.x",
+				"y": "Euler.y",
+				"z": "Euler.z"
 
 			},
 
 			"Frustum": {
 
 				"#URL": "api/math/Frustum",
-				"planes": "Frustum.planes",
 				"clone": "Frustum.clone",
 				"containsPoint": "Frustum.containsPoint",
 				"copy": "Frustum.copy",
@@ -2414,6 +2527,7 @@ var list = {
 				"intersectsObject": "Frustum.intersectsObject",
 				"intersectsSphere": "Frustum.intersectsSphere",
 				"intersectsSprite": "Frustum.intersectsSprite",
+				"planes": "Frustum.planes",
 				"set": "Frustum.set",
 				"setFromMatrix": "Frustum.setFromMatrix"
 
@@ -2422,20 +2536,18 @@ var list = {
 			"Interpolant": {
 
 				"#URL": "api/math/Interpolant",
+				"evaluate": "Interpolant.evaluate",
 				"parameterPositions": "Interpolant.parameterPositions",
 				"resultBuffer": "Interpolant.resultBuffer",
 				"sampleValues": "Interpolant.sampleValues",
 				"settings": "Interpolant.settings",
-				"valueSize": "Interpolant.valueSize",
-				"evaluate": "Interpolant.evaluate"
+				"valueSize": "Interpolant.valueSize"
 
 			},
 
 			"Line3": {
 
 				"#URL": "api/math/Line3",
-				"start": "Line3.start",
-				"end": "Line3.end",
 				"applyMatrix4": "Line3.applyMatrix4",
 				"at": "Line3.at",
 				"clone": "Line3.clone",
@@ -2445,52 +2557,54 @@ var list = {
 				"delta": "Line3.delta",
 				"distance": "Line3.distance",
 				"distanceSq": "Line3.distanceSq",
+				"end": "Line3.end",
 				"equals": "Line3.equals",
 				"getCenter": "Line3.getCenter",
-				"set": "Line3.set"
+				"set": "Line3.set",
+				"start": "Line3.start"
 
 			},
 
 			"Math": {
 
 				"#URL": "api/math/Math",
+				"ceilPowerOfTwo": "Math.ceilPowerOfTwo",
 				"clamp": "Math.clamp",
 				"degToRad": "Math.degToRad",
 				"euclideanModulo": "Math.euclideanModulo",
+				"floorPowerOfTwo": "Math.floorPowerOfTwo",
 				"generateUUID": "Math.generateUUID",
 				"isPowerOfTwo": "Math.isPowerOfTwo",
 				"lerp": "Math.lerp",
 				"mapLinear": "Math.mapLinear",
-				"ceilPowerOfTwo": "Math.ceilPowerOfTwo",
-				"floorPowerOfTwo": "Math.floorPowerOfTwo",
 				"radToDeg": "Math.radToDeg",
 				"randFloat": "Math.randFloat",
 				"randFloatSpread": "Math.randFloatSpread",
 				"randInt": "Math.randInt",
-				"smoothstep": "Math.smoothstep",
-				"smootherstep": "Math.smootherstep"
+				"smootherstep": "Math.smootherstep",
+				"smoothstep": "Math.smoothstep"
 
 			},
 
 			"Matrix3": {
 
 				"#URL": "api/math/Matrix3",
-				"elements": "Matrix3.elements",
-				"isMatrix3": "Matrix3.isMatrix3",
 				"applyToBufferAttribute": "Matrix3.applyToBufferAttribute",
 				"clone": "Matrix3.clone",
 				"copy": "Matrix3.copy",
 				"determinant": "Matrix3.determinant",
+				"elements": "Matrix3.elements",
 				"equals": "Matrix3.equals",
 				"fromArray": "Matrix3.fromArray",
 				"getInverse": "Matrix3.getInverse",
 				"getNormalMatrix": "Matrix3.getNormalMatrix",
 				"identity": "Matrix3.identity",
+				"isMatrix3": "Matrix3.isMatrix3",
 				"multiply": "Matrix3.multiply",
 				"multiplyMatrices": "Matrix3.multiplyMatrices",
 				"multiplyScalar": "Matrix3.multiplyScalar",
-				"set": "Matrix3.set",
 				"premultiply": "Matrix3.premultiply",
+				"set": "Matrix3.set",
 				"setFromMatrix4": "Matrix3.setFromMatrix4",
 				"setUvTransform": "Matrix3.setUvTransform",
 				"toArray": "Matrix3.toArray",
@@ -2502,8 +2616,6 @@ var list = {
 			"Matrix4": {
 
 				"#URL": "api/math/Matrix4",
-				"elements": "Matrix4.elements",
-				"isMatrix4": "Matrix4.isMatrix4",
 				"applyToBufferAttribute": "Matrix4.applyToBufferAttribute",
 				"clone": "Matrix4.clone",
 				"compose": "Matrix4.compose",
@@ -2511,6 +2623,7 @@ var list = {
 				"copyPosition": "Matrix4.copyPosition",
 				"decompose": "Matrix4.decompose",
 				"determinant": "Matrix4.determinant",
+				"elements": "Matrix4.elements",
 				"equals": "Matrix4.equals",
 				"extractBasis": "Matrix4.extractBasis",
 				"extractRotation": "Matrix4.extractRotation",
@@ -2518,11 +2631,12 @@ var list = {
 				"getInverse": "Matrix4.getInverse",
 				"getMaxScaleOnAxis": "Matrix4.getMaxScaleOnAxis",
 				"identity": "Matrix4.identity",
+				"isMatrix4": "Matrix4.isMatrix4",
 				"lookAt": "Matrix4.lookAt",
-				"makeRotationAxis": "Matrix4.makeRotationAxis",
 				"makeBasis": "Matrix4.makeBasis",
-				"makePerspective": "Matrix4.makePerspective",
 				"makeOrthographic": "Matrix4.makeOrthographic",
+				"makePerspective": "Matrix4.makePerspective",
+				"makeRotationAxis": "Matrix4.makeRotationAxis",
 				"makeRotationFromEuler": "Matrix4.makeRotationFromEuler",
 				"makeRotationFromQuaternion": "Matrix4.makeRotationFromQuaternion",
 				"makeRotationX": "Matrix4.makeRotationX",
@@ -2546,10 +2660,9 @@ var list = {
 			"Plane": {
 
 				"#URL": "api/math/Plane",
-				"normal": "Plane.normal",
-				"constant": "Plane.constant",
 				"applyMatrix4": "Plane.applyMatrix4",
 				"clone": "Plane.clone",
+				"constant": "Plane.constant",
 				"coplanarPoint": "Plane.coplanarPoint",
 				"copy": "Plane.copy",
 				"distanceToPoint": "Plane.distanceToPoint",
@@ -2560,6 +2673,7 @@ var list = {
 				"intersectsLine": "Plane.intersectsLine",
 				"intersectsSphere": "Plane.intersectsSphere",
 				"negate": "Plane.negate",
+				"normal": "Plane.normal",
 				"normalize": "Plane.normalize",
 				"projectPoint": "Plane.projectPoint",
 				"set": "Plane.set",
@@ -2573,46 +2687,45 @@ var list = {
 			"Quaternion": {
 
 				"#URL": "api/math/Quaternion",
-				"x": "Quaternion.x",
-				"y": "Quaternion.y",
-				"z": "Quaternion.z",
-				"w": "Quaternion.w",
 				"clone": "Quaternion.clone",
 				"conjugate": "Quaternion.conjugate",
 				"copy": "Quaternion.copy",
-				"equals": "Quaternion.equals",
 				"dot": "Quaternion.dot",
+				"equals": "Quaternion.equals",
 				"fromArray": "Quaternion.fromArray",
 				"inverse": "Quaternion.inverse",
 				"length": "Quaternion.length",
 				"lengthSq": "Quaternion.lengthSq",
-				"normalize": "Quaternion.normalize",
 				"multiply": "Quaternion.multiply",
 				"multiplyQuaternions": "Quaternion.multiplyQuaternions",
+				"normalize": "Quaternion.normalize",
 				"onChange": "Quaternion.onChange",
 				"onChangeCallback": "Quaternion.onChangeCallback",
 				"premultiply": "Quaternion.premultiply",
-				"slerp": "Quaternion.slerp",
 				"set": "Quaternion.set",
 				"setFromAxisAngle": "Quaternion.setFromAxisAngle",
 				"setFromEuler": "Quaternion.setFromEuler",
 				"setFromRotationMatrix": "Quaternion.setFromRotationMatrix",
 				"setFromUnitVectors": "Quaternion.setFromUnitVectors",
+				"slerp": "Quaternion.slerp",
+				"slerpFlat": "Quaternion.slerpFlat",
 				"toArray": "Quaternion.toArray",
-				"slerpFlat": "Quaternion.slerpFlat"
+				"w": "Quaternion.w",
+				"x": "Quaternion.x",
+				"y": "Quaternion.y",
+				"z": "Quaternion.z"
 
 			},
 
 			"Ray": {
 
 				"#URL": "api/math/Ray",
-				"origin": "Ray.origin",
-				"direction": "Ray.direction",
 				"applyMatrix4": "Ray.applyMatrix4",
 				"at": "Ray.at",
 				"clone": "Ray.clone",
 				"closestPointToPoint": "Ray.closestPointToPoint",
 				"copy": "Ray.copy",
+				"direction": "Ray.direction",
 				"distanceSqToPoint": "Ray.distanceSqToPoint",
 				"distanceSqToSegment": "Ray.distanceSqToSegment",
 				"distanceToPlane": "Ray.distanceToPlane",
@@ -2626,6 +2739,7 @@ var list = {
 				"intersectsPlane": "Ray.intersectsPlane",
 				"intersectsSphere": "Ray.intersectsSphere",
 				"lookAt": "Ray.lookAt",
+				"origin": "Ray.origin",
 				"recast": "Ray.recast",
 				"set": "Ray.set"
 
@@ -2634,9 +2748,8 @@ var list = {
 			"Sphere": {
 
 				"#URL": "api/math/Sphere",
-				"center": "Sphere.center",
-				"radius": "Sphere.radius",
 				"applyMatrix4": "Sphere.applyMatrix4",
+				"center": "Sphere.center",
 				"clampPoint": "Sphere.clampPoint",
 				"clone": "Sphere.clone",
 				"containsPoint": "Sphere.containsPoint",
@@ -2648,6 +2761,7 @@ var list = {
 				"intersectsBox": "Sphere.intersectsBox",
 				"intersectsPlane": "Sphere.intersectsPlane",
 				"intersectsSphere": "Sphere.intersectsSphere",
+				"radius": "Sphere.radius",
 				"set": "Sphere.set",
 				"setFromPoints": "Sphere.setFromPoints",
 				"translate": "Sphere.translate"
@@ -2657,14 +2771,14 @@ var list = {
 			"Spherical": {
 
 				"#URL": "api/math/Spherical",
-				"radius": "Spherical.radius",
-				"phi": "Spherical.phi",
-				"theta": "Spherical.theta",
 				"clone": "Spherical.clone",
 				"copy": "Spherical.copy",
 				"makeSafe": "Spherical.makeSafe",
+				"phi": "Spherical.phi",
+				"radius": "Spherical.radius",
 				"set": "Spherical.set",
-				"setFromVector3": "Spherical.setFromVector3"
+				"setFromVector3": "Spherical.setFromVector3",
+				"theta": "Spherical.theta"
 
 			},
 
@@ -2672,10 +2786,10 @@ var list = {
 
 				"#URL": "api/math/Triangle",
 				"a": "Triangle.a",
-				"b": "Triangle.b",
-				"c": "Triangle.c",
 				"area": "Triangle.area",
+				"b": "Triangle.b",
 				"barycoordFromPoint": "Triangle.barycoordFromPoint",
+				"c": "Triangle.c",
 				"clone": "Triangle.clone",
 				"closestPointToPoint": "Triangle.closestPointToPoint",
 				"containsPoint": "Triangle.containsPoint",
@@ -2692,11 +2806,6 @@ var list = {
 			"Vector2": {
 
 				"#URL": "api/math/Vector2",
-				"isVector2": "Vector2.isVector2",
-				"height": "Vector2.height",
-				"width": "Vector2.width",
-				"x": "Vector2.x",
-				"y": "Vector2.y",
 				"add": "Vector2.add",
 				"addScalar": "Vector2.addScalar",
 				"addScaledVector": "Vector2.addScaledVector",
@@ -2710,7 +2819,6 @@ var list = {
 				"clone": "Vector2.clone",
 				"copy": "Vector2.copy",
 				"distanceTo": "Vector2.distanceTo",
-				"manhattanDistanceTo": "Vector2.manhattanDistanceTo",
 				"distanceToSquared": "Vector2.distanceToSquared",
 				"divide": "Vector2.divide",
 				"divideScalar": "Vector2.divideScalar",
@@ -2720,17 +2828,20 @@ var list = {
 				"fromArray": "Vector2.fromArray",
 				"fromBufferAttribute": "Vector2.fromBufferAttribute",
 				"getComponent": "Vector2.getComponent",
+				"height": "Vector2.height",
+				"isVector2": "Vector2.isVector2",
 				"length": "Vector2.length",
-				"manhattanLength": "Vector2.manhattanLength",
 				"lengthSq": "Vector2.lengthSq",
 				"lerp": "Vector2.lerp",
 				"lerpVectors": "Vector2.lerpVectors",
-				"negate": "Vector2.negate",
-				"normalize": "Vector2.normalize",
+				"manhattanDistanceTo": "Vector2.manhattanDistanceTo",
+				"manhattanLength": "Vector2.manhattanLength",
 				"max": "Vector2.max",
 				"min": "Vector2.min",
 				"multiply": "Vector2.multiply",
 				"multiplyScalar": "Vector2.multiplyScalar",
+				"negate": "Vector2.negate",
+				"normalize": "Vector2.normalize",
 				"rotateAround": "Vector2.rotateAround",
 				"round": "Vector2.round",
 				"roundToZero": "Vector2.roundToZero",
@@ -2743,27 +2854,26 @@ var list = {
 				"sub": "Vector2.sub",
 				"subScalar": "Vector2.subScalar",
 				"subVectors": "Vector2.subVectors",
-				"toArray": "Vector2.toArray"
+				"toArray": "Vector2.toArray",
+				"width": "Vector2.width",
+				"x": "Vector2.x",
+				"y": "Vector2.y"
 
 			},
 
 			"Vector3": {
 
 				"#URL": "api/math/Vector3",
-				"isVector3": "Vector3.isVector3",
-				"x": "Vector3.x",
-				"y": "Vector3.y",
-				"z": "Vector3.z",
 				"add": "Vector3.add",
 				"addScalar": "Vector3.addScalar",
 				"addScaledVector": "Vector3.addScaledVector",
 				"addVectors": "Vector3.addVectors",
+				"angleTo": "Vector3.angleTo",
 				"applyAxisAngle": "Vector3.applyAxisAngle",
 				"applyEuler": "Vector3.applyEuler",
 				"applyMatrix3": "Vector3.applyMatrix3",
 				"applyMatrix4": "Vector3.applyMatrix4",
 				"applyQuaternion": "Vector3.applyQuaternion",
-				"angleTo": "Vector3.angleTo",
 				"ceil": "Vector3.ceil",
 				"clamp": "Vector3.clamp",
 				"clampLength": "Vector3.clampLength",
@@ -2773,7 +2883,6 @@ var list = {
 				"cross": "Vector3.cross",
 				"crossVectors": "Vector3.crossVectors",
 				"distanceTo": "Vector3.distanceTo",
-				"manhattanDistanceTo": "Vector3.manhattanDistanceTo",
 				"distanceToSquared": "Vector3.distanceToSquared",
 				"divide": "Vector3.divide",
 				"divideScalar": "Vector3.divideScalar",
@@ -2783,18 +2892,20 @@ var list = {
 				"fromArray": "Vector3.fromArray",
 				"fromBufferAttribute": "Vector3.fromBufferAttribute",
 				"getComponent": "Vector3.getComponent",
+				"isVector3": "Vector3.isVector3",
 				"length": "Vector3.length",
-				"manhattanLength": "Vector3.manhattanLength",
 				"lengthSq": "Vector3.lengthSq",
 				"lerp": "Vector3.lerp",
 				"lerpVectors": "Vector3.lerpVectors",
-				"negate": "Vector3.negate",
-				"normalize": "Vector3.normalize",
+				"manhattanDistanceTo": "Vector3.manhattanDistanceTo",
+				"manhattanLength": "Vector3.manhattanLength",
 				"max": "Vector3.max",
 				"min": "Vector3.min",
 				"multiply": "Vector3.multiply",
 				"multiplyScalar": "Vector3.multiplyScalar",
 				"multiplyVectors": "Vector3.multiplyVectors",
+				"negate": "Vector3.negate",
+				"normalize": "Vector3.normalize",
 				"project": "Vector3.project",
 				"projectOnPlane": "Vector3.projectOnPlane",
 				"projectOnVector": "Vector3.projectOnVector",
@@ -2818,18 +2929,16 @@ var list = {
 				"subVectors": "Vector3.subVectors",
 				"toArray": "Vector3.toArray",
 				"transformDirection": "Vector3.transformDirection",
-				"unproject": "Vector3.unproject"
+				"unproject": "Vector3.unproject",
+				"x": "Vector3.x",
+				"y": "Vector3.y",
+				"z": "Vector3.z"
 
 			},
 
 			"Vector4": {
 
 				"#URL": "api/math/Vector4",
-				"isVector4": "Vector4.isVector4",
-				"x": "Vector4.x",
-				"y": "Vector4.y",
-				"z": "Vector4.z",
-				"w": "Vector4.w",
 				"add": "Vector4.add",
 				"addScalar": "Vector4.addScalar",
 				"addScaledVector": "Vector4.addScaledVector",
@@ -2848,16 +2957,17 @@ var list = {
 				"fromArray": "Vector4.fromArray",
 				"fromBufferAttribute": "Vector4.fromBufferAttribute",
 				"getComponent": "Vector4.getComponent",
+				"isVector4": "Vector4.isVector4",
 				"length": "Vector4.length",
-				"manhattanLength": "Vector4.manhattanLength",
 				"lengthSq": "Vector4.lengthSq",
 				"lerp": "Vector4.lerp",
 				"lerpVectors": "Vector4.lerpVectors",
-				"negate": "Vector4.negate",
-				"normalize": "Vector4.normalize",
+				"manhattanLength": "Vector4.manhattanLength",
 				"max": "Vector4.max",
 				"min": "Vector4.min",
 				"multiplyScalar": "Vector4.multiplyScalar",
+				"negate": "Vector4.negate",
+				"normalize": "Vector4.normalize",
 				"round": "Vector4.round",
 				"roundToZero": "Vector4.roundToZero",
 				"set": "Vector4.set",
@@ -2866,14 +2976,18 @@ var list = {
 				"setComponent": "Vector4.setComponent",
 				"setLength": "Vector4.setLength",
 				"setScalar": "Vector4.setScalar",
+				"setW": "Vector4.setW",
 				"setX": "Vector4.setX",
 				"setY": "Vector4.setY",
 				"setZ": "Vector4.setZ",
-				"setW": "Vector4.setW",
 				"sub": "Vector4.sub",
 				"subScalar": "Vector4.subScalar",
 				"subVectors": "Vector4.subVectors",
-				"toArray": "Vector4.toArray"
+				"toArray": "Vector4.toArray",
+				"w": "Vector4.w",
+				"x": "Vector4.x",
+				"y": "Vector4.y",
+				"z": "Vector4.z"
 
 			}
 
@@ -2884,49 +2998,53 @@ var list = {
 
 			"CubicInterpolant": {
 
+				"#PARENT": "Interpolant",
 				"#URL": "api/math/interpolants/CubicInterpolant",
+				"evaluate": "CubicInterpolant.evaluate",
 				"parameterPositions": "CubicInterpolant.parameterPositions",
 				"resultBuffer": "CubicInterpolant.resultBuffer",
 				"sampleValues": "CubicInterpolant.sampleValues",
 				"settings": "CubicInterpolant.settings",
-				"valueSize": "CubicInterpolant.valueSize",
-				"evaluate": "CubicInterpolant.evaluate"
+				"valueSize": "CubicInterpolant.valueSize"
 
 			},
 
 			"DiscreteInterpolant": {
 
+				"#PARENT": "Interpolant",
 				"#URL": "api/math/interpolants/DiscreteInterpolant",
+				"evaluate": "DiscreteInterpolant.evaluate",
 				"parameterPositions": "DiscreteInterpolant.parameterPositions",
 				"resultBuffer": "DiscreteInterpolant.resultBuffer",
 				"sampleValues": "DiscreteInterpolant.sampleValues",
 				"settings": "DiscreteInterpolant.settings",
-				"valueSize": "DiscreteInterpolant.valueSize",
-				"evaluate": "DiscreteInterpolant.evaluate"
+				"valueSize": "DiscreteInterpolant.valueSize"
 
 			},
 
 			"LinearInterpolant": {
 
+				"#PARENT": "Interpolant",
 				"#URL": "api/math/interpolants/LinearInterpolant",
+				"evaluate": "LinearInterpolant.evaluate",
 				"parameterPositions": "LinearInterpolant.parameterPositions",
 				"resultBuffer": "LinearInterpolant.resultBuffer",
 				"sampleValues": "LinearInterpolant.sampleValues",
 				"settings": "LinearInterpolant.settings",
-				"valueSize": "LinearInterpolant.valueSize",
-				"evaluate": "LinearInterpolant.evaluate"
+				"valueSize": "LinearInterpolant.valueSize"
 
 			},
 
 			"QuaternionLinearInterpolant": {
 
+				"#PARENT": "Interpolant",
 				"#URL": "api/math/interpolants/QuaternionLinearInterpolant",
+				"evaluate": "QuaternionLinearInterpolant.evaluate",
 				"parameterPositions": "QuaternionLinearInterpolant.parameterPositions",
 				"resultBuffer": "QuaternionLinearInterpolant.resultBuffer",
 				"sampleValues": "QuaternionLinearInterpolant.sampleValues",
 				"settings": "QuaternionLinearInterpolant.settings",
-				"valueSize": "QuaternionLinearInterpolant.valueSize",
-				"evaluate": "QuaternionLinearInterpolant.evaluate"
+				"valueSize": "QuaternionLinearInterpolant.valueSize"
 
 			}
 
@@ -2937,6 +3055,7 @@ var list = {
 
 			"Bone": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/Bone",
 				"isBone": "Bone.isBone",
 				"type": "Bone.type"
@@ -2945,6 +3064,7 @@ var list = {
 
 			"Group": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/Group",
 				"type": "Group.type"
 
@@ -2952,31 +3072,34 @@ var list = {
 
 			"LensFlare": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/LensFlare",
-				"isLensFlare": "LensFlare.isLensFlare",
-				"lensFlares": "LensFlare.lensFlares",
-				"positionScreen": "LensFlare.positionScreen",
-				"customUpdateCallback": "LensFlare.customUpdateCallback",
 				"add": "LensFlare.add",
 				"clone": "LensFlare.clone",
 				"copy": "LensFlare.copy",
+				"customUpdateCallback": "LensFlare.customUpdateCallback",
+				"isLensFlare": "LensFlare.isLensFlare",
+				"lensFlares": "LensFlare.lensFlares",
+				"positionScreen": "LensFlare.positionScreen",
 				"updateLensFlares": "LensFlare.updateLensFlares"
 
 			},
 
 			"Line": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/Line",
-				"isLine": "Line.isLine",
+				"clone": "Line.clone",
 				"geometry": "Line.geometry",
+				"isLine": "Line.isLine",
 				"material": "Line.material",
-				"raycast": "Line.raycast",
-				"clone": "Line.clone"
+				"raycast": "Line.raycast"
 
 			},
 
 			"LineLoop": {
 
+				"#PARENT": "Line",
 				"#URL": "api/objects/LineLoop",
 				"isLineLoop": "LineLoop.isLineLoop"
 
@@ -2984,6 +3107,7 @@ var list = {
 
 			"LineSegments": {
 
+				"#PARENT": "Line",
 				"#URL": "api/objects/LineSegments",
 				"isLineSegments": "LineSegments.isLineSegments"
 
@@ -2991,11 +3115,12 @@ var list = {
 
 			"LOD": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/LOD",
-				"levels": "LOD.levels",
 				"addLevel": "LOD.addLevel",
 				"clone": "LOD.clone",
 				"getObjectForDistance": "LOD.getObjectForDistance",
+				"levels": "LOD.levels",
 				"raycast": "LOD.raycast",
 				"toJSON": "LOD.toJSON",
 				"update": "LOD.update"
@@ -3004,40 +3129,42 @@ var list = {
 
 			"Mesh": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/Mesh",
-				"drawMode": "Mesh.drawMode",
-				"isMesh": "Mesh.isMesh",
-				"geometry": "Mesh.geometry",
-				"material": "Mesh.material",
-				"morphTargetInfluences": "Mesh.morphTargetInfluences",
-				"morphTargetDictionary": "Mesh.morphTargetDictionary",
-				"setDrawMode": "Mesh.setDrawMode",
 				"clone": "Mesh.clone",
+				"drawMode": "Mesh.drawMode",
+				"geometry": "Mesh.geometry",
+				"isMesh": "Mesh.isMesh",
+				"material": "Mesh.material",
+				"morphTargetDictionary": "Mesh.morphTargetDictionary",
+				"morphTargetInfluences": "Mesh.morphTargetInfluences",
 				"raycast": "Mesh.raycast",
+				"setDrawMode": "Mesh.setDrawMode",
 				"updateMorphTargets": "Mesh.updateMorphTargets"
 
 			},
 
 			"Points": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/Points",
+				"clone": "Points.clone",
 				"geometry": "Points.geometry",
 				"isPoints": "Points.isPoints",
 				"material": "Points.material",
-				"raycast": "Points.raycast",
-				"clone": "Points.clone"
+				"raycast": "Points.raycast"
 
 			},
 
 			"Skeleton": {
 
 				"#URL": "api/objects/Skeleton",
-				"bones": "Skeleton.bones",
 				"boneInverses": "Skeleton.boneInverses",
 				"boneMatrices": "Skeleton.boneMatrices",
 				"boneTexture": "Skeleton.boneTexture",
-				"clone": "Skeleton.clone",
+				"bones": "Skeleton.bones",
 				"calculateInverses": "Skeleton.calculateInverses",
+				"clone": "Skeleton.clone",
 				"pose": "Skeleton.pose",
 				"update": "Skeleton.update"
 
@@ -3045,27 +3172,29 @@ var list = {
 
 			"SkinnedMesh": {
 
+				"#PARENT": "Mesh",
 				"#URL": "api/objects/SkinnedMesh",
-				"bindMode": "SkinnedMesh.bindMode",
+				"bind": "SkinnedMesh.bind",
 				"bindMatrix": "SkinnedMesh.bindMatrix",
 				"bindMatrixInverse": "SkinnedMesh.bindMatrixInverse",
-				"isSkinnedMesh": "SkinnedMesh.isSkinnedMesh",
-				"skeleton": "SkinnedMesh.skeleton",
-				"bind": "SkinnedMesh.bind",
+				"bindMode": "SkinnedMesh.bindMode",
 				"clone": "SkinnedMesh.clone",
+				"initBones": "SkinnedMesh.initBones",
+				"isSkinnedMesh": "SkinnedMesh.isSkinnedMesh",
 				"normalizeSkinWeights": "SkinnedMesh.normalizeSkinWeights",
 				"pose": "SkinnedMesh.pose",
-				"updateMatrixWorld": "SkinnedMesh.updateMatrixWorld",
-				"initBones": "SkinnedMesh.initBones"
+				"skeleton": "SkinnedMesh.skeleton",
+				"updateMatrixWorld": "SkinnedMesh.updateMatrixWorld"
 
 			},
 
 			"Sprite": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/Sprite",
+				"clone": "Sprite.clone",
 				"isSprite": "Sprite.isSprite",
 				"material": "Sprite.material",
-				"clone": "Sprite.clone",
 				"raycast": "Sprite.raycast"
 
 			}
@@ -3078,76 +3207,63 @@ var list = {
 			"WebGLRenderer": {
 
 				"#URL": "api/renderers/WebGLRenderer",
+				"allocTextureUnit": "WebGLRenderer.allocTextureUnit",
 				"autoClear": "WebGLRenderer.autoClear",
 				"autoClearColor": "WebGLRenderer.autoClearColor",
 				"autoClearDepth": "WebGLRenderer.autoClearDepth",
 				"autoClearStencil": "WebGLRenderer.autoClearStencil",
 				"capabilities": "WebGLRenderer.capabilities",
-				"floatFragmentTextures": "WebGLRenderer.floatFragmentTextures",
-				"floatVertexTextures": "WebGLRenderer.floatVertexTextures",
-				"vertexTextures": "WebGLRenderer.vertexTextures",
-				"getMaxAnisotropy": "WebGLRenderer.getMaxAnisotropy",
-				"getMaxPrecision": "WebGLRenderer.getMaxPrecision",
-				"logarithmicDepthBuffer": "WebGLRenderer.logarithmicDepthBuffer",
-				"maxAttributes": "WebGLRenderer.maxAttributes",
-				"maxCubemapSize": "WebGLRenderer.maxCubemapSize",
-				"maxFragmentUniforms": "WebGLRenderer.maxFragmentUniforms",
-				"maxTextureSize": "WebGLRenderer.maxTextureSize",
-				"maxTextures": "WebGLRenderer.maxTextures",
-				"maxVaryings": "WebGLRenderer.maxVaryings",
-				"maxVertexTextures": "WebGLRenderer.maxVertexTextures",
-				"maxVertexUniforms": "WebGLRenderer.maxVertexUniforms",
-				"precision": "WebGLRenderer.precision",
-				"clippingPlanes": "WebGLRenderer.clippingPlanes",
-				"context": "WebGLRenderer.context",
-				"domElement": "WebGLRenderer.domElement",
-				"extensions": "WebGLRenderer.extensions",
-				"gammaFactor": "WebGLRenderer.gammaFactor",
-				"gammaInput": "WebGLRenderer.gammaInput",
-				"gammaOutput": "WebGLRenderer.gammaOutput",
-				"info": "WebGLRenderer.info",
-				"localClippingEnabled": "WebGLRenderer.localClippingEnabled",
-				"maxMorphTargets": "WebGLRenderer.maxMorphTargets",
-				"maxMorphNormals": "WebGLRenderer.maxMorphNormals",
-				"physicallyCorrectLights": "WebGLRenderer.physicallyCorrectLights",
-				"properties": "WebGLRenderer.properties",
-				"renderLists": "WebGLRenderer.renderLists",
-				"shadowMap": "WebGLRenderer.shadowMap",
-				"shadowMap.enabled": "WebGLRenderer.shadowMap.enabled",
-				"shadowMap.autoUpdate": "WebGLRenderer.shadowMap.autoUpdate",
-				"shadowMap.needsUpdate": "WebGLRenderer.shadowMap.needsUpdate",
-				"shadowMap.type": "WebGLRenderer.shadowMap.type",
-				"shadowMap.renderReverseSided": "WebGLRenderer.shadowMap.renderReverseSided",
-				"shadowMap.renderSingleSided": "WebGLRenderer.shadowMap.renderSingleSided",
-				"sortObjects": "WebGLRenderer.sortObjects",
-				"state": "WebGLRenderer.state",
-				"toneMapping": "WebGLRenderer.toneMapping",
-				"toneMappingExposure": "WebGLRenderer.toneMappingExposure",
-				"toneMappingWhitePoint": "WebGLRenderer.toneMappingWhitePoint",
-				"allocTextureUnit": "WebGLRenderer.allocTextureUnit",
 				"clear": "WebGLRenderer.clear",
 				"clearColor": "WebGLRenderer.clearColor",
 				"clearDepth": "WebGLRenderer.clearDepth",
 				"clearStencil": "WebGLRenderer.clearStencil",
 				"clearTarget": "WebGLRenderer.clearTarget",
+				"clippingPlanes": "WebGLRenderer.clippingPlanes",
 				"compile": "WebGLRenderer.compile",
+				"context": "WebGLRenderer.context",
 				"dispose": "WebGLRenderer.dispose",
+				"domElement": "WebGLRenderer.domElement",
+				"extensions": "WebGLRenderer.extensions",
 				"extensions.get": "WebGLRenderer.extensions.get",
+				"floatFragmentTextures": "WebGLRenderer.floatFragmentTextures",
+				"floatVertexTextures": "WebGLRenderer.floatVertexTextures",
 				"forceContextLoss": "WebGLRenderer.forceContextLoss",
+				"gammaFactor": "WebGLRenderer.gammaFactor",
+				"gammaInput": "WebGLRenderer.gammaInput",
+				"gammaOutput": "WebGLRenderer.gammaOutput",
 				"getClearAlpha": "WebGLRenderer.getClearAlpha",
 				"getClearColor": "WebGLRenderer.getClearColor",
 				"getContext": "WebGLRenderer.getContext",
 				"getContextAttributes": "WebGLRenderer.getContextAttributes",
 				"getCurrentRenderTarget": "WebGLRenderer.getCurrentRenderTarget",
 				"getDrawingBufferSize": "WebGLRenderer.getDrawingBufferSize",
+				"getMaxAnisotropy": "WebGLRenderer.getMaxAnisotropy",
+				"getMaxPrecision": "WebGLRenderer.getMaxPrecision",
 				"getPixelRatio": "WebGLRenderer.getPixelRatio",
 				"getPrecision": "WebGLRenderer.getPrecision",
 				"getSize": "WebGLRenderer.getSize",
-				"resetGLState": "WebGLRenderer.resetGLState",
+				"info": "WebGLRenderer.info",
+				"localClippingEnabled": "WebGLRenderer.localClippingEnabled",
+				"logarithmicDepthBuffer": "WebGLRenderer.logarithmicDepthBuffer",
+				"maxAttributes": "WebGLRenderer.maxAttributes",
+				"maxCubemapSize": "WebGLRenderer.maxCubemapSize",
+				"maxFragmentUniforms": "WebGLRenderer.maxFragmentUniforms",
+				"maxMorphNormals": "WebGLRenderer.maxMorphNormals",
+				"maxMorphTargets": "WebGLRenderer.maxMorphTargets",
+				"maxTextureSize": "WebGLRenderer.maxTextureSize",
+				"maxTextures": "WebGLRenderer.maxTextures",
+				"maxVaryings": "WebGLRenderer.maxVaryings",
+				"maxVertexTextures": "WebGLRenderer.maxVertexTextures",
+				"maxVertexUniforms": "WebGLRenderer.maxVertexUniforms",
+				"physicallyCorrectLights": "WebGLRenderer.physicallyCorrectLights",
+				"precision": "WebGLRenderer.precision",
+				"properties": "WebGLRenderer.properties",
 				"readRenderTargetPixels": "WebGLRenderer.readRenderTargetPixels",
 				"render": "WebGLRenderer.render",
 				"renderBufferDirect": "WebGLRenderer.renderBufferDirect",
 				"renderBufferImmediate": "WebGLRenderer.renderBufferImmediate",
+				"renderLists": "WebGLRenderer.renderLists",
+				"resetGLState": "WebGLRenderer.resetGLState",
 				"setClearAlpha": "WebGLRenderer.setClearAlpha",
 				"setClearColor": "WebGLRenderer.setClearColor",
 				"setFaceCulling": "WebGLRenderer.setFaceCulling",
@@ -3155,37 +3271,51 @@ var list = {
 				"setRenderTarget": "WebGLRenderer.setRenderTarget",
 				"setScissor": "WebGLRenderer.setScissor",
 				"setScissorTest": "WebGLRenderer.setScissorTest",
-				"supportsVertexTextures": "WebGLRenderer.supportsVertexTextures",
 				"setSize": "WebGLRenderer.setSize",
-				"setTexture2D": "WebGLRenderer.setTexture2D",
 				"setTexture": "WebGLRenderer.setTexture",
+				"setTexture2D": "WebGLRenderer.setTexture2D",
 				"setTextureCube": "WebGLRenderer.setTextureCube",
-				"setViewport": "WebGLRenderer.setViewport"
+				"setViewport": "WebGLRenderer.setViewport",
+				"shadowMap": "WebGLRenderer.shadowMap",
+				"shadowMap.autoUpdate": "WebGLRenderer.shadowMap.autoUpdate",
+				"shadowMap.enabled": "WebGLRenderer.shadowMap.enabled",
+				"shadowMap.needsUpdate": "WebGLRenderer.shadowMap.needsUpdate",
+				"shadowMap.renderReverseSided": "WebGLRenderer.shadowMap.renderReverseSided",
+				"shadowMap.renderSingleSided": "WebGLRenderer.shadowMap.renderSingleSided",
+				"shadowMap.type": "WebGLRenderer.shadowMap.type",
+				"sortObjects": "WebGLRenderer.sortObjects",
+				"state": "WebGLRenderer.state",
+				"supportsVertexTextures": "WebGLRenderer.supportsVertexTextures",
+				"toneMapping": "WebGLRenderer.toneMapping",
+				"toneMappingExposure": "WebGLRenderer.toneMappingExposure",
+				"toneMappingWhitePoint": "WebGLRenderer.toneMappingWhitePoint",
+				"vertexTextures": "WebGLRenderer.vertexTextures"
 
 			},
 
 			"WebGLRenderTarget": {
 
 				"#URL": "api/renderers/WebGLRenderTarget",
-				"uuid": "WebGLRenderTarget.uuid",
-				"width": "WebGLRenderTarget.width",
+				"clone": "WebGLRenderTarget.clone",
+				"copy": "WebGLRenderTarget.copy",
+				"depthBuffer": "WebGLRenderTarget.depthBuffer",
+				"depthTexture": "WebGLRenderTarget.depthTexture",
+				"dispose": "WebGLRenderTarget.dispose",
 				"height": "WebGLRenderTarget.height",
 				"scissor": "WebGLRenderTarget.scissor",
 				"scissorTest": "WebGLRenderTarget.scissorTest",
-				"viewport": "WebGLRenderTarget.viewport",
-				"texture": "WebGLRenderTarget.texture",
-				"depthBuffer": "WebGLRenderTarget.depthBuffer",
-				"stencilBuffer": "WebGLRenderTarget.stencilBuffer",
-				"depthTexture": "WebGLRenderTarget.depthTexture",
 				"setSize": "WebGLRenderTarget.setSize",
-				"clone": "WebGLRenderTarget.clone",
-				"copy": "WebGLRenderTarget.copy",
-				"dispose": "WebGLRenderTarget.dispose"
+				"stencilBuffer": "WebGLRenderTarget.stencilBuffer",
+				"texture": "WebGLRenderTarget.texture",
+				"uuid": "WebGLRenderTarget.uuid",
+				"viewport": "WebGLRenderTarget.viewport",
+				"width": "WebGLRenderTarget.width"
 
 			},
 
 			"WebGLRenderTargetCube": {
 
+				"#PARENT": "WebGLRenderTarget",
 				"#URL": "api/renderers/WebGLRenderTargetCube",
 				"activeCubeFace": "WebGLRenderTargetCube.activeCubeFace"
 
@@ -3228,11 +3358,11 @@ var list = {
 			"Fog": {
 
 				"#URL": "api/scenes/Fog",
-				"name": "Fog.name",
-				"color": "Fog.color",
-				"near": "Fog.near",
-				"far": "Fog.far",
 				"clone": "Fog.clone",
+				"color": "Fog.color",
+				"far": "Fog.far",
+				"name": "Fog.name",
+				"near": "Fog.near",
 				"toJSON": "Fog.toJSON"
 
 			},
@@ -3240,21 +3370,22 @@ var list = {
 			"FogExp2": {
 
 				"#URL": "api/scenes/FogExp2",
-				"name": "FogExp2.name",
+				"clone": "FogExp2.clone",
 				"color": "FogExp2.color",
 				"density": "FogExp2.density",
-				"clone": "FogExp2.clone",
+				"name": "FogExp2.name",
 				"toJSON": "FogExp2.toJSON"
 
 			},
 
 			"Scene": {
 
+				"#PARENT": "Object3D",
 				"#URL": "api/scenes/Scene",
-				"fog": "Scene.fog",
-				"overrideMaterial": "Scene.overrideMaterial",
 				"autoUpdate": "Scene.autoUpdate",
 				"background": "Scene.background",
+				"fog": "Scene.fog",
+				"overrideMaterial": "Scene.overrideMaterial",
 				"toJSON": "Scene.toJSON"
 
 			}
@@ -3266,6 +3397,7 @@ var list = {
 
 			"CanvasTexture": {
 
+				"#PARENT": "Texture",
 				"#URL": "api/textures/CanvasTexture",
 				"needsUpdate": "CanvasTexture.needsUpdate"
 
@@ -3273,6 +3405,7 @@ var list = {
 
 			"CompressedTexture": {
 
+				"#PARENT": "Texture",
 				"#URL": "api/textures/CompressedTexture",
 				"flipY": "CompressedTexture.flipY",
 				"generateMipmaps": "CompressedTexture.generateMipmaps"
@@ -3281,12 +3414,14 @@ var list = {
 
 			"CubeTexture": {
 
+				"#PARENT": "Texture",
 				"#URL": "api/textures/CubeTexture"
 
 			},
 
 			"DataTexture": {
 
+				"#PARENT": "Texture",
 				"#URL": "api/textures/DataTexture",
 				"image": "DataTexture.image"
 
@@ -3294,6 +3429,7 @@ var list = {
 
 			"DepthTexture": {
 
+				"#PARENT": "Texture",
 				"#URL": "api/textures/DepthTexture"
 
 			},
@@ -3301,42 +3437,43 @@ var list = {
 			"Texture": {
 
 				"#URL": "api/textures/Texture",
-				"id": "Texture.id",
-				"uuid": "Texture.uuid",
-				"name": "Texture.name",
-				"image": "Texture.image",
-				"mipmaps": "Texture.mipmaps",
-				"mapping": "Texture.mapping",
-				"wrapS": "Texture.wrapS",
-				"wrapT": "Texture.wrapT",
-				"magFilter": "Texture.magFilter",
-				"minFilter": "Texture.minFilter",
 				"anisotropy": "Texture.anisotropy",
+				"center": "Texture.center",
+				"clone": "Texture.clone",
+				"dispose": "Texture.dispose",
+				"encoding": "Texture.encoding",
+				"flipY": "Texture.flipY",
 				"format": "Texture.format",
-				"type": "Texture.type",
+				"generateMipmaps": "Texture.generateMipmaps",
+				"id": "Texture.id",
+				"image": "Texture.image",
+				"magFilter": "Texture.magFilter",
+				"mapping": "Texture.mapping",
+				"matrix": "Texture.matrix",
+				"matrixAutoUpdate": "Texture.matrixAutoUpdate",
+				"minFilter": "Texture.minFilter",
+				"mipmaps": "Texture.mipmaps",
+				"name": "Texture.name",
+				"needsUpdate": "Texture.needsUpdate",
 				"offset": "Texture.offset",
+				"onUpdate": "Texture.onUpdate",
+				"premultiplyAlpha": "Texture.premultiplyAlpha",
 				"repeat": "Texture.repeat",
 				"rotation": "Texture.rotation",
-				"center": "Texture.center",
-				"matrixAutoUpdate": "Texture.matrixAutoUpdate",
-				"matrix": "Texture.matrix",
-				"generateMipmaps": "Texture.generateMipmaps",
-				"premultiplyAlpha": "Texture.premultiplyAlpha",
-				"flipY": "Texture.flipY",
-				"unpackAlignment": "Texture.unpackAlignment",
-				"encoding": "Texture.encoding",
-				"version": "Texture.version",
-				"needsUpdate": "Texture.needsUpdate",
-				"onUpdate": "Texture.onUpdate",
-				"clone": "Texture.clone",
 				"toJSON": "Texture.toJSON",
-				"dispose": "Texture.dispose",
-				"transformUv": "Texture.transformUv"
+				"transformUv": "Texture.transformUv",
+				"type": "Texture.type",
+				"unpackAlignment": "Texture.unpackAlignment",
+				"uuid": "Texture.uuid",
+				"version": "Texture.version",
+				"wrapS": "Texture.wrapS",
+				"wrapT": "Texture.wrapT"
 
 			},
 
 			"VideoTexture": {
 
+				"#PARENT": "Texture",
 				"#URL": "api/textures/VideoTexture",
 				"needsUpdate": "VideoTexture.needsUpdate",
 				"update": "VideoTexture.update"
@@ -3353,72 +3490,407 @@ var list = {
 
 		"Controls": {
 
-			"OrbitControls": "examples/controls/OrbitControls"
+			"OrbitControls": {
+
+				"#URL": "examples/controls/OrbitControls",
+				"autoRotate": "OrbitControls.autoRotate",
+				"autoRotateSpeed": "OrbitControls.autoRotateSpeed",
+				"dampingFactor": "OrbitControls.dampingFactor",
+				"dispose": "OrbitControls.dispose",
+				"domElement": "OrbitControls.domElement",
+				"enableDamping": "OrbitControls.enableDamping",
+				"enableKeys": "OrbitControls.enableKeys",
+				"enablePan": "OrbitControls.enablePan",
+				"enableRotate": "OrbitControls.enableRotate",
+				"enableZoom": "OrbitControls.enableZoom",
+				"enabled": "OrbitControls.enabled",
+				"getAzimuthalAngle": "OrbitControls.getAzimuthalAngle",
+				"getPolarAngle": "OrbitControls.getPolarAngle",
+				"keyPanSpeed": "OrbitControls.keyPanSpeed",
+				"keys": "OrbitControls.keys",
+				"maxAzimuthAngle": "OrbitControls.maxAzimuthAngle",
+				"maxDistance": "OrbitControls.maxDistance",
+				"maxPolarAngle": "OrbitControls.maxPolarAngle",
+				"maxZoom": "OrbitControls.maxZoom",
+				"minAzimuthAngle": "OrbitControls.minAzimuthAngle",
+				"minDistance": "OrbitControls.minDistance",
+				"minPolarAngle": "OrbitControls.minPolarAngle",
+				"minZoom": "OrbitControls.minZoom",
+				"mouseButtons": "OrbitControls.mouseButtons",
+				"object": "OrbitControls.object",
+				"position0": "OrbitControls.position0",
+				"reset": "OrbitControls.reset",
+				"rotateSpeed": "OrbitControls.rotateSpeed",
+				"saveState": "OrbitControls.saveState",
+				"target": "OrbitControls.target",
+				"target0": "OrbitControls.target0",
+				"update": "OrbitControls.update",
+				"zoom0": "OrbitControls.zoom0",
+				"zoomSpeed": "OrbitControls.zoomSpeed"
+
+			}
+
 
 		},
 
 		"Geometries": {
 
-			"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
-			"ConvexGeometry": "examples/geometries/ConvexGeometry",
-			"DecalGeometry": "examples/geometries/DecalGeometry"
+			"ConvexBufferGeometry": {
+
+				"#PARENT": "BufferGeometry",
+				"#URL": "examples/geometries/ConvexBufferGeometry"
+
+			},
+
+			"ConvexGeometry": {
+
+				"#PARENT": "Geometry",
+				"#URL": "examples/geometries/ConvexGeometry"
+
+			},
+
+			"DecalGeometry": {
+
+				"#PARENT": "BufferGeometry",
+				"#URL": "examples/geometries/DecalGeometry"
+
+			}
+
 
 		},
 
 		"Loaders": {
 
-			"BabylonLoader": "examples/loaders/BabylonLoader",
-			"GLTFLoader": "examples/loaders/GLTFLoader",
-			"MTLLoader": "examples/loaders/MTLLoader",
-			"OBJLoader": "examples/loaders/OBJLoader",
-			"OBJLoader2": "examples/loaders/OBJLoader2",
-			"LoaderSupport": "examples/loaders/LoaderSupport",
-			"PCDLoader": "examples/loaders/PCDLoader",
-			"PDBLoader": "examples/loaders/PDBLoader",
-			"SVGLoader": "examples/loaders/SVGLoader",
-			"TGALoader": "examples/loaders/TGALoader",
-			"PRWMLoader": "examples/loaders/PRWMLoader"
+			"BabylonLoader": {
+
+				"#URL": "examples/loaders/BabylonLoader",
+				"load": "BabylonLoader.load",
+				"parse": "BabylonLoader.parse"
+
+			},
+
+			"GLTFLoader": {
+
+				"#PARENT": "Loader",
+				"#URL": "examples/loaders/GLTFLoader",
+				"load": "GLTFLoader.load",
+				"parse": "GLTFLoader.parse",
+				"setCrossOrigin": "GLTFLoader.setCrossOrigin",
+				"setPath": "GLTFLoader.setPath"
+
+			},
+
+			"MTLLoader": {
+
+				"#URL": "examples/loaders/MTLLoader",
+				"load": "MTLLoader.load",
+				"parse": "MTLLoader.parse",
+				"setCrossOrigin": "MTLLoader.setCrossOrigin",
+				"setMaterialOptions": "MTLLoader.setMaterialOptions",
+				"setPath": "MTLLoader.setPath",
+				"setTexturePath": "MTLLoader.setTexturePath"
+
+			},
+
+			"OBJLoader": {
+
+				"#URL": "examples/loaders/OBJLoader",
+				"load": "OBJLoader.load",
+				"parse": "OBJLoader.parse"
+
+			},
+
+			"OBJLoader2": {
+
+				"#URL": "examples/loaders/OBJLoader2",
+				"getLogger": "OBJLoader2.getLogger",
+				"load": "OBJLoader2.load",
+				"parse": "OBJLoader2.parse",
+				"parseAsync": "OBJLoader2.parseAsync",
+				"run": "OBJLoader2.run",
+				"setDisregardNormals": "OBJLoader2.setDisregardNormals",
+				"setMaterialPerSmoothingGroup": "OBJLoader2.setMaterialPerSmoothingGroup",
+				"setMaterials": "OBJLoader2.setMaterials",
+				"setModelName": "OBJLoader2.setModelName",
+				"setPath": "OBJLoader2.setPath",
+				"setStreamMeshesTo": "OBJLoader2.setStreamMeshesTo",
+				"setUseIndices": "OBJLoader2.setUseIndices"
+
+			},
+
+			"LoaderSupport": {
+
+				"#URL": "examples/loaders/LoaderSupport",
+				"addMesh": "LoaderSupport.addMesh",
+				"addResource": "LoaderSupport.addResource",
+				"applyProperties": "LoaderSupport.applyProperties",
+				"buildMeshes": "LoaderSupport.buildMeshes",
+				"enqueueForRun": "LoaderSupport.enqueueForRun",
+				"getCallbacks": "LoaderSupport.getCallbacks",
+				"getLogger": "LoaderSupport.getLogger",
+				"getMaterials": "LoaderSupport.getMaterials",
+				"getMaterialsJSON": "LoaderSupport.getMaterialsJSON",
+				"getMaxQueueSize": "LoaderSupport.getMaxQueueSize",
+				"getMaxWebWorkers": "LoaderSupport.getMaxWebWorkers",
+				"isDebug": "LoaderSupport.isDebug",
+				"isDisregardMesh": "LoaderSupport.isDisregardMesh",
+				"isEnabled": "LoaderSupport.isEnabled",
+				"isRunning": "LoaderSupport.isRunning",
+				"isValid": "LoaderSupport.isValid",
+				"logDebug": "LoaderSupport.logDebug",
+				"logError": "LoaderSupport.logError",
+				"logInfo": "LoaderSupport.logInfo",
+				"logTimeEnd": "LoaderSupport.logTimeEnd",
+				"logTimeStart": "LoaderSupport.logTimeStart",
+				"logWarn": "LoaderSupport.logWarn",
+				"onProgress": "LoaderSupport.onProgress",
+				"prepareWorkers": "LoaderSupport.prepareWorkers",
+				"processPayload": "LoaderSupport.processPayload",
+				"processQueue": "LoaderSupport.processQueue",
+				"providesAlteredMeshes": "LoaderSupport.providesAlteredMeshes",
+				"run": "LoaderSupport.run",
+				"setCallbackOnLoad": "LoaderSupport.setCallbackOnLoad",
+				"setCallbackOnLoadMaterials": "LoaderSupport.setCallbackOnLoadMaterials",
+				"setCallbackOnMeshAlter": "LoaderSupport.setCallbackOnMeshAlter",
+				"setCallbackOnProgress": "LoaderSupport.setCallbackOnProgress",
+				"setCallbacks": "LoaderSupport.setCallbacks",
+				"setCrossOrigin": "LoaderSupport.setCrossOrigin",
+				"setDebug": "LoaderSupport.setDebug",
+				"setDisregardNormals": "LoaderSupport.setDisregardNormals",
+				"setEnabled": "LoaderSupport.setEnabled",
+				"setMaterialPerSmoothingGroup": "LoaderSupport.setMaterialPerSmoothingGroup",
+				"setMaterials": "LoaderSupport.setMaterials",
+				"setModelName": "LoaderSupport.setModelName",
+				"setPath": "LoaderSupport.setPath",
+				"setStreamMeshesTo": "LoaderSupport.setStreamMeshesTo",
+				"setTerminateRequested": "LoaderSupport.setTerminateRequested",
+				"setUseAsync": "LoaderSupport.setUseAsync",
+				"setUseIndices": "LoaderSupport.setUseIndices",
+				"tearDown": "LoaderSupport.tearDown",
+				"updateMaterials": "LoaderSupport.updateMaterials",
+				"validate": "LoaderSupport.validate",
+				"verifyInput": "LoaderSupport.verifyInput"
+
+			},
+
+			"PCDLoader": {
+
+				"#URL": "examples/loaders/PCDLoader",
+				"load": "PCDLoader.load",
+				"parse": "PCDLoader.parse"
+
+			},
+
+			"PDBLoader": {
+
+				"#URL": "examples/loaders/PDBLoader",
+				"load": "PDBLoader.load",
+				"parse": "PDBLoader.parse"
+
+			},
+
+			"SVGLoader": {
+
+				"#URL": "examples/loaders/SVGLoader",
+				"load": "SVGLoader.load"
+
+			},
+
+			"TGALoader": {
+
+				"#URL": "examples/loaders/TGALoader",
+				"load": "TGALoader.load"
+
+			},
+
+			"PRWMLoader": {
+
+				"#URL": "examples/loaders/PRWMLoader",
+				"load": "PRWMLoader.load",
+				"parse": "PRWMLoader.parse"
+
+			}
+
 
 		},
 
 		"Exporters": {
 
-			"GLTFExporter": "examples/exporters/GLTFExporter"
+			"GLTFExporter": {
+
+				"#URL": "examples/exporters/GLTFExporter",
+				"parse": "GLTFExporter.parse"
+
+			}
+
 
 		},
 
 		"Plugins": {
 
-			"LookupTable": "examples/Lut",
-			"SpriteCanvasMaterial": "examples/SpriteCanvasMaterial"
+			"LookupTable": {
+
+				"#URL": "examples/Lut",
+				"addColorMap": "LookupTable.addColorMap",
+				"changeColorMap": "LookupTable.changeColorMap",
+				"changeNumberOfColors": "LookupTable.changeNumberOfColors",
+				"copy": "LookupTable.copy",
+				"getColor": "LookupTable.getColor",
+				"maxV": "LookupTable.maxV",
+				"minV": "LookupTable.minV",
+				"setmaxV": "LookupTable.setmaxV",
+				"setminV": "LookupTable.setminV"
+
+			},
+
+			"SpriteCanvasMaterial": {
+
+				"#PARENT": "Material",
+				"#URL": "examples/SpriteCanvasMaterial",
+				"color": "SpriteCanvasMaterial.color",
+				"program": "SpriteCanvasMaterial.program"
+
+			}
+
 
 		},
 
 		"QuickHull": {
 
-			"Face": "examples/quickhull/Face",
-			"HalfEdge": "examples/quickhull/HalfEdge",
-			"QuickHull": "examples/quickhull/QuickHull",
-			"VertexNode": "examples/quickhull/VertexNode",
-			"VertexList": "examples/quickhull/VertexList"
+			"Face": {
+
+				"#URL": "examples/quickhull/Face",
+				"area": "Face.area",
+				"compute": "Face.compute",
+				"constant": "Face.constant",
+				"create": "Face.create",
+				"distanceToPoint": "Face.distanceToPoint",
+				"edge": "Face.edge",
+				"getEdge": "Face.getEdge",
+				"mark": "Face.mark",
+				"midpoint": "Face.midpoint",
+				"normal": "Face.normal",
+				"outside": "Face.outside"
+
+			},
+
+			"HalfEdge": {
+
+				"#URL": "examples/quickhull/HalfEdge",
+				"face": "HalfEdge.face",
+				"head": "HalfEdge.head",
+				"length": "HalfEdge.length",
+				"lengthSquared": "HalfEdge.lengthSquared",
+				"next": "HalfEdge.next",
+				"prev": "HalfEdge.prev",
+				"setTwin": "HalfEdge.setTwin",
+				"tail": "HalfEdge.tail",
+				"twin": "HalfEdge.twin",
+				"vertex": "HalfEdge.vertex"
+
+			},
+
+			"QuickHull": {
+
+				"#URL": "examples/quickhull/QuickHull",
+				"addAdjoiningFace": "QuickHull.addAdjoiningFace",
+				"addNewFaces": "QuickHull.addNewFaces",
+				"addVertexToFace": "QuickHull.addVertexToFace",
+				"addVertexToHull": "QuickHull.addVertexToHull",
+				"assigned": "QuickHull.assigned",
+				"cleanup": "QuickHull.cleanup",
+				"compute": "QuickHull.compute",
+				"computeExtremes": "QuickHull.computeExtremes",
+				"computeHorizon": "QuickHull.computeHorizon",
+				"computeInitialHull": "QuickHull.computeInitialHull",
+				"deleteFaceVertices": "QuickHull.deleteFaceVertices",
+				"faces": "QuickHull.faces",
+				"makeEmpty": "QuickHull.makeEmpty",
+				"newFaces": "QuickHull.newFaces",
+				"nextVertexToAdd": "QuickHull.nextVertexToAdd",
+				"reindexFaces": "QuickHull.reindexFaces",
+				"removeAllVerticesFromFace": "QuickHull.removeAllVerticesFromFace",
+				"removeVertexFromFace": "QuickHull.removeVertexFromFace",
+				"resolveUnassignedPoints": "QuickHull.resolveUnassignedPoints",
+				"setFromObject": "QuickHull.setFromObject",
+				"setFromPoints": "QuickHull.setFromPoints",
+				"tolerance": "QuickHull.tolerance",
+				"unassigned": "QuickHull.unassigned",
+				"vertices": "QuickHull.vertices"
+
+			},
+
+			"VertexNode": {
+
+				"#URL": "examples/quickhull/VertexNode",
+				"face": "VertexNode.face",
+				"next": "VertexNode.next",
+				"point": "VertexNode.point",
+				"prev": "VertexNode.prev"
+
+			},
+
+			"VertexList": {
+
+				"#URL": "examples/quickhull/VertexList",
+				"append": "VertexList.append",
+				"appendChain": "VertexList.appendChain",
+				"clear": "VertexList.clear",
+				"first": "VertexList.first",
+				"head": "VertexList.head",
+				"insertAfter": "VertexList.insertAfter",
+				"insertBefore": "VertexList.insertBefore",
+				"isEmpty": "VertexList.isEmpty",
+				"last": "VertexList.last",
+				"remove": "VertexList.remove",
+				"removeSubList": "VertexList.removeSubList",
+				"tail": "VertexList.tail"
+
+			}
+
 
 		},
 
 		"Renderers": {
 
-			"CanvasRenderer": "examples/renderers/CanvasRenderer"
+			"CanvasRenderer": {
+
+				"#URL": "examples/renderers/CanvasRenderer",
+				"autoClear": "CanvasRenderer.autoClear",
+				"clear": "CanvasRenderer.clear",
+				"clearColor": "CanvasRenderer.clearColor",
+				"clearDepth": "CanvasRenderer.clearDepth",
+				"clearStencil": "CanvasRenderer.clearStencil",
+				"domElement": "CanvasRenderer.domElement",
+				"getClearAlpha": "CanvasRenderer.getClearAlpha",
+				"getClearColorHex": "CanvasRenderer.getClearColorHex",
+				"getMaxAnisotropy": "CanvasRenderer.getMaxAnisotropy",
+				"info": "CanvasRenderer.info",
+				"render": "CanvasRenderer.render",
+				"setClearColor": "CanvasRenderer.setClearColor",
+				"setClearColorHex": "CanvasRenderer.setClearColorHex",
+				"setFaceCulling": "CanvasRenderer.setFaceCulling",
+				"setSize": "CanvasRenderer.setSize",
+				"sortElements": "CanvasRenderer.sortElements",
+				"sortObjects": "CanvasRenderer.sortObjects",
+				"supportsVertexTextures": "CanvasRenderer.supportsVertexTextures"
+
+			}
+
+
 		},
 
 		"Utils": {
 
-		    "SceneUtils": {
+			"SceneUtils": {
 
-		        "#URL": "examples/extras/SceneUtils",
-		        "createMultiMaterialObject": "SceneUtils.createMultiMaterialObject",
-		        "attach": "SceneUtils.attach",
-		        "detach": "SceneUtils.detach"
+				"#URL": "examples/utils/SceneUtils",
+				"attach": "SceneUtils.attach",
+				"createMultiMaterialObject": "SceneUtils.createMultiMaterialObject",
+				"detach": "SceneUtils.detach"
 
-		    },
+			}
+
 
 		}
 

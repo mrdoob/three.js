@@ -195,7 +195,7 @@
 
 							for ( var i in filter ) {
 
-								if ( i !== "#URL" ) {
+								if ( !i.startsWith("#") ) {
 
 									var filterItem = document.createElement( 'li' );
 									filterItem.classList.add( 'hidden' );
@@ -298,6 +298,11 @@
 
 					} else if ( filterItemResults.length > 0 ) {
 
+                        for (var j = 0; j < pageProperty.filterLinkItems.length; j++) {
+
+                            var filterLinkItem = pageProperty.filterLinkItems[j];
+                            filterLinkItem.parentElement.classList.add('hidden');
+                        }
 
 						for ( var i = 0; i < filterItemResults.length; i ++ ) {
 
@@ -308,10 +313,6 @@
 								if ( filterLinkItem.textContent == filterItemResults[ i ] ) {
 
 									filterLinkItem.parentElement.classList.remove( 'hidden' );
-		
-						        } else {
-
-									filterLinkItem.parentElement.classList.add( 'hidden' );
 		
 						        }
 
@@ -351,7 +352,7 @@
 				}
 
 
-	}
+	        }
 
 			displayFilteredPanel();
 
