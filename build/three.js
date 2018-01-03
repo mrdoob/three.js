@@ -43934,45 +43934,6 @@
 	AxesHelper.prototype.constructor = AxesHelper;
 
 	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
-	var SceneUtils = {
-
-		createMultiMaterialObject: function ( geometry, materials ) {
-
-			var group = new Group();
-
-			for ( var i = 0, l = materials.length; i < l; i ++ ) {
-
-				group.add( new Mesh( geometry, materials[ i ] ) );
-
-			}
-
-			return group;
-
-		},
-
-		detach: function ( child, parent, scene ) {
-
-			child.applyMatrix( parent.matrixWorld );
-			parent.remove( child );
-			scene.add( child );
-
-		},
-
-		attach: function ( child, scene, parent ) {
-
-			child.applyMatrix( new Matrix4().getInverse( parent.matrixWorld ) );
-
-			scene.remove( child );
-			parent.add( child );
-
-		}
-
-	};
-
-	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
@@ -45623,6 +45584,30 @@
 
 	}
 
+	//
+
+	var SceneUtils = {
+
+		createMultiMaterialObject: function ( /* geometry, materials */ ) {
+
+			console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+
+		},
+
+		detach: function ( /* child, parent, scene */ ) {
+
+			console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+
+		},
+
+		attach: function ( /* child, scene, parent */ ) {
+
+			console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+
+		}
+
+	};
+
 	exports.WebGLRenderTargetCube = WebGLRenderTargetCube;
 	exports.WebGLRenderTarget = WebGLRenderTarget;
 	exports.WebGLRenderer = WebGLRenderer;
@@ -45766,7 +45751,6 @@
 	exports.CurvePath = CurvePath;
 	exports.Curve = Curve;
 	exports.ShapeUtils = ShapeUtils;
-	exports.SceneUtils = SceneUtils;
 	exports.WebGLUtils = WebGLUtils;
 	exports.WireframeGeometry = WireframeGeometry;
 	exports.ParametricGeometry = ParametricGeometry;
@@ -46022,6 +46006,7 @@
 	exports.ImageUtils = ImageUtils;
 	exports.Projector = Projector;
 	exports.CanvasRenderer = CanvasRenderer;
+	exports.SceneUtils = SceneUtils;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
