@@ -913,15 +913,6 @@ var list = {
 
 			},
 
-			"SceneUtils": {
-
-				"#URL": "api/extras/SceneUtils",
-				"createMultiMaterialObject": "SceneUtils.createMultiMaterialObject",
-				"attach": "SceneUtils.attach",
-				"detach": "SceneUtils.detach"
-
-			},
-
 			"ShapeUtils": {
 
 				"#URL": "api/extras/ShapeUtils",
@@ -3416,6 +3407,18 @@ var list = {
 		"Renderers": {
 
 			"CanvasRenderer": "examples/renderers/CanvasRenderer"
+		},
+
+		"Utils": {
+
+		    "SceneUtils": {
+
+		        "#URL": "examples/extras/SceneUtils",
+		        "createMultiMaterialObject": "SceneUtils.createMultiMaterialObject",
+		        "attach": "SceneUtils.attach",
+		        "detach": "SceneUtils.detach"
+
+		    },
 
 		}
 
