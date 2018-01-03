@@ -383,7 +383,7 @@ var list = {
 		},
 
 		"Utils": {
-			"SceneUtils": "examples/utils/SceneUtils",
+			"SceneUtils": "examples/utils/SceneUtils"
 		}
 
 	},
