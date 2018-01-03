@@ -12,6 +12,17 @@ Sidebar.Scene = function ( editor ) {
 
 	// outliner
 
+	function escapeHTML( html ) {
+
+		return html
+			.replace( /&/g, '&amp;' )
+			.replace( /"/g, '&quot;' )
+			.replace( /'/g, '&#39;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' );
+
+		}
+
 	function buildOption( object, draggable ) {
 
 		var option = document.createElement( 'div' );
@@ -45,15 +56,15 @@ Sidebar.Scene = function ( editor ) {
 
 	function buildHTML( object ) {
 
-		var html = '<span class="type ' + object.type + '"></span> ' + object.name;
+		var html = '<span class="type ' + object.type + '"></span> ' + escapeHTML( object.name );
 
 		if ( object instanceof THREE.Mesh ) {
 
 			var geometry = object.geometry;
 			var material = object.material;
 
-			html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
-			html += ' <span class="type ' + material.type + '"></span> ' + getMaterialName( material );
+			html += ' <span class="type ' + geometry.type + '"></span> ' + escapeHTML( geometry.name );
+			html += ' <span class="type ' + material.type + '"></span> ' + escapeHTML( getMaterialName( material ) );
 
 		}
 
