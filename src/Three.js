@@ -147,7 +147,6 @@ export { Font } from './extras/core/Font.js';
 export { CurvePath } from './extras/core/CurvePath.js';
 export { Curve } from './extras/core/Curve.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
-export { SceneUtils } from './extras/SceneUtils.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';

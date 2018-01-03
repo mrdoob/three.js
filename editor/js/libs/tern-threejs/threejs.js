@@ -805,24 +805,6 @@
       "prototype": {},
       "!doc": "Contains handy functions geometry manipulations."
     },
-    "SceneUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/SceneUtils",
-      "prototype": {
-        "createMultiMaterialObject": {
-          "!type": "fn(geometry: +THREE.Geometry, materials: []) -> +THREE.Object3D",
-          "!doc": "Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as MultiMaterial which defines multiple material for 1 mesh.<br>\n\t\tThis is mostly useful for object that need a material and a wireframe implementation."
-        },
-        "attach": {
-          "!type": "fn(child: +THREE.Object3D, scene: +THREE.Object3D, parent: +THREE.Object3D)",
-          "!doc": "Attaches the object to the parent without the moving the object in the worldspace."
-        },
-        "detach": {
-          "!type": "fn(child: +THREE.Object3D, parent: +THREE.Object3D, scene: +THREE.Object3D)",
-          "!doc": "Detaches the object from the parent and adds it back to the scene without moving in worldspace."
-        }
-      },
-      "!doc": "A class containing useful utility functions for scene manipulation."
-    },
     "Curve": {
       "!url": "http://threejs.org/docs/#Reference/extras/core/Curve",
       "prototype": {
