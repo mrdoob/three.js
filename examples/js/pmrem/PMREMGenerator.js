@@ -90,6 +90,7 @@ THREE.PMREMGenerator.prototype = {
 		var gammaOutput = renderer.gammaOutput;
 		var toneMapping = renderer.toneMapping;
 		var toneMappingExposure = renderer.toneMappingExposure;
+		var renderTarget = renderer.getCurrentRenderTarget();
 
 		renderer.toneMapping = THREE.LinearToneMapping;
 		renderer.toneMappingExposure = 1.0;
@@ -109,6 +110,7 @@ THREE.PMREMGenerator.prototype = {
 
 		}
 
+		renderer.setRenderTarget(renderTarget);
 		renderer.toneMapping = toneMapping;
 		renderer.toneMappingExposure = toneMappingExposure;
 		renderer.gammaInput = gammaInput;
