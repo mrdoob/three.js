@@ -259,11 +259,11 @@
 
 								filterItemResults.push( filterItem );
 		
-					}
+					        }
 
-				}
+				        }
 		
-			}
+			        }
 
 
 					if ( filterResults && filterResults.length > 0 ) {
@@ -278,7 +278,7 @@
 
 								pageName = pageName.replace( result, '<b>' + result + '</b>' );
 		
-					}
+					        }
 
 						}
 
@@ -287,11 +287,11 @@
 							for ( var j = 0; j < pageProperty.filterLinkItems.length; j ++ ) {
 
 								var filterLinkItem = pageProperty.filterLinkItems[ j ];
-								filterLinkItem.parentElement.classList.remove( 'hidden' );
+								filterLinkItem.parentElement.classList.add( 'hidden' );
 
 							}
 		
-				}
+				        }
 
 						categoryClassList.remove( 'hidden' );
 						linkElement.innerHTML = pageName;
@@ -309,11 +309,11 @@
 
 									filterLinkItem.parentElement.classList.remove( 'hidden' );
 		
-						} else {
+						        } else {
 
 									filterLinkItem.parentElement.classList.add( 'hidden' );
 		
-						}
+						        }
 
 							}
 
