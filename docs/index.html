@@ -1,371 +1,497 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>three.js / documentation</title>
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="index.css">
-	</head>
-	<body>
+<head>
+    <meta charset="utf-8">
+    <title>three.js / documentation</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="index.css">
+</head>
+<body>
 
-		<div id="panel" class="collapsed">
+    <div id="panel" class="collapsed">
 
-			<h1><a href="http://threejs.org">three.js</a> / docs</h1>
+        <h1><a href="http://threejs.org">three.js</a> / docs</h1>
 
-			<a id="expandButton" href="#">
-				<span></span>
-				<span></span>
-				<span></span>
-			</a>
+        <a id="expandButton" href="#">
+            <span></span>
+            <span></span>
+            <span></span>
+        </a>
 
-			<div class="filterBlock" >
-				<input type="text" id="filterInput" placeholder="Type to filter">
-				<a href="#" id="clearFilterButton">x</a>
-			</div>
-			<div id="content"></div>
+        <div class="filterBlock">
+            <input type="text" id="filterInput" placeholder="Type to filter">
+            <a href="#" id="clearFilterButton">x</a>
+        </div>
+        <div id="content"></div>
 
-		</div>
+    </div>
 
-		<iframe name="viewer"></iframe>
+    <iframe name="viewer"></iframe>
 
-		<script src="list.js"></script>
+    <script src="list.js"></script>
 
-		<script>
+    <script>
 
-			var panel = document.getElementById( 'panel' );
-			var content = document.getElementById( 'content' );
-			var clearFilterButton = document.getElementById( 'clearFilterButton' );
-			var expandButton = document.getElementById( 'expandButton' );
-			var filterInput = document.getElementById( 'filterInput' );
-			var iframe = document.querySelector( 'iframe' );
+        var panel = document.getElementById('panel');
+        var content = document.getElementById('content');
+        var clearFilterButton = document.getElementById('clearFilterButton');
+        var expandButton = document.getElementById('expandButton');
+        var filterInput = document.getElementById('filterInput');
+        var iframe = document.querySelector('iframe');
 
-			var pageProperties = {};
-			var titles = {};
-			var categoryElements = [];
+        var pageProperties = {};
+        var titles = {};
+        var categoryElements = [];
 
 
-			// Functionality for hamburger button (on small devices)
+        // Functionality for hamburger button (on small devices)
 
-			expandButton.onclick = function ( event ) {
+        expandButton.onclick = function (event) {
 
-				event.preventDefault();
-				panel.classList.toggle( 'collapsed' );
+            event.preventDefault();
+            panel.classList.toggle('collapsed');
 
-			};
+        };
 
 
-			// Functionality for search/filter input field
+        // Functionality for search/filter input field
 
-			filterInput.oninput = function ( event ) {
+        filterInput.oninput = function (event) {
 
-				updateFilter();
+            updateFilter();
 
-			};
+        };
 
 
-			// Functionality for filter clear button
+        // Functionality for filter clear button
 
-			clearFilterButton.onclick = function ( event ) {
+        clearFilterButton.onclick = function (event) {
 
-				event.preventDefault();
+            event.preventDefault();
 
-				filterInput.value = '';
-				updateFilter();
+            filterInput.value = '';
+            updateFilter();
 
-			};
+        };
 
-			// Activate content and title change on browser navigation
+        // Activate content and title change on browser navigation
 
-			window.onpopstate = createNewIframe;
+        window.onpopstate = createNewIframe;
 
-			// Create the navigation panel and configure the iframe
+        // Create the navigation panel and configure the iframe
 
-			createNavigation();
-			createNewIframe();
+        createNavigation();
+        createNewIframe();
 
-			// Navigation Panel
+        // Navigation Panel
 
-			function createLink( pageName, pageURL ) {
+        function createLink(pageName, pageURL) {
 
-				var link = document.createElement( 'a' );
-				link.href = pageURL + '.html';
-				link.textContent = pageName;
-				link.setAttribute( 'target', 'viewer' );
-				link.addEventListener( 'click', function ( event ) {
+            var link = document.createElement('a');
+            link.href = pageURL + '.html';
+            link.textContent = pageName;
+            link.setAttribute('target', 'viewer');
+            link.addEventListener('click', function (event) {
 
-					window.location.hash = pageURL;
-					panel.classList.add( 'collapsed' );
+                window.location.hash = pageURL;
+                panel.classList.add('collapsed');
 
-				} );
+            });
 
-				return link;
+            return link;
 
-			}
+        }
 
-			function createNavigation() {
 
-				// Create the navigation panel using data from list.js
+        function createFilterLink(pageName, pageURL, fragment) {
 
-				var navigation = document.createElement( 'div' );
-				content.appendChild( navigation );
+            var link = document.createElement('a');
+            link.href = pageURL + '.html#' + pageName;
+            link.textContent = pageName;
+            link.setAttribute('target', 'viewer');
+            link.addEventListener('click', function (event) {
 
-				for ( var section in list ) {
+                setUrlFragment(fragment);
+                panel.classList.add('collapsed');
 
-					// Create sections
+            });
 
-					var categories = list[ section ];
+            return link;
 
-					var sectionHead = document.createElement( 'h2' );
-					sectionHead.textContent = section;
-					navigation.appendChild( sectionHead );
+        }
 
-					for ( var category in categories ) {
+        function createNavigation() {
 
-						// Create categories
+            // Create the navigation panel using data from list.js
 
-						var pages = categories[ category ];
+            var navigation = document.createElement('div');
+            content.appendChild(navigation);
 
-						var categoryContainer = document.createElement( 'div' );
-						navigation.appendChild( categoryContainer );
+            for (var section in list) {
 
-						var categoryHead = document.createElement( 'h3' );
-						categoryHead.textContent = category;
-						categoryContainer.appendChild( categoryHead );
+                // Create sections
 
-						var categoryContent = document.createElement( 'ul' );
-						categoryContainer.appendChild( categoryContent );
+                var categories = list[section];
 
-						for ( var pageName in pages ) {
+                var sectionHead = document.createElement('h2');
+                sectionHead.textContent = section;
+                navigation.appendChild(sectionHead);
 
-							// Create page links
+                for (var category in categories) {
 
-							var pageURL = pages[ pageName ];
+                    // Create categories
 
-							var listElement = document.createElement( 'li' );
-							categoryContent.appendChild( listElement );
+                    var pages = categories[category];
 
-							var linkElement = createLink( pageName, pageURL )
-							listElement.appendChild( linkElement );
+                    var categoryContainer = document.createElement('div');
+                    navigation.appendChild(categoryContainer);
 
-							// Gather the main properties for the current subpage
+                    var categoryHead = document.createElement('h3');
+                    categoryHead.textContent = category;
+                    categoryContainer.appendChild(categoryHead);
 
-							pageProperties[ pageName ] = {
-								section: section,
-								category: category,
-								pageURL: pageURL,
-								linkElement: linkElement
-							};
+                    var categoryContent = document.createElement('ul');
+                    categoryContainer.appendChild(categoryContent);
 
-						// Gather the document titles (used for easy access on browser navigation)
+                    for (var pageName in pages) {
 
-						titles[ pageURL ] = pageName;
+                        // Create page links
 
-						}
+                        var filter = pages[pageName];
+                        if (typeof filter !== "string") {
 
-						// Gather the category elements for easy access on filtering
+                            pageURL = filter["#URL"];
 
-						categoryElements.push( categoryContent );
+                        } else {
 
-					}
+                            pageURL = filter;
 
-				}
+                        }
 
-			}
 
+                        var listElement = document.createElement('li');
+                        categoryContent.appendChild(listElement);
 
-			// Filtering
+                        var linkElement = createLink(pageName, pageURL)
+                        listElement.appendChild(linkElement);
 
-			function updateFilter() {
+                        // Gather the main properties for the current subpage
 
-				// (uncomment the following line and the "Query strings" section, if you want query strings):
-				// updateQueryString();
+                        pageProperties[pageName] = {
+                            section: section,
+                            category: category,
+                            pageURL: pageURL,
+                            linkElement: linkElement,
 
-				var regExp = new RegExp( filterInput.value, 'gi' );
+                        };
+                        if (typeof filter !== "string") {
 
-				for ( var pageName in pageProperties ) {
 
-					var linkElement = pageProperties[ pageName ].linkElement;
-					var categoryClassList = linkElement.parentElement.classList;
-					var filterResults = pageName.match( regExp );
+                            pageProperties[pageName].filterItems = filter;
+                            pageProperties[pageName].filterLinkItems = [];
 
-					if ( filterResults && filterResults.length > 0 ) {
+                            var filterItems = document.createElement('ul');
+                            listElement.appendChild(filterItems);
 
-						// Accentuate matching characters
+                            for (var i in filter) {
 
-						for ( var i = 0; i < filterResults.length; i++ ) {
+                                if (i !== "#URL") {
 
-							var result = filterResults[ i ];
+                                    var filterItem = document.createElement('li');
+                                    filterItem.classList.add('hidden');
+                                    filterItem.classList.add('filterItem');
+                                    filterItems.appendChild(filterItem);
 
-							if ( result !== '' ) {
-								pageName = pageName.replace( result, '<b>' + result + '</b>' );
-							}
+                                    linkElement = createFilterLink(i, pageURL, filter[i])
+                                    filterItem.appendChild(linkElement);
 
-						}
+                                    pageProperties[pageName].filterLinkItems.push(linkElement);
 
-						categoryClassList.remove( 'hidden' );
-						linkElement.innerHTML = pageName;
+                                }
 
-					} else {
+                            }
 
-						// Hide all non-matching page names
+                        }
 
-						categoryClassList.add( 'hidden' );
 
-					}
+                        // Gather the document titles (used for easy access on browser navigation)
 
-				}
+                        titles[pageURL] = pageName;
 
-				displayFilteredPanel();
+                    }
 
-			}
+                    // Gather the category elements for easy access on filtering
 
-			function displayFilteredPanel() {
+                    categoryElements.push(categoryContent);
 
-				// Show/hide categories depending on their content
-				// First check if at least one page in this category is not hidden
+                }
 
-				categoryElements.forEach( function ( category ) {
+            }
 
-					var pages = category.children;
-					var pagesLength = pages.length;
-					var sectionClassList = category.parentElement.classList;
+        }
 
-					var hideCategory = true;
 
-					for ( var i = 0; i < pagesLength; i ++ ) {
+        // Filtering
 
-						var pageClassList = pages[ i ].classList;
+        function updateFilter() {
 
-						if ( ! pageClassList.contains( 'hidden' ) ) {
+            // (uncomment the following line and the "Query strings" section, if you want query strings):
+            // updateQueryString();
 
-							hideCategory = false;
+            if (filterInput.value !== "") {
 
-						}
+                var regExp = new RegExp(filterInput.value, 'gi');
 
-					}
+                for (var pageName in pageProperties) {
 
-					// If and only if all page names are hidden, hide the whole category
+                    var pageProperty = pageProperties[pageName];
+                    var linkElement = pageProperty.linkElement;
+                    var categoryClassList = linkElement.parentElement.classList;
+                    var filterResults = pageName.match(regExp);
+                    var filterItemResults = [];
 
-					if ( hideCategory ) {
+                    if (pageProperty.filterItems) {
+                        for (var filterItem in pageProperty.filterItems) {
 
-						sectionClassList.add( 'hidden' );
+                            var match = filterItem.match(regExp);
+                            if (match && match.length > 0) {
+                                filterItemResults.push(filterItem);
+                            };
 
-					} else {
+                        }
+                    }
 
-						sectionClassList.remove( 'hidden' );
 
-					}
+                    if (filterResults && filterResults.length > 0) {
 
-				} );
+                        // Accentuate matching characters
 
-			}
+                        for (var i = 0; i < filterResults.length; i++) {
 
+                            var result = filterResults[i];
 
-			// Routing
+                            if (result !== '') {
+                                pageName = pageName.replace(result, '<b>' + result + '</b>');
+                            }
 
-			function setUrlFragment( pageName ) {
+                        }
 
-				// Handle navigation from the subpages (iframes):
-				// First separate the memeber (if existing) from the page name,
-				// then identify the subpage's URL and set it as URL fragment (re-adding the member)
+                        if (pageProperty.filterItems) {
+                            for (var j = 0; j < pageProperty.filterLinkItems.length; j++) {
 
-				var splitPageName = decomposePageName( pageName, '.', '.' );
+                                var filterLinkItem = pageProperty.filterLinkItems[j];
+                                filterLinkItem.parentElement.classList.remove('hidden');
 
-				var currentProperties = pageProperties[ splitPageName[ 0 ] ];
+                            }
+                        }
 
-				if ( currentProperties ) {
+                        categoryClassList.remove('hidden');
+                        linkElement.innerHTML = pageName;
 
-					window.location.hash = currentProperties.pageURL + splitPageName[ 1 ];
+                    } else if (filterItemResults.length > 0) {
 
-					createNewIframe();
 
-				}
+                        for (var i = 0; i < filterItemResults.length; i++) {
 
-			}
+                            for (var j = 0; j < pageProperty.filterLinkItems.length; j++) {
 
-			function createNewIframe() {
+                                var filterLinkItem = pageProperty.filterLinkItems[j];
 
-				// Change the content displayed in the iframe
-				// First separate the member part of the fragment (if existing)
+                                if (filterLinkItem.textContent == filterItemResults[i]) {
+                                    filterLinkItem.parentElement.classList.remove('hidden');
+                                } else {
+                                    filterLinkItem.parentElement.classList.add('hidden');
+                                }
 
-				var hash = window.location.hash.substring( 1 );
-				var splitHash = decomposePageName( hash, '.', '#' );
+                            }
 
-				// Creating a new Iframe instead of assigning a new src is
-				// a cross-browser solution to allow normal browser navigation;
-				// - only assigning a new src would result in two history states each time.
+                        }
 
-				// Note: iframe.contentWindow.location.replace(hash) should work, too,
-				// but it doesn't work in Edge with links from the subpages!
+                        categoryClassList.remove('hidden');
+                        linkElement.innerHTML = pageName;
 
-				var oldIframe;
-				var subtitle;
+                    } else {
 
-				oldIframe = iframe;
-				iframe = oldIframe.cloneNode();
+                        // Hide all non-matching page names
+                        categoryClassList.add('hidden');
 
-				if(hash) {
+                    }
 
-					iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
-					subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' - ';
+                }
 
-				} else {
 
-					iframe.src = '';
-					subtitle = '';
+            } else {
 
-				}
+                for (var pageName in pageProperties) {
 
-				document.body.replaceChild( iframe, oldIframe );
-				document.title = subtitle + 'three.js docs';
+                    var linkElement = pageProperties[pageName].linkElement;
+                    var categoryClassList = linkElement.parentElement.classList;
+                    categoryClassList.remove('hidden');
+                    linkElement.innerHTML = pageName;
 
-			}
+                }
 
-			function decomposePageName( pageName, oldDelimiter, newDelimiter ) {
+                var filterItems = document.getElementsByClassName("filterItem");
+                for (var i = 0; i < filterItems.length; ++i) {
 
-				// Helper function for separating the member (if existing) from the pageName
-				// For example: 'Geometry.morphTarget' can be converted to
-				// ['Geometry', '.morphTarget'] or ['Geometry', '#morphTarget']
-				// Note: According RFC 3986 no '#' allowed inside of an URL fragment!
+                    filterItems[i].classList.add('hidden')
 
-				var parts = [];
+                };
 
-				var dotIndex = pageName.indexOf( oldDelimiter );
 
-				if ( dotIndex !== -1 ) {
+            }
 
-					parts = pageName.split( oldDelimiter );
-					parts[ 1 ] = newDelimiter + parts[ 1 ];
+            displayFilteredPanel();
 
-				} else {
+        }
 
-					parts[ 0 ] = pageName;
-					parts[ 1 ] = '';
+        function displayFilteredPanel() {
 
-				}
+            // Show/hide categories depending on their content
+            // First check if at least one page in this category is not hidden
 
-				return parts;
+            categoryElements.forEach(function (category) {
 
-			}
+                var pages = category.children;
+                var pagesLength = pages.length;
+                var sectionClassList = category.parentElement.classList;
 
-			//
+                var hideCategory = true;
 
-			console.log([
-				'    __     __',
-				' __/ __\\  / __\\__   ____   _____   _____',
-				'/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
-				'\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
-				'/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
-				'\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
-				'                                         / __/  /  \\__  \\',
-				'                                         \\/____/\\/_____/'
-			].join('\n'));
+                for (var i = 0; i < pagesLength; i++) {
 
+                    var pageClassList = pages[i].classList;
 
-		</script>
+                    if (!pageClassList.contains('hidden')) {
 
-		<script src="../build/three.min.js"></script> <!-- console sandbox -->
+                        hideCategory = false;
 
-	</body>
+                    }
+
+                }
+
+                // If and only if all page names are hidden, hide the whole category
+
+                if (hideCategory) {
+
+                    sectionClassList.add('hidden');
+
+                } else {
+
+                    sectionClassList.remove('hidden');
+
+                }
+
+            });
+
+        }
+
+
+        // Routing
+
+        function setUrlFragment(pageName) {
+
+            // Handle navigation from the subpages (iframes):
+            // First separate the memeber (if existing) from the page name,
+            // then identify the subpage's URL and set it as URL fragment (re-adding the member)
+
+            var splitPageName = decomposePageName(pageName, '.', '.');
+
+            var currentProperties = pageProperties[splitPageName[0]];
+
+            if (currentProperties) {
+
+                window.location.hash = currentProperties.pageURL + splitPageName[1];
+
+                createNewIframe();
+
+            }
+
+        }
+
+        function createNewIframe() {
+
+            // Change the content displayed in the iframe
+            // First separate the member part of the fragment (if existing)
+
+            var hash = window.location.hash.substring(1);
+            var splitHash = decomposePageName(hash, '.', '#');
+
+            // Creating a new Iframe instead of assigning a new src is
+            // a cross-browser solution to allow normal browser navigation;
+            // - only assigning a new src would result in two history states each time.
+
+            // Note: iframe.contentWindow.location.replace(hash) should work, too,
+            // but it doesn't work in Edge with links from the subpages!
+
+            var oldIframe;
+            var subtitle;
+
+            oldIframe = iframe;
+            iframe = oldIframe.cloneNode();
+
+            if (hash) {
+
+                iframe.src = splitHash[0] + '.html' + splitHash[1];
+                subtitle = titles[splitHash[0]] + splitHash[1] + ' - ';
+
+            } else {
+
+                iframe.src = '';
+                subtitle = '';
+
+            }
+
+            document.body.replaceChild(iframe, oldIframe);
+            document.title = subtitle + 'three.js docs';
+
+        }
+
+        function decomposePageName(pageName, oldDelimiter, newDelimiter) {
+
+            // Helper function for separating the member (if existing) from the pageName
+            // For example: 'Geometry.morphTarget' can be converted to
+            // ['Geometry', '.morphTarget'] or ['Geometry', '#morphTarget']
+            // Note: According RFC 3986 no '#' allowed inside of an URL fragment!
+
+            var parts = [];
+
+            var dotIndex = pageName.indexOf(oldDelimiter);
+
+            if (dotIndex !== -1) {
+
+                parts = pageName.split(oldDelimiter);
+                parts[1] = newDelimiter + parts[1];
+
+            } else {
+
+                parts[0] = pageName;
+                parts[1] = '';
+
+            }
+
+            return parts;
+
+        }
+
+        //
+
+        console.log([
+            '    __     __',
+            ' __/ __\\  / __\\__   ____   _____   _____',
+            '/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
+            '\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
+            '/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
+            '\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
+            '                                         / __/  /  \\__  \\',
+            '                                         \\/____/\\/_____/'
+        ].join('\n'));
+
+
+    </script>
+
+    <script src="../build/three.min.js"></script> <!-- console sandbox -->
+
+</body>
 
 </html>
