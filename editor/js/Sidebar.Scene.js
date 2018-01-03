@@ -12,17 +12,6 @@ Sidebar.Scene = function ( editor ) {
 
 	// outliner
 
-	function escapeHTML( html ) {
-
-		return html
-			.replace( /&/g, '&amp;' )
-			.replace( /"/g, '&quot;' )
-			.replace( /'/g, '&#39;' )
-			.replace( /</g, '&lt;' )
-			.replace( />/g, '&gt;' );
-
-		}
-
 	function buildOption( object, draggable ) {
 
 		var option = document.createElement( 'div' );
@@ -51,6 +40,17 @@ Sidebar.Scene = function ( editor ) {
 		}
 
 		return material.name;
+
+	}
+
+	function escapeHTML( html ) {
+
+		return html
+			.replace( /&/g, '&amp;' )
+			.replace( /"/g, '&quot;' )
+			.replace( /'/g, '&#39;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' );
 
 	}
 
