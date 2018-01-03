@@ -105,7 +105,6 @@ var list = {
 
 		"Extras": {
 			"Earcut": "api/extras/Earcut",
-			"SceneUtils": "api/extras/SceneUtils",
 			"ShapeUtils": "api/extras/ShapeUtils"
 		},
 
@@ -381,6 +380,10 @@ var list = {
 
 		"Renderers": {
 			"CanvasRenderer": "examples/renderers/CanvasRenderer"
+		},
+
+		"Utils": {
+			"SceneUtils": "examples/utils/SceneUtils"
 		}
 
 	},
