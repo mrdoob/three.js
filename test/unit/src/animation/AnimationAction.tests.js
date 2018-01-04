@@ -230,15 +230,46 @@ export default QUnit.module( 'Animation', () => {
 			
 		} );
 
-		QUnit.todo( "setEffectiveWeight", ( assert ) => {
+		QUnit.test( "setEffectiveWeight", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var {animationAction} = createAnimation();
+            assert.equal( animationAction.getEffectiveWeight(), 1 , "When an animation is created, EffectiveWeight is 1." );
+            animationAction.setEffectiveWeight(0.3);
+			assert.equal( animationAction.getEffectiveWeight(), 0.3 , "When EffectiveWeight is set to 0.3 , EffectiveWeight is 0.3." );
+
+
+			var {animationAction} = createAnimation();
+            assert.equal( animationAction.getEffectiveWeight(), 1 , "When an animation is created, EffectiveWeight is 1." );
+            animationAction.enabled = false;
+            animationAction.setEffectiveWeight(0.3);
+			assert.equal( animationAction.getEffectiveWeight(), 0 , "When EffectiveWeight is set to 0.3 when disabled , EffectiveWeight is 0." );
+
+
+			var { root, mixer,animationAction } = createAnimation();
+            animationAction.setEffectiveWeight(0.5);
+			animationAction.play();
+			mixer.update(500);
+			assert.equal( root.rotation.x, 90 ,  "When an animation has weight 0.5 and runs half through the animation, it has changed to 1/4." );
+			mixer.update(1000);
+			assert.equal( root.rotation.x, 90 ,  "When an animation has weight 0.5 and runs one and half through the animation, it has changed to 1/4." );
+
+
 
 		} );
 
-		QUnit.todo( "getEffectiveWeight", ( assert ) => {
+		QUnit.test( "getEffectiveWeight", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+		    var {animationAction} = createAnimation();
+            assert.equal( animationAction.getEffectiveWeight(), 1 , "When an animation is created, EffectiveWeight is 1." );
+            animationAction.setEffectiveWeight(0.3);
+			assert.equal( animationAction.getEffectiveWeight(), 0.3 , "When EffectiveWeight is set to 0.3 , EffectiveWeight is 0.3." );
+
+
+			var {animationAction} = createAnimation();
+            assert.equal( animationAction.getEffectiveWeight(), 1 , "When an animation is created, EffectiveWeight is 1." );
+            animationAction.enabled = false;
+            animationAction.setEffectiveWeight(0.3);
+			assert.equal( animationAction.getEffectiveWeight(), 0 , "When EffectiveWeight is set to 0.3 when disabled , EffectiveWeight is 0." );
 
 		} );
 
