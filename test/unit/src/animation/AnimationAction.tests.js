@@ -273,15 +273,37 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( "fadeIn", ( assert ) => {
+		QUnit.test( "fadeIn", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+		    var {mixer, animationAction} = createAnimation();
+            animationAction.fadeIn(1000);
+			animationAction.play();
+            assert.equal( animationAction.getEffectiveWeight(), 1 , "When an animation fadeIn is started, EffectiveWeight is 1." );
+			mixer.update(250);
+			assert.equal( animationAction.getEffectiveWeight(), 0.25, "When an animation fadeIn happened 1/4, EffectiveWeight is 0.25." );
+			mixer.update(250);
+			assert.equal( animationAction.getEffectiveWeight(), 0.5, "When an animation fadeIn is halfway , EffectiveWeight is 0.5." );
+			mixer.update(250);
+			assert.equal( animationAction.getEffectiveWeight(), 0.75, "When an animation fadeIn is halfway , EffectiveWeight is 0.75." );
+			mixer.update(500);
+			assert.equal( animationAction.getEffectiveWeight(), 1, "When an animation fadeIn is ended , EffectiveWeight is 1." );
 
 		} );
 
-		QUnit.todo( "fadeOut", ( assert ) => {
+		QUnit.test( "fadeOut", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var {mixer, animationAction} = createAnimation();
+            animationAction.fadeOut(1000);
+			animationAction.play();
+            assert.equal( animationAction.getEffectiveWeight(), 1 , "When an animation fadeOut is started, EffectiveWeight is 1." );
+			mixer.update(250);
+			assert.equal( animationAction.getEffectiveWeight(), 0.75, "When an animation fadeOut happened 1/4, EffectiveWeight is 0.75." );
+			mixer.update(250);
+			assert.equal( animationAction.getEffectiveWeight(), 0.5, "When an animation fadeOut is halfway , EffectiveWeight is 0.5." );
+			mixer.update(250);
+			assert.equal( animationAction.getEffectiveWeight(), 0.25, "When an animation fadeOut is happened 3/4 , EffectiveWeight is 0.25." );
+			mixer.update(500);
+			assert.equal( animationAction.getEffectiveWeight(), 0, "When an animation fadeOut is ended , EffectiveWeight is 0." );
 
 		} );
 
