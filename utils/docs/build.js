@@ -81,7 +81,7 @@ function getMembers( HTMLFile ) {
 }
 
 
-function extractData( obj ) {
+function extractData( obj, includeBaseTypeMethods ) {
 
 	var allPages = {};
 
@@ -129,22 +129,38 @@ function extractData( obj ) {
 		}
 
 	}
-	/*
-    for (var pageToCheck in allPages) {
-        var parent = allPages[pageToCheck]["#PARENT"];
-        while (parent) {
-            if (allPages[parent]) {
-                for (parentFilters in allPages[parent]) {
-                    if (!parentFilters.startsWith("#") && !allPages[pageToCheck][parentFilters]) {
-                        allPages[pageToCheck][parentFilters] = allPages[parent][parentFilters];
-                    }
-                }
-                parent = allPages[parent]["#PARENT"];
-            } else {
-                parent = undefined;
-            }
-        }
-    }*/
+
+	if ( includeBaseTypeMethods ) {
+
+		for ( var pageToCheck in allPages ) {
+
+			var parent = allPages[ pageToCheck ][ "#PARENT" ];
+			while ( parent ) {
+
+				if ( allPages[ parent ] ) {
+
+					for ( parentFilters in allPages[ parent ] ) {
+
+						if ( ! parentFilters.startsWith( "#" ) && ! allPages[ pageToCheck ][ parentFilters ] ) {
+
+							allPages[ pageToCheck ][ parentFilters ] = allPages[ parent ][ parentFilters ];
+
+						}
+
+					}
+					parent = allPages[ parent ][ "#PARENT" ];
+
+				} else {
+
+					parent = undefined;
+
+				}
+
+			}
+
+		}
+
+	}
 
 }
 
@@ -165,14 +181,17 @@ function eslint( files ) {
 
 }
 
-var docsFolder = "../../docs/"
+var docsFolder = "../../docs/";
 var listFile = docsFolder + "list.js";
+var args = process.argv.slice( 2 );
+var includeBaseTypeMethods = args.indexOf( "--include-base-type-methods" ) > - 1;
+
 
 var list = ( new Function( fs.readFileSync( listFile, "utf8" ) + ";return list;" ) )();
-extractData( list.Reference );
-extractData( list.Examples );
+extractData( list.Reference, includeBaseTypeMethods );
+extractData( list.Examples, includeBaseTypeMethods );
 
 
 fs.writeFileSync( listFile, "var list = " + JSON.stringify( list, undefined, 4 ), "utf8" );
 
-eslint( [ listFile,] );
+eslint( [ listFile ] );
