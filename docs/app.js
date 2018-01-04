@@ -282,7 +282,7 @@ function updateFilter() {
 
                     }
 
-                    if (found) {
+                    if (!found) {
 
 					    var filterLinkItem = pageProperty.filterLinkItems[ j ];
 					    filterLinkItem.parentElement.classList.add( 'hidden' );
