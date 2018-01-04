@@ -1,9 +1,6 @@
 var list = {
-
 	"Manual": {
-
 		"Getting Started": {
-
 			"Creating a scene": "manual/introduction/Creating-a-scene",
 			"Import via modules": "manual/introduction/Import-via-modules",
 			"Browser support": "manual/introduction/Browser-support",
@@ -15,32 +12,19 @@ var list = {
 			"Code Style Guide": "manual/introduction/Code-style-guide",
 			"FAQ": "manual/introduction/FAQ",
 			"Useful links": "manual/introduction/Useful-links"
-
 		},
-
 		"Next Steps": {
-
 			"How to update things": "manual/introduction/How-to-update-things",
 			"Matrix transformations": "manual/introduction/Matrix-transformations",
 			"Animation System": "manual/introduction/Animation-system"
-
 		},
-
 		"Build Tools": {
-
 			"Testing with NPM": "manual/buildTools/Testing-with-NPM"
-
 		}
-
-
 	},
-
 	"Reference": {
-
 		"Animation": {
-
 			"AnimationAction": {
-
 				"#URL": "api/animation/AnimationAction",
 				"clampWhenFinished": "AnimationAction.clampWhenFinished",
 				"crossFadeFrom": "AnimationAction.crossFadeFrom",
@@ -76,11 +60,8 @@ var list = {
 				"weight": "AnimationAction.weight",
 				"zeroSlopeAtEnd": "AnimationAction.zeroSlopeAtEnd",
 				"zeroSlopeAtStart": "AnimationAction.zeroSlopeAtStart"
-
 			},
-
 			"AnimationClip": {
-
 				"#URL": "api/animation/AnimationClip",
 				"CreateClipsFromMorphTargetSequences": "AnimationClip.CreateClipsFromMorphTargetSequences",
 				"CreateFromMorphTargetSequence": "AnimationClip.CreateFromMorphTargetSequence",
@@ -95,11 +76,8 @@ var list = {
 				"tracks": "AnimationClip.tracks",
 				"trim": "AnimationClip.trim",
 				"uuid": "AnimationClip.uuid"
-
 			},
-
 			"AnimationMixer": {
-
 				"#URL": "api/animation/AnimationMixer",
 				"clipAction": "AnimationMixer.clipAction",
 				"existingAction": "AnimationMixer.existingAction",
@@ -111,22 +89,16 @@ var list = {
 				"uncacheClip": "AnimationMixer.uncacheClip",
 				"uncacheRoot": "AnimationMixer.uncacheRoot",
 				"update": "AnimationMixer.update"
-
 			},
-
 			"AnimationObjectGroup": {
-
 				"#URL": "api/animation/AnimationObjectGroup",
 				"add": "AnimationObjectGroup.add",
 				"remove": "AnimationObjectGroup.remove",
 				"stats": "AnimationObjectGroup.stats",
 				"uncache": "AnimationObjectGroup.uncache",
 				"uuid": "AnimationObjectGroup.uuid"
-
 			},
-
 			"AnimationUtils": {
-
 				"#URL": "api/animation/AnimationUtils",
 				"arraySlice": "AnimationUtils.arraySlice",
 				"convertArray": "AnimationUtils.convertArray",
@@ -134,11 +106,8 @@ var list = {
 				"getKeyframeOrder": "AnimationUtils.getKeyframeOrder",
 				"isTypedArray": "AnimationUtils.isTypedArray",
 				"sortedArray": "AnimationUtils.sortedArray"
-
 			},
-
 			"KeyframeTrack": {
-
 				"#URL": "api/animation/KeyframeTrack",
 				"DefaultInterpolation": "KeyframeTrack.DefaultInterpolation",
 				"InterpolantFactoryMethodDiscrete": "KeyframeTrack.InterpolantFactoryMethodDiscrete",
@@ -160,11 +129,8 @@ var list = {
 				"trim": "KeyframeTrack.trim",
 				"validate": "KeyframeTrack.validate",
 				"values": "KeyframeTrack.values"
-
 			},
-
 			"PropertyBinding": {
-
 				"#URL": "api/animation/PropertyBinding",
 				"BindingType": "PropertyBinding.BindingType",
 				"Composite": "PropertyBinding.Composite",
@@ -182,11 +148,8 @@ var list = {
 				"rootNode": "PropertyBinding.rootNode",
 				"setValue": "PropertyBinding.setValue",
 				"unbind": "PropertyBinding.unbind"
-
 			},
-
 			"PropertyMixer": {
-
 				"#URL": "api/animation/PropertyMixer",
 				"accumulate": "PropertyMixer.accumulate",
 				"apply": "PropertyMixer.apply",
@@ -198,16 +161,10 @@ var list = {
 				"saveOriginalState": "PropertyMixer.saveOriginalState",
 				"useCount": "PropertyMixer.useCount",
 				"valueSize": "PropertyMixer.valueSize"
-
 			}
-
-
 		},
-
 		"Animation / Tracks": {
-
 			"BooleanKeyframeTrack": {
-
 				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/BooleanKeyframeTrack",
 				"DefaultInterpolation": "BooleanKeyframeTrack.DefaultInterpolation",
@@ -215,37 +172,25 @@ var list = {
 				"InterpolantFactoryMethodSmooth ": "BooleanKeyframeTrack.InterpolantFactoryMethodSmooth ",
 				"ValueBufferType": "BooleanKeyframeTrack.ValueBufferType",
 				"ValueTypeName": "BooleanKeyframeTrack.ValueTypeName"
-
 			},
-
 			"ColorKeyframeTrack": {
-
 				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/ColorKeyframeTrack",
 				"ValueTypeName": "ColorKeyframeTrack.ValueTypeName"
-
 			},
-
 			"NumberKeyframeTrack": {
-
 				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/NumberKeyframeTrack",
 				"ValueTypeName": "NumberKeyframeTrack.ValueTypeName"
-
 			},
-
 			"QuaternionKeyframeTrack": {
-
 				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/QuaternionKeyframeTrack",
 				"DefaultInterpolation": "QuaternionKeyframeTrack.DefaultInterpolation",
 				"InterpolantFactoryMethodLinear": "QuaternionKeyframeTrack.InterpolantFactoryMethodLinear",
 				"ValueTypeName": "QuaternionKeyframeTrack.ValueTypeName"
-
 			},
-
 			"StringKeyframeTrack": {
-
 				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/StringKeyframeTrack",
 				"DefaultInterpolation": "StringKeyframeTrack.DefaultInterpolation",
@@ -253,24 +198,15 @@ var list = {
 				"InterpolantFactoryMethodSmooth": "StringKeyframeTrack.InterpolantFactoryMethodSmooth",
 				"ValueBufferType": "StringKeyframeTrack.ValueBufferType",
 				"ValueTypeName": "StringKeyframeTrack.ValueTypeName"
-
 			},
-
 			"VectorKeyframeTrack": {
-
 				"#PARENT": "KeyframeTrack",
 				"#URL": "api/animation/tracks/VectorKeyframeTrack",
 				"ValueTypeName": "VectorKeyframeTrack.ValueTypeName"
-
 			}
-
-
 		},
-
 		"Audio": {
-
 			"Audio": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/audio/Audio",
 				"autoplay": "Audio.autoplay",
@@ -304,30 +240,21 @@ var list = {
 				"startTime": "Audio.startTime",
 				"stop": "Audio.stop",
 				"type": "Audio.type"
-
 			},
-
 			"AudioAnalyser": {
-
 				"#URL": "api/audio/AudioAnalyser",
 				"analyser": "AudioAnalyser.analyser",
 				"data": "AudioAnalyser.data",
 				"fftSize": "AudioAnalyser.fftSize",
 				"getAverageFrequency": "AudioAnalyser.getAverageFrequency",
 				"getFrequencyData": "AudioAnalyser.getFrequencyData"
-
 			},
-
 			"AudioContext": {
-
 				"#URL": "api/audio/AudioContext",
 				"getContext": "AudioContext.getContext",
 				"setContext": "AudioContext.setContext"
-
 			},
-
 			"AudioListener": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/audio/AudioListener",
 				"context": "AudioListener.context",
@@ -339,12 +266,9 @@ var list = {
 				"removeFilter": "AudioListener.removeFilter",
 				"setFilter": "AudioListener.setFilter",
 				"setMasterVolume": "AudioListener.setMasterVolume"
-
 			},
-
 			"PositionalAudio": {
-
-				"#PARENT": "Audio",
+				"#PARENT": "Object3D",
 				"#URL": "api/audio/PositionalAudio",
 				"getDistanceModel": "PositionalAudio.getDistanceModel",
 				"getMaxDistance": "PositionalAudio.getMaxDistance",
@@ -356,16 +280,10 @@ var list = {
 				"setMaxDistance": "PositionalAudio.setMaxDistance",
 				"setRefDistance": "PositionalAudio.setRefDistance",
 				"setRolloffFactor": "PositionalAudio.setRolloffFactor"
-
 			}
-
-
 		},
-
 		"Cameras": {
-
 			"Camera": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/cameras/Camera",
 				"clone": "Camera.clone",
@@ -375,22 +293,16 @@ var list = {
 				"layers": "Camera.layers",
 				"matrixWorldInverse": "Camera.matrixWorldInverse",
 				"projectionMatrix": "Camera.projectionMatrix"
-
 			},
-
 			"CubeCamera": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/cameras/CubeCamera",
 				"clear": "CubeCamera.clear",
 				"renderTarget": "CubeCamera.renderTarget",
 				"update": "CubeCamera.update"
-
 			},
-
 			"OrthographicCamera": {
-
-				"#PARENT": "Camera",
+				"#PARENT": "Object3D",
 				"#URL": "api/cameras/OrthographicCamera",
 				"bottom": "OrthographicCamera.bottom",
 				"clearViewOffset": "OrthographicCamera.clearViewOffset",
@@ -405,12 +317,9 @@ var list = {
 				"updateProjectionMatrix": "OrthographicCamera.updateProjectionMatrix",
 				"view": "OrthographicCamera.view",
 				"zoom": "OrthographicCamera.zoom"
-
 			},
-
 			"PerspectiveCamera": {
-
-				"#PARENT": "Camera",
+				"#PARENT": "Object3D",
 				"#URL": "api/cameras/PerspectiveCamera",
 				"aspect": "PerspectiveCamera.aspect",
 				"clearViewOffset": "PerspectiveCamera.clearViewOffset",
@@ -431,76 +340,43 @@ var list = {
 				"updateProjectionMatrix": "PerspectiveCamera.updateProjectionMatrix",
 				"view": "PerspectiveCamera.view",
 				"zoom": "PerspectiveCamera.zoom"
-
 			},
-
 			"StereoCamera": {
-
 				"#URL": "api/cameras/StereoCamera",
 				"aspect": "StereoCamera.aspect",
 				"cameraL": "StereoCamera.cameraL",
 				"cameraR": "StereoCamera.cameraR",
 				"eyeSep": "StereoCamera.eyeSep",
 				"update": "StereoCamera.update"
-
 			}
-
-
 		},
-
 		"Constants": {
-
 			"Animation": {
-
 				"#URL": "api/constants/Animation"
-
 			},
-
 			"Core": {
-
 				"#URL": "api/constants/Core"
-
 			},
-
 			"CustomBlendingEquation": {
-
 				"#URL": "api/constants/CustomBlendingEquations"
-
 			},
-
 			"DrawModes": {
-
 				"#URL": "api/constants/DrawModes"
-
 			},
-
 			"Materials": {
-
 				"#URL": "api/constants/Materials",
 				"color": "Materials.color",
 				"vertexColors": "Materials.vertexColors"
-
 			},
-
 			"Renderer": {
-
 				"#URL": "api/constants/Renderer"
-
 			},
-
 			"Textures": {
-
 				"#URL": "api/constants/Textures"
-
 			}
-
-
 		},
-
 		"Core": {
-
 			"BufferAttribute": {
-
 				"#URL": "api/core/BufferAttribute",
 				"array": "BufferAttribute.array",
 				"clone": "BufferAttribute.clone",
@@ -537,11 +413,8 @@ var list = {
 				"updateRange": "BufferAttribute.updateRange",
 				"uuid": "BufferAttribute.uuid",
 				"version": "BufferAttribute.version"
-
 			},
-
 			"BufferGeometry": {
-
 				"#URL": "api/core/BufferGeometry",
 				"addAttribute": "BufferGeometry.addAttribute",
 				"addGroup": "BufferGeometry.addGroup",
@@ -586,11 +459,8 @@ var list = {
 				"translate": "BufferGeometry.translate",
 				"updateFromObject": "BufferGeometry.updateFromObject",
 				"uuid": "BufferGeometry.uuid"
-
 			},
-
 			"Clock": {
-
 				"#URL": "api/core/Clock",
 				"autoStart": "Clock.autoStart",
 				"elapsedTime": "Clock.elapsedTime",
@@ -601,11 +471,8 @@ var list = {
 				"start": "Clock.start",
 				"startTime": "Clock.startTime",
 				"stop": "Clock.stop"
-
 			},
-
 			"DirectGeometry": {
-
 				"#URL": "api/core/DirectGeometry",
 				"boundingBox": "DirectGeometry.boundingBox",
 				"boundingSphere": "DirectGeometry.boundingSphere",
@@ -632,21 +499,15 @@ var list = {
 				"uvsNeedUpdate": "DirectGeometry.uvsNeedUpdate",
 				"vertices": "DirectGeometry.vertices",
 				"verticesNeedUpdate": "DirectGeometry.verticesNeedUpdate"
-
 			},
-
 			"EventDispatcher": {
-
 				"#URL": "api/core/EventDispatcher",
 				"addEventListener": "EventDispatcher.addEventListener",
 				"dispatchEvent": "EventDispatcher.dispatchEvent",
 				"hasEventListener": "EventDispatcher.hasEventListener",
 				"removeEventListener": "EventDispatcher.removeEventListener"
-
 			},
-
 			"Face3": {
-
 				"#URL": "api/core/Face3",
 				"a": "Face3.a",
 				"b": "Face3.b",
@@ -658,11 +519,8 @@ var list = {
 				"normal": "Face3.normal",
 				"vertexColors": "Face3.vertexColors",
 				"vertexNormals": "Face3.vertexNormals"
-
 			},
-
 			"Geometry": {
-
 				"#URL": "api/core/Geometry",
 				"applyMatrix": "Geometry.applyMatrix",
 				"boundingBox": "Geometry.boundingBox",
@@ -712,39 +570,27 @@ var list = {
 				"uvsNeedUpdate": "Geometry.uvsNeedUpdate",
 				"vertices": "Geometry.vertices",
 				"verticesNeedUpdate": "Geometry.verticesNeedUpdate"
-
 			},
-
 			"InstancedBufferAttribute": {
-
 				"#PARENT": "BufferAttribute",
 				"#URL": "api/core/InstancedBufferAttribute",
 				"isInstancedBufferAttribute": "InstancedBufferAttribute.isInstancedBufferAttribute",
 				"meshPerAttribute": "InstancedBufferAttribute.meshPerAttribute"
-
 			},
-
 			"InstancedBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/core/InstancedBufferGeometry",
 				"addGroup": "InstancedBufferGeometry.addGroup",
 				"isInstancedBufferGeometry": "InstancedBufferGeometry.isInstancedBufferGeometry",
 				"maxInstancedCount": "InstancedBufferGeometry.maxInstancedCount"
-
 			},
-
 			"InstancedInterleavedBuffer": {
-
 				"#PARENT": "InterleavedBuffer",
 				"#URL": "api/core/InstancedInterleavedBuffer",
 				"isInstancedInterleavedBuffer": "InstancedInterleavedBuffer.isInstancedInterleavedBuffer",
 				"meshPerAttribute": "InstancedInterleavedBuffer.meshPerAttribute"
-
 			},
-
 			"InterleavedBuffer": {
-
 				"#URL": "api/core/InterleavedBuffer",
 				"array": "InterleavedBuffer.array",
 				"clone": "InterleavedBuffer.clone",
@@ -762,11 +608,8 @@ var list = {
 				"updateRange.count": "InterleavedBuffer.updateRange.count",
 				"updateRange.offset": "InterleavedBuffer.updateRange.offset",
 				"version": "InterleavedBuffer.version"
-
 			},
-
 			"InterleavedBufferAttribute": {
-
 				"#URL": "api/core/InterleavedBufferAttribute",
 				"array": "InterleavedBufferAttribute.array",
 				"count": "InterleavedBufferAttribute.count",
@@ -786,11 +629,8 @@ var list = {
 				"setXYZW": "InterleavedBufferAttribute.setXYZW",
 				"setY": "InterleavedBufferAttribute.setY",
 				"setZ": "InterleavedBufferAttribute.setZ"
-
 			},
-
 			"Layers": {
-
 				"#URL": "api/core/Layers",
 				"disable": "Layers.disable",
 				"enable": "Layers.enable",
@@ -798,11 +638,8 @@ var list = {
 				"set": "Layers.set",
 				"test": "Layers.test",
 				"toggle": "Layers.toggle"
-
 			},
-
 			"Object3D": {
-
 				"#URL": "api/core/Object3D",
 				"DefaultMatrixAutoUpdate": "Object3D.DefaultMatrixAutoUpdate",
 				"DefaultUp": "Object3D.DefaultUp",
@@ -869,11 +706,8 @@ var list = {
 				"uuid": "Object3D.uuid",
 				"visible": "Object3D.visible",
 				"worldToLocal": "Object3D.worldToLocal"
-
 			},
-
 			"Raycaster": {
-
 				"#URL": "api/core/Raycaster",
 				"far": "Raycaster.far",
 				"intersectObject": "Raycaster.intersectObject",
@@ -884,68 +718,38 @@ var list = {
 				"ray": "Raycaster.ray",
 				"set": "Raycaster.set",
 				"setFromCamera": "Raycaster.setFromCamera"
-
 			},
-
 			"Uniform": {
-
 				"#URL": "api/core/Uniform",
 				"clone": "Uniform.clone",
 				"value": "Uniform.value"
-
 			}
-
-
 		},
-
 		"Core / BufferAttributes": {
-
 			"BufferAttribute Types": {
-
 				"#PARENT": "BufferAttribute",
 				"#URL": "api/core/bufferAttributeTypes/BufferAttributeTypes"
-
 			}
-
-
 		},
-
 		"Deprecated": {
-
 			"DeprecatedList": {
-
 				"#URL": "api/deprecated/DeprecatedList"
-
 			}
-
-
 		},
-
 		"Extras": {
-
 			"Earcut": {
-
 				"#URL": "api/extras/Earcut",
 				"triangulate": "Earcut.triangulate"
-
 			},
-
 			"ShapeUtils": {
-
 				"#URL": "api/extras/ShapeUtils",
 				"area": "ShapeUtils.area",
 				"isClockwise": "ShapeUtils.isClockwise",
 				"triangulateShape": "ShapeUtils.triangulateShape"
-
 			}
-
-
 		},
-
 		"Extras / Core": {
-
 			"Curve": {
-
 				"#URL": "api/extras/core/Curve",
 				"arcLengthDivisions": "Curve.arcLengthDivisions",
 				"clone": "Curve.clone",
@@ -963,11 +767,8 @@ var list = {
 				"getUtoTmapping": "Curve.getUtoTmapping",
 				"toJSON": "Curve.toJSON",
 				"updateArcLengths": "Curve.updateArcLengths"
-
 			},
-
 			"CurvePath": {
-
 				"#PARENT": "Curve",
 				"#URL": "api/extras/core/CurvePath",
 				"add": "CurvePath.add",
@@ -975,29 +776,20 @@ var list = {
 				"closePath": "CurvePath.closePath",
 				"curves": "CurvePath.curves",
 				"getCurveLengths": "CurvePath.getCurveLengths"
-
 			},
-
 			"Font": {
-
 				"#URL": "api/extras/core/Font",
 				"data": "Font.data",
 				"generateShapes": "Font.generateShapes",
 				"isFont": "Font.isFont"
-
 			},
-
 			"Interpolations": {
-
 				"#URL": "api/extras/core/Interpolations",
 				"CatmullRom": "Interpolations.CatmullRom",
 				"CubicBezier": "Interpolations.CubicBezier",
 				"QuadraticBezier": "Interpolations.QuadraticBezier"
-
 			},
-
 			"Path": {
-
 				"#PARENT": "CurvePath",
 				"#URL": "api/extras/core/Path",
 				"absarc": "Path.absarc",
@@ -1011,22 +803,16 @@ var list = {
 				"quadraticCurveTo": "Path.quadraticCurveTo",
 				"setFromPoints": "Path.setFromPoints",
 				"splineThru": "Path.splineThru"
-
 			},
-
 			"Shape": {
-
 				"#PARENT": "Path",
 				"#URL": "api/extras/core/Shape",
 				"extractPoints": "Shape.extractPoints",
 				"getPointsHoles": "Shape.getPointsHoles",
 				"holes": "Shape.holes",
 				"uuid": "Shape.uuid"
-
 			},
-
 			"ShapePath": {
-
 				"#PARENT": "CurvePath",
 				"#URL": "api/extras/core/ShapePath",
 				"bezierCurveTo": "ShapePath.bezierCurveTo",
@@ -1037,24 +823,15 @@ var list = {
 				"splineThru": "ShapePath.splineThru",
 				"subPaths": "ShapePath.subPaths",
 				"toShapes": "ShapePath.toShapes"
-
 			}
-
-
 		},
-
 		"Extras / Curves": {
-
 			"ArcCurve": {
-
 				"#PARENT": "EllipseCurve",
 				"#URL": "api/extras/curves/ArcCurve",
 				"isArcCurve": "ArcCurve.isArcCurve"
-
 			},
-
 			"CatmullRomCurve3": {
-
 				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/CatmullRomCurve3",
 				"closed": "CatmullRomCurve3.closed",
@@ -1062,11 +839,8 @@ var list = {
 				"isCatmullRomCurve3": "CatmullRomCurve3.isCatmullRomCurve3",
 				"points": "CatmullRomCurve3.points",
 				"tension": "CatmullRomCurve3.tension"
-
 			},
-
 			"CubicBezierCurve": {
-
 				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/CubicBezierCurve",
 				"isCubicBezierCurve": "CubicBezierCurve.isCubicBezierCurve",
@@ -1074,11 +848,8 @@ var list = {
 				"v1": "CubicBezierCurve.v1",
 				"v2": "CubicBezierCurve.v2",
 				"v3": "CubicBezierCurve.v3"
-
 			},
-
 			"CubicBezierCurve3": {
-
 				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/CubicBezierCurve3",
 				"isCubicBezierCurve3": "CubicBezierCurve3.isCubicBezierCurve3",
@@ -1086,11 +857,8 @@ var list = {
 				"v1": "CubicBezierCurve3.v1",
 				"v2": "CubicBezierCurve3.v2",
 				"v3": "CubicBezierCurve3.v3"
-
 			},
-
 			"EllipseCurve": {
-
 				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/EllipseCurve",
 				"aClockwise": "EllipseCurve.aClockwise",
@@ -1102,401 +870,245 @@ var list = {
 				"isEllipseCurve": "EllipseCurve.isEllipseCurve",
 				"xRadius": "EllipseCurve.xRadius",
 				"yRadius": "EllipseCurve.yRadius"
-
 			},
-
 			"LineCurve": {
-
 				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/LineCurve",
 				"isLineCurve": "LineCurve.isLineCurve",
 				"v1": "LineCurve.v1",
 				"v2": "LineCurve.v2"
-
 			},
-
 			"LineCurve3": {
-
 				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/LineCurve3",
 				"isLineCurve3": "LineCurve3.isLineCurve3",
 				"v1": "LineCurve3.v1",
 				"v2": "LineCurve3.v2"
-
 			},
-
 			"QuadraticBezierCurve": {
-
 				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/QuadraticBezierCurve",
 				"isQuadraticBezierCurve": "QuadraticBezierCurve.isQuadraticBezierCurve",
 				"v0": "QuadraticBezierCurve.v0",
 				"v1": "QuadraticBezierCurve.v1",
 				"v2": "QuadraticBezierCurve.v2"
-
 			},
-
 			"QuadraticBezierCurve3": {
-
 				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/QuadraticBezierCurve3",
 				"isQuadraticBezierCurve3": "QuadraticBezierCurve3.isQuadraticBezierCurve3",
 				"v0": "QuadraticBezierCurve3.v0",
 				"v1": "QuadraticBezierCurve3.v1",
 				"v2": "QuadraticBezierCurve3.v2"
-
 			},
-
 			"SplineCurve": {
-
 				"#PARENT": "Curve",
 				"#URL": "api/extras/curves/SplineCurve",
 				"isSplineCurve": "SplineCurve.isSplineCurve",
 				"points": "SplineCurve.points"
-
 			}
-
-
 		},
-
 		"Extras / Objects": {
-
 			"ImmediateRenderObject": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/extras/objects/ImmediateRenderObject",
 				"render": "ImmediateRenderObject.render"
-
 			}
-
-
 		},
-
 		"Geometries": {
-
 			"BoxBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/BoxBufferGeometry"
-
 			},
-
 			"BoxGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/BoxGeometry"
-
 			},
-
 			"CircleBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/CircleBufferGeometry"
-
 			},
-
 			"CircleGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/CircleGeometry"
-
 			},
-
 			"ConeBufferGeometry": {
-
 				"#PARENT": "CylinderBufferGeometry",
 				"#URL": "api/geometries/ConeBufferGeometry"
-
 			},
-
 			"ConeGeometry": {
-
 				"#PARENT": "CylinderGeometry",
 				"#URL": "api/geometries/ConeGeometry"
-
 			},
-
 			"CylinderBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/CylinderBufferGeometry"
-
 			},
-
 			"CylinderGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/CylinderGeometry"
-
 			},
-
 			"DodecahedronBufferGeometry": {
-
 				"#PARENT": "PolyhedronBufferGeometry",
 				"#URL": "api/geometries/DodecahedronBufferGeometry",
 				"parameters": "DodecahedronBufferGeometry.parameters"
-
 			},
-
 			"DodecahedronGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/DodecahedronGeometry",
 				"parameters": "DodecahedronGeometry.parameters"
-
 			},
-
 			"EdgesGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/EdgesGeometry"
-
 			},
-
 			"ExtrudeGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/ExtrudeGeometry",
 				"addShape": "ExtrudeGeometry.addShape",
 				"addShapeList": "ExtrudeGeometry.addShapeList"
-
 			},
-
 			"ExtrudeBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/ExtrudeBufferGeometry",
 				"addShape": "ExtrudeBufferGeometry.addShape",
 				"addShapeList": "ExtrudeBufferGeometry.addShapeList"
-
 			},
-
 			"IcosahedronBufferGeometry": {
-
 				"#PARENT": "PolyhedronBufferGeometry",
 				"#URL": "api/geometries/IcosahedronBufferGeometry",
 				"parameters": "IcosahedronBufferGeometry.parameters"
-
 			},
-
 			"IcosahedronGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/IcosahedronGeometry",
 				"parameters": "IcosahedronGeometry.parameters"
-
 			},
-
 			"LatheBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/LatheBufferGeometry"
-
 			},
-
 			"LatheGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/LatheGeometry"
-
 			},
-
 			"OctahedronBufferGeometry": {
-
 				"#PARENT": "PolyhedronBufferGeometry",
 				"#URL": "api/geometries/OctahedronBufferGeometry",
 				"parameters": "OctahedronBufferGeometry.parameters"
-
 			},
-
 			"OctahedronGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/OctahedronGeometry",
 				"parameters": "OctahedronGeometry.parameters"
-
 			},
-
 			"ParametricBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/ParametricBufferGeometry"
-
 			},
-
 			"ParametricGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/ParametricGeometry"
-
 			},
-
 			"PlaneBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/PlaneBufferGeometry"
-
 			},
-
 			"PlaneGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/PlaneGeometry"
-
 			},
-
 			"PolyhedronBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/PolyhedronBufferGeometry",
 				"parameters": "PolyhedronBufferGeometry.parameters"
-
 			},
-
 			"PolyhedronGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/PolyhedronGeometry",
 				"parameters": "PolyhedronGeometry.parameters"
-
 			},
-
 			"RingBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/RingBufferGeometry"
-
 			},
-
 			"RingGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/RingGeometry"
-
 			},
-
 			"ShapeBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/ShapeBufferGeometry"
-
 			},
-
 			"ShapeGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/ShapeGeometry"
-
 			},
-
 			"SphereBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/SphereBufferGeometry"
-
 			},
-
 			"SphereGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/SphereGeometry"
-
 			},
-
 			"TetrahedronBufferGeometry": {
-
 				"#PARENT": "PolyhedronBufferGeometry",
 				"#URL": "api/geometries/TetrahedronBufferGeometry",
 				"parameters": "TetrahedronBufferGeometry.parameters"
-
 			},
-
 			"TetrahedronGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/TetrahedronGeometry",
 				"parameters": "TetrahedronGeometry.parameters"
-
 			},
-
 			"TextBufferGeometry": {
-
 				"#PARENT": "ExtrudeBufferGeometry",
 				"#URL": "api/geometries/TextBufferGeometry"
-
 			},
-
 			"TextGeometry": {
-
 				"#PARENT": "ExtrudeGeometry",
 				"#URL": "api/geometries/TextGeometry"
-
 			},
-
 			"TorusBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/TorusBufferGeometry"
-
 			},
-
 			"TorusGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/TorusGeometry"
-
 			},
-
 			"TorusKnotBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/TorusKnotBufferGeometry"
-
 			},
-
 			"TorusKnotGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/TorusKnotGeometry"
-
 			},
-
 			"TubeBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/TubeBufferGeometry",
 				"binormals": "TubeBufferGeometry.binormals",
 				"normals": "TubeBufferGeometry.normals",
 				"parameters": "TubeBufferGeometry.parameters",
 				"tangents": "TubeBufferGeometry.tangents"
-
 			},
-
 			"TubeGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "api/geometries/TubeGeometry",
 				"binormals": "TubeGeometry.binormals",
 				"normals": "TubeGeometry.normals",
 				"parameters": "TubeGeometry.parameters",
 				"tangents": "TubeGeometry.tangents"
-
 			},
-
 			"WireframeGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "api/geometries/WireframeGeometry"
-
 			}
-
-
 		},
-
 		"Helpers": {
-
 			"ArrowHelper": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/helpers/ArrowHelper",
 				"cone": "ArrowHelper.cone",
@@ -1504,36 +1116,24 @@ var list = {
 				"setColor": "ArrowHelper.setColor",
 				"setDirection": "ArrowHelper.setDirection",
 				"setLength": "ArrowHelper.setLength"
-
 			},
-
 			"AxesHelper": {
-
 				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/AxesHelper"
-
 			},
-
 			"BoxHelper": {
-
 				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/BoxHelper",
 				"setFromObject": "BoxHelper.setFromObject",
 				"update": "BoxHelper.update"
-
 			},
-
 			"Box3Helper": {
-
 				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/Box3Helper",
 				"box": "Box3Helper.box",
 				"updateMatrixWorld": "Box3Helper.updateMatrixWorld"
-
 			},
-
 			"CameraHelper": {
-
 				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/CameraHelper",
 				"camera": "CameraHelper.camera",
@@ -1541,11 +1141,8 @@ var list = {
 				"matrixAutoUpdate": "CameraHelper.matrixAutoUpdate",
 				"pointMap": "CameraHelper.pointMap",
 				"update": "CameraHelper.update"
-
 			},
-
 			"DirectionalLightHelper": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/helpers/DirectionalLightHelper",
 				"color": "DirectionalLightHelper.color",
@@ -1555,36 +1152,24 @@ var list = {
 				"matrix": "DirectionalLightHelper.matrix",
 				"matrixAutoUpdate": "DirectionalLightHelper.matrixAutoUpdate",
 				"update": "DirectionalLightHelper.update"
-
 			},
-
 			"FaceNormalsHelper": {
-
 				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/FaceNormalsHelper",
 				"matrixAutoUpdate": "FaceNormalsHelper.matrixAutoUpdate",
 				"object": "FaceNormalsHelper.object",
 				"size": "FaceNormalsHelper.size",
 				"update": "FaceNormalsHelper.update"
-
 			},
-
 			"GridHelper": {
-
 				"#PARENT": "Line",
 				"#URL": "api/helpers/GridHelper"
-
 			},
-
 			"PolarGridHelper": {
-
 				"#PARENT": "Line",
 				"#URL": "api/helpers/PolarGridHelper"
-
 			},
-
 			"HemisphereLightHelper": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/helpers/HemisphereLightHelper",
 				"color": "HemisphereLightHelper.color",
@@ -1593,21 +1178,15 @@ var list = {
 				"matrix": "HemisphereLightHelper.matrix",
 				"matrixAutoUpdate": "HemisphereLightHelper.matrixAutoUpdate",
 				"update": "HemisphereLightHelper.update"
-
 			},
-
 			"PlaneHelper": {
-
 				"#PARENT": "LineSegments",
 				"#URL": "api/helpers/PlaneHelper",
 				"plane": "PlaneHelper.plane",
 				"size": "PlaneHelper.size",
 				"updateMatrixWorld": "PlaneHelper.updateMatrixWorld"
-
 			},
-
 			"PointLightHelper": {
-
 				"#PARENT": "Mesh",
 				"#URL": "api/helpers/PointLightHelper",
 				"color": "PointLightHelper.color",
@@ -1616,31 +1195,22 @@ var list = {
 				"matrix": "PointLightHelper.matrix",
 				"matrixAutoUpdate": "PointLightHelper.matrixAutoUpdate",
 				"update": "PointLightHelper.update"
-
 			},
-
 			"RectAreaLightHelper": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/helpers/RectAreaLightHelper",
 				"color": "RectAreaLightHelper.color",
 				"dispose": "RectAreaLightHelper.dispose",
 				"light": "RectAreaLightHelper.light",
 				"update": "RectAreaLightHelper.update"
-
 			},
-
 			"SkeletonHelper": {
-
-				"#PARENT": "LineSegments",
+				"#PARENT": "Object3D",
 				"#URL": "api/helpers/SkeletonHelper",
 				"bones": "SkeletonHelper.bones",
 				"root": "SkeletonHelper.root"
-
 			},
-
 			"SpotLightHelper": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/helpers/SpotLightHelper",
 				"color": "SpotLightHelper.color",
@@ -1650,37 +1220,25 @@ var list = {
 				"matrix": "SpotLightHelper.matrix",
 				"matrixAutoUpdate": "SpotLightHelper.matrixAutoUpdate",
 				"update": "SpotLightHelper.update"
-
 			},
-
 			"VertexNormalsHelper": {
-
 				"#PARENT": "Line",
 				"#URL": "api/helpers/VertexNormalsHelper",
 				"matrixAutoUpdate": "VertexNormalsHelper.matrixAutoUpdate",
 				"object": "VertexNormalsHelper.object",
 				"size": "VertexNormalsHelper.size",
 				"update": "VertexNormalsHelper.update"
-
 			}
-
-
 		},
-
 		"Lights": {
-
 			"AmbientLight": {
-
-				"#PARENT": "Light",
+				"#PARENT": "Object3D",
 				"#URL": "api/lights/AmbientLight",
 				"castShadow": "AmbientLight.castShadow",
 				"isAmbientLight": "AmbientLight.isAmbientLight"
-
 			},
-
 			"DirectionalLight": {
-
-				"#PARENT": "Light",
+				"#PARENT": "Object3D",
 				"#URL": "api/lights/DirectionalLight",
 				"castShadow": "DirectionalLight.castShadow",
 				"copy": "DirectionalLight.copy",
@@ -1688,12 +1246,9 @@ var list = {
 				"position": "DirectionalLight.position",
 				"shadow": "DirectionalLight.shadow",
 				"target": "DirectionalLight.target"
-
 			},
-
 			"HemisphereLight": {
-
-				"#PARENT": "Light",
+				"#PARENT": "Object3D",
 				"#URL": "api/lights/HemisphereLight",
 				"castShadow": "HemisphereLight.castShadow",
 				"color": "HemisphereLight.color",
@@ -1701,11 +1256,8 @@ var list = {
 				"groundColor": "HemisphereLight.groundColor",
 				"isHemisphereLight": "HemisphereLight.isHemisphereLight",
 				"position": "HemisphereLight.position"
-
 			},
-
 			"Light": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/lights/Light",
 				"color": "Light.color",
@@ -1713,12 +1265,9 @@ var list = {
 				"intensity": "Light.intensity",
 				"isLight": "Light.isLight",
 				"toJSON": "Light.toJSON"
-
 			},
-
 			"PointLight": {
-
-				"#PARENT": "Light",
+				"#PARENT": "Object3D",
 				"#URL": "api/lights/PointLight",
 				"copy": "PointLight.copy",
 				"decay": "PointLight.decay",
@@ -1726,21 +1275,15 @@ var list = {
 				"isPointLight": "PointLight.isPointLight",
 				"power": "PointLight.power",
 				"shadow": "PointLight.shadow"
-
 			},
-
 			"RectAreaLight": {
-
-				"#PARENT": "Light",
+				"#PARENT": "Object3D",
 				"#URL": "api/lights/RectAreaLight",
 				"copy": "RectAreaLight.copy",
 				"isRectAreaLight": "RectAreaLight.isRectAreaLight"
-
 			},
-
 			"SpotLight": {
-
-				"#PARENT": "Light",
+				"#PARENT": "Object3D",
 				"#URL": "api/lights/SpotLight",
 				"angle": "SpotLight.angle",
 				"castShadow": "SpotLight.castShadow",
@@ -1753,24 +1296,15 @@ var list = {
 				"power": "SpotLight.power",
 				"shadow": "SpotLight.shadow",
 				"target": "SpotLight.target"
-
 			}
-
-
 		},
-
 		"Lights / Shadows": {
-
 			"DirectionalLightShadow": {
-
 				"#PARENT": "LightShadow",
 				"#URL": "api/lights/shadows/DirectionalLightShadow",
 				"camera": "DirectionalLightShadow.camera"
-
 			},
-
 			"LightShadow": {
-
 				"#URL": "api/lights/shadows/LightShadow",
 				"bias": "LightShadow.bias",
 				"camera": "LightShadow.camera",
@@ -1781,52 +1315,34 @@ var list = {
 				"matrix": "LightShadow.matrix",
 				"radius": "LightShadow.radius",
 				"toJSON": "LightShadow.toJSON"
-
 			},
-
 			"SpotLightShadow": {
-
 				"#PARENT": "LightShadow",
 				"#URL": "api/lights/shadows/SpotLightShadow",
 				"camera": "SpotLightShadow.camera",
 				"isSpotLightShadow": "SpotLightShadow.isSpotLightShadow",
 				"update": "SpotLightShadow.update"
-
 			}
-
-
 		},
-
 		"Loaders": {
-
 			"AnimationLoader": {
-
 				"#URL": "api/loaders/AnimationLoader",
 				"load": "AnimationLoader.load",
 				"manager": "AnimationLoader.manager",
 				"parse": "AnimationLoader.parse"
-
 			},
-
 			"AudioLoader": {
-
 				"#URL": "api/loaders/AudioLoader",
 				"load": "AudioLoader.load",
 				"manager": "AudioLoader.manager"
-
 			},
-
 			"BufferGeometryLoader": {
-
 				"#URL": "api/loaders/BufferGeometryLoader",
 				"load": "BufferGeometryLoader.load",
 				"manager": "BufferGeometryLoader.manager",
 				"parse": "BufferGeometryLoader.parse"
-
 			},
-
 			"Cache": {
-
 				"#URL": "api/loaders/Cache",
 				"add": "Cache.add",
 				"clear": "Cache.clear",
@@ -1834,21 +1350,15 @@ var list = {
 				"files": "Cache.files",
 				"get": "Cache.get",
 				"remove": "Cache.remove"
-
 			},
-
 			"CompressedTextureLoader": {
-
 				"#URL": "api/loaders/CompressedTextureLoader",
 				"load": "CompressedTextureLoader.load",
 				"manager": "CompressedTextureLoader.manager",
 				"path": "CompressedTextureLoader.path",
 				"setPath": "CompressedTextureLoader.setPath"
-
 			},
-
 			"CubeTextureLoader": {
-
 				"#URL": "api/loaders/CubeTextureLoader",
 				"crossOrigin": "CubeTextureLoader.crossOrigin",
 				"load": "CubeTextureLoader.load",
@@ -1856,19 +1366,13 @@ var list = {
 				"path": "CubeTextureLoader.path",
 				"setCrossOrigin": "CubeTextureLoader.setCrossOrigin",
 				"setPath": "CubeTextureLoader.setPath"
-
 			},
-
 			"DataTextureLoader": {
-
 				"#URL": "api/loaders/DataTextureLoader",
 				"load": "DataTextureLoader.load",
 				"manager": "DataTextureLoader.manager"
-
 			},
-
 			"FileLoader": {
-
 				"#URL": "api/loaders/FileLoader",
 				"cache": "FileLoader.cache",
 				"load": "FileLoader.load",
@@ -1881,22 +1385,16 @@ var list = {
 				"setResponseType": "FileLoader.setResponseType",
 				"setWithCredentials": "FileLoader.setWithCredentials",
 				"withCredentials": "FileLoader.withCredentials"
-
 			},
-
 			"FontLoader": {
-
 				"#URL": "api/loaders/FontLoader",
 				"load": "FontLoader.load",
 				"manager": "FontLoader.manager",
 				"parse": "FontLoader.parse",
 				"path": "FontLoader.path",
 				"setPath": "FontLoader.setPath"
-
 			},
-
 			"ImageBitmapLoader": {
-
 				"#URL": "api/loaders/ImageBitmapLoader",
 				"load": "ImageBitmapLoader.load",
 				"manager": "ImageBitmapLoader.manager",
@@ -1905,11 +1403,8 @@ var list = {
 				"setCrossOrigin": "ImageBitmapLoader.setCrossOrigin",
 				"setOptions": "ImageBitmapLoader.setOptions",
 				"setPath": "ImageBitmapLoader.setPath"
-
 			},
-
 			"ImageLoader": {
-
 				"#URL": "api/loaders/ImageLoader",
 				"crossOrigin": "ImageLoader.crossOrigin",
 				"load": "ImageLoader.load",
@@ -1917,22 +1412,16 @@ var list = {
 				"path": "ImageLoader.path",
 				"setCrossOrigin": "ImageLoader.setCrossOrigin",
 				"setPath": "ImageLoader.setPath"
-
 			},
-
 			"JSONLoader": {
-
 				"#URL": "api/loaders/JSONLoader",
 				"load": "JSONLoader.load",
 				"manager": "JSONLoader.manager",
 				"parse": "JSONLoader.parse",
 				"setTexturePath": "JSONLoader.setTexturePath",
 				"withCredentials": "JSONLoader.withCredentials"
-
 			},
-
 			"Loader": {
-
 				"#URL": "api/loaders/Loader",
 				"createMaterial": "Loader.createMaterial",
 				"crossOrigin": "Loader.crossOrigin",
@@ -1940,30 +1429,21 @@ var list = {
 				"onLoadComplete": "Loader.onLoadComplete",
 				"onLoadProgress": "Loader.onLoadProgress",
 				"onLoadStart": "Loader.onLoadStart"
-
 			},
-
 			"LoaderUtils": {
-
 				"#URL": "api/loaders/LoaderUtils",
 				"decodeText": "LoaderUtils.decodeText",
 				"extractUrlBase": "LoaderUtils.extractUrlBase"
-
 			},
-
 			"MaterialLoader": {
-
 				"#URL": "api/loaders/MaterialLoader",
 				"load": "MaterialLoader.load",
 				"manager": "MaterialLoader.manager",
 				"parse": "MaterialLoader.parse",
 				"setTextures": "MaterialLoader.setTextures",
 				"textures": "MaterialLoader.textures"
-
 			},
-
 			"ObjectLoader": {
-
 				"#URL": "api/loaders/ObjectLoader",
 				"crossOrigin": "ObjectLoader.crossOrigin",
 				"load": "ObjectLoader.load",
@@ -1978,11 +1458,8 @@ var list = {
 				"setCrossOrigin": "ObjectLoader.setCrossOrigin",
 				"setTexturePath": "ObjectLoader.setTexturePath",
 				"texturePath": "ObjectLoader.texturePath"
-
 			},
-
 			"TextureLoader": {
-
 				"#URL": "api/loaders/TextureLoader",
 				"crossOrigin": "TextureLoader.crossOrigin",
 				"load": "TextureLoader.load",
@@ -1992,22 +1469,13 @@ var list = {
 				"setPath": "TextureLoader.setPath",
 				"setWithCredentials": "TextureLoader.setWithCredentials",
 				"withCredentials": "TextureLoader.withCredentials"
-
 			}
-
-
 		},
-
 		"Loaders / Managers": {
-
 			"DefaultLoadingManager": {
-
 				"#URL": "api/loaders/managers/DefaultLoadingManager"
-
 			},
-
 			"LoadingManager": {
-
 				"#URL": "api/loaders/managers/LoadingManager",
 				"itemEnd": "LoadingManager.itemEnd",
 				"itemError": "LoadingManager.itemError",
@@ -2018,16 +1486,10 @@ var list = {
 				"onStart": "LoadingManager.onStart",
 				"resolveURL": "LoadingManager.resolveURL",
 				"setURLModifier": "LoadingManager.setURLModifier"
-
 			}
-
-
 		},
-
 		"Materials": {
-
 			"LineBasicMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/LineBasicMaterial",
 				"color": "LineBasicMaterial.color",
@@ -2036,11 +1498,8 @@ var list = {
 				"linecap": "LineBasicMaterial.linecap",
 				"linejoin": "LineBasicMaterial.linejoin",
 				"linewidth": "LineBasicMaterial.linewidth"
-
 			},
-
 			"LineDashedMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/LineDashedMaterial",
 				"color": "LineDashedMaterial.color",
@@ -2050,11 +1509,8 @@ var list = {
 				"lights": "LineDashedMaterial.lights",
 				"linewidth": "LineDashedMaterial.linewidth",
 				"scale": "LineDashedMaterial.scale"
-
 			},
-
 			"Material": {
-
 				"#URL": "api/materials/Material",
 				"alphaTest": "Material.alphaTest",
 				"blendDst": "Material.blendDst",
@@ -2104,11 +1560,8 @@ var list = {
 				"uuid": "Material.uuid",
 				"vertexColors": "Material.vertexColors",
 				"visible": "Material.visible"
-
 			},
-
 			"MeshBasicMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/MeshBasicMaterial",
 				"alphaMap": "MeshBasicMaterial.alphaMap",
@@ -2131,11 +1584,8 @@ var list = {
 				"wireframeLinecap": "MeshBasicMaterial.wireframeLinecap",
 				"wireframeLinejoin": "MeshBasicMaterial.wireframeLinejoin",
 				"wireframeLinewidth": "MeshBasicMaterial.wireframeLinewidth"
-
 			},
-
 			"MeshDepthMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/MeshDepthMaterial",
 				"alphaMap": "MeshDepthMaterial.alphaMap",
@@ -2151,11 +1601,8 @@ var list = {
 				"skinning": "MeshDepthMaterial.skinning",
 				"wireframe": "MeshDepthMaterial.wireframe",
 				"wireframeLinewidth": "MeshDepthMaterial.wireframeLinewidth"
-
 			},
-
 			"MeshLambertMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/MeshLambertMaterial",
 				"alphaMap": "MeshLambertMaterial.alphaMap",
@@ -2181,11 +1628,8 @@ var list = {
 				"wireframeLinecap": "MeshLambertMaterial.wireframeLinecap",
 				"wireframeLinejoin": "MeshLambertMaterial.wireframeLinejoin",
 				"wireframeLinewidth": "MeshLambertMaterial.wireframeLinewidth"
-
 			},
-
 			"MeshNormalMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/MeshNormalMaterial",
 				"fog": "MeshNormalMaterial.fog",
@@ -2194,11 +1638,8 @@ var list = {
 				"morphTargets": "MeshNormalMaterial.morphTargets",
 				"wireframe": "MeshNormalMaterial.wireframe",
 				"wireframeLinewidth": "MeshNormalMaterial.wireframeLinewidth"
-
 			},
-
 			"MeshPhongMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/MeshPhongMaterial",
 				"alphaMap": "MeshPhongMaterial.alphaMap",
@@ -2233,23 +1674,17 @@ var list = {
 				"wireframeLinecap": "MeshPhongMaterial.wireframeLinecap",
 				"wireframeLinejoin": "MeshPhongMaterial.wireframeLinejoin",
 				"wireframeLinewidth": "MeshPhongMaterial.wireframeLinewidth"
-
 			},
-
 			"MeshPhysicalMaterial": {
-
-				"#PARENT": "MeshStandardMaterial",
+				"#PARENT": "Material",
 				"#URL": "api/materials/MeshPhysicalMaterial",
 				"clearCoat": "MeshPhysicalMaterial.clearCoat",
 				"clearCoatRoughness": "MeshPhysicalMaterial.clearCoatRoughness",
 				"defines": "MeshPhysicalMaterial.defines",
 				"isMeshPhysicalMaterial": "MeshPhysicalMaterial.isMeshPhysicalMaterial",
 				"reflectivity": "MeshPhysicalMaterial.reflectivity"
-
 			},
-
 			"MeshStandardMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/MeshStandardMaterial",
 				"alphaMap": "MeshStandardMaterial.alphaMap",
@@ -2285,21 +1720,15 @@ var list = {
 				"wireframeLinecap": "MeshStandardMaterial.wireframeLinecap",
 				"wireframeLinejoin": "MeshStandardMaterial.wireframeLinejoin",
 				"wireframeLinewidth": "MeshStandardMaterial.wireframeLinewidth"
-
 			},
-
 			"MeshToonMaterial": {
-
-				"#PARENT": "MeshPhongMaterial",
+				"#PARENT": "Material",
 				"#URL": "api/materials/MeshToonMaterial",
 				"defines": "MeshToonMaterial.defines",
 				"gradientMap": "MeshToonMaterial.gradientMap",
 				"isMeshToonMaterial": "MeshToonMaterial.isMeshToonMaterial"
-
 			},
-
 			"PointsMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/PointsMaterial",
 				"color": "PointsMaterial.color",
@@ -2308,19 +1737,13 @@ var list = {
 				"map": "PointsMaterial.map",
 				"size": "PointsMaterial.size",
 				"sizeAttenuation": "PointsMaterial.sizeAttenuation"
-
 			},
-
 			"RawShaderMaterial": {
-
 				"#PARENT": "ShaderMaterial",
 				"#URL": "api/materials/RawShaderMaterial",
 				"isRawShaderMaterial": "RawShaderMaterial.isRawShaderMaterial"
-
 			},
-
 			"ShaderMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/ShaderMaterial",
 				"clipping": "ShaderMaterial.clipping",
@@ -2344,21 +1767,15 @@ var list = {
 				"vertexShader": "ShaderMaterial.vertexShader",
 				"wireframe": "ShaderMaterial.wireframe",
 				"wireframeLinewidth": "ShaderMaterial.wireframeLinewidth"
-
 			},
-
 			"ShadowMaterial": {
-
-				"#PARENT": "ShaderMaterial",
+				"#PARENT": "Material",
 				"#URL": "api/materials/ShadowMaterial",
 				"isShadowMaterial": "ShadowMaterial.isShadowMaterial",
 				"lights": "ShadowMaterial.lights",
 				"transparent": "ShadowMaterial.transparent"
-
 			},
-
 			"SpriteMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "api/materials/SpriteMaterial",
 				"color": "SpriteMaterial.color",
@@ -2366,16 +1783,10 @@ var list = {
 				"lights": "SpriteMaterial.lights",
 				"map": "SpriteMaterial.map",
 				"rotation": "SpriteMaterial.rotation"
-
 			}
-
-
 		},
-
 		"Math": {
-
 			"Box2": {
-
 				"#URL": "api/math/Box2",
 				"clampPoint": "Box2.clampPoint",
 				"clone": "Box2.clone",
@@ -2401,11 +1812,8 @@ var list = {
 				"setFromPoints": "Box2.setFromPoints",
 				"translate": "Box2.translate",
 				"union": "Box2.union"
-
 			},
-
 			"Box3": {
-
 				"#URL": "api/math/Box3",
 				"applyMatrix4": "Box3.applyMatrix4",
 				"clampPoint": "Box3.clampPoint",
@@ -2440,11 +1848,8 @@ var list = {
 				"setFromPoints": "Box3.setFromPoints",
 				"translate": "Box3.translate",
 				"union": "Box3.union"
-
 			},
-
 			"Color": {
-
 				"#URL": "api/math/Color",
 				"add": "Color.add",
 				"addColors": "Color.addColors",
@@ -2477,11 +1882,8 @@ var list = {
 				"setStyle": "Color.setStyle",
 				"sub": "Color.sub",
 				"toArray": "Color.toArray"
-
 			},
-
 			"Cylindrical": {
-
 				"#URL": "api/math/Cylindrical",
 				"clone": "Cylindrical.clone",
 				"copy": "Cylindrical.copy",
@@ -2490,11 +1892,8 @@ var list = {
 				"setFromVector3": "Cylindrical.setFromVector3",
 				"theta": "Cylindrical.theta",
 				"y": "Cylindrical.y"
-
 			},
-
 			"Euler": {
-
 				"#URL": "api/math/Euler",
 				"clone": "Euler.clone",
 				"copy": "Euler.copy",
@@ -2514,11 +1913,8 @@ var list = {
 				"x": "Euler.x",
 				"y": "Euler.y",
 				"z": "Euler.z"
-
 			},
-
 			"Frustum": {
-
 				"#URL": "api/math/Frustum",
 				"clone": "Frustum.clone",
 				"containsPoint": "Frustum.containsPoint",
@@ -2530,11 +1926,8 @@ var list = {
 				"planes": "Frustum.planes",
 				"set": "Frustum.set",
 				"setFromMatrix": "Frustum.setFromMatrix"
-
 			},
-
 			"Interpolant": {
-
 				"#URL": "api/math/Interpolant",
 				"evaluate": "Interpolant.evaluate",
 				"parameterPositions": "Interpolant.parameterPositions",
@@ -2542,11 +1935,8 @@ var list = {
 				"sampleValues": "Interpolant.sampleValues",
 				"settings": "Interpolant.settings",
 				"valueSize": "Interpolant.valueSize"
-
 			},
-
 			"Line3": {
-
 				"#URL": "api/math/Line3",
 				"applyMatrix4": "Line3.applyMatrix4",
 				"at": "Line3.at",
@@ -2562,11 +1952,8 @@ var list = {
 				"getCenter": "Line3.getCenter",
 				"set": "Line3.set",
 				"start": "Line3.start"
-
 			},
-
 			"Math": {
-
 				"#URL": "api/math/Math",
 				"ceilPowerOfTwo": "Math.ceilPowerOfTwo",
 				"clamp": "Math.clamp",
@@ -2583,11 +1970,8 @@ var list = {
 				"randInt": "Math.randInt",
 				"smootherstep": "Math.smootherstep",
 				"smoothstep": "Math.smoothstep"
-
 			},
-
 			"Matrix3": {
-
 				"#URL": "api/math/Matrix3",
 				"applyToBufferAttribute": "Matrix3.applyToBufferAttribute",
 				"clone": "Matrix3.clone",
@@ -2610,11 +1994,8 @@ var list = {
 				"toArray": "Matrix3.toArray",
 				"transpose": "Matrix3.transpose",
 				"transposeIntoArray": "Matrix3.transposeIntoArray"
-
 			},
-
 			"Matrix4": {
-
 				"#URL": "api/math/Matrix4",
 				"applyToBufferAttribute": "Matrix4.applyToBufferAttribute",
 				"clone": "Matrix4.clone",
@@ -2654,11 +2035,8 @@ var list = {
 				"setPosition": "Matrix4.setPosition",
 				"toArray": "Matrix4.toArray",
 				"transpose": "Matrix4.transpose"
-
 			},
-
 			"Plane": {
-
 				"#URL": "api/math/Plane",
 				"applyMatrix4": "Plane.applyMatrix4",
 				"clone": "Plane.clone",
@@ -2681,11 +2059,8 @@ var list = {
 				"setFromCoplanarPoints": "Plane.setFromCoplanarPoints",
 				"setFromNormalAndCoplanarPoint": "Plane.setFromNormalAndCoplanarPoint",
 				"translate": "Plane.translate"
-
 			},
-
 			"Quaternion": {
-
 				"#URL": "api/math/Quaternion",
 				"clone": "Quaternion.clone",
 				"conjugate": "Quaternion.conjugate",
@@ -2714,11 +2089,8 @@ var list = {
 				"x": "Quaternion.x",
 				"y": "Quaternion.y",
 				"z": "Quaternion.z"
-
 			},
-
 			"Ray": {
-
 				"#URL": "api/math/Ray",
 				"applyMatrix4": "Ray.applyMatrix4",
 				"at": "Ray.at",
@@ -2742,11 +2114,8 @@ var list = {
 				"origin": "Ray.origin",
 				"recast": "Ray.recast",
 				"set": "Ray.set"
-
 			},
-
 			"Sphere": {
-
 				"#URL": "api/math/Sphere",
 				"applyMatrix4": "Sphere.applyMatrix4",
 				"center": "Sphere.center",
@@ -2765,11 +2134,8 @@ var list = {
 				"set": "Sphere.set",
 				"setFromPoints": "Sphere.setFromPoints",
 				"translate": "Sphere.translate"
-
 			},
-
 			"Spherical": {
-
 				"#URL": "api/math/Spherical",
 				"clone": "Spherical.clone",
 				"copy": "Spherical.copy",
@@ -2779,11 +2145,8 @@ var list = {
 				"set": "Spherical.set",
 				"setFromVector3": "Spherical.setFromVector3",
 				"theta": "Spherical.theta"
-
 			},
-
 			"Triangle": {
-
 				"#URL": "api/math/Triangle",
 				"a": "Triangle.a",
 				"area": "Triangle.area",
@@ -2800,11 +2163,8 @@ var list = {
 				"plane": "Triangle.plane",
 				"set": "Triangle.set",
 				"setFromPointsAndIndices": "Triangle.setFromPointsAndIndices"
-
 			},
-
 			"Vector2": {
-
 				"#URL": "api/math/Vector2",
 				"add": "Vector2.add",
 				"addScalar": "Vector2.addScalar",
@@ -2858,11 +2218,8 @@ var list = {
 				"width": "Vector2.width",
 				"x": "Vector2.x",
 				"y": "Vector2.y"
-
 			},
-
 			"Vector3": {
-
 				"#URL": "api/math/Vector3",
 				"add": "Vector3.add",
 				"addScalar": "Vector3.addScalar",
@@ -2933,11 +2290,8 @@ var list = {
 				"x": "Vector3.x",
 				"y": "Vector3.y",
 				"z": "Vector3.z"
-
 			},
-
 			"Vector4": {
-
 				"#URL": "api/math/Vector4",
 				"add": "Vector4.add",
 				"addScalar": "Vector4.addScalar",
@@ -2988,16 +2342,10 @@ var list = {
 				"x": "Vector4.x",
 				"y": "Vector4.y",
 				"z": "Vector4.z"
-
 			}
-
-
 		},
-
 		"Math / Interpolants": {
-
 			"CubicInterpolant": {
-
 				"#PARENT": "Interpolant",
 				"#URL": "api/math/interpolants/CubicInterpolant",
 				"evaluate": "CubicInterpolant.evaluate",
@@ -3006,11 +2354,8 @@ var list = {
 				"sampleValues": "CubicInterpolant.sampleValues",
 				"settings": "CubicInterpolant.settings",
 				"valueSize": "CubicInterpolant.valueSize"
-
 			},
-
 			"DiscreteInterpolant": {
-
 				"#PARENT": "Interpolant",
 				"#URL": "api/math/interpolants/DiscreteInterpolant",
 				"evaluate": "DiscreteInterpolant.evaluate",
@@ -3019,11 +2364,8 @@ var list = {
 				"sampleValues": "DiscreteInterpolant.sampleValues",
 				"settings": "DiscreteInterpolant.settings",
 				"valueSize": "DiscreteInterpolant.valueSize"
-
 			},
-
 			"LinearInterpolant": {
-
 				"#PARENT": "Interpolant",
 				"#URL": "api/math/interpolants/LinearInterpolant",
 				"evaluate": "LinearInterpolant.evaluate",
@@ -3032,11 +2374,8 @@ var list = {
 				"sampleValues": "LinearInterpolant.sampleValues",
 				"settings": "LinearInterpolant.settings",
 				"valueSize": "LinearInterpolant.valueSize"
-
 			},
-
 			"QuaternionLinearInterpolant": {
-
 				"#PARENT": "Interpolant",
 				"#URL": "api/math/interpolants/QuaternionLinearInterpolant",
 				"evaluate": "QuaternionLinearInterpolant.evaluate",
@@ -3045,33 +2384,21 @@ var list = {
 				"sampleValues": "QuaternionLinearInterpolant.sampleValues",
 				"settings": "QuaternionLinearInterpolant.settings",
 				"valueSize": "QuaternionLinearInterpolant.valueSize"
-
 			}
-
-
 		},
-
 		"Objects": {
-
 			"Bone": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/objects/Bone",
 				"isBone": "Bone.isBone",
 				"type": "Bone.type"
-
 			},
-
 			"Group": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/objects/Group",
 				"type": "Group.type"
-
 			},
-
 			"LensFlare": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/objects/LensFlare",
 				"add": "LensFlare.add",
@@ -3082,11 +2409,8 @@ var list = {
 				"lensFlares": "LensFlare.lensFlares",
 				"positionScreen": "LensFlare.positionScreen",
 				"updateLensFlares": "LensFlare.updateLensFlares"
-
 			},
-
 			"Line": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/objects/Line",
 				"clone": "Line.clone",
@@ -3094,27 +2418,18 @@ var list = {
 				"isLine": "Line.isLine",
 				"material": "Line.material",
 				"raycast": "Line.raycast"
-
 			},
-
 			"LineLoop": {
-
-				"#PARENT": "Line",
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/LineLoop",
 				"isLineLoop": "LineLoop.isLineLoop"
-
 			},
-
 			"LineSegments": {
-
-				"#PARENT": "Line",
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/LineSegments",
 				"isLineSegments": "LineSegments.isLineSegments"
-
 			},
-
 			"LOD": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/objects/LOD",
 				"addLevel": "LOD.addLevel",
@@ -3124,11 +2439,8 @@ var list = {
 				"raycast": "LOD.raycast",
 				"toJSON": "LOD.toJSON",
 				"update": "LOD.update"
-
 			},
-
 			"Mesh": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/objects/Mesh",
 				"clone": "Mesh.clone",
@@ -3141,11 +2453,8 @@ var list = {
 				"raycast": "Mesh.raycast",
 				"setDrawMode": "Mesh.setDrawMode",
 				"updateMorphTargets": "Mesh.updateMorphTargets"
-
 			},
-
 			"Points": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/objects/Points",
 				"clone": "Points.clone",
@@ -3153,11 +2462,8 @@ var list = {
 				"isPoints": "Points.isPoints",
 				"material": "Points.material",
 				"raycast": "Points.raycast"
-
 			},
-
 			"Skeleton": {
-
 				"#URL": "api/objects/Skeleton",
 				"boneInverses": "Skeleton.boneInverses",
 				"boneMatrices": "Skeleton.boneMatrices",
@@ -3167,12 +2473,9 @@ var list = {
 				"clone": "Skeleton.clone",
 				"pose": "Skeleton.pose",
 				"update": "Skeleton.update"
-
 			},
-
 			"SkinnedMesh": {
-
-				"#PARENT": "Mesh",
+				"#PARENT": "Object3D",
 				"#URL": "api/objects/SkinnedMesh",
 				"bind": "SkinnedMesh.bind",
 				"bindMatrix": "SkinnedMesh.bindMatrix",
@@ -3185,27 +2488,18 @@ var list = {
 				"pose": "SkinnedMesh.pose",
 				"skeleton": "SkinnedMesh.skeleton",
 				"updateMatrixWorld": "SkinnedMesh.updateMatrixWorld"
-
 			},
-
 			"Sprite": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/objects/Sprite",
 				"clone": "Sprite.clone",
 				"isSprite": "Sprite.isSprite",
 				"material": "Sprite.material",
 				"raycast": "Sprite.raycast"
-
 			}
-
-
 		},
-
 		"Renderers": {
-
 			"WebGLRenderer": {
-
 				"#URL": "api/renderers/WebGLRenderer",
 				"allocTextureUnit": "WebGLRenderer.allocTextureUnit",
 				"autoClear": "WebGLRenderer.autoClear",
@@ -3290,11 +2584,8 @@ var list = {
 				"toneMappingExposure": "WebGLRenderer.toneMappingExposure",
 				"toneMappingWhitePoint": "WebGLRenderer.toneMappingWhitePoint",
 				"vertexTextures": "WebGLRenderer.vertexTextures"
-
 			},
-
 			"WebGLRenderTarget": {
-
 				"#URL": "api/renderers/WebGLRenderTarget",
 				"clone": "WebGLRenderTarget.clone",
 				"copy": "WebGLRenderTarget.copy",
@@ -3310,53 +2601,29 @@ var list = {
 				"uuid": "WebGLRenderTarget.uuid",
 				"viewport": "WebGLRenderTarget.viewport",
 				"width": "WebGLRenderTarget.width"
-
 			},
-
 			"WebGLRenderTargetCube": {
-
 				"#PARENT": "WebGLRenderTarget",
 				"#URL": "api/renderers/WebGLRenderTargetCube",
 				"activeCubeFace": "WebGLRenderTargetCube.activeCubeFace"
-
 			}
-
-
 		},
-
 		"Renderers / Shaders": {
-
 			"ShaderChunk": {
-
 				"#URL": "api/renderers/shaders/ShaderChunk"
-
 			},
-
 			"ShaderLib": {
-
 				"#URL": "api/renderers/shaders/ShaderLib"
-
 			},
-
 			"UniformsLib": {
-
 				"#URL": "api/renderers/shaders/UniformsLib"
-
 			},
-
 			"UniformsUtils": {
-
 				"#URL": "api/renderers/shaders/UniformsUtils"
-
 			}
-
-
 		},
-
 		"Scenes": {
-
 			"Fog": {
-
 				"#URL": "api/scenes/Fog",
 				"clone": "Fog.clone",
 				"color": "Fog.color",
@@ -3364,22 +2631,16 @@ var list = {
 				"name": "Fog.name",
 				"near": "Fog.near",
 				"toJSON": "Fog.toJSON"
-
 			},
-
 			"FogExp2": {
-
 				"#URL": "api/scenes/FogExp2",
 				"clone": "FogExp2.clone",
 				"color": "FogExp2.color",
 				"density": "FogExp2.density",
 				"name": "FogExp2.name",
 				"toJSON": "FogExp2.toJSON"
-
 			},
-
 			"Scene": {
-
 				"#PARENT": "Object3D",
 				"#URL": "api/scenes/Scene",
 				"autoUpdate": "Scene.autoUpdate",
@@ -3387,55 +2648,34 @@ var list = {
 				"fog": "Scene.fog",
 				"overrideMaterial": "Scene.overrideMaterial",
 				"toJSON": "Scene.toJSON"
-
 			}
-
-
 		},
-
 		"Textures": {
-
 			"CanvasTexture": {
-
 				"#PARENT": "Texture",
 				"#URL": "api/textures/CanvasTexture",
 				"needsUpdate": "CanvasTexture.needsUpdate"
-
 			},
-
 			"CompressedTexture": {
-
 				"#PARENT": "Texture",
 				"#URL": "api/textures/CompressedTexture",
 				"flipY": "CompressedTexture.flipY",
 				"generateMipmaps": "CompressedTexture.generateMipmaps"
-
 			},
-
 			"CubeTexture": {
-
 				"#PARENT": "Texture",
 				"#URL": "api/textures/CubeTexture"
-
 			},
-
 			"DataTexture": {
-
 				"#PARENT": "Texture",
 				"#URL": "api/textures/DataTexture",
 				"image": "DataTexture.image"
-
 			},
-
 			"DepthTexture": {
-
 				"#PARENT": "Texture",
 				"#URL": "api/textures/DepthTexture"
-
 			},
-
 			"Texture": {
-
 				"#URL": "api/textures/Texture",
 				"anisotropy": "Texture.anisotropy",
 				"center": "Texture.center",
@@ -3468,30 +2708,18 @@ var list = {
 				"version": "Texture.version",
 				"wrapS": "Texture.wrapS",
 				"wrapT": "Texture.wrapT"
-
 			},
-
 			"VideoTexture": {
-
 				"#PARENT": "Texture",
 				"#URL": "api/textures/VideoTexture",
 				"needsUpdate": "VideoTexture.needsUpdate",
 				"update": "VideoTexture.update"
-
 			}
-
-
 		}
-
-
 	},
-
 	"Examples": {
-
 		"Controls": {
-
 			"OrbitControls": {
-
 				"#URL": "examples/controls/OrbitControls",
 				"autoRotate": "OrbitControls.autoRotate",
 				"autoRotateSpeed": "OrbitControls.autoRotateSpeed",
@@ -3527,61 +2755,37 @@ var list = {
 				"update": "OrbitControls.update",
 				"zoom0": "OrbitControls.zoom0",
 				"zoomSpeed": "OrbitControls.zoomSpeed"
-
 			}
-
-
 		},
-
 		"Geometries": {
-
 			"ConvexBufferGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "examples/geometries/ConvexBufferGeometry"
-
 			},
-
 			"ConvexGeometry": {
-
 				"#PARENT": "Geometry",
 				"#URL": "examples/geometries/ConvexGeometry"
-
 			},
-
 			"DecalGeometry": {
-
 				"#PARENT": "BufferGeometry",
 				"#URL": "examples/geometries/DecalGeometry"
-
 			}
-
-
 		},
-
 		"Loaders": {
-
 			"BabylonLoader": {
-
 				"#URL": "examples/loaders/BabylonLoader",
 				"load": "BabylonLoader.load",
 				"parse": "BabylonLoader.parse"
-
 			},
-
 			"GLTFLoader": {
-
 				"#PARENT": "Loader",
 				"#URL": "examples/loaders/GLTFLoader",
 				"load": "GLTFLoader.load",
 				"parse": "GLTFLoader.parse",
 				"setCrossOrigin": "GLTFLoader.setCrossOrigin",
 				"setPath": "GLTFLoader.setPath"
-
 			},
-
 			"MTLLoader": {
-
 				"#URL": "examples/loaders/MTLLoader",
 				"load": "MTLLoader.load",
 				"parse": "MTLLoader.parse",
@@ -3589,19 +2793,13 @@ var list = {
 				"setMaterialOptions": "MTLLoader.setMaterialOptions",
 				"setPath": "MTLLoader.setPath",
 				"setTexturePath": "MTLLoader.setTexturePath"
-
 			},
-
 			"OBJLoader": {
-
 				"#URL": "examples/loaders/OBJLoader",
 				"load": "OBJLoader.load",
 				"parse": "OBJLoader.parse"
-
 			},
-
 			"OBJLoader2": {
-
 				"#URL": "examples/loaders/OBJLoader2",
 				"getLogger": "OBJLoader2.getLogger",
 				"load": "OBJLoader2.load",
@@ -3615,11 +2813,8 @@ var list = {
 				"setPath": "OBJLoader2.setPath",
 				"setStreamMeshesTo": "OBJLoader2.setStreamMeshesTo",
 				"setUseIndices": "OBJLoader2.setUseIndices"
-
 			},
-
 			"LoaderSupport": {
-
 				"#URL": "examples/loaders/LoaderSupport",
 				"addMesh": "LoaderSupport.addMesh",
 				"addResource": "LoaderSupport.addResource",
@@ -3670,66 +2865,39 @@ var list = {
 				"updateMaterials": "LoaderSupport.updateMaterials",
 				"validate": "LoaderSupport.validate",
 				"verifyInput": "LoaderSupport.verifyInput"
-
 			},
-
 			"PCDLoader": {
-
 				"#URL": "examples/loaders/PCDLoader",
 				"load": "PCDLoader.load",
 				"parse": "PCDLoader.parse"
-
 			},
-
 			"PDBLoader": {
-
 				"#URL": "examples/loaders/PDBLoader",
 				"load": "PDBLoader.load",
 				"parse": "PDBLoader.parse"
-
 			},
-
 			"SVGLoader": {
-
 				"#URL": "examples/loaders/SVGLoader",
 				"load": "SVGLoader.load"
-
 			},
-
 			"TGALoader": {
-
 				"#URL": "examples/loaders/TGALoader",
 				"load": "TGALoader.load"
-
 			},
-
 			"PRWMLoader": {
-
 				"#URL": "examples/loaders/PRWMLoader",
 				"load": "PRWMLoader.load",
 				"parse": "PRWMLoader.parse"
-
 			}
-
-
 		},
-
 		"Exporters": {
-
 			"GLTFExporter": {
-
 				"#URL": "examples/exporters/GLTFExporter",
 				"parse": "GLTFExporter.parse"
-
 			}
-
-
 		},
-
 		"Plugins": {
-
 			"LookupTable": {
-
 				"#URL": "examples/Lut",
 				"addColorMap": "LookupTable.addColorMap",
 				"changeColorMap": "LookupTable.changeColorMap",
@@ -3740,25 +2908,16 @@ var list = {
 				"minV": "LookupTable.minV",
 				"setmaxV": "LookupTable.setmaxV",
 				"setminV": "LookupTable.setminV"
-
 			},
-
 			"SpriteCanvasMaterial": {
-
 				"#PARENT": "Material",
 				"#URL": "examples/SpriteCanvasMaterial",
 				"color": "SpriteCanvasMaterial.color",
 				"program": "SpriteCanvasMaterial.program"
-
 			}
-
-
 		},
-
 		"QuickHull": {
-
 			"Face": {
-
 				"#URL": "examples/quickhull/Face",
 				"area": "Face.area",
 				"compute": "Face.compute",
@@ -3771,11 +2930,8 @@ var list = {
 				"midpoint": "Face.midpoint",
 				"normal": "Face.normal",
 				"outside": "Face.outside"
-
 			},
-
 			"HalfEdge": {
-
 				"#URL": "examples/quickhull/HalfEdge",
 				"face": "HalfEdge.face",
 				"head": "HalfEdge.head",
@@ -3787,11 +2943,8 @@ var list = {
 				"tail": "HalfEdge.tail",
 				"twin": "HalfEdge.twin",
 				"vertex": "HalfEdge.vertex"
-
 			},
-
 			"QuickHull": {
-
 				"#URL": "examples/quickhull/QuickHull",
 				"addAdjoiningFace": "QuickHull.addAdjoiningFace",
 				"addNewFaces": "QuickHull.addNewFaces",
@@ -3817,21 +2970,15 @@ var list = {
 				"tolerance": "QuickHull.tolerance",
 				"unassigned": "QuickHull.unassigned",
 				"vertices": "QuickHull.vertices"
-
 			},
-
 			"VertexNode": {
-
 				"#URL": "examples/quickhull/VertexNode",
 				"face": "VertexNode.face",
 				"next": "VertexNode.next",
 				"point": "VertexNode.point",
 				"prev": "VertexNode.prev"
-
 			},
-
 			"VertexList": {
-
 				"#URL": "examples/quickhull/VertexList",
 				"append": "VertexList.append",
 				"appendChain": "VertexList.appendChain",
@@ -3845,16 +2992,10 @@ var list = {
 				"remove": "VertexList.remove",
 				"removeSubList": "VertexList.removeSubList",
 				"tail": "VertexList.tail"
-
 			}
-
-
 		},
-
 		"Renderers": {
-
 			"CanvasRenderer": {
-
 				"#URL": "examples/renderers/CanvasRenderer",
 				"autoClear": "CanvasRenderer.autoClear",
 				"clear": "CanvasRenderer.clear",
@@ -3874,53 +3015,29 @@ var list = {
 				"sortElements": "CanvasRenderer.sortElements",
 				"sortObjects": "CanvasRenderer.sortObjects",
 				"supportsVertexTextures": "CanvasRenderer.supportsVertexTextures"
-
 			}
-
-
 		},
-
 		"Utils": {
-
 			"SceneUtils": {
-
 				"#URL": "examples/utils/SceneUtils",
 				"attach": "SceneUtils.attach",
 				"createMultiMaterialObject": "SceneUtils.createMultiMaterialObject",
 				"detach": "SceneUtils.detach"
-
 			}
-
-
 		}
-
-
 	},
-
 	"Developer Reference": {
-
 		"Polyfills": {
-
 			"Polyfills": "api/Polyfills"
-
 		},
-
 		"WebGLRenderer": {
-
 			"WebGLProgram": "api/renderers/webgl/WebGLProgram",
 			"WebGLShader": "api/renderers/webgl/WebGLShader",
 			"WebGLState": "api/renderers/webgl/WebGLState"
-
 		},
-
 		"WebGLRenderer / Plugins": {
-
 			"LensFlarePlugin": "api/renderers/webgl/plugins/LensFlarePlugin",
 			"SpritePlugin": "api/renderers/webgl/plugins/SpritePlugin"
-
 		}
-
-
 	}
-
-}
+};
