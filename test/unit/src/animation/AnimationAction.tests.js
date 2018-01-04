@@ -184,39 +184,49 @@ export default QUnit.module( 'Animation', () => {
 	
 		QUnit.test( "setLoop LoopRepeat", ( assert ) => {
 	
-			var {mixer,animationAction} = createAnimation();
+			var { root, mixer,animationAction } = createAnimation();
 			animationAction.setLoop(LoopRepeat,3);
 			animationAction.play();
 			assert.ok( animationAction.isRunning(), "When an animation is started, it is running." );
-			mixer.update(500);
+			mixer.update(750);
+			assert.equal( root.rotation.x, 270 , "When an animation is 3/4 in the first loop, it has changed to 3/4 when LoopRepeat." );
 			assert.ok( animationAction.isRunning(), "When an animation is in the first loop, it is running." );
 			mixer.update(1000);
+			assert.equal( root.rotation.x, 270 , "When an animation is 3/4 in the second loop, it has changed to 3/4 when LoopRepeat." );
 			assert.ok( animationAction.isRunning(), "When an animation is in second loop when in looprepeat 3 times, it is running." );
 			mixer.update(1000);
+			assert.equal( root.rotation.x, 270 , "When an animation is 3/4 in the third loop, it has changed to 3/4 when LoopRepeat." );
 			assert.ok( animationAction.isRunning(), "When an animation is in third loop when in looprepeat 3 times, it is running." );
 			mixer.update(1000);
+			assert.equal( root.rotation.x, 270 , "When an animation is 3/4 in the fourth loop, it has changed to 3/4 when LoopRepeat." );
 			assert.ok( animationAction.isRunning(), "When an animation is in fourth loop when in looprepeat 3 times, it is running." );
 			mixer.update(1000);
+			assert.equal( root.rotation.x, 0 , "When an animation ended his third loop when in looprepeat 3 times, it stays on the end result." );
 			assert.notOk( animationAction.isRunning(), "When an animation ended his third loop when in looprepeat 3 times, it stays not running anymore." );
 			
 		} );
 
 		QUnit.test( "setLoop LoopPingPong", ( assert ) => {
 	
-			var {mixer,animationAction} = createAnimation();
+			var {root, mixer,animationAction} = createAnimation();
 			animationAction.setLoop(LoopPingPong,3);
 			animationAction.play();
 			assert.ok( animationAction.isRunning(), "When an animation is started, it is running." );
-			mixer.update(500);
+			mixer.update(750);
+			assert.equal( root.rotation.x, 270 , "When an animation is 3/4 in the first loop, it has changed to 3/4 when LoopPingPong." );
 			assert.ok( animationAction.isRunning(), "When an animation is in the first loop, it is running." );
 			mixer.update(1000);
+			assert.equal( root.rotation.x, 90 ,  "When an animation is 3/4 in the second loop, it has changed to 1/4 when LoopPingPong." );
 			assert.ok( animationAction.isRunning(), "When an animation is in second loop when in looprepeat 3 times, it is running." );
 			mixer.update(1000);
+			assert.equal( root.rotation.x, 270 ,  "When an animation is 3/4 in the third loop, it has changed to 3/4 when LoopPingPong." );
 			assert.ok( animationAction.isRunning(), "When an animation is in third loop when in looprepeat 3 times, it is running." );
 			mixer.update(1000);
+			assert.equal( root.rotation.x, 90 ,  "When an animation is 3/4 in the fourth loop, it has changed to 1/4 when LoopPingPong." );
 			assert.ok( animationAction.isRunning(), "When an animation is in fourth loop when in looprepeat 3 times, it is running." );
 			mixer.update(1000);
-			assert.notOk( animationAction.isRunning(), "When an animation ended his third loop when in looprepeat 3 times, it stays not running anymore." );
+			assert.equal( root.rotation.x, 0 , "When an animation ended his fourth loop when in looprepeat 3 times, it stays on the end result." );
+			assert.notOk( animationAction.isRunning(), "When an animation ended his fourth loop when in looprepeat 3 times, it stays not running anymore." );
 			
 		} );
 
