@@ -267,29 +267,29 @@ function updateFilter() {
 
 				for ( var j = 0; j < pageProperty.filterLinkItems.length; j ++ ) {
 
-                    var found = false;
+					var found = false;
 
-                    for ( var i = 0; i < filterItemResults.length; i ++ ) {
+					for ( var i = 0; i < filterItemResults.length; i ++ ) {
 
-                        var filterLinkItem = pageProperty.filterLinkItems[ j ];
+						var filterLinkItem = pageProperty.filterLinkItems[ j ];
 
 						if ( filterLinkItem.textContent == filterItemResults[ i ] ) {
 
 							filterLinkItem.parentElement.classList.remove( 'hidden' );
-                            found = true;
+							found = true;
 
 						}
 
-                    }
+					}
 
-                    if (!found) {
+					if (!found) {
 
-					    var filterLinkItem = pageProperty.filterLinkItems[ j ];
-					    filterLinkItem.parentElement.classList.add( 'hidden' );
+						var filterLinkItem = pageProperty.filterLinkItems[ j ];
+						filterLinkItem.parentElement.classList.add( 'hidden' );
 
-                    } 
+					} 
 
-		        }
+				}
 
 				categoryClassList.remove( 'hidden' );
 				linkElement.innerHTML = pageName;
