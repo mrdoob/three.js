@@ -510,6 +510,8 @@ function WebGLRenderer( parameters ) {
 		_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 
 		renderLists.dispose();
+		properties.dispose();
+		objects.dispose();
 
 		vr.dispose();
 

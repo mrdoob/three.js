@@ -28,7 +28,7 @@ function WebGLProperties() {
 
 	}
 
-	function clear() {
+	function dispose() {
 
 		properties = {};
 
@@ -37,7 +37,7 @@ function WebGLProperties() {
 	return {
 		get: get,
 		remove: remove,
-		clear: clear
+		dispose: dispose
 	};
 
 }
