@@ -2008,67 +2008,16 @@
 
 	function bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections, sceneGraph ) {
 
-		// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
-		sceneGraph.updateMatrixWorld( true );
-
-		var worldMatrices = new Map();
-
-		// Put skeleton into bind pose.
-		if ( 'Pose' in FBXTree.Objects ) {
-
-			var BindPoseNode = FBXTree.Objects.Pose;
-
-			for ( var nodeID in BindPoseNode ) {
-
-				if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
-
-					var poseNodes = BindPoseNode[ nodeID ].PoseNode;
-
-					if ( Array.isArray( poseNodes ) ) {
-
-						poseNodes.forEach( function ( node ) {
-
-							var rawMatWrd = new THREE.Matrix4().fromArray( node.Matrix.a );
-							worldMatrices.set( parseInt( node.Node ), rawMatWrd );
-
-						} );
-
-					} else {
-
-						var rawMatWrd = new THREE.Matrix4().fromArray( poseNodes.Matrix.a );
-						worldMatrices.set( parseInt( poseNodes.Node ), rawMatWrd );
-
-					}
-
-				}
-
-			}
-
-		}
-
 		for ( var ID in skeletons ) {
 
 			var skeleton = skeletons[ ID ];
 
 			skeleton.bones.forEach( function ( bone, i ) {
 
-				// if the bone's initial transform is set in a poseNode, copy that
-				if ( worldMatrices.has( bone.ID ) ) {
-
-					var mat = worldMatrices.get( bone.ID );
-					bone.matrixWorld.copy( mat );
-
-				}
-				// otherwise use the transform from the rawBone
-				else {
-
-					bone.matrixWorld.copy( skeleton.rawBones[ i ].transformLink );
-
-				}
+				bone.matrixWorld.copy( skeleton.rawBones[ i ].transformLink );
 
 			} );
 
-			// Now that skeleton is in bind pose, bind to model.
 			var parents = connections.get( parseInt( skeleton.ID ) ).parents;
 
 			parents.forEach( function ( parent ) {
@@ -2095,9 +2044,6 @@
 			} );
 
 		}
-
-		//Skeleton is now bound, return objects to starting world positions.
-		sceneGraph.updateMatrixWorld( true );
 
 	}
 
@@ -2633,12 +2579,7 @@
 				// if the subnode already exists, append it
 				if ( nodeName in currentNode ) {
 
-					// special case Pose needs PoseNodes as an array
-					if ( nodeName === 'PoseNode' ) {
-
-						currentNode.PoseNode.push( node );
-
-					} else if ( currentNode[ nodeName ].id !== undefined ) {
+					if ( currentNode[ nodeName ].id !== undefined ) {
 
 						currentNode[ nodeName ] = {};
 						currentNode[ nodeName ][ currentNode[ nodeName ].id ] = currentNode[ nodeName ];
@@ -2654,8 +2595,7 @@
 
 				} else if ( nodeName !== 'Properties70' ) {
 
-					if ( nodeName === 'PoseNode' )	currentNode[ nodeName ] = [ node ];
-					else currentNode[ nodeName ] = node;
+					currentNode[ nodeName ] = node;
 
 				}
 
@@ -3049,23 +2989,9 @@
 
 				}
 
-			} else {
+			} else if ( node[ subNode.name ][ subNode.id ] === undefined ) {
 
-				if ( subNode.name === 'PoseNode' ) {
-
-					if ( ! Array.isArray( node[ subNode.name ] ) ) {
-
-						node[ subNode.name ] = [ node[ subNode.name ] ];
-
-					}
-
-					node[ subNode.name ].push( subNode );
-
-				} else if ( node[ subNode.name ][ subNode.id ] === undefined ) {
-
-					node[ subNode.name ][ subNode.id ] = subNode;
-
-				}
+				node[ subNode.name ][ subNode.id ] = subNode;
 
 			}
 
