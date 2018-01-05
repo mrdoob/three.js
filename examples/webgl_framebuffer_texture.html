@@ -116,10 +116,14 @@
 
 				//
 
-				texture = new THREE.Texture();
-				texture.image = new Image( imageWidth, imageHeight );
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = imageWidth;
+				canvas.height = imageHeight;
+
+				texture = new THREE.CanvasTexture( canvas );
 				texture.format = THREE.RGBFormat;
 				texture.minFilter = texture.magFilter = THREE.NearestFilter;
+				texture.needsUpdate = true;
 
 				//
 
