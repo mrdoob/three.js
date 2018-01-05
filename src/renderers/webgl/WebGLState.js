@@ -342,8 +342,20 @@ function WebGLState( gl, extensions, utils ) {
 
 	var maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
 
-	var version = parseFloat( /^WebGL\ ([0-9])/.exec( gl.getParameter( gl.VERSION ) )[ 1 ] );
-	var lineWidthAvailable = parseFloat( version ) >= 1.0;
+	var versionString = gl.getParameter(gl.VERSION);
+    var lineWidthAvailable = false;
+    var version = 0.0;
+    if(versionString.indexOf("WebGL") != -1)
+    {
+		version = parseFloat( /^WebGL\ ([0-9])/.exec( gl.getParameter( gl.VERSION ) )[ 1 ] );
+		lineWidthAvailable = parseFloat( version ) >= 1.0;
+    }
+    else if(versionString.indexOf("OpenGL ES") != -1)
+    {
+        version = parseFloat( /^OpenGL ES\ ([0-9])/.exec( gl.getParameter( gl.VERSION ) )[ 1 ] );
+        lineWidthAvailable = parseFloat( version ) >= 2.0;
+    }
+
 
 	var currentTextureSlot = null;
 	var currentBoundTextures = {};
