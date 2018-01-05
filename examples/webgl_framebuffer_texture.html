@@ -75,8 +75,7 @@
 
 			var dpr = window.devicePixelRatio;
 
-			var imageWidth = 128 * dpr;
-			var imageHeight = 128 * dpr;
+			var textureSize = 128 * dpr;
 
 			init();
 			animate();
@@ -117,8 +116,8 @@
 				//
 
 				var canvas = document.createElement( 'canvas' );
-				canvas.width = imageWidth;
-				canvas.height = imageHeight;
+				canvas.width = textureSize;
+				canvas.height = textureSize;
 
 				texture = new THREE.CanvasTexture( canvas );
 				texture.format = THREE.RGBFormat;
@@ -129,7 +128,7 @@
 
 				var spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
 				sprite = new THREE.Sprite( spriteMaterial );
-				sprite.scale.set( imageWidth, imageHeight, 1 );
+				sprite.scale.set( textureSize, textureSize, 1 );
 				sceneOrtho.add( sprite );
 
 				updateSpritePosition();
@@ -179,8 +178,8 @@
 				var halfWidth = window.innerWidth / 2;
 				var halfHeight = window.innerHeight / 2;
 
-				var halfImageWidth = imageWidth / 2;
-				var halfImageHeight = imageHeight / 2;
+				var halfImageWidth = textureSize / 2;
+				var halfImageHeight = textureSize / 2;
 
 				sprite.position.set( - halfWidth + halfImageWidth, halfHeight - halfImageHeight, 1 );
 
@@ -198,8 +197,8 @@
 
 				// calculate start position for copying data
 
-				var x = ( window.innerWidth * dpr / 2 ) - ( imageWidth / 2 );
-				var y = ( window.innerHeight * dpr / 2 ) - ( imageHeight / 2 );
+				var x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
+				var y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
 
 				renderer.copyFramebufferToTexture( x, y, texture );
 

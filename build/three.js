@@ -23764,18 +23764,6 @@
 
 		};
 
-		this.copyFramebufferToTexture = function ( x, y, texture, level ) {
-
-			var width = texture.image.width;
-			var height = texture.image.height;
-			var internalFormat = utils.convert( texture.format );
-
-			this.setTexture2D( texture, 0 );
-
-			_gl.copyTexImage2D( _gl.TEXTURE_2D, level || 0, internalFormat, x, y, width, height, 0 );
-
-		};
-
 	}
 
 	/**
