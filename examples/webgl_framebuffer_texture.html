@@ -40,8 +40,8 @@
 			}
 
 			#overlay > div {
-		    height: 256px;
-		    width: 256px;
+		    height: 128px;
+		    width: 128px;
 				border: 1px solid white;
 			}
 		</style>
@@ -75,8 +75,8 @@
 
 			var dpr = window.devicePixelRatio;
 
-			var imageWidth = 256 * dpr;
-			var imageHeight = 256 * dpr;
+			var imageWidth = 128 * dpr;
+			var imageHeight = 128 * dpr;
 
 			init();
 			animate();
@@ -142,6 +142,7 @@
 
 				var overlay = document.getElementById( 'overlay' );
 				var controls = new THREE.OrbitControls( camera, overlay );
+				controls.enablePan = false;
 
 				//
 
