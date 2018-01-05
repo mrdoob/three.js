@@ -52,7 +52,7 @@
 
 		[page:Boolean preserveDrawingBuffer] - whether to preserve the buffers until manually cleared
 		or overwritten. Default is *false*.<br />
-		
+
 		[page:String powerPreference] - Provides a hint to the user agent indicating what configuration
 		of GPU is suitable for this WebGL context. Can be *"high-performance"*, *"low-power"* or *"default"*. Default is *"default"*.<br />
 
@@ -323,6 +323,9 @@
 
 		<h3>[method:null compile]( [page:Scene scene], [page:Camera camera] )</h3>
 		<div>Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.</div>
+
+		<h3>[method:null copyFramebufferToTexture]( [page:Number x], [page:Number y], [page:Texture texture], [page:Number level] )</h3>
+		<div>Copies pixels from the current WebGLFramebuffer into a 2D texture. Enables access to [link:https://developer.mozilla.org/de/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].</div>
 
 		<h3>[method:null dispose]( )</h3>
 		<div>Dispose of the current rendering context.</div>
