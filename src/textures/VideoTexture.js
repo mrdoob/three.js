@@ -21,7 +21,15 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	}
 
-	video.addEventListener( 'loadeddata', onLoaded, false );
+	if( video.readyState >= video.HAVE_CURRENT_DATA ) {
+
+		scope.needsUpdate = true;
+
+	} else {
+
+		video.addEventListener( 'loadeddata', onLoaded, false );
+
+	}
 
 }
 
