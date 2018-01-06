@@ -22313,6 +22313,8 @@
 
 			}
 
+			scene.onBeforeRender( _this, scene, camera, renderTarget );
+
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 			_frustum.setFromMatrix( _projScreenMatrix );
 
@@ -22410,6 +22412,8 @@
 			state.buffers.color.setMask( true );
 
 			state.setPolygonOffset( false );
+
+			scene.onAfterRender( _this, scene, camera, renderTarget );
 
 			if ( vr.enabled ) {
 

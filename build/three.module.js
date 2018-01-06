@@ -22307,6 +22307,8 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		scene.onBeforeRender( _this, scene, camera, renderTarget );
+
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
@@ -22404,6 +22406,8 @@ function WebGLRenderer( parameters ) {
 		state.buffers.color.setMask( true );
 
 		state.setPolygonOffset( false );
+
+		scene.onAfterRender( _this, scene, camera, renderTarget );
 
 		if ( vr.enabled ) {
 
