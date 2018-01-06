@@ -52,6 +52,7 @@ import { BufferGeometryLoader } from './BufferGeometryLoader.js';
 import { JSONLoader } from './JSONLoader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
+import * as Curves from '../extras/curves/Curves.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -364,7 +365,6 @@ Object.assign( ObjectLoader.prototype, {
 						for ( var i = 0, l = data.shapes.length; i < l; i ++ ) {
 
 							var shape = shapes[ data.shapes[ i ] ];
-
 							geometryShapes.push( shape );
 
 						}
@@ -372,6 +372,50 @@ Object.assign( ObjectLoader.prototype, {
 						geometry = new Geometries[ data.type ](
 							geometryShapes,
 							data.curveSegments
+						);
+
+						break;
+
+					case 'ExtrudeGeometry':
+					case 'ExtrudeBufferGeometry':
+
+						// shapes
+
+						var geometryShapes = [];
+
+						for ( var i = 0, l = data.shapes.length; i < l; i ++ ) {
+
+							var shape = shapes[ data.shapes[ i ] ];
+							geometryShapes.push( shape );
+
+						}
+
+						// extrudePath
+
+						var options = data.options;
+						var extrudePath = options.extrudePath;
+						var path;
+
+						if ( extrudePath !== undefined ) {
+
+							path = new Curves[ extrudePath.type ]().fromJSON( extrudePath );
+
+						}
+
+						//
+
+						geometry = new Geometries[ data.type ](
+							geometryShapes,
+							{
+								curveSegments: options.curveSegments,
+								steps: options.steps,
+								amount: options.amount,
+								bevelEnabled: options.bevelEnabled,
+								bevelThickness: options.bevelThickness,
+								bevelSize: options.bevelSize,
+								bevelSegments: options.bevelSegments,
+								extrudePath: path
+							}
 						);
 
 						break;
