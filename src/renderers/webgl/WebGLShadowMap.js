@@ -34,8 +34,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		_materialCache = {};
 
-	//var shadowSide = { 0: BackSide, 1: FrontSide, 2: BackSide };
-	var shadowSide = { 0: BackSide, 1: FrontSide, 2: DoubleSide }; // proposed
+	var shadowSide = { 0: BackSide, 1: FrontSide, 2: DoubleSide };
 
 	var cubeDirections = [
 		new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
@@ -350,7 +349,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		result.visible = material.visible;
 		result.wireframe = material.wireframe;
 
-		result.side = ( material.shadowSide !== undefined ) ? material.shadowSide : shadowSide[ material.side ];
+		result.side = ( material.shadowSide != null ) ? material.shadowSide : shadowSide[ material.side ];
 
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;

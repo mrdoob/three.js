@@ -131,7 +131,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.BasicShadowMap;
-				renderer.shadowMap.renderSingleSided = false; // must be set to false to honor double-sided materials
 				document.body.appendChild( renderer.domElement );
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
