@@ -1579,6 +1579,7 @@ function WebGLRenderer( parameters ) {
 			uniforms.ambientLightColor.value = lights.state.ambient;
 			uniforms.directionalLights.value = lights.state.directional;
 			uniforms.spotLights.value = lights.state.spot;
+			uniforms.projectorLights.value = lights.state.projector;
 			uniforms.rectAreaLights.value = lights.state.rectArea;
 			uniforms.pointLights.value = lights.state.point;
 			uniforms.hemisphereLights.value = lights.state.hemi;
@@ -1587,6 +1588,9 @@ function WebGLRenderer( parameters ) {
 			uniforms.directionalShadowMatrix.value = lights.state.directionalShadowMatrix;
 			uniforms.spotShadowMap.value = lights.state.spotShadowMap;
 			uniforms.spotShadowMatrix.value = lights.state.spotShadowMatrix;
+			uniforms.projectorTextures.value = lights.state.projectorTextures;
+			uniforms.projectorShadowMap.value = lights.state.projectorShadowMap;
+			uniforms.projectorShadowMatrix.value = lights.state.projectorShadowMatrix;
 			uniforms.pointShadowMap.value = lights.state.pointShadowMap;
 			uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix;
 			// TODO (abelnation): add area lights shadow info to uniforms
@@ -2298,6 +2302,7 @@ function WebGLRenderer( parameters ) {
 		uniforms.directionalLights.needsUpdate = value;
 		uniforms.pointLights.needsUpdate = value;
 		uniforms.spotLights.needsUpdate = value;
+		uniforms.projectorLights.needsUpdate = value;
 		uniforms.rectAreaLights.needsUpdate = value;
 		uniforms.hemisphereLights.needsUpdate = value;
 

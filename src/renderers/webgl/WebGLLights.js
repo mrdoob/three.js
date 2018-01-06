@@ -6,6 +6,8 @@ import { Color } from '../../math/Color.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { _Math } from '../../math/Math.js';
+import { Quaternion } from '../../math/Quaternion.js';
 
 function UniformsCache() {
 
@@ -45,6 +47,21 @@ function UniformsCache() {
 						distance: 0,
 						coneCos: 0,
 						penumbraCos: 0,
+						decay: 0,
+
+						shadow: false,
+						shadowBias: 0,
+						shadowRadius: 1,
+						shadowMapSize: new Vector2()
+					};
+					break;
+
+				case 'ProjectorLight':
+					uniforms = {
+						position: new Vector3(),
+						projectorMatrix: new Matrix4(),
+						color: new Color(),
+						distance: 0,
 						decay: 0,
 
 						shadow: false,
@@ -115,6 +132,10 @@ function WebGLLights() {
 		spot: [],
 		spotShadowMap: [],
 		spotShadowMatrix: [],
+		projector: [],
+		projectorTextures: [],
+		projectorShadowMap: [],
+		projectorShadowMatrix: [],
 		rectArea: [],
 		point: [],
 		pointShadowMap: [],
@@ -124,6 +145,7 @@ function WebGLLights() {
 	};
 
 	var vector3 = new Vector3();
+	var quaternion = new Quaternion();
 	var matrix4 = new Matrix4();
 	var matrix42 = new Matrix4();
 
@@ -134,6 +156,7 @@ function WebGLLights() {
 		var directionalLength = 0;
 		var pointLength = 0;
 		var spotLength = 0;
+		var projectorLength = 0;
 		var rectAreaLength = 0;
 		var hemiLength = 0;
 
@@ -219,6 +242,69 @@ function WebGLLights() {
 				state.spot[ spotLength ] = uniforms;
 
 				spotLength ++;
+
+			} else if ( light.isProjectorLight ) {
+
+				var uniforms = cache.get( light );
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
+
+				uniforms.color.copy( color ).multiplyScalar( intensity );
+				uniforms.distance = distance;
+				uniforms.decay = ( light.distance === 0 ) ? 0.0 : light.decay;
+
+				// construct a world-matrix from light-position, -target and z-rotation
+				matrix4.lookAt( light.position, light.target.position, light.up );
+				matrix4.multiply( matrix42.makeRotationZ( light.rotation.z ) );
+
+				quaternion.setFromRotationMatrix( matrix4 );
+
+				matrix4.compose( light.position, quaternion, vector3.set( 1, 1, 1 ) );
+				matrix42.getInverse( matrix4 );
+
+				var near = ( distance || 500 ) * 1e-7,
+					far = ( distance || 500 ),
+					top = near * Math.tan( 0.5 * light.fov * _Math.DEG2RAD ),
+					height = 2 * top,
+					width = light.aspect * height,
+					left = - 0.5 * width;
+
+				// construct the projector-matrix that takes view-space
+				// coordinates from GeometricContext in the fragment-shader
+				// and transforms them to texture-coordinates for the
+				// light-texture
+				uniforms.projectorMatrix
+					.makePerspective(
+						left,
+						left + width,
+						top,
+						top - height,
+						near,
+						far
+					)
+					.multiply( matrix42 )
+					.multiply( camera.matrixWorld )
+				;
+
+				uniforms.shadow = light.castShadow;
+
+				if ( light.castShadow ) {
+
+					var shadow = light.shadow;
+
+					uniforms.shadowBias = shadow.bias;
+					uniforms.shadowRadius = shadow.radius;
+					uniforms.shadowMapSize = shadow.mapSize;
+
+				}
+
+				state.projectorTextures[ projectorLength ] = light.map;
+				state.projectorShadowMap[ projectorLength ] = shadowMap;
+				state.projectorShadowMatrix[ projectorLength ] = light.shadow.matrix;
+				state.projector[ projectorLength ] = uniforms;
+
+				projectorLength ++;
 
 			} else if ( light.isRectAreaLight ) {
 
@@ -308,12 +394,13 @@ function WebGLLights() {
 
 		state.directional.length = directionalLength;
 		state.spot.length = spotLength;
+		state.projector.length = projectorLength;
 		state.rectArea.length = rectAreaLength;
 		state.point.length = pointLength;
 		state.hemi.length = hemiLength;
 
 		// TODO (sam-g-steel) why aren't we using join
-		state.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + shadows.length;
+		state.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + projectorLength + ',' + rectAreaLength + ',' + hemiLength + ',' + shadows.length;
 
 	}
 

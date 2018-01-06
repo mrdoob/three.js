@@ -14,6 +14,13 @@
 
 	#endif
 
+	#if NUM_PROJECTOR_LIGHTS > 0
+
+		uniform sampler2D projectorShadowMap[ NUM_PROJECTOR_LIGHTS ];
+		varying vec4 vProjectorShadowCoord[ NUM_PROJECTOR_LIGHTS ];
+
+	#endif
+
 	#if NUM_POINT_LIGHTS > 0
 
 		uniform sampler2D pointShadowMap[ NUM_POINT_LIGHTS ];

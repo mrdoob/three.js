@@ -61,6 +61,39 @@ IncidentLight directLight;
 
 #endif
 
+#if ( NUM_PROJECTOR_LIGHTS > 0 ) && defined( RE_Direct )
+
+	ProjectorLight projectorLight;
+
+	for ( int i = 0; i < NUM_PROJECTOR_LIGHTS; i ++ ) {
+
+		projectorLight = projectorLights[ i ];
+
+		getProjectorDirectLightIrradiance(
+				projectorLight,
+				projectorTextures[ i ],
+				geometry,
+				directLight
+		);
+
+		#ifdef USE_SHADOWMAP
+		directLight.color *= all( bvec2( projectorLight.shadow, directLight.visible ) )
+				? getShadow(
+						projectorShadowMap[ i ],
+						projectorLight.shadowMapSize,
+						projectorLight.shadowBias,
+						projectorLight.shadowRadius,
+						vProjectorShadowCoord[ i ]
+					)
+				: 1.0;
+		#endif
+
+		RE_Direct( directLight, geometry, material, reflectedLight );
+
+	}
+
+#endif
+
 #if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )
 
 	DirectionalLight directionalLight;

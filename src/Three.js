@@ -51,6 +51,7 @@ export { Cache } from './loaders/Cache.js';
 export { AudioLoader } from './loaders/AudioLoader.js';
 export { SpotLightShadow } from './lights/SpotLightShadow.js';
 export { SpotLight } from './lights/SpotLight.js';
+export { ProjectorLight } from './lights/ProjectorLight.js';
 export { PointLight } from './lights/PointLight.js';
 export { RectAreaLight } from './lights/RectAreaLight.js';
 export { HemisphereLight } from './lights/HemisphereLight.js';

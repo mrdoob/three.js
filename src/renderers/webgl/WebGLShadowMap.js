@@ -180,7 +180,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			}
 
-			if ( shadow.isSpotLightShadow ) {
+			if ( shadow.isSpotLightShadow || shadow.isProjectorLightShadow ) {
 
 				shadow.update( light );
 
@@ -207,6 +207,17 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
 				shadowCamera.lookAt( _lookTarget );
+
+				// FIXME: feels wrong here, but the only other solution I
+				//   can come up with would be to have updating the shadow-cameras
+				//   fully managed by the *LightShadow classes.
+
+				if ( shadow.isProjectorLightShadow ) {
+
+					shadowCamera.rotateZ( light.rotation.z );
+
+				}
+
 				shadowCamera.updateMatrixWorld();
 
 				// compute shadow matrix

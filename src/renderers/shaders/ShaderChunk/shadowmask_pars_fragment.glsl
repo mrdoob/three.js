@@ -30,6 +30,19 @@ float getShadowMask() {
 
 	#endif
 
+	#if NUM_PROJECTOR_LIGHTS > 0
+
+	ProjectorLight projLight;
+
+	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
+
+		projLight = projectorLights[ i ];
+		shadow *= bool( projLight.shadow ) ? getShadow( projectorShadowMap[ i ], projLight.shadowMapSize, projLight.shadowBias, projLight.shadowRadius, vProjectorShadowCoord[ i ] ) : 1.0;
+
+	}
+
+	#endif
+
 	#if NUM_POINT_LIGHTS > 0
 
 	PointLight pointLight;
