@@ -290,7 +290,8 @@ var files = {
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
-		"webgl_simple_gi"
+		"webgl_simple_gi",
+		"webgl_tiled_forward"
 	],
 	"webgl deferred": [
 		"webgldeferred_animation"
