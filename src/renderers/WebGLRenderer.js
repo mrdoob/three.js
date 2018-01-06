@@ -273,7 +273,7 @@ function WebGLRenderer( parameters ) {
 		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
 		properties = new WebGLProperties();
-		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, _infoMemory );
+		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, _infoMemory, _infoRender );
 		attributes = new WebGLAttributes( _gl );
 		geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
 		objects = new WebGLObjects( geometries, _infoRender );
@@ -1129,10 +1129,6 @@ function WebGLRenderer( parameters ) {
 			currentRenderList.sort();
 
 		}
-
-		//
-
-		textures.updateVideoTextures();
 
 		//
 
