@@ -17446,7 +17446,7 @@ function WebGLObjects( geometries, infoRender ) {
 
 	}
 
-	function clear() {
+	function dispose() {
 
 		updateList = {};
 
@@ -17455,7 +17455,7 @@ function WebGLObjects( geometries, infoRender ) {
 	return {
 
 		update: update,
-		clear: clear
+		dispose: dispose
 
 	};
 
@@ -18483,7 +18483,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory ) {
+function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory, infoRender ) {
 
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 	var _videoTextures = {};
@@ -18677,6 +18677,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function setTexture2D( texture, slot ) {
 
 		var textureProperties = properties.get( texture );
+
+		if ( texture.isVideoTexture ) updateVideoTexture( texture );
 
 		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
 
@@ -18888,12 +18890,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			texture.addEventListener( 'dispose', onTextureDispose );
 
 			textureProperties.__webglTexture = _gl.createTexture();
-
-			if ( texture.isVideoTexture ) {
-
-				_videoTextures[ texture.id ] = texture;
-
-			}
 
 			infoMemory.textures ++;
 
@@ -19276,11 +19272,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function updateVideoTextures() {
+	function updateVideoTexture( texture ) {
 
-		for ( var id in _videoTextures ) {
+		var id = texture.id;
+		var frame = infoRender.frame;
 
-			_videoTextures[ id ].update();
+		// Check the last frame we updated the VideoTexture
+
+		if ( _videoTextures[ id ] !== frame ) {
+
+			_videoTextures[ id ] = frame;
+			texture.update();
 
 		}
 
@@ -19291,7 +19293,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	this.setTextureCubeDynamic = setTextureCubeDynamic;
 	this.setupRenderTarget = setupRenderTarget;
 	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
-	this.updateVideoTextures = updateVideoTextures;
 
 }
 
@@ -19325,7 +19326,7 @@ function WebGLProperties() {
 
 	}
 
-	function clear() {
+	function dispose() {
 
 		properties = {};
 
@@ -19334,7 +19335,7 @@ function WebGLProperties() {
 	return {
 		get: get,
 		remove: remove,
-		clear: clear
+		dispose: dispose
 	};
 
 }
@@ -21472,7 +21473,7 @@ function WebGLRenderer( parameters ) {
 		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
 		properties = new WebGLProperties();
-		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, _infoMemory );
+		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, _infoMemory, _infoRender );
 		attributes = new WebGLAttributes( _gl );
 		geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
 		objects = new WebGLObjects( geometries, _infoRender );
@@ -21709,6 +21710,8 @@ function WebGLRenderer( parameters ) {
 		_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 
 		renderLists.dispose();
+		properties.dispose();
+		objects.dispose();
 
 		vr.dispose();
 
@@ -22326,10 +22329,6 @@ function WebGLRenderer( parameters ) {
 			currentRenderList.sort();
 
 		}
-
-		//
-
-		textures.updateVideoTextures();
 
 		//
 
@@ -25147,19 +25146,6 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.generateMipmaps = false;
-
-	// Set needsUpdate when first frame is ready
-
-	var scope = this;
-
-	function onLoaded() {
-
-		video.removeEventListener( 'loadeddata', onLoaded, false );
-		scope.needsUpdate = true;
-
-	}
-
-	video.addEventListener( 'loadeddata', onLoaded, false );
 
 }
 
