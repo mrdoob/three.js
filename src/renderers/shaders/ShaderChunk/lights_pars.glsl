@@ -152,12 +152,12 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		directLight.direction = normalize( lVector );
 
-		vec4 projected = projectorLight.projectorMatrix * vec4(geometry.position, 1.0);
-		vec2 projectorUv = 0.5 * (projected.xy / projected.w) + vec2(0.5);
+		vec4 projected = projectorLight.projectorMatrix * vec4( geometry.position, 1.0 );
+		vec2 projectorUv = 0.5 * (projected.xy / projected.w) + vec2( 0.5 );
 
 		directLight.visible = all(bvec3(
-			all(lessThanEqual(projectorUv.xy, vec2(1.0))),
-			all(greaterThanEqual(projectorUv.xy, vec2(0.0))),
+			all( lessThanEqual( projectorUv.xy, vec2( 1.0 ) ) ),
+			all( greaterThanEqual( projectorUv.xy, vec2( 0.0 ) ) ),
 			projected.z >= 0.0
 		));
 
