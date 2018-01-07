@@ -1256,7 +1256,6 @@ THREE.GLTFLoader = ( function () {
 	GLTFParser.prototype.parse = function ( onLoad, onError ) {
 
 		var json = this.json;
-		var parser = this;
 
 		// Clear the loader cache
 		this.cache.removeAll();
@@ -1495,6 +1494,7 @@ THREE.GLTFLoader = ( function () {
 	 */
 	GLTFParser.prototype.loadAccessor = function ( accessorIndex ) {
 
+		var parser = this;
 		var json = this.json;
 
 		var accessorDef = this.json.accessors[ accessorIndex ];
@@ -1536,11 +1536,20 @@ THREE.GLTFLoader = ( function () {
 			// The buffer is not interleaved if the stride is the item size in bytes.
 			if ( byteStride && byteStride !== itemBytes ) {
 
-				// Use the full buffer if it's interleaved.
-				array = new TypedArray( bufferView );
+				var ibCacheKey = 'InterleavedBuffer:' + accessorDef.bufferView + ':' + accessorDef.componentType;
+				var ib = parser.cache.get( ibCacheKey );
 
-				// Integer parameters to IB/IBA are in array elements, not bytes.
-				var ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
+				if ( !ib ) {
+
+					// Use the full buffer if it's interleaved.
+					array = new TypedArray( bufferView );
+
+					// Integer parameters to IB/IBA are in array elements, not bytes.
+					ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
+
+					parser.cache.add( ibCacheKey, ib );
+
+				}
 
 				bufferAttribute = new THREE.InterleavedBufferAttribute( ib, itemSize, byteOffset / elementBytes, normalized );
 
