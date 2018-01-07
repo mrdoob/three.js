@@ -3,11 +3,12 @@
  */
 
 import { Color } from '../../math/Color.js';
+import { Matrix3 } from '../../math/Matrix3';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
-import { _Math } from '../../math/Math.js';
 import { Quaternion } from '../../math/Quaternion.js';
+import { _Math } from '../../math/Math.js';
 
 function UniformsCache() {
 
@@ -59,10 +60,11 @@ function UniformsCache() {
 				case 'ProjectorLight':
 					uniforms = {
 						position: new Vector3(),
-						projectorMatrix: new Matrix4(),
 						color: new Color(),
 						distance: 0,
 						decay: 0,
+						projectorMatrix: new Matrix4(),
+						uvTransform: new Matrix3(),
 
 						shadow: false,
 						shadowBias: 0,
@@ -287,6 +289,21 @@ function WebGLLights() {
 					.multiply( camera.matrixWorld )
 				;
 
+				var projectorTexture = light.map;
+
+				if ( projectorTexture ) {
+
+					var offset = projectorTexture.offset;
+					var repeat = projectorTexture.repeat;
+					var rotation = projectorTexture.rotation;
+					var center = projectorTexture.center;
+
+					projectorTexture.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+
+					uniforms.uvTransform.copy(projectorTexture.matrix);
+
+				}
+
 				uniforms.shadow = light.castShadow;
 
 				if ( light.castShadow ) {
@@ -299,7 +316,7 @@ function WebGLLights() {
 
 				}
 
-				state.projectorTextures[ projectorLength ] = light.map;
+				state.projectorTextures[ projectorLength ] = projectorTexture;
 				state.projectorShadowMap[ projectorLength ] = shadowMap;
 				state.projectorShadowMatrix[ projectorLength ] = light.shadow.matrix;
 				state.projector[ projectorLength ] = uniforms;

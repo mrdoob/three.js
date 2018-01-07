@@ -142,9 +142,10 @@ var UniformsLib = {
 		projectorLights: { value: [], properties: {
 			color: {},
 			position: {},
-			projectorMatrix: {},
 			distance: {},
 			decay: {},
+			projectorMatrix: {},
+			uvTransform: {},
 
 			shadow: {},
 			shadowBias: {},

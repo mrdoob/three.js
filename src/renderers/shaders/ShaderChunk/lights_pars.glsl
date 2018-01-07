@@ -125,11 +125,12 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	struct ProjectorLight {
 		vec3 position;
-		mat4 projectorMatrix;
-
 		vec3 color;
 		float distance;
 		float decay;
+
+		mat4 projectorMatrix;
+		mat3 uvTransform;
 
 		int shadow;
 		float shadowBias;
@@ -153,11 +154,14 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		directLight.direction = normalize( lVector );
 
 		vec4 projected = projectorLight.projectorMatrix * vec4( geometry.position, 1.0 );
-		vec2 projectorUv = 0.5 * (projected.xy / projected.w) + vec2( 0.5 );
+		projected = projected / projected.w;
+
+		vec2 projectorUv = 0.5 * projected.xy + vec2( 0.5 );
+		projectorUv = ( projectorLight.uvTransform * vec3( projectorUv, 1.0 ) ).xy;
 
 		directLight.visible = all(bvec3(
-			all( lessThanEqual( projectorUv.xy, vec2( 1.0 ) ) ),
-			all( greaterThanEqual( projectorUv.xy, vec2( 0.0 ) ) ),
+			all( lessThanEqual( projected.xy, vec2( 1.0 ) ) ),
+			all( greaterThanEqual( projected.xy, vec2( -1.0 ) ) ),
 			projected.z >= 0.0
 		));
 
