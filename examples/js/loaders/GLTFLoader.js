@@ -1539,7 +1539,7 @@ THREE.GLTFLoader = ( function () {
 				var ibCacheKey = 'InterleavedBuffer:' + accessorDef.bufferView + ':' + accessorDef.componentType;
 				var ib = parser.cache.get( ibCacheKey );
 
-				if ( !ib ) {
+				if ( ! ib ) {
 
 					// Use the full buffer if it's interleaved.
 					array = new TypedArray( bufferView );
