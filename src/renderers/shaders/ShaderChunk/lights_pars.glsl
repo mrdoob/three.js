@@ -163,8 +163,11 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		if (directLight.visible) {
 
+			vec4 textureColor = texture2D( projectorTexture, projectorUv );
 			directLight.color = projectorLight.color;
-			directLight.color *= texture2D(projectorTexture, projectorUv).rgb;
+			directLight.color *= textureColor.rgb;
+			directLight.color *= textureColor.a; // attenuate
+
 			directLight.color *= punctualLightIntensityToIrradianceFactor(
 				lightDistance,
 				projectorLight.distance,
