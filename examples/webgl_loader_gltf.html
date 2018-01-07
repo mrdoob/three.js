@@ -59,7 +59,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( -1.8, 0.9, 2.7 );
 
 				controls = new THREE.OrbitControls( camera );
@@ -93,6 +93,12 @@
 				plane.receiveShadow = true;
 				scene.add(plane);
 
+				var grid = new THREE.GridHelper( 20, 20, 0x000000, 0x000000 );
+				grid.position.y = -0.99;
+				grid.material.opacity = 0.2;
+				grid.material.transparent = true;
+				scene.add( grid );
+
 				// envmap
 				var path = 'textures/cube/Park2/';
 				var format = '.jpg';
@@ -122,9 +128,10 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				container.appendChild( renderer.domElement );
