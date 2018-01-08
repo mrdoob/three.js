@@ -3,7 +3,7 @@
  * @thanks bhouston / https://clara.io/
  */
 
-THREE.FunctionNode = function( src, includesOrType, extensionsOrIncludes, keywordsOrExtensions ) {
+THREE.FunctionNode = function ( src, includesOrType, extensionsOrIncludes, keywordsOrExtensions ) {
 
 	src = src || '';
 
@@ -22,20 +22,21 @@ THREE.FunctionNode.rProperties = /[a-z_0-9]+/ig;
 
 THREE.FunctionNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.FunctionNode.prototype.constructor = THREE.FunctionNode;
+THREE.FunctionNode.prototype.nodeType = "Function";
 
-THREE.FunctionNode.prototype.isShared = function( builder, output ) {
+THREE.FunctionNode.prototype.isShared = function ( builder, output ) {
 
 	return ! this.isMethod;
 
 };
 
-THREE.FunctionNode.prototype.getType = function( builder ) {
+THREE.FunctionNode.prototype.getType = function ( builder ) {
 
 	return builder.getTypeByFormat( this.type );
 
 };
 
-THREE.FunctionNode.prototype.getInputByName = function( name ) {
+THREE.FunctionNode.prototype.getInputByName = function ( name ) {
 
 	var i = this.inputs.length;
 
@@ -48,7 +49,7 @@ THREE.FunctionNode.prototype.getInputByName = function( name ) {
 
 };
 
-THREE.FunctionNode.prototype.getIncludeByName = function( name ) {
+THREE.FunctionNode.prototype.getIncludeByName = function ( name ) {
 
 	var i = this.includes.length;
 
@@ -61,7 +62,7 @@ THREE.FunctionNode.prototype.getIncludeByName = function( name ) {
 
 };
 
-THREE.FunctionNode.prototype.generate = function( builder, output ) {
+THREE.FunctionNode.prototype.generate = function ( builder, output ) {
 
 	var match, offset = 0, src = this.value;
 
@@ -136,7 +137,7 @@ THREE.FunctionNode.prototype.generate = function( builder, output ) {
 
 };
 
-THREE.FunctionNode.prototype.eval = function( src, includes, extensions, keywords ) {
+THREE.FunctionNode.prototype.eval = function ( src, includes, extensions, keywords ) {
 
 	src = ( src || '' ).trim();
 
@@ -180,9 +181,9 @@ THREE.FunctionNode.prototype.eval = function( src, includes, extensions, keyword
 					name = inputs[ i ++ ];
 
 					this.inputs.push( {
-						name : name,
-						type : type,
-						qualifier : qualifier
+						name: name,
+						type: type,
+						qualifier: qualifier
 					} );
 
 				}
@@ -199,5 +200,46 @@ THREE.FunctionNode.prototype.eval = function( src, includes, extensions, keyword
 	}
 
 	this.value = src;
+
+};
+
+THREE.FunctionNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.src = this.value;
+		data.isMethod = this.isMethod;
+		data.useKeywords = this.useKeywords;
+
+		if ( ! this.isMethod ) data.out = this.type;
+
+		data.extensions = JSON.parse( JSON.stringify( this.extensions ) );
+		data.keywords = {};
+
+		for ( var keyword in this.keywords ) {
+
+			data.keywords[ keyword ] = this.keywords[ keyword ].toJSON( meta ).uuid;
+
+		}
+
+		if ( this.includes.length ) {
+
+			data.includes = [];
+
+			for ( var i = 0; i < this.includes.length; i ++ ) {
+
+				data.includes.push( this.includes[ i ].toJSON( meta ).uuid );
+
+			}
+
+		}
+
+	}
+
+	return data;
 
 };

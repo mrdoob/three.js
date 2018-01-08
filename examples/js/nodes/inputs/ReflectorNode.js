@@ -1,6 +1,16 @@
-THREE.ReflectorNode = function( mirror, camera, options ) {
+THREE.ReflectorNode = function ( mirror ) {
 
 	THREE.TempNode.call( this, 'v4' );
+
+	if ( mirror ) this.setMirror( mirror );
+
+};
+
+THREE.ReflectorNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.ReflectorNode.prototype.constructor = THREE.ReflectorNode;
+THREE.ReflectorNode.prototype.nodeType = "Reflector";
+
+THREE.ReflectorNode.prototype.setMirror = function ( mirror ) {
 
 	this.mirror = mirror;
 
@@ -15,10 +25,7 @@ THREE.ReflectorNode = function( mirror, camera, options ) {
 
 };
 
-THREE.ReflectorNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.ReflectorNode.prototype.constructor = THREE.ReflectorNode;
-
-THREE.ReflectorNode.prototype.generate = function( builder, output ) {
+THREE.ReflectorNode.prototype.generate = function ( builder, output ) {
 
 	var material = builder.material;
 
@@ -42,5 +49,23 @@ THREE.ReflectorNode.prototype.generate = function( builder, output ) {
 		return builder.format( 'vec4(0.0)', this.type, output );
 
 	}
+
+};
+
+THREE.ReflectorNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.mirror = this.mirror.uuid;
+
+		if ( this.offset ) data.offset = this.offset.toJSON( meta ).uuid;
+
+	}
+
+	return data;
 
 };

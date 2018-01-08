@@ -13,6 +13,7 @@ THREE.SpriteNode = function () {
 
 THREE.SpriteNode.prototype = Object.create( THREE.GLNode.prototype );
 THREE.SpriteNode.prototype.constructor = THREE.SpriteNode;
+THREE.SpriteNode.prototype.nodeType = "Sprite";
 
 THREE.SpriteNode.prototype.build = function ( builder ) {
 
@@ -21,8 +22,8 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 
 	material.define( 'SPRITE' );
 
-	material.requestAttribs.light = false;
-	material.requestAttribs.transparent = this.alpha != undefined;
+	material.requires.lights = false;
+	material.requires.transparent = this.alpha != undefined;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
@@ -135,5 +136,30 @@ THREE.SpriteNode.prototype.build = function ( builder ) {
 	}
 
 	return output.join( "\n" );
+
+};
+
+THREE.SpriteNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		// vertex
+
+		if ( this.transform ) data.transform = this.transform.toJSON( meta ).uuid;
+
+		// fragment
+
+		data.color = this.color.toJSON( meta ).uuid;
+		if ( this.spherical === false ) data.spherical = false;
+
+		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;
+
+	}
+
+	return data;
 
 };

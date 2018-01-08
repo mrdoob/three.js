@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.NormalMapNode = function( value, uv, scale, normal, position ) {
+THREE.NormalMapNode = function ( value, uv, scale, normal, position ) {
 
 	THREE.TempNode.call( this, 'v3' );
 
@@ -16,8 +16,9 @@ THREE.NormalMapNode = function( value, uv, scale, normal, position ) {
 
 THREE.NormalMapNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.NormalMapNode.prototype.constructor = THREE.NormalMapNode;
+THREE.NormalMapNode.prototype.nodeType = "NormalMap";
 
-THREE.NormalMapNode.prototype.generate = function( builder, output ) {
+THREE.NormalMapNode.prototype.generate = function ( builder, output ) {
 
 	var material = builder.material;
 
@@ -38,5 +39,25 @@ THREE.NormalMapNode.prototype.generate = function( builder, output ) {
 		return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
 
 	}
+
+};
+
+THREE.NormalMapNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.value = this.value.uuid;
+		data.scale = this.scale.toJSON( meta ).uuid;
+
+		data.normal = this.normal.toJSON( meta ).uuid;
+		data.position = this.position.toJSON( meta ).uuid;
+
+	}
+
+	return data;
 
 };

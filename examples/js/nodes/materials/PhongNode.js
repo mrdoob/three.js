@@ -14,6 +14,7 @@ THREE.PhongNode = function () {
 
 THREE.PhongNode.prototype = Object.create( THREE.GLNode.prototype );
 THREE.PhongNode.prototype.constructor = THREE.PhongNode;
+THREE.PhongNode.prototype.nodeType = "Phong";
 
 THREE.PhongNode.prototype.build = function ( builder ) {
 
@@ -23,7 +24,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 	material.define( 'PHONG' );
 	material.define( 'ALPHATEST', '0.0' );
 
-	material.requestAttribs.light = true;
+	material.requires.lights = true;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
@@ -137,7 +138,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 		var environment = this.environment ? this.environment.buildCode( builder, 'c', { slot: 'environment' } ) : undefined;
 		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.buildCode( builder, 'fv1' ) : undefined;
 
-		material.requestAttribs.transparent = alpha != undefined;
+		material.requires.transparent = alpha != undefined;
 
 		material.addFragmentPars( [
 			"#include <common>",
@@ -306,5 +307,45 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 	}
 
 	return code;
+
+};
+
+
+THREE.PhongNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		// vertex
+
+		if ( this.transform ) data.transform = this.transform.toJSON( meta ).uuid;
+
+		// fragment
+
+		data.color = this.color.toJSON( meta ).uuid;
+		data.specular = this.specular.toJSON( meta ).uuid;
+		data.shininess = this.shininess.toJSON( meta ).uuid;
+
+		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;
+
+		if ( this.normal ) data.normal = this.normal.toJSON( meta ).uuid;
+		if ( this.normalScale ) data.normalScale = this.normalScale.toJSON( meta ).uuid;
+
+		if ( this.light ) data.light = this.light.toJSON( meta ).uuid;
+
+		if ( this.ao ) data.ao = this.ao.toJSON( meta ).uuid;
+		if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
+		if ( this.shadow ) data.shadow = this.shadow.toJSON( meta ).uuid;
+		if ( this.emissive ) data.emissive = this.emissive.toJSON( meta ).uuid;
+
+		if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
+		if ( this.environmentAlpha ) data.environmentAlpha = this.environmentAlpha.toJSON( meta ).uuid;
+
+	}
+
+	return data;
 
 };
