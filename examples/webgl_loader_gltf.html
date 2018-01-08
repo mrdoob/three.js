@@ -100,12 +100,12 @@
 				scene.add( grid );
 
 				// envmap
-				var path = 'textures/cube/Park2/';
+				var path = 'textures/cube/skybox/';
 				var format = '.jpg';
 				var envMap = new THREE.CubeTextureLoader().load( [
-					path + 'posx' + format, path + 'negx' + format,
-					path + 'posy' + format, path + 'negy' + format,
-					path + 'posz' + format, path + 'negz' + format
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
 				] );
 
 				// model
@@ -124,7 +124,7 @@
 
 					} );
 
-					scene.add.apply( scene, gltf.scene.children );
+					scene.add( gltf.scene );
 
 				} );
 
