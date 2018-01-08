@@ -1554,6 +1554,7 @@
 
 						var subBone = bone;
 						bone = new THREE.Bone();
+						bone.matrixWorld.copy( rawBone.transformLink );
 
 						// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
 						bone.name = THREE.PropertyBinding.sanitizeNodeName( name );
@@ -2006,17 +2007,13 @@
 
 	}
 
-	function bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections, sceneGraph ) {
+	function bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections ) {
+
+		var bindMatrices = parsePoseNodes( FBXTree );
 
 		for ( var ID in skeletons ) {
 
 			var skeleton = skeletons[ ID ];
-
-			skeleton.bones.forEach( function ( bone, i ) {
-
-				bone.matrixWorld.copy( skeleton.rawBones[ i ].transformLink );
-
-			} );
 
 			var parents = connections.get( parseInt( skeleton.ID ) ).parents;
 
@@ -2033,7 +2030,7 @@
 
 							var model = modelMap.get( geoConnParent.ID );
 
-							model.bind( new THREE.Skeleton( skeleton.bones ), model.matrixWorld );
+							model.bind( new THREE.Skeleton( skeleton.bones ), bindMatrices[ geoConnParent.ID ] );
 
 						}
 
@@ -2044,6 +2041,44 @@
 			} );
 
 		}
+
+	}
+
+	function parsePoseNodes( FBXTree ) {
+
+		var bindMatrices = {};
+
+		if ( 'Pose' in FBXTree.Objects ) {
+
+			var BindPoseNode = FBXTree.Objects.Pose;
+
+			for ( var nodeID in BindPoseNode ) {
+
+				if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
+
+					var poseNodes = BindPoseNode[ nodeID ].PoseNode;
+
+					if ( Array.isArray( poseNodes ) ) {
+
+						poseNodes.forEach( function ( poseNode ) {
+
+							bindMatrices[ poseNode.Node ] = new THREE.Matrix4().fromArray( poseNode.Matrix.a );
+
+						} );
+
+					} else {
+
+						bindMatrices[ poseNodes.Node ] = new THREE.Matrix4().fromArray( poseNodes.Matrix.a );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return bindMatrices;
 
 	}
 
@@ -2579,7 +2614,12 @@
 				// if the subnode already exists, append it
 				if ( nodeName in currentNode ) {
 
-					if ( currentNode[ nodeName ].id !== undefined ) {
+				// special case Pose needs PoseNodes as an array
+					if ( nodeName === 'PoseNode' ) {
+
+						currentNode.PoseNode.push( node );
+
+					} else if ( currentNode[ nodeName ].id !== undefined ) {
 
 						currentNode[ nodeName ] = {};
 						currentNode[ nodeName ][ currentNode[ nodeName ].id ] = currentNode[ nodeName ];
@@ -2595,7 +2635,8 @@
 
 				} else if ( nodeName !== 'Properties70' ) {
 
-					currentNode[ nodeName ] = node;
+					if ( nodeName === 'PoseNode' )	currentNode[ nodeName ] = [ node ];
+					else currentNode[ nodeName ] = node;
 
 				}
 
@@ -2918,7 +2959,7 @@
 
 				subNode.propertyList.forEach( function ( property, i ) {
 
-							// first Connection is FBX type (OO, OP, etc.). We'll discard these
+					// first Connection is FBX type (OO, OP, etc.). We'll discard these
 					if ( i !== 0 ) array.push( property );
 
 				} );
@@ -2989,9 +3030,23 @@
 
 				}
 
-			} else if ( node[ subNode.name ][ subNode.id ] === undefined ) {
+			} else {
 
-				node[ subNode.name ][ subNode.id ] = subNode;
+				if ( subNode.name === 'PoseNode' ) {
+
+					if ( ! Array.isArray( node[ subNode.name ] ) ) {
+
+						node[ subNode.name ] = [ node[ subNode.name ] ];
+
+					}
+
+					node[ subNode.name ].push( subNode );
+
+				} else if ( node[ subNode.name ][ subNode.id ] === undefined ) {
+
+					node[ subNode.name ][ subNode.id ] = subNode;
+
+				}
 
 			}
 
