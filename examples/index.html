@@ -261,7 +261,7 @@
 		var expandButton = document.getElementById( 'expandButton' );
 		expandButton.addEventListener( 'click', function ( event ) {
 			event.preventDefault();
-			panel.classList.remove( 'collapsed' );
+			panel.classList.toggle( 'collapsed' );
 		} );
 
 		// iOS iframe auto-resize workaround

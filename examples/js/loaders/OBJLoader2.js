@@ -1341,7 +1341,7 @@ THREE.OBJLoader2 = (function () {
 			callbackOnLoad( materials );
 		};
 
-		var mtlLoader = new THREE.MTLLoader();
+		var mtlLoader = new THREE.MTLLoader(this.manager);
 		crossOrigin = Validator.verifyInput( crossOrigin, 'anonymous' );
 		mtlLoader.setCrossOrigin( crossOrigin );
 
@@ -1361,7 +1361,7 @@ THREE.OBJLoader2 = (function () {
 
 				var onError = function ( event ) {
 					var output = 'Error occurred while downloading "' + resource.url + '"';
-					this.logger.logError( output + ': ' + event );
+					scope.logger.logError( output + ': ' + event );
 					throw output;
 				};
 

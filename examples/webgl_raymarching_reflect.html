@@ -5,6 +5,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style type="text/css">
+			html, body {
+				height: 100%;
+			}
+
 			body {
 				background-color: black;
 				margin: 0;
@@ -13,20 +17,18 @@
 
 			a { color: skyblue }
 
-			canvas {
-				display: block;
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
-				margin: auto;
+			#container {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 			}
 
 			#info {
+				position: absolute;
 				color: white;
 				font-size: 13px;
-				position: absolute;
 				bottom: 10px;
 				width: 100%;
 				text-align: center;
@@ -38,7 +40,10 @@
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raymarching example -
-			reflect by <a href="https://github.com/gam0022" target="_blank" rel="noopener">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank" rel="noopener">article in Japanese</a>)
+			reflect by <a href="https://github.com/gam0022" target="_blank" rel="noopener">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank" rel="noopener">article</a>)
+		</div>
+		<div id="container">
+			<canvas id="canvas"></canvas>
 		</div>
 
 		<script id="fragment_shader" type="x-shader/x-fragment">
@@ -257,10 +262,8 @@
 
 		<script>
 
-			var camera, scene, controls, renderer;
+			var dolly, camera, scene, renderer;
 			var geometry, material, mesh;
-			var mouse = new THREE.Vector2( 0.5, 0.5 );
-			var canvas;
 			var stats;
 
 			var config = {
@@ -270,7 +273,6 @@
 					window.open( canvas.toDataURL() );
 
 				},
-				orbitControls: false,
 				resolution: '512'
 			};
 
@@ -279,19 +281,21 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { canvas: canvas } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( config.resolution, config.resolution );
 
-				canvas = renderer.domElement;
-				canvas.addEventListener( 'mousemove', onMouseMove );
 				window.addEventListener( 'resize', onWindowResize );
-				document.body.appendChild( canvas );
 
 				// Scene
 				scene = new THREE.Scene();
 
+				dolly = new THREE.Group();
+				scene.add( dolly );
+
 				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
+				camera.position.z = 4;
+				dolly.add( camera );
 
 				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
@@ -308,12 +312,11 @@
 				scene.add( mesh );
 
 				// Controls
-				controls = new THREE.OrbitControls( camera, canvas );
+				var controls = new THREE.OrbitControls( camera, canvas );
 
 				// GUI
 				var gui = new dat.GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
-				gui.add( config, 'orbitControls' ).name( 'Orbit Controls' );
 				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( onWindowResize );
 
 				stats = new Stats();
@@ -321,36 +324,7 @@
 
 			}
 
-			function render( timestamp ) {
-
-				stats.begin();
-
-				if ( config.orbitControls ) {
-
-					controls.update();
-
-				} else {
-
-					camera.position.set( mouse.x * 2 - 1, mouse.y * 4, timestamp * 0.001 );
-					camera.rotation.set( 0.25, - Math.PI, 0 );
-
-				}
-
-				renderer.render( scene, camera );
-
-				stats.end();
-				requestAnimationFrame( render );
-
-			}
-
-			function onMouseMove( e ) {
-
-				mouse.x = e.clientX / window.innerWidth;
-				mouse.y = e.clientY / window.innerHeight;
-
-			}
-
-			function onWindowResize( e ) {
+			function onWindowResize() {
 
 				if ( config.resolution === 'full' ) {
 
@@ -367,6 +341,19 @@
 
 				material.uniforms.resolution.value.set( canvas.width, canvas.height );
 				material.uniforms.cameraProjectionMatrixInverse.value.getInverse( camera.projectionMatrix );
+
+			}
+
+			function render( time ) {
+
+				stats.begin();
+
+				dolly.position.z = - time / 1000;
+
+				renderer.render( scene, camera );
+
+				stats.end();
+				requestAnimationFrame( render );
 
 			}
 

@@ -88,6 +88,8 @@ var files = {
 		"webgl_loader_ctm_materials",
 		"webgl_loader_draco",
 		"webgl_loader_fbx",
+		"webgl_loader_fbx_nurbs",
+		"webgl_loader_gcode",
 		"webgl_loader_gltf",
 		"webgl_loader_imagebitmap",
 		"webgl_loader_json_blender",
@@ -120,8 +122,10 @@ var files = {
 		"webgl_loader_sea3d_skinning",
 		"webgl_loader_sea3d_sound",
 		"webgl_loader_stl",
+		"webgl_loader_texture_dds",
 		"webgl_loader_texture_exr",
 		"webgl_loader_texture_hdr",
+		"webgl_loader_texture_ktx",
 		"webgl_loader_texture_pvrtc",
 		"webgl_loader_texture_tga",
 		"webgl_loader_ttf",
@@ -159,7 +163,6 @@ var files = {
 		"webgl_materials_standard",
 		"webgl_materials_texture_anisotropy",
 		"webgl_materials_texture_canvas",
-		"webgl_materials_texture_compressed",
 		"webgl_materials_texture_filters",
 		"webgl_materials_texture_manualmipmap",
 		"webgl_materials_texture_rotation",
@@ -171,6 +174,7 @@ var files = {
 		"webgl_materials_variations_physical",
 		"webgl_materials_variations_toon",
 		"webgl_materials_video",
+		"webgl_materials_video_webcam",
 		"webgl_materials_wireframe",
 		"webgl_mirror",
 		"webgl_mirror_nodes",
@@ -286,7 +290,8 @@ var files = {
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
-		"webgl_simple_gi"
+		"webgl_simple_gi",
+		"webgl_tiled_forward"
 	],
 	"webgl deferred": [
 		"webgldeferred_animation"

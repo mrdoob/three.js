@@ -8,3 +8,4 @@ npm-debug.log
 .jshintrc
 *.sublime-project
 *.sublime-workspace
+.vs/

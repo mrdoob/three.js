@@ -1,20 +1,16 @@
-import { Matrix4 } from '../math/Matrix4.js';
-import { Mesh } from '../objects/Mesh.js';
-import { Group } from '../objects/Group.js';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
-var SceneUtils = {
+THREE.SceneUtils = {
 
 	createMultiMaterialObject: function ( geometry, materials ) {
 
-		var group = new Group();
+		var group = new THREE.Group();
 
 		for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-			group.add( new Mesh( geometry, materials[ i ] ) );
+			group.add( new THREE.Mesh( geometry, materials[ i ] ) );
 
 		}
 
@@ -32,7 +28,7 @@ var SceneUtils = {
 
 	attach: function ( child, scene, parent ) {
 
-		child.applyMatrix( new Matrix4().getInverse( parent.matrixWorld ) );
+		child.applyMatrix( new THREE.Matrix4().getInverse( parent.matrixWorld ) );
 
 		scene.remove( child );
 		parent.add( child );
@@ -40,6 +36,3 @@ var SceneUtils = {
 	}
 
 };
-
-
-export { SceneUtils };

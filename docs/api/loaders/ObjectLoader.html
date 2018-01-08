@@ -43,12 +43,12 @@
 			},
 
 			// onProgress callback
-			function ( err ) {
+			function ( xhr ) {
 				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
 			},
 
 			// onError callback
-			function ( xhr ) {
+			function ( err ) {
 				console.error( 'An error happened' );
 			}
 		);
