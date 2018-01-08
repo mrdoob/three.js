@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.NodeMaterial = function( vertex, fragment ) {
+THREE.NodeMaterial = function ( vertex, fragment ) {
 
 	THREE.ShaderMaterial.call( this );
 
@@ -12,29 +12,29 @@ THREE.NodeMaterial = function( vertex, fragment ) {
 };
 
 THREE.NodeMaterial.types = {
-	t : 'sampler2D',
-	tc : 'samplerCube',
-	bv1 : 'bool',
-	iv1 : 'int',
-	fv1 : 'float',
-	c : 'vec3',
-	v2 : 'vec2',
-	v3 : 'vec3',
-	v4 : 'vec4',
-	m4 : 'mat4'
+	t: 'sampler2D',
+	tc: 'samplerCube',
+	bv1: 'bool',
+	iv1: 'int',
+	fv1: 'float',
+	c: 'vec3',
+	v2: 'vec2',
+	v3: 'vec3',
+	v4: 'vec4',
+	m4: 'mat4'
 };
 
-THREE.NodeMaterial.addShortcuts = function( proto, prop, list ) {
+THREE.NodeMaterial.addShortcuts = function ( proto, prop, list ) {
 
 	function applyShortcut( prop, name ) {
 
 		return {
-			get: function() {
+			get: function () {
 
 				return this[ prop ][ name ];
 
 			},
-			set: function( val ) {
+			set: function ( val ) {
 
 				this[ prop ][ name ] = val;
 
@@ -43,7 +43,7 @@ THREE.NodeMaterial.addShortcuts = function( proto, prop, list ) {
 
 	}
 
-	return ( function() {
+	return ( function () {
 
 		var shortcuts = {};
 
@@ -63,20 +63,23 @@ THREE.NodeMaterial.addShortcuts = function( proto, prop, list ) {
 
 THREE.NodeMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
 THREE.NodeMaterial.prototype.constructor = THREE.NodeMaterial;
+THREE.NodeMaterial.prototype.type = "NodeMaterial";
 
-THREE.NodeMaterial.prototype.updateFrame = function( delta ) {
+THREE.NodeMaterial.prototype.updateFrame = function ( delta ) {
 
-	for ( var i = 0; i < this.requestUpdate.length; ++ i ) {
+	for ( var i = 0; i < this.updaters.length; ++ i ) {
 
-		this.requestUpdate[ i ].updateFrame( delta );
+		this.updaters[ i ].updateFrame( delta );
 
 	}
 
 };
 
-THREE.NodeMaterial.prototype.build = function() {
+THREE.NodeMaterial.prototype.build = function () {
 
 	var vertex, fragment;
+
+	this.nodes = [];
 
 	this.defines = {};
 	this.uniforms = {};
@@ -84,7 +87,7 @@ THREE.NodeMaterial.prototype.build = function() {
 
 	this.extensions = {};
 
-	this.nodeData = {};	
+	this.nodeData = {};
 
 	this.vertexUniform = [];
 	this.fragmentUniform = [];
@@ -98,11 +101,13 @@ THREE.NodeMaterial.prototype.build = function() {
 	this.consts = [];
 	this.functions = [];
 
-	this.requestUpdate = [];
+	this.updaters = [];
 
-	this.requestAttribs = {
+	this.requires = {
 		uv: [],
-		color: []
+		color: [],
+		lights: this.lights,
+		fog: this.fog
 	};
 
 	this.vertexPars = '';
@@ -115,25 +120,25 @@ THREE.NodeMaterial.prototype.build = function() {
 	this.fragmentNode = '';
 
 	this.prefixCode = [
-	"#ifdef GL_EXT_shader_texture_lod",
+		"#ifdef GL_EXT_shader_texture_lod",
 
-	"	#define texCube(a, b) textureCube(a, b)",
-	"	#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)",
+		"	#define texCube(a, b) textureCube(a, b)",
+		"	#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)",
 
-	"	#define tex2D(a, b) texture2D(a, b)",
-	"	#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)",
+		"	#define tex2D(a, b) texture2D(a, b)",
+		"	#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)",
 
-	"#else",
+		"#else",
 
-	"	#define texCube(a, b) textureCube(a, b)",
-	"	#define texCubeBias(a, b, c) textureCube(a, b, c)",
+		"	#define texCube(a, b) textureCube(a, b)",
+		"	#define texCubeBias(a, b, c) textureCube(a, b, c)",
 
-	"	#define tex2D(a, b) texture2D(a, b)",
-	"	#define tex2DBias(a, b, c) texture2D(a, b, c)",
+		"	#define tex2D(a, b) texture2D(a, b)",
+		"	#define tex2DBias(a, b, c) texture2D(a, b, c)",
 
-	"#endif",
+		"#endif",
 
-	"#include <packing>"
+		"#include <packing>"
 
 	].join( "\n" );
 
@@ -142,7 +147,7 @@ THREE.NodeMaterial.prototype.build = function() {
 	vertex = this.vertex.build( builder.setShader( 'vertex' ), 'v4' );
 	fragment = this.fragment.build( builder.setShader( 'fragment' ), 'v4' );
 
-	if ( this.requestAttribs.uv[ 0 ] ) {
+	if ( this.requires.uv[ 0 ] ) {
 
 		this.addVertexPars( 'varying vec2 vUv;' );
 		this.addFragmentPars( 'varying vec2 vUv;' );
@@ -151,7 +156,7 @@ THREE.NodeMaterial.prototype.build = function() {
 
 	}
 
-	if ( this.requestAttribs.uv[ 1 ] ) {
+	if ( this.requires.uv[ 1 ] ) {
 
 		this.addVertexPars( 'varying vec2 vUv2; attribute vec2 uv2;' );
 		this.addFragmentPars( 'varying vec2 vUv2;' );
@@ -160,7 +165,7 @@ THREE.NodeMaterial.prototype.build = function() {
 
 	}
 
-	if ( this.requestAttribs.color[ 0 ] ) {
+	if ( this.requires.color[ 0 ] ) {
 
 		this.addVertexPars( 'varying vec4 vColor; attribute vec4 color;' );
 		this.addFragmentPars( 'varying vec4 vColor;' );
@@ -169,7 +174,7 @@ THREE.NodeMaterial.prototype.build = function() {
 
 	}
 
-	if ( this.requestAttribs.color[ 1 ] ) {
+	if ( this.requires.color[ 1 ] ) {
 
 		this.addVertexPars( 'varying vec4 vColor2; attribute vec4 color2;' );
 		this.addFragmentPars( 'varying vec4 vColor2;' );
@@ -178,7 +183,7 @@ THREE.NodeMaterial.prototype.build = function() {
 
 	}
 
-	if ( this.requestAttribs.position ) {
+	if ( this.requires.position ) {
 
 		this.addVertexPars( 'varying vec3 vPosition;' );
 		this.addFragmentPars( 'varying vec3 vPosition;' );
@@ -187,16 +192,16 @@ THREE.NodeMaterial.prototype.build = function() {
 
 	}
 
-	if ( this.requestAttribs.worldPosition ) {
+	if ( this.requires.worldPosition ) {
 
 		this.addVertexPars( 'varying vec3 vWPosition;' );
 		this.addFragmentPars( 'varying vec3 vWPosition;' );
 
-		this.addVertexCode( 'vWPosition = ( modelMatrix * vec4( position, 1.0 ) ).xyz;' );
+		this.addVertexCode( 'vWPosition = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;' );
 
 	}
 
-	if ( this.requestAttribs.normal ) {
+	if ( this.requires.normal ) {
 
 		this.addVertexPars( 'varying vec3 vObjectNormal;' );
 		this.addFragmentPars( 'varying vec3 vObjectNormal;' );
@@ -205,7 +210,7 @@ THREE.NodeMaterial.prototype.build = function() {
 
 	}
 
-	if ( this.requestAttribs.worldNormal ) {
+	if ( this.requires.worldNormal ) {
 
 		this.addVertexPars( 'varying vec3 vWNormal;' );
 		this.addFragmentPars( 'varying vec3 vWNormal;' );
@@ -214,8 +219,10 @@ THREE.NodeMaterial.prototype.build = function() {
 
 	}
 
-	this.lights = this.requestAttribs.light;
-	this.transparent = this.requestAttribs.transparent || this.blending > THREE.NormalBlending;
+	this.fog = this.requires.fog;
+	this.lights = this.requires.lights;
+
+	this.transparent = this.requires.transparent || this.blending > THREE.NormalBlending;
 
 	this.vertexShader = [
 		this.prefixCode,
@@ -250,19 +257,19 @@ THREE.NodeMaterial.prototype.build = function() {
 
 };
 
-THREE.NodeMaterial.prototype.define = function( name, value ) {
+THREE.NodeMaterial.prototype.define = function ( name, value ) {
 
 	this.defines[ name ] = value == undefined ? 1 : value;
 
 };
 
-THREE.NodeMaterial.prototype.isDefined = function( name ) {
+THREE.NodeMaterial.prototype.isDefined = function ( name ) {
 
 	return this.defines[ name ] != undefined;
 
 };
 
-THREE.NodeMaterial.prototype.mergeUniform = function( uniforms ) {
+THREE.NodeMaterial.prototype.mergeUniform = function ( uniforms ) {
 
 	for ( var name in uniforms ) {
 
@@ -272,15 +279,15 @@ THREE.NodeMaterial.prototype.mergeUniform = function( uniforms ) {
 
 };
 
-THREE.NodeMaterial.prototype.createUniform = function( type, value, ns, needsUpdate ) {
+THREE.NodeMaterial.prototype.createUniform = function ( type, value, ns, needsUpdate ) {
 
 	var index = this.uniformList.length;
 
 	var uniform = {
-		type : type,
-		value : value,
-		name : ns ? ns : 'nVu' + index,
-		needsUpdate : needsUpdate
+		type: type,
+		value: value,
+		name: ns ? ns : 'nVu' + index,
+		needsUpdate: needsUpdate
 	};
 
 	this.uniformList.push( uniform );
@@ -289,7 +296,7 @@ THREE.NodeMaterial.prototype.createUniform = function( type, value, ns, needsUpd
 
 };
 
-THREE.NodeMaterial.prototype.getVertexTemp = function( uuid, type, ns ) {
+THREE.NodeMaterial.prototype.getVertexTemp = function ( uuid, type, ns ) {
 
 	var data = this.vertexTemps[ uuid ];
 
@@ -298,7 +305,7 @@ THREE.NodeMaterial.prototype.getVertexTemp = function( uuid, type, ns ) {
 		var index = this.vertexTemps.length,
 			name = ns ? ns : 'nVt' + index;
 
-		data = { name : name, type : type };
+		data = { name: name, type: type };
 
 		this.vertexTemps.push( data );
 		this.vertexTemps[ uuid ] = data;
@@ -309,7 +316,7 @@ THREE.NodeMaterial.prototype.getVertexTemp = function( uuid, type, ns ) {
 
 };
 
-THREE.NodeMaterial.prototype.getFragmentTemp = function( uuid, type, ns ) {
+THREE.NodeMaterial.prototype.getFragmentTemp = function ( uuid, type, ns ) {
 
 	var data = this.fragmentTemps[ uuid ];
 
@@ -318,7 +325,7 @@ THREE.NodeMaterial.prototype.getFragmentTemp = function( uuid, type, ns ) {
 		var index = this.fragmentTemps.length,
 			name = ns ? ns : 'nVt' + index;
 
-		data = { name : name, type : type };
+		data = { name: name, type: type };
 
 		this.fragmentTemps.push( data );
 		this.fragmentTemps[ uuid ] = data;
@@ -329,7 +336,7 @@ THREE.NodeMaterial.prototype.getFragmentTemp = function( uuid, type, ns ) {
 
 };
 
-THREE.NodeMaterial.prototype.getVar = function( uuid, type, ns ) {
+THREE.NodeMaterial.prototype.getVar = function ( uuid, type, ns ) {
 
 	var data = this.vars[ uuid ];
 
@@ -338,7 +345,7 @@ THREE.NodeMaterial.prototype.getVar = function( uuid, type, ns ) {
 		var index = this.vars.length,
 			name = ns ? ns : 'nVv' + index;
 
-		data = { name : name, type : type };
+		data = { name: name, type: type };
 
 		this.vars.push( data );
 		this.vars[ uuid ] = data;
@@ -352,7 +359,7 @@ THREE.NodeMaterial.prototype.getVar = function( uuid, type, ns ) {
 
 };
 
-THREE.NodeMaterial.prototype.getAttribute = function( name, type ) {
+THREE.NodeMaterial.prototype.getAttribute = function ( name, type ) {
 
 	if ( ! this.attributes[ name ] ) {
 
@@ -361,7 +368,7 @@ THREE.NodeMaterial.prototype.getAttribute = function( name, type ) {
 		this.addVertexPars( 'attribute ' + type + ' ' + name + ';' );
 		this.addVertexCode( varying.name + ' = ' + name + ';' );
 
-		this.attributes[ name ] = { varying : varying, name : name, type : type };
+		this.attributes[ name ] = { varying: varying, name: name, type: type };
 
 	}
 
@@ -369,7 +376,7 @@ THREE.NodeMaterial.prototype.getAttribute = function( name, type ) {
 
 };
 
-THREE.NodeMaterial.prototype.getIncludes = function() {
+THREE.NodeMaterial.prototype.getIncludes = function () {
 
 	function sortByPosition( a, b ) {
 
@@ -377,7 +384,7 @@ THREE.NodeMaterial.prototype.getIncludes = function() {
 
 	}
 
-	return function( incs ) {
+	return function ( incs ) {
 
 		if ( ! incs ) return '';
 
@@ -391,41 +398,41 @@ THREE.NodeMaterial.prototype.getIncludes = function() {
 
 		return code;
 
-	}
+	};
 
 }();
 
-THREE.NodeMaterial.prototype.addVertexPars = function( code ) {
+THREE.NodeMaterial.prototype.addVertexPars = function ( code ) {
 
 	this.vertexPars += code + '\n';
 
 };
 
-THREE.NodeMaterial.prototype.addFragmentPars = function( code ) {
+THREE.NodeMaterial.prototype.addFragmentPars = function ( code ) {
 
 	this.fragmentPars += code + '\n';
 
 };
 
-THREE.NodeMaterial.prototype.addVertexCode = function( code ) {
+THREE.NodeMaterial.prototype.addVertexCode = function ( code ) {
 
 	this.vertexCode += code + '\n';
 
 };
 
-THREE.NodeMaterial.prototype.addFragmentCode = function( code ) {
+THREE.NodeMaterial.prototype.addFragmentCode = function ( code ) {
 
 	this.fragmentCode += code + '\n';
 
 };
 
-THREE.NodeMaterial.prototype.addVertexNode = function( code ) {
+THREE.NodeMaterial.prototype.addVertexNode = function ( code ) {
 
 	this.vertexNode += code + '\n';
 
 };
 
-THREE.NodeMaterial.prototype.clearVertexNode = function() {
+THREE.NodeMaterial.prototype.clearVertexNode = function () {
 
 	var code = this.vertexNode;
 
@@ -435,13 +442,13 @@ THREE.NodeMaterial.prototype.clearVertexNode = function() {
 
 };
 
-THREE.NodeMaterial.prototype.addFragmentNode = function( code ) {
+THREE.NodeMaterial.prototype.addFragmentNode = function ( code ) {
 
 	this.fragmentNode += code + '\n';
 
 };
 
-THREE.NodeMaterial.prototype.clearFragmentNode = function() {
+THREE.NodeMaterial.prototype.clearFragmentNode = function () {
 
 	var code = this.fragmentNode;
 
@@ -451,7 +458,7 @@ THREE.NodeMaterial.prototype.clearFragmentNode = function() {
 
 };
 
-THREE.NodeMaterial.prototype.getCodePars = function( pars, prefix ) {
+THREE.NodeMaterial.prototype.getCodePars = function ( pars, prefix ) {
 
 	prefix = prefix || '';
 
@@ -477,7 +484,7 @@ THREE.NodeMaterial.prototype.getCodePars = function( pars, prefix ) {
 
 };
 
-THREE.NodeMaterial.prototype.createVertexUniform = function( type, value, ns, needsUpdate ) {
+THREE.NodeMaterial.prototype.createVertexUniform = function ( type, value, ns, needsUpdate ) {
 
 	var uniform = this.createUniform( type, value, ns, needsUpdate );
 
@@ -490,7 +497,7 @@ THREE.NodeMaterial.prototype.createVertexUniform = function( type, value, ns, ne
 
 };
 
-THREE.NodeMaterial.prototype.createFragmentUniform = function( type, value, ns, needsUpdate ) {
+THREE.NodeMaterial.prototype.createFragmentUniform = function ( type, value, ns, needsUpdate ) {
 
 	var uniform = this.createUniform( type, value, ns, needsUpdate );
 
@@ -503,13 +510,13 @@ THREE.NodeMaterial.prototype.createFragmentUniform = function( type, value, ns, 
 
 };
 
-THREE.NodeMaterial.prototype.getDataNode = function( uuid ) {
+THREE.NodeMaterial.prototype.getDataNode = function ( uuid ) {
 
 	return this.nodeData[ uuid ] = this.nodeData[ uuid ] || {};
 
 };
 
-THREE.NodeMaterial.prototype.include = function( builder, node, parent, source ) {
+THREE.NodeMaterial.prototype.include = function ( builder, node, parent, source ) {
 
 	var includes;
 
@@ -530,8 +537,8 @@ THREE.NodeMaterial.prototype.include = function( builder, node, parent, source )
 	if ( ! included ) {
 
 		included = includes[ node.name ] = {
-			node : node,
-			deps : []
+			node: node,
+			deps: []
 		};
 
 		includes.push( included );
@@ -563,5 +570,65 @@ THREE.NodeMaterial.prototype.include = function( builder, node, parent, source )
 		included.src = source;
 
 	}
+
+};
+
+THREE.NodeMaterial.prototype.toJSON = function ( meta ) {
+
+	var isRootObject = ( meta === undefined || typeof meta === 'string' );
+
+	if ( isRootObject ) {
+
+		meta = {
+			nodes: {}
+		};
+
+	}
+
+	if ( meta && ! meta.materials ) meta.materials = {};
+
+	if ( ! meta.materials[ this.uuid ] ) {
+
+		var data = {};
+
+		data.uuid = this.uuid;
+		data.type = this.type;
+
+		meta.materials[ data.uuid ] = data;
+
+		if ( this.name !== "" ) data.name = this.name;
+
+		if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
+		if ( this.flatShading === true ) data.flatShading = this.flatShading;
+		if ( this.side !== THREE.FrontSide ) data.side = this.side;
+
+		if ( this.transparent === true ) data.transparent = this.transparent;
+
+		data.depthFunc = this.depthFunc;
+		data.depthTest = this.depthTest;
+		data.depthWrite = this.depthWrite;
+
+		if ( this.wireframe === true ) data.wireframe = this.wireframe;
+		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
+		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
+		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
+
+		if ( this.morphTargets === true ) data.morphTargets = true;
+		if ( this.skinning === true ) data.skinning = true;
+
+		data.fog = this.fog;
+		data.lights = this.lights;
+
+		if ( this.visible === false ) data.visible = false;
+		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
+
+		data.vertex = this.vertex.toJSON( meta ).uuid;
+		data.fragment = this.fragment.toJSON( meta ).uuid;
+
+	}
+
+	meta.material = this.uuid;
+
+	return meta;
 
 };

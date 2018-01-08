@@ -97,13 +97,18 @@
 		<!-- Sprite Material -->
 		<script src="js/nodes/materials/SpriteNode.js"></script>
 		<script src="js/nodes/materials/SpriteNodeMaterial.js"></script>
-		
+
+		<!-- NodeMaterial Loader -->
+		<script src="js/loaders/NodeMaterialLoader.js"></script>
+
 		<script>
 
 		var container = document.getElementById( 'container' );
 
 		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
 		var plane, sprite1, sprite2, sprite3;
+		var walkingManTexture, walkingManTextureURL;
+		var library = {};
 		var controls;
 
 		window.addEventListener( 'load', init );
@@ -138,8 +143,12 @@
 			plane = new THREE.PlaneBufferGeometry( 1, 1 );
 
 			// https://openclipart.org/detail/239883/walking-man-sprite-sheet
-			var walkingManTexture = new THREE.TextureLoader().load( "textures/WalkingManSpriteSheet.png" );
+			walkingManTextureURL = "textures/WalkingManSpriteSheet.png";
+
+			walkingManTexture = new THREE.TextureLoader().load( walkingManTextureURL );
 			walkingManTexture.wrapS = walkingManTexture.wrapT = THREE.RepeatWrapping;
+
+			library[ walkingManTextureURL ] = walkingManTexture;
 
 			// horizontal sprite-sheet animator
 
@@ -203,7 +212,7 @@
 			sprite2.material.spherical = false; // look at camera horizontally only, very used to vegetation
 			// horizontal zigzag sprite
 			sprite2.material.transform = new THREE.OperatorNode(
-				new THREE.OperatorNode( 
+				new THREE.OperatorNode(
 					new THREE.Math1Node( new THREE.TimerNode( 0, 3 ), THREE.Math1Node.SIN ), // 3 is speed (time scale)
 					new THREE.Vector2Node( .3, 0 ), // horizontal scale (position)
 					THREE.OperatorNode.MUL
@@ -227,13 +236,21 @@
 			sprite3.position.x = - 30;
 			sprite3.scale.x = spriteWidth;
 			sprite3.scale.y = spriteHeight;
-			sprite3.material.fog = true;
 			sprite3.material.color = new THREE.TextureNode( walkingManTexture );
 			sprite3.material.color.coord = new THREE.FunctionCallNode( sineWaveFunction, {
 				"uv": createHorizontalSpriteSheetNode( 8, 0 ),
 				"phase": new THREE.TimerNode()
 			} );
+			sprite3.material.fog = true;
 			sprite3.material.build();
+
+			//
+			//	Test serialization
+			//
+
+			spriteToJSON( sprite1 );
+			spriteToJSON( sprite2 );
+			spriteToJSON( sprite3 );
 
 			//
 			// Events
@@ -243,6 +260,26 @@
 
 			onWindowResize();
 			animate();
+
+		}
+
+		function spriteToJSON( sprite ) {
+
+			// serialize
+
+			var json = sprite.material.toJSON();
+
+			// replace uuid to url (facilitates the load of textures using url otherside uuid)
+
+			THREE.NodeMaterialLoaderUtils.replaceUUID( json, walkingManTexture, walkingManTextureURL );
+
+			// unserialize
+
+			var material = new THREE.NodeMaterialLoader( null, library ).parse( json );
+
+			// replace material
+
+			sprite.material = material;
 
 		}
 

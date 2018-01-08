@@ -102,6 +102,7 @@ var files = {
 		"webgl_loader_mmd_pose",
 		"webgl_loader_mmd_audio",
 		"webgl_loader_msgpack",
+		"webgl_loader_nodes",
 		"webgl_loader_obj",
 		"webgl_loader_obj_mtl",
 		"webgl_loader_obj2",

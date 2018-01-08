@@ -13,6 +13,7 @@ THREE.UVTransformNode = function () {
 
 THREE.UVTransformNode.prototype = Object.create( THREE.FunctionNode.prototype );
 THREE.UVTransformNode.prototype.constructor = THREE.UVTransformNode;
+THREE.UVTransformNode.prototype.nodeType = "UVTransform";
 
 THREE.UVTransformNode.prototype.generate = function ( builder, output ) {
 
@@ -46,3 +47,20 @@ THREE.UVTransformNode.prototype.compose = function () {
 	};
 
 }();
+
+THREE.UVTransformNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.uv = this.uv.toJSON( meta ).uuid;
+		data.elements = this.transform.value.elements.concat();
+
+	}
+
+	return data;
+
+};
