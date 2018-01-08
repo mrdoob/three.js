@@ -437,13 +437,13 @@ UI.Outliner.prototype.setValue = function ( value ) {
 
 UI.THREE = {};
 
-UI.THREE.Boolean = function ( value, text ) {
+UI.THREE.Boolean = function ( bool, text ) {
 
 	UI.Span.call( this );
 
 	this.setMarginRight( '10px' );
 
-	this.checkbox = new UI.Checkbox( value );
+	this.checkbox = new UI.Checkbox( bool );
 	this.text = new UI.Text( text ).setMarginLeft( '3px' );
 
 	this.add( this.checkbox );

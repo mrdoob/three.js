@@ -502,9 +502,9 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	};
 
-	this.setScissorTest = function ( scissorTest ) {
+	this.setScissorTest = function ( bool ) {
 
-		renderer.setScissorTest( scissorTest );
+		renderer.setScissorTest( bool );
 
 	};
 
