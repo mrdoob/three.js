@@ -2048,7 +2048,6 @@
 
 		var bindMatrices = {};
 
-		// Put skeleton into bind pose.
 		if ( 'Pose' in FBXTree.Objects ) {
 
 			var BindPoseNode = FBXTree.Objects.Pose;
