@@ -489,7 +489,9 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 
 
-  	return tmpBuffer;
+		exit(0);
+
+		return true;
 	}
 
 	function parseNullTerminatedString( buffer, offset ) {
