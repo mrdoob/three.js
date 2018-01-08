@@ -2017,7 +2017,7 @@
 
 			var parents = connections.get( parseInt( skeleton.ID ) ).parents;
 
-			parents.forEach( function ( parent, i ) {
+			parents.forEach( function ( parent ) {
 
 				if ( geometryMap.has( parent.ID ) ) {
 
@@ -2030,8 +2030,7 @@
 
 							var model = modelMap.get( geoConnParent.ID );
 
-							if ( geoConnParent.ID in bindMatrices ) model.bind( new THREE.Skeleton( skeleton.bones ), bindMatrices[ geoConnParent.ID ] );
-							else model.bind( new THREE.Skeleton( skeleton.bones ), model.matrixWorld );
+							model.bind( new THREE.Skeleton( skeleton.bones ), bindMatrices[ geoConnParent.ID ] );
 
 						}
 
