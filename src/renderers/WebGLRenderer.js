@@ -1579,7 +1579,7 @@ function WebGLRenderer( parameters ) {
 			uniforms.ambientLightColor.value = lights.state.ambient;
 			uniforms.directionalLights.value = lights.state.directional;
 			uniforms.spotLights.value = lights.state.spot;
-			uniforms.projectorLights.value = lights.state.projector;
+			uniforms.projectors.value = lights.state.projector;
 			uniforms.rectAreaLights.value = lights.state.rectArea;
 			uniforms.pointLights.value = lights.state.point;
 			uniforms.hemisphereLights.value = lights.state.hemi;
@@ -2302,7 +2302,7 @@ function WebGLRenderer( parameters ) {
 		uniforms.directionalLights.needsUpdate = value;
 		uniforms.pointLights.needsUpdate = value;
 		uniforms.spotLights.needsUpdate = value;
-		uniforms.projectorLights.needsUpdate = value;
+		uniforms.projectors.needsUpdate = value;
 		uniforms.rectAreaLights.needsUpdate = value;
 		uniforms.hemisphereLights.needsUpdate = value;
 

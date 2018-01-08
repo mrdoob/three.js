@@ -57,7 +57,7 @@ function UniformsCache() {
 					};
 					break;
 
-				case 'ProjectorLight':
+				case 'Projector':
 					uniforms = {
 						position: new Vector3(),
 						color: new Color(),
@@ -245,7 +245,7 @@ function WebGLLights() {
 
 				spotLength ++;
 
-			} else if ( light.isProjectorLight ) {
+			} else if ( light.isProjector ) {
 
 				var uniforms = cache.get( light );
 

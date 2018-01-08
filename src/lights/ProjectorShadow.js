@@ -1,17 +1,17 @@
 import { LightShadow } from './LightShadow.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 
-function ProjectorLightShadow() {
+function ProjectorShadow() {
 
 	LightShadow.call( this, new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
 }
 
-ProjectorLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
+ProjectorShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
 
-	constructor: ProjectorLightShadow,
+	constructor: ProjectorShadow,
 
-	isProjectorLightShadow: true,
+	isProjectorShadow: true,
 
 	update: function ( light ) {
 
@@ -35,4 +35,4 @@ ProjectorLightShadow.prototype = Object.assign( Object.create( LightShadow.proto
 } );
 
 
-export { ProjectorLightShadow };
+export { ProjectorShadow };

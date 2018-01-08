@@ -1,16 +1,16 @@
 import { Light } from './Light.js';
-import { ProjectorLightShadow } from './ProjectorLightShadow.js';
+import { ProjectorShadow } from './ProjectorShadow.js';
 import { Object3D } from '../core/Object3D.js';
 
 /**
  * @author usefulthink / https://github.com/usefulthink
  */
 
-function ProjectorLight( color, intensity, distance, fov, aspect, decay ) {
+function Projector( color, intensity, distance, fov, aspect, decay ) {
 
 	Light.call( this, color, intensity );
 
-	this.type = 'ProjectorLight';
+	this.type = 'Projector';
 
 	this.position.copy( Object3D.DefaultUp );
 	this.updateMatrix();
@@ -40,17 +40,17 @@ function ProjectorLight( color, intensity, distance, fov, aspect, decay ) {
 	this.fov = fov; // vertical field-of-view in degrees
 	this.aspect = ( aspect !== undefined ) ? aspect : 1;
 
-	this.shadow = new ProjectorLightShadow();
+	this.shadow = new ProjectorShadow();
 
 	this.map = null;
 
 }
 
-ProjectorLight.prototype = Object.assign( Object.create( Light.prototype ), {
+Projector.prototype = Object.assign( Object.create( Light.prototype ), {
 
-	constructor: ProjectorLight,
+	constructor: Projector,
 
-	isProjectorLight: true,
+	isProjector: true,
 
 	copy: function ( source ) {
 
@@ -79,4 +79,4 @@ ProjectorLight.prototype = Object.assign( Object.create( Light.prototype ), {
 } );
 
 
-export { ProjectorLight };
+export { Projector };

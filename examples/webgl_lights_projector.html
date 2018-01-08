@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgl - lights - projectorlight</title>
+	<title>three.js webgl - lights - projector</title>
 	<meta charset="utf-8">
 	<meta name="viewport"
 				content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -37,7 +37,7 @@
 
 <div id="info">
 	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl
-	- projectorlight by <a href="http://github.com/usefulthink" target="_blank"
+	- projector by <a href="http://github.com/usefulthink" target="_blank"
 												 rel="noopener">Martin Schuhfuss</a><br/>
 </div>
 
@@ -60,7 +60,7 @@
 
 	var renderer, scene, camera;
 	var controls;
-	var projectorLight;
+	var projector;
 	var shadowCameraHelper;
 	var helpers = [];
 
@@ -73,7 +73,9 @@
 		var textureLoader = new THREE.TextureLoader();
 		var texture;
 
-		textures.uvGrid = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
+		texture = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
+
+		textures.uvGrid = texture;
 
 		var video = document.getElementById( 'video' );
 		texture = new THREE.VideoTexture( video );
@@ -110,25 +112,25 @@
 		var ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
 		scene.add( ambient );
 
-		projectorLight = new THREE.ProjectorLight( 0xffffff, 1 );
+		projector = new THREE.Projector( 0xffffff, 1 );
 
-		projectorLight.map = textures.uvGrid;
-		projectorLight.position.set( 15, 40, 35 );
-		projectorLight.angle = Math.PI / 3;
-		projectorLight.fov = 60;
-		projectorLight.aspect = 1;
-		projectorLight.decay = 2;
-		projectorLight.distance = 200;
+		projector.map = textures.uvGrid;
+		projector.position.set( 15, 40, 35 );
+		projector.angle = Math.PI / 3;
+		projector.fov = 60;
+		projector.aspect = 1;
+		projector.decay = 2;
+		projector.distance = 200;
 
-		projectorLight.castShadow = true;
-		projectorLight.shadow.mapSize.width = 1024;
-		projectorLight.shadow.mapSize.height = 1024;
-		projectorLight.shadow.camera.near = 10;
-		projectorLight.shadow.camera.far = 200;
+		projector.castShadow = true;
+		projector.shadow.mapSize.width = 1024;
+		projector.shadow.mapSize.height = 1024;
+		projector.shadow.camera.near = 10;
+		projector.shadow.camera.far = 200;
 
-		scene.add( projectorLight );
+		scene.add( projector );
 
-		shadowCameraHelper = new THREE.CameraHelper( projectorLight.shadow.camera );
+		shadowCameraHelper = new THREE.CameraHelper( projector.shadow.camera );
 
 		helpers.push( shadowCameraHelper );
 		helpers.push( new THREE.AxesHelper( 10 ) );
@@ -160,7 +162,7 @@
 		box2.castShadow = true;
 		scene.add( box2 );
 
-		projectorLight.target = box2;
+		projector.target = box2;
 
 		controls.target.copy( box2.position );
 		controls.update();
@@ -183,40 +185,40 @@
 		gui = new dat.GUI();
 
 		var params = {
-			'light color': projectorLight.color.getHex(),
-			intensity: projectorLight.intensity,
-			distance: projectorLight.distance,
-			fov: projectorLight.fov,
-			aspect: projectorLight.aspect,
-			decay: projectorLight.decay,
-			rotation: projectorLight.rotation.z,
+			'light color': projector.color.getHex(),
+			intensity: projector.intensity,
+			distance: projector.distance,
+			fov: projector.fov,
+			aspect: projector.aspect,
+			decay: projector.decay,
+			rotation: projector.rotation.z,
 			texture: 'uvGrid',
 			showHelpers: true
 		};
 
 		gui.addColor( params, 'light color' ).onChange( function ( val ) {
-			projectorLight.color.setHex( val );
+			projector.color.setHex( val );
 		} );
 		gui.add( params, 'intensity', 0, 2 ).onChange( function ( val ) {
-			projectorLight.intensity = val;
+			projector.intensity = val;
 		} );
 		gui.add( params, 'distance', 50, 200 ).onChange( function ( val ) {
-			projectorLight.distance = val;
+			projector.distance = val;
 		} );
 		gui.add( params, 'decay', 1, 2 ).onChange( function ( val ) {
-			projectorLight.decay = val;
+			projector.decay = val;
 		} );
 		gui.add( params, 'fov', 10, 120 ).onChange( function ( val ) {
-			projectorLight.fov = val;
+			projector.fov = val;
 		} );
 		gui.add( params, 'aspect', 0.5, 2 ).onChange( function ( val ) {
-			projectorLight.aspect = val;
+			projector.aspect = val;
 		} );
 		gui.add( params, 'texture', Object.keys( textures ) ).onChange( function ( val ) {
-			projectorLight.map = textures[ val ];
+			projector.map = textures[ val ];
 		} );
 		gui.add( params, 'rotation', -Math.PI, Math.PI ).onChange( function ( val ) {
-			projectorLight.rotation.z = val;
+			projector.rotation.z = val;
 		} );
 		gui.add( params, 'showHelpers' ).onChange( function ( val ) {
 			helpers.forEach( function ( helper ) { helper.visible = val; } );

@@ -180,7 +180,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			}
 
-			if ( shadow.isSpotLightShadow || shadow.isProjectorLightShadow ) {
+			if ( shadow.isSpotLightShadow || shadow.isProjectorShadow ) {
 
 				shadow.update( light );
 
@@ -212,7 +212,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 				//   can come up with would be to have updating the shadow-cameras
 				//   fully managed by the *LightShadow classes.
 
-				if ( shadow.isProjectorLightShadow ) {
+				if ( shadow.isProjectorShadow ) {
 
 					shadowCamera.rotateZ( light.rotation.z );
 

@@ -123,7 +123,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 #if NUM_PROJECTOR_LIGHTS > 0
 
-	struct ProjectorLight {
+	struct Projector {
 		vec3 position;
 		vec3 color;
 		float distance;
@@ -138,26 +138,26 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		vec2 shadowMapSize;
 	};
 
-	uniform ProjectorLight projectorLights[NUM_PROJECTOR_LIGHTS];
+	uniform Projector projectors[NUM_PROJECTOR_LIGHTS];
 	uniform sampler2D projectorTextures[NUM_PROJECTOR_LIGHTS];
 
 	void getProjectorDirectLightIrradiance(
-			const in ProjectorLight projectorLight,
+			const in Projector projector,
 			const in sampler2D projectorTexture,
 			const in GeometricContext geometry,
 			out IncidentLight directLight)
 	{
 
-		vec3 lVector = projectorLight.position - geometry.position;
+		vec3 lVector = projector.position - geometry.position;
 		float lightDistance = length( lVector );
 
 		directLight.direction = normalize( lVector );
 
-		vec4 projected = projectorLight.projectorMatrix * vec4( geometry.position, 1.0 );
+		vec4 projected = projector.projectorMatrix * vec4( geometry.position, 1.0 );
 		projected = projected / projected.w;
 
 		vec2 projectorUv = 0.5 * projected.xy + vec2( 0.5 );
-		projectorUv = ( projectorLight.uvTransform * vec3( projectorUv, 1.0 ) ).xy;
+		projectorUv = ( projector.uvTransform * vec3( projectorUv, 1.0 ) ).xy;
 
 		directLight.visible = all(bvec3(
 			all( lessThanEqual( projected.xy, vec2( 1.0 ) ) ),
@@ -168,14 +168,14 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		if (directLight.visible) {
 
 			vec4 textureColor = texture2D( projectorTexture, projectorUv );
-			directLight.color = projectorLight.color;
+			directLight.color = projector.color;
 			directLight.color *= textureColor.rgb;
 			directLight.color *= textureColor.a; // attenuate
 
 			directLight.color *= punctualLightIntensityToIrradianceFactor(
 				lightDistance,
-				projectorLight.distance,
-				projectorLight.decay
+				projector.distance,
+				projector.decay
 			);
 
 		} else {
