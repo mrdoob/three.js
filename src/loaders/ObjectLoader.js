@@ -582,8 +582,6 @@ Object.assign( ObjectLoader.prototype, {
 
 	parseObject: function () {
 
-		var matrix = new Matrix4();
-
 		return function parseObject( data, geometries, materials ) {
 
 			var object;
@@ -797,8 +795,8 @@ Object.assign( ObjectLoader.prototype, {
 			if ( data.name !== undefined ) object.name = data.name;
 			if ( data.matrix !== undefined ) {
 
-				matrix.fromArray( data.matrix );
-				matrix.decompose( object.position, object.quaternion, object.scale );
+				object.matrix.fromArray( data.matrix );
+				object.matrix.decompose( object.position, object.quaternion, object.scale );
 
 			} else {
 
