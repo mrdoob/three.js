@@ -2893,7 +2893,7 @@
 
 		},
 
-		parseSubNode( name, node, subNode ) {
+		parseSubNode: function ( name, node, subNode ) {
 
 			// special case: child node is single property
 			if ( subNode.singleProperty === true ) {
