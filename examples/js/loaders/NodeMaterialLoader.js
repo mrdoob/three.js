@@ -214,6 +214,7 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 					break;
 
+				case "Matrix3Node":
 				case "Matrix4Node":
 
 					object.value.fromArray( node.elements );
@@ -321,7 +322,7 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 				case "UVTransformNode":
 
 					object.uv = this.getNode( node.uv );
-					object.transform.value.fromArray( node.elements );
+					object.transform = this.getNode( node.transform );
 
 					break;
 
@@ -449,20 +450,15 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 					break;
 
 				case "TextureNode":
+				case "CubeTextureNode":
 				case "ScreenNode":
 
 					if ( node.value ) object.value = this.getNode( node.value );
 
 					object.coord = this.getNode( node.coord );
-					object.project = node.project;
 
 					if ( node.bias ) object.bias = this.getNode( node.bias );
-
-					break;
-
-				case "CubeTextureNode":
-
-					object.value = this.getNode( node.value );
+					if ( object.project !== undefined ) object.project = node.project;
 
 					break;
 
