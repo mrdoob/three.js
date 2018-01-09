@@ -426,6 +426,10 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+    this.setCurrentCamera = function ( camera ) {
+        _currentCamera = camera;
+    };
+
 	this.setScissor = function ( x, y, width, height ) {
 
 		_scissor.set( x, _height - y - height, width, height );
