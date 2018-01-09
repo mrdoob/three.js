@@ -5,6 +5,7 @@ var files = {
 		"webgl_animation_scene",
 		"webgl_animation_skinning_blending",
 		"webgl_animation_skinning_morph",
+		"webgl_animation_skinning_share",
 		"webgl_camera",
 		"webgl_camera_array",
 		"webgl_camera_cinematic",
