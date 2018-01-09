@@ -109,13 +109,13 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers.get( attribute.uuid );
+		var data = buffers.get( attribute );
 
 		if ( data ) {
 
 			gl.deleteBuffer( data.buffer );
 
-			buffers.delete( attribute.uuid );
+			buffers.delete( attribute );
 
 		}
 
