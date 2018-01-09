@@ -162,6 +162,7 @@ THREE.Reflector = function ( geometry, options ) {
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 		renderer.render( scene, virtualCamera, renderTarget, true );
+		renderer.setupLights( camera ); // rebuild light uniforms, see #12883
 
 		renderer.vr.enabled = currentVrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
