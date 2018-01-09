@@ -72,6 +72,7 @@
 		<script src="js/nodes/inputs/Vector3Node.js"></script>
 		<script src="js/nodes/inputs/Vector4Node.js"></script>
 		<script src="js/nodes/inputs/TextureNode.js"></script>
+		<script src="js/nodes/inputs/Matrix3Node.js"></script>
 		<script src="js/nodes/inputs/Matrix4Node.js"></script>
 		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
 
@@ -860,7 +861,7 @@
 
 					function updateUVTransform() {
 
-						texture.coord.compose( translate, THREE.Math.degToRad( rotate ), scale );
+						texture.coord.compose( translate, scale, THREE.Math.degToRad( rotate ) );
 
 					}
 

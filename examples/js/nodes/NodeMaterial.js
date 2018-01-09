@@ -21,6 +21,7 @@ THREE.NodeMaterial.types = {
 	v2: 'vec2',
 	v3: 'vec3',
 	v4: 'vec4',
+	m3: 'mat3',
 	m4: 'mat4'
 };
 

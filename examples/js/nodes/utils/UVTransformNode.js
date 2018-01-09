@@ -4,10 +4,10 @@
 
 THREE.UVTransformNode = function () {
 
-	THREE.FunctionNode.call( this, "( uvTransform * vec4( uvNode, 0, 1 ) ).xy", "vec2" );
+	THREE.FunctionNode.call( this, "( uvTransform * vec3( uvNode, 1 ) ).xy", "vec2" );
 
 	this.uv = new THREE.UVNode();
-	this.transform = new THREE.Matrix4Node();
+	this.transform = new THREE.Matrix3Node();
 
 };
 
@@ -26,21 +26,13 @@ THREE.UVTransformNode.prototype.generate = function ( builder, output ) {
 
 THREE.UVTransformNode.prototype.compose = function () {
 
-	var defaultPivot = new THREE.Vector2( .5, .5 ),
-		tempVector = new THREE.Vector3(),
-		tempMatrix = new THREE.Matrix4();
+	var defaultPivot = new THREE.Vector2( .5, .5 );
 
-	return function compose( translate, rotate, scale, optionalCenter ) {
+	return function compose( translate, scale, rotate, optionalCenter ) {
 
 		optionalCenter = optionalCenter !== undefined ? optionalCenter : defaultPivot;
 
-		var matrix = this.transform.value;
-
-		matrix.identity()
-			.setPosition( tempVector.set( - optionalCenter.x, - optionalCenter.y, 0 ) )
-			.premultiply( tempMatrix.makeRotationZ( rotate ) )
-			.multiply( tempMatrix.makeScale( scale.x, scale.y, 0 ) )
-			.multiply( tempMatrix.makeTranslation( translate.x, translate.y, 0 ) );
+		this.transform.value.setUvTransform( translate.x, translate.y, scale.x, scale.y, rotate, optionalCenter.x, optionalCenter.y );
 
 		return this;
 
@@ -57,7 +49,7 @@ THREE.UVTransformNode.prototype.toJSON = function ( meta ) {
 		data = this.createJSONNode( meta );
 
 		data.uv = this.uv.toJSON( meta ).uuid;
-		data.elements = this.transform.value.elements.concat();
+		data.transform = this.transform.toJSON( meta ).uuid;
 
 	}
 

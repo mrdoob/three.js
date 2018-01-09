@@ -214,6 +214,7 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 					break;
 
+				case "Matrix3Node":
 				case "Matrix4Node":
 
 					object.value.fromArray( node.elements );
@@ -321,7 +322,7 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 				case "UVTransformNode":
 
 					object.uv = this.getNode( node.uv );
-					object.transform.value.fromArray( node.elements );
+					object.transform = this.getNode( node.transform );
 
 					break;
 
