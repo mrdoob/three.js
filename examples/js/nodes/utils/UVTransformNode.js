@@ -24,21 +24,14 @@ THREE.UVTransformNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.UVTransformNode.prototype.compose = function () {
+THREE.UVTransformNode.prototype.setUvTransform = function ( tx, ty, sx, sy, rotation, cx, cy ) {
 
-	var defaultPivot = new THREE.Vector2( .5, .5 );
+	cx = cx !== undefined ? cx : .5;
+	cy = cy !== undefined ? cy : .5;
 
-	return function compose( translate, scale, rotate, optionalCenter ) {
+	this.transform.value.setUvTransform( tx, ty, sx, sy, rotation, cx, cy );
 
-		optionalCenter = optionalCenter !== undefined ? optionalCenter : defaultPivot;
-
-		this.transform.value.setUvTransform( translate.x, translate.y, scale.x, scale.y, rotate, optionalCenter.x, optionalCenter.y );
-
-		return this;
-
-	};
-
-}();
+};
 
 THREE.UVTransformNode.prototype.toJSON = function ( meta ) {
 

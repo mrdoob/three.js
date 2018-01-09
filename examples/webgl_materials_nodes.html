@@ -861,7 +861,7 @@
 
 					function updateUVTransform() {
 
-						texture.coord.compose( translate, scale, THREE.Math.degToRad( rotate ) );
+						texture.coord.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.Math.degToRad( rotate ) );
 
 					}
 
