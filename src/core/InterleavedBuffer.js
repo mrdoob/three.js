@@ -6,8 +6,6 @@ import { _Math } from '../math/Math.js';
 
 function InterleavedBuffer( array, stride ) {
 
-	this.uuid = _Math.generateUUID();
-
 	this.array = array;
 	this.stride = stride;
 	this.count = array !== undefined ? array.length / stride : 0;
@@ -108,5 +106,6 @@ Object.assign( InterleavedBuffer.prototype, {
 
 } );
 
+Object.defineProperties( InterleavedBuffer.prototype, Object.getOwnPropertyDescriptors( _Math.lazyUUID ) );
 
 export { InterleavedBuffer };

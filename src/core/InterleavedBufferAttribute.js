@@ -6,8 +6,6 @@ import { _Math } from '../math/Math.js';
 
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
-	this.uuid = _Math.generateUUID();
-
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
 	this.offset = offset;
@@ -138,5 +136,6 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 } );
 
+Object.defineProperties( InterleavedBufferAttribute.prototype, Object.getOwnPropertyDescriptors( _Math.lazyUUID ) );
 
 export { InterleavedBufferAttribute };

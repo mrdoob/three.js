@@ -13,8 +13,6 @@ function Material() {
 
 	Object.defineProperty( this, 'id', { value: materialId ++ } );
 
-	this.uuid = _Math.generateUUID();
-
 	this.name = '';
 	this.type = 'Material';
 
@@ -363,5 +361,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 } );
 
+Object.defineProperties( Material.prototype, Object.getOwnPropertyDescriptors( _Math.lazyUUID ) );
 
 export { Material };

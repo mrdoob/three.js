@@ -21,8 +21,6 @@ function BufferGeometry() {
 
 	Object.defineProperty( this, 'id', { value: bufferGeometryId += 2 } );
 
-	this.uuid = _Math.generateUUID();
-
 	this.name = '';
 	this.type = 'BufferGeometry';
 
@@ -1119,5 +1117,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 } );
 
+Object.defineProperties( BufferGeometry.prototype, Object.getOwnPropertyDescriptors( _Math.lazyUUID ) );
 
 export { BufferGeometry };

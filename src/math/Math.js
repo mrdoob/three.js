@@ -20,8 +20,6 @@ var _Math = {
 
 		}
 
-		return function generateUUID() { return null };
-		/*
 		return function generateUUID() {
 
 			var d0 = Math.random() * 0xffffffff | 0;
@@ -34,7 +32,7 @@ var _Math = {
 				lut[ d3 & 0xff ] + lut[ d3 >> 8 & 0xff ] + lut[ d3 >> 16 & 0xff ] + lut[ d3 >> 24 & 0xff ];
 
 		};
-*/
+
 	} )(),
 
 	clamp: function ( value, min, max ) {
@@ -144,9 +142,42 @@ var _Math = {
 
 		return Math.pow( 2, Math.floor( Math.log( value ) / Math.LN2 ) );
 
-	}
+	},
+
+	lazyUUID: {}
 
 };
+
+Object.defineProperties( _Math.lazyUUID, {
+
+	_uuid: {
+		value: null,
+		writable: true
+	},
+
+	uuid: {
+
+		get: function () {
+
+			if ( this._uuid === null ) {
+
+				this._uuid = _Math.generateUUID();
+
+			}
+
+			return this._uuid;
+
+		},
+
+		set: function ( value ) {
+
+			this._uuid = value;
+
+		}
+
+	}
+
+} );
 
 
 export { _Math };

@@ -21,8 +21,6 @@ function Object3D() {
 
 	Object.defineProperty( this, 'id', { value: object3DId ++ } );
 
-	this.uuid = _Math.generateUUID();
-
 	this.name = '';
 	this.type = 'Object3D';
 
@@ -826,5 +824,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 } );
 
+Object.defineProperties( Object3D.prototype, Object.getOwnPropertyDescriptors( _Math.lazyUUID ) );
 
 export { Object3D };
