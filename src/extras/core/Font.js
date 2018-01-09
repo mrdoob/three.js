@@ -51,16 +51,16 @@ function createPaths( text, size, divisions, data ) {
 
 	for ( var i = 0; i < chars.length; i ++ ) {
 
-		var char = chars[ i ];
+		var character = chars[ i ];
 
-		if ( char === '\n' ) {
+		if ( character === '\n' ) {
 
 			offsetX = 0;
 			offsetY -= line_height;
 
 		} else {
 
-			var ret = createPath( char, divisions, scale, offsetX, offsetY, data );
+			var ret = createPath( character, divisions, scale, offsetX, offsetY, data );
 			offsetX += ret.offsetX;
 			paths.push( ret.path );
 
@@ -72,9 +72,9 @@ function createPaths( text, size, divisions, data ) {
 
 }
 
-function createPath( char, divisions, scale, offsetX, offsetY, data ) {
+function createPath( character, divisions, scale, offsetX, offsetY, data ) {
 
-	var glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
+	var glyph = data.glyphs[ character ] || data.glyphs[ '?' ];
 
 	if ( ! glyph ) return;
 
