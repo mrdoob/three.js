@@ -449,20 +449,15 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 					break;
 
 				case "TextureNode":
+				case "CubeTextureNode":
 				case "ScreenNode":
 
 					if ( node.value ) object.value = this.getNode( node.value );
 
 					object.coord = this.getNode( node.coord );
-					object.project = node.project;
 
 					if ( node.bias ) object.bias = this.getNode( node.bias );
-
-					break;
-
-				case "CubeTextureNode":
-
-					object.value = this.getNode( node.value );
+					if ( object.project !== undefined ) object.project = node.project;
 
 					break;
 
