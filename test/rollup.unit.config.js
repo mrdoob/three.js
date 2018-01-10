@@ -26,17 +26,17 @@ function glsl() {
 export default [
 	// editor unit conf
 	{
-		entry: 'test/three.editor.unit.js',
+		input: 'test/three.editor.unit.js',
 		indent: '\t',
 		plugins: [
 			glsl()
 		],
 		// sourceMap: true,
-		targets: [
+		output: [
 			{
 				format: 'umd',
-				moduleName: 'THREE',
-				dest: 'test/unit/three.editor.unit.js',
+				name: 'THREE',
+				file: 'test/unit/three.editor.unit.js',
 				intro: 'QUnit.module( "Editor", () => {',
 				outro: '} );',
 			}
@@ -44,17 +44,17 @@ export default [
 	},
 	// example unit conf
 	{
-		entry: 'test/three.example.unit.js',
+		input: 'test/three.example.unit.js',
 		indent: '\t',
 		plugins: [
 			glsl()
 		],
 		// sourceMap: true,
-		targets: [
+		output: [
 			{
 				format: 'umd',
-				moduleName: 'THREE',
-				dest: 'test/unit/three.example.unit.js',
+				name: 'THREE',
+				file: 'test/unit/three.example.unit.js',
 				intro: 'QUnit.module( "Example", () => {',
 				outro: '} );',
 			}
@@ -62,17 +62,17 @@ export default [
 	},
 	// source unit conf
 	{
-		entry: 'test/three.source.unit.js',
+		input: 'test/three.source.unit.js',
 		indent: '\t',
 		plugins: [
 			glsl()
 		],
 		// sourceMap: true,
-		targets: [
+		output: [
 			{
 				format: 'umd',
-				moduleName: 'THREE',
-				dest: 'test/unit/three.source.unit.js',
+				name: 'THREE',
+				file: 'test/unit/three.source.unit.js',
 				intro: 'QUnit.module( "Source", () => {',
 				outro: '} );',
 			}
