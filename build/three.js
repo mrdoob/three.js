@@ -21372,9 +21372,21 @@
 
 			render: _infoRender,
 			memory: _infoMemory,
-			programs: null
+			programs: null,
+			autoReset: true,
+			reset: resetInfo
 
 		};
+
+		function resetInfo () {
+
+			_infoRender.frame ++;
+			_infoRender.calls = 0;
+			_infoRender.vertices = 0;
+			_infoRender.faces = 0;
+			_infoRender.points = 0;
+
+		}
 
 		function getTargetPixelRatio() {
 
@@ -22338,11 +22350,7 @@
 
 			//
 
-			_infoRender.frame ++;
-			_infoRender.calls = 0;
-			_infoRender.vertices = 0;
-			_infoRender.faces = 0;
-			_infoRender.points = 0;
+			if ( this.info.autoReset ) this.info.reset();
 
 			if ( renderTarget === undefined ) {
 
@@ -23752,6 +23760,18 @@
 				}
 
 			}
+
+		};
+
+		this.copyFramebufferToTexture = function ( x, y, texture, level ) {
+
+			var width = texture.image.width;
+			var height = texture.image.height;
+			var internalFormat = utils.convert( texture.format );
+
+			this.setTexture2D( texture, 0 );
+
+			_gl.copyTexImage2D( _gl.TEXTURE_2D, level || 0, internalFormat, x, y, width, height, 0 );
 
 		};
 
