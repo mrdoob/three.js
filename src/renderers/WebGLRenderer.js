@@ -428,6 +428,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.getViewport = function ( viewport ) {
+
+		viewport.copy( _currentViewport );
+
+	};
+
 	this.setViewport = function ( x, y, width, height ) {
 
 		_viewport.set( x, _height - y - height, width, height );
@@ -1425,7 +1431,7 @@ function WebGLRenderer( parameters ) {
 
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
-		object.onBeforeRender( _this, scene, camera, geometry, material, group, _currentViewport );
+		object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
@@ -1444,7 +1450,7 @@ function WebGLRenderer( parameters ) {
 
 		} else {
 
-			_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group, _currentViewport );
+			_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
 
 		}
 
