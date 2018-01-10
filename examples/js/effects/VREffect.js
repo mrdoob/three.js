@@ -139,7 +139,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
-	this.setFullScreen = function ( boolean ) {
+	this.setFullScreen = function ( bool ) {
 
 		return new Promise( function ( resolve, reject ) {
 
@@ -157,7 +157,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			if ( boolean ) {
+			if ( bool ) {
 
 				resolve( vrDisplay.requestPresent( [ { source: canvas } ] ) );
 

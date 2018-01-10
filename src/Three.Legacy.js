@@ -1308,10 +1308,10 @@ Object.assign( WebGLRenderer.prototype, {
 		return this.extensions.get( 'ANGLE_instanced_arrays' );
 
 	},
-	enableScissorTest: function ( boolean ) {
+	enableScissorTest: function ( bool ) {
 
 		console.warn( 'THREE.WebGLRenderer: .enableScissorTest() is now .setScissorTest().' );
-		this.setScissorTest( boolean );
+		this.setScissorTest( bool );
 
 	},
 	initMaterial: function () {

@@ -445,9 +445,9 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.setScissorTest = function ( boolean ) {
+	this.setScissorTest = function ( bool ) {
 
-		state.setScissorTest( _scissorTest = boolean );
+		state.setScissorTest( _scissorTest = bool );
 
 	};
 
