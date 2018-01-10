@@ -67,12 +67,12 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	this.needsSwap = false;
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
+	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.scene2  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
+	this.scene2.add( this.quad );
 
 };
 
@@ -91,7 +91,7 @@ THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 		this.convolutionUniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
 
-		renderer.render( this.scene, this.camera, this.renderTargetX, true );
+		renderer.render( this.scene2, this.camera2, this.renderTargetX, true );
 
 
 		// Render quad with blured scene into texture (convolution pass 2)
@@ -99,7 +99,7 @@ THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 		this.convolutionUniforms[ "tDiffuse" ].value = this.renderTargetX.texture;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurY;
 
-		renderer.render( this.scene, this.camera, this.renderTargetY, true );
+		renderer.render( this.scene2, this.camera2, this.renderTargetY, true );
 
 		// Render original scene with superimposed blur to texture
 
@@ -109,7 +109,7 @@ THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		renderer.render( this.scene2, this.camera2, readBuffer, this.clear );
 
 	}
 

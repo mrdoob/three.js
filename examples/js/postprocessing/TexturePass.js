@@ -28,12 +28,12 @@ THREE.TexturePass = function ( map, opacity ) {
 
 	this.needsSwap = false;
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
+	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.scene2  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
+	this.scene2.add( this.quad );
 
 };
 
@@ -52,7 +52,7 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		this.uniforms[ "tDiffuse" ].value = this.map;
 		this.material.transparent = ( this.opacity < 1.0 );
 
-		renderer.render( this.scene, this.camera, this.renderToScreen ? null : readBuffer, this.clear );
+		renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : readBuffer, this.clear );
 
 		renderer.autoClear = oldAutoClear;
 	}

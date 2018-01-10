@@ -35,8 +35,8 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 
 	this.renderToScreen = false;
 
-	this.camera2 = camera;
-	this.scene2 = scene;
+	this.camera = camera;
+	this.scene = scene;
 
 	//Depth material
 	this.depthMaterial = new THREE.MeshDepthMaterial();
@@ -50,8 +50,8 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	//Shader uniforms
 	this.uniforms[ 'tDepth' ].value = this.depthRenderTarget.texture;
 	this.uniforms[ 'size' ].value.set( this.width, this.height );
-	this.uniforms[ 'cameraNear' ].value = this.camera2.near;
-	this.uniforms[ 'cameraFar' ].value = this.camera2.far;
+	this.uniforms[ 'cameraNear' ].value = this.camera.near;
+	this.uniforms[ 'cameraFar' ].value = this.camera.far;
 
 	this.uniforms[ 'radius' ].value = 4;
 	this.uniforms[ 'onlyAO' ].value = false;
@@ -100,11 +100,11 @@ THREE.SSAOPass.prototype = Object.create( THREE.ShaderPass.prototype );
 THREE.SSAOPass.prototype.render = function( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 	//Render depth into depthRenderTarget
-	this.scene2.overrideMaterial = this.depthMaterial;
+	this.scene.overrideMaterial = this.depthMaterial;
 	
-	renderer.render( this.scene2, this.camera2, this.depthRenderTarget, true );
+	renderer.render( this.scene, this.camera, this.depthRenderTarget, true );
 	
-	this.scene2.overrideMaterial = null;
+	this.scene.overrideMaterial = null;
 
 
 	//SSAO shaderPass
@@ -120,7 +120,7 @@ THREE.SSAOPass.prototype.render = function( renderer, writeBuffer, readBuffer, d
  */
 THREE.SSAOPass.prototype.setScene = function(scene) {
 	
-	this.scene2 = scene;
+	this.scene = scene;
 
 };
 
@@ -132,10 +132,10 @@ THREE.SSAOPass.prototype.setScene = function(scene) {
  */
 THREE.SSAOPass.prototype.setCamera = function( camera ) {
 
-	this.camera2 = camera;
+	this.camera = camera;
 
-	this.uniforms[ 'cameraNear' ].value = this.camera2.near;
-	this.uniforms[ 'cameraFar' ].value = this.camera2.far;
+	this.uniforms[ 'cameraNear' ].value = this.camera.near;
+	this.uniforms[ 'cameraFar' ].value = this.camera.far;
 
 };
 
