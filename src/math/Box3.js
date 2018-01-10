@@ -371,6 +371,107 @@ Object.assign( Box3.prototype, {
 
 	},
 
+	intersectsTriangle: ( function () {
+
+		// triangle centered vertices
+		var v0 = new Vector3();
+		var v1 = new Vector3();
+		var v2 = new Vector3();
+
+		// triangle edge vectors
+		var f0 = new Vector3();
+		var f1 = new Vector3();
+		var f2 = new Vector3();
+
+		var testAxis = new Vector3();
+
+		var center = new Vector3();
+		var extents = new Vector3();
+
+		var triangleNormal = new Vector3();
+
+		function satForAxes (axes) {
+
+			var i, j;
+
+			for ( i = 0, j = axes.length - 3; i <= j; i += 3 ) {
+
+				testAxis.fromArray( axes, i );
+				// project the aabb onto the seperating axis
+				var r = extents.x * Math.abs( testAxis.x ) + extents.y * Math.abs( testAxis.y ) + extents.z * Math.abs( testAxis.z );
+				// project all 3 vertices of the triangle onto the seperating axis
+				var p0 = v0.dot( testAxis );
+				var p1 = v1.dot( testAxis );
+				var p2 = v2.dot( testAxis );
+				// actual test, basically see if either of the most extreme of the triangle points intersects r
+				if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
+
+					// points of the projected triangle are outside the projected half-length of the aabb
+					// the axis is seperating and we can exit
+					return false;
+
+				}
+
+			}
+
+			return true;
+
+		}
+
+		return function intersectsTriangle ( triangle ) {
+
+			if ( this.isEmpty() ) {
+
+				return false;
+				
+			}
+
+			// compute box center and extents
+			this.getCenter(center);
+			extents.subVectors( this.max, center );
+
+			// translate triangle to aabb origin
+			v0.subVectors( triangle.a, center );
+			v1.subVectors( triangle.b, center );
+			v2.subVectors( triangle.c, center );
+
+			// compute edge vectors for triangle
+			f0.subVectors( v1, v0 );
+			f1.subVectors( v2, v1 );
+			f2.subVectors( v0, v2 );
+
+			// test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
+			// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
+			// axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
+			var axes = [
+				0, - f0.z, f0.y, 0, - f1.z, f1.y, 0, - f2.z, f2.y,
+				f0.z, 0, - f0.x, f1.z, 0, - f1.x, f2.z, 0, - f2.x,
+				- f0.y, f0.x, 0, - f1.y, f1.x, 0, - f2.y, f2.x, 0
+			];
+			if ( ! satForAxes( axes ) ) {
+
+				return false;
+
+			}
+
+			// test 3 face normals from the aabb
+			axes = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
+			if ( ! satForAxes( axes ) ) {
+
+				return false;
+
+			}
+
+			// finally testing the face normal of the triangle
+			// use already existing triangle edge vectors here
+			triangleNormal.crossVectors( f0, f1 );
+			axes = [ triangleNormal.x, triangleNormal.y, triangleNormal.z ];
+			return satForAxes( axes );
+
+		};
+
+	} )(),
+
 	clampPoint: function ( point, optionalTarget ) {
 
 		var result = optionalTarget || new Vector3();
