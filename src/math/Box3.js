@@ -423,7 +423,7 @@ Object.assign( Box3.prototype, {
 			if ( this.isEmpty() ) {
 
 				return false;
-				
+
 			}
 
 			// compute box center and extents
