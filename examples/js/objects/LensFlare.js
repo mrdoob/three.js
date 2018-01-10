@@ -272,7 +272,7 @@ THREE.LensFlare = function ( texture, size, distance, blending, color, opacity )
 
 	var scale = new THREE.Vector2();
 
-	this.onBeforeRender = function ( renderer, scene, camera, geometry, material, group, viewport ) {
+	this.onBeforeRender = function ( renderer, scene, camera, currentViewport, geometry, material, group ) {
 
 		var group = this.parent;
 
@@ -285,12 +285,12 @@ THREE.LensFlare = function ( texture, size, distance, blending, color, opacity )
 
 		//
 
-		group.update( renderer, camera, viewport );
+		group.update( renderer, camera, currentViewport );
 
 		//
 
-		var size = this.flareSize * this.flareScale / viewport.w;
-		var invAspect = viewport.w / viewport.z;
+		var size = this.flareSize * this.flareScale / currentViewport.w;
+		var invAspect = currentViewport.w / currentViewport.z;
 
 		scale.set( size * invAspect, size );
 
