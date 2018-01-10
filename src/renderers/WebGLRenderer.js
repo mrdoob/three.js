@@ -178,9 +178,21 @@ function WebGLRenderer( parameters ) {
 
 		render: _infoRender,
 		memory: _infoMemory,
-		programs: null
+		programs: null,
+		autoReset: true,
+		reset: resetInfo
 
 	};
+
+	function resetInfo () {
+
+		_infoRender.frame ++;
+		_infoRender.calls = 0;
+		_infoRender.vertices = 0;
+		_infoRender.faces = 0;
+		_infoRender.points = 0;
+
+	}
 
 	function getTargetPixelRatio() {
 
@@ -1144,11 +1156,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		_infoRender.frame ++;
-		_infoRender.calls = 0;
-		_infoRender.vertices = 0;
-		_infoRender.faces = 0;
-		_infoRender.points = 0;
+		if ( this.info.autoReset ) this.info.reset();
 
 		if ( renderTarget === undefined ) {
 
