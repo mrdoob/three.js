@@ -6,7 +6,6 @@ import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { UniformsLib } from './shaders/UniformsLib.js';
 import { UniformsUtils } from './shaders/UniformsUtils.js';
 import { ShaderLib } from './shaders/ShaderLib.js';
-import { WebGLFlareRenderer } from './webgl/WebGLFlareRenderer.js';
 import { WebGLSpriteRenderer } from './webgl/WebGLSpriteRenderer.js';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
@@ -62,7 +61,6 @@ function WebGLRenderer( parameters ) {
 	var currentRenderList = null;
 
 	var spritesArray = [];
-	var flaresArray = [];
 
 	// public properties
 
@@ -260,7 +258,7 @@ function WebGLRenderer( parameters ) {
 	var programCache, renderLists;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
-	var flareRenderer, spriteRenderer;
+	var spriteRenderer;
 
 	var utils;
 
@@ -299,7 +297,6 @@ function WebGLRenderer( parameters ) {
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, _infoRender );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
 
-		flareRenderer = new WebGLFlareRenderer( _this, _gl, state, textures, capabilities );
 		spriteRenderer = new WebGLSpriteRenderer( _this, _gl, state, textures, capabilities );
 
 		_this.info.programs = programCache.programs;
@@ -1128,7 +1125,6 @@ function WebGLRenderer( parameters ) {
 		shadowsArray.length = 0;
 
 		spritesArray.length = 0;
-		flaresArray.length = 0;
 
 		_localClippingEnabled = this.localClippingEnabled;
 		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
@@ -1197,7 +1193,6 @@ function WebGLRenderer( parameters ) {
 		// custom renderers
 
 		spriteRenderer.render( spritesArray, scene, camera );
-		flareRenderer.render( flaresArray, scene, camera, _currentViewport );
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -1307,10 +1302,6 @@ function WebGLRenderer( parameters ) {
 					spritesArray.push( object );
 
 				}
-
-			} else if ( object.isLensFlare ) {
-
-				flaresArray.push( object );
 
 			} else if ( object.isImmediateRenderObject ) {
 
@@ -1434,7 +1425,7 @@ function WebGLRenderer( parameters ) {
 
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
-		object.onBeforeRender( _this, scene, camera, geometry, material, group );
+		object.onBeforeRender( _this, scene, camera, geometry, material, group, _currentViewport );
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
@@ -1453,7 +1444,7 @@ function WebGLRenderer( parameters ) {
 
 		} else {
 
-			_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
+			_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group, _currentViewport );
 
 		}
 
