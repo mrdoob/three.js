@@ -1,0 +1,3 @@
+<Files *.js>
+SetOutputFilter DEFLATE
+</Files>
