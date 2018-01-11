@@ -16,6 +16,8 @@ function SkinnedMesh( geometry, material ) {
 
 	this.type = 'SkinnedMesh';
 
+	this.childBoneMap = {};
+
 	this.bindMode = 'attached';
 	this.bindMatrix = new Matrix4();
 	this.bindMatrixInverse = new Matrix4();
@@ -194,6 +196,46 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			console.warn( 'THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode );
 
 		}
+
+	},
+
+	getParentBoneOf: function ( object ) {
+
+		return this.childBoneMap[ object.uuid ];
+
+	},
+
+	addToBone: function ( bone, object ) {
+
+		if ( object.isObject3D !== true ) {
+
+			return;
+
+		}
+
+		this.add( object );
+		this.childBoneMap[ object.uuid ] = bone;
+
+	},
+
+	removeFromBone: function ( object ) {
+
+		if ( object.isObject3D !== true ) {
+
+			return;
+
+		}
+
+		this.remove( object );
+		delete this.childBoneMap[ object.uuid ];
+
+	},
+
+	getBoneMatrixWorld: function ( bone, optionalTarget ) {
+
+		var result = optionalTarget || new Matrix4();
+
+		return result.multiplyMatrices( this.matrixWorld, bone.matrixWorld );
 
 	},
 

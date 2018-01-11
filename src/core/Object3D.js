@@ -589,7 +589,16 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			} else {
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+				if ( this.parent.isSkinnedMesh === true && this.parent.getParentBoneOf( this ) !== undefined ) {
+
+					this.parent.getBoneMatrixWorld( this.parent.getParentBoneOf( this ), this.matrixWorld );
+					this.matrixWorld.multiply( this.matrix );
+
+				} else {
+
+					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+
+				}
 
 			}
 
