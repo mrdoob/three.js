@@ -39,8 +39,7 @@
 
 		<script src="js/effects/ParallaxBarrierEffect.js"></script>
 
-		<script src="js/libs/inflate.min.js"></script>
-		<script src="js/loaders/FBXLoader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -79,12 +78,21 @@
 				scene.add( hemi );
 
 				var direct = new THREE.DirectionalLight( 0xffffff );
-				direct.position.set( 5, 5, 0 );
+				direct.position.set( -6, 7, 2 );
+				direct.castShadow = true;
+				direct.shadow.camera.top = 3;
+				direct.shadow.camera.bottom = -3;
+				direct.shadow.camera.left = -3;
+				direct.shadow.camera.right = 3;
+				direct.shadow.camera.near = 7;
+				direct.shadow.camera.far = 11;
+				direct.shadow.radius = 2;
 				scene.add( direct );
 
 				// ground
 				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
+				mesh.receiveShadow = true;
 				scene.add( mesh );
 
 				var grid = new THREE.GridHelper( 100, 50, 0x000000, 0x000000 );
@@ -95,15 +103,24 @@
 				var width = window.innerWidth || 2;
 				var height = window.innerHeight || 2;
 
-				var loader = new THREE.FBXLoader();
-				loader.load( 'models/fbx/viper.fbx', function ( object ) {
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'models/gltf/viper/viper.gltf', function ( gltf ) {
 
+					var object = gltf.scene;
 					object.traverse( function ( child ) {
 
 						if ( child.isMesh ) {
-
+							console.log( child )
 							child.material.envMap = textureCube;
-							child.material.reflectivity = 0.5;
+							child.material.metalness = 0.4;
+							child.material.roughness = 0.15;
+
+							if( child.name === 'body' || child.name === 'back_piece_inner'  ) {
+
+								child.castShadow = true;
+								child.material.side = THREE.DoubleSide;
+							}
+
 
 						}
 
@@ -116,6 +133,8 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.renderSingleSided = false;
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.ParallaxBarrierEffect( renderer );
@@ -146,13 +165,13 @@
 
 				render();
 
+				stats.update();
+
 			}
 
 			function render() {
 
 				effect.render( scene, camera );
-
-				stats.update();
 
 			}
 
