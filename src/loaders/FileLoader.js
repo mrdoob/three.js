@@ -176,7 +176,7 @@ Object.assign( FileLoader.prototype, {
 
 				delete loading[ url ];
 
-				if ( this.status >= 200 && this.status < 400 ) {
+				if ( this.status === 200 || this.status === 206 ) {
 
 					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
