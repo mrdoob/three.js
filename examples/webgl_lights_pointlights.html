@@ -34,7 +34,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -63,10 +63,10 @@
 				scene = new THREE.Scene();
 
 				//model
-				var loader = new THREE.OBJLoader();
-				loader.load( 'models/obj/walt/WaltHead.obj', function ( obj ) {
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'models/gltf/walt/WaltHead.gltf', function ( gltf ) {
 
-					object = obj;
+					object = gltf.scene.children[ 0 ];
 					object.scale.multiplyScalar( 0.8 );
 					object.position.y = - 30;
 					scene.add( object );
