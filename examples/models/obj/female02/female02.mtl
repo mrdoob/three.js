@@ -1,0 +1,67 @@
+# Material Count: 6
+newmtl FrontColorNoCullingID__01_-_Default1noCulli
+Ns 154.901961
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.165000 0.165000 0.165000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 01_-_Default1noCulling.JPG
+
+
+newmtl _02_-_Default1noCulli__02_-_Default1noCulli
+Ns 154.901961
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.165000 0.165000 0.165000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 02_-_Default1noCulling.JPG
+
+
+newmtl _01_-_Default1noCulli__01_-_Default1noCulli
+Ns 154.901961
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.165000 0.165000 0.165000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 01_-_Default1noCulling.JPG
+
+
+newmtl FrontColorNoCullingID__03_-_Default1noCulli
+Ns 154.901961
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.165000 0.165000 0.165000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 03_-_Default1noCulling.JPG
+
+
+newmtl _03_-_Default1noCulli__03_-_Default1noCulli
+Ns 154.901961
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.165000 0.165000 0.165000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 03_-_Default1noCulling.JPG
+
+
+newmtl FrontColorNoCullingID__02_-_Default1noCulli
+Ns 154.901961
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.165000 0.165000 0.165000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 02_-_Default1noCulling.JPG
+
+
