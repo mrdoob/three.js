@@ -29,6 +29,20 @@
 			a:hover {
 				color: #0080ff;
 			}
+			@media screen and (max-width: 1000px) and (min-width: 0px) {
+				iframe{
+					min-height: calc(50vh - 1.5em);
+					width:100vw; height:50vw;
+				}
+			}
+			@media screen and (min-width: 1001px){
+				iframe{
+					width:49vw; height:calc(100vh - 1.5em);
+				}
+			}
+			iframe{
+				border: 0;
+			}
 		</style>
 	</head>
 	<body>
@@ -36,15 +50,13 @@
 			style="width:30vw; height:30vw;"
 			src="http://groovemechanic.net/three.js.compress/examples/webgl_lights_rectarealight.html"
 		></iframe> -->
-		<span>Original 202kb</span>
-		<iframe
-			style="width:30vw; height:30vw;"
-			src="./webgl_lights_rectarealight.html"
-		></iframe>
-		<span>Compesssed 29kb</span>
-		<iframe
-			style="width:30vw; height:30vw;"
-			src="./webgl_lights_rectarealight_compressed.html"
-		></iframe>
+		<div style="display: inline-block">
+			<span>Original 301kb</span><br/>
+			<iframe src="./webgl_lights_rectarealight.html" ></iframe>
+		</div>
+		<div style="display: inline-block">
+			<span>Compesssed 24kb</span><br/>
+			<iframe src="./webgl_lights_rectarealight_compressed.html" ></iframe>
+		</div>
 	</body>
 </html>

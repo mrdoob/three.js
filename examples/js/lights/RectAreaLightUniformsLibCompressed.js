@@ -11,7 +11,7 @@
  *       the large texture data before including the full RectAreaLight implementation
  *       in the main build files.
  *
- * TODO: figure out a way to compress the LTC BRDF data
+ * Done???: figure out a way to compress the LTC BRDF data
  */
 
 // Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
