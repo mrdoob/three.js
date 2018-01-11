@@ -116,7 +116,9 @@ function WebGLUtils( gl, extensions ) {
 			extension = extensions.get( 'WEBGL_compressed_texture_astc' );
 
 			if ( extension !== null ) {
+
 				return p;
+
 			}
 
 		}

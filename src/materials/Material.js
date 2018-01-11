@@ -44,6 +44,8 @@ function Material() {
 	this.clipIntersection = false;
 	this.clipShadows = false;
 
+	this.shadowSide = null;
+
 	this.colorWrite = true;
 
 	this.precision = null; // override the renderer's default precision for this material
@@ -350,6 +352,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		}
 
 		this.clippingPlanes = dstPlanes;
+
+		this.shadowSide = source.shadowSide;
 
 		return this;
 

@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.ScreenUVNode = function( resolution ) {
+THREE.ScreenUVNode = function ( resolution ) {
 
 	THREE.TempNode.call( this, 'v2' );
 
@@ -12,8 +12,9 @@ THREE.ScreenUVNode = function( resolution ) {
 
 THREE.ScreenUVNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.ScreenUVNode.prototype.constructor = THREE.ScreenUVNode;
+THREE.ScreenUVNode.prototype.nodeType = "ScreenUV";
 
-THREE.ScreenUVNode.prototype.generate = function( builder, output ) {
+THREE.ScreenUVNode.prototype.generate = function ( builder, output ) {
 
 	var material = builder.material;
 	var result;
@@ -31,5 +32,21 @@ THREE.ScreenUVNode.prototype.generate = function( builder, output ) {
 	}
 
 	return builder.format( result, this.getType( builder ), output );
+
+};
+
+THREE.ScreenUVNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.resolution = this.resolution.toJSON( meta ).uuid;
+
+	}
+
+	return data;
 
 };

@@ -18,6 +18,7 @@ var files = {
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
 		"webgl_effects_stereo",
+		"webgl_framebuffer_texture",
 		"webgl_geometries",
 		"webgl_geometries_parametric",
 		"webgl_geometry_colors",
@@ -88,8 +89,10 @@ var files = {
 		"webgl_loader_ctm_materials",
 		"webgl_loader_draco",
 		"webgl_loader_fbx",
+		"webgl_loader_fbx_nurbs",
 		"webgl_loader_gcode",
 		"webgl_loader_gltf",
+		"webgl_loader_gltf_extensions",
 		"webgl_loader_imagebitmap",
 		"webgl_loader_json_blender",
 		"webgl_loader_json_claraio",
@@ -101,6 +104,7 @@ var files = {
 		"webgl_loader_mmd_pose",
 		"webgl_loader_mmd_audio",
 		"webgl_loader_msgpack",
+		"webgl_loader_nodes",
 		"webgl_loader_obj",
 		"webgl_loader_obj_mtl",
 		"webgl_loader_obj2",
@@ -289,7 +293,8 @@ var files = {
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
-		"webgl_simple_gi"
+		"webgl_simple_gi",
+		"webgl_tiled_forward"
 	],
 	"webgl deferred": [
 		"webgldeferred_animation"

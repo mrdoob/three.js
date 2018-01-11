@@ -341,7 +341,7 @@ var _Math = {
 
 		}
 
-		return function () {
+		return function generateUUID() {
 
 			var d0 = Math.random() * 0xffffffff | 0;
 			var d1 = Math.random() * 0xffffffff | 0;
@@ -7669,6 +7669,8 @@ function Material() {
 	this.clipIntersection = false;
 	this.clipShadows = false;
 
+	this.shadowSide = null;
+
 	this.colorWrite = true;
 
 	this.precision = null; // override the renderer's default precision for this material
@@ -7975,6 +7977,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		}
 
 		this.clippingPlanes = dstPlanes;
+
+		this.shadowSide = source.shadowSide;
 
 		return this;
 
@@ -9241,6 +9245,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		_materialCache = {};
 
+	var shadowSide = { 0: BackSide, 1: FrontSide, 2: DoubleSide };
+
 	var cubeDirections = [
 		new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
 		new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
@@ -9297,9 +9303,6 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 	this.needsUpdate = false;
 
 	this.type = PCFShadowMap;
-
-	this.renderReverseSided = true;
-	this.renderSingleSided = true;
 
 	this.render = function ( lights, scene, camera ) {
 
@@ -9557,22 +9560,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		result.visible = material.visible;
 		result.wireframe = material.wireframe;
 
-		var side = material.side;
-
-		if ( scope.renderSingleSided && side == DoubleSide ) {
-
-			side = FrontSide;
-
-		}
-
-		if ( scope.renderReverseSided ) {
-
-			if ( side === FrontSide ) side = BackSide;
-			else if ( side === BackSide ) side = FrontSide;
-
-		}
-
-		result.side = side;
+		result.side = ( material.shadowSide != null ) ? material.shadowSide : shadowSide[ material.side ];
 
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;
@@ -17311,13 +17299,11 @@ function WebGLLights() {
 
 				var uniforms = cache.get( light );
 
-				// (a) intensity controls irradiance of entire light
-				uniforms.color
-					.copy( color )
-					.multiplyScalar( intensity / ( light.width * light.height ) );
+				// (a) intensity is the total visible light emitted
+				//uniforms.color.copy( color ).multiplyScalar( intensity / ( light.width * light.height * Math.PI ) );
 
-				// (b) intensity controls the radiance per light area
-				// uniforms.color.copy( color ).multiplyScalar( intensity );
+				// (b) intensity is the brightness of the light
+				uniforms.color.copy( color ).multiplyScalar( intensity );
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 				uniforms.position.applyMatrix4( viewMatrix );
@@ -17448,7 +17434,7 @@ function WebGLObjects( geometries, infoRender ) {
 
 	}
 
-	function clear() {
+	function dispose() {
 
 		updateList = {};
 
@@ -17457,7 +17443,7 @@ function WebGLObjects( geometries, infoRender ) {
 	return {
 
 		update: update,
-		clear: clear
+		dispose: dispose
 
 	};
 
@@ -18044,9 +18030,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	gl.linkProgram( program );
 
-	var programLog = gl.getProgramInfoLog( program );
-	var vertexLog = gl.getShaderInfoLog( glVertexShader );
-	var fragmentLog = gl.getShaderInfoLog( glFragmentShader );
+	var programLog = gl.getProgramInfoLog( program ).trim();
+	var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
+	var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
 
 	var runnable = true;
 	var haveDiagnostics = true;
@@ -18485,9 +18471,9 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory ) {
+function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory, infoRender ) {
 
-	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof window.WebGL2RenderingContext );
+	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 	var _videoTextures = {};
 
 	//
@@ -18679,6 +18665,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function setTexture2D( texture, slot ) {
 
 		var textureProperties = properties.get( texture );
+
+		if ( texture.isVideoTexture ) updateVideoTexture( texture );
 
 		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
 
@@ -18890,12 +18878,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			texture.addEventListener( 'dispose', onTextureDispose );
 
 			textureProperties.__webglTexture = _gl.createTexture();
-
-			if ( texture.isVideoTexture ) {
-
-				_videoTextures[ texture.id ] = texture;
-
-			}
 
 			infoMemory.textures ++;
 
@@ -19278,11 +19260,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function updateVideoTextures() {
+	function updateVideoTexture( texture ) {
 
-		for ( var id in _videoTextures ) {
+		var id = texture.id;
+		var frame = infoRender.frame;
 
-			_videoTextures[ id ].update();
+		// Check the last frame we updated the VideoTexture
+
+		if ( _videoTextures[ id ] !== frame ) {
+
+			_videoTextures[ id ] = frame;
+			texture.update();
 
 		}
 
@@ -19293,7 +19281,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	this.setTextureCubeDynamic = setTextureCubeDynamic;
 	this.setupRenderTarget = setupRenderTarget;
 	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
-	this.updateVideoTextures = updateVideoTextures;
 
 }
 
@@ -19327,7 +19314,7 @@ function WebGLProperties() {
 
 	}
 
-	function clear() {
+	function dispose() {
 
 		properties = {};
 
@@ -19336,7 +19323,7 @@ function WebGLProperties() {
 	return {
 		get: get,
 		remove: remove,
-		clear: clear
+		dispose: dispose
 	};
 
 }
@@ -21196,7 +21183,9 @@ function WebGLUtils( gl, extensions ) {
 			extension = extensions.get( 'WEBGL_compressed_texture_astc' );
 
 			if ( extension !== null ) {
+
 				return p;
+
 			}
 
 		}
@@ -21377,9 +21366,21 @@ function WebGLRenderer( parameters ) {
 
 		render: _infoRender,
 		memory: _infoMemory,
-		programs: null
+		programs: null,
+		autoReset: true,
+		reset: resetInfo
 
 	};
+
+	function resetInfo () {
+
+		_infoRender.frame ++;
+		_infoRender.calls = 0;
+		_infoRender.vertices = 0;
+		_infoRender.faces = 0;
+		_infoRender.points = 0;
+
+	}
 
 	function getTargetPixelRatio() {
 
@@ -21472,7 +21473,7 @@ function WebGLRenderer( parameters ) {
 		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
 		properties = new WebGLProperties();
-		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, _infoMemory );
+		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, _infoMemory, _infoRender );
 		attributes = new WebGLAttributes( _gl );
 		geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
 		objects = new WebGLObjects( geometries, _infoRender );
@@ -21709,6 +21710,8 @@ function WebGLRenderer( parameters ) {
 		_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 
 		renderLists.dispose();
+		properties.dispose();
+		objects.dispose();
 
 		vr.dispose();
 
@@ -22304,6 +22307,8 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		scene.onBeforeRender( _this, scene, camera, renderTarget );
+
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
@@ -22329,10 +22334,6 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		textures.updateVideoTextures();
-
-		//
-
 		if ( _clippingEnabled ) _clipping.beginShadows();
 
 		shadowMap.render( shadowsArray, scene, camera );
@@ -22343,11 +22344,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		_infoRender.frame ++;
-		_infoRender.calls = 0;
-		_infoRender.vertices = 0;
-		_infoRender.faces = 0;
-		_infoRender.points = 0;
+		if ( this.info.autoReset ) this.info.reset();
 
 		if ( renderTarget === undefined ) {
 
@@ -22405,6 +22402,8 @@ function WebGLRenderer( parameters ) {
 		state.buffers.color.setMask( true );
 
 		state.setPolygonOffset( false );
+
+		scene.onAfterRender( _this, scene, camera, renderTarget );
 
 		if ( vr.enabled ) {
 
@@ -23758,6 +23757,18 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.copyFramebufferToTexture = function ( x, y, texture, level ) {
+
+		var width = texture.image.width;
+		var height = texture.image.height;
+		var internalFormat = utils.convert( texture.format );
+
+		this.setTexture2D( texture, 0 );
+
+		_gl.copyTexImage2D( _gl.TEXTURE_2D, level || 0, internalFormat, x, y, width, height, 0 );
+
+	};
+
 }
 
 /**
@@ -24406,6 +24417,24 @@ Object.assign( Skeleton.prototype, {
 	clone: function () {
 
 		return new Skeleton( this.bones, this.boneInverses );
+
+	},
+
+	getBoneByName: function ( name ) {
+
+		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
+
+			var bone = this.bones[ i ];
+
+			if ( bone.name === name ) {
+
+				return bone;
+
+			}
+
+		}
+
+		return undefined;
 
 	}
 
@@ -25129,19 +25158,6 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.generateMipmaps = false;
-
-	// Set needsUpdate when first frame is ready
-
-	var scope = this;
-
-	function onLoaded() {
-
-		video.removeEventListener( 'loadeddata', onLoaded, false );
-		scope.needsUpdate = true;
-
-	}
-
-	video.addEventListener( 'loadeddata', onLoaded, false );
 
 }
 
@@ -33794,21 +33810,11 @@ function RectAreaLight( color, intensity, width, height ) {
 
 	this.type = 'RectAreaLight';
 
-	this.position.set( 0, 1, 0 );
-	this.updateMatrix();
-
 	this.width = ( width !== undefined ) ? width : 10;
 	this.height = ( height !== undefined ) ? height : 10;
 
-	// TODO (abelnation): distance/decay
-
-	// TODO (abelnation): update method for RectAreaLight to update transform to lookat target
-
-	// TODO (abelnation): shadows
-
 }
 
-// TODO (abelnation): RectAreaLight update when light shape is changed
 RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	constructor: RectAreaLight,
@@ -36710,7 +36716,7 @@ Object.assign( JSONLoader.prototype, {
 
 		}
 
-		return function ( json, texturePath ) {
+		return function parse( json, texturePath ) {
 
 			if ( json.data !== undefined ) {
 
@@ -37284,286 +37290,280 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parseObject: function () {
+	parseObject: function ( data, geometries, materials ) {
 
-		var matrix = new Matrix4();
+		var object;
 
-		return function parseObject( data, geometries, materials ) {
+		function getGeometry( name ) {
 
-			var object;
+			if ( geometries[ name ] === undefined ) {
 
-			function getGeometry( name ) {
-
-				if ( geometries[ name ] === undefined ) {
-
-					console.warn( 'THREE.ObjectLoader: Undefined geometry', name );
-
-				}
-
-				return geometries[ name ];
+				console.warn( 'THREE.ObjectLoader: Undefined geometry', name );
 
 			}
 
-			function getMaterial( name ) {
+			return geometries[ name ];
 
-				if ( name === undefined ) return undefined;
+		}
 
-				if ( Array.isArray( name ) ) {
+		function getMaterial( name ) {
 
-					var array = [];
+			if ( name === undefined ) return undefined;
 
-					for ( var i = 0, l = name.length; i < l; i ++ ) {
+			if ( Array.isArray( name ) ) {
 
-						var uuid = name[ i ];
+				var array = [];
 
-						if ( materials[ uuid ] === undefined ) {
+				for ( var i = 0, l = name.length; i < l; i ++ ) {
 
-							console.warn( 'THREE.ObjectLoader: Undefined material', uuid );
+					var uuid = name[ i ];
 
-						}
+					if ( materials[ uuid ] === undefined ) {
 
-						array.push( materials[ uuid ] );
+						console.warn( 'THREE.ObjectLoader: Undefined material', uuid );
 
 					}
 
-					return array;
+					array.push( materials[ uuid ] );
 
 				}
 
-				if ( materials[ name ] === undefined ) {
-
-					console.warn( 'THREE.ObjectLoader: Undefined material', name );
-
-				}
-
-				return materials[ name ];
+				return array;
 
 			}
 
-			switch ( data.type ) {
+			if ( materials[ name ] === undefined ) {
 
-				case 'Scene':
-
-					object = new Scene();
-
-					if ( data.background !== undefined ) {
-
-						if ( Number.isInteger( data.background ) ) {
-
-							object.background = new Color( data.background );
-
-						}
-
-					}
-
-					if ( data.fog !== undefined ) {
-
-						if ( data.fog.type === 'Fog' ) {
-
-							object.fog = new Fog( data.fog.color, data.fog.near, data.fog.far );
-
-						} else if ( data.fog.type === 'FogExp2' ) {
-
-							object.fog = new FogExp2( data.fog.color, data.fog.density );
-
-						}
-
-					}
-
-					break;
-
-				case 'PerspectiveCamera':
-
-					object = new PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
-
-					if ( data.focus !== undefined ) object.focus = data.focus;
-					if ( data.zoom !== undefined ) object.zoom = data.zoom;
-					if ( data.filmGauge !== undefined ) object.filmGauge = data.filmGauge;
-					if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
-					if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
-
-					break;
-
-				case 'OrthographicCamera':
-
-					object = new OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
-
-					break;
-
-				case 'AmbientLight':
-
-					object = new AmbientLight( data.color, data.intensity );
-
-					break;
-
-				case 'DirectionalLight':
-
-					object = new DirectionalLight( data.color, data.intensity );
-
-					break;
-
-				case 'PointLight':
-
-					object = new PointLight( data.color, data.intensity, data.distance, data.decay );
-
-					break;
-
-				case 'RectAreaLight':
-
-					object = new RectAreaLight( data.color, data.intensity, data.width, data.height );
-
-					break;
-
-				case 'SpotLight':
-
-					object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
-
-					break;
-
-				case 'HemisphereLight':
-
-					object = new HemisphereLight( data.color, data.groundColor, data.intensity );
-
-					break;
-
-				case 'SkinnedMesh':
-
-					console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
-
-				case 'Mesh':
-
-					var geometry = getGeometry( data.geometry );
-					var material = getMaterial( data.material );
-
-					if ( geometry.bones && geometry.bones.length > 0 ) {
-
-						object = new SkinnedMesh( geometry, material );
-
-					} else {
-
-						object = new Mesh( geometry, material );
-
-					}
-
-					break;
-
-				case 'LOD':
-
-					object = new LOD();
-
-					break;
-
-				case 'Line':
-
-					object = new Line( getGeometry( data.geometry ), getMaterial( data.material ), data.mode );
-
-					break;
-
-				case 'LineLoop':
-
-					object = new LineLoop( getGeometry( data.geometry ), getMaterial( data.material ) );
-
-					break;
-
-				case 'LineSegments':
-
-					object = new LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
-
-					break;
-
-				case 'PointCloud':
-				case 'Points':
-
-					object = new Points( getGeometry( data.geometry ), getMaterial( data.material ) );
-
-					break;
-
-				case 'Sprite':
-
-					object = new Sprite( getMaterial( data.material ) );
-
-					break;
-
-				case 'Group':
-
-					object = new Group();
-
-					break;
-
-				default:
-
-					object = new Object3D();
+				console.warn( 'THREE.ObjectLoader: Undefined material', name );
 
 			}
 
-			object.uuid = data.uuid;
+			return materials[ name ];
 
-			if ( data.name !== undefined ) object.name = data.name;
-			if ( data.matrix !== undefined ) {
+		}
 
-				matrix.fromArray( data.matrix );
-				matrix.decompose( object.position, object.quaternion, object.scale );
+		switch ( data.type ) {
 
-			} else {
+			case 'Scene':
 
-				if ( data.position !== undefined ) object.position.fromArray( data.position );
-				if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
-				if ( data.quaternion !== undefined ) object.quaternion.fromArray( data.quaternion );
-				if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
+				object = new Scene();
 
-			}
+				if ( data.background !== undefined ) {
 
-			if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
-			if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
+					if ( Number.isInteger( data.background ) ) {
 
-			if ( data.shadow ) {
-
-				if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
-				if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
-				if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
-				if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
-
-			}
-
-			if ( data.visible !== undefined ) object.visible = data.visible;
-			if ( data.userData !== undefined ) object.userData = data.userData;
-
-			if ( data.children !== undefined ) {
-
-				var children = data.children;
-
-				for ( var i = 0; i < children.length; i ++ ) {
-
-					object.add( this.parseObject( children[ i ], geometries, materials ) );
-
-				}
-
-			}
-
-			if ( data.type === 'LOD' ) {
-
-				var levels = data.levels;
-
-				for ( var l = 0; l < levels.length; l ++ ) {
-
-					var level = levels[ l ];
-					var child = object.getObjectByProperty( 'uuid', level.object );
-
-					if ( child !== undefined ) {
-
-						object.addLevel( child, level.distance );
+						object.background = new Color( data.background );
 
 					}
 
 				}
 
+				if ( data.fog !== undefined ) {
+
+					if ( data.fog.type === 'Fog' ) {
+
+						object.fog = new Fog( data.fog.color, data.fog.near, data.fog.far );
+
+					} else if ( data.fog.type === 'FogExp2' ) {
+
+						object.fog = new FogExp2( data.fog.color, data.fog.density );
+
+					}
+
+				}
+
+				break;
+
+			case 'PerspectiveCamera':
+
+				object = new PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
+
+				if ( data.focus !== undefined ) object.focus = data.focus;
+				if ( data.zoom !== undefined ) object.zoom = data.zoom;
+				if ( data.filmGauge !== undefined ) object.filmGauge = data.filmGauge;
+				if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
+				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+
+				break;
+
+			case 'OrthographicCamera':
+
+				object = new OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
+
+				break;
+
+			case 'AmbientLight':
+
+				object = new AmbientLight( data.color, data.intensity );
+
+				break;
+
+			case 'DirectionalLight':
+
+				object = new DirectionalLight( data.color, data.intensity );
+
+				break;
+
+			case 'PointLight':
+
+				object = new PointLight( data.color, data.intensity, data.distance, data.decay );
+
+				break;
+
+			case 'RectAreaLight':
+
+				object = new RectAreaLight( data.color, data.intensity, data.width, data.height );
+
+				break;
+
+			case 'SpotLight':
+
+				object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
+
+				break;
+
+			case 'HemisphereLight':
+
+				object = new HemisphereLight( data.color, data.groundColor, data.intensity );
+
+				break;
+
+			case 'SkinnedMesh':
+
+				console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
+
+			case 'Mesh':
+
+				var geometry = getGeometry( data.geometry );
+				var material = getMaterial( data.material );
+
+				if ( geometry.bones && geometry.bones.length > 0 ) {
+
+					object = new SkinnedMesh( geometry, material );
+
+				} else {
+
+					object = new Mesh( geometry, material );
+
+				}
+
+				break;
+
+			case 'LOD':
+
+				object = new LOD();
+
+				break;
+
+			case 'Line':
+
+				object = new Line( getGeometry( data.geometry ), getMaterial( data.material ), data.mode );
+
+				break;
+
+			case 'LineLoop':
+
+				object = new LineLoop( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+				break;
+
+			case 'LineSegments':
+
+				object = new LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+				break;
+
+			case 'PointCloud':
+			case 'Points':
+
+				object = new Points( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+				break;
+
+			case 'Sprite':
+
+				object = new Sprite( getMaterial( data.material ) );
+
+				break;
+
+			case 'Group':
+
+				object = new Group();
+
+				break;
+
+			default:
+
+				object = new Object3D();
+
+		}
+
+		object.uuid = data.uuid;
+
+		if ( data.name !== undefined ) object.name = data.name;
+		if ( data.matrix !== undefined ) {
+
+			object.matrix.fromArray( data.matrix );
+			object.matrix.decompose( object.position, object.quaternion, object.scale );
+
+		} else {
+
+			if ( data.position !== undefined ) object.position.fromArray( data.position );
+			if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
+			if ( data.quaternion !== undefined ) object.quaternion.fromArray( data.quaternion );
+			if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
+
+		}
+
+		if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
+		if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
+
+		if ( data.shadow ) {
+
+			if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
+			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
+			if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
+			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
+
+		}
+
+		if ( data.visible !== undefined ) object.visible = data.visible;
+		if ( data.userData !== undefined ) object.userData = data.userData;
+
+		if ( data.children !== undefined ) {
+
+			var children = data.children;
+
+			for ( var i = 0; i < children.length; i ++ ) {
+
+				object.add( this.parseObject( children[ i ], geometries, materials ) );
+
 			}
 
-			return object;
+		}
 
-		};
+		if ( data.type === 'LOD' ) {
 
-	}()
+			var levels = data.levels;
+
+			for ( var l = 0; l < levels.length; l ++ ) {
+
+				var level = levels[ l ];
+				var child = object.getObjectByProperty( 'uuid', level.object );
+
+				if ( child !== undefined ) {
+
+					object.addLevel( child, level.distance );
+
+				}
+
+			}
+
+		}
+
+		return object;
+
+	}
 
 } );
 
@@ -39331,7 +39331,7 @@ Object.assign( PropertyBinding, {
 
 		var reservedRe = new RegExp( '[' + RESERVED_CHARS_RE + ']', 'g' );
 
-		return function sanitizeNodeName ( name ) {
+		return function sanitizeNodeName( name ) {
 
 			return name.replace( /\s/g, '_' ).replace( reservedRe, '' );
 
@@ -39373,7 +39373,7 @@ Object.assign( PropertyBinding, {
 
 		var supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
-		return function ( trackName ) {
+		return function parseTrackName( trackName ) {
 
 			var matches = trackRe.exec( trackName );
 
@@ -39434,27 +39434,9 @@ Object.assign( PropertyBinding, {
 		// search into skeleton bones.
 		if ( root.skeleton ) {
 
-			var searchSkeleton = function ( skeleton ) {
+			var bone = root.skeleton.getBoneByName( nodeName );
 
-				for ( var i = 0; i < skeleton.bones.length; i ++ ) {
-
-					var bone = skeleton.bones[ i ];
-
-					if ( bone.name === nodeName ) {
-
-						return bone;
-
-					}
-
-				}
-
-				return null;
-
-			};
-
-			var bone = searchSkeleton( root.skeleton );
-
-			if ( bone ) {
+			if ( bone !== undefined ) {
 
 				return bone;
 
@@ -40050,14 +40032,14 @@ Object.assign( AnimationObjectGroup.prototype, {
 			paths = this._paths,
 			parsedPaths = this._parsedPaths,
 			bindings = this._bindings,
-			nBindings = bindings.length;
+			nBindings = bindings.length,
+			knownObject = undefined;
 
 		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
 
 			var object = arguments[ i ],
 				uuid = object.uuid,
-				index = indicesByUUID[ uuid ],
-				knownObject = undefined;
+				index = indicesByUUID[ uuid ];
 
 			if ( index === undefined ) {
 
@@ -43938,45 +43920,6 @@ AxesHelper.prototype = Object.create( LineSegments.prototype );
 AxesHelper.prototype.constructor = AxesHelper;
 
 /**
- * @author alteredq / http://alteredqualia.com/
- */
-
-var SceneUtils = {
-
-	createMultiMaterialObject: function ( geometry, materials ) {
-
-		var group = new Group();
-
-		for ( var i = 0, l = materials.length; i < l; i ++ ) {
-
-			group.add( new Mesh( geometry, materials[ i ] ) );
-
-		}
-
-		return group;
-
-	},
-
-	detach: function ( child, parent, scene ) {
-
-		child.applyMatrix( parent.matrixWorld );
-		parent.remove( child );
-		scene.add( child );
-
-	},
-
-	attach: function ( child, scene, parent ) {
-
-		child.applyMatrix( new Matrix4().getInverse( parent.matrixWorld ) );
-
-		scene.remove( child );
-		parent.add( child );
-
-	}
-
-};
-
-/**
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -45272,13 +45215,13 @@ Object.defineProperties( WebGLRenderer.prototype, {
 	shadowMapCullFace: {
 		get: function () {
 
-			return this.shadowMap.cullFace;
+			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.' );
+			return undefined;
 
 		},
 		set: function ( value ) {
 
-			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
-			this.shadowMap.cullFace = value;
+			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.' );
 
 		}
 	}
@@ -45289,14 +45232,39 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 	cullFace: {
 		get: function () {
 
-			return this.renderReverseSided ? CullFaceFront : CullFaceBack;
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.' );
+			return undefined;
 
 		},
 		set: function ( cullFace ) {
 
-			var value = ( cullFace !== CullFaceBack );
-			console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. Set .shadowMap.renderReverseSided to " + value + "." );
-			this.renderReverseSided = value;
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.' );
+
+		}
+	},
+	renderReverseSided: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderReverseSided has been removed. Set Material.shadowSide instead.' );
+			return undefined;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderReverseSided has been removed. Set Material.shadowSide instead.' );
+
+		}
+	},
+	renderSingleSided: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderSingleSided has been removed. Set Material.shadowSide instead.' );
+			return undefined;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderSingleSided has been removed. Set Material.shadowSide instead.' );
 
 		}
 	}
@@ -45627,4 +45595,28 @@ function CanvasRenderer() {
 
 }
 
-export { WebGLRenderTargetCube, WebGLRenderTarget, WebGLRenderer, ShaderLib, UniformsLib, UniformsUtils, ShaderChunk, FogExp2, Fog, Scene, LensFlare, Sprite, LOD, SkinnedMesh, Skeleton, Bone, Mesh, LineSegments, LineLoop, Line, Points, Group, VideoTexture, DataTexture, CompressedTexture, CubeTexture, CanvasTexture, DepthTexture, Texture, CompressedTextureLoader, DataTextureLoader, CubeTextureLoader, TextureLoader, ObjectLoader, MaterialLoader, BufferGeometryLoader, DefaultLoadingManager, LoadingManager, JSONLoader, ImageLoader, ImageBitmapLoader, FontLoader, FileLoader, Loader, LoaderUtils, Cache, AudioLoader, SpotLightShadow, SpotLight, PointLight, RectAreaLight, HemisphereLight, DirectionalLightShadow, DirectionalLight, AmbientLight, LightShadow, Light, StereoCamera, PerspectiveCamera, OrthographicCamera, CubeCamera, ArrayCamera, Camera, AudioListener, PositionalAudio, AudioContext, AudioAnalyser, Audio, VectorKeyframeTrack, StringKeyframeTrack, QuaternionKeyframeTrack, NumberKeyframeTrack, ColorKeyframeTrack, BooleanKeyframeTrack, PropertyMixer, PropertyBinding, KeyframeTrack, AnimationUtils, AnimationObjectGroup, AnimationMixer, AnimationClip, Uniform, InstancedBufferGeometry, BufferGeometry, Geometry, InterleavedBufferAttribute, InstancedInterleavedBuffer, InterleavedBuffer, InstancedBufferAttribute, Face3, Object3D, Raycaster, Layers, EventDispatcher, Clock, QuaternionLinearInterpolant, LinearInterpolant, DiscreteInterpolant, CubicInterpolant, Interpolant, Triangle, _Math as Math, Spherical, Cylindrical, Plane, Frustum, Sphere, Ray, Matrix4, Matrix3, Box3, Box2, Line3, Euler, Vector4, Vector3, Vector2, Quaternion, Color, ImmediateRenderObject, VertexNormalsHelper, SpotLightHelper, SkeletonHelper, PointLightHelper, RectAreaLightHelper, HemisphereLightHelper, GridHelper, PolarGridHelper, FaceNormalsHelper, DirectionalLightHelper, CameraHelper, BoxHelper, Box3Helper, PlaneHelper, ArrowHelper, AxesHelper, Shape, Path, ShapePath, Font, CurvePath, Curve, ShapeUtils, SceneUtils, WebGLUtils, WireframeGeometry, ParametricGeometry, ParametricBufferGeometry, TetrahedronGeometry, TetrahedronBufferGeometry, OctahedronGeometry, OctahedronBufferGeometry, IcosahedronGeometry, IcosahedronBufferGeometry, DodecahedronGeometry, DodecahedronBufferGeometry, PolyhedronGeometry, PolyhedronBufferGeometry, TubeGeometry, TubeBufferGeometry, TorusKnotGeometry, TorusKnotBufferGeometry, TorusGeometry, TorusBufferGeometry, TextGeometry, TextBufferGeometry, SphereGeometry, SphereBufferGeometry, RingGeometry, RingBufferGeometry, PlaneGeometry, PlaneBufferGeometry, LatheGeometry, LatheBufferGeometry, ShapeGeometry, ShapeBufferGeometry, ExtrudeGeometry, ExtrudeBufferGeometry, EdgesGeometry, ConeGeometry, ConeBufferGeometry, CylinderGeometry, CylinderBufferGeometry, CircleGeometry, CircleBufferGeometry, BoxGeometry, BoxBufferGeometry, ShadowMaterial, SpriteMaterial, RawShaderMaterial, ShaderMaterial, PointsMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshPhongMaterial, MeshToonMaterial, MeshNormalMaterial, MeshLambertMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshBasicMaterial, LineDashedMaterial, LineBasicMaterial, Material, Float64BufferAttribute, Float32BufferAttribute, Uint32BufferAttribute, Int32BufferAttribute, Uint16BufferAttribute, Int16BufferAttribute, Uint8ClampedBufferAttribute, Uint8BufferAttribute, Int8BufferAttribute, BufferAttribute, ArcCurve, CatmullRomCurve3, CubicBezierCurve, CubicBezierCurve3, EllipseCurve, LineCurve, LineCurve3, QuadraticBezierCurve, QuadraticBezierCurve3, SplineCurve, REVISION, MOUSE, CullFaceNone, CullFaceBack, CullFaceFront, CullFaceFrontBack, FrontFaceDirectionCW, FrontFaceDirectionCCW, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, FrontSide, BackSide, DoubleSide, FlatShading, SmoothShading, NoColors, FaceColors, VertexColors, NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth, MultiplyOperation, MixOperation, AddOperation, NoToneMapping, LinearToneMapping, ReinhardToneMapping, Uncharted2ToneMapping, CineonToneMapping, UVMapping, CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, SphericalReflectionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipMapNearestFilter, NearestMipMapLinearFilter, LinearFilter, LinearMipMapNearestFilter, LinearMipMapLinearFilter, UnsignedByteType, ByteType, ShortType, UnsignedShortType, IntType, UnsignedIntType, FloatType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedInt248Type, AlphaFormat, RGBFormat, RGBAFormat, LuminanceFormat, LuminanceAlphaFormat, RGBEFormat, DepthFormat, DepthStencilFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, LoopOnce, LoopRepeat, LoopPingPong, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, ZeroCurvatureEnding, ZeroSlopeEnding, WrapAroundEnding, TrianglesDrawMode, TriangleStripDrawMode, TriangleFanDrawMode, LinearEncoding, sRGBEncoding, GammaEncoding, RGBEEncoding, LogLuvEncoding, RGBM7Encoding, RGBM16Encoding, RGBDEncoding, BasicDepthPacking, RGBADepthPacking, BoxGeometry as CubeGeometry, Face4, LineStrip, LinePieces, MeshFaceMaterial, MultiMaterial, PointCloud, Particle, ParticleSystem, PointCloudMaterial, ParticleBasicMaterial, ParticleSystemMaterial, Vertex, DynamicBufferAttribute, Int8Attribute, Uint8Attribute, Uint8ClampedAttribute, Int16Attribute, Uint16Attribute, Int32Attribute, Uint32Attribute, Float32Attribute, Float64Attribute, ClosedSplineCurve3, SplineCurve3, Spline, AxisHelper, BoundingBoxHelper, EdgesHelper, WireframeHelper, XHRLoader, BinaryTextureLoader, GeometryUtils, ImageUtils, Projector, CanvasRenderer };
+//
+
+var SceneUtils = {
+
+	createMultiMaterialObject: function ( /* geometry, materials */ ) {
+
+		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+
+	},
+
+	detach: function ( /* child, parent, scene */ ) {
+
+		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+
+	},
+
+	attach: function ( /* child, scene, parent */ ) {
+
+		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+
+	}
+
+};
+
+export { WebGLRenderTargetCube, WebGLRenderTarget, WebGLRenderer, ShaderLib, UniformsLib, UniformsUtils, ShaderChunk, FogExp2, Fog, Scene, LensFlare, Sprite, LOD, SkinnedMesh, Skeleton, Bone, Mesh, LineSegments, LineLoop, Line, Points, Group, VideoTexture, DataTexture, CompressedTexture, CubeTexture, CanvasTexture, DepthTexture, Texture, CompressedTextureLoader, DataTextureLoader, CubeTextureLoader, TextureLoader, ObjectLoader, MaterialLoader, BufferGeometryLoader, DefaultLoadingManager, LoadingManager, JSONLoader, ImageLoader, ImageBitmapLoader, FontLoader, FileLoader, Loader, LoaderUtils, Cache, AudioLoader, SpotLightShadow, SpotLight, PointLight, RectAreaLight, HemisphereLight, DirectionalLightShadow, DirectionalLight, AmbientLight, LightShadow, Light, StereoCamera, PerspectiveCamera, OrthographicCamera, CubeCamera, ArrayCamera, Camera, AudioListener, PositionalAudio, AudioContext, AudioAnalyser, Audio, VectorKeyframeTrack, StringKeyframeTrack, QuaternionKeyframeTrack, NumberKeyframeTrack, ColorKeyframeTrack, BooleanKeyframeTrack, PropertyMixer, PropertyBinding, KeyframeTrack, AnimationUtils, AnimationObjectGroup, AnimationMixer, AnimationClip, Uniform, InstancedBufferGeometry, BufferGeometry, Geometry, InterleavedBufferAttribute, InstancedInterleavedBuffer, InterleavedBuffer, InstancedBufferAttribute, Face3, Object3D, Raycaster, Layers, EventDispatcher, Clock, QuaternionLinearInterpolant, LinearInterpolant, DiscreteInterpolant, CubicInterpolant, Interpolant, Triangle, _Math as Math, Spherical, Cylindrical, Plane, Frustum, Sphere, Ray, Matrix4, Matrix3, Box3, Box2, Line3, Euler, Vector4, Vector3, Vector2, Quaternion, Color, ImmediateRenderObject, VertexNormalsHelper, SpotLightHelper, SkeletonHelper, PointLightHelper, RectAreaLightHelper, HemisphereLightHelper, GridHelper, PolarGridHelper, FaceNormalsHelper, DirectionalLightHelper, CameraHelper, BoxHelper, Box3Helper, PlaneHelper, ArrowHelper, AxesHelper, Shape, Path, ShapePath, Font, CurvePath, Curve, ShapeUtils, WebGLUtils, WireframeGeometry, ParametricGeometry, ParametricBufferGeometry, TetrahedronGeometry, TetrahedronBufferGeometry, OctahedronGeometry, OctahedronBufferGeometry, IcosahedronGeometry, IcosahedronBufferGeometry, DodecahedronGeometry, DodecahedronBufferGeometry, PolyhedronGeometry, PolyhedronBufferGeometry, TubeGeometry, TubeBufferGeometry, TorusKnotGeometry, TorusKnotBufferGeometry, TorusGeometry, TorusBufferGeometry, TextGeometry, TextBufferGeometry, SphereGeometry, SphereBufferGeometry, RingGeometry, RingBufferGeometry, PlaneGeometry, PlaneBufferGeometry, LatheGeometry, LatheBufferGeometry, ShapeGeometry, ShapeBufferGeometry, ExtrudeGeometry, ExtrudeBufferGeometry, EdgesGeometry, ConeGeometry, ConeBufferGeometry, CylinderGeometry, CylinderBufferGeometry, CircleGeometry, CircleBufferGeometry, BoxGeometry, BoxBufferGeometry, ShadowMaterial, SpriteMaterial, RawShaderMaterial, ShaderMaterial, PointsMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshPhongMaterial, MeshToonMaterial, MeshNormalMaterial, MeshLambertMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshBasicMaterial, LineDashedMaterial, LineBasicMaterial, Material, Float64BufferAttribute, Float32BufferAttribute, Uint32BufferAttribute, Int32BufferAttribute, Uint16BufferAttribute, Int16BufferAttribute, Uint8ClampedBufferAttribute, Uint8BufferAttribute, Int8BufferAttribute, BufferAttribute, ArcCurve, CatmullRomCurve3, CubicBezierCurve, CubicBezierCurve3, EllipseCurve, LineCurve, LineCurve3, QuadraticBezierCurve, QuadraticBezierCurve3, SplineCurve, REVISION, MOUSE, CullFaceNone, CullFaceBack, CullFaceFront, CullFaceFrontBack, FrontFaceDirectionCW, FrontFaceDirectionCCW, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, FrontSide, BackSide, DoubleSide, FlatShading, SmoothShading, NoColors, FaceColors, VertexColors, NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth, MultiplyOperation, MixOperation, AddOperation, NoToneMapping, LinearToneMapping, ReinhardToneMapping, Uncharted2ToneMapping, CineonToneMapping, UVMapping, CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, SphericalReflectionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipMapNearestFilter, NearestMipMapLinearFilter, LinearFilter, LinearMipMapNearestFilter, LinearMipMapLinearFilter, UnsignedByteType, ByteType, ShortType, UnsignedShortType, IntType, UnsignedIntType, FloatType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedInt248Type, AlphaFormat, RGBFormat, RGBAFormat, LuminanceFormat, LuminanceAlphaFormat, RGBEFormat, DepthFormat, DepthStencilFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, LoopOnce, LoopRepeat, LoopPingPong, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, ZeroCurvatureEnding, ZeroSlopeEnding, WrapAroundEnding, TrianglesDrawMode, TriangleStripDrawMode, TriangleFanDrawMode, LinearEncoding, sRGBEncoding, GammaEncoding, RGBEEncoding, LogLuvEncoding, RGBM7Encoding, RGBM16Encoding, RGBDEncoding, BasicDepthPacking, RGBADepthPacking, BoxGeometry as CubeGeometry, Face4, LineStrip, LinePieces, MeshFaceMaterial, MultiMaterial, PointCloud, Particle, ParticleSystem, PointCloudMaterial, ParticleBasicMaterial, ParticleSystemMaterial, Vertex, DynamicBufferAttribute, Int8Attribute, Uint8Attribute, Uint8ClampedAttribute, Int16Attribute, Uint16Attribute, Int32Attribute, Uint32Attribute, Float32Attribute, Float64Attribute, ClosedSplineCurve3, SplineCurve3, Spline, AxisHelper, BoundingBoxHelper, EdgesHelper, WireframeHelper, XHRLoader, BinaryTextureLoader, GeometryUtils, ImageUtils, Projector, CanvasRenderer, SceneUtils };

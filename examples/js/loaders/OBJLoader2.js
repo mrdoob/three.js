@@ -1341,7 +1341,7 @@ THREE.OBJLoader2 = (function () {
 			callbackOnLoad( materials );
 		};
 
-		var mtlLoader = new THREE.MTLLoader();
+		var mtlLoader = new THREE.MTLLoader(this.manager);
 		crossOrigin = Validator.verifyInput( crossOrigin, 'anonymous' );
 		mtlLoader.setCrossOrigin( crossOrigin );
 

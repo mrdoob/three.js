@@ -859,6 +859,61 @@ THREE.GLTFLoader = ( function () {
 	}
 
 	/*********************************/
+	/********** INTERPOLATION ********/
+	/*********************************/
+
+	// Spline Interpolation
+	// Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#appendix-c-spline-interpolation
+	function GLTFCubicSplineInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+
+		THREE.Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+	};
+
+	GLTFCubicSplineInterpolant.prototype = Object.create( THREE.Interpolant.prototype );
+	GLTFCubicSplineInterpolant.prototype.constructor = GLTFCubicSplineInterpolant;
+
+	GLTFCubicSplineInterpolant.prototype.interpolate_ = function ( i1, t0, t, t1 ) {
+
+		var result = this.resultBuffer;
+		var values = this.sampleValues;
+		var stride = this.valueSize;
+
+		var stride2 = stride * 2;
+		var stride3 = stride * 3;
+
+		var td = t1 - t0;
+
+		var p = ( t - t0 ) / td;
+		var pp = p * p;
+		var ppp = pp * p;
+
+		var offset1 = i1 * stride3;
+		var offset0 = offset1 - stride3;
+
+		var s0 = 2 * ppp - 3 * pp + 1;
+		var s1 = ppp - 2 * pp + p;
+		var s2 = - 2 * ppp + 3 * pp;
+		var s3 = ppp - pp;
+
+		// Layout of keyframe output values for CUBICSPLINE animations:
+		//   [ inTangent_1, splineVertex_1, outTangent_1, inTangent_2, splineVertex_2, ... ]
+		for ( var i = 0; i !== stride; i ++ ) {
+
+			var p0 = values[ offset0 + i + stride ];        // splineVertex_k
+			var m0 = values[ offset0 + i + stride2 ] * td;  // outTangent_k * (t_k+1 - t_k)
+			var p1 = values[ offset1 + i + stride ];        // splineVertex_k+1
+			var m1 = values[ offset1 + i ] * td;            // inTangent_k+1 * (t_k+1 - t_k)
+
+			result[ i ] = s0 * p0 + s1 * m0 + s2 * p1 + s3 * m1;
+
+		}
+
+		return result;
+
+	};
+
+	/*********************************/
 	/********** INTERNALS ************/
 	/*********************************/
 
@@ -996,7 +1051,10 @@ THREE.GLTFLoader = ( function () {
 	};
 
 	var INTERPOLATION = {
-		CUBICSPLINE: THREE.InterpolateSmooth,
+		CUBICSPLINE: THREE.InterpolateSmooth, // We use custom interpolation GLTFCubicSplineInterpolation for CUBICSPLINE.
+		                                      // KeyframeTrack.optimize() can't handle glTF Cubic Spline output values layout,
+		                                      // using THREE.InterpolateSmooth for KeyframeTrack instantiation to prevent optimization.
+		                                      // See KeyframeTrack.optimize() for the detail.
 		LINEAR: THREE.InterpolateLinear,
 		STEP: THREE.InterpolateDiscrete
 	};
@@ -1100,7 +1158,7 @@ THREE.GLTFLoader = ( function () {
 				// So morphTarget value will depend on mesh's position, then cloning attribute
 				// for the case if attribute is shared among two or more meshes.
 
-				positionAttribute = accessors[ target.POSITION ].clone();
+				positionAttribute = cloneBufferAttribute( accessors[ target.POSITION ] );
 				var position = geometry.attributes.position;
 
 				for ( var j = 0, jl = positionAttribute.count; j < jl; j ++ ) {
@@ -1118,7 +1176,7 @@ THREE.GLTFLoader = ( function () {
 
 				// Copying the original position not to affect the final position.
 				// See the formula above.
-				positionAttribute = geometry.attributes.position.clone();
+				positionAttribute = cloneBufferAttribute( geometry.attributes.position );
 
 			}
 
@@ -1135,7 +1193,7 @@ THREE.GLTFLoader = ( function () {
 
 				// see target.POSITION's comment
 
-				normalAttribute = accessors[ target.NORMAL ].clone();
+				normalAttribute = cloneBufferAttribute( accessors[ target.NORMAL ] );
 				var normal = geometry.attributes.normal;
 
 				for ( var j = 0, jl = normalAttribute.count; j < jl; j ++ ) {
@@ -1151,7 +1209,7 @@ THREE.GLTFLoader = ( function () {
 
 			} else if ( geometry.attributes.normal !== undefined ) {
 
-				normalAttribute = geometry.attributes.normal.clone();
+				normalAttribute = cloneBufferAttribute( geometry.attributes.normal );
 
 			}
 
@@ -1231,6 +1289,31 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
+	function cloneBufferAttribute( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) {
+
+			var count = attribute.count;
+			var itemSize = attribute.itemSize;
+			var array = attribute.array.slice( 0, count * itemSize );
+
+			for ( var i = 0; i < count; ++ i ) {
+
+				array[ i ] = attribute.getX( i );
+				if ( itemSize >= 2 ) array[ i + 1 ] = attribute.getY( i );
+				if ( itemSize >= 3 ) array[ i + 2 ] = attribute.getZ( i );
+				if ( itemSize >= 4 ) array[ i + 3 ] = attribute.getW( i );
+
+			}
+
+			return new THREE.BufferAttribute( array, itemSize, attribute.normalized );
+
+		}
+
+		return attribute.clone();
+
+	}
+
 	/* GLTF PARSER */
 
 	function GLTFParser( json, extensions, options ) {
@@ -1256,7 +1339,6 @@ THREE.GLTFLoader = ( function () {
 	GLTFParser.prototype.parse = function ( onLoad, onError ) {
 
 		var json = this.json;
-		var parser = this;
 
 		// Clear the loader cache
 		this.cache.removeAll();
@@ -1495,6 +1577,7 @@ THREE.GLTFLoader = ( function () {
 	 */
 	GLTFParser.prototype.loadAccessor = function ( accessorIndex ) {
 
+		var parser = this;
 		var json = this.json;
 
 		var accessorDef = this.json.accessors[ accessorIndex ];
@@ -1528,6 +1611,7 @@ THREE.GLTFLoader = ( function () {
 			// For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
 			var elementBytes = TypedArray.BYTES_PER_ELEMENT;
 			var itemBytes = elementBytes * itemSize;
+			var byteOffset = accessorDef.byteOffset || 0;
 			var byteStride = json.bufferViews[ accessorDef.bufferView ].byteStride;
 			var normalized = accessorDef.normalized === true;
 			var array, bufferAttribute;
@@ -1535,13 +1619,22 @@ THREE.GLTFLoader = ( function () {
 			// The buffer is not interleaved if the stride is the item size in bytes.
 			if ( byteStride && byteStride !== itemBytes ) {
 
-				// Use the full buffer if it's interleaved.
-				array = new TypedArray( bufferView );
+				var ibCacheKey = 'InterleavedBuffer:' + accessorDef.bufferView + ':' + accessorDef.componentType;
+				var ib = parser.cache.get( ibCacheKey );
 
-				// Integer parameters to IB/IBA are in array elements, not bytes.
-				var ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
+				if ( ! ib ) {
 
-				bufferAttribute = new THREE.InterleavedBufferAttribute( ib, itemSize, accessorDef.byteOffset / elementBytes, normalized );
+					// Use the full buffer if it's interleaved.
+					array = new TypedArray( bufferView );
+
+					// Integer parameters to IB/IBA are in array elements, not bytes.
+					ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
+
+					parser.cache.add( ibCacheKey, ib );
+
+				}
+
+				bufferAttribute = new THREE.InterleavedBufferAttribute( ib, itemSize, byteOffset / elementBytes, normalized );
 
 			} else {
 
@@ -1551,7 +1644,7 @@ THREE.GLTFLoader = ( function () {
 
 				} else {
 
-					array = new TypedArray( bufferView, accessorDef.byteOffset, accessorDef.count * itemSize );
+					array = new TypedArray( bufferView, byteOffset, accessorDef.count * itemSize );
 
 				}
 
@@ -2105,19 +2198,60 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
+					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ||
+						primitive.mode === WEBGL_CONSTANTS.LINE_STRIP ||
+						primitive.mode === WEBGL_CONSTANTS.LINE_LOOP ) {
 
-						mesh = new THREE.LineSegments( geometry, material );
+						var cacheKey = 'LineBasicMaterial:' + material.uuid;
 
-					} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_STRIP ) {
+						var lineMaterial = scope.cache.get( cacheKey );
 
-						mesh = new THREE.Line( geometry, material );
+						if ( ! lineMaterial ) {
 
-					} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_LOOP ) {
+							lineMaterial = new THREE.LineBasicMaterial();
+							THREE.Material.prototype.copy.call( lineMaterial, material );
+							lineMaterial.color.copy( material.color );
+							lineMaterial.lights = false;  // LineBasicMaterial doesn't support lights yet
 
-						mesh = new THREE.LineLoop( geometry, material );
+							scope.cache.add( cacheKey, lineMaterial );
+
+						}
+
+						material = lineMaterial;
+
+						if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
+
+							mesh = new THREE.LineSegments( geometry, material );
+
+						} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_STRIP ) {
+
+							mesh = new THREE.Line( geometry, material );
+
+						} else {
+
+							mesh = new THREE.LineLoop( geometry, material );
+
+						}
 
 					} else if ( primitive.mode === WEBGL_CONSTANTS.POINTS ) {
+
+						var cacheKey = 'PointsMaterial:' + material.uuid;
+
+						var pointsMaterial = scope.cache.get( cacheKey );
+
+						if ( ! pointsMaterial ) {
+
+							pointsMaterial = new THREE.PointsMaterial();
+							THREE.Material.prototype.copy.call( pointsMaterial, material );
+							pointsMaterial.color.copy( material.color );
+							pointsMaterial.map = material.map;
+							pointsMaterial.lights = false;  // PointsMaterial doesn't support lights yet
+
+							scope.cache.add( cacheKey, pointsMaterial );
+
+						}
+
+						material = pointsMaterial;
 
 						mesh = new THREE.Points( geometry, material );
 
@@ -2299,36 +2433,6 @@ THREE.GLTFLoader = ( function () {
 
 						var targetName = node.name ? node.name : node.uuid;
 
-						if ( sampler.interpolation === 'CUBICSPLINE' ) {
-
-							var itemSize = outputAccessor.itemSize;
-							var TypedArray = outputAccessor.array.constructor;
-							var outputAccessorValues = new TypedArray( outputAccessor.count * itemSize / 3 );
-
-							// Layout of keyframe output values for CUBICSPLINE animations:
-							//
-							//   [ inTangent1, splineVertex1, outTangent1, inTangent2, splineVertex2, ... ]
-							//
-							// THREE.KeyframeTrack infers tangents from the spline vertices when interpolating:
-							// those values are extracted below. This still guarantees smooth curves, but does
-							// throw away more precise information in the tangents. In the future, consider
-							// re-sampling at a higher framerate using the tangents provided.
-							//
-							// See: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#appendix-c-spline-interpolation
-
-							for ( var j = 0, jl = outputAccessor.count; j < jl; j += 3 ) {
-
-								outputAccessorValues[ j * itemSize / 3 ] = outputAccessor.getX( j + 1 );
-								if ( itemSize > 1 ) outputAccessorValues[ j * itemSize / 3 + 1 ] = outputAccessor.getY( j + 1 );
-								if ( itemSize > 2 ) outputAccessorValues[ j * itemSize / 3 + 2 ] = outputAccessor.getZ( j + 1 );
-								if ( itemSize > 3 ) outputAccessorValues[ j * itemSize / 3 + 3 ] = outputAccessor.getW( j + 1 );
-
-							}
-
-							outputAccessor = new THREE.BufferAttribute( outputAccessorValues, itemSize / 3, outputAccessor.normalized );
-
-						}
-
 						var interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : THREE.InterpolateLinear;
 
 						var targetNames = [];
@@ -2361,12 +2465,30 @@ THREE.GLTFLoader = ( function () {
 						// be reused by other tracks, make copies here.
 						for ( var j = 0, jl = targetNames.length; j < jl; j ++ ) {
 
-							tracks.push( new TypedKeyframeTrack(
+							var track = new TypedKeyframeTrack(
 								targetNames[ j ] + '.' + PATH_PROPERTIES[ target.path ],
 								THREE.AnimationUtils.arraySlice( inputAccessor.array, 0 ),
 								THREE.AnimationUtils.arraySlice( outputAccessor.array, 0 ),
 								interpolation
-							) );
+							);
+
+							// Here is the trick to enable custom interpolation.
+							// Overrides .createInterpolant in a factory method which creates custom interpolation.
+							if ( sampler.interpolation === 'CUBICSPLINE' ) {
+
+								track.createInterpolant = function ( result ) {
+
+									// A CUBICSPLINE keyframe in glTF has three output values for each input value,
+									// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
+									// must be divided by three to get the interpolant's sampleSize argument.
+
+									return new GLTFCubicSplineInterpolant( this.times, this.values, this.getValueSize() / 3, result );
+
+								};
+
+							}
+
+							tracks.push( track );
 
 						}
 

@@ -1,6 +1,7 @@
 //
 // Custom QUnit assertions.
 //
+/* global QUnit, SmartComparer */
 
 QUnit.assert.success = function ( message ) {
 

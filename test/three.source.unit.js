@@ -64,7 +64,6 @@ import './unit/src/core/Uniform.tests';
 
 
 //src/extras
-import './unit/src/extras/SceneUtils.tests';
 import './unit/src/extras/ShapeUtils.tests';
 
 //src/extras/core

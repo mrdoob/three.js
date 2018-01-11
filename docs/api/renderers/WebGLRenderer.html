@@ -52,7 +52,7 @@
 
 		[page:Boolean preserveDrawingBuffer] - whether to preserve the buffers until manually cleared
 		or overwritten. Default is *false*.<br />
-		
+
 		[page:String powerPreference] - Provides a hint to the user agent indicating what configuration
 		of GPU is suitable for this WebGL context. Can be *"high-performance"*, *"low-power"* or *"default"*. Default is *"default"*.<br />
 
@@ -188,6 +188,12 @@
 			</li>
 		</ul>
 		</div>
+		<div>By default these data are reset at each render calls, but when using the composer or mirrors it can be preferred to reset them with a custom pattern :
+		<code>
+		renderer.info.autoReset = false;
+		renderer.info.reset();
+		</code>
+		</div>
 
 		<h3>[property:Boolean localClippingEnabled]</h3>
 		<div>Defines whether the renderer respects object-level clipping planes. Default is *false*.</div>
@@ -239,21 +245,6 @@
 		<h3>[property:Integer shadowMap.type]</h3>
 		<div>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</div>
 		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default), THREE.PCFSoftShadowMap. See [page:WebGLRenderer WebGLRenderer constants] for details.</div>
-
-		<h3>[property:Boolean shadowMap.renderReverseSided]</h3>
-		<div>
-		Whether to render the opposite side as specified by the material into the shadow map.
-			When disabled, an appropriate shadow.bias must be set on the light source for surfaces that can
-			both cast and receive shadows at the same time to render correctly. Default is *true*.
-		</div>
-
-		<h3>[property:Boolean shadowMap.renderSingleSided]</h3>
-		<div>
-		Whether to treat materials specified as double-sided as if they were specified as front-sided
-		when rendering the shadow map. When disabled, an appropriate shadow.bias must be set on the light
-		source for surfaces that can both cast and receive shadows at the same time to render correctly.
-		Default is *true*.
-		</div>
 
 		<h3>[property:Boolean sortObjects]</h3>
 		<div>
@@ -324,6 +315,9 @@
 		<h3>[method:null compile]( [page:Scene scene], [page:Camera camera] )</h3>
 		<div>Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.</div>
 
+		<h3>[method:null copyFramebufferToTexture]( [page:Number x], [page:Number y], [page:Texture texture], [page:Number level] )</h3>
+		<div>Copies pixels from the current WebGLFramebuffer into a 2D texture. Enables access to [link:https://developer.mozilla.org/de/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].</div>
+
 		<h3>[method:null dispose]( )</h3>
 		<div>Dispose of the current rendering context.</div>
 
@@ -358,7 +352,7 @@
 		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
 		<div>Returns an object that describes the attributes set on the WebGL context when it was created.</div>
 
-		<h3>[method:RenderTarget getCurrentRenderTarget](  )</h3>
+		<h3>[method:RenderTarget getRenderTarget]()</h3>
 		<div>Returns the current RenderTarget, if any.</div>
 
 		<h3>[method:Number getMaxAnisotropy]()</h3>
