@@ -85,7 +85,6 @@
 				// ground
 				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
-				mesh.receiveShadow = true;
 				scene.add( mesh );
 
 				var grid = new THREE.GridHelper( 100, 50, 0x000000, 0x000000 );
@@ -95,8 +94,6 @@
 
 				var width = window.innerWidth || 2;
 				var height = window.innerHeight || 2;
-
-
 
 				var loader = new THREE.FBXLoader();
 				loader.load( 'models/fbx/viper.fbx', function ( object ) {
@@ -119,7 +116,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.ParallaxBarrierEffect( renderer );
