@@ -206,13 +206,15 @@ var list = {
 			"Light": "api/lights/Light",
 			"PointLight": "api/lights/PointLight",
 			"RectAreaLight": "api/lights/RectAreaLight",
-			"SpotLight": "api/lights/SpotLight"
+			"SpotLight": "api/lights/SpotLight",
+			"Projector": "api/lights/Projector"
 		},
 
 		"Lights / Shadows": {
 			"DirectionalLightShadow": "api/lights/shadows/DirectionalLightShadow",
 			"LightShadow": "api/lights/shadows/LightShadow",
-			"SpotLightShadow": "api/lights/shadows/SpotLightShadow"
+			"SpotLightShadow": "api/lights/shadows/SpotLightShadow",
+			"ProjectorShadow": "api/lights/shadows/ProjectorShadow"
 		},
 
 		"Loaders": {
