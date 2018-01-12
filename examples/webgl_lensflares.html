@@ -140,30 +140,18 @@
 					var flareColor = new THREE.Color( 0xffffff );
 					flareColor.setHSL( h, s, l + 0.5 );
 
-					var lensFlareGroup = new THREE.LensFlareGroup();
-
-					var lensFlare0 = new THREE.LensFlare( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor );
-					var lensFlare1 = new THREE.LensFlare( textureFlare2, 512, 0, THREE.AdditiveBlending );
-					var lensFlare2 = new THREE.LensFlare( textureFlare2, 512, 0, THREE.AdditiveBlending );
-					var lensFlare3 = new THREE.LensFlare( textureFlare2, 512, 0, THREE.AdditiveBlending );
-					var lensFlare4 = new THREE.LensFlare( textureFlare3, 60, 0.6, THREE.AdditiveBlending );
-					var lensFlare5 = new THREE.LensFlare( textureFlare3, 70, 0.7, THREE.AdditiveBlending );
-					var lensFlare6 = new THREE.LensFlare( textureFlare3, 120, 0.9, THREE.AdditiveBlending );
-					var lensFlare7 = new THREE.LensFlare( textureFlare3, 70, 1, THREE.AdditiveBlending );
-
-					lensFlareGroup.add( lensFlare0 );
-					lensFlareGroup.add( lensFlare1 );
-					lensFlareGroup.add( lensFlare2 );
-					lensFlareGroup.add( lensFlare3 );
-					lensFlareGroup.add( lensFlare4 );
-					lensFlareGroup.add( lensFlare5 );
-					lensFlareGroup.add( lensFlare6 );
-					lensFlareGroup.add( lensFlare7 );
-
-					lensFlareGroup.customUpdateCallback = lensFlareUpdateCallback;
-					lensFlareGroup.position.copy( light.position );
-
-					scene.add( lensFlareGroup );
+					var lensFlare = new THREE.LensFlare();
+					lensFlare.add( new THREE.LensFlareElement( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor ) );
+					lensFlare.add( new THREE.LensFlareElement( textureFlare2, 512, 0 ) );
+					lensFlare.add( new THREE.LensFlareElement( textureFlare2, 512, 0 ) );
+					lensFlare.add( new THREE.LensFlareElement( textureFlare2, 512, 0 ) );
+					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 60, 0.6 ) );
+					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 70, 0.7 ) );
+					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 120, 0.9 ) );
+					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 70, 1 ) );
+					lensFlare.customUpdateCallback = lensFlareUpdateCallback;
+					lensFlare.position.copy( light.position );
+					scene.add( lensFlare );
 
 				}
 

@@ -3,11 +3,11 @@
  *
  */
 
-THREE.LensFlareGroup = function () {
+THREE.LensFlare = function () {
 
 	THREE.Group.call( this );
 
-	this.type = 'LensFlareGroup';
+	this.type = 'LensFlare';
 
 	this.positionScreen = new THREE.Vector3();
 	this.customUpdateCallback = undefined;
@@ -15,21 +15,19 @@ THREE.LensFlareGroup = function () {
 
 	// textures
 
-	var tempMap = new THREE.CanvasTexture( document.createElement( 'canvas' ) );
-	tempMap.image.width = tempMap.image.height = 16;
-	tempMap.format = THREE.RGBFormat;
-	tempMap.minFilter = tempMap.magFilter = THREE.NearestFilter;
+	var tempMap = new THREE.DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, THREE.RGBFormat );
+	tempMap.minFilter = THREE.NearestFilter;
+	tempMap.magFilter = THREE.NearestFilter;
 	tempMap.needsUpdate = true;
 
-	var occlusionMap = new THREE.CanvasTexture( document.createElement( 'canvas' ) );
-	occlusionMap.image.width = occlusionMap.image.height = 16;
-	occlusionMap.format = THREE.RGBAFormat;
-	occlusionMap.minFilter = occlusionMap.magFilter = THREE.NearestFilter;
+	var occlusionMap = new THREE.DataTexture( new Uint8Array( 16 * 16 * 4 ), 16, 16, THREE.RGBAFormat );
+	occlusionMap.minFilter = THREE.NearestFilter;
+	occlusionMap.magFilter = THREE.NearestFilter;
 	occlusionMap.needsUpdate = true;
 
 	// material
 
-	var shader = THREE.LensFlareGroup.Shader;
+	var shader = THREE.LensFlare.Shader;
 
 	var material = new THREE.RawShaderMaterial( {
 		uniforms: shader.uniforms,
@@ -166,11 +164,11 @@ THREE.LensFlareGroup = function () {
 
 };
 
-THREE.LensFlareGroup.prototype = Object.create( THREE.Group.prototype );
-THREE.LensFlareGroup.prototype.constructor = THREE.LensFlareGroup;
-THREE.LensFlareGroup.prototype.isLensFlareGroup = true;
+THREE.LensFlare.prototype = Object.create( THREE.Group.prototype );
+THREE.LensFlare.prototype.constructor = THREE.LensFlare;
+THREE.LensFlare.prototype.isLensFlare = true;
 
-THREE.LensFlareGroup.Shader = {
+THREE.LensFlare.Shader = {
 
 	uniforms: {
 
@@ -238,17 +236,17 @@ THREE.LensFlareGroup.Shader = {
 
 //
 
-THREE.LensFlare = function ( texture, size, distance, blending, color, opacity ) {
+THREE.LensFlareElement = function ( texture, size, distance, blending, color, opacity ) {
 
 	THREE.Mesh.call( this );
 
-	this.type = 'LensFlare';
+	this.type = 'LensFlareElement';
 	this.frustumCulled = false;
 
 	this.flareTexture = texture;
 	this.flareSize = size || 1;
 	this.flareDistance = distance || 0;
-	this.flareBlending = blending || THREE.NormalBlending,
+	this.flareBlending = blending || THREE.AdditiveBlending;
 	this.flareColor = color || new THREE.Color( 0xffffff );
 	this.flareOpacity = opacity || 1;
 	this.flarePosition = new THREE.Vector3();
@@ -257,13 +255,13 @@ THREE.LensFlare = function ( texture, size, distance, blending, color, opacity )
 
 	this.geometry = THREE.LensFlare.Geometry;
 
-	var shader = THREE.LensFlare.Shader;
+	var shader = THREE.LensFlareElement.Shader;
 
 	this.material = new THREE.RawShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
-		blending: blending,
+		blending: this.flareBlending,
 		transparent: true,
 		depthWrite: false
 	} );
@@ -275,11 +273,11 @@ THREE.LensFlare = function ( texture, size, distance, blending, color, opacity )
 
 	this.onBeforeRender = function ( renderer, scene, camera, geometry, material, group ) {
 
-		var group = this.parent;
+		var parent = this.parent;
 
-		if ( group === null ) {
+		if ( parent === null ) {
 
-			console.error( 'THREE.LensFlare: LensFlare not assigned to a LensFlareGroup. Rendering not possible.' );
+			console.error( 'THREE.LensFlareElement: LensFlareElement not assigned to a LensFlare. Rendering not possible.' );
 			return;
 
 		}
@@ -288,7 +286,7 @@ THREE.LensFlare = function ( texture, size, distance, blending, color, opacity )
 
 		viewport.copy( renderer.getCurrentViewport() );
 
-		group.update( renderer, camera, viewport );
+		parent.update( renderer, camera, viewport );
 
 		//
 
@@ -298,14 +296,14 @@ THREE.LensFlare = function ( texture, size, distance, blending, color, opacity )
 		scale.set( size * invAspect, size );
 
 		this.material.uniforms.map.value = this.flareTexture;
-		this.material.uniforms.occlusionMap.value = group.getOcclusionMap();
+		this.material.uniforms.occlusionMap.value = parent.getOcclusionMap();
 		this.material.uniforms.opacity.value = this.flareOpacity;
 		this.material.uniforms.color.value = this.flareColor;
 		this.material.uniforms.scale.value = scale;
 		this.material.uniforms.rotation.value = this.flareRotation;
 		this.material.uniforms.screenPosition.value = this.flarePosition;
 
-		if ( group.flareVisible === false ) {
+		if ( parent.flareVisible === false ) {
 
 			this.material.uniforms.opacity.value = 0;
 
@@ -321,11 +319,11 @@ THREE.LensFlare = function ( texture, size, distance, blending, color, opacity )
 
 };
 
-THREE.LensFlare.prototype = Object.create( THREE.Mesh.prototype );
-THREE.LensFlare.prototype.constructor = THREE.LensFlare;
-THREE.LensFlare.prototype.isLensFlare = true;
+THREE.LensFlareElement.prototype = Object.create( THREE.Mesh.prototype );
+THREE.LensFlareElement.prototype.constructor = THREE.LensFlareElement;
+THREE.LensFlareElement.prototype.isLensFlareElement = true;
 
-THREE.LensFlare.Shader = {
+THREE.LensFlareElement.Shader = {
 
 	uniforms: {
 
