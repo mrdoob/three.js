@@ -1,6 +1,5 @@
 /**
  * @author Mugen87 / https://github.com/Mugen87
- *
  */
 
 THREE.LensFlare = function () {
@@ -241,7 +240,6 @@ THREE.LensFlareElement = function ( texture, size, distance, blending, color, op
 	this.flareColor = color || new THREE.Color( 0xffffff );
 	this.flareOpacity = opacity || 1;
 	this.flarePosition = new THREE.Vector3();
-	this.flareScale = 1;
 	this.flareRotation = 0;
 
 	this.geometry = THREE.LensFlare.Geometry;
@@ -281,7 +279,7 @@ THREE.LensFlareElement = function ( texture, size, distance, blending, color, op
 
 		//
 
-		var size = this.flareSize * this.flareScale / viewport.w;
+		var size = this.flareSize / viewport.w;
 		var invAspect = viewport.w / viewport.z;
 
 		scale.set( size * invAspect, size );

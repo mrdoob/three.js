@@ -17,9 +17,10 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/vr/WebVR.js"></script>
-
+		<script src="js/objects/LensFlare.js"></script>
 		<script src="js/objects/Reflector.js"></script>
+
+		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
@@ -87,6 +88,23 @@
 				var helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
+				// lensflare
+				var loader = new THREE.TextureLoader();
+				var texture0 = loader.load( "textures/lensflare/lensflare0.png" );
+				var texture2 = loader.load( "textures/lensflare/lensflare2.png" );
+				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
+
+				var lensFlare = new THREE.LensFlare();
+				lensFlare.add( new THREE.LensFlareElement( texture0, 700, 0 ) );
+				lensFlare.add( new THREE.LensFlareElement( texture2, 512, 0 ) );
+				lensFlare.add( new THREE.LensFlareElement( texture2, 512, 0 ) );
+				lensFlare.add( new THREE.LensFlareElement( texture2, 512, 0 ) );
+				lensFlare.add( new THREE.LensFlareElement( texture3, 60, 0.6 ) );
+				lensFlare.add( new THREE.LensFlareElement( texture3, 70, 0.7 ) );
+				lensFlare.add( new THREE.LensFlareElement( texture3, 120, 0.9 ) );
+				lensFlare.add( new THREE.LensFlareElement( texture3, 70, 1 ) );
+				light.add( lensFlare );
+
 				//
 
 				var geometry = new THREE.PlaneBufferGeometry( 1.4, 1.4 );
@@ -110,7 +128,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
