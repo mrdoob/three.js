@@ -10,7 +10,6 @@ THREE.LensFlare = function () {
 	this.type = 'LensFlare';
 
 	this.positionScreen = new THREE.Vector3();
-	this.customUpdateCallback = undefined;
 	this.flareVisible = false;
 
 	// textures
@@ -111,15 +110,7 @@ THREE.LensFlare = function () {
 
 			// update object positions
 
-			if ( this.customUpdateCallback ) {
-
-				this.customUpdateCallback( this );
-
-			} else {
-
-				this.updateLensFlares();
-
-			}
+			updateLensFlares();
 
 		} else {
 
@@ -129,23 +120,23 @@ THREE.LensFlare = function () {
 
 	};
 
-	this.updateLensFlares = function () {
+	var scope = this;
 
-		var vecX = - this.positionScreen.x * 2;
-		var vecY = - this.positionScreen.y * 2;
+	function updateLensFlares() {
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+		var vecX = - scope.positionScreen.x * 2;
+		var vecY = - scope.positionScreen.y * 2;
 
-			var flare = this.children[ i ];
+		for ( var i = 0, l = scope.children.length; i < l; i ++ ) {
 
-			flare.flarePosition.x = this.positionScreen.x + vecX * flare.flareDistance;
-			flare.flarePosition.y = this.positionScreen.y + vecY * flare.flareDistance;
+			var flare = scope.children[ i ];
 
-			flare.flareRotation += 0.25;
+			flare.flarePosition.x = scope.positionScreen.x + vecX * flare.flareDistance;
+			flare.flarePosition.y = scope.positionScreen.y + vecY * flare.flareDistance;
 
 		}
 
-	};
+	}
 
 	this.getOcclusionMap = function () {
 
@@ -332,7 +323,7 @@ THREE.LensFlareElement.Shader = {
 		'opacity': { value: 1 },
 		'color': { value: null },
 		'scale': { value: null },
-		'rotation': { value: 1 },
+		'rotation': { value: 0 },
 		'screenPosition': { value: null }
 
 	},

@@ -149,9 +149,7 @@
 					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 70, 0.7 ) );
 					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 120, 0.9 ) );
 					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 70, 1 ) );
-					lensFlare.customUpdateCallback = lensFlareUpdateCallback;
-					lensFlare.position.copy( light.position );
-					scene.add( lensFlare );
+					light.add( lensFlare );
 
 				}
 
@@ -179,28 +177,6 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
-
-			//
-
-			function lensFlareUpdateCallback( object ) {
-
-				 var vecX = - object.positionScreen.x * 2;
-				 var vecY = - object.positionScreen.y * 2;
-
-				 for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-					 var flare = this.children[ i ];
-
-					 flare.flarePosition.x = object.positionScreen.x + vecX * flare.flareDistance;
-					 flare.flarePosition.y = object.positionScreen.y + vecY * flare.flareDistance;
-					 flare.flareRotation = 0;
-
-				 }
-
-				 object.children[ 2 ].flarePosition.y += 0.025;
-				 object.children[ 3 ].flareRotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
-
-			 }
 
 			//
 
