@@ -428,9 +428,9 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.getViewport = function ( viewport ) {
+	this.getCurrentViewport = function () {
 
-		viewport.copy( _currentViewport );
+		return _currentViewport;
 
 	};
 

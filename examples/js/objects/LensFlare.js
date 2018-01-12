@@ -286,7 +286,7 @@ THREE.LensFlare = function ( texture, size, distance, blending, color, opacity )
 
 		//
 
-		renderer.getViewport( viewport );
+		viewport.copy( renderer.getCurrentViewport() );
 
 		group.update( renderer, camera, viewport );
 
