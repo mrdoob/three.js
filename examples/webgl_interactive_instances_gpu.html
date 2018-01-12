@@ -642,7 +642,7 @@
 
 			var matrix = new THREE.Matrix4();
 
-			function onBeforeRender( renderer, scene, camera, geometry, material, group ){
+			function onBeforeRender( renderer, scene, camera, currentViewport, geometry, material, group ){
 
 				var updateList = [];
 				var u = material.uniforms;

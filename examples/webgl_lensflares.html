@@ -43,6 +43,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FlyControls.js"></script>
+		<script src="js/objects/LensFlare.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -86,7 +87,7 @@
 
 				var s = 250;
 
-				var cube = new THREE.BoxGeometry( s, s, s );
+				var cube = new THREE.BoxBufferGeometry( s, s, s );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
 
@@ -139,21 +140,30 @@
 					var flareColor = new THREE.Color( 0xffffff );
 					flareColor.setHSL( h, s, l + 0.5 );
 
-					var lensFlare = new THREE.LensFlare( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor );
+					var lensFlareGroup = new THREE.LensFlareGroup();
 
-					lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-					lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-					lensFlare.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending );
+					var lensFlare0 = new THREE.LensFlare( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor );
+					var lensFlare1 = new THREE.LensFlare( textureFlare2, 512, 0, THREE.AdditiveBlending );
+					var lensFlare2 = new THREE.LensFlare( textureFlare2, 512, 0, THREE.AdditiveBlending );
+					var lensFlare3 = new THREE.LensFlare( textureFlare2, 512, 0, THREE.AdditiveBlending );
+					var lensFlare4 = new THREE.LensFlare( textureFlare3, 60, 0.6, THREE.AdditiveBlending );
+					var lensFlare5 = new THREE.LensFlare( textureFlare3, 70, 0.7, THREE.AdditiveBlending );
+					var lensFlare6 = new THREE.LensFlare( textureFlare3, 120, 0.9, THREE.AdditiveBlending );
+					var lensFlare7 = new THREE.LensFlare( textureFlare3, 70, 1, THREE.AdditiveBlending );
 
-					lensFlare.add( textureFlare3, 60, 0.6, THREE.AdditiveBlending );
-					lensFlare.add( textureFlare3, 70, 0.7, THREE.AdditiveBlending );
-					lensFlare.add( textureFlare3, 120, 0.9, THREE.AdditiveBlending );
-					lensFlare.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending );
+					lensFlareGroup.add( lensFlare0 );
+					lensFlareGroup.add( lensFlare1 );
+					lensFlareGroup.add( lensFlare2 );
+					lensFlareGroup.add( lensFlare3 );
+					lensFlareGroup.add( lensFlare4 );
+					lensFlareGroup.add( lensFlare5 );
+					lensFlareGroup.add( lensFlare6 );
+					lensFlareGroup.add( lensFlare7 );
 
-					lensFlare.customUpdateCallback = lensFlareUpdateCallback;
-					lensFlare.position.copy( light.position );
+					lensFlareGroup.customUpdateCallback = lensFlareUpdateCallback;
+					lensFlareGroup.position.copy( light.position );
 
-					scene.add( lensFlare );
+					scene.add( lensFlareGroup );
 
 				}
 
@@ -162,6 +172,8 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false;
+				renderer.info.autoReset = false;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -182,29 +194,25 @@
 
 			//
 
-			 function lensFlareUpdateCallback( object ) {
+			function lensFlareUpdateCallback( object ) {
 
-				var f, fl = object.lensFlares.length;
-				var flare;
-				var vecX = -object.positionScreen.x * 2;
-				var vecY = -object.positionScreen.y * 2;
+				 var vecX = - object.positionScreen.x * 2;
+				 var vecY = - object.positionScreen.y * 2;
 
+				 for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-				for( f = 0; f < fl; f++ ) {
+					 var flare = this.children[ i ];
 
-					flare = object.lensFlares[ f ];
+					 flare.flarePosition.x = object.positionScreen.x + vecX * flare.flareDistance;
+					 flare.flarePosition.y = object.positionScreen.y + vecY * flare.flareDistance;
+					 flare.flareRotation = 0;
 
-					flare.x = object.positionScreen.x + vecX * flare.distance;
-					flare.y = object.positionScreen.y + vecY * flare.distance;
+				 }
 
-					flare.rotation = 0;
+				 object.children[ 2 ].flarePosition.y += 0.025;
+				 object.children[ 3 ].flareRotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
 
-				}
-
-				object.lensFlares[ 2 ].y += 0.025;
-				object.lensFlares[ 3 ].rotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
-
-			}
+			 }
 
 			//
 
@@ -233,6 +241,8 @@
 				var delta = clock.getDelta();
 
 				controls.update( delta );
+				renderer.clear();
+				renderer.info.reset();
 				renderer.render( scene, camera );
 
 			}

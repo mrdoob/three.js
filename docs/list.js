@@ -292,7 +292,6 @@ var list = {
 		"Objects": {
 			"Bone": "api/objects/Bone",
 			"Group": "api/objects/Group",
-			"LensFlare": "api/objects/LensFlare",
 			"Line": "api/objects/Line",
 			"LineLoop": "api/objects/LineLoop",
 			"LineSegments": "api/objects/LineSegments",
@@ -359,6 +358,10 @@ var list = {
 			"SVGLoader": "examples/loaders/SVGLoader",
 			"TGALoader": "examples/loaders/TGALoader",
 			"PRWMLoader": "examples/loaders/PRWMLoader"
+		},
+
+		"Objects": {
+			"LensFlare": "examples/objects/LensFlare",
 		},
 
 		"Exporters": {
