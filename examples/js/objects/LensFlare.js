@@ -232,6 +232,7 @@ THREE.LensFlareElement = function ( texture, size, distance, blending, color, op
 
 	this.type = 'LensFlareElement';
 	this.frustumCulled = false;
+	this.renderOrder = Infinity; // see #12883
 
 	this.flareTexture = texture;
 	this.flareSize = size || 1;
