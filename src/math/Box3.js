@@ -390,7 +390,7 @@ Object.assign( Box3.prototype, {
 
 		var triangleNormal = new Vector3();
 
-		function satForAxes (axes) {
+		function satForAxes( axes ) {
 
 			var i, j;
 
@@ -418,7 +418,7 @@ Object.assign( Box3.prototype, {
 
 		}
 
-		return function intersectsTriangle ( triangle ) {
+		return function intersectsTriangle( triangle ) {
 
 			if ( this.isEmpty() ) {
 
@@ -427,7 +427,7 @@ Object.assign( Box3.prototype, {
 			}
 
 			// compute box center and extents
-			this.getCenter(center);
+			this.getCenter( center );
 			extents.subVectors( this.max, center );
 
 			// translate triangle to aabb origin
