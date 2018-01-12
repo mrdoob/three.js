@@ -32,19 +32,13 @@ var textureFlare0 = textureLoader.load( "textures/lensflare/lensflare0.png" );
 var textureFlare1 = textureLoader.load( "textures/lensflare/lensflare2.png" );
 var textureFlare2 = textureLoader.load( "textures/lensflare/lensflare3.png" );
 
-var lensFlareGroup = new THREE.LensFlareGroup();
+var lensFlare = new THREE.LensFlare();
 
-var lensFlare0 = new THREE.LensFlare( textureFlare0, 512, 0, THREE.AdditiveBlending );
-var lensFlare1 = new THREE.LensFlare( textureFlare1, 512, 0, THREE.AdditiveBlending );
-var lensFlare2 = new THREE.LensFlare( textureFlare2, 60, 0.6, THREE.AdditiveBlending );
+lensFlare.add( new THREE.LensFlareElement( textureFlare0, 512, 0, THREE.AdditiveBlending ) );
+lensFlare.add( new THREE.LensFlareElement( textureFlare1, 512, 0, THREE.AdditiveBlending ) );
+lensFlare.add( new THREE.LensFlareElement( textureFlare2, 60, 0.6, THREE.AdditiveBlending ) );
 
-lensFlareGroup.add( lensFlare0 );
-lensFlareGroup.add( lensFlare1 );
-lensFlareGroup.add( lensFlare2 );
-
-lensFlareGroup.position.copy( light.position );
-
-scene.add( lensFlareGroup );
+light.add( lensFlare );
 			</code>
 
 		</div>
@@ -52,7 +46,7 @@ scene.add( lensFlareGroup );
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Texture texture], [page:Float size], [page:Float distance], [page:Materials blending], [page:Color color], [page:Float opacity] )</h3>
+		<h3>LensFlareElement( [page:Texture texture], [page:Float size], [page:Float distance], [page:Materials blending], [page:Color color], [page:Float opacity] )</h3>
 		<div>
 		[page:Texture texture] - THREE.Texture to use for the flare. <br />
 		[page:Float size] - (optional) size in pixels <br />
