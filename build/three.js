@@ -6647,604 +6647,6 @@
 	};
 
 	/**
-	 * @author bhouston / http://clara.io
-	 */
-
-	function Box2( min, max ) {
-
-		this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
-		this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
-
-	}
-
-	Object.assign( Box2.prototype, {
-
-		set: function ( min, max ) {
-
-			this.min.copy( min );
-			this.max.copy( max );
-
-			return this;
-
-		},
-
-		setFromPoints: function ( points ) {
-
-			this.makeEmpty();
-
-			for ( var i = 0, il = points.length; i < il; i ++ ) {
-
-				this.expandByPoint( points[ i ] );
-
-			}
-
-			return this;
-
-		},
-
-		setFromCenterAndSize: function () {
-
-			var v1 = new Vector2();
-
-			return function setFromCenterAndSize( center, size ) {
-
-				var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
-				this.min.copy( center ).sub( halfSize );
-				this.max.copy( center ).add( halfSize );
-
-				return this;
-
-			};
-
-		}(),
-
-		clone: function () {
-
-			return new this.constructor().copy( this );
-
-		},
-
-		copy: function ( box ) {
-
-			this.min.copy( box.min );
-			this.max.copy( box.max );
-
-			return this;
-
-		},
-
-		makeEmpty: function () {
-
-			this.min.x = this.min.y = + Infinity;
-			this.max.x = this.max.y = - Infinity;
-
-			return this;
-
-		},
-
-		isEmpty: function () {
-
-			// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
-
-			return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y );
-
-		},
-
-		getCenter: function ( optionalTarget ) {
-
-			var result = optionalTarget || new Vector2();
-			return this.isEmpty() ? result.set( 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
-
-		},
-
-		getSize: function ( optionalTarget ) {
-
-			var result = optionalTarget || new Vector2();
-			return this.isEmpty() ? result.set( 0, 0 ) : result.subVectors( this.max, this.min );
-
-		},
-
-		expandByPoint: function ( point ) {
-
-			this.min.min( point );
-			this.max.max( point );
-
-			return this;
-
-		},
-
-		expandByVector: function ( vector ) {
-
-			this.min.sub( vector );
-			this.max.add( vector );
-
-			return this;
-
-		},
-
-		expandByScalar: function ( scalar ) {
-
-			this.min.addScalar( - scalar );
-			this.max.addScalar( scalar );
-
-			return this;
-
-		},
-
-		containsPoint: function ( point ) {
-
-			return point.x < this.min.x || point.x > this.max.x ||
-				point.y < this.min.y || point.y > this.max.y ? false : true;
-
-		},
-
-		containsBox: function ( box ) {
-
-			return this.min.x <= box.min.x && box.max.x <= this.max.x &&
-				this.min.y <= box.min.y && box.max.y <= this.max.y;
-
-		},
-
-		getParameter: function ( point, optionalTarget ) {
-
-			// This can potentially have a divide by zero if the box
-			// has a size dimension of 0.
-
-			var result = optionalTarget || new Vector2();
-
-			return result.set(
-				( point.x - this.min.x ) / ( this.max.x - this.min.x ),
-				( point.y - this.min.y ) / ( this.max.y - this.min.y )
-			);
-
-		},
-
-		intersectsBox: function ( box ) {
-
-			// using 4 splitting planes to rule out intersections
-
-			return box.max.x < this.min.x || box.min.x > this.max.x ||
-				box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
-
-		},
-
-		clampPoint: function ( point, optionalTarget ) {
-
-			var result = optionalTarget || new Vector2();
-			return result.copy( point ).clamp( this.min, this.max );
-
-		},
-
-		distanceToPoint: function () {
-
-			var v1 = new Vector2();
-
-			return function distanceToPoint( point ) {
-
-				var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
-				return clampedPoint.sub( point ).length();
-
-			};
-
-		}(),
-
-		intersect: function ( box ) {
-
-			this.min.max( box.min );
-			this.max.min( box.max );
-
-			return this;
-
-		},
-
-		union: function ( box ) {
-
-			this.min.min( box.min );
-			this.max.max( box.max );
-
-			return this;
-
-		},
-
-		translate: function ( offset ) {
-
-			this.min.add( offset );
-			this.max.add( offset );
-
-			return this;
-
-		},
-
-		equals: function ( box ) {
-
-			return box.min.equals( this.min ) && box.max.equals( this.max );
-
-		}
-
-	} );
-
-	/**
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
-	function WebGLFlareRenderer( renderer, gl, state, textures, capabilities ) {
-
-		var vertexBuffer, elementBuffer;
-		var shader, program, attributes, uniforms;
-
-		var tempTexture, occlusionTexture;
-
-		function init() {
-
-			var vertices = new Float32Array( [
-				- 1, - 1, 0, 0,
-				  1, - 1, 1, 0,
-				  1, 1, 1, 1,
-				- 1, 1, 0, 1
-			] );
-
-			var faces = new Uint16Array( [
-				0, 1, 2,
-				0, 2, 3
-			] );
-
-			// buffers
-
-			vertexBuffer = gl.createBuffer();
-			elementBuffer = gl.createBuffer();
-
-			gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
-			gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW );
-
-			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
-			gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, faces, gl.STATIC_DRAW );
-
-			// textures
-
-			tempTexture = gl.createTexture();
-			occlusionTexture = gl.createTexture();
-
-			state.bindTexture( gl.TEXTURE_2D, tempTexture );
-			gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 16, 16, 0, gl.RGB, gl.UNSIGNED_BYTE, null );
-			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
-			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
-			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
-
-			state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
-			gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, 16, 16, 0, gl.RGBA, gl.UNSIGNED_BYTE, null );
-			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
-			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
-			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-			gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
-
-			shader = {
-
-				vertexShader: [
-
-					'uniform lowp int renderType;',
-
-					'uniform vec3 screenPosition;',
-					'uniform vec2 scale;',
-					'uniform float rotation;',
-
-					'uniform sampler2D occlusionMap;',
-
-					'attribute vec2 position;',
-					'attribute vec2 uv;',
-
-					'varying vec2 vUV;',
-					'varying float vVisibility;',
-
-					'void main() {',
-
-					'	vUV = uv;',
-
-					'	vec2 pos = position;',
-
-					'	if ( renderType == 2 ) {',
-
-					'		vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );',
-					'		visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );',
-					'		visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );',
-					'		visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );',
-					'		visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );',
-					'		visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );',
-					'		visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );',
-					'		visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );',
-					'		visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );',
-
-					'		vVisibility =        visibility.r / 9.0;',
-					'		vVisibility *= 1.0 - visibility.g / 9.0;',
-					'		vVisibility *=       visibility.b / 9.0;',
-					'		vVisibility *= 1.0 - visibility.a / 9.0;',
-
-					'		pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;',
-					'		pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;',
-
-					'	}',
-
-					'	gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );',
-
-					'}'
-
-				].join( '\n' ),
-
-				fragmentShader: [
-
-					'uniform lowp int renderType;',
-
-					'uniform sampler2D map;',
-					'uniform float opacity;',
-					'uniform vec3 color;',
-
-					'varying vec2 vUV;',
-					'varying float vVisibility;',
-
-					'void main() {',
-
-					// pink square
-
-					'	if ( renderType == 0 ) {',
-
-					'		gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );',
-
-					// restore
-
-					'	} else if ( renderType == 1 ) {',
-
-					'		gl_FragColor = texture2D( map, vUV );',
-
-					// flare
-
-					'	} else {',
-
-					'		vec4 texture = texture2D( map, vUV );',
-					'		texture.a *= opacity * vVisibility;',
-					'		gl_FragColor = texture;',
-					'		gl_FragColor.rgb *= color;',
-
-					'	}',
-
-					'}'
-
-				].join( '\n' )
-
-			};
-
-			program = createProgram( shader );
-
-			attributes = {
-				vertex: gl.getAttribLocation( program, 'position' ),
-				uv: gl.getAttribLocation( program, 'uv' )
-			};
-
-			uniforms = {
-				renderType: gl.getUniformLocation( program, 'renderType' ),
-				map: gl.getUniformLocation( program, 'map' ),
-				occlusionMap: gl.getUniformLocation( program, 'occlusionMap' ),
-				opacity: gl.getUniformLocation( program, 'opacity' ),
-				color: gl.getUniformLocation( program, 'color' ),
-				scale: gl.getUniformLocation( program, 'scale' ),
-				rotation: gl.getUniformLocation( program, 'rotation' ),
-				screenPosition: gl.getUniformLocation( program, 'screenPosition' )
-			};
-
-		}
-
-		/*
-		 * Render lens flares
-		 * Method: renders 16x16 0xff00ff-colored points scattered over the light source area,
-		 *         reads these back and calculates occlusion.
-		 */
-
-		this.render = function ( flares, scene, camera, viewport ) {
-
-			if ( flares.length === 0 ) return;
-
-			var tempPosition = new Vector3();
-
-			var invAspect = viewport.w / viewport.z,
-				halfViewportWidth = viewport.z * 0.5,
-				halfViewportHeight = viewport.w * 0.5;
-
-			var size = 16 / viewport.w,
-				scale = new Vector2( size * invAspect, size );
-
-			var screenPosition = new Vector3( 1, 1, 0 ),
-				screenPositionPixels = new Vector2( 1, 1 );
-
-			var validArea = new Box2();
-
-			validArea.min.set( viewport.x, viewport.y );
-			validArea.max.set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ) );
-
-			if ( program === undefined ) {
-
-				init();
-
-			}
-
-			state.useProgram( program );
-
-			state.initAttributes();
-			state.enableAttribute( attributes.vertex );
-			state.enableAttribute( attributes.uv );
-			state.disableUnusedAttributes();
-
-			// loop through all lens flares to update their occlusion and positions
-			// setup gl and common used attribs/uniforms
-
-			gl.uniform1i( uniforms.occlusionMap, 0 );
-			gl.uniform1i( uniforms.map, 1 );
-
-			gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
-			gl.vertexAttribPointer( attributes.vertex, 2, gl.FLOAT, false, 2 * 8, 0 );
-			gl.vertexAttribPointer( attributes.uv, 2, gl.FLOAT, false, 2 * 8, 8 );
-
-			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
-
-			state.disable( gl.CULL_FACE );
-			state.buffers.depth.setMask( false );
-
-			for ( var i = 0, l = flares.length; i < l; i ++ ) {
-
-				size = 16 / viewport.w;
-				scale.set( size * invAspect, size );
-
-				// calc object screen position
-
-				var flare = flares[ i ];
-
-				tempPosition.set( flare.matrixWorld.elements[ 12 ], flare.matrixWorld.elements[ 13 ], flare.matrixWorld.elements[ 14 ] );
-
-				tempPosition.applyMatrix4( camera.matrixWorldInverse );
-				tempPosition.applyMatrix4( camera.projectionMatrix );
-
-				// setup arrays for gl programs
-
-				screenPosition.copy( tempPosition );
-
-				// horizontal and vertical coordinate of the lower left corner of the pixels to copy
-
-				screenPositionPixels.x = viewport.x + ( screenPosition.x * halfViewportWidth ) + halfViewportWidth - 8;
-				screenPositionPixels.y = viewport.y + ( screenPosition.y * halfViewportHeight ) + halfViewportHeight - 8;
-
-				// screen cull
-
-				if ( validArea.containsPoint( screenPositionPixels ) === true ) {
-
-					// save current RGB to temp texture
-
-					state.activeTexture( gl.TEXTURE0 );
-					state.bindTexture( gl.TEXTURE_2D, null );
-					state.activeTexture( gl.TEXTURE1 );
-					state.bindTexture( gl.TEXTURE_2D, tempTexture );
-					gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x, screenPositionPixels.y, 16, 16, 0 );
-
-
-					// render pink quad
-
-					gl.uniform1i( uniforms.renderType, 0 );
-					gl.uniform2f( uniforms.scale, scale.x, scale.y );
-					gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
-
-					state.disable( gl.BLEND );
-					state.enable( gl.DEPTH_TEST );
-
-					gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
-
-
-					// copy result to occlusionMap
-
-					state.activeTexture( gl.TEXTURE0 );
-					state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
-					gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, screenPositionPixels.x, screenPositionPixels.y, 16, 16, 0 );
-
-
-					// restore graphics
-
-					gl.uniform1i( uniforms.renderType, 1 );
-					state.disable( gl.DEPTH_TEST );
-
-					state.activeTexture( gl.TEXTURE1 );
-					state.bindTexture( gl.TEXTURE_2D, tempTexture );
-					gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
-
-
-					// update object positions
-
-					flare.positionScreen.copy( screenPosition );
-
-					if ( flare.customUpdateCallback ) {
-
-						flare.customUpdateCallback( flare );
-
-					} else {
-
-						flare.updateLensFlares();
-
-					}
-
-					// render flares
-
-					gl.uniform1i( uniforms.renderType, 2 );
-					state.enable( gl.BLEND );
-
-					for ( var j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
-
-						var sprite = flare.lensFlares[ j ];
-
-						if ( sprite.opacity > 0.001 && sprite.scale > 0.001 ) {
-
-							screenPosition.x = sprite.x;
-							screenPosition.y = sprite.y;
-							screenPosition.z = sprite.z;
-
-							size = sprite.size * sprite.scale / viewport.w;
-
-							scale.x = size * invAspect;
-							scale.y = size;
-
-							gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
-							gl.uniform2f( uniforms.scale, scale.x, scale.y );
-							gl.uniform1f( uniforms.rotation, sprite.rotation );
-
-							gl.uniform1f( uniforms.opacity, sprite.opacity );
-							gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
-
-							state.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
-
-							textures.setTexture2D( sprite.texture, 1 );
-
-							gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
-
-						}
-
-					}
-
-				}
-
-			}
-
-			// restore gl
-
-			state.enable( gl.CULL_FACE );
-			state.enable( gl.DEPTH_TEST );
-			state.buffers.depth.setMask( true );
-
-			state.reset();
-
-		};
-
-		function createProgram( shader ) {
-
-			var program = gl.createProgram();
-
-			var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
-			var vertexShader = gl.createShader( gl.VERTEX_SHADER );
-
-			var prefix = 'precision ' + capabilities.precision + ' float;\n';
-
-			gl.shaderSource( fragmentShader, prefix + shader.fragmentShader );
-			gl.shaderSource( vertexShader, prefix + shader.vertexShader );
-
-			gl.compileShader( fragmentShader );
-			gl.compileShader( vertexShader );
-
-			gl.attachShader( program, fragmentShader );
-			gl.attachShader( program, vertexShader );
-
-			gl.linkProgram( program );
-
-			return program;
-
-		}
-
-	}
-
-	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
@@ -21256,7 +20658,6 @@
 		var currentRenderList = null;
 
 		var spritesArray = [];
-		var flaresArray = [];
 
 		// public properties
 
@@ -21454,7 +20855,7 @@
 		var programCache, renderLists;
 
 		var background, morphtargets, bufferRenderer, indexedBufferRenderer;
-		var flareRenderer, spriteRenderer;
+		var spriteRenderer;
 
 		var utils;
 
@@ -21493,7 +20894,6 @@
 			bufferRenderer = new WebGLBufferRenderer( _gl, extensions, _infoRender );
 			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
 
-			flareRenderer = new WebGLFlareRenderer( _this, _gl, state, textures, capabilities );
 			spriteRenderer = new WebGLSpriteRenderer( _this, _gl, state, textures, capabilities );
 
 			_this.info.programs = programCache.programs;
@@ -21622,6 +21022,12 @@
 			_canvas.height = height * pixelRatio;
 
 			this.setViewport( 0, 0, width, height );
+
+		};
+
+		this.getCurrentViewport = function () {
+
+			return _currentViewport;
 
 		};
 
@@ -22322,7 +21728,6 @@
 			shadowsArray.length = 0;
 
 			spritesArray.length = 0;
-			flaresArray.length = 0;
 
 			_localClippingEnabled = this.localClippingEnabled;
 			_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
@@ -22391,7 +21796,6 @@
 			// custom renderers
 
 			spriteRenderer.render( spritesArray, scene, camera );
-			flareRenderer.render( flaresArray, scene, camera, _currentViewport );
 
 			// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -22501,10 +21905,6 @@
 						spritesArray.push( object );
 
 					}
-
-				} else if ( object.isLensFlare ) {
-
-					flaresArray.push( object );
 
 				} else if ( object.isImmediateRenderObject ) {
 
@@ -23889,103 +23289,6 @@
 			if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 			return data;
-
-		}
-
-	} );
-
-	/**
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
-	function LensFlare( texture, size, distance, blending, color ) {
-
-		Object3D.call( this );
-
-		this.lensFlares = [];
-
-		this.positionScreen = new Vector3();
-		this.customUpdateCallback = undefined;
-
-		if ( texture !== undefined ) {
-
-			this.add( texture, size, distance, blending, color );
-
-		}
-
-	}
-
-	LensFlare.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-		constructor: LensFlare,
-
-		isLensFlare: true,
-
-		copy: function ( source ) {
-
-			Object3D.prototype.copy.call( this, source );
-
-			this.positionScreen.copy( source.positionScreen );
-			this.customUpdateCallback = source.customUpdateCallback;
-
-			for ( var i = 0, l = source.lensFlares.length; i < l; i ++ ) {
-
-				this.lensFlares.push( source.lensFlares[ i ] );
-
-			}
-
-			return this;
-
-		},
-
-		add: function ( texture, size, distance, blending, color, opacity ) {
-
-			if ( size === undefined ) size = - 1;
-			if ( distance === undefined ) distance = 0;
-			if ( opacity === undefined ) opacity = 1;
-			if ( color === undefined ) color = new Color( 0xffffff );
-			if ( blending === undefined ) blending = NormalBlending;
-
-			distance = Math.min( distance, Math.max( 0, distance ) );
-
-			this.lensFlares.push( {
-				texture: texture,	// THREE.Texture
-				size: size, 		// size in pixels (-1 = use texture.width)
-				distance: distance, 	// distance (0-1) from light source (0=at light source)
-				x: 0, y: 0, z: 0,	// screen position (-1 => 1) z = 0 is in front z = 1 is back
-				scale: 1, 		// scale
-				rotation: 0, 		// rotation
-				opacity: opacity,	// opacity
-				color: color,		// color
-				blending: blending	// blending
-			} );
-
-		},
-
-		/*
-		 * Update lens flares update positions on all flares based on the screen position
-		 * Set myLensFlare.customUpdateCallback to alter the flares in your project specific way.
-		 */
-
-		updateLensFlares: function () {
-
-			var f, fl = this.lensFlares.length;
-			var flare;
-			var vecX = - this.positionScreen.x * 2;
-			var vecY = - this.positionScreen.y * 2;
-
-			for ( f = 0; f < fl; f ++ ) {
-
-				flare = this.lensFlares[ f ];
-
-				flare.x = this.positionScreen.x + vecX * flare.distance;
-				flare.y = this.positionScreen.y + vecY * flare.distance;
-
-				flare.wantedRotation = flare.x * Math.PI * 0.25;
-				flare.rotation += ( flare.wantedRotation - flare.rotation ) * 0.25;
-
-			}
 
 		}
 
@@ -42441,6 +41744,223 @@
 	} );
 
 	/**
+	 * @author bhouston / http://clara.io
+	 */
+
+	function Box2( min, max ) {
+
+		this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
+		this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
+
+	}
+
+	Object.assign( Box2.prototype, {
+
+		set: function ( min, max ) {
+
+			this.min.copy( min );
+			this.max.copy( max );
+
+			return this;
+
+		},
+
+		setFromPoints: function ( points ) {
+
+			this.makeEmpty();
+
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+				this.expandByPoint( points[ i ] );
+
+			}
+
+			return this;
+
+		},
+
+		setFromCenterAndSize: function () {
+
+			var v1 = new Vector2();
+
+			return function setFromCenterAndSize( center, size ) {
+
+				var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
+				this.min.copy( center ).sub( halfSize );
+				this.max.copy( center ).add( halfSize );
+
+				return this;
+
+			};
+
+		}(),
+
+		clone: function () {
+
+			return new this.constructor().copy( this );
+
+		},
+
+		copy: function ( box ) {
+
+			this.min.copy( box.min );
+			this.max.copy( box.max );
+
+			return this;
+
+		},
+
+		makeEmpty: function () {
+
+			this.min.x = this.min.y = + Infinity;
+			this.max.x = this.max.y = - Infinity;
+
+			return this;
+
+		},
+
+		isEmpty: function () {
+
+			// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+
+			return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y );
+
+		},
+
+		getCenter: function ( optionalTarget ) {
+
+			var result = optionalTarget || new Vector2();
+			return this.isEmpty() ? result.set( 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+
+		},
+
+		getSize: function ( optionalTarget ) {
+
+			var result = optionalTarget || new Vector2();
+			return this.isEmpty() ? result.set( 0, 0 ) : result.subVectors( this.max, this.min );
+
+		},
+
+		expandByPoint: function ( point ) {
+
+			this.min.min( point );
+			this.max.max( point );
+
+			return this;
+
+		},
+
+		expandByVector: function ( vector ) {
+
+			this.min.sub( vector );
+			this.max.add( vector );
+
+			return this;
+
+		},
+
+		expandByScalar: function ( scalar ) {
+
+			this.min.addScalar( - scalar );
+			this.max.addScalar( scalar );
+
+			return this;
+
+		},
+
+		containsPoint: function ( point ) {
+
+			return point.x < this.min.x || point.x > this.max.x ||
+				point.y < this.min.y || point.y > this.max.y ? false : true;
+
+		},
+
+		containsBox: function ( box ) {
+
+			return this.min.x <= box.min.x && box.max.x <= this.max.x &&
+				this.min.y <= box.min.y && box.max.y <= this.max.y;
+
+		},
+
+		getParameter: function ( point, optionalTarget ) {
+
+			// This can potentially have a divide by zero if the box
+			// has a size dimension of 0.
+
+			var result = optionalTarget || new Vector2();
+
+			return result.set(
+				( point.x - this.min.x ) / ( this.max.x - this.min.x ),
+				( point.y - this.min.y ) / ( this.max.y - this.min.y )
+			);
+
+		},
+
+		intersectsBox: function ( box ) {
+
+			// using 4 splitting planes to rule out intersections
+
+			return box.max.x < this.min.x || box.min.x > this.max.x ||
+				box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
+
+		},
+
+		clampPoint: function ( point, optionalTarget ) {
+
+			var result = optionalTarget || new Vector2();
+			return result.copy( point ).clamp( this.min, this.max );
+
+		},
+
+		distanceToPoint: function () {
+
+			var v1 = new Vector2();
+
+			return function distanceToPoint( point ) {
+
+				var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
+				return clampedPoint.sub( point ).length();
+
+			};
+
+		}(),
+
+		intersect: function ( box ) {
+
+			this.min.max( box.min );
+			this.max.min( box.max );
+
+			return this;
+
+		},
+
+		union: function ( box ) {
+
+			this.min.min( box.min );
+			this.max.max( box.max );
+
+			return this;
+
+		},
+
+		translate: function ( offset ) {
+
+			this.min.add( offset );
+			this.max.add( offset );
+
+			return this;
+
+		},
+
+		equals: function ( box ) {
+
+			return box.min.equals( this.min ) && box.max.equals( this.max );
+
+		}
+
+	} );
+
+	/**
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
@@ -45625,6 +45145,14 @@
 
 	};
 
+	//
+
+	function LensFlare() {
+
+		console.error( 'THREE.LensFlare has been moved to /examples/js/objects/LensFlare.js' );
+
+	}
+
 	exports.WebGLRenderTargetCube = WebGLRenderTargetCube;
 	exports.WebGLRenderTarget = WebGLRenderTarget;
 	exports.WebGLRenderer = WebGLRenderer;
@@ -45635,7 +45163,6 @@
 	exports.FogExp2 = FogExp2;
 	exports.Fog = Fog;
 	exports.Scene = Scene;
-	exports.LensFlare = LensFlare;
 	exports.Sprite = Sprite;
 	exports.LOD = LOD;
 	exports.SkinnedMesh = SkinnedMesh;
@@ -46024,6 +45551,7 @@
 	exports.Projector = Projector;
 	exports.CanvasRenderer = CanvasRenderer;
 	exports.SceneUtils = SceneUtils;
+	exports.LensFlare = LensFlare;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
