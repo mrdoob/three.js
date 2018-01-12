@@ -132,6 +132,8 @@
 				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false;
+				renderer.info.autoReset = false;
 				renderer.shadowMap.enabled = true;
 				renderer.vr.enabled = true;
 				document.body.appendChild( renderer.domElement );
@@ -155,6 +157,8 @@
 
 			function animate() {
 
+				renderer.clear();
+				renderer.info.reset();
 				renderer.animate( render );
 
 			}
