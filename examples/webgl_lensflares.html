@@ -138,11 +138,11 @@
 					scene.add( light );
 
 					var flareColor = new THREE.Color( 0xffffff );
-					flareColor.setHSL( h, s, l + 0.5 );
+					flareColor.setHSL( h, s, l );
 
 					var lensFlare = new THREE.LensFlare();
-					lensFlare.add( new THREE.LensFlareElement( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor ) );
-					lensFlare.add( new THREE.LensFlareElement( textureFlare2, 512, 0 ) );
+					lensFlare.add( new THREE.LensFlareElement( textureFlare0, 512, 0, flareColor ) );
+					lensFlare.add( new THREE.LensFlareElement( textureFlare2, 512, 0, flareColor ) );
 					lensFlare.add( new THREE.LensFlareElement( textureFlare2, 512, 0 ) );
 					lensFlare.add( new THREE.LensFlareElement( textureFlare2, 512, 0 ) );
 					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 60, 0.6 ) );

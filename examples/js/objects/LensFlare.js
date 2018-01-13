@@ -226,7 +226,7 @@ THREE.LensFlare.Shader = {
 
 //
 
-THREE.LensFlareElement = function ( texture, size, distance, blending, color, opacity ) {
+THREE.LensFlareElement = function ( texture, size, distance, color, blending, opacity ) {
 
 	THREE.Mesh.call( this );
 
