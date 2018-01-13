@@ -53,7 +53,7 @@ THREE.LensFlare = function () {
 	var validArea = new THREE.Box2();
 	var viewport = new THREE.Vector4();
 
-	this.onBeforeRender = function ( renderer, scene, camera, geometry, material, group ) {
+	this.onBeforeRender = function ( renderer, scene, camera ) {
 
 		viewport.copy( renderer.getCurrentViewport() );
 
@@ -252,7 +252,7 @@ THREE.LensFlareElement = function ( texture, size, distance, color, blending, op
 		uniforms: {
 			'map': { value: texture },
 			'occlusionMap': { value: null },
-			'opacity': { value: 1 },
+			'opacity': { value: opacity || 1 },
 			'color': { value: color || new THREE.Color( 0xffffff ) },
 			'scale': { value: new THREE.Vector2() },
 			'screenPosition': { value: new THREE.Vector3() }
@@ -314,7 +314,7 @@ THREE.LensFlareElement.Shader = {
 		'	visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );',
 		'	visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );',
 		'	visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );',
-		' visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );',
+		'	visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );',
 		'	visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );',
 		'	visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );',
 		'	visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );',
