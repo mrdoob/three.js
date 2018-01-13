@@ -10,6 +10,7 @@ THREE.LensFlare = function () {
 	this.type = 'LensFlare';
 
 	this.renderOrder = Infinity; // see #12883
+	this.material.transparent = true;
 	this.frustumCulled = false;
 
 	//
@@ -239,6 +240,7 @@ THREE.LensFlareElement = function ( texture, size, distance, color, blending ) {
 
 	this.type = 'LensFlareElement';
 	this.frustumCulled = false;
+	this.renderOrder = Infinity;
 
 	this.flareSize = size || 1;
 	this.flareDistance = distance || 0;
