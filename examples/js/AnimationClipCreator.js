@@ -74,7 +74,7 @@ THREE.AnimationClipCreator.CreatePulsationAnimation = function( duration, pulseS
 
 	var trackName = '.scale';
 
-	var track = new THREE.VectorKeyframeTrack( trackName, keys );
+	var track = new THREE.VectorKeyframeTrack( trackName, times, values );
 
 	return new THREE.AnimationClip( null, duration, [ track ] );
 
@@ -101,7 +101,7 @@ THREE.AnimationClipCreator.CreateMaterialColorAnimation = function( duration, co
 
 	for( var i = 0; i <= colors.length; i ++ ) {
 
-		timees.push( i * timeStep );
+		times.push( i * timeStep );
 		values.push( colors[ i % colors.length ] );
 
 	}
