@@ -182,7 +182,7 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	function resetInfo () {
+	function resetInfo() {
 
 		_infoRender.frame ++;
 		_infoRender.calls = 0;
