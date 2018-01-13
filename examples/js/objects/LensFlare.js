@@ -84,7 +84,7 @@ THREE.LensFlare = function () {
 
 			// save current RGB to temp texture
 
-			renderer.copyFramebufferToTexture( screenPositionPixels.x, screenPositionPixels.y, tempMap );
+			renderer.copyFramebufferToTexture( screenPositionPixels, tempMap );
 
 			// render pink quad
 
@@ -97,7 +97,7 @@ THREE.LensFlare = function () {
 
 			// copy result to occlusionMap
 
-			renderer.copyFramebufferToTexture( screenPositionPixels.x, screenPositionPixels.y, occlusionMap );
+			renderer.copyFramebufferToTexture( screenPositionPixels, occlusionMap );
 
 			// restore graphics
 
