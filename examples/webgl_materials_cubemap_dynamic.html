@@ -233,8 +233,8 @@
 				// FLARES
 				var textureLoader = new THREE.TextureLoader();
 
-				flareA = textureLoader.load( "textures/lensflare2.jpg" );
-				flareB = textureLoader.load( "textures/lensflare0.png" );
+				flareA = textureLoader.load( "textures/lensflare/lensflare0.png" );
+				flareB = textureLoader.load( "textures/lensflare/lensflare3.png" );
 
 				// CARS - VEYRON
 
@@ -286,8 +286,8 @@
 						var material = new THREE.SpriteMaterial( p );
 						var sprite = new THREE.Sprite( material );
 
-						var spriteWidth = 128;
-						var spriteHeight = 128;
+						var spriteWidth = 16;
+						var spriteHeight = 16;
 
 						sprite.scale.set( s * spriteWidth, s * spriteHeight, s );
 						sprite.position.set( x, y, z );
@@ -353,8 +353,8 @@
 						var material = new THREE.SpriteMaterial( p );
 						var sprite = new THREE.Sprite( material );
 
-						var spriteWidth = 128;
-						var spriteHeight = 128;
+						var spriteWidth = 16;
+						var spriteHeight = 16;
 
 						sprite.scale.set( s * spriteWidth, s * spriteHeight, s );
 						sprite.position.set( x, y, z );
