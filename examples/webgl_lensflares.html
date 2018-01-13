@@ -155,11 +155,9 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.autoClear = false;
-				renderer.info.autoReset = false;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -205,8 +203,6 @@
 				var delta = clock.getDelta();
 
 				controls.update( delta );
-				renderer.clear();
-				renderer.info.reset();
 				renderer.render( scene, camera );
 
 			}

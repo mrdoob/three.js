@@ -1,15 +1,21 @@
 /**
  * @author Mugen87 / https://github.com/Mugen87
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.LensFlare = function () {
 
-	THREE.Group.call( this );
+	THREE.Mesh.call( this );
 
 	this.type = 'LensFlare';
 
-	this.positionScreen = new THREE.Vector3();
-	this.flareVisible = false;
+	this.renderOrder = Infinity; // see #12883
+	this.frustumCulled = false;
+
+	//
+
+	var flareVisible = false;
+	var positionScreen = new THREE.Vector3();
 
 	// textures
 
@@ -18,7 +24,7 @@ THREE.LensFlare = function () {
 	tempMap.magFilter = THREE.NearestFilter;
 	tempMap.needsUpdate = true;
 
-	var occlusionMap = new THREE.DataTexture( new Uint8Array( 16 * 16 * 4 ), 16, 16, THREE.RGBAFormat );
+	var occlusionMap = new THREE.DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, THREE.RGBFormat );
 	occlusionMap.minFilter = THREE.NearestFilter;
 	occlusionMap.magFilter = THREE.NearestFilter;
 	occlusionMap.needsUpdate = true;
@@ -31,7 +37,8 @@ THREE.LensFlare = function () {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
-		depthWrite: false
+		depthWrite: false,
+		transparent: false
 	} );
 
 	// the following object is used for occlusionMap generation
@@ -44,19 +51,15 @@ THREE.LensFlare = function () {
 	var scale = new THREE.Vector2();
 	var screenPositionPixels = new THREE.Vector2();
 	var validArea = new THREE.Box2();
-	var currentFrame = 0;
+	var viewport = new THREE.Vector4();
 
-	this.update = function ( renderer, camera, viewport ) {
+	this.onBeforeRender = function ( renderer, scene, camera, geometry, material, group ) {
 
-		var frame = renderer.info.render.frame;
-
-		if ( currentFrame === frame ) return;
-
-		currentFrame = frame;
+		viewport.copy( renderer.getCurrentViewport() );
 
 		var invAspect = viewport.w / viewport.z;
-		var halfViewportWidth = viewport.z * 0.5;
-		var halfViewportHeight = viewport.w * 0.5;
+		var halfViewportWidth = viewport.z / 2.0;
+		var halfViewportHeight = viewport.w / 2.0;
 
 		var size = 16 / viewport.w;
 		scale.set( size * invAspect, size );
@@ -66,21 +69,26 @@ THREE.LensFlare = function () {
 
 		// calculate position in screen space
 
-		this.positionScreen.setFromMatrixPosition( this.matrixWorld );
+		positionScreen.setFromMatrixPosition( this.matrixWorld );
 
-		this.positionScreen.applyMatrix4( camera.matrixWorldInverse );
-		this.positionScreen.applyMatrix4( camera.projectionMatrix );
+		positionScreen.applyMatrix4( camera.matrixWorldInverse );
+		positionScreen.applyMatrix4( camera.projectionMatrix );
 
 		// horizontal and vertical coordinate of the lower left corner of the pixels to copy
 
-		screenPositionPixels.x = viewport.x + ( this.positionScreen.x * halfViewportWidth ) + halfViewportWidth - 8;
-		screenPositionPixels.y = viewport.y + ( this.positionScreen.y * halfViewportHeight ) + halfViewportHeight - 8;
+		screenPositionPixels.x = viewport.x + ( positionScreen.x * halfViewportWidth ) + halfViewportWidth - 8;
+		screenPositionPixels.y = viewport.y + ( positionScreen.y * halfViewportHeight ) + halfViewportHeight - 8;
 
 		// screen cull
 
-		if ( validArea.containsPoint( screenPositionPixels ) === true ) {
+		flareVisible = validArea.containsPoint( screenPositionPixels );
 
-			this.flareVisible = true;
+		if ( flareVisible ) {
+
+			var currentAutoClear = renderer.autoClear;
+
+			renderer.autoClear = false;
+
 
 			// save current RGB to temp texture
 
@@ -90,7 +98,7 @@ THREE.LensFlare = function () {
 
 			occluder.material.uniforms.renderType.value = 0;
 			occluder.material.uniforms.scale.value = scale;
-			occluder.material.uniforms.screenPosition.value = this.positionScreen;
+			occluder.material.uniforms.screenPosition.value = positionScreen;
 			occluder.material.depthTest = true;
 
 			renderer.render( occluder, camera );
@@ -107,39 +115,38 @@ THREE.LensFlare = function () {
 
 			renderer.render( occluder, camera );
 
-			// update object positions
+			//
 
-			updateLensFlares();
-
-		} else {
-
-			this.flareVisible = false;
+			renderer.autoClear = currentAutoClear;
 
 		}
 
-	};
+		// update object positions
 
-	var scope = this;
+		var children = this.children;
 
-	function updateLensFlares() {
+		var vecX = - positionScreen.x * 2;
+		var vecY = - positionScreen.y * 2;
 
-		var vecX = - scope.positionScreen.x * 2;
-		var vecY = - scope.positionScreen.y * 2;
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-		for ( var i = 0, l = scope.children.length; i < l; i ++ ) {
+			var flare = children[ i ];
 
-			var flare = scope.children[ i ];
+			var flarePosition = flare.material.uniforms.screenPosition.value;
+			flarePosition.x = positionScreen.x + vecX * flare.flareDistance;
+			flarePosition.y = positionScreen.y + vecY * flare.flareDistance;
 
-			flare.flarePosition.x = scope.positionScreen.x + vecX * flare.flareDistance;
-			flare.flarePosition.y = scope.positionScreen.y + vecY * flare.flareDistance;
+			//
+
+			var size = flare.flareSize / viewport.w;
+			var invAspect = viewport.w / viewport.z;
+
+			flare.material.uniforms.occlusionMap.value = occlusionMap;
+			flare.material.uniforms.scale.value.set( size * invAspect, size );
+
+			flare.material.uniforms.opacity.value = flareVisible ? 1 : 0;
 
 		}
-
-	}
-
-	this.getOcclusionMap = function () {
-
-		return occlusionMap;
 
 	};
 
@@ -154,7 +161,7 @@ THREE.LensFlare = function () {
 
 };
 
-THREE.LensFlare.prototype = Object.create( THREE.Group.prototype );
+THREE.LensFlare.prototype = Object.create( THREE.Mesh.prototype );
 THREE.LensFlare.prototype.constructor = THREE.LensFlare;
 THREE.LensFlare.prototype.isLensFlare = true;
 
@@ -208,7 +215,7 @@ THREE.LensFlare.Shader = {
 
 		'	if ( renderType == 0 ) {',
 
-		'		gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );',
+		'		gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );',
 
 		// restore
 
@@ -232,74 +239,30 @@ THREE.LensFlareElement = function ( texture, size, distance, color, blending, op
 
 	this.type = 'LensFlareElement';
 	this.frustumCulled = false;
-	this.renderOrder = Infinity; // see #12883
 
-	this.flareTexture = texture;
 	this.flareSize = size || 1;
 	this.flareDistance = distance || 0;
-	this.flareBlending = blending || THREE.AdditiveBlending;
-	this.flareColor = color || new THREE.Color( 0xffffff );
-	this.flareOpacity = opacity || 1;
-	this.flarePosition = new THREE.Vector3();
-	this.flareRotation = 0;
 
 	this.geometry = THREE.LensFlare.Geometry;
 
 	var shader = THREE.LensFlareElement.Shader;
 
 	this.material = new THREE.RawShaderMaterial( {
-		uniforms: shader.uniforms,
+		// uniforms: Object.assign( {}, shader.uniforms ),
+		uniforms: {
+			'map': { value: texture },
+			'occlusionMap': { value: null },
+			'opacity': { value: 1 },
+			'color': { value: color || new THREE.Color( 0xffffff ) },
+			'scale': { value: new THREE.Vector2() },
+			'screenPosition': { value: new THREE.Vector3() }
+		},
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
-		blending: this.flareBlending,
+		blending: blending || THREE.AdditiveBlending,
 		transparent: true,
 		depthWrite: false
 	} );
-
-	//
-
-	var scale = new THREE.Vector2();
-	var viewport = new THREE.Vector4();
-
-	this.onBeforeRender = function ( renderer, scene, camera, geometry, material, group ) {
-
-		var parent = this.parent;
-
-		if ( parent === null ) {
-
-			console.error( 'THREE.LensFlareElement: LensFlareElement not assigned to a LensFlare. Rendering not possible.' );
-			return;
-
-		}
-
-		//
-
-		viewport.copy( renderer.getCurrentViewport() );
-
-		parent.update( renderer, camera, viewport );
-
-		//
-
-		var size = this.flareSize / viewport.w;
-		var invAspect = viewport.w / viewport.z;
-
-		scale.set( size * invAspect, size );
-
-		this.material.uniforms.map.value = this.flareTexture;
-		this.material.uniforms.occlusionMap.value = parent.getOcclusionMap();
-		this.material.uniforms.opacity.value = this.flareOpacity;
-		this.material.uniforms.color.value = this.flareColor;
-		this.material.uniforms.scale.value = scale;
-		this.material.uniforms.rotation.value = this.flareRotation;
-		this.material.uniforms.screenPosition.value = this.flarePosition;
-
-		if ( parent.flareVisible === false ) {
-
-			this.material.uniforms.opacity.value = 0;
-
-		}
-
-	};
 
 	this.dispose = function () {
 
@@ -322,7 +285,6 @@ THREE.LensFlareElement.Shader = {
 		'opacity': { value: 1 },
 		'color': { value: null },
 		'scale': { value: null },
-		'rotation': { value: 0 },
 		'screenPosition': { value: null }
 
 	},
@@ -333,7 +295,6 @@ THREE.LensFlareElement.Shader = {
 
 		'uniform vec3 screenPosition;',
 		'uniform vec2 scale;',
-		'uniform float rotation;',
 
 		'uniform sampler2D occlusionMap;',
 
@@ -362,10 +323,6 @@ THREE.LensFlareElement.Shader = {
 		'	vVisibility =        visibility.r / 9.0;',
 		'	vVisibility *= 1.0 - visibility.g / 9.0;',
 		'	vVisibility *=       visibility.b / 9.0;',
-		'	vVisibility *= 1.0 - visibility.a / 9.0;',
-
-		'	pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;',
-		'	pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;',
 
 		'	gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );',
 
