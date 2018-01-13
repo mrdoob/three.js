@@ -34,9 +34,9 @@ var textureFlare2 = textureLoader.load( "textures/lensflare/lensflare3.png" );
 
 var lensFlare = new THREE.LensFlare();
 
-lensFlare.add( new THREE.LensFlareElement( textureFlare0, 512, 0, THREE.AdditiveBlending ) );
-lensFlare.add( new THREE.LensFlareElement( textureFlare1, 512, 0, THREE.AdditiveBlending ) );
-lensFlare.add( new THREE.LensFlareElement( textureFlare2, 60, 0.6, THREE.AdditiveBlending ) );
+lensFlare.add( new THREE.LensFlareElement( textureFlare0, 512, 0 ) );
+lensFlare.add( new THREE.LensFlareElement( textureFlare1, 512, 0 ) );
+lensFlare.add( new THREE.LensFlareElement( textureFlare2, 60, 0.6 ) );
 
 light.add( lensFlare );
 			</code>
@@ -46,15 +46,13 @@ light.add( lensFlare );
 		<h2>Constructor</h2>
 
 
-		<h3>LensFlareElement( [page:Texture texture], [page:Float size], [page:Float distance], [page:Materials blending], [page:Color color], [page:Float opacity] )</h3>
+		<h3>LensFlareElement( [page:Texture texture], [page:Float size], [page:Float distance], [page:Color color], [page:Materials blending] )</h3>
 		<div>
 		[page:Texture texture] - THREE.Texture to use for the flare. <br />
 		[page:Float size] - (optional) size in pixels <br />
 		[page:Float distance] - (optional) (0-1) from light source (0 = at light source) <br />
-		[page:Materials blending] - (optional) [page:Materials Blending Mode] - Defaults to THREE.NormalBlending <br />
-		[page:Color color] - (optional) the [page:Color] of the lens flare<br /><br />
-		[page:Float opacity] - (optional) the opacity of the lens flare<br /><br />
-
+		[page:Color color] - (optional) the [page:Color] of the lens flare<br />
+		[page:Materials blending] - (optional) [page:Materials Blending Mode] - Defaults to THREE.NormalBlending
 		</div>
 
 		<h2>Properties</h2>
