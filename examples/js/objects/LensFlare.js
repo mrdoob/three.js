@@ -233,7 +233,7 @@ THREE.LensFlare.Shader = {
 
 //
 
-THREE.LensFlareElement = function ( texture, size, distance, color, blending, opacity ) {
+THREE.LensFlareElement = function ( texture, size, distance, color, blending ) {
 
 	THREE.Mesh.call( this );
 
@@ -252,7 +252,7 @@ THREE.LensFlareElement = function ( texture, size, distance, color, blending, op
 		uniforms: {
 			'map': { value: texture },
 			'occlusionMap': { value: null },
-			'opacity': { value: opacity || 1 },
+			'opacity': { value: 1 },
 			'color': { value: color || new THREE.Color( 0xffffff ) },
 			'scale': { value: new THREE.Vector2() },
 			'screenPosition': { value: new THREE.Vector3() }
