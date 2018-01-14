@@ -15,7 +15,6 @@ import { WebGLMorphtargets } from './webgl/WebGLMorphtargets.js';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
 import { WebGLGeometries } from './webgl/WebGLGeometries.js';
-import { WebGLLights } from './webgl/WebGLLights.js';
 import { WebGLObjects } from './webgl/WebGLObjects.js';
 import { WebGLPrograms } from './webgl/WebGLPrograms.js';
 import { WebGLTextures } from './webgl/WebGLTextures.js';
@@ -29,6 +28,7 @@ import { WebGLClipping } from './webgl/WebGLClipping.js';
 import { Frustum } from '../math/Frustum.js';
 import { Vector4 } from '../math/Vector4.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
+import { WebGLRenderContexts } from './webgl/WebGLRenderContexts.js';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -55,12 +55,8 @@ function WebGLRenderer( parameters ) {
 		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default';
 
-	var lightsArray = [];
-	var shadowsArray = [];
-
 	var currentRenderList = null;
-
-	var spritesArray = [];
+	var currentRenderContext = null;
 
 	// public properties
 
@@ -254,8 +250,8 @@ function WebGLRenderer( parameters ) {
 	}
 
 	var extensions, capabilities, state;
-	var properties, textures, attributes, geometries, objects, lights;
-	var programCache, renderLists;
+	var properties, textures, attributes, geometries, objects;
+	var programCache, renderLists, renderContexts;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 	var spriteRenderer;
@@ -289,8 +285,8 @@ function WebGLRenderer( parameters ) {
 		objects = new WebGLObjects( geometries, _infoRender );
 		morphtargets = new WebGLMorphtargets( _gl );
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
-		lights = new WebGLLights();
 		renderLists = new WebGLRenderLists();
+		renderContexts = new WebGLRenderContexts();
 
 		background = new WebGLBackground( _this, state, geometries, _premultipliedAlpha );
 
@@ -525,6 +521,7 @@ function WebGLRenderer( parameters ) {
 		_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 
 		renderLists.dispose();
+		renderContexts.dispose();
 		properties.dispose();
 		objects.dispose();
 
@@ -994,18 +991,17 @@ function WebGLRenderer( parameters ) {
 
 	this.compile = function ( scene, camera ) {
 
-		lightsArray.length = 0;
-		shadowsArray.length = 0;
+		currentRenderContext.init();
 
 		scene.traverse( function ( object ) {
 
 			if ( object.isLight ) {
 
-				lightsArray.push( object );
+				currentRenderContext.pushLight( object );
 
 				if ( object.castShadow ) {
 
-					shadowsArray.push( object );
+					currentRenderContext.pushShadow( object );
 
 				}
 
@@ -1013,7 +1009,7 @@ function WebGLRenderer( parameters ) {
 
 		} );
 
-		lights.setup( lightsArray, shadowsArray, camera );
+		currentRenderContext.setupLights( camera );
 
 		scene.traverse( function ( object ) {
 
@@ -1122,15 +1118,15 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		//
+
+		currentRenderContext = renderContexts.get( scene, camera );
+		currentRenderContext.init();
+
 		scene.onBeforeRender( _this, scene, camera, renderTarget );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
-
-		lightsArray.length = 0;
-		shadowsArray.length = 0;
-
-		spritesArray.length = 0;
 
 		_localClippingEnabled = this.localClippingEnabled;
 		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
@@ -1150,9 +1146,11 @@ function WebGLRenderer( parameters ) {
 
 		if ( _clippingEnabled ) _clipping.beginShadows();
 
+		var shadowsArray = currentRenderContext.state.shadowsArray;
+
 		shadowMap.render( shadowsArray, scene, camera );
 
-		lights.setup( lightsArray, shadowsArray, camera );
+		currentRenderContext.setupLights( camera );
 
 		if ( _clippingEnabled ) _clipping.endShadows();
 
@@ -1197,6 +1195,8 @@ function WebGLRenderer( parameters ) {
 		}
 
 		// custom renderers
+
+		var spritesArray = currentRenderContext.state.spritesArray;
 
 		spriteRenderer.render( spritesArray, scene, camera );
 
@@ -1293,11 +1293,11 @@ function WebGLRenderer( parameters ) {
 
 			if ( object.isLight ) {
 
-				lightsArray.push( object );
+				currentRenderContext.pushLight( object );
 
 				if ( object.castShadow ) {
 
-					shadowsArray.push( object );
+					currentRenderContext.pushShadow( object );
 
 				}
 
@@ -1305,7 +1305,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
-					spritesArray.push( object );
+					currentRenderContext.pushSprite( object );
 
 				}
 
@@ -1432,6 +1432,7 @@ function WebGLRenderer( parameters ) {
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
 		object.onBeforeRender( _this, scene, camera, geometry, material, group );
+		restoreRenderContext( scene, _currentArrayCamera || camera );
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
@@ -1455,12 +1456,16 @@ function WebGLRenderer( parameters ) {
 		}
 
 		object.onAfterRender( _this, scene, camera, geometry, material, group );
+		restoreRenderContext( scene, _currentArrayCamera || camera );
 
 	}
 
 	function initMaterial( material, fog, object ) {
 
 		var materialProperties = properties.get( material );
+
+		var lights = currentRenderContext.state.lights;
+		var shadowsArray = currentRenderContext.state.shadowsArray;
 
 		var parameters = programCache.getParameters(
 			material, lights.state, shadowsArray, fog, _clipping.numPlanes, _clipping.numIntersection, object );
@@ -1479,6 +1484,11 @@ function WebGLRenderer( parameters ) {
 
 			// changed glsl or parameters
 			releaseMaterialProgramReference( material );
+
+		} else if ( materialProperties.lightsHash !== lights.state.hash ) {
+
+			properties.update( material, 'lightsHash', lights.state.hash );
+			programChange = false;
 
 		} else if ( parameters.shaderID !== undefined ) {
 
@@ -1611,6 +1621,7 @@ function WebGLRenderer( parameters ) {
 		_usedTextureUnits = 0;
 
 		var materialProperties = properties.get( material );
+		var lights = currentRenderContext.state.lights;
 
 		if ( _clippingEnabled ) {
 
@@ -2305,6 +2316,14 @@ function WebGLRenderer( parameters ) {
 		uniforms.spotLights.needsUpdate = value;
 		uniforms.rectAreaLights.needsUpdate = value;
 		uniforms.hemisphereLights.needsUpdate = value;
+
+	}
+
+	//
+
+	function restoreRenderContext( scene, camera ) {
+
+		currentRenderContext = renderContexts.get( scene, camera );
 
 	}
 
