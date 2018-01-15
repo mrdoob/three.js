@@ -38,9 +38,9 @@ LineDashedMaterial.prototype.copy = function ( source ) {
 
 	LineBasicMaterial.prototype.copy.call( this, source );
 
-	this.scale = source.scale;
-	this.dashSize = source.dashSize;
-	this.gapSize = source.gapSize;
+	if ( source.scale !== undefined ) this.scale = source.scale;
+	if ( source.dashSize !== undefined ) this.dashSize = source.dashSize;
+	if ( source.gapSize !== undefined ) this.gapSize = source.gapSize;
 
 	return this;
 

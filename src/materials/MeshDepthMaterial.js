@@ -62,21 +62,21 @@ MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
-	this.depthPacking = source.depthPacking;
+	if ( source.depthPacking !== undefined ) this.depthPacking = source.depthPacking;
 
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
+	if ( source.skinning !== undefined ) this.skinning = source.skinning;
+	if ( source.morphTargets !== undefined ) this.morphTargets = source.morphTargets;
 
-	this.map = source.map;
+	if ( source.map !== undefined ) this.map = source.map;
 
-	this.alphaMap = source.alphaMap;
+	if ( source.alphaMap !== undefined ) this.alphaMap = source.alphaMap;
 
-	this.displacementMap = source.displacementMap;
-	this.displacementScale = source.displacementScale;
-	this.displacementBias = source.displacementBias;
+	if ( source.displacementMap !== undefined ) this.displacementMap = source.displacementMap;
+	if ( source.displacementScale !== undefined ) this.displacementScale = source.displacementScale;
+	if ( source.displacementBias !== undefined ) this.displacementBias = source.displacementBias;
 
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
+	if ( source.wireframe !== undefined ) this.wireframe = source.wireframe;
+	if ( source.wireframeLinewidth !== undefined ) this.wireframeLinewidth = source.wireframeLinewidth;
 
 	return this;
 

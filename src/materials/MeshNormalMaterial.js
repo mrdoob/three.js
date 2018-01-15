@@ -66,22 +66,22 @@ MeshNormalMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
-	this.bumpMap = source.bumpMap;
-	this.bumpScale = source.bumpScale;
+	if ( source.bumpMap !== undefined ) this.bumpMap = source.bumpMap;
+	if ( source.bumpScale !== undefined ) this.bumpScale = source.bumpScale;
 
-	this.normalMap = source.normalMap;
-	this.normalScale.copy( source.normalScale );
+	if ( source.normalMap !== undefined ) this.normalMap = source.normalMap;
+	if ( source.normalScale !== undefined ) this.normalScale.copy( source.normalScale );
 
-	this.displacementMap = source.displacementMap;
-	this.displacementScale = source.displacementScale;
-	this.displacementBias = source.displacementBias;
+	if ( source.displacementMap !== undefined ) this.displacementMap = source.displacementMap;
+	if ( source.displacementScale !== undefined ) this.displacementScale = source.displacementScale;
+	if ( source.displacementBias !== undefined ) this.displacementBias = source.displacementBias;
 
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
+	if ( source.wireframe !== undefined ) this.wireframe = source.wireframe;
+	if ( source.wireframeLinewidth !== undefined ) this.wireframeLinewidth = source.wireframeLinewidth;
 
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
-	this.morphNormals = source.morphNormals;
+	if ( source.skinning !== undefined ) this.skinning = source.skinning;
+	if ( source.morphTargets !== undefined ) this.morphTargets = source.morphTargets;
+	if ( source.morphNormals !== undefined ) this.morphNormals = source.morphNormals;
 
 	return this;
 

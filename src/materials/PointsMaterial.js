@@ -43,12 +43,12 @@ PointsMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
-	this.color.copy( source.color );
+	if ( source.color !== undefined ) this.color.copy( source.color );
 
-	this.map = source.map;
+	if ( source.map !== undefined ) this.map = source.map;
 
-	this.size = source.size;
-	this.sizeAttenuation = source.sizeAttenuation;
+	if ( source.size !== undefined ) this.size = source.size;
+	if ( source.sizeAttenuation !== undefined ) this.sizeAttenuation = source.sizeAttenuation;
 
 	return this;
 

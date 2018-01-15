@@ -31,7 +31,7 @@ MeshToonMaterial.prototype.copy = function ( source ) {
 
 	MeshPhongMaterial.prototype.copy.call( this, source );
 
-	this.gradientMap = source.gradientMap;
+	if ( source.gradientMap !== undefined ) this.gradientMap = source.gradientMap;
 
 	return this;
 

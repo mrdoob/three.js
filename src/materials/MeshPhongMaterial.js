@@ -116,49 +116,49 @@ MeshPhongMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
-	this.color.copy( source.color );
-	this.specular.copy( source.specular );
-	this.shininess = source.shininess;
+	if ( source.color !== undefined ) this.color.copy( source.color );
+	if ( source.specular !== undefined ) this.specular.copy( source.specular );
+	if ( source.shininess !== undefined ) this.shininess = source.shininess;
 
-	this.map = source.map;
+	if ( source.map !== undefined ) this.map = source.map;
 
-	this.lightMap = source.lightMap;
-	this.lightMapIntensity = source.lightMapIntensity;
+	if ( source.lightMap !== undefined ) this.lightMap = source.lightMap;
+	if ( source.lightMapIntensity !== undefined ) this.lightMapIntensity = source.lightMapIntensity;
 
-	this.aoMap = source.aoMap;
-	this.aoMapIntensity = source.aoMapIntensity;
+	if ( source.aoMap !== undefined ) this.aoMap = source.aoMap;
+	if ( source.aoMapIntensity !== undefined ) this.aoMapIntensity = source.aoMapIntensity;
 
-	this.emissive.copy( source.emissive );
-	this.emissiveMap = source.emissiveMap;
-	this.emissiveIntensity = source.emissiveIntensity;
+	if ( source.emissive !== undefined ) this.emissive.copy( source.emissive );
+	if ( source.emissiveMap !== undefined ) this.emissiveMap = source.emissiveMap;
+	if ( source.emissiveIntensity !== undefined ) this.emissiveIntensity = source.emissiveIntensity;
 
-	this.bumpMap = source.bumpMap;
-	this.bumpScale = source.bumpScale;
+	if ( source.bumpMap !== undefined ) this.bumpMap = source.bumpMap;
+	if ( source.bumpScale !== undefined ) this.bumpScale = source.bumpScale;
 
-	this.normalMap = source.normalMap;
-	this.normalScale.copy( source.normalScale );
+	if ( source.normalMap !== undefined ) this.normalMap = source.normalMap;
+	if ( source.normalScale !== undefined ) this.normalScale.copy( source.normalScale );
 
-	this.displacementMap = source.displacementMap;
-	this.displacementScale = source.displacementScale;
-	this.displacementBias = source.displacementBias;
+	if ( source.displacementMap !== undefined ) this.displacementMap = source.displacementMap;
+	if ( source.displacementScale !== undefined ) this.displacementScale = source.displacementScale;
+	if ( source.displacementBias !== undefined ) this.displacementBias = source.displacementBias;
 
-	this.specularMap = source.specularMap;
+	if ( source.specularMap !== undefined ) this.specularMap = source.specularMap;
 
-	this.alphaMap = source.alphaMap;
+	if ( source.alphaMap !== undefined ) this.alphaMap = source.alphaMap;
 
-	this.envMap = source.envMap;
-	this.combine = source.combine;
-	this.reflectivity = source.reflectivity;
-	this.refractionRatio = source.refractionRatio;
+	if ( source.envMap !== undefined ) this.envMap = source.envMap;
+	if ( source.combine !== undefined ) this.combine = source.combine;
+	if ( source.reflectivity !== undefined ) this.reflectivity = source.reflectivity;
+	if ( source.refractionRatio !== undefined ) this.refractionRatio = source.refractionRatio;
 
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
-	this.wireframeLinecap = source.wireframeLinecap;
-	this.wireframeLinejoin = source.wireframeLinejoin;
+	if ( source.wireframe !== undefined ) this.wireframe = source.wireframe;
+	if ( source.wireframeLinewidth !== undefined ) this.wireframeLinewidth = source.wireframeLinewidth;
+	if ( source.wireframeLinecap !== undefined ) this.wireframeLinecap = source.wireframeLinecap;
+	if ( source.wireframeLinejoin !== undefined ) this.wireframeLinejoin = source.wireframeLinejoin;
 
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
-	this.morphNormals = source.morphNormals;
+	if ( source.skinning !== undefined ) this.skinning = source.skinning;
+	if ( source.morphTargets !== undefined ) this.morphTargets = source.morphTargets;
+	if ( source.morphNormals !== undefined ) this.morphNormals = source.morphNormals;
 
 	return this;
 

@@ -61,20 +61,20 @@ MeshDistanceMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
-	this.referencePosition.copy( source.referencePosition );
-	this.nearDistance = source.nearDistance;
-	this.farDistance = source.farDistance;
+	if ( source.referencePosition !== undefined ) this.referencePosition.copy( source.referencePosition );
+	if ( source.nearDistance !== undefined ) this.nearDistance = source.nearDistance;
+	if ( source.farDistance !== undefined ) this.farDistance = source.farDistance;
 
-	this.skinning = source.skinning;
-	this.morphTargets = source.morphTargets;
+	if ( source.skinning !== undefined ) this.skinning = source.skinning;
+	if ( source.morphTargets !== undefined ) this.morphTargets = source.morphTargets;
 
-	this.map = source.map;
+	if ( source.map !== undefined ) this.map = source.map;
 
-	this.alphaMap = source.alphaMap;
+	if ( source.alphaMap !== undefined ) this.alphaMap = source.alphaMap;
 
-	this.displacementMap = source.displacementMap;
-	this.displacementScale = source.displacementScale;
-	this.displacementBias = source.displacementBias;
+	if ( source.displacementMap !== undefined ) this.displacementMap = source.displacementMap;
+	if ( source.displacementScale !== undefined ) this.displacementScale = source.displacementScale;
+	if ( source.displacementBias !== undefined ) this.displacementBias = source.displacementBias;
 
 	return this;
 

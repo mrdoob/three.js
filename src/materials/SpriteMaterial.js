@@ -40,10 +40,10 @@ SpriteMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
-	this.color.copy( source.color );
-	this.map = source.map;
+	if ( source.color !== undefined ) this.color.copy( source.color );
+	if ( source.map !== undefined ) this.map = source.map;
 
-	this.rotation = source.rotation;
+	if ( source.rotation !== undefined ) this.rotation = source.rotation;
 
 	return this;
 

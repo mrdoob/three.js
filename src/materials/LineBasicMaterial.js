@@ -42,11 +42,11 @@ LineBasicMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
-	this.color.copy( source.color );
+	if ( source.color !== undefined ) this.color.copy( source.color );
 
-	this.linewidth = source.linewidth;
-	this.linecap = source.linecap;
-	this.linejoin = source.linejoin;
+	if ( source.linewidth !== undefined ) this.linewidth = source.linewidth;
+	if ( source.linecap !== undefined ) this.linecap = source.linecap;
+	if ( source.linejoin !== undefined ) this.linejoin = source.linejoin;
 
 	return this;
 

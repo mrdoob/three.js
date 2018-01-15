@@ -36,10 +36,10 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
 	this.defines = { 'PHYSICAL': '' };
 
-	this.reflectivity = source.reflectivity;
+	if ( source.reflectivity !== undefined ) this.reflectivity = source.reflectivity;
 
-	this.clearCoat = source.clearCoat;
-	this.clearCoatRoughness = source.clearCoatRoughness;
+	if ( source.clearCoat !== undefined ) this.clearCoat = source.clearCoat;
+	if ( source.clearCoatRoughness !== undefined ) this.clearCoatRoughness = source.clearCoatRoughness;
 
 	return this;
 

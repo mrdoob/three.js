@@ -87,25 +87,24 @@ ShaderMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
-	this.fragmentShader = source.fragmentShader;
-	this.vertexShader = source.vertexShader;
+	if ( source.fragmentShader !== undefined ) this.fragmentShader = source.fragmentShader;
+	if ( source.vertexShader !== undefined ) this.vertexShader = source.vertexShader;
 
-	this.uniforms = UniformsUtils.clone( source.uniforms );
+	if ( source.uniforms !== undefined ) this.uniforms = UniformsUtils.clone( source.uniforms );
 
-	this.defines = source.defines;
+	if ( source.defines !== undefined ) this.defines = source.defines;
 
-	this.wireframe = source.wireframe;
-	this.wireframeLinewidth = source.wireframeLinewidth;
+	if ( source.wireframe !== undefined ) this.wireframe = source.wireframe;
+	if ( source.wireframeLinewidth !== undefined ) this.wireframeLinewidth = source.wireframeLinewidth;
 
-	this.lights = source.lights;
-	this.clipping = source.clipping;
+	if ( source.clipping !== undefined ) this.clipping = source.clipping;
 
-	this.skinning = source.skinning;
+	if ( source.skinning !== undefined ) this.skinning = source.skinning;
 
-	this.morphTargets = source.morphTargets;
-	this.morphNormals = source.morphNormals;
+	if ( source.morphTargets !== undefined ) this.morphTargets = source.morphTargets;
+	if ( source.morphNormals !== undefined ) this.morphNormals = source.morphNormals;
 
-	this.extensions = source.extensions;
+	if ( source.extensions !== undefined ) this.extensions = source.extensions;
 
 	return this;
 
