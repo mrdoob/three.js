@@ -65,6 +65,14 @@
 
 			}
 
+			var objectType = object.type
+            if ( objectType !== 'Group' && objectType !== 'Mesh' ) {
+
+                console.error( 'SplitModifier: Can process only Group or Mesh !' );
+                return;
+
+            }
+
 //			THREE.Object3D.prototype.add.call( this, object );
 
 			this.originalObjects[ object.uuid ] = object;
