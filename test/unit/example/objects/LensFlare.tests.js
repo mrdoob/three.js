@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { LensFlare } from '../../../../src/objects/LensFlare';
+import * as LensFlare from '../../../../examples/js/objects/LensFlare';
 
 export default QUnit.module( 'Objects', () => {
 
