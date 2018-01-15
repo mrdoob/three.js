@@ -6,7 +6,7 @@ import { WebGLLights } from './WebGLLights.js';
 
 var count = 0;
 
-function WebGLRenderContext() {
+function WebGLRenderState() {
 
 	var id = count ++;
 
@@ -68,30 +68,30 @@ function WebGLRenderContext() {
 
 }
 
-function WebGLRenderContexts() {
+function WebGLRenderStates() {
 
-	var renderContexts = {};
+	var renderStates = {};
 
 	function get( scene, camera ) {
 
 		var hash = scene.id + ',' + camera.id;
 
-		var renderContext = renderContexts[ hash ];
+		var renderState = renderStates[ hash ];
 
-		if ( renderContext === undefined ) {
+		if ( renderState === undefined ) {
 
-			renderContext = new WebGLRenderContext();
-			renderContexts[ hash ] = renderContext;
+			renderState = new WebGLRenderState();
+			renderStates[ hash ] = renderState;
 
 		}
 
-		return renderContext;
+		return renderState;
 
 	}
 
 	function dispose() {
 
-		renderContexts = {};
+		renderStates = {};
 
 	}
 
@@ -103,4 +103,4 @@ function WebGLRenderContexts() {
 }
 
 
-export { WebGLRenderContexts };
+export { WebGLRenderStates };
