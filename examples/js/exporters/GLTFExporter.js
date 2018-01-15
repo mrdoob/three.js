@@ -938,7 +938,7 @@ THREE.GLTFExporter.prototype = {
 
 					input: processAccessor( new THREE.BufferAttribute( track.times, inputItemSize ) ),
 					output: processAccessor( new THREE.BufferAttribute( track.values, outputItemSize ) ),
-					interpolation: track.interpolation === THREE.InterpolateDiscrete ? 'STEP' : 'LINEAR'
+					interpolation: track.getInterpolation() === THREE.InterpolateDiscrete ? 'STEP' : 'LINEAR'
 
 				} );
 
