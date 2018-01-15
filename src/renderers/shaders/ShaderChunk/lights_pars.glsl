@@ -14,6 +14,39 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 }
 
+#ifdef USE_SPHERICAL_HARMONICS
+
+uniform vec3 sphericalHarmonicsValues[9];
+
+vec3 getSphericalHarmonicsLightIrradiance( vec3 worldNormal, const in vec3 shValues[9] ) {
+
+	// src: https://www.shadertoy.com/view/lt2GRD
+
+    float c1 = 0.429043;
+    float c2 = 0.511664;
+    float c3 = 0.743125;
+    float c4 = 0.886227;
+    float c5 = 0.247708;
+
+    vec3 irradiance = vec3(
+        c1 * shValues[8] * (worldNormal.x * worldNormal.x - worldNormal.y * worldNormal.y) +
+        c3 * shValues[6] * worldNormal.z * worldNormal.z +
+        c4 * shValues[0] -
+        c5 * shValues[6] +
+        2.0 * c1 * shValues[4] * worldNormal.x * worldNormal.y +
+        2.0 * c1 * shValues[7]  * worldNormal.x * worldNormal.z +
+        2.0 * c1 * shValues[5] * worldNormal.y * worldNormal.z +
+        2.0 * c2 * shValues[3]  * worldNormal.x +
+        2.0 * c2 * shValues[1] * worldNormal.y +
+        2.0 * c2 * shValues[2]  * worldNormal.z
+    );
+
+	irradiance = LinearToGamma(vec4(irradiance,1), float(GAMMA_FACTOR) ).xyz;
+		
+	return irradiance;
+}
+#endif
+
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {

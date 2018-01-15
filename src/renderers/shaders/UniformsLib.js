@@ -108,6 +108,8 @@ var UniformsLib = {
 
 		ambientLightColor: { value: [] },
 
+		sphericalHarmonicsValues: { value: null },
+
 		directionalLights: { value: [], properties: {
 			direction: {},
 			color: {},

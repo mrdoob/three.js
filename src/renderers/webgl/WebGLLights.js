@@ -109,6 +109,7 @@ function WebGLLights() {
 		hash: '',
 
 		ambient: [ 0, 0, 0 ],
+		sphericalHarmonicsValues: null,
 		directional: [],
 		directionalShadowMap: [],
 		directionalShadowMatrix: [],
@@ -154,6 +155,10 @@ function WebGLLights() {
 				r += color.r * intensity;
 				g += color.g * intensity;
 				b += color.b * intensity;
+
+			} else if (light.isSphericalHarmonicsLight) {
+
+				state.sphericalHarmonicsValues = light.values;
 
 			} else if ( light.isDirectionalLight ) {
 

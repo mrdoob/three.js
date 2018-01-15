@@ -19,6 +19,10 @@ varying vec3 vViewPosition;
 
 #endif
 
+#ifdef USE_SPHERICAL_HARMONICS
+	varying vec3 worldNormal;
+#endif
+
 #include <common>
 #include <packing>
 #include <dithering_pars_fragment>

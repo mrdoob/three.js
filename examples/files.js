@@ -69,6 +69,7 @@ var files = {
 		"webgl_lights_spotlight",
 		"webgl_lights_spotlights",
 		"webgl_lights_rectarealight",
+		"webgl_lights_spherical_harmonics",
 		"webgl_lines_colors",
 		"webgl_lines_cubes",
 		"webgl_lines_dashed",

@@ -98,6 +98,10 @@ IncidentLight directLight;
 
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
+	#ifdef USE_SPHERICAL_HARMONICS
+	irradiance += getSphericalHarmonicsLightIrradiance(worldNormal,sphericalHarmonicsValues);
+	#endif
+
 	#ifdef USE_LIGHTMAP
 
 		vec3 lightMapIrradiance = texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;

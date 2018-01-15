@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - spherical harmonics</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #fff;
+				color: #111;
+				margin: 0px;
+				overflow: hidden;
+				font-family: Monospace;
+				font-size: 13px;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+
+			a {
+				color: #0080ff;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #f00;
+			}
+
+			#footer { width: 100%; margin: 2em auto; text-align: center; position: absolute; bottom: 0 }
+			strong { color: red }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - 3rd order spherical harmonics based ambient term - by <a href="https://github.com/atteneder" target="_blank" rel="noopener">Andreas Atteneder</a><br />
+		</div>
+		<div id="footer">
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script type="x-shader/x-vertex" id="vertexShader">
+
+			varying vec3 vWorldPosition;
+
+			void main() {
+
+				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+				vWorldPosition = worldPosition.xyz;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentShader">
+
+			uniform vec3 topColor;
+			uniform vec3 bottomColor;
+			uniform float offset;
+			uniform float exponent;
+
+			varying vec3 vWorldPosition;
+
+			void main() {
+
+				float h = normalize( vWorldPosition + offset ).y;
+				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
+
+			}
+
+		</script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer, dirLight, dirLightHeper, shLight, shLightHelper;
+			var mouseX = 0, mouseY = 0;
+			var stats;
+
+			var clock = new THREE.Clock();
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.set( 0, 0, 250 );
+
+				scene = new THREE.Scene();
+				
+				// LIGHTS
+
+				// Spherical Harmonic Values retrieved from textures/cube/skybox
+				// via Unity3D and this script: https://gist.github.com/atteneder/d4fe33368afaf176413ec09d14ef41db
+				var shLight = new THREE.SphericalHarmonicsLight(
+					[
+						new THREE.Color(0.3996281,0.3411802,0.2419128),
+						new THREE.Color(0.142093,0.09635267,0.01494713),
+						new THREE.Color(0.08023436,0.07530768,0.03336681),
+						new THREE.Color(0.07269116,0.07394479,0.04278772),
+						new THREE.Color(0.05431392,0.05045794,0.0205737),
+						new THREE.Color(0.07121608,0.06678943,0.03363363),
+						new THREE.Color(0.008722264,0.005476702,0.0006165598),
+						new THREE.Color(0.01847383,0.03232491,0.02740111),
+						new THREE.Color(0.02490644,0.0140671,-0.002444069)
+					]);
+
+				scene.add( shLight );
+
+				var path = "textures/cube/skybox/";
+				var format = '.jpg';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
+
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.format = THREE.RGBFormat;
+
+				scene.background = textureCube;
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				// SPHERE
+
+				var geometry = new THREE.SphereGeometry( 50, 32, 32 );
+				var material = new THREE.MeshStandardMaterial(
+				{
+					color: new THREE.Color(),
+					metalness: 0,
+					roughness: 0,
+					envMap: textureCube
+				});
+
+				var material2 = new THREE.MeshStandardMaterial(
+				{
+					color: new THREE.Color(),
+					metalness: 0,
+					roughness: 1,
+					envMap: textureCube
+				});
+
+				var sphere = new THREE.Mesh( geometry, material );
+				sphere.position.x = -50;
+				scene.add( sphere );
+
+				var sphere2 = new THREE.Mesh( geometry, material2 );
+				sphere2.position.x = 50;
+				scene.add( sphere2 );
+
+				// STATS
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'keydown', onKeyDown, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onKeyDown ( event ) {
+
+				switch ( event.keyCode ) {
+
+					case 72: // h
+
+					shLight.visible = !shLight.visible;
+					break;
+
+					case 68: // d
+
+					dirLight.visible = !dirLight.visible;
+					dirLightHeper.visible = !dirLightHeper.visible;
+					break;
+
+				}
+
+			}
+
+			//
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = 0.0001 * Date.now();
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

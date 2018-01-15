@@ -347,6 +347,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
+			parameters.sphericalHarmonics ? '#define USE_SPHERICAL_HARMONICS' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -454,6 +455,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
+			parameters.sphericalHarmonics ? '#define USE_SPHERICAL_HARMONICS' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
