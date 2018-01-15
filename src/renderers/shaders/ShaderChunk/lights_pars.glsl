@@ -16,7 +16,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 #ifdef USE_SPHERICAL_HARMONICS
 
-uniform vec3 sphericalHarmonicsValues[9];
+uniform vec3 sphericalHarmonics[9];
 
 vec3 getSphericalHarmonicsLightIrradiance( vec3 worldNormal, const in vec3 shValues[9] ) {
 

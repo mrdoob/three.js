@@ -1582,7 +1582,7 @@ function WebGLRenderer( parameters ) {
 			// wire up the material to this renderer's lighting state
 
 			uniforms.ambientLightColor.value = lights.state.ambient;
-			uniforms.sphericalHarmonicsValues.value = lights.state.sphericalHarmonicsValues;
+			uniforms.sphericalHarmonics.value = lights.state.sphericalHarmonics;
 			uniforms.directionalLights.value = lights.state.directional;
 			uniforms.spotLights.value = lights.state.spot;
 			uniforms.rectAreaLights.value = lights.state.rectArea;

@@ -160,7 +160,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			vertexColors: material.vertexColors,
 
-			sphericalHarmonics: !! lights.sphericalHarmonicsValues,
+			sphericalHarmonics: !! lights.sphericalHarmonics,
 
 			fog: !! fog,
 			useFog: material.fog,

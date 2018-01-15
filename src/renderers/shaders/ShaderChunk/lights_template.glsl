@@ -99,7 +99,7 @@ IncidentLight directLight;
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
 	#ifdef USE_SPHERICAL_HARMONICS
-	irradiance += getSphericalHarmonicsLightIrradiance(worldNormal,sphericalHarmonicsValues);
+	irradiance += getSphericalHarmonicsLightIrradiance(worldNormal,sphericalHarmonics);
 	#endif
 
 	#ifdef USE_LIGHTMAP
