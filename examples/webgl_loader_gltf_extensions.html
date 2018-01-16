@@ -206,9 +206,8 @@
 
 				loader = new THREE.GLTFLoader();
 
-				var dracoLoader = new THREE.DRACOLoader();
-				dracoLoader.setDecoderPath( 'js/loaders/draco/' );
-				loader.setDRACOLoader( dracoLoader );
+				THREE.DRACOLoader.setDecoderPath( 'js/loaders/draco/' );
+				loader.setDRACOLoader( new THREE.DRACOLoader() );
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];

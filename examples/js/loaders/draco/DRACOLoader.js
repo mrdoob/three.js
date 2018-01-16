@@ -352,18 +352,26 @@ THREE.DRACOLoader.setDecoderPath = function ( path ) {
 THREE.DRACOLoader.setDecoderConfig = function ( config ) {
   var wasmBinary = THREE.DRACOLoader.decoderConfig.wasmBinary;
   THREE.DRACOLoader.decoderConfig = config || {};
-  THREE.DRACOLoader.decoderModulePromise = null;
+  THREE.DRACOLoader.releaseDecoderModule();
 
   // Reuse WASM binary.
   if ( wasmBinary ) THREE.DRACOLoader.decoderConfig.wasmBinary = wasmBinary;
 };
 
- /**
-  * Gets WebAssembly or asm.js singleton instance of DracoDecoderModule
-  * after testing for browser support. Returns Promise that resolves when
-  * module is available.
-  * @return {Promise<{decoder: DracoDecoderModule}>}
-  */
+/**
+ * Releases the singleton DracoDecoderModule instance. Module will be recreated
+ * with the next decoding call.
+ */
+THREE.DRACOLoader.releaseDecoderModule = function () {
+  THREE.DRACOLoader.decoderModulePromise = null;
+};
+
+/**
+ * Gets WebAssembly or asm.js singleton instance of DracoDecoderModule
+ * after testing for browser support. Returns Promise that resolves when
+ * module is available.
+ * @return {Promise<{decoder: DracoDecoderModule}>}
+ */
 THREE.DRACOLoader.getDecoderModule = function () {
   var scope = this;
   var path = THREE.DRACOLoader.decoderPath;
