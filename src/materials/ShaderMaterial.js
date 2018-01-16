@@ -82,6 +82,7 @@ ShaderMaterial.prototype = Object.create( Material.prototype );
 ShaderMaterial.prototype.constructor = ShaderMaterial;
 
 ShaderMaterial.prototype.isShaderMaterial = true;
+ShaderMaterial.prototype.unrollLoops = false;
 
 ShaderMaterial.prototype.copy = function ( source ) {
 
