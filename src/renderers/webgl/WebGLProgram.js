@@ -506,12 +506,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	fragmentShader = parseIncludes( fragmentShader );
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 
-
-
     if ( material.unrollLoops !== false ) {
 		vertexShader = unrollLoops( vertexShader );
 		fragmentShader = unrollLoops( fragmentShader );
-
 	}
 
 	var vertexGlsl = prefixVertex + vertexShader;
