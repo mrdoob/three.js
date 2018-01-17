@@ -737,17 +737,17 @@ Object.assign( ExtrudeBufferGeometry.prototype, {
 
 	getArrays: function () {
 
-		console.warn( 'THREE.ExtrudeBufferGeometry: .getArrays() has been removed.' );
+		console.error( 'THREE.ExtrudeBufferGeometry: .getArrays() has been removed.' );
 
 	},
 	addShapeList: function () {
 
-		console.warn( 'THREE.ExtrudeBufferGeometry: .addShapeList() has been removed.' );
+		console.error( 'THREE.ExtrudeBufferGeometry: .addShapeList() has been removed.' );
 
 	},
 	addShape: function () {
 
-		console.warn( 'THREE.ExtrudeBufferGeometry: .addShape() has been removed.' );
+		console.error( 'THREE.ExtrudeBufferGeometry: .addShape() has been removed.' );
 
 	}
 
