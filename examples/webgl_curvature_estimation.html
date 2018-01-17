@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - shader - curvature [heart]</title>
-		<div class="label" style="position: absolute;left: 22%;bottom: 10%;">Raw curvature values</div>
-		<div class="label" style="position: absolute;left: 71%;bottom: 10%;">Curvature driving specular + texture </div>
+		<title>three.js webgl - shader - curvature [ninja]</title>
+		<div class="label" style="position: absolute;left: 20%;bottom: 10%;">Raw curvature values</div>
+		<div class="label" style="position: absolute;left: 68%;bottom: 10%;">Curvature driving specular + texture </div>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -53,9 +53,6 @@
 		varying vec3 vNormal;
 		varying vec3 vViewPosition;
 		varying float vCurvature;
-		varying vec2 vUv;
-
-		uniform sampler2D tex;
 
 		void main() {
 
@@ -66,7 +63,23 @@
 			gl_Position = projectionMatrix * modelViewPosition;
 			vNormal = normalMatrix * normal;
 			vCurvature = curvature;
-			vUv = uv;
+
+		}
+
+		</script>
+
+		<script id="vertexShaderRaw" type="x-shader/x-vertex">
+
+		attribute float curvature;
+
+		varying float vCurvature;
+
+		void main() {
+
+			vec3 p = position;
+			vec4 modelViewPosition = modelViewMatrix * vec4( p , 1.0 );
+			gl_Position = projectionMatrix * modelViewPosition;
+			vCurvature = curvature;
 
 		}
 
@@ -74,7 +87,6 @@
 
 		<script id="fragmentShaderRaw" type="x-shader/x-fragment">
 
-		varying vec3 vNormal;
 		varying vec3 vViewPosition;
 		varying float vCurvature;
 
@@ -90,7 +102,6 @@
 		varying vec3 vNormal;
 		varying vec3 vViewPosition;
 		varying float vCurvature;
-		varying vec2 vUv;
 
 		vec4 permute( vec4 x ){ return mod((( x * 34.0 ) + 1.0 ) * x, 289.0); }
 		vec4 taylorInvSqrt( vec4 r ){ return 1.79284291400159 - 0.85373472095314 * r; }
@@ -168,7 +179,7 @@
 		void main() {
 			vec3 V = vViewPosition; //view vector
 			vec3 N = vNormal; //normal vector
-			vec3 L = vec3( 55.0, 55.0, 15.0 ); //imaginary light
+			vec3 L = vec3( 50.0, 22.0, 50.0 ); //imaginary light
 			vec3 R = reflect( -L, N ); //reflection from light
 
 			//specular coefficient
@@ -178,7 +189,10 @@
 			//calculate noise coefficient
 			float x = cnoise( 10.0 * vPos );
 			vec4 diffuseColor = vec4(x, x, x, 1.0 );
-			diffuseColor.xyz = pow( vCurvature , 2.0 ) * diffuseColor.xyz;
+			float diffuse = pow( vCurvature , 2.0 );
+
+			if ( spec < 0.1 ) diffuse = 0.0;
+			diffuseColor.xyz =  diffuse * diffuseColor.xyz;
 
 			gl_FragColor = spec * specColor + diffuseColor;
 
@@ -194,7 +208,7 @@
 
 			var camera, scene, sceneLeft, renderer;
 
-			var heartMesh, curvatureAttribute;
+			var ninjaMesh, curvatureAttribute;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -266,9 +280,10 @@
 				sceneLeft = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 75, windowHalfX / window.innerHeight, 0.1, 1000 );
-				camera.position.z = 9;
-				camera.position.x = 14;
-				camera.position.y =  4;
+
+				camera.position.x = -23;
+				camera.position.y = 2;
+				camera.position.z = 24;
 
 				controls = new THREE.OrbitControls( camera );
 
@@ -280,11 +295,12 @@
 
 				var loader = new THREE.OBJLoader();
 				//load the obj
-				loader.load( 'obj/heart/heart.obj', function ( object ) {
+				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( object ) {
 					object.traverse( function ( child ) {
 						if ( child instanceof THREE.Mesh ) {
 
 							bufferGeo = child.geometry;
+							bufferGeo.center();
 							var dict= {};
 
 							for ( var i = 0; i < bufferGeo.attributes.position.count; i+=3 ) {
@@ -312,13 +328,13 @@
 								var normB_C = new THREE.Vector3().subVectors( normB, normC );
 								var normC_A = new THREE.Vector3().subVectors( normC, normA );
 
-								var b2a = normB.dot( posB_A.normalize()  );
-								var b2c = normB.dot( posB_C.normalize()  );
-								var c2a = normC.dot( posC_A.normalize()  );
+								var b2a = normB.dot( posB_A.normalize() );
+								var b2c = normB.dot( posB_C.normalize() );
+								var c2a = normC.dot( posC_A.normalize() );
 
-								var a2b = -normA.dot( posB_A.normalize()  );
-								var c2b = -normC.dot( posB_C.normalize()  );
-								var a2c = -normA.dot( posC_A.normalize()  );
+								var a2b = -normA.dot( posB_A.normalize() );
+								var c2b = -normC.dot( posB_C.normalize() );
+								var a2c = -normA.dot( posC_A.normalize() );
 
 								if (dict[ strA ] === undefined ) {
 									dict[ strA ] = {};
@@ -344,7 +360,7 @@
 
 							Object.keys( dict ).forEach( function( key ) {
 
-    						curvatureDict[ key ] = average( dict[ key ] );
+								curvatureDict[ key ] = average( dict[ key ] );
 
 							});
 
@@ -397,7 +413,6 @@
 								var pos = new THREE.Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
 								var str = pos.toArray().toString();
 								curvatureAttribute[i] = curvatureDict[ str ];
-
 							}
 
 							bufferGeo.addAttribute( 'curvature', new THREE.BufferAttribute( curvatureAttribute, 1 ) );
@@ -405,8 +420,6 @@
 							//starting filter is to show both concave and convex
 							var curvatureFiltered = new Float32Array( curvatureAttribute );
 							filterBoth(curvatureFiltered);
-							bufferGeo.attributes.curvature.array = curvatureFiltered;
-
 
 							var material = new THREE.ShaderMaterial ({
 
@@ -415,21 +428,25 @@
 
 							} );
 
-							heartMesh = new THREE.Mesh( bufferGeo, material );
+							ninjaMesh = new THREE.Mesh( bufferGeo, material );
 
 							var materialRaw = new THREE.ShaderMaterial ({
 
-								vertexShader: document.getElementById( 'vertexShader' ).textContent,
+								vertexShader: document.getElementById( 'vertexShaderRaw' ).textContent,
 								fragmentShader: document.getElementById( 'fragmentShaderRaw' ).textContent
 
 							} );
 
-							heartMeshRaw = new THREE.Mesh( bufferGeo, materialRaw );
+							ninjaMeshRaw = new THREE.Mesh( bufferGeo, materialRaw );
 
 						}
 					} );
-					sceneRight.add( heartMesh );
-					sceneLeft.add( heartMeshRaw );
+					sceneRight.add( ninjaMesh );
+					sceneLeft.add( ninjaMeshRaw );
+					render();
+					bufferGeo.attributes.curvature.needsUpdate = true;
+					render();
+					bufferGeo.attributes.curvature.needsUpdate = true;
 
 				} );
 
@@ -440,21 +457,26 @@
 
 						var curvatureFiltered = new Float32Array( curvatureAttribute );
 						filterConvex(curvatureFiltered);
-						heartMesh.geometry.attributes.curvature.array = curvatureFiltered;
+						bufferGeo.attributes.curvature.array = curvatureFiltered;
+						bufferGeo.attributes.curvature.needsUpdate = true;
+
 
 					},
 					filterConcave: function () {
 
 						var curvatureFiltered = new Float32Array( curvatureAttribute );
 						filterConcave(curvatureFiltered);
-						heartMesh.geometry.attributes.curvature.array = curvatureFiltered;
+						bufferGeo.attributes.curvature.array = curvatureFiltered;
+						bufferGeo.attributes.curvature.needsUpdate = true;
+
 
 					},
 					filterBoth: function () {
 
 						var curvatureFiltered = new Float32Array( curvatureAttribute );
 						filterBoth(curvatureFiltered);
-						heartMesh.geometry.attributes.curvature.array = curvatureFiltered;
+						bufferGeo.attributes.curvature.array = curvatureFiltered;
+						bufferGeo.attributes.curvature.needsUpdate = true;
 
 					}
 				};
@@ -491,9 +513,6 @@
 			}
 
 			function render() {
-
-				controls.update();
-				heartMesh.geometry.attributes.curvature.needsUpdate = true;
 
 				renderer.clear();
 				renderer.setViewport( windowHalfX, 0, windowHalfX, window.innerHeight );
