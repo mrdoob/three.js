@@ -772,6 +772,8 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		var useDataCount = ( index !== null || position !== undefined );
+
 		var rangeStart = geometry.drawRange.start * rangeFactor;
 		var rangeCount = geometry.drawRange.count * rangeFactor;
 
@@ -779,7 +781,7 @@ function WebGLRenderer( parameters ) {
 		var groupCount = group !== null ? group.count * rangeFactor : Infinity;
 
 		var drawStart = Math.max( rangeStart, groupStart );
-		var drawEnd = Math.min( dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
+		var drawEnd = Math.min( ( useDataCount ? dataCount : Infinity ), rangeStart + rangeCount, groupStart + groupCount ) - 1;
 
 		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
 
