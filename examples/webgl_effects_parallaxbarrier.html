@@ -31,7 +31,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - parallax barrier<br />
 			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
-			Dodge Viper model by <a href="https://www.turbosquid.com/3d-models/3d-2010-dodge-viper-acr-model/528631" target="_blank" rel="noopener">quads_tris_and_ngons</a>
+			Ferrari F50 model by <a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1687" target="_blank" rel="noopener">Daniel Sathya</a>
 		</div>
 
 
@@ -57,13 +57,14 @@
 				var container  = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
-				camera.position.set( 4, 2, 4 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 200, 100, 200 );
 
 				controls = new THREE.OrbitControls( camera );
+				// controls.target.set( 0, 100, 0 );
 				controls.maxPolarAngle = Math.PI / 2.25;
-				controls.minDistance = 4;
-				controls.maxDistance = 20;
+				controls.minDistance = 100;
+				controls.maxDistance = 500;
 
 				var textureCube = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/Bridge2/')
@@ -71,31 +72,22 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
-				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
 
 				var hemi = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				hemi.position.set( 0, 20, 0 );
+				hemi.position.set( 0, 200, 0 );
 				scene.add( hemi );
 
-				var direct = new THREE.DirectionalLight( 0xffffff );
-				direct.position.set( -6, 7, 2 );
-				direct.castShadow = true;
-				direct.shadow.camera.top = 3;
-				direct.shadow.camera.bottom = -3;
-				direct.shadow.camera.left = -3;
-				direct.shadow.camera.right = 3;
-				direct.shadow.camera.near = 7;
-				direct.shadow.camera.far = 11;
-				direct.shadow.radius = 2;
+				var direct = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				direct.position.set( 200, 300, 200 );
 				scene.add( direct );
 
 				// ground
 				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
-				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var grid = new THREE.GridHelper( 100, 50, 0x000000, 0x000000 );
+				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				scene.add( grid );
@@ -104,22 +96,20 @@
 				var height = window.innerHeight || 2;
 
 				var loader = new THREE.GLTFLoader();
-				loader.load( 'models/gltf/viper/viper.gltf', function ( gltf ) {
+				loader.load( 'models/gltf/f50/f50.glb', function ( gltf ) {
 
 					var object = gltf.scene;
+
 					object.traverse( function ( child ) {
 
 						if ( child.isMesh ) {
 
 							child.material.envMap = textureCube;
-							child.material.metalness = 0.4;
-							child.material.roughness = 0.15;
+							child.material.envMapIntensity = 1;
+							child.material.metalness = 0.6;
+							child.material.roughness = 0.1;
 
-							if( child.name === 'body' || child.name === 'back_piece_inner'  ) {
-
-								child.castShadow = true;
-								child.material.side = THREE.DoubleSide;
-							}
+							child.material.needsUpdate = true;
 
 
 						}
@@ -133,8 +123,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.renderSingleSided = false;
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.ParallaxBarrierEffect( renderer );
