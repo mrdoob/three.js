@@ -73,13 +73,13 @@
 				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
 				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
 				<li>amount — int. Depth to extrude the shape. Default is 100.</li>
+				<li>material — int. Material index for the lid faces. Default is 0.</li>
+				<li>extrudeMaterial — int. Material index of extruded faces (sides). Default is 1.</li>
 				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
 				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
 				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
-				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
-				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
-				<li>UVGenerator —  Object. object that provides UV generator functions</li>
+				<li>extrudePath — THREE.Curve. A 3D curve path along which the shape should be extruded. Default is undefined.</li>
 			</ul>
 
 		</div>
@@ -96,50 +96,13 @@
 
 		<h2>Properties</h2>
 
-
-		<h2>Methods</h2>
-
-		<h3>[method:null addShapeList]([page:Array shapes], [page:Object options])</h3>
+		<h3>[property:Object parameters]</h3>
 		<div>
-			shapes — An Array of shapes to add. <br />
-			options — Object that can contain the following parameters.
-			<ul>
-				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
-				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
-				<li>amount — int. Depth to extrude the shape. Default is 100.</li>
-				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
-				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
-				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
-				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
-				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
-				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
-				<li>UVGenerator —  Object. object that provides UV generator functions</li>
-			</ul>
+		An object with all of the parameters that were used to generate the geometry.
 		</div>
-		<div>Adds the shapes to the list to extrude.</div>
-
-		<h3>[method:null addShape]([page:Shape shape], [page:Object options])</h3>
-		<div>
-			shape — A shape to add. <br />
-			options — Object that can contain the following parameters.
-			<ul>
-				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
-				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
-				<li>amount — int. Depth to extrude the shape. Default is 100.</li>
-				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
-				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
-				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
-				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
-				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
-				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
-				<li>UVGenerator —  Object. object that provides UV generator functions</li>
-			</ul>
-		</div>
-		<div>Add the shape to the list to extrude.</div>
-
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/ExtrudeGeometry.js src/ExtrudeGeometry.js]
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
 </html>
