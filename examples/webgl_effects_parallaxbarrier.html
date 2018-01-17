@@ -58,13 +58,14 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 200, 100, 200 );
+				camera.position.set( 175, 100, 150 );
 
 				controls = new THREE.OrbitControls( camera );
-				// controls.target.set( 0, 100, 0 );
 				controls.maxPolarAngle = Math.PI / 2.25;
+				controls.target.set( -50, 0, 0 );
 				controls.minDistance = 100;
 				controls.maxDistance = 500;
+				controls.update();
 
 				var textureCube = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/Bridge2/')
@@ -105,12 +106,8 @@
 						if ( child.isMesh ) {
 
 							child.material.envMap = textureCube;
-							child.material.envMapIntensity = 1;
 							child.material.metalness = 0.6;
 							child.material.roughness = 0.1;
-
-							child.material.needsUpdate = true;
-
 
 						}
 
