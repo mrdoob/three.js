@@ -232,7 +232,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var tempUVs = [];
 		var tempUVs2 = [];
 
-		for ( var i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
+		var colorStride = colors !== undefined ? attributes.color.itemSize : 3;
+
+		for ( var i = 0, j = 0, k = 0; i < positions.length; i += 3, j += 2, k += colorStride ) {
 
 			scope.vertices.push( new Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] ) );
 
@@ -244,7 +246,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( colors !== undefined ) {
 
-				scope.colors.push( new Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
+				scope.colors.push( new Color( colors[ k ], colors[ k + 1 ], colors[ k + 2 ] ) );
 
 			}
 
