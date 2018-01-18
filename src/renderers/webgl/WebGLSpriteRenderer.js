@@ -114,7 +114,6 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
 
-		gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
 		state.activeTexture( gl.TEXTURE0 );
 		gl.uniform1i( uniforms.map, 0 );
@@ -154,20 +153,6 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 		}
 
-
-		// update positions and sort
-
-		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
-
-			var sprite = sprites[ i ];
-
-			sprite.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-			sprite.z = - sprite.modelViewMatrix.elements[ 14 ];
-
-		}
-
-		sprites.sort( painterSortStable );
-
 		// render all sprites
 
 		var scale = [];
@@ -182,12 +167,6 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			sprite.onBeforeRender( renderer, scene, camera, undefined, material, undefined );
 
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
-			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
-
-			sprite.matrixWorld.decompose( spritePosition, spriteRotation, spriteScale );
-
-			scale[ 0 ] = spriteScale.x;
-			scale[ 1 ] = spriteScale.y;
 
 			var fogType = 0;
 
@@ -220,7 +199,6 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
 
 			gl.uniform1f( uniforms.rotation, material.rotation );
-			gl.uniform2fv( uniforms.scale, scale );
 
 			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
 			state.buffers.depth.setTest( material.depthTest );
@@ -229,9 +207,73 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 			textures.setTexture2D( material.map || texture, 0 );
 
-			gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
+            // is arraycamera
+            if ( camera.isArrayCamera ) {
 
-			sprite.onAfterRender( renderer, scene, camera, undefined, material, undefined );
+                renderer.setCurrentCamera( camera );
+
+                var cameras = camera.cameras;
+
+                for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
+
+                    var currentCamera = cameras[ j ];
+                    sprite.modelViewMatrix.multiplyMatrices( currentCamera.matrixWorldInverse, sprite.matrixWorld );
+                    sprite.z = - sprite.modelViewMatrix.elements[ 14 ];
+
+                    gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
+
+                    sprite.matrixWorld.decompose( spritePosition, spriteRotation, spriteScale );
+
+                    scale[ 0 ] = spriteScale.x;
+                    scale[ 1 ] = spriteScale.y;
+
+                    gl.uniform2fv( uniforms.scale, scale );
+
+                    gl.uniformMatrix4fv( uniforms.projectionMatrix, false, currentCamera.projectionMatrix.elements );
+
+
+
+                    var bounds = currentCamera.bounds;
+
+                    var x = bounds.x * renderer.getSize().width;
+                    var y = bounds.y * renderer.getSize().height;
+                    var width = bounds.z * renderer.getSize().width;
+                    var height = bounds.w * renderer.getSize().height;
+
+                    renderer.setViewport( x, y, width, height );
+                    renderer.setScissor( x, y, width, height );
+                    renderer.setScissorTest( true );
+
+                    gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
+
+                    renderer.setScissorTest( false );
+
+                }
+
+            } else {
+
+                renderer.setCurrentCamera( null );
+
+                sprite.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
+                sprite.z = - sprite.modelViewMatrix.elements[ 14 ];
+
+                gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
+
+                sprite.matrixWorld.decompose( spritePosition, spriteRotation, spriteScale );
+
+                scale[ 0 ] = spriteScale.x;
+                scale[ 1 ] = spriteScale.y;
+
+                gl.uniform2fv( uniforms.scale, scale );
+
+                gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
+
+
+                gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
+
+            }
+
+            sprite.onAfterRender( renderer, scene, camera, undefined, material, undefined );
 
 		}
 
