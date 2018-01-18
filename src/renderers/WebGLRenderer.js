@@ -1216,7 +1216,7 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		scene.onAfterRender( _this, scene, camera, renderTarget );
+		scene.onAfterRender( _this, scene, camera );
 
 		if ( vr.enabled ) {
 
