@@ -2275,7 +2275,9 @@ Object.assign( Quaternion.prototype, {
 
 	inverse: function () {
 
-		return this.conjugate().normalize();
+		// quaternion is assumed to have unit length
+
+		return this.conjugate();
 
 	},
 
@@ -20773,7 +20775,7 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	function resetInfo () {
+	function resetInfo() {
 
 		_infoRender.frame ++;
 		_infoRender.calls = 0;
@@ -21351,7 +21353,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		var dataCount = 0;
+		var dataCount = Infinity;
 
 		if ( index !== null ) {
 
@@ -21816,6 +21818,8 @@ function WebGLRenderer( parameters ) {
 		}
 
 		// _gl.finish();
+
+		currentRenderList = null;
 
 	};
 
@@ -32922,14 +32926,14 @@ function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
 		get: function () {
 
 			// intensity = power per solid angle.
-			// ref: equation (17) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+			// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 			return this.intensity * Math.PI;
 
 		},
 		set: function ( power ) {
 
 			// intensity = power per solid angle.
-			// ref: equation (17) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+			// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 			this.intensity = power / Math.PI;
 
 		}
@@ -32984,14 +32988,14 @@ function PointLight( color, intensity, distance, decay ) {
 		get: function () {
 
 			// intensity = power per solid angle.
-			// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+			// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 			return this.intensity * 4 * Math.PI;
 
 		},
 		set: function ( power ) {
 
 			// intensity = power per solid angle.
-			// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+			// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 			this.intensity = power / ( 4 * Math.PI );
 
 		}
@@ -44739,7 +44743,7 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			return undefined;
 
 		},
-		set: function ( value ) {
+		set: function ( /* value */ ) {
 
 			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.' );
 
@@ -44756,7 +44760,7 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 			return undefined;
 
 		},
-		set: function ( cullFace ) {
+		set: function ( /* cullFace */ ) {
 
 			console.warn( 'THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.' );
 
