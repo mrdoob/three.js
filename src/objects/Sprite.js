@@ -16,7 +16,7 @@ function Sprite( material ) {
 
 	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
-	this.pivot = new Vector2( 0, 0 );
+	this.center = new Vector2( 0.5, 0.5 );
 
 }
 
