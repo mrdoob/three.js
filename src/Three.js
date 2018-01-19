@@ -106,6 +106,7 @@ export { Interpolant } from './math/Interpolant.js';
 export { Triangle } from './math/Triangle.js';
 export { _Math as Math } from './math/Math.js';
 export { Spherical } from './math/Spherical.js';
+export { SphericalHarmonics3 } from './math/SphericalHarmonics3.js';
 export { Cylindrical } from './math/Cylindrical.js';
 export { Plane } from './math/Plane.js';
 export { Frustum } from './math/Frustum.js';

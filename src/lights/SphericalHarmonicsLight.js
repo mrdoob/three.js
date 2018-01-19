@@ -4,11 +4,11 @@ import { Light } from './Light.js';
  * @author Andreas Atteneder
  */
 
-function SphericalHarmonicsLight( values ) {
+function SphericalHarmonicsLight( sphericalHarmonics3 ) {
 
 	Light.call( this );
 
-	this.values = values;
+	this.sphericalHarmonics3 = sphericalHarmonics3;
 
 	this.type = 'SphericalHarmonicsLight';
 

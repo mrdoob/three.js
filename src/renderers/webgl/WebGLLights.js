@@ -158,7 +158,7 @@ function WebGLLights() {
 
 			} else if (light.isSphericalHarmonicsLight) {
 
-				state.sphericalHarmonics = light.values;
+				state.sphericalHarmonics = light.sphericalHarmonics3.coefficients;
 
 			} else if ( light.isDirectionalLight ) {
 

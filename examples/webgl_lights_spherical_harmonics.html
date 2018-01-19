@@ -82,18 +82,60 @@
 
 				// Spherical Harmonic Values retrieved from textures/cube/skybox
 				// via Unity3D and this script: https://gist.github.com/atteneder/d4fe33368afaf176413ec09d14ef41db
-				var shLight = new THREE.SphericalHarmonicsLight(
-					[
-						new THREE.Color(0.3996281,0.3411802,0.2419128),
-						new THREE.Color(0.142093,0.09635267,0.01494713),
-						new THREE.Color(0.08023436,0.07530768,0.03336681),
-						new THREE.Color(0.07269116,0.07394479,0.04278772),
-						new THREE.Color(0.05431392,0.05045794,0.0205737),
-						new THREE.Color(0.07121608,0.06678943,0.03363363),
-						new THREE.Color(0.008722264,0.005476702,0.0006165598),
-						new THREE.Color(0.01847383,0.03232491,0.02740111),
-						new THREE.Color(0.02490644,0.0140671,-0.002444069)
-					]);
+				var sh3 = new THREE.SphericalHarmonics3().set(
+		    		new THREE.Color(0.3996281,0.3411802,0.2419128),
+					new THREE.Color(0.142093,0.09635267,0.01494713),
+					new THREE.Color(0.08023436,0.07530768,0.03336681),
+					new THREE.Color(0.07269116,0.07394479,0.04278772),
+					new THREE.Color(0.05431392,0.05045794,0.0205737),
+					new THREE.Color(0.07121608,0.06678943,0.03363363),
+					new THREE.Color(0.008722264,0.005476702,0.0006165598),
+					new THREE.Color(0.01847383,0.03232491,0.02740111),
+					new THREE.Color(0.02490644,0.0140671,-0.002444069)
+				);
+
+				//
+				// Further example values to try:
+				// Debevec's light probe gallery examples.  Source: http://www.yaldex.com/open-gl/ch12lev1sec3.html
+				//
+
+				THREE.SphericalHarmonics3.EucalyptusGroove = new THREE.SphericalHarmonics3().set(
+				    new THREE.Color( 0.3783264,  0.4260425,  0.4504587),
+				    new THREE.Color( 0.2887813,  0.3586803,  0.4147053),
+				    new THREE.Color( 0.0379030,  0.0295216,  0.0098567),
+				    new THREE.Color(-0.1033028, -0.1031690, -0.0884924),
+				    new THREE.Color(-0.0621750, -0.0554432, -0.0396779),
+				    new THREE.Color( 0.0077820, -0.0148312, -0.0471301),
+				    new THREE.Color(-0.0935561, -0.1254260, -0.1525629),
+				    new THREE.Color(-0.0572703, -0.0502192, -0.0363410),
+				    new THREE.Color( 0.0203348, -0.0044201, -0.0452180)
+				);
+
+				THREE.SphericalHarmonics3.FunstoneBeachSunset = new THREE.SphericalHarmonics3().set(
+				    new THREE.Color( 0.6841148,  0.6929004,  0.7069543),
+				    new THREE.Color( 0.3173355,  0.3694407,  0.4406839),
+				    new THREE.Color(-0.1747193, -0.1737154, -0.1657420),
+				    new THREE.Color(-0.4496467, -0.4155184, -0.3416573),
+				    new THREE.Color(-0.1690202, -0.1703022, -0.1525870),
+				    new THREE.Color(-0.0837808, -0.0940454, -0.1027518),
+				    new THREE.Color(-0.0319670, -0.0214051, -0.0147691),
+				    new THREE.Color( 0.1641816,  0.1377558,  0.1010403),
+				    new THREE.Color( 0.3697189,  0.3097930,  0.2029923)
+				);
+
+				THREE.SphericalHarmonics3.GalileoTomb = new THREE.SphericalHarmonics3().set(
+				    new THREE.Color( 1.0351604,  0.7603549,  0.7074635),
+				    new THREE.Color( 0.4442150,  0.3430402,  0.3403777),
+				    new THREE.Color(-0.2247797, -0.1828517, -0.1705181),
+				    new THREE.Color( 0.7110400,  0.5423169,  0.5587956),
+				    new THREE.Color( 0.6430452,  0.4971454,  0.5156357),
+				    new THREE.Color(-0.1150112, -0.0936603, -0.0839287),
+				    new THREE.Color(-0.3742487, -0.2755962, -0.2875017),
+				    new THREE.Color(-0.1694954, -0.1343096, -0.1335315),
+				    new THREE.Color( 0.5515260,  0.4222179,  0.4162488)
+				);
+
+				var shLight = new THREE.SphericalHarmonicsLight(sh3);
 
 				scene.add( shLight );
 

@@ -99,7 +99,8 @@ IncidentLight directLight;
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
 	#ifdef USE_SPHERICAL_HARMONICS
-	irradiance += getSphericalHarmonicsLightIrradiance(worldNormal,sphericalHarmonics);
+	vec3 shIrradiance = shGetIrradianceAt( sphericalHarmonics, worldNormal );
+	irradiance += LinearToGamma(vec4(shIrradiance,1), float(GAMMA_FACTOR) ).xyz;
 	#endif
 
 	#ifdef USE_LIGHTMAP
