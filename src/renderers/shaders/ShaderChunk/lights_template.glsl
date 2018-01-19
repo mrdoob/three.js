@@ -25,6 +25,7 @@ IncidentLight directLight;
 
 	PointLight pointLight;
 
+	#pragma three unroll
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
 		pointLight = pointLights[ i ];
@@ -45,6 +46,7 @@ IncidentLight directLight;
 
 	SpotLight spotLight;
 
+	#pragma three unroll
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
 		spotLight = spotLights[ i ];
@@ -65,6 +67,7 @@ IncidentLight directLight;
 
 	DirectionalLight directionalLight;
 
+	#pragma three unroll
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		directionalLight = directionalLights[ i ];
@@ -85,6 +88,7 @@ IncidentLight directLight;
 
 	RectAreaLight rectAreaLight;
 
+	#pragma three unroll
 	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
 
 		rectAreaLight = rectAreaLights[ i ];
@@ -114,6 +118,7 @@ IncidentLight directLight;
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
+		#pragma three unroll
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
 			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );

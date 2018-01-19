@@ -174,7 +174,7 @@ function parseIncludes( string ) {
 
 function unrollLoops( string ) {
 
-	var pattern = /for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
+	var pattern = /#pragma three unroll[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
 
 	function replace( match, start, end, snippet ) {
 
@@ -506,12 +506,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	fragmentShader = parseIncludes( fragmentShader );
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 
-	if ( ! material.isShaderMaterial ) {
-
-		vertexShader = unrollLoops( vertexShader );
-		fragmentShader = unrollLoops( fragmentShader );
-
-	}
+	vertexShader = unrollLoops( vertexShader );
+	fragmentShader = unrollLoops( fragmentShader );
 
 	var vertexGlsl = prefixVertex + vertexShader;
 	var fragmentGlsl = prefixFragment + fragmentShader;
