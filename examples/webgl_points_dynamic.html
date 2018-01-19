@@ -57,23 +57,20 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer, mesh, directionalLight;
+			var camera, scene, renderer, mesh;
 
 			var parent, meshes = [], clonemeshes = [];
-
-			var p;
 
 			var composer, effectFocus;
 
 			var clock = new THREE.Clock();
 
+			var stats;
+
 			init();
 			animate();
 
 			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 50000 );
 				camera.position.set( 0, 700, 7000 );
@@ -193,9 +190,9 @@
 
 					if ( child.isMesh ) {
 
-						buffer = child.geometry.attributes[ bufferName ];
+						var buffer = child.geometry.attributes[ bufferName ];
 
-						combined.set(buffer.array, offset);
+						combined.set( buffer.array, offset );
 						offset += buffer.array.length;
 
 					}
