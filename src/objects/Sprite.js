@@ -1,3 +1,4 @@
+import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Object3D } from '../core/Object3D.js';
 import { SpriteMaterial } from '../materials/SpriteMaterial.js';
@@ -14,6 +15,8 @@ function Sprite( material ) {
 	this.type = 'Sprite';
 
 	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
+
+	this.center = new Vector2( 0.5, 0.5 );
 
 }
 
