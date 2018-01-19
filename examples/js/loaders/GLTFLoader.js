@@ -121,6 +121,12 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_UNLIT ) >= 0 ) {
+
+					extensions[ EXTENSIONS.KHR_MATERIALS_UNLIT ] = new GLTFMaterialsUnlitExtension( json );
+
+				}
+
 				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ) >= 0 ) {
 
 					extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
@@ -202,7 +208,8 @@ THREE.GLTFLoader = ( function () {
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
 		KHR_LIGHTS: 'KHR_lights',
-		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness'
+		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
+		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit'
 	};
 
 	/**
@@ -288,6 +295,152 @@ THREE.GLTFLoader = ( function () {
 		}
 
 	}
+
+	/**
+	 * Common Materials Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_common
+	 */
+	function GLTFMaterialsCommonExtension( json ) {
+
+		this.name = EXTENSIONS.KHR_MATERIALS_COMMON;
+
+	}
+
+	GLTFMaterialsCommonExtension.prototype.getMaterialType = function ( material ) {
+
+		var khrMaterial = material.extensions[ this.name ];
+
+		switch ( khrMaterial.type ) {
+
+			case 'commonBlinn' :
+			case 'commonPhong' :
+				return THREE.MeshPhongMaterial;
+
+			case 'commonLambert' :
+				return THREE.MeshLambertMaterial;
+
+			case 'commonConstant' :
+			default :
+				return THREE.MeshBasicMaterial;
+
+		}
+
+	};
+
+	GLTFMaterialsCommonExtension.prototype.extendParams = function ( materialParams, material, parser ) {
+
+		var khrMaterial = material.extensions[ this.name ];
+
+		var pending = [];
+
+		var keys = [];
+
+		// TODO: Currently ignored: 'ambientFactor', 'ambientTexture'
+		switch ( khrMaterial.type ) {
+
+			case 'commonBlinn' :
+			case 'commonPhong' :
+				keys.push( 'diffuseFactor', 'diffuseTexture', 'specularFactor', 'specularTexture', 'shininessFactor' );
+				break;
+
+			case 'commonLambert' :
+				keys.push( 'diffuseFactor', 'diffuseTexture' );
+				break;
+
+			case 'commonConstant' :
+			default :
+				break;
+
+		}
+
+		var materialValues = {};
+
+		keys.forEach( function ( v ) {
+
+			if ( khrMaterial[ v ] !== undefined ) materialValues[ v ] = khrMaterial[ v ];
+
+		} );
+
+		if ( materialValues.diffuseFactor !== undefined ) {
+
+			materialParams.color = new THREE.Color().fromArray( materialValues.diffuseFactor );
+			materialParams.opacity = materialValues.diffuseFactor[ 3 ];
+
+		}
+
+		if ( materialValues.diffuseTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'map', materialValues.diffuseTexture.index ) );
+
+		}
+
+		if ( materialValues.specularFactor !== undefined ) {
+
+			materialParams.specular = new THREE.Color().fromArray( materialValues.specularFactor );
+
+		}
+
+		if ( materialValues.specularTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'specularMap', materialValues.specularTexture.index ) );
+
+		}
+
+		if ( materialValues.shininessFactor !== undefined ) {
+
+			materialParams.shininess = materialValues.shininessFactor;
+
+		}
+
+		return Promise.all( pending );
+
+	};
+
+	/**
+	 * Unlit Materials Extension (pending)
+	 *
+	 * PR: https://github.com/KhronosGroup/glTF/pull/1163
+	 */
+	function GLTFMaterialsUnlitExtension( json ) {
+
+		this.name = EXTENSIONS.KHR_MATERIALS_UNLIT;
+
+	}
+
+	GLTFMaterialsUnlitExtension.prototype.getMaterialType = function ( material ) {
+
+		return THREE.MeshBasicMaterial;
+
+	};
+
+	GLTFMaterialsUnlitExtension.prototype.extendParams = function ( materialParams, material, parser ) {
+
+		var pending = [];
+
+		var metallicRoughness = material.pbrMetallicRoughness;
+
+		materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
+		materialParams.opacity = 1.0;
+
+		if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
+
+			var array = metallicRoughness.baseColorFactor;
+
+			materialParams.color.fromArray( array );
+			materialParams.opacity = array[ 3 ];
+
+		}
+
+		if ( metallicRoughness.baseColorTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture.index ) );
+
+		}
+
+		return Promise.all( pending );
+
+	};
 
 	/* BINARY EXTENSION */
 
@@ -1714,6 +1867,12 @@ THREE.GLTFLoader = ( function () {
 			var sgExtension = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ];
 			materialType = sgExtension.getMaterialType( materialDef );
 			pending.push( sgExtension.extendParams( materialParams, materialDef, parser ) );
+
+		} else if ( materialExtensions[ EXTENSIONS.KHR_MATERIALS_UNLIT ] ) {
+
+			var kmuExtension = extensions[ EXTENSIONS.KHR_MATERIALS_UNLIT ];
+			materialType = kmuExtension.getMaterialType( materialDef );
+			pending.push( kmuExtension.extendParams( materialParams, materialDef, parser ) );
 
 		} else if ( materialDef.pbrMetallicRoughness !== undefined ) {
 
