@@ -63,7 +63,18 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return new this.constructor( this.material ).copy( this );
 
+	},
+
+	copy: function ( source ) {
+
+		Object3D.prototype.copy.call( this, source );
+
+		if ( source.center !== undefined ) this.center.copy( source.center );
+
+		return this;
+
 	}
+
 
 } );
 
