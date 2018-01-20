@@ -45,11 +45,12 @@ Viewport.Info = function ( editor ) {
 				if ( object instanceof THREE.Mesh ) {
 
 					var geometry = object.geometry;
+					var indexCount;
 
 					if ( geometry instanceof THREE.Geometry ) {
 
 						vertices += geometry.vertices.length;
-						triangles += geometry.faces.length;
+						indexCount = geometry.faces.length * 3;
 
 					} else if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -57,13 +58,23 @@ Viewport.Info = function ( editor ) {
 
 						if ( geometry.index !== null ) {
 
-							triangles += geometry.index.count / 3;
+							indexCount = geometry.index.count;
 
 						} else {
 
-							triangles += geometry.attributes.position.count / 3;
+							indexCount = geometry.attributes.position.count;
 
 						}
+
+					}
+
+					if ( object.drawMode === THREE.TrianglesDrawMode ) {
+
+						triangles += indexCount / 3;
+
+					} else {
+
+						triangles += indexCount - 2;
 
 					}
 
