@@ -28,8 +28,19 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 		infoRender.calls ++;
 		infoRender.vertices += count;
 
-		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
-		else if ( mode === gl.POINTS ) infoRender.points += count;
+		if ( mode === gl.TRIANGLES ) {
+
+			infoRender.faces += count / 3;
+
+		} else if ( mode === gl.TRIANGLE_STRIP || mode === gl.TRIANGLE_FAN ) {
+
+			infoRender.faces += count - 2;
+
+		} else if ( mode === gl.POINTS ) {
+
+			infoRender.points += count;
+
+		}
 
 	}
 
@@ -49,8 +60,19 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 		infoRender.calls ++;
 		infoRender.vertices += count * geometry.maxInstancedCount;
 
-		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
-		else if ( mode === gl.POINTS ) infoRender.points += geometry.maxInstancedCount * count;
+		if ( mode === gl.TRIANGLES ) {
+
+			infoRender.faces += geometry.maxInstancedCount * count / 3;
+
+		} else if ( mode === gl.TRIANGLE_STRIP || mode === gl.TRIANGLE_FAN ) {
+
+			infoRender.faces += geometry.maxInstancedCount * ( count - 2 );
+
+		} else if ( mode === gl.POINTS ) {
+
+			infoRender.points += geometry.maxInstancedCount * count;
+
+		}
 
 	}
 
