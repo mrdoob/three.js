@@ -317,6 +317,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	} else {
 
 		prefixVertex = [
+			'#define IS_VERTEX',
 
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
@@ -424,6 +425,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 		prefixFragment = [
 
 			customExtensions,
+
+			'#define IS_FRAGMENT',
 
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
