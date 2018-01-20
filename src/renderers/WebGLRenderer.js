@@ -1227,6 +1227,7 @@ function WebGLRenderer( parameters ) {
 		// _gl.finish();
 
 		currentRenderList = null;
+		currentRenderState = null;
 
 	};
 
