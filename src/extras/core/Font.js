@@ -3,7 +3,6 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { QuadraticBezier, CubicBezier } from './Interpolations.js';
 import { ShapePath } from './ShapePath.js';
 
 
