@@ -20,7 +20,6 @@ import {
 	LinearMipMapLinearFilter
 } from '../constants.js';
 import { Color } from '../math/Color.js';
-import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
 import { Sprite } from '../objects/Sprite.js';

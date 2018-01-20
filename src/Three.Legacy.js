@@ -5,7 +5,7 @@
 import { Audio } from './audio/Audio.js';
 import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
-import { CullFaceFront, CullFaceBack, FlatShading } from './constants.js';
+import { FlatShading } from './constants.js';
 import {
 	Float64BufferAttribute,
 	Float32BufferAttribute,
@@ -1372,7 +1372,7 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			return undefined;
 
 		},
-		set: function ( value ) {
+		set: function ( /* value */ ) {
 
 			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.' );
 
@@ -1389,7 +1389,7 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 			return undefined;
 
 		},
-		set: function ( cullFace ) {
+		set: function ( /* cullFace */ ) {
 
 			console.warn( 'THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.' );
 

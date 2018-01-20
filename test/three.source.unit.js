@@ -220,7 +220,6 @@ import './unit/src/math/interpolants/QuaternionLinearInterpolant.tests';
 //src/objects
 import './unit/src/objects/Bone.tests';
 import './unit/src/objects/Group.tests';
-import './unit/src/objects/LensFlare.tests';
 import './unit/src/objects/Line.tests';
 import './unit/src/objects/LineLoop.tests';
 import './unit/src/objects/LineSegments.tests';
@@ -251,7 +250,6 @@ import './unit/src/renderers/webgl/WebGLBufferRenderer.tests';
 import './unit/src/renderers/webgl/WebGLCapabilities.tests';
 import './unit/src/renderers/webgl/WebGLClipping.tests';
 import './unit/src/renderers/webgl/WebGLExtensions.tests';
-import './unit/src/renderers/webgl/WebGLFlareRenderer.tests';
 import './unit/src/renderers/webgl/WebGLGeometries.tests';
 import './unit/src/renderers/webgl/WebGLIndexedBufferRenderer.tests';
 import './unit/src/renderers/webgl/WebGLLights.tests';

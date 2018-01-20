@@ -2281,7 +2281,9 @@
 
 		inverse: function () {
 
-			return this.conjugate().normalize();
+			// quaternion is assumed to have unit length
+
+			return this.conjugate();
 
 		},
 
@@ -6714,6 +6716,7 @@
 				uvScale: gl.getUniformLocation( program, 'uvScale' ),
 
 				rotation: gl.getUniformLocation( program, 'rotation' ),
+				center: gl.getUniformLocation( program, 'center' ),
 				scale: gl.getUniformLocation( program, 'scale' ),
 
 				color: gl.getUniformLocation( program, 'color' ),
@@ -6830,6 +6833,7 @@
 			// render all sprites
 
 			var scale = [];
+			var center = [];
 
 			for ( var i = 0, l = sprites.length; i < l; i ++ ) {
 
@@ -6847,6 +6851,9 @@
 
 				scale[ 0 ] = spriteScale.x;
 				scale[ 1 ] = spriteScale.y;
+
+				center[ 0 ] = sprite.center.x - 0.5;
+				center[ 1 ] = sprite.center.y - 0.5;
 
 				var fogType = 0;
 
@@ -6879,6 +6886,7 @@
 				gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
 
 				gl.uniform1f( uniforms.rotation, material.rotation );
+				gl.uniform2fv( uniforms.center, center );
 				gl.uniform2fv( uniforms.scale, scale );
 
 				state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
@@ -6918,6 +6926,7 @@
 				'uniform mat4 modelViewMatrix;',
 				'uniform mat4 projectionMatrix;',
 				'uniform float rotation;',
+				'uniform vec2 center;',
 				'uniform vec2 scale;',
 				'uniform vec2 uvOffset;',
 				'uniform vec2 uvScale;',
@@ -6932,7 +6941,7 @@
 
 				'	vUV = uvOffset + uv * uvScale;',
 
-				'	vec2 alignedPosition = position * scale;',
+				'	vec2 alignedPosition = ( position - center ) * scale;',
 
 				'	vec2 rotatedPosition;',
 				'	rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;',
@@ -7929,6 +7938,107 @@
 			return ( min <= plane.constant && max >= plane.constant );
 
 		},
+
+		intersectsTriangle: ( function () {
+
+			// triangle centered vertices
+			var v0 = new Vector3();
+			var v1 = new Vector3();
+			var v2 = new Vector3();
+
+			// triangle edge vectors
+			var f0 = new Vector3();
+			var f1 = new Vector3();
+			var f2 = new Vector3();
+
+			var testAxis = new Vector3();
+
+			var center = new Vector3();
+			var extents = new Vector3();
+
+			var triangleNormal = new Vector3();
+
+			function satForAxes( axes ) {
+
+				var i, j;
+
+				for ( i = 0, j = axes.length - 3; i <= j; i += 3 ) {
+
+					testAxis.fromArray( axes, i );
+					// project the aabb onto the seperating axis
+					var r = extents.x * Math.abs( testAxis.x ) + extents.y * Math.abs( testAxis.y ) + extents.z * Math.abs( testAxis.z );
+					// project all 3 vertices of the triangle onto the seperating axis
+					var p0 = v0.dot( testAxis );
+					var p1 = v1.dot( testAxis );
+					var p2 = v2.dot( testAxis );
+					// actual test, basically see if either of the most extreme of the triangle points intersects r
+					if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
+
+						// points of the projected triangle are outside the projected half-length of the aabb
+						// the axis is seperating and we can exit
+						return false;
+
+					}
+
+				}
+
+				return true;
+
+			}
+
+			return function intersectsTriangle( triangle ) {
+
+				if ( this.isEmpty() ) {
+
+					return false;
+
+				}
+
+				// compute box center and extents
+				this.getCenter( center );
+				extents.subVectors( this.max, center );
+
+				// translate triangle to aabb origin
+				v0.subVectors( triangle.a, center );
+				v1.subVectors( triangle.b, center );
+				v2.subVectors( triangle.c, center );
+
+				// compute edge vectors for triangle
+				f0.subVectors( v1, v0 );
+				f1.subVectors( v2, v1 );
+				f2.subVectors( v0, v2 );
+
+				// test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
+				// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
+				// axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
+				var axes = [
+					0, - f0.z, f0.y, 0, - f1.z, f1.y, 0, - f2.z, f2.y,
+					f0.z, 0, - f0.x, f1.z, 0, - f1.x, f2.z, 0, - f2.x,
+					- f0.y, f0.x, 0, - f1.y, f1.x, 0, - f2.y, f2.x, 0
+				];
+				if ( ! satForAxes( axes ) ) {
+
+					return false;
+
+				}
+
+				// test 3 face normals from the aabb
+				axes = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
+				if ( ! satForAxes( axes ) ) {
+
+					return false;
+
+				}
+
+				// finally testing the face normal of the triangle
+				// use already existing triangle edge vectors here
+				triangleNormal.crossVectors( f0, f1 );
+				axes = [ triangleNormal.x, triangleNormal.y, triangleNormal.z ];
+				return satForAxes( axes );
+
+			};
+
+		} )(),
 
 		clampPoint: function ( point, optionalTarget ) {
 
@@ -15319,6 +15429,12 @@
 
 		},
 
+		intersectsBox: function ( box ) {
+
+			return box.intersectsTriangle( this );
+
+		},
+
 		closestPointToPoint: function () {
 
 			var plane = new Plane();
@@ -20779,7 +20895,7 @@
 
 		};
 
-		function resetInfo () {
+		function resetInfo() {
 
 			_infoRender.frame ++;
 			_infoRender.calls = 0;
@@ -21357,7 +21473,7 @@
 
 			//
 
-			var dataCount = 0;
+			var dataCount = Infinity;
 
 			if ( index !== null ) {
 
@@ -21813,7 +21929,7 @@
 
 			state.setPolygonOffset( false );
 
-			scene.onAfterRender( _this, scene, camera, renderTarget );
+			scene.onAfterRender( _this, scene, camera );
 
 			if ( vr.enabled ) {
 
@@ -21822,6 +21938,8 @@
 			}
 
 			// _gl.finish();
+
+			currentRenderList = null;
 
 		};
 
@@ -23355,6 +23473,8 @@
 
 		this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
+		this.center = new Vector2( 0.5, 0.5 );
+
 	}
 
 	Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
@@ -23400,7 +23520,18 @@
 
 			return new this.constructor( this.material ).copy( this );
 
+		},
+
+		copy: function ( source ) {
+
+			Object3D.prototype.copy.call( this, source );
+
+			if ( source.center !== undefined ) this.center.copy( source.center );
+
+			return this;
+
 		}
+
 
 	} );
 
@@ -32928,14 +33059,14 @@
 			get: function () {
 
 				// intensity = power per solid angle.
-				// ref: equation (17) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+				// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 				return this.intensity * Math.PI;
 
 			},
 			set: function ( power ) {
 
 				// intensity = power per solid angle.
-				// ref: equation (17) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+				// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 				this.intensity = power / Math.PI;
 
 			}
@@ -32990,14 +33121,14 @@
 			get: function () {
 
 				// intensity = power per solid angle.
-				// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+				// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 				return this.intensity * 4 * Math.PI;
 
 			},
 			set: function ( power ) {
 
 				// intensity = power per solid angle.
-				// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+				// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 				this.intensity = power / ( 4 * Math.PI );
 
 			}
@@ -37360,8 +37491,7 @@
 
 		var path = new ShapePath();
 
-		var pts = [];
-		var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
+		var x, y, cpx, cpy, cpx1, cpy1, cpx2, cpy2;
 
 		if ( glyph.o ) {
 
@@ -37400,17 +37530,6 @@
 
 						path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
 
-						laste = pts[ pts.length - 1 ];
-
-						if ( laste ) {
-
-							cpx0 = laste.x;
-							cpy0 = laste.y;
-
-							
-
-						}
-
 						break;
 
 					case 'b': // bezierCurveTo
@@ -37423,17 +37542,6 @@
 						cpy2 = outline[ i ++ ] * scale + offsetY;
 
 						path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
-
-						laste = pts[ pts.length - 1 ];
-
-						if ( laste ) {
-
-							cpx0 = laste.x;
-							cpy0 = laste.y;
-
-							
-
-						}
 
 						break;
 
@@ -44745,7 +44853,7 @@
 				return undefined;
 
 			},
-			set: function ( value ) {
+			set: function ( /* value */ ) {
 
 				console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.' );
 
@@ -44762,7 +44870,7 @@
 				return undefined;
 
 			},
-			set: function ( cullFace ) {
+			set: function ( /* cullFace */ ) {
 
 				console.warn( 'THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.' );
 
