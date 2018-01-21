@@ -35,6 +35,67 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isLine: true,
 
+	computeLineDistances: ( function () {
+
+		var start = new Vector3();
+		var end = new Vector3();
+
+		return function computeLineDistances() {
+
+			var distance = 0;
+			var geometry = this.geometry;
+
+			if ( geometry.isBufferGeometry ) {
+
+				// we assume non-indexed geometry
+
+				var positionAttribute = geometry.attributes.position;
+				var lineDistances = [];
+
+				for ( var i = 0, l = positionAttribute.count; i < l; i ++ ) {
+
+					if ( i > 0 ) {
+
+						start.fromBufferAttribute( positionAttribute, i - 1 );
+						end.fromBufferAttribute( positionAttribute, i );
+
+						distance += start.distanceTo( end );
+
+					}
+
+					lineDistances.push( distance );
+
+				}
+
+				geometry.addAttribute( 'lineDistance', new THREE.Float32BufferAttribute( lineDistances, 1 ) );
+
+			} else if ( geometry.isGeometry ) {
+
+				var vertices = geometry.vertices;
+
+				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+
+					if ( i > 0 ) {
+
+						start.copy( vertices[ i - 1 ] );
+						end.copy( vertices[ i ] );
+
+						distance += start.distanceTo( end );
+
+					}
+
+					geometry.lineDistances[ i ] = distance;
+
+				}
+
+			}
+
+			return this;
+
+		};
+
+	}() ),
+
 	raycast: ( function () {
 
 		var inverseMatrix = new Matrix4();
