@@ -69,7 +69,7 @@
 				var spline = new THREE.CatmullRomCurve3( points );
 
 				var samples = spline.getPoints( points.length * subdivisions );
-				var geometrySpline = new THREE.BufferGeometry().setFromPoints( samples );
+				var geometrySpline = new THREE.Geometry().setFromPoints( samples );
 
 				var geometryCube = cube( 50 );
 
