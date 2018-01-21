@@ -70,7 +70,6 @@
 				scene.background = new THREE.Color( 0x222222 );
 
 				var user = new THREE.Group();
-				user.position.set( 0, 1.6, 0 );
 				scene.add( user );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
@@ -142,11 +141,13 @@
 				// controllers
 
 				controller1 = new THREE.PaintViveController( 0 );
+				controller1.standingMatrix = renderer.vr.getStandingMatrix();
 				controller1.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				user.add( controller1 );
 
 				controller2 = new THREE.PaintViveController( 1 );
+				controller2.standingMatrix = renderer.vr.getStandingMatrix();
 				controller2.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				user.add( controller2 );

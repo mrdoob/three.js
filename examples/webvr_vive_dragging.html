@@ -59,7 +59,6 @@
 				scene.background = new THREE.Color( 0x808080 );
 
 				var user = new THREE.Group();
-				user.position.set( 0, 1.6, 0 );
 				scene.add( user );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
@@ -143,11 +142,13 @@
 				// controllers
 
 				controller1 = new THREE.ViveController( 0 );
+				controller1.standingMatrix = renderer.vr.getStandingMatrix();
 				controller1.addEventListener( 'triggerdown', onTriggerDown );
 				controller1.addEventListener( 'triggerup', onTriggerUp );
 				user.add( controller1 );
 
 				controller2 = new THREE.ViveController( 1 );
+				controller2.standingMatrix = renderer.vr.getStandingMatrix();
 				controller2.addEventListener( 'triggerdown', onTriggerDown );
 				controller2.addEventListener( 'triggerup', onTriggerUp );
 				user.add( controller2 );
