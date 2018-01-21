@@ -65,7 +65,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 						}
 
-						lineDistances.push( distance );
+						lineDistances[ i ] = distance;
 
 					}
 
