@@ -26,7 +26,6 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
 		return function computeLineDistances() {
 
-			var distance = 0;
 			var geometry = this.geometry;
 
 			if ( geometry.isBufferGeometry ) {
@@ -43,10 +42,8 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 						start.fromBufferAttribute( positionAttribute, i );
 						end.fromBufferAttribute( positionAttribute, i + 1 );
 
-						distance += start.distanceTo( end );
-
 						lineDistances[ i ] = ( i === 0 ) ? 0 : lineDistances[ i - 1 ];
-						lineDistances[ i + 1 ] = distance;
+						lineDistances[ i + 1 ] = lineDistances[ i ] + start.distanceTo( end );
 
 					}
 
@@ -61,16 +58,15 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 			} else if ( geometry.isGeometry ) {
 
 				var vertices = geometry.vertices;
+				var lineDistances = geometry.lineDistances;
 
 				for ( var i = 0, l = vertices.length; i < l; i += 2 ) {
 
 					start.copy( vertices[ i ] );
 					end.copy( vertices[ i + 1 ] );
 
-					distance += start.distanceTo( end );
-
-					geometry.lineDistances[ i ] = ( i === 0 ) ? 0 : geometry.lineDistances[ i - 1 ];
-					geometry.lineDistances[ i + 1 ] = distance;
+					lineDistances[ i ] = ( i === 0 ) ? 0 : lineDistances[ i - 1 ];
+					lineDistances[ i + 1 ] = lineDistances[ i ] + start.distanceTo( end );
 
 				}
 

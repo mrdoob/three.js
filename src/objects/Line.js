@@ -42,7 +42,6 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return function computeLineDistances() {
 
-			var distance = 0;
 			var geometry = this.geometry;
 
 			if ( geometry.isBufferGeometry ) {
@@ -52,20 +51,15 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				if ( geometry.index === null ) {
 
 					var positionAttribute = geometry.attributes.position;
-					var lineDistances = [];
+					var lineDistances = [ 0 ];
 
-					for ( var i = 0, l = positionAttribute.count; i < l; i ++ ) {
+					for ( var i = 1, l = positionAttribute.count; i < l; i ++ ) {
 
-						if ( i > 0 ) {
+						start.fromBufferAttribute( positionAttribute, i - 1 );
+						end.fromBufferAttribute( positionAttribute, i );
 
-							start.fromBufferAttribute( positionAttribute, i - 1 );
-							end.fromBufferAttribute( positionAttribute, i );
-
-							distance += start.distanceTo( end );
-
-						}
-
-						lineDistances[ i ] = distance;
+						lineDistances[ i ] = lineDistances[ i - 1 ];
+						lineDistances[ i ] += start.distanceTo( end );
 
 					}
 
@@ -80,19 +74,14 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			} else if ( geometry.isGeometry ) {
 
 				var vertices = geometry.vertices;
+				var lineDistances = geometry.lineDistances;
 
-				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+				lineDistances[ 0 ] = 0;
 
-					if ( i > 0 ) {
+				for ( var i = 1, l = vertices.length; i < l; i ++ ) {
 
-						start.copy( vertices[ i - 1 ] );
-						end.copy( vertices[ i ] );
-
-						distance += start.distanceTo( end );
-
-					}
-
-					geometry.lineDistances[ i ] = distance;
+					lineDistances[ i ] = lineDistances[ i - 1 ];
+					lineDistances[ i ] += vertices[ i - 1 ].distanceTo( vertices[ i ] );
 
 				}
 
