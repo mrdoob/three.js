@@ -13,20 +13,25 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-		A 2d path representation, comprising of points, lines, and cubes, similar to the 2D Canvas API.
-		It extends [page:CurvePath].
+		A 2D path representation. The class provides methods for creating paths and contours of 2D shapes similar to the 2D Canvas API.
 		</div>
 
 		<h2>Example</h2>
 
 		<code>
-var v1 = new THREE.Vector2();
-var v2 = new THREE.Vector2(1, 45);
-var v3 = new THREE.Vector2(34, 34);
+			var path = new THREE.Path();
 
-var vectors = [v1, v2, v3];
+			path.lineTo( 0, 0.8 );
+			path.quadraticCurveTo( 0, 1, 0.2, 1 );
+			path.lineTo( 1, 1 );
 
-var path = new THREE.Path(vectors);
+			var points = path.getPoints();
+
+			var geometry = new THREE.BufferGeometry().setFromPoints( points );
+			var material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+
+			var line = new THREE.Line( geometry, material );
+			scene.add( line );
 		</code>
 
 
