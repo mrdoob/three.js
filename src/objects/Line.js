@@ -49,25 +49,33 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				// we assume non-indexed geometry
 
-				var positionAttribute = geometry.attributes.position;
-				var lineDistances = [];
+				if ( geometry.index === null ) {
 
-				for ( var i = 0, l = positionAttribute.count; i < l; i ++ ) {
+					var positionAttribute = geometry.attributes.position;
+					var lineDistances = [];
 
-					if ( i > 0 ) {
+					for ( var i = 0, l = positionAttribute.count; i < l; i ++ ) {
 
-						start.fromBufferAttribute( positionAttribute, i - 1 );
-						end.fromBufferAttribute( positionAttribute, i );
+						if ( i > 0 ) {
 
-						distance += start.distanceTo( end );
+							start.fromBufferAttribute( positionAttribute, i - 1 );
+							end.fromBufferAttribute( positionAttribute, i );
+
+							distance += start.distanceTo( end );
+
+						}
+
+						lineDistances.push( distance );
 
 					}
 
-					lineDistances.push( distance );
+					geometry.addAttribute( 'lineDistance', new THREE.Float32BufferAttribute( lineDistances, 1 ) );
+
+				} else {
+
+					console.warn( 'THREE.Line.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.' );
 
 				}
-
-				geometry.addAttribute( 'lineDistance', new THREE.Float32BufferAttribute( lineDistances, 1 ) );
 
 			} else if ( geometry.isGeometry ) {
 
