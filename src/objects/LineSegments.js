@@ -54,7 +54,7 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
 				} else {
 
-					console.warn( 'THREE.Line.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.' );
+					console.warn( 'THREE.LineSegments.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.' );
 
 				}
 
