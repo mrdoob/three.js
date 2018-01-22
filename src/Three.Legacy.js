@@ -1338,7 +1338,7 @@ Object.assign( WebGLRenderer.prototype, {
 
 		console.warn( 'THREE.WebGLRenderer: .setFaceCulling() has been removed.' );
 
-	},
+	}
 
 } );
 
