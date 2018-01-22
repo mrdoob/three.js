@@ -1435,7 +1435,7 @@ function WebGLRenderer( parameters ) {
 	function renderObject( object, scene, camera, geometry, material, group ) {
 
 		object.onBeforeRender( _this, scene, camera, geometry, material, group );
-		restoreRenderState( scene, _currentArrayCamera || camera );
+		currentRenderState = renderStates.get( scene, _currentArrayCamera || camera );
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
@@ -1459,7 +1459,7 @@ function WebGLRenderer( parameters ) {
 		}
 
 		object.onAfterRender( _this, scene, camera, geometry, material, group );
-		restoreRenderState( scene, _currentArrayCamera || camera );
+		currentRenderState = renderStates.get( scene, _currentArrayCamera || camera );
 
 	}
 
@@ -2319,14 +2319,6 @@ function WebGLRenderer( parameters ) {
 		uniforms.spotLights.needsUpdate = value;
 		uniforms.rectAreaLights.needsUpdate = value;
 		uniforms.hemisphereLights.needsUpdate = value;
-
-	}
-
-	//
-
-	function restoreRenderState( scene, camera ) {
-
-		currentRenderState = renderStates.get( scene, camera );
 
 	}
 
