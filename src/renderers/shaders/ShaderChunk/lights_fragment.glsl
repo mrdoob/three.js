@@ -108,8 +108,6 @@ IncidentLight directLight;
 
 	#endif
 
-	RE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );
-
 #endif
 
 #if defined( RE_IndirectSpecular )
