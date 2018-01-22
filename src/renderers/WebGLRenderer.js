@@ -2310,15 +2310,6 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	// GL state setting
-
-	this.setFaceCulling = function ( cullFace, frontFaceDirection ) {
-
-		state.setCullFace( cullFace );
-		state.setFlipSided( frontFaceDirection === FrontFaceDirectionCW );
-
-	};
-
 	// Textures
 
 	function allocTextureUnit() {
