@@ -530,6 +530,7 @@ function WebGLRenderer( parameters ) {
 
 		vr.dispose();
 
+		isAnimating = false;
 	};
 
 	// Events
@@ -1065,6 +1066,9 @@ function WebGLRenderer( parameters ) {
 	}
 
 	function loop( time ) {
+
+		if ( isAnimating === false || onAnimationFrame === null )
+			return;
 
 		if ( onAnimationFrame !== null ) onAnimationFrame( time );
 
