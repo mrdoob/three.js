@@ -41,7 +41,9 @@ import lights_phong_fragment from './ShaderChunk/lights_phong_fragment.glsl';
 import lights_phong_pars_fragment from './ShaderChunk/lights_phong_pars_fragment.glsl';
 import lights_physical_fragment from './ShaderChunk/lights_physical_fragment.glsl';
 import lights_physical_pars_fragment from './ShaderChunk/lights_physical_pars_fragment.glsl';
-import lights_template from './ShaderChunk/lights_template.glsl';
+import lights_fragment from './ShaderChunk/lights_fragment.glsl';
+import lights_maps_fragment from './ShaderChunk/lights_maps_fragment.glsl';
+import lights_apply_fragment from './ShaderChunk/lights_apply_fragment.glsl';
 import logdepthbuf_fragment from './ShaderChunk/logdepthbuf_fragment.glsl';
 import logdepthbuf_pars_fragment from './ShaderChunk/logdepthbuf_pars_fragment.glsl';
 import logdepthbuf_pars_vertex from './ShaderChunk/logdepthbuf_pars_vertex.glsl';
@@ -153,7 +155,9 @@ export var ShaderChunk = {
 	lights_phong_pars_fragment: lights_phong_pars_fragment,
 	lights_physical_fragment: lights_physical_fragment,
 	lights_physical_pars_fragment: lights_physical_pars_fragment,
-	lights_template: lights_template,
+	lights_fragment: lights_fragment,
+	lights_maps_fragment: lights_maps_fragment,
+	lights_apply_fragment: lights_apply_fragment,
 	logdepthbuf_fragment: logdepthbuf_fragment,
 	logdepthbuf_pars_fragment: logdepthbuf_pars_fragment,
 	logdepthbuf_pars_vertex: logdepthbuf_pars_vertex,

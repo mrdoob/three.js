@@ -49,7 +49,9 @@ void main() {
 
 	// accumulation
 	#include <lights_phong_fragment>
-	#include <lights_template>
+	#include <lights_fragment>
+	#include <lights_maps_fragment>
+	#include <lights_apply_fragment>
 
 	// modulation
 	#include <aomap_fragment>
