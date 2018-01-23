@@ -4821,10 +4821,6 @@
           "!type": "fn(camera, lights, fog, material, object)",
           "!doc": "Renders an immediate Object using a camera."
         },
-        "setFaceCulling": {
-          "!type": "fn(cullFace, frontFace)",
-          "!doc": "If cullFace is false, culling will be disabled."
-        },
         "setDepthTest": {
           "!type": "fn(depthTest: boolean)",
           "!doc": "This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer."
