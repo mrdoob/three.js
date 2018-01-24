@@ -37,36 +37,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.focus = function ( target ) {
 
-		if ( target === undefined || !target.isObject3D ) {
-			return;
-		}
-
 		var box = new THREE.Box3().setFromObject( target );
-
-		var targetDistance;
-
-		if ( box.isEmpty() ) {
-
-			// Focusing on an empty such as a light.
-
-			target.getWorldPosition( center );
-			targetDistance = 0.5;
-
-		} else {
-
-			center.copy( box.getCenter() );
-			targetDistance = box.getBoundingSphere().radius * 6;
-
-		}
-
-		var forwards = object.getWorldDirection().normalize();
-
-		var targetDelta = forwards.multiplyScalar( -targetDistance );
-
-		var targetWorldPosition = targetDelta.add( center );
-
-		object.position.copy( targetWorldPosition );
-
+		object.lookAt( center.copy( box.getCenter() ) );
 		scope.dispatchEvent( changeEvent );
 
 	};
@@ -226,8 +198,6 @@ THREE.EditorControls = function ( object, domElement ) {
 	domElement.addEventListener( 'wheel', onMouseWheel, false );
 
 	// touch
-
-	var touch = new THREE.Vector3();
 
 	var touches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 	var prevTouches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
