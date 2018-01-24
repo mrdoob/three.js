@@ -59,7 +59,7 @@
     "qunit": "^2.4.0",
     "rollup": "^0.51.0",
     "rollup-watch": "^4.0.0",
-    "serve": "^6.3.1",
+    "serve": "6.4.9",
     "uglify-js": "^3.0.23"
   }
 }
