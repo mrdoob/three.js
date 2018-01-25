@@ -3190,6 +3190,11 @@ THREE.ColladaLoader.prototype = {
 			for ( var i = 0, l = keys.length; i < l; i ++ ) {
 
 				var id = instanceMaterials[ keys[ i ] ];
+
+				if( id === undefined ) { // Fallback if no material matches
+					id = instanceMaterials[Object.keys(instanceMaterials)[0]] // take simply the first material 
+				}
+
 				materials.push( getMaterial( id ) );
 
 			}
