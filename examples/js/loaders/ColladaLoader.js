@@ -3191,8 +3191,11 @@ THREE.ColladaLoader.prototype = {
 
 				var id = instanceMaterials[ keys[ i ] ];
 
-				if( id === undefined ) { // Fallback if no material matches
-					id = instanceMaterials[Object.keys(instanceMaterials)[0]] // take simply the first material 
+				if ( id === undefined ) {
+
+					console.warn( 'THREE.ColladaLoader: Material with key %s not found. Apply fallback material.', keys[ i ] );
+					id = instanceMaterials[ Object.keys( instanceMaterials )[ 0 ] ];
+
 				}
 
 				materials.push( getMaterial( id ) );
