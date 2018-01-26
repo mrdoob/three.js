@@ -55,7 +55,7 @@
     "electron": "1.7.11",
     "eslint": "^4.1.1",
     "eslint-config-mdcs": "^4.2.2",
-    "google-closure-compiler": "^20170521.0.0",
+    "google-closure-compiler": "20180101.0.0",
     "qunit": "^2.4.0",
     "rollup": "^0.51.0",
     "rollup-watch": "^4.0.0",
