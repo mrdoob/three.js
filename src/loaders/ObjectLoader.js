@@ -479,9 +479,14 @@ Object.assign( ObjectLoader.prototype, {
 
 				scope.manager.itemEnd( url );
 
+				if ( onLoad !== undefined ) onLoad( );
+
 			}, undefined, function () {
 
 				scope.manager.itemEnd( url );
+
+				if ( onLoad !== undefined ) onLoad( );
+
 				scope.manager.itemError( url );
 
 			} );
@@ -490,7 +495,7 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			var manager = new LoadingManager( onLoad );
+			var manager = this.imageManager !== undefined ? this.imageManager : new LoadingManager( );
 
 			var loader = new ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
