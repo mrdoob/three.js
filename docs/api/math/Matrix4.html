@@ -26,11 +26,10 @@
 			Every [page:Object3D] has three associated Matrix4s:
 			<ul>
 				<li>
-					[page:Object3D.matrix]: This stores the local transform of the object.
+					[page:Object3D.matrix]: This stores the local transform of the object. This is the object's transformation relative to its parent.
 				</li>
 				<li>
-					[page:Object3D.matrixWorld]: The global or world transform of the object. This is the object's transformation relative to its parent.
-					If the object has no parent, then this is identical to the local transform.
+					[page:Object3D.matrixWorld]: The global or world transform of the object. If the object has no parent, then this is identical to the local transform stored in [page:Object3D.matrix matrix].
 				</li>
 				<li>
 					[page:Object3D.modelViewMatrix]: This represents the object's transformation relative to the camera's coordinate system.
