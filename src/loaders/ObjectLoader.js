@@ -484,10 +484,9 @@ Object.assign( ObjectLoader.prototype, {
 			}, undefined, function () {
 
 				scope.manager.itemEnd( url );
+				scope.manager.itemError( url );
 
 				if ( onLoad !== undefined ) onLoad( );
-
-				scope.manager.itemError( url );
 
 			} );
 
