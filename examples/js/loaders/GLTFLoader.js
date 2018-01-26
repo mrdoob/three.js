@@ -418,23 +418,27 @@ THREE.GLTFLoader = ( function () {
 
 		var pending = [];
 
-		var metallicRoughness = material.pbrMetallicRoughness;
-
 		materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
 		materialParams.opacity = 1.0;
 
-		if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
+		var metallicRoughness = material.pbrMetallicRoughness;
 
-			var array = metallicRoughness.baseColorFactor;
+		if ( metallicRoughness ) {
 
-			materialParams.color.fromArray( array );
-			materialParams.opacity = array[ 3 ];
+			if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
 
-		}
+				var array = metallicRoughness.baseColorFactor;
 
-		if ( metallicRoughness.baseColorTexture !== undefined ) {
+				materialParams.color.fromArray( array );
+				materialParams.opacity = array[ 3 ];
 
-			pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture.index ) );
+			}
+
+			if ( metallicRoughness.baseColorTexture !== undefined ) {
+
+				pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture.index ) );
+
+			}
 
 		}
 
@@ -1942,7 +1946,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		if ( materialDef.normalTexture !== undefined ) {
+		if ( materialDef.normalTexture !== undefined && materialType !== THREE.MeshBasicMaterial) {
 
 			pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture.index ) );
 
@@ -1956,7 +1960,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		if ( materialDef.occlusionTexture !== undefined ) {
+		if ( materialDef.occlusionTexture !== undefined && materialType !== THREE.MeshBasicMaterial) {
 
 			pending.push( parser.assignTexture( materialParams, 'aoMap', materialDef.occlusionTexture.index ) );
 
@@ -1968,31 +1972,15 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		if ( materialDef.emissiveFactor !== undefined ) {
+		if ( materialDef.emissiveFactor !== undefined && materialType !== THREE.MeshBasicMaterial) {
 
-			if ( materialType === THREE.MeshBasicMaterial ) {
-
-				materialParams.color = new THREE.Color().fromArray( materialDef.emissiveFactor );
-
-			} else {
-
-				materialParams.emissive = new THREE.Color().fromArray( materialDef.emissiveFactor );
-
-			}
+			materialParams.emissive = new THREE.Color().fromArray( materialDef.emissiveFactor );
 
 		}
 
-		if ( materialDef.emissiveTexture !== undefined ) {
+		if ( materialDef.emissiveTexture !== undefined && materialType !== THREE.MeshBasicMaterial) {
 
-			if ( materialType === THREE.MeshBasicMaterial ) {
-
-				pending.push( parser.assignTexture( materialParams, 'map', materialDef.emissiveTexture.index ) );
-
-			} else {
-
-				pending.push( parser.assignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture.index ) );
-
-			}
+			pending.push( parser.assignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture.index ) );
 
 		}
 
