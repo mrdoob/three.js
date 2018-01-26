@@ -217,7 +217,7 @@
 				var r = eval("/" + '\%s' + "/g");
 				url = url.replace(r, extension);
 
-				if (extension === 'glTF-Binary' || extension === 'glTF-MaterialsUnlit') {
+				if (extension === 'glTF-Binary') {
 					url = url.replace('.gltf', '.glb');
 				}
 
@@ -437,7 +437,7 @@
 					cameraPos: new THREE.Vector3(0, 4, 6),
 					objectRotation: new THREE.Euler(0, 0, 0),
 					addLights:true,
-					extensions: ['glTF', 'glTF-MaterialsUnlit'],
+					extensions: ['glTF-MaterialsUnlit'],
 					addEnvMap: true
 				},
 				{
