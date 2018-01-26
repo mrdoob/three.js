@@ -105,7 +105,7 @@ THREE.DRACOLoader.prototype = {
       THREE.DRACOLoader.getDecoderModule()
           .then( function ( module ) {
             scope.decodeDracoFileInternal( rawBuffer, module.decoder, callback,
-              attributeUniqueIdMap );
+              attributeUniqueIdMap || {});
           });
     },
 
