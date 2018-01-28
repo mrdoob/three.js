@@ -103,7 +103,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			}
 
-			scope.parse( json, onLoad );
+			scope.parse( json, onLoad, onError );
 
 		}, onProgress, onError );
 
@@ -121,7 +121,7 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parse: function ( json, onLoad ) {
+	parse: function ( json, onLoad, onError ) {
 
 		var shapes = this.parseShape( json.shapes );
 		var geometries = this.parseGeometries( json.geometries, shapes );
@@ -130,7 +130,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			if ( onLoad !== undefined ) onLoad( object );
 
-		} );
+		}, onError );
 
 		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
@@ -466,7 +466,7 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parseImages: function ( json, onLoad ) {
+	parseImages: function ( json, onLoad, onError ) {
 
 		var scope = this;
 		var images = {};
@@ -477,16 +477,16 @@ Object.assign( ObjectLoader.prototype, {
 
 			return loader.load( url, function () {
 
-				scope.manager.itemEnd( url );
-
 				if ( onLoad !== undefined ) onLoad( );
 
-			}, undefined, function () {
+				scope.manager.itemEnd( url );
+
+			}, undefined, function ( event ) {
+
+				if ( onError !== undefined ) onError( event );
 
 				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
-
-				if ( onLoad !== undefined ) onLoad( );
 
 			} );
 
@@ -494,9 +494,7 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			var manager = this.imageManager !== undefined ? this.imageManager : new LoadingManager( );
-
-			var loader = new ImageLoader( manager );
+			var loader = new ImageLoader( scope.manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
