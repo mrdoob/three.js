@@ -1,4 +1,4 @@
-import { REVISION, RGBAFormat, HalfFloatType, FloatType, UnsignedByteType, FrontFaceDirectionCW, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, LinearToneMapping } from '../constants.js';
+import { REVISION, RGBAFormat, HalfFloatType, FloatType, UnsignedByteType, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, LinearToneMapping } from '../constants.js';
 import { _Math } from '../math/Math.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { DataTexture } from '../textures/DataTexture.js';
