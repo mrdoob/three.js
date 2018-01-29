@@ -470,6 +470,21 @@ Object.assign( ObjectLoader.prototype, {
 
 		var scope = this;
 		var images = {};
+		var firstError;
+		var successCount = 0;
+		var errCount = 0;
+
+		function allImagesFinished() {
+			if ( errCount > 0 ) {
+				if ( onError ) {
+					onError( firstError );
+				}
+			} else {
+				if ( onLoad ) {
+					onLoad( );
+				}
+			}
+		}
 
 		function loadImage( url ) {
 
@@ -477,13 +492,25 @@ Object.assign( ObjectLoader.prototype, {
 
 			return loader.load( url, function () {
 
-				if ( onLoad !== undefined ) onLoad( );
+				successCount ++;
+
+				if ( successCount + errCount === imageCount ) {
+					allImagesFinished( );
+				}
 
 				scope.manager.itemEnd( url );
 
 			}, undefined, function ( event ) {
 
-				if ( onError !== undefined ) onError( event );
+				errCount ++;
+
+				if ( firstError === undefined ) {
+					firstError = event;
+				}
+
+				if ( successCount + errCount === imageCount ) {
+					allImagesFinished( );
+				}
 
 				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
@@ -497,7 +524,9 @@ Object.assign( ObjectLoader.prototype, {
 			var loader = new ImageLoader( scope.manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			var imageCount = json.length;
+
+			for ( var i = 0; i < imageCount; i ++ ) {
 
 				var image = json[ i ];
 				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
