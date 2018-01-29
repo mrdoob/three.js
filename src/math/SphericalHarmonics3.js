@@ -195,6 +195,14 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 		return new SphericalHarmonics3().copy( this );
 
+	},
+
+	toArray: function () {
+		var c = [];
+		for( var i=0; i<9; i++ ) {
+			c.push( this.coefficients[i].clone() );
+		}
+		return c;
 	}
 } );
 
