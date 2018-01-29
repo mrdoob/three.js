@@ -1,8 +1,6 @@
 // normal is assumed to be unit length!
-vec3 shGetAt( const in vec3 shCoefficients[9], const in GeometricContext geometry )
+vec3 shGetAt( const in vec3 shCoefficients[9], const in vec3 worldNormal )
 {
-    vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
-
     // band 0
     vec3 result = shCoefficients[0];
 
@@ -30,10 +28,8 @@ vec3 shGetAt( const in vec3 shCoefficients[9], const in GeometricContext geometr
 #define C5 0.247708
 
 // normal is assumed to be unit length!
-vec3 shGetIrradianceAt( const in vec3 shCoefficients[9], const in GeometricContext geometry )
+vec3 shGetIrradianceAt( const in vec3 shCoefficients[9], const in vec3 worldNormal )
 {
-    vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
-
     // band 0
     vec3 result = shCoefficients[0] * C4;
 

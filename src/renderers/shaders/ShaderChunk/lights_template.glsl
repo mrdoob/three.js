@@ -124,7 +124,7 @@ IncidentLight directLight;
 
 	#ifdef USE_SPHERICAL_HARMONICS
 
-		irradiance += shGetIrradianceAt( sphericalHarmonics, geometry );
+		irradiance += getSHLightProbeIndirectIrradiance( sphericalHarmonics, geometry );
 
 	#elif defined( USE_ENVMAP ) && defined( PHYSICAL ) && defined( ENVMAP_TYPE_CUBE_UV )
 

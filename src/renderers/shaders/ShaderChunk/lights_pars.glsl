@@ -175,6 +175,17 @@ uniform vec3 sphericalHarmonics[9];
 
 #endif
 
+#ifdef USE_SPHERICAL_HARMONICS
+
+	vec3 getSHLightProbeIndirectIrradiance( const in vec3 sh[9], const in GeometricContext geometry ) {
+
+		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
+		
+		return shGetIrradianceAt( sh, worldNormal );
+
+	}
+
+#endif
 
 #if defined( USE_ENVMAP ) && defined( PHYSICAL )
 

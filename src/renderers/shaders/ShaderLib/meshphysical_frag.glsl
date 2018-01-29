@@ -25,6 +25,7 @@ varying vec3 vViewPosition;
 #include <color_pars_fragment>
 #include <uv_pars_fragment>
 #include <uv2_pars_fragment>
+#include <spherical_harmonics_inc>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <aomap_pars_fragment>
@@ -43,7 +44,6 @@ varying vec3 vViewPosition;
 #include <metalnessmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
-#include <spherical_harmonics_inc>
 
 void main() {
 
