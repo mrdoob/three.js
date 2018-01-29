@@ -1,20 +1,22 @@
 // normal is assumed to be unit length!
-vec3 shGetAt( const in vec3 shCoefficients[9], vec3 normal )
+vec3 shGetAt( const in vec3 shCoefficients[9], const in GeometricContext geometry )
 {
+    vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
+
     // band 0
     vec3 result = shCoefficients[0];
 
     // band 1
-    result += shCoefficients[1] * normal.y;
-    result += shCoefficients[2] * normal.z;
-    result += shCoefficients[3] * normal.x;
+    result += shCoefficients[1] * worldNormal.y;
+    result += shCoefficients[2] * worldNormal.z;
+    result += shCoefficients[3] * worldNormal.x;
 
     // band 2
-    result += shCoefficients[4] * ( normal.x*normal.y );
-    result += shCoefficients[5] * ( normal.y*normal.z );
-    result += shCoefficients[6] * ( 3.0 * normal.z*normal.z - 1.0 );
-    result += shCoefficients[7] * ( normal.x*normal.z );
-    result += shCoefficients[8] * ( normal.x*normal.x - normal.y*normal.y );
+    result += shCoefficients[4] * ( worldNormal.x*worldNormal.y );
+    result += shCoefficients[5] * ( worldNormal.y*worldNormal.z );
+    result += shCoefficients[6] * ( 3.0 * worldNormal.z*worldNormal.z - 1.0 );
+    result += shCoefficients[7] * ( worldNormal.x*worldNormal.z );
+    result += shCoefficients[8] * ( worldNormal.x*worldNormal.x - worldNormal.y*worldNormal.y );
 
     return result;
 }
@@ -28,22 +30,24 @@ vec3 shGetAt( const in vec3 shCoefficients[9], vec3 normal )
 #define C5 0.247708
 
 // normal is assumed to be unit length!
-vec3 shGetIrradianceAt( const in vec3 shCoefficients[9], vec3 normal )
+vec3 shGetIrradianceAt( const in vec3 shCoefficients[9], const in GeometricContext geometry )
 {
+    vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
+
     // band 0
     vec3 result = shCoefficients[0] * C4;
 
     // band 1
-    result += shCoefficients[1] * ( 2.0 * C2 * normal.y );
-    result += shCoefficients[2] * ( 2.0 * C2 * normal.z );
-    result += shCoefficients[3] * ( 2.0 * C2 * normal.x );
+    result += shCoefficients[1] * ( 2.0 * C2 * worldNormal.y );
+    result += shCoefficients[2] * ( 2.0 * C2 * worldNormal.z );
+    result += shCoefficients[3] * ( 2.0 * C2 * worldNormal.x );
 
     // band 2
-    result += shCoefficients[4] * ( 2.0 * C1 * normal.x*normal.y );
-    result += shCoefficients[5] * ( 2.0 * C1 * normal.y*normal.z );
-    result += shCoefficients[6] * ( C3 * normal.z*normal.z - C5 );
-    result += shCoefficients[7] * ( 2.0 * C1 * normal.x*normal.z );
-    result += shCoefficients[8] * ( C1 * ( normal.x*normal.x - normal.y*normal.y ) );
+    result += shCoefficients[4] * ( 2.0 * C1 * worldNormal.x * worldNormal.y );
+    result += shCoefficients[5] * ( 2.0 * C1 * worldNormal.y * worldNormal.z );
+    result += shCoefficients[6] * ( C3 * worldNormal.z * worldNormal.z - C5 );
+    result += shCoefficients[7] * ( 2.0 * C1 * worldNormal.x * worldNormal.z );
+    result += shCoefficients[8] * ( C1 * ( worldNormal.x * worldNormal.x - worldNormal.y * worldNormal.y ) );
 
     return result;
 }

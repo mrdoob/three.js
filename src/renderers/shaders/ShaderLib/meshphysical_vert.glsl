@@ -8,10 +8,6 @@ varying vec3 vViewPosition;
 
 #endif
 
-#ifdef USE_SPHERICAL_HARMONICS
-	varying vec3 worldNormal;
-#endif
-
 #include <common>
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>
@@ -56,7 +52,4 @@ void main() {
 	#include <shadowmap_vertex>
 	#include <fog_vertex>
 
-#ifdef USE_SPHERICAL_HARMONICS
-	worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );
-#endif
 }
