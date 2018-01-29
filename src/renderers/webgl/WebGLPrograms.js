@@ -241,10 +241,12 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		}
 
+		// if the user is aware of the feature and added a dictionary
 		if ( material.shaderIncludes !== undefined ){
 
 			for( var include in material.shaderIncludes ){
 
+				//do proper hashing, onBeforeCompile.toString() had some issues
 				array.push( material.shaderIncludes[ include ] );
 
 			}
