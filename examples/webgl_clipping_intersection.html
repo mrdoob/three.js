@@ -16,110 +16,126 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
 			var camera, scene, renderer;
-			var group, mode;
 
-			var stats;
+			var params = {
+				clipIntersection: true,
+				planeConstant: 0,
+				showHelpers: false
+			};
+
+			var clipPlanes = [
+				new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 ),
+				new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
+				new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
+			];
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 800 );
-
-				camera.position.set( -20, 10, 50 );
-				camera.lookAt( new THREE.Vector3( 0, 0, 0) );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.localClippingEnabled = true;
+				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
 
-				// Lights
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
 
-				var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+				camera.position.set( - 20, 30, 40 );
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use only if there is no animation loop
+				controls.minDistance = 10;
+				controls.maxDistance = 100;
+				controls.enablePan = false;
+
+				var light = new THREE.HemisphereLight( 0xffffff, 0x080808, 1 );
 				scene.add( light );
-
-				var clipPlanes = [
-					new THREE.Plane( new THREE.Vector3( 1,  0,  0 ), 0 ),
-					new THREE.Plane( new THREE.Vector3( 0, -1,  0 ), 0 ),
-					new THREE.Plane( new THREE.Vector3( 0,  0, -1 ), 0 )
-				];
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
-				group = new THREE.Object3D();
+				//
+
+				var group = new THREE.Group();
 
 				for ( var i = 1; i < 25; i ++ ) {
 
-					var geometry = new THREE.SphereBufferGeometry( i / 2, 48, 48 );
-					var material = new THREE.MeshStandardMaterial( {
+					var geometry = new THREE.SphereBufferGeometry( i / 2, 48, 24 );
+
+					var material = new THREE.MeshLambertMaterial( {
+
 						color: new THREE.Color( Math.sin( i * 0.5 ) * 0.5 + 0.5, Math.cos( i * 1.5 ) * 0.5 + 0.5, Math.sin( i * 4.5 + 0 ) * 0.5 + 0.5 ),
-						roughness: 0.95,
-						metalness: 0.0,
 						side: THREE.DoubleSide,
 						clippingPlanes: clipPlanes,
-						clipIntersection: true
+						clipIntersection: params.clipIntersection
+
 					} );
+
 					group.add( new THREE.Mesh( geometry, material ) );
 
 				}
 
 				scene.add( group );
 
-				// Renderer
+				// helpers
 
-				var container = document.body;
+				var helpers = new THREE.Group();
+				helpers.add( new THREE.AxesHelper( 20 ) );
+				helpers.add( new THREE.PlaneHelper( clipPlanes[ 0 ], 30, 0xff0000 ) );
+				helpers.add( new THREE.PlaneHelper( clipPlanes[ 1 ], 30, 0x00ff00 ) );
+				helpers.add( new THREE.PlaneHelper( clipPlanes[ 2 ], 30, 0x0000ff ) );
+				helpers.visible = false;
+				scene.add( helpers );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.antialias = true;
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x222222 );
-				renderer.localClippingEnabled = true;
-
-				window.addEventListener( 'resize', onWindowResize, false );
-				container.appendChild( renderer.domElement );
-
-				// Stats
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
-				// GUI
-
-				mode = {};
-				mode.clipIntersection = true;
-				mode.clipPosition = 0;
+				// gui
 
 				var gui = new dat.GUI();
-				gui.add( mode, 'clipIntersection' ).onChange( function () {
+
+				gui.add( params, 'clipIntersection' ).name( 'clip intersection' ).onChange( function ( value ) {
 
 					var children = group.children;
 
 					for ( var i = 0; i < children.length; i ++ ) {
 
-						var child = children[ i ];
-						child.material.clipIntersection = ! child.material.clipIntersection;
+						children[ i ].material.clipIntersection = value;
 
 					}
 
+					render();
+
 				} );
-				gui.add( mode, 'clipPosition', -16, 16 );
 
-				// Controls
+				gui.add( params, 'planeConstant', - 16, 16 ).step( 1 ).name( 'plane constant' ).onChange( function ( value ) {
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 1, 0 );
-				controls.update();
+					for ( var j = 0; j < clipPlanes.length; j ++ ) {
 
-				// Start
+						clipPlanes[ j ].constant = value;
 
-				startTime = Date.now();
-				time = 0;
+					}
+
+					render();
+
+				} );
+
+				gui.add( params, 'showHelpers' ).name( 'show helpers' ).onChange( function ( value ) {
+
+					helpers.visible = value;
+
+					render();
+
+				} );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -130,30 +146,13 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
-			function animate() {
+			function render() {
 
-				requestAnimationFrame( animate );
-
-				var children = group.children;
-
-				for ( var i = 0; i < children.length; i ++ ) {
-
-					var current = children[ i ].material;
-
-					for ( var j = 0; j < current.clippingPlanes.length; j ++ ) {
-
-						var plane = current.clippingPlanes[ j ];
-						plane.constant = ( 49 * plane.constant + mode.clipPosition ) / 50;
-
-					}
-
-				}
-
-				stats.begin();
 				renderer.render( scene, camera );
-				stats.end();
 
 			}
 

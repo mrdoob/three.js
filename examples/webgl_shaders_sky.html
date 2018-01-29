@@ -44,7 +44,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/SkyShader.js"></script>
+		<script src="js/objects/Sky.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -65,9 +65,10 @@
 
 			function initSky() {
 
-				// Add Sky Mesh
+				// Add Sky
 				sky = new THREE.Sky();
-				scene.add( sky.mesh );
+				sky.scale.setScalar( 450000 );
+				scene.add( sky );
 
 				// Add Sun Helper
 				sunSphere = new THREE.Mesh(
@@ -95,7 +96,7 @@
 
 				function guiChanged() {
 
-					var uniforms = sky.uniforms;
+					var uniforms = sky.material.uniforms;
 					uniforms.turbidity.value = effectController.turbidity;
 					uniforms.rayleigh.value = effectController.rayleigh;
 					uniforms.luminance.value = effectController.luminance;
@@ -111,7 +112,7 @@
 
 					sunSphere.visible = effectController.sun;
 
-					sky.uniforms.sunPosition.value.copy( sunSphere.position );
+					uniforms.sunPosition.value.copy( sunSphere.position );
 
 					renderer.render( scene, camera );
 

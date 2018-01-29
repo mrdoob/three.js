@@ -1,17 +1,17 @@
-import { Vector3 } from '../math/Vector3';
-import { Object3D } from '../core/Object3D';
-import { LineSegments } from '../objects/LineSegments';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  * @author WestLangley / http://github.com/WestLangley
-*/
+ */
 
-function SpotLightHelper( light ) {
+import { Vector3 } from '../math/Vector3.js';
+import { Object3D } from '../core/Object3D.js';
+import { LineSegments } from '../objects/LineSegments.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+
+function SpotLightHelper( light, color ) {
 
 	Object3D.call( this );
 
@@ -21,14 +21,16 @@ function SpotLightHelper( light ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
+	this.color = color;
+
 	var geometry = new BufferGeometry();
 
 	var positions = [
-		0, 0, 0,   0,   0,   1,
-		0, 0, 0,   1,   0,   1,
-		0, 0, 0, - 1,   0,   1,
-		0, 0, 0,   0,   1,   1,
-		0, 0, 0,   0, - 1,   1
+		0, 0, 0, 	0, 0, 1,
+		0, 0, 0, 	1, 0, 1,
+		0, 0, 0,	- 1, 0, 1,
+		0, 0, 0, 	0, 1, 1,
+		0, 0, 0, 	0, - 1, 1
 	];
 
 	for ( var i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
@@ -83,7 +85,15 @@ SpotLightHelper.prototype.update = function () {
 
 		this.cone.lookAt( vector2.sub( vector ) );
 
-		this.cone.material.color.copy( this.light.color );
+		if ( this.color !== undefined ) {
+
+			this.cone.material.color.set( this.color );
+
+		} else {
+
+			this.cone.material.color.copy( this.light.color );
+
+		}
 
 	};
 

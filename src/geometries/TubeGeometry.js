@@ -8,11 +8,11 @@
  *
  */
 
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector2 } from '../math/Vector2';
-import { Vector3 } from '../math/Vector3';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
 
 // TubeGeometry
 
@@ -84,6 +84,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 	var vertex = new Vector3();
 	var normal = new Vector3();
 	var uv = new Vector2();
+	var P = new Vector3();
 
 	var i, j;
 
@@ -137,7 +138,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 		// we use getPointAt to sample evenly distributed points from the given path
 
-		var P = path.getPointAt( i / tubularSegments );
+		P = path.getPointAt( i / tubularSegments, P );
 
 		// retrieve corresponding normal and binormal
 
@@ -150,7 +151,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 			var v = j / radialSegments * Math.PI * 2;
 
-			var sin =   Math.sin( v );
+			var sin = Math.sin( v );
 			var cos = - Math.cos( v );
 
 			// normal

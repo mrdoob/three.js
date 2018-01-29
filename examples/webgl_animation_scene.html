@@ -60,7 +60,6 @@
 			container.appendChild( stats.dom );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0xffffff );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 			container.appendChild( renderer.domElement );
@@ -71,6 +70,7 @@
 			new THREE.ObjectLoader().load( url, function ( loadedScene ) {
 
 				scene = loadedScene;
+				scene.background = new THREE.Color( 0xffffff );
 
 				// If the loaded file contains a perspective camera, use it with adjusted aspect ratio...
 

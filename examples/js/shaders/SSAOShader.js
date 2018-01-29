@@ -20,9 +20,10 @@ THREE.SSAOShader = {
 		"size":         { value: new THREE.Vector2( 512, 512 ) },
 		"cameraNear":   { value: 1 },
 		"cameraFar":    { value: 100 },
+		"radius":       { value: 32 },
 		"onlyAO":       { value: 0 },
-		"aoClamp":      { value: 0.5 },
-		"lumInfluence": { value: 0.5 }
+		"aoClamp":      { value: 0.25 },
+		"lumInfluence": { value: 0.7 }
 
 	},
 
@@ -48,6 +49,7 @@ THREE.SSAOShader = {
 			"uniform float logDepthBufFC;",
 		"#endif",
 
+		"uniform float radius;",     // ao radius
 		"uniform bool onlyAO;",      // use only ambient occlusion pass?
 
 		"uniform vec2 size;",        // texture width, height
@@ -66,11 +68,10 @@ THREE.SSAOShader = {
 
 		// user variables
 
-		"const int samples = 8;",     // ao sample count
-		"const float radius = 5.0;",  // ao radius
+		"const int samples = 64;",     // ao sample count
 
-		"const bool useNoise = false;",      // use noise instead of pattern for sample dithering
-		"const float noiseAmount = 0.0003;", // dithering amount
+		"const bool useNoise = true;",      // use noise instead of pattern for sample dithering
+		"const float noiseAmount = 0.0004;", // dithering amount
 
 		"const float diffArea = 0.4;",   // self-shadowing reduction
 		"const float gDisplace = 0.4;",  // gauss bell center
@@ -131,7 +132,7 @@ THREE.SSAOShader = {
 
 		"float compareDepths( const in float depth1, const in float depth2, inout int far ) {",
 
-			"float garea = 2.0;",                         // gauss bell width
+			"float garea = 8.0;",                         // gauss bell width
 			"float diff = ( depth1 - depth2 ) * 100.0;",  // depth difference (0-100)
 
 			// reduce left bell width to avoid self-shadowing
@@ -147,18 +148,17 @@ THREE.SSAOShader = {
 			"}",
 
 			"float dd = diff - gDisplace;",
-			"float gauss = pow( EULER, -2.0 * dd * dd / ( garea * garea ) );",
+			"float gauss = pow( EULER, -2.0 * ( dd * dd ) / ( garea * garea ) );",
 			"return gauss;",
 
 		"}",
 
 		"float calcAO( float depth, float dw, float dh ) {",
 
-			"float dd = radius - depth * radius;",
 			"vec2 vv = vec2( dw, dh );",
 
-			"vec2 coord1 = vUv + dd * vv;",
-			"vec2 coord2 = vUv - dd * vv;",
+			"vec2 coord1 = vUv + radius * vv;",
+			"vec2 coord2 = vUv - radius * vv;",
 
 			"float temp1 = 0.0;",
 			"float temp2 = 0.0;",
@@ -186,14 +186,14 @@ THREE.SSAOShader = {
 
 			"float tt = clamp( depth, aoClamp, 1.0 );",
 
-			"float w = ( 1.0 / size.x )  / tt + ( noise.x * ( 1.0 - noise.x ) );",
+			"float w = ( 1.0 / size.x ) / tt + ( noise.x * ( 1.0 - noise.x ) );",
 			"float h = ( 1.0 / size.y ) / tt + ( noise.y * ( 1.0 - noise.y ) );",
 
 			"float ao = 0.0;",
 
 			"float dz = 1.0 / float( samples );",
-			"float z = 1.0 - dz / 2.0;",
 			"float l = 0.0;",
+			"float z = 1.0 - dz / 2.0;",
 
 			"for ( int i = 0; i <= samples; i ++ ) {",
 

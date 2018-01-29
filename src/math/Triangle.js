@@ -1,6 +1,6 @@
-import { Vector3 } from './Vector3';
-import { Line3 } from './Line3';
-import { Plane } from './Plane';
+import { Vector3 } from './Vector3.js';
+import { Line3 } from './Line3.js';
+import { Plane } from './Plane.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -189,6 +189,12 @@ Object.assign( Triangle.prototype, {
 
 	},
 
+	intersectsBox: function ( box ) {
+
+		return box.intersectsTriangle( this );
+
+	},
+
 	closestPointToPoint: function () {
 
 		var plane = new Plane();
@@ -208,7 +214,7 @@ Object.assign( Triangle.prototype, {
 
 			// check if the projection lies within the triangle
 
-			if( this.containsPoint( projectedPoint ) === true ) {
+			if ( this.containsPoint( projectedPoint ) === true ) {
 
 				// if so, this is the closest point
 
@@ -222,13 +228,13 @@ Object.assign( Triangle.prototype, {
 				edgeList[ 1 ].set( this.b, this.c );
 				edgeList[ 2 ].set( this.c, this.a );
 
-				for( var i = 0; i < edgeList.length; i ++ ) {
+				for ( var i = 0; i < edgeList.length; i ++ ) {
 
 					edgeList[ i ].closestPointToPoint( projectedPoint, true, closestPoint );
 
 					var distance = projectedPoint.distanceToSquared( closestPoint );
 
-					if( distance < minDistance ) {
+					if ( distance < minDistance ) {
 
 						minDistance = distance;
 

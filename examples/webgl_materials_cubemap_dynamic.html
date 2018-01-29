@@ -150,8 +150,8 @@
 				cameraTarget = new THREE.Vector3();
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xffffff, 3000, 10000 );
-				scene.fog.color.setHSL( 0.51, 0.6, 0.6 );
+				scene.background = new THREE.Color().setHSL( 0.51, 0.6, 0.6 );
+				scene.fog = new THREE.Fog( scene.background, 3000, 10000 );
 
 				createScene();
 
@@ -178,14 +178,12 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
 				// SHADOW
 
-				renderer.shadowMap.renderReverseSided = false;
 				renderer.shadowMap.enabled = true;
 
 				// STATS
@@ -235,8 +233,8 @@
 				// FLARES
 				var textureLoader = new THREE.TextureLoader();
 
-				flareA = textureLoader.load( "textures/lensflare2.jpg" );
-				flareB = textureLoader.load( "textures/lensflare0.png" );
+				flareA = textureLoader.load( "textures/lensflare/lensflare0.png" );
+				flareB = textureLoader.load( "textures/lensflare/lensflare3.png" );
 
 				// CARS - VEYRON
 
@@ -288,8 +286,8 @@
 						var material = new THREE.SpriteMaterial( p );
 						var sprite = new THREE.Sprite( material );
 
-						var spriteWidth = 128;
-						var spriteHeight = 128;
+						var spriteWidth = 16;
+						var spriteHeight = 16;
 
 						sprite.scale.set( s * spriteWidth, s * spriteHeight, s );
 						sprite.position.set( x, y, z );
@@ -355,8 +353,8 @@
 						var material = new THREE.SpriteMaterial( p );
 						var sprite = new THREE.Sprite( material );
 
-						var spriteWidth = 128;
-						var spriteHeight = 128;
+						var spriteWidth = 16;
+						var spriteHeight = 16;
 
 						sprite.scale.set( s * spriteWidth, s * spriteHeight, s );
 						sprite.position.set( x, y, z );
@@ -876,9 +874,8 @@
 				// day / night
 
 				v = THREE.Math.clamp( v + 0.5 * delta * vdir, 0.1, 0.9 );
+				scene.background.setHSL( 0.51, 0.5, v * 0.75 );
 				scene.fog.color.setHSL( 0.51, 0.5, v * 0.75 );
-
-				renderer.setClearColor( scene.fog.color );
 
 				var vnorm = ( v - 0.05 ) / ( 0.9 - 0.05 );
 
@@ -963,7 +960,7 @@
 					cubeCamera.position.copy( currentCar.root.position );
 
 					renderer.autoClear = true;
-					cubeCamera.updateCubeMap( renderer, scene );
+					cubeCamera.update( renderer, scene );
 
 					veyron.setVisible( true );
 					gallardo.setVisible( true );

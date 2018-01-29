@@ -1,7 +1,7 @@
-import { Vector2 } from '../math/Vector2';
-import { FileLoader } from './FileLoader';
-import { DefaultLoadingManager } from './LoadingManager';
-import * as Materials from '../materials/Materials';
+import { Vector2 } from '../math/Vector2.js';
+import { FileLoader } from './FileLoader.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
+import * as Materials from '../materials/Materials.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -68,7 +68,7 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
 		if ( json.fog !== undefined ) material.fog = json.fog;
-		if ( json.shading !== undefined ) material.shading = json.shading;
+		if ( json.flatShading !== undefined ) material.flatShading = json.flatShading;
 		if ( json.blending !== undefined ) material.blending = json.blending;
 		if ( json.side !== undefined ) material.side = json.side;
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
@@ -81,8 +81,24 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 		if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;
 		if ( json.wireframeLinejoin !== undefined ) material.wireframeLinejoin = json.wireframeLinejoin;
+
+		if ( json.rotation !== undefined ) material.rotation = json.rotation;
+
+		if ( json.linewidth !== 1 ) material.linewidth = json.linewidth;
+		if ( json.dashSize !== undefined ) material.dashSize = json.dashSize;
+		if ( json.gapSize !== undefined ) material.gapSize = json.gapSize;
+		if ( json.scale !== undefined ) material.scale = json.scale;
+
 		if ( json.skinning !== undefined ) material.skinning = json.skinning;
 		if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
+		if ( json.dithering !== undefined ) material.dithering = json.dithering;
+
+		if ( json.visible !== undefined ) material.visible = json.visible;
+		if ( json.userData !== undefined ) material.userData = json.userData;
+
+		// Deprecated
+
+		if ( json.shading !== undefined ) material.flatShading = json.shading === 1; // THREE.FlatShading
 
 		// for PointsMaterial
 

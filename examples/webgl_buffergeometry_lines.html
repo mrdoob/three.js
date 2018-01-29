@@ -62,14 +62,13 @@
 
 				scene = new THREE.Scene();
 
-
 				var segments = 10000;
 
 				var geometry = new THREE.BufferGeometry();
-				var material = new THREE.LineBasicMaterial({ vertexColors: THREE.VertexColors });
+				var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
 
-				var positions = new Float32Array( segments * 3 );
-				var colors = new Float32Array( segments * 3 );
+				var positions = [];
+				var colors = [];
 
 				var r = 800;
 
@@ -81,20 +80,18 @@
 
 					// positions
 
-					positions[ i * 3 ] = x;
-					positions[ i * 3 + 1 ] = y;
-					positions[ i * 3 + 2 ] = z;
+					positions.push( x, y, z );
 
 					// colors
 
-					colors[ i * 3 ] = ( x / r ) + 0.5;
-					colors[ i * 3 + 1 ] = ( y / r ) + 0.5;
-					colors[ i * 3 + 2 ] = ( z / r ) + 0.5;
+					colors.push( ( x / r ) + 0.5 );
+					colors.push( ( y / r ) + 0.5 );
+					colors.push( ( z / r ) + 0.5 );
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				geometry.computeBoundingSphere();
 

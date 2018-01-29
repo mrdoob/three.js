@@ -1,5 +1,5 @@
-import { Object3D } from '../core/Object3D';
-import { Color } from '../math/Color';
+import { Object3D } from '../core/Object3D.js';
+import { Color } from '../math/Color.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

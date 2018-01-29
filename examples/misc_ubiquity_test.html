@@ -49,6 +49,7 @@
 
 				scene = new THREE.Scene();
 				scene.autoUpdate = false;
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				// QRCODE
 
@@ -186,24 +187,20 @@
 				scene.add( directional );
 
 				canvasRenderer = new THREE.CanvasRenderer();
-				canvasRenderer.setClearColor( 0xf0f0f0 );
 				canvasRenderer.setPixelRatio( window.devicePixelRatio );
 				canvasRenderer.setSize( width, height );
 				document.body.appendChild( canvasRenderer.domElement );
 
 				svgRenderer = new THREE.SVGRenderer();
-				svgRenderer.setClearColor( 0xf0f0f0 );
 				svgRenderer.setSize( width, height );
 				svgRenderer.setQuality( 'low' );
 				document.body.appendChild( svgRenderer.domElement );
 
 				softwareRenderer = new THREE.SoftwareRenderer();
-				softwareRenderer.setClearColor( 0xf0f0f0 );
 				softwareRenderer.setSize( width, height );
 				document.body.appendChild( softwareRenderer.domElement );
 
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
-				webglRenderer.setClearColor( 0xf0f0f0 );
 				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( width, height );
 				document.body.appendChild( webglRenderer.domElement );

@@ -1,11 +1,11 @@
-import { Quaternion } from '../math/Quaternion';
-import { Vector3 } from '../math/Vector3';
-import { Matrix4 } from '../math/Matrix4';
-import { EventDispatcher } from './EventDispatcher';
-import { Euler } from '../math/Euler';
-import { Layers } from './Layers';
-import { Matrix3 } from '../math/Matrix3';
-import { _Math } from '../math/Math';
+import { Quaternion } from '../math/Quaternion.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { EventDispatcher } from './EventDispatcher.js';
+import { Euler } from '../math/Euler.js';
+import { Layers } from './Layers.js';
+import { Matrix3 } from '../math/Matrix3.js';
+import { _Math } from '../math/Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -92,12 +92,15 @@ function Object3D() {
 	this.renderOrder = 0;
 
 	this.userData = {};
+
 }
 
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
-Object.assign( Object3D.prototype, EventDispatcher.prototype, {
+Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+
+	constructor: Object3D,
 
 	isObject3D: true,
 
@@ -162,6 +165,26 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 			q1.setFromAxisAngle( axis, angle );
 
 			this.quaternion.multiply( q1 );
+
+			return this;
+
+		};
+
+	}(),
+
+	rotateOnWorldAxis: function () {
+
+		// rotate object on axis in world space
+		// axis is assumed to be normalized
+		// method assumes no rotated parent
+
+		var q1 = new Quaternion();
+
+		return function rotateOnWorldAxis( axis, angle ) {
+
+			q1.setFromAxisAngle( axis, angle );
+
+			this.quaternion.premultiply( q1 );
 
 			return this;
 
@@ -283,8 +306,19 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		// This method does not support objects with rotated and/or translated parent(s)
 
 		var m1 = new Matrix4();
+		var vector = new Vector3();
 
-		return function lookAt( vector ) {
+		return function lookAt( x, y, z ) {
+
+			if ( x.isVector3 ) {
+
+				vector.copy( x );
+
+			} else {
+
+				vector.set( x, y, z );
+
+			}
 
 			if ( this.isCamera ) {
 
@@ -356,6 +390,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 			}
 
+			return this;
+
 		}
 
 		var index = this.children.indexOf( object );
@@ -369,6 +405,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 			this.children.splice( index, 1 );
 
 		}
+
+		return this;
 
 	},
 
@@ -575,8 +613,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	toJSON: function ( meta ) {
 
-		// meta is '' when called from JSON.stringify
-		var isRootObject = ( meta === undefined || meta === '' );
+		// meta is a string when called from JSON.stringify
+		var isRootObject = ( meta === undefined || typeof meta === 'string' );
 
 		var output = {};
 
@@ -590,7 +628,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 				geometries: {},
 				materials: {},
 				textures: {},
-				images: {}
+				images: {},
+				shapes: {}
 			};
 
 			output.metadata = {
@@ -609,10 +648,10 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		object.type = this.type;
 
 		if ( this.name !== '' ) object.name = this.name;
-		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
 		if ( this.castShadow === true ) object.castShadow = true;
 		if ( this.receiveShadow === true ) object.receiveShadow = true;
 		if ( this.visible === false ) object.visible = false;
+		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
 
 		object.matrix = this.matrix.toArray();
 
@@ -633,6 +672,30 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		if ( this.geometry !== undefined ) {
 
 			object.geometry = serialize( meta.geometries, this.geometry );
+
+			var parameters = this.geometry.parameters;
+
+			if ( parameters !== undefined && parameters.shapes !== undefined ) {
+
+				var shapes = parameters.shapes;
+
+				if ( Array.isArray( shapes ) ) {
+
+					for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+
+						var shape = shapes[ i ];
+
+						serialize( meta.shapes, shape );
+
+					}
+
+				} else {
+
+					serialize( meta.shapes, shapes );
+
+				}
+
+			}
 
 		}
 
@@ -678,11 +741,13 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 			var materials = extractFromCache( meta.materials );
 			var textures = extractFromCache( meta.textures );
 			var images = extractFromCache( meta.images );
+			var shapes = extractFromCache( meta.shapes );
 
 			if ( geometries.length > 0 ) output.geometries = geometries;
 			if ( materials.length > 0 ) output.materials = materials;
 			if ( textures.length > 0 ) output.textures = textures;
 			if ( images.length > 0 ) output.images = images;
+			if ( shapes.length > 0 ) output.shapes = shapes;
 
 		}
 

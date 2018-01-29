@@ -77,7 +77,7 @@
 						color: 0xffffff,
 						morphTargets: true,
 						vertexColors: THREE.FaceColors,
-						shading: THREE.FlatShading
+						flatShading: true
 					} );
 					var mesh = new THREE.Mesh( geometry, material );
 
@@ -103,8 +103,7 @@
 						color: 0xffffff,
 						morphTargets: true,
 						morphNormals: true,
-						vertexColors: THREE.FaceColors,
-						shading: THREE.SmoothShading
+						vertexColors: THREE.FaceColors
 					} );
 					var mesh = new THREE.Mesh( geometry, material );
 

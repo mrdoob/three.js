@@ -63,6 +63,7 @@
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial() );
 				scene.add( sphere );
@@ -86,10 +87,8 @@
 				scene.matrixAutoUpdate = false;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

@@ -213,8 +213,6 @@
 				composer.addPass( copyPass );
 
 				var controls = new THREE.OrbitControls( cameraP, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

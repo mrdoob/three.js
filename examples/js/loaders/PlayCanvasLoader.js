@@ -1,5 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 THREE.PlayCanvasLoader = function ( manager ) {
@@ -31,19 +32,37 @@ THREE.PlayCanvasLoader.prototype = {
 
 			var attributes = {};
 
+			// create a buffer attribute for each array that contains vertex information
+
 			for ( var name in data ) {
 
-				var attribute = data[ name ];
+				var array = data[ name ];
 
-				var type = attribute.type;
-				var size = attribute.components;
+				var type = array.type;
+				var size = array.components;
 
-				var array;
+				var attribute;
 
-				if ( type === 'float32' ) array = new Float32Array( attribute.data );
-				if ( array === undefined ) console.log( 'PlayCanvasLoader: TODO', type );
+				switch ( type ) {
 
-				attributes[ name ] = new THREE.BufferAttribute( array, size );
+					case 'float32':
+						attribute = new THREE.Float32BufferAttribute( array.data, size );
+						break;
+
+					case 'uint8':
+						attribute = new THREE.Uint8BufferAttribute( array.data, size );
+						break;
+
+					case 'uint16':
+						attribute = new THREE.Uint16BufferAttribute( array.data, size );
+						break;
+
+					default:
+						console.log( 'THREE.PlayCanvasLoader: Array type "%s" not yet supported.', type );
+
+				}
+
+				attributes[ name ] = attribute;
 
 			}
 
@@ -53,9 +72,11 @@ THREE.PlayCanvasLoader.prototype = {
 
 		function parseMeshes( data ) {
 
+			// create buffer geometry
+
 			var geometry = new THREE.BufferGeometry();
 
-			geometry.setIndex( new THREE.Uint16BufferAttribute( data.indices, 1 ) );
+			geometry.setIndex( data.indices );
 
 			var attributes = model.vertices[ data.vertices ]._attributes;
 
@@ -91,15 +112,16 @@ THREE.PlayCanvasLoader.prototype = {
 		function parseNodes( data ) {
 
 			var object = new THREE.Group();
-			object.name = data.name;
 
-			if ( data._geometries !== undefined ) {
+			var geometries = data._geometries;
+
+			if ( geometries !== undefined ) {
 
 				var material = new THREE.MeshPhongMaterial();
 
-				for ( var i = 0; i < data._geometries.length; i ++ ) {
+				for ( var i = 0, l = geometries.length; i < l; i ++ ) {
 
-					var geometry = data._geometries[ i ];
+					var geometry = geometries[ i ];
 
 					object.add( new THREE.Mesh( geometry, material ) );
 
@@ -107,11 +129,15 @@ THREE.PlayCanvasLoader.prototype = {
 
 			}
 
-			for ( var i = 0; i < data.rotation.length; i ++ ) {
+			for ( var i = 0, l = data.rotation.length; i < l; i ++ ) {
 
 				data.rotation[ i ] *= Math.PI / 180;
 
 			}
+
+			//
+
+			object.name = data.name;
 
 			object.position.fromArray( data.position );
 			object.rotation.fromArray( data.rotation );
@@ -123,39 +149,39 @@ THREE.PlayCanvasLoader.prototype = {
 
 		//
 
-		console.log( json );
-
 		var model = json.model;
 
-		for ( var i = 0; i < model.vertices.length; i ++ ) {
+		for ( var i = 0, l = model.vertices.length; i < l; i ++ ) {
 
 			parseVertices( model.vertices[ i ] );
 
 		}
 
-		for ( var i = 0; i < model.meshes.length; i ++ ) {
+		for ( var i = 0, l = model.meshes.length; i < l; i ++ ) {
 
 			parseMeshes( model.meshes[ i ] );
 
 		}
 
-		for ( var i = 0; i < model.meshInstances.length; i ++ ) {
+		for ( var i = 0, l = model.meshInstances.length; i < l; i ++ ) {
 
 			parseMeshInstances( model.meshInstances[ i ] );
 
 		}
 
-		for ( var i = 0; i < model.nodes.length; i ++ ) {
+		for ( var i = 0, l = model.nodes.length; i < l; i ++ ) {
 
 			parseNodes( model.nodes[ i ] );
 
 		}
 
-		for ( var i = 0; i < model.parents.length; i ++ ) {
+		// setup scene hierarchy
+
+		for ( var i = 0, l = model.parents.length; i < l; i ++ ) {
 
 			var parent = model.parents[ i ];
 
-			if ( parent === -1 ) continue;
+			if ( parent === - 1 ) continue;
 
 			model.nodes[ parent ]._object.add( model.nodes[ i ]._object );
 

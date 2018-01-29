@@ -110,8 +110,10 @@
 
 				controls = new THREE.OrbitControls( camera );
 				controls.target.set( 0, 100, 0 );
+				controls.update();
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				var theText = "&"; // i % & j b 8
 
@@ -324,7 +326,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -361,7 +362,6 @@
 
 			function render() {
 
-				controls.update();
 				renderer.render( scene, camera );
 
 			}

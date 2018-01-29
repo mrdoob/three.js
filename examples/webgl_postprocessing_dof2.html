@@ -96,7 +96,7 @@ Use WEBGL Depth buffer support?
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, height );
-				renderer.sortObjects = false;
+				//renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				material_depth = new THREE.MeshDepthMaterial();

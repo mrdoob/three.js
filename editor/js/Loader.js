@@ -177,7 +177,7 @@ var Loader = function ( editor ) {
 					var contents = event.target.result;
 
 					var loader = new THREE.GLTFLoader();
-					loader.parse( contents, function ( result ) {
+					loader.parse( contents, '', function ( result ) {
 
 						result.scene.name = filename;
 						editor.execute( new AddObjectCommand( result.scene ) );
@@ -425,6 +425,29 @@ var Loader = function ( editor ) {
 
 				}, false );
 				reader.readAsText( file );
+
+				break;
+
+			case 'zip':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var zip = new JSZip( contents );
+
+					// BLOCKS
+
+					if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
+
+						var materials = new THREE.MTLLoader().parse( zip.file( 'materials.mtl' ).asText() );
+						var object = new THREE.OBJLoader().setMaterials( materials ).parse( zip.file( 'model.obj' ).asText() );
+						editor.execute( new AddObjectCommand( object ) );
+
+					}
+
+				}, false );
+				reader.readAsBinaryString( file );
 
 				break;
 

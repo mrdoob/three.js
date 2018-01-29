@@ -87,6 +87,7 @@
 				controls.lookVertical = true;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
 
 				// sides
 
@@ -196,7 +197,6 @@
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xbfd1e5 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

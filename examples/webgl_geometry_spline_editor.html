@@ -85,6 +85,8 @@
 				container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
+
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 250, 1000 );
 				scene.add( camera );
@@ -115,12 +117,11 @@
 				helper.material.transparent = true;
 				scene.add( helper );
 
-				var axis = new THREE.AxisHelper();
-				axis.position.set( -500, -500, -500 );
-				scene.add( axis );
+				//var axes = new THREE.AxesHelper( 1000 );
+				//axes.position.set( - 500, - 500, - 500 );
+				//scene.add( axes );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -257,7 +258,7 @@
 				}
 
 				var curve = new THREE.CatmullRomCurve3( positions );
-				curve.type = 'catmullrom';
+				curve.curveType = 'catmullrom';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0xff0000,
 					opacity: 0.35,
@@ -267,7 +268,7 @@
 				splines.uniform = curve;
 
 				curve = new THREE.CatmullRomCurve3( positions );
-				curve.type = 'centripetal';
+				curve.curveType = 'centripetal';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0x00ff00,
 					opacity: 0.35,
@@ -277,7 +278,7 @@
 				splines.centripetal = curve;
 
 				curve = new THREE.CatmullRomCurve3( positions );
-				curve.type = 'chordal';
+				curve.curveType = 'chordal';
 				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0x0000ff,
 					opacity: 0.35,
@@ -361,14 +362,14 @@
 					for ( var i = 0; i < ARC_SEGMENTS; i ++ ) {
 
 						var p = splineMesh.geometry.vertices[ i ];
-						p.copy( spline.getPoint( i /  ( ARC_SEGMENTS - 1 ) ) );
+						var t = i /  ( ARC_SEGMENTS - 1 );
+						spline.getPoint( t, p );
 
 					}
 
 					splineMesh.geometry.verticesNeedUpdate = true;
 
 				}
-
 
 			}
 

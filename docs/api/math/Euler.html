@@ -54,19 +54,10 @@
 			rotated around its X axis, then its Y axis and finally its Z axis. Other possibilities are:
 			'YZX', 'ZXY', 'XZY', 'YXZ' and 'ZYX'. These must be in upper case.<br /><br />
 
-			Three.js uses <em>intrinsic</em> (Tait-Bryan) ordering, also known as <em>yaw</em>, <em>pitch</em>
-			and <em>roll</em>. This means that rotations are performed with respect to the <em>local</em>
-			coordinate system. That is, for order 'XYZ', the rotation is first around world-X, then around
-			local-Y (which may now be different from the world Y-axis), then local-Z (which may be different
-			from the world Z-axis).<br /><br />
-
-			Some implementations may use <em>extrinsic</em> (proper) ordering, in which case rotations are performed
-			with respect to the <em>world</em> coordinate system, so that for order 'XYZ', the rotations
-			are around world-X, world-Y, and world-Z.<br /><br />
-
-			Converting between the two types is relatively straightforward, you just need to reverse the order
-			and the rotation, so that an intrinsic (three.js) Euler rotation of angles a, b, c about XYZ
-			will be equivalent to to an extrinsic Euler rotation of angles c, b, a about ZYX.<br /><br />
+			Three.js uses <em>intrinsic</em> Tait-Bryan angles. This means that rotations are performed with respect
+			to the <em>local</em> coordinate system. That is, for order 'XYZ', the rotation is first around the local-X
+			axis (which is the same as the world-X axis), then around local-Y (which may now be different from the
+			world Y-axis), then local-Z (which may be different from the world Z-axis).<br /><br />
 
 			If the order is changed, [page:.onChangeCallback onChangeCallback] will be called.
 		</div>

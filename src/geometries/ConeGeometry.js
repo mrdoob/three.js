@@ -2,8 +2,8 @@
  * @author abelnation / http://github.com/abelnation
  */
 
-import { CylinderGeometry } from './CylinderGeometry';
-import { CylinderBufferGeometry } from './CylinderGeometry';
+import { CylinderGeometry } from './CylinderGeometry.js';
+import { CylinderBufferGeometry } from './CylinderGeometry.js';
 
 // ConeGeometry
 

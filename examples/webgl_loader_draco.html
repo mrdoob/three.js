@@ -38,12 +38,15 @@
 		<a href="https://github.com/google/draco" target="_blank" rel="noopener">DRACO</a> loader
 	</div>
 	<script src="../build/three.js"></script>
-	<script src="js/loaders/draco/draco_decoder.js"></script>
 	<script src="js/loaders/draco/DRACOLoader.js"></script>
 	<script>
 
 		var camera, scene, renderer;
 
+		// Configure and create Draco decoder.
+		THREE.DRACOLoader.setDecoderPath('js/loaders/draco/');
+		THREE.DRACOLoader.setDecoderConfig({type: 'js'});
+		var dracoLoader = new THREE.DRACOLoader();
 		init();
 		animate();
 
@@ -77,8 +80,7 @@
 			light.position.set( - 1, 1, 1 );
 			scene.add( light );
 
-			var loader = new THREE.DRACOLoader();
-			loader.load( 'models/draco/bunny.drc', function ( geometry ) {
+			dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
 
 				geometry.computeVertexNormals();
 

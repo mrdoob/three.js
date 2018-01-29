@@ -81,12 +81,13 @@
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( bgColor );
 
 				//
 
 				materialDepth = new THREE.MeshDepthMaterial();
 
-				var materialScene = new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading } );
+				var materialScene = new THREE.MeshBasicMaterial( { color: 0x000000 } );
 
 				// tree
 
@@ -110,13 +111,11 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( bgColor );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				renderer.autoClear = false;
-				renderer.sortObjects = false;
 
 				//
 

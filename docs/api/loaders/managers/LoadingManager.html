@@ -31,6 +31,10 @@
 			[example:webgl_terrain_dynamic WebGL / terrain / dynamic]
 		</div>
 
+		<p>
+			This example shows how to use LoadingManager to track the progress of
+			[page:OBJLoader].
+		</p>
 
 		<code>
 		var manager = new THREE.LoadingManager();
@@ -67,6 +71,41 @@
 		} );
 		</code>
 
+		<p>
+			In addition to observing progress, a LoadingManager can be used to
+			override resource URLs during loading. This may be helpful for assets
+			coming from drag-and-drop events, WebSockets, WebRTC, or other APIs. An
+			example showing how to load an in-memory model using Blob URLs is below.
+		</p>
+
+		<code>
+		// Blob or File objects created when dragging files into the webpage.
+		var blobs = {'fish.gltf': blob1, 'diffuse.png': blob2, 'normal.png': blob3};
+
+		var manager = new THREE.LoadingManager();
+
+		// Initialize loading manager with URL callback.
+		var objectURLs = [];
+		manager.setURLModifier( ( url ) => {
+
+			url = URL.createObjectURL( blobs[ url ] );
+
+			objectURLs.push( url );
+
+			return url;
+
+		} );
+
+		// Load as usual, then revoke the blob URLs.
+		var loader = new THREE.GLTFLoader( manager );
+		loader.load( 'fish.gltf', (gltf) => {
+
+			scene.add( gltf.scene );
+
+			objectURLs.forEach( ( url ) => URL.revokeObjectURL( url ) );
+
+		});
+		</code>
 
 		<h2>Constructor</h2>
 
@@ -121,6 +160,25 @@
 
 		<h2>Methods</h2>
 
+		<h3>[method:null setURLModifier]( [page:Function callback] )</h3>
+		<div>
+		[page:Function callback] — URL modifier callback. Called with [page:String url] argument, and
+		must return [page:String resolvedURL].<br /><br />
+
+		If provided, the callback will be passed each resource URL before a request is sent. The
+		callback may return the original URL, or a new URL to override loading behavior. This
+		behavior can be used to load assets from .ZIP files, drag-and-drop APIs, and Data URIs.
+		</div>
+
+		<h3>[method:String resolveURL]( [page:String url] )</h3>
+		<div>
+		[page:String url] — the url to load<br /><br />
+
+		Given a URL, uses the URL modifier callback (if any) and returns a resolved URL. If no
+		URL modifier is set, returns the original URL.
+		</div>
+
+		<br /><br />
 		<div>
 			<em>Note: The following methods are designed to be called internally by loaders. You shouldn't call
 			them directly.</em>
@@ -130,14 +188,14 @@
 		<div>
 		[page:String url] — the url to load<br /><br />
 
-		This should be called by any loader used by the manager when the loader starts loading an url.
+		This should be called by any loader using the manager when the loader starts loading an url.
 		</div>
 
 		<h3>[method:null itemEnd]( [page:String url] )</h3>
 		<div>
 		[page:String url] — the loaded url<br /><br />
 
-		This should be called by any loader used by the manager when the loader ended loading an url.
+		This should be called by any loader using the manager when the loader ended loading an url.
 		</div>
 
 
@@ -145,7 +203,7 @@
 		<div>
 		[page:String url] — the loaded url<br /><br />
 
-		This should be called by any loader used by the manager when the loader errors loading an url.
+		This should be called by any loader using the manager when the loader errors loading an url.
 		</div>
 
 		<h2>Source</h2>

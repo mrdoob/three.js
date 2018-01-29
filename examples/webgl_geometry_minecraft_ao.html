@@ -93,6 +93,7 @@
 				controls.verticalMax = 2.2;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.FogExp2( 0xffffff, 0.00015 );
 
 				// sides
@@ -289,7 +290,6 @@
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

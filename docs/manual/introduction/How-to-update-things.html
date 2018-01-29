@@ -12,13 +12,13 @@
 		<div>
 			<p>All objects by default automatically update their matrices if they have been added to the scene with</p>
 			<code>
-var object = new THREE.Object3D;
+var object = new THREE.Object3D();
 scene.add( object );
 			</code>
 			or if they are the child of another object that has been added to the scene:
 			<code>
-var object1 = new THREE.Object3D;
-var object2 = new THREE.Object3D;
+var object1 = new THREE.Object3D();
+var object2 = new THREE.Object3D();
 
 object1.add( object2 );
 scene.add( object1 ); //object1 and object2 will automatically update their matrices
@@ -118,7 +118,7 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 					[link:http://jsfiddle.net/w67tzfhx/ Here is a fiddle] showing an animated line which you can adapt to your use case.
 				</p>
 
-				<h4>Examples:</h4>
+				<h3>Examples:</h3>
 					[example:webgl_custom_attributes WebGL / custom / attributes]<br />
 					[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
 
@@ -155,7 +155,7 @@ geometry.tangentsNeedUpdate = true;
 		geometry.dynamic = true;
 				</code>
 
-				<h4>Example:</h4>
+				<h3>Examples:</h3>
 					[example:webgl_geometry_dynamic WebGL / geometry / dynamic]<br />
 			</div>
 

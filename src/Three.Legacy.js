@@ -5,7 +5,7 @@
 import { Audio } from './audio/Audio.js';
 import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
-import { CullFaceFront, CullFaceBack } from './constants.js';
+import { FlatShading } from './constants.js';
 import {
 	Float64BufferAttribute,
 	Float32BufferAttribute,
@@ -20,12 +20,15 @@ import {
 } from './core/BufferAttribute.js';
 import { BufferGeometry } from './core/BufferGeometry.js';
 import { Face3 } from './core/Face3.js';
-import { Geometry } from './core/Geometry';
+import { Geometry } from './core/Geometry.js';
 import { Object3D } from './core/Object3D.js';
-import { Uniform } from './core/Uniform';
+import { Uniform } from './core/Uniform.js';
 import { Curve } from './extras/core/Curve.js';
+import { CurvePath } from './extras/core/CurvePath.js';
+import { Path } from './extras/core/Path.js';
 import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
-import { BoxHelper } from './helpers/BoxHelper';
+import { AxesHelper } from './helpers/AxesHelper.js';
+import { BoxHelper } from './helpers/BoxHelper.js';
 import { GridHelper } from './helpers/GridHelper.js';
 import { SkeletonHelper } from './helpers/SkeletonHelper.js';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
@@ -34,6 +37,8 @@ import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
 import { ShapeGeometry } from './geometries/ShapeGeometry.js';
 import { WireframeGeometry } from './geometries/WireframeGeometry.js';
 import { Light } from './lights/Light.js';
+import { Loader } from './loaders/Loader.js';
+import { LoaderUtils } from './loaders/LoaderUtils.js';
 import { FileLoader } from './loaders/FileLoader.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
@@ -65,7 +70,9 @@ import { Skeleton } from './objects/Skeleton.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
+import { WebVRManager } from './renderers/webvr/WebVRManager.js';
 import { Shape } from './extras/core/Shape.js';
+import { CubeCamera } from './cameras/CubeCamera.js';
 
 export { BoxGeometry as CubeGeometry };
 
@@ -240,6 +247,64 @@ Curve.create = function ( construct, getPoint ) {
 
 //
 
+Object.assign( CurvePath.prototype, {
+
+	createPointsGeometry: function ( divisions ) {
+
+		console.warn( 'THREE.CurvePath: .createPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
+
+		// generate geometry from path points (for Line or Points objects)
+
+		var pts = this.getPoints( divisions );
+		return this.createGeometry( pts );
+
+	},
+
+	createSpacedPointsGeometry: function ( divisions ) {
+
+		console.warn( 'THREE.CurvePath: .createSpacedPointsGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
+
+		// generate geometry from equidistant sampling along the path
+
+		var pts = this.getSpacedPoints( divisions );
+		return this.createGeometry( pts );
+
+	},
+
+	createGeometry: function ( points ) {
+
+		console.warn( 'THREE.CurvePath: .createGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
+
+		var geometry = new Geometry();
+
+		for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+			var point = points[ i ];
+			geometry.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
+
+		}
+
+		return geometry;
+
+	}
+
+} );
+
+//
+
+Object.assign( Path.prototype, {
+
+	fromPoints: function ( points ) {
+
+		console.warn( 'THREE.Path: .fromPoints() has been renamed to .setFromPoints().' );
+		this.setFromPoints( points );
+
+	}
+
+} );
+
+//
+
 export function ClosedSplineCurve3( points ) {
 
 	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
@@ -280,17 +345,17 @@ Spline.prototype = Object.create( CatmullRomCurve3.prototype );
 
 Object.assign( Spline.prototype, {
 
-	initFromArray: function ( a ) {
+	initFromArray: function ( /* a */ ) {
 
 		console.error( 'THREE.Spline: .initFromArray() has been removed.' );
 
 	},
-	getControlPointsArray: function ( optionalTarget ) {
+	getControlPointsArray: function ( /* optionalTarget */ ) {
 
 		console.error( 'THREE.Spline: .getControlPointsArray() has been removed.' );
 
 	},
-	reparametrizeByArcLength: function ( samplingCoef ) {
+	reparametrizeByArcLength: function ( /* samplingCoef */ ) {
 
 		console.error( 'THREE.Spline: .reparametrizeByArcLength() has been removed.' );
 
@@ -299,6 +364,14 @@ Object.assign( Spline.prototype, {
 } );
 
 //
+
+export function AxisHelper( size ) {
+
+	console.warn( 'THREE.AxisHelper has been renamed to THREE.AxesHelper.' );
+	return new AxesHelper( size );
+
+}
+
 export function BoundingBoxHelper( object, color ) {
 
 	console.warn( 'THREE.BoundingBoxHelper has been deprecated. Creating a THREE.BoxHelper instead.' );
@@ -322,7 +395,7 @@ GridHelper.prototype.setColors = function () {
 SkeletonHelper.prototype.update = function () {
 
 	console.error( 'THREE.SkeletonHelper: update() no longer needs to be called.' );
-	
+
 };
 
 export function WireframeHelper( object, hex ) {
@@ -333,6 +406,17 @@ export function WireframeHelper( object, hex ) {
 }
 
 //
+
+Object.assign( Loader.prototype, {
+
+	extractUrlBase: function ( url ) {
+
+		console.warn( 'THREE.Loader: .extractUrlBase() has been deprecated. Use THREE.LoaderUtils.extractUrlBase() instead.' );
+		return LoaderUtils.extractUrlBase( url );
+
+	}
+
+} );
 
 export function XHRLoader( manager ) {
 
@@ -419,12 +503,30 @@ Line3.prototype.center = function ( optionalTarget ) {
 
 };
 
-_Math.random16 = function () {
+Object.assign( _Math, {
 
-	console.warn( 'THREE.Math.random16() has been deprecated. Use Math.random() instead.' );
-	return Math.random();
+	random16: function () {
 
-};
+		console.warn( 'THREE.Math: .random16() has been deprecated. Use Math.random() instead.' );
+		return Math.random();
+
+	},
+
+	nearestPowerOfTwo: function ( value ) {
+
+		console.warn( 'THREE.Math: .nearestPowerOfTwo() has been renamed to .floorPowerOfTwo().' );
+		return _Math.floorPowerOfTwo( value );
+
+	},
+
+	nextPowerOfTwo: function ( value ) {
+
+		console.warn( 'THREE.Math: .nextPowerOfTwo() has been renamed to .ceilPowerOfTwo().' );
+		return _Math.ceilPowerOfTwo( value );
+
+	}
+
+} );
 
 Object.assign( Matrix3.prototype, {
 
@@ -440,18 +542,18 @@ Object.assign( Matrix3.prototype, {
 		return vector.applyMatrix3( this );
 
 	},
-	multiplyVector3Array: function ( a ) {
+	multiplyVector3Array: function ( /* a */ ) {
 
-		console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.'  );
+		console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.' );
 
 	},
-	applyToBuffer: function( buffer, offset, length ) {
+	applyToBuffer: function ( buffer /*, offset, length */ ) {
 
 		console.warn( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 		return this.applyToBufferAttribute( buffer );
 
 	},
-	applyToVector3Array: function( array, offset, length ) {
+	applyToVector3Array: function ( /* array, offset, length */ ) {
 
 		console.error( 'THREE.Matrix3: .applyToVector3Array() has been removed.' );
 
@@ -509,9 +611,9 @@ Object.assign( Matrix4.prototype, {
 		return vector.applyMatrix4( this );
 
 	},
-	multiplyVector3Array: function ( a ) {
+	multiplyVector3Array: function ( /* a */ ) {
 
-		console.error( 'THREE.Matrix4: .multiplyVector3Array() has been removed.'  );
+		console.error( 'THREE.Matrix4: .multiplyVector3Array() has been removed.' );
 
 	},
 	rotateAxis: function ( v ) {
@@ -551,18 +653,18 @@ Object.assign( Matrix4.prototype, {
 		console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 
 	},
-	applyToBuffer: function( buffer, offset, length ) {
+	applyToBuffer: function ( buffer /*, offset, length */ ) {
 
 		console.warn( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 		return this.applyToBufferAttribute( buffer );
 
 	},
-	applyToVector3Array: function( array, offset, length ) {
+	applyToVector3Array: function ( /* array, offset, length */ ) {
 
 		console.error( 'THREE.Matrix4: .applyToVector3Array() has been removed.' );
 
 	},
-	makeFrustum: function( left, right, bottom, top, near, far ) {
+	makeFrustum: function ( left, right, bottom, top, near, far ) {
 
 		console.warn( 'THREE.Matrix4: .makeFrustum() has been removed. Use .makePerspective( left, right, top, bottom, near, far ) instead.' );
 		return this.makePerspective( left, right, top, bottom, near, far );
@@ -610,6 +712,12 @@ Object.assign( Ray.prototype, {
 
 Object.assign( Shape.prototype, {
 
+	extractAllPoints: function ( divisions ) {
+
+		console.warn( 'THREE.Shape: .extractAllPoints() has been removed. Use .extractPoints() instead.' );
+		return this.extractPoints( divisions );
+
+	},
 	extrude: function ( options ) {
 
 		console.warn( 'THREE.Shape: .extrude() has been removed. Use ExtrudeGeometry() instead.' );
@@ -629,8 +737,20 @@ Object.assign( Vector2.prototype, {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-		console.error( 'THREE.Vector2: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+		console.warn( 'THREE.Vector2: .fromAttribute() has been renamed to .fromBufferAttribute().' );
 		return this.fromBufferAttribute( attribute, index, offset );
+
+	},
+	distanceToManhattan: function ( v ) {
+
+		console.warn( 'THREE.Vector2: .distanceToManhattan() has been renamed to .manhattanDistanceTo().' );
+		return this.manhattanDistanceTo( v );
+
+	},
+	lengthManhattan: function () {
+
+		console.warn( 'THREE.Vector2: .lengthManhattan() has been renamed to .manhattanLength().' );
+		return this.manhattanLength();
 
 	}
 
@@ -674,8 +794,20 @@ Object.assign( Vector3.prototype, {
 	},
 	fromAttribute: function ( attribute, index, offset ) {
 
-		console.error( 'THREE.Vector3: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+		console.warn( 'THREE.Vector3: .fromAttribute() has been renamed to .fromBufferAttribute().' );
 		return this.fromBufferAttribute( attribute, index, offset );
+
+	},
+	distanceToManhattan: function ( v ) {
+
+		console.warn( 'THREE.Vector3: .distanceToManhattan() has been renamed to .manhattanDistanceTo().' );
+		return this.manhattanDistanceTo( v );
+
+	},
+	lengthManhattan: function () {
+
+		console.warn( 'THREE.Vector3: .lengthManhattan() has been renamed to .manhattanLength().' );
+		return this.manhattanLength();
 
 	}
 
@@ -685,8 +817,14 @@ Object.assign( Vector4.prototype, {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-		console.error( 'THREE.Vector4: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+		console.warn( 'THREE.Vector4: .fromAttribute() has been renamed to .fromBufferAttribute().' );
 		return this.fromBufferAttribute( attribute, index, offset );
+
+	},
+	lengthManhattan: function () {
+
+		console.warn( 'THREE.Vector4: .lengthManhattan() has been renamed to .manhattanLength().' );
+		return this.manhattanLength();
 
 	}
 
@@ -1035,6 +1173,20 @@ Object.defineProperties( Material.prototype, {
 			return new Color();
 
 		}
+	},
+
+	shading: {
+		get: function () {
+
+			console.error( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
+			this.flatShading = ( value === FlatShading );
+
+		}
 	}
 
 } );
@@ -1084,6 +1236,27 @@ Object.assign( WebGLRenderer.prototype, {
 
 		console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );
 		return this.getRenderTarget();
+
+	},
+
+	getMaxAnisotropy: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .getMaxAnisotropy() is now .capabilities.getMaxAnisotropy().' );
+		return this.capabilities.getMaxAnisotropy();
+
+	},
+
+	getPrecision: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .getPrecision() is now .capabilities.precision.' );
+		return this.capabilities.precision;
+
+	},
+
+	resetGLState: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .resetGLState() is now .state.reset().' );
+		return this.state.reset();
 
 	},
 
@@ -1160,6 +1333,11 @@ Object.assign( WebGLRenderer.prototype, {
 
 		console.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
 
+	},
+	setFaceCulling: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .setFaceCulling() has been removed.' );
+
 	}
 
 } );
@@ -1195,13 +1373,13 @@ Object.defineProperties( WebGLRenderer.prototype, {
 	shadowMapCullFace: {
 		get: function () {
 
-			return this.shadowMap.cullFace;
+			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.' );
+			return undefined;
 
 		},
-		set: function ( value ) {
+		set: function ( /* value */ ) {
 
-			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
-			this.shadowMap.cullFace = value;
+			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.' );
 
 		}
 	}
@@ -1212,14 +1390,39 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 	cullFace: {
 		get: function () {
 
-			return this.renderReverseSided ? CullFaceFront : CullFaceBack;
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.' );
+			return undefined;
 
 		},
-		set: function ( cullFace ) {
+		set: function ( /* cullFace */ ) {
 
-			var value = ( cullFace !== CullFaceBack );
-			console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. Set .shadowMap.renderReverseSided to " + value + "." );
-			this.renderReverseSided = value;
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.cullFace has been removed. Set Material.shadowSide instead.' );
+
+		}
+	},
+	renderReverseSided: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderReverseSided has been removed. Set Material.shadowSide instead.' );
+			return undefined;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderReverseSided has been removed. Set Material.shadowSide instead.' );
+
+		}
+	},
+	renderSingleSided: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderSingleSided has been removed. Set Material.shadowSide instead.' );
+			return undefined;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderSingleSided has been removed. Set Material.shadowSide instead.' );
 
 		}
 	}
@@ -1375,6 +1578,30 @@ Object.defineProperties( WebGLRenderTarget.prototype, {
 
 //
 
+Object.assign( WebVRManager.prototype, {
+
+	getStandingMatrix: function () {
+
+		console.warn( 'THREE.WebVRManager: .getStandingMatrix() has been removed.' );
+
+	}
+
+} );
+
+Object.defineProperties( WebVRManager.prototype, {
+
+	standing: {
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.WebVRManager: .standing has been removed.' );
+
+		}
+	}
+
+} );
+
+//
+
 Audio.prototype.load = function ( file ) {
 
 	console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
@@ -1393,6 +1620,15 @@ AudioAnalyser.prototype.getData = function () {
 
 	console.warn( 'THREE.AudioAnalyser: .getData() is now .getFrequencyData().' );
 	return this.getFrequencyData();
+
+};
+
+//
+
+CubeCamera.prototype.updateCubeMap = function ( renderer, scene ) {
+
+	console.warn( 'THREE.CubeCamera: .updateCubeMap() is now .update().' );
+	return this.update( renderer, scene );
 
 };
 
@@ -1514,5 +1750,37 @@ export function CanvasRenderer() {
 	this.render = function () {};
 	this.setClearColor = function () {};
 	this.setSize = function () {};
+
+}
+
+//
+
+export var SceneUtils = {
+
+	createMultiMaterialObject: function ( /* geometry, materials */ ) {
+
+		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+
+	},
+
+	detach: function ( /* child, parent, scene */ ) {
+
+		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+
+	},
+
+	attach: function ( /* child, scene, parent */ ) {
+
+		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+
+	}
+
+};
+
+//
+
+export function LensFlare() {
+
+	console.error( 'THREE.LensFlare has been moved to /examples/js/objects/LensFlare.js' );
 
 }

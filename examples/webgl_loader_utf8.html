@@ -74,6 +74,7 @@
 				camera.position.z = 800;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0x000000, 800, 2000 );
 
 				var path = "textures/cube/SwedishRoyalCastle/";
@@ -114,7 +115,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";

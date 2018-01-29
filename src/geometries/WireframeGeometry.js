@@ -3,9 +3,9 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector3 } from '../math/Vector3';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
 
 function WireframeGeometry( geometry ) {
 

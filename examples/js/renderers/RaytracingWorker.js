@@ -41,7 +41,7 @@ self.onmessage = function( e ) {
 		var meta = data.annex;
 		scene.traverse( function( o ) {
 
-			if ( o instanceof THREE.PointLight ) {
+			if ( o.isPointLight ) {
 
 				o.physicalAttenuation = true;
 
@@ -96,10 +96,12 @@ THREE.RaytracingRendererWorker = function () {
 	var cameraPosition = new THREE.Vector3();
 
 	var raycaster = new THREE.Raycaster( origin, direction );
+	var ray = raycaster.ray;
+
 	var raycasterLight = new THREE.Raycaster();
+	var rayLight = raycasterLight.ray;
 
 	var perspective;
-	var modelViewMatrix = new THREE.Matrix4();
 	var cameraNormalMatrix = new THREE.Matrix3();
 
 	var objects;
@@ -147,31 +149,19 @@ THREE.RaytracingRendererWorker = function () {
 
 		return function spawnRay( rayOrigin, rayDirection, outputColor, recursionDepth ) {
 
-			var ray = raycaster.ray;
-
-			ray.origin = rayOrigin;
-			ray.direction = rayDirection;
-
-			//
-
-			var rayLight = raycasterLight.ray;
-
-			//
-
 			outputColor.setRGB( 0, 0, 0 );
 
 			//
+
+			ray.origin = rayOrigin;
+			ray.direction = rayDirection;
 
 			var intersections = raycaster.intersectObjects( objects, true );
 
 			// ray didn't find anything
 			// (here should come setting of background color?)
 
-			if ( intersections.length === 0 ) {
-
-				return;
-
-			}
+			if ( intersections.length === 0 ) return;
 
 			// ray hit
 
@@ -188,14 +178,13 @@ THREE.RaytracingRendererWorker = function () {
 
 			var _object = cache[ object.id ];
 
-			localPoint.copy( point ).applyMatrix4( _object.inverseMatrix );
-			eyeVector.subVectors( raycaster.ray.origin, point ).normalize();
+			eyeVector.subVectors( ray.origin, point ).normalize();
 
 			// resolve pixel diffuse color
 
-			if ( material instanceof THREE.MeshLambertMaterial ||
-				 material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshBasicMaterial ) {
+			if ( material.isMeshLambertMaterial ||
+				 material.isMeshPhongMaterial ||
+				 material.isMeshBasicMaterial ) {
 
 				diffuseColor.copyGammaToLinear( material.color );
 
@@ -215,7 +204,7 @@ THREE.RaytracingRendererWorker = function () {
 
 			rayLight.origin.copy( point );
 
-			if ( material instanceof THREE.MeshBasicMaterial ) {
+			if ( material.isMeshBasicMaterial ) {
 
 				for ( var i = 0, l = lights.length; i < l; i ++ ) {
 
@@ -238,16 +227,13 @@ THREE.RaytracingRendererWorker = function () {
 
 				}
 
-			} else if ( material instanceof THREE.MeshLambertMaterial ||
-						material instanceof THREE.MeshPhongMaterial ) {
+			} else if ( material.isMeshLambertMaterial || material.isMeshPhongMaterial ) {
 
 				var normalComputed = false;
 
 				for ( var i = 0, l = lights.length; i < l; i ++ ) {
 
 					var light = lights[ i ];
-
-					lightColor.copyGammaToLinear( light.color );
 
 					lightVector.setFromMatrixPosition( light.matrixWorld );
 					lightVector.sub( point );
@@ -267,12 +253,15 @@ THREE.RaytracingRendererWorker = function () {
 						// the same normal can be reused for all lights
 						// (should be possible to cache even more)
 
-						computePixelNormal( normalVector, localPoint, material.shading, face, vertices );
+						localPoint.copy( point ).applyMatrix4( _object.inverseMatrix );
+						computePixelNormal( normalVector, localPoint, material.flatShading, face, vertices );
 						normalVector.applyMatrix3( _object.normalMatrix ).normalize();
 
 						normalComputed = true;
 
 					}
+
+					lightColor.copyGammaToLinear( light.color );
 
 					// compute attenuation
 
@@ -300,7 +289,7 @@ THREE.RaytracingRendererWorker = function () {
 
 					// compute specular
 
-					if ( material instanceof THREE.MeshPhongMaterial ) {
+					if ( material.isMeshPhongMaterial ) {
 
 						halfVector.addVectors( lightVector, eyeVector ).normalize();
 
@@ -318,9 +307,9 @@ THREE.RaytracingRendererWorker = function () {
 						schlick.b = specularColor.b + ( 1.0 - specularColor.b ) * alpha;
 
 						lightContribution.copy( schlick );
-
 						lightContribution.multiply( lightColor );
 						lightContribution.multiplyScalar( specularNormalization * specularIntensity * attenuation );
+
 						outputColor.add( lightContribution );
 
 					}
@@ -397,16 +386,16 @@ THREE.RaytracingRendererWorker = function () {
 		var tmpVec2 = new THREE.Vector3();
 		var tmpVec3 = new THREE.Vector3();
 
-		return function computePixelNormal( outputVector, point, shading, face, vertices ) {
+		return function computePixelNormal( outputVector, point, flatShading, face, vertices ) {
 
 			var faceNormal = face.normal;
 			var vertexNormals = face.vertexNormals;
 
-			if ( shading === THREE.FlatShading ) {
+			if ( flatShading === true ) {
 
 				outputVector.copy( faceNormal );
 
-			} else if ( shading === THREE.SmoothShading ) {
+			} else {
 
 				// compute barycentric coordinates
 
@@ -474,7 +463,7 @@ THREE.RaytracingRendererWorker = function () {
 
 					// convert from linear to gamma
 
-					data[ index ]     = Math.sqrt( pixelColor.r ) * 255;
+					data[ index + 0 ] = Math.sqrt( pixelColor.r ) * 255;
 					data[ index + 1 ] = Math.sqrt( pixelColor.g ) * 255;
 					data[ index + 2 ] = Math.sqrt( pixelColor.b ) * 255;
 					data[ index + 3 ] = 255;
@@ -519,7 +508,6 @@ THREE.RaytracingRendererWorker = function () {
 		//
 
 		cameraNormalMatrix.getNormalMatrix( camera.matrixWorld );
-		origin.copy( cameraPosition );
 
 		perspective = 0.5 / Math.tan( THREE.Math.degToRad( camera.fov * 0.5 ) ) * canvasHeight;
 
@@ -531,7 +519,7 @@ THREE.RaytracingRendererWorker = function () {
 
 		scene.traverse( function ( object ) {
 
-			if ( object instanceof THREE.Light ) {
+			if ( object.isPointLight ) {
 
 				lights.push( object );
 
@@ -546,11 +534,9 @@ THREE.RaytracingRendererWorker = function () {
 
 			}
 
-			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-
 			var _object = cache[ object.id ];
 
-			_object.normalMatrix.getNormalMatrix( modelViewMatrix );
+			_object.normalMatrix.getNormalMatrix( object.matrixWorld );
 			_object.inverseMatrix.getInverse( object.matrixWorld );
 
 		} );

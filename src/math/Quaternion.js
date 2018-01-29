@@ -1,4 +1,4 @@
-import { Vector3 } from './Vector3';
+import { Vector3 } from './Vector3.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -395,7 +395,9 @@ Object.assign( Quaternion.prototype, {
 
 	inverse: function () {
 
-		return this.conjugate().normalize();
+		// quaternion is assumed to have unit length
+
+		return this.conjugate();
 
 	},
 

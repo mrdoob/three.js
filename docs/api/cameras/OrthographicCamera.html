@@ -25,7 +25,6 @@
 		<h2>Example</h2>
 
 		<div>[example:canvas_camera_orthographic camera / orthographic ]</div>
-		<div>[example:canvas_camera_orthographic2 camera / orthographic2 ]</div>
 		<div>[example:webgl_camera camera ]</div>
 		<div>[example:webgl_interactive_cubes_ortho interactive / cubes / ortho ]</div>
 		<div>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</div>
@@ -58,7 +57,11 @@ scene.add( camera );</code>
 
 
 		<h2>Properties</h2>
-		<div>See the base [page:Camera] class for common properties.</div>
+		<div>
+			See the base [page:Camera] class for common properties.<br>
+ 			Note that after making changes to most of these properties you will have to call 
+ 			[page:OrthographicCamera.updateProjectionMatrix .updateProjectionMatrix] for the changes to take effect.
+		</div>
 
 		<h3>[property:Float bottom]</h3>
 		<div>Camera frustum bottom plane.</div>

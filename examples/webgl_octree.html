@@ -28,7 +28,7 @@
 				mesh,
 				meshes = [],
 				meshesSearch = [],
-				meshCountMax = 1000,
+				meshCountMax = 100,
 				radius = 500,
 				radiusMax = radius * 10,
 				radiusMaxHalf = radiusMax * 0.5,
@@ -49,12 +49,12 @@
 				// standard three scene, camera, renderer
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, radius * 100 );
 				scene.add( camera );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

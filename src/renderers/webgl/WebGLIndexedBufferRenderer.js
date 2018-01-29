@@ -29,6 +29,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 		infoRender.vertices += count;
 
 		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
+		else if ( mode === gl.POINTS ) infoRender.points += count;
 
 	}
 
@@ -49,6 +50,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 		infoRender.vertices += count * geometry.maxInstancedCount;
 
 		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
+		else if ( mode === gl.POINTS ) infoRender.points += geometry.maxInstancedCount * count;
 
 	}
 

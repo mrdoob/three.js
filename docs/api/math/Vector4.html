@@ -110,6 +110,15 @@ var d = a.dot( b );
 		If this vector's x, y, z or w value is less than the min vector's x, y, z or w value, it is replaced by the corresponding value.
 		</div>
 
+		<h3>[method:Vector4 clampLength]( [page:Float min], [page:Float max] )</h3>
+		<div>
+		[page:Float min] - the minimum value the length will be clamped to <br />
+		[page:Float max] - the maximum value the length will be clamped to<br /><br />
+
+		If this vector's length is greater than the max value, it is replaced by the max value. <br /><br />
+		If this vector's length is less than the min value, it is replaced by the min value.
+		</div>
+
 		<h3>[method:Vector4 clampScalar]( [page:Float min], [page:Float max] )</h3>
 		<div>
 		[page:Float min] - the minimum value the components will be clamped to <br />
@@ -167,7 +176,7 @@ var d = a.dot( b );
 
 		<h3>[method:Float getComponent]( [page:Integer index] )</h3>
 		<div>
-		[page:Integer index] - 0, 1 or 2.<br /><br />
+		[page:Integer index] - 0, 1, 2 or 3.<br /><br />
 
 		If index equals 0 returns the [page:.x x] value. <br />
 		If index equals 1 returns the [page:.y y] value. <br />
@@ -179,7 +188,7 @@ var d = a.dot( b );
 		<div>Computes the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
 		(straight-line length) from (0, 0, 0, 0) to (x, y, z, w).</div>
 
-		<h3>[method:Float lengthManhattan]()</h3>
+		<h3>[method:Float manhattanLength]()</h3>
 		<div>
 		Computes the [link:http://en.wikipedia.org/wiki/Taxicab_geometry Manhattan length] of this vector.
 		</div>
@@ -222,13 +231,13 @@ var d = a.dot( b );
 
 		<h3>[method:Vector4 max]( [page:Vector4 v] )</h3>
 		<div>
-		If this vector's x, y, z or w value is less than [page:Vector4 v's] x, y, z or w value, replace
+		If this vector's x, y, z or w value is less than [page:Vector4 v]'s x, y, z or w value, replace
 		that value with the corresponding max value.
 		</div>
 
 		<h3>[method:Vector4 min]( [page:Vector4 v] )</h3>
 		<div>
-		If this vector's x, y, z or w value is greater than [page:Vector4 v's] x, y, z or w value, replace
+		If this vector's x, y, z or w value is greater than [page:Vector4 v]'s x, y, z or w value, replace
 		that value with the corresponding min value.
 		</div>
 

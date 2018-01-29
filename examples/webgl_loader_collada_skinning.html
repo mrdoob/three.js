@@ -9,7 +9,6 @@
 				background:#777;
 				padding:0;
 				margin:0;
-				font-weight: bold;
 				overflow:hidden;
 			}
 
@@ -33,7 +32,8 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - collada - skinning
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader - skinning
+			| Dancing Stormtrooper by <a href="https://sketchfab.com/strykerdoesgames" target="_blank" rel="noopener">StrykerDoesAnimation</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -46,7 +46,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats, clock;
+			var container, stats, clock, controls;
 			var camera, scene, renderer, mixer;
 
 			init();
@@ -57,7 +57,7 @@
 				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( - 7, 4, 7 );
+				camera.position.set( 15, 10, - 15 );
 
 				scene = new THREE.Scene();
 
@@ -66,40 +66,30 @@
 				// collada
 
 				var loader = new THREE.ColladaLoader();
-				loader.options.convertUpAxis = true;
-				loader.load( "./models/collada/avatar.dae", function ( collada ) {
+				loader.load( './models/collada/stormtrooper/stormtrooper.dae', function ( collada ) {
 
-					var object = collada.scene;
+					var animations = collada.animations;
+					var avatar = collada.scene;
 
-					mixer = new THREE.AnimationMixer( object );
+					mixer = new THREE.AnimationMixer( avatar );
+					var action = mixer.clipAction( animations[ 0 ] ).play();
 
-					object.traverse( function ( child ) {
-
-						if ( child instanceof THREE.SkinnedMesh ) {
-
-							var clip = THREE.AnimationClip.parseAnimation( child.geometry.animation, child.geometry.bones );
-							mixer.clipAction( clip, child ).play();
-
-						}
-
-					} );
-
-					scene.add( object );
+					scene.add( avatar );
 
 				} );
 
 				//
 
-				var gridHelper = new THREE.GridHelper( 5, 20 );
+				var gridHelper = new THREE.GridHelper( 10, 20 );
 				scene.add( gridHelper );
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc );
+				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( -1, 0.5, -1 ).normalize();
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				directionalLight.position.set( 1, 1, - 1 );
 				scene.add( directionalLight );
 
 				//
@@ -107,12 +97,13 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				//
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2, 0 );
+				controls.update();
 
 				//
 
