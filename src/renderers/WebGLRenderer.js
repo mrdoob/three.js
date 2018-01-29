@@ -1496,18 +1496,19 @@ function WebGLRenderer( parameters ) {
 
 		if ( programChange ) {
 
-
 			if ( parameters.shaderID ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
 
-				//if any extra uniforms are provided, merge them with the others
+				// 1. if any extra uniforms are provided, merge them with the others
+				
 				var computedUniforms = undefined !== material.shaderUniforms ?
-					UniformsUtils.merge([ UniformsUtils.clone( shader.uniforms ) , material.shaderUniforms ]) :
+					UniformsUtils.merge([ UniformsUtils.clone( shader.uniforms ), material.shaderUniforms ]) :
 					UniformsUtils.clone( shader.uniforms );
 
-				//if the uniform is provided with { value , type } inject this GLSL automatically
-				//(no need to write `uniform float uFoo;` and include manually in a snippet)
+				// if the uniform is provided with { value , type } inject this GLSL automatically
+				// (no need to write `uniform float uFoo;` and include manually in a snippet)
+				// which may be a poor idea because they would get injected into both vert and frag
 				var shaderUniformsGLSL = ''; //collect the GLSL in here
 
 				for ( var uniformName in material.shaderUniforms ) {
@@ -1521,9 +1522,7 @@ function WebGLRenderer( parameters ) {
 					}
 
 				}
-				
-				//inject these here, maybe this is a bad idea 
-				//because they end up in both vert and frag
+
 				materialProperties.shader = {
 					name: material.type,
 					uniforms: computedUniforms,
@@ -1846,9 +1845,9 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			//follow the same pattern with common uniforms -
-			//refreshUniformsCommon looks at some known uniforms and refreshes them
-			//refreshUniformsCustom should look at unknown uniforms but in a known place
+			//2. follow the same pattern with common uniforms -
+			//   refreshUniformsCommon looks at some known uniforms and refreshes them
+			//   refreshUniformsCustom should look at unknown uniforms but in a known place
 			
 			if ( undefined !== material.shaderUniforms ) {
 
@@ -2097,7 +2096,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	//same pattern as refreshUniformsFOO
+	//3. same pattern as refreshUniformsFOO
 	function refreshUniformsCustom( uniforms, material ) {
 
 		for ( var uniform in material.shaderUniforms ) {

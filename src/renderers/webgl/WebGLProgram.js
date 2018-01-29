@@ -150,13 +150,14 @@ function replaceLightNums( string, parameters ) {
 
 }
 
+//4. allow parsing of a custom dictionary, not just THREE.ShaderChunk
 function parseIncludes( string, materialIncludes ) {
 
 	var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
 
 	function replace( match, include ) {
 
-		//if there are material includes provided use those instead of the default chunks
+		//if there are material includes provided use those instead of the default chunks:
 		var replace = undefined !== materialIncludes[ include ] ? 
 			materialIncludes[ include ] : 
 			ShaderChunk[ include ];
@@ -508,6 +509,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	}
 
+	//4. provide optional chunk dictionary
 	vertexShader = parseIncludes( vertexShader, customIncludes );
 	vertexShader = replaceLightNums( vertexShader, parameters );
 
