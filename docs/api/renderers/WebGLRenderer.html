@@ -98,8 +98,8 @@
 		- [property:Boolean floatFragmentTextures]: whether the context supports the [link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float] extension.
 			According to [link:https://webglstats.com/ WebGLStats], as of February 2016 over 95% of WebGL enabled devices support this.<br />
 		- [property:Boolean floatVertexTextures]: *true* if [property:Boolean floatFragmentTextures] and [property:Boolean vertexTextures] are both true.<br />
-		- [property:Method getMaxAnisotropy](): see [page:WebGLRenderer.getMaxAnisotropy getMaxAnisotropy] below. <br />
-		- [property:Method getMaxPrecision](): see [page:WebGLRenderer.getMaxPrecision getMaxPrecision] below. <br />
+		- [property:Method getMaxAnisotropy](): Returns the maximum available anisotropy.<br />
+		- [property:Method getMaxPrecision](): Returns the maximum available precision for vertex and fragment shaders. <br />
 		- [property:Boolean logarithmicDepthBuffer]: *true* if the [property:parameter logarithmicDepthBuffer] was set to true in the constructor and
 		the context supports the [link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth] extension.
 			According to [link:https://webglstats.com/ WebGLStats], as of February 2016 around 66% of WebGL enabled devices support this.<br />
@@ -358,17 +358,11 @@
 		<h3>[method:RenderTarget getCurrentViewport]()</h3>
 		<div>Returns the current viewport.</div>
 
-		<h3>[method:Number getMaxAnisotropy]()</h3>
-		<div>This returns the anisotropy level of the textures.</div>
-
 		<h3>[method:Object getDrawingBufferSize]()</h3>
 		<div>Returns an object containing the width and height of the renderer's drawing buffer, in pixels.</div>
 
 		<h3>[method:number getPixelRatio]()</h3>
 		<div>Returns current device pixel ratio used.</div>
-
-		<h3>[method:string getPrecision]()</h3>
-		<div>This gets the precision used by the shaders. It returns "highp","mediump" or "lowp".</div>
 
 		<h3>[method:Object getSize]()</h3>
 		<div>Returns an object containing the width and height of the renderer's output canvas, in pixels.</div>
