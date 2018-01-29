@@ -11,7 +11,6 @@ varying vec3 vWorldPosition;
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <clipping_planes_pars_fragment>
-#include <global_fragment>
 
 void main () {
 

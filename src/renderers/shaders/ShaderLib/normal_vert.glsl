@@ -17,7 +17,6 @@
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>
 #include <logdepthbuf_pars_vertex>
-#include <global_vertex>
 
 void main() {
 

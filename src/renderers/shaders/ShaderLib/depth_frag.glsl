@@ -11,7 +11,6 @@
 #include <alphamap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
-#include <global_fragment>
 
 void main() {
 

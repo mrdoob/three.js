@@ -19,7 +19,6 @@ uniform float opacity;
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
-#include <global_fragment>
 
 void main() {
 
