@@ -54,6 +54,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		uniforms: {
 			"lastLum": { value: null },
 			"currentLum": { value: null },
+			"minLuminance": { value: 0.01 },
 			"delta": { value: 0.016 },
 			"tau": { value: 1.0 }
 		},
@@ -72,6 +73,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 			"uniform sampler2D lastLum;",
 			"uniform sampler2D currentLum;",
+			"uniform float minLuminance;",
 			"uniform float delta;",
 			"uniform float tau;",
 
@@ -80,8 +82,8 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 				"vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );",
 				"vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );",
 
-				"float fLastLum = lastLum.r;",
-				"float fCurrentLum = currentLum.r;",
+				"float fLastLum = max( minLuminance, lastLum.r );",
+				"float fCurrentLum = max( minLuminance, currentLum.r );",
 
 				//The adaption seems to work better in extreme lighting differences
 				//if the input luminance is squared.
@@ -90,7 +92,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 				// Adapt the luminance using Pattanaik's technique
 				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
 				// "fAdaptedLum = sqrt(fAdaptedLum);",
-				"gl_FragColor = vec4( vec3( fAdaptedLum ), 1.0 );",
+				"gl_FragColor.r = fAdaptedLum;",
 			"}"
 		].join( '\n' )
 	};
@@ -165,7 +167,16 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 		this.quad.material = this.materialToneMap;
 		this.materialToneMap.uniforms.tDiffuse.value = readBuffer.texture;
-		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+
+		if ( this.renderToScreen ) {
+
+			renderer.render( this.scene, this.camera );
+
+		} else {
+
+			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+
+		}
 
 	},
 
@@ -244,6 +255,17 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		if ( rate ) {
 
 			this.materialAdaptiveLum.uniforms.tau.value = Math.abs( rate );
+
+		}
+
+	},
+
+	setMinLuminance: function( minLum ) {
+
+		if ( minLum ) {
+
+			this.materialToneMap.uniforms.minLuminance.value = minLum;
+			this.materialAdaptiveLum.uniforms.minLuminance.value = minLum;
 
 		}
 

@@ -42,7 +42,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			nrrd format loader test
 		</div>
 		<div id="inset"></div>
@@ -58,7 +58,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/zlib_and_gzip.min.js"></script>
+		<script src="js/libs/gunzip.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
@@ -263,7 +263,7 @@
 				camera2.up = camera.up; // important!
 
 				// axes
-				axes2 = new THREE.AxisHelper( 100 );
+				axes2 = new THREE.AxesHelper( 100 );
 				scene2.add( axes2 );
 			}
 

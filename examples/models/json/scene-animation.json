@@ -16,8 +16,6 @@
                 "visible": true,
                 "type": "Mesh",
                 "material": "541CFE3C-B1BD-37FD-8A82-3870870BB8A8",
-                "castShadow": true,
-                "receiveShadow": true,
                 "geometry": "CAEC0410-6CA0-3646-AF22-DE6D5D34C387"
             },{
                 "name": "cylinder002",
@@ -26,8 +24,6 @@
                 "visible": true,
                 "type": "Mesh",
                 "material": "3701AB15-0042-3531-BDFA-EB0FA575D7D5",
-                "castShadow": true,
-                "receiveShadow": true,
                 "geometry": "0AF705E6-E495-351F-944E-8E96CEB82A7B"
             },{
                 "name": "cylinder003",
@@ -36,28 +32,36 @@
                 "visible": true,
                 "type": "Mesh",
                 "material": "D95A0291-848F-32DE-B7CF-F93015785600",
-                "castShadow": true,
-                "receiveShadow": true,
                 "geometry": "84174F78-6B50-3C0D-A3D3-D1203D616F79"
             }]
+        },{
+            "name": "ambientlight",
+            "uuid": "217f2d71-80f0-44cd-9d97-43e5611050a3",
+            "type": "AmbientLight",
+            "color": 5592405
         },{
             "name": "pointlight",
             "uuid": "FCC1C4DA-037A-33FF-97AE-339CD1CB618C",
             "matrix": [-1,0,0,0,0,1,-0,0,0,-0,-1,0,-22.1326,52.6576,-28.8763,1],
-            "visible": true,
             "type": "PointLight",
             "color": 16777215,
-            "intensity": 1,
-            "distance": 0
+            "intensity": 1
         },{
             "name": "pointlight1",
             "uuid": "D9440A28-5F71-3A2A-94B3-954420962156",
             "matrix": [-1,0,0,0,0,1,-0,0,0,-0,-1,0,18.3723,34.5427,79.0829,1],
-            "visible": true,
             "type": "PointLight",
             "color": 16777215,
-            "intensity": 1,
-            "distance": 0
+            "intensity": 1
+        },{
+            "name": "camera",
+            "uuid": "e2b22508-5e7c-4609-8505-d781754ba105",
+            "matrix": [0.70711, 0, 0.70711, 0, 0, 1, 0, 0, -0.70711, 0, 0.70711, 0, -200, 0, 200, 1],
+            "type": "PerspectiveCamera",
+            "fov": 30,
+            "aspect": 1.77778,
+            "near": 1,
+            "far": 10000
         }]
     },
     "images": [],

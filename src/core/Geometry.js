@@ -1,14 +1,14 @@
-import { EventDispatcher } from './EventDispatcher';
-import { Face3 } from './Face3';
-import { Matrix3 } from '../math/Matrix3';
-import { Sphere } from '../math/Sphere';
-import { Box3 } from '../math/Box3';
-import { Vector3 } from '../math/Vector3';
-import { Matrix4 } from '../math/Matrix4';
-import { Vector2 } from '../math/Vector2';
-import { Color } from '../math/Color';
-import { Object3D } from './Object3D';
-import { _Math } from '../math/Math';
+import { EventDispatcher } from './EventDispatcher.js';
+import { Face3 } from './Face3.js';
+import { Matrix3 } from '../math/Matrix3.js';
+import { Sphere } from '../math/Sphere.js';
+import { Box3 } from '../math/Box3.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Color } from '../math/Color.js';
+import { Object3D } from './Object3D.js';
+import { _Math } from '../math/Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -19,12 +19,11 @@ import { _Math } from '../math/Math';
  * @author bhouston / http://clara.io
  */
 
-var count = 0;
-function GeometryIdCount() { return count++; }
+var geometryId = 0; // Geometry uses even numbers as Id
 
 function Geometry() {
 
-	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
+	Object.defineProperty( this, 'id', { value: geometryId += 2 } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -59,7 +58,9 @@ function Geometry() {
 
 }
 
-Object.assign( Geometry.prototype, EventDispatcher.prototype, {
+Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+
+	constructor: Geometry,
 
 	isGeometry: true,
 
@@ -284,32 +285,28 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		if ( indices !== undefined ) {
+		var groups = geometry.groups;
 
-			var groups = geometry.groups;
+		if ( groups.length > 0 ) {
 
-			if ( groups.length > 0 ) {
+			for ( var i = 0; i < groups.length; i ++ ) {
 
-				for ( var i = 0; i < groups.length; i ++ ) {
+				var group = groups[ i ];
 
-					var group = groups[ i ];
+				var start = group.start;
+				var count = group.count;
 
-					var start = group.start;
-					var count = group.count;
+				for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
+					if ( indices !== undefined ) {
 
 						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex );
 
+					} else {
+
+						addFace( j, j + 1, j + 2, group.materialIndex );
+
 					}
-
-				}
-
-			} else {
-
-				for ( var i = 0; i < indices.length; i += 3 ) {
-
-					addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
 
 				}
 
@@ -317,9 +314,21 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		} else {
 
-			for ( var i = 0; i < positions.length / 3; i += 3 ) {
+			if ( indices !== undefined ) {
 
-				addFace( i, i + 1, i + 2 );
+				for ( var i = 0; i < indices.length; i += 3 ) {
+
+					addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+
+				}
+
+			} else {
+
+				for ( var i = 0; i < positions.length / 3; i += 3 ) {
+
+					addFace( i, i + 1, i + 2 );
+
+				}
 
 			}
 
@@ -692,7 +701,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	merge: function ( geometry, matrix, materialIndexOffset ) {
 
-		if ( ( geometry && geometry.isGeometry ) === false ) {
+		if ( ! ( geometry && geometry.isGeometry ) ) {
 
 			console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 			return;
@@ -812,7 +821,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	mergeMesh: function ( mesh ) {
 
-		if ( ( mesh && mesh.isMesh ) === false ) {
+		if ( ! ( mesh && mesh.isMesh ) ) {
 
 			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
 			return;
@@ -914,6 +923,21 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	},
 
+	setFromPoints: function ( points ) {
+
+		this.vertices = [];
+
+		for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+			var point = points[ i ];
+			this.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
+
+		}
+
+		return this;
+
+	},
+
 	sortFacesByMaterialIndex: function () {
 
 		var faces = this.faces;
@@ -965,7 +989,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		var data = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'Geometry',
 				generator: 'Geometry.toJSON'
 			}
@@ -1427,4 +1451,4 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 } );
 
 
-export { GeometryIdCount, Geometry };
+export { Geometry };

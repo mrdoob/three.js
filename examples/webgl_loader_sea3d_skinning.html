@@ -28,7 +28,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a>. Asset by <a href="http://www.turbosquid.com/3d-models/soccer-player-max-free/307330" style="color:#FFFFFF" target="_blank">Trivision</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a>. Asset by <a href="http://www.turbosquid.com/3d-models/soccer-player-max-free/307330" style="color:#FFFFFF" target="_blank" rel="noopener">Trivision</a>
 			<br/>
 			<br/>BoneObject: Object3D attached in a Bone
 			<br/>Left Click to hidden/show the hat - Right click to run
@@ -158,6 +158,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -168,7 +169,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x333333, 1 );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

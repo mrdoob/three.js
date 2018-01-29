@@ -12,13 +12,13 @@
 		<div>
 			<p>All objects by default automatically update their matrices if they have been added to the scene with</p>
 			<code>
-var object = new THREE.Object3D;
+var object = new THREE.Object3D();
 scene.add( object );
 			</code>
 			or if they are the child of another object that has been added to the scene:
 			<code>
-var object1 = new THREE.Object3D;
-var object2 = new THREE.Object3D;
+var object1 = new THREE.Object3D();
+var object2 = new THREE.Object3D();
 
 object1.add( object2 );
 scene.add( object1 ); //object1 and object2 will automatically update their matrices
@@ -69,14 +69,14 @@ var positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
 geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 // draw range
-drawCount = 2; // draw the first 2 points, only
+var drawCount = 2; // draw the first 2 points, only
 geometry.setDrawRange( 0, drawCount );
 
 // material
 var material = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 2 } );
 
 // line
-line = new THREE.Line( geometry,  material );
+var line = new THREE.Line( geometry,  material );
 scene.add( line );
 				</code>
 			 	<p>
@@ -85,7 +85,8 @@ scene.add( line );
 				<code>
 var positions = line.geometry.attributes.position.array;
 
-var x = y = z = index = 0;
+var x, y, z, index;
+x = y = z = index = 0;
 
 for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
 
@@ -117,7 +118,7 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 					[link:http://jsfiddle.net/w67tzfhx/ Here is a fiddle] showing an animated line which you can adapt to your use case.
 				</p>
 
-				<h4>Examples:</h4>
+				<h3>Examples:</h3>
 					[example:webgl_custom_attributes WebGL / custom / attributes]<br />
 					[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
 
@@ -154,7 +155,7 @@ geometry.tangentsNeedUpdate = true;
 		geometry.dynamic = true;
 				</code>
 
-				<h4>Example:</h4>
+				<h3>Examples:</h3>
 					[example:webgl_geometry_dynamic WebGL / geometry / dynamic]<br />
 			</div>
 

@@ -1,6 +1,3 @@
-import { ExtrudeBufferGeometry } from './ExtrudeGeometry';
-import { Geometry } from '../core/Geometry';
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * @author alteredq / http://alteredqualia.com/
@@ -19,9 +16,13 @@ import { Geometry } from '../core/Geometry';
  *  bevelSize: <float> // how far from text outline is bevel
  * }
  */
- 
 
-function TextGeometry(  text, parameters ) {
+import { Geometry } from '../core/Geometry.js';
+import { ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
+
+// TextGeometry
+
+function TextGeometry( text, parameters ) {
 
 	Geometry.call( this );
 
@@ -40,6 +41,7 @@ function TextGeometry(  text, parameters ) {
 TextGeometry.prototype = Object.create( Geometry.prototype );
 TextGeometry.prototype.constructor = TextGeometry;
 
+// TextBufferGeometry
 
 function TextBufferGeometry( text, parameters ) {
 
@@ -47,7 +49,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	var font = parameters.font;
 
-	if ( ( font && font.isFont ) === false ) {
+	if ( ! ( font && font.isFont ) ) {
 
 		console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
 		return new Geometry();
@@ -68,7 +70,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	ExtrudeBufferGeometry.call( this, shapes, parameters );
 
-	this.type = 'TextGeometry';
+	this.type = 'TextBufferGeometry';
 
 }
 
@@ -76,7 +78,4 @@ TextBufferGeometry.prototype = Object.create( ExtrudeBufferGeometry.prototype );
 TextBufferGeometry.prototype.constructor = TextBufferGeometry;
 
 
-export { 
-	TextGeometry,
-	TextBufferGeometry 
-};
+export { TextGeometry, TextBufferGeometry };

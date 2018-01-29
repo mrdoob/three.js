@@ -17,9 +17,10 @@ THREE.DaydreamController = function () {
 
 	function findGamepad() {
 
-		// iterate across gamepads as the Daydream Controller may not be in position 0
+		// iterate across gamepads as the Daydream Controller may not be
+		// in position 0
 
-		var gamepads = navigator.getGamepads();
+		var gamepads = navigator.getGamepads && navigator.getGamepads();
 
 		for ( var i = 0; i < 4; i ++ ) {
 
@@ -53,9 +54,9 @@ THREE.DaydreamController = function () {
 
 		if ( gamepad !== undefined && gamepad.pose !== undefined ) {
 
-			if ( pose === null ) return; // no user action yet
-
 			var pose = gamepad.pose;
+
+			if ( pose === null ) return; // no user action yet
 
 			//  orientation
 

@@ -32,18 +32,19 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - decals - Decal Splatter (click or tap to shoot)</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - decals - Decal Splatter (click or tap to shoot)</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/geometries/DecalGeometry.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
 		var container = document.getElementById( 'container' );
 
-		var renderer, scene, camera, fov = 45;
+		var renderer, scene, camera, stats;
 		var mesh, decal;
 		var raycaster;
 		var line;
@@ -53,7 +54,6 @@
 			point: new THREE.Vector3(),
 			normal: new THREE.Vector3()
 		};
-		var controls;
 		var mouse = new THREE.Vector2();
 
 		var textureLoader = new THREE.TextureLoader();
@@ -101,13 +101,16 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
 			scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 			camera.position.z = 120;
 			camera.target = new THREE.Vector3();
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.minDistance = 50;
 			controls.maxDistance = 200;
 
@@ -163,6 +166,8 @@
 
 			function onTouchMove( event ) {
 
+				var x, y;
+
 				if ( event.changedTouches ) {
 
 					x = event.changedTouches[ 0 ].pageX;
@@ -197,6 +202,7 @@
 					intersection.point.copy( p );
 
 					var n = intersects[ 0 ].face.normal.clone();
+					n.transformDirection( mesh.matrixWorld );
 					n.multiplyScalar( 10 );
 					n.add( intersects[ 0 ].point );
 
@@ -298,6 +304,8 @@
 			requestAnimationFrame( animate );
 
 			renderer.render( scene, camera );
+
+			stats.update();
 
 		}
 

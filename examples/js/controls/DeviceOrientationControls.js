@@ -17,9 +17,7 @@ THREE.DeviceOrientationControls = function( object ) {
 	this.deviceOrientation = {};
 	this.screenOrientation = 0;
 
-	this.alpha = 0;
-	this.alphaOffsetAngle = 0;
-
+	this.alphaOffset = 0; // radians
 
 	var onDeviceOrientationChangeEvent = function( event ) {
 
@@ -83,26 +81,28 @@ THREE.DeviceOrientationControls = function( object ) {
 
 		if ( scope.enabled === false ) return;
 
-		var alpha = scope.deviceOrientation.alpha ? THREE.Math.degToRad( scope.deviceOrientation.alpha ) + this.alphaOffsetAngle : 0; // Z
-		var beta = scope.deviceOrientation.beta ? THREE.Math.degToRad( scope.deviceOrientation.beta ) : 0; // X'
-		var gamma = scope.deviceOrientation.gamma ? THREE.Math.degToRad( scope.deviceOrientation.gamma ) : 0; // Y''
-		var orient = scope.screenOrientation ? THREE.Math.degToRad( scope.screenOrientation ) : 0; // O
+		var device = scope.deviceOrientation;
 
-		setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
-		this.alpha = alpha;
+		if ( device ) {
 
-	};
+			var alpha = device.alpha ? THREE.Math.degToRad( device.alpha ) + scope.alphaOffset : 0; // Z
 
-	this.updateAlphaOffsetAngle = function( angle ) {
+			var beta = device.beta ? THREE.Math.degToRad( device.beta ) : 0; // X'
 
-		this.alphaOffsetAngle = angle;
-		this.update();
+			var gamma = device.gamma ? THREE.Math.degToRad( device.gamma ) : 0; // Y''
+
+			var orient = scope.screenOrientation ? THREE.Math.degToRad( scope.screenOrientation ) : 0; // O
+
+			setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
+
+		}
+
 
 	};
 
 	this.dispose = function() {
 
-		this.disconnect();
+		scope.disconnect();
 
 	};
 

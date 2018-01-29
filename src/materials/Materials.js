@@ -10,6 +10,7 @@ export { MeshToonMaterial } from './MeshToonMaterial.js';
 export { MeshNormalMaterial } from './MeshNormalMaterial.js';
 export { MeshLambertMaterial } from './MeshLambertMaterial.js';
 export { MeshDepthMaterial } from './MeshDepthMaterial.js';
+export { MeshDistanceMaterial } from './MeshDistanceMaterial.js';
 export { MeshBasicMaterial } from './MeshBasicMaterial.js';
 export { LineDashedMaterial } from './LineDashedMaterial.js';
 export { LineBasicMaterial } from './LineBasicMaterial.js';

@@ -26,13 +26,13 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - MMDLoader test<br />
-		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank">MMD Assets license</a><br />
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
+		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
 		Copyright
-		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank">Model Data</a>
-		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank">Dance Data</a>
-		<a href="http://www.nicovideo.jp/watch/sm11938255" target="_blank">Audio Data</a><br />
-		<a href="http://www.nicovideo.jp/watch/sm19168559" target="_blank">Original Camera Data(I've customized this)</a>
+		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank" rel="noopener">Model Data</a>
+		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank" rel="noopener">Dance Data</a>
+		<a href="http://www.nicovideo.jp/watch/sm11938255" target="_blank" rel="noopener">Audio Data</a><br />
+		<a href="http://www.nicovideo.jp/watch/sm19168559" target="_blank" rel="noopener">Original Camera Data(I've customized this)</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -78,6 +78,7 @@
 				// scene
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
 
@@ -93,7 +94,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.OutlineEffect( renderer );

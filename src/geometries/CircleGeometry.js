@@ -1,8 +1,16 @@
 /**
+ * @author benaadams / https://twitter.com/ben_a_adams
+ * @author Mugen87 / https://github.com/Mugen87
  * @author hughes
  */
 
-import { Geometry } from '../core/Geometry';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector2 } from '../math/Vector2.js';
+
+// CircleGeometry
 
 function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
 
@@ -18,21 +26,14 @@ function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
 	};
 
 	this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
+	this.mergeVertices();
 
 }
 
 CircleGeometry.prototype = Object.create( Geometry.prototype );
 CircleGeometry.prototype.constructor = CircleGeometry;
 
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
+// CircleBufferGeometry
 
 function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
@@ -47,7 +48,7 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 		thetaLength: thetaLength
 	};
 
-	radius = radius || 50;
+	radius = radius || 1;
 	segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;
@@ -115,5 +116,6 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
 CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
+
 
 export { CircleGeometry, CircleBufferGeometry };

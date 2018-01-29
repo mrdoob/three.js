@@ -39,7 +39,7 @@
 
 	<div class="info">
 
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - gpu picking of geometry instances
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking of geometry instances
 
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 
@@ -452,6 +452,8 @@
 			} );
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xffffff );
+
 			scene.add( camera );
 			scene.add( highlightBox );
 
@@ -606,32 +608,24 @@
 			var vert = document.getElementById( 'vertMaterial' ).textContent;
 			var frag = document.getElementById( 'fragMaterial' ).textContent;
 
-			function updateColor( object, material, camera ) {
-
-				this.value.setHex( object.userData.color );
-
-			}
-
 			var material = new THREE.RawShaderMaterial( {
 				vertexShader: vert,
 				fragmentShader: frag,
 				uniforms: {
-					color: new THREE.Uniform( new THREE.Color() ).onUpdate( updateColor )
+					color: {
+						value: new THREE.Color()
+					}
 				}
 			} );
 			materialList.push( material );
-
-			function updatePickingColor( object, camera ) {
-
-				this.value.setHex( object.userData.pickingColor );
-
-			}
 
 			var pickingMaterial = new THREE.RawShaderMaterial( {
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
-					pickingColor: new THREE.Uniform( new THREE.Color() ).onUpdate( updatePickingColor )
+					pickingColor: {
+						value: new THREE.Color()
+					}
 				}
 			} );
 			materialList.push( pickingMaterial );
@@ -647,6 +641,43 @@
 			// geometry / mesh
 
 			var matrix = new THREE.Matrix4();
+
+			function onBeforeRender( renderer, scene, camera, geometry, material, group ){
+
+				var updateList = [];
+				var u = material.uniforms;
+				var d = this.userData;
+
+				if( u.pickingColor ){
+					u.pickingColor.value.setHex( d.pickingColor );
+					updateList.push( "pickingColor" );
+				}
+
+				if( u.color ){
+					u.color.value.setHex( d.color );
+					updateList.push( "color" );
+				}
+
+				if( updateList.length ){
+
+					var materialProperties = renderer.properties.get( material );
+
+					if( materialProperties.program ){
+
+						var gl = renderer.getContext();
+						var p = materialProperties.program;
+						gl.useProgram( p.program );
+						var pu = p.getUniforms();
+
+						updateList.forEach( function( name ){
+							pu.setValue( gl, name, u[ name ].value );
+						} );
+
+					}
+
+				}
+
+			}
 
 			for ( var i = 0; i < instanceCount; i ++ ) {
 
@@ -669,11 +700,13 @@
 				if ( useOverrideMaterial ) {
 
 					object.userData[ "pickingColor" ] = i + 1;
+					object.onBeforeRender = onBeforeRender;
 
 				}else {
 
 					pickingObject.material = pickingMaterial;
 					pickingObject.userData[ "pickingColor" ] = i + 1;
+					pickingObject.onBeforeRender = onBeforeRender;
 
 				}
 
@@ -718,24 +751,16 @@
 			var vertices = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * posLen ), 3
 			);
-			var vertex = new THREE.Vector3();
 			var matrix = new THREE.Matrix4();
 			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
-				var offset = i * posLen;
+
 				randomizeMatrix( matrix );
 				var object = new THREE.Object3D();
 				objectCount ++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
-				vertices.set( pos.array, offset );
-
-				for ( var k = 0, l = offset; k < posLen; k += 3, l += 3 ) {
-
-					vertex.fromArray( vertices.array, l );
-					vertex.applyMatrix4( matrix );
-					vertex.toArray( vertices.array, l );
-
-				}
+				vertices.set( pos.array, i * posLen );
+				matrix.applyToVector3Array( vertices.array, i * posLen, posLen )
 
 			}
 			mgeo.addAttribute( 'position', vertices );
@@ -933,10 +958,9 @@
 				return;
 
 			}
-			renderer.setClearColor( 0xffffff );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.sortObjects = false;
+			//renderer.sortObjects = false;
 			container.appendChild( renderer.domElement );
 
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {

@@ -40,7 +40,7 @@
 
 		<h2>Creating the scene</h2>
 
-		<div>To actually be able to display anything with three.js, we need three things: A scene, a camera, and a renderer so we can render the scene with the camera.</div>
+		<div>To actually be able to display anything with three.js, we need three things: scene, camera and renderer, so that we can render the scene with camera.</div>
 
 		<code>
 		var scene = new THREE.Scene();
@@ -51,7 +51,11 @@
 		document.body.appendChild( renderer.domElement );
 		</code>
 
-		<div>Let's take a moment to explain what's going on here. We have now set up the scene, our camera and the renderer. There are a few different cameras in three.js. For now, let's use a PerspectiveCamera. The first attribute is the <strong>field of view</strong>.</div>
+		<div>Let's take a moment to explain what's going on here. We have now set up the scene, our camera and the renderer.</div>
+
+		<div>There are a few different cameras in three.js. For now, let's use a <strong>PerspectiveCamera</strong>.</div>
+
+		<div>The first attribute is the <strong>field of view</strong>. FOV is the extent of the scene that is seen on the display at any given moment. The value is in degrees.</div>
 
 		<div>The second one is the <strong>aspect ratio</strong>. You almost always want to use the width of the element divided by the height, or you'll get the same result as when you play old movies on a widescreen TV - the image looks squished.</div>
 
@@ -86,30 +90,30 @@
 
 		<h2>Rendering the scene</h2>
 
-		<div>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a <strong>render loop</strong>.</div>
+		<div>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a <strong>render or animate loop</strong>.</div>
 
 		<code>
-		function render() {
-			requestAnimationFrame( render );
+		function animate() {
+			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
-		render();
+		animate();
 		</code>
 
-		<div>This will create a loop that causes the renderer to draw the scene 60 times per second. If you're new to writing games in the browser, you might say "why don't we just  create a <strong>setInterval</strong>? The thing is - we could, but <strong>requestAnimationFrame</strong> has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</div>
+		<div>This will create a loop that causes the renderer to draw the scene every time the screen is refreshed (on a typical screen this means 60 times per second). If you're new to writing games in the browser, you might say <em>"why don't we just create a setInterval ?"</em> The thing is - we could, but <strong>requestAnimationFrame</strong> has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</div>
 
 		<h2>Animating the cube</h2>
 
 		<div>If you insert all the code above into the file you created before we began, you should see a green box. Let's make it all a little more interesting by rotating it.</div>
 
-		<div>Add the following right above the <strong>renderer.render</strong> call in your <strong>render</strong> function:</div>
+		<div>Add the following right above the <strong>renderer.render</strong> call in your <strong>animate</strong> function:</div>
 
 		<code>
 		cube.rotation.x += 0.1;
 		cube.rotation.y += 0.1;
 		</code>
 
-		<div>This will be run every frame (60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the render loop. You can of course call other functions from there, so that you don't end up with a <strong>render</strong> function that's hundreds of lines.
+		<div>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animate loop. You can of course call other functions from there, so that you don't end up with a <strong>animate</strong> function that's hundreds of lines.
 		</div>
 
 		<h2>The result</h2>
@@ -143,8 +147,8 @@
 
 					camera.position.z = 5;
 
-					var render = function () {
-						requestAnimationFrame( render );
+					var animate = function () {
+						requestAnimationFrame( animate );
 
 						cube.rotation.x += 0.1;
 						cube.rotation.y += 0.1;
@@ -152,7 +156,7 @@
 						renderer.render(scene, camera);
 					};
 
-					render();
+					animate();
 				&lt;/script&gt;
 			&lt;/body&gt;
 		&lt;/html&gt;

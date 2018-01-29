@@ -1,12 +1,12 @@
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Geometry } from '../core/Geometry';
-import { _Math } from '../math/Math';
-
 /**
  * @author WestLangley / http://github.com/WestLangley
  * @author Mugen87 / https://github.com/Mugen87
  */
+
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Geometry } from '../core/Geometry.js';
+import { _Math } from '../math/Math.js';
 
 function EdgesGeometry( geometry, thresholdAngle ) {
 

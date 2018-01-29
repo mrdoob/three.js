@@ -1,25 +1,29 @@
-import { Mesh } from '../objects/Mesh';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { SphereBufferGeometry } from '../geometries/SphereGeometry';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  */
 
-function PointLightHelper( light, sphereSize ) {
+import { Mesh } from '../objects/Mesh.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { SphereBufferGeometry } from '../geometries/SphereGeometry.js';
+
+function PointLightHelper( light, sphereSize, color ) {
 
 	this.light = light;
 	this.light.updateMatrixWorld();
 
+	this.color = color;
+
 	var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
 	var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
-	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	Mesh.call( this, geometry, material );
 
 	this.matrix = this.light.matrixWorld;
 	this.matrixAutoUpdate = false;
+
+	this.update();
+
 
 	/*
 	var distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
@@ -57,7 +61,15 @@ PointLightHelper.prototype.dispose = function () {
 
 PointLightHelper.prototype.update = function () {
 
-	this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	if ( this.color !== undefined ) {
+
+		this.material.color.set( this.color );
+
+	} else {
+
+		this.material.color.copy( this.light.color );
+
+	}
 
 	/*
 	var d = this.light.distance;

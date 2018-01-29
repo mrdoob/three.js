@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 function arrayMin( array ) {
 
 	if ( array.length === 0 ) return Infinity;

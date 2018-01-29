@@ -26,7 +26,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl ocean simulation<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean simulation<br/>
 			current simulation framebuffers type is <span id="type-status"></span><br/>
 			change type to <span id="change-type"></span>
 		</div>
@@ -183,7 +183,6 @@
 					this.ms_Ocean.materialOcean.uniforms.u_cameraPosition.value = this.ms_Camera.position;
 					this.ms_Ocean.materialOcean.depthTest = true;
 					//this.ms_Scene.__lights[1].position.x = this.ms_Scene.__lights[1].position.x + 0.01;
-					this.ms_Controls.update();
 					this.Display();
 				},
 

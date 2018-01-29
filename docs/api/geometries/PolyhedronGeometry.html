@@ -39,10 +39,10 @@ var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Array vertices], [page:Array faces], [page:Float radius], [page:Integer detail])</h3>
+		<h3>[name]([page:Array vertices], [page:Array indices], [page:Float radius], [page:Integer detail])</h3>
 		<div>
 		vertices — [page:Array] of points of the form [1,1,1, -1,-1,-1, ... ] <br />
-		faces — [page:Array] of indices that make up the faces of the form [0,1,2, 2,3,0, ... ] <br />
+		indices — [page:Array] of indices that make up the faces of the form [0,1,2, 2,3,0, ... ] <br />
 		radius — [page:Float] - The radius of the final shape <br />
 		detail — [page:Integer] - How many levels to subdivide the geometry. The more detail, the smoother the shape.
 		</div>

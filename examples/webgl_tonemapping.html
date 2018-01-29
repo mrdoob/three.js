@@ -29,7 +29,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Inline Tone Mapping (within a Material's fragment shader) without<br/>using a pre-processing step or float/half buffers by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Inline Tone Mapping (within a Material's fragment shader) without<br/>using a pre-processing step or float/half buffers by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -96,7 +96,6 @@
 					color: 0xffffff,
 					metalness: 0.9,
 					roughness: 0.8,
-					shading: THREE.SmoothShading,
 					premultipliedAlpha: true,
 					transparent: true
 				} );
@@ -209,8 +208,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

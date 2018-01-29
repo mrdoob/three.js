@@ -27,9 +27,9 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> -
-		<a href="http://code.google.com/p/webgl-loader/" target="_blank">UTF8 format</a> loader test -
-		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank">The Utah 3D Animation Repository</a>
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		<a href="http://code.google.com/p/webgl-loader/" target="_blank" rel="noopener">UTF8 format</a> loader test -
+		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank" rel="noopener">The Utah 3D Animation Repository</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -74,6 +74,7 @@
 				camera.position.z = 800;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0x000000, 800, 2000 );
 
 				var path = "textures/cube/SwedishRoyalCastle/";
@@ -114,7 +115,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";

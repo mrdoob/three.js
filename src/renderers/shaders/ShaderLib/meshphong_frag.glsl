@@ -8,6 +8,7 @@ uniform float opacity;
 
 #include <common>
 #include <packing>
+#include <dithering_pars_fragment>
 #include <color_pars_fragment>
 #include <uv_pars_fragment>
 #include <uv2_pars_fragment>
@@ -43,7 +44,6 @@ void main() {
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <specularmap_fragment>
-	#include <normal_flip>
 	#include <normal_fragment>
 	#include <emissivemap_fragment>
 
@@ -60,9 +60,10 @@ void main() {
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
-	#include <premultiplied_alpha_fragment>
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
 	#include <fog_fragment>
+	#include <premultiplied_alpha_fragment>
+	#include <dithering_fragment>
 
 }

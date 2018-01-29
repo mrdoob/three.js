@@ -33,7 +33,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a></div>
 
 		<script src="../build/three.js"></script>
 
@@ -77,12 +77,8 @@
 
 				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
 
-				var textureCube = new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/Park3Med/' )
-					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-				textureCube.mapping = THREE.CubeRefractionMapping;
-
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: scene.background, refractionRatio: 0.95 } );
+				material.envMap.mapping = THREE.CubeRefractionMapping;
 
 				for ( var i = 0; i < 500; i ++ ) {
 

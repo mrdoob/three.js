@@ -29,7 +29,7 @@
 
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive - raycasting - points </div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - raycasting - points </div>
 
 		<script src="../build/three.js"></script>
 
@@ -217,8 +217,9 @@
 				clock = new THREE.Clock();
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.applyMatrix( new THREE.Matrix4().makeTranslation( 0,0,20 ) );
-				camera.applyMatrix( new THREE.Matrix4().makeRotationX( -0.5 ) );
+				camera.position.set( 10, 10, 10 );
+				camera.lookAt( scene.position );
+				camera.updateMatrix();
 
 				//
 
@@ -247,7 +248,7 @@
 				//
 
 				var sphereGeometry = new THREE.SphereGeometry( 0.1, 32, 32 );
-				var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, shading: THREE.FlatShading } );
+				var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
 				for ( var i = 0; i < 40; i++ ) {
 

@@ -2,8 +2,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Cache } from './Cache';
-import { DefaultLoadingManager } from './LoadingManager';
+import { Cache } from './Cache.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 
 function ImageLoader( manager ) {
@@ -14,11 +14,15 @@ function ImageLoader( manager ) {
 
 Object.assign( ImageLoader.prototype, {
 
+	crossOrigin: 'Anonymous',
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
 
 		if ( this.path !== undefined ) url = this.path + url;
+
+		url = this.manager.resolveURL( url );
 
 		var scope = this;
 
@@ -64,6 +68,7 @@ Object.assign( ImageLoader.prototype, {
 
 			if ( onError ) onError( event );
 
+			scope.manager.itemEnd( url );
 			scope.manager.itemError( url );
 
 		}, false );

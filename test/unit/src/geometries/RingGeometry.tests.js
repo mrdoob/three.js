@@ -1,42 +1,112 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author Anonymous
+ */
+/* global QUnit */
 
-	'use strict';
+import {
+	RingGeometry,
+	RingBufferGeometry
+} from '../../../../src/geometries/RingGeometry';
 
-	var parameters = {
-		innerRadius: 10,
-		outerRadius: 60,
-		thetaSegments: 12,
-		phiSegments: 14,
-		thetaStart: 0.1,
-		thetaLength: 2.0
-	};
+export default QUnit.module( 'Geometries', () => {
 
-	var geometries;
+	QUnit.module( 'RingGeometry', ( hooks ) => {
 
-	QUnit.module( "Extras - Geometries - RingGeometry", {
+		var geometries = undefined;
+		hooks.beforeEach( function () {
 
-		beforeEach: function() {
+			const parameters = {
+				innerRadius: 10,
+				outerRadius: 60,
+				thetaSegments: 12,
+				phiSegments: 14,
+				thetaStart: 0.1,
+				thetaLength: 2.0
+			};
 
 			geometries = [
-
-				new THREE.RingGeometry(),
-				new THREE.RingGeometry( parameters.innerRadius ),
-				new THREE.RingGeometry( parameters.innerRadius, parameters.outerRadius ),
-				new THREE.RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments ),
-				new THREE.RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments ),
-				new THREE.RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart ),
-				new THREE.RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart, parameters.thetaLength ),
-
+				new RingGeometry(),
+				new RingGeometry( parameters.innerRadius ),
+				new RingGeometry( parameters.innerRadius, parameters.outerRadius ),
+				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments ),
+				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments ),
+				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart ),
+				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart, parameters.thetaLength ),
 			];
 
-		}
+		} );
 
-	});
+		// INHERITANCE
+		QUnit.todo( "Extending", ( assert ) => {
 
-	QUnit.test( "standard geometry tests", function( assert ) {
+			assert.ok( false, "everything's gonna be alright" );
 
-		runStdGeometryTests( assert, geometries );
+		} );
 
-	});
+		// INSTANCING
+		QUnit.todo( "Instancing", ( assert ) => {
 
-})();
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard geometry tests', ( assert ) => {
+
+			runStdGeometryTests( assert, geometries );
+
+		} );
+
+	} );
+
+	QUnit.module( 'RingBufferGeometry', ( hooks ) => {
+
+		var geometries = undefined;
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				innerRadius: 10,
+				outerRadius: 60,
+				thetaSegments: 12,
+				phiSegments: 14,
+				thetaStart: 0.1,
+				thetaLength: 2.0
+			};
+
+			geometries = [
+				new RingBufferGeometry(),
+				new RingBufferGeometry( parameters.innerRadius ),
+				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius ),
+				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments ),
+				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments ),
+				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart ),
+				new RingBufferGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart, parameters.thetaLength ),
+			];
+
+		} );
+
+		// INHERITANCE
+		QUnit.todo( "Extending", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// INSTANCING
+		QUnit.todo( "Instancing", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard geometry tests', ( assert ) => {
+
+			runStdGeometryTests( assert, geometries );
+
+		} );
+
+	} );
+
+} );

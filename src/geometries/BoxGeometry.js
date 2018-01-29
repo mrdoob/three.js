@@ -1,9 +1,14 @@
 /**
  * @author mrdoob / http://mrdoob.com/
- * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { Geometry } from '../core/Geometry';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
+
+// BoxGeometry
 
 function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
@@ -28,13 +33,7 @@ function BoxGeometry( width, height, depth, widthSegments, heightSegments, depth
 BoxGeometry.prototype = Object.create( Geometry.prototype );
 BoxGeometry.prototype.constructor = BoxGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Vector3 } from '../math/Vector3';
+// BoxBufferGeometry
 
 function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
@@ -52,6 +51,10 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 	};
 
 	var scope = this;
+
+	width = width || 1;
+	height = height || 1;
+	depth = depth || 1;
 
 	// segments
 
@@ -73,12 +76,12 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 
 	// build each side of the box geometry
 
-	buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments, 0 ); // px
-	buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments, 1 ); // nx
-	buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments,  2 ); // py
-	buildPlane( 'x', 'z', 'y',   1, - 1, width, depth,  - height, widthSegments, depthSegments,  3 ); // ny
-	buildPlane( 'x', 'y', 'z',   1, - 1, width, height,   depth,  widthSegments, heightSegments, 4 ); // pz
-	buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
+	buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height, width, depthSegments, heightSegments, 0 ); // px
+	buildPlane( 'z', 'y', 'x', 1, - 1, depth, height, - width, depthSegments, heightSegments, 1 ); // nx
+	buildPlane( 'x', 'z', 'y', 1, 1, width, depth, height, widthSegments, depthSegments, 2 ); // py
+	buildPlane( 'x', 'z', 'y', 1, - 1, width, depth, - height, widthSegments, depthSegments, 3 ); // ny
+	buildPlane( 'x', 'y', 'z', 1, - 1, width, height, depth, widthSegments, heightSegments, 4 ); // pz
+	buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth, widthSegments, heightSegments, 5 ); // nz
 
 	// build geometry
 
@@ -195,5 +198,6 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 
 BoxBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 BoxBufferGeometry.prototype.constructor = BoxBufferGeometry;
+
 
 export { BoxGeometry, BoxBufferGeometry };

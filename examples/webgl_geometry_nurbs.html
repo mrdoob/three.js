@@ -23,14 +23,13 @@
 	<body>
 		<canvas id="debug" style="position:absolute; left:100px"></canvas>
 
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - NURBS curve and surface example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - NURBS curve and surface example</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/curves/NURBSCurve.js"></script>
 		<script src="js/curves/NURBSSurface.js"></script>
 		<script src="js/curves/NURBSUtils.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-
 
 		<script>
 
@@ -68,6 +67,8 @@
 				camera.position.set( 0, 150, 750 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
+				
 				scene.add( new THREE.AmbientLight( 0x808080 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
@@ -155,9 +156,11 @@
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
-				getSurfacePoint = function(u, v) {
+				function getSurfacePoint(u, v) {
+
 					return nurbsSurface.getPoint(u, v);
-				};
+
+				}
 
 				var geometry = new THREE.ParametricBufferGeometry( getSurfacePoint, 20, 20 );
 				var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
@@ -169,7 +172,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

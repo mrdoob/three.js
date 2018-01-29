@@ -123,7 +123,7 @@ function loadObject( data ) {
 function loadGeometry( data, url ) {
 
     var loader = new THREE.JSONLoader();
-    var texturePath = THREE.Loader.prototype.extractUrlBase( url );
+    var texturePath = THREE.LoaderUtils.extractUrlBase( url );
     data = loader.parse( data, texturePath );
 
     if ( data.materials === undefined ) {
@@ -133,27 +133,28 @@ function loadGeometry( data, url ) {
 
     }
 
-    var material = new THREE.MultiMaterial( data.materials );
     var mesh;
 
     if ( data.geometry.animations !== undefined && data.geometry.animations.length > 0 ) {
 
         console.log( 'loading animation' );
         data.materials[ 0 ].skinning = true;
-        mesh = new THREE.SkinnedMesh( data.geometry, material, false );
+        mesh = new THREE.SkinnedMesh( data.geometry, data.materials, false );
 
         mixer = new THREE.AnimationMixer( mesh );
         animation =  mixer.clipAction( mesh.geometry.animations[ 0 ] );
 
     } else {
 
-        mesh = new THREE.Mesh( data.geometry, material );
+        mesh = new THREE.Mesh( data.geometry, data.materials );
 
         if ( data.geometry.morphTargets.length > 0 ) {
 
             console.log( 'loading morph targets' );
             data.materials[ 0 ].morphTargets = true;
-            animation = new THREE.MorphAnimation( mesh );
+
+            mixer = new THREE.AnimationMixer( mesh );
+            animation = mixer.clipAction( mesh.geometry.animations[ 0 ] );
             hasMorph = true;
 
         }

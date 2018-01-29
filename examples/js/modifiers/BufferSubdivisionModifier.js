@@ -173,21 +173,19 @@ function convertGeometryToIndexedBuffer( geometry ) {
 	var indexArray = new TypedArrayHelper( geometry.faces.length, 0, THREE.Face3, Uint32Array, 3, [ 'a', 'b', 'c' ] );
 	var uvArray = new TypedArrayHelper( geometry.faceVertexUvs[0].length * 3 * 3, 0, THREE.Vector2, Float32Array, 2, [ 'x', 'y' ] );
 
-	var i, il;
-
-	for ( i = 0, il = geometry.vertices.length; i < il; i++ ) {
+	for ( var i = 0, il = geometry.vertices.length; i < il; i++ ) {
 
 		vertArray.push_element( geometry.vertices[ i ] );
 
 	}
 
-	for ( i = 0, il = geometry.faces.length; i < il; i++ ) {
+	for ( var i = 0, il = geometry.faces.length; i < il; i++ ) {
 
 		indexArray.push_element( geometry.faces[ i ] );
 
 	}
 
-	for ( i = 0, il = geometry.faceVertexUvs[ 0 ].length; i < il; i++ ) {
+	for ( var i = 0, il = geometry.faceVertexUvs[ 0 ].length; i < il; i++ ) {
 
 		uvArray.push_element( geometry.faceVertexUvs[ 0 ][ i ][ 0 ] );
 		uvArray.push_element( geometry.faceVertexUvs[ 0 ][ i ][ 1 ] );
@@ -222,11 +220,10 @@ function compute_vertex_normals( geometry ) {
 	newNormals.length = oldVertices.length;
 	oldFaces.from_existing( geometry.index.array );
 	var a, b, c;
-	var i, j, jl;
 	var my_weight;
 	var full_weights = [ 0.0, 0.0, 0.0 ];
 
-	for ( i = 0, il = oldFaces.length; i < il; i++ ) {
+	for ( var i = 0, il = oldFaces.length; i < il; i++ ) {
 
 		oldFaces.index_to_register( i, 0 );
 
@@ -245,10 +242,9 @@ function compute_vertex_normals( geometry ) {
 
 	}
 
-	var tmpx, tmpy, tmpz;
 	var t_len;
 
-	for ( i = 0, il = oldFaces.length; i < il; i++ ) {
+	for ( var i = 0, il = oldFaces.length; i < il; i++ ) {
 
 		oldFaces.index_to_register( i, 0 );
 		oldVertices.index_to_register( oldFaces.register[ 0 ].a, 0 );
@@ -270,10 +266,6 @@ function compute_vertex_normals( geometry ) {
 		full_weights[ 0 ] = ( my_weight / newNormalFaces.buffer[ oldFaces.register[ 0 ].a ] );
 		full_weights[ 1 ] = ( my_weight / newNormalFaces.buffer[ oldFaces.register[ 0 ].b ] );
 		full_weights[ 2 ] = ( my_weight / newNormalFaces.buffer[ oldFaces.register[ 0 ].c ] );
-
-		tmpx = newNormals.register[ 3 ].x * full_weights[ 0 ];
-		tmpy = newNormals.register[ 3 ].y * full_weights[ 0 ];
-		tmpz = newNormals.register[ 3 ].z * full_weights[ 0 ];
 
 		newNormals.buffer[ ( oldFaces.register[ 0 ].a * 3 ) + 0 ] += newNormals.register[ 3 ].x * full_weights[ 0 ];
 		newNormals.buffer[ ( oldFaces.register[ 0 ].a * 3 ) + 1 ] += newNormals.register[ 3 ].y * full_weights[ 0 ];
@@ -718,40 +710,29 @@ var edge_type = function ( a, b ) {
 
 
 			/*
+				0________C_______2
+				 \      /\      /
+				  \ F2 /  \ F4 /
+				   \  / F1 \  /
+				    \/______\/
+				   A \      / B
+				      \ F3 /
+				       \  /
+				        \/
+				         1
 
+				Draw orders:
+				F1: ABC x3,x4,x5
+				F2: 0AC x0,x3,x5
+				F3: 1BA x1,x4,x3
+				F4: 2CB x2,x5,x4
 
-				0___________________C___________________2
-				 \                 /\                  /
-				  \              /   \      F4        /
-				   \     F2    /       \             /
-				    \        /            \         /
-				     \     /                \      /
-				      \  /         F1         \   /
-				       \/_______________________\/
-				      A \                       / B
-				         \       F3            /
-				          \                   /
-				           \                 /
-				            \               /
-				             \             /
-				              \           /
-				               \         /
-				                   \/
-				                    1
-
-
-			Draw orders:
-			F1: ABC x3,x4,x5
-			F2: 0AC x0,x3,x5
-			F3: 1BA x1,x4,x3
-			F4: 2CB x2,x5,x4
-
-			0: x0
-			1: x1
-			2: x2
-			A: x3
-			B: x4
-			C: x5
+				0: x0
+				1: x1
+				2: x2
+				A: x3
+				B: x4
+				C: x5
 			*/
 
 			if ( doUvs === true ) {
@@ -760,9 +741,9 @@ var edge_type = function ( a, b ) {
 				oldUvs.index_to_register( ( i * 3 ) + 1, 1 );
 				oldUvs.index_to_register( ( i * 3 ) + 2, 2 );
 
-				x0 = oldUvs.register[ 0 ]; //uv[0];
-				x1 = oldUvs.register[ 1 ]; //uv[1];
-				x2 = oldUvs.register[ 2 ]; //uv[2];
+				var x0 = oldUvs.register[ 0 ]; // uv[0];
+				var x1 = oldUvs.register[ 1 ]; // uv[1];
+				var x2 = oldUvs.register[ 2 ]; // uv[2];
 
 				x3.set( midpoint( x0.x, x1.x ), midpoint( x0.y, x1.y ) );
 				x4.set( midpoint( x1.x, x2.x ), midpoint( x1.y, x2.y ) );

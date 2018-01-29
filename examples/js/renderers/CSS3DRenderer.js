@@ -261,7 +261,7 @@ THREE.CSS3DRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		var fov = 0.5 / Math.tan( THREE.Math.degToRad( camera.getEffectiveFOV() * 0.5 ) ) * _height;
+		var fov = camera.projectionMatrix.elements[ 5 ] * _heightHalf;
 
 		if ( cache.camera.fov !== fov ) {
 
@@ -276,8 +276,6 @@ THREE.CSS3DRenderer = function () {
 		scene.updateMatrixWorld();
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
-
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		var cameraCSSMatrix = 'translateZ(' + fov + 'px)' +
 			getCameraCSSMatrix( camera.matrixWorldInverse );

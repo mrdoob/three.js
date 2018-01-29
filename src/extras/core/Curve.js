@@ -1,35 +1,35 @@
-import { _Math } from '../../math/Math';
-import { Vector3 } from '../../math/Vector3';
-import { Matrix4 } from '../../math/Matrix4';
+import { _Math } from '../../math/Math.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { Matrix4 } from '../../math/Matrix4.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Extensible curve object
  *
- * Some common of Curve methods
- * .getPoint(t), getTangent(t)
- * .getPointAt(u), getTangentAt(u)
+ * Some common of curve methods:
+ * .getPoint( t, optionalTarget ), .getTangent( t )
+ * .getPointAt( u, optionalTarget ), .getTangentAt( u )
  * .getPoints(), .getSpacedPoints()
  * .getLength()
  * .updateArcLengths()
  *
- * This following classes subclasses THREE.Curve:
+ * This following curves inherit from THREE.Curve:
  *
- * -- 2d classes --
+ * -- 2D curves --
+ * THREE.ArcCurve
+ * THREE.CubicBezierCurve
+ * THREE.EllipseCurve
  * THREE.LineCurve
  * THREE.QuadraticBezierCurve
- * THREE.CubicBezierCurve
  * THREE.SplineCurve
- * THREE.ArcCurve
- * THREE.EllipseCurve
  *
- * -- 3d classes --
+ * -- 3D curves --
+ * THREE.CatmullRomCurve3
+ * THREE.CubicBezierCurve3
  * THREE.LineCurve3
  * THREE.QuadraticBezierCurve3
- * THREE.CubicBezierCurve3
- * THREE.CatmullRomCurve3
  *
- * A series of curves can be represented as a THREE.CurvePath
+ * A series of curves can be represented as a THREE.CurvePath.
  *
  **/
 
@@ -37,16 +37,22 @@ import { Matrix4 } from '../../math/Matrix4';
  *	Abstract Curve base class
  **************************************************************/
 
-function Curve() {}
+function Curve() {
+
+	this.type = 'Curve';
+
+	this.arcLengthDivisions = 200;
+
+}
 
 Object.assign( Curve.prototype, {
 
 	// Virtual base class method to overwrite and implement in subclasses
 	//	- t [0 .. 1]
 
-	getPoint: function () {
+	getPoint: function ( /* t, optionalTarget */ ) {
 
-		console.warn( "THREE.Curve: Warning, getPoint() not implemented!" );
+		console.warn( 'THREE.Curve: .getPoint() not implemented.' );
 		return null;
 
 	},
@@ -54,10 +60,10 @@ Object.assign( Curve.prototype, {
 	// Get point at relative position in curve according to arc length
 	// - u [0 .. 1]
 
-	getPointAt: function ( u ) {
+	getPointAt: function ( u, optionalTarget ) {
 
 		var t = this.getUtoTmapping( u );
-		return this.getPoint( t );
+		return this.getPoint( t, optionalTarget );
 
 	},
 
@@ -110,13 +116,12 @@ Object.assign( Curve.prototype, {
 
 	getLengths: function ( divisions ) {
 
-		if ( divisions === undefined ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+		if ( divisions === undefined ) divisions = this.arcLengthDivisions;
 
-		if ( this.cacheArcLengths
-			&& ( this.cacheArcLengths.length === divisions + 1 )
-			&& ! this.needsUpdate ) {
+		if ( this.cacheArcLengths &&
+			( this.cacheArcLengths.length === divisions + 1 ) &&
+			! this.needsUpdate ) {
 
-			//console.log( "cached", this.cacheArcLengths );
 			return this.cacheArcLengths;
 
 		}
@@ -140,7 +145,7 @@ Object.assign( Curve.prototype, {
 
 		this.cacheArcLengths = cache;
 
-		return cache; // { sums: cache, sum:sum }; Sum is in the last element.
+		return cache; // { sums: cache, sum: sum }; Sum is in the last element.
 
 	},
 
@@ -170,8 +175,6 @@ Object.assign( Curve.prototype, {
 			targetArcLength = u * arcLengths[ il - 1 ];
 
 		}
-
-		//var time = Date.now();
 
 		// binary search for the index with largest value smaller than target u distance
 
@@ -204,12 +207,9 @@ Object.assign( Curve.prototype, {
 
 		i = high;
 
-		//console.log('b' , i, low, high, Date.now()- time);
-
 		if ( arcLengths[ i ] === targetArcLength ) {
 
-			var t = i / ( il - 1 );
-			return t;
+			return i / ( il - 1 );
 
 		}
 
@@ -377,6 +377,45 @@ Object.assign( Curve.prototype, {
 			normals: normals,
 			binormals: binormals
 		};
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
+	copy: function ( source ) {
+
+		this.arcLengthDivisions = source.arcLengthDivisions;
+
+		return this;
+
+	},
+
+	toJSON: function () {
+
+		var data = {
+			metadata: {
+				version: 4.5,
+				type: 'Curve',
+				generator: 'Curve.toJSON'
+			}
+		};
+
+		data.arcLengthDivisions = this.arcLengthDivisions;
+		data.type = this.type;
+
+		return data;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		this.arcLengthDivisions = json.arcLengthDivisions;
+
+		return this;
 
 	}
 

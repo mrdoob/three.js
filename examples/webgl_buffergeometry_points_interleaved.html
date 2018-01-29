@@ -30,7 +30,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry - particles</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - particles</div>
 
 		<script src="../build/three.js"></script>
 
@@ -58,6 +58,7 @@
 				camera.position.z = 2750;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
 
 				//
@@ -66,26 +67,34 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				var interleaved_buffer_float32 = new Float32Array( particles * 4 );
-				var interleaved_buffer_uint8 = new Uint8Array( interleaved_buffer_float32.buffer );
+				// create a generic buffer of binary data (a single particle has 16 bytes of data)
+
+				var arrayBuffer = new ArrayBuffer( particles * 16 );
+
+				// the following typed arrays share the same buffer
+
+				var interleavedFloat32Buffer = new Float32Array( arrayBuffer );
+				var interleavedUint8Buffer = new Uint8Array( arrayBuffer );
+
+				//
 
 				var color = new THREE.Color();
 
 				var n = 1000, n2 = n / 2; // particles spread in the cube
 
-				for ( var i = 0; i < interleaved_buffer_float32.length; i += 4 ) {
+				for ( var i = 0; i < interleavedFloat32Buffer.length; i += 4 ) {
 
-					// positions
+					// position (first 12 bytes)
 
 					var x = Math.random() * n - n2;
 					var y = Math.random() * n - n2;
 					var z = Math.random() * n - n2;
 
-					interleaved_buffer_float32[ i + 0 ] = x;
-					interleaved_buffer_float32[ i + 1 ] = y;
-					interleaved_buffer_float32[ i + 2 ] = z;
+					interleavedFloat32Buffer[ i + 0 ] = x;
+					interleavedFloat32Buffer[ i + 1 ] = y;
+					interleavedFloat32Buffer[ i + 2 ] = z;
 
-					// colors
+					// color (last 4 bytes)
 
 					var vx = ( x / n ) + 0.5;
 					var vy = ( y / n ) + 0.5;
@@ -95,19 +104,18 @@
 
 					var j = ( i + 3 ) * 4;
 
-					interleaved_buffer_uint8[ j + 0 ] = color.r * 255;
-					interleaved_buffer_uint8[ j + 1 ] = color.g * 255;
-					interleaved_buffer_uint8[ j + 2 ] = color.b * 255;
-					interleaved_buffer_uint8[ j + 3 ] = 0;
+					interleavedUint8Buffer[ j + 0 ] = color.r * 255;
+					interleavedUint8Buffer[ j + 1 ] = color.g * 255;
+					interleavedUint8Buffer[ j + 2 ] = color.b * 255;
+					interleavedUint8Buffer[ j + 3 ] = 0; // not needed
 
 				}
 
-				var ibp = new THREE.InterleavedBuffer( interleaved_buffer_float32, 4 );
-				var ibc = new THREE.InterleavedBuffer( interleaved_buffer_uint8, 16 );
+				var interleavedBuffer32 = new THREE.InterleavedBuffer( interleavedFloat32Buffer, 4 );
+				var interleavedBuffer8 = new THREE.InterleavedBuffer( interleavedUint8Buffer, 16 );
 
-				geometry.addAttribute( 'position', new THREE.InterleavedBufferAttribute( ibp, 3, 0, false ) );
-				geometry.addAttribute( 'color', new THREE.InterleavedBufferAttribute( ibc, 3, 12, true ) );
-				// geometry.computeBoundingSphere();
+				geometry.addAttribute( 'position', new THREE.InterleavedBufferAttribute( interleavedBuffer32, 3, 0, false ) );
+				geometry.addAttribute( 'color', new THREE.InterleavedBufferAttribute( interleavedBuffer8, 3, 12, true ) );
 
 				//
 
@@ -119,7 +127,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

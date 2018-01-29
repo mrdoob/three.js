@@ -4,10 +4,10 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-import { Matrix4 } from '../math/Matrix4';
-import { Quaternion } from '../math/Quaternion';
-import { Object3D } from '../core/Object3D';
-import { Vector3 } from '../math/Vector3';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Quaternion } from '../math/Quaternion.js';
+import { Object3D } from '../core/Object3D.js';
+import { Vector3 } from '../math/Vector3.js';
 
 function Camera() {
 
@@ -26,9 +26,9 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isCamera: true,
 
-	copy: function ( source ) {
+	copy: function ( source, recursive ) {
 
-		Object3D.prototype.copy.call( this, source );
+		Object3D.prototype.copy.call( this, source, recursive );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
 		this.projectionMatrix.copy( source.projectionMatrix );
@@ -52,6 +52,14 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		};
 
 	}(),
+
+	updateMatrixWorld: function ( force ) {
+
+		Object3D.prototype.updateMatrixWorld.call( this, force );
+
+		this.matrixWorldInverse.getInverse( this.matrixWorld );
+
+	},
 
 	clone: function () {
 

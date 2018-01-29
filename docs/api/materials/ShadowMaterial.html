@@ -13,11 +13,11 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-		This material can recieve shadows, but otherwise is completely transparent.
+		This material can receive shadows, but otherwise is completely transparent.
 		</div>
 
 		<h3>Example</h3>
-		[example:webgl_geometry_spline_editor gemoetry / spline / editor]
+		[example:webgl_geometry_spline_editor geometry / spline / editor]
 
 		<code>
 var planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
@@ -34,7 +34,11 @@ scene.add( plane );
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( )</h3>
+		<h3>[name]( [page:Object parameters] )</h3>
+		<div>
+			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
+			Any property of the material (including any property inherited from [page:Material] and [page:ShaderMaterial]) can be passed in here.<br /><br />
+		</div>
 
 
 		<h2>Properties</h2>

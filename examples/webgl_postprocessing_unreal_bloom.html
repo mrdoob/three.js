@@ -56,7 +56,7 @@
 		<script src="js/postprocessing/UnrealBloomPass.js"></script>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Bloom pass by <a href="http://eduperiment.com" target="_blank">Prashant Sharma</a> and <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Bloom pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 			This Bloom Pass is inspired by the bloom pass of the Unreal Engine. It creates a mip map chain of bloom textures and blur them <br>
 			with different radii. Because of the weigted combination of mips, and since larger blurs are done on higher mips this bloom <br>
 			is better in quality and performance.<br>
@@ -70,7 +70,7 @@
 			var params = {
 				projection: 'normal',
 				background: false,
-				exposure: 1.0,
+				exposure: 0.9,
 				bloomStrength: 1.5,
 				bloomThreshold: 0.85,
 				bloomRadius: 0.4
@@ -94,16 +94,15 @@
 				camera.position.set( 0.0, 35, 35 * 3.5 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( new THREE.Color( 0x111111 ) );
 				renderer.toneMapping = THREE.LinearToneMapping;
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					color: 0xffffff,
-					metalness: 1.0,
-					shading: THREE.SmoothShading
+					metalness: 1.0
 				} );
 
 				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
@@ -115,7 +114,8 @@
 				objects.push( torusMesh1 );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "./textures/roughness_map.jpg", function( map ) {
+				textureLoader.load( './textures/roughness_map.jpg', function ( map ) {
+
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -123,17 +123,20 @@
 					standardMaterial.roughnessMap = map;
 					standardMaterial.bumpMap = map;
 					standardMaterial.needsUpdate = true;
+
 				} );
 
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
+
 				};
 
-				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
+				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
@@ -145,11 +148,12 @@
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
 				} );
+
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.1 ) );
 
-				var spotLight = new THREE.SpotLight( 0xffffff );
+				var spotLight = new THREE.SpotLight( 0xffffff, 1 );
 				spotLight.position.set( 50, 100, 50 );
 				spotLight.angle = Math.PI / 7;
 				spotLight.penumbra = 0.8;
@@ -161,23 +165,20 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderScene = new THREE.RenderPass(scene, camera);
+				renderScene = new THREE.RenderPass( scene, camera );
 
-		    // renderScene.clear = true;
-		    effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
-		    effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
-				var copyShader = new THREE.ShaderPass(THREE.CopyShader);
-				copyShader.renderToScreen = true;
+				bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 ); //1.0, 9, 0.5, 512);
+				bloomPass.renderToScreen = true;
 
-		    bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);//1.0, 9, 0.5, 512);
-				composer = new THREE.EffectComposer(renderer);
-		    composer.setSize(window.innerWidth, window.innerHeight);
-		    composer.addPass(renderScene);
-				composer.addPass(effectFXAA);
-		    composer.addPass(bloomPass);
-				composer.addPass(copyShader);
-				//renderer.toneMapping = THREE.ReinhardToneMapping;
+				composer = new THREE.EffectComposer( renderer );
+				composer.setSize( window.innerWidth, window.innerHeight );
+				composer.addPass( renderScene );
+				composer.addPass( effectFXAA );
+				composer.addPass( bloomPass );
+
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
@@ -185,23 +186,33 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
+				controls.minDistance = 50;
+				controls.maxDistance = 200;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				var gui = new dat.GUI();
 
 				gui.add( params, 'exposure', 0.1, 2 );
-				gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function(value) {
-		        bloomPass.threshold = Number(value);
-		    });
-				gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function(value) {
-		        bloomPass.strength = Number(value);
-		    });
-				gui.add( params, 'bloomRadius', 0.0, 1.0 ).onChange( function(value) {
-		        bloomPass.radius = Number(value);
-		    });
+
+				gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
+
+					bloomPass.threshold = Number( value );
+
+				} );
+
+				gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function ( value ) {
+
+					bloomPass.strength = Number( value );
+
+				} );
+
+				gui.add( params, 'bloomRadius', 0.0, 1.0 ).onChange( function ( value ) {
+
+					bloomPass.radius = Number( value );
+
+				} );
+
 				gui.open();
 
 			}
@@ -216,7 +227,8 @@
 
 				renderer.setSize( width, height );
 				composer.setSize( width, height );
-				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+
 			}
 
 			//
@@ -236,14 +248,16 @@
 				if ( standardMaterial !== undefined ) {
 
 					standardMaterial.roughness = 1.0;
-					standardMaterial.bumpScale = - 0.05;
+					standardMaterial.bumpScale = 0.25;
 
 					var newEnvMap = standardMaterial.envMap;
-					newEnvMap = hdrCubeRenderTarget ? hdrCubeRenderTarget.texture : null;
 
-					if( newEnvMap !== standardMaterial.envMap ) {
+					if ( hdrCubeRenderTarget ) newEnvMap = hdrCubeRenderTarget.texture;
+
+					if ( newEnvMap !== standardMaterial.envMap ) {
 
 						standardMaterial.envMap = newEnvMap;
+						standardMaterial.envMapIntensity = 1;
 						standardMaterial.needsUpdate = true;
 
 					}
@@ -263,8 +277,8 @@
 
 				}
 
-				// renderer.render( scene, camera );
 				composer.render();
+
 			}
 
 		</script>

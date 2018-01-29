@@ -1,19 +1,19 @@
-import { Vector3 } from '../math/Vector3';
-import { Color } from '../math/Color';
-import { Object3D } from '../core/Object3D';
-import { Mesh } from '../objects/Mesh';
-import { VertexColors } from '../constants';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry';
-import { BufferAttribute } from '../core/BufferAttribute';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-function HemisphereLightHelper( light, size ) {
+import { Vector3 } from '../math/Vector3.js';
+import { Color } from '../math/Color.js';
+import { Object3D } from '../core/Object3D.js';
+import { Mesh } from '../objects/Mesh.js';
+import { VertexColors } from '../constants.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
+
+function HemisphereLightHelper( light, size, color ) {
 
 	Object3D.call( this );
 
@@ -23,17 +23,20 @@ function HemisphereLightHelper( light, size ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
+	this.color = color;
+
 	var geometry = new OctahedronBufferGeometry( size );
 	geometry.rotateY( Math.PI * 0.5 );
 
-	var material = new MeshBasicMaterial( { vertexColors: VertexColors, wireframe: true } );
+	this.material = new MeshBasicMaterial( { wireframe: true, fog: false } );
+	if ( this.color === undefined ) this.material.vertexColors = VertexColors;
 
 	var position = geometry.getAttribute( 'position' );
 	var colors = new Float32Array( position.count * 3 );
 
 	geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
 
-	this.add( new Mesh( geometry, material ) );
+	this.add( new Mesh( geometry, this.material ) );
 
 	this.update();
 
@@ -60,22 +63,30 @@ HemisphereLightHelper.prototype.update = function () {
 
 		var mesh = this.children[ 0 ];
 
-		var colors = mesh.geometry.getAttribute( 'color' );
+		if ( this.color !== undefined ) {
 
-		color1.copy( this.light.color ).multiplyScalar( this.light.intensity );
-		color2.copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
+			this.material.color.set( this.color );
 
-		for ( var i = 0, l = colors.count; i < l; i ++ ) {
+		} else {
 
-			var color = ( i < ( l / 2 ) ) ? color1 : color2;
+			var colors = mesh.geometry.getAttribute( 'color' );
 
-			colors.setXYZ( i, color.r, color.g, color.b );
+			color1.copy( this.light.color );
+			color2.copy( this.light.groundColor );
+
+			for ( var i = 0, l = colors.count; i < l; i ++ ) {
+
+				var color = ( i < ( l / 2 ) ) ? color1 : color2;
+
+				colors.setXYZ( i, color.r, color.g, color.b );
+
+			}
+
+			colors.needsUpdate = true;
 
 		}
 
 		mesh.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
-
-		colors.needsUpdate = true;
 
 	};
 

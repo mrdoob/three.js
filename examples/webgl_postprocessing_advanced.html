@@ -34,8 +34,8 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl postprocessing example -
-			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a> head
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing example -
+			<a href="http://g3d.cs.williams.edu/g3d/data10/index.html#mesh19" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
 		<div id="container"></div>
@@ -111,8 +111,12 @@
 				directionalLight.position.set( 0, -0.1, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
-				loader = new THREE.JSONLoader();
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createMesh( geometry, sceneModel, 100 ) } );
+				var loader = new THREE.JSONLoader();
+				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) {
+
+					createMesh( geometry, sceneModel, 100 );
+
+				} );
 
 				//
 
@@ -138,7 +142,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.autoClear = false;

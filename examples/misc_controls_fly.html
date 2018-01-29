@@ -53,7 +53,7 @@
 
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - earth [fly controls]<br/><br/>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - earth [fly controls]<br/><br/>
 		<b>WASD</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll, <b>up|down</b> pitch, <b>left|right</b> yaw<br/>
 		</div>
 
@@ -76,6 +76,8 @@
 			var camera, controls, scene, renderer;
 			var geometry, meshPlanet, meshClouds, meshMoon;
 			var dirLight, pointLight, ambientLight;
+
+			var composer;
 
 			var textureLoader = new THREE.TextureLoader();
 
@@ -201,9 +203,7 @@
 					stars.rotation.x = Math.random() * 6;
 					stars.rotation.y = Math.random() * 6;
 					stars.rotation.z = Math.random() * 6;
-
-					s = i * 10;
-					stars.scale.set( s, s, s );
+					stars.scale.setScalar( i * 10 );
 
 					stars.matrixAutoUpdate = false;
 					stars.updateMatrix();
@@ -215,7 +215,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.sortObjects = false;
 
 				container.appendChild( renderer.domElement );
 

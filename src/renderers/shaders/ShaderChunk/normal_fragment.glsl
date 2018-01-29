@@ -8,7 +8,13 @@
 
 #else
 
-	vec3 normal = normalize( vNormal ) * flipNormal;
+	vec3 normal = normalize( vNormal );
+
+	#ifdef DOUBLE_SIDED
+
+		normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+
+	#endif
 
 #endif
 

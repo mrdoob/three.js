@@ -1,6 +1,6 @@
-import { AnimationClip } from '../animation/AnimationClip';
-import { FileLoader } from './FileLoader';
-import { DefaultLoadingManager } from './LoadingManager';
+import { AnimationClip } from '../animation/AnimationClip.js';
+import { FileLoader } from './FileLoader.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 /**
  * @author bhouston / http://clara.io/

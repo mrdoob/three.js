@@ -18,6 +18,17 @@
 		<h2>Example</h2>
 
 		<code>
+		var texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+
+		// immediately use the texture for material creation
+		var material = new THREE.MeshBasicMaterial( { map: texture } );
+		</code>
+
+		[example:webgl_geometry_cube geometry / cube]
+
+		<h2>Example with Callbacks</h2>
+
+		<code>
 		// instantiate a loader
 		var loader = new THREE.TextureLoader();
 
@@ -25,25 +36,26 @@
 		loader.load(
 			// resource URL
 			'textures/land_ocean_ice_cloud_2048.jpg',
-			// Function when resource is loaded
+
+			// onLoad callback
 			function ( texture ) {
-				// do something with the texture
+				// in this example we create the material when the texture is loaded
 				var material = new THREE.MeshBasicMaterial( {
 					map: texture
 				 } );
 			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
-				console.log( 'An error happened' );
+
+			// onProgress callback currently not supported
+			undefined,
+
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened.' );
 			}
 		);
 		</code>
 
-		[example:canvas_geometry_earth]
+		Please note three.js r84 dropped support for TextureLoader progress events. For a TextureLoader that supports progress events, see [link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 this thread].
 
 		<h2>Constructor</h2>
 
@@ -81,15 +93,16 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:Texture load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Texture texture].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
 		[page:Function onError] — Will be called when load errors.<br /><br />
 
-		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
+		Begin loading from the given URL and pass the fully loaded [page:Texture texture] to onLoad. The method also returns a new texture object which can directly be used for material creation.
+		If you do it this way, the texture may pop up in your scene once the respective loading process is finished.
 		</div>
 
 		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>

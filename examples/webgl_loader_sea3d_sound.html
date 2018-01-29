@@ -67,7 +67,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Studio</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Studio</a>
 		</div>
 
 		<div id="blocker">
@@ -146,7 +146,7 @@
 
 				lightOutside = loader.getLight("Light1");
 
-				soundOutside = loader.getSound3D("Point001");
+				var soundOutside = loader.getSound3D("Point001");
 				soundOutsideAnalyser = new THREE.AudioAnalyser( soundOutside, 32 );
 
 				// sound asset 2 + area
@@ -303,6 +303,8 @@
 				raycaster = new THREE.Raycaster();
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
+
 				velocity = new THREE.Vector3();
 
 				container = document.createElement( 'div' );
@@ -319,7 +321,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x333333, 1 );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

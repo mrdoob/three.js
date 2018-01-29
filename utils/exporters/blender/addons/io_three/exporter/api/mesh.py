@@ -14,12 +14,10 @@ from .. import constants, utilities, logger, exceptions
 
 # flips vectors 
 
-#TODO: add these strings into constants.py
-
-XZ_Y = "XZ_Y"
-X_ZY = "X_ZY"
-XYZ = "XYZ"
-_XY_Z = "_XY_Z"
+XZ_Y = constants.XZ_Y
+X_ZY = constants.X_ZY
+XYZ = constants.XYZ
+_XY_Z = constants._XY_Z
 
 
 def flip_axes (a, dir=XYZ):
@@ -134,6 +132,26 @@ def bones(mesh, options):
 
 
 @_mesh
+def buffer_color(mesh, options):
+    """
+
+    :param mesh:
+    :rtype: []
+
+    """
+    colors_ = []
+
+    try:
+        vertex_colors_ = mesh.vertex_colors[0]  # only supports one set
+    except IndexError:
+        return []  # no colors found
+    for color_data in vertex_colors_.data:
+        colors_.extend(tuple(color_data.color))
+
+    return colors_
+
+
+@_mesh
 def buffer_normal(mesh, options):
     """
 
@@ -182,6 +200,24 @@ def buffer_normal(mesh, options):
                 normals_.extend(vector)
 
     return normals_
+
+
+@_mesh
+def buffer_face_material(mesh, options):
+    """
+
+    :param mesh:
+    :rtype: []
+
+    """
+    face_material = []
+    logger.info("Retrieving face materials.")
+
+    for face in mesh.tessfaces:
+        #logger.info("face:%d,%d",face.index,face.material_index)
+        face_material.append(face.material_index)
+
+    return face_material
 
 
 @_mesh
@@ -672,9 +708,15 @@ def materials(mesh, options):
         return []
 
     indices = []
-    for face in mesh.tessfaces:
-        if face.material_index not in indices:
-            indices.append(face.material_index)
+    
+    #manthrax: Disable the following logic that attempts to find only the used materials on this mesh
+    #for face in mesh.tessfaces:
+    #    if face.material_index not in indices:
+    #        indices.append(face.material_index)
+    # instead, export all materials on this object... they are probably there for a good reason, even if they aren't referenced by the geometry at present...
+    for index in range(len( mesh.materials )):
+        indices.append(index)
+
 
     material_sets = [(mesh.materials[index], index) for index in indices]
     materials_ = []
@@ -1178,10 +1220,12 @@ def _armature(mesh):
     """
     obj = object_.objects_using_mesh(mesh)[0]
     armature = obj.find_armature()
-    if armature:
-        logger.info("Found armature %s for %s", armature.name, obj.name)
-    else:
-        logger.info("Found no armature for %s", obj.name)
+    
+    #manthrax: Remove logging spam. This was spamming on every vertex...
+    #if armature:
+    #    logger.info("Found armature %s for %s", armature.name, obj.name)
+    #else:
+    #    logger.info("Found no armature for %s", obj.name)
     return armature
 
 
@@ -1276,6 +1320,7 @@ def _pose_bones(armature):
         bones_.append({
             constants.PARENT: bone_index,
             constants.NAME: armature_bone.name,
+
             constants.POS: (pos.x, pos.z, -pos.y),
             constants.ROTQ: (rot.x, rot.z, -rot.y, rot.w),
             constants.SCL: (scl.x, scl.z, scl.y)
@@ -1306,9 +1351,12 @@ def _rest_bones(armature):
 
         if bone.parent is None:
             bone_pos = bone.head_local
+            logger.debug("Root bone:%s",str(bone_pos))
             bone_index = -1
         else:
             bone_pos = bone.head_local - bone.parent.head_local
+            logger.debug("Child bone:%s",str(bone_pos))
+
             bone_index = 0
             index = 0
             for parent in armature.data.bones:
@@ -1317,9 +1365,12 @@ def _rest_bones(armature):
                 index += 1
 
         bone_world_pos = armature.matrix_world * bone_pos
+
         x_axis = bone_world_pos.x
         y_axis = bone_world_pos.z
         z_axis = -bone_world_pos.y
+
+        logger.debug("Bone pos:%s",str(bone_world_pos))
 
         logger.debug("Adding bone %s at: %s, %s",
                      bone.name, bone_index, bone_index_rel)

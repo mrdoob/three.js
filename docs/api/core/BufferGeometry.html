@@ -73,7 +73,7 @@
 
 		<h3>[page:BufferAttribute normal] (itemSize: 3)</h3>
 		<div>
-		Stores the x, y, and z components of the face or vertex normal vector of each vertex in this geometry.
+		Stores the x, y, and z components of the vertex normal vector of each vertex in this geometry.
 		Set by [page:.fromGeometry]().
 		</div>
 
@@ -110,7 +110,7 @@
 		<h3>[property:Hashmap attributes]</h3>
 		<div>
 		This hashmap has as id the name of the attribute to be set and as value the [page:BufferAttribute buffer] to set it to.
-		Rather than accessing this property directly, use addAttribute and getAttribute to access attributes of this geometry.
+		Rather than accessing this property directly, use [page:.addAttribute] and [page:.getAttribute] to access attributes of this geometry.
 		</div>
 
 		<h3>[property:Box3 boundingBox]</h3>
@@ -138,12 +138,12 @@
 		<h3>[property:Array groups]</h3>
 		<div>
 			Split the geometry into groups, each of which will be rendered in a separate WebGL draw call.
-			This allows a [page:MultiMaterial] to be used with the bufferGeometry.<br /><br />
+			This allows an array of materials to be used with the bufferGeometry.<br /><br />
 
 			Each group is an object of the form:
 			<code>{ start: Integer, count: Integer, materialIndex: Integer }</code>
 			where start specifies the index of the first vertex in this draw call, count specifies
-			how many vertices are included, and materialIndex specifies the [page:MultiMaterial] index to use.<br /><br />
+			how many vertices are included, and materialIndex specifies the material array index to use.<br /><br />
 
 			Use [page:.addGroup] to add groups, rather than modifying this array directly.
 		</div>
@@ -175,9 +175,6 @@
 
 			You should not change this, as it used internally for optimisation.
 		</div>
-
-		<h3>[property:Integer MaxIndex]</h3>
-		<div>Maximum number of vertices allowed, set to *65535*.</div>
 
 		<h3>[property:Object morphAttributes]</h3>
 		<div>
@@ -318,6 +315,9 @@
 
 		<h3>[method:BufferGeometry setFromObject] ( [page:Object3D object] )</h3>
 		<div>Sets the attributes for this BufferGeometry from an [page:Object3D].</div>
+
+		<h3>[method:BufferGeometry setFromPoints] ( [page:Array points] )</h3>
+		<div>Sets the attributes for this BufferGeometry from an array of points.</div>
 
 		<h3>[method:Object toJSON]()</h3>
 		<div>Returns a JSON object representation of the BufferGeometry.</div>

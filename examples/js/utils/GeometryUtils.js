@@ -206,8 +206,7 @@ THREE.GeometryUtils = {
 			vB.set( vertices[ i * 9 + 3 ], vertices[ i * 9 + 4 ], vertices[ i * 9 + 5 ] );
 			vC.set( vertices[ i * 9 + 6 ], vertices[ i * 9 + 7 ], vertices[ i * 9 + 8 ] );
 
-			area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
-			totalArea += area;
+			totalArea += THREE.GeometryUtils.triangleArea( vA, vB, vC );
 
 			cumulativeAreas.push( totalArea );
 

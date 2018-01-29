@@ -131,16 +131,17 @@ https://github.com/creationix/msgpack-js-browser
 				container.appendChild( renderer.domElement );
 
 				var aspect = container.offsetWidth / container.offsetHeight;
+
 				camera = new THREE.PerspectiveCamera( 60, aspect, 0.01, 50 );
-				orbit = new THREE.OrbitControls( camera, container );
+				camera.position.set( 5, 5, 5 );
+				camera.updateProjectionMatrix();
+
+				var orbit = new THREE.OrbitControls( camera, container );
 				orbit.addEventListener( 'change', render );
-				camera.position.z = 5;
-				camera.position.x = 5;
-				camera.position.y = 5;
+
 				var target = new THREE.Vector3( 0, 1, 0 );
 				camera.lookAt( target );
 				orbit.target = target;
-				camera.updateProjectionMatrix();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

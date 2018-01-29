@@ -39,7 +39,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based material - <a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl physically based material - <a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank" rel="noopener">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -89,7 +89,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x202020 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -126,7 +125,7 @@
 					material.metalness = 1;
 
 					material.map = loader.load( path + 'Cerberus_A.jpg' );
-					// roughness is in G channel, metalness is in B channel 
+					// roughness is in G channel, metalness is in B channel
 					material.metalnessMap = material.roughnessMap = loader.load( path + 'Cerberus_RM.jpg' );
 					material.normalMap = loader.load( path + 'Cerberus_N.jpg' );
 
@@ -168,7 +167,7 @@
 					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
 
-					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+					var hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
 					material.envMap = hdrCubeRenderTarget.texture;
 					material.needsUpdate = true;
@@ -192,12 +191,9 @@
 
 			function onWindowResize( event ) {
 
-				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight;
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 			}

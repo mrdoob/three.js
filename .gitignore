@@ -5,4 +5,5 @@ node_modules
 .idea/
 .vscode/
 npm-debug.log
-
+.jshintrc
+.vs/

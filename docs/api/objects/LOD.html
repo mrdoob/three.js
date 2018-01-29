@@ -31,7 +31,7 @@ for( var i = 0; i < 3; i++ ) {
 
 	var geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
 
-	new THREE.Mesh( geometry, material );
+	var mesh = new THREE.Mesh( geometry, material );
 
 	lod.addLevel( mesh, i * 75 );
 

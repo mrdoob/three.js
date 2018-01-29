@@ -1,0 +1,22 @@
+# Gear VR Controller MTL
+newmtl Base
+Kd 0.0911392 0.0911392 0.0911392
+Ns 256
+d 1
+illum 2
+Ka 0 0 0
+Ks 0.04 0.04 0.04
+newmtl Touchpad
+Kd 0.172688 0.172688 0.172688
+Ns 256
+d 1
+illum 2
+Ka 0 0 0
+Ks 0.04 0.04 0.04
+newmtl Trigger
+Kd 0.172688 0.172688 0.172688
+Ns 256
+d 1
+illum 2
+Ka 0 0 0
+Ks 0.04 0.04 0.04

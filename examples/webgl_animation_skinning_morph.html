@@ -39,7 +39,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - clip system
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - clip system
 		- knight by <a href="http://vimeo.com/36113323">apendua</a>
 			<div id="meminfo"></div>
 		</div>
@@ -88,7 +88,7 @@
 				camera.position.z = 2200;
 
 				scene = new THREE.Scene();
-
+				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
 
 				scene.add( camera );
@@ -131,7 +131,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
@@ -655,8 +654,9 @@
 				camera.lookAt( scene.position );
 
 				if( mixer ) {
+
 					mixer.update( delta );
-					helper.update();
+
 				}
 
 				renderer.render( scene, camera );

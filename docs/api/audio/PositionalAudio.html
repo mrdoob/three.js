@@ -21,30 +21,34 @@
 
 		<h2>Example</h2>
 
-		<div>[example:misc_sound misc / sound ]</div>
+		<div>
+			[example:webaudio_sandbox webaudio / sandbox ]</br>
+			[example:webaudio_timing webaudio / timing ]
+		</div>
+
 		<code>
-		//Create an AudioListener and add it to the camera
+		// create an AudioListener and add it to the camera
 		var listener = new THREE.AudioListener();
 		camera.add( listener );
 
-		//Create the PositionalAudio object (passing in the listener)
+		// create the PositionalAudio object (passing in the listener)
 		var sound = new THREE.PositionalAudio( listener );
 
-		//Load a sound and set it as the PositionalAudio object's buffer
+		// load a sound and set it as the PositionalAudio object's buffer
 		var audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/song.ogg', function( buffer ) {
-			sound1.setBuffer( buffer );
-			sound1.setRefDistance( 20 );
-			sound1.play();
+			sound.setBuffer( buffer );
+			sound.setRefDistance( 20 );
+			sound.play();
 		});
 
-		//Create an object for the sound to play from
+		// create an object for the sound to play from
 		var sphere = new THREE.SphereGeometry( 20, 32, 16 );
 		var material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
 		var mesh = new THREE.Mesh( sphere, material );
 		scene.add( mesh );
 
-		//Finally add the sound to the mesh
+		// finally add the sound to the mesh
 		mesh.add( sound );
 		</code>
 
@@ -110,12 +114,12 @@
 
 		<h3>[method:PannerNode getMaxDistance]()</h3>
 		<div>
-		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.distanceModel].
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
 		</div>
 
 		<h3>[method:PannerNode setMaxDistance]( [page:Number value] )</h3>
 		<div>
-		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.distanceModel].
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
 		</div>
 
 		<h2>Source</h2>

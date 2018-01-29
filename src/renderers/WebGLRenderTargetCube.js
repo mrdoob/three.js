@@ -1,4 +1,4 @@
-import { WebGLRenderTarget } from './WebGLRenderTarget';
+import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 
 /**
  * @author alteredq / http://alteredqualia.com

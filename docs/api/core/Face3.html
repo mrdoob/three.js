@@ -21,7 +21,7 @@
 
 		<div>[example:misc_ubiquity_test ubiquity / test ]</div>
 		<div>[example:svg_sandbox svg / sandbox ]</div>
-		<div>[example:webgl_exporter_obj WebGL / exporter / obj ]</div>
+		<div>[example:misc_exporter_obj exporter / obj ]</div>
 		<div>[example:webgl_shaders_vector WebGL / shaders / vector ]</div>
 
 
@@ -67,7 +67,7 @@ scene.add( new THREE.Mesh( geometry, material ) );
 		If a single vector is passed in, this sets [page:.color], otherwise if an array of three
 		vectors is passed in this sets [page:.vertexColors]<br /><br />
 
-		materialIndex — (optional) which index of a [page:MultiMaterial] to associate
+		materialIndex — (optional) which index of an array of materials to associate
 		with the face.
 		</div>
 
@@ -115,7 +115,7 @@ scene.add( new THREE.Mesh( geometry, material ) );
 
 		<h3>[property:Integer materialIndex]</h3>
 		<div>
-		Material index (points to [page:MultiMaterial MultiMaterial.materials]). Default is *0*.
+		Material index (points to an index in the associated array of materials). Default is *0*.
 		</div>
 
 		<h2>Methods</h2>
