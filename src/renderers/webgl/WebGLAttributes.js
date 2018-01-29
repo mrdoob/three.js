@@ -11,10 +11,20 @@ function WebGLAttributes( gl ) {
 		var array = attribute.array;
 		var usage = attribute.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
-		var buffer = gl.createBuffer();
+		var buffer;
 
-		gl.bindBuffer( bufferType, buffer );
-		gl.bufferData( bufferType, array, usage );
+		if (attribute.onCreateCallback) {
+
+			buffer = attribute.onCreateCallback();
+
+		} else {
+
+			buffer = gl.createBuffer();
+
+			gl.bindBuffer( bufferType, buffer );
+			gl.bufferData( bufferType, array, usage );
+
+		}
 
 		attribute.onUploadCallback();
 
