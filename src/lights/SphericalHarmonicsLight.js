@@ -4,12 +4,12 @@ import { Light } from './Light.js';
  * @author Andreas Atteneder
  */
 
-function SphericalHarmonicsLight( sh, intensity = 1.0 ) {
+function SphericalHarmonicsLight( sh, intensity ) {
 
 	Light.call( this );
 
 	this.sh = sh;
-	this.intensity = intensity;
+	this.intensity =  (intensity === undefined || typeof intensity !== 'number') ? 1.0 : intensity;
 
 	this.type = 'SphericalHarmonicsLight';
 
