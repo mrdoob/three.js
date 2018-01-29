@@ -178,6 +178,8 @@ uniform vec3 sphericalHarmonics[9];
 
 #if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
+	#if ! defined( USE_SPHERICAL_HARMONICS )
+
 	vec3 getLightProbeIndirectIrradiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
 
 		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
@@ -216,6 +218,8 @@ uniform vec3 sphericalHarmonics[9];
 		return PI * envMapColor.rgb * envMapIntensity;
 
 	}
+
+	#endif
 
 	// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
 	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {

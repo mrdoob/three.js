@@ -98,12 +98,6 @@ IncidentLight directLight;
 
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
-	#ifdef USE_SPHERICAL_HARMONICS
-
-		irradiance += shGetIrradianceAt( sphericalHarmonics, geometry );
-
-	#endif
-
 	#ifdef USE_LIGHTMAP
 
 		vec3 lightMapIrradiance = texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
@@ -128,7 +122,11 @@ IncidentLight directLight;
 
 	#endif
 
-	#if defined( USE_ENVMAP ) && defined( PHYSICAL ) && defined( ENVMAP_TYPE_CUBE_UV )
+	#ifdef USE_SPHERICAL_HARMONICS
+
+		irradiance += shGetIrradianceAt( sphericalHarmonics, geometry );
+
+	#elif defined( USE_ENVMAP ) && defined( PHYSICAL ) && defined( ENVMAP_TYPE_CUBE_UV )
 
 		// TODO, replace 8 with the real maxMIPLevel
 		irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 );
