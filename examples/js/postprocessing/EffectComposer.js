@@ -141,6 +141,8 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		this.writeBuffer = this.renderTarget1;
 		this.readBuffer = this.renderTarget2;
+		
+		this.passes = [];
 
 	},
 
