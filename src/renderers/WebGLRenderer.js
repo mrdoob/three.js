@@ -1500,34 +1500,11 @@ function WebGLRenderer( parameters ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
 
-				// 1. if any extra uniforms are provided, merge them with the others
-				
-				var computedUniforms = undefined !== material.shaderUniforms ?
-					UniformsUtils.merge([ UniformsUtils.clone( shader.uniforms ), material.shaderUniforms ]) :
-					UniformsUtils.clone( shader.uniforms );
-
-				// if the uniform is provided with { value , type } inject this GLSL automatically
-				// (no need to write `uniform float uFoo;` and include manually in a snippet)
-				// which may be a poor idea because they would get injected into both vert and frag
-				var shaderUniformsGLSL = ''; //collect the GLSL in here
-
-				for ( var uniformName in material.shaderUniforms ) {
-
-					var type = material.shaderUniforms[ uniformName ].type; 
-
-					if ( type ) {
-
-						shaderUniformsGLSL += 'uniform ' + type + ' ' + uniformName + ';\n'
-
-					}
-
-				}
-
 				materialProperties.shader = {
 					name: material.type,
-					uniforms: computedUniforms,
-					vertexShader: shaderUniformsGLSL + shader.vertexShader, 
-					fragmentShader: shaderUniformsGLSL + shader.fragmentShader
+					uniforms: UniformsUtils.clone( shader.uniforms ),
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader
 				};
 
 			} else {
@@ -2096,7 +2073,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	//3. same pattern as refreshUniformsFOO
+	//2. same pattern as refreshUniformsFoobar
 	function refreshUniformsCustom( uniforms, material ) {
 
 		for ( var uniform in material.shaderUniforms ) {
