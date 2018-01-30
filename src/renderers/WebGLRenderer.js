@@ -1500,9 +1500,13 @@ function WebGLRenderer( parameters ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
 
+				var computedUniforms = undefined !== material.shaderUniforms ?
+					UniformsUtils.merge([ UniformsUtils.clone( shader.uniforms ), material.shaderUniforms ]) :
+					UniformsUtils.clone( shader.uniforms );
+					
 				materialProperties.shader = {
 					name: material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
+					uniforms: computedUniforms,
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
 				};
