@@ -714,7 +714,7 @@ THREE.GLTFLoader = ( function () {
 			// Here's based on refreshUniformsCommon() and refreshUniformsStandard() in WebGLRenderer.
 			refreshUniforms: function ( renderer, scene, camera, geometry, material, group ) {
 
-				if ( !material.isGLTFSpecularGlossinessMaterial) {
+				if ( material.isGLTFSpecularGlossinessMaterial !== true) {
 
 					return;
 
