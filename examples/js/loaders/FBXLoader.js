@@ -1476,7 +1476,7 @@
 
 		} );
 
-		bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections, sceneGraph );
+		bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections );
 
 		addAnimations( FBXTree, connections, sceneGraph );
 

@@ -108,7 +108,7 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var maxAnisotropy = renderer.getMaxAnisotropy();
+				var maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				var texture1 = textureLoader.load( "textures/crate.gif" );
 				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );

@@ -792,6 +792,7 @@ THREE.GLTFExporter.prototype = {
 			// Morph targets
 			if ( mesh.morphTargetInfluences !== undefined && mesh.morphTargetInfluences.length > 0 ) {
 
+				var weights = [];
 				gltfMesh.primitives[ 0 ].targets = [];
 
 				for ( var i = 0; i < mesh.morphTargetInfluences.length; ++ i ) {
@@ -808,7 +809,11 @@ THREE.GLTFExporter.prototype = {
 
 					gltfMesh.primitives[ 0 ].targets.push( target );
 
+					weights.push( mesh.morphTargetInfluences[ i ] );
+
 				}
+
+				gltfMesh.weights = weights;
 
 			}
 
