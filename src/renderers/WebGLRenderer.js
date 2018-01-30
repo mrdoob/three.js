@@ -1068,15 +1068,12 @@ function WebGLRenderer( parameters ) {
 
 	function loop( time ) {
 
-		if ( isAnimating === false || onAnimationFrame === null )
-		{
+		if ( onAnimationFrame === null ) isAnimating = false;
 
-			isAnimating = false;
+		if ( isAnimating === false )
 			return;
 
-		}
-
-		if ( onAnimationFrame !== null ) onAnimationFrame( time );
+		onAnimationFrame( time );
 
 		var device = vr.getDevice();
 
