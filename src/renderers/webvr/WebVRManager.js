@@ -112,11 +112,7 @@ function WebVRManager( renderer ) {
 
 			poseObject.position.fromArray( pose.position );
 
-		} else {
-
-			poseObject.position.set( 0, scope.userHeight, 0 );
-
-		}
+		} 
 
 		if ( pose.orientation !== null ) {
 
