@@ -1189,9 +1189,14 @@ THREE.ColladaLoader.prototype = {
 					case 'diffuse':
 					case 'specular':
 					case 'shininess':
-					case 'transparent':
 					case 'transparency':
 						data[ child.nodeName ] = parseEffectParameter( child );
+						break;
+					case 'transparent':
+						data[ child.nodeName ] = {
+							opaque: child.getAttribute( 'opaque' ),
+							data: parseEffectParameters( child )
+						};
 						break;
 
 				}
@@ -1471,11 +1476,24 @@ THREE.ColladaLoader.prototype = {
 							material.emissive.fromArray( parameter.color );
 						break;
 					case 'transparent':
-						// if ( parameter.texture ) material.alphaMap = getTexture( parameter.texture );
+						// if ( parameter.data.texture ) material.alphaMap = getTexture( parameter.data.texture );
 						material.transparent = true;
 						break;
 					case 'transparency':
-						if ( parameter.float !== undefined ) material.opacity = parameter.float;
+						if ( parameter.float !== undefined ) {
+
+							material.opacity = parameter.float;
+
+							if ( parameters[ 'transparent' ] !== undefined ) {
+
+								var opaque = parameters[ 'transparent' ].opaque;
+
+								if ( opaque === 'RGB_ZERO' ) material.opacity = 1 - material.opacity;
+
+							}
+
+						}
+
 						material.transparent = true;
 						break;
 
