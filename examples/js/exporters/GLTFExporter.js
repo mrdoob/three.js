@@ -1070,7 +1070,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.name ) {
 
-				gltfNode.name = String(object.name);
+				gltfNode.name = String( object.name );
 
 			}
 
