@@ -29,7 +29,7 @@
 
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive - particles</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - particles</div>
 
 		<script src="../build/three.js"></script>
 
@@ -95,7 +95,7 @@
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				var container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
 
@@ -119,7 +119,7 @@
 					vertex = vertices[ i ];
 					vertex.toArray( positions, i * 3 );
 
-					color.setHSL( 0.01 + 0.1 * ( i / l ), 1.0, 0.5 )
+					color.setHSL( 0.01 + 0.1 * ( i / l ), 1.0, 0.5 );
 					color.toArray( colors, i * 3 );
 
 					sizes[ i ] = PARTICLE_SIZE * 0.5;
@@ -142,7 +142,7 @@
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-					alphaTest: 0.9,
+					alphaTest: 0.9
 
 				} );
 

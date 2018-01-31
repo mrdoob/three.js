@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<h2>Which Import Format/Exporter is best supported?</h2>
+		<div>
+TODO
+		</div>
+
+		<h2>Why are there meta viewport tags in examples?</h2>
+		<div>
+			<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">meta</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>viewport<span class="pl-pds">"</span></span> <span class="pl-e">content</span>=<span class="pl-s"><span class="pl-pds">"</span>width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0<span class="pl-pds">"</span></span>&gt;</pre></div>
+
+				<p>These tags control viewport size and scale for mobile browsers (where page content may be rendered at different size than visible viewport).</p>
+
+				<p><a href="http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html">http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html</a></p>
+
+				<p><a href="https://developer.mozilla.org/en/Mobile/Viewport_meta_tag">https://developer.mozilla.org/en/Mobile/Viewport_meta_tag</a></p>
+		</div>
+
+		<h2>How can scene scale be preserved on resize?</h2>
+		<div>
+			We want all objects, regardless of their distance from the camera, to appear the same size, even as the window is resized.
+
+			The key equation to solving this is this formula for the visible height at a given distance:
+
+			<code>
+visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;
+			</code>
+			If we increase the window height by a certain percentage, then what we want is the visible height at all distances
+			to increase by the same percentage.
+
+			This can not be done by changing the camera position. Instead you have to change the camera field-of-view.
+			[link:http://jsfiddle.net/Q4Jpu/ Example].
+		</div>
+
+		<h2>Why is part of my object invisible?</h2>
+		<div>
+			This could be because of face culling. Faces have an orientation that  decides which side is which. And the culling removes the backside in normal circumstances. To see if this is your problem, change the material side to THREE.DoubleSide.
+			<code>material.side = THREE.DoubleSide</code>
+		</div>
+	</body>
+</html>

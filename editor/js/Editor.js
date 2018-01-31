@@ -4,9 +4,9 @@
 
 var Editor = function () {
 
-	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.1, 10000 );
+	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
 	this.DEFAULT_CAMERA.name = 'Camera';
-	this.DEFAULT_CAMERA.position.set( 20, 10, 20 );
+	this.DEFAULT_CAMERA.position.set( 0, 5, 10 );
 	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
 
 	var Signal = signals.Signal;
@@ -40,6 +40,8 @@ var Editor = function () {
 		spaceChanged: new Signal(),
 		rendererChanged: new Signal(),
 
+		sceneBackgroundChanged: new Signal(),
+		sceneFogChanged: new Signal(),
 		sceneGraphChanged: new Signal(),
 
 		cameraChanged: new Signal(),
@@ -62,15 +64,11 @@ var Editor = function () {
 		scriptChanged: new Signal(),
 		scriptRemoved: new Signal(),
 
-		fogTypeChanged: new Signal(),
-		fogColorChanged: new Signal(),
-		fogParametersChanged: new Signal(),
 		windowResize: new Signal(),
 
 		showGridChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
-		historyChanged: new Signal(),
-		refreshScriptEditor: new Signal()
+		historyChanged: new Signal()
 
 	};
 
@@ -83,6 +81,7 @@ var Editor = function () {
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
+	this.scene.background = new THREE.Color( 0xaaaaaa );
 
 	this.sceneHelpers = new THREE.Scene();
 
@@ -113,6 +112,10 @@ Editor.prototype = {
 
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
+
+		if ( scene.background !== null ) this.scene.background = scene.background.clone();
+		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
+
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
 		// avoid render per object
@@ -337,6 +340,34 @@ Editor.prototype = {
 
 	},
 
+	getObjectMaterial: function ( object, slot ) {
+
+		var material = object.material;
+
+		if ( Array.isArray( material ) ) {
+
+			material = material[ slot ];
+
+		}
+
+		return material;
+
+	},
+
+	setObjectMaterial: function ( object, slot, newMaterial ) {
+
+		if ( Array.isArray( object.material ) ) {
+
+			object.material[ slot ] = newMaterial;
+
+		} else {
+
+			object.material = newMaterial;
+
+		}
+
+	},
+
 	//
 
 	select: function ( object ) {
@@ -411,6 +442,8 @@ Editor.prototype = {
 		this.storage.clear();
 
 		this.camera.copy( this.DEFAULT_CAMERA );
+		this.scene.background.setHex( 0xaaaaaa );
+		this.scene.fog = null;
 
 		var objects = this.scene.children;
 
@@ -484,8 +517,9 @@ Editor.prototype = {
 
 			metadata: {},
 			project: {
+				gammaInput: this.config.getKey( 'project/renderer/gammaInput' ),
+				gammaOutput: this.config.getKey( 'project/renderer/gammaOutput' ),
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
-				editable: this.config.getKey( 'project/editable' ),
 				vr: this.config.getKey( 'project/vr' )
 			},
 			camera: this.camera.toJSON(),

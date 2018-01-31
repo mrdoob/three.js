@@ -2,13 +2,18 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CanvasTexture = function ( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+import { Texture } from './Texture.js';
 
-	THREE.Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+	Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.needsUpdate = true;
 
-};
+}
 
-THREE.CanvasTexture.prototype = Object.create( THREE.Texture.prototype );
-THREE.CanvasTexture.prototype.constructor = THREE.CanvasTexture;
+CanvasTexture.prototype = Object.create( Texture.prototype );
+CanvasTexture.prototype.constructor = CanvasTexture;
+
+
+export { CanvasTexture };

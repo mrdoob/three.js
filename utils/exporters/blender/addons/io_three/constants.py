@@ -13,6 +13,15 @@ BLENDING_TYPES = type('Blending', (), {
     'CUSTOM': 'CustomBlending'
 })
 
+BLENDING_CONSTANTS = type('BlendingConstant', (), {
+    'NoBlending':0,
+    'NormalBlending':1,
+    'AdditiveBlending':2,
+    'SubtractiveBlending':3,
+    'MultiplyBlending':4,
+    'CustomBlending':5
+})
+
 NEAREST_FILTERS = type('NearestFilters', (), {
     'NEAREST': 'NearestFilter',
     'MIP_MAP_NEAREST': 'NearestMipMapNearestFilter',
@@ -41,6 +50,7 @@ NUMERIC = {
     'SphericalReflectionMapping': 305,
 
     'RepeatWrapping': 1000,
+    'repeat': 1000,
     'ClampToEdgeWrapping': 1001,
     'MirroredRepeatWrapping': 1002,
 
@@ -72,6 +82,9 @@ DRAW_CALLS = 'drawcalls'
 DC_START = 'start'
 DC_COUNT = 'count'
 DC_INDEX = 'index'
+
+GROUPS = 'groups'
+
 SCALE = 'scale'
 COMPRESSION = 'compression'
 MAPS = 'maps'
@@ -159,12 +172,12 @@ EXPORT_OPTIONS = {
     EMBED_TEXTURES: False,
     TEXTURE_FOLDER: '',
     LOGGING: DEBUG,
-    ENABLE_PRECISION: True,
+    ENABLE_PRECISION: False,
     PRECISION: DEFAULT_PRECISION,
     CUSTOM_PROPERTIES: False,
     EMBED_GEOMETRY: True,
     EMBED_ANIMATION: True,
-    GEOMETRY_TYPE: GEOMETRY,
+    GEOMETRY_TYPE: BUFFER_GEOMETRY,
     INFLUENCES_PER_VERTEX: 2,
     INDENT: True
 }
@@ -204,7 +217,10 @@ AMBIENT_LIGHT = 'AmbientLight'
 DIRECTIONAL_LIGHT = 'DirectionalLight'
 POINT_LIGHT = 'PointLight'
 SPOT_LIGHT = 'SpotLight'
+# TODO (abelnation): confirm this is correct area light string for exporter
+RECT_AREA_LIGHT = 'RectAreaLight'
 HEMISPHERE_LIGHT = 'HemisphereLight'
+# TODO: RectAreaLight support
 MESH = 'Mesh'
 EMPTY = 'Empty'
 SPRITE = 'Sprite'
@@ -230,14 +246,10 @@ NORMAL = 'normal'
 ITEM_SIZE = 'itemSize'
 ARRAY = 'array'
 
-FLOAT_32 = 'Float32Array'
-
 VISIBLE = 'visible'
 CAST_SHADOW = 'castShadow'
 RECEIVE_SHADOW = 'receiveShadow'
 QUAD = 'quad'
-
-USER_DATA = 'userData'
 
 MASK = {
     QUAD: 0,
@@ -254,9 +266,9 @@ URL = 'url'
 WRAP = 'wrap'
 REPEAT = 'repeat'
 WRAPPING = type('Wrapping', (), {
-    'REPEAT': 'RepeatWrapping',
-    'CLAMP': 'ClampToEdgeWrapping',
-    'MIRROR': 'MirroredRepeatWrapping'
+    'REPEAT': 'repeat',
+    'CLAMP': 'clamp',
+    'MIRROR': 'mirror'
 })
 ANISOTROPY = 'anisotropy'
 MAG_FILTER = 'magFilter'
@@ -341,7 +353,6 @@ THREE_PHONG = 'MeshPhongMaterial'
 
 INTENSITY = 'intensity'
 DISTANCE = 'distance'
-ASPECT = 'aspect'
 ANGLE = 'angle'
 DECAY = 'decayExponent'
 
@@ -376,3 +387,10 @@ DBG_COLORS = (0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee,
 DOUBLE_SIDED = 'doubleSided'
 
 EXPORT_SETTINGS_KEY = 'threeExportSettings'
+
+# flips vectors
+
+XZ_Y = "XZ_Y"
+X_ZY = "X_ZY"
+XYZ = "XYZ"
+_XY_Z = "_XY_Z"

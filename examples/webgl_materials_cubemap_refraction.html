@@ -31,12 +31,12 @@
 			<p><a href="http://threejs.org">Three.js</a> cube map refraction demo
 
 			<p>Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository</a>
-			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>
+			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
 		</div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="js/loaders/PLYLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -71,7 +71,7 @@
 				document.body.appendChild(container);
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.z = 2000;
+				camera.position.z =  - 4000;
 
 				//
 
@@ -99,7 +99,7 @@
 
 				// light representation
 
-				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
+				var sphere = new THREE.SphereBufferGeometry( 100, 16, 8 );
 
 				var mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				mesh.scale.set( 0.05, 0.05, 0.05 );
@@ -107,9 +107,9 @@
 
 				// material samples
 
-				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity:0.9 } );
-				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
-				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
+				var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity: 0.9 } );
+				var cubeMaterial2 = new THREE.MeshPhongMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
+				var cubeMaterial1 = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
 
 				//
 
@@ -121,8 +121,8 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				loader = new THREE.BinaryLoader();
-				loader.load( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
+				loader = new THREE.PLYLoader();
+				loader.load( 'models/ply/binary/Lucy100k.ply', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 
@@ -134,8 +134,8 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-				windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -146,22 +146,21 @@
 
 			function createScene( geometry, m1, m2, m3 ) {
 
-				var s = 1.5, z = - 1000;
+				geometry.computeVertexNormals();
+
+				var s = 1.5;
 
 				var mesh = new THREE.Mesh( geometry, m1 );
-				mesh.position.z = z;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( geometry, m2 );
-				mesh.position.x = - 900;
-				mesh.position.z = z;
+				mesh.position.x = - 1500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( geometry, m3 );
-				mesh.position.x = 900;
-				mesh.position.z = z;
+				mesh.position.x = 1500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 

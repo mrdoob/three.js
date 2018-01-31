@@ -28,8 +28,8 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
-			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
+			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -39,8 +39,6 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/Half.js"></script>
-		<script src="js/Encodings.js"></script>
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -66,6 +64,7 @@
 				bumpScale: 0.3,
 				background: false,
 				exposure: 1.0,
+				side: 'front'
 			};
 			var camera, scene, renderer, controls, objects = [];
 			var hdrCubeMap;
@@ -85,21 +84,20 @@
 				camera.position.set( 0.0, 40, 40 * 3.5 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				renderer.toneMapping = THREE.LinearToneMapping;
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					bumpScale: - 0.05,
-					color: 0xffffff,
-					metalness: 1.0,
-					roughness: 1.0,
-					shading: THREE.SmoothShading
+					color: 0xff4444,
+					metalness: 0.5,
+					roughness: 1.0
 				} );
 
-				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
+				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
 				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				torusMesh1.position.x = 0.0;
 				torusMesh1.castShadow = true;
@@ -112,8 +110,7 @@
 					roughnessMap: null,
 					color: 0xffffff,
 					metalness: 0.0,
-					roughness: 0.0,
-					shading: THREE.SmoothShading
+					roughness: 0.0
 				} );
 
 				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
@@ -129,6 +126,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 9, 2 );
+					standardMaterial.map = map;
 					standardMaterial.roughnessMap = map;
 					standardMaterial.bumpMap = map;
 					standardMaterial.needsUpdate = true;
@@ -193,7 +191,7 @@
 				var spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.position.set( 50, 100, 50 );
 				spotLight.angle = Math.PI / 7;
-				spotLight.penumbra = 0.8
+				spotLight.penumbra = 0.8;
 				spotLight.castShadow = true;
 				scene.add( spotLight );
 
@@ -210,8 +208,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -221,6 +217,7 @@
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'bumpScale', - 1, 1 );
 				gui.add( params, 'exposure', 0.1, 2 );
+				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
 				gui.open();
 
 			}
@@ -277,6 +274,23 @@
 
 					}
 
+
+					var side = standardMaterial.side;
+
+					switch ( params.side ) {
+
+						case 'front': side = THREE.FrontSide; break;
+						case 'back': side = THREE.BackSide; break;
+						case 'double': side = THREE.DoubleSide; break;
+
+					}
+
+					if( standardMaterial.side !== side ) {
+
+						standardMaterial.side = side;
+						standardMaterial.needsUpdate = true;
+
+					}
 				}
 
 				renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );

@@ -1,10 +1,3 @@
-The models in this directory are bandle models of MMD software.
-So I copied MMD readme.txt here.
-
-by takahiro
-
-----------------------------------------------------------------------
-
 MikuMikuDance.exe　Ver.5.24
 
 3Dポリゴンモデルの振り付け用ツール

@@ -1,6 +1,6 @@
 #ifdef USE_MAP
 
-	uniform vec4 offsetRepeat;
+	uniform mat3 uvTransform;
 	uniform sampler2D map;
 
 #endif

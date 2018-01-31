@@ -30,7 +30,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based shading testbed
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl physically based shading testbed
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -49,6 +49,8 @@
 			var camera, scene, renderer;
 
 			var mesh, geometry;
+
+			var controls;
 
 			var cubeCamera;
 
@@ -211,7 +213,7 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, shading: THREE.FlatShading } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, flatShading: true } );
 
 					var mesh = new THREE.Mesh( geometry, morphMaterial );
 
@@ -390,7 +392,7 @@
 				// render cube map
 
 				mesh.visible = false;
-				cubeCamera.updateCubeMap( renderer, scene );
+				cubeCamera.update( renderer, scene );
 				mesh.visible = true;
 
 				// render scene

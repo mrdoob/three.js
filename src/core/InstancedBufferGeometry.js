@@ -1,59 +1,40 @@
+import { BufferGeometry } from './BufferGeometry.js';
+
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedBufferGeometry = function () {
+function InstancedBufferGeometry() {
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'InstancedBufferGeometry';
 	this.maxInstancedCount = undefined;
 
-};
+}
 
-THREE.InstancedBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.InstancedBufferGeometry.prototype.constructor = THREE.InstancedBufferGeometry;
+InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry.prototype ), {
 
-THREE.InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
+	constructor: InstancedBufferGeometry,
 
-	this.groups.push( {
+	isInstancedBufferGeometry: true,
 
-		start: start,
-		count: count,
-		instances: instances
+	copy: function ( source ) {
 
-	} );
+		BufferGeometry.prototype.copy.call( this, source );
 
-};
+		this.maxInstancedCount = source.maxInstancedCount;
 
-THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
+		return this;
 
-	var index = source.index;
+	},
 
-	if ( index !== null ) {
+	clone: function () {
 
-		this.setIndex( index.clone() );
+		return new this.constructor().copy( this );
 
 	}
 
-	var attributes = source.attributes;
+} );
 
-	for ( var name in attributes ) {
-
-		var attribute = attributes[ name ];
-		this.addAttribute( name, attribute.clone() );
-
-	}
-
-	var groups = source.groups;
-
-	for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-		var group = groups[ i ];
-		this.addGroup( group.start, group.count, group.instances );
-
-	}
-
-	return this;
-
-};
+export { InstancedBufferGeometry };

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - compressed textures</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #050505;
+				color: #fff;
+				overflow: hidden;
+			}
+
+			a { color: #e00 }
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed textures -
+			leaf texture by <a href="http://opengameart.org/node/10505">lauris71</a>, explosion texture by <a href="http://opengameart.org/node/7728">bart</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer;
+			var meshes = [];
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 1000;
+
+				scene = new THREE.Scene();
+
+				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
+
+				/*
+				This is how compressed textures are supposed to be used:
+
+				DXT1 - RGB - opaque textures
+				DXT3 - RGBA - transparent textures with sharp alpha transitions
+				DXT5 - RGBA - transparent textures with full alpha range
+				*/
+
+				var loader = new THREE.DDSLoader();
+
+				var map1 = loader.load( 'textures/compressed/disturb_dxt1_nomip.dds' );
+				map1.minFilter = map1.magFilter = THREE.LinearFilter;
+				map1.anisotropy = 4;
+
+				var map2 = loader.load( 'textures/compressed/disturb_dxt1_mip.dds' );
+				map2.anisotropy = 4;
+
+				var map3 = loader.load( 'textures/compressed/hepatica_dxt3_mip.dds' );
+				map3.anisotropy = 4;
+
+				var map4 = loader.load( 'textures/compressed/explosion_dxt5_mip.dds' );
+				map4.anisotropy = 4;
+
+				var map5 = loader.load( 'textures/compressed/disturb_argb_nomip.dds' );
+				map5.minFilter = map5.magFilter = THREE.LinearFilter;
+				map5.anisotropy = 4;
+
+				var map6 = loader.load( 'textures/compressed/disturb_argb_mip.dds' );
+				map6.anisotropy = 4;
+
+				var cubemap1 = loader.load( 'textures/compressed/Mountains.dds', function ( texture ) {
+					texture.magFilter = THREE.LinearFilter;
+					texture.minFilter = THREE.LinearFilter;
+					texture.mapping = THREE.CubeReflectionMapping;
+					material1.needsUpdate = true;
+				} );
+
+				var cubemap2 = loader.load( 'textures/compressed/Mountains_argb_mip.dds', function ( texture ) {
+					texture.magFilter = THREE.LinearFilter;
+					texture.minFilter = THREE.LinearFilter;
+					texture.mapping = THREE.CubeReflectionMapping;
+					material5.needsUpdate = true;
+				} );
+
+				var cubemap3 = loader.load( 'textures/compressed/Mountains_argb_nomip.dds', function ( texture ) {
+					texture.magFilter = THREE.LinearFilter;
+					texture.minFilter = THREE.LinearFilter;
+					texture.mapping = THREE.CubeReflectionMapping;
+					material6.needsUpdate = true;
+				} );
+
+				var material1 = new THREE.MeshBasicMaterial( { map: map1, envMap: cubemap1 } );
+				var material2 = new THREE.MeshBasicMaterial( { map: map2 } );
+				var material3 = new THREE.MeshBasicMaterial( { map: map3, alphaTest: 0.5, side: THREE.DoubleSide } );
+				var material4 = new THREE.MeshBasicMaterial( { map: map4, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+				var material5 = new THREE.MeshBasicMaterial( { envMap: cubemap2 } );
+				var material6 = new THREE.MeshBasicMaterial( { envMap: cubemap3 } );
+				var material7 = new THREE.MeshBasicMaterial( { map: map5 } );
+				var material8 = new THREE.MeshBasicMaterial( { map: map6 } );
+
+
+				var mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 50, 32, 16 ), material1 );
+				mesh.position.x = -600;
+				mesh.position.y = -200;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material2 );
+				mesh.position.x = -200;
+				mesh.position.y = -200;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material3 );
+				mesh.position.x = -200;
+				mesh.position.y = 200;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material4 );
+				mesh.position.x = -600;
+				mesh.position.y = 200;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material5 );
+				mesh.position.x = 200;
+				mesh.position.y = 200;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material6 );
+				mesh.position.x = 200;
+				mesh.position.y = -200;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material7 );
+				mesh.position.x = 600;
+				mesh.position.y = -200;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material8 );
+				mesh.position.x = 600;
+				mesh.position.y = 200;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var time = Date.now() * 0.001;
+
+				for ( var i = 0; i < meshes.length; i ++ ) {
+
+					var mesh = meshes[ i ];
+					mesh.rotation.x = time;
+					mesh.rotation.y = time;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -43,7 +43,7 @@ var ImprovedNoise = function () {
 
 		noise: function (x, y, z) {
 
-			var floorX = ~~x, floorY = ~~y, floorZ = ~~z;
+			var floorX = Math.floor(x), floorY = Math.floor(y), floorZ = Math.floor(z);
 
 			var X = floorX & 255, Y = floorY & 255, Z = floorZ & 255;
 
@@ -57,7 +57,7 @@ var ImprovedNoise = function () {
 
 			var A = p[X] + Y, AA = p[A] + Z, AB = p[A + 1] + Z, B = p[X + 1] + Y, BA = p[B] + Z, BB = p[B + 1] + Z;
 
-			return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z), 
+			return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z),
 							grad(p[BA], xMinus1, y, z)),
 						lerp(u, grad(p[AB], x, yMinus1, z),
 							grad(p[BB], xMinus1, yMinus1, z))),

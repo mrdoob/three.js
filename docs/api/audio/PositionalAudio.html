@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Audio] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			Create a positional audio object.<br /><br />
+
+			This uses the [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
+		</div>
+
+
+		<h2>Example</h2>
+
+		<div>
+			[example:webaudio_sandbox webaudio / sandbox ]</br>
+			[example:webaudio_timing webaudio / timing ]
+		</div>
+
+		<code>
+		// create an AudioListener and add it to the camera
+		var listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create the PositionalAudio object (passing in the listener)
+		var sound = new THREE.PositionalAudio( listener );
+
+		// load a sound and set it as the PositionalAudio object's buffer
+		var audioLoader = new THREE.AudioLoader();
+		audioLoader.load( 'sounds/song.ogg', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setRefDistance( 20 );
+			sound.play();
+		});
+
+		// create an object for the sound to play from
+		var sphere = new THREE.SphereGeometry( 20, 32, 16 );
+		var material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
+		var mesh = new THREE.Mesh( sphere, material );
+		scene.add( mesh );
+
+		// finally add the sound to the mesh
+		mesh.add( sound );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:AudioListener listener] )</h3>
+		<div>
+		listener — (required) [page:AudioListener AudioListener] instance.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<div>
+			See the [page:Audio Audio] class for inherited properties.
+		</div>
+
+		<h3>[property:PannerNode panner]</h3>
+		<div>The PositionalAudio's [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode PannerNode].</div>
+
+
+		<h2>Methods</h2>
+
+		<div>
+			See the [page:Audio Audio] class for inherited methods.
+		</div>
+
+		<h3>[method:PannerNode getOutput]()</h3>
+		<div>
+		Returns the [page:PositionalAudio.panner panner].
+		</div>
+
+		<h3>[method:Number getRefDistance]()</h3>
+		<div>
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance].
+		</div>
+
+		<h3>[method:PannerNode setRefDistance]( [page:Number value] )</h3>
+		<div>
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance].
+		</div>
+
+		<h3>[method:PannerNode getRolloffFactor]()</h3>
+		<div>
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor].
+		</div>
+
+		<h3>[method:PannerNode setRolloffFactor]( [page:Number value] )</h3>
+		<div>
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor].
+		</div>
+
+		<h3>[method:String getDistanceModel]()</h3>
+		<div>
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel].
+		</div>
+
+		<h3>[method:String setDistanceModel]( [page:String value] )</h3>
+		<div>
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel].
+		</div>
+
+		<h3>[method:PannerNode getMaxDistance]()</h3>
+		<div>
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
+		</div>
+
+		<h3>[method:PannerNode setMaxDistance]( [page:Number value] )</h3>
+		<div>
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

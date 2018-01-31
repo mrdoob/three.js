@@ -1,3 +1,4 @@
+import math
 from bpy import data, types, context
 from .. import logger
 
@@ -74,7 +75,11 @@ def fov(camera):
 
     """
     logger.debug("camera.fov(%s)", camera)
-    return camera.lens
+    fov_in_radians = camera.angle
+    aspect_ratio = aspect(camera)
+    if aspect_ratio > 1:
+        fov_in_radians = 2 * math.atan(math.tan(fov_in_radians / 2) / aspect_ratio)
+    return math.degrees(fov_in_radians)
 
 
 @_camera

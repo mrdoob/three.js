@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for loading a <em>.babylon</em> resource. <br />
+		The <a href="https://doc.babylonjs.com/generals/file_format_map_(.babylon)"> .babylon </a> file format used by
+		<a href="https://www.babylonjs.com/">Babylon.js</a>.
+		</div>
+
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.BabylonLoader();
+
+		// load a Babylon resource
+		loader.load(
+			// resource URL
+			'models/babylon/skull.babylon',
+			// called when resource is loaded
+			function ( object ) {
+
+				scene.add( object );
+
+			},
+			// called when loading is in progress
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( xhr ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+		[example:webgl_loader_babylon]
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+		<h2>Properties</h2>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — A string containing the path/URL of the <em>.babylon</em> file.<br />
+		[page:function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives the loaded [page:Object3D] as an argument.<br />
+		[page:function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
+		[page:function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
+		</div>
+		<div>
+		Begin loading from url and call onLoad with the parsed response content.
+		</div>
+
+		<h3>[method:Object3D parse]( [page:Object json] )</h3>
+		<div>
+		[page:Object json] — The <em>JSON</em> structure to parse.
+		</div>
+		<div>
+		Parse a <em>JSON</em> structure and return an [page:Object3D object] or a [page:Scene scene].<br />
+		Found objects are converted to [page:Mesh] with a [page:BufferGeometry] and a default [page:MeshPhongMaterial].<br />
+		Lights are parsed accordingly.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/BabylonLoader.js examples/js/loaders/BabylonLoader.js]
+	</body>
+</html>

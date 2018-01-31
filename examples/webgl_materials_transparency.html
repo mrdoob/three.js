@@ -28,25 +28,24 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Transparency with Premultiplied Alpha (right) and without (left)<br /> using RGBA8 Buffers by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Transparency with Premultiplied Alpha (right) and without (left)<br /> using RGBA8 Buffers by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
 		<script src="../build/three.js"></script>
-		<script src="../examples/js/controls/OrbitControls.js"></script>
-		<script src="../src/loaders/BinaryTextureLoader.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="../examples/js/Detector.js"></script>
-		<script src="../examples/js/libs/stats.min.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-		<script src="../examples/js/libs/dat.gui.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="../examples/js/postprocessing/EffectComposer.js"></script>
-		<script src="../examples/js/postprocessing/RenderPass.js"></script>
-		<script src="../examples/js/postprocessing/MaskPass.js"></script>
-		<script src="../examples/js/postprocessing/ShaderPass.js"></script>
-		<script src="../examples/js/shaders/CopyShader.js"></script>
-		<script src="../examples/js/shaders/FXAAShader.js"></script>
-		<script src="../examples/js/postprocessing/BloomPass.js"></script>
-		<script src="../examples/js/shaders/ConvolutionShader.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
 
 		<script>
 
@@ -155,8 +154,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

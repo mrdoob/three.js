@@ -4,63 +4,71 @@
  * @author szimek / https://github.com/szimek/
  */
 
-THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+import { EventDispatcher } from '../core/EventDispatcher.js';
+import { UVMapping } from '../constants.js';
+import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants.js';
+import { _Math } from '../math/Math.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Matrix3 } from '../math/Matrix3.js';
 
-	Object.defineProperty( this, 'id', { value: THREE.TextureIdCount ++ } );
+var textureId = 0;
 
-	this.uuid = THREE.Math.generateUUID();
+function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+
+	Object.defineProperty( this, 'id', { value: textureId ++ } );
+
+	this.uuid = _Math.generateUUID();
 
 	this.name = '';
-	this.sourceFile = '';
 
-	this.image = image !== undefined ? image : THREE.Texture.DEFAULT_IMAGE;
+	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
 
-	this.mapping = mapping !== undefined ? mapping : THREE.Texture.DEFAULT_MAPPING;
+	this.mapping = mapping !== undefined ? mapping : Texture.DEFAULT_MAPPING;
 
-	this.wrapS = wrapS !== undefined ? wrapS : THREE.ClampToEdgeWrapping;
-	this.wrapT = wrapT !== undefined ? wrapT : THREE.ClampToEdgeWrapping;
+	this.wrapS = wrapS !== undefined ? wrapS : ClampToEdgeWrapping;
+	this.wrapT = wrapT !== undefined ? wrapT : ClampToEdgeWrapping;
 
-	this.magFilter = magFilter !== undefined ? magFilter : THREE.LinearFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : THREE.LinearMipMapLinearFilter;
+	this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
+	this.minFilter = minFilter !== undefined ? minFilter : LinearMipMapLinearFilter;
 
 	this.anisotropy = anisotropy !== undefined ? anisotropy : 1;
 
-	this.format = format !== undefined ? format : THREE.RGBAFormat;
-	this.type = type !== undefined ? type : THREE.UnsignedByteType;
+	this.format = format !== undefined ? format : RGBAFormat;
+	this.type = type !== undefined ? type : UnsignedByteType;
 
-	this.offset = new THREE.Vector2( 0, 0 );
-	this.repeat = new THREE.Vector2( 1, 1 );
+	this.offset = new Vector2( 0, 0 );
+	this.repeat = new Vector2( 1, 1 );
+	this.center = new Vector2( 0, 0 );
+	this.rotation = 0;
+
+	this.matrixAutoUpdate = true;
+	this.matrix = new Matrix3();
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
 	this.flipY = true;
 	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-
 	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
 	// update.  You need to explicitly call Material.needsUpdate to trigger it to recompile.
-	this.encoding = encoding !== undefined ? encoding :  THREE.LinearEncoding;
+	this.encoding = encoding !== undefined ? encoding : LinearEncoding;
 
 	this.version = 0;
 	this.onUpdate = null;
 
-};
+}
 
-THREE.Texture.DEFAULT_IMAGE = undefined;
-THREE.Texture.DEFAULT_MAPPING = THREE.UVMapping;
+Texture.DEFAULT_IMAGE = undefined;
+Texture.DEFAULT_MAPPING = UVMapping;
 
-THREE.Texture.prototype = {
+Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
-	constructor: THREE.Texture,
+	constructor: Texture,
 
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	},
+	isTexture: true,
 
 	clone: function () {
 
@@ -69,6 +77,8 @@ THREE.Texture.prototype = {
 	},
 
 	copy: function ( source ) {
+
+		this.name = source.name;
 
 		this.image = source.image;
 		this.mipmaps = source.mipmaps.slice( 0 );
@@ -88,6 +98,11 @@ THREE.Texture.prototype = {
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
+		this.center.copy( source.center );
+		this.rotation = source.rotation;
+
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
+		this.matrix.copy( source.matrix );
 
 		this.generateMipmaps = source.generateMipmaps;
 		this.premultiplyAlpha = source.premultiplyAlpha;
@@ -101,7 +116,9 @@ THREE.Texture.prototype = {
 
 	toJSON: function ( meta ) {
 
-		if ( meta.textures[ this.uuid ] !== undefined ) {
+		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+
+		if ( ! isRootObject && meta.textures[ this.uuid ] !== undefined ) {
 
 			return meta.textures[ this.uuid ];
 
@@ -111,7 +128,7 @@ THREE.Texture.prototype = {
 
 			var canvas;
 
-			if ( image.toDataURL !== undefined ) {
+			if ( image instanceof HTMLCanvasElement ) {
 
 				canvas = image;
 
@@ -121,7 +138,17 @@ THREE.Texture.prototype = {
 				canvas.width = image.width;
 				canvas.height = image.height;
 
-				canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
+				var context = canvas.getContext( '2d' );
+
+				if ( image instanceof ImageData ) {
+
+					context.putImageData( image, 0, 0 );
+
+				} else {
+
+					context.drawImage( image, 0, 0, image.width, image.height );
+
+				}
 
 			}
 
@@ -139,7 +166,7 @@ THREE.Texture.prototype = {
 
 		var output = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'Texture',
 				generator: 'Texture.toJSON'
 			},
@@ -151,11 +178,16 @@ THREE.Texture.prototype = {
 
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],
+			center: [ this.center.x, this.center.y ],
+			rotation: this.rotation,
+
 			wrap: [ this.wrapS, this.wrapT ],
 
 			minFilter: this.minFilter,
 			magFilter: this.magFilter,
-			anisotropy: this.anisotropy
+			anisotropy: this.anisotropy,
+
+			flipY: this.flipY
 		};
 
 		if ( this.image !== undefined ) {
@@ -166,11 +198,11 @@ THREE.Texture.prototype = {
 
 			if ( image.uuid === undefined ) {
 
-				image.uuid = THREE.Math.generateUUID(); // UGH
+				image.uuid = _Math.generateUUID(); // UGH
 
 			}
 
-			if ( meta.images[ image.uuid ] === undefined ) {
+			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
 				meta.images[ image.uuid ] = {
 					uuid: image.uuid,
@@ -183,7 +215,11 @@ THREE.Texture.prototype = {
 
 		}
 
-		meta.textures[ this.uuid ] = output;
+		if ( ! isRootObject ) {
+
+			meta.textures[ this.uuid ] = output;
+
+		}
 
 		return output;
 
@@ -197,26 +233,25 @@ THREE.Texture.prototype = {
 
 	transformUv: function ( uv ) {
 
-		if ( this.mapping !== THREE.UVMapping )  return;
+		if ( this.mapping !== UVMapping ) return;
 
-		uv.multiply( this.repeat );
-		uv.add( this.offset );
+		uv.applyMatrix3( this.matrix );
 
 		if ( uv.x < 0 || uv.x > 1 ) {
 
 			switch ( this.wrapS ) {
 
-				case THREE.RepeatWrapping:
+				case RepeatWrapping:
 
 					uv.x = uv.x - Math.floor( uv.x );
 					break;
 
-				case THREE.ClampToEdgeWrapping:
+				case ClampToEdgeWrapping:
 
 					uv.x = uv.x < 0 ? 0 : 1;
 					break;
 
-				case THREE.MirroredRepeatWrapping:
+				case MirroredRepeatWrapping:
 
 					if ( Math.abs( Math.floor( uv.x ) % 2 ) === 1 ) {
 
@@ -237,17 +272,17 @@ THREE.Texture.prototype = {
 
 			switch ( this.wrapT ) {
 
-				case THREE.RepeatWrapping:
+				case RepeatWrapping:
 
 					uv.y = uv.y - Math.floor( uv.y );
 					break;
 
-				case THREE.ClampToEdgeWrapping:
+				case ClampToEdgeWrapping:
 
 					uv.y = uv.y < 0 ? 0 : 1;
 					break;
 
-				case THREE.MirroredRepeatWrapping:
+				case MirroredRepeatWrapping:
 
 					if ( Math.abs( Math.floor( uv.y ) % 2 ) === 1 ) {
 
@@ -272,8 +307,17 @@ THREE.Texture.prototype = {
 
 	}
 
-};
+} );
 
-Object.assign( THREE.Texture.prototype, THREE.EventDispatcher.prototype );
+Object.defineProperty( Texture.prototype, "needsUpdate", {
 
-THREE.TextureIdCount = 0;
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
+
+	}
+
+} );
+
+
+export { Texture };

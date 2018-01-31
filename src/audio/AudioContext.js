@@ -2,24 +2,28 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Object.defineProperty( THREE, 'AudioContext', {
+var context;
 
-	get: ( function () {
+var AudioContext = {
 
-		var context;
+	getContext: function () {
 
-		return function get() {
+		if ( context === undefined ) {
 
-			if ( context === undefined ) {
+			context = new ( window.AudioContext || window.webkitAudioContext )();
 
-				context = new ( window.AudioContext || window.webkitAudioContext )();
+		}
 
-			}
+		return context;
 
-			return context;
+	},
 
-		};
+	setContext: function ( value ) {
 
-	} )()
+		context = value;
 
-} );
+	}
+
+};
+
+export { AudioContext };

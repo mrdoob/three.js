@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for loading a <em>.tga</em> resource. <br />
+		<a href="https://en.wikipedia.org/wiki/Truevision_TGA">TGA</a> is a raster graphics, image file format.
+		</div>
+
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.TGALoader();
+
+		// load a resource
+		var texture = loader.load(
+			// resource URL
+			'textures/crate_grey8.tga'
+			// called when loading is completed
+			function ( texture ) {
+
+				console.log( 'Texture is loaded' );
+
+			},
+			// called when the loading is in progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when the loading failes
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		
+		var material = new THREE.MeshPhongMaterial( {
+			color: 0xffffff,
+			map: texture
+		} );
+		</code>
+
+		[example:webgl_materials_texture_tga]
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:DataTexture load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — A string containing the path/URL of the <em>.tga</em> file. <br />
+		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives loaded [page:DataTexture] as an argument.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
+		</div>
+		<div>
+		Begin loading from url and pass the loaded [page:DataTexture texture] to onLoad. The [page:DataTexture texture] is also directly returned for immediate use (but may not be fully loaded).
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/TGALoader.js examples/js/loaders/TGALoader.js]
+	</body>
+</html>

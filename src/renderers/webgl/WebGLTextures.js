@@ -1,15 +1,18 @@
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
+import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants.js';
+import { _Math } from '../../math/Math.js';
 
-	var _infoMemory = info.memory;
+function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory, infoRender ) {
+
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
+	var _videoTextures = {};
 
 	//
 
-	function clampToMaxSize ( image, maxSize ) {
+	function clampToMaxSize( image, maxSize ) {
 
 		if ( image.width > maxSize || image.height > maxSize ) {
 
@@ -37,17 +40,17 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 	function isPowerOfTwo( image ) {
 
-		return THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height );
+		return _Math.isPowerOfTwo( image.width ) && _Math.isPowerOfTwo( image.height );
 
 	}
 
 	function makePowerOfTwo( image ) {
 
-		if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement ) {
+		if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement || image instanceof ImageBitmap ) {
 
 			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-			canvas.width = THREE.Math.nearestPowerOfTwo( image.width );
-			canvas.height = THREE.Math.nearestPowerOfTwo( image.height );
+			canvas.width = _Math.floorPowerOfTwo( image.width );
+			canvas.height = _Math.floorPowerOfTwo( image.height );
 
 			var context = canvas.getContext( '2d' );
 			context.drawImage( image, 0, 0, canvas.width, canvas.height );
@@ -64,18 +67,23 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 	function textureNeedsPowerOfTwo( texture ) {
 
-		if ( texture.wrapS !== THREE.ClampToEdgeWrapping || texture.wrapT !== THREE.ClampToEdgeWrapping ) return true;
-		if ( texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) return true;
+		return ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) ||
+			( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
 
-		return false;
+	}
+
+	function textureNeedsGenerateMipmaps( texture, isPowerOfTwo ) {
+
+		return texture.generateMipmaps && isPowerOfTwo &&
+			texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter;
 
 	}
 
 	// Fallback filters for non-power-of-2 textures
 
-	function filterFallback ( f ) {
+	function filterFallback( f ) {
 
-		if ( f === THREE.NearestFilter || f === THREE.NearestMipMapNearestFilter || f === THREE.NearestMipMapLinearFilter ) {
+		if ( f === NearestFilter || f === NearestMipMapNearestFilter || f === NearestMipMapLinearFilter ) {
 
 			return _gl.NEAREST;
 
@@ -95,8 +103,13 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		deallocateTexture( texture );
 
-		_infoMemory.textures --;
+		if ( texture.isVideoTexture ) {
 
+			delete _videoTextures[ texture.id ];
+
+		}
+
+		infoMemory.textures --;
 
 	}
 
@@ -108,7 +121,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		deallocateRenderTarget( renderTarget );
 
-		_infoMemory.textures --;
+		infoMemory.textures --;
 
 	}
 
@@ -135,7 +148,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 		}
 
 		// remove all webgl properties
-		properties.delete( texture );
+		properties.remove( texture );
 
 	}
 
@@ -158,7 +171,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		}
 
-		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
+		if ( renderTarget.isWebGLRenderTargetCube ) {
 
 			for ( var i = 0; i < 6; i ++ ) {
 
@@ -174,8 +187,8 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		}
 
-		properties.delete( renderTarget.texture );
-		properties.delete( renderTarget );
+		properties.remove( renderTarget.texture );
+		properties.remove( renderTarget );
 
 	}
 
@@ -186,6 +199,8 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 	function setTexture2D( texture, slot ) {
 
 		var textureProperties = properties.get( texture );
+
+		if ( texture.isVideoTexture ) updateVideoTexture( texture );
 
 		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
 
@@ -213,7 +228,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 	}
 
-	function setTextureCube ( texture, slot ) {
+	function setTextureCube( texture, slot ) {
 
 		var textureProperties = properties.get( texture );
 
@@ -227,7 +242,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 					textureProperties.__image__webglTextureCube = _gl.createTexture();
 
-					_infoMemory.textures ++;
+					infoMemory.textures ++;
 
 				}
 
@@ -236,8 +251,8 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
-				var isCompressed = texture instanceof THREE.CompressedTexture;
-				var isDataTexture = texture.image[ 0 ] instanceof THREE.DataTexture;
+				var isCompressed = ( texture && texture.isCompressedTexture );
+				var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
 				var cubeImage = [];
 
@@ -256,9 +271,9 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 				}
 
 				var image = cubeImage[ 0 ],
-				isPowerOfTwoImage = isPowerOfTwo( image ),
-				glFormat = paramThreeToGL( texture.format ),
-				glType = paramThreeToGL( texture.type );
+					isPowerOfTwoImage = isPowerOfTwo( image ),
+					glFormat = utils.convert( texture.format ),
+					glType = utils.convert( texture.type );
 
 				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, isPowerOfTwoImage );
 
@@ -284,7 +299,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 							mipmap = mipmaps[ j ];
 
-							if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
+							if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
 								if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
@@ -292,7 +307,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 								} else {
 
-									console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()" );
+									console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()' );
 
 								}
 
@@ -308,7 +323,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 				}
 
-				if ( texture.generateMipmaps && isPowerOfTwoImage ) {
+				if ( textureNeedsGenerateMipmaps( texture, isPowerOfTwoImage ) ) {
 
 					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
@@ -329,31 +344,31 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 	}
 
-	function setTextureCubeDynamic ( texture, slot ) {
+	function setTextureCubeDynamic( texture, slot ) {
 
 		state.activeTexture( _gl.TEXTURE0 + slot );
 		state.bindTexture( _gl.TEXTURE_CUBE_MAP, properties.get( texture ).__webglTexture );
 
 	}
 
-	function setTextureParameters ( textureType, texture, isPowerOfTwoImage ) {
+	function setTextureParameters( textureType, texture, isPowerOfTwoImage ) {
 
 		var extension;
 
 		if ( isPowerOfTwoImage ) {
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, utils.convert( texture.wrapS ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, utils.convert( texture.wrapT ) );
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.minFilter ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, utils.convert( texture.magFilter ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, utils.convert( texture.minFilter ) );
 
 		} else {
 
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
 
-			if ( texture.wrapS !== THREE.ClampToEdgeWrapping || texture.wrapT !== THREE.ClampToEdgeWrapping ) {
+			if ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) {
 
 				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping.', texture );
 
@@ -362,7 +377,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, filterFallback( texture.magFilter ) );
 			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, filterFallback( texture.minFilter ) );
 
-			if ( texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
+			if ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) {
 
 				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.', texture );
 
@@ -374,8 +389,8 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		if ( extension ) {
 
-			if ( texture.type === THREE.FloatType && extensions.get( 'OES_texture_float_linear' ) === null ) return;
-			if ( texture.type === THREE.HalfFloatType && extensions.get( 'OES_texture_half_float_linear' ) === null ) return;
+			if ( texture.type === FloatType && extensions.get( 'OES_texture_float_linear' ) === null ) return;
+			if ( texture.type === HalfFloatType && extensions.get( 'OES_texture_half_float_linear' ) === null ) return;
 
 			if ( texture.anisotropy > 1 || properties.get( texture ).__currentAnisotropy ) {
 
@@ -398,7 +413,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 			textureProperties.__webglTexture = _gl.createTexture();
 
-			_infoMemory.textures ++;
+			infoMemory.textures ++;
 
 		}
 
@@ -418,22 +433,22 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 		}
 
 		var isPowerOfTwoImage = isPowerOfTwo( image ),
-		glFormat = paramThreeToGL( texture.format ),
-		glType = paramThreeToGL( texture.type );
+			glFormat = utils.convert( texture.format ),
+			glType = utils.convert( texture.type );
 
 		setTextureParameters( _gl.TEXTURE_2D, texture, isPowerOfTwoImage );
 
 		var mipmap, mipmaps = texture.mipmaps;
 
-		if ( texture instanceof THREE.DepthTexture ) {
+		if ( texture.isDepthTexture ) {
 
 			// populate depth texture with dummy data
 
 			var internalFormat = _gl.DEPTH_COMPONENT;
 
-			if ( texture.type === THREE.FloatType ) {
+			if ( texture.type === FloatType ) {
 
-				if ( !_isWebGL2 ) throw new Error('Float Depth Texture only supported in WebGL2.0');
+				if ( ! _isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
 				internalFormat = _gl.DEPTH_COMPONENT32F;
 
 			} else if ( _isWebGL2 ) {
@@ -443,9 +458,45 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 			}
 
+			if ( texture.format === DepthFormat && internalFormat === _gl.DEPTH_COMPONENT ) {
+
+				// The error INVALID_OPERATION is generated by texImage2D if format and internalformat are
+				// DEPTH_COMPONENT and type is not UNSIGNED_SHORT or UNSIGNED_INT
+				// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
+				if ( texture.type !== UnsignedShortType && texture.type !== UnsignedIntType ) {
+
+					console.warn( 'THREE.WebGLRenderer: Use UnsignedShortType or UnsignedIntType for DepthFormat DepthTexture.' );
+
+					texture.type = UnsignedShortType;
+					glType = utils.convert( texture.type );
+
+				}
+
+			}
+
+			// Depth stencil textures need the DEPTH_STENCIL internal format
+			// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
+			if ( texture.format === DepthStencilFormat ) {
+
+				internalFormat = _gl.DEPTH_STENCIL;
+
+				// The error INVALID_OPERATION is generated by texImage2D if format and internalformat are
+				// DEPTH_STENCIL and type is not UNSIGNED_INT_24_8_WEBGL.
+				// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
+				if ( texture.type !== UnsignedInt248Type ) {
+
+					console.warn( 'THREE.WebGLRenderer: Use UnsignedInt248Type for DepthStencilFormat DepthTexture.' );
+
+					texture.type = UnsignedInt248Type;
+					glType = utils.convert( texture.type );
+
+				}
+
+			}
+
 			state.texImage2D( _gl.TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, glFormat, glType, null );
 
-		} else if ( texture instanceof THREE.DataTexture ) {
+		} else if ( texture.isDataTexture ) {
 
 			// use manually created mipmaps if available
 			// if there are no manual mipmaps
@@ -468,13 +519,13 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 			}
 
-		} else if ( texture instanceof THREE.CompressedTexture ) {
+		} else if ( texture.isCompressedTexture ) {
 
 			for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 				mipmap = mipmaps[ i ];
 
-				if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
+				if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
 					if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
@@ -482,7 +533,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 					} else {
 
-						console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()" );
+						console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
 
 					}
 
@@ -521,7 +572,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		}
 
-		if ( texture.generateMipmaps && isPowerOfTwoImage ) _gl.generateMipmap( _gl.TEXTURE_2D );
+		if ( textureNeedsGenerateMipmaps( texture, isPowerOfTwoImage ) ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
 		textureProperties.__version = texture.version;
 
@@ -532,10 +583,10 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 	// Render targets
 
 	// Setup storage for target texture and bind it to correct framebuffer
-	function setupFrameBufferTexture ( framebuffer, renderTarget, attachment, textureTarget ) {
+	function setupFrameBufferTexture( framebuffer, renderTarget, attachment, textureTarget ) {
 
-		var glFormat = paramThreeToGL( renderTarget.texture.format );
-		var glType = paramThreeToGL( renderTarget.texture.type );
+		var glFormat = utils.convert( renderTarget.texture.format );
+		var glType = utils.convert( renderTarget.texture.type );
 		state.texImage2D( textureTarget, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
@@ -544,7 +595,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 	}
 
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
-	function setupRenderBufferStorage ( renderbuffer, renderTarget ) {
+	function setupRenderBufferStorage( renderbuffer, renderTarget ) {
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
@@ -570,32 +621,47 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 	}
 
 	// Setup resources for a Depth Texture for a FBO (needs an extension)
-	function setupDepthTexture ( framebuffer, renderTarget ) {
+	function setupDepthTexture( framebuffer, renderTarget ) {
 
-		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
-		if ( isCube ) throw new Error('Depth Texture with cube render targets is not supported!');
+		var isCube = ( renderTarget && renderTarget.isWebGLRenderTargetCube );
+		if ( isCube ) throw new Error( 'Depth Texture with cube render targets is not supported' );
 
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
-		if ( !( renderTarget.depthTexture instanceof THREE.DepthTexture ) ) {
+		if ( ! ( renderTarget.depthTexture && renderTarget.depthTexture.isDepthTexture ) ) {
 
-			throw new Error('renderTarget.depthTexture must be an instance of THREE.DepthTexture');
+			throw new Error( 'renderTarget.depthTexture must be an instance of THREE.DepthTexture' );
 
 		}
 
 		// upload an empty depth texture with framebuffer size
-		if ( !properties.get( renderTarget.depthTexture ).__webglTexture ||
+		if ( ! properties.get( renderTarget.depthTexture ).__webglTexture ||
 				renderTarget.depthTexture.image.width !== renderTarget.width ||
 				renderTarget.depthTexture.image.height !== renderTarget.height ) {
+
 			renderTarget.depthTexture.image.width = renderTarget.width;
 			renderTarget.depthTexture.image.height = renderTarget.height;
 			renderTarget.depthTexture.needsUpdate = true;
+
 		}
 
 		setTexture2D( renderTarget.depthTexture, 0 );
 
 		var webglDepthTexture = properties.get( renderTarget.depthTexture ).__webglTexture;
-		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+		if ( renderTarget.depthTexture.format === DepthFormat ) {
+
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+		} else if ( renderTarget.depthTexture.format === DepthStencilFormat ) {
+
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+		} else {
+
+			throw new Error( 'Unknown depthTexture format' );
+
+		}
 
 	}
 
@@ -604,11 +670,11 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		var renderTargetProperties = properties.get( renderTarget );
 
-		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
+		var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
 
 		if ( renderTarget.depthTexture ) {
 
-			if ( isCube ) throw new Error('target.depthTexture not supported in Cube render targets');
+			if ( isCube ) throw new Error( 'target.depthTexture not supported in Cube render targets' );
 
 			setupDepthTexture( renderTargetProperties.__webglFramebuffer, renderTarget );
 
@@ -650,9 +716,9 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		textureProperties.__webglTexture = _gl.createTexture();
 
-		_infoMemory.textures ++;
+		infoMemory.textures ++;
 
-		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
+		var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
 		var isTargetPowerOfTwo = isPowerOfTwo( renderTarget );
 
 		// Setup framebuffer
@@ -686,7 +752,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 			}
 
-			if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+			if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
 		} else {
@@ -695,7 +761,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
 			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
 
-			if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
+			if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) _gl.generateMipmap( _gl.TEXTURE_2D );
 			state.bindTexture( _gl.TEXTURE_2D, null );
 
 		}
@@ -713,17 +779,32 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 	function updateRenderTargetMipmap( renderTarget ) {
 
 		var texture = renderTarget.texture;
+		var isTargetPowerOfTwo = isPowerOfTwo( renderTarget );
 
-		if ( texture.generateMipmaps && isPowerOfTwo( renderTarget ) &&
-				texture.minFilter !== THREE.NearestFilter &&
-				texture.minFilter !== THREE.LinearFilter ) {
+		if ( textureNeedsGenerateMipmaps( texture, isTargetPowerOfTwo ) ) {
 
-			var target = renderTarget instanceof THREE.WebGLRenderTargetCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+			var target = renderTarget.isWebGLRenderTargetCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
 			var webglTexture = properties.get( texture ).__webglTexture;
 
 			state.bindTexture( target, webglTexture );
 			_gl.generateMipmap( target );
 			state.bindTexture( target, null );
+
+		}
+
+	}
+
+	function updateVideoTexture( texture ) {
+
+		var id = texture.id;
+		var frame = infoRender.frame;
+
+		// Check the last frame we updated the VideoTexture
+
+		if ( _videoTextures[ id ] !== frame ) {
+
+			_videoTextures[ id ] = frame;
+			texture.update();
 
 		}
 
@@ -735,4 +816,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 	this.setupRenderTarget = setupRenderTarget;
 	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
 
-};
+}
+
+
+export { WebGLTextures };

@@ -1,24 +1,35 @@
+import { BufferAttribute } from './BufferAttribute.js';
+
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedBufferAttribute = function ( array, itemSize, meshPerAttribute ) {
+function InstancedBufferAttribute( array, itemSize, meshPerAttribute ) {
 
-	THREE.BufferAttribute.call( this, array, itemSize );
+	BufferAttribute.call( this, array, itemSize );
 
 	this.meshPerAttribute = meshPerAttribute || 1;
 
-};
+}
 
-THREE.InstancedBufferAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
-THREE.InstancedBufferAttribute.prototype.constructor = THREE.InstancedBufferAttribute;
+InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribute.prototype ), {
 
-THREE.InstancedBufferAttribute.prototype.copy = function ( source ) {
+	constructor: InstancedBufferAttribute,
 
-	THREE.BufferAttribute.prototype.copy.call( this, source );
+	isInstancedBufferAttribute: true,
 
-	this.meshPerAttribute = source.meshPerAttribute;
+	copy: function ( source ) {
 
-	return this;
+		BufferAttribute.prototype.copy.call( this, source );
 
-};
+		this.meshPerAttribute = source.meshPerAttribute;
+
+		return this;
+
+	}
+
+} );
+
+
+
+export { InstancedBufferAttribute };

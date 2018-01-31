@@ -32,7 +32,7 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain raycasting demo</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain raycasting demo</div>
 
 		<script src="../build/three.js"></script>
 
@@ -77,12 +77,13 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
 
 				controls = new THREE.OrbitControls(camera);
 				controls.target.set( 0.0, 100.0, 0.0 );
 				controls.userPanSpeed = 100;
 
-				data = generateHeight( worldWidth, worldDepth );
+				var data = generateHeight( worldWidth, worldDepth );
 
 				controls.target.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
 				camera.position.y =  controls.target.y + 2000;
@@ -115,7 +116,6 @@
 				scene.add( helper );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xbfd1e5 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -243,7 +243,7 @@
 
 			function render() {
 
-				controls.update( clock.getDelta() );
+				controls.update();
 				renderer.render( scene, camera );
 
 			}

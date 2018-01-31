@@ -1,0 +1,57 @@
+mtllib cubes.mtl
+
+# cube 01: pair of group and material per side/quad
+o cube 01
+
+v -10.00000 10.00000 10.00000
+v -10.00000 -10.00000 10.00000
+v 10.00000 -10.00000 10.00000
+v 10.00000 10.00000 10.00000
+v -10.00000 10.00000 -10.00000
+v -10.00000 -10.00000 -10.00000
+v 10.00000 -10.00000 -10.00000
+v 10.00000 10.00000 -10.00000
+
+g front
+usemtl red
+f 1 2 3 4
+g back
+usemtl blue
+f 8 7 6 5
+g right
+usemtl green
+f 4 3 7 8
+g top
+usemtl lightblue
+f 5 1 4 8
+g left
+usemtl orange
+f 5 6 2 1
+g bottom
+usemtl purple
+f 2 6 7 3
+
+# cube 02: one pair of group and material with different smoothing groups
+o cube 02
+
+v 20.00000 10.00000 10.00000
+v 20.00000 -10.00000 10.00000
+v 40.00000 -10.00000 10.00000
+v 40.00000 10.00000 10.00000
+v 20.00000 10.00000 -10.00000
+v 20.00000 -10.00000 -10.00000
+v 40.00000 -10.00000 -10.00000
+v 40.00000 10.00000 -10.00000
+
+g cube 02 one group
+usemtl blue
+s 0
+f 9 10 11 12
+f 16 15 14 13
+s 1
+f 12 11 15 16
+f 13 9 12 16
+s 2
+f 13 14 10 9
+s off
+f 10 14 15 11

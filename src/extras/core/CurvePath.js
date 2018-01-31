@@ -1,3 +1,6 @@
+import { Curve } from './Curve.js';
+import * as Curves from '../curves/Curves.js';
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
@@ -8,17 +11,20 @@
  *  curves, but retains the api of a curve
  **************************************************************/
 
-THREE.CurvePath = function () {
+function CurvePath() {
+
+	Curve.call( this );
+
+	this.type = 'CurvePath';
 
 	this.curves = [];
-
 	this.autoClose = false; // Automatically closes the path
 
-};
+}
 
-THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype ), {
+CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
-	constructor: THREE.CurvePath,
+	constructor: CurvePath,
 
 	add: function ( curve ) {
 
@@ -28,15 +34,13 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 	closePath: function () {
 
-		// TODO Test
-		// and verify for vector3 (needs to implement equals)
 		// Add a line curve if start and end of lines are not connected
 		var startPoint = this.curves[ 0 ].getPoint( 0 );
 		var endPoint = this.curves[ this.curves.length - 1 ].getPoint( 1 );
 
 		if ( ! startPoint.equals( endPoint ) ) {
 
-			this.curves.push( new THREE.LineCurve( endPoint, startPoint ) );
+			this.curves.push( new Curves[ 'LineCurve' ]( endPoint, startPoint ) );
 
 		}
 
@@ -66,7 +70,8 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 				var diff = curveLengths[ i ] - d;
 				var curve = this.curves[ i ];
 
-				var u = 1 - diff / curve.getLength();
+				var segmentLength = curve.getLength();
+				var u = segmentLength === 0 ? 0 : 1 - diff / segmentLength;
 
 				return curve.getPointAt( u );
 
@@ -98,7 +103,7 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		this.needsUpdate = true;
 		this.cacheLengths = null;
-		this.getLengths();
+		this.getCurveLengths();
 
 	},
 
@@ -133,41 +138,124 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 	},
 
-	/**************************************************************
-	 *	Create Geometries Helpers
-	 **************************************************************/
+	getSpacedPoints: function ( divisions ) {
 
-	/// Generate geometry from path points (for Line or Points objects)
+		if ( divisions === undefined ) divisions = 40;
 
-	createPointsGeometry: function ( divisions ) {
+		var points = [];
 
-		var pts = this.getPoints( divisions );
-		return this.createGeometry( pts );
+		for ( var i = 0; i <= divisions; i ++ ) {
 
-	},
-
-	// Generate geometry from equidistant sampling along the path
-
-	createSpacedPointsGeometry: function ( divisions ) {
-
-		var pts = this.getSpacedPoints( divisions );
-		return this.createGeometry( pts );
-
-	},
-
-	createGeometry: function ( points ) {
-
-		var geometry = new THREE.Geometry();
-
-		for ( var i = 0, l = points.length; i < l; i ++ ) {
-
-			var point = points[ i ];
-			geometry.vertices.push( new THREE.Vector3( point.x, point.y, point.z || 0 ) );
+			points.push( this.getPoint( i / divisions ) );
 
 		}
 
-		return geometry;
+		if ( this.autoClose ) {
+
+			points.push( points[ 0 ] );
+
+		}
+
+		return points;
+
+	},
+
+	getPoints: function ( divisions ) {
+
+		divisions = divisions || 12;
+
+		var points = [], last;
+
+		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
+
+			var curve = curves[ i ];
+			var resolution = ( curve && curve.isEllipseCurve ) ? divisions * 2
+				: ( curve && curve.isLineCurve ) ? 1
+					: ( curve && curve.isSplineCurve ) ? divisions * curve.points.length
+						: divisions;
+
+			var pts = curve.getPoints( resolution );
+
+			for ( var j = 0; j < pts.length; j ++ ) {
+
+				var point = pts[ j ];
+
+				if ( last && last.equals( point ) ) continue; // ensures no consecutive points are duplicates
+
+				points.push( point );
+				last = point;
+
+			}
+
+		}
+
+		if ( this.autoClose && points.length > 1 && ! points[ points.length - 1 ].equals( points[ 0 ] ) ) {
+
+			points.push( points[ 0 ] );
+
+		}
+
+		return points;
+
+	},
+
+	copy: function ( source ) {
+
+		Curve.prototype.copy.call( this, source );
+
+		this.curves = [];
+
+		for ( var i = 0, l = source.curves.length; i < l; i ++ ) {
+
+			var curve = source.curves[ i ];
+
+			this.curves.push( curve.clone() );
+
+		}
+
+		this.autoClose = source.autoClose;
+
+		return this;
+
+	},
+
+	toJSON: function () {
+
+		var data = Curve.prototype.toJSON.call( this );
+
+		data.autoClose = this.autoClose;
+		data.curves = [];
+
+		for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
+
+			var curve = this.curves[ i ];
+			data.curves.push( curve.toJSON() );
+
+		}
+
+		return data;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.autoClose = json.autoClose;
+		this.curves = [];
+
+		for ( var i = 0, l = json.curves.length; i < l; i ++ ) {
+
+			var curve = json.curves[ i ];
+			this.curves.push( new Curves[ curve.type ]().fromJSON( curve ) );
+
+		}
+
+		return this;
 
 	}
 
 } );
+
+
+export { CurvePath };

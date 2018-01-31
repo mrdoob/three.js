@@ -1,43 +1,55 @@
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Object3D } from '../core/Object3D.js';
+import { SpriteMaterial } from '../materials/SpriteMaterial.js';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Sprite = function ( material ) {
+function Sprite( material ) {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.type = 'Sprite';
 
-	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
+	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
-};
+	this.center = new Vector2( 0.5, 0.5 );
 
-THREE.Sprite.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+}
 
-	constructor: THREE.Sprite,
+Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
+
+	constructor: Sprite,
+
+	isSprite: true,
 
 	raycast: ( function () {
 
-		var matrixPosition = new THREE.Vector3();
+		var intersectPoint = new Vector3();
+		var worldPosition = new Vector3();
+		var worldScale = new Vector3();
 
 		return function raycast( raycaster, intersects ) {
 
-			matrixPosition.setFromMatrixPosition( this.matrixWorld );
+			worldPosition.setFromMatrixPosition( this.matrixWorld );
+			raycaster.ray.closestPointToPoint( worldPosition, intersectPoint );
 
-			var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
-			var guessSizeSq = this.scale.x * this.scale.y / 4;
+			worldScale.setFromMatrixScale( this.matrixWorld );
+			var guessSizeSq = worldScale.x * worldScale.y / 4;
 
-			if ( distanceSq > guessSizeSq ) {
+			if ( worldPosition.distanceToSquared( intersectPoint ) > guessSizeSq ) return;
 
-				return;
+			var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
-			}
+			if ( distance < raycaster.near || distance > raycaster.far ) return;
 
 			intersects.push( {
 
-				distance: Math.sqrt( distanceSq ),
-				point: this.position,
+				distance: distance,
+				point: intersectPoint.clone(),
 				face: null,
 				object: this
 
@@ -51,6 +63,20 @@ THREE.Sprite.prototype = Object.assign( Object.create( THREE.Object3D.prototype 
 
 		return new this.constructor( this.material ).copy( this );
 
+	},
+
+	copy: function ( source ) {
+
+		Object3D.prototype.copy.call( this, source );
+
+		if ( source.center !== undefined ) this.center.copy( source.center );
+
+		return this;
+
 	}
 
+
 } );
+
+
+export { Sprite };

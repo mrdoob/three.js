@@ -1,3 +1,5 @@
+import { KeyframeTrack } from '../KeyframeTrack.js';
+
 /**
  *
  * A Track of keyframe values that represent color.
@@ -8,16 +10,15 @@
  * @author tschw
  */
 
-THREE.ColorKeyframeTrack = function ( name, times, values, interpolation ) {
+function ColorKeyframeTrack( name, times, values, interpolation ) {
 
-	THREE.KeyframeTrack.call( this, name, times, values, interpolation );
+	KeyframeTrack.call( this, name, times, values, interpolation );
 
-};
+}
 
-THREE.ColorKeyframeTrack.prototype =
-		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+ColorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
 
-	constructor: THREE.ColorKeyframeTrack,
+	constructor: ColorKeyframeTrack,
 
 	ValueTypeName: 'color'
 
@@ -25,8 +26,9 @@ THREE.ColorKeyframeTrack.prototype =
 
 	// DefaultInterpolation is inherited
 
-
 	// Note: Very basic implementation and nothing special yet.
 	// However, this is the place for color space parameterization.
 
 } );
+
+export { ColorKeyframeTrack };

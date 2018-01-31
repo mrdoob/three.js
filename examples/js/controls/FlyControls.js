@@ -270,7 +270,7 @@ THREE.FlyControls = function ( object, domElement ) {
 		window.removeEventListener( 'keydown', _keydown, false );
 		window.removeEventListener( 'keyup', _keyup, false );
 
-	}
+	};
 
 	var _mousemove = bind( this, this.mousemove );
 	var _mousedown = bind( this, this.mousedown );

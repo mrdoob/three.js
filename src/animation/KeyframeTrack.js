@@ -1,3 +1,19 @@
+import { StringKeyframeTrack } from './tracks/StringKeyframeTrack.js';
+import { BooleanKeyframeTrack } from './tracks/BooleanKeyframeTrack.js';
+import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack.js';
+import { ColorKeyframeTrack } from './tracks/ColorKeyframeTrack.js';
+import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
+import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack.js';
+import {
+	InterpolateLinear,
+	InterpolateSmooth,
+	InterpolateDiscrete
+} from '../constants.js';
+import { CubicInterpolant } from '../math/interpolants/CubicInterpolant.js';
+import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
+import { DiscreteInterpolant } from '../math/interpolants/DiscreteInterpolant.js';
+import { AnimationUtils } from './AnimationUtils.js';
+
 /**
  *
  * A timed sequence of keyframes for a specific property.
@@ -8,77 +24,194 @@
  * @author tschw
  */
 
-THREE.KeyframeTrack = function ( name, times, values, interpolation ) {
+function KeyframeTrack( name, times, values, interpolation ) {
 
-	if( name === undefined ) throw new Error( "track name is undefined" );
-
-	if( times === undefined || times.length === 0 ) {
-
-		throw new Error( "no keyframes in track named " + name );
-
-	}
+	if ( name === undefined ) throw new Error( 'THREE.KeyframeTrack: track name is undefined' );
+	if ( times === undefined || times.length === 0 ) throw new Error( 'THREE.KeyframeTrack: no keyframes in track named ' + name );
 
 	this.name = name;
 
-	this.times = THREE.AnimationUtils.convertArray( times, this.TimeBufferType );
-	this.values = THREE.AnimationUtils.convertArray( values, this.ValueBufferType );
+	this.times = AnimationUtils.convertArray( times, this.TimeBufferType );
+	this.values = AnimationUtils.convertArray( values, this.ValueBufferType );
 
 	this.setInterpolation( interpolation || this.DefaultInterpolation );
 
 	this.validate();
 	this.optimize();
 
-};
+}
 
-THREE.KeyframeTrack.prototype = {
+// Static methods:
 
-	constructor: THREE.KeyframeTrack,
+Object.assign( KeyframeTrack, {
+
+	// Serialization (in static context, because of constructor invocation
+	// and automatic invocation of .toJSON):
+
+	parse: function ( json ) {
+
+		if ( json.type === undefined ) {
+
+			throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
+
+		}
+
+		var trackType = KeyframeTrack._getTrackTypeForValueTypeName( json.type );
+
+		if ( json.times === undefined ) {
+
+			var times = [], values = [];
+
+			AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
+
+			json.times = times;
+			json.values = values;
+
+		}
+
+		// derived classes can define a static parse method
+		if ( trackType.parse !== undefined ) {
+
+			return trackType.parse( json );
+
+		} else {
+
+			// by default, we assume a constructor compatible with the base
+			return new trackType( json.name, json.times, json.values, json.interpolation );
+
+		}
+
+	},
+
+	toJSON: function ( track ) {
+
+		var trackType = track.constructor;
+
+		var json;
+
+		// derived classes can define a static toJSON method
+		if ( trackType.toJSON !== undefined ) {
+
+			json = trackType.toJSON( track );
+
+		} else {
+
+			// by default, we assume the data can be serialized as-is
+			json = {
+
+				'name': track.name,
+				'times': AnimationUtils.convertArray( track.times, Array ),
+				'values': AnimationUtils.convertArray( track.values, Array )
+
+			};
+
+			var interpolation = track.getInterpolation();
+
+			if ( interpolation !== track.DefaultInterpolation ) {
+
+				json.interpolation = interpolation;
+
+			}
+
+		}
+
+		json.type = track.ValueTypeName; // mandatory
+
+		return json;
+
+	},
+
+	_getTrackTypeForValueTypeName: function ( typeName ) {
+
+		switch ( typeName.toLowerCase() ) {
+
+			case 'scalar':
+			case 'double':
+			case 'float':
+			case 'number':
+			case 'integer':
+
+				return NumberKeyframeTrack;
+
+			case 'vector':
+			case 'vector2':
+			case 'vector3':
+			case 'vector4':
+
+				return VectorKeyframeTrack;
+
+			case 'color':
+
+				return ColorKeyframeTrack;
+
+			case 'quaternion':
+
+				return QuaternionKeyframeTrack;
+
+			case 'bool':
+			case 'boolean':
+
+				return BooleanKeyframeTrack;
+
+			case 'string':
+
+				return StringKeyframeTrack;
+
+		}
+
+		throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
+
+	}
+
+} );
+
+Object.assign( KeyframeTrack.prototype, {
+
+	constructor: KeyframeTrack,
 
 	TimeBufferType: Float32Array,
+
 	ValueBufferType: Float32Array,
 
-	DefaultInterpolation: THREE.InterpolateLinear,
+	DefaultInterpolation: InterpolateLinear,
 
-	InterpolantFactoryMethodDiscrete: function( result ) {
+	InterpolantFactoryMethodDiscrete: function ( result ) {
 
-		return new THREE.DiscreteInterpolant(
-				this.times, this.values, this.getValueSize(), result );
-
-	},
-
-	InterpolantFactoryMethodLinear: function( result ) {
-
-		return new THREE.LinearInterpolant(
-				this.times, this.values, this.getValueSize(), result );
+		return new DiscreteInterpolant( this.times, this.values, this.getValueSize(), result );
 
 	},
 
-	InterpolantFactoryMethodSmooth: function( result ) {
+	InterpolantFactoryMethodLinear: function ( result ) {
 
-		return new THREE.CubicInterpolant(
-				this.times, this.values, this.getValueSize(), result );
+		return new LinearInterpolant( this.times, this.values, this.getValueSize(), result );
 
 	},
 
-	setInterpolation: function( interpolation ) {
+	InterpolantFactoryMethodSmooth: function ( result ) {
+
+		return new CubicInterpolant( this.times, this.values, this.getValueSize(), result );
+
+	},
+
+	setInterpolation: function ( interpolation ) {
 
 		var factoryMethod;
 
 		switch ( interpolation ) {
 
-			case THREE.InterpolateDiscrete:
+			case InterpolateDiscrete:
 
 				factoryMethod = this.InterpolantFactoryMethodDiscrete;
 
 				break;
 
-			case THREE.InterpolateLinear:
+			case InterpolateLinear:
 
 				factoryMethod = this.InterpolantFactoryMethodLinear;
 
 				break;
 
-			case THREE.InterpolateSmooth:
+			case InterpolateSmooth:
 
 				factoryMethod = this.InterpolantFactoryMethodSmooth;
 
@@ -89,7 +222,7 @@ THREE.KeyframeTrack.prototype = {
 		if ( factoryMethod === undefined ) {
 
 			var message = "unsupported interpolation for " +
-					this.ValueTypeName + " keyframe track named " + this.name;
+				this.ValueTypeName + " keyframe track named " + this.name;
 
 			if ( this.createInterpolant === undefined ) {
 
@@ -106,7 +239,7 @@ THREE.KeyframeTrack.prototype = {
 
 			}
 
-			console.warn( message );
+			console.warn( 'THREE.KeyframeTrack:', message );
 			return;
 
 		}
@@ -115,40 +248,40 @@ THREE.KeyframeTrack.prototype = {
 
 	},
 
-	getInterpolation: function() {
+	getInterpolation: function () {
 
 		switch ( this.createInterpolant ) {
 
 			case this.InterpolantFactoryMethodDiscrete:
 
-				return THREE.InterpolateDiscrete;
+				return InterpolateDiscrete;
 
 			case this.InterpolantFactoryMethodLinear:
 
-				return THREE.InterpolateLinear;
+				return InterpolateLinear;
 
 			case this.InterpolantFactoryMethodSmooth:
 
-				return THREE.InterpolateSmooth;
+				return InterpolateSmooth;
 
 		}
 
 	},
 
-	getValueSize: function() {
+	getValueSize: function () {
 
 		return this.values.length / this.times.length;
 
 	},
 
 	// move all keyframes either forwards or backwards in time
-	shift: function( timeOffset ) {
+	shift: function ( timeOffset ) {
 
-		if( timeOffset !== 0.0 ) {
+		if ( timeOffset !== 0.0 ) {
 
 			var times = this.times;
 
-			for( var i = 0, n = times.length; i !== n; ++ i ) {
+			for ( var i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] += timeOffset;
 
@@ -161,13 +294,13 @@ THREE.KeyframeTrack.prototype = {
 	},
 
 	// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
-	scale: function( timeScale ) {
+	scale: function ( timeScale ) {
 
-		if( timeScale !== 1.0 ) {
+		if ( timeScale !== 1.0 ) {
 
 			var times = this.times;
 
-			for( var i = 0, n = times.length; i !== n; ++ i ) {
+			for ( var i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] *= timeScale;
 
@@ -181,27 +314,35 @@ THREE.KeyframeTrack.prototype = {
 
 	// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
 	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
-	trim: function( startTime, endTime ) {
+	trim: function ( startTime, endTime ) {
 
 		var times = this.times,
 			nKeys = times.length,
 			from = 0,
 			to = nKeys - 1;
 
-		while ( from !== nKeys && times[ from ] < startTime ) ++ from;
-		while ( to !== -1 && times[ to ] > endTime ) -- to;
+		while ( from !== nKeys && times[ from ] < startTime ) {
+
+			++ from;
+
+		}
+
+		while ( to !== - 1 && times[ to ] > endTime ) {
+
+			-- to;
+
+		}
 
 		++ to; // inclusive -> exclusive bound
 
-		if( from !== 0 || to !== nKeys ) {
+		if ( from !== 0 || to !== nKeys ) {
 
 			// empty tracks are forbidden, so keep at least one keyframe
-			if ( from >= to ) to = Math.max( to , 1 ), from = to - 1;
+			if ( from >= to ) to = Math.max( to, 1 ), from = to - 1;
 
 			var stride = this.getValueSize();
-			this.times = THREE.AnimationUtils.arraySlice( times, from, to );
-			this.values = THREE.AnimationUtils.
-					arraySlice( this.values, from * stride, to * stride );
+			this.times = AnimationUtils.arraySlice( times, from, to );
+			this.values = AnimationUtils.arraySlice( this.values, from * stride, to * stride );
 
 		}
 
@@ -210,14 +351,14 @@ THREE.KeyframeTrack.prototype = {
 	},
 
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
-	validate: function() {
+	validate: function () {
 
 		var valid = true;
 
 		var valueSize = this.getValueSize();
 		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
 
-			console.error( "invalid value size in track", this );
+			console.error( 'THREE.KeyframeTrack: Invalid value size in track.', this );
 			valid = false;
 
 		}
@@ -227,30 +368,30 @@ THREE.KeyframeTrack.prototype = {
 
 			nKeys = times.length;
 
-		if( nKeys === 0 ) {
+		if ( nKeys === 0 ) {
 
-			console.error( "track is empty", this );
+			console.error( 'THREE.KeyframeTrack: Track is empty.', this );
 			valid = false;
 
 		}
 
 		var prevTime = null;
 
-		for( var i = 0; i !== nKeys; i ++ ) {
+		for ( var i = 0; i !== nKeys; i ++ ) {
 
 			var currTime = times[ i ];
 
 			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
 
-				console.error( "time is not a valid number", this, i, currTime );
+				console.error( 'THREE.KeyframeTrack: Time is not a valid number.', this, i, currTime );
 				valid = false;
 				break;
 
 			}
 
-			if( prevTime !== null && prevTime > currTime ) {
+			if ( prevTime !== null && prevTime > currTime ) {
 
-				console.error( "out of order keys", this, i, currTime, prevTime );
+				console.error( 'THREE.KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
 				valid = false;
 				break;
 
@@ -262,7 +403,7 @@ THREE.KeyframeTrack.prototype = {
 
 		if ( values !== undefined ) {
 
-			if ( THREE.AnimationUtils.isTypedArray( values ) ) {
+			if ( AnimationUtils.isTypedArray( values ) ) {
 
 				for ( var i = 0, n = values.length; i !== n; ++ i ) {
 
@@ -270,7 +411,7 @@ THREE.KeyframeTrack.prototype = {
 
 					if ( isNaN( value ) ) {
 
-						console.error( "value is not a valid number", this, i, value );
+						console.error( 'THREE.KeyframeTrack: Value is not a valid number.', this, i, value );
 						valid = false;
 						break;
 
@@ -288,15 +429,18 @@ THREE.KeyframeTrack.prototype = {
 
 	// removes equivalent sequential keys as common in morph target sequences
 	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
-	optimize: function() {
+	optimize: function () {
 
 		var times = this.times,
 			values = this.values,
 			stride = this.getValueSize(),
 
-			writeIndex = 1;
+			smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
 
-		for( var i = 1, n = times.length - 1; i <= n; ++ i ) {
+			writeIndex = 1,
+			lastIndex = times.length - 1;
+
+		for ( var i = 1; i < lastIndex; ++ i ) {
 
 			var keep = false;
 
@@ -307,22 +451,31 @@ THREE.KeyframeTrack.prototype = {
 
 			if ( time !== timeNext && ( i !== 1 || time !== time[ 0 ] ) ) {
 
-				// remove unnecessary keyframes same as their neighbors
-				var offset = i * stride,
-					offsetP = offset - stride,
-					offsetN = offset + stride;
+				if ( ! smoothInterpolation ) {
 
-				for ( var j = 0; j !== stride; ++ j ) {
+					// remove unnecessary keyframes same as their neighbors
 
-					var value = values[ offset + j ];
+					var offset = i * stride,
+						offsetP = offset - stride,
+						offsetN = offset + stride;
 
-					if ( value !== values[ offsetP + j ] ||
+					for ( var j = 0; j !== stride; ++ j ) {
+
+						var value = values[ offset + j ];
+
+						if ( value !== values[ offsetP + j ] ||
 							value !== values[ offsetN + j ] ) {
 
-						keep = true;
-						break;
+							keep = true;
+							break;
+
+						}
 
 					}
+
+				} else {
+
+					keep = true;
 
 				}
 
@@ -345,7 +498,6 @@ THREE.KeyframeTrack.prototype = {
 
 					}
 
-
 				}
 
 				++ writeIndex;
@@ -354,10 +506,26 @@ THREE.KeyframeTrack.prototype = {
 
 		}
 
+		// flush last keyframe (compaction looks ahead)
+
+		if ( lastIndex > 0 ) {
+
+			times[ writeIndex ] = times[ lastIndex ];
+
+			for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j ) {
+
+				values[ writeOffset + j ] = values[ readOffset + j ];
+
+			}
+
+			++ writeIndex;
+
+		}
+
 		if ( writeIndex !== times.length ) {
 
-			this.times = THREE.AnimationUtils.arraySlice( times, 0, writeIndex );
-			this.values = THREE.AnimationUtils.arraySlice( values, 0, writeIndex * stride );
+			this.times = AnimationUtils.arraySlice( times, 0, writeIndex );
+			this.values = AnimationUtils.arraySlice( values, 0, writeIndex * stride );
 
 		}
 
@@ -365,129 +533,6 @@ THREE.KeyframeTrack.prototype = {
 
 	}
 
-};
-
-// Static methods:
-
-Object.assign( THREE.KeyframeTrack, {
-
-	// Serialization (in static context, because of constructor invocation
-	// and automatic invocation of .toJSON):
-
-	parse: function( json ) {
-
-		if( json.type === undefined ) {
-
-			throw new Error( "track type undefined, can not parse" );
-
-		}
-
-		var trackType = THREE.KeyframeTrack._getTrackTypeForValueTypeName( json.type );
-
-		if ( json.times === undefined ) {
-
-			var times = [], values = [];
-
-			THREE.AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
-
-			json.times = times;
-			json.values = values;
-
-		}
-
-		// derived classes can define a static parse method
-		if ( trackType.parse !== undefined ) {
-
-			return trackType.parse( json );
-
-		} else {
-
-			// by default, we asssume a constructor compatible with the base
-			return new trackType(
-					json.name, json.times, json.values, json.interpolation );
-
-		}
-
-	},
-
-	toJSON: function( track ) {
-
-		var trackType = track.constructor;
-
-		var json;
-
-		// derived classes can define a static toJSON method
-		if ( trackType.toJSON !== undefined ) {
-
-			json = trackType.toJSON( track );
-
-		} else {
-
-			// by default, we assume the data can be serialized as-is
-			json = {
-
-				'name': track.name,
-				'times': THREE.AnimationUtils.convertArray( track.times, Array ),
-				'values': THREE.AnimationUtils.convertArray( track.values, Array )
-
-			};
-
-			var interpolation = track.getInterpolation();
-
-			if ( interpolation !== track.DefaultInterpolation ) {
-
-				json.interpolation = interpolation;
-
-			}
-
-		}
-
-		json.type = track.ValueTypeName; // mandatory
-
-		return json;
-
-	},
-
-	_getTrackTypeForValueTypeName: function( typeName ) {
-
-		switch( typeName.toLowerCase() ) {
-
-			case "scalar":
-			case "double":
-			case "float":
-			case "number":
-			case "integer":
-
-				return THREE.NumberKeyframeTrack;
-
-			case "vector":
-			case "vector2":
-			case "vector3":
-			case "vector4":
-
-				return THREE.VectorKeyframeTrack;
-
-			case "color":
-
-				return THREE.ColorKeyframeTrack;
-
-			case "quaternion":
-
-				return THREE.QuaternionKeyframeTrack;
-
-			case "bool":
-			case "boolean":
-
-				return THREE.BooleanKeyframeTrack;
-
-			case "string":
-
-				return THREE.StringKeyframeTrack;
-
-		}
-
-		throw new Error( "Unsupported typeName: " + typeName );
-
-	}
-
 } );
+
+export { KeyframeTrack };

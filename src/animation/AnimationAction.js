@@ -1,3 +1,5 @@
+import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat } from '../constants.js';
+
 /**
  *
  * Action provided by AnimationMixer for scheduling clip playback on specific
@@ -9,15 +11,7 @@
  *
  */
 
-THREE.AnimationAction = function() {
-
-	throw new Error( "THREE.AnimationAction: " +
-			"Use mixer.clipAction for construction." );
-
-};
-
-THREE.AnimationAction._new =
-		function AnimationAction( mixer, clip, localRoot ) {
+function AnimationAction( mixer, clip, localRoot ) {
 
 	this._mixer = mixer;
 	this._clip = clip;
@@ -28,8 +22,8 @@ THREE.AnimationAction._new =
 		interpolants = new Array( nTracks );
 
 	var interpolantSettings = {
-			endingStart: 	THREE.ZeroCurvatureEnding,
-			endingEnd:		THREE.ZeroCurvatureEnding
+		endingStart: ZeroCurvatureEnding,
+		endingEnd: ZeroCurvatureEnding
 	};
 
 	for ( var i = 0; i !== nTracks; ++ i ) {
@@ -53,8 +47,8 @@ THREE.AnimationAction._new =
 	this._timeScaleInterpolant = null;
 	this._weightInterpolant = null;
 
-	this.loop = THREE.LoopRepeat;
-	this._loopCount = -1;
+	this.loop = LoopRepeat;
+	this._loopCount = - 1;
 
 	// global mixer time when the action is to be started
 	// it's set back to 'null' upon start of the action
@@ -72,23 +66,21 @@ THREE.AnimationAction._new =
 
 	this.repetitions = Infinity; 		// no. of repetitions when looping
 
-	this.paused = false;				// false -> zero effective time scale
-	this.enabled = true;				// true -> zero effective weight
+	this.paused = false;				// true -> zero effective time scale
+	this.enabled = true;				// false -> zero effective weight
 
 	this.clampWhenFinished 	= false;	// keep feeding the last frame?
 
 	this.zeroSlopeAtStart 	= true;		// for smooth interpolation w/o separate
 	this.zeroSlopeAtEnd		= true;		// clips for start, loop and end
 
-};
+}
 
-THREE.AnimationAction._new.prototype = {
-
-	constructor: THREE.AnimationAction._new,
+Object.assign( AnimationAction.prototype, {
 
 	// State & Scheduling
 
-	play: function() {
+	play: function () {
 
 		this._mixer._activateAction( this );
 
@@ -96,7 +88,7 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	stop: function() {
+	stop: function () {
 
 		this._mixer._deactivateAction( this );
 
@@ -104,22 +96,20 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	reset: function() {
+	reset: function () {
 
 		this.paused = false;
 		this.enabled = true;
 
 		this.time = 0;			// restart clip
-		this._loopCount = -1;	// forget previous loops
+		this._loopCount = - 1;	// forget previous loops
 		this._startTime = null;	// forget scheduling
 
 		return this.stopFading().stopWarping();
 
 	},
 
-	isRunning: function() {
-
-		var start = this._startTime;
+	isRunning: function () {
 
 		return this.enabled && ! this.paused && this.timeScale !== 0 &&
 				this._startTime === null && this._mixer._isActiveAction( this );
@@ -127,13 +117,13 @@ THREE.AnimationAction._new.prototype = {
 	},
 
 	// return true when play has been called
-	isScheduled: function() {
+	isScheduled: function () {
 
 		return this._mixer._isActiveAction( this );
 
 	},
 
-	startAt: function( time ) {
+	startAt: function ( time ) {
 
 		this._startTime = time;
 
@@ -141,7 +131,7 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	setLoop: function( mode, repetitions ) {
+	setLoop: function ( mode, repetitions ) {
 
 		this.loop = mode;
 		this.repetitions = repetitions;
@@ -155,7 +145,7 @@ THREE.AnimationAction._new.prototype = {
 	// set the weight stopping any scheduled fading
 	// although .enabled = false yields an effective weight of zero, this
 	// method does *not* change .enabled, because it would be confusing
-	setEffectiveWeight: function( weight ) {
+	setEffectiveWeight: function ( weight ) {
 
 		this.weight = weight;
 
@@ -167,32 +157,30 @@ THREE.AnimationAction._new.prototype = {
 	},
 
 	// return the weight considering fading and .enabled
-	getEffectiveWeight: function() {
+	getEffectiveWeight: function () {
 
 		return this._effectiveWeight;
 
 	},
 
-	fadeIn: function( duration ) {
+	fadeIn: function ( duration ) {
 
 		return this._scheduleFading( duration, 0, 1 );
 
 	},
 
-	fadeOut: function( duration ) {
+	fadeOut: function ( duration ) {
 
 		return this._scheduleFading( duration, 1, 0 );
 
 	},
 
-	crossFadeFrom: function( fadeOutAction, duration, warp ) {
-
-		var mixer = this._mixer;
+	crossFadeFrom: function ( fadeOutAction, duration, warp ) {
 
 		fadeOutAction.fadeOut( duration );
 		this.fadeIn( duration );
 
-		if( warp ) {
+		if ( warp ) {
 
 			var fadeInDuration = this._clip.duration,
 				fadeOutDuration = fadeOutAction._clip.duration,
@@ -209,13 +197,13 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	crossFadeTo: function( fadeInAction, duration, warp ) {
+	crossFadeTo: function ( fadeInAction, duration, warp ) {
 
 		return fadeInAction.crossFadeFrom( this, duration, warp );
 
 	},
 
-	stopFading: function() {
+	stopFading: function () {
 
 		var weightInterpolant = this._weightInterpolant;
 
@@ -232,26 +220,26 @@ THREE.AnimationAction._new.prototype = {
 
 	// Time Scale Control
 
-	// set the weight stopping any scheduled warping
+	// set the time scale stopping any scheduled warping
 	// although .paused = true yields an effective time scale of zero, this
 	// method does *not* change .paused, because it would be confusing
-	setEffectiveTimeScale: function( timeScale ) {
+	setEffectiveTimeScale: function ( timeScale ) {
 
 		this.timeScale = timeScale;
-		this._effectiveTimeScale = this.paused ? 0 :timeScale;
+		this._effectiveTimeScale = this.paused ? 0 : timeScale;
 
 		return this.stopWarping();
 
 	},
 
 	// return the time scale considering warping and .paused
-	getEffectiveTimeScale: function() {
+	getEffectiveTimeScale: function () {
 
 		return this._effectiveTimeScale;
 
 	},
 
-	setDuration: function( duration ) {
+	setDuration: function ( duration ) {
 
 		this.timeScale = this._clip.duration / duration;
 
@@ -259,7 +247,7 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	syncWith: function( action ) {
+	syncWith: function ( action ) {
 
 		this.time = action.time;
 		this.timeScale = action.timeScale;
@@ -268,13 +256,13 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	halt: function( duration ) {
+	halt: function ( duration ) {
 
 		return this.warp( this._effectiveTimeScale, 0, duration );
 
 	},
 
-	warp: function( startTimeScale, endTimeScale, duration ) {
+	warp: function ( startTimeScale, endTimeScale, duration ) {
 
 		var mixer = this._mixer, now = mixer.time,
 			interpolant = this._timeScaleInterpolant,
@@ -283,7 +271,7 @@ THREE.AnimationAction._new.prototype = {
 
 		if ( interpolant === null ) {
 
-			interpolant = mixer._lendControlInterpolant(),
+			interpolant = mixer._lendControlInterpolant();
 			this._timeScaleInterpolant = interpolant;
 
 		}
@@ -301,7 +289,7 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	stopWarping: function() {
+	stopWarping: function () {
 
 		var timeScaleInterpolant = this._timeScaleInterpolant;
 
@@ -318,19 +306,19 @@ THREE.AnimationAction._new.prototype = {
 
 	// Object Accessors
 
-	getMixer: function() {
+	getMixer: function () {
 
 		return this._mixer;
 
 	},
 
-	getClip: function() {
+	getClip: function () {
 
 		return this._clip;
 
 	},
 
-	getRoot: function() {
+	getRoot: function () {
 
 		return this._localRoot || this._mixer._root;
 
@@ -338,8 +326,18 @@ THREE.AnimationAction._new.prototype = {
 
 	// Interna
 
-	_update: function( time, deltaTime, timeDirection, accuIndex ) {
+	_update: function ( time, deltaTime, timeDirection, accuIndex ) {
+
 		// called by the mixer
+
+		if ( ! this.enabled ) {
+
+			// call ._updateWeight() to update ._effectiveWeight
+
+			this._updateWeight( time );
+			return;
+
+		}
 
 		var startTime = this._startTime;
 
@@ -387,7 +385,7 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	_updateWeight: function( time ) {
+	_updateWeight: function ( time ) {
 
 		var weight = 0;
 
@@ -424,7 +422,7 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	_updateTimeScale: function( time ) {
+	_updateTimeScale: function ( time ) {
 
 		var timeScale = 0;
 
@@ -467,7 +465,7 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	_updateTime: function( deltaTime ) {
+	_updateTime: function ( deltaTime ) {
 
 		var time = this.time + deltaTime;
 
@@ -478,12 +476,13 @@ THREE.AnimationAction._new.prototype = {
 			loop = this.loop,
 			loopCount = this._loopCount;
 
-		if ( loop === THREE.LoopOnce ) {
+		if ( loop === LoopOnce ) {
 
-			if ( loopCount === -1 ) {
+			if ( loopCount === - 1 ) {
+
 				// just started
 
-				this.loopCount = 0;
+				this._loopCount = 0;
 				this._setEndings( true, true, false );
 
 			}
@@ -505,24 +504,24 @@ THREE.AnimationAction._new.prototype = {
 
 				this._mixer.dispatchEvent( {
 					type: 'finished', action: this,
-					direction: deltaTime < 0 ? -1 : 1
+					direction: deltaTime < 0 ? - 1 : 1
 				} );
 
 			}
 
 		} else { // repetitive Repeat or PingPong
 
-			var pingPong = ( loop === THREE.LoopPingPong );
+			var pingPong = ( loop === LoopPingPong );
 
-			if ( loopCount === -1 ) {
+			if ( loopCount === - 1 ) {
+
 				// just started
 
 				if ( deltaTime >= 0 ) {
 
 					loopCount = 0;
 
-					this._setEndings(
-							true, this.repetitions === 0, pingPong );
+					this._setEndings( true, this.repetitions === 0, pingPong );
 
 				} else {
 
@@ -530,14 +529,14 @@ THREE.AnimationAction._new.prototype = {
 					// transition through zero counts as a repetition,
 					// so leave loopCount at -1
 
-					this._setEndings(
-							this.repetitions === 0, true, pingPong );
+					this._setEndings( this.repetitions === 0, true, pingPong );
 
 				}
 
 			}
 
 			if ( time >= duration || time < 0 ) {
+
 				// wrap around
 
 				var loopDelta = Math.floor( time / duration ); // signed
@@ -548,6 +547,7 @@ THREE.AnimationAction._new.prototype = {
 				var pending = this.repetitions - loopCount;
 
 				if ( pending < 0 ) {
+
 					// have to stop (switch state, clamp time, fire event)
 
 					if ( this.clampWhenFinished ) this.paused = true;
@@ -557,13 +557,15 @@ THREE.AnimationAction._new.prototype = {
 
 					this._mixer.dispatchEvent( {
 						type: 'finished', action: this,
-						direction: deltaTime > 0 ? 1 : -1
+						direction: deltaTime > 0 ? 1 : - 1
 					} );
 
 				} else {
+
 					// keep running
 
 					if ( pending === 0 ) {
+
 						// entering the last round
 
 						var atStart = deltaTime < 0;
@@ -586,6 +588,7 @@ THREE.AnimationAction._new.prototype = {
 			}
 
 			if ( pingPong && ( loopCount & 1 ) === 1 ) {
+
 				// invert time for the "pong round"
 
 				this.time = time;
@@ -600,14 +603,14 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	_setEndings: function( atStart, atEnd, pingPong ) {
+	_setEndings: function ( atStart, atEnd, pingPong ) {
 
 		var settings = this._interpolantSettings;
 
 		if ( pingPong ) {
 
-			settings.endingStart 	= THREE.ZeroSlopeEnding;
-			settings.endingEnd		= THREE.ZeroSlopeEnding;
+			settings.endingStart 	= ZeroSlopeEnding;
+			settings.endingEnd		= ZeroSlopeEnding;
 
 		} else {
 
@@ -615,23 +618,21 @@ THREE.AnimationAction._new.prototype = {
 
 			if ( atStart ) {
 
-				settings.endingStart = this.zeroSlopeAtStart ?
-						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
+				settings.endingStart = this.zeroSlopeAtStart ? ZeroSlopeEnding : ZeroCurvatureEnding;
 
 			} else {
 
-				settings.endingStart = THREE.WrapAroundEnding;
+				settings.endingStart = WrapAroundEnding;
 
 			}
 
 			if ( atEnd ) {
 
-				settings.endingEnd = this.zeroSlopeAtEnd ?
-						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
+				settings.endingEnd = this.zeroSlopeAtEnd ? ZeroSlopeEnding : ZeroCurvatureEnding;
 
 			} else {
 
-				settings.endingEnd 	 = THREE.WrapAroundEnding;
+				settings.endingEnd 	 = WrapAroundEnding;
 
 			}
 
@@ -639,14 +640,14 @@ THREE.AnimationAction._new.prototype = {
 
 	},
 
-	_scheduleFading: function( duration, weightNow, weightThen ) {
+	_scheduleFading: function ( duration, weightNow, weightThen ) {
 
 		var mixer = this._mixer, now = mixer.time,
 			interpolant = this._weightInterpolant;
 
 		if ( interpolant === null ) {
 
-			interpolant = mixer._lendControlInterpolant(),
+			interpolant = mixer._lendControlInterpolant();
 			this._weightInterpolant = interpolant;
 
 		}
@@ -661,5 +662,7 @@ THREE.AnimationAction._new.prototype = {
 
 	}
 
-};
+} );
 
+
+export { AnimationAction };

@@ -746,114 +746,6 @@
       "!doc": "Represents a lookup table for colormaps. It is used to determine the color values from a range of data values.",
       "!type": "fn(colormap, numberOfColors)"
     },
-    "CombinedCamera": {
-      "!url": "http://threejs.org/docs/#Reference/examples/cameras/CombinedCamera",
-      "prototype": {
-        "!proto": "THREE.Camera.prototype",
-        "fov": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum vertical field of view in perspective view."
-        },
-        "left": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum left plane in orthographic view."
-        },
-        "right": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum right plane in orthographic view."
-        },
-        "top": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum top plane in orthographic view."
-        },
-        "bottom": {
-          "!type": "number",
-          "!doc": "Gets or sets the camera frustum bottom plane in orthographic view."
-        },
-        "zoom": {
-          "!type": "number",
-          "!doc": "Gets or sets the zoom factor of the camera."
-        },
-        "near": {
-          "!type": "number",
-          "!doc": "Gets camera frustum near plane."
-        },
-        "far": {
-          "!type": "number",
-          "!doc": "Gets camera frustum far plane."
-        },
-        "cameraO": {
-          "!type": "+THREE.OrthographicCamera",
-          "!doc": "Gets or sets the internal OrthographicCamera used as camera."
-        },
-        "cameraP": {
-          "!type": "+THREE.PerspectiveCamera",
-          "!doc": "Gets or sets the internal PerspectiveCamera used as camera."
-        },
-        "inOrthographicMode": {
-          "!type": "boolean",
-          "!doc": "Gets whether the combinedCamera is in Orthographic Mode."
-        },
-        "inPerspectiveMode": {
-          "!type": "boolean",
-          "!doc": "Gets whether the combinedCamera is in Perspective Mode."
-        },
-        "setFov": {
-          "!type": "fn(fov: number)",
-          "!doc": "sets the camera frustum vertical field of view in perspective view."
-        },
-        "setZoom": {
-          "!type": "fn(zoom: number)",
-          "!doc": "Sets the zoomfactor."
-        },
-        "setLens": {
-          "!type": "fn(focalLength: number, frameHeight: number)",
-          "!doc": "Sets the fov based on lens data."
-        },
-        "toFrontView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the front of the target."
-        },
-        "toBackView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the back of the target."
-        },
-        "toLeftView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the left of the target."
-        },
-        "toRightView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the right of the target."
-        },
-        "toTopView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the top."
-        },
-        "toBottomView": {
-          "!type": "fn()",
-          "!doc": "Sets the camera to view the bottom."
-        },
-        "setSize": {
-          "!type": "fn(width: number, height: number)",
-          "!doc": "Sets the size of the orthographic view."
-        },
-        "toOrthographic": {
-          "!type": "fn()",
-          "!doc": "Change the camera to orthographic view."
-        },
-        "toPerspective": {
-          "!type": "fn()",
-          "!doc": "Change the camera to Perspective view."
-        },
-        "updateProjectionMatrix": {
-          "!type": "fn()",
-          "!doc": "Updates the ProjectionMatrix."
-        }
-      },
-      "!doc": "A general purpose camera, for setting FOV, Lens Focal Length,\n \t\tand switching between perspective and orthographic views easily.\n \t\tUse this only if you do not wish to manage\n \t\tboth an Orthographic and Perspective Camera",
-      "!type": "fn(width: number, height: number, fov: number, near: number, far: number, orthoNear: number, orthoFar: number)"
-    },
     "FontUtils": {
       "!url": "http://threejs.org/docs/#Reference/extras/FontUtils",
       "prototype": {
@@ -912,302 +804,6 @@
       "!url": "http://threejs.org/docs/#Reference/extras/GeometryUtils",
       "prototype": {},
       "!doc": "Contains handy functions geometry manipulations."
-    },
-    "ImageUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/ImageUtils",
-      "prototype": {
-        "crossOrigin": {
-          "!type": "string",
-          "!doc": "The crossOrigin string to implement CORS for loading the image from a different domain that allows CORS."
-        },
-        "generateDataTexture": {
-          "!type": "fn(width: number, height: number, color: number) -> +THREE.DataTexture",
-          "!doc": "Generates a texture of a single color. It is a DataTexture with format, RGBFormat."
-        },
-        "parseDDS": {
-          "!type": "fn(buffer: string, loadMipmaps: boolean) -> +THREE.CompressedTexture",
-          "!doc": "Parses a DDS Image from the string into a CompressedTexture."
-        },
-        "loadCompressedTexture": {
-          "!type": "fn(url: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadTexture": {
-          "!type": "fn(url: string, mapping: UVMapping, onLoad: function, onError: function) -> todo",
-          "!doc": "todo"
-        },
-        "getNormalMap": {
-          "!type": "fn(image: todo, depth: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadCompressedTextureCube": {
-          "!type": "fn(array: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        },
-        "loadTextureCube": {
-          "!type": "fn(array: todo, mapping: todo, onLoad: todo, onError: todo) -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "A Helper class to ease the loading of images of different types."
-    },
-    "SceneUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/SceneUtils",
-      "prototype": {
-        "createMultiMaterialObject": {
-          "!type": "fn(geometry: +THREE.Geometry, materials: []) -> +THREE.Object3D",
-          "!doc": "Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as MultiMaterial which defines multiple material for 1 mesh.<br>\n\t\tThis is mostly useful for object that need a material and a wireframe implementation."
-        },
-        "attach": {
-          "!type": "fn(child: +THREE.Object3D, scene: +THREE.Object3D, parent: +THREE.Object3D)",
-          "!doc": "Attaches the object to the parent without the moving the object in the worldspace."
-        },
-        "detach": {
-          "!type": "fn(child: +THREE.Object3D, parent: +THREE.Object3D, scene: +THREE.Object3D)",
-          "!doc": "Detaches the object from the parent and adds it back to the scene without moving in worldspace."
-        }
-      },
-      "!doc": "A class containing useful utility functions for scene manipulation."
-    },
-    "Animation": {
-      "!url": "http://threejs.org/docs/#Reference/extras/animation/Animation",
-      "prototype": {
-        "root": {
-          "!type": "Object3d",
-          "!doc": "The root object of the animation."
-        },
-        "data": {
-          "!type": "object",
-          "!doc": "The data containing the animation"
-        },
-        "hierarchy": {
-          "!type": "[]",
-          "!doc": "The objects that are influenced by the animation."
-        },
-        "currentTime": {
-          "!type": "number",
-          "!doc": "The time elapsed since the last start/restart of the animation."
-        },
-        "timeScale": {
-          "!type": "number",
-          "!doc": "The timez"
-        },
-        "isPlaying": {
-          "!type": "boolean",
-          "!doc": "Indicates whether the animation is playing. This shouldn't be adapted by user code."
-        },
-        "isPaused": {
-          "!type": "boolean",
-          "!doc": "Indicates whether the animation is paused. This shouldn't be adapted by user code."
-        },
-        "loop": {
-          "!type": "boolean",
-          "!doc": "Set to make the animation restart when the animation ends."
-        },
-        "interpolationType": {
-          "!type": "number",
-          "!doc": "The type to indicate how to interpolate between 2 data points."
-        },
-        "play": {
-          "!type": "fn(startTime: number)",
-          "!doc": "Starts the animation from a moment startTime in the animation."
-        },
-        "stop": {
-          "!type": "fn()",
-          "!doc": "Stops the animation."
-        },
-        "update": {
-          "!type": "fn(deltaTimeMS: number) -> bool",
-          "!doc": "Updates the animation in time. This shouldn't be called by user code. The animationHandler calls this method."
-        },
-        "interpolateCatmullRom": {
-          "!type": "fn(points: [], scale: number) -> array",
-          "!doc": "Interpolates the point based on the key. Is used in update."
-        },
-        "getNextKeyWith": {
-          "!type": "fn(type: string, h: object, key: number) -> object",
-          "!doc": "Gets the next key. Is used in Update."
-        },
-        "getPrevKeyWith": {
-          "!type": "fn(type: string, h: object, key: number) -> object",
-          "!doc": "Gets the previous key. Is used in Update."
-        }
-      },
-      "!doc": "This class animates an object based on an hierarchy. This hierarchy can be Object3ds or bones.",
-      "!type": "fn(root: Object3d, name: string)"
-    },
-    "AnimationHandler": {
-      "!url": "http://threejs.org/docs/#Reference/extras/animation/AnimationHandler",
-      "prototype": {
-        "CATMULLROM": {
-          "!type": "number",
-          "!doc": "Enum Value to indicate that the animation needs to be interpolated as CATMULLROM."
-        },
-        "CATMULLROM_FORWARD": {
-          "!type": "number",
-          "!doc": "Enum Value to indicate that the animation needs to be interpolated as CATMULLROM_FORWARD."
-        },
-        "LINEAR": {
-          "!type": "number",
-          "!doc": "Enum Value to indicate that the animation needs to be interpolated as LINEAR."
-        },
-        "removeFromUpdate": {
-          "!type": "fn(animation: +THREE.Animation)",
-          "!doc": "Removes the animation from the update cycle. This gets called when the animation stops. This shouldn't be called by usercode."
-        },
-        "get": {
-          "!type": "fn(name: string) -> object",
-          "!doc": "Gets the animationData from its library."
-        },
-        "update": {
-          "!type": "fn(deltaTimeMS: number)",
-          "!doc": "Updates all active animations with deltaTime."
-        },
-        "parse": {
-          "!type": "fn(root: object)",
-          "!doc": "Parses the object to get the hierachy."
-        },
-        "add": {
-          "!type": "fn(data: object)",
-          "!doc": "Adds the animationData from its library."
-        },
-        "addToUpdate": {
-          "!type": "fn(animation: +THREE.Animation)",
-          "!doc": "Adds the animation from the update cycle. This gets called when the animation starts. This shouldn't be called by user code."
-        }
-      },
-      "!doc": "The AnimationHandler handles the initialisation of the Animation data and \n\t\tthe animations itself. It keeps track of every animation and if it's active or not.\n\t\tIt also update all animations which are active if its method *update* is called.",
-      "!type": "fn()"
-    },
-    "AnimationMorphTarget": {
-      "!url": "http://threejs.org/docs/#Reference/extras/animation/AnimationMorphTarget",
-      "prototype": {
-        "root": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "data": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "hierarchy": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "currentTime": {
-          "!type": "number",
-          "!doc": "todo"
-        },
-        "timeScale": {
-          "!type": "number",
-          "!doc": "todo"
-        },
-        "isPlaying": {
-          "!type": "boolean",
-          "!doc": "todo"
-        },
-        "isPaused": {
-          "!type": "boolean",
-          "!doc": "todo"
-        },
-        "loop": {
-          "!type": "boolean",
-          "!doc": "todo"
-        },
-        "influence": {
-          "!type": "number",
-          "!doc": "todo"
-        },
-        "play": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        },
-        "pause": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        },
-        "stop": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        },
-        "update": {
-          "!type": "fn(deltaTimeMS: todo) -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "todo",
-      "!type": "fn(root: todo, data: todo)"
-    },
-    "KeyFrameAnimation": {
-      "!url": "http://threejs.org/docs/#Reference/extras/animation/KeyFrameAnimation",
-      "prototype": {
-        "root": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "data": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "hierarchy": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "currentTime": {
-          "!type": "number",
-          "!doc": "todo"
-        },
-        "timeScale": {
-          "!type": "number",
-          "!doc": "todo"
-        },
-        "isPlaying": {
-          "!type": "boolean",
-          "!doc": "todo"
-        },
-        "isPaused": {
-          "!type": "boolean",
-          "!doc": "todo"
-        },
-        "loop": {
-          "!type": "boolean",
-          "!doc": "todo"
-        },
-        "JITCompile": {
-          "!type": "boolean",
-          "!doc": "todo"
-        },
-        "play": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        },
-        "pause": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        },
-        "stop": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        },
-        "update": {
-          "!type": "fn(deltaTimeMS: todo) -> todo",
-          "!doc": "todo"
-        },
-        "interpolateCatmullRom": {
-          "!type": "fn(points: todo, scale: todo) -> todo",
-          "!doc": "todo"
-        },
-        "getNextKeyWith": {
-          "!type": "fn(sid: todo, h: todo, key: todo) -> todo",
-          "!doc": "todo"
-        },
-        "getPrevKeyWith": {
-          "!type": "fn(sid: todo, h: todo, key: todo) -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "todo",
-      "!type": "fn(root: todo, data: todo, JITCompile: todo)"
     },
     "Curve": {
       "!url": "http://threejs.org/docs/#Reference/extras/core/Curve",
@@ -1272,32 +868,8 @@
           "!type": "boolean",
           "!doc": "todo"
         },
-        "getWrapPoints": {
-          "!type": "fn(oldPts: todo, path: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createPointsGeometry": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "todo"
-        },
-        "addWrapPath": {
-          "!type": "fn(bendpath: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createGeometry": {
-          "!type": "fn(points: todo) -> todo",
-          "!doc": "todo"
-        },
         "add": {
           "!type": "fn(curve: todo) -> todo",
-          "!doc": "todo"
-        },
-        "getTransformedSpacedPoints": {
-          "!type": "fn(segments: todo, bends: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createSpacedPointsGeometry": {
-          "!type": "fn(divisions: todo) -> todo",
           "!doc": "todo"
         },
         "closePath": {
@@ -1309,14 +881,6 @@
           "!doc": "todo"
         },
         "getCurveLengths": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        },
-        "getTransformedPoints": {
-          "!type": "fn(segments: todo, bends: todo) -> todo",
-          "!doc": "todo"
-        },
-        "checkConnection": {
           "!type": "fn() -> todo",
           "!doc": "todo"
         }
@@ -1340,7 +904,7 @@
           "!type": "array",
           "!doc": "The possible actions that define the path."
         },
-        "fromPoints": {
+        "setFromPoints": {
           "!type": "fn(vectors) -> todo",
           "!doc": "Adds to the Path from the points. The first vector defines the offset. After that the lines get defined."
         },
@@ -1392,23 +956,7 @@
           "!type": "array",
           "!doc": "todo"
         },
-        "makeGeometry": {
-          "!type": "fn(options: todo) -> todo",
-          "!doc": "Convenience method to return ShapeGeometry"
-        },
-        "extractAllPoints": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "Get points of shape and holes (keypoints based on segments parameter)"
-        },
-        "extrude": {
-          "!type": "fn(options: todo) -> todo",
-          "!doc": "Convenience method to return ExtrudeGeometry"
-        },
         "extractPoints": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "todo"
-        },
-        "extractAllSpacedPoints": {
           "!type": "fn(divisions: todo) -> todo",
           "!doc": "todo"
         },
@@ -1416,10 +964,6 @@
           "!type": "fn(divisions: todo) -> todo",
           "!doc": "Get points of holes"
         },
-        "getSpacedPointsHoles": {
-          "!type": "fn(divisions: todo) -> todo",
-          "!doc": "Get points of holes (spaced by regular distance)"
-        }
       },
       "!doc": "Defines a 2d shape plane using paths.",
       "!type": "fn()"
@@ -1430,15 +974,6 @@
         "!proto": "THREE.EllipseCurve.prototype"
       },
       "!doc": "Alias for [page:EllipseCurve]"
-    },
-    "ClosedSplineCurve3": {
-      "!url": "http://threejs.org/docs/#Reference/extras/curves/ClosedSplineCurve3",
-      "prototype": {
-        "!proto": "THREE.Curve.prototype",
-        "points": "[]"
-      },
-      "!doc": "Create a smooth 3d spline curve from a series of points that loops back onto itself",
-      "!type": "fn(points: [])"
     },
     "CubicBezierCurve": {
       "!url": "http://threejs.org/docs/#Reference/extras/curves/CubicBezierCurve",
@@ -1529,17 +1064,8 @@
       "!doc": "Create a smooth 2d spline curve from a series of points",
       "!type": "fn(points: [])"
     },
-    "SplineCurve3": {
-      "!url": "http://threejs.org/docs/#Reference/extras/curves/SplineCurve3",
-      "prototype": {
-        "!proto": "THREE.Curve.prototype",
-        "points": "[]"
-      },
-      "!doc": "Create a smooth 3d spline curve from a series of points",
-      "!type": "fn(points: [])"
-    },
     "BoxGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/BoxGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/BoxGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
@@ -1547,7 +1073,7 @@
       "!type": "fn(width: number, height: number, depth: number, widthSegments: number, heightSegments: number, depthSegments: number)"
     },
     "CircleGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/CircleGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/CircleGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
@@ -1555,14 +1081,14 @@
       "!type": "fn(radius: number, segments: number, thetaStart: number, thetaLength: number)"
     },
     "CubeGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/CubeGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/CubeGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
       "!doc": "Renamed CubeGeometry to BoxGeometry. see [page:BoxGeometry]."
     },
     "CylinderGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/CylinderGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/CylinderGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
@@ -1570,7 +1096,7 @@
       "!type": "fn(radiusTop: number, radiusBottom: number, height: number, radiusSegments: number, heightSegments: number, openEnded: bool, thetaStart: number, thetaLength: number)"
     },
     "DodecahedronGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/DodecahedronGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/DodecahedronGeometry",
       "prototype": {
         "!proto": "THREE.PolyhedronGeometry.prototype",
         "parameters": {
@@ -1582,7 +1108,7 @@
       "!type": "fn(radius: number, detail: number)"
     },
     "ExtrudeGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/ExtrudeGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/ExtrudeGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype",
         "addShapeList": {
@@ -1598,7 +1124,7 @@
       "!type": "fn(shapes: [], options: object)"
     },
     "IcosahedronGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/IcosahedronGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/IcosahedronGeometry",
       "prototype": {
         "!proto": "THREE.PolyhedronGeometry.prototype",
         "parameters": {
@@ -1610,7 +1136,7 @@
       "!type": "fn(radius: number, detail: number)"
     },
     "LatheGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/LatheGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/LatheGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
@@ -1618,7 +1144,7 @@
       "!type": "fn(points: [], segments: number, phiStart: number, phiLength: number)"
     },
     "OctahedronGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/OctahedronGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/OctahedronGeometry",
       "prototype": {
         "!proto": "THREE.PolyhedronGeometry.prototype",
         "parameters": {
@@ -1630,7 +1156,7 @@
       "!type": "fn(radius: number, detail: number)"
     },
     "ParametricGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/ParametricGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/ParametricGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
@@ -1638,7 +1164,7 @@
       "!type": "fn(func: function, slices: number, stacks: number)"
     },
     "PlaneGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/PlaneGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/PlaneGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
@@ -1646,7 +1172,7 @@
       "!type": "fn(width: number, height: number, widthSegments: number, heightSegments: number)"
     },
     "PolyhedronGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/PolyhedronGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/PolyhedronGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype",
         "parameters": {
@@ -1658,7 +1184,7 @@
       "!type": "fn(vertices: [], faces: [], radius: number, detail: number)"
     },
     "RingGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/RingGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/RingGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
@@ -1666,7 +1192,7 @@
       "!type": "fn(innerRadius: number, outerRadius: number, thetaSegments: number, phiSegments: number, thetaStart: number, thetaLength: number)"
     },
     "ShapeGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/ShapeGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/ShapeGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype",
         "addShape": {
@@ -1678,7 +1204,7 @@
       "!type": "fn(shapes: [], options: object)"
     },
     "SphereGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/SphereGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/SphereGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
@@ -1686,7 +1212,7 @@
       "!type": "fn(radius: number, widthSegments: number, heightSegments: number, phiStart: number, phiLength: number, thetaStart: number, thetaLength: number)"
     },
     "TetrahedronGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/TetrahedronGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/TetrahedronGeometry",
       "prototype": {
         "!proto": "THREE.PolyhedronGeometry.prototype",
         "parameters": {
@@ -1698,7 +1224,7 @@
       "!type": "fn(radius: number, detail: number)"
     },
     "TextGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/TextGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/TextGeometry",
       "prototype": {
         "!proto": "THREE.ExtrudeGeometry.prototype"
       },
@@ -1706,7 +1232,7 @@
       "!type": "fn(text: string, parameters: object)"
     },
     "TorusGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/TorusGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/TorusGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
@@ -1714,7 +1240,7 @@
       "!type": "fn(radius: number, tube: number, radialSegments: number, tubularSegments: number, arc: number)"
     },
     "TorusKnotGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/TorusKnotGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/TorusKnotGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
@@ -1722,7 +1248,7 @@
       "!type": "fn(radius: number, tube: number, radialSegments: number, tubularSegments: number, p: number, q: number, heightScale: number)"
     },
     "TubeGeometry": {
-      "!url": "http://threejs.org/docs/#Reference/extras/geometries/TubeGeometry",
+      "!url": "http://threejs.org/docs/#Reference/geometries/TubeGeometry",
       "prototype": {
         "!proto": "THREE.Geometry.prototype",
         "parameters": {
@@ -1989,74 +1515,6 @@
       "!doc": "base class for immediate rendering objects.",
       "!type": "fn()"
     },
-    "MorphBlendMesh": {
-      "!url": "http://threejs.org/docs/#Reference/extras/objects/MorphBlendMesh",
-      "prototype": {
-        "!proto": "THREE.Mesh.prototype",
-        "animationsMap": {
-          "!type": "object",
-          "!doc": "todo"
-        },
-        "animationsList": {
-          "!type": "array",
-          "!doc": "todo"
-        },
-        "setAnimationWeight": {
-          "!type": "fn(name: todo, weight: todo) -> todo",
-          "!doc": "todo"
-        },
-        "setAnimationFPS": {
-          "!type": "fn(name: todo, fps: todo) -> todo",
-          "!doc": "todo"
-        },
-        "createAnimation": {
-          "!type": "fn(name: todo, start: todo, end: todo, fps: todo) -> todo",
-          "!doc": "todo"
-        },
-        "playAnimation": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        },
-        "update": {
-          "!type": "fn(delta: todo) -> todo",
-          "!doc": "todo"
-        },
-        "autoCreateAnimations": {
-          "!type": "fn(fps: todo) -> todo",
-          "!doc": "todo"
-        },
-        "setAnimationDuration": {
-          "!type": "fn(name: todo, duration: todo) -> todo",
-          "!doc": "todo"
-        },
-        "setAnimationDirectionForward": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        },
-        "getAnimationDuration": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        },
-        "getAnimationTime": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        },
-        "setAnimationDirectionBackward": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        },
-        "setAnimationTime": {
-          "!type": "fn(name: todo, time: todo) -> todo",
-          "!doc": "todo"
-        },
-        "stopAnimation": {
-          "!type": "fn(name: todo) -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "todo",
-      "!type": "fn(geometry: todo, material: todo)"
-    },
     "AmbientLight": {
       "!url": "http://threejs.org/docs/#Reference/lights/AmbientLight",
       "prototype": {
@@ -2207,7 +1665,7 @@
           "!doc": "Remove all values from the cache."
         }
       },
-      "!doc": "A simple caching classe, used internaly by [page:XHRLoader].",
+      "!doc": "A simple caching classe, used internaly by [page:FileLoader].",
       "!type": "fn()"
     },
     "ColladaLoader": {
@@ -2338,10 +1796,6 @@
         "initMaterials": {
           "!type": "fn(materials: [], texturePath: string) -> []",
           "!doc": "Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials."
-        },
-        "extractUrlBase": {
-          "!type": "fn(url: string) -> string",
-          "!doc": "Extract the base from the URL."
         }
       },
       "!doc": "Base class for implementing loaders.",
@@ -2513,8 +1967,8 @@
       "!doc": "Class for loading a [page:Texture texture].",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
-    "XHRLoader": {
-      "!url": "http://threejs.org/docs/#Reference/loaders/XHRLoader",
+    "FileLoader": {
+      "!url": "http://threejs.org/docs/#Reference/loaders/FileLoader",
       "prototype": {
         "cache": {
           "!type": "+THREE.Cache",
@@ -2541,11 +1995,11 @@
           "!doc": "[page:String value] — the empty string (default), \"arraybuffer\", \"blob\", \"document\", \"json\", or \"text\"."
         }
       },
-      "!doc": "A low level class for loading resources with XmlHttpRequest, used internaly by most loaders.",
+      "!doc": "A low level class for loading resources with XMLHttpRequest, used internaly by most loaders.",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
-    "glTFLoader": {
-      "!url": "http://threejs.org/docs/#Reference/loaders/glTFLoader",
+    "GLTFLoader": {
+      "!url": "http://threejs.org/docs/#Reference/loaders/GLTFLoader",
       "prototype": {
         "!proto": "THREE.Loader.prototype",
         "load": {
@@ -3774,9 +3228,9 @@
           "!type": "fn(scalar: number) -> +THREE.Matrix3",
           "!doc": "Multiply every component of the matrix by a scalar value."
         },
-        "applyToVector3Array": {
-          "!type": "fn(array: []) -> []",
-          "!doc": "Multiply (apply) this matrix to every vector3 in the array."
+        "applyToBufferAttribute": {
+          "!type": "fn(attribute: []) -> +THREE.BufferAttribute",
+          "!doc": "Multiply (apply) this matrix to every vector3 in the attribute."
         },
         "getNormalMatrix": {
           "!type": "fn(matrix4: +THREE.Matrix4) -> +THREE.Matrix3",
@@ -3849,10 +3303,6 @@
           "!type": "fn(a: +THREE.Matrix4, b: +THREE.Matrix4) -> +THREE.Matrix4",
           "!doc": "Sets this matrix to *a x b*."
         },
-        "multiplyToArray": {
-          "!type": "fn(a: +THREE.Matrix4, b: +THREE.Matrix4, r: []) -> +THREE.Matrix4",
-          "!doc": "Sets this matrix to *a x b* and stores the result into the flat array *r*.<br>\n\t\t*r* can be either a regular Array or a TypedArray."
-        },
         "multiplyScalar": {
           "!type": "fn(s: number) -> +THREE.Matrix4",
           "!doc": "Multiplies this matrix by *s*."
@@ -3921,25 +3371,21 @@
           "!type": "fn(x: number, y: number, z: number) -> +THREE.Matrix4",
           "!doc": "Sets this matrix as scale transform."
         },
-        "makeFrustum": {
-          "!type": "fn(left: number, right: number, bottom: number, top: number, near: number, far: number) -> +THREE.Matrix4",
-          "!doc": "Creates a [page:Frustum frustum] matrix."
-        },
         "makePerspective": {
-          "!type": "fn(fov: number, aspect: number, near: number, far: number) -> +THREE.Matrix4",
+          "!type": "fn(left: number, right: number, top: number, bottom: number, near: number, far: number) -> +THREE.Matrix4",
           "!doc": "Creates a perspective projection matrix."
         },
         "makeOrthographic": {
-          "!type": "fn(left: number, right: number, bottom: number, top: number, near: number, far: number) -> +THREE.Matrix4",
+          "!type": "fn(left: number, right: number, top: number, bottom: number, near: number, far: number) -> +THREE.Matrix4",
           "!doc": "Creates an orthographic projection matrix."
         },
         "clone": {
           "!type": "fn() -> +THREE.Matrix4",
           "!doc": "Clones this matrix."
         },
-        "applyToVector3Array": {
-          "!type": "fn(a: []) -> []",
-          "!doc": "Multiply (apply) this matrix to every vector3 in the array."
+        "applyToBufferAttribute": {
+          "!type": "fn(attribute: []) -> +THREE.BufferAttribute",
+          "!doc": "Multiply (apply) this matrix to every vector3 in the attribute."
         },
         "getMaxScaleOnAxis": {
           "!type": "fn() -> number",
@@ -4236,34 +3682,6 @@
       },
       "!doc": "A geometric sphere defined by a center position and radius.",
       "!type": "fn(center: +THREE.Vector3, radius: number)"
-    },
-    "Spline": {
-      "!url": "http://threejs.org/docs/#Reference/math/Spline",
-      "prototype": {
-        "points": "[]",
-        "initFromArray": {
-          "!type": "fn(a: [])",
-          "!doc": "Initialises using the data in the array as a series of points. Each value in *a* must be another array with three values, where a[n] is v, the value for the *nth* point, and v[0], v[1] and v[2] are the x, y and z coordinates of that point n, respectively."
-        },
-        "getPoint": {
-          "!type": "fn(k: number) -> +THREE.Vector3",
-          "!doc": "Return the interpolated point at *k*."
-        },
-        "getControlPointsArray": {
-          "!type": "fn() -> []",
-          "!doc": "Returns an array with triplets of x, y, z coordinates that correspond to the current control points."
-        },
-        "getLength": {
-          "!type": "fn(nSubDivisions: number) -> object",
-          "!doc": "Returns an object with the two properties. The property .[page:Number total] contains\n\t\t\tthe length of the spline when using nSubDivisions. The property .[page:Array chunkLength]\n\t\t\tcontains an array with the total length from the beginning of the spline to the end of that chunk."
-        },
-        "reparametrizeByArcLength": {
-          "!type": "fn(samplingCoef: number)",
-          "!doc": "This is done by resampling the original spline, with the density of sampling controlled by *samplingCoef*. Here it's interesting to note that denser sampling is not necessarily better: if sampling is too high, you may get weird kinks in curvature."
-        }
-      },
-      "!doc": "Represents a spline.",
-      "!type": "fn(points: [])"
     },
     "Triangle": {
       "!url": "http://threejs.org/docs/#Reference/math/Triangle",
@@ -4681,7 +4099,7 @@
         },
         "reflect": {
           "!type": "fn(normal: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Reflect incident vector off of plane orthogonal to normal. normal is assumed to have unit length."
+          "!doc": "Reflect incident vector off of plane orthogonal to normal. Normal is assumed to have unit length."
         },
         "fromArray": {
           "!type": "fn(array: []) -> +THREE.Vector3",
@@ -4689,7 +4107,7 @@
         },
         "multiply": {
           "!type": "fn(v: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Multipies this vector by vector v."
+          "!doc": "Multiplies this vector by vector v."
         },
         "applyProjection": {
           "!type": "fn(m: +THREE.Matrix4) -> +THREE.Vector3",
@@ -4701,7 +4119,7 @@
         },
         "applyEuler": {
           "!type": "fn(euler: +THREE.Euler) -> +THREE.Vector3",
-          "!doc": "Applies euler transform to this vector by converting the [page:Euler] obect to a [page:Quaternion] and applying."
+          "!doc": "Applies euler transform to this vector by converting the [page:Euler] object to a [page:Quaternion] and applying."
         },
         "applyQuaternion": {
           "!type": "fn(quaternion: +THREE.Quaternion) -> +THREE.Vector3",
@@ -4930,30 +4348,6 @@
       "!doc": "todo",
       "!type": "fn()"
     },
-    "LensFlare": {
-      "!url": "http://threejs.org/docs/#Reference/objects/LensFlare",
-      "prototype": {
-        "!proto": "THREE.Object3D.prototype",
-        "lensFlares": {
-          "!type": "array",
-          "!doc": "todo"
-        },
-        "positionScreen": {
-          "!type": "+THREE.Vector3",
-          "!doc": "todo"
-        },
-        "customUpdateCallback": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "updateLensFlares": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "todo",
-      "!type": "fn(texture: todo, size: todo, distance: todo, blending: todo, color: todo)"
-    },
     "Line": {
       "!url": "http://threejs.org/docs/#Reference/objects/Line",
       "prototype": {
@@ -4988,7 +4382,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised color."
         },
         "getMorphTargetIndexByName": {
           "!type": "fn(name: string) -> number",
@@ -5092,7 +4486,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised color."
         },
         "clone": {
           "!type": "fn() -> +THREE.PointCloud",
@@ -5427,10 +4821,6 @@
           "!type": "fn(camera, lights, fog, material, object)",
           "!doc": "Renders an immediate Object using a camera."
         },
-        "setFaceCulling": {
-          "!type": "fn(cullFace, frontFace)",
-          "!doc": "If cullFace is false, culling will be disabled."
-        },
         "setDepthTest": {
           "!type": "fn(depthTest: boolean)",
           "!doc": "This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer."
@@ -5523,23 +4913,12 @@
       "prototype": {},
       "!doc": "todo"
     },
-    "LensFlarePlugin": {
-      "!url": "http://threejs.org/docs/#Reference/renderers/webgl/plugins/LensFlarePlugin",
-      "prototype": {
-        "render": {
-          "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera, viewportWidth: number, viewportHeight: number)",
-          "!doc": "Renders the lensflares defined in the scene. This gets automatically called as post render function to draw the lensflares."
-        }
-      },
-      "!doc": "The Webglrenderer plugin class that allows lensflares to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
-      "!type": "fn()"
-    },
     "ShadowMapPlugin": {
       "!url": "http://threejs.org/docs/#Reference/renderers/webgl/plugins/ShadowMapPlugin",
       "prototype": {
         "render": {
           "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera)",
-          "!doc": "Prepares the shadowmaps to be rendered defined in the scene. This gets automatically called as pre render function to draw the lensflares."
+          "!doc": "Prepares the shadowmaps to be rendered defined in the scene."
         }
       },
       "!doc": "The Webglrenderer plugin class that allows shadowmaps to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
@@ -5550,7 +4929,7 @@
       "prototype": {
         "render": {
           "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera)",
-          "!doc": "Renders the sprites defined in the scene. This gets automatically called as post-render function to draw the lensflares."
+          "!doc": "Renders the sprites defined in the scene."
         }
       },
       "!doc": "The Webglrenderer plugin class that allows Sprites to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
@@ -5659,7 +5038,7 @@
         },
         "image": {
           "!type": "Image",
-          "!doc": "An Image object, typically created using the ImageUtils or [page:ImageLoader ImageLoader] classes. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
+          "!doc": "An Image object, typically created using the [page:ImageLoader ImageLoader] class. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
         },
         "mapping": {
           "!type": "object",

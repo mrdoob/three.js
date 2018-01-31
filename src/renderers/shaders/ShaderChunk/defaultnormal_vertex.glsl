@@ -1,7 +1,7 @@
+vec3 transformedNormal = normalMatrix * objectNormal;
+
 #ifdef FLIP_SIDED
 
-	objectNormal = -objectNormal;
+	transformedNormal = - transformedNormal;
 
 #endif
-
-vec3 transformedNormal = normalMatrix * objectNormal;

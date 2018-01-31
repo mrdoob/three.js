@@ -44,7 +44,7 @@ THREE.BokehShader = {
 		"pentagon": { value: 0 },
 
 		"shaderFocus":  { value: 1 },
-		"focusCoords":  { value: new THREE.Vector2() },
+		"focusCoords":  { value: new THREE.Vector2() }
 
 
 	},

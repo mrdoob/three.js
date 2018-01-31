@@ -1,17 +1,17 @@
-//
-// This is a template that can be used to light a material, it uses pluggable RenderEquations (RE)
-//   for specific lighting scenarios.
-//
-// Instructions for use:
-//  - Ensure that both RE_Direct, RE_IndirectDiffuse and RE_IndirectSpecular are defined
-//  - If you have defined an RE_IndirectSpecular, you need to also provide a Material_LightProbeLOD. <---- ???
-//  - Create a material parameter that is to be passed as the third parameter to your lighting functions.
-//
-// TODO:
-//  - Add area light support.
-//  - Add sphere light support.
-//  - Add diffuse light probe (irradiance cubemap) support.
-//
+/**
+ * This is a template that can be used to light a material, it uses pluggable
+ * RenderEquations (RE)for specific lighting scenarios.
+ *
+ * Instructions for use:
+ * - Ensure that both RE_Direct, RE_IndirectDiffuse and RE_IndirectSpecular are defined
+ * - If you have defined an RE_IndirectSpecular, you need to also provide a Material_LightProbeLOD. <---- ???
+ * - Create a material parameter that is to be passed as the third parameter to your lighting functions.
+ *
+ * TODO:
+ * - Add area light support.
+ * - Add sphere light support.
+ * - Add diffuse light probe (irradiance cubemap) support.
+ */
 
 GeometricContext geometry;
 
@@ -32,7 +32,7 @@ IncidentLight directLight;
 		getPointDirectLightIrradiance( pointLight, geometry, directLight );
 
 		#ifdef USE_SHADOWMAP
-		directLight.color *= all( bvec2( pointLight.shadow, directLight.visible ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ] ) : 1.0;
+		directLight.color *= all( bvec2( pointLight.shadow, directLight.visible ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -81,6 +81,19 @@ IncidentLight directLight;
 
 #endif
 
+#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )
+
+	RectAreaLight rectAreaLight;
+
+	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
+
+		rectAreaLight = rectAreaLights[ i ];
+		RE_Direct_RectArea( rectAreaLight, geometry, material, reflectedLight );
+
+	}
+
+#endif
+
 #if defined( RE_IndirectDiffuse )
 
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
@@ -112,7 +125,7 @@ IncidentLight directLight;
 	#if defined( USE_ENVMAP ) && defined( PHYSICAL ) && defined( ENVMAP_TYPE_CUBE_UV )
 
 		// TODO, replace 8 with the real maxMIPLevel
-	 	irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 );
+		irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 );
 
 	#endif
 
@@ -130,7 +143,7 @@ IncidentLight directLight;
 	#else
 		vec3 clearCoatRadiance = vec3( 0.0 );
 	#endif
-		
+
 	RE_IndirectSpecular( radiance, clearCoatRadiance, geometry, material, reflectedLight );
 
 #endif

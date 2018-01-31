@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - webgl2 sandbox</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl2 sandbox.</div>
+
+		<script type="module">
+
+			import { PerspectiveCamera } from '../src/cameras/PerspectiveCamera.js';
+			import { SphereBufferGeometry } from '../src/geometries/SphereGeometry.js';
+			import { MeshNormalMaterial } from '../src/materials/MeshNormalMaterial.js';
+			import { PointLight } from '../src/lights/PointLight.js';
+			import { Color } from '../src/math/Color.js';
+			import { Mesh } from '../src/objects/Mesh.js';
+			import { Fog } from '../src/scenes/Fog.js';
+			import { Scene } from '../src/scenes/Scene.js';
+			import { WebGL2Renderer } from '../src/renderers/WebGL2Renderer.js';
+
+			//
+
+			var camera, scene, renderer;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.z = 3200;
+
+				scene = new Scene();
+				scene.background = new Color( 0, 0, 0.5 );
+				scene.fog = new Fog( 0x000000, 1, 20000 );
+
+				var light = new PointLight( 0xffffff );
+				scene.add( light );
+
+				var geometry = new SphereBufferGeometry( 50, 32, 16 );
+				var material = new MeshNormalMaterial();
+
+				for ( var i = 0; i < 5000; i ++ ) {
+
+					var mesh = new Mesh( geometry, material );
+
+					mesh.position.x = Math.random() * 10000 - 5000;
+					mesh.position.y = Math.random() * 10000 - 5000;
+					mesh.position.z = Math.random() * 10000 - 5000;
+
+					mesh.rotation.y = Math.random() * 2 * Math.PI;
+
+					mesh.scale.setScalar( Math.random() * 4 + 1 );
+
+					scene.add( mesh );
+
+				}
+
+				renderer = new WebGL2Renderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -1,4 +1,4 @@
-﻿THREE.Ocean = function ( renderer, camera, scene, options ) {
+THREE.Ocean = function ( renderer, camera, scene, options ) {
 
 	// flag used to trigger parameter changes
 	this.changed = true;
@@ -31,9 +31,9 @@
 	this.geometrySize = optionalParameter( options.GEOMETRY_SIZE, 2000 );
 	this.resolution = optionalParameter( options.RESOLUTION, 64 );
 	this.floatSize = optionalParameter( options.SIZE_OF_FLOAT, 4 );
-	this.windX = optionalParameter( options.INITIAL_WIND[ 0 ], 10.0 ),
-	this.windY = optionalParameter( options.INITIAL_WIND[ 1 ], 10.0 ),
-	this.size = optionalParameter( options.INITIAL_SIZE, 250.0 ),
+	this.windX = optionalParameter( options.INITIAL_WIND[ 0 ], 10.0 );
+	this.windY = optionalParameter( options.INITIAL_WIND[ 1 ], 10.0 );
+	this.size = optionalParameter( options.INITIAL_SIZE, 250.0 );
 	this.choppiness = optionalParameter( options.INITIAL_CHOPPINESS, 1.5 );
 
 	//

@@ -1,11 +1,14 @@
+import { Camera } from './Camera.js';
+import { Object3D } from '../core/Object3D.js';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author arose / http://github.com/arose
  */
 
-THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
+function OrthographicCamera( left, right, top, bottom, near, far ) {
 
-	THREE.Camera.call( this );
+	Camera.call( this );
 
 	this.type = 'OrthographicCamera';
 
@@ -22,15 +25,17 @@ THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
 
 	this.updateProjectionMatrix();
 
-};
+}
 
-THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.prototype ), {
+OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 
-	constructor: THREE.OrthographicCamera,
+	constructor: OrthographicCamera,
 
-	copy: function ( source ) {
+	isOrthographicCamera: true,
 
-		THREE.Camera.prototype.copy.call( this, source );
+	copy: function ( source, recursive ) {
+
+		Camera.prototype.copy.call( this, source, recursive );
 
 		this.left = source.left;
 		this.right = source.right;
@@ -46,24 +51,42 @@ THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.
 
 	},
 
-	setViewOffset: function( fullWidth, fullHeight, x, y, width, height ) {
+	setViewOffset: function ( fullWidth, fullHeight, x, y, width, height ) {
 
-		this.view = {
-			fullWidth: fullWidth,
-			fullHeight: fullHeight,
-			offsetX: x,
-			offsetY: y,
-			width: width,
-			height: height
-		};
+		if ( this.view === null ) {
+
+			this.view = {
+				enabled: true,
+				fullWidth: 1,
+				fullHeight: 1,
+				offsetX: 0,
+				offsetY: 0,
+				width: 1,
+				height: 1
+			};
+
+		}
+
+		this.view.enabled = true;
+		this.view.fullWidth = fullWidth;
+		this.view.fullHeight = fullHeight;
+		this.view.offsetX = x;
+		this.view.offsetY = y;
+		this.view.width = width;
+		this.view.height = height;
 
 		this.updateProjectionMatrix();
 
 	},
 
-	clearViewOffset: function() {
+	clearViewOffset: function () {
 
-		this.view = null;
+		if ( this.view !== null ) {
+
+			this.view.enabled = false;
+
+		}
+
 		this.updateProjectionMatrix();
 
 	},
@@ -80,7 +103,7 @@ THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.
 		var top = cy + dy;
 		var bottom = cy - dy;
 
-		if ( this.view !== null ) {
+		if ( this.view !== null && this.view.enabled ) {
 
 			var zoomW = this.zoom / ( this.view.width / this.view.fullWidth );
 			var zoomH = this.zoom / ( this.view.height / this.view.fullHeight );
@@ -100,7 +123,7 @@ THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.
 
 	toJSON: function ( meta ) {
 
-		var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+		var data = Object3D.prototype.toJSON.call( this, meta );
 
 		data.object.zoom = this.zoom;
 		data.object.left = this.left;
@@ -117,3 +140,6 @@ THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.
 	}
 
 } );
+
+
+export { OrthographicCamera };

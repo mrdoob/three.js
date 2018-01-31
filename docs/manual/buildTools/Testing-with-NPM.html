@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+			This article shows how to get three.js into a [link:https://nodejs.org/en/ node.js] environment so that you
+			can execute automated tests. Tests can be run on the command line, or by automated
+			CI tools like [link:https://travis-ci.org/ Travis].
+		</div>
+
+		<h2>The short version</h2>
+
+		<div>
+			If you're comfortable with node and npm,
+			<code>
+				$ npm install three --save-dev
+			</code>
+			and add
+		<code>
+			var THREE = require('three');
+		</code>
+			to your test.
+		</div>
+
+		<h2>Create a testable project from scratch</h2>
+		<div>
+			If you're not familiar with these tools, here's a quick guide (for linux, the installation process
+			will be slightly different using windows, but the NPM commands are identical).
+		</div>
+
+		<h3>Basic setup</h3>
+		<div>
+			<ol>
+				<li>
+					Install [link:https://www.npmjs.org/ npm] and nodejs. The shortest path typically looks something like
+					<code>
+$ sudo apt-get install -y npm nodejs-legacy
+# fix any problems with SSL in the default registry URL
+$ npm config set registry http://registry.npmjs.org/
+					</code>
+				</li>
+
+				<li>
+					Make a new project directory
+					<code>
+						 $ mkdir test-example; cd test-example
+					</code>
+				</li>
+
+				<li>
+					Ask npm to create a new project file for you:
+					<code>
+					 $ npm init
+					</code>
+					 and accept all defaults by hitting Enter on all the prompts.
+					 This will create package.json.
+				</li><br />
+
+				<li>
+					Try and start the test feature with
+					<code>
+$ npm test
+					</code>
+					This will fail, which is expected.
+					If you look in the package.json, the definition of the test script is
+					<code>
+						"test": "echo \"Error: no test specified\" && exit 1"
+					</code>
+				</li>
+
+			</ol>
+		</div>
+
+		<h2>Add mocha</h2>
+		<div>
+			We're going to use [link:https://mochajs.org/ mocha].
+
+			<ol>
+				<li>
+					Install mocha with
+					<code>
+$ npm install mocha --save-dev
+					</code>
+					Notice that node_modules/ is created and your dependencies appear in there.
+				  Also notice that your package.json has been updated: the property devDependencies
+					is added and updated by the use of --save-dev.
+				</li><br />
+
+				<li>
+					Edit package.json to use mocha for testing. When test is invoked, we just want to run
+					mocha and specify a verbose reporter. By default this will run anything in test/
+					(not having directory test/ can run into npm ERR!, create it by mkdir test)
+					<code>
+						"test": "mocha --reporter list"
+					</code>
+				</li>
+
+				<li>
+					Rerun the test with
+					<code>
+						$ npm test
+					</code>
+
+					This should now succeed, reporting 0 passing (1ms)
+				 	or similar.
+				</li>
+
+			</ol>
+		</div>
+
+		<h2>Add three.js</h2>
+		<div>
+			<ol>
+				<li>
+					Let's pull in our three.js dependency with
+					<code>
+$ npm install three --save-dev
+					</code>
+					<ul>
+						<li>
+							If you need a different three version, use
+							<code>
+								$ npm show three versions
+							</code>
+						  to see
+							what's available. To tell npm the right one, use
+							<code>
+ $ npm install three@0.84.0 --save
+							</code>
+							(0.84.0 in this example). --save makes this a dependency of this project, rather than
+							dev dependency. See the docs [link:https://www.npmjs.org/doc/json.html here] for more info.
+						</li>
+					</ul>
+				</li>
+
+				<li>
+					Mocha will look for tests in test/, so let's
+					<code>
+					$ mkdir test
+					</code>
+				</li>
+
+				<li>
+					Finally we actually need a JS test to run. Let's add a simple test that will verify that
+					the three.js object is available and working. Create test/verify-three.js containing:
+<code>
+var THREE = require('three');
+var assert = require("assert");
+
+describe('The THREE object', function() {
+  it('should have a defined BasicShadowMap constant', function() {
+    assert.notEqual('undefined', THREE.BasicShadowMap);
+  }),
+
+  it('should be able to construct a Vector3 with default of x=0', function() {
+    var vec3 = new THREE.Vector3();
+    assert.equal(0, vec3.x);
+  })
+})
+</code>
+				</li>
+
+				<li>
+				Finally let's test again with $ npm test. This should run the tests above and succeed,
+				showing something like:
+				<code>
+The THREE object should have a defined BasicShadowMap constant: 0ms
+The THREE object should be able to construct a Vector3 with default of x=0: 0ms
+2 passing (8ms)
+				</code>
+				</li>
+			</ol>
+		</div>
+
+		<h2>Add your own code</h2>
+		<div>
+			You need to do three things:
+
+			<ol>
+				<li>
+					Write a test for the expected behaviour of your code, and place it under test/.
+					[link:https://github.com/air/encounter/blob/master/test/Physics-test.js Here] is an example from a real project.
+				</li>
+
+				<li>
+					Export your functional code in such a way that nodejs can see it, for use in conjunction with require.
+					See it [link:https://github.com/air/encounter/blob/master/js/Physics.js here].
+				</li>
+
+				<li>
+					Require your code into the test file, in the same way we did a require('three') in the example above.
+				</li>
+			</ol>
+
+			Items 2 and 3 will vary depending on how you manage your code. In the example of Physics.js
+		  given above, the export part is right at the end. We assign an object to module.exports:
+			<code>
+//=============================================================================
+// make available in nodejs
+//=============================================================================
+if (typeof exports !== 'undefined')
+{
+  module.exports = Physics;
+}
+			</code>
+		</div>
+
+		<h2>Dealing with dependencies</h2>
+		<div>
+			<p>
+				If you're already using something clever like require.js or browserify, skip this part.
+			</p>
+			<p>
+				Typically a three.js project is going to run in the browser. Module loading is hence done by
+				the browser executing a bunch of script tags. Your individual files don't have to worry
+				about dependencies. In a nodejs context however, there is no index.html binding everything
+				together, so you have to be explicit.
+			</p>
+			<p>
+				If you're exporting a module that depends on other files, you're going to have to tell node to load them.
+				Here is one approach:
+			</p>
+			<ol>
+				<li>
+					At the start of your module, check to see if you're in a nodejs environment.
+				</li>
+				<li>
+					If so, explicitly declare your dependencies.
+				</li>
+				<li>
+					If not, you're probably in a browser so you don't need to do anything else.
+				</li>
+			</ol>
+			Example code from Physics.js:
+			<code>
+//=============================================================================
+// setup for server-side testing
+//=============================================================================
+if (typeof require === 'function') // test for nodejs environment
+{
+  var THREE = require('three');
+  var MY3 = require('./MY3.js');
+}
+			</code>
+		</div>
+
+	</body>
+</html>

@@ -27,14 +27,18 @@
 				width: 100%;
 			}
 
+			#warning {
+				color: #ff0000;
+			}
+
 		</style>
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - <span id="protoplanets"></span> webgl gpgpu debris<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="protoplanets"></span> webgl gpgpu debris<br/>
 			Select <span id="options"></span> debris<br/>
-
+			<span id="warning"></span>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -67,7 +71,7 @@
 				}
 
 				// Dynamics
-			        pos += vel * delta;
+				pos += vel * delta;
 
 				gl_FragColor = vec4( pos, 1.0 );
 
@@ -107,7 +111,6 @@
 				float mass = tmpVel.w;
 
 				if ( mass > 0.0 ) {
-				    
 
 					float radius = radiusFromMass( mass );
 
@@ -266,11 +269,15 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+			var isIE = /Trident/i.test( navigator.userAgent );
+			var isEdge = /Edge/i.test( navigator.userAgent );
+
 			var hash = document.location.hash.substr( 1 );
+
 			if ( hash ) hash = parseInt( hash, 0 );
 
 			// Texture width for simulation (each texel is a debris particle)
-			var WIDTH = hash || 64;
+			var WIDTH = hash || ( isIE || isEdge ) ? 4 : 64;
 
 			var container, stats;
 			var camera, scene, renderer, geometry, controls;
@@ -279,21 +286,31 @@
 
 			document.getElementById( 'protoplanets' ).innerText = PARTICLES;
 
-			function change(n) {
+			function change( n ) {
+
 				location.hash = n;
 				location.reload();
 				return false;
+
 			}
 
 
 			var options = '';
+
 			for ( var i = 1; i < 8; i++ ) {
+
 				var j = Math.pow( 2, i );
 				options += '<a href="#" onclick="return change(' + j + ')">' + ( j * j ) + '</a> ';
+
 			}
+
 			document.getElementById( 'options' ).innerHTML = options;
 
-			var last = performance.now();
+			if ( isEdge || isIE ) {
+
+				document.getElementById( 'warning' ).innerText = 'particle counts greater than 16 may not render with ' + ( isEdge ? 'Edge' : 'IE11' );
+
+			}
 
 			var gpuCompute;
 			var velocityVariable;
@@ -318,7 +335,6 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -338,7 +354,6 @@
 					velocity: 70,
 					velocityExponent: 0.2,
 					randVelocity: 0.001
-
 				};
 
 				initComputeRenderer();
@@ -358,7 +373,7 @@
 
 			function initComputeRenderer() {
 
-    				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
 				var dtPosition = gpuCompute.createTexture();
 				var dtVelocity = gpuCompute.createTexture();
@@ -378,8 +393,11 @@
 				velocityUniforms.density = { value: 0.0 };
 
 				var error = gpuCompute.init();
+
 				if ( error !== null ) {
-				    console.error( error );
+
+					console.error( error );
+
 				}
 
 			}
@@ -404,23 +422,27 @@
 
 				var positions = new Float32Array( PARTICLES * 3 );
 				var p = 0;
+
 				for ( var i = 0; i < PARTICLES; i++ ) {
 
 					positions[ p++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
-					positions[ p++ ] = 0;//( Math.random() * 2 - 1 ) * effectController.radius;
+					positions[ p++ ] = 0; //( Math.random() * 2 - 1 ) * effectController.radius;
 					positions[ p++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
 
 				}
 
 				var uvs = new Float32Array( PARTICLES * 2 );
 				p = 0;
+
 				for ( var j = 0; j < WIDTH; j++ ) {
+
 					for ( var i = 0; i < WIDTH; i++ ) {
 
 						uvs[ p++ ] = i / ( WIDTH - 1 );
 						uvs[ p++ ] = j / ( WIDTH - 1 );
 
 					}
+
 				}
 
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
@@ -439,6 +461,7 @@
 					vertexShader:   document.getElementById( 'particleVertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'particleFragmentShader' ).textContent
 				} );
+
 				material.extensions.drawBuffers = true;
 
 				var particles = new THREE.Points( geometry, material );
@@ -468,9 +491,11 @@
 					var x, y, z, rr;
 
 					do {
+
 						x = ( Math.random() * 2 - 1 );
 						z = ( Math.random() * 2 - 1 );
 						rr = x * x + z * z;
+
 					} while ( rr > 1 );
 
 					rr = Math.sqrt( rr );
@@ -514,7 +539,7 @@
 
 				particleUniforms.cameraConstant.value = getCameraConstant( camera );
 
-    			}
+			}
 
 			function dynamicValuesChanger() {
 
@@ -526,7 +551,7 @@
 
 			function initGUI() {
 
-  				var gui = new dat.GUI();
+				var gui = new dat.GUI();
 
 				var folder1 = gui.addFolder( 'Dynamic parameters' );
 
@@ -544,10 +569,9 @@
 				folder2.add( effectController, "randVelocity", 0.0, 50.0, 0.1 );
 
 				var buttonRestart = {
-				    restartSimulation: function() {
-					restartSimulation();
-				    }
+					restartSimulation: function() { restartSimulation(); }
 				};
+
 				folder2.add( buttonRestart, 'restartSimulation' );
 
 				folder1.open();
@@ -572,12 +596,6 @@
 			}
 
 			function render() {
-
-				var now = performance.now();
-				var delta = (now - last) / 1000;
-
-				if (delta > 1) delta = 1; // safety cap on large deltas
-				last = now;
 
 				gpuCompute.compute();
 

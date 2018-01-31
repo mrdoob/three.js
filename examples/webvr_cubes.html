@@ -4,6 +4,8 @@
 		<title>three.js webvr - cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-02-26 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-02-26" content="ApUnsKNm8cOce0NnJY05mJWYKGaTC2dw9o/+zbrmpEZk/ePiOfxjvcRnKlJUo6zYOrltLnYMcvdWjPTMCJzR1g4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxOTY0ODk5MX0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -21,23 +23,14 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebVR.js"></script>
-		<script src="js/effects/VREffect.js"></script>
-		<script src="js/controls/VRControls.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
-			if ( WEBVR.isLatestAvailable() === false ) {
-
-				document.body.appendChild( WEBVR.getMessage() );
-
-			}
-
-			//
+			var clock = new THREE.Clock();
 
 			var container;
 			var camera, scene, raycaster, renderer;
-			var effect, controls;
 
 			var room;
 			var isMouseDown = false;
@@ -58,10 +51,11 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes';
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				scene.add( camera );
@@ -78,12 +72,12 @@
 				camera.add( crosshair );
 
 				room = new THREE.Mesh(
-					new THREE.BoxGeometry( 6, 6, 6, 10, 10, 10 ),
-					new THREE.MeshBasicMaterial( { color: 0x202020, wireframe: true } )
+					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
 				);
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x404020, 0x202040, 0.5 ) );
+				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -119,29 +113,24 @@
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x101010 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
-
-				controls = new THREE.VRControls( camera );
-				effect = new THREE.VREffect( renderer );
-
-				if ( WEBVR.isAvailable() === true ) {
-
-					document.body.appendChild( WEBVR.getButton( effect ) );
-
-				}
 
 				renderer.domElement.addEventListener( 'mousedown', onMouseDown, false );
 				renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
 				renderer.domElement.addEventListener( 'touchstart', onMouseDown, false );
 				renderer.domElement.addEventListener( 'touchend', onMouseUp, false );
 
+				window.addEventListener( 'resize', onWindowResize, false );
+
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'vrdisplaypointerrestricted', onPointerRestricted, false );
+				window.addEventListener( 'vrdisplaypointerunrestricted', onPointerUnrestricted, false );
+
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 			}
 
@@ -157,12 +146,28 @@
 
 			}
 
+			function onPointerRestricted() {
+				var pointerLockElement = renderer.domElement;
+				if ( pointerLockElement && typeof(pointerLockElement.requestPointerLock) === 'function' ) {
+					pointerLockElement.requestPointerLock();
+
+				}
+			}
+
+			function onPointerUnrestricted() {
+				var currentPointerLockElement = document.pointerLockElement;
+				var expectedPointerLockElement = renderer.domElement;
+				if ( currentPointerLockElement && currentPointerLockElement === expectedPointerLockElement && typeof(document.exitPointerLock) === 'function' ) {
+					document.exitPointerLock();
+				}
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -170,12 +175,13 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-				render();
+				renderer.animate( render );
 
 			}
 
 			function render() {
+
+				var delta = clock.getDelta() * 60;
 
 				if ( isMouseDown === true ) {
 
@@ -184,9 +190,9 @@
 
 					cube.position.set( 0, 0, - 0.75 );
 					cube.position.applyQuaternion( camera.quaternion );
-					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
-					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
-					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 ) * delta;
 					cube.userData.velocity.applyQuaternion( camera.quaternion );
 					room.add( cube );
 
@@ -224,7 +230,7 @@
 
 					var cube = room.children[ i ];
 
-					cube.userData.velocity.multiplyScalar( 0.999 );
+					cube.userData.velocity.multiplyScalar( 1 - ( 0.001 * delta ) );
 
 					cube.position.add( cube.userData.velocity );
 
@@ -249,14 +255,13 @@
 
 					}
 
-					cube.rotation.x += cube.userData.velocity.x * 2;
-					cube.rotation.y += cube.userData.velocity.y * 2;
-					cube.rotation.z += cube.userData.velocity.z * 2;
+					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
+					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
+					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
 
 				}
 
-				controls.update();
-				effect.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

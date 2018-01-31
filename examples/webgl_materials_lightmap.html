@@ -88,7 +88,7 @@
 
 				// CONTROLS
 
-				controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera );
 				controls.maxPolarAngle = 0.9 * Math.PI / 2;
 				controls.enableZoom = false;
 
@@ -149,7 +149,7 @@
 
 					}
 
-					var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
+					var mesh = new THREE.Mesh( geometry, materials );
 
 					mesh.scale.multiplyScalar( 100 );
 					scene.add( mesh );

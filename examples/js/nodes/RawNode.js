@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.RawNode = function( value ) {
+THREE.RawNode = function ( value ) {
 
 	THREE.GLNode.call( this, 'v4' );
 
@@ -12,8 +12,9 @@ THREE.RawNode = function( value ) {
 
 THREE.RawNode.prototype = Object.create( THREE.GLNode.prototype );
 THREE.RawNode.prototype.constructor = THREE.RawNode;
+THREE.RawNode.prototype.nodeType = "Raw";
 
-THREE.GLNode.prototype.generate = function( builder ) {
+THREE.RawNode.prototype.generate = function ( builder ) {
 
 	var material = builder.material;
 
@@ -25,13 +26,28 @@ THREE.GLNode.prototype.generate = function( builder ) {
 
 		code += 'gl_Position = ' + data.result + ';';
 
-	}
-	else {
+	} else {
 
 		code += 'gl_FragColor = ' + data.result + ';';
 
 	}
 
 	return code;
+
+};
+
+THREE.RawNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.value = this.value.toJSON( meta ).uuid;
+
+	}
+
+	return data;
 
 };

@@ -47,11 +47,12 @@
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				var material = new THREE.MeshNormalMaterial();
 
-				var loader = new THREE.JSONLoader();
-				loader.load( 'obj/Suzanne.js', function ( geometry ) {
+				var loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/suzanne.json', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
@@ -75,10 +76,9 @@
 				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
+				//renderer.sortObjects = false;
 
 				container.appendChild( renderer.domElement );
 

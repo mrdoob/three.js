@@ -47,7 +47,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -57,7 +56,7 @@
 				camera.lookAt( new THREE.Vector3( 0, 200, 0 ) );
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.GridHelper( 500, 100 ) );
+				scene.add( new THREE.GridHelper( 1000, 10 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 2 );
 				light.position.set( 1, 1, 1 );
@@ -66,7 +65,7 @@
 
 				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
 				texture.mapping = THREE.UVMapping;
-				texture.anisotropy = renderer.getMaxAnisotropy();
+				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );

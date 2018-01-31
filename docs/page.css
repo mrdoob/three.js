@@ -17,6 +17,8 @@ body {
 
 a {
 	color: #1184CE;
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 h1 {
@@ -40,7 +42,7 @@ h3 {
 	font-size: 16px;
 	font-weight: normal;
 
-	margin-top: 30px;
+	margin-top: 40px;
 }
 
 div {
@@ -56,6 +58,7 @@ pre, code {
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
+
 code {
 	display: block;
 	width: -webkit-calc( 100% - 40px );
@@ -77,6 +80,7 @@ th {
 	padding: 10px;
 	text-decoration: underline;
 }
+
 td {
 	text-align: center;
 }
@@ -102,10 +106,10 @@ strong {
 	opacity: 0.5;
 }
 
-	#button:hover {
-		cursor: pointer;
-		opacity: 1;
-	}
+#button:hover {
+	cursor: pointer;
+	opacity: 1;
+}
 
 a.permalink {
 	float: right;

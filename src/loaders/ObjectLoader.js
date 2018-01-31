@@ -1,15 +1,69 @@
+import {
+	UVMapping,
+	CubeReflectionMapping,
+	CubeRefractionMapping,
+	EquirectangularReflectionMapping,
+	EquirectangularRefractionMapping,
+	SphericalReflectionMapping,
+	CubeUVReflectionMapping,
+	CubeUVRefractionMapping,
+
+	RepeatWrapping,
+	ClampToEdgeWrapping,
+	MirroredRepeatWrapping,
+
+	NearestFilter,
+	NearestMipMapNearestFilter,
+	NearestMipMapLinearFilter,
+	LinearFilter,
+	LinearMipMapNearestFilter,
+	LinearMipMapLinearFilter
+} from '../constants.js';
+import { Color } from '../math/Color.js';
+import { Object3D } from '../core/Object3D.js';
+import { Group } from '../objects/Group.js';
+import { Sprite } from '../objects/Sprite.js';
+import { Points } from '../objects/Points.js';
+import { Line } from '../objects/Line.js';
+import { LineLoop } from '../objects/LineLoop.js';
+import { LineSegments } from '../objects/LineSegments.js';
+import { LOD } from '../objects/LOD.js';
+import { Mesh } from '../objects/Mesh.js';
+import { SkinnedMesh } from '../objects/SkinnedMesh.js';
+import { Shape } from '../extras/core/Shape.js';
+import { Fog } from '../scenes/Fog.js';
+import { FogExp2 } from '../scenes/FogExp2.js';
+import { HemisphereLight } from '../lights/HemisphereLight.js';
+import { SpotLight } from '../lights/SpotLight.js';
+import { PointLight } from '../lights/PointLight.js';
+import { DirectionalLight } from '../lights/DirectionalLight.js';
+import { AmbientLight } from '../lights/AmbientLight.js';
+import { RectAreaLight } from '../lights/RectAreaLight.js';
+import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
+import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
+import { Scene } from '../scenes/Scene.js';
+import { Texture } from '../textures/Texture.js';
+import { ImageLoader } from './ImageLoader.js';
+import { LoadingManager, DefaultLoadingManager } from './LoadingManager.js';
+import { AnimationClip } from '../animation/AnimationClip.js';
+import { MaterialLoader } from './MaterialLoader.js';
+import { BufferGeometryLoader } from './BufferGeometryLoader.js';
+import { JSONLoader } from './JSONLoader.js';
+import { FileLoader } from './FileLoader.js';
+import * as Geometries from '../geometries/Geometries.js';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ObjectLoader = function ( manager ) {
+function ObjectLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 	this.texturePath = '';
 
-};
+}
 
-Object.assign( THREE.ObjectLoader.prototype, {
+Object.assign( ObjectLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -21,10 +75,35 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			scope.parse( JSON.parse( text ), onLoad );
+			var json = null;
+
+			try {
+
+				json = JSON.parse( text );
+
+			} catch ( error ) {
+
+				if ( onError !== undefined ) onError( error );
+
+				console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+
+				return;
+
+			}
+
+			var metadata = json.metadata;
+
+			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
+
+				console.error( 'THREE.ObjectLoader: Can\'t load ' + url + '. Use THREE.JSONLoader instead.' );
+				return;
+
+			}
+
+			scope.parse( json, onLoad );
 
 		}, onProgress, onError );
 
@@ -44,7 +123,8 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 	parse: function ( json, onLoad ) {
 
-		var geometries = this.parseGeometries( json.geometries );
+		var shapes = this.parseShape( json.shapes );
+		var geometries = this.parseGeometries( json.geometries, shapes );
 
 		var images = this.parseImages( json.images, function () {
 
@@ -52,7 +132,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 		} );
 
-		var textures  = this.parseTextures( json.textures, images );
+		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 
 		var object = this.parseObject( json.object, geometries, materials );
@@ -73,14 +153,34 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 	},
 
-	parseGeometries: function ( json ) {
+	parseShape: function ( json ) {
+
+		var shapes = {};
+
+		if ( json !== undefined ) {
+
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
+
+				var shape = new Shape().fromJSON( json[ i ] );
+
+				shapes[ shape.uuid ] = shape;
+
+			}
+
+		}
+
+		return shapes;
+
+	},
+
+	parseGeometries: function ( json, shapes ) {
 
 		var geometries = {};
 
 		if ( json !== undefined ) {
 
-			var geometryLoader = new THREE.JSONLoader();
-			var bufferGeometryLoader = new THREE.BufferGeometryLoader();
+			var geometryLoader = new JSONLoader();
+			var bufferGeometryLoader = new BufferGeometryLoader();
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
@@ -92,7 +192,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					case 'PlaneGeometry':
 					case 'PlaneBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.width,
 							data.height,
 							data.widthSegments,
@@ -105,7 +205,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					case 'BoxBufferGeometry':
 					case 'CubeGeometry': // backwards compatible
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.width,
 							data.height,
 							data.depth,
@@ -119,7 +219,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					case 'CircleGeometry':
 					case 'CircleBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.segments,
 							data.thetaStart,
@@ -131,7 +231,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					case 'CylinderGeometry':
 					case 'CylinderBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radiusTop,
 							data.radiusBottom,
 							data.height,
@@ -147,7 +247,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					case 'ConeGeometry':
 					case 'ConeBufferGeometry':
 
-						geometry = new THREE [ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.height,
 							data.radialSegments,
@@ -162,7 +262,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					case 'SphereGeometry':
 					case 'SphereBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.widthSegments,
 							data.heightSegments,
@@ -175,11 +275,15 @@ Object.assign( THREE.ObjectLoader.prototype, {
 						break;
 
 					case 'DodecahedronGeometry':
+					case 'DodecahedronBufferGeometry':
 					case 'IcosahedronGeometry':
+					case 'IcosahedronBufferGeometry':
 					case 'OctahedronGeometry':
+					case 'OctahedronBufferGeometry':
 					case 'TetrahedronGeometry':
+					case 'TetrahedronBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.detail
 						);
@@ -189,7 +293,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					case 'RingGeometry':
 					case 'RingBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.innerRadius,
 							data.outerRadius,
 							data.thetaSegments,
@@ -203,7 +307,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					case 'TorusGeometry':
 					case 'TorusBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.tube,
 							data.radialSegments,
@@ -216,7 +320,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					case 'TorusKnotGeometry':
 					case 'TorusKnotBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.tube,
 							data.tubularSegments,
@@ -230,11 +334,43 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					case 'LatheGeometry':
 					case 'LatheBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.points,
 							data.segments,
 							data.phiStart,
 							data.phiLength
+						);
+
+						break;
+
+					case 'PolyhedronGeometry':
+					case 'PolyhedronBufferGeometry':
+
+						geometry = new Geometries[ data.type ](
+							data.vertices,
+							data.indices,
+							data.radius,
+							data.details
+						);
+
+						break;
+
+					case 'ShapeGeometry':
+					case 'ShapeBufferGeometry':
+
+						var geometryShapes = [];
+
+						for ( var i = 0, l = data.shapes.length; i < l; i ++ ) {
+
+							var shape = shapes[ data.shapes[ i ] ];
+
+							geometryShapes.push( shape );
+
+						}
+
+						geometry = new Geometries[ data.type ](
+							geometryShapes,
+							data.curveSegments
 						);
 
 						break;
@@ -247,7 +383,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 					case 'Geometry':
 
-						geometry = geometryLoader.parse( data.data, this.texturePath ).geometry;
+						geometry = geometryLoader.parse( data, this.texturePath ).geometry;
 
 						break;
 
@@ -279,13 +415,32 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 		if ( json !== undefined ) {
 
-			var loader = new THREE.MaterialLoader();
+			var loader = new MaterialLoader();
 			loader.setTextures( textures );
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-				var material = loader.parse( json[ i ] );
-				materials[ material.uuid ] = material;
+				var data = json[ i ];
+
+				if ( data.type === 'MultiMaterial' ) {
+
+					// Deprecated
+
+					var array = [];
+
+					for ( var j = 0; j < data.materials.length; j ++ ) {
+
+						array.push( loader.parse( data.materials[ j ] ) );
+
+					}
+
+					materials[ data.uuid ] = array;
+
+				} else {
+
+					materials[ data.uuid ] = loader.parse( data );
+
+				}
 
 			}
 
@@ -301,7 +456,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 		for ( var i = 0; i < json.length; i ++ ) {
 
-			var clip = THREE.AnimationClip.parse( json[ i ] );
+			var clip = AnimationClip.parse( json[ i ] );
 
 			animations.push( clip );
 
@@ -324,15 +479,20 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 				scope.manager.itemEnd( url );
 
+			}, undefined, function () {
+
+				scope.manager.itemEnd( url );
+				scope.manager.itemError( url );
+
 			} );
 
 		}
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			var manager = new THREE.LoadingManager( onLoad );
+			var manager = new LoadingManager( onLoad );
 
-			var loader = new THREE.ImageLoader( manager );
+			var loader = new ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
@@ -352,13 +512,13 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 	parseTextures: function ( json, images ) {
 
-		function parseConstant( value ) {
+		function parseConstant( value, type ) {
 
-			if ( typeof( value ) === 'number' ) return value;
+			if ( typeof value === 'number' ) return value;
 
 			console.warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
 
-			return THREE[ value ];
+			return type[ value ];
 
 		}
 
@@ -382,24 +542,32 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 				}
 
-				var texture = new THREE.Texture( images[ data.image ] );
+				var texture = new Texture( images[ data.image ] );
 				texture.needsUpdate = true;
 
 				texture.uuid = data.uuid;
 
 				if ( data.name !== undefined ) texture.name = data.name;
-				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping );
-				if ( data.offset !== undefined ) texture.offset = new THREE.Vector2( data.offset[ 0 ], data.offset[ 1 ] );
-				if ( data.repeat !== undefined ) texture.repeat = new THREE.Vector2( data.repeat[ 0 ], data.repeat[ 1 ] );
-				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter );
-				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter );
-				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
-				if ( Array.isArray( data.wrap ) ) {
 
-					texture.wrapS = parseConstant( data.wrap[ 0 ] );
-					texture.wrapT = parseConstant( data.wrap[ 1 ] );
+				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, TEXTURE_MAPPING );
+
+				if ( data.offset !== undefined ) texture.offset.fromArray( data.offset );
+				if ( data.repeat !== undefined ) texture.repeat.fromArray( data.repeat );
+				if ( data.center !== undefined ) texture.center.fromArray( data.center );
+				if ( data.rotation !== undefined ) texture.rotation = data.rotation;
+
+				if ( data.wrap !== undefined ) {
+
+					texture.wrapS = parseConstant( data.wrap[ 0 ], TEXTURE_WRAPPING );
+					texture.wrapT = parseConstant( data.wrap[ 1 ], TEXTURE_WRAPPING );
 
 				}
+
+				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
+				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
+				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
+
+				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
 
 				textures[ data.uuid ] = texture;
 
@@ -411,205 +579,308 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 	},
 
-	parseObject: function () {
+	parseObject: function ( data, geometries, materials ) {
 
-		var matrix = new THREE.Matrix4();
+		var object;
 
-		return function parseObject( data, geometries, materials ) {
+		function getGeometry( name ) {
 
-			var object;
+			if ( geometries[ name ] === undefined ) {
 
-			function getGeometry( name ) {
-
-				if ( geometries[ name ] === undefined ) {
-
-					console.warn( 'THREE.ObjectLoader: Undefined geometry', name );
-
-				}
-
-				return geometries[ name ];
+				console.warn( 'THREE.ObjectLoader: Undefined geometry', name );
 
 			}
 
-			function getMaterial( name ) {
+			return geometries[ name ];
 
-				if ( name === undefined ) return undefined;
+		}
 
-				if ( materials[ name ] === undefined ) {
+		function getMaterial( name ) {
 
-					console.warn( 'THREE.ObjectLoader: Undefined material', name );
+			if ( name === undefined ) return undefined;
 
-				}
+			if ( Array.isArray( name ) ) {
 
-				return materials[ name ];
+				var array = [];
 
-			}
+				for ( var i = 0, l = name.length; i < l; i ++ ) {
 
-			switch ( data.type ) {
+					var uuid = name[ i ];
 
-				case 'Scene':
+					if ( materials[ uuid ] === undefined ) {
 
-					object = new THREE.Scene();
-
-					break;
-
-				case 'PerspectiveCamera':
-
-					object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
-
-					if ( data.focus !== undefined ) object.focus = data.focus;
-					if ( data.zoom !== undefined ) object.zoom = data.zoom;
-					if ( data.filmGauge !== undefined ) object.filmGauge = data.filmGauge;
-					if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
-					if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
-
-					break;
-
-				case 'OrthographicCamera':
-
-					object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
-
-					break;
-
-				case 'AmbientLight':
-
-					object = new THREE.AmbientLight( data.color, data.intensity );
-
-					break;
-
-				case 'DirectionalLight':
-
-					object = new THREE.DirectionalLight( data.color, data.intensity );
-
-					break;
-
-				case 'PointLight':
-
-					object = new THREE.PointLight( data.color, data.intensity, data.distance, data.decay );
-
-					break;
-
-				case 'SpotLight':
-
-					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
-
-					break;
-
-				case 'HemisphereLight':
-
-					object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
-
-					break;
-
-				case 'Mesh':
-
-					var geometry = getGeometry( data.geometry );
-					var material = getMaterial( data.material );
-
-					if ( geometry.bones && geometry.bones.length > 0 ) {
-
-						object = new THREE.SkinnedMesh( geometry, material );
-
-					} else {
-
-						object = new THREE.Mesh( geometry, material );
+						console.warn( 'THREE.ObjectLoader: Undefined material', uuid );
 
 					}
 
-					break;
-
-				case 'LOD':
-
-					object = new THREE.LOD();
-
-					break;
-
-				case 'Line':
-
-					object = new THREE.Line( getGeometry( data.geometry ), getMaterial( data.material ), data.mode );
-
-					break;
-
-				case 'PointCloud':
-				case 'Points':
-
-					object = new THREE.Points( getGeometry( data.geometry ), getMaterial( data.material ) );
-
-					break;
-
-				case 'Sprite':
-
-					object = new THREE.Sprite( getMaterial( data.material ) );
-
-					break;
-
-				case 'Group':
-
-					object = new THREE.Group();
-
-					break;
-
-				default:
-
-					object = new THREE.Object3D();
-
-			}
-
-			object.uuid = data.uuid;
-
-			if ( data.name !== undefined ) object.name = data.name;
-			if ( data.matrix !== undefined ) {
-
-				matrix.fromArray( data.matrix );
-				matrix.decompose( object.position, object.quaternion, object.scale );
-
-			} else {
-
-				if ( data.position !== undefined ) object.position.fromArray( data.position );
-				if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
-				if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
-
-			}
-
-			if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
-			if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
-
-			if ( data.visible !== undefined ) object.visible = data.visible;
-			if ( data.userData !== undefined ) object.userData = data.userData;
-
-			if ( data.children !== undefined ) {
-
-				for ( var child in data.children ) {
-
-					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+					array.push( materials[ uuid ] );
 
 				}
 
+				return array;
+
 			}
 
-			if ( data.type === 'LOD' ) {
+			if ( materials[ name ] === undefined ) {
 
-				var levels = data.levels;
+				console.warn( 'THREE.ObjectLoader: Undefined material', name );
 
-				for ( var l = 0; l < levels.length; l ++ ) {
+			}
 
-					var level = levels[ l ];
-					var child = object.getObjectByProperty( 'uuid', level.object );
+			return materials[ name ];
 
-					if ( child !== undefined ) {
+		}
 
-						object.addLevel( child, level.distance );
+		switch ( data.type ) {
+
+			case 'Scene':
+
+				object = new Scene();
+
+				if ( data.background !== undefined ) {
+
+					if ( Number.isInteger( data.background ) ) {
+
+						object.background = new Color( data.background );
 
 					}
 
 				}
 
+				if ( data.fog !== undefined ) {
+
+					if ( data.fog.type === 'Fog' ) {
+
+						object.fog = new Fog( data.fog.color, data.fog.near, data.fog.far );
+
+					} else if ( data.fog.type === 'FogExp2' ) {
+
+						object.fog = new FogExp2( data.fog.color, data.fog.density );
+
+					}
+
+				}
+
+				break;
+
+			case 'PerspectiveCamera':
+
+				object = new PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
+
+				if ( data.focus !== undefined ) object.focus = data.focus;
+				if ( data.zoom !== undefined ) object.zoom = data.zoom;
+				if ( data.filmGauge !== undefined ) object.filmGauge = data.filmGauge;
+				if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
+				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+
+				break;
+
+			case 'OrthographicCamera':
+
+				object = new OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
+
+				break;
+
+			case 'AmbientLight':
+
+				object = new AmbientLight( data.color, data.intensity );
+
+				break;
+
+			case 'DirectionalLight':
+
+				object = new DirectionalLight( data.color, data.intensity );
+
+				break;
+
+			case 'PointLight':
+
+				object = new PointLight( data.color, data.intensity, data.distance, data.decay );
+
+				break;
+
+			case 'RectAreaLight':
+
+				object = new RectAreaLight( data.color, data.intensity, data.width, data.height );
+
+				break;
+
+			case 'SpotLight':
+
+				object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
+
+				break;
+
+			case 'HemisphereLight':
+
+				object = new HemisphereLight( data.color, data.groundColor, data.intensity );
+
+				break;
+
+			case 'SkinnedMesh':
+
+				console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
+
+			case 'Mesh':
+
+				var geometry = getGeometry( data.geometry );
+				var material = getMaterial( data.material );
+
+				if ( geometry.bones && geometry.bones.length > 0 ) {
+
+					object = new SkinnedMesh( geometry, material );
+
+				} else {
+
+					object = new Mesh( geometry, material );
+
+				}
+
+				break;
+
+			case 'LOD':
+
+				object = new LOD();
+
+				break;
+
+			case 'Line':
+
+				object = new Line( getGeometry( data.geometry ), getMaterial( data.material ), data.mode );
+
+				break;
+
+			case 'LineLoop':
+
+				object = new LineLoop( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+				break;
+
+			case 'LineSegments':
+
+				object = new LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+				break;
+
+			case 'PointCloud':
+			case 'Points':
+
+				object = new Points( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+				break;
+
+			case 'Sprite':
+
+				object = new Sprite( getMaterial( data.material ) );
+
+				break;
+
+			case 'Group':
+
+				object = new Group();
+
+				break;
+
+			default:
+
+				object = new Object3D();
+
+		}
+
+		object.uuid = data.uuid;
+
+		if ( data.name !== undefined ) object.name = data.name;
+		if ( data.matrix !== undefined ) {
+
+			object.matrix.fromArray( data.matrix );
+			object.matrix.decompose( object.position, object.quaternion, object.scale );
+
+		} else {
+
+			if ( data.position !== undefined ) object.position.fromArray( data.position );
+			if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
+			if ( data.quaternion !== undefined ) object.quaternion.fromArray( data.quaternion );
+			if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
+
+		}
+
+		if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
+		if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
+
+		if ( data.shadow ) {
+
+			if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
+			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
+			if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
+			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
+
+		}
+
+		if ( data.visible !== undefined ) object.visible = data.visible;
+		if ( data.userData !== undefined ) object.userData = data.userData;
+
+		if ( data.children !== undefined ) {
+
+			var children = data.children;
+
+			for ( var i = 0; i < children.length; i ++ ) {
+
+				object.add( this.parseObject( children[ i ], geometries, materials ) );
+
 			}
 
-			return object;
+		}
 
-		};
+		if ( data.type === 'LOD' ) {
 
-	}()
+			var levels = data.levels;
+
+			for ( var l = 0; l < levels.length; l ++ ) {
+
+				var level = levels[ l ];
+				var child = object.getObjectByProperty( 'uuid', level.object );
+
+				if ( child !== undefined ) {
+
+					object.addLevel( child, level.distance );
+
+				}
+
+			}
+
+		}
+
+		return object;
+
+	}
 
 } );
+
+var TEXTURE_MAPPING = {
+	UVMapping: UVMapping,
+	CubeReflectionMapping: CubeReflectionMapping,
+	CubeRefractionMapping: CubeRefractionMapping,
+	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
+	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
+	SphericalReflectionMapping: SphericalReflectionMapping,
+	CubeUVReflectionMapping: CubeUVReflectionMapping,
+	CubeUVRefractionMapping: CubeUVRefractionMapping
+};
+
+var TEXTURE_WRAPPING = {
+	RepeatWrapping: RepeatWrapping,
+	ClampToEdgeWrapping: ClampToEdgeWrapping,
+	MirroredRepeatWrapping: MirroredRepeatWrapping
+};
+
+var TEXTURE_FILTER = {
+	NearestFilter: NearestFilter,
+	NearestMipMapNearestFilter: NearestMipMapNearestFilter,
+	NearestMipMapLinearFilter: NearestMipMapLinearFilter,
+	LinearFilter: LinearFilter,
+	LinearMipMapNearestFilter: LinearMipMapNearestFilter,
+	LinearMipMapLinearFilter: LinearMipMapLinearFilter
+};
+
+
+export { ObjectLoader };

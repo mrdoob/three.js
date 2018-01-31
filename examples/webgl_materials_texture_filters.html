@@ -37,7 +37,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - texture filtering example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - texture filtering example
 			- painting by <a href="http://en.wikipedia.org/wiki/Basket_of_Fruit_%28Caravaggio%29">Caravaggio</a>
 		</div>
 
@@ -95,10 +95,12 @@
 				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0x000000, 1500, 4000 );
 
 				scene2 = new THREE.Scene();
-				scene2.fog = scene.fog;
+				scene2.background = new THREE.Color( 0x000000 );
+				scene2.fog = new THREE.Fog( 0x000000, 1500, 4000 );
 
 				// GROUND
 
@@ -163,13 +165,13 @@
 
 						zscene.add( zmesh );
 
-						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 5 } )  );
+						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
+						meshFrame.position.z = - 10.0;
 						meshFrame.scale.x = 1.1 * image.width / 100;
 						meshFrame.scale.y = 1.1 * image.height / 100;
-
 						zscene.add( meshFrame );
 
-						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } )  );
+						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } ) );
 						meshShadow.position.y = - 1.1 * image.height/2;
 						meshShadow.position.z = - 1.1 * image.height/2;
 						meshShadow.rotation.x = - Math.PI / 2;
@@ -196,7 +198,6 @@
 
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;

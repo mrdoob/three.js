@@ -26,7 +26,7 @@
 	<body>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank">zz85</a> &amp; alteredq
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq
 		<br/>type to enter new text, drag to spin the text
 		<br/><span class="button" id="color">change color</span>,
 			<span class="button" id="font">change font</span>,
@@ -52,7 +52,7 @@
 
 			var camera, cameraTarget, scene, renderer;
 
-			var group, textMesh1, textMesh2, textGeo, material;
+			var group, textMesh1, textMesh2, textGeo, materials;
 
 			var firstLetter = true;
 
@@ -138,6 +138,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
 
 				// LIGHTS
@@ -181,10 +182,10 @@
 
 				}
 
-				material = new THREE.MultiMaterial( [
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), // front
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ) // side
-				] );
+				materials = [
+					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+					new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+				];
 
 				group = new THREE.Group();
 				group.position.y = 100;
@@ -204,7 +205,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -427,7 +427,7 @@
 
 				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-				textMesh1 = new THREE.Mesh( textGeo, material );
+				textMesh1 = new THREE.Mesh( textGeo, materials );
 
 				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
@@ -440,7 +440,7 @@
 
 				if ( mirror ) {
 
-					textMesh2 = new THREE.Mesh( textGeo, material );
+					textMesh2 = new THREE.Mesh( textGeo, materials );
 
 					textMesh2.position.x = centerOffset;
 					textMesh2.position.y = -hover;

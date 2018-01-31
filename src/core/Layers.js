@@ -2,37 +2,35 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Layers = function () {
+function Layers() {
 
-	this.mask = 1;
+	this.mask = 1 | 0;
 
-};
+}
 
-THREE.Layers.prototype = {
-
-	constructor: THREE.Layers,
+Object.assign( Layers.prototype, {
 
 	set: function ( channel ) {
 
-		this.mask = 1 << channel;
+		this.mask = 1 << channel | 0;
 
 	},
 
 	enable: function ( channel ) {
 
-		this.mask |= 1 << channel;
+		this.mask |= 1 << channel | 0;
 
 	},
 
 	toggle: function ( channel ) {
 
-		this.mask ^= 1 << channel;
+		this.mask ^= 1 << channel | 0;
 
 	},
 
 	disable: function ( channel ) {
 
-		this.mask &= ~ ( 1 << channel );
+		this.mask &= ~ ( 1 << channel | 0 );
 
 	},
 
@@ -42,4 +40,7 @@ THREE.Layers.prototype = {
 
 	}
 
-};
+} );
+
+
+export { Layers };

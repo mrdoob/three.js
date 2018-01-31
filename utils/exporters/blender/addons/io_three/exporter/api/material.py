@@ -44,6 +44,8 @@ def blending(material):
     except AttributeError:
         logger.debug("No THREE_blending_type attribute found")
         blend = constants.NORMAL_BLENDING
+
+    blend = getattr( constants.BLENDING_CONSTANTS , blend) #manthrax: Translate the blending type name, to the three.js constant value.
     return blend
 
 
@@ -70,7 +72,10 @@ def bump_scale(material):
     :rtype: float
 
     """
-    return normal_scale(material)
+    logger.debug("material.bump_scale(%s)", material)
+    for texture in _valid_textures(material):
+        if texture.use_map_normal:
+            return texture.normal_factor
 
 
 @_material

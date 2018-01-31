@@ -1,0 +1,219 @@
+{
+    "asset": {
+        "generator": "COLLADA2GLTF",
+        "version": "2.0"
+    },
+    "scene": 0,
+    "scenes": [
+        {
+            "nodes": [
+                0
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "children": [
+                2,
+                1
+            ],
+            "matrix": [
+                0.009999999776482582,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.009999999776482582,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.009999999776482582,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        {
+            "matrix": [
+                -0.7289686799049377,
+                0.0,
+                -0.6845470666885376,
+                0.0,
+                -0.4252049028873444,
+                0.7836934328079224,
+                0.4527972936630249,
+                0.0,
+                0.5364750623703003,
+                0.6211478114128113,
+                -0.571287989616394,
+                0.0,
+                400.1130065917969,
+                463.2640075683594,
+                -431.0780334472656,
+                1.0
+            ],
+            "camera": 0
+        },
+        {
+            "mesh": 0
+        }
+    ],
+    "cameras": [
+        {
+            "perspective": {
+                "aspectRatio": 1.5,
+                "yfov": 0.6605925559997559,
+                "zfar": 10000.0,
+                "znear": 1.0
+            },
+            "type": "perspective"
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": 1,
+                        "POSITION": 2,
+                        "TEXCOORD_0": 3
+                    },
+                    "indices": 0,
+                    "mode": 4,
+                    "material": 0
+                }
+            ],
+            "name": "LOD3spShape"
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5123,
+            "count": 12636,
+            "max": [
+                2398
+            ],
+            "min": [
+                0
+            ],
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 2399,
+            "max": [
+                0.9995989799499512,
+                0.999580979347229,
+                0.9984359741210938
+            ],
+            "min": [
+                -0.9990839958190918,
+                -1.0,
+                -0.9998319745063782
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 28788,
+            "componentType": 5126,
+            "count": 2399,
+            "max": [
+                96.17990112304688,
+                163.97000122070313,
+                53.92519760131836
+            ],
+            "min": [
+                -69.29850006103516,
+                9.929369926452637,
+                -61.32819747924805
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 2399,
+            "max": [
+                0.9833459854125976,
+                0.9800369739532472
+            ],
+            "min": [
+                0.026409000158309938,
+                0.01996302604675293
+            ],
+            "type": "VEC2"
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0
+                },
+                "metallicFactor": 0.0
+            },
+            "emissiveFactor": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "blinn3-fx"
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "images": [
+        {
+            "uri": "DuckCM.png"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9986,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 76768,
+            "byteLength": 25272,
+            "target": 34963
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 57576,
+            "byteStride": 12,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 57576,
+            "byteLength": 19192,
+            "byteStride": 8,
+            "target": 34962
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 102040,
+            "uri": "Duck0.bin"
+        }
+    ]
+}

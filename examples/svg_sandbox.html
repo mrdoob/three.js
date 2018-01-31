@@ -42,6 +42,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				// QRCODE
 
@@ -177,7 +178,6 @@
 				scene.add( directional );
 
 				renderer = new THREE.SVGRenderer();
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setQuality( 'low' );
 				document.body.appendChild( renderer.domElement );
