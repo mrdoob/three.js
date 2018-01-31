@@ -1050,6 +1050,22 @@ function WebGLRenderer( parameters ) {
 
 		if ( isAnimating ) return;
 
+		requestLoopFrame();
+
+		isAnimating = true;
+
+	}
+
+	function stop()
+	{
+
+		isAnimating = false;
+
+	}
+
+	function requestLoopFrame()
+	{
+
 		var device = vr.getDevice();
 
 		if ( device && device.isPresenting ) {
@@ -1062,37 +1078,23 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		isAnimating = true;
-
 	}
 
 	function loop( time ) {
-
-		if ( onAnimationFrame === null ) isAnimating = false;
 
 		if ( isAnimating === false )
 			return;
 
 		onAnimationFrame( time );
 
-		var device = vr.getDevice();
-
-		if ( device && device.isPresenting ) {
-
-			device.requestAnimationFrame( loop );
-
-		} else {
-
-			window.requestAnimationFrame( loop );
-
-		}
+		requestLoopFrame();
 
 	}
 
 	this.animate = function ( callback ) {
 
 		onAnimationFrame = callback;
-		start();
+		onAnimationFrame !== null ? start() : stop();
 
 	};
 
