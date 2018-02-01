@@ -328,19 +328,19 @@
 
 		var fileName;
 
+		var currentPath = loader.path;
+
 		var children = connections.get( textureNode.id ).children;
 
 		if ( children !== undefined && children.length > 0 && images[ children[ 0 ].ID ] !== undefined ) {
 
 			fileName = images[ children[ 0 ].ID ];
 
-		}
+			if ( fileName.indexOf( 'blob:' ) === 0 || fileName.indexOf( 'data:' ) === 0 ) {
 
-		var currentPath = loader.path;
+				loader.setPath( undefined );
 
-		if ( fileName.indexOf( 'blob:' ) === 0 || fileName.indexOf( 'data:' ) === 0 ) {
-
-			loader.setPath( undefined );
+			}
 
 		}
 
