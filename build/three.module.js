@@ -17993,6 +17993,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 	var _videoTextures = {};
+	var _canvas;
 
 	//
 
@@ -18032,16 +18033,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement || image instanceof ImageBitmap ) {
 
-			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-			canvas.width = _Math.floorPowerOfTwo( image.width );
-			canvas.height = _Math.floorPowerOfTwo( image.height );
+			if ( _canvas === undefined ) _canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 
-			var context = canvas.getContext( '2d' );
-			context.drawImage( image, 0, 0, canvas.width, canvas.height );
+			_canvas.width = _Math.floorPowerOfTwo( image.width );
+			_canvas.height = _Math.floorPowerOfTwo( image.height );
 
-			console.warn( 'THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
+			var context = _canvas.getContext( '2d' );
+			context.drawImage( image, 0, 0, _canvas.width, _canvas.height );
 
-			return canvas;
+			console.warn( 'THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + _canvas.width + 'x' + _canvas.height, image );
+
+			return _canvas;
 
 		}
 
@@ -19187,8 +19189,21 @@ function WebGLState( gl, extensions, utils ) {
 
 	var maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
 
-	var version = parseFloat( /^WebGL\ ([0-9])/.exec( gl.getParameter( gl.VERSION ) )[ 1 ] );
-	var lineWidthAvailable = parseFloat( version ) >= 1.0;
+	var lineWidthAvailable = false;
+	var version = 0;
+	var glVersion = gl.getParameter( gl.VERSION );
+
+	if ( glVersion.indexOf( 'WebGL' ) !== - 1 ) {
+
+	   version = parseFloat( /^WebGL\ ([0-9])/.exec( glVersion )[ 1 ] );
+	   lineWidthAvailable = ( version >= 1.0 );
+
+	} else if ( glVersion.indexOf( 'OpenGL ES' ) !== - 1 ) {
+
+	   version = parseFloat( /^OpenGL\ ES\ ([0-9])/.exec( glVersion )[ 1 ] );
+	   lineWidthAvailable = ( version >= 2.0 );
+
+	}
 
 	var currentTextureSlot = null;
 	var currentBoundTextures = {};
