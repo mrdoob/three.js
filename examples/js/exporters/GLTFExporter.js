@@ -181,6 +181,27 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
+		 * Get the required size + padding for a buffer, rounded to the next 4-byte boundary.
+		 * https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#data-alignment
+		 *
+		 * @param {Integer} bufferSize The size the original buffer.
+		 * @returns {Integer} new buffer size with required padding.
+		 *
+		 */
+		function getPaddedBufferSize( bufferSize ) {
+			
+			// adapted from https://github.com/AnalyticalGraphicsInc/obj2gltf/blob/master/lib/getBufferPadded.js
+
+			var boundary = 4;
+
+			var remainder = bufferSize % boundary;
+			
+			var padding =  (remainder === 0 ) ? 0 : boundary - remainder;
+
+			return bufferSize + padding;
+		}
+		
+		/**
 		 * Process a buffer to append to the default one.
 		 * @param  {THREE.BufferAttribute} attribute     Attribute to store
 		 * @param  {Integer} componentType Component type (Unsigned short, unsigned int or float)
@@ -208,6 +229,10 @@ THREE.GLTFExporter.prototype = {
 
 			// Create a new dataview and dump the attribute's array into it
 			var byteLength = count * attribute.itemSize * componentSize;
+			
+			// adjust required size of array buffer with padding 
+			// to satisfy gltf requirement that the length is divisible by 4
+			byteLength = getPaddedBufferSize( byteLength );
 
 			var dataView = new DataView( new ArrayBuffer( byteLength ) );
 
