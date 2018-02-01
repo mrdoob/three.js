@@ -246,6 +246,25 @@
 				type = 'image/tiff';
 				break;
 
+			case 'tga':
+				if ( typeof THREE.TGALoader !== 'function' ) {
+
+					console.warn( 'FBXLoader: THREE.TGALoader is required to load TGA textures' );
+					return;
+
+				} else {
+
+					if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
+
+						THREE.Loader.Handlers.add( /\.tga$/i, new THREE.TGALoader() );
+
+					}
+
+					type = 'image/tga';
+					break;
+
+				}
+
 			default:
 
 				console.warn( 'FBXLoader: Image type "' + extension + '" is not supported.' );
@@ -344,7 +363,17 @@
 
 		}
 
-		var texture = loader.load( fileName );
+		var texture;
+
+		if ( fileName.indexOf( 'image/tga' ) !== - 1 ) {
+
+			texture = THREE.Loader.Handlers.get( '.tga' ).load( fileName );
+
+		} else {
+
+			texture = loader.load( fileName );
+
+		}
 
 		loader.setPath( currentPath );
 
