@@ -246,6 +246,25 @@
 				type = 'image/tiff';
 				break;
 
+			case 'dds':
+				if ( typeof THREE.DDSLoader !== 'function' ) {
+
+					console.warn( 'FBXLoader: THREE.DDSLoader is required to load DDS textures' );
+					return;
+
+				} else {
+
+					if ( THREE.Loader.Handlers.get( '.dds' ) === null ) {
+
+						THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
+
+					}
+
+					type = 'image/dds';
+					break;
+
+				}
+
 			case 'tga':
 				if ( typeof THREE.TGALoader !== 'function' ) {
 
@@ -365,7 +384,12 @@
 
 		var texture;
 
-		if ( fileName.indexOf( 'image/tga' ) !== - 1 ) {
+		if ( fileName.indexOf( 'image/dds' ) !== - 1 ) {
+
+			texture = THREE.Loader.Handlers.get( '.dds' ).load( fileName );
+			console.log( 'dds', texture );
+
+		} else if ( fileName.indexOf( 'image/tga' ) !== - 1 ) {
 
 			texture = THREE.Loader.Handlers.get( '.tga' ).load( fileName );
 
