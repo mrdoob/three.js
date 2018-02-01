@@ -2209,42 +2209,49 @@
 
 						var curveNode = curveNodesMap.get( child.ID );
 
-						if ( layerCurveNodes[ i ] === undefined ) {
+						// check that the curves are defined for at least one axis, otherwise ignore the curveNode
+						if ( curveNode.curves.x !== undefined || curveNode.curves.y !== undefined || curveNode.curves.z !== undefined ) {
 
-							var modelID;
+							if ( layerCurveNodes[ i ] === undefined ) {
 
-							connections.get( child.ID ).parents.forEach( function ( parent ) {
+								var modelID;
 
-								if ( parent.relationship !== undefined ) modelID = parent.ID;
+								connections.get( child.ID ).parents.forEach( function ( parent ) {
 
-							} );
+									if ( parent.relationship !== undefined ) modelID = parent.ID;
 
-							var rawModel = FBXTree.Objects.Model[ modelID.toString() ];
+								} );
 
-							var node = {
+								var rawModel = FBXTree.Objects.Model[ modelID.toString() ];
 
-								modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
-								initialPosition: [ 0, 0, 0 ],
-								initialRotation: [ 0, 0, 0 ],
-								initialScale: [ 1, 1, 1 ],
+								var node = {
 
-							};
+									modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+									initialPosition: [ 0, 0, 0 ],
+									initialRotation: [ 0, 0, 0 ],
+									initialScale: [ 1, 1, 1 ],
 
-							if ( 'Lcl_Translation' in rawModel ) node.initialPosition = rawModel.Lcl_Translation.value;
+								};
 
-							if ( 'Lcl_Rotation' in rawModel ) node.initialRotation = rawModel.Lcl_Rotation.value;
+								if ( 'Lcl_Translation' in rawModel ) node.initialPosition = rawModel.Lcl_Translation.value;
 
-							if ( 'Lcl_Scaling' in rawModel ) node.initialScale = rawModel.Lcl_Scaling.value;
+								if ( 'Lcl_Rotation' in rawModel ) node.initialRotation = rawModel.Lcl_Rotation.value;
 
-							// if the animated model is pre rotated, we'll have to apply the pre rotations to every
-							// animation value as well
-							if ( 'PreRotation' in rawModel ) node.preRotations = rawModel.PreRotation.value;
+								if ( 'Lcl_Scaling' in rawModel ) node.initialScale = rawModel.Lcl_Scaling.value;
 
-							layerCurveNodes[ i ] = node;
+								// if the animated model is pre rotated, we'll have to apply the pre rotations to every
+								// animation value as well
+								if ( 'PreRotation' in rawModel ) node.preRotations = rawModel.PreRotation.value;
+
+								layerCurveNodes[ i ] = node;
+
+							}
+
+							layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
 
 						}
 
-						layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
+
 
 					}
 
