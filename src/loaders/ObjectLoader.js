@@ -103,7 +103,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			}
 
-			scope.parse( json, onLoad );
+			scope.parse( json, onLoad, onError );
 
 		}, onProgress, onError );
 
@@ -121,7 +121,7 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parse: function ( json, onLoad ) {
+	parse: function ( json, onLoad, onError ) {
 
 		var shapes = this.parseShape( json.shapes );
 		var geometries = this.parseGeometries( json.geometries, shapes );
@@ -130,7 +130,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			if ( onLoad !== undefined ) onLoad( object );
 
-		} );
+		}, onError );
 
 		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
@@ -466,10 +466,25 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parseImages: function ( json, onLoad ) {
+	parseImages: function ( json, onLoad, onError ) {
 
 		var scope = this;
 		var images = {};
+		var firstError;
+		var successCount = 0;
+		var errCount = 0;
+
+		function allImagesFinished() {
+			if ( errCount > 0 ) {
+				if ( onError ) {
+					onError( firstError );
+				}
+			} else {
+				if ( onLoad ) {
+					onLoad( );
+				}
+			}
+		}
 
 		function loadImage( url ) {
 
@@ -477,9 +492,25 @@ Object.assign( ObjectLoader.prototype, {
 
 			return loader.load( url, function () {
 
+				successCount ++;
+
+				if ( successCount + errCount === imageCount ) {
+					allImagesFinished( );
+				}
+
 				scope.manager.itemEnd( url );
 
-			}, undefined, function () {
+			}, undefined, function ( event ) {
+
+				errCount ++;
+
+				if ( firstError === undefined ) {
+					firstError = event;
+				}
+
+				if ( successCount + errCount === imageCount ) {
+					allImagesFinished( );
+				}
 
 				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
@@ -490,12 +521,12 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			var manager = new LoadingManager( onLoad );
-
-			var loader = new ImageLoader( manager );
+			var loader = new ImageLoader( scope.manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			var imageCount = json.length;
+
+			for ( var i = 0; i < imageCount; i ++ ) {
 
 				var image = json[ i ];
 				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
