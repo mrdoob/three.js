@@ -46,13 +46,16 @@
 			</li>
 			<li>
 				You can use the directive #pragma unroll_loop in order to unroll a *for* loop in GLSL by the shader preprocessor.
-				The directive has to be placed right above the loop. The loop itself has to correspond to a defined standard.
+				The directive has to be placed right above the loop. The loop formatting has to correspond to a defined standard.
 				<ul>
 					<li>
-						The loop has to be [link:https://en.wikipedia.org/wiki/Normalized_loop normalized/well-behaved].
+						The loop has to be [link:https://en.wikipedia.org/wiki/Normalized_loop normalized].
 					</li>
 					<li>
-						The loop variable must be *i*.
+						The loop variable has to be *i*.
+					</li>
+					<li>
+						The loop has to use a certain whitespace formatting.
 					</li>
 				</ul>
 				<code>
