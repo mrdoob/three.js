@@ -44,6 +44,10 @@
 				If you don't want the [page:WebGLProgram] to add anything to your shader code, you can use
 				[page:RawShaderMaterial] instead of this class.
 			</li>
+			<li>
+				You can use the directive #pragma unroll_loop in order to unroll a *for* loop in GLSL by the shader preprocessor.
+				The directive has to be placed right above the loop. The loop itself has to be normalized/well-behaved.
+			</li>
 		</ul>
 		</div>
 
