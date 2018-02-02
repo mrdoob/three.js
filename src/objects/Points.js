@@ -50,8 +50,6 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
-			//
-
 			inverseMatrix.getInverse( matrixWorld );
 			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
