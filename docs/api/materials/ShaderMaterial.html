@@ -49,12 +49,20 @@
 				The directive has to be placed right above the loop. The loop itself has to correspond to a defined standard.
 				<ul>
 					<li>
-						The loop has to be normalized/well-behaved.
+						The loop has to be [link:https://en.wikipedia.org/wiki/Normalized_loop normalized/well-behaved].
 					</li>
 					<li>
 						The loop variable must be *i*.
 					</li>
 				</ul>
+				<code>
+		#pragma unroll_loop
+		for ( int i = 0; i < 10; i ++ ) {
+
+			// ...
+
+		}
+				</code>
 			</li>
 		</ul>
 		</div>
