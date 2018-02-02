@@ -2,7 +2,7 @@
 
 	#if NUM_DIR_LIGHTS > 0
 
-	#pragma three unroll
+	#pragma unroll_loop
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * worldPosition;
@@ -13,7 +13,7 @@
 
 	#if NUM_SPOT_LIGHTS > 0
 
-	#pragma three unroll
+	#pragma unroll_loop
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
 		vSpotShadowCoord[ i ] = spotShadowMatrix[ i ] * worldPosition;
@@ -24,7 +24,7 @@
 
 	#if NUM_POINT_LIGHTS > 0
 
-	#pragma three unroll
+	#pragma unroll_loop
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
 		vPointShadowCoord[ i ] = pointShadowMatrix[ i ] * worldPosition;
