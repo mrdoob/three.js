@@ -196,7 +196,7 @@ THREE.GLTFExporter.prototype = {
 
 			var remainder = bufferSize % boundary;
 			
-			var padding =  (remainder === 0 ) ? 0 : boundary - remainder;
+			var padding =  remainder === 0 ? 0 : boundary - remainder;
 
 			return bufferSize + padding;
 		}
