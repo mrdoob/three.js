@@ -185,6 +185,155 @@ THREE.BufferGeometryUtils = {
 	},
 
 	/**
+	 * @param  {Array<THREE.BufferGeometry>} geometries
+	 * @return {THREE.BufferGeometry}
+	 */
+	mergeBufferGeometries: function ( geometries ) {
+
+		var isIndexed = geometries[ 0 ].index !== null;
+
+		var attributesUsed = new Set( Object.keys( geometries[ 0 ].attributes ) );
+		var morphAttributesUsed = new Set( Object.keys( geometries[ 0 ].morphAttributes ) );
+
+		var attributes = {};
+		var morphAttributes = {};
+
+		var mergedGeometry = new THREE.BufferGeometry();
+		var offset = 0;
+
+		for ( var i = 0; i < geometries.length; ++ i ) {
+
+			var geometry = geometries[ i ];
+
+			// ensure that all geometries are indexed, or none
+
+			if ( isIndexed !== ( geometry.index !== null ) ) return null;
+
+			// gather attributes, exit early if they're different
+
+			for ( var name in geometry.attributes ) {
+
+				if ( !attributesUsed.has( name ) ) return null;
+
+				if ( attributes[ name ] === undefined ) attributes[ name ] = [];
+
+				attributes[ name ].push( geometry.attributes[ name ] );
+
+			}
+
+			// gather morph attributes, exit early if they're different
+
+			for ( var name in geometry.morphAttributes ) {
+
+				if ( !morphAttributesUsed.has( name ) ) return null;
+
+				if ( morphAttributes[ name ] === undefined ) morphAttributes[ name ] = [];
+
+				morphAttributes[ name ].push( geometry.morphAttributes[ name ] );
+
+			}
+
+			// gather .userData
+
+			if ( geometry.userData !== undefined ) {
+
+				mergedGeometry.userData = mergedGeometry.userData || {};
+				mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || [];
+				mergedGeometry.userData.mergedUserData.push( geometry.userData );
+
+			}
+
+			// create new group for this geometry
+
+			mergedGeometry.addGroup( offset, geometry.attributes.position.count, i );
+			offset += geometry.attributes.position.count;
+
+		}
+
+		// merge indices
+
+		if ( isIndexed ) {
+
+			var indexOffset = 0;
+			var indexList = [];
+
+			for ( var i = 0; i < geometries.length; ++ i ) {
+
+				var index = geometries[ i ].index;
+
+				if ( indexOffset > 0 ) {
+
+					index = index.clone();
+
+					for ( var j = 0; j < index.count; ++ j ) {
+
+						index.setX( j, index.getX( j ) + indexOffset );
+
+					}
+
+				}
+
+				indexList.push( index );
+				indexOffset += geometries[ i ].attributes.position.count;
+
+			}
+
+			var mergedIndex = this.mergeBufferAttributes( indexList );
+
+			if ( !mergedIndex ) return null;
+
+			mergedGeometry.index = mergedIndex;
+
+		}
+
+		// merge attributes
+
+		for ( var name in attributes ) {
+
+			var mergedAttribute = this.mergeBufferAttributes( attributes[ name ] );
+
+			if ( ! mergedAttribute ) return null;
+
+			mergedGeometry.addAttribute( name, mergedAttribute );
+
+		}
+
+		// merge morph attributes
+
+		for ( var name in morphAttributes ) {
+
+			var numMorphTargets = morphAttributes[ name ][ 0 ].length;
+
+			if ( numMorphTargets === 0 ) break;
+
+			mergedGeometry.morphAttributes = mergedGeometry.morphAttributes || {};
+			mergedGeometry.morphAttributes[ name ] = [];
+
+			for ( var i = 0; i < numMorphTargets; ++ i ) {
+
+				var morphAttributesToMerge = [];
+
+				for ( var j = 0; j < morphAttributes[ name ].length; ++ j ) {
+
+					morphAttributesToMerge.push( morphAttributes[ name ][ j ][ i ] );
+
+				}
+
+				var mergedMorphAttribute = this.mergeBufferAttributes( morphAttributesToMerge );
+
+				if ( !mergedMorphAttribute ) return null;
+
+				mergedGeometry.morphAttributes[ name ].push( mergedMorphAttribute );
+
+			}
+
+		}
+
+		return mergedGeometry;
+
+	},
+
+	/**
 	 * @param {Array<THREE.BufferAttribute>} attributes
 	 * @return {THREE.BufferAttribute}
 	 */

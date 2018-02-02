@@ -2154,6 +2154,9 @@ THREE.GLTFLoader = ( function () {
 
 			return scope.loadGeometries( primitives ).then( function ( geometries ) {
 
+				var useSkinning = false;
+				var useMorphTargets = false;
+
 				for ( var i = 0, il = primitives.length; i < il; i ++ ) {
 
 					var primitive = primitives[ i ];
@@ -2173,10 +2176,10 @@ THREE.GLTFLoader = ( function () {
 					}
 
 					// If the material will be modified later on, clone it now.
+					useSkinning = meshDef.isSkinnedMesh === true;
+					useMorphTargets = primitive.targets !== undefined;
 					var useVertexColors = geometry.attributes.color !== undefined;
 					var useFlatShading = geometry.attributes.normal === undefined;
-					var useSkinning = meshDef.isSkinnedMesh === true;
-					var useMorphTargets = primitive.targets !== undefined;
 
 					if ( useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
 
@@ -2325,64 +2328,40 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				// TODO(donmccurdy): Does this work if it's not a THREE.Mesh?
+				// Attempt to merge primitives into a single mesh with multiple
+				// buffer geometry groups, returning the group if that fails.
+
 				if ( ! group.children[ 0 ].isMesh ) return group;
 				if ( Object.keys( modesUsed ).length > 1 ) return group;
 				if ( THREE.BufferGeometryUtils === undefined ) return group;
 
-				var mergedGeometry = new THREE.BufferGeometry();
-				var materials = [];
-				var attributes = {};
-				var attributesUsed = Object.keys( group.children[ 0 ].geometry.attributes ).sort().join( '|' );
-				var offset = 0;
+				var groupGeometries = [];
+				var groupMaterials = [];
 
-				for ( var j = 0, jl = group.children.length; j < jl; ++ j ) {
+				for ( var i = 0; i < group.children.length; ++i ) {
 
-					var childGeometry = group.children[ j ].geometry;
+					var geometry = group.children[ i ].geometry;
+					var material = group.children[ i ].material;
 
-					if ( childGeometry.index ) childGeometry = childGeometry.toNonIndexed();
+					// Can't update spec/gloss uniforms on a multi-material mesh,
+					// so skip this case for now.
+					if ( material.isGLTFSpecularGlossinessMaterial ) return group;
 
-					var childAttributesUsed = Object.keys( childGeometry.attributes ).sort().join( '|' );
-
-					if ( attributesUsed !== childAttributesUsed ) {
-						console.log('bailing');
-						return group;
-					}
-
-					for ( var name in childGeometry.attributes ) {
-
-						if ( attributes[ name ] === undefined ) attributes[ name ] = [];
-
-						attributes[ name ].push( childGeometry.attributes[ name ] );
-
-					}
-
-					// TODO(donmccurdy): Keep track of primitive .extras?
-
-					// TODO(donmccurdy): Reuse materials.
-					materials.push( group.children[ j ].material );
-					mergedGeometry.addGroup( offset, childGeometry.attributes.position.count, j );
-					offset += childGeometry.attributes.position.count;
+					groupGeometries.push( geometry );
+					groupMaterials.push( material );
 
 				}
 
-				for ( var name in attributes ) {
+				var mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries( groupGeometries );
 
-					var mergedAttribute = THREE.BufferGeometryUtils.mergeBufferAttributes( attributes[ name ] );
+				if ( !mergedGeometry ) return group;
 
-					if ( ! mergedAttribute ) return group;
-
-					mergedGeometry.addAttribute( name, mergedAttribute );
-
-				}
-
-				var mergedMesh = group.children[ 0 ].isSkinnedMesh
-					? new THREE.SkinnedMesh( mergedGeometry, materials )
-					: new THREE.Mesh( mergedGeometry, materials );
+				var mergedMesh = useSkinning
+					? new THREE.SkinnedMesh( mergedGeometry, groupMaterials )
+					: new THREE.Mesh( mergedGeometry, groupMaterials );
 
 				if ( meshDef.name !== undefined ) mergedMesh.name = meshDef.name;
 				if ( meshDef.extras !== undefined ) mergedMesh.userData = meshDef.extras;
-				// TODO(donmccurdy): Spec gloss... morph targets ... siiighh.
 
 				return mergedMesh;
 
