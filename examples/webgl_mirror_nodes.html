@@ -50,6 +50,7 @@
 		<script src="js/nodes/FunctionCallNode.js"></script>
 		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
 		<!-- Accessors -->
@@ -125,6 +126,8 @@
 
 		var sphereGroup, smallSphere;
 		var groundMirrorMaterial;
+
+		var frame = new THREE.NodeFrame();
 
 		function init() {
 
@@ -322,7 +325,7 @@
 			smallSphere.rotation.y = ( Math.PI / 2 ) - timer * 0.1;
 			smallSphere.rotation.z = timer * 0.8;
 
-			groundMirrorMaterial.updateFrame( delta );
+			frame.update( delta ).updateFrame( groundMirrorMaterial );
 
 			render();
 

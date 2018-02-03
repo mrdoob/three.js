@@ -372,6 +372,7 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 				case "TimerNode":
 
+					object.scope = node.scope;
 					object.scale = node.scale;
 
 					break;
