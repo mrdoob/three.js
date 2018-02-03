@@ -1525,10 +1525,13 @@
 
 							}
 
+							var focalLength = cameraAttribute.FocalLength ? cameraAttribute.FocalLength.value : null;
+
 							switch ( type ) {
 
 								case 0: // Perspective
 									model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
+									if ( focalLength !== null ) model.setFocalLength( focalLength );
 									break;
 
 								case 1: // Orthographic
