@@ -20,19 +20,13 @@ Sidebar.Settings.Viewport = function ( editor ) {
 
 	var snap = new UI.THREE.Boolean( false, 'snap' ).onChange( update );
 	container.add( snap );
-
-	var local = new UI.THREE.Boolean( false, 'local' ).onChange( update );
-	container.add( local );
 	*/
 
 	function update() {
 
 		signals.showGridChanged.dispatch( show.getValue() );
 
-		/*
-		signals.snapChanged.dispatch( snap.getValue() === true ? snapSize.getValue() : null );
-		signals.spaceChanged.dispatch( local.getValue() === true ? "local" : "world" );
-		*/
+		// signals.snapChanged.dispatch( snap.getValue() === true ? snapSize.getValue() : null );
 
 	}
 
