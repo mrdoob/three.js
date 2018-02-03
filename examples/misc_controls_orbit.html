@@ -106,11 +106,10 @@
 				container.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.up.set(0, 0, 1);
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = 23 * Math.PI / 48; // radians
+				controls.maxPolarAngle = 24 * Math.PI / 48; // radians
 				controls.addEventListener( 'change', render ); // remove when using animation loop
 				// enable animation loop when using damping or autorotation
 				//controls.enableDamping = true;
@@ -131,7 +130,8 @@
 							needsUpdate: true
 						} );
 						var mesh = new THREE.Mesh( geometry, material );
-						mesh.position.set(0, 0, -1);
+						mesh.rotateX( 3 * Math.PI/2 );
+						mesh.position.set( 0, -10, 0 );
 						scene.add( mesh );
 						render();
 					}
@@ -139,7 +139,7 @@
 
 				// target axes
 				axes = originAxes( 5, 200 );
-				axes.position.set( 0, 0, 1 );
+				axes.position.set( 0, 0, 0 );
 				scene.add(axes);
 
 				// lights
