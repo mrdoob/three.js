@@ -61,12 +61,12 @@
 
 				scene = new THREE.Scene();
 
-				var ambient = new THREE.AmbientLight( 0x101030 );
-				scene.add( ambient );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 );
-				scene.add( directionalLight );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( pointLight );
+				scene.add( camera );
 
 				// texture
 
@@ -77,7 +77,10 @@
 
 				};
 
-				var texture = new THREE.Texture();
+				var textureLoader = new THREE.TextureLoader( manager );
+				var texture = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
+
+				// model
 
 				var onProgress = function ( xhr ) {
 					if ( xhr.lengthComputable ) {
@@ -88,17 +91,6 @@
 
 				var onError = function ( xhr ) {
 				};
-
-
-				var loader = new THREE.ImageLoader( manager );
-				loader.load( 'textures/UV_Grid_Sm.jpg', function ( image ) {
-
-					texture.image = image;
-					texture.needsUpdate = true;
-
-				} );
-
-				// model
 
 				var loader = new THREE.OBJLoader( manager );
 				loader.load( 'obj/male02/male02.obj', function ( object ) {

@@ -77,7 +77,9 @@
 
 			// refractor
 
-			refractor = new THREE.Refractor( 10, 10, {
+			var refractorGeometry = new THREE.PlaneBufferGeometry( 10, 10 );
+
+			refractor = new THREE.Refractor( refractorGeometry, {
 				color: 0x999999,
 				textureWidth: 1024,
 				textureHeight: 1024,

@@ -168,7 +168,7 @@ Object.assign( FileLoader.prototype, {
 
 			request.addEventListener( 'load', function ( event ) {
 
-				var response = event.target.response;
+				var response = this.response;
 
 				Cache.add( url, response );
 
@@ -235,6 +235,8 @@ Object.assign( FileLoader.prototype, {
 			request.addEventListener( 'error', function ( event ) {
 
 				var callbacks = loading[ url ];
+
+				delete loading[ url ];
 
 				for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 

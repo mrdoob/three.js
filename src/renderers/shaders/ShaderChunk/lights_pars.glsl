@@ -132,8 +132,8 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	// Pre-computed values of LinearTransformedCosine approximation of BRDF
 	// BRDF approximation Texture is 64x64
-	uniform sampler2D ltcMat; // RGBA Float
-	uniform sampler2D ltcMag; // Alpha Float (only has w component)
+	uniform sampler2D ltc_1; // RGBA Float
+	uniform sampler2D ltc_2; // RGBA Float
 
 	uniform RectAreaLight rectAreaLights[ NUM_RECT_AREA_LIGHTS ];
 

@@ -65,7 +65,7 @@
 
 				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
 				texture.mapping = THREE.UVMapping;
-				texture.anisotropy = renderer.getMaxAnisotropy();
+				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );

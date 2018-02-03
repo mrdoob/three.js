@@ -5,24 +5,24 @@
 THREE.OBJLoader = ( function () {
 
 	// o object_name | g group_name
-	var object_pattern           = /^[og]\s*(.+)?/;
+	var object_pattern = /^[og]\s*(.+)?/;
 	// mtllib file_reference
 	var material_library_pattern = /^mtllib /;
 	// usemtl material_name
-	var material_use_pattern     = /^usemtl /;
+	var material_use_pattern = /^usemtl /;
 
 	function ParserState() {
 
 		var state = {
-			objects  : [],
-			object   : {},
+			objects: [],
+			object: {},
 
-			vertices : [],
-			normals  : [],
-			colors   : [],
-			uvs      : [],
+			vertices: [],
+			normals: [],
+			colors: [],
+			uvs: [],
 
-			materialLibraries : [],
+			materialLibraries: [],
 
 			startObject: function ( name, fromDeclaration ) {
 
@@ -45,17 +45,17 @@ THREE.OBJLoader = ( function () {
 				}
 
 				this.object = {
-					name : name || '',
-					fromDeclaration : ( fromDeclaration !== false ),
+					name: name || '',
+					fromDeclaration: ( fromDeclaration !== false ),
 
-					geometry : {
-						vertices : [],
-						normals  : [],
-						colors   : [],
-						uvs      : []
+					geometry: {
+						vertices: [],
+						normals: [],
+						colors: [],
+						uvs: []
 					},
-					materials : [],
-					smooth : true,
+					materials: [],
+					smooth: true,
 
 					startMaterial: function ( name, libraries ) {
 
@@ -70,28 +70,30 @@ THREE.OBJLoader = ( function () {
 						}
 
 						var material = {
-							index      : this.materials.length,
-							name       : name || '',
-							mtllib     : ( Array.isArray( libraries ) && libraries.length > 0 ? libraries[ libraries.length - 1 ] : '' ),
-							smooth     : ( previous !== undefined ? previous.smooth : this.smooth ),
-							groupStart : ( previous !== undefined ? previous.groupEnd : 0 ),
-							groupEnd   : -1,
-							groupCount : -1,
-							inherited  : false,
+							index: this.materials.length,
+							name: name || '',
+							mtllib: ( Array.isArray( libraries ) && libraries.length > 0 ? libraries[ libraries.length - 1 ] : '' ),
+							smooth: ( previous !== undefined ? previous.smooth : this.smooth ),
+							groupStart: ( previous !== undefined ? previous.groupEnd : 0 ),
+							groupEnd: - 1,
+							groupCount: - 1,
+							inherited: false,
 
 							clone: function ( index ) {
+
 								var cloned = {
-									index      : ( typeof index === 'number' ? index : this.index ),
-									name       : this.name,
-									mtllib     : this.mtllib,
-									smooth     : this.smooth,
-									groupStart : 0,
-									groupEnd   : -1,
-									groupCount : -1,
-									inherited  : false
+									index: ( typeof index === 'number' ? index : this.index ),
+									name: this.name,
+									mtllib: this.mtllib,
+									smooth: this.smooth,
+									groupStart: 0,
+									groupEnd: - 1,
+									groupCount: - 1,
+									inherited: false
 								};
-								cloned.clone = this.clone.bind(cloned);
+								cloned.clone = this.clone.bind( cloned );
 								return cloned;
+
 							}
 						};
 
@@ -104,7 +106,9 @@ THREE.OBJLoader = ( function () {
 					currentMaterial: function () {
 
 						if ( this.materials.length > 0 ) {
+
 							return this.materials[ this.materials.length - 1 ];
+
 						}
 
 						return undefined;
@@ -114,7 +118,7 @@ THREE.OBJLoader = ( function () {
 					_finalize: function ( end ) {
 
 						var lastMultiMaterial = this.currentMaterial();
-						if ( lastMultiMaterial && lastMultiMaterial.groupEnd === -1 ) {
+						if ( lastMultiMaterial && lastMultiMaterial.groupEnd === - 1 ) {
 
 							lastMultiMaterial.groupEnd = this.geometry.vertices.length / 3;
 							lastMultiMaterial.groupCount = lastMultiMaterial.groupEnd - lastMultiMaterial.groupStart;
@@ -125,10 +129,14 @@ THREE.OBJLoader = ( function () {
 						// Ignore objects tail materials if no face declarations followed them before a new o/g started.
 						if ( end && this.materials.length > 1 ) {
 
-							for ( var mi = this.materials.length - 1; mi >= 0; mi-- ) {
+							for ( var mi = this.materials.length - 1; mi >= 0; mi -- ) {
+
 								if ( this.materials[ mi ].groupCount <= 0 ) {
+
 									this.materials.splice( mi, 1 );
+
 								}
+
 							}
 
 						}
@@ -136,10 +144,10 @@ THREE.OBJLoader = ( function () {
 						// Guarantee at least one empty material, this makes the creation later more straight forward.
 						if ( end && this.materials.length === 0 ) {
 
-							this.materials.push({
-								name   : '',
-								smooth : this.smooth
-							});
+							this.materials.push( {
+								name: '',
+								smooth: this.smooth
+							} );
 
 						}
 
@@ -205,6 +213,15 @@ THREE.OBJLoader = ( function () {
 				dst.push( src[ a + 0 ], src[ a + 1 ], src[ a + 2 ] );
 				dst.push( src[ b + 0 ], src[ b + 1 ], src[ b + 2 ] );
 				dst.push( src[ c + 0 ], src[ c + 1 ], src[ c + 2 ] );
+
+			},
+
+			addVertexPoint: function ( a ) {
+
+				var src = this.vertices;
+				var dst = this.object.geometry.vertices;
+
+				dst.push( src[ a + 0 ], src[ a + 1 ], src[ a + 2 ] );
 
 			},
 
@@ -302,6 +319,20 @@ THREE.OBJLoader = ( function () {
 
 			},
 
+			addPointGeometry: function ( vertices ) {
+
+				this.object.geometry.type = 'Points';
+
+				var vLen = this.vertices.length;
+
+				for ( var vi = 0, l = vertices.length; vi < l; vi ++ ) {
+
+					this.addVertexPoint( this.parseVertexIndex( vertices[ vi ], vLen ) );
+
+				}
+
+			},
+
 			addLineGeometry: function ( vertices, uvs ) {
 
 				this.object.geometry.type = 'Line';
@@ -339,7 +370,7 @@ THREE.OBJLoader = ( function () {
 
 		this.materials = null;
 
-	};
+	}
 
 	OBJLoader.prototype = {
 
@@ -386,7 +417,7 @@ THREE.OBJLoader = ( function () {
 
 			}
 
-			if ( text.indexOf( '\\\n' ) !== - 1) {
+			if ( text.indexOf( '\\\n' ) !== - 1 ) {
 
 				// join lines separated by a line continuation character (\)
 				text = text.replace( /\\\n/g, '' );
@@ -429,12 +460,14 @@ THREE.OBJLoader = ( function () {
 								parseFloat( data[ 3 ] )
 							);
 							if ( data.length === 8 ) {
+
 								state.colors.push(
 									parseFloat( data[ 4 ] ),
 									parseFloat( data[ 5 ] ),
 									parseFloat( data[ 6 ] )
 
 								);
+
 							}
 							break;
 						case 'vn':
@@ -450,6 +483,7 @@ THREE.OBJLoader = ( function () {
 								parseFloat( data[ 2 ] )
 							);
 							break;
+
 					}
 
 				} else if ( lineFirstChar === 'f' ) {
@@ -512,6 +546,13 @@ THREE.OBJLoader = ( function () {
 
 					}
 					state.addLineGeometry( lineVertices, lineUVs );
+
+				} else if ( lineFirstChar === 'p' ) {
+
+					var lineData = line.substr( 1 ).trim();
+					var pointData = lineData.split( " " );
+
+					state.addPointGeometry( pointData );
 
 				} else if ( ( result = object_pattern.exec( line ) ) !== null ) {
 
@@ -580,7 +621,7 @@ THREE.OBJLoader = ( function () {
 					// Handle null terminated files without exception
 					if ( line === '\0' ) continue;
 
-					throw new Error( "Unexpected line: '" + line  + "'" );
+					throw new Error( 'THREE.OBJLoader: Unexpected line: "' + line + '"' );
 
 				}
 
@@ -597,17 +638,19 @@ THREE.OBJLoader = ( function () {
 				var geometry = object.geometry;
 				var materials = object.materials;
 				var isLine = ( geometry.type === 'Line' );
+				var isPoints = ( geometry.type === 'Points' );
+				var hasVertexColors = false;
 
 				// Skip o/g line declarations that did not follow with any faces
 				if ( geometry.vertices.length === 0 ) continue;
 
 				var buffergeometry = new THREE.BufferGeometry();
 
-				buffergeometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( geometry.vertices ), 3 ) );
+				buffergeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( geometry.vertices, 3 ) );
 
 				if ( geometry.normals.length > 0 ) {
 
-					buffergeometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( geometry.normals ), 3 ) );
+					buffergeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
 
 				} else {
 
@@ -617,13 +660,14 @@ THREE.OBJLoader = ( function () {
 
 				if ( geometry.colors.length > 0 ) {
 
-					buffergeometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( geometry.colors ), 3 ) );
+					hasVertexColors = true;
+					buffergeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( geometry.colors, 3 ) );
 
 				}
 
 				if ( geometry.uvs.length > 0 ) {
 
-					buffergeometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geometry.uvs ), 2 ) );
+					buffergeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( geometry.uvs, 2 ) );
 
 				}
 
@@ -631,7 +675,7 @@ THREE.OBJLoader = ( function () {
 
 				var createdMaterials = [];
 
-				for ( var mi = 0, miLen = materials.length; mi < miLen ; mi++ ) {
+				for ( var mi = 0, miLen = materials.length; mi < miLen; mi ++ ) {
 
 					var sourceMaterial = materials[ mi ];
 					var material = undefined;
@@ -645,7 +689,14 @@ THREE.OBJLoader = ( function () {
 
 							var materialLine = new THREE.LineBasicMaterial();
 							materialLine.copy( material );
+							materialLine.lights = false; // TOFIX
 							material = materialLine;
+
+						} else if ( isPoints && material && ! ( material instanceof THREE.PointsMaterial ) ) {
+
+							var materialPoints = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false } );
+							materialLine.copy( material );
+							material = materialPoints;
 
 						}
 
@@ -653,14 +704,28 @@ THREE.OBJLoader = ( function () {
 
 					if ( ! material ) {
 
-						material = ( ! isLine ? new THREE.MeshPhongMaterial() : new THREE.LineBasicMaterial() );
+						if ( isLine ) {
+
+							material = new THREE.LineBasicMaterial();
+
+						} else if ( isPoints ) {
+
+							material = new THREE.PointsMaterial( { size: 1, sizeAttenuation: false } );
+
+						} else {
+
+							material = new THREE.MeshPhongMaterial();
+
+						}
+
 						material.name = sourceMaterial.name;
 
 					}
 
 					material.flatShading = sourceMaterial.smooth ? false : true;
+					material.vertexColors = hasVertexColors ? THREE.VertexColors : THREE.NoColors;
 
-					createdMaterials.push(material);
+					createdMaterials.push( material );
 
 				}
 
@@ -670,18 +735,43 @@ THREE.OBJLoader = ( function () {
 
 				if ( createdMaterials.length > 1 ) {
 
-					for ( var mi = 0, miLen = materials.length; mi < miLen ; mi++ ) {
+					for ( var mi = 0, miLen = materials.length; mi < miLen; mi ++ ) {
 
 						var sourceMaterial = materials[ mi ];
 						buffergeometry.addGroup( sourceMaterial.groupStart, sourceMaterial.groupCount, mi );
 
 					}
 
-					mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, createdMaterials ) : new THREE.LineSegments( buffergeometry, createdMaterials ) );
+					if ( isLine ) {
+
+						mesh = new THREE.LineSegments( buffergeometry, createdMaterials );
+
+					} else if ( isPoints ) {
+
+						mesh = new THREE.Points( buffergeometry, createdMaterials );
+
+					} else {
+
+						mesh = new THREE.Mesh( buffergeometry, createdMaterials );
+
+					}
 
 				} else {
 
-					mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] ) : new THREE.LineSegments( buffergeometry, createdMaterials[ 0 ] ) );
+					if ( isLine ) {
+
+						mesh = new THREE.LineSegments( buffergeometry, createdMaterials[ 0 ] );
+
+					} else if ( isPoints ) {
+
+						mesh = new THREE.Points( buffergeometry, createdMaterials[ 0 ] );
+
+					} else {
+
+						mesh = new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] );
+
+					}
+
 				}
 
 				mesh.name = object.name;

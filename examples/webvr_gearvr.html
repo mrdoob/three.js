@@ -4,6 +4,8 @@
 		<title>three.js webvr - gear vr</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-02-26 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-02-26" content="ApUnsKNm8cOce0NnJY05mJWYKGaTC2dw9o/+zbrmpEZk/ePiOfxjvcRnKlJUo6zYOrltLnYMcvdWjPTMCJzR1g4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxOTY0ODk5MX0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -24,16 +26,10 @@
 		<script src="js/loaders/MTLLoader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 
-        <script src="js/vr/GearVRController.js"></script>
+		<script src="js/vr/GearVRController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
-
-			WEBVR.checkAvailability().catch( function ( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
 
 			var clock = new THREE.Clock();
 
@@ -116,9 +112,10 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.vr.enabled = true;
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				controller = new THREE.GearVRController();
 				camBox.position.y = 1.8;
@@ -157,14 +154,6 @@
 						controller.add( obj );
 
 					} );
-
-				} );
-
-				WEBVR.getVRDisplay( function ( display ) {
-
-					renderer.vr.setDevice( display );
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
 				} );
 

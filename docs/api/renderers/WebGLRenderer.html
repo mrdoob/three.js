@@ -51,7 +51,11 @@
 		Default is *true*.<br />
 
 		[page:Boolean preserveDrawingBuffer] - whether to preserve the buffers until manually cleared
-	  or overwritten. Default is *false*.<br />
+		or overwritten. Default is *false*.<br />
+
+		[page:String powerPreference] - Provides a hint to the user agent indicating what configuration
+		of GPU is suitable for this WebGL context. Can be *"high-performance"*, *"low-power"* or *"default"*. Default is *"default"*.
+		See the [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] for more information.<br />
 
 		[page:Boolean depth] - whether the drawing buffer has a
 		[link:https://en.wikipedia.org/wiki/Z-buffering depth buffer] of at least 16 bits.
@@ -95,8 +99,8 @@
 		- [property:Boolean floatFragmentTextures]: whether the context supports the [link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float] extension.
 			According to [link:https://webglstats.com/ WebGLStats], as of February 2016 over 95% of WebGL enabled devices support this.<br />
 		- [property:Boolean floatVertexTextures]: *true* if [property:Boolean floatFragmentTextures] and [property:Boolean vertexTextures] are both true.<br />
-		- [property:Method getMaxAnisotropy](): see [page:WebGLRenderer.getMaxAnisotropy getMaxAnisotropy] below. <br />
-		- [property:Method getMaxPrecision](): see [page:WebGLRenderer.getMaxPrecision getMaxPrecision] below. <br />
+		- [property:Method getMaxAnisotropy](): Returns the maximum available anisotropy.<br />
+		- [property:Method getMaxPrecision](): Returns the maximum available precision for vertex and fragment shaders. <br />
 		- [property:Boolean logarithmicDepthBuffer]: *true* if the [property:parameter logarithmicDepthBuffer] was set to true in the constructor and
 		the context supports the [link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth] extension.
 			According to [link:https://webglstats.com/ WebGLStats], as of February 2016 around 66% of WebGL enabled devices support this.<br />
@@ -129,7 +133,7 @@
 		<h3>[property:WebGLRenderingContext context]</h3>
 		<div>
 		The renderer obtains a [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext] context
-		  from its [page:WebGLRenderer.domElement domElement][page:WebGLRenderer.domElement domElement] by default, using
+		  from its [page:WebGLRenderer.domElement domElement] by default, using
 			[link:https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement/getContext HTMLCanvasElement.getContext]().<br /><br />
 
 		You can create this manually, however it must correspond to the
@@ -185,6 +189,12 @@
 			</li>
 		</ul>
 		</div>
+		<div>By default these data are reset at each render calls, but when using the composer or mirrors it can be preferred to reset them with a custom pattern :
+		<code>
+		renderer.info.autoReset = false;
+		renderer.info.reset();
+		</code>
+		</div>
 
 		<h3>[property:Boolean localClippingEnabled]</h3>
 		<div>Defines whether the renderer respects object-level clipping planes. Default is *false*.</div>
@@ -236,21 +246,6 @@
 		<h3>[property:Integer shadowMap.type]</h3>
 		<div>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</div>
 		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default), THREE.PCFSoftShadowMap. See [page:WebGLRenderer WebGLRenderer constants] for details.</div>
-
-		<h3>[property:Boolean shadowMap.renderReverseSided]</h3>
-		<div>
-		Whether to render the opposite side as specified by the material into the shadow map.
-			When disabled, an appropriate shadow.bias must be set on the light source for surfaces that can
-			both cast and receive shadows at the same time to render correctly. Default is *true*.
-		</div>
-
-		<h3>[property:Boolean shadowMap.renderSingleSided]</h3>
-		<div>
-		Whether to treat materials specified as double-sided as if they were specified as front-sided
-		when rendering the shadow map. When disabled, an appropriate shadow.bias must be set on the light
-		source for surfaces that can both cast and receive shadows at the same time to render correctly.
-		Default is *true*.
-		</div>
 
 		<h3>[property:Boolean sortObjects]</h3>
 		<div>
@@ -321,6 +316,9 @@
 		<h3>[method:null compile]( [page:Scene scene], [page:Camera camera] )</h3>
 		<div>Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.</div>
 
+		<h3>[method:null copyFramebufferToTexture]( [page:Vector2 position], [page:Texture texture], [page:Number level] )</h3>
+		<div>Copies pixels from the current WebGLFramebuffer into a 2D texture. Enables access to [link:https://developer.mozilla.org/de/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].</div>
+
 		<h3>[method:null dispose]( )</h3>
 		<div>Dispose of the current rendering context.</div>
 
@@ -355,20 +353,17 @@
 		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
 		<div>Returns an object that describes the attributes set on the WebGL context when it was created.</div>
 
-		<h3>[method:RenderTarget getCurrentRenderTarget](  )</h3>
+		<h3>[method:RenderTarget getRenderTarget]()</h3>
 		<div>Returns the current RenderTarget, if any.</div>
 
-		<h3>[method:Number getMaxAnisotropy]()</h3>
-		<div>This returns the anisotropy level of the textures.</div>
+		<h3>[method:RenderTarget getCurrentViewport]()</h3>
+		<div>Returns the current viewport.</div>
 
 		<h3>[method:Object getDrawingBufferSize]()</h3>
 		<div>Returns an object containing the width and height of the renderer's drawing buffer, in pixels.</div>
 
 		<h3>[method:number getPixelRatio]()</h3>
 		<div>Returns current device pixel ratio used.</div>
-
-		<h3>[method:string getPrecision]()</h3>
-		<div>This gets the precision used by the shaders. It returns "highp","mediump" or "lowp".</div>
 
 		<h3>[method:Object getSize]()</h3>
 		<div>Returns an object containing the width and height of the renderer's output canvas, in pixels.</div>
@@ -414,13 +409,6 @@
 		<h3>[method:null setClearColor]( [page:Color color], [page:Float alpha] )</h3>
 		<div>Sets the clear color and opacity.</div>
 
-		<h3>[method:null setFaceCulling]( [page:Renderer cullFace], [page:Renderer frontFace] )</h3>
-		<div>
-		See [page:Renderer WebGLRenderer constants] for all possible values for [page:Renderer cullFace] and [page:Renderer frontFace].<br />
-		Used for setting the gl.frontFace and gl.cullFace states in the GPU, thus enabling/disabling face culling when rendering.<br />
-		If cullFace is set to [page:Renderer CullFaceNone], culling will be disabled.<br />
-		</div>
-
 		<h3>[method:null setPixelRatio]( [page:number value] )</h3>
 		<div>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</div>
 
@@ -451,7 +439,7 @@
 		<div>
 		Resizes the output canvas to (width, height) with device pixel ratio taken into account,
 			and also sets the viewport to fit that size, starting in (0, 0).
-			Setting [page:Boolean updateStyle] to true adds explicit pixel units to the output canvas style.
+			Setting [page:Boolean updateStyle] to false prevents any style changes to the output canvas.
 		</div>
 
 		<h3>[method:null setTexture2D]( [page:Texture texture], [page:number slot] )</h3>

@@ -81,8 +81,10 @@
 
 				];
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 300, 300, 300, 7, 7, 7 ), materials );
-				mesh.scale.x = - 1;
+				var geometry = new THREE.BoxGeometry( 300, 300, 300, 7, 7, 7 );
+				geometry.scale( - 1, 1, 1 );
+
+				mesh = new THREE.Mesh( geometry, materials );
 				scene.add( mesh );
 
 				for ( var i = 0, l = mesh.geometry.vertices.length; i < l; i ++ ) {

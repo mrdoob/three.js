@@ -31,6 +31,10 @@
 			[example:webgl_terrain_dynamic WebGL / terrain / dynamic]
 		</div>
 
+		<p>
+			This example shows how to use LoadingManager to track the progress of
+			[page:OBJLoader].
+		</p>
 
 		<code>
 		var manager = new THREE.LoadingManager();
@@ -67,6 +71,41 @@
 		} );
 		</code>
 
+		<p>
+			In addition to observing progress, a LoadingManager can be used to
+			override resource URLs during loading. This may be helpful for assets
+			coming from drag-and-drop events, WebSockets, WebRTC, or other APIs. An
+			example showing how to load an in-memory model using Blob URLs is below.
+		</p>
+
+		<code>
+		// Blob or File objects created when dragging files into the webpage.
+		var blobs = {'fish.gltf': blob1, 'diffuse.png': blob2, 'normal.png': blob3};
+
+		var manager = new THREE.LoadingManager();
+
+		// Initialize loading manager with URL callback.
+		var objectURLs = [];
+		manager.setURLModifier( ( url ) => {
+
+			url = URL.createObjectURL( blobs[ url ] );
+
+			objectURLs.push( url );
+
+			return url;
+
+		} );
+
+		// Load as usual, then revoke the blob URLs.
+		var loader = new THREE.GLTFLoader( manager );
+		loader.load( 'fish.gltf', (gltf) => {
+
+			scene.add( gltf.scene );
+
+			objectURLs.forEach( ( url ) => URL.revokeObjectURL( url ) );
+
+		});
+		</code>
 
 		<h2>Constructor</h2>
 

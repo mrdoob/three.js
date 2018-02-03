@@ -185,8 +185,8 @@
 							"float viewDot = abs(dot( normal, viewPosition ));",
 							"viewDot = clamp( pow( viewDot + 0.6, 10.0 ), 0.0, 1.0);",
 
-							"vec3 colour = vec3( 0.05, 0.09, 0.13 ) * dirDiffuse;",
-							"gl_FragColor = vec4( colour, viewDot );",
+							"vec3 color = vec3( 0.05, 0.09, 0.13 ) * dirDiffuse;",
+							"gl_FragColor = vec4( color, viewDot );",
 
 						"}"
 
@@ -272,9 +272,9 @@
 					"void main() {",
 
 						"vec2 sampleUV = vUv;",
-						"vec4 colour = texture2D( map, sampleUV, 0.0 );",
+						"vec4 color = texture2D( map, sampleUV, 0.0 );",
 
-						"gl_FragColor = vec4( colour.xyz, 1.0 );",
+						"gl_FragColor = vec4( color.xyz, 1.0 );",
 
 					"}"
 
@@ -342,7 +342,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setFaceCulling( THREE.CullFaceNone );
 				renderer.autoClear = false;
 
 				renderer.gammaInput = true;

@@ -4,8 +4,8 @@
 		<title>three.js webvr - roller coaster</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-11-14 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-11-14" content="ArBMPtmfrwfw86hMJs4EG/pLjENp0J9EhNnzQVrHeXXMYSDNM/FPZEwZ1etrwiLAW4kNVrzXz5J7OBtFGNhVgQ0AAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUxMDYxNzYwMH0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-02-26 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-02-26" content="ApUnsKNm8cOce0NnJY05mJWYKGaTC2dw9o/+zbrmpEZk/ePiOfxjvcRnKlJUo6zYOrltLnYMcvdWjPTMCJzR1g4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxOTY0ODk5MX0=">
 		<style>
 			body {
 				margin: 0px;
@@ -29,20 +29,15 @@
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.vr.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
-			renderer.vr.enabled = true;
+			document.body.appendChild( WEBVR.createButton( renderer ) );
+
+			//
 
 			var scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xf0f0ff );
@@ -60,7 +55,7 @@
 			// environment
 
 			var geometry = new THREE.PlaneBufferGeometry( 500, 500, 15, 15 );
-			geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+			geometry.rotateX( - Math.PI / 2 );
 
 			var positions = geometry.attributes.position.array;
 			var vertex = new THREE.Vector3();
@@ -185,16 +180,6 @@
 			scene.add( mesh );
 
 			funfairs.push( mesh );
-
-			//
-
-			WEBVR.getVRDisplay( function ( display ) {
-
-				renderer.vr.setDevice( display );
-
-				document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-			} );
 
 			//
 

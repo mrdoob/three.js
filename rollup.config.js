@@ -24,21 +24,22 @@ function glsl() {
 }
 
 export default {
-	entry: 'src/Three.js',
-	indent: '\t',
+	input: 'src/Three.js',
 	plugins: [
 		glsl()
 	],
 	// sourceMap: true,
-	targets: [
+	output: [
 		{
 			format: 'umd',
-			moduleName: 'THREE',
-			dest: 'build/three.js'
+			name: 'THREE',
+			file: 'build/three.js',
+			indent: '\t'
 		},
 		{
 			format: 'es',
-			dest: 'build/three.module.js'
+			file: 'build/three.module.js',
+			indent: '\t'
 		}
 	]
 };

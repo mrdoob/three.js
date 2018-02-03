@@ -13,20 +13,25 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-		A 2d path representation, comprising of points, lines, and cubes, similar to the 2D Canvas API.
-		It extends [page:CurvePath].
+		A 2D path representation. The class provides methods for creating paths and contours of 2D shapes similar to the 2D Canvas API.
 		</div>
 
 		<h2>Example</h2>
 
 		<code>
-var v1 = new THREE.Vector3();
-var v2 = new THREE.Vector3(1, 45, 6);
-var v3 = new THREE.Vector3(34, 34, 676);
+			var path = new THREE.Path();
 
-var vectors = [v1, v2, v3];
+			path.lineTo( 0, 0.8 );
+			path.quadraticCurveTo( 0, 1, 0.2, 1 );
+			path.lineTo( 1, 1 );
 
-var path = new THREE.Path(vectors);
+			var points = path.getPoints();
+
+			var geometry = new THREE.BufferGeometry().setFromPoints( points );
+			var material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+
+			var line = new THREE.Line( geometry, material );
+			scene.add( line );
 		</code>
 
 
@@ -94,14 +99,6 @@ var path = new THREE.Path(vectors);
 		<h3>[method:null bezierCurveTo]( [page:Float cp1X], [page:Float cp1Y], [page:Float cp2X], [page:Float cp2Y], [page:Float x], [page:Float y] )</h3>
 		<div>This creates a bezier curve from [page:.currentPoint] with (cp1X, cp1Y) and (cp2X, cp2Y) as control points and updates [page:.currentPoint] to x and y.</div>
 
-		<h3>[method:null fromPoints]( [page:Array vector2s] )</h3>
-		<div>
-			points --  array of [page:Vector2 Vector2s].<br /><br />
-
-			Adds to the from the points. Points	are added to the [page:CurvePath.curves curves]
-			array as [page:LineCurve LineCurves].
-		</div>
-
 		<h3>[method:null ellipse]( [page:Float x], [page:Float y], [page:Float xRadius], [page:Float yRadius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise], [page:Float rotation] )</h3>
 		<div>
 			x, y -- The center of the ellipse offset from the last call.<br />
@@ -125,6 +122,14 @@ var path = new THREE.Path(vectors);
 
 		<h3>[method:null quadraticCurveTo]( [page:Float cpX], [page:Float cpY], [page:Float x], [page:Float y] )</h3>
 		<div>Creates a quadratic curve from [page:.currentPoint] with cpX and cpY as control point and updates [page:.currentPoint] to x and y.</div>
+
+		<h3>[method:null setFromPoints]( [page:Array vector2s] )</h3>
+		<div>
+			points --  array of [page:Vector2 Vector2s].<br /><br />
+
+			Points are added to the [page:CurvePath.curves curves]
+			array as [page:LineCurve LineCurves].
+		</div>
 
 		<h3>[method:null splineThru] ( [page:Array points] ) </h3>
 		<div>

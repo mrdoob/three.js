@@ -2,11 +2,12 @@
  * @author Slayvin / http://slayvin.net
  */
 
-THREE.Reflector = function ( width, height, options ) {
+THREE.Reflector = function ( geometry, options ) {
 
-	THREE.Mesh.call( this, new THREE.PlaneBufferGeometry( width, height ) );
+	THREE.Mesh.call( this, geometry );
 
 	this.type = 'Reflector';
+	this.renderOrder = Infinity; // see #12883
 
 	var scope = this;
 
