@@ -270,6 +270,7 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 				case "PositionNode":
 				case "NormalNode":
 				case "ReflectNode":
+				case "LightNode":
 
 					object.scope = node.scope;
 
@@ -463,7 +464,6 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 					break;
 
-				case "LightNode":
 				case "RoughnessToBlinnExponentNode":
 					break;
 
