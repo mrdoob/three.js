@@ -5,7 +5,6 @@
 THREE.NodeFrame = function ( time ) {
 
 	this.time = time !== undefined ? time : 0;
-	this.delta = 0;
 
 	this.frameId = 0;
 
