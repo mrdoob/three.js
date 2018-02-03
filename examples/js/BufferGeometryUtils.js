@@ -245,8 +245,17 @@ THREE.BufferGeometryUtils = {
 
 			// create new group for this geometry
 
-			mergedGeometry.addGroup( offset, geometry.attributes.position.count, i );
-			offset += geometry.attributes.position.count;
+			if ( isIndexed ) {
+
+				mergedGeometry.addGroup( offset, geometry.index.count, i );
+				offset += geometry.index.count;
+
+			} else {
+
+				mergedGeometry.addGroup( offset, geometry.attributes.position.count, i );
+				offset += geometry.attributes.position.count;
+
+			}
 
 		}
 
