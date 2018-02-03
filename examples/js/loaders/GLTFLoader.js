@@ -2150,12 +2150,10 @@ THREE.GLTFLoader = ( function () {
 
 			var primitives = meshDef.primitives;
 
-			var modesUsed = {};
+			var typesUsed = new Set();
+			var drawModesUsed = new Set();
 
 			return scope.loadGeometries( primitives ).then( function ( geometries ) {
-
-				var useSkinning = false;
-				var useMorphTargets = false;
 
 				for ( var i = 0, il = primitives.length; i < il; i ++ ) {
 
@@ -2176,8 +2174,8 @@ THREE.GLTFLoader = ( function () {
 					}
 
 					// If the material will be modified later on, clone it now.
-					useSkinning = meshDef.isSkinnedMesh === true;
-					useMorphTargets = primitive.targets !== undefined;
+					var useSkinning = meshDef.isSkinnedMesh === true;
+					var useMorphTargets = primitive.targets !== undefined;
 					var useVertexColors = geometry.attributes.color !== undefined;
 					var useFlatShading = geometry.attributes.normal === undefined;
 
@@ -2324,16 +2322,28 @@ THREE.GLTFLoader = ( function () {
 
 					group.add( mesh );
 
-					modesUsed[ primitive.Mode ] = true;
+					typesUsed.add( mesh.constructor );
+					drawModesUsed.add( mesh.drawMode );
 
 				}
 
-				// Attempt to merge primitives into a single mesh with multiple
-				// buffer geometry groups, returning the group if that fails.
+				// Merge primitives into a single mesh with multiple buffer geometry
+				// groups. Merging requires BufferGeometryUtils, and that all primitives
+				// use the constructor, draw mode, and set of attributes. If any
+				// requirements are not met, a THREE.Group is returned instead.
 
-				if ( ! group.children[ 0 ].isMesh ) return group;
-				if ( Object.keys( modesUsed ).length > 1 ) return group;
 				if ( THREE.BufferGeometryUtils === undefined ) return group;
+
+				if ( typesUsed.size > 1 || drawModesUsed.size > 1 ) return group;
+
+				var TypedMesh = Array.from( typesUsed )[ 0 ];
+				var drawMode = Array.from( drawModesUsed )[ 0 ];
+
+				if ( TypedMesh !== THREE.Mesh && TypedMesh !== THREE.SkinnedMesh ) {
+
+					return group;
+
+				}
 
 				var groupGeometries = [];
 				var groupMaterials = [];
@@ -2356,9 +2366,8 @@ THREE.GLTFLoader = ( function () {
 
 				if ( !mergedGeometry ) return group;
 
-				var mergedMesh = useSkinning
-					? new THREE.SkinnedMesh( mergedGeometry, groupMaterials )
-					: new THREE.Mesh( mergedGeometry, groupMaterials );
+				var mergedMesh = new TypedMesh( mergedGeometry, groupMaterials );
+				mergedMesh.drawMode = drawMode;
 
 				if ( meshDef.name !== undefined ) mergedMesh.name = meshDef.name;
 				if ( meshDef.extras !== undefined ) mergedMesh.userData = meshDef.extras;
