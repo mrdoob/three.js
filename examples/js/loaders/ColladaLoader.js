@@ -1477,7 +1477,6 @@ THREE.ColladaLoader.prototype = {
 						break;
 					case 'transparent':
 						// if ( parameter.data.texture ) material.alphaMap = getTexture( parameter.data.texture );
-						material.transparent = true;
 						break;
 					case 'transparency':
 						if ( parameter.float !== undefined ) {
@@ -1492,9 +1491,9 @@ THREE.ColladaLoader.prototype = {
 
 							}
 
-						}
+							if ( material.opacity < 1 ) material.transparent = true;
 
-						material.transparent = true;
+						}
 						break;
 
 				}
