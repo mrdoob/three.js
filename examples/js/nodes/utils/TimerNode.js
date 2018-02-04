@@ -13,6 +13,7 @@ THREE.TimerNode = function ( scope, scale ) {
 
 THREE.TimerNode.GLOBAL = 'global';
 THREE.TimerNode.LOCAL = 'local';
+THREE.TimerNode.DELTA = 'delta';
 
 THREE.TimerNode.prototype = Object.create( THREE.FloatNode.prototype );
 THREE.TimerNode.prototype.constructor = THREE.TimerNode;
@@ -25,6 +26,12 @@ THREE.TimerNode.prototype.updateFrame = function ( frame ) {
 		case THREE.TimerNode.LOCAL:
 
 			this.number += frame.delta * this.scale;
+
+			break;
+
+		case THREE.TimerNode.DELTA:
+
+			this.number = frame.delta * this.scale;
 
 			break;
 
