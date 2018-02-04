@@ -2174,10 +2174,10 @@ THREE.GLTFLoader = ( function () {
 					}
 
 					// If the material will be modified later on, clone it now.
-					var useSkinning = meshDef.isSkinnedMesh === true;
-					var useMorphTargets = primitive.targets !== undefined;
 					var useVertexColors = geometry.attributes.color !== undefined;
 					var useFlatShading = geometry.attributes.normal === undefined;
+					var useSkinning = meshDef.isSkinnedMesh === true;
+					var useMorphTargets = primitive.targets !== undefined;
 
 					if ( useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
 
