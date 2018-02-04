@@ -1140,6 +1140,8 @@ function WebGLRenderer( parameters ) {
 
 		projectObject( scene, camera, _this.sortObjects );
 
+		currentRenderList.cleanup();
+
 		if ( _this.sortObjects === true ) {
 
 			currentRenderList.sort();

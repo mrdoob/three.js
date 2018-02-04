@@ -108,12 +108,23 @@ function WebGLRenderList() {
 
 	}
 
+	function cleanup() {
+
+		for ( var i = renderItemsIndex; i < renderItems.length; i++ ) {
+
+			renderItems[i] = undefined;
+
+		}
+
+	}
+
 	return {
 		opaque: opaque,
 		transparent: transparent,
 
 		init: init,
 		push: push,
+		cleanup: cleanup,
 
 		sort: sort
 	};
