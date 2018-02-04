@@ -189,16 +189,9 @@ THREE.GLTFExporter.prototype = {
 		 *
 		 */
 		function getPaddedBufferSize( bufferSize ) {
-			
-			// adapted from https://github.com/AnalyticalGraphicsInc/obj2gltf/blob/master/lib/getBufferPadded.js
 
-			var boundary = 4;
+			return Math.ceil( bufferSize / 4 ) * 4;
 
-			var remainder = bufferSize % boundary;
-			
-			var padding =  remainder === 0 ? 0 : boundary - remainder;
-
-			return bufferSize + padding;
 		}
 		
 		/**
