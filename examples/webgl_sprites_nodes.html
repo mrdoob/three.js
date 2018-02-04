@@ -51,6 +51,7 @@
 		<script src="js/nodes/AttributeNode.js"></script>
 		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
 		<!-- Accessors -->
@@ -106,6 +107,7 @@
 		var container = document.getElementById( 'container' );
 
 		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+		var frame = new THREE.NodeFrame();
 		var plane, sprite1, sprite2, sprite3;
 		var walkingManTexture, walkingManTextureURL;
 		var library = {};
@@ -299,9 +301,10 @@
 			var delta = clock.getDelta();
 
 			// update material animation and/or gpu calcs (pre-renderer)
-			sprite1.material.updateFrame( delta );
-			sprite2.material.updateFrame( delta );
-			sprite3.material.updateFrame( delta );
+			frame.update( delta )
+				.updateFrame( sprite1.material )
+				.updateFrame( sprite2.material )
+				.updateFrame( sprite3.material );
 
 			// rotate sprite
 			sprite3.rotation.z -= Math.PI * .005;

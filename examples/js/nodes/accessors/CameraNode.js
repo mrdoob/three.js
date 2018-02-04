@@ -142,7 +142,7 @@ THREE.CameraNode.prototype.generate = function ( builder, output ) {
 
 };
 
-THREE.CameraNode.prototype.onUpdateFrame = function ( delta ) {
+THREE.CameraNode.prototype.onUpdateFrame = function ( frame ) {
 
 	switch ( this.scope ) {
 

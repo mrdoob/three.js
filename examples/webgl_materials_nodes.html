@@ -52,6 +52,7 @@
 		<script src="js/nodes/AttributeNode.js"></script>
 		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
 		<!-- Accessors -->
@@ -112,6 +113,7 @@
 		var container = document.getElementById( 'container' );
 
 		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+		var frame = new THREE.NodeFrame();
 		var teapot, mesh;
 		var controls;
 		var move = false;
@@ -2372,7 +2374,7 @@
 			//mesh.rotation.z += .01;
 
 			// update material animation and/or gpu calcs (pre-renderer)
-			mesh.material.updateFrame( delta );
+			frame.update( delta ).updateFrame( mesh.material );
 
 			// render to texture for sss/translucent material only
 			if ( rtTexture ) {
