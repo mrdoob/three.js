@@ -72,7 +72,7 @@ THREE.NodeMaterial.prototype.updateFrame = function ( frame ) {
 
 	for ( var i = 0; i < this.updaters.length; ++ i ) {
 
-		frame.updateFrame( this.updaters[ i ] );
+		frame.updateNode( this.updaters[ i ] );
 
 	}
 

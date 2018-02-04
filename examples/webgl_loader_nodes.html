@@ -274,7 +274,7 @@
 			var delta = clock.getDelta();
 
 			// update material animation and/or gpu calcs (pre-renderer)
-			if ( mesh.material instanceof THREE.NodeMaterial ) frame.update( delta ).updateFrame( mesh.material );
+			if ( mesh.material instanceof THREE.NodeMaterial ) frame.update( delta ).updateNode( mesh.material );
 
 			renderer.render( scene, camera );
 

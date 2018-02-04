@@ -2391,7 +2391,7 @@
 			//mesh.rotation.z += .01;
 
 			// update material animation and/or gpu calcs (pre-renderer)
-			frame.update( delta ).updateFrame( mesh.material );
+			frame.update( delta ).updateNode( mesh.material );
 
 			// render to texture for sss/translucent material only
 			if ( rtTexture ) {

@@ -21,7 +21,7 @@ THREE.NodeFrame.prototype.update = function ( delta ) {
 
 };
 
-THREE.NodeFrame.prototype.updateFrame = function ( node ) {
+THREE.NodeFrame.prototype.updateNode = function ( node ) {
 
 	if ( node.frameId === this.frameId ) return this;
 
