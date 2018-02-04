@@ -256,6 +256,7 @@
 				'misc / firefly': 'firefly',
 				'misc / reserved-keywords': 'reserved-keywords',
 				'misc / varying': 'varying',
+				'misc / readonly': 'readonly',
 				'misc / custom-attribute': 'custom-attribute'
 			} ).onFinishChange( function () {
 
@@ -2016,6 +2017,22 @@
 
 					mtl.transform = transform;
 					mtl.color = varying;
+
+					break;
+
+				case 'readonly':
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					mtl.color = new THREE.ColorNode( 0xFFFFFF );
+					mtl.specular = new THREE.FloatNode( .5 );
+					mtl.shininess = new THREE.FloatNode( 15 );
+
+					// not use "uniform" input ( for optimization ) 
+					// instead use explicit declaration example: 
+					// vec3( 1.0, 1.0, 1.0 ) instead "uniform vec3"
+					// but not allow change the value after build the shader material
+					mtl.color.readonly = mtl.specular.readonly = mtl.shininess.readonly = true;
 
 					break;
 

@@ -16,6 +16,12 @@ THREE.Vector2Node.prototype.nodeType = "Vector2";
 
 THREE.NodeMaterial.addShortcuts( THREE.Vector2Node.prototype, 'value', [ 'x', 'y' ] );
 
+THREE.Vector2Node.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
+
+	return builder.format( "vec2( " + this.x + ", " + this.y + " )", type, output );
+
+};
+
 THREE.Vector2Node.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -26,6 +32,8 @@ THREE.Vector2Node.prototype.toJSON = function ( meta ) {
 
 		data.x = this.x;
 		data.y = this.y;
+
+		if ( this.readyonly === true ) data.readyonly = true;
 
 	}
 

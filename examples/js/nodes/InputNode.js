@@ -9,6 +9,8 @@ THREE.InputNode = function ( type, params ) {
 
 	THREE.TempNode.call( this, type, params );
 
+	this.readonly = false;
+
 };
 
 THREE.InputNode.prototype = Object.create( THREE.TempNode.prototype );
@@ -21,27 +23,36 @@ THREE.InputNode.prototype.generate = function ( builder, output, uuid, type, ns,
 	uuid = builder.getUuid( uuid || this.getUuid() );
 	type = type || this.getType( builder );
 
-	var data = material.getDataNode( uuid );
+	var data = material.getDataNode( uuid ),
+		readonly = this.readonly && this.generateReadonly !== undefined;
 
-	if ( builder.isShader( 'vertex' ) ) {
+	if ( readonly ) {
 
-		if ( ! data.vertex ) {
-
-			data.vertex = material.createVertexUniform( type, this.value, ns, needsUpdate );
-
-		}
-
-		return builder.format( data.vertex.name, type, output );
+		return this.generateReadonly( builder, output, uuid, type, ns, needsUpdate );
 
 	} else {
 
-		if ( ! data.fragment ) {
+		if ( builder.isShader( 'vertex' ) ) {
 
-			data.fragment = material.createFragmentUniform( type, this.value, ns, needsUpdate );
+			if ( ! data.vertex ) {
+
+				data.vertex = material.createVertexUniform( type, this.value, ns, needsUpdate );
+
+			}
+
+			return builder.format( data.vertex.name, type, output );
+
+		} else {
+
+			if ( ! data.fragment ) {
+
+				data.fragment = material.createFragmentUniform( type, this.value, ns, needsUpdate );
+
+			}
+
+			return builder.format( data.fragment.name, type, output );
 
 		}
-
-		return builder.format( data.fragment.name, type, output );
 
 	}
 

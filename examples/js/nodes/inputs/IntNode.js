@@ -29,6 +29,12 @@ Object.defineProperties( THREE.IntNode.prototype, {
 	}
 } );
 
+THREE.IntNode.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
+
+	return builder.format( this.number, type, output );
+
+};
+
 THREE.IntNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -38,6 +44,8 @@ THREE.IntNode.prototype.toJSON = function ( meta ) {
 		data = this.createJSONNode( meta );
 
 		data.number = this.number;
+
+		if ( this.readyonly === true ) data.readyonly = true;
 
 	}
 
