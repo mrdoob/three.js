@@ -476,18 +476,18 @@ Object.assign( ObjectLoader.prototype, {
 
 		function imageFinishedLoading( err ) {
 
-			if ( err ) {
-				firstError = firstError || err;
-				errCount ++;
-			} else {
-				successCount ++;
-			}
+			firstError = firstError || err;
 
 			if ( successCount + errCount === imageCount ) {
-				if ( errCount > 0 && onError ) {
-					onError( firstError );
-				} else if ( errCount === 0 && onLoad ) {
+
+				if ( errCount === 0 && onLoad ) {
+
 					onLoad( );
+
+				} else if ( errCount > 0 && onError ) {
+
+					onError( firstError );
+
 				}
 			}
 
@@ -495,20 +495,15 @@ Object.assign( ObjectLoader.prototype, {
 
 		function loadImage( url ) {
 
-			scope.manager.itemStart( url );
-
 			return loader.load( url, function () {
 
+				successCount ++;
 				imageFinishedLoading( );
-
-				scope.manager.itemEnd( url );
 
 			}, undefined, function ( err ) {
 
+				errCount ++;
 				imageFinishedLoading( err || "Unknown Error!" );
-
-				scope.manager.itemEnd( url );
-				scope.manager.itemError( url );
 
 			} );
 
