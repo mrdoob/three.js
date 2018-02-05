@@ -1500,9 +1500,13 @@ function WebGLRenderer( parameters ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
 
+				var computedUniforms = undefined !== material.shaderUniforms ?
+					UniformsUtils.merge([ UniformsUtils.clone( shader.uniforms ), material.shaderUniforms ]) :
+					UniformsUtils.clone( shader.uniforms );
+					
 				materialProperties.shader = {
 					name: material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
+					uniforms: computedUniforms,
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
 				};
@@ -1822,6 +1826,16 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+			//2. follow the same pattern with common uniforms -
+			//   refreshUniformsCommon looks at some known uniforms and refreshes them
+			//   refreshUniformsCustom should look at unknown uniforms but in a known place
+			
+			if ( undefined !== material.shaderUniforms ) {
+
+				refreshUniformsCustom( m_uniforms, material );
+
+			}
+
 			// refresh uniforms common to several materials
 
 			if ( fog && material.fog ) {
@@ -2059,6 +2073,17 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
+		}
+
+	}
+
+	//2. same pattern as refreshUniformsFoobar
+	function refreshUniformsCustom( uniforms, material ) {
+
+		for ( var uniform in material.shaderUniforms ) {
+
+			uniforms[ uniform ].value = material.shaderUniforms[ uniform ].value;
+		
 		}
 
 	}

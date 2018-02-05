@@ -241,10 +241,20 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		}
 
-		array.push( material.onBeforeCompile.toString() );
+		//4. if the user is aware of the feature and added a dictionary
+		if ( material.shaderIncludes !== undefined ) {
+
+			for ( var include in material.shaderIncludes ) {
+
+				//4. hash with chunks?
+				array.push( material.shaderIncludes[ include ] );
+
+			}
+
+		}
 
 		array.push( renderer.gammaOutput );
-
+		
 		return array.join();
 
 	};
