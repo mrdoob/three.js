@@ -34,7 +34,7 @@ THREE.ColorNode.prototype.toJSON = function ( meta ) {
 		data.g = this.g;
 		data.b = this.b;
 
-		if ( this.readyonly === true ) data.readyonly = true;
+		if ( this.readonly === true ) data.readonly = true;
 
 	}
 

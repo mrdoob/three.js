@@ -16,7 +16,7 @@ THREE.Matrix3Node.prototype.nodeType = "Matrix3";
 
 THREE.Matrix3Node.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
-	return builder.format( "mat3( " + this.value.elements.joint( ", " ) + " )", type, output );
+	return builder.format( "mat3( " + this.value.elements.join( ", " ) + " )", type, output );
 
 };
 
@@ -30,7 +30,7 @@ THREE.Matrix3Node.prototype.toJSON = function ( meta ) {
 
 		data.elements = this.value.elements.concat();
 
-		if ( this.readyonly === true ) data.readyonly = true;
+		if ( this.readonly === true ) data.readonly = true;
 
 	}
 

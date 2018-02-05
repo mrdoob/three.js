@@ -35,7 +35,7 @@ THREE.Vector4Node.prototype.toJSON = function ( meta ) {
 		data.z = this.z;
 		data.w = this.w;
 
-		if ( this.readyonly === true ) data.readyonly = true;
+		if ( this.readonly === true ) data.readonly = true;
 
 	}
 

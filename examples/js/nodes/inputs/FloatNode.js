@@ -47,7 +47,7 @@ THREE.FloatNode.prototype.toJSON = function ( meta ) {
 
 		data.number = this.number;
 
-		if ( this.readyonly === true ) data.readyonly = true;
+		if ( this.readonly === true ) data.readonly = true;
 
 	}
 

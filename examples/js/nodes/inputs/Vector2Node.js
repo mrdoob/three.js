@@ -33,7 +33,7 @@ THREE.Vector2Node.prototype.toJSON = function ( meta ) {
 		data.x = this.x;
 		data.y = this.y;
 
-		if ( this.readyonly === true ) data.readyonly = true;
+		if ( this.readonly === true ) data.readonly = true;
 
 	}
 
