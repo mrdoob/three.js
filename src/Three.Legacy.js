@@ -71,6 +71,7 @@ import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 import { WebVRManager } from './renderers/webvr/WebVRManager.js';
+import { ShaderChunk } from './renderers/shaders/ShaderChunk.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
 
@@ -158,6 +159,8 @@ export function Vertex( x, y, z ) {
 	return new Vector3( x, y, z );
 
 }
+
+ShaderChunk.lights_template = ShaderChunk.lights_fragment + ShaderChunk.lights_maps_fragment + ShaderChunk.lights_apply_fragment;
 
 //
 
