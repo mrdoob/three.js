@@ -33,7 +33,7 @@ THREE.FloatNode.prototype.generateReadonly = function ( builder, output, uuid, t
 
 	var value = this.number;
 
-	return builder.format( ~~value !== value ? value : value + ".0", type, output );
+	return builder.format( Math.floor( value ) !== value ? value : value + ".0", type, output );
 
 };
 
