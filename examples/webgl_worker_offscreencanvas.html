@@ -59,7 +59,7 @@
 		if ( canvas.transferControlToOffscreen !== undefined ) {
 
 			var offscreen = canvas.transferControlToOffscreen();
-			var worker = new Worker( 'worker/offscreenCanvas.js' );
+			var worker = new Worker( 'js/worker/OffscreenCanvas.js' );
 
 			worker.postMessage( {
 				drawingSurface: offscreen,
