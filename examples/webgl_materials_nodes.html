@@ -2031,7 +2031,7 @@
 					// not use "uniform" input ( for optimization ) 
 					// instead use explicit declaration, for example: 
 					// vec3( 1.0, 1.0, 1.0 ) instead "uniform vec3"
-					// but not allow change the value after build the shader material
+					// if readonly is true not allow change the value after build the shader material
 					mtl.color.readonly = mtl.specular.readonly = mtl.shininess.readonly = true;
 
 					break;
