@@ -799,21 +799,33 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
 
-			var uv = uvs2[ i ], uvCopy = [];
-
-			if ( uv === undefined ) {
-
-				continue;
-
-			}
-
-			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
-
-				uvCopy.push( uv[ j ].clone() );
-
-			}
-
-			uvs1.push( uvCopy );
+			var uv1 = uvs1[ i ], uv2 = uvs2[ i ];
+ 
+                	if ( uv1 === undefined || uv2 === undefined ) {
+ 
+                    		continue;
+ 
+                	}
+                
+                	for ( j = 0, jl = uv2.length; j < jl; j ++ ) {
+ 
+                    		var fuv = uv2[ j ], fuvCopy = [];
+ 
+                    		if ( fuv === undefined ) {
+ 
+                        		continue;
+ 
+                    		}
+ 
+                    		for ( var k = 0, kl = fuv.length; k < kl; k ++ ) {
+ 
+                        		fuvCopy.push( fuv[ k ].clone() );
+ 
+                    		}
+ 
+                    	uv1.push( fuvCopy );
+ 
+                	}
 
 		}
 
