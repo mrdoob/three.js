@@ -18,7 +18,7 @@ function init( offscreen, width, height, pixelRatio ) {
 
 	clock = new THREE.Clock();
 
-	// we don't use ImageLoader since it has a DOM dependecy (HTML5 image element)
+	// we don't use ImageLoader since it has a DOM dependency (HTML5 image element)
 
 	var loader = new THREE.ImageBitmapLoader();
 
