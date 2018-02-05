@@ -1555,7 +1555,7 @@ THREE.ColladaLoader.prototype = {
 			
 			if ( extra !== undefined && extra.technique !== undefined && isEmpty( extra.technique ) === false ) {
                 
-                		if ( extra.technique.double_sided !== undefined ) {
+                		if ( extra.technique.double_sided !== undefined && extra.technique.double_sided === 1) {
                     			
 					material.side = THREE.DoubleSide;
  
