@@ -32,6 +32,8 @@ import fog_vertex from './ShaderChunk/fog_vertex.glsl';
 import fog_pars_vertex from './ShaderChunk/fog_pars_vertex.glsl';
 import fog_fragment from './ShaderChunk/fog_fragment.glsl';
 import fog_pars_fragment from './ShaderChunk/fog_pars_fragment.glsl';
+import global_fragment from './ShaderChunk/global_fragment.glsl';
+import global_vertex from './ShaderChunk/global_vertex.glsl';
 import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.glsl';
 import lightmap_fragment from './ShaderChunk/lightmap_fragment.glsl';
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl';
@@ -144,6 +146,8 @@ export var ShaderChunk = {
 	fog_pars_vertex: fog_pars_vertex,
 	fog_fragment: fog_fragment,
 	fog_pars_fragment: fog_pars_fragment,
+	global_fragment: global_fragment,
+	global_vertex: global_vertex,
 	gradientmap_pars_fragment: gradientmap_pars_fragment,
 	lightmap_fragment: lightmap_fragment,
 	lightmap_pars_fragment: lightmap_pars_fragment,

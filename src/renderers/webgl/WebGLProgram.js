@@ -150,13 +150,13 @@ function replaceLightNums( string, parameters ) {
 
 }
 
-function parseIncludes( string ) {
+function parseIncludes( string , materialIncludes ) {
 
 	var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
 
 	function replace( match, include ) {
 
-		var replace = ShaderChunk[ include ];
+		var replace = undefined !== materialIncludes[ include ] ? materialIncludes[ include ] : ShaderChunk[ include ];
 
 		if ( replace === undefined ) {
 
@@ -199,6 +199,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	var gl = renderer.context;
 
 	var defines = material.defines;
+
+
+	var materialIncludes = material.shaderIncludes;
 
 	var vertexShader = shader.vertexShader;
 	var fragmentShader = shader.fragmentShader;
@@ -280,6 +283,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	var customExtensions = generateExtensions( material.extensions, parameters, extensions );
 
 	var customDefines = generateDefines( defines );
+
+	var customIncludes = undefined !== materialIncludes ? materialIncludes : {};
 
 	//
 
@@ -500,10 +505,11 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	}
 
-	vertexShader = parseIncludes( vertexShader );
+	vertexShader = parseIncludes( vertexShader, customIncludes );
 	vertexShader = replaceLightNums( vertexShader, parameters );
 
-	fragmentShader = parseIncludes( fragmentShader );
+	fragmentShader = parseIncludes( fragmentShader, customIncludes );
+
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 
 	if ( ! material.isShaderMaterial ) {

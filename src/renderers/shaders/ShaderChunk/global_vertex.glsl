@@ -1,0 +1,1 @@
+// template for injecting varying, uniform , attributes and functions above main below other includes

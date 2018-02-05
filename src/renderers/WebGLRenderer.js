@@ -1496,15 +1496,35 @@ function WebGLRenderer( parameters ) {
 
 		if ( programChange ) {
 
+			var shaderUniformsGLSL = ''
+
 			if ( parameters.shaderID ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
 
+				var computedUniforms = undefined !== material.shaderUniforms ?
+					UniformsUtils.merge([ UniformsUtils.clone( shader.uniforms ) , material.shaderUniforms ]) :
+					UniformsUtils.clone( shader.uniforms );
+
+				//if shader uniforms are present
+				for ( var u in material.shaderUniforms ) {
+
+					var uniform = material.shaderUniforms[ u ];
+					var type = uniform.type;
+
+					if ( type ) {
+
+						shaderUniformsGLSL += 'uniform ' + type + ' ' + u + ';\n'
+
+					}
+
+				}
+
 				materialProperties.shader = {
 					name: material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
-					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader
+					uniforms: computedUniforms,
+					vertexShader: shaderUniformsGLSL + shader.vertexShader,
+					fragmentShader: shaderUniformsGLSL + shader.fragmentShader
 				};
 
 			} else {
@@ -1822,6 +1842,16 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+			//follow the same pattern with common uniforms -
+			//refreshUniformsCommon looks at some known uniforms and refreshes them
+			//refreshUniformsCustom should look at unknown uniforms but in a known place
+			
+			if ( undefined !== material.shaderUniforms ) {
+
+				refreshUniformsCustom( m_uniforms, material );
+
+			}
+
 			// refresh uniforms common to several materials
 
 			if ( fog && material.fog ) {
@@ -2059,6 +2089,17 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
+		}
+
+	}
+
+	//same pattern as refreshUniformsFOO
+	function refreshUniformsCustom( uniforms, material ) {
+
+		for ( var uniform in material.shaderUniforms ) {
+
+			uniforms[ uniform ].value = material.shaderUniforms[ uniform ].value;
+		
 		}
 
 	}

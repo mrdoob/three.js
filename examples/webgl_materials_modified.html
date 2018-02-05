@@ -91,28 +91,58 @@
 				scene = new THREE.Scene();
 
 				var material = new THREE.MeshNormalMaterial();
-				material.onBeforeCompile = function ( shader ) {
 
-					// console.log( shader )
+				// BEGIN custom shader injection ----
 
-					shader.uniforms.time = { value: 0 };
+				var myShader = [
+					'float theta = sin( time + position.y ) / 2.0;',
+					'float c = cos( theta );',
+					'float s = sin( theta );',
+					'mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );',
+					'vec3 transformed = vec3( position ) * m;',
+					'vNormal = vNormal * m;'
+				].join( '\n' );
 
-					shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
-					shader.vertexShader = shader.vertexShader.replace(
-						'#include <begin_vertex>',
-						[
-							'float theta = sin( time + position.y ) / 2.0;',
-							'float c = cos( theta );',
-							'float s = sin( theta );',
-							'mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );',
-							'vec3 transformed = vec3( position ) * m;',
-							'vNormal = vNormal * m;'
-						].join( '\n' )
-					);
+				material.shaderIncludes = {
 
-					materialShader = shader;
+					begin_vertex: myShader,
+
+					global_vertex: 'uniform float time;\n'
 
 				};
+
+				material.shaderUniforms = {
+					time: { value: 0 }  
+				};
+
+				//OR
+
+				// material.shaderIncludes = {
+
+					// begin_vertex: myShader,
+
+				// };
+
+				// material.shaderUniforms = {
+					// time: { value: 0 , type:'float' } //if type is provided the uniform will be injected automatically  
+				// };
+
+				materialShader = material;
+
+				// material.onBeforeCompile = function ( shader ) {
+
+					// shader.uniforms.time = { value: 0 };
+
+					// shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
+					
+					// shader.vertexShader = shader.vertexShader.replace(
+					// 	'#include <begin_vertex>',
+					// 	myShader
+					// );
+
+					// materialShader = shader;
+
+				// };
 
 				loader = new THREE.JSONLoader();
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) {
@@ -188,7 +218,8 @@
 
 				if ( materialShader ) {
 
-					materialShader.uniforms.time.value = performance.now() / 1000;
+					// materialShader.uniforms.time.value = performance.now() / 1000;
+					materialShader.shaderUniforms.time.value = performance.now() / 1000;
 
 				}
 
