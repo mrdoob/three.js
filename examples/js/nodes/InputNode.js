@@ -16,6 +16,12 @@ THREE.InputNode = function ( type, params ) {
 THREE.InputNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.InputNode.prototype.constructor = THREE.InputNode;
 
+THREE.InputNode.prototype.isReadonly = function ( builder ) {
+
+	return this.readonly;
+
+};
+
 THREE.InputNode.prototype.generate = function ( builder, output, uuid, type, ns, needsUpdate ) {
 
 	var material = builder.material;
@@ -24,7 +30,7 @@ THREE.InputNode.prototype.generate = function ( builder, output, uuid, type, ns,
 	type = type || this.getType( builder );
 
 	var data = material.getDataNode( uuid ),
-		readonly = this.readonly && this.generateReadonly !== undefined;
+		readonly = this.isReadonly( builder ) && this.generateReadonly !== undefined;
 
 	if ( readonly ) {
 

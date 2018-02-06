@@ -21,6 +21,12 @@ THREE.TimerNode.prototype = Object.create( THREE.FloatNode.prototype );
 THREE.TimerNode.prototype.constructor = THREE.TimerNode;
 THREE.TimerNode.prototype.nodeType = "Timer";
 
+THREE.TimerNode.prototype.isReadonly = function ( builder ) {
+
+	return false;
+
+};
+
 THREE.TimerNode.prototype.isUnique = function ( builder ) {
 
 	// share TimerNode "uniform" input if is used on more time with others TimerNode
