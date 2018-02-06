@@ -7,7 +7,6 @@ THREE.Reflector = function ( geometry, options ) {
 	THREE.Mesh.call( this, geometry );
 
 	this.type = 'Reflector';
-	this.renderOrder = Infinity; // see #12883
 
 	var scope = this;
 

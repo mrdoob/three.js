@@ -8,9 +8,6 @@ THREE.LensFlare = function () {
 	THREE.Mesh.call( this );
 
 	this.type = 'LensFlare';
-
-	this.renderOrder = Infinity; // see #12883
-	this.material.transparent = true;
 	this.frustumCulled = false;
 
 	//
