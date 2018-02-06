@@ -6093,7 +6093,7 @@ var bsdfs = "float punctualLightIntensityToIrradianceFactor( const in float ligh
 
 var bumpmap_pars_fragment = "#ifdef USE_BUMPMAP\n\tuniform sampler2D bumpMap;\n\tuniform float bumpScale;\n\tvec2 dHdxy_fwd() {\n\t\tvec2 dSTdx = dFdx( vUv );\n\t\tvec2 dSTdy = dFdy( vUv );\n\t\tfloat Hll = bumpScale * texture2D( bumpMap, vUv ).x;\n\t\tfloat dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;\n\t\tfloat dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;\n\t\treturn vec2( dBx, dBy );\n\t}\n\tvec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {\n\t\tvec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );\n\t\tvec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );\n\t\tvec3 vN = surf_norm;\n\t\tvec3 R1 = cross( vSigmaY, vN );\n\t\tvec3 R2 = cross( vN, vSigmaX );\n\t\tfloat fDet = dot( vSigmaX, R1 );\n\t\tvec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );\n\t\treturn normalize( abs( fDet ) * surf_norm - vGrad );\n\t}\n#endif\n";
 
-var clipping_planes_fragment = "#if NUM_CLIPPING_PLANES > 0\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < UNION_CLIPPING_PLANES; i ++ ) {\n\t\tvec4 plane = clippingPlanes[ i ];\n\t\tif ( dot( vViewPosition, plane.xyz ) > plane.w ) discard;\n\t}\n\t#if UNION_CLIPPING_PLANES < NUM_CLIPPING_PLANES\n\t\tbool clipped = true;\n\t\t#pragma unroll_loop\n\t\tfor ( int i = UNION_CLIPPING_PLANES; i < NUM_CLIPPING_PLANES; i ++ ) {\n\t\t\tvec4 plane = clippingPlanes[ i ];\n\t\t\tclipped = ( dot( vViewPosition, plane.xyz ) > plane.w ) && clipped;\n\t\t}\n\t\tif ( clipped ) discard;\n\t#endif\n#endif\n";
+var clipping_planes_fragment = "#if NUM_CLIPPING_PLANES > 0\n\tvec4 plane;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < UNION_CLIPPING_PLANES; i ++ ) {\n\t\tplane = clippingPlanes[ i ];\n\t\tif ( dot( vViewPosition, plane.xyz ) > plane.w ) discard;\n\t}\n\t#if UNION_CLIPPING_PLANES < NUM_CLIPPING_PLANES\n\t\tbool clipped = true;\n\t\t#pragma unroll_loop\n\t\tfor ( int i = UNION_CLIPPING_PLANES; i < NUM_CLIPPING_PLANES; i ++ ) {\n\t\t\tplane = clippingPlanes[ i ];\n\t\t\tclipped = ( dot( vViewPosition, plane.xyz ) > plane.w ) && clipped;\n\t\t}\n\t\tif ( clipped ) discard;\n\t#endif\n#endif\n";
 
 var clipping_planes_pars_fragment = "#if NUM_CLIPPING_PLANES > 0\n\t#if ! defined( PHYSICAL ) && ! defined( PHONG )\n\t\tvarying vec3 vViewPosition;\n\t#endif\n\tuniform vec4 clippingPlanes[ NUM_CLIPPING_PLANES ];\n#endif\n";
 
@@ -21253,6 +21253,8 @@ function WebGLRenderer( parameters ) {
 
 		vr.dispose();
 
+		stopAnimation();
+
 	};
 
 	// Events
@@ -21767,48 +21769,52 @@ function WebGLRenderer( parameters ) {
 	var isAnimating = false;
 	var onAnimationFrame = null;
 
-	function start() {
+	function startAnimation() {
 
 		if ( isAnimating ) return;
 
-		var device = vr.getDevice();
-
-		if ( device && device.isPresenting ) {
-
-			device.requestAnimationFrame( loop );
-
-		} else {
-
-			window.requestAnimationFrame( loop );
-
-		}
+		requestAnimationLoopFrame();
 
 		isAnimating = true;
 
 	}
 
-	function loop( time ) {
+	function stopAnimation() {
 
-		if ( onAnimationFrame !== null ) onAnimationFrame( time );
+		isAnimating = false;
+
+	}
+
+	function requestAnimationLoopFrame() {
 
 		var device = vr.getDevice();
 
 		if ( device && device.isPresenting ) {
 
-			device.requestAnimationFrame( loop );
+			device.requestAnimationFrame( animationLoop );
 
 		} else {
 
-			window.requestAnimationFrame( loop );
+			window.requestAnimationFrame( animationLoop );
 
 		}
+
+	}
+
+	function animationLoop( time ) {
+
+		if ( isAnimating === false ) return;
+
+		onAnimationFrame( time );
+
+		requestAnimationLoopFrame();
 
 	}
 
 	this.animate = function ( callback ) {
 
 		onAnimationFrame = callback;
-		start();
+		onAnimationFrame !== null ? startAnimation() : stopAnimation();
 
 	};
 
