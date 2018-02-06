@@ -2150,9 +2150,6 @@ THREE.GLTFLoader = ( function () {
 
 			var primitives = meshDef.primitives;
 
-			var typesUsed = new Set();
-			var drawModesUsed = new Set();
-
 			return scope.loadGeometries( primitives ).then( function ( geometries ) {
 
 				for ( var i = 0, il = primitives.length; i < il; i ++ ) {
@@ -2316,63 +2313,21 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					if ( primitives.length === 1 ) return mesh;
+					if ( primitives.length > 1 ) {
 
-					mesh.name += '_' + i;
+						mesh.name += '_' + i;
 
-					group.add( mesh );
+						group.add( mesh );
 
-					typesUsed.add( mesh.constructor );
-					drawModesUsed.add( mesh.drawMode );
+					} else {
 
-				}
+						return mesh;
 
-				// Merge primitives into a single mesh with multiple buffer geometry
-				// groups. Merging requires BufferGeometryUtils, and that all primitives
-				// use the constructor, draw mode, and set of attributes. If any
-				// requirements are not met, a THREE.Group is returned instead.
-
-				if ( THREE.BufferGeometryUtils === undefined ) return group;
-
-				if ( typesUsed.size > 1 || drawModesUsed.size > 1 ) return group;
-
-				var TypedMesh = Array.from( typesUsed )[ 0 ];
-				var drawMode = Array.from( drawModesUsed )[ 0 ];
-
-				if ( TypedMesh !== THREE.Mesh && TypedMesh !== THREE.SkinnedMesh ) {
-
-					return group;
+					}
 
 				}
 
-				var groupGeometries = [];
-				var groupMaterials = [];
-
-				for ( var i = 0; i < group.children.length; ++i ) {
-
-					var geometry = group.children[ i ].geometry;
-					var material = group.children[ i ].material;
-
-					// Can't update spec/gloss uniforms on a multi-material mesh,
-					// so skip this case for now.
-					if ( material.isGLTFSpecularGlossinessMaterial ) return group;
-
-					groupGeometries.push( geometry );
-					groupMaterials.push( material );
-
-				}
-
-				var mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries( groupGeometries );
-
-				if ( !mergedGeometry ) return group;
-
-				var mergedMesh = new TypedMesh( mergedGeometry, groupMaterials );
-				mergedMesh.drawMode = drawMode;
-
-				if ( meshDef.name !== undefined ) mergedMesh.name = meshDef.name;
-				if ( meshDef.extras !== undefined ) mergedMesh.userData = meshDef.extras;
-
-				return mergedMesh;
+				return group;
 
 			} );
 
