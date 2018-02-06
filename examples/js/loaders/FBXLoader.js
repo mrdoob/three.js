@@ -433,7 +433,7 @@
 		}
 		if ( properties.Diffuse ) {
 
-			parameters.color = parseColor( properties.Diffuse );
+			parameters.color = new THREE.Color().fromArray( properties.Diffuse.value );
 
 		}
 		if ( properties.DisplacementFactor ) {
@@ -448,7 +448,7 @@
 		}
 		if ( properties.Specular ) {
 
-			parameters.specular = parseColor( properties.Specular );
+			parameters.specular = new THREE.Color().fromArray( properties.Specular.value );
 
 		}
 		if ( properties.Shininess ) {
@@ -458,7 +458,7 @@
 		}
 		if ( properties.Emissive ) {
 
-			parameters.emissive = parseColor( properties.Emissive );
+			parameters.emissive = new THREE.Color().fromArray( properties.Emissive.value );
 
 		}
 		if ( properties.EmissiveFactor ) {
@@ -1711,7 +1711,7 @@
 
 			if ( lightAttribute.Color !== undefined ) {
 
-				color = parseColor( lightAttribute.Color );
+				color = new THREE.Color().fromArray( lightAttribute.Color.value );
 
 			}
 
@@ -2791,6 +2791,8 @@
 			var innerPropFlag = props[ 3 ];
 			var innerPropValue = props[ 4 ];
 
+			console.log( innerPropType1 )
+
 			// cast values where needed, otherwise leave as strings
 			switch ( innerPropType1 ) {
 
@@ -2804,6 +2806,7 @@
 					innerPropValue = parseFloat( innerPropValue );
 					break;
 
+				case 'Color':
 				case 'ColorRGB':
 				case 'Vector3D':
 				case 'Lcl_Translation':
@@ -2993,7 +2996,7 @@
 				if ( innerPropName.indexOf( 'Lcl ' ) === 0 ) innerPropName = innerPropName.replace( 'Lcl ', 'Lcl_' );
 				if ( innerPropType1.indexOf( 'Lcl ' ) === 0 ) innerPropType1 = innerPropType1.replace( 'Lcl ', 'Lcl_' );
 
-				if ( innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' || innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
+				if ( innerPropType1 === 'Color' || innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' || innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
 
 					innerPropValue = [
 						subNode.propertyList[ 4 ],
@@ -3485,20 +3488,6 @@
 		} );
 
 		return array;
-
-	}
-
-	function parseColor( property ) {
-
-		var color = new THREE.Color();
-
-		if ( property.type === 'Color' ) {
-
-			return color.setScalar( property.value );
-
-		}
-
-		return color.fromArray( property.value );
 
 	}
 
