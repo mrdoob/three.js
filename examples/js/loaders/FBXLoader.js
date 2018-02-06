@@ -2791,8 +2791,6 @@
 			var innerPropFlag = props[ 3 ];
 			var innerPropValue = props[ 4 ];
 
-			console.log( innerPropType1 )
-
 			// cast values where needed, otherwise leave as strings
 			switch ( innerPropType1 ) {
 
