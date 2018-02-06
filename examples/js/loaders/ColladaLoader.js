@@ -1535,7 +1535,7 @@ THREE.ColladaLoader.prototype = {
 							material.opacity = color[ 0 ] * transparency.float;
 							break;
 						default:
-							console.warn( 'THREE.ColladaLoader: Invalid opaque type of transparent tag.' );
+							console.warn( 'THREE.ColladaLoader: Invalid opaque type "%s" of transparent tag.', transparent.opaque );
 
 					}
 
