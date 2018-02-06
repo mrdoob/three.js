@@ -243,9 +243,13 @@
 			
 				if (time) {
 				
-					time.timeScale = true;
+					// enable time scale
 					
+					time.timeScale = true;
+
 					loader.material.build();
+					
+					// gui
 				
 					addGui( 'timeScale', time.scale, function ( val ) {
 
