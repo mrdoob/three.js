@@ -224,7 +224,7 @@
 
 		}
 
-		
+
 		function updateMaterial() {
 
 			if ( mesh.material ) mesh.material.dispose();
@@ -234,31 +234,31 @@
 			var url = "nodes/" + param.load + ".json";
 
 			var library = {
-				"cloud" : cloud
+				"cloud": cloud
 			};
 
 			var loader = new THREE.NodeMaterialLoader( undefined, library ).load( url, function () {
 
-				var time = loader.getObjectByName("time");
-			
-				if (time) {
-				
+				var time = loader.getObjectByName( "time" );
+
+				if ( time ) {
+
 					// enable time scale
-					
+
 					time.timeScale = true;
 
 					loader.material.build();
-					
+
 					// gui
-				
+
 					addGui( 'timeScale', time.scale, function ( val ) {
 
 						time.scale = val;
 
-					}, false, -2, 2 );
-				
+					}, false, - 2, 2 );
+
 				}
-			
+
 				// set material
 				mesh.material = loader.material;
 
