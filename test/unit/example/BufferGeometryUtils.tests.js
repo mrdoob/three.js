@@ -75,7 +75,6 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
     assert.ok( mergedGeometry, 'merge succeeds' );
     assert.smartEqual( Array.from( mergedGeometry.attributes.position.array ), [ 1, 2, 3, 4, 5, 6 ], 'merges elements' );
     assert.smartEqual( Array.from( mergedGeometry.index.array ), [ 0, 1, 2, 2, 1, 0, 3, 4, 5 ], 'merges indices' );
-    assert.smartEqual( [ { start: 0, count: 6, materialIndex: 0 }, { start: 6, count: 3, materialIndex: 1 } ], mergedGeometry.groups, 'creates groups' );
     assert.equal( mergedGeometry.attributes.position.itemSize, 1, 'retains .itemSize' );
 
   } );

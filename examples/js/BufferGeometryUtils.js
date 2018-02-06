@@ -199,7 +199,6 @@ THREE.BufferGeometryUtils = {
 		var morphAttributes = {};
 
 		var mergedGeometry = new THREE.BufferGeometry();
-		var offset = 0;
 
 		for ( var i = 0; i < geometries.length; ++ i ) {
 
@@ -240,20 +239,6 @@ THREE.BufferGeometryUtils = {
 				mergedGeometry.userData = mergedGeometry.userData || {};
 				mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || [];
 				mergedGeometry.userData.mergedUserData.push( geometry.userData );
-
-			}
-
-			// create new group for this geometry
-
-			if ( isIndexed ) {
-
-				mergedGeometry.addGroup( offset, geometry.index.count, i );
-				offset += geometry.index.count;
-
-			} else {
-
-				mergedGeometry.addGroup( offset, geometry.attributes.position.count, i );
-				offset += geometry.attributes.position.count;
 
 			}
 
