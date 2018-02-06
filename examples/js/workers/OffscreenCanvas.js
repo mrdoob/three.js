@@ -1,4 +1,4 @@
-self.importScripts( '../../build/three.js' );
+self.importScripts( '../../../build/three.js' );
 
 self.onmessage = function ( message ) {
 
@@ -22,7 +22,7 @@ function init( offscreen, width, height, pixelRatio ) {
 
 	var loader = new THREE.ImageBitmapLoader();
 
-	loader.load( '../textures/crate.gif', function ( imageBitmap ) {
+	loader.load( '../../textures/crate.gif', function ( imageBitmap ) {
 
 		var texture = new THREE.CanvasTexture( imageBitmap );
 		var material = new THREE.MeshBasicMaterial( { map: texture } );
