@@ -1195,7 +1195,7 @@ THREE.ColladaLoader.prototype = {
 					case 'transparent':
 						data[ child.nodeName ] = {
 							opaque: child.getAttribute( 'opaque' ),
-							data: parseEffectParameters( child )
+							data: parseEffectParameter( child )
 						};
 						break;
 
@@ -1475,26 +1475,71 @@ THREE.ColladaLoader.prototype = {
 						if ( parameter.color && material.emissive )
 							material.emissive.fromArray( parameter.color );
 						break;
-					case 'transparent':
-						// if ( parameter.data.texture ) material.alphaMap = getTexture( parameter.data.texture );
-						break;
-					case 'transparency':
-						if ( parameter.float !== undefined ) {
 
-							material.opacity = parameter.float;
+				}
 
-							if ( parameters[ 'transparent' ] !== undefined ) {
+			}
 
-								var opaque = parameters[ 'transparent' ].opaque;
+			//
 
-								if ( opaque === 'RGB_ZERO' ) material.opacity = 1 - material.opacity;
+			var transparent = parameters[ 'transparent' ];
+			var transparency = parameters[ 'transparency' ];
 
-							}
+			// <transparency> does not exist but <transparent>
 
-							if ( material.opacity < 1 ) material.transparent = true;
+			if ( transparency === undefined && transparent ) {
 
-						}
-						break;
+				transparency = {
+					float: 1
+				};
+
+			}
+
+			// <transparent> does not exist but <transparency>
+
+			if ( transparent === undefined && transparency ) {
+
+				transparent = {
+					opaque: 'A_ONE',
+					data: {
+						color: [ 1, 1, 1, 1 ]
+					} };
+
+			}
+
+			if ( transparent && transparency ) {
+
+				// handle case if a texture exists but no color
+
+				if ( transparent.data.texture ) {
+
+					material.alphaMap = getTexture( transparent.data.texture );
+					material.transparent = true;
+
+				} else {
+
+					var color = transparent.data.color;
+
+					switch ( transparent.opaque ) {
+
+						case 'A_ONE':
+							material.opacity = color[ 3 ] * transparency.float;
+							break;
+						case 'RGB_ZERO':
+							material.opacity = 1 - ( color[ 0 ] * transparency.float );
+							break;
+						case 'A_ZERO':
+							material.opacity = 1 - ( color[ 3 ] * transparency.float );
+							break;
+						case 'RGB_ONE':
+							material.opacity = color[ 0 ] * transparency.float;
+							break;
+						default:
+							console.warn( 'THREE.ColladaLoader: Invalid opaque type of transparent tag.' );
+
+					}
+
+					if ( material.opacity < 1 ) material.transparent = true;
 
 				}
 
