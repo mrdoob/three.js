@@ -215,7 +215,7 @@
 			// horizontal zigzag sprite
 			sprite2.material.transform = new THREE.OperatorNode(
 				new THREE.OperatorNode(
-					new THREE.Math1Node( new THREE.TimerNode( 0, 3 ), THREE.Math1Node.SIN ), // 3 is speed (time scale)
+					new THREE.Math1Node( new THREE.TimerNode( 3 ), THREE.Math1Node.SIN ), // 3 is speed (time scale)
 					new THREE.Vector2Node( .3, 0 ), // horizontal scale (position)
 					THREE.OperatorNode.MUL
 				),
