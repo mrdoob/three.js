@@ -9,6 +9,8 @@ THREE.TimerNode = function ( scale, scope ) {
 	this.scale = scale !== undefined ? scale : 1;
 	this.scope = scope || THREE.TimerNode.GLOBAL;
 
+	this.timeScale = this.scale !== 1;
+
 };
 
 THREE.TimerNode.GLOBAL = 'global';
@@ -19,25 +21,34 @@ THREE.TimerNode.prototype = Object.create( THREE.FloatNode.prototype );
 THREE.TimerNode.prototype.constructor = THREE.TimerNode;
 THREE.TimerNode.prototype.nodeType = "Timer";
 
+THREE.TimerNode.prototype.isUnique = function ( builder ) {
+
+	// share TimerNode "uniform" input if is used on more time with others TimerNode
+	return this.timeScale && ( this.scope === THREE.TimerNode.GLOBAL || this.scope === THREE.TimerNode.DELTA );
+
+};
+
 THREE.TimerNode.prototype.updateFrame = function ( frame ) {
+
+	var scale = this.timeScale ? this.scale : 1;
 
 	switch( this.scope ) {
 
 		case THREE.TimerNode.LOCAL:
 
-			this.number += frame.delta * this.scale;
+			this.number += frame.delta * scale;
 
 			break;
 
 		case THREE.TimerNode.DELTA:
 
-			this.number = frame.delta * this.scale;
+			this.number = frame.delta * scale;
 
 			break;
 
 		default:
 
-			this.number = frame.time * this.scale;
+			this.number = frame.time * scale;
 
 	}
 
@@ -53,6 +64,7 @@ THREE.TimerNode.prototype.toJSON = function ( meta ) {
 
 		data.scope = this.scope;
 		data.scale = this.scale;
+		data.timeScale = this.timeScale;
 
 	}
 
