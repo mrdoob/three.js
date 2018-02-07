@@ -125,7 +125,14 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 				this.names[ object.name ] = object;
 
+			} else {
+
+				// ignore "uniform" shader input ( for optimization )
+				object.readonly = true;
+
 			}
+
+			if ( node.readonly !== undefined ) object.readonly = node.readonly;
 
 			this.nodes[ uuid ] = object;
 

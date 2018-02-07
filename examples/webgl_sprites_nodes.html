@@ -215,7 +215,7 @@
 			// horizontal zigzag sprite
 			sprite2.material.transform = new THREE.OperatorNode(
 				new THREE.OperatorNode(
-					new THREE.Math1Node( new THREE.TimerNode( 0, 3 ), THREE.Math1Node.SIN ), // 3 is speed (time scale)
+					new THREE.Math1Node( new THREE.TimerNode( 3 ), THREE.Math1Node.SIN ), // 3 is speed (time scale)
 					new THREE.Vector2Node( .3, 0 ), // horizontal scale (position)
 					THREE.OperatorNode.MUL
 				),
@@ -302,9 +302,9 @@
 
 			// update material animation and/or gpu calcs (pre-renderer)
 			frame.update( delta )
-				.updateFrame( sprite1.material )
-				.updateFrame( sprite2.material )
-				.updateFrame( sprite3.material );
+				.updateNode( sprite1.material )
+				.updateNode( sprite2.material )
+				.updateNode( sprite3.material );
 
 			// rotate sprite
 			sprite3.rotation.z -= Math.PI * .005;

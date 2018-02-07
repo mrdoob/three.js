@@ -19,6 +19,12 @@ THREE.VelocityNode.prototype = Object.create( THREE.Vector3Node.prototype );
 THREE.VelocityNode.prototype.constructor = THREE.VelocityNode;
 THREE.VelocityNode.prototype.nodeType = "Velocity";
 
+THREE.VelocityNode.prototype.isReadonly = function ( builder ) {
+
+	return false;
+
+};
+
 THREE.VelocityNode.prototype.setParams = function ( params ) {
 
 	switch ( this.params.type ) {
