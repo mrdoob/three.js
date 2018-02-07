@@ -2370,30 +2370,29 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			textures.setTexture2D( texture, slot );
+			if ( _currentRenderTarget && _currentRenderTarget.texture === texture ) {
 
-		};
+				textures.unsetTexture2D( slot );
 
-	}() );
+			} else {
 
-	this.setTexture = ( function () {
-
-		var warned = false;
-
-		return function setTexture( texture, slot ) {
-
-			if ( ! warned ) {
-
-				console.warn( "THREE.WebGLRenderer: .setTexture is deprecated, use setTexture2D instead." );
-				warned = true;
+				textures.setTexture2D( texture, slot );
 
 			}
 
-			textures.setTexture2D( texture, slot );
-
 		};
 
 	}() );
+
+	this.setTexture = function ( texture, slot ) {
+
+		console.warn( "THREE.WebGLRenderer: .setTexture is deprecated, use setTexture2D instead." );
+
+		_this.setTexture = _this.setTexture2D; // replace function after first warn
+
+		_this.setTexture2D( texture, slot );
+
+	};
 
 	this.setTextureCube = ( function () {
 
@@ -2415,21 +2414,29 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			// currently relying on the fact that WebGLRenderTargetCube.texture is a Texture and NOT a CubeTexture
-			// TODO: unify these code paths
-			if ( ( texture && texture.isCubeTexture ) ||
-				( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
+			if ( _currentRenderTarget && _currentRenderTarget.texture === texture ) {
 
-				// CompressedTexture can have Array in image :/
-
-				// this function alone should take care of cube textures
-				textures.setTextureCube( texture, slot );
+				textures.unsetTextureCube( slot );
 
 			} else {
 
-				// assumed: texture property of THREE.WebGLRenderTargetCube
+				// currently relying on the fact that WebGLRenderTargetCube.texture is a Texture and NOT a CubeTexture
+				// TODO: unify these code paths
+				if ( ( texture && texture.isCubeTexture ) ||
+					( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
 
-				textures.setTextureCubeDynamic( texture, slot );
+					// CompressedTexture can have Array in image :/
+
+					// this function alone should take care of cube textures
+					textures.setTextureCube( texture, slot );
+
+				} else {
+
+					// assumed: texture property of THREE.WebGLRenderTargetCube
+
+					textures.setTextureCubeDynamic( texture, slot );
+
+				}
 
 			}
 
