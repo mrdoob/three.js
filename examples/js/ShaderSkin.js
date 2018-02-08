@@ -85,6 +85,7 @@ THREE.ShaderSkin = {
 			THREE.ShaderChunk[ "bsdfs" ],
 			THREE.ShaderChunk[ "packing" ],
 			THREE.ShaderChunk[ "lights_pars" ],
+			THREE.ShaderChunk[ 'lights_maps_pars' ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
@@ -265,6 +266,7 @@ THREE.ShaderSkin = {
 
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "lights_pars" ],
+			THREE.ShaderChunk[ 'lights_maps_pars' ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 			THREE.ShaderChunk[ "fog_pars_vertex" ],
 
@@ -369,6 +371,7 @@ THREE.ShaderSkin = {
 
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "lights_pars" ],
+			THREE.ShaderChunk[ 'lights_maps_pars' ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 
 			"float fresnelReflectance( vec3 H, vec3 V, float F0 ) {",
