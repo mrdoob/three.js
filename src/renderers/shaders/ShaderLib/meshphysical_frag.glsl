@@ -35,6 +35,7 @@ varying vec3 vViewPosition;
 #include <bsdfs>
 #include <cube_uv_reflection_fragment>
 #include <lights_pars>
+#include <lights_maps_pars>
 #include <lights_physical_pars_fragment>
 #include <shadowmap_pars_fragment>
 #include <bumpmap_pars_fragment>
@@ -64,7 +65,9 @@ void main() {
 
 	// accumulation
 	#include <lights_physical_fragment>
-	#include <lights_template>
+	#include <begin_lights_fragment>
+	#include <lights_maps_fragment>
+	#include <end_lights_fragment>
 
 	// modulation
 	#include <aomap_fragment>
