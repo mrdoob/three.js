@@ -208,7 +208,8 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 			'material.specularShininess = shininess;',
 			'material.specularStrength = specularStrength;',
 
-			"#include <lights_template>"
+			"#include <begin_lights_fragment>",
+			"#include <end_lights_fragment>"
 		);
 
 		if ( light ) {

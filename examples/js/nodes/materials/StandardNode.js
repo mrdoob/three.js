@@ -287,7 +287,8 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 		}
 
 		output.push(
-			"#include <lights_template>"
+			"#include <begin_lights_fragment>",
+			"#include <end_lights_fragment>"
 		);
 
 		if ( light ) {
@@ -355,12 +356,8 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 
 				output.push(
 					clearCoatEnv.code,
-					"vec3 clearCoatRadiance = " + clearCoatEnv.result + ";"
+					"clearCoatRadiance += " + clearCoatEnv.result + ";"
 				);
-
-			} else {
-
-				output.push( "vec3 clearCoatRadiance = vec3( 0.0 );" );
 
 			}
 
