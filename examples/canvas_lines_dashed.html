@@ -75,10 +75,8 @@
 
 				for ( var i = 0; i < points.length * subdivisions; i ++ ) {
 
-					var index = i / ( points.length * subdivisions );
-					var position = spline.getPoint( index );
-
-					geometrySpline.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
+					var t = i / ( points.length * subdivisions );
+					geometrySpline.vertices[ i ] = spline.getPoint( t );
 
 				}
 

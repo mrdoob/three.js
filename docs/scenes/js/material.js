@@ -6,65 +6,65 @@ var constants = {
 
 	combine: {
 
-		"THREE.MultiplyOperation" : THREE.MultiplyOperation,
-		"THREE.MixOperation" : THREE.MixOperation,
-		"THREE.AddOperation" : THREE.AddOperation
+		'THREE.MultiplyOperation': THREE.MultiplyOperation,
+		'THREE.MixOperation': THREE.MixOperation,
+		'THREE.AddOperation': THREE.AddOperation
 
 	},
 
-	side : {
+	side: {
 
-		"THREE.FrontSide" : THREE.FrontSide,
-		"THREE.BackSide" : THREE.BackSide,
-		"THREE.DoubleSide" : THREE.DoubleSide
-
-	},
-
-	colors : {
-
-		"THREE.NoColors" : THREE.NoColors,
-		"THREE.FaceColors" : THREE.FaceColors,
-		"THREE.VertexColors" : THREE.VertexColors
+		'THREE.FrontSide': THREE.FrontSide,
+		'THREE.BackSide': THREE.BackSide,
+		'THREE.DoubleSide': THREE.DoubleSide
 
 	},
 
-	blendingMode : {
+	colors: {
 
-		"THREE.NoBlending" : THREE.NoBlending,
-		"THREE.NormalBlending" : THREE.NormalBlending,
-		"THREE.AdditiveBlending" : THREE.AdditiveBlending,
-		"THREE.SubtractiveBlending" : THREE.SubtractiveBlending,
-		"THREE.MultiplyBlending" : THREE.MultiplyBlending,
-		"THREE.CustomBlending" : THREE.CustomBlending
+		'THREE.NoColors': THREE.NoColors,
+		'THREE.FaceColors': THREE.FaceColors,
+		'THREE.VertexColors': THREE.VertexColors
 
 	},
 
-	equations : {
+	blendingMode: {
 
-		"THREE.AddEquation" : THREE.AddEquation,
-		"THREE.SubtractEquation" : THREE.SubtractEquation,
-		"THREE.ReverseSubtractEquation" : THREE.ReverseSubtractEquation
-
-	},
-
-	destinationFactors : {
-
-		"THREE.ZeroFactor" : THREE.ZeroFactor,
-		"THREE.OneFactor" : THREE.OneFactor,
-		"THREE.SrcColorFactor" : THREE.SrcColorFactor,
-		"THREE.OneMinusSrcColorFactor" : THREE.OneMinusSrcColorFactor,
-		"THREE.SrcAlphaFactor" : THREE.SrcAlphaFactor,
-		"THREE.OneMinusSrcAlphaFactor" : THREE.OneMinusSrcAlphaFactor,
-		"THREE.DstAlphaFactor" : THREE.DstAlphaFactor,
-		"THREE.OneMinusDstAlphaFactor" : THREE.OneMinusDstAlphaFactor
+		'THREE.NoBlending': THREE.NoBlending,
+		'THREE.NormalBlending': THREE.NormalBlending,
+		'THREE.AdditiveBlending': THREE.AdditiveBlending,
+		'THREE.SubtractiveBlending': THREE.SubtractiveBlending,
+		'THREE.MultiplyBlending': THREE.MultiplyBlending,
+		'THREE.CustomBlending': THREE.CustomBlending
 
 	},
 
-	sourceFactors : {
+	equations: {
 
-		"THREE.DstColorFactor" : THREE.DstColorFactor,
-		"THREE.OneMinusDstColorFactor" : THREE.OneMinusDstColorFactor,
-		"THREE.SrcAlphaSaturateFactor" : THREE.SrcAlphaSaturateFactor
+		'THREE.AddEquation': THREE.AddEquation,
+		'THREE.SubtractEquation': THREE.SubtractEquation,
+		'THREE.ReverseSubtractEquation': THREE.ReverseSubtractEquation
+
+	},
+
+	destinationFactors: {
+
+		'THREE.ZeroFactor': THREE.ZeroFactor,
+		'THREE.OneFactor': THREE.OneFactor,
+		'THREE.SrcColorFactor': THREE.SrcColorFactor,
+		'THREE.OneMinusSrcColorFactor': THREE.OneMinusSrcColorFactor,
+		'THREE.SrcAlphaFactor': THREE.SrcAlphaFactor,
+		'THREE.OneMinusSrcAlphaFactor': THREE.OneMinusSrcAlphaFactor,
+		'THREE.DstAlphaFactor': THREE.DstAlphaFactor,
+		'THREE.OneMinusDstAlphaFactor': THREE.OneMinusDstAlphaFactor
+
+	},
+
+	sourceFactors: {
+
+		'THREE.DstColorFactor': THREE.DstColorFactor,
+		'THREE.OneMinusDstColorFactor': THREE.OneMinusDstColorFactor,
+		'THREE.SrcAlphaSaturateFactor': THREE.SrcAlphaSaturateFactor
 
 	}
 
@@ -85,11 +85,12 @@ function getObjectsKeys( obj ) {
 	}
 
 	return keys;
+
 }
 
-var envMaps = (function () {
+var envMaps = ( function () {
 
-	var path = "../../examples/textures/cube/SwedishRoyalCastle/";
+	var path = '../../examples/textures/cube/SwedishRoyalCastle/';
 	var format = '.jpg';
 	var urls = [
 		path + 'px' + format, path + 'nx' + format,
@@ -105,47 +106,47 @@ var envMaps = (function () {
 	refractionCube.format = THREE.RGBFormat;
 
 	return {
-		none : null,
-		reflection : reflectionCube,
-		refraction : refractionCube
+		none: null,
+		reflection: reflectionCube,
+		refraction: refractionCube
 	};
 
-})();
+} )();
 
 var envMapKeys = getObjectsKeys( envMaps );
 
-var textureMaps = (function () {
+var textureMaps = ( function () {
 
 	return {
-		none : null,
-		grass : new THREE.TextureLoader().load( "../../examples/textures/terrain/grasslight-thin.jpg" )
+		none: null,
+		grass: new THREE.TextureLoader().load( '../../examples/textures/terrain/grasslight-thin.jpg' )
 	};
 
-})();
+} )();
 
 var textureMapKeys = getObjectsKeys( textureMaps );
 
-function generateVertexColors ( geometry ) {
+function generateVertexColors( geometry ) {
 
-	for ( var i=0, il = geometry.faces.length; i < il; i++ ) {
+	for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
 
-		geometry.faces[i].vertexColors.push( new THREE.Color().setHSL(
+		geometry.faces[ i ].vertexColors.push( new THREE.Color().setHSL(
 			i / il * Math.random(),
 			0.5,
 			0.5
 		) );
-		geometry.faces[i].vertexColors.push( new THREE.Color().setHSL(
+		geometry.faces[ i ].vertexColors.push( new THREE.Color().setHSL(
 			i / il * Math.random(),
 			0.5,
 			0.5
 		) );
-		geometry.faces[i].vertexColors.push( new THREE.Color().setHSL(
+		geometry.faces[ i ].vertexColors.push( new THREE.Color().setHSL(
 			i / il * Math.random(),
 			0.5,
 			0.5
 		) );
 
-		geometry.faces[i].color = new THREE.Color().setHSL(
+		geometry.faces[ i ].color = new THREE.Color().setHSL(
 			i / il * Math.random(),
 			0.5,
 			0.5
@@ -155,11 +156,11 @@ function generateVertexColors ( geometry ) {
 
 }
 
-function generateMorphTargets ( mesh, geometry ) {
+function generateMorphTargets( mesh, geometry ) {
 
 	var vertices = [], scale;
 
-	for ( var i = 0; i < geometry.vertices.length; i++ ) {
+	for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 
 		vertices.push( geometry.vertices[ i ].clone() );
 
@@ -171,32 +172,32 @@ function generateMorphTargets ( mesh, geometry ) {
 
 	}
 
-	geometry.morphTargets.push( { name: "target1", vertices: vertices } );
+	geometry.morphTargets.push( { name: 'target1', vertices: vertices } );
 
 }
 
-function handleColorChange ( color ) {
+function handleColorChange( color ) {
 
-	return function ( value ){
+	return function ( value ) {
 
-		if (typeof value === "string") {
+		if ( typeof value === 'string' ) {
 
-			value = value.replace('#', '0x');
+			value = value.replace( '#', '0x' );
 
 		}
 
 		color.setHex( value );
 
-    };
+	};
 
 }
 
-function needsUpdate ( material, geometry ) {
+function needsUpdate( material, geometry ) {
 
 	return function () {
 
-		material.vertexColors = +material.vertexColors; //Ensure number
-		material.side = +material.side; //Ensure number
+		material.vertexColors = + material.vertexColors; //Ensure number
+		material.side = + material.side; //Ensure number
 		material.needsUpdate = true;
 		geometry.verticesNeedUpdate = true;
 		geometry.normalsNeedUpdate = true;
@@ -206,7 +207,7 @@ function needsUpdate ( material, geometry ) {
 
 }
 
-function updateMorphs ( torus, material ) {
+function updateMorphs( torus, material ) {
 
 	return function () {
 
@@ -217,30 +218,30 @@ function updateMorphs ( torus, material ) {
 
 }
 
-function updateTexture ( material, materialKey, textures ) {
+function updateTexture( material, materialKey, textures ) {
 
 	return function ( key ) {
 
-		material[materialKey] = textures[key];
+		material[ materialKey ] = textures[ key ];
 		material.needsUpdate = true;
 
 	};
 
 }
 
-function guiScene ( gui, scene ) {
+function guiScene( gui, scene ) {
 
-	var folder = gui.addFolder('Scene');
+	var folder = gui.addFolder( 'Scene' );
 
 	var data = {
-		background : "#000000",
-		"ambient light" : ambientLight.color.getHex()
+		background: '#000000',
+		'ambient light': ambientLight.color.getHex()
 	};
 
 	var color = new THREE.Color();
 	var colorConvert = handleColorChange( color );
 
-	folder.addColor( data, "background" ).onChange( function ( value ) {
+	folder.addColor( data, 'background' ).onChange( function ( value ) {
 
 		colorConvert( value );
 
@@ -248,22 +249,22 @@ function guiScene ( gui, scene ) {
 
 	} );
 
-	folder.addColor( data, "ambient light" ).onChange( handleColorChange( ambientLight.color ) );
+	folder.addColor( data, 'ambient light' ).onChange( handleColorChange( ambientLight.color ) );
 
 	guiSceneFog( folder, scene );
 
 }
 
-function guiSceneFog ( folder, scene ) {
+function guiSceneFog( folder, scene ) {
 
-	var fogFolder = folder.addFolder('scene.fog');
+	var fogFolder = folder.addFolder( 'scene.fog' );
 
 	var fog = new THREE.Fog( 0x3f7b9d, 0, 60 );
 
 	var data = {
-		fog : {
-			"THREE.Fog()" : false,
-			"scene.fog.color" : fog.color.getHex()
+		fog: {
+			'THREE.Fog()': false,
+			'scene.fog.color': fog.color.getHex()
 		}
 	};
 
@@ -281,13 +282,13 @@ function guiSceneFog ( folder, scene ) {
 
 	} );
 
-	fogFolder.addColor( data.fog, 'scene.fog.color').onChange( handleColorChange( fog.color ) );
+	fogFolder.addColor( data.fog, 'scene.fog.color' ).onChange( handleColorChange( fog.color ) );
 
 }
 
-function guiMaterial ( gui, mesh, material, geometry ) {
+function guiMaterial( gui, mesh, material, geometry ) {
 
-	var folder = gui.addFolder('THREE.Material');
+	var folder = gui.addFolder( 'THREE.Material' );
 
 	folder.add( material, 'transparent' );
 	folder.add( material, 'opacity', 0, 1 );
@@ -307,22 +308,22 @@ function guiMaterial ( gui, mesh, material, geometry ) {
 
 }
 
-function guiMeshBasicMaterial ( gui, mesh, material, geometry ) {
+function guiMeshBasicMaterial( gui, mesh, material, geometry ) {
 
 	var data = {
-		color : material.color.getHex(),
-		envMaps : envMapKeys,
-		map : textureMapKeys,
-		specularMap : textureMapKeys,
-		alphaMap : textureMapKeys
+		color: material.color.getHex(),
+		envMaps: envMapKeys,
+		map: textureMapKeys,
+		specularMap: textureMapKeys,
+		alphaMap: textureMapKeys
 	};
 
-	var folder = gui.addFolder('THREE.MeshBasicMaterial');
+	var folder = gui.addFolder( 'THREE.MeshBasicMaterial' );
 
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
-	folder.add( material, 'vertexColors', constants.colors).onChange( needsUpdate( material, geometry ) );
+	folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'fog' );
 
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
@@ -333,13 +334,12 @@ function guiMeshBasicMaterial ( gui, mesh, material, geometry ) {
 	folder.add( material, 'combine', constants.combine ).onChange( updateMorphs( mesh, material ) );
 	folder.add( material, 'reflectivity', 0, 1 );
 	folder.add( material, 'refractionRatio', 0, 1 );
-	//folder.add( material, 'skinning' );
 
 }
 
-function guiMeshDepthMaterial ( gui, mesh, material, geometry ) {
+function guiMeshDepthMaterial( gui, mesh, material, geometry ) {
 
-	var folder = gui.addFolder('THREE.MeshDepthMaterial');
+	var folder = gui.addFolder( 'THREE.MeshDepthMaterial' );
 
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
@@ -347,9 +347,9 @@ function guiMeshDepthMaterial ( gui, mesh, material, geometry ) {
 
 }
 
-function guiMeshNormalMaterial ( gui, mesh, material, geometry ) {
+function guiMeshNormalMaterial( gui, mesh, material, geometry ) {
 
-	var folder = gui.addFolder('THREE.MeshNormalMaterial');
+	var folder = gui.addFolder( 'THREE.MeshNormalMaterial' );
 
 	folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
@@ -358,37 +358,37 @@ function guiMeshNormalMaterial ( gui, mesh, material, geometry ) {
 
 }
 
-function guiLineBasicMaterial ( gui, mesh, material, geometry ) {
+function guiLineBasicMaterial( gui, mesh, material, geometry ) {
 
 	var data = {
-		color : material.color.getHex()
+		color: material.color.getHex()
 	};
 
-	var folder = gui.addFolder('THREE.LineBasicMaterial');
+	var folder = gui.addFolder( 'THREE.LineBasicMaterial' );
 
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 	folder.add( material, 'linewidth', 0, 10 );
-	folder.add( material, 'linecap', ["butt", "round", "square"] );
-	folder.add( material, 'linejoin', ["round", "bevel", "miter"] );
-	folder.add( material, 'vertexColors', constants.colors).onChange( needsUpdate( material, geometry ) );
+	folder.add( material, 'linecap', [ 'butt', 'round', 'square' ] );
+	folder.add( material, 'linejoin', [ 'round', 'bevel', 'miter' ] );
+	folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'fog' );
 
 }
 
-function guiMeshLambertMaterial ( gui, mesh, material, geometry ) {
+function guiMeshLambertMaterial( gui, mesh, material, geometry ) {
 
 	var data = {
-		color : material.color.getHex(),
-		emissive : material.emissive.getHex(),
-		envMaps : envMapKeys,
-		map : textureMapKeys,
-		specularMap : textureMapKeys,
-		alphaMap : textureMapKeys
+		color: material.color.getHex(),
+		emissive: material.emissive.getHex(),
+		envMaps: envMapKeys,
+		map: textureMapKeys,
+		specularMap: textureMapKeys,
+		alphaMap: textureMapKeys
 	};
 
 	var envObj = {};
 
-	var folder = gui.addFolder('THREE.MeshLambertMaterial');
+	var folder = gui.addFolder( 'THREE.MeshLambertMaterial' );
 
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
@@ -410,30 +410,30 @@ function guiMeshLambertMaterial ( gui, mesh, material, geometry ) {
 
 }
 
-function guiMeshPhongMaterial ( gui, mesh, material, geometry ) {
+function guiMeshPhongMaterial( gui, mesh, material, geometry ) {
 
 	var data = {
-		color : material.color.getHex(),
-		emissive : material.emissive.getHex(),
-		specular : material.specular.getHex(),
-		envMaps : envMapKeys,
-		map : textureMapKeys,
-		lightMap : textureMapKeys,
-		specularMap : textureMapKeys,
-		alphaMap : textureMapKeys
+		color: material.color.getHex(),
+		emissive: material.emissive.getHex(),
+		specular: material.specular.getHex(),
+		envMaps: envMapKeys,
+		map: textureMapKeys,
+		lightMap: textureMapKeys,
+		specularMap: textureMapKeys,
+		alphaMap: textureMapKeys
 	};
 
-	var folder = gui.addFolder('THREE.MeshPhongMaterial');
+	var folder = gui.addFolder( 'THREE.MeshPhongMaterial' );
 
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 	folder.addColor( data, 'specular' ).onChange( handleColorChange( material.specular ) );
 
-	folder.add( material, 'shininess', 0, 100);
+	folder.add( material, 'shininess', 0, 100 );
 	folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
-	folder.add( material, 'vertexColors', constants.colors);
+	folder.add( material, 'vertexColors', constants.colors );
 	folder.add( material, 'fog' );
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
@@ -443,19 +443,19 @@ function guiMeshPhongMaterial ( gui, mesh, material, geometry ) {
 
 }
 
-function guiMeshStandardMaterial ( gui, mesh, material, geometry ) {
+function guiMeshStandardMaterial( gui, mesh, material, geometry ) {
 
 	var data = {
-		color : material.color.getHex(),
-		emissive : material.emissive.getHex(),
-		envMaps : envMapKeys,
-		map : textureMapKeys,
-		lightMap : textureMapKeys,
-		specularMap : textureMapKeys,
-		alphaMap : textureMapKeys
+		color: material.color.getHex(),
+		emissive: material.emissive.getHex(),
+		envMaps: envMapKeys,
+		map: textureMapKeys,
+		lightMap: textureMapKeys,
+		specularMap: textureMapKeys,
+		alphaMap: textureMapKeys
 	};
 
-	var folder = gui.addFolder('THREE.MeshStandardMaterial');
+	var folder = gui.addFolder( 'THREE.MeshStandardMaterial' );
 
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
@@ -465,7 +465,7 @@ function guiMeshStandardMaterial ( gui, mesh, material, geometry ) {
 	folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
-	folder.add( material, 'vertexColors', constants.colors);
+	folder.add( material, 'vertexColors', constants.colors );
 	folder.add( material, 'fog' );
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
@@ -476,82 +476,83 @@ function guiMeshStandardMaterial ( gui, mesh, material, geometry ) {
 
 }
 
-function chooseFromHash ( gui, mesh, geometry ) {
+function chooseFromHash( gui, mesh, geometry ) {
 
-	var selectedMaterial = window.location.hash.substring(1) || "MeshBasicMaterial";
+	var selectedMaterial = window.location.hash.substring( 1 ) || 'MeshBasicMaterial';
 	var material;
 
-	switch (selectedMaterial) {
+	switch ( selectedMaterial ) {
 
-	case "MeshBasicMaterial" :
+		case 'MeshBasicMaterial' :
 
-		material = new THREE.MeshBasicMaterial({color: 0x2194CE});
-		guiMaterial( gui, mesh, material, geometry );
-		guiMeshBasicMaterial( gui, mesh, material, geometry );
+			material = new THREE.MeshBasicMaterial( { color: 0x2194CE } );
+			guiMaterial( gui, mesh, material, geometry );
+			guiMeshBasicMaterial( gui, mesh, material, geometry );
 
-		return material;
+			return material;
 
-		break;
+			break;
 
-	case "MeshLambertMaterial" :
+		case 'MeshLambertMaterial' :
 
-		material = new THREE.MeshLambertMaterial({color: 0x2194CE});
-		guiMaterial( gui, mesh, material, geometry );
-		guiMeshLambertMaterial( gui, mesh, material, geometry );
+			material = new THREE.MeshLambertMaterial( { color: 0x2194CE } );
+			guiMaterial( gui, mesh, material, geometry );
+			guiMeshLambertMaterial( gui, mesh, material, geometry );
 
-		return material;
+			return material;
 
-		break;
+			break;
 
-	case "MeshPhongMaterial" :
+		case 'MeshPhongMaterial' :
 
-		material = new THREE.MeshPhongMaterial({color: 0x2194CE});
-		guiMaterial( gui, mesh, material, geometry );
-		guiMeshPhongMaterial( gui, mesh, material, geometry );
+			material = new THREE.MeshPhongMaterial( { color: 0x2194CE } );
+			guiMaterial( gui, mesh, material, geometry );
+			guiMeshPhongMaterial( gui, mesh, material, geometry );
 
-		return material;
+			return material;
 
-		break;
+			break;
 
-	case "MeshStandardMaterial" :
+		case 'MeshStandardMaterial' :
 
-		material = new THREE.MeshStandardMaterial({color: 0x2194CE});
-		guiMaterial( gui, mesh, material, geometry );
-		guiMeshStandardMaterial( gui, mesh, material, geometry );
+			material = new THREE.MeshStandardMaterial( { color: 0x2194CE } );
+			guiMaterial( gui, mesh, material, geometry );
+			guiMeshStandardMaterial( gui, mesh, material, geometry );
 
-		return material;
+			return material;
 
-		break;
+			break;
 
-	case "MeshDepthMaterial" :
+		case 'MeshDepthMaterial' :
 
-		material = new THREE.MeshDepthMaterial();
-		guiMaterial( gui, mesh, material, geometry );
-		guiMeshDepthMaterial( gui, mesh, material, geometry );
+			material = new THREE.MeshDepthMaterial();
+			guiMaterial( gui, mesh, material, geometry );
+			guiMeshDepthMaterial( gui, mesh, material, geometry );
 
-		return material;
+			return material;
 
-		break;
+			break;
 
-	case "MeshNormalMaterial" :
+		case 'MeshNormalMaterial' :
 
-		material = new THREE.MeshNormalMaterial();
-		guiMaterial( gui, mesh, material, geometry );
-		guiMeshNormalMaterial( gui, mesh, material, geometry );
+			material = new THREE.MeshNormalMaterial();
+			guiMaterial( gui, mesh, material, geometry );
+			guiMeshNormalMaterial( gui, mesh, material, geometry );
 
-		return material;
+			return material;
 
-		break;
+			break;
 
-	case "LineBasicMaterial" :
+		case 'LineBasicMaterial' :
 
-		material = new THREE.LineBasicMaterial({color: 0x2194CE});
-		guiMaterial( gui, mesh, material, geometry );
-		guiLineBasicMaterial( gui, mesh, material, geometry );
+			material = new THREE.LineBasicMaterial( { color: 0x2194CE } );
+			guiMaterial( gui, mesh, material, geometry );
+			guiLineBasicMaterial( gui, mesh, material, geometry );
 
-		return material;
+			return material;
 
-		break;
+			break;
+
 	}
 
 }

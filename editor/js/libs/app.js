@@ -113,18 +113,7 @@ var APP = {
 
 			if ( renderer.vr.enabled ) {
 
-				WEBVR.checkAvailability().catch( function( message ) {
-
-					dom.appendChild( WEBVR.getMessageContainer( message ) );
-
-				} );
-
-				WEBVR.getVRDisplay( function ( device ) {
-
-					renderer.vr.setDevice( device );
-					dom.appendChild( WEBVR.getButton( device, renderer.domElement ) );
-
-				} );
+				dom.appendChild( WEBVR.createButton( renderer ) );
 
 			}
 

@@ -169,22 +169,24 @@
 				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
 				var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
 
-				var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.y = - 250;
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+				var shadowMesh;
 
-				var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.x = - 400;
-				mesh.position.y = - 250;
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+				shadowMesh.position.y = - 250;
+				shadowMesh.rotation.x = - Math.PI / 2;
+				scene.add( shadowMesh );
 
-				var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.x = 400;
-				mesh.position.y = - 250;
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+				shadowMesh.position.x = - 400;
+				shadowMesh.position.y = - 250;
+				shadowMesh.rotation.x = - Math.PI / 2;
+				scene.add( shadowMesh );
+
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+				shadowMesh.position.x = 400;
+				shadowMesh.position.y = - 250;
+				shadowMesh.rotation.x = - Math.PI / 2;
+				scene.add( shadowMesh );
 
 				var faceIndices = [ 'a', 'b', 'c' ];
 
@@ -225,24 +227,28 @@
 
 				}
 
-				var materials = [
+				var mesh, wireframe;
 
-					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } ),
-					new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } )
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } );
+				var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
-				];
+				mesh = new THREE.Mesh( geometry1, material );
+				wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
+				mesh.add( wireframe );
+				mesh.position.x = - 400;
+				mesh.rotation.x = - 1.87;
+				scene.add( mesh );
 
-				var group1 = THREE.SceneUtils.createMultiMaterialObject( geometry1, materials );
-				group1.position.x = -400;
-				group1.rotation.x = -1.87;
-				scene.add( group1 );
+				mesh = new THREE.Mesh( geometry2, material );
+				wireframe = new THREE.Mesh( geometry2, wireframeMaterial );
+				mesh.add( wireframe );
+				mesh.position.x = 400;
+				scene.add( mesh );
 
-				var group2 = THREE.SceneUtils.createMultiMaterialObject( geometry2, materials );
-				group2.position.x = 400;
-				scene.add( group2 );
-
-				var group3 = THREE.SceneUtils.createMultiMaterialObject( geometry3, materials );
-				scene.add( group3 );
+				mesh = new THREE.Mesh( geometry3, material );
+				wireframe = new THREE.Mesh( geometry3, wireframeMaterial );
+				mesh.add( wireframe );
+				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );

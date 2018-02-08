@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.ReflectNode = function( scope ) {
+THREE.ReflectNode = function ( scope ) {
 
 	THREE.TempNode.call( this, 'v3', { unique: true } );
 
@@ -16,19 +16,22 @@ THREE.ReflectNode.VECTOR = 'vector';
 
 THREE.ReflectNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.ReflectNode.prototype.constructor = THREE.ReflectNode;
+THREE.ReflectNode.prototype.nodeType = "Reflect";
 
-THREE.ReflectNode.prototype.getType = function( builder ) {
+THREE.ReflectNode.prototype.getType = function ( builder ) {
 
 	switch ( this.scope ) {
+
 		case THREE.ReflectNode.SPHERE:
 			return 'v2';
+
 	}
 
 	return this.type;
 
 };
 
-THREE.ReflectNode.prototype.generate = function( builder, output ) {
+THREE.ReflectNode.prototype.generate = function ( builder, output ) {
 
 	var result;
 
@@ -61,8 +64,25 @@ THREE.ReflectNode.prototype.generate = function( builder, output ) {
 			result = 'reflectSphereVec';
 
 			break;
+
 	}
 
 	return builder.format( result, this.getType( this.type ), output );
+
+};
+
+THREE.ReflectNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.scope = this.scope;
+
+	}
+
+	return data;
 
 };

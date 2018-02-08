@@ -18,7 +18,7 @@ THREE.AssimpLoader.prototype = {
 
 		var scope = this;
 
-		var path = THREE.Loader.prototype.extractUrlBase( url );
+		var path = THREE.LoaderUtils.extractUrlBase( url );
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
@@ -1021,17 +1021,6 @@ THREE.AssimpLoader.prototype = {
 
 		};
 
-		var nameTexMapping = {
-
-			"$tex.ambient": "ambientMap",
-			"$clr.diffuse": "map",
-			"$clr.specular": "specMap",
-			"$clr.emissive": "emissive",
-			"$clr.transparent": "alphaMap",
-			"$clr.reflective": "reflectMap",
-
-		};
-
 		var nameTypeMapping = {
 
 			"?mat.name": "string",
@@ -1139,9 +1128,11 @@ THREE.AssimpLoader.prototype = {
 
 			}
 
-			if ( ! key ) return null;
+			if ( ! key ) {
+				
+				return null;
 
-			if ( key && nextKey ) {
+			} else if ( nextKey ) {
 
 				var dT = nextKey.mTime - key.mTime;
 				var T = key.mTime - time;
@@ -1149,16 +1140,18 @@ THREE.AssimpLoader.prototype = {
 
 				return lerp( key.mValue.toTHREE(), nextKey.mValue.toTHREE(), l );
 
+			} else {
+
+				nextKey = keys[ 0 ].clone();
+				nextKey.mTime += lne;
+
+				var dT = nextKey.mTime - key.mTime;
+				var T = key.mTime - time;
+				var l = T / dT;
+
+				return lerp( key.mValue.toTHREE(), nextKey.mValue.toTHREE(), l );
+				
 			}
-
-			nextKey = keys[ 0 ].clone();
-			nextKey.mTime += lne;
-
-			var dT = nextKey.mTime - key.mTime;
-			var T = key.mTime - time;
-			var l = T / dT;
-
-			return lerp( key.mValue.toTHREE(), nextKey.mValue.toTHREE(), l );
 
 		}
 

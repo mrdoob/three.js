@@ -63,6 +63,12 @@
 				side: 'double'
 			};
 
+			var sides = {
+				'front': THREE.FrontSide,
+				'back': THREE.BackSide,
+				'double': THREE.DoubleSide
+			};
+
 			var cameraOrtho, cameraPerspective;
 			var controlsOrtho, controlsPerspective;
 
@@ -277,7 +283,7 @@
 
 					}
 
-					if ( params.side !== material.side ) {
+					if ( sides[ params.side ] !== material.side ) {
 
 						switch ( params.side ) {
 

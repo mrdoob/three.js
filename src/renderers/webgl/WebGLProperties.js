@@ -28,7 +28,16 @@ function WebGLProperties() {
 
 	}
 
-	function clear() {
+	function update( object, key, value ) {
+
+		var uuid = object.uuid;
+		var map = properties[ uuid ];
+
+		map[ key ] = value;
+
+	}
+
+	function dispose() {
 
 		properties = {};
 
@@ -37,7 +46,8 @@ function WebGLProperties() {
 	return {
 		get: get,
 		remove: remove,
-		clear: clear
+		update: update,
+		dispose: dispose
 	};
 
 }

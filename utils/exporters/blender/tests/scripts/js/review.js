@@ -123,7 +123,7 @@ function loadObject( data ) {
 function loadGeometry( data, url ) {
 
     var loader = new THREE.JSONLoader();
-    var texturePath = THREE.Loader.prototype.extractUrlBase( url );
+    var texturePath = THREE.LoaderUtils.extractUrlBase( url );
     data = loader.parse( data, texturePath );
 
     if ( data.materials === undefined ) {

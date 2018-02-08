@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.SwitchNode = function( node, components ) {
+THREE.SwitchNode = function ( node, components ) {
 
 	THREE.GLNode.call( this );
 
@@ -13,14 +13,15 @@ THREE.SwitchNode = function( node, components ) {
 
 THREE.SwitchNode.prototype = Object.create( THREE.GLNode.prototype );
 THREE.SwitchNode.prototype.constructor = THREE.SwitchNode;
+THREE.SwitchNode.prototype.nodeType = "Switch";
 
-THREE.SwitchNode.prototype.getType = function( builder ) {
+THREE.SwitchNode.prototype.getType = function ( builder ) {
 
 	return builder.getFormatFromLength( this.components.length );
 
 };
 
-THREE.SwitchNode.prototype.generate = function( builder, output ) {
+THREE.SwitchNode.prototype.generate = function ( builder, output ) {
 
 	var type = this.node.getType( builder );
 	var inputLength = builder.getFormatLength( type ) - 1;
@@ -65,8 +66,25 @@ THREE.SwitchNode.prototype.generate = function( builder, output ) {
 
 		// join
 
-		return builder.format( node, type, output )
+		return builder.format( node, type, output );
 
 	}
+
+};
+
+THREE.SwitchNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.node = this.node.toJSON( meta ).uuid;
+		data.components = this.components;
+
+	}
+
+	return data;
 
 };

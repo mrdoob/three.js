@@ -135,6 +135,11 @@
 		When drawing 2D overlays it can be useful to disable the depth writing in order to layer several things together without creating z-index artifacts.
 		</div>
 
+		<h3>[property:Boolean flatShading]</h3>
+		<div>
+		Define whether the material is rendered with flat shading. Default is false.
+		</div>
+
 		<h3>[property:Boolean fog]</h3>
 		<div>Whether the material is affected by fog. Default is *true*.</div>
 
@@ -191,7 +196,7 @@
 		<h3>[property:String precision]</h3>
 		<div>
 		Override the renderer's default precision for this material. Can be "*highp*", "*mediump*" or "*lowp*".
-		Defaults is *null*.
+		Default is *null*.
 		</div>
 
 		<h3>[property:Boolean premultipliedAlpha]</h3>
@@ -207,9 +212,37 @@
 		Default is *false*.
 		</div>
 
-		<h3>[property:Boolean flatShading]</h3>
+		<h3>[property:Integer shadowSide]</h3>
 		<div>
-		Define whether the material is rendered with flat shading. Default is false.
+		Defines which side of faces cast shadows.
+		When set, can be [page:Materials THREE.FrontSide], [page:Materials THREE.BackSide], or [page:Materials THREE.DoubleSide]. Default is *null*. <br />
+		If *null*, the side casting shadows is determined as follows: <br />
+
+		<table>
+			<thead>
+				<tr>
+					<th>[page:Material.side]</th>
+					<th>Side casting shadows</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				<tr>
+					<td>THREE.FrontSide</td>
+					<td>back side</td>
+				</tr>
+				<tr>
+					<td>THREE.BackSide</td>
+					<td>front side</td>
+				</tr>
+				<tr>
+					<td>THREE.DoubleSide</td>
+					<td>both sides</td>
+				</tr>
+			</tbody>
+		</table>
+
+
 		</div>
 
 		<h3>[property:Integer side]</h3>

@@ -42,6 +42,14 @@ var Toolbar = function ( editor ) {
 	} );
 	buttons.add( scale );
 
+	var local = new UI.THREE.Boolean( false, 'local' )
+	local.onChange( function () {
+
+		signals.spaceChanged.dispatch( this.getValue() === true ? 'local' : 'world' );
+
+	} );
+	buttons.add( local );
+
 	signals.transformModeChanged.add( function ( mode ) {
 
 		translate.dom.classList.remove( 'selected' );
@@ -57,29 +65,6 @@ var Toolbar = function ( editor ) {
 		}
 
 	} );
-
-	// grid
-
-	var grid = new UI.Number( 25 ).setWidth( '40px' ).onChange( update );
-	buttons.add( new UI.Text( 'grid: ' ) );
-	buttons.add( grid );
-
-	var snap = new UI.THREE.Boolean( false, 'snap' ).onChange( update );
-	buttons.add( snap );
-
-	var local = new UI.THREE.Boolean( false, 'local' ).onChange( update );
-	buttons.add( local );
-
-	var showGrid = new UI.THREE.Boolean( true, 'show' ).onChange( update );
-	buttons.add( showGrid );
-
-	function update() {
-
-		signals.snapChanged.dispatch( snap.getValue() === true ? grid.getValue() : null );
-		signals.spaceChanged.dispatch( local.getValue() === true ? "local" : "world" );
-		signals.showGridChanged.dispatch( showGrid.getValue() );
-
-	}
 
 	return container;
 

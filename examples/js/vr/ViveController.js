@@ -40,7 +40,6 @@ THREE.ViveController = function ( id ) {
 	}
 
 	this.matrixAutoUpdate = false;
-	this.standingMatrix = new THREE.Matrix4();
 
 	this.getGamepad = function () {
 
@@ -72,7 +71,6 @@ THREE.ViveController = function ( id ) {
 			if ( pose.position !== null ) scope.position.fromArray( pose.position );
 			if ( pose.orientation !== null ) scope.quaternion.fromArray( pose.orientation );
 			scope.matrix.compose( scope.position, scope.quaternion, scope.scale );
-			scope.matrix.multiplyMatrices( scope.standingMatrix, scope.matrix );
 			scope.matrixWorldNeedsUpdate = true;
 			scope.visible = true;
 

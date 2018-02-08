@@ -14,12 +14,10 @@ from .. import constants, utilities, logger, exceptions
 
 # flips vectors 
 
-#TODO: add these strings into constants.py
-
-XZ_Y = "XZ_Y"
-X_ZY = "X_ZY"
-XYZ = "XYZ"
-_XY_Z = "_XY_Z"
+XZ_Y = constants.XZ_Y
+X_ZY = constants.X_ZY
+XYZ = constants.XYZ
+_XY_Z = constants._XY_Z
 
 
 def flip_axes (a, dir=XYZ):

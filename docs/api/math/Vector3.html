@@ -178,7 +178,7 @@ var d = a.distanceTo( b );
 		<h3>[method:Float distanceTo]( [page:Vector3 v] )</h3>
 		<div>Computes the distance from this vector to [page:Vector3 v].</div>
 
-		<h3>[method:Float distanceToManhattan]( [page:Vector3 v] )</h3>
+		<h3>[method:Float manhattanDistanceTo]( [page:Vector3 v] )</h3>
 		<div>
 		Computes the [link:https://en.wikipedia.org/wiki/Taxicab_geometry Manhattan distance] from this vector to [page:Vector3 v].
 		</div>
@@ -241,7 +241,7 @@ var d = a.distanceTo( b );
 		<div>Computes the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
 		(straight-line length) from (0, 0, 0) to (x, y, z).</div>
 
-		<h3>[method:Float lengthManhattan]()</h3>
+		<h3>[method:Float manhattanLength]()</h3>
 		<div>
 		Computes the [link:http://en.wikipedia.org/wiki/Taxicab_geometry Manhattan length] of this vector.
 		</div>
@@ -301,7 +301,7 @@ var d = a.distanceTo( b );
 		<div>Multiplies this vector by scalar [page:Float s].</div>
 
 		<h3>[method:Vector3 multiplyVectors]( [page:Vector3 a], [page:Vector3 b] )</h3>
-		<div>Sets this vector equal to [page:Vector3 a] x [page:Vector3 b].</div>
+		<div>Sets this vector equal to [page:Vector3 a] * [page:Vector3 b], component-wise.</div>
 
 		<h3>[method:Vector3 project]( [page:Camera camera] )</h3>
 		<div>

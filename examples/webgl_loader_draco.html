@@ -43,8 +43,10 @@
 
 		var camera, scene, renderer;
 
-                // Global Draco decoder type.
-                var dracoLoader = new THREE.DRACOLoader('js/loaders/draco/');
+		// Configure and create Draco decoder.
+		THREE.DRACOLoader.setDecoderPath('js/loaders/draco/');
+		THREE.DRACOLoader.setDecoderConfig({type: 'js'});
+		var dracoLoader = new THREE.DRACOLoader();
 		init();
 		animate();
 

@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.PositionNode = function( scope ) {
+THREE.PositionNode = function ( scope ) {
 
 	THREE.TempNode.call( this, 'v3' );
 
@@ -17,31 +17,36 @@ THREE.PositionNode.PROJECTION = 'projection';
 
 THREE.PositionNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.PositionNode.prototype.constructor = THREE.PositionNode;
+THREE.PositionNode.prototype.nodeType = "Position";
 
-THREE.PositionNode.prototype.getType = function( builder ) {
+THREE.PositionNode.prototype.getType = function ( builder ) {
 
 	switch ( this.scope ) {
+
 		case THREE.PositionNode.PROJECTION:
 			return 'v4';
+
 	}
 
 	return this.type;
 
 };
 
-THREE.PositionNode.prototype.isShared = function( builder ) {
+THREE.PositionNode.prototype.isShared = function ( builder ) {
 
 	switch ( this.scope ) {
+
 		case THREE.PositionNode.LOCAL:
 		case THREE.PositionNode.WORLD:
 			return false;
+
 	}
 
 	return true;
 
 };
 
-THREE.PositionNode.prototype.generate = function( builder, output ) {
+THREE.PositionNode.prototype.generate = function ( builder, output ) {
 
 	var material = builder.material;
 	var result;
@@ -50,7 +55,7 @@ THREE.PositionNode.prototype.generate = function( builder, output ) {
 
 		case THREE.PositionNode.LOCAL:
 
-			material.requestAttribs.position = true;
+			material.requires.position = true;
 
 			if ( builder.isShader( 'vertex' ) ) result = 'transformed';
 			else result = 'vPosition';
@@ -59,7 +64,7 @@ THREE.PositionNode.prototype.generate = function( builder, output ) {
 
 		case THREE.PositionNode.WORLD:
 
-			material.requestAttribs.worldPosition = true;
+			material.requires.worldPosition = true;
 
 			if ( builder.isShader( 'vertex' ) ) result = 'vWPosition';
 			else result = 'vWPosition';
@@ -83,5 +88,21 @@ THREE.PositionNode.prototype.generate = function( builder, output ) {
 	}
 
 	return builder.format( result, this.getType( builder ), output );
+
+};
+
+THREE.PositionNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.scope = this.scope;
+
+	}
+
+	return data;
 
 };

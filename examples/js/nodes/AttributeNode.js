@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.AttributeNode = function( name, type ) {
+THREE.AttributeNode = function ( name, type ) {
 
 	THREE.GLNode.call( this, type );
 
@@ -12,14 +12,15 @@ THREE.AttributeNode = function( name, type ) {
 
 THREE.AttributeNode.prototype = Object.create( THREE.GLNode.prototype );
 THREE.AttributeNode.prototype.constructor = THREE.AttributeNode;
+THREE.AttributeNode.prototype.nodeType = "Attribute";
 
-THREE.AttributeNode.prototype.getAttributeType = function( builder ) {
+THREE.AttributeNode.prototype.getAttributeType = function ( builder ) {
 
 	return typeof this.type === 'number' ? builder.getConstructorFromLength( this.type ) : this.type;
 
 };
 
-THREE.AttributeNode.prototype.getType = function( builder ) {
+THREE.AttributeNode.prototype.getType = function ( builder ) {
 
 	var type = this.getAttributeType( builder );
 
@@ -27,12 +28,28 @@ THREE.AttributeNode.prototype.getType = function( builder ) {
 
 };
 
-THREE.AttributeNode.prototype.generate = function( builder, output ) {
+THREE.AttributeNode.prototype.generate = function ( builder, output ) {
 
 	var type = this.getAttributeType( builder );
 
 	var attribute = builder.material.getAttribute( this.name, type );
 
 	return builder.format( builder.isShader( 'vertex' ) ? this.name : attribute.varying.name, this.getType( builder ), output );
+
+};
+
+THREE.AttributeNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.out = this.type;
+
+	}
+
+	return data;
 
 };

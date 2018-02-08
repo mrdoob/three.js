@@ -110,9 +110,8 @@
 
 				for ( var i = 0; i < points.length * n_sub; i ++ ) {
 
-					var index = i / ( points.length * n_sub );
-
-					vertices[ i ] = spline.getPoint( index );
+					var t = i / ( points.length * n_sub );
+					vertices[ i ] = spline.getPoint( t );
 					colors[ i ] = new THREE.Color( 0x88aaff );
 
 				}

@@ -190,8 +190,10 @@
 					var material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );
 
 					var sphere = new THREE.Mesh( geometry, material );
-					sphere.position.x = Math.random() * 6 - 3;
-					sphere.position.z = Math.random() * 6 - 3;
+					sphere.position.x = Math.random() - 0.5;
+					sphere.position.z = Math.random() - 0.5;
+					sphere.position.normalize();
+					sphere.position.multiplyScalar( Math.random() * 2 + 1 );
 					sphere.castShadow = true;
 					sphere.receiveShadow = true;
 					sphere.userData.phase = Math.random() * Math.PI;
@@ -205,6 +207,14 @@
 
 				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
 				mesh.rotation.x = - Math.PI / 2;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				// column
+
+				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 4, 1 ), groundMaterial );
+				mesh.position.y = 2;
+				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 

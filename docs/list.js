@@ -5,8 +5,9 @@ var list = {
 		"Getting Started": {
 			"Creating a scene": "manual/introduction/Creating-a-scene",
 			"Import via modules": "manual/introduction/Import-via-modules",
+			"Browser support": "manual/introduction/Browser-support",
 			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
-			"How to run things locally": "manual/introduction/How-to-run-thing-locally",
+			"How to run things locally": "manual/introduction/How-to-run-things-locally",
 			"Drawing Lines": "manual/introduction/Drawing-lines",
 			"Creating Text": "manual/introduction/Creating-text",
 			"Migration Guide": "manual/introduction/Migration-guide",
@@ -103,7 +104,7 @@ var list = {
 		},
 
 		"Extras": {
-			"SceneUtils": "api/extras/SceneUtils",
+			"Earcut": "api/extras/Earcut",
 			"ShapeUtils": "api/extras/ShapeUtils"
 		},
 
@@ -174,14 +175,14 @@ var list = {
 			"TorusGeometry": "api/geometries/TorusGeometry",
 			"TorusKnotBufferGeometry": "api/geometries/TorusKnotBufferGeometry",
 			"TorusKnotGeometry": "api/geometries/TorusKnotGeometry",
-			"TubeGeometry": "api/geometries/TubeGeometry",
 			"TubeBufferGeometry": "api/geometries/TubeBufferGeometry",
+			"TubeGeometry": "api/geometries/TubeGeometry",
 			"WireframeGeometry": "api/geometries/WireframeGeometry"
 		},
 
 		"Helpers": {
 			"ArrowHelper": "api/helpers/ArrowHelper",
-			"AxisHelper": "api/helpers/AxisHelper",
+			"AxesHelper": "api/helpers/AxesHelper",
 			"BoxHelper": "api/helpers/BoxHelper",
 			"Box3Helper": "api/helpers/Box3Helper",
 			"CameraHelper": "api/helpers/CameraHelper",
@@ -211,7 +212,6 @@ var list = {
 		"Lights / Shadows": {
 			"DirectionalLightShadow": "api/lights/shadows/DirectionalLightShadow",
 			"LightShadow": "api/lights/shadows/LightShadow",
-			"RectAreaLightShadow": "api/lights/shadows/RectAreaLightShadow",
 			"SpotLightShadow": "api/lights/shadows/SpotLightShadow"
 		},
 
@@ -225,9 +225,11 @@ var list = {
 			"DataTextureLoader": "api/loaders/DataTextureLoader",
 			"FileLoader": "api/loaders/FileLoader",
 			"FontLoader": "api/loaders/FontLoader",
+			"ImageBitmapLoader": "api/loaders/ImageBitmapLoader",
 			"ImageLoader": "api/loaders/ImageLoader",
 			"JSONLoader": "api/loaders/JSONLoader",
 			"Loader": "api/loaders/Loader",
+			"LoaderUtils": "api/loaders/LoaderUtils",
 			"MaterialLoader": "api/loaders/MaterialLoader",
 			"ObjectLoader": "api/loaders/ObjectLoader",
 			"TextureLoader": "api/loaders/TextureLoader"
@@ -290,7 +292,6 @@ var list = {
 		"Objects": {
 			"Bone": "api/objects/Bone",
 			"Group": "api/objects/Group",
-			"LensFlare": "api/objects/LensFlare",
 			"Line": "api/objects/Line",
 			"LineLoop": "api/objects/LineLoop",
 			"LineSegments": "api/objects/LineSegments",
@@ -355,7 +356,12 @@ var list = {
 			"PCDLoader": "examples/loaders/PCDLoader",
 			"PDBLoader": "examples/loaders/PDBLoader",
 			"SVGLoader": "examples/loaders/SVGLoader",
-			"TGALoader": "examples/loaders/TGALoader"
+			"TGALoader": "examples/loaders/TGALoader",
+			"PRWMLoader": "examples/loaders/PRWMLoader"
+		},
+
+		"Objects": {
+			"LensFlare": "examples/objects/LensFlare",
 		},
 
 		"Exporters": {
@@ -377,6 +383,10 @@ var list = {
 
 		"Renderers": {
 			"CanvasRenderer": "examples/renderers/CanvasRenderer"
+		},
+
+		"Utils": {
+			"SceneUtils": "examples/utils/SceneUtils"
 		}
 
 	},

@@ -36,23 +36,26 @@
 		loader.load(
 			// resource URL
 			'textures/land_ocean_ice_cloud_2048.jpg',
-			// Function when resource is loaded
+
+			// onLoad callback
 			function ( texture ) {
 				// in this example we create the material when the texture is loaded
 				var material = new THREE.MeshBasicMaterial( {
 					map: texture
 				 } );
 			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
-				console.error( 'An error happened' );
+
+			// onProgress callback currently not supported
+			undefined,
+
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened.' );
 			}
 		);
 		</code>
+
+		Please note three.js r84 dropped support for TextureLoader progress events. For a TextureLoader that supports progress events, see [link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 this thread].
 
 		<h2>Constructor</h2>
 
