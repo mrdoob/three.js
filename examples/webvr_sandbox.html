@@ -24,7 +24,7 @@
 
 		<script>
 
-			var camera, scene, renderer;
+			var box, camera, scene, renderer, poseTarget;
 
 			var reflector;
 
@@ -123,6 +123,15 @@
 				mesh.receiveShadow = true;
 				reflector.add( mesh );
 
+
+				box = new THREE.Mesh(new THREE.BoxGeometry());
+				var boxPivot = new THREE.Object3D();
+				boxPivot.add(box);
+				boxPivot.position.z = -3;
+				scene.add(boxPivot);
+
+				poseTarget = new THREE.Object3D();
+
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -131,6 +140,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.vr.enabled = true;
+				renderer.vr.setPoseTarget(poseTarget);
 				document.body.appendChild( renderer.domElement );
 
 				document.body.appendChild( WEBVR.createButton( renderer ) );
@@ -138,7 +148,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
 			}
 
 			function onWindowResize() {
@@ -162,6 +171,9 @@
 				var mesh = scene.children[ 1 ];
 				mesh.rotation.x = time * 2;
 				mesh.rotation.y = time * 5;
+
+				box.position.setFromMatrixPosition(poseTarget.matrixWorld);
+				box.quaternion.setFromRotationMatrix(poseTarget.matrixWorld);
 
 				renderer.render( scene, camera );
 
