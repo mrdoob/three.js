@@ -182,7 +182,7 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 			"#include <common>",
 			"#include <fog_pars_fragment>",
 			"#include <bsdfs>",
-			"#include <lights_pars>",
+			"#include <begin_lights_pars>",
 			"#include <lights_physical_pars_fragment>",
 			"#include <shadowmap_pars_fragment>",
 			"#include <logdepthbuf_pars_fragment>",

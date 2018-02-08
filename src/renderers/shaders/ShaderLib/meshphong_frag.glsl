@@ -21,7 +21,7 @@ uniform float opacity;
 #include <gradientmap_pars_fragment>
 #include <fog_pars_fragment>
 #include <bsdfs>
-#include <lights_pars>
+#include <begin_lights_pars>
 #include <lights_maps_pars>
 #include <lights_phong_pars_fragment>
 #include <shadowmap_pars_fragment>

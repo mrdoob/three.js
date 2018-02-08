@@ -84,7 +84,7 @@ THREE.ShaderSkin = {
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "bsdfs" ],
 			THREE.ShaderChunk[ "packing" ],
-			THREE.ShaderChunk[ "lights_pars" ],
+			THREE.ShaderChunk[ "begin_lights_pars" ],
 			THREE.ShaderChunk[ 'lights_maps_pars' ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
@@ -265,7 +265,7 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "lights_pars" ],
+			THREE.ShaderChunk[ "begin_lights_pars" ],
 			THREE.ShaderChunk[ 'lights_maps_pars' ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 			THREE.ShaderChunk[ "fog_pars_vertex" ],
@@ -370,7 +370,7 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "lights_pars" ],
+			THREE.ShaderChunk[ "begin_lights_pars" ],
 			THREE.ShaderChunk[ 'lights_maps_pars' ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 

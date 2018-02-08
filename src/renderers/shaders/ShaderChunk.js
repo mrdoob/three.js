@@ -36,7 +36,7 @@ import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.g
 import lightmap_fragment from './ShaderChunk/lightmap_fragment.glsl';
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl';
 import lights_lambert_vertex from './ShaderChunk/lights_lambert_vertex.glsl';
-import lights_pars from './ShaderChunk/lights_pars.glsl';
+import begin_lights_pars from './ShaderChunk/begin_lights_pars.glsl';
 import lights_maps_pars from './ShaderChunk/lights_maps_pars.glsl';
 import lights_phong_fragment from './ShaderChunk/lights_phong_fragment.glsl';
 import lights_phong_pars_fragment from './ShaderChunk/lights_phong_pars_fragment.glsl';
@@ -151,7 +151,7 @@ export var ShaderChunk = {
 	lightmap_fragment: lightmap_fragment,
 	lightmap_pars_fragment: lightmap_pars_fragment,
 	lights_lambert_vertex: lights_lambert_vertex,
-	lights_pars: lights_pars,
+	begin_lights_pars: begin_lights_pars,
 	lights_maps_pars: lights_maps_pars,
 	lights_phong_fragment: lights_phong_fragment,
 	lights_phong_pars_fragment: lights_phong_pars_fragment,

@@ -144,7 +144,7 @@ THREE.Water = function ( geometry, options ) {
 			THREE.ShaderChunk[ 'packing' ],
 			THREE.ShaderChunk[ 'bsdfs' ],
 			THREE.ShaderChunk[ 'fog_pars_fragment' ],
-			THREE.ShaderChunk[ 'lights_pars' ],
+			THREE.ShaderChunk[ 'begin_lights_pars' ],
 			THREE.ShaderChunk[ 'lights_maps_pars' ],
 			THREE.ShaderChunk[ 'shadowmap_pars_fragment' ],
 			THREE.ShaderChunk[ 'shadowmask_pars_fragment' ],
