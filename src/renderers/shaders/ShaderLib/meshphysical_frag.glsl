@@ -35,7 +35,7 @@ varying vec3 vViewPosition;
 #include <bsdfs>
 #include <cube_uv_reflection_fragment>
 #include <begin_lights_pars>
-#include <lights_maps_pars>
+#include <maps_lights_pars>
 #include <lights_physical_pars_fragment>
 #include <shadowmap_pars_fragment>
 #include <bumpmap_pars_fragment>
