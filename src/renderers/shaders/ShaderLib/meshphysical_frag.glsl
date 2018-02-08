@@ -66,7 +66,7 @@ void main() {
 	// accumulation
 	#include <lights_physical_fragment>
 	#include <begin_lights_fragment>
-	#include <lights_maps_fragment>
+	#include <maps_lights_fragment>
 	#include <end_lights_fragment>
 
 	// modulation
