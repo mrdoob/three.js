@@ -4,12 +4,12 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { Vector3 } from '../math/Vector3';
-import { Object3D } from '../core/Object3D';
-import { LineSegments } from '../objects/LineSegments';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
+import { Vector3 } from '../math/Vector3.js';
+import { Object3D } from '../core/Object3D.js';
+import { LineSegments } from '../objects/LineSegments.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
 
 function SpotLightHelper( light, color ) {
 
@@ -26,11 +26,11 @@ function SpotLightHelper( light, color ) {
 	var geometry = new BufferGeometry();
 
 	var positions = [
-		0, 0, 0,   0,   0,   1,
-		0, 0, 0,   1,   0,   1,
-		0, 0, 0, - 1,   0,   1,
-		0, 0, 0,   0,   1,   1,
-		0, 0, 0,   0, - 1,   1
+		0, 0, 0, 	0, 0, 1,
+		0, 0, 0, 	1, 0, 1,
+		0, 0, 0,	- 1, 0, 1,
+		0, 0, 0, 	0, 1, 1,
+		0, 0, 0, 	0, - 1, 1
 	];
 
 	for ( var i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
@@ -47,7 +47,7 @@ function SpotLightHelper( light, color ) {
 
 	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
-	var material = new LineBasicMaterial( { fog: false, color: this.color } );
+	var material = new LineBasicMaterial( { fog: false } );
 
 	this.cone = new LineSegments( geometry, material );
 	this.add( this.cone );

@@ -102,10 +102,9 @@
 						container = document.getElementById( 'container' );
 
 						renderer = new THREE.WebGLRenderer();
-						renderer.setClearColor( 0xbfd1e5 );
-						renderer.shadowMap.enabled = true;
 						renderer.setPixelRatio( window.devicePixelRatio );
 						renderer.setSize( window.innerWidth, window.innerHeight );
+						renderer.shadowMap.enabled = true;
 
 						container.innerHTML = "";
 
@@ -120,6 +119,7 @@
 						camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
 						scene = new THREE.Scene();
+						scene.background = new THREE.Color( 0xbfd1e5 );
 
 						camera.position.y = heightData[ terrainHalfWidth + terrainHalfDepth * terrainWidth ] * ( terrainMaxHeight - terrainMinHeight ) + 5;
 
@@ -128,7 +128,7 @@
 
 						controls = new THREE.OrbitControls( camera );
 
-						var geometry = new THREE.PlaneBufferGeometry( 100, 100, terrainWidth - 1, terrainDepth - 1 );
+						var geometry = new THREE.PlaneBufferGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
 						geometry.rotateX( -Math.PI / 2 );
 
 						var vertices = geometry.attributes.position.array;
@@ -402,8 +402,6 @@
 						}
 
 						updatePhysics( deltaTime );
-
-						controls.update( deltaTime );
 
 						renderer.render( scene, camera );
 

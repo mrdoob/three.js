@@ -86,10 +86,10 @@
 			// Initialize scene, light and renderer
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x333333 );
 			scene.add( new THREE.AmbientLight( 0xffffff ) );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0x333333 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 

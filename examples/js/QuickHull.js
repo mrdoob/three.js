@@ -5,7 +5,7 @@
  *
  */
 
-( function() {
+( function () {
 
 	var Visible = 0;
 	var Deleted = 1;
@@ -348,7 +348,7 @@
 
 			// compute the min/max vertex on all six directions
 
-			for ( i = 0, l = this.vertices.length; i < l ; i ++ ) {
+			for ( i = 0, l = this.vertices.length; i < l; i ++ ) {
 
 				var vertex = this.vertices[ i ];
 				var point = vertex.point;
@@ -400,7 +400,7 @@
 
 			var line3, plane, closestPoint;
 
-			return function computeInitialHull () {
+			return function computeInitialHull() {
 
 				if ( line3 === undefined ) {
 
@@ -562,7 +562,7 @@
 
 				for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
-					vertex = vertices[i];
+					vertex = vertices[ i ];
 
 					if ( vertex !== v0 && vertex !== v1 && vertex !== v2 && vertex !== v3 ) {
 
@@ -785,7 +785,6 @@
 		addVertexToHull: function ( eyeVertex ) {
 
 			var horizon = [];
-			var i, face;
 
 			this.unassigned.clear();
 
@@ -856,7 +855,7 @@
 
 	Object.assign( Face, {
 
-		create: function( a, b, c ) {
+		create: function ( a, b, c ) {
 
 			var face = new Face();
 
@@ -908,7 +907,7 @@
 
 			var triangle;
 
-			return function compute () {
+			return function compute() {
 
 				if ( triangle === undefined ) triangle = new THREE.Triangle();
 
@@ -1202,7 +1201,7 @@
 
 		},
 
-		isEmpty: function() {
+		isEmpty: function () {
 
 			return this.head === null;
 
@@ -1215,4 +1214,4 @@
 	THREE.QuickHull = QuickHull;
 
 
-} ) ();
+} )();

@@ -1,7 +1,7 @@
-import { Curve } from './Curve';
-import { Vector3 } from '../../math/Vector3';
-import { Geometry } from '../../core/Geometry';
-import { LineCurve } from '../curves/LineCurve';
+import { Curve } from './Curve.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { Geometry } from '../../core/Geometry.js';
+import { LineCurve } from '../curves/LineCurve.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -170,14 +170,14 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
 			var curve = curves[ i ];
-			var resolution = (curve && curve.isEllipseCurve) ? divisions * 2
-				: (curve && curve.isLineCurve) ? 1
-				: (curve && curve.isSplineCurve) ? divisions * curve.points.length
-				: divisions;
+			var resolution = ( curve && curve.isEllipseCurve ) ? divisions * 2
+				: ( curve && curve.isLineCurve ) ? 1
+					: ( curve && curve.isSplineCurve ) ? divisions * curve.points.length
+						: divisions;
 
 			var pts = curve.getPoints( resolution );
 
-			for ( var j = 0; j < pts.length; j++ ) {
+			for ( var j = 0; j < pts.length; j ++ ) {
 
 				var point = pts[ j ];
 
@@ -190,7 +190,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		}
 
-		if ( this.autoClose && points.length > 1 && !points[ points.length - 1 ].equals( points[ 0 ] ) ) {
+		if ( this.autoClose && points.length > 1 && ! points[ points.length - 1 ].equals( points[ 0 ] ) ) {
 
 			points.push( points[ 0 ] );
 

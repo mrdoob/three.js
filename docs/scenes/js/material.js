@@ -20,13 +20,6 @@ var constants = {
 
 	},
 
-	shading : {
-
-		"THREE.FlatShading" : THREE.FlatShading,
-		"THREE.SmoothShading" : THREE.SmoothShading
-
-	},
-
 	colors : {
 
 		"THREE.NoColors" : THREE.NoColors,
@@ -202,7 +195,6 @@ function needsUpdate ( material, geometry ) {
 
 	return function () {
 
-		material.shading = +material.shading; //Ensure number
 		material.vertexColors = +material.vertexColors; //Ensure number
 		material.side = +material.side; //Ensure number
 		material.needsUpdate = true;
@@ -330,7 +322,6 @@ function guiMeshBasicMaterial ( gui, mesh, material, geometry ) {
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
-	folder.add( material, 'shading', constants.shading);
 	folder.add( material, 'vertexColors', constants.colors).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'fog' );
 
@@ -360,6 +351,7 @@ function guiMeshNormalMaterial ( gui, mesh, material, geometry ) {
 
 	var folder = gui.addFolder('THREE.MeshNormalMaterial');
 
+	folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );
@@ -438,7 +430,7 @@ function guiMeshPhongMaterial ( gui, mesh, material, geometry ) {
 	folder.addColor( data, 'specular' ).onChange( handleColorChange( material.specular ) );
 
 	folder.add( material, 'shininess', 0, 100);
-	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
+	folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 	folder.add( material, 'vertexColors', constants.colors);
@@ -470,7 +462,7 @@ function guiMeshStandardMaterial ( gui, mesh, material, geometry ) {
 
 	folder.add( material, 'roughness', 0, 1 );
 	folder.add( material, 'metalness', 0, 1 );
-	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
+	folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 	folder.add( material, 'vertexColors', constants.colors);
@@ -533,7 +525,7 @@ function chooseFromHash ( gui, mesh, geometry ) {
 
 	case "MeshDepthMaterial" :
 
-		material = new THREE.MeshDepthMaterial({color: 0x2194CE});
+		material = new THREE.MeshDepthMaterial();
 		guiMaterial( gui, mesh, material, geometry );
 		guiMeshDepthMaterial( gui, mesh, material, geometry );
 

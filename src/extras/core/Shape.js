@@ -1,5 +1,5 @@
-import { PathPrototype } from './PathPrototype';
-import { Path } from './Path';
+import { PathPrototype } from './PathPrototype.js';
+import { Path } from './Path.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog

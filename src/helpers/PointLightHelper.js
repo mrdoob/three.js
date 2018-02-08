@@ -3,9 +3,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Mesh } from '../objects/Mesh';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { SphereBufferGeometry } from '../geometries/SphereGeometry';
+import { Mesh } from '../objects/Mesh.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { SphereBufferGeometry } from '../geometries/SphereGeometry.js';
 
 function PointLightHelper( light, sphereSize, color ) {
 
@@ -15,7 +15,7 @@ function PointLightHelper( light, sphereSize, color ) {
 	this.color = color;
 
 	var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
-	var material = new MeshBasicMaterial( { wireframe: true, fog: false, color: this.color } );
+	var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
 
 	Mesh.call( this, geometry, material );
 

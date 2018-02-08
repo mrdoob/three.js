@@ -22,13 +22,6 @@ var Editor = function () {
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
 
-		// vr
-
-		enterVR: new Signal(),
-
-		enteredVR: new Signal(),
-		exitedVR: new Signal(),
-
 		// actions
 
 		showModal: new Signal(),
@@ -344,6 +337,34 @@ Editor.prototype = {
 		}
 
 		this.signals.scriptRemoved.dispatch( script );
+
+	},
+
+	getObjectMaterial: function ( object, slot ) {
+
+		var material = object.material;
+
+		if ( Array.isArray( material ) ) {
+
+			material = material[ slot ];
+
+		}
+
+		return material;
+
+	},
+
+	setObjectMaterial: function ( object, slot, newMaterial ) {
+
+		if ( Array.isArray( object.material ) ) {
+
+			object.material[ slot ] = newMaterial;
+
+		} else {
+
+			object.material = newMaterial;
+
+		}
 
 	},
 

@@ -3,7 +3,7 @@
  * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
-import { Object3D } from '../core/Object3D';
+import { Object3D } from '../core/Object3D.js';
 
 function Audio( listener ) {
 
@@ -286,7 +286,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		return this.gain.gain.value;
 
 	},
-	
+
 	setVolume: function ( value ) {
 
 		this.gain.gain.value = value;

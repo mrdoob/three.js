@@ -20,21 +20,21 @@
 		<div>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</div>
 		<div>[example:webgl_shading_physical shading / physical ]</div>
 
-		<code>//Create cube camera
+		<code>// Create cube camera
 		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
 		scene.add( cubeCamera );
 
-		//Create car
+		// Create car
 		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget } );
 		var car = new Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 
-		//Update the render target cube
+		// Update the render target cube
 		car.setVisible( false );
 		cubeCamera.position.copy( car.position );
-		cubeCamera.updateCubeMap( renderer, scene );
+		cubeCamera.update( renderer, scene );
 
-		//Render the scene
+		// Render the scene
 		car.setVisible( true );
 		renderer.render( scene, camera );
 		</code>
@@ -67,13 +67,19 @@
 		<div>See the base [page:Object3D] class for common methods.</div>
 
 
-		<h3>[method:null updateCubeMap]( [page:WebGLRenderer renderer], [page:Scene scene] )</h3>
+		<h3>[method:null update]( [page:WebGLRenderer renderer], [page:Scene scene] )</h3>
 		<div>
 		renderer -- The current WebGL renderer <br />
 		scene -- The current scene
 		</div>
 		<div>
 		Call this to update the [page:CubeCamera.renderTarget renderTarget].
+		</div>
+
+		<h3>[method:null clear]( [page:WebGLRenderer renderer], [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
+		<div>
+		Call this to clear the [page:CubeCamera.renderTarget renderTarget] color, depth, and/or stencil buffers.
+		The color buffer is set to the renderer's current clear color. Arguments default to *true*.
 		</div>
 
 		<h2>Source</h2>

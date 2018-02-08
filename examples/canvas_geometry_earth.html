@@ -62,6 +62,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				group = new THREE.Group();
 				scene.add( group );
@@ -111,7 +112,6 @@
 				group.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

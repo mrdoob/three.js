@@ -55,6 +55,8 @@
 				controls = new THREE.TrackballControls( camera );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
+
 				scene2 = new THREE.Scene();
 
 				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide } );
@@ -92,7 +94,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

@@ -235,7 +235,7 @@
 				group.add( mesh );
 
 				var meshmaterials = [
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } ),
 					new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } )
 				];
 
@@ -264,6 +264,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				var light = new THREE.PointLight( 0xffffff, 1.5 );
 				light.position.set( 1000, 1000, 2000 );
@@ -272,7 +273,6 @@
 				addStuff();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -302,8 +302,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
 
 				stats.begin();
 				render();

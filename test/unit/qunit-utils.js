@@ -5,14 +5,24 @@
 QUnit.assert.success = function( message ) {
 
 	// Equivalent to assert( true, message );
-	QUnit.assert.push( true, undefined, undefined, message );
+	this.pushResult( {
+		result: true,
+		actual: undefined,
+		expected: undefined,
+		message: message
+	} );
 
 };
 
 QUnit.assert.fail = function( message ) {
 
 	// Equivalent to assert( false, message );
-	QUnit.assert.push( false, undefined, undefined, message );
+	this.pushResult( {
+		result: false,
+		actual: undefined,
+		expected: undefined,
+		message: message
+	} );
 
 };
 
@@ -20,7 +30,12 @@ QUnit.assert.numEqual = function( actual, expected, message ) {
 
 	var diff = Math.abs(actual - expected);
 	message = message || ( actual + " should be equal to " + expected );
-	QUnit.assert.push( diff < 0.1, actual, expected, message );
+	this.pushResult( {
+		result: diff < 0.1,
+		actual: actual,
+		expected: expected,
+		message: message
+	} );
 
 };
 
@@ -29,7 +44,12 @@ QUnit.assert.equalKey = function( obj, ref, key ) {
 	var actual = obj[key];
 	var expected = ref[key];
 	var message = actual + ' should be equal to ' + expected + ' for key "' + key + '"';
-	QUnit.assert.push( actual == expected, actual, expected, message );
+	this.pushResult( {
+		result: actual == expected,
+		actual: actual,
+		expected: expected,
+		message: message
+	} );
 
 };
 
@@ -40,7 +60,12 @@ QUnit.assert.smartEqual = function( actual, expected, message ) {
 	var same = cmp.areEqual(actual, expected);
 	var msg = cmp.getDiagnostic() || message;
 
-	QUnit.assert.push( same, actual, expected, msg );
+	this.pushResult( {
+		result: same,
+		actual: actual,
+		expected: expected,
+		message: msg
+	} );
 
 };
 
@@ -76,7 +101,6 @@ function getDifferingProp( geometryA, geometryB, excludedProperties) {
 	var geometryKeys = Object.keys( geometryA );
 	var cloneKeys = Object.keys( geometryB );
 
-	var keysWhichAreNotChecked = [ 'parameters', 'widthSegments', 'heightSegments', 'depthSegments' ];
 	var differingProp = undefined;
 
 	for ( var i = 0, l = geometryKeys.length; i < l; i++ ) {
@@ -100,7 +124,7 @@ function getDifferingProp( geometryA, geometryB, excludedProperties) {
 // Compare json file with its source geometry.
 function checkGeometryJsonWriting( geom, json ) {
 
-	QUnit.assert.equal( json.metadata.version, "4.4", "check metadata version" );
+	QUnit.assert.equal( json.metadata.version, "4.5", "check metadata version" );
 	QUnit.assert.equalKey( geom, json, 'type' );
 	QUnit.assert.equalKey( geom, json, 'uuid' );
 	QUnit.assert.equal( json.id, undefined, "should not persist id" );
@@ -252,7 +276,7 @@ function checkLightClone( light ) {
 // Compare json file with its source Light.
 function checkLightJsonWriting( light, json ) {
 
-	QUnit.assert.equal( json.metadata.version, "4.4", "check metadata version" );
+	QUnit.assert.equal( json.metadata.version, "4.5", "check metadata version" );
 
 	var object = json.object;
 	QUnit.assert.equalKey( light, object, 'type' );

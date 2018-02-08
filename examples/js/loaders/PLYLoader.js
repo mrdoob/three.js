@@ -92,7 +92,7 @@ THREE.PLYLoader.prototype = {
 
 			if ( result !== null ) {
 
-				headerText = result [ 1 ];
+				headerText = result[ 1 ];
 				headerLength = result[ 0 ].length;
 
 			}
@@ -203,14 +203,14 @@ THREE.PLYLoader.prototype = {
 
 			switch ( type ) {
 
-			case 'char': case 'uchar': case 'short': case 'ushort': case 'int': case 'uint':
-			case 'int8': case 'uint8': case 'int16': case 'uint16': case 'int32': case 'uint32':
+				case 'char': case 'uchar': case 'short': case 'ushort': case 'int': case 'uint':
+				case 'int8': case 'uint8': case 'int16': case 'uint16': case 'int32': case 'uint32':
 
-				return parseInt( n );
+					return parseInt( n );
 
-			case 'float': case 'double': case 'float32': case 'float64':
+				case 'float': case 'double': case 'float32': case 'float64':
 
-				return parseFloat( n );
+					return parseFloat( n );
 
 			}
 
@@ -254,11 +254,11 @@ THREE.PLYLoader.prototype = {
 			// PLY ascii format specification, as per http://en.wikipedia.org/wiki/PLY_(file_format)
 
 			var buffer = {
-				indices : [],
-				vertices : [],
-				normals : [],
-				uvs : [],
-				colors : []
+				indices: [],
+				vertices: [],
+				normals: [],
+				uvs: [],
+				colors: []
 			};
 
 			var result;
@@ -267,7 +267,7 @@ THREE.PLYLoader.prototype = {
 			var body = '';
 			if ( ( result = patternBody.exec( data ) ) !== null ) {
 
-				body = result [ 1 ];
+				body = result[ 1 ];
 
 			}
 
@@ -447,11 +447,11 @@ THREE.PLYLoader.prototype = {
 		function parseBinary( data, header ) {
 
 			var buffer = {
-				indices : [],
-				vertices : [],
-				normals : [],
-				uvs : [],
-				colors : []
+				indices: [],
+				vertices: [],
+				normals: [],
+				uvs: [],
+				colors: []
 			};
 
 			var little_endian = ( header.format === 'binary_little_endian' );

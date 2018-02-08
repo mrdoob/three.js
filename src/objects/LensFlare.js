@@ -1,7 +1,7 @@
-import { Object3D } from '../core/Object3D';
-import { NormalBlending } from '../constants';
-import { Color } from '../math/Color';
-import { Vector3 } from '../math/Vector3';
+import { Object3D } from '../core/Object3D.js';
+import { NormalBlending } from '../constants.js';
+import { Color } from '../math/Color.js';
+import { Vector3 } from '../math/Vector3.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/

@@ -158,6 +158,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -168,7 +169,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x333333, 1 );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

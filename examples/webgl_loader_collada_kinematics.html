@@ -9,7 +9,6 @@
 				background:#777;
 				padding:0;
 				margin:0;
-				font-weight: bold;
 				overflow:hidden;
 			}
 
@@ -31,8 +30,8 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader - kinematics
+			 | robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -58,8 +57,8 @@
 			var tweenParameters = {};
 
 			var loader = new THREE.ColladaLoader();
-			loader.options.convertUpAxis = true;
-			loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
+			// loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
+			loader.load( './models/collada/abb_irb52_7_120.dae', function ( collada ) {
 
 				dae = collada.scene;
 
@@ -67,8 +66,8 @@
 
 					if ( child instanceof THREE.Mesh ) {
 
-						child.geometry.computeFaceNormals();
-						child.material.shading = THREE.FlatShading;
+						// model does not have normals
+						child.material.flatShading = true;
 
 					}
 
@@ -132,21 +131,29 @@
 
 			function setupTween() {
 
-				var duration = getRandomInt( 1000, 5000 );
+				var duration = THREE.Math.randInt( 1000, 5000 );
 
 				var target = {};
 
-				for ( var i = 0; i < kinematics.joints.length; i ++ ) {
+				for ( var prop in kinematics.joints ) {
 
-					var joint = kinematics.joints[ i ];
+					if ( kinematics.joints.hasOwnProperty( prop ) ) {
 
-					var old = tweenParameters[ i ];
+						if ( ! kinematics.joints[ prop ].static ) {
 
-					var position = old ? old : joint.zeroPosition;
+							var joint = kinematics.joints[ prop ];
 
-					tweenParameters[ i ] = position;
+							var old = tweenParameters[ prop ];
 
-					target[ i ] = getRandomInt( joint.limits.min, joint.limits.max )
+							var position = old ? old : joint.zeroPosition;
+
+							tweenParameters[ prop ] = position;
+
+							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max )
+
+						}
+
+					}
 
 				}
 
@@ -154,9 +161,17 @@
 
 				kinematicsTween.onUpdate( function() {
 
-					for ( var i = 0; i < kinematics.joints.length; i ++ ) {
+					for ( var prop in kinematics.joints ) {
 
-						kinematics.setJointValue( i, this[ i ] );
+						if ( kinematics.joints.hasOwnProperty( prop ) ) {
+
+							if ( ! kinematics.joints[ prop ].static ) {
+
+								kinematics.setJointValue( prop, this[ prop ] );
+
+							}
+
+						}
 
 					}
 
@@ -193,26 +208,17 @@
 
 				var timer = Date.now() * 0.0001;
 
-				camera.position.x = Math.cos( timer ) * 17;
+				camera.position.x = Math.cos( timer ) * 20;
 				camera.position.y = 10;
-				camera.position.z = Math.sin( timer ) * 17;
+				camera.position.z = Math.sin( timer ) * 20;
 
-				camera.lookAt( scene.position );
+				camera.lookAt( new THREE.Vector3( 0, 5, 0 ) );
 
 				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
 				particleLight.position.y = Math.cos( timer * 5 ) * 4000;
 				particleLight.position.z = Math.cos( timer * 4 ) * 3009;
 
 				renderer.render( scene, camera );
-
-			}
-
-			// Returns a random integer between min (inclusive) and max (inclusive)
-			// Using Math.round() will give you a non-uniform distribution!
-
-			function getRandomInt( min, max ) {
-
-				return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
 
 			}
 

@@ -170,7 +170,9 @@ THREE.ShadowMapViewer = function ( light ) {
 			 camera.right = window.innerWidth / 2;
 			 camera.top = window.innerHeight / 2;
 			 camera.bottom = window.innerHeight / - 2;
+			 camera.updateProjectionMatrix();
 
+			 this.update();
 		}
 
 	};

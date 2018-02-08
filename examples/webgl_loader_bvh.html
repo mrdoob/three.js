@@ -1,6 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
-	  <title>three.js webgl - BVHLoader</title>
+	  <title>three.js webgl - loaders - BVHLoader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				color: #fff;
@@ -26,7 +29,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - BVH Loader -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - BVH Loader -
 			animation from <a href="http://mocap.cs.cmu.edu/">http://mocap.cs.cmu.edu/</a>
 		</div>
 		<script src="../build/three.js"></script>
@@ -70,12 +73,12 @@
 				controls.maxDistance = 700;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xeeeeee );
 
 				scene.add( new THREE.GridHelper( 400, 10 ) );
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xeeeeee );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

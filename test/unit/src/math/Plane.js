@@ -165,13 +165,6 @@ QUnit.test( "projectPoint" , function( assert ) {
 
 });
 
-QUnit.test( "orthoPoint" , function( assert ) {
-	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
-
-	assert.ok( a.orthoPoint( new THREE.Vector3( 10, 0, 0 ) ).equals( new THREE.Vector3( 10, 0, 0 ) ), "Passed!" );
-	assert.ok( a.orthoPoint( new THREE.Vector3( -10, 0, 0 ) ).equals( new THREE.Vector3( -10, 0, 0 ) ), "Passed!" );
-});
-
 QUnit.test( "coplanarPoint" , function( assert ) {
 	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
 	assert.ok( a.distanceToPoint( a.coplanarPoint() ) === 0, "Passed!" );

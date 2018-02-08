@@ -102,12 +102,15 @@
 
 		<h3>[property:Material customDepthMaterial]</h3>
 		<div>
-		Custom depth material to be used by this material in depth based computation. If a material uses any custom logic to position the vertices (animation, displacement other than the default texture based, instancing...) the depth material should also include that logic in order to make effects like shadows and SSAO work. Defining this property allows the WebGLRenderer to use this instance of the material instead of the internal cache. Default is *undefined*.
+		Custom depth material to be used by this material when rendering to the depth map.
+		When shadow-casting with a [page:DirectionalLight] or [page:SpotLight], if you are (a) modifying vertex positions in the vertex shader,
+		(b) using a displacement map, (c) using an alpha map with alphaTest, or (d) using a transparent texture with alphaTest,
+		you must specify a customDepthMaterial for proper shadows. Default is *undefined*.
 		</div>
 		
 		<h3>[property:Material customDistanceMaterial]</h3>
 		<div>
-		Same as customDepthMaterial but used for specific computation (point lights for example). Default is *undefined*
+		Same as customDepthMaterial, but used with [page:PointLight]. Default is *undefined*.
 		</div>
 		
 		<h3>[property:Object defines]</h3>
@@ -204,10 +207,9 @@
 		Default is *false*.
 		</div>
 
-		<h3>[property:Integer shading]</h3>
+		<h3>[property:Boolean flatShading]</h3>
 		<div>
-		Defines how the material is shaded.
-		This can be either [page:Materials THREE.SmoothShading] (default)	or [page:Materials THREE.FlatShading].
+		Define whether the material is rendered with flat shading. Default is false.
 		</div>
 
 		<h3>[property:Integer side]</h3>
@@ -250,7 +252,12 @@
 		<div>
 		Defines whether this material is visible. Default is *true*.
 		</div>
-
+		
+		<h3>[property:object userData]</h3>
+		<div>
+		An object that can be used to store custom data about the Material. It should not hold
+		references to functions as these will not be cloned.
+		</div>
 
 		<h2>Methods</h2>
 

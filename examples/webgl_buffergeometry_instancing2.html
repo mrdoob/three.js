@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgl - instancing test</title>
+	<title>three.js webgl - instancing test (meshes)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style>
@@ -27,10 +27,6 @@
 			color: #ffffff;
 		}
 
-		#oldie a {
-			color: #da0;
-		}
-
 		#notSupported {
 			width: 50%;
 			margin: auto;
@@ -44,7 +40,7 @@
 
 	<div id="container"></div>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - instancing demo
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - instancing test (meshes)
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
@@ -61,6 +57,8 @@
 		attribute vec4 instanceQuaternion;
 		attribute vec3 instanceScale;
 
+		varying vec3 vColor;
+
 		vec3 applyTRS( vec3 position, vec3 translation, vec4 quaternion, vec3 scale ) {
 
 			position *= scale;
@@ -68,9 +66,6 @@
 			return position + translation;
 
 		}
-
-		attribute vec3 color;
-		varying vec3 vColor;
 
 		void main(){
 
@@ -99,7 +94,7 @@
 
 	<script>
 
-		if ( !Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 		var container, stats;
 
@@ -123,7 +118,6 @@
 
 			//
 
-			// var geometry = new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 );
 			var geometry = new THREE.IcosahedronBufferGeometry( 0.1, 1 );
 
 			var colors = [];
@@ -138,20 +132,19 @@
 
 			var material = new THREE.MeshBasicMaterial( { color: 0xff0000, vertexColors: THREE.VertexColors } );
 
-			var mesh = new THREE.Mesh( geometry, material );
-			// scene.add( mesh );
-
 			//
 
-			var INSTANCE_COUNT = 100;
-
-			var geometry2 = new THREE.InstancedBufferGeometry().copy( geometry );
+			var instances = 100;
 
 			var instancePositions = [];
 			var instanceQuaternions = [];
 			var instanceScales = [];
 
-			for ( var i = 0; i < INSTANCE_COUNT; i ++ ) {
+			// we create for each mesh a counterpart in our instanced geometry data
+
+			for ( var i = 0; i < instances; i ++ ) {
+
+				// the red meshes are drawn with separate draw calls
 
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -167,47 +160,59 @@
 
 				scale.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
 
+				// instanced attribute data
+
 				instancePositions.push( position.x, position.y, position.z );
 				instanceQuaternions.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
 				instanceScales.push( scale.x, scale.y, scale.z );
 
 			}
 
-			var attribute = new THREE.InstancedBufferAttribute( new Float32Array( instancePositions ), 3 );
-			geometry2.addAttribute( 'instancePosition', attribute );
+			var instancedGeometry = new THREE.InstancedBufferGeometry();
+			instancedGeometry.attributes.position = geometry.attributes.position;
+			instancedGeometry.attributes.color = geometry.attributes.color;
 
-			var attribute = new THREE.InstancedBufferAttribute( new Float32Array( instanceQuaternions ), 4 );
-			geometry2.addAttribute( 'instanceQuaternion', attribute );
+			instancedGeometry.addAttribute( 'instancePosition', new THREE.InstancedBufferAttribute( new Float32Array( instancePositions ), 3 ) );
+			instancedGeometry.addAttribute( 'instanceQuaternion', new THREE.InstancedBufferAttribute( new Float32Array( instanceQuaternions ), 4 ) );
+			instancedGeometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( new Float32Array( instanceScales ), 3 ) );
 
-			var attribute = new THREE.InstancedBufferAttribute( new Float32Array( instanceScales ), 3 );
-			geometry2.addAttribute( 'instanceScale', attribute );
+			//
 
-			var material = new THREE.ShaderMaterial( {
+			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms: {},
 				vertexShader: document.getElementById( 'vertexShader' ).textContent,
-				fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+				fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+				vertexColors: true
 
 			} );
 
-			var mesh2 = new THREE.Mesh( geometry2, material );
-			mesh2.position.x = 0.1;
-			scene.add( mesh2 );
+			// counterparts are drawn all at once with a single draw call (via instanced rendering)
+
+			var instancedMesh = new THREE.Mesh( instancedGeometry, shaderMaterial );
+			instancedMesh.position.x = 0.1;
+			scene.add( instancedMesh );
+
+			//
 
 			renderer = new THREE.WebGLRenderer();
-
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
-				document.getElementById( "notSupported" ).style.display = "";
-				return;
-			}
-
-			renderer.setClearColor( 0x101010 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+
+				document.getElementById( 'notSupported' ).style.display = '';
+				return;
+
+			}
+
+			//
+
 			stats = new Stats();
 			container.appendChild( stats.dom );
+
+			//
 
 			window.addEventListener( 'resize', onWindowResize, false );
 

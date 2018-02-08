@@ -475,13 +475,13 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		switch ( event.deltaMode ) {
 
-                        case 2:
-                                // Zoom in pages
-                                _zoomStart.y -= event.deltaY * 0.025;
-                                break;
+			case 2:
+				// Zoom in pages
+				_zoomStart.y -= event.deltaY * 0.025;
+				break;
 
 			case 1:
-                                // Zoom in lines
+				// Zoom in lines
 				_zoomStart.y -= event.deltaY * 0.01;
 				break;
 

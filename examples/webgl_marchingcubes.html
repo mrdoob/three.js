@@ -118,6 +118,7 @@
 			// SCENE
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x050505 );
 
 			// LIGHTS
 
@@ -154,7 +155,6 @@
 			// RENDERER
 
 			renderer = new THREE.WebGLRenderer();
-			renderer.setClearColor( 0x050505 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
@@ -313,7 +313,7 @@
 
 			"flat" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, flatShading: true } ),
 				h: 0, s: 0, l: 1
 			},
 
@@ -563,8 +563,6 @@
 			var delta = clock.getDelta();
 
 			time += delta * effectController.speed * 0.5;
-
-			controls.update( delta );
 
 			// marching cubes
 

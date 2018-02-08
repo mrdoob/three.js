@@ -3,8 +3,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { QuadraticBezier, CubicBezier } from './Interpolations';
-import { ShapePath } from './ShapePath';
+import { QuadraticBezier, CubicBezier } from './Interpolations.js';
+import { ShapePath } from './ShapePath.js';
 
 
 function Font( data ) {
@@ -93,8 +93,8 @@ Object.assign( Font.prototype, {
 
 						case 'q': // quadraticCurveTo
 
-							cpx  = outline[ i ++ ] * scale + offsetX;
-							cpy  = outline[ i ++ ] * scale + offsetY;
+							cpx = outline[ i ++ ] * scale + offsetX;
+							cpy = outline[ i ++ ] * scale + offsetY;
 							cpx1 = outline[ i ++ ] * scale + offsetX;
 							cpy1 = outline[ i ++ ] * scale + offsetY;
 
@@ -121,8 +121,8 @@ Object.assign( Font.prototype, {
 
 						case 'b': // bezierCurveTo
 
-							cpx  = outline[ i ++ ] * scale + offsetX;
-							cpy  = outline[ i ++ ] * scale + offsetY;
+							cpx = outline[ i ++ ] * scale + offsetX;
+							cpy = outline[ i ++ ] * scale + offsetY;
 							cpx1 = outline[ i ++ ] * scale + offsetX;
 							cpy1 = outline[ i ++ ] * scale + offsetY;
 							cpx2 = outline[ i ++ ] * scale + offsetX;

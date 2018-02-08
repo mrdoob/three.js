@@ -22,18 +22,6 @@ var Viewport = function ( editor ) {
 
 	var objects = [];
 
-	//
-
-	var vrEffect, vrControls;
-
-	if ( WEBVR.isAvailable() === true ) {
-
-		var vrCamera = new THREE.PerspectiveCamera();
-		vrCamera.projectionMatrix = camera.projectionMatrix;
-		camera.add( vrCamera );
-
-	}
-
 	// helpers
 
 	var grid = new THREE.GridHelper( 60, 60 );
@@ -283,12 +271,6 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.enterVR.add( function () {
-
-		vrEffect.isPresenting ? vrEffect.exitPresent() : vrEffect.requestPresent();
-
-	} );
-
 	signals.themeChanged.add( function ( value ) {
 
 		switch ( value ) {
@@ -344,19 +326,6 @@ var Viewport = function ( editor ) {
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
-
-		if ( WEBVR.isAvailable() === true ) {
-
-			vrControls = new THREE.VRControls( vrCamera );
-			vrEffect = new THREE.VREffect( renderer );
-
-			window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
-
-				effect.isPresenting ? signals.enteredVR.dispatch() : signals.exitedVR.dispatch();
-
-			}, false );
-
-		}
 
 		render();
 
@@ -557,48 +526,20 @@ var Viewport = function ( editor ) {
 
 	//
 
-	function animate() {
-
-		requestAnimationFrame( animate );
-
-		if ( vrEffect && vrEffect.isPresenting ) {
-
-			render();
-
-		}
-
-	}
-
 	function render() {
 
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
-		if ( vrEffect && vrEffect.isPresenting ) {
+		renderer.render( scene, camera );
 
-			vrControls.update();
+		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
 
-			camera.updateMatrixWorld();
-
-			vrEffect.render( scene, vrCamera );
-			vrEffect.render( sceneHelpers, vrCamera );
-
-		} else {
-
-			renderer.render( scene, camera );
-
-			if ( renderer instanceof THREE.RaytracingRenderer === false ) {
-
-				renderer.render( sceneHelpers, camera );
-
-			}
+			renderer.render( sceneHelpers, camera );
 
 		}
 
-
 	}
-
-	requestAnimationFrame( animate );
 
 	return container;
 

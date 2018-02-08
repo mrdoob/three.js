@@ -48,6 +48,7 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				var geometry = new THREE.SphereGeometry( 5 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
@@ -123,7 +124,6 @@
 				raycaster.linePrecision = 3;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild(renderer.domElement);

@@ -76,7 +76,7 @@
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
-				var shininess = 50, specular = 0x333333, bumpScale = 1, shading = THREE.SmoothShading;
+				var shininess = 50, specular = 0x333333, bumpScale = 1;
 
 				var materials = [];
 
@@ -108,7 +108,6 @@
 								specular: specularColor,
 								reflectivity: beta,
 								shininess: specularShininess,
-								shading: THREE.SmoothShading,
 								envMap: alphaIndex % 2 === 0 ? null : reflectionCube
 							} );
 
@@ -184,8 +183,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

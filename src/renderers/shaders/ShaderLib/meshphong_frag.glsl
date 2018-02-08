@@ -44,7 +44,6 @@ void main() {
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <specularmap_fragment>
-	#include <normal_flip>
 	#include <normal_fragment>
 	#include <emissivemap_fragment>
 

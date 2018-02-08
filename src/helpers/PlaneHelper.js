@@ -1,12 +1,14 @@
 /**
  * @author WestLangley / http://github.com/WestLangley
  */
- 
-import { Box3 } from '../math/Box3';
-import { Line } from '../objects/Line';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
+
+import { Line } from '../objects/Line.js';
+import { Mesh } from '../objects/Mesh.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Object3D } from '../core/Object3D.js';
 
 function PlaneHelper( plane, size, hex ) {
 
@@ -34,18 +36,14 @@ function PlaneHelper( plane, size, hex ) {
 	geometry2.addAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
 	geometry2.computeBoundingSphere();
 
-	this.add( new THREE.Mesh( geometry2, new LineBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
-
-	//
-
-	this.onBeforeRender();
+	this.add( new Mesh( geometry2, new MeshBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
 
 }
 
 PlaneHelper.prototype = Object.create( Line.prototype );
 PlaneHelper.prototype.constructor = PlaneHelper;
 
-PlaneHelper.prototype.onBeforeRender = function () {
+PlaneHelper.prototype.updateMatrixWorld = function ( force ) {
 
 	var scale = - this.plane.constant;
 
@@ -54,6 +52,8 @@ PlaneHelper.prototype.onBeforeRender = function () {
 	this.scale.set( 0.5 * this.size, 0.5 * this.size, scale );
 
 	this.lookAt( this.plane.normal );
+
+	Object3D.prototype.updateMatrixWorld.call( this, force );
 
 };
 

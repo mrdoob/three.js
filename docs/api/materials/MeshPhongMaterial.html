@@ -15,8 +15,8 @@
 		<div class="desc">
 			A material for shiny surfaces with specular highlights.<br /><br />
 
-			The uses a non-physically based [link:https://en.wikipedia.org/wiki/Blinn-Phong_shading_model Blinn-Phong]
-			model	for calculating reflectance. Unlike the Lambertian model used in the [page:MeshLambertMaterial]
+			The material uses a non-physically based [link:https://en.wikipedia.org/wiki/Blinn-Phong_shading_model Blinn-Phong]
+			model for calculating reflectance. Unlike the Lambertian model used in the [page:MeshLambertMaterial]
 			this can simulate shiny surfaces with specular highlights (such as varnished wood).<br /><br />
 
 			Shading is calculated using a [link:https://en.wikipedia.org/wiki/Phong_shading Phong] shading model.
@@ -192,7 +192,11 @@
 		</div>
 
 		<h3>[property:Float refractionRatio]</h3>
-		<div>The index of refraction for an environment map using [page:Textures THREE.CubeRefractionMapping]. Default is *0.98*.</div>
+		<div>
+			The index of refraction (IOR) of air (approximately 1) divided by the index of refraction of the material.
+			It is used with environment mapping modes [page:Textures THREE.CubeRefractionMapping] and [page:Textures THREE.EquirectangularRefractionMapping].
+			The refraction ratio should not exceed 1. Default is *0.98*.
+		</div>
 
 		<h3>[property:Float shininess]</h3>
 		<div>How shiny the [page:.specular] highlight is; a higher value gives a sharper highlight. Default is *30*.</div>

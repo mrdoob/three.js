@@ -226,7 +226,11 @@
 		</div>
 
 		<h3>[property:Float refractionRatio]</h3>
-		<div>The index of refraction for an environment map using [page:Textures THREE.CubeRefractionMapping]. Default is *0.98*.</div>
+		<div>
+			The index of refraction (IOR) of air (approximately 1) divided by the index of refraction of the material.
+			It is used with environment mapping modes [page:Textures THREE.CubeRefractionMapping] and [page:Textures THREE.EquirectangularRefractionMapping].
+			The refraction ratio should not exceed 1. Default is *0.98*.
+		</div>
 
 		<h3>[property:Float roughness]</h3>
 		<div>

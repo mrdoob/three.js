@@ -213,7 +213,7 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, shading: THREE.FlatShading } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, side: THREE.DoubleSide, flatShading: true } );
 
 					var mesh = new THREE.Mesh( geometry, morphMaterial );
 
@@ -392,7 +392,7 @@
 				// render cube map
 
 				mesh.visible = false;
-				cubeCamera.updateCubeMap( renderer, scene );
+				cubeCamera.update( renderer, scene );
 				mesh.visible = true;
 
 				// render scene

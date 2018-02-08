@@ -61,6 +61,7 @@
 				camera.position.z = 2750;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
 
 				//
@@ -81,14 +82,14 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				var positions = new Float32Array( triangles * 3 * 3 );
-				var normals = new Float32Array( triangles * 3 * 3 );
-				var colors = new Float32Array( triangles * 3 * 3 );
+				var positions = [];
+				var normals = [];
+				var colors = [];
 
 				var color = new THREE.Color();
 
-				var n = 800, n2 = n/2;	// triangles spread in the cube
-				var d = 12, d2 = d/2;	// individual triangle size
+				var n = 800, n2 = n / 2;	// triangles spread in the cube
+				var d = 12, d2 = d / 2;	// individual triangle size
 
 				var pA = new THREE.Vector3();
 				var pB = new THREE.Vector3();
@@ -97,7 +98,7 @@
 				var cb = new THREE.Vector3();
 				var ab = new THREE.Vector3();
 
-				for ( var i = 0; i < positions.length; i += 9 ) {
+				for ( var i = 0; i < triangles; i ++ ) {
 
 					// positions
 
@@ -117,17 +118,9 @@
 					var cy = y + Math.random() * d - d2;
 					var cz = z + Math.random() * d - d2;
 
-					positions[ i ]     = ax;
-					positions[ i + 1 ] = ay;
-					positions[ i + 2 ] = az;
-
-					positions[ i + 3 ] = bx;
-					positions[ i + 4 ] = by;
-					positions[ i + 5 ] = bz;
-
-					positions[ i + 6 ] = cx;
-					positions[ i + 7 ] = cy;
-					positions[ i + 8 ] = cz;
+					positions.push( ax, ay, az );
+					positions.push( bx, by, bz );
+					positions.push( cx, cy, cz );
 
 					// flat face normals
 
@@ -145,17 +138,9 @@
 					var ny = cb.y;
 					var nz = cb.z;
 
-					normals[ i ]     = nx;
-					normals[ i + 1 ] = ny;
-					normals[ i + 2 ] = nz;
-
-					normals[ i + 3 ] = nx;
-					normals[ i + 4 ] = ny;
-					normals[ i + 5 ] = nz;
-
-					normals[ i + 6 ] = nx;
-					normals[ i + 7 ] = ny;
-					normals[ i + 8 ] = nz;
+					normals.push( nx, ny, nz );
+					normals.push( nx, ny, nz );
+					normals.push( nx, ny, nz );
 
 					// colors
 
@@ -165,25 +150,17 @@
 
 					color.setRGB( vx, vy, vz );
 
-					colors[ i ]     = color.r;
-					colors[ i + 1 ] = color.g;
-					colors[ i + 2 ] = color.b;
-
-					colors[ i + 3 ] = color.r;
-					colors[ i + 4 ] = color.g;
-					colors[ i + 5 ] = color.b;
-
-					colors[ i + 6 ] = color.r;
-					colors[ i + 7 ] = color.g;
-					colors[ i + 8 ] = color.b;
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
 
 				}
 
 				function disposeArray() { this.array = null; }
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).onUpload( disposeArray ) );
-				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).onUpload( disposeArray ) );
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).onUpload( disposeArray ) );
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ).onUpload( disposeArray ) );
+				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ).onUpload( disposeArray ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ).onUpload( disposeArray ) );
 
 				geometry.computeBoundingSphere();
 
@@ -198,7 +175,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

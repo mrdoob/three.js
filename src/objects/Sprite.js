@@ -1,6 +1,6 @@
-import { Vector3 } from '../math/Vector3';
-import { Object3D } from '../core/Object3D';
-import { SpriteMaterial } from '../materials/SpriteMaterial';
+import { Vector3 } from '../math/Vector3.js';
+import { Object3D } from '../core/Object3D.js';
+import { SpriteMaterial } from '../materials/SpriteMaterial.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/

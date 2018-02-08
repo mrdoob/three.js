@@ -220,3 +220,40 @@ QUnit.test( 'sanitizeNodeName' , function( assert ) {
 	);
 
 } );
+
+QUnit.test( 'setValue', function( assert ) {
+
+	var paths = [
+		'.material.opacity',
+		'.material[opacity]'
+	];
+
+	paths.forEach( function ( path, i ) {
+
+		var originalValue = 0;
+		var expectedValue = 1;
+
+		var geometry = new THREE.BoxGeometry();
+		var material = new THREE.MeshBasicMaterial();
+		material.opacity = originalValue;
+		var mesh = new THREE.Mesh( geometry, material );
+
+		var binding = new THREE.PropertyBinding( mesh, path, null );
+		binding.bind();
+
+		assert.equal(
+			material.opacity,
+			originalValue,
+			'Sets property of material with "' + path + '" (pre-setValue)'
+		);
+
+		binding.setValue( [ expectedValue ], 0 );
+		assert.equal(
+			material.opacity,
+			expectedValue,
+			'Sets property of material with "' + path + '" (post-setValue)'
+		);
+
+	} );
+
+} );

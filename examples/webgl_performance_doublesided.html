@@ -52,6 +52,7 @@
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
 				scene.add( new THREE.AmbientLight( 0x050505 ) );
 
@@ -102,7 +103,6 @@
 				}
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x050505 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 

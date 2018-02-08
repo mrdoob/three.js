@@ -24,7 +24,6 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	var maxRecursionDepth = 3;
 
 	var canvasWidth, canvasHeight;
-	var canvasWidthHalf, canvasHeightHalf;
 
 	var clearColor = new THREE.Color( 0x000000 );
 
@@ -125,9 +124,6 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		canvasWidth = canvas.width;
 		canvasHeight = canvas.height;
-
-		canvasWidthHalf = Math.floor( canvasWidth / 2 );
-		canvasHeightHalf = Math.floor( canvasHeight / 2 );
 
 		context.fillStyle = 'white';
 

@@ -142,7 +142,10 @@
 
 			function onDocumentMouseWheel( event ) {
 
-				camera.fov += ( event.deltaY * 0.05 );
+				var fov = camera.fov + event.deltaY * 0.05;
+
+				camera.fov = THREE.Math.clamp( fov, 10, 75 );
+
 				camera.updateProjectionMatrix();
 
 			}
@@ -191,12 +194,12 @@
 				if ( count % 2 === 0 ) {
 
 					material.envMap = cubeCamera1.renderTarget.texture;
-					cubeCamera2.updateCubeMap( renderer, scene );
+					cubeCamera2.update( renderer, scene );
 
 				} else {
 
 					material.envMap = cubeCamera2.renderTarget.texture;
-					cubeCamera1.updateCubeMap( renderer, scene );
+					cubeCamera1.update( renderer, scene );
 
 				}
 

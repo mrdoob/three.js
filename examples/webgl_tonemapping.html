@@ -96,7 +96,6 @@
 					color: 0xffffff,
 					metalness: 0.9,
 					roughness: 0.8,
-					shading: THREE.SmoothShading,
 					premultipliedAlpha: true,
 					transparent: true
 				} );
@@ -209,8 +208,6 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

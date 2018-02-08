@@ -14,11 +14,11 @@ import {
 
 	MirroredRepeatWrapping,
 	RepeatWrapping
-} from '../constants';
-import { _Math } from '../math/Math';
-import { MaterialLoader } from './MaterialLoader';
-import { TextureLoader } from './TextureLoader';
-import { Color } from '../math/Color';
+} from '../constants.js';
+import { _Math } from '../math/Math.js';
+import { MaterialLoader } from './MaterialLoader.js';
+import { TextureLoader } from './TextureLoader.js';
+import { Color } from '../math/Color.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/

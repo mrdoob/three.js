@@ -96,10 +96,10 @@ QUnit.test( "normal" , function( assert ) {
 QUnit.test( "plane" , function( assert ) {
 	var a = new THREE.Triangle();
 
-	assert.ok( isNaN( a.plane().distanceToPoint( a.a ) ), "Passed!" );
-	assert.ok( isNaN( a.plane().distanceToPoint( a.b ) ), "Passed!" );
-	assert.ok( isNaN( a.plane().distanceToPoint( a.c ) ), "Passed!" );
-	assert.propEqual( a.plane().normal, {x: NaN, y: NaN, z: NaN}, "Passed!" );
+	assert.notOk( isNaN( a.plane().distanceToPoint( a.a ) ), "Passed!" );
+	assert.notOk( isNaN( a.plane().distanceToPoint( a.b ) ), "Passed!" );
+	assert.notOk( isNaN( a.plane().distanceToPoint( a.c ) ), "Passed!" );
+	assert.notPropEqual( a.plane().normal, { x: NaN, y: NaN, z: NaN }, "Passed!" );
 
 	a = new THREE.Triangle( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
 	assert.ok( a.plane().distanceToPoint( a.a ) == 0, "Passed!" );

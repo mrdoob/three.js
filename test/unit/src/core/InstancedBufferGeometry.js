@@ -31,7 +31,7 @@ QUnit.test( "copy" , function( assert ) {
 	instance.addAttribute( 'defaultAttribute1', defaultAttribute1 );
 	instance.addAttribute( 'defaultAttribute2', defaultAttribute2 );
 
-	var copiedInstance = instance.copy( instance );
+	var copiedInstance = new THREE.InstancedBufferGeometry().copy( instance );
 
 	assert.ok( copiedInstance instanceof THREE.InstancedBufferGeometry, "the clone has the correct type" );
 

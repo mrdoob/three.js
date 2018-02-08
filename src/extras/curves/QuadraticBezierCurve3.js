@@ -1,6 +1,6 @@
-import { Curve } from '../core/Curve';
-import { QuadraticBezier } from '../core/Interpolations';
-import { Vector3 } from '../../math/Vector3';
+import { Curve } from '../core/Curve.js';
+import { QuadraticBezier } from '../core/Interpolations.js';
+import { Vector3 } from '../../math/Vector3.js';
 
 
 function QuadraticBezierCurve3( v0, v1, v2 ) {

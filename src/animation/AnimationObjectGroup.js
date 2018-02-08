@@ -1,5 +1,5 @@
-import { PropertyBinding } from './PropertyBinding';
-import { _Math } from '../math/Math';
+import { PropertyBinding } from './PropertyBinding.js';
+import { _Math } from '../math/Math.js';
 
 /**
  *
@@ -32,7 +32,7 @@ import { _Math } from '../math/Math';
  * @author tschw
  */
 
-function AnimationObjectGroup( var_args ) {
+function AnimationObjectGroup() {
 
 	this.uuid = _Math.generateUUID();
 
@@ -61,11 +61,22 @@ function AnimationObjectGroup( var_args ) {
 	this.stats = {
 
 		objects: {
-			get total() { return scope._objects.length; },
-			get inUse() { return this.total - scope.nCachedObjects_; }
-		},
+			get total() {
 
-		get bindingsPerObject() { return scope._bindings.length; }
+				return scope._objects.length;
+
+			},
+			get inUse() {
+
+				return this.total - scope.nCachedObjects_;
+
+			}
+		},
+		get bindingsPerObject() {
+
+			return scope._bindings.length;
+
+		}
 
 	};
 
@@ -75,7 +86,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 	isAnimationObjectGroup: true,
 
-	add: function( var_args ) {
+	add: function () {
 
 		var objects = this._objects,
 			nObjects = objects.length,
@@ -105,9 +116,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
 
-					bindings[ j ].push(
-							new PropertyBinding(
-								object, paths[ j ], parsedPaths[ j ] ) );
+					bindings[ j ].push( new PropertyBinding( object, paths[ j ], parsedPaths[ j ] ) );
 
 				}
 
@@ -142,8 +151,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 						// for objects that are cached, the binding may
 						// or may not exist
 
-						binding = new PropertyBinding(
-								object, paths[ j ], parsedPaths[ j ] );
+						binding = new PropertyBinding( object, paths[ j ], parsedPaths[ j ] );
 
 					}
 
@@ -164,7 +172,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 	},
 
-	remove: function( var_args ) {
+	remove: function () {
 
 		var objects = this._objects,
 			nCachedObjects = this.nCachedObjects_,
@@ -213,7 +221,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 	},
 
 	// remove & forget
-	uncache: function( var_args ) {
+	uncache: function () {
 
 		var objects = this._objects,
 			nObjects = objects.length,

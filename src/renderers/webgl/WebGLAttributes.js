@@ -89,7 +89,7 @@ function WebGLAttributes( gl ) {
 			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
 				array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
 
-			updateRange.count = -1; // reset range
+			updateRange.count = - 1; // reset range
 
 		}
 
@@ -108,7 +108,7 @@ function WebGLAttributes( gl ) {
 	function remove( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
-		
+
 		var data = buffers[ attribute.uuid ];
 
 		if ( data ) {

@@ -82,10 +82,11 @@
 				// world
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xcccccc );
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
 				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-				var material =  new THREE.MeshPhongMaterial( { color:0xffffff, shading: THREE.FlatShading } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
@@ -117,7 +118,6 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

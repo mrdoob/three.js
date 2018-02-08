@@ -43,11 +43,12 @@ class ThreeJsWriter(object):
         self.skinIndices = []
         self.skinWeights = []
 
-        print("exporting meshes")
-        self._exportMeshes()
+        # Materials are used when exporting faces, so do them first.
         if self.options["materials"]:
             print("exporting materials")
             self._exportMaterials()
+        print("exporting meshes")
+        self._exportMeshes()
         if not self.accessMode == MPxFileTranslator.kExportActiveAccessMode :
 			if self.options["bakeAnimations"]:
 				print("exporting animations")
@@ -199,10 +200,13 @@ class ThreeJsWriter(object):
                 self._exportFaceVertexNormals(face)
 
     def _exportFaceBitmask(self, face, typeBitmask, hasMaterial=True):
-        if face.polygonVertexCount() == 4:
+        vertexCount = face.polygonVertexCount()
+        if vertexCount == 4:
             faceBitmask = 1
-        else:
+        elif vertexCount == 3:
             faceBitmask = 0
+        else:
+            raise ValueError('Faces must have 3 or 4 vertices')
 
         if hasMaterial:
             faceBitmask |= (1 << 1)
@@ -247,8 +251,8 @@ class ThreeJsWriter(object):
             "depthTest": True,
             "depthWrite": True,
             "shading": mat.__class__.__name__,
-            "opacity": mat.getTransparency().r,
-            "transparent": mat.getTransparency().r != 1.0,
+            "opacity": 1.0 - mat.getTransparency().r,
+            "transparent": mat.getTransparency().r != 0.0,
             "vertexColors": False
         }
         if isinstance(mat, nodetypes.Phong):

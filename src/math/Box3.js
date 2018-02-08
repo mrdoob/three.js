@@ -1,5 +1,5 @@
-import { Vector3 } from './Vector3';
-import { Sphere } from './Sphere';
+import { Vector3 } from './Vector3.js';
+import { Sphere } from './Sphere.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -413,7 +413,7 @@ Object.assign( Box3.prototype, {
 		this.max.min( box.max );
 
 		// ensure that if there is no overlap, the result is fully empty, not slightly empty with non-inf/+inf values that will cause subsequence intersects to erroneously return valid values.
-		if( this.isEmpty() ) this.makeEmpty();
+		if ( this.isEmpty() ) this.makeEmpty();
 
 		return this;
 
@@ -444,7 +444,7 @@ Object.assign( Box3.prototype, {
 		return function applyMatrix4( matrix ) {
 
 			// transform of empty box is an empty box.
-			if( this.isEmpty() ) return this;
+			if ( this.isEmpty() ) return this;
 
 			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000

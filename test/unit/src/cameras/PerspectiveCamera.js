@@ -4,7 +4,31 @@
 
 QUnit.module( "PerspectiveCamera" );
 
-QUnit.test( "updateProjectionMatrix" , function( assert ) {
+// see e.g. math/Matrix4.js
+var matrixEquals4 = function ( a, b, tolerance ) {
+
+	tolerance = tolerance || 0.0001;
+	if ( a.elements.length != b.elements.length ) {
+
+		return false;
+
+	}
+	for ( var i = 0, il = a.elements.length; i < il; i ++ ) {
+
+		var delta = a.elements[ i ] - b.elements[ i ];
+		if ( delta > tolerance ) {
+
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+};
+
+QUnit.test( "updateProjectionMatrix", function ( assert ) {
 
 	var cam = new THREE.PerspectiveCamera( 75, 16 / 9, 0.1, 300.0 );
 
@@ -22,12 +46,14 @@ QUnit.test( "updateProjectionMatrix" , function( assert ) {
 	var reference = new THREE.Matrix4().set(
 		0.7330642938613892, 0, 0, 0,
 		0, 1.3032253980636597, 0, 0,
-		0, 0, -1.000666856765747, -0.2000666856765747,
-		0, 0, -1, 0
+		0, 0, - 1.000666856765747, - 0.2000666856765747,
+		0, 0, - 1, 0
 	);
 
-	assert.ok( reference.equals(m) );
-});
+	// assert.ok( reference.equals(m) );
+	assert.ok( matrixEquals4( reference, m, 0.000001 ) );
+
+} );
 
 QUnit.test( "clone" , function( assert ) {
 	var near = 1,

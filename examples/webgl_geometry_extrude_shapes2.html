@@ -344,12 +344,12 @@
 
 				/// Global : renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xb0b0b0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				/// Global : scene
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xb0b0b0 );
 
 				/// Global : camera
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );

@@ -11,7 +11,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			Class for loading an animation in JSON format.
+			Class for loading [page:AnimationClip AnimationClips] in JSON format.
 			This uses the [page:FileLoader] internally for loading files.
 		</div>
 
@@ -26,8 +26,8 @@
 			// resource URL
 			'animations/animation.js',
 			// Function when resource is loaded
-			function ( animation ) {
-				// do something with the animation
+			function ( animations ) {
+				// animations is an array of AnimationClips
 			},
 			// Function called when download progresses
 			function ( xhr ) {

@@ -86,6 +86,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 				scene.fog = new THREE.Fog( 0x050505, 400, 1000 );
 
 				// LIGHTS
@@ -133,7 +134,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -157,6 +157,7 @@
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 50, 0 );
+				controls.update();
 
 				// GUI
 
@@ -340,7 +341,6 @@
 
 				var delta = clock.getDelta();
 
-				controls.update();
 				character.update( delta );
 
 				renderer.render( scene, camera );

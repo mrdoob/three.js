@@ -77,7 +77,7 @@ THREE.GPUParticleSystem = function( options ) {
 			'	v.y = ( velocity.y - 0.5 ) * 3.0;',
 			'	v.z = ( velocity.z - 0.5 ) * 3.0;',
 
-			'	newPosition = positionStart + ( v * 10.0 ) * ( uTime - startTime );',
+			'	newPosition = positionStart + ( v * 10.0 ) * timeElapsed;',
 
 			'	vec3 noise = texture2D( tNoise, vec2( newPosition.x * 0.015 + ( uTime * 0.05 ), newPosition.y * 0.02 + ( uTime * 0.015 ) ) ).rgb;',
 			'	vec3 noiseVel = ( noise.rgb - 0.5 ) * 30.0;',

@@ -1,4 +1,4 @@
-import { Light } from './Light';
+import { Light } from './Light.js';
 
 /**
  * @author abelnation / http://github.com/abelnation

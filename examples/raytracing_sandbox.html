@@ -37,6 +37,7 @@
 				camera.position.z = 600;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				// materials
 
@@ -45,7 +46,7 @@
 					specular: 0x222222,
 					shininess: 150,
 					vertexColors: THREE.NoColors,
-					shading: THREE.SmoothShading
+					flatShading: false
 				} );
 
 				var phongMaterialBox = new THREE.MeshPhongMaterial( {
@@ -53,7 +54,7 @@
 					specular: 0x111111,
 					shininess: 100,
 					vertexColors: THREE.NoColors,
-					shading: THREE.FlatShading
+					flatShading: true
 				} );
 
 				var phongMaterialBoxBottom = new THREE.MeshPhongMaterial( {
@@ -61,7 +62,7 @@
 					specular: 0x111111,
 					shininess: 100,
 					vertexColors: THREE.NoColors,
-					shading: THREE.FlatShading
+					flatShading: true
 				} );
 
 				var phongMaterialBoxLeft = new THREE.MeshPhongMaterial( {
@@ -69,7 +70,7 @@
 					specular: 0x111111,
 					shininess: 100,
 					vertexColors: THREE.NoColors,
-					shading: THREE.FlatShading
+					flatShading: true
 				} );
 
 				var phongMaterialBoxRight = new THREE.MeshPhongMaterial( {
@@ -77,7 +78,7 @@
 					specular: 0x111111,
 					shininess: 100,
 					vertexColors: THREE.NoColors,
-					shading: THREE.FlatShading
+					flatShading: true
 				} );
 
 				var mirrorMaterialFlat = new THREE.MeshPhongMaterial( {
@@ -85,7 +86,7 @@
 					specular: 0xff8888,
 					shininess: 10000,
 					vertexColors: THREE.NoColors,
-					shading: THREE.FlatShading
+					flatShading: true
 				} );
 				mirrorMaterialFlat.mirror = true;
 				mirrorMaterialFlat.reflectivity = 1;
@@ -95,7 +96,7 @@
 					specular: 0xaaaaaa,
 					shininess: 10000,
 					vertexColors: THREE.NoColors,
-					shading: THREE.FlatShading
+					flatShading: true
 				} );
 				mirrorMaterialFlatDark.mirror = true;
 				mirrorMaterialFlatDark.reflectivity = 1;
@@ -105,7 +106,7 @@
 					specular: 0x222222,
 					shininess: 10000,
 					vertexColors: THREE.NoColors,
-					shading: THREE.SmoothShading
+					flatShading: false
 				} );
 				mirrorMaterialSmooth.mirror = true;
 				mirrorMaterialSmooth.reflectivity = 0.3;
@@ -115,7 +116,7 @@
 					specular: 0x00ff00,
 					shininess: 10000,
 					vertexColors: THREE.NoColors,
-					shading: THREE.FlatShading
+					flatShading: true
 				} );
 				glassMaterialFlat.glass = true;
 				glassMaterialFlat.reflectivity = 0.5;
@@ -125,7 +126,7 @@
 					specular: 0xffaa55,
 					shininess: 10000,
 					vertexColors: THREE.NoColors,
-					shading: THREE.SmoothShading
+					flatShading: false
 				} );
 				glassMaterialSmooth.glass = true;
 				glassMaterialSmooth.reflectivity = 0.25;
@@ -256,7 +257,6 @@
 					randomize: true,
 					blockSize: 64
 				} );
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.domElement.style.position = "absolute";

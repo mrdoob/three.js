@@ -22,13 +22,6 @@ var constants = {
 
 	},
 
-	shading : {
-
-		"THREE.FlatShading" : THREE.FlatShading,
-		"THREE.SmoothShading" : THREE.SmoothShading
-
-	},
-
 	colors : {
 
 		"THREE.NoColors" : THREE.NoColors,
@@ -984,6 +977,75 @@ var guis = {
 
 	},
 
+	TextBufferGeometry : function( mesh ) {
+
+		var data = {
+			text : "TextBufferGeometry",
+			size : 5,
+			height : 2,
+			curveSegments : 12,
+			font : "helvetiker",
+			weight : "regular",
+			bevelEnabled : false,
+			bevelThickness : 1,
+			bevelSize : 0.5,
+			bevelSegments : 3
+		};
+
+		var fonts = [
+			"helvetiker",
+			"optimer",
+			"gentilis",
+			"droid/droid_serif"
+		];
+
+		var weights = [
+			"regular", "bold"
+		];
+
+		function generateGeometry() {
+
+			var loader = new THREE.FontLoader();
+			loader.load( '../../examples/fonts/' + data.font + '_' + data.weight + '.typeface.json', function ( font ) {
+
+				var geometry = new THREE.TextBufferGeometry( data.text, {
+					font: font,
+					size: data.size,
+					height: data.height,
+					curveSegments: data.curveSegments,
+					bevelEnabled: data.bevelEnabled,
+					bevelThickness: data.bevelThickness,
+					bevelSize: data.bevelSize,
+					bevelSegments: data.bevelSegments
+				} );
+				geometry.center();
+
+				updateGroupGeometry( mesh, geometry );
+
+			} );
+
+		}
+
+		//Hide the wireframe
+		mesh.children[ 0 ].visible = false;
+
+		var folder = gui.addFolder( 'THREE.TextBufferGeometry' );
+
+		folder.add( data, 'text' ).onChange( generateGeometry );
+		folder.add( data, 'size', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'height', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'curveSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'font', fonts ).onChange( generateGeometry );
+		folder.add( data, 'weight', weights ).onChange( generateGeometry );
+		folder.add( data, 'bevelEnabled' ).onChange( generateGeometry );
+		folder.add( data, 'bevelThickness', 0.1, 3 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSize', 0.1, 3 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSegments', 0, 8 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	TorusBufferGeometry : function( mesh ) {
 
 		var data = {
@@ -1356,7 +1418,7 @@ function chooseFromHash ( mesh ) {
 
 	}
 
-	if ( selectedGeometry === 'TextGeometry' ) {
+	if ( selectedGeometry === 'TextGeometry' || selectedGeometry === 'TextBufferGeometry' ) {
 
 		return { fixed : true };
 

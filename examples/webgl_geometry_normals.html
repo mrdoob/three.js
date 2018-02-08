@@ -47,7 +47,7 @@
 		<script>
 
 			var container, stats, gui;
-			var camera, controls, scene, renderer;
+			var camera, scene, renderer;
 			var mesh, geometry;
 
 			var geometries = [
@@ -150,7 +150,7 @@
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				//
 

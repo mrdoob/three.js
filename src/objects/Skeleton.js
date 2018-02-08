@@ -1,4 +1,4 @@
-import { Matrix4 } from '../math/Matrix4';
+import { Matrix4 } from '../math/Matrix4.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/

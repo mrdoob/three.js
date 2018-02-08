@@ -1,5 +1,5 @@
-import { Curve } from '../core/Curve';
-import { Vector2 } from '../../math/Vector2';
+import { Curve } from '../core/Curve.js';
+import { Vector2 } from '../../math/Vector2.js';
 
 
 function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {

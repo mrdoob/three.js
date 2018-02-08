@@ -1,7 +1,7 @@
-import { LinearFilter, LinearMipMapLinearFilter, ClampToEdgeWrapping } from '../constants';
-import { FileLoader } from './FileLoader';
-import { DataTexture } from '../textures/DataTexture';
-import { DefaultLoadingManager } from './LoadingManager';
+import { LinearFilter, LinearMipMapLinearFilter, ClampToEdgeWrapping } from '../constants.js';
+import { FileLoader } from './FileLoader.js';
+import { DataTexture } from '../textures/DataTexture.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 /**
  * @author Nikos M. / https://github.com/foo123/

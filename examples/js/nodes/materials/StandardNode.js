@@ -190,7 +190,6 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 
 		var output = [
 				// prevent undeclared normal
-			"	#include <normal_flip>",
 			"	#include <normal_fragment>",
 
 				// prevent undeclared material

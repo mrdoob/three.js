@@ -14,7 +14,7 @@ http://jsfiddle.net/hw9rcLL8/ (dev)
 ##### Three.js version
 
 - [ ] Dev
-- [ ] r85
+- [ ] r87
 - [ ] ...
 
 ##### Browser

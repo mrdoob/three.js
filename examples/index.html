@@ -291,6 +291,27 @@
 		var links = {};
 		var selected = null;
 
+		function createLink( file ) {
+
+			var link = document.createElement( 'a' );
+			link.className = 'link';
+			link.href = file + '.html';
+			link.textContent = getName( file );
+			link.setAttribute( 'target', 'viewer' );
+			link.addEventListener( 'click', function ( event ) {
+
+				if ( event.button === 0 ) {
+
+					selectFile( file );
+
+				}
+
+			} );
+
+			return link;
+
+		}
+
 		for ( var key in files ) {
 
 			var section = files[ key ];
@@ -302,29 +323,12 @@
 
 			for ( var i = 0; i < section.length; i ++ ) {
 
-				( function ( file ) {
+				var file = section[ i ];
 
-					var name = getName( file );
+				var link = createLink( file );
+				container.appendChild( link );
 
-					var link = document.createElement( 'a' );
-					link.className = 'link';
-					link.textContent = name;
-					link.href = file + '.html';
-					link.setAttribute( 'target', 'viewer' );
-					link.addEventListener( 'click', function ( event ) {
-
-						if ( event.button === 0 ) {
-
-							selectFile( file );
-
-						}
-
-					} );
-					container.appendChild( link );
-
-					links[ file ] = link;
-
-				} )( section[ i ] );
+				links[ file ] = link;
 
 			}
 

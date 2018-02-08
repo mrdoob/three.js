@@ -1,5 +1,5 @@
-import { Vector3 } from './Vector3';
-import { _Math } from './Math';
+import { Vector3 } from './Vector3.js';
+import { _Math } from './Math.js';
 
 /**
  * @author bhouston / http://clara.io

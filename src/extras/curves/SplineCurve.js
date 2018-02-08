@@ -1,6 +1,6 @@
-import { Curve } from '../core/Curve';
-import { CatmullRom } from '../core/Interpolations';
-import { Vector2 } from '../../math/Vector2';
+import { Curve } from '../core/Curve.js';
+import { CatmullRom } from '../core/Interpolations.js';
+import { Vector2 } from '../../math/Vector2.js';
 
 
 function SplineCurve( points /* array of Vector2 */ ) {

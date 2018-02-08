@@ -1,5 +1,5 @@
-import { Color } from '../math/Color';
-import { Vector3 } from '../math/Vector3';
+import { Color } from '../math/Color.js';
+import { Vector3 } from '../math/Vector3.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

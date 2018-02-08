@@ -54,7 +54,6 @@
 			point: new THREE.Vector3(),
 			normal: new THREE.Vector3()
 		};
-		var controls;
 		var mouse = new THREE.Vector2();
 
 		var textureLoader = new THREE.TextureLoader();
@@ -111,7 +110,7 @@
 			camera.position.z = 120;
 			camera.target = new THREE.Vector3();
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.minDistance = 50;
 			controls.maxDistance = 200;
 
@@ -203,6 +202,7 @@
 					intersection.point.copy( p );
 
 					var n = intersects[ 0 ].face.normal.clone();
+					n.transformDirection( mesh.matrixWorld );
 					n.multiplyScalar( 10 );
 					n.add( intersects[ 0 ].point );
 

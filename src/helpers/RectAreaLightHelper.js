@@ -4,11 +4,11 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { Object3D } from '../core/Object3D';
-import { Line } from '../objects/Line';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { BufferAttribute } from '../core/BufferAttribute';
+import { Object3D } from '../core/Object3D.js';
+import { Line } from '../objects/Line.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
 
 function RectAreaLightHelper( light, color ) {
 
@@ -22,7 +22,7 @@ function RectAreaLightHelper( light, color ) {
 
 	this.color = color;
 
-	var material = new LineBasicMaterial( { fog: false, color: this.color } );
+	var material = new LineBasicMaterial( { fog: false } );
 
 	var geometry = new BufferGeometry();
 
@@ -58,11 +58,11 @@ RectAreaLightHelper.prototype.update = function () {
 
 	// update vertices
 
-	array[  0 ] =   hx; array[  1 ] = - hy; array[  2 ] = 0;
-	array[  3 ] =   hx; array[  4 ] =   hy; array[  5 ] = 0;
-	array[  6 ] = - hx; array[  7 ] =   hy; array[  8 ] = 0;
-	array[  9 ] = - hx; array[ 10 ] = - hy; array[ 11 ] = 0;
-	array[ 12 ] =   hx; array[ 13 ] = - hy; array[ 14 ] = 0;
+	array[ 0 ] = hx; array[ 1 ] = - hy; array[ 2 ] = 0;
+	array[ 3 ] = hx; array[ 4 ] = hy; array[ 5 ] = 0;
+	array[ 6 ] = - hx; array[ 7 ] = hy; array[ 8 ] = 0;
+	array[ 9 ] = - hx; array[ 10 ] = - hy; array[ 11 ] = 0;
+	array[ 12 ] = hx; array[ 13 ] = - hy; array[ 14 ] = 0;
 
 	position.needsUpdate = true;
 

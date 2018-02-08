@@ -104,9 +104,8 @@
 				camera.position.set( 0, 0, 250 );
 
 				scene = new THREE.Scene();
-
-				scene.fog = new THREE.Fog( 0xffffff, 1, 5000 );
-				scene.fog.color.setHSL( 0.6, 0, 1 );
+				scene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
+				scene.fog = new THREE.Fog( scene.background, 1, 5000 );
 
 				// LIGHTS
 
@@ -117,7 +116,7 @@
 				scene.add( hemiLight );
 
 				hemiLightHelper = new THREE.HemisphereLightHelper( hemiLight, 10 );
-        scene.add( hemiLightHelper );
+				scene.add( hemiLightHelper );
 
 				//
 
@@ -184,7 +183,7 @@
 
 				loader.load( 'models/animated/flamingo.js', function( geometry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, flatShading: true } );
 					var mesh = new THREE.Mesh( geometry, material );
 
 					var s = 0.35;
@@ -206,7 +205,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
