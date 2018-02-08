@@ -1093,7 +1093,7 @@ function WebGLRenderer( parameters ) {
 
 	// Rendering
 
-	this.render = function ( scene, camera, renderTarget, forceClear ) {
+	this.render = function ( scene, camera, renderTarget, forceClear, submitVrFrame = true ) {
 
 		if ( ! ( camera && camera.isCamera ) ) {
 
@@ -1118,7 +1118,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		if ( vr.enabled ) {
+		if ( vr.enabled && submitVrFrame ) {
 
 			camera = vr.getCamera( camera );
 

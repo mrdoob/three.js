@@ -379,7 +379,7 @@
 		See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.
 		</div>
 
-		<h3>[method:null render]( [page:Scene scene], [page:Camera camera], [page:WebGLRenderTarget renderTarget], [page:Boolean forceClear] )</h3>
+		<h3>[method:null render]( [page:Scene scene], [page:Camera camera], [page:WebGLRenderTarget renderTarget], [page:Boolean forceClear], [page:Boolean submitVrFrame] )</h3>
 		<div>
 			Render a [page:Scene scene] using a [page:Camera camera].<br />
 
@@ -389,7 +389,9 @@
 			before rendering even if the renderer's [page:WebGLRenderer.autoClear autoClear] property is false.<br />
 
 			Even with forceClear set to true you can prevent certain buffers being cleared by setting
-			either the [page:WebGLRenderer.autoClearColor autoClearColor], [page:WebGLRenderer.autoClearStencil autoClearStencil] or [page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false.
+			either the [page:WebGLRenderer.autoClearColor autoClearColor], [page:WebGLRenderer.autoClearStencil autoClearStencil] or [page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false.<br />
+
+			If [page:Boolean submitVrFrame] is *true*, the rendered frame is immediately sent to the VR device after render. Default is *true*.
 		</div>
 
 		<h3>[method:null renderBufferDirect]( [page:Camera camera], [page:Array lights], [page:Fog fog], [page:Material material], [page:Object geometryGroup], [page:Object3D object] )</h3>
