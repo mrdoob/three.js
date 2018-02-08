@@ -3,16 +3,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LensFlare = function () {
+THREE.Lensflare = function () {
 
-	THREE.Mesh.call( this, THREE.LensFlare.Geometry, THREE.LensFlare.Material );
+	THREE.Mesh.call( this, THREE.Lensflare.Geometry, new THREE.MeshBasicMaterial( { opacity: 0, transparent: true } ) );
 
-	this.type = 'LensFlare';
+	this.type = 'Lensflare';
 	this.frustumCulled = false;
 
 	//
 
-	var flareVisible = false;
 	var positionScreen = new THREE.Vector3();
 
 	// textures
@@ -20,29 +19,80 @@ THREE.LensFlare = function () {
 	var tempMap = new THREE.DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, THREE.RGBFormat );
 	tempMap.minFilter = THREE.NearestFilter;
 	tempMap.magFilter = THREE.NearestFilter;
+	tempMap.wrapS = THREE.ClampToEdgeWrapping;
+	tempMap.wrapT = THREE.ClampToEdgeWrapping;
 	tempMap.needsUpdate = true;
 
 	var occlusionMap = new THREE.DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, THREE.RGBFormat );
 	occlusionMap.minFilter = THREE.NearestFilter;
 	occlusionMap.magFilter = THREE.NearestFilter;
+	occlusionMap.wrapS = THREE.ClampToEdgeWrapping;
+	occlusionMap.wrapT = THREE.ClampToEdgeWrapping;
 	occlusionMap.needsUpdate = true;
 
 	// material
 
-	var shader = THREE.LensFlare.Shader;
+	var geometry = THREE.Lensflare.Geometry;
 
-	var material = new THREE.RawShaderMaterial( {
-		uniforms: shader.uniforms,
+	var shader = THREE.Lensflare.Shader;
+
+	var material1a = new THREE.RawShaderMaterial( {
+		uniforms: {
+			'scale': { value: null },
+			'screenPosition': { value: null }
+		},
 		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader,
+		fragmentShader: shader.fragmentShader1,
+		depthTest: true,
+		depthWrite: false,
+		transparent: false
+	} );
+
+	var material1b = new THREE.RawShaderMaterial( {
+		uniforms: {
+			'map': { value: tempMap },
+			'scale': { value: null },
+			'screenPosition': { value: null }
+		},
+		vertexShader: shader.vertexShader,
+		fragmentShader: shader.fragmentShader2,
+		depthTest: false,
 		depthWrite: false,
 		transparent: false
 	} );
 
 	// the following object is used for occlusionMap generation
 
-	var occluder = new THREE.Mesh( THREE.LensFlare.Geometry, material );
-	occluder.frustumCulled = false;
+	var mesh1 = new THREE.Mesh( geometry, material1a );
+
+	//
+
+	var elements = [];
+
+	var shader = THREE.LensflareElement.Shader;
+
+	var material2 = new THREE.RawShaderMaterial( {
+		uniforms: {
+			'map': { value: null },
+			'occlusionMap': { value: occlusionMap },
+			'color': { value: new THREE.Color( 0xffffff ) },
+			'scale': { value: new THREE.Vector2() },
+			'screenPosition': { value: new THREE.Vector3() }
+		},
+		vertexShader: shader.vertexShader,
+		fragmentShader: shader.fragmentShader,
+		blending: THREE.AdditiveBlending,
+		transparent: true,
+		depthWrite: false
+	} );
+
+	var mesh2 = new THREE.Mesh( geometry, material2 );
+
+	this.addElement = function ( element ) {
+
+		elements.push( element );
+
+	};
 
 	//
 
@@ -79,14 +129,7 @@ THREE.LensFlare = function () {
 
 		// screen cull
 
-		flareVisible = validArea.containsPoint( screenPositionPixels );
-
-		if ( flareVisible ) {
-
-			var currentAutoClear = renderer.autoClear;
-
-			renderer.autoClear = false;
-
+		if ( validArea.containsPoint( screenPositionPixels ) ) {
 
 			// save current RGB to temp texture
 
@@ -94,12 +137,11 @@ THREE.LensFlare = function () {
 
 			// render pink quad
 
-			occluder.material.uniforms.renderType.value = 0;
-			occluder.material.uniforms.scale.value = scale;
-			occluder.material.uniforms.screenPosition.value = positionScreen;
-			occluder.material.depthTest = true;
+			var uniforms = material1a.uniforms;
+			uniforms.scale.value = scale;
+			uniforms.screenPosition.value = positionScreen;
 
-			renderer.render( occluder, camera );
+			renderer.renderBufferDirect( camera, null, geometry, material1a, mesh1, null );
 
 			// copy result to occlusionMap
 
@@ -107,42 +149,38 @@ THREE.LensFlare = function () {
 
 			// restore graphics
 
-			occluder.material.uniforms.renderType.value = 1;
-			occluder.material.uniforms.map.value = tempMap;
-			occluder.material.depthTest = false;
+			var uniforms = material1b.uniforms;
+			uniforms.scale.value = scale;
+			uniforms.screenPosition.value = positionScreen;
 
-			renderer.render( occluder, camera );
+			renderer.renderBufferDirect( camera, null, geometry, material1b, mesh1, null );
 
-			//
+			// render elements
 
-			renderer.autoClear = currentAutoClear;
+			var vecX = - positionScreen.x * 2;
+			var vecY = - positionScreen.y * 2;
 
-		}
+			for ( var i = 0, l = elements.length; i < l; i ++ ) {
 
-		// update object positions
+				var element = elements[ i ];
 
-		var children = this.children;
+				var uniforms = material2.uniforms;
 
-		var vecX = - positionScreen.x * 2;
-		var vecY = - positionScreen.y * 2;
+				uniforms.color.value.copy( element.color );
+				uniforms.map.value = element.texture;
+				uniforms.screenPosition.value.x = positionScreen.x + vecX * element.distance;
+				uniforms.screenPosition.value.y = positionScreen.y + vecY * element.distance;
 
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
+				var size = element.size / viewport.w;
+				var invAspect = viewport.w / viewport.z;
 
-			var flare = children[ i ];
+				uniforms.scale.value.set( size * invAspect, size );
 
-			var flarePosition = flare.material.uniforms.screenPosition.value;
-			flarePosition.x = positionScreen.x + vecX * flare.flareDistance;
-			flarePosition.y = positionScreen.y + vecY * flare.flareDistance;
+				material2.uniformsNeedUpdate = true;
 
-			//
+				renderer.renderBufferDirect( camera, null, geometry, material2, mesh2, null );
 
-			var size = flare.flareSize / viewport.w;
-			var invAspect = viewport.w / viewport.z;
-
-			flare.material.uniforms.occlusionMap.value = occlusionMap;
-			flare.material.uniforms.scale.value.set( size * invAspect, size );
-
-			flare.material.uniforms.opacity.value = flareVisible ? 1 : 0;
+			}
 
 		}
 
@@ -150,7 +188,8 @@ THREE.LensFlare = function () {
 
 	this.dispose = function () {
 
-		occluder.material.dispose();
+		material1.dispose();
+		material2.dispose();
 
 		tempMap.dispose();
 		occlusionMap.dispose();
@@ -159,20 +198,11 @@ THREE.LensFlare = function () {
 
 };
 
-THREE.LensFlare.prototype = Object.create( THREE.Mesh.prototype );
-THREE.LensFlare.prototype.constructor = THREE.LensFlare;
-THREE.LensFlare.prototype.isLensFlare = true;
+THREE.Lensflare.prototype = Object.create( THREE.Mesh.prototype );
+THREE.Lensflare.prototype.constructor = THREE.Lensflare;
+THREE.Lensflare.prototype.isLensflare = true;
 
-THREE.LensFlare.Shader = {
-
-	uniforms: {
-
-		'renderType': { value: 0 },
-		'map': { value: null },
-		'scale': { value: null },
-		'screenPosition': { value: null }
-
-	},
+THREE.Lensflare.Shader = {
 
 	vertexShader: [
 
@@ -198,30 +228,29 @@ THREE.LensFlare.Shader = {
 
 	].join( '\n' ),
 
-	fragmentShader: [
+	fragmentShader1: [
 
 		'precision highp float;',
 
-		'uniform lowp int renderType;',
+		'void main() {',
+
+		'		gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );',
+
+		'}'
+
+	].join( '\n' ),
+
+	fragmentShader2: [
+
+		'precision highp float;',
+
 		'uniform sampler2D map;',
 
 		'varying vec2 vUV;',
 
 		'void main() {',
 
-		// pink square
-
-		'	if ( renderType == 0 ) {',
-
-		'		gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );',
-
-		// restore
-
-		'	} else {',
-
 		'		gl_FragColor = texture2D( map, vUV );',
-
-		'	}',
 
 		'}'
 
@@ -231,57 +260,21 @@ THREE.LensFlare.Shader = {
 
 //
 
-THREE.LensFlareElement = function ( texture, size, distance, color, blending ) {
+THREE.LensflareElement = function ( texture, size, distance, color ) {
 
-	THREE.Mesh.call( this );
-
-	this.type = 'LensFlareElement';
-	this.frustumCulled = false;
-	this.renderOrder = Infinity;
-
-	this.flareSize = size || 1;
-	this.flareDistance = distance || 0;
-
-	this.geometry = THREE.LensFlare.Geometry;
-
-	var shader = THREE.LensFlareElement.Shader;
-
-	this.material = new THREE.RawShaderMaterial( {
-		// uniforms: Object.assign( {}, shader.uniforms ),
-		uniforms: {
-			'map': { value: texture },
-			'occlusionMap': { value: null },
-			'opacity': { value: 1 },
-			'color': { value: color || new THREE.Color( 0xffffff ) },
-			'scale': { value: new THREE.Vector2() },
-			'screenPosition': { value: new THREE.Vector3() }
-		},
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader,
-		blending: blending || THREE.AdditiveBlending,
-		transparent: true,
-		depthWrite: false
-	} );
-
-	this.dispose = function () {
-
-		this.material.dispose();
-
-	};
+	this.texture = texture;
+	this.size = size || 1;
+	this.distance = distance || 0;
+	this.color = color || new THREE.Color( 0xffffff );
 
 };
 
-THREE.LensFlareElement.prototype = Object.create( THREE.Mesh.prototype );
-THREE.LensFlareElement.prototype.constructor = THREE.LensFlareElement;
-THREE.LensFlareElement.prototype.isLensFlareElement = true;
-
-THREE.LensFlareElement.Shader = {
+THREE.LensflareElement.Shader = {
 
 	uniforms: {
 
 		'map': { value: null },
 		'occlusionMap': { value: null },
-		'opacity': { value: 1 },
 		'color': { value: null },
 		'scale': { value: null },
 		'screenPosition': { value: null }
@@ -334,7 +327,6 @@ THREE.LensFlareElement.Shader = {
 		'precision highp float;',
 
 		'uniform sampler2D map;',
-		'uniform float opacity;',
 		'uniform vec3 color;',
 
 		'varying vec2 vUV;',
@@ -343,7 +335,7 @@ THREE.LensFlareElement.Shader = {
 		'void main() {',
 
 		'	vec4 texture = texture2D( map, vUV );',
-		'	texture.a *= opacity * vVisibility;',
+		'	texture.a *= vVisibility;',
 		'	gl_FragColor = texture;',
 		'	gl_FragColor.rgb *= color;',
 
@@ -353,7 +345,7 @@ THREE.LensFlareElement.Shader = {
 
 };
 
-THREE.LensFlare.Geometry = ( function () {
+THREE.Lensflare.Geometry = ( function () {
 
 	var geometry = new THREE.BufferGeometry();
 
@@ -371,11 +363,5 @@ THREE.LensFlare.Geometry = ( function () {
 	geometry.addAttribute( 'uv', new THREE.InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
 
 	return geometry;
-
-} )();
-
-THREE.LensFlare.Material = ( function () {
-
-	return new THREE.MeshBasicMaterial( { opacity: 0, transparent: true } );
 
 } )();
