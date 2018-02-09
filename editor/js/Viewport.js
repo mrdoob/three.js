@@ -288,7 +288,7 @@ var Viewport = function ( editor ) {
 		var type = controls.CAMERACTRLTYPE.DEFAULT
 		if ( value == "Maya" ) {
 
-			type = controls.CAMERACTRLTYPE.MAYA
+			type = controls.CAMERACTRLTYPE.MAYA;
 
 		}
 

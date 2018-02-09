@@ -14,6 +14,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		MAYA: 1
 	};
 	// API
+	this.focusSize = 0.65; //right ok
 	this.cameraCtrlType = this.CAMERACTRLTYPE.DEFAULT; //default 0; maya 1;
 	this.enabled = true;
 	this.center = new THREE.Vector3();
@@ -50,7 +51,70 @@ THREE.EditorControls = function ( object, domElement ) {
 	this.focus = function ( target ) {
 
 		var box = new THREE.Box3().setFromObject( target );
+
 		object.lookAt( center.copy( box.getCenter() ) );
+
+		if ( scope.cameraCtrlType == scope.CAMERACTRLTYPE.MAYA ) {
+
+			var distance = object.position.distanceTo( center );
+
+			var size = box.getSize().multiplyScalar( 0.5 ); //length width height
+			var c = box.getCenter(); //box pos
+			var toCamMatrix = object.matrixWorldInverse
+
+			var worldVerters = []
+			worldVerters.push( new THREE.Vector3( c.x - size.x, c.y + size.y, c.z - size.z ) );
+			worldVerters.push( new THREE.Vector3( c.x + size.x, c.y + size.y, c.z - size.z ) );
+			worldVerters.push( new THREE.Vector3( c.x + size.x, c.y - size.y, c.z - size.z ) );
+			worldVerters.push( new THREE.Vector3( c.x - size.x, c.y - size.y, c.z - size.z ) );
+			worldVerters.push( new THREE.Vector3( c.x - size.x, c.y + size.y, c.z + size.z ) );
+			worldVerters.push( new THREE.Vector3( c.x + size.x, c.y + size.y, c.z + size.z ) );
+			worldVerters.push( new THREE.Vector3( c.x + size.x, c.y - size.y, c.z + size.z ) );
+			worldVerters.push( new THREE.Vector3( c.x - size.x, c.y - size.y, c.z + size.z ) );
+
+			var camVerters = []
+
+			for ( var i = 0; i < 8; i++ ) {
+
+				var pos = worldVerters[ i ].applyMatrix4( toCamMatrix ).applyMatrix4( object.projectionMatrix );
+				camVerters.push( new THREE.Vector3( pos.x, pos.y ) );
+
+			}
+
+			var dis = []
+			for ( var i = 0; i < 7; i++ ) {
+				for ( var j = i + 1; j < 8; j++ ) {
+					dis.push( camVerters[ i ].distanceTo( camVerters[ j ] ) );
+				}
+			}
+
+			var maxDistance = dis[ dis.length - 1 ]
+
+			console.log( maxDistance + "  maxDis" );
+			console.log( distance + " camer distance" );
+			console.log( object.aspect + " aspect" );
+
+			if ( Math.abs( scope.focusSize - maxDistance ) > 0.1 ) {
+
+				var delta = new THREE.Vector3( 0, 0, -1 );
+				console.log("mul "+scope.focusSize / maxDistance )
+				var d = distance / (1- scope.focusSize / maxDistance );
+				console.log( d + " Rate" )
+				delta.multiplyScalar( -d );
+
+				delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
+
+				console.log( "the fuck distance " )
+				console.log( delta )
+
+				//object.position.copy( rightDis );
+				object.position.add( delta );
+
+			}
+
+		}
+		object.lookAt( center.copy( box.getCenter() ) );
+
 		scope.dispatchEvent( changeEvent );
 
 	};

@@ -88,7 +88,7 @@ Sidebar.Settings = function ( editor ) {
 
 	if ( config.getKey( 'wheelSpeed' ) !== undefined ) {
 
-		speed = config.getKey( 'wheelSpeed' )
+		speed = config.getKey( 'wheelSpeed' );
 		wheelSpeed.setValue( speed );
 		editor.setWheelSpeed( speed );
 
