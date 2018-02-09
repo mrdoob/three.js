@@ -35,6 +35,64 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isLine: true,
 
+	computeLineDistances: ( function () {
+
+		var start = new Vector3();
+		var end = new Vector3();
+
+		return function computeLineDistances() {
+
+			var geometry = this.geometry;
+
+			if ( geometry.isBufferGeometry ) {
+
+				// we assume non-indexed geometry
+
+				if ( geometry.index === null ) {
+
+					var positionAttribute = geometry.attributes.position;
+					var lineDistances = [ 0 ];
+
+					for ( var i = 1, l = positionAttribute.count; i < l; i ++ ) {
+
+						start.fromBufferAttribute( positionAttribute, i - 1 );
+						end.fromBufferAttribute( positionAttribute, i );
+
+						lineDistances[ i ] = lineDistances[ i - 1 ];
+						lineDistances[ i ] += start.distanceTo( end );
+
+					}
+
+					geometry.addAttribute( 'lineDistance', new THREE.Float32BufferAttribute( lineDistances, 1 ) );
+
+				} else {
+
+					console.warn( 'THREE.Line.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.' );
+
+				}
+
+			} else if ( geometry.isGeometry ) {
+
+				var vertices = geometry.vertices;
+				var lineDistances = geometry.lineDistances;
+
+				lineDistances[ 0 ] = 0;
+
+				for ( var i = 1, l = vertices.length; i < l; i ++ ) {
+
+					lineDistances[ i ] = lineDistances[ i - 1 ];
+					lineDistances[ i ] += vertices[ i - 1 ].distanceTo( vertices[ i ] );
+
+				}
+
+			}
+
+			return this;
+
+		};
+
+	}() ),
+
 	raycast: ( function () {
 
 		var inverseMatrix = new Matrix4();
