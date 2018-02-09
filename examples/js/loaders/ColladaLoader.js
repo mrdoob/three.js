@@ -1062,6 +1062,10 @@ THREE.ColladaLoader.prototype = {
 					case 'technique':
 						data.technique = parseEffectTechnique( child );
 						break;
+						
+					case 'extra':
+                        			data.extra = parseEffectExtra( child );
+                        			break;
 
 				}
 
@@ -1328,6 +1332,54 @@ THREE.ColladaLoader.prototype = {
 			}
 
 		}
+		
+		function parseEffectExtra( xml ) {
+ 
+            		var data = {};
+ 
+            		for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+ 
+                		var child = xml.childNodes[ i ];
+ 
+                		if ( child.nodeType !== 1 ) continue;
+ 
+                		switch ( child.nodeName ) {
+ 
+                    		case 'technique':
+                        		data.technique = parseEffectExtraTechnique( child );
+                        		break;
+ 
+                		}
+ 
+            		}
+ 
+            		return data;
+ 
+        	}
+        
+        	function parseEffectExtraTechnique( xml ) {
+ 
+            		var data = {};
+ 
+            		for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+ 
+                		var child = xml.childNodes[ i ];
+ 
+                		if ( child.nodeType !== 1 ) continue;
+ 
+                		switch ( child.nodeName ) {
+ 
+                    		case 'double_sided':
+                    			data[ child.nodeName ] = parseInt( child.textContent );
+                    			break;
+ 
+                		}
+ 
+            		}
+ 
+            		return data;
+ 
+        	}
 
 		function buildEffect( data ) {
 
@@ -1373,7 +1425,8 @@ THREE.ColladaLoader.prototype = {
 
 			var effect = getEffect( data.url );
 			var technique = effect.profile.technique;
-
+			var extra = effect.profile.extra;
+			
 			var material;
 
 			switch ( technique.type ) {
@@ -1544,6 +1597,16 @@ THREE.ColladaLoader.prototype = {
 				}
 
 			}
+			
+			if ( extra !== undefined && extra.technique !== undefined && isEmpty( extra.technique ) === false ) {
+                
+                		if ( extra.technique.double_sided !== undefined && extra.technique.double_sided === 1 ) {
+                    			
+					material.side = THREE.DoubleSide;
+ 
+                		}
+ 
+            		}
 
 			return material;
 
