@@ -188,7 +188,8 @@ THREE.Lensflare = function () {
 
 	this.dispose = function () {
 
-		material1.dispose();
+		material1a.dispose();
+		material1b.dispose();
 		material2.dispose();
 
 		tempMap.dispose();
