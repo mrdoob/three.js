@@ -14,8 +14,6 @@
 
 		<div class="desc">
 			Creates a simulated lens flare that tracks a light.<br /><br />
-
-			Note: [page:WebGLRenderer.alpha] must be set to *true* for LensFlare to work.
 		</div>
 
 		<h2>Example</h2>
@@ -32,13 +30,13 @@ var textureFlare0 = textureLoader.load( "textures/lensflare/lensflare0.png" );
 var textureFlare1 = textureLoader.load( "textures/lensflare/lensflare2.png" );
 var textureFlare2 = textureLoader.load( "textures/lensflare/lensflare3.png" );
 
-var lensFlare = new THREE.LensFlare();
+var lensflare = new THREE.Lensflare();
 
-lensFlare.add( new THREE.LensFlareElement( textureFlare0, 512, 0 ) );
-lensFlare.add( new THREE.LensFlareElement( textureFlare1, 512, 0 ) );
-lensFlare.add( new THREE.LensFlareElement( textureFlare2, 60, 0.6 ) );
+lensflare.add( new THREE.LensflareElement( textureFlare0, 512, 0 ) );
+lensflare.add( new THREE.LensflareElement( textureFlare1, 512, 0 ) );
+lensflare.add( new THREE.LensflareElement( textureFlare2, 60, 0.6 ) );
 
-light.add( lensFlare );
+light.add( lensflare );
 			</code>
 
 		</div>
@@ -46,7 +44,7 @@ light.add( lensFlare );
 		<h2>Constructor</h2>
 
 
-		<h3>LensFlareElement( [page:Texture texture], [page:Float size], [page:Float distance], [page:Color color], [page:Materials blending] )</h3>
+		<h3>LensflareElement( [page:Texture texture], [page:Float size], [page:Float distance], [page:Color color], [page:Materials blending] )</h3>
 		<div>
 		[page:Texture texture] - THREE.Texture to use for the flare. <br />
 		[page:Float size] - (optional) size in pixels <br />
@@ -68,6 +66,6 @@ light.add( lensFlare );
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/objects/LensFlare.js examples/js/objects/LensFlare.js]
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/objects/Lensflare.js examples/js/objects/Lensflare.js]
 	</body>
 </html>
