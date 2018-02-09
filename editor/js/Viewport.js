@@ -296,6 +296,12 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.changeWheelSpeed.add( function ( value ) {
+
+		controls.wheelSpeed = value;
+
+	} );
+
 	signals.transformModeChanged.add( function ( mode ) {
 
 		transformControls.setMode( mode );

@@ -20,7 +20,7 @@ THREE.EditorControls = function ( object, domElement ) {
 	this.panSpeed = 0.001;
 	this.zoomSpeed = 0.001;
 	this.rotationSpeed = 0.005;
-
+	this.wheelSpeed = 100;
 	// internals
 
 	var scope = this;
@@ -165,7 +165,14 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		} else if ( state === STATE.ZOOM ) {
 
-			scope.zoom( new THREE.Vector3( 0, 0, movementY - movementX ) );
+			if ( scope.cameraCtrlType == scope.CAMERACTRLTYPE.MAYA ) {
+
+				scope.zoom( new THREE.Vector3( 0, 0, -movementY - movementX ) );
+
+			} else {
+
+				scope.zoom( new THREE.Vector3( 0, 0, movementY - movementX ) );
+			}
 
 		} else if ( state === STATE.PAN ) {
 
@@ -194,7 +201,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		// if ( scope.enabled === false ) return;
 
-		scope.zoom( new THREE.Vector3( 0, 0, event.deltaY ) );
+		scope.zoom( new THREE.Vector3( 0, 0, event.deltaY * scope.wheelSpeed ) );
 
 	}
 

@@ -70,7 +70,8 @@ var Editor = function () {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		changeCameraCtrlType: new Signal()
+		changeCameraCtrlType: new Signal(),
+		changeWheelSpeed: new Signal()
 
 	};
 
@@ -107,11 +108,19 @@ Editor.prototype = {
 		this.signals.themeChanged.dispatch( value );
 
 	},
+
 	setCamerCtrlType: function ( value ) {
 
 		this.signals.changeCameraCtrlType.dispatch( value );
 
 	},
+
+	setWheelSpeed: function ( value ) {
+
+		this.signals.changeWheelSpeed.dispatch( value );
+
+	},
+
 	//
 
 	setScene: function ( scene ) {

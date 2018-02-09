@@ -4,6 +4,7 @@
 
 Sidebar.Settings = function ( editor ) {
 
+	var wheelSpeed = 100;
 	var config = editor.config;
 	var signals = editor.signals;
 
@@ -56,7 +57,9 @@ Sidebar.Settings = function ( editor ) {
 
 	if ( config.getKey( 'cameraCtrlType' ) !== undefined ) {
 
-		type.setValue( config.getKey( 'cameraCtrlType' ) );
+		var v = config.getKey( 'cameraCtrlType' );
+		type.setValue( v );
+		editor.setCamerCtrlType( v );
 
 	} else {
 
@@ -77,6 +80,34 @@ Sidebar.Settings = function ( editor ) {
 	typeRow.add( type );
 
 	container.add( typeRow )
+
+	//wheel speed
+	var speed = 100;
+	var speedRow = new UI.Row();
+	var wheelSpeed = new UI.Number( speed ).setRange( 1, 300 );
+
+	if ( config.getKey( 'wheelSpeed' ) !== undefined ) {
+
+		speed = config.getKey( 'wheelSpeed' )
+		wheelSpeed.setValue( speed );
+		editor.setWheelSpeed( speed );
+
+	} else {
+		speed = 100;
+		wheelSpeed.setValue( 100 );
+	}
+
+	wheelSpeed.onChange( function () {
+		speed = this.value;
+		editor.setWheelSpeed( speed );
+		editor.config.setKey( 'wheelSpeed', speed );
+
+	} );
+
+	speedRow.add( new UI.Text( 'wheelSpeed' ).setWidth( '90px' ) );
+	speedRow.add( wheelSpeed );
+
+	container.add( speedRow );
 
 	container.add( new Sidebar.Settings.Shortcuts( editor ) );
 	container.add( new Sidebar.Settings.Viewport( editor ) );
