@@ -38,8 +38,7 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 
 	this.prepareMaskMaterial = this.getPrepareMaskMaterial();
 	this.prepareMaskMaterial.side = THREE.DoubleSide;
-	if ( this.renderCamera.isPerspectiveCamera ) this.prepareMaskMaterial.defines[ "CAMERA_TYPE_PERSPECTIVE" ] = "";
-	else if ( this.renderCamera.isOrthographicCamera ) this.prepareMaskMaterial.defines[ "CAMERA_TYPE_ORTHOGRAPHIC" ] = "";
+	this.prepareMaskMaterial.fragmentShader = replaceDepthToViewZ( this.prepareMaskMaterial.fragmentShader, this.renderCamera );
 
 	this.renderTargetDepthBuffer = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, pars );
 	this.renderTargetDepthBuffer.texture.name = "OutlinePass.depth";
@@ -112,6 +111,14 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	this.tempPulseColor1 = new THREE.Color();
 	this.tempPulseColor2 = new THREE.Color();
 	this.textureMatrix = new THREE.Matrix4();
+
+	function replaceDepthToViewZ( string, camera ) {
+
+		var type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
+
+		return string.replace( /DEPTH_TO_VIEW_Z/g, type + 'DepthToViewZ' );
+
+	}
 
 };
 
@@ -374,12 +381,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 				'void main() {',
 
 				'	float depth = unpackRGBAToDepth(texture2DProj( depthTexture, projTexCoord ));',
-				'	float viewZ;',
-				'	#ifdef CAMERA_TYPE_PERSPECTIVE',
-				'		viewZ = -perspectiveDepthToViewZ( depth, cameraNearFar.x, cameraNearFar.y );',
-				'	#elif defined( CAMERA_TYPE_ORTHOGRAPHIC )',
-				'		viewZ = -orthographicDepthToViewZ( depth, cameraNearFar.x, cameraNearFar.y );',
-				'	#endif',
+				'	float viewZ = - DEPTH_TO_VIEW_Z( depth, cameraNearFar.x, cameraNearFar.y );',
 				'	float depthTest = (-vPosition.z > viewZ) ? 1.0 : 0.0;',
 				'	gl_FragColor = vec4(0.0, depthTest, 1.0, 1.0);',
 
