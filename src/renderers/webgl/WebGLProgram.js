@@ -158,21 +158,57 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 }
 
-function parseIncludes( string ) {
+function parseIncludes( string, stack, stackMap, alreadyIncluded ) {
 
-	var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
+	var pattern = /^[ \t]*#include(_once|) +<([\w\d.]+)>/gm;
 
-	function replace( match, include ) {
+	if ( stack === undefined ) {
+
+		stack = [];
+		alreadyIncluded = {};
+		stackMap = {};
+
+	}
+
+	function replace( match, once, include ) {
+
+		if ( once.length !== 0 && alreadyIncluded[ include ] === true ) {
+
+			return '';
+
+		}
+
+		if ( stackMap[ include ] === true ) {
+
+			throw new Error(
+				'Circular #include' + once + ' <' + include + '> detected!\n(\n\t' + stack.join( '\n\t' ) + '\n)'
+			);
+
+		}
 
 		var replace = ShaderChunk[ include ];
 
 		if ( replace === undefined ) {
 
-			throw new Error( 'Can not resolve #include <' + include + '>' );
+			throw new Error(
+				'Can not resolve #include' + once + ' <' + include + '>'
+					+ ( stack.length !== 0 ? '\n(\n\t' + stack.join( '\n\t' ) + '\n)' : '' )
+			);
+
+		} else {
+
+			alreadyIncluded[ include ] = true;
 
 		}
 
-		return parseIncludes( replace );
+		stack.push( include );
+		stackMap[ include ] = true;
+		alreadyIncluded[ include ] = true;
+		var result = parseIncludes( replace, stack, stackMap, alreadyIncluded );
+		stack.pop();
+		stackMap[ include ] = false;
+
+		return result;
 
 	}
 
@@ -678,4 +714,4 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 }
 
-export { WebGLProgram };
+export { WebGLProgram, parseIncludes };
