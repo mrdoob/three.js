@@ -6,7 +6,6 @@ uniform float opacity;
 #include <fog_pars_fragment>
 #include <bsdfs>
 #include <begin_lights_pars>
-#include <maps_lights_pars>
 #include <shadowmap_pars_fragment>
 #include <shadowmask_pars_fragment>
 
