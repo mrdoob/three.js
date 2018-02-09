@@ -158,7 +158,7 @@
 
 		<h3>[method:null validate] ( [page:Function functionCodeBuilder], Array of [page:String libLocations], [page:String libPath], [page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] )</h3>
 		<div>
-			[page:Function functionCodeBuilder] - Function that is invoked with funcBuildObject and funcBuildSingelton that allows stringification of objects and singletons.<br>
+			[page:Function functionCodeBuilder] - Function that is invoked with funcBuildObject and funcBuildSingleton that allows stringification of objects and singletons.<br>
 			Array of [page:String libLocations] - URL of libraries that shall be added to worker code relative to libPath.<br>
 			[page:String libPath] - Base path used for loading libraries.<br>
 			[page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] - The default worker parser wrapper implementation (communication and execution). An extended class could be passed here.
@@ -405,12 +405,35 @@
 			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
 		</div>
 		<div>
-			Base class to be used by loaders.
+			Base class to be used by Loaders that provide load, parse, parseAsync and run
 		</div>
 
 
 		<h2>Methods</h2>
-
+		
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError], [page:Function onMeshAlter], [page:boolean useAsync] )</h3>
+		<div>
+			[page:String url] - A string containing the path/URL of the file to be loaded.<br>
+			[page:Function onLoad] - A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br>
+			[page:Function onProgress] - (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br>
+			[page:Function onError] - (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br>
+			[page:Function onMeshAlter] - (optional) A function to be called after a new mesh raw data becomes available for alteration.<br>
+			[page:boolean useAsync] - (optional) If true, uses async loading with worker, if false loads data synchronously.
+		</div>
+		<div>
+			Use this convenient method to load a file at the given URL. By default the fileLoader uses an ArrayBuffer.
+		</div>
+		
+		<h3>[method:ConsoleLogger checkResourceDescriptorFiles] ( [page:THREE.LoaderSupport.ResourceDescriptor resources], [page:Object fileDesc] )</h3>
+		<div>
+			[page:THREE.LoaderSupport.ResourceDescriptor resources] - Array of {@link THREE.LoaderSupport.ResourceDescriptor}
+			[page:Object fileDesc] - Object describing which resources are of interest (ext, type (string or UInt8Array) and ignore (boolean))
+		</div>
+		<div>
+			Identify files or content of interest from an Array of {@link THREE.LoaderSupport.ResourceDescriptor}. Returns Object with each "ext" and the corresponding {@link THREE.LoaderSupport.ResourceDescriptor}
+	 	</div>
+		
+		
 		<h3>[method:ConsoleLogger getLogger] ()</h3>
 		<div>
 			Returns [page:LoaderSupport.ConsoleLogger].
@@ -608,36 +631,40 @@
 		</div>
 
 
-		<h3>[method:null logDebug]( [page:String message] )</h3>
+		<h3>[method:null logDebug]( [page:String message], Array of [page:String additional] )</h3>
 		<div>
 			[page:String message] - Message to log
+			Array of [page:String additional] - Array of [page:String strings] containing additional content to be logged
 		</div>
 		<div>
 			Log a debug message if enabled and debug is set.
 		</div>
 
 
-		<h3>[method:null logInfo]( [page:String message] )</h3>
+		<h3>[method:null logInfo]( [page:String message], Array of [page:String additional] )</h3>
 		<div>
 			[page:String message] - Message to log
+			Array of [page:String additional] - Array of [page:String strings] containing additional content to be logged
 		</div>
 		<div>
 			Log an info message if enabled.
 		</div>
 
 
-		<h3>[method:null logWarn]( [page:String message] )</h3>
+		<h3>[method:null logWarn]( [page:String message], Array of [page:String additional] )</h3>
 		<div>
 			[page:String message] - Message to log
+			Array of [page:String additional] - Array of [page:String strings] containing additional content to be logged
 		</div>
 		<div>
 			Log a warn message (always).
 		</div>
 
 
-		<h3>[method:null logError]( [page:String message] )</h3>
+		<h3>[method:null logError]( [page:String message], Array of [page:String additional] )</h3>
 		<div>
 			[page:String message] - Message to log
+			Array of [page:String additional] - Array of [page:String strings] containing additional content to be logged
 		</div>
 		<div>
 			Log an error message (always).
