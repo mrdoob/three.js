@@ -17,7 +17,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/objects/LensFlare.js"></script>
+		<script src="js/objects/Lensflare.js"></script>
 		<script src="js/objects/Reflector.js"></script>
 
 		<script src="js/vr/WebVR.js"></script>
@@ -94,12 +94,12 @@
 				var texture2 = loader.load( "textures/lensflare/lensflare2.png" );
 				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
 
-				var lensFlare = new THREE.LensFlare();
-				lensFlare.add( new THREE.LensFlareElement( texture0, 700, 0 ) );
-				lensFlare.add( new THREE.LensFlareElement( texture3, 60, 0.6 ) );
-				lensFlare.add( new THREE.LensFlareElement( texture3, 70, 0.7 ) );
-				lensFlare.add( new THREE.LensFlareElement( texture3, 120, 0.9 ) );
-				lensFlare.add( new THREE.LensFlareElement( texture3, 70, 1 ) );
+				var lensFlare = new THREE.Lensflare();
+				lensFlare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
+				lensFlare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
+				lensFlare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
+				lensFlare.addElement( new THREE.LensflareElement( texture3, 120, 0.9 ) );
+				lensFlare.addElement( new THREE.LensflareElement( texture3, 70, 1 ) );
 				light.add( lensFlare );
 
 				//
