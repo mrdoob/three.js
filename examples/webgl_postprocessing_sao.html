@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 	<head>
 		<title>three.js webgl - post processing - Scalable Ambient Occlusion (SAO)</title>
@@ -35,15 +34,15 @@
 	<body>
 		<script src="../build/three.js"></script>
 
-        <script src="js/postprocessing/EffectComposer.js"></script>
+    <script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/SAOPass.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/SAOShader.js"></script>
-        <script src="js/shaders/DepthLimitedBlurShader.js"></script>
-        <script src="js/shaders/UnpackDepthRGBAShader.js"></script>
+    <script src="js/shaders/DepthLimitedBlurShader.js"></script>
+    <script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -126,6 +125,7 @@
 				scene.add( light3 );
 
 				var geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
+
 				for ( var i = 0; i < 120; i ++ ) {
 
 					var material = new THREE.MeshStandardMaterial();
@@ -143,38 +143,40 @@
 
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 0.2 + 0.05;
 					group.add( mesh );
+
 				}
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				composer = new THREE.EffectComposer(renderer);
-				renderPass = new THREE.RenderPass(scene, camera);
-				composer.addPass(renderPass);
-				saoPass = new THREE.SAOPass(scene, camera, false, true);
+				composer = new THREE.EffectComposer( renderer );
+				renderPass = new THREE.RenderPass( scene, camera );
+				composer.addPass( renderPass );
+				saoPass = new THREE.SAOPass( scene, camera, false, true );
 				saoPass.renderToScreen = true;
-				composer.addPass(saoPass);
+				composer.addPass( saoPass );
 
 				// Init gui
 				var gui = new dat.GUI();
-				gui.add( saoPass.params, "output", {
+				gui.add( saoPass.params, 'output', {
 					'Beauty': THREE.SAOPass.OUTPUT.Beauty,
 					'Beauty+SAO': THREE.SAOPass.OUTPUT.Default,
 					'SAO': THREE.SAOPass.OUTPUT.SAO,
 					'Depth': THREE.SAOPass.OUTPUT.Depth,
 					'Normal': THREE.SAOPass.OUTPUT.Normal
-				});
-				gui.add( saoPass.params, "saoBias", -1, 1 );
-				gui.add( saoPass.params, "saoIntensity", 0, 1 );
-				gui.add( saoPass.params, "saoScale", 0, 10 );
-				gui.add( saoPass.params, "saoKernelRadius", 1, 100 );
-				gui.add( saoPass.params, "saoMinResolution", 0, 1 );
-				gui.add( saoPass.params, "saoBlur" );
-				gui.add( saoPass.params, "saoBlurRadius", 0, 200 );
-				gui.add( saoPass.params, "saoBlurStdDev", 0.5, 150 );
-				gui.add( saoPass.params, "saoBlurDepthCutoff", 0.0, 0.1 );
+				} ).onChange( function ( value ) { saoPass.params.output = parseInt( value ); } );
+				gui.add( saoPass.params, 'saoBias', - 1, 1 );
+				gui.add( saoPass.params, 'saoIntensity', 0, 1 );
+				gui.add( saoPass.params, 'saoScale', 0, 10 );
+				gui.add( saoPass.params, 'saoKernelRadius', 1, 100 );
+				gui.add( saoPass.params, 'saoMinResolution', 0, 1 );
+				gui.add( saoPass.params, 'saoBlur' );
+				gui.add( saoPass.params, 'saoBlurRadius', 0, 200 );
+				gui.add( saoPass.params, 'saoBlurStdDev', 0.5, 150 );
+				gui.add( saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1 );
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
 			function onWindowResize() {
@@ -187,27 +189,29 @@
 				camera.updateProjectionMatrix();
 				renderer.setSize( width, height );
 
-                composer.setSize( width, height );
+        composer.setSize( width, height );
 
 
 			}
 
 			function animate() {
+
 				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();
 				stats.end();
+
 			}
 
-			var prevStdDev, prevNumSamples;
-
 			function render() {
+
 				var timer = performance.now();
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 
 				composer.render();
+
 			}
 
 		</script>
