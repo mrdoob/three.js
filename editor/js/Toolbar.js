@@ -42,6 +42,14 @@ var Toolbar = function ( editor ) {
 	} );
 	buttons.add( scale );
 
+	var local = new UI.THREE.Boolean( false, 'local' )
+	local.onChange( function () {
+
+		signals.spaceChanged.dispatch( this.getValue() === true ? 'local' : 'world' );
+
+	} );
+	buttons.add( local );
+
 	signals.transformModeChanged.add( function ( mode ) {
 
 		translate.dom.classList.remove( 'selected' );

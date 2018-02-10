@@ -29,6 +29,14 @@ Object.defineProperties( THREE.FloatNode.prototype, {
 	}
 } );
 
+THREE.FloatNode.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
+
+	var value = this.number;
+
+	return builder.format( Math.floor( value ) !== value ? value : value + ".0", type, output );
+
+};
+
 THREE.FloatNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -38,6 +46,8 @@ THREE.FloatNode.prototype.toJSON = function ( meta ) {
 		data = this.createJSONNode( meta );
 
 		data.number = this.number;
+
+		if ( this.readonly === true ) data.readonly = true;
 
 	}
 

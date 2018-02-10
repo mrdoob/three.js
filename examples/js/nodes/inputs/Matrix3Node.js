@@ -14,6 +14,12 @@ THREE.Matrix3Node.prototype = Object.create( THREE.InputNode.prototype );
 THREE.Matrix3Node.prototype.constructor = THREE.Matrix3Node;
 THREE.Matrix3Node.prototype.nodeType = "Matrix3";
 
+THREE.Matrix3Node.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
+
+	return builder.format( "mat3( " + this.value.elements.join( ", " ) + " )", type, output );
+
+};
+
 THREE.Matrix3Node.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -23,6 +29,8 @@ THREE.Matrix3Node.prototype.toJSON = function ( meta ) {
 		data = this.createJSONNode( meta );
 
 		data.elements = this.value.elements.concat();
+
+		if ( this.readonly === true ) data.readonly = true;
 
 	}
 

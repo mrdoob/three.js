@@ -3,11 +3,11 @@
  */
 /* global QUnit */
 
-import * as LensFlare from '../../../../examples/js/objects/LensFlare';
+import * as Lensflare from '../../../../examples/js/objects/Lensflare';
 
 export default QUnit.module( 'Objects', () => {
 
-	QUnit.module( 'LensFlare', () => {
+	QUnit.module( 'Lensflare', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {
@@ -18,31 +18,6 @@ export default QUnit.module( 'Objects', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		// PUBLIC STUFF
-		QUnit.todo( "isLensFlare", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "copy", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "add", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "updateLensFlares", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

@@ -51,6 +51,7 @@
 		<script src="js/nodes/FunctionCallNode.js"></script>
 		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
 		<!-- Accessors -->
@@ -94,7 +95,9 @@
 			var camera, scene, renderer, composer;
 			var object, light, nodepass;
 			var gui, guiElements = [];
+
 			var clock = new THREE.Clock();
+			var frame = new THREE.NodeFrame();
 
 			var param = { example: 'color-adjustment' };
 
@@ -588,7 +591,7 @@
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;
 
-				nodepass.node.updateFrame( delta );
+				frame.update( delta ).updateNode( nodepass.node );
 
 				composer.render();
 

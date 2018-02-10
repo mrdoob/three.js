@@ -43,7 +43,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FlyControls.js"></script>
-		<script src="js/objects/LensFlare.js"></script>
+		<script src="js/objects/Lensflare.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -137,16 +137,13 @@
 					light.position.set( x, y, z );
 					scene.add( light );
 
-					var flareColor = new THREE.Color( 0xffffff );
-					flareColor.setHSL( h, s, l );
-
-					var lensFlare = new THREE.LensFlare();
-					lensFlare.add( new THREE.LensFlareElement( textureFlare0, 700, 0, flareColor ) );
-					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 60, 0.6 ) );
-					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 70, 0.7 ) );
-					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 120, 0.9 ) );
-					lensFlare.add( new THREE.LensFlareElement( textureFlare3, 70, 1 ) );
-					light.add( lensFlare );
+					var lensflare = new THREE.Lensflare();
+					lensflare.addElement( new THREE.LensflareElement( textureFlare0, 700, 0, light.color ) );
+					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 60, 0.6 ) );
+					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 70, 0.7 ) );
+					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 120, 0.9 ) );
+					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 70, 1 ) );
+					light.add( lensflare );
 
 				}
 

@@ -125,7 +125,14 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 				this.names[ object.name ] = object;
 
+			} else {
+
+				// ignore "uniform" shader input ( for optimization )
+				object.readonly = true;
+
 			}
+
+			if ( node.readonly !== undefined ) object.readonly = node.readonly;
 
 			this.nodes[ uuid ] = object;
 
@@ -270,6 +277,7 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 				case "PositionNode":
 				case "NormalNode":
 				case "ReflectNode":
+				case "LightNode":
 
 					object.scope = node.scope;
 
@@ -372,6 +380,7 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 				case "TimerNode":
 
+					object.scope = node.scope;
 					object.scale = node.scale;
 
 					break;
@@ -462,7 +471,6 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 					break;
 
-				case "LightNode":
 				case "RoughnessToBlinnExponentNode":
 					break;
 
