@@ -182,7 +182,7 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 			"#include <common>",
 			"#include <fog_pars_fragment>",
 			"#include <bsdfs>",
-			"#include <begin_lights_pars>",
+			"#include <lights_pars_begin>",
 			"#include <lights_physical_pars_fragment>",
 			"#include <shadowmap_pars_fragment>",
 			"#include <logdepthbuf_pars_fragment>",
@@ -287,8 +287,8 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 		}
 
 		output.push(
-			"#include <begin_lights_fragment>",
-			"#include <end_lights_fragment>"
+			"#include <lights_fragment_begin>",
+			"#include <lights_fragment_end>"
 		);
 
 		if ( light ) {

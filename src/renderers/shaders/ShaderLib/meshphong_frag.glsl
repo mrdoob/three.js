@@ -21,8 +21,8 @@ uniform float opacity;
 #include <gradientmap_pars_fragment>
 #include <fog_pars_fragment>
 #include <bsdfs>
-#include <begin_lights_pars>
-#include <maps_lights_pars>
+#include <lights_pars_begin>
+#include <lights_pars_maps>
 #include <lights_phong_pars_fragment>
 #include <shadowmap_pars_fragment>
 #include <bumpmap_pars_fragment>
@@ -50,9 +50,9 @@ void main() {
 
 	// accumulation
 	#include <lights_phong_fragment>
-	#include <begin_lights_fragment>
-	#include <maps_lights_fragment>
-	#include <end_lights_fragment>
+	#include <lights_fragment_begin>
+	#include <lights_fragment_maps>
+	#include <lights_fragment_end>
 
 	// modulation
 	#include <aomap_fragment>
