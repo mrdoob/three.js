@@ -195,10 +195,6 @@ function parseIncludes( string, stack, stackMap, alreadyIncluded ) {
 					+ ( stack.length !== 0 ? '\n(\n\t' + stack.join( '\n\t' ) + '\n)' : '' )
 			);
 
-		} else {
-
-			alreadyIncluded[ include ] = true;
-
 		}
 
 		stack.push( include );
