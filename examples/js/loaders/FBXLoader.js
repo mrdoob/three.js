@@ -1097,7 +1097,16 @@
 
 		if ( normalBuffer.length > 0 ) {
 
-			geo.addAttribute( 'normal', new THREE.Float32BufferAttribute( normalBuffer, 3 ) );
+			var normalAttribute = new THREE.Float32BufferAttribute( normalBuffer, 3 );
+
+			var normalsPreTransform = preTransform.clone().setPosition( new THREE.Vector3() );
+
+			// required when preTransform has a non-uniform scale component
+			normalsPreTransform.getInverse( normalsPreTransform ).transpose();
+
+			normalsPreTransform.applyToBufferAttribute( normalAttribute );
+
+			geo.addAttribute( 'normal', normalAttribute );
 
 		}
 
