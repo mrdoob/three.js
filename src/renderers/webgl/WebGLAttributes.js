@@ -123,6 +123,19 @@ function WebGLAttributes( gl ) {
 
 	function update( attribute, bufferType ) {
 
+		if (attribute.isDynamicBufferAttribute) {
+
+			buffers[ attribute.uuid ] = {
+				buffer: attribute.buffer,
+				type: attribute.type,
+				bytesPerElement: attribute.elementSize,
+				version: attribute.version
+			};
+
+			return;
+
+		}
+
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
 		var data = buffers[ attribute.uuid ];
