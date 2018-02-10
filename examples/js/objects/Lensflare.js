@@ -9,6 +9,7 @@ THREE.Lensflare = function () {
 
 	this.type = 'Lensflare';
 	this.frustumCulled = false;
+	this.renderOrder = Infinity;
 
 	//
 
