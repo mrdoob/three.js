@@ -295,7 +295,11 @@ var Viewport = function ( editor ) {
 		controls.cameraCtrlType = type;
 
 	} );
+	signals.changeFocusSize.add( function ( value ) {
 
+		controls.focusSize = value;
+
+	} )
 	signals.changeWheelSpeed.add( function ( value ) {
 
 		controls.wheelSpeed = value;

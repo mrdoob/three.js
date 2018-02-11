@@ -71,7 +71,8 @@ var Editor = function () {
 		historyChanged: new Signal(),
 
 		changeCameraCtrlType: new Signal(),
-		changeWheelSpeed: new Signal()
+		changeWheelSpeed: new Signal(),
+		changeFocusSize: new Signal(),
 
 	};
 
@@ -106,18 +107,6 @@ Editor.prototype = {
 		document.getElementById( 'theme' ).href = value;
 
 		this.signals.themeChanged.dispatch( value );
-
-	},
-
-	setCamerCtrlType: function ( value ) {
-
-		this.signals.changeCameraCtrlType.dispatch( value );
-
-	},
-
-	setWheelSpeed: function ( value ) {
-
-		this.signals.changeWheelSpeed.dispatch( value );
 
 	},
 

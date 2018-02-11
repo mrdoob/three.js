@@ -14,7 +14,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		MAYA: 1
 	};
 	// API
-	this.focusSize = 0.65; //right ok
+	this.focusSize = 0.8; //right ok !!screenspace is between(-1 ,1)
 	this.cameraCtrlType = this.CAMERACTRLTYPE.DEFAULT; //default 0; maya 1;
 	this.enabled = true;
 	this.center = new THREE.Vector3();
@@ -51,17 +51,16 @@ THREE.EditorControls = function ( object, domElement ) {
 	this.focus = function ( target ) {
 
 		var box = new THREE.Box3().setFromObject( target );
-
 		object.lookAt( center.copy( box.getCenter() ) );
+		object.updateMatrix();
 
 		if ( scope.cameraCtrlType == scope.CAMERACTRLTYPE.MAYA ) {
-
+			var focusSize=scope.focusSize*2;
 			var distance = object.position.distanceTo( center );
-
 			var size = box.getSize().multiplyScalar( 0.5 ); //length width height
 			var c = box.getCenter(); //box pos
 			var toCamMatrix = object.matrixWorldInverse
-
+			
 			var worldVerters = []
 			worldVerters.push( new THREE.Vector3( c.x - size.x, c.y + size.y, c.z - size.z ) );
 			worldVerters.push( new THREE.Vector3( c.x + size.x, c.y + size.y, c.z - size.z ) );
@@ -80,41 +79,28 @@ THREE.EditorControls = function ( object, domElement ) {
 				camVerters.push( new THREE.Vector3( pos.x, pos.y ) );
 
 			}
-
+			
 			var dis = []
 			for ( var i = 0; i < 7; i++ ) {
 				for ( var j = i + 1; j < 8; j++ ) {
 					dis.push( camVerters[ i ].distanceTo( camVerters[ j ] ) );
 				}
 			}
+			dis.sort()
+			var maxSize = dis[ dis.length - 1 ]
 
-			var maxDistance = dis[ dis.length - 1 ]
-
-			console.log( maxDistance + "  maxDis" );
-			console.log( distance + " camer distance" );
-			console.log( object.aspect + " aspect" );
-
-			if ( Math.abs( scope.focusSize - maxDistance ) > 0.1 ) {
+			if ( Math.abs( focusSize - maxSize ) > 0.1 ) {
 
 				var delta = new THREE.Vector3( 0, 0, -1 );
-				console.log("mul "+scope.focusSize / maxDistance )
-				var d = distance / (1- scope.focusSize / maxDistance );
-				console.log( d + " Rate" )
-				delta.multiplyScalar( -d );
-
+				var d = distance * ( 1 - maxSize / focusSize );
+				delta.multiplyScalar( d );
 				delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
-
-				console.log( "the fuck distance " )
-				console.log( delta )
-
-				//object.position.copy( rightDis );
 				object.position.add( delta );
 
 			}
 
 		}
-		object.lookAt( center.copy( box.getCenter() ) );
-
+		
 		scope.dispatchEvent( changeEvent );
 
 	};
