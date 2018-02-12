@@ -24853,7 +24853,7 @@
 
 		update: ( function () {
 
-			var prevTime = 0;
+			var prevTime = Date.now();
 
 			return function () {
 
@@ -24861,9 +24861,9 @@
 
 				if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
 
-					var time = performance.now();
+					var time = Date.now();
 
-					if ( prevTime + ( 1 / this.frameRate ) < time ) {
+					if ( time - prevTime >= ( 1000 / this.frameRate ) ) {
 
 						this.needsUpdate = true;
 						prevTime = time;
