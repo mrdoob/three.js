@@ -15,7 +15,8 @@ The aim of the project is to create an easy to use, lightweight, 3D library. The
 [Documentation](http://threejs.org/docs/) &mdash;
 [Wiki](https://github.com/mrdoob/three.js/wiki) &mdash;
 [Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
-[Help](http://stackoverflow.com/questions/tagged/three.js)
+[Questions](http://stackoverflow.com/questions/tagged/three.js) &mdash;
+[Forum](https://discourse.threejs.org/)
 
 ### Usage ###
 
