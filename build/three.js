@@ -21934,7 +21934,7 @@
 
 		// Rendering
 
-		this.render = function ( scene, camera, renderTarget, forceClear ) {
+		this.render = function ( scene, camera, renderTarget, forceClear, submitVrFrame ) {
 
 			if ( ! ( camera && camera.isCamera ) ) {
 
@@ -22065,7 +22065,7 @@
 
 			scene.onAfterRender( _this, scene, camera );
 
-			if ( vr.enabled ) {
+			if ( vr.enabled && submitVrFrame ) {
 
 				vr.submitFrame();
 

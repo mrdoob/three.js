@@ -21928,7 +21928,7 @@ function WebGLRenderer( parameters ) {
 
 	// Rendering
 
-	this.render = function ( scene, camera, renderTarget, forceClear ) {
+	this.render = function ( scene, camera, renderTarget, forceClear, submitVrFrame ) {
 
 		if ( ! ( camera && camera.isCamera ) ) {
 
@@ -22059,7 +22059,7 @@ function WebGLRenderer( parameters ) {
 
 		scene.onAfterRender( _this, scene, camera );
 
-		if ( vr.enabled ) {
+		if ( vr.enabled && submitVrFrame ) {
 
 			vr.submitFrame();
 
