@@ -142,6 +142,8 @@
 
 					texture = new THREE.VideoTexture( video );
 					texture.minFilter = THREE.NearestFilter;
+					texture.format = THREE.RGBFormat;
+					texture.frameRate = 30;
 
 					var width = 640, height = 480;
 					var nearClipping = 850, farClipping = 4000;
