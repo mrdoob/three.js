@@ -1093,7 +1093,7 @@ function WebGLRenderer( parameters ) {
 
 	// Rendering
 
-	this.render = function ( scene, camera, renderTarget, forceClear, submitVrFrame = true ) {
+	this.render = function ( scene, camera, renderTarget, forceClear, submitVrFrame ) {
 
 		if ( ! ( camera && camera.isCamera ) ) {
 
