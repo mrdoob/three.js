@@ -1118,7 +1118,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		if ( vr.enabled && submitVrFrame ) {
+		if ( vr.enabled ) {
 
 			camera = vr.getCamera( camera );
 
@@ -1224,7 +1224,7 @@ function WebGLRenderer( parameters ) {
 
 		scene.onAfterRender( _this, scene, camera );
 
-		if ( vr.enabled ) {
+		if ( vr.enabled && submitVrFrame ) {
 
 			vr.submitFrame();
 
