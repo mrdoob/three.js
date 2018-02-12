@@ -9,6 +9,7 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.generateMipmaps = false;
+	this.frameRate = 30;
 
 }
 
@@ -18,17 +19,30 @@ VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 
 	isVideoTexture: true,
 
-	update: function () {
+	update: ( function () {
 
-		var video = this.image;
+		var prevTime = 0;
 
-		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+		return function () {
 
-			this.needsUpdate = true;
+			var video = this.image;
+
+			if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+
+				var time = performance.now();
+
+				if ( prevTime + ( 1 / this.frameRate ) < time ) {
+
+					this.needsUpdate = true;
+					prevTime = time;
+
+				}
+
+			}
 
 		}
 
-	}
+	} )()
 
 } );
 
