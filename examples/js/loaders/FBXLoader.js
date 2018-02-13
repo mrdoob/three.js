@@ -1099,13 +1099,6 @@
 
 			var normalAttribute = new THREE.Float32BufferAttribute( normalBuffer, 3 );
 
-			// var normalsPreTransform = preTransform.clone().setPosition( new THREE.Vector3() );
-
-			// // required when preTransform has a non-uniform scale component
-			// normalsPreTransform.getInverse( normalsPreTransform ).transpose();
-
-			// normalsPreTransform.applyToBufferAttribute( normalAttribute );
-
 			var normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
 			normalMatrix.applyToBufferAttribute( normalAttribute );
 
