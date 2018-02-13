@@ -182,7 +182,6 @@ function WebGLRenderer( parameters ) {
 
 		_infoRender.frame ++;
 		_infoRender.calls = 0;
-		_infoRender.vertices = 0;
 		_infoRender.faces = 0;
 		_infoRender.points = 0;
 
