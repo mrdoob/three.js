@@ -112,6 +112,10 @@ function WebVRManager( renderer ) {
 
 			poseObject.position.fromArray( pose.position );
 
+		} else {
+
+			poseObject.position.set( 0, 0, 0 );
+
 		}
 
 		if ( pose.orientation !== null ) {
@@ -128,10 +132,8 @@ function WebVRManager( renderer ) {
 		  standingMatrix.makeTranslation(0, scope.userHeight, 0);
 		}
 
-		standingMatrixInverse.getInverse( standingMatrix );
 		poseObject.position.applyMatrix4( standingMatrix );
 		poseObject.updateMatrixWorld();
-		camera.matrixWorldInverse.multiply( standingMatrixInverse );
 
 		if ( device.isPresenting === false ) return camera;
 
