@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - dynamic cube reflection</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a {
+				color: red;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl dynamic cube reflection demo -
+			Ferrari F50 model by <a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1687" target="_blank" rel="noopener">Daniel Sathya</a><br>
+			Controls: arrow keys & space
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/loaders/GLTFLoader.js"></script>
+		<script src="js/libs/inflate.min.js"></script>
+		<script src="js/loaders/FBXLoader.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/Car.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, light;
+
+			var clock = new THREE.Clock();
+
+			var car, carModel;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20000 );
+				camera.position.set( 0, 3, -12 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 100, 500 );
+
+				light = new THREE.AmbientLight( 0x999999 );
+    		scene.add( light );
+
+				light = new THREE.PointLight( 0xffffff );
+				camera.add( this.light );
+				scene.add( camera );
+
+				// ground
+				var mesh = new THREE.Mesh( new THREE.CircleBufferGeometry( 2000, 12 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				mesh.rotation.x = - Math.PI / 2;
+				scene.add( mesh );
+
+				var grid = new THREE.PolarGridHelper( 2000, 10, 200, 200 );
+				grid.material.opacity = 0.2;
+				grid.material.transparent = true;
+				scene.add( grid );
+
+				var envMap = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Bridge2/')
+					.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+
+
+				car = new THREE.Car();
+
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'models/gltf/f50/f50_blender_new.glb', function ( gltf ) {
+
+					carModel = gltf.scene.children[0];
+
+					var carBodyMat = carModel.getObjectByName( 'body_exterior' ).material;
+					carBodyMat.envMap = envMap;
+					carBodyMat.metalness = 0.25;
+					carBodyMat.roughness = 0.15;
+
+					car.setModel( carModel );
+					scene.add( carModel );
+
+				} );
+
+				renderer = new THREE.WebGLRenderer( {antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize( event ) {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				car.update( delta );
+
+				if ( carModel ) {
+
+					updateCamera( delta );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+			var height = camera.position.y;
+			var damping = 6.0;
+			var distance = -12;
+
+			var cameraTarget = new THREE.Vector3();
+
+			function updateCamera( delta ) {
+
+				carModel.getWorldPosition( cameraTarget );
+				cameraTarget.y = height;
+				cameraTarget.z += distance
+				camera.position.lerp(cameraTarget, delta * damping );
+
+				camera.lookAt( carModel.position );
+			}
+
+		</script>
+
+	</body>
+</html>
