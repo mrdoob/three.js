@@ -85,7 +85,7 @@
 				scene.add( mesh );
 
 				var grid = new THREE.PolarGridHelper( 2000, 10, 200, 200 );
-				grid.material.opacity = 0.2;
+				grid.material.opacity = 0.4;
 				grid.material.transparent = true;
 				scene.add( grid );
 
@@ -99,7 +99,9 @@
 				var loader = new THREE.GLTFLoader();
 				loader.load( 'models/gltf/f50/f50.glb', function ( gltf ) {
 
-					carModel = gltf.scene.children[0];
+          carModel = gltf.scene.children[0];
+
+          console.log( carModel )
 
 					var carBodyMat = carModel.getObjectByName( 'body_exterior' ).material;
 					carBodyMat.envMap = envMap;
@@ -149,7 +151,9 @@
 
 				if ( carModel ) {
 
-					updateCamera( delta );
+          updateCamera( delta );
+
+          resetAtExtremities( carModel );
 
 				}
 
@@ -158,8 +162,8 @@
 			}
 
 			var height = camera.position.y;
-			var damping = 6.0;
-			var distance = -12;
+			var damping = 5.0;
+			var distance = -9;
 
 			var cameraTarget = new THREE.Vector3();
 
@@ -167,11 +171,32 @@
 
 				carModel.getWorldPosition( cameraTarget );
 				cameraTarget.y = height;
-				cameraTarget.z += distance
+        cameraTarget.z += distance;
+
 				camera.position.lerp(cameraTarget, delta * damping );
 
-				camera.lookAt( carModel.position );
-			}
+        camera.lookAt( carModel.position );
+
+      }
+
+      var initialPos = null;
+
+      function resetAtExtremities( object ) {
+
+        if( initialPos === null ) {
+
+          initialPos = object.position.clone();
+
+        }
+
+        else if ( initialPos.distanceTo( object.position ) > 1500 ) {
+
+          object.position.copy( initialPos );
+          car.speed = 0;
+
+        }
+
+      }
 
 		</script>
 
