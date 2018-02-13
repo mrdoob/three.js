@@ -124,12 +124,18 @@
 
 				var posAttr = new THREE.DynamicBufferAttribute( gl, pos, gl.FLOAT, 3, particles );
 				geometry.addAttribute( 'position', posAttr );
-				
+
 				setInterval(function () {
 					posAttr.buffer = (posAttr.buffer === pos) ? pos2 : pos;
 					posAttr.needsUpdate = true;
 				}, 2000);
-				
+
+				var drawCount = 0;
+				setInterval(function () {
+					drawCount = 1 + (drawCount + Math.floor(1000 * Math.random())) % particles;
+					geometry.setDrawRange(0, drawCount);
+				}, 20);
+
 				geometry.addAttribute( 'color', new THREE.DynamicBufferAttribute( gl, rgb, gl.FLOAT, 3, particles ) );
 
 				geometry.computeBoundingSphere();

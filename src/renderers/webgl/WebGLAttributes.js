@@ -125,6 +125,12 @@ function WebGLAttributes( gl ) {
 
 		if (attribute.isDynamicBufferAttribute) {
 
+			var cached = buffers[ attribute.uuid ];
+
+			if (cached && cached.version >= attribute.version) {
+				return;
+			}
+
 			buffers[ attribute.uuid ] = {
 				buffer: attribute.buffer,
 				type: attribute.type,
