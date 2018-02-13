@@ -93,9 +93,15 @@ THREE.LoaderSupport.ConsoleLogger = (function () {
 	 * @memberOf THREE.LoaderSupport.ConsoleLogger
 	 *
 	 * @param {string} message Message to log
+	 * @param {string[]} additional Array of strings containing additional content to be logged
+	 *
 	 */
-	ConsoleLogger.prototype.logDebug = function ( message ) {
-		if ( this.enabled && this.debug ) console.info( message );
+	ConsoleLogger.prototype.logDebug = function ( message, additional ) {
+		if ( this.enabled && this.debug ) {
+
+			this._createStatement( message, 'Additional content:', additional, function ( output ) { console.debug( output ) } );
+
+		}
 	};
 
 	/**
@@ -103,9 +109,14 @@ THREE.LoaderSupport.ConsoleLogger = (function () {
 	 * @memberOf THREE.LoaderSupport.ConsoleLogger
 	 *
 	 * @param {string} message Message to log
+	 * @param {string[]} additional Array of strings containing additional content to be logged
 	 */
-	ConsoleLogger.prototype.logInfo = function ( message ) {
-		if ( this.enabled ) console.info( message );
+	ConsoleLogger.prototype.logInfo = function ( message, additional ) {
+		if ( this.enabled ) {
+
+			this._createStatement( message, 'Additional content:', additional, function ( output ) { console.info( output ) } );
+
+		}
 	};
 
 	/**
@@ -113,9 +124,10 @@ THREE.LoaderSupport.ConsoleLogger = (function () {
 	 * @memberOf THREE.LoaderSupport.ConsoleLogger
 	 *
 	 * @param {string} message Message to log
+	 * @param {string[]} additional Array of strings containing additional content to be logged
 	 */
-	ConsoleLogger.prototype.logWarn = function ( message ) {
-		console.warn( message );
+	ConsoleLogger.prototype.logWarn = function ( message, additional ) {
+		this._createStatement( message, 'Additional content:', additional, function ( output ) { console.warn( output ) } );
 	};
 
 	/**
@@ -123,9 +135,10 @@ THREE.LoaderSupport.ConsoleLogger = (function () {
 	 * @memberOf THREE.LoaderSupport.ConsoleLogger
 	 *
 	 * @param {string} message Message to log
+	 * @param {string[]} additional Array of strings containing additional content to be logged
 	 */
-	ConsoleLogger.prototype.logError = function ( message ) {
-		console.error( message );
+	ConsoleLogger.prototype.logError = function ( message, additional ) {
+		this._createStatement( message, 'Additional content:', additional, function ( output ) { console.error( output ) } );
 	};
 
 	/**
@@ -146,6 +159,16 @@ THREE.LoaderSupport.ConsoleLogger = (function () {
 	 */
 	ConsoleLogger.prototype.logTimeEnd = function ( id ) {
 		if ( this.enabled ) console.timeEnd( id );
+	};
+
+	ConsoleLogger.prototype._createStatement = function ( message, addHeader, additional, logFunction ) {
+		var output = message;
+		if ( Array.isArray( additional ) ) {
+
+			output += '\n' + addHeader + '\n' + additional.join( '\n' );
+
+		}
+		logFunction( output );
 	};
 
 	return ConsoleLogger;
@@ -445,7 +468,40 @@ THREE.LoaderSupport.Builder = (function () {
 		this.logger.logInfo( 'Using THREE.LoaderSupport.Builder version: ' + LOADER_BUILDER_VERSION );
 		this.callbacks = new THREE.LoaderSupport.Callbacks();
 		this.materials = [];
+		this._createDefaultMaterials();
 	}
+
+	Builder.prototype._createDefaultMaterials = function () {
+		var defaultMaterial = new THREE.MeshStandardMaterial( { color: 0xDCF1FF } );
+		defaultMaterial.name = 'defaultMaterial';
+
+		var defaultVertexColorMaterial = new THREE.MeshStandardMaterial( { color: 0xDCF1FF } );
+		defaultVertexColorMaterial.name = 'defaultVertexColorMaterial';
+		defaultVertexColorMaterial.vertexColors = THREE.VertexColors;
+
+		var defaultLineMaterial = new THREE.LineBasicMaterial();
+		defaultLineMaterial.name = 'defaultLineMaterial';
+
+		var defaultPointMaterial = new THREE.PointsMaterial( { size: 1, sizeAttenuation: false } );
+		defaultPointMaterial.name = 'defaultPointMaterial';
+
+		var runtimeMaterials = {};
+		runtimeMaterials[ defaultMaterial.name ] = defaultMaterial;
+		runtimeMaterials[ defaultVertexColorMaterial.name ] = defaultVertexColorMaterial;
+		runtimeMaterials[ defaultLineMaterial.name ] = defaultLineMaterial;
+		runtimeMaterials[ defaultPointMaterial.name ] = defaultPointMaterial;
+
+		this.updateMaterials(
+			{
+				cmd: 'materialData',
+				materials: {
+					materialCloneInstructions: null,
+					serializedMaterials: null,
+					runtimeMaterials: runtimeMaterials
+				}
+			}
+		);
+	};
 
 	/**
 	 * Set materials loaded by any supplier of an Array of {@link THREE.Material}.
@@ -560,6 +616,7 @@ THREE.LoaderSupport.Builder = (function () {
 		var callbackOnMeshAlter = this.callbacks.onMeshAlter;
 		var callbackOnMeshAlterResult;
 		var useOrgMesh = true;
+		var geometryType = Validator.verifyInput( meshPayload.geometryType, 0 );
 		if ( Validator.isValid( callbackOnMeshAlter ) ) {
 
 			callbackOnMeshAlterResult = callbackOnMeshAlter(
@@ -567,7 +624,8 @@ THREE.LoaderSupport.Builder = (function () {
 					detail: {
 						meshName: meshName,
 						bufferGeometry: bufferGeometry,
-						material: material
+						material: material,
+						geometryType: geometryType
 					}
 				}
 			);
@@ -589,7 +647,20 @@ THREE.LoaderSupport.Builder = (function () {
 		}
 		if ( useOrgMesh ) {
 
-			mesh = new THREE.Mesh( bufferGeometry, material );
+			if ( meshPayload.computeBoundingSphere ) bufferGeometry.computeBoundingSphere();
+			if ( geometryType === 0 ) {
+
+				mesh = new THREE.Mesh( bufferGeometry, material );
+
+			} else if ( geometryType === 1) {
+
+				mesh = new THREE.LineSegments( bufferGeometry, material );
+
+			} else {
+
+				mesh = new THREE.Points( bufferGeometry, material );
+
+			}
 			mesh.name = meshName;
 			meshes.push( mesh );
 
@@ -645,19 +716,27 @@ THREE.LoaderSupport.Builder = (function () {
 
 			var materialNameOrg = materialCloneInstructions.materialNameOrg;
 			var materialOrg = this.materials[ materialNameOrg ];
-			material = materialOrg.clone();
 
-			materialName = materialCloneInstructions.materialName;
-			material.name = materialName;
+			if ( Validator.isValid( materialNameOrg ) ) {
 
-			var materialProperties = materialCloneInstructions.materialProperties;
-			for ( var key in materialProperties ) {
+				material = materialOrg.clone();
 
-				if ( material.hasOwnProperty( key ) && materialProperties.hasOwnProperty( key ) ) material[ key ] = materialProperties[ key ];
+				materialName = materialCloneInstructions.materialName;
+				material.name = materialName;
+
+				var materialProperties = materialCloneInstructions.materialProperties;
+				for ( var key in materialProperties ) {
+
+					if ( material.hasOwnProperty( key ) && materialProperties.hasOwnProperty( key ) ) material[ key ] = materialProperties[ key ];
+
+				}
+				this.materials[ materialName ] = material;
+
+			} else {
+
+				this.logger.logWarn( 'Requested material "' + materialNameOrg + '" is not available!' );
 
 			}
-			this.materials[ materialName ] = material;
-
 		}
 
 		var materials = materialPayload.materials.serializedMaterials;
@@ -723,7 +802,7 @@ THREE.LoaderSupport.Builder = (function () {
 })();
 
 /**
- * Base class to be used by loaders.
+ * Base class to be used by Loaders that provide load, parse, parseAsync and run
  * @class
  *
  * @param {THREE.DefaultLoadingManager} [manager] The loadingManager for the loader to use. Default is {@link THREE.DefaultLoadingManager}
@@ -738,6 +817,9 @@ THREE.LoaderSupport.LoaderBase = (function () {
 		this.manager = Validator.verifyInput( manager, THREE.DefaultLoadingManager );
 		this.logger = Validator.verifyInput( logger, new ConsoleLogger() );
 
+		this.fileLoader = new THREE.FileLoader( this.manager );
+		this.fileLoader.setResponseType( 'arraybuffer' );
+
 		this.modelName = '';
 		this.instanceNo = 0;
 		this.path = '';
@@ -746,33 +828,8 @@ THREE.LoaderSupport.LoaderBase = (function () {
 
 		this.loaderRootNode = new THREE.Group();
 		this.builder = new THREE.LoaderSupport.Builder( this.logger );
-		this._createDefaultMaterials();
 		this.callbacks = new THREE.LoaderSupport.Callbacks();
-	};
-
-	LoaderBase.prototype._createDefaultMaterials = function () {
-		var defaultMaterial = new THREE.MeshStandardMaterial( { color: 0xDCF1FF } );
-		defaultMaterial.name = 'defaultMaterial';
-
-		var vertexColorMaterial = new THREE.MeshStandardMaterial( { color: 0xDCF1FF } );
-		vertexColorMaterial.name = 'vertexColorMaterial';
-		vertexColorMaterial.vertexColors = THREE.VertexColors;
-
-		var runtimeMaterials = {};
-		runtimeMaterials[ defaultMaterial.name ] = defaultMaterial;
-		runtimeMaterials[ vertexColorMaterial.name ] = vertexColorMaterial;
-
-		this.builder.updateMaterials(
-			{
-				cmd: 'materialData',
-				materials: {
-					materialCloneInstructions: null,
-					serializedMaterials: null,
-					runtimeMaterials: runtimeMaterials
-				}
-			}
-		);
-	};
+	}
 
 	LoaderBase.prototype._applyPrepData = function ( prepData ) {
 		if ( Validator.isValid( prepData ) ) {
@@ -891,6 +948,141 @@ THREE.LoaderSupport.LoaderBase = (function () {
 		this.logger.logDebug( content );
 	};
 
+	/**
+	 * Use this convenient method to load a file at the given URL. By default the fileLoader uses an ArrayBuffer.
+	 * @memberOf THREE.LoaderSupport.LoaderBase
+	 *
+	 * @param {string}  url A string containing the path/URL of the file to be loaded.
+	 * @param {callback} onLoad A function to be called after loading is successfully completed. The function receives loaded Object3D as an argument.
+	 * @param {callback} [onProgress] A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains total and Integer bytes.
+	 * @param {callback} [onError] A function to be called if an error occurs during loading. The function receives the error as an argument.
+	 * @param {callback} [onMeshAlter] A function to be called after a new mesh raw data becomes available for alteration.
+	 * @param {boolean} [useAsync] If true, uses async loading with worker, if false loads data synchronously.
+	 */
+	LoaderBase.prototype.load = function ( url, onLoad, onProgress, onError, onMeshAlter, useAsync ) {
+		var scope = this;
+		if ( ! Validator.isValid( onProgress ) ) {
+			var numericalValueRef = 0;
+			var numericalValue = 0;
+			onProgress = function ( event ) {
+				if ( ! event.lengthComputable ) return;
+
+				numericalValue = event.loaded / event.total;
+				if ( numericalValue > numericalValueRef ) {
+
+					numericalValueRef = numericalValue;
+					var output = 'Download of "' + url + '": ' + ( numericalValue * 100 ).toFixed( 2 ) + '%';
+					scope.onProgress( 'progressLoad', output, numericalValue );
+
+				}
+			};
+		}
+
+		if ( ! Validator.isValid( onError ) ) {
+			onError = function ( event ) {
+				var output = 'Error occurred while downloading "' + url + '"';
+				scope.logger.logError( output + ': ' + event );
+				scope.onProgress( 'error', output, -1 );
+			};
+		}
+
+		this.fileLoader.setPath( this.path );
+		this.fileLoader.load( url, function ( content ) {
+			if ( useAsync ) {
+
+				scope.parseAsync( content, onLoad );
+
+			} else {
+
+				var callbacks = new THREE.LoaderSupport.Callbacks();
+				callbacks.setCallbackOnMeshAlter( onMeshAlter );
+				scope._setCallbacks( callbacks );
+				onLoad(
+					{
+						detail: {
+							loaderRootNode: scope.parse( content ),
+							modelName: scope.modelName,
+							instanceNo: scope.instanceNo
+						}
+					}
+				);
+
+			}
+
+		}, onProgress, onError );
+
+	};
+
+	/**
+	 * Identify files or content of interest from an Array of {@link THREE.LoaderSupport.ResourceDescriptor}.
+	 *
+	 * @param {THREE.LoaderSupport.ResourceDescriptor[]} resources Array of {@link THREE.LoaderSupport.ResourceDescriptor}
+	 * @param Object fileDesc Object describing which resources are of interest (ext, type (string or UInt8Array) and ignore (boolean))
+	 * @returns {{}} Object with each "ext" and the corresponding {@link THREE.LoaderSupport.ResourceDescriptor}
+	 */
+	LoaderBase.prototype.checkResourceDescriptorFiles = function ( resources, fileDesc ) {
+		var resource, triple, i, found;
+		var result = {};
+
+		for ( var index in resources ) {
+
+			resource = resources[ index ];
+			found = false;
+			if ( ! Validator.isValid( resource.name ) ) continue;
+			if ( Validator.isValid( resource.content ) ) {
+
+				for ( i = 0; i < fileDesc.length && !found; i++ ) {
+
+					triple = fileDesc[ i ];
+					if ( resource.extension.toLowerCase() === triple.ext.toLowerCase() ) {
+
+						if ( triple.ignore ) {
+
+							found = true;
+
+						} else if ( triple.type === "Uint8Array" ) {
+
+							// fast-fail on bad type
+							if ( ! ( resource.content instanceof Uint8Array ) ) throw 'Provided content is not of type arraybuffer! Aborting...';
+							result[ triple.ext ] = resource;
+							found = true;
+
+						} else if ( triple.type === "String" ) {
+
+							if ( ! (typeof(resource.content) === 'string' || resource.content instanceof String) ) throw 'Provided  content is not of type String! Aborting...';
+							result[ triple.ext ] = resource;
+							found = true;
+
+						}
+
+					}
+
+				}
+				if ( !found ) throw 'Unidentified resource "' + resource.name + '": ' + resource.url;
+
+			} else {
+
+				// fast-fail on bad type
+				if ( ! ( typeof( resource.name ) === 'string' || resource.name instanceof String ) ) throw 'Provided file is not properly defined! Aborting...';
+				for ( i = 0; i < fileDesc.length && !found; i++ ) {
+
+					triple = fileDesc[ i ];
+					if ( resource.extension.toLowerCase() === triple.ext.toLowerCase() ) {
+
+						if ( ! triple.ignore ) result[ triple.ext ] = resource;
+						found = true;
+
+					}
+
+				}
+				if ( !found ) throw 'Unidentified resource "' + resource.name + '": ' + resource.url;
+
+			}
+		}
+
+		return result;
+	};
+
 	return LoaderBase;
 })();
 
@@ -989,7 +1181,7 @@ THREE.LoaderSupport.WorkerRunnerRefImpl = (function () {
  */
 THREE.LoaderSupport.WorkerSupport = (function () {
 
-	var WORKER_SUPPORT_VERSION = '2.0.1';
+	var WORKER_SUPPORT_VERSION = '2.1.2';
 
 	var Validator = THREE.LoaderSupport.Validator;
 
@@ -1158,12 +1350,13 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 	 * Validate the status of worker code and the derived worker.
 	 * @memberOf THREE.LoaderSupport.WorkerSupport
 	 *
-	 * @param {Function} functionCodeBuilder Function that is invoked with funcBuildObject and funcBuildSingelton that allows stringification of objects and singletons.
+	 * @param {Function} functionCodeBuilder Function that is invoked with funcBuildObject and funcBuildSingleton that allows stringification of objects and singletons.
+	 * @param {String} parserName Name of the Parser object
 	 * @param {String[]} libLocations URL of libraries that shall be added to worker code relative to libPath
 	 * @param {String} libPath Base path used for loading libraries
 	 * @param {THREE.LoaderSupport.WorkerRunnerRefImpl} runnerImpl The default worker parser wrapper implementation (communication and execution). An extended class could be passed here.
 	 */
-	WorkerSupport.prototype.validate = function ( functionCodeBuilder, libLocations, libPath, runnerImpl ) {
+	WorkerSupport.prototype.validate = function ( functionCodeBuilder, parserName, libLocations, libPath, runnerImpl ) {
 		if ( Validator.isValid( this.loaderWorker.worker ) ) return;
 
 		this.logger.logInfo( 'WorkerSupport: Building worker code...' );
@@ -1171,17 +1364,18 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 
 		if ( Validator.isValid( runnerImpl ) ) {
 
-			this.logger.logInfo( 'WorkerSupport: Using "' + runnerImpl.name + '" as Runncer class for worker.' );
+			this.logger.logInfo( 'WorkerSupport: Using "' + runnerImpl.name + '" as Runner class for worker.' );
 
 		} else {
 
 			runnerImpl = THREE.LoaderSupport.WorkerRunnerRefImpl;
-			this.logger.logInfo( 'WorkerSupport: Using DEFAULT "THREE.LoaderSupport.WorkerRunnerRefImpl" as Runncer class for worker.' );
+			this.logger.logInfo( 'WorkerSupport: Using DEFAULT "THREE.LoaderSupport.WorkerRunnerRefImpl" as Runner class for worker.' );
 
 		}
 
-		var userWorkerCode = functionCodeBuilder( buildObject, buildSingelton );
-		userWorkerCode += buildSingelton( runnerImpl.name, runnerImpl.name, runnerImpl );
+		var userWorkerCode = functionCodeBuilder( buildObject, buildSingleton );
+		userWorkerCode += 'var Parser = '+ parserName + ';\n\n';
+		userWorkerCode += buildSingleton( runnerImpl.name, runnerImpl );
 		userWorkerCode += 'new ' + runnerImpl.name + '();\n\n';
 
 		var scope = this;
@@ -1191,7 +1385,7 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 			var loadAllLibraries = function ( path, locations ) {
 				if ( locations.length === 0 ) {
 
-					scope.loaderWorker.initWorker( libsContent + userWorkerCode, scope.logger, runnerImpl.name );
+					scope.loaderWorker.initWorker( libsContent + userWorkerCode, runnerImpl.name );
 					scope.logger.logTimeEnd( 'buildWebWorkerCode' );
 
 				} else {
@@ -1213,7 +1407,7 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 
 		} else {
 
-			this.loaderWorker.initWorker( userWorkerCode, this.logger, runnerImpl.name );
+			this.loaderWorker.initWorker( userWorkerCode, runnerImpl.name );
 			this.logger.logTimeEnd( 'buildWebWorkerCode' );
 
 		}
@@ -1282,27 +1476,41 @@ THREE.LoaderSupport.WorkerSupport = (function () {
 		return objectString;
 	};
 
-	var buildSingelton = function ( fullName, internalName, object ) {
-		var objectString = fullName + ' = (function () {\n\n';
-		objectString += '\t' + object.prototype.constructor.toString() + '\n\n';
-		objectString = objectString.replace( object.name, internalName );
+	var buildSingleton = function ( fullName, object, internalName ) {
+		var objectString = '';
+		var objectName = ( Validator.isValid( internalName ) ) ? internalName : object.name;
 
-		var funcString;
-		var objectPart;
+		var funcString, objectPart, constructorString;
 		for ( var name in object.prototype ) {
 
 			objectPart = object.prototype[ name ];
-			if ( typeof objectPart === 'function' ) {
+			if ( name === 'constructor' ) {
 
 				funcString = objectPart.toString();
-				objectString += '\t' + internalName + '.prototype.' + name + ' = ' + funcString + ';\n\n';
+				funcString = funcString.replace( 'function', '' );
+				constructorString = '\tfunction ' + objectName + funcString + ';\n\n';
+
+			} else if ( typeof objectPart === 'function' ) {
+
+				funcString = objectPart.toString();
+				objectString += '\t' + objectName + '.prototype.' + name + ' = ' + funcString + ';\n\n';
 
 			}
 
 		}
-		objectString += '\treturn ' + internalName + ';\n';
+		objectString += '\treturn ' + objectName + ';\n';
 		objectString += '})();\n\n';
+		if ( ! Validator.isValid( constructorString ) ) {
 
+			constructorString = fullName + ' = (function () {\n\n';
+			constructorString += '\t' + object.prototype.constructor.toString() + '\n\n';
+			objectString = constructorString + objectString;
+
+		} else {
+
+			objectString = fullName + ' = (function () {\n\n' + constructorString + objectString;
+
+		}
 		return objectString;
 	};
 
