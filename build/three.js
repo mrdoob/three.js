@@ -11426,25 +11426,6 @@
 
 		},
 
-		computeLineDistances: function () {
-
-			var d = 0;
-			var vertices = this.vertices;
-
-			for ( var i = 0, il = vertices.length; i < il; i ++ ) {
-
-				if ( i > 0 ) {
-
-					d += vertices[ i ].distanceTo( vertices[ i - 1 ] );
-
-				}
-
-				this.lineDistances[ i ] = d;
-
-			}
-
-		},
-
 		computeBoundingBox: function () {
 
 			if ( this.boundingBox === null ) {
@@ -24327,6 +24308,64 @@
 
 		isLine: true,
 
+		computeLineDistances: ( function () {
+
+			var start = new Vector3();
+			var end = new Vector3();
+
+			return function computeLineDistances() {
+
+				var geometry = this.geometry;
+
+				if ( geometry.isBufferGeometry ) {
+
+					// we assume non-indexed geometry
+
+					if ( geometry.index === null ) {
+
+						var positionAttribute = geometry.attributes.position;
+						var lineDistances = [ 0 ];
+
+						for ( var i = 1, l = positionAttribute.count; i < l; i ++ ) {
+
+							start.fromBufferAttribute( positionAttribute, i - 1 );
+							end.fromBufferAttribute( positionAttribute, i );
+
+							lineDistances[ i ] = lineDistances[ i - 1 ];
+							lineDistances[ i ] += start.distanceTo( end );
+
+						}
+
+						geometry.addAttribute( 'lineDistance', new THREE.Float32BufferAttribute( lineDistances, 1 ) );
+
+					} else {
+
+						console.warn( 'THREE.Line.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.' );
+
+					}
+
+				} else if ( geometry.isGeometry ) {
+
+					var vertices = geometry.vertices;
+					var lineDistances = geometry.lineDistances;
+
+					lineDistances[ 0 ] = 0;
+
+					for ( var i = 1, l = vertices.length; i < l; i ++ ) {
+
+						lineDistances[ i ] = lineDistances[ i - 1 ];
+						lineDistances[ i ] += vertices[ i - 1 ].distanceTo( vertices[ i ] );
+
+					}
+
+				}
+
+				return this;
+
+			};
+
+		}() ),
+
 		raycast: ( function () {
 
 			var inverseMatrix = new Matrix4();
@@ -24500,7 +24539,66 @@
 
 		constructor: LineSegments,
 
-		isLineSegments: true
+		isLineSegments: true,
+
+		computeLineDistances: ( function () {
+
+			var start = new Vector3();
+			var end = new Vector3();
+
+			return function computeLineDistances() {
+
+				var geometry = this.geometry;
+
+				if ( geometry.isBufferGeometry ) {
+
+					// we assume non-indexed geometry
+
+					if ( geometry.index === null ) {
+
+						var positionAttribute = geometry.attributes.position;
+						var lineDistances = [];
+
+						for ( var i = 0, l = positionAttribute.count; i < l; i += 2 ) {
+
+							start.fromBufferAttribute( positionAttribute, i );
+							end.fromBufferAttribute( positionAttribute, i + 1 );
+
+							lineDistances[ i ] = ( i === 0 ) ? 0 : lineDistances[ i - 1 ];
+							lineDistances[ i + 1 ] = lineDistances[ i ] + start.distanceTo( end );
+
+						}
+
+						geometry.addAttribute( 'lineDistance', new THREE.Float32BufferAttribute( lineDistances, 1 ) );
+
+					} else {
+
+						console.warn( 'THREE.LineSegments.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.' );
+
+					}
+
+				} else if ( geometry.isGeometry ) {
+
+					var vertices = geometry.vertices;
+					var lineDistances = geometry.lineDistances;
+
+					for ( var i = 0, l = vertices.length; i < l; i += 2 ) {
+
+						start.copy( vertices[ i ] );
+						end.copy( vertices[ i + 1 ] );
+
+						lineDistances[ i ] = ( i === 0 ) ? 0 : lineDistances[ i - 1 ];
+						lineDistances[ i + 1 ] = lineDistances[ i ] + start.distanceTo( end );
+
+					}
+
+				}
+
+				return this;
+
+			};
+
+		}() )
 
 	} );
 
@@ -44458,11 +44556,20 @@
 
 	//
 
-	Geometry.prototype.computeTangents = function () {
+	Object.assign( Geometry.prototype, {
 
-		console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
+		computeTangents: function () {
 
-	};
+			console.error( 'THREE.Geometry: .computeTangents() has been removed.' );
+
+		},
+		computeLineDistances: function () {
+
+			console.error( 'THREE.Geometry: .computeLineDistances() has been removed. Use THREE.Line.computeLineDistances() instead.' );
+
+		}
+
+	} );
 
 	Object.assign( Object3D.prototype, {
 
@@ -45407,7 +45514,7 @@
 
 	function LensFlare() {
 
-		console.error( 'THREE.LensFlare has been moved to /examples/js/objects/LensFlare.js' );
+		console.error( 'THREE.LensFlare has been moved to /examples/js/objects/Lensflare.js' );
 
 	}
 
