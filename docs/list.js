@@ -361,7 +361,7 @@ var list = {
 		},
 
 		"Objects": {
-			"LensFlare": "examples/objects/LensFlare",
+			"Lensflare": "examples/objects/Lensflare",
 		},
 
 		"Exporters": {
@@ -404,7 +404,6 @@ var list = {
 		},
 
 		"WebGLRenderer / Plugins": {
-			"LensFlarePlugin": "api/renderers/webgl/plugins/LensFlarePlugin",
 			"SpritePlugin": "api/renderers/webgl/plugins/SpritePlugin"
 		}
 

@@ -272,18 +272,6 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "normalize", ( assert ) => {
 
-			var geometry = getGeometry();
-			geometry.computeLineDistances();
-
-			var distances = geometry.lineDistances;
-			assert.ok( distances[ 0 ] === 0, "distance to the 1st point is 0" );
-			assert.ok( distances[ 1 ] === 1 + distances[ 0 ], "distance from the 1st to the 2nd is sqrt(2nd - 1st) + distance - 1" );
-			assert.ok( distances[ 2 ] === Math.sqrt( 0.5 * 0.5 + 1 ) + distances[ 1 ], "distance from the 1st to the 3nd is sqrt(3rd - 2nd) + distance - 1" );
-
-		} );
-
-		QUnit.test( "normalize (actual)", ( assert ) => {
-
 			var a = getGeometry();
 			var sqrt = 0.5 * Math.sqrt( 2 );
 			var expected = [
@@ -328,12 +316,6 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		QUnit.todo( "computeMorphNormals", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "computeLineDistances", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

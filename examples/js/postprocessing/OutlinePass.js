@@ -38,6 +38,7 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 
 	this.prepareMaskMaterial = this.getPrepareMaskMaterial();
 	this.prepareMaskMaterial.side = THREE.DoubleSide;
+	this.prepareMaskMaterial.fragmentShader = replaceDepthToViewZ( this.prepareMaskMaterial.fragmentShader, this.renderCamera );
 
 	this.renderTargetDepthBuffer = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, pars );
 	this.renderTargetDepthBuffer.texture.name = "OutlinePass.depth";
@@ -110,6 +111,14 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	this.tempPulseColor1 = new THREE.Color();
 	this.tempPulseColor2 = new THREE.Color();
 	this.textureMatrix = new THREE.Matrix4();
+
+	function replaceDepthToViewZ( string, camera ) {
+
+		var type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
+
+		return string.replace( /DEPTH_TO_VIEW_Z/g, type + 'DepthToViewZ' );
+
+	}
 
 };
 
@@ -224,9 +233,9 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 	updateTextureMatrix: function () {
 
 		this.textureMatrix.set( 0.5, 0.0, 0.0, 0.5,
-														0.0, 0.5, 0.0, 0.5,
-														0.0, 0.0, 0.5, 0.5,
-														0.0, 0.0, 0.0, 1.0 );
+			0.0, 0.5, 0.0, 0.5,
+			0.0, 0.0, 0.5, 0.5,
+			0.0, 0.0, 0.0, 1.0 );
 		this.textureMatrix.multiply( this.renderCamera.projectionMatrix );
 		this.textureMatrix.multiply( this.renderCamera.matrixWorldInverse );
 
@@ -347,33 +356,38 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 				"textureMatrix": { value: new THREE.Matrix4() }
 			},
 
-			vertexShader:
-				"varying vec2 vUv;\
-				varying vec4 projTexCoord;\
-				varying vec4 vPosition;\
-				uniform mat4 textureMatrix;\
-				void main() {\
-					vUv = uv;\
-					vPosition = modelViewMatrix * vec4( position, 1.0 );\
-					vec4 worldPosition = modelMatrix * vec4( position, 1.0 );\
-					projTexCoord = textureMatrix * worldPosition;\
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\
-				}",
+			vertexShader: [
+				'varying vec4 projTexCoord;',
+				'varying vec4 vPosition;',
+				'uniform mat4 textureMatrix;',
 
-			fragmentShader:
-				"#include <packing>\
-				varying vec2 vUv;\
-				varying vec4 vPosition;\
-				varying vec4 projTexCoord;\
-				uniform sampler2D depthTexture;\
-				uniform vec2 cameraNearFar;\
-				\
-				void main() {\
-					float depth = unpackRGBAToDepth(texture2DProj( depthTexture, projTexCoord ));\
-					float viewZ = -perspectiveDepthToViewZ( depth, cameraNearFar.x, cameraNearFar.y );\
-					float depthTest = (-vPosition.z > viewZ) ? 1.0 : 0.0;\
-					gl_FragColor = vec4(0.0, depthTest, 1.0, 1.0);\
-				}"
+				'void main() {',
+
+				'	vPosition = modelViewMatrix * vec4( position, 1.0 );',
+				'	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );',
+				'	projTexCoord = textureMatrix * worldPosition;',
+				'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+
+				'}'
+			].join( '\n' ),
+
+			fragmentShader: [
+				'#include <packing>',
+				'varying vec4 vPosition;',
+				'varying vec4 projTexCoord;',
+				'uniform sampler2D depthTexture;',
+				'uniform vec2 cameraNearFar;',
+
+				'void main() {',
+
+				'	float depth = unpackRGBAToDepth(texture2DProj( depthTexture, projTexCoord ));',
+				'	float viewZ = - DEPTH_TO_VIEW_Z( depth, cameraNearFar.x, cameraNearFar.y );',
+				'	float depthTest = (-vPosition.z > viewZ) ? 1.0 : 0.0;',
+				'	gl_FragColor = vec4(0.0, depthTest, 1.0, 1.0);',
+
+				'}'
+			].join( '\n' )
+
 		} );
 
 	},

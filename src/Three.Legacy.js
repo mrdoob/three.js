@@ -832,11 +832,20 @@ Object.assign( Vector4.prototype, {
 
 //
 
-Geometry.prototype.computeTangents = function () {
+Object.assign( Geometry.prototype, {
 
-	console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
+	computeTangents: function () {
 
-};
+		console.error( 'THREE.Geometry: .computeTangents() has been removed.' );
+
+	},
+	computeLineDistances: function () {
+
+		console.error( 'THREE.Geometry: .computeLineDistances() has been removed. Use THREE.Line.computeLineDistances() instead.' );
+
+	}
+
+} );
 
 Object.assign( Object3D.prototype, {
 
@@ -1781,6 +1790,6 @@ export var SceneUtils = {
 
 export function LensFlare() {
 
-	console.error( 'THREE.LensFlare has been moved to /examples/js/objects/LensFlare.js' );
+	console.error( 'THREE.LensFlare has been moved to /examples/js/objects/Lensflare.js' );
 
 }

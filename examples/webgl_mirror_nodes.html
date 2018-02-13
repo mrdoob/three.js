@@ -50,6 +50,7 @@
 		<script src="js/nodes/FunctionCallNode.js"></script>
 		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
 		<!-- Accessors -->
@@ -125,6 +126,8 @@
 
 		var sphereGroup, smallSphere;
 		var groundMirrorMaterial;
+
+		var frame = new THREE.NodeFrame();
 
 		function init() {
 
@@ -224,9 +227,11 @@
 			//--
 
 			var mirrorMesh = new THREE.Mesh( planeGeo, groundMirrorMaterial );
-			mirrorMesh.add( groundMirror );
-			mirrorMesh.rotateX( - Math.PI / 2 );
-			scene.add( mirrorMesh );
+			// add all alternative mirror materials inside the ReflectorRTT to prevent:
+			// glDrawElements: Source and destination textures of the draw are the same.
+			groundMirror.add( mirrorMesh );
+			groundMirror.rotateX( - Math.PI / 2 );
+			scene.add( groundMirror );
 
 			sphereGroup = new THREE.Object3D();
 			scene.add( sphereGroup );
@@ -322,7 +327,7 @@
 			smallSphere.rotation.y = ( Math.PI / 2 ) - timer * 0.1;
 			smallSphere.rotation.z = timer * 0.8;
 
-			groundMirrorMaterial.updateFrame( delta );
+			frame.update( delta ).updateNode( groundMirrorMaterial );
 
 			render();
 
