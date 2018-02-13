@@ -22,8 +22,6 @@
 
 		THREE.BufferGeometry.call( this );
 
-		this.type = 'DecalGeometry';
-
 		// buffers
 
 		var vertices = [];
