@@ -87,13 +87,12 @@
 
 				var s = 250;
 
-				var cube = new THREE.BoxBufferGeometry( s, s, s );
+				var geometry = new THREE.BoxBufferGeometry( s, s, s );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 50 } );
-
 
 				for ( var i = 0; i < 3000; i ++ ) {
 
-					var mesh = new THREE.Mesh( cube, material );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
 					mesh.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
@@ -115,9 +114,8 @@
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.05 );
 				dirLight.position.set( 0, -1, 0 ).normalize();
-				scene.add( dirLight );
-
 				dirLight.color.setHSL( 0.1, 0.7, 0.5 );
+				scene.add( dirLight );
 
 				// lensflares
 				var textureLoader = new THREE.TextureLoader();
