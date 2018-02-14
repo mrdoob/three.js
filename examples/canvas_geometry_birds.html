@@ -76,8 +76,10 @@
 
 			Bird.prototype = Object.create( THREE.Geometry.prototype );
 			Bird.prototype.constructor = Bird;
+			
+			// Based on https://www.openprocessing.org/sketch/6910
 
-			var Boid = function() {
+			var Boid = function () {
 
 				var vector = new THREE.Vector3(),
 				_acceleration, _width = 500, _height = 500, _depth = 200, _goal, _neighborhoodRadius = 100,
