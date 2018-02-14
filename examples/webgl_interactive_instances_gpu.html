@@ -500,7 +500,7 @@
 			clean();
 
 			// make instances
-			loader.load( 'obj/Suzanne.js', function ( geo ) {
+			loader.load( 'models/json/suzanne_geometry.json', function ( geo ) {
 
 				geo.computeBoundingBox();
 				geometrySize = geo.boundingBox.getSize();
