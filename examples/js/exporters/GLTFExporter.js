@@ -241,7 +241,7 @@ THREE.GLTFExporter.prototype = {
 
 					} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_INT ) {
 
-						dataView.setUint8( offset, value, true );
+						dataView.setUint32( offset, value, true );
 
 					} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ) {
 
