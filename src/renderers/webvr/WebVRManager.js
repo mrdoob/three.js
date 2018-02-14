@@ -132,6 +132,7 @@ function WebVRManager( renderer ) {
 		  standingMatrix.makeTranslation(0, scope.userHeight, 0);
 		}
 
+		standingMatrixInverse.getInverse( standingMatrix );
 		poseObject.position.applyMatrix4( standingMatrix );
 		poseObject.updateMatrixWorld();
 
