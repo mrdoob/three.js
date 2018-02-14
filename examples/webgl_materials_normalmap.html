@@ -131,7 +131,7 @@
 				} );
 
 				loader = new THREE.JSONLoader();
-				loader.load( "models/json/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
+				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) { createScene( geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
