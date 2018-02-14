@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - dynamic cube reflection</title>
+		<title>three.js misc - controls - car</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -31,7 +31,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl dynamic cube reflection demo -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - car controls demo -
 			Ferrari F50 model by <a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1687" target="_blank" rel="noopener">Daniel Sathya</a><br>
 			Controls: arrow keys & space
 		</div>
@@ -101,14 +101,22 @@
 
           carModel = gltf.scene.children[0];
 
-          console.log( carModel )
+          // console.log( carModel )
 
-					var carBodyMat = carModel.getObjectByName( 'body_exterior' ).material;
+					var carBodyMat = carModel.getObjectByName( 'exterior' ).material;
 					carBodyMat.envMap = envMap;
 					carBodyMat.metalness = 0.25;
 					carBodyMat.roughness = 0.15;
 
-					car.setModel( carModel );
+					car.setModel( carModel, {
+							flWheel: 'wheelFrontLeft',
+							frWheel: 'wheelFrontRight',
+							blWheel: 'wheelRearLeft',
+							brWheel: 'wheelRearRight',
+							steeringWheel: 'steeringWheel',
+						}
+					);
+
 					scene.add( carModel );
 
 				} );
@@ -163,7 +171,7 @@
 
 			var height = camera.position.y;
 			var damping = 5.0;
-			var distance = -9;
+			var distance = -11;
 
 			var cameraTarget = new THREE.Vector3();
 
@@ -192,7 +200,14 @@
         else if ( initialPos.distanceTo( object.position ) > 1500 ) {
 
           object.position.copy( initialPos );
-          car.speed = 0;
+					car.speed = 0;
+					car.enabled = false;
+
+					setTimeout( function() {
+
+						car.enabled = true;
+
+					}, 1500 )
 
         }
 
