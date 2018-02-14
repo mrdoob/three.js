@@ -91,16 +91,16 @@
 				// lensflare
 				var loader = new THREE.TextureLoader();
 				var texture0 = loader.load( "textures/lensflare/lensflare0.png" );
-				var texture2 = loader.load( "textures/lensflare/lensflare2.png" );
 				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
 
-				var lensFlare = new THREE.Lensflare();
-				lensFlare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
-				lensFlare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
-				lensFlare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
-				lensFlare.addElement( new THREE.LensflareElement( texture3, 120, 0.9 ) );
-				lensFlare.addElement( new THREE.LensflareElement( texture3, 70, 1 ) );
-				light.add( lensFlare );
+				var lensflare = new THREE.Lensflare();
+				lensflare.position.set( 0, 5, -5 );
+				lensflare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 120, 0.9 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 1 ) );
+				scene.add( lensflare );
 
 				//
 
@@ -113,7 +113,7 @@
 				reflector.position.y = 0.5;
 				reflector.position.z = -3;
 				reflector.rotation.y = - Math.PI / 4;
-				// scene.add( reflector );
+				scene.add( reflector );
 
 				var geometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
 				var material = new THREE.MeshPhongMaterial();
