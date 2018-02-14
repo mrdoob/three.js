@@ -2,10 +2,6 @@
  * @author alteredq / http://alteredqualia.com/
  * @author Lewy Blue https://github.com/looeee
  *
- * INSTRUCTIONS: car.SetModel( model ) - the model must have 4 children called
- * wheelFrontLeft,  wheelFrontRight, wheelRearLeft, wheelRearRight
- * that will be automatically set to the 4 wheels. These can be any Object3D ( Group, Mesh etc. )
- *
  * The model is expected to follow real world car proportions. You can try unusual car types
  * but your results may be unexpected.
  *
@@ -14,6 +10,18 @@
  */
 
 THREE.Car = function ( maxSpeed, acceleration, brakePower, turningRadius, keys ) {
+
+	var self = this;
+
+	this.enabled = true;
+
+	this.elemNames = {
+		flWheel: 'wheelFrontLeft',
+		frWheel: 'wheelFrontRight',
+		blWheel: 'wheelBackLeft',
+		brWheel: 'wheelBackRight',
+		steeringWheel: null, // disabled by default
+	}
 
 	// km/hr
 	this.maxSpeed = maxSpeed || 312;
@@ -57,6 +65,8 @@ THREE.Car = function ( maxSpeed, acceleration, brakePower, turningRadius, keys )
 	var backLeftWheel = null;
 	var backRightWheel = null;
 
+	var steeringWheel = null;
+
 	var wheelDiameter = 1;
 	var length = 1;
 
@@ -71,8 +81,6 @@ THREE.Car = function ( maxSpeed, acceleration, brakePower, turningRadius, keys )
 		moveRight: false
 
 	};
-
-	var self = this;
 
 	function onKeyDown( event ) {
 
@@ -126,7 +134,7 @@ THREE.Car = function ( maxSpeed, acceleration, brakePower, turningRadius, keys )
 
 	this.update = function ( delta ) {
 
-		if ( ! loaded ) return;
+		if ( ! loaded || ! this.enabled ) return;
 
 		var brakingDeceleration = 1;
 
@@ -215,13 +223,17 @@ THREE.Car = function ( maxSpeed, acceleration, brakePower, turningRadius, keys )
 		backLeftWheel.rotation.x += wheelDelta;
 		backRightWheel.rotation.x += wheelDelta;
 
-		// front wheels rotation while steering
+		// rotation while steering
 		frontLeftWheelRoot.rotation.y = wheelOrientation;
 		frontRightWheelRoot.rotation.y = wheelOrientation;
 
+		steeringWheel.rotation.z = -wheelOrientation * 6;
+
 	};
 
-	this.setModel = function ( model ) {
+	this.setModel = function ( model, elemNames ) {
+
+		if ( elemNames ) this.elemNames = elemNames;
 
 		root = model;
 
@@ -234,10 +246,12 @@ THREE.Car = function ( maxSpeed, acceleration, brakePower, turningRadius, keys )
 
 	function setupWheels() {
 
-		frontLeftWheelRoot = root.getObjectByName( 'wheelFrontLeft' );
-		frontRightWheelRoot = root.getObjectByName( 'wheelFrontRight' );
-		backLeftWheel = root.getObjectByName( 'wheelRearLeft' );
-		backRightWheel = root.getObjectByName( 'wheelRearRight' );
+		frontLeftWheelRoot = root.getObjectByName( self.elemNames.flWheel );
+		frontRightWheelRoot = root.getObjectByName( self.elemNames.frWheel );
+		backLeftWheel = root.getObjectByName( self.elemNames.blWheel );
+		backRightWheel = root.getObjectByName( self.elemNames.brWheel );
+
+		if( self.elemNames.steeringWheel !== null ) steeringWheel = root.getObjectByName( self.elemNames.steeringWheel );
 
 		while ( frontLeftWheelRoot.children.length > 0 ) frontLeftWheel.add( frontLeftWheelRoot.children[ 0 ] );
 		while ( frontRightWheelRoot.children.length > 0 ) frontRightWheel.add( frontRightWheelRoot.children[ 0 ] );
