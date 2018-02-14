@@ -118,10 +118,10 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				uniformsUV[ "tNormal" ].value = textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniformsUV[ "tNormal" ].value = textureLoader.load( "models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniformsUV[ "uNormalScale" ].value = -1.5;
 
-				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" );
+				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "models/json/leeperrysmith/Map-COL.jpg" );
 
 				uniformsUV[ "passID" ].value = 0;
 
@@ -150,7 +150,7 @@
 				// LOADER
 
 				loader = new THREE.JSONLoader();
-				loader.load(  "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) {
+				loader.load(  "models/json/leeperrysmith/LeePerrySmith.js", function( geometry ) {
 
 					createScene( geometry, 100, material );
 
