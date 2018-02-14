@@ -240,13 +240,13 @@
 
 			var loader = new THREE.JSONLoader();
 
-			loader.load( 'obj/leeperrysmith/LeePerrySmith.js', function( geometry ) {
+			loader.load( 'models/json/leeperrysmith/LeePerrySmith.json', function( geometry ) {
 
 				var material = new THREE.MeshPhongMaterial( {
 					specular: 0x111111,
-					map: textureLoader.load( 'obj/leeperrysmith/Map-COL.jpg' ),
-					specularMap: textureLoader.load( 'obj/leeperrysmith/Map-SPEC.jpg' ),
-					normalMap: textureLoader.load( 'obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
+					map: textureLoader.load( 'models/json/leeperrysmith/Map-COL.jpg' ),
+					specularMap: textureLoader.load( 'models/json/leeperrysmith/Map-SPEC.jpg' ),
+					normalMap: textureLoader.load( 'models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
 					shininess: 25
 				} );
 
