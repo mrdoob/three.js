@@ -19867,6 +19867,9 @@
 
 		var poseTarget = null;
 
+		var standingMatrix = new Matrix4();
+		var standingMatrixInverse = new Matrix4();
+
 		if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
 			frameData = new window.VRFrameData();
@@ -19921,6 +19924,7 @@
 		//
 
 		this.enabled = false;
+		this.userHeight = 1.6;
 
 		this.getDevice = function () {
 
@@ -19970,6 +19974,19 @@
 
 			}
 
+			var stageParameters = device.stageParameters;
+
+			if ( stageParameters ) {
+
+				standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
+
+			} else {
+
+				standingMatrix.makeTranslation( 0, scope.userHeight, 0 );
+
+			}
+
+			poseObject.position.applyMatrix4( standingMatrix );
 			poseObject.updateMatrixWorld();
 
 			if ( device.isPresenting === false ) return camera;
@@ -19987,6 +20004,13 @@
 
 			cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 			cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
+
+			// TODO (mrdoob) Double check this code
+
+			standingMatrixInverse.getInverse( standingMatrix );
+
+			cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
+			cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
 
 			var parent = poseObject.parent;
 
@@ -20007,7 +20031,7 @@
 			cameraL.projectionMatrix.fromArray( frameData.leftProjectionMatrix );
 			cameraR.projectionMatrix.fromArray( frameData.rightProjectionMatrix );
 
-			// HACK @mrdoob
+			// HACK (mrdoob)
 			// https://github.com/w3c/webvr/issues/203
 
 			cameraVR.projectionMatrix.copy( cameraL.projectionMatrix );
@@ -20035,6 +20059,12 @@
 			}
 
 			return cameraVR;
+
+		};
+
+		this.getStandingMatrix = function () {
+
+			return standingMatrix;
 
 		};
 
@@ -20527,11 +20557,15 @@
 
 	}
 
-	function WebGLLights( stateId ) {
+	var count = 0;
+
+	function WebGLLights() {
 
 		var cache = new UniformsCache();
 
 		var state = {
+
+			id: count ++,
 
 			hash: '',
 
@@ -20739,8 +20773,7 @@
 			state.point.length = pointLength;
 			state.hemi.length = hemiLength;
 
-			// TODO (sam-g-steel) why aren't we using join
-			state.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + shadows.length + ',' + stateId;
+			state.hash = state.id + ',' + directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + shadows.length;
 
 		}
 
@@ -20755,13 +20788,9 @@
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
-	var count = 0;
-
 	function WebGLRenderState() {
 
-		var id = count ++;
-
-		var lights = new WebGLLights( id );
+		var lights = new WebGLLights();
 
 		var lightsArray = [];
 		var shadowsArray = [];
@@ -45310,16 +45339,6 @@
 	} );
 
 	//
-
-	Object.assign( WebVRManager.prototype, {
-
-		getStandingMatrix: function () {
-
-			console.warn( 'THREE.WebVRManager: .getStandingMatrix() has been removed.' );
-
-		}
-
-	} );
 
 	Object.defineProperties( WebVRManager.prototype, {
 
