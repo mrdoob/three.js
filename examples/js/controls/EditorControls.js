@@ -37,7 +37,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.focus = function ( target ) {
 
-		if ( target === undefined || !target.isObject3D ) {
+		if ( target === undefined ) {
 			return;
 		}
 
