@@ -993,6 +993,7 @@ function WebGLRenderer( parameters ) {
 
 	this.compile = function ( scene, camera ) {
 
+		currentRenderState = renderStates.get( scene, camera );
 		currentRenderState.init();
 
 		scene.traverse( function ( object ) {
