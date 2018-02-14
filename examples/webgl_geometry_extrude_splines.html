@@ -95,7 +95,7 @@
 			SampleClosedSpline: sampleClosedSpline
 		};
 
-		var parent, tubeGeometry, group;
+		var parent, tubeGeometry, mesh;
 
 		var params = {
 			spline: 'GrannyKnot',
@@ -114,12 +114,10 @@
 
 		function addTube() {
 
-			if ( group !== undefined ) {
+			if ( mesh !== undefined ) {
 
-				parent.remove( group );
-
-				group.children[ 0 ].geometry.dispose();
-				group.children[ 1 ].geometry.dispose();
+				parent.remove( mesh );
+				mesh.geometry.dispose();
 
 			}
 
@@ -135,7 +133,7 @@
 
 		function setScale() {
 
-			group.scale.set( params.scale, params.scale, params.scale );
+			mesh.scale.set( params.scale, params.scale, params.scale );
 
 		}
 
@@ -144,9 +142,11 @@
 
 			// 3D shape
 
-			group = THREE.SceneUtils.createMultiMaterialObject( geometry, [ material, wireframeMaterial ] );
+			mesh = new THREE.Mesh( geometry, material );
+			var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
+			mesh.add( wireframe );
 
-			parent.add( group );
+			parent.add( mesh );
 
 		}
 

@@ -43,8 +43,8 @@
 		var mesh = new THREE.Mesh( geometry, material );
 		</code>
 		<div>
-			[example:webgl_buffergeometry Complex mesh with non-indexed faces]<br />
-			[example:webgl_buffergeometry_uint Complex mesh with indexed faces]<br />
+			[example:webgl_buffergeometry Mesh with non-indexed faces]<br />
+			[example:webgl_buffergeometry_indexed Mesh with indexed faces]<br />
 			[example:webgl_buffergeometry_lines Lines]<br />
 			[example:webgl_buffergeometry_lines_indexed Indexed Lines]<br />
 			[example:webgl_buffergeometry_custom_attributes_particles Particles]<br />
@@ -83,14 +83,6 @@
 		Set by [page:.fromGeometry]().
 		</div>
 
-		<h3>[page:BufferAttribute index] (itemSize: 1)</h3>
-		Allows for vertices to be re-used across multiple triangles; this is called using "indexed triangles" and
-		works much the same as it does in [page:Geometry]: each triangle is associated with the indices of three vertices.
-		This attribute therefore stores the index of each vertex for each triangular face.
-
-		If this attribute is not set, the [page:WebGLRenderer renderer] assumes that each three contiguous
-		positions represent a single triangle.
-		</div>
 		<p>
 		In addition to the the built-in attributes, you can set your own custom attributes using the addAttribute method. With [page:Geometry], these attributes are set and stored on the [page:Material]. In BufferGeometry, the attributes are stored with the geometry itself. Note that you still need to set the attributes information on the material as well, but the value of each attribute is stored in the BufferGeometry.
 		</p>
@@ -165,7 +157,13 @@
 
 		<h3>[property:BufferAttribute index]</h3>
 		<div>
-			See "Accessing Attributes" section above for a description of this property.
+			Allows for vertices to be re-used across multiple triangles; this is called using "indexed triangles" and
+			works much the same as it does in [page:Geometry]: each triangle is associated with the indices of three vertices.
+			This attribute therefore stores the index of each vertex for each triangular face.
+
+			If this attribute is not set, the [page:WebGLRenderer renderer] assumes that each three contiguous
+			positions represent a single triangle.
+
 			Default is *null*.
 		</div>
 

@@ -201,8 +201,6 @@
 
 	};
 
-	"use strict";
-
 	var XLoader = function () {
 
 		function XLoader( manager, texloader ) {
@@ -1482,7 +1480,6 @@
 
 				var model = _model;
 				var animation = _animation;
-				var bindFlag = _isBind ? _isBind : true;
 				if ( ! model ) {
 
 					model = this.Meshes[ 0 ];
@@ -1567,16 +1564,14 @@
 					model.geometry.animations = [];
 
 				}
-				if ( bindFlag ) {
 
-					model.geometry.animations.push( THREE.AnimationClip.parseAnimation( put, model.skeleton.bones ) );
-					if ( ! model.animationMixer ) {
+				model.geometry.animations.push( THREE.AnimationClip.parseAnimation( put, model.skeleton.bones ) );
+				if ( ! model.animationMixer ) {
 
-						model.animationMixer = new THREE.AnimationMixer( model );
-
-					}
+					model.animationMixer = new THREE.AnimationMixer( model );
 
 				}
+
 				return put;
 
 			}

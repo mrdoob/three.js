@@ -112,7 +112,7 @@
 				sceneModel.add( directionalLight );
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) {
+				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) {
 
 					createMesh( geometry, sceneModel, 100 );
 
@@ -340,8 +340,8 @@
 					color: 0x999999,
 					specular: 0x080808,
 					shininess: 20,
-					map: new THREE.TextureLoader().load( "obj/leeperrysmith/Map-COL.jpg" ),
-					normalMap: new THREE.TextureLoader().load("obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					map: new THREE.TextureLoader().load( "models/json/leeperrysmith/Map-COL.jpg" ),
+					normalMap: new THREE.TextureLoader().load("models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 )
 
 				} );

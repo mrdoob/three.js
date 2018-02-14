@@ -181,6 +181,20 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
+		 * Get the required size + padding for a buffer, rounded to the next 4-byte boundary.
+		 * https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#data-alignment
+		 *
+		 * @param {Integer} bufferSize The size the original buffer.
+		 * @returns {Integer} new buffer size with required padding.
+		 *
+		 */
+		function getPaddedBufferSize( bufferSize ) {
+
+			return Math.ceil( bufferSize / 4 ) * 4;
+
+		}
+		
+		/**
 		 * Process a buffer to append to the default one.
 		 * @param  {THREE.BufferAttribute} attribute     Attribute to store
 		 * @param  {Integer} componentType Component type (Unsigned short, unsigned int or float)
@@ -208,6 +222,10 @@ THREE.GLTFExporter.prototype = {
 
 			// Create a new dataview and dump the attribute's array into it
 			var byteLength = count * attribute.itemSize * componentSize;
+			
+			// adjust required size of array buffer with padding 
+			// to satisfy gltf requirement that the length is divisible by 4
+			byteLength = getPaddedBufferSize( byteLength );
 
 			var dataView = new DataView( new ArrayBuffer( byteLength ) );
 
@@ -223,7 +241,7 @@ THREE.GLTFExporter.prototype = {
 
 					} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_INT ) {
 
-						dataView.setUint8( offset, value, true );
+						dataView.setUint32( offset, value, true );
 
 					} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ) {
 
@@ -396,7 +414,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processImage( map ) {
 
-			if ( cachedData.images[ map.uuid ] ) {
+			if ( cachedData.images[ map.uuid ] !== undefined ) {
 
 				return cachedData.images[ map.uuid ];
 
@@ -507,7 +525,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMaterial( material ) {
 
-			if ( cachedData.materials[ material.uuid ] ) {
+			if ( cachedData.materials[ material.uuid ] !== undefined ) {
 
 				return cachedData.materials[ material.uuid ];
 
@@ -792,6 +810,7 @@ THREE.GLTFExporter.prototype = {
 			// Morph targets
 			if ( mesh.morphTargetInfluences !== undefined && mesh.morphTargetInfluences.length > 0 ) {
 
+				var weights = [];
 				gltfMesh.primitives[ 0 ].targets = [];
 
 				for ( var i = 0; i < mesh.morphTargetInfluences.length; ++ i ) {
@@ -808,7 +827,11 @@ THREE.GLTFExporter.prototype = {
 
 					gltfMesh.primitives[ 0 ].targets.push( target );
 
+					weights.push( mesh.morphTargetInfluences[ i ] );
+
 				}
+
+				gltfMesh.weights = weights;
 
 			}
 
@@ -904,6 +927,20 @@ THREE.GLTFExporter.prototype = {
 				var trackNode = THREE.PropertyBinding.findNode( root, trackBinding.nodeName );
 				var trackProperty = PATH_PROPERTIES[ trackBinding.propertyName ];
 
+				if ( trackBinding.objectName === 'bones' ) {
+
+					if ( trackNode.isSkinnedMesh === true ) {
+
+						trackNode = trackNode.skeleton.getBoneByName( trackBinding.objectIndex );
+
+					} else {
+
+						trackNode = undefined;
+
+					}
+
+				}
+
 				if ( ! trackNode || ! trackProperty ) {
 
 					console.warn( 'THREE.GLTFExporter: Could not export animation track "%s".', track.name );
@@ -924,7 +961,7 @@ THREE.GLTFExporter.prototype = {
 
 					input: processAccessor( new THREE.BufferAttribute( track.times, inputItemSize ) ),
 					output: processAccessor( new THREE.BufferAttribute( track.values, outputItemSize ) ),
-					interpolation: track.interpolation === THREE.InterpolateDiscrete ? 'STEP' : 'LINEAR'
+					interpolation: track.getInterpolation() === THREE.InterpolateDiscrete ? 'STEP' : 'LINEAR'
 
 				} );
 
@@ -1051,7 +1088,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.name ) {
 
-				gltfNode.name = object.name;
+				gltfNode.name = String( object.name );
 
 			}
 

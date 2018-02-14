@@ -51,6 +51,7 @@
 		<script src="js/nodes/FunctionCallNode.js"></script>
 		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
 		<!-- Accessors -->
@@ -86,18 +87,23 @@
 		<!-- Post-Processing -->
 		<script src="js/nodes/postprocessing/NodePass.js"></script>
 
+		<!-- NodeMaterial Loader -->
+		<script src="js/loaders/NodeMaterialLoader.js"></script>
+
 		<script>
 
 			var camera, scene, renderer, composer;
 			var object, light, nodepass;
 			var gui, guiElements = [];
+
 			var clock = new THREE.Clock();
+			var frame = new THREE.NodeFrame();
 
 			var param = { example: 'color-adjustment' };
 
 			var textureLoader = new THREE.TextureLoader();
 
-			var lensflare2 = textureLoader.load( 'textures/lensflare2.jpg' );
+			var lensflare2 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
 			lensflare2.wrapS = lensflare2.wrapT = THREE.RepeatWrapping;
 
 			var decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
@@ -121,7 +127,7 @@
 					'adv / saturation': 'saturation',
 					'adv / refraction': 'refraction',
 					'adv / mosaic': 'mosaic'
-				} ).onFinishChange( function() {
+				} ).onFinishChange( function () {
 
 					updateMaterial();
 
@@ -139,7 +145,7 @@
 
 				if ( isColor ) {
 
-					node = gui.addColor( param, name ).onChange( function() {
+					node = gui.addColor( param, name ).onChange( function () {
 
 						callback( param[ name ] );
 
@@ -147,7 +153,7 @@
 
 				} else if ( typeof value == 'object' ) {
 
-					node = gui.add( param, name, value ).onChange( function() {
+					node = gui.add( param, name, value ).onChange( function () {
 
 						callback( param[ name ] );
 
@@ -155,7 +161,7 @@
 
 				} else {
 
-					node = gui.add( param, name, min, max ).onChange( function() {
+					node = gui.add( param, name, min, max ).onChange( function () {
 
 						callback( param[ name ] );
 
@@ -195,31 +201,31 @@
 
 						// GUI
 
-						addGui( 'hue', hue.number, function( val ) {
+						addGui( 'hue', hue.number, function ( val ) {
 
 							hue.number = val;
 
 						}, false, 0, Math.PI * 2 );
 
-						addGui( 'saturation', sataturation.number, function( val ) {
+						addGui( 'saturation', sataturation.number, function ( val ) {
 
 							sataturation.number = val;
 
 						}, false, 0, 2 );
 
-						addGui( 'vibrance', vibrance.number, function( val ) {
+						addGui( 'vibrance', vibrance.number, function ( val ) {
 
 							vibrance.number = val;
 
 						}, false, - 1, 1 );
 
-						addGui( 'brightness', brightness.number, function( val ) {
+						addGui( 'brightness', brightness.number, function ( val ) {
 
 							brightness.number = val;
 
 						}, false, 0, .5 );
 
-						addGui( 'contrast', contrast.number, function( val ) {
+						addGui( 'contrast', contrast.number, function ( val ) {
 
 							contrast.number = val;
 
@@ -245,13 +251,13 @@
 
 						// GUI
 
-						addGui( 'color', color.value.getHex(), function( val ) {
+						addGui( 'color', color.value.getHex(), function ( val ) {
 
 							color.value.setHex( val );
 
 						}, true );
 
-						addGui( 'fade', percent.number, function( val ) {
+						addGui( 'fade', percent.number, function ( val ) {
 
 							percent.number = val;
 
@@ -279,7 +285,7 @@
 
 						// GUI
 
-						addGui( 'alpha', alpha.number, function( val ) {
+						addGui( 'alpha', alpha.number, function ( val ) {
 
 							alpha.number = val;
 
@@ -302,11 +308,11 @@
 						// GUI
 
 						addGui( 'blend', {
-							'addition' : THREE.OperatorNode.ADD,
-							'subtract' : THREE.OperatorNode.SUB,
-							'multiply' : THREE.OperatorNode.MUL,
-							'division' : THREE.OperatorNode.DIV
-						}, function( val ) {
+							'addition': THREE.OperatorNode.ADD,
+							'subtract': THREE.OperatorNode.SUB,
+							'multiply': THREE.OperatorNode.MUL,
+							'division': THREE.OperatorNode.DIV
+						}, function ( val ) {
 
 							multiply.op = val;
 
@@ -324,11 +330,11 @@
 						var sat = new THREE.FloatNode( 0 );
 
 						var satrgb = new THREE.FunctionNode( [
-						"vec3 satrgb(vec3 rgb, float adjustment) {",
-						//"	const vec3 W = vec3(0.2125, 0.7154, 0.0721);", // LUMA
-						"	vec3 intensity = vec3(dot(rgb, LUMA));",
-						"	return mix(intensity, rgb, adjustment);",
-						"}"
+							"vec3 satrgb(vec3 rgb, float adjustment) {",
+							//"	const vec3 W = vec3(0.2125, 0.7154, 0.0721);", // LUMA
+							"	vec3 intensity = vec3(dot(rgb, LUMA));",
+							"	return mix(intensity, rgb, adjustment);",
+							"}"
 						].join( "\n" ) );
 
 						var saturation = new THREE.FunctionCallNode( satrgb );
@@ -339,7 +345,7 @@
 
 						// GUI
 
-						addGui( 'saturation', sat.number, function( val ) {
+						addGui( 'saturation', sat.number, function ( val ) {
 
 							sat.number = val;
 
@@ -392,13 +398,13 @@
 
 						// GUI
 
-						addGui( 'scale', scale.number, function( val ) {
+						addGui( 'scale', scale.number, function ( val ) {
 
 							scale.number = val;
 
 						}, false, 0, 1 );
 
-						addGui( 'invert', false, function( val ) {
+						addGui( 'invert', false, function ( val ) {
 
 							offsetNormal.a = val ? normalXYFlip : normalXY;
 
@@ -444,19 +450,19 @@
 
 						// GUI
 
-						addGui( 'scale', scale.number, function( val ) {
+						addGui( 'scale', scale.number, function ( val ) {
 
 							scale.number = val;
 
 						}, false, 16, 1024 );
 
-						addGui( 'fade', fade.number, function( val ) {
+						addGui( 'fade', fade.number, function ( val ) {
 
 							fade.number = val;
 
 						}, false, 0, 1 );
 
-						addGui( 'mask', true, function( val ) {
+						addGui( 'mask', true, function ( val ) {
 
 							fadeCoord.c = val ? maskAlpha : fade;
 
@@ -479,13 +485,13 @@
 
 						// GUI
 
-						addGui( 'blurX', blurScreen.radius.x, function( val ) {
+						addGui( 'blurX', blurScreen.radius.x, function ( val ) {
 
 							blurScreen.radius.x = val;
 
 						}, false, 0, 15 );
 
-						addGui( 'blurY', blurScreen.radius.y, function( val ) {
+						addGui( 'blurY', blurScreen.radius.y, function ( val ) {
 
 							blurScreen.radius.y = val;
 
@@ -497,6 +503,17 @@
 
 				nodepass.build();
 
+				// test serialization
+/*
+				var library = {};
+				library[ lensflare2.uuid ] = lensflare2;
+				library[ decalNormal.uuid ] = decalNormal;
+
+				var json = nodepass.toJSON();
+
+				nodepass.value = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
+				nodepass.build();
+*/
 			}
 
 			function init() {
@@ -574,7 +591,7 @@
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;
 
-				nodepass.node.updateFrame( delta );
+				frame.update( delta ).updateNode( nodepass.node );
 
 				composer.render();
 
