@@ -3,6 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author Tony Parisi / http://www.tonyparisi.com/
  * @author Takahiro / https://github.com/takahirox
+ * @author 1d2d3d / https://github.com/1d2d3d
  */
 
 THREE.LegacyGLTFLoader = ( function () {
@@ -31,7 +32,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			loader.load( url, function ( data ) {
 
-				scope.parse( data, onLoad, path );
+				scope.parse( data, path, onLoad );
 
 			}, onProgress, onError );
 
@@ -49,7 +50,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		},
 
-		parse: function ( data, callback, path ) {
+		parse: function ( data, path, callback ) {
 
 			var content;
 			var extensions = {};
@@ -664,6 +665,84 @@ THREE.LegacyGLTFLoader = ( function () {
 
 	}
 
+	function threeifyAttrName( attributeId ) {
+
+		// rename attributes in the vertex shader according to three.js naming conventions
+		var attrName = attributeId.toLowerCase();
+		var attrNum = 0;
+
+		// an underscore in the name means the attribute has an index,
+		// such as TEXCOORD_1 or COLOR_0
+		var underscoreIndex = attributeId.indexOf( '_' );
+
+		if ( underscoreIndex !== - 1 ) {
+
+			attrName = attributeId.slice( 0, underscoreIndex ).toLowerCase();
+			attrNum = parseInt( attributeId.slice( underscoreIndex + 1 ) );
+
+		}
+
+		// in three.js, 'color0' is renamed 'color'
+		// and numbering starts at 2 (color, color2, color3)
+		if ( attrNum === 0 )
+			attrNum = '';
+		else
+			attrNum += 1;
+
+		// 1. rename the attribute according to three.js conventions
+		// 2. if attributeId has a number but no underscore,
+		//    e.g., 'COLOR0', rename it properly anyway
+		// 3. if the attribute is not one of the types three.js understands,
+		//    tag it as 'no_rename_needed' so its name can be left alone
+		switch ( attrName ) {
+
+			case 'position':
+			case 'position0':
+
+				attrName = 'position';
+				break;
+
+			case 'color':
+			case 'color0':
+
+				attrName = 'color';
+				break;
+
+			case 'normal':
+			case 'normal0':
+
+				attrName = 'normal';
+				break;
+
+			case 'texcoord':
+			case 'texcoord0':
+
+				attrName = 'uv';
+				break;
+
+			case 'weight':
+			case 'weight0':
+
+				attrName = 'skinWeight';
+				break;
+
+			case 'joint':
+			case 'joint0':
+
+				attrName = 'skinIndex';
+				break;
+
+			default:
+
+				attrName = 'no_rename_needed';
+				attrNum = '';
+
+		}
+
+		return attrName + attrNum;
+
+	}
+
 	// Three.js seems too dependent on attribute names so globally
 	// replace those in the shader code
 	function replaceTHREEShaderAttributes( shaderText, technique ) {
@@ -712,46 +791,11 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			var regEx = new RegExp( "\\b" + pname + "\\b", "g" );
 
-			switch ( semantic ) {
+			// rename the attribute if it has a default name in three.js
+			var threeAttrName = threeifyAttrName( semantic );
+			if ( threeAttrName !== 'no_rename_needed' ) {
 
-				case "POSITION":
-
-					shaderText = shaderText.replace( regEx, 'position' );
-					break;
-
-				case "NORMAL":
-
-					shaderText = shaderText.replace( regEx, 'normal' );
-					break;
-
-				case 'TEXCOORD_0':
-				case 'TEXCOORD0':
-				case 'TEXCOORD':
-
-					shaderText = shaderText.replace( regEx, 'uv' );
-					break;
-
-				case 'TEXCOORD_1':
-
-					shaderText = shaderText.replace( regEx, 'uv2' );
-					break;
-
-				case 'COLOR_0':
-				case 'COLOR0':
-				case 'COLOR':
-
-					shaderText = shaderText.replace( regEx, 'color' );
-					break;
-
-				case "WEIGHT":
-
-					shaderText = shaderText.replace( regEx, 'skinWeight' );
-					break;
-
-				case "JOINT":
-
-					shaderText = shaderText.replace( regEx, 'skinIndex' );
-					break;
+				shaderText = shaderText.replace( regEx, threeAttrName );
 
 			}
 
@@ -1592,6 +1636,8 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						var attributes = primitive.attributes;
 
+						var attrIndex = 0;
+
 						for ( var attributeId in attributes ) {
 
 							var attributeEntry = attributes[ attributeId ];
@@ -1600,41 +1646,25 @@ THREE.LegacyGLTFLoader = ( function () {
 
 							var bufferAttribute = dependencies.accessors[ attributeEntry ];
 
-							switch ( attributeId ) {
+							// rename the attribute if it has a default name in three.js
+							// otherwise, keep the attribute's name as-is
+							var threeAttrName = threeifyAttrName(attributeId);
+							if ( threeAttrName !== 'no_rename_needed' ) {
 
-								case 'POSITION':
-									geometry.addAttribute( 'position', bufferAttribute );
-									break;
+								geometry.addAttribute( threeAttrName, bufferAttribute );
 
-								case 'NORMAL':
-									geometry.addAttribute( 'normal', bufferAttribute );
-									break;
+							} else {
 
-								case 'TEXCOORD_0':
-								case 'TEXCOORD0':
-								case 'TEXCOORD':
-									geometry.addAttribute( 'uv', bufferAttribute );
-									break;
+								// use the attribute index to find the attribute name
+								var material = json.materials[ primitive.material ];
+								var attributeNames = json.techniques[ material.technique ].attributes;
+								var attributeName = Object.keys( attributeNames )[ attrIndex ];
 
-								case 'TEXCOORD_1':
-									geometry.addAttribute( 'uv2', bufferAttribute );
-									break;
-
-								case 'COLOR_0':
-								case 'COLOR0':
-								case 'COLOR':
-									geometry.addAttribute( 'color', bufferAttribute );
-									break;
-
-								case 'WEIGHT':
-									geometry.addAttribute( 'skinWeight', bufferAttribute );
-									break;
-
-								case 'JOINT':
-									geometry.addAttribute( 'skinIndex', bufferAttribute );
-									break;
+								geometry.addAttribute( attributeName, bufferAttribute );
 
 							}
+
+							++attrIndex;
 
 						}
 
