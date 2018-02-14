@@ -80,12 +80,12 @@
 				scene.add( camera );
 
 				// ground
-				var mesh = new THREE.Mesh( new THREE.CircleBufferGeometry( 2000, 12 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
-				var grid = new THREE.PolarGridHelper( 2000, 10, 200, 200 );
-				grid.material.opacity = 0.4;
+				var grid = new THREE.GridHelper( 2000, 200, 0x000000, 0x000000 );
+				grid.material.opacity = 0.25;
 				grid.material.transparent = true;
 				scene.add( grid );
 
@@ -197,7 +197,7 @@
 
         }
 
-        else if ( initialPos.distanceTo( object.position ) > 1500 ) {
+        else if ( initialPos.distanceTo( object.position ) > 1000 ) {
 
           object.position.copy( initialPos );
 					car.speed = 0;
