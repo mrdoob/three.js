@@ -230,7 +230,6 @@ THREE.GLTFLoader = ( function () {
 
 				case 'directional':
 					lightNode = new THREE.DirectionalLight( color );
-					lightNode.position.set( 0, 0, 1 );
 					break;
 
 				case 'point':
@@ -239,7 +238,12 @@ THREE.GLTFLoader = ( function () {
 
 				case 'spot':
 					lightNode = new THREE.SpotLight( color );
-					lightNode.position.set( 0, 0, 1 );
+					// Handle spotlight properties.
+					var spot = light.spot || {};
+					var innerConeAngle = spot.innerConeAngle ? spot.innerConeAngle : 0;
+					var outerConeAngle = spot.outerConeAngle || Math.PI / 4.0;
+					lightNode.angle = outerConeAngle;
+					lightNode.penumbra = 1.0 - innerConeAngle / outerConeAngle;
 					break;
 
 				case 'ambient':
@@ -250,33 +254,11 @@ THREE.GLTFLoader = ( function () {
 
 			if ( lightNode ) {
 
-				if ( light.constantAttenuation !== undefined ) {
+				lightNode.decay = 2;
 
-					lightNode.intensity = light.constantAttenuation;
+				if ( light.intensity !== undefined ) {
 
-				}
-
-				if ( light.linearAttenuation !== undefined ) {
-
-					lightNode.distance = 1 / light.linearAttenuation;
-
-				}
-
-				if ( light.quadraticAttenuation !== undefined ) {
-
-					lightNode.decay = light.quadraticAttenuation;
-
-				}
-
-				if ( light.fallOffAngle !== undefined ) {
-
-					lightNode.angle = light.fallOffAngle;
-
-				}
-
-				if ( light.fallOffExponent !== undefined ) {
-
-					console.warn( 'THREE.GLTFLoader:: light.fallOffExponent not currently supported.' );
+					lightNode.intensity = light.intensity;
 
 				}
 
@@ -2417,7 +2399,8 @@ THREE.GLTFLoader = ( function () {
 
 			'mesh',
 			'skin',
-			'camera'
+			'camera',
+			'light'
 
 		] ).then( function ( dependencies ) {
 
