@@ -375,8 +375,6 @@ THREE.GLTFLoader = ( function () {
 	 * DRACO Mesh Compression Extension
 	 *
 	 * Specification: https://github.com/KhronosGroup/glTF/pull/874
-	 *
-	 * TODO: Support fallback to uncompressed data if decoder is unavailable.
 	 */
 	function GLTFDracoMeshCompressionExtension ( dracoLoader ) {
 
@@ -1090,8 +1088,6 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#morph-targets
 	 *
-	 * TODO: Implement support for morph targets on TANGENT attribute.
-	 *
 	 * @param {THREE.Mesh} mesh
 	 * @param {GLTF.Mesh} meshDef
 	 * @param {GLTF.Primitive} primitiveDef
@@ -1254,7 +1250,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( isPrimitiveEqual( cached.primitive, newPrimitive ) ) {
 
-				return cached.geometry;
+				return cached.promise;
 
 			}
 
@@ -2017,14 +2013,16 @@ THREE.GLTFLoader = ( function () {
 				if ( cached ) {
 
 					// Use the cached geometry if it exists
-					geometries.push( cached );
+					pending.push( cached.then( function ( geometry ) {
 
-					continue;
+						geometries.push( geometry );
+
+					} ) );
 
 				} else if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) {
 
 					// Use DRACO geometry if available
-					pending.push( extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ]
+					var geometryPromise = extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ]
 						.decodePrimitive( primitive, parser )
 						.then( function ( geometry ) {
 
@@ -2032,9 +2030,13 @@ THREE.GLTFLoader = ( function () {
 
 							geometries.push( geometry );
 
-							// TODO(donmccurdy): Cache DRACO geometries.
+							return geometry;
 
-						} ) );
+						} );
+
+					cache.push( { primitive: primitive, promise: geometryPromise  } );
+
+					pending.push( geometryPromise );
 
 				} else  {
 
@@ -2047,7 +2049,7 @@ THREE.GLTFLoader = ( function () {
 					cache.push( {
 
 						primitive: primitive,
-						geometry: geometry
+						promise: Promise.resolve( geometry )
 
 					} );
 
