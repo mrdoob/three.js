@@ -25,16 +25,9 @@
 				color: red;
 				font-weight: bold;
 			}
-			button {
-				border:0;
-				background:#000;
-				color:#fff;
-				padding:0.2em 0.5em;
-				cursor:pointer;
-				border-radius:3px;
-				}
-			button:hover { background:#333 }
-
+			span {
+				white-space: nowrap;
+			}
 		</style>
 	</head>
 
@@ -43,35 +36,12 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo :
 			texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a> :
 			Ferrari F50 model by <a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1687" target="_blank" rel="noopener">Daniel Sathya</a>
-			<br>
-			<div id="material-selections">
-				<strong>MATERIALS:</strong>
-				<span>Body:</span>
-				<select id="body-mat">
-					<option value="orange">Orange</option>
-					<option value="blue">Blue</option>
-					<option value="red" selected>Red</option>
-					<option value="black">Black</option>
-					<option value="white">White</option>
-				</select>
-				<span>Engine/Wheels:</span>
-				<select id="wheel-mat">
-					<option value="chrome" selected>Chrome</option>
-					<option value="white">White</option>
-					<option value="gold">Gold</option>
-				</select>
-				<span>Trim:</span>
-				<select id="trim-mat">
-					<option value="black" selected>Black</option>
-					<option value="white">White</option>
-				</select>
-				<span>Glass:</span>
-				<select id="glass-mat">
-					<option value="clear" selected>Clear</option>
-					<option value="blue">Blue</option>
-					<option value="red">Red</option>
-				</select>
-			</div>
+			<br><br>
+			<strong>MATERIALS:</strong>
+			<span>Body: <select id="body-mat"></select></span>
+			<span>Engine/Wheels: <select id="wheel-mat"></select></span>
+			<span>Trim: <select id="trim-mat"></select></span>
+			<span>Glass: <select id="glass-mat"></select></span>
 		</div>
 
 		<div id="container"></div>
@@ -89,6 +59,13 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+			var camera, scene, renderer, controls, stats;
+
+			var bodyMatSelect = document.getElementById( 'body-mat' );
+			var wheelMatSelect = document.getElementById( 'wheel-mat' );
+			var trimMatSelect = document.getElementById( 'trim-mat' );
+			var glassMatSelect = document.getElementById( 'glass-mat' );
+
 			var car = {
 				body: [],
 				wheelsTransmission:[],
@@ -97,8 +74,6 @@
 			};
 
 			var materialsLib;
-
-			var camera, scene, renderer, controls, stats;
 
 			init();
 			animate();
@@ -111,8 +86,8 @@
 				camera.position.set( 8, 4, 8 )
 
 				controls = new THREE.OrbitControls( camera, container );
-				controls.autoRotate = true;
-				controls.autoRotateSpeed = 0.5;
+				// controls.autoRotate = true;
+				controls.autoRotateSpeed = 0.25;
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
 
@@ -159,39 +134,30 @@
 					.setPath( 'textures/cube/Bridge2/')
 					.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
 
-				var orangeMetal = new THREE.MeshStandardMaterial( { color: 0xff6600, envMap: envMap, metalness: 0.25, roughness: 0.15 } );
-				var blueMetal = new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0.25, roughness: 0.15 } );
-				var redMetal = new THREE.MeshStandardMaterial( { color: 0x660000, envMap: envMap, metalness: 0.25, roughness: 0.15 } );
-				var blackMetal = new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.25, roughness: 0.15 } );
-				var whiteMetal = new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.25, roughness: 0.15 } );
-				var chrome = new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.25, roughness: 0.15 } );
-				var goldMetal = new THREE.MeshStandardMaterial( { color: 0xaa9944, envMap: envMap, metalness: 0.25, roughness: 0.15 } );
-				var clearGlass = new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.25, roughness: 0.15, opacity: 0.5, transparent: true } );
-				var redGlass = new THREE.MeshStandardMaterial( { color: 0x660000, envMap: envMap, metalness: 0.25, roughness: 0.15, opacity: 0.75, transparent: true } );
-				var blueGlass = new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0.25, roughness: 0.15, opacity: 0.75, transparent: true } );
+				envMapRefraction = envMap.clone();
+				envMapRefraction.mapping = THREE.CubeRefractionMapping;
+				envMapRefraction.needsUpdate = true;
 
 				materialsLib = {
-					body: {
-						orange: orangeMetal,
-						blue: blueMetal,
-						red: redMetal,
-						black: blackMetal,
-						white: whiteMetal,
-					},
-					wheelsTransmission: {
-						chrome: chrome,
-						white: whiteMetal,
-						gold: goldMetal,
-					},
-					trim: {
-						black: blackMetal,
-						white: whiteMetal,
+
+					main: {
+
+						orangePaint: new THREE.MeshStandardMaterial( { color: 0xff6600, envMap: envMap, metalness: 0.25, roughness: 0.15 } ),
+						bluePaint: new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 0.25, roughness: 0.15 } ),
+						redPaint: new THREE.MeshStandardMaterial( { color: 0x660000, envMap: envMap, metalness: 0.25, roughness: 0.15 } ),
+						blackPaint: new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.25, roughness: 0.15 } ),
+						whitePaint: new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.25, roughness: 0.15 } ),
+						chrome: new THREE.MeshStandardMaterial( { color: 0xcccccc, envMap: envMap, metalness: 0.75, roughness: 0.15 } ),
+						gold: new THREE.MeshStandardMaterial( { color: 0xf3d855, envMap: envMap, metalness: 0.75, roughness: 0.15 } ),
+
 					},
 					glass: {
-						clear: clearGlass,
-						blue: blueGlass,
-						red: redGlass,
-					}
+
+						clearGlass: new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMapRefraction, metalness: 0.0, roughness: 0.25, opacity: 0.5, transparent: true, refractionRatio: 0.25 } ),
+						smokedGlass: new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMapRefraction, metalness: 0, roughness: 0.25, opacity: 0.75, transparent: true, refractionRatio: 0.75 } ),
+						blueGlass: new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMapRefraction, metalness: 0, roughness: 0.25, opacity: 0.5, transparent: true, refractionRatio: 0.75 } ),
+
+					},
 				}
 
 			}
@@ -204,8 +170,6 @@
 					var carModel = gltf.scene.children[ 0 ];
 
 					scene.add( carModel );
-
-					console.log( carModel )
 
 					car.body.push( carModel.getObjectByName( 'exterior' ) );
 
@@ -222,28 +186,76 @@
 						carModel.getObjectByName( 'glass' )
 					 );
 
-					car.trim.push( carModel.getObjectByName( 'trim' ) )
+					car.trim.push( carModel.getObjectByName( 'trim' ) );
+
+					updateMaterials();
 
 				} )
 			}
 
+			// set materials to the current values of the selection menus
+			function updateMaterials() {
+
+				var bodyMatName = bodyMatSelect.options[ bodyMatSelect.selectedIndex ].value;
+				var wheelMatName = wheelMatSelect.options[ wheelMatSelect.selectedIndex ].value;
+				var trimMatName = trimMatSelect.options[ trimMatSelect.selectedIndex ].value;
+				var glassMatName = glassMatSelect.options[ glassMatSelect.selectedIndex ].value;
+
+				var bodyMat = materialsLib.main[ bodyMatName ];
+				var wheelMat = materialsLib.main[ wheelMatName ];
+				var trimMat = materialsLib.main[ trimMatName ];
+				var glassMat = materialsLib.glass[ glassMatName ];
+
+				car.body.forEach( function ( part ) { part.material = bodyMat; } );
+				car.wheelsTransmission.forEach( function ( part ) { part.material = wheelMat; } );
+				car.trim.forEach( function ( part ) { part.material = trimMat; } );
+				car.glass.forEach( function ( part ) { part.material = glassMat; } );
+
+			}
+
+			// set up material selection menus
 			function initMaterialSelection() {
 
-				function changeMat( e, parts ) {
+				function changeMat( e ) {
 
 					e.preventDefault();
-
-					const materialName = e.target.options[e.target.selectedIndex].value;
-					const material = materialsLib[ parts ][ materialName ];
-
-					car[ parts ].forEach( function ( part ) { part.material = material; } );
+					updateMaterials();
 
 				};
 
-				document.getElementById( 'body-mat' ).addEventListener( 'change', function ( e ) { 	changeMat( e, 'body' ); } );
-				document.getElementById( 'wheel-mat' ).addEventListener( 'change', function ( e ) { 	changeMat( e, 'wheelsTransmission' ); } );
-				document.getElementById( 'trim-mat' ).addEventListener( 'change', function ( e ) { 	changeMat( e, 'trim' ); } );
-				document.getElementById( 'glass-mat' ).addEventListener( 'change', function ( e ) { 	changeMat( e, 'glass' ); } );
+				function addOption( name, value, menu ) {
+
+					var option = document.createElement( 'option' );
+					option.text = name;
+					option.value = value;
+					menu.add( option );
+
+				}
+
+				Object.keys( materialsLib.main ).forEach( function( materialName ) {
+
+					addOption( materialName, materialName, bodyMatSelect );
+					addOption( materialName, materialName, wheelMatSelect );
+					addOption( materialName, materialName, trimMatSelect );
+
+				} );
+
+				Object.keys( materialsLib.glass ).forEach( function( materialName ) {
+
+					addOption( materialName, materialName, glassMatSelect );
+
+				} );
+
+				// set initial materials
+				bodyMatSelect.selectedIndex = 2;
+				wheelMatSelect.selectedIndex = 5;
+				trimMatSelect.selectedIndex = 3;
+				glassMatSelect.selectedIndex = 0;
+
+				bodyMatSelect.addEventListener( 'change', changeMat );
+				wheelMatSelect.addEventListener( 'change', changeMat );
+				trimMatSelect.addEventListener( 'change', changeMat );
+				glassMatSelect.addEventListener( 'change', changeMat );
 
 			}
 
