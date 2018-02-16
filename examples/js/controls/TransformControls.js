@@ -12,6 +12,7 @@
 
 		this.depthTest = false;
 		this.depthWrite = false;
+		this.fog = false;
 		this.side = THREE.FrontSide;
 		this.transparent = true;
 
@@ -48,6 +49,7 @@
 
 		this.depthTest = false;
 		this.depthWrite = false;
+		this.fog = false;
 		this.transparent = true;
 		this.linewidth = 1;
 
