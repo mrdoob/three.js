@@ -23,8 +23,6 @@
 
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="obj/Qrcode.js"></script>
-
 		<script>
 
 			var AMOUNT = 100;
@@ -53,9 +51,14 @@
 
 				// QRCODE
 
-				mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshLambertMaterial( { /*emissive: 0xff0000,*/ vertexColors: THREE.FaceColors } ) );
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.add( mesh );
+				var loader = new THREE.JSONLoader();
+				loader.load( 'models/json/QRCode.json', function ( geometry) {
+
+					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { vertexColors: THREE.FaceColors } ) );
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
+					scene.add( mesh );
+
+				} );
 
 				// CUBES
 

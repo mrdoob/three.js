@@ -24,8 +24,6 @@ THREE.DRACOLoader = function(manager) {
     this.verbosity = 0;
     this.attributeOptions = {};
     this.drawMode = THREE.TrianglesDrawMode;
-    // User defined unique id for attributes.
-    this.attributeUniqueIdMap = {};
     // Native Draco attribute type to Three.JS attribute type.
     this.nativeAttributeMap = {
       'position' : 'POSITION',
@@ -104,14 +102,15 @@ THREE.DRACOLoader.prototype = {
      */
     decodeDracoFile: function(rawBuffer, callback, attributeUniqueIdMap) {
       var scope = this;
-      this.attributeUniqueIdMap = attributeUniqueIdMap || {};
       THREE.DRACOLoader.getDecoderModule()
           .then( function ( module ) {
-            scope.decodeDracoFileInternal( rawBuffer, module.decoder, callback );
+            scope.decodeDracoFileInternal( rawBuffer, module.decoder, callback,
+              attributeUniqueIdMap || {});
           });
     },
 
-    decodeDracoFileInternal: function(rawBuffer, dracoDecoder, callback) {
+    decodeDracoFileInternal: function(rawBuffer, dracoDecoder, callback,
+                                      attributeUniqueIdMap) {
       /*
        * Here is how to use Draco Javascript decoder and get the geometry.
        */
@@ -137,7 +136,7 @@ THREE.DRACOLoader.prototype = {
         throw new Error(errorMsg);
       }
       callback(this.convertDracoGeometryTo3JS(dracoDecoder, decoder,
-          geometryType, buffer));
+          geometryType, buffer, attributeUniqueIdMap));
     },
 
     addAttributeToGeometry: function(dracoDecoder, decoder, dracoGeometry,
@@ -168,7 +167,7 @@ THREE.DRACOLoader.prototype = {
     },
 
     convertDracoGeometryTo3JS: function(dracoDecoder, decoder, geometryType,
-                                        buffer) {
+                                        buffer, attributeUniqueIdMap) {
         if (this.getAttributeOptions('position').skipDequantization === true) {
           decoder.SkipAttributeTransform(dracoDecoder.POSITION);
         }
@@ -236,7 +235,7 @@ THREE.DRACOLoader.prototype = {
         for (var attributeName in this.nativeAttributeMap) {
           // The native attribute type is only used when no unique Id is
           // provided. For example, loading .drc files.
-          if (this.attributeUniqueIdMap[attributeName] === undefined) {
+          if (attributeUniqueIdMap[attributeName] === undefined) {
             var attId = decoder.GetAttributeId(dracoGeometry,
                 dracoDecoder[this.nativeAttributeMap[attributeName]]);
             if (attId !== -1) {
@@ -251,8 +250,8 @@ THREE.DRACOLoader.prototype = {
         }
 
         // Add attributes of user specified unique id. E.g. GLTF models.
-        for (var attributeName in this.attributeUniqueIdMap) {
-          var attributeId = this.attributeUniqueIdMap[attributeName];
+        for (var attributeName in attributeUniqueIdMap) {
+          var attributeId = attributeUniqueIdMap[attributeName];
           var attribute = decoder.GetAttributeByUniqueId(dracoGeometry,
                                                          attributeId);
           this.addAttributeToGeometry(dracoDecoder, decoder, dracoGeometry,
@@ -353,18 +352,26 @@ THREE.DRACOLoader.setDecoderPath = function ( path ) {
 THREE.DRACOLoader.setDecoderConfig = function ( config ) {
   var wasmBinary = THREE.DRACOLoader.decoderConfig.wasmBinary;
   THREE.DRACOLoader.decoderConfig = config || {};
-  THREE.DRACOLoader.decoderModulePromise = null;
+  THREE.DRACOLoader.releaseDecoderModule();
 
   // Reuse WASM binary.
   if ( wasmBinary ) THREE.DRACOLoader.decoderConfig.wasmBinary = wasmBinary;
 };
 
- /**
-  * Gets WebAssembly or asm.js singleton instance of DracoDecoderModule
-  * after testing for browser support. Returns Promise that resolves when
-  * module is available.
-  * @return {Promise<{decoder: DracoDecoderModule}>}
-  */
+/**
+ * Releases the singleton DracoDecoderModule instance. Module will be recreated
+ * with the next decoding call.
+ */
+THREE.DRACOLoader.releaseDecoderModule = function () {
+  THREE.DRACOLoader.decoderModulePromise = null;
+};
+
+/**
+ * Gets WebAssembly or asm.js singleton instance of DracoDecoderModule
+ * after testing for browser support. Returns Promise that resolves when
+ * module is available.
+ * @return {Promise<{decoder: DracoDecoderModule}>}
+ */
 THREE.DRACOLoader.getDecoderModule = function () {
   var scope = this;
   var path = THREE.DRACOLoader.decoderPath;

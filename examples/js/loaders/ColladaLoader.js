@@ -159,7 +159,15 @@ THREE.ColladaLoader.prototype = {
 
 		function parseAssetUnit( xml ) {
 
-			return xml !== undefined ? parseFloat( xml.getAttribute( 'meter' ) ) : 1;
+			if ( ( xml !== undefined ) && ( xml.hasAttribute( 'meter' ) === true ) ) {
+
+				return parseFloat( xml.getAttribute( 'meter' ) );
+
+			} else {
+
+				return 1; // default 1 meter
+
+			}
 
 		}
 
