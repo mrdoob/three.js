@@ -231,6 +231,12 @@ def animated_xform(obj, options):
     inverted_fallback = mathutils.Matrix() if use_inverted else None
     convert_matrix = AXIS_CONVERSION    # matrix to convert the exported matrix
     original_frame = context.scene.frame_current
+
+    if options.get(constants.BAKE_KEYFRAMES):
+        frame_step = options.get(constants.FRAME_STEP, 1)
+        logger.info("Baking keyframes, frame_step=%d", frame_step)
+        times = range(context.scene.frame_start, context.scene.frame_end+1, frame_step)
+
     for time in times:
         context.scene.frame_set(time, 0.0)
         if use_inverted:  # need to use the inverted, parent matrix might have chance
