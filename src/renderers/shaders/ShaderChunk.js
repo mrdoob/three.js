@@ -36,12 +36,15 @@ import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.g
 import lightmap_fragment from './ShaderChunk/lightmap_fragment.glsl';
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl';
 import lights_lambert_vertex from './ShaderChunk/lights_lambert_vertex.glsl';
-import lights_pars from './ShaderChunk/lights_pars.glsl';
+import lights_pars_begin from './ShaderChunk/lights_pars_begin.glsl';
+import lights_pars_maps from './ShaderChunk/lights_pars_maps.glsl';
 import lights_phong_fragment from './ShaderChunk/lights_phong_fragment.glsl';
 import lights_phong_pars_fragment from './ShaderChunk/lights_phong_pars_fragment.glsl';
 import lights_physical_fragment from './ShaderChunk/lights_physical_fragment.glsl';
 import lights_physical_pars_fragment from './ShaderChunk/lights_physical_pars_fragment.glsl';
-import lights_template from './ShaderChunk/lights_template.glsl';
+import lights_fragment_begin from './ShaderChunk/lights_fragment_begin.glsl';
+import lights_fragment_maps from './ShaderChunk/lights_fragment_maps.glsl';
+import lights_fragment_end from './ShaderChunk/lights_fragment_end.glsl';
 import logdepthbuf_fragment from './ShaderChunk/logdepthbuf_fragment.glsl';
 import logdepthbuf_pars_fragment from './ShaderChunk/logdepthbuf_pars_fragment.glsl';
 import logdepthbuf_pars_vertex from './ShaderChunk/logdepthbuf_pars_vertex.glsl';
@@ -148,12 +151,15 @@ export var ShaderChunk = {
 	lightmap_fragment: lightmap_fragment,
 	lightmap_pars_fragment: lightmap_pars_fragment,
 	lights_lambert_vertex: lights_lambert_vertex,
-	lights_pars: lights_pars,
+	lights_pars_begin: lights_pars_begin,
+	lights_pars_maps: lights_pars_maps,
 	lights_phong_fragment: lights_phong_fragment,
 	lights_phong_pars_fragment: lights_phong_pars_fragment,
 	lights_physical_fragment: lights_physical_fragment,
 	lights_physical_pars_fragment: lights_physical_pars_fragment,
-	lights_template: lights_template,
+	lights_fragment_begin: lights_fragment_begin,
+	lights_fragment_maps: lights_fragment_maps,
+	lights_fragment_end: lights_fragment_end,
 	logdepthbuf_fragment: logdepthbuf_fragment,
 	logdepthbuf_pars_fragment: logdepthbuf_pars_fragment,
 	logdepthbuf_pars_vertex: logdepthbuf_pars_vertex,

@@ -102,20 +102,6 @@ IncidentLight directLight;
 
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
-	#ifdef USE_LIGHTMAP
-
-		vec3 lightMapIrradiance = texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
-
-		#ifndef PHYSICALLY_CORRECT_LIGHTS
-
-			lightMapIrradiance *= PI; // factor of PI should not be present; included here to prevent breakage
-
-		#endif
-
-		irradiance += lightMapIrradiance;
-
-	#endif
-
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
 		#pragma unroll_loop
@@ -127,28 +113,11 @@ IncidentLight directLight;
 
 	#endif
 
-	#if defined( USE_ENVMAP ) && defined( PHYSICAL ) && defined( ENVMAP_TYPE_CUBE_UV )
-
-		// TODO, replace 8 with the real maxMIPLevel
-		irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 );
-
-	#endif
-
-	RE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );
-
 #endif
 
-#if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
+#if defined( RE_IndirectSpecular )
 
-	// TODO, replace 8 with the real maxMIPLevel
-	vec3 radiance = getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry, Material_BlinnShininessExponent( material ), 8 );
-
-	#ifndef STANDARD
-		vec3 clearCoatRadiance = getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry, Material_ClearCoat_BlinnShininessExponent( material ), 8 );
-	#else
-		vec3 clearCoatRadiance = vec3( 0.0 );
-	#endif
-
-	RE_IndirectSpecular( radiance, clearCoatRadiance, geometry, material, reflectedLight );
+	vec3 radiance = vec3( 0.0 );
+	vec3 clearCoatRadiance = vec3( 0.0 );
 
 #endif
