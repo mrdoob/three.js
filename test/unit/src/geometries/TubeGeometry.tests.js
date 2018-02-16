@@ -8,8 +8,8 @@ import {
 	TubeBufferGeometry
 } from '../../../../src/geometries/TubeGeometry';
 
-import { LineCurve3 } from '../../../../src/extras/curves/LineCurve3'
-import { Vector3 } from '../../../../src/math/Vector3'
+import { LineCurve3 } from '../../../../src/extras/curves/LineCurve3';
+import { Vector3 } from '../../../../src/math/Vector3';
 
 export default QUnit.module( 'Geometries', () => {
 

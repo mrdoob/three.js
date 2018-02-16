@@ -24,7 +24,8 @@ var Config = function ( name ) {
 		'settings/shortcuts/translate': 'w',
 		'settings/shortcuts/rotate': 'e',
 		'settings/shortcuts/scale': 'r',
-		'settings/shortcuts/undo': 'z'
+		'settings/shortcuts/undo': 'z',
+		'settings/shortcuts/focus': 'f'
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

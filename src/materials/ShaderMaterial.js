@@ -63,6 +63,7 @@ function ShaderMaterial( parameters ) {
 	};
 
 	this.index0AttributeName = undefined;
+	this.uniformsNeedUpdate = false;
 
 	if ( parameters !== undefined ) {
 

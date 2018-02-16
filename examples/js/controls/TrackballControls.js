@@ -469,6 +469,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 	function mousewheel( event ) {
 
 		if ( _this.enabled === false ) return;
+		
+		if ( _this.noZoom === true ) return;
 
 		event.preventDefault();
 		event.stopPropagation();

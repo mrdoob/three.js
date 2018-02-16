@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.JoinNode = function( x, y, z, w ) {
+THREE.JoinNode = function ( x, y, z, w ) {
 
 	THREE.TempNode.call( this, 'fv1' );
 
@@ -17,8 +17,9 @@ THREE.JoinNode.inputs = [ 'x', 'y', 'z', 'w' ];
 
 THREE.JoinNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.JoinNode.prototype.constructor = THREE.JoinNode;
+THREE.JoinNode.prototype.nodeType = "Join";
 
-THREE.JoinNode.prototype.getNumElements = function() {
+THREE.JoinNode.prototype.getNumElements = function () {
 
 	var inputs = THREE.JoinNode.inputs;
 	var i = inputs.length;
@@ -38,13 +39,13 @@ THREE.JoinNode.prototype.getNumElements = function() {
 
 };
 
-THREE.JoinNode.prototype.getType = function( builder ) {
+THREE.JoinNode.prototype.getType = function ( builder ) {
 
 	return builder.getFormatFromLength( this.getNumElements() );
 
 };
 
-THREE.JoinNode.prototype.generate = function( builder, output ) {
+THREE.JoinNode.prototype.generate = function ( builder, output ) {
 
 	var material = builder.material;
 
@@ -65,5 +66,37 @@ THREE.JoinNode.prototype.generate = function( builder, output ) {
 	var code = ( length > 1 ? builder.getConstructorFromLength( length ) : '' ) + '(' + outputs.join( ',' ) + ')';
 
 	return builder.format( code, type, output );
+
+};
+
+THREE.JoinNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.inputs = {};
+
+		var length = this.getNumElements();
+		var inputs = THREE.JoinNode.inputs;
+
+		for ( var i = 0; i < length; i ++ ) {
+
+			var elm = this[ inputs[ i ] ];
+
+			if ( elm ) {
+
+				data.inputs[ inputs[ i ] ] = elm.toJSON( meta ).uuid;
+
+			}
+
+		}
+
+
+	}
+
+	return data;
 
 };

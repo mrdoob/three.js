@@ -85,28 +85,25 @@
 
 			var MeshSpray = (function () {
 
-				var Validator = THREE.LoaderSupport.Validator;
-				var ConsoleLogger = THREE.LoaderSupport.ConsoleLogger;
-
 				MeshSpray.prototype = Object.create( THREE.LoaderSupport.LoaderBase.prototype );
 				MeshSpray.prototype.constructor = MeshSpray;
 
 				function MeshSpray( manager, logger ) {
 					THREE.LoaderSupport.LoaderBase.call( this, manager, logger );
 					this.workerSupport = null;
-					this.logger = new ConsoleLogger();
+					this.logger = new THREE.LoaderSupport.ConsoleLogger();
 				};
 
 				MeshSpray.prototype.run = function ( prepData, workerSupportExternal ) {
 
-					if ( Validator.isValid( workerSupportExternal ) ) {
+					if ( THREE.LoaderSupport.Validator.isValid( workerSupportExternal ) ) {
 
 						this.workerSupport = workerSupportExternal;
 						this.logger = workerSupportExternal.logger;
 
 					} else {
 
-						this.workerSupport = Validator.verifyInput( this.workerSupport, new THREE.LoaderSupport.WorkerSupport() );
+						this.workerSupport = THREE.LoaderSupport.Validator.verifyInput( this.workerSupport, new THREE.LoaderSupport.WorkerSupport() );
 
 					}
 
@@ -125,7 +122,7 @@
 					};
 					var scopeFuncComplete = function ( message ) {
 						var callback = scope.callbacks.onLoad;
-						if ( Validator.isValid( callback ) ) callback(
+						if ( THREE.LoaderSupport.Validator.isValid( callback ) ) callback(
 							{
 								detail: {
 									loaderRootNode: scope.loaderRootNode,
@@ -137,19 +134,20 @@
 						scope.logger.logTimeEnd( 'MeshSpray' );
 					};
 
-					var buildCode = function ( funcBuildObject, funcBuildSingelton ) {
+					var buildCode = function ( funcBuildObject, funcBuildSingleton ) {
 						var workerCode = '';
 						workerCode += '/**\n';
 						workerCode += '  * This code was constructed by MeshSpray buildCode.\n';
 						workerCode += '  */\n\n';
-						workerCode += funcBuildObject( 'Validator', Validator );
-						workerCode += funcBuildSingelton( 'ConsoleLogger', 'ConsoleLogger', ConsoleLogger );
-						workerCode += funcBuildSingelton( 'Parser', 'Parser', Parser );
+						workerCode += 'THREE.LoaderSupport = {};\n\n';
+						workerCode += funcBuildObject( 'THREE.LoaderSupport.Validator', THREE.LoaderSupport.Validator );
+						workerCode += funcBuildSingleton( 'THREE.LoaderSupport.ConsoleLogger', THREE.LoaderSupport.ConsoleLogger );
+						workerCode += funcBuildSingleton( 'Parser', Parser );
 
 						return workerCode;
 					};
 					var libs2Load = [ 'build/three.min.js' ];
-					this.workerSupport.validate( buildCode, libs2Load, '../' );
+					this.workerSupport.validate( buildCode, 'Parser', libs2Load, '../' );
 					this.workerSupport.setCallbacks( scopeBuilderFunc, scopeFuncComplete );
 					this.workerSupport.run(
 						{
@@ -175,8 +173,6 @@
 
 				var Parser  = ( function () {
 
-					var ConsoleLogger = THREE.LoaderSupport.ConsoleLogger;
-
 					function Parser() {
 						this.sizeFactor = 0.5;
 						this.localOffsetFactor = 1.0;
@@ -186,7 +182,7 @@
 						this.quantity = 1;
 						this.callbackBuilder = null;
 						this.callbackProgress = null;
-						this.logger = new ConsoleLogger();
+						this.logger = new THREE.LoaderSupport.ConsoleLogger();
 						this.serializedMaterials = null;
 					};
 
@@ -265,16 +261,16 @@
 						 *
 						 * This is not the most effective way, but outlining possibilities
 						 */
-						var materialName = 'vertexColorMaterial_double';
-						var vertexColorMaterialJson = this.serializedMaterials[ 'vertexColorMaterial' ];
+						var materialName = 'defaultVertexColorMaterial_double';
+						var defaultVertexColorMaterialJson = this.serializedMaterials[ 'defaultVertexColorMaterial' ];
 						var loader = new THREE.MaterialLoader();
 
-						var vertexColorMaterialDouble = loader.parse( vertexColorMaterialJson );
-						vertexColorMaterialDouble.name = materialName;
-						vertexColorMaterialDouble.side = THREE.DoubleSide;
+						var defaultVertexColorMaterialDouble = loader.parse( defaultVertexColorMaterialJson );
+						defaultVertexColorMaterialDouble.name = materialName;
+						defaultVertexColorMaterialDouble.side = THREE.DoubleSide;
 
 						var newSerializedMaterials = {};
-						newSerializedMaterials[ materialName ] = vertexColorMaterialDouble.toJSON();
+						newSerializedMaterials[ materialName ] = defaultVertexColorMaterialDouble.toJSON();
 						var payload = {
 							cmd: 'materialData',
 							materials: {
@@ -319,7 +315,7 @@
 
 
 				Parser.prototype.setSerializedMaterials = function ( serializedMaterials ) {
-					if ( Validator.isValid( serializedMaterials ) ) {
+					if ( THREE.LoaderSupport.Validator.isValid( serializedMaterials ) ) {
 
 						this.serializedMaterials = serializedMaterials;
 

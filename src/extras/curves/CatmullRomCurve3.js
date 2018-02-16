@@ -209,5 +209,47 @@ CatmullRomCurve3.prototype.copy = function ( source ) {
 
 };
 
+CatmullRomCurve3.prototype.toJSON = function () {
+
+	var data = Curve.prototype.toJSON.call( this );
+
+	data.points = [];
+
+	for ( var i = 0, l = this.points.length; i < l; i ++ ) {
+
+		var point = this.points[ i ];
+		data.points.push( point.toArray() );
+
+	}
+
+	data.closed = this.closed;
+	data.curveType = this.curveType;
+	data.tension = this.tension;
+
+	return data;
+
+};
+
+CatmullRomCurve3.prototype.fromJSON = function ( json ) {
+
+	Curve.prototype.fromJSON.call( this, json );
+
+	this.points = [];
+
+	for ( var i = 0, l = json.points.length; i < l; i ++ ) {
+
+		var point = json.points[ i ];
+		this.points.push( new Vector3().fromArray( point ) );
+
+	}
+
+	this.closed = json.closed;
+	this.curveType = json.curveType;
+	this.tension = json.tension;
+
+	return this;
+
+};
+
 
 export { CatmullRomCurve3 };

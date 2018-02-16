@@ -201,8 +201,6 @@
 
 	};
 
-	"use strict";
-
 	var XLoader = function () {
 
 		function XLoader( manager, texloader ) {
@@ -237,14 +235,17 @@
 		}
 
 		createClass( XLoader, [ {
-			key: 'load',
-			value: function load( _arg, onLoad, onProgress, onError ) {
+			key: '_setArgOption',
+			value: function _setArgOption( _arg ) {
 
-				var _this = this;
+				var _start = arguments.length > 1 && arguments[ 1 ] !== undefined ? arguments[ 1 ] : 0;
 
-				var loader = new THREE.FileLoader( this.manager );
-				loader.setResponseType( 'arraybuffer' );
-				for ( var i = 0; i < _arg.length; i ++ ) {
+				if ( ! _arg ) {
+
+					return;
+
+				}
+				for ( var i = _start; i < _arg.length; i ++ ) {
 
 					switch ( i ) {
 
@@ -263,11 +264,77 @@
 					this.options = {};
 
 				}
+
+			}
+		}, {
+			key: 'load',
+			value: function load( _arg, onLoad, onProgress, onError ) {
+
+				var _this = this;
+
+				this._setArgOption( _arg );
+				var loader = new THREE.FileLoader( this.manager );
+				loader.setResponseType( 'arraybuffer' );
 				loader.load( this.url, function ( response ) {
 
 					_this._parse( response, onLoad );
 
 				}, onProgress, onError );
+
+			}
+		}, {
+			key: 'fromResponsedData',
+			value: function fromResponsedData( _data, _arg, onLoad ) {
+
+				this._setArgOption( _arg );
+				this._parse( _data, onLoad );
+
+			}
+		}, {
+			key: '_readLine',
+			value: function _readLine( line ) {
+
+				var readed = 0;
+				while ( true ) {
+
+					var find = - 1;
+					find = line.indexOf( '//', readed );
+					if ( find === - 1 ) {
+
+						find = line.indexOf( '#', readed );
+
+					}
+					if ( find > - 1 && find < 2 ) {
+
+						var foundNewLine = - 1;
+						foundNewLine = line.indexOf( "\r\n", readed );
+						if ( foundNewLine > 0 ) {
+
+							readed = foundNewLine + 2;
+
+						} else {
+
+							foundNewLine = line.indexOf( "\r", readed );
+							if ( foundNewLine > 0 ) {
+
+								readed = foundNewLine + 1;
+
+							} else {
+
+								readed = line.indexOf( "\n", readed ) + 1;
+
+							}
+
+						}
+
+					} else {
+
+						break;
+
+					}
+
+				}
+				return line.substr( readed );
 
 			}
 		}, {
@@ -370,14 +437,7 @@
 
 				if ( typeof buf !== "string" ) {
 
-					var array_buffer = new Uint8Array( buf );
-					var str = '';
-					for ( var i = 0; i < buf.byteLength; i ++ ) {
-
-						str += String.fromCharCode( array_buffer[ i ] );
-
-					}
-					return str;
+					return THREE.LoaderUtils.decodeText( new Uint8Array( buf ) );
 
 				} else {
 
@@ -400,7 +460,7 @@
 			key: '_parseBinary',
 			value: function _parseBinary( data ) {
 
-				return this._parseASCII( String.fromCharCode.apply( null, data ) );
+				return this._parseASCII( THREE.LoaderUtils.decodeText( new Uint8Array( data ) ) );
 
 			}
 		}, {
@@ -518,7 +578,6 @@
 
 				} else {
 
-					this._readFinalize();
 					setTimeout( function () {
 
 						_this2.onLoad( {
@@ -877,15 +936,7 @@
 			value: function _readNormalVector1( line ) {
 
 				var data = this._readLine( line.trim() ).substr( 0, line.length - 2 ).split( ";" );
-				if ( this.options.zflag ) {
-
-					this._currentGeo.normalVectors.push( new THREE.Vector3( parseFloat( data[ 0 ] ) * - 1, parseFloat( data[ 1 ] ) * - 1, parseFloat( data[ 2 ] ) * - 1 ) );
-
-				} else {
-
-					this._currentGeo.normalVectors.push( new THREE.Vector3( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) ) );
-
-				}
+				this._currentGeo.normalVectors.push( new THREE.Vector3( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ), parseFloat( data[ 2 ] ) ) );
 
 			}
 		}, {
@@ -1066,15 +1117,7 @@
 				var _nowMat = new THREE.MeshPhongMaterial( {
 					color: Math.random() * 0xffffff
 				} );
-				if ( this.options.zflag ) {
-
-					_nowMat.side = THREE.BackSide;
-
-				} else {
-
-					_nowMat.side = THREE.FrontSide;
-
-				}
+				_nowMat.side = THREE.FrontSide;
 				_nowMat.name = this._currentObject.name;
 				var endRead = 0;
 				var find = this._currentObject.data.indexOf( ';;', endRead );
@@ -1437,7 +1480,6 @@
 
 				var model = _model;
 				var animation = _animation;
-				var bindFlag = _isBind ? _isBind : true;
 				if ( ! model ) {
 
 					model = this.Meshes[ 0 ];
@@ -1522,32 +1564,15 @@
 					model.geometry.animations = [];
 
 				}
-				if ( bindFlag ) {
 
-					model.geometry.animations.push( THREE.AnimationClip.parseAnimation( put, model.skeleton.bones ) );
-					if ( ! model.animationMixer ) {
+				model.geometry.animations.push( THREE.AnimationClip.parseAnimation( put, model.skeleton.bones ) );
+				if ( ! model.animationMixer ) {
 
-						model.animationMixer = new THREE.AnimationMixer( model );
-
-					}
+					model.animationMixer = new THREE.AnimationMixer( model );
 
 				}
+
 				return put;
-
-			}
-		}, {
-			key: '_readFinalize',
-			value: function _readFinalize() {
-
-				if ( this.options.zflag ) {
-
-					for ( var i = 0; i < this.Meshes.length; i ++ ) {
-
-						this.Meshes[ i ].scale.set( - 1, 1, 1 );
-
-					}
-
-				}
 
 			}
 		}, {

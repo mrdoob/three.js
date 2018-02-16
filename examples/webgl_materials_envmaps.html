@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - cube reflection [cars]</title>
+		<title>three.js webgl - materials - environment maps</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -135,7 +135,6 @@
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setFaceCulling( THREE.CullFaceNone );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -211,8 +210,6 @@
 			}
 
 			function render() {
-
-				var timer = -0.0002 * Date.now();
 
 				camera.lookAt( scene.position );
 				cameraCube.rotation.copy( camera.rotation );

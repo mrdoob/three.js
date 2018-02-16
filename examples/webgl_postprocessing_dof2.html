@@ -172,8 +172,10 @@ Use WEBGL Depth buffer support?
 
 				// Adding Monkeys
 
-				var loader2 = new THREE.JSONLoader();
-				loader2.load( 'obj/Suzanne.js', function ( geometry ) {
+				var loader2 = new THREE.BufferGeometryLoader();
+				loader2.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
+
+					geometry.computeVertexNormals();
 
 					var material = new THREE.MeshPhongMaterial( {
 						color: 0xffffff,
@@ -191,12 +193,11 @@ Use WEBGL Depth buffer support?
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.scale.multiplyScalar(30);
 
-
 						mesh.position.z = Math.cos(i / monkeys * Math.PI * 2) * 200;
 						mesh.position.y = Math.sin(i / monkeys * Math.PI * 3) * 20;
 						mesh.position.x = Math.sin(i / monkeys * Math.PI * 2) * 200;
 
-						mesh.rotation.x = Math.PI / 2;
+						mesh.rotation.y = -Math.PI / 2;
 						mesh.rotation.z = -i / monkeys * Math.PI * 2;
 
 						scene.add( mesh );

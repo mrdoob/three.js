@@ -278,29 +278,11 @@ THREE.STLLoader.prototype = {
 
 			if ( typeof buffer !== 'string' ) {
 
-				var array_buffer = new Uint8Array( buffer );
-
-				if ( window.TextDecoder !== undefined ) {
-
-					return new TextDecoder().decode( array_buffer );
-
-				}
-
-				var str = '';
-
-				for ( var i = 0, il = buffer.byteLength; i < il; i ++ ) {
-
-					str += String.fromCharCode( array_buffer[ i ] ); // implicitly assumes little-endian
-
-				}
-
-				return str;
-
-			} else {
-
-				return buffer;
+				return THREE.LoaderUtils.decodeText( new Uint8Array( buffer ) );
 
 			}
+
+			return buffer;
 
 		}
 

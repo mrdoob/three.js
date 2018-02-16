@@ -6,6 +6,7 @@
 
 import { Box3 } from '../../../../src/math/Box3';
 import { Sphere } from '../../../../src/math/Sphere';
+import { Triangle } from '../../../../src/math/Triangle';
 import { Plane } from '../../../../src/math/Plane';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
@@ -387,6 +388,23 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.intersectsPlane( b ), "Passed!" );
 			assert.ok( ! a.intersectsPlane( c ), "Passed!" );
 			assert.ok( ! a.intersectsPlane( d ), "Passed!" );
+
+		} );
+
+		QUnit.test( "intersectsTriangle", ( assert ) => {
+
+			var a = new Box3( one3.clone(), two3.clone() );
+			var b = new Triangle( new Vector3( 1.5, 1.5, 2.5 ), new Vector3( 2.5, 1.5, 1.5 ), new Vector3( 1.5, 2.5, 1.5 ) );
+			var c = new Triangle( new Vector3( 1.5, 1.5, 3.5 ), new Vector3( 3.5, 1.5, 1.5 ), new Vector3( 1.5, 1.5, 1.5 ) );
+			var d = new Triangle( new Vector3( 1.5, 1.75, 3 ), new Vector3( 3, 1.75, 1.5 ), new Vector3( 1.5, 2.5, 1.5 ) );
+			var e = new Triangle( new Vector3( 1.5, 1.8, 3 ), new Vector3( 3, 1.8, 1.5 ), new Vector3( 1.5, 2.5, 1.5 ) );
+			var f = new Triangle( new Vector3( 1.5, 2.5, 3 ), new Vector3( 3, 2.5, 1.5 ), new Vector3( 1.5, 2.5, 1.5 ) );
+
+			assert.ok( a.intersectsTriangle( b ), "Passed!" );
+			assert.ok( a.intersectsTriangle( c ), "Passed!" );
+			assert.ok( a.intersectsTriangle( d ), "Passed!" );
+			assert.ok( ! a.intersectsTriangle( e ), "Passed!" );
+			assert.ok( ! a.intersectsTriangle( f ), "Passed!" );
 
 		} );
 
