@@ -136,7 +136,7 @@
 
 						object.name = name;
 
-						//always render on top of the scene (avoid being hidden by transparent objects)
+						//avoid being hidden by other transparent objects
 						object.renderOrder = Infinity;
 
 						if ( position ) object.position.set( position[ 0 ], position[ 1 ], position[ 2 ] );
