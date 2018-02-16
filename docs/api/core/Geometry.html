@@ -211,7 +211,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:null applyMatrix]( [page:Matrix4 matrix] )</h3>
+		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
 		<div>Bakes matrix transform directly into vertex coordinates.</div>
 
 		<h3>[method:null center] ()</h3>
@@ -244,7 +244,7 @@
 		<h3>[method:null computeMorphNormals]()</h3>
 		<div>Computes [page:.morphNormals].</div>
 
-		<h3>[method:null computeVertexNormals]( [page:Boolean areaWeighted] )</h3>
+		<h3>[method:null computeVertexNormals]( [param:Boolean areaWeighted] )</h3>
 		<div>
 		areaWeighted - If true the contribution of each face normal to the vertex normal is
 		weighted by the area of the face. Default is true.<br /><br />
@@ -252,7 +252,7 @@
 		Computes vertex normals by averaging face normals.
 		</div>
 
-		<h3>[method:Geometry copy]( [page:Geometry geometry] )</h3>
+		<h3>[method:Geometry copy]( [param:Geometry geometry] )</h3>
 		<div>
 			Copies vertices, faces and uvs into this geometry. It does not copy any other properties of the geometry.
 		</div>
@@ -263,10 +263,10 @@
 		Don't forget to call this method when you remove a geometry because it can cause memory leaks.
 		</div>
 
-		<h3>[method:Geometry fromBufferGeometry]( [page:BufferGeometry geometry] )</h3>
+		<h3>[method:Geometry fromBufferGeometry]( [param:BufferGeometry geometry] )</h3>
 		<div>Convert a [page:BufferGeometry] to a Geometry.</div>
 
-		<h3>[method:Geometry lookAt] ( [page:Vector3 vector] )</h3>
+		<h3>[method:Geometry lookAt] ( [param:Vector3 vector] )</h3>
 		<div>
 		vector - A world vector to look at.<br /><br />
 
@@ -274,10 +274,10 @@
 		Use [page:Object3D.lookAt] for typical real-time mesh usage.
 		</div>
 
-		<h3>[method:null merge]( [page:Geometry geometry], [page:Matrix4 matrix], [page:Integer materialIndexOffset] )</h3>
+		<h3>[method:null merge]( [param:Geometry geometry], [param:Matrix4 matrix], [param:Integer materialIndexOffset] )</h3>
 		<div>Merge two geometries or geometry and geometry from object (using object's transform)</div>
 
-		<h3>[method:null mergeMesh]( [page:Mesh mesh] )</h3>
+		<h3>[method:null mergeMesh]( [param:Mesh mesh] )</h3>
 		<div>Merge the mesh's geometry with this, also applying the mesh's transform.</div>
 
 
@@ -293,25 +293,25 @@
 		Make the geometry centered and have a bounding sphere of radius *1.0*.
 		</div>
 
-		<h3>[method:Geometry rotateX] ( [page:Float radians] )</h3>
+		<h3>[method:Geometry rotateX] ( [param:Float radians] )</h3>
 		<div>
 		Rotate the geometry about the X axis. This is typically done as a one time operation but not during the render loop.<br>
 		Use [page:Object3D.rotation] for typical real-time mesh rotation.
 		</div>
 
-		<h3>[method:Geometry rotateY] ( [page:Float radians] )</h3>
+		<h3>[method:Geometry rotateY] ( [param:Float radians] )</h3>
 		<div>
 		Rotate the geometry about the Y axis. This is typically done as a one time operation but not during the render loop.<br>
     	        Use [page:Object3D.rotation] for typical real-time mesh rotation.
 		</div>
 
-		<h3>[method:Geometry rotateZ] ( [page:Float radians] )</h3>
+		<h3>[method:Geometry rotateZ] ( [param:Float radians] )</h3>
 		<div>
 		Rotate the geometry about the Z axis. This is typically done as a one time operation but not during the render loop.<br>
 	        Use [page:Object3D.rotation] for typical real-time mesh rotation.
 		</div>
 
-		<h3>[method:Geometry setFromPoints] ( [page:Array points] )</h3>
+		<h3>[method:Geometry setFromPoints] ( [param:Array points] )</h3>
 		<div>Sets the vertices for this Geometry from an array of points.</div>
 
 		<h3>[method:null sortFacesByMaterialIndex] (  )</h3>
@@ -320,7 +320,7 @@
 		this can result in reduced draw calls and improved performance.
 		</div>
 
-		<h3>[method:Geometry scale] ( [page:Float x], [page:Float y], [page:Float z] )</h3>
+		<h3>[method:Geometry scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<div>
 		Scale the geometry data. This is typically done as a one time operation but not during the render loop.<br>
 		Use [page:Object3D.scale] for typical real-time mesh scaling.
@@ -329,7 +329,7 @@
 		<h3>[method:JSON toJSON] ( )</h3>
 		<div>Convert the geometry to JSON format.</div>
 
-		<h3>[method:Geometry translate] ( [page:Float x], [page:Float y], [page:Float z] )</h3>
+		<h3>[method:Geometry translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<div>
 		Translate the geometry. This is typically done as a one time operation but not during the render loop.<br>
     	        Use [page:Object3D.position] for typical real-time mesh translation.

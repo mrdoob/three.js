@@ -72,13 +72,13 @@
 		represents the same rotation in the opposite direction about the rotational axis.
 		</div>
 
-		<h3>[method:Quaternion copy]( [page:Quaternion q] )</h3>
+		<h3>[method:Quaternion copy]( [param:Quaternion q] )</h3>
 		<div>
 			Copies the [page:.x x], [page:.y y],	[page:.z z] and [page:.w w] properties
 			of [page:Quaternion q] into this quaternion.
 		</div>
 
-		<h3>[method:Boolean equals]( [page:Quaternion v] )</h3>
+		<h3>[method:Boolean equals]( [param:Quaternion v] )</h3>
 		<div>
 		[page:Quaternion v] - Quaternion that this quaternion will be compared to.<br /><br />
 
@@ -87,13 +87,13 @@
 		represent the same rotation.
 		</div>
 
-		<h3>[method:Float dot]( [page:Quaternion v] )</h3>
+		<h3>[method:Float dot]( [param:Quaternion v] )</h3>
 		<div>
 			Calculates the [link:https://en.wikipedia.org/wiki/Dot_product dot product] of
 			quaternions [page:Quaternion v] and this one.
 		</div>
 
-		<h3>[method:Quaternion fromArray]( [page:Array array], [page:Integer offset] )</h3>
+		<h3>[method:Quaternion fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<div>
 		[page:Array array] - array of format (x, y, z, w) used to construct the quaternion.<br />
 		[page:Integer offset] - (optional) an offset into the array.<br /><br />
@@ -127,16 +127,16 @@
 		equal to *1*.
 		</div>
 
-		<h3>[method:Quaternion multiply]( [page:Quaternion q] )</h3>
+		<h3>[method:Quaternion multiply]( [param:Quaternion q] )</h3>
 		<div>Multiplies this quaternion by [page:Quaternion q].</div>
 
-		<h3>[method:Quaternion multiplyQuaternions]( [page:Quaternion a], [page:Quaternion b] )</h3>
+		<h3>[method:Quaternion multiplyQuaternions]( [param:Quaternion a], [param:Quaternion b] )</h3>
 		<div>
 		Sets this quaternion to [page:Quaternion a] x [page:Quaternion b].<br />
 		Adapted from the method outlined [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm here].
 		</div>
 
-		<h3>[method:Quaternion onChange]( [page:Function onChangeCallback] )</h3>
+		<h3>[method:Quaternion onChange]( [param:Function onChangeCallback] )</h3>
 		<div>Sets the [page:.onChangeCallback onChangeCallback]() method.</div>
 
 		<h3>[method:Quaternion onChangeCallback]( )</h3>
@@ -162,10 +162,10 @@
 		</div>
 
 
-		<h3>[method:Quaternion premultiply]( [page:Quaternion q] )</h3>
+		<h3>[method:Quaternion premultiply]( [param:Quaternion q] )</h3>
 		<div>Pre-multiplies this quaternion by [page:Quaternion q].</div>
 
-		<h3>[method:Quaternion slerp]( [page:Quaternion qb], [page:float t] )</h3>
+		<h3>[method:Quaternion slerp]( [param:Quaternion qb], [param:float t] )</h3>
 		<div>
 			[page:Quaternion qb] - The other quaternion rotation<br />
 			[page:float t] - interpolation factor in the closed interval [0, 1].<br /><br />
@@ -181,26 +181,26 @@
 			</code>
 		</div>
 
-		<h3>[method:Quaternion set]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
+		<h3>[method:Quaternion set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<div>Sets [page:.x x], [page:.y y], [page:.z z], [page:.w w] properties of this quaternion.</div>
 
-		<h3>[method:Quaternion setFromAxisAngle]( [page:Vector3 axis], [page:Float angle] )</h3>
+		<h3>[method:Quaternion setFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<div>
 		Sets this quaternion from rotation specified by [page:Vector3 axis] and [page:Float angle].<br />
 		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm here].<br />
 		*Axis* is assumed to be normalized, *angle* is in radians.
 		</div>
 
-		<h3>[method:Quaternion setFromEuler]( [page:Euler euler] )</h3>
+		<h3>[method:Quaternion setFromEuler]( [param:Euler euler] )</h3>
 		<div>Sets this quaternion from the rotation specified by [page:Euler] angle.</div>
 
-		<h3>[method:Quaternion setFromRotationMatrix]( [page:Matrix4 m] )</h3>
+		<h3>[method:Quaternion setFromRotationMatrix]( [param:Matrix4 m] )</h3>
 		<div>
 		Sets this quaternion from rotation component of [page:Matrix4 m].<br />
 		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm here].
 		</div>
 
-		<h3>[method:Quaternion setFromUnitVectors]( [page:Vector3 vFrom], [page:Vector3 vTo] )</h3>
+		<h3>[method:Quaternion setFromUnitVectors]( [param:Vector3 vFrom], [param:Vector3 vTo] )</h3>
 		<div>
 		Sets this quaternion to the rotation required to rotate direction vector [page:Vector3 vFrom] to
 		direction vector [page:Vector3 vTo].<br />
@@ -208,7 +208,7 @@
 		[page:Vector3 vFrom] and [page:Vector3 vTo] are assumed to be normalized.
 		</div>
 
-		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<div>
 		[page:Array array] - An optional array to store the quaternion. If not specified, a new array will be created.<br/>
 		[page:Integer offset] - (optional) if specified, the result will be copied
@@ -236,7 +236,7 @@ q.slerp( qb, t )
 
 		</div>
 
-		<h3>[method:Quaternion slerp]( [page:Quaternion qStart], [page:Quaternion qEnd], [page:Quaternion qTarget], [page:Float t] )</h3>
+		<h3>[method:Quaternion slerp]( [param:Quaternion qStart], [param:Quaternion qEnd], [param:Quaternion qTarget], [param:Float t] )</h3>
 		<div>
 			[page:Quaternion qStart] - The starting quaternion (where [page:Float t] is 0)<br />
 			[page:Quaternion qEnd] - The ending quaternion (where [page:Float t] is 1)<br />

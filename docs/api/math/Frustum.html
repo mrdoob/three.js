@@ -48,28 +48,28 @@
 		<div>Return a new Frustum with the same parameters as this one.</div>
 
 
-		<h3>[method:Boolean containsPoint]( [page:Vector3 point] )</h3>
+		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
 		<div>
 		[page:Vector3 point] - [page:Vector3] to test.<br /><br />
 
 		Checks to see if the frustum contains the [page:Vector3 point].
 		</div>
 
-		<h3>[method:Frustum copy]( [page:Frustum frustum] )</h3>
+		<h3>[method:Frustum copy]( [param:Frustum frustum] )</h3>
 		<div>
 		[page:Frustum frustum] - The frustum to copy<br /><br />
 
 		Copies the properties of the passed [page:Frustum frustum] into this one.
 		</div>
 
-		<h3>[method:Boolean intersectsBox]( [page:Box3 box] )</h3>
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<div>
 		[page:Box3 box] - [page:Box3] to check for intersection.<br /><br />
 
 	 	Return true if [page:Box3 box] intersects with this frustum.
 		</div>
 
-		<h3>[method:Boolean intersectsObject]( [page:Object3D object] )</h3>
+		<h3>[method:Boolean intersectsObject]( [param:Object3D object] )</h3>
 		<div>
 			Checks whether the [page:Object3D object]'s [page:Geometry.boundingSphere bounding sphere] is intersecting the Frustum.<br /><br />
 
@@ -77,24 +77,24 @@
 			can be calculated.
 		</div>
 
-		<h3>[method:Boolean intersectsSphere]( [page:Sphere sphere] )</h3>
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
 		<div>
 		[page:Sphere sphere] - [page:Sphere] to check for intersection.<br /><br />
 
 	 	Return true if [page:Sphere sphere] intersects with this frustum.
 		</div>
 
-		<h3>[method:Boolean intersectsSprite]( [page:Sprite sprite] )</h3>
+		<h3>[method:Boolean intersectsSprite]( [param:Sprite sprite] )</h3>
 		<div>
 			Checks whether the [page:Sprite sprite] is intersecting the Frustum.<br /><br />
 		</div>
 
-		<h3>[method:Frustum set]( [page:Plane p0], [page:Plane p1], [page:Plane p2], [page:Plane p3], [page:Plane p4], [page:Plane p5] )</h3>
+		<h3>[method:Frustum set]( [param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5] )</h3>
 		<div>
 		Sets the current frustum from the passed planes. No plane order is implicitely implied.
 		</div>
 
-		<h3>[method:Frustum setFromMatrix]( [page:Matrix4 matrix] )</h3>
+		<h3>[method:Frustum setFromMatrix]( [param:Matrix4 matrix] )</h3>
 		<div>
 			[page:Matrix4 matrix] - [page:Matrix4] used to set the [page:.planes planes]<br /><br />
 

@@ -80,16 +80,16 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Vector2 add]( [page:Vector2 v] )</h3>
+		<h3>[method:Vector2 add]( [param:Vector2 v] )</h3>
 		<div>Adds [page:Vector2 v] to this vector.</div>
 
-		<h3>[method:Vector2 addScalar]( [page:Float s] )</h3>
+		<h3>[method:Vector2 addScalar]( [param:Float s] )</h3>
 		<div>Adds the scalar value [page:Float s] to this vector's [page:.x x] and [page:.y y] values.</div>
 
-		<h3>[method:Vector2 addScaledVector]( [page:Vector2 v], [page:Float s] )</h3>
+		<h3>[method:Vector2 addScaledVector]( [param:Vector2 v], [param:Float s] )</h3>
 		<div>Adds the multiple of [page:Vector2 v] and [page:Float s] to this vector.</div>
 
-		<h3>[method:Vector2 addVectors]( [page:Vector2 a], [page:Vector2 b] )</h3>
+		<h3>[method:Vector2 addVectors]( [param:Vector2 a], [param:Vector2 b] )</h3>
 		<div>Sets this vector to [page:Vector2 a] + [page:Vector2 b].</div>
 
 		<h3>[method:Float angle]()</h3>
@@ -97,7 +97,7 @@
 		Computes the angle in radians of this vector with respect to the positive x-axis.
 		</div>
 
-		<h3>[method:Vector2 applyMatrix3]( [page:Matrix3 m] )</h3>
+		<h3>[method:Vector2 applyMatrix3]( [param:Matrix3 m] )</h3>
 		<div>
 		Multiplies this vector (with an implicit 1 as the 3rd component) by m.
 		</div>
@@ -107,7 +107,7 @@
 		The [page:.x x] and [page:.y y] components of the vector are rounded up to the nearest integer value.
 		</div>
 
-		<h3>[method:Vector2 clamp]( [page:Vector2 min], [page:Vector2 max] )</h3>
+		<h3>[method:Vector2 clamp]( [param:Vector2 min], [param:Vector2 max] )</h3>
 		<div>
 		[page:Vector2 min] - the minimum x and y values.<br />
 		[page:Vector2 max] - the maximum x and y values in the desired range<br /><br />
@@ -116,7 +116,7 @@
 		If this vector's x or y value is less than the min vector's x or y value, it is replaced by the corresponding value.
 		</div>
 
-		<h3>[method:Vector2 clampLength]( [page:Float min], [page:Float max] )</h3>
+		<h3>[method:Vector2 clampLength]( [param:Float min], [param:Float max] )</h3>
 		<div>
 		[page:Float min] - the minimum value the length will be clamped to <br />
 		[page:Float max] - the maximum value the length will be clamped to<br /><br />
@@ -125,7 +125,7 @@
 		If this vector's length is less than the min value, it is replaced by the min value.
 		</div>
 
-		<h3>[method:Vector2 clampScalar]( [page:Float min], [page:Float max] )</h3>
+		<h3>[method:Vector2 clampScalar]( [param:Float min], [param:Float max] )</h3>
 		<div>
 		[page:Float min] - the minimum value the components will be clamped to <br />
 		[page:Float max] - the maximum value the components will be clamped to<br /><br />
@@ -139,49 +139,49 @@
 		Returns a new Vector2 with the same [page:.x x] and [page:.y y] values as this one.
 		</div>
 
-		<h3>[method:Vector2 copy]( [page:Vector2 v] )</h3>
+		<h3>[method:Vector2 copy]( [param:Vector2 v] )</h3>
 		<div>
 			Copies the values of the passed Vector2's [page:.x x] and [page:.y y]
 			properties to this Vector2.
 		</div>
 
-		<h3>[method:Float distanceTo]( [page:Vector2 v] )</h3>
+		<h3>[method:Float distanceTo]( [param:Vector2 v] )</h3>
 		<div>Computes the distance from this vector to [page:Vector2 v].</div>
 
-		<h3>[method:Float manhattanDistanceTo]( [page:Vector2 v] )</h3>
+		<h3>[method:Float manhattanDistanceTo]( [param:Vector2 v] )</h3>
 		<div>
 		Computes the [link:https://en.wikipedia.org/wiki/Taxicab_geometry Manhattan distance] from this vector to [page:Vector2 v].
 		</div>
 
-		<h3>[method:Float distanceToSquared]( [page:Vector2 v] )</h3>
+		<h3>[method:Float distanceToSquared]( [param:Vector2 v] )</h3>
 		<div>
 		Computes the squared distance from this vector to [page:Vector2 v]. If you are just
 		comparing the distance with another distance, you should compare the distance squared instead
 		as it is slightly more efficient to calculate.
 		</div>
 
-		<h3>[method:Vector2 divide]( [page:Vector2 v] )</h3>
+		<h3>[method:Vector2 divide]( [param:Vector2 v] )</h3>
 		<div>Divides this vector by [page:Vector2 v].</div>
 
-		<h3>[method:Vector2 divideScalar]( [page:Float s] )</h3>
+		<h3>[method:Vector2 divideScalar]( [param:Float s] )</h3>
 		<div>
 		Divides this vector by scalar [page:Float s].<br />
 		Sets vector to *( 0, 0 )* if [page:Float s] = 0.
 		</div>
 
-		<h3>[method:Float dot]( [page:Vector2 v] )</h3>
+		<h3>[method:Float dot]( [param:Vector2 v] )</h3>
 		<div>
 		Calculates the [link:https://en.wikipedia.org/wiki/Dot_product dot product] of this
 	  vector and [page:Vector2 v].
 		</div>
 
-		<h3>[method:Boolean equals]( [page:Vector2 v] )</h3>
+		<h3>[method:Boolean equals]( [param:Vector2 v] )</h3>
 		<div>Checks for strict equality of this vector and [page:Vector2 v].</div>
 
 		<h3>[method:Vector2 floor]()</h3>
 		<div>The components of the vector are rounded down to the nearest integer value.</div>
 
-		<h3>[method:Vector2 fromArray]( [page:Array array], [page:Integer offset] )</h3>
+		<h3>[method:Vector2 fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<div>
 		[page:Array array] - the source array.<br />
 		[page:Integer offset] - (optional) offset into the array. Default is 0.<br /><br />
@@ -189,7 +189,7 @@
 		Sets this vector's [page:.x x] value to be array[ offset ] and [page:.y y] value to be array[ offset + 1 ].
 		</div>
 
-		<h3>[method:Vector2 fromBufferAttribute]( [page:BufferAttribute attribute], [page:Integer index] )</h3>
+		<h3>[method:Vector2 fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
 		<div>
 		[page:BufferAttribute attribute] - the source attribute.<br />
 		[page:Integer index] - index in the attribute.<br /><br />
@@ -197,7 +197,7 @@
 		Sets this vector's [page:.x x] and [page:.y y] values from the [page:BufferAttribute attribute].
 		</div>
 
-		<h3>[method:Float getComponent]( [page:Integer index] )</h3>
+		<h3>[method:Float getComponent]( [param:Integer index] )</h3>
 		<div>
 		[page:Integer index] - 0 or 1.<br /><br />
 
@@ -221,7 +221,7 @@
 		vectors, you should compare the length squared instead as it is slightly more efficient to calculate.
 		</div>
 
-		<h3>[method:Vector2 lerp]( [page:Vector2 v], [page:Float alpha] )</h3>
+		<h3>[method:Vector2 lerp]( [param:Vector2 v], [param:Float alpha] )</h3>
 		<div>
 		[page:Vector2 v] - [page:Vector2] to interpolate towards.<br />
 		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
@@ -230,7 +230,7 @@
 		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector2 v].
 		</div>
 
-		<h3>[method:Vector2 lerpVectors]( [page:Vector2 v1], [page:Vector2 v2], [page:Float alpha] )</h3>
+		<h3>[method:Vector2 lerpVectors]( [param:Vector2 v1], [param:Vector2 v2], [param:Float alpha] )</h3>
 		<div>
 		[page:Vector2 v1] - the starting [page:Vector2].<br />
 		[page:Vector2 v2] - [page:Vector2] to interpolate towards.<br />
@@ -250,26 +250,26 @@
 		as this one, but [page:.length length] 1.
 		</div>
 
-		<h3>[method:Vector2 max]( [page:Vector2 v] )</h3>
+		<h3>[method:Vector2 max]( [param:Vector2 v] )</h3>
 		<div>
 		If this vector's x or y value is less than [page:Vector2 v]'s x or y value, replace
 		that value with the corresponding max value.
 		</div>
 
-		<h3>[method:Vector2 min]( [page:Vector2 v] )</h3>
+		<h3>[method:Vector2 min]( [param:Vector2 v] )</h3>
 		<div>
 		If this vector's x or y value is greater than [page:Vector2 v]'s x or y value, replace
 		that value with the corresponding min value.
 		</div>
 
-		<h3>[method:Vector2 multiply]( [page:Vector2 v] )</h3>
+		<h3>[method:Vector2 multiply]( [param:Vector2 v] )</h3>
 		<div>Multiplies this vector by [page:Vector2 v].</div>
 
 
-		<h3>[method:Vector2 multiplyScalar]( [page:Float s] )</h3>
+		<h3>[method:Vector2 multiplyScalar]( [param:Float s] )</h3>
 		<div>Multiplies this vector by scalar [page:Float s].</div>
 
-		<h3>[method:Vector2 rotateAround]( [page:Vector2 center], [page:float angle] )</h3>
+		<h3>[method:Vector2 rotateAround]( [param:Vector2 center], [param:float angle] )</h3>
 		<div>
 			[page:Vector2 center] - the point around which to rotate.<br />
 			[page:float angle] - the angle to rotate, in radians.<br /><br />
@@ -285,10 +285,10 @@
 		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</div>
 
-		<h3>[method:Vector2 set]( [page:Float x], [page:Float y] )</h3>
+		<h3>[method:Vector2 set]( [param:Float x], [param:Float y] )</h3>
 		<div>Sets the [page:.x x] and [page:.y y] components of this vector.</div>
 
-		<h3>[method:null setComponent]( [page:Integer index], [page:Float value] )</h3>
+		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<div>
 		[page:Integer index] - 0 or 1.<br />
 		[page:Float value] - [page:Float]<br /><br />
@@ -297,33 +297,33 @@
 		If index equals 1 set [page:.y y] to [page:Float value]
 		</div>
 
-		<h3>[method:Vector2 setLength]( [page:Float l] )</h3>
+		<h3>[method:Vector2 setLength]( [param:Float l] )</h3>
 		<div>
 		Sets this vector to the vector with the same direction as this one, but [page:.length length]
 		[page:Float l].
 		</div>
 
-		<h3>[method:Vector2 setScalar]( [page:Float scalar] )</h3>
+		<h3>[method:Vector2 setScalar]( [param:Float scalar] )</h3>
 		<div>
 		Sets the [page:.x x] and [page:.y y] values of this vector both equal to [page:Float scalar].
 		</div>
 
-		<h3>[method:Vector2 setX]( [page:Float x] )</h3>
+		<h3>[method:Vector2 setX]( [param:Float x] )</h3>
 		<div>Replaces this vector's [page:.x x] value with [page:Float x].</div>
 
-		<h3>[method:Vector2 setY]( [page:Float y] )</h3>
+		<h3>[method:Vector2 setY]( [param:Float y] )</h3>
 		<div>Replaces this vector's [page:.y y] value with [page:Float y].</div>
 
-		<h3>[method:Vector2 sub]( [page:Vector2 v] )</h3>
+		<h3>[method:Vector2 sub]( [param:Vector2 v] )</h3>
 		<div>Subtracts [page:Vector2 v] from this vector.</div>
 
-		<h3>[method:Vector2 subScalar]( [page:Float s] )</h3>
+		<h3>[method:Vector2 subScalar]( [param:Float s] )</h3>
 		<div>Subtracts [page:Float s]  from this vector's [page:.x x] and [page:.y y] components.</div>
 
-		<h3>[method:Vector2 subVectors]( [page:Vector2 a], [page:Vector2 b] )</h3>
+		<h3>[method:Vector2 subVectors]( [param:Vector2 a], [param:Vector2 b] )</h3>
 		<div>Sets this vector to [page:Vector2 a] - [page:Vector2 b].</div>
 
-		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<div>
 		[page:Array array] - (optional) array to store the vector to. If this is not provided, a new array will be created.<br />
 		[page:Integer offset] - (optional) optional offset into the array.<br /><br />

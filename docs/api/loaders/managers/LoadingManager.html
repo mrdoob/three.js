@@ -160,7 +160,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setURLModifier]( [page:Function callback] )</h3>
+		<h3>[method:null setURLModifier]( [param:Function callback] )</h3>
 		<div>
 		[page:Function callback] — URL modifier callback. Called with [page:String url] argument, and
 		must return [page:String resolvedURL].<br /><br />
@@ -170,7 +170,7 @@
 		behavior can be used to load assets from .ZIP files, drag-and-drop APIs, and Data URIs.
 		</div>
 
-		<h3>[method:String resolveURL]( [page:String url] )</h3>
+		<h3>[method:String resolveURL]( [param:String url] )</h3>
 		<div>
 		[page:String url] — the url to load<br /><br />
 
@@ -184,14 +184,14 @@
 			them directly.</em>
 		</div>
 
-		<h3>[method:null itemStart]( [page:String url] )</h3>
+		<h3>[method:null itemStart]( [param:String url] )</h3>
 		<div>
 		[page:String url] — the url to load<br /><br />
 
 		This should be called by any loader using the manager when the loader starts loading an url.
 		</div>
 
-		<h3>[method:null itemEnd]( [page:String url] )</h3>
+		<h3>[method:null itemEnd]( [param:String url] )</h3>
 		<div>
 		[page:String url] — the loaded url<br /><br />
 
@@ -199,7 +199,7 @@
 		</div>
 
 
-		<h3>[method:null itemError]( [page:String url] )</h3>
+		<h3>[method:null itemError]( [param:String url] )</h3>
 		<div>
 		[page:String url] — the loaded url<br /><br />
 

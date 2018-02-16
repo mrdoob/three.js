@@ -109,7 +109,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — A string containing the path/URL of the <em>.gltf</em> or <em>.glb</em> file.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed. The function receives the loaded JSON response returned from [page:Function parse].<br />
@@ -120,7 +120,7 @@
 		Begin loading from url and call the callback function with the parsed response content.
 		</div>
 
-		<h3>[method:null setPath]( [page:String path] )</h3>
+		<h3>[method:null setPath]( [param:String path] )</h3>
 		<div>
 		[page:String path] — Base path for loading additional resources e.g. textures and .bin data.
 		</div>
@@ -128,17 +128,17 @@
 		Set the base path for additional resources.
 		</div>
 
-		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
+		<h3>[method:null setCrossOrigin]( [param:String value] )</h3>
 		<div>
 		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</div>
 
-		<h3>[method:null setDRACOLoader]( [page:DRACOLoader dracoLoader] )</h3>
+		<h3>[method:null setDRACOLoader]( [param:DRACOLoader dracoLoader] )</h3>
 		<div>
 		[page:DRACOLoader dracoLoader] — Instance of THREE.DRACOLoader, to be used for decoding assets compressed with the KHR_draco_mesh_compression extension.
 		</div>
 
-		<h3>[method:null parse]( [page:ArrayBuffer data], [page:String path], [page:Function onLoad], [page:Function onError] )</h3>
+		<h3>[method:null parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
 		<div>
 		[page:ArrayBuffer data] — glTF asset to parse, as an ArrayBuffer or <em>JSON</em> string.<br />
 		[page:String path] — The base path from which to find subsequent glTF resources such as textures and .bin data files.<br />

@@ -69,7 +69,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — A string containing the path/URL of the <em>.prwm</em> file. Any <em>*</em> character in the URL will be automatically replaced by <em>le</em> or <em>be</em> depending on the platform endianness.<br />
 		[page:Function onLoad] — (optional) A function to be called after the loading is successfully completed. The function receives the loaded [page:BufferGeometry] as an argument.<br />
@@ -80,7 +80,7 @@
 		Begin loading from url and call onLoad with the parsed response content.
 		</div>
 
-		<h3>[method:BufferGeometry parse]( [page:ArrayBuffer arrayBuffer] )</h3>
+		<h3>[method:BufferGeometry parse]( [param:ArrayBuffer arrayBuffer] )</h3>
 		<div>
 		[page:ArrayBuffer arrayBuffer] — ArrayBuffer containing the <em>prwm</em> data.
 		</div>

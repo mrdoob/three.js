@@ -34,7 +34,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Plane applyMatrix4]( [page:Matrix4 matrix], [page:Matrix3 optionalNormalMatrix] )</h3>
+		<h3>[method:Plane applyMatrix4]( [param:Matrix4 matrix], [param:Matrix3 optionalNormalMatrix] )</h3>
 		<div>
 		[page:Matrix4 matrix] - the [Page:Matrix4] to apply.<br />
 		[page:Matrix3 optionalNormalMatrix] - (optional) pre-computed normal [Page:Matrix3] of the Matrix4 being applied.<br /><br />
@@ -49,7 +49,7 @@
 		<h3>[method:Plane clone]()</h3>
 		<div>Returns a new plane with the same [page:.normal normal] and [page:.constant constant] as this one.</div>
 
-		<h3>[method:Vector3 coplanarPoint]( [page:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 coplanarPoint]( [param:Vector3 optionalTarget] )</h3>
 		<div>
 			[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
 			otherwise a new [page:Vector3] will be created.<br /><br />
@@ -58,25 +58,25 @@
 		normal vector at the origin onto the plane.
 		</div>
 
-		<h3>[method:Plane copy]( [page:Plane plane] )</h3>
+		<h3>[method:Plane copy]( [param:Plane plane] )</h3>
 		<div>
 		Copies the values of the passed plane's [page:.normal normal] and [page:.constant constant]
 		properties to this plane.
 		</div>
 
-		<h3>[method:Float distanceToPoint]( [page:Vector3 point] )</h3>
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
 		<div>Returns the signed distance from the [page:Vector3 point] to the plane.</div>
 
-		<h3>[method:Float distanceToSphere]( [page:Sphere sphere] )</h3>
+		<h3>[method:Float distanceToSphere]( [param:Sphere sphere] )</h3>
 		<div>Returns the signed distance from the [page:Sphere sphere] to the plane.</div>
 
-		<h3>[method:Boolean equals]( [page:Plane plane] )</h3>
+		<h3>[method:Boolean equals]( [param:Plane plane] )</h3>
 		<div>
 			Checks to see if two planes are equal (their [page:.normal normal] and
 			[page:.constant constant] properties match).
 		</div>
 
-		<h3>[method:Vector3 intersectLine]( [page:Line3 line], [page:Vector3 optionalTarget] ) or [page:undefined]</h3>
+		<h3>[method:Vector3 intersectLine]( [param:Line3 line], [param:Vector3 optionalTarget] ) or [param:undefined]</h3>
 		<div>
 		[page:Line3 line] - the [page:Line3] to check for intersection.<br />
 		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
@@ -87,21 +87,21 @@
 		 coplanar with the plane.
 		</div>
 
-		<h3>[method:Boolean intersectsBox]( [page:Box3 box] )</h3>
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<div>
 		[page:Box3 box] - the [page:Box3] to check for intersection.<br /><br />
 
 		Determines whether or not this plane intersects [page:Box3 box].
 		</div>
 
-		<h3>[method:Boolean intersectsLine]( [page:Line3 line] )</h3>
+		<h3>[method:Boolean intersectsLine]( [param:Line3 line] )</h3>
 		<div>
 		[page:Line3 line] - the [page:Line3] to check for intersection.<br /><br />
 
 		Tests whether a line segment intersects with (passes through) the plane.
 		</div>
 
-		<h3>[method:Boolean intersectsSphere]( [page:Sphere sphere] )</h3>
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
 		<div>
 		[page:Sphere sphere]  - the [page:Sphere] to check for intersection.<br /><br />
 
@@ -119,7 +119,7 @@
 			value accordingly.
 		</div>
 
-		<h3>[method:Vector3 projectPoint]( [page:Vector3 point], [page:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 projectPoint]( [param:Vector3 point], [param:Vector3 optionalTarget] )</h3>
 		<div>
 		[page:Vector3 point] - the [page:Vector3] to project onto the plane.<br />
 		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
@@ -128,7 +128,7 @@
 		Projects a [page:Vector3 point] onto the plane.
 		</div>
 
-		<h3>[method:Plane set]( [page:Vector3 normal], [page:Float constant] )</h3>
+		<h3>[method:Plane set]( [param:Vector3 normal], [param:Float constant] )</h3>
 		<div>
 			[page:Vector3 normal] - a unit length [page:Vector3] defining the normal of the plane.<br />
 			[page:Float constant] - the signed distance from the origin to the plane. Default is *0*.<br /><br />
@@ -136,7 +136,7 @@
 			 Sets the plane's [page:.normal normal] and [page:.constant constant] properties.
 		</div>
 
-		<h3>[method:Plane setComponents]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
+		<h3>[method:Plane setComponents]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<div>
 		[page:Float x] - x value of the unit length normal vector.<br />
 		[page:Float y] - y value of the unit length normal vector.<br />
@@ -146,7 +146,7 @@
 		Set the individual components that define the plane.
 		</div>
 
-		<h3>[method:Plane setFromCoplanarPoints]( [page:Vector3 a], [page:Vector3 b], [page:Vector3 c] )</h3>
+		<h3>[method:Plane setFromCoplanarPoints]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
 		<div>
 		 [page:Vector3 a] - first point on the plane.<br />
 		 [page:Vector3 b] - second point on the plane.<br />
@@ -156,7 +156,7 @@
 		and determines the direction of the [page:.normal normal].
 		</div>
 
-		<h3>[method:Plane setFromNormalAndCoplanarPoint]( [page:Vector3 normal], [page:Vector3 point] ) [page:Vector3 this]</h3>
+		<h3>[method:Plane setFromNormalAndCoplanarPoint]( [param:Vector3 normal], [param:Vector3 point] ) [param:Vector3 this]</h3>
 		<div>
 		[page:Vector3 normal] - a unit length [page:Vector3] defining the normal of the plane.<br />
 		[page:Vector3 point] - [page:Vector3]<br /><br />
@@ -164,7 +164,7 @@
 		Sets the plane's properties as defined by a [page:Vector3 normal] and an arbitrary coplanar [page:Vector3 point].
 		</div>
 
-		<h3>[method:Plane translate]( [page:Vector3 offset] )</h3>
+		<h3>[method:Plane translate]( [param:Vector3 offset] )</h3>
 		<div>
 		[page:Vector3 offset] - the amount to move the plane by.<br /><br />
 

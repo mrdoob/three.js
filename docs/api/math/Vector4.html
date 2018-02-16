@@ -79,19 +79,19 @@ var d = a.dot( b );
 
 		<h2>Methods</h2>
 
-		<h3>[method:Vector4 add]( [page:Vector4 v] )</h3>
+		<h3>[method:Vector4 add]( [param:Vector4 v] )</h3>
 		<div>Adds [page:Vector4 v] to this vector.</div>
 
-		<h3>[method:Vector4 addScalar]( [page:Float s] )</h3>
+		<h3>[method:Vector4 addScalar]( [param:Float s] )</h3>
 		<div>Adds the scalar value s to this vector's [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values.</div>
 
-		<h3>[method:Vector4 addScaledVector]( [page:Vector4 v], [page:Float s] )</h3>
+		<h3>[method:Vector4 addScaledVector]( [param:Vector4 v], [param:Float s] )</h3>
 		<div>Adds the multiple of [page:Vector4 v] and [page:Float s] to this vector.</div>
 
-		<h3>[method:Vector4 addVectors]( [page:Vector4 a], [page:Vector4 b] )</h3>
+		<h3>[method:Vector4 addVectors]( [param:Vector4 a], [param:Vector4 b] )</h3>
 		<div>Sets this vector to [page:Vector4 a] + [page:Vector4 b].</div>
 
-		<h3>[method:Vector4 applyMatrix4]( [page:Matrix4 m] )</h3>
+		<h3>[method:Vector4 applyMatrix4]( [param:Matrix4 m] )</h3>
 		<div>
 		Multiplies this vector by 4 x 4 [page:Matrix4 m].
 		</div>
@@ -101,7 +101,7 @@ var d = a.dot( b );
 		The [page:.x x], [page:.y y], [page:.z z] and [page:.w w] components of the vector are rounded up to the nearest integer value.
 		</div>
 
-		<h3>[method:Vector4 clamp]( [page:Vector4 min], [page:Vector4 max] )</h3>
+		<h3>[method:Vector4 clamp]( [param:Vector4 min], [param:Vector4 max] )</h3>
 		<div>
 		[page:Vector4 min] - the minimum [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values.<br />
 		[page:Vector4 max] - the maximum [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values in the desired range<br /><br />
@@ -110,7 +110,7 @@ var d = a.dot( b );
 		If this vector's x, y, z or w value is less than the min vector's x, y, z or w value, it is replaced by the corresponding value.
 		</div>
 
-		<h3>[method:Vector4 clampLength]( [page:Float min], [page:Float max] )</h3>
+		<h3>[method:Vector4 clampLength]( [param:Float min], [param:Float max] )</h3>
 		<div>
 		[page:Float min] - the minimum value the length will be clamped to <br />
 		[page:Float max] - the maximum value the length will be clamped to<br /><br />
@@ -119,7 +119,7 @@ var d = a.dot( b );
 		If this vector's length is less than the min value, it is replaced by the min value.
 		</div>
 
-		<h3>[method:Vector4 clampScalar]( [page:Float min], [page:Float max] )</h3>
+		<h3>[method:Vector4 clampScalar]( [param:Float min], [param:Float max] )</h3>
 		<div>
 		[page:Float min] - the minimum value the components will be clamped to <br />
 		[page:Float max] - the maximum value the components will be clamped to<br /><br />
@@ -133,31 +133,31 @@ var d = a.dot( b );
 		Returns a new Vector4 with the same [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values as this one.
 		</div>
 
-		<h3>[method:Vector4 copy]( [page:Vector4 v] )</h3>
+		<h3>[method:Vector4 copy]( [param:Vector4 v] )</h3>
 		<div>
 			Copies the values of the passed Vector4's [page:.x x], [page:.y y], [page:.z z] and [page:.w w]
 			properties to this Vector4.
 		</div>
 
-		<h3>[method:Vector4 divideScalar]( [page:Float s] )</h3>
+		<h3>[method:Vector4 divideScalar]( [param:Float s] )</h3>
 		<div>
 		Divides this vector by scalar [page:Float s].<br />
 		Sets vector to *( 0, 0, 0, 0 )* if *[page:Float s] = 0*.
 		</div>
 
-		<h3>[method:Float dot]( [page:Vector4 v] )</h3>
+		<h3>[method:Float dot]( [param:Vector4 v] )</h3>
 		<div>
 		Calculates the [link:https://en.wikipedia.org/wiki/Dot_product dot product] of this
 		vector and [page:Vector4 v].
 		</div>
 
-		<h3>[method:Boolean equals]( [page:Vector4 v] )</h3>
+		<h3>[method:Boolean equals]( [param:Vector4 v] )</h3>
 		<div>Checks for strict equality of this vector and [page:Vector4 v].</div>
 
 		<h3>[method:Vector4 floor]()</h3>
 		<div>The components of the vector are rounded down to the nearest integer value.</div>
 
-		<h3>[method:Vector4 fromArray]( [page:Array array], [page:Integer offset] )</h3>
+		<h3>[method:Vector4 fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<div>
 		[page:Array array] - the source array.<br />
 		[page:Integer offset] - (optional) offset into the array. Default is 0.<br /><br />
@@ -166,7 +166,7 @@ var d = a.dot( b );
 		[page:.z z] value to be array[ offset + 2 ] and [page:.w w ] value to be array[ offset + 3 ].
 		</div>
 
-		<h3>[method:Vector4 fromBufferAttribute]( [page:BufferAttribute attribute], [page:Integer index] )</h3>
+		<h3>[method:Vector4 fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
 		<div>
 		[page:BufferAttribute attribute] - the source attribute.<br />
 		[page:Integer index] - index in the attribute.<br /><br />
@@ -174,7 +174,7 @@ var d = a.dot( b );
 		Sets this vector's [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values from the [page:BufferAttribute attribute].
 		</div>
 
-		<h3>[method:Float getComponent]( [page:Integer index] )</h3>
+		<h3>[method:Float getComponent]( [param:Integer index] )</h3>
 		<div>
 		[page:Integer index] - 0, 1, 2 or 3.<br /><br />
 
@@ -200,7 +200,7 @@ var d = a.dot( b );
 		vectors, you should compare the length squared instead as it is slightly more efficient to calculate.
 		</div>
 
-		<h3>[method:Vector4 lerp]( [page:Vector4 v], [page:Float alpha] )</h3>
+		<h3>[method:Vector4 lerp]( [param:Vector4 v], [param:Float alpha] )</h3>
 		<div>
 		[page:Vector4 v] - [page:Vector4] to interpolate towards.<br />
 		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
@@ -209,7 +209,7 @@ var d = a.dot( b );
 		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector4 v].
 		</div>
 
-		<h3>[method:Vector4 lerpVectors]( [page:Vector4 v1], [page:Vector4 v2], [page:Float alpha] )</h3>
+		<h3>[method:Vector4 lerpVectors]( [param:Vector4 v1], [param:Vector4 v2], [param:Float alpha] )</h3>
 		<div>
 		[page:Vector4 v1] - the starting [page:Vector4].<br />
 		[page:Vector4 v2] - [page:Vector4] to interpolate towards.<br />
@@ -229,19 +229,19 @@ var d = a.dot( b );
 		as this one, but [page:.length length] 1.
 		</div>
 
-		<h3>[method:Vector4 max]( [page:Vector4 v] )</h3>
+		<h3>[method:Vector4 max]( [param:Vector4 v] )</h3>
 		<div>
 		If this vector's x, y, z or w value is less than [page:Vector4 v]'s x, y, z or w value, replace
 		that value with the corresponding max value.
 		</div>
 
-		<h3>[method:Vector4 min]( [page:Vector4 v] )</h3>
+		<h3>[method:Vector4 min]( [param:Vector4 v] )</h3>
 		<div>
 		If this vector's x, y, z or w value is greater than [page:Vector4 v]'s x, y, z or w value, replace
 		that value with the corresponding min value.
 		</div>
 
-		<h3>[method:Vector4 multiplyScalar]( [page:Float s] )</h3>
+		<h3>[method:Vector4 multiplyScalar]( [param:Float s] )</h3>
 		<div>Multiplies this vector by scalar [page:Float s].</div>
 
 		<h3>[method:Vector4 round]()</h3>
@@ -252,10 +252,10 @@ var d = a.dot( b );
 		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</div>
 
-		<h3>[method:Vector4 set]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
+		<h3>[method:Vector4 set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<div>Sets the [page:.x x], [page:.y y], [page:.z z] and [page:.w w] components of this vector.</div>
 
-		<h3>[method:Vector4 setAxisAngleFromQuaternion]( [page:Quaterion q] )</h3>
+		<h3>[method:Vector4 setAxisAngleFromQuaternion]( [param:Quaterion q] )</h3>
 		<div>
 			[page:Quaterion q] - a normalized [page:Quaterion]<br /><br />
 
@@ -263,14 +263,14 @@ var d = a.dot( b );
 			quaternion's axis and [page:.w w] to the angle.
 		</div>
 
-		<h3>[method:Vector4 setAxisAngleFromRotationMatrix]( [page:Matrix4 m] )</h3>
+		<h3>[method:Vector4 setAxisAngleFromRotationMatrix]( [param:Matrix4 m] )</h3>
 		<div>
 			 [page:Matrix4 m] - a [page:Matrix4] of which the upper left 3x3 matrix is a pure rotation matrix.<br /><br />
 
 			Sets the [page:.x x], [page:.y y] and [page:.z z] to the axis of rotation and [page:.w w] to the angle.
 		</div>
 
-		<h3>[method:null setComponent]( [page:Integer index], [page:Float value] )</h3>
+		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<div>
 		[page:Integer index] - 0, 1 or 2.<br />
 		[page:Float value] - [page:Float]<br /><br />
@@ -282,39 +282,39 @@ var d = a.dot( b );
 		</div>
 
 
-		<h3>[method:Vector4 setLength]( [page:Float l] )</h3>
+		<h3>[method:Vector4 setLength]( [param:Float l] )</h3>
 		<div>
 		Sets this vector to the vector with the same direction as this one, but [page:.length length]
 		[page:Float l].
 		</div>
 
-		<h3>[method:Vector4 setScalar]( [page:Float scalar] )</h3>
+		<h3>[method:Vector4 setScalar]( [param:Float scalar] )</h3>
 		<div>
 		Sets the [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values of this vector both equal to [page:Float scalar].
 		</div>
 
-		<h3>[method:Vector4 setX]( [page:Float x] )</h3>
+		<h3>[method:Vector4 setX]( [param:Float x] )</h3>
 		<div>Replaces this vector's [page:.x x] value with [page:Float x].</div>
 
-		<h3>[method:Vector4 setY]( [page:Float y] )</h3>
+		<h3>[method:Vector4 setY]( [param:Float y] )</h3>
 		<div>Replaces this vector's [page:.y y] value with [page:Float y].</div>
 
-		<h3>[method:Vector4 setZ]( [page:Float z] )</h3>
+		<h3>[method:Vector4 setZ]( [param:Float z] )</h3>
 		<div>Replaces this vector's [page:.z z] value with [page:Float z].</div>
 
-		<h3>[method:Vector4 setW]( [page:Float w] )</h3>
+		<h3>[method:Vector4 setW]( [param:Float w] )</h3>
 		<div>Replaces this vector's [page:.w w] value with [page:Float w].</div>
 
-		<h3>[method:Vector4 sub]( [page:Vector4 v] )</h3>
+		<h3>[method:Vector4 sub]( [param:Vector4 v] )</h3>
 		<div>Subtracts [page:Vector4 v] from this vector.</div>
 
-		<h3>[method:Vector4 subScalar]( [page:Float s] )</h3>
+		<h3>[method:Vector4 subScalar]( [param:Float s] )</h3>
 		<div>Subtracts [page:Float s]  from this vector's [page:.x x], [page:.y y], [page:.z z] and [page:.w w] compnents.</div>
 
-		<h3>[method:Vector4 subVectors]( [page:Vector4 a], [page:Vector4 b] )</h3>
+		<h3>[method:Vector4 subVectors]( [param:Vector4 a], [param:Vector4 b] )</h3>
 		<div>Sets this vector to [page:Vector4 a] - [page:Vector4 b].</div>
 
-		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<div>
 		[page:Array array] - (optional) array to store the vector to. If this is not provided, a new array will be created.<br />
 		[page:Integer offset] - (optional) optional offset into the array.<br /><br />

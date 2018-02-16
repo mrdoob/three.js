@@ -150,7 +150,7 @@
 		<h2>Methods</h2>
 
 
-		<h3>[method:AnimationAction crossFadeFrom]( [page:AnimationAction fadeOutAction], [page:Number durationInSeconds], [page:Boolean warpBoolean] )</h3>
+		<h3>[method:AnimationAction crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<div>
 			Causes this action to [page:.fadeIn fade in], fading out another action simultaneously, within
 			the passed time interval. This method can be chained.<br /><br />
@@ -162,7 +162,7 @@
 
 		</div>
 
-		<h3>[method:AnimationAction crossFadeTo]( [page:AnimationAction fadeInAction], [page:Number durationInSeconds], [page:Boolean warpBoolean] )</h3>
+		<h3>[method:AnimationAction crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<div>
 			Causes this action to [page:.fadeOut fade out], fading in another action simultaneously, within
 			the passed time interval. This method can be chained.<br /><br />
@@ -172,13 +172,13 @@
 			Note: Like with *fadeIn*/*fadeOut*, the fading starts/ends with a weight of 1.
 		</div>
 
-		<h3>[method:AnimationAction fadeIn]( [page:Number durationInSeconds] )</h3>
+		<h3>[method:AnimationAction fadeIn]( [param:Number durationInSeconds] )</h3>
 		<div>
 			Increases the [page:.weight weight] of this action gradually from 0 to 1, within the passed time
 			interval. This method can be chained.
 		</div>
 
-		<h3>[method:AnimationAction fadeOut]( [page:Number durationInSeconds] )</h3>
+		<h3>[method:AnimationAction fadeOut]( [param:Number durationInSeconds] )</h3>
 		<div>
 			Decreases the [page:.weight weight] of this action gradually from 1 to 0, within the passed time
 			interval. This method can be chained.
@@ -211,7 +211,7 @@
 			Returns the root object on which this action is performed.
 		</div>
 
-		<h3>[method:AnimationAction halt]( [page:Number durationInSeconds] )</h3>
+		<h3>[method:AnimationAction halt]( [param:Number durationInSeconds] )</h3>
 		<div>
 			Decelerates this animation's speed to 0 by decreasing [page:.timeScale timeScale] gradually
 			(starting from its current value), within the passed time interval. This method can be chained.
@@ -261,13 +261,13 @@
 			This means: If you want both, resetting and stopping, don’t call .*reset*; call .*stop* instead.
 		</div>
 
-		<h3>[method:AnimationAction setDuration]( [page:Number durationInSeconds] )</h3>
+		<h3>[method:AnimationAction setDuration]( [param:Number durationInSeconds] )</h3>
 		<div>
 			Sets the duration for a single loop of this action (by adjusting [page:.timeScale timeScale]
 			and stopping any scheduled warping). This method can be chained.
 		</div>
 
-		<h3>[method:AnimationAction setEffectiveTimeScale]( [page:Number timeScale] )</h3>
+		<h3>[method:AnimationAction setEffectiveTimeScale]( [param:Number timeScale] )</h3>
 		<div>
 			Sets the [page:.timeScale timeScale] and stops any scheduled warping. This method can be chained.<br /><br />
 
@@ -279,7 +279,7 @@
 			this method.
 		</div>
 
-		<h3>[method:AnimationAction setEffectiveWeight]( [page:Number weight] )</h3>
+		<h3>[method:AnimationAction setEffectiveWeight]( [param:Number weight] )</h3>
 		<div>
 			Sets the [page:.weight weight] and stops any scheduled fading. This method can be chained.<br /><br />
 
@@ -291,13 +291,13 @@
 			this method.
 		</div>
 
-		<h3>[method:AnimationAction setLoop]( [page:Number loopMode], [page:Number repetitions] )</h3>
+		<h3>[method:AnimationAction setLoop]( [param:Number loopMode], [param:Number repetitions] )</h3>
 		<div>
 			Sets the [page:.loop loop mode] and the number of [page:.repetitions repetitions]. This method
 			can be chained.
 		</div>
 
-		<h3>[method:AnimationAction startAt]( [page:Number startTimeInSeconds] )</h3>
+		<h3>[method:AnimationAction startAt]( [param:Number startTimeInSeconds] )</h3>
 		<div>
 			Defines the time for a delayed start (usually passed as [page:AnimationMixer.time] +
 			deltaTimeInSeconds). This method can be chained.<br /><br />
@@ -313,7 +313,7 @@
 
 			The action will be immediately stopped and completely [page:.reset reset].<br /><br />
 
-			Note: You can stop all active actions on the same mixer in one go via 
+			Note: You can stop all active actions on the same mixer in one go via
 			[page:AnimationMixer.stopAllAction mixer.stopAllAction].
 		</div>
 
@@ -329,7 +329,7 @@
 			chained.
 		</div>
 
-		<h3>[method:AnimationAction syncWith]( [page:AnimationAction otherAction] )</h3>
+		<h3>[method:AnimationAction syncWith]( [param:AnimationAction otherAction] )</h3>
 		<div>
 			Synchronizes this action with the passed other action. This method can be chained.<br /><br />
 
@@ -339,9 +339,9 @@
 			Note: Future changes of the other action's *time* and *timeScale* will not be detected.
 		</div>
 
-		<h3>[method:AnimationAction warp]( [page:Number startTimeScale], [page:Number endTimeScale], [page:Number durationInSeconds] )</h3>
+		<h3>[method:AnimationAction warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
 		<div>
-			Changes the playback speed, within the passed time interval, by modifying 
+			Changes the playback speed, within the passed time interval, by modifying
 			[page:.timeScale timeScale] gradually from *startTimeScale* to *endTimeScale*. This method can
 			be chained.
 		</div>

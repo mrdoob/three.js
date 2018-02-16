@@ -52,7 +52,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Object3D parse]( {[page:arraybuffer content]|[page:String content]] )</h3>
+		<h3>[method:Object3D parse]( {[param:arraybuffer content]|[param:String content]] )</h3>
 		<div>
 			[[page:arraybuffer content]|[page:String content]] OBJ data as Uint8Array or String
 		</div>
@@ -61,7 +61,7 @@
 		</div>
 
 
-		<h3>[method:Object3D parseAsync]( [page:arraybuffer content], [page:Function onLoad] )</h3>
+		<h3>[method:Object3D parseAsync]( [param:arraybuffer content], [param:Function onLoad] )</h3>
 		<div>
 			[page:arraybuffer content] - OBJ data as Uint8Array<br>
 			[page:Function onLoad] - Called after worker successfully completed loading<br>
@@ -71,10 +71,10 @@
 		</div>
 
 
-		<h3>[method:null load] => [page:LoaderSupport.LoaderBase.load]</h3>
-		
+		<h3>[method:null load] => [param:LoaderSupport.LoaderBase.load]</h3>
 
-		<h3>[method:null run]( [page:LoaderSupport.PrepData params], [page:LoaderSupport.WorkerSupport workerSupportExternal] )</h3>
+
+		<h3>[method:null run]( [param:LoaderSupport.PrepData params], [param:LoaderSupport.WorkerSupport workerSupportExternal] )</h3>
 		<div>
 			[page:LoaderSupport.PrepData params] - prepData All parameters and resources required for execution<br>
 			[page:LoaderSupport.WorkerSupport workerSupportExternal] - Use pre-existing WorkerSupport
@@ -83,11 +83,11 @@
 			Run the loader according the provided instructions.
 		</div>
 
-		
-		<h3>[method:Object checkResourceDescriptorFiles] => [page:LoaderSupport.LoaderBase.checkResourceDescriptorFiles]</h3>
-		
-		
-		<h3>[method:null setMaterialPerSmoothingGroup] ( [page:boolean materialPerSmoothingGroup] )</h3>
+
+		<h3>[method:Object checkResourceDescriptorFiles] => [param:LoaderSupport.LoaderBase.checkResourceDescriptorFiles]</h3>
+
+
+		<h3>[method:null setMaterialPerSmoothingGroup] ( [param:boolean materialPerSmoothingGroup] )</h3>
 		<div>
 			[page:boolean materialPerSmoothingGroup]
 		</div>
@@ -104,7 +104,7 @@
 		</div>
 
 
-		<h3>[method:null setModelName] ( [page:String modelName] )</h3>
+		<h3>[method:null setModelName] ( [param:String modelName] )</h3>
 		<div>
 			[page:String modelName]
 		</div>
@@ -113,7 +113,7 @@
 		</div>
 
 
-		<h3>[method:null setPath] ( [page:String path] )</h3>
+		<h3>[method:null setPath] ( [param:String path] )</h3>
 		<div>
 			[page:String path] - URL
 		</div>
@@ -122,7 +122,7 @@
 		</div>
 
 
-		<h3>[method:null setStreamMeshesTo] ( [page:Object3D streamMeshesTo] )</h3>
+		<h3>[method:null setStreamMeshesTo] ( [param:Object3D streamMeshesTo] )</h3>
 		<div>
 			[page:Object3D streamMeshesTo] - Object already attached to scenegraph where new meshes will be attached to
 		</div>
@@ -131,7 +131,7 @@
 		</div>
 
 
-		<h3>[method:null setMaterials] ( Array of [page:Material materials] )</h3>
+		<h3>[method:null setMaterials] ( Array of [param:Material materials] )</h3>
 		<div>
 			Array of [page:Material materials] - Array of [page:Material Materials]
 		</div>
@@ -140,7 +140,7 @@
 		</div>
 
 
-		<h3>[method:null setUseIndices]( [page:Boolean useIndices] )</h3>
+		<h3>[method:null setUseIndices]( [param:Boolean useIndices] )</h3>
 		<div>
 			[page:Boolean useIndices]
 		</div>
@@ -149,16 +149,16 @@
 		</div>
 
 
-		<h3>[method:null setDisregardNormals]( [page:Boolean disregardNormals] )</h3>
+		<h3>[method:null setDisregardNormals]( [param:Boolean disregardNormals] )</h3>
 		<div>
 			[page:Boolean disregardNormals]
 		</div>
 		<div>
 			Tells whether normals should be completely disregarded and regenerated.
 		</div>
-		
-		
-		<h3>[method:null loadMtl]( [page:String url], [page:Object content], [page:Function callbackOnLoad], [page:String crossOrigin], [page:Object materialOptions]) </h3>
+
+
+		<h3>[method:null loadMtl]( [param:String url], [param:Object content], [param:Function callbackOnLoad], [param:String crossOrigin], [param:Object materialOptions]) </h3>
 		<div>
 			[page:String url] - URL to the file
 			[page:Object content] - The file content as arraybuffer or text
@@ -170,7 +170,7 @@
 			Utility method for loading an mtl file according resource description. Provide url or content..
 		</div>
 
-		
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/OBJLoader2.js examples/js/loaders/OBJLoader2.js]

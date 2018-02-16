@@ -72,7 +72,7 @@ m.elements = [ 11, 21, 31,
 
 		<h2>Methods</h2>
 
-		<h3>[method:Array applyToBufferAttribute]( [page:BufferAttribute attribute] )</h3>
+		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
 		<div>
 		[page:BufferAttribute attribute] - An attribute of floats that represent 3D vectors.<br /><br />
 
@@ -83,7 +83,7 @@ m.elements = [ 11, 21, 31,
 		<h3>[method:Matrix3 clone]()</h3>
 		<div>Creates a new Matrix3 and with identical elements to this one.</div>
 
-		<h3>[method:Matrix3 copy]( [page:Matrix3 m] )</h3>
+		<h3>[method:Matrix3 copy]( [param:Matrix3 m] )</h3>
 		<div>Copies the elements of matrix [page:Matrix3 m] into this matrix.</div>
 
 		<h3>[method:Float determinant]()</h3>
@@ -92,10 +92,10 @@ m.elements = [ 11, 21, 31,
 		[link:https://en.wikipedia.org/wiki/Determinant determinant] of this matrix.
 		</div>
 
-		<h3>[method:Boolean equals]( [page:Matrix3 m] )</h3>
+		<h3>[method:Boolean equals]( [param:Matrix3 m] )</h3>
 		<div>Return true if this matrix and [page:Matrix3 m] are equal.</div>
 
-		<h3>[method:Matrix3 fromArray]( [page:Array array], [page:Integer offset] )</h3>
+		<h3>[method:Matrix3 fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<div>
 		[page:Array array] - the array to read the elements from.<br />
 		[page:Integer offset] - (optional) index of first element in the array. Default is 0.<br /><br />
@@ -104,7 +104,7 @@ m.elements = [ 11, 21, 31,
 		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
 		</div>
 
-		<h3>[method:Matrix3 getInverse]( [page:Matrix3 m], [page:Boolean throwOnDegenerate] )</h3>
+		<h3>[method:Matrix3 getInverse]( [param:Matrix3 m], [param:Boolean throwOnDegenerate] )</h3>
 		<div>
 		[page:Matrix3 m] - the matrix to take the inverse of.<br />
 		[page:Boolean throwOnDegenerate] - (optional) If true, throw an error if the matrix is degenerate (not invertible).<br /><br />
@@ -115,7 +115,7 @@ m.elements = [ 11, 21, 31,
 		If [page:Boolean throwOnDegenerate] is not set and the matrix is not invertible, set this to the 3x3 identity matrix.
 		</div>
 
-		<h3>[method:Matrix3 getNormalMatrix]( [page:Matrix4 m] )</h3>
+		<h3>[method:Matrix3 getNormalMatrix]( [param:Matrix4 m] )</h3>
 		<div>
 		[page:Matrix4 m] - [page:Matrix4]<br /><br />
 
@@ -135,13 +135,13 @@ m.elements = [ 11, 21, 31,
 
 		</div>
 
-		<h3>[method:Matrix3 multiply]( [page:Matrix3 m] )</h3>
+		<h3>[method:Matrix3 multiply]( [param:Matrix3 m] )</h3>
 		<div>Post-multiplies this matrix by [page:Matrix3 m].</div>
 
-		<h3>[method:Matrix3 multiplyMatrices]( [page:Matrix3 a], [page:Matrix3 b] )</h3>
+		<h3>[method:Matrix3 multiplyMatrices]( [param:Matrix3 a], [param:Matrix3 b] )</h3>
 		<div>Sets this matrix to [page:Matrix3 a] x [page:Matrix3 b].</div>
 
-		<h3>[method:Matrix3 multiplyScalar]( [page:Float s] )</h3>
+		<h3>[method:Matrix3 multiplyScalar]( [param:Float s] )</h3>
 		<div>Multiplies every component of the matrix by the scalar value *s*.</div>
 
 		<h3>
@@ -163,10 +163,10 @@ m.elements = [ 11, 21, 31,
 		sequence of values.
 		</div>
 
-		<h3>[method:Matrix3 premultiply]( [page:Matrix3 m] )</h3>
+		<h3>[method:Matrix3 premultiply]( [param:Matrix3 m] )</h3>
 		<div>Pre-multiplies this matrix by [page:Matrix3 m].</div>
 
-		<h3>[method:Matrix3 setFromMatrix4]( [page:Matrix4 m] )</h3>
+		<h3>[method:Matrix3 setFromMatrix4]( [param:Matrix4 m] )</h3>
 		<div>Set this matrx to the upper 3x3 matrix of the Matrix4 [page:Matrix4 m].</div>
 
 		<h3>
@@ -186,7 +186,7 @@ m.elements = [ 11, 21, 31,
 		Sets the UV transform matrix from offset, repeat, rotation, and center.
 		</div>
 
-		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<div>
 		[page:Array array] - (optional) array to store the resulting vector in. If not given a new array will be created.<br />
 		[page:Integer offset] - (optional) offset in the array at which to put the result.<br /><br />
@@ -198,7 +198,7 @@ m.elements = [ 11, 21, 31,
 		<h3>[method:Matrix3 transpose]()</h3>
 		<div>[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix in place.</div>
 
-		<h3>[method:Matrix3 transposeIntoArray]( [page:Array array] )</h3>
+		<h3>[method:Matrix3 transposeIntoArray]( [param:Array array] )</h3>
 		<div>
 		[page:Array array] -  array to store the resulting vector in.<br /><br />
 

@@ -93,7 +93,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Texture load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:Texture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
@@ -105,16 +105,16 @@
 		If you do it this way, the texture may pop up in your scene once the respective loading process is finished.
 		</div>
 
-		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
+		<h3>[method:null setCrossOrigin]( [param:String value] )</h3>
 		<div>Set the [page:.crossOrigin] attribute.</div>
 
-		<h3>[method:FileLoader setPath]( [page:String path] )</h3>
+		<h3>[method:FileLoader setPath]( [param:String path] )</h3>
 		<div>
 			Set the base path or URL from which to load files. This can be useful if
 			you are loading many models from the same directory.
 		</div>
 
-		<h3>[method:FileLoader setWithCredentials]( [page:Boolean value] )</h3>
+		<h3>[method:FileLoader setWithCredentials]( [param:Boolean value] )</h3>
 		Whether the XMLHttpRequest uses credentials such as cookies, authorization headers or
 		TLS client certificates. See
 		[link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />

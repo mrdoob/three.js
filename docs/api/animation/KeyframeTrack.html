@@ -192,18 +192,18 @@
 			[page:AnimationClip.CreateFromMorphTargetSequence animationClip.CreateFromMorphTargetSequence]).
 		</div>
 
-		<h3>[method:null setInterpolation]( [page:Constant interpolationType] )</h3>
+		<h3>[method:null setInterpolation]( [param:Constant interpolationType] )</h3>
 		<div>
 			Sets the interpolation type. See [page:Animation Animation Constants] for choices.
 		</div>
 
-		<h3>[method:null shift]( [page:Number timeOffsetInSeconds] )</h3>
+		<h3>[method:null shift]( [param:Number timeOffsetInSeconds] )</h3>
 		<div>
 			Moves all keyframes either forward or backward in time.
 		</div>
 
 
-		<h3>[method:null trim]( [page:Number startTimeInSeconds], [page:Number endTimeInSeconds] )</h3>
+		<h3>[method:null trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
 		<div>
 			Removes keyframes before *startTime* and after *endTime*,
 			without changing any values within the range [*startTime*, *endTime*].
@@ -218,12 +218,12 @@
 
 		<h2>Static Methods</h2>
 
-		<h3>[method:KeyframeTrack parse]( [page:JSON json] )</h3>
+		<h3>[method:KeyframeTrack parse]( [param:JSON json] )</h3>
 		<div>
 		Parses a JSON object and returns a new keyframe track of the correct type.
 		</div>
 
-		<h3>[method:JSON toJSON]( [page:KeyframeTrack track] )</h3>
+		<h3>[method:JSON toJSON]( [param:KeyframeTrack track] )</h3>
 		<div>
 		Converts the track to JSON.
 		</div>

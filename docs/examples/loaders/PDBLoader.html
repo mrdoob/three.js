@@ -68,7 +68,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — A string containing the path/URL of the <em>.pdb</em> file.<br />
 		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives the object having the following properties. [page:BufferGeometry geometryAtoms], [page:BufferGeometry geometryBonds] and the [page:Object JSON] structure.<br />
@@ -79,7 +79,7 @@
 		Begin loading from url and call onLoad with the parsed response content.
 		</div>
 
-		<h3>[method:Object parse]( [page:String text] )</h3>
+		<h3>[method:Object parse]( [param:String text] )</h3>
 		<div>
 		[page:String text] — The textual <em>pdb</em> structure to parse.
 		</div>
