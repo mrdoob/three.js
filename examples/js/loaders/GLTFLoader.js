@@ -254,8 +254,8 @@ THREE.GLTFLoader = ( function () {
 					lightNode = new THREE.SpotLight( color );
 					// Handle spotlight properties.
 					var spot = light.spot || {};
-					var innerConeAngle = spot.innerConeAngle ? spot.innerConeAngle : 0;
-					var outerConeAngle = spot.outerConeAngle || Math.PI / 4.0;
+					var innerConeAngle = spot.innerConeAngle !== undefined ? spot.innerConeAngle : 0;
+					var outerConeAngle = spot.outerConeAngle !== undefined ? spot.outerConeAngle : Math.PI / 4.0;
 					lightNode.angle = outerConeAngle;
 					lightNode.penumbra = 1.0 - innerConeAngle / outerConeAngle;
 					break;
