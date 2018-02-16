@@ -136,8 +136,7 @@
 
 						object.name = name;
 
-						//avoid being hidden by other transparent objects
-						object.renderOrder = Infinity;
+						object.renderOrder = Infinity; // avoid being hidden by other transparent objects
 
 						if ( position ) object.position.set( position[ 0 ], position[ 1 ], position[ 2 ] );
 						if ( rotation ) object.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
