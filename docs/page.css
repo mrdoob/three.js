@@ -115,3 +115,12 @@ a.permalink {
 	float: right;
 	margin-left: 5px;
 }
+
+a.param,
+span.param {
+	color: #999;
+}
+
+a.param:hover {
+	color: #777;
+}

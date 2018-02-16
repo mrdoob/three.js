@@ -59,7 +59,7 @@ scene.add( helper );
 
 		<h2>Constructor</h2>
 
-		The constructor creates a [page:PerspectiveCamera PerspectiveCamera] to manage the shadow's view of the world.
+		The constructor creates a [param:PerspectiveCamera PerspectiveCamera] to manage the shadow's view of the world.
 
 		<h2>Properties</h2>
 		See the base [page:LightShadow LightShadow] class for common properties.
@@ -72,11 +72,11 @@ scene.add( helper );
 
 		 The default is a  [page:PerspectiveCamera] with [page:PerspectiveCamera.near near] clipping plane at 0.5.
 		 The [page:PerspectiveCamera.fov fov] will track the [page:SpotLight.angle angle] property of the owning
-		 [page:SpotLight SpotLight] via the [page:SpotLightShadow.update update] method. Similarly, the 
+		 [page:SpotLight SpotLight] via the [page:SpotLightShadow.update update] method. Similarly, the
 		 [page:PerspectiveCamera.aspect aspect] property will track the aspect of the
-		 [page:LightShadow.mapSize mapSize]. If the [page:SpotLight.distance distance] property of the light is 
+		 [page:LightShadow.mapSize mapSize]. If the [page:SpotLight.distance distance] property of the light is
 		 set, the [page:PerspectiveCamera.far far] clipping plane will track that, otherwise it defaults to 500.
-		 
+
 	 </div>
 
 	 <h3>[property:Boolean isSpotLightShadow]</h3>
@@ -89,7 +89,7 @@ scene.add( helper );
 		<h2>Methods</h2>
 		See the base [page:LightShadow LightShadow] class for common methods.
 
-		<h3>[method:SpotLightShadow update]( [page:SpotLight light] )</h3>
+		<h3>[method:SpotLightShadow update]( [param:SpotLight light] )</h3>
 		<div>
 		Updates the internal perspective [page:.camera camera] based on the passed in [page:SpotLight light].
 		</div>
