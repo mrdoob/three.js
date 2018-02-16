@@ -90,6 +90,9 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
+				// Release decoder resources.
+				THREE.DRACOLoader.releaseDecoderModule();
+
 			} );
 
 			// renderer
