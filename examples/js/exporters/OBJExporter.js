@@ -22,6 +22,9 @@ THREE.OBJExporter.prototype = {
 
 		var i, j, k, l, m, face = [];
 
+		var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
+		var precision = Math.pow( 10, precisionPoints );
+
 		var parseMesh = function ( mesh ) {
 
 			var nbVertex = 0;
@@ -42,8 +45,17 @@ THREE.OBJExporter.prototype = {
 
 				// shortcuts
 				var vertices = geometry.getAttribute( 'position' );
+				var verticesUnique = {}; // "v XXX YYY ZZZ" : [vertex index]
+				var verticesMapping = {}; // [original index]: [first equal index]
+				var verticesDuplicateCount = 0;
 				var normals = geometry.getAttribute( 'normal' );
+				var normalsUnique = {};
+				var normalsMapping = {};
+				var normalsDuplicateCount = 0;
 				var uvs = geometry.getAttribute( 'uv' );
+				var uvsUnique = {};
+				var uvsMapping = {};
+				var uvsDuplicateCount = 0;
 				var indices = geometry.getIndex();
 
 				// name of the mesh object
@@ -66,11 +78,22 @@ THREE.OBJExporter.prototype = {
 						vertex.y = vertices.getY( i );
 						vertex.z = vertices.getZ( i );
 
-						// transfrom the vertex to world space
+						// transform the vertex to world space
 						vertex.applyMatrix4( mesh.matrixWorld );
 
-						// transform the vertex to export format
-						output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+						var key = Math.round( vertex.x * precision ) + '_' + Math.round( vertex.y * precision ) + '_' + Math.round( vertex.z * precision );
+						if ( verticesUnique[key] === undefined ) {
+							// transform the vertex to export format
+							output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+							// adds the line number to unique vertices, taking into account all the lines that were not written since they were duplicates
+							verticesUnique[key] = i - verticesDuplicateCount + 1;
+							verticesMapping[i + 1] = i - verticesDuplicateCount + 1;
+						} else { // vertex already exist
+							// adds the matching for the current vertex line to the existing vertex line
+							verticesMapping[i + 1] = verticesUnique[key];
+							verticesDuplicateCount++
+						}
+						
 
 					}
 
@@ -85,8 +108,21 @@ THREE.OBJExporter.prototype = {
 						uv.x = uvs.getX( i );
 						uv.y = uvs.getY( i );
 
-						// transform the uv to export format
-						output += 'vt ' + uv.x + ' ' + uv.y + '\n';
+						
+
+						var key = Math.round( uv.x * precision ) + '_' + Math.round( uv.y * precision );
+						if ( uvsUnique[key] === undefined ) {
+							// transform the uv to export format
+							output += 'vt ' + uv.x + ' ' + uv.y + '\n';
+							// adds the line number to unique uvs, taking into account all the lines that were not written since they were duplicates
+							uvsUnique[key] = i - uvsDuplicateCount + 1;
+							uvsMapping[i + 1] = i - uvsDuplicateCount + 1;
+						} else { // uvs already exist
+							// adds the matching for the current uvs line to the existing uvs line
+							uvsMapping[i + 1] = uvsUnique[key];
+							uvsDuplicateCount++
+						}
+						
 
 					}
 
@@ -107,8 +143,21 @@ THREE.OBJExporter.prototype = {
 						// transfrom the normal to world space
 						normal.applyMatrix3( normalMatrixWorld );
 
-						// transform the normal to export format
-						output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
+						
+						var key = Math.round( normal.x * precision ) + '_' + Math.round( normal.y * precision ) + '_' + Math.round( normal.z * precision );
+						if ( normalsUnique[key] === undefined ) {
+							// transform the normal to export format
+							output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
+							// adds the line number to unique normals, taking into account all the lines that were not written since they were duplicates
+							normalsUnique[key] = i - normalsDuplicateCount + 1;
+							normalsMapping[i + 1] = i - normalsDuplicateCount + 1;
+						} else { // normals already exist
+							// adds the matching for the current normals line to the existing normals line
+							normalsMapping[i + 1] = normalsUnique[key];
+							normalsDuplicateCount++
+						}
+
+						
 
 					}
 
@@ -124,7 +173,7 @@ THREE.OBJExporter.prototype = {
 
 							j = indices.getX( i + m ) + 1;
 
-							face[ m ] = ( indexVertex + j ) + '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + '/' + ( indexNormals + j );
+							face[ m ] = ( indexVertex + verticesMapping[j] ) + '/' + ( uvs ? ( indexVertexUvs + uvsMapping[j] ) : '' ) + '/' + ( indexNormals + normalsMapping[j] );
 
 						}
 
@@ -141,7 +190,7 @@ THREE.OBJExporter.prototype = {
 
 							j = i + m + 1;
 
-							face[ m ] = ( indexVertex + j ) + '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + '/' + ( indexNormals + j );
+							face[ m ] = ( indexVertex + verticesMapping[j] ) + '/' + ( uvs ? ( indexVertexUvs + uvsMapping[j] ) : '' ) + '/' + ( indexNormals + normalsMapping[j] );
 
 						}
 
@@ -159,9 +208,9 @@ THREE.OBJExporter.prototype = {
 			}
 
 			// update index
-			indexVertex += nbVertex;
-			indexVertexUvs += nbVertexUvs;
-			indexNormals += nbNormals;
+			indexVertex += nbVertex - verticesDuplicateCount;
+			indexVertexUvs += nbVertexUvs - uvsDuplicateCount;
+			indexNormals += nbNormals - normalsDuplicateCount;
 
 		};
 
