@@ -312,11 +312,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	var panUp = function () {
 
-		var v = new THREE.Vector3();
+		var v = new THREE.Vector3( 1, 0, 0 );
 
 		return function panUp( distance, objectMatrix ) {
 
-			v.setFromMatrixColumn( objectMatrix, 1 ); // get Y column of objectMatrix
+			v.setFromMatrixColumn( objectMatrix, 0 ); // get X column of objectMatrix
+			v.applyAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
 			v.multiplyScalar( distance );
 
 			panOffset.add( v );

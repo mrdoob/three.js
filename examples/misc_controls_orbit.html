@@ -51,11 +51,47 @@
 			render(); // remove when using next line for animation loop (requestAnimationFrame)
 			//animate();
 
+			function originAxes( radius, height ) {
+				
+				// static originAxes() {
+				let origin = new THREE.Object3D();
+
+				//radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight, openEnded
+				let ge3 = new THREE.CylinderGeometry( radius, radius, height, 4, 1 );
+				let axeXMesh = new THREE.Mesh( ge3,
+					new THREE.MeshBasicMaterial( {
+						color: Math.random() * 0xffffff
+					} )
+				);
+				axeXMesh.rotation.set( 0, 0, Math.PI / 2 );
+				axeXMesh.position.setX( height / 2 );
+				origin.add( axeXMesh );
+				let axeYMesh = new THREE.Mesh( ge3,
+					new THREE.MeshBasicMaterial( {
+						color: Math.random() * 0xffffff,
+						opacity: 0.7
+					} )
+				);
+				axeYMesh.position.setY( height / 2 );
+				origin.add( axeYMesh );
+				let axeZMesh = new THREE.Mesh( ge3,
+					new THREE.MeshBasicMaterial( {
+						color: Math.random() * 0xffffff,
+						opacity: 0.7
+					} )
+				);
+				axeZMesh.rotation.set( Math.PI / 2, 0, 0 );
+				axeZMesh.position.setZ( height / 2 );
+				origin.add( axeZMesh );
+				return origin;
+
+			}
+
 			function init() {
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xcccccc );
-				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.00002 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -64,32 +100,42 @@
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = 24 * Math.PI / 48; // radians
 				controls.addEventListener( 'change', render ); // remove when using animation loop
 				// enable animation loop when using damping or autorotation
 				//controls.enableDamping = true;
 				//controls.dampingFactor = 0.25;
-				controls.enableZoom = false;
+
 
 				// world
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				textureLoader = new THREE.TextureLoader();
+				textureLoader.load(
+					'textures/land_ocean_ice_cloud_2048.jpg',
+					function( tex ) {
+						var geometry = new THREE.PlaneGeometry( 1000, 1000, 2, 2 );
+						var material = new THREE.MeshPhongMaterial( {
+							map: tex,
+							color: 0xffffff,
+							shininess: 200,
+							needsUpdate: true
+						} );
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.rotateX( 3 * Math.PI/2 );
+						mesh.position.set( 0, -10, 0 );
+						scene.add( mesh );
+						render();
+					}
+				);
 
-				for ( var i = 0; i < 500; i ++ ) {
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
-					mesh.updateMatrix();
-					mesh.matrixAutoUpdate = false;
-					scene.add( mesh );
-
-				}
+				// target axes
+				axes = originAxes( 5, 200 );
+				axes.position.set( 0, 0, 0 );
+				scene.add(axes);
 
 				// lights
 
@@ -132,6 +178,12 @@
 			function render() {
 
 				renderer.render( scene, camera );
+
+				if (typeof axes !== "undefined") {
+					axes.position.setX( controls.target.x );
+					axes.position.setY( controls.target.y );
+					axes.position.setZ( controls.target.z );
+				}
 
 			}
 
