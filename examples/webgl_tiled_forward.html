@@ -52,7 +52,7 @@
 
 		var RADIUS = 75;
 
-		THREE.ShaderChunk[ 'lights_pars' ] += [
+		THREE.ShaderChunk[ 'lights_pars_maps' ] += [
 			'#if defined TILED_FORWARD',
 			'uniform vec4 tileData;',
 			'uniform sampler2D tileTexture;',
@@ -60,7 +60,7 @@
 			'#endif'
 		].join( '\n' );
 
-		THREE.ShaderChunk[ 'lights_template' ] += [
+		THREE.ShaderChunk[ 'lights_fragment_maps' ] += [
 			'',
 			'#if defined TILED_FORWARD',
 			'vec2 tUv = floor(gl_FragCoord.xy / tileData.xy * 32.) / 32. + tileData.zw;',
@@ -96,10 +96,9 @@
 			cols: 0,
 			width: 0,
 			height: 0,
-			tileData: { type: 'v4', value: null },
-			tileTexture: { type: 't', value: null },
+			tileData: { value: null },
+			tileTexture: { value: null },
 			lightTexture: {
-				type: 't',
 				value: new THREE.DataTexture( new Float32Array( 32 * 2 * 4 ), 32, 2, THREE.RGBAFormat, THREE.FloatType )
 			},
 		};
