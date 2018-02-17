@@ -32,9 +32,9 @@ var textureFlare2 = textureLoader.load( "textures/lensflare/lensflare3.png" );
 
 var lensflare = new THREE.Lensflare();
 
-lensflare.add( new THREE.LensflareElement( textureFlare0, 512, 0 ) );
-lensflare.add( new THREE.LensflareElement( textureFlare1, 512, 0 ) );
-lensflare.add( new THREE.LensflareElement( textureFlare2, 60, 0.6 ) );
+lensflare.addElement( new THREE.LensflareElement( textureFlare0, 512, 0 ) );
+lensflare.addElement( new THREE.LensflareElement( textureFlare1, 512, 0 ) );
+lensflare.addElement( new THREE.LensflareElement( textureFlare2, 60, 0.6 ) );
 
 light.add( lensflare );
 			</code>
