@@ -193,7 +193,7 @@ THREE.GLTFExporter.prototype = {
 			return Math.ceil( bufferSize / 4 ) * 4;
 
 		}
-		
+
 		/**
 		 * Process a buffer to append to the default one.
 		 * @param  {THREE.BufferAttribute} attribute     Attribute to store
@@ -222,8 +222,8 @@ THREE.GLTFExporter.prototype = {
 
 			// Create a new dataview and dump the attribute's array into it
 			var byteLength = count * attribute.itemSize * componentSize;
-			
-			// adjust required size of array buffer with padding 
+
+			// adjust required size of array buffer with padding
 			// to satisfy gltf requirement that the length is divisible by 4
 			byteLength = getPaddedBufferSize( byteLength );
 
@@ -427,7 +427,7 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			var mimeType = map.format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
-			var gltfImage = {mimeType: mimeType};
+			var gltfImage = { mimeType: mimeType };
 
 			if ( options.embedImages ) {
 
@@ -439,7 +439,7 @@ THREE.GLTFExporter.prototype = {
 				if ( map.flipY === true ) {
 
 					ctx.translate( 0, map.image.height );
-					ctx.scale( 1, -1 );
+					ctx.scale( 1, - 1 );
 
 				}
 
@@ -909,7 +909,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param {THREE.Object3D} root
 		 * @return {number}
 		 */
-		function processAnimation ( clip, root ) {
+		function processAnimation( clip, root ) {
 
 			if ( ! outputJSON.animations ) {
 
