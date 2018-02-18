@@ -65,6 +65,7 @@
 					gltf.scene; // THREE.Scene
 					gltf.scenes; // Array&lt;THREE.Scene&gt;
 					gltf.cameras; // Array&lt;THREE.Camera&gt;
+					gltf.asset; // Object
 
 				},
 				// called when loading is in progresses
@@ -146,7 +147,7 @@
 		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</div>
 		<div>
-		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], and .[page:Array animations].
+		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
 		</div>
 
 		<h2>Source</h2>
