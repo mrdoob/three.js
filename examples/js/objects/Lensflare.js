@@ -127,7 +127,7 @@ THREE.Lensflare = function () {
 
 	//
 
-	this.elements = [];
+	elements = [];
 
 	var shader = THREE.LensflareElement.Shader;
 
@@ -150,7 +150,7 @@ THREE.Lensflare = function () {
 
 	this.addElement = function ( element ) {
 
-		this.elements.push( element );
+		elements.push( element );
 
 	};
 
@@ -220,9 +220,9 @@ THREE.Lensflare = function () {
 			var vecX = - positionScreen.x * 2;
 			var vecY = - positionScreen.y * 2;
 
-			for ( var i = 0, l = this.elements.length; i < l; i ++ ) {
+			for ( var i = 0, l = elements.length; i < l; i ++ ) {
 
-				var element = this.elements[ i ];
+				var element = elements[ i ];
 
 				var uniforms = material2.uniforms;
 
@@ -254,6 +254,10 @@ THREE.Lensflare = function () {
 
 		tempMap.dispose();
 		occlusionMap.dispose();
+		
+		for ( var i = 0, l = elements.length; i < l; i ++ ) {
+			elements[i].texture.dispose();
+		}
 
 	};
 
