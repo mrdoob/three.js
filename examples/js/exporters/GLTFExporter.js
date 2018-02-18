@@ -1086,7 +1086,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( object.name ) {
+			if ( object.name !== undefined ) {
 
 				gltfNode.name = String( object.name );
 
