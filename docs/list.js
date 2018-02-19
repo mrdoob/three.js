@@ -3,6 +3,7 @@ var list = {
 	"Manual": {
 
 		"Getting Started": {
+			"Quickstart Project": "manual/introduction/Quick-start-project",
 			"Creating a scene": "manual/introduction/Creating-a-scene",
 			"Import via modules": "manual/introduction/Import-via-modules",
 			"Browser support": "manual/introduction/Browser-support",
