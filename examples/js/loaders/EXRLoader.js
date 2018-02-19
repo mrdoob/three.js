@@ -83,9 +83,6 @@ THREE.EXRLoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
 
 THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
-	var date = new Date();
-	var startTime = date.getTime();
-
 	const USHORT_RANGE = (1 << 16);
 	const BITMAP_SIZE = (USHORT_RANGE >> 3);
 
@@ -134,6 +131,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		}
 	}
 
+	const getBitsReturn = { l: 0, c: 0, lc: 0 };
 	function getBits(nBits, c, lc, uInt8Array, inOffset) {
 		while (lc < nBits) {
 			c = (c << 8) | parseUint8Array(uInt8Array, inOffset);
@@ -142,28 +140,29 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		lc -= nBits;
 
-		return { l: (c >> lc) & ((1 << nBits) - 1), c: c, lc: lc };
+		getBitsReturn.l = (c >> lc) & ((1 << nBits) - 1);
+		getBitsReturn.c = c;
+		getBitsReturn.lc = lc;
 	}
 
+	const hufTableBuffer = new Array(59);
 	function hufCanonicalCodeTable(hcode) {
-		var n = new Array(59);
+		for (var i = 0; i <= 58; ++i) hufTableBuffer[i] = 0;
 
-		for (var i = 0; i <= 58; ++i) n[i] = 0;
-
-		for (var i = 0; i < HUF_ENCSIZE; ++i) n[hcode[i]] += 1;
+		for (var i = 0; i < HUF_ENCSIZE; ++i) hufTableBuffer[hcode[i]] += 1;
 
 		var c = 0;
 
 		for (var i = 58; i > 0; --i) {
-			var nc = ((c + n[i]) >> 1);
-			n[i] = c;
+			var nc = ((c + hufTableBuffer[i]) >> 1);
+			hufTableBuffer[i] = c;
 			c = nc;
 		}
 
 		for (var i = 0; i < HUF_ENCSIZE; ++i) {
 			var l = hcode[i];
 
-			if (l > 0) hcode[i] = l | (n[l]++ << 6);
+			if (l > 0) hcode[i] = l | (hufTableBuffer[l]++ << 6);
 		}
 	}
 
@@ -177,10 +176,10 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 				return false;
 			}
 
-			var bits = getBits(6, c, lc, uInt8Array, p);
-			var l = bits.l;
-			c = bits.c;
-			lc = bits.lc;
+			getBits(6, c, lc, uInt8Array, p);
+			var l = getBitsReturn.l;
+			c = getBitsReturn.c;
+			lc = getBitsReturn.lc;
 			hcode[im] = l;
 
 			if (l == LONG_ZEROCODE_RUN) {
@@ -188,10 +187,10 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 					throw 'Something wrong with hufUnpackEncTable';
 				}
 
-				var bits = getBits(8, c, lc, uInt8Array, p);
-				var zerun = bits.l + SHORTEST_LONG_RUN;
-				c = bits.c;
-				lc = bits.lc;
+				getBits(8, c, lc, uInt8Array, p);
+				var zerun = getBitsReturn.l + SHORTEST_LONG_RUN;
+				c = getBitsReturn.c;
+				lc = getBitsReturn.lc;
 
 				if (im + zerun > iM + 1) {
 					throw 'Something wrong with hufUnpackEncTable';
@@ -271,19 +270,22 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		return true;
 	}
 
+	const getCharReturn = { c: 0, lc: 0 };
 	function getChar(c, lc, uInt8Array, inOffset) {
 		c = (c << 8) | parseUint8Array(uInt8Array, inOffset);
 		lc += 8;
 
-		return { c: c, lc: lc };
+		getCharReturn.c = c;
+		getCharReturn.lc = lc;
 	}
 
+	const getCodeReturn = { c: 0, lc: 0 };
 	function getCode(po, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outBufferOffset, outBufferEndOffset) {
 		if (po == rlc) {
 			if (lc < 8) {
-				var temp = getChar(c, lc, uInt8Array, inOffset);
-				c = temp.c;
-				lc = temp.lc;
+				getChar(c, lc, uInt8Array, inOffset);
+				c = getCharReturn.c;
+				lc = getCharReturn.lc;
 			}
 
 			lc -= 8;
@@ -305,7 +307,8 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 			throw 'Issue with getCode';
 		}
 
-		return { c: c, lc: lc };
+		getCodeReturn.c = c;
+		getCodeReturn.lc = lc;
 	}
 
 	var NBITS = 16;
@@ -322,6 +325,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		return (ref > 0x7FFF) ? ref - 0x10000 : ref;
 	};
 
+	const wdec14Return = { a: 0, b: 0 };
 	function wdec14(l, h) {
 		var ls = Int16(l);
 		var hs = Int16(h);
@@ -332,7 +336,8 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		var as = ai;
 		var bs = ai - hi;
 
-		return {a: as, b: bs}
+		wdec14Return.a = as;
+		wdec14Return.b = bs;
 	}
 
 	function wav2Decode(j, buffer, nx, ox, ny, oy, mx) {
@@ -364,29 +369,29 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 					var p10 = px + oy1;
 					var p11 = p10 + ox1;
 
-					var tmp = wdec14(buffer[px + j], buffer[p10 + j]);
-					i00 = tmp.a;
-					i10 = tmp.b;
+					wdec14(buffer[px + j], buffer[p10 + j]);
+					i00 = wdec14Return.a;
+					i10 = wdec14Return.b;
 
-					var tmp = wdec14(buffer[p01 + j], buffer[p11 + j]);
-					i01 = tmp.a;
-					i11 = tmp.b;
+					wdec14(buffer[p01 + j], buffer[p11 + j]);
+					i01 = wdec14Return.a;
+					i11 = wdec14Return.b;
 
-					var tmp = wdec14(i00, i01);
-					buffer[px + j] = tmp.a;
-					buffer[p01 + j] = tmp.b;
+					wdec14(i00, i01);
+					buffer[px + j] = wdec14Return.a;
+					buffer[p01 + j] = wdec14Return.b;
 
-					var tmp = wdec14(i10, i11);
-					buffer[p10 + j] = tmp.a;
-					buffer[p11 + j] = tmp.b;
+					wdec14(i10, i11);
+					buffer[p10 + j] = wdec14Return.a;
+					buffer[p11 + j] = wdec14Return.b;
 				}
 
 				if (nx & p) {
 					var p10 = px + oy1;
 
-					var tmp = wdec14(buffer[px + j], buffer[p10 + j]);
-					i00 = tmp.a;
-					buffer[p10 + j] = tmp.b;
+					wdec14(buffer[px + j], buffer[p10 + j]);
+					i00 = wdec14Return.a;
+					buffer[p10 + j] = wdec14Return.b;
 
 					buffer[px + j] = i00;
 				}
@@ -399,9 +404,9 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 				for (; px <= ex; px += ox2) {
 					var p01 = px + ox1;
 
-					var tmp = wdec14(buffer[px + j], buffer[p01 + j]);
-					i00 = tmp.a;
-					buffer[p01 + j] = tmp.b;
+					wdec14(buffer[px + j], buffer[p01 + j]);
+					i00 = wdec14Return.a;
+					buffer[p01 + j] = wdec14Return.b;
 
 					buffer[px + j] = i00;
 				}
@@ -418,12 +423,12 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		var c = 0;
 		var lc = 0;
 		var outBufferEndOffset = no;
-		var inOffsetEnd = parseInt(inOffset.value + (ni + 7) / 8);
+		var inOffsetEnd = Math.trunc(inOffset.value + (ni + 7) / 8);
 
 		while (inOffset.value < inOffsetEnd) {
-			var temp = getChar(c, lc, uInt8Array, inOffset);
-			c = temp.c;
-			lc = temp.lc;
+			getChar(c, lc, uInt8Array, inOffset);
+			c = getCharReturn.c;
+			lc = getCharReturn.lc;
 
 			while (lc >= HUF_DECBITS) {
 				var index = (c >> (lc - HUF_DECBITS)) & HUF_DECMASK;
@@ -431,9 +436,9 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 				if (pl.len) {
 					lc -= pl.len;
-					var temp = getCode(pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
-					c = temp.c;
-					lc = temp.lc;
+					getCode(pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
+					c = getCodeReturn.c;
+					lc = getCodeReturn.lc;
 				} else {
 					if (!pl.p) {
 						throw 'hufDecode issues';
@@ -445,9 +450,9 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 						var l = hufLength(encodingTable[pl.p[j]]);
 
 						while (lc < l && inOffset.value < inOffsetEnd) {
-							var temp = getChar(c, lc, uInt8Array, inOffset);
-							c = temp.c;
-							lc = temp.lc;
+							getChar(c, lc, uInt8Array, inOffset);
+							c = getCharReturn.c;
+							lc = getCharReturn.lc;
 						}
 
 						if (lc >= l) {
@@ -455,9 +460,9 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 								((c >> (lc - l)) & ((1 << l) - 1))) {
 
 								lc -= l;
-								var temp = getCode(pl.p[j], rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
-								c = temp.c;
-								lc = temp.lc;
+								getCode(pl.p[j], rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
+								c = getCodeReturn.c;
+								lc = getCodeReturn.lc;
 								break;
 							}
 						}
@@ -479,9 +484,9 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 			if (pl.len) {
 				lc -= pl.len;
-				var temp = getCode(pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
-				c = temp.c;
-				lc = temp.lc;
+				getCode(pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
+				c = getCodeReturn.c;
+				lc = getCodeReturn.lc;
 			} else {
 				throw 'hufDecode issues';
 			}
@@ -988,9 +993,6 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		throw 'Cannot decompress unsupported compression';
 
 	}
-
-	var date = new Date();
-	var endTime = date.getTime();
 
 	console.log((endTime - startTime) + 'ms');
 
