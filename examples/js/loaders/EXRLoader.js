@@ -134,9 +134,9 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		}
 	}
 
-	function getBits(nBits, c, lc, inDataView, inOffset) {
+	function getBits(nBits, c, lc, uInt8Array, inOffset) {
 		while (lc < nBits) {
-			c = (c << 8) | parseUint8(inDataView, inOffset);
+			c = (c << 8) | parseUint8Array(uInt8Array, inOffset);
 			lc += 8;
 		}
 
@@ -167,7 +167,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		}
 	}
 
-	function hufUnpackEncTable(inDataView, inOffset, ni, im, iM, hcode) {
+	function hufUnpackEncTable(uInt8Array, inDataView, inOffset, ni, im, iM, hcode) {
 		var p = inOffset;
 		var c = 0;
 		var lc = 0;
@@ -177,7 +177,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 				return false;
 			}
 
-			var bits = getBits(6, c, lc, inDataView, p);
+			var bits = getBits(6, c, lc, uInt8Array, p);
 			var l = bits.l;
 			c = bits.c;
 			lc = bits.lc;
@@ -188,7 +188,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 					throw 'Something wrong with hufUnpackEncTable';
 				}
 
-				var bits = getBits(8, c, lc, inDataView, p);
+				var bits = getBits(8, c, lc, uInt8Array, p);
 				var zerun = bits.l + SHORTEST_LONG_RUN;
 				c = bits.c;
 				lc = bits.lc;
@@ -271,17 +271,17 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		return true;
 	}
 
-	function getChar(c, lc, inDataView, inOffset) {
-		c = (c << 8) | parseUint8(inDataView, inOffset);
+	function getChar(c, lc, uInt8Array, inOffset) {
+		c = (c << 8) | parseUint8Array(uInt8Array, inOffset);
 		lc += 8;
 
 		return { c: c, lc: lc };
 	}
 
-	function getCode(po, rlc, c, lc, inDataView, inOffset, outBuffer, outBufferOffset, outBufferEndOffset) {
+	function getCode(po, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outBufferOffset, outBufferEndOffset) {
 		if (po == rlc) {
 			if (lc < 8) {
-				var temp = getChar(c, lc, inDataView, inOffset);
+				var temp = getChar(c, lc, uInt8Array, inOffset);
 				c = temp.c;
 				lc = temp.lc;
 			}
@@ -414,14 +414,14 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		return py;
 	}
 
-	function hufDecode(encodingTable, decodingTable, inDataView, inOffset, ni, rlc, no, outBuffer, outOffset) {
+	function hufDecode(encodingTable, decodingTable, uInt8Array, inDataView, inOffset, ni, rlc, no, outBuffer, outOffset) {
 		var c = 0;
 		var lc = 0;
 		var outBufferEndOffset = no;
 		var inOffsetEnd = parseInt(inOffset.value + (ni + 7) / 8);
 
 		while (inOffset.value < inOffsetEnd) {
-			var temp = getChar(c, lc, inDataView, inOffset);
+			var temp = getChar(c, lc, uInt8Array, inOffset);
 			c = temp.c;
 			lc = temp.lc;
 
@@ -431,7 +431,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 				if (pl.len) {
 					lc -= pl.len;
-					var temp = getCode(pl.lit, rlc, c, lc, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
+					var temp = getCode(pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
 					c = temp.c;
 					lc = temp.lc;
 				} else {
@@ -445,7 +445,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 						var l = hufLength(encodingTable[pl.p[j]]);
 
 						while (lc < l && inOffset.value < inOffsetEnd) {
-							var temp = getChar(c, lc, inDataView, inOffset);
+							var temp = getChar(c, lc, uInt8Array, inOffset);
 							c = temp.c;
 							lc = temp.lc;
 						}
@@ -455,7 +455,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 								((c >> (lc - l)) & ((1 << l) - 1))) {
 
 								lc -= l;
-								var temp = getCode(pl.p[j], rlc, c, lc, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
+								var temp = getCode(pl.p[j], rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
 								c = temp.c;
 								lc = temp.lc;
 								break;
@@ -479,7 +479,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 			if (pl.len) {
 				lc -= pl.len;
-				var temp = getCode(pl.lit, rlc, c, lc, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
+				var temp = getCode(pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset);
 				c = temp.c;
 				lc = temp.lc;
 			} else {
@@ -490,7 +490,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		return true;
 	}
 
-	function hufUncompress(inDataView, inOffset, nCompressed, outBuffer, outOffset, nRaw) {
+	function hufUncompress(uInt8Array, inDataView, inOffset, nCompressed, outBuffer, outOffset, nRaw) {
 		var initialInOffset = inOffset.value;
 
 		var im = parseUint32(inDataView, inOffset);
@@ -510,7 +510,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		var ni = nCompressed - (inOffset.value - initialInOffset);
 
-		hufUnpackEncTable(inDataView, inOffset, ni, im, iM, freq);
+		hufUnpackEncTable(uInt8Array, inDataView, inOffset, ni, im, iM, freq);
 
 		if (nBits > 8 * (nCompressed - (inOffset.value - initialInOffset))) {
 			throw 'Something wrong with hufUncompress';
@@ -518,7 +518,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		hufBuildDecTable(freq, im, iM, hdec);
 
-		hufDecode(freq, hdec, inDataView, inOffset, nBits, iM, nRaw, outBuffer, outOffset);
+		hufDecode(freq, hdec, uInt8Array, inDataView, inOffset, nBits, iM, nRaw, outBuffer, outOffset);
 	}
 
 	function applyLut(lut, data, nData) {
@@ -527,7 +527,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		}
 	}
 
-	function decompressPIZ(outBuffer, outOffset, inDataView, inOffset, tmpBufSize, num_channels, exrChannelInfos, dataWidth, num_lines) {
+	function decompressPIZ(outBuffer, outOffset, uInt8Array, inDataView, inOffset, tmpBufSize, num_channels, exrChannelInfos, dataWidth, num_lines) {
 		var bitmap = new Uint8Array(BITMAP_SIZE);
 
 		var minNonZero = parseUint16(inDataView, inOffset);
@@ -548,7 +548,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		var length = parseUint32(inDataView, inOffset);
 
-		hufUncompress(inDataView, inOffset, length, outBuffer, outOffset, tmpBufSize);
+		hufUncompress(uInt8Array, inDataView, inOffset, length, outBuffer, outOffset, tmpBufSize);
 
 		var pizChannelData = new Array(num_channels);
 
@@ -640,6 +640,16 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		offset.value = offset.value + INT32_SIZE;
 
 		return Uint32;
+
+	}
+
+	function parseUint8Array( uInt8Array, offset ) {
+
+		var Uint8 = uInt8Array[offset.value];
+
+		offset.value = offset.value + INT8_SIZE;
+
+		return Uint8;
 
 	}
 
@@ -833,6 +843,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 	}
 
 	var bufferDataView = new DataView(buffer);
+	var uInt8Array = new Uint8Array(buffer);
 
 	var EXRHeader = {};
 
@@ -937,9 +948,9 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 			var tmpBufferSize = width * scanlineBlockSize * (EXRHeader.channels.length * BYTES_PER_HALF);
 			var tmpBuffer = new Uint16Array(tmpBufferSize);
-	  	var tmpOffset = { value: 0 };
+			var tmpOffset = { value: 0 };
 
-			decompressPIZ(tmpBuffer, tmpOffset, bufferDataView, offset, tmpBufferSize, numChannels, EXRHeader.channels, width, scanlineBlockSize);
+			decompressPIZ(tmpBuffer, tmpOffset, uInt8Array, bufferDataView, offset, tmpBufferSize, numChannels, EXRHeader.channels, width, scanlineBlockSize);
 
 			for ( var line_y = 0; line_y < scanlineBlockSize; line_y ++ ) {
 
