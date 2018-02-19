@@ -811,6 +811,19 @@ THREE.GLTFExporter.prototype = {
 			if ( mesh.morphTargetInfluences !== undefined && mesh.morphTargetInfluences.length > 0 ) {
 
 				var weights = [];
+				var targetNames = [];
+				var reverseDictionary = {};
+
+				if ( mesh.morphTargetDictionary !== undefined ) {
+
+					for ( var key in mesh.morphTargetDictionary ) {
+
+						reverseDictionary[ mesh.morphTargetDictionary[ key ] ] = key;
+
+					}
+
+				}
+
 				gltfMesh.primitives[ 0 ].targets = [];
 
 				for ( var i = 0; i < mesh.morphTargetInfluences.length; ++ i ) {
@@ -828,10 +841,18 @@ THREE.GLTFExporter.prototype = {
 					gltfMesh.primitives[ 0 ].targets.push( target );
 
 					weights.push( mesh.morphTargetInfluences[ i ] );
+					if ( mesh.morphTargetDictionary !== undefined ) targetNames.push( reverseDictionary[ i ] );
 
 				}
 
 				gltfMesh.weights = weights;
+
+				if ( targetNames.length > 0 ) {
+
+					gltfMesh.extras = {};
+					gltfMesh.extras.targetNames = targetNames;
+
+				}
 
 			}
 
