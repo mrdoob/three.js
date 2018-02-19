@@ -191,7 +191,7 @@ THREE.StandardNode.prototype.build = function ( builder ) {
 
 		var output = [
 			// prevent undeclared normal
-			"	#include <normal_fragment>",
+			"	#include <normal_fragment_begin>",
 
 			// prevent undeclared material
 			"	PhysicalMaterial material;",

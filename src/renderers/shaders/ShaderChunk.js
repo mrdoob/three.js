@@ -58,7 +58,8 @@ import metalnessmap_pars_fragment from './ShaderChunk/metalnessmap_pars_fragment
 import morphnormal_vertex from './ShaderChunk/morphnormal_vertex.glsl';
 import morphtarget_pars_vertex from './ShaderChunk/morphtarget_pars_vertex.glsl';
 import morphtarget_vertex from './ShaderChunk/morphtarget_vertex.glsl';
-import normal_fragment from './ShaderChunk/normal_fragment.glsl';
+import normal_fragment_begin from './ShaderChunk/normal_fragment_begin.glsl';
+import normal_fragment_maps from './ShaderChunk/normal_fragment_maps.glsl';
 import normalmap_pars_fragment from './ShaderChunk/normalmap_pars_fragment.glsl';
 import packing from './ShaderChunk/packing.glsl';
 import premultiplied_alpha_fragment from './ShaderChunk/premultiplied_alpha_fragment.glsl';
@@ -173,7 +174,8 @@ export var ShaderChunk = {
 	morphnormal_vertex: morphnormal_vertex,
 	morphtarget_pars_vertex: morphtarget_pars_vertex,
 	morphtarget_vertex: morphtarget_vertex,
-	normal_fragment: normal_fragment,
+	normal_fragment_begin: normal_fragment_begin,
+	normal_fragment_maps: normal_fragment_maps,
 	normalmap_pars_fragment: normalmap_pars_fragment,
 	packing: packing,
 	premultiplied_alpha_fragment: premultiplied_alpha_fragment,
