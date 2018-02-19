@@ -127,7 +127,7 @@ THREE.Lensflare = function () {
 
 	//
 
-	var elements = [];
+	elements = [];
 
 	var shader = THREE.LensflareElement.Shader;
 
@@ -254,6 +254,10 @@ THREE.Lensflare = function () {
 
 		tempMap.dispose();
 		occlusionMap.dispose();
+		
+		for ( var i = 0, l = elements.length; i < l; i ++ ) {
+			elements[i].texture.dispose();
+		}
 
 	};
 
