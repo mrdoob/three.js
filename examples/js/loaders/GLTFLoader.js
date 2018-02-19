@@ -1205,6 +1205,17 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		// .extras has user defined data so just in case cheking if .extras.targetNames is array.
+		if ( meshDef.extras && Array.isArray( meshDef.extras.targetNames ) ) {
+
+			for ( var i = 0, il = meshDef.extras.targetNames.length; i < il; i ++ ) {
+
+				mesh.morphTargetDictionary[ meshDef.extras.targetNames[ i ] ] = i;
+
+			}
+
+		}
+
 	}
 
 	function isPrimitiveEqual( a, b ) {
