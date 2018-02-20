@@ -1205,7 +1205,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		// .extras has user defined data so just in case cheking if .extras.targetNames is array.
+		// .extras has user-defined data, so check that .extras.targetNames is an array.
 		if ( meshDef.extras && Array.isArray( meshDef.extras.targetNames ) ) {
 
 			for ( var i = 0, il = meshDef.extras.targetNames.length; i < il; i ++ ) {
