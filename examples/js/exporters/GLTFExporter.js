@@ -903,7 +903,6 @@ THREE.GLTFExporter.prototype = {
 		 *
 		 * Status:
 		 * - Only properties listed in PATH_PROPERTIES may be animated.
-		 * - Only LINEAR and STEP interpolation currently supported.
 		 *
 		 * @param {THREE.AnimationClip} clip
 		 * @param {THREE.Object3D} root
@@ -957,11 +956,35 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
+				var interpolation;
+
+				// Detecting glTF cubic spline interpolant by checking factory method name because
+				// GLTFCubicSplineInterpolant is a custom interpolant and doesn't return
+				// valid value from .getInterpolation().
+				if ( track.createInterpolant.name === 'InterpolantFactoryMethodGLTFCubicSpline' ) {
+
+					interpolation = 'CUBICSPLINE';
+
+					// itemSize of CUBICSPLINE keyframe is 9
+					// (VEC3 * 3: inTangent, splineVertex, and outTangent)
+					// but needs to be stored as VEC3 so dividing by 3 here.
+					outputItemSize /= 3;
+
+				} else if ( track.getInterpolation() === THREE.InterpolateDiscrete ) {
+
+					interpolation = 'STEP';
+
+				} else {
+
+					interpolation = 'LINEAR';
+
+				}
+
 				samplers.push( {
 
 					input: processAccessor( new THREE.BufferAttribute( track.times, inputItemSize ) ),
 					output: processAccessor( new THREE.BufferAttribute( track.values, outputItemSize ) ),
-					interpolation: track.getInterpolation() === THREE.InterpolateDiscrete ? 'STEP' : 'LINEAR'
+					interpolation: interpolation
 
 				} );
 
