@@ -1086,6 +1086,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			// We don't export empty strings name because it represents no-name in Three.js.
 			if ( object.name ) {
 
 				gltfNode.name = String( object.name );
