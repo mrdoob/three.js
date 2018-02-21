@@ -958,10 +958,10 @@ THREE.GLTFExporter.prototype = {
 
 				var interpolation;
 
-				// Detecting glTF cubic spline interpolant by checking factory method name because
+				// Detecting glTF cubic spline interpolant by checking factory method's special property
 				// GLTFCubicSplineInterpolant is a custom interpolant and doesn't return
-				// valid value from .getInterpolation().
-				if ( track.createInterpolant.name === 'InterpolantFactoryMethodGLTFCubicSpline' ) {
+				// valid value from track.getInterpolation().
+				if ( track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline === true ) {
 
 					interpolation = 'CUBICSPLINE';
 
