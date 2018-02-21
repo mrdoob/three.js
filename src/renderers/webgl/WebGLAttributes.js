@@ -64,7 +64,6 @@ function WebGLAttributes( gl ) {
 	}
 
 	function updateBuffer( buffer, attribute, bufferType ) {
-
 		var array = attribute.array;
 		var updateRange = attribute.updateRange;
 
@@ -74,25 +73,74 @@ function WebGLAttributes( gl ) {
 
 			gl.bufferData( bufferType, array, gl.STATIC_DRAW );
 
-		} else if ( updateRange.count === - 1 ) {
-
-			// Not using update ranges
-
-			gl.bufferSubData( bufferType, 0, array );
-
-		} else if ( updateRange.count === 0 ) {
-
-			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
-
 		} else {
 
-			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-				array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+			var subTypedArrays = [];
+			var totalLength = 0;
 
-			updateRange.count = - 1; // reset range
+			for (var i = 0; i<updateRange.length; i++){
+
+				var curUpdateRange = updateRange[i];
+				var curOffset = curUpdateRange.offset;
+				var curCount = curUpdateRange.count;
+
+				if (curCount != -1 && curCount != 0){
+
+					// Store each subarray in subTypedArrays, we'll concat these arrays later
+					subTypedArrays.push(
+						array.subarray(curOffset, curOffset + curCount)
+					);
+					totalLength += curCount;
+
+					if (totalLength > array.length){
+
+						console.error( 'THREE.WebGLObjects.updateBuffer: Tried to update more indices than the size of the buffer.' );
+						subTypedArrays = null;
+						return;
+
+					}
+
+				} else if (curCount == 0){
+
+					console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0 for index '+i+', ensure you are using set methods or updating manually.' );
+
+				}
+
+			}
+
+			if (subTypedArrays.length == 0){
+
+				gl.bufferSubData(bufferType, 0, array);
+
+			}else{
+
+				// This typed array will contain the sub typed arrays
+				// After we put this to the WebGL buffer, we'll set this to null to prevent possible memory issues
+				var abstractTypedArray = new array.constructor(totalLength);
+
+				// Merge
+				var indexOffset = 0;
+				for (var x = 0; x<subTypedArrays.length; x++){
+
+						abstractTypedArray.set(subTypedArrays[x], indexOffset);
+
+						indexOffset += subTypedArrays[x].length;
+
+				}
+
+				// Call WebGL
+				gl.bufferSubData(bufferType, 0, abstractTypedArray);
+
+				// Reset the updateRange property
+				attribute.updateRange = [];
+
+				// Set the references to null so that the GC collects them
+				subTypedArrays = null;
+				abstractTypedArray = null;
+
+			}
 
 		}
-
 	}
 
 	//
