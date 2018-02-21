@@ -2464,7 +2464,7 @@ THREE.GLTFLoader = ( function () {
 							// Overrides .createInterpolant in a factory method which creates custom interpolation.
 							if ( sampler.interpolation === 'CUBICSPLINE' ) {
 
-								track.createInterpolant = function ( result ) {
+								track.createInterpolant = function InterpolantFactoryMethodGLTFCubicSpline( result ) {
 
 									// A CUBICSPLINE keyframe in glTF has three output values for each input value,
 									// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
@@ -2473,6 +2473,10 @@ THREE.GLTFLoader = ( function () {
 									return new GLTFCubicSplineInterpolant( this.times, this.values, this.getValueSize() / 3, result );
 
 								};
+
+								// Workaround, provide an alternate way to know if the interpolant type is cubis spline to track.
+								// track.getInterpolation() doesn't return valid value for custom interpolant.
+								track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true;
 
 							}
 
