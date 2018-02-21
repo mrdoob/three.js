@@ -3450,17 +3450,7 @@ THREE.ColladaLoader.prototype = {
 
 				var child = children[ i ];
 
-				if ( child.id === null ) {
-
-					group.add( buildNode( child ) );
-
-				} else {
-
-					// if there is an ID, let's try to get the finished build (e.g. joints are already build)
-
-					group.add( getNode( child.id ) );
-
-				}
+				group.add( getNode( child.id ) );
 
 			}
 
