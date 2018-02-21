@@ -273,15 +273,6 @@ var d = a.distanceTo( b );
 		- alpha = 0 will be [page:Vector3 v1], and alpha = 1 will be [page:Vector3 v2].
 		</div>
 
-		<h3>[method:Vector3 negate]()</h3>
-		<div>Inverts this vector - i.e. sets x = -x, y = -y and z = -z.</div>
-
-		<h3>[method:Vector3 normalize]()</h3>
-		<div>
-		Convert this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
-		as this one, but [page:.length length] 1.
-		</div>
-
 		<h3>[method:Vector3 max]( [param:Vector3 v] )</h3>
 		<div>
 		If this vector's x, y or z value is less than [page:Vector3 v]'s x, y or z value, replace
@@ -302,6 +293,15 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Vector3 multiplyVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
 		<div>Sets this vector equal to [page:Vector3 a] * [page:Vector3 b], component-wise.</div>
+
+		<h3>[method:Vector3 negate]()</h3>
+		<div>Inverts this vector - i.e. sets x = -x, y = -y and z = -z.</div>
+
+		<h3>[method:Vector3 normalize]()</h3>
+		<div>
+		Convert this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
+		as this one, but [page:.length length] 1.
+		</div>
 
 		<h3>[method:Vector3 project]( [param:Camera camera] )</h3>
 		<div>
