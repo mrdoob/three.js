@@ -714,15 +714,11 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			switch ( semantic ) {
 
-				case "POSITION_0":
-				case "POSITION0":
 				case "POSITION":
 
 					shaderText = shaderText.replace( regEx, 'position' );
 					break;
 
-				case "NORMAL_0":
-				case "NORMAL0":
 				case "NORMAL":
 
 					shaderText = shaderText.replace( regEx, 'normal' );
@@ -735,6 +731,11 @@ THREE.LegacyGLTFLoader = ( function () {
 					shaderText = shaderText.replace( regEx, 'uv' );
 					break;
 
+				case 'TEXCOORD_1':
+
+					shaderText = shaderText.replace( regEx, 'uv2' );
+					break;
+
 				case 'COLOR_0':
 				case 'COLOR0':
 				case 'COLOR':
@@ -742,56 +743,15 @@ THREE.LegacyGLTFLoader = ( function () {
 					shaderText = shaderText.replace( regEx, 'color' );
 					break;
 
-				case "WEIGHT_0":
-				case "WEIGHT0":
 				case "WEIGHT":
 
 					shaderText = shaderText.replace( regEx, 'skinWeight' );
 					break;
 
-				case "JOINT_0":
-				case "JOINT0":
 				case "JOINT":
 
 					shaderText = shaderText.replace( regEx, 'skinIndex' );
 					break;
-
-				default:
-
-					var underscoreIndex = semantic.indexOf( '_' );
-
-					if ( underscoreIndex !== - 1 ) {
-
-						var attrName = semantic.slice( 0, underscoreIndex ).toLowerCase();
-						var attrNum = parseInt( semantic.slice( underscoreIndex + 1 ) ) + 1;
-
-						switch ( attrName ) {
-
-							case 'position':
-							case 'normal':
-							case 'color':
-
-								shaderText = shaderText.replace( regEx, attrName + attrNum );
-								break;
-
-							case 'texcoord':
-
-								shaderText = shaderText.replace( regEx, 'uv' + attrNum );
-								break;
-
-							case 'weight':
-
-								shaderText = shaderText.replace( regEx, 'skinWeight' + attrNum );
-								break;
-
-							case 'joint':
-
-								shaderText = shaderText.replace( regEx, 'skinIndex' + attrNum );
-								break;
-
-						}
-
-					}
 
 			}
 
@@ -1644,14 +1604,10 @@ THREE.LegacyGLTFLoader = ( function () {
 
 							switch ( attributeId ) {
 
-								case 'POSITION_0':
-								case 'POSITION0':
 								case 'POSITION':
 									geometry.addAttribute( 'position', bufferAttribute );
 									break;
 
-								case 'NORMAL_0':
-								case 'NORMAL0':
 								case 'NORMAL':
 									geometry.addAttribute( 'normal', bufferAttribute );
 									break;
@@ -1662,70 +1618,30 @@ THREE.LegacyGLTFLoader = ( function () {
 									geometry.addAttribute( 'uv', bufferAttribute );
 									break;
 
+								case 'TEXCOORD_1':
+									geometry.addAttribute( 'uv2', bufferAttribute );
+									break;
+
 								case 'COLOR_0':
 								case 'COLOR0':
 								case 'COLOR':
 									geometry.addAttribute( 'color', bufferAttribute );
 									break;
 
-								case 'WEIGHT_0':
-								case 'WEIGHT0':
 								case 'WEIGHT':
 									geometry.addAttribute( 'skinWeight', bufferAttribute );
 									break;
 
-								case 'JOINT_0':
-								case 'JOINT0':
 								case 'JOINT':
 									geometry.addAttribute( 'skinIndex', bufferAttribute );
 									break;
 
 								default:
+									var material = json.materials[ primitive.material ];
+									var attributeNames = json.techniques[ material.technique ].attributes;
+									var attributeName = Object.keys( attributeNames )[ attributeIndex ];
 
-									var addAttributeWithItsNameUnchanged = false;
-
-									var underscoreIndex = attributeId.indexOf( '_' );
-									if ( underscoreIndex !== - 1 ) {
-
-										var attrName = attributeId.slice( 0, underscoreIndex ).toLowerCase();
-										var attrNum = parseInt( attributeId.slice( underscoreIndex + 1 ) ) + 1;
-
-										switch ( attrName ) {
-
-											case 'position':
-											case 'normal':
-											case 'color':
-												geometry.addAttribute( attrName + attrNum, bufferAttribute );
-												break;
-
-											case 'texcoord':
-												geometry.addAttribute( 'uv' + attrNum, bufferAttribute );
-												break;
-
-											case 'weight':
-												geometry.addAttribute( 'skinWeight' + attrNum, bufferAttribute );
-												break;
-
-											case 'joint':
-												geometry.addAttribute( 'skinIndex' + attrNum, bufferAttribute );
-												break;
-
-											default:
-												addAttributeWithItsNameUnchanged = true;
-										}
-
-									}
-
-									if ( addAttributeWithItsNameUnchanged || underscoreIndex === - 1 ) {
-
-										var material = json.materials[ primitive.material ];
-										var attributeNames = json.techniques[ material.technique ].attributes;
-										var attributeName = Object.keys( attributeNames )[ attributeIndex ];
-
-										geometry.addAttribute( attributeName, bufferAttribute );
-
-									}
-
+									geometry.addAttribute( attributeName, bufferAttribute );
 							}
 
 							++attributeIndex;

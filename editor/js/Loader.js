@@ -175,8 +175,18 @@ var Loader = function ( editor ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
+					var loader;
 
-					var loader = new THREE.GLTFLoader();
+					if ( isGltf1( contents ) ) {
+
+						loader = new THREE.LegacyGLTFLoader();
+
+					} else {
+
+						loader = new THREE.GLTFLoader();
+
+					}
+
 					loader.parse( contents, '', function ( result ) {
 
 						result.scene.name = filename;
@@ -569,6 +579,47 @@ var Loader = function ( editor ) {
 				break;
 
 		}
+
+	}
+
+	function isGltf1( contents ) {
+
+		var resultContent;
+
+		if ( typeof contents === 'string' ) {
+
+			resultContent = contents;
+
+		} else {
+
+			var magic = THREE.LoaderUtils.decodeText( new Uint8Array( contents, 0, 4 ) );
+
+			if ( magic === 'glTF' ) {
+
+				try {
+
+					extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( contents );
+
+				} catch ( error ) {
+
+					// dunno what it is, but it's definitely not OK
+					return false;
+
+				}
+
+				resultContent = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
+
+			} else {
+
+				resultContent = THREE.LoaderUtils.decodeText( new Uint8Array( contents ) );
+
+			}
+
+		}
+
+		var json = JSON.parse( resultContent );
+
+		return ( json.asset != undefined && json.asset.version[ 0 ] < 2 );
 
 	}
 
