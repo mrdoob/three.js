@@ -2463,6 +2463,10 @@ THREE.GLTFLoader = ( function () {
 
 								};
 
+								// Workaround, provide an alternate way to know if the interpolant type is cubis spline to track.
+								// track.getInterpolation() doesn't return valid value for custom interpolant.
+								track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true;
+
 							}
 
 							tracks.push( track );
