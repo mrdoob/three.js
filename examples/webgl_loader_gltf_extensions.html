@@ -209,7 +209,11 @@
 					var child = extensionSelect.children[i];
 					child.disabled = sceneInfo.extensions.indexOf(child.value) === -1;
 					if (child.disabled && child.selected) {
-						extensionSelect.value = extension = 'glTF';
+						if (sceneInfo.extensions.length === 0) {
+							extensionSelect.value = extension = 'glTF';
+						} else {
+							extensionSelect.value = extension = sceneInfo.extensions[0];
+						}
 					}
 				}
 
