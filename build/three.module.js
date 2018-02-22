@@ -18461,16 +18461,13 @@ function WebGLProperties() {
 
 	function get( object ) {
 
-		var map = properties.get( object );
+		if ( properties.has( object ) === false ) {
 
-		if ( map === undefined ) {
-
-			map = {};
-			properties.set( object, map );
+			properties.set( object, {} );
 
 		}
 
-		return map;
+		return properties.get( object );
 
 	}
 
@@ -18482,10 +18479,7 @@ function WebGLProperties() {
 
 	function update( object, key, value ) {
 
-		var uuid = object.uuid;
-		var map = properties[ uuid ];
-
-		map[ key ] = value;
+		properties.get( object )[ key ] = value;
 
 	}
 
