@@ -40,11 +40,12 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
-
+		<script src="js/libs/vrml.min.js"></script>
 		<script src="js/loaders/VRMLLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<
 
 		<script>
 
@@ -67,16 +68,9 @@
 				scene = new THREE.Scene();
 				scene.add( camera );
 
-				// light
-
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 200, 200, 1000 ).normalize();
-
-				camera.add( dirLight );
-				camera.add( dirLight.target );
-
 				var loader = new THREE.VRMLLoader();
-				loader.load( 'models/vrml/house.wrl', function ( object ) {
+				// loader.load( 'models/CreaseAngleTest9.wrl', function ( object ) {
+				loader.load( 'models/vrml/house2.wrl', function ( object ) {
 
 					scene.add( object );
 
