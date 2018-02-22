@@ -13,7 +13,7 @@ function WebGLProperties() {
 		if ( map === undefined ) {
 
 			map = {};
-			properties.set( object, map);
+			properties.set( object, map );
 
 		}
 
