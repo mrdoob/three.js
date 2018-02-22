@@ -51,9 +51,7 @@ THREE.VRMLLoader.prototype = {
 		var vrmlRenderer = new VrmlParser.Renderer.ThreeJs(this.debug);
 		var scene = new THREE.Scene();
 		var nodeTree = vrmlParser.parse(data);
-		console.log(nodeTree);
 		vrmlRenderer.render(nodeTree, scene);
-		console.log(scene);
 		return scene;
 	}
 
