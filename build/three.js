@@ -12338,24 +12338,6 @@
 
 		},
 
-		copyIndicesArray: function ( indices ) {
-
-			var array = this.array, offset = 0;
-
-			for ( var i = 0, l = indices.length; i < l; i ++ ) {
-
-				var index = indices[ i ];
-
-				array[ offset ++ ] = index.a;
-				array[ offset ++ ] = index.b;
-				array[ offset ++ ] = index.c;
-
-			}
-
-			return this;
-
-		},
-
 		copyVector2sArray: function ( vectors ) {
 
 			var array = this.array, offset = 0;
@@ -12646,7 +12628,6 @@
 
 	function DirectGeometry() {
 
-		this.indices = [];
 		this.vertices = [];
 		this.normals = [];
 		this.colors = [];
@@ -13427,14 +13408,6 @@
 
 				var uvs2 = new Float32Array( geometry.uvs2.length * 2 );
 				this.addAttribute( 'uv2', new BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
-
-			}
-
-			if ( geometry.indices.length > 0 ) {
-
-				var TypeArray = arrayMax( geometry.indices ) > 65535 ? Uint32Array : Uint16Array;
-				var indices = new TypeArray( geometry.indices.length * 3 );
-				this.setIndex( new BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 			}
 
@@ -40566,7 +40539,7 @@
 
 					var pending = this.repetitions - loopCount;
 
-					if ( pending < 0 ) {
+					if ( pending <= 0 ) {
 
 						// have to stop (switch state, clamp time, fire event)
 
@@ -40584,7 +40557,7 @@
 
 						// keep running
 
-						if ( pending === 0 ) {
+						if ( pending === 1 ) {
 
 							// entering the last round
 
@@ -44844,6 +44817,11 @@
 				return this.array.length;
 
 			}
+		},
+		copyIndicesArray: function ( /* indices */ ) {
+
+			console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
+
 		}
 
 	} );
