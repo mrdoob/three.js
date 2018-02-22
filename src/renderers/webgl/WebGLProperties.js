@@ -29,10 +29,7 @@ function WebGLProperties() {
 
 	function update( object, key, value ) {
 
-		var uuid = object.uuid;
-		var map = properties[ uuid ];
-
-		map[ key ] = value;
+		properties.get( object )[ key ] = value;
 
 	}
 
