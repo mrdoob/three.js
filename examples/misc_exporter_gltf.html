@@ -26,6 +26,7 @@
 			<button id="export_scene">Export Scene1</button>
 			<button id="export_scenes">Export Scene1 and Scene 2</button>
 			<button id="export_object">Export Sphere</button>
+			<button id="export_obj">Export WaltHead</button>
 			<button id="export_objects">Export Sphere and Grid</button>
 			<button id="export_scene_object">Export Scene1 and Sphere</button>
 			<br/>
@@ -38,6 +39,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/exporters/GLTFExporter.js"></script>
 
 		<script>
@@ -88,6 +90,12 @@
 
 			} );
 
+			document.getElementById( 'export_obj' ).addEventListener( 'click', function () {
+
+				exportGLTF( waltHead );
+
+			} );
+
 			document.getElementById( 'export_objects' ).addEventListener( 'click', function () {
 
 				exportGLTF( [ sphere, gridHelper ] );
@@ -133,7 +141,7 @@
 			var container;
 
 			var camera, object, scene1, scene2, renderer;
-			var gridHelper, sphere;
+			var gridHelper, sphere, waltHead;
 
 			init();
 			animate();
@@ -474,6 +482,20 @@
 				object.visible = false;
 				scene1.add( object );
 
+				// ---------------------------------------------------------------------
+				//
+				//
+				var loader = new THREE.OBJLoader();
+				loader.load( 'models/obj/walt/WaltHead.obj', function ( obj ) {
+
+					waltHead = obj;
+					waltHead.scale.multiplyScalar( 1.5 );
+					waltHead.position.set(400, 0, 0);
+					scene1.add( waltHead );
+
+				} );
+				
+				
 				// ---------------------------------------------------------------------
 				// 2nd Scene
 				// ---------------------------------------------------------------------
