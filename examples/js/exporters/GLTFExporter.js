@@ -128,7 +128,18 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {string} text
 		 * @return {ArrayBuffer}
 		 */
-		function stringToArrayBuffer( text ) {
+		function stringToArrayBuffer( text, padded ) {
+			if ( padded ) {
+
+				var pad = getPaddedBufferSize( text.length ) - text.length;
+
+				for ( var i = 0; i < pad; i++ ) {
+
+					text += ' ';
+
+				}
+
+			}
 
 			if ( window.TextEncoder !== undefined ) {
 
@@ -191,6 +202,28 @@ THREE.GLTFExporter.prototype = {
 		function getPaddedBufferSize( bufferSize ) {
 
 			return Math.ceil( bufferSize / 4 ) * 4;
+
+		}
+
+		/**
+		 * Returns a buffer aligned to 4-byte boundary. 
+		 * 
+		 * @param {ArrayBuffer} arrayBuffer Buffer to pad
+		 * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
+		 */
+		function getPaddedArrayBuffer( arrayBuffer ) {
+						
+			var paddedLength = getPaddedBufferSize( arrayBuffer.byteLength );
+			
+			if (paddedLength !== arrayBuffer.byteLength ) {
+			
+				var paddedBuffer = new ArrayBuffer( paddedLength );
+				new Uint8Array( paddedBuffer ).set(new Uint8Array(arrayBuffer));
+				return paddedBuffer;
+
+			}
+
+			return arrayBuffer;
 
 		}
 
@@ -1392,14 +1425,14 @@ THREE.GLTFExporter.prototype = {
 				reader.onloadend = function () {
 
 					// Binary chunk.
-					var binaryChunk = reader.result;
+					var binaryChunk = getPaddedArrayBuffer( reader.result );
 					var binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
 					binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
 					binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
 
 					// JSON chunk.
 					delete outputJSON.buffers[ 0 ].uri; // Omitted URI indicates use of binary chunk.
-					var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ) );
+					var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ), true );
 					var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
 					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
 					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
