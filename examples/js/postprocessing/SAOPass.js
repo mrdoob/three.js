@@ -75,7 +75,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	}
 
 	this.saoMaterial = new THREE.ShaderMaterial( {
-		defines: THREE.SAOShader.defines,
+		defines: Object.assign( {}, THREE.SAOShader.defines ),
 		fragmentShader: THREE.SAOShader.fragmentShader,
 		vertexShader: THREE.SAOShader.vertexShader,
 		uniforms: THREE.UniformsUtils.clone( THREE.SAOShader.uniforms )
