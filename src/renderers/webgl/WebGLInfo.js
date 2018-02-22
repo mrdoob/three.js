@@ -29,6 +29,11 @@ function WebGLInfo( gl ) {
 				render.faces += instanceCount * ( count / 3 );
 				break;
 
+			case gl.TRIANGLE_STRIP:
+			case gl.TRIANGLE_FAN:
+				render.faces += instanceCount * ( count - 2 );
+				break;
+
 			case gl.LINES:
 				render.segments += instanceCount * ( count / 2 );
 				break;
