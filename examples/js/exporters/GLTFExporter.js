@@ -960,8 +960,8 @@ THREE.GLTFExporter.prototype = {
 
 					xmag: camera.right * 2,
 					ymag: camera.top * 2,
-					zfar: camera.far,
-					znear: camera.near
+					zfar: camera.far <= 0 ? 0.001 : camera.far,
+					znear: camera.near < 0 ? 0 : camera.near
 
 				};
 
@@ -971,8 +971,8 @@ THREE.GLTFExporter.prototype = {
 
 					aspectRatio: camera.aspect,
 					yfov: THREE.Math.degToRad( camera.fov ) / camera.aspect,
-					zfar: camera.far,
-					znear: camera.near
+					zfar: camera.far <= 0 ? 0.001 : camera.far,
+					znear: camera.near < 0 ? 0 : camera.near
 
 				};
 
