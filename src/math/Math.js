@@ -142,9 +142,42 @@ var _Math = {
 
 		return Math.pow( 2, Math.floor( Math.log( value ) / Math.LN2 ) );
 
-	}
+	},
+
+	lazyUUID: {}
 
 };
+
+Object.defineProperties( _Math.lazyUUID, {
+
+	_uuid: {
+		value: null,
+		writable: true
+	},
+
+	uuid: {
+
+		get: function () {
+
+			if ( this._uuid === null ) {
+
+				this._uuid = _Math.generateUUID();
+
+			}
+
+			return this._uuid;
+
+		},
+
+		set: function ( value ) {
+
+			this._uuid = value;
+
+		}
+
+	}
+
+} );
 
 
 export { _Math };

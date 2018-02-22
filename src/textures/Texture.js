@@ -17,8 +17,6 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	Object.defineProperty( this, 'id', { value: textureId ++ } );
 
-	this.uuid = _Math.generateUUID();
-
 	this.name = '';
 
 	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
@@ -319,5 +317,6 @@ Object.defineProperty( Texture.prototype, "needsUpdate", {
 
 } );
 
+Object.defineProperties( Texture.prototype, Object.getOwnPropertyDescriptors( _Math.lazyUUID ) );
 
 export { Texture };

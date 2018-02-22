@@ -16,7 +16,6 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	}
 
-	this.uuid = _Math.generateUUID();
 	this.name = '';
 
 	this.array = array;
@@ -42,6 +41,8 @@ Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
 	}
 
 } );
+
+Object.defineProperties( BufferAttribute.prototype, Object.getOwnPropertyDescriptors( _Math.lazyUUID ) );
 
 Object.assign( BufferAttribute.prototype, {
 

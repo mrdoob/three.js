@@ -25,8 +25,6 @@ function Geometry() {
 
 	Object.defineProperty( this, 'id', { value: geometryId += 2 } );
 
-	this.uuid = _Math.generateUUID();
-
 	this.name = '';
 	this.type = 'Geometry';
 
@@ -1431,5 +1429,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 } );
 
+Object.defineProperties( Geometry.prototype, Object.getOwnPropertyDescriptors( _Math.lazyUUID ) );
 
 export { Geometry };
