@@ -9173,7 +9173,7 @@
 
 	function WebGLAttributes( gl ) {
 
-		var buffers = {};
+		var buffers = new WeakMap();
 
 		function createBuffer( attribute, bufferType ) {
 
@@ -9270,7 +9270,7 @@
 
 			if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-			return buffers[ attribute.uuid ];
+			return buffers.get( attribute );
 
 		}
 
@@ -9278,13 +9278,13 @@
 
 			if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-			var data = buffers[ attribute.uuid ];
+			var data = buffers.get( attribute );
 
 			if ( data ) {
 
 				gl.deleteBuffer( data.buffer );
 
-				delete buffers[ attribute.uuid ];
+				buffers.delete( attribute );
 
 			}
 
@@ -9294,11 +9294,11 @@
 
 			if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-			var data = buffers[ attribute.uuid ];
+			var data = buffers.get( attribute );
 
 			if ( data === undefined ) {
 
-				buffers[ attribute.uuid ] = createBuffer( attribute, bufferType );
+				buffers.set( attribute, createBuffer( attribute, bufferType ) );
 
 			} else if ( data.version < attribute.version ) {
 
@@ -18463,17 +18463,16 @@
 
 	function WebGLProperties() {
 
-		var properties = {};
+		var properties = new WeakMap();
 
 		function get( object ) {
 
-			var uuid = object.uuid;
-			var map = properties[ uuid ];
+			var map = properties.get( object );
 
 			if ( map === undefined ) {
 
 				map = {};
-				properties[ uuid ] = map;
+				properties.set( object, map );
 
 			}
 
@@ -18483,7 +18482,7 @@
 
 		function remove( object ) {
 
-			delete properties[ object.uuid ];
+			properties.delete( object );
 
 		}
 
@@ -18498,7 +18497,7 @@
 
 		function dispose() {
 
-			properties = {};
+			properties = new WeakMap();
 
 		}
 
