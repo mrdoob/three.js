@@ -613,6 +613,25 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			// pbrMetallicRoughness.metallicRoughnessTexture
+			if ( material.metalnessMap || material.roughnessMap ) {
+
+				if ( material.metalnessMap === material.roughnessMap ) {
+
+					gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture = {
+
+						index: processTexture( material.metalnessMap )
+
+					};
+
+				} else {
+
+					console.warn( 'THREE.GLTFExporter: Ignoring metalnessMap and roughnessMap because they are not the same Texture.' );
+
+				}
+
+			}
+
 			// pbrMetallicRoughness.baseColorTexture
 			if ( material.map ) {
 
