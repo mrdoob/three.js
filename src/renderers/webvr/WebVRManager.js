@@ -142,10 +142,6 @@ function WebVRManager( renderer ) {
 			tempPosition.applyQuaternion(tempQuaternion);
 			poseObject.position.add( tempPosition );
 
-		} else {
-
-			poseObject.position.set( 0, 0, 0 );
-
 		}
 
 		poseObject.updateMatrixWorld();
