@@ -68,7 +68,8 @@ THREE.GLTFExporter.prototype = {
 			onlyVisible: true,
 			truncateDrawRange: true,
 			embedImages: true,
-			animations: []
+			animations: [],
+			forceIndices: false
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
@@ -808,6 +809,18 @@ THREE.GLTFExporter.prototype = {
 			if ( geometry.index ) {
 
 				gltfMesh.primitives[ 0 ].indices = processAccessor( geometry.index, geometry );
+
+			} else if ( options.forceIndices ) {
+
+				var numFaces = geometry.attributes.position.count;
+				var indices = new Uint32Array( numFaces );
+				for ( var i = 0; i < numFaces; i ++ ) {
+
+					indices[ i ] = i;
+
+				}
+
+				gltfMesh.primitives[ 0 ].indices = processAccessor( new THREE.Uint32BufferAttribute( indices, 1 ), geometry );
 
 			}
 
