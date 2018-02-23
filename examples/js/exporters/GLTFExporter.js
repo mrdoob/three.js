@@ -448,6 +448,8 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processImage( map ) {
 
+			// @QUESTION Needs image cache for the case where two different textures share the same image?
+
 			if ( ! outputJSON.images ) {
 
 				outputJSON.images = [];
