@@ -126,7 +126,7 @@ function WebVRManager( renderer ) {
 
 		// We want to manipulate poseObject by its position and quaternion components since users may rely on them.
 		poseObject.matrix.copy( standingMatrix );
-		poseObject.matrix.decompose(poseObject.position, poseObject.quaternion, poseObject.scale);
+		poseObject.matrix.decompose( poseObject.position, poseObject.quaternion, poseObject.scale );
 
 		if ( pose.orientation !== null ) {
 
@@ -137,15 +137,14 @@ function WebVRManager( renderer ) {
 
 		if ( pose.position !== null ) {
 
-			tempQuaternion.setFromRotationMatrix(standingMatrix);
+			tempQuaternion.setFromRotationMatrix( standingMatrix );
 			tempPosition.fromArray( pose.position );
-			tempPosition.applyQuaternion(tempQuaternion);
+			tempPosition.applyQuaternion( tempQuaternion );
 			poseObject.position.add( tempPosition );
 
 		}
 
 		poseObject.updateMatrixWorld();
-
 
 		if ( device.isPresenting === false ) return camera;
 
