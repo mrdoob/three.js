@@ -135,8 +135,9 @@ function WebVRManager( renderer ) {
 
 		}
 
-		poseObject.position.applyMatrix4( standingMatrix );
-		poseObject.updateMatrixWorld();
+		poseObject.matrixWorld.multiply( standingMatrix );
+		standingMatrixInverse.getInverse( standingMatrix );
+		camera.matrixWorldInverse.multiply( standingMatrixInverse );
 
 		if ( device.isPresenting === false ) return camera;
 
