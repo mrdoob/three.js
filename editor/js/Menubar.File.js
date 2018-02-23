@@ -197,9 +197,10 @@ Menubar.File = function ( editor ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-		}, { binary: true } );
-
-
+			// forceIndices: true to allow compatibility with facebook
+			// https://github.com/mrdoob/three.js/issues/13397
+		}, { binary: true, forceIndices: true } );
+		
 	} );
 	options.add( option );
 
