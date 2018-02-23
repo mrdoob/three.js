@@ -98,7 +98,6 @@ THREE.GLTFExporter.prototype = {
 		var skins = [];
 		var cachedData = {
 
-			images: {},
 			materials: {},
 			textures: {}
 
@@ -449,12 +448,6 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processImage( map ) {
 
-			if ( cachedData.images[ map.uuid ] !== undefined ) {
-
-				return cachedData.images[ map.uuid ];
-
-			}
-
 			if ( ! outputJSON.images ) {
 
 				outputJSON.images = [];
@@ -492,10 +485,7 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.images.push( gltfImage );
 
-			var index = outputJSON.images.length - 1;
-			cachedData.images[ map.uuid ] = index;
-
-			return index;
+			return outputJSON.images.length - 1;
 
 		}
 
