@@ -596,18 +596,7 @@ var Loader = function ( editor ) {
 
 			if ( magic === 'glTF' ) {
 
-				try {
-
-					extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( contents );
-
-				} catch ( error ) {
-
-					// dunno what it is, but it's definitely not OK
-					return false;
-
-				}
-
-				resultContent = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
+				return false;
 
 			} else {
 
