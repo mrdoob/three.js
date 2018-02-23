@@ -76,7 +76,6 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 	this.saoMaterial = new THREE.ShaderMaterial( THREE.SAOShader );
 	this.saoMaterial.extensions.derivatives = true;
-	this.saoMaterial.extensions.drawBuffers = true;
 	this.saoMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 	this.saoMaterial.defines[ 'NORMAL_TEXTURE' ] = this.supportsNormalTexture ? 1 : 0;
 	this.saoMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
