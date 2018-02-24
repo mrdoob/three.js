@@ -473,20 +473,16 @@ THREE.GLTFExporter.prototype = {
 			var mimeType = map.format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
 			var gltfImage = { mimeType: mimeType };
 
-			if ( options.embedImages || ( options.forcePowerOfTwoTexture && ! isPowerOfTwo( map.image ) ) ) {
+			if ( options.embedImages ) {
 
 				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
 
 				canvas.width = map.image.width;
 				canvas.height = map.image.height;
 
-				if ( options.forcePowerOfTwoTexture ) {
+				if ( options.forcePowerOfTwoTexture && ! isPowerOfTwo( map.image ) ) {
 
-					if ( ! options.embedImages ) {
-
-						console.warn( 'GLTFExporter: image is not power of two. Resized and embedded.', image );
-
-					}
+					console.warn( 'GLTFExporter: Resized non-power-of-two image.', map.image );
 
 					canvas.width = THREE.Math.floorPowerOfTwo( canvas.width );
 					canvas.height = THREE.Math.floorPowerOfTwo( canvas.height );
