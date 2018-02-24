@@ -21,8 +21,8 @@ function DirectGeometry() {
 
 	// this.lineDistances = [];
 
-	this.boundingBox = null;
-	this.boundingSphere = null;
+	// this.boundingBox = null;
+	// this.boundingSphere = null;
 
 	// update flags
 
