@@ -99,7 +99,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 	this.vBlurMaterial = new THREE.ShaderMaterial( {
 		uniforms: THREE.UniformsUtils.clone( THREE.DepthLimitedBlurShader.uniforms ),
-		defines: THREE.DepthLimitedBlurShader.defines,
+		defines: Object.assign( {}, THREE.DepthLimitedBlurShader.defines ),
 		vertexShader: THREE.DepthLimitedBlurShader.vertexShader,
 		fragmentShader: THREE.DepthLimitedBlurShader.fragmentShader
 	} );
@@ -112,7 +112,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 	this.hBlurMaterial = new THREE.ShaderMaterial( {
 		uniforms: THREE.UniformsUtils.clone( THREE.DepthLimitedBlurShader.uniforms ),
-		defines: THREE.DepthLimitedBlurShader.defines,
+		defines: Object.assign( {}, THREE.DepthLimitedBlurShader.defines ),
 		vertexShader: THREE.DepthLimitedBlurShader.vertexShader,
 		fragmentShader: THREE.DepthLimitedBlurShader.fragmentShader
 	} );

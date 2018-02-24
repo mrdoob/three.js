@@ -102,7 +102,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		uniforms: THREE.UniformsUtils.clone( this.adaptLuminanceShader.uniforms ),
 		vertexShader: this.adaptLuminanceShader.vertexShader,
 		fragmentShader: this.adaptLuminanceShader.fragmentShader,
-		defines: this.adaptLuminanceShader.defines,
+		defines: Object.assign( {}, this.adaptLuminanceShader.defines ),
 		blending: THREE.NoBlending
 	} );
 
