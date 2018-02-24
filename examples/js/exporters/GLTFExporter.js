@@ -318,6 +318,9 @@ THREE.GLTFExporter.prototype = {
 
 			// Create a new dataview and dump the attribute's array into it
 			var byteLength = count * data.itemSize * componentSize;
+			
+			// Adjust required buffer length for 4-byte alignment
+			byteLength = getPaddedBufferSize( byteLength );
 
 			var gltfBufferView = {
 
