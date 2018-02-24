@@ -74,7 +74,12 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 	}
 
-	this.saoMaterial = new THREE.ShaderMaterial( THREE.SAOShader );
+	this.saoMaterial = new THREE.ShaderMaterial( {
+		defines: Object.assign( {}, THREE.SAOShader.defines ),
+		fragmentShader: THREE.SAOShader.fragmentShader,
+		vertexShader: THREE.SAOShader.vertexShader,
+		uniforms: THREE.UniformsUtils.clone( THREE.SAOShader.uniforms )
+	} );
 	this.saoMaterial.extensions.derivatives = true;
 	this.saoMaterial.extensions.drawBuffers = true;
 	this.saoMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
