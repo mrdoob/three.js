@@ -69,7 +69,8 @@ THREE.GLTFExporter.prototype = {
 			truncateDrawRange: true,
 			embedImages: true,
 			animations: [],
-			forceIndices: false
+			forceIndices: false,
+			forcePowerOfTwoTexture: false
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
@@ -189,6 +190,19 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			return output;
+
+		}
+
+		/**
+		 * Checks if image size is POT.
+		 *
+		 * @param {Image} image The image to be checked.
+		 * @returns {Boolean} Returns true if image size is POT.
+		 *
+		 */
+		function isPowerOfTwo( image ) {
+
+			return THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height );
 
 		}
 
@@ -459,21 +473,36 @@ THREE.GLTFExporter.prototype = {
 			var mimeType = map.format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
 			var gltfImage = { mimeType: mimeType };
 
-			if ( options.embedImages ) {
+			if ( options.embedImages || ( options.forcePowerOfTwoTexture && ! isPowerOfTwo( map.image ) ) ) {
 
 				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
+
 				canvas.width = map.image.width;
 				canvas.height = map.image.height;
+
+				if ( options.forcePowerOfTwoTexture ) {
+
+					if ( ! options.embedImages ) {
+
+						console.warn( 'GLTFExporter: image is not power of two. Resized and embedded.', image );
+
+					}
+
+					canvas.width = THREE.Math.floorPowerOfTwo( canvas.width );
+					canvas.height = THREE.Math.floorPowerOfTwo( canvas.height );
+
+				}
+
 				var ctx = canvas.getContext( '2d' );
 
 				if ( map.flipY === true ) {
 
-					ctx.translate( 0, map.image.height );
+					ctx.translate( 0, canvas.height );
 					ctx.scale( 1, - 1 );
 
 				}
 
-				ctx.drawImage( map.image, 0, 0 );
+				ctx.drawImage( map.image, 0, 0, canvas.width, canvas.height );
 
 				// @TODO Embed in { bufferView } if options.binary set.
 
