@@ -38,7 +38,14 @@ THREE.PCDLoader.prototype = {
 		var parser = new THREE.PCDLoader.Parser();
 		parser.setLittleEndian( this.littleEndian );
 
-		return parser.parse( data, url );
+		var mesh = parser.parse( data );
+
+		var name = url.split( '' ).reverse().join( '' );
+		name = /([^\/]*)/.exec( name );
+		name = name[ 1 ].split( '' ).reverse().join( '' );
+		mesh.name = name;
+
+		return mesh;
 	}
 };
 
@@ -58,19 +65,10 @@ THREE.PCDLoader.Parser.prototype = {
 		this.littleEndian = littleEndian === true;
 	},
 
-	parse: function ( data, url ) {
+	parse: function ( data ) {
 		var textData = THREE.LoaderUtils.decodeText( data );
-
 		var pcdHeader = this.parseHeader( textData );
-
-		var mesh = this.parseData( pcdHeader, textData, data );
-
-		var name = url.split( '' ).reverse().join( '' );
-		name = /([^\/]*)/.exec( name );
-		name = name[ 1 ].split( '' ).reverse().join( '' );
-		mesh.name = name;
-
-		return mesh;
+		return this.parseData( pcdHeader, textData, data );
 	},
 
 	parseHeader: function ( data ) {

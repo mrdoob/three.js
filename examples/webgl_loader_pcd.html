@@ -48,6 +48,8 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/PCDLoader.js"></script>
+		<script src="js/loaders/LoaderSupport.js"></script>
+		<script src="js/loaders/WorkerPCDLoader.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -93,7 +95,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new THREE.PCDLoader();
+				var loader = new THREE.WorkerPCDLoader();
 				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( mesh ) {
 
 					scene.add( mesh );
@@ -101,7 +103,7 @@
 					controls.target.set( center.x, center.y, center.z);
 					controls.update();
 
-				} );
+				}, null, null, null, true );
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
