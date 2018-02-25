@@ -97,7 +97,7 @@
 				light.position.set( 0.5, 1, 1 ).normalize();
 				scene.add( light );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
