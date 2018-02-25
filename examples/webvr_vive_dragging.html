@@ -64,7 +64,7 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				user.add( camera );
 
-				var geometry = new THREE.PlaneGeometry( 4, 4 );
+				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xeeeeee,
 					roughness: 1.0,
@@ -91,11 +91,11 @@
 				scene.add( group );
 
 				var geometries = [
-					new THREE.BoxGeometry( 0.2, 0.2, 0.2 ),
-					new THREE.ConeGeometry( 0.2, 0.2, 64 ),
-					new THREE.CylinderGeometry( 0.2, 0.2, 0.2, 64 ),
-					new THREE.IcosahedronGeometry( 0.2, 3 ),
-					new THREE.TorusGeometry( 0.2, 0.04, 64, 32 )
+					new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ),
+					new THREE.ConeBufferGeometry( 0.2, 0.2, 64 ),
+					new THREE.CylinderBufferGeometry( 0.2, 0.2, 0.2, 64 ),
+					new THREE.IcosahedronBufferGeometry( 0.2, 3 ),
+					new THREE.TorusBufferGeometry( 0.2, 0.04, 64, 32 )
 				];
 
 				for ( var i = 0; i < 50; i ++ ) {
@@ -171,9 +171,7 @@
 
 				//
 
-				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
-				geometry.vertices.push( new THREE.Vector3( 0, 0, - 1 ) );
+				var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
 				var line = new THREE.Line( geometry );
 				line.name = 'line';
