@@ -197,9 +197,9 @@ Menubar.File = function ( editor ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-			// forceIndices: true, forcePowerOfTwoTexture: true
+			// forceIndices: true, forcePowerOfTwoTextures: true
 			// to allow compatibility with facebook
-		}, { binary: true, forceIndices: true, forcePowerOfTwoTexture: true } );
+		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
 		
 	} );
 	options.add( option );

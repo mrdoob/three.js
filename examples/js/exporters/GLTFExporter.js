@@ -70,7 +70,7 @@ THREE.GLTFExporter.prototype = {
 			embedImages: true,
 			animations: [],
 			forceIndices: false,
-			forcePowerOfTwoTexture: false
+			forcePowerOfTwoTextures: false
 		};
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
@@ -480,7 +480,7 @@ THREE.GLTFExporter.prototype = {
 				canvas.width = map.image.width;
 				canvas.height = map.image.height;
 
-				if ( options.forcePowerOfTwoTexture && ! isPowerOfTwo( map.image ) ) {
+				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( map.image ) ) {
 
 					console.warn( 'GLTFExporter: Resized non-power-of-two image.', map.image );
 
