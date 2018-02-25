@@ -1,403 +1,281 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author Lewy Blue https://github.com/looeee
+ *
+ * The model is expected to follow real world car proportions. You can try unusual car types
+ * but your results may be unexpected.
+ *
+ * Defaults below are for a Ferrari F50, taken from https://en.wikipedia.org/wiki/Ferrari_F50
+ *
  */
 
-THREE.Car = function () {
+THREE.Car = function ( maxSpeed, acceleration, brakePower, turningRadius, keys ) {
 
-	var scope = this;
+	var self = this;
 
-	// car geometry manual parameters
+	this.enabled = true;
 
-	this.modelScale = 1;
+	this.elemNames = {
+		flWheel: 'wheelFrontLeft',
+		frWheel: 'wheelFrontRight',
+		blWheel: 'wheelBackLeft',
+		brWheel: 'wheelBackRight',
+		steeringWheel: null, // disabled by default
+	}
 
-	this.backWheelOffset = 2;
+	// km/hr
+	this.maxSpeed = maxSpeed || 312;
+	var maxSpeedReverse = - this.maxSpeed * 0.25;
 
-	this.autoWheelGeometry = true;
+	// m/s
+	this.acceleration = acceleration || 19;
+	var accelerationReverse = this.acceleration * 0.5;
 
-	// car geometry parameters automatically set from wheel mesh
-	// 	- assumes wheel mesh is front left wheel in proper global
-	//    position with respect to body mesh
-	//	- other wheels are mirrored against car root
-	//	- if necessary back wheels can be offset manually
+	// metres
+	this.turningRadius = turningRadius || 12;
 
-	this.wheelOffset = new THREE.Vector3();
+	// m/s
+	var deceleration = this.acceleration * 2;
 
-	this.wheelDiameter = 1;
+	// multiplied with deceleration, so breaking deceleration = ( acceleration * 2 * brakePower ) m/s
+	this.brakePower = brakePower || 10;
 
-	// car "feel" parameters
-
-	this.MAX_SPEED = 2200;
-	this.MAX_REVERSE_SPEED = - 1500;
-
-	this.MAX_WHEEL_ROTATION = 0.6;
-
-	this.FRONT_ACCELERATION = 1250;
-	this.BACK_ACCELERATION = 1500;
-
-	this.WHEEL_ANGULAR_ACCELERATION = 1.5;
-
-	this.FRONT_DECCELERATION = 750;
-	this.WHEEL_ANGULAR_DECCELERATION = 1.0;
-
-	this.STEERING_RADIUS_RATIO = 0.0023;
-
-	this.MAX_TILT_SIDES = 0.05;
-	this.MAX_TILT_FRONTBACK = 0.015;
-
-	// internal control variables
-
+	// exposed so that a user can use this for various effect, e.g blur
+	// km / hr
 	this.speed = 0;
-	this.acceleration = 0;
 
-	this.wheelOrientation = 0;
-	this.carOrientation = 0;
+	// keys used to control car - by default the arrow keys and space to brake
+	this.keys = keys || { LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40, BRAKE: 32 };
 
-	// car rigging
+	var steeringWheelSpeed = 1.5;
+	var maxSteeringRotation = 0.6;
 
-	this.root = new THREE.Object3D();
+	var acceleration = 0;
 
-	this.frontLeftWheelRoot = new THREE.Object3D();
-	this.frontRightWheelRoot = new THREE.Object3D();
+	var wheelOrientation = 0;
+	var carOrientation = 0;
 
-	this.bodyMesh = null;
+	var root = null;
 
-	this.frontLeftWheelMesh = null;
-	this.frontRightWheelMesh = null;
+	var frontLeftWheelRoot = null;
+	var frontRightWheelRoot = null;
 
-	this.backLeftWheelMesh = null;
-	this.backRightWheelMesh = null;
+	var frontLeftWheel = new THREE.Group();
+	var frontRightWheel = new THREE.Group();
+	var backLeftWheel = null;
+	var backRightWheel = null;
 
-	this.bodyGeometry = null;
-	this.wheelGeometry = null;
+	var steeringWheel = null;
 
-	this.bodyMaterials = null;
-	this.wheelMaterials = null;
+	var wheelDiameter = 1;
+	var length = 1;
 
-	// internal helper variables
+	var loaded = false;
 
-	this.loaded = false;
+	var controls = {
 
-	this.meshes = [];
+		brake: false,
+		moveForward: false,
+		moveBackward: false,
+		moveLeft: false,
+		moveRight: false
 
-	// API
+	};
 
-	this.enableShadows = function ( enable ) {
+	function onKeyDown( event ) {
 
-		for ( var i = 0; i < this.meshes.length; i ++ ) {
+		switch ( event.keyCode ) {
 
-			this.meshes[ i ].castShadow = enable;
-			this.meshes[ i ].receiveShadow = enable;
+			case self.keys.BRAKE:
+				controls.brake = true;
+				controls.moveForward = false;
+				controls.moveBackward = false;
+				break;
+
+			case self.keys.UP: controls.moveForward = true; break;
+
+			case self.keys.DOWN: controls.moveBackward = true; break;
+
+			case self.keys.LEFT: controls.moveLeft = true; break;
+
+			case self.keys.RIGHT: controls.moveRight = true; break;
 
 		}
 
-	};
+	}
 
-	this.setVisible = function ( enable ) {
+	function onKeyUp( event ) {
 
-		for ( var i = 0; i < this.meshes.length; i ++ ) {
+		switch ( event.keyCode ) {
 
-			this.meshes[ i ].visible = enable;
-			this.meshes[ i ].visible = enable;
+			case self.keys.BRAKE: controls.brake = false; break;
+
+			case self.keys.UP: controls.moveForward = false; break;
+
+			case self.keys.DOWN: controls.moveBackward = false; break;
+
+			case self.keys.LEFT: controls.moveLeft = false; break;
+
+			case self.keys.RIGHT: controls.moveRight = false; break;
 
 		}
 
-	};
+	}
 
-	this.loadPartsJSON = function ( bodyURL, wheelURL ) {
+	document.addEventListener( 'keydown', onKeyDown, false );
+	document.addEventListener( 'keyup', onKeyUp, false );
 
-		var loader = new THREE.JSONLoader();
+	this.dispose = function () {
 
-		loader.load( bodyURL, function( geometry, materials ) {
-
-			createBody( geometry, materials )
-
-		} );
-		loader.load( wheelURL, function( geometry, materials ) {
-
-			createWheels( geometry, materials )
-
-		} );
+		document.removeEventListener( 'keydown', onKeyDown, false );
+		document.removeEventListener( 'keyup', onKeyUp, false );
 
 	};
 
-	this.loadPartsBinary = function ( bodyURL, wheelURL ) {
+	this.update = function ( delta ) {
 
-		var loader = new THREE.BinaryLoader();
+		if ( ! loaded || ! this.enabled ) return;
 
-		loader.load( bodyURL, function( geometry, materials ) {
+		var brakingDeceleration = 1;
 
-			createBody( geometry, materials )
-
-		} );
-		loader.load( wheelURL, function( geometry, materials ) {
-
-			createWheels( geometry, materials )
-
-		} );
-
-	};
-
-	this.updateCarModel = function ( delta, controls ) {
-
-		// speed and wheels based on controls
+		if ( controls.brake ) brakingDeceleration = this.brakePower;
 
 		if ( controls.moveForward ) {
 
-			this.speed = THREE.Math.clamp( this.speed + delta * this.FRONT_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
-			this.acceleration = THREE.Math.clamp( this.acceleration + delta, - 1, 1 );
+			this.speed = THREE.Math.clamp( this.speed + delta * this.acceleration, maxSpeedReverse, this.maxSpeed );
+			acceleration = THREE.Math.clamp( acceleration + delta, - 1, 1 );
 
 		}
 
 		if ( controls.moveBackward ) {
 
-
-			this.speed = THREE.Math.clamp( this.speed - delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
-			this.acceleration = THREE.Math.clamp( this.acceleration - delta, - 1, 1 );
+			this.speed = THREE.Math.clamp( this.speed - delta * accelerationReverse, maxSpeedReverse, this.maxSpeed );
+			acceleration = THREE.Math.clamp( acceleration - delta, - 1, 1 );
 
 		}
 
 		if ( controls.moveLeft ) {
 
-			this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
+			wheelOrientation = THREE.Math.clamp( wheelOrientation + delta * steeringWheelSpeed, - maxSteeringRotation, maxSteeringRotation );
 
 		}
 
 		if ( controls.moveRight ) {
 
-			this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
+			wheelOrientation = THREE.Math.clamp( wheelOrientation - delta * steeringWheelSpeed, - maxSteeringRotation, maxSteeringRotation );
 
 		}
 
-		// speed decay
-
+		// this.speed decay
 		if ( ! ( controls.moveForward || controls.moveBackward ) ) {
 
 			if ( this.speed > 0 ) {
 
-				var k = exponentialEaseOut( this.speed / this.MAX_SPEED );
+				var k = exponentialEaseOut( this.speed / this.maxSpeed );
 
-				this.speed = THREE.Math.clamp( this.speed - k * delta * this.FRONT_DECCELERATION, 0, this.MAX_SPEED );
-				this.acceleration = THREE.Math.clamp( this.acceleration - k * delta, 0, 1 );
+				this.speed = THREE.Math.clamp( this.speed - k * delta * deceleration * brakingDeceleration, 0, this.maxSpeed );
+				acceleration = THREE.Math.clamp( acceleration - k * delta, 0, 1 );
 
 			} else {
 
-				var k = exponentialEaseOut( this.speed / this.MAX_REVERSE_SPEED );
+				var k = exponentialEaseOut( this.speed / maxSpeedReverse );
 
-				this.speed = THREE.Math.clamp( this.speed + k * delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, 0 );
-				this.acceleration = THREE.Math.clamp( this.acceleration + k * delta, - 1, 0 );
+				this.speed = THREE.Math.clamp( this.speed + k * delta * accelerationReverse * brakingDeceleration, maxSpeedReverse, 0 );
+				acceleration = THREE.Math.clamp( acceleration + k * delta, - 1, 0 );
 
 			}
-
 
 		}
 
 		// steering decay
-
 		if ( ! ( controls.moveLeft || controls.moveRight ) ) {
 
-			if ( this.wheelOrientation > 0 ) {
+			if ( wheelOrientation > 0 ) {
 
-				this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_DECCELERATION, 0, this.MAX_WHEEL_ROTATION );
+				wheelOrientation = THREE.Math.clamp( wheelOrientation - delta * steeringWheelSpeed, 0, maxSteeringRotation );
 
 			} else {
 
-				this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_DECCELERATION, - this.MAX_WHEEL_ROTATION, 0 );
+				wheelOrientation = THREE.Math.clamp( wheelOrientation + delta * steeringWheelSpeed, - maxSteeringRotation, 0 );
 
 			}
 
 		}
-
-		// car update
 
 		var forwardDelta = this.speed * delta;
 
-		this.carOrientation += ( forwardDelta * this.STEERING_RADIUS_RATIO ) * this.wheelOrientation;
+		carOrientation += ( forwardDelta * this.turningRadius * 0.02 ) * wheelOrientation;
 
-		// displacement
+		// movement of car
+		root.position.x += Math.sin( carOrientation ) * forwardDelta * length;
+		root.position.z += Math.cos( carOrientation ) * forwardDelta * length;
 
-		this.root.position.x += Math.sin( this.carOrientation ) * forwardDelta;
-		this.root.position.z += Math.cos( this.carOrientation ) * forwardDelta;
-
-		// steering
-
-		this.root.rotation.y = this.carOrientation;
-
-		// tilt
-
-		if ( this.loaded ) {
-
-			this.bodyMesh.rotation.z = this.MAX_TILT_SIDES * this.wheelOrientation * ( this.speed / this.MAX_SPEED );
-			this.bodyMesh.rotation.x = - this.MAX_TILT_FRONTBACK * this.acceleration;
-
-		}
+		// angle of car
+		root.rotation.y = carOrientation;
 
 		// wheels rolling
+		var angularSpeedRatio = 2 / wheelDiameter;
 
-		var angularSpeedRatio = 1 / ( this.modelScale * ( this.wheelDiameter / 2 ) );
+		var wheelDelta = forwardDelta * angularSpeedRatio * length;
 
-		var wheelDelta = forwardDelta * angularSpeedRatio;
+		frontLeftWheel.rotation.x += wheelDelta;
+		frontRightWheel.rotation.x += wheelDelta;
+		backLeftWheel.rotation.x += wheelDelta;
+		backRightWheel.rotation.x += wheelDelta;
 
-		if ( this.loaded ) {
+		// rotation while steering
+		frontLeftWheelRoot.rotation.y = wheelOrientation;
+		frontRightWheelRoot.rotation.y = wheelOrientation;
 
-			this.frontLeftWheelMesh.rotation.x += wheelDelta;
-			this.frontRightWheelMesh.rotation.x += wheelDelta;
-			this.backLeftWheelMesh.rotation.x += wheelDelta;
-			this.backRightWheelMesh.rotation.x += wheelDelta;
-
-		}
-
-		// front wheels steering
-
-		this.frontLeftWheelRoot.rotation.y = this.wheelOrientation;
-		this.frontRightWheelRoot.rotation.y = this.wheelOrientation;
+		steeringWheel.rotation.z = -wheelOrientation * 6;
 
 	};
 
-	// internal helper methods
+	this.setModel = function ( model, elemNames ) {
 
-	function createBody ( geometry, materials ) {
+		if ( elemNames ) this.elemNames = elemNames;
 
-		scope.bodyGeometry = geometry;
-		scope.bodyMaterials = materials;
+		root = model;
 
-		createCar();
+		setupWheels();
+		computeDimensions();
 
-	}
+		loaded = true;
 
-	function createWheels ( geometry, materials ) {
+	};
 
-		scope.wheelGeometry = geometry;
-		scope.wheelMaterials = materials;
+	function setupWheels() {
 
-		createCar();
+		frontLeftWheelRoot = root.getObjectByName( self.elemNames.flWheel );
+		frontRightWheelRoot = root.getObjectByName( self.elemNames.frWheel );
+		backLeftWheel = root.getObjectByName( self.elemNames.blWheel );
+		backRightWheel = root.getObjectByName( self.elemNames.brWheel );
 
-	}
+		if( self.elemNames.steeringWheel !== null ) steeringWheel = root.getObjectByName( self.elemNames.steeringWheel );
 
-	function createCar () {
+		while ( frontLeftWheelRoot.children.length > 0 ) frontLeftWheel.add( frontLeftWheelRoot.children[ 0 ] );
+		while ( frontRightWheelRoot.children.length > 0 ) frontRightWheel.add( frontRightWheelRoot.children[ 0 ] );
 
-		if ( scope.bodyGeometry && scope.wheelGeometry ) {
-
-			// compute wheel geometry parameters
-
-			if ( scope.autoWheelGeometry ) {
-
-				scope.wheelGeometry.computeBoundingBox();
-
-				var bb = scope.wheelGeometry.boundingBox;
-
-				scope.wheelOffset.addVectors( bb.min, bb.max );
-				scope.wheelOffset.multiplyScalar( 0.5 );
-
-				scope.wheelDiameter = bb.max.y - bb.min.y;
-
-				scope.wheelGeometry.center();
-
-			}
-
-			// rig the car
-
-			var s = scope.modelScale,
-				delta = new THREE.Vector3();
-
-			var bodyFaceMaterial = scope.bodyMaterials;
-			var wheelFaceMaterial = scope.wheelMaterials;
-
-			// body
-
-			scope.bodyMesh = new THREE.Mesh( scope.bodyGeometry, bodyFaceMaterial );
-			scope.bodyMesh.scale.set( s, s, s );
-
-			scope.root.add( scope.bodyMesh );
-
-			// front left wheel
-
-			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( s, s, s ) );
-
-			scope.frontLeftWheelRoot.position.add( delta );
-
-			scope.frontLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
-			scope.frontLeftWheelMesh.scale.set( s, s, s );
-
-			scope.frontLeftWheelRoot.add( scope.frontLeftWheelMesh );
-			scope.root.add( scope.frontLeftWheelRoot );
-
-			// front right wheel
-
-			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( - s, s, s ) );
-
-			scope.frontRightWheelRoot.position.add( delta );
-
-			scope.frontRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
-
-			scope.frontRightWheelMesh.scale.set( s, s, s );
-			scope.frontRightWheelMesh.rotation.z = Math.PI;
-
-			scope.frontRightWheelRoot.add( scope.frontRightWheelMesh );
-			scope.root.add( scope.frontRightWheelRoot );
-
-			// back left wheel
-
-			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( s, s, - s ) );
-			delta.z -= scope.backWheelOffset;
-
-			scope.backLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
-
-			scope.backLeftWheelMesh.position.add( delta );
-			scope.backLeftWheelMesh.scale.set( s, s, s );
-
-			scope.root.add( scope.backLeftWheelMesh );
-
-			// back right wheel
-
-			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( - s, s, - s ) );
-			delta.z -= scope.backWheelOffset;
-
-			scope.backRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
-
-			scope.backRightWheelMesh.position.add( delta );
-			scope.backRightWheelMesh.scale.set( s, s, s );
-			scope.backRightWheelMesh.rotation.z = Math.PI;
-
-			scope.root.add( scope.backRightWheelMesh );
-
-			// cache meshes
-
-			scope.meshes = [ scope.bodyMesh, scope.frontLeftWheelMesh, scope.frontRightWheelMesh, scope.backLeftWheelMesh, scope.backRightWheelMesh ];
-
-			// callback
-
-			scope.loaded = true;
-
-			if ( scope.callback ) {
-
-				scope.callback( scope );
-
-			}
-
-		}
+		frontLeftWheelRoot.add( frontLeftWheel );
+		frontRightWheelRoot.add( frontRightWheel );
 
 	}
 
-	function quadraticEaseOut( k ) {
+	function computeDimensions() {
 
-		return - k * ( k - 2 );
+		var bb = new THREE.Box3().setFromObject( frontLeftWheelRoot );
 
-	}
-	function cubicEaseOut( k ) {
+		var size = bb.getSize();
 
-		return -- k * k * k + 1;
+		wheelDiameter = Math.max( size.x, size.y, size.z );
 
-	}
-	function circularEaseOut( k ) {
+		bb.setFromObject( root );
 
-		return Math.sqrt( 1 - -- k * k );
-
-	}
-	function sinusoidalEaseOut( k ) {
-
-		return Math.sin( k * Math.PI / 2 );
+		size = bb.getSize();
+		length = Math.max( size.x, size.y, size.z );
 
 	}
+
 	function exponentialEaseOut( k ) {
 
 		return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1;
@@ -405,3 +283,4 @@ THREE.Car = function () {
 	}
 
 };
+

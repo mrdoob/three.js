@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js misc - controls - car</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a {
+				color: red;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - car controls demo -
+			Ferrari F50 model by <a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1687" target="_blank" rel="noopener">Daniel Sathya</a><br>
+			Controls: arrow keys & space
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/loaders/GLTFLoader.js"></script>
+
+    <script src="js/Car.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, light;
+
+			var clock = new THREE.Clock();
+
+			var car, carModel;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20000 );
+				camera.position.set( 500, 3, 500 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 100, 500 );
+
+				light = new THREE.AmbientLight( 0x999999 );
+    		scene.add( light );
+
+				light = new THREE.PointLight( 0xffffff );
+				camera.add( this.light );
+				scene.add( camera );
+
+				// ground
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				mesh.rotation.x = - Math.PI / 2;
+				scene.add( mesh );
+
+				var grid = new THREE.GridHelper( 2000, 200, 0x000000, 0x000000 );
+				grid.material.opacity = 0.25;
+				grid.material.transparent = true;
+				scene.add( grid );
+
+				var envMap = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Bridge2/')
+					.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+
+
+				car = new THREE.Car();
+
+				var loader = new THREE.GLTFLoader();
+				loader.load( 'models/gltf/f50/f50.glb', function ( gltf ) {
+
+          carModel = gltf.scene.children[0];
+
+          // console.log( carModel )
+
+					var carBodyMat = carModel.getObjectByName( 'exterior' ).material;
+					carBodyMat.envMap = envMap;
+					carBodyMat.metalness = 0.25;
+					carBodyMat.roughness = 0.15;
+
+					car.setModel( carModel, {
+							flWheel: 'wheelFrontLeft',
+							frWheel: 'wheelFrontRight',
+							blWheel: 'wheelRearLeft',
+							brWheel: 'wheelRearRight',
+							steeringWheel: 'steeringWheel',
+						}
+					);
+
+					scene.add( carModel );
+
+				} );
+
+				renderer = new THREE.WebGLRenderer( {antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize( event ) {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				car.update( delta );
+
+				if ( carModel ) {
+
+          updateCamera( delta );
+
+          resetAtExtremities( carModel );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+			var height = camera.position.y;
+			var damping = 5.0;
+			var distance = -11;
+
+			var cameraTarget = new THREE.Vector3();
+
+			function updateCamera( delta ) {
+
+				carModel.getWorldPosition( cameraTarget );
+				cameraTarget.y = height;
+        cameraTarget.z += distance;
+
+				camera.position.lerp(cameraTarget, delta * damping );
+
+        camera.lookAt( carModel.position );
+
+      }
+
+      var initialPos = null;
+
+      function resetAtExtremities( object ) {
+
+        if( initialPos === null ) {
+
+          initialPos = object.position.clone();
+
+        }
+
+        else if ( initialPos.distanceTo( object.position ) > 1000 ) {
+
+          object.position.copy( initialPos );
+					car.speed = 0;
+					car.enabled = false;
+
+					setTimeout( function() {
+
+						car.enabled = true;
+
+					}, 1500 )
+
+        }
+
+      }
+
+		</script>
+
+	</body>
+</html>
