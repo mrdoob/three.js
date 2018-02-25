@@ -80,7 +80,9 @@ exporter.parse( [ scene1, object1, object2, scene2 ], ...)
 			<li>truncateDrawRange - bool. Export just the attributes within the drawRange, if defined, instead of exporting the whole array. Default is true.</li>
 			<li>binary - bool. Export in binary (.glb) format, returning an ArrayBuffer. Default is false.</li>
 			<li>embedImages - bool. Export with images embedded into the glTF asset. Default is true.</li>
-			<li>animations - Array<[page:AnimationClip AnimationClip]>. List of animations to be included in the export.
+			<li>animations - Array<[page:AnimationClip AnimationClip]>. List of animations to be included in the export.</li>
+			<li>forceIndices - bool. Generate indices for non-index geometry and export with them. Default is false.</li>
+			<li>forcePowerOfTwoTextures - bool. Export with images resized to POT size. This option works only if embedImages is true. Default is false.</li>
 		</ul>
 		</div>
 		<div>
