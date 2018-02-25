@@ -562,7 +562,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		//
+		/*
 
 		if ( geometry.boundingSphere !== null ) {
 
@@ -575,6 +575,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			this.boundingBox = geometry.boundingBox.clone();
 
 		}
+		*/
 
 		return this;
 
