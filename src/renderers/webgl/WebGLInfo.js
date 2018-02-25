@@ -12,9 +12,9 @@ function WebGLInfo( gl ) {
 	var render = {
 		frame: 0,
 		calls: 0,
-		faces: 0,
+		triangles: 0,
 		points: 0,
-		segments: 0
+		lines: 0
 	};
 
 	function update( count, mode, instanceCount ) {
@@ -26,24 +26,24 @@ function WebGLInfo( gl ) {
 		switch ( mode ) {
 
 			case gl.TRIANGLES:
-				render.faces += instanceCount * ( count / 3 );
+				render.triangles += instanceCount * ( count / 3 );
 				break;
 
 			case gl.TRIANGLE_STRIP:
 			case gl.TRIANGLE_FAN:
-				render.faces += instanceCount * ( count - 2 );
+				render.triangles += instanceCount * ( count - 2 );
 				break;
 
 			case gl.LINES:
-				render.segments += instanceCount * ( count / 2 );
+				render.lines += instanceCount * ( count / 2 );
 				break;
 
 			case gl.LINE_STRIP:
-				render.segments += instanceCount * ( count - 1 );
+				render.lines += instanceCount * ( count - 1 );
 				break;
 
 			case gl.LINE_LOOP:
-				render.segments += instanceCount * count;
+				render.lines += instanceCount * count;
 				break;
 
 			case gl.POINTS:
@@ -62,9 +62,9 @@ function WebGLInfo( gl ) {
 
 		render.frame ++;
 		render.calls = 0;
-		render.faces = 0;
+		render.triangles = 0;
 		render.points = 0;
-		render.segments = 0;
+		render.lines = 0;
 
 	}
 
