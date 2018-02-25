@@ -35,6 +35,7 @@
 			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label>
 			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
 			<label><input id="option_forceindices" name="visible" type="checkbox">Force indices</label>
+			<label><input id="option_forcepot" name="visible" type="checkbox">Force POT textures</label>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -54,7 +55,8 @@
 					onlyVisible: document.getElementById('option_visible').checked,
 					truncateDrawRange: document.getElementById('option_drawrange').checked,
 					binary: document.getElementById('option_binary').checked,
-					forceIndices: document.getElementById('option_forceindices').checked
+					forceIndices: document.getElementById('option_forceindices').checked,
+					forcePowerOfTwoTextures: document.getElementById('option_forcepot').checked
 				};
 				gltfExporter.parse( input, function( result ) {
 
@@ -438,7 +440,7 @@
 				// ---------------------------------------------------------------------
 				// Ortho camera
 				// ---------------------------------------------------------------------
-				var cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10, 10 );
+				var cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 0.1, 10 );
 				scene1.add( cameraOrtho );
 				cameraOrtho.name = 'OrthographicCamera';
 
