@@ -651,6 +651,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.castShadow === true ) object.castShadow = true;
 		if ( this.receiveShadow === true ) object.receiveShadow = true;
 		if ( this.visible === false ) object.visible = false;
+		if ( this.frustumCulled === false ) object.frustumCulled = false;
+		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
 		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
 
 		object.matrix = this.matrix.toArray();
