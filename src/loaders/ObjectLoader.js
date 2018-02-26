@@ -817,6 +817,8 @@ Object.assign( ObjectLoader.prototype, {
 		}
 
 		if ( data.visible !== undefined ) object.visible = data.visible;
+		if ( data.frustumCulled !== undefined ) object.frustumCulled = data.frustumCulled;
+		if ( data.renderOrder !== undefined ) object.renderOrder = data.renderOrder;
 		if ( data.userData !== undefined ) object.userData = data.userData;
 
 		if ( data.children !== undefined ) {
