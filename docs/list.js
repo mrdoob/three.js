@@ -1,12 +1,12 @@
 var list = {
 
-	"Manual": {
+	"指南": {
 
-		"Getting Started": {
-			"Creating a scene": "manual/introduction/Creating-a-scene",
-			"Import via modules": "manual/introduction/Import-via-modules",
-			"Browser support": "manual/introduction/Browser-support",
-			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
+		"起步": {
+			"创建一个场景": "manual/introduction/Creating-a-scene",
+			"通过模块导入": "manual/introduction/Import-via-modules",
+			"浏览器支持": "manual/introduction/Browser-support",
+			"WebGL 兼容检测": "manual/introduction/WebGL-compatibility-check",
 			"How to run things locally": "manual/introduction/How-to-run-things-locally",
 			"Drawing Lines": "manual/introduction/Drawing-lines",
 			"Creating Text": "manual/introduction/Creating-text",
