@@ -1,35 +1,46 @@
-import { REVISION, RGBAFormat, HalfFloatType, FloatType, UnsignedByteType, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, LinearToneMapping } from '../constants.js';
+import {
+	REVISION,
+	RGBAFormat,
+	HalfFloatType,
+	FloatType,
+	UnsignedByteType,
+	TriangleFanDrawMode,
+	TriangleStripDrawMode,
+	TrianglesDrawMode,
+	NoColors,
+	LinearToneMapping
+} from '../constants.js';
 import { _Math } from '../math/Math.js';
-import { Matrix4 } from '../math/Matrix4.js';
 import { DataTexture } from '../textures/DataTexture.js';
-import { WebGLUniforms } from './webgl/WebGLUniforms.js';
+import { Frustum } from '../math/Frustum.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { ShaderLib } from './shaders/ShaderLib.js';
 import { UniformsLib } from './shaders/UniformsLib.js';
 import { UniformsUtils } from './shaders/UniformsUtils.js';
-import { ShaderLib } from './shaders/ShaderLib.js';
-import { WebGLSpriteRenderer } from './webgl/WebGLSpriteRenderer.js';
-import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector4 } from '../math/Vector4.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
-import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
-import { WebGLMorphtargets } from './webgl/WebGLMorphtargets.js';
-import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
+import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
+import { WebGLClipping } from './webgl/WebGLClipping.js';
+import { WebGLExtensions } from './webgl/WebGLExtensions.js';
 import { WebGLGeometries } from './webgl/WebGLGeometries.js';
+import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
+import { WebGLInfo } from './webgl/WebGLInfo.js';
+import { WebGLMorphtargets } from './webgl/WebGLMorphtargets.js';
 import { WebGLObjects } from './webgl/WebGLObjects.js';
 import { WebGLPrograms } from './webgl/WebGLPrograms.js';
-import { WebGLTextures } from './webgl/WebGLTextures.js';
 import { WebGLProperties } from './webgl/WebGLProperties.js';
-import { WebGLState } from './webgl/WebGLState.js';
-import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
-import { WebVRManager } from './webvr/WebVRManager.js';
-import { WebGLExtensions } from './webgl/WebGLExtensions.js';
-import { Vector3 } from '../math/Vector3.js';
-import { WebGLClipping } from './webgl/WebGLClipping.js';
-import { Frustum } from '../math/Frustum.js';
-import { Vector4 } from '../math/Vector4.js';
-import { WebGLUtils } from './webgl/WebGLUtils.js';
+import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
 import { WebGLRenderStates } from './webgl/WebGLRenderStates.js';
-import { WebGLInfo } from './webgl/WebGLInfo.js';
+import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
+import { WebGLSpriteRenderer } from './webgl/WebGLSpriteRenderer.js';
+import { WebGLState } from './webgl/WebGLState.js';
+import { WebGLTextures } from './webgl/WebGLTextures.js';
+import { WebGLUniforms } from './webgl/WebGLUniforms.js';
+import { WebGLUtils } from './webgl/WebGLUtils.js';
+import { WebVRManager } from './webvr/WebVRManager.js';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
