@@ -352,7 +352,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param {Blob} blob
 		 * @return {Promise<Integer>}
 		 */
-		function processBufferViewImage ( blob ) {
+		function processBufferViewImage( blob ) {
 
 			if ( ! outputJSON.bufferViews ) {
 
