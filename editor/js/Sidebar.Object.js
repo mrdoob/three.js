@@ -272,7 +272,7 @@ Sidebar.Object = function ( editor ) {
 	// renderOrder
 
 	var objectRenderOrderRow = new UI.Row();
-	var objectRenderOrder = new UI.Integer().setWidth( '50px' ).setStep( 1 ).setRange( 0, Infinity ).onChange( update );
+	var objectRenderOrder = new UI.Integer().setWidth( '50px' ).onChange( update );
 
 	objectRenderOrderRow.add( new UI.Text( 'Render Order' ).setWidth( '90px' ) );
 	objectRenderOrderRow.add( objectRenderOrder );
