@@ -887,6 +887,15 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
+		var groups = this.groups;
+
+		for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+			var group = groups[ i ];
+			geometry2.addGroup( group.start, group.count, group.materialIndex );
+
+		}
+
 		return geometry2;
 
 	},
