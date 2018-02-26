@@ -94,7 +94,7 @@ THREE.GLTFExporter.prototype = {
 		};
 
 		var byteOffset = 0;
-		var buffers = [];
+		var dataViews = [];
 		var nodeMap = {};
 		var skins = [];
 		var cachedData = {
@@ -103,9 +103,6 @@ THREE.GLTFExporter.prototype = {
 			textures: {}
 
 		};
-
-		// Counter for pending asynchronous tasks.
-		var numPending = 0;
 
 		var cachedCanvas;
 
@@ -224,17 +221,17 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
-		 * Returns a buffer aligned to 4-byte boundary.
-		 *
+		 * Returns a buffer aligned to 4-byte boundary. 
+		 * 
 		 * @param {ArrayBuffer} arrayBuffer Buffer to pad
 		 * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
 		 */
 		function getPaddedArrayBuffer( arrayBuffer ) {
-
+						
 			var paddedLength = getPaddedBufferSize( arrayBuffer.byteLength );
-
+			
 			if (paddedLength !== arrayBuffer.byteLength ) {
-
+			
 				var paddedBuffer = new ArrayBuffer( paddedLength );
 				new Uint8Array( paddedBuffer ).set(new Uint8Array(arrayBuffer));
 				return paddedBuffer;
@@ -247,9 +244,11 @@ THREE.GLTFExporter.prototype = {
 
 		/**
 		 * Process a buffer to append to the default one.
-		 * @param {ArrayBuffer} buffer ArrayBuffer to store
+		 * @param  {THREE.BufferAttribute} attribute     Attribute to store
+		 * @param  {Integer} componentType Component type (Unsigned short, unsigned int or float)
+		 * @return {Integer}               Index of the buffer created (Currently always 0)
 		 */
-		function processBuffer( buffer ) {
+		function processBuffer( attribute, componentType, start, count ) {
 
 			if ( ! outputJSON.buffers ) {
 
@@ -266,33 +265,10 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			// We just use one buffer
-			buffers.push( buffer );
-
-			// Always using just one buffer
-			return 0;
-
-		}
-
-		/**
-		 * Process and generate a BufferView
-		 * @param  {THREE.BufferAttribute} attribute
-		 * @param  {number} componentType
-		 * @param  {number} start
-		 * @param  {number} count
-		 * @param  {number} target (Optional) Target usage of the BufferView
-		 * @return {Object}
-		 */
-		function processBufferView( attribute, componentType, start, count, target ) {
-
-			if ( ! outputJSON.bufferViews ) {
-
-				outputJSON.bufferViews = [];
-
-			}
+			var offset = 0;
+			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
 
 			// Create a new dataview and dump the attribute's array into it
-			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
 			var byteLength = count * attribute.itemSize * componentSize;
 
 			// adjust required size of array buffer with padding
@@ -300,14 +276,11 @@ THREE.GLTFExporter.prototype = {
 			byteLength = getPaddedBufferSize( byteLength );
 
 			var dataView = new DataView( new ArrayBuffer( byteLength ) );
-			var offset = 0;
 
 			for ( var i = start; i < start + count; i ++ ) {
 
 				for ( var a = 0; a < attribute.itemSize; a ++ ) {
 
-					// @TODO Fails on InterleavedBufferAttribute, and could probably be
-					// optimized for normal BufferAttribute.
 					var value = attribute.array[ i * attribute.itemSize + a ];
 
 					if ( componentType === WEBGL_CONSTANTS.FLOAT ) {
@@ -330,9 +303,39 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			// We just use one buffer
+			dataViews.push( dataView );
+
+			// Always using just one buffer
+			return 0;
+
+		}
+
+		/**
+		 * Process and generate a BufferView
+		 * @param  {THREE.BufferAttribute} data
+		 * @param  {number} componentType
+		 * @param  {number} start
+		 * @param  {number} count
+		 * @param  {number} target (Optional) Target usage of the BufferView
+		 * @return {Object}
+		 */
+		function processBufferView( data, componentType, start, count, target ) {
+
+			if ( ! outputJSON.bufferViews ) {
+
+				outputJSON.bufferViews = [];
+
+			}
+
+			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
+
+			// Create a new dataview and dump the attribute's array into it
+			var byteLength = count * data.itemSize * componentSize;
+
 			var gltfBufferView = {
 
-				buffer: processBuffer( dataView.buffer ),
+				buffer: processBuffer( data, componentType, start, count ),
 				byteOffset: byteOffset,
 				byteLength: byteLength
 
@@ -343,7 +346,7 @@ THREE.GLTFExporter.prototype = {
 			if ( target === WEBGL_CONSTANTS.ARRAY_BUFFER ) {
 
 				// Only define byteStride for vertex attributes.
-				gltfBufferView.byteStride = attribute.itemSize * componentSize;
+				gltfBufferView.byteStride = data.itemSize * componentSize;
 
 			}
 
@@ -351,7 +354,7 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.bufferViews.push( gltfBufferView );
 
-			// @TODO Merge bufferViews where possible.
+			// @TODO Ideally we'll have just two bufferviews: 0 is for vertex attributes, 1 for indices
 			var output = {
 
 				id: outputJSON.bufferViews.length - 1,
@@ -360,47 +363,6 @@ THREE.GLTFExporter.prototype = {
 			};
 
 			return output;
-
-		}
-
-		/**
-		 * Process and generate a BufferView from an image Blob.
-		 * @param {Blob} blob
-		 * @return {number}
-		 */
-		function processBufferViewImage ( blob ) {
-
-			if ( ! outputJSON.bufferViews ) {
-
-				outputJSON.bufferViews = [];
-
-			}
-
-			var bufferView = { buffer: null, byteOffset: null, byteLength: null };
-
-			var reader = new window.FileReader();
-			reader.readAsArrayBuffer( blob );
-			reader.addEventListener('loadend', function () {
-
-				var buffer = reader.result;
-				var byteLength = buffer.byteLength;
-
-				// Update the allocated BufferView.
-				bufferView.buffer = processBuffer( buffer );
-				bufferView.byteOffset = byteOffset;
-				bufferView.byteLength = byteLength;
-
-				byteOffset += byteLength;
-
-				next();
-
-			} );
-
-			numPending++;
-
-			outputJSON.bufferViews.push( bufferView );
-
-			return outputJSON.bufferViews.length - 1;
 
 		}
 
@@ -538,23 +500,9 @@ THREE.GLTFExporter.prototype = {
 
 				ctx.drawImage( map.image, 0, 0, canvas.width, canvas.height );
 
-				if ( options.binary === true ) {
+				// @TODO Embed in { bufferView } if options.binary set.
 
-					numPending++;
-
-					canvas.toBlob( function ( blob ) {
-
-						gltfImage.bufferView = processBufferViewImage( blob );
-
-						next();
-
-					}, mimeType );
-
-				} else {
-
-					gltfImage.uri = canvas.toDataURL( mimeType );
-
-				}
+				gltfImage.uri = canvas.toDataURL( mimeType );
 
 			} else {
 
@@ -1508,20 +1456,16 @@ THREE.GLTFExporter.prototype = {
 
 		}
 
-		function next () {
+		processInput( input );
 
-			if ( --numPending > 0 ) return;
+		// Generate buffer
+		// Create a new blob with all the dataviews from the buffers
+		var blob = new Blob( dataViews, { type: 'application/octet-stream' } );
 
-			// Generate buffer
-			// Create a new blob with all the buffers
-			var blob = new Blob( buffers, { type: 'application/octet-stream' } );
+		// Update the bytlength of the only main buffer and update the uri with the base64 representation of it
+		if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
 
-			// Update the bytlength of the only main buffer and update the uri with the base64 representation of it
-			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
-
-				outputJSON.buffers[ 0 ].byteLength = blob.size;
-
-			}
+			outputJSON.buffers[ 0 ].byteLength = blob.size;
 
 			var reader = new window.FileReader();
 
@@ -1581,32 +1525,24 @@ THREE.GLTFExporter.prototype = {
 
 				};
 
-				} else {
-
-					reader.readAsDataURL( blob );
-					reader.addEventListener( 'loadend', function () {
-
-						var base64data = reader.result;
-						outputJSON.buffers[ 0 ].uri = base64data;
-						onDone( outputJSON );
-
-					} );
-
-				}
-
 			} else {
 
-				onDone( outputJSON );
+				reader.readAsDataURL( blob );
+				reader.onloadend = function () {
+
+					var base64data = reader.result;
+					outputJSON.buffers[ 0 ].uri = base64data;
+					onDone( outputJSON );
+
+				};
 
 			}
 
+		} else {
+
+			onDone( outputJSON );
+
 		}
-
-		numPending++;
-
-		processInput( input );
-
-		next();
 
 	}
 
