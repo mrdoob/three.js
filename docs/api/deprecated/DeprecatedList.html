@@ -51,6 +51,7 @@
 
 		<h3>[page:BufferAttribute]</h3>
 		<div>BufferAttribute.length has been renamed to [page:BufferAttribute.count].</div>
+		<div>BufferAttribute.copyIndicesArray() has been removed.</div>
 
 
 		<h3>[page:DynamicBufferAttribute]</h3>
@@ -152,6 +153,12 @@
 
 
 		<h2>Geometry</h2>
+
+		<div>
+			Geometry.computeTangents() has been removed.<br /><br />
+
+			Geometry.computeLineDistances() has been removed. Use [page:Line.computeLineDistances] instead.<br /><br />
+		</div>
 
 		<h3>[page:BufferGeometry]</h3>
 		<div>
@@ -456,6 +463,11 @@
 			Object3D.useQuaternion has been removed. The library now uses quaternions by default.
 		</div>
 
+		<h3>[page:LensFlare]</h3>
+		<div>
+			LensFlare has been moved to [link:https://github.com/mrdoob/three.js/blob/master/examples/js/objects/Lensflare.js /examples/js/objects/Lensflare.js].
+		</div>
+
 
 		<h3>[page:Particle]</h3>
 		<div>Particle has been renamed to [page:Sprite].</div>
@@ -534,15 +546,22 @@
 
 			WebGLRenderer.updateShadowMap() has been removed.<br /><br />
 
+			WebGLRenderer.setFaceCulling() has been removed.<br /><br />
+
 			WebGLRenderer.setTexture is deprecated, use [page:WebGLRenderer.setTexture2D]() instead.<br /><br />
 
 			WebGLRenderer.shadowMapEnabled is now [page:WebGLRenderer.shadowMap.enabled].<br /><br />
 
 			WebGLRenderer.shadowMapType is now [page:WebGLRenderer.shadowMap.type].<br /><br />
 
-			WebGLRenderer.shadowMapCullFace is now [page:WebGLRenderer.shadowMap.cullFace].<br /><br />
+			WebGLRenderer.shadowMapCullFace has been removed. Set [page:Material.shadowSide] instead.<br /><br />
 
-			WebGLRenderer.shadowMap.cullFace is deprecated. Set [page:WebGLRenderer.shadowMap.renderReverseSided] to true or false instead.
+			WebGLRenderer.shadowMap.cullFace has been removed. Set [page:Material.shadowSide] instead.<br /><br />
+
+			WebGLRenderer.shadowMap.renderReverseSided has been removed. Set [page:Material.shadowSide] instead.<br /><br />
+
+			WebGLRenderer.shadowMap.renderSingleSided has been removed. Set [page:Material.shadowSide] instead.
+
 		</div>
 
 		<h3>[page:WebGLRenderTarget]</h3>
@@ -567,11 +586,6 @@
 
 			WebGLRenderTarget.generateMipmaps is now [page:WebGLRenderTarget.texture.generateMipmaps].
 		</div>
-
-
-
-
-
 
 
 		<h2>Textures</h2>

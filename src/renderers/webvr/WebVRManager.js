@@ -16,6 +16,9 @@ function WebVRManager( renderer ) {
 
 	var poseTarget = null;
 
+	var standingMatrix = new Matrix4();
+	var standingMatrixInverse = new Matrix4();
+
 	if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
 		frameData = new window.VRFrameData();
@@ -70,6 +73,7 @@ function WebVRManager( renderer ) {
 	//
 
 	this.enabled = false;
+	this.userHeight = 1.6;
 
 	this.getDevice = function () {
 
@@ -101,17 +105,7 @@ function WebVRManager( renderer ) {
 		//
 
 		var pose = frameData.pose;
-		var poseObject;
-
-		if ( poseTarget !== null ) {
-
-			poseObject = poseTarget;
-
-		} else {
-
-			poseObject = camera;
-
-		}
+		var poseObject = poseTarget !== null ? poseTarget : camera;
 
 		if ( pose.position !== null ) {
 
@@ -129,6 +123,19 @@ function WebVRManager( renderer ) {
 
 		}
 
+		var stageParameters = device.stageParameters;
+
+		if ( stageParameters ) {
+
+			standingMatrix.fromArray( stageParameters.sittingToStandingTransform );
+
+		} else {
+
+			standingMatrix.makeTranslation( 0, scope.userHeight, 0 );
+
+		}
+
+		poseObject.position.applyMatrix4( standingMatrix );
 		poseObject.updateMatrixWorld();
 
 		if ( device.isPresenting === false ) return camera;
@@ -147,7 +154,14 @@ function WebVRManager( renderer ) {
 		cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 		cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
 
-		var parent = camera.parent;
+		// TODO (mrdoob) Double check this code
+
+		standingMatrixInverse.getInverse( standingMatrix );
+
+		cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
+		cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
+
+		var parent = poseObject.parent;
 
 		if ( parent !== null ) {
 
@@ -166,7 +180,7 @@ function WebVRManager( renderer ) {
 		cameraL.projectionMatrix.fromArray( frameData.leftProjectionMatrix );
 		cameraR.projectionMatrix.fromArray( frameData.rightProjectionMatrix );
 
-		// HACK @mrdoob
+		// HACK (mrdoob)
 		// https://github.com/w3c/webvr/issues/203
 
 		cameraVR.projectionMatrix.copy( cameraL.projectionMatrix );
@@ -194,6 +208,12 @@ function WebVRManager( renderer ) {
 		}
 
 		return cameraVR;
+
+	};
+
+	this.getStandingMatrix = function () {
+
+		return standingMatrix;
 
 	};
 

@@ -12,13 +12,13 @@
 		<div>
 			<p>All objects by default automatically update their matrices if they have been added to the scene with</p>
 			<code>
-var object = new THREE.Object3D;
+var object = new THREE.Object3D();
 scene.add( object );
 			</code>
 			or if they are the child of another object that has been added to the scene:
 			<code>
-var object1 = new THREE.Object3D;
-var object2 = new THREE.Object3D;
+var object1 = new THREE.Object3D();
+var object2 = new THREE.Object3D();
 
 object1.add( object2 );
 scene.add( object1 ); //object1 and object2 will automatically update their matrices

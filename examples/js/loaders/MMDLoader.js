@@ -101,7 +101,7 @@ THREE.MMDLoader.prototype.loadModel = function ( url, callback, onProgress, onEr
 
 	var scope = this;
 
-	var texturePath = this.extractUrlBase( url );
+	var texturePath = THREE.LoaderUtils.extractUrlBase( url );
 	var modelExtension = this.extractExtension( url );
 
 	this.loadFileAsBuffer( url, function ( buffer ) {

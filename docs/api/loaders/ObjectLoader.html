@@ -29,42 +29,42 @@
 		</div>
 
 		<code>
-var loader = new THREE.ObjectLoader();
+		var loader = new THREE.ObjectLoader();
 
-loader.load(
-    // resource URL
-    "models/json/example.json",
+		loader.load(
+			// resource URL
+			"models/json/example.json",
 
-    // pass the loaded data to the onLoad function.
-		//Here it is assumed to be an object
-    function ( obj ) {
-				//add the loaded object to the scene
-        scene.add( obj );
-    },
+			// onLoad callback
+			// Here the loaded data is assumed to be an object
+			function ( obj ) {
+				// Add the loaded object to the scene
+				scene.add( obj );
+			},
 
-    // Function called when download progresses
-    function ( xhr ) {
-        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-    },
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
 
-    // Function called when download errors
-    function ( xhr ) {
-        console.error( 'An error happened' );
-    }
-);
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+		);
 
 
-// Alternatively, to parse a previously loaded JSON structure
-var object = loader.parse( a_json_object );
+		// Alternatively, to parse a previously loaded JSON structure
+		var object = loader.parse( a_json_object );
 
-scene.add( object );
+		scene.add( object );
 		</code>
 
 
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<div>
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
 
@@ -94,7 +94,7 @@ scene.add( object );
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
@@ -107,7 +107,7 @@ scene.add( object );
 		</div>
 
 
-		<h3>[method:Object3D parse]( [page:Object json], [page:Function onLoad]  )</h3>
+		<h3>[method:Object3D parse]( [param:Object json], [param:Function onLoad]  )</h3>
 		<div>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 		[page:Function onLoad] — Will be called when parsed completes. The argument will be the parsed [page:Object3D object].<br />
@@ -117,7 +117,7 @@ scene.add( object );
 		a previously loaded JSON structure.
 		</div>
 
-		<h3>[method:Object3D parseGeometries]( [page:Object json] )</h3>
+		<h3>[method:Object3D parseGeometries]( [param:Object json] )</h3>
 		<div>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
@@ -125,35 +125,35 @@ scene.add( object );
 		Internally it uses [page:JSONLoader] for geometries and [page:BufferGeometryLoader] for buffer geometries.
 		</div>
 
-		<h3>[method:Object3D parseMaterials]( [page:Object json] )</h3>
+		<h3>[method:Object3D parseMaterials]( [param:Object json] )</h3>
 		<div>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
 		This is used [page:.parse] to parse any materials in the JSON structure using [page:MaterialLoader].
 		</div>
 
-		<h3>[method:Object3D parseAnimations]( [page:Object json] )</h3>
+		<h3>[method:Object3D parseAnimations]( [param:Object json] )</h3>
 		<div>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
 		This is used [page:.parse] to parse any animations in the JSON structure, using [page:AnimationClip.parse].
 		</div>
 
-		<h3>[method:Object3D parseImages]( [page:Object json] )</h3>
+		<h3>[method:Object3D parseImages]( [param:Object json] )</h3>
 		<div>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
 		This is used [page:.parse] to parse any images in the JSON structure, using [page:ImageLoader].
 		</div>
 
-		<h3>[method:Object3D parseTextures]( [page:Object json] )</h3>
+		<h3>[method:Object3D parseTextures]( [param:Object json] )</h3>
 		<div>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
 		This is used [page:.parse] to parse any textures in the JSON structure.
 		</div>
 
-		<h3>[method:Object3D parseObject]( [page:Object json] )</h3>
+		<h3>[method:Object3D parseObject]( [param:Object json] )</h3>
 		<div>
 		[page:Object json] — required. The JSON source to parse.<br /><br />
 
@@ -213,12 +213,12 @@ scene.add( object );
 		</ul>
 		</div>
 
-		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
+		<h3>[method:null setCrossOrigin]( [param:String value] )</h3>
 		<div>
 		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</div>
 
-		<h3>[method:null setTexturePath]( [page:String value] )</h3>
+		<h3>[method:null setTexturePath]( [param:String value] )</h3>
 		<div>
 		[page:String value] — The base path or URL from which textures will be loaded.<br /><br />
 

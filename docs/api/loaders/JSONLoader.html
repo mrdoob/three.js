@@ -28,25 +28,31 @@
 
 		// load a resource
 		loader.load(
-
 			// resource URL
 			'models/animated/monster/monster.js',
 
-			// Function when resource is loaded
+			// onLoad callback
 			function ( geometry, materials ) {
-
 				var material = materials[ 0 ];
 				var object = new THREE.Mesh( geometry, material );
-
 				scene.add( object );
+			},
 
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+
+			// onError callback
+			function( err ) {
+				console.log( 'An error happened' );
 			}
 		);
 		</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<div>
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
 		</div>
@@ -69,7 +75,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI]..<br />
@@ -81,13 +87,13 @@
 		Begin loading from url and pass the <em>JSON</em> to onLoad.
 		</div>
 
-		<h3>[method:null setTexturePath]( [page:String texturePath] )</h3>
+		<h3>[method:null setTexturePath]( [param:String texturePath] )</h3>
 		<div>
 			Set the base path or URL from which to load files. This can be useful if
 			you are loading many files from the same directory.
 		</div>
 
-		<h3>[method:Object3D parse]( [page:Object json], [page:String texturePath] )</h3>
+		<h3>[method:Object3D parse]( [param:Object json], [param:String texturePath] )</h3>
 		<div>
 		[page:String json] — JSON object to parse.<br />
 		[page:String texturePath] — Base path for textures.<br /><br />

@@ -8,6 +8,8 @@ import {
 	ShapeBufferGeometry
 } from '../../../../src/geometries/ShapeGeometry';
 
+import { Shape } from '../../../../src/extras/core/Shape';
+
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'ShapeGeometry', ( hooks ) => {
@@ -15,10 +17,13 @@ export default QUnit.module( 'Geometries', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {};
+			var triangleShape = new Shape();
+			triangleShape.moveTo( 0, - 1 );
+			triangleShape.lineTo( 1, 1 );
+			triangleShape.lineTo( - 1, 1 );
 
 			geometries = [
-				new ShapeGeometry()
+				new ShapeGeometry( triangleShape )
 			];
 
 		} );
@@ -51,10 +56,13 @@ export default QUnit.module( 'Geometries', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {};
+			var triangleShape = new Shape();
+			triangleShape.moveTo( 0, - 1 );
+			triangleShape.lineTo( 1, 1 );
+			triangleShape.lineTo( - 1, 1 );
 
 			geometries = [
-				new ShapeBufferGeometry()
+				new ShapeBufferGeometry( triangleShape )
 			];
 
 		} );

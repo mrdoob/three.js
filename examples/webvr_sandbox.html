@@ -4,8 +4,8 @@
 		<title>three.js webvr - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2017-12-16 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2017-12-16" content="AvEXeg7kY84HQ60ApBlqf6zPqClJwEy499YltannXHd+qIIN8ibQQFbHDkKL/Na/L7ha4VOqsjsGHhFpI6HYfgAAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxMzQ0NjE5Nn0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-04-03 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-04-03" content="AqIrNtaoJSmDZatgEEW2ehuK9ITIiFk3gZ3/gC6Vp0gF85NDYl7IzVPj4Bh7O6SIcr3ICOm6kocYSaS+BPkazgYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyMjc2MzAwMn0=">
 		<style>
 			body {
 				margin: 0px;
@@ -17,9 +17,10 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/vr/WebVR.js"></script>
-
+		<script src="js/objects/Lensflare.js"></script>
 		<script src="js/objects/Reflector.js"></script>
+
+		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
@@ -86,6 +87,20 @@
 
 				var helper = new THREE.CameraHelper( light.shadow.camera );
 				// scene.add( helper );
+
+				// lensflare
+				var loader = new THREE.TextureLoader();
+				var texture0 = loader.load( "textures/lensflare/lensflare0.png" );
+				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
+
+				var lensflare = new THREE.Lensflare();
+				lensflare.position.set( 0, 5, -5 );
+				lensflare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 120, 0.9 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 1 ) );
+				scene.add( lensflare );
 
 				//
 

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>three.js webgl - indexed instancing (single box), interleaved buffers, dynamic updates</title>
@@ -214,7 +214,7 @@
 
 		// material
 		var texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
-		texture.anisotropy = renderer.getMaxAnisotropy();
+		texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 		var material = new THREE.RawShaderMaterial( {
 

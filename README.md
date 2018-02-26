@@ -1,7 +1,6 @@
 three.js
 ========
 
-[![Gitter][gitter-badge]][gitter-badge-url]
 [![Latest NPM release][npm-badge]][npm-badge-url]
 [![License][license-badge]][license-badge-url]
 [![Dependencies][dependencies-badge]][dependencies-badge-url]
@@ -15,7 +14,10 @@ The aim of the project is to create an easy to use, lightweight, 3D library. The
 [Documentation](http://threejs.org/docs/) &mdash;
 [Wiki](https://github.com/mrdoob/three.js/wiki) &mdash;
 [Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
-[Help](http://stackoverflow.com/questions/tagged/three.js)
+[Questions](http://stackoverflow.com/questions/tagged/three.js) &mdash;
+[Forum](https://discourse.threejs.org/) &mdash;
+[Gitter](https://gitter.im/mrdoob/three.js) &mdash;
+[Slack](https://threejs-slack.herokuapp.com/)
 
 ### Usage ###
 
@@ -73,8 +75,6 @@ If everything went well you should see [this](https://jsfiddle.net/f2Lommf5/).
 [releases](https://github.com/mrdoob/three.js/releases)
 
 
-[gitter-badge]: https://badges.gitter.im/mrdoob/three.js.svg
-[gitter-badge-url]: https://gitter.im/mrdoob/three.js
 [npm-badge]: https://img.shields.io/npm/v/three.svg
 [npm-badge-url]: https://www.npmjs.com/package/three
 [license-badge]: https://img.shields.io/npm/l/three.svg

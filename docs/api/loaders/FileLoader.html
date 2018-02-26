@@ -22,34 +22,34 @@
 			[example:webgl_morphtargets_human WebGL / morphtargets / human]<br />
 		</div>
 		<code>
-var loader = new THREE.FileLoader();
+		var loader = new THREE.FileLoader();
 
-//load a text file a output the result to the console
-loader.load(
-    // resource URL
-    'example.txt',
+		//load a text file a output the result to the console
+		loader.load(
+			// resource URL
+			'example.txt',
 
-    // Function when resource is loaded
-    function ( data ) {
-        // output the text to the console
-        console.log( data )
-    },
+			// onLoad callback
+			function ( data ) {
+				// output the text to the console
+				console.log( data )
+			},
 
-    // Function called when download progresses
-    function ( xhr ) {
-        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-    },
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
 
-    // Function called when download errors
-    function ( xhr ) {
-        console.error( 'An error happened' );
-    }
-);
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+		);
 		</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<div>
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use.
 		Default is [page:DefaultLoadingManager].
@@ -95,7 +95,7 @@ loader.load(
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
@@ -107,19 +107,19 @@ loader.load(
 		Load the URL and pass the response to the onLoad function.
 		</div>
 
-		<h3>[method:FileLoader setMimeType]( [page:String mimeType] )</h3>
+		<h3>[method:FileLoader setMimeType]( [param:String mimeType] )</h3>
 		<div>
 			Set the expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
 			of the file being loaded. Note that in many cases this will be determined automatically, so by default it is *undefined*.
 		</div>
 
-		<h3>[method:FileLoader setPath]( [page:String path] )</h3>
+		<h3>[method:FileLoader setPath]( [param:String path] )</h3>
 		<div>
 			Set the base path or URL from which to load files. This can be useful if
 			you are loading many models from the same directory.
 		</div>
 
-		<h3>[method:FileLoader setResponseType]( [page:String responseType] )</h3>
+		<h3>[method:FileLoader setResponseType]( [param:String responseType] )</h3>
 		<div>
 		[page:String responseType] — Default is '' (empty string).<br /><br />
 
@@ -132,7 +132,7 @@ loader.load(
 
 		</div>
 
-		<h3>[method:FileLoader setWithCredentials]( [page:Boolean value] )</h3>
+		<h3>[method:FileLoader setWithCredentials]( [param:Boolean value] )</h3>
 		Whether the XMLHttpRequest uses credentials such as cookies, authorization headers or
 		TLS client certificates. See
 		[link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />

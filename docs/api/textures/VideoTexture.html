@@ -15,11 +15,7 @@
 		<div class="desc">
 		Creates a texture for use with a video texture.<br /><br />
 
-		This is almost the same as the base [page:Texture Texture] class,
-    except that it continuosly sets [page:Texture.needsUpdate needsUpdate] to *true*
-    (using <a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame">requestAnimationFrame</a>)
-    so that the texture is updated as the video plays. Automatic creation of [page:Texture.mipmaps mipmaps]
-    is also disabled.
+		This is almost the same as the base [page:Texture Texture] class, except that it continuosly sets [page:Texture.needsUpdate needsUpdate] to *true* so that the texture is updated as the video plays. Automatic creation of [page:Texture.mipmaps mipmaps] is also disabled.
 		</div>
 
     <h2>Example</h2>
@@ -38,7 +34,7 @@ texture.format = THREE.RGBFormat;
 
 
 		<h2>Constructor</h2>
-		<h3>[name]( [page:Video video], [page:Constant mapping], [page:Constant wrapS], [page:Constant wrapT], [page:Constant magFilter], [page:Constant minFilter], [page:Constant format], [page:Constant type], [page:Number anisotropy] )</h3>
+		<h3>[name]( [param:Video video], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
 		<div>
 		[page:Video video] -- The video element to use as the texture. <br />
 

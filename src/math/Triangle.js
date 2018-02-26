@@ -189,6 +189,12 @@ Object.assign( Triangle.prototype, {
 
 	},
 
+	intersectsBox: function ( box ) {
+
+		return box.intersectsTriangle( this );
+
+	},
+
 	closestPointToPoint: function () {
 
 		var plane = new Plane();

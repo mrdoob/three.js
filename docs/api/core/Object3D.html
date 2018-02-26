@@ -188,34 +188,34 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:null add]( [page:Object3D object], ... )</h3>
+		<h3>[method:null add]( [param:Object3D object], ... )</h3>
 		<div>
 		Adds *object* as child of this object. An arbitrary number of objects may be added.<br /><br />
 
 		See [page:Group] for info on manually grouping objects.
 		</div>
 
-		<h3>[method:null applyMatrix]( [page:Matrix4 matrix] )</h3>
+		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
 		<div>Applies the matrix transform to the object and updates the object's position, rotation and scale.</div>
 
-		<h3>[method:Object3D applyQuaternion]( [page:Quaternion quaternion] )</h3>
+		<h3>[method:Object3D applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<div>Applies the rotation represented by the quaternion to the object.</div>
 
-		<h3>[method:Object3D clone]( [page:Boolean recursive] )</h3>
+		<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
 		<div>
 		recursive -- if true, descendants of the object are also cloned. Default is true.<br /><br />
 
 		Returns a clone of this object and optionally all descendants.
 		</div>
 
-		<h3>[method:Object3D copy]( [page:Object3D object], [page:Boolean recursive] )</h3>
+		<h3>[method:Object3D copy]( [param:Object3D object], [param:Boolean recursive] )</h3>
 		<div>
 		recursive -- if true, descendants of the object are also copied. Default is true.<br /><br />
 
 		Copy the given object into this object.
 		</div>
 
-		<h3>[method:Object3D getObjectById]( [page:Integer id] )</h3>
+		<h3>[method:Object3D getObjectById]( [param:Integer id] )</h3>
 		<div>
 		id -- Unique number of the object instance<br /><br />
 
@@ -223,7 +223,7 @@
 		Note that ids are assigned in chronological order: 1, 2, 3, ..., incrementing by one for each new object.
 		</div>
 
-		<h3>[method:Object3D getObjectByName]( [page:String name] )</h3>
+		<h3>[method:Object3D getObjectByName]( [param:String name] )</h3>
 		<div>
 		name -- String to match to the children's Object3D.name property. <br /><br />
 
@@ -232,7 +232,7 @@
 		have to set it manually to make use of this method.
 		</div>
 
-		<h3>[method:Object3D getObjectByProperty]( [page:String name], [page:Float value] )</h3>
+		<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Float value] )</h3>
 		<div>
 		name -- the property name to search for. <br />
 		value -- value of the given property. <br /><br />
@@ -276,15 +276,15 @@
 		</div>
 
 
-		<h3>[method:Vector3 localToWorld]( [page:Vector3 vector] )</h3>
+		<h3>[method:Vector3 localToWorld]( [param:Vector3 vector] )</h3>
 		<div>
 		vector - A vector representing a position in local (object) space.<br /><br />
 
 		Converts the vector from local space to world space.
 		</div>
 
-		<h3>[method:null lookAt]( [page:Vector3 vector] )</br>
-		[method:null lookAt]( [page:Float x], [page:Float y], [page:Float z] )</h3>
+		<h3>[method:null lookAt]( [param:Vector3 vector] )</br>
+		[method:null lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<div>
 		vector - A vector representing a position in world space.<br /><br />
 		Optionally, the [page:.x x], [page:.y y] and [page:.z z] components of the world space position.<br /><br />
@@ -296,19 +296,19 @@
 
 		</div>
 
-		<h3>[method:Array raycast]( [page:Raycaster raycaster], [page:Array intersects] )</h3>
+		<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<div>
 		Abstract (empty) method to get intersections between a casted ray and this object.
 		Subclasses such as [page:Mesh], [page:Line], and [page:Points] implement this method in order
 		to use raycasting.
 		</div>
 
-		<h3>[method:null remove]( [page:Object3D object], ... )</h3>
+		<h3>[method:null remove]( [param:Object3D object], ... )</h3>
 		<div>
 		Removes *object* as child of this object. An arbitrary number of objects may be removed.
 		</div>
 
-		<h3>[method:Object3D rotateOnAxis]( [page:Vector3 axis], [page:Float angle] )</h3>
+		<h3>[method:Object3D rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<div>
 		axis -- A normalized vector in object space. <br />
 		angle -- The angle in radians.<br /><br />
@@ -316,7 +316,7 @@
 		Rotate an object along an axis in object space. The axis is assumed to be normalized.
 		</div>
 
-		<h3>[method:Object3D rotateOnWorldAxis]( [page:Vector3 axis], [page:Float angle] )</h3>
+		<h3>[method:Object3D rotateOnWorldAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<div>
 		axis -- A normalized vector in world space. <br />
 		angle -- The angle in radians.<br /><br />
@@ -325,28 +325,28 @@
 		Method Assumes no rotated parent.
 		</div>
 
-		<h3>[method:null rotateX]( [page:Float rad] )</h3>
+		<h3>[method:null rotateX]( [param:Float rad] )</h3>
 		<div>
 		rad - the angle to rotate in radians.<br /><br />
 
 		Rotates the object around x axis in local space.
 		</div>
 
-		<h3>[method:null rotateY]( [page:Float rad] )</h3>
+		<h3>[method:null rotateY]( [param:Float rad] )</h3>
 		<div>
 		rad - the angle to rotate in radians.<br /><br />
 
 		Rotates the object around y axis in local space.
 		</div>
 
-		<h3>[method:null rotateZ]( [page:Float rad] )</h3>
+		<h3>[method:null rotateZ]( [param:Float rad] )</h3>
 		<div>
 		rad - the angle to rotate in radians.<br /><br />
 
 		Rotates the object around z axis in local space.
 		</div>
 
-		<h3>[method:null setRotationFromAxisAngle]( [page:Vector3 axis], [page:Float angle] )</h3>
+		<h3>[method:null setRotationFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<div>
 			axis -- A normalized vector in object space. <br />
 			angle -- angle in radians<br /><br />
@@ -355,7 +355,7 @@
 			on the [page:.quaternion].
 		</div>
 
-		<h3>[method:null setRotationFromEuler]( [page:Euler euler] )</h3>
+		<h3>[method:null setRotationFromEuler]( [param:Euler euler] )</h3>
 		<div>
 			euler -- Euler angle specifying rotation amount.<br />
 
@@ -363,7 +363,7 @@
 			on the [page:.quaternion].
 		</div>
 
-		<h3>[method:null setRotationFromMatrix]( [page:Matrix4 m] )</h3>
+		<h3>[method:null setRotationFromMatrix]( [param:Matrix4 m] )</h3>
 		<div>
 			m -- rotate the quaternion by the rotation component of the matrix.<br />
 
@@ -373,19 +373,19 @@
 			Note that this assumes that the upper 3x3 of m is a pure rotation matrix (i.e, unscaled).
 		</div>
 
-		<h3>[method:null setRotationFromQuaternion]( [page:Quaternion q] )</h3>
+		<h3>[method:null setRotationFromQuaternion]( [param:Quaternion q] )</h3>
 		<div>
 			q -- normalized Quaternion.<br /><br />
 
 			Copy the given quaternion into [page:.quaternion].
 		</div>
 
-		<h3>[method:null toJSON]( [page:Quaternion q] )</h3>
+		<h3>[method:null toJSON]( [param:Quaternion q] )</h3>
 		<div>
 			Convert the object to JSON format.
 		</div>
 
-		<h3>[method:Object3D translateOnAxis]( [page:Vector3 axis], [page:Float distance] )</h3>
+		<h3>[method:Object3D translateOnAxis]( [param:Vector3 axis], [param:Float distance] )</h3>
 		<div>
 		axis -- A normalized vector in object space.<br />
 		distance -- The distance to translate.<br /><br />
@@ -393,23 +393,23 @@
 		Translate an object by distance along an axis in object space. The axis is assumed to be normalized.
 		</div>
 
-		<h3>[method:null translateX]( [page:Float distance] )</h3>
+		<h3>[method:null translateX]( [param:Float distance] )</h3>
 		<div>Translates object along x axis by *distance* units.</div>
 
-		<h3>[method:null translateY]( [page:Float distance] )</h3>
+		<h3>[method:null translateY]( [param:Float distance] )</h3>
 		<div>Translates object along y axis by *distance* units.</div>
 
-		<h3>[method:null translateZ]( [page:Float distance] )</h3>
+		<h3>[method:null translateZ]( [param:Float distance] )</h3>
 		<div>Translates object along z axis by *distance* units.</div>
 
-		<h3>[method:null traverse]( [page:Function callback] )</h3>
+		<h3>[method:null traverse]( [param:Function callback] )</h3>
 		<div>
 		callback - A function with as first argument an object3D object.<br /><br />
 
 		Executes the callback on this object and all descendants.
 		</div>
 
-		<h3>[method:null traverseVisible]( [page:Function callback] )</h3>
+		<h3>[method:null traverseVisible]( [param:Function callback] )</h3>
 		<div>
 		callback - A function with as first argument an object3D object.<br /><br />
 
@@ -417,7 +417,7 @@
 		Descendants of invisible objects are not traversed.
 		</div>
 
-		<h3>[method:null traverseAncestors]( [page:Function callback] )</h3>
+		<h3>[method:null traverseAncestors]( [param:Function callback] )</h3>
 		<div>
 		callback - A function with as first argument an object3D object.<br /><br />
 
@@ -427,11 +427,11 @@
 		<h3>[method:null updateMatrix]()</h3>
 		<div>Update the local transform.</div>
 
-		<h3>[method:null updateMatrixWorld]( [page:Boolean force] )</h3>
+		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
 		<div>Update the global transform of the object and its children.</div>
 
 
-		<h3>[method:Vector3 worldToLocal]( [page:Vector3 vector] )</h3>
+		<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
 		<div>
 		vector - A world vector.<br /><br />
 

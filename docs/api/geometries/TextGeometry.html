@@ -13,7 +13,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A class for generating text as a single geometry. It is constructed by providing a string of text, and a hash of 
+			A class for generating text as a single geometry. It is constructed by providing a string of text, and a hash of
 			parameters consisting of a loaded [page:Font] and settings for the geometry's parent [page:ExtrudeGeometry].
 			See the [page:Font], [page:FontLoader] and [page:Creating_Text] pages for additional details.
 		</div>
@@ -39,13 +39,12 @@
 		<h2>Examples</h2>
 
 		<div>
-		[example:webgl_geometry_text geometry / text ]<br/>
-		[example:webgl_geometry_text2 geometry / text2 ]
+		[example:webgl_geometry_text geometry / text ]
 		</div>
 
 		<code>
 		var loader = new THREE.FontLoader();
-		
+
 		loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 			var geometry = new THREE.TextGeometry( 'Hello three.js!', {
@@ -58,12 +57,12 @@
 				bevelSize: 8,
 				bevelSegments: 5
 			} );
-		} );			
+		} );
 		</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([page:String text], [page:Object parameters])</h3>
+		<h3>[name]([param:String text], [param:Object parameters])</h3>
 		<div>
 		text — The text that needs to be shown. <br />
 		parameters — Object that can contains the following parameters.

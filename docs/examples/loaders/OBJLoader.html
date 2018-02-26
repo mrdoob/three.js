@@ -12,9 +12,9 @@
 		<h1>[name]</h1>
 
 		<div class="desc">A loader for loading a <em>.obj</em> resource.<br />
-		The <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ file format</a> is a simple data-format 
-		that represents 3D geometry in a human readable format as the position of each vertex, the UV position of 
-		each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of 
+		The <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ file format</a> is a simple data-format
+		that represents 3D geometry in a human readable format as the position of each vertex, the UV position of
+		each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of
 		vertices, and texture vertices.
 		</div>
 
@@ -55,7 +55,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<div>
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
 		</div>
@@ -68,7 +68,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — A string containing the path/URL of the <em>.obj</em> file.<br />
 		[page:Function onLoad] — (optional) A function to be called after the loading is successfully completed. The function receives the loaded [page:Object3D] as an argument.<br />
@@ -79,7 +79,7 @@
 		Begin loading from url and call onLoad with the parsed response content.
 		</div>
 
-		<h3>[method:Object3D parse]( [page:String text] )</h3>
+		<h3>[method:Object3D parse]( [param:String text] )</h3>
 		<div>
 		[page:String text] — The textual <em>obj</em> structure to parse.
 		</div>

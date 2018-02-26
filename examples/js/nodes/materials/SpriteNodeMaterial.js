@@ -8,10 +8,12 @@ THREE.SpriteNodeMaterial = function () {
 
 	THREE.NodeMaterial.call( this, this.node, this.node );
 
+	this.type = "SpriteNodeMaterial";
+
 };
 
 THREE.SpriteNodeMaterial.prototype = Object.create( THREE.NodeMaterial.prototype );
 THREE.SpriteNodeMaterial.prototype.constructor = THREE.SpriteNodeMaterial;
 
 THREE.NodeMaterial.addShortcuts( THREE.SpriteNodeMaterial.prototype, 'node',
-[ 'color', 'alpha', 'transform', 'spherical' ] );
+	[ 'color', 'alpha', 'transform', 'spherical' ] );

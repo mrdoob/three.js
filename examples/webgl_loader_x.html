@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>three.js webgl - loaders - X-File loader</title>
@@ -163,17 +163,22 @@
 
             //download Model file
 
-            loader.load( [ 'models/xfile/SSR06_model.x', { zflag: true } ], function ( object ) {
+            loader.load( [ 'models/xfile/SSR06_model.x' ], function ( object ) {
 
                 for ( var i = 0; i < object.models.length; i ++ ) {
 
-                    Models.push( object.models[ i ] );
+                    var model = object.models[ i ];
+
+                    model.scale.x *= - 1;
+
+                    Models.push( model );
 
                 }
 
                 loadAnimation( 'stand', 0, () => {
 
                     scene.add( Models[ 0 ] );
+
                     if ( Models[ 0 ] instanceof THREE.SkinnedMesh ) {
 
                         skeletonHelper = new THREE.SkeletonHelper( Models[ 0 ] );
@@ -240,7 +245,7 @@
             } else {
 
                 var loader2 = new THREE.XLoader( manager, Texloader );
-                loader2.load( [ 'models/xfile/' + animeName + '.x', { zflag: true, putPos: false, putScl: false } ], function () {
+                loader2.load( [ 'models/xfile/' + animeName + '.x', { putPos: false, putScl: false } ], function () {
 
                     // !! important!
                     // associate divided model and animation.

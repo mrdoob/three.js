@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - OBJLoader2</title>
+		<title>three.js webgl - OBJLoader2 basic usage</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -152,12 +152,10 @@
 					var onLoadMtl = function ( materials ) {
 						objLoader.setModelName( modelName );
 						objLoader.setMaterials( materials );
-						objLoader.setUseIndices( true );
-						objLoader.setDisregardNormals( false );
 						objLoader.getLogger().setDebug( true );
-						objLoader.load( 'obj/female02/female02.obj', callbackOnLoad, null, null, null, false );
+						objLoader.load( 'models/obj/female02/female02.obj', callbackOnLoad, null, null, null, false );
 					};
-					objLoader.loadMtl( 'obj/female02/female02.mtl', 'female02.mtl', null, onLoadMtl );
+					objLoader.loadMtl( 'models/obj/female02/female02.mtl', null, onLoadMtl );
 				};
 
 				OBJLoader2Example.prototype._reportProgress = function( event ) {

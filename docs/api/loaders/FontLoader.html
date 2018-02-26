@@ -30,17 +30,20 @@
 		var font = loader.load(
 			// resource URL
 			'fonts/helvetiker_bold.typeface.json'
-			// Function when resource is loaded
+
+			// onLoad callback
 			function ( font ) {
 				// do something with the font
 				scene.add( font );
 			},
-			// Function called when download progresses
+
+			// onProgress callback
 			function ( xhr ) {
 				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
 			},
-			// Function called when download errors
-			function ( xhr ) {
+
+			// onError callback
+			function ( err ) {
 				console.log( 'An error happened' );
 			}
 		);
@@ -48,7 +51,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<div>
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
 		Creates a new [name].
@@ -66,7 +69,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
@@ -77,13 +80,13 @@
 		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
 		</div>
 
-		<h3>[method:Font parse]( [page:Object json] )</h3>
+		<h3>[method:Font parse]( [param:Object json] )</h3>
 		<div>
 		[page:Object json] — The <em>JSON</em> structure to parse.<br /><br />
 		Parse a <em>JSON</em> structure and return a [page:Font].
 		</div>
 
-		<h3>[method:FontLoader setPath]( [page:String path] )</h3>
+		<h3>[method:FontLoader setPath]( [param:String path] )</h3>
 		<div>
 			Set the base path or URL from which to load fonts. This can be useful if
 			you are loading many fonts from the same directory.
