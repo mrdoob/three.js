@@ -208,7 +208,7 @@
 		var scene = new THREE.Scene();
 		scene.background = new THREE.Color( 0x111111 );
 
-		var renderer = new THREE.WebGLRenderer( { antialias: false } );
+		var renderer = new THREE.WebGLRenderer();
 		renderer.toneMapping = THREE.LinearToneMapping;
 		container.appendChild( renderer.domElement );
 
