@@ -4,6 +4,7 @@
 
 Sidebar.Settings = function ( editor ) {
 
+	var wheelSpeed = 100;
 	var config = editor.config;
 	var signals = editor.signals;
 
@@ -43,6 +44,7 @@ Sidebar.Settings = function ( editor ) {
 
 	container.add( themeRow );
 
+	container.add( new Sidebar.Settings.Controllers( editor ) );
 	container.add( new Sidebar.Settings.Shortcuts( editor ) );
 	container.add( new Sidebar.Settings.Viewport( editor ) );
 

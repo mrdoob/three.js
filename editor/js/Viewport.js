@@ -31,7 +31,7 @@ var Viewport = function ( editor ) {
 
 	for ( var i = 0; i < array.length; i += 60 ) {
 
-		for ( var j = 0; j < 12; j ++ ) {
+		for ( var j = 0; j < 12; j++ ) {
 
 			array[ i + j ] = 0.26;
 
@@ -96,7 +96,7 @@ var Viewport = function ( editor ) {
 
 				case 'translate':
 
-					if ( ! objectPositionOnDown.equals( object.position ) ) {
+					if ( !objectPositionOnDown.equals( object.position ) ) {
 
 						editor.execute( new SetPositionCommand( object, object.position, objectPositionOnDown ) );
 
@@ -106,7 +106,7 @@ var Viewport = function ( editor ) {
 
 				case 'rotate':
 
-					if ( ! objectRotationOnDown.equals( object.rotation ) ) {
+					if ( !objectRotationOnDown.equals( object.rotation ) ) {
 
 						editor.execute( new SetRotationCommand( object, object.rotation, objectRotationOnDown ) );
 
@@ -116,7 +116,7 @@ var Viewport = function ( editor ) {
 
 				case 'scale':
 
-					if ( ! objectScaleOnDown.equals( object.scale ) ) {
+					if ( !objectScaleOnDown.equals( object.scale ) ) {
 
 						editor.execute( new SetScaleCommand( object, object.scale, objectScaleOnDown ) );
 
@@ -143,7 +143,7 @@ var Viewport = function ( editor ) {
 
 	function getIntersects( point, objects ) {
 
-		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+		mouse.set( ( point.x * 2 ) - 1, -( point.y * 2 ) + 1 );
 
 		raycaster.setFromCamera( mouse, camera );
 
@@ -280,6 +280,29 @@ var Viewport = function ( editor ) {
 
 		controls.center.set( 0, 0, 0 );
 		render();
+
+	} );
+
+	signals.changeCameraCtrlType.add( function ( value ) {
+
+		var type = controls.CAMERACTRLTYPE.DEFAULT
+		if ( value == "Maya" ) {
+
+			type = controls.CAMERACTRLTYPE.MAYA;
+
+		}
+
+		controls.cameraCtrlType = type;
+
+	} );
+	signals.changeFocusSize.add( function ( value ) {
+
+		controls.focusSize = value;
+
+	} )
+	signals.changeWheelSpeed.add( function ( value ) {
+
+		controls.wheelSpeed = value;
 
 	} );
 
@@ -514,6 +537,10 @@ var Viewport = function ( editor ) {
 		render();
 
 	} );
+
+	signals.changeCameraCtrlType.add( function ( type ) {
+
+	} )
 
 	//
 

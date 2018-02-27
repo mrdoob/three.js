@@ -6,6 +6,11 @@ var Config = function ( name ) {
 
 	var storage = {
 		'autosave': true,
+		
+		'cameraCtrlType': 'Default',
+		'wheelSpeed': 100,
+		'focusSize':0.8,
+
 		'theme': 'css/light.css',
 
 		'project/title': '',
