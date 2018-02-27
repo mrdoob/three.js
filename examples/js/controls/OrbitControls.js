@@ -59,6 +59,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Set to false to disable panning
 	this.enablePan = true;
+	this.enablePanVertical = true;
+	this.enablePanHorizontal = true;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
@@ -74,6 +76,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Mouse buttons
 	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+
+	// Touch fingers
+	this.fingers = { ORBIT: 1, ZOOM: 2, PAN: 3 };
 
 	// for reset
 	this.target0 = this.target.clone();
@@ -445,11 +450,21 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-		// rotating across whole screen goes 360 degrees around
-		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
 
-		// rotating up and down along whole screen attempts to go 360, but limited to 180
-		rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
+		if ( scope.enablePanHorizontal ) {
+
+			// rotating across whole screen goes 360 degrees around
+			rotateLeft(2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed);
+
+		}
+
+
+		if ( scope.enablePanVertical ) {
+
+			// rotating up and down along whole screen attempts to go 360, but limited to 180
+			rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
+
+		}
 
 		rotateStart.copy( rotateEnd );
 
@@ -589,11 +604,19 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-		// rotating across whole screen goes 360 degrees around
-		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
+		if ( scope.enablePanHorizontal ) {
 
-		// rotating up and down along whole screen attempts to go 360, but limited to 180
-		rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
+			// rotating across whole screen goes 360 degrees around
+			rotateLeft(2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed);
+
+		}
+
+		if ( scope.enablePanVertical ) {
+
+			// rotating up and down along whole screen attempts to go 360, but limited to 180
+			rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
+
+		}
 
 		rotateStart.copy( rotateEnd );
 
@@ -787,7 +810,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		switch ( event.touches.length ) {
 
-			case 1:	// one-fingered touch: rotate
+			case scope.fingers.ORBIT:
 
 				if ( scope.enableRotate === false ) return;
 
@@ -797,7 +820,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				break;
 
-			case 2:	// two-fingered touch: dolly
+			case scope.fingers.ZOOM:
 
 				if ( scope.enableZoom === false ) return;
 
@@ -807,7 +830,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				break;
 
-			case 3: // three-fingered touch: pan
+			case scope.fingers.PAN:
 
 				if ( scope.enablePan === false ) return;
 
@@ -840,7 +863,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		switch ( event.touches.length ) {
 
-			case 1: // one-fingered touch: rotate
+			case scope.fingers.ORBIT: // one-fingered touch: rotate
 
 				if ( scope.enableRotate === false ) return;
 				if ( state !== STATE.TOUCH_ROTATE ) return; // is this needed?...
@@ -849,7 +872,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				break;
 
-			case 2: // two-fingered touch: dolly
+			case scope.fingers.ZOOM:
 
 				if ( scope.enableZoom === false ) return;
 				if ( state !== STATE.TOUCH_DOLLY ) return; // is this needed?...
@@ -858,7 +881,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				break;
 
-			case 3: // three-fingered touch: pan
+			case scope.fingers.PAN:
 
 				if ( scope.enablePan === false ) return;
 				if ( state !== STATE.TOUCH_PAN ) return; // is this needed?...
