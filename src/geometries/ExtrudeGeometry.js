@@ -9,8 +9,8 @@
  *  steps: <int>, // number of points for z-side extrusions / used for subdividing segments of extrude spline too
  *  amount: <int>, // Depth to extrude the shape
  *
- *	material: <int>, // material index for the lid faces
- *	extrudeMaterial: <int>, // material index of extruded faces (sides)
+ *  material: <int>, // material index for the lid faces
+ *  extrudeMaterial: <int>, // material index of extruded faces (sides)
  *
  *  bevelEnabled: <bool>, // turn on bevel
  *  bevelThickness: <float>, // how deep into the original shape bevel goes
