@@ -1522,8 +1522,7 @@ function WebGLRenderer( parameters ) {
 					name: material.type,
 					uniforms: UniformsUtils.clone( shader.uniforms ),
 					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader,
-					renderer: _this
+					fragmentShader: shader.fragmentShader
 				};
 
 			} else {
@@ -1532,8 +1531,7 @@ function WebGLRenderer( parameters ) {
 					name: material.type,
 					uniforms: material.uniforms,
 					vertexShader: material.vertexShader,
-					fragmentShader: material.fragmentShader,
-					renderer: _this
+					fragmentShader: material.fragmentShader
 				};
 
 			}
