@@ -3756,6 +3756,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 		}
 
 		var output = {
+
 			metadata: {
 				version: 4.5,
 				type: 'Texture',
@@ -3774,11 +3775,13 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			wrap: [ this.wrapS, this.wrapT ],
 
+			format: this.format,
 			minFilter: this.minFilter,
 			magFilter: this.magFilter,
 			anisotropy: this.anisotropy,
 
 			flipY: this.flipY
+
 		};
 
 		if ( this.image !== undefined ) {
@@ -8367,6 +8370,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.castShadow === true ) object.castShadow = true;
 		if ( this.receiveShadow === true ) object.receiveShadow = true;
 		if ( this.visible === false ) object.visible = false;
+		if ( this.frustumCulled === false ) object.frustumCulled = false;
+		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
 		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
 
 		object.matrix = this.matrix.toArray();
@@ -11698,7 +11703,16 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) {
+
+			offset = 0;
+
+			console.warn(
+				'THREE.BufferGeometry.merge(): Overwriting original geometry, starting at offset=0. '
+				+ 'Use BufferGeometryUtils.mergeBufferGeometries() for lossless merge.'
+			);
+
+		}
 
 		var attributes = this.attributes;
 
@@ -11788,6 +11802,15 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			}
 
 			geometry2.addAttribute( name, new BufferAttribute( array2, itemSize ) );
+
+		}
+
+		var groups = this.groups;
+
+		for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+			var group = groups[ i ];
+			geometry2.addGroup( group.start, group.count, group.materialIndex );
 
 		}
 
@@ -36992,6 +37015,8 @@ Object.assign( ObjectLoader.prototype, {
 
 				}
 
+				if ( data.format !== undefined ) texture.format = data.format;
+
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
@@ -37246,6 +37271,8 @@ Object.assign( ObjectLoader.prototype, {
 		}
 
 		if ( data.visible !== undefined ) object.visible = data.visible;
+		if ( data.frustumCulled !== undefined ) object.frustumCulled = data.frustumCulled;
+		if ( data.renderOrder !== undefined ) object.renderOrder = data.renderOrder;
 		if ( data.userData !== undefined ) object.userData = data.userData;
 
 		if ( data.children !== undefined ) {
