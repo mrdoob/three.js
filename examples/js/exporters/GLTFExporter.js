@@ -94,7 +94,8 @@ THREE.GLTFExporter.prototype = {
 		};
 
 		var byteOffset = 0;
-		var dataViews = [];
+		var buffers = [];
+		var pending = [];
 		var nodeMap = {};
 		var skins = [];
 		var cachedData = {
@@ -221,17 +222,17 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
-		 * Returns a buffer aligned to 4-byte boundary. 
-		 * 
+		 * Returns a buffer aligned to 4-byte boundary.
+		 *
 		 * @param {ArrayBuffer} arrayBuffer Buffer to pad
 		 * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
 		 */
 		function getPaddedArrayBuffer( arrayBuffer ) {
-						
+
 			var paddedLength = getPaddedBufferSize( arrayBuffer.byteLength );
-			
+
 			if (paddedLength !== arrayBuffer.byteLength ) {
-			
+
 				var paddedBuffer = new ArrayBuffer( paddedLength );
 				new Uint8Array( paddedBuffer ).set(new Uint8Array(arrayBuffer));
 				return paddedBuffer;
@@ -244,43 +245,53 @@ THREE.GLTFExporter.prototype = {
 
 		/**
 		 * Process a buffer to append to the default one.
-		 * @param  {THREE.BufferAttribute} attribute     Attribute to store
-		 * @param  {Integer} componentType Component type (Unsigned short, unsigned int or float)
-		 * @return {Integer}               Index of the buffer created (Currently always 0)
+		 * @param  {ArrayBuffer} buffer
+		 * @return {Integer}
 		 */
-		function processBuffer( attribute, componentType, start, count ) {
+		function processBuffer( buffer ) {
 
 			if ( ! outputJSON.buffers ) {
 
-				outputJSON.buffers = [
-
-					{
-
-						byteLength: 0,
-						uri: ''
-
-					}
-
-				];
+				outputJSON.buffers = [ { byteLength: 0 } ];
 
 			}
 
-			var offset = 0;
-			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
+			// All buffers are merged before export.
+			buffers.push( buffer );
+
+			return 0;
+
+		}
+
+		/**
+		 * Process and generate a BufferView
+		 * @param  {THREE.BufferAttribute} attribute
+		 * @param  {number} componentType
+		 * @param  {number} start
+		 * @param  {number} count
+		 * @param  {number} target (Optional) Target usage of the BufferView
+		 * @return {Object}
+		 */
+		function processBufferView( attribute, componentType, start, count, target ) {
+
+			if ( ! outputJSON.bufferViews ) {
+
+				outputJSON.bufferViews = [];
+
+			}
 
 			// Create a new dataview and dump the attribute's array into it
-			var byteLength = count * attribute.itemSize * componentSize;
-
-			// adjust required size of array buffer with padding
-			// to satisfy gltf requirement that the length is divisible by 4
-			byteLength = getPaddedBufferSize( byteLength );
-
+			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
+			var byteLength = getPaddedBufferSize( count * attribute.itemSize * componentSize );
 			var dataView = new DataView( new ArrayBuffer( byteLength ) );
+			var offset = 0;
 
 			for ( var i = start; i < start + count; i ++ ) {
 
 				for ( var a = 0; a < attribute.itemSize; a ++ ) {
 
+					// @TODO Fails on InterleavedBufferAttribute, and could probably be
+					// optimized for normal BufferAttribute.
 					var value = attribute.array[ i * attribute.itemSize + a ];
 
 					if ( componentType === WEBGL_CONSTANTS.FLOAT ) {
@@ -303,39 +314,9 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			// We just use one buffer
-			dataViews.push( dataView );
-
-			// Always using just one buffer
-			return 0;
-
-		}
-
-		/**
-		 * Process and generate a BufferView
-		 * @param  {THREE.BufferAttribute} data
-		 * @param  {number} componentType
-		 * @param  {number} start
-		 * @param  {number} count
-		 * @param  {number} target (Optional) Target usage of the BufferView
-		 * @return {Object}
-		 */
-		function processBufferView( data, componentType, start, count, target ) {
-
-			if ( ! outputJSON.bufferViews ) {
-
-				outputJSON.bufferViews = [];
-
-			}
-
-			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
-
-			// Create a new dataview and dump the attribute's array into it
-			var byteLength = count * data.itemSize * componentSize;
-
 			var gltfBufferView = {
 
-				buffer: processBuffer( data, componentType, start, count ),
+				buffer: processBuffer( dataView.buffer ),
 				byteOffset: byteOffset,
 				byteLength: byteLength
 
@@ -346,7 +327,7 @@ THREE.GLTFExporter.prototype = {
 			if ( target === WEBGL_CONSTANTS.ARRAY_BUFFER ) {
 
 				// Only define byteStride for vertex attributes.
-				gltfBufferView.byteStride = data.itemSize * componentSize;
+				gltfBufferView.byteStride = attribute.itemSize * componentSize;
 
 			}
 
@@ -354,7 +335,7 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.bufferViews.push( gltfBufferView );
 
-			// @TODO Ideally we'll have just two bufferviews: 0 is for vertex attributes, 1 for indices
+			// @TODO Merge bufferViews where possible.
 			var output = {
 
 				id: outputJSON.bufferViews.length - 1,
@@ -363,6 +344,45 @@ THREE.GLTFExporter.prototype = {
 			};
 
 			return output;
+
+		}
+
+		/**
+		 * Process and generate a BufferView from an image Blob.
+		 * @param {Blob} blob
+		 * @return {Promise<Integer>}
+		 */
+		function processBufferViewImage( blob ) {
+
+			if ( ! outputJSON.bufferViews ) {
+
+				outputJSON.bufferViews = [];
+
+			}
+
+			return new Promise( function ( resolve ) {
+
+				var reader = new window.FileReader();
+				reader.readAsArrayBuffer( blob );
+				reader.onloadend = function () {
+
+					var buffer = getPaddedArrayBuffer( reader.result );
+
+					var bufferView = {
+						buffer: processBuffer( buffer ),
+						byteOffset: byteOffset,
+						byteLength: buffer.byteLength
+					};
+
+					byteOffset += buffer.byteLength;
+
+					outputJSON.bufferViews.push( bufferView );
+
+					resolve( outputJSON.bufferViews.length - 1 );
+
+				};
+
+			} );
 
 		}
 
@@ -500,9 +520,29 @@ THREE.GLTFExporter.prototype = {
 
 				ctx.drawImage( map.image, 0, 0, canvas.width, canvas.height );
 
-				// @TODO Embed in { bufferView } if options.binary set.
+				if ( options.binary === true ) {
 
-				gltfImage.uri = canvas.toDataURL( mimeType );
+					pending.push( new Promise( function ( resolve ) {
+
+						canvas.toBlob( function ( blob ) {
+
+							processBufferViewImage( blob ).then( function ( bufferViewIndex ) {
+
+								gltfImage.bufferView = bufferViewIndex;
+
+								resolve();
+
+							} );
+
+						}, mimeType );
+
+					} ) );
+
+				} else {
+
+					gltfImage.uri = canvas.toDataURL( mimeType );
+
+				}
 
 			} else {
 
@@ -608,7 +648,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( ! ( material instanceof THREE.MeshStandardMaterial ) ) {
 
-				console.warn( 'GLTFExporter: Currently just THREE.StandardMaterial is supported. Material conversion may lose information.' );
+				console.warn( 'GLTFExporter: Currently just THREE.MeshStandardMaterial is supported. Material conversion may lose information.' );
 
 			}
 
@@ -1458,91 +1498,93 @@ THREE.GLTFExporter.prototype = {
 
 		processInput( input );
 
-		// Generate buffer
-		// Create a new blob with all the dataviews from the buffers
-		var blob = new Blob( dataViews, { type: 'application/octet-stream' } );
+		Promise.all( pending ).then( function () {
 
-		// Update the bytlength of the only main buffer and update the uri with the base64 representation of it
-		if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
+			// Merge buffers.
+			var blob = new Blob( buffers, { type: 'application/octet-stream' } );
 
-			outputJSON.buffers[ 0 ].byteLength = blob.size;
+			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
 
-			var reader = new window.FileReader();
+				// Update bytelength of the single buffer.
+				outputJSON.buffers[ 0 ].byteLength = blob.size;
 
-			if ( options.binary === true ) {
+				var reader = new window.FileReader();
 
-				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+				if ( options.binary === true ) {
 
-				var GLB_HEADER_BYTES = 12;
-				var GLB_HEADER_MAGIC = 0x46546C67;
-				var GLB_VERSION = 2;
+					// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
 
-				var GLB_CHUNK_PREFIX_BYTES = 8;
-				var GLB_CHUNK_TYPE_JSON = 0x4E4F534A;
-				var GLB_CHUNK_TYPE_BIN = 0x004E4942;
+					var GLB_HEADER_BYTES = 12;
+					var GLB_HEADER_MAGIC = 0x46546C67;
+					var GLB_VERSION = 2;
 
-				reader.readAsArrayBuffer( blob );
-				reader.onloadend = function () {
+					var GLB_CHUNK_PREFIX_BYTES = 8;
+					var GLB_CHUNK_TYPE_JSON = 0x4E4F534A;
+					var GLB_CHUNK_TYPE_BIN = 0x004E4942;
 
-					// Binary chunk.
-					var binaryChunk = getPaddedArrayBuffer( reader.result );
-					var binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-					binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
-					binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
+					reader.readAsArrayBuffer( blob );
+					reader.onloadend = function () {
 
-					// JSON chunk.
-					delete outputJSON.buffers[ 0 ].uri; // Omitted URI indicates use of binary chunk.
-					var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ), true );
-					var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
-					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
+						// Binary chunk.
+						var binaryChunk = getPaddedArrayBuffer( reader.result );
+						var binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+						binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
+						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
 
-					// GLB header.
-					var header = new ArrayBuffer( GLB_HEADER_BYTES );
-					var headerView = new DataView( header );
-					headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
-					headerView.setUint32( 4, GLB_VERSION, true );
-					var totalByteLength = GLB_HEADER_BYTES
-						+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
-						+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
-					headerView.setUint32( 8, totalByteLength, true );
+						// JSON chunk.
+						var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ), true );
+						var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
+						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
 
-					var glbBlob = new Blob( [
-						header,
-						jsonChunkPrefix,
-						jsonChunk,
-						binaryChunkPrefix,
-						binaryChunk
-					], { type: 'application/octet-stream' } );
+						// GLB header.
+						var header = new ArrayBuffer( GLB_HEADER_BYTES );
+						var headerView = new DataView( header );
+						headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
+						headerView.setUint32( 4, GLB_VERSION, true );
+						var totalByteLength = GLB_HEADER_BYTES
+							+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
+							+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
+						headerView.setUint32( 8, totalByteLength, true );
 
-					var glbReader = new window.FileReader();
-					glbReader.readAsArrayBuffer( glbBlob );
-					glbReader.onloadend = function () {
+						var glbBlob = new Blob( [
+							header,
+							jsonChunkPrefix,
+							jsonChunk,
+							binaryChunkPrefix,
+							binaryChunk
+						], { type: 'application/octet-stream' } );
 
-						onDone( glbReader.result );
+						var glbReader = new window.FileReader();
+						glbReader.readAsArrayBuffer( glbBlob );
+						glbReader.onloadend = function () {
+
+							onDone( glbReader.result );
+
+						};
 
 					};
 
-				};
+				} else {
+
+					reader.readAsDataURL( blob );
+					reader.onloadend = function () {
+
+						var base64data = reader.result;
+						outputJSON.buffers[ 0 ].uri = base64data;
+						onDone( outputJSON );
+
+					};
+
+				}
 
 			} else {
 
-				reader.readAsDataURL( blob );
-				reader.onloadend = function () {
-
-					var base64data = reader.result;
-					outputJSON.buffers[ 0 ].uri = base64data;
-					onDone( outputJSON );
-
-				};
+				onDone( outputJSON );
 
 			}
 
-		} else {
-
-			onDone( outputJSON );
-
-		}
+		} );
 
 	}
 
