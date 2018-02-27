@@ -360,11 +360,11 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			return new Promise( function (resolve) {
+			return new Promise( function ( resolve ) {
 
 				var reader = new window.FileReader();
 				reader.readAsArrayBuffer( blob );
-				reader.addEventListener('loadend', function () {
+				reader.onloadend = function () {
 
 					var buffer = getPaddedArrayBuffer( reader.result );
 
@@ -380,7 +380,7 @@ THREE.GLTFExporter.prototype = {
 
 					resolve( outputJSON.bufferViews.length - 1 );
 
-				} );
+				};
 
 			} );
 
