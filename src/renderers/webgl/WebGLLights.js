@@ -100,11 +100,15 @@ function UniformsCache() {
 
 }
 
+var count = 0;
+
 function WebGLLights() {
 
 	var cache = new UniformsCache();
 
 	var state = {
+
+		id: count ++,
 
 		hash: '',
 
@@ -312,8 +316,7 @@ function WebGLLights() {
 		state.point.length = pointLength;
 		state.hemi.length = hemiLength;
 
-		// TODO (sam-g-steel) why aren't we using join
-		state.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + shadows.length;
+		state.hash = state.id + ',' + directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + shadows.length;
 
 	}
 

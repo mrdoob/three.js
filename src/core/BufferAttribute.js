@@ -129,24 +129,6 @@ Object.assign( BufferAttribute.prototype, {
 
 	},
 
-	copyIndicesArray: function ( indices ) {
-
-		var array = this.array, offset = 0;
-
-		for ( var i = 0, l = indices.length; i < l; i ++ ) {
-
-			var index = indices[ i ];
-
-			array[ offset ++ ] = index.a;
-			array[ offset ++ ] = index.b;
-			array[ offset ++ ] = index.c;
-
-		}
-
-		return this;
-
-	},
-
 	copyVector2sArray: function ( vectors ) {
 
 		var array = this.array, offset = 0;

@@ -500,10 +500,6 @@
         "dispose": {
           "!type": "fn()",
           "!doc": "Removes The object from memory. <br>\n\t\tDon't forget to call this method when you remove a geometry because it can cause memory leaks."
-        },
-        "computeLineDistances": {
-          "!type": "fn()",
-          "!doc": "Compute distances between vertices for Line geometries."
         }
       },
       "!doc": "Base class for geometries.<br>\n\t\tA geometry holds all data necessary to describe a 3D model.",
@@ -4820,10 +4816,6 @@
         "renderImmediateObject": {
           "!type": "fn(camera, lights, fog, material, object)",
           "!doc": "Renders an immediate Object using a camera."
-        },
-        "setFaceCulling": {
-          "!type": "fn(cullFace, frontFace)",
-          "!doc": "If cullFace is false, culling will be disabled."
         },
         "setDepthTest": {
           "!type": "fn(depthTest: boolean)",

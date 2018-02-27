@@ -21,7 +21,7 @@
 		</div>
 
 		<h2>Constructor</h2>
-		<h3>[name]( [page:TypedArray array], [page:Integer itemSize], [page:Boolean normalized] )</h3>
+		<h3>[name]( [param:TypedArray array], [param:Integer itemSize], [param:Boolean normalized] )</h3>
 		<div>
 		[page:TypedArray array] -- Must be a [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/TypedArray TypedArray].
 		Used to instantiate the buffer. <br />
@@ -134,14 +134,11 @@
 			for notes on requirements if copying a TypedArray.
 		</div>
 
-		<h3>[method:null copyAt] ( [page:Integer index1], [page:BufferAttribute bufferAttribute], [page:Integer index2] ) </h3>
+		<h3>[method:null copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
 		<div>Copy a vector from bufferAttribute[index2] to [page:BufferAttribute.array array][index1].</div>
 
 		<h3>[method:BufferAttribute copyColorsArray]( colors ) </h3>
 		<div>Copy an array representing RGB color values into [page:BufferAttribute.array array].</div>
-
-		<h3>[method:BufferAttribute copyIndicesArray]( indices ) </h3>
-		<div>Copy an array representing [page:Face3] indices into [page:BufferAttribute.array array].</div>
 
 		<h3>[method:BufferAttribute copyVector2sArray]( vectors ) </h3>
 		<div>Copy an array representing [page:Vector2]s into [page:BufferAttribute.array array].</div>
@@ -164,7 +161,7 @@
 		<h3>[method:Number getW]( index ) </h3>
 		<div>Returns the w component of the vector at the given index.</div>
 
-		<h3>[method:null onUpload]( [page:Function callback] ) </h3>
+		<h3>[method:null onUpload]( [param:Function callback] ) </h3>
 		<div>
 		Sets the value of the onUploadCallback property.<br /><br />
 
@@ -172,7 +169,7 @@
 		after the buffer has been	transfered to the GPU.
 		</div>
 
-		<h3>[method:null set] ( [page:Array value], [page:Integer offset] ) </h3>
+		<h3>[method:null set] ( [param:Array value], [param:Integer offset] ) </h3>
 		<div>
 		value -- an [page:Array] or [page:TypedArray] from which to copy values. <br />
 		offset -- (optional) index of the [page:BufferAttribute.array array] at which to start copying.<br /><br />
@@ -184,14 +181,14 @@
 		being a [page:TypedArray].
 		</div>
 
-		<h3>[method:null setArray] ( [page:TypedArray array] ) </h3>
+		<h3>[method:null setArray] ( [param:TypedArray array] ) </h3>
 		<div>
 		[page:BufferAttribute.array array] to the TypedArray passed in here.<br /><br />
 
 		After setting the array, [page:BufferAttribute.needsUpdate needsUpdate] should be set to true.
 		</div>
 
-		<h3>[method:BufferAttribute setDynamic] ( [page:Boolean value] ) </h3>
+		<h3>[method:BufferAttribute setDynamic] ( [param:Boolean value] ) </h3>
 		<div>Set [page:BufferAttribute.dynamic dynamic] to value.</div>
 
 		<h3>[method:null setX]( index, x ) </h3>

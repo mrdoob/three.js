@@ -21,7 +21,7 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:String name], [page:Number duration], [page:Array tracks] )</h3>
+		<h3>[name]( [param:String name], [param:Number duration], [param:Array tracks] )</h3>
 		<div>
 			[page:String name] - a name for this clip.<br />
 			[page:Number duration] - the duration of this clip (in seconds). If a negative value is passed,
@@ -87,7 +87,7 @@
 		<h2>Static Methods</h2>
 
 
-		<h3>[method:Array CreateClipsFromMorphTargetSequences]( [page:String name], [page:Array morphTargetSequence], [page:Number fps], [page:Boolean noLoop] )</h3>
+		<h3>[method:Array CreateClipsFromMorphTargetSequences]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<div>
 			Returns an array of new AnimationClips created from the [page:Geometry.morphTargets morph
 			target sequences] of a geometry, trying to sort morph target names into animation-group-based
@@ -97,32 +97,32 @@
 			[page:.CreateFromMorphTargetSequence CreateFromMorphTargetSequence].
 		</div>
 
-		<h3>[method:AnimationClip CreateFromMorphTargetSequence]( [page:String name], [page:Array morphTargetSequence], [page:Number fps], [page:Boolean noLoop] )</h3>
+		<h3>[method:AnimationClip CreateFromMorphTargetSequence]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
 		<div>
 			Returns a new AnimationClip from the passed [page:Geometry.morphTargets morph targets array]
 			of a geometry, taking a name and the number of frames per second.<br /><br />
 
-			Note: The fps parameter is required, but the animation speed can be overridden in an 
+			Note: The fps parameter is required, but the animation speed can be overridden in an
 			*AnimationAction* via [page:AnimationAction.setDuration animationAction.setDuration].
 		</div>
 
-		<h3>[method:AnimationClip findByName]( [page:Object objectOrClipArray], [page:String name] )</h3>
+		<h3>[method:AnimationClip findByName]( [param:Object objectOrClipArray], [param:String name] )</h3>
 		<div>
 			Searches for an AnimationClip by name, taking as its first parameter either an array of
 			AnimationClips, or a mesh or geometry that contains an array named "animations".
 		</div>
 
-		<h3>[method:AnimationClip parse]( [page:Object json] )</h3>
+		<h3>[method:AnimationClip parse]( [param:Object json] )</h3>
 		<div>
 			Parses a JSON representation of a clip and returns an AnimationClip.
 		</div>
 
-		<h3>[method:AnimationClip parseAnimation]( [page:Object animation], [page:Array bones] )</h3>
+		<h3>[method:AnimationClip parseAnimation]( [param:Object animation], [param:Array bones] )</h3>
 		<div>
 			Parses the animation.hierarchy format and returns an AnimationClip.
 		</div>
 
-		<h3>[method:Object toJSON]( [page:AnimationClip clip] )</h3>
+		<h3>[method:Object toJSON]( [param:AnimationClip clip] )</h3>
 		<div>
 			Takes an AnimationClip and returns a JSON object.
 		</div>

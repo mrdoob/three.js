@@ -152,6 +152,7 @@ var files = {
 		"webgl_materials_cubemap_dynamic",
 		"webgl_materials_cubemap_dynamic2",
 		"webgl_materials_cubemap_refraction",
+		"webgl_materials_curvature",
 		"webgl_materials_displacementmap",
 		"webgl_materials_envmaps",
 		"webgl_materials_envmaps_hdr",
@@ -273,6 +274,7 @@ var files = {
 		"webgl_buffergeometry_constructed_from_geometry",
 		"webgl_buffergeometry_custom_attributes_particles",
 		"webgl_buffergeometry_drawcalls",
+		"webgl_buffergeometry_indexed",
 		"webgl_buffergeometry_instancing",
 		"webgl_buffergeometry_instancing2",
 		"webgl_buffergeometry_instancing_billboards",
@@ -294,7 +296,8 @@ var files = {
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",
-		"webgl_tiled_forward"
+		"webgl_tiled_forward",
+		"webgl_worker_offscreencanvas"
 	],
 	"webgl deferred": [
 		"webgldeferred_animation"

@@ -15,7 +15,7 @@
 		<a href="https://www.khronos.org/gltf">glTF</a> (GL Transmission Format) is an
 		<a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0">open format specification</a>
 		for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
-		or binary (.glb) format. External files store textures (.jpg, .png, ...) and additional binary
+		or binary (.glb) format. External files store textures (.jpg, .png) and additional binary
 		data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
 		textures, skins, skeletons, morph targets, animations, lights, and/or cameras.
 		</div>
@@ -28,15 +28,14 @@
 
 		<ul>
 			<li>
-				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_pbrSpecularGlossiness">
+				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_pbrSpecularGlossiness">
 					KHR_materials_pbrSpecularGlossiness
 				</a>
 			</li>
 			<li>
-				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_materials_common">
-					KHR_materials_common
+				<a target="_blank" href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_draco_mesh_compression">
+					KHR_draco_mesh_compression
 				</a>
-				(experimental)
 			</li>
 			<li>
 				KHR_lights (experimental)
@@ -46,38 +45,43 @@
 		<h2>Example</h2>
 
 		<code>
-			// Instantiate a loader
-			var loader = new THREE.GLTFLoader();
+		// Instantiate a loader
+		var loader = new THREE.GLTFLoader();
 
-			// Load a glTF resource
-			loader.load(
-				// resource URL
-				'models/gltf/duck/duck.gltf',
-				// called when the resource is loaded
-				function ( gltf ) {
+		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
+		THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
+		loader.setDRACOLoader( new THREE.DRACOLoader() );
 
-					scene.add( gltf.scene );
+		// Load a glTF resource
+		loader.load(
+			// resource URL
+			'models/gltf/duck/duck.gltf',
+			// called when the resource is loaded
+			function ( gltf ) {
 
-					gltf.animations; // Array&lt;THREE.AnimationClip&gt;
-					gltf.scene; // THREE.Scene
-					gltf.scenes; // Array&lt;THREE.Scene&gt;
-					gltf.cameras; // Array&lt;THREE.Camera&gt;
+				scene.add( gltf.scene );
 
-				},
-				// called when loading is in progresses
-				function ( xhr ) {
+				gltf.animations; // Array&lt;THREE.AnimationClip&gt;
+				gltf.scene; // THREE.Scene
+				gltf.scenes; // Array&lt;THREE.Scene&gt;
+				gltf.cameras; // Array&lt;THREE.Camera&gt;
+				gltf.asset; // Object
 
-					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+			},
+			// called when loading is in progresses
+			function ( xhr ) {
 
-				},
-				// called when loading has errors
-				function ( error ) {
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-					console.log( 'An error happened' );
+			},
+			// called when loading has errors
+			function ( error ) {
 
-				}
-			);
-			</code>
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
 
 		[example:webgl_loader_gltf]
 
@@ -93,7 +97,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<div>
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
 		</div>
@@ -106,7 +110,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — A string containing the path/URL of the <em>.gltf</em> or <em>.glb</em> file.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed. The function receives the loaded JSON response returned from [page:Function parse].<br />
@@ -117,7 +121,7 @@
 		Begin loading from url and call the callback function with the parsed response content.
 		</div>
 
-		<h3>[method:null setPath]( [page:String path] )</h3>
+		<h3>[method:null setPath]( [param:String path] )</h3>
 		<div>
 		[page:String path] — Base path for loading additional resources e.g. textures and .bin data.
 		</div>
@@ -125,12 +129,20 @@
 		Set the base path for additional resources.
 		</div>
 
-		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
+		<h3>[method:null setCrossOrigin]( [param:String value] )</h3>
 		<div>
 		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</div>
 
-		<h3>[method:null parse]( [page:ArrayBuffer data], [page:String path], [page:Function onLoad], [page:Function onError] )</h3>
+		<h3>[method:null setDRACOLoader]( [param:DRACOLoader dracoLoader] )</h3>
+		<div>
+		[page:DRACOLoader dracoLoader] — Instance of THREE.DRACOLoader, to be used for decoding assets compressed with the KHR_draco_mesh_compression extension.
+		</div>
+		<div>
+		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme] for the details of Draco and its decoder.
+		</div>
+
+		<h3>[method:null parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
 		<div>
 		[page:ArrayBuffer data] — glTF asset to parse, as an ArrayBuffer or <em>JSON</em> string.<br />
 		[page:String path] — The base path from which to find subsequent glTF resources such as textures and .bin data files.<br />
@@ -138,7 +150,7 @@
 		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</div>
 		<div>
-		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], and .[page:Array animations].
+		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
 		</div>
 
 		<h2>Source</h2>

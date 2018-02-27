@@ -852,11 +852,20 @@ Object.assign( Vector4.prototype, {
 
 //
 
-Geometry.prototype.computeTangents = function () {
+Object.assign( Geometry.prototype, {
 
-	console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
+	computeTangents: function () {
 
-};
+		console.error( 'THREE.Geometry: .computeTangents() has been removed.' );
+
+	},
+	computeLineDistances: function () {
+
+		console.error( 'THREE.Geometry: .computeLineDistances() has been removed. Use THREE.Line.computeLineDistances() instead.' );
+
+	}
+
+} );
 
 Object.assign( Object3D.prototype, {
 
@@ -1085,6 +1094,11 @@ Object.defineProperties( BufferAttribute.prototype, {
 			return this.array.length;
 
 		}
+	},
+	copyIndicesArray: function ( /* indices */ ) {
+
+		console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
+
 	}
 
 } );
@@ -1353,6 +1367,11 @@ Object.assign( WebGLRenderer.prototype, {
 
 		console.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
 
+	},
+	setFaceCulling: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .setFaceCulling() has been removed.' );
+
 	}
 
 } );
@@ -1593,16 +1612,6 @@ Object.defineProperties( WebGLRenderTarget.prototype, {
 
 //
 
-Object.assign( WebVRManager.prototype, {
-
-	getStandingMatrix: function () {
-
-		console.warn( 'THREE.WebVRManager: .getStandingMatrix() has been removed.' );
-
-	}
-
-} );
-
 Object.defineProperties( WebVRManager.prototype, {
 
 	standing: {
@@ -1796,6 +1805,6 @@ export var SceneUtils = {
 
 export function LensFlare() {
 
-	console.error( 'THREE.LensFlare has been moved to /examples/js/objects/LensFlare.js' );
+	console.error( 'THREE.LensFlare has been moved to /examples/js/objects/Lensflare.js' );
 
 }

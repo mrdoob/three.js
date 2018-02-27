@@ -52,6 +52,7 @@
 		<script src="js/nodes/AttributeNode.js"></script>
 		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
 		<!-- Accessors -->
@@ -112,6 +113,7 @@
 		var container = document.getElementById( 'container' );
 
 		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+		var frame = new THREE.NodeFrame();
 		var teapot, mesh;
 		var controls;
 		var move = false;
@@ -254,6 +256,7 @@
 				'misc / firefly': 'firefly',
 				'misc / reserved-keywords': 'reserved-keywords',
 				'misc / varying': 'varying',
+				'misc / readonly': 'readonly',
 				'misc / custom-attribute': 'custom-attribute'
 			} ).onFinishChange( function () {
 
@@ -2017,6 +2020,24 @@
 
 					break;
 
+				case 'readonly':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					mtl.color = new THREE.ColorNode( 0xFFFFFF );
+					mtl.specular = new THREE.FloatNode( .5 );
+					mtl.shininess = new THREE.FloatNode( 15 );
+
+					// not use "uniform" input ( for optimization ) 
+					// instead use explicit declaration, for example: 
+					// vec3( 1.0, 1.0, 1.0 ) instead "uniform vec3"
+					// if readonly is true not allow change the value after build the shader material
+					mtl.color.readonly = mtl.specular.readonly = mtl.shininess.readonly = true;
+
+					break;
+
 				case 'triangle-blur':
 
 					// MATERIAL
@@ -2372,7 +2393,7 @@
 			//mesh.rotation.z += .01;
 
 			// update material animation and/or gpu calcs (pre-renderer)
-			mesh.material.updateFrame( delta );
+			frame.update( delta ).updateNode( mesh.material );
 
 			// render to texture for sss/translucent material only
 			if ( rtTexture ) {

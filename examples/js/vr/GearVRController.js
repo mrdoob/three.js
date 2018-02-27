@@ -60,7 +60,7 @@ THREE.GearVRController = function () {
 
 	};
 
-	this.getTouchPadState = function () {
+	this.getTouchpadState = function () {
 
 		return touchpadIsPressed;
 
@@ -128,6 +128,15 @@ THREE.GearVRController = function () {
 			scope.visible = false;
 
 		}
+
+	};
+
+	// DEPRECATED
+
+	this.getTouchPadState = function () {
+
+		console.warn( 'THREE.GearVRController: getTouchPadState() is now getTouchpadState()' );
+		return touchpadIsPressed;
 
 	};
 

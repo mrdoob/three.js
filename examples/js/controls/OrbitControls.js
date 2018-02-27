@@ -59,6 +59,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Set to false to disable panning
 	this.enablePan = true;
+	this.panningMode = THREE.ScreenSpacePanning; // alternate THREE.HorizontalPanning
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
@@ -316,7 +317,21 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		return function panUp( distance, objectMatrix ) {
 
-			v.setFromMatrixColumn( objectMatrix, 1 ); // get Y column of objectMatrix
+			switch ( scope.panningMode ) {
+
+				case THREE.ScreenSpacePanning:
+
+					v.setFromMatrixColumn( objectMatrix, 1 );
+					break;
+
+				case THREE.HorizontalPanning:
+
+					v.setFromMatrixColumn( objectMatrix, 0 );
+					v.crossVectors( scope.object.up, v );
+					break;
+
+			}
+
 			v.multiplyScalar( distance );
 
 			panOffset.add( v );
@@ -1041,3 +1056,6 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 	}
 
 } );
+
+THREE.ScreenSpacePanning = 0;
+THREE.HorizontalPanning = 1;

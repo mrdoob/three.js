@@ -17,6 +17,12 @@ THREE.Vector3Node.prototype.nodeType = "Vector3";
 
 THREE.NodeMaterial.addShortcuts( THREE.Vector3Node.prototype, 'value', [ 'x', 'y', 'z' ] );
 
+THREE.Vector3Node.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
+
+	return builder.format( "vec3( " + this.x + ", " + this.y + ", " + this.z + " )", type, output );
+
+};
+
 THREE.Vector3Node.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -28,6 +34,8 @@ THREE.Vector3Node.prototype.toJSON = function ( meta ) {
 		data.x = this.x;
 		data.y = this.y;
 		data.z = this.z;
+
+		if ( this.readonly === true ) data.readonly = true;
 
 	}
 

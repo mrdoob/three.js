@@ -51,6 +51,7 @@
 
 		<h3>[page:BufferAttribute]</h3>
 		<div>BufferAttribute.length has been renamed to [page:BufferAttribute.count].</div>
+		<div>BufferAttribute.copyIndicesArray() has been removed.</div>
 
 
 		<h3>[page:DynamicBufferAttribute]</h3>
@@ -152,6 +153,12 @@
 
 
 		<h2>Geometry</h2>
+
+		<div>
+			Geometry.computeTangents() has been removed.<br /><br />
+
+			Geometry.computeLineDistances() has been removed. Use [page:Line.computeLineDistances] instead.<br /><br />
+		</div>
 
 		<h3>[page:BufferGeometry]</h3>
 		<div>
@@ -458,7 +465,7 @@
 
 		<h3>[page:LensFlare]</h3>
 		<div>
-			LensFlare has been moved to [link:https://github.com/mrdoob/three.js/blob/master/examples/js/objects/LensFlare.js /examples/js/objects/LensFlare.js].
+			LensFlare has been moved to [link:https://github.com/mrdoob/three.js/blob/master/examples/js/objects/Lensflare.js /examples/js/objects/Lensflare.js].
 		</div>
 
 
@@ -538,6 +545,8 @@
 			WebGLRenderer.addPostPlugin() has been removed.<br /><br />
 
 			WebGLRenderer.updateShadowMap() has been removed.<br /><br />
+
+			WebGLRenderer.setFaceCulling() has been removed.<br /><br />
 
 			WebGLRenderer.setTexture is deprecated, use [page:WebGLRenderer.setTexture2D]() instead.<br /><br />
 
