@@ -37,35 +37,29 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.focus = function ( target ) {
 
-		if ( target === undefined ) {
-			return;
-		}
-
 		var box = new THREE.Box3().setFromObject( target );
 
-		var targetDistance;
+		var distance;
 
-		if ( box.isEmpty() ) {
+		if ( box.isEmpty() === false ) {
 
-			// Focusing on an empty such as a light.
-
-			target.getWorldPosition( center );
-			targetDistance = 0.5;
+			center.copy( box.getCenter() );
+			distance = box.getBoundingSphere().radius;
 
 		} else {
 
-			center.copy( box.getCenter() );
-			targetDistance = box.getBoundingSphere().radius * 6;
+			// Focusing on an Group, AmbientLight, etc
+
+			center.setFromMatrixPosition( target.matrixWorld );
+			distance = 0.1;
 
 		}
 
-		var forwards = object.getWorldDirection().normalize();
+		var delta = new THREE.Vector3( 0, 0, 1 );
+		delta.applyQuaternion( object.quaternion );
+		delta.multiplyScalar( distance * 4 );
 
-		var targetDelta = forwards.multiplyScalar( -targetDistance );
-
-		var targetWorldPosition = targetDelta.add( center );
-
-		object.position.copy( targetWorldPosition );
+		object.position.copy( center ).add( delta );
 
 		scope.dispatchEvent( changeEvent );
 
