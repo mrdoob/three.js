@@ -178,6 +178,8 @@
 
 			function render() {
 
+				var delta = clock.getDelta() * 60;
+
 				controller.update();
 
 				if ( controller.getTouchpadState() === true ) {
@@ -194,13 +196,13 @@
 
 				}
 
-				var delta = clock.getDelta() * 60;
+				// keep cubes inside room
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
 					var cube = room.children[ i ];
 
-					if ( cube.geometry instanceof THREE.BoxGeometry === false ) continue;
+					cube.position.add( cube.userData.velocity );
 
 					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
 
@@ -223,7 +225,9 @@
 
 					}
 
-					cube.rotation.x += 0.01 * delta;
+					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
+					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
+					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
 
 				}
 
