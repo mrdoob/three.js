@@ -1,5 +1,13 @@
 /**
  * @author fernandojsg / http://fernandojsg.com
+ *
+ * Note: We Three.js (partly) ensure the valid values in the exporter
+ * while we don't do neither parameter validation nor type check in general.
+ * Because of
+ * - non hot code (code that runs every frame)
+ * - difficulty to fix the invalid gltf files that get spread around
+ * - increase glTF demand (eg: Facebook 3D Posts)
+ *
  */
 
 //------------------------------------------------------------------------------
