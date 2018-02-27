@@ -199,8 +199,8 @@ Menubar.File = function ( editor ) {
 
 			// forceIndices: true, forcePowerOfTwoTexture: true
 			// to allow compatibility with facebook
-		}, { binary: true, forceIndices: true, forcePowerOfTwoTexture: true } );
-		
+		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
+
 	} );
 	options.add( option );
 
