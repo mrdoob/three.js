@@ -819,13 +819,21 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var attributeSize = attribute2.itemSize;
 
-			for ( var i = 0, j = attributeSize * offset; i < attributeArray2.length; i ++, j ++ ) {
-
-				attributeArray1[ j ] = attributeArray2[ i ];
-
-			}
-
+			var mergeArray = new attributeArray1.constructor(attributeArray1.length + attributeArray2.length);
+			mergeArray.set(attributeArray1);
+			mergeArray.set(attributeArray2, attributeArray1.length);
+			attributes[ key ] = new BufferAttribute(mergeArray, attribute1.itemSize);
 		}
+
+		// merge index
+		var index1 = this.index;
+		var indexArray1 = index1.array;
+		var index2 = geometry.index;
+		var indexArray2 = index2.array;
+		var indexMergeArray = new ( (indexArray1.length + indexArray2.length) > 65535 ? Uint32Array : Uint16Array )(indexArray1.length + indexArray2.length);
+		indexMergeArray.set(indexArray1);
+		indexMergeArray.set(indexArray2, indexArray1.length);
+		this.index = new ( arrayMax( indexMergeArray ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indexMergeArray, 1 );
 
 		return this;
 
