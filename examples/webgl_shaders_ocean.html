@@ -118,7 +118,7 @@
 				var parameters = {
 					distance: 400,
 					inclination: 0.49,
-					azimuth: 0.2
+					azimuth: 0.205
 				};
 
 				var cubeCamera = new THREE.CubeCamera( 1, 20000, 256 );
@@ -168,7 +168,7 @@
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI * 0.495;
 				controls.target.set( 0, 10, 0 );
-				controls.enablePan = false;
+				controls.panningMode = THREE.HorizontalPanning;
 				controls.minDistance = 40.0;
 				controls.maxDistance = 200.0;
 				camera.lookAt( controls.target );
@@ -185,7 +185,7 @@
 				var uniforms = sky.material.uniforms;
 
 				var folder = gui.addFolder( 'Sky' );
-				folder.add( parameters, 'inclination', 0, 1, 0.0001 ).onChange( updateSun );
+				folder.add( parameters, 'inclination', - 0.5, 0.5, 0.0001 ).onChange( updateSun );
 				folder.add( parameters, 'azimuth', 0, 1, 0.0001 ).onChange( updateSun );
 				folder.open();
 
