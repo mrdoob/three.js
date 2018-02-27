@@ -246,9 +246,12 @@ THREE.GLTFExporter.prototype = {
 		 * Process a buffer to append to the default one.
 		 * @param  {THREE.BufferAttribute} attribute     Attribute to store
 		 * @param  {Integer} componentType Component type (Unsigned short, unsigned int or float)
-		 * @return {Integer}               Index of the buffer created (Currently always 0)
+		 * @param  {Integer} componentSize byte length of this component
+		 * @param  {Integer} start start position in attribute array
+		 * @param  {Integer} count number of components to store
+		 * @return {Integer} Index of the buffer created (Currently always 0)
 		 */
-		function processBuffer( attribute, componentType, start, count ) {
+		function processBuffer( attribute, componentType, componentSize, start, count, byteLength ) {
 
 			if ( ! outputJSON.buffers ) {
 
@@ -266,14 +269,6 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			var offset = 0;
-			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
-
-			// Create a new dataview and dump the attribute's array into it
-			var byteLength = count * attribute.itemSize * componentSize;
-
-			// adjust required size of array buffer with padding
-			// to satisfy gltf requirement that the length is divisible by 4
-			byteLength = getPaddedBufferSize( byteLength );
 
 			var dataView = new DataView( new ArrayBuffer( byteLength ) );
 
@@ -332,10 +327,13 @@ THREE.GLTFExporter.prototype = {
 
 			// Create a new dataview and dump the attribute's array into it
 			var byteLength = count * data.itemSize * componentSize;
+			
+			// Adjust required buffer length for 4-byte alignment
+			byteLength = getPaddedBufferSize( byteLength );
 
 			var gltfBufferView = {
 
-				buffer: processBuffer( data, componentType, start, count ),
+				buffer: processBuffer( data, componentType, componentSize, start, count, byteLength ),
 				byteOffset: byteOffset,
 				byteLength: byteLength
 
