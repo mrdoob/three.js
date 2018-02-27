@@ -1097,7 +1097,12 @@
 
 		if ( normalBuffer.length > 0 ) {
 
-			geo.addAttribute( 'normal', new THREE.Float32BufferAttribute( normalBuffer, 3 ) );
+			var normalAttribute = new THREE.Float32BufferAttribute( normalBuffer, 3 );
+
+			var normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
+			normalMatrix.applyToBufferAttribute( normalAttribute );
+
+			geo.addAttribute( 'normal', normalAttribute );
 
 		}
 

@@ -5,3 +5,4 @@ test/
 utils/
 docs/
 editor/
+.DS_Store

@@ -89,12 +89,15 @@
 				<option value="glTF">None (Default)</option>
 				<option value="glTF-Embedded">None (Embedded)</option>
 				<option value="glTF-Binary">None (Binary)</option>
+				<option value="glTF-MaterialsUnlit">Materials Unlit</option>
 				<option value="glTF-pbrSpecularGlossiness">Specular-Glossiness (PBR)</option>
+				<option value="glTF-Draco">Draco (Compressed)</option>
 			</select>
 		</div>
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/DRACOLoader.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
@@ -204,11 +207,18 @@
 
 				loader = new THREE.GLTFLoader();
 
+				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+				loader.setDRACOLoader( new THREE.DRACOLoader() );
+
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
 					child.disabled = sceneInfo.extensions.indexOf(child.value) === -1;
 					if (child.disabled && child.selected) {
-						extensionSelect.value = extension = 'glTF';
+						if (sceneInfo.extensions.length === 0) {
+							extensionSelect.value = extension = 'glTF';
+						} else {
+							extensionSelect.value = extension = sceneInfo.extensions[0];
+						}
 					}
 				}
 
@@ -432,6 +442,14 @@
 					addEnvMap: true
 				},
 				{
+					name : 'Bot Skinned', url : './models/gltf/BotSkinned/%s/Bot_Skinned.gltf',
+					cameraPos: new THREE.Vector3(0, 4, 6),
+					objectRotation: new THREE.Euler(0, 0, 0),
+					addLights:true,
+					extensions: ['glTF-MaterialsUnlit'],
+					addEnvMap: true
+				},
+				{
 					name : 'MetalRoughSpheres (PBR)', url : './models/gltf/MetalRoughSpheres/%s/MetalRoughSpheres.gltf',
 					cameraPos: new THREE.Vector3(2, 1, 15),
 					objectRotation: new THREE.Euler(0, 0, 0),
@@ -445,7 +463,7 @@
 					addLights:true,
 					addGround:true,
 					shadows:true,
-					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-Draco']
 				},
 				{
 					name : "Monster", url : "./models/gltf/Monster/%s/Monster.gltf",
@@ -457,16 +475,16 @@
 					addLights:true,
 					shadows:true,
 					addGround:true,
-					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-Draco']
 				},
 				{
 					name : "Cesium Man", url : "./models/gltf/CesiumMan/%s/CesiumMan.gltf",
-					 cameraPos: new THREE.Vector3(0, 3, 10),
-					 objectRotation: new THREE.Euler(0, 0, 0),
-					 addLights:true,
-					 addGround:true,
-					 shadows:true,
-					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+					cameraPos: new THREE.Vector3(0, 3, 10),
+					objectRotation: new THREE.Euler(0, 0, 0),
+					addLights:true,
+					addGround:true,
+					shadows:true,
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-Draco']
 				},
 				{
 					name : "Cesium Milk Truck",
@@ -475,7 +493,7 @@
 					addLights:true,
 					addGround:true,
 					shadows:true,
-					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-Draco']
 				},
 				{
 					name : "Rigged Simple",
@@ -484,7 +502,7 @@
 					objectRotation: new THREE.Euler(0, 90, 0),
 					addLights:true,
 					shadows:true,
-					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary']
+					extensions: ['glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-Draco']
 				},
 				{
 					name : 'Outlined Box',

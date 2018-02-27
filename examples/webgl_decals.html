@@ -124,8 +124,8 @@
 			light.position.set( -1, 0.75, -0.5 );
 			scene.add( light );
 
-			var geometry = new THREE.Geometry();
-			geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
+			var geometry = new THREE.BufferGeometry();
+			geometry.setFromPoints( [ new THREE.Vector3(), new THREE.Vector3() ] );
 
 			line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { linewidth: 4 } ) );
 			scene.add( line );
@@ -209,9 +209,10 @@
 					intersection.normal.copy( intersects[ 0 ].face.normal );
 					mouseHelper.lookAt( n );
 
-					line.geometry.vertices[ 0 ].copy( intersection.point );
-					line.geometry.vertices[ 1 ].copy( n );
-					line.geometry.verticesNeedUpdate = true;
+					var positions = line.geometry.attributes.position;
+					positions.setXYZ( 0, p.x, p.y, p.z );
+					positions.setXYZ( 1, n.x, n.y, n.z );
+					positions.needsUpdate = true;
 
 					intersection.intersects = true;
 
@@ -240,13 +241,13 @@
 
 			var loader = new THREE.JSONLoader();
 
-			loader.load( 'obj/leeperrysmith/LeePerrySmith.js', function( geometry ) {
+			loader.load( 'models/json/leeperrysmith/LeePerrySmith.json', function( geometry ) {
 
 				var material = new THREE.MeshPhongMaterial( {
 					specular: 0x111111,
-					map: textureLoader.load( 'obj/leeperrysmith/Map-COL.jpg' ),
-					specularMap: textureLoader.load( 'obj/leeperrysmith/Map-SPEC.jpg' ),
-					normalMap: textureLoader.load( 'obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
+					map: textureLoader.load( 'models/json/leeperrysmith/Map-COL.jpg' ),
+					specularMap: textureLoader.load( 'models/json/leeperrysmith/Map-SPEC.jpg' ),
+					normalMap: textureLoader.load( 'models/json/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
 					shininess: 25
 				} );
 

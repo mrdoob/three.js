@@ -45,7 +45,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setMaterials] ( Array of [page:Material materials] )</h3>
+		<h3>[method:null setMaterials] ( Array of [param:Material materials] )</h3>
 		<div>
 			Array of [page:Material materials] - Array of [page:Material Materials]
 		</div>
@@ -106,7 +106,7 @@
 		<a name="LoadedMeshUserOverride"></a><h1>LoadedMeshUserOverride</h1>
 		<h2>Constructor</h2>
 
-		<h3>LoadedMeshUserOverride( [page:Boolean disregardMesh], [page:BufferGeometry bufferGeometry] )</h3>
+		<h3>LoadedMeshUserOverride( [param:Boolean disregardMesh], [param:BufferGeometry bufferGeometry] )</h3>
 		<div>
 			[page:Boolean disregardMesh] - Tell implementation to completely disregard this mesh<br>
 			[page:Boolean alteredMesh] - Tell implementation that mesh(es) have been altered or added
@@ -118,7 +118,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null addMesh] ( [page:Mesh mesh] )</h3>
+		<h3>[method:null addMesh] ( [param:Mesh mesh] )</h3>
 		<div>
 			[page:Mesh mesh] - Mesh
 		</div>
@@ -144,7 +144,7 @@
 		<a name="WorkerSupport"></a><h1>WorkerSupport</h1>
 		<h2>Constructor</h2>
 
-		<h3>WorkerSupport( [page:LoaderSupport.ConsoleLogger logger] )</h3>
+		<h3>WorkerSupport( [param:LoaderSupport.ConsoleLogger logger] )</h3>
 		<div>
 			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
 		</div>
@@ -156,9 +156,9 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null validate] ( [page:Function functionCodeBuilder], Array of [page:String libLocations], [page:String libPath], [page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] )</h3>
+		<h3>[method:null validate] ( [param:Function functionCodeBuilder], Array of [param:String libLocations], [param:String libPath], [param:LoaderSupport.WorkerRunnerRefImpl runnerImpl] )</h3>
 		<div>
-			[page:Function functionCodeBuilder] - Function that is invoked with funcBuildObject and funcBuildSingelton that allows stringification of objects and singletons.<br>
+			[page:Function functionCodeBuilder] - Function that is invoked with funcBuildObject and funcBuildSingleton that allows stringification of objects and singletons.<br>
 			Array of [page:String libLocations] - URL of libraries that shall be added to worker code relative to libPath.<br>
 			[page:String libPath] - Base path used for loading libraries.<br>
 			[page:LoaderSupport.WorkerRunnerRefImpl runnerImpl] - The default worker parser wrapper implementation (communication and execution). An extended class could be passed here.
@@ -168,7 +168,7 @@
 		</div>
 
 
-		<h3>[method:null setTerminateRequested] ( [page:Boolean terminateRequested] )</h3>
+		<h3>[method:null setTerminateRequested] ( [param:Boolean terminateRequested] )</h3>
 		<div>
 			[page:Boolean terminateRequested] - True or false.
 		</div>
@@ -177,7 +177,7 @@
 		</div>
 
 
-		<h3>[method:null setCallbacks] ( [page:Function builder], [page:Function onLoad] )</h3>
+		<h3>[method:null setCallbacks] ( [param:Function builder], [param:Function onLoad] )</h3>
 		<div>
 			[page:Function builder] - The builder function. Default is [page:LoaderSupport.Builder].<br>
 			[page:Function onLoad] - The function that is called when parsing is complete.
@@ -187,7 +187,7 @@
 		</div>
 
 
-		<h3>[method:null run] ( [page:Object payload] )</h3>
+		<h3>[method:null run] ( [param:Object payload] )</h3>
 		<div>
 			[page:Object payload] - Raw mesh description (buffers, params, materials) used to build one to many meshes.
 		</div>
@@ -209,7 +209,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null applyProperties] ( [page:Object parser], [page:Object params] )</h3>
+		<h3>[method:null applyProperties] ( [param:Object parser], [param:Object params] )</h3>
 		<div>
 			[page:Object parser] - The parser instance<br>
 			[page:Object params] - The parameter object
@@ -219,7 +219,7 @@
 		</div>
 
 
-		<h3>[method:null run] ( [page:Object payload] )</h3>
+		<h3>[method:null run] ( [param:Object payload] )</h3>
 		<div>
 			[page:Object payload] - Raw mesh description (buffers, params, materials) used to build one to many meshes.
 		</div>
@@ -233,7 +233,7 @@
 		<a name="WorkerDirector"></a><h1>WorkerDirector</h1>
 		<h2>Constructor</h2>
 
-		<h3>WorkerDirector( [page:String classDef], [page:LoaderSupport.ConsoleLogger logger] )</h3>
+		<h3>WorkerDirector( [param:String classDef], [param:LoaderSupport.ConsoleLogger logger] )</h3>
 		<div>
 			[page:String classDef] - Class definition to be used for construction<br>
 			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
@@ -250,7 +250,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null prepareWorkers]( [page:WWOBJLoader2.Callbacks globalCallbacks], [page:Number maxQueueSize], [page:Number maxWebWorkers] )</h3>
+		<h3>[method:null prepareWorkers]( [param:WWOBJLoader2.Callbacks globalCallbacks], [param:Number maxQueueSize], [param:Number maxWebWorkers] )</h3>
 		<div>
 			[page:LoaderSupport.Callbacks globalCallbacks] - Register global callbacks used by all web workers<br>
 			[page:Number maxQueueSize] - Set the maximum size of the instruction queue (1-1024)<br>
@@ -261,7 +261,7 @@
 		</div>
 
 
-		<h3>[method:null enqueueForRun]( [page:LoaderSupport.PrepData runParams] )</h3>
+		<h3>[method:null enqueueForRun]( [param:LoaderSupport.PrepData runParams] )</h3>
 		<div>
 			[page:LoaderSupport.PrepData runParams]
 		</div>
@@ -276,7 +276,7 @@
 		</div>
 
 
-		<h3>[method:null tearDown]( [page:Function callbackOnFinishedProcessing] )</h3>
+		<h3>[method:null tearDown]( [param:Function callbackOnFinishedProcessing] )</h3>
 		<div>
 			[page:Function callbackOnFinishedProcessing] - Function called once all workers finished processing.
 		</div>
@@ -302,7 +302,7 @@
 		</div>
 
 
-		<h3>[method:null setCrossOrigin]( [page:String crossOrigin] )</h3>
+		<h3>[method:null setCrossOrigin]( [param:String crossOrigin] )</h3>
 		<div>
 			[page:String crossOrigin] - CORS value
 		</div>
@@ -314,7 +314,7 @@
 		<a name="PrepData"></a><h1>PrepData</h1>
 		<h2>Constructor</h2>
 
-		<h3>PrepData( [page:String modelName] )</h3>
+		<h3>PrepData( [param:String modelName] )</h3>
 		<div>
 			[page:String modelName] - Overall name of the model
 		</div>
@@ -325,7 +325,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setStreamMeshesTo] ( [page:Object3D streamMeshesTo] )</h3>
+		<h3>[method:null setStreamMeshesTo] ( [param:Object3D streamMeshesTo] )</h3>
 		<div>
 			[page:Object3D streamMeshesTo] - Object already attached to scenegraph where new meshes will be attached to
 		</div>
@@ -334,7 +334,7 @@
 		</div>
 
 
-		<h3>[method:null setMaterialPerSmoothingGroup] ( [page:boolean materialPerSmoothingGroup] )</h3>
+		<h3>[method:null setMaterialPerSmoothingGroup] ( [param:boolean materialPerSmoothingGroup] )</h3>
 		<div>
 			[page:boolean materialPerSmoothingGroup]
 		</div>
@@ -343,7 +343,7 @@
 		</div>
 
 
-		<h3>[method:null setUseIndices]( [page:Boolean useIndices] )</h3>
+		<h3>[method:null setUseIndices]( [param:Boolean useIndices] )</h3>
 		<div>
 			[page:Boolean useIndices] - Default is false
 		</div>
@@ -352,7 +352,7 @@
 		</div>
 
 
-		<h3>[method:null setDisregardNormals]( [page:Boolean disregardNormals] )</h3>
+		<h3>[method:null setDisregardNormals]( [param:Boolean disregardNormals] )</h3>
 		<div>
 			[page:Boolean disregardNormals]
 		</div>
@@ -367,7 +367,7 @@
 		</div>
 
 
-		<h3>[method:null setCrossOrigin]( [page:String crossOrigin] )</h3>
+		<h3>[method:null setCrossOrigin]( [param:String crossOrigin] )</h3>
 		<div>
 			[page:String crossOrigin] - CORS value
 		</div>
@@ -376,7 +376,7 @@
 		</div>
 
 
-		<h3>[method:null addResource]( [page:LoaderSupport.ResourceDescriptor resource] )</h3>
+		<h3>[method:null addResource]( [param:LoaderSupport.ResourceDescriptor resource] )</h3>
 		<div>
 			[page:LoaderSupport.ResourceDescriptor resource]
 		</div>
@@ -385,7 +385,7 @@
 		</div>
 
 
-		<h3>[method:null setUseAsync]( [page:Boolean useAsync] )</h3>
+		<h3>[method:null setUseAsync]( [param:Boolean useAsync] )</h3>
 		<div>
 			[page:Boolean useAsync]
 		</div>
@@ -399,17 +399,40 @@
 		<a name="LoaderBase"></a><h1>LoaderBase</h1>
 		<h2>Constructor</h2>
 
-		<h3>LoaderBase( [page:LoadingManager manager], [page:LoaderSupport.ConsoleLogger logger] )</h3>
+		<h3>LoaderBase( [param:LoadingManager manager], [param:LoaderSupport.ConsoleLogger logger] )</h3>
 		<div>
 			[page:LoadingManager manager] - The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
 			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
 		</div>
 		<div>
-			Base class to be used by loaders.
+			Base class to be used by Loaders that provide load, parse, parseAsync and run
 		</div>
 
 
 		<h2>Methods</h2>
+
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError], [param:Function onMeshAlter], [param:boolean useAsync] )</h3>
+		<div>
+			[page:String url] - A string containing the path/URL of the file to be loaded.<br>
+			[page:Function onLoad] - A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br>
+			[page:Function onProgress] - (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br>
+			[page:Function onError] - (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br>
+			[page:Function onMeshAlter] - (optional) A function to be called after a new mesh raw data becomes available for alteration.<br>
+			[page:boolean useAsync] - (optional) If true, uses async loading with worker, if false loads data synchronously.
+		</div>
+		<div>
+			Use this convenient method to load a file at the given URL. By default the fileLoader uses an ArrayBuffer.
+		</div>
+
+		<h3>[method:ConsoleLogger checkResourceDescriptorFiles] ( [param:THREE.LoaderSupport.ResourceDescriptor resources], [param:Object fileDesc] )</h3>
+		<div>
+			[page:THREE.LoaderSupport.ResourceDescriptor resources] - Array of {@link THREE.LoaderSupport.ResourceDescriptor}
+			[page:Object fileDesc] - Object describing which resources are of interest (ext, type (string or UInt8Array) and ignore (boolean))
+		</div>
+		<div>
+			Identify files or content of interest from an Array of {@link THREE.LoaderSupport.ResourceDescriptor}. Returns Object with each "ext" and the corresponding {@link THREE.LoaderSupport.ResourceDescriptor}
+	 	</div>
+
 
 		<h3>[method:ConsoleLogger getLogger] ()</h3>
 		<div>
@@ -417,7 +440,7 @@
 		</div>
 
 
-		<h3>[method:null setModelName] ( [page:String modelName] )</h3>
+		<h3>[method:null setModelName] ( [param:String modelName] )</h3>
 		<div>
 			[page:String modelName]
 		</div>
@@ -426,7 +449,7 @@
 		</div>
 
 
-		<h3>[method:null setPath] ( [page:String path] )</h3>
+		<h3>[method:null setPath] ( [param:String path] )</h3>
 		<div>
 			[page:String path] - URL
 		</div>
@@ -435,7 +458,7 @@
 		</div>
 
 
-		<h3>[method:null setStreamMeshesTo] ( [page:Object3D streamMeshesTo] )</h3>
+		<h3>[method:null setStreamMeshesTo] ( [param:Object3D streamMeshesTo] )</h3>
 		<div>
 			[page:Object3D streamMeshesTo] - Object already attached to scenegraph where new meshes will be attached to
 		</div>
@@ -444,7 +467,7 @@
 		</div>
 
 
-		<h3>[method:null setMaterials] ( Array of [page:Material materials] )</h3>
+		<h3>[method:null setMaterials] ( Array of [param:Material materials] )</h3>
 		<div>
 			Array of [page:Material materials] - Array of [page:Material Materials]
 		</div>
@@ -453,7 +476,7 @@
 		</div>
 
 
-		<h3>[method:null setUseIndices]( [page:Boolean useIndices] )</h3>
+		<h3>[method:null setUseIndices]( [param:Boolean useIndices] )</h3>
 		<div>
 			[page:Boolean useIndices]
 		</div>
@@ -462,7 +485,7 @@
 		</div>
 
 
-		<h3>[method:null setDisregardNormals]( [page:Boolean disregardNormals] )</h3>
+		<h3>[method:null setDisregardNormals]( [param:Boolean disregardNormals] )</h3>
 		<div>
 			[page:Boolean disregardNormals]
 		</div>
@@ -471,7 +494,7 @@
 		</div>
 
 
-		<h3>[method:null onProgress]( [page:String type], [page:String text], [page:Number numericalValue] )</h3>
+		<h3>[method:null onProgress]( [param:String type], [param:String text], [param:Number numericalValue] )</h3>
 		<div>
 			[page:String type] - The type of event<br>
 			[page:String text] - Textual description of the event<br>
@@ -495,7 +518,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setCallbackOnProgress]( [page:Function callbackOnProgress] )</h3>
+		<h3>[method:null setCallbackOnProgress]( [param:Function callbackOnProgress] )</h3>
 		<div>
 			[page:Function callbackOnProgress] - Callback function for described functionality
 		</div>
@@ -504,7 +527,7 @@
 		</div>
 
 
-		<h3>[method:null setCallbackOnMeshAlter]( [page:Function callbackOnMeshAlter] )</h3>
+		<h3>[method:null setCallbackOnMeshAlter]( [param:Function callbackOnMeshAlter] )</h3>
 		<div>
 			[page:Function callbackOnMeshAlter] - Callback function for described functionality
 		</div>
@@ -514,7 +537,7 @@
 		</div>
 
 
-		<h3>[method:null setCallbackOnLoad]( [page:Function callbackOnLoad] )</h3>
+		<h3>[method:null setCallbackOnLoad]( [param:Function callbackOnLoad] )</h3>
 		<div>
 			[page:Function callbackOnLoad] - Callback function for described functionality
 		</div>
@@ -522,7 +545,7 @@
 			Register callback function that is called once loading of the complete OBJ file is completed.
 		</div>
 
-		<h3>[method:null setCallbackOnLoadMaterials]( [page:Function callbackOnLoadMaterials] )</h3>
+		<h3>[method:null setCallbackOnLoadMaterials]( [param:Function callbackOnLoadMaterials] )</h3>
 		<div>
 			[page:Function callbackOnLoadMaterials] - Callback function for described functionality
 		</div>
@@ -544,7 +567,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Boolean isValid]( [page:Object input] )</h3>
+		<h3>[method:Boolean isValid]( [param:Object input] )</h3>
 		<div>
 			[page:Object input] - Can be anything
 		</div>
@@ -553,7 +576,7 @@
 		</div>
 
 
-		<h3>[method:null verifyInput]( [page:Object input], [page:Object defaultValue] )</h3>
+		<h3>[method:null verifyInput]( [param:Object input], [param:Object defaultValue] )</h3>
 		<div>
 			[page:Object input] - Can be anything
 			[page:Object defaultValue] - Can be anything
@@ -568,7 +591,7 @@
 		<a name="ConsoleLogger"></a><h1>ConsoleLogger</h1>
 		<h2>Constructor</h2>
 
-		<h3>ConsoleLogger( [page:Boolean enabled], [page:Boolean debug] )</h3>
+		<h3>ConsoleLogger( [param:Boolean enabled], [param:Boolean debug] )</h3>
 		<div>
 			[page:Boolean enabled] - Tell if logger is enabled.
 			[page:Boolean debug] - Toggle debug logging.
@@ -579,7 +602,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setDebug]( [page:Boolean debug] )</h3>
+		<h3>[method:null setDebug]( [param:Boolean debug] )</h3>
 		<div>
 			[page:Boolean debug] - True or False
 		</div>
@@ -593,7 +616,7 @@
 			Returns if is enabled and debug.
 		</div>
 
-		<h3>[method:null setEnabled]( [page:Boolean enabled] )</h3>
+		<h3>[method:null setEnabled]( [param:Boolean enabled] )</h3>
 		<div>
 			[page:Boolean enabled] - True or False
 		</div>
@@ -608,43 +631,47 @@
 		</div>
 
 
-		<h3>[method:null logDebug]( [page:String message] )</h3>
+		<h3>[method:null logDebug]( [param:String message], Array of [param:String additional] )</h3>
 		<div>
 			[page:String message] - Message to log
+			Array of [page:String additional] - Array of [page:String strings] containing additional content to be logged
 		</div>
 		<div>
 			Log a debug message if enabled and debug is set.
 		</div>
 
 
-		<h3>[method:null logInfo]( [page:String message] )</h3>
+		<h3>[method:null logInfo]( [param:String message], Array of [param:String additional] )</h3>
 		<div>
 			[page:String message] - Message to log
+			Array of [page:String additional] - Array of [page:String strings] containing additional content to be logged
 		</div>
 		<div>
 			Log an info message if enabled.
 		</div>
 
 
-		<h3>[method:null logWarn]( [page:String message] )</h3>
+		<h3>[method:null logWarn]( [param:String message], Array of [param:String additional] )</h3>
 		<div>
 			[page:String message] - Message to log
+			Array of [page:String additional] - Array of [page:String strings] containing additional content to be logged
 		</div>
 		<div>
 			Log a warn message (always).
 		</div>
 
 
-		<h3>[method:null logError]( [page:String message] )</h3>
+		<h3>[method:null logError]( [param:String message], Array of [param:String additional] )</h3>
 		<div>
 			[page:String message] - Message to log
+			Array of [page:String additional] - Array of [page:String strings] containing additional content to be logged
 		</div>
 		<div>
 			Log an error message (always).
 		</div>
 
 
-		<h3>[method:null logTimeStart]( [page:String id] )</h3>
+		<h3>[method:null logTimeStart]( [param:String id] )</h3>
 		<div>
 			[page:String id] - Time identification
 		</div>
@@ -653,7 +680,7 @@
 		</div>
 
 
-		<h3>[method:null logTimeEnd]( [page:String id] )</h3>
+		<h3>[method:null logTimeEnd]( [param:String id] )</h3>
 		<div>
 			[page:String id] - Time identification
 		</div>

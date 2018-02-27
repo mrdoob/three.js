@@ -5,7 +5,7 @@
 import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants.js';
 import { _Math } from '../../math/Math.js';
 
-function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, infoMemory, infoRender ) {
+function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 	var _videoTextures = {};
@@ -111,7 +111,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		infoMemory.textures --;
+		info.memory.textures --;
 
 	}
 
@@ -123,7 +123,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		deallocateRenderTarget( renderTarget );
 
-		infoMemory.textures --;
+		info.memory.textures --;
 
 	}
 
@@ -244,7 +244,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					textureProperties.__image__webglTextureCube = _gl.createTexture();
 
-					infoMemory.textures ++;
+					info.memory.textures ++;
 
 				}
 
@@ -415,7 +415,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			textureProperties.__webglTexture = _gl.createTexture();
 
-			infoMemory.textures ++;
+			info.memory.textures ++;
 
 		}
 
@@ -718,7 +718,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		textureProperties.__webglTexture = _gl.createTexture();
 
-		infoMemory.textures ++;
+		info.memory.textures ++;
 
 		var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
 		var isTargetPowerOfTwo = isPowerOfTwo( renderTarget );
@@ -799,7 +799,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function updateVideoTexture( texture ) {
 
 		var id = texture.id;
-		var frame = infoRender.frame;
+		var frame = info.render.frame;
 
 		// Check the last frame we updated the VideoTexture
 

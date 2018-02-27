@@ -23,7 +23,7 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Object3D rootObject] )</h3>
+		<h3>[name]( [param:Object3D rootObject] )</h3>
 		<div>
 			[page:Object3D rootObject] - the object whose animations shall be played by this mixer.<br />
 		</div>
@@ -49,7 +49,7 @@
 		<h2>Methods</h2>
 
 
-		<h3>[method:AnimationAction clipAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
+		<h3>[method:AnimationAction clipAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<div>
 			Returns an [page:AnimationAction] for the passed clip, optionally using a root object different
 			from the mixer's default root. The first parameter can be either an [page:AnimationClip] object
@@ -57,11 +57,11 @@
 
 			If an action fitting these parameters doesn't yet exist, it will be created by this method.<br /><br />
 
-			Note: Calling this method several times with the same parameters returns always the same clip 
+			Note: Calling this method several times with the same parameters returns always the same clip
 			instance.
 		</div>
 
-		<h3>[method:AnimationAction existingAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
+		<h3>[method:AnimationAction existingAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<div>
 			Returns an existing [page:AnimationAction] for the passed clip, optionally using a root object
 			different from the mixer's default root.<br /><br />
@@ -79,25 +79,25 @@
 			Deactivates all previously scheduled actions on this mixer.
 		</div>
 
-		<h3>[method:AnimationMixer update]([page:Number deltaTimeInSeconds]) </h3>
+		<h3>[method:AnimationMixer update]([param:Number deltaTimeInSeconds]) </h3>
 		<div>
 			Advances the global mixer time and updates the animation.<br /><br />
 
 			This is usually done in the render loop, passing [page:Clock.getDelta clock.getDelta] scaled by the mixer's [page:.timeScale timeScale]).
 		</div>
 
-		<h3>[method:null uncacheClip]([page:AnimationClip clip])</h3>
+		<h3>[method:null uncacheClip]([param:AnimationClip clip])</h3>
 
 		<div>
 			Deallocates all memory resources for a clip.
 		</div>
 
-		<h3>[method:null uncacheRoot]([page:Object3D root]) </h3>
+		<h3>[method:null uncacheRoot]([param:Object3D root]) </h3>
 		<div>
 			Deallocates all memory resources for a root object.
 		</div>
 
-		<h3>[method:null uncacheAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
+		<h3>[method:null uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<div>
 			Deallocates all memory resources for an action.
 		</div>

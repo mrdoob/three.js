@@ -147,8 +147,8 @@ var list = {
 			"DodecahedronBufferGeometry": "api/geometries/DodecahedronBufferGeometry",
 			"DodecahedronGeometry": "api/geometries/DodecahedronGeometry",
 			"EdgesGeometry": "api/geometries/EdgesGeometry",
-			"ExtrudeGeometry": "api/geometries/ExtrudeGeometry",
 			"ExtrudeBufferGeometry": "api/geometries/ExtrudeBufferGeometry",
+			"ExtrudeGeometry": "api/geometries/ExtrudeGeometry",
 			"IcosahedronBufferGeometry": "api/geometries/IcosahedronBufferGeometry",
 			"IcosahedronGeometry": "api/geometries/IcosahedronGeometry",
 			"LatheBufferGeometry": "api/geometries/LatheBufferGeometry",
@@ -361,7 +361,7 @@ var list = {
 		},
 
 		"Objects": {
-			"LensFlare": "examples/objects/LensFlare",
+			"Lensflare": "examples/objects/Lensflare",
 		},
 
 		"Exporters": {
@@ -386,6 +386,7 @@ var list = {
 		},
 
 		"Utils": {
+			"BufferGeometryUtils": "examples/BufferGeometryUtils",
 			"SceneUtils": "examples/utils/SceneUtils"
 		}
 
@@ -404,7 +405,6 @@ var list = {
 		},
 
 		"WebGLRenderer / Plugins": {
-			"LensFlarePlugin": "api/renderers/webgl/plugins/LensFlarePlugin",
 			"SpritePlugin": "api/renderers/webgl/plugins/SpritePlugin"
 		}
 

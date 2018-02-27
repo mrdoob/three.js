@@ -434,6 +434,10 @@ def restore_export_settings(properties, settings):
         constants.KEYFRAMES,
         constants.EXPORT_OPTIONS[constants.KEYFRAMES])
 
+    properties.option_bake_keyframes = settings.get(
+        constants.BAKE_KEYFRAMES,
+        constants.EXPORT_OPTIONS[constants.BAKE_KEYFRAMES])
+
     properties.option_frame_step = settings.get(
         constants.FRAME_STEP,
         constants.EXPORT_OPTIONS[constants.FRAME_STEP])
@@ -491,6 +495,7 @@ def set_settings(properties):
         constants.BLEND_SHAPES: properties.option_blend_shape,
         constants.ANIMATION: properties.option_animation_skeletal,
         constants.KEYFRAMES: properties.option_keyframes,
+        constants.BAKE_KEYFRAMES: properties.option_bake_keyframes,
         constants.FRAME_STEP: properties.option_frame_step,
         constants.FRAME_INDEX_AS_TIME: properties.option_frame_index_as_time,
         constants.INFLUENCES_PER_VERTEX: properties.option_influences
@@ -736,6 +741,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Export animation (keyframes)",
         default=constants.EXPORT_OPTIONS[constants.KEYFRAMES])
 
+    option_bake_keyframes = BoolProperty(
+        name="Bake keyframe animation",
+        description="Bake keyframe animation each frame step",
+        default=constants.EXPORT_OPTIONS[constants.BAKE_KEYFRAMES])
+
     option_frame_index_as_time = BoolProperty(
         name="Frame index as time",
         description="Use (original) frame index as frame time",
@@ -960,6 +970,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = box.row()
         row.prop(self.properties, 'option_keyframes')
+
+        row = box.row()
+        row.prop(self.properties, 'option_bake_keyframes')
 
         row = box.row()
         row.prop(self.properties, 'option_influences')
