@@ -563,6 +563,8 @@ Object.assign( ObjectLoader.prototype, {
 
 				}
 
+				if ( data.format !== undefined ) texture.format = data.format;
+
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
