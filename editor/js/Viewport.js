@@ -31,7 +31,7 @@ var Viewport = function ( editor ) {
 
 	for ( var i = 0; i < array.length; i += 60 ) {
 
-		for ( var j = 0; j < 12; j++ ) {
+		for ( var j = 0; j < 12; j ++ ) {
 
 			array[ i + j ] = 0.26;
 
