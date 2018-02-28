@@ -75,34 +75,5 @@ Sidebar.Settings.Controllers = function ( editor ) {
 
 	container.add( speedRow );
 
-	//focus Size
-	var size = 0.8;
-	var sizeRow = new UI.Row();
-	var focusSize = new UI.Number( size ).setRange( 0.2, 1 )
-	if ( config.getKey( 'focusSize' ) !== undefined ) {
-
-		size = config.getKey( 'focusSize' );
-		focusSize.setValue( size );
-		signals.changeFocusSize.dispatch( size );
-
-	} else {
-
-		size = 0.8;
-		focuseSize.setValue( 0.8 );
-
-	}
-
-	focusSize.onChange( function () {
-
-		size = this.value;
-		signals.changeFocusSize.dispatch( size );
-		config.setKey( 'focusSize', size );
-
-	} );
-
-	sizeRow.add( new UI.Text( "focusSize" ).setWidth( '90px' ) );
-	sizeRow.add( focusSize );
-	container.add( sizeRow );
-
 	return container
 }

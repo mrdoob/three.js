@@ -72,7 +72,6 @@ var Editor = function () {
 
 		changeCameraCtrlType: new Signal(),
 		changeWheelSpeed: new Signal(),
-		changeFocusSize: new Signal(),
 
 	};
 
@@ -257,7 +256,7 @@ Editor.prototype = {
 
 			if ( object instanceof THREE.Camera ) {
 
-				helper = new THREE.CameraHelper( object, 1 );
+				helper = new THREE.CameraHelper( object, -1 );
 
 			} else if ( object instanceof THREE.PointLight ) {
 
