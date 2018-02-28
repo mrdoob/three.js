@@ -245,10 +245,7 @@ Editor.prototype = {
 	addHelper: function () {
 
 		var geometry = new THREE.SphereBufferGeometry( 2, 4, 2 );
-		var material = new THREE.MeshBasicMaterial( {
-			color: 0xff0000,
-			visible: false
-		} );
+		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object ) {
 
@@ -256,7 +253,7 @@ Editor.prototype = {
 
 			if ( object instanceof THREE.Camera ) {
 
-				helper = new THREE.CameraHelper( object, -1 );
+				helper = new THREE.CameraHelper( object, 1 );
 
 			} else if ( object instanceof THREE.PointLight ) {
 
@@ -336,7 +333,7 @@ Editor.prototype = {
 
 		var index = this.scripts[ object.uuid ].indexOf( script );
 
-		if ( index !== -1 ) {
+		if ( index !== - 1 ) {
 
 			this.scripts[ object.uuid ].splice( index, 1 );
 

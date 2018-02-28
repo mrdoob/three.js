@@ -96,7 +96,7 @@ var Viewport = function ( editor ) {
 
 				case 'translate':
 
-					if ( !objectPositionOnDown.equals( object.position ) ) {
+					if ( ! objectPositionOnDown.equals( object.position ) ) {
 
 						editor.execute( new SetPositionCommand( object, object.position, objectPositionOnDown ) );
 
@@ -106,7 +106,7 @@ var Viewport = function ( editor ) {
 
 				case 'rotate':
 
-					if ( !objectRotationOnDown.equals( object.rotation ) ) {
+					if ( ! objectRotationOnDown.equals( object.rotation ) ) {
 
 						editor.execute( new SetRotationCommand( object, object.rotation, objectRotationOnDown ) );
 
@@ -116,7 +116,7 @@ var Viewport = function ( editor ) {
 
 				case 'scale':
 
-					if ( !objectScaleOnDown.equals( object.scale ) ) {
+					if ( ! objectScaleOnDown.equals( object.scale ) ) {
 
 						editor.execute( new SetScaleCommand( object, object.scale, objectScaleOnDown ) );
 
@@ -143,7 +143,7 @@ var Viewport = function ( editor ) {
 
 	function getIntersects( point, objects ) {
 
-		mouse.set( ( point.x * 2 ) - 1, -( point.y * 2 ) + 1 );
+		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
 
 		raycaster.setFromCamera( mouse, camera );
 
