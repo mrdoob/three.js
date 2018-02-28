@@ -11,23 +11,20 @@
 		<h1>[name]</h1>
 		<div>
 			<p>
-				There are often times when you might need to use text in your three.js application - here are
-				a couple of ways that you can do so.
+				通常情况下，您可能需要在Three.js应用程序中使用文本——这里有几种可以这样做的方法。
 			</p>
 		</div>
 
 		<h2>1. DOM + CSS</h2>
 		<div>
 			<p>
-				Using HTML is generally the easiest and fastest manner to add text. This is the method
-				used for descriptive overlays in most three.js examples.
+				使用HTML通常是添加文本的最简单和最快的方式。这是大多数Three.js示例中用于（添加）描述性覆盖（式文本）的方法。
 			</p>
-			<p>You can add content to a</p>
+			<p>你可以添加内容到一个</p>
 			<code>&lt;div id="info"&gt;Description&lt;/div&gt;</code>
 
 			<p>
-				and use CSS markup to position absolutely at a position above all others with a
-				z-index especially if you are running three.js full screen.
+				同时使用CSS标记进行绝对定位，并且设置z-index属性使其位于其他元素之上，特别是在运行Three.js全屏时。
 			</p>
 
 			<code>
@@ -45,44 +42,40 @@
 
 
 
-		<h2>2. Draw text to canvas and use as a [page:Texture]</h2>
+		<h2>2. 将文本绘制到画布上并用作为一个[page:Texture]</h2>
 		<div>
-			<p>Use this method if you wish to draw text easily on a plane in your three.js scene.</p>
+			<p>如果您希望轻松地在您的Three.js场景中的平面上绘制文本，请使用此方法。</p>
 		</div>
 
 
-		<h2>3. Create a model in your favourite 3D application and export to three.js</h2>
+		<h2>3. 在您最喜欢的3D应用程序中创建一个模型并导出到Three.js</h2>
 		<div>
-			<p>Use this method if you prefer working with your 3d applications and importing the models to three.js</p>
+			<p>如果您喜欢使用3D应用程序并将模型导入到Three.js，请使用此方法。</p>
 		</div>
 
 
 
-		<h2>4. Procedural Text Geometry</h2>
+		<h2>4. 程序文本几何图形</h2>
 		<div>
 			<p>
-				If you prefer to work purely in THREE.js or to create procedural and dynamic 3D
-				text geometries, you can create a mesh whose geometry is an instance of THREE.TextGeometry:
+				如果您喜欢单纯地在Three.js中工作，或者创建程序上的动态3D文本几何图形，你可以创建一个网格，它的几何图形是THREE.TextGeometry的一个实例：
 			</p>
 			<p>
 				<code>new THREE.TextGeometry( text, parameters );</code>
 			</p>
 			<p>
-				In order for this to work, however, your TextGeometry will need an instance of THREE.Font 
-				to be set on its "font" parameter.
+				然而，为了使这一工作有效，你的TextGeometry需要在它的“font”参数上设置一个THREE.Font的实例。
 
-				See the [page:TextGeometry] page for more info on how this can be done, descriptions of each
-				accepted parameter, and a list of the JSON fonts that come with the THREE.js distribution itself.
+				有关如何做到这一点，对每个可接受参数的描述，以及与Three.js发行版本身一起提供的JSON字体列表的更多信息，请参见TextGeometry页面。
 			</p>
 
-			<h3>Examples</h3>
+			<h3>示例</h3>
 			[example:webgl_geometry_text WebGL / geometry / text]<br />
 			[example:canvas_geometry_text canvas / geometry / text]<br />
 			[example:webgl_shadowmap WebGL / shadowmap]
 
 			<p>
-				If Typeface is down, or you want to use a font that is not there, there's a tutorial
-				with a python script for blender that allows you to export text to Three.js's JSON format:
+				如果Typeface无法使用，或者您想使用一个不存在的字体，有一个教程，其中有一个用于blender的Python脚本，它允许您将文本导出到Three.js的JSON格式：
 				[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]
 				</p>
 
