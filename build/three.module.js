@@ -4553,8 +4553,6 @@ Object.assign( Vector4.prototype, {
 */
 function WebGLRenderTarget( width, height, options ) {
 
-	this.uuid = _Math.generateUUID();
-
 	this.width = width;
 	this.height = height;
 
@@ -10244,7 +10242,6 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	}
 
-	this.uuid = _Math.generateUUID();
 	this.name = '';
 
 	this.array = array;
@@ -41518,8 +41515,6 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
-	this.uuid = _Math.generateUUID();
-
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
 	this.offset = offset;
@@ -41655,8 +41650,6 @@ Object.assign( InterleavedBufferAttribute.prototype, {
  */
 
 function InterleavedBuffer( array, stride ) {
-
-	this.uuid = _Math.generateUUID();
 
 	this.array = array;
 	this.stride = stride;

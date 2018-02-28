@@ -4559,8 +4559,6 @@
 	*/
 	function WebGLRenderTarget( width, height, options ) {
 
-		this.uuid = _Math.generateUUID();
-
 		this.width = width;
 		this.height = height;
 
@@ -10250,7 +10248,6 @@
 
 		}
 
-		this.uuid = _Math.generateUUID();
 		this.name = '';
 
 		this.array = array;
@@ -41524,8 +41521,6 @@
 
 	function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
-		this.uuid = _Math.generateUUID();
-
 		this.data = interleavedBuffer;
 		this.itemSize = itemSize;
 		this.offset = offset;
@@ -41661,8 +41656,6 @@
 	 */
 
 	function InterleavedBuffer( array, stride ) {
-
-		this.uuid = _Math.generateUUID();
 
 		this.array = array;
 		this.stride = stride;
