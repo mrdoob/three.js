@@ -9,19 +9,14 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	domElement = ( domElement !== undefined ) ? domElement : document;
 
-	this.CAMERACTRLTYPE = {
-		DEFAULT: 0,
-		MAYA: 1
-	};
 	// API
-	this.focusSize = 0.8; //right ok !!screenspace is between(-1 ,1)
-	this.cameraCtrlType = this.CAMERACTRLTYPE.DEFAULT; //default 0; maya 1;
+
 	this.enabled = true;
 	this.center = new THREE.Vector3();
 	this.panSpeed = 0.001;
 	this.zoomSpeed = 0.001;
 	this.rotationSpeed = 0.005;
-	this.wheelSpeed = 100;
+
 	// internals
 
 	var scope = this;
@@ -33,7 +28,6 @@ THREE.EditorControls = function ( object, domElement ) {
 		ZOOM: 1,
 		PAN: 2
 	};
-
 	var state = STATE.NONE;
 
 	var center = this.center;
@@ -51,56 +45,29 @@ THREE.EditorControls = function ( object, domElement ) {
 	this.focus = function ( target ) {
 
 		var box = new THREE.Box3().setFromObject( target );
-		object.lookAt( center.copy( box.getCenter() ) );
-		object.updateMatrix();
 
-		if ( scope.cameraCtrlType == scope.CAMERACTRLTYPE.MAYA ) {
-			var focusSize=scope.focusSize*2;
-			var distance = object.position.distanceTo( center );
-			var size = box.getSize().multiplyScalar( 0.5 ); //length width height
-			var c = box.getCenter(); //box pos
-			var toCamMatrix = object.matrixWorldInverse
-			
-			var worldVerters = []
-			worldVerters.push( new THREE.Vector3( c.x - size.x, c.y + size.y, c.z - size.z ) );
-			worldVerters.push( new THREE.Vector3( c.x + size.x, c.y + size.y, c.z - size.z ) );
-			worldVerters.push( new THREE.Vector3( c.x + size.x, c.y - size.y, c.z - size.z ) );
-			worldVerters.push( new THREE.Vector3( c.x - size.x, c.y - size.y, c.z - size.z ) );
-			worldVerters.push( new THREE.Vector3( c.x - size.x, c.y + size.y, c.z + size.z ) );
-			worldVerters.push( new THREE.Vector3( c.x + size.x, c.y + size.y, c.z + size.z ) );
-			worldVerters.push( new THREE.Vector3( c.x + size.x, c.y - size.y, c.z + size.z ) );
-			worldVerters.push( new THREE.Vector3( c.x - size.x, c.y - size.y, c.z + size.z ) );
+		var distance;
 
-			var camVerters = []
+		if ( box.isEmpty() === false ) {
 
-			for ( var i = 0; i < 8; i++ ) {
+			center.copy( box.getCenter() );
+			distance = box.getBoundingSphere().radius;
 
-				var pos = worldVerters[ i ].applyMatrix4( toCamMatrix ).applyMatrix4( object.projectionMatrix );
-				camVerters.push( new THREE.Vector3( pos.x, pos.y ) );
+		} else {
 
-			}
-			
-			var dis = []
-			for ( var i = 0; i < 7; i++ ) {
-				for ( var j = i + 1; j < 8; j++ ) {
-					dis.push( camVerters[ i ].distanceTo( camVerters[ j ] ) );
-				}
-			}
-			dis.sort()
-			var maxSize = dis[ dis.length - 1 ]
+			// Focusing on an Group, AmbientLight, etc
 
-			if ( Math.abs( focusSize - maxSize ) > 0.1 ) {
-
-				var delta = new THREE.Vector3( 0, 0, -1 );
-				var d = distance * ( 1 - maxSize / focusSize );
-				delta.multiplyScalar( d );
-				delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
-				object.position.add( delta );
-
-			}
+			center.setFromMatrixPosition( target.matrixWorld );
+			distance = 0.1;
 
 		}
-		
+
+		var delta = new THREE.Vector3( 0, 0, 1 );
+		delta.applyQuaternion( object.quaternion );
+		delta.multiplyScalar( distance * 4 );
+
+		object.position.copy( center ).add( delta );
+
 		scope.dispatchEvent( changeEvent );
 
 	};
@@ -168,26 +135,11 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		} else if ( event.button === 1 ) {
 
-			if ( scope.cameraCtrlType == scope.CAMERACTRLTYPE.MAYA ) {
-
-				state = STATE.PAN;
-
-			} else {
-
-				state = STATE.ZOOM;
-			}
+			state = STATE.ZOOM;
 
 		} else if ( event.button === 2 ) {
 
-			if ( scope.cameraCtrlType == scope.CAMERACTRLTYPE.MAYA ) {
-
-				state = STATE.ZOOM;
-
-			} else {
-
-				state = STATE.PAN;
-
-			}
+			state = STATE.PAN;
 
 		}
 
@@ -215,14 +167,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		} else if ( state === STATE.ZOOM ) {
 
-			if ( scope.cameraCtrlType == scope.CAMERACTRLTYPE.MAYA ) {
-
-				scope.zoom( new THREE.Vector3( 0, 0, -movementY - movementX ) );
-
-			} else {
-
-				scope.zoom( new THREE.Vector3( 0, 0, movementY - movementX ) );
-			}
+			scope.zoom( new THREE.Vector3( 0, 0, movementY ) );
 
 		} else if ( state === STATE.PAN ) {
 
@@ -251,7 +196,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		// if ( scope.enabled === false ) return;
 
-		scope.zoom( new THREE.Vector3( 0, 0, event.deltaY * scope.wheelSpeed ) );
+		scope.zoom( new THREE.Vector3( 0, 0, event.deltaY ) );
 
 	}
 
