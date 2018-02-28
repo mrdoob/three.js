@@ -1,12 +1,9 @@
-import { _Math } from '../math/Math.js';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
 function InterleavedBuffer( array, stride ) {
-
-	this.uuid = _Math.generateUUID();
 
 	this.array = array;
 	this.stride = stride;
