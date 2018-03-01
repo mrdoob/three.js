@@ -386,6 +386,7 @@ var list = {
 		},
 
 		"Utils": {
+			"BufferGeometryUtils": "examples/BufferGeometryUtils",
 			"SceneUtils": "examples/utils/SceneUtils"
 		}
 

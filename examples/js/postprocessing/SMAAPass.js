@@ -63,7 +63,7 @@ THREE.SMAAPass = function ( width, height ) {
 	this.uniformsEdges[ "resolution" ].value.set( 1 / width, 1 / height );
 
 	this.materialEdges = new THREE.ShaderMaterial( {
-		defines: THREE.SMAAShader[0].defines,
+		defines: Object.assign( {}, THREE.SMAAShader[ 0 ].defines ),
 		uniforms: this.uniformsEdges,
 		vertexShader: THREE.SMAAShader[0].vertexShader,
 		fragmentShader: THREE.SMAAShader[0].fragmentShader
@@ -79,7 +79,7 @@ THREE.SMAAPass = function ( width, height ) {
 	this.uniformsWeights[ "tSearch" ].value = this.searchTexture;
 
 	this.materialWeights = new THREE.ShaderMaterial( {
-		defines: THREE.SMAAShader[1].defines,
+		defines: Object.assign( {}, THREE.SMAAShader[ 1 ].defines ),
 		uniforms: this.uniformsWeights,
 		vertexShader: THREE.SMAAShader[1].vertexShader,
 		fragmentShader: THREE.SMAAShader[1].fragmentShader

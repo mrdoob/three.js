@@ -134,8 +134,9 @@
 
 			Each group is an object of the form:
 			<code>{ start: Integer, count: Integer, materialIndex: Integer }</code>
-			where start specifies the index of the first vertex in this draw call, count specifies
-			how many vertices are included, and materialIndex specifies the material array index to use.<br /><br />
+			where start specifies the first element in this draw call – the first vertex for non-indexed geometry,
+			otherwise the first triangle index. Count specifies how many vertices (or indices) are included, and
+			materialIndex specifies the material array index to use.<br /><br />
 
 			Use [page:.addGroup] to add groups, rather than modifying this array directly.
 		</div>

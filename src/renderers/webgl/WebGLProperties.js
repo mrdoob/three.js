@@ -4,42 +4,35 @@
 
 function WebGLProperties() {
 
-	var properties = {};
+	var properties = new WeakMap();
 
 	function get( object ) {
 
-		var uuid = object.uuid;
-		var map = properties[ uuid ];
+		if ( properties.has( object ) === false ) {
 
-		if ( map === undefined ) {
-
-			map = {};
-			properties[ uuid ] = map;
+			properties.set( object, {} );
 
 		}
 
-		return map;
+		return properties.get( object );
 
 	}
 
 	function remove( object ) {
 
-		delete properties[ object.uuid ];
+		properties.delete( object );
 
 	}
 
 	function update( object, key, value ) {
 
-		var uuid = object.uuid;
-		var map = properties[ uuid ];
-
-		map[ key ] = value;
+		properties.get( object )[ key ] = value;
 
 	}
 
 	function dispose() {
 
-		properties = {};
+		properties = new WeakMap();
 
 	}
 

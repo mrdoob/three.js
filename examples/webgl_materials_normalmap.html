@@ -133,7 +133,7 @@
 				loader = new THREE.JSONLoader();
 				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) { createScene( geometry, 100, material ) } );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

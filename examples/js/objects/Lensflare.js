@@ -35,8 +35,6 @@ THREE.Lensflare = function () {
 
 	var geometry = THREE.Lensflare.Geometry;
 
-	var shader = THREE.Lensflare.Shader;
-
 	var material1a = new THREE.RawShaderMaterial( {
 		uniforms: {
 			'scale': { value: null },

@@ -53,7 +53,7 @@
 				torus = new THREE.Mesh( new THREE.TorusGeometry( 3, 1, 16, 32 ) );
 				scene2.add( torus );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xe0e0e0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

@@ -48,23 +48,11 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/shaders/BleachBypassShader.js"></script>
-		<script src="js/shaders/ColorCorrectionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats, loader;
-
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			var mesh, materialShader;
 
@@ -81,9 +69,6 @@
 			animate();
 
 			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1200;
@@ -114,8 +99,8 @@
 
 				};
 
-				loader = new THREE.JSONLoader();
-				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) {
+				var loader = new THREE.JSONLoader();
+				loader.load( 'models/json/leeperrysmith/LeePerrySmith.json', function( geometry ) {
 
 					mesh = new THREE.Mesh( geometry, material );
 					mesh.position.y = - 50;
@@ -124,15 +109,15 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				// EVENTS
 
@@ -147,6 +132,9 @@
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
+
+				windowHalfX = width / 2;
+				windowHalfY = height / 2;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
