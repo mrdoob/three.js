@@ -26,6 +26,7 @@
 
 three.js
 ========
+[![Build Status](https://www.travis-ci.org/docschina/threejs.org.svg?branch=cn)](https://www.travis-ci.org/docschina/threejs.org)
 
 ## 翻译 ##
 
