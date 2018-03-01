@@ -10,7 +10,7 @@
 	<body>
 		<h1>[name]</h1>
 		<div>
-			<p>默认情况下，若对象通过如下方式添加到场景中，则其矩阵会自动更新</p>
+			<p>默认情况下，若对象通过如下方式添加到 scene（场景）中，则其 matrices（矩阵）会自动更新</p>
 			<code>
 var object = new THREE.Object3D();
 scene.add( object );
@@ -32,20 +32,20 @@ object.matrixAutoUpdate  = false;
 object.updateMatrix();
 		</code>
 
-		<h2>几何体</h2>
+		<h2>Geometries（几何体）</h2>
 		<div>
 			<h3>[page:BufferGeometry]</h3>
 			<div>
 				<p>
-					BufferGeometries 以 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays 类型化数组（typed arrays）] [page:BufferAttribute buffers] 存储信息（如顶点位置（vertex positions），面索引（face indices），法线（normals），颜色（colors），贴图坐标（UVs），及其他自定义属性）。一般情况下，这使得它们比普通的几何体性能更好，但代价是操作困难。
+					BufferGeometries 在[page:BufferAttribute buffers]（缓冲区）中 —— 缓冲区其实是一种 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays typed arrays ]（类型化数组）， 存储信息（如   vertex positions（顶点位置），face indices（面索引），normals（法线），colors（颜色），UVs（贴图坐标），及其他自定义属性）。一般情况下比普通的几何体性能更好，但代价是操作麻烦。
 				</p>
 				<p>
-					关于更新 BufferGeometries，最重要的是你不能调整缓冲区大小（因为调整操作的代价很高，基本相当于重新创建一个新的几何体）。但可以更新缓冲区的内容。
+					关于 BufferGeometries 的更新，最重要的是你不能调整缓冲区大小（因为调整操作的代价很高，基本相当于重新创建一个新的几何体）。但可以更新缓冲区的内容。
 				</p>
 				<p>
-					也就是说，若你知道 BufferGeometry 的某个属性会增加，比如顶点的数量，那么你应该预先分配一个足够大的缓冲区来容纳新顶点。当然，这也意味着 BufferGeometry 会有一个最大值 —— 无法创建一个能无限扩展的 BufferGeometry。
+					也就是说，若你知道 BufferGeometry 的某个属性会增加，比如顶点的数量，那么你应该预先分配一个足够大的缓冲区来容纳新顶点。当然，这也意味着 BufferGeometry 会有一个最大值 —— 无法创建一个无限大的 BufferGeometry。
 				</p>
-				<p>我们以一条能动态扩展的线段为例。通过 [page:BufferGeometry.drawRange] ，最开始先在缓冲区中分配 500 个点的空间，但仅绘制两个点。
+				<p>我们以一条能在渲染时动态延伸的线段为例。通过 [page:BufferGeometry.drawRange] ，最开始虽然在缓冲区中分配了 500 个点的空间，但仅绘制两个点。
 				</p>
 				<code>
 var MAX_POINTS = 500;
@@ -90,7 +90,7 @@ for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
 }
 				</code>
 				<p>
-					在第一次渲染后，如果你想更改渲染的 <em>点的数量</em>，则可执行以下操作：
+					在第一次渲染后，如果你想更改渲染的 <em>点的数量</em>，可执行以下操作：
 				</p>
 				<code>
 line.geometry.setDrawRange( 0, newValue );
@@ -103,10 +103,10 @@ line.geometry.attributes.position.needsUpdate = true; // 在第一次渲染后�
 				</code>
 
 				<p>
-					[link:http://jsfiddle.net/w67tzfhx/ fiddle 示例]，演示了一条带动画的线，你可以任意修改它。
+					示例 [link:http://jsfiddle.net/w67tzfhx/ fiddle example] 中展示了一条带动画的线，你可以按自己的想法修改它。
 				</p>
 
-				<h3>例子：</h3>
+				<h3>示例：</h3>
 					[example:webgl_custom_attributes WebGL / custom / attributes]<br />
 					[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
 
@@ -116,7 +116,7 @@ line.geometry.attributes.position.needsUpdate = true; // 在第一次渲染后�
 			<h3>[page:Geometry]</h3>
 			<div>
 				<p>
-					以下几个标志位控制着各种几何体属性的更新。只为需要更新的属性设置标志位，因为更新的代价较高。一旦更改缓冲区后，这些标志位会自动重置为 false。如果要继续更新缓冲区，则需要将它们设置为 true。注意，仅适用于 [page:Geometry] 而不适用于 [page:BufferGeometry]。
+					以下几个标志位控制着各种几何体属性的更新。因更新的代价较高，为需要更新的属性设置标志位即可。一旦更改缓冲区后，这些标志位会自动重置为 false。如果要保存更新的缓冲区，则应将它们设置为 true。注意，此仅适用于 [page:Geometry] 而不适用于 [page:BufferGeometry]。
 				</p>
 				<code>
 var geometry = new THREE.Geometry();
@@ -130,7 +130,7 @@ geometry.tangentsNeedUpdate = true;
 				</code>
 
 				<p>
-					在 [link:https://github.com/mrdoob/three.js/releases/tag/r66 r66] 之前的版本中，还需要为网格开启 <em>dynamic</em> 标志位（更新其内的类型化数组）：
+					在 [link:https://github.com/mrdoob/three.js/releases/tag/r66 r66] 之前的版本中，还需要为网格开启 <em>dynamic</em> 标志位（用来保存其内的类型化数组）：
 				</p>
 
 				<code>
@@ -138,7 +138,7 @@ geometry.tangentsNeedUpdate = true;
 		geometry.dynamic = true;
 				</code>
 
-				<h3>例子：</h3>
+				<h3>示例：</h3>
 					[example:webgl_geometry_dynamic WebGL / geometry / dynamic]<br />
 			</div>
 
@@ -147,27 +147,27 @@ geometry.tangentsNeedUpdate = true;
 
 
 
-		<h2>材质</h2>
+		<h2>Materials（材质）</h2>
 		<div>
-			<p>所有 uniform 值都可以任意更改（如 颜色，纹理，不透明度等），每一帧，值都会传给着色器。</p>
+			<p>所有 uniform（贴图） 的值可任意更改（如 colors（颜色），textures（纹理），opacity（不透明度） 等），每一帧，这些值都会传给 shader （着色器）。</p>
 
-			<p>GLstate 相关参数也可以随时更改（如depthTest，blending，polygonOffset等）。</p>
+			<p>GLstate 相关参数也可以随时更改（如 depthTest（深度测试），blending（混合），polygonOffset（多边形偏移） 等）。</p>
 
-			<p>flat / smooth 着色将按照法向量渲染。此时你需要重置法向量缓冲区（参见上文）。</p>
+			<p>flat / smooth 着色将按照法线渲染。此时你需要重置法线缓冲区（参见上文）。</p>
 
 			<p>在运行时，如下属性不能任意更改（一旦材质被渲染后）：</p>
 			<ul>
-				<li>uniform 数量和类型</li>
-				<li>light 的数量和类型</li>
+				<li>numbers and types of uniforms （贴图的数量和类型）</li>
+				<li>numbers and types of lights（灯光的数量和类型）</li>
 				<li>已设但非如下的属性
 					<ul>
-						<li>纹理</li>
-						<li>雾</li>
-						<li>顶点颜色</li>
-						<li>皮肤</li>
-						<li>渐变</li>
-						<li>阴影映射</li>
-						<li>alpha 测试</li>
+						<li>texture（纹理）</li>
+						<li>fog（雾）</li>
+						<li>vertex colors（顶点颜色）</li>
+						<li>skinning（皮肤）</li>
+						<li>morphing（渐变）</li>
+						<li>shadow map（阴影映射）</li>
+						<li>alpha test（alpha 测试）</li>
 					</ul>
 				</li>
 			</ul>
@@ -179,53 +179,53 @@ geometry.tangentsNeedUpdate = true;
 
 			<p>为了更平滑的体验，你可以通过使用如零强度灯光，白色纹理或零密度的雾等“假”值来在某种程度上模拟这些功能的更改。</p>
 
-			<p>你可以随意更改用于几何体分块（chunk）的材质，但是不能更改对象的分块方式（据具体的材质而定）。</p>
+			<p>你可以随意更改用于几何体 chunk（分块）的材质，但是不能更改对象的分块方式（据具体的材质而定）。</p>
 
 			<h3>I如果您想要在运行时有多种材质配置：</h3>
-			<p>若材质 / 分块（chunk）的数量比较少，你可以预先将物体先分开（例如，人的头发 / 脸 / 身体 / 上衣 / 裤子，汽车的前部 / 侧部 / 顶部 / 玻璃 / 轮胎 / 内部）。</p>
+			<p>若 materials（材质） / chunk（分块）的数量比较少，你可以预先将物体先分开（例如，人的头发 / 脸 / 身体 / 上衣 / 裤子，汽车的前部 / 侧部 / 顶部 / 玻璃 / 轮胎 / 内部）。</p>
 
-			<p>如果数量很多（例如，每个人的脸可能会是不同的），请使用另外的方案，例如使用属性 / 纹理来驱动不同的人脸外观。</p>
+			<p>如果数量很多（例如，每个人的脸可能会是不同的），请使用另外的方案，例如使用 attributes（属性） / textures（纹理）来驱动不同的人脸外观。</p>
 
-			<h3>例子：</h3>
+			<h3>示例：</h3>
 			[example:webgl_materials_cars WebGL / materials / cars]<br />
 			[example:webgl_postprocessing_dof WebGL / webgl_postprocessing / dof]
 		</div>
 
 
-		<h2>纹理</h2>
+		<h2>Textures（纹理）</h2>
 		<div>
-			<p>若图像，画布，视频和纹理更改了，则需要设置以下标志位：</p>
+			<p>若需要更改 image（图片）, canvas（画布）, video（视频）和 data（数据）纹理，则需要设置以下标志位：</p>
 			<code>
 				texture.needsUpdate = true;
 			</code>
 			<p>让渲染目标自动更新。</p>
 
-			<h3>例子：</h3>
+			<h3>示例：</h3>
 			[example:webgl_materials_video WebGL / materials / video]<br />
 			[example:webgl_rtt WebGL / rtt]
 
 		</div>
 
 
-		<h2>相机</h2>
+		<h2>Cameras（相机）</h2>
 		<div>
-			<p>相机的位置和目标会自动更新。如果你需要改变</p>
+			<p>相机的 position （坐标）和 target（目标）会自动更新。如果你需要改变</p>
 			<ul>
 				<li>
-					视区（fov）
+					fov （视区）
 				</li>
 				<li>
-					长宽比（aspect）
+					aspect（长宽比）
 				</li>
 				<li>
-					近面（near）
+					near（近面）
 				</li>
 				<li>
-					远面（far）
+					far（远面）
 				</li>
 			</ul>
 			<p>
-				那么你将需要重新计算投影矩阵：
+				那么你需要重新计算 projection matrix（投影矩阵）：
 			</p>
 			<code>
 camera.aspect = window.innerWidth / window.innerHeight;
