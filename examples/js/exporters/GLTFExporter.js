@@ -801,7 +801,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material.name ) {
+			if ( material.name !== '' ) {
 
 				gltfMaterial.name = material.name;
 
@@ -1079,7 +1079,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( camera.name ) {
+			if ( camera.name !== '' ) {
 
 				gltfCamera.name = camera.type;
 
@@ -1401,7 +1401,7 @@ THREE.GLTFExporter.prototype = {
 
 			};
 
-			if ( scene.name ) {
+			if ( scene.name !== '' ) {
 
 				gltfScene.name = scene.name;
 
