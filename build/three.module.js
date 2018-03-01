@@ -8160,13 +8160,18 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	getWorldPosition: function ( optionalTarget ) {
+	getWorldPosition: function ( target ) {
 
-		var result = optionalTarget || new Vector3();
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Object3D: .getWorldPosition() target is now required' );
+			target = new Vector3();
+
+		}
 
 		this.updateMatrixWorld( true );
 
-		return result.setFromMatrixPosition( this.matrixWorld );
+		return target.setFromMatrixPosition( this.matrixWorld );
 
 	},
 
@@ -8175,15 +8180,20 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var position = new Vector3();
 		var scale = new Vector3();
 
-		return function getWorldQuaternion( optionalTarget ) {
+		return function getWorldQuaternion( target ) {
 
-			var result = optionalTarget || new Quaternion();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldQuaternion() target is now required' );
+				target = new Quaternion();
+
+			}
 
 			this.updateMatrixWorld( true );
 
-			this.matrixWorld.decompose( position, result, scale );
+			this.matrixWorld.decompose( position, target, scale );
 
-			return result;
+			return target;
 
 		};
 
@@ -8193,13 +8203,18 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var quaternion = new Quaternion();
 
-		return function getWorldRotation( optionalTarget ) {
+		return function getWorldRotation( target ) {
 
-			var result = optionalTarget || new Euler();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldRotation() target is now required' );
+				target = new Euler();
+
+			}
 
 			this.getWorldQuaternion( quaternion );
 
-			return result.setFromQuaternion( quaternion, this.rotation.order, false );
+			return target.setFromQuaternion( quaternion, this.rotation.order, false );
 
 		};
 
@@ -8210,15 +8225,20 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var position = new Vector3();
 		var quaternion = new Quaternion();
 
-		return function getWorldScale( optionalTarget ) {
+		return function getWorldScale( target ) {
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldScale() target is now required' );
+				target = new Vector3();
+
+			}
 
 			this.updateMatrixWorld( true );
 
-			this.matrixWorld.decompose( position, quaternion, result );
+			this.matrixWorld.decompose( position, quaternion, target );
 
-			return result;
+			return target;
 
 		};
 
@@ -8228,13 +8248,18 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var quaternion = new Quaternion();
 
-		return function getWorldDirection( optionalTarget ) {
+		return function getWorldDirection( target ) {
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
+				target = new Vector3();
+
+			}
 
 			this.getWorldQuaternion( quaternion );
 
-			return result.set( 0, 0, 1 ).applyQuaternion( quaternion );
+			return target.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
 		};
 
@@ -8583,13 +8608,18 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		var quaternion = new Quaternion();
 
-		return function getWorldDirection( optionalTarget ) {
+		return function getWorldDirection( target ) {
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
+				target = new Vector3();
+
+			}
 
 			this.getWorldQuaternion( quaternion );
 
-			return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+			return target.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
 		};
 
