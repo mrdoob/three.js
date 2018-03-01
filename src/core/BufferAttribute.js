@@ -25,8 +25,6 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
 
-	this.onUploadCallback = function () {};
-
 	this.version = 0;
 
 }
@@ -44,6 +42,8 @@ Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
 Object.assign( BufferAttribute.prototype, {
 
 	isBufferAttribute: true,
+
+	onUploadCallback: function () {},
 
 	setArray: function ( array ) {
 
