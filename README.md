@@ -66,4 +66,4 @@ threejs.org 中文文档的翻译工作，由 **360 企业安全集团(360ESG) -
 - 审校：@mysisi @heymarch
 
 #### 翻译词汇表
-https://github.com/docschina/threejs.org/wiki
+https://github.com/docschina/threejs.org/wiki/%E8%A7%84%E8%8C%83%E8%AF%8D%E6%B1%87%E8%A1%A8
