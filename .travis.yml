@@ -1,0 +1,10 @@
+sudo: false
+language: node_js
+node_js:
+  - "8"
+script:
+  - npm i
+  - bash ./scripts/deploy.sh
+branches:
+  only:
+    - cn
