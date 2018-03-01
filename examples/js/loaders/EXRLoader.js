@@ -994,8 +994,6 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	console.log((endTime - startTime) + 'ms');
-
 	return {
 		header: EXRHeader,
 		width: width,
