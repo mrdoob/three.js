@@ -69,16 +69,13 @@
 		Copy the properties from the source camera into this one.
 		</div>
 
-		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 getWorldDirection]( [page:Vector3 target] )</h3>
 		<div>
-		Returns a [page:Vector3] representing the world space direction in which the camera is looking.<br /><br />
 
-		Note: This is not the camera’s positive, but its negative z-axis, in contrast to
-		[page:Object3D.getWorldDirection getWorldDirection] of the base class (Object3D).<br /><br />
+		[page:Vector3 target] — the result will be copied into this Vector3. <br /><br />
 
-		If an [page:Vector3 optionalTarget] vector is specified, the result will be copied into this vector
-		(which can be reused in this way), otherwise a new vector will be created.
-		</div>
+		Returns a [page:Vector3] representing the world space direction in which the camera is looking.
+		(Note: A camera looks down its local, negative z-axis).<br /><br />
 
 		<h2>Source</h2>
 
