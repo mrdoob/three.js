@@ -12,8 +12,6 @@ function InterleavedBuffer( array, stride ) {
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
 
-	this.onUploadCallback = function () {};
-
 	this.version = 0;
 
 }
@@ -31,6 +29,8 @@ Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
 Object.assign( InterleavedBuffer.prototype, {
 
 	isInterleavedBuffer: true,
+
+	onUploadCallback: function () {},
 
 	setArray: function ( array ) {
 
