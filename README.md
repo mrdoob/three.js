@@ -1,19 +1,5 @@
 <div align="center">
   <a href="https://docschina.org">
-
-## 翻译 ##
-
-#### 任务分配
-
-- 任务管理：@xmoyKing @hugo-seth
-  1. 标签管理
-  2. issue 子任务的根据翻译状态，修改标签
-  3. 为每个 pr 追加 reviewer
-  4. project 面板中，issue 任务状态变化后，放置对应到流程面板中
-- 分支合并：@blueyy @mysisi
-- 校对：@blueyy（其他人如果对 pr 校对感兴趣，都可以辅助 review）
-- 审校：@mysisi @heymarch
-=======
     <img width="100" src="site.png">
   </a>
   <br>
