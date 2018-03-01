@@ -10,16 +10,11 @@
 	<body>
 		<h1>[name]</h1><br />
 
-		<div>
-			本节的目标是简要介绍 three.js。我们以建立一个有旋转的立方体的场景开始。如果你有问题或需要帮助，可在页面底部看到示例。
-		</div>
-
+		<div>本节的目标是简要介绍 three.js。我们以建立一个有旋转的立方体的 scene （场景）开始。如果你有问题或需要帮助，可在页面底部看到示例。</div>
 
 		<h2>开始之前</h2>
 
-		<div>
-			在使用 three.js 之前，你需要一个显示的地方。将下面的 HTML 文件保存到你的计算机上，同时将 <a href="http://threejs.org/build/three.js">three.js</a> 文件复制到 js/ 目录下，并在浏览器中打开 HTML 文件。
-		</div>
+		<div>在使用 three.js 之前，你需要一个显示的地方。将下面的 HTML 文件保存到你的计算机上，同时将 <a href="http://threejs.org/build/three.js">three.js</a> 文件复制到 js/ 目录下，并在浏览器中打开 HTML 文件。</div>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -41,15 +36,11 @@
 		&lt;/html&gt;
 		</code>
 
-		<div>
-			如此。后面的所有代码都会写在上面的空的 &lt;script&gt; 标签中。
-		</div>
+		<div>如此。后面的所有代码都会写在上面的空的 &lt;script&gt; 标签中。</div>
 
 		<h2>创建场景</h2>
 
-		<div>
-			要通过 three.js 显示物体，我们需要三个东西：场景（scene），相机（camera）和渲染器（renderer），通过相机渲染场景。
-		</div>
+		<div>要通过 three.js 显示物体，我们需要三个东西：scene（场景），camera（相机）和 renderer（渲染器），通过相机渲染场景。</div>
 
 		<code>
 		var scene = new THREE.Scene();
@@ -60,45 +51,25 @@
 		document.body.appendChild( renderer.domElement );
 		</code>
 
-		<div>
-			花点时间解释一下发生了什么。我们已经设置了场景，相机和渲染器。
-		</div>
+		<div>花点时间解释一下发生了什么。我们已经设置了场景，相机和渲染器。</div>
 
-		<div>
-			three.js 中有几种不同的相机。现在我们用的是 <strong>PerspectiveCamera（透视相机）</strong>。
-		</div>
+		<div>three.js 中有几种不同的相机。现在我们用的是 <strong>PerspectiveCamera（透视相机）</strong>。</div>
 
-		<div>
-			第一个属性是 <strong>field of view（视场）</strong>。FOV 是指在任意时刻显示器的场景的范围。以角度为单位。
-		</div>
+		<div>第一个属性是 <strong>field of view（视场）</strong>。FOV 是指在任意时刻显示器的场景的范围。以角度为单位。</div>
 
-		<div>
-			第二个是 <strong>aspect ratio（长宽比）</strong>。一般使用元素的长宽比，否则你会发现结果如同在宽屏电视上放老电影时 —— 图像看起来像被挤压过。
-		</div>
+		<div>第二个是 <strong>aspect ratio（长宽比）</strong>。一般使用元素的长宽比，否则你会发现结果如同在宽屏电视上放老电影时 —— 图像看起来像被挤压过。</div>
 
-		<div>
-			接下来的两个属性是 <strong>near（近面）</strong> 和 <strong>far（远面）</strong>。指的是位置值大于 <strong>far</strong> 或值小于 <strong>near</strong> 的物体（离相机过远或过近）不会被渲染。现在你不用考虑这个，但你在自己的应用程序中可以使用其他值来获得更好的效果。
-		</div>
+		<div>接下来的两个属性是 <strong>near（近面）</strong> 和 <strong>far（远面）</strong>。指的是位置值大于 <strong>far</strong> 或值小于 <strong>near</strong> 的物体（离相机过远或过近）不会被渲染。现在你不用考虑这个，但你在自己的应用程序中可以使用其他值来获得更好的效果。</div>
 
-		<div>
-			接下来是渲染器。这是魔法发生的地方。除了我们在这里使用的 WebGLRenderer 之外，three.js 还有其他几种方式，其他方式通常作为降级功能，为使用老浏览器的用户或由于某些原因而无法使用 WebGL 的用户准备的。
-		</div>
+		<div>接下来是渲染器。这是魔法发生的地方。除了我们在这里使用的 WebGLRenderer 之外，three.js 还有其他几种方式，其他方式通常作为降级功能，为使用老浏览器的用户或由于某些原因而无法使用 WebGL 的用户准备的。</div>
 
-		<div>
-			创建渲染器实例之后，我们还需要设置一个大小，即应用程序显示的大小。若想要填满显示区域，则直接使用显示区域的宽高即可 —— 在这种情况下，即浏览器窗口的宽度和高度。对于性能密集型应用程序，你可以通过 <strong>setSize</strong> 设置一个较小的值，比如 <strong>window.innerWidth/2</strong> 和 <strong>window.innerHeight/2</strong>，这样能将应用程序的渲染大小缩小为一半。
-		</div>
+		<div>创建渲染器实例之后，我们还需要设置一个大小，即应用程序显示的大小。若想要填满显示区域，则直接使用显示区域的宽高即可 —— 在这种情况下，即浏览器窗口的宽度和高度。对于性能密集型应用程序，你可以通过 <strong>setSize</strong> 设置一个较小的值，比如 <strong>window.innerWidth/2</strong> 和 <strong>window.innerHeight/2</strong>，这样能将应用程序的渲染大小缩小为一半。</div>
 
-		<div>
-			如果你想保持应用程序显示的大小，但以较低的分辨率渲染它，你可以在调用 <strong>setSize</strong> 时将 <strong>updateStyle</strong>（第三个参数）设为 false。例如，<strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> 将以一半的分辨率渲染应用程序，因为你的 &lt;canvas&gt; 宽度和高度为 100%。
-		</div>
+		<div>如果你想保持应用程序显示的大小，但以较低的分辨率渲染它，你可以在调用 <strong>setSize</strong> 时将 <strong>updateStyle</strong>（第三个参数）设为 false。例如，<strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> 将以一半的分辨率渲染应用程序，因为你的 &lt;canvas&gt; 宽度和高度为 100%。</div>
 
-		<div>
-			最后同样重要的是，我们需要将 <strong>renderer</strong> 元素添加到我们的 HTML 文档中。即渲染器用来显示场景的 &lt;canvas&gt; 元素。
-		</div>
+		<div>最后同样重要的是，我们需要将 <strong>renderer</strong> 元素添加到我们的 HTML 文档中。即渲染器用来显示场景的 &lt;canvas&gt; 元素。</div>
 
-		<div>
-			<em>“没问题，但说好的那个立方体呢？” </em> 现在我们将它补上。
-		</div>
+		<div><em>“没问题，但说好的那个立方体呢？” </em> 现在我们将它补上。</div>
 
 		<code>
 		var geometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -109,27 +80,17 @@
 		camera.position.z = 5;
 		</code>
 
-		<div>
-			要创建一个立方体，我们需要一个 <strong>BoxGeometry</strong>。它是一个对象，包含了立方体所有的顶点（<strong>vertices</strong>）和填充面（<strong>faces</strong>）。后面我们会继续讨论这个。
-		</div>
+		<div>要创建一个立方体，我们需要一个 <strong>BoxGeometry</strong>。它是一个对象，包含了立方体所有的 <strong>vertices（顶点）</strong>和 <strong>faces（填充面）</strong>。后面我们会继续讨论这个。</div>
 
-		<div>
-			除了几何图形之外，我们还需要用材质来为其着色。three.js 自带了好几种材质，目前我们将使用 <strong>MeshBasicMaterial</strong>。所有材质都是一个包含了许多属性的对象。简单起见，我们就用 <strong>0x00ff00</strong> 作为颜色属性，即绿色。与 CSS 或 Photoshop（<strong>十六进制颜色</strong>）中的颜色值类似。
-		</div>
+		<div>除了几何体之外，我们还需要用 material （材质）来为其着色。three.js 自带了好几种材质，目前我们将使用 <strong>MeshBasicMaterial</strong>。所有材质都是一个包含了许多属性的对象。简单起见，我们就用 <strong>0x00ff00</strong> 作为颜色属性，即绿色。与 CSS 或 Photoshop（<strong>hex colors（十六进制颜色）</strong>）中的颜色值类似。</div>
 
-		<div>
-			我们需要做的第三件事是创建一个网格（<strong>Mesh</strong>）。网格是一个对象，该网格对象需要指定一个几何体以及一个应用到几何体上的材质。随后我们可将这个网格对象加入到我们的场景中，这样就可以在场景中随意移动这个网格对象了。
-		</div>
+		<div>我们需要做的第三件事是创建一个 <strong>Mesh（网格）</strong>。网格是一个对象，该网格对象需要指定一个几何体以及一个应用到几何体上的材质。随后我们可将这个网格对象加入到我们的场景中，这样就可以在场景中随意移动这个网格对象了。</div>
 
-		<div>
-			默认情况下，当我们调用 <strong>scene.add()</strong> 时，对象将被添加到坐标 <strong>(0,0,0)</strong> 处。这会导致相机和立方体彼此混合。要避免这种情况，我们只要将摄像头移出来一些即可。
-		</div>
+		<div>默认情况下，当我们调用 <strong>scene.add()</strong> 时，对象将被添加到坐标 <strong>(0,0,0)</strong> 处。这会导致相机和立方体彼此混合。要避免这种情况，我们只要将相机移出来一些即可。</div>
 
 		<h2>渲染场景</h2>
 
-		<div>
-			如果你将上面的代码复制到我们之前创建的 HTML 文件中，你会发现没有任何内容。因为实际上我们并没有渲染任何东西。所以，我们需要做一个所谓的 <strong>渲染或动画循环</strong> 的操作。
-		</div>
+		<div>如果你将上面的代码复制到我们之前创建的 HTML 文件中，你会发现没有任何内容。因为实际上我们并没有渲染任何东西。所以，我们需要做一个所谓的 <strong>渲染或动画循环</strong> 的操作。</div>
 
 		<code>
 		function animate() {
@@ -139,37 +100,26 @@
 		animate();
 		</code>
 
-		<div>
-			上述代码将创建一个循环，使渲染器在每次刷新屏幕时都绘制场景（若是普通屏幕，这意味着每秒会执行 60 次）。如果你是一个写网页游戏的新手，你可能会说 <em>“为什么我们不使用 setInterval？”</em> 其实 —— 我们可以用，但用 <strong>requestAnimationFrame</strong> 更好。也许，最重要的是，当用户切换到浏览器的另一个选项卡时，requestAnimationFrame 会暂停，因此不会浪费浏览器宝贵的计算资源和电量。
-		</div>
+		<div>上述代码将创建一个循环，使渲染器在每次刷新屏幕时都绘制场景（若是普通屏幕，这意味着每秒会执行 60 次）。如果你是一个写网页游戏的新手，你可能会说 <em>“为什么我们不使用 setInterval？”</em> 其实 —— 我们可以用，但用 <strong>requestAnimationFrame</strong> 更好。也许，最重要的是，当用户切换到浏览器的另一个选项卡时，requestAnimationFrame 会暂停，因此不会浪费浏览器宝贵的计算资源和电量。</div>
 
 		<h2>让立方体动起来</h2>
 
-		<div>
-			如果你将上述代码写入我们最开始创建的那个 HTML 文件中，你应该会看到一个绿方块。可以通过旋转让其变得有意思一些。
-		</div>
+		<div>如果你将上述代码写入我们最开始创建的那个 HTML 文件中，你应该会看到一个绿方块。可以通过旋转让其变得有意思一些。</div>
 
-		<div>
-			将如下代码加入到你的 <strong>animate</strong> 函数中的 <strong>renderer.render</strong> 调用之前：
-		</div>
+		<div>将如下代码加入到你的 <strong>animate</strong> 函数中的 <strong>renderer.render</strong> 调用之前：</div>
 
 		<code>
 		cube.rotation.x += 0.1;
 		cube.rotation.y += 0.1;
 		</code>
 
-		<div>
-			上面的代码每帧运行一次（通常是每秒 60 次），并给立方体加上一个很不错的旋转动画。基本上，在应用程序运行时，任何你想要的移动或改变都必须通过动画循环。当然，你可以在动画循环内调用其他函数，这样你的 <strong>animate</strong> 函数就不会太长了。
+		<div>上面的代码每帧运行一次（通常是每秒 60 次），并给立方体加上一个很不错的旋转动画。基本上，在应用程序运行时，任何你想要的移动或改变都必须通过动画循环。当然，你可以在动画循环内调用其他函数，这样你的 <strong>animate</strong> 函数就不会太长了。
 		</div>
 
 		<h2>结果</h2>
-		<div>
-			恭喜！现在你已经完成了你的第一个 three.js 应用程序。简单的说，凡事总有个开始。
-		</div>
+		<div>恭喜！现在你已经完成了你的第一个 three.js 应用程序。简单的说，凡事总有个开始。</div>
 
-		<div>
-			完整代码如下。研究一下，你会对它是如何工作的有更好的理解。
-		</div>
+		<div>完整代码如下。研究一下，你会对它是如何工作的有更好的理解。</div>
 
 		<code>
 		&lt;html&gt;
