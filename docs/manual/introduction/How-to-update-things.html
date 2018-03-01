@@ -37,15 +37,26 @@ object.updateMatrix();
 			<h3>[page:BufferGeometry]</h3>
 			<div>
 				<p>
-					BufferGeometries 在[page:BufferAttribute buffers]（缓冲区）中 —— 缓冲区其实是一种 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays typed arrays ]（类型化数组）， 存储信息（如   vertex positions（顶点位置），face indices（面索引），normals（法线），colors（颜色），UVs（贴图坐标），及其他自定义属性）。一般情况下比普通的几何体性能更好，但代价是操作麻烦。
+					BufferGeometries 在[page:BufferAttribute buffers]（缓冲区）中 —— 缓冲区其实是一种 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays typed arrays ]（类型化数组），
+					存储信息（如 vertex positions（顶点位置），face indices（面索引），normals（法线），colors（颜色），UVs（贴图坐标），及其他自定义属性）。
+					一般情况下比普通的几何体性能更好，但代价是操作麻烦。
+
+
 				</p>
 				<p>
-					关于 BufferGeometries 的更新，最重要的是你不能调整缓冲区大小（因为调整操作的代价很高，基本相当于重新创建一个新的几何体）。但可以更新缓冲区的内容。
+					关于 BufferGeometries 的更新，最重要的是你不能调整缓冲区大小（因为调整操作的代价很高，基本相当于重新创建一个新的几何体）。
+					但可以更新缓冲区的内容。
+
 				</p>
 				<p>
-					也就是说，若你知道 BufferGeometry 的某个属性会增加，比如顶点的数量，那么你应该预先分配一个足够大的缓冲区来容纳新顶点。当然，这也意味着 BufferGeometry 会有一个最大值 —— 无法创建一个无限大的 BufferGeometry。
+					也就是说，若你知道 BufferGeometry 的某个属性会增加，比如顶点的数量，那么你应该预先分配一个足够大的缓冲区来容纳新顶点。
+					当然，这也意味着 BufferGeometry 会有一个最大值 —— 无法创建一个无限大的 BufferGeometry。
+
+
 				</p>
 				<p>我们以一条能在渲染时动态延伸的线段为例。通过 [page:BufferGeometry.drawRange] ，最开始虽然在缓冲区中分配了 500 个点的空间，但仅绘制两个点。
+
+
 				</p>
 				<code>
 var MAX_POINTS = 500;
@@ -97,6 +108,7 @@ line.geometry.setDrawRange( 0, newValue );
 				</code>
 				<p>
 					在第一次渲染后，如果你想更改位置值，则需要像如下一样设置 needsUpdate 标志：
+
 				</p>
 				<code>
 line.geometry.attributes.position.needsUpdate = true; // 在第一次渲染后，必须这样设置
@@ -116,7 +128,11 @@ line.geometry.attributes.position.needsUpdate = true; // 在第一次渲染后�
 			<h3>[page:Geometry]</h3>
 			<div>
 				<p>
-					以下几个标志位控制着各种几何体属性的更新。因更新的代价较高，为需要更新的属性设置标志位即可。一旦更改缓冲区后，这些标志位会自动重置为 false。如果要保存更新的缓冲区，则应将它们设置为 true。注意，此仅适用于 [page:Geometry] 而不适用于 [page:BufferGeometry]。
+					以下几个标志位控制着各种几何体属性的更新。因更新的代价较高，为需要更新的属性设置标志位即可。
+					一旦更改缓冲区后，这些标志位会自动重置为 false。如果要保存更新的缓冲区，则应将它们设置为 true。
+					注意，此仅适用于 [page:Geometry] 而不适用于 [page:BufferGeometry]。
+
+
 				</p>
 				<code>
 var geometry = new THREE.Geometry();
@@ -131,6 +147,7 @@ geometry.tangentsNeedUpdate = true;
 
 				<p>
 					在 [link:https://github.com/mrdoob/three.js/releases/tag/r66 r66] 之前的版本中，还需要为网格开启 <em>dynamic</em> 标志位（用来保存其内的类型化数组）：
+
 				</p>
 
 				<code>
