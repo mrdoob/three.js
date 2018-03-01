@@ -10288,8 +10288,6 @@
 		this.dynamic = false;
 		this.updateRange = { offset: 0, count: - 1 };
 
-		this.onUploadCallback = function () {};
-
 		this.version = 0;
 
 	}
@@ -10307,6 +10305,8 @@
 	Object.assign( BufferAttribute.prototype, {
 
 		isBufferAttribute: true,
+
+		onUploadCallback: function () {},
 
 		setArray: function ( array ) {
 
@@ -35622,13 +35622,7 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
-	function Loader() {
-
-		this.onLoadStart = function () {};
-		this.onLoadProgress = function () {};
-		this.onLoadComplete = function () {};
-
-	}
+	function Loader() {}
 
 	Loader.Handlers = {
 
@@ -35666,6 +35660,12 @@
 	Object.assign( Loader.prototype, {
 
 		crossOrigin: undefined,
+
+		onLoadStart: function () {},
+
+		onLoadProgress: function () {},
+
+		onLoadComplete: function () {},
 
 		initMaterials: function ( materials, texturePath, crossOrigin ) {
 
@@ -41694,8 +41694,6 @@
 		this.dynamic = false;
 		this.updateRange = { offset: 0, count: - 1 };
 
-		this.onUploadCallback = function () {};
-
 		this.version = 0;
 
 	}
@@ -41713,6 +41711,8 @@
 	Object.assign( InterleavedBuffer.prototype, {
 
 		isInterleavedBuffer: true,
+
+		onUploadCallback: function () {},
 
 		setArray: function ( array ) {
 
