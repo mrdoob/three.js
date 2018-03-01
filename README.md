@@ -1,6 +1,24 @@
 <div align="center">
   <a href="https://docschina.org">
-    <img width="200" heigth="200" src="site.png">
+
+## 翻译 ##
+
+#### 任务分配
+
+- 任务管理：@xmoyKing @hugo-seth
+  1. 标签管理
+  2. issue 子任务的根据翻译状态，修改标签
+  3. 为每个 pr 追加 reviewer
+  4. project 面板中，issue 任务状态变化后，放置对应到流程面板中
+- 分支合并：@blueyy @mysisi
+- 校对：@blueyy（其他人如果对 pr 校对感兴趣，都可以辅助 review）
+- 审校：@mysisi @heymarch
+=======
+    <img width="100" src="site.png">
+  </a>
+  <br>
+  <a href="http://falcon.360es.cn">
+    <img width="100" src="skyeye.jpeg">
   </a>
 </div>
 
@@ -25,13 +43,44 @@ three.js
 
 ## 翻译 ##
 
+#### 幕后支持
+<a href="https://docschina.org">
+  <img width="180" src="site.png">
+</a>
+<a href="http://falcon.360es.cn">
+  <img width="100" src="skyeye.jpeg">
+</a>
+
+threejs.org 中文文档的翻译工作，由 **360 企业安全集团(360ESG) - 天眼可视化团队** 主导进行，关于 **天眼可视化团队** 的更多信息，可以通过这里了解 https://www.zhihu.com/question/267808191/answer/330358370 。其中，
+
+- 天眼可视化团队团队成员 **@mysisi**, **@blueyy**, **@heymarch** 提供翻译方面的专业支持
+- 天眼可视化团队团队成员 **@dear-lizhihua** 提供翻译流程方面的支持
+- **@QC-L** 提供持续集成方面的支持
+- **@lcxfs1991** 提供服务部署方面的支持
+- 还有众多积极参与其中并贡献翻译的小伙伴 **@xmoyKing**, **@Hugo-seth**, **@ASPIRATION2018**
+
+其他翻译同学的名单，按 github 的字母顺序列出如下：
+
+- ASPIRATION2018
+- blueyy
+- heymarch
+- Hugo-seth
+- mysisi
+- xmoyKing
+
 #### 任务分配
 
-- 任务管理：@xmoyKing @hugo-seth
+- 任务管理：@xmoyKing @hugo-seth @ryouaki
   1. 标签管理
   2. issue 子任务的根据翻译状态，修改标签
-  3. 为每个 pr 追加 reviewer
+  3. 为每个 pr 追加 reviewer，即所有校对者
   4. project 面板中，issue 任务状态变化后，放置对应到流程面板中
 - 分支合并：@blueyy @mysisi
-- 校对：@blueyy（其他人如果对 pr 校对感兴趣，都可以辅助 review）
-- 审校：@mysisi @heymarch
+- 校对：
+  1. 责任校对 @blueyy，具有决定权，可以直接修改提交翻译人员的 pr
+  2. 辅助校对 @ryouaki，帮助提出改进，可以在 pr 的注释中评论
+  3. 其他人如果对 pr 校对感兴趣，都可以辅助 review
+- 审校：@mysisi, @heymarch
+
+#### 翻译规范词汇表
+[规范词汇表](https://github.com/docschina/threejs.org/wiki/%E8%A7%84%E8%8C%83%E8%AF%8D%E6%B1%87%E8%A1%A8)
