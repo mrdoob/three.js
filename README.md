@@ -64,8 +64,8 @@ threejs.org 中文文档的翻译工作，由 **360 企业安全集团(360ESG) -
   4. project 面板中，issue 任务状态变化后，放置对应到流程面板中
 - 分支合并：@blueyy @mysisi
 - 校对：
-  1. 责任校对 @blueyy，具有决定权，可以直接修改提交翻译人员的 pr
-  2. 辅助校对 @ryouaki，帮助提出改进，可以在 pr 的注释中评论
+  1. 责任校对 @blueyy，具有决定权。可以直接修改提交翻译人员的 pr
+  2. 辅助校对 @ryouaki 帮助提出改进意见，@dear-lizhihua 帮助提出格式意见。可以在 pr 的注释中评论
   3. 其他人如果对 pr 校对感兴趣，都可以辅助 review
 - 审校：@mysisi, @heymarch
 
