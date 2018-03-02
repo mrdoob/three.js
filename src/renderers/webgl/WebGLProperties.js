@@ -8,13 +8,16 @@ function WebGLProperties() {
 
 	function get( object ) {
 
-		if ( properties.has( object ) === false ) {
+		var map = properties.get( object );
 
-			properties.set( object, {} );
+		if ( map === undefined ) {
+
+			map = {};
+			properties.set( object, map );
 
 		}
 
-		return properties.get( object );
+		return map;
 
 	}
 
