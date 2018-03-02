@@ -2,7 +2,6 @@ import { EventDispatcher } from '../core/EventDispatcher.js';
 import { Texture } from '../textures/Texture.js';
 import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
-import { _Math } from '../math/Math.js';
 
 /**
  * @author szimek / https://github.com/szimek/
@@ -16,8 +15,6 @@ import { _Math } from '../math/Math.js';
  * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
 */
 function WebGLRenderTarget( width, height, options ) {
-
-	this.uuid = _Math.generateUUID();
 
 	this.width = width;
 	this.height = height;
