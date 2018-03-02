@@ -95,6 +95,10 @@ function WebGLRenderList() {
 
 		}
 
+		if (group && group.renderOrder !== undefined) {
+			renderItem.renderOrder = group.renderOrder;
+		}
+
 		( material.transparent === true ? transparent : opaque ).push( renderItem );
 
 		renderItemsIndex ++;
