@@ -224,9 +224,10 @@
 				renderer.clearDepth(); // important!
 
 				renderer.setScissorTest( true );
-				renderer.setScissor( 20, 20, insetWidth, insetHeight );
 
-				renderer.setViewport( 20, 20, insetWidth, insetHeight );
+				renderer.setScissor( 20, window.innerHeight - insetHeight - 20, insetWidth, insetHeight );
+
+				renderer.setViewport( 20, window.innerHeight - insetHeight - 20, insetWidth, insetHeight );
 
 				renderer.render( scene, camera );
 
