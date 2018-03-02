@@ -65,10 +65,21 @@
 				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
 				video.play();
 
-				texture = new THREE.VideoTexture( video );
+				texture = new THREE.Texture( video );
+				texture.generateMipmaps = false;
 				texture.minFilter = THREE.NearestFilter;
 				texture.maxFilter = THREE.NearestFilter;
 				texture.format = THREE.RGBFormat;
+
+				setInterval( function () {
+
+					if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+
+						texture.needsUpdate = true;
+
+					}
+
+				}, 1000 / 24 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
