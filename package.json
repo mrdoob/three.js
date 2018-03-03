@@ -32,12 +32,13 @@
     "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
     "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"serve --port 8080\"",
-    "dev-all": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --port 8080\"", 
+    "dev-all": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"serve --port 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"serve --port 8080\"",
     "start": "npm run dev",
     "lint": "eslint src",
     "test": "npm run build-test && qunit test/unit/three.source.unit.js",
-    "editor": "electron ./editor/main.js"
+    "editor": "electron ./editor/main.js",
+    "deploy": "gh-pages -d docs"
   },
   "keywords": [
     "three",
@@ -61,6 +62,7 @@
     "rollup": "^0.55.1",
     "rollup-watch": "^4.0.0",
     "serve": "6.4.9",
-    "uglify-js": "^3.0.23"
+    "uglify-js": "^3.0.23",
+    "gh-pages": "^1.1.0"
   }
 }
