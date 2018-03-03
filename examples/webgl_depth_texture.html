@@ -63,17 +63,17 @@
 			uniform float cameraFar;
 
 
-			float readDepth (sampler2D depthSampler, vec2 coord) {
-				float fragCoordZ = texture2D(depthSampler, coord).x;
+			float readDepth( sampler2D depthSampler, vec2 coord ) {
+				float fragCoordZ = texture2D( depthSampler, coord ).x;
 				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
 				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
 			}
 
 			void main() {
-				vec3 diffuse = texture2D(tDiffuse, vUv).rgb;
-				float depth = readDepth(tDepth, vUv);
+				//vec3 diffuse = texture2D( tDiffuse, vUv ).rgb;
+				float depth = readDepth( tDepth, vUv );
 
-				gl_FragColor.rgb = vec3(depth);
+				gl_FragColor.rgb = 1.0 - vec3( depth );
 				gl_FragColor.a = 1.0;
 			}
 		</script>
@@ -128,7 +128,7 @@
 				document.body.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
-				camera.position.z = -4;
+				camera.position.z = 4;
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
@@ -161,7 +161,7 @@
 			function setupPost () {
 
 				// Setup post processing stage
-				postCamera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 				var postMaterial = new THREE.ShaderMaterial( {
 					vertexShader: document.querySelector( '#post-vert' ).textContent.trim(),
 					fragmentShader: document.querySelector( '#post-frag' ).textContent.trim(),
@@ -181,8 +181,8 @@
 
 			function setupScene () {
 
-				var diffuse = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
-				diffuse.wrapS = diffuse.wrapT = THREE.RepeatWrapping;
+				//var diffuse = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
+				//diffuse.wrapS = diffuse.wrapT = THREE.RepeatWrapping;
 
 				// Setup some geometries
 				var geometry = new THREE.TorusKnotBufferGeometry( 1, 0.3, 128, 64 );
