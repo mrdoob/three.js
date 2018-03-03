@@ -1513,7 +1513,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			material.onBeforeCompile( materialProperties.shader );
+			material.onBeforeCompile( materialProperties.shader, _this );
 
 			program = programCache.acquireProgram( material, materialProperties.shader, parameters, code );
 
