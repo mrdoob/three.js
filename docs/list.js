@@ -383,7 +383,8 @@ var list = {
 
 		"Renderers": {
 			"CanvasRenderer": "examples/renderers/CanvasRenderer",
-			"CSS3DRenderer": "examples/renderers/CSS3DRenderer"
+			"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
+			"CSS2DRenderer": "examples/renderers/CSS2DRenderer"
 		},
 
 		"Utils": {
