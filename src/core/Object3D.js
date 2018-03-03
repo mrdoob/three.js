@@ -482,27 +482,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	}(),
 
-	getWorldRotation: function () {
-
-		var quaternion = new Quaternion();
-
-		return function getWorldRotation( target ) {
-
-			if ( target === undefined ) {
-
-				console.warn( 'THREE.Object3D: .getWorldRotation() target is now required' );
-				target = new Euler();
-
-			}
-
-			this.getWorldQuaternion( quaternion );
-
-			return target.setFromQuaternion( quaternion, this.rotation.order, false );
-
-		};
-
-	}(),
-
 	getWorldScale: function () {
 
 		var position = new Vector3();
