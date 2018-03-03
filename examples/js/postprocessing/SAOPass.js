@@ -238,7 +238,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		if ( ! this.supportsDepthTextureExtension ) {
 
 			// Clear rule : far clipping plane in both RGBA and Basic encoding
-			this.renderOverride( renderer, this.depthMaterial, this.depthRenderTarget, 0xffffff, 1.0 );
+			this.renderOverride( renderer, this.depthMaterial, this.depthRenderTarget, 0x000000, 1.0 );
 
 		}
 
