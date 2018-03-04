@@ -163,17 +163,29 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	getCenter: function ( optionalTarget ) {
+	getCenter: function ( target ) {
 
-		var result = optionalTarget || new Vector3();
-		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Box3: .getCenter() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	getSize: function ( optionalTarget ) {
+	getSize: function ( target ) {
 
-		var result = optionalTarget || new Vector3();
-		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.subVectors( this.max, this.min );
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Box3: .getSize() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.subVectors( this.max, this.min );
 
 	},
 
@@ -284,14 +296,19 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	getParameter: function ( point, optionalTarget ) {
+	getParameter: function ( point, target ) {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		var result = optionalTarget || new Vector3();
+		if ( target === undefined ) {
 
-		return result.set(
+			console.warn( 'THREE.Box3: .getParameter() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return target.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
 			( point.z - this.min.z ) / ( this.max.z - this.min.z )
@@ -472,10 +489,16 @@ Object.assign( Box3.prototype, {
 
 	} )(),
 
-	clampPoint: function ( point, optionalTarget ) {
+	clampPoint: function ( point, target ) {
 
-		var result = optionalTarget || new Vector3();
-		return result.copy( point ).clamp( this.min, this.max );
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Box3: .clampPoint() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return target.copy( point ).clamp( this.min, this.max );
 
 	},
 
@@ -496,15 +519,20 @@ Object.assign( Box3.prototype, {
 
 		var v1 = new Vector3();
 
-		return function getBoundingSphere( optionalTarget ) {
+		return function getBoundingSphere( target ) {
 
-			var result = optionalTarget || new Sphere();
+			if ( target === undefined ) {
 
-			this.getCenter( result.center );
+				console.warn( 'THREE.Box3: .getBoundingSphere() target is now required' );
+				target = new Sphere();
 
-			result.radius = this.getSize( v1 ).length() * 0.5;
+			}
 
-			return result;
+			this.getCenter( target.center );
+
+			target.radius = this.getSize( v1 ).length() * 0.5;
+
+			return target;
 
 		};
 
