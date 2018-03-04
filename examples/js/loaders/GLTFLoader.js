@@ -72,6 +72,7 @@ THREE.GLTFLoader = ( function () {
 		setDRACOLoader: function ( dracoLoader ) {
 
 			this.dracoLoader = dracoLoader;
+			return this;
 
 		},
 
