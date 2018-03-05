@@ -117,5 +117,12 @@ ArrowHelper.prototype.setColor = function ( color ) {
 
 };
 
+ArrowHelper.prototype.raycast = function ( raycaster, intersects ) {
+
+	this.line.raycast( raycaster, intersects );
+	this.cone.raycast( raycaster, intersects );
+
+};
+
 
 export { ArrowHelper };
