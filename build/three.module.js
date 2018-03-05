@@ -3756,6 +3756,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 		}
 
 		var output = {
+
 			metadata: {
 				version: 4.5,
 				type: 'Texture',
@@ -3774,11 +3775,13 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			wrap: [ this.wrapS, this.wrapT ],
 
+			format: this.format,
 			minFilter: this.minFilter,
 			magFilter: this.magFilter,
 			anisotropy: this.anisotropy,
 
 			flipY: this.flipY
+
 		};
 
 		if ( this.image !== undefined ) {
@@ -4549,8 +4552,6 @@ Object.assign( Vector4.prototype, {
  * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
 */
 function WebGLRenderTarget( width, height, options ) {
-
-	this.uuid = _Math.generateUUID();
 
 	this.width = width;
 	this.height = height;
@@ -6017,7 +6018,7 @@ var cube_frag = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float
 
 var cube_vert = "varying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tvWorldPosition = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}\n";
 
-var depth_frag = "#if DEPTH_PACKING == 3200\n\tuniform float opacity;\n#endif\n#include <common>\n#include <packing>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( 1.0 );\n\t#if DEPTH_PACKING == 3200\n\t\tdiffuseColor.a = opacity;\n\t#endif\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <logdepthbuf_fragment>\n\t#if DEPTH_PACKING == 3200\n\t\tgl_FragColor = vec4( vec3( gl_FragCoord.z ), opacity );\n\t#elif DEPTH_PACKING == 3201\n\t\tgl_FragColor = packDepthToRGBA( gl_FragCoord.z );\n\t#endif\n}\n";
+var depth_frag = "#if DEPTH_PACKING == 3200\n\tuniform float opacity;\n#endif\n#include <common>\n#include <packing>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( 1.0 );\n\t#if DEPTH_PACKING == 3200\n\t\tdiffuseColor.a = opacity;\n\t#endif\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <logdepthbuf_fragment>\n\t#if DEPTH_PACKING == 3200\n\t\tgl_FragColor = vec4( vec3( 1.0 - gl_FragCoord.z ), opacity );\n\t#elif DEPTH_PACKING == 3201\n\t\tgl_FragColor = packDepthToRGBA( gl_FragCoord.z );\n\t#endif\n}\n";
 
 var depth_vert = "#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <skinbase_vertex>\n\t#ifdef USE_DISPLACEMENTMAP\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n}\n";
 
@@ -8159,13 +8160,18 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	getWorldPosition: function ( optionalTarget ) {
+	getWorldPosition: function ( target ) {
 
-		var result = optionalTarget || new Vector3();
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Object3D: .getWorldPosition() target is now required' );
+			target = new Vector3();
+
+		}
 
 		this.updateMatrixWorld( true );
 
-		return result.setFromMatrixPosition( this.matrixWorld );
+		return target.setFromMatrixPosition( this.matrixWorld );
 
 	},
 
@@ -8174,31 +8180,20 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var position = new Vector3();
 		var scale = new Vector3();
 
-		return function getWorldQuaternion( optionalTarget ) {
+		return function getWorldQuaternion( target ) {
 
-			var result = optionalTarget || new Quaternion();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldQuaternion() target is now required' );
+				target = new Quaternion();
+
+			}
 
 			this.updateMatrixWorld( true );
 
-			this.matrixWorld.decompose( position, result, scale );
+			this.matrixWorld.decompose( position, target, scale );
 
-			return result;
-
-		};
-
-	}(),
-
-	getWorldRotation: function () {
-
-		var quaternion = new Quaternion();
-
-		return function getWorldRotation( optionalTarget ) {
-
-			var result = optionalTarget || new Euler();
-
-			this.getWorldQuaternion( quaternion );
-
-			return result.setFromQuaternion( quaternion, this.rotation.order, false );
+			return target;
 
 		};
 
@@ -8209,15 +8204,20 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var position = new Vector3();
 		var quaternion = new Quaternion();
 
-		return function getWorldScale( optionalTarget ) {
+		return function getWorldScale( target ) {
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldScale() target is now required' );
+				target = new Vector3();
+
+			}
 
 			this.updateMatrixWorld( true );
 
-			this.matrixWorld.decompose( position, quaternion, result );
+			this.matrixWorld.decompose( position, quaternion, target );
 
-			return result;
+			return target;
 
 		};
 
@@ -8227,13 +8227,18 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var quaternion = new Quaternion();
 
-		return function getWorldDirection( optionalTarget ) {
+		return function getWorldDirection( target ) {
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Object3D: .getWorldDirection() target is now required' );
+				target = new Vector3();
+
+			}
 
 			this.getWorldQuaternion( quaternion );
 
-			return result.set( 0, 0, 1 ).applyQuaternion( quaternion );
+			return target.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
 		};
 
@@ -8367,6 +8372,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.castShadow === true ) object.castShadow = true;
 		if ( this.receiveShadow === true ) object.receiveShadow = true;
 		if ( this.visible === false ) object.visible = false;
+		if ( this.frustumCulled === false ) object.frustumCulled = false;
+		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
 		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
 
 		object.matrix = this.matrix.toArray();
@@ -8580,13 +8587,18 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		var quaternion = new Quaternion();
 
-		return function getWorldDirection( optionalTarget ) {
+		return function getWorldDirection( target ) {
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
+				target = new Vector3();
+
+			}
 
 			this.getWorldQuaternion( quaternion );
 
-			return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+			return target.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
 		};
 
@@ -10239,7 +10251,6 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	}
 
-	this.uuid = _Math.generateUUID();
 	this.name = '';
 
 	this.array = array;
@@ -10249,8 +10260,6 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
-
-	this.onUploadCallback = function () {};
 
 	this.version = 0;
 
@@ -10269,6 +10278,8 @@ Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
 Object.assign( BufferAttribute.prototype, {
 
 	isBufferAttribute: true,
+
+	onUploadCallback: function () {},
 
 	setArray: function ( array ) {
 
@@ -11698,7 +11709,16 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) {
+
+			offset = 0;
+
+			console.warn(
+				'THREE.BufferGeometry.merge(): Overwriting original geometry, starting at offset=0. '
+				+ 'Use BufferGeometryUtils.mergeBufferGeometries() for lossless merge.'
+			);
+
+		}
 
 		var attributes = this.attributes;
 
@@ -11788,6 +11808,15 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			}
 
 			geometry2.addAttribute( name, new BufferAttribute( array2, itemSize ) );
+
+		}
+
+		var groups = this.groups;
+
+		for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+			var group = groups[ i ];
+			geometry2.addGroup( group.start, group.count, group.materialIndex );
 
 		}
 
@@ -16908,13 +16937,16 @@ function WebGLProperties() {
 
 	function get( object ) {
 
-		if ( properties.has( object ) === false ) {
+		var map = properties.get( object );
 
-			properties.set( object, {} );
+		if ( map === undefined ) {
+
+			map = {};
+			properties.set( object, map );
 
 		}
 
-		return properties.get( object );
+		return map;
 
 	}
 
@@ -22390,7 +22422,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			material.onBeforeCompile( materialProperties.shader );
+			material.onBeforeCompile( materialProperties.shader, _this );
 
 			program = programCache.acquireProgram( material, materialProperties.shader, parameters, code );
 
@@ -35566,13 +35598,7 @@ var TYPED_ARRAYS = {
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Loader() {
-
-	this.onLoadStart = function () {};
-	this.onLoadProgress = function () {};
-	this.onLoadComplete = function () {};
-
-}
+function Loader() {}
 
 Loader.Handlers = {
 
@@ -35610,6 +35636,12 @@ Loader.Handlers = {
 Object.assign( Loader.prototype, {
 
 	crossOrigin: undefined,
+
+	onLoadStart: function () {},
+
+	onLoadProgress: function () {},
+
+	onLoadComplete: function () {},
 
 	initMaterials: function ( materials, texturePath, crossOrigin ) {
 
@@ -36992,6 +37024,8 @@ Object.assign( ObjectLoader.prototype, {
 
 				}
 
+				if ( data.format !== undefined ) texture.format = data.format;
+
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
@@ -37246,6 +37280,8 @@ Object.assign( ObjectLoader.prototype, {
 		}
 
 		if ( data.visible !== undefined ) object.visible = data.visible;
+		if ( data.frustumCulled !== undefined ) object.frustumCulled = data.frustumCulled;
+		if ( data.renderOrder !== undefined ) object.renderOrder = data.renderOrder;
 		if ( data.userData !== undefined ) object.userData = data.userData;
 
 		if ( data.children !== undefined ) {
@@ -41491,8 +41527,6 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
-	this.uuid = _Math.generateUUID();
-
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
 	this.offset = offset;
@@ -41629,16 +41663,12 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 function InterleavedBuffer( array, stride ) {
 
-	this.uuid = _Math.generateUUID();
-
 	this.array = array;
 	this.stride = stride;
 	this.count = array !== undefined ? array.length / stride : 0;
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
-
-	this.onUploadCallback = function () {};
 
 	this.version = 0;
 
@@ -41657,6 +41687,8 @@ Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
 Object.assign( InterleavedBuffer.prototype, {
 
 	isInterleavedBuffer: true,
+
+	onUploadCallback: function () {},
 
 	setArray: function ( array ) {
 
@@ -44623,6 +44655,11 @@ Object.assign( Object3D.prototype, {
 
 		console.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
 		return this.translateOnAxis( axis, distance );
+
+	},
+	getWorldRotation: function () {
+
+		console.error( 'THREE.Object3D: .getWorldRotation() has been removed. Use THREE.Object3D.getWorldQuaternion( target ) instead.' );
 
 	}
 
