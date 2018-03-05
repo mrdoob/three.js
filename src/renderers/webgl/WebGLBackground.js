@@ -72,6 +72,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 			}
 
 			boxMesh.material.uniforms.tCube.value = background;
+			boxMesh.material.map = background;
 
 			renderList.push( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
 
