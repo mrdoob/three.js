@@ -16,8 +16,7 @@
 
 	#if defined( USE_ENVMAP ) && defined( PHYSICAL ) && defined( ENVMAP_TYPE_CUBE_UV )
 
-		// TODO, replace 8 with the real maxMIPLevel
-		irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, 8 );
+		irradiance += getLightProbeIndirectIrradiance( /*lightProbe,*/ geometry, maxMipLevel );
 
 	#endif
 
