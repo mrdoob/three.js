@@ -7,9 +7,6 @@ var Config = function ( name ) {
 	var storage = {
 		'autosave': true,
 
-		'cameraCtrlType': 'Default',
-		'wheelSpeed': 100,
-
 		'theme': 'css/light.css',
 
 		'project/title': '',
@@ -29,7 +26,12 @@ var Config = function ( name ) {
 		'settings/shortcuts/rotate': 'e',
 		'settings/shortcuts/scale': 'r',
 		'settings/shortcuts/undo': 'z',
-		'settings/shortcuts/focus': 'f'
+		'settings/shortcuts/focus': 'f',
+
+		'settings/mouse/LeftBtn':0,
+		'settings/mouse/MidBtn':1,
+		'settings/mouse/RightBtn':2,
+		'settings/mouse/wheelSpeed': 100,
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

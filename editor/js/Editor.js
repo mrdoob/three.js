@@ -70,7 +70,7 @@ var Editor = function () {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		changeCameraCtrlType: new Signal(),
+		mouseConfigChanged:new Signal(),
 		changeWheelSpeed: new Signal(),
 
 	};

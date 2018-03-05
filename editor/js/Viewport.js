@@ -5,6 +5,7 @@
 var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
+	var config = editor.config;
 
 	var container = new UI.Panel();
 	container.setId( 'viewport' );
@@ -267,6 +268,7 @@ var Viewport = function ( editor ) {
 	// otherwise controls.enabled doesn't work.
 
 	var controls = new THREE.EditorControls( camera, container.dom );
+
 	controls.addEventListener( 'change', function () {
 
 		transformControls.update();
@@ -283,22 +285,18 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.changeCameraCtrlType.add( function ( value ) {
-
-		var type = controls.CAMERACTRLTYPE.DEFAULT
-		if ( value == "Maya" ) {
-
-			type = controls.CAMERACTRLTYPE.MAYA;
-
-		}
-
-		controls.cameraCtrlType = type;
-
-	} );
-
 	signals.changeWheelSpeed.add( function ( value ) {
 
 		controls.wheelSpeed = value;
+
+	} );
+
+	signals.mouseConfigChanged.add( function () {
+
+		let arr = getMouseBtnConfig();
+		for ( var i = 0; i < arr.length; i++ ) {
+			controls.stateList[ i ] = arr[ i ];
+		}
 
 	} );
 
@@ -534,10 +532,6 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.changeCameraCtrlType.add( function ( type ) {
-
-	} )
-
 	//
 
 	function render() {
@@ -554,6 +548,35 @@ var Viewport = function ( editor ) {
 		}
 
 	}
+
+	//
+
+	function getMouseBtnConfig() {
+
+		var ctrls = [ 'LeftBtn', 'MidBtn', 'RightBtn' ]
+		// var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
+		// var stateList=[0,1,2];
+		// in EditorControls
+
+		let arr = []
+		for ( var i = 0; i < ctrls.length; i++ ) {
+			let configName = 'settings/mouse/' + ctrls[ i ]
+			let v = config.getKey( configName );
+			arr.push( parseInt( v ) );
+		}
+
+		return arr;
+
+	}
+
+	//initial mouseState
+
+	signals.mouseConfigChanged.dispatch();
+
+	//initial wheelSpeed
+
+	var speed=config.getKey("settings/mouse/wheelSpeed");
+	signals.changeWheelSpeed.dispatch(speed)
 
 	return container;
 

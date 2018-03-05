@@ -9,27 +9,23 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	domElement = ( domElement !== undefined ) ? domElement : document;
 
-	this.CAMERACTRLTYPE = {
-		DEFAULT: 0,
-		MAYA: 1
-	};
 	// API
-	this.cameraCtrlType = this.CAMERACTRLTYPE.DEFAULT; //default 0; maya 1;
 	this.wheelSpeed = 100;
 	this.enabled = true;
 	this.center = new THREE.Vector3();
 	this.panSpeed = 0.001;
 	this.zoomSpeed = 0.001;
 	this.rotationSpeed = 0.005;
-
+	this.stateList=[0,1,2];
 	// internals
 
 	var scope = this;
 	var vector = new THREE.Vector3();
 
 	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
-	var state = STATE.NONE;
 
+	var state = STATE.NONE;
+	var stateList=this.stateList;
 	var center = this.center;
 	var normalMatrix = new THREE.Matrix3();
 	var pointer = new THREE.Vector2();
@@ -127,34 +123,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		if ( event.button === 0 ) {
-
-			state = STATE.ROTATE;
-
-		} else if ( event.button === 1 ) {
-
-			if ( scope.cameraCtrlType == scope.CAMERACTRLTYPE.MAYA ) {
-
-				state = STATE.PAN;
-
-			} else {
-
-				state = STATE.ZOOM;
-			}
-
-		} else if ( event.button === 2 ) {
-
-			if ( scope.cameraCtrlType == scope.CAMERACTRLTYPE.MAYA ) {
-
-				state = STATE.ZOOM;
-
-			} else {
-
-				state = STATE.PAN;
-
-			}
-
-		}
+		state=stateList[event.button]
 
 		pointerOld.set( event.clientX, event.clientY );
 
@@ -180,14 +149,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		} else if ( state === STATE.ZOOM ) {
 
-			if ( scope.cameraCtrlType == scope.CAMERACTRLTYPE.MAYA ) {
-
 				scope.zoom( new THREE.Vector3( 0, 0, - movementY - movementX ) );
-
-			} else {
-
-				scope.zoom( new THREE.Vector3( 0, 0, movementY - movementX ) );
-			}
 
 		} else if ( state === STATE.PAN ) {
 
