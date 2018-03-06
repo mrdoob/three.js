@@ -1975,7 +1975,7 @@ function WebGLRenderer( parameters ) {
 			uniforms.reflectivity.value = material.reflectivity;
 			uniforms.refractionRatio.value = material.refractionRatio;
 
-			uniforms.maxMipLevel.value = material.envMap.maxMipLevel;
+			uniforms.maxMipLevel.value = properties.get( material.envMap ).__maxMipLevel;
 
 		}
 

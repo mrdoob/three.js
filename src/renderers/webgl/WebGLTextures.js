@@ -86,7 +86,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.generateMipmap( target );
 
 		var image = Array.isArray( texture.image ) ? texture.image[ 0 ] : texture.image;
-		texture.maxMipLevel = Math.max( Math.log2( Math.max( image.width, image.height ) ), texture.maxMipLevel );
+		var textureProperties = properties.get( texture );
+		textureProperties.__maxMipLevel = Math.max( Math.log2( Math.max( image.width, image.height ) ), textureProperties.__maxMipLevel );
 
 	}
 
@@ -336,11 +337,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( ! isCompressed ) {
 
-					texture.maxMipLevel = 0;
+					textureProperties.__maxMipLevel = 0;
 
 				} else {
 
-					texture.maxMipLevel = mipmaps.length - 1;
+					textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 				}
 
@@ -533,12 +534,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				}
 
 				texture.generateMipmaps = false;
-				texture.maxMipLevel = mipmaps.length - 1;
+				textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 			} else {
 
 				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data );
-				texture.maxMipLevel = 0;
+				textureProperties.__maxMipLevel = 0;
 
 			}
 
@@ -568,7 +569,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			texture.maxMipLevel = mipmaps.length - 1;
+			textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 		} else {
 
@@ -588,12 +589,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				}
 
 				texture.generateMipmaps = false;
-				texture.maxMipLevel = mipmaps.length - 1;
+				textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 			} else {
 
 				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, image );
-				texture.maxMipLevel = 0;
+				textureProperties.__maxMipLevel = 0;
 
 			}
 
