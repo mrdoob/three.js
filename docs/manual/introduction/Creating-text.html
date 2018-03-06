@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -11,7 +12,7 @@
 		<h1>[name]</h1>
 		<div>
 			<p>
-				通常情况下，你可能需要在 three.js 应用程序中使用文本——这里有几种可以这样做的方法。
+				很多时候你可能需要在 three.js 应用程序中使用文本 —— 本篇将介绍一些常用的方法。
 				
 			</p>
 		</div>
@@ -20,7 +21,7 @@
 		<div>
 			<p>
 				使用 HTML 通常是添加文本的最简单和最快的方式。
-				这是大多数 three.js 示例中用于（添加）描述性覆盖（式文本）的方法。
+				这是大多数 three.js 示例中用于添加描述性文本的方法。
 			</p>
 			<p>你可以添加内容到一个</p>
 			<code>&lt;div id="info"&gt;Description&lt;/div&gt;</code>
@@ -47,7 +48,7 @@
 
 		<h2>2. 将文本绘制到画布上并用作为一个 [page:Texture]</h2>
 		<div>
-			<p>如果你希望轻松地在 three.js 场景中的平面上绘制文本，请使用此方法。</p>
+			<p>如果你希望简单地在 three.js 场景中的平面上绘制文本，请使用此方法。</p>
 		</div>
 
 
@@ -61,15 +62,14 @@
 		<h2>4. 程序性的文本几何图形</h2>
 		<div>
 			<p>
-				如果你喜欢单纯地使用 three.js 工作，或者创建程序性的动态3D文本几何图形，你可以创建一个网格，
-				它的几何图形是 THREE.TextGeometry 的一个实例：
+				如果你喜欢单纯地使用 three.js 工作，或者创建程序性的动态3D文本几何图形，你可以创建一个 mesh(网格)，
+				它的 geometry(图形) 是 THREE.TextGeometry 的一个实例：
 			</p>
 			<p>
 				<code>new THREE.TextGeometry( text, parameters );</code>
 			</p>
 			<p>
-				然而，为了使这一工作有效，
-				你需要在 TextGeometry 的 “font” 参数上设置一个 THREE.Font 的实例。
+				为了使其生效，需要在 TextGeometry 的 “font” 参数上设置一个 THREE.Font 的实例。
 
 				有关如何做到这一点，每个可接受参数的描述，以及与 three.js 发行版本身一起提供的 JSON 字体列表的更多信息，
 				请参见 [page:TextGeometry] 页面。
@@ -81,8 +81,8 @@
 			[example:webgl_shadowmap WebGL / shadowmap]
 
 			<p>
-				如果 Typeface 无法使用，或者你想使用一个不存在的字体，有一个教程，
-				其中有一个用于 blender 的 Python 脚本，它允许你将文本导出到 three.js 的 JSON 格式：
+				如果 Typeface 无法使用，或者你想使用的字体不存在，
+				有一个用于 blender 的 Python 脚本教程，可以将文本导出成 three.js 支持的的 JSON 格式：
 				[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]
 				</p>
 
