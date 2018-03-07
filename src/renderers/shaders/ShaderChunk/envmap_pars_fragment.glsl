@@ -15,6 +15,7 @@
 		uniform sampler2D envMap;
 	#endif
 	uniform float flipEnvMap;
+	uniform int maxMipLevel;
 
 	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( PHYSICAL )
 		uniform float refractionRatio;

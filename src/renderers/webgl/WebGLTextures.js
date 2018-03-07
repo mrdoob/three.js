@@ -81,6 +81,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function generateMipmap( texture, target ) {
+
+		_gl.generateMipmap( target );
+
+		var image = Array.isArray( texture.image ) ? texture.image[ 0 ] : texture.image;
+		var textureProperties = properties.get( texture );
+		textureProperties.__maxMipLevel = Math.max( Math.log2( Math.max( image.width, image.height ) ), textureProperties.__maxMipLevel );
+
+	}
+
 	// Fallback filters for non-power-of-2 textures
 
 	function filterFallback( f ) {
@@ -325,9 +335,19 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
+				if ( ! isCompressed ) {
+
+					textureProperties.__maxMipLevel = 0;
+
+				} else {
+
+					textureProperties.__maxMipLevel = mipmaps.length - 1;
+
+				}
+
 				if ( textureNeedsGenerateMipmaps( texture, isPowerOfTwoImage ) ) {
 
-					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+					generateMipmap( texture, _gl.TEXTURE_CUBE_MAP );
 
 				}
 
@@ -514,10 +534,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				}
 
 				texture.generateMipmaps = false;
+				textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 			} else {
 
 				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data );
+				textureProperties.__maxMipLevel = 0;
 
 			}
 
@@ -547,6 +569,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
+			textureProperties.__maxMipLevel = mipmaps.length - 1;
+
 		} else {
 
 			// regular Texture (image, video, canvas)
@@ -565,16 +589,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				}
 
 				texture.generateMipmaps = false;
+				textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 			} else {
 
 				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, image );
+				textureProperties.__maxMipLevel = 0;
 
 			}
 
 		}
 
-		if ( textureNeedsGenerateMipmaps( texture, isPowerOfTwoImage ) ) _gl.generateMipmap( _gl.TEXTURE_2D );
+		if ( textureNeedsGenerateMipmaps( texture, isPowerOfTwoImage ) ) {
+
+			generateMipmap( texture, _gl.TEXTURE_2D );
+
+		}
 
 		textureProperties.__version = texture.version;
 
@@ -754,7 +784,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+			if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) {
+
+				generateMipmap( renderTarget.texture,  _gl.TEXTURE_CUBE_MAP );
+
+			}
+
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
 		} else {
@@ -763,7 +798,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
 			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
 
-			if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) _gl.generateMipmap( _gl.TEXTURE_2D );
+			if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) {
+
+				generateMipmap( renderTarget.texture, _gl.TEXTURE_2D );
+
+			}
+
 			state.bindTexture( _gl.TEXTURE_2D, null );
 
 		}
@@ -789,7 +829,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			var webglTexture = properties.get( texture ).__webglTexture;
 
 			state.bindTexture( target, webglTexture );
-			_gl.generateMipmap( target );
+			generateMipmap( texture, target );
 			state.bindTexture( target, null );
 
 		}
