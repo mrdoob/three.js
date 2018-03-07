@@ -703,6 +703,7 @@
 		// For now just assume one model and get the preRotations from that
 		var modelNode = modelNodes[ 0 ];
 
+
 		if ( 'GeometricRotation' in modelNode ) {
 
 			var array = modelNode.GeometricRotation.value.map( THREE.Math.degToRad );
@@ -715,6 +716,12 @@
 		if ( 'GeometricTranslation' in modelNode ) {
 
 			preTransform.setPosition( new THREE.Vector3().fromArray( modelNode.GeometricTranslation.value ) );
+
+		}
+
+		if ( 'GeometricScaling' in modelNode ) {
+
+			preTransform.scale( new THREE.Vector3().fromArray( modelNode.GeometricScaling.value ) );
 
 		}
 
