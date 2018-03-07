@@ -73,11 +73,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	this.autoClear = true;
 
-	// WebGLRenderer compatibility
-
-	this.supportsVertexTextures = function () {};
-	this.setFaceCulling = function () {};
-
 	this.setClearColor = function ( color ) {
 
 		clearColor.set( color );

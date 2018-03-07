@@ -65,8 +65,6 @@ THREE.CSS3DRenderer = function () {
 
 	var isIE = /Trident/i.test( navigator.userAgent );
 
-	this.setClearColor = function () {};
-
 	this.getSize = function () {
 
 		return {
