@@ -681,6 +681,9 @@ Object.assign( ObjectLoader.prototype, {
 
 				object = new OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
 
+				if ( data.zoom !== undefined ) object.zoom = data.zoom;
+				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+
 				break;
 
 			case 'AmbientLight':
