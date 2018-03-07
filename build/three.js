@@ -19665,14 +19665,12 @@
 
 		}
 
-		function generateMipmap( texture, target ) {
+		function generateMipmap( target, texture, width, height ) {
 
 			_gl.generateMipmap( target );
 
-			// We assume images for cube map have the same size.
-			var image = Array.isArray( texture.image ) ? texture.image[ 0 ] : texture.image;
 			var textureProperties = properties.get( texture );
-			textureProperties.__maxMipLevel = Math.log2( Math.max( image.width, image.height ) );
+			textureProperties.__maxMipLevel = Math.log2( Math.max( width, height ) );
 
 		}
 
@@ -19932,7 +19930,8 @@
 
 					if ( textureNeedsGenerateMipmaps( texture, isPowerOfTwoImage ) ) {
 
-						generateMipmap( texture, _gl.TEXTURE_CUBE_MAP );
+						// We assume images for cube map have the same size.
+						generateMipmap( _gl.TEXTURE_CUBE_MAP, texture, image.width, image.height );
 
 					}
 
@@ -20187,7 +20186,7 @@
 
 			if ( textureNeedsGenerateMipmaps( texture, isPowerOfTwoImage ) ) {
 
-				generateMipmap( texture, _gl.TEXTURE_2D );
+				generateMipmap( _gl.TEXTURE_2D, texture, image.width, image.height );
 
 			}
 
@@ -20371,7 +20370,7 @@
 
 				if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) {
 
-					generateMipmap( renderTarget.texture,  _gl.TEXTURE_CUBE_MAP );
+					generateMipmap( _gl.TEXTURE_CUBE_MAP, renderTarget.texture, renderTarget.width, renderTarget.height );
 
 				}
 
@@ -20385,7 +20384,7 @@
 
 				if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) {
 
-					generateMipmap( renderTarget.texture, _gl.TEXTURE_2D );
+					generateMipmap( _gl.TEXTURE_2D, renderTarget.texture, renderTarget.width, renderTarget.height );
 
 				}
 
@@ -20414,7 +20413,7 @@
 				var webglTexture = properties.get( texture ).__webglTexture;
 
 				state.bindTexture( target, webglTexture );
-				generateMipmap( texture, target );
+				generateMipmap( target, texture, renderTarget.width, renderTarget.height );
 				state.bindTexture( target, null );
 
 			}
