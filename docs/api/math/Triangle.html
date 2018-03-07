@@ -51,10 +51,10 @@
 		<h3>[method:Float area]()</h3>
 		<div>Return the area of the triangle.</div>
 
-		<h3>[method:Vector3 barycoordFromPoint]( [param:Vector3 point], [param:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 barycoordFromPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
 		<div>
 		[page:Vector3 point] - [page:Vector3] <br />
-		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3], otherwise a new [page:Vector3] will be created.<br /><br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 		Return a [link:https://en.wikipedia.org/wiki/Barycentric_coordinate_system barycentric coordinate]
 		 from the given vector. <br/><br/>
@@ -67,10 +67,10 @@
 			Returns a new triangle with the same [page:.a a], [page:.b b] and  [page:.c c] properties as this one.
 		</div>
 
-		<h3>[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
 		<div>
 		point - [page:Vector3] <br />
-		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3], otherwise a new [page:Vector3] will be created.<br /><br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 		Returns the closest point on the triangle to [page:Vector3 point].
 		</div>
@@ -100,23 +100,23 @@
 		Determines whether or not this triangle intersects [page:Box3 box].
 		</div>
 
-		<h3>[method:Vector3 midpoint]( [param:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 midpoint]( [param:Vector3 target] )</h3>
 		<div>
-			[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3], otherwise a new [page:Vector3] will be created.<br /><br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 		Calculate the midpoint of the triangle.
 		</div>
 
-		<h3>[method:Vector3 normal]( [param:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 normal]( [param:Vector3 target] )</h3>
 		<div>
-			[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3], otherwise a new [page:Vector3] will be created.<br /><br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 		Calculate the [link:https://en.wikipedia.org/wiki/Normal_(geometry) normal vector] of the triangle.
 		</div>
 
-		<h3>[method:Plane plane]( [param:Plane optionalTarget] )</h3>
+		<h3>[method:Plane plane]( [param:Plane target] )</h3>
 		<div>
-			[page:Plane optionalTarget] - (optional) if specified, the result will be copied into this [page:Plane], otherwise a new [page:Plane] will be created.<br /><br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 		Create a [page:Plane plane] based on the triangle. .
 		</div>
