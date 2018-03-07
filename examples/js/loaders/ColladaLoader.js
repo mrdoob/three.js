@@ -3074,11 +3074,39 @@ THREE.ColladaLoader.prototype = {
 			for ( i = 0; i < skeletons.length; i ++ ) {
 
 				var skeleton = skeletons[ i ];
-				var root = getNode( skeleton );
 
-				// setup bone data for a single bone hierarchy
+				var root;
 
-				buildBoneHierarchy( root, joints, boneData );
+				if ( hasNode( skeleton ) ) {
+
+					root = getNode( skeleton );
+					buildBoneHierarchy( root, joints, boneData );
+
+				} else if ( hasVisualScene( skeleton ) ) {
+
+					// handle case where the skeleton refers to the visual scene (#13335)
+
+					var visualScene = library.visualScenes[ skeleton ];
+					var children = visualScene.children;
+
+					for ( var j = 0; j < children.length; j ++ ) {
+
+						var child = children[ j ];
+
+						if ( child.type === 'JOINT' ) {
+
+							var root = getNode( child.id );
+							buildBoneHierarchy( root, joints, boneData );
+
+						}
+
+					}
+
+				} else {
+
+					console.error( 'THREE.ColladaLoader: Unable to find root bone of skeleton with ID:', skeleton );
+
+				}
 
 			}
 
@@ -3415,6 +3443,12 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function hasNode( id ) {
+
+			return library.nodes[ id ] !== undefined;
+
+		}
+
 		function getNode( id ) {
 
 			return getBuild( library.nodes[ id ], buildNode );
@@ -3460,6 +3494,12 @@ THREE.ColladaLoader.prototype = {
 			}
 
 			return group;
+
+		}
+
+		function hasVisualScene( id ) {
+
+			return library.visualScenes[ id ] !== undefined;
 
 		}
 
