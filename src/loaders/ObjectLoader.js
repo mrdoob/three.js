@@ -136,10 +136,11 @@ Object.assign( ObjectLoader.prototype, {
 		var materials = this.parseMaterials( json.materials, textures );
 
 		var object = this.parseObject( json.object, geometries, materials );
-
+		var animations;
+		
 		if ( json.animations ) {
 
-			object.animations = this.parseAnimations( json.animations );
+			animations = this.parseAnimations( json.animations );
 
 		}
 
@@ -149,7 +150,7 @@ Object.assign( ObjectLoader.prototype, {
 
 		}
 
-		return object;
+		return animations !== undefined ? [object, animations] : [object];
 
 	},
 
