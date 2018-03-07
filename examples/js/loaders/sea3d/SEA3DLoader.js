@@ -1695,7 +1695,7 @@ THREE.SEA3D.prototype.updateTransform = function ( obj3d, sea ) {
 
 	// ignore rotation scale
 
-	obj3d.rotation.setFromRotationMatrix( THREE.SEA3D.identityMatrixScale( mtx ) );
+	obj3d.quaternion.setFromRotationMatrix( THREE.SEA3D.identityMatrixScale( mtx ) );
 
 	// optimize if is static
 

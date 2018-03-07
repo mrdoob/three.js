@@ -1989,7 +1989,7 @@
 
 			var rotation = modelNode.Lcl_Rotation.value.map( THREE.Math.degToRad );
 			rotation.push( 'ZYX' );
-			model.rotation.fromArray( rotation );
+			model.quaternion.setFromEuler( new THREE.Euler().fromArray( rotation ) );
 
 		}
 
@@ -2007,9 +2007,7 @@
 			var preRotations = new THREE.Euler().fromArray( array );
 
 			preRotations = new THREE.Quaternion().setFromEuler( preRotations );
-			var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
-			preRotations.multiply( currentRotation );
-			model.rotation.setFromQuaternion( preRotations, 'ZYX' );
+			model.quaternion.premultiply( preRotations );
 
 		}
 

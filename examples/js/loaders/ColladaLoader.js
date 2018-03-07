@@ -3696,7 +3696,7 @@ THREE.ColladaLoader.prototype = {
 
 		if ( asset.upAxis === 'Z_UP' ) {
 
-			scene.rotation.x = - Math.PI / 2;
+			scene.quaternion.setFromEuler( new THREE.Euler( - Math.PI / 2, 0, 0 ) );
 
 		}
 
