@@ -46,7 +46,6 @@
 			var camera, scene, renderer, clock, dataTexture, diffuseMap;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -58,7 +57,7 @@
 				clock = new THREE.Clock();
 
 				var loader = new THREE.TextureLoader();
-				diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
+				diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', animate );
 				diffuseMap.minFilter = THREE.LinearFilter;
 				diffuseMap.generateMipmaps = false;
 
