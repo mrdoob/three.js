@@ -97,7 +97,7 @@
 
 			}
 
-			console.log( FBXTree );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -424,7 +424,6 @@
 	// Also parse the texture map and return any textures associated with the material
 	function parseParameters( FBXTree, properties, textureMap, ID, connections ) {
 
-		console.log( properties)
 		var parameters = {};
 
 		if ( properties.BumpFactor ) {
