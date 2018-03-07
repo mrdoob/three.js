@@ -41,11 +41,10 @@
 			Transforms this sphere with the provided [page:Matrix4].
 		</div>
 
-		<h3>[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 optionalTarget] )</h3>
+		<h3>[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
 		<div>
 		[page:Vector3 point] - [page:Vector3] The point to clamp.<br />
-		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
-		otherwise a new [page:Vector3] will be created.<br /><br />
+		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 		Clamps a point within the sphere. If the point is is outside the sphere, it will clamp it to the
 		closets point on the edge of the sphere. Points already inside the sphere will not be affected.
@@ -82,11 +81,11 @@
 		Checks to see if the two spheres' centers and radii are equal.
 		</div>
 
-		<h3>[method:Box3 getBoundingBox]( [param:Box3 optionalTarget] )</h3>
+		<h3>[method:Box3 getBoundingBox]( [param:Box3 target] )</h3>
 		<div>
-			[page:Box3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Box3], otherwise a new [page:Box3] will be created.<br /><br />
+		[page:Box3 target] — the result will be copied into this Box3.<br /><br />
 
-			Returns a[link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Box] for the sphere.
+		Returns a[link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Box] for the sphere.
 		</div>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
