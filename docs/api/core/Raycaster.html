@@ -175,6 +175,9 @@
 		<p>
 		*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray passing through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to *THREE.DoubleSide*.
 		</p>
+		<p>
+		*Note* that the raycaster have a first collision filter with the *cached .boundingSphere* of a [page:Geometry Geometry] or [page:BufferGeometry BufferGeometry], which is not updated by the [page:Geometry Geometry.*NeedUpdate] or [page:BufferAttribute.needsUpdate BufferAttribute.needsUpdate] flags. Consider calling [page:Geometry Geometry.computeBoundingSphere()] or [page:BufferGeometry BufferGeometry.computeBoundingSphere()] when modifying vertices dynamically.
+		</p>
 		</div>
 
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive] )</h3>
