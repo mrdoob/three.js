@@ -1741,7 +1741,7 @@
 
 				} else {
 
-					distance = lightAttribute.FarAttenuationEnd.value / 1000;
+					distance = lightAttribute.FarAttenuationEnd.value;
 
 				}
 
