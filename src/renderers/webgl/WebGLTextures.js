@@ -85,9 +85,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		_gl.generateMipmap( target );
 
+		// We assume images for cube map have the same size.
 		var image = Array.isArray( texture.image ) ? texture.image[ 0 ] : texture.image;
 		var textureProperties = properties.get( texture );
-		textureProperties.__maxMipLevel = Math.max( Math.log2( Math.max( image.width, image.height ) ), textureProperties.__maxMipLevel );
+		textureProperties.__maxMipLevel = Math.log2( Math.max( image.width, image.height ) );
 
 	}
 
