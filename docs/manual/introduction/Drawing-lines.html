@@ -12,7 +12,7 @@
 		<div>
 			<p>
 				假设你想绘制一条线或一个圆, 而非线框 [page:Mesh].
-				首先, 需要设置 [page:WebGLRenderer renderer], [page:Scene scene] 和camera(参考 Creating a scene 章节).
+				首先, 需要设置 [page:WebGLRenderer renderer], [page:Scene scene] 和 camera (参考 Creating a scene 章节).
 			</p>
 
 			<p>代码如下：</p>
@@ -27,15 +27,15 @@ camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
 var scene = new THREE.Scene();
 			</code>
-			<p>接下来需要定义材质Material. 对于线条来说, 我们必须从 [page:LineBasicMaterial] 和 [page:LineDashedMaterial] 中二选一.代码如下：</p>
+			<p>接下来需要定义材质 Material。 对于线条来说, 我们必须从 [page:LineBasicMaterial] 和 [page:LineDashedMaterial] 中二选一。代码如下：</p>
 			<code>
-//create a blue LineBasicMaterial
+// 创建一个蓝色的 LineBasicMaterial 材质
 var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 			</code>
 
 			<p>
-				材质定义好之后, 需要一个包含顶点的 [page:Geometry] 或 [page:BufferGeometry].
-				(因为性能更优, 推荐使用BufferGeometry, 这里为了简化, 使用Geometry):
+				材质定义好之后, 需要一个包含顶点的 [page:Geometry] 或 [page:BufferGeometry]。
+				(因为性能更优, 推荐使用 BufferGeometry, 这里为了简化, 使用 Geometry):
 			</p>
 
 			<code>
@@ -45,20 +45,20 @@ geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
 geometry.vertices.push(new THREE.Vector3( 10, 0, 0) );
 			</code>
 
-			<p>请注意, 线条是在每对连续的顶点之间绘制的, 但不一定在第一个和最后一个之间有连接(即线段是非闭合的).</p>
+			<p>请注意, 线条是在每对连续的顶点之间绘制的, 但不一定在第一个和最后一个之间有连接(即线段是非闭合的)。</p>
 
-			<p>现在有了可以组成两条线的顶点和一个材质, 组合在一起即可生成一条线.</p>
+			<p>现在有了可以组成两条线的顶点和一个材质, 组合在一起即可生成一条线。</p>
 			<code>
 var line = new THREE.Line( geometry, material );
 			</code>
-			<p>最后, 将生成的线条加入到场景中并调用 [page:WebGLRenderer.render render].</p>
+			<p>最后, 将生成的线条加入到场景中并调用 [page:WebGLRenderer.render render]。</p>
 
 			<code>
 scene.add( line );
 renderer.render( scene, camera );
 			</code>
 
-			<p>现在就可以看到一个由两条蓝线组成的向上的箭头.</p>
+			<p>现在就可以看到一个由两条蓝线组成的向上的箭头。</p>
 		</div>
 	</body>
 </html>
