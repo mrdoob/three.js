@@ -350,7 +350,7 @@
 		var materialList = [];
 		var geometryList = [];
 		var objectCount = 0;
-		var geometrySize;
+		var geometrySize = new THREE.Vector3();
 		var mouse = new THREE.Vector2();
 		var scale = 1.03;
 
@@ -503,7 +503,7 @@
 			loader.load( 'models/json/suzanne_geometry.json', function ( geo ) {
 
 				geo.computeBoundingBox();
-				geometrySize = geo.boundingBox.getSize();
+				geo.boundingBox.getSize( geometrySize );
 				geometryList.push( geo );
 
 				var start = window.performance.now();
