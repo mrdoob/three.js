@@ -10,16 +10,16 @@
 	<body>
 		<h1>[name]</h1>
 
-		<h2>最佳支持的Import形式/Exporter?</h2>
+		<h2>最佳支持的 Import Format（3D 模型的格式）/ Exporter（导入器类）?</h2>
 		<div>
 TODO
 		</div>
 
-		<h2>在示例中为什么会有meta标签？</h2>
+		<h2>在示例中为什么会有 meta 标签？</h2>
 		<div>
 			<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">meta</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>viewport<span class="pl-pds">"</span></span> <span class="pl-e">content</span>=<span class="pl-s"><span class="pl-pds">"</span>width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0<span class="pl-pds">"</span></span>&gt;</pre></div>
 
-				<p>这些标签控制了viewport在移动端浏览器中的大小和缩放比例（这些浏览器中，页面内容可能会以不同于可见viewport的大小呈现）。</p>
+				<p>这些标签控制了 viewport 在移动端浏览器中的大小和缩放比例（这些浏览器中，页面内容可能会以不同于可见 viewport 的大小呈现）。</p>
 
 				<p><a href="http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html">http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html</a></p>
 
@@ -42,9 +42,9 @@ visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_f
 			[link:http://jsfiddle.net/Q4Jpu/ Example].
 		</div>
 
-		<h2>为什么我的一部分对象不可见？</h2>
+		<h2>为什么我对象的一部分不可见？</h2>
 		<div>
-			这可能是因为设置了背景剔除（face culling），面是有方向的，方向决定了哪面是正面哪面是背面。正常情况下，背景剔除会移除（不渲染）背面。 要查看这是否是您的问题，请将material的side改为THREE.DoubleSide。
+			这可能是因为设置了背景剔除（face culling），面是有方向的，方向决定了哪面是正面哪面是背面。正常情况下，背景剔除会移除（不渲染）背面。 要查看这是否是您的问题，请将 material 的 side 改为 THREE.DoubleSide。
 			<code>material.side = THREE.DoubleSide</code>
 		</div>
 	</body>
