@@ -13,7 +13,7 @@
 		<h2>概览</h2>
 
 		<div class="desc">
-			在three.js的动画系统中，你可以动画化模型的任何属性：[page:SkinnedMesh skinned and rigged model]的骨骼，
+			在 three.js 的动画系统中，你可以动画化模型的任何属性：[page:SkinnedMesh skinned and rigged model] 的骨骼，
 			[page:Geometry.morphTargets morph targets]，不同材质属性（颜色，透明度，布尔值），可见性和变换。
 			动画属性可以淡入，淡出，交叉淡入淡出和扭曲。
 			同一个对象上不同动画的权重和时间尺度可以像不同对象一样单独改变。
@@ -22,66 +22,66 @@
 
 
 
-			为了在同一个动画系统（three.js动画系统[link:https://github.com/mrdoob/three.js/issues/6881 has completely changed in 2015]请注意其中过时的信息！）中实现上述效果，
-			three.js动画系统有一个类似于Unity/Unreal 引擎4的体系。本章节简要介绍其中的主要组件以及他们是如何共同产生效果的。
+			为了在同一个动画系统（ three.js 动画系统[link:https://github.com/mrdoob/three.js/issues/6881 has completely changed in 2015]请注意其中过时的信息！）中实现上述效果，
+			three.js 动画系统有一个类似于 Unity/Unreal 引擎 4 的体系。本章节简要介绍其中的主要组件以及他们是如何共同产生效果的。
 			
 
 
 
 		</div>
 
-		<h3>动画裁剪</h3>
+		<h3>AnimationClip （动画裁剪）</h3>
 
 		<div class="desc">
 
-			如果你已经成功导入和动画操作过3D对象（无所谓这个3D对象是否有骨骼或者变形目标或两者都有）- 
-			例如，从Blender中使用[link:https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/addons/io_three Blender exporter]导出，
-			并使用[page:JSONLoader]加载到three.js场景中 - ，加载的mesh的geometry属性之一应该有一个叫做‘animations’的数组，
-			包含这个模型的[page:AnimationClip AnimationClips]（查看下述列表中的常见加载器）。<br /><br />
+			如果你已经成功导入和动画操作过 3D 对象（无所谓这个 3D 对象是否有骨骼或者变形目标或两者都有）—— 
+			例如，从 Blender 中使用 [link:https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/addons/io_three Blender exporter] 导出，
+			并使用 [page:JSONLoader] 加载到 three.js 场景中 —— ，加载的 mesh 的 geometry 属性之一应该有一个叫做 ‘animations’ 的数组，
+			包含这个模型的 [page:AnimationClip AnimationClips] （查看下述列表中的常见加载器）。<br /><br />
 
 
 			
-			每个*动画裁剪*通常包含对象某个动作的数据。如果mesh是一个字符，例如，一个动画裁剪用于漫游，第二个用于跳跃，第三个用于躲闪等等。
+			每个 *AnimationClip* 通常包含对象某个动作的数据。如果 mesh 是一个人物（或角色，原文为character），例如，一个动画裁剪用于漫游，第二个用于跳跃，第三个用于躲闪等等。
 
 
 			
 		</div>
 
-		<h3>关键帧跟踪</h3>
+		<h3>KeyFrame Tracks（关键帧跟踪）</h3>
 
 		<div class="desc">
 
-			在这样一个*动画裁剪*内部，每个动画属性的数据都保存在一个单独的[page:KeyframeTrack]中。
-			假设一个字符对象有一个[page:Skeleton skeleton]，一个关键帧可以保存在包含一些较低的手臂骨骼随着时间的位置变换的数据中，
+			在这样一个 *AnimationClip* 内部，每个动画属性的数据都保存在一个单独的 [page:KeyframeTrack] 中。
+			假设一个字符对象有一个 [page:Skeleton skeleton]，一个关键帧可以保存在包含一些较低的手臂骨骼随着时间的位置变换的数据中，
 			另一帧跟踪同一骨骼的旋转变换，第三帧跟踪其他骨骼的位置、旋转或缩放，等等。应该清楚的是，
 			一个动画裁剪可以由许多这样的关键帧跟踪组合而成。<br /><br />
 
 
 
-			假设模型有[page:Geometry.morphTargets morph targets]（例如一个变形目标展示友好的表情，另一个展示愤怒的表情），
-			每个帧包含的信息是某个变形目标的[page:Mesh.morphTargetInfluences influence]是怎样在裁剪表现间变化的。
+			假设模型有 [page:Geometry.morphTargets morph targets] （例如一个变形目标展示友好的表情，另一个展示愤怒的表情），
+			每个帧包含的信息是某个变形目标的 [page:Mesh.morphTargetInfluences influence] 是怎样在裁剪运行期间变化的。
 
 
 
 		</div>
 
-		<h3>动画混合器</h3>
+		<h3>Animation Mixer （动画混合器）</h3>
 
 		<div class="desc">
 
-			数据只是构成动画的基础 - 实际的回放是通过[page:AnimationMixer]来控制的。你可以认为动画混合器不仅是一个动画的播放器，
-			也是一个类似实际调音台硬件的模拟，他可以同时控制不同的动画，并混合和合并他们。
+			数据只是构成动画的基础 - 实际的播放是通过 [page:AnimationMixer] 来控制的。你可以认为动画混合器不仅是一个动画的播放器，
+			也是一个类似真正调音台的模拟设备，他可以同时控制不同的动画，并混合和合并他们。
 
 
 
 		</div>
 
-		<h3>动画动作</h3>
+		<h3>Animation Actions （动画动作）</h3>
 
 		<div class="desc">
 
-			*动画混合器*本身只有非常少的属性和方法，因为他可以被[page:AnimationAction AnimationActions]控制。
-			通过确认一个*动画动作*，你可以决定某个*动画裁剪*何时在混合器中播放，暂停或停止，动画裁剪必须多久重复一次，
+			*AnimationMixer* 本身只有非常少的属性和方法，因为他可以被 [page:AnimationAction AnimationActions] 控制。
+			通过确认一个 *AnimationClip*，你可以决定某个 *AnimationClip* 何时在混合器中播放，暂停或停止，动画裁剪必须多久重复一次，
 			是否应该通过渐变或时间比例来展现，以及一些其他的事情，例如交叉渐变或同步。
 
 
@@ -89,20 +89,20 @@
 			
 		</div>
 
-		<h3>动画对象组</h3>
+		<h3>Animation Object Groups （动画对象组）</h3>
 
 		<div class="desc">
 
-			如果你想要对对象分组以便接受一个共同的动画状态，可查看这一章节
+			如果你想让一组对象能使用一个共享动画状态，可以使用
 			[page:AnimationObjectGroup].
 
 		</div>
 
-		<h3>支持的形式和加载器</h3>
+		<h3>支持的格式和加载器</h3>
 
 		<div class="desc">
-			需要注意的是，不是所有的模型格式都包含动画（OBJ即显然不支持），
-			只有一些three.js加载器支持[page:AnimationClip AnimationClip]序列。一些<i>确实</i>支持这些动画类型：
+			需要注意的是，不是所有的模型格式都包含动画（ OBJ 即显然不支持），
+			只有一些 three.js 加载器支持 [page:AnimationClip AnimationClip] 序列。<i>确定</i>支持该动画类型的有：
 
 		</div>
 
@@ -118,7 +118,7 @@
 			</ul>
 
 		<div class="desc">
-			需要注意的是，3ds max和Maya当前还不能导出多个动画（即不在同一个时间线上的动画）到一个单独的文件中。
+			需要注意的是，3ds max 和 Maya 当前还不能导出多重动画（即动画不在同一个时间线上）到一个单独的文件中。
 
 		</div>
 
