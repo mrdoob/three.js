@@ -584,14 +584,10 @@ var Loader = function ( editor ) {
 
 	function isGltf1( contents ) {
 
+		var contentType = typeof contents;
 		var resultContent;
 
-		if ( typeof contents === 'string' ) {
-
-			// contents is a JSON string
-			resultContent = contents;
-
-		} else {
+		if( contentType !== 'string' ) {
 
 			var magic = THREE.LoaderUtils.decodeText( new Uint8Array( contents, 0, 4 ) );
 
@@ -609,6 +605,11 @@ var Loader = function ( editor ) {
 				resultContent = THREE.LoaderUtils.decodeText( new Uint8Array( contents ) );
 
 			}
+
+		} else {
+
+			// contents is a JSON string
+			resultContent = contents;
 
 		}
 
