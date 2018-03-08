@@ -162,10 +162,9 @@ var color = new THREE.Color( 1, 0, 0 );
 		<h3>[method:String getHexString]()</h3>
 		<div>Returns the hexadecimal value of this color as a string (for example, 'FFFFFF').</div>
 
-		<h3>[method:Object getHSL]( [param:Object optionalTarget] )</h3>
+		<h3>[method:Object getHSL]( [param:Object target] )</h3>
 		<div>
-			[page:Object optionalTarget] — (optional) if specified, adds h, s and l keys to the object (if not already present)
-			and sets the results there. Otherwise, a new Object will be created. <br /><br />
+			[page:Object target] — the result will be copied into this Object. Adds h, s and l keys to the object (if not already present).<br /><br />
 
 			Convert this Color's [page:.r r], [page:.g g] and [page:.b b] values to [link:https://en.wikipedia.org/wiki/HSL_and_HSV HSL]
 			format and returns an object of the form:
