@@ -141,11 +141,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var uvC = new Vector2();
 
 		var barycoord = new Vector3();
-		var triangle = new Triangle();
 
 		var intersectionPoint = new Vector3();
 		var intersectionPointWorld = new Vector3();
-		var faceNormal = new Vector3();
 
 		function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3 ) {
 
@@ -213,9 +211,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				}
 
 				var face = new Face3( a, b, c );
-
-				triangle.set( vA, vB, vC ).normal( faceNormal );
-				face.normal.copy( faceNormal );
+				Triangle.normal( vA, vB, vC, face.normal );
 
 				intersection.face = face;
 				intersection.faceIndex = a;
