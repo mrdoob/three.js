@@ -1642,7 +1642,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 									if ( ! material.technique ) break;
 
-									var parameters = json.techniques[ material.technique ].parameters;
+									var parameters = json.techniques[ material.technique ].parameters || {};
 
 									for( var attributeName in parameters ) {
 
