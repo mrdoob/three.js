@@ -598,10 +598,9 @@ var Loader = function ( editor ) {
 			if ( magic === 'glTF' ) {
 
 				// contents is a .glb file; extract the version
-				var u32bytes = new Uint8Array( contents, 4, 4 );
-				var versionNumber = new Uint32Array(u32bytes)[0];
+				var version = new DataView( contents ).getUint32( 4, true );
 
-				return ( versionNumber < 2 );
+				return version < 2;
 
 			} else {
 

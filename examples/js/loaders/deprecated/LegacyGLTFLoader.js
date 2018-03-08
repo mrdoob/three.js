@@ -1636,23 +1636,19 @@ THREE.LegacyGLTFLoader = ( function () {
 
 								default:
 
-									if ( primitive.material ) {
+									if ( ! primitive.material ) break;
 
-										var material = json.materials[ primitive.material ];
+									var material = json.materials[ primitive.material ];
 
-										if ( material.technique ) {
+									if ( ! material.technique ) break;
 
-											var parameters = json.techniques[ material.technique ].parameters;
+									var parameters = json.techniques[ material.technique ].parameters;
 
-											for( var attributeName in parameters ) {
+									for( var attributeName in parameters ) {
 
-												if ( parameters [ attributeName ][ 'semantic' ] === attributeId ) {
+										if ( parameters [ attributeName ][ 'semantic' ] === attributeId ) {
 
-													geometry.addAttribute( attributeName, bufferAttribute );
-
-												}
-
-											}
+											geometry.addAttribute( attributeName, bufferAttribute );
 
 										}
 
