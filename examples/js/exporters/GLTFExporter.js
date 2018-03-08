@@ -131,38 +131,69 @@ THREE.GLTFExporter.prototype = {
 		/**
 		 * Converts a string to an ArrayBuffer.
 		 * @param  {string} text
+		 * @param  {Boolean} padded
 		 * @return {ArrayBuffer}
 		 */
 		function stringToArrayBuffer( text, padded ) {
-			if ( padded ) {
 
-				var pad = getPaddedBufferSize( text.length ) - text.length;
-
-				for ( var i = 0; i < pad; i++ ) {
-
-					text += ' ';
-
-				}
-
-			}
+			var spaceCode = ' '.charCodeAt( 0 );
 
 			if ( window.TextEncoder !== undefined ) {
 
-				return new TextEncoder().encode( text ).buffer;
+				var view = new TextEncoder().encode( text );
+
+				if ( ! padded || ( view.length % 4 ) === 0 ) return view.buffer;
+
+				var view2 = new Uint8Array( new ArrayBuffer( getPaddedBufferSize( view.length ) ) );
+
+				for ( var i = 0, il = view.length; i < il; i ++ ) {
+
+					view2[ i ] = view[ i ];
+
+				}
+
+				// pad with space
+				for ( var i = view.length, il = view2.length; i < il; i ++ ) {
+
+					view2[ i ] = spaceCode;
+
+				}
+
+				return view2.buffer;
+
+			} else {
+
+				var length = padded ? getPaddedBufferSize( text.length ) : text.length;
+
+				var view = new Uint8Array( new ArrayBuffer( length ) );
+
+				for ( var i = 0, il = text.length; i < il; i ++ ) {
+
+					var value = text.charCodeAt( i );
+
+					if ( value > 0xFF ) {
+
+						// replace multi-byte string with space
+						view[ i ] = spaceCode;
+
+					} else {
+
+						view[ i ] = value;
+
+					}
+
+				}
+
+				// pad with space
+				for ( var i = text.length; i < length; i ++ ) {
+
+					view[ i ] = spaceCode;
+
+				}
+
+				return view.buffer;
 
 			}
-
-			var buffer = new ArrayBuffer( text.length );
-
-			var bufferView = new Uint8Array( buffer );
-
-			for ( var i = 0; i < text.length; ++ i ) {
-
-				bufferView[ i ] = text.charCodeAt( i );
-
-			}
-
-			return buffer;
 
 		}
 
