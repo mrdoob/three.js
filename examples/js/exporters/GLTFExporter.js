@@ -264,11 +264,11 @@ THREE.GLTFExporter.prototype = {
 
 			var paddedLength = getPaddedBufferSize( arrayBuffer.byteLength );
 
-			if (paddedLength !== arrayBuffer.byteLength ) {
+			if ( paddedLength !== arrayBuffer.byteLength ) {
 
-				var paddedBuffer = new ArrayBuffer( paddedLength );
-				new Uint8Array( paddedBuffer ).set(new Uint8Array(arrayBuffer));
-				return paddedBuffer;
+				var array = new Uint8Array( paddedLength );
+				array.set( new Uint8Array( arrayBuffer ) );
+				return array.buffer;
 
 			}
 
