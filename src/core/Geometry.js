@@ -809,7 +809,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		mesh.matrixAutoUpdate && mesh.updateMatrix();
+		if ( mesh.matrixAutoUpdate ) mesh.updateMatrix();
 
 		this.merge( mesh.geometry, mesh.matrix );
 
