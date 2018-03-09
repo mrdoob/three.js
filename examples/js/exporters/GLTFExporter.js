@@ -102,8 +102,8 @@ THREE.GLTFExporter.prototype = {
 		var skins = [];
 		var cachedData = {
 
-			materials: {},
-			textures: {}
+			materials: new Map(),
+			textures: new Map()
 
 		};
 
@@ -593,9 +593,9 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processTexture( map ) {
 
-			if ( cachedData.textures[ map.uuid ] !== undefined ) {
+			if ( cachedData.textures.has( map ) ) {
 
-				return cachedData.textures[ map.uuid ];
+				return cachedData.textures.get( map );
 
 			}
 
@@ -615,7 +615,7 @@ THREE.GLTFExporter.prototype = {
 			outputJSON.textures.push( gltfTexture );
 
 			var index = outputJSON.textures.length - 1;
-			cachedData.textures[ map.uuid ] = index;
+			cachedData.textures.set( map, index );
 
 			return index;
 
@@ -628,9 +628,9 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMaterial( material ) {
 
-			if ( cachedData.materials[ material.uuid ] !== undefined ) {
+			if ( cachedData.materials.has( material ) ) {
 
-				return cachedData.materials[ material.uuid ];
+				return cachedData.materials.get( material );
 
 			}
 
@@ -810,7 +810,7 @@ THREE.GLTFExporter.prototype = {
 			outputJSON.materials.push( gltfMaterial );
 
 			var index = outputJSON.materials.length - 1;
-			cachedData.materials[ material.uuid ] = index;
+			cachedData.materials.set( material, index );
 
 			return index;
 
