@@ -17,15 +17,15 @@ function Triangle( a, b, c ) {
 
 Object.assign( Triangle, {
 
-	normal: function () {
+	getNormal: function () {
 
 		var v0 = new Vector3();
 
-		return function normal( a, b, c, target ) {
+		return function getNormal( a, b, c, target ) {
 
 			if ( target === undefined ) {
 
-				console.warn( 'THREE.Triangle: .normal() target is now required' );
+				console.warn( 'THREE.Triangle: .getNormal() target is now required' );
 				target = new Vector3();
 
 			}
@@ -49,13 +49,13 @@ Object.assign( Triangle, {
 
 	// static/instance method to calculate barycentric coordinates
 	// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-	barycoordFromPoint: function () {
+	getBarycoord: function () {
 
 		var v0 = new Vector3();
 		var v1 = new Vector3();
 		var v2 = new Vector3();
 
-		return function barycoordFromPoint( point, a, b, c, target ) {
+		return function getBarycoord( point, a, b, c, target ) {
 
 			v0.subVectors( c, a );
 			v1.subVectors( b, a );
@@ -71,7 +71,7 @@ Object.assign( Triangle, {
 
 			if ( target === undefined ) {
 
-				console.warn( 'THREE.Triangle: .barycoordFromPoint() target is now required' );
+				console.warn( 'THREE.Triangle: .getBarycoord() target is now required' );
 				target = new Vector3();
 
 			}
@@ -102,7 +102,7 @@ Object.assign( Triangle, {
 
 		return function containsPoint( point, a, b, c ) {
 
-			Triangle.barycoordFromPoint( point, a, b, c, v1 );
+			Triangle.getBarycoord( point, a, b, c, v1 );
 
 			return ( v1.x >= 0 ) && ( v1.y >= 0 ) && ( ( v1.x + v1.y ) <= 1 );
 
@@ -150,12 +150,12 @@ Object.assign( Triangle.prototype, {
 
 	},
 
-	area: function () {
+	getArea: function () {
 
 		var v0 = new Vector3();
 		var v1 = new Vector3();
 
-		return function area() {
+		return function getArea() {
 
 			v0.subVectors( this.c, this.b );
 			v1.subVectors( this.a, this.b );
@@ -166,11 +166,11 @@ Object.assign( Triangle.prototype, {
 
 	}(),
 
-	midpoint: function ( target ) {
+	getMidpoint: function ( target ) {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Triangle: .midpoint() target is now required' );
+			console.warn( 'THREE.Triangle: .getMidpoint() target is now required' );
 			target = new Vector3();
 
 		}
@@ -179,17 +179,17 @@ Object.assign( Triangle.prototype, {
 
 	},
 
-	normal: function ( target ) {
+	getNormal: function ( target ) {
 
-		return Triangle.normal( this.a, this.b, this.c, target );
+		return Triangle.getNormal( this.a, this.b, this.c, target );
 
 	},
 
-	plane: function ( target ) {
+	getPlane: function ( target ) {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Triangle: .plane() target is now required' );
+			console.warn( 'THREE.Triangle: .getPlane() target is now required' );
 			target = new Vector3();
 
 		}
@@ -198,9 +198,9 @@ Object.assign( Triangle.prototype, {
 
 	},
 
-	barycoordFromPoint: function ( point, target ) {
+	getBarycoord: function ( point, target ) {
 
-		return Triangle.barycoordFromPoint( point, this.a, this.b, this.c, target );
+		return Triangle.getBarycoord( point, this.a, this.b, this.c, target );
 
 	},
 
