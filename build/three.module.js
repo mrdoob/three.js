@@ -6644,11 +6644,16 @@ Object.assign( Color.prototype, {
 
 	},
 
-	getHSL: function ( optionalTarget ) {
+	getHSL: function ( target ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		var hsl = optionalTarget || { h: 0, s: 0, l: 0 };
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Color: .getHSL() target is now required' );
+			target = { h: 0, s: 0, l: 0 };
+
+		}
 
 		var r = this.r, g = this.g, b = this.b;
 
@@ -6681,11 +6686,11 @@ Object.assign( Color.prototype, {
 
 		}
 
-		hsl.h = hue;
-		hsl.s = saturation;
-		hsl.l = lightness;
+		target.h = hue;
+		target.s = saturation;
+		target.l = lightness;
 
-		return hsl;
+		return target;
 
 	},
 
@@ -6695,17 +6700,23 @@ Object.assign( Color.prototype, {
 
 	},
 
-	offsetHSL: function ( h, s, l ) {
+	offsetHSL: function () {
 
-		var hsl = this.getHSL();
+		var hsl = {};
 
-		hsl.h += h; hsl.s += s; hsl.l += l;
+		return function ( h, s, l ) {
 
-		this.setHSL( hsl.h, hsl.s, hsl.l );
+			this.getHSL( hsl );
 
-		return this;
+			hsl.h += h; hsl.s += s; hsl.l += l;
 
-	},
+			this.setHSL( hsl.h, hsl.s, hsl.l );
+
+			return this;
+
+		};
+
+	}(),
 
 	add: function ( color ) {
 
@@ -9216,15 +9227,21 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	center: function () {
 
-		this.computeBoundingBox();
+		var offset = new Vector3();
 
-		var offset = this.boundingBox.getCenter().negate();
+		return function center() {
 
-		this.translate( offset.x, offset.y, offset.z );
+			this.computeBoundingBox();
 
-		return offset;
+			this.boundingBox.getCenter( offset ).negate();
 
-	},
+			this.translate( offset.x, offset.y, offset.z );
+
+			return this;
+
+		};
+
+	}(),
 
 	normalize: function () {
 
@@ -9671,7 +9688,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		mesh.matrixAutoUpdate && mesh.updateMatrix();
+		if ( mesh.matrixAutoUpdate ) mesh.updateMatrix();
 
 		this.merge( mesh.geometry, mesh.matrix );
 
@@ -11247,15 +11264,21 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	center: function () {
 
-		this.computeBoundingBox();
+		var offset = new Vector3();
 
-		var offset = this.boundingBox.getCenter().negate();
+		return function center() {
 
-		this.translate( offset.x, offset.y, offset.z );
+			this.computeBoundingBox();
 
-		return offset;
+			this.boundingBox.getCenter( offset ).negate();
 
-	},
+			this.translate( offset.x, offset.y, offset.z );
+
+			return this;
+
+		};
+
+	}(),
 
 	setFromObject: function ( object ) {
 
@@ -13724,22 +13747,27 @@ Object.assign( Triangle, {
 
 		var v0 = new Vector3();
 
-		return function normal( a, b, c, optionalTarget ) {
+		return function normal( a, b, c, target ) {
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
 
-			result.subVectors( c, b );
-			v0.subVectors( a, b );
-			result.cross( v0 );
-
-			var resultLengthSq = result.lengthSq();
-			if ( resultLengthSq > 0 ) {
-
-				return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
+				console.warn( 'THREE.Triangle: .normal() target is now required' );
+				target = new Vector3();
 
 			}
 
-			return result.set( 0, 0, 0 );
+			target.subVectors( c, b );
+			v0.subVectors( a, b );
+			target.cross( v0 );
+
+			var targetLengthSq = target.lengthSq();
+			if ( targetLengthSq > 0 ) {
+
+				return target.multiplyScalar( 1 / Math.sqrt( targetLengthSq ) );
+
+			}
+
+			return target.set( 0, 0, 0 );
 
 		};
 
@@ -13753,7 +13781,7 @@ Object.assign( Triangle, {
 		var v1 = new Vector3();
 		var v2 = new Vector3();
 
-		return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
+		return function barycoordFromPoint( point, a, b, c, target ) {
 
 			v0.subVectors( c, a );
 			v1.subVectors( b, a );
@@ -13767,14 +13795,19 @@ Object.assign( Triangle, {
 
 			var denom = ( dot00 * dot11 - dot01 * dot01 );
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Triangle: .barycoordFromPoint() target is now required' );
+				target = new Vector3();
+
+			}
 
 			// collinear or singular triangle
 			if ( denom === 0 ) {
 
 				// arbitrary location outside of triangle?
 				// not sure if this is the best idea, maybe should be returning undefined
-				return result.set( - 2, - 1, - 1 );
+				return target.set( - 2, - 1, - 1 );
 
 			}
 
@@ -13783,7 +13816,7 @@ Object.assign( Triangle, {
 			var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
 			// barycentric coordinates must always sum to 1
-			return result.set( 1 - u - v, v, u );
+			return target.set( 1 - u - v, v, u );
 
 		};
 
@@ -13795,9 +13828,9 @@ Object.assign( Triangle, {
 
 		return function containsPoint( point, a, b, c ) {
 
-			var result = Triangle.barycoordFromPoint( point, a, b, c, v1 );
+			Triangle.barycoordFromPoint( point, a, b, c, v1 );
 
-			return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+			return ( v1.x >= 0 ) && ( v1.y >= 0 ) && ( ( v1.x + v1.y ) <= 1 );
 
 		};
 
@@ -13859,30 +13892,41 @@ Object.assign( Triangle.prototype, {
 
 	}(),
 
-	midpoint: function ( optionalTarget ) {
+	midpoint: function ( target ) {
 
-		var result = optionalTarget || new Vector3();
-		return result.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
+		if ( target === undefined ) {
 
-	},
+			console.warn( 'THREE.Triangle: .midpoint() target is now required' );
+			target = new Vector3();
 
-	normal: function ( optionalTarget ) {
+		}
 
-		return Triangle.normal( this.a, this.b, this.c, optionalTarget );
-
-	},
-
-	plane: function ( optionalTarget ) {
-
-		var result = optionalTarget || new Plane();
-
-		return result.setFromCoplanarPoints( this.a, this.b, this.c );
+		return target.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
 
 	},
 
-	barycoordFromPoint: function ( point, optionalTarget ) {
+	normal: function ( target ) {
 
-		return Triangle.barycoordFromPoint( point, this.a, this.b, this.c, optionalTarget );
+		return Triangle.normal( this.a, this.b, this.c, target );
+
+	},
+
+	plane: function ( target ) {
+
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Triangle: .plane() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return target.setFromCoplanarPoints( this.a, this.b, this.c );
+
+	},
+
+	barycoordFromPoint: function ( point, target ) {
+
+		return Triangle.barycoordFromPoint( point, this.a, this.b, this.c, target );
 
 	},
 
@@ -13905,9 +13949,15 @@ Object.assign( Triangle.prototype, {
 		var projectedPoint = new Vector3();
 		var closestPoint = new Vector3();
 
-		return function closestPointToPoint( point, optionalTarget ) {
+		return function closestPointToPoint( point, target ) {
 
-			var result = optionalTarget || new Vector3();
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Triangle: .closestPointToPoint() target is now required' );
+				target = new Vector3();
+
+			}
+
 			var minDistance = Infinity;
 
 			// project the point onto the plane of the triangle
@@ -13921,11 +13971,11 @@ Object.assign( Triangle.prototype, {
 
 				// if so, this is the closest point
 
-				result.copy( projectedPoint );
+				target.copy( projectedPoint );
 
 			} else {
 
-				// if not, the point falls outside the triangle. the result is the closest point to the triangle's edges or vertices
+				// if not, the point falls outside the triangle. the target is the closest point to the triangle's edges or vertices
 
 				edgeList[ 0 ].set( this.a, this.b );
 				edgeList[ 1 ].set( this.b, this.c );
@@ -13941,7 +13991,7 @@ Object.assign( Triangle.prototype, {
 
 						minDistance = distance;
 
-						result.copy( closestPoint );
+						target.copy( closestPoint );
 
 					}
 
@@ -13949,7 +13999,7 @@ Object.assign( Triangle.prototype, {
 
 			}
 
-			return result;
+			return target;
 
 		};
 
@@ -14163,7 +14213,10 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				}
 
-				intersection.face = new Face3( a, b, c, Triangle.normal( vA, vB, vC ) );
+				var face = new Face3( a, b, c );
+				Triangle.normal( vA, vB, vC, face.normal );
+
+				intersection.face = face;
 				intersection.faceIndex = a;
 
 			}
@@ -23605,11 +23658,25 @@ function WebGLRenderer( parameters ) {
 
 		var width = texture.image.width;
 		var height = texture.image.height;
-		var internalFormat = utils.convert( texture.format );
+		var glFormat = utils.convert( texture.format );
 
 		this.setTexture2D( texture, 0 );
 
-		_gl.copyTexImage2D( _gl.TEXTURE_2D, level || 0, internalFormat, position.x, position.y, width, height, 0 );
+		_gl.copyTexImage2D( _gl.TEXTURE_2D, level || 0, glFormat, position.x, position.y, width, height, 0 );
+
+	};
+
+	this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level ) {
+
+		var width = srcTexture.image.width;
+		var height = srcTexture.image.height;
+		var glFormat = utils.convert( dstTexture.format );
+		var glType = utils.convert( dstTexture.type );
+		var pixels = srcTexture.isDataTexture ? srcTexture.image.data : srcTexture.image;
+
+		this.setTexture2D( dstTexture, 0 );
+
+		_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, width, height, glFormat, glType, pixels );
 
 	};
 
@@ -24921,6 +24988,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 			var localThresholdSq = localThreshold * localThreshold;
 			var position = new Vector3();
+			var intersectPoint = new Vector3();
 
 			function testPoint( point, index ) {
 
@@ -24928,7 +24996,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				if ( rayPointDistanceSq < localThresholdSq ) {
 
-					var intersectPoint = ray.closestPointToPoint( point );
+					ray.closestPointToPoint( point, intersectPoint );
 					intersectPoint.applyMatrix4( matrixWorld );
 
 					var distance = raycaster.ray.origin.distanceTo( intersectPoint );
@@ -35957,7 +36025,7 @@ Object.assign( Loader.prototype, {
 						json.normalMap = loadTexture( value, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
 						break;
 					case 'mapNormalFactor':
-						json.normalScale = [ value, value ];
+						json.normalScale = value;
 						break;
 					case 'mapNormalRepeat':
 					case 'mapNormalOffset':
