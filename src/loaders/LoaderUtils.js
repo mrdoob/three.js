@@ -12,6 +12,12 @@ var LoaderUtils = {
 
 		}
 
+		if ( typeof Buffer !== 'undefined' ) {
+
+			return new Buffer( array ).toString();
+
+		}
+
 		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
 		// throws a "maximum call stack size exceeded" error for large arrays.
 
