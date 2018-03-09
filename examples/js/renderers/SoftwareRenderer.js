@@ -86,18 +86,18 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		canvasWBlocks = Math.floor( width / blockSize );
 		canvasHBlocks = Math.floor( height / blockSize );
-		canvasWidth   = canvasWBlocks * blockSize;
-		canvasHeight  = canvasHBlocks * blockSize;
+		canvasWidth = canvasWBlocks * blockSize;
+		canvasHeight = canvasHBlocks * blockSize;
 
 		var fixScale = 1 << subpixelBits;
 
-		viewportXScale =  fixScale * canvasWidth  / 2;
+		viewportXScale = fixScale * canvasWidth / 2;
 		viewportYScale = - fixScale * canvasHeight / 2;
-		viewportZScale =             maxZVal      / 2;
+		viewportZScale = maxZVal / 2;
 
-		viewportXOffs  =  fixScale * canvasWidth  / 2 + 0.5;
-		viewportYOffs  =  fixScale * canvasHeight / 2 + 0.5;
-		viewportZOffs  =             maxZVal      / 2 + 0.5;
+		viewportXOffs = fixScale * canvasWidth / 2 + 0.5;
+		viewportYOffs = fixScale * canvasHeight / 2 + 0.5;
+		viewportZOffs = maxZVal / 2 + 0.5;
 
 		canvas.width = canvasWidth;
 		canvas.height = canvasHeight;
@@ -286,6 +286,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					shader,
 					material
 				);
+
 			}
 
 		}
@@ -326,18 +327,18 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		canvasWBlocks = Math.floor( width / blockSize );
 		canvasHBlocks = Math.floor( height / blockSize );
-		canvasWidth   = canvasWBlocks * blockSize;
-		canvasHeight  = canvasHBlocks * blockSize;
+		canvasWidth = canvasWBlocks * blockSize;
+		canvasHeight = canvasHBlocks * blockSize;
 
 		var fixScale = 1 << subpixelBits;
 
-		viewportXScale =  fixScale * canvasWidth  / 2;
-		viewportYScale = -fixScale * canvasHeight / 2;
-		viewportZScale =             maxZVal      / 2;
+		viewportXScale = fixScale * canvasWidth / 2;
+		viewportYScale = - fixScale * canvasHeight / 2;
+		viewportZScale = maxZVal / 2;
 
-		viewportXOffs  =  fixScale * canvasWidth  / 2 + 0.5;
-		viewportYOffs  =  fixScale * canvasHeight / 2 + 0.5;
-		viewportZOffs  =             maxZVal      / 2 + 0.5;
+		viewportXOffs = fixScale * canvasWidth / 2 + 0.5;
+		viewportYOffs = fixScale * canvasHeight / 2 + 0.5;
+		viewportZOffs = maxZVal / 2 + 0.5;
 
 		canvas.width = canvasWidth;
 		canvas.height = canvasHeight;
@@ -440,8 +441,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		var texture = textures[ material.map.id ];
 
-		if ( ! texture.data )
-			return;
+		if ( ! texture.data ) return;
 
 		var tdim = texture.width;
 		var isTransparent = material.transparent;
@@ -472,8 +472,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			buffer[ colorOffset + 2 ] = ( srcB * opaci + destB * ( 1 - opaci ) );
 			buffer[ colorOffset + 3 ] = ( material.opacity << 8 ) - 1;
 
-			if ( buffer[ colorOffset + 3 ] == 255 )	// Only opaue pixls write to the depth buffer
-				depthBuf[ offset ] = depth;
+			// Only opaue pixls write to the depth buffer
+
+			if ( buffer[ colorOffset + 3 ] == 255 )	depthBuf[ offset ] = depth;
 
 		}
 
@@ -485,12 +486,11 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		var texture = textures[ material.map.id ];
 
-		if ( ! texture.data )
-			return;
+		if ( ! texture.data ) return;
 
 		var tdim = texture.width;
 		var isTransparent = material.transparent;
-		var cIndex = ( n > 0 ? ( ~~ n ) : 0 ) * 3;
+		var cIndex = ( n > 0 ? ( ~ ~ n ) : 0 ) * 3;
 		var tbound = tdim - 1;
 		var tdata = texture.data;
 		var tIndex = ( ( ( v * tdim ) & tbound ) * tdim + ( ( u * tdim ) & tbound ) ) * 4;
@@ -518,8 +518,10 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			buffer[ colorOffset + 2 ] = foreColorB * opaci + destB * ( 1 - opaci );
 			buffer[ colorOffset + 3 ] = ( material.opacity << 8 ) - 1;
 
-			if ( buffer[ colorOffset + 3 ] == 255 )	// Only opaue pixls write to the depth buffer
-				depthBuf[ offset ] = depth;
+			// Only opaue pixls write to the depth buffer
+
+			if ( buffer[ colorOffset + 3 ] == 255 ) depthBuf[ offset ] = depth;
+
 		}
 
 	}
@@ -529,7 +531,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var id = material.id;
 		var shader = shaders[ id ];
 
-		if ( shader && material.map && !textures[ material.map.id ] ) delete shaders[ id ];
+		if ( shader && material.map && ! textures[ material.map.id ] ) delete shaders[ id ];
 
 		if ( shaders[ id ] === undefined || material.needsUpdate === true ) {
 
@@ -724,26 +726,26 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 					mpUV12 = new THREE.Vector2();
 					mpUVPool.push( mpUV12 );
-					++mpUVPoolCount;
+					++ mpUVPoolCount;
 
 					mpUV23 = new THREE.Vector2();
 					mpUVPool.push( mpUV23 );
-					++mpUVPoolCount;
+					++ mpUVPoolCount;
 
 					mpUV31 = new THREE.Vector2();
 					mpUVPool.push( mpUV31 );
-					++mpUVPoolCount;
+					++ mpUVPoolCount;
 
 				} else {
 
 					mpUV12 = mpUVPool[ mpUVPoolCount ];
-					++mpUVPoolCount;
+					++ mpUVPoolCount;
 
 					mpUV23 = mpUVPool[ mpUVPoolCount ];
-					++mpUVPoolCount;
+					++ mpUVPoolCount;
 
 					mpUV31 = mpUVPool[ mpUVPoolCount ];
-					++mpUVPoolCount;
+					++ mpUVPoolCount;
 
 				}
 
@@ -766,26 +768,26 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 				mpV12 = new THREE.Vector4();
 				mpVPool.push( mpV12 );
-				++mpVPoolCount;
+				++ mpVPoolCount;
 
 				mpV23 = new THREE.Vector4();
 				mpVPool.push( mpV23 );
-				++mpVPoolCount;
+				++ mpVPoolCount;
 
 				mpV31 = new THREE.Vector4();
 				mpVPool.push( mpV31 );
-				++mpVPoolCount;
+				++ mpVPoolCount;
 
 			} else {
 
 				mpV12 = mpVPool[ mpVPoolCount ];
-				++mpVPoolCount;
+				++ mpVPoolCount;
 
 				mpV23 = mpVPool[ mpVPoolCount ];
-				++mpVPoolCount;
+				++ mpVPoolCount;
 
 				mpV31 = mpVPool[ mpVPoolCount ];
-				++mpVPoolCount;
+				++ mpVPoolCount;
 
 			}
 
@@ -801,26 +803,26 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 					mpN12 = new THREE.Vector3();
 					mpNPool.push( mpN12 );
-					++mpNPoolCount;
+					++ mpNPoolCount;
 
 					mpN23 = new THREE.Vector3();
 					mpNPool.push( mpN23 );
-					++mpNPoolCount;
+					++ mpNPoolCount;
 
 					mpN31 = new THREE.Vector3();
 					mpNPool.push( mpN31 );
-					++mpNPoolCount;
+					++ mpNPoolCount;
 
 				} else {
 
 					mpN12 = mpNPool[ mpNPoolCount ];
-					++mpNPoolCount;
+					++ mpNPoolCount;
 
 					mpN23 = mpNPool[ mpNPoolCount ];
-					++mpNPoolCount;
+					++ mpNPoolCount;
 
 					mpN31 = mpNPool[ mpNPoolCount ];
-					++mpNPoolCount;
+					++ mpNPoolCount;
 
 				}
 
@@ -1486,7 +1488,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 				var bflags = blockFlags[ blockId ];
 				if ( bflags & BLOCK_NEEDCLEAR ) clearBlock( blockX, blockY );
-				blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );
+				blockFlags[ blockId ] = bflags & ~ ( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );
 
 				// draw pixel
 				var offset = pX + pY * canvasWidth;
@@ -1499,7 +1501,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 			}
 
-			--length;
+			-- length;
 
 		}
 
@@ -1574,7 +1576,7 @@ THREE.SoftwareRenderer.Texture = function () {
 		}
 
 		var size = image.width > image.height ? image.width : image.height;
-		size = THREE.Math.nextPowerOfTwo( size );
+		size = THREE.Math.ceilPowerOfTwo( size );
 
 		if ( canvas.width != size || canvas.height != size ) {
 
