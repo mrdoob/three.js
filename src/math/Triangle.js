@@ -187,12 +187,12 @@ Object.assign( Triangle.prototype, {
 
 	plane: function ( target ) {
 
-	if ( target === undefined ) {
+		if ( target === undefined ) {
 
-		console.warn( 'THREE.Triangle: .plane() target is now required' );
-		target = new Vector3();
+			console.warn( 'THREE.Triangle: .plane() target is now required' );
+			target = new Vector3();
 
-	}
+		}
 
 		return target.setFromCoplanarPoints( this.a, this.b, this.c );
 
