@@ -123,16 +123,13 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Triangle();
 			var midpoint = new Vector3();
 
-			a.getMidpoint( midpoint );
-			assert.ok( midpoint.equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+			assert.ok( a.getMidpoint( midpoint ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
-			a.getMidpoint( midpoint );
-			assert.ok( midpoint.equals( new Vector3( 1 / 3, 1 / 3, 0 ) ), "Passed!" );
+			assert.ok( a.getMidpoint( midpoint ).equals( new Vector3( 1 / 3, 1 / 3, 0 ) ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 2 ) );
-			a.getMidpoint( midpoint );
-			assert.ok( midpoint.equals( new Vector3( 2 / 3, 0, 2 / 3 ) ), "Passed!" );
+			assert.ok( a.getMidpoint( midpoint ).equals( new Vector3( 2 / 3, 0, 2 / 3 ) ), "Passed!" );
 
 		} );
 
@@ -141,16 +138,13 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Triangle();
 			var normal = new Vector3();
 
-			a.getNormal( normal );
-			assert.ok( normal.equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+			assert.ok( a.getNormal( normal ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
-			a.getNormal( normal );
-			assert.ok( normal.equals( new Vector3( 0, 0, 1 ) ), "Passed!" );
+			assert.ok( a.getNormal( normal ).equals( new Vector3( 0, 0, 1 ) ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 2 ) );
-			a.getNormal( normal );
-			assert.ok( normal.equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
+			assert.ok( a.getNormal( normal ).equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
 
 		} );
 
