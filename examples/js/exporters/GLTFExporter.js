@@ -102,8 +102,8 @@ THREE.GLTFExporter.prototype = {
 		var skins = [];
 		var cachedData = {
 
-			materials: new WeakMap(),
-			textures: new WeakMap()
+			materials: new Map(),
+			textures: new Map()
 
 		};
 
