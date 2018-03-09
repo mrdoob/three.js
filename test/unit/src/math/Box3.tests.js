@@ -122,20 +122,31 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var b = a.clone();
+			var centerA = new Vector3();
+			var sizeA = new Vector3();
+			var sizeB = new Vector3();
 			var newCenter = one3;
 			var newSize = two3;
 
-			a.setFromCenterAndSize( a.getCenter(), a.getSize() );
+			a.getCenter( centerA );
+			a.getSize( sizeA );
+			a.setFromCenterAndSize( centerA, sizeA );
 			assert.ok( a.equals( b ), "Same values: no changes" );
 
-			a.setFromCenterAndSize( newCenter, a.getSize() );
-			assert.ok( a.getCenter().equals( newCenter ), "Move center: correct new center" );
-			assert.ok( a.getSize().equals( b.getSize() ), "Move center: no change in size" );
+			a.setFromCenterAndSize( newCenter, sizeA );
+			a.getCenter( centerA );
+			a.getSize( sizeA );
+			b.getSize( sizeB );
+
+			assert.ok( centerA.equals( newCenter ), "Move center: correct new center" );
+			assert.ok( sizeA.equals( sizeB ), "Move center: no change in size" );
 			assert.notOk( a.equals( b ), "Move center: no longer equal to old values" );
 
-			a.setFromCenterAndSize( a.getCenter(), newSize );
-			assert.ok( a.getCenter().equals( newCenter ), "Resize: no change to center" );
-			assert.ok( a.getSize().equals( newSize ), "Resize: correct new size" );
+			a.setFromCenterAndSize( centerA, newSize );
+			a.getCenter( centerA );
+			a.getSize( sizeA );
+			assert.ok( centerA.equals( newCenter ), "Resize: no change to center" );
+			assert.ok( sizeA.equals( newSize ), "Resize: correct new size" );
 			assert.notOk( a.equals( b ), "Resize: no longer equal to old values" );
 
 		} );
@@ -197,65 +208,87 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "getCenter", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
+			var center = new Vector3();
 
-			assert.ok( a.getCenter().equals( zero3 ), "Passed!" );
+			a.getCenter( center );
+			assert.ok( center.equals( zero3 ), "Passed!" );
 
 			var a = new Box3( zero3.clone(), one3.clone() );
+			a.getCenter( center );
 			var midpoint = one3.clone().multiplyScalar( 0.5 );
-			assert.ok( a.getCenter().equals( midpoint ), "Passed!" );
+			assert.ok( center.equals( midpoint ), "Passed!" );
 
 		} );
 
 		QUnit.test( "getSize", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
+			var size = new Vector3();
 
-			assert.ok( a.getSize().equals( zero3 ), "Passed!" );
+			a.getSize( size );
+			assert.ok( size.equals( zero3 ), "Passed!" );
 
 			var a = new Box3( zero3.clone(), one3.clone() );
-			assert.ok( a.getSize().equals( one3 ), "Passed!" );
+			a.getSize( size );
+			assert.ok( size.equals( one3 ), "Passed!" );
 
 		} );
 
 		QUnit.test( "expandByPoint", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
+			var center = new Vector3();
+			var size = new Vector3();
 
 			a.expandByPoint( zero3 );
-			assert.ok( a.getSize().equals( zero3 ), "Passed!" );
+			a.getSize( size );
+			assert.ok( size.equals( zero3 ), "Passed!" );
 
 			a.expandByPoint( one3 );
-			assert.ok( a.getSize().equals( one3 ), "Passed!" );
+			a.getSize( size );
+			assert.ok( size.equals( one3 ), "Passed!" );
 
 			a.expandByPoint( one3.clone().negate() );
-			assert.ok( a.getSize().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
-			assert.ok( a.getCenter().equals( zero3 ), "Passed!" );
+			a.getCenter( center );
+			a.getSize( size );
+			assert.ok( size.equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
+			assert.ok( center.equals( zero3 ), "Passed!" );
 
 		} );
 
 		QUnit.test( "expandByVector", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
+			var center = new Vector3();
+			var size = new Vector3();
 
 			a.expandByVector( zero3 );
-			assert.ok( a.getSize().equals( zero3 ), "Passed!" );
+			a.getSize( size );
+			assert.ok( size.equals( zero3 ), "Passed!" );
 
 			a.expandByVector( one3 );
-			assert.ok( a.getSize().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
-			assert.ok( a.getCenter().equals( zero3 ), "Passed!" );
+			a.getCenter( center );
+			a.getSize( size );
+			assert.ok( size.equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
+			assert.ok( center.equals( zero3 ), "Passed!" );
 
 		} );
 
 		QUnit.test( "expandByScalar", ( assert ) => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
+			var center = new Vector3();
+			var size = new Vector3();
 
 			a.expandByScalar( 0 );
-			assert.ok( a.getSize().equals( zero3 ), "Passed!" );
+			a.getSize( size );
+			assert.ok( size.equals( zero3 ), "Passed!" );
 
 			a.expandByScalar( 1 );
-			assert.ok( a.getSize().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
-			assert.ok( a.getCenter().equals( zero3 ), "Passed!" );
+			a.getCenter( center );
+			a.getSize( size );
+			assert.ok( size.equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
+			assert.ok( center.equals( zero3 ), "Passed!" );
 
 		} );
 
@@ -335,13 +368,19 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
 			var b = new Box3( one3.clone().negate(), one3.clone() );
+			var parameter = new Vector3();
 
-			assert.ok( a.getParameter( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
-			assert.ok( a.getParameter( new Vector3( 1, 1, 1 ) ).equals( new Vector3( 1, 1, 1 ) ), "Passed!" );
+			a.getParameter( zero3, parameter );
+			assert.ok( parameter.equals( zero3 ), "Passed!" );
+			a.getParameter( one3, parameter );
+			assert.ok( parameter.equals( one3 ), "Passed!" );
 
-			assert.ok( b.getParameter( new Vector3( - 1, - 1, - 1 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
-			assert.ok( b.getParameter( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0.5, 0.5, 0.5 ) ), "Passed!" );
-			assert.ok( b.getParameter( new Vector3( 1, 1, 1 ) ).equals( new Vector3( 1, 1, 1 ) ), "Passed!" );
+			b.getParameter( one3.clone().negate(), parameter );
+			assert.ok( parameter.equals( zero3 ), "Passed!" );
+			b.getParameter( zero3, parameter );
+			assert.ok( parameter.equals( new Vector3( 0.5, 0.5, 0.5 ) ), "Passed!" );
+			b.getParameter( one3, parameter );
+			assert.ok( parameter.equals( one3 ), "Passed!" );
 
 		} );
 
@@ -412,16 +451,25 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( one3.clone().negate(), one3.clone() );
+			var point = new Vector3();
 
-			assert.ok( a.clampPoint( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
-			assert.ok( a.clampPoint( new Vector3( 1, 1, 1 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
-			assert.ok( a.clampPoint( new Vector3( - 1, - 1, - 1 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+			a.clampPoint( zero3, point );
+			assert.ok( point.equals( zero3 ), "Passed!" );
+			a.clampPoint( one3, point );
+			assert.ok( point.equals( zero3 ), "Passed!" );
+			a.clampPoint( one3.clone().negate(), point );
+			assert.ok( point.equals( zero3 ), "Passed!" );
 
-			assert.ok( b.clampPoint( new Vector3( 2, 2, 2 ) ).equals( new Vector3( 1, 1, 1 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector3( 1, 1, 1 ) ).equals( new Vector3( 1, 1, 1 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector3( 0, 0, 0 ) ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector3( - 1, - 1, - 1 ) ).equals( new Vector3( - 1, - 1, - 1 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector3( - 2, - 2, - 2 ) ).equals( new Vector3( - 1, - 1, - 1 ) ), "Passed!" );
+			b.clampPoint( new Vector3( 2, 2, 2 ), point );
+			assert.ok( point.equals( one3 ), "Passed!" );
+			b.clampPoint( one3, point );
+			assert.ok( point.equals( one3 ), "Passed!" );
+			b.clampPoint( zero3, point );
+			assert.ok( point.equals( zero3 ), "Passed!" );
+			b.clampPoint( one3.clone().negate(), point );
+			assert.ok( point.equals( one3.clone().negate() ), "Passed!" );
+			b.clampPoint( new Vector3( - 2, - 2, - 2 ), point );
+			assert.ok( point.equals( one3.clone().negate() ), "Passed!" );
 
 		} );
 
@@ -447,10 +495,14 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Box3( zero3.clone(), zero3.clone() );
 			var b = new Box3( zero3.clone(), one3.clone() );
 			var c = new Box3( one3.clone().negate(), one3.clone() );
+			var sphere = new Sphere();
 
-			assert.ok( a.getBoundingSphere().equals( new Sphere( zero3, 0 ) ), "Passed!" );
-			assert.ok( b.getBoundingSphere().equals( new Sphere( one3.clone().multiplyScalar( 0.5 ), Math.sqrt( 3 ) * 0.5 ) ), "Passed!" );
-			assert.ok( c.getBoundingSphere().equals( new Sphere( zero3, Math.sqrt( 12 ) * 0.5 ) ), "Passed!" );
+			a.getBoundingSphere( sphere );
+			assert.ok( sphere.equals( new Sphere( zero3, 0 ) ), "Passed!" );
+			b.getBoundingSphere( sphere );
+			assert.ok( sphere.equals( new Sphere( one3.clone().multiplyScalar( 0.5 ), Math.sqrt( 3 ) * 0.5 ) ), "Passed!" );
+			c.getBoundingSphere( sphere );
+			assert.ok( sphere.equals( new Sphere( zero3, Math.sqrt( 12 ) * 0.5 ) ), "Passed!" );
 
 		} );
 
