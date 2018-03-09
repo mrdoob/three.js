@@ -114,14 +114,11 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var center = new Vector2();
-
-			a.getCenter( center );
-			assert.ok( center.equals( zero2 ), "Passed!" );
+			assert.ok( a.getCenter( center ).equals( zero2 ), "Passed!" );
 
 			var a = new Box2( zero2, one2 );
 			var midpoint = one2.clone().multiplyScalar( 0.5 );
-			a.getCenter( center );
-			assert.ok( center.equals( midpoint ), "Passed!" );
+			assert.ok( a.getCenter( center ).equals( midpoint ), "Passed!" );
 
 		} );
 
@@ -130,12 +127,10 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var size = new Vector2();
 
-			a.getSize( size );
-			assert.ok( size.equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( zero2 ), "Passed!" );
 
 			var a = new Box2( zero2.clone(), one2.clone() );
-			a.getSize( size );
-			assert.ok( size.equals( one2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( one2 ), "Passed!" );
 
 		} );
 
@@ -146,18 +141,14 @@ export default QUnit.module( 'Maths', () => {
 			var center = new Vector2();
 
 			a.expandByPoint( zero2 );
-			a.getSize( size );
-			assert.ok( size.equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( zero2 ), "Passed!" );
 
 			a.expandByPoint( one2 );
-			a.getSize( size );
-			assert.ok( size.equals( one2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( one2 ), "Passed!" );
 
 			a.expandByPoint( one2.clone().negate() );
-			a.getSize( size );
-			a.getCenter( center );
-			assert.ok( size.equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
-			assert.ok( center.equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
+			assert.ok( a.getCenter( center ).equals( zero2 ), "Passed!" );
 
 		} );
 
@@ -168,14 +159,11 @@ export default QUnit.module( 'Maths', () => {
 			var center = new Vector2();
 
 			a.expandByVector( zero2 );
-			a.getSize( size );
-			assert.ok( size.equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( zero2 ), "Passed!" );
 
 			a.expandByVector( one2 );
-			a.getSize( size );
-			a.getCenter( center );
-			assert.ok( size.equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
-			assert.ok( center.equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
+			assert.ok( a.getCenter( center ).equals( zero2 ), "Passed!" );
 
 		} );
 
@@ -186,14 +174,11 @@ export default QUnit.module( 'Maths', () => {
 			var center = new Vector2();
 
 			a.expandByScalar( 0 );
-			a.getSize( size );
-			assert.ok( size.equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( zero2 ), "Passed!" );
 
 			a.expandByScalar( 1 );
-			a.getSize( size );
-			a.getCenter( center );
-			assert.ok( size.equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
-			assert.ok( center.equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
+			assert.ok( a.getCenter( center ).equals( zero2 ), "Passed!" );
 
 		} );
 
