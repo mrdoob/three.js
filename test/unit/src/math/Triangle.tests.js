@@ -270,37 +270,38 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "closestPointToPoint", ( assert ) => {
 
 			var a = new Triangle( new Vector3( - 1, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
+			var point = new Vector3();
 
 			// point lies inside the triangle
-			var b0 = a.closestPointToPoint( new Vector3( 0, 0.5, 0 ) );
-			assert.ok( b0.equals( new Vector3( 0, 0.5, 0 ) ), "Passed!" );
+			a.closestPointToPoint( new Vector3( 0, 0.5, 0 ), point );
+			assert.ok( point.equals( new Vector3( 0, 0.5, 0 ) ), "Passed!" );
 
 			// point lies on a vertex
-			var b0 = a.closestPointToPoint( a.a );
-			assert.ok( b0.equals( a.a ), "Passed!" );
+			a.closestPointToPoint( a.a, point );
+			assert.ok( point.equals( a.a ), "Passed!" );
 
-			var b0 = a.closestPointToPoint( a.b );
-			assert.ok( b0.equals( a.b ), "Passed!" );
+			a.closestPointToPoint( a.b, point );
+			assert.ok( point.equals( a.b ), "Passed!" );
 
-			var b0 = a.closestPointToPoint( a.c );
-			assert.ok( b0.equals( a.c ), "Passed!" );
+			a.closestPointToPoint( a.c, point );
+			assert.ok( point.equals( a.c ), "Passed!" );
 
 			// point lies on an edge
-			var b0 = a.closestPointToPoint( zero3.clone() );
-			assert.ok( b0.equals( zero3.clone() ), "Passed!" );
+			a.closestPointToPoint( zero3.clone(), point );
+			assert.ok( point.equals( zero3.clone() ), "Passed!" );
 
 			// point lies outside the triangle
-			var b0 = a.closestPointToPoint( new Vector3( - 2, 0, 0 ) );
-			assert.ok( b0.equals( new Vector3( - 1, 0, 0 ) ), "Passed!" );
+			a.closestPointToPoint( new Vector3( - 2, 0, 0 ), point );
+			assert.ok( point.equals( new Vector3( - 1, 0, 0 ) ), "Passed!" );
 
-			var b0 = a.closestPointToPoint( new Vector3( 2, 0, 0 ) );
-			assert.ok( b0.equals( new Vector3( 1, 0, 0 ) ), "Passed!" );
+			a.closestPointToPoint( new Vector3( 2, 0, 0 ), point );
+			assert.ok( point.equals( new Vector3( 1, 0, 0 ) ), "Passed!" );
 
-			var b0 = a.closestPointToPoint( new Vector3( 0, 2, 0 ) );
-			assert.ok( b0.equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
+			a.closestPointToPoint( new Vector3( 0, 2, 0 ), point );
+			assert.ok( point.equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
 
-			var b0 = a.closestPointToPoint( new Vector3( 0, - 2, 0 ) );
-			assert.ok( b0.equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+			a.closestPointToPoint( new Vector3( 0, - 2, 0 ), point );
+			assert.ok( point.equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
 
 		} );
 
