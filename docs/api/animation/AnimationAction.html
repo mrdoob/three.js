@@ -11,103 +11,103 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			AnimationActions （动画动作）安排存储在 [page:AnimationClip AnimationClips] 中的动画的运行。<br /><br />
+			AnimationActions schedule the performance of the animations which are stored in
+			[page:AnimationClip AnimationClips].<br /><br />
 
+			Note: Most of AnimationAction's methods can be chained.<br /><br />
 
-			注意：大部分 AnimationAction 方法是可以链式调用的。<br /><br />
-
-			有关 three.js 动画系统的不同元素概览，请参阅本手册 'Next Steps' 部分的 'Animation System' 一文查看。
-
+			For an overview of the different elements of the three.js animation system see the
+			"Animation System" article in the "Next Steps" section of the manual.
 		</div>
 
 
-		<h2>Constructor （构造器）</h2>
+		<h2>Constructor</h2>
 
 
 		<h3>[name]( [param:AnimationMixer mixer], [param:AnimationClip clip], [param:Object3D localRoot] )</h3>
 		<div>
-			[page:AnimationMixer mixer] —— *AnimationMixer*， 由这一 action 控制。<br />
-			[page:AnimationClip clip] —— *AnimationClip*， 包含这一 action 的动画数据。<br />
-			[page:Object3D localRoot] —— 根对象，这一action运行的地方。<br /><br />
+			[page:AnimationMixer mixer] - the *AnimationMixer* that is controlled by this action.<br />
+			[page:AnimationClip clip] - the *AnimationClip* that holds the animation data for this action.<br />
+			[page:Object3D localRoot] - the root object on which this action is performed.<br /><br />
 
-			注意：除了直接调用这一构造器，还应该用 [page:AnimationMixer.clipAction] 实例化一个 AnimationAction，
-			因为这个方法为了保证更好的性能而提供了缓存。
+			Note: Instead of calling this constructor directly you should instantiate an AnimationAction with
+			[page:AnimationMixer.clipAction] since this method provides caching for better performance.
 		</div>
 
 
-		<h2>Properties （属性）</h2>
+		<h2>Properties</h2>
 
 
 		<h3>[property:Boolean clampWhenFinished]</h3>
 		<div>
-			如果 *clampWhenFinished* 设置为 true，动画将会造它的最后一帧自动 [page:.paused paused]。<br /><br />
+			If *clampWhenFinished* is set to true the animation will automatically be [page:.paused paused]
+			on its last frame.<br /><br />
 
+			If *clampWhenFinished* is set to false, [page:.enabled enabled] will automatically be switched
+			to false when the last loop of the action has finished, so that this action has no further
+			impact.<br /><br />
 
-			如果 *clampWhenFinished* 设置为 false，当动作的最后一个循环结束时，[page:.enabled enabled] 将会自动切换为 false，
-			以使该动作不会造成更多的影响。<br /><br />
+			Default is false.<br /><br />
 
-
-			默认为 false。<br /><br />
-
-			注意：如果 action 被打断，*clampWhenFinished* 不会产生影响（它只会影响 action 的最后一个循环是否完成）。
-
+			Note: *clampWhenFinished* has no impact if the action is interrupted (it has only an effect if
+			its last loop has really finished).
 		</div>
 
 		<h3>[property:Boolean enabled]</h3>
 		<div>
-			将 *enabled* 设置为 *false* 禁用该 action，这样 action 就不会产生影响。默认为 *true*。<br /><br />
+			Setting *enabled* to *false* disables this action, so that it has no impact. Default is *true*.<br /><br />
 
-			当 action 重启时，动画从当前 [page:.time time] 继续（设置 *enabled* 为 *false* 不会重置 action）。<br /><br />
+			When the action is re-enabled, the animation continues from its current [page:.time time]
+			(setting *enabled* to *false* doesn't reset the action).<br /><br />
 
-
-			注意：设置 *enable* 为 *true* 不会自动重启动画。设置 *enabled* 为 *true* 只会在满足以下条件时立即重启动画：
-			[page:.paused paused] 为 *false*，这一 action 在此期间还没有被停用（通过执行 [page:.stop stop] 或 [page:.reset reset] 命令），
-      [page:.weight weight] 和 [page:.timeScale timeScale] 都不为0。
-
-
+			Note: Setting *enabled* to *true* doesn’t automatically restart the animation. Setting *enabled*
+			to *true* will only restart the animation immediately if the following condition is fulfilled:
+			[page:.paused paused] is *false*, this action has not been deactivated in the meantime (by
+			executing a [page:.stop stop] or [page:.reset reset] command), and neither [page:.weight weight]
+			nor [page:.timeScale timeScale] is 0.
 		</div>
 
 		<h3>[property:Number loop]</h3>
 		<div>
-			循环模式（可以通过 [page:.setLoop setLoop] 被改变）。默认为 [page:Animation THREE.LoopRepeat] （带有无限个 [page:.repetitions repetitions]）。<br /><br />
+			The looping mode (can be changed with [page:.setLoop setLoop]). Default is
+			[page:Animation THREE.LoopRepeat] (with an infinite number of [page:.repetitions repetitions])<br /><br />
 
-
-			必须为一下常量之一:<br /><br />
-			[page:Animation THREE.LoopOnce] —— 播放 clip （裁剪） 一次，<br />
-			[page:Animation THREE.LoopRepeat] —— 播放 clip 数次，次数通过 *repetitions* 来选择，
-			每次从 clip 的结尾直接跳转到它的开始，<br />
-			[page:Animation THREE.LoopPingPong] —— 播放 clip 数次，次数通过 *repetitions* 来选择，
-			选择性地正常播放或回放。
+			Must be one of these constants:<br /><br />
+			[page:Animation THREE.LoopOnce] - playing the clip once,<br />
+			[page:Animation THREE.LoopRepeat] - playing the clip with the choosen number of *repetitions*,
+			each time jumping from the end of the clip directly to its beginning,<br />
+			[page:Animation THREE.LoopPingPong] - playing the clip with the choosen number of *repetitions*,
+			alternately playing forward and backward.
 		</div>
 
 		<h3>[property:Boolean paused]</h3>
 		<div>
-			设置 *paused* 为 *true*，会通过设置有效时间缩放为 0 来暂停 ation 的执行。默认为 *false*。<br /><br />
-
+			Setting *paused* to *true* pauses the execution of the action by setting the effective time scale
+			to 0. Default is *false*.<br /><br />
 		</div>
 
 		<h3>[property:Number repetitions]</h3>
 		<div>
-			在此 action 的执行过程中 [page:AnimationClip] 的执行次数。
-			可以通过 [page:.setLoop setLoop] 设置。默认为 *Infinity*。<br /><br />
-			如果 [page:.loop loop mode] 设置为 [page:Animation THREE.LoopOnce]，
-			*repetitions* 的设置将不起作用。
+			The number of repetitions of the performed [page:AnimationClip] over the course of this action.
+			Can be set via [page:.setLoop setLoop]. Default is *Infinity*.<br /><br />
+			Setting this number has no effect, if the [page:.loop loop mode] is set to
+			[page:Animation THREE.LoopOnce].
 		</div>
 
 		<h3>[property:Number time]</h3>
 		<div>
-			action 的本地时间（以秒为单位，从 0 开始）。<br /><br />
+			The local time of this action (in seconds, starting with 0).<br /><br />
 
-			这个值被插值或封装为 0 到 clip.duration （根据循环状态）之间。
-			通过改变 [page:.timeScale timeScale]（用[page:.setEffectiveTimeScale setEffectiveTimeScale] 或 [page:.setDuration setDuration]），
-			该值能够相对缩放至全局 mixer time。<br />
+			The value gets clamped or wrapped to 0...clip.duration (according to the loop state). It can be
+			scaled relativly to the global mixer time by changing [page:.timeScale timeScale] (using
+			[page:.setEffectiveTimeScale setEffectiveTimeScale] or [page:.setDuration setDuration]).<br />
 		</div>
 
 		<h3>[property:Number timeScale]</h3>
 		<div>
-			[page:.time time] 的缩放因子。值为 0 时，将会暂停 action。
-			负值将会使动画回放。默认为1.<br /><br />
-			有关 *timeScale* （尤其是 *time*） 的属性 / 方法有：
+			Scaling factor for the [page:.time time]. A value of 0 causes the animation to pause. Negative
+			values cause the animation to play backwards. Default is 1.<br /><br />
+			Properties/methods concerning *timeScale* (respectively *time*) are:
 			[page:.getEffectiveTimeScale getEffectiveTimeScale],
 			[page:.halt halt],
 			[page:.paused paused],
@@ -120,9 +120,9 @@
 
 		<h3>[property:Number weight]</h3>
 		<div>
-			action 的影响程度（在[0, 1]区间）。
-			0 （无影响）和 1 （完全影响）间的值可以被用来做多个 action 之间的混合。 <br /><br />
-			*weight* 相关的属性/方法有:
+			The degree of influence of this action (in the interval [0, 1]). Values between 0 (no impact)
+			and 1 (full impact) can be used to blend between several actions. Default is 1. <br /><br />
+			Properties/methods concerning  *weight* are:
 			[page:.crossFadeFrom crossFadeFrom],
 			[page:.crossFadeTo crossFadeTo],
 			[page:.enabled enabled],
@@ -135,227 +135,227 @@
 
 		<h3>[property:Boolean zeroSlopeAtEnd]</h3>
 		<div>
-			启用平滑插值，无需单独裁剪（clips）即可启动，循环和结束。默认为 *true*。
+			Enables smooth interpolation without separate clips for start, loop and end. Default is *true*.
 		</div>
 
 		<h3>[property:Boolean zeroSlopeAtStart]</h3>
 		<div>
-			启用平滑插值，无需单独裁剪（clips）即可启动、循环和结束。默认为 *true*。
+			Enables smooth interpolation without separate clips for start, loop and end. Default is *true*.
 		</div>
 
 
-		<h2>方法 （Methods）</h2>
+		<h2>Methods</h2>
 
 
 		<h3>[method:AnimationAction crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<div>
-			在传入的时间间隔内，淡出另一个 action 的同时，淡入到这一 action。
-			这个方法可以被链式调用。<br /><br />
+			Causes this action to [page:.fadeIn fade in], fading out another action simultaneously, within
+			the passed time interval. This method can be chained.<br /><br />
 
-			如果 warpBoolean 为 true，附加的 [page:.warp warping] （时间尺度的渐变）将会被应用<br /><br />
+			If warpBoolean is true, additional [page:.warp warping] (gradually changes of the time scales)
+			will be applied.<br /><br />
 
+			Note: Like with *fadeIn*/*fadeOut*, the fading starts/ends with a weight of 1.
 
-			注意：和 *fadeIn*/*fadeOut* 类似，渐变开始/结束从 weight（权重）为 1 开始。
 		</div>
-
 
 		<h3>[method:AnimationAction crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<div>
-			在传入的时间间隔内，淡出这一 action 的同时，淡入到另一 action。
-			这个方法可以被链式调用。<br /><br />
-			如果 warpBoolean 为 true，附加的 [page:.warp warping] （时间尺度的渐变）将会被应用<br /><br />
+			Causes this action to [page:.fadeOut fade out], fading in another action simultaneously, within
+			the passed time interval. This method can be chained.<br /><br />
+			If warpBoolean is true, additional [page:.warp warping] (gradually changes of the time scales)
+			will be applied.<br /><br />
 
-
-			注意：和 *fadeIn*/*fadeOut* 类似，渐变开始/结束从 weight（权重）为 1 开始。
+			Note: Like with *fadeIn*/*fadeOut*, the fading starts/ends with a weight of 1.
 		</div>
 
 		<h3>[method:AnimationAction fadeIn]( [param:Number durationInSeconds] )</h3>
 		<div>
-			在给定的时间间隔内，将 action 的 [page:.weight weight] 从 0 渐增到 1。
-			这个函数可以被链式调用。
+			Increases the [page:.weight weight] of this action gradually from 0 to 1, within the passed time
+			interval. This method can be chained.
 		</div>
 
 		<h3>[method:AnimationAction fadeOut]( [param:Number durationInSeconds] )</h3>
 		<div>
-			在给定的时间间隔内，将 action 的 [page:.weight weight] 从 1 渐减到 0。
-			这个函数可以被链式调用。
+			Decreases the [page:.weight weight] of this action gradually from 1 to 0, within the passed time
+			interval. This method can be chained.
 		</div>
 
 		<h3>[method:Number getEffectiveTimeScale]()</h3>
 		<div>
-			返回有效的 time scale （考虑当前的扭曲变形（warping）和 [page:.paused paused] 的状态）。
-
+			Returns the effective time scale (considering the current states of warping and
+			[page:.paused paused]).
 		</div>
 
 		<h3>[method:number getEffectiveWeight]()</h3>
 		<div>
-			返回有效的 weight （考虑当前渐变（fading）状态和 [page:.enabled enabled]）。
-
+			Returns the effective weight (considering the current states of fading and
+			[page:.enabled enabled]).
 		</div>
 
 		<h3>[method:AnimationClip getClip]()</h3>
 		<div>
-			返回包含这一 action 的动画数据的裁剪（clip）。
+			Returns the clip which holds the animation data for this action.
 		</div>
 
 		<h3>[method:AnimationMixer getMixer]()</h3>
 		<div>
-			返回负责播放这一 action 的 mixer。
+			Returns the mixer which is responsible for playing this action.
 		</div>
 
 		<h3>[method:Object3D getRoot]()</h3>
 		<div>
-			返回运行这一 action 的根对象。
+			Returns the root object on which this action is performed.
 		</div>
 
 		<h3>[method:AnimationAction halt]( [param:Number durationInSeconds] )</h3>
 		<div>
-			在给定时间间隔内，通过 [page:.timeScale timeScale] 的逐渐减小（从当前值开始），
-			将动画的速度减至 0 。这一方法可以被链式调用。
+			Decelerates this animation's speed to 0 by decreasing [page:.timeScale timeScale] gradually
+			(starting from its current value), within the passed time interval. This method can be chained.
 		</div>
 
 		<h3>[method:Boolean isRunning]()</h3>
 		<div>
-			如果 action 的 [page:.time time] 当前正在运行，返回 true。<br /><br />
+			Returns true if the action’s [page:.time time] is currently running.<br /><br />
 
-			除了在 mixer 中被调用（详见 [page:.isScheduled isScheduled]），还必须满足一下条件：
-			[page:.paused paused] 等同于 false， [page:.enabled enabled] 等同于 true，
-			[page:.timeScale timeScale] 不为 0 , 并且不会被延迟启动 ([page:.startAt startAt])。<br /><br />
+			In addition to being activated in the mixer (see [page:.isScheduled isScheduled]) the following conditions must be fulfilled:
+			[page:.paused paused] is equal to false, [page:.enabled enabled] is equal to true,
+			[page:.timeScale timeScale] is different from 0, and there is no scheduling for a delayed start
+			([page:.startAt startAt]).<br /><br />
 
-
-			注意：*isRunning* 为 true 不一定意味着动画能够真正地被看到。
-			仅在 [page:.weight weight] 也被设置为非零值时，才可以被实际看到。
+			Note: *isRunning* being true doesn’t necessarily mean that the animation can actually be seen.
+			This is only the case, if [page:.weight weight] is additionally set to a non-zero value.
 		</div>
 
 		<h3>[method:Boolean isScheduled]()</h3>
 		<div>
-			如果这一 action 在 mixer 中被启动，返回 true。<br /><br />
-			注意：这不一定意味着动画实际上是运行的（参照 [page:.isRunning isRunning] 的附加条件（[page:.weight weight] 需要设置为非零值））。
-
+			Returns true, if this action is activated in the mixer.<br /><br />
+			Note: This doesn’t necessarily mean that the animation is actually running (compare the additional
+			conditions for [page:.isRunning isRunning]).
 		</div>
 
 		<h3>[method:AnimationAction play]()</h3>
 		<div>
-			通知 mixer 去启动这一 action。这一方法可以被链式调用。<br /><br />
+			Tells the mixer to activate the action. This method can be chained.<br /><br />
 
-			注意：启动这一 action 并不一定意味着动画会立即开始：
-			如果 action 在这之前早已完成（通过到达最后一个循环的末尾），或如果为动画的延迟开始设置了时间（参考[page:.startAt startAt]），
-			就必须首先执行 [page:.reset reset]。一些其他的设置（[page:.paused paused]=true, [page:.enabled enabled]=false,
-			[page:.weight weight]=0, [page:.timeScale timeScale]=0）也能够阻止动画的播放。
-
-
+			Note: Activating this action doesn’t necessarily mean that the animation starts immediately:
+			If the action had already finished before (by reaching the end of its last loop), or if a time
+			for a delayed start has been set (via [page:.startAt startAt]), a [page:.reset reset] must be
+			executed first. Some other settings ([page:.paused paused]=true, [page:.enabled enabled]=false,
+			[page:.weight weight]=0, [page:.timeScale timeScale]=0) can prevent the animation from playing,
+			too.
 		</div>
 
 		<h3>[method:AnimationAction reset]()</h3>
 		<div>
-			重置 action。这一方法可以被链式调用。<br /><br />
+			Resets the action. This method can be chained.<br /><br />
 
-			这一方法将 [page:.paused paused] 设置为 false，[page:.enabled enabled] 设置为 true,
-			[page:.time time] 设置为 0, 打断任何 fading 和 warping， 并且清除内部的循环次数和
-			延迟启动计划。<br /><br />
+			This method sets [page:.paused paused] to false, [page:.enabled enabled] to true,
+			[page:.time time] to 0, interrupts any scheduled fading and warping, and removes the internal
+			loop count and scheduling for delayed starting.<br /><br />
 
-			注意：.*reset* 总是通过 [page:.stop stop]调用，但 .*reset* 本身不会调用 .*stop*。
-			即：如果你想同时停止和重启动画，不要调用 .*reset* 而是调用 .*stop*。
+			Note: .*reset* is always called by [page:.stop stop], but .*reset* doesn’t call .*stop* itself.
+			This means: If you want both, resetting and stopping, don’t call .*reset*; call .*stop* instead.
 		</div>
 
 		<h3>[method:AnimationAction setDuration]( [param:Number durationInSeconds] )</h3>
 		<div>
-			为这一 action 的单个循环设置持续时间（duration）（通过调整 [page:.timeScale timeScale]，
-			同时停止所有的 warping）。这一方法可以被链式调用。
+			Sets the duration for a single loop of this action (by adjusting [page:.timeScale timeScale]
+			and stopping any scheduled warping). This method can be chained.
 		</div>
 
 		<h3>[method:AnimationAction setEffectiveTimeScale]( [param:Number timeScale] )</h3>
 		<div>
-			设置 [page:.timeScale timeScale] 并停止所有的 warping。这个方法可以被链式调用。<br /><br />
+			Sets the [page:.timeScale timeScale] and stops any scheduled warping. This method can be chained.<br /><br />
 
-			如果 [page:.paused paused] 为 false，有效的 time scale （一个内部属性）将被设置为这个值，
-			否则，有效的 time scale（直接影响此刻的动画）将被设置为0。<br /><br />
+			If [page:.paused paused] is false, the effective time scale (an internal property) will also be set
+			to this value; otherwise the effective time scale (directly affecting the animation at
+			this moment) will be set to 0.<br /><br />
 
-
-			注意：如果 .*timeScale* 通过这一方法设置为 0 ，.*paused* 将会自动转换为 *true*。
-
+			Note: .*paused* will not be switched to *true* automatically, if .*timeScale* is set to 0 by
+			this method.
 		</div>
 
 		<h3>[method:AnimationAction setEffectiveWeight]( [param:Number weight] )</h3>
 		<div>
-			设置 [page:.weight weight]，并停止所有的 fading。这一方法可以被链式调用。<br /><br />
+			Sets the [page:.weight weight] and stops any scheduled fading. This method can be chained.<br /><br />
 
-			如果 [page:.enabled enabled] 为 true, 有效的 weight （一个内部属性）也将被设置为这个值；
-			否则，有效的 weight （直接影响此刻的动画），将被设置为0.<br /><br />
+			If [page:.enabled enabled] is true, the effective weight (an internal property) will also be set
+			to this value; otherwise the effective weight (directly affecting the animation at this moment)
+			will be set to 0.<br /><br />
 
-
-			注意：如果 .*weight* 通过这一方法被设置为0，.*enabled* 将会自动转换为 *false*。
-
+			Note: .*enabled* will not be switched to *false* automatically, if .*weight* is set to 0 by
+			this method.
 		</div>
 
 		<h3>[method:AnimationAction setLoop]( [param:Number loopMode], [param:Number repetitions] )</h3>
 		<div>
-			设置 [page:.loop loop mode] 和 [page:.repetitions repetitions] 的数值。
-			这一方法可以被链式调用。
+			Sets the [page:.loop loop mode] and the number of [page:.repetitions repetitions]. This method
+			can be chained.
 		</div>
 
 		<h3>[method:AnimationAction startAt]( [param:Number startTimeInSeconds] )</h3>
 		<div>
-			定义延迟启动的时间（通常像 [page:AnimationMixer.time] + deltaTimeInSeconds 这样传入）。
-			这一方法可以被链式调用。<br /><br />
+			Defines the time for a delayed start (usually passed as [page:AnimationMixer.time] +
+			deltaTimeInSeconds). This method can be chained.<br /><br />
 
-			注意：如果 .*startAt* 后链式调用 [page:.play play]，或者如果 action 早已在 mixer 中被启动（通过前面调用的 .*play*，同时并未停止或重启），
-			动画将仅在给定的时间启动。
-
+			Note: The animation will only start at the given time, if .*startAt* is chained with
+			[page:.play play], or if the action has already been activated in the mixer (by a previous
+			call of .*play*, without stopping or resetting it in the meantime).
 		</div>
 
 		<h3>[method:AnimationAction stop]()</h3>
 		<div>
-			通知 mixer 关闭 action。这一方法可以被链式调用。<br /><br />
+			Tells the mixer to deactivate this action. This method can be chained.<br /><br />
 
-			action 可以被立即停止并完全 [page:.reset reset].<br /><br />
+			The action will be immediately stopped and completely [page:.reset reset].<br /><br />
 
-			注意：可以通过 [page:AnimationMixer.stopAllAction mixer.stopAllAction] 停止同一个mixer上的所有活动的 action。
-
+			Note: You can stop all active actions on the same mixer in one go via
+			[page:AnimationMixer.stopAllAction mixer.stopAllAction].
 		</div>
 
 		<h3>[method:AnimationAction stopFading]()</h3>
 		<div>
-			停止应用在这一 action 上所有计划好的 [page:.fadeIn fading]。
-			这一方法可以被链式调用。
+			Stops any scheduled [page:.fadeIn fading] which is applied to this action. This method can be
+			chained.
 		</div>
 
 		<h3>[method:AnimationAction stopWarping]()</h3>
 		<div>
-			停止应用在这一 action 上所有计划好的 [page:.warp warping]。
-			这一方法可以被链式调用。
+			Stops any scheduled [page:.warp warping] which is applied to this action. This method can be
+			chained.
 		</div>
 
 		<h3>[method:AnimationAction syncWith]( [param:AnimationAction otherAction] )</h3>
 		<div>
-			将这一 action 和传入的另一个 action 同步。
-			这一方法可以被链式调用。<br /><br />
+			Synchronizes this action with the passed other action. This method can be chained.<br /><br />
 
-			同步是通过设置 action 的 [page:.time time] 和 [page:.timeScale timeScale] 为传入的另一 action 的相应值来实现的（停止所有计划好的 warping）。<br /><br />
+			Synchronizing is done by setting this action’s [page:.time time] and [page:.timeScale timeScale] values
+			to the corresponding values of the other action (stopping any scheduled warping).<br /><br />
 
-			注意：另一 action 后续的 *time* 和 *timeScale* 的变化将不会被检测到。
+			Note: Future changes of the other action's *time* and *timeScale* will not be detected.
 		</div>
 
 		<h3>[method:AnimationAction warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
 		<div>
-			在传入的时间间隔内，改变回放速度。
-			通过将 [page:.timeScale timeScale] 从 *startTimeScale* 渐变到 *endTimeScale*来实现。
-			这一方法可以被链式调用。
+			Changes the playback speed, within the passed time interval, by modifying
+			[page:.timeScale timeScale] gradually from *startTimeScale* to *endTimeScale*. This method can
+			be chained.
 		</div>
 
 
-		<h2>Events（事件）</h2>
+		<h2>Events</h2>
 
 
 		<div class="desc">
-			有两个事件分别表示动作的单个循环何时完成整个动作。可以这样使用它们：
+			There are two events indicating when a single loop of the action respectively the entire action has finished. You can react to them with:
 		</div>
 		<code>
-		mixer.addEventListener( 'loop', function( e ) { …} ); // e的属性：type, action 和 loopDelta
-		mixer.addEventListener( 'finished', function( e ) { …} ); // e的属性：type, action 和 direction
+		mixer.addEventListener( 'loop', function( e ) { …} ); // properties of e: type, action and loopDelta
+		mixer.addEventListener( 'finished', function( e ) { …} ); // properties of e: type, action and direction
 		</code>
 
-		<h2>来源</h2>
+		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
