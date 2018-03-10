@@ -406,26 +406,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "inverse", ( assert ) => {
-
-			assert.expect( 6 );
-
-			var a = new Quaternion( x, y, z, w );
-			var inverted = new Quaternion( - 0.2721655269759087, - 0.408248290463863, - 0.5443310539518174, 0.6804138174397717 );
-			a.onChange( function () {
-
-				assert.ok( true, "onChange called" );
-
-			} );
-
-			a.inverse().normalize();
-			assert.ok( Math.abs( a.x - inverted.x ) <= eps, "Check x" );
-			assert.ok( Math.abs( a.y - inverted.y ) <= eps, "Check y" );
-			assert.ok( Math.abs( a.z - inverted.z ) <= eps, "Check z" );
-			assert.ok( Math.abs( a.w - inverted.w ) <= eps, "Check w" );
-
-		} );
-
 		QUnit.todo( "dot", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
@@ -435,7 +415,6 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "normalize/length/lengthSq", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
-			var b = new Quaternion( - x, - y, - z, - w );
 
 			assert.ok( a.length() != 1, "Passed!" );
 			assert.ok( a.lengthSq() != 1, "Passed!" );
