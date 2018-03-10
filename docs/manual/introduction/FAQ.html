@@ -10,41 +10,41 @@
 	<body>
 		<h1>[name]</h1>
 
-		<h2>Which Import Format/Exporter is best supported?</h2>
+		<h2>最佳支持的 Import Format（3D 模型的格式）/ Exporter（导入器类）?</h2>
 		<div>
 TODO
 		</div>
 
-		<h2>Why are there meta viewport tags in examples?</h2>
+		<h2>在示例中为什么会有 meta 标签？</h2>
 		<div>
 			<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">meta</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>viewport<span class="pl-pds">"</span></span> <span class="pl-e">content</span>=<span class="pl-s"><span class="pl-pds">"</span>width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0<span class="pl-pds">"</span></span>&gt;</pre></div>
 
-				<p>These tags control viewport size and scale for mobile browsers (where page content may be rendered at different size than visible viewport).</p>
+				<p>这些标签控制了 viewport 在移动端浏览器中的大小和缩放比例（这些浏览器中，页面内容可能会以不同于可见 viewport 的大小呈现）。</p>
 
 				<p><a href="http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html">http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html</a></p>
 
 				<p><a href="https://developer.mozilla.org/en/Mobile/Viewport_meta_tag">https://developer.mozilla.org/en/Mobile/Viewport_meta_tag</a></p>
 		</div>
 
-		<h2>How can scene scale be preserved on resize?</h2>
+		<h2>怎样在调整大小时保持场景比例？</h2>
 		<div>
-			We want all objects, regardless of their distance from the camera, to appear the same size, even as the window is resized.
+			我们希望所有对象，无论它们与相机之间的距离如何，都会显示相同的大小，即使窗口大小已调整。
 
-			The key equation to solving this is this formula for the visible height at a given distance:
+			解决这个问题的关键方程是计算给定距离处可见高度的公式：
 
 			<code>
 visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;
 			</code>
-			If we increase the window height by a certain percentage, then what we want is the visible height at all distances
-			to increase by the same percentage.
+			如果我们将窗口高度增加一定的百分比，那么我们想要的是所有距离处的可见高度以相同的百分比增加。
 
-			This can not be done by changing the camera position. Instead you have to change the camera field-of-view.
+			
+			通过改变相机的位置是不能达到这一效果的，除非改变相机的视野（field-of-view）。
 			[link:http://jsfiddle.net/Q4Jpu/ Example].
 		</div>
 
-		<h2>Why is part of my object invisible?</h2>
+		<h2>为什么我对象的一部分不可见？</h2>
 		<div>
-			This could be because of face culling. Faces have an orientation that  decides which side is which. And the culling removes the backside in normal circumstances. To see if this is your problem, change the material side to THREE.DoubleSide.
+			这可能是因为设置了背景剔除（face culling），面是有方向的，方向决定了哪面是正面哪面是背面。正常情况下，背景剔除会移除（不渲染）背面。 要查看这是否是您的问题，请将 material 的 side 改为 THREE.DoubleSide。
 			<code>material.side = THREE.DoubleSide</code>
 		</div>
 	</body>
