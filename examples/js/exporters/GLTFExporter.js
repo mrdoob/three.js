@@ -98,7 +98,7 @@ THREE.GLTFExporter.prototype = {
 		var byteOffset = 0;
 		var buffers = [];
 		var pending = [];
-		var nodeMap = {};
+		var nodeMap = new Map();
 		var skins = [];
 		var cachedData = {
 
@@ -1187,7 +1187,7 @@ THREE.GLTFExporter.prototype = {
 
 					sampler: samplers.length - 1,
 					target: {
-						node: nodeMap[ trackNode.uuid ],
+						node: nodeMap.get( trackNode ),
 						path: trackProperty
 					}
 
@@ -1209,7 +1209,7 @@ THREE.GLTFExporter.prototype = {
 
 		function processSkin( object ) {
 
-			var node = outputJSON.nodes[ nodeMap[ object.uuid ] ];
+			var node = outputJSON.nodes[ nodeMap.get( object ) ];
 
 			var skeleton = object.skeleton;
 			var rootJoint = object.skeleton.bones[ 0 ];
@@ -1221,7 +1221,7 @@ THREE.GLTFExporter.prototype = {
 
 			for ( var i = 0; i < skeleton.bones.length; ++ i ) {
 
-				joints.push( nodeMap[ skeleton.bones[ i ].uuid ] );
+				joints.push( nodeMap.get( skeleton.bones[ i ] ) );
 
 				skeleton.boneInverses[ i ].toArray( inverseBindMatrices, i * 16 );
 
@@ -1237,7 +1237,7 @@ THREE.GLTFExporter.prototype = {
 
 				inverseBindMatrices: processAccessor( new THREE.BufferAttribute( inverseBindMatrices, 16 ) ),
 				joints: joints,
-				skeleton: nodeMap[ rootJoint.uuid ]
+				skeleton: nodeMap.get( rootJoint )
 
 			} );
 
@@ -1376,7 +1376,8 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.nodes.push( gltfNode );
 
-			var nodeIndex = nodeMap[ object.uuid ] = outputJSON.nodes.length - 1;
+			var nodeIndex = outputJSON.nodes.length - 1;
+			nodeMap.set( object, nodeIndex );
 
 			return nodeIndex;
 
