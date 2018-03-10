@@ -418,7 +418,7 @@ export default QUnit.module( 'Maths', () => {
 
 			} );
 
-			a.inverse();
+			a.inverse().normalize();
 			assert.ok( Math.abs( a.x - inverted.x ) <= eps, "Check x" );
 			assert.ok( Math.abs( a.y - inverted.y ) <= eps, "Check y" );
 			assert.ok( Math.abs( a.z - inverted.z ) <= eps, "Check z" );
