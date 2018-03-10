@@ -6,7 +6,6 @@
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
 import { JSONLoader } from '../../../../src/loaders/JSONLoader';
-import { arrayMax } from '../../../../src/utils';
 import { DirectGeometry } from '../../../../src/core/DirectGeometry';
 import {
 	BufferAttribute,
@@ -22,7 +21,7 @@ import { Geometry } from '../../../../src/core/Geometry';
 import { Face3 } from '../../../../src/core/Face3';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { Color } from '../../../../src/math/Color';
-import { LineSegments as Line } from '../../../../src/objects/LineSegments.js';
+import { Line } from '../../../../src/objects/Line.js';
 import {
 	x,
 	y,
