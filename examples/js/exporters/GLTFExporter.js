@@ -133,18 +133,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {string} text
 		 * @return {ArrayBuffer}
 		 */
-		function stringToArrayBuffer( text, padded ) {
-			if ( padded ) {
-
-				var pad = getPaddedBufferSize( text.length ) - text.length;
-
-				for ( var i = 0; i < pad; i++ ) {
-
-					text += ' ';
-
-				}
-
-			}
+		function stringToArrayBuffer( text ) {
 
 			if ( window.TextEncoder !== undefined ) {
 
@@ -1548,7 +1537,7 @@ THREE.GLTFExporter.prototype = {
 						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
 
 						// JSON chunk.
-						var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ), true ), 0x20 );
+						var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ) ), 0x20 );
 						var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
 						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
 						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
