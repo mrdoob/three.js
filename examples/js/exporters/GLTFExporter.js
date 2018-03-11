@@ -1008,10 +1008,9 @@ THREE.GLTFExporter.prototype = {
 
 			if ( geometry.index === null && options.forceIndices ) {
 
-				var numFaces = geometry.attributes.position.count;
-				var indices = new Uint32Array( numFaces );
+				var indices = new Uint32Array( geometry.attributes.position.count );
 
-				for ( var i = 0; i < numFaces; i ++ ) {
+				for ( var i = 0, il = indices.length; i < il; i ++ ) {
 
 					indices[ i ] = i;
 
