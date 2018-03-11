@@ -1004,9 +1004,19 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			var forceIndices = options.forceIndices;
+
+			if ( ! forceIndices && Array.isArray( mesh.material ) ) {
+
+				// temporal workaround.
+				console.warn( 'THREE.GLTFExporter: Force index for a mesh with multi-material.', mesh );
+				forceIndices = true;
+
+			}
+
 			var forcedIndex = false;
 
-			if ( geometry.index === null && options.forceIndices ) {
+			if ( geometry.index === null && forceIndices ) {
 
 				var indices = new Uint32Array( geometry.attributes.position.count );
 
