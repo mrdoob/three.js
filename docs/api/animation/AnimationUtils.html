@@ -11,45 +11,45 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-		An object with various functions to assist with animations, used internally.
+		具有多种 function 以协助动画，内部使用。
 		</div>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 
 		<h3>[method:Array arraySlice]( array, from, to )</h3>
 		<div>
-		This is the same as  Array.prototype.slice, but also works on typed arrays.
+		和 Array.prototype.slice 相同，但只作用于类型数组（typed array）。
 		</div>
 
 		<h3>[method:Array convertArray]( array, type, forceClone )</h3>
 		<div>
-		Converts an array to a specific type.
+		将数组转换为一种特定的类型。
 		</div>
 
 		<h3>[method:Array flattenJSON]( jsonKeys, times, values, valuePropertyName  )</h3>
 		<div>
-		Used for parsing AOS keyframe formats.
+		用来解析 AOS 关键帧格式。
 		</div>
 
 		<h3>[method:Array getKeyframeOrder]( times )</h3>
 		<div>
-		Returns an array by which times and values can be sorted.
+		返回一个可以对时间和值排序的数组。
 		</div>
 
 		<h3>[method:Boolean isTypedArray]( object )</h3>
 		<div>
-		Returns *true* if the object is a typed array.
+		如果传入的对象为类型数组，返回 *true*。
 		</div>
 
 		<h3>[method:Array sortedArray]( values, stride, order )</h3>
 		<div>
-		Sorts the array previously returned by [page:AnimationUtils.getKeyframeOrder getKeyframeOrder].
+		对之前通过 [page:AnimationUtils.getKeyframeOrder getKeyframeOrder] 返回的数组排序。
 		</div>
 
 
-		<h2>Source</h2>
+		<h2>来源</h2>
 
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
