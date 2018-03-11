@@ -1005,8 +1005,9 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			var forceIndices = options.forceIndices;
+			var isMultiMaterial = Array.isArray( mesh.material );
 
-			if ( ! forceIndices && Array.isArray( mesh.material ) ) {
+			if ( ! forceIndices && isMultiMaterial ) {
 
 				// temporal workaround.
 				console.warn( 'THREE.GLTFExporter: Force index for a mesh with multi-material.', mesh );
@@ -1032,8 +1033,8 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var materials = Array.isArray( mesh.material ) ? mesh.material : [ mesh.material ] ;
-			var groups = Array.isArray( mesh.material ) ? mesh.geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
+			var materials = isMultiMaterial ? mesh.material : [ mesh.material ] ;
+			var groups = isMultiMaterial ? mesh.geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
 
 			// assuming materials.length === groups.length
 			for ( var i = 0, il = materials.length; i < il; i ++ ) {
