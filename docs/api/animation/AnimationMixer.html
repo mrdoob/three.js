@@ -11,21 +11,21 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			The AnimationMixer is a player for animations on a particular object in the scene. When
-			multiple objects in the scene are animated independently, one AnimationMixer may be used for
-			each object.<br /><br />
+			AnimationMixer 是场景中某个特定对象的动画播放器，当场景中的多个对象单独动画的时候，每个对象都可以使用一个 AnimationMixer。<br /><br />
 
-			For an overview of the different elements of the three.js animation system see the
-			"Animation System" article in the "Next Steps" section of the manual.
+
+
+			有关 three.js 动画系统的不同元素概览，请参阅本手册 'Next Steps' 部分的 'Animation System' 一文查看。
+
 		</div>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:Object3D rootObject] )</h3>
 		<div>
-			[page:Object3D rootObject] - the object whose animations shall be played by this mixer.<br />
+			[page:Object3D rootObject] —— 由这一 mixer 播放动画的对象。<br />
 		</div>
 
 
@@ -34,76 +34,76 @@
 
 		<h3>[property:Number time]</h3>
 		<div>
-			The global mixer time (in seconds; starting with 0 on the mixer's creation).
+			全局 mixer time（以秒为单位，以 mixer 的创建为开始，开始时间为0）。
 		</div>
 
 		<h3>[property:Number timeScale]</h3>
 		<div>
-			A scaling factor for the global [page:.time mixer time].<br /><br />
+			全局缩放因子 [page:.time mixer time]。<br /><br />
 
-			Note: Setting the mixer's timeScale to 0 and later back to 1 is a possibility to pause/unpause
-			all actions that are controlled by this mixer.
+			注意：设置 mixer 的 timeScale 为 0，然后再设置为 1 可能会让该 mixer 控制的所有 action 暂停/取消暂停。
+
 		</div>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 
 		<h3>[method:AnimationAction clipAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<div>
-			Returns an [page:AnimationAction] for the passed clip, optionally using a root object different
-			from the mixer's default root. The first parameter can be either an [page:AnimationClip] object
-			or the name of an AnimationClip.<br /><br />
+			为传入的 clip 返回一个 [page:AnimationAction]，可以选择性地使用一个不同于该 mixer 默认的根对象的根对象。
+			第一个参数可以是一个 [page:AnimationClip] 对象或一个 AnimationClip 的名称。<br /><br />
 
-			If an action fitting these parameters doesn't yet exist, it will be created by this method.<br /><br />
 
-			Note: Calling this method several times with the same parameters returns always the same clip
-			instance.
+			如果不存在满足这些参数的 action，这个方法会新建一个。<br /><br />
+
+			注意：多次调用该方法并传入相同的参数将始终返回同一个 clip 实例。
+
 		</div>
 
 		<h3>[method:AnimationAction existingAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<div>
-			Returns an existing [page:AnimationAction] for the passed clip, optionally using a root object
-			different from the mixer's default root.<br /><br />
+			为传入的 clip 返回存在的 [page:AnimationAction]，可以选择性地使用一个不同于该 mixer 默认的根对象的根对象。<br /><br />
 
-			The first parameter can be either an [page:AnimationClip] object or the name of an AnimationClip.
+
+			第一个参数可以是一个 [page:AnimationClip] 对象或一个 AnimationClip 的名称。<br /><br />
 		</div>
 
 		<h3>[method:Object3D getRoot]()</h3>
 		<div>
-			Returns this mixer's root object.
+			返回这一 mixer 的根对象。
 		</div>
 
 		<h3>[method:AnimationMixer stopAllAction]()</h3>
 		<div>
-			Deactivates all previously scheduled actions on this mixer.
+			关闭该 mixer 上之前计划好的所有 action。
 		</div>
 
 		<h3>[method:AnimationMixer update]([param:Number deltaTimeInSeconds]) </h3>
 		<div>
-			Advances the global mixer time and updates the animation.<br /><br />
+			增加全局 mixer time 并更新动画。<br /><br />
 
-			This is usually done in the render loop, passing [page:Clock.getDelta clock.getDelta] scaled by the mixer's [page:.timeScale timeScale]).
+			通常在渲染循环中，通过 mixer 的 [page:.timeScale timeScale] 缩放传入的 [page:Clock.getDelta clock.getDelta] 来完成这一操作。
 		</div>
 
 		<h3>[method:null uncacheClip]([param:AnimationClip clip])</h3>
 
 		<div>
-			Deallocates all memory resources for a clip.
+			为传入的 clip 释放所有的内存资源。
 		</div>
 
 		<h3>[method:null uncacheRoot]([param:Object3D root]) </h3>
 		<div>
-			Deallocates all memory resources for a root object.
+			为传入的根对象释放所有的内存资源。
 		</div>
 
 		<h3>[method:null uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<div>
-			Deallocates all memory resources for an action.
+			为 action 释放所有的内存资源。
 		</div>
 
 
-		<h2>Source</h2>
+		<h2>来源</h2>
 
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
