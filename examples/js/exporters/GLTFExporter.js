@@ -233,7 +233,7 @@ THREE.GLTFExporter.prototype = {
 
 				if ( padByte !== 0 ) {
 
-					for ( var i = arrayBuffer.byteLength; i < paddedLength; i < il ) {
+					for ( var i = arrayBuffer.byteLength; i < paddedLength; i ++ ) {
 
 						array[ i ] = padByte;
 
