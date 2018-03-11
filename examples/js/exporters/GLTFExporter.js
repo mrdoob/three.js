@@ -1548,7 +1548,7 @@ THREE.GLTFExporter.prototype = {
 						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
 
 						// JSON chunk.
-						var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ), true );
+						var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ), true ), 0x20 );
 						var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
 						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
 						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
