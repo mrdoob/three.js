@@ -227,9 +227,12 @@ THREE.GLTFExporter.prototype = {
 		 * Returns a buffer aligned to 4-byte boundary.
 		 *
 		 * @param {ArrayBuffer} arrayBuffer Buffer to pad
+		 * @param {Integer} padByte (Optional)
 		 * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
 		 */
-		function getPaddedArrayBuffer( arrayBuffer ) {
+		function getPaddedArrayBuffer( arrayBuffer, padByte ) {
+
+			padByte = padByte || 0;
 
 			var paddedLength = getPaddedBufferSize( arrayBuffer.byteLength );
 
@@ -237,6 +240,17 @@ THREE.GLTFExporter.prototype = {
 
 				var array = new Uint8Array( paddedLength );
 				array.set( new Uint8Array( arrayBuffer ) );
+
+				if ( padByte !== 0 ) {
+
+					for ( var i = arrayBuffer.byteLength; i < paddedLength; i < il ) {
+
+						array[ i ] = padByte;
+
+					}
+
+				}
+
 				return array.buffer;
 
 			}
