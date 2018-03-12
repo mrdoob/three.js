@@ -547,6 +547,13 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "fromGeometry/fromDirectGeometry", ( assert ) => {
 
+			if ( typeof XMLHttpRequest === 'undefined' ) {
+
+				assert.expect( 0 );
+				return;
+
+			}
+
 			assert.timeout( 1000 );
 
 			var a = new BufferGeometry();
