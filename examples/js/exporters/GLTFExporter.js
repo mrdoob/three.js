@@ -100,6 +100,7 @@ THREE.GLTFExporter.prototype = {
 		var pending = [];
 		var nodeMap = {};
 		var skins = [];
+		var extensionsUsed = {};
 		var cachedData = {
 
 			materials: new Map(),
@@ -647,19 +648,24 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-
-			if ( ! ( material instanceof THREE.MeshStandardMaterial ) ) {
-
-				console.warn( 'GLTFExporter: Currently just THREE.MeshStandardMaterial is supported. Material conversion may lose information.' );
-
-			}
-
 			// @QUESTION Should we avoid including any attribute that has the default value?
 			var gltfMaterial = {
 
 				pbrMetallicRoughness: {}
 
 			};
+
+			if ( material instanceof THREE.MeshBasicMaterial ) {
+
+				gltfMaterial.extensions = { KHR_materials_unlit: {} };
+
+				extensionsUsed[ 'KHR_materials_unlit' ] = true;
+
+			} else if ( ! ( material instanceof THREE.MeshStandardMaterial ) ) {
+
+				console.warn( 'GLTFExporter: Use MeshStandardMaterial or MeshBasicMaterial for best results.' );
+
+			}
 
 			// pbrMetallicRoughness.baseColorFactor
 			var color = material.color.toArray().concat( [ material.opacity ] );
@@ -674,6 +680,11 @@ THREE.GLTFExporter.prototype = {
 
 				gltfMaterial.pbrMetallicRoughness.metallicFactor = material.metalness;
 				gltfMaterial.pbrMetallicRoughness.roughnessFactor = material.roughness;
+
+			} else if ( material instanceof THREE.MeshBasicMaterial ) {
+
+				gltfMaterial.pbrMetallicRoughness.metallicFactor = 0.0;
+				gltfMaterial.pbrMetallicRoughness.roughnessFactor = 0.9;
 
 			} else {
 
@@ -1504,6 +1515,10 @@ THREE.GLTFExporter.prototype = {
 
 			// Merge buffers.
 			var blob = new Blob( buffers, { type: 'application/octet-stream' } );
+
+			// Declare extensions.
+			var extensionsUsedList = Object.keys( extensionsUsed );
+			if ( extensionsUsedList.length > 0 ) outputJSON.extensionsUsed = extensionsUsedList;
 
 			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
 
