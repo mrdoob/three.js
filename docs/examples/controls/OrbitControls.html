@@ -96,7 +96,8 @@ function animate() {
 
     <h3>[property:Boolean enableDamping]</h3>
     <div>
-      Set to true to enable damping (inertia), which can be used to give a sense of weight to the controls. Default is false.<br>          Note that if this is enabled, you must call [page:.update] () in your animation loop.
+      Set to true to enable damping (inertia), which can be used to give a sense of weight to the controls. Default is false.<br>
+      Note that if this is enabled, you must call [page:.update] () in your animation loop.
     </div>
 
     <h3>[property:Boolean enableKeys]</h3>
@@ -198,7 +199,20 @@ controls.mouseButtons = {
 
     <h3>[property:Camera object]</h3>
     <div>
-      The camera ( or other object ) that is being controlled.
+      The camera being controlled.
+    </div>
+
+    <h3>[property:Integer panningMode]</h3>
+    <div>
+    Panning mode. Defines how the camera's position is translated when panning.
+    The options are THREE.ScreenSpacePanning, in which the camera pans in screen space,
+    and THREE.HorizontalPanning, in which the camera pans in the plane orthogonal to the camera's up direction.
+    Default is THREE.ScreenSpacePanning.
+    </div>
+
+    <h3>[property:Float panSpeed]</h3>
+    <div>
+      Speed of panning. Default is 1.
     </div>
 
     <h3>[property:Vector3 position0]</h3>
