@@ -1036,8 +1036,7 @@ THREE.GLTFExporter.prototype = {
 			var materials = isMultiMaterial ? mesh.material : [ mesh.material ] ;
 			var groups = isMultiMaterial ? mesh.geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
 
-			// assuming materials.length === groups.length
-			for ( var i = 0, il = materials.length; i < il; i ++ ) {
+			for ( var i = 0, il = groups.length; i < il; i ++ ) {
 
 				var primitive = {
 					mode: mode,
