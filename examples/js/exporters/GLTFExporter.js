@@ -1015,7 +1015,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var forcedIndex = false;
+			var didForceIndices = false;
 
 			if ( geometry.index === null && forceIndices ) {
 
@@ -1029,7 +1029,7 @@ THREE.GLTFExporter.prototype = {
 
 				geometry.index = new THREE.Uint32BufferAttribute( indices, 1 );
 
-				forcedIndex = true;
+				didForceIndices = true;
 
 			}
 
@@ -1063,7 +1063,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( forcedIndex ) {
+			if ( didForceIndices ) {
 
 				geometry.index = null;
 
