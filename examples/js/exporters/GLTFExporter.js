@@ -641,7 +641,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material instanceof THREE.ShaderMaterial ) {
+			if ( material.isShaderMaterial ) {
 
 				console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
 				return null;
@@ -655,13 +655,13 @@ THREE.GLTFExporter.prototype = {
 
 			};
 
-			if ( material instanceof THREE.MeshBasicMaterial ) {
+			if ( material.isMeshBasicMaterial ) {
 
 				gltfMaterial.extensions = { KHR_materials_unlit: {} };
 
 				extensionsUsed[ 'KHR_materials_unlit' ] = true;
 
-			} else if ( ! ( material instanceof THREE.MeshStandardMaterial ) ) {
+			} else if ( ! material.isMeshStandardMaterial ) {
 
 				console.warn( 'GLTFExporter: Use MeshStandardMaterial or MeshBasicMaterial for best results.' );
 
@@ -676,12 +676,12 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material instanceof THREE.MeshStandardMaterial ) {
+			if ( material.isMeshStandardMaterial ) {
 
 				gltfMaterial.pbrMetallicRoughness.metallicFactor = material.metalness;
 				gltfMaterial.pbrMetallicRoughness.roughnessFactor = material.roughness;
 
-			} else if ( material instanceof THREE.MeshBasicMaterial ) {
+			} else if ( material.isMeshBasicMaterial ) {
 
 				gltfMaterial.pbrMetallicRoughness.metallicFactor = 0.0;
 				gltfMaterial.pbrMetallicRoughness.roughnessFactor = 0.9;
@@ -723,9 +723,9 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material instanceof THREE.MeshBasicMaterial ||
-				material instanceof THREE.LineBasicMaterial ||
-				material instanceof THREE.PointsMaterial ) {
+			if ( material.isMeshBasicMaterial ||
+				material.isLineBasicMaterial ||
+				material.isPointsMaterial ) {
 
 			} else {
 
@@ -845,19 +845,19 @@ THREE.GLTFExporter.prototype = {
 			var mode;
 
 			// Use the correct mode
-			if ( mesh instanceof THREE.LineSegments ) {
+			if ( mesh.isLineSegments ) {
 
 				mode = WEBGL_CONSTANTS.LINES;
 
-			} else if ( mesh instanceof THREE.LineLoop ) {
+			} else if ( mesh.isLineLoop ) {
 
 				mode = WEBGL_CONSTANTS.LINE_LOOP;
 
-			} else if ( mesh instanceof THREE.Line ) {
+			} else if ( mesh.isLine ) {
 
 				mode = WEBGL_CONSTANTS.LINE_STRIP;
 
-			} else if ( mesh instanceof THREE.Points ) {
+			} else if ( mesh.isPoints ) {
 
 				mode = WEBGL_CONSTANTS.POINTS;
 
@@ -1058,7 +1058,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var isOrtho = camera instanceof THREE.OrthographicCamera;
+			var isOrtho = camera.isOrthographicCamera;
 
 			var gltfCamera = {
 
@@ -1265,7 +1265,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processNode( object ) {
 
-			if ( object instanceof THREE.Light ) {
+			if ( object.isLight ) {
 
 				console.warn( 'GLTFExporter: Unsupported node type:', object.constructor.name );
 				return null;
@@ -1336,19 +1336,17 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( object instanceof THREE.Mesh ||
-				object instanceof THREE.Line ||
-				object instanceof THREE.Points ) {
+			if ( object.isMesh || object.isLine || object.isPoints ) {
 
 				gltfNode.mesh = processMesh( object );
 
-			} else if ( object instanceof THREE.Camera ) {
+			} else if ( object.isCamera ) {
 
 				gltfNode.camera = processCamera( object );
 
 			}
 
-			if ( object instanceof THREE.SkinnedMesh ) {
+			if ( object.isSkinnedMesh ) {
 
 				skins.push( object );
 
