@@ -1007,10 +1007,10 @@ THREE.GLTFExporter.prototype = {
 			var forceIndices = options.forceIndices;
 			var isMultiMaterial = Array.isArray( mesh.material );
 
-			if ( ! forceIndices && isMultiMaterial ) {
+			if ( ! forceIndices && geometry.index === null && isMultiMaterial ) {
 
 				// temporal workaround.
-				console.warn( 'THREE.GLTFExporter: Force index for a mesh with multi-material.', mesh );
+				console.warn( 'THREE.GLTFExporter: Creating index for non-indexed multi-material mesh.' );
 				forceIndices = true;
 
 			}
