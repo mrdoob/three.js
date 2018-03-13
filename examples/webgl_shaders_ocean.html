@@ -182,8 +182,6 @@
 
 				var gui = new dat.GUI();
 
-				var uniforms = sky.material.uniforms;
-
 				var folder = gui.addFolder( 'Sky' );
 				folder.add( parameters, 'inclination', 0, 0.5, 0.0001 ).onChange( updateSun );
 				folder.add( parameters, 'azimuth', 0, 1, 0.0001 ).onChange( updateSun );

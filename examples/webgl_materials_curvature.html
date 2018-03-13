@@ -253,7 +253,7 @@
 							// fit values to 0 and 1
 							Object.keys( curvatureDict ).forEach( function( key ) {
 
-								val = Math.abs( curvatureDict[ key ] );
+								var val = Math.abs( curvatureDict[ key ] );
 								if ( val < min ) min = val;
 								if ( val > max ) max = val;
 
@@ -263,7 +263,7 @@
 
 							Object.keys( curvatureDict ).forEach( function( key ) {
 
-								val = Math.abs( curvatureDict[ key ] );
+								var val = Math.abs( curvatureDict[ key ] );
 								if ( curvatureDict[ key ] < 0 ) {
 									curvatureDict[ key ] = (min - val) / range
 								} else {
