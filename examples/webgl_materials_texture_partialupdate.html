@@ -62,7 +62,7 @@
 				diffuseMap.generateMipmaps = false;
 
 				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
-				material = new THREE.MeshBasicMaterial( { map: diffuseMap } );
+				var material = new THREE.MeshBasicMaterial( { map: diffuseMap } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );

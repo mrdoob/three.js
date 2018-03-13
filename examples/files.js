@@ -72,6 +72,7 @@ var files = {
 		"webgl_lines_colors",
 		"webgl_lines_cubes",
 		"webgl_lines_dashed",
+		"webgl_lines_fat",
 		"webgl_lines_sphere",
 		"webgl_lines_splines",
 		"webgl_loader_3ds",
