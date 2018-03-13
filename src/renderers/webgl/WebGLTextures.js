@@ -7,7 +7,7 @@ import { _Math } from '../../math/Math.js';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
-	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
+	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext ); /* global WebGL2RenderingContext */
 	var _videoTextures = {};
 	var _canvas;
 
