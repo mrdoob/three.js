@@ -17,6 +17,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( image.width > maxSize || image.height > maxSize ) {
 
+			if ( 'data' in image ) {
+
+				console.warn( 'THREE.WebGLRenderer: image in DataTexture is too big (' + image.width + 'x' + image.height + ').' );
+				return;
+
+			}
+
 			// Warning: Scaling through the canvas will only work with images that use
 			// premultiplied alpha.
 
