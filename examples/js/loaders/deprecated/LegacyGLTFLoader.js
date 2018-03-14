@@ -31,7 +31,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			loader.load( url, function ( data ) {
 
-				scope.parse( data, onLoad, path );
+				scope.parse( data, path, onLoad );
 
 			}, onProgress, onError );
 
@@ -49,7 +49,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		},
 
-		parse: function ( data, callback, path ) {
+		parse: function ( data, path, callback ) {
 
 			var content;
 			var extensions = {};
@@ -1633,6 +1633,26 @@ THREE.LegacyGLTFLoader = ( function () {
 								case 'JOINT':
 									geometry.addAttribute( 'skinIndex', bufferAttribute );
 									break;
+
+								default:
+
+									if ( ! primitive.material ) break;
+
+									var material = json.materials[ primitive.material ];
+
+									if ( ! material.technique ) break;
+
+									var parameters = json.techniques[ material.technique ].parameters || {};
+
+									for( var attributeName in parameters ) {
+
+										if ( parameters [ attributeName ][ 'semantic' ] === attributeId ) {
+
+											geometry.addAttribute( attributeName, bufferAttribute );
+
+										}
+
+									}
 
 							}
 
