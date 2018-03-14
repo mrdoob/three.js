@@ -57,11 +57,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x505050 );
 
-				var user = new THREE.Group();
-				scene.add( user );
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				user.add( camera );
 
 				room = new THREE.Mesh(
 					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
@@ -165,11 +161,11 @@
 
 				controller1 = new THREE.ViveController( 0 );
 				controller1.standingMatrix = renderer.vr.getStandingMatrix();
-				user.add( controller1 );
+				scene.add( controller1 );
 
 				controller2 = new THREE.ViveController( 1 );
 				controller2.standingMatrix = renderer.vr.getStandingMatrix();
-				user.add( controller2 );
+				scene.add( controller2 );
 
 				var loader = new THREE.OBJLoader();
 				loader.setPath( 'models/obj/vive-controller/' );
