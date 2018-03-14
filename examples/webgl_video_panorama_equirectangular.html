@@ -68,6 +68,7 @@
 				geometry.scale( - 1, 1, 1 );
 
 				var video = document.createElement( 'video' );
+				video.crossOrigin = 'anonymous';
 				video.width = 640;
 				video.height = 360;
 				video.loop = true;

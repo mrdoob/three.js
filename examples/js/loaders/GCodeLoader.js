@@ -210,7 +210,7 @@ THREE.GCodeLoader.prototype.parse = function ( data ) {
 
 	}
 
-	object.rotation.set( - Math.PI / 2, 0, 0 );
+	object.quaternion.setFromEuler( new THREE.Euler( - Math.PI / 2, 0, 0 ) );
 
 	return object;
 

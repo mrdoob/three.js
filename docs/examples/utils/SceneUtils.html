@@ -16,7 +16,7 @@
 		<h2>Methods</h2>
 
 
-		<h3>[method:Group createMultiMaterialObject]( [page:Geometry geometry], [page:Array materials] )</h3>
+		<h3>[method:Group createMultiMaterialObject]( [param:Geometry geometry], [param:Array materials] )</h3>
 		<div>
 		geometry -- The geometry for the set of materials. <br />
 		materials -- The materials for the object.
@@ -26,7 +26,7 @@
 		This is mostly useful for objects that need both a material and a wireframe implementation.
 		</div>
 
-		<h3>[method:null attach]( [page:Object3D child], [page:Object3D scene], [page:Object3D parent] )</h3>
+		<h3>[method:null attach]( [param:Object3D child], [param:Object3D scene], [param:Object3D parent] )</h3>
 		<div>
 		child -- The object to add to the parent  <br />
 		scene -- The scene to detach the object on. <br />
@@ -36,7 +36,7 @@
 		Attaches the object to the parent without the moving the object in the worldspace. Beware that to do this the matrixWorld needs to be updated, this can be done by calling the updateMatrixWorld method on the parent object.
 		</div>
 
-		<h3>[method:null detach]( [page:Object3D child], [page:Object3D parent], [page:Object3D scene] )</h3>
+		<h3>[method:null detach]( [param:Object3D child], [param:Object3D parent], [param:Object3D scene] )</h3>
 		<div>
 		child -- The object to remove from the parent  <br />
 		scene -- The scene to attach the object on. <br />

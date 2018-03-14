@@ -74,9 +74,13 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 	}
 
-	this.saoMaterial = new THREE.ShaderMaterial( THREE.SAOShader );
+	this.saoMaterial = new THREE.ShaderMaterial( {
+		defines: Object.assign( {}, THREE.SAOShader.defines ),
+		fragmentShader: THREE.SAOShader.fragmentShader,
+		vertexShader: THREE.SAOShader.vertexShader,
+		uniforms: THREE.UniformsUtils.clone( THREE.SAOShader.uniforms )
+	} );
 	this.saoMaterial.extensions.derivatives = true;
-	this.saoMaterial.extensions.drawBuffers = true;
 	this.saoMaterial.defines[ 'DEPTH_PACKING' ] = this.supportsDepthTextureExtension ? 0 : 1;
 	this.saoMaterial.defines[ 'NORMAL_TEXTURE' ] = this.supportsNormalTexture ? 1 : 0;
 	this.saoMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
@@ -95,7 +99,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 	this.vBlurMaterial = new THREE.ShaderMaterial( {
 		uniforms: THREE.UniformsUtils.clone( THREE.DepthLimitedBlurShader.uniforms ),
-		defines: THREE.DepthLimitedBlurShader.defines,
+		defines: Object.assign( {}, THREE.DepthLimitedBlurShader.defines ),
 		vertexShader: THREE.DepthLimitedBlurShader.vertexShader,
 		fragmentShader: THREE.DepthLimitedBlurShader.fragmentShader
 	} );
@@ -108,7 +112,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 
 	this.hBlurMaterial = new THREE.ShaderMaterial( {
 		uniforms: THREE.UniformsUtils.clone( THREE.DepthLimitedBlurShader.uniforms ),
-		defines: THREE.DepthLimitedBlurShader.defines,
+		defines: Object.assign( {}, THREE.DepthLimitedBlurShader.defines ),
 		vertexShader: THREE.DepthLimitedBlurShader.vertexShader,
 		fragmentShader: THREE.DepthLimitedBlurShader.fragmentShader
 	} );
@@ -234,7 +238,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		if ( ! this.supportsDepthTextureExtension ) {
 
 			// Clear rule : far clipping plane in both RGBA and Basic encoding
-			this.renderOverride( renderer, this.depthMaterial, this.depthRenderTarget, 0xffffff, 1.0 );
+			this.renderOverride( renderer, this.depthMaterial, this.depthRenderTarget, 0x000000, 1.0 );
 
 		}
 

@@ -75,6 +75,7 @@
 					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
 				);
+				room.position.y = 3;
 				scene.add( room );
 
 				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );

@@ -66,7 +66,7 @@
 		</code>
 
 		<h2>Constructor</h2>
-		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
+		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
 		<div>
     [page:Geometry geometry] - an instance of [page:Geometry] or [page:BufferGeometry] (recommended).
 		[page:Geometry.skinIndices skinIndices] and [page:Geometry.skinWeights skinWeights] should be set to true on the geometry.<br />
@@ -115,7 +115,7 @@
 		<h2>Methods</h2>
 		<div>See the base [page:Mesh] class for common methods.</div>
 
-		<h3>[method:null bind]( [page:Skeleton skeleton], [page:Matrix4 bindMatrix] )</h3>
+		<h3>[method:null bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
 		<div>
 		[page:Skeleton skeleton] - [page:Skeleton] created from a [page:Bone Bones] tree.<br/>
 		[page:Matrix4 bindMatrix] - [page:Matrix4] that represents the base transform of the skeleton.<br /><br />
@@ -141,7 +141,7 @@
 		This method sets the skinned mesh in the rest pose (resets the pose).
 		</div>
 
-		<h3>[method:null updateMatrixWorld]( [page:Boolean force] )</h3>
+		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
 		<div>
 		Updates the [page:Matrix4 MatrixWorld].
 		</div>

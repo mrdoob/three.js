@@ -159,7 +159,15 @@ THREE.ColladaLoader.prototype = {
 
 		function parseAssetUnit( xml ) {
 
-			return xml !== undefined ? parseFloat( xml.getAttribute( 'meter' ) ) : 1;
+			if ( ( xml !== undefined ) && ( xml.hasAttribute( 'meter' ) === true ) ) {
+
+				return parseFloat( xml.getAttribute( 'meter' ) );
+
+			} else {
+
+				return 1; // default 1 meter
+
+			}
 
 		}
 
@@ -2036,7 +2044,8 @@ THREE.ColladaLoader.prototype = {
 				material: xml.getAttribute( 'material' ),
 				count: parseInt( xml.getAttribute( 'count' ) ),
 				inputs: {},
-				stride: 0
+				stride: 0,
+				hasUV: false
 			};
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
@@ -2053,6 +2062,7 @@ THREE.ColladaLoader.prototype = {
 						var offset = parseInt( child.getAttribute( 'offset' ) );
 						primitive.inputs[ semantic ] = { id: id, offset: offset };
 						primitive.stride = Math.max( primitive.stride, offset + 1 );
+						if ( semantic === 'TEXCOORD' ) primitive.hasUV = true;
 						break;
 
 					case 'vcount':
@@ -2089,6 +2099,30 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function checkUVCoordinates( primitives ) {
+
+			var count = 0;
+
+			for ( var i = 0, l = primitives.length; i < l; i ++ ) {
+
+				var primitive = primitives[ i ];
+
+				if ( primitive.hasUV === true ) {
+
+					count ++;
+
+				}
+
+			}
+
+			if ( count > 0 && count < primitives.length ) {
+
+				primitives.uvsNeedsFix = true;
+
+			}
+
+		}
+
 		function buildGeometry( data ) {
 
 			var build = {};
@@ -2099,16 +2133,22 @@ THREE.ColladaLoader.prototype = {
 
 			if ( primitives.length === 0 ) return {};
 
-			// our goal is to create one buffer geoemtry for a single type of primitives
+			// our goal is to create one buffer geometry for a single type of primitives
 			// first, we group all primitives by their type
 
 			var groupedPrimitives = groupPrimitives( primitives );
 
 			for ( var type in groupedPrimitives ) {
 
-				// second, we create for each type of primitives (polylist,triangles or lines) a buffer geometry
+				var primitiveType = groupedPrimitives[ type ];
 
-				build[ type ] = buildGeometryType( groupedPrimitives[ type ], sources, vertices );
+				// second, ensure consistent uv coordinates for each type of primitives (polylist,triangles or lines)
+
+				checkUVCoordinates( primitiveType );
+
+				// third, create a buffer geometry for each type of primitives
+
+				build[ type ] = buildGeometryType( primitiveType, sources, vertices );
 
 			}
 
@@ -2185,6 +2225,7 @@ THREE.ColladaLoader.prototype = {
 								switch ( key ) {
 
 									case 'POSITION':
+										var prevLength = position.array.length;
 										buildGeometryData( primitive, sources[ id ], input.offset, position.array );
 										position.stride = sources[ id ].stride;
 
@@ -2192,6 +2233,22 @@ THREE.ColladaLoader.prototype = {
 
 											buildGeometryData( primitive, sources.skinIndices, input.offset, skinIndex.array );
 											buildGeometryData( primitive, sources.skinWeights, input.offset, skinWeight.array );
+
+										}
+
+										// see #3803
+
+										if ( primitive.hasUV === false && primitives.uvsNeedsFix === true ) {
+
+											var count = ( position.array.length - prevLength ) / position.stride;
+
+											for ( var i = 0; i < count; i ++ ) {
+
+												// fill missing uv coordinates
+
+												uv.array.push( 0, 0 );
+
+											}
 
 										}
 										break;
@@ -3066,11 +3123,39 @@ THREE.ColladaLoader.prototype = {
 			for ( i = 0; i < skeletons.length; i ++ ) {
 
 				var skeleton = skeletons[ i ];
-				var root = getNode( skeleton );
 
-				// setup bone data for a single bone hierarchy
+				var root;
 
-				buildBoneHierarchy( root, joints, boneData );
+				if ( hasNode( skeleton ) ) {
+
+					root = getNode( skeleton );
+					buildBoneHierarchy( root, joints, boneData );
+
+				} else if ( hasVisualScene( skeleton ) ) {
+
+					// handle case where the skeleton refers to the visual scene (#13335)
+
+					var visualScene = library.visualScenes[ skeleton ];
+					var children = visualScene.children;
+
+					for ( var j = 0; j < children.length; j ++ ) {
+
+						var child = children[ j ];
+
+						if ( child.type === 'JOINT' ) {
+
+							var root = getNode( child.id );
+							buildBoneHierarchy( root, joints, boneData );
+
+						}
+
+					}
+
+				} else {
+
+					console.error( 'THREE.ColladaLoader: Unable to find root bone of skeleton with ID:', skeleton );
+
+				}
 
 			}
 
@@ -3298,7 +3383,12 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			object.name = ( type === 'JOINT' ) ? data.sid : data.name;
+			if ( object.name === '' ) {
+
+				object.name = ( type === 'JOINT' ) ? data.sid : data.name;
+
+			}
+
 			object.matrix.copy( matrix );
 			object.matrix.decompose( object.position, object.quaternion, object.scale );
 
@@ -3402,6 +3492,12 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
+		function hasNode( id ) {
+
+			return library.nodes[ id ] !== undefined;
+
+		}
+
 		function getNode( id ) {
 
 			return getBuild( library.nodes[ id ], buildNode );
@@ -3442,21 +3538,17 @@ THREE.ColladaLoader.prototype = {
 
 				var child = children[ i ];
 
-				if ( child.id === null ) {
-
-					group.add( buildNode( child ) );
-
-				} else {
-
-					// if there is an ID, let's try to get the finished build (e.g. joints are already build)
-
-					group.add( getNode( child.id ) );
-
-				}
+				group.add( getNode( child.id ) );
 
 			}
 
 			return group;
+
+		}
+
+		function hasVisualScene( id ) {
+
+			return library.visualScenes[ id ] !== undefined;
 
 		}
 
@@ -3604,7 +3696,7 @@ THREE.ColladaLoader.prototype = {
 
 		if ( asset.upAxis === 'Z_UP' ) {
 
-			scene.rotation.x = - Math.PI / 2;
+			scene.quaternion.setFromEuler( new THREE.Euler( - Math.PI / 2, 0, 0 ) );
 
 		}
 

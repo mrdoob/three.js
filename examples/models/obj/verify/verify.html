@@ -160,14 +160,10 @@
 
 						objLoader2.setModelName( modelName );
 						objLoader2.setMaterials( materials );
-						var mats = objLoader2.builder.getMaterials();
-						var defaultPointMaterial = mats[ 'defaultPointMaterial' ];
-						defaultPointMaterial.sizeAttenuation = true;
-
-						objLoader2.getLogger().setDebug( true );
+						objLoader2.setLogging( true, false );
 						objLoader2.load( './verify.obj', callbackOnLoad, null, null, null, false );
 					};
-					objLoader2.loadMtl( './verify.mtl', null, onLoadMtl, null, { invertTrProperty: false } );
+					objLoader2.loadMtl( './verify.mtl', null, onLoadMtl );
 				};
 
 				OBJLoaderVerify.prototype._reportProgress = function( event ) {

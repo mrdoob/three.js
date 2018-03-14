@@ -382,10 +382,13 @@ var list = {
 		},
 
 		"Renderers": {
-			"CanvasRenderer": "examples/renderers/CanvasRenderer"
+			"CanvasRenderer": "examples/renderers/CanvasRenderer",
+			"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
+			"CSS2DRenderer": "examples/renderers/CSS2DRenderer"
 		},
 
 		"Utils": {
+			"BufferGeometryUtils": "examples/BufferGeometryUtils",
 			"SceneUtils": "examples/utils/SceneUtils"
 		}
 

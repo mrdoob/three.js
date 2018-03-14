@@ -127,7 +127,7 @@ var guis = {
 			radiusTop: 5,
 			radiusBottom: 5,
 			height: 10,
-			radiusSegments: 8,
+			radialSegments: 8,
 			heightSegments: 1,
 			openEnded: false,
 			thetaStart: 0,
@@ -141,7 +141,7 @@ var guis = {
 					data.radiusTop,
 					data.radiusBottom,
 					data.height,
-					data.radiusSegments,
+					data.radialSegments,
 					data.heightSegments,
 					data.openEnded,
 					data.thetaStart,
@@ -156,7 +156,7 @@ var guis = {
 		folder.add( data, 'radiusTop', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'radiusBottom', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'openEnded' ).onChange( generateGeometry );
 		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
@@ -173,7 +173,7 @@ var guis = {
 			radiusTop: 5,
 			radiusBottom: 5,
 			height: 10,
-			radiusSegments: 8,
+			radialSegments: 8,
 			heightSegments: 1,
 			openEnded: false,
 			thetaStart: 0,
@@ -187,7 +187,7 @@ var guis = {
 					data.radiusTop,
 					data.radiusBottom,
 					data.height,
-					data.radiusSegments,
+					data.radialSegments,
 					data.heightSegments,
 					data.openEnded,
 					data.thetaStart,
@@ -202,7 +202,7 @@ var guis = {
 		folder.add( data, 'radiusTop', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'radiusBottom', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'openEnded' ).onChange( generateGeometry );
 		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
@@ -218,7 +218,7 @@ var guis = {
 		var data = {
 			radius: 5,
 			height: 10,
-			radiusSegments: 8,
+			radialSegments: 8,
 			heightSegments: 1,
 			openEnded: false,
 			thetaStart: 0,
@@ -231,7 +231,7 @@ var guis = {
 				new THREE.ConeBufferGeometry(
 					data.radius,
 					data.height,
-					data.radiusSegments,
+					data.radialSegments,
 					data.heightSegments,
 					data.openEnded,
 					data.thetaStart,
@@ -245,7 +245,7 @@ var guis = {
 
 		folder.add( data, 'radius', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'openEnded' ).onChange( generateGeometry );
 		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
@@ -261,7 +261,7 @@ var guis = {
 		var data = {
 			radius: 5,
 			height: 10,
-			radiusSegments: 8,
+			radialSegments: 8,
 			heightSegments: 1,
 			openEnded: false,
 			thetaStart: 0,
@@ -274,7 +274,7 @@ var guis = {
 				new THREE.ConeGeometry(
 					data.radius,
 					data.height,
-					data.radiusSegments,
+					data.radialSegments,
 					data.heightSegments,
 					data.openEnded,
 					data.thetaStart,
@@ -288,7 +288,7 @@ var guis = {
 
 		folder.add( data, 'radius', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'openEnded' ).onChange( generateGeometry );
 		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
@@ -1165,7 +1165,7 @@ var guis = {
 		var data = {
 			segments: 20,
 			radius: 2,
-			radiusSegments: 8
+			radialSegments: 8
 		};
 
 		var path = new CustomSinCurve( 10 );
@@ -1173,7 +1173,7 @@ var guis = {
 		function generateGeometry() {
 
 			updateGroupGeometry( mesh,
-				new THREE.TubeGeometry( path, data.segments, data.radius, data.radiusSegments, false )
+				new THREE.TubeGeometry( path, data.segments, data.radius, data.radialSegments, false )
 			);
 
 		}
@@ -1182,7 +1182,7 @@ var guis = {
 
 		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 
@@ -1193,7 +1193,7 @@ var guis = {
 		var data = {
 			segments: 20,
 			radius: 2,
-			radiusSegments: 8
+			radialSegments: 8
 		};
 
 		var path = new CustomSinCurve( 10 );
@@ -1201,7 +1201,7 @@ var guis = {
 		function generateGeometry() {
 
 			updateGroupGeometry( mesh,
-				new THREE.TubeBufferGeometry( path, data.segments, data.radius, data.radiusSegments, false )
+				new THREE.TubeBufferGeometry( path, data.segments, data.radius, data.radialSegments, false )
 			);
 
 		}
@@ -1210,7 +1210,7 @@ var guis = {
 
 		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 

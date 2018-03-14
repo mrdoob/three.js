@@ -73,7 +73,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Object parameters] )</h3>
+		<h3>[name]( [param:Object parameters] )</h3>
 		<div>
 			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
 			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
@@ -97,7 +97,7 @@
 		</div>
 
 		<h3>[property:Texture aoMap]</h3>
-		<div>The red channel of this texture is used as the ambient occlusion map. Default is null. 
+		<div>The red channel of this texture is used as the ambient occlusion map. Default is null.
 		The aoMap requires a second set of UVs, and consequently will ignore the [page:Texture repeat]
 		and [page:Texture offset] Texture properties.</div>
 
@@ -166,10 +166,10 @@
 		<div>Intensity of the emissive light. Modulates the emissive color. Default is 1.</div>
 
 		<h3>[property:TextureCube envMap]</h3>
-		<div>The environment map. Default is null.  Note that in order for the material roughness 
-		property to correctly blur out the environment map, the shader must have access to mipmaps 
-		of the env texture.  TextureCubes created with default settings are correctly configured; 
-		if adjusting texture parameters manually, ensure minFilter is set to one of the MipMap options, 
+		<div>The environment map. Default is null.  Note that in order for the material roughness
+		property to correctly blur out the environment map, the shader must have access to mipmaps
+		of the env texture.  TextureCubes created with default settings are correctly configured;
+		if adjusting texture parameters manually, ensure minFilter is set to one of the MipMap options,
 		and that mip maps have not been otherwise forcibly disabled.</div>
 
 		<h3>[property:Float envMapIntensity]</h3>
@@ -184,8 +184,8 @@
 
 
 		<h3>[property:Texture lightMap]</h3>
-		<div>The light map. Default is null. The lightMap requires a second set of UVs, 
-		and consequently will ignore the [page:Texture repeat] and [page:Texture offset] 
+		<div>The light map. Default is null. The lightMap requires a second set of UVs,
+		and consequently will ignore the [page:Texture repeat] and [page:Texture offset]
 		Texture properties.</div>
 
 		<h3>[property:Float lightMapIntensity]</h3>

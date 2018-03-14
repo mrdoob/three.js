@@ -59,12 +59,6 @@
 				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camBox = new THREE.Object3D();
-
-				camBox.position.y = 1.8;
-
-				camBox.add( camera );
-				scene.add( camBox );
 
 				room = new THREE.Mesh(
 					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
@@ -118,9 +112,8 @@
 				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				controller = new THREE.GearVRController();
-				camBox.position.y = 1.8;
-				controller.setHand( 'right' );
-				camBox.add( controller );
+				controller.position.set( 0.25, 0.75, 0 );
+				scene.add( controller );
 
 				var skyBox = {
 					front: 'textures/cube/Bridge2/posz.jpg',
@@ -182,11 +175,27 @@
 
 				controller.update();
 
+				if ( controller.getTouchpadState() === true ) {
+
+					var cube = room.children[ 0 ];
+					room.remove( cube );
+
+					cube.position.copy( controller.position );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 ) * delta;
+					cube.userData.velocity.applyQuaternion( controller.quaternion );
+					room.add( cube );
+
+				}
+
+				// keep cubes inside room
+
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
 					var cube = room.children[ i ];
 
-					if ( cube.geometry instanceof THREE.BoxGeometry === false ) continue;
+					cube.position.add( cube.userData.velocity );
 
 					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
 
@@ -209,7 +218,9 @@
 
 					}
 
-					cube.rotation.x += 0.01 * delta;
+					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
+					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
+					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
 
 				}
 
