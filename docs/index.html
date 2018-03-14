@@ -29,6 +29,7 @@
 		<iframe name="viewer"></iframe>
 
 		<script src="list.js"></script>
+		<script src="fts_fuzzy_match.js"></script>
 
 		<script>
 
@@ -177,30 +178,22 @@
 
 			function updateFilter() {
 
+
 				// (uncomment the following line and the "Query strings" section, if you want query strings):
 				// updateQueryString();
 
-				var regExp = new RegExp( filterInput.value, 'gi' );
 
 				for ( var pageName in pageProperties ) {
 
 					var linkElement = pageProperties[ pageName ].linkElement;
 					var categoryClassList = linkElement.parentElement.classList;
-					var filterResults = pageName.match( regExp );
 
-					if ( filterResults && filterResults.length > 0 ) {
+					var filterResults = fuzzy_match( filterInput.value, pageName );
+
+					if ( filterResults[0] ) {
 
 						// Accentuate matching characters
-
-						for ( var i = 0; i < filterResults.length; i++ ) {
-
-							var result = filterResults[ i ];
-
-							if ( result !== '' ) {
-								pageName = pageName.replace( result, '<b>' + result + '</b>' );
-							}
-
-						}
+						pageName = filterResults[2];
 
 						categoryClassList.remove( 'hidden' );
 						linkElement.innerHTML = pageName;
