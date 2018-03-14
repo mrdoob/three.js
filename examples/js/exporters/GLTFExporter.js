@@ -169,10 +169,12 @@ THREE.GLTFExporter.prototype = {
 
 		/**
 		 * Get the min and max vectors from the given attribute
-		 * @param  {THREE.BufferAttribute} attribute Attribute to find the min/max
+		 * @param  {THREE.BufferAttribute} attribute Attribute to find the min/max in range from start to start + count
+		 * @param  {Integer} start
+		 * @param  {Integer} count
 		 * @return {Object} Object containing the `min` and `max` values (As an array of attribute.itemSize components)
 		 */
-		function getMinMax( attribute ) {
+		function getMinMax( attribute, start, count ) {
 
 			var output = {
 
@@ -181,7 +183,7 @@ THREE.GLTFExporter.prototype = {
 
 			};
 
-			for ( var i = 0; i < attribute.count; i ++ ) {
+			for ( var i = start; i < start + count; i ++ ) {
 
 				for ( var a = 0; a < attribute.itemSize; a ++ ) {
 
@@ -393,9 +395,11 @@ THREE.GLTFExporter.prototype = {
 		 * Process attribute to generate an accessor
 		 * @param  {THREE.BufferAttribute} attribute Attribute to process
 		 * @param  {THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
+		 * @param  {Integer} start (Optional)
+		 * @param  {Integer} count (Optional)
 		 * @return {Integer}           Index of the processed accessor on the "accessors" array
 		 */
-		function processAccessor( attribute, geometry ) {
+		function processAccessor( attribute, geometry, start, count ) {
 
 			if ( ! outputJSON.accessors ) {
 
@@ -434,18 +438,25 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var minMax = getMinMax( attribute );
-
-			var start = 0;
-			var count = attribute.count;
+			if ( start === undefined ) start = 0;
+			if ( count === undefined ) count = attribute.count;
 
 			// @TODO Indexed buffer geometry with drawRange not supported yet
 			if ( options.truncateDrawRange && geometry !== undefined && geometry.index === null ) {
 
-				start = geometry.drawRange.start;
-				count = geometry.drawRange.count !== Infinity ? geometry.drawRange.count : attribute.count;
+				var end = start + count;
+				var end2 = geometry.drawRange.count === Infinity
+						? attribute.count
+						: geometry.drawRange.start + geometry.drawRange.count;
+
+				start = Math.max( start, geometry.drawRange.start );
+				count = Math.min( end, end2 ) - start;
+
+				if ( count < 0 ) count = 0;
 
 			}
+
+			var minMax = getMinMax( attribute, start, count );
 
 			var bufferViewTarget;
 
@@ -453,8 +464,7 @@ THREE.GLTFExporter.prototype = {
 			// animation samplers, target must not be set.
 			if ( geometry !== undefined ) {
 
-				var isVertexAttributes = componentType === WEBGL_CONSTANTS.FLOAT;
-				bufferViewTarget = isVertexAttributes ? WEBGL_CONSTANTS.ARRAY_BUFFER : WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER;
+				bufferViewTarget = attribute === geometry.index ? WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER : WEBGL_CONSTANTS.ARRAY_BUFFER;
 
 			}
 
@@ -888,43 +898,11 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var gltfMesh = {
-				primitives: [
-					{
-						mode: mode,
-						attributes: {},
-					}
-				]
-			};
+			var gltfMesh = {};
 
-			var material = processMaterial( mesh.material );
-			if ( material !== null ) {
-
-				gltfMesh.primitives[ 0 ].material = material;
-
-			}
-
-
-			if ( geometry.index ) {
-
-				gltfMesh.primitives[ 0 ].indices = processAccessor( geometry.index, geometry );
-
-			} else if ( options.forceIndices ) {
-
-				var numFaces = geometry.attributes.position.count;
-				var indices = new Uint32Array( numFaces );
-				for ( var i = 0; i < numFaces; i ++ ) {
-
-					indices[ i ] = i;
-
-				}
-
-				gltfMesh.primitives[ 0 ].indices = processAccessor( new THREE.Uint32BufferAttribute( indices, 1 ), geometry );
-
-			}
-
-			// We've just one primitive per mesh
-			var gltfAttributes = gltfMesh.primitives[ 0 ].attributes;
+			var attributes = {};
+			var primitives = [];
+			var targets = [];
 
 			// Conversion between attributes names in threejs and gltf spec
 			var nameConversion = {
@@ -946,7 +924,7 @@ THREE.GLTFExporter.prototype = {
 
 				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
 
-					gltfAttributes[ attributeName ] = processAccessor( attribute, geometry );
+					attributes[ attributeName ] = processAccessor( attribute, geometry );
 
 				}
 
@@ -968,8 +946,6 @@ THREE.GLTFExporter.prototype = {
 					}
 
 				}
-
-				gltfMesh.primitives[ 0 ].targets = [];
 
 				for ( var i = 0; i < mesh.morphTargetInfluences.length; ++ i ) {
 
@@ -1021,7 +997,7 @@ THREE.GLTFExporter.prototype = {
 
 					}
 
-					gltfMesh.primitives[ 0 ].targets.push( target );
+					targets.push( target );
 
 					weights.push( mesh.morphTargetInfluences[ i ] );
 					if ( mesh.morphTargetDictionary !== undefined ) targetNames.push( reverseDictionary[ i ] );
@@ -1038,6 +1014,73 @@ THREE.GLTFExporter.prototype = {
 				}
 
 			}
+
+			var forceIndices = options.forceIndices;
+			var isMultiMaterial = Array.isArray( mesh.material );
+
+			if ( ! forceIndices && geometry.index === null && isMultiMaterial ) {
+
+				// temporal workaround.
+				console.warn( 'THREE.GLTFExporter: Creating index for non-indexed multi-material mesh.' );
+				forceIndices = true;
+
+			}
+
+			var didForceIndices = false;
+
+			if ( geometry.index === null && forceIndices ) {
+
+				var indices = [];
+
+				for ( var i = 0, il = geometry.attributes.position.count; i < il; i ++ ) {
+
+					indices[ i ] = i;
+
+				}
+
+				geometry.setIndex( indices );
+
+				didForceIndices = true;
+
+			}
+
+			var materials = isMultiMaterial ? mesh.material : [ mesh.material ] ;
+			var groups = isMultiMaterial ? mesh.geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
+
+			for ( var i = 0, il = groups.length; i < il; i ++ ) {
+
+				var primitive = {
+					mode: mode,
+					attributes: attributes,
+				};
+
+				if ( targets.length > 0 ) primitive.targets = targets;
+
+				var material = processMaterial( materials[ groups[ i ].materialIndex ] );
+
+				if ( material !== null ) {
+
+					primitive.material = material;
+
+				}
+
+				if ( geometry.index !== null ) {
+
+					primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
+
+				}
+
+				primitives.push( primitive );
+
+			}
+
+			if ( didForceIndices ) {
+
+				geometry.setIndex( null );
+
+			}
+
+			gltfMesh.primitives = primitives;
 
 			outputJSON.meshes.push( gltfMesh );
 
