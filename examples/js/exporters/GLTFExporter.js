@@ -98,8 +98,9 @@ THREE.GLTFExporter.prototype = {
 		var byteOffset = 0;
 		var buffers = [];
 		var pending = [];
-		var nodeMap = {};
+		var nodeMap = new Map();
 		var skins = [];
+		var extensionsUsed = {};
 		var cachedData = {
 
 			materials: new Map(),
@@ -133,18 +134,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {string} text
 		 * @return {ArrayBuffer}
 		 */
-		function stringToArrayBuffer( text, padded ) {
-			if ( padded ) {
-
-				var pad = getPaddedBufferSize( text.length ) - text.length;
-
-				for ( var i = 0; i < pad; i++ ) {
-
-					text += ' ';
-
-				}
-
-			}
+		function stringToArrayBuffer( text ) {
 
 			if ( window.TextEncoder !== undefined ) {
 
@@ -152,26 +142,29 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var buffer = new ArrayBuffer( text.length );
+			var array = new Uint8Array( new ArrayBuffer( text.length ) );
 
-			var bufferView = new Uint8Array( buffer );
+			for ( var i = 0, il = text.length; i < il; i ++ ) {
 
-			for ( var i = 0; i < text.length; ++ i ) {
+				var value = text.charCodeAt( i );
 
-				bufferView[ i ] = text.charCodeAt( i );
+				// Replacing multi-byte character with space(0x20).
+				array[ i ] = value > 0xFF ? 0x20 : value
 
 			}
 
-			return buffer;
+			return array.buffer;
 
 		}
 
 		/**
 		 * Get the min and max vectors from the given attribute
-		 * @param  {THREE.BufferAttribute} attribute Attribute to find the min/max
+		 * @param  {THREE.BufferAttribute} attribute Attribute to find the min/max in range from start to start + count
+		 * @param  {Integer} start
+		 * @param  {Integer} count
 		 * @return {Object} Object containing the `min` and `max` values (As an array of attribute.itemSize components)
 		 */
-		function getMinMax( attribute ) {
+		function getMinMax( attribute, start, count ) {
 
 			var output = {
 
@@ -180,7 +173,7 @@ THREE.GLTFExporter.prototype = {
 
 			};
 
-			for ( var i = 0; i < attribute.count; i ++ ) {
+			for ( var i = start; i < start + count; i ++ ) {
 
 				for ( var a = 0; a < attribute.itemSize; a ++ ) {
 
@@ -227,17 +220,31 @@ THREE.GLTFExporter.prototype = {
 		 * Returns a buffer aligned to 4-byte boundary.
 		 *
 		 * @param {ArrayBuffer} arrayBuffer Buffer to pad
+		 * @param {Integer} paddingByte (Optional)
 		 * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
 		 */
-		function getPaddedArrayBuffer( arrayBuffer ) {
+		function getPaddedArrayBuffer( arrayBuffer, paddingByte ) {
+
+			paddingByte = paddingByte || 0;
 
 			var paddedLength = getPaddedBufferSize( arrayBuffer.byteLength );
 
-			if (paddedLength !== arrayBuffer.byteLength ) {
+			if ( paddedLength !== arrayBuffer.byteLength ) {
 
-				var paddedBuffer = new ArrayBuffer( paddedLength );
-				new Uint8Array( paddedBuffer ).set(new Uint8Array(arrayBuffer));
-				return paddedBuffer;
+				var array = new Uint8Array( paddedLength );
+				array.set( new Uint8Array( arrayBuffer ) );
+
+				if ( paddingByte !== 0 ) {
+
+					for ( var i = arrayBuffer.byteLength; i < paddedLength; i ++ ) {
+
+						array[ i ] = paddingByte;
+
+					}
+
+				}
+
+				return array.buffer;
 
 			}
 
@@ -392,9 +399,11 @@ THREE.GLTFExporter.prototype = {
 		 * Process attribute to generate an accessor
 		 * @param  {THREE.BufferAttribute} attribute Attribute to process
 		 * @param  {THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
+		 * @param  {Integer} start (Optional)
+		 * @param  {Integer} count (Optional)
 		 * @return {Integer}           Index of the processed accessor on the "accessors" array
 		 */
-		function processAccessor( attribute, geometry ) {
+		function processAccessor( attribute, geometry, start, count ) {
 
 			if ( ! outputJSON.accessors ) {
 
@@ -433,18 +442,25 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var minMax = getMinMax( attribute );
-
-			var start = 0;
-			var count = attribute.count;
+			if ( start === undefined ) start = 0;
+			if ( count === undefined ) count = attribute.count;
 
 			// @TODO Indexed buffer geometry with drawRange not supported yet
 			if ( options.truncateDrawRange && geometry !== undefined && geometry.index === null ) {
 
-				start = geometry.drawRange.start;
-				count = geometry.drawRange.count !== Infinity ? geometry.drawRange.count : attribute.count;
+				var end = start + count;
+				var end2 = geometry.drawRange.count === Infinity
+						? attribute.count
+						: geometry.drawRange.start + geometry.drawRange.count;
+
+				start = Math.max( start, geometry.drawRange.start );
+				count = Math.min( end, end2 ) - start;
+
+				if ( count < 0 ) count = 0;
 
 			}
+
+			var minMax = getMinMax( attribute, start, count );
 
 			var bufferViewTarget;
 
@@ -452,8 +468,7 @@ THREE.GLTFExporter.prototype = {
 			// animation samplers, target must not be set.
 			if ( geometry !== undefined ) {
 
-				var isVertexAttributes = componentType === WEBGL_CONSTANTS.FLOAT;
-				bufferViewTarget = isVertexAttributes ? WEBGL_CONSTANTS.ARRAY_BUFFER : WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER;
+				bufferViewTarget = attribute === geometry.index ? WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER : WEBGL_CONSTANTS.ARRAY_BUFFER;
 
 			}
 
@@ -640,17 +655,10 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material instanceof THREE.ShaderMaterial ) {
+			if ( material.isShaderMaterial ) {
 
 				console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
 				return null;
-
-			}
-
-
-			if ( ! ( material instanceof THREE.MeshStandardMaterial ) ) {
-
-				console.warn( 'GLTFExporter: Currently just THREE.MeshStandardMaterial is supported. Material conversion may lose information.' );
 
 			}
 
@@ -661,6 +669,18 @@ THREE.GLTFExporter.prototype = {
 
 			};
 
+			if ( material.isMeshBasicMaterial ) {
+
+				gltfMaterial.extensions = { KHR_materials_unlit: {} };
+
+				extensionsUsed[ 'KHR_materials_unlit' ] = true;
+
+			} else if ( ! material.isMeshStandardMaterial ) {
+
+				console.warn( 'GLTFExporter: Use MeshStandardMaterial or MeshBasicMaterial for best results.' );
+
+			}
+
 			// pbrMetallicRoughness.baseColorFactor
 			var color = material.color.toArray().concat( [ material.opacity ] );
 
@@ -670,10 +690,15 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material instanceof THREE.MeshStandardMaterial ) {
+			if ( material.isMeshStandardMaterial ) {
 
 				gltfMaterial.pbrMetallicRoughness.metallicFactor = material.metalness;
 				gltfMaterial.pbrMetallicRoughness.roughnessFactor = material.roughness;
+
+			} else if ( material.isMeshBasicMaterial ) {
+
+				gltfMaterial.pbrMetallicRoughness.metallicFactor = 0.0;
+				gltfMaterial.pbrMetallicRoughness.roughnessFactor = 0.9;
 
 			} else {
 
@@ -712,9 +737,9 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material instanceof THREE.MeshBasicMaterial ||
-				material instanceof THREE.LineBasicMaterial ||
-				material instanceof THREE.PointsMaterial ) {
+			if ( material.isMeshBasicMaterial ||
+				material.isLineBasicMaterial ||
+				material.isPointsMaterial ) {
 
 			} else {
 
@@ -834,19 +859,19 @@ THREE.GLTFExporter.prototype = {
 			var mode;
 
 			// Use the correct mode
-			if ( mesh instanceof THREE.LineSegments ) {
+			if ( mesh.isLineSegments ) {
 
 				mode = WEBGL_CONSTANTS.LINES;
 
-			} else if ( mesh instanceof THREE.LineLoop ) {
+			} else if ( mesh.isLineLoop ) {
 
 				mode = WEBGL_CONSTANTS.LINE_LOOP;
 
-			} else if ( mesh instanceof THREE.Line ) {
+			} else if ( mesh.isLine ) {
 
 				mode = WEBGL_CONSTANTS.LINE_STRIP;
 
-			} else if ( mesh instanceof THREE.Points ) {
+			} else if ( mesh.isPoints ) {
 
 				mode = WEBGL_CONSTANTS.POINTS;
 
@@ -877,43 +902,11 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var gltfMesh = {
-				primitives: [
-					{
-						mode: mode,
-						attributes: {},
-					}
-				]
-			};
+			var gltfMesh = {};
 
-			var material = processMaterial( mesh.material );
-			if ( material !== null ) {
-
-				gltfMesh.primitives[ 0 ].material = material;
-
-			}
-
-
-			if ( geometry.index ) {
-
-				gltfMesh.primitives[ 0 ].indices = processAccessor( geometry.index, geometry );
-
-			} else if ( options.forceIndices ) {
-
-				var numFaces = geometry.attributes.position.count;
-				var indices = new Uint32Array( numFaces );
-				for ( var i = 0; i < numFaces; i ++ ) {
-
-					indices[ i ] = i;
-
-				}
-
-				gltfMesh.primitives[ 0 ].indices = processAccessor( new THREE.Uint32BufferAttribute( indices, 1 ), geometry );
-
-			}
-
-			// We've just one primitive per mesh
-			var gltfAttributes = gltfMesh.primitives[ 0 ].attributes;
+			var attributes = {};
+			var primitives = [];
+			var targets = [];
 
 			// Conversion between attributes names in threejs and gltf spec
 			var nameConversion = {
@@ -935,7 +928,7 @@ THREE.GLTFExporter.prototype = {
 
 				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
 
-					gltfAttributes[ attributeName ] = processAccessor( attribute, geometry );
+					attributes[ attributeName ] = processAccessor( attribute, geometry );
 
 				}
 
@@ -957,8 +950,6 @@ THREE.GLTFExporter.prototype = {
 					}
 
 				}
-
-				gltfMesh.primitives[ 0 ].targets = [];
 
 				for ( var i = 0; i < mesh.morphTargetInfluences.length; ++ i ) {
 
@@ -1010,7 +1001,7 @@ THREE.GLTFExporter.prototype = {
 
 					}
 
-					gltfMesh.primitives[ 0 ].targets.push( target );
+					targets.push( target );
 
 					weights.push( mesh.morphTargetInfluences[ i ] );
 					if ( mesh.morphTargetDictionary !== undefined ) targetNames.push( reverseDictionary[ i ] );
@@ -1027,6 +1018,73 @@ THREE.GLTFExporter.prototype = {
 				}
 
 			}
+
+			var forceIndices = options.forceIndices;
+			var isMultiMaterial = Array.isArray( mesh.material );
+
+			if ( ! forceIndices && geometry.index === null && isMultiMaterial ) {
+
+				// temporal workaround.
+				console.warn( 'THREE.GLTFExporter: Creating index for non-indexed multi-material mesh.' );
+				forceIndices = true;
+
+			}
+
+			var didForceIndices = false;
+
+			if ( geometry.index === null && forceIndices ) {
+
+				var indices = [];
+
+				for ( var i = 0, il = geometry.attributes.position.count; i < il; i ++ ) {
+
+					indices[ i ] = i;
+
+				}
+
+				geometry.setIndex( indices );
+
+				didForceIndices = true;
+
+			}
+
+			var materials = isMultiMaterial ? mesh.material : [ mesh.material ] ;
+			var groups = isMultiMaterial ? mesh.geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
+
+			for ( var i = 0, il = groups.length; i < il; i ++ ) {
+
+				var primitive = {
+					mode: mode,
+					attributes: attributes,
+				};
+
+				if ( targets.length > 0 ) primitive.targets = targets;
+
+				var material = processMaterial( materials[ groups[ i ].materialIndex ] );
+
+				if ( material !== null ) {
+
+					primitive.material = material;
+
+				}
+
+				if ( geometry.index !== null ) {
+
+					primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
+
+				}
+
+				primitives.push( primitive );
+
+			}
+
+			if ( didForceIndices ) {
+
+				geometry.setIndex( null );
+
+			}
+
+			gltfMesh.primitives = primitives;
 
 			outputJSON.meshes.push( gltfMesh );
 
@@ -1047,7 +1105,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var isOrtho = camera instanceof THREE.OrthographicCamera;
+			var isOrtho = camera.isOrthographicCamera;
 
 			var gltfCamera = {
 
@@ -1187,7 +1245,7 @@ THREE.GLTFExporter.prototype = {
 
 					sampler: samplers.length - 1,
 					target: {
-						node: nodeMap[ trackNode.uuid ],
+						node: nodeMap.get( trackNode ),
 						path: trackProperty
 					}
 
@@ -1209,7 +1267,7 @@ THREE.GLTFExporter.prototype = {
 
 		function processSkin( object ) {
 
-			var node = outputJSON.nodes[ nodeMap[ object.uuid ] ];
+			var node = outputJSON.nodes[ nodeMap.get( object ) ];
 
 			var skeleton = object.skeleton;
 			var rootJoint = object.skeleton.bones[ 0 ];
@@ -1221,7 +1279,7 @@ THREE.GLTFExporter.prototype = {
 
 			for ( var i = 0; i < skeleton.bones.length; ++ i ) {
 
-				joints.push( nodeMap[ skeleton.bones[ i ].uuid ] );
+				joints.push( nodeMap.get( skeleton.bones[ i ] ) );
 
 				skeleton.boneInverses[ i ].toArray( inverseBindMatrices, i * 16 );
 
@@ -1237,7 +1295,7 @@ THREE.GLTFExporter.prototype = {
 
 				inverseBindMatrices: processAccessor( new THREE.BufferAttribute( inverseBindMatrices, 16 ) ),
 				joints: joints,
-				skeleton: nodeMap[ rootJoint.uuid ]
+				skeleton: nodeMap.get( rootJoint )
 
 			} );
 
@@ -1254,7 +1312,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processNode( object ) {
 
-			if ( object instanceof THREE.Light ) {
+			if ( object.isLight ) {
 
 				console.warn( 'GLTFExporter: Unsupported node type:', object.constructor.name );
 				return null;
@@ -1325,19 +1383,17 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( object instanceof THREE.Mesh ||
-				object instanceof THREE.Line ||
-				object instanceof THREE.Points ) {
+			if ( object.isMesh || object.isLine || object.isPoints ) {
 
 				gltfNode.mesh = processMesh( object );
 
-			} else if ( object instanceof THREE.Camera ) {
+			} else if ( object.isCamera ) {
 
 				gltfNode.camera = processCamera( object );
 
 			}
 
-			if ( object instanceof THREE.SkinnedMesh ) {
+			if ( object.isSkinnedMesh ) {
 
 				skins.push( object );
 
@@ -1376,7 +1432,8 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.nodes.push( gltfNode );
 
-			var nodeIndex = nodeMap[ object.uuid ] = outputJSON.nodes.length - 1;
+			var nodeIndex = outputJSON.nodes.length - 1;
+			nodeMap.set( object, nodeIndex );
 
 			return nodeIndex;
 
@@ -1505,6 +1562,10 @@ THREE.GLTFExporter.prototype = {
 			// Merge buffers.
 			var blob = new Blob( buffers, { type: 'application/octet-stream' } );
 
+			// Declare extensions.
+			var extensionsUsedList = Object.keys( extensionsUsed );
+			if ( extensionsUsedList.length > 0 ) outputJSON.extensionsUsed = extensionsUsedList;
+
 			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
 
 				// Update bytelength of the single buffer.
@@ -1534,7 +1595,7 @@ THREE.GLTFExporter.prototype = {
 						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
 
 						// JSON chunk.
-						var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ), true );
+						var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ) ), 0x20 );
 						var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
 						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
 						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
