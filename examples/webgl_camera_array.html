@@ -37,7 +37,7 @@
 					for ( var x = 0; x < AMOUNT; x ++ ) {
 
 						var subcamera = new THREE.PerspectiveCamera( 40, ASPECT_RATIO, 0.1, 10 );
-						subcamera.bounds = new THREE.Vector4( x / AMOUNT, y / AMOUNT, SIZE, SIZE );
+						subcamera.bounds = new THREE.Vector4( x / AMOUNT, 1 - ( ( y + 1 ) / AMOUNT ), SIZE, SIZE );
 						subcamera.position.x = ( x / AMOUNT ) - 0.5;
 						subcamera.position.y = 0.5 - ( y / AMOUNT );
 						subcamera.position.z = 1.5;
