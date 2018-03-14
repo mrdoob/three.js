@@ -74,7 +74,6 @@ var files = {
 		"webgl_lines_dashed",
 		"webgl_lines_fat",
 		"webgl_lines_sphere",
-		"webgl_lines_splines",
 		"webgl_loader_3ds",
 		"webgl_loader_3mf",
 		"webgl_loader_amf",
