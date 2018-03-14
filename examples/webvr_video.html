@@ -141,6 +141,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.vr.enabled = true;
+				renderer.vr.userHeight = 0; // TOFIX
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( WEBVR.createButton( renderer ) );

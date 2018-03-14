@@ -59,12 +59,6 @@
 				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camBox = new THREE.Object3D();
-
-				camBox.position.y = 1.8;
-
-				camBox.add( camera );
-				scene.add( camBox );
 
 				room = new THREE.Mesh(
 					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
@@ -118,9 +112,8 @@
 				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				controller = new THREE.GearVRController();
-				camBox.position.y = 1.8;
-				controller.setHand( 'right' );
-				camBox.add( controller );
+				controller.position.set( 0.25, 0.75, 0 );
+				scene.add( controller );
 
 				var skyBox = {
 					front: 'textures/cube/Bridge2/posz.jpg',

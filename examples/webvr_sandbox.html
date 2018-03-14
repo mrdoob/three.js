@@ -41,12 +41,7 @@
 				scene = new THREE.Scene();
 				scene.background = background;
 
-				var user = new THREE.Group();
-				user.position.set( 0, 0.75, 0 );
-				scene.add( user );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
-				user.add( camera );
 
 				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
 				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
@@ -159,7 +154,7 @@
 			function render() {
 
 				var time = performance.now() * 0.0002;
-				var mesh = scene.children[ 1 ];
+				var mesh = scene.children[ 0 ];
 				mesh.rotation.x = time * 2;
 				mesh.rotation.y = time * 5;
 

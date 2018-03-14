@@ -68,6 +68,7 @@
 					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x808080, wireframe: true } )
 				);
+				room.position.y = 3;
 				scene.add( room );
 
 				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
@@ -122,7 +123,7 @@
 				//
 
 				controller = new THREE.DaydreamController();
-				controller.position.set( 0.25, - 0.5, 0 );
+				controller.position.set( 0.3, 0.75, 0 );
 				scene.add( controller );
 
 				//
