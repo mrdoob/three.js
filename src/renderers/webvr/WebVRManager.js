@@ -130,7 +130,7 @@ function WebVRManager( renderer ) {
 
 		if ( pose.orientation !== null ) {
 
-			tempQuaternion.fromArray ( pose.orientation );
+			tempQuaternion.fromArray( pose.orientation );
 			poseObject.quaternion.multiply( tempQuaternion );
 
 		}
