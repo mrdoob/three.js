@@ -134,18 +134,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {string} text
 		 * @return {ArrayBuffer}
 		 */
-		function stringToArrayBuffer( text, padded ) {
-			if ( padded ) {
-
-				var pad = getPaddedBufferSize( text.length ) - text.length;
-
-				for ( var i = 0; i < pad; i++ ) {
-
-					text += ' ';
-
-				}
-
-			}
+		function stringToArrayBuffer( text ) {
 
 			if ( window.TextEncoder !== undefined ) {
 
@@ -153,17 +142,18 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var buffer = new ArrayBuffer( text.length );
+			var array = new Uint8Array( new ArrayBuffer( text.length ) );
 
-			var bufferView = new Uint8Array( buffer );
+			for ( var i = 0, il = text.length; i < il; i ++ ) {
 
-			for ( var i = 0; i < text.length; ++ i ) {
+				var value = text.charCodeAt( i );
 
-				bufferView[ i ] = text.charCodeAt( i );
+				// Replacing multi-byte character with space(0x20).
+				array[ i ] = value > 0xFF ? 0x20 : value
 
 			}
 
-			return buffer;
+			return array.buffer;
 
 		}
 
@@ -230,17 +220,31 @@ THREE.GLTFExporter.prototype = {
 		 * Returns a buffer aligned to 4-byte boundary.
 		 *
 		 * @param {ArrayBuffer} arrayBuffer Buffer to pad
+		 * @param {Integer} paddingByte (Optional)
 		 * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
 		 */
-		function getPaddedArrayBuffer( arrayBuffer ) {
+		function getPaddedArrayBuffer( arrayBuffer, paddingByte ) {
+
+			paddingByte = paddingByte || 0;
 
 			var paddedLength = getPaddedBufferSize( arrayBuffer.byteLength );
 
-			if (paddedLength !== arrayBuffer.byteLength ) {
+			if ( paddedLength !== arrayBuffer.byteLength ) {
 
-				var paddedBuffer = new ArrayBuffer( paddedLength );
-				new Uint8Array( paddedBuffer ).set(new Uint8Array(arrayBuffer));
-				return paddedBuffer;
+				var array = new Uint8Array( paddedLength );
+				array.set( new Uint8Array( arrayBuffer ) );
+
+				if ( paddingByte !== 0 ) {
+
+					for ( var i = arrayBuffer.byteLength; i < paddedLength; i ++ ) {
+
+						array[ i ] = paddingByte;
+
+					}
+
+				}
+
+				return array.buffer;
 
 			}
 
@@ -1590,7 +1594,7 @@ THREE.GLTFExporter.prototype = {
 						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
 
 						// JSON chunk.
-						var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ), true );
+						var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ) ), 0x20 );
 						var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
 						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
 						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
