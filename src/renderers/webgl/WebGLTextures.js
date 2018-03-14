@@ -17,35 +17,28 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( image.width > maxSize || image.height > maxSize ) {
 
-			var scale = maxSize / Math.max( image.width, image.height );
+			if ( 'data' in image ) {
 
-			if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement || image instanceof ImageBitmap ) {
-
-				// Warning: Scaling through the canvas will only work with images that use
-				// premultiplied alpha.
-
-				var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-				canvas.width = Math.max( Math.floor( image.width * scale ), 1 );
-				canvas.height = Math.max( Math.floor( image.height * scale ), 1 );
-
-				var context = canvas.getContext( '2d' );
-				context.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
-
-				console.warn( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
-
-				return canvas;
-
-			} else {
-
-				var width = Math.max( Math.floor( image.width * scale ), 1 );
-				var height = Math.max( Math.floor( image.height * scale ), 1 );
-
-				console.warn( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + width + 'x' + height, image );
-
-				image.width = width;
-				image.height = height;
+				console.warn( 'THREE.WebGLRenderer: image in DataTexture is too big (' + image.width + 'x' + image.height + ').' );
+				return;
 
 			}
+
+			// Warning: Scaling through the canvas will only work with images that use
+			// premultiplied alpha.
+
+			var scale = maxSize / Math.max( image.width, image.height );
+
+			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+			canvas.width = Math.floor( image.width * scale );
+			canvas.height = Math.floor( image.height * scale );
+
+			var context = canvas.getContext( '2d' );
+			context.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
+
+			console.warn( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
+
+			return canvas;
 
 		}
 
