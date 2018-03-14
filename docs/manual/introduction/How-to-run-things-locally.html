@@ -10,59 +10,59 @@
 	<body>
 		<h1>[name]</h1>
 		<div>
-			If you use just procedural geometries and don't load any textures, webpages should work
-			straight from the file system, just double-click on HTML file in a file manager and it
-			should appear working in the browser (you'll see <em>file:///yourFile.html</em> in the address bar).
+				如果你仅使用过程几何并且不加载任何纹理，则网页应该
+				直接从文件系统中运行，只需在文件管理器中双击 HTML 文件，
+				就可以看到它运行在浏览器中(你将在地址栏中看到<em>file:///yourFile.html</em>）。
 		</div>
 
-		<h2>Content loaded from external files</h2>
+		<h2>从外部文件加载的内容</h2>
 		<div>
 			<p>
-				If you load models or textures from external files, due to browsers' [link:http://en.wikipedia.org/wiki/Same_origin_policy same origin policy]
-			 	security restrictions, loading from a file system will fail with a security exception.
+				如果你从外部文件加载模型或纹理，由于浏览器的[link:http://en.wikipedia.org/wiki/Same_origin_policy 同源策略]
+                安全限制，从文件系统加载会失败，并出现安全异常。
 		 	</p>
 
-			<p>There are two ways to solve this:</p>
+			<p>有两种方法可以解决这个问题：</p>
 
 			<ol>
 				<li>
-					Change security for local files in a browser. This allows you to access your page as: <code>file:///yourFile.html</code>
+					修改浏览器对本地文件的安全策略。这可以让你访问你的页面：<code>file:///yourFile.html</code>
 				</li>
 				<li>
-					Run files from a local web server. This allows you to access your page as: <code>http://localhost/yourFile.html</code>
+					从本地 web 服务器运行文件。这可以让你访问你的页面：<code>http://localhost/yourFile.html</code>
 				</li>
 			</ol>
 
 			<p>
-				If you use option 1, be aware that you may open yourself to some vulnerabilities if using
-				the same browser for a regular web surfing. You may want to create a separate browser
-				profile / shortcut used just for local development to be safe. Let's go over each option in turn.
+				如果你使用选项1，请注意，如果使用
+				相同的浏览器进行常规 web 访问，你可能面对一些安全漏洞。你不妨创建一个单独的浏览器
+				配置 / 快捷方式仅用于本地开发以确保安全。我们依次浏览每个选项。
 			</p>
 		</div>
 
 
-		<h2>Run a local server</h2>
+		<h2>运行本地服务器</h2>
 		<div>
 			<p>
-				Many programming languages have simple HTTP servers built in. They are not as full featured as
-				production servers such as [link:https://www.apache.org/ Apache] or [link:https://nginx.org NGINX], however they should be sufficient for testing your
-				three.js application.
+				许多编程语言都内置了简易的 HTTP 服务器。他们不像
+				[link:https://www.apache.org/ Apache] 或 [link:https://nginx.org NGINX] 那样功能全面，但他们应该
+				足以用来测试你的 three.js 应用。
 			</p>
 
-			<h3>Node.js server</h3>
+			<h3>Node.js 服务器</h3>
 			<div>
-				<p>Node.js has a simple HTTP server package. To install:</p>
+				<p>Node.js 有一个简单的 HTTP server 包。安装：</p>
 				<code>npm install http-server -g</code>
 
-				<p>To run (from your local directory):</p>
+				<p>开始运行（从你的本地目录）：</p>
 				<code>http-server . -p 8000</code>
 			</div>
 
-			<h3>Python server</h3>
+			<h3>Python 服务器</h3>
 			<div>
 				<p>
-					If you have [link:http://python.org/ Python] installed, it should be enough to run this
-					from a command line (from your working directory):
+					如果你安装了 [link:http://python.org/ Python]，
+					通过命令行（从你的工作目录）运行它应该足够了：
 				</p>
 				<code>
 //Python 2.x
@@ -72,93 +72,91 @@ python -m SimpleHTTPServer
 python -m http.server
 				</code>
 
-				<p>This will serve files from the current directory at localhost under port 8000, i.e in the address bar type:</p>
+				<p>这样可以通过本地主机的8000端口访问当前目录的文件，即在地址栏中输入：</p>
 
 				<code>http://localhost:8000/</code>
 			</div>
 
-			<h3>Ruby server</h3>
+			<h3>Ruby 服务器</h3>
 			<div>
-				<p>If you have Ruby installed, you can get the same result running this instead:</p>
+				<p>如果你安装了 Ruby，你可以运行以下内容获得相同结果：</p>
 				<code>
 ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => Dir.pwd); trap('INT') { s.shutdown }; s.start"
 				</code>
 			</div>
 
-			<h3>PHP server</h3>
+			<h3>PHP 服务器</h3>
 			<div>
-				<p>PHP also has a built-in web server, starting with php 5.4.0:</p>
+				<p>PHP 从 php 5.4.0 起也有内置服务器：</p>
 				<code>php -S localhost:8000</code>
 			</div>
 
 			<h3>Lighttpd</h3>
 			<div>
 				<p>
-					Lighttpd is a very lightweight general purpose webserver. We'll cover installing it on OSX with
-					HomeBrew here. Unlike the other servers discussed here, lighttpd is a full fledged production
-					ready server.
+					Lighttpd是一个非常轻量级的通用网络服务器。 我们将在这里介绍在 OSX 上使用 HomeBrew 安装它。
+					与此处讨论的其他服务器不同，lighttpd 是一个成熟的可用于生产环境的服务器。
 				</p>
 
 				<ol>
 					<li>
-						Install it via homebrew
+						通过 homebrew 安装它
 						<code>brew install lighttpd</code>
 					</li>
 					<li>
-						Create a configuration file called lighttpd.conf in the directory where you want to run
-						your webserver. There is a sample [link:http://redmine.lighttpd.net/projects/lighttpd/wiki/TutorialConfiguration here].
+						在要运行Web服务器的目录中创建一个名为 lighttpd.conf的配置
+						文件。这里有个[link:http://redmine.lighttpd.net/projects/lighttpd/wiki/TutorialConfiguration 例子]。
 					 </li>
 					<li>
-						In the conf file, change the server.document-root to the directory you want to serve files from.
+						在 conf 文件中，将 server.document-root 更改为你要为文件提供服务的目录。
 					</li>
 					<li>
-						Start it with
+						启动它
 						<code>lighttpd -f lighttpd.conf</code>
 					</li>
 					<li>
-						Navigate to http://localhost:3000/ and it will serve static files from the directory you
-						chose.
+						导航到 http://localhost:3000/ ，它将为你选择的目录中的静态文件提供
+						服务。
 					</li>
 				</ol>
 			</div>
 
-		<h2>Change local files security policy</h2>
+		<h2>更改本地文件安全策略</h2>
 		<div>
 			<h3>Safari</h3>
 			<div>
 				<p>
-					Enable the develop menu using the preferences panel, under Advanced -&gt; "Show develop menu
-					in menu bar".
+					使用首选项面板启用 Develop 菜单，在高级 -&gt; “在菜单栏中
+					显示 Develop 菜单”。
 				</p>
 
 				<p>
-					Then from the safari "Develop" menu, select "Disable local file restrictions", it is also
-					worth noting safari has some odd behaviour with caches, so it is advisable to use the
-					"Disable caches" option in the same menu; if you are editing &amp; debugging using safari.
+					然后在 safari "Develop" 菜单中，选择“禁用本地文件限制”，
+					同样值得注意的是 Safari 浏览器对缓存有怪异表现，所以如果你正在使用 safari 编辑&调试，
+					建议在同一菜单中启用“禁用缓存”选项。
 				</p>
 			</div>
 
 
 			<h3>Chrome</h3>
 			<div>
-				<p>Close all running Chrome instances first. The important word here is 'all'.</p>
+				<p>首先关闭所有运行中的 Chrome 实例，重点是“所有”。</p>
 
 				<p>
-					On Windows, you may check for Chrome instances using the Windows Task Manager.
-					Alternatively, if you see a Chrome icon in the system tray, then you may open its context
-					menu and click 'Exit'. This should close all Chrome instances.
+					在 Windows 中，你可以使用 Windows 任务管理器检查 Chrome 实例。you may check for Chrome instances using the Windows Task Manager.
+					此外，如果你在系统托盘中看到 Chrome 图标，那么你可以打开它的右键菜单并点击“退出”。这应该可以关闭所有 Chrome 实例。
 				</p>
 
-				<p>Then start the Chrome executable with a command line flag:</p>
+				<p>然后使用命令行标志启动 Chrome 可执行文件：</p>
 
 				<code>chrome --allow-file-access-from-files</code>
 
 				<p>
-					On Windows, probably the easiest is probably to create a special shortcut icon which has
-					added the flag given above (right-click on shortcut -&gt; properties -&gt; target).
+					在 Windows 上，最简单的方式可能是创建一个添加了上述命令行标志
+					的特殊快捷方式（右键单击快捷方式 -&gt; 属性 -&gt; 目标）。
 				</p>
 
-				<p>On Mac OSX, you can do this with</p>
+				<p>在 Mac OSX 上，你可以使用</p>
 
 				<code>open /Applications/Google\ Chrome.app --args --allow-file-access-from-files</code>
 			</div>
@@ -167,13 +165,13 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 			<div>
 				<ol>
 				<li>
-					In the address bar, type <code>about:config</code>
+					在地址栏中，输入 <code>about:config</code>
 				</li>
 				<li>
-					Find the <code>security.fileuri.strict_origin_policy</code> parameter
+					找到 <code>security.fileuri.strict_origin_policy</code> parameter
 				</li>
 				<li>
-					Set it to <em>false</em>
+					将其设置为 <em>false</em>
 				</li>
 				</ol>
 			</div>
@@ -181,8 +179,8 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 		</div>
 
 			<p>
-				Other simple alternatives are [link:http://stackoverflow.com/q/12905426/24874 discussed here]
-				on Stack Overflow.
+				在 Stack Overflow 上有其他简单的选项
+				的[link:http://stackoverflow.com/q/12905426/24874 讨论]。
 			</p>
 		</div>
 
