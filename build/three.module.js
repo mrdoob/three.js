@@ -179,7 +179,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '91dev';
+var REVISION = '91';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -13743,15 +13743,15 @@ function Triangle( a, b, c ) {
 
 Object.assign( Triangle, {
 
-	normal: function () {
+	getNormal: function () {
 
 		var v0 = new Vector3();
 
-		return function normal( a, b, c, target ) {
+		return function getNormal( a, b, c, target ) {
 
 			if ( target === undefined ) {
 
-				console.warn( 'THREE.Triangle: .normal() target is now required' );
+				console.warn( 'THREE.Triangle: .getNormal() target is now required' );
 				target = new Vector3();
 
 			}
@@ -13775,13 +13775,13 @@ Object.assign( Triangle, {
 
 	// static/instance method to calculate barycentric coordinates
 	// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-	barycoordFromPoint: function () {
+	getBarycoord: function () {
 
 		var v0 = new Vector3();
 		var v1 = new Vector3();
 		var v2 = new Vector3();
 
-		return function barycoordFromPoint( point, a, b, c, target ) {
+		return function getBarycoord( point, a, b, c, target ) {
 
 			v0.subVectors( c, a );
 			v1.subVectors( b, a );
@@ -13797,7 +13797,7 @@ Object.assign( Triangle, {
 
 			if ( target === undefined ) {
 
-				console.warn( 'THREE.Triangle: .barycoordFromPoint() target is now required' );
+				console.warn( 'THREE.Triangle: .getBarycoord() target is now required' );
 				target = new Vector3();
 
 			}
@@ -13828,7 +13828,7 @@ Object.assign( Triangle, {
 
 		return function containsPoint( point, a, b, c ) {
 
-			Triangle.barycoordFromPoint( point, a, b, c, v1 );
+			Triangle.getBarycoord( point, a, b, c, v1 );
 
 			return ( v1.x >= 0 ) && ( v1.y >= 0 ) && ( ( v1.x + v1.y ) <= 1 );
 
@@ -13876,12 +13876,12 @@ Object.assign( Triangle.prototype, {
 
 	},
 
-	area: function () {
+	getArea: function () {
 
 		var v0 = new Vector3();
 		var v1 = new Vector3();
 
-		return function area() {
+		return function getArea() {
 
 			v0.subVectors( this.c, this.b );
 			v1.subVectors( this.a, this.b );
@@ -13892,11 +13892,11 @@ Object.assign( Triangle.prototype, {
 
 	}(),
 
-	midpoint: function ( target ) {
+	getMidpoint: function ( target ) {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Triangle: .midpoint() target is now required' );
+			console.warn( 'THREE.Triangle: .getMidpoint() target is now required' );
 			target = new Vector3();
 
 		}
@@ -13905,17 +13905,17 @@ Object.assign( Triangle.prototype, {
 
 	},
 
-	normal: function ( target ) {
+	getNormal: function ( target ) {
 
-		return Triangle.normal( this.a, this.b, this.c, target );
+		return Triangle.getNormal( this.a, this.b, this.c, target );
 
 	},
 
-	plane: function ( target ) {
+	getPlane: function ( target ) {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Triangle: .plane() target is now required' );
+			console.warn( 'THREE.Triangle: .getPlane() target is now required' );
 			target = new Vector3();
 
 		}
@@ -13924,9 +13924,9 @@ Object.assign( Triangle.prototype, {
 
 	},
 
-	barycoordFromPoint: function ( point, target ) {
+	getBarycoord: function ( point, target ) {
 
-		return Triangle.barycoordFromPoint( point, this.a, this.b, this.c, target );
+		return Triangle.getBarycoord( point, this.a, this.b, this.c, target );
 
 	},
 
@@ -14150,7 +14150,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3 ) {
 
-			Triangle.barycoordFromPoint( point, p1, p2, p3, barycoord );
+			Triangle.getBarycoord( point, p1, p2, p3, barycoord );
 
 			uv1.multiplyScalar( barycoord.x );
 			uv2.multiplyScalar( barycoord.y );
@@ -14214,7 +14214,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				}
 
 				var face = new Face3( a, b, c );
-				Triangle.normal( vA, vB, vC, face.normal );
+				Triangle.getNormal( vA, vB, vC, face.normal );
 
 				intersection.face = face;
 				intersection.faceIndex = a;
@@ -19638,7 +19638,7 @@ function WebGLState( gl, extensions, utils ) {
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
-	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
+	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext ); /* global WebGL2RenderingContext */
 	var _videoTextures = {};
 	var _canvas;
 
@@ -19647,6 +19647,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function clampToMaxSize( image, maxSize ) {
 
 		if ( image.width > maxSize || image.height > maxSize ) {
+
+			if ( 'data' in image ) {
+
+				console.warn( 'THREE.WebGLRenderer: image in DataTexture is too big (' + image.width + 'x' + image.height + ').' );
+				return;
+
+			}
 
 			// Warning: Scaling through the canvas will only work with images that use
 			// premultiplied alpha.
@@ -20923,6 +20930,8 @@ function WebVRManager( renderer ) {
 	}
 
 	var matrixWorldInverse = new Matrix4();
+	var tempQuaternion = new Quaternion();
+	var tempPosition = new Vector3();
 
 	var cameraL = new PerspectiveCamera();
 	cameraL.bounds = new Vector4( 0.0, 0.0, 0.5, 1.0 );
@@ -21001,25 +21010,6 @@ function WebVRManager( renderer ) {
 
 		//
 
-		var pose = frameData.pose;
-		var poseObject = poseTarget !== null ? poseTarget : camera;
-
-		if ( pose.position !== null ) {
-
-			poseObject.position.fromArray( pose.position );
-
-		} else {
-
-			poseObject.position.set( 0, 0, 0 );
-
-		}
-
-		if ( pose.orientation !== null ) {
-
-			poseObject.quaternion.fromArray( pose.orientation );
-
-		}
-
 		var stageParameters = device.stageParameters;
 
 		if ( stageParameters ) {
@@ -21032,7 +21022,30 @@ function WebVRManager( renderer ) {
 
 		}
 
-		poseObject.position.applyMatrix4( standingMatrix );
+
+		var pose = frameData.pose;
+		var poseObject = poseTarget !== null ? poseTarget : camera;
+
+		// We want to manipulate poseObject by its position and quaternion components since users may rely on them.
+		poseObject.matrix.copy( standingMatrix );
+		poseObject.matrix.decompose( poseObject.position, poseObject.quaternion, poseObject.scale );
+
+		if ( pose.orientation !== null ) {
+
+			tempQuaternion.fromArray( pose.orientation );
+			poseObject.quaternion.multiply( tempQuaternion );
+
+		}
+
+		if ( pose.position !== null ) {
+
+			tempQuaternion.setFromRotationMatrix( standingMatrix );
+			tempPosition.fromArray( pose.position );
+			tempPosition.applyQuaternion( tempQuaternion );
+			poseObject.position.add( tempPosition );
+
+		}
+
 		poseObject.updateMatrixWorld();
 
 		if ( device.isPresenting === false ) return camera;
@@ -25435,7 +25448,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 			// vertex
 
-			p0 = func( u, v, p0 );
+			func( u, v, p0 );
 			vertices.push( p0.x, p0.y, p0.z );
 
 			// normal
@@ -25444,24 +25457,24 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 			if ( u - EPS >= 0 ) {
 
-				p1 = func( u - EPS, v, p1 );
+				func( u - EPS, v, p1 );
 				pu.subVectors( p0, p1 );
 
 			} else {
 
-				p1 = func( u + EPS, v, p1 );
+				func( u + EPS, v, p1 );
 				pu.subVectors( p1, p0 );
 
 			}
 
 			if ( v - EPS >= 0 ) {
 
-				p1 = func( u, v - EPS, p1 );
+				func( u, v - EPS, p1 );
 				pv.subVectors( p0, p1 );
 
 			} else {
 
-				p1 = func( u, v + EPS, p1 );
+				func( u, v + EPS, p1 );
 				pv.subVectors( p1, p0 );
 
 			}
@@ -28142,7 +28155,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-		scope.addGroup( start, verticesArray.length / 3 - start, options.material !== undefined ? options.material : 0 );
+		scope.addGroup( start, verticesArray.length / 3 - start, 0 );
 
 	}
 
@@ -28166,7 +28179,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 		}
 
 
-		scope.addGroup( start, verticesArray.length / 3 - start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1 );
+		scope.addGroup( start, verticesArray.length / 3 - start, 1 );
 
 
 	}
@@ -42117,9 +42130,9 @@ Object.assign( Raycaster.prototype, {
 
 	},
 
-	intersectObject: function ( object, recursive ) {
+	intersectObject: function ( object, recursive, optionalTarget ) {
 
-		var intersects = [];
+		var intersects = optionalTarget || [];
 
 		intersectObject( object, this, intersects, recursive );
 
@@ -42129,9 +42142,9 @@ Object.assign( Raycaster.prototype, {
 
 	},
 
-	intersectObjects: function ( objects, recursive ) {
+	intersectObjects: function ( objects, recursive, optionalTarget ) {
 
-		var intersects = [];
+		var intersects = optionalTarget || [];
 
 		if ( Array.isArray( objects ) === false ) {
 
@@ -44720,6 +44733,58 @@ Object.assign( Ray.prototype, {
 
 		console.warn( 'THREE.Ray: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
 		return this.intersectsSphere( sphere );
+
+	}
+
+} );
+
+Object.assign( Triangle.prototype, {
+
+	area: function () {
+
+		console.warn( 'THREE.Triangle: .area() has been renamed to .getArea().' );
+		return this.getArea();
+
+	},
+	barycoordFromPoint: function ( point, target ) {
+
+		console.warn( 'THREE.Triangle: .barycoordFromPoint() has been renamed to .getBarycoord().' );
+		return this.getBarycoord( point, target );
+
+	},
+	midpoint: function ( target ) {
+
+		console.warn( 'THREE.Triangle: .midpoint() has been renamed to .getMidpoint().' );
+		return this.getMidpoint( target );
+
+	},
+	normal: function ( target ) {
+
+		console.warn( 'THREE.Triangle: .normal() has been renamed to .getNormal().' );
+		return this.getNormal( target );
+
+	},
+	plane: function ( target ) {
+
+		console.warn( 'THREE.Triangle: .plane() has been renamed to .getPlane().' );
+		return this.getPlane( target );
+
+	}
+
+} );
+
+Object.assign( Triangle, {
+
+	barycoordFromPoint: function ( point, a, b, c, target ) {
+
+		console.warn( 'THREE.Triangle: .barycoordFromPoint() has been renamed to .getBarycoord().' );
+		return Triangle.getBarycoord( point, a, b, c, target );
+
+	},
+	normal: function ( a, b, c, target ) {
+
+		console.warn( 'THREE.Triangle: .normal() has been renamed to .getNormal().' );
+		return Triangle.getNormal( a, b, c, target );
 
 	}
 
