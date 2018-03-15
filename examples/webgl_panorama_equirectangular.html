@@ -47,34 +47,39 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 50;
-
-				controls = new THREE.OrbitControls( camera );
-				controls.autoRotate = true;
-				controls.autoRotateSpeed = -0.3;
-				controls.enableDamping = true;
-				controls.enableZoom = false;
-				controls.enablePan = false;
-
-				scene = new THREE.Scene();
-
-				var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
-				// invert the geometry on the x-axis so that all of the faces point inward
-				geometry.scale( - 1, 1, 1 );
-
-				var material = new THREE.MeshBasicMaterial( {
-					map: new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' )
-				} );
-
-				mesh = new THREE.Mesh( geometry, material );
-
-				scene.add( mesh );
+				var container = document.getElementById( 'container' );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 0.01;
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+				controls.enablePan = false;
+				controls.enableDamping = true;
+				controls.rotateSpeed = - 0.25;
+
+				var material = new THREE.MeshBasicMaterial( {
+					map: new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' )
+				} );
+
+				var skyBox = new THREE.Mesh( new THREE.SphereBufferGeometry( 1, 32, 32 ), material );
+				skyBox.geometry.scale( 1, 1, - 1 );
+				scene.add( skyBox );
+
+				setupImageDrag( material );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function setupImageDrag( material ) {
 
 				document.addEventListener( 'dragover', function ( event ) {
 
@@ -106,13 +111,12 @@
 						material.map.needsUpdate = true;
 
 					}, false );
+
 					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
 
 					document.body.style.opacity = 1;
 
 				}, false );
-
-				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -127,9 +131,11 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-				renderer.render( scene, camera )
-				controls.update();
+			requestAnimationFrame( animate );
+
+			controls.update(); // required when damping is enabled
+
+			renderer.render( scene, camera );
 
 			}
 
