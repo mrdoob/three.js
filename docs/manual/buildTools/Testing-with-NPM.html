@@ -40,10 +40,10 @@
 		<div>
 			<ol>
 				<li>
-					要安装 [link:https://www.npmjs.org/ npm] 和 nodejs。最短路径通常像下面这样
+					要安装 [link:https://www.npmjs.org/ npm] 和 nodejs。最短的指令通常像下面这样
 					<code>
 $ sudo apt-get install -y npm nodejs-legacy
-# 修复默认 registry URL 中任何 SSL 问题
+# 修复默认 registry URL 中 SSL 问题
 $ npm config set registry http://registry.npmjs.org/
 					</code>
 				</li>
@@ -109,7 +109,7 @@ $ npm install mocha --save-dev
 						$ npm test
 					</code>
 
-					这次应该成功了，报告 0 passing（通过）（1ms）或类似语句。
+					这次应该成功了，报告 0 passing（1ms）或类似语句。
 
 				</li>
 
@@ -204,7 +204,7 @@ The THREE object should be able to construct a Vector3 with default of x=0: 0ms
 
 			<code>
 //=============================================================================
-// make available in nodejs
+// 使其在 nodejs 中可用
 //=============================================================================
 if (typeof exports !== 'undefined')
 {
@@ -219,7 +219,7 @@ if (typeof exports !== 'undefined')
 				如果你已经在使用像 require.js 或 browserify 这样的巧妙工具，请跳过此部分。
 			</p>
 			<p>
-				通常一个 three.js 项目将在浏览器中运行。因此，模块加载是由浏览器执行一堆脚本标记完成的。你单独的文件不必担心依赖关系。然而，在 nodejs 上下文中，没有 index.html 将所有东西都绑定在一起，所以你必须显式声明依赖。
+				通常一个 three.js 项目将在浏览器中运行。因此，模块加载是由浏览器执行一堆 script 标签完成的。你单独的文件不必担心依赖关系。然而，在 nodejs 上下文中，没有能将所有文件联系在一起的 index.html，所以你必须显式声明依赖。
 
 
 
@@ -242,9 +242,9 @@ if (typeof exports !== 'undefined')
 			Physics.js 中的代码示例:
 			<code>
 //=============================================================================
-// setup for server-side testing
+// 服务器端测试的设置
 //=============================================================================
-if (typeof require === 'function') // test for nodejs environment
+if (typeof require === 'function') // 判断是否 nodejs 环境
 {
   var THREE = require('three');
   var MY3 = require('./MY3.js');
