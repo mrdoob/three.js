@@ -225,27 +225,32 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "clone/copy, check callbacks", ( assert ) => {
 
-			assert.expect( 3 );
-
-			var a = new Euler( 1, 2, 3, "ZXY" );
+            var a = new Euler( 1, 2, 3, "ZXY" );
 			var b = new Euler( 4, 5, 6, "XZY" );
-			var cb = function () {
+			var cbSucceed = function () {
 
-				assert.step( "onChange called" );
+    			assert.ok( true );
+    			assert.step( "onChange called" );
 
 			};
-			a.onChange( cb );
-			b.onChange( cb );
+			var cbFail = function () {
+
+			    assert.ok( false );
+
+			};
+			a.onChange( cbFail );
+			b.onChange( cbFail );
 
 			// clone doesn't trigger onChange
-			var a = b.clone();
+			a = b.clone();
 			assert.ok( a.equals( b ), "clone: check if a equals b" );
 
 			// copy triggers onChange once
-			var a = new Euler( 1, 2, 3, "ZXY" );
-			a.onChange( cb );
+			a = new Euler( 1, 2, 3, "ZXY" );
+			a.onChange( cbSucceed );
 			a.copy( b );
 			assert.ok( a.equals( b ), "copy: check if a equals b" );
+			assert.verifySteps( [ "onChange called" ] );
 
 		} );
 
