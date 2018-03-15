@@ -62,13 +62,16 @@
 
 			var gltf = null;
 			var mixer = null;
+			var gui = null;
+			var extensionCtrl = null;
 			var clock = new THREE.Clock();
 
 			var scenes = {
 				Boombox: {
 					name: 'BoomBox (PBR)',
 					url: './models/gltf/BoomBox/%s/BoomBox.gltf',
-					descriptionHTML: 'BoomBox by <a href="https://www.microsoft.com/" target="_blank" rel="noopener">Microsoft</a>',
+					author: 'Microsoft',
+					authorURL: 'https://www.microsoft.com/',
 					cameraPos: new THREE.Vector3(0.02, 0.01, 0.03),
 					objectRotation: new THREE.Euler(0, Math.PI, 0),
 					addLights: true,
@@ -78,8 +81,9 @@
 				'Bot Skinned': {
 					name: 'Bot Skinned',
 					url: './models/gltf/BotSkinned/%s/Bot_Skinned.gltf',
-					descriptionHTML: 'Bot Skinned by <a href="https://vr.mozilla.org/" target="_blank" rel="noopener">Mozilla VR</a>',
-					cameraPos: new THREE.Vector3(1.5, 2, 3),
+					author: 'MozillaVR',
+					authorURL: 'https://vr.mozilla.org/',
+					cameraPos: new THREE.Vector3(0.5, 2, 2),
 					center: new THREE.Vector3(0, 1.2, 0),
 					objectRotation: new THREE.Euler(0, 0, 0),
 					addLights: true,
@@ -90,7 +94,8 @@
 				MetalRoughSpheres: {
 					name: 'MetalRoughSpheres (PBR)',
 					url: './models/gltf/MetalRoughSpheres/%s/MetalRoughSpheres.gltf',
-					descriptionHTML: 'MetalRoughSpheres by Ed Mackey (TODO: link)',
+					author: '@emackey',
+					authorURL: 'https://twitter.com/emackey',
 					cameraPos: new THREE.Vector3(2, 1, 15),
 					objectRotation: new THREE.Euler(0, 0, 0),
 					addLights: true,
@@ -100,7 +105,8 @@
 				Duck: {
 					name: 'Duck',
 					url: './models/gltf/Duck/%s/Duck.gltf',
-					descriptionHTML: 'Duck by TODO',
+					author: 'Sony',
+					authorURL: 'https://www.playstation.com/en-us/corporate/about/',
 					cameraPos: new THREE.Vector3(0, 3, 5),
 					addLights: true,
 					addGround: true,
@@ -110,7 +116,8 @@
 				Monster: {
 					name: 'Monster',
 					url: './models/gltf/Monster/%s/Monster.gltf',
-					descriptionHTML: 'Monster by TODO',
+					author: '3drt.com',
+					authorURL: 'http://www.3drt.com/downloads.htm',
 					cameraPos: new THREE.Vector3(30, 10, 70),
 					objectScale: new THREE.Vector3(0.4, 0.4, 0.4),
 					objectPosition: new THREE.Vector3(2, 1, 0),
@@ -124,7 +131,8 @@
 				'Cesium Man': {
 					name: 'Cesium Man',
 					url: './models/gltf/CesiumMan/%s/CesiumMan.gltf',
-					descriptionHTML: 'Cesium Man by TODO',
+					author: 'Cesium',
+					authorURL: 'https://cesiumjs.org/',
 					cameraPos: new THREE.Vector3(0, 3, 10),
 					objectRotation: new THREE.Euler(0, 0, 0),
 					addLights: true,
@@ -135,7 +143,8 @@
 				'Cesium Milk Truck': {
 					name: 'Cesium Milk Truck',
 					url: './models/gltf/CesiumMilkTruck/%s/CesiumMilkTruck.gltf',
-					descriptionHTML: 'Cesium Milk Truck by TODO',
+					author: 'Cesium',
+					authorURL: 'https://cesiumjs.org/',
 					cameraPos: new THREE.Vector3(0, 3, 10),
 					addLights: true,
 					addGround: true,
@@ -145,7 +154,8 @@
 				'Outlined Box': {
 					name: 'Outlined Box',
 					url: './models/gltf/OutlinedBox/OutlinedBox.gltf',
-					descriptionHTML: 'Outlined Box by TODO',
+					author: '@twittmann',
+					authorURL: 'https://github.com/twittmann',
 					cameraPos: new THREE.Vector3(0, 5, 15),
 					objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
 					objectRotation: new THREE.Euler(0, 90, 0),
@@ -155,26 +165,17 @@
 				},
 			};
 
-			var variants = {
-				default: 'glTF',
-				embedded: 'glTF-Embedded',
-				binary: 'glTF-Binary',
-				'extension: unlit': 'glTF-MaterialsUnlit',
-				'extension: spec/gloss': 'glTF-pbrSpecularGlossiness',
-				'extension: draco': 'glTF-Draco',
-			};
-
 			var state = {
 				scene: Object.keys( scenes )[ 0 ],
-				playAnimation: true,
-				variant: variants[ Object.keys( variants )[ 0 ] ]
+				extension: scenes[ Object.keys( scenes )[ 0 ] ].extensions[ 0 ],
+				playAnimation: true
 			};
 
 			function onload() {
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				buildSceneList();
+				buildGUI();
 				initScene( scenes[ state.scene ] );
 				animate();
 
@@ -185,7 +186,14 @@
 				container = document.getElementById( 'container' );
 
 				descriptionEl = document.getElementById( 'description' );
-				descriptionEl.innerHTML = sceneInfo.descriptionHTML;
+
+				if ( sceneInfo.author && sceneInfo.authorURL ) {
+
+					descriptionEl.innerHTML = sceneInfo.name + ' by <a href="' + sceneInfo.authorURL + '" target="_blank" rel="noopener">' + sceneInfo.author + '</a>';
+
+				}
+
+				sceneInfo.descriptionHTML;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
@@ -267,9 +275,9 @@
 
 				var url = sceneInfo.url;
 				var r = eval( '/' + '\%s' + '/g' );
-				url = url.replace( r, state.variant );
+				url = url.replace( r, state.extension );
 
-				if ( state.variant === 'glTF-Binary' ) {
+				if ( state.extension === 'glTF-Binary' ) {
 
 					url = url.replace( '.gltf', '.glb' );
 
@@ -416,19 +424,35 @@
 
 			}
 
-			function buildSceneList() {
+			function buildGUI() {
 
-				var gui = new dat.GUI();
+				gui = new dat.GUI( { width: 330 } );
 				gui.domElement.parentElement.style.zIndex = 101;
 
 				var sceneCtrl = gui.add( state, 'scene', Object.keys( scenes ) );
 				sceneCtrl.onChange( reload );
 
-				var variantCtrl = gui.add( state, 'variant', variants ).listen();
-				variantCtrl.onChange( reload );
-
 				var animCtrl = gui.add( state, 'playAnimation' );
 				animCtrl.onChange( toggleAnimations );
+
+				updateGUI();
+
+			}
+
+			function updateGUI() {
+
+				if ( extensionCtrl ) extensionCtrl.remove();
+
+				var sceneInfo = scenes[ state.scene ];
+
+				if ( sceneInfo.extensions.indexOf( state.extension ) === -1 ) {
+
+					state.extension = sceneInfo.extensions[ 0 ];
+
+				}
+
+				extensionCtrl = gui.add( state, 'extension', sceneInfo.extensions );
+				extensionCtrl.onChange( reload );
 
 			}
 
@@ -447,21 +471,16 @@
 
 			function reload() {
 
-				if (container && renderer) {
-					container.removeChild(renderer.domElement);
-				}
+				if ( container && renderer ) {
 
-				if (loader && mixer) mixer.stopAllAction();
-
-				var scene = scenes[ state.scene ];
-
-				if ( scene.extensions.indexOf( state.variant ) === -1 ) {
-
-					state.variant = scene.extensions[ 0 ];
+					container.removeChild( renderer.domElement );
 
 				}
 
-				initScene( scene );
+				if ( loader && mixer ) mixer.stopAllAction();
+
+				updateGUI();
+				initScene( scenes[ state.scene ] );
 
 			}
 
