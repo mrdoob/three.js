@@ -34,7 +34,7 @@
 			var clock = new THREE.Clock();
 
 			var container;
-			var camera, camBox, scene, renderer;
+			var camera, scene, renderer;
 			var controller;
 
 			var room;
@@ -73,7 +73,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+				var geometry = new THREE.IcosahedronGeometry( 0.08, 2 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
@@ -89,10 +89,6 @@
 					object.rotation.x = Math.random() * 2 * Math.PI;
 					object.rotation.y = Math.random() * 2 * Math.PI;
 					object.rotation.z = Math.random() * 2 * Math.PI;
-
-					object.scale.x = Math.random() + 0.5;
-					object.scale.y = Math.random() + 0.5;
-					object.scale.z = Math.random() + 0.5;
 
 					object.userData.velocity = new THREE.Vector3();
 					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
@@ -181,9 +177,9 @@
 					room.remove( cube );
 
 					cube.position.copy( controller.position ).sub( room.position );
-					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02 * delta;
-					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02 * delta;
-					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 ) * delta;
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
+					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.1 );
 					cube.userData.velocity.applyQuaternion( controller.quaternion );
 					room.add( cube );
 
@@ -191,29 +187,34 @@
 
 				// keep cubes inside room
 
+				var range = 3 - 0.04;
+
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
 					var cube = room.children[ i ];
 
 					cube.position.add( cube.userData.velocity );
 
-					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
+					if ( cube.position.x < - range || cube.position.x > range ) {
 
-						cube.position.x = THREE.Math.clamp( cube.position.x, - 3, 3 );
+						cube.position.x = THREE.Math.clamp( cube.position.x, - range, range );
 						cube.userData.velocity.x = - cube.userData.velocity.x;
 
 					}
 
-					if ( cube.position.y < - 3 || cube.position.y > 3 ) {
+					if ( cube.position.y < - range || cube.position.y > range ) {
 
-						cube.position.y = THREE.Math.clamp( cube.position.y, - 3, 3 );
-						cube.userData.velocity.y = - cube.userData.velocity.y;
+						cube.position.y = Math.max( cube.position.y, - range );
+
+						cube.userData.velocity.x *= 0.9;
+						cube.userData.velocity.y = - cube.userData.velocity.y * 0.8;
+						cube.userData.velocity.z *= 0.9;
 
 					}
 
-					if ( cube.position.z < - 3 || cube.position.z > 3 ) {
+					if ( cube.position.z < - range || cube.position.z > range ) {
 
-						cube.position.z = THREE.Math.clamp( cube.position.z, - 3, 3 );
+						cube.position.z = THREE.Math.clamp( cube.position.z, - range, range );
 						cube.userData.velocity.z = - cube.userData.velocity.z;
 
 					}
@@ -221,6 +222,8 @@
 					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
 					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
 					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
+
+					cube.userData.velocity.y -= 0.00098;
 
 				}
 
