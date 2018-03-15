@@ -70,7 +70,6 @@ var files = {
 		"webgl_lights_spotlights",
 		"webgl_lights_rectarealight",
 		"webgl_lines_colors",
-		"webgl_lines_cubes",
 		"webgl_lines_dashed",
 		"webgl_lines_fat",
 		"webgl_lines_sphere",
