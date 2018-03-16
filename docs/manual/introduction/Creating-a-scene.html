@@ -57,9 +57,9 @@
 
 		<div>第一个属性是 <strong>field of view（视场）</strong>。FOV 是指在任意时刻显示器的场景的范围。以角度为单位。</div>
 
-		<div>第二个是 <strong>aspect ratio（长宽比）</strong>。一般使用元素的长宽比，否则你会发现结果如同在宽屏电视上放老电影时 —— 图像看起来像被挤压过。</div>
+		<div>第二个是 <strong>aspect ratio（长宽比）</strong>。一般使用元素的长宽比，否则你会发现结果如同在宽屏电视上放老电影 —— 图像看起来像被挤压过。</div>
 
-		<div>接下来的两个属性是 <strong>near（近面）</strong> 和 <strong>far（远面）</strong>。指的是位置值大于 <strong>far</strong> 或值小于 <strong>near</strong> 的物体（离相机过远或过近）不会被渲染。现在你不用考虑这个，但你在自己的应用程序中可以使用其他值来获得更好的效果。</div>
+		<div>接下来的两个属性是 <strong>near（近面）</strong> 和 <strong>far（远面）</strong>。即，与相机的距离值大于 <strong>far</strong> 值或小于 <strong>near</strong> 值的物体不会被渲染。现在你不用考虑这个，你在自己的应用程序中可以使用其他值来获得更好的效果。</div>
 
 		<div>接下来是渲染器。这是魔法发生的地方。除了我们在这里使用的 WebGLRenderer 之外，three.js 还有其他几种方式，其他方式通常作为降级功能，为使用老浏览器的用户或由于某些原因而无法使用 WebGL 的用户准备的。</div>
 
@@ -86,7 +86,7 @@
 
 		<div>我们需要做的第三件事是创建一个 <strong>Mesh（网格）</strong>。网格是一个对象，该网格对象需要指定一个几何体以及一个应用到几何体上的材质。随后我们可将这个网格对象加入到我们的场景中，这样就可以在场景中随意移动这个网格对象了。</div>
 
-		<div>默认情况下，当我们调用 <strong>scene.add()</strong> 时，对象将被添加到坐标 <strong>(0,0,0)</strong> 处。这会导致相机和立方体彼此混合。要避免这种情况，我们只要将相机移出来一些即可。</div>
+		<div>默认情况下，当我们调用 <strong>scene.add()</strong> 时，对象将被添加到坐标 <strong>(0,0,0)</strong> 处。这会导致相机和立方体彼此重叠。要避免这种情况，我们只要将相机移出来一些即可。</div>
 
 		<h2>渲染场景</h2>
 
