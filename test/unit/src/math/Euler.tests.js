@@ -201,25 +201,24 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "set/get properties, check callbacks", ( assert ) => {
 
-			var a = new Euler();
-			a.onChange( function () {
+            var a = new Euler();
+            a.onChange( function () {
 
-				assert.step( "set: onChange called" );
+                assert.step( "set: onChange called" );
 
-			} );
+            } );
 
-			assert.expect( 8 );
+            a.x = 1;
+            a.y = 2;
+            a.z = 3;
+            a.order = "ZYX";
 
-			// should be 4 calls to onChangeCallback
-			a.x = 1;
-			a.y = 2;
-			a.z = 3;
-			a.order = "ZYX";
+            assert.strictEqual( a.x, 1, "get: check x" );
+            assert.strictEqual( a.y, 2, "get: check y" );
+            assert.strictEqual( a.z, 3, "get: check z" );
+            assert.strictEqual( a.order, "ZYX", "get: check order" );
 
-			assert.strictEqual( a.x, 1, "get: check x" );
-			assert.strictEqual( a.y, 2, "get: check y" );
-			assert.strictEqual( a.z, 3, "get: check z" );
-			assert.strictEqual( a.order, "ZYX", "get: check order" );
+            assert.verifySteps( Array( 4 ).fill( "set: onChange called" ) );
 
 		} );
 
@@ -284,31 +283,31 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "fromArray", ( assert ) => {
 
-			assert.expect( 10 );
+            var a = new Euler();
+            var array = [ x, y, z ];
+            var cb = function () {
 
-			var a = new Euler();
-			var array = [ x, y, z ];
-			var cb = function () {
+                assert.step( "onChange called" );
 
-				assert.step( "onChange called" );
+            };
+            a.onChange( cb );
 
-			};
-			a.onChange( cb );
+            a.fromArray( array );
+            assert.strictEqual( a.x, x, "No order: check x" );
+            assert.strictEqual( a.y, y, "No order: check y" );
+            assert.strictEqual( a.z, z, "No order: check z" );
+            assert.strictEqual( a.order, "XYZ", "No order: check order" );
 
-			a.fromArray( array );
-			assert.strictEqual( a.x, x, "No order: check x" );
-			assert.strictEqual( a.y, y, "No order: check y" );
-			assert.strictEqual( a.z, z, "No order: check z" );
-			assert.strictEqual( a.order, "XYZ", "No order: check order" );
+            a = new Euler();
+            array = [ x, y, z, "ZXY" ];
+            a.onChange( cb );
+            a.fromArray( array );
+            assert.strictEqual( a.x, x, "With order: check x" );
+            assert.strictEqual( a.y, y, "With order: check y" );
+            assert.strictEqual( a.z, z, "With order: check z" );
+            assert.strictEqual( a.order, "ZXY", "With order: check order" );
 
-			var a = new Euler();
-			var array = [ x, y, z, "ZXY" ];
-			a.onChange( cb );
-			a.fromArray( array );
-			assert.strictEqual( a.x, x, "With order: check x" );
-			assert.strictEqual( a.y, y, "With order: check y" );
-			assert.strictEqual( a.z, z, "With order: check z" );
-			assert.strictEqual( a.order, "ZXY", "With order: check order" );
+            assert.verifySteps( Array( 2 ).fill( "onChange called" ) );
 
 		} );
 
