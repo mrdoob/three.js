@@ -10,18 +10,18 @@
 	<body>
 		<h1>[name]</h1><br />
 		<p>
-			Even though this is becoming less and less of a problem, some devices or browsers may still not support WebGL.
-			The following method allows you to check if it is supported and display a message to the user if it is not.
+			尽管 WebGL 兼容性问题越来越微不足道，但一些设备或浏览器依然不能支持 WebGL。
+			以下方法允许你去检测是否支持 WebGL，并在不能支持 WebGL 时给出提示.
 		</p>
 
 		<p>
-			Add	[link:https://github.com/mrdoob/three.js/blob/master/examples/js/Detector.js]
-			to your javascript and run the following before attempting to render anything.
+			添加	[link:https://github.com/mrdoob/three.js/blob/master/examples/js/Detector.js]
+			至你的 javascript 并且在你试图渲染之前运行以下代码即可.
 		</p>
 
 <code>
 if (Detector.webgl) {
-    // Initiate function or other initializations here
+    // 启动方法或其他初始化方法
     animate();
 } else {
     var warning = Detector.getWebGLErrorMessage();
