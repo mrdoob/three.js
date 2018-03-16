@@ -24,7 +24,7 @@ THREE.GearVRController = function () {
 
 			var gamepad = gamepads[ i ];
 
-			if ( gamepad && ( gamepad.id === 'Gear VR Controller' ) ) {
+			if ( gamepad && ( gamepad.id === 'Gear VR Controller' || gamepad.id === 'Oculus Go Controller' ) ) {
 
 				return gamepad;
 
