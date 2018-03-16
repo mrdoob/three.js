@@ -123,7 +123,7 @@ function WebGLAttributes( gl ) {
 
 	function update( attribute, bufferType ) {
 
-		if (attribute.isDynamicBufferAttribute) {
+		if (attribute.isExternalBufferAttribute) {
 
 			var cached = buffers[ attribute.uuid ];
 

@@ -122,7 +122,7 @@
 				gl.bindBuffer(gl.ARRAY_BUFFER, rgb);
 				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
-				var posAttr = new THREE.DynamicBufferAttribute( gl, pos, gl.FLOAT, 3, particles );
+				var posAttr = new THREE.ExternalBufferAttribute( gl, pos, gl.FLOAT, 3, particles );
 				geometry.addAttribute( 'position', posAttr );
 
 				setInterval(function () {
@@ -136,7 +136,7 @@
 					geometry.setDrawRange(0, drawCount);
 				}, 20);
 
-				geometry.addAttribute( 'color', new THREE.DynamicBufferAttribute( gl, rgb, gl.FLOAT, 3, particles ) );
+				geometry.addAttribute( 'color', new THREE.ExternalBufferAttribute( gl, rgb, gl.FLOAT, 3, particles ) );
 
 				geometry.computeBoundingSphere();
 

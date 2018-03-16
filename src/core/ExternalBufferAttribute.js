@@ -5,7 +5,7 @@ import { _Math } from '../math/Math.js';
  */
 
 
-function DynamicBufferAttribute( gl, buffer, type, itemSize, count ) {
+function ExternalBufferAttribute( gl, buffer, type, itemSize, count ) {
 
 	this.sizes = [
 		[gl.FLOAT, 4],
@@ -21,7 +21,7 @@ function DynamicBufferAttribute( gl, buffer, type, itemSize, count ) {
 	}, {});
 
 	if ( ! this.sizes[type] ) {
-		throw new TypeError( 'THREE.DynamicBufferAttribute: unsupported GL data type.' );
+		throw new TypeError( 'THREE.ExternalBufferAttribute: unsupported GL data type.' );
 	}
 
 	this.uuid = _Math.generateUUID();
@@ -36,7 +36,7 @@ function DynamicBufferAttribute( gl, buffer, type, itemSize, count ) {
 
 }
 
-Object.defineProperty( DynamicBufferAttribute.prototype, 'needsUpdate', {
+Object.defineProperty( ExternalBufferAttribute.prototype, 'needsUpdate', {
 
 	set: function ( value ) {
 
@@ -46,9 +46,9 @@ Object.defineProperty( DynamicBufferAttribute.prototype, 'needsUpdate', {
 
 } );
 
-Object.assign( DynamicBufferAttribute.prototype, {
+Object.assign( ExternalBufferAttribute.prototype, {
 
-	isDynamicBufferAttribute: true,
+	isExternalBufferAttribute: true,
 
 	setBuffer: function ( buffer ) {
 
@@ -61,7 +61,7 @@ Object.assign( DynamicBufferAttribute.prototype, {
 	setType: function ( type ) {
 
 		if ( ! sizes[type] ) {
-			throw new TypeError( 'THREE.DynamicBufferAttribute: unsupported GL data type.' );
+			throw new TypeError( 'THREE.ExternalBufferAttribute: unsupported GL data type.' );
 		}
 
 		this.type = type;
@@ -90,4 +90,4 @@ Object.assign( DynamicBufferAttribute.prototype, {
 } );
 
 
-export { DynamicBufferAttribute };
+export { ExternalBufferAttribute };
