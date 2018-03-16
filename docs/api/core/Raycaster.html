@@ -155,20 +155,16 @@
 		<div>
 		Checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first. An array of intersections is returned...
         <code>
-            [ { distance, point, face, faceIndex, indices, object }, ... ]
+            [ { distance, point, face, faceIndex, object }, ... ]
         </code>
         <p>
         [page:Float distance] – distance between the origin of the ray and the intersection<br />
         [page:Vector3 point] – point of intersection, in world coordinates<br />
         [page:Face3 face] – intersected face<br />
         [page:Integer faceIndex] – index of the intersected face<br />
-        [page:Array indices] – indices of vertices comprising the intersected face<br />
         [page:Object3D object] – the intersected object<br />
         [page:Vector2 uv] - U,V coordinates at point of intersection
     	</p>
-        <p>
-        When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*.
-        </p>
 		<p>
 		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].
 		</p>
