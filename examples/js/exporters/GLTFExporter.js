@@ -926,6 +926,17 @@ THREE.GLTFExporter.prototype = {
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
 
+				// JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
+				if ( attributeName === 'JOINTS_0' &&
+						! ( attribute instanceof THREE.Uint16BufferAttribute ) &&
+						! ( attribute instanceof THREE.Uint8BufferAttribute ) ) {
+
+					console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
+
+					attribute = new THREE.Uint16BufferAttribute( attribute.array, attribute.itemSize, attribute.normalized );
+
+				}
+
 				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
 
 					attributes[ attributeName ] = processAccessor( attribute, geometry );
