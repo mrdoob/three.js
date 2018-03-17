@@ -85,7 +85,11 @@
 
 						var path = paths[ i ];
 
-						var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
+						var material = new THREE.MeshBasicMaterial( {
+							color: Math.random() * 0xffffff,
+							polygonOffset: true,
+							polygonOffsetUnits: - i
+						} );
 
 						var shapes = path.toShapes( true );
 
