@@ -86,10 +86,6 @@
 					object.position.y = Math.random() * 4 - 2;
 					object.position.z = Math.random() * 4 - 2;
 
-					object.rotation.x = Math.random() * 2 * Math.PI;
-					object.rotation.y = Math.random() * 2 * Math.PI;
-					object.rotation.z = Math.random() * 2 * Math.PI;
-
 					object.userData.velocity = new THREE.Vector3();
 					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
 					object.userData.velocity.y = Math.random() * 0.01 - 0.005;
@@ -218,10 +214,6 @@
 						cube.userData.velocity.z = - cube.userData.velocity.z;
 
 					}
-
-					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
-					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
-					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
 
 					cube.userData.velocity.y -= 0.00098;
 
