@@ -60,7 +60,6 @@ THREE.SVGLoader.prototype = {
 
 				default:
 					console.log( node );
-					break;
 
 			}
 
@@ -75,7 +74,7 @@ THREE.SVGLoader.prototype = {
 
 			var d = node.getAttribute( 'd' );
 
-			console.log( d );
+			// console.log( d );
 
 			var commands = d.match( /[a-df-z][^a-df-z]*/ig );
 
@@ -164,6 +163,9 @@ THREE.SVGLoader.prototype = {
 					case 'z':
 						path.currentPath.autoClose = true;
 						break;
+
+					default:
+						console.log( command );
 
 				}
 
