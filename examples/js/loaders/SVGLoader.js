@@ -160,6 +160,11 @@ THREE.SVGLoader.prototype = {
 						point.y += numbers[ 5 ];
 						break;
 
+					case 'Z':
+					case 'z':
+						path.currentPath.autoClose = true;
+						break;
+
 				}
 
 			}
