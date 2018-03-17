@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+			<p>
+				[name] can be used to render geometric data using SVG. The produced vector graphics are particular useful in the following use cases:
+				<ul>
+					<li>Animated logos or icons</li>
+					<li>Interactive 2D/3D diagrams or graphs</li>
+					<li>Interactive maps</li>
+					<li>Complex or animated user interfaces</li>
+				</ul>
+				[name] has various advantages. It produces crystal-clear and sharp output which is independet of the actual viewport resolution.<br />
+				SVG elements can be styled via CSS. And they have good accessibility since it's possible to add metadata like title or description (useful for search engines or screen readers).
+			</p>
+			<p>
+				There are, however, some important limitations:
+				<ul>
+					<li>No advanced shading</li>
+					<li>No texture support</li>
+					<li>No shadow support</li>
+				</ul>
+			</p>
+		</div>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Examples</h2>
+
+		<div>
+			[example:svg_lines lines]<br />
+			[example:svg_sandbox sandbox]
+		</div>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null clear]()</h3>
+		<div>
+			Tells the renderer to clear its drawing surface.
+		</div>
+
+		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
+		<div>
+			Renders a [page:Scene scene] using a [page:Camera camera].
+		</div>
+
+		<h3>[method:null setClearColor]( [param:Color color], [param:number alpha] )</h3>
+		<div>
+			Sets the clearColor and the clearAlpha.
+		</div>
+
+		<h3>[method:null setPrecision]( [param:Number precision] )</h3>
+		<div>
+			Sets the precision of the data used to create a path.
+		</div>
+
+		<h3>[method:null setQuality]()</h3>
+		<div>
+			Sets the render quality. Possible values are *low* and *high* (default).
+		</div>
+
+		<h3>[method:null setSize]( [param:Number width], [param:Number height] )</h3>
+		<div>
+			Resizes the renderer to (width, height).
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/[path].js examples/js/[path].js]
+	</body>
+</html>
