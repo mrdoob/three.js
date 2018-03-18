@@ -10,51 +10,51 @@
 	<body>
 		<h1>[name]</h1>
 		<div>
-			如果你仅使用过程几何并且不加载任何纹理，则网页应该
-			直接从文件系统中运行，只需在文件管理器中双击 HTML 文件，
-			就可以看到它运行在浏览器中(你将在地址栏中看到<em>file:///yourFile.html</em>）。
+			如果你的程序只有 procedural geometries (过程几何) 而并没有加载材质，则网页可以直接双击HTML文件运行
+			然后就可以直接在浏览器中看到运行的结果 (你将在地址栏中看到 <em>file:///yourFile.html</em> )。
+			
 		</div>
 
-		<h2>从外部文件加载的内容</h2>
+		<h2>从外部文件中加载内容/h2>
 		<div>
 			<p>
-				如果你从外部文件加载模型或纹理，由于浏览器的[link:http://en.wikipedia.org/wiki/Same_origin_policy 同源策略]
-                安全限制，从文件系统加载会失败，并出现安全异常。
+				如果你从外部文件加载模型或纹理，由于浏览器的[link:http://en.wikipedia.org/wiki/Same_origin_policy same origin policy]  (同源策略)
+                		安全限制，从文件系统加载会失败，并出现安全异常。
 		 	</p>
 
 			<p>有两种方法可以解决这个问题：</p>
 
 			<ol>
 				<li>
-					修改浏览器对本地文件的安全策略。这可以让你访问你的页面：<code>file:///yourFile.html</code>
+					修改浏览器对本地文件的安全策略，通过 <code>file:///yourFile.html</code> 访问页面。
 				</li>
 				<li>
-					从本地 web 服务器运行文件。这可以让你访问你的页面：<code>http://localhost/yourFile.html</code>
+					使用本地Web服务器，通过 <code>http://localhost/yourFile.html</code> 访问页面。
 				</li>
 			</ol>
 
 			<p>
-				如果你使用选项1，请注意，如果使用
-				相同的浏览器进行常规 web 访问，你可能面对一些安全漏洞。你不妨创建一个单独的浏览器
-				配置 / 快捷方式仅用于本地开发以确保安全。我们依次浏览每个选项。
+				如果使用第一种方法，需要注意的是，如果使用相同的浏览器进行普通上网行为，可能会存在一些安全隐患。
+				因此，你不妨创建一个单独的浏览器配置或者快捷方式仅用于本地开发以确保安全。
+				接下来会一一介绍。
 			</p>
 		</div>
 
 
-		<h2>运行本地服务器</h2>
+		<h2>使用本地Web服务器</h2>
 		<div>
 			<p>
-				许多编程语言都内置了简易的 HTTP 服务器。他们不像
-				[link:https://www.apache.org/ Apache] 或 [link:https://nginx.org NGINX] 那样功能全面，但他们应该
-				足以用来测试你的 three.js 应用。
+				许多编程语言都内置了简易的 HTTP 服务器。
+				但是，它们一般没有 [link:https://www.apache.org/ Apache] 或 [link:https://nginx.org NGINX] 那样功能全面。
+				即使如此也是足够用来测试你的 three.js 应用的。
 			</p>
 
 			<h3>Node.js 服务器</h3>
 			<div>
-				<p>Node.js 有一个简单的 HTTP server 包。安装：</p>
+				<p>Node.js 有一个简单的 HTTP server 包。安装命令如下：</p>
 				<code>npm install http-server -g</code>
 
-				<p>开始运行（从你的本地目录）：</p>
+				<p>跳转至你的工作目录，然后通过如下命令运行：</p>
 				<code>http-server . -p 8000</code>
 			</div>
 
@@ -62,7 +62,7 @@
 			<div>
 				<p>
 					如果你安装了 [link:http://python.org/ Python]，
-					通过命令行（从你的工作目录）运行它应该足够了：
+					通过如下命令（从你的工作目录），就可以运行它：
 				</p>
 				<code>
 //Python 2.x
@@ -72,7 +72,7 @@ python -m SimpleHTTPServer
 python -m http.server
 				</code>
 
-				<p>这样可以通过本地主机的8000端口访问当前目录的文件，即在地址栏中输入：</p>
+				<p>这样可以通过本地主机的 8000 端口访问当前目录的文件，即在地址栏中输入：</p>
 
 				<code>http://localhost:8000/</code>
 			</div>
@@ -87,26 +87,26 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 
 			<h3>PHP 服务器</h3>
 			<div>
-				<p>PHP 从 php 5.4.0 起也有内置服务器：</p>
+				<p>从 5.4.0 版本开始， PHP 也有了内置的 Web服务器，通过如下命令运行：</p>
 				<code>php -S localhost:8000</code>
 			</div>
 
 			<h3>Lighttpd</h3>
 			<div>
 				<p>
-					Lighttpd是一个非常轻量级的通用网络服务器。 我们将在这里介绍在 OSX 上使用 HomeBrew 安装它。
-					与此处讨论的其他服务器不同，lighttpd 是一个成熟的可用于生产
-					环境的服务器。
+					Lighttpd 是一个非常轻量级的通用网络服务器。 我们将在这里介绍如何在 OSX 上使用 HomeBrew 安装它。
+					与此处讨论的其他服务器不同，Lighttpd 是一个成熟的可用于生产环境的服务器。
+					
 				</p>
 
 				<ol>
 					<li>
-						通过 homebrew 安装它
+						通过 homebrew 安装它，命令如下：
 						<code>brew install lighttpd</code>
 					</li>
 					<li>
-						在要运行Web服务器的目录中创建一个名为 lighttpd.conf的配置
-						文件。这里有个[link:http://redmine.lighttpd.net/projects/lighttpd/wiki/TutorialConfiguration 例子]。
+						在要运行 Web服务器的目录中创建一个名为 lighttpd.conf 的配置文件。
+						这里有个[link:http://redmine.lighttpd.net/projects/lighttpd/wiki/TutorialConfiguration example] (例子)
 					 </li>
 					<li>
 						在 conf 文件中，将 server.document-root 更改为你要为文件提供服务的目录。
@@ -132,8 +132,8 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 				</p>
 
 				<p>
-					然后在 safari "Develop" 菜单中，选择“禁用本地文件限制”，
-					同样值得注意的是 Safari 浏览器对缓存有怪异表现，所以如果你正在使用 safari 编辑&调试，
+					然后在 Safari "Develop" 菜单中，选择“禁用本地文件限制”，
+					同样值得注意的是 Safari 浏览器对缓存有怪异表现，所以如果你正在使用 Safari 编辑&调试，
 					建议在同一菜单中启用“禁用缓存”选项。
 				</p>
 			</div>
@@ -181,8 +181,8 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 		</div>
 
 			<p>
-				在 Stack Overflow 上有其他简单的选项
-				的[link:http://stackoverflow.com/q/12905426/24874 讨论]。
+				在 Stack Overflow 上有其他简单的选项的[link:http://stackoverflow.com/q/12905426/24874 discussed here] (讨论)。
+				
 			</p>
 		</div>
 
