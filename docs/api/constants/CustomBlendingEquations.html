@@ -8,14 +8,14 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>Custom Blending Equation Constants</h1>
+		<h1>自定义混合方程常量</h1>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 		<div>[example:webgl_materials_blending_custom materials / blending / custom ]</div>
 
-		<h2>Usage</h2>
-		These work with all material types. First set the material's blending mode to THREE.CustomBlending, then set the desired Blending Equation, Source Factor and Destination Factor.
+		<h2>使用</h2>
+		这些适用于所有材料类型。首先将材质的混合模式设置为 THREE.CustomBlending，然后设置所需的混合方程（Blending Equation），源因子（Source Factor）和目标因子（Destination Factor）。
 
 		<code>
 		var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
@@ -25,36 +25,36 @@
 		material.blendDst = THREE.OneMinusSrcAlphaFactor; //default
 		</code>
 
-		<h2>Blending Equations</h2>
+		<h2>混合方程（Blending Equation）</h2>
 		<code>
-		THREE.AddEquation
-		THREE.SubtractEquation
-		THREE.ReverseSubtractEquation
-		THREE.MinEquation
-		THREE.MaxEquation
+		THREE.AddEquation（译注：加法方程）
+		THREE.SubtractEquation（译注：减法方程）
+		THREE.ReverseSubtractEquation（译注：反向减法方程）
+		THREE.MinEquation（译注：最小方程）
+		THREE.MaxEquation（译注：最大方程）
 		</code>
 
-		<h2>Source Factors</h2>
+		<h2>源因子（Source Factors）</h2>
 		<code>
-		THREE.ZeroFactor
-		THREE.OneFactor
-		THREE.SrcColorFactor
-		THREE.OneMinusSrcColorFactor
-		THREE.SrcAlphaFactor
-		THREE.OneMinusSrcAlphaFactor
-		THREE.DstAlphaFactor
-		THREE.OneMinusDstAlphaFactor
-		THREE.DstColorFactor
-		THREE.OneMinusDstColorFactor
-		THREE.SrcAlphaSaturateFactor
+		THREE.ZeroFactor（译注：对应于GL_ZERO，表示使用0.0作为因子，实际上相当于不使用这种颜色参与混合运算）
+		THREE.OneFactor（译注：GL_ONE，表示使用1.0作为因子，实际上相当于完全的使用了这种颜色参与混合运算）
+		THREE.SrcColorFactor（译注：GL_SRC_COLOR，表示使用源颜色的四个分量分别作为因子的四个分量）
+		THREE.OneMinusSrcColorFactor（译注：GL_ONE_MINUS_SRC_COLOR，表示使用1.0减去源颜色的四个分量分别作为因子的四个分量）
+		THREE.SrcAlphaFactor（译注：GL_SRC_ALPHA，表示使用源颜色的alpha值来作为因子。）
+		THREE.OneMinusSrcAlphaFactor（译注：GL_ONE_MINUS_SRC_ALPHA，表示用1.0减去源颜色的alpha值来作为因子。）
+		THREE.DstAlphaFactor（译注：GL_DST_ALPHA，表示使用目标颜色的alpha值来作为因子。）
+		THREE.OneMinusDstAlphaFactor（译注：GL_ONE_MINUS_DST_ALPHA，表示用1.0减去目标颜色的alpha值来作为因子。）
+		THREE.DstColorFactor（译注：对应于GL_DST_COLOR，表示使用目标颜色的四个分量分别作为因子的四个分量。）
+		THREE.OneMinusDstColorFactor（译注：GL_ONE_MINUS_DST_COLOR 表示使用1.0减去目标颜色的四个分量分别作为因子的四个分量。）
+		THREE.SrcAlphaSaturateFactor（译注：GL_SRC_ALPHA_SATURATE 表示源颜色的alpha 值和RGB值采用不同的混合因子。）
 		</code>
 
-		<h2>Destination Factors</h2>
+		<h2>目标因子（Destination Factors）</h2>
 		<div>
-			All of the Source Factors are valid as Destination Factors, except for <code>THREE.SrcAlphaSaturateFactor</code>
+			除 <code>THREE.SrcAlphaSaturateFactor</code> 外，所有源因子（Source Factors）均可作为目标因子（Destination Factors）。
 		</div>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
 	</body>
