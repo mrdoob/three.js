@@ -74,6 +74,10 @@ THREE.SVGLoader.prototype = {
 					paths.push( parseEllipseNode( node ) );
 					break;
 
+				case 'line':
+					paths.push( parseLineNode( node ) );
+					break;
+
 				default:
 					console.log( node );
 
@@ -417,6 +421,22 @@ THREE.SVGLoader.prototype = {
 			var path = new THREE.ShapePath();
 
 			path.currentPath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
+
+			return path;
+
+		}
+
+		function parseLineNode( node ) {
+
+			var x1 = parseFloat( node.getAttribute( 'x1' ) );
+			var y1 = parseFloat( node.getAttribute( 'y1' ) );
+			var x2 = parseFloat( node.getAttribute( 'x2' ) );
+			var y2 = parseFloat( node.getAttribute( 'y2' ) );
+
+			var path = new THREE.ShapePath();
+			path.moveTo( x1, y1 );
+			path.lineTo( x2, y2 );
+			path.currentPath.autoClose = false;
 
 			return path;
 
