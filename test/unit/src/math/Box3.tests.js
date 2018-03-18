@@ -8,7 +8,6 @@ import { Box3 } from '../../../../src/math/Box3';
 import { Sphere } from '../../../../src/math/Sphere';
 import { Triangle } from '../../../../src/math/Triangle';
 import { Plane } from '../../../../src/math/Plane';
-import { Vector2 } from '../../../../src/math/Vector2';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Mesh } from '../../../../src/objects/Mesh';
