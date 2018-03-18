@@ -1,3 +1,4 @@
+import { Vector2 } from './Vector2.js';
 import { Vector3 } from './Vector3.js';
 import { Sphere } from './Sphere.js';
 
@@ -250,11 +251,25 @@ Object.assign( Box3.prototype, {
 
 					if ( attribute !== undefined ) {
 
-						for ( i = 0, l = attribute.count; i < l; i ++ ) {
+						if ( attribute.itemSize === 2 ) {
 
-							v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+							for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-							scope.expandByPoint( v1 );
+								v1.set( attribute.getX( i ), attribute.getY( i ), 0 ).applyMatrix4( node.matrixWorld );
+
+								scope.expandByPoint( v1 );
+	
+							}
+
+						} else {
+
+							for ( i = 0, l = attribute.count; i < l; i ++ ) {
+
+								v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+	
+								scope.expandByPoint( v1 );
+	
+							}
 
 						}
 
