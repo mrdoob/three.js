@@ -66,6 +66,14 @@ THREE.SVGLoader.prototype = {
 					paths.push( parsePolylineNode( node ) );
 					break;
 
+				case 'circle':
+					paths.push( parseCircleNode( node ) );
+					break;
+
+				case 'ellipse':
+					paths.push( parseEllipseNode( node ) );
+					break;
+
 				default:
 					console.log( node );
 
@@ -380,6 +388,35 @@ THREE.SVGLoader.prototype = {
 			node.getAttribute( 'points' ).replace(regex, iterator);
 
 			path.currentPath.autoClose = false;
+
+			return path;
+
+		}
+
+		function parseCircleNode( node ) {
+
+			var x = parseFloat( node.getAttribute( 'cx' ) );
+			var y = parseFloat( node.getAttribute( 'cy' ) );
+			var r = parseFloat( node.getAttribute( 'r' ) );
+
+			var path = new THREE.ShapePath();
+
+			path.currentPath.absarc( x, y, r, 0, Math.PI * 2 );
+
+			return path;
+
+		}
+
+		function parseEllipseNode( node ) {
+
+			var x = parseFloat( node.getAttribute( 'cx' ) );
+			var y = parseFloat( node.getAttribute( 'cy' ) );
+			var rx parseFloat( node.getAttribute( 'rx' ) );
+			var ry = parseFloat( node.getAttribute( 'ry' ) );
+
+			var path = new THREE.ShapePath();
+
+			path.currentPath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
 
 			return path;
 
