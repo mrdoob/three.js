@@ -11,7 +11,8 @@ import { Plane } from '../../../../src/math/Plane';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Mesh } from '../../../../src/objects/Mesh';
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
+import { BufferAttribute, Float32BufferAttribute } from '../../../../src/core/BufferAttribute';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry';
 import {
 	BoxGeometry,
 	BoxBufferGeometry
@@ -161,6 +162,21 @@ export default QUnit.module( 'Maths', () => {
 			a.setFromObject( object );
 			assert.ok( a.min.equals( new Vector3( - 1, - 1, - 1 ) ), "Correct new minimum" );
 			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Correct new maximum" );
+
+		} );
+
+		QUnit.test( "setFromObject/BufferGeometry-2D", ( assert ) => {
+
+			var a = new Box3( zero3.clone(), one3.clone() );
+			var object = new Mesh( new BoxBufferGeometry( 2, 2, 2 ) );
+			var buffer2D = new BufferGeometry();
+			buffer2D.addAttribute( "position", new Float32BufferAttribute( [0, 0, 5, 1], 2 ) );
+			var child = new Mesh( buffer2D );
+			object.add( child );
+
+			a.setFromObject( object );
+			assert.ok( a.min.equals( new Vector3( - 1, - 1, - 1 ) ), "Correct new minimum" );
+			assert.ok( a.max.equals( new Vector3( 5, 1, 1 ) ), "Correct new maximum" );
 
 		} );
 
