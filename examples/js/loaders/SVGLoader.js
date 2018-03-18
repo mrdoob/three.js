@@ -58,6 +58,14 @@ THREE.SVGLoader.prototype = {
 					paths.push( parseRectNode( node ) );
 					break;
 
+				case 'polygon':
+					paths.push( parsePolygonNode( node ) );
+					break;
+
+				case 'polyline':
+					paths.push( parsePolylineNode( node ) );
+					break;
+
 				default:
 					console.log( node );
 
@@ -315,6 +323,64 @@ THREE.SVGLoader.prototype = {
 			path.lineTo( x + w, y );
 			path.lineTo( x + w, y + h );
 			path.lineTo( x, y + h );
+			return path;
+
+		}
+
+		function parsePolygonNode( node ) {
+
+			function iterator( match, a, b ) {
+
+				var x = parseFloat( a );
+				var y = parseFloat( b );
+
+				if ( index === 0 ) {
+					path.moveTo( x, y );
+				} else {
+					path.lineTo( x, y );
+				}
+
+				index++;
+
+			}
+
+			var regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
+			var path = new THREE.ShapePath();
+			var index = 0;
+
+			node.getAttribute( 'points' ).replace(regex, iterator);
+
+			path.currentPath.autoClose = true;
+
+			return path;
+
+		}
+
+		function parsePolylineNode( node ) {
+
+			function iterator( match, a, b ) {
+
+				var x = parseFloat( a );
+				var y = parseFloat( b );
+
+				if ( index === 0 ) {
+					path.moveTo( x, y );
+				} else {
+					path.lineTo( x, y );
+				}
+
+				index++;
+
+			}
+
+			var regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
+			var path = new THREE.ShapePath();
+			var index = 0;
+
+			node.getAttribute( 'points' ).replace(regex, iterator);
+
+			path.currentPath.autoClose = false;
+
 			return path;
 
 		}
