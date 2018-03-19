@@ -1108,7 +1108,7 @@
 
 		if ( skeleton ) {
 
-			geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( weightsIndicesBuffer, 4 ) );
+			geo.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( weightsIndicesBuffer, 4 ) );
 
 			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( vertexWeightsBuffer, 4 ) );
 
