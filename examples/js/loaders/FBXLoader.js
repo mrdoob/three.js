@@ -446,26 +446,6 @@
 			parameters.displacementScale = properties.DisplacementFactor.value;
 
 		}
-		if ( properties.ReflectionFactor ) {
-
-			parameters.reflectivity = properties.ReflectionFactor.value;
-
-		}
-		if ( properties.Specular ) {
-
-			parameters.specular = new THREE.Color().fromArray( properties.Specular.value );
-
-		} else if ( properties.SpecularColor && properties.SpecularColor.type === 'Color' ) {
-
-			// The blender exporter exports specular color here instead of in properties.Specular
-			parameters.emissive = new THREE.Color().fromArray( properties.SpecularColor.value );
-
-		}
-		if ( properties.Shininess ) {
-
-			parameters.shininess = properties.Shininess.value;
-
-		}
 		if ( properties.Emissive ) {
 
 			parameters.emissive = new THREE.Color().fromArray( properties.Emissive.value );
@@ -489,6 +469,26 @@
 		if ( parameters.opacity < 1.0 ) {
 
 			parameters.transparent = true;
+
+		}
+		if ( properties.ReflectionFactor ) {
+
+			parameters.reflectivity = properties.ReflectionFactor.value;
+
+		}
+		if ( properties.Shininess ) {
+
+			parameters.shininess = properties.Shininess.value;
+
+		}
+		if ( properties.Specular ) {
+
+			parameters.specular = new THREE.Color().fromArray( properties.Specular.value );
+
+		} else if ( properties.SpecularColor && properties.SpecularColor.type === 'Color' ) {
+
+			// The blender exporter exports specular color here instead of in properties.Specular
+			parameters.specular = new THREE.Color().fromArray( properties.SpecularColor.value );
 
 		}
 
