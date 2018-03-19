@@ -104,7 +104,7 @@ THREE.SVGLoader.prototype = {
 				var command = commands[ i ];
 
 				var type = command.charAt( 0 );
-				var data = command.substr( 1 );
+				var data = command.substr( 1 ).trim();
 
 				switch ( type ) {
 
