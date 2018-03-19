@@ -415,7 +415,7 @@ THREE.SVGLoader.prototype = {
 
 			var x = parseFloat( node.getAttribute( 'cx' ) );
 			var y = parseFloat( node.getAttribute( 'cy' ) );
-			var rx parseFloat( node.getAttribute( 'rx' ) );
+			var rx = parseFloat( node.getAttribute( 'rx' ) );
 			var ry = parseFloat( node.getAttribute( 'ry' ) );
 
 			var path = new THREE.ShapePath();
