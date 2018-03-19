@@ -15,8 +15,8 @@
 		<div class="desc">
 			是一种使用 [link:https://en.wikipedia.org/wiki/Perspective_(graphical) perspective projection] 的相机。<br /><br />
 
-			这种投影模式旨在模仿人眼所见。这是最常见的
-			用于渲染3D场景的投影模式。
+			这种投影模式旨在模仿人眼所见。这是最常见的用于渲染3D场景的投影模式。
+
 		</div>
 
 
@@ -38,10 +38,10 @@ scene.add( camera );</code>
 
 		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far] )</h3>
 		<div>
-		fov — 相机截头锥体可视空间（Camera frustum）垂直的视野（视角）。<br />
-		aspect — 相机截头锥体可视空间宽高比。<br />
-		near — 最近相机截头锥体可视空间平面的距离（基于相机所在位置，从这一near坐标值开始渲染场景）。<br />
-		far — 最远相机截头锥体可视空间平面的距离（基于相机所在位置，一直渲染到场景中最远这一far坐标值）。<br /><br />
+		fov — 相机视锥体可视空间（Camera frustum）垂直的视野（视角）。<br />
+		aspect — 相机视锥体可视空间宽高比。<br />
+		near — 锥中距离相机最近的平面到相机的距离（基于相机所在位置，从这一near坐标值开始渲染场景）。<br />
+		far — 锥中距离相机最远的平面到相机的距离（基于相机所在位置，一直渲染到场景中最远这一far坐标值）。<br /><br />
 
 			它们一起定义了相机的 [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum]。
 		</div>
@@ -59,7 +59,7 @@ scene.add( camera );</code>
 
 		<h3>[property:Float far]</h3>
 		<div>
-			最远相机截头锥体可视空间平面的距离。默认值是 *2000*。<br /><br />
+			锥中距离相机最远的平面到相机的距离。默认值是 *2000*。<br /><br />
 
 			有效值范围介于当前 [page:.near near] 平面的 near 值到无穷远。
 		</div>
@@ -77,7 +77,7 @@ scene.add( camera );</code>
 		</div>
 
 		<h3>[property:Float fov]</h3>
-		<div>相机截头锥体可视空间（Camera frustum）垂直的视野（视角），即从下到上视角范围的角度值。默认值是 *50*。</div>
+		<div>相机视锥体可视空间（Camera frustum）垂直的视野（视角），即从下到上视角范围的角度值。默认值是 *50*。</div>
 
 		<h3>[property:Boolean isPerspectiveCamera]</h3>
 		<div>
@@ -89,7 +89,7 @@ scene.add( camera );</code>
 
 		<h3>[property:Float near]</h3>
 		<div>
-			最近相机截头锥体可视空间平面的距离。默认值是 *0.1*。<br /><br />
+			锥中距离相机最近的平面到相机的距离。默认值是 *0.1*。<br /><br />
 
 			有效值范围大于 0 且小于当前 [page:.far far] 平面的 far 值。
 			请注意，与 [page:OrthographicCamera] 不同的是对于透视相机的 near 平面，*0* <em>不是</em> 一个
@@ -184,7 +184,7 @@ camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
 camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 </code>
 
-		请注意，没有理由监视器必须具有相同的大小或网格。
+		请注意，监视器不必具有相同的大小或网格。
 		</div>
 
 		<h3>[method:null updateProjectionMatrix]()</h3>

@@ -32,7 +32,7 @@
 
 		<h3>[property:Boolean isCamera]</h3>
 		<div>
-			用于检查此类是否是相机或派生于相机。默认值是 *true*。<br /><br />
+			用于检查此类是否是相机或派生于相机类。默认值是 *true*。<br /><br />
 
 			你不应该修改它，因为渲染器内部需要使用它进行优化操作。
 		</div>
@@ -71,10 +71,10 @@
 
 		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 optionalTarget] )</h3>
 		<div>
-		返回一个 [page:Vector3] 用来表示相机正在查看的世界空间方向。<br /><br />
+		返回一个 [page:Vector3] 用来表示相机当前所看向的世界坐标系方向。<br /><br />
 
-		注意：这不是相机的 positive（正轴），而是它的负 z 轴, 是基类（ Object3D ）调
-		[page:Object3D.getWorldDirection getWorldDirection] 后的相反。<br /><br />
+		注意：这不是相机的 positive（正轴），而是它的负 z 轴, 是基类（ Object3D ）调用方法
+		[page:Object3D.getWorldDirection getWorldDirection] 后的相反方向。<br /><br />
 
 		假如一个 [page:Vector3 optionalTarget] vector（向量）被明确指定了, 则将结果复制到此 vector 中，
 		（可以以这种方式重复使用） 否则将创建新 vector。

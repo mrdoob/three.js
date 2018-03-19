@@ -15,8 +15,8 @@
 		<div class="desc">
 			是一种使用 [link:https://en.wikipedia.org/wiki/Orthographic_projection orthographic projection] 的相机。<br /><br />
 
-			在此投影模式下，渲染图像中对象的大小保持不变
-			而不管其与相机的距离如何。<br /><br />
+			在此投影模式下，不管渲染图像中的对象与相机的距离有多远，
+			渲染图像中对象的大小仍保持不变。<br /><br />
 
 			这对于渲染 2D 场景和 UI 元素尤其有用。
 		</div>
@@ -45,12 +45,12 @@ scene.add( camera );</code>
 
 		<h3>[name]( [param:Number left], [param:Number right], [param:Number top], [param:Number bottom], [param:Number near], [param:Number far] )</h3>
 		<div>
-		left — 相机截头锥体可视空间（Camera frustum）左平面。<br />
-		right — 相机截头锥体可视空间右平面。<br />
-		top — 相机截头锥体可视空间上平面。<br />
-		bottom — 相机截头锥体可视空间下平面。<br />
-		near — 最近的相机截头锥体可视空间平面的距离。<br />
-		far — 最远的相机截头锥体可视空间平面的距离。<br /><br />
+		left — 相机视锥体可视空间（Camera frustum）左平面。<br />相机视锥体远平面（视锥中距离相机最远的平面到相机的距离）
+		right — 相机视锥体可视空间右平面。<br />
+		top — 相机视锥体可视空间上平面。<br />
+		bottom — 相机视锥体可视空间下平面。<br />
+		near — 锥中距离相机最近的平面到相机的距离。<br />
+		far — 锥中距离相机最远的平面到相机的距离。<br /><br />
 
 		它们一起定义了相机的 [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum].
 		</div>
@@ -64,11 +64,11 @@ scene.add( camera );</code>
 		</div>
 
 		<h3>[property:Float bottom]</h3>
-		<div>相机截头锥体可视空间的下平面。</div>
+		<div>相机视锥体可视空间的下平面。</div>
 
 		<h3>[property:Float far]</h3>
 		<div>
-			最远相机截头锥体可视空间平面的距离。默认值为 *2000*.<br /><br />
+			锥中距离相机最远的平面到相机的距离。默认值为 *2000*.<br /><br />
 
 			有效值范围介于当前 [page:.near near] 平面的 near 值到无穷远。
 		</div>
@@ -81,11 +81,11 @@ scene.add( camera );</code>
 		</div>
 
 		<h3>[property:Float left]</h3>
-		<div>相机截头锥体可视空间左平面</div>
+		<div>相机视锥体可视空间左平面</div>
 
 		<h3>[property:Float near]</h3>
 		<div>
-			最近相机截头锥体可视空间平面的距离。默认值是 *0.1*。<br /><br />
+			锥中距离相机最近的平面到相机的距离。默认值是 *0.1*。<br /><br />
 
 			有效值范围介于 0 到当前 [page:.far far] 平面的距离。
 			请注意，与 [page:PerspectiveCamera] 不同的是，OrthographicCamera 的 near 值可以为 *0*，它是一个合法有效值。
@@ -93,10 +93,10 @@ scene.add( camera );</code>
 		</div>
 
 		<h3>[property:Float right]</h3>
-		<div>相机截头锥体可视空间右平面。</div>
+		<div>相机视锥体可视空间右平面。</div>
 
 		<h3>[property:Float top]</h3>
-		<div>相机截头锥体可视空间上平面。</div>
+		<div>相机视锥体可视空间上平面。</div>
 
 		<h3>[property:Object view]</h3>
 		<div>通过 [page:OrthographicCamera.setViewOffset setViewOffset] 来设置。默认值是 *null*。</div>
