@@ -927,13 +927,13 @@ THREE.GLTFExporter.prototype = {
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
 
 				// JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
+				var array = attribute.array;
 				if ( attributeName === 'JOINTS_0' &&
-						! ( attribute instanceof THREE.Uint16BufferAttribute ) &&
-						! ( attribute instanceof THREE.Uint8BufferAttribute ) ) {
+					! ( array instanceof Uint16Array ) &&
+					! ( array instanceof Uint8Array ) ) {
 
 					console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
-
-					attribute = new THREE.Uint16BufferAttribute( attribute.array, attribute.itemSize, attribute.normalized );
+					attribute = new THREE.BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
 
 				}
 
