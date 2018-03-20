@@ -1871,14 +1871,14 @@ THREE.GLTFLoader = ( function () {
 			materialType = kmuExtension.getMaterialType( materialDef );
 			pending.push( kmuExtension.extendParams( materialParams, materialDef, parser ) );
 
-		} else if ( materialDef.pbrMetallicRoughness !== undefined ) {
+		} else {
 
 			// Specification:
 			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#metallic-roughness-material
 
 			materialType = THREE.MeshStandardMaterial;
 
-			var metallicRoughness = materialDef.pbrMetallicRoughness;
+			var metallicRoughness = materialDef.pbrMetallicRoughness || {};
 
 			materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
 			materialParams.opacity = 1.0;
@@ -1908,10 +1908,6 @@ THREE.GLTFLoader = ( function () {
 				pending.push( parser.assignTexture( materialParams, 'roughnessMap', textureIndex ) );
 
 			}
-
-		} else {
-
-			materialType = THREE.MeshPhongMaterial;
 
 		}
 
