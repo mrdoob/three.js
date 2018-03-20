@@ -72,6 +72,7 @@
 			<div id="feedback"></div>
 		</div>
 
+		<script src="js/Detector.js"></script>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
@@ -79,41 +80,43 @@
 
 		<script src="js/loaders/LoaderSupport.js"></script>
 		<script src="js/loaders/OBJLoader2.js"></script>
+		<script src="js/loaders/WorkerLoader.js"></script>
+
 		<script>
 
 			'use strict';
 
-			var WWOBJLoader2Example = function ( elementToBindTo ) {
-				this.renderer = null;
-				this.canvas = elementToBindTo;
-				this.aspectRatio = 1;
-				this.recalcAspectRatio();
+			var WWOBJLoader2Example = (function () {
 
-				this.scene = null;
-				this.cameraDefaults = {
-					posCamera: new THREE.Vector3( 0.0, 175.0, 500.0 ),
-					posCameraTarget: new THREE.Vector3( 0, 0, 0 ),
-					near: 0.1,
-					far: 10000,
-					fov: 45
-				};
-				this.camera = null;
-				this.cameraTarget = this.cameraDefaults.posCameraTarget;
+				var Validator = THREE.LoaderSupport.Validator;
 
-				this.controls = null;
+				function WWOBJLoader2Example( elementToBindTo ) {
+					this.renderer = null;
+					this.canvas = elementToBindTo;
+					this.aspectRatio = 1;
+					this.recalcAspectRatio();
 
-				this.flatShading = false;
-				this.doubleSide = false;
+					this.scene = null;
+					this.cameraDefaults = {
+						posCamera: new THREE.Vector3( 0.0, 175.0, 500.0 ),
+						posCameraTarget: new THREE.Vector3( 0, 0, 0 ),
+						near: 0.1,
+						far: 10000,
+						fov: 45
+					};
+					this.camera = null;
+					this.cameraTarget = this.cameraDefaults.posCameraTarget;
 
-				this.cube = null;
-				this.pivot = null;
-			};
+					this.controls = null;
 
-			WWOBJLoader2Example.prototype = {
+					this.flatShading = false;
+					this.doubleSide = false;
 
-				constructor: WWOBJLoader2Example,
+					this.cube = null;
+					this.pivot = null;
+				}
 
-				initGL: function () {
+				WWOBJLoader2Example.prototype.initGL = function () {
 					this.renderer = new THREE.WebGLRenderer( {
 						canvas: this.canvas,
 						antialias: true,
@@ -150,17 +153,18 @@
 					this.pivot = new THREE.Object3D();
 					this.pivot.name = 'Pivot';
 					this.scene.add( this.pivot );
-				},
+				};
 
-				useParseSync: function () {
+				WWOBJLoader2Example.prototype.useParseSync = function () {
 					var modelName = 'female02';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
+					var objLoader2 = new THREE.OBJLoader2();
+					objLoader2.setModelName( modelName );
+
 					var scope = this;
-					var objLoader = new THREE.OBJLoader2();
-					var onLoadMtl = function ( materials ) {
-						objLoader.setModelName( modelName );
-						objLoader.setMaterials( materials );
+					var onLoadMtl = function ( mtlParseResult ) {
+						objLoader2.setMaterials( mtlParseResult.materials );
 
 						var fileLoader = new THREE.FileLoader();
 						fileLoader.setPath( '' );
@@ -171,19 +175,17 @@
 								local.name = 'Pivot_female02';
 								local.position.set( 75, 0, 0 );
 								scope.pivot.add( local );
-								local.add( objLoader.parse( content ) );
+								local.add( objLoader2.parse( content ) );
 
 								scope._reportProgress( { detail: { text: 'Loading complete: ' + modelName } } );
 							}
 						);
 					};
-					var onError = function ( event ) {
-						console.error( 'Error occurred: ' + event );
-					};
-					objLoader.loadMtl( 'models/obj/female02/female02.mtl', null, onLoadMtl, null, onError );
-				},
+					objLoader2.load( 'models/obj/female02/female02.mtl', onLoadMtl );
+				};
 
-				useParseAsync: function () {
+
+				WWOBJLoader2Example.prototype.useParseAsync = function () {
 					var modelName = 'female02_vertex' ;
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
@@ -192,14 +194,12 @@
 						local.name = 'Pivot_female02_vertex';
 						local.position.set( -75, 0, 0 );
 						scope.pivot.add( local );
-						local.add( event.detail.loaderRootNode );
+						local.add( event.detail.result );
 
 						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
 					};
 
 					var scope = this;
-					var objLoader = new THREE.OBJLoader2();
-					objLoader.setModelName( modelName );
 
 					var fileLoader = new THREE.FileLoader();
 					fileLoader.setPath( '' );
@@ -207,163 +207,176 @@
 					var filename = 'models/obj/female02/female02_vertex_colors.obj';
 					fileLoader.load( filename,
 						function ( content ) {
-							objLoader.parseAsync( content, callbackOnLoad );
+							var objLoader = new THREE.OBJLoader2();
+							objLoader.setModelName( modelName );
+
+							var workerLoader = new THREE.WorkerLoader();
+							workerLoader.getLoadingTask()
+								.setLoader( objLoader )
+								.setTerminateWorkerOnLoad( true );
+							workerLoader.parseAsync( content, callbackOnLoad );
+
 							scope._reportProgress( { detail: { text: 'File loading complete: ' + filename } } );
 						}
 					);
-				},
+				};
 
-				useLoadSync: function () {
+				WWOBJLoader2Example.prototype.useLoadSync = function () {
 					var modelName = 'male02';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
+					var objLoader2 = new THREE.OBJLoader2();
+					objLoader2.setModelName( modelName );
+					objLoader2.setUseIndices( true );
+
 					var scope = this;
-					var objLoader = new THREE.OBJLoader2();
-					var callbackOnLoad = function ( event ) {
+					var callbackOnLoad = function ( object3d ) {
 						var local = new THREE.Object3D();
 						local.name = 'Pivot_male02';
 						local.position.set( 0, 0, -75 );
 						scope.pivot.add( local );
-						local.add( event.detail.loaderRootNode );
+						local.add( object3d );
 
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
+						scope._reportProgress( { detail: { text: 'Loading complete: ' + objLoader2.modelName } } );
 					};
 
-					var onLoadMtl = function ( materials ) {
-						objLoader.setModelName( modelName );
-						objLoader.setMaterials( materials );
-						objLoader.setUseIndices( true );
-						objLoader.load( 'models/obj/male02/male02.obj', callbackOnLoad, null, null, null, false );
+					var onLoadMtl = function ( mtlParseResult ) {
+						objLoader2.setMaterials( mtlParseResult.materials );
+						objLoader2.load( 'models/obj/male02/male02.obj', callbackOnLoad, null, null, null );
 					};
-					objLoader.loadMtl( 'models/obj/male02/male02.mtl', null, onLoadMtl );
-				},
+					objLoader2.load( 'models/obj/male02/male02.mtl', onLoadMtl );
+				};
 
-				useLoadAsync: function () {
+				WWOBJLoader2Example.prototype.useLoadAsync = function () {
 					var modelName = 'WaltHead';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
-					var scope = this;
-					var objLoader = new THREE.OBJLoader2();
-					var callbackOnLoad = function ( event ) {
-						objLoader.workerSupport.setTerminateRequested( true );
+					var objLoader2 = new THREE.OBJLoader2();
+					objLoader2.setModelName( modelName );
 
-						var local = new THREE.Object3D();
-						local.name = 'Pivot_WaltHead';
-						local.position.set( -125, 50, 0 );
-						var scale = 0.5;
-						local.scale.set( scale, scale, scale );
-						scope.pivot.add( local );
-						local.add( event.detail.loaderRootNode );
+					var local = new THREE.Object3D();
+					local.name = 'Pivot_WaltHead';
+					local.position.set( -125, 50, 0 );
+					var scale = 0.5;
+					local.scale.set( scale, scale, scale );
+					this.pivot.add( local );
 
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
-					};
-
-					var onLoadMtl = function ( materials ) {
-						objLoader.setModelName( modelName );
-						objLoader.setMaterials( materials );
-						objLoader.terminateWorkerOnLoad = false;
-						objLoader.load( 'models/obj/walt/WaltHead.obj', callbackOnLoad, null, null, null, true );
-
-					};
-					objLoader.loadMtl( 'models/obj/walt/WaltHead.mtl', null, onLoadMtl );
-				},
-
-				useRunSync: function () {
 					var scope = this;
 					var callbackOnLoad = function ( event ) {
 						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
 					};
 
-					var prepData = new THREE.LoaderSupport.PrepData( 'cerberus' );
+					var onLoadMtl = function ( mtlParseResult ) {
+						objLoader2.setMaterials( mtlParseResult.materials );
+
+						var workerLoader = new THREE.WorkerLoader()
+							.setLoader( objLoader2 );
+						workerLoader.getLoadingTask()
+							.setTerminateWorkerOnLoad( false )
+							.setBaseObject3d( local );
+						workerLoader.loadAsync( 'models/obj/walt/WaltHead.obj', callbackOnLoad );
+
+					};
+					objLoader2.load( 'models/obj/walt/WaltHead.mtl', onLoadMtl );
+				};
+
+				WWOBJLoader2Example.prototype.useRunSync = function () {
 					var local = new THREE.Object3D();
 					local.position.set( 0, 0, 100 );
 					local.scale.set( 50.0, 50.0, 50.0 );
 					this.pivot.add( local );
-					prepData.streamMeshesTo = local;
-					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/cerberus/Cerberus.obj', 'OBJ' ) );
-					var callbacks = prepData.getCallbacks();
-					callbacks.setCallbackOnProgress( this._reportProgress );
-					callbacks.setCallbackOnLoad( callbackOnLoad );
 
-					var objLoader = new THREE.OBJLoader2();
-					objLoader.run( prepData );
-				},
-
-				useRunAsyncMeshAlter: function () {
 					var scope = this;
 					var callbackOnLoad = function ( event ) {
 						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
 					};
+					var callbackOnProgress = function ( event ) {
+						scope._reportProgress( event );
+					};
 
-					var prepData = new THREE.LoaderSupport.PrepData( 'vive-controller' );
+					var rd = new THREE.WorkerLoader.ResourceDescriptor( 'URL', 'Cerberus.obj', 'models/obj/cerberus/Cerberus.obj' );
+
+					var loadingTaskConfig = new THREE.WorkerLoader.LoadingTaskConfig( {
+							instanceNo: 42,
+							baseObject3d: local
+						} )
+						.setLoaderConfig( THREE.OBJLoader2 )
+						.addResourceDescriptor( rd )
+						.setCallbacksPipeline( callbackOnLoad )
+						.setCallbacksApp( callbackOnProgress );
+					new THREE.WorkerLoader()
+						.getLoadingTask()
+						.execute( loadingTaskConfig );
+				};
+
+				WWOBJLoader2Example.prototype.useRunAsyncMeshAlter = function () {
 					var local = new THREE.Object3D();
 					local.position.set( 125, 50, 0 );
 					local.name = 'Pivot_vive-controller';
 					this.pivot.add( local );
-					prepData.streamMeshesTo = local;
-					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/vive-controller/vr_controller_vive_1_5.obj', 'OBJ' ) );
-					prepData.useAsync = true;
-					var callbacks = prepData.getCallbacks();
-					var callbackMeshAlter = function ( event ) {
-						var override = new THREE.LoaderSupport.LoadedMeshUserOverride( false, true );
 
-						var mesh = new THREE.Mesh( event.detail.bufferGeometry, event.detail.material );
+					var scope = this;
+					var callbackOnLoad = function ( event ) {
+						var mesh = event.detail.result;
 						var scale = 200.0;
 						mesh.scale.set( scale, scale, scale );
-						mesh.name = event.detail.meshName;
-						var helper = new THREE.VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
-						helper.name = 'VertexNormalsHelper';
-
-						override.addMesh( mesh );
-						override.addMesh( helper );
-
-						return override;
+						local.add( mesh );
+						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
 					};
-					callbacks.setCallbackOnMeshAlter( callbackMeshAlter );
-					callbacks.setCallbackOnProgress( this._reportProgress );
-					callbacks.setCallbackOnLoad( callbackOnLoad );
 
-					var objLoader = new THREE.OBJLoader2();
-					objLoader.run( prepData );
-				},
+					var rd = new THREE.WorkerLoader.ResourceDescriptor( 'URL', 'vr_controller_vive_1_5.obj', 'models/obj/vive-controller/vr_controller_vive_1_5.obj' );
 
-				finalize: function () {
+					var loadingTaskConfig = new THREE.WorkerLoader.LoadingTaskConfig( {
+							terminateWorkerOnLoad: false
+						} )
+						.setLoaderConfig( THREE.OBJLoader2 )
+						.addResourceDescriptor( rd )
+						.setCallbacksPipeline( callbackOnLoad );
+					new THREE.WorkerLoader()
+						.getLoadingTask()
+						.execute( loadingTaskConfig );
+				};
+
+				WWOBJLoader2Example.prototype.finalize = function () {
 					this._reportProgress( { detail: { text: '' } } );
-				},
+				};
 
-				_reportProgress: function( event ) {
-					var output = THREE.LoaderSupport.Validator.verifyInput( event.detail.text, '' );
+				WWOBJLoader2Example.prototype._reportProgress = function( event ) {
+					var output = '';
+					if ( Validator.isValid( event.detail ) && Validator.isValid( event.detail.text ) ) {
+						output = event.detail.text;
+					}
 					console.log( 'Progress: ' + output );
 					document.getElementById( 'feedback' ).innerHTML = output;
-				},
+				};
 
-				resizeDisplayGL: function () {
+				WWOBJLoader2Example.prototype.resizeDisplayGL = function () {
 					this.controls.handleResize();
 
 					this.recalcAspectRatio();
 					this.renderer.setSize( this.canvas.offsetWidth, this.canvas.offsetHeight, false );
 
 					this.updateCamera();
-				},
+				};
 
-				recalcAspectRatio: function () {
+				WWOBJLoader2Example.prototype.recalcAspectRatio = function () {
 					this.aspectRatio = ( this.canvas.offsetHeight === 0 ) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
-				},
+				};
 
-				resetCamera: function () {
+				WWOBJLoader2Example.prototype.resetCamera = function () {
 					this.camera.position.copy( this.cameraDefaults.posCamera );
 					this.cameraTarget.copy( this.cameraDefaults.posCameraTarget );
 
 					this.updateCamera();
-				},
+				};
 
-				updateCamera: function () {
+				WWOBJLoader2Example.prototype.updateCamera = function () {
 					this.camera.aspect = this.aspectRatio;
 					this.camera.lookAt( this.cameraTarget );
 					this.camera.updateProjectionMatrix();
-				},
+				};
 
-				render: function () {
+				WWOBJLoader2Example.prototype.render = function () {
 					if ( ! this.renderer.autoClear ) this.renderer.clear();
 
 					this.controls.update();
@@ -372,9 +385,9 @@
 					this.cube.rotation.y += 0.05;
 
 					this.renderer.render( this.scene, this.camera );
-				},
+				};
 
-				alterShading: function () {
+				WWOBJLoader2Example.prototype.alterShading = function () {
 					var scope = this;
 					scope.flatShading = ! scope.flatShading;
 					console.log( scope.flatShading ? 'Enabling flat shading' : 'Enabling smooth shading');
@@ -387,14 +400,14 @@
 						scope.traverseScene( object3d );
 					};
 					scope.pivot.traverse( scopeTraverse );
-				},
+				};
 
-				alterDouble: function () {
+				WWOBJLoader2Example.prototype.alterDouble = function () {
 					var scope = this;
 					scope.doubleSide = ! scope.doubleSide;
-					console.log( scope.doubleSide ? 'Enabling DoubleSide materials' : 'Enabling FrontSide materials' );
+					console.log( scope.doubleSide ? 'Enabling DoubleSide materials' : 'Enabling FrontSide materials');
 
-					scope.traversalFunction = function ( material ) {
+					scope.traversalFunction  = function ( material ) {
 						material.side = scope.doubleSide ? THREE.DoubleSide : THREE.FrontSide;
 					};
 
@@ -402,9 +415,9 @@
 						scope.traverseScene( object3d );
 					};
 					scope.pivot.traverse( scopeTraverse );
-				},
+				};
 
-				traverseScene: function ( object3d ) {
+				WWOBJLoader2Example.prototype.traverseScene = function ( object3d ) {
 					if ( object3d.material instanceof THREE.MultiMaterial ) {
 
 						var materials = object3d.material.materials;
@@ -419,9 +432,11 @@
 						this.traversalFunction( object3d.material );
 
 					}
-				}
+				};
 
-			};
+				return WWOBJLoader2Example;
+
+			})();
 
 
 			var app = new WWOBJLoader2Example( document.getElementById( 'example' ) );
@@ -470,7 +485,6 @@
 
 			// kick render loop
 			render();
-
 
 			// Load a file with OBJLoader.parse synchronously
 			app.useParseSync();

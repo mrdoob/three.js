@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - OBJLoader2/OBJLoader verification</title>
+		<title>three.js webgl - WorkerLoader - Multi-Loader Support</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -67,48 +67,49 @@
 
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2/OBJLoader verification
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WorkerLoader loader adapter
 			<div id="feedback"></div>
 		</div>
 
-		<script src="../../../js/Detector.js"></script>
-		<script src="../../../../build/three.js"></script>
-		<script src="../../../js/controls/TrackballControls.js"></script>
-		<script src="../../../js/loaders/MTLLoader.js"></script>
-		<script src="../../../js/loaders/OBJLoader.js"></script>
-		<script src="../../../js/libs/dat.gui.min.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="../build/three.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/MTLLoader.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+        <script src="js/loaders/PCDLoader.js"></script>
 
-		<script src="../../../js/loaders/LoaderSupport.js"></script>
-		<script src="../../../js/loaders/OBJLoader2.js"></script>
+		<script src="js/loaders/LoaderSupport.js"></script>
+		<script src="js/loaders/OBJLoader2.js"></script>
+		<script src="js/loaders/WorkerLoader.js"></script>
 		<script>
 
 			'use strict';
 
-			var OBJLoaderVerify = (function () {
+			var WWLoaderAdapter = function ( elementToBindTo ) {
+				this.renderer = null;
+				this.canvas = elementToBindTo;
+				this.aspectRatio = 1;
+				this.recalcAspectRatio();
 
-				var Validator = THREE.LoaderSupport.Validator;
+				this.scene = null;
+				this.cameraDefaults = {
+					posCamera: new THREE.Vector3( 0.0, 175.0, 500.0 ),
+					posCameraTarget: new THREE.Vector3( 0, 0, 0 ),
+					near: 0.1,
+					far: 10000,
+					fov: 45
+				};
+				this.camera = null;
+				this.cameraTarget = this.cameraDefaults.posCameraTarget;
 
-				function OBJLoaderVerify( elementToBindTo ) {
-					this.renderer = null;
-					this.canvas = elementToBindTo;
-					this.aspectRatio = 1;
-					this.recalcAspectRatio();
+				this.controls = null;
+			};
 
-					this.scene = null;
-					this.cameraDefaults = {
-						posCamera: new THREE.Vector3( 0.0, 175.0, 500.0 ),
-						posCameraTarget: new THREE.Vector3( 0, 0, 0 ),
-						near: 0.1,
-						far: 10000,
-						fov: 45
-					};
-					this.camera = null;
-					this.cameraTarget = this.cameraDefaults.posCameraTarget;
+			WWLoaderAdapter.prototype = {
 
-					this.controls = null;
-				}
+				constructor: WWLoaderAdapter,
 
-				OBJLoaderVerify.prototype.initGL = function () {
+				initGL: function () {
 					this.renderer = new THREE.WebGLRenderer( {
 						canvas: this.canvas,
 						antialias: true,
@@ -135,82 +136,88 @@
 
 					var helper = new THREE.GridHelper( 1200, 60, 0xFF4444, 0x404040 );
 					this.scene.add( helper );
-				};
+				},
 
-				OBJLoaderVerify.prototype.initContent = function () {
-					var modelName = 'verificationCubes';
-					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
+				initContent: function () {
+					var local = new THREE.Object3D();
+					local.position.set( 0, 0, 100 );
+					local.scale.set( 50.0, 50.0, 50.0 );
+					this.scene.add( local );
 
 					var scope = this;
-					var objLoader2 = new THREE.OBJLoader2();
-
-					var callbackOnLoad = function ( object3d ) {
-						scope.scene.add( object3d );
-						console.log( 'Loading complete: ' + modelName );
-						scope._reportProgress( { detail: { text: '' } } );
+					var callbackOnLoad = function ( event ) {
+						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
 					};
-
-					var onLoadMtl = function ( materials ) {
-						var objLoader = new THREE.OBJLoader();
-						objLoader.setMaterials( materials.materialCreator );
-						objLoader.load( './verify.obj', function ( object ) {
-							object.position.y = -100;
-							scope.scene.add( object );
-						} );
-
-						objLoader2.setModelName( modelName );
-						objLoader2.setMaterials( materials );
-						objLoader2.setLogging( true, false );
-						objLoader2.setUseOAsMesh( true );
-						objLoader2.load( './verify.obj', callbackOnLoad, null, null, null, false );
+					var buildWorkerCode = function ( codeSerializer ) {
+						return {
+							code: '',
+							parserName: 'THREE.PCDLoader',
+							useMeshDisassembler: true,
+							libs: {
+								locations: [
+									'build/three.min.js',
+									'examples/js/loaders/PCDLoader.js'
+								],
+								path: '../'
+							}
+						}
 					};
+					var rd = new THREE.WorkerLoader.ResourceDescriptor( 'URL', 'Zaghetto.pcd', 'models/pcd/binary/Zaghetto.pcd' );
 
-					objLoader2.load( './verify.mtl', onLoadMtl );
-				};
+					var loadingTaskConfig = new THREE.WorkerLoader.LoadingTaskConfig( {
+						baseObject3d: local
+					} )
+						.setLoaderConfig( THREE.PCDLoader )
+						.setBuildWorkerCodeFunction( buildWorkerCode )
+						.addResourceDescriptor( rd )
+						.setCallbacksPipeline( callbackOnLoad );
+					new THREE.WorkerLoader()
+						.getLoadingTask()
+						.execute( loadingTaskConfig );
+				},
 
-				OBJLoaderVerify.prototype._reportProgress = function( event ) {
-					var output = Validator.verifyInput( event.detail.text, '' );
+				_reportProgress: function( event ) {
+					var output = THREE.LoaderSupport.Validator.verifyInput( event.detail.text, '' );
 					console.log( 'Progress: ' + output );
 					document.getElementById( 'feedback' ).innerHTML = output;
-				};
+				},
 
-				OBJLoaderVerify.prototype.resizeDisplayGL = function () {
+				resizeDisplayGL: function () {
 					this.controls.handleResize();
 
 					this.recalcAspectRatio();
 					this.renderer.setSize( this.canvas.offsetWidth, this.canvas.offsetHeight, false );
 
 					this.updateCamera();
-				};
+				},
 
-				OBJLoaderVerify.prototype.recalcAspectRatio = function () {
+				recalcAspectRatio: function () {
 					this.aspectRatio = ( this.canvas.offsetHeight === 0 ) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
-				};
+				},
 
-				OBJLoaderVerify.prototype.resetCamera = function () {
+				resetCamera: function () {
 					this.camera.position.copy( this.cameraDefaults.posCamera );
 					this.cameraTarget.copy( this.cameraDefaults.posCameraTarget );
 
 					this.updateCamera();
-				};
+				},
 
-				OBJLoaderVerify.prototype.updateCamera = function () {
+				updateCamera: function () {
 					this.camera.aspect = this.aspectRatio;
 					this.camera.lookAt( this.cameraTarget );
 					this.camera.updateProjectionMatrix();
-				};
+				},
 
-				OBJLoaderVerify.prototype.render = function () {
+				render: function () {
 					if ( ! this.renderer.autoClear ) this.renderer.clear();
 					this.controls.update();
 					this.renderer.render( this.scene, this.camera );
-				};
+				}
 
-				return OBJLoaderVerify;
+			};
 
-			})();
 
-			var app = new OBJLoaderVerify( document.getElementById( 'example' ) );
+			var app = new WWLoaderAdapter( document.getElementById( 'example' ) );
 
 			var resizeWindow = function () {
 				app.resizeDisplayGL();
