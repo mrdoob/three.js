@@ -251,13 +251,12 @@
 						var fixedOffsetY;
 						var fixedOffsetZ;
 						var s, t;
-						// complete triagle
-						var sizeVaring = this.sizeFactor * Math.random();
+						// complete triangle
 						// local coords offset
 						var localOffsetFactor = this.localOffsetFactor;
 
 						for ( var i = 0; i < this.quantity; i++ ) {
-							sizeVaring = this.sizeFactor * Math.random();
+							var sizeVaring = this.sizeFactor * Math.random();
 
 							s = 2 * Math.PI * Math.random();
 							t = Math.PI * Math.random();

@@ -282,7 +282,7 @@
 				object.name = "Cube";
 				scene1.add( object );
 
-				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 40, 40, 2, 2, 2 ), material );
+				var object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 40, 40, 40, 2, 2, 2 ), material );
 				object2.position.set( 0, 0, 50 );
 				object2.rotation.set( 0, 45, 0 );
 				object2.name = "SubCube";
@@ -301,7 +301,7 @@
 				group2.position.set( 0, 50, 0);
 				group1.add( group2 );
 
-				var object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
+				object2 = new THREE.Mesh( new THREE.BoxBufferGeometry( 30, 30, 30 ), material );
 				object2.name = "Cube in group";
 				object2.position.set( 0, 0, 400 );
 				group2.add( object2 );
@@ -498,8 +498,8 @@
 					scene1.add( waltHead );
 
 				} );
-				
-				
+
+
 				// ---------------------------------------------------------------------
 				// 2nd Scene
 				// ---------------------------------------------------------------------
