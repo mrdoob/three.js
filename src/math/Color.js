@@ -1,4 +1,4 @@
-import { _Math } from './Math';
+import { _Math } from './Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -23,7 +23,7 @@ var ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0
 	'mediumvioletred': 0xC71585, 'midnightblue': 0x191970, 'mintcream': 0xF5FFFA, 'mistyrose': 0xFFE4E1, 'moccasin': 0xFFE4B5, 'navajowhite': 0xFFDEAD,
 	'navy': 0x000080, 'oldlace': 0xFDF5E6, 'olive': 0x808000, 'olivedrab': 0x6B8E23, 'orange': 0xFFA500, 'orangered': 0xFF4500, 'orchid': 0xDA70D6,
 	'palegoldenrod': 0xEEE8AA, 'palegreen': 0x98FB98, 'paleturquoise': 0xAFEEEE, 'palevioletred': 0xDB7093, 'papayawhip': 0xFFEFD5, 'peachpuff': 0xFFDAB9,
-	'peru': 0xCD853F, 'pink': 0xFFC0CB, 'plum': 0xDDA0DD, 'powderblue': 0xB0E0E6, 'purple': 0x800080, 'red': 0xFF0000, 'rosybrown': 0xBC8F8F,
+	'peru': 0xCD853F, 'pink': 0xFFC0CB, 'plum': 0xDDA0DD, 'powderblue': 0xB0E0E6, 'purple': 0x800080, 'rebeccapurple': 0x663399, 'red': 0xFF0000, 'rosybrown': 0xBC8F8F,
 	'royalblue': 0x4169E1, 'saddlebrown': 0x8B4513, 'salmon': 0xFA8072, 'sandybrown': 0xF4A460, 'seagreen': 0x2E8B57, 'seashell': 0xFFF5EE,
 	'sienna': 0xA0522D, 'silver': 0xC0C0C0, 'skyblue': 0x87CEEB, 'slateblue': 0x6A5ACD, 'slategray': 0x708090, 'slategrey': 0x708090, 'snow': 0xFFFAFA,
 	'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
@@ -347,11 +347,16 @@ Object.assign( Color.prototype, {
 
 	},
 
-	getHSL: function ( optionalTarget ) {
+	getHSL: function ( target ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		var hsl = optionalTarget || { h: 0, s: 0, l: 0 };
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Color: .getHSL() target is now required' );
+			target = { h: 0, s: 0, l: 0 };
+
+		}
 
 		var r = this.r, g = this.g, b = this.b;
 
@@ -384,11 +389,11 @@ Object.assign( Color.prototype, {
 
 		}
 
-		hsl.h = hue;
-		hsl.s = saturation;
-		hsl.l = lightness;
+		target.h = hue;
+		target.s = saturation;
+		target.l = lightness;
 
-		return hsl;
+		return target;
 
 	},
 
@@ -398,17 +403,23 @@ Object.assign( Color.prototype, {
 
 	},
 
-	offsetHSL: function ( h, s, l ) {
+	offsetHSL: function () {
 
-		var hsl = this.getHSL();
+		var hsl = {};
 
-		hsl.h += h; hsl.s += s; hsl.l += l;
+		return function ( h, s, l ) {
 
-		this.setHSL( hsl.h, hsl.s, hsl.l );
+			this.getHSL( hsl );
 
-		return this;
+			hsl.h += h; hsl.s += s; hsl.l += l;
 
-	},
+			this.setHSL( hsl.h, hsl.s, hsl.l );
+
+			return this;
+
+		};
+
+	}(),
 
 	add: function ( color ) {
 
@@ -440,7 +451,7 @@ Object.assign( Color.prototype, {
 
 	},
 
-	sub: function( color ) {
+	sub: function ( color ) {
 
 		this.r = Math.max( 0, this.r - color.r );
 		this.g = Math.max( 0, this.g - color.g );

@@ -119,19 +119,17 @@ THREE.PaintViveController = function ( id ) {
 
 	function resizeTriangleGeometry(geometry, ratio) {
 
+		var x = 0, y = 0;
+		var fullWidth = 0.75, fullHeight = 1.5;
+		var angle = Math.atan( ( fullWidth / 2 ) / fullHeight );
 
-
-		var x = 0, y =0;
-		var fullWidth = 0.75; fullHeight = 1.5;
-		var angle = Math.atan((fullWidth/2)/fullHeight);
-
-		var bottomY = y - fullHeight/2;
+		var bottomY = y - fullHeight / 2;
 		var height = fullHeight * ratio;
-		var width = (Math.tan(angle) * height) * 2;
+		var width = ( Math.tan( angle ) * height ) * 2;
 
-		geometry.vertices[0].set( x, bottomY, 0);
-		geometry.vertices[1].set( x + width/2, bottomY + height, 0 );
-		geometry.vertices[2].set( x - width/2, bottomY + height, 0  );
+		geometry.vertices[ 0 ].set( x, bottomY, 0 );
+		geometry.vertices[ 1 ].set( x + width / 2, bottomY + height, 0 );
+		geometry.vertices[ 2 ].set( x - width / 2, bottomY + height, 0 );
 
 		geometry.verticesNeedUpdate = true;
 

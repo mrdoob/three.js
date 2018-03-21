@@ -1,30 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js</title>
+		<title><!-- title --></title>
 		<meta charset="utf-8">
 		<meta name="generator" content="Three.js Editor">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				font-family: Helvetica, Arial, sans-serif;
-				font-size: 12px;
+				font-family: sans-serif;
+				font-size: 13px;
 				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
-			}
-			#edit {
-				position: absolute;
-				bottom: 20px;
-				right: 20px;
-				padding: 8px;
-				text-decoration: none;
-				background-color: #fff;
-				color: #555;
-				opacity: 0.5;
-			}
-			#edit:hover {
-				opacity: 1;
 			}
 		</style>
 	</head>
@@ -48,16 +35,9 @@
 					player.setSize( window.innerWidth, window.innerHeight );
 				} );
 
-				if ( location.search === '?edit' ) {
-					var button = document.createElement( 'a' );
-					button.id = 'edit';
-					button.href = 'https://threejs.org/editor/#file=' + location.href.split( '/' ).slice( 0, - 1 ).join( '/' ) + '/app.json';
-					button.target = '_blank';
-					button.textContent = 'EDIT';
-					document.body.appendChild( button );
-				}
-
 			} );
+
+			/* edit button */
 
 		</script>
 	</body>

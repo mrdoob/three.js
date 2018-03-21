@@ -1,4 +1,4 @@
-import { Matrix4 } from '../math/Matrix4';
+import { Matrix4 } from '../math/Matrix4.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -151,6 +151,24 @@ Object.assign( Skeleton.prototype, {
 	clone: function () {
 
 		return new Skeleton( this.bones, this.boneInverses );
+
+	},
+
+	getBoneByName: function ( name ) {
+
+		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
+
+			var bone = this.bones[ i ];
+
+			if ( bone.name === name ) {
+
+				return bone;
+
+			}
+
+		}
+
+		return undefined;
 
 	}
 

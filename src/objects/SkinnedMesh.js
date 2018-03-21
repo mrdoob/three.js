@@ -1,8 +1,8 @@
-import { Mesh } from './Mesh';
-import { Vector4 } from '../math/Vector4';
-import { Skeleton } from './Skeleton';
-import { Bone } from './Bone';
-import { Matrix4 } from '../math/Matrix4';
+import { Mesh } from './Mesh.js';
+import { Vector4 } from '../math/Vector4.js';
+import { Skeleton } from './Skeleton.js';
+import { Bone } from './Bone.js';
+import { Matrix4 } from '../math/Matrix4.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -130,7 +130,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 				var sw = this.geometry.skinWeights[ i ];
 
-				scale = 1.0 / sw.lengthManhattan();
+				scale = 1.0 / sw.manhattanLength();
 
 				if ( scale !== Infinity ) {
 
@@ -157,7 +157,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				vec.z = skinWeight.getZ( i );
 				vec.w = skinWeight.getW( i );
 
-				scale = 1.0 / vec.lengthManhattan();
+				scale = 1.0 / vec.manhattanLength();
 
 				if ( scale !== Infinity ) {
 

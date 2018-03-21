@@ -4,8 +4,8 @@
 		<title>three.js webvr - daydream</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR, origin = https://threejs.org, expires = 2017-04-17 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR" data-expires="2017-04-17" content="Aj3fKurj0eOvRSbpJ0NaqkV/AE2Y2KJIepdCGWNmCB/iMgbDV/rhFn8zFu6c6zZZlRGZNR7Xv/BEX544EeqLuQAAAABKeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUiIsImV4cGlyeSI6MTQ5MjQ3MzYwMH0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-04-03 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-04-03" content="AqIrNtaoJSmDZatgEEW2ehuK9ITIiFk3gZ3/gC6Vp0gF85NDYl7IzVPj4Bh7O6SIcr3ICOm6kocYSaS+BPkazgYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyMjc2MzAwMn0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -25,27 +25,16 @@
 
 		<script src="js/vr/DaydreamController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
-		<script src="js/vr/WebVRCamera.js"></script>
 
 		<script>
-
-			if ( WEBVR.isAvailable() === false ) {
-
-				document.body.appendChild( WEBVR.getMessage() );
-
-			}
-
-			//
 
 			var clock = new THREE.Clock();
 
 			var container;
-			var camera, scene, ray, raycaster, renderer;
-			var gamepad, vrdisplay;
+			var camera, scene, renderer;
+			var controller;
 
 			var room;
-
-			var INTERSECTED;
 
 			init();
 			animate();
@@ -60,7 +49,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank">three.js</a> webvr - daydream';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - daydream';
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
@@ -72,6 +61,7 @@
 					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x808080, wireframe: true } )
 				);
+				room.position.y = 3;
 				scene.add( room );
 
 				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
@@ -80,7 +70,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
+				var geometry = new THREE.IcosahedronGeometry( 0.08, 2 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
@@ -89,14 +79,6 @@
 					object.position.x = Math.random() * 4 - 2;
 					object.position.y = Math.random() * 4 - 2;
 					object.position.z = Math.random() * 4 - 2;
-
-					object.rotation.x = Math.random() * 2 * Math.PI;
-					object.rotation.y = Math.random() * 2 * Math.PI;
-					object.rotation.z = Math.random() * 2 * Math.PI;
-
-					object.scale.x = Math.random() + 0.5;
-					object.scale.y = Math.random() + 0.5;
-					object.scale.z = Math.random() + 0.5;
 
 					object.userData.velocity = new THREE.Vector3();
 					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
@@ -109,48 +91,27 @@
 
 				//
 
-				raycaster = new THREE.Raycaster();
-
-				//
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				//
 
-				WEBVR.getVRDisplay( function ( display ) {
-
-					if ( display !== undefined ) {
-
-						vrdisplay = display;
-						camera = new THREE.WebVRCamera( display, renderer );
-
-					}
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-				} );
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				//
 
-				gamepad = new THREE.DaydreamController();
-				gamepad.position.set( 0.25, - 0.5, 0 );
-				scene.add( gamepad );
+				controller = new THREE.DaydreamController();
+				controller.position.set( 0.3, 0.75, 0 );
+				scene.add( controller );
 
 				//
 
-				var gamepadHelper = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( { linewidth: 4 } ) );
-				gamepadHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 10 ], 3 ) );
-				gamepad.add( gamepadHelper );
-
-				renderer.domElement.addEventListener( 'click', function ( event ) {
-
-					gamepadHelper.material.color.setHex( Math.random() * 0xffffff );
-
-				} );
+				var controllerHelper = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( { linewidth: 2 } ) );
+				controllerHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 10 ], 3 ) );
+				controller.add( controllerHelper );
 
 				//
 
@@ -171,10 +132,7 @@
 
 			function animate() {
 
-				gamepad.update();
-				render();
-
-				( vrdisplay ? vrdisplay : window ).requestAnimationFrame( animate );
+				renderer.animate( render );
 
 			}
 
@@ -182,34 +140,25 @@
 
 				var delta = clock.getDelta() * 60;
 
-				// find intersections
+				controller.update();
 
-				raycaster.ray.origin.copy( gamepad.position );
-				raycaster.ray.direction.set( 0, 0, - 1 ).applyQuaternion( gamepad.quaternion );
+				if ( controller.getTouchpadState() === true ) {
 
-				var intersects = raycaster.intersectObjects( room.children );
+					var cube = room.children[ 0 ];
+					room.remove( cube );
 
-				if ( intersects.length > 0 ) {
-
-					if ( INTERSECTED != intersects[ 0 ].object ) {
-
-						if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-						INTERSECTED.material.emissive.setHex( 0xff0000 );
-
-					}
-
-				} else {
-
-					if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-					INTERSECTED = undefined;
+					cube.position.copy( controller.position ).sub( room.position );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
+					cube.userData.velocity.z = ( Math.random() * 0.02 - 0.1 );
+					cube.userData.velocity.applyQuaternion( controller.quaternion );
+					room.add( cube );
 
 				}
 
 				// keep cubes inside room
+
+				var range = 3 - 0.08;
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
@@ -217,30 +166,31 @@
 
 					cube.position.add( cube.userData.velocity );
 
-					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
+					if ( cube.position.x < - range || cube.position.x > range ) {
 
-						cube.position.x = THREE.Math.clamp( cube.position.x, - 3, 3 );
+						cube.position.x = THREE.Math.clamp( cube.position.x, - range, range );
 						cube.userData.velocity.x = - cube.userData.velocity.x;
 
 					}
 
-					if ( cube.position.y < - 3 || cube.position.y > 3 ) {
+					if ( cube.position.y < - range ) {
 
-						cube.position.y = THREE.Math.clamp( cube.position.y, - 3, 3 );
-						cube.userData.velocity.y = - cube.userData.velocity.y;
+						cube.position.y = Math.max( cube.position.y, - range );
+
+						cube.userData.velocity.x *= 0.9;
+						cube.userData.velocity.y = - cube.userData.velocity.y * 0.8;
+						cube.userData.velocity.z *= 0.9;
 
 					}
 
-					if ( cube.position.z < - 3 || cube.position.z > 3 ) {
+					if ( cube.position.z < - range || cube.position.z > range ) {
 
-						cube.position.z = THREE.Math.clamp( cube.position.z, - 3, 3 );
+						cube.position.z = THREE.Math.clamp( cube.position.z, - range, range );
 						cube.userData.velocity.z = - cube.userData.velocity.z;
 
 					}
 
-					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
-					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
-					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
+					cube.userData.velocity.y -= 0.00098;
 
 				}
 

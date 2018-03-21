@@ -1,28 +1,66 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author moraxy / https://github.com/moraxy
+ */
+/* global QUnit */
 
-	'use strict';
+import { runStdLightTests } from '../../qunit-utils';
+import { DirectionalLight } from '../../../../src/lights/DirectionalLight';
 
-	var lights;
+export default QUnit.module( 'Lights', () => {
 
-	QUnit.module( "Lights - DirectionalLight", {
+	QUnit.module( 'DirectionalLight', ( hooks ) => {
 
-		beforeEach: function() {
+		var lights = undefined;
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				color: 0xaaaaaa,
+				intensity: 0.8
+			};
 
 			lights = [
-
-				new THREE.DirectionalLight( 0xaaaaaa ),
-				new THREE.DirectionalLight( 0xaaaaaa, 0.8 ),
-
+				new DirectionalLight(),
+				new DirectionalLight( parameters.color ),
+				new DirectionalLight( parameters.color, parameters.intensity )
 			];
 
-		}
+		} );
 
-	});
+		// INHERITANCE
+		QUnit.todo( "Extending", ( assert ) => {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			assert.ok( false, "everything's gonna be alright" );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+		// INSTANCING
+		QUnit.todo( "Instancing", ( assert ) => {
 
-})();
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// PUBLIC STUFF
+		QUnit.todo( "isDirectionalLight", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		QUnit.todo( "copy", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard light tests', ( assert ) => {
+
+			runStdLightTests( assert, lights );
+
+		} );
+
+	} );
+
+} );

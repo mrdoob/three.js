@@ -6,10 +6,10 @@
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  */
 
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector3 } from '../math/Vector3';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector3 } from '../math/Vector3.js';
 
 // ParametricGeometry
 
@@ -77,7 +77,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 			// vertex
 
-			p0 = func( u, v, p0 );
+			func( u, v, p0 );
 			vertices.push( p0.x, p0.y, p0.z );
 
 			// normal
@@ -86,24 +86,24 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 			if ( u - EPS >= 0 ) {
 
-				p1 = func( u - EPS, v, p1 );
+				func( u - EPS, v, p1 );
 				pu.subVectors( p0, p1 );
 
 			} else {
 
-				p1 = func( u + EPS, v, p1 );
+				func( u + EPS, v, p1 );
 				pu.subVectors( p1, p0 );
 
 			}
 
 			if ( v - EPS >= 0 ) {
 
-				p1 = func( u, v - EPS, p1 );
+				func( u, v - EPS, p1 );
 				pv.subVectors( p0, p1 );
 
 			} else {
 
-				p1 = func( u, v + EPS, p1 );
+				func( u, v + EPS, p1 );
 				pv.subVectors( p1, p0 );
 
 			}

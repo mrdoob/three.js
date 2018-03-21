@@ -1,4 +1,4 @@
-import { Quaternion } from '../math/Quaternion';
+import { Quaternion } from '../math/Quaternion.js';
 
 /**
  *

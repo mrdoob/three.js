@@ -40,7 +40,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - lines WebGL demo
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - lines WebGL demo
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -138,7 +138,7 @@
 
 				var geometry = new THREE.Geometry();
 
-				for ( i = 0; i < 1500; i ++ ) {
+				for ( var i = 0; i < 1500; i ++ ) {
 
 					var vertex1 = new THREE.Vector3();
 					vertex1.x = Math.random() * 2 - 1;
@@ -147,7 +147,7 @@
 					vertex1.normalize();
 					vertex1.multiplyScalar( r );
 
-					vertex2 = vertex1.clone();
+					var vertex2 = vertex1.clone();
 					vertex2.multiplyScalar( Math.random() * 0.09 + 1 );
 
 					geometry.vertices.push( vertex1 );

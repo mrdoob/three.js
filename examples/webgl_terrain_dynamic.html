@@ -31,8 +31,8 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - dynamic procedural terrain using
-			<a href="https://github.com/ashima/webgl-noise" target="_blank">3d simplex noise</a><br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dynamic procedural terrain using
+			<a href="https://github.com/ashima/webgl-noise" target="_blank" rel="noopener">3d simplex noise</a><br/>
 			textures by <a href="http://opengameart.org/content/dark-grass">qubodup</a> and
 			<a href="http://opengameart.org/content/backgrounds-topdown-games">davis123</a>
 		</div>
@@ -211,7 +211,7 @@
 
 			var renderer, container, stats;
 
-			var camera, scene;
+			var camera, scene, controls;
 			var cameraOrtho, sceneRenderTarget;
 
 			var uniformsNoise, uniformsNormal, uniformsTerrain,
@@ -257,7 +257,6 @@
 				camera.position.set( -1200, 800, 1200 );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0, 0 );
 
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;
@@ -268,6 +267,7 @@
 				// SCENE (FINAL)
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 				scene.fog = new THREE.Fog( 0x050505, 2000, 4000 );
 
 				// LIGHTS
@@ -368,7 +368,7 @@
 
 				for( var i = 0; i < params.length; i ++ ) {
 
-					material = new THREE.ShaderMaterial( {
+					var material = new THREE.ShaderMaterial( {
 
 						uniforms: 		params[ i ][ 3 ],
 						vertexShader: 	params[ i ][ 2 ],
@@ -403,7 +403,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -467,8 +466,6 @@
 
 				if ( terrain.visible ) {
 
-					controls.update();
-
 					var time = Date.now() * 0.001;
 
 					var fLow = 0.1, fHigh = 0.8;
@@ -477,9 +474,8 @@
 
 					var valNorm = ( lightVal - fLow ) / ( fHigh - fLow );
 
+					scene.background.setHSL( 0.1, 0.5, lightVal );
 					scene.fog.color.setHSL( 0.1, 0.5, lightVal );
-
-					renderer.setClearColor( scene.fog.color );
 
 					directionalLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.1, 1.15 );
 					pointLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.9, 1.5 );

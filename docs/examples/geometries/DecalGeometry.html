@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">[name] can be used to create a decal mesh that serves different kinds of purposes e.g. adding unique details to models, performing dynamic visual environmental changes or covering seams.</div>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Example</h2>
+
+		<div>[example:webgl_decals decals ]</div>
+
+		<code>var geometry =  new THREE.DecalGeometry( mesh, position, orientation, size );
+		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Mesh mesh], [param:Vector3 position], [param:Euler orientation], [param:Vector3 size] )</h3>
+		<div>
+		mesh — Any mesh object.<br />
+		position — Position of the decal projector.<br />
+		orientation — Orientation of the decal projector.<br />
+		size — Size of the decal projector.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/geometries/DecalGeometry.js examples/js/geometries/DecalGeometry.js]
+	</body>
+</html>

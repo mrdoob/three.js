@@ -34,7 +34,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - This animates 3 Spot Lights - by <a href="http://master-domain.com" target="_blank">Master James</a><br />
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - This animates 3 Spot Lights - by <a href="http://master-domain.com" target="_blank" rel="noopener">Master James</a><br />
 			Orbit Controls are available to navigate.<br />
 			Where the lights converge to make white light the shadows will appear as C M Y from light color pairing.
 		</div>
@@ -50,6 +50,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
 
 			var camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 2000 );
 

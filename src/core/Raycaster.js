@@ -1,4 +1,4 @@
-import { Ray } from '../math/Ray';
+import { Ray } from '../math/Ray.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -25,8 +25,10 @@ function Raycaster( origin, direction, near, far ) {
 	Object.defineProperties( this.params, {
 		PointCloud: {
 			get: function () {
+
 				console.warn( 'THREE.Raycaster: params.PointCloud has been renamed to params.Points.' );
 				return this.Points;
+
 			}
 		}
 	} );
@@ -91,9 +93,9 @@ Object.assign( Raycaster.prototype, {
 
 	},
 
-	intersectObject: function ( object, recursive ) {
+	intersectObject: function ( object, recursive, optionalTarget ) {
 
-		var intersects = [];
+		var intersects = optionalTarget || [];
 
 		intersectObject( object, this, intersects, recursive );
 
@@ -103,9 +105,9 @@ Object.assign( Raycaster.prototype, {
 
 	},
 
-	intersectObjects: function ( objects, recursive ) {
+	intersectObjects: function ( objects, recursive, optionalTarget ) {
 
-		var intersects = [];
+		var intersects = optionalTarget || [];
 
 		if ( Array.isArray( objects ) === false ) {
 

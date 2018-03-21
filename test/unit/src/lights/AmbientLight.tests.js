@@ -1,27 +1,60 @@
-(function () {
+/**
+ * @author TristanVALCKE / https://github.com/Itee
+ * @author moraxy / https://github.com/moraxy
+ */
+/* global QUnit */
 
-	'use strict';
+import { runStdLightTests } from '../../qunit-utils';
+import { AmbientLight } from '../../../../src/lights/AmbientLight';
 
-	var lights;
+export default QUnit.module( 'Lights', () => {
 
-	QUnit.module( "Lights - AmbientLight", {
+	QUnit.module( 'ArrowHelper', ( hooks ) => {
 
-		beforeEach: function() {
+		var lights = undefined;
+		hooks.beforeEach( function () {
+
+			const parameters = {
+				color: 0xaaaaaa,
+				intensity: 0.5
+			};
 
 			lights = [
-
-				new THREE.AmbientLight( 0xaaaaaa ),
-
+				new AmbientLight(),
+				new AmbientLight( parameters.color ),
+				new AmbientLight( parameters.color, parameters.intensity )
 			];
 
-		}
+		} );
 
-	});
+		// INHERITANCE
+		QUnit.todo( "Extending", ( assert ) => {
 
-	QUnit.test( "standard light tests", function( assert ) {
+			assert.ok( false, "everything's gonna be alright" );
 
-		runStdLightTests( assert, lights );
+		} );
 
-	});
+		// INSTANCING
+		QUnit.todo( "Instancing", ( assert ) => {
 
-})();
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// PUBLIC STUFF
+		QUnit.todo( "isAmbiantLight", ( assert ) => {
+
+			assert.ok( false, "everything's gonna be alright" );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'Standard light tests', ( assert ) => {
+
+			runStdLightTests( assert, lights );
+
+		} );
+
+	} );
+
+} );

@@ -2,9 +2,9 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.CubeTextureNode = function( value, coord, bias ) {
+THREE.CubeTextureNode = function ( value, coord, bias ) {
 
-	THREE.InputNode.call( this, 'v4', { shared : true } );
+	THREE.InputNode.call( this, 'v4', { shared: true } );
 
 	this.value = value;
 	this.coord = coord || new THREE.ReflectNode();
@@ -14,14 +14,15 @@ THREE.CubeTextureNode = function( value, coord, bias ) {
 
 THREE.CubeTextureNode.prototype = Object.create( THREE.InputNode.prototype );
 THREE.CubeTextureNode.prototype.constructor = THREE.CubeTextureNode;
+THREE.CubeTextureNode.prototype.nodeType = "CubeTexture";
 
-THREE.CubeTextureNode.prototype.getTexture = function( builder, output ) {
+THREE.CubeTextureNode.prototype.getTexture = function ( builder, output ) {
 
 	return THREE.InputNode.prototype.generate.call( this, builder, output, this.value.uuid, 't' );
 
 };
 
-THREE.CubeTextureNode.prototype.generate = function( builder, output ) {
+THREE.CubeTextureNode.prototype.generate = function ( builder, output ) {
 
 	if ( output === 'samplerCube' ) {
 
@@ -59,5 +60,24 @@ THREE.CubeTextureNode.prototype.generate = function( builder, output ) {
 	}
 
 	return builder.format( code, this.type, output );
+
+};
+
+THREE.CubeTextureNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.value = this.value.uuid;
+		data.coord = this.coord.toJSON( meta ).uuid;
+
+		if ( this.bias ) data.bias = this.bias.toJSON( meta ).uuid;
+
+	}
+
+	return data;
 
 };

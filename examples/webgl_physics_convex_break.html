@@ -1,50 +1,52 @@
 <html lang="en">
-    <head>
-        <title>Convex object breaking example</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <style>
-            body {
-                color: #61443e;
-                font-family:Monospace;
-                font-size:13px;
-                text-align:center;
+	<head>
+		<title>Convex object breaking example</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #61443e;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
 
-                background-color: #bfd1e5;
-                margin: 0px;
-                overflow: hidden;
-            }
+				background-color: #bfd1e5;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-            #info {
-                position: absolute;
-                top: 0px; width: 100%;
-                padding: 5px;
-            }
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
 
-            a {
-                color: #a06851;
-            }
+			a {
+				color: #a06851;
+			}
 
-        </style>
-    </head>
-    <body>
+		</style>
+	</head>
+	<body>
+
 	<div id="info">Physics threejs demo with convex objects breaking in real time<br />Press mouse to throw balls and move the camera.</div>
-        <div id="container"><br /><br /><br /><br /><br />Loading...</div>
+	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
 
 	<script src="../build/three.js"></script>
 	<script src="js/libs/ammo.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
-        <script src="js/Detector.js"></script>
+	<script src="js/Detector.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 	<script src="js/ConvexObjectBreaker.js"></script>
+	<script src="js/QuickHull.js"></script>
 	<script src="js/geometries/ConvexGeometry.js"></script>
 
-        <script>
+		<script>
 
 		// Detects webgl
 		if ( ! Detector.webgl ) {
-		    Detector.addGetWebGLMessage();
-		    document.getElementById( 'container' ).innerHTML = "";
+			Detector.addGetWebGLMessage();
+			document.getElementById( 'container' ).innerHTML = "";
 		}
 
 		// - Global variables -
@@ -82,7 +84,7 @@
 
 		var objectsToRemove = [];
 		for ( var i = 0; i < 500; i++ ) {
-		    objectsToRemove[ i ] = null;
+			objectsToRemove[ i ] = null;
 		}
 		var numObjectsToRemove = 0;
 
@@ -116,16 +118,15 @@
 			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xbfd1e5 );
 
-			camera.position.x = -14;
-			camera.position.y = 8;
-			camera.position.z =  16;
+			camera.position.set( -14, 8, 16 );
 
 			controls = new THREE.OrbitControls( camera );
-			controls.target.y = 2;
+			controls.target.set( 0, 2, 0 );
+			controls.update();
 
 			renderer = new THREE.WebGLRenderer();
-			renderer.setClearColor( 0xbfd1e5 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
@@ -232,9 +233,9 @@
 			quat.set( 0, 0, 0, 1 );
 			for ( var i = 0; i < numStones; i++ ) {
 
-			    pos.set( 0, 2, 15 * ( 0.5 - i / ( numStones + 1 ) ) );
+				pos.set( 0, 2, 15 * ( 0.5 - i / ( numStones + 1 ) ) );
 
-			    createObject( stoneMass, stoneHalfExtents, pos, quat, createMaterial( 0xB0B0B0 ) );
+				createObject( stoneMass, stoneHalfExtents, pos, quat, createMaterial( 0xB0B0B0 ) );
 
 			}
 
@@ -312,16 +313,16 @@
 		function createRigidBody( object, physicsShape, mass, pos, quat, vel, angVel ) {
 
 			if ( pos ) {
-			    object.position.copy( pos );
+				object.position.copy( pos );
 			}
 			else {
-			    pos = object.position;
+				pos = object.position;
 			}
 			if ( quat ) {
-			    object.quaternion.copy( quat );
+				object.quaternion.copy( quat );
 			}
 			else {
-			    quat = object.quaternion;
+				quat = object.quaternion;
 			}
 
 			var transform = new Ammo.btTransform();
@@ -339,10 +340,10 @@
 			body.setFriction( 0.5 );
 
 			if ( vel ) {
-			    body.setLinearVelocity( new Ammo.btVector3( vel.x, vel.y, vel.z ) );
+				body.setLinearVelocity( new Ammo.btVector3( vel.x, vel.y, vel.z ) );
 			}
 			if ( angVel ) {
-			    body.setAngularVelocity( new Ammo.btVector3( angVel.x, angVel.y, angVel.z ) );
+				body.setAngularVelocity( new Ammo.btVector3( angVel.x, angVel.y, angVel.z ) );
 			}
 
 			object.userData.physicsBody = body;
@@ -427,8 +428,6 @@
 			var deltaTime = clock.getDelta();
 
 			updatePhysics( deltaTime );
-
-			controls.update( deltaTime );
 
 			renderer.render( scene, camera );
 
@@ -548,14 +547,14 @@
 
 			for ( var i = 0; i < numObjectsToRemove; i++ ) {
 
-			    removeDebris( objectsToRemove[ i ] );
+				removeDebris( objectsToRemove[ i ] );
 
 			}
 			numObjectsToRemove = 0;
 
 		}
 
-        </script>
+		</script>
 
-    </body>
+	</body>
 </html>

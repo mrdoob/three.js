@@ -43,7 +43,11 @@ By default, this should look like:
 For Ubuntu users who installed Blender 2.68 via apt-get, this is the location:
 
     /usr/lib/blender/scripts/addons
-    
+
+For Ubuntu users who installed Blender 2.7x via apt-get, this is the location:
+
+    /usr/share/blender/scripts/addons
+
 
 ## Usage
 

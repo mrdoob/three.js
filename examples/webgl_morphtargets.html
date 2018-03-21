@@ -33,7 +33,7 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - WebGL morph target example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL morph target example
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -66,6 +66,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
 
 				var light = new THREE.PointLight( 0xff2200 );
@@ -135,10 +136,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x222222 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				//

@@ -88,7 +88,7 @@
 
 				// CONTROLS
 
-				controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera );
 				controls.maxPolarAngle = 0.9 * Math.PI / 2;
 				controls.enableZoom = false;
 
@@ -141,7 +141,7 @@
 				// MODEL
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "obj/lightmap/lightmap.js", function ( geometry, materials ) {
+				loader.load( "models/json/lightmap/lightmap.json", function ( geometry, materials ) {
 
 					for ( var i = 0; i < materials.length; i ++ ) {
 

@@ -149,7 +149,7 @@
 					color: 0x156289,
 					emissive: 0x072534,
 					side: THREE.DoubleSide,
-					shading: THREE.FlatShading
+					flatShading: true
 				} );
 
 				var mesh = new THREE.SkinnedMesh( geometry,	material );
@@ -252,8 +252,6 @@
 					}
 
 				}
-
-				skeletonHelper.update();
 
 				renderer.render( scene, camera );
 

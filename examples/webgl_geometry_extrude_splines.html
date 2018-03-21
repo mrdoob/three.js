@@ -26,7 +26,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - geometry - spline extrusion examples by <a href="http://www.lab4games.net/zz85/blog" target="_blank">zz85</a></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - geometry - spline extrusion examples by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a></div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -72,7 +72,7 @@
 			new THREE.Vector3( 0, -40, 40 )
 		] );
 
-		sampleClosedSpline.type = 'catmullrom';
+		sampleClosedSpline.curveType = 'catmullrom';
 		sampleClosedSpline.closed = true;
 
 		// Keep a dictionary of Curve instances
@@ -95,7 +95,7 @@
 			SampleClosedSpline: sampleClosedSpline
 		};
 
-		var parent, tubeGeometry, group;
+		var parent, tubeGeometry, mesh;
 
 		var params = {
 			spline: 'GrannyKnot',
@@ -114,16 +114,14 @@
 
 		function addTube() {
 
-			if ( group !== undefined ) {
+			if ( mesh !== undefined ) {
 
-				parent.remove( group );
-
-				group.children[ 0 ].geometry.dispose();
-				group.children[ 1 ].geometry.dispose();
+				parent.remove( mesh );
+				mesh.geometry.dispose();
 
 			}
 
-			extrudePath = splines[ params.spline ];
+			var extrudePath = splines[ params.spline ];
 
 			tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, params.extrusionSegments, 2, params.radiusSegments, params.closed );
 
@@ -135,7 +133,7 @@
 
 		function setScale() {
 
-			group.scale.set( params.scale, params.scale, params.scale );
+			mesh.scale.set( params.scale, params.scale, params.scale );
 
 		}
 
@@ -144,9 +142,11 @@
 
 			// 3D shape
 
-			group = THREE.SceneUtils.createMultiMaterialObject( geometry, [ material, wireframeMaterial ] );
+			mesh = new THREE.Mesh( geometry, material );
+			var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
+			mesh.add( wireframe );
 
-			parent.add( group );
+			parent.add( mesh );
 
 		}
 
@@ -172,6 +172,7 @@
 			// scene
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xf0f0f0 );
 
 			// light
 
@@ -203,7 +204,6 @@
 			// renderer
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0xf0f0f0 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
@@ -226,14 +226,14 @@
 			folderGeometry.open();
 
 			var folderCamera = gui.addFolder( 'Camera' );
-			folderCamera.add( params, 'animationView').onChange( function( value ) { animateCamera( true ); } );
+			folderCamera.add( params, 'animationView').onChange( function( value ) { animateCamera(); } );
 			folderCamera.add( params, 'lookAhead').onChange( function( value ) { animateCamera(); } );
 			folderCamera.add( params, 'cameraHelper').onChange( function( value ) { animateCamera(); } );
 			folderCamera.open();
 
 			// controls
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 			// event listener
 

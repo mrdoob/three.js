@@ -22,26 +22,45 @@ float clearCoatDHRApprox( const in float roughness, const in float dotNL ) {
 }
 
 #if NUM_RECT_AREA_LIGHTS > 0
+
 	void RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-		vec3 matDiffColor = material.diffuseColor;
-		vec3 matSpecColor = material.specularColor;
-		vec3 lightColor   = rectAreaLight.color;
+		vec3 normal = geometry.normal;
+		vec3 viewDir = geometry.viewDir;
+		vec3 position = geometry.position;
+		vec3 lightPos = rectAreaLight.position;
+		vec3 halfWidth = rectAreaLight.halfWidth;
+		vec3 halfHeight = rectAreaLight.halfHeight;
+		vec3 lightColor = rectAreaLight.color;
 		float roughness = material.specularRoughness;
 
-		vec3 spec = Rect_Area_Light_Specular_Reflectance(
-				geometry,
-				rectAreaLight.position, rectAreaLight.halfWidth, rectAreaLight.halfHeight,
-				roughness,
-				ltcMat, ltcMag );
-		vec3 diff = Rect_Area_Light_Diffuse_Reflectance(
-				geometry,
-				rectAreaLight.position, rectAreaLight.halfWidth, rectAreaLight.halfHeight );
+		vec3 rectCoords[ 4 ];
+		rectCoords[ 0 ] = lightPos - halfWidth - halfHeight; // counterclockwise
+		rectCoords[ 1 ] = lightPos + halfWidth - halfHeight;
+		rectCoords[ 2 ] = lightPos + halfWidth + halfHeight;
+		rectCoords[ 3 ] = lightPos - halfWidth + halfHeight;
 
-		reflectedLight.directSpecular += lightColor * matSpecColor * spec;
-		reflectedLight.directDiffuse  += lightColor * matDiffColor * diff;
+		vec2 uv = LTC_Uv( normal, viewDir, roughness );
+
+		vec4 t1 = texture2D( ltc_1, uv );
+		vec4 t2 = texture2D( ltc_2, uv );
+
+		mat3 mInv = mat3(
+			vec3( t1.x, 0, t1.y ),
+			vec3(    0, 1,    0 ),
+			vec3( t1.z, 0, t1.w )
+		);
+
+		// LTC Fresnel Approximation by Stephen Hill
+		// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf
+		vec3 fresnel = ( material.specularColor * t2.x + ( vec3( 1.0 ) - material.specularColor ) * t2.y );
+
+		reflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );
+
+		reflectedLight.directDiffuse += lightColor * material.diffuseColor * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );
 
 	}
+
 #endif
 
 void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
@@ -63,6 +82,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 	#endif
 
 	reflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );
+
 	reflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
 
 	#ifndef STANDARD
@@ -107,7 +127,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 clearCo
 #define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )
 #define Material_ClearCoat_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.clearCoatRoughness )
 
-// ref: http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr_v2.pdf
+// ref: https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {
 
 	return saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );

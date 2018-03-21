@@ -46,13 +46,15 @@ var lastTime;
 
 function plane( width, height ) {
 
-	return function( u, v ) {
+	return function ( u, v, optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
 
 		var x = ( u - 0.5 ) * width;
 		var y = ( v + 0.5 ) * height;
 		var z = 0;
 
-		return new THREE.Vector3( x, y, z );
+		return result.set( x, y, z );
 
 	};
 
@@ -101,7 +103,7 @@ Particle.prototype.integrate = function( timesq ) {
 
 var diff = new THREE.Vector3();
 
-function satisifyConstraints( p1, p2, distance ) {
+function satisfyConstraints( p1, p2, distance ) {
 
 	diff.subVectors( p2.position, p1.position );
 	var currentDist = diff.length();
@@ -272,7 +274,7 @@ function simulate( time ) {
 	for ( i = 0; i < il; i ++ ) {
 
 		constraint = constraints[ i ];
-		satisifyConstraints( constraint[ 0 ], constraint[ 1 ], constraint[ 2 ] );
+		satisfyConstraints( constraint[ 0 ], constraint[ 1 ], constraint[ 2 ] );
 
 	}
 
@@ -286,7 +288,7 @@ function simulate( time ) {
 		for ( particles = cloth.particles, i = 0, il = particles.length; i < il; i ++ ) {
 
 			particle = particles[ i ];
-			pos = particle.position;
+			var pos = particle.position;
 			diff.subVectors( pos, ballPosition );
 			if ( diff.length() < ballSize ) {
 

@@ -1,13 +1,11 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Mugen87 / https://github.com/Mugen87
- *
- * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
 // PlaneGeometry
 
@@ -46,6 +44,9 @@ function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 		widthSegments: widthSegments,
 		heightSegments: heightSegments
 	};
+
+	width = width || 1;
+	height = height || 1;
 
 	var width_half = width / 2;
 	var height_half = height / 2;

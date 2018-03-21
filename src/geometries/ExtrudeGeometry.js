@@ -22,12 +22,12 @@
  * }
  */
 
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector2 } from '../math/Vector2';
-import { Vector3 } from '../math/Vector3';
-import { ShapeUtils } from '../extras/ShapeUtils';
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { ShapeUtils } from '../extras/ShapeUtils.js';
 
 // ExtrudeGeometry
 
@@ -56,7 +56,6 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 	if ( typeof ( shapes ) === "undefined" ) {
 
-		shapes = [];
 		return;
 
 	}
@@ -211,8 +210,6 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-		reverse = false; // If vertices are in order now, we shouldn't need to worry about them again (hopefully)!
-
 	}
 
 
@@ -256,7 +253,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 		// inPt' is the intersection of the two lines parallel to the two
 		//  adjacent edges of inPt at a distance of 1 unit on the left side.
 
-		var v_trans_x, v_trans_y, shrink_by = 1; // resulting translation vector for inPt
+		var v_trans_x, v_trans_y, shrink_by; // resulting translation vector for inPt
 
 		// good reading for geometry algorithms (here: line-line intersection)
 		// http://geomalgorithms.com/a05-_intersect-1.html
@@ -568,7 +565,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 	function buildLidFaces() {
 
-		var start = verticesArray.length/3;
+		var start = verticesArray.length / 3;
 
 		if ( bevelEnabled ) {
 
@@ -618,7 +615,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-		scope.addGroup( start, verticesArray.length/3 -start, options.material !== undefined ? options.material : 0);
+		scope.addGroup( start, verticesArray.length / 3 - start, 0 );
 
 	}
 
@@ -626,7 +623,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 	function buildSideFaces() {
 
-		var start = verticesArray.length/3;
+		var start = verticesArray.length / 3;
 		var layeroffset = 0;
 		sidewalls( contour, layeroffset );
 		layeroffset += contour.length;
@@ -642,7 +639,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 		}
 
 
-		scope.addGroup( start, verticesArray.length/3 -start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1);
+		scope.addGroup( start, verticesArray.length / 3 - start, 1 );
 
 
 	}
@@ -673,7 +670,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 					c = layeroffset + k + slen2,
 					d = layeroffset + j + slen2;
 
-				f4( a, b, c, d, contour, s, sl, j, k );
+				f4( a, b, c, d );
 
 			}
 
@@ -705,7 +702,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
+	function f4( a, b, c, d ) {
 
 		addVertex( a );
 		addVertex( b );
@@ -750,7 +747,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		this.setIndex( indicesArray );
 		this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
-		this.addAttribute( 'uv', new Float32BufferAttribute( options.arrays.uv, 2 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
 
 	}
 

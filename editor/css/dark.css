@@ -110,11 +110,13 @@ select {
 		}
 
 		#menubar .menu .options {
-			position: absolute;
+			position: fixed;
 			display: none;
 			padding: 5px 0;
 			background: #111;
 			width: 150px;
+			max-height: calc(100% - 80px);
+			overflow: auto;
 		}
 
 		#menubar .menu:hover .options {
@@ -245,11 +247,3 @@ select {
 	.Outliner .option.active {
 		background-color: rgba(21,60,94,1);
 	}
-
-.Panel.Collapsible.collapsed .Static .Button {
-	border-left-color: #444;
-}
-
-.Panel.Collapsible:not(.collapsed) .Static .Button {
-	border-top-color: #444;
-}

@@ -33,12 +33,13 @@
 
 	<div id="container"></div>
 	<div id="info">
-		<a href="https://threejs.org" target="_blank">three.js</a> - GPU particle system plugin by <a href="http://charliehoey.com">Charlie Hoey</a>.
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GPU particle system plugin by <a href="http://charliehoey.com">Charlie Hoey</a>.
 	</div>
 
 	<script src="../build/three.js"></script>
 	<script src="./js/controls/TrackballControls.js"></script>
 	<script src="./js/libs/dat.gui.min.js"></script>
+	<script src="./js/libs/stats.min.js"></script>
 	<script src="./js/GPUParticleSystem.js"></script>
 
 	<script>
@@ -46,6 +47,8 @@
 			scene, renderer, clock = new THREE.Clock(),
 			controls, container, gui = new dat.GUI( { width: 350 } ),
 			options, spawnerOptions, particleSystem;
+
+		var stats;
 
 		init();
 		animate();
@@ -109,6 +112,11 @@
 
 			//
 
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			//
+
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -142,6 +150,7 @@
 			controls.update();
 
 			var delta = clock.getDelta() * spawnerOptions.timeScale;
+
 			tick += delta;
 
 			if ( tick < 0 ) tick = 0;
@@ -166,6 +175,8 @@
 			particleSystem.update( tick );
 
 			render();
+
+			stats.update();
 
 		}
 

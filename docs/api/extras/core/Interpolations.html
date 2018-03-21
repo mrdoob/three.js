@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		TODO
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Float CatmullRom]( [param:Float t], [param:Float p0], [param:Float p1], [param:Float p2], [param:Float p3] )</h3>
+		<div>
+		t -- interpolation weight.<br />
+		p0, p1, p2, p3 -- the points defining the spline curve.<br /><br />
+
+		Used internally by [page:SplineCurve SplineCurve].
+		</div>
+
+		<h3>[method:Float QuadraticBezier]( [param:Float t], [param:Float p0], [param:Float p1], [param:Float p2] )</h3>
+		<div>
+		t -- interpolation weight.<br />
+		p0, p1, p2 -- the starting, control and end points defining the curve.<br /><br />
+
+		Used internally by [page:QuadraticBezierCurve3 QuadraticBezierCurve3], [page:QuadraticBezierCurve QuadraticBezierCurve] and [page:Font Font].
+		</div>
+
+		<h3>[method:Float CubicBezier]( [param:Float t], [param:Float p0], [param:Float p1], [param:Float p2], [param:Float p3] )</h3>
+		<div>
+		t -- interpolation weight.<br />
+		p0, p1, p2, p3 -- the starting, control(twice) and end points defining the curve.<br /><br />
+
+		Used internally by [page:CubicBezierCurve3 CubicBezierCurve3], [page:CubicBezierCurve CubicBezierCurve] and [page:Font Font].
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

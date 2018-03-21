@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - instancing test (meshes)</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			color: #ffffff;
+			font-family: Monospace;
+			font-size: 13px;
+			text-align: center;
+			font-weight: bold;
+			background-color: #000000;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		#info {
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			padding: 5px;
+		}
+
+		a {
+			color: #ffffff;
+		}
+
+		#notSupported {
+			width: 50%;
+			margin: auto;
+			border: 2px red solid;
+			margin-top: 20px;
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="container"></div>
+	<div id="info">
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - instancing test (meshes)
+		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
+	</div>
+
+	<script src="../build/three.js"></script>
+	<script src="js/Detector.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+
+	<script src="js/controls/TrackballControls.js"></script>
+
+	<script id="vertexShader" type="x-shader/x-vertex">
+		precision highp float;
+
+		attribute vec3 instancePosition;
+		attribute vec4 instanceQuaternion;
+		attribute vec3 instanceScale;
+
+		varying vec3 vColor;
+
+		vec3 applyTRS( vec3 position, vec3 translation, vec4 quaternion, vec3 scale ) {
+
+			position *= scale;
+			position += 2.0 * cross( quaternion.xyz, cross( quaternion.xyz, position ) + quaternion.w * position );
+			return position + translation;
+
+		}
+
+		void main(){
+
+			vColor = color;
+
+			vec3 transformed = applyTRS( position.xyz, instancePosition, instanceQuaternion, instanceScale );
+
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( transformed, 1.0 );
+
+		}
+
+	</script>
+
+	<script id="fragmentShader" type="x-shader/x-fragment">
+
+		precision highp float;
+		varying vec3 vColor;
+
+		void main() {
+
+			gl_FragColor = vec4( vColor, 1.0 );
+
+		}
+
+	</script>
+
+	<script>
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+		var container, stats;
+
+		var camera, scene, renderer;
+
+		var controls;
+
+		init();
+		animate();
+
+		function init() {
+
+			container = document.getElementById( 'container' );
+
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+			camera.position.z = 4;
+
+			controls = new THREE.TrackballControls( camera );
+
+			scene = new THREE.Scene();
+
+			//
+
+			var geometry = new THREE.IcosahedronBufferGeometry( 0.1, 1 );
+
+			var colors = [];
+
+			for ( var i = 0, l = geometry.attributes.position.count; i < l; i ++ ) {
+
+				colors.push( Math.random(), Math.random(), Math.random() );
+
+			}
+
+			geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+			var material = new THREE.MeshBasicMaterial( { color: 0xff0000, vertexColors: THREE.VertexColors } );
+
+			//
+
+			var instances = 100;
+
+			var instancePositions = [];
+			var instanceQuaternions = [];
+			var instanceScales = [];
+
+			// we create for each mesh a counterpart in our instanced geometry data
+
+			for ( var i = 0; i < instances; i ++ ) {
+
+				// the red meshes are drawn with separate draw calls
+
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				var position = mesh.position;
+				var quaternion = mesh.quaternion;
+				var scale = mesh.scale;
+
+				position.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+
+				quaternion.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+				quaternion.normalize();
+
+				scale.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+
+				// instanced attribute data
+
+				instancePositions.push( position.x, position.y, position.z );
+				instanceQuaternions.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+				instanceScales.push( scale.x, scale.y, scale.z );
+
+			}
+
+			var instancedGeometry = new THREE.InstancedBufferGeometry();
+			instancedGeometry.attributes.position = geometry.attributes.position;
+			instancedGeometry.attributes.color = geometry.attributes.color;
+
+			instancedGeometry.addAttribute( 'instancePosition', new THREE.InstancedBufferAttribute( new Float32Array( instancePositions ), 3 ) );
+			instancedGeometry.addAttribute( 'instanceQuaternion', new THREE.InstancedBufferAttribute( new Float32Array( instanceQuaternions ), 4 ) );
+			instancedGeometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( new Float32Array( instanceScales ), 3 ) );
+
+			//
+
+			var shaderMaterial = new THREE.ShaderMaterial( {
+
+				uniforms: {},
+				vertexShader: document.getElementById( 'vertexShader' ).textContent,
+				fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+				vertexColors: true
+
+			} );
+
+			// counterparts are drawn all at once with a single draw call (via instanced rendering)
+
+			var instancedMesh = new THREE.Mesh( instancedGeometry, shaderMaterial );
+			instancedMesh.position.x = 0.1;
+			scene.add( instancedMesh );
+
+			//
+
+			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			container.appendChild( renderer.domElement );
+
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+
+				document.getElementById( 'notSupported' ).style.display = '';
+				return;
+
+			}
+
+			//
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize( event ) {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		//
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+			stats.update();
+
+		}
+
+		function render() {
+
+			controls.update();
+
+			renderer.render( scene, camera );
+
+		}
+
+	</script>
+
+</body>
+
+</html>

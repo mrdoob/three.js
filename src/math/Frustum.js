@@ -1,6 +1,6 @@
-import { Vector3 } from './Vector3';
-import { Sphere } from './Sphere';
-import { Plane } from './Plane';
+import { Vector3 } from './Vector3.js';
+import { Sphere } from './Sphere.js';
+import { Plane } from './Plane.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/

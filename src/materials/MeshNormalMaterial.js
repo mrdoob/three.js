@@ -1,5 +1,5 @@
-import { Material } from './Material';
-import { Vector2 } from '../math/Vector2';
+import { Material } from './Material.js';
+import { Vector2 } from '../math/Vector2.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -29,7 +29,7 @@ import { Vector2 } from '../math/Vector2';
 
 function MeshNormalMaterial( parameters ) {
 
-	Material.call( this, parameters );
+	Material.call( this );
 
 	this.type = 'MeshNormalMaterial';
 

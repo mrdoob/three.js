@@ -28,9 +28,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Studio</a>. Asset by <a href="http://vhalldez.cgsociety.org/" style="color:#FFFFFF" target="_blank">Valdez Araujo</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Studio</a>. Asset by <a href="http://vhalldez.cgsociety.org/" style="color:#FFFFFF" target="_blank" rel="noopener">Valdez Araujo</a>
 			<br/>
-			<br/>High geometry compression with <a href="https://github.com/amd/rest3d/tree/master/server/o3dgc" style="color:#FFFFFF" target="_blank">Open3DGC</a> and LZMA<br>
+			<br/>High geometry compression with <a href="https://github.com/amd/rest3d/tree/master/server/o3dgc" style="color:#FFFFFF" target="_blank" rel="noopener">Open3DGC</a> and LZMA<br>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -114,6 +114,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -123,7 +124,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x333333, 1 );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				container.appendChild( renderer.domElement );

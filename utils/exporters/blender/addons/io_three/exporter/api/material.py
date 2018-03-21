@@ -44,6 +44,8 @@ def blending(material):
     except AttributeError:
         logger.debug("No THREE_blending_type attribute found")
         blend = constants.NORMAL_BLENDING
+
+    blend = getattr( constants.BLENDING_CONSTANTS , blend) #manthrax: Translate the blending type name, to the three.js constant value.
     return blend
 
 

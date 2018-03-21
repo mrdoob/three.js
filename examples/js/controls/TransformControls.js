@@ -12,6 +12,7 @@
 
 		this.depthTest = false;
 		this.depthWrite = false;
+		this.fog = false;
 		this.side = THREE.FrontSide;
 		this.transparent = true;
 
@@ -48,6 +49,7 @@
 
 		this.depthTest = false;
 		this.depthWrite = false;
+		this.fog = false;
 		this.transparent = true;
 		this.linewidth = 1;
 
@@ -82,8 +84,6 @@
 
 
 	THREE.TransformGizmo = function () {
-
-		var scope = this;
 
 		this.init = function () {
 
@@ -135,6 +135,8 @@
 						var rotation = gizmoMap[ name ][ i ][ 2 ];
 
 						object.name = name;
+
+						object.renderOrder = Infinity; // avoid being hidden by other transparent objects
 
 						if ( position ) object.position.set( position[ 0 ], position[ 1 ], position[ 2 ] );
 						if ( rotation ) object.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
@@ -441,13 +443,6 @@
 
 			THREE.TransformGizmo.prototype.update.apply( this, arguments );
 
-			var group = {
-
-				handles: this[ "handles" ],
-				pickers: this[ "pickers" ]
-
-			};
-
 			var tempMatrix = new THREE.Matrix4();
 			var worldRotation = new THREE.Euler( 0, 0, 1 );
 			var tempQuaternion = new THREE.Quaternion();
@@ -625,7 +620,6 @@
 
 		var _mode = "translate";
 		var _dragging = false;
-		var _plane = "XY";
 		var _gizmo = {
 
 			"translate": new THREE.TransformGizmoTranslate(),
@@ -866,9 +860,9 @@
 					event.preventDefault();
 					event.stopPropagation();
 
-					scope.dispatchEvent( mouseDownEvent );
-
 					scope.axis = intersect.object.name;
+
+					scope.dispatchEvent( mouseDownEvent );
 
 					scope.update();
 

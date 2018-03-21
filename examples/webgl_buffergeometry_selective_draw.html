@@ -1,42 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-	<title>three.js - BufferGeometry selectively drawn using attributes and a shader</title>
+	<title>three.js webgl - buffergeometry - selective - draw</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style>
-		body {
-			background-color: #000;
-			font-family: Monospace;
-			margin: 0;
-			color: #000;
-			overflow: hidden;
-		}
-		a {
-			color:#ff0;
-		}
-		#title {
-			position: absolute;
-			width: 100%;
-			top: 0;
-			height: 20px;
-			padding: 0;
-			text-align: center;
-			font-size: 1.1em;
-			background-color: rgba(64,96,64,0.7);
-			color: #fff;
-		}
-        #ui {
-        	position:absolute;
-        	left:0;
-        	top: 20px;
-        	padding: 0;
-        	text-align: center;
-        	width:100%;
-        	height:20px;
-        	color: #fff;
-        	background-color: rgba(64,96,64,0.6);
-		}
+	body {
+		color: #cccccc;
+		font-family:Monospace;
+		font-size:13px;
+		text-align:center;
+
+		background-color: #050505;
+		margin: 0px;
+		overflow: hidden;
+	}
+
+	#info {
+		position: absolute;
+		top: 0px; width: 100%;
+		padding: 5px;
+	}
+
+	a {
+		color: #0080ff;
+	}
 	</style>
 	<script type="text/javascript" src="../build/three.js"></script>
 	<script type="text/javascript" src="js/Detector.js"></script>
@@ -49,9 +37,11 @@
 		varying vec3 vColor;
 
 		void main() {
+
 			vColor = vertColor;
 			vVisible = visible;
-			gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
 		}
 	</script>
 	<script type="x-shader/x-fragment" id="fragmentshader">
@@ -59,46 +49,45 @@
 		varying vec3 vColor;
 
 		void main() {
+
 			if ( vVisible > 0.0 ) {
+
 				gl_FragColor = vec4( vColor, 1.0 );
+
 			} else {
+
 				discard;
+
 			}
+			
 		}
 	</script>
 	</head>
-	<body onload="app()">
-		<div id="title"></div>
-		<div id="ui"><a href="#" onclick="hideLines();">CULL SOME LINES</a> - <a href="#" onclick="showAllLines();">SHOW ALL LINES</a></div>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> buffergeometry - selective - draw
+			<div id="title"></div>
+			<div id="ui"><a href="#" onclick="hideLines();">CULL SOME LINES</a> - <a href="#" onclick="showAllLines();">SHOW ALL LINES</a></div>
+		</div>
+
 		<script>
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
 		var camera, scene, renderer, stats;
 		var geometry, mesh;
 		var numLat = 100;
 		var numLng = 200;
 		var numLinesCulled = 0;
 
-		function app() {
-
-			if ( ! Detector.webgl ) {
-
-				Detector.addGetWebGLMessage();
-
-			}
-
-			init();
-			animate();
-
-		}
+		init();
+		animate();
 
 		function init() {
 
-			renderer = new THREE.WebGLRenderer( {
-				antialias: true
-			} );
-			renderer.setClearColor( 0x000000, 0.0 );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
 			document.body.appendChild( renderer.domElement );
 
 			scene = new THREE.Scene();
@@ -181,8 +170,9 @@
 
 		function updateCount() {
 
-			var str = 'BufferGeometry selective drawing: 1 draw call, ' + numLat * numLng + ' lines, ' + numLinesCulled + ' culled (<a target="_blank" href="http://callum.com">author</a>)';
+			var str = '1 draw call, ' + numLat * numLng + ' lines, ' + numLinesCulled + ' culled (<a target="_blank" href="http://callum.com">author</a>)';
 			document.getElementById( 'title' ).innerHTML = str.replace( /\B(?=(\d{3})+(?!\d))/g, "," );
+
 		}
 
 		function hideLines() {
@@ -203,6 +193,7 @@
 				}
 
 			}
+
 			geometry.attributes.visible.needsUpdate = true;
 
 			updateCount();
@@ -230,6 +221,7 @@
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
+
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}

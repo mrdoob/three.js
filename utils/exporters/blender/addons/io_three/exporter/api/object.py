@@ -98,11 +98,12 @@ def cast_shadow(obj):
             ret = None
         return ret
     elif obj.type == MESH:
-        mat = material(obj)
-        if mat:
-            return data.materials[mat].use_cast_shadows
-        else:
-            return False
+        mats = material(obj)
+        if mats:
+            for m in mats:
+                if data.materials[m].use_cast_shadows:
+                    return True
+        return False
 
 
 @_object
@@ -115,7 +116,7 @@ def children(obj, valid_types):
     """
     logger.debug('object.children(%s, %s)', obj, valid_types)
     for child in obj.children:
-        if child.type in valid_types:
+        if child.type in valid_types and child.THREE_export:
             yield child.name
 
 
@@ -127,8 +128,10 @@ def material(obj):
 
     """
     logger.debug('object.material(%s)', obj)
+
     try:
-        return obj.material_slots[0].name
+        matName = obj.material_slots[0].name # manthrax: Make this throw an error on an empty material array, resulting in non-material
+        return [o.name for o in obj.material_slots]
     except IndexError:
         pass
 
@@ -228,6 +231,12 @@ def animated_xform(obj, options):
     inverted_fallback = mathutils.Matrix() if use_inverted else None
     convert_matrix = AXIS_CONVERSION    # matrix to convert the exported matrix
     original_frame = context.scene.frame_current
+
+    if options.get(constants.BAKE_KEYFRAMES):
+        frame_step = options.get(constants.FRAME_STEP, 1)
+        logger.info("Baking keyframes, frame_step=%d", frame_step)
+        times = range(context.scene.frame_start, context.scene.frame_end+1, frame_step)
+
     for time in times:
         context.scene.frame_set(time, 0.0)
         if use_inverted:  # need to use the inverted, parent matrix might have chance
@@ -361,13 +370,14 @@ def receive_shadow(obj):
 
     """
     if obj.type == MESH:
-        mat = material(obj)
-        if mat:
-            return data.materials[mat].use_shadows
-        else:
-            return False
+        mats = material(obj)
+        if mats:
+            for m in mats:
+                if data.materials[m].use_shadows:
+                    return True
+        return False
 
-AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4()
+AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4() 
 
 @_object
 def matrix(obj, options):
@@ -451,6 +461,10 @@ def extract_mesh(obj, options, recalculate=False):
 
     """
     logger.debug('object.extract_mesh(%s, %s)', obj, options)
+    bpy.context.scene.objects.active = obj
+    hidden_state = obj.hide
+    obj.hide = False
+
     apply_modifiers = options.get(constants.APPLY_MODIFIERS, True)
     if apply_modifiers:
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -466,8 +480,6 @@ def extract_mesh(obj, options, recalculate=False):
     opt_buffer = opt_buffer == constants.BUFFER_GEOMETRY
     prop_buffer = mesh_node.THREE_geometry_type == constants.BUFFER_GEOMETRY
 
-    bpy.context.scene.objects.active = obj
-
     # if doing buffer geometry it is imperative to triangulate the mesh
     if opt_buffer or prop_buffer:
         original_mesh = obj.data
@@ -476,8 +488,6 @@ def extract_mesh(obj, options, recalculate=False):
                      original_mesh.name,
                      mesh_node.name)
 
-        hidden_state = obj.hide
-        obj.hide = False
         bpy.ops.object.mode_set(mode='OBJECT')
         obj.select = True
         bpy.context.scene.objects.active = obj
@@ -487,18 +497,19 @@ def extract_mesh(obj, options, recalculate=False):
                                       modifier='Triangulate')
         obj.data = original_mesh
         obj.select = False
-        obj.hide = hidden_state
 
     # split sharp edges
     original_mesh = obj.data
     obj.data = mesh_node
     obj.select = True
 
+    logger.info("Applying EDGE_SPLIT modifier....")
     bpy.ops.object.modifier_add(type='EDGE_SPLIT')
     bpy.context.object.modifiers['EdgeSplit'].use_edge_angle = False
     bpy.context.object.modifiers['EdgeSplit'].use_edge_sharp = True
     bpy.ops.object.modifier_apply(apply_as='DATA', modifier='EdgeSplit')
 
+    obj.hide = hidden_state
     obj.select = False
     obj.data = original_mesh
 
@@ -589,7 +600,8 @@ def objects_using_mesh(mesh_node):
     :return: list of object names
 
     """
-    logger.debug('object.objects_using_mesh(%s)', mesh_node)
+    #manthrax: remove spam
+    #logger.debug('object.objects_using_mesh(%s)', mesh_node)
     for mesh_name, objects in _MESH_MAP.items():
         if mesh_name == mesh_node.name:
             return objects

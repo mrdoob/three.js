@@ -2,11 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Vector2 } from '../math/Vector2';
+import { Vector2 } from '../math/Vector2.js';
 
 function DirectGeometry() {
 
-	this.indices = [];
 	this.vertices = [];
 	this.normals = [];
 	this.colors = [];

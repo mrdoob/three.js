@@ -1,4 +1,4 @@
-import { Vector3 } from './Vector3';
+import { Vector3 } from './Vector3.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -196,7 +196,7 @@ Object.assign( Quaternion.prototype, {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( ( euler && euler.isEuler ) === false ) {
+		if ( ! ( euler && euler.isEuler ) ) {
 
 			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
@@ -349,8 +349,6 @@ Object.assign( Quaternion.prototype, {
 
 	setFromUnitVectors: function () {
 
-		// http://lolengine.net/blog/2014/02/24/quaternion-from-two-vectors-final
-
 		// assumes direction vectors vFrom and vTo are normalized
 
 		var v1 = new Vector3();
@@ -397,7 +395,9 @@ Object.assign( Quaternion.prototype, {
 
 	inverse: function () {
 
-		return this.conjugate().normalize();
+		// quaternion is assumed to have unit length
+
+		return this.conjugate();
 
 	},
 

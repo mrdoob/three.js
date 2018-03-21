@@ -21,13 +21,13 @@ THREE.ViveController = function ( id ) {
 		// Iterate across gamepads as Vive Controllers may not be
 		// in position 0 and 1.
 
-		var gamepads = navigator.getGamepads();
+		var gamepads = navigator.getGamepads && navigator.getGamepads();
 
-		for ( var i = 0, j = 0; i < 4; i ++ ) {
+		for ( var i = 0, j = 0; i < gamepads.length; i ++ ) {
 
 			var gamepad = gamepads[ i ];
 
-			if ( gamepad && ( gamepad.id === 'OpenVR Gamepad' || gamepad.id === 'Oculus Touch (Left)' || gamepad.id === 'Oculus Touch (Right)' ) ) {
+			if ( gamepad && ( gamepad.id === 'OpenVR Gamepad' || gamepad.id.startsWith( 'Oculus Touch' ) || gamepad.id.startsWith( 'Spatial Controller' ) ) ) {
 
 				if ( j === id ) return gamepad;
 
@@ -72,7 +72,7 @@ THREE.ViveController = function ( id ) {
 			if ( pose.position !== null ) scope.position.fromArray( pose.position );
 			if ( pose.orientation !== null ) scope.quaternion.fromArray( pose.orientation );
 			scope.matrix.compose( scope.position, scope.quaternion, scope.scale );
-			scope.matrix.multiplyMatrices( scope.standingMatrix, scope.matrix );
+			scope.matrix.premultiply( scope.standingMatrix );	
 			scope.matrixWorldNeedsUpdate = true;
 			scope.visible = true;
 
@@ -89,7 +89,7 @@ THREE.ViveController = function ( id ) {
 			if ( thumbpadIsPressed !== gamepad.buttons[ 0 ].pressed ) {
 
 				thumbpadIsPressed = gamepad.buttons[ 0 ].pressed;
-				scope.dispatchEvent( { type: thumbpadIsPressed ? 'thumbpaddown' : 'thumbpadup' } );
+				scope.dispatchEvent( { type: thumbpadIsPressed ? 'thumbpaddown' : 'thumbpadup', axes: axes } );
 
 			}
 

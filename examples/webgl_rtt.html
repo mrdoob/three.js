@@ -31,7 +31,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> render-to-texture webgl example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> render-to-texture webgl example</div>
 
 		<script src="../build/three.js"></script>
 
@@ -180,7 +180,7 @@
 
 					for( var i = 0; i < n; i ++ ) {
 
-						mesh = new THREE.Mesh( geometry, material2 );
+						var mesh = new THREE.Mesh( geometry, material2 );
 
 						mesh.position.x = ( i - ( n - 1 ) / 2 ) * 20;
 						mesh.position.y = ( j - ( n - 1 ) / 2 ) * 20;

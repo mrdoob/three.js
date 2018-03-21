@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.Math3Node = function( a, b, c, method ) {
+THREE.Math3Node = function ( a, b, c, method ) {
 
 	THREE.TempNode.call( this );
 
@@ -21,8 +21,9 @@ THREE.Math3Node.FACEFORWARD = 'faceforward';
 
 THREE.Math3Node.prototype = Object.create( THREE.TempNode.prototype );
 THREE.Math3Node.prototype.constructor = THREE.Math3Node;
+THREE.Math3Node.prototype.nodeType = "Math3";
 
-THREE.Math3Node.prototype.getType = function( builder ) {
+THREE.Math3Node.prototype.getType = function ( builder ) {
 
 	var a = builder.getFormatLength( this.a.getType( builder ) );
 	var b = builder.getFormatLength( this.b.getType( builder ) );
@@ -35,7 +36,7 @@ THREE.Math3Node.prototype.getType = function( builder ) {
 
 };
 
-THREE.Math3Node.prototype.generate = function( builder, output ) {
+THREE.Math3Node.prototype.generate = function ( builder, output ) {
 
 	var material = builder.material;
 
@@ -49,6 +50,7 @@ THREE.Math3Node.prototype.generate = function( builder, output ) {
 	// optimzer
 
 	switch ( this.method ) {
+
 		case THREE.Math3Node.REFRACT:
 			a = this.a.build( builder, type );
 			b = this.b.build( builder, type );
@@ -70,5 +72,24 @@ THREE.Math3Node.prototype.generate = function( builder, output ) {
 	}
 
 	return builder.format( this.method + '(' + a + ',' + b + ',' + c + ')', type, output );
+
+};
+
+THREE.Math3Node.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.a = this.a.toJSON( meta ).uuid;
+		data.b = this.b.toJSON( meta ).uuid;
+		data.c = this.c.toJSON( meta ).uuid;
+		data.method = this.method;
+
+	}
+
+	return data;
 
 };

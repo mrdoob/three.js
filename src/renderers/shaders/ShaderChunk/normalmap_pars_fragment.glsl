@@ -8,8 +8,10 @@
 
 	vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm ) {
 
-		vec3 q0 = dFdx( eye_pos.xyz );
-		vec3 q1 = dFdy( eye_pos.xyz );
+		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
+
+		vec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );
+		vec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );
 		vec2 st0 = dFdx( vUv.st );
 		vec2 st1 = dFdy( vUv.st );
 

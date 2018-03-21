@@ -167,12 +167,23 @@ iframe {
 		position: absolute;
 		left: 0;
 		top: 0;
-		height: 480px;
+		height: 100%;
 		width: 100%;
 		right: 0;
 		z-index: 100;
 		overflow: hidden;
 		border-bottom: 1px solid #dedede;
+	}
+
+	#content{
+		position: absolute;
+		left: 0;
+		top: 90px;
+		right: 0;
+		bottom: 0;
+		font-size: 17px;
+		line-height: 22px;
+		overflow: auto;
 	}
 
 	#navigation{
