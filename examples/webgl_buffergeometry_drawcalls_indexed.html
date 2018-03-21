@@ -49,7 +49,7 @@
 			var pointCloud, linesMesh;
 			var positions, colors, indices;
 
-			var maxParticleCount = 3000;
+			var maxParticleCount = 2000;
 			var particleCount = 500;
 			var r = 800;
 			var rHalf = r / 2;
@@ -74,7 +74,7 @@
 				gui.add( effectController, "showLines" ).onChange( function( value ) { linesMesh.visible = value; } );
 				gui.add( effectController, "minDistance", 10, 300 );
 				gui.add( effectController, "limitConnections" );
-				gui.add( effectController, "maxConnections", 0, 100, 1 );
+				gui.add( effectController, "maxConnections", 0, 30, 1 );
 				gui.add( effectController, "particleCount", 0, maxParticleCount, 1 ).onChange( function( value ) {
 
 					particleCount = parseInt( value );
@@ -108,7 +108,7 @@
 
 
 				// create position attribute (for both pointCloud and lineMesh)
-				positions = new THREE.Float32BufferAttribute(maxParticleCount * 3, 3).setDynamic(true);
+				positions = new THREE.Float32BufferAttribute( maxParticleCount * 3, 3 ).setDynamic( true );
 				
 				for ( var i = 0; i < maxParticleCount; i++ ) {
 					
@@ -117,9 +117,8 @@
 					var z = Math.random() * r - r / 2;
 
 					// setXYZ() is usefull to set values. See documentation https://threejs.org/docs/#api/core/BufferAttribute
-					positions.setXYZ(i, x, y, z);
+					positions.setXYZ( i, x, y, z );
 					
-					// add it to the geometry
 					particlesData.push( {
 						velocity: new THREE.Vector3( -1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2 ),
 						numConnections: 0
@@ -128,14 +127,11 @@
 				}
 
 				// create color attribute (only for lineMesh)
-				colors = new THREE.Float32BufferAttribute(maxParticleCount * 3, 3);
+				colors = new THREE.Float32BufferAttribute( maxParticleCount * 3, 3 );
 
 				// create index attribute (only for lineMesh)
-				var numIndices = maxParticleCount * (maxParticleCount - 1);
-				indices = new THREE.Uint32BufferAttribute(numIndices, 1).setDynamic(true);
-				// for (var i = 0; i < numIndices; i++) {
-				// 	indices.array[i] = 0;
-				// }
+				var numIndices = maxParticleCount * ( maxParticleCount - 1 );
+				indices = new THREE.Uint32BufferAttribute( numIndices, 1 ).setDynamic( true );
 				
 				// create particles
 				var particleGeometry = new THREE.BufferGeometry();
@@ -199,20 +195,20 @@
 				// update particle position
 				for ( var i = 0; i < particleCount; i++ ) {
 
-					var pData = particlesData[i];
+					var pData = particlesData[ i ];
 					pData.numConnections = 0;
 
 					positions.array[ i * 3     ] += pData.velocity.x;
 					positions.array[ i * 3 + 1 ] += pData.velocity.y;
 					positions.array[ i * 3 + 2 ] += pData.velocity.z;
 
-					if ( positions.getX(i) < -rHalf || positions.getX(i) > rHalf )
+					if ( positions.getX( i ) < -rHalf || positions.getX( i ) > rHalf )
 						pData.velocity.x = -pData.velocity.x;
 
-					if ( positions.getY(i) < -rHalf || positions.getY(i) > rHalf )
+					if ( positions.getY( i ) < -rHalf || positions.getY( i ) > rHalf )
 						pData.velocity.y = -pData.velocity.y;
 
-					if ( positions.getZ(i) < -rHalf || positions.getZ(i) > rHalf )
+					if ( positions.getZ( i ) < -rHalf || positions.getZ( i ) > rHalf )
 						pData.velocity.z = -pData.velocity.z;
 					
 				}
@@ -263,10 +259,10 @@
 							pDataA.numConnections++;
 							pDataB.numConnections++;
 
-							indices.array[indicesCount++] = i;
-							indices.array[indicesCount++] = j;
+							indices.array[ indicesCount++ ] = i;
+							indices.array[ indicesCount++ ] = j;
 
-							var alpha = 1.0 - (dist / effectController.minDistance);
+							var alpha = 1.0 - ( dist / effectController.minDistance );
 							colors.setXYZ( i, alpha, alpha, alpha );
 							colors.setXYZ( j, alpha, alpha, alpha );
 						}
