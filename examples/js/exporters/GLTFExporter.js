@@ -290,7 +290,23 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			// Create a new dataview and dump the attribute's array into it
-			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
+
+			var componentSize;
+
+			if ( componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE ) {
+
+				componentSize = 1;
+
+			} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ) {
+
+				componentSize = 2;
+
+			} else {
+
+				componentSize = 4;
+
+			}
+
 			var byteLength = getPaddedBufferSize( count * attribute.itemSize * componentSize );
 			var dataView = new DataView( new ArrayBuffer( byteLength ) );
 			var offset = 0;
@@ -314,6 +330,10 @@ THREE.GLTFExporter.prototype = {
 					} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ) {
 
 						dataView.setUint16( offset, value, true );
+
+					} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE ) {
+
+						dataView.setUint8( offset, value );
 
 					}
 
@@ -435,6 +455,10 @@ THREE.GLTFExporter.prototype = {
 			} else if ( attribute.array.constructor === Uint16Array ) {
 
 				componentType = WEBGL_CONSTANTS.UNSIGNED_SHORT;
+
+			} else if ( attribute.array.constructor === Uint8Array ) {
+
+				componentType = WEBGL_CONSTANTS.UNSIGNED_BYTE;
 
 			} else {
 
