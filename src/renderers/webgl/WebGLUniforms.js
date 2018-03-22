@@ -545,8 +545,7 @@ function WebGLUniforms( gl, program, renderer ) {
 	for ( var i = 0; i < n; ++ i ) {
 
 		var info = gl.getActiveUniform( program, i ),
-			path = info.name,
-			addr = gl.getUniformLocation( program, path );
+			addr = gl.getUniformLocation( program, info.name );
 
 		parseUniform( info, addr, this );
 
