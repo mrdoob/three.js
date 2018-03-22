@@ -96,10 +96,13 @@ Use WEBGL Depth buffer support?
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, height );
-				//renderer.sortObjects = false;
+				renderer.setClearColor( 0xffffff );
+				renderer.setClearAlpha( 1.0 );
 				container.appendChild( renderer.domElement );
 
 				material_depth = new THREE.MeshDepthMaterial();
+				material_depth.depthPacking = THREE.RGBADepthPacking;
+				material_depth.blending = THREE.NoBlending;
 
 				//
 
@@ -413,7 +416,8 @@ Use WEBGL Depth buffer support?
 					fragmentShader: bokeh_shader.fragmentShader,
 					defines: {
 						RINGS: shaderSettings.rings,
-						SAMPLES: shaderSettings.samples
+						SAMPLES: shaderSettings.samples,
+						DEPTH_PACKING: 1 // RGBADepth
 					}
 
 				} );
@@ -514,16 +518,16 @@ Use WEBGL Depth buffer support?
 
 					// Render scene into texture
 
-					scene.overrideMaterial = null;
 					renderer.render( scene, camera, postprocessing.rtTextureColor, true );
 
 					// Render depth into texture
 
 					scene.overrideMaterial = material_depth;
 					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
+					scene.overrideMaterial = null;
 
 					// Render bokeh composite
-
+					
 					renderer.render( postprocessing.scene, postprocessing.camera );
 
 
