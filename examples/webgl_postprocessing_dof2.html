@@ -96,8 +96,6 @@ Use WEBGL Depth buffer support?
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, height );
-				renderer.setClearColor( 0xffffff );
-				renderer.setClearAlpha( 1.0 );
 				container.appendChild( renderer.domElement );
 
 				material_depth = new THREE.MeshDepthMaterial();
@@ -527,7 +525,7 @@ Use WEBGL Depth buffer support?
 					scene.overrideMaterial = null;
 
 					// Render bokeh composite
-					
+
 					renderer.render( postprocessing.scene, postprocessing.camera );
 
 
