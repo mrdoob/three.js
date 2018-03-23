@@ -23,6 +23,8 @@ export default QUnit.module( 'Loaders', () => {
 		QUnit.test( 'extractUrlBase', ( assert ) => {
 
 			assert.equal( '/path/to/', LoaderUtils.extractUrlBase( '/path/to/model.glb' ) );
+			assert.equal( './', LoaderUtils.extractUrlBase( 'model.glb' ) );
+			assert.equal( '/', LoaderUtils.extractUrlBase( '/model.glb' ) );
 
 		} );
 
