@@ -1,134 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - effects - parallax barrier</title>
+		<title>three.js webgl - effects - anaglyph</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				font-family: Monospace;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #000;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #046;
+				background:#777;
+				padding:0;
+				margin:0;
 				font-weight: bold;
+				overflow:hidden;
 			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+			#oldie a { color:#da0 }
 		</style>
 	</head>
 
 	<body>
-
-		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - parallax barrier<br />
-			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
-			Ferrari F50 model by <a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1687" target="_blank" rel="noopener">Daniel Sathya</a>
-		</div>
-
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - parallax barrier. skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a></div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/effects/ParallaxBarrierEffect.js"></script>
 
-		<script src="js/loaders/GLTFLoader.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var stats, camera, scene, renderer, effect;
+			var container;
+
+			var camera, scene, renderer, effect;
+
+			var mesh, lightMesh, geometry;
+			var spheres = [];
+
+			var directionalLight, pointLight;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			init();
+			animate();
 
 			function init() {
 
-				var container  = document.createElement( 'div' );
+				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 175, 100, 150 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera.position.z = 3;
+				camera.focalLength = 3;
 
-				controls = new THREE.OrbitControls( camera );
-				controls.maxPolarAngle = Math.PI / 2.25;
-				controls.target.set( -50, 0, 0 );
-				controls.minDistance = 100;
-				controls.maxDistance = 500;
-				controls.update();
+				var path = "textures/cube/pisa/";
+				var format = '.png';
+				var urls = [
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
 
-				var textureCube = new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/Bridge2/')
-					.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xa0a0a0 );
-				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
+				scene.background = textureCube;
 
-				var hemi = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				hemi.position.set( 0, 200, 0 );
-				scene.add( hemi );
+				var geometry = new THREE.SphereBufferGeometry( 0.1, 32, 16 );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 
-				var direct = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				direct.position.set( 200, 300, 200 );
-				scene.add( direct );
+				for ( var i = 0; i < 500; i ++ ) {
 
-				// ground
-				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+					var mesh = new THREE.Mesh( geometry, material );
 
-				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
-				grid.material.opacity = 0.2;
-				grid.material.transparent = true;
-				scene.add( grid );
+					mesh.position.x = Math.random() * 10 - 5;
+					mesh.position.y = Math.random() * 10 - 5;
+					mesh.position.z = Math.random() * 10 - 5;
+
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
+
+					scene.add( mesh );
+
+					spheres.push( mesh );
+
+				}
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				container.appendChild( renderer.domElement );
 
 				var width = window.innerWidth || 2;
 				var height = window.innerHeight || 2;
 
-				var loader = new THREE.GLTFLoader();
-				loader.load( 'models/gltf/f50/f50.glb', function ( gltf ) {
-
-					var object = gltf.scene;
-
-					object.traverse( function ( child ) {
-
-						if ( child.isMesh ) {
-
-							child.material.envMap = textureCube;
-							child.material.metalness = 0.6;
-							child.material.roughness = 0.1;
-
-						}
-
-					} );
-
-					scene.add( object )
-
-				} );
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
 				effect = new THREE.ParallaxBarrierEffect( renderer );
 				effect.setSize( width, height );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				//
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -144,24 +136,44 @@
 
 			}
 
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX ) / 100;
+				mouseY = ( event.clientY - windowHalfY ) / 100;
+
+			}
+
+			//
+
 			function animate() {
 
 				requestAnimationFrame( animate );
 
 				render();
 
-				stats.update();
-
 			}
 
 			function render() {
 
+				var timer = 0.0001 * Date.now();
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
+
+				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
+
+					var sphere = spheres[ i ];
+
+					sphere.position.x = 5 * Math.cos( timer + i );
+					sphere.position.y = 5 * Math.sin( timer + i * 1.1 );
+
+				}
+
 				effect.render( scene, camera );
 
 			}
-
-			init();
-			animate();
 
 		</script>
 
