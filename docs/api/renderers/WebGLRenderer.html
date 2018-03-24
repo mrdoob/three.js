@@ -379,10 +379,7 @@
 		<div>Reset the GL state to default. Called internally if the WebGL context is lost.</div>
 
 		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], buffer )</h3>
-		<div>Reads the pixel data from the renderTarget into the buffer you pass in.
-			Buffer should be a Javascript Uint8Array instantiated with
-			new Uint8Array( renderTargetWidth * renderTargetWidth * 4 ) to account for size and color
-			information. This is a wrapper around gl.readPixels.<br />
+		<div>Reads the pixel data from the renderTarget into the buffer you pass in. This is a wrapper around [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().<br />
 		See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.
 		</div>
 
