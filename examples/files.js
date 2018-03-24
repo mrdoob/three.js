@@ -71,10 +71,9 @@ var files = {
 		"webgl_lights_rectarealight",
 		"webgl_lights_spherical_harmonics",
 		"webgl_lines_colors",
-		"webgl_lines_cubes",
 		"webgl_lines_dashed",
+		"webgl_lines_fat",
 		"webgl_lines_sphere",
-		"webgl_lines_splines",
 		"webgl_loader_3ds",
 		"webgl_loader_3mf",
 		"webgl_loader_amf",
@@ -126,6 +125,7 @@ var files = {
 		"webgl_loader_sea3d_skinning",
 		"webgl_loader_sea3d_sound",
 		"webgl_loader_stl",
+		"webgl_loader_svg",
 		"webgl_loader_texture_dds",
 		"webgl_loader_texture_exr",
 		"webgl_loader_texture_hdr",
@@ -153,6 +153,7 @@ var files = {
 		"webgl_materials_cubemap_dynamic",
 		"webgl_materials_cubemap_dynamic2",
 		"webgl_materials_cubemap_refraction",
+		"webgl_materials_curvature",
 		"webgl_materials_displacementmap",
 		"webgl_materials_envmaps",
 		"webgl_materials_envmaps_hdr",
@@ -169,6 +170,7 @@ var files = {
 		"webgl_materials_texture_canvas",
 		"webgl_materials_texture_filters",
 		"webgl_materials_texture_manualmipmap",
+		"webgl_materials_texture_partialupdate",
 		"webgl_materials_texture_rotation",
 		"webgl_materials_transparency",
 		"webgl_materials_variations_basic",
@@ -274,6 +276,7 @@ var files = {
 		"webgl_buffergeometry_constructed_from_geometry",
 		"webgl_buffergeometry_custom_attributes_particles",
 		"webgl_buffergeometry_drawcalls",
+		"webgl_buffergeometry_indexed",
 		"webgl_buffergeometry_instancing",
 		"webgl_buffergeometry_instancing2",
 		"webgl_buffergeometry_instancing_billboards",
@@ -295,7 +298,8 @@ var files = {
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",
-		"webgl_tiled_forward"
+		"webgl_tiled_forward",
+		"webgl_worker_offscreencanvas"
 	],
 	"webgl deferred": [
 		"webgldeferred_animation"

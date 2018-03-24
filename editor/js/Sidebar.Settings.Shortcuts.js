@@ -100,8 +100,7 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 				var object = editor.selected;
 
 				if ( object === null ) return;
-				if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
-
+				
 				var parent = object.parent;
 				if ( parent !== null ) editor.execute( new RemoveObjectCommand( object ) );
 

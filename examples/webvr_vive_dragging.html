@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webvr - htc vive - dragging</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-01-21 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-01-21" content="Ap+tmQjuEXRrzmu+ZuReB/eY8fZmTEOybJ2hME1RgEZAPzhZ4/IAKEHRebiTp6o4LoZOMBexL4GAL7flIkAUlQYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxNjUzODYxMX0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-04-03 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-04-03" content="AqIrNtaoJSmDZatgEEW2ehuK9ITIiFk3gZ3/gC6Vp0gF85NDYl7IzVPj4Bh7O6SIcr3ICOm6kocYSaS+BPkazgYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyMjc2MzAwMn0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -58,14 +58,9 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x808080 );
 
-				var user = new THREE.Group();
-				user.position.set( 0, 1.6, 0 );
-				scene.add( user );
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				user.add( camera );
 
-				var geometry = new THREE.PlaneGeometry( 4, 4 );
+				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xeeeeee,
 					roughness: 1.0,
@@ -92,11 +87,11 @@
 				scene.add( group );
 
 				var geometries = [
-					new THREE.BoxGeometry( 0.2, 0.2, 0.2 ),
-					new THREE.ConeGeometry( 0.2, 0.2, 64 ),
-					new THREE.CylinderGeometry( 0.2, 0.2, 0.2, 64 ),
-					new THREE.IcosahedronGeometry( 0.2, 3 ),
-					new THREE.TorusGeometry( 0.2, 0.04, 64, 32 )
+					new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ),
+					new THREE.ConeBufferGeometry( 0.2, 0.2, 64 ),
+					new THREE.CylinderBufferGeometry( 0.2, 0.2, 0.2, 64 ),
+					new THREE.IcosahedronBufferGeometry( 0.2, 3 ),
+					new THREE.TorusBufferGeometry( 0.2, 0.04, 64, 32 )
 				];
 
 				for ( var i = 0; i < 50; i ++ ) {
@@ -143,14 +138,16 @@
 				// controllers
 
 				controller1 = new THREE.ViveController( 0 );
+				controller1.standingMatrix = renderer.vr.getStandingMatrix();
 				controller1.addEventListener( 'triggerdown', onTriggerDown );
 				controller1.addEventListener( 'triggerup', onTriggerUp );
-				user.add( controller1 );
+				scene.add( controller1 );
 
 				controller2 = new THREE.ViveController( 1 );
+				controller2.standingMatrix = renderer.vr.getStandingMatrix();
 				controller2.addEventListener( 'triggerdown', onTriggerDown );
 				controller2.addEventListener( 'triggerup', onTriggerUp );
-				user.add( controller2 );
+				scene.add( controller2 );
 
 				var loader = new THREE.OBJLoader();
 				loader.setPath( 'models/obj/vive-controller/' );
@@ -170,9 +167,7 @@
 
 				//
 
-				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
-				geometry.vertices.push( new THREE.Vector3( 0, 0, - 1 ) );
+				var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
 				var line = new THREE.Line( geometry );
 				line.name = 'line';

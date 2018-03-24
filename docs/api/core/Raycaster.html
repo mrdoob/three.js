@@ -73,7 +73,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Vector3 origin], [page:Vector3 direction], [page:Float near], [page:Float far] ) {</h3>
+		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] ) {</h3>
 		<div>
 		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
 		[page:Vector3 direction] — The direction vector that gives direction to the ray. Should be normalized.<br />
@@ -126,7 +126,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null set]( [page:Vector3 origin], [page:Vector3 direction] )</h3>
+		<h3>[method:null set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<div>
 		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
 		[page:Vector3 direction] — The normalized direction vector that gives direction to the ray.
@@ -135,7 +135,7 @@
 		Updates the ray with a new origin and direction.
 		</div>
 
-		<h3>[method:null setFromCamera]( [page:Vector2 coords], [page:Camera camera] )</h3>
+		<h3>[method:null setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
 		<div>
 		[page:Vector2 coords] — 2D coordinates of the mouse, in normalized device coordinates (NDC)---X and Y components should be between -1 and 1.<br />
 		[page:Camera camera] — camera from which the ray should originate
@@ -144,31 +144,27 @@
 		Updates the ray with a new origin and direction.
 		</div>
 
-
-		<h3>[method:Array intersectObject]( [page:Object3D object], [page:Boolean recursive] )</h3>
+		<h3>[method:Array intersectObject]( [page:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<div>
 		<p>
 		[page:Object3D object] — The object to check for intersection with the ray.<br />
-		[page:Boolean recursive] — If true, it also checks all descendants. Otherwise it only checks intersecton with the object. Default is false.
+		[page:Boolean recursive] — If true, it also checks all descendants. Otherwise it only checks intersecton with the object. Default is false.<br />
+		[page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated. If set, you must clear this array prior to each call (i.e., array.length = 0;).
 		</p>
 		</div>
 		<div>
 		Checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first. An array of intersections is returned...
         <code>
-            [ { distance, point, face, faceIndex, indices, object }, ... ]
+            [ { distance, point, face, faceIndex, object }, ... ]
         </code>
         <p>
         [page:Float distance] – distance between the origin of the ray and the intersection<br />
         [page:Vector3 point] – point of intersection, in world coordinates<br />
         [page:Face3 face] – intersected face<br />
         [page:Integer faceIndex] – index of the intersected face<br />
-        [page:Array indices] – indices of vertices comprising the intersected face<br />
         [page:Object3D object] – the intersected object<br />
         [page:Vector2 uv] - U,V coordinates at point of intersection
     	</p>
-        <p>
-        When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*.
-        </p>
 		<p>
 		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].
 		</p>
@@ -177,10 +173,11 @@
 		</p>
 		</div>
 
-		<h3>[method:Array intersectObjects]( [page:Array objects], [page:Boolean recursive] )</h3>
+		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<div>
 		[page:Array objects] — The objects to check for intersection with the ray.<br />
-		[page:Boolean recursive] — If true, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects. Default is false.
+		[page:Boolean recursive] — If true, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects. Default is false.<br />
+		[page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated. If set, you must clear this array prior to each call (i.e., array.length = 0;).
 		</div>
 		<div>
 		Checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject].

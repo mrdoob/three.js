@@ -226,7 +226,7 @@
 			folderGeometry.open();
 
 			var folderCamera = gui.addFolder( 'Camera' );
-			folderCamera.add( params, 'animationView').onChange( function( value ) { animateCamera( true ); } );
+			folderCamera.add( params, 'animationView').onChange( function( value ) { animateCamera(); } );
 			folderCamera.add( params, 'lookAhead').onChange( function( value ) { animateCamera(); } );
 			folderCamera.add( params, 'cameraHelper').onChange( function( value ) { animateCamera(); } );
 			folderCamera.open();

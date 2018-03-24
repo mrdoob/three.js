@@ -51,6 +51,7 @@
 
 		<h3>[page:BufferAttribute]</h3>
 		<div>BufferAttribute.length has been renamed to [page:BufferAttribute.count].</div>
+		<div>BufferAttribute.copyIndicesArray() has been removed.</div>
 
 
 		<h3>[page:DynamicBufferAttribute]</h3>
@@ -152,6 +153,12 @@
 
 
 		<h2>Geometry</h2>
+
+		<div>
+			Geometry.computeTangents() has been removed.<br /><br />
+
+			Geometry.computeLineDistances() has been removed. Use [page:Line.computeLineDistances] instead.<br /><br />
+		</div>
 
 		<h3>[page:BufferGeometry]</h3>
 		<div>
@@ -356,6 +363,15 @@
 			Ray.isIntersectionSphere has been renamed to [page:Ray.intersectsSphere].
 		</div>
 
+		<h3>[page:Triangle]</h3>
+		<div>
+			Triangle.area() has been renamed to [page:Triangle.getArea]().<br /><br />
+			Triangle.barycoordFromPoint() has been renamed to [page:Triangle.getBarycoord]().<br /><br />
+			Triangle.midpoint() has been renamed to [page:Triangle.getMidpoint]().<br /><br />
+			Triangle.normal() has been renamed to [page:Triangle.getNormal]().<br /><br />
+			Triangle.plane() has been renamed to [page:Triangle.getPlane]().
+		</div>
+
 		<h3>[page:Vector2]</h3>
 		<div>
 			Vector2.fromAttribute() has been renamed to [page:Vector2.fromBufferAttribute]().
@@ -458,7 +474,7 @@
 
 		<h3>[page:LensFlare]</h3>
 		<div>
-			LensFlare has been moved to [link:https://github.com/mrdoob/three.js/blob/master/examples/js/objects/LensFlare.js /examples/js/objects/LensFlare.js].
+			LensFlare has been moved to [link:https://github.com/mrdoob/three.js/blob/master/examples/js/objects/Lensflare.js /examples/js/objects/Lensflare.js].
 		</div>
 
 
@@ -538,6 +554,8 @@
 			WebGLRenderer.addPostPlugin() has been removed.<br /><br />
 
 			WebGLRenderer.updateShadowMap() has been removed.<br /><br />
+
+			WebGLRenderer.setFaceCulling() has been removed.<br /><br />
 
 			WebGLRenderer.setTexture is deprecated, use [page:WebGLRenderer.setTexture2D]() instead.<br /><br />
 

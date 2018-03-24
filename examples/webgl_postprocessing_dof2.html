@@ -93,13 +93,14 @@ Use WEBGL Depth buffer support?
 				scene = new THREE.Scene();
 				scene.add( camera );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, height );
-				//renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				material_depth = new THREE.MeshDepthMaterial();
+				material_depth.depthPacking = THREE.RGBADepthPacking;
+				material_depth.blending = THREE.NoBlending;
 
 				//
 
@@ -126,7 +127,7 @@ Use WEBGL Depth buffer support?
 
 				} );
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 1000, 1000, 1000 ), material );
+				var mesh = new THREE.Mesh( new THREE.BoxGeometry( 1000, 1000, 1000 ), material );
 				camera.add( mesh );
 
 
@@ -172,8 +173,10 @@ Use WEBGL Depth buffer support?
 
 				// Adding Monkeys
 
-				var loader2 = new THREE.JSONLoader();
-				loader2.load( 'obj/Suzanne.js', function ( geometry ) {
+				var loader2 = new THREE.BufferGeometryLoader();
+				loader2.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
+
+					geometry.computeVertexNormals();
 
 					var material = new THREE.MeshPhongMaterial( {
 						color: 0xffffff,
@@ -191,12 +194,11 @@ Use WEBGL Depth buffer support?
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.scale.multiplyScalar(30);
 
-
 						mesh.position.z = Math.cos(i / monkeys * Math.PI * 2) * 200;
 						mesh.position.y = Math.sin(i / monkeys * Math.PI * 3) * 20;
 						mesh.position.x = Math.sin(i / monkeys * Math.PI * 2) * 200;
 
-						mesh.rotation.x = Math.PI / 2;
+						mesh.rotation.y = -Math.PI / 2;
 						mesh.rotation.z = -i / monkeys * Math.PI * 2;
 
 						scene.add( mesh );
@@ -412,7 +414,8 @@ Use WEBGL Depth buffer support?
 					fragmentShader: bokeh_shader.fragmentShader,
 					defines: {
 						RINGS: shaderSettings.rings,
-						SAMPLES: shaderSettings.samples
+						SAMPLES: shaderSettings.samples,
+						DEPTH_PACKING: 1 // RGBADepth
 					}
 
 				} );
@@ -513,13 +516,13 @@ Use WEBGL Depth buffer support?
 
 					// Render scene into texture
 
-					scene.overrideMaterial = null;
 					renderer.render( scene, camera, postprocessing.rtTextureColor, true );
 
 					// Render depth into texture
 
 					scene.overrideMaterial = material_depth;
 					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
+					scene.overrideMaterial = null;
 
 					// Render bokeh composite
 

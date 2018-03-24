@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.89.0",
+  "version": "0.91.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "repository": "mrdoob/three.js",
@@ -49,17 +49,17 @@
   "bugs": {
     "url": "https://github.com/mrdoob/three.js/issues"
   },
-  "homepage": "http://threejs.org/",
+  "homepage": "https://threejs.org/",
   "devDependencies": {
     "concurrently": "^3.5.0",
-    "electron": "1.7.8",
+    "electron": "1.8.2",
     "eslint": "^4.1.1",
     "eslint-config-mdcs": "^4.2.2",
-    "google-closure-compiler": "^20170521.0.0",
+    "google-closure-compiler": "20180204.0.0",
     "qunit": "^2.4.0",
-    "rollup": "^0.51.0",
+    "rollup": "^0.56.4",
     "rollup-watch": "^4.0.0",
-    "serve": "^6.3.1",
+    "serve": "6.5.1",
     "uglify-js": "^3.0.23"
   }
 }

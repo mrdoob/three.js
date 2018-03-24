@@ -40,26 +40,29 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 100000, 0, 3200 );
+				camera.position.set( 0, 0, 1000 );
 
 				scene = new THREE.Scene();
 
-				var colors = [ 0x000000, 0xff0080, 0x8000ff, 0xffffff ];
-				var geometry = new THREE.Geometry();
+				var colorArray = [ new THREE.Color( 0xff0080 ), new THREE.Color( 0xffffff ), new THREE.Color( 0x8000ff ) ];
+				var positions = [];
+				var colors = [];
 
-				for ( var i = 0; i < 2000; i ++ ) {
+				for ( var i = 0; i < 100; i ++ ) {
 
-					var vertex = new THREE.Vector3();
-					vertex.x = Math.random() * 4000 - 2000;
-					vertex.y = Math.random() * 4000 - 2000;
-					vertex.z = Math.random() * 4000 - 2000;
-					geometry.vertices.push( vertex );
+					positions.push( 4000 * ( Math.random() - 0.5 ), 4000 * ( Math.random() - 0.5 ), 4000 * ( Math.random() - 0.5 ) );
 
-					geometry.colors.push( new THREE.Color( colors[ Math.floor( Math.random() * colors.length ) ] ) );
+					var clr = colorArray[ Math.floor( Math.random() * colorArray.length ) ];
+
+					colors.push( clr.r, clr.g, clr.b );
 
 				}
 
-				var material = new THREE.PointsMaterial( { size: 1, vertexColors: THREE. VertexColors, depthTest: false, opacity: 0.5, sizeAttenuation: false, transparent: true } );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+				var material = new THREE.PointsMaterial( { size: 4, vertexColors: THREE.VertexColors, depthTest: false, sizeAttenuation: false } );
 
 				var mesh = new THREE.Points( geometry, material );
 				scene.add( mesh );

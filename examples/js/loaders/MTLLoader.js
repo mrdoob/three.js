@@ -462,9 +462,11 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 				case 'tr':
 					n = parseFloat( value );
 
-					if ( n > 0 ) {
+					if ( this.options && this.options.invertTrProperty ) n = 1 - n;
 
-						params.opacity = 1 - n;
+					if ( n < 1 ) {
+
+						params.opacity = n;
 						params.transparent = true;
 
 					}

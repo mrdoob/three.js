@@ -16,6 +16,12 @@ THREE.ColorNode.prototype.nodeType = "Color";
 
 THREE.NodeMaterial.addShortcuts( THREE.ColorNode.prototype, 'value', [ 'r', 'g', 'b' ] );
 
+THREE.ColorNode.prototype.generateReadonly = function ( builder, output, uuid, type, ns, needsUpdate ) {
+
+	return builder.format( "vec3( " + this.r + ", " + this.g + ", " + this.b + " )", type, output );
+
+};
+
 THREE.ColorNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
@@ -27,6 +33,8 @@ THREE.ColorNode.prototype.toJSON = function ( meta ) {
 		data.r = this.r;
 		data.g = this.g;
 		data.b = this.b;
+
+		if ( this.readonly === true ) data.readonly = true;
 
 	}
 

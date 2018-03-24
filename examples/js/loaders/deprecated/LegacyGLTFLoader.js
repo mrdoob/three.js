@@ -31,7 +31,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			loader.load( url, function ( data ) {
 
-				scope.parse( data, onLoad, path );
+				scope.parse( data, path, onLoad );
 
 			}, onProgress, onError );
 
@@ -49,7 +49,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		},
 
-		parse: function ( data, callback, path ) {
+		parse: function ( data, path, callback ) {
 
 			var content;
 			var extensions = {};
@@ -391,16 +391,6 @@ THREE.LegacyGLTFLoader = ( function () {
 		var array = new Uint8Array( bufferView );
 
 		return THREE.LoaderUtils.decodeText( array );
-
-	};
-
-	GLTFBinaryExtension.prototype.loadTextureSourceUri = function ( source, bufferViews ) {
-
-		var metadata = source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ];
-		var bufferView = bufferViews[ metadata.bufferView ];
-		var stringData = THREE.LoaderUtils.decodeText( new Uint8Array( bufferView ) );
-
-		return 'data:' + metadata.mimeType + ';base64,' + btoa( stringData );
 
 	};
 
@@ -1071,10 +1061,15 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						var source = json.images[ texture.source ];
 						var sourceUri = source.uri;
+						var isObjectURL = false;
 
 						if ( source.extensions && source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ] ) {
 
-							sourceUri = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].loadTextureSourceUri( source, dependencies.bufferViews );
+							var metadata = source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ];
+							var bufferView = dependencies.bufferViews[ metadata.bufferView ];
+							var blob = new Blob( [ bufferView ], { type: metadata.mimeType } );
+							sourceUri = URL.createObjectURL( blob );
+							isObjectURL = true;
 
 						}
 
@@ -1089,6 +1084,8 @@ THREE.LegacyGLTFLoader = ( function () {
 						textureLoader.setCrossOrigin( options.crossOrigin );
 
 						textureLoader.load( resolveURL( sourceUri, options.path ), function ( _texture ) {
+
+							if ( isObjectURL ) URL.revokeObjectURL( sourceUri );
 
 							_texture.flipY = false;
 
@@ -1119,6 +1116,8 @@ THREE.LegacyGLTFLoader = ( function () {
 							resolve( _texture );
 
 						}, undefined, function () {
+
+							if ( isObjectURL ) URL.revokeObjectURL( sourceUri );
 
 							resolve();
 
@@ -1633,6 +1632,26 @@ THREE.LegacyGLTFLoader = ( function () {
 								case 'JOINT':
 									geometry.addAttribute( 'skinIndex', bufferAttribute );
 									break;
+
+								default:
+
+									if ( ! primitive.material ) break;
+
+									var material = json.materials[ primitive.material ];
+
+									if ( ! material.technique ) break;
+
+									var parameters = json.techniques[ material.technique ].parameters || {};
+
+									for( var attributeName in parameters ) {
+
+										if ( parameters [ attributeName ][ 'semantic' ] === attributeId ) {
+
+											geometry.addAttribute( attributeName, bufferAttribute );
+
+										}
+
+									}
 
 							}
 

@@ -328,19 +328,19 @@
 
 		var fileName;
 
+		var currentPath = loader.path;
+
 		var children = connections.get( textureNode.id ).children;
 
 		if ( children !== undefined && children.length > 0 && images[ children[ 0 ].ID ] !== undefined ) {
 
 			fileName = images[ children[ 0 ].ID ];
 
-		}
+			if ( fileName.indexOf( 'blob:' ) === 0 || fileName.indexOf( 'data:' ) === 0 ) {
 
-		var currentPath = loader.path;
+				loader.setPath( undefined );
 
-		if ( fileName.indexOf( 'blob:' ) === 0 || fileName.indexOf( 'data:' ) === 0 ) {
-
-			loader.setPath( undefined );
+			}
 
 		}
 
@@ -433,7 +433,12 @@
 		}
 		if ( properties.Diffuse ) {
 
-			parameters.color = parseColor( properties.Diffuse );
+			parameters.color = new THREE.Color().fromArray( properties.Diffuse.value );
+
+		} else if ( properties.DiffuseColor && properties.DiffuseColor.type === 'Color' ) {
+
+			// The blender exporter exports diffuse here instead of in properties.Diffuse
+			parameters.color = new THREE.Color().fromArray( properties.DiffuseColor.value );
 
 		}
 		if ( properties.DisplacementFactor ) {
@@ -441,24 +446,14 @@
 			parameters.displacementScale = properties.DisplacementFactor.value;
 
 		}
-		if ( properties.ReflectionFactor ) {
-
-			parameters.reflectivity = properties.ReflectionFactor.value;
-
-		}
-		if ( properties.Specular ) {
-
-			parameters.specular = parseColor( properties.Specular );
-
-		}
-		if ( properties.Shininess ) {
-
-			parameters.shininess = properties.Shininess.value;
-
-		}
 		if ( properties.Emissive ) {
 
-			parameters.emissive = parseColor( properties.Emissive );
+			parameters.emissive = new THREE.Color().fromArray( properties.Emissive.value );
+
+		} else if ( properties.EmissiveColor && properties.EmissiveColor.type === 'Color' ) {
+
+			// The blender exporter exports emissive color here instead of in properties.Emissive
+			parameters.emissive = new THREE.Color().fromArray( properties.EmissiveColor.value );
 
 		}
 		if ( properties.EmissiveFactor ) {
@@ -474,6 +469,26 @@
 		if ( parameters.opacity < 1.0 ) {
 
 			parameters.transparent = true;
+
+		}
+		if ( properties.ReflectionFactor ) {
+
+			parameters.reflectivity = properties.ReflectionFactor.value;
+
+		}
+		if ( properties.Shininess ) {
+
+			parameters.shininess = properties.Shininess.value;
+
+		}
+		if ( properties.Specular ) {
+
+			parameters.specular = new THREE.Color().fromArray( properties.Specular.value );
+
+		} else if ( properties.SpecularColor && properties.SpecularColor.type === 'Color' ) {
+
+			// The blender exporter exports specular color here instead of in properties.Specular
+			parameters.specular = new THREE.Color().fromArray( properties.SpecularColor.value );
 
 		}
 
@@ -703,6 +718,7 @@
 		// For now just assume one model and get the preRotations from that
 		var modelNode = modelNodes[ 0 ];
 
+
 		if ( 'GeometricRotation' in modelNode ) {
 
 			var array = modelNode.GeometricRotation.value.map( THREE.Math.degToRad );
@@ -715,6 +731,12 @@
 		if ( 'GeometricTranslation' in modelNode ) {
 
 			preTransform.setPosition( new THREE.Vector3().fromArray( modelNode.GeometricTranslation.value ) );
+
+		}
+
+		if ( 'GeometricScaling' in modelNode ) {
+
+			preTransform.scale( new THREE.Vector3().fromArray( modelNode.GeometricScaling.value ) );
 
 		}
 
@@ -1086,7 +1108,7 @@
 
 		if ( skeleton ) {
 
-			geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( weightsIndicesBuffer, 4 ) );
+			geo.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( weightsIndicesBuffer, 4 ) );
 
 			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( vertexWeightsBuffer, 4 ) );
 
@@ -1097,7 +1119,12 @@
 
 		if ( normalBuffer.length > 0 ) {
 
-			geo.addAttribute( 'normal', new THREE.Float32BufferAttribute( normalBuffer, 3 ) );
+			var normalAttribute = new THREE.Float32BufferAttribute( normalBuffer, 3 );
+
+			var normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
+			normalMatrix.applyToBufferAttribute( normalAttribute );
+
+			geo.addAttribute( 'normal', normalAttribute );
 
 		}
 
@@ -1476,7 +1503,7 @@
 
 		} );
 
-		bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections, sceneGraph );
+		bindSkeleton( FBXTree, skeletons, geometryMap, modelMap, connections );
 
 		addAnimations( FBXTree, connections, sceneGraph );
 
@@ -1647,10 +1674,13 @@
 
 			}
 
+			var focalLength = cameraAttribute.FocalLength ? cameraAttribute.FocalLength.value : null;
+
 			switch ( type ) {
 
 				case 0: // Perspective
 					model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
+					if ( focalLength !== null ) model.setFocalLength( focalLength );
 					break;
 
 				case 1: // Orthographic
@@ -1711,7 +1741,7 @@
 
 			if ( lightAttribute.Color !== undefined ) {
 
-				color = parseColor( lightAttribute.Color );
+				color = new THREE.Color().fromArray( lightAttribute.Color.value );
 
 			}
 
@@ -1733,7 +1763,7 @@
 
 				} else {
 
-					distance = lightAttribute.FarAttenuationEnd.value / 1000;
+					distance = lightAttribute.FarAttenuationEnd.value;
 
 				}
 
@@ -1981,7 +2011,7 @@
 
 			var rotation = modelNode.Lcl_Rotation.value.map( THREE.Math.degToRad );
 			rotation.push( 'ZYX' );
-			model.rotation.fromArray( rotation );
+			model.quaternion.setFromEuler( new THREE.Euler().fromArray( rotation ) );
 
 		}
 
@@ -1999,9 +2029,7 @@
 			var preRotations = new THREE.Euler().fromArray( array );
 
 			preRotations = new THREE.Quaternion().setFromEuler( preRotations );
-			var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
-			preRotations.multiply( currentRotation );
-			model.rotation.setFromQuaternion( preRotations, 'ZYX' );
+			model.quaternion.premultiply( preRotations );
 
 		}
 
@@ -2209,42 +2237,49 @@
 
 						var curveNode = curveNodesMap.get( child.ID );
 
-						if ( layerCurveNodes[ i ] === undefined ) {
+						// check that the curves are defined for at least one axis, otherwise ignore the curveNode
+						if ( curveNode.curves.x !== undefined || curveNode.curves.y !== undefined || curveNode.curves.z !== undefined ) {
 
-							var modelID;
+							if ( layerCurveNodes[ i ] === undefined ) {
 
-							connections.get( child.ID ).parents.forEach( function ( parent ) {
+								var modelID;
 
-								if ( parent.relationship !== undefined ) modelID = parent.ID;
+								connections.get( child.ID ).parents.forEach( function ( parent ) {
 
-							} );
+									if ( parent.relationship !== undefined ) modelID = parent.ID;
 
-							var rawModel = FBXTree.Objects.Model[ modelID.toString() ];
+								} );
 
-							var node = {
+								var rawModel = FBXTree.Objects.Model[ modelID.toString() ];
 
-								modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
-								initialPosition: [ 0, 0, 0 ],
-								initialRotation: [ 0, 0, 0 ],
-								initialScale: [ 1, 1, 1 ],
+								var node = {
 
-							};
+									modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+									initialPosition: [ 0, 0, 0 ],
+									initialRotation: [ 0, 0, 0 ],
+									initialScale: [ 1, 1, 1 ],
 
-							if ( 'Lcl_Translation' in rawModel ) node.initialPosition = rawModel.Lcl_Translation.value;
+								};
 
-							if ( 'Lcl_Rotation' in rawModel ) node.initialRotation = rawModel.Lcl_Rotation.value;
+								if ( 'Lcl_Translation' in rawModel ) node.initialPosition = rawModel.Lcl_Translation.value;
 
-							if ( 'Lcl_Scaling' in rawModel ) node.initialScale = rawModel.Lcl_Scaling.value;
+								if ( 'Lcl_Rotation' in rawModel ) node.initialRotation = rawModel.Lcl_Rotation.value;
 
-							// if the animated model is pre rotated, we'll have to apply the pre rotations to every
-							// animation value as well
-							if ( 'PreRotation' in rawModel ) node.preRotations = rawModel.PreRotation.value;
+								if ( 'Lcl_Scaling' in rawModel ) node.initialScale = rawModel.Lcl_Scaling.value;
 
-							layerCurveNodes[ i ] = node;
+								// if the animated model is pre rotated, we'll have to apply the pre rotations to every
+								// animation value as well
+								if ( 'PreRotation' in rawModel ) node.preRotations = rawModel.PreRotation.value;
+
+								layerCurveNodes[ i ] = node;
+
+							}
+
+							layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
 
 						}
 
-						layerCurveNodes[ i ][ curveNode.attr ] = curveNode;
+
 
 					}
 
@@ -2804,6 +2839,7 @@
 					innerPropValue = parseFloat( innerPropValue );
 					break;
 
+				case 'Color':
 				case 'ColorRGB':
 				case 'Vector3D':
 				case 'Lcl_Translation':
@@ -2993,7 +3029,7 @@
 				if ( innerPropName.indexOf( 'Lcl ' ) === 0 ) innerPropName = innerPropName.replace( 'Lcl ', 'Lcl_' );
 				if ( innerPropType1.indexOf( 'Lcl ' ) === 0 ) innerPropType1 = innerPropType1.replace( 'Lcl ', 'Lcl_' );
 
-				if ( innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' || innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
+				if ( innerPropType1 === 'Color' || innerPropType1 === 'ColorRGB' || innerPropType1 === 'Vector' || innerPropType1 === 'Vector3D' || innerPropType1.indexOf( 'Lcl_' ) === 0 ) {
 
 					innerPropValue = [
 						subNode.propertyList[ 4 ],
@@ -3121,7 +3157,7 @@
 
 					if ( window.Zlib === undefined ) {
 
-						throw new Error( 'THREE.FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+						console.error( 'THREE.FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
 					}
 
@@ -3485,20 +3521,6 @@
 		} );
 
 		return array;
-
-	}
-
-	function parseColor( property ) {
-
-		var color = new THREE.Color();
-
-		if ( property.type === 'Color' ) {
-
-			return color.setScalar( property.value );
-
-		}
-
-		return color.fromArray( property.value );
 
 	}
 
