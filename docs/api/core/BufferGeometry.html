@@ -12,14 +12,15 @@
 
 		<div class="desc">
 		<p>
-		This class is an efficient alternative to [page:Geometry], because it stores all data, including
-		vertex positions, face indices, normals, colors, UVs, and custom attributes within buffers; this
-		reduces the cost of passing all this data to the GPU.<br />
-		This also makes BufferGeometry harder to work with than [page:Geometry]; rather than accessing
-		position data as [page:Vector3] objects, color data as [page:Color] objects, and so on, you have to
-		access the raw data from the appropriate [page:BufferAttribute attribute buffer]. This makes
-		BufferGeometry best-suited for static objects where you don't need to manipulate the geometry much
-		after instantiating it.
+		An efficient representation of mesh, line, or point geometry. Includes vertex positions, face
+		indices, normals, colors, UVs, and custom attributes within buffers, reducing the cost of
+		passing all this data to the GPU.
+		</p>
+		<p>
+		To read and edit data in BufferGeometry attributes, see [page:BufferAttribute] documentation.
+		</p>
+		<p>
+		For a less efficient but easier-to-use representation of geometry, see [page:Geometry].
 		</p>
 
 		<h2>Example</h2>
