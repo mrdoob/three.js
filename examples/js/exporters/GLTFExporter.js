@@ -481,7 +481,7 @@ THREE.GLTFExporter.prototype = {
 			// Skip creating an accessor if the attribute doesn't have data to export
 			if ( count === 0) {
 
-				return -1;
+				return null;
 
 			}
 
@@ -965,7 +965,7 @@ THREE.GLTFExporter.prototype = {
 				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
 					
 					var accessor = processAccessor( attribute, geometry );
-					if ( accessor !== -1 ) {
+					if ( accessor !== null ) {
 
 						attributes[ attributeName ] = accessor;
 
@@ -1132,7 +1132,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( primitives.length === 0 ) {
 
-				return -1;
+				return null;
 
 			}
 
@@ -1445,7 +1445,7 @@ THREE.GLTFExporter.prototype = {
 
 				var mesh = processMesh( object );
 
-				if ( mesh !== -1 ) {
+				if ( mesh !== null ) {
 
 					gltfNode.mesh = mesh;
 
