@@ -149,7 +149,7 @@ THREE.GLTFExporter.prototype = {
 				var value = text.charCodeAt( i );
 
 				// Replacing multi-byte character with space(0x20).
-				array[ i ] = value > 0xFF ? 0x20 : value
+				array[ i ] = value > 0xFF ? 0x20 : value;
 
 			}
 
@@ -479,7 +479,7 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			// Skip creating an accessor if the attribute doesn't have data to export
-			if ( count === 0) {
+			if ( count === 0 ) {
 
 				return null;
 
@@ -963,7 +963,7 @@ THREE.GLTFExporter.prototype = {
 				}
 
 				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
-					
+
 					var accessor = processAccessor( attribute, geometry );
 					if ( accessor !== null ) {
 
@@ -1089,7 +1089,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var materials = isMultiMaterial ? mesh.material : [ mesh.material ] ;
+			var materials = isMultiMaterial ? mesh.material : [ mesh.material ];
 			var groups = isMultiMaterial ? mesh.geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
 
 			for ( var i = 0, il = groups.length; i < il; i ++ ) {
@@ -1108,16 +1108,16 @@ THREE.GLTFExporter.prototype = {
 				}
 
 				// Skip meshes without exportable attributes
-				if ( Object.keys(primitive.attributes).length > 0 ) {
+				if ( Object.keys( primitive.attributes ).length > 0 ) {
 
 					var material = processMaterial( materials[ groups[ i ].materialIndex ] );
 
 					if ( material !== null ) {
-	
+
 						primitive.material = material;
-	
+
 					}
-	
+
 					primitives.push( primitive );
 
 				}
@@ -1143,7 +1143,7 @@ THREE.GLTFExporter.prototype = {
 				outputJSON.meshes = [];
 
 			}
-			
+
 			outputJSON.meshes.push( gltfMesh );
 
 			return outputJSON.meshes.length - 1;
