@@ -975,6 +975,13 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			// Skip if no exportable attributes found
+			if ( Object.keys( attributes ).length === 0 ) {
+
+				return null;
+
+			}
+
 			// Morph targets
 			if ( mesh.morphTargetInfluences !== undefined && mesh.morphTargetInfluences.length > 0 ) {
 
@@ -1107,20 +1114,15 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				// Skip meshes without exportable attributes
-				if ( Object.keys( primitive.attributes ).length > 0 ) {
+				var material = processMaterial( materials[ groups[ i ].materialIndex ] );
 
-					var material = processMaterial( materials[ groups[ i ].materialIndex ] );
+				if ( material !== null ) {
 
-					if ( material !== null ) {
-
-						primitive.material = material;
-
-					}
-
-					primitives.push( primitive );
+					primitive.material = material;
 
 				}
+
+				primitives.push( primitive );
 
 			}
 
