@@ -69,6 +69,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	var mpUVPool = [];
 	var mpUVPoolCount = 0;
 
+	var _this = this;
+
 	this.domElement = canvas;
 
 	this.autoClear = true;
@@ -129,8 +131,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		clearColorBuffer( clearColor );
 
 	};
-
-	this.setSize( canvas.width, canvas.height );
 
 	this.clear = function () {
 
@@ -322,54 +322,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		prevrectx2 = rectx2; prevrecty2 = recty2;
 
 	};
-
-	function setSize( width, height ) {
-
-		canvasWBlocks = Math.floor( width / blockSize );
-		canvasHBlocks = Math.floor( height / blockSize );
-		canvasWidth = canvasWBlocks * blockSize;
-		canvasHeight = canvasHBlocks * blockSize;
-
-		var fixScale = 1 << subpixelBits;
-
-		viewportXScale = fixScale * canvasWidth / 2;
-		viewportYScale = - fixScale * canvasHeight / 2;
-		viewportZScale = maxZVal / 2;
-
-		viewportXOffs = fixScale * canvasWidth / 2 + 0.5;
-		viewportYOffs = fixScale * canvasHeight / 2 + 0.5;
-		viewportZOffs = maxZVal / 2 + 0.5;
-
-		canvas.width = canvasWidth;
-		canvas.height = canvasHeight;
-
-		context.fillStyle = alpha ? "rgba(0, 0, 0, 0)" : clearColor.getStyle();
-		context.fillRect( 0, 0, canvasWidth, canvasHeight );
-
-		imagedata = context.getImageData( 0, 0, canvasWidth, canvasHeight );
-		data = imagedata.data;
-
-		zbuffer = new Int32Array( data.length / 4 );
-
-		numBlocks = canvasWBlocks * canvasHBlocks;
-		blockMaxZ = new Int32Array( numBlocks );
-		blockFlags = new Uint8Array( numBlocks );
-
-		for ( var i = 0, l = zbuffer.length; i < l; i ++ ) {
-
-			zbuffer[ i ] = maxZVal;
-
-		}
-
-		for ( var i = 0; i < numBlocks; i ++ ) {
-
-			blockFlags[ i ] = BLOCK_ISCLEAR;
-
-		}
-
-		clearColorBuffer( clearColor );
-
-	}
 
 	function clearColorBuffer( color ) {
 
@@ -1404,7 +1356,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			blockShift = 0;
 			blockSize = 1 << blockShift;
 
-			setSize( canvas.width, canvas.height );
+			_this.setSize( canvas.width, canvas.height );
 
 		}
 
