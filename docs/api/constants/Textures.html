@@ -33,9 +33,9 @@
 		[page:Constant CubeReflectionMapping] is the default for a [page:CubeTexture CubeTexture]. <br /><br />
 
 		[page:Constant EquirectangularReflectionMapping] and [page:Constant EquirectangularRefractionMapping]
-		are for use with an equirectangular environment map.  Also called a lat-long map, an equirectangular 
-		texture represents a 360-degree view along the horizontal centerline, and a 180-degree view along the 
-		vertical axis, with the top and bottom edges of the image corresponding to the north and south poles 
+		are for use with an equirectangular environment map.  Also called a lat-long map, an equirectangular
+		texture represents a 360-degree view along the horizontal centerline, and a 180-degree view along the
+		vertical axis, with the top and bottom edges of the image corresponding to the north and south poles
 		of a mapped sphere.<br /><br />
 
 		[page:Constant SphericalReflectionMapping] is for use with a spherical reflection map such as may be obtained
@@ -159,37 +159,33 @@
 		For use with a texture's [page:Texture.format format]	property, these define
 		how elements of a 2d texture, or *texels*, are read by shaders.<br /><br />
 
-		[page:constant AlphaFormat] discards the red, green and blue components and reads just the alpha component.
-		The [page:Texture.type type] must be [page:constant UnsignedByteType].<br /><br />
+		[page:constant AlphaFormat] discards the red, green and blue components and reads just the alpha component.<br /><br />
 
-		[page:constant RGBFormat] discards the alpha components and reads the red, green and blue components.
-		The [page:Texture.type type] must be [page:constant UnsignedByteType] or [page:constant UnsignedShort565Type].<br /><br />
+		[page:constant RGBFormat] discards the alpha components and reads the red, green and blue components.<br /><br />
 
-		[page:constant RGBAFormat] is the default and reads the red, green, blue and alpha components.
-		The [page:Texture.type type] must be [page:constant UnsignedByteType], [page:constant UnsignedShort4444Type] or [page:constant THREE.UnsignedShort5551Type].<br /><br />
+		[page:constant RGBAFormat] is the default and reads the red, green, blue and alpha components.<br /><br />
 
 		[page:constant LuminanceFormat] reads each element as a single luminance component.
 		 This is then converted to a floating point, clamped to the range [0,1], and then assembled
 		 into an RGBA element by placing the luminance value in the red, green and blue channels,
-		 and attaching 1.0 to the alpha channel. The [page:Texture.type type] must be [page:constant UnsignedByteType].<br /><br />
+		 and attaching 1.0 to the alpha channel.<br /><br />
 
 		[page:constant LuminanceAlphaFormat] reads each element as a luminance/alpha double.
 		The same process occurs as for the [page:constant LuminanceFormat], except that the
-		alpha channel may have values other than *1.0*. The [page:Texture.type type] must be [page:constant UnsignedByteType].<br /><br />
+		alpha channel may have values other than *1.0*.<br /><br />
 
 		[page:constant RGBEFormat] is identical to [page:constant RGBAFormat].<br /><br />
 
 		[page:constant DepthFormat] reads each element as a single depth value, converts it to floating point, and clamps to the range [0,1].
-		The [page:Texture.type type] must be [page:constant UnsignedIntType] or [page:constant UnsignedShortType].
 		This is the default for [page:DepthTexture DepthTexture].<br /><br />
 
 		[page:constant DepthStencilFormat] reads each element is a pair of depth and stencil values.
 		The depth component of the pair is interpreted as in [page:constant DepthFormat].
 		The stencil component is interpreted based on the depth + stencil internal format.
-		The [page:Texture.type type] must be [page:constant UnsignedInt248Type].<br /><br />
+		<br /><br />
 
 		Note that the texture must have the correct [page:Texture.type type] set, as described above.
-		See <a href="https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D">this page</a> for details.
+		See [link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D WebGLRenderingContext.texImage2D] for details.
 		</div>
 
 		<h2>DDS / ST3C Compressed Texture Formats</h2>
@@ -202,12 +198,10 @@
 		<div>
 		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
 		these require support for the
-		<a href="https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/">WEBGL_compressed_texture_s3tc</a>
-		extension. <br />
-		According to <a href="http://webglstats.com/">WebglStats</a>, as of February 2016
-		over 80% of WebGL enabled devices support this extension.<br /><br />
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc]
+		extension. <br /><br />
 
-		There are four <a href="https://en.wikipedia.org/wiki/S3_Texture_Compression">S3TC</a> formats available via this extension. These are:<br />
+		There are four [link:https://en.wikipedia.org/wiki/S3_Texture_Compression S3TC] formats available via this extension. These are:<br />
 		[page:constant RGB_S3TC_DXT1_Format]: A DXT1-compressed image in an RGB image format.<br />
 		[page:constant RGBA_S3TC_DXT1_Format]: A DXT1-compressed image in an RGB image format with a simple on/off alpha value.<br />
 		[page:constant RGBA_S3TC_DXT3_Format]: A DXT3-compressed image in an RGBA image format. Compared to a 32-bit RGBA texture, it offers 4:1 compression.<br />
@@ -223,14 +217,11 @@
 		</code>
 		<div>
 		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
-		these require support for the <a href="https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/">WEBGL_compressed_texture_pvrtc</a>
+		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/ WEBGL_compressed_texture_pvrtc]
 		extension. <br />
-		According to <a href="http://webglstats.com/">WebglStats</a>, as of February 2016
-		less than 8% of WebGL enabled devices support this extenstion.
-		PVRTC is typically only available on mobile devices with PowerVR chipsets,
-		which are mainly Apple devices.<br /><br />
+		PVRTC is typically only available on mobile devices with PowerVR chipsets, which are mainly Apple devices.<br /><br />
 
-		There are four <a href="https://en.wikipedia.org/wiki/PVRTC">PVRTC</a> formats available via this extension. These are:<br />
+		There are four [link:https://en.wikipedia.org/wiki/PVRTC PVRTC] formats available via this extension. These are:<br />
 		[page:constant RGB_PVRTC_4BPPV1_Format]: RGB compression in 4-bit mode. One block for each 4×4 pixels.<br />
 		[page:constant RGB_PVRTC_2BPPV1_Format]: RGB compression in 2-bit mode. One block for each 8×4 pixels.<br />
 		[page:constant RGBA_PVRTC_4BPPV1_Format]: RGBA compression in 4-bit mode. One block for each 4×4 pixels.<br />
@@ -243,10 +234,8 @@
 		</code>
 		<div>
 		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
-		these require support for the <a href="https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/">WEBGL_compressed_texture_etc1</a>
-		extension. <br />
-		According to <a href="http://webglstats.com/">WebglStats</a>, as of February 2016
-		just over 13% of WebGL enabled devices support this extenstion.<br /><br />
+		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
+		extension. <br /><br />
 		</div>
 
 		<h2>Encoding</h2>
