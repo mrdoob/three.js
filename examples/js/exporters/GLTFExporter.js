@@ -1101,14 +1101,6 @@ THREE.GLTFExporter.prototype = {
 
 				if ( targets.length > 0 ) primitive.targets = targets;
 
-				var material = processMaterial( materials[ groups[ i ].materialIndex ] );
-
-				if ( material !== null ) {
-
-					primitive.material = material;
-
-				}
-
 				if ( geometry.index !== null ) {
 
 					primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
@@ -1118,6 +1110,14 @@ THREE.GLTFExporter.prototype = {
 				// Skip meshes without exportable attributes
 				if ( Object.keys(primitive.attributes).length > 0 ) {
 
+					var material = processMaterial( materials[ groups[ i ].materialIndex ] );
+
+					if ( material !== null ) {
+	
+						primitive.material = material;
+	
+					}
+	
 					primitives.push( primitive );
 
 				}
