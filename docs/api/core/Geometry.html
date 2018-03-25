@@ -11,12 +11,14 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-		Base class for all geometries (but not for [page:BufferGeometry BufferGeometries]).<br />
-		This can also be used directly for building custom geometries.<br /><br />
-
-		Geometries are easier to work with than [page:BufferGeometry BufferGeometries] as they store
-		attributes such as vertices, faces, colors and so on directly (rather than in [page:BufferAttribute buffers]),
-		however they are generally slower.
+		<p>
+		Geometry is a user-friendly alternative to [page:BufferGeometry]. Geometries store attributes
+		(vertex positions, faces, colors, etc.) using objects like [page:Vector3] or [page:Color] that
+		are easier to read and edit, but less efficient than typed arrays.
+		</p>
+		<p>
+		Prefer [page:BufferGeometry] for large or serious projects.
+		</p>
 		</div>
 
 
