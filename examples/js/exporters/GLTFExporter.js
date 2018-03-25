@@ -425,12 +425,6 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processAccessor( attribute, geometry, start, count ) {
 
-			if ( ! outputJSON.accessors ) {
-
-				outputJSON.accessors = [];
-
-			}
-
 			var types = {
 
 				1: 'SCALAR',
@@ -484,6 +478,13 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			// Skip creating an accessor if the attribute doesn't have data to export
+			if ( count === 0) {
+
+				return -1;
+
+			}
+
 			var minMax = getMinMax( attribute, start, count );
 
 			var bufferViewTarget;
@@ -509,6 +510,12 @@ THREE.GLTFExporter.prototype = {
 				type: types[ attribute.itemSize ]
 
 			};
+
+			if ( ! outputJSON.accessors ) {
+
+				outputJSON.accessors = [];
+
+			}
 
 			outputJSON.accessors.push( gltfAccessor );
 
@@ -872,12 +879,6 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMesh( mesh ) {
 
-			if ( ! outputJSON.meshes ) {
-
-				outputJSON.meshes = [];
-
-			}
-
 			var geometry = mesh.geometry;
 
 			var mode;
@@ -962,8 +963,13 @@ THREE.GLTFExporter.prototype = {
 				}
 
 				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
+					
+					var accessor = processAccessor( attribute, geometry );
+					if ( accessor !== -1 ) {
 
-					attributes[ attributeName ] = processAccessor( attribute, geometry );
+						attributes[ attributeName ] = accessor;
+
+					}
 
 				}
 
@@ -1109,7 +1115,12 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				primitives.push( primitive );
+				// Skip meshes without exportable attributes
+				if ( Object.keys(primitive.attributes).length > 0 ) {
+
+					primitives.push( primitive );
+
+				}
 
 			}
 
@@ -1119,8 +1130,20 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			if ( primitives.length === 0 ) {
+
+				return -1;
+
+			}
+
 			gltfMesh.primitives = primitives;
 
+			if ( ! outputJSON.meshes ) {
+
+				outputJSON.meshes = [];
+
+			}
+			
 			outputJSON.meshes.push( gltfMesh );
 
 			return outputJSON.meshes.length - 1;
@@ -1420,7 +1443,13 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				gltfNode.mesh = processMesh( object );
+				var mesh = processMesh( object );
+
+				if ( mesh !== -1 ) {
+
+					gltfNode.mesh = mesh;
+
+				}
 
 			} else if ( object.isCamera ) {
 

@@ -26,6 +26,7 @@
 			<button id="export_scene">Export Scene1</button>
 			<button id="export_scenes">Export Scene1 and Scene 2</button>
 			<button id="export_object">Export Sphere</button>
+			<button id="export_empty">Export empty geometry</button>
 			<button id="export_obj">Export WaltHead</button>
 			<button id="export_objects">Export Sphere and Grid</button>
 			<button id="export_scene_object">Export Scene1 and Sphere</button>
@@ -88,6 +89,13 @@
 
 			} );
 
+
+			document.getElementById( 'export_empty' ).addEventListener( 'click', function () {
+
+			exportGLTF( empty );
+
+			} );
+
 			document.getElementById( 'export_object' ).addEventListener( 'click', function () {
 
 				exportGLTF( sphere );
@@ -145,7 +153,7 @@
 			var container;
 
 			var camera, object, scene1, scene2, renderer;
-			var gridHelper, sphere, waltHead;
+			var gridHelper, sphere, waltHead, empty;
 
 			init();
 			animate();
@@ -416,6 +424,24 @@
 				object.position.set( 340, -40, -200 );
 
 				scene1.add( object );
+
+				// ---------------------------------------------------------------------
+				// Empty buffer geometry
+				// ---------------------------------------------------------------------
+				var geometry = new THREE.BufferGeometry();
+				var numElements = 6;
+
+				var positions = new Float32Array( ( numElements ) * 3 );
+				var colors = new Float32Array( ( numElements ) * 3 );
+
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setDrawRange( 0, 0 );
+
+				empty = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
+				empty.name = 'Custom buffered empty (drawrange)';
+				scene1.add( empty );
+
 
 				// ---------------------------------------------------------------------
 				// Points
