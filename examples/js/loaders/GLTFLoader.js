@@ -2052,7 +2052,6 @@ THREE.GLTFLoader = ( function () {
 
 		return this.getDependencies( 'accessor' ).then( function ( accessors ) {
 
-			var geometries = [];
 			var pending = [];
 
 			for ( var i = 0, il = primitives.length; i < il; i ++ ) {
@@ -2067,11 +2066,7 @@ THREE.GLTFLoader = ( function () {
 				if ( cached ) {
 
 					// Use the cached geometry if it exists
-					pending.push( cached.then( function ( geometry ) {
-
-						geometries.push( geometry );
-
-					} ) );
+					pending.push( cached );
 
 				} else if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) {
 
@@ -2081,8 +2076,6 @@ THREE.GLTFLoader = ( function () {
 						.then( function ( geometry ) {
 
 							addPrimitiveAttributes( geometry, primitive, accessors );
-
-							geometries.push( geometry );
 
 							return geometry;
 
@@ -2099,25 +2092,23 @@ THREE.GLTFLoader = ( function () {
 
 					addPrimitiveAttributes( geometry, primitive, accessors );
 
+					var geometryPromise = Promise.resolve( geometry );
+
 					// Cache this geometry
 					cache.push( {
 
 						primitive: primitive,
-						promise: Promise.resolve( geometry )
+						promise: geometryPromise
 
 					} );
 
-					geometries.push( geometry );
+					pending.push( geometryPromise );
 
 				}
 
 			}
 
-			return Promise.all( pending ).then( function () {
-
-				return geometries;
-
-			} );
+			return Promise.all( pending );
 
 		} );
 
