@@ -6,7 +6,16 @@
 
 ### Source
 
+- Math
+    - Reduce memory usage of `generateUUID` (from 600B to 64B by uuid) #13595 ([@takahirox](https://github.com/takahirox))
+    - Remove `.index` intersection property in `raycast` result #13603 ([@Mugen87](https://github.com/Mugen87))
 ### Documentation
+
+- Improve `ParametricGeometry` #13591 ([@DonKarlssonSan](https://github.com/DonKarlssonSan))
+- Replace `GLTF2Loader` with `GLTFExporter` in `BrowserSupport` #13592 ([@takahirox](https://github.com/takahirox))
+- Fix position of cubes emission in `daydream/gearvr` ([@mrdoob](https://github.com/mrdoob))
+- Clean up `webgl_loader_gltf_extensions` #13596 ([@donmccurdy](https://github.com/donmccurdy))
+- Remove `webgl_lines_cubes` #13597 ([@WestLangley](https://github.com/WestLangley))
 
 ### Examples
 
