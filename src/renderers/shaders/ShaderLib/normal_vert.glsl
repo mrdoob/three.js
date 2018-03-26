@@ -2,13 +2,21 @@
 
 #if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )
 
+#if defined(NEEDSGLSL300)
+	out vec3 vViewPosition;
+#else
 	varying vec3 vViewPosition;
+#endif
 
 #endif
 
 #ifndef FLAT_SHADED
 
+#if defined(NEEDSGLSL300)
+	out vec3 vNormal;
+#else
 	varying vec3 vNormal;
+#endif
 
 #endif
 

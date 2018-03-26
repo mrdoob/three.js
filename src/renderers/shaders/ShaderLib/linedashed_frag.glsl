@@ -4,7 +4,15 @@ uniform float opacity;
 uniform float dashSize;
 uniform float totalSize;
 
+#if defined(NEEDSGLSL300)
+in float vLineDistance;
+#else
 varying float vLineDistance;
+#endif
+
+#if defined(NEEDSGLSL300)
+out vec4 glFragColor;
+#endif
 
 #include <common>
 #include <color_pars_fragment>
@@ -30,8 +38,11 @@ void main() {
 
 	outgoingLight = diffuseColor.rgb; // simple shader
 
+#if defined(NEEDSGLSL300)
+	glFragColor = vec4( outgoingLight, diffuseColor.a );
+#else
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
-
+#endif
 	#include <premultiplied_alpha_fragment>
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>

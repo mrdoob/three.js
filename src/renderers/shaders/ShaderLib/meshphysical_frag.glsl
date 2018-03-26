@@ -11,12 +11,24 @@ uniform float opacity;
 	uniform float clearCoatRoughness;
 #endif
 
+#if defined(NEEDSGLSL300)
+in vec3 vViewPosition;
+#else
 varying vec3 vViewPosition;
+#endif
 
 #ifndef FLAT_SHADED
 
+#if defined(NEEDSGLSL300)
+	in vec3 vNormal;
+#else
 	varying vec3 vNormal;
+#endif
 
+#endif
+
+#if defined(NEEDSGLSL300)
+out vec4 glFragColor;
 #endif
 
 #include <common>
@@ -75,7 +87,11 @@ void main() {
 
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
 
+#if defined(NEEDSGLSL300)
+	glFragColor = vec4( outgoingLight, diffuseColor.a );
+#else
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+#endif
 
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>

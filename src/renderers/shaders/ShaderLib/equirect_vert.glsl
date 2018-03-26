@@ -1,4 +1,8 @@
+#if defined(NEEDSGLSL300)
+out vec3 vWorldPosition;
+#else
 varying vec3 vWorldPosition;
+#endif
 
 #include <common>
 
