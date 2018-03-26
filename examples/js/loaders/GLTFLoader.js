@@ -2062,8 +2062,6 @@ THREE.GLTFLoader = ( function () {
 				// See if we've already created this geometry
 				var cached = getCachedGeometry( cache, primitive );
 
-				var geometry;
-
 				if ( cached ) {
 
 					// Use the cached geometry if it exists
@@ -2088,14 +2086,14 @@ THREE.GLTFLoader = ( function () {
 
 						} );
 
-					cache.push( { primitive: primitive, promise: geometryPromise  } );
+					cache.push( { primitive: primitive, promise: geometryPromise } );
 
 					pending.push( geometryPromise );
 
-				} else  {
+				} else {
 
 					// Otherwise create a new geometry
-					geometry = new THREE.BufferGeometry();
+					var geometry = new THREE.BufferGeometry();
 
 					addPrimitiveAttributes( geometry, primitive, accessors );
 
