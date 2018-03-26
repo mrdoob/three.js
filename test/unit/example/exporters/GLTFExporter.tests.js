@@ -143,12 +143,12 @@ export default QUnit.module( 'Exporters', () => {
 
       exporter.parse( scene, function ( gltf ) {
 
-        assert.equal( result.meshes, undefined, 'empty meshes');
-        assert.equal( result.materials, undefined, 'empty materials');
-        assert.equal( result.bufferViews, undefined, 'empty bufferViews');
-        assert.equal( result.buffers, undefined, 'buffers');
-        assert.equal( result.accessors, undefined, 'accessors');
-        assert.equal( result.nodes[0].mesh, undefined, 'nodes[0].mesh');
+        assert.equal( gltf.meshes, undefined, 'empty meshes');
+        assert.equal( gltf.materials, undefined, 'empty materials');
+        assert.equal( gltf.bufferViews, undefined, 'empty bufferViews');
+        assert.equal( gltf.buffers, undefined, 'buffers');
+        assert.equal( gltf.accessors, undefined, 'accessors');
+        assert.equal( gltf.nodes[0].mesh, undefined, 'nodes[0].mesh');
 
         done();
 
