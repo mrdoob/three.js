@@ -2,6 +2,24 @@
 
 ## r91
 
+### Migration
+
+- `Geometry.center()` and `BufferGeometry.center()` now return `this` instead of `offset`.
+- `optionalTargets` are now mandatory method parameters (with exception of curve classes).
+- Split `ShaderChunk.lights_pars` into `ShaderChunks.lights_pars_begin` and `ShaderChunks.lights_pars_maps`.
+- Split `ShaderChunk.lights_template` into `ShaderChunks.lights_fragment_begin`, `ShaderChunnks.lights_fragment_maps` and `ShaderChunks.lights_fragment_end`.
+- Split `ShaderChunk.normal_fragment` into `ShaderChunks.normal_fragment_begin` and `ShaderChunks.normal_fragment_maps`.
+- The semantics of `AnimationAction.repetition` has changed. The first run of the animation is now taken into account.
+- Removed `copyIndicesArray()` from `BufferAttribute`.
+- Removed `getWorldRotation()` from `Object3D`
+- Renamed `Triangle.area()` to `Triangle.getArea()`
+- Renamed `Triangle.barycoordFromPoint()` to `Triangle.getBarycoord()`
+- Renamed `Triangle.midpoint()` to `Triangle.getMidpoint()`
+- Renamed `Triangle.normal()` to `Triangle.getNormal()`
+- Renamed `Triangle.plane()` to `Triangle.getPlane()`
+- Removed options `material` and `extrudeMaterial` from `ExtrudeGeometry`
+- Removed `vertices` from `renderer.info.render`.
+
 ### Source
 
 - Global
