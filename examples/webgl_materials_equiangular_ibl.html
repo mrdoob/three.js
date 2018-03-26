@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - materials - equiangular exr image based lighting</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				color: #fff;
+
+				background-color: #000;
+
+				margin: 0px;
+				overflow: hidden;
+			}
+			a { color: #00f }
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Example of an IBL (Image based lighting) pipeline based around<br> equiangular EXR lightprobe data. Created by <a href="https://github.com/richardmonette" target="_blank" rel="noopener">Richard Monette</a></div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/loaders/EXRLoader.js"></script>
+		<script src="js/loaders/EquiangularToCubeGenerator.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+			var params = {
+				envMap: "EXR",
+				roughness: 0.1,
+				metalness: 0.5,
+				exposure: 1.0
+			};
+			var camera, scene, renderer, controls, objects = [];
+			var standardMaterial, floorMaterial;
+			var pngCubeRenderTarget, exrCubeRenderTarget;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0.0, 0, 120 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.toneMapping = THREE.LinearToneMapping;
+
+				standardMaterial = new THREE.MeshStandardMaterial( {
+					map: null,
+					color: 0x000000,
+					metalness: 1.0,
+					roughness: 0.0,
+					envMapIntensity: 10.0
+				} );
+
+				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
+
+				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+				torusMesh1.position.x = 0.0;
+
+				scene.add( torusMesh1 );
+				objects.push( torusMesh1 );
+
+				floorMaterial = new THREE.MeshStandardMaterial( {
+					map: null,
+					roughnessMap: null,
+					color: 0xffffff,
+					metalness: 0.0,
+					roughness: 0.0
+				} );
+
+				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
+				planeMesh1.position.y = - 50;
+				planeMesh1.rotation.x = - Math.PI * 0.5;
+				planeMesh1.receiveShadow = true;
+				scene.add( planeMesh1 );
+
+				new THREE.EXRLoader().load( "textures/piz_compressed.exr", function ( texture ) {
+
+					texture.minFilter = THREE.NearestFilter;
+					texture.magFilter = THREE.NearestFilter;
+
+					var cubemapGenerator = new THREE.EquiangularToCubeGenerator( texture, 512 );
+					var cubeMapTexture = cubemapGenerator.generate( renderer );
+
+					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					exrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+				} );
+
+				new THREE.TextureLoader().load( "textures/equiangular.png", function ( texture ) {
+
+					var cubemapGenerator = new THREE.EquiangularToCubeGenerator( texture, 512 );
+					var cubeMapTexture = cubemapGenerator.generate( renderer );
+
+					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					pngCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+				} );
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = false;
+				renderer.gammaOutput = true;
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				var gui = new dat.GUI();
+
+				gui.add( params, 'envMap', [ 'EXR', 'PNG' ] );
+				gui.add( params, 'roughness', 0, 1 );
+				gui.add( params, 'metalness', 0, 1 );
+				gui.add( params, 'exposure', 0, 2 );
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				if ( standardMaterial !== undefined ) {
+
+					standardMaterial.roughness = params.roughness;
+					standardMaterial.metalness = params.metalness;
+
+					var newEnvMap = standardMaterial.envMap;
+
+					switch( params.envMap ) {
+
+						case 'EXR': newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null; break;
+						case 'PNG': newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null; break;
+
+					}
+
+					if( newEnvMap !== standardMaterial.envMap ) {
+
+						standardMaterial.envMap = newEnvMap;
+						standardMaterial.needsUpdate = true;
+
+						floorMaterial.emissive = new THREE.Color( 1, 1, 1 );
+						floorMaterial.emissiveMap = newEnvMap;
+						floorMaterial.needsUpdate = true;
+
+					}
+				}
+
+				renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );
+
+				camera.lookAt( scene.position );
+
+				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+					var object = objects[ i ];
+					object.rotation.y += 0.005;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
