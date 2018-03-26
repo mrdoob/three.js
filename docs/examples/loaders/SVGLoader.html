@@ -19,20 +19,16 @@
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.PDBLoader();
+		var loader = new THREE.SVGLoader();
 
-		// load a PDB resource
+		// load a SVG resource
 		loader.load(
 			// resource URL
-			'models/molecules/caffeine.pdb',
+			'data/svgSample.svg',
 			// called when the resource is loaded
-			function ( pdb ) {
+			function ( doc ) {
 
-				var geometryAtoms = pdb.geometryAtoms;
-				var geometryBonds = pdb.geometryBonds;
-				var json = pdb.json;
-
-				console.log( 'This molecule has ' + json.atoms.length + ' atoms' );
+				scene.add( new THREE.SVGObject(doc) );
 
 			},
 			// called when loading is in progresses
