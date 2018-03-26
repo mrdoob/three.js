@@ -52,7 +52,7 @@
 			var params = {
 				envMap: "EXR",
 				roughness: 0.1,
-				metalness: 0.5,
+				metalness: 0.95,
 				exposure: 1.0
 			};
 			var camera, scene, renderer, controls, objects = [];
@@ -78,10 +78,10 @@
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
-					color: 0x000000,
-					metalness: 1.0,
-					roughness: 0.0,
-					envMapIntensity: 10.0
+					color: 0xffffff,
+					metalness: 0.95,
+					roughness: 0.1,
+					envMapIntensity: 1.0
 				} );
 
 				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
@@ -92,12 +92,8 @@
 				scene.add( torusMesh1 );
 				objects.push( torusMesh1 );
 
-				floorMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					roughnessMap: null,
-					color: 0xffffff,
-					metalness: 0.0,
-					roughness: 0.0
+				floorMaterial = new THREE.MeshBasicMaterial( {
+					color: 0xffffff
 				} );
 
 				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
@@ -208,8 +204,7 @@
 						standardMaterial.envMap = newEnvMap;
 						standardMaterial.needsUpdate = true;
 
-						floorMaterial.emissive = new THREE.Color( 1, 1, 1 );
-						floorMaterial.emissiveMap = newEnvMap;
+						floorMaterial.map = newEnvMap;
 						floorMaterial.needsUpdate = true;
 
 					}
