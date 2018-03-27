@@ -1361,6 +1361,9 @@ THREE.GLTFLoader = ( function () {
 	 */
 	function isCombinable( primitives ) {
 
+		// Returns true if all primitives use the same attributes/morphAttributes/mode
+		// and also have index. Otherwise returns false.
+
 		var primitive0 = primitives[ 0 ];
 		var targets0 = primitive0.targets || [];
 
