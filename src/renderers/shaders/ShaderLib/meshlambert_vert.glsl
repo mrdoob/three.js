@@ -1,10 +1,18 @@
 #define LAMBERT
 
+#if defined(NEEDSGLSL300)
+out vec3 vLightFront;
+#else
 varying vec3 vLightFront;
+#endif
 
 #ifdef DOUBLE_SIDED
 
+#if defined(NEEDSGLSL300)
+	out vec3 vLightBack;
+#else
 	varying vec3 vLightBack;
+#endif
 
 #endif
 

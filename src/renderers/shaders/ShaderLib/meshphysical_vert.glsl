@@ -1,10 +1,18 @@
 #define PHYSICAL
 
+#if defined(NEEDSGLSL300)
+out vec3 vViewPosition;
+#else
 varying vec3 vViewPosition;
+#endif
 
 #ifndef FLAT_SHADED
 
+#if defined(NEEDSGLSL300)
+	out vec3 vNormal;
+#else
 	varying vec3 vNormal;
+#endif
 
 #endif
 

@@ -251,6 +251,10 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 
 	function createProgram() {
 
+		var attribute = renderer.needsGLSL300 ? 'in' : 'attribute';
+		var varying = renderer.needsGLSL300 ? 'out' : 'varying';
+
+
 		var program = gl.createProgram();
 
 		var vertexShader = gl.createShader( gl.VERTEX_SHADER );
@@ -270,11 +274,11 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			'uniform vec2 uvOffset;',
 			'uniform vec2 uvScale;',
 
-			'attribute vec2 position;',
-			'attribute vec2 uv;',
+			attribute + ' vec2 position;',
+			attribute + ' vec2 uv;',
 
-			'varying vec2 vUV;',
-			'varying float fogDepth;',
+			varying + ' vec2 vUV;',
+			varying + ' float fogDepth;',
 
 			'void main() {',
 
@@ -316,8 +320,8 @@ function WebGLSpriteRenderer( renderer, gl, state, textures, capabilities ) {
 			'uniform float fogFar;',
 			'uniform float alphaTest;',
 
-			'varying vec2 vUV;',
-			'varying float fogDepth;',
+			varying + ' vec2 vUV;',
+			varying + ' float fogDepth;',
 
 			'void main() {',
 

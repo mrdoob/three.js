@@ -626,11 +626,32 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var glFormat = utils.convert( renderTarget.texture.format );
 		var glType = utils.convert( renderTarget.texture.type );
+
+/*
 		state.texImage2D( textureTarget, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+*/
 
+		var glInternalFormat = glFormat;
+
+		if (_isWebGL2 && glFormat == _gl.RGBA && glType == _gl.FLOAT) {
+			glInternalFormat = _gl.RGBA32F;
+		} else if (_isWebGL2 && glFormat == _gl.RGBA && glType == _gl.HALF_FLOAT) {
+			glInternalFormat = _gl.RGBA16F;
+		}
+
+		if (_isWebGL2) {
+			var ary = new Uint8Array(renderTarget.width * renderTarget.height * 4);
+		} else {
+			var ary = null;
+		}
+		state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, ary );
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+		var t = properties.get( renderTarget.texture );
+		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, t.__webglTexture, 0 );
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 	}
 
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer

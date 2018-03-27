@@ -3,21 +3,33 @@
 	#if NUM_DIR_LIGHTS > 0
 
 		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];
+	#if defined(NEEDSGLSL300)
+		in vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
+	#else
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
+	#endif
 
 	#endif
 
 	#if NUM_SPOT_LIGHTS > 0
 
 		uniform sampler2D spotShadowMap[ NUM_SPOT_LIGHTS ];
+	#if defined(NEEDSGLSL300)
+		in vec4 vSpotShadowCoord[ NUM_SPOT_LIGHTS ];
+	#else
 		varying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHTS ];
+	#endif
 
 	#endif
 
 	#if NUM_POINT_LIGHTS > 0
 
 		uniform sampler2D pointShadowMap[ NUM_POINT_LIGHTS ];
+	#if defined(NEEDSGLSL300)
+		in vec4 vPointShadowCoord[ NUM_POINT_LIGHTS ];
+	#else
 		varying vec4 vPointShadowCoord[ NUM_POINT_LIGHTS ];
+	#endif
 
 	#endif
 
