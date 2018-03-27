@@ -1353,6 +1353,114 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
+	/**
+	 * Checks if we can build a single Mesh with MultiMaterial from the primitives.
+	 *
+	 * @param {Array<Object>} primitives whose length is > 1
+	 * @return {Boolean}
+	 */
+	function isCombinable( primitives ) {
+
+		var primitive0 = primitives[ 0 ];
+		var targets0 = primitive0.targets || [];
+
+		if ( primitive0.indices === undefined ) return false;
+
+		for ( var i = 1, il = primitives.length; i < il; i ++ ) {
+
+			var primitive = primitives[ i ];
+
+			if ( primitive0.mode !== primitive.mode ) return false;
+			if ( primitive.indices === undefined ) return false;
+
+			if ( Object.keys( primitive0.attributes ).length !== Object.keys( primitive.attributes ).length ) return false;
+
+			for ( var key in primitive0.attributes ) {
+
+				if ( primitive0.attributes[ key ] !== primitive.attributes[ key ] ) return false;
+
+			}
+
+			var targets = primitive.targets || [];
+
+			if ( targets0.length !== targets.length ) return false;
+
+			if ( targets0.length > 0 ) {
+
+				if ( Object.keys( targets0[ 0 ] ).length !== Object.keys( targets[ 0 ] ).length ) return false;
+
+				for ( var j = 0, jl = targets0.length; j < jl; j ++ ) {
+
+					for ( key in targets0[ j ] ) {
+
+						if ( targets0[ j ][ key ] !== targets[ j ][ key ] ) return false;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * Builds a single Mesh with MultiMaterial from meshes.
+	 *
+	 * @param {Array<THREE.Object3D>} meshes whose length is > 1
+	 * @param {Array<Object>} primitives whose length is same as the meshes'
+	 * @param {Array<THREE.Material>} materials
+	 * @return {Object3D}
+	 */
+	function combineMeshes( meshes, primitives, materials ) {
+
+		var newGeometry = meshes[ 0 ].geometry.clone();
+		var newMaterials = [];
+		var indices = []
+		var offset = 0;
+
+		var hasMorphTargets = Object.keys( newGeometry.morphAttributes ).length > 0;
+		var hasMorphNormals = hasMorphTargets && ( newGeometry.morphAttributes.normal !== undefined );
+
+		for ( var i = 0, il = meshes.length; i < il; i ++ ) {
+
+			var mesh = meshes[ i ];
+			var primitive = primitives[ i ];
+
+			var index = mesh.geometry.index;
+			var material = materials[ primitive.material ];
+
+			if ( mesh.isSkinnedMesh ) material.skinning = true;
+			if ( hasMorphTargets ) material.morphTargets = true;
+			if ( hasMorphNormals ) material.morphNormals = true;
+
+			newGeometry.addGroup( offset, index.count, i );
+			newMaterials.push( material );
+
+			for ( var j = 0, jl = index.array.length; j < jl; j ++ ) {
+
+				indices.push( index.array[ j ] );
+
+			}
+
+			offset += index.count;
+
+		}
+
+		newGeometry.setIndex( indices );
+
+		var newMesh = new meshes[ 0 ].constructor( newGeometry, newMaterials );
+
+		newMesh.morphTargetDictionary = Object.assign( {}, meshes[ 0 ].morphTargetDictionary );
+		newMesh.name = meshes[ 0 ].name.slice( 0, meshes[ 0 ].name.lastIndexOf( '_' ) );
+
+		return newMesh;
+
+	}
+
 	/* GLTF PARSER */
 
 	function GLTFParser( json, extensions, options ) {
@@ -2310,6 +2418,12 @@ THREE.GLTFLoader = ( function () {
 						return mesh;
 
 					}
+
+				}
+
+				if ( isCombinable( primitives ) ) {
+
+					return combineMeshes( group.children, primitives, dependencies.materials );
 
 				}
 
