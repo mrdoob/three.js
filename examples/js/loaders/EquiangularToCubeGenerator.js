@@ -18,7 +18,7 @@ THREE.EquiangularToCubeGenerator = function( sourceTexture, resolution ) {
 
 	this.camera = new THREE.PerspectiveCamera( 90, 1, 0.1, 10 );
 	this.boxMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), this.getShader() );
-	this.boxMesh.material.side = THREE.DoubleSide;
+	this.boxMesh.material.side = THREE.BackSide;
 	this.scene = new THREE.Scene();
 	this.scene.add( this.boxMesh );
 
