@@ -245,7 +245,7 @@ function convertToGLSL1( string, type ) {
 function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
 	var gl = renderer.context;
 
-	var isWebGL2 = gl && typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+	var isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
         this.needsGLSL300 = isWebGL2 & material.needsGLSL300;
 
 	this.generateExtensions = function( extensions, parameters, rendererExtensions ) {
