@@ -1,5 +1,5 @@
 #if defined( DITHERING )
 
-  gl_FragColor.rgb = dithering( gl_FragColor.rgb );
+  glFragColor.rgb = dithering( glFragColor.rgb );
 
 #endif

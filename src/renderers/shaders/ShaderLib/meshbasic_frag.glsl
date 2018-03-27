@@ -3,9 +3,11 @@ uniform float opacity;
 
 #ifndef FLAT_SHADED
 
-	varying vec3 vNormal;
+	in vec3 vNormal;
 
 #endif
+
+out vec4 glFragColor;
 
 #include <common>
 #include <color_pars_fragment>
@@ -56,7 +58,7 @@ void main() {
 
 	#include <envmap_fragment>
 
-	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	glFragColor = vec4( outgoingLight, diffuseColor.a );
 
 	#include <premultiplied_alpha_fragment>
 	#include <tonemapping_fragment>

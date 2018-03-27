@@ -1,7 +1,7 @@
 uniform float scale;
-attribute float lineDistance;
+in float lineDistance;
 
-varying float vLineDistance;
+out float vLineDistance;
 
 #include <common>
 #include <color_pars_vertex>

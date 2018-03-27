@@ -1,1 +1,1 @@
-  gl_FragColor = linearToOutputTexel( gl_FragColor );
+  glFragColor = linearToOutputTexel( glFragColor );

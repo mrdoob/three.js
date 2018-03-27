@@ -4,7 +4,9 @@ uniform float opacity;
 uniform float dashSize;
 uniform float totalSize;
 
-varying float vLineDistance;
+in float vLineDistance;
+
+out vec4 glFragColor;
 
 #include <common>
 #include <color_pars_fragment>
@@ -30,7 +32,7 @@ void main() {
 
 	outgoingLight = diffuseColor.rgb; // simple shader
 
-	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	glFragColor = vec4( outgoingLight, diffuseColor.a );
 
 	#include <premultiplied_alpha_fragment>
 	#include <tonemapping_fragment>

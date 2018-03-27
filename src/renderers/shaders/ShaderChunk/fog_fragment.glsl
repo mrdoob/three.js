@@ -10,6 +10,6 @@
 
 	#endif
 
-	gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+	glFragColor.rgb = mix( glFragColor.rgb, fogColor, fogFactor );
 
 #endif
