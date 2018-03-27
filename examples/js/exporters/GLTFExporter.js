@@ -1070,6 +1070,8 @@ THREE.GLTFExporter.prototype = {
 			var forceIndices = options.forceIndices;
 			var isMultiMaterial = Array.isArray( mesh.material );
 
+			if ( isMultiMaterial && mesh.geometry.groups.length === 0 ) return null;
+
 			if ( ! forceIndices && geometry.index === null && isMultiMaterial ) {
 
 				// temporal workaround.
@@ -1129,12 +1131,6 @@ THREE.GLTFExporter.prototype = {
 			if ( didForceIndices ) {
 
 				geometry.setIndex( null );
-
-			}
-
-			if ( primitives.length === 0 ) {
-
-				return null;
 
 			}
 
