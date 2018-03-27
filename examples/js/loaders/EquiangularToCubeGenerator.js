@@ -17,10 +17,10 @@ THREE.EquiangularToCubeGenerator = function( sourceTexture, resolution ) {
 	];
 
 	this.camera = new THREE.PerspectiveCamera( 90, 1, 0.1, 10 );
-	this.planeMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), this.getShader() );
-	this.planeMesh.material.side = THREE.DoubleSide;
+	this.boxMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), this.getShader() );
+	this.boxMesh.material.side = THREE.DoubleSide;
 	this.scene = new THREE.Scene();
-	this.scene.add( this.planeMesh );
+	this.scene.add( this.boxMesh );
 	this.scene.add( this.camera );
 
 };
@@ -96,13 +96,7 @@ THREE.EquiangularToCubeGenerator.prototype = {
     			vec3 color = texture2D(equirectangularMap, uv).rgb;\n\
     			\n\
 					gl_FragColor = vec4( color, 1.0 );\n\
-				}",
-			blending: THREE.CustomBlending,
-			blendSrc: THREE.OneFactor,
-			blendDst: THREE.ZeroFactor,
-			blendSrcAlpha: THREE.OneFactor,
-			blendDstAlpha: THREE.ZeroFactor,
-			blendEquation: THREE.AddEquation
+				}"
 		} );
 
 	}
