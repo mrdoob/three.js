@@ -107,6 +107,7 @@
 
 					texture.minFilter = THREE.NearestFilter;
 					texture.magFilter = THREE.NearestFilter;
+					texture.encoding = THREE.LinearEncoding;
 
 					var cubemapGenerator = new THREE.EquiangularToCubeGenerator( texture, 512 );
 					var cubeMapTexture = cubemapGenerator.generate( renderer );
@@ -122,6 +123,8 @@
 				} );
 
 				new THREE.TextureLoader().load( "textures/equiangular.png", function ( texture ) {
+
+					texture.encoding = THREE.sRGBEncoding;
 
 					var cubemapGenerator = new THREE.EquiangularToCubeGenerator( texture, 512 );
 					var cubeMapTexture = cubemapGenerator.generate( renderer );
