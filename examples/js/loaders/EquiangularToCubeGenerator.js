@@ -17,7 +17,7 @@ THREE.EquiangularToCubeGenerator = function( sourceTexture, resolution ) {
 	];
 
 	this.camera = new THREE.PerspectiveCamera( 90, 1, 0.1, 10 );
-	this.planeMesh = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), this.getShader() );
+	this.planeMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), this.getShader() );
 	this.planeMesh.material.side = THREE.DoubleSide;
 	this.scene = new THREE.Scene();
 	this.scene.add( this.planeMesh );
@@ -32,14 +32,14 @@ THREE.EquiangularToCubeGenerator.prototype = {
 	generate: function( renderer ) {
 
 		var params = {
-			format: this.sourceTexture.format,
+			format: THREE.RGBAFormat,
 			magFilter: this.sourceTexture.magFilter,
 			minFilter: this.sourceTexture.minFilter,
 			type: this.sourceTexture.type,
 			generateMipmaps: this.sourceTexture.generateMipmaps,
 			anisotropy: this.sourceTexture.anisotropy,
 			encoding: this.sourceTexture.encoding
-		 };
+		};
 
 		var renderTarget = new THREE.WebGLRenderTargetCube( this.resolution, this.resolution, params );
 
