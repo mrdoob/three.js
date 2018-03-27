@@ -15,7 +15,6 @@
  *  bevelSegments: <int>, // number of bevel layers
  *
  *  extrudePath: <THREE.Curve> // curve to extrude shape along
- *  frames: <Object> // containing arrays of tangents, normals, binormals
  *
  *  UVGenerator: <Object> // object that provides UV generator functions
  *
@@ -160,7 +159,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		// TODO1 - have a .isClosed in spline?
 
-		splineTube = options.frames !== undefined ? options.frames : extrudePath.computeFrenetFrames( steps, false );
+		splineTube = extrudePath.computeFrenetFrames( steps, false );
 
 		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
