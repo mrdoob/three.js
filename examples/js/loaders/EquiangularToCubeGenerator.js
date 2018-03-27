@@ -21,7 +21,6 @@ THREE.EquiangularToCubeGenerator = function( sourceTexture, resolution ) {
 	this.boxMesh.material.side = THREE.DoubleSide;
 	this.scene = new THREE.Scene();
 	this.scene.add( this.boxMesh );
-	this.scene.add( this.camera );
 
 };
 
@@ -49,9 +48,9 @@ THREE.EquiangularToCubeGenerator.prototype = {
 
 			var v = this.views[i];
 
-			this.camera.position.set(0, 0, 0);
-			this.camera.up.set(v.u[0], v.u[1], v.u[2]);
-			this.camera.lookAt(new THREE.Vector3(v.t[0], v.t[1], v.t[2]));
+			this.camera.position.set( 0, 0, 0 );
+			this.camera.up.set( v.u[ 0 ], v.u[ 1 ], v.u[ 2 ] );
+			this.camera.lookAt( v.t[ 0 ], v.t[ 1 ], v.t[ 2 ] );
 
 			this.camera.updateProjectionMatrix();
 
