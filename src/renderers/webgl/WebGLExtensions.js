@@ -62,7 +62,8 @@ function WebGLExtensions( gl ) {
 						  'OES_element_index_uint',
 						  'OES_standard_derivatives',
 						  'EXT_frag_depth',
-						  'EXT_shader_texture_lod' ].indexOf( name ) >= 0 ) {
+						  'EXT_shader_texture_lod',
+						  'EXT_blend_minmax' ].indexOf( name ) >= 0 ) {
 
 						extension = gl;
 

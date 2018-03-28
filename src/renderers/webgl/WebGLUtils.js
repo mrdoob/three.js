@@ -131,8 +131,8 @@ function WebGLUtils( gl, extensions ) {
 
 			if ( extension !== null ) {
 
-				if ( p === MinEquation ) return extension.MIN_EXT;
-				if ( p === MaxEquation ) return extension.MAX_EXT;
+				if ( p === MinEquation ) return isWebGL2 ? extension.MIN : extension.MIN_EXT;
+				if ( p === MaxEquation ) return isWebGL2 ? extension.MAX : extension.MAX_EXT;
 
 			}
 
