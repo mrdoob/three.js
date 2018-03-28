@@ -6,6 +6,8 @@ import { MaxEquation, MinEquation, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, R
 
 function WebGLUtils( gl, extensions ) {
 
+	var isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext );
+
 	function convert( p ) {
 
 		var extension;
@@ -38,7 +40,6 @@ function WebGLUtils( gl, extensions ) {
 
 			extension = extensions.get( 'OES_texture_half_float' );
 
-			var isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext );
 			return isWebGL2 ? gl.HALF_FLOAT : extension.HALF_FLOAT_OES;
 
 		}
