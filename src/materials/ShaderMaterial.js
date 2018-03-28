@@ -34,6 +34,8 @@ function ShaderMaterial( parameters ) {
 	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
 	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
 
+	this.isGLSL3 = false;
+
 	this.linewidth = 1;
 
 	this.wireframe = false;

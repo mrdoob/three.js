@@ -518,6 +518,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	if ( isWebGL2 && ! material.isRawShaderMaterial ) {
 
+		var isGLSL3ShaderMaterial = material.isShaderMaterial && material.isGLSL3;
+
 		// GLSL 3.0 conversion
 		prefixVertex = [
 			'#version 300 es\n',
@@ -529,8 +531,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 		prefixFragment = [
 			'#version 300 es\n',
 			'#define varying in',
-			'out highp vec4 pc_fragColor;',
-			'#define gl_FragColor pc_fragColor',
+			isGLSL3ShaderMaterial ? '' : 'out highp vec4 pc_fragColor;',
+			isGLSL3ShaderMaterial ? '' : '#define gl_FragColor pc_fragColor',
 			'#define gl_FragDepthEXT gl_FragDepth',
 			'#define texture2D texture',
 			'#define textureCube texture',
