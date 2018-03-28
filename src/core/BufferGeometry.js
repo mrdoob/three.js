@@ -642,7 +642,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				for ( var i = 0; i < count; i ++ ) {
 
-					vector.set( position.getX( i ), position.getY( i ), position.getZ( i ) );
+					vector.fromBufferAttribute( position, i );
 
 					var distance = center.distanceToSquared( vector );
 
