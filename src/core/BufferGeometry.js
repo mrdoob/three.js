@@ -619,8 +619,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		var box = new Box3();
 		var vector = new Vector3();
 
-		return function computeBoundingSphere() {
-
+		return function ()
+		{
 			if ( this.boundingSphere === null ) {
 
 				this.boundingSphere = new Sphere();
@@ -636,27 +636,24 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 				box.setFromBufferAttribute( position );
 				box.getCenter( center );
 
-				// hoping to find a boundingSphere with a radius smaller than the
-				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
-
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = position.count; i < il; i ++ ) {
+				var count = position.count;
 
-					vector.x = position.getX( i );
-					vector.y = position.getY( i );
-					vector.z = position.getZ( i );
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+				for ( var i = 0; i < count; i ++ ) {
 
+					vector.fromBufferAttribute( position, i );
+
+					var distance = center.distanceToSquared( vector );
+
+					if( distance > maxRadiusSq ) {
+
+						maxRadiusSq = distance;
+
+					}
 				}
 
 				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
-				if ( isNaN( this.boundingSphere.radius ) ) {
-
-					console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
-
-				}
 
 			}
 
