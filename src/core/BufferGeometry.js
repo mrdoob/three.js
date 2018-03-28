@@ -616,14 +616,14 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	computeBoundingSphere: function () {
 
-		var box = new THREE.Box3();
-		var vector = new THREE.Vector3();
+		var box = new Box3();
+		var vector = new Vector3();
 
 		return function ()
 		{
 			if ( this.boundingSphere === null ) {
 
-				this.boundingSphere = new THREE.Sphere();
+				this.boundingSphere = new Sphere();
 
 			}
 
