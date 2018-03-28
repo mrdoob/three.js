@@ -60,7 +60,8 @@ function WebGLExtensions( gl ) {
 						  'OES_texture_half_float',
 						  'OES_texture_half_float_linear',
 						  'OES_element_index_uint',
-						  'OES_standard_derivatives' ].indexOf( name ) >= 0 ) {
+						  'OES_standard_derivatives',
+						  'EXT_frag_depth' ].indexOf( name ) >= 0 ) {
 
 						extension = gl;
 

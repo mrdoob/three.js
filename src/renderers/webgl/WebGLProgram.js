@@ -85,7 +85,7 @@ function generateExtensions( extensions, parameters, rendererExtensions, isWebGL
 
 	var chunks = [
 		( ! isWebGL2 && ( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ) ? '#extension GL_OES_standard_derivatives : enable' : '',
-		( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
+		( ! isWebGL2 && ( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ) ? '#extension GL_EXT_frag_depth : enable' : '',
 		( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
 		( ! isWebGL2 && ( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ) ? '#extension GL_EXT_shader_texture_lod : enable' : ''
 	];
@@ -532,6 +532,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			'#define varying in',
 			'out highp vec4 pc_fragColor;',
 			'#define gl_FragColor pc_fragColor',
+			'#define gl_FragDepthEXT gl_FragDepth',
 			'#define texture2D texture',
 			'#define textureCube texture',
 			'#define texture2DProj textureProj',
