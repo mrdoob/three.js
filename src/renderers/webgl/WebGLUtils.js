@@ -142,7 +142,7 @@ function WebGLUtils( gl, extensions ) {
 
 			extension = extensions.get( 'WEBGL_depth_texture' );
 
-			if ( extension !== null ) return extension.UNSIGNED_INT_24_8_WEBGL;
+			if ( extension !== null ) return isWebGL2 ? extension.UNSIGNED_INT_24_8 : extension.UNSIGNED_INT_24_8_WEBGL;
 
 		}
 
