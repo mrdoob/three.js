@@ -528,7 +528,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			'#define texture2D texture'
 		].join( '\n' );
 
-		var gles3PS = [
+		var gles3FS = [
 			'#define varying in',
 			'out highp vec4 pc_fragColor;',
 			'#define gl_FragColor pc_fragColor',
@@ -544,7 +544,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 		].join( '\n' );
 
 		vertexGlsl = '#version 300 es\n' + gles3VS + '\n' + vertexGlsl;
-		fragmentGlsl = '#version 300 es\n' + gles3PS + '\n' + fragmentGlsl;
+		fragmentGlsl = '#version 300 es\n' + gles3FS + '\n' + fragmentGlsl;
 
 	}
 
