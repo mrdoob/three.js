@@ -99,8 +99,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getInternalFormat( glFormat, glType ) {
 
-		if ( _isWebGL2 && glFormat === _gl.RGBA && glType === _gl.FLOAT ) return _gl.RGBA32F;
-		if ( _isWebGL2 && glFormat === _gl.RGBA && glType === _gl.HALF_FLOAT ) return _gl.RGBA16F;
+		if ( ! _isWebGL2 ) return glFormat;
+
+		if ( glFormat === _gl.RGBA && glType === _gl.FLOAT ) return _gl.RGBA32F;
+		if ( glFormat === _gl.RGBA && glType === _gl.HALF_FLOAT ) return _gl.RGBA16F;
 
 		return glFormat;
 
