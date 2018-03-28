@@ -97,6 +97,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function getInternalFormat( glFormat, glType ) {
+
+		if ( _isWebGL2 && glFormat === _gl.RGBA && glType === _gl.FLOAT ) return _gl.RGBA32F;
+		if ( _isWebGL2 && glFormat === _gl.RGBA && glType === _gl.HALF_FLOAT ) return _gl.RGBA16F;
+
+		return glFormat;
+
+	}
+
 	// Fallback filters for non-power-of-2 textures
 
 	function filterFallback( f ) {
@@ -465,6 +474,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			glFormat = utils.convert( texture.format ),
 			glType = utils.convert( texture.type );
 
+		var internalFormat = getInternalFormat( glFormat, glType );
+
 		setTextureParameters( _gl.TEXTURE_2D, texture, isPowerOfTwoImage );
 
 		var mipmap, mipmaps = texture.mipmaps;
@@ -473,7 +484,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			// populate depth texture with dummy data
 
-			var internalFormat = _gl.DEPTH_COMPONENT;
+			internalFormat = _gl.DEPTH_COMPONENT;
 
 			if ( texture.type === FloatType ) {
 
@@ -536,7 +547,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 					mipmap = mipmaps[ i ];
-					state.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+					state.texImage2D( _gl.TEXTURE_2D, i, internalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
 
 				}
 
@@ -545,13 +556,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				// temporal workaround
-				// @TODO Fix
-				var isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
-
-				var glInternalFormat = ( isWebGL2 && glFormat === _gl.RGBA && glType === _gl.FLOAT ) ? _gl.RGBA32F : glFormat;
-
-				state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
+				state.texImage2D( _gl.TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, glFormat, glType, image.data );
 				textureProperties.__maxMipLevel = 0;
 
 			}
@@ -566,7 +571,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
-						state.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+						state.compressedTexImage2D( _gl.TEXTURE_2D, i, internalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
 					} else {
 
@@ -576,7 +581,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				} else {
 
-					state.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+					state.texImage2D( _gl.TEXTURE_2D, i, internalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
 
 				}
 
@@ -597,7 +602,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 					mipmap = mipmaps[ i ];
-					state.texImage2D( _gl.TEXTURE_2D, i, glFormat, glFormat, glType, mipmap );
+					state.texImage2D( _gl.TEXTURE_2D, i, internalFormat, glFormat, glType, mipmap );
 
 				}
 
@@ -606,7 +611,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, image );
+				state.texImage2D( _gl.TEXTURE_2D, 0, internalFormat, glFormat, glType, image );
 				textureProperties.__maxMipLevel = 0;
 
 			}
