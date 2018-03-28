@@ -519,7 +519,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	var vertexGlsl = prefixVertex + vertexShader;
 	var fragmentGlsl = prefixFragment + fragmentShader;
 
-	if ( isWebGL2 ) {
+	if ( isWebGL2 && ! material.isRawShaderMaterial ) {
 
 		// GLSL 3.0 conversion
 		var gles3VS = [
