@@ -516,19 +516,18 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
 
-	var vertexGlsl = prefixVertex + vertexShader;
-	var fragmentGlsl = prefixFragment + fragmentShader;
-
 	if ( isWebGL2 && ! material.isRawShaderMaterial ) {
 
 		// GLSL 3.0 conversion
-		var gles3VS = [
+		prefixVertex = [
+			'#version 300 es\n',
 			'#define attribute in',
 			'#define varying out',
 			'#define texture2D texture'
-		].join( '\n' );
+		].join( '\n' ) + '\n' + prefixVertex;
 
-		var gles3FS = [
+		prefixFragment = [
+			'#version 300 es\n',
 			'#define varying in',
 			'out highp vec4 pc_fragColor;',
 			'#define gl_FragColor pc_fragColor',
@@ -542,12 +541,12 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			'#define texture2DGradEXT textureGrad',
 			'#define texture2DProjGradEXT textureProjGrad',
 			'#define textureCubeGradEXT textureGrad'
-		].join( '\n' );
-
-		vertexGlsl = '#version 300 es\n' + gles3VS + '\n' + vertexGlsl;
-		fragmentGlsl = '#version 300 es\n' + gles3FS + '\n' + fragmentGlsl;
+		].join( '\n' ) + '\n' + prefixFragment;
 
 	}
+
+	var vertexGlsl = prefixVertex + vertexShader;
+	var fragmentGlsl = prefixFragment + fragmentShader;
 
 	// console.log( '*VERTEX*', vertexGlsl );
 	// console.log( '*FRAGMENT*', fragmentGlsl );
