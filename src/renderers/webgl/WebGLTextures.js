@@ -545,7 +545,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data );
+				// temporal workaround
+				// @TODO Fix
+				var isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
+
+				var glInternalFormat = ( isWebGL2 && glFormat === _gl.RGBA && glType === _gl.FLOAT ) ? _gl.RGBA32F : glFormat;
+
+				state.texImage2D( _gl.TEXTURE_2D, 0, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
 				textureProperties.__maxMipLevel = 0;
 
 			}

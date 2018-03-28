@@ -79,15 +79,15 @@ function getToneMappingFunction( functionName, toneMapping ) {
 
 }
 
-function generateExtensions( extensions, parameters, rendererExtensions ) {
+function generateExtensions( extensions, parameters, rendererExtensions, isWebGL2 ) {
 
 	extensions = extensions || {};
 
 	var chunks = [
-		( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+		( ! isWebGL2 && ( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 		( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 		( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
-		( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : ''
+		( ! isWebGL2 && ( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ) ? '#extension GL_EXT_shader_texture_lod : enable' : ''
 	];
 
 	return chunks.filter( filterEmptyLine ).join( '\n' );
@@ -206,6 +206,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var gl = renderer.context;
 
+	var isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+
 	var defines = material.defines;
 
 	var vertexShader = shader.vertexShader;
@@ -285,7 +287,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	//
 
-	var customExtensions = generateExtensions( material.extensions, parameters, extensions );
+	var customExtensions = generateExtensions( material.extensions, parameters, extensions, isWebGL2 );
 
 	var customDefines = generateDefines( defines );
 
@@ -516,6 +518,35 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var vertexGlsl = prefixVertex + vertexShader;
 	var fragmentGlsl = prefixFragment + fragmentShader;
+
+	if ( isWebGL2 ) {
+
+		// GLSL 3.0 conversion
+		var gles3VS = [
+			'#define attribute in',
+			'#define varying out',
+			'#define texture2D texture'
+		].join( '\n' );
+
+		var gles3PS = [
+			'#define varying in',
+			'out highp vec4 pc_fragColor;',
+			'#define gl_FragColor pc_fragColor',
+			'#define texture2D texture',
+			'#define textureCube texture',
+			'#define texture2DProj textureProj',
+			'#define texture2DLodEXT textureLod',
+			'#define texture2DProjLodEXT textureProjLod',
+			'#define textureCubeLodEXT textureLod',
+			'#define texture2DGradEXT textureGrad',
+			'#define texture2DProjGradEXT textureProjGrad',
+			'#define textureCubeGradEXT textureGrad'
+		].join( '\n' );
+
+		vertexGlsl = '#version 300 es\n' + gles3VS + '\n' + vertexGlsl;
+		fragmentGlsl = '#version 300 es\n' + gles3PS + '\n' + fragmentGlsl;
+
+	}
 
 	// console.log( '*VERTEX*', vertexGlsl );
 	// console.log( '*FRAGMENT*', fragmentGlsl );
