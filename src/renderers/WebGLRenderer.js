@@ -65,7 +65,8 @@ function WebGLRenderer( parameters ) {
 		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
-		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default';
+		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
+		_webgl2 = parameters.webgl2 !== undefined ? parameters.webgl2 : false;
 
 	var currentRenderList = null;
 	var currentRenderState = null;
@@ -190,11 +191,15 @@ function WebGLRenderer( parameters ) {
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
-		_gl = _context || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
+		var webglVersion = _webgl2 && typeof WebGL2RenderingContext !== 'undefined' ? 'webgl2' : 'webgl';
+
+		_gl = _context || _canvas.getContext( webglVersion, contextAttributes );
+
+		if ( _gl === null && webglVersion === 'webgl' )	_gl = _canvas.getContext( 'experimental-webgl', contextAttributes );
 
 		if ( _gl === null ) {
 
-			if ( _canvas.getContext( 'webgl' ) !== null ) {
+			if ( _canvas.getContext( webglVersion ) !== null ) {
 
 				throw new Error( 'Error creating WebGL context with your selected attributes.' );
 
