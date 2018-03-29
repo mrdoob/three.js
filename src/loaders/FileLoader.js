@@ -178,14 +178,33 @@ Object.assign( FileLoader.prototype, {
 
 				if ( this.status === 200 ) {
 
-					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+					if ( scope.decodeCallback !== undefined ) {
 
-						var callback = callbacks[ i ];
-						if ( callback.onLoad ) callback.onLoad( response );
+						scope.decodeCallback( response, function ( decodedResponse ) {
+
+							for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+								var callback = callbacks[ i ];
+								if ( callback.onLoad ) callback.onLoad( decodedResponse );
+
+							}
+
+							scope.manager.itemEnd( url );
+
+						} );
+
+					} else {
+
+						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+
+							var callback = callbacks[ i ];
+							if ( callback.onLoad ) callback.onLoad( response );
+
+						}
+
+						scope.manager.itemEnd( url );
 
 					}
-
-					scope.manager.itemEnd( url );
 
 				} else if ( this.status === 0 ) {
 
@@ -302,6 +321,13 @@ Object.assign( FileLoader.prototype, {
 	setRequestHeader: function ( value ) {
 
 		this.requestHeader = value;
+		return this;
+
+	},
+
+	setDecodeCallback: function ( value ) {
+
+		this.decodeCallback = value;
 		return this;
 
 	}
