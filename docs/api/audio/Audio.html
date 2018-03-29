@@ -63,7 +63,7 @@
 		<div>The [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] of the [page:AudioListener listener] given in the constructor.</div>
 
 		<h3>[property:Array filters]</h3>
-		<div>Whether the audio is currently playing. Default is empty array.</div>
+		<div>Represents an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]. Can be used to apply a variety of low-order filters to create more complex sound effects. Filters are set via [page:Audio.setFilter] or [page:Audio.setFilters].</div>
 
 		<h3>[property:GainNode gain]</h3>
 		<div>A [link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode] created
@@ -164,13 +164,13 @@
 
 		<h3>[method:null setFilter]( filter )</h3>
 		<div>
-		Add the filter to the [page:Audio.filters filters] array.
+		Applies a single [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNode] to the audio.
 		</div>
 
 		<h3>[method:Audio setFilters]( [param:Array value] )</h3>
 		<div>
 		value - arrays of filters.<br />
-		Set the [page:Audio.filters filters] array to *value*.
+		Applies an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes] to the audio.
 		</div>
 
 		<h3>[method:null setLoop]( [param:Boolean value] )</h3>
