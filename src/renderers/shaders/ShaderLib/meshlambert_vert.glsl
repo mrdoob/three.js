@@ -1,10 +1,10 @@
 #define LAMBERT
 
-out vec3 vLightFront;
+varying vec3 vLightFront;
 
 #ifdef DOUBLE_SIDED
 
-	out vec3 vLightBack;
+	varying vec3 vLightBack;
 
 #endif
 

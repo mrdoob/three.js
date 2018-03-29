@@ -1,10 +1,10 @@
 #define PHONG
 
-out vec3 vViewPosition;
+varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED
 
-	out vec3 vNormal;
+	varying vec3 vNormal;
 
 #endif
 

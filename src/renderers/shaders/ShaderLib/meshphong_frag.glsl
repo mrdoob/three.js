@@ -31,8 +31,6 @@ uniform float opacity;
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
-out vec4 glFragColor;
-
 void main() {
 
 	#include <clipping_planes_fragment>
@@ -64,7 +62,7 @@ void main() {
 
 	#include <envmap_fragment>
 
-	glFragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>

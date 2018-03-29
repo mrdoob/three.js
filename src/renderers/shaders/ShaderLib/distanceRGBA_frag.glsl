@@ -3,7 +3,7 @@
 uniform vec3 referencePosition;
 uniform float nearDistance;
 uniform float farDistance;
-in vec3 vWorldPosition;
+varying vec3 vWorldPosition;
 
 #include <common>
 #include <packing>
@@ -26,6 +26,6 @@ void main () {
 	dist = ( dist - nearDistance ) / ( farDistance - nearDistance );
 	dist = saturate( dist ); // clamp to [ 0, 1 ]
 
-	glFragColor = packDepthToRGBA( dist );
+	gl_FragColor = packDepthToRGBA( dist );
 
 }

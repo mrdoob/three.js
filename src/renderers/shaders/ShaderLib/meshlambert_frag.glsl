@@ -2,15 +2,13 @@ uniform vec3 diffuse;
 uniform vec3 emissive;
 uniform float opacity;
 
-in vec3 vLightFront;
+varying vec3 vLightFront;
 
 #ifdef DOUBLE_SIDED
 
-	in vec3 vLightBack;
+	varying vec3 vLightBack;
 
 #endif
-
-out vec4 glFragColor;
 
 #include <common>
 #include <packing>
@@ -76,7 +74,7 @@ void main() {
 
 	#include <envmap_fragment>
 
-	glFragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>

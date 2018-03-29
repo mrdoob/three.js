@@ -1,4 +1,4 @@
-out vec3 vWorldPosition;
+varying vec3 vWorldPosition;
 
 #include <common>
 

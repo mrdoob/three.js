@@ -1,6 +1,6 @@
 #define DISTANCE
 
-out vec3 vWorldPosition;
+varying vec3 vWorldPosition;
 
 #include <common>
 #include <uv_pars_vertex>

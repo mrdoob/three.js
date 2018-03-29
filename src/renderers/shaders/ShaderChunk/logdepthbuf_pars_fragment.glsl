@@ -4,7 +4,7 @@
 
 	#ifdef USE_LOGDEPTHBUF_EXT
 
-		in float vFragDepth;
+		varying float vFragDepth;
 
 	#endif
 

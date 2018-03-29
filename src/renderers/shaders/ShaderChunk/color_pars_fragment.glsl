@@ -1,5 +1,5 @@
 #ifdef USE_COLOR
 
-	in vec3 vColor;
+	varying vec3 vColor;
 
 #endif

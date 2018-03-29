@@ -149,7 +149,7 @@ THREE.GLTFExporter.prototype = {
 				var value = text.charCodeAt( i );
 
 				// Replacing multi-byte character with space(0x20).
-				array[ i ] = value > 0xFF ? 0x20 : value
+				array[ i ] = value > 0xFF ? 0x20 : value;
 
 			}
 
@@ -425,12 +425,6 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processAccessor( attribute, geometry, start, count ) {
 
-			if ( ! outputJSON.accessors ) {
-
-				outputJSON.accessors = [];
-
-			}
-
 			var types = {
 
 				1: 'SCALAR',
@@ -484,6 +478,13 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			// Skip creating an accessor if the attribute doesn't have data to export
+			if ( count === 0 ) {
+
+				return null;
+
+			}
+
 			var minMax = getMinMax( attribute, start, count );
 
 			var bufferViewTarget;
@@ -509,6 +510,12 @@ THREE.GLTFExporter.prototype = {
 				type: types[ attribute.itemSize ]
 
 			};
+
+			if ( ! outputJSON.accessors ) {
+
+				outputJSON.accessors = [];
+
+			}
 
 			outputJSON.accessors.push( gltfAccessor );
 
@@ -872,12 +879,6 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMesh( mesh ) {
 
-			if ( ! outputJSON.meshes ) {
-
-				outputJSON.meshes = [];
-
-			}
-
 			var geometry = mesh.geometry;
 
 			var mode;
@@ -963,9 +964,21 @@ THREE.GLTFExporter.prototype = {
 
 				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
 
-					attributes[ attributeName ] = processAccessor( attribute, geometry );
+					var accessor = processAccessor( attribute, geometry );
+					if ( accessor !== null ) {
+
+						attributes[ attributeName ] = accessor;
+
+					}
 
 				}
+
+			}
+
+			// Skip if no exportable attributes found
+			if ( Object.keys( attributes ).length === 0 ) {
+
+				return null;
 
 			}
 
@@ -1057,6 +1070,8 @@ THREE.GLTFExporter.prototype = {
 			var forceIndices = options.forceIndices;
 			var isMultiMaterial = Array.isArray( mesh.material );
 
+			if ( isMultiMaterial && mesh.geometry.groups.length === 0 ) return null;
+
 			if ( ! forceIndices && geometry.index === null && isMultiMaterial ) {
 
 				// temporal workaround.
@@ -1083,7 +1098,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var materials = isMultiMaterial ? mesh.material : [ mesh.material ] ;
+			var materials = isMultiMaterial ? mesh.material : [ mesh.material ];
 			var groups = isMultiMaterial ? mesh.geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
 
 			for ( var i = 0, il = groups.length; i < il; i ++ ) {
@@ -1095,17 +1110,17 @@ THREE.GLTFExporter.prototype = {
 
 				if ( targets.length > 0 ) primitive.targets = targets;
 
+				if ( geometry.index !== null ) {
+
+					primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
+
+				}
+
 				var material = processMaterial( materials[ groups[ i ].materialIndex ] );
 
 				if ( material !== null ) {
 
 					primitive.material = material;
-
-				}
-
-				if ( geometry.index !== null ) {
-
-					primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
 
 				}
 
@@ -1120,6 +1135,12 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			gltfMesh.primitives = primitives;
+
+			if ( ! outputJSON.meshes ) {
+
+				outputJSON.meshes = [];
+
+			}
 
 			outputJSON.meshes.push( gltfMesh );
 
@@ -1420,7 +1441,13 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				gltfNode.mesh = processMesh( object );
+				var mesh = processMesh( object );
+
+				if ( mesh !== null ) {
+
+					gltfNode.mesh = mesh;
+
+				}
 
 			} else if ( object.isCamera ) {
 

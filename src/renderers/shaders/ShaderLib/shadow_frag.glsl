@@ -1,8 +1,6 @@
 uniform vec3 color;
 uniform float opacity;
 
-out vec4 glFragColor;
-
 #include <common>
 #include <packing>
 #include <fog_pars_fragment>
@@ -13,7 +11,7 @@ out vec4 glFragColor;
 
 void main() {
 
-	glFragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );
+	gl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );
 
 	#include <fog_fragment>
 

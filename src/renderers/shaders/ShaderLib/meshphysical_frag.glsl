@@ -11,15 +11,13 @@ uniform float opacity;
 	uniform float clearCoatRoughness;
 #endif
 
-in vec3 vViewPosition;
+varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED
 
-	in vec3 vNormal;
+	varying vec3 vNormal;
 
 #endif
-
-out vec4 glFragColor;
 
 #include <common>
 #include <packing>
@@ -77,7 +75,7 @@ void main() {
 
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
 
-	glFragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>

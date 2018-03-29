@@ -1,8 +1,6 @@
 uniform vec3 diffuse;
 uniform float opacity;
 
-out vec4 glFragColor;
-
 #include <common>
 #include <packing>
 #include <color_pars_fragment>
@@ -26,7 +24,7 @@ void main() {
 
 	outgoingLight = diffuseColor.rgb;
 
-	glFragColor = vec4( outgoingLight, diffuseColor.a );
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
 	#include <premultiplied_alpha_fragment>
 	#include <tonemapping_fragment>

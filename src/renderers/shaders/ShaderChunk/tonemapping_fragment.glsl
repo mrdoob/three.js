@@ -1,5 +1,5 @@
 #if defined( TONE_MAPPING )
 
-  glFragColor.rgb = toneMapping( glFragColor.rgb );
+  gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );
 
 #endif

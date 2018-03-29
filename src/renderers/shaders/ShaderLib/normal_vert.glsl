@@ -2,13 +2,13 @@
 
 #if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )
 
-	out vec3 vViewPosition;
+	varying vec3 vViewPosition;
 
 #endif
 
 #ifndef FLAT_SHADED
 
-	out vec3 vNormal;
+	varying vec3 vNormal;
 
 #endif
 
