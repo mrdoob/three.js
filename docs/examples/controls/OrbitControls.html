@@ -202,14 +202,6 @@ controls.mouseButtons = {
       The camera being controlled.
     </div>
 
-    <h3>[property:Integer panningMode]</h3>
-    <div>
-    Panning mode. Defines how the camera's position is translated when panning.
-    The options are THREE.ScreenSpacePanning, in which the camera pans in screen space,
-    and THREE.HorizontalPanning, in which the camera pans in the plane orthogonal to the camera's up direction.
-    Default is THREE.ScreenSpacePanning.
-    </div>
-
     <h3>[property:Float panSpeed]</h3>
     <div>
       Speed of panning. Default is 1.
@@ -223,6 +215,12 @@ controls.mouseButtons = {
     <h3>[property:Float rotateSpeed]</h3>
     <div>
       Speed of rotation. Default is 1.
+    </div>
+
+    <h3>[property:Boolean screenSpacePanning]</h3>
+    <div>
+    Defines how the camera's position is translated when panning. If true, the camera pans in screen space.
+    Otherwise, the camera pans in the plane orthogonal to the camera's up direction. Default is false.
     </div>
 
     <h3>[property:Vector3 target0]</h3>
