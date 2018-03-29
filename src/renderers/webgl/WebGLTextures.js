@@ -101,10 +101,19 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( ! _isWebGL2 ) return glFormat;
 
-		if ( glFormat === _gl.RGB || glFormat === _gl.RGBA ) {
+		if ( glFormat === _gl.RGB ) {
+
+			if ( glType === _gl.FLOAT ) return _gl.RGB32F;
+			if ( glType === _gl.HALF_FLOAT ) return _gl.RGB16F;
+			if ( glType === _gl.UNSIGNED_BYTE ) return _gl.RGB8;
+
+		}
+
+		if ( glFormat === _gl.RGBA ) {
 
 			if ( glType === _gl.FLOAT ) return _gl.RGBA32F;
 			if ( glType === _gl.HALF_FLOAT ) return _gl.RGBA16F;
+			if ( glType === _gl.UNSIGNED_BYTE ) return _gl.RGBA8;
 
 		}
 
