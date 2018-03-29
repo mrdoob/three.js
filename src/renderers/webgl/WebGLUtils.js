@@ -129,12 +129,19 @@ function WebGLUtils( gl, extensions ) {
 
 		if ( p === MinEquation || p === MaxEquation ) {
 
+			if ( isWebGL2 ) {
+
+				if ( p === MinEquation ) return gl.MIN;
+				if ( p === MaxEquation ) return gl.MAX;
+
+			}
+
 			extension = extensions.get( 'EXT_blend_minmax' );
 
 			if ( extension !== null ) {
 
-				if ( p === MinEquation ) return isWebGL2 ? extension.MIN : extension.MIN_EXT;
-				if ( p === MaxEquation ) return isWebGL2 ? extension.MAX : extension.MAX_EXT;
+				if ( p === MinEquation ) return extension.MIN_EXT;
+				if ( p === MaxEquation ) return extension.MAX_EXT;
 
 			}
 
@@ -142,9 +149,11 @@ function WebGLUtils( gl, extensions ) {
 
 		if ( p === UnsignedInt248Type ) {
 
+			if ( isWebGL2 ) return gl.UNSIGNED_INT_24_8;
+
 			extension = extensions.get( 'WEBGL_depth_texture' );
 
-			if ( extension !== null ) return isWebGL2 ? extension.UNSIGNED_INT_24_8 : extension.UNSIGNED_INT_24_8_WEBGL;
+			if ( extension !== null ) return extension.UNSIGNED_INT_24_8_WEBGL;
 
 		}
 
