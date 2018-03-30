@@ -151,7 +151,8 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 			fragmentShader: bokeh_shader.fragmentShader,
 			defines: {
 				RINGS: this.shaderSettings.rings,
-				SAMPLES: this.shaderSettings.samples
+				SAMPLES: this.shaderSettings.samples,
+				DEPTH_PACKING: this.material_depth.depthPacking
 			}
 		} );
 
