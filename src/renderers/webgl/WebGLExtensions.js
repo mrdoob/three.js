@@ -54,7 +54,7 @@ function WebGLExtensions( gl ) {
 
 				default:
 
-					if ( isWebGL2 && 
+					if ( isWebGL2 &&
 						[ 'ANGLE_instanced_arrays',
 						  'OES_texture_float',
 						  'OES_texture_half_float',
