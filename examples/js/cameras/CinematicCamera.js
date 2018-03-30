@@ -18,6 +18,7 @@ THREE.CinematicCamera = function( fov, aspect, near, far ) {
 	};
 
 	this.material_depth = new THREE.MeshDepthMaterial();
+	this.material_depth.depthPacking = THREE.RGBADepthPacking;
 
 	// In case of cinematicCamera, having a default lens set is important
 	this.setLens();
@@ -152,7 +153,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 			defines: {
 				RINGS: this.shaderSettings.rings,
 				SAMPLES: this.shaderSettings.samples,
-				DEPTH_PACKING: this.material_depth.depthPacking
+				DEPTH_PACKING: 1
 			}
 		} );
 
