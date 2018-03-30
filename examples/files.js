@@ -303,11 +303,9 @@ var files = {
 	"webgl deferred": [
 		"webgldeferred_animation"
 	],
-	/*
 	"webgl2": [
 		"webgl2_sandbox"
 	],
-	*/
 	"webaudio": [
 		"webaudio_sandbox",
 		"webaudio_timing",
