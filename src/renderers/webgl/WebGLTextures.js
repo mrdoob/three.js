@@ -7,7 +7,6 @@ import { _Math } from '../../math/Math.js';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
-	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext ); /* global WebGL2RenderingContext */
 	var _videoTextures = {};
 	var _canvas;
 
@@ -76,7 +75,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function textureNeedsPowerOfTwo( texture ) {
 
-		if ( _isWebGL2 ) return false;
+		if ( _gl.isWebGL2 ) return false;
 
 		return ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) ||
 			( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
@@ -101,7 +100,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getInternalFormat( glFormat, glType ) {
 
-		if ( ! _isWebGL2 ) return glFormat;
+		if ( ! _gl.isWebGL2 ) return glFormat;
 
 		if ( glFormat === _gl.RGB ) {
 
@@ -505,10 +504,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( texture.type === FloatType ) {
 
-				if ( ! _isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
+				if ( ! _gl.isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
 				glInternalFormat = _gl.DEPTH_COMPONENT32F;
 
-			} else if ( _isWebGL2 ) {
+			} else if ( _gl.isWebGL2 ) {
 
 				// WebGL 2.0 requires signed internalformat for glTexImage2D
 				glInternalFormat = _gl.DEPTH_COMPONENT16;
@@ -655,7 +654,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		var glFormat = utils.convert( renderTarget.texture.format );
 		var glType = utils.convert( renderTarget.texture.type );
 		var glInternalFormat = getInternalFormat( glFormat, glType );
-		var array = ( _isWebGL2 ) ? new Uint8Array( renderTarget.width * renderTarget.height * 4 ) : null;
+		var array = ( _gl.isWebGL2 ) ? new Uint8Array( renderTarget.width * renderTarget.height * 4 ) : null;
 		state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, array );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );

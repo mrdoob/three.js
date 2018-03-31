@@ -6,8 +6,6 @@ function WebGLExtensions( gl ) {
 
 	var extensions = {};
 
-	var isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext );
-
 	return {
 
 		get: function ( name ) {
@@ -24,7 +22,7 @@ function WebGLExtensions( gl ) {
 
 				case 'WEBGL_depth_texture':
 
-					if ( isWebGL2 ) {
+					if ( gl.isWebGL2 ) {
 
 						extension = gl;
 
@@ -54,7 +52,7 @@ function WebGLExtensions( gl ) {
 
 				default:
 
-					if ( isWebGL2 &&
+					if ( gl.isWebGL2 &&
 						[ 'ANGLE_instanced_arrays',
 						  'OES_texture_float',
 						  'OES_texture_half_float',

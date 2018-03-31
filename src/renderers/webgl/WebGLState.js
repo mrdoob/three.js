@@ -7,8 +7,6 @@ import { Vector4 } from '../../math/Vector4.js';
 
 function WebGLState( gl, extensions, utils ) {
 
-	var isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
-
 	function ColorBuffer() {
 
 		var locked = false;
@@ -432,7 +430,7 @@ function WebGLState( gl, extensions, utils ) {
 
 			var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-			extension[ isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, 0 );
+			extension[ gl.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, 0 );
 			attributeDivisors[ attribute ] = 0;
 
 		}
@@ -454,7 +452,7 @@ function WebGLState( gl, extensions, utils ) {
 
 			var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-			extension[ isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
+			extension[ gl.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
 			attributeDivisors[ attribute ] = meshPerAttribute;
 
 		}

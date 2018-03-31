@@ -206,8 +206,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var gl = renderer.context;
 
-	var isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
-
 	var defines = material.defines;
 
 	var vertexShader = shader.vertexShader;
@@ -287,7 +285,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	//
 
-	var customExtensions = isWebGL2 ? '' : generateExtensions( material.extensions, parameters, extensions );
+	var customExtensions = gl.isWebGL2 ? '' : generateExtensions( material.extensions, parameters, extensions );
 
 	var customDefines = generateDefines( defines );
 
@@ -516,7 +514,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
 
-	if ( isWebGL2 && ! material.isRawShaderMaterial ) {
+	if ( gl.isWebGL2 && ! material.isRawShaderMaterial ) {
 
 		var isGLSL3ShaderMaterial = material.isShaderMaterial && material.isGLSL3;
 

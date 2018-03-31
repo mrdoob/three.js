@@ -4,8 +4,6 @@
 
 function WebGLBufferRenderer( gl, extensions, info ) {
 
-	var isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
-
 	var mode;
 
 	function setMode( value ) {
@@ -39,11 +37,11 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 			count = position.data.count;
 
-			extension[ isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, 0, count, geometry.maxInstancedCount );
+			extension[ gl.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, 0, count, geometry.maxInstancedCount );
 
 		} else {
 
-			extension[ isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, start, count, geometry.maxInstancedCount );
+			extension[ gl.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, start, count, geometry.maxInstancedCount );
 
 		}
 

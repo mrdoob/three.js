@@ -211,6 +211,8 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		_gl.isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext;
+
 		// Some experimental-webgl implementations do not have getShaderPrecisionFormat
 
 		if ( _gl.getShaderPrecisionFormat === undefined ) {
