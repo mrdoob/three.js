@@ -47,7 +47,7 @@
 
 				camera = new THREE.CinematicCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.setLens( 5 );
-        camera.position.set( 2, 1, 500 );
+				camera.position.set( 2, 1, 500 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
@@ -77,7 +77,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild(renderer.domElement);
+				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
