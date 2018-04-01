@@ -516,7 +516,20 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	if ( gl.isWebGL2 && ! material.isRawShaderMaterial ) {
 
-		var isGLSL3ShaderMaterial = material.isShaderMaterial && material.isGLSL3;
+		var isGLSL3ShaderMaterial = false;
+
+		var versionRegex = /^\s*#version\s+300\s+es\s*\n/;
+
+		if ( material.isShaderMaterial &&
+			vertexShader.match( versionRegex ) !== null &&
+			fragmentShader.match( versionRegex ) !== null ) {
+
+			isGLSL3ShaderMaterial = true;
+
+			vertexShader = vertexShader.replace( versionRegex, '' );
+			fragmentShader = fragmentShader.replace( versionRegex, '' );
+
+		}
 
 		// GLSL 3.0 conversion
 		prefixVertex = [
