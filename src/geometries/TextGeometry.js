@@ -72,6 +72,8 @@ function TextBufferGeometry( text, parameters ) {
 
 	this.type = 'TextBufferGeometry';
 
+	this.compactGroups();
+
 }
 
 TextBufferGeometry.prototype = Object.create( ExtrudeBufferGeometry.prototype );

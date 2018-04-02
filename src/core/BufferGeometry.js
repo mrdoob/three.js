@@ -586,6 +586,93 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
+	compactGroups: function () {
+
+		// sort by material
+
+		var groups = this.groups.slice().sort( function ( a, b ) {
+
+			if ( a.materialIndex !== b.materialIndex ) return a.materialIndex - b.materialIndex;
+
+			return a.start - b.start;
+
+		} );
+
+		// relay out buffers in material order
+
+		var attributes = this.attributes;
+		var i, group;
+
+		for ( var key in attributes ) {
+
+			var attribute = attributes[ key ];
+
+			var itemSize = attribute.itemSize;
+			var srcArray = attribute.array;
+
+			var targetOffset = 0;
+
+			var targetArray = new srcArray.constructor( srcArray.length );
+
+			for ( i = 0; i < groups.length; i ++ ) {
+
+				group = groups[ i ];
+
+				var groupLength = group.count * itemSize;
+				var groupStart = group.start * itemSize;
+
+				var sub = srcArray.subarray( groupStart, groupStart + groupLength );
+
+				targetArray.set( sub, targetOffset );
+
+				targetOffset += groupLength;
+
+			}
+
+			srcArray.set( targetArray );
+
+		}
+
+		// adjust groups to new layout
+
+		var start = 0;
+
+		for ( i = 0; i < groups.length; i ++ ) {
+
+			group = groups[ i ];
+
+			group.start = start;
+			start += group.count;
+
+		}
+
+		var lastGroup = groups[ 0 ];
+
+		this.groups = [ lastGroup ];
+
+		// merge adjacent groups with same materialIndex
+
+		for ( i = 1; i < groups.length; i ++ ) {
+
+			group = groups[ i ];
+
+			if ( lastGroup.materialIndex === group.materialIndex ) {
+
+				lastGroup.count += group.count;
+
+			} else {
+
+				lastGroup = group;
+				this.groups.push( lastGroup );
+
+			}
+
+		}
+
+		console.log( 'compact groups: old count:', groups.length, 'new count:', this.groups.length );
+
+	},
+
 	computeBoundingBox: function () {
 
 		if ( this.boundingBox === null ) {
