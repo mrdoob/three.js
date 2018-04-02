@@ -2177,6 +2177,14 @@
 
 			};
 
+			var offset = animationCurve.times[ 0 ];
+
+			for ( var i = 0; i < animationCurve.times.length; i++ ) {
+
+				animationCurve.times[ i ] -= offset;
+
+			}
+
 			var relationships = connections.get( animationCurve.id );
 
 			if ( relationships !== undefined ) {
