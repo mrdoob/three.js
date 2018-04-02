@@ -590,7 +590,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		// sort by material
 
-		var groups = this.groups.slice().sort( function ( a, b ) {
+		var groups = this.groups.sort( function ( a, b ) {
 
 			if ( a.materialIndex !== b.materialIndex ) return a.materialIndex - b.materialIndex;
 
