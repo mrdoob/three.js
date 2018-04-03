@@ -72,7 +72,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	this.type = 'TextBufferGeometry';
 
-	this.compactGroups();
+	this.mergeGroups();
 
 }
 
