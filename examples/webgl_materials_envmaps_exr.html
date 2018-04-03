@@ -51,8 +51,8 @@
 			var container, stats;
 			var params = {
 				envMap: "EXR",
-				roughness: 0.1,
-				metalness: 0.95,
+				roughness: 0.0,
+				metalness: 0.0,
 				exposure: 1.0
 			};
 			var camera, scene, renderer, controls, objects = [];
@@ -79,15 +79,14 @@
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					color: 0xffffff,
-					metalness: 0.95,
-					roughness: 0.1,
+					metalness: params.roughness,
+					roughness: params.metalness,
 					envMapIntensity: 1.0
 				} );
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
 
 				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
-				torusMesh1.position.x = 0.0;
 
 				scene.add( torusMesh1 );
 				objects.push( torusMesh1 );
@@ -100,7 +99,6 @@
 				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
 				planeMesh1.position.y = - 50;
 				planeMesh1.rotation.x = - Math.PI * 0.5;
-				planeMesh1.receiveShadow = true;
 				scene.add( planeMesh1 );
 
 				new THREE.EXRLoader().load( "textures/piz_compressed.exr", function ( texture ) {
@@ -151,6 +149,8 @@
 				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 300;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -195,14 +195,14 @@
 
 					var newEnvMap = standardMaterial.envMap;
 
-					switch( params.envMap ) {
+					switch ( params.envMap ) {
 
 						case 'EXR': newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null; break;
 						case 'PNG': newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null; break;
 
 					}
 
-					if( newEnvMap !== standardMaterial.envMap ) {
+					if ( newEnvMap !== standardMaterial.envMap ) {
 
 						standardMaterial.envMap = newEnvMap;
 						standardMaterial.needsUpdate = true;
@@ -211,6 +211,7 @@
 						floorMaterial.needsUpdate = true;
 
 					}
+
 				}
 
 				renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );
