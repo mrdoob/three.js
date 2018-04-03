@@ -839,6 +839,13 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	mergeGroups: function () {
 
+		if ( this.index !== null ) {
+
+			console.warn( 'THREE.BufferGeometry.mergeGroups(): Geometry is indexed.' );
+			return this;
+
+		}
+
 		// sort by material
 
 		var groups = this.groups.sort( function ( a, b ) {
