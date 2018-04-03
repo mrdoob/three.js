@@ -274,6 +274,12 @@
 		<h3>[method:null merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
 		<div>Merge in another BufferGeometry with an optional offset of where to start merging in.</div>
 
+		<h3>[method:BufferGeometry mergeGroups]()</h3>
+		<div>Merge groups with common materialIndex values to minimize the number of draw calls required to
+		render the geometery. This will reorder the elements of all attributes.
+		Indexed BufferGeometries or those using an [page:InterleavedBufferAttribute] are not supported.
+		</div>
+
 		<h3>[method:null normalizeNormals]()</h3>
 		<div>
 		Every normal vector in a geometry will have a magnitude of 1.
