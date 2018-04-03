@@ -13,8 +13,7 @@
  * The arrangement of the faces is fixed, as assuming this arrangement, the sampling function has been written.
  */
 
-
-THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
+THREE.PMREMCubeUVPacker = function ( cubeTextureLods, numLods ) {
 
 	this.cubeLods = cubeTextureLods;
 	this.numLods = numLods;
@@ -83,8 +82,8 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 				material.uniforms[ 'faceIndex' ].value = k;
 				material.uniforms[ 'mapSize' ].value = mipSize;
 				var planeMesh = new THREE.Mesh(
-				new THREE.PlaneGeometry( mipSize, mipSize, 0 ),
-				material );
+					new THREE.PlaneGeometry( mipSize, mipSize, 0 ),
+					material );
 				planeMesh.position.x = faceOffsets[ k ].x * mipSize - offset1 + mipOffsetX;
 				planeMesh.position.y = faceOffsets[ k ].y * mipSize - offset1 + offset2 + mipOffsetY;
 				planeMesh.material.side = THREE.DoubleSide;
@@ -115,7 +114,7 @@ THREE.PMREMCubeUVPacker.prototype = {
 		var toneMapping = renderer.toneMapping;
 		var toneMappingExposure = renderer.toneMappingExposure;
 		var currentRenderTarget = renderer.getRenderTarget();
-		
+
 		renderer.gammaInput = false;
 		renderer.gammaOutput = false;
 		renderer.toneMapping = THREE.LinearToneMapping;
