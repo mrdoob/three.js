@@ -87,7 +87,7 @@ THREE.PMREMCubeUVPacker = function ( cubeTextureLods, numLods ) {
 				planeMesh.position.x = faceOffsets[ k ].x * mipSize - offset1 + mipOffsetX;
 				planeMesh.position.y = faceOffsets[ k ].y * mipSize - offset1 + offset2 + mipOffsetY;
 				planeMesh.material.side = THREE.BackSide;
-				planeMesh.scale.set( mipSize, mipSize );
+				planeMesh.scale.setScalar( mipSize );
 				this.scene.add( planeMesh );
 				this.objects.push( planeMesh );
 
