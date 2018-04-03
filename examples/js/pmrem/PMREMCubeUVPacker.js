@@ -40,12 +40,13 @@ THREE.PMREMCubeUVPacker = function ( cubeTextureLods, numLods ) {
 	this.CubeUVRenderTarget = new THREE.WebGLRenderTarget( size, size, params );
 	this.CubeUVRenderTarget.texture.name = "PMREMCubeUVPacker.cubeUv";
 	this.CubeUVRenderTarget.texture.mapping = THREE.CubeUVReflectionMapping;
-	this.camera = new THREE.OrthographicCamera( - size * 0.5, size * 0.5, - size * 0.5, size * 0.5, 0.0, 1000 );
+	this.camera = new THREE.OrthographicCamera( - size * 0.5, size * 0.5, - size * 0.5, size * 0.5, 0, 1 ); // top and bottom are swapped for some reason?
 
 	this.scene = new THREE.Scene();
-	this.scene.add( this.camera );
 
 	this.objects = [];
+
+	var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
 
 	var faceOffsets = [];
 	faceOffsets.push( new THREE.Vector2( 0, 0 ) );
@@ -81,12 +82,12 @@ THREE.PMREMCubeUVPacker = function ( cubeTextureLods, numLods ) {
 				material.envMap = this.cubeLods[ i ].texture;
 				material.uniforms[ 'faceIndex' ].value = k;
 				material.uniforms[ 'mapSize' ].value = mipSize;
-				var planeMesh = new THREE.Mesh(
-					new THREE.PlaneGeometry( mipSize, mipSize, 0 ),
-					material );
+
+				var planeMesh = new THREE.Mesh( geometry, material );
 				planeMesh.position.x = faceOffsets[ k ].x * mipSize - offset1 + mipOffsetX;
 				planeMesh.position.y = faceOffsets[ k ].y * mipSize - offset1 + offset2 + mipOffsetY;
-				planeMesh.material.side = THREE.DoubleSide;
+				planeMesh.material.side = THREE.BackSide;
+				planeMesh.scale.set( mipSize, mipSize );
 				this.scene.add( planeMesh );
 				this.objects.push( planeMesh );
 
