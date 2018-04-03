@@ -2417,31 +2417,26 @@
 		if ( preRotations !== undefined ) {
 
 			preRotations = preRotations.map( THREE.Math.degToRad );
-			preRotations.push( 'ZYX' );
 
-			preRotations = new THREE.Euler().fromArray( preRotations );
-			preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+		} else {
+
+			preRotations = [ 0, 0, 0 ];
 
 		}
 
-		var quaternion = new THREE.Quaternion();
 		var euler = new THREE.Euler();
 
-		var quaternionValues = [];
+		var eulersValues = [];
 
 		for ( var i = 0; i < values.length; i += 3 ) {
 
-			euler.set( values[ i ], values[ i + 1 ], values[ i + 2 ], 'ZYX' );
+			euler.set( values[ i ] + preRotations[ 0 ], values[ i + 1 ] + preRotations[ 1 ], values[ i + 2 ] + preRotations[ 2 ], 'ZYX' );
 
-			quaternion.setFromEuler( euler );
-
-			if ( preRotations !== undefined )quaternion.premultiply( preRotations );
-
-			quaternion.toArray( quaternionValues, ( i / 3 ) * 4 );
+			eulersValues = eulersValues.concat( euler.toArray().slice( 0, 3 ) );
 
 		}
 
-		return new THREE.QuaternionKeyframeTrack( modelName + '.quaternion', times, quaternionValues );
+		return new THREE.VectorKeyframeTrack( modelName + '.rotation', times, eulersValues );
 
 	}
 
