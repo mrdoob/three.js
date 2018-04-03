@@ -882,6 +882,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			srcArray.set( targetArray );
 
+			attribute.needsUpdate = true;
+
 		}
 
 		// adjust groups to new layout
