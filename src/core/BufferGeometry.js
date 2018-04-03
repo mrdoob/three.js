@@ -839,9 +839,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	mergeGroups: function () {
 
-		if ( this.index !== null ) {
+		if ( this.isInstancedBufferGeometry ) {
 
-			console.warn( 'THREE.BufferGeometry.mergeGroups(): Geometry is indexed.' );
+			console.warn( 'THREE.BufferGeometry.mergeGroups(): Geometry is instanced.' );
 			return this;
 
 		}
@@ -856,14 +856,33 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		} );
 
-		// relay out buffers in material order
+		var index = this.index;
+		var i, group, attributes;
 
-		var attributes = this.attributes;
-		var i, group;
+		if ( index === null ) {
+
+			attributes = this.attributes;
+
+		} else {
+
+			// for indexed geometries only the index values need adjusting
+
+			attributes = [ index ];
+
+		}
+
+		// relay out buffers in material order
 
 		for ( var key in attributes ) {
 
 			var attribute = attributes[ key ];
+
+			if ( attribute.isInterleavedBufferAttribute ) {
+
+				console.warn( 'THREE.BufferGeometry.mergeGroups(): Geometry has an InterleavedBufferAttribute.' );
+				return this;
+
+			}
 
 			var itemSize = attribute.itemSize;
 			var srcArray = attribute.array;
