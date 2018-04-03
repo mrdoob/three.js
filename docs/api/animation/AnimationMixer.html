@@ -10,47 +10,47 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			The AnimationMixer is a player for animations on a particular object in the scene. When
 			multiple objects in the scene are animated independently, one AnimationMixer may be used for
 			each object.<br /><br />
 
 			For an overview of the different elements of the three.js animation system see the
 			"Animation System" article in the "Next Steps" section of the manual.
-		</div>
+		</p>
 
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]( [param:Object3D rootObject] )</h3>
-		<div>
+		<p>
 			[page:Object3D rootObject] - the object whose animations shall be played by this mixer.<br />
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
 
 
 		<h3>[property:Number time]</h3>
-		<div>
+		<p>
 			The global mixer time (in seconds; starting with 0 on the mixer's creation).
-		</div>
+		</p>
 
 		<h3>[property:Number timeScale]</h3>
-		<div>
+		<p>
 			A scaling factor for the global [page:.time mixer time].<br /><br />
 
 			Note: Setting the mixer's timeScale to 0 and later back to 1 is a possibility to pause/unpause
 			all actions that are controlled by this mixer.
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
 
 
 		<h3>[method:AnimationAction clipAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
-		<div>
+		<p>
 			Returns an [page:AnimationAction] for the passed clip, optionally using a root object different
 			from the mixer's default root. The first parameter can be either an [page:AnimationClip] object
 			or the name of an AnimationClip.<br /><br />
@@ -59,48 +59,48 @@
 
 			Note: Calling this method several times with the same parameters returns always the same clip
 			instance.
-		</div>
+		</p>
 
 		<h3>[method:AnimationAction existingAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
-		<div>
+		<p>
 			Returns an existing [page:AnimationAction] for the passed clip, optionally using a root object
 			different from the mixer's default root.<br /><br />
 
 			The first parameter can be either an [page:AnimationClip] object or the name of an AnimationClip.
-		</div>
+		</p>
 
 		<h3>[method:Object3D getRoot]()</h3>
-		<div>
+		<p>
 			Returns this mixer's root object.
-		</div>
+		</p>
 
 		<h3>[method:AnimationMixer stopAllAction]()</h3>
-		<div>
+		<p>
 			Deactivates all previously scheduled actions on this mixer.
-		</div>
+		</p>
 
 		<h3>[method:AnimationMixer update]([param:Number deltaTimeInSeconds]) </h3>
-		<div>
+		<p>
 			Advances the global mixer time and updates the animation.<br /><br />
 
 			This is usually done in the render loop, passing [page:Clock.getDelta clock.getDelta] scaled by the mixer's [page:.timeScale timeScale]).
-		</div>
+		</p>
 
 		<h3>[method:null uncacheClip]([param:AnimationClip clip])</h3>
 
-		<div>
+		<p>
 			Deallocates all memory resources for a clip.
-		</div>
+		</p>
 
 		<h3>[method:null uncacheRoot]([param:Object3D root]) </h3>
-		<div>
+		<p>
 			Deallocates all memory resources for a root object.
-		</div>
+		</p>
 
 		<h3>[method:null uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
-		<div>
+		<p>
 			Deallocates all memory resources for an action.
-		</div>
+		</p>
 
 
 		<h2>Source</h2>

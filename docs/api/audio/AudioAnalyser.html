@@ -10,21 +10,21 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			Create a AudioAnalyser object, which uses an [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode]
 			to analyse audio data.<br /><br />
 
 			This uses the [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
 
-		</div>
+		</p>
 
 
 		<h2>Example</h2>
 
-		<div>
+		<p>
 			[example:webaudio_sandbox webaudio / sandbox ]</br>
 			[example:webaudio_visualizer webaudio / visualizer ]
-		</div>
+		</p>
 
 		<code>
 		// create an AudioListener and add it to the camera
@@ -55,42 +55,42 @@
 
 
 		<h3>[name]( audio, [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize fftSize] )</h3>
-		<div>
+		<p>
 		Create a new [page:AudioAnalyser AudioAnalyser].
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
 
 		<h3>[property:AnalyserNode analyser]</h3>
-		<div>An [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode] used to analyze audio.</div>
+		<p>An [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode] used to analyze audio.</p>
 
 		<h3>[property:Integer fftSize]</h3>
-		<div>
-		A non-zero power of two up to 2048, representing the size of the FFT (Fast Fourier Transform) to be used to determine the frequency domain.<br />
+		<p>
+		A non-zero power of two up to 2048, representing the size of the FFT (Fast Fourier Transform) to be used to determine the frequency domain.
 		See [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize this page] for details.
-		</div>
+		</p>
 
 		<h3>[property:Uint8Array data]</h3>
-		<div>
+		<p>
 		A Uint8Array with size determined by [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/frequencyBinCount analyser.frequencyBinCount]
 		used to hold analysis data.
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
 
 
 		<h3>[method:Uint8Array getFrequencyData]()</h3>
-		<div>
+		<p>
 		Uses the Web Audio's [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getByteFrequencyData getByteFrequencyData] method.
 		See that page.
-		</div>
+		</p>
 
 		<h3>[method:Number getAverageFrequency]()</h3>
-		<div>
+		<p>
 		Get the average of the frequencies returned by the [page:AudioAnalyser.getFrequencyData getFrequencyData] method.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

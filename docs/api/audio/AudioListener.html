@@ -12,20 +12,20 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			The [name] represents a virtual [link:https://developer.mozilla.org/de/docs/Web/API/AudioListener listener] of the all positional and non-positional audio effects in the scene.</br>
 			A three.js application usually creates a single instance of [name]. It is a mandatory construtor parameter for audios entities like [page:Audio Audio] and [page:PositionalAudio PositionalAudio].</br>
 			In most cases, the listener object is a child of the camera. So the 3D transformation of the camera represents the 3D transformation of the listener.
-		</div>
+		</p>
 
 
 		<h2>Example</h2>
 
-		<div>
+		<p>
 			[example:webaudio_sandbox webaudio / sandbox ]</br>
 			[example:webaudio_timing webaudio / timing ]</br>
 			[example:webaudio_visualizer webaudio / visualizer ]
-		</div>
+		</p>
 
 		<code>
 		// create an AudioListener and add it to the camera
@@ -50,56 +50,56 @@
 
 
 		<h3>[name](  )</h3>
-		<div>
+		<p>
 		Create a new AudioListener.
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
 
 		<h3>[property:AudioContext context]</h3>
-		<div>The [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] of the [page:AudioListener listener] given in the constructor.</div>
+		<p>The [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] of the [page:AudioListener listener] given in the constructor.</p>
 
 		<h3>[property:GainNode gain]</h3>
-		<div>A [link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode] created
-		using [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]().</div>
+		<p>A [link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode] created
+		using [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]().</p>
 
 		<h3>[property:AudioNode filter]</h3>
-		<div>Default is *null*.</div>
+		<p>Default is *null*.</p>
 
 
 		<h2>Methods</h2>
 
 
 		<h3>[method:GainNode getInput]()</h3>
-		<div>
+		<p>
 		Return the [page:AudioListener.gain gainNode].
-		</div>
+		</p>
 
 		<h3>[method:null removeFilter]()</h3>
-		<div>
+		<p>
 		Set the [page:AudioListener.filter filter] property to *null*.
-		</div>
+		</p>
 
 		<h3>[method:AudioNode getFilter]()</h3>
-		<div>
+		<p>
 		Returns the value of the [page:AudioListener.filter filter] property.
-		</div>
+		</p>
 
 		<h3>[method:null setFilter]( [param:AudioNode value] )</h3>
-		<div>
+		<p>
 		Set the [page:AudioListener.filter filter] property to *value*.
-		</div>
+		</p>
 
 		<h3>[method:Number getMasterVolume]()</h3>
-		<div>
+		<p>
 		Return the volume.
-		</div>
+		</p>
 
 		<h3>[method:null setMasterVolume]( [param:Number value] )</h3>
-		<div>
+		<p>
 		Set the volume.
-		</div>
+		</p>
 
 
 		<h2>Source</h2>
