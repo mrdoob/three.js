@@ -2183,22 +2183,21 @@ THREE.ColladaLoader.prototype = {
 
 				var count = 0;
 
-				for ( var g = 0; g < primitive.count; g ++ ) {
+				switch ( primitive.type ) {
 
-					var type = primitive.type;
+					case 'lines':
+					case 'linestrips':
+						count = primitive.count * 2;
+						break;
 
-					switch ( type ) {
+					case 'triangles':
+						count = primitive.count * 3;
+						break;
 
-						case 'lines':
-						case 'linestrips':
-							count += 2;
-							break;
+					case 'polylist':
 
-						case 'triangles':
-							count += 3;
-							break;
+						for ( var g = 0; g < primitive.count; g ++ ) {
 
-						case 'polylist':
 							var vc = primitive.vcount[ g ];
 
 							switch ( vc ) {
@@ -2216,12 +2215,13 @@ THREE.ColladaLoader.prototype = {
 									break;
 
 							}
-							break;
 
-						default:
-							console.warn( 'THREE.ColladaLoader: Unknow primitive type:', type );
+						}
 
-					}
+						break;
+
+					default:
+						console.warn( 'THREE.ColladaLoader: Unknow primitive type:', primitive.type );
 
 				}
 
