@@ -403,9 +403,11 @@ THREE.SVGLoader.prototype = {
 			var y = parseFloat( node.getAttribute( 'cy' ) );
 			var r = parseFloat( node.getAttribute( 'r' ) );
 
-			var path = new THREE.ShapePath();
+			var subpath = new THREE.Path();
+			subpath.absarc( x, y, r, 0, Math.PI * 2 );
 
-			path.currentPath.absarc( x, y, r, 0, Math.PI * 2 );
+			var path = new THREE.ShapePath();
+			path.subPaths.push( subpath );
 
 			return path;
 
@@ -418,9 +420,11 @@ THREE.SVGLoader.prototype = {
 			var rx = parseFloat( node.getAttribute( 'rx' ) );
 			var ry = parseFloat( node.getAttribute( 'ry' ) );
 
-			var path = new THREE.ShapePath();
+			var subpath = new THREE.Path();
+			subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
 
-			path.currentPath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
+			var path = new THREE.ShapePath();
+			path.subPaths.push( subpath );
 
 			return path;
 
