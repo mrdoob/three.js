@@ -80,7 +80,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { webgl2: true } );
+				renderer = new THREE.WebGLRenderer( { webglVersion: 'webgl2' } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
