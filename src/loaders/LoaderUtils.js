@@ -4,7 +4,7 @@
 
 var LoaderUtils = {
 
-	decodeText: function ( array ) {
+	decodeText: function ( array, isASCII ) {
 
 		if ( typeof TextDecoder !== 'undefined' ) {
 
@@ -23,6 +23,8 @@ var LoaderUtils = {
 			s += String.fromCharCode( array[ i ] );
 
 		}
+
+		if ( isASCII ) return s;
 
 		// Merges multi-byte utf-8 characters.
 		return decodeURIComponent( escape( s ) );
