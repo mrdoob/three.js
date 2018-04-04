@@ -260,6 +260,7 @@ THREE.PMREMGenerator.prototype = {
 				}",
 
 			blending: THREE.CustomBlending,
+			premultipliedAlpha: false,
 			blendSrc: THREE.OneFactor,
 			blendDst: THREE.ZeroFactor,
 			blendSrcAlpha: THREE.OneFactor,
