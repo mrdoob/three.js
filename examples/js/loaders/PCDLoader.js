@@ -36,6 +36,30 @@ THREE.PCDLoader.prototype = {
 
 	parse: function ( data, url ) {
 
+		function decode( data ) {
+
+			// `data` may contain binary section, and it will be a garbled text
+
+			if ( typeof TextDecoder !== 'undefined' ) {
+
+				return new TextDecoder().decode( data );
+
+			}
+
+			var s = '';
+			var u8array = new Uint8Array( data );
+
+			for ( var i = 0, il = u8array.length; i < il; i ++ ) {
+
+				// Implicitly assumes little-endian.
+				s += String.fromCharCode( u8array[ i ] );
+
+			}
+
+			return s;
+
+		}
+
 		function parseHeader( data ) {
 
 			var PCDheader = {};
@@ -145,7 +169,7 @@ THREE.PCDLoader.prototype = {
 
 		}
 
-		var textData = THREE.LoaderUtils.decodeText( data );
+		var textData = decode( data );
 
 		// parse header (always ascii format)
 
