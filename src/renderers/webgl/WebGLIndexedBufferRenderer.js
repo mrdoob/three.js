@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
+function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 	var mode;
 
@@ -25,11 +25,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 		gl.drawElements( mode, count, type, start * bytesPerElement );
 
-		infoRender.calls ++;
-		infoRender.vertices += count;
-
-		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
-		else if ( mode === gl.POINTS ) infoRender.points += count;
+		info.update( count, mode );
 
 	}
 
@@ -46,11 +42,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 		extension.drawElementsInstancedANGLE( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
 
-		infoRender.calls ++;
-		infoRender.vertices += count * geometry.maxInstancedCount;
-
-		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
-		else if ( mode === gl.POINTS ) infoRender.points += geometry.maxInstancedCount * count;
+		info.update( count, mode, geometry.maxInstancedCount );
 
 	}
 

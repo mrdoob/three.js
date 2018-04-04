@@ -30,19 +30,6 @@
 			var torusGeometry = new THREE.TorusGeometry( 50, 25, 8, 8, Math.PI * 2 );
 			var sphereGeometry = new THREE.SphereGeometry( 50, 15, 15 );
 			var planeGeometry = new THREE.PlaneGeometry( 100, 100, 6, 6 );
-			var textGeometry;
-
-			var loader = new THREE.FontLoader();
-			loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
-
-					textGeometry = new THREE.TextGeometry( '&', {
-					size: 200,
-					height: 50,
-					curveSegments: 1,
-					font: font
-				} );
-
-			} );
 
 			var modifer = new THREE.SimplifyModifier();
 			var meshes = [];

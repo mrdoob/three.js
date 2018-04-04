@@ -144,7 +144,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 			"#include <common>",
 			"#include <fog_pars_fragment>",
 			"#include <bsdfs>",
-			"#include <lights_pars>",
+			"#include <lights_pars_begin>",
 			"#include <lights_phong_pars_fragment>",
 			"#include <shadowmap_pars_fragment>",
 			"#include <logdepthbuf_pars_fragment>"
@@ -152,7 +152,7 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 
 		var output = [
 			// prevent undeclared normal
-			"#include <normal_fragment>",
+			"#include <normal_fragment_begin>",
 
 			// prevent undeclared material
 			"	BlinnPhongMaterial material;",
@@ -208,7 +208,8 @@ THREE.PhongNode.prototype.build = function ( builder ) {
 			'material.specularShininess = shininess;',
 			'material.specularStrength = specularStrength;',
 
-			"#include <lights_template>"
+			"#include <lights_fragment_begin>",
+			"#include <lights_fragment_end>"
 		);
 
 		if ( light ) {

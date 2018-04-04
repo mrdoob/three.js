@@ -47,7 +47,7 @@ var armSkeleton = new THREE.Skeleton( bones );
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Array bones], [page:Array boneInverses] )</h3>
+		<h3>[name]( [param:Array bones], [param:Array boneInverses] )</h3>
 		<div>
 		[page:Array bones] - The array of [page:Bone bones]. Default is an empty array.<br/>
 		[page:Array boneInverses] - (optional) An array of [page:Matrix4 Matrix4s].<br /><br />
@@ -101,6 +101,13 @@ var armSkeleton = new THREE.Skeleton( bones );
 		<div>
 		Updates the [page:Float32Array boneMatrices] and [page:DataTexture boneTexture] after changing the bones.
 		This is called automatically by the [page:WebGLRenderer] if the skeleton is used with a [page:SkinnedMesh].
+		</div>
+
+		<h3>[method:Bone getBoneByName]( [param:String name] )</h3>
+		<div>
+		name -- String to match to the Bone's .name property. <br /><br />
+
+		Searches through the skeleton's bone array and returns the first with a matching name.<br />
 		</div>
 
 		<h2>Source</h2>

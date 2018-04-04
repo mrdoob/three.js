@@ -347,11 +347,16 @@ Object.assign( Color.prototype, {
 
 	},
 
-	getHSL: function ( optionalTarget ) {
+	getHSL: function ( target ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		var hsl = optionalTarget || { h: 0, s: 0, l: 0 };
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Color: .getHSL() target is now required' );
+			target = { h: 0, s: 0, l: 0 };
+
+		}
 
 		var r = this.r, g = this.g, b = this.b;
 
@@ -384,11 +389,11 @@ Object.assign( Color.prototype, {
 
 		}
 
-		hsl.h = hue;
-		hsl.s = saturation;
-		hsl.l = lightness;
+		target.h = hue;
+		target.s = saturation;
+		target.l = lightness;
 
-		return hsl;
+		return target;
 
 	},
 
@@ -398,17 +403,23 @@ Object.assign( Color.prototype, {
 
 	},
 
-	offsetHSL: function ( h, s, l ) {
+	offsetHSL: function () {
 
-		var hsl = this.getHSL();
+		var hsl = {};
 
-		hsl.h += h; hsl.s += s; hsl.l += l;
+		return function ( h, s, l ) {
 
-		this.setHSL( hsl.h, hsl.s, hsl.l );
+			this.getHSL( hsl );
 
-		return this;
+			hsl.h += h; hsl.s += s; hsl.l += l;
 
-	},
+			this.setHSL( hsl.h, hsl.s, hsl.l );
+
+			return this;
+
+		};
+
+	}(),
 
 	add: function ( color ) {
 

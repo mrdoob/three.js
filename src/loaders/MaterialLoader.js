@@ -89,6 +89,10 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.gapSize !== undefined ) material.gapSize = json.gapSize;
 		if ( json.scale !== undefined ) material.scale = json.scale;
 
+		if ( json.polygonOffset !== undefined ) material.polygonOffset = json.polygonOffset;
+		if ( json.polygonOffsetFactor !== undefined ) material.polygonOffsetFactor = json.polygonOffsetFactor;
+		if ( json.polygonOffsetUnits !== undefined ) material.polygonOffsetUnits = json.polygonOffsetUnits;
+
 		if ( json.skinning !== undefined ) material.skinning = json.skinning;
 		if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
 		if ( json.dithering !== undefined ) material.dithering = json.dithering;

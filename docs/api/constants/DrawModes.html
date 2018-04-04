@@ -10,7 +10,7 @@
 	<body>
 		<h1>Draw Mode Constants</h1>
 
-		<div class="desc">
+		<p class="desc">
 			These are valid values for [page:Mesh.drawMode], and control how the list of vertices is interpeted once sent to the GPU.<br /><br />
 
 			Note that these only work when [page:Mesh.geometry] is a [page:BufferGeometry]. Changing this
@@ -18,31 +18,31 @@
 
 
 
-		</div>
+		</p>
 
 		<h2>Draw Modes</h2>
 
 		<code>
 			THREE.TrianglesDrawMode
 		</code>
-		<div>
+		<p>
 			This is the default, and results in every three consecutive vertices (v0, v1, v2), (v2, v3, v5), ...
 			being interpreted as a separate triangle. <br />
 			If the number of vertices is not a multiple of 3, excess vertices are ignored.
-		</div>
+		</p>
 
 		<code>
 			THREE.TriangleStripDrawMode
 		</code>
-		<div>
+		<p>
 			This will result in a series of triangles connected in a strip, given by (v0, v1, v2), (v2, v1, v3), (v2, v3, v4), ...
 			so that every subsequent triangle shares two vertices with the previous triangle.
-		</div>
+		</p>
 
 		<code>
 			THREE.TriangleFanDrawMode
 		</code>
-		<div>
+		<p>
 			This will result in a series of triangles each sharing the first vertex (like a fan),
 			given by (v0, v1, v2), (v0, v2, v3), (v0, v3, v4), ... <br /><br />
 
@@ -50,7 +50,7 @@
 			render WebGL using [link:https://en.wikipedia.org/wiki/ANGLE_(software) ANGLE] on Windows,
 			internally this mode will be converted to a supported mode, which will likely lead to lowered
 			performance on those browsers.
-		</div>
+		</p>
 
 
 		<h2>Usage</h2>

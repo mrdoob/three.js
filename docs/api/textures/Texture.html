@@ -130,20 +130,20 @@
 		<h3>[property:Vector2 offset]</h3>
 		<div>
 		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
-		Typical range is *0.0* to *1.0*.  _Note:_ The offset property is a convenience modifier and only affects 
+		Typical range is *0.0* to *1.0*.  _Note:_ The offset property is a convenience modifier and only affects
 		the Texture's application to the first set of UVs on a model.  If the Texture is used as a map requiring
-		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually 
+		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually
 		assigned to achieve the desired offset.
 		</div>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<div>
-		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set 
-		greater than 1 in either direction, the corresponding Wrap parameter should also be set to 
-		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired 
-		tiling effect.  _Note:_ The repeat property is a convenience modifier and only affects 
+		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set
+		greater than 1 in either direction, the corresponding Wrap parameter should also be set to
+		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired
+		tiling effect.  _Note:_ The repeat property is a convenience modifier and only affects
 		the Texture's application to the first set of UVs on a model.  If the Texture is used as a map requiring
-		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually 
+		additional UV sets (e.g. the aoMap or lightMap of most stock materials), those UVs must be manually
 		assigned to achieve the desired repetiton.
 		</div>
 
@@ -169,7 +169,7 @@
 		The uv-transform matrix for the texture. Updated by the renderer from the texture properties [property:Vector2 offset], [property:Vector2 repeat],
 		and [property:number rotation] when the texture's [property:boolean matrixAutoUpdate] property is true.
 		When [property:boolean matrixAutoUpdate] property is false, this matrix may be set manually.
-		Default is the indentity matrix.
+		Default is the identity matrix.
 		</div>
 
 		<h3>[property:boolean generateMipmaps]</h3>
@@ -194,7 +194,7 @@
 		4 by default. Specifies the alignment requirements for the start of each pixel row in memory.
 		The allowable values are 1 (byte-alignment), 2 (rows aligned to even-numbered bytes),
 		4 (word-alignment), and 8 (rows start on double-word boundaries).
-		See <a href="http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml">glPixelStorei</a>
+		See [link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei]
 		for more information.
 		</div>
 
@@ -203,7 +203,7 @@
 		[page:Textures THREE.LinearEncoding] is the default.
 		See the [page:Textures texture constants] page for details of other formats.<br /><br />
 
-		Note that ff this value is changed on a texture after the material has been used,
+		Note that if this value is changed on a texture after the material has been used,
 		it is necessary to trigger a Material.needsUpdate for this value to be realized in the shader.
 		</div>
 
@@ -228,7 +228,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:Texture clone]( [page:Texture texture] )</h3>
+		<h3>[method:Texture clone]( [param:Texture texture] )</h3>
 		<div>
 		Make copy of the texture. Note this is not a "deep copy", the image is shared.
 		</div>

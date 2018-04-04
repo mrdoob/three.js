@@ -10,107 +10,107 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			"Interleaved" means that multiple attributes, possibly of different types, (e.g., position, normal, uv, color) are packed into a single array buffer.
 			<br/><br/>
 			An introduction into interleaved arrays can be found here: [link:https://blog.tojicode.com/2011/05/interleaved-array-basics.html Interleaved array basics]
-		</div>
+		</p>
 
 		<h2>Example</h2>
 
-		<div>[example:webgl_buffergeometry_points_interleaved webgl / buffergeometry / points / interleaved]</div>
+		<p>[example:webgl_buffergeometry_points_interleaved webgl / buffergeometry / points / interleaved]</p>
 
 		<h2>Constructor</h2>
-		<h3>[name]( [page:TypedArray array], [page:Integer stride] )</h3>
-		<div>
+		<h3>[name]( [param:TypedArray array], [param:Integer stride] )</h3>
+		<p>
 			[page:TypedArray array] -- A typed array with a shared buffer. Stores the geometry data.<br/>
 			[page:Integer stride] -- The number of typed-array elements per vertex.
-		</div>
+		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Array array]</h3>
-		<div>
+		<p>
 			 A typed array with a shared buffer. Stores the geometry data.
-		</div>
+		</p>
 
 		<h3>[property:Integer stride]</h3>
-		<div>
+		<p>
 			The number of typed-array elements per vertex.
-		</div>
+		</p>
 
 		<h3>[property:Integer count]</h3>
-		<div>
+		<p>
 		Gives the total number of elements in the array.
-		</div>
+		</p>
 
 		<h3>[property:Boolean dynamic]</h3>
-		<div>
+		<p>
 		Default is *false*.
-		</div>
+		</p>
 
 		<h3>[property:Object updateRange]</h3>
-		<div>
+		<p>
 		Object containing offset and count.
-		</div>
+		</p>
 
 		<h3>[property:Number updateRange.offset]</h3>
-		<div>
+		<p>
 		Default is *0*.
-		</div>
+		</p>
 
 		<h3>[property:Number updateRange.count]</h3>
-		<div>
+		<p>
 		Default is *-1*.
-		</div>
+		</p>
 
 		<h3>[property:Integer version]</h3>
-		<div>
+		<p>
 		A version number, incremented every time the needsUpdate property is set to true.
-		</div>
+		</p>
 
 		<h3>[property:Integer isInterleavedBuffer]</h3>
-		<div>
+		<p>
 		Default is *true*.
-		</div>
+		</p>
 
 		<h3>[property:Integer needsUpdate]</h3>
-		<div>
+		<p>
 		Default is *false*. Setting this to true increments [page:InterleavedBuffer.version version].
-		</div>
+		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setArray] ( [page:TypedArray array] ) </h3>
-		<div>
+		<h3>[method:null setArray] ( [param:TypedArray array] ) </h3>
+		<p>
 		 array - must be  a Typed Array.
-		</div>
+		</p>
 
-		<h3>[method:InterleavedBuffer setDynamic] ( [page:Boolean value] ) </h3>
-		<div>
+		<h3>[method:InterleavedBuffer setDynamic] ( [param:Boolean value] ) </h3>
+		<p>
 			Set [page:InterleavedBuffer.dynamic dynamic] to value.
-		</div>
+		</p>
 
 		<h3>[method:InterleavedBuffer copy]( source ) </h3>
-		<div>
+		<p>
 		 Copies another [name] to this [name].
-		</div>
+		</p>
 
 		<h3>[method:InterleavedBuffer copyAt]( index1, attribute, index2 ) </h3>
-		<div>Copies data from attribute[index2] to [page:InterleavedBuffer.array array][index1].</div>
+		<p>Copies data from attribute[index2] to [page:InterleavedBuffer.array array][index1].</p>
 
 		<h3>[method:InterleavedBuffer set]( value, offset ) </h3>
-		<div>
+		<p>
 			value - The source (typed) array.<br/>
 			offset - The offset into the target array at which to begin writing values from the source array. Default is *0*.<br/><br />
 
 			Stores multiple values in the buffer, reading input values from a specified array.
-		</div>
+		</p>
 
 		<h3>[method:InterleavedBuffer clone]() </h3>
-		<div>
+		<p>
 			Creates a clone of this [name].
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

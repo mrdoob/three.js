@@ -32,11 +32,13 @@
 		<h2>Constructor</h2>
 
 		All of the above are called in the same way.
-		<h3>TypedBufferAttribute( [page:Array array], [page:Integer itemSize] )</h3>
+		<h3>TypedBufferAttribute( [param:Array array], [param:Integer itemSize], [param:Boolean normalized] )</h3>
 		<div>
 			array -- this can be a typed or untyped (normal) array. It will be converted to the Type specified.<br /><br />
 
-			itemSize -- the number of values of the array that should be associated with a particular vertex.
+			itemSize -- the number of values of the array that should be associated with a particular vertex.<br /><br />
+
+			normalized -- (optional) indicates how the underlying data in the buffer maps to the values in the GLSL code. 
 		</div>
 
 		<h2>Properties</h2>

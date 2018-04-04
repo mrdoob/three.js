@@ -113,65 +113,72 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "getCenter", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
-
-			assert.ok( a.getCenter().equals( zero2 ), "Passed!" );
+			var center = new Vector2();
+			assert.ok( a.getCenter( center ).equals( zero2 ), "Passed!" );
 
 			var a = new Box2( zero2, one2 );
 			var midpoint = one2.clone().multiplyScalar( 0.5 );
-			assert.ok( a.getCenter().equals( midpoint ), "Passed!" );
+			assert.ok( a.getCenter( center ).equals( midpoint ), "Passed!" );
 
 		} );
 
 		QUnit.test( "getSize", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
+			var size = new Vector2();
 
-			assert.ok( a.getSize().equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( zero2 ), "Passed!" );
 
 			var a = new Box2( zero2.clone(), one2.clone() );
-			assert.ok( a.getSize().equals( one2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( one2 ), "Passed!" );
 
 		} );
 
 		QUnit.test( "expandByPoint", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
+			var size = new Vector2();
+			var center = new Vector2();
 
 			a.expandByPoint( zero2 );
-			assert.ok( a.getSize().equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( zero2 ), "Passed!" );
 
 			a.expandByPoint( one2 );
-			assert.ok( a.getSize().equals( one2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( one2 ), "Passed!" );
 
 			a.expandByPoint( one2.clone().negate() );
-			assert.ok( a.getSize().equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
-			assert.ok( a.getCenter().equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
+			assert.ok( a.getCenter( center ).equals( zero2 ), "Passed!" );
 
 		} );
 
 		QUnit.test( "expandByVector", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
+			var size = new Vector2();
+			var center = new Vector2();
 
 			a.expandByVector( zero2 );
-			assert.ok( a.getSize().equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( zero2 ), "Passed!" );
 
 			a.expandByVector( one2 );
-			assert.ok( a.getSize().equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
-			assert.ok( a.getCenter().equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
+			assert.ok( a.getCenter( center ).equals( zero2 ), "Passed!" );
 
 		} );
 
 		QUnit.test( "expandByScalar", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
+			var size = new Vector2();
+			var center = new Vector2();
 
 			a.expandByScalar( 0 );
-			assert.ok( a.getSize().equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( zero2 ), "Passed!" );
 
 			a.expandByScalar( 1 );
-			assert.ok( a.getSize().equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
-			assert.ok( a.getCenter().equals( zero2 ), "Passed!" );
+			assert.ok( a.getSize( size ).equals( one2.clone().multiplyScalar( 2 ) ), "Passed!" );
+			assert.ok( a.getCenter( center ).equals( zero2 ), "Passed!" );
 
 		} );
 
@@ -210,12 +217,19 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Box2( zero2.clone(), one2.clone() );
 			var b = new Box2( one2.clone().negate(), one2.clone() );
 
-			assert.ok( a.getParameter( new Vector2( 0, 0 ) ).equals( new Vector2( 0, 0 ) ), "Passed!" );
-			assert.ok( a.getParameter( new Vector2( 1, 1 ) ).equals( new Vector2( 1, 1 ) ), "Passed!" );
+			var parameter = new Vector2();
 
-			assert.ok( b.getParameter( new Vector2( - 1, - 1 ) ).equals( new Vector2( 0, 0 ) ), "Passed!" );
-			assert.ok( b.getParameter( new Vector2( 0, 0 ) ).equals( new Vector2( 0.5, 0.5 ) ), "Passed!" );
-			assert.ok( b.getParameter( new Vector2( 1, 1 ) ).equals( new Vector2( 1, 1 ) ), "Passed!" );
+			a.getParameter( zero2, parameter );
+			assert.ok( parameter.equals( zero2 ), "Passed!" );
+			a.getParameter( one2, parameter );
+			assert.ok( parameter.equals( one2 ), "Passed!" );
+
+			b.getParameter( one2.clone().negate(), parameter );
+			assert.ok( parameter.equals( zero2 ), "Passed!" );
+			b.getParameter( zero2, parameter );
+			assert.ok( parameter.equals( new Vector2( 0.5, 0.5 ) ), "Passed!" );
+			b.getParameter( one2, parameter );
+			assert.ok( parameter.equals( one2 ), "Passed!" );
 
 		} );
 
@@ -233,7 +247,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( c.intersectsBox( a ), "Passed!" );
 			assert.ok( b.intersectsBox( c ), "Passed!" );
 
-			b.translate( new Vector2( 2, 2 ) );
+			b.translate( two2 );
 			assert.ok( ! a.intersectsBox( b ), "Passed!" );
 			assert.ok( ! b.intersectsBox( a ), "Passed!" );
 			assert.ok( ! b.intersectsBox( c ), "Passed!" );
@@ -245,15 +259,25 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Box2( zero2.clone(), zero2.clone() );
 			var b = new Box2( one2.clone().negate(), one2.clone() );
 
-			assert.ok( a.clampPoint( new Vector2( 0, 0 ) ).equals( new Vector2( 0, 0 ) ), "Passed!" );
-			assert.ok( a.clampPoint( new Vector2( 1, 1 ) ).equals( new Vector2( 0, 0 ) ), "Passed!" );
-			assert.ok( a.clampPoint( new Vector2( - 1, - 1 ) ).equals( new Vector2( 0, 0 ) ), "Passed!" );
+			var point = new Vector2();
 
-			assert.ok( b.clampPoint( new Vector2( 2, 2 ) ).equals( new Vector2( 1, 1 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector2( 1, 1 ) ).equals( new Vector2( 1, 1 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector2( 0, 0 ) ).equals( new Vector2( 0, 0 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector2( - 1, - 1 ) ).equals( new Vector2( - 1, - 1 ) ), "Passed!" );
-			assert.ok( b.clampPoint( new Vector2( - 2, - 2 ) ).equals( new Vector2( - 1, - 1 ) ), "Passed!" );
+			a.clampPoint( zero2, point );
+			assert.ok( point.equals( new Vector2( 0, 0 ) ), "Passed!" );
+			a.clampPoint( one2, point );
+			assert.ok( point.equals( new Vector2( 0, 0 ) ), "Passed!" );
+			a.clampPoint( one2.clone().negate(), point );
+			assert.ok( point.equals( new Vector2( 0, 0 ) ), "Passed!" );
+
+			b.clampPoint( two2, point );
+			assert.ok( point.equals( new Vector2( 1, 1 ) ), "Passed!" );
+			b.clampPoint( one2, point );
+			assert.ok( point.equals( new Vector2( 1, 1 ) ), "Passed!" );
+			b.clampPoint( zero2, point );
+			assert.ok( point.equals( new Vector2( 0, 0 ) ), "Passed!" );
+			b.clampPoint( one2.clone().negate(), point );
+			assert.ok( point.equals( new Vector2( - 1, - 1 ) ), "Passed!" );
+			b.clampPoint( two2.clone().negate(), point );
+			assert.ok( point.equals( new Vector2( - 1, - 1 ) ), "Passed!" );
 
 		} );
 

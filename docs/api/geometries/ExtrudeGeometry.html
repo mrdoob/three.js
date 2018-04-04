@@ -64,7 +64,7 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Array shapes], [page:Object options])</h3>
+		<h3>[name]([param:Array shapes], [param:Object options])</h3>
 		<div>
 		shapes — Shape or an array of shapes. <br />
 		options — Object that can contain the following parameters.
@@ -77,8 +77,7 @@
 				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
 				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
-				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
-				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
+				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded.</li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 
@@ -99,7 +98,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null addShapeList]([page:Array shapes], [page:Object options])</h3>
+		<h3>[method:null addShapeList]([param:Array shapes], [param:Object options])</h3>
 		<div>
 			shapes — An Array of shapes to add. <br />
 			options — Object that can contain the following parameters.
@@ -111,14 +110,13 @@
 				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
 				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
-				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
-				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
+				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded.</li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 		</div>
 		<div>Adds the shapes to the list to extrude.</div>
 
-		<h3>[method:null addShape]([page:Shape shape], [page:Object options])</h3>
+		<h3>[method:null addShape]([param:Shape shape], [param:Object options])</h3>
 		<div>
 			shape — A shape to add. <br />
 			options — Object that can contain the following parameters.
@@ -130,8 +128,7 @@
 				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
 				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
-				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
-				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
+				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded.</li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 		</div>

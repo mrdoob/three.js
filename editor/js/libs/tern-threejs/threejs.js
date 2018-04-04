@@ -3702,11 +3702,11 @@
           "!type": "fn(a: +THREE.Vector3, b: +THREE.Vector3, c: +THREE.Vector3) -> +THREE.Triangle",
           "!doc": "Sets the triangle's vectors to the passed vectors."
         },
-        "normal": {
+        "getNormal": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the calculated normal of the triangle."
         },
-        "barycoordFromPoint": {
+        "getBarycoord": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return a barycentric coordinate from the given vector. <br><br>\n\t\t[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png](Picture of barycentric coordinates)"
         },
@@ -3714,11 +3714,11 @@
           "!type": "fn() -> +THREE.Triangle",
           "!doc": "Return a new copy of this triangle."
         },
-        "area": {
+        "getArea": {
           "!type": "fn() -> number",
           "!doc": "Return the area of the triangle."
         },
-        "midpoint": {
+        "getMidpoint": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the midpoint of the triangle. Optionally sets a target vector."
         },
@@ -3726,7 +3726,7 @@
           "!type": "fn(triangle: +THREE.Triangle) -> bool",
           "!doc": "Checks to see if two triangles are equal (share the same vectors)."
         },
-        "plane": {
+        "getPlane": {
           "!type": "fn(optionalTarget: +THREE.Plane) -> +THREE.Plane",
           "!doc": "Return a [page:Plane plane] based on the triangle. Optionally sets a target plane."
         },

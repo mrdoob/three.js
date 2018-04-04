@@ -134,16 +134,19 @@ export default QUnit.module( 'Core', () => {
 			var axis = new Vector3( 0, 1, 0 );
 			var angle = Math.PI;
 			var expected = new Euler( - Math.PI, 0, - Math.PI );
+			var euler = new Euler();
 
 			a.setRotationFromAxisAngle( axis, angle );
-			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after rotation" );
+			euler.setFromQuaternion( a.getWorldQuaternion( new Quaternion() ) );
+			assert.ok( eulerEquals( euler, expected ), "Correct values after rotation" );
 
 			axis.set( 1, 0, 0 );
 			var angle = 0;
 			expected.set( 0, 0, 0 );
 
 			a.setRotationFromAxisAngle( axis, angle );
-			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after zeroing" );
+			euler.setFromQuaternion( a.getWorldQuaternion( new Quaternion() ) );
+			assert.ok( eulerEquals( euler, expected ), "Correct values after zeroing" );
 
 		} );
 
@@ -152,9 +155,11 @@ export default QUnit.module( 'Core', () => {
 			var a = new Object3D();
 			var rotation = new Euler( ( 45 / RadToDeg ), 0, Math.PI );
 			var expected = rotation.clone(); // bit obvious
+			var euler = new Euler();
 
 			a.setRotationFromEuler( rotation );
-			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after rotation" );
+			euler.setFromQuaternion( a.getWorldQuaternion( new Quaternion() ) );
+			assert.ok( eulerEquals( euler, expected ), "Correct values after rotation" );
 
 		} );
 
@@ -165,10 +170,12 @@ export default QUnit.module( 'Core', () => {
 			var eye = new Vector3( 0, 0, 0 );
 			var target = new Vector3( 0, 1, - 1 );
 			var up = new Vector3( 0, 1, 0 );
+			var euler = new Euler();
 
 			m.lookAt( eye, target, up );
 			a.setRotationFromMatrix( m );
-			assert.numEqual( a.getWorldRotation().x * RadToDeg, 45, "Correct rotation angle" );
+			euler.setFromQuaternion( a.getWorldQuaternion( new Quaternion() ) );
+			assert.numEqual( euler.x * RadToDeg, 45, "Correct rotation angle" );
 
 		} );
 
@@ -176,10 +183,11 @@ export default QUnit.module( 'Core', () => {
 
 			var a = new Object3D();
 			var rotation = new Quaternion().setFromEuler( new Euler( Math.PI, 0, - Math.PI ) );
-			var expected = new Euler( Math.PI, 0, - Math.PI );
+			var euler = new Euler();
 
 			a.setRotationFromQuaternion( rotation );
-			assert.ok( eulerEquals( a.getWorldRotation(), expected ), "Correct values after rotation" );
+			euler.setFromQuaternion( a.getWorldQuaternion( new Quaternion() ) );
+			assert.ok( eulerEquals( euler, new Euler( Math.PI, 0, - Math.PI ) ), "Correct values after rotation" );
 
 		} );
 
@@ -354,41 +362,27 @@ export default QUnit.module( 'Core', () => {
 			var expectedSingle = new Vector3( x, y, z );
 			var expectedParent = new Vector3( x, y, 0 );
 			var expectedChild = new Vector3( x, y, 7 + ( z - z ) );
+			var position = new Vector3();
 
 			a.translateX( x );
 			a.translateY( y );
 			a.translateZ( z );
 
-			assert.deepEqual(
-				a.getWorldPosition(), expectedSingle,
-				"WorldPosition as expected for single object"
-			);
+			assert.deepEqual( a.getWorldPosition( position ), expectedSingle, "WorldPosition as expected for single object" );
 
 			// translate child and then parent
 			b.translateZ( 7 );
 			a.add( b );
 			a.translateZ( - z );
 
-			assert.deepEqual( a.getWorldPosition(), expectedParent, "WorldPosition as expected for parent" );
-			assert.deepEqual( b.getWorldPosition(), expectedChild, "WorldPosition as expected for child" );
+			assert.deepEqual( a.getWorldPosition( position ), expectedParent, "WorldPosition as expected for parent" );
+			assert.deepEqual( b.getWorldPosition( position ), expectedChild, "WorldPosition as expected for child" );
 
 		} );
 
 		QUnit.todo( "getWorldQuaternion", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "getWorldRotation", ( assert ) => {
-
-			var obj = new Object3D();
-
-			obj.lookAt( new Vector3( 0, - 1, 1 ) );
-			assert.numEqual( obj.getWorldRotation().x * RadToDeg, 45, "x is equal" );
-
-			obj.lookAt( new Vector3( 1, 0, 0 ) );
-			assert.numEqual( obj.getWorldRotation().y * RadToDeg, 90, "y is equal" );
 
 		} );
 
@@ -400,7 +394,7 @@ export default QUnit.module( 'Core', () => {
 
 			a.applyMatrix( m );
 
-			assert.deepEqual( a.getWorldScale(), expected, "WorldScale as expected" );
+			assert.deepEqual( a.getWorldScale( new Vector3() ), expected, "WorldScale as expected" );
 
 		} );
 
@@ -408,15 +402,15 @@ export default QUnit.module( 'Core', () => {
 
 			var a = new Object3D();
 			var expected = new Vector3( 0, - 0.5 * Math.sqrt( 2 ), 0.5 * Math.sqrt( 2 ) );
-			var dir;
+			var direction = new Vector3();
 
 			a.lookAt( new Vector3( 0, - 1, 1 ) );
-			dir = a.getWorldDirection();
+			a.getWorldDirection( direction );
 
 			assert.ok(
-				Math.abs( dir.x - expected.x ) <= eps &&
-				Math.abs( dir.y - expected.y ) <= eps &&
-				Math.abs( dir.z - expected.z ) <= eps,
+				Math.abs( direction.x - expected.x ) <= eps &&
+				Math.abs( direction.y - expected.y ) <= eps &&
+				Math.abs( direction.z - expected.z ) <= eps,
 				"Direction has the expected values"
 			);
 

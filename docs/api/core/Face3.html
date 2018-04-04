@@ -10,19 +10,19 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 		Triangular face used in [page:Geometry]. These are created automatically for all
 		standard geometry types, however if you are building a custom geometry you will have to
 		create them manually.
-		</div>
+		</p>
 
 
 		<h2>Examples</h2>
 
-		<div>[example:misc_ubiquity_test ubiquity / test ]</div>
-		<div>[example:svg_sandbox svg / sandbox ]</div>
-		<div>[example:misc_exporter_obj exporter / obj ]</div>
-		<div>[example:webgl_shaders_vector WebGL / shaders / vector ]</div>
+		<p>[example:misc_ubiquity_test ubiquity / test ]</p>
+		<p>[example:svg_sandbox svg / sandbox ]</p>
+		<p>[example:misc_exporter_obj exporter / obj ]</p>
+		<p>[example:webgl_shaders_vector WebGL / shaders / vector ]</p>
 
 
 		<code>
@@ -53,8 +53,8 @@ scene.add( new THREE.Mesh( geometry, material ) );
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Integer a], [page:Integer b], [page:Integer c], [page:Vector3 normal], [page:Color color], [page:Integer materialIndex] )</h3>
-		<div>
+		<h3>[name]( [param:Integer a], [param:Integer b], [param:Integer c], [param:Vector3 normal], [param:Color color], [param:Integer materialIndex] )</h3>
+		<p>
 		a — Vertex A index.<br />
 		b — Vertex B index.<br />
 		c — Vertex C index.<br /><br />
@@ -69,62 +69,62 @@ scene.add( new THREE.Mesh( geometry, material ) );
 
 		materialIndex — (optional) which index of an array of materials to associate
 		with the face.
-		</div>
+		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Integer a]</h3>
-		<div>
+		<p>
 		Vertex A index.
-		</div>
+		</p>
 
 		<h3>[property:Integer b]</h3>
-		<div>
+		<p>
 		Vertex B index.
-		</div>
+		</p>
 
 		<h3>[property:Integer c]</h3>
-		<div>
+		<p>
 		Vertex C index.
-		</div>
+		</p>
 
 		<h3>[property:Vector3 normal]</h3>
-		<div>
+		<p>
 		Face normal - vector showing the direction of the Face3. If calculated automatically
 		(using [page:Geometry.computeFaceNormals]), this is the normalized cross product of two edges of the
 		triangle. Default is *(0, 0, 0)*.
-		</div>
+		</p>
 
 		<h3>[property:Color color]</h3>
-		<div>
+		<p>
 		Face color - for this to be used a material's [page:Material.vertexColors vertexColors] property
 		must be set to [page:Materials THREE.FaceColors].
-		</div>
+		</p>
 
 		<h3>[property:Array vertexNormals]</h3>
-		<div>
+		<p>
 		Array of 3 [page:Vector3 vertex normals].
-		</div>
+		</p>
 
 		<h3>[property:Array vertexColors]</h3>
-		<div>
+		<p>
 		Array of 3 vertex colors - for these to be used a material's [page:Material.vertexColors vertexColors] property
 		must be set to [page:Materials THREE.VertexColors].
-		</div>
+		</p>
 
 
 		<h3>[property:Integer materialIndex]</h3>
-		<div>
+		<p>
 		Material index (points to an index in the associated array of materials). Default is *0*.
-		</div>
+		</p>
 
 		<h2>Methods</h2>
 
 		<h3>[method:Face3 clone]()</h3>
-		<div>Creates a new clone of the Face3 object.</div>
+		<p>Creates a new clone of the Face3 object.</p>
 
-		<h3>[method:Face3 copy]( [page:Face3 face3] )</h3>
-		<div>Copy the paramaters of another Face3 into this.</div>
+		<h3>[method:Face3 copy]( [param:Face3 face3] )</h3>
+		<p>Copy the paramaters of another Face3 into this.</p>
 
 
 		<h2>Source</h2>

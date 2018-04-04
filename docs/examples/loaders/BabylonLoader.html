@@ -50,7 +50,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<div>
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
 		</div>
@@ -63,7 +63,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<div>
 		[page:String url] — A string containing the path/URL of the <em>.babylon</em> file.<br />
 		[page:function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives the loaded [page:Object3D] as an argument.<br />
@@ -74,7 +74,7 @@
 		Begin loading from url and call onLoad with the parsed response content.
 		</div>
 
-		<h3>[method:Object3D parse]( [page:Object json] )</h3>
+		<h3>[method:Object3D parse]( [param:Object json] )</h3>
 		<div>
 		[page:Object json] — The <em>JSON</em> structure to parse.
 		</div>

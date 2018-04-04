@@ -85,6 +85,7 @@
 		User-defined clipping planes specified as THREE.Plane objects in world space.
 		These planes apply to the objects this material is attached to.
 		Points in space whose signed distance to the plane is negative are clipped (not rendered).
+		This requires [page:WebGLRenderer.localClippingEnabled] to be *true*.
 		See the [example:webgl_clipping_intersection WebGL / clipping /intersection] example.
 		Default is *null*.
 		</div>
@@ -107,17 +108,17 @@
 		(b) using a displacement map, (c) using an alpha map with alphaTest, or (d) using a transparent texture with alphaTest,
 		you must specify a customDepthMaterial for proper shadows. Default is *undefined*.
 		</div>
-		
+
 		<h3>[property:Material customDistanceMaterial]</h3>
 		<div>
 		Same as customDepthMaterial, but used with [page:PointLight]. Default is *undefined*.
 		</div>
-		
+
 		<h3>[property:Object defines]</h3>
 		<div>
 		Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. { MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }. The pairs are defined in both vertex and fragment shaders.  Default is *undefined*.
 		</div>
-		
+
 		<h3>[property:Integer depthFunc]</h3>
 		<div>
 		Which depth function to use. Default is [page:Materials LessEqualDepth]. See the depth mode [page:Materials constants] for all possible values.
@@ -285,7 +286,7 @@
 		<div>
 		Defines whether this material is visible. Default is *true*.
 		</div>
-		
+
 		<h3>[property:object userData]</h3>
 		<div>
 		An object that can be used to store custom data about the Material. It should not hold
@@ -299,7 +300,7 @@
 		<h3>[method:Material clone]( )</h3>
 		<div>Return a new material with the same parameters as this material.</div>
 
-		<h3>[method:Material copy]( [page:material material] )</h3>
+		<h3>[method:Material copy]( [param:material material] )</h3>
 		<div>Copy the parameters from the passed material into this material.</div>
 
 		<h3>[method:null dispose]()</h3>
@@ -308,21 +309,22 @@
 		These needs to be disposed by [page:Texture Texture].
 		</div>
 
-		<h3>[method:null setValues]( [page:object values] )</h3>
+		<h3>[method:null onBeforeCompile]( [param:Object shader], [param:WebGLRenderer renderer] )</h3>
+		<div>
+		An optional callback that is executed immediately before the shader program is compiled.
+		This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.
+		</div>
+
+		<h3>[method:null setValues]( [param:object values] )</h3>
 		<div>
 		values -- a container with parameters.<br />
 		Sets the properties based on the *values*.
 		</div>
 
-		<h3>[method:null toJSON]( [page:object meta] )</h3>
+		<h3>[method:null toJSON]( [param:object meta] )</h3>
 		<div>
 		meta -- object containing metadata such as textures or images for the material.<br />
 		Convert the material to three.js JSON format.
-		</div>
-
-		<h3>[method:null update]()</h3>
-		<div>
-		Call [method:null dispatchEvent]( { type: '[page:object update]' }) on the material.
 		</div>
 
 		<h2>Source</h2>

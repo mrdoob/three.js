@@ -30,7 +30,7 @@ document.body.appendChild( renderer.domElement );
 
 var scene = new THREE.Scene();
 
-var  camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
 var controls = new THREE.OrbitControls( camera );
 
@@ -52,7 +52,7 @@ function animate() {
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Camera object], [page:HTMLDOMElement domElement] )</h3>
+		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
 		<div>
       [page:Camera object]: (required) The camera to be controlled.<br><br>
 
@@ -96,7 +96,8 @@ function animate() {
 
     <h3>[property:Boolean enableDamping]</h3>
     <div>
-      Set to true to enable damping (inertia), which can be used to give a sense of weight to the controls. Default is false.<br>          Note that if this is enabled, you must call [page:.update] () in your animation loop.
+      Set to true to enable damping (inertia), which can be used to give a sense of weight to the controls. Default is false.<br>
+      Note that if this is enabled, you must call [page:.update] () in your animation loop.
     </div>
 
     <h3>[property:Boolean enableKeys]</h3>
@@ -198,7 +199,12 @@ controls.mouseButtons = {
 
     <h3>[property:Camera object]</h3>
     <div>
-      The camera ( or other object ) that is being controlled.
+      The camera being controlled.
+    </div>
+
+    <h3>[property:Float panSpeed]</h3>
+    <div>
+      Speed of panning. Default is 1.
     </div>
 
     <h3>[property:Vector3 position0]</h3>
@@ -209,6 +215,12 @@ controls.mouseButtons = {
     <h3>[property:Float rotateSpeed]</h3>
     <div>
       Speed of rotation. Default is 1.
+    </div>
+
+    <h3>[property:Boolean screenSpacePanning]</h3>
+    <div>
+    Defines how the camera's position is translated when panning. If true, the camera pans in screen space.
+    Otherwise, the camera pans in the plane orthogonal to the camera's up direction. Default is false.
     </div>
 
     <h3>[property:Vector3 target0]</h3>
