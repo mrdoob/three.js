@@ -305,13 +305,13 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	};
 
-    this.createTexture = function( sizeXTexture, sizeYTexture ) {
+	this.createTexture = function( sizeXTexture, sizeYTexture ) {
 
 		sizeXTexture = sizeXTexture || sizeX;
 		sizeYTexture = sizeYTexture || sizeY;
 
 		var a = new Float32Array( sizeXTexture * sizeYTexture * 4 );
-		var texture = new THREE.DataTexture( a, sizeX, sizeY, THREE.RGBAFormat, THREE.FloatType );
+		var texture = new THREE.DataTexture( a, sizeXTexture, sizeYTexture, THREE.RGBAFormat, THREE.FloatType );
 		texture.needsUpdate = true;
 
 		return texture;
