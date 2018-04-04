@@ -95,7 +95,16 @@ THREE.EquiangularToCubeGenerator.prototype = {
     			vec3 color = texture2D(equirectangularMap, uv).rgb;\n\
     			\n\
 					gl_FragColor = vec4( color, 1.0 );\n\
-				}"
+				}",
+
+			blending: THREE.CustomBlending,
+			premultipliedAlpha: false,
+			blendSrc: THREE.OneFactor,
+			blendDst: THREE.ZeroFactor,
+			blendSrcAlpha: THREE.OneFactor,
+			blendDstAlpha: THREE.ZeroFactor,
+			blendEquation: THREE.AddEquation
+
 		} );
 
 	}
