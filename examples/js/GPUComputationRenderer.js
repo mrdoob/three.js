@@ -298,7 +298,8 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 			magFilter: magFilter,
 			format: THREE.RGBAFormat,
 			type: ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) ? THREE.HalfFloatType : THREE.FloatType,
-			stencilBuffer: false
+			stencilBuffer: false,
+			depthBuffer: false
 		} );
 
 		return renderTarget;
