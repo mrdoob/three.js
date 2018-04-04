@@ -24,10 +24,7 @@ var LoaderUtils = {
 
 		}
 
-		if ( isASCII ) return s;
-
-		// Merges multi-byte utf-8 characters.
-		return decodeURIComponent( escape( s ) );
+		return ( isASCII === true ) ? s : decodeURIComponent( escape( s ) );
 
 	},
 
