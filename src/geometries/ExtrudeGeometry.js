@@ -69,14 +69,6 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 	this.computeVertexNormals();
 
-	// can't really use automatic vertex normals
-	// as then front and back sides get smoothed too
-	// should do separate smoothing just for sides
-
-	//this.computeVertexNormals();
-
-	//console.log( "took", ( Date.now() - startTime ) );
-
 }
 
 ExtrudeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
@@ -90,13 +82,9 @@ ExtrudeBufferGeometry.prototype.getArrays = function () {
 	var uvAttribute = this.getAttribute( "uv" );
 	var uvArray = uvAttribute ? Array.prototype.slice.call( uvAttribute.array ) : [];
 
-	var IndexAttribute = this.index;
-	var indicesArray = IndexAttribute ? Array.prototype.slice.call( IndexAttribute.array ) : [];
-
 	return {
 		position: verticesArray,
-		uv: uvArray,
-		index: indicesArray
+		uv: uvArray
 	};
 
 };
@@ -113,7 +101,6 @@ ExtrudeBufferGeometry.prototype.addShapeList = function ( shapes, options ) {
 
 	}
 
-	this.setIndex( options.arrays.index );
 	this.addAttribute( 'position', new Float32BufferAttribute( options.arrays.position, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( options.arrays.uv, 2 ) );
 
@@ -123,7 +110,6 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 	var arrays = options.arrays ? options.arrays : this.getArrays();
 	var verticesArray = arrays.position;
-	var indicesArray = arrays.index;
 	var uvArray = arrays.uv;
 
 	var placeholder = [];
@@ -727,7 +713,6 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 	function addVertex( index ) {
 
-		indicesArray.push( verticesArray.length / 3 );
 		verticesArray.push( placeholder[ index * 3 + 0 ] );
 		verticesArray.push( placeholder[ index * 3 + 1 ] );
 		verticesArray.push( placeholder[ index * 3 + 2 ] );
@@ -744,7 +729,6 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 	if ( ! options.arrays ) {
 
-		this.setIndex( indicesArray );
 		this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
 
