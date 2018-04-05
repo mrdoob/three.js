@@ -218,16 +218,12 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			var v = new THREE.Vector3();
+
 			for ( var i = 0, il = normal.count; i < il; i ++ ) {
 
-				var x = normal.getX( i );
-				var y = normal.getY( i );
-				var z = normal.getZ( i );
-
-				var length = Math.sqrt( x * x + y * y + z * z );
-
 				// 0.0005 is from glTF-validator
-				if ( Math.abs( length - 1.0 ) > 0.0005 ) return false;
+				if ( Math.abs( v.fromArray( normal.array, i * 3 ).length() - 1.0 ) > 0.0005 ) return false;
 
 			}
 
@@ -256,7 +252,7 @@ THREE.GLTFExporter.prototype = {
 
 			for ( var i = 0, il = attribute.count; i < il; i ++ ) {
 
-				v.set( attribute.getX( i ), attribute.getY( i ), attribute.getZ( i ) );
+				v.fromArray( attribute.array, i * 3 );
 
 				if ( v.x === 0 && v.y === 0 && v.z === 0 ) {
 
@@ -269,9 +265,7 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				attribute.setX( i, v.x );
-				attribute.setY( i, v.y );
-				attribute.setZ( i, v.z );
+				v.toArray( attribute.array, i * 3 );
 
 			}
 
