@@ -263,11 +263,11 @@ THREE.GLTFLoader = ( function () {
 				case 'spot':
 					lightNode = new THREE.SpotLight( color );
 					// Handle spotlight properties.
-					var spot = light.spot || {};
-					var innerConeAngle = spot.innerConeAngle !== undefined ? spot.innerConeAngle : 0;
-					var outerConeAngle = spot.outerConeAngle !== undefined ? spot.outerConeAngle : Math.PI / 4.0;
-					lightNode.angle = outerConeAngle;
-					lightNode.penumbra = 1.0 - innerConeAngle / outerConeAngle;
+					light.spot = light.spot || {};
+					light.spot.innerConeAngle = light.spot.innerConeAngle !== undefined ? light.spot.innerConeAngle : 0;
+					light.spot.outerConeAngle = light.spot.outerConeAngle !== undefined ? light.spot.outerConeAngle : Math.PI / 4.0;
+					lightNode.angle = light.spot.outerConeAngle;
+					lightNode.penumbra = 1.0 - light.spot.innerConeAngle / light.spot.outerConeAngle;
 					lightNode.target.position.set( 0, 0, 1 );
 					lightNode.add( lightNode.target );
 					break;
