@@ -1283,26 +1283,17 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		var attribA = a.attributes || {};
-		var attribB = b.attributes || {};
-		var keysA = Object.keys( attribA );
-		var keysB = Object.keys( attribB );
+		return isObjectEqual( a.attributes || {}, b.attributes || {} );
 
-		if ( keysA.length !== keysB.length ) {
+	}
 
-			return false;
+	function isObjectEqual( a, b ) {
 
-		}
+		if ( Object.keys( a ).length !== Object.keys( b ).length ) return false;
 
-		for ( var i = 0, il = keysA.length; i < il; i ++ ) {
+		for ( var key in a ) {
 
-			var key = keysA[ i ];
-
-			if ( attribA[ key ] !== attribB[ key ] ) {
-
-				return false;
-
-			}
+			if ( a[ key ] !== b[ key ] ) return false;
 
 		}
 
@@ -1355,14 +1346,13 @@ THREE.GLTFLoader = ( function () {
 
 	/**
 	 * Checks if we can build a single Mesh with MultiMaterial from the primitives.
+	 * Returns true if all primitives use the same attributes/morphAttributes/mode
+	 * and also have index. Otherwise returns false.
 	 *
 	 * @param {Array<Object>} primitives whose length is > 1
 	 * @return {Boolean}
 	 */
 	function isCombinable( primitives ) {
-
-		// Returns true if all primitives use the same attributes/morphAttributes/mode
-		// and also have index. Otherwise returns false.
 
 		var primitive0 = primitives[ 0 ];
 		var targets0 = primitive0.targets || [];
@@ -1375,32 +1365,15 @@ THREE.GLTFLoader = ( function () {
 
 			if ( primitive0.mode !== primitive.mode ) return false;
 			if ( primitive.indices === undefined ) return false;
-
-			if ( Object.keys( primitive0.attributes ).length !== Object.keys( primitive.attributes ).length ) return false;
-
-			for ( var key in primitive0.attributes ) {
-
-				if ( primitive0.attributes[ key ] !== primitive.attributes[ key ] ) return false;
-
-			}
+			if ( ! isObjectEqual( primitive0.attributes, primitive.attributes ) ) return false;
 
 			var targets = primitive.targets || [];
 
 			if ( targets0.length !== targets.length ) return false;
 
-			if ( targets0.length > 0 ) {
+			for ( var j = 0, jl = targets0.length; j < jl; j ++ ) {
 
-				if ( Object.keys( targets0[ 0 ] ).length !== Object.keys( targets[ 0 ] ).length ) return false;
-
-				for ( var j = 0, jl = targets0.length; j < jl; j ++ ) {
-
-					for ( key in targets0[ j ] ) {
-
-						if ( targets0[ j ][ key ] !== targets[ j ][ key ] ) return false;
-
-					}
-
-				}
+				if ( ! isObjectEqual( targets0[ j ], targets[ j ] ) ) return false;
 
 			}
 
