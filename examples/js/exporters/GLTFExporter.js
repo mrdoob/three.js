@@ -218,11 +218,11 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			for ( var i = 0, il = normal.array.length; i < il; i += 3 ) {
+			for ( var i = 0, il = normal.count; i < il; i ++ ) {
 
-				var x = normal.array[ i + 0 ];
-				var y = normal.array[ i + 1 ];
-				var z = normal.array[ i + 2 ];
+				var x = normal.getX( i );
+				var y = normal.getY( i );
+				var z = normal.getZ( i );
 
 				var length = Math.sqrt( x * x + y * y + z * z );
 
@@ -252,13 +252,11 @@ THREE.GLTFExporter.prototype = {
 
 			var attribute = normal.clone();
 
-			var array = attribute.array;
-
 			var v = new THREE.Vector3();
 
-			for ( var i = 0, il = array.length; i < il; i += 3 ) {
+			for ( var i = 0, il = attribute.count; i < il; i ++ ) {
 
-				v.set( array[ i ], array[ i + 1 ], array[ i + 2 ] );
+				v.set( attribute.getX( i ), attribute.getY( i ), attribute.getZ( i ) );
 
 				if ( v.x === 0 && v.y === 0 && v.z === 0 ) {
 
@@ -271,9 +269,9 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				array[ i ] = v.x;
-				array[ i + 1 ] = v.y;
-				array[ i + 2 ] = v.z;
+				attribute.setX( i, v.x );
+				attribute.setY( i, v.y );
+				attribute.setZ( i, v.z );
 
 			}
 
