@@ -1153,102 +1153,120 @@ THREE.GLTFLoader = ( function () {
 	function addMorphTargets( mesh, meshDef, primitiveDef, accessors ) {
 
 		var geometry = mesh.geometry;
-		var material = mesh.material;
-
 		var targets = primitiveDef.targets;
-		var morphAttributes = geometry.morphAttributes;
 
-		morphAttributes.position = [];
-		morphAttributes.normal = [];
+		var hasMorphPosition = false;
+		var hasMorphNormal = false;
 
-		material.morphTargets = true;
+		for ( var i = 0, il = targets.length; i < il; i ++ ) {
+
+			var target = targets[ i ];
+
+			if ( target.POSITION !== undefined ) hasMorphPosition = true;
+			if ( target.NORMAL !== undefined ) hasMorphNormal = true;
+
+			if ( hasMorphPosition && hasMorphNormal ) break;
+
+		}
+
+		// unnecessary to set morph if base attributes don't exist
+		if ( geometry.attributes.position === undefined ) hasMorphPosition = false;
+		if ( geometry.attributes.normal === undefined ) hasMorphNormal = false;
+
+		if ( ! hasMorphPosition && ! hasMorphNormal ) return;
+
+		var morphPositions = [];
+		var morphNormals = [];
 
 		for ( var i = 0, il = targets.length; i < il; i ++ ) {
 
 			var target = targets[ i ];
 			var attributeName = 'morphTarget' + i;
 
-			var positionAttribute, normalAttribute;
+			if ( hasMorphPosition ) {
 
-			if ( target.POSITION !== undefined ) {
+				var positionAttribute;
 
-				// Three.js morph formula is
-				//   position
-				//     + weight0 * ( morphTarget0 - position )
-				//     + weight1 * ( morphTarget1 - position )
-				//     ...
-				// while the glTF one is
-				//   position
-				//     + weight0 * morphTarget0
-				//     + weight1 * morphTarget1
-				//     ...
-				// then adding position to morphTarget.
-				// So morphTarget value will depend on mesh's position, then cloning attribute
-				// for the case if attribute is shared among two or more meshes.
+				if ( target.POSITION !== undefined ) {
 
-				positionAttribute = cloneBufferAttribute( accessors[ target.POSITION ] );
-				var position = geometry.attributes.position;
+					// Three.js morph formula is
+					//   position
+					//     + weight0 * ( morphTarget0 - position )
+					//     + weight1 * ( morphTarget1 - position )
+					//     ...
+					// while the glTF one is
+					//   position
+					//     + weight0 * morphTarget0
+					//     + weight1 * morphTarget1
+					//     ...
+					// then adding position to morphTarget.
+					// So morphTarget value will depend on mesh's position, then cloning attribute
+					// for the case if attribute is shared among two or more meshes.
 
-				for ( var j = 0, jl = positionAttribute.count; j < jl; j ++ ) {
+					positionAttribute = cloneBufferAttribute( accessors[ target.POSITION ] );
+					var position = geometry.attributes.position;
 
-					positionAttribute.setXYZ(
-						j,
-						positionAttribute.getX( j ) + position.getX( j ),
-						positionAttribute.getY( j ) + position.getY( j ),
-						positionAttribute.getZ( j ) + position.getZ( j )
-					);
+					for ( var j = 0, jl = positionAttribute.count; j < jl; j ++ ) {
+
+						positionAttribute.setXYZ(
+							j,
+							positionAttribute.getX( j ) + position.getX( j ),
+							positionAttribute.getY( j ) + position.getY( j ),
+							positionAttribute.getZ( j ) + position.getZ( j )
+						);
+
+					}
+
+				} else {
+
+					// Copying the original position not to affect the final position.
+					// See the formula above.
+					positionAttribute = cloneBufferAttribute( geometry.attributes.position );
 
 				}
-
-			} else if ( geometry.attributes.position ) {
-
-				// Copying the original position not to affect the final position.
-				// See the formula above.
-				positionAttribute = cloneBufferAttribute( geometry.attributes.position );
-
-			}
-
-			if ( positionAttribute !== undefined ) {
 
 				positionAttribute.name = attributeName;
-				morphAttributes.position.push( positionAttribute );
+				morphPositions.push( positionAttribute );
 
 			}
 
-			if ( target.NORMAL !== undefined ) {
+			if ( hasMorphNormal ) {
 
-				material.morphNormals = true;
+				var normalAttribute;
 
-				// see target.POSITION's comment
+				if ( target.NORMAL !== undefined ) {
 
-				normalAttribute = cloneBufferAttribute( accessors[ target.NORMAL ] );
-				var normal = geometry.attributes.normal;
+					// see target.POSITION's comment
 
-				for ( var j = 0, jl = normalAttribute.count; j < jl; j ++ ) {
+					normalAttribute = cloneBufferAttribute( accessors[ target.NORMAL ] );
+					var normal = geometry.attributes.normal;
 
-					normalAttribute.setXYZ(
-						j,
-						normalAttribute.getX( j ) + normal.getX( j ),
-						normalAttribute.getY( j ) + normal.getY( j ),
-						normalAttribute.getZ( j ) + normal.getZ( j )
-					);
+					for ( var j = 0, jl = normalAttribute.count; j < jl; j ++ ) {
+
+						normalAttribute.setXYZ(
+							j,
+							normalAttribute.getX( j ) + normal.getX( j ),
+							normalAttribute.getY( j ) + normal.getY( j ),
+							normalAttribute.getZ( j ) + normal.getZ( j )
+						);
+
+					}
+
+				} else {
+
+					normalAttribute = cloneBufferAttribute( geometry.attributes.normal );
 
 				}
 
-			} else if ( geometry.attributes.normal !== undefined ) {
-
-				normalAttribute = cloneBufferAttribute( geometry.attributes.normal );
-
-			}
-
-			if ( normalAttribute !== undefined ) {
-
 				normalAttribute.name = attributeName;
-				morphAttributes.normal.push( normalAttribute );
+				morphNormals.push( normalAttribute );
 
 			}
 
 		}
+
+		if ( hasMorphPosition ) geometry.morphAttributes.position = morphPositions;
+		if ( hasMorphNormal ) geometry.morphAttributes.normal = morphNormals;
 
 		mesh.updateMorphTargets();
 
@@ -2286,6 +2304,10 @@ THREE.GLTFLoader = ( function () {
 					if ( useMorphTargets ) {
 
 						addMorphTargets( mesh, meshDef, primitive, dependencies.accessors );
+
+						material.morphTargets = true;
+
+						if ( mesh.geometry.morphAttributes.normal !== undefined ) material.morphNormals = true;
 
 					}
 
