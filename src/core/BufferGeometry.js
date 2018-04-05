@@ -948,7 +948,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		console.log( 'THREE.BufferGeometry: old count:', groups.length, 'new count:', this.groups.length );
+		// console.log( 'THREE.BufferGeometry: old count:', groups.length, 'new count:', this.groups.length );
 
 		return this;
 
