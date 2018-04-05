@@ -90,6 +90,8 @@ THREE.SVGLoader.prototype = {
 		function parsePathNode( node ) {
 
 			var path = new THREE.ShapePath();
+			path.color.setStyle( parseFill( node ) );
+
 			var point = new THREE.Vector2();
 			var control = new THREE.Vector2();
 
@@ -331,6 +333,7 @@ THREE.SVGLoader.prototype = {
 			var h = parseFloat( node.getAttribute( 'height' ) );
 
 			var path = new THREE.ShapePath();
+			path.color.setStyle( parseFill( node ) );
 			path.moveTo( x, y );
 			path.lineTo( x + w, y );
 			path.lineTo( x + w, y + h );
@@ -357,7 +360,10 @@ THREE.SVGLoader.prototype = {
 			}
 
 			var regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
+
 			var path = new THREE.ShapePath();
+			path.color.setStyle( parseFill( node ) );
+
 			var index = 0;
 
 			node.getAttribute( 'points' ).replace(regex, iterator);
@@ -386,7 +392,10 @@ THREE.SVGLoader.prototype = {
 			}
 
 			var regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
+
 			var path = new THREE.ShapePath();
+			path.color.setStyle( parseFill( node ) );
+
 			var index = 0;
 
 			node.getAttribute( 'points' ).replace(regex, iterator);
@@ -407,6 +416,7 @@ THREE.SVGLoader.prototype = {
 			subpath.absarc( x, y, r, 0, Math.PI * 2 );
 
 			var path = new THREE.ShapePath();
+			path.color.setStyle( parseFill( node ) );
 			path.subPaths.push( subpath );
 
 			return path;
@@ -424,6 +434,7 @@ THREE.SVGLoader.prototype = {
 			subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
 
 			var path = new THREE.ShapePath();
+			path.color.setStyle( parseFill( node ) );
 			path.subPaths.push( subpath );
 
 			return path;
@@ -443,6 +454,18 @@ THREE.SVGLoader.prototype = {
 			path.currentPath.autoClose = false;
 
 			return path;
+
+		}
+
+		function parseFill( node ) {
+
+			if ( node.hasAttribute( 'fill' ) ) {
+
+				return node.getAttribute( 'fill' );
+
+			}
+
+			return '#ffffff';
 
 		}
 
