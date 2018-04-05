@@ -11,6 +11,8 @@ function ShapePath() {
 
 	this.type = 'ShapePath';
 
+	this.color = new THREE.Color();
+
 	this.subPaths = [];
 	this.currentPath = null;
 
