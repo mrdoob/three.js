@@ -103,7 +103,7 @@ Object.assign( DirectGeometry.prototype, {
 
 			for ( var i = 0; i < morphTargetsLength; i ++ ) {
 
-				morphTargetsPosition[ i ] = [];
+				morphTargetsPosition[ i ] = { name: morphTargets[i].name, array: [] };
 
 			}
 
@@ -122,7 +122,7 @@ Object.assign( DirectGeometry.prototype, {
 
 			for ( var i = 0; i < morphNormalsLength; i ++ ) {
 
-				morphTargetsNormal[ i ] = [];
+				morphTargetsNormal[ i ] = { name: morphNormals[i].name, array: [] };
 
 			}
 
@@ -216,7 +216,7 @@ Object.assign( DirectGeometry.prototype, {
 
 				var morphTarget = morphTargets[ j ].vertices;
 
-				morphTargetsPosition[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
+				morphTargetsPosition[ j ].array.push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
 
@@ -224,7 +224,7 @@ Object.assign( DirectGeometry.prototype, {
 
 				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
-				morphTargetsNormal[ j ].push( morphNormal.a, morphNormal.b, morphNormal.c );
+				morphTargetsNormal[ j ].array.push( morphNormal.a, morphNormal.b, morphNormal.c );
 
 			}
 
