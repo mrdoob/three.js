@@ -25,8 +25,8 @@
 		
 		#example {
 			float: left;
-			margin-top: 200px;
-			margin-left: 100px;
+			margin-top: 100px;
+			margin-left: 50px;
 		}
 		
 		#container svg {
@@ -43,9 +43,10 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - SVGLoader
 		</div>
 		<div id="example">
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200" width="200" height="200" id="example_svg">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="-200 -200 400 400" width="400" height="400" id="example_svg">
 				<g>
-					<path id="red" style="fill: red;" d="M-50,-50L50,-50L50,50L-50,50z"/>
+					<path id="path" style="fill: none; stroke: red" d="M-200,-200L -180 , -180 H-170V -190z"/>
+					<rect id="rect" style="fill: none; stroke: green" x="-200" y="0" width="200" height="200"/>
 				</g>
 			</svg>
 		</div>
