@@ -10,56 +10,56 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">Base class for implementing loaders.</div>
+		<p class="desc">Base class for implementing loaders.</p>
 
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]()</h3>
-		<div>
+		<p>
 		Creates a new [name]. This should be called as base class.
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
 
 		<h3>[property:Function onLoadStart]</h3>
-		<div>Will be called when load starts.</div>
-		<div>The default is a function with empty body.</div>
+		<p>Will be called when load starts.</p>
+		<p>The default is a function with empty body.</p>
 
 		<h3>[property:Function onLoadProgress]</h3>
-		<div>Will be called while load progresses.</div>
-		<div>The default is a function with empty body.</div>
+		<p>Will be called while load progresses.</p>
+		<p>The default is a function with empty body.</p>
 
 		<h3>[property:Function onLoadComplete]</h3>
-		<div>Will be called when load completes.</div>
-		<div>The default is a function with empty body.</div>
+		<p>Will be called when load completes.</p>
+		<p>The default is a function with empty body.</p>
 
 		<h3>[property:string crossOrigin]</h3>
-		<div>
+		<p>
 		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
-		</div>
+		</p>
 
 		<h2>Methods</h2>
 
 		<h3>[method:Material createMaterial]( [param:object m], [param:string texturePath] )</h3>
-		<div>
+		<p>
 		[page:Object m] — The parameters to create the material. <br />
 		[page:String texturePath] — The base path of the textures.
-		</div>
-		<div>
+		</p>
+		<p>
 		Creates the Material based on the parameters m.
-		</div>
+		</p>
 
 		<h3>[method:Array initMaterials]( [param:Array materials], [param:string texturePath] )</h3>
-		<div>
+		<p>
 		[page:Array materials] — an array of parameters to create materials. <br />
 		[page:String texturePath] —  The base path of the textures.
-		</div>
-		<div>
+		</p>
+		<p>
 		Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials.
-		</div>
+		</p>
 
 
 		<h2>Source</h2>
