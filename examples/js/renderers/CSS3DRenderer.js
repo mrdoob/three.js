@@ -1,6 +1,7 @@
 /**
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  * @author mrdoob / http://mrdoob.com/
+ * @author yomotsu / http://yomotsu.net/
  */
 
 THREE.CSS3DObject = function ( element ) {
@@ -263,9 +264,19 @@ THREE.CSS3DRenderer = function () {
 
 		if ( cache.camera.fov !== fov ) {
 
-			domElement.style.WebkitPerspective = fov + 'px';
-			domElement.style.MozPerspective = fov + 'px';
-			domElement.style.perspective = fov + 'px';
+			if ( camera.type === 'OrthographicCamera' ) {
+
+				domElement.style.WebkitTransform = 'scale(' + fov + ')';
+				domElement.style.MozTransform = 'scale(' + fov + ')';
+				domElement.style.transform = 'scale(' + fov + ')';
+
+			} else {
+
+				domElement.style.WebkitPerspective = fov + 'px';
+				domElement.style.MozPerspective = fov + 'px';
+				domElement.style.perspective = fov + 'px';
+
+			}
 
 			cache.camera.fov = fov;
 
