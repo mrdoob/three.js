@@ -352,6 +352,7 @@ var files = {
 		"css3d_panorama_deviceorientation",
 		"css3d_periodictable",
 		"css3d_sandbox",
+		"css3d_orthographic",
 		"css3d_sprites",
 		"css3d_youtube"
 	],
