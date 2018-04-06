@@ -2042,7 +2042,7 @@ THREE.GLTFLoader = ( function () {
 			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
 			if ( material.normalScale ) {
 
-				material.normalScale.x = - material.normalScale.x;
+				material.normalScale.y = - material.normalScale.y;
 
 			}
 
