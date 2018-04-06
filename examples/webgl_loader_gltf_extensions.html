@@ -122,7 +122,7 @@
 					addLights: true,
 					shadows: true,
 					addGround: true,
-					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco' ]
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco', 'glTF-lights' ]
 				},
 				'Cesium Man': {
 					name: 'Cesium Man',
@@ -202,14 +202,13 @@
 					var ambient = new THREE.AmbientLight( 0x222222 );
 					scene.add( ambient );
 
-					var directionalLight = new THREE.DirectionalLight( 0xdddddd );
+					var directionalLight = new THREE.DirectionalLight( 0xdddddd, 4 );
 					directionalLight.position.set( 0, 0, 1 ).normalize();
 					scene.add( directionalLight );
 
 					spot1 = new THREE.SpotLight( 0xffffff, 1 );
 					spot1.position.set( 10, 20, 10 );
 					spot1.angle = 0.25;
-					spot1.distance = 1024;
 					spot1.penumbra = 0.75;
 
 					if ( sceneInfo.shadows ) {
@@ -232,6 +231,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
+				renderer.physicallyCorrectLights = true;
 
 				if ( sceneInfo.shadows ) {
 
