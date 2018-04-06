@@ -12,11 +12,11 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			A class for generating text as a single geometry. It is constructed by providing a string of text, and a hash of
 			parameters consisting of a loaded [page:Font] and settings for the geometry's parent [page:ExtrudeGeometry].
 			See the [page:Font], [page:FontLoader] and [page:Creating_Text] pages for additional details.
-		</div>
+		</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#TextGeometry"></iframe>
 
@@ -38,9 +38,9 @@
 
 		<h2>Examples</h2>
 
-		<div>
+		<p>
 		[example:webgl_geometry_text geometry / text ]
-		</div>
+		</p>
 
 		<code>
 		var loader = new THREE.FontLoader();
@@ -63,7 +63,7 @@
 		<h2>Constructor</h2>
 
 		<h3>[name]([param:String text], [param:Object parameters])</h3>
-		<div>
+		<p>
 		text — The text that needs to be shown. <br />
 		parameters — Object that can contains the following parameters.
 		<ul>
@@ -76,14 +76,14 @@
 			<li>bevelSize — Float. How far from text outline is bevel. Default is 8.</li>
 			<li>bevelSegments — Integer. Number of bevel segments. Default is 3.</li>
 		</ul>
-		</div>
+		</p>
 
 		<h2>Available Fonts</h2>
 
-		<div>
+		<p>
 		TextGeometry uses <a href='http://gero3.github.io/facetype.js/' target="_top">typeface.json</a> generated fonts.
 		Some existing fonts can be found located in <b>/examples/fonts</b> and must be included in the page.
-		</div>
+		</p>
 		<table>
 			<tr>
 				<th>Font</th>
