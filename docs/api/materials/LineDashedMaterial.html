@@ -12,14 +12,14 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">A material for drawing wireframe-style geometries with dashed lines.</div>
+		<p class="desc">A material for drawing wireframe-style geometries with dashed lines.</p>
 
 		<h2>Examples</h2>
 
-		<div>
+		<p>
 			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
 			[example:canvas_lines_dashed Canvas / lines /dashed]
-		</div>
+		</p>
 
 		<code>
 var material = new THREE.LineDashedMaterial( {
@@ -35,50 +35,51 @@ var material = new THREE.LineDashedMaterial( {
 
 
 		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
 		[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
 		Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
 
 		The exception is the property [page:Hexadecimal color], which can be passed i	as a hexadecimal
 		string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
-		<div>See the base [page:Material] class for common properties.</div>
+		<p>See the base [page:Material] class for common properties.</p>
 
 		<h3>[property:Color color]</h3>
-		<div>[page:Color] of the material, by default set to white (0xffffff).</div>
+		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
 
 		<h3>[property:number dashSize]</h3>
-		<div>The size of the dash. This is both the gap with the stroke. Default is *3*.</div>
+		<p>The size of the dash. This is both the gap with the stroke. Default is *3*.</p>
 
 		<h3>[property:number gapSize]</h3>
-		<div>The size of the gap. Default is *1*.</div>
+		<p>The size of the gap. Default is *1*.</p>
 
 		<h3>[property:Boolean isLineDashedMaterial]</h3>
-		<div>
+		<p>
 			Used to check whether this or derived classes are line dashed materials. Default is *true*.<br /><br />
 
 			You should not change this, as it used internally for optimisation.
-		</div>
+		</p>
 
 		<h3>[property:Boolean lights]</h3>
-		<div>Whether the material is affected by lights. Default is *false*.</div>
+		<p>Whether the material is affected by lights. Default is *false*.</p>
 
 		<h3>[property:Float linewidth]</h3>
-		<div>
+		<p>
 			Controls line thickness. Default is *1*.<br /><br />
 
 			Due to limitations in the [link:https://code.google.com/p/angleproject ANGLE layer],
 			with the [page:WebGLRenderer WebGL] renderer on Windows platforms linewidth will
 			always be 1 regardless of the set value.
-		</div>
+		</p>
 
 		<h3>[property:number scale]</h3>
-		<div>The scale of the dashed part of a line. Default is *1*.</div>
+		<p>The scale of the dashed part of a line. Default is *1*.</p>
 
 		<h2>Methods</h2>
-		<div>See the base [page:Material] class for common methods.</div>
+		<p>See the base [page:Material] class for common methods.</p>
 
 
 
