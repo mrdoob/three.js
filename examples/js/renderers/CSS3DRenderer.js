@@ -264,13 +264,7 @@ THREE.CSS3DRenderer = function () {
 
 		if ( cache.camera.fov !== fov ) {
 
-			if ( camera.type === 'OrthographicCamera' ) {
-
-				domElement.style.WebkitTransform = 'scale(' + fov + ')';
-				domElement.style.MozTransform = 'scale(' + fov + ')';
-				domElement.style.transform = 'scale(' + fov + ')';
-
-			} else {
+			if ( camera.type === 'PerspectiveCamera' ) {
 
 				domElement.style.WebkitPerspective = fov + 'px';
 				domElement.style.MozPerspective = fov + 'px';
@@ -288,6 +282,12 @@ THREE.CSS3DRenderer = function () {
 
 		var cameraCSSMatrix = 'translateZ(' + fov + 'px)' +
 			getCameraCSSMatrix( camera.matrixWorldInverse );
+
+		if ( camera.type === 'OrthographicCamera' ) {
+
+			cameraCSSMatrix = 'scale(' + fov + ')' + cameraCSSMatrix;
+
+		}
 
 		var style = cameraCSSMatrix +
 			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
