@@ -1348,7 +1348,7 @@ THREE.GLTFLoader = ( function () {
 	 * @param {Array<GLTF.Primitive>} primitives
 	 * @return {Boolean}
 	 */
-	function isCombinablePrimitives( primitives ) {
+	function isMultiPassGeometry( primitives ) {
 
 		if ( primitives.length < 2 ) return false;
 
@@ -2107,7 +2107,7 @@ THREE.GLTFLoader = ( function () {
 		var extensions = this.extensions;
 		var cache = this.primitiveCache;
 
-		if ( isCombinablePrimitives( primitives ) ) {
+		if ( isMultiPassGeometry( primitives ) ) {
 
 			// We builds a single BufferGeometry with .groups from multiple primitives
 			// because all primitives share the same attributes/morph/mode and have indices.
