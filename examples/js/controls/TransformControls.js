@@ -21,7 +21,7 @@
 		this.oldColor = this.color.clone();
 		this.oldOpacity = this.opacity;
 
-		this.highlight = function( highlighted ) {
+		this.highlight = function ( highlighted ) {
 
 			if ( highlighted ) {
 
@@ -58,7 +58,7 @@
 		this.oldColor = this.color.clone();
 		this.oldOpacity = this.opacity;
 
-		this.highlight = function( highlighted ) {
+		this.highlight = function ( highlighted ) {
 
 			if ( highlighted ) {
 
@@ -103,9 +103,9 @@
 			var planeMaterial = new THREE.MeshBasicMaterial( { visible: false, side: THREE.DoubleSide } );
 
 			var planes = {
-				"XY":   new THREE.Mesh( planeGeometry, planeMaterial ),
-				"YZ":   new THREE.Mesh( planeGeometry, planeMaterial ),
-				"XZ":   new THREE.Mesh( planeGeometry, planeMaterial ),
+				"XY": new THREE.Mesh( planeGeometry, planeMaterial ),
+				"YZ": new THREE.Mesh( planeGeometry, planeMaterial ),
+				"XZ": new THREE.Mesh( planeGeometry, planeMaterial ),
 				"XYZE": new THREE.Mesh( planeGeometry, planeMaterial )
 			};
 
@@ -124,7 +124,7 @@
 
 			//// HANDLES AND PICKERS
 
-			var setupGizmos = function( gizmoMap, parent ) {
+			var setupGizmos = function ( gizmoMap, parent ) {
 
 				for ( var name in gizmoMap ) {
 
@@ -176,7 +176,7 @@
 
 		this.highlight = function ( axis ) {
 
-			this.traverse( function( child ) {
+			this.traverse( function ( child ) {
 
 				if ( child.material && child.material.highlight ) {
 
@@ -207,7 +207,7 @@
 		var vec2 = new THREE.Vector3( 0, 1, 0 );
 		var lookAtMatrix = new THREE.Matrix4();
 
-		this.traverse( function( child ) {
+		this.traverse( function ( child ) {
 
 			if ( child.name.search( "E" ) !== - 1 ) {
 
@@ -235,13 +235,13 @@
 		arrowGeometry.merge( mesh.geometry, mesh.matrix );
 
 		var lineXGeometry = new THREE.BufferGeometry();
-		lineXGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  1, 0, 0 ], 3 ) );
+		lineXGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0 ], 3 ) );
 
 		var lineYGeometry = new THREE.BufferGeometry();
-		lineYGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  0, 1, 0 ], 3 ) );
+		lineYGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
 		var lineZGeometry = new THREE.BufferGeometry();
-		lineZGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  0, 0, 1 ], 3 ) );
+		lineZGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
 
 		this.handleGizmos = {
 
@@ -671,12 +671,12 @@
 		var oldScale = new THREE.Vector3();
 		var oldRotationMatrix = new THREE.Matrix4();
 
-		var parentRotationMatrix  = new THREE.Matrix4();
+		var parentRotationMatrix = new THREE.Matrix4();
 		var parentScale = new THREE.Vector3();
 
 		var worldPosition = new THREE.Vector3();
 		var worldRotation = new THREE.Euler();
-		var worldRotationMatrix  = new THREE.Matrix4();
+		var worldRotationMatrix = new THREE.Matrix4();
 		var camPosition = new THREE.Vector3();
 		var camRotation = new THREE.Euler();
 
