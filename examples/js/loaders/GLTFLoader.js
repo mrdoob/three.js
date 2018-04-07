@@ -2251,23 +2251,17 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ||
-						primitive.mode === WEBGL_CONSTANTS.LINE_STRIP ||
-						primitive.mode === WEBGL_CONSTANTS.LINE_LOOP ) {
+					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
 
-						if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
+						mesh = new THREE.LineSegments( geometry, material );
 
-							mesh = new THREE.LineSegments( geometry, material );
+					} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_STRIP ) {
 
-						} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_STRIP ) {
+						mesh = new THREE.Line( geometry, material );
 
-							mesh = new THREE.Line( geometry, material );
+					} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_LOOP ) {
 
-						} else {
-
-							mesh = new THREE.LineLoop( geometry, material );
-
-						}
+						mesh = new THREE.LineLoop( geometry, material );
 
 					} else if ( primitive.mode === WEBGL_CONSTANTS.POINTS ) {
 
