@@ -459,7 +459,7 @@ THREE.SVGLoader.prototype = {
 
 		function parseStyle( node, style ) {
 
-			if (node.style.fill != '') style.fill = node.style.fill
+			if (node.style.fill != '') style.fill = node.style.fill;
 
 		}
 
