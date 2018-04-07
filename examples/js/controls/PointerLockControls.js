@@ -31,7 +31,7 @@ THREE.PointerLockControls = function ( camera ) {
 
 	};
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 
@@ -47,14 +47,14 @@ THREE.PointerLockControls = function ( camera ) {
 
 	};
 
-	this.getDirection = function() {
+	this.getDirection = function () {
 
 		// assumes the camera itself is not rotated
 
 		var direction = new THREE.Vector3( 0, 0, - 1 );
-		var rotation = new THREE.Euler( 0, 0, 0, "YXZ" );
+		var rotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
 
-		return function( v ) {
+		return function ( v ) {
 
 			rotation.set( pitchObject.rotation.x, yawObject.rotation.y, 0 );
 

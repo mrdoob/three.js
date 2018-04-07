@@ -199,7 +199,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	}
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		domElement.removeEventListener( 'contextmenu', contextmenu, false );
 		domElement.removeEventListener( 'mousedown', onMouseDown, false );
