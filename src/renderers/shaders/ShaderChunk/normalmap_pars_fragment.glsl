@@ -16,12 +16,7 @@
 		vec2 st1 = dFdy( vUv.st );
 
 		float scale = sign( st1.t * st0.s - st0.t * st1.s ); // we do not care about the magnitude
-
-		#ifdef DOUBLE_SIDED
-
-			scale *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-
-		#endif
+		scale *= float( gl_FrontFacing ) * 2.0 - 1.0;
 
 		vec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );
 		vec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );
