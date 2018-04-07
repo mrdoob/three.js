@@ -64,32 +64,34 @@
 
 				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide } );
 
-				//
-
-				for ( var i = 0; i < 10; i ++ ) {
-
-					var element = document.createElement( 'div' );
-					element.style.width = '100px';
-					element.style.height = '100px';
-					element.style.opacity = ( i < 5 ) ? 0.5 : 1;
-					element.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
-
-					var object = new THREE.CSS3DObject( element );
-					object.position.x = Math.random() * 200 - 100;
-					object.position.y = Math.random() * 200 - 100;
-					object.position.z = Math.random() * 200 - 100;
-					object.scale.x = Math.random() + 0.5;
-					object.scale.y = Math.random() + 0.5;
-					scene2.add( object );
-
-					var geometry = new THREE.PlaneGeometry( 100, 100 );
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.copy( object.position );
-					mesh.rotation.copy( object.rotation );
-					mesh.scale.copy( object.scale );
-					scene.add( mesh );
-
-				}
+				// left
+				createPlane(
+					100, 100,
+					'chocolate',
+					new THREE.Vector3( -25, 0, 25 ),
+					new THREE.Euler( 0, 0, 0 )
+				);
+				// right
+				createPlane(
+					100, 100,
+					'saddlebrown',
+					new THREE.Vector3( 25, 0, -25 ),
+					new THREE.Euler( 0, -90 * THREE.Math.DEG2RAD, 0 )
+				);
+				// top
+				createPlane(
+					100, 100,
+					'yellowgreen',
+					new THREE.Vector3( -25, 50, -25 ),
+					new THREE.Euler( 90 * THREE.Math.DEG2RAD, 0, 0 )
+				);
+				// bottom
+				createPlane(
+					500, 500,
+					'seagreen',
+					new THREE.Vector3( -25, -50, -25 ),
+					new THREE.Euler( 90 * THREE.Math.DEG2RAD, 0, 0 )
+				);
 
 				//
 
@@ -103,6 +105,27 @@
 				renderer2.domElement.style.position = 'absolute';
 				renderer2.domElement.style.top = 0;
 				document.body.appendChild( renderer2.domElement );
+
+				function createPlane( width, height, cssColor, pos, rot ) {
+
+					var element = document.createElement( 'div' );
+					element.style.width = width + 'px';
+					element.style.height = height + 'px';
+					element.style.opacity = 0.75;
+					element.style.background = cssColor;
+
+					var object = new THREE.CSS3DObject( element );
+					object.position.copy( pos );
+					object.rotation.copy( rot );
+					scene2.add( object );
+
+					var geometry = new THREE.PlaneGeometry( width, height );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.copy( object.position );
+					mesh.rotation.copy( object.rotation );
+					scene.add( mesh );
+
+				}
 
 			}
 

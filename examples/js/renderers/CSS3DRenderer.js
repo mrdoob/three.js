@@ -1,7 +1,7 @@
 /**
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  * @author mrdoob / http://mrdoob.com/
- * @author yomotsu / http://yomotsu.net/
+ * @author yomotsu / https://yomotsu.net/
  */
 
 THREE.CSS3DObject = function ( element ) {
