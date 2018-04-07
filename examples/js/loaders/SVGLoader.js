@@ -42,6 +42,7 @@ THREE.SVGLoader.prototype = {
 					break;
 
 				case 'path':
+					parseStyle( node, style );
 					paths.push( parsePathNode( node, style ) );
 					break;
 
@@ -470,7 +471,7 @@ THREE.SVGLoader.prototype = {
 
 			}
 
-			if ( style.fill !== '' ) {
+			if ( style.fill !== '' && style.fill !== 'none' ) {
 
 				return style.fill;
 
