@@ -35,6 +35,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
+	// Set to true to press the key once and only change once you press another key.
+	this.keyPersistentMode = false;
+
 	// internals
 
 	this.target = new THREE.Vector3();
@@ -71,6 +74,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	// events
 
+	var keyEvent = { type: 'keypress' };
 	var changeEvent = { type: 'change' };
 	var startEvent = { type: 'start' };
 	var endEvent = { type: 'end' };
@@ -361,30 +365,47 @@ THREE.TrackballControls = function ( object, domElement ) {
 		_prevState = _state;
 
 		if ( _state !== STATE.NONE ) {
-
-			return;
-
-		} else if ( event.keyCode === _this.keys[ STATE.ROTATE ] && ! _this.noRotate ) {
-
-			_state = STATE.ROTATE;
-
-		} else if ( event.keyCode === _this.keys[ STATE.ZOOM ] && ! _this.noZoom ) {
-
-			_state = STATE.ZOOM;
-
-		} else if ( event.keyCode === _this.keys[ STATE.PAN ] && ! _this.noPan ) {
-
-			_state = STATE.PAN;
-
+			if (!_this.keyPersistentMode) {
+				return;
+			}
+			_this.keyPressed = String.fromCharCode(_this.keys[_prevState]);
+				if (_this.keyPressed != String.fromCharCode(event.keyCode)) {
+				_this.dispatchEvent( keyEvent );
+			}
+		}
+		if (_this.keyPersistentMode) {
+			_this.keyPressed = String.fromCharCode(event.keyCode);
+			_this.dispatchEvent( keyEvent );
 		}
 
+		if ( event.keyCode === _this.keys[ STATE.ROTATE ] && !_this.noRotate ) {
+			if (_state != STATE.ROTATE) {
+				_state = STATE.ROTATE;
+			} else {
+				_state = STATE.NONE;
+			}
+		} else if ( event.keyCode === _this.keys[ STATE.ZOOM ] && !_this.noZoom ) {
+			if (_state != STATE.ZOOM) {
+				_state = STATE.ZOOM;
+			} else {
+				_state = STATE.NONE;
+			}
+		} else if ( event.keyCode === _this.keys[ STATE.PAN ] && !_this.noPan ) {
+			if (_state != STATE.PAN) {
+				_state = STATE.PAN;
+			} else {
+				_state = STATE.NONE;
+			}
+		}
 	}
 
 	function keyup( event ) {
 
 		if ( _this.enabled === false ) return;
 
-		_state = _prevState;
+		if (!_this.keyPersistentMode) {
+			_state = _prevState;
+		}
 
 		window.addEventListener( 'keydown', keydown, false );
 
@@ -399,7 +420,10 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _state === STATE.NONE ) {
 
-			_state = event.button;
+			if (!_this.keyPersistentMode) {
+			  _state = event.button;
+			}
+			return;
 
 		}
 
@@ -458,7 +482,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		_state = STATE.NONE;
+		if (!_this.keyPersistentMode) {
+		  _state = STATE.NONE;
+		}
 
 		document.removeEventListener( 'mousemove', mousemove );
 		document.removeEventListener( 'mouseup', mouseup );
