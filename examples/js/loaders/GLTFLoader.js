@@ -1251,9 +1251,18 @@ THREE.GLTFLoader = ( function () {
 		// .extras has user-defined data, so check that .extras.targetNames is an array.
 		if ( meshDef.extras && Array.isArray( meshDef.extras.targetNames ) ) {
 
-			for ( var i = 0, il = meshDef.extras.targetNames.length; i < il; i ++ ) {
+			var targetNames = meshDef.extras.targetNames;
+			var dictionary = mesh.morphTargetDictionary;
 
-				mesh.morphTargetDictionary[ meshDef.extras.targetNames[ i ] ] = i;
+			for ( var key in dictionary ) {
+
+				if ( dictionary[ key ] < targetNames.length ) delete dictionary[ key ];
+
+			}
+
+			for ( var i = 0, il = targetNames.length; i < il; i ++ ) {
+
+				dictionary[ targetNames[ i ] ] = i;
 
 			}
 
