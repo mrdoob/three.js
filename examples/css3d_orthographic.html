@@ -32,7 +32,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/renderers/CSS3DRenderer.js"></script>
 
@@ -55,7 +55,7 @@
 
 				camera.position.set( 200, 200, 200 );
 
-				controls = new THREE.TrackballControls( camera );
+				controls = new THREE.OrbitControls( camera );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
