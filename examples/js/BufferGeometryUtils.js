@@ -188,7 +188,7 @@ THREE.BufferGeometryUtils = {
 	 * @param  {Array<THREE.BufferGeometry>} geometries
 	 * @return {THREE.BufferGeometry}
 	 */
-	mergeBufferGeometries: function ( geometries ) {
+	mergeBufferGeometries: function ( geometries, useGroups ) {
 
 		var isIndexed = geometries[ 0 ].index !== null;
 
@@ -199,6 +199,8 @@ THREE.BufferGeometryUtils = {
 		var morphAttributes = {};
 
 		var mergedGeometry = new THREE.BufferGeometry();
+
+		var offset = 0;
 
 		for ( var i = 0; i < geometries.length; ++ i ) {
 
@@ -239,6 +241,30 @@ THREE.BufferGeometryUtils = {
 				mergedGeometry.userData = mergedGeometry.userData || {};
 				mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || [];
 				mergedGeometry.userData.mergedUserData.push( geometry.userData );
+
+			}
+
+			if ( useGroups ) {
+
+				var count;
+
+				if ( isIndexed ) {
+
+					count = geometry.index.count
+
+				} else if ( geometry.attributes.position !== undefined ) {
+
+					count = geometry.attributes.position.count;
+
+				} else {
+
+					return null;
+
+				}
+
+				mergedGeometry.addGroup( offset, count, i );
+
+				offset += count;
 
 			}
 
