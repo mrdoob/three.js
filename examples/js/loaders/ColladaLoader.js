@@ -1529,12 +1529,11 @@ THREE.ColladaLoader.prototype = {
 						if ( parameter.texture ) material.specularMap = getTexture( parameter.texture );
 						break;
 					case 'shininess':
-						if ( parameter.float && material.shininess )
-							material.shininess = parameter.float;
+						if ( parameter.float && material.shininess ) material.shininess = parameter.float;
 						break;
 					case 'emission':
-						if ( parameter.color && material.emissive )
-							material.emissive.fromArray( parameter.color );
+						if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
+						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture );
 						break;
 
 				}
