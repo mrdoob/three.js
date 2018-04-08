@@ -262,7 +262,7 @@ THREE.CSS3DRenderer = function () {
 
 		if ( cache.camera.fov !== fov ) {
 
-			if ( camera.type === 'PerspectiveCamera' ) {
+			if ( camera.isPerspectiveCamera ) {
 
 				domElement.style.WebkitPerspective = fov + 'px';
 				domElement.style.perspective = fov + 'px';
@@ -277,7 +277,7 @@ THREE.CSS3DRenderer = function () {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		var cameraCSSMatrix = camera.type === 'OrthographicCamera' ?
+		var cameraCSSMatrix = camera.isOrthographicCamera ?
 			'scale(' + fov + ')' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
 			'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
