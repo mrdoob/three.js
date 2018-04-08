@@ -1328,7 +1328,7 @@
 				index = vertexIndex;
 				break;
 			case 'AllSame' :
-				index = 0;
+				index = infoObject.indices[ 0 ];
 				break;
 			default :
 				console.warn( 'THREE.FBXLoader: unknown attribute mapping type ' + infoObject.mappingType );
