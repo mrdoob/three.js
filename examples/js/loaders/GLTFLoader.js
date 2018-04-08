@@ -2178,7 +2178,28 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			return Promise.all( pending );
+			return Promise.all( pending ).then( function ( geometries ) {
+
+				// Try merge geometries with BufferGeometryUtils if possible
+
+				if ( geometries.length > 1 && THREE.BufferGeometryUtils !== undefined ) {
+
+					for ( var i = 1, il = primitives.length; i < il; i ++ ) {
+
+						// can't merge if draw mode is differenct
+						if ( primitives[ 0 ].mode !== primitives[ i ].mode ) return geometries;
+
+					}
+
+					var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries( geometries, true );
+
+					if ( geometry !== null ) return [ geometry ];
+
+				}
+
+				return geometries;
+
+			} );
 
 		} );
 
