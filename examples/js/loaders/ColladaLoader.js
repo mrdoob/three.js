@@ -1575,7 +1575,6 @@ THREE.ColladaLoader.prototype = {
 				if ( transparent.data.texture ) {
 
 					material.alphaMap = getTexture( transparent.data.texture );
-					material.transparent = true;
 
 				} else {
 
@@ -1600,9 +1599,9 @@ THREE.ColladaLoader.prototype = {
 
 					}
 
-					if ( material.opacity < 1 ) material.transparent = true;
-
 				}
+					
+				if ( material.opacity < 1 ) material.transparent = true;
 
 			}
 
