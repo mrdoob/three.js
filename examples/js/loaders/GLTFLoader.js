@@ -1185,19 +1185,17 @@ THREE.GLTFLoader = ( function () {
 
 			if ( hasMorphPosition ) {
 
-				// Three.js morph formula is
-				//   position
-				//     + weight0 * ( morphTarget0 - position )
-				//     + weight1 * ( morphTarget1 - position )
+				// Three.js morph position is absolute value. The formula is
+				//   basePosition
+				//     + weight0 * ( morphPosition0 - basePosition )
+				//     + weight1 * ( morphPosition1 - basePosition )
 				//     ...
-				// while the glTF one is
-				//   position
-				//     + weight0 * morphTarget0
-				//     + weight1 * morphTarget1
+				// while the glTF one is relative
+				//   basePosition
+				//     + weight0 * glTFmorphPosition0
+				//     + weight1 * glTFmorphPosition1
 				//     ...
-				// then adding position to morphTarget.
-				// So morphTarget value will depend on mesh's position, then cloning attribute
-				// for the case if attribute is shared among two or more meshes.
+				// then we need to convert from relative to absolute here.
 
 				var positionAttribute = cloneBufferAttribute( geometry.attributes.position );
 
