@@ -2155,7 +2155,8 @@ THREE.GLTFLoader = ( function () {
 
 				if ( isCombinable ) {
 
-					var geometry = geometries[ 0 ];
+					// Cloning geometry because of index override
+					var geometry = geometries[ 0 ].clone();
 					var indices = [];
 					var offset = 0;
 
@@ -2176,6 +2177,8 @@ THREE.GLTFLoader = ( function () {
 					}
 
 					geometry.setIndex( indices );
+
+					return [ geometry ];
 
 				} else if ( geometries.length > 1 && THREE.BufferGeometryUtils !== undefined ) {
 
