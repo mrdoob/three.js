@@ -2,18 +2,18 @@
 * @author Richard M. / https://github.com/richardmonette
 */
 
-THREE.EquiangularToCubeGenerator = function( sourceTexture, resolution ) {
+THREE.EquiangularToCubeGenerator = function ( sourceTexture, resolution ) {
 
 	this.sourceTexture = sourceTexture;
 	this.resolution = resolution;
 
  	this.views = [
-		{ t: [1.0,  0.0,  0.0 ], u: [0.0, -1.0,  0.0] },
-		{ t: [-1.0,  0.0,  0.0], u: [0.0, -1.0,  0.0] },
-		{ t: [0.0,  1.0,  0.0],  u: [0.0,  0.0,  1.0] },
-		{ t: [0.0, -1.0,  0.0],  u: [0.0,  0.0, -1.0] },
-		{ t: [0.0,  0.0,  1.0],  u: [0.0, -1.0,  0.0] },
-		{ t: [0.0,  0.0, -1.0],  u: [0.0, -1.0,  0.0] },
+		{ t: [ 1, 0, 0 ], u: [ 0, - 1, 0 ] },
+		{ t: [ - 1, 0, 0 ], u: [ 0, - 1, 0 ] },
+		{ t: [ 0, 1, 0 ], u: [ 0, 0, 1 ] },
+		{ t: [ 0, - 1, 0 ], u: [ 0, 0, - 1 ] },
+		{ t: [ 0, 0, 1 ], u: [ 0, - 1, 0 ] },
+		{ t: [ 0, 0, - 1 ], u: [ 0, - 1, 0 ] },
 	];
 
 	this.camera = new THREE.PerspectiveCamera( 90, 1, 0.1, 10 );
@@ -22,49 +22,47 @@ THREE.EquiangularToCubeGenerator = function( sourceTexture, resolution ) {
 	this.scene = new THREE.Scene();
 	this.scene.add( this.boxMesh );
 
+	var params = {
+		format: THREE.RGBAFormat,
+		magFilter: this.sourceTexture.magFilter,
+		minFilter: this.sourceTexture.minFilter,
+		type: this.sourceTexture.type,
+		generateMipmaps: this.sourceTexture.generateMipmaps,
+		anisotropy: this.sourceTexture.anisotropy,
+		encoding: this.sourceTexture.encoding
+	};
+
+	this.renderTarget = new THREE.WebGLRenderTargetCube( this.resolution, this.resolution, params );
+
 };
 
 THREE.EquiangularToCubeGenerator.prototype = {
 
-	constructor : THREE.EquiangularToCubeGenerator,
+	constructor: THREE.EquiangularToCubeGenerator,
 
-	generate: function( renderer ) {
+	update: function ( renderer ) {
 
-		var params = {
-			format: THREE.RGBAFormat,
-			magFilter: this.sourceTexture.magFilter,
-			minFilter: this.sourceTexture.minFilter,
-			type: this.sourceTexture.type,
-			generateMipmaps: this.sourceTexture.generateMipmaps,
-			anisotropy: this.sourceTexture.anisotropy,
-			encoding: this.sourceTexture.encoding
-		};
+		for ( var i = 0; i < 6; i ++ ) {
 
-		var renderTarget = new THREE.WebGLRenderTargetCube( this.resolution, this.resolution, params );
+			this.renderTarget.activeCubeFace = i;
 
-		for ( var i = 0; i < 6; i++ ) {
-
-			renderTarget.activeCubeFace = i;
-
-			var v = this.views[i];
+			var v = this.views[ i ];
 
 			this.camera.position.set( 0, 0, 0 );
 			this.camera.up.set( v.u[ 0 ], v.u[ 1 ], v.u[ 2 ] );
 			this.camera.lookAt( v.t[ 0 ], v.t[ 1 ], v.t[ 2 ] );
 
-			this.camera.updateProjectionMatrix();
-
-			renderer.render( this.scene, this.camera, renderTarget, true );
+			renderer.render( this.scene, this.camera, this.renderTarget, true );
 
 		}
 
-		return renderTarget.texture;
+		return this.renderTarget.texture;
 
 	},
 
-	getShader: function() {
+	getShader: function () {
 
-		return new THREE.ShaderMaterial( {
+		var shaderMaterial = new THREE.ShaderMaterial( {
 
 			uniforms: {
 				"equirectangularMap": { value: this.sourceTexture },
@@ -107,7 +105,18 @@ THREE.EquiangularToCubeGenerator.prototype = {
 
 		} );
 
+		shaderMaterial.type = 'EquiangularToCubeGenerator';
+
+		return shaderMaterial;
+
+	},
+
+	dispose: function () {
+
+		this.boxMesh.geometry.dispose();
+		this.boxMesh.material.dispose();
+		this.renderTarget.dispose();
+
 	}
 
 };
-
