@@ -1197,26 +1197,31 @@ THREE.GLTFLoader = ( function () {
 				//     ...
 				// then we need to convert from relative to absolute here.
 
-				var positionAttribute = cloneBufferAttribute( geometry.attributes.position );
-
 				if ( target.POSITION !== undefined ) {
 
-					var morphPosition = accessors[ target.POSITION ];
+					// Cloning not to pollute original accessor
+					var positionAttribute = cloneBufferAttribute( accessors[ target.POSITION ] );
+					positionAttribute.name = attributeName;
+
+					var position = geometry.attributes.position;
 
 					for ( var j = 0, jl = positionAttribute.count; j < jl; j ++ ) {
 
 						positionAttribute.setXYZ(
 							j,
-							positionAttribute.getX( j ) + morphPosition.getX( j ),
-							positionAttribute.getY( j ) + morphPosition.getY( j ),
-							positionAttribute.getZ( j ) + morphPosition.getZ( j )
+							positionAttribute.getX( j ) + position.getX( j ),
+							positionAttribute.getY( j ) + position.getY( j ),
+							positionAttribute.getZ( j ) + position.getZ( j )
 						);
 
 					}
 
+				} else {
+
+					positionAttribute = geometry.attributes.position;
+
 				}
 
-				positionAttribute.name = attributeName;
 				morphPositions.push( positionAttribute );
 
 			}
@@ -1225,26 +1230,32 @@ THREE.GLTFLoader = ( function () {
 
 				// see target.POSITION's comment
 
-				var normalAttribute = cloneBufferAttribute( geometry.attributes.normal );
+				var normalAttribute;
 
 				if ( target.NORMAL !== undefined ) {
 
-					var morphNormal = geometry.attributes.normal;
+					var normalAttribute = cloneBufferAttribute( accessors[ target.NORMAL ] );
+					normalAttribute.name = attributeName;
+
+					var normal = geometry.attributes.normal;
 
 					for ( var j = 0, jl = normalAttribute.count; j < jl; j ++ ) {
 
 						normalAttribute.setXYZ(
 							j,
-							normalAttribute.getX( j ) + morphNormal.getX( j ),
-							normalAttribute.getY( j ) + morphNormal.getY( j ),
-							normalAttribute.getZ( j ) + morphNormal.getZ( j )
+							normalAttribute.getX( j ) + normal.getX( j ),
+							normalAttribute.getY( j ) + normal.getY( j ),
+							normalAttribute.getZ( j ) + normal.getZ( j )
 						);
 
 					}
 
+				} else {
+
+					normalAttribute = geometry.attributes.normal;
+
 				}
 
-				normalAttribute.name = attributeName;
 				morphNormals.push( normalAttribute );
 
 			}
