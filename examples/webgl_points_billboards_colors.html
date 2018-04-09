@@ -45,8 +45,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
-			var camera, scene, renderer, particles, geometry, material, i, h, color, colors = [], sprite, size;
+			var camera, scene, renderer, stats, material;
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -57,39 +56,41 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 1400;
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0009 );
 
-				geometry = new THREE.Geometry();
+				var geometry = new THREE.BufferGeometry();
+				var vertices = [];
+				var colors = [];
 
-				sprite = new THREE.TextureLoader().load( "textures/sprites/ball.png" );
+				var sprite = new THREE.TextureLoader().load( 'textures/sprites/ball.png' );
 
-				for ( i = 0; i < 5000; i ++ ) {
+				var color = new THREE.Color();
 
-					var vertex = new THREE.Vector3();
-					vertex.x = 2000 * Math.random() - 1000;
-					vertex.y = 2000 * Math.random() - 1000;
-					vertex.z = 2000 * Math.random() - 1000;
+				for ( var i = 0; i < 5000; i ++ ) {
 
-					geometry.vertices.push( vertex );
+					var x = 2000 * Math.random() - 1000;
+					var y = 2000 * Math.random() - 1000;
+					var z = 2000 * Math.random() - 1000;
 
-					colors[ i ] = new THREE.Color( 0xffffff );
-					colors[ i ].setHSL( ( vertex.x + 1000 ) / 2000, 1, 0.5 );
+					color.setHSL( ( x + 1000 ) / 2000, 1, 0.5 );
+
+					vertices.push( x, y, z );
+					colors.push( color.r, color.g, color.b );
 
 				}
 
-				geometry.colors = colors;
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
 
 				material = new THREE.PointsMaterial( { size: 85, map: sprite, vertexColors: THREE.VertexColors, alphaTest: 0.5, transparent: true } );
 				material.color.setHSL( 1.0, 0.2, 0.7 );
 
-				particles = new THREE.Points( geometry, material );
+				var particles = new THREE.Points( geometry, material );
 				scene.add( particles );
 
 				//
@@ -97,12 +98,12 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -180,7 +181,7 @@
 
 				camera.lookAt( scene.position );
 
-				h = ( 360 * ( 1.0 + time ) % 360 ) / 360;
+				var h = ( 360 * ( 1.0 + time ) % 360 ) / 360;
 				material.color.setHSL( h, 1.0, 0.6 );
 
 				renderer.render( scene, camera );
