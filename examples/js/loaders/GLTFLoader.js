@@ -1279,7 +1279,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		return isObjectEqual( a.attributes || {}, b.attributes || {} );
+		return isObjectEqual( a.attributes, b.attributes );
 
 	}
 
