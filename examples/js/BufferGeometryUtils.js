@@ -250,7 +250,7 @@ THREE.BufferGeometryUtils = {
 
 				if ( isIndexed ) {
 
-					count = geometry.index.count
+					count = geometry.index.count;
 
 				} else if ( geometry.attributes.position !== undefined ) {
 
