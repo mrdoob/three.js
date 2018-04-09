@@ -1252,17 +1252,20 @@ THREE.GLTFLoader = ( function () {
 		if ( meshDef.extras && Array.isArray( meshDef.extras.targetNames ) ) {
 
 			var targetNames = meshDef.extras.targetNames;
-			var dictionary = mesh.morphTargetDictionary;
 
-			for ( var key in dictionary ) {
+			if ( mesh.morphTargetInfluences.length === targetNames.length ) {
 
-				if ( dictionary[ key ] < targetNames.length ) delete dictionary[ key ];
+				mesh.morphTargetDictionary = {};
 
-			}
+				for ( var i = 0, il = targetNames.length; i < il; i ++ ) {
 
-			for ( var i = 0, il = targetNames.length; i < il; i ++ ) {
+					mesh.morphTargetDictionary[ targetNames[ i ] ] = i;
 
-				dictionary[ targetNames[ i ] ] = i;
+				}
+
+			} else {
+
+				console.warn( 'THREE.GLTFLoader: Invalid extras.targetNames length. Ignoring names.' );
 
 			}
 
