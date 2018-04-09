@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			.info {
+				position: absolute;
+				background-color: black;
+				opacity: 0.8;
+				color: white;
+				text-align: center;
+				top: 0px;
+				width: 100%;
+			}
+
+			.info a {
+				color: #00ffff;
+			}
+		</style>
+	</head>
+	<body>
+		<script src="../build/three.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/HalftonePass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/HalftoneShader.js"></script>
+		<script src="js/shaders/DepthLimitedBlurShader.js"></script>
+		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src='js/libs/dat.gui.min.js'></script>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - Halftone shader by @meatbags
+		</div>
+
+		<script>
+
+		class Example {
+			constructor() {
+				this.wrapper = document.createElement('div');
+				document.body.appendChild(this.wrapper);
+
+			 	this.clock = new THREE.Clock();
+			 	this.width = window.innerWidth;
+			 	this.height = window.innerHeight;
+			 	this.camera = new THREE.PerspectiveCamera(75, this.width / this.height, 1, 1000);
+				this.camera.position.z = 20;
+
+				this.initScene();
+				this.initRender();
+				this.loop();
+			}
+
+			initScene() {
+				var geo = new THREE.BoxBufferGeometry(1, 1, 1);
+				var mat = new THREE.MeshBasicMaterial({});
+				this.group = new THREE.Group();
+
+				for (var i=0, len=20; i<len; ++i) {
+					var mesh = new THREE.Mesh(geo.clone(), mat.clone());
+					mesh.position.x = Math.random() * 10 - 5;
+					mesh.position.y = Math.random() * 10 - 5;
+					mesh.position.z = Math.random() * 10 - 5;
+					this.group.add(mesh);
+				}
+
+				this.scene = new THREE.Scene();
+				this.scene.background = new THREE.Color(0x111111);
+				this.scene.add(this.group);
+			}
+
+			initRender() {
+				// 3js renderer
+				this.renderer = new THREE.WebGLRenderer();
+				this.renderer.setPixelRatio(window.devicePixelRatio);
+				this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+				// effect composer
+				this.composer = new THREE.EffectComposer(this.renderer);
+			 	this.renderPass = new THREE.RenderPass(this.scene, this.camera);
+				this.renderPass.renderToScreen = true;
+				this.composer.addPass(this.renderPass);
+
+				// add to doc
+				this.wrapper.appendChild(this.renderer.domElement);
+			}
+
+			loop() {
+				requestAnimationFrame(() => { this.loop(); });
+				var delta = this.clock.getDelta();
+				this.group.rotation.y += delta * Math.PI * 0.25;
+				this.composer.render(delta);
+			}
+		}
+
+		var example = new Example();
+
+		</script>
+	</body>
+</html>
