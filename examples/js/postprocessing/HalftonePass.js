@@ -2,11 +2,9 @@
  * @author meatbags / xavierburrow.com, github/meatbags
  */
 
-THREE.HalftonePass = function(scene, camera, width, height, texture) {
+THREE.HalftonePass = function(width, height) {
 	THREE.Pass.call(this);
 
-	this.scene = scene;
-	this.camera = camera;
 	this.width = width;
 	this.height = height;
 
@@ -15,8 +13,9 @@ THREE.HalftonePass = function(scene, camera, width, height, texture) {
 	}
 
 	this.shader = THREE.HalftoneShader;
+	this.uniforms = THREE.UniformsUtils.clone(this.shader.uniforms);
 	this.material = new THREE.ShaderMaterial({
-		uniforms: THREE.UniformsUtils.clone(this.shader.uniforms),
+		uniforms: this.uniforms,
 		fragmentShader: this.shader.fragmentShader,
 		vertexShader: this.shader.vertexShader
 	});
