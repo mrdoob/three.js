@@ -2059,31 +2059,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		// .indicesArray isn't in glTF spec. See .loadGeometries()
-		if ( primitiveDef.indicesArray !== undefined && ! geometry.index ) {
-
-			var indices = [];
-			var offset = 0;
-
-			for ( var i = 0, il = primitiveDef.indicesArray.length; i < il; i ++ ) {
-
-				var accessor = accessors[ primitiveDef.indicesArray[ i ] ];
-
-				for ( var j = 0, jl = accessor.count; j < jl; j ++ ) {
-
-					indices.push( accessor.array[ j ] );
-
-				}
-
-				geometry.addGroup( offset, accessor.count, i );
-
-				offset += accessor.count;
-
-			}
-
-			geometry.setIndex( indices );
-
-		} else if ( primitiveDef.indices !== undefined && ! geometry.index ) {
+		if ( primitiveDef.indices !== undefined && ! geometry.index ) {
 
 			geometry.setIndex( accessors[ primitiveDef.indices ] );
 
@@ -2107,23 +2083,20 @@ THREE.GLTFLoader = ( function () {
 		var extensions = this.extensions;
 		var cache = this.primitiveCache;
 
-		if ( isMultiPassGeometry( primitives ) ) {
+		var isCombinable = isMultiPassGeometry( primitives );
+		var originalPrimitives;
+
+		if ( isCombinable ) {
+
+			originalPrimitives = primitives; // save original primitives and use later
 
 			// We builds a single BufferGeometry with .groups from multiple primitives
 			// because all primitives share the same attributes/morph/mode and have indices.
 
 			var primitive = Object.assign( {}, primitives[ 0 ] );
-			primitive.indicesArray = [];
-
-			// combines indices in addPrimitiveAttributes() later
-
-			for ( var i = 0, il = primitives.length; i < il; i ++ ) {
-
-				primitive.indicesArray[ i ] = primitives[ i ].indices;
-
-			}
-
 			primitives = [ primitive ];
+
+			// Sets .groups and combined indices to a geometry later in this method.
 
 		}
 
@@ -2180,13 +2153,37 @@ THREE.GLTFLoader = ( function () {
 
 			return Promise.all( pending ).then( function ( geometries ) {
 
-				// Try merge geometries with BufferGeometryUtils if possible
+				if ( isCombinable ) {
 
-				if ( geometries.length > 1 && THREE.BufferGeometryUtils !== undefined ) {
+					var geometry = geometries[ 0 ];
+					var indices = [];
+					var offset = 0;
+
+					for ( var i = 0, il = originalPrimitives.length; i < il; i ++ ) {
+
+						var accessor = accessors[ originalPrimitives[ i ].indices ];
+
+						for ( var j = 0, jl = accessor.count; j < jl; j ++ ) {
+
+							indices.push( accessor.array[ j ] );
+
+						}
+
+						geometry.addGroup( offset, accessor.count, i );
+
+						offset += accessor.count;
+
+					}
+
+					geometry.setIndex( indices );
+
+				} else if ( geometries.length > 1 && THREE.BufferGeometryUtils !== undefined ) {
+
+					// Tries to merge geometries with BufferGeometryUtils if possible
 
 					for ( var i = 1, il = primitives.length; i < il; i ++ ) {
 
-						// can't merge if draw mode is differenct
+						// can't merge if draw mode is different
 						if ( primitives[ 0 ].mode !== primitives[ i ].mode ) return geometries;
 
 					}
