@@ -2090,7 +2090,7 @@ THREE.GLTFLoader = ( function () {
 
 			originalPrimitives = primitives; // save original primitives and use later
 
-			// We builds a single BufferGeometry with .groups from multiple primitives
+			// We build a single BufferGeometry with .groups from multiple primitives
 			// because all primitives share the same attributes/morph/mode and have indices.
 
 			primitives = [ primitives[ 0 ] ];
