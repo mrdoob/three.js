@@ -2074,6 +2074,12 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		if ( primitiveDef.extras !== undefined ) {
+
+			geometry.userData = primitiveDef.extras;
+
+		}
+
 	}
 
 	/**
@@ -2314,7 +2320,6 @@ THREE.GLTFLoader = ( function () {
 					if ( geometries.length > 1 ) mesh.name += '_' + i;
 
 					if ( meshDef.extras !== undefined ) mesh.userData = meshDef.extras;
-					if ( primitive.extras !== undefined ) mesh.geometry.userData = primitive.extras;
 
 					meshes.push( mesh );
 
