@@ -1838,13 +1838,15 @@ THREE.GLTFLoader = ( function () {
 
 			// Load Texture resource.
 
+			var loader;
+
 			if ( textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
 
-				var loader = DDSLoader;
+				loader = DDSLoader;
 
 			} else {
 
-				var loader = THREE.Loader.Handlers.get( sourceURI ) || textureLoader;
+				loader = THREE.Loader.Handlers.get( sourceURI ) || textureLoader;
 
 			}
 
