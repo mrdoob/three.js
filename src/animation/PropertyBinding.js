@@ -8,6 +8,8 @@
  * @author tschw
  */
 
+import { Euler } from '../math/Euler.js';
+
 // Characters [].:/ are reserved for track binding syntax.
 var RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
 
@@ -435,8 +437,15 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			function setValue_fromArray_setMatrixWorldNeedsUpdate( buffer, offset ) {
 
-				this.resolvedProperty.fromArray( buffer, offset );
-				this.targetObject.matrixWorldNeedsUpdate = true;
+				if ( this.resolvedProperty instanceof Euler ) {
+
+					this.resolvedProperty.fromArray( buffer.slice( offset, offset + 3 ) );
+
+				} else {
+
+					this.resolvedProperty.fromArray( buffer, offset );
+
+				}
 
 			}
 
