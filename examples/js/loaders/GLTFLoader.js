@@ -1169,10 +1169,6 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		// unnecessary to set morph if base attributes don't exist
-		if ( geometry.attributes.position === undefined ) hasMorphPosition = false;
-		if ( geometry.attributes.normal === undefined ) hasMorphNormal = false;
-
 		if ( ! hasMorphPosition && ! hasMorphNormal ) return;
 
 		var morphPositions = [];
