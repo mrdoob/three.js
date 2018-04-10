@@ -23,9 +23,9 @@
 			#info {
 				color:#fff;
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0px;
+				width: 100%;
 				padding: 5px;
-				z-index:100;
 			}
 
 		</style>
@@ -40,6 +40,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -96,6 +97,18 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+
+				//
+
+				var gui = new dat.GUI();
+
+				gui.add( material, 'sizeAttenuation' ).onChange( function() {
+
+					material.needsUpdate = true;
+
+				} );
+
+				gui.open();
 
 				//
 
