@@ -1318,6 +1318,65 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
+	function getCachedCombinedGeometry( cache, geometries ) {
+
+		for ( var i = 0, il = cache.length; i < il; i ++ ) {
+
+			var entry = cache[ i ];
+
+			if ( geometries.length !== entry.baseGeometries.length ) continue;
+
+			var match = true;
+
+			for ( var j = 0, jl = geometries.length; j < jl; j ++ ) {
+
+				if ( geometries[ j ] !== entry.baseGeometries[ j ] ) {
+
+					match = false;
+					break;
+
+				}
+
+			}
+
+			if ( match ) return entry.geometry;
+
+		}
+
+		return null;
+
+	}
+
+	function getCachedMultiPassGeometry( cache, geometry, primitives ) {
+
+		for ( var i = 0, il = cache.length; i < il; i ++ ) {
+
+			var entry = cache[ i ];
+
+			if ( geometry !== entry.baseGeometry ) continue;
+			if ( primitives.length !== entry.primitives.length ) continue;
+
+			var match = true;
+
+			for ( var j = 0, jl = primitives.length; j < jl; j ++ ) {
+
+				if ( primitives[ j ].indices !== entry.primitives[ j ].indices ) {
+
+					match = false;
+					break;
+
+				}
+
+			}
+
+			if ( match ) return entry.geometry;
+
+		}
+
+		return null;
+
+	}
+
 	function cloneBufferAttribute( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) {
@@ -1397,6 +1456,8 @@ THREE.GLTFLoader = ( function () {
 
 		// BufferGeometry caching
 		this.primitiveCache = [];
+		this.multiplePrimitivesCache = [];
+		this.multiPassGeometryCache = []
 
 		this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
@@ -2098,10 +2159,10 @@ THREE.GLTFLoader = ( function () {
 		var extensions = this.extensions;
 		var cache = this.primitiveCache;
 
-		var isCombinable = isMultiPassGeometry( primitives );
+		var isMultiPass = isMultiPassGeometry( primitives );
 		var originalPrimitives;
 
-		if ( isCombinable ) {
+		if ( isMultiPass ) {
 
 			originalPrimitives = primitives; // save original primitives and use later
 
@@ -2167,18 +2228,25 @@ THREE.GLTFLoader = ( function () {
 
 			return Promise.all( pending ).then( function ( geometries ) {
 
-				if ( isCombinable ) {
+				if ( isMultiPass ) {
+
+					var baseGeometry = geometries[ 0 ];
+
+					// See if we've already created this combined geometry
+					var cache = parser.multiPassGeometryCache;
+					var cached = getCachedMultiPassGeometry( cache, baseGeometry, originalPrimitives );
+
+					if ( cached !== null ) return [ cached.geometry ];
 
 					// Cloning geometry because of index override.
 					// Attributes can be reused so cloning by myself here.
-					var source = geometries[ 0 ];
 					var geometry = new THREE.BufferGeometry();
 
-					geometry.name = source.name;
-					geometry.userData = source.userData;
+					geometry.name = baseGeometry.name;
+					geometry.userData = baseGeometry.userData;
 
-					for ( var key in source.attributes ) geometry.addAttribute( key, source.attributes[ key ] );
-					for ( var key in source.morphAttributes ) geometry.morphAttributes[ key ] = source.morphAttributes[ key ];
+					for ( var key in baseGeometry.attributes ) geometry.addAttribute( key, baseGeometry.attributes[ key ] );
+					for ( var key in baseGeometry.morphAttributes ) geometry.morphAttributes[ key ] = baseGeometry.morphAttributes[ key ];
 
 					var indices = [];
 					var offset = 0;
@@ -2187,11 +2255,7 @@ THREE.GLTFLoader = ( function () {
 
 						var accessor = accessors[ originalPrimitives[ i ].indices ];
 
-						for ( var j = 0, jl = accessor.count; j < jl; j ++ ) {
-
-							indices.push( accessor.array[ j ] );
-
-						}
+						for ( var j = 0, jl = accessor.count; j < jl; j ++ ) indices.push( accessor.array[ j ] );
 
 						geometry.addGroup( offset, accessor.count, i );
 
@@ -2200,6 +2264,8 @@ THREE.GLTFLoader = ( function () {
 					}
 
 					geometry.setIndex( indices );
+
+					cache.push( { geometry: geometry, baseGeometry: baseGeometry, primitives: originalPrimitives } );
 
 					return [ geometry ];
 
@@ -2214,9 +2280,23 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries( geometries, true );
+					// See if we've already created this combined geometry
+					var cache = parser.multiplePrimitivesCache;
+					var cached = getCachedCombinedGeometry( cache, geometries );
 
-					if ( geometry !== null ) return [ geometry ];
+					if ( cached ) {
+
+						if ( cached.geometry !== null ) return [ cached.geometry ];
+
+					} else {
+
+						var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries( geometries, true );
+
+						cache.push( { geometry: geometry, baseGeometries: geometries } );
+
+						if ( geometry !== null ) return [ geometry ];
+
+					}
 
 				}
 
