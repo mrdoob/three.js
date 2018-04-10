@@ -23,9 +23,9 @@
 			#info {
 				color:#fff;
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 0px;
+				width: 100%;
 				padding: 5px;
-				z-index:100;
 			}
 
 		</style>
@@ -41,6 +41,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -113,13 +114,38 @@
 
 				}
 
+				//
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				//
+
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+
+				//
+
+				var gui = new dat.GUI();
+
+				var params = {
+					texture: true
+				}
+
+				gui.add( params, 'texture' ).onChange( function( value ) {
+
+					for ( var i = 0; i < materials.length; i ++ ) {
+
+						materials[ i ].map = ( value === true ) ? parameters[ i ][ 1 ] : null;
+						materials[ i ].needsUpdate = true;
+
+					}
+
+				} );
+
+				gui.open();
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
