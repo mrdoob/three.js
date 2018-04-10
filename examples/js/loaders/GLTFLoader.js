@@ -2169,8 +2169,17 @@ THREE.GLTFLoader = ( function () {
 
 				if ( isCombinable ) {
 
-					// Cloning geometry because of index override
-					var geometry = geometries[ 0 ].clone();
+					// Cloning geometry because of index override.
+					// Attributes can be reused so cloning by myself here.
+					var source = geometries[ 0 ];
+					var geometry = new THREE.BufferGeometry();
+
+					geometry.name = source.name;
+					geometry.userData = source.userData;
+
+					for ( var key in source.attributes ) geometry.addAttribute( key, source.attributes[ key ] );
+					for ( var key in source.morphAttributes ) geometry.morphAttributes[ key ] = source.morphAttributes[ key ];
+
 					var indices = [];
 					var offset = 0;
 
