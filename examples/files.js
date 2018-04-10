@@ -374,7 +374,6 @@ var files = {
 		"canvas_lights_pointlights",
 		"canvas_lines",
 		"canvas_lines_colors",
-		"canvas_lines_colors_2d",
 		"canvas_lines_dashed",
 		"canvas_lines_sphere",
 		"canvas_materials",
