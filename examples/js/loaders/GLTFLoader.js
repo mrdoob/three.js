@@ -120,7 +120,6 @@ THREE.GLTFLoader = ( function () {
 				return;
 
 			}
-
 			if ( json.extensionsUsed ) {
 
 				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_LIGHTS ) >= 0 ) {
@@ -144,6 +143,12 @@ THREE.GLTFLoader = ( function () {
 				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ) >= 0 ) {
 
 					extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] = new GLTFDracoMeshCompressionExtension( this.dracoLoader );
+
+				}
+
+				if ( json.extensionsUsed.indexOf( EXTENSIONS.MSFT_TEXTURE_DDS ) >= 0 ) {
+
+					extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = "MSFT_texture_dds";
 
 				}
 
@@ -224,7 +229,8 @@ THREE.GLTFLoader = ( function () {
 		KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
 		KHR_LIGHTS: 'KHR_lights',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
-		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit'
+		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
+		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
 	};
 
 	/**
@@ -1780,7 +1786,6 @@ THREE.GLTFLoader = ( function () {
 	 * @return {Promise<THREE.Texture>}
 	 */
 	GLTFParser.prototype.loadTexture = function ( textureIndex ) {
-
 		var parser = this;
 		var json = this.json;
 		var options = this.options;
@@ -1789,7 +1794,21 @@ THREE.GLTFLoader = ( function () {
 		var URL = window.URL || window.webkitURL;
 
 		var textureDef = json.textures[ textureIndex ];
-		var source = json.images[ textureDef.source ];
+
+		var textureExtensions = textureDef.extensions || {};
+
+		var source;
+		if ( textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
+
+			var DDSLoader = new THREE.DDSLoader;
+			source = json.images[ textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].source ];
+
+		} else {
+
+			source = json.images[ textureDef.source ];
+
+		}
+
 		var sourceURI = source.uri;
 		var isObjectURL = false;
 
@@ -1812,7 +1831,15 @@ THREE.GLTFLoader = ( function () {
 
 			// Load Texture resource.
 
-			var loader = THREE.Loader.Handlers.get( sourceURI ) || textureLoader;
+			if ( textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
+
+				var loader = DDSLoader;
+
+			} else {
+
+				var loader = THREE.Loader.Handlers.get( sourceURI ) || textureLoader;
+
+			}
 
 			return new Promise( function ( resolve, reject ) {
 
@@ -1834,7 +1861,11 @@ THREE.GLTFLoader = ( function () {
 
 			if ( textureDef.name !== undefined ) texture.name = textureDef.name;
 
-			texture.format = textureDef.format !== undefined ? WEBGL_TEXTURE_FORMATS[ textureDef.format ] : THREE.RGBAFormat;
+			if ( ! textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
+
+				texture.format = textureDef.format !== undefined ? WEBGL_TEXTURE_FORMATS[ textureDef.format ] : THREE.RGBAFormat;
+
+			}
 
 			if ( textureDef.internalFormat !== undefined && texture.format !== WEBGL_TEXTURE_FORMATS[ textureDef.internalFormat ] ) {
 

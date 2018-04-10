@@ -53,8 +53,9 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/DRACOLoader.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
-
+		
 		<script>
 			var orbitControls;
 			var container, camera, scene, renderer, loader;
@@ -71,7 +72,7 @@
 					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
 					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
 					addLights: true,
-					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary' ],
+					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds'],
 					addEnvMap: true
 				},
 				'Bot Skinned': {
