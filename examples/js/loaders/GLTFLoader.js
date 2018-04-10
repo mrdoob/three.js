@@ -1300,17 +1300,27 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
+	function isArrayEqual( a, b ) {
+
+		if ( a.length !== b.length ) return false;
+
+		for ( var i = 0, il = a.length; i < il; i ++ ) {
+
+			if ( a[ i ] !== b[ i ] ) return false;
+
+		}
+
+		return true;
+
+	}
+
 	function getCachedGeometry( cache, newPrimitive ) {
 
 		for ( var i = 0, il = cache.length; i < il; i ++ ) {
 
 			var cached = cache[ i ];
 
-			if ( isPrimitiveEqual( cached.primitive, newPrimitive ) ) {
-
-				return cached.promise;
-
-			}
+			if ( isPrimitiveEqual( cached.primitive, newPrimitive ) ) return cached.promise;
 
 		}
 
@@ -1324,22 +1334,7 @@ THREE.GLTFLoader = ( function () {
 
 			var entry = cache[ i ];
 
-			if ( geometries.length !== entry.baseGeometries.length ) continue;
-
-			var match = true;
-
-			for ( var j = 0, jl = geometries.length; j < jl; j ++ ) {
-
-				if ( geometries[ j ] !== entry.baseGeometries[ j ] ) {
-
-					match = false;
-					break;
-
-				}
-
-			}
-
-			if ( match ) return entry.geometry;
+			if ( isArrayEqual( geometries, entry.baseGeometries ) ) return entry.geometry;
 
 		}
 
@@ -1353,23 +1348,7 @@ THREE.GLTFLoader = ( function () {
 
 			var entry = cache[ i ];
 
-			if ( geometry !== entry.baseGeometry ) continue;
-			if ( primitives.length !== entry.primitives.length ) continue;
-
-			var match = true;
-
-			for ( var j = 0, jl = primitives.length; j < jl; j ++ ) {
-
-				if ( primitives[ j ].indices !== entry.primitives[ j ].indices ) {
-
-					match = false;
-					break;
-
-				}
-
-			}
-
-			if ( match ) return entry.geometry;
+			if ( geometry === entry.baseGeometry && isArrayEqual( primitives, entry.primitives ) ) return entry.geometry;
 
 		}
 
