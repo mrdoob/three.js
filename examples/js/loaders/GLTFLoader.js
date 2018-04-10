@@ -2225,7 +2225,6 @@ THREE.GLTFLoader = ( function () {
 		] ).then( function ( dependencies ) {
 
 			var primitives = meshDef.primitives;
-			var meshes = [];
 			var originalMaterials = [];
 
 			for ( var i = 0, il = primitives.length; i < il; i ++ ) {
@@ -2239,6 +2238,8 @@ THREE.GLTFLoader = ( function () {
 			return scope.loadGeometries( primitives ).then( function ( geometries ) {
 
 				var isMultiMaterial = geometries.length === 1 && geometries[ 0 ].groups.length > 0;
+
+				var meshes = [];
 
 				for ( var i = 0, il = geometries.length; i < il; i ++ ) {
 
