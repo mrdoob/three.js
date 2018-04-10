@@ -1145,17 +1145,12 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#morph-targets
 	 *
-	 * @param {THREE.Mesh} mesh
-	 * @param {GLTF.Mesh} meshDef
-	 * @param {GLTF.Primitive} primitiveDef
+	 * @param {THREE.Geometry} geometry
+	 * @param {Array<GLTF.Target>} targets
 	 * @param {Array<THREE.BufferAttribute>} accessors
 	 */
-	function addMorphTargets( mesh, meshDef, primitiveDef, accessors ) {
+	function addMorphTargets( geometry, targets, accessors ) {
 
-		var geometry = mesh.geometry;
-		var material = mesh.material;
-
-		var targets = primitiveDef.targets;
 		var morphAttributes = geometry.morphAttributes;
 
 		morphAttributes.position = [];
@@ -1245,6 +1240,14 @@ THREE.GLTFLoader = ( function () {
 			}
 
 		}
+
+	}
+
+	/**
+	 * @param {THREE.Mesh} mesh
+	 * @param {GLTF.Mesh} meshDef
+	 */
+	function updateMorphTargets( mesh, meshDef ) {
 
 		mesh.updateMorphTargets();
 
@@ -2065,6 +2068,12 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		if ( primitiveDef.targets !== undefined ) {
+
+			addMorphTargets( geometry, primitiveDef.targets, accessors );
+
+		}
+
 	}
 
 	/**
@@ -2294,9 +2303,9 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					if ( primitive.targets !== undefined ) {
+					if ( Object.keys( mesh.geometry.morphAttributes ).length > 0 ) {
 
-						addMorphTargets( mesh, meshDef, primitive, dependencies.accessors );
+						updateMorphTargets( mesh, meshDef );
 
 					}
 
