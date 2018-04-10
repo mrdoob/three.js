@@ -1786,6 +1786,7 @@ THREE.GLTFLoader = ( function () {
 	 * @return {Promise<THREE.Texture>}
 	 */
 	GLTFParser.prototype.loadTexture = function ( textureIndex ) {
+
 		var parser = this;
 		var json = this.json;
 		var options = this.options;
@@ -1799,6 +1800,12 @@ THREE.GLTFLoader = ( function () {
 
 		var source;
 		if ( textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
+
+			if (!THREE.DDSLoader) {
+
+				throw new Error( 'THREE.GLTFLoader: Attempting to load .dds texture without importing THREE.DDSLoader' );
+
+			}
 
 			var DDSLoader = new THREE.DDSLoader;
 			source = json.images[ textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].source ];
