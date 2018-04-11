@@ -123,27 +123,32 @@ THREE.GLTFLoader = ( function () {
 
 			if ( json.extensionsUsed ) {
 
-				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_LIGHTS ) >= 0 ) {
+				for ( var i = 0; i < json.extensionsUsed.length; ++ i ) {
 
-					extensions[ EXTENSIONS.KHR_LIGHTS ] = new GLTFLightsExtension( json );
+					var extensionName = json.extensionsUsed[ i ];
 
-				}
+					switch ( extensionName ) {
 
-				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_UNLIT ) >= 0 ) {
+						case EXTENSIONS.KHR_LIGHTS:
+							extensions[ extensionName ] = new GLTFLightsExtension( json );
+							break;
 
-					extensions[ EXTENSIONS.KHR_MATERIALS_UNLIT ] = new GLTFMaterialsUnlitExtension( json );
+						case EXTENSIONS.KHR_MATERIALS_UNLIT:
+							extensions[ extensionName ] = new GLTFMaterialsUnlitExtension( json );
+							break;
 
-				}
+						case EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS:
+							extensions[ extensionName ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
+							break;
 
-				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ) >= 0 ) {
+						case EXTENSIONS.KHR_DRACO_MESH_COMPRESSION:
+							extensions[ extensionName ] = new GLTFDracoMeshCompressionExtension( this.dracoLoader );
+							break;
 
-					extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
+						default:
+							console.warn( 'THREE.GLTFLoader: Unknown extension "' + extensionName + '".' );
 
-				}
-
-				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ) >= 0 ) {
-
-					extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] = new GLTFDracoMeshCompressionExtension( this.dracoLoader );
+					}
 
 				}
 
@@ -1155,6 +1160,23 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
+	function addExtensionUserData( extensionsUsed, object, objectDef ) {
+
+		// Add unknown glTF extensions to an object's userData.
+
+		for ( var name in objectDef.extensions ) {
+
+			if ( extensionsUsed[ name ] === undefined ) {
+
+				object.userData.gltfExtensions = object.userData.gltfExtensions || {};
+				object.userData.gltfExtensions[ name ] = objectDef.extensions[ name ];
+
+			}
+
+		}
+
+	}
+
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#morph-targets
 	 *
@@ -2114,6 +2136,8 @@ THREE.GLTFLoader = ( function () {
 
 			if ( materialDef.extras ) material.userData = materialDef.extras;
 
+			if ( materialDef.extensions ) addExtensionUserData( extensions, material, materialDef );
+
 			return material;
 
 		} );
@@ -2733,6 +2757,8 @@ THREE.GLTFLoader = ( function () {
 			}
 
 			if ( nodeDef.extras ) node.userData = nodeDef.extras;
+
+			if ( nodeDef.extensions ) addExtensionUserData( extensions, node, nodeDef );
 
 			if ( nodeDef.matrix !== undefined ) {
 
