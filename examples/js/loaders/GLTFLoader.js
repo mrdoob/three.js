@@ -120,6 +120,7 @@ THREE.GLTFLoader = ( function () {
 				return;
 
 			}
+
 			if ( json.extensionsUsed ) {
 
 				if ( json.extensionsUsed.indexOf( EXTENSIONS.KHR_LIGHTS ) >= 0 ) {
@@ -148,7 +149,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( json.extensionsUsed.indexOf( EXTENSIONS.MSFT_TEXTURE_DDS ) >= 0 ) {
 
-					extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = "MSFT_texture_dds";
+					extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension();
 
 				}
 
@@ -232,6 +233,20 @@ THREE.GLTFLoader = ( function () {
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
 		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
 	};
+
+	/**
+	 * DDS Texture Extension
+	 *
+	 * Specification: 
+	 * https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/MSFT_texture_dds
+	 * 
+	 */
+	function GLTFTextureDDSExtension() {
+
+		this.name = EXTENSIONS.MSFT_TEXTURE_DDS;
+    this.ddsLoader = new THREE.DDSLoader();
+
+	}
 
 	/**
 	 * Lights Extension
@@ -1799,6 +1814,7 @@ THREE.GLTFLoader = ( function () {
 		var textureExtensions = textureDef.extensions || {};
 
 		var source;
+
 		if ( textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
 
 			if (!THREE.DDSLoader) {
@@ -1807,7 +1823,6 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			var DDSLoader = new THREE.DDSLoader;
 			source = json.images[ textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].source ];
 
 		} else {
@@ -1842,7 +1857,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
 
-				loader = DDSLoader;
+				loader = THREE.Loader.Handlers.get( sourceURI ) || parser.extensions[EXTENSIONS.MSFT_TEXTURE_DDS].ddsLoader
 
 			} else {
 
