@@ -105,25 +105,40 @@
 			}
 
 			initGUI() {
-				this.controller = {
-					size: 10
+				var guiTarget = this.halftonePass.uniforms;
+				var controller = {
+					radius: 5,
+					rotateSampleGrid: 45,
+					rotateC: 45,
+					rotateM: 30,
+					rotateY: 60,
+					shape: 1
 				};
-				this.onGUIChange = function() {
-					for (var key in this.controller) {
-						if (this.halftonePass.uniforms.hasOwnProperty(key)) {
-							this.halftonePass.uniforms[key] = this.controller[key];
-						}
-					}
-				}
+				var onGUIChange = function() {
+					guiTarget.radius.value = controller.radius;
+					guiTarget.rSample.value = controller.rotateSampleGrid * (Math.PI / 180);
+					guiTarget.rC.value = controller.rotateC * (Math.PI / 180);
+					guiTarget.rM.value = controller.rotateM * (Math.PI / 180);
+					guiTarget.rY.value = controller.rotateY * (Math.PI / 180);
+					guiTarget.shape.value = controller.shape;
+				};
 				this.gui = new dat.GUI();
-				this.gui.add(this.controller, 'size', 1, 50).onChange(this.onGUIChange);
+				this.gui.add(controller, 'shape', {'dot': 1, 'euclidean-dot': 2, 'ellipse': 3, 'line': 4}).onChange(onGUIChange);
+				this.gui.add(controller, 'radius', 1, 50).onChange(onGUIChange);
+				this.gui.add(controller, 'rotateSampleGrid', 0, 360).onChange(onGUIChange);
+				this.gui.add(controller, 'rotateC', 0, 360).onChange(onGUIChange);
+				this.gui.add(controller, 'rotateM', 0, 360).onChange(onGUIChange);
+				this.gui.add(controller, 'rotateY', 0, 360).onChange(onGUIChange);
+
+				// reset
+				onGUIChange();
 			}
 
 
 			loop() {
 				requestAnimationFrame(() => { this.loop(); });
 				var delta = this.clock.getDelta();
-				this.group.rotation.y += delta * this.rotationSpeed;
+				//this.group.rotation.y += delta * this.rotationSpeed;
 				this.composer.render(delta);
 			}
 		}

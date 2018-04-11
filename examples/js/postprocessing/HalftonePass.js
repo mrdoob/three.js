@@ -12,12 +12,11 @@ THREE.HalftonePass = function(width, height) {
 		console.error('THREE.HalftonePass requires THREE.HalftoneShader');
 	}
 
-	this.shader = THREE.HalftoneShader;
-	this.uniforms = THREE.UniformsUtils.clone(this.shader.uniforms);
+	this.uniforms = THREE.UniformsUtils.clone(THREE.HalftoneShader.uniforms);
 	this.material = new THREE.ShaderMaterial({
 		uniforms: this.uniforms,
-		fragmentShader: this.shader.fragmentShader,
-		vertexShader: this.shader.vertexShader
+		fragmentShader: THREE.HalftoneShader.fragmentShader,
+		vertexShader: THREE.HalftoneShader.vertexShader
 	});
 
 	this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -29,6 +28,7 @@ THREE.HalftonePass = function(width, height) {
 
 THREE.HalftonePass.prototype = Object.assign(Object.create(THREE.Pass.prototype), {
 	constructor: THREE.HalftonePass,
+
 	render: function(renderer, writeBuffer, readBuffer, delta, maskActive) {
 		this.material.uniforms["tDiffuse"].value = readBuffer.texture;
 		this.quad.material = this.material;
@@ -39,9 +39,11 @@ THREE.HalftonePass.prototype = Object.assign(Object.create(THREE.Pass.prototype)
 			renderer.render(this.scene, this.camera, writeBuffer, this.clear);
 		}
 	},
+
 	setSize: function(width, height) {
 		this.width = width;
 		this.height = height;
-		// send to shader uniforms
+		this.uniforms['width'].value = this.width;
+		this.uniforms['height'].value = this.height;
 	}
 });
