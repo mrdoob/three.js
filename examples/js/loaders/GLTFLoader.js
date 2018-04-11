@@ -1332,9 +1332,9 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var i = 0, il = cache.length; i < il; i ++ ) {
 
-			var entry = cache[ i ];
+			var cached = cache[ i ];
 
-			if ( isArrayEqual( geometries, entry.baseGeometries ) ) return entry.geometry;
+			if ( isArrayEqual( geometries, cached.baseGeometries ) ) return cached.geometry;
 
 		}
 
@@ -1346,9 +1346,9 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var i = 0, il = cache.length; i < il; i ++ ) {
 
-			var entry = cache[ i ];
+			var cached = cache[ i ];
 
-			if ( geometry === entry.baseGeometry && isArrayEqual( primitives, entry.primitives ) ) return entry.geometry;
+			if ( geometry === cached.baseGeometry && isArrayEqual( primitives, cached.primitives ) ) return cached.geometry;
 
 		}
 
