@@ -126,6 +126,7 @@ THREE.GLTFLoader = ( function () {
 				for ( var i = 0; i < json.extensionsUsed.length; ++ i ) {
 
 					var extensionName = json.extensionsUsed[ i ];
+					var extensionsRequired = json.extensionsRequired || [];
 
 					switch ( extensionName ) {
 
@@ -146,7 +147,12 @@ THREE.GLTFLoader = ( function () {
 							break;
 
 						default:
-							console.warn( 'THREE.GLTFLoader: Unknown extension "' + extensionName + '".' );
+
+							if ( extensionsRequired.indexOf( extensionName ) >= 0 ) {
+
+								console.warn( 'THREE.GLTFLoader: Unknown extension "' + extensionName + '".' );
+
+							}
 
 					}
 
@@ -1160,13 +1166,13 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	function addExtensionUserData( extensionsUsed, object, objectDef ) {
+	function addUnknownExtensionsToUserData( object, objectDef ) {
 
 		// Add unknown glTF extensions to an object's userData.
 
 		for ( var name in objectDef.extensions ) {
 
-			if ( extensionsUsed[ name ] === undefined ) {
+			if ( EXTENSIONS[ name ] === undefined ) {
 
 				object.userData.gltfExtensions = object.userData.gltfExtensions || {};
 				object.userData.gltfExtensions[ name ] = objectDef.extensions[ name ];
@@ -2136,7 +2142,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( materialDef.extras ) material.userData = materialDef.extras;
 
-			if ( materialDef.extensions ) addExtensionUserData( extensions, material, materialDef );
+			if ( materialDef.extensions ) addUnknownExtensionsToUserData( material, materialDef );
 
 			return material;
 
@@ -2758,7 +2764,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( nodeDef.extras ) node.userData = nodeDef.extras;
 
-			if ( nodeDef.extensions ) addExtensionUserData( extensions, node, nodeDef );
+			if ( nodeDef.extensions ) addUnknownExtensionsToUserData( node, nodeDef );
 
 			if ( nodeDef.matrix !== undefined ) {
 
@@ -2891,6 +2897,8 @@ THREE.GLTFLoader = ( function () {
 				if ( sceneDef.name !== undefined ) scene.name = sceneDef.name;
 
 				if ( sceneDef.extras ) scene.userData = sceneDef.extras;
+
+				if ( sceneDef.extensions ) addUnknownExtensionsToUserData( scene, sceneDef );
 
 				var nodeIds = sceneDef.nodes || [];
 
