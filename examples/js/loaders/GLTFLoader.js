@@ -1166,13 +1166,13 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	function addUnknownExtensionsToUserData( object, objectDef ) {
+	function addUnknownExtensionsToUserData( knownExtensions, object, objectDef ) {
 
 		// Add unknown glTF extensions to an object's userData.
 
 		for ( var name in objectDef.extensions ) {
 
-			if ( EXTENSIONS[ name ] === undefined ) {
+			if ( knownExtensions[ name ] === undefined ) {
 
 				object.userData.gltfExtensions = object.userData.gltfExtensions || {};
 				object.userData.gltfExtensions[ name ] = objectDef.extensions[ name ];
@@ -2142,7 +2142,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( materialDef.extras ) material.userData = materialDef.extras;
 
-			if ( materialDef.extensions ) addUnknownExtensionsToUserData( material, materialDef );
+			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
 			return material;
 
@@ -2764,7 +2764,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( nodeDef.extras ) node.userData = nodeDef.extras;
 
-			if ( nodeDef.extensions ) addUnknownExtensionsToUserData( node, nodeDef );
+			if ( nodeDef.extensions ) addUnknownExtensionsToUserData( extensions, node, nodeDef );
 
 			if ( nodeDef.matrix !== undefined ) {
 
@@ -2898,7 +2898,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( sceneDef.extras ) scene.userData = sceneDef.extras;
 
-				if ( sceneDef.extensions ) addUnknownExtensionsToUserData( scene, sceneDef );
+				if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, scene, sceneDef );
 
 				var nodeIds = sceneDef.nodes || [];
 
