@@ -4,29 +4,21 @@
  * @author Lewy Blue https://github.com/looeee
  *
  * Loader loads FBX file and generates Group representing FBX scene.
- * Requires FBX file to be >= 7.0 and in ASCII or to be any version in Binary format.
- *
- * Supports:
- * 	Mesh Generation (Positional Data)
- * 	Normal Data (Per Vertex Drawing Instance)
- *	UV Data (Per Vertex Drawing Instance)
- *	Skinning
- *	Animation
- * 	- Separated Animations based on stacks.
- * 	- Skeletal & Non-Skeletal Animations
- *	NURBS (Open, Closed and Periodic forms)
+ * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
+ * Versions lower than this may load but will probably have errors
  *
  * Needs Support:
+ *  Morph targets / blend shapes
  *	Euler rotation order
- *
  *
  * FBX format references:
  * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
+ * 	http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
  *
  * 	Binary format specification:
  *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
- *		https://wiki.rogiken.org/specifications/file-format/fbx/ (more detail but Japanese)
  */
+
 
 ( function () {
 
