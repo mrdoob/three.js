@@ -511,7 +511,22 @@ THREE.SVGLoader.prototype = {
 
 		var paths = [];
 
-		parseNode( svg, {} );
+		var styles = {};
+
+		if (svg.attributes.style && svg.attributes.style.value) {
+			var stylesArr = svg.attributes.style.value.split(';');
+		
+			stylesArr.forEach(function(styleString) {
+				if (styleString.length > 0) {
+					var styleArr = styleString.split(':');
+					var key = styleArr[0].trim();
+					var value = styleArr[1].trim();
+					styles[key] = value;
+				}
+			});
+		}	
+
+		parseNode( svg, styles );
 
 		return paths;
 
