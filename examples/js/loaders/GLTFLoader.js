@@ -1289,9 +1289,21 @@ THREE.GLTFLoader = ( function () {
 		// .extras has user-defined data, so check that .extras.targetNames is an array.
 		if ( meshDef.extras && Array.isArray( meshDef.extras.targetNames ) ) {
 
-			for ( var i = 0, il = meshDef.extras.targetNames.length; i < il; i ++ ) {
+			var targetNames = meshDef.extras.targetNames;
 
-				mesh.morphTargetDictionary[ meshDef.extras.targetNames[ i ] ] = i;
+			if ( mesh.morphTargetInfluences.length === targetNames.length ) {
+
+				mesh.morphTargetDictionary = {};
+
+				for ( var i = 0, il = targetNames.length; i < il; i ++ ) {
+
+					mesh.morphTargetDictionary[ targetNames[ i ] ] = i;
+
+				}
+
+			} else {
+
+				console.warn( 'THREE.GLTFLoader: Invalid extras.targetNames length. Ignoring names.' );
 
 			}
 
