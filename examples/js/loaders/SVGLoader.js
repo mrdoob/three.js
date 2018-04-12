@@ -38,36 +38,42 @@ THREE.SVGLoader.prototype = {
 					break;
 
 				case 'g':
-					parseStyle( node, style );
+					style = parseStyle( node, style );
 					break;
 
 				case 'path':
-					parseStyle( node, style );
-					paths.push( parsePathNode( node, style ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parsePathNode( node, style ) );
 					break;
 
 				case 'rect':
-					paths.push( parseRectNode( node, style ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parseRectNode( node, style ) );
 					break;
 
 				case 'polygon':
-					paths.push( parsePolygonNode( node, style ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parsePolygonNode( node, style ) );
 					break;
 
 				case 'polyline':
-					paths.push( parsePolylineNode( node, style ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parsePolylineNode( node, style ) );
 					break;
 
 				case 'circle':
-					paths.push( parseCircleNode( node, style ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parseCircleNode( node, style ) );
 					break;
 
 				case 'ellipse':
-					paths.push( parseEllipseNode( node, style ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parseEllipseNode( node, style ) );
 					break;
 
 				case 'line':
-					paths.push( parseLineNode( node, style ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parseLineNode( node, style ) );
 					break;
 
 				default:
@@ -88,7 +94,7 @@ THREE.SVGLoader.prototype = {
 		function parsePathNode( node, style ) {
 
 			var path = new THREE.ShapePath();
-			path.color.setStyle( parseFill( node, style ) );
+			path.color.setStyle( style.fill );
 
 			var point = new THREE.Vector2();
 			var control = new THREE.Vector2();
@@ -331,11 +337,12 @@ THREE.SVGLoader.prototype = {
 			var h = parseFloat( node.getAttribute( 'height' ) );
 
 			var path = new THREE.ShapePath();
-			path.color.setStyle( parseFill( node, style ) );
+			path.color.setStyle( style.fill );
 			path.moveTo( x, y );
 			path.lineTo( x + w, y );
 			path.lineTo( x + w, y + h );
 			path.lineTo( x, y + h );
+
 			return path;
 
 		}
@@ -392,7 +399,7 @@ THREE.SVGLoader.prototype = {
 			var regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
 
 			var path = new THREE.ShapePath();
-			path.color.setStyle( parseFill( node, style ) );
+			path.color.setStyle( style.fill );
 
 			var index = 0;
 
@@ -414,7 +421,7 @@ THREE.SVGLoader.prototype = {
 			subpath.absarc( x, y, r, 0, Math.PI * 2 );
 
 			var path = new THREE.ShapePath();
-			path.color.setStyle( parseFill( node, style ) );
+			path.color.setStyle( style.fill );
 			path.subPaths.push( subpath );
 
 			return path;
@@ -432,7 +439,7 @@ THREE.SVGLoader.prototype = {
 			subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
 
 			var path = new THREE.ShapePath();
-			path.color.setStyle( parseFill( node, style ) );
+			path.color.setStyle( style.fill );
 			path.subPaths.push( subpath );
 
 			return path;
@@ -459,25 +466,12 @@ THREE.SVGLoader.prototype = {
 
 		function parseStyle( node, style ) {
 
+			style = Object.assign( {}, style ); // clone style
+
+			if ( node.hasAttribute( 'fill' ) ) style.fill = node.getAttribute( 'fill' );
 			if ( node.style.fill !== '' ) style.fill = node.style.fill;
 
-		}
-
-		function parseFill( node, style ) {
-
-			if ( node.hasAttribute( 'fill' ) ) {
-
-				return node.getAttribute( 'fill' );
-
-			}
-
-			if ( style.fill !== '' && style.fill !== 'none' ) {
-
-				return style.fill;
-
-			}
-
-			return '#ffffff';
+			return style;
 
 		}
 
@@ -511,7 +505,7 @@ THREE.SVGLoader.prototype = {
 
 		var paths = [];
 
-		parseNode( svg, {} );
+		parseNode( svg, { fill: '#000' } );
 
 		return paths;
 
