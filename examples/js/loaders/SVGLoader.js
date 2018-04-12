@@ -209,9 +209,7 @@ THREE.SVGLoader.prototype = {
 						point.y = numbers[ 1 ];
 						break;
 
-					case 'A':
-						// TODO:
-						break;
+					// case 'A': break;
 
 					case 'm':
 						var numbers = parseFloats( data );
@@ -309,9 +307,7 @@ THREE.SVGLoader.prototype = {
 						point.y = point.y + numbers[ 1 ];
 						break;
 
-					case 'a':
-						// TODO:
-						break;
+					// case 'a': break;
 
 					case 'Z':
 					case 'z':
@@ -331,8 +327,8 @@ THREE.SVGLoader.prototype = {
 
 		function parseRectNode( node, style ) {
 
-			var x = parseFloat( node.getAttribute( 'x' ) );
-			var y = parseFloat( node.getAttribute( 'y' ) );
+			var x = parseFloat( node.getAttribute( 'x' ) || 0 );
+			var y = parseFloat( node.getAttribute( 'y' ) || 0 );
 			var w = parseFloat( node.getAttribute( 'width' ) );
 			var h = parseFloat( node.getAttribute( 'height' ) );
 
@@ -360,14 +356,14 @@ THREE.SVGLoader.prototype = {
 					path.lineTo( x, y );
 				}
 
-				index++;
+				index ++;
 
 			}
 
 			var regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
 
 			var path = new THREE.ShapePath();
-			path.color.setStyle( parseFill( node, style ) );
+			path.color.setStyle( style.fill );
 
 			var index = 0;
 
@@ -392,7 +388,7 @@ THREE.SVGLoader.prototype = {
 					path.lineTo( x, y );
 				}
 
-				index++;
+				index ++;
 
 			}
 
