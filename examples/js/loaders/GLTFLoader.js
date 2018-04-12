@@ -243,8 +243,14 @@ THREE.GLTFLoader = ( function () {
 	 */
 	function GLTFTextureDDSExtension() {
 
+		if (!THREE.DDSLoader) {
+
+			throw new Error( 'THREE.GLTFLoader: Attempting to load .dds texture without importing THREE.DDSLoader' );
+
+		}
+
 		this.name = EXTENSIONS.MSFT_TEXTURE_DDS;
-    this.ddsLoader = new THREE.DDSLoader();
+		this.ddsLoader = new THREE.DDSLoader();
 
 	}
 
@@ -1817,12 +1823,6 @@ THREE.GLTFLoader = ( function () {
 
 		if ( textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
 
-			if (!THREE.DDSLoader) {
-
-				throw new Error( 'THREE.GLTFLoader: Attempting to load .dds texture without importing THREE.DDSLoader' );
-
-			}
-
 			source = json.images[ textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].source ];
 
 		} else {
@@ -1853,15 +1853,13 @@ THREE.GLTFLoader = ( function () {
 
 			// Load Texture resource.
 
-			var loader;
+			var loader = THREE.Loader.Handlers.get( sourceURI );
 
-			if ( textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
+			if ( ! loader ) {
 
-				loader = THREE.Loader.Handlers.get( sourceURI ) || parser.extensions[EXTENSIONS.MSFT_TEXTURE_DDS].ddsLoader
-
-			} else {
-
-				loader = THREE.Loader.Handlers.get( sourceURI ) || textureLoader;
+				loader = textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ]
+					? parser.extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].ddsLoader
+					: textureLoader;
 
 			}
 
