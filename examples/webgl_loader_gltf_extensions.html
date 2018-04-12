@@ -348,7 +348,7 @@
 
 					object.traverse( function ( node ) {
 
-						if ( node.isMesh ) node.castShadow = true;
+						if ( node.isMesh || node.isLight ) node.castShadow = true;
 
 					} );
 
