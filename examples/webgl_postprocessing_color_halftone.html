@@ -107,7 +107,7 @@
 					this.group.add(mesh);
 				}
 
-				var floor = new THREE.Mesh(new THREE.BoxBufferGeometry(50, 1, 50), new THREE.MeshPhongMaterial({}));
+				var floor = new THREE.Mesh(new THREE.BoxBufferGeometry(100, 1, 100), new THREE.MeshPhongMaterial({}));
 				var light = new THREE.PointLight(0xffffff, 1.0, 50, 2);
 				light.position.y = 2;
 				floor.position.y = -10;
@@ -148,15 +148,15 @@
 			initGUI() {
 				var guiTarget = this.halftonePass.uniforms;
 				var controller = {
-					radius: 10,
-					rotateC: 45,
-					rotateM: 75,
-					rotateY: 60,
-					shape: 1,
-					greyscale: false,
-					blending: 0,
-					blendingMode: 1,
-					disable: false
+					radius: guiTarget.radius.value,
+					rotateC: guiTarget.rC.value / (Math.PI / 180),
+					rotateM: guiTarget.rM.value / (Math.PI / 180),
+					rotateY: guiTarget.rY.value / (Math.PI / 180),
+					shape: guiTarget.shape.value,
+					greyscale: guiTarget.greyscale.value,
+					blending: guiTarget.blending.value,
+					blendingMode: guiTarget.blendingMode.value,
+					disable: guiTarget.disable.value
 				};
 				var onGUIChange = function() {
 					guiTarget.radius.value = controller.radius;
@@ -172,9 +172,9 @@
 				this.gui = new dat.GUI();
 				this.gui.add(controller, 'shape', {'dot': 1, 'euclidean-dot': 2, 'ellipse': 3, 'line': 4, 'square': 5}).onChange(onGUIChange);
 				this.gui.add(controller, 'radius', 1, 50).onChange(onGUIChange);
-				this.gui.add(controller, 'rotateC', 0, 180).onChange(onGUIChange);
-				this.gui.add(controller, 'rotateM', 0, 180).onChange(onGUIChange);
-				this.gui.add(controller, 'rotateY', 0, 180).onChange(onGUIChange);
+				this.gui.add(controller, 'rotateC', 0, 90).onChange(onGUIChange);
+				this.gui.add(controller, 'rotateM', 0, 90).onChange(onGUIChange);
+				this.gui.add(controller, 'rotateY', 0, 90).onChange(onGUIChange);
 				this.gui.add(controller, 'greyscale').onChange(onGUIChange);
 				this.gui.add(controller, 'blending', 0, 1, 0.01).onChange(onGUIChange);
 				this.gui.add(controller, 'blendingMode', {'normal': 1, 'add': 2, 'multiply': 3, 'lighter': 4, 'darker': 5}).onChange(onGUIChange);

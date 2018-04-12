@@ -8,12 +8,12 @@
 
 THREE.HalftoneShader = {
 	uniforms: {
-		"shape": {value: 1},
+		"shape": {value: 2},
 		"tDiffuse": {value: null},
-		"radius": {value: 5},
-		"rC": {value: Math.PI * 0.25},
-		"rM": {value: Math.PI * 0.33},
-		"rY": {value: Math.PI * 0.66},
+		"radius": {value: 12},
+		"rC": {value: Math.PI / 12},
+		"rM": {value: Math.PI / 12 * 2},
+		"rY": {value: Math.PI / 12 * 3},
 		"width": {value: 1},
 		"height": {value: 1},
 		"blending": {value: 0},
@@ -93,29 +93,35 @@ THREE.HalftoneShader = {
 			return d;
 		}
 
-		float shapeRadius(float r, vec2 p, vec2 coord) {
-			float theta = atan(p.y - coord.y, p.x - coord.x);
-			float sin_t = abs(sin(theta));
-			float cos_t = abs(cos(theta));
+		float shapeRadius(float r, vec2 p, vec2 coord, float angle) {
+			r = pow(abs(r), 1.125);
 
-			if (shape == 2) {
-				// euclidean dot
-				float square = r + ((sin_t > cos_t) ? r - sin_t * r : r - cos_t * r);
-				if (r <= 0.5) {
-					r = blend(r, square, r * 2.0);
+			if (shape == 2 || shape == 5) {
+				float theta = atan(p.y - coord.y, p.x - coord.x) - angle;
+				float sin_t = abs(sin(theta));
+				float cos_t = abs(cos(theta));
+
+				if (shape == 2) {
+					// euclidean dot
+					float square = r + 2.0 * ((sin_t > cos_t) ? r - sin_t * r : r - cos_t * r);
+
+					if (r <= 0.5) {
+						r = blend(r, square, r * 2.0);
+					} else {
+						r = 0.0;
+						//float r_max = 0.0;
+						//r = blend(square, r_max, pow(abs((r - 0.5) * 2.0), 0.4));
+					}
 				} else {
-					float max_r = r + 2.0 * ((sin_t > cos_t) ? r - sin_t * r : r - cos_t * r);
-					r = blend(square, max_r, pow(abs((r - 0.5) * 2.0), 0.4));
+					// square
+					r += (sin_t > cos_t) ? r - sin_t * r : r - cos_t * r;
 				}
-			} else if (shape == 5) {
-				// square
-				r += (sin_t > cos_t) ? r - sin_t * r : r - cos_t * r;
 			}
 
 			return r;
 		}
 
-		vec2 gridReference(vec2 p, vec2 origin, vec2 n, float step, float aspect) {
+		vec2 gridReference(vec2 p, vec2 origin, vec2 n, float step) {
 			// get nearest grid reference (rotated grid)
 			float dot_normal = n.x * (p.x - origin.x) + n.y * (p.y - origin.y);
 			float dot_line = -n.y * (p.x - origin.x) + n.x * (p.y - origin.y);
@@ -127,31 +133,29 @@ THREE.HalftoneShader = {
 
 			return vec2(
 				p.x - n.x * normal_scale + n.y * line_scale,
-				p.y - n.y * normal_scale * aspect - n.x * line_scale
+				p.y - n.y * normal_scale - n.x * line_scale
 			);
 		}
 
 		void main() {
 			if (!disable) {
+				vec2 p = vec2(vUV.x * width, vUV.y * height);
 				vec2 origin = vec2(0, 0);
-				float step = radius / width;
-				float radius_max = step;
-				float aspect = height / width;
-				float aa = (step < 1.0 / width) ? step * 0.5 : 1.0 / width;
-				vec2 normC = vec2(cos(rC), sin(rC));
-				vec2 normM = vec2(cos(rM), sin(rM));
-				vec2 normY = vec2(cos(rY), sin(rY));
+				float blur = (radius < 2.0) ? radius * 0.5 : 1.0;
+				vec2 n_c = vec2(cos(rC), sin(rC));
+				vec2 n_m = vec2(cos(rM), sin(rM));
+				vec2 n_y = vec2(cos(rY), sin(rY));
 
 				// sampling
-				vec2 coordC = gridReference(vUV, origin, normC, step, aspect);
-				vec2 coordM = gridReference(vUV, origin, normM, step, aspect);
-				vec2 coordY = gridReference(vUV, origin, normY, step, aspect);
-				float distC = shapeRadius(texture2D(tDiffuse, coordC).r, vUV, coordC) * radius_max - shapeDistance(vUV, coordC, normC);
-				float distM = shapeRadius(texture2D(tDiffuse, coordM).g, vUV, coordM) * radius_max - shapeDistance(vUV, coordM, normM);
-				float distY = shapeRadius(texture2D(tDiffuse, coordY).b, vUV, coordY) * radius_max - shapeDistance(vUV, coordY, normY);
-				float r = (distC > 0.0) ? clamp(0.0, 1.0, distC / aa) : 0.0;
-				float g = (distM > 0.0) ? clamp(0.0, 1.0, distM / aa) : 0.0;
-				float b = (distY > 0.0) ? clamp(0.0, 1.0, distY / aa) : 0.0;
+				vec2 p_c = gridReference(p, origin, n_c, radius);
+				vec2 p_m = gridReference(p, origin, n_m, radius);
+				vec2 p_y = gridReference(p, origin, n_y, radius);
+				float dist_c = shapeRadius(texture2D(tDiffuse, vec2(p_c.x / width, p_c.y / height)).r, p, p_c, rC) * radius - shapeDistance(p, p_c, n_c);
+				float dist_m = shapeRadius(texture2D(tDiffuse, vec2(p_m.x / width, p_m.y / height)).g, p, p_m, rM) * radius - shapeDistance(p, p_m, n_m);
+				float dist_y = shapeRadius(texture2D(tDiffuse, vec2(p_y.x / width, p_y.y / height)).b, p, p_y, rY) * radius - shapeDistance(p, p_y, n_y);
+				float r = (dist_c > 0.0) ? clamp(dist_c / blur, 0.0, 1.0) : 0.0;
+				float g = (dist_m > 0.0) ? clamp(dist_m / blur, 0.0, 1.0) : 0.0;
+				float b = (dist_y > 0.0) ? clamp(dist_y / blur, 0.0, 1.0) : 0.0;
 
 				if (blending != 0.0) {
 					vec4 colour = texture2D(tDiffuse, vUV);
