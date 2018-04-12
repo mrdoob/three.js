@@ -40,8 +40,9 @@
 		<script src="js/Detector.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
-		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - Halftone shader by @meatbags
+		<div class="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - Halftone shader by
+			<a href="https://github.com/meatbags" target="_blank">@meatbags</a>
 		</div>
 
 		<script>
@@ -60,7 +61,7 @@
 			 	this.height = window.innerHeight;
 			 	this.camera = new THREE.PerspectiveCamera(75, this.width / this.height, 1, 1000);
 				this.camera.position.z = 20;
-				this.rotationSpeed = Math.PI / 8;
+				this.rotationSpeed = Math.PI / 64;
 
 				this.initScene();
 				this.initRender();
@@ -69,15 +70,35 @@
 			}
 
 			initScene() {
-				var geo = new THREE.BoxBufferGeometry(1, 1, 1);
-				var mat = new THREE.MeshBasicMaterial({});
-				this.group = new THREE.Group();
+				var geo = new THREE.BoxBufferGeometry(2, 2, 2);
+				var mat = new THREE.ShaderMaterial({
+					uniforms: {},
+					vertexShader: `
+						varying vec2 vUV;
+						varying vec3 vNormal;
 
-				for (var i=0, len=20; i<len; ++i) {
+						void main() {
+			      	vUV = uv;
+							vNormal = vec3(normal);
+			      	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+			    	}`,
+					fragmentShader: `
+						varying vec2 vUV;
+						varying vec3 vNormal;
+
+						void main() {
+							vec4 c = vec4(abs(vNormal) + vec3(vUV, 0.0), 0.0);
+							gl_FragColor = c;
+						}`
+				});
+
+				this.group = new THREE.Group();
+				var rand = (x) => { return x * Math.random() - x * 0.5; };
+
+				for (var i=0; i<50; ++i) {
 					var mesh = new THREE.Mesh(geo.clone(), mat.clone());
-					mesh.position.x = Math.random() * 10 - 5;
-					mesh.position.y = Math.random() * 10 - 5;
-					mesh.position.z = Math.random() * 10 - 5;
+					mesh.position.set(rand(15), rand(15), rand(15));
+					mesh.rotation.set(rand(Math.PI), rand(Math.PI), rand(Math.PI));
 					this.group.add(mesh);
 				}
 
@@ -125,7 +146,7 @@
 				this.gui = new dat.GUI();
 				this.gui.add(controller, 'shape', {'dot': 1, 'euclidean-dot': 2, 'ellipse': 3, 'line': 4}).onChange(onGUIChange);
 				this.gui.add(controller, 'radius', 1, 50).onChange(onGUIChange);
-				this.gui.add(controller, 'rotateSampleGrid', 0, 360).onChange(onGUIChange);
+				//this.gui.add(controller, 'rotateSampleGrid', 0, 360).onChange(onGUIChange);
 				this.gui.add(controller, 'rotateC', 0, 360).onChange(onGUIChange);
 				this.gui.add(controller, 'rotateM', 0, 360).onChange(onGUIChange);
 				this.gui.add(controller, 'rotateY', 0, 360).onChange(onGUIChange);
@@ -134,11 +155,10 @@
 				onGUIChange();
 			}
 
-
 			loop() {
 				requestAnimationFrame(() => { this.loop(); });
 				var delta = this.clock.getDelta();
-				//this.group.rotation.y += delta * this.rotationSpeed;
+				this.group.rotation.y += delta * this.rotationSpeed;
 				this.composer.render(delta);
 			}
 		}

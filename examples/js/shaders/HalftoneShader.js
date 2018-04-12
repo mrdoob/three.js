@@ -8,7 +8,6 @@ THREE.HalftoneShader = {
 	uniforms: {
 		"tDiffuse": {value: null},
 		"radius": {value: 5},
-		"rSample": {value: Math.PI * 0.25},
 		"rC": {value: Math.PI * 0.25},
 		"rM": {value: Math.PI * 0.33},
 		"rY": {value: Math.PI * 0.66},
@@ -27,7 +26,6 @@ THREE.HalftoneShader = {
 		varying vec2 vUv;
 		uniform sampler2D tDiffuse;
 		uniform float radius;
-		uniform float rSample;
 		uniform float rC;
 		uniform float rY;
 		uniform float rM;
