@@ -2120,7 +2120,7 @@
 
 			var offset = animationCurve.times[ 0 ];
 
-			for ( var i = 0; i < animationCurve.times.length; i++ ) {
+			for ( var i = 0; i < animationCurve.times.length; i ++ ) {
 
 				animationCurve.times[ i ] -= offset;
 
@@ -2132,27 +2132,20 @@
 
 				var animationCurveID = relationships.parents[ 0 ].ID;
 				var animationCurveRelationship = relationships.parents[ 0 ].relationship;
-				var axis = '';
 
 				if ( animationCurveRelationship.match( /X/ ) ) {
 
-					axis = 'x';
+					curveNodesMap.get( animationCurveID ).curves[ 'x' ] = animationCurve;
 
 				} else if ( animationCurveRelationship.match( /Y/ ) ) {
 
-					axis = 'y';
+					curveNodesMap.get( animationCurveID ).curves[ 'y' ] = animationCurve;
 
 				} else if ( animationCurveRelationship.match( /Z/ ) ) {
 
-					axis = 'z';
-
-				} else {
-
-					continue;
+					curveNodesMap.get( animationCurveID ).curves[ 'z' ] = animationCurve;
 
 				}
-
-				curveNodesMap.get( animationCurveID ).curves[ axis ] = animationCurve;
 
 			}
 
@@ -2162,7 +2155,7 @@
 
 	// parse nodes in FBXTree.Objects.AnimationLayer. Each layers holds references
 	// to various AnimationCurveNodes and is referenced by an AnimationStack node
-	// note: theoretically a stack can multiple layers, however in practice there always seems to be one per stack
+	// note: theoretically a stack can have multiple layers, however in practice there always seems to be one per stack
 	function parseAnimationLayers( FBXTree, connections, curveNodesMap ) {
 
 		var rawLayers = FBXTree.Objects.AnimationLayer;
@@ -2356,9 +2349,24 @@
 
 	function generateRotationTrack( modelName, curves, initialValue, preRotations ) {
 
-		if ( curves.x !== undefined ) curves.x.values = curves.x.values.map( THREE.Math.degToRad );
-		if ( curves.y !== undefined ) curves.y.values = curves.y.values.map( THREE.Math.degToRad );
-		if ( curves.z !== undefined ) curves.z.values = curves.z.values.map( THREE.Math.degToRad );
+		if ( curves.x !== undefined ) {
+
+			interpolateRotations( curves.x );
+			curves.x.values = curves.x.values.map( THREE.Math.degToRad );
+
+		}
+		if ( curves.y !== undefined ) {
+
+			interpolateRotations( curves.y );
+			curves.y.values = curves.y.values.map( THREE.Math.degToRad );
+
+		}
+		if ( curves.z !== undefined ) {
+
+			interpolateRotations( curves.z );
+			curves.z.values = curves.z.values.map( THREE.Math.degToRad );
+
+		}
 
 		var times = getTimesForAllAxes( curves );
 		var values = getKeyframeTrackValues( times, curves, initialValue );
@@ -2477,6 +2485,50 @@
 		} );
 
 		return times;
+
+	}
+
+	// Rotations are defined as Euler angles which can have values  of any size
+	// These will be converted to quaternions which don't support values greater than
+	// PI, so we'll interpolate large rotations
+	function interpolateRotations( curve ) {
+
+		for ( var i = 1; i < curve.values.length; i ++ ) {
+
+			var initialValue = curve.values[ i - 1 ];
+			var valuesSpan = curve.values[ i ] - initialValue;
+
+			if ( valuesSpan > 180 ) {
+
+				var numSubIntervals = Math.abs( valuesSpan / 180 );
+
+				var step = valuesSpan / numSubIntervals;
+				var nextValue = initialValue + step;
+
+				var initialTime = curve.times[ i - 1 ];
+				var timeSpan = curve.times[ i ] - initialTime;
+				var interval = timeSpan / numSubIntervals;
+				var nextTime = initialTime + interval;
+
+				var interpolatedTimes = [];
+				var interpolatedValues = [];
+
+				while ( nextTime < curve.times[ i ] ) {
+
+					interpolatedTimes.push( nextTime );
+					nextTime += interval;
+
+					interpolatedValues.push( nextValue );
+					nextValue += step;
+
+				}
+
+				curve.times = inject( curve.times, i, interpolatedTimes );
+				curve.values = inject( curve.values, i, interpolatedValues );
+
+			}
+
+		}
 
 	}
 
@@ -3501,6 +3553,13 @@
 		}
 
 		return a;
+
+	}
+
+	// inject array a2 into array a1 at index
+	function inject( a1, index, a2 ) {
+
+		return a1.slice( 0, index ).concat( a2 ).concat( a1.slice( index ) );
 
 	}
 
