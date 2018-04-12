@@ -10,11 +10,11 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 		This class is designed to assist with [link:https://en.wikipedia.org/wiki/Ray_casting raycasting].
 		Raycasting is used for mouse picking (working out what objects in the 3d space the mouse is over) amongst
 		other things.
-		</div>
+		</p>
 
 		<h2>Example</h2>
 		<code>
@@ -67,45 +67,45 @@
 		</div>
 
 
-		<div>
-		</div>
+		<p>
+		</p>
 
 
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] ) {</h3>
-		<div>
+		<p>
 		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
 		[page:Vector3 direction] — The direction vector that gives direction to the ray. Should be normalized.<br />
 		[page:Float near] — All results returned are further away than near. Near can't be negative. Default value is 0.<br />
 		[page:Float far] — All results returned are closer then far. Far can't be lower then near . Default value is Infinity.
-		</div>
-		<div>
+		</p>
+		<p>
 		This creates a new raycaster object.<br />
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
 
 		<h3>[property:float far]</h3>
-		<div>
-		The far factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
+		<p>
+		The far factor of the raycaster. This value indicates which objects can be discarded based on the distance.
 		This value shouldn't be negative and should be larger than the near property.
-		</div>
+		</p>
 
 		<h3>[property:float linePrecision]</h3>
-		<div>
+		<p>
 		The precision factor of the raycaster when intersecting [page:Line] objects.
-		</div>
+		</p>
 
 		<h3>[property:float near]</h3>
-		<div>
-		The near factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
+		<p>
+		The near factor of the raycaster. This value indicates which objects can be discarded based on the distance.
 		This value shouldn't be negative and should be smaller than the far property.
-		</div>
+		</p>
 
 		<h3>[property:Object params]</h3>
-		<div>
+		<p>
 		An object with the following properties:
 
 			<code>
@@ -118,70 +118,68 @@
 }
 			</code>
 
-		</div>
+		</p>
 
 		<h3>[property:Ray ray]</h3>
-		<div>The [Page:Ray] used for the raycasting.</div>
+		<p>The [Page:Ray] used for the raycasting.</p>
 
 
 		<h2>Methods</h2>
 
 		<h3>[method:null set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
-		<div>
+		<p>
 		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
 		[page:Vector3 direction] — The normalized direction vector that gives direction to the ray.
-		</div>
-		<div>
+		</p>
+		<p>
 		Updates the ray with a new origin and direction.
-		</div>
+		</p>
 
 		<h3>[method:null setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
-		<div>
+		<p>
 		[page:Vector2 coords] — 2D coordinates of the mouse, in normalized device coordinates (NDC)---X and Y components should be between -1 and 1.<br />
 		[page:Camera camera] — camera from which the ray should originate
-		</div>
-		<div>
+		</p>
+		<p>
 		Updates the ray with a new origin and direction.
-		</div>
+		</p>
 
 		<h3>[method:Array intersectObject]( [page:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
-		<div>
 		<p>
 		[page:Object3D object] — The object to check for intersection with the ray.<br />
 		[page:Boolean recursive] — If true, it also checks all descendants. Otherwise it only checks intersecton with the object. Default is false.<br />
 		[page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated. If set, you must clear this array prior to each call (i.e., array.length = 0;).
 		</p>
-		</div>
-		<div>
+		<p>
 		Checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first. An array of intersections is returned...
-        <code>
-            [ { distance, point, face, faceIndex, object }, ... ]
-        </code>
-        <p>
-        [page:Float distance] – distance between the origin of the ray and the intersection<br />
-        [page:Vector3 point] – point of intersection, in world coordinates<br />
-        [page:Face3 face] – intersected face<br />
-        [page:Integer faceIndex] – index of the intersected face<br />
-        [page:Object3D object] – the intersected object<br />
-        [page:Vector2 uv] - U,V coordinates at point of intersection
-    	</p>
+		</p>
+		<code>
+				[ { distance, point, face, faceIndex, object }, ... ]
+		</code>
+		<p>
+			[page:Float distance] – distance between the origin of the ray and the intersection<br />
+			[page:Vector3 point] – point of intersection, in world coordinates<br />
+			[page:Face3 face] – intersected face<br />
+			[page:Integer faceIndex] – index of the intersected face<br />
+			[page:Object3D object] – the intersected object<br />
+			[page:Vector2 uv] - U,V coordinates at point of intersection
+		</p>
 		<p>
 		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].
 		</p>
 		<p>
 		*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray passing through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to *THREE.DoubleSide*.
 		</p>
-		</div>
 
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
-		<div>
+		<p>
 		[page:Array objects] — The objects to check for intersection with the ray.<br />
 		[page:Boolean recursive] — If true, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects. Default is false.<br />
 		[page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated. If set, you must clear this array prior to each call (i.e., array.length = 0;).
-		</div>
-		<div>
+		</p>
+		<p>
 		Checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject].
-		</div>
+		</p>
 
 
 		<h2>Source</h2>

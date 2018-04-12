@@ -4,29 +4,21 @@
  * @author Lewy Blue https://github.com/looeee
  *
  * Loader loads FBX file and generates Group representing FBX scene.
- * Requires FBX file to be >= 7.0 and in ASCII or to be any version in Binary format.
- *
- * Supports:
- * 	Mesh Generation (Positional Data)
- * 	Normal Data (Per Vertex Drawing Instance)
- *	UV Data (Per Vertex Drawing Instance)
- *	Skinning
- *	Animation
- * 	- Separated Animations based on stacks.
- * 	- Skeletal & Non-Skeletal Animations
- *	NURBS (Open, Closed and Periodic forms)
+ * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
+ * Versions lower than this may load but will probably have errors
  *
  * Needs Support:
+ *  Morph targets / blend shapes
  *	Euler rotation order
- *
  *
  * FBX format references:
  * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
+ * 	http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
  *
  * 	Binary format specification:
  *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
- *		https://wiki.rogiken.org/specifications/file-format/fbx/ (more detail but Japanese)
  */
+
 
 ( function () {
 
@@ -747,8 +739,8 @@
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
 	function genGeometry( FBXTree, relationships, geometryNode, skeleton, preTransform ) {
 
-		var vertexPositions = geometryNode.Vertices.a;
-		var vertexIndices = geometryNode.PolygonVertexIndex.a;
+		var vertexPositions = ( geometryNode.Vertices !== undefined ) ? geometryNode.Vertices.a : [];
+		var vertexIndices = ( geometryNode.PolygonVertexIndex !== undefined ) ? geometryNode.PolygonVertexIndex.a : [];
 
 		// create arrays to hold the final data used to build the buffergeometry
 		var vertexBuffer = [];
@@ -1310,96 +1302,37 @@
 
 	}
 
-	// Functions use the infoObject and given indices to return value array of geometry.
-	// Parameters:
-	// 	- polygonVertexIndex - Index of vertex in draw order (which index of the index buffer refers to this vertex).
-	// 	- polygonIndex - Index of polygon in geometry.
-	// 	- vertexIndex - Index of vertex inside vertex buffer (used because some data refers to old index buffer that we don't use anymore).
-	// 	- infoObject: can be materialInfo, normalInfo, UVInfo or colorInfo
-	// Index type:
-	//	- Direct: index is same as polygonVertexIndex
-	//	- IndexToDirect: infoObject has it's own set of indices
 	var dataArray = [];
-
-	var GetData = {
-
-		ByPolygonVertex: {
-
-			Direct: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
-
-				var from = ( polygonVertexIndex * infoObject.dataSize );
-				var to = ( polygonVertexIndex * infoObject.dataSize ) + infoObject.dataSize;
-
-				return slice( dataArray, infoObject.buffer, from, to );
-
-			},
-
-			IndexToDirect: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
-
-				var index = infoObject.indices[ polygonVertexIndex ];
-				var from = ( index * infoObject.dataSize );
-				var to = ( index * infoObject.dataSize ) + infoObject.dataSize;
-
-				return slice( dataArray, infoObject.buffer, from, to );
-
-			}
-
-		},
-
-		ByPolygon: {
-
-			Direct: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
-
-				var from = polygonIndex * infoObject.dataSize;
-				var to = polygonIndex * infoObject.dataSize + infoObject.dataSize;
-
-				return slice( dataArray, infoObject.buffer, from, to );
-
-			},
-
-			IndexToDirect: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
-
-				var index = infoObject.indices[ polygonIndex ];
-				var from = index * infoObject.dataSize;
-				var to = index * infoObject.dataSize + infoObject.dataSize;
-
-				return slice( dataArray, infoObject.buffer, from, to );
-
-			}
-
-		},
-
-		ByVertice: {
-
-			Direct: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
-
-				var from = ( vertexIndex * infoObject.dataSize );
-				var to = ( vertexIndex * infoObject.dataSize ) + infoObject.dataSize;
-
-				return slice( dataArray, infoObject.buffer, from, to );
-
-			}
-
-		},
-
-		AllSame: {
-
-			IndexToDirect: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
-
-				var from = infoObject.indices[ 0 ] * infoObject.dataSize;
-				var to = infoObject.indices[ 0 ] * infoObject.dataSize + infoObject.dataSize;
-
-				return slice( dataArray, infoObject.buffer, from, to );
-
-			}
-
-		}
-
-	};
 
 	function getData( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
 
-		return GetData[ infoObject.mappingType ][ infoObject.referenceType ]( polygonVertexIndex, polygonIndex, vertexIndex, infoObject );
+		var index;
+
+		switch ( infoObject.mappingType ) {
+
+			case 'ByPolygonVertex' :
+				index = polygonVertexIndex;
+				break;
+			case 'ByPolygon' :
+				index = polygonIndex;
+				break;
+			case 'ByVertice' :
+				index = vertexIndex;
+				break;
+			case 'AllSame' :
+				index = infoObject.indices[ 0 ];
+				break;
+			default :
+				console.warn( 'THREE.FBXLoader: unknown attribute mapping type ' + infoObject.mappingType );
+
+		}
+
+		if ( infoObject.referenceType === 'IndexToDirect' ) index = infoObject.indices[ index ];
+
+		var from = index * infoObject.dataSize;
+		var to = from + infoObject.dataSize;
+
+		return slice( dataArray, infoObject.buffer, from, to );
 
 	}
 
@@ -2176,6 +2109,14 @@
 				values: rawCurves[ nodeID ].KeyValueFloat.a,
 
 			};
+
+			var offset = animationCurve.times[ 0 ];
+
+			for ( var i = 0; i < animationCurve.times.length; i++ ) {
+
+				animationCurve.times[ i ] -= offset;
+
+			}
 
 			var relationships = connections.get( animationCurve.id );
 

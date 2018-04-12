@@ -1529,12 +1529,11 @@ THREE.ColladaLoader.prototype = {
 						if ( parameter.texture ) material.specularMap = getTexture( parameter.texture );
 						break;
 					case 'shininess':
-						if ( parameter.float && material.shininess )
-							material.shininess = parameter.float;
+						if ( parameter.float && material.shininess ) material.shininess = parameter.float;
 						break;
 					case 'emission':
-						if ( parameter.color && material.emissive )
-							material.emissive.fromArray( parameter.color );
+						if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
+						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture );
 						break;
 
 				}
@@ -1574,7 +1573,8 @@ THREE.ColladaLoader.prototype = {
 
 				if ( transparent.data.texture ) {
 
-					material.alphaMap = getTexture( transparent.data.texture );
+					// we do not set an alpha map (see #13792)
+
 					material.transparent = true;
 
 				} else {
@@ -2172,29 +2172,56 @@ THREE.ColladaLoader.prototype = {
 
 			var materialKeys = [];
 
-			var start = 0, count = 0;
+			var start = 0;
 
 			for ( var p = 0; p < primitives.length; p ++ ) {
 
 				var primitive = primitives[ p ];
 				var inputs = primitive.inputs;
-				var triangleCount = 1;
-
-				if ( primitive.vcount && primitive.vcount[ 0 ] === 4 ) {
-
-					triangleCount = 2; // one quad -> two triangles
-
-				}
 
 				// groups
 
-				if ( primitive.type === 'lines' || primitive.type === 'linestrips' ) {
+				var count = 0;
 
-					count = primitive.count * 2;
+				switch ( primitive.type ) {
 
-				} else {
+					case 'lines':
+					case 'linestrips':
+						count = primitive.count * 2;
+						break;
 
-					count = primitive.count * 3 * triangleCount;
+					case 'triangles':
+						count = primitive.count * 3;
+						break;
+
+					case 'polylist':
+
+						for ( var g = 0; g < primitive.count; g ++ ) {
+
+							var vc = primitive.vcount[ g ];
+
+							switch ( vc ) {
+
+								case 3:
+									count += 3; // single triangle
+									break;
+
+								case 4:
+									count += 6; // quad, subdivided into two triangles
+									break;
+
+								default:
+									count += ( vc - 2 ) * 3; // polylist with more than four vertices
+									break;
+
+							}
+
+						}
+
+						break;
+
+					default:
+						console.warn( 'THREE.ColladaLoader: Unknow primitive type:', primitive.type );
 
 				}
 
@@ -2334,8 +2361,6 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			var maxcount = 0;
-
 			var sourceArray = source.array;
 			var sourceStride = source.stride;
 
@@ -2365,19 +2390,21 @@ THREE.ColladaLoader.prototype = {
 
 						pushVector( a ); pushVector( b ); pushVector( c );
 
-					} else {
+					} else if ( count > 4 ) {
 
-						maxcount = Math.max( maxcount, count );
+						for ( var k = 1, kl = ( count - 2 ); k <= kl; k ++ ) {
+
+							var a = index + stride * 0;
+							var b = index + stride * k;
+							var c = index + stride * ( k + 1 );
+
+							pushVector( a ); pushVector( b ); pushVector( c );
+
+						}
 
 					}
 
 					index += stride * count;
-
-				}
-
-				if ( maxcount > 0 ) {
-
-					console.log( 'THREE.ColladaLoader: Geometry has faces with more than 4 vertices.' );
 
 				}
 

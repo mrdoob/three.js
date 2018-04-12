@@ -75,8 +75,6 @@
 				var loader = new THREE.SVGLoader();
 				loader.load( 'models/svg/tiger.svg', function ( paths ) {
 
-					console.log( paths );
-
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 0.1 );
 					group.scale.y *= -1;
@@ -86,7 +84,7 @@
 						var path = paths[ i ];
 
 						var material = new THREE.MeshBasicMaterial( {
-							color: Math.random() * 0xffffff,
+							color: path.color,
 							depthWrite: false
 						} );
 
@@ -119,6 +117,7 @@
 				//
 
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.screenSpacePanning = true;
 
 				//
 

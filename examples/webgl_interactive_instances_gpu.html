@@ -965,7 +965,7 @@
 				antialias: true,
 				alpha: true
 			} );
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 				document.getElementById( "notSupported" ).style.display = "";
 				return;
@@ -976,7 +976,7 @@
 			//renderer.sortObjects = false;
 			container.appendChild( renderer.domElement );
 
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 				throw 'ANGLE_instanced_arrays not supported';
 

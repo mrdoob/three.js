@@ -28,17 +28,7 @@ THREE.SVGLoader.prototype = {
 
 	parse: function ( text ) {
 
-		function parseNodes( nodes ) {
-
-			for ( var i = 0; i < nodes.length; i ++ ) {
-
-				parseNode( nodes[ i ] );
-
-			}
-
-		}
-
-		function parseNode( node ) {
+		function parseNode( node, style ) {
 
 			if ( node.nodeType !== 1 ) return;
 
@@ -48,34 +38,42 @@ THREE.SVGLoader.prototype = {
 					break;
 
 				case 'g':
+					style = parseStyle( node, style );
 					break;
 
 				case 'path':
-					paths.push( parsePathNode( node ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parsePathNode( node, style ) );
 					break;
 
 				case 'rect':
-					paths.push( parseRectNode( node ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parseRectNode( node, style ) );
 					break;
 
 				case 'polygon':
-					paths.push( parsePolygonNode( node ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parsePolygonNode( node, style ) );
 					break;
 
 				case 'polyline':
-					paths.push( parsePolylineNode( node ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parsePolylineNode( node, style ) );
 					break;
 
 				case 'circle':
-					paths.push( parseCircleNode( node ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parseCircleNode( node, style ) );
 					break;
 
 				case 'ellipse':
-					paths.push( parseEllipseNode( node ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parseEllipseNode( node, style ) );
 					break;
 
 				case 'line':
-					paths.push( parseLineNode( node ) );
+					style = parseStyle( node, style );
+					if ( style.fill !== 'none' ) paths.push( parseLineNode( node, style ) );
 					break;
 
 				default:
@@ -83,13 +81,21 @@ THREE.SVGLoader.prototype = {
 
 			}
 
-			parseNodes( node.childNodes );
+			var nodes = node.childNodes;
+
+			for ( var i = 0; i < nodes.length; i ++ ) {
+
+				parseNode( nodes[ i ], style );
+
+			}
 
 		}
 
-		function parsePathNode( node ) {
+		function parsePathNode( node, style ) {
 
 			var path = new THREE.ShapePath();
+			path.color.setStyle( style.fill );
+
 			var point = new THREE.Vector2();
 			var control = new THREE.Vector2();
 
@@ -149,7 +155,7 @@ THREE.SVGLoader.prototype = {
 							numbers[ 2 ],
 							numbers[ 3 ],
 							numbers[ 4 ],
-							numbers[ 5 ],
+							numbers[ 5 ]
 						);
 						control.x = numbers[ 2 ];
 						control.y = numbers[ 3 ];
@@ -203,9 +209,7 @@ THREE.SVGLoader.prototype = {
 						point.y = numbers[ 1 ];
 						break;
 
-					case 'A':
-						// TODO:
-						break;
+					// case 'A': break;
 
 					case 'm':
 						var numbers = parseFloats( data );
@@ -249,7 +253,7 @@ THREE.SVGLoader.prototype = {
 							point.x + numbers[ 2 ],
 							point.y + numbers[ 3 ],
 							point.x + numbers[ 4 ],
-							point.y + numbers[ 5 ],
+							point.y + numbers[ 5 ]
 						);
 						point.x += numbers[ 4 ];
 						point.y += numbers[ 5 ];
@@ -303,9 +307,7 @@ THREE.SVGLoader.prototype = {
 						point.y = point.y + numbers[ 1 ];
 						break;
 
-					case 'a':
-						// TODO:
-						break;
+					// case 'a': break;
 
 					case 'Z':
 					case 'z':
@@ -323,23 +325,25 @@ THREE.SVGLoader.prototype = {
 
 		}
 
-		function parseRectNode( node ) {
+		function parseRectNode( node, style ) {
 
-			var x = parseFloat( node.getAttribute( 'x' ) );
-			var y = parseFloat( node.getAttribute( 'y' ) );
+			var x = parseFloat( node.getAttribute( 'x' ) || 0 );
+			var y = parseFloat( node.getAttribute( 'y' ) || 0 );
 			var w = parseFloat( node.getAttribute( 'width' ) );
 			var h = parseFloat( node.getAttribute( 'height' ) );
 
 			var path = new THREE.ShapePath();
+			path.color.setStyle( style.fill );
 			path.moveTo( x, y );
 			path.lineTo( x + w, y );
 			path.lineTo( x + w, y + h );
 			path.lineTo( x, y + h );
+
 			return path;
 
 		}
 
-		function parsePolygonNode( node ) {
+		function parsePolygonNode( node, style ) {
 
 			function iterator( match, a, b ) {
 
@@ -352,12 +356,15 @@ THREE.SVGLoader.prototype = {
 					path.lineTo( x, y );
 				}
 
-				index++;
+				index ++;
 
 			}
 
 			var regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
+
 			var path = new THREE.ShapePath();
+			path.color.setStyle( style.fill );
+
 			var index = 0;
 
 			node.getAttribute( 'points' ).replace(regex, iterator);
@@ -368,7 +375,7 @@ THREE.SVGLoader.prototype = {
 
 		}
 
-		function parsePolylineNode( node ) {
+		function parsePolylineNode( node, style ) {
 
 			function iterator( match, a, b ) {
 
@@ -381,12 +388,15 @@ THREE.SVGLoader.prototype = {
 					path.lineTo( x, y );
 				}
 
-				index++;
+				index ++;
 
 			}
 
 			var regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
+
 			var path = new THREE.ShapePath();
+			path.color.setStyle( style.fill );
+
 			var index = 0;
 
 			node.getAttribute( 'points' ).replace(regex, iterator);
@@ -397,36 +407,42 @@ THREE.SVGLoader.prototype = {
 
 		}
 
-		function parseCircleNode( node ) {
+		function parseCircleNode( node, style ) {
 
 			var x = parseFloat( node.getAttribute( 'cx' ) );
 			var y = parseFloat( node.getAttribute( 'cy' ) );
 			var r = parseFloat( node.getAttribute( 'r' ) );
 
-			var path = new THREE.ShapePath();
+			var subpath = new THREE.Path();
+			subpath.absarc( x, y, r, 0, Math.PI * 2 );
 
-			path.currentPath.absarc( x, y, r, 0, Math.PI * 2 );
+			var path = new THREE.ShapePath();
+			path.color.setStyle( style.fill );
+			path.subPaths.push( subpath );
 
 			return path;
 
 		}
 
-		function parseEllipseNode( node ) {
+		function parseEllipseNode( node, style ) {
 
 			var x = parseFloat( node.getAttribute( 'cx' ) );
 			var y = parseFloat( node.getAttribute( 'cy' ) );
 			var rx = parseFloat( node.getAttribute( 'rx' ) );
 			var ry = parseFloat( node.getAttribute( 'ry' ) );
 
-			var path = new THREE.ShapePath();
+			var subpath = new THREE.Path();
+			subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
 
-			path.currentPath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
+			var path = new THREE.ShapePath();
+			path.color.setStyle( style.fill );
+			path.subPaths.push( subpath );
 
 			return path;
 
 		}
 
-		function parseLineNode( node ) {
+		function parseLineNode( node, style ) {
 
 			var x1 = parseFloat( node.getAttribute( 'x1' ) );
 			var y1 = parseFloat( node.getAttribute( 'y1' ) );
@@ -439,6 +455,19 @@ THREE.SVGLoader.prototype = {
 			path.currentPath.autoClose = false;
 
 			return path;
+
+		}
+
+		//
+
+		function parseStyle( node, style ) {
+
+			style = Object.assign( {}, style ); // clone style
+
+			if ( node.hasAttribute( 'fill' ) ) style.fill = node.getAttribute( 'fill' );
+			if ( node.style.fill !== '' ) style.fill = node.style.fill;
+
+			return style;
 
 		}
 
@@ -472,7 +501,7 @@ THREE.SVGLoader.prototype = {
 
 		var paths = [];
 
-		parseNode( svg );
+		parseNode( svg, { fill: '#000' } );
 
 		return paths;
 

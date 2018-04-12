@@ -10,26 +10,26 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 		A class containing utility functions for shapes.<br /><br />
 
 		Note that these are all linear functions so it is neccessary to calculate separately for
 		x, y (and z, w if present) components of a vector.
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
 
 		<h3>[method:Number area]( contour )</h3>
-		<div>
+		<p>
 		contour -- 2D polygon.<br /><br />
 
 		Calculate area of a ( 2D ) contour polygon.<br /><br />
 
-		</div>
+		</p>
 
 		<h3>[method:Boolean isClockwise]( pts )</h3>
-		<div>
+		<p>
 		pts -- points defining a 2D polygon<br /><br />
 
 		Note that this is a linear function so it is neccessary to calculate separately for
@@ -37,15 +37,15 @@
 
 		Used internally by [page:Path Path],
 		[page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeGeometry ShapeGeometry].
-		</div>
+		</p>
 
 		<h3>[method:null triangulateShape]( contour, holes )</h3>
-		<div>
+		<p>
 		contour -- 2D polygon.<br />
 		holes -- array of holes<br /><br />
 
 		Used internally by [page:ExtrudeGeometry ExtrudeGeometry] and [page:ShapeGeometry ShapeGeometry] to calculate faces in shapes with holes.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

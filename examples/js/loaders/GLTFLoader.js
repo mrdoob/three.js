@@ -252,7 +252,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'directional':
 					lightNode = new THREE.DirectionalLight( color );
-					lightNode.position.set( 0, 0, 1 );
+					lightNode.target.position.set( 0, 0, 1 );
+					lightNode.add( lightNode.target );
 					break;
 
 				case 'point':
@@ -261,7 +262,14 @@ THREE.GLTFLoader = ( function () {
 
 				case 'spot':
 					lightNode = new THREE.SpotLight( color );
-					lightNode.position.set( 0, 0, 1 );
+					// Handle spotlight properties.
+					light.spot = light.spot || {};
+					light.spot.innerConeAngle = light.spot.innerConeAngle !== undefined ? light.spot.innerConeAngle : 0;
+					light.spot.outerConeAngle = light.spot.outerConeAngle !== undefined ? light.spot.outerConeAngle : Math.PI / 4.0;
+					lightNode.angle = light.spot.outerConeAngle;
+					lightNode.penumbra = 1.0 - light.spot.innerConeAngle / light.spot.outerConeAngle;
+					lightNode.target.position.set( 0, 0, 1 );
+					lightNode.add( lightNode.target );
 					break;
 
 				case 'ambient':
@@ -272,33 +280,11 @@ THREE.GLTFLoader = ( function () {
 
 			if ( lightNode ) {
 
-				if ( light.constantAttenuation !== undefined ) {
+				lightNode.decay = 2;
 
-					lightNode.intensity = light.constantAttenuation;
+				if ( light.intensity !== undefined ) {
 
-				}
-
-				if ( light.linearAttenuation !== undefined ) {
-
-					lightNode.distance = 1 / light.linearAttenuation;
-
-				}
-
-				if ( light.quadraticAttenuation !== undefined ) {
-
-					lightNode.decay = light.quadraticAttenuation;
-
-				}
-
-				if ( light.fallOffAngle !== undefined ) {
-
-					lightNode.angle = light.fallOffAngle;
-
-				}
-
-				if ( light.fallOffExponent !== undefined ) {
-
-					console.warn( 'THREE.GLTFLoader:: light.fallOffExponent not currently supported.' );
+					lightNode.intensity = light.intensity;
 
 				}
 
@@ -1482,8 +1468,57 @@ THREE.GLTFLoader = ( function () {
 
 		if ( ! dependency ) {
 
-			var fnName = 'load' + type.charAt( 0 ).toUpperCase() + type.slice( 1 );
-			dependency = this[ fnName ]( index );
+			switch ( type ) {
+
+				case 'scene':
+					dependency = this.loadScene( index );
+					break;
+
+				case 'node':
+					dependency = this.loadNode( index );
+					break;
+
+				case 'mesh':
+					dependency = this.loadMesh( index );
+					break;
+
+				case 'accessor':
+					dependency = this.loadAccessor( index );
+					break;
+
+				case 'bufferView':
+					dependency = this.loadBufferView( index );
+					break;
+
+				case 'buffer':
+					dependency = this.loadBuffer( index );
+					break;
+
+				case 'material':
+					dependency = this.loadMaterial( index );
+					break;
+
+				case 'texture':
+					dependency = this.loadTexture( index );
+					break;
+
+				case 'skin':
+					dependency = this.loadSkin( index );
+					break;
+
+				case 'animation':
+					dependency = this.loadAnimation( index );
+					break;
+
+				case 'camera':
+					dependency = this.loadCamera( index );
+					break;
+
+				default:
+					throw new Error( 'Unknown type: ' + type );
+
+			}
+
 			this.cache.add( cacheKey, dependency );
 
 		}
@@ -1993,7 +2028,7 @@ THREE.GLTFLoader = ( function () {
 			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
 			if ( material.normalScale ) {
 
-				material.normalScale.x = - material.normalScale.x;
+				material.normalScale.y = - material.normalScale.y;
 
 			}
 
@@ -2546,7 +2581,8 @@ THREE.GLTFLoader = ( function () {
 
 			'mesh',
 			'skin',
-			'camera'
+			'camera',
+			'light'
 
 		] ).then( function ( dependencies ) {
 

@@ -36,7 +36,6 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/modifiers/ExplodeModifier.js"></script>
 		<script src="js/modifiers/TessellateModifier.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -140,14 +139,11 @@
 
 			}
 
-			var explodeModifier = new THREE.ExplodeModifier();
-			explodeModifier.modify( geometry );
-
-			var numFaces = geometry.faces.length;
-
 			//
 
 			geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
+			var numFaces = geometry.attributes.position.count / 3
 
 			var colors = new Float32Array( numFaces * 3 * 3 );
 			var displacement = new Float32Array( numFaces * 3 * 3 );
