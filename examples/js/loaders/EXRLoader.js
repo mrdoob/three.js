@@ -817,7 +817,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		} else if ( type == 'chromaticities' ) {
 
-			return parseChromaticities( buffer, offset );
+			return parseChromaticities( dataView, offset );
 
 		} else if ( type == 'compression' ) {
 
@@ -838,6 +838,10 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		} else if ( type == 'v2f' ) {
 
 			return parseV2f( dataView, offset );
+
+		} else if ( type == 'int' ) {
+
+			return parseUint32( dataView, offset );
 
 		} else {
 
@@ -916,8 +920,8 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		for ( var y = 0; y < height; y ++ ) {
 
-			var y_scanline = parseUint32( buffer, offset );
-			var dataSize = parseUint32( buffer, offset );
+			var y_scanline = parseUint32( bufferDataView, offset );
+			var dataSize = parseUint32( bufferDataView, offset );
 
 			for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
 
@@ -928,9 +932,9 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 					// HALF
 					for ( var x = 0; x < width; x ++ ) {
 
-						var val = parseFloat16( buffer, offset );
+						var val = parseFloat16( bufferDataView, offset );
 
-						byteArray[ ( ( ( width - y_scanline ) * ( height * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
+						byteArray[ ( ( (height - y_scanline) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
 
 					}
 
