@@ -10,7 +10,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			The Canvas renderer displays your beautifully crafted scenes <em>not</em> using WebGL,
 			but draws it using the (slower) <a href="http://drafts.htmlwg.org/2dcontext/html5_canvas_CR/Overview.html">Canvas 2D Context</a>
 			API.<br /><br />
@@ -46,15 +46,15 @@
 			The "Canvas" in CanvasRenderer means it uses Canvas 2D instead of WebGL.<br /><br />
 
 			Don't confuse either CanvasRenderer with the SoftwareRenderer example, which simulates a screen buffer in a Javascript array.
-		</div>
+		</p>
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]([param:object parameters])</h3>
-        <div>parameters is an optional object with properties defining the renderer's behaviour. The constructor also accepts no parameters at all. In all cases, it will assume sane defaults when parameters are missing.</div>
+		<p>parameters is an optional object with properties defining the renderer's behaviour. The constructor also accepts no parameters at all. In all cases, it will assume sane defaults when parameters are missing.</p>
 
-		<div>
+		<p>
 		[page:DOMElement canvas] - A [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas]
 		where the renderer draws its output.
 		This corresponds to the [page:CanvasRenderer.domElement domElement] property below.
@@ -62,14 +62,14 @@
 
 		[page:Boolean alpha] - whether the canvas contains an alpha (transparency) buffer or not.
 	  Default is *false*.
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
 
     <h3>[property:Object info]</h3>
 
-		<div>
+		<p>
 			An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:
 			<ul>
 				<li>render:
@@ -79,93 +79,93 @@
 					</ul>
 				</li>
 			</ul>
-		</div>
+		</p>
 
     <h3>[property:DOMElement domElement]</h3>
 
-		<div>
+		<p>
 			A [page:Canvas] where the renderer draws its output.<br />
 			This is automatically created by the renderer in the constructor (if not provided already); you just need to add it to your page.
-		</div>
+		</p>
 
 		<h3>[property:Boolean autoClear]</h3>
-		<div>
+		<p>
       Defines whether the renderer should automatically clear its output before rendering.
-    </div>
+    </p>
 
 		<h3>[property:Boolean sortObjects]</h3>
-		<div>
+		<p>
       Defines whether the renderer should sort objects. Default is true.<br />
       Note: Sorting is used to attempt to properly render objects that have some degree of transparency.  By definition, sorting objects may not work in all cases.  Depending on the needs of application, it may be neccessary to turn off sorting and use other methods to deal with transparency rendering e.g. manually determining the object rendering order.
-    </div>
+    </p>
 
 		<h3>[property:boolean sortElements]</h3>
-		<div>
+		<p>
 			Defines whether the renderer should sort the face of each object. Default is true.
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
 
 		<h3>[method:null render]([param:Scene scene], [param:Camera camera])</h3>
-		<div>
+		<p>
 			scene -- The scene to render. <br />
 			camera -- the camera to view the scene.
-		</div>
-		<div>
+		</p>
+		<p>
         Render a scene using a camera.
-		</div>
+		</p>
 
 		<h3>[method:null clear]()</h3>
-		<div>
+		<p>
 			Tells the renderer to clear its color drawing buffer with the clearcolor.
-		</div>
+		</p>
 
 		<h3>[method:null setClearColor]([param:Color color], [param:number alpha])</h3>
-		<div>
+		<p>
 			color -- The color to clear the canvas with. <br />
 			alpha -- The alpha channel to clear the canvas with.
-		</div>
-		<div>
+		</p>
+		<p>
 			This set the clearColor and the clearAlpha.
-		</div>
+		</p>
 
 
 		<h3>[method:null setSize]([param:Number width], [param:Number height])</h3>
-		<div>
+		<p>
 			width -- The width of the drawing canvas. <br />
 			height -- The height of the drawing canvas.
-		</div>
-		<div>
+		</p>
+		<p>
 			This set the size of the drawing canvas and if updateStyle is set, then the css of the canvas is updated too.
-		</div>
+		</p>
 
 		<h3>[method:null setClearColorHex]([param:number hex], [param:number alpha])</h3>
-		<div>
+		<p>
 			hex -- The the hexadecimal value of the color to clear the canvas with. <br />
 	    alpha -- The alpha channel to clear the canvas with.
-		</div>
-		<div>
+		</p>
+		<p>
 			This set the clearColor and the clearAlpha.
-		</div>
+		</p>
 
 		<h3>[method:number getClearColorHex]()</h3>
-		<div>
+		<p>
 			Returns the [page:number hex] color.
-		</div>
+		</p>
 
 		<h3>[method:number getClearAlpha]()</h3>
-		<div>
+		<p>
 			Returns the alpha value.
-		</div>
+		</p>
 
 		<h2>Empty Methods to Maintain Compatibility with [page:WebglRenderer]</h2>
-		<div>
+		<p>
 			[method:null clearColor]()<br/>
 			[method:null clearDepth]()<br/>
 			[method:null clearStencil]()<br/>
 			[method:number getMaxAnisotropy]() - returns 1 <br/>
-		</div>
+		</p>
 
 		<h2>Source</h2>
 
