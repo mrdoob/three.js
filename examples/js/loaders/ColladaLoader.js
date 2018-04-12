@@ -1018,7 +1018,17 @@ THREE.ColladaLoader.prototype = {
 
 		function getImage( id ) {
 
-			return getBuild( library.images[ id ], buildImage );
+			var data = library.images[ id ];
+
+			if ( data !== undefined ) {
+
+				return getBuild( data, buildImage );
+
+			}
+
+			console.warn( 'THREE.ColladaLoader: Couldn\'t find image with ID:', id );
+
+			return null;
 
 		}
 
@@ -1459,7 +1469,7 @@ THREE.ColladaLoader.prototype = {
 			function getTexture( textureObject ) {
 
 				var sampler = effect.profile.samplers[ textureObject.id ];
-				var image;
+				var image = null;
 
 				// get image
 
@@ -1477,7 +1487,7 @@ THREE.ColladaLoader.prototype = {
 
 				// create texture if image is avaiable
 
-				if ( image !== undefined ) {
+				if ( image !== null ) {
 
 					var texture = textureLoader.load( image );
 
@@ -1504,7 +1514,7 @@ THREE.ColladaLoader.prototype = {
 
 				} else {
 
-					console.error( 'THREE.ColladaLoader: Unable to load texture with ID:', textureObject.id );
+					console.warn( 'THREE.ColladaLoader: Couldn\'t create texture with ID:', textureObject.id );
 
 					return null;
 
