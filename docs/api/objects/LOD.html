@@ -12,17 +12,16 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			Level of Detail - show meshes with more or less geometry based on distance from the camera.<br /><br />
 
 		  Every level is associated with an object, and rendering can be switched between them at the distances
 			specified. Typically you would create, say, three meshes, one for far away (low detail), one for mid range (medium detail)
 			and one for close up (high detail).
-		</div>
+		</p>
 
 		<h2>Example</h2>
 
-		<div>
 		<code>
 var lod = new THREE.LOD();
 
@@ -39,74 +38,75 @@ for( var i = 0; i < 3; i++ ) {
 
 scene.add( lod );
 		</code>
+
+		<p>
 		Note that for the LOD to switch between the different detail levels, you will
 		have to call [page:.update update]( camera ) in your render loop. See the source code
 		for this example for details:
 		[example:webgl_lod WebGL / LOD]
-
 		</div>
 
 		<h2>Constructor</h2>
 		<h3>[name]( )</h3>
-		<div>
+		<p>
 			Creates a new [name].
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
-		<div>See the base [page:Object3D] class for common properties.</div>
+		<p>See the base [page:Object3D] class for common properties.</p>
 
 		<h3>[property:array levels]</h3>
-		<div>
+		<p>
 		An array of [page:object level] objects<br /><br />
 
 		Each level is an object with two properties:<br />
 		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
 		[page:Float distance] - The distance at which to display this level of detail.
-		</div>
+		</p>
 
 		<h2>Methods</h2>
-		<div>See the base [page:Object3D] class for common methods.</div>
+		<p>See the base [page:Object3D] class for common methods.</p>
 
 		<h3>[method:null addLevel]( [param:Object3D object], [param:Float distance] )</h3>
-		<div>
+		<p>
 		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
 		[page:Float distance] - The distance at which to display this level of detail.<br /><br />
 
 		Adds a mesh that will display at a certain distance and greater. Typically the further away the distance,
 		the lower the detail on the mesh.
-		</div>
+		</p>
 
 		<h3>[method:LOD clone]()</h3>
-		<div>
+		<p>
 		Returns a clone of this LOD object and its associated distance specific objects.
-		</div>
+		</p>
 
 
 		<h3>[method:Object3D getObjectForDistance]( [param:Float distance] )</h3>
-		<div>
+		<p>
 		Get a reference to the first [page:Object3D] (mesh) that is greater than [page:Float distance].
-		</div>
+		</p>
 
 		<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
-		<div>
+		<p>
 		Get intersections between a casted [page:Ray] and this LOD.
 		[page:Raycaster.intersectObject] will call this method.
-		</div>
+		</p>
 
 
 
 		<h3>[method:null toJSON]( meta )</h3>
-		<div>
+		<p>
 		Create a JSON structure with details of this LOD object.
-		</div>
+		</p>
 
 		<h3>[method:null update]( [param:Camera camera] )</h3>
-		<div>
+		<p>
 			Set the visibility of each [page:levels level]'s [page:Object3D object] based on
 			distance from the [page:Camera camera]. This needs to be called in the render loop
 			for levels of detail to be updated dynamically.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

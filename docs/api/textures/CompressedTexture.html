@@ -12,19 +12,19 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 		Creates a texture based on data in compressed form, for example from a [link:https://en.wikipedia.org/wiki/DirectDraw_Surface DDS] file.<br /><br />
 
 
 		For use with the [page:CompressedTextureLoader CompressedTextureLoader].
-		</div>
+		</p>
 
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]( [param:Array mipmaps], [param:Number width], [param:Number height], [param:Constant format], [param:Constant type], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy] )</h3>
-		<div>
+		<p>
 		[page:Array mipmaps] -- The mipmaps array should contain objects with data, width and height. The mipmaps should be of the correct format and type.<br />
 
 		[page:Number width] -- The width of the biggest mipmap.<br />
@@ -57,7 +57,7 @@
 		[page:Number anisotropy] -- The number of samples taken along the axis through the pixel that has the highest density of texels.
 		By default, this value is 1. A higher value gives a less blurry result than a basic mipmap, at the cost of more texture samples being used.
 		Use renderer.getMaxAnisotropy() to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.<br /><br />
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
@@ -66,15 +66,15 @@
 
 		<h3>[property:boolean flipY]</h3>
 
-		<div>
+		<p>
 			False by default. Flipping textures does not work for compressed textures.
-		</div>
+		</p>
 
 		<h3>[property:boolean generateMipmaps]</h3>
 
-		<div>
+		<p>
 			False by default. Mipmaps can't be generated for compressed textures
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
