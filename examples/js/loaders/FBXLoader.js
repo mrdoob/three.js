@@ -747,8 +747,8 @@
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
 	function genGeometry( FBXTree, relationships, geometryNode, skeleton, preTransform ) {
 
-		var vertexPositions = geometryNode.Vertices.a;
-		var vertexIndices = geometryNode.PolygonVertexIndex.a;
+		var vertexPositions = ( geometryNode.Vertices !== undefined ) ? geometryNode.Vertices.a : [];
+		var vertexIndices = ( geometryNode.PolygonVertexIndex !== undefined ) ? geometryNode.PolygonVertexIndex.a : [];
 
 		// create arrays to hold the final data used to build the buffergeometry
 		var vertexBuffer = [];
