@@ -47,18 +47,16 @@
 			var mesh, geometry;
 
 			var geometries = [
-
-				{ type: 'BoxGeometry', geometry: new THREE.BoxBufferGeometry( 200, 200, 200, 2, 2, 2 ) },
-				{ type: 'CircleGeometry', geometry: new THREE.CircleBufferGeometry( 200, 32 ) },
-				{ type: 'CylinderGeometry', geometry: new THREE.CylinderBufferGeometry( 75, 75, 200, 8, 8 ) } ,
-				{ type: 'IcosahedronGeometry', geometry: new THREE.IcosahedronBufferGeometry( 100, 1 ) },
-				{ type: 'OctahedronGeometry', geometry: new THREE.OctahedronBufferGeometry( 200, 0 ) },
-				{ type: 'PlaneGeometry', geometry: new THREE.PlaneBufferGeometry( 200, 200, 4, 4 ) },
-				{ type: 'RingGeometry', geometry: new THREE.RingBufferGeometry( 32, 64, 16 ) },
-				{ type: 'SphereGeometry', geometry: new THREE.SphereBufferGeometry( 100, 12, 12 ) },
-				{ type: 'TorusGeometry', geometry: new THREE.TorusBufferGeometry( 64, 16, 12, 12 ) },
-				{ type: 'TorusKnotGeometry', geometry: new THREE.TorusKnotBufferGeometry( 64, 16 ) }
-
+				new THREE.BoxBufferGeometry( 200, 200, 200, 2, 2, 2 ),
+				new THREE.CircleBufferGeometry( 200, 32 ),
+				new THREE.CylinderBufferGeometry( 75, 75, 200, 8, 8 ),
+				new THREE.IcosahedronBufferGeometry( 100, 1 ),
+			  new THREE.OctahedronBufferGeometry( 200, 0 ),
+				new THREE.PlaneBufferGeometry( 200, 200, 4, 4 ),
+				new THREE.RingBufferGeometry( 32, 64, 16 ),
+				new THREE.SphereBufferGeometry( 100, 12, 12 ),
+				new THREE.TorusBufferGeometry( 64, 16, 12, 12 ),
+				new THREE.TorusKnotBufferGeometry( 64, 16 )
 			];
 
 			var options = {
@@ -79,7 +77,7 @@
 
 				}
 
-				geometry = geometries[ options.Geometry ].geometry;
+				geometry = geometries[ options.Geometry ];
 
 				// scale geometry to a uniform size
 
@@ -122,16 +120,16 @@
 				//
 
 				var geometries = {
-					BoxGeometry: 0,
-					CircleGeometry: 1,
-					CylinderGeometry: 2,
-					IcosahedronGeometry: 3,
-					OctahedronGeometry: 4,
-					PlaneGeometry: 5,
-					RingGeometry: 6,
-					SphereGeometry: 7,
-					TorusGeometry: 8,
-					TorusKnotGeometry: 9
+					BoxBufferGeometry: 0,
+					CircleBufferGeometry: 1,
+					CylinderBufferGeometry: 2,
+					IcosahedronBufferGeometry: 3,
+					OctahedronBufferGeometry: 4,
+					PlaneBufferGeometry: 5,
+					RingBufferGeometry: 6,
+					SphereBufferGeometry: 7,
+					TorusBufferGeometry: 8,
+					TorusKnotBufferGeometry: 9
 				};
 
 				gui = new dat.GUI( { width: 350 } );
