@@ -97,15 +97,16 @@
 
 			}
 
-			// console.log( FBXTree );
+			console.log( FBXTree.Objects );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
 			var textures = parseTextures( FBXTree, new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ), images, connections );
 			var materials = parseMaterials( FBXTree, textures, connections );
-			var skeletons = parseDeformers( FBXTree, connections );
-			var geometryMap = parseGeometries( FBXTree, connections, skeletons );
-			var sceneGraph = parseScene( FBXTree, connections, skeletons, geometryMap, materials );
+			var deformers = parseDeformers( FBXTree, connections );
+			console.log( 'deformers', deformers );
+			var geometryMap = parseGeometries( FBXTree, connections, deformers );
+			var sceneGraph = parseScene( FBXTree, connections, deformers.skeletons, geometryMap, materials );
 
 			return sceneGraph;
 
@@ -570,6 +571,7 @@
 	function parseDeformers( FBXTree, connections ) {
 
 		var skeletons = {};
+		var morphTargets = {};
 
 		if ( 'Deformer' in FBXTree.Objects ) {
 
@@ -579,9 +581,9 @@
 
 				var deformerNode = DeformerNodes[ nodeID ];
 
-				if ( deformerNode.attrType === 'Skin' ) {
+				var relationships = connections.get( parseInt( nodeID ) );
 
-					var relationships = connections.get( parseInt( nodeID ) );
+				if ( deformerNode.attrType === 'Skin' ) {
 
 					var skeleton = parseSkeleton( relationships, DeformerNodes );
 					skeleton.ID = nodeID;
@@ -591,18 +593,33 @@
 
 					skeletons[ nodeID ] = skeleton;
 
+				} else if ( deformerNode.attrType === 'BlendShape' ) {
+
+					var morphTarget = parseMorphTargets( relationships, deformerNode, DeformerNodes, connections, FBXTree );
+					morphTarget.id = nodeID;
+
+					if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: morph target attached to more than one geometry is not supported.' );
+					morphTarget.parentID = relationships.parents[ 0 ].ID;
+
+					morphTargets[ nodeID ] = morphTarget;
+
 				}
 
 			}
 
 		}
 
-		return skeletons;
+		return {
+
+			skeletons: skeletons,
+			morphTargets: morphTargets,
+
+		};
 
 	}
 
 	// Parse single nodes in FBXTree.Objects.Deformer
-	// The top level deformer nodes have type 'Skin' and subDeformer nodes have type 'Cluster'
+	// The top level skeleton node has type 'Skin' and sub nodes have type 'Cluster'
 	// Each skin node represents a skeleton and each cluster node represents a bone
 	function parseSkeleton( connections, deformerNodes ) {
 
@@ -610,25 +627,25 @@
 
 		connections.children.forEach( function ( child ) {
 
-			var subDeformerNode = deformerNodes[ child.ID ];
+			var boneNode = deformerNodes[ child.ID ];
 
-			if ( subDeformerNode.attrType !== 'Cluster' ) return;
+			if ( boneNode.attrType !== 'Cluster' ) return;
 
 			var rawBone = {
 
 				ID: child.ID,
 				indices: [],
 				weights: [],
-				transform: new THREE.Matrix4().fromArray( subDeformerNode.Transform.a ),
-				transformLink: new THREE.Matrix4().fromArray( subDeformerNode.TransformLink.a ),
-				linkMode: subDeformerNode.Mode,
+				transform: new THREE.Matrix4().fromArray( boneNode.Transform.a ),
+				transformLink: new THREE.Matrix4().fromArray( boneNode.TransformLink.a ),
+				linkMode: boneNode.Mode,
 
 			};
 
-			if ( 'Indexes' in subDeformerNode ) {
+			if ( 'Indexes' in boneNode ) {
 
-				rawBone.indices = subDeformerNode.Indexes.a;
-				rawBone.weights = subDeformerNode.Weights.a;
+				rawBone.indices = boneNode.Indexes.a;
+				rawBone.weights = boneNode.Weights.a;
 
 			}
 
@@ -645,8 +662,56 @@
 
 	}
 
+	// The top level morph deformer node has type "BlendShape" and sub nodes have type "BlendShapeChannel"
+	function parseMorphTargets( relationships, deformerNode, deformerNodes, connections ) {
+
+		var rawMorphTargets = [];
+
+		relationships.children.forEach( function ( child ) {
+
+			var morphTargetNode = deformerNodes[ child.ID ];
+
+			var rawMorphTarget = {
+
+				name: morphTargetNode.attrName,
+				initialWeight: morphTargetNode.DeformPercent,
+				id: morphTargetNode.id,
+				fullWeights: morphTargetNode.FullWeights.a
+
+			};
+
+			if ( morphTargetNode.attrType !== 'BlendShapeChannel' ) return;
+
+			var targetRelationships = connections.get( parseInt( child.ID ) );
+
+			targetRelationships.children.forEach( function ( child ) {
+
+				if ( child.relationship === 'DeformPercent' ) {
+
+					rawMorphTarget.weightCurveID = child.ID;
+					// FBXTree.Objects.AnimationCurveNode[ child.ID ];
+
+				} else {
+
+					rawMorphTarget.geoID = child.ID;
+					// FBXTree.Objects.Geometry[ child.ID ];
+
+				}
+
+			} );
+
+			rawMorphTargets.push( rawMorphTarget );
+
+
+		} );
+
+		return rawMorphTargets;
+
+	}
+
+
 	// Parse nodes in FBXTree.Objects.Geometry
-	function parseGeometries( FBXTree, connections, skeletons ) {
+	function parseGeometries( FBXTree, connections, deformers ) {
 
 		var geometryMap = new Map();
 
@@ -659,7 +724,7 @@
 			for ( var nodeID in geometryNodes ) {
 
 				var relationships = connections.get( parseInt( nodeID ) );
-				var geo = parseGeometry( FBXTree, relationships, geometryNodes[ nodeID ], skeletons );
+				var geo = parseGeometry( FBXTree, relationships, geometryNodes[ nodeID ], deformers );
 
 				geometryMap.set( parseInt( nodeID ), geo );
 
@@ -672,12 +737,12 @@
 	}
 
 	// Parse single node in FBXTree.Objects.Geometry
-	function parseGeometry( FBXTree, relationships, geometryNode, skeletons ) {
+	function parseGeometry( FBXTree, relationships, geometryNode, deformers ) {
 
 		switch ( geometryNode.attrType ) {
 
 			case 'Mesh':
-				return parseMeshGeometry( FBXTree, relationships, geometryNode, skeletons );
+				return parseMeshGeometry( FBXTree, relationships, geometryNode, deformers );
 				break;
 
 			case 'NurbsCurve':
@@ -690,7 +755,10 @@
 
 
 	// Parse single node mesh geometry in FBXTree.Objects.Geometry
-	function parseMeshGeometry( FBXTree, relationships, geometryNode, skeletons ) {
+	function parseMeshGeometry( FBXTree, relationships, geometryNode, deformers ) {
+
+		var skeletons = deformers.skeletons;
+		var morphTargets = deformers.morphTargets;
 
 		var modelNodes = relationships.parents.map( function ( parent ) {
 
@@ -709,6 +777,14 @@
 
 		}, null );
 
+		var morphTarget = relationships.children.reduce( function ( morphTarget, child ) {
+
+			if ( morphTargets[ child.ID ] !== undefined ) morphTarget = morphTargets[ child.ID ];
+
+			return morphTarget;
+
+		}, null );
+
 		var preTransform = new THREE.Matrix4();
 
 		// TODO: if there is more than one model associated with the geometry, AND the models have
@@ -717,7 +793,6 @@
 
 		// For now just assume one model and get the preRotations from that
 		var modelNode = modelNodes[ 0 ];
-
 
 		if ( 'GeometricRotation' in modelNode ) {
 
@@ -740,12 +815,12 @@
 
 		}
 
-		return genGeometry( FBXTree, relationships, geometryNode, skeleton, preTransform );
+		return genGeometry( FBXTree, geometryNode, skeleton, morphTarget, preTransform );
 
 	}
 
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
-	function genGeometry( FBXTree, relationships, geometryNode, skeleton, preTransform ) {
+	function genGeometry( FBXTree, geometryNode, skeleton, morphTarget, preTransform ) {
 
 		var vertexPositions = geometryNode.Vertices.a;
 		var vertexIndices = geometryNode.PolygonVertexIndex.a;
@@ -2120,7 +2195,7 @@
 
 			var offset = animationCurve.times[ 0 ];
 
-			for ( var i = 0; i < animationCurve.times.length; i++ ) {
+			for ( var i = 0; i < animationCurve.times.length; i ++ ) {
 
 				animationCurve.times[ i ] -= offset;
 
