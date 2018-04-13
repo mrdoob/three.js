@@ -325,19 +325,35 @@ THREE.SVGLoader.prototype = {
 
 		}
 
+		/*
+		* According to https://www.w3.org/TR/SVG/shapes.html#RectElementRXAttribute
+		* rounded corner should be rendered to elliptical arc, but bezier curve does the job well enough
+		*/
 		function parseRectNode( node, style ) {
 
 			var x = parseFloat( node.getAttribute( 'x' ) || 0 );
 			var y = parseFloat( node.getAttribute( 'y' ) || 0 );
+			var rx = parseFloat( node.getAttribute( 'rx' ) || 0 );
+			var ry = parseFloat( node.getAttribute( 'ry' ) || 0 );
 			var w = parseFloat( node.getAttribute( 'width' ) );
 			var h = parseFloat( node.getAttribute( 'height' ) );
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
-			path.moveTo( x, y );
-			path.lineTo( x + w, y );
-			path.lineTo( x + w, y + h );
-			path.lineTo( x, y + h );
+			path.moveTo( x + 2 * rx, y );
+			path.lineTo( x + w - 2 * rx, y );
+			if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y, x + w, y, x + w, y + 2 * ry );
+			path.lineTo( x + w, y + h - 2 * ry );
+			if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y + h, x + w, y + h, x + w - 2 * rx, y + h );
+			path.lineTo( x + 2 * rx, y + h );
+
+			if ( rx !== 0 || ry !== 0 ) {
+
+				path.bezierCurveTo( x, y + h, x, y + h, x, y + h - 2 * ry );
+				path.lineTo( x, y + 2 * ry );
+				path.bezierCurveTo( x, y, x, y, x + 2 * rx, y );
+
+			}
 
 			return path;
 
