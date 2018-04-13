@@ -101,6 +101,8 @@
 				geometry.morphAttributes.position[ 0 ] = new THREE.Float32BufferAttribute( morphTargetPositions0, 3 );
 
 				// morph bottom right corner
+				// since the square consists of two distinct triangles,
+				// we need to move vertices of upper and lower triangles together here
 				var morphTargetPositions1 = [
 					-1, -1, 0,
 					2, -2, 0,
