@@ -426,6 +426,8 @@
 
 		var parameters = {};
 
+		parameters.morphTargets = true;
+
 		if ( properties.BumpFactor ) {
 
 			parameters.bumpScale = properties.BumpFactor.value;
@@ -719,12 +721,12 @@
 
 		if ( 'Geometry' in FBXTree.Objects ) {
 
-			var geometryNodes = FBXTree.Objects.Geometry;
+			var geoNodes = FBXTree.Objects.Geometry;
 
-			for ( var nodeID in geometryNodes ) {
+			for ( var nodeID in geoNodes ) {
 
 				var relationships = connections.get( parseInt( nodeID ) );
-				var geo = parseGeometry( FBXTree, relationships, geometryNodes[ nodeID ], deformers );
+				var geo = parseGeometry( FBXTree, relationships, geoNodes[ nodeID ], deformers );
 
 				geometryMap.set( parseInt( nodeID ), geo );
 
@@ -737,16 +739,16 @@
 	}
 
 	// Parse single node in FBXTree.Objects.Geometry
-	function parseGeometry( FBXTree, relationships, geometryNode, deformers ) {
+	function parseGeometry( FBXTree, relationships, geoNode, deformers ) {
 
-		switch ( geometryNode.attrType ) {
+		switch ( geoNode.attrType ) {
 
 			case 'Mesh':
-				return parseMeshGeometry( FBXTree, relationships, geometryNode, deformers );
+				return parseMeshGeometry( FBXTree, relationships, geoNode, deformers );
 				break;
 
 			case 'NurbsCurve':
-				return parseNurbsGeometry( geometryNode );
+				return parseNurbsGeometry( geoNode );
 				break;
 
 		}
@@ -754,7 +756,7 @@
 	}
 
 	// Parse single node mesh geometry in FBXTree.Objects.Geometry
-	function parseMeshGeometry( FBXTree, relationships, geometryNode, deformers ) {
+	function parseMeshGeometry( FBXTree, relationships, geoNode, deformers ) {
 
 		var skeletons = deformers.skeletons;
 		var morphTargets = deformers.morphTargets;
@@ -814,51 +816,20 @@
 
 		}
 
-		return genGeometry( FBXTree, geometryNode, skeleton, morphTarget, preTransform );
-
-	}
-
-	function addMorphTargets( FBXTree, parentGeo, morphTarget, preTransform ) {
-
-		if ( morphTarget === null ) return;
-
-		parentGeo.morphAttributes.position = [];
-		parentGeo.morphAttributes.normal = [];
-
-		morphTarget.rawTargets.forEach( function ( rawTarget, index ) {
-
-			var geoNode = FBXTree.Objects.Geometry[ rawTarget.geoID ];
-
-			if ( geoNode !== undefined ) {
-
-				genMorphGeometry( parentGeo, geoNode, preTransform, index );
-
-			}
-
-		} );
-
-	}
-
-	// a morph geometry is similar to a normal geometry, and the node is also included
-	// in FBXTree.Objects.Geometry, however it can only have attributes for position, normal
-	// and a special attribute Index defining which vertices of the original geometry
-	// it controls
-	function genMorphGeometry( parentGeo, geoNode, preTransform ) {
-
-		var vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
-		var normalsPositions = ( geoNode.Normals !== undefined ) ? geoNode.Normals.a : [];
-		var indices = ( geoNode.Indexes !== undefined ) ? geoNode.Indexes.a : [];
+		return genGeometry( FBXTree, geoNode, skeleton, morphTarget, preTransform );
 
 	}
 
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
-	function genGeometry( FBXTree, geometryNode, skeleton, morphTarget, preTransform, calledFrom ) {
+	function genGeometry( FBXTree, geoNode, skeleton, morphTarget, preTransform ) {
 
 		var geo = new THREE.BufferGeometry();
-		if ( geometryNode.attrName ) geo.name = geometryNode.attrName;
+		if ( geoNode.attrName ) geo.name = geoNode.attrName;
 
-		var vertexPositions = ( geometryNode.Vertices !== undefined ) ? geometryNode.Vertices.a : [];
-		var vertexIndices = ( geometryNode.PolygonVertexIndex !== undefined ) ? geometryNode.PolygonVertexIndex.a : [];
+		var vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
+
+		// TEMP: Clone array so that it doesn't get changed and can be reused in genMorphGeo
+		var vertexIndices = ( geoNode.PolygonVertexIndex !== undefined ) ? geoNode.PolygonVertexIndex.a.slice( 0 ) : [];
 
 		// create arrays to hold the final data used to build the buffergeometry
 		var vertexBuffer = [];
@@ -869,31 +840,31 @@
 		var vertexWeightsBuffer = [];
 		var weightsIndicesBuffer = [];
 
-		if ( geometryNode.LayerElementColor ) {
+		if ( geoNode.LayerElementColor ) {
 
-			var colorInfo = getColors( geometryNode.LayerElementColor[ 0 ] );
-
-		}
-
-		if ( geometryNode.LayerElementMaterial ) {
-
-			var materialInfo = getMaterials( geometryNode.LayerElementMaterial[ 0 ] );
+			var colorInfo = getColors( geoNode.LayerElementColor[ 0 ] );
 
 		}
 
-		if ( geometryNode.LayerElementNormal ) {
+		if ( geoNode.LayerElementMaterial ) {
 
-			var normalInfo = getNormals( geometryNode.LayerElementNormal[ 0 ] );
+			var materialInfo = getMaterials( geoNode.LayerElementMaterial[ 0 ] );
 
 		}
 
-		if ( geometryNode.LayerElementUV ) {
+		if ( geoNode.LayerElementNormal ) {
+
+			var normalInfo = getNormals( geoNode.LayerElementNormal[ 0 ] );
+
+		}
+
+		if ( geoNode.LayerElementUV ) {
 
 			var uvInfo = [];
 			var i = 0;
-			while ( geometryNode.LayerElementUV[ i ] ) {
+			while ( geoNode.LayerElementUV[ i ] ) {
 
-				uvInfo.push( getUVs( geometryNode.LayerElementUV[ i ] ) );
+				uvInfo.push( getUVs( geoNode.LayerElementUV[ i ] ) );
 				i ++;
 
 			}
@@ -1207,6 +1178,8 @@
 
 		geo.addAttribute( 'position', positionAttribute );
 
+		console.log( 'orig positionAttribute', positionAttribute );
+
 		if ( colorsBuffer.length > 0 ) {
 
 			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsBuffer, 3 ) );
@@ -1294,9 +1267,122 @@
 
 		}
 
-		addMorphTargets( FBXTree, geo, morphTarget, preTransform );
+		addMorphTargets( FBXTree, geo, geoNode, morphTarget, preTransform );
+
+		// console.log( 'main geo ', geo );
 
 		return geo;
+
+	}
+
+	function addMorphTargets( FBXTree, parentGeo, parentGeoNode, morphTarget, preTransform ) {
+
+		if ( morphTarget === null ) return;
+
+		parentGeo.morphAttributes.position = [];
+		parentGeo.morphAttributes.normal = [];
+
+		morphTarget.rawTargets.forEach( function ( rawTarget, index ) {
+
+			var morphGeoNode = FBXTree.Objects.Geometry[ rawTarget.geoID ];
+
+			if ( morphGeoNode !== undefined ) {
+
+				genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, index );
+
+			}
+
+		} );
+
+	}
+
+	// a morph geometry is similar to a normal geometry, and the node is also included
+	// in FBXTree.Objects.Geometry, however it can only have attributes for position, normal
+	// and a special attribute Index defining which vertices of the original geometry
+	// it controls
+	function genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, index ) {
+
+		var morphGeo = new THREE.BufferGeometry();
+		if ( morphGeoNode.attrName ) morphGeo.name = morphGeoNode.attrName;
+
+		var vertexPositions = ( morphGeoNode.Vertices !== undefined ) ? morphGeoNode.Vertices.a : [];
+		// console.log( 'vertexPositions', vertexPositions );
+
+		// var normalsPositions = ( geoNode.Normals !== undefined ) ? geoNode.Normals.a : [];
+		// var indices = ( geoNode.Indexes !== undefined ) ? geoNode.Indexes.a : [];
+
+		var vertexIndices = ( parentGeoNode.PolygonVertexIndex !== undefined ) ? parentGeoNode.PolygonVertexIndex.a : [];
+		// console.log( 'vertexIndices', vertexIndices );
+
+
+		// create arrays to hold the final data used to build the buffergeometry
+		var vertexBuffer = [];
+
+		var faceLength = 0;
+
+		// these will hold data for a single face
+		var vertexPositionIndexes = [];
+		// var faceNormals = [];
+
+		vertexIndices.forEach( function ( vertexIndex, polygonVertexIndex ) {
+
+			// console.log( 'vertexIndex', vertexIndex);
+			var endOfFace = false;
+
+			if ( vertexIndex < 0 ) {
+
+				vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
+				vertexIndices[ polygonVertexIndex ] = vertexIndex;
+				endOfFace = true;
+
+			}
+
+			vertexPositionIndexes.push( vertexIndex * 3, vertexIndex * 3 + 1, vertexIndex * 3 + 2 );
+
+			faceLength ++;
+
+			// we have reached the end of a face - it may have 4 sides though
+			// in which case the data is split to represent two 3 sided faces
+			if ( endOfFace ) {
+
+				for ( var i = 2; i < faceLength; i ++ ) {
+
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 0 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 1 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 2 ] ] );
+
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 1 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 2 ] ] );
+
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ] );
+					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ] );
+
+				}
+
+				faceLength = 0;
+
+				// reset arrays for the next face
+				vertexPositionIndexes = [];
+
+			}
+
+		} );
+
+		// console.log( 'vertexBuffer', vertexBuffer );
+
+		var positionAttribute = new THREE.Float32BufferAttribute( vertexBuffer, 3 );
+
+		preTransform.applyToBufferAttribute( positionAttribute );
+
+		parentGeo.morphAttributes.position[ index ] = positionAttribute;
+
+		morphGeo.addAttribute( 'position', positionAttribute );
+
+		console.log( 'morph positionAttribute', positionAttribute );
+
+		return morphGeo;
 
 	}
 
@@ -1453,7 +1539,7 @@
 	}
 
 	// Generate a NurbGeometry from a node in FBXTree.Objects.Geometry
-	function parseNurbsGeometry( geometryNode ) {
+	function parseNurbsGeometry( geoNode ) {
 
 		if ( THREE.NURBSCurve === undefined ) {
 
@@ -1462,20 +1548,20 @@
 
 		}
 
-		var order = parseInt( geometryNode.Order );
+		var order = parseInt( geoNode.Order );
 
 		if ( isNaN( order ) ) {
 
-			console.error( 'THREE.FBXLoader: Invalid Order %s given for geometry ID: %s', geometryNode.Order, geometryNode.id );
+			console.error( 'THREE.FBXLoader: Invalid Order %s given for geometry ID: %s', geoNode.Order, geoNode.id );
 			return new THREE.BufferGeometry();
 
 		}
 
 		var degree = order - 1;
 
-		var knots = geometryNode.KnotVector.a;
+		var knots = geoNode.KnotVector.a;
 		var controlPoints = [];
-		var pointsValues = geometryNode.Points.a;
+		var pointsValues = geoNode.Points.a;
 
 		for ( var i = 0, l = pointsValues.length; i < l; i += 4 ) {
 
@@ -1485,11 +1571,11 @@
 
 		var startKnot, endKnot;
 
-		if ( geometryNode.Form === 'Closed' ) {
+		if ( geoNode.Form === 'Closed' ) {
 
 			controlPoints.push( controlPoints[ 0 ] );
 
-		} else if ( geometryNode.Form === 'Periodic' ) {
+		} else if ( geoNode.Form === 'Periodic' ) {
 
 			startKnot = degree;
 			endKnot = knots.length - 1 - startKnot;
