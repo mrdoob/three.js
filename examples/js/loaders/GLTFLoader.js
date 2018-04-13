@@ -146,6 +146,10 @@ THREE.GLTFLoader = ( function () {
 							extensions[ extensionName ] = new GLTFDracoMeshCompressionExtension( this.dracoLoader );
 							break;
 
+						case EXTENSIONS.MSFT_TEXTURE_DDS:
+							extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension();
+							break;
+
 						default:
 
 							if ( extensionsRequired.indexOf( extensionName ) >= 0 ) {
@@ -155,12 +159,6 @@ THREE.GLTFLoader = ( function () {
 							}
 
 					}
-
-				}
-
-				if ( json.extensionsUsed.indexOf( EXTENSIONS.MSFT_TEXTURE_DDS ) >= 0 ) {
-
-					extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension();
 
 				}
 
