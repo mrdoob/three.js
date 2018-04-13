@@ -366,7 +366,7 @@
 
 		var texture;
 	
-		if ( textureNode.FileName.slice( textureNode.FileName.lastIndexOf( '.' ) + 1 ) === 'tga' ) {
+		if ( textureNode.FileName.slice( -3 ).toLowerCase() === 'tga' ) {
 			
  			texture = THREE.Loader.Handlers.get( '.tga' ).load( fileName );
 			
