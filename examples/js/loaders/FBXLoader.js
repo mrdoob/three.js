@@ -672,7 +672,17 @@
 
 		var rawMorphTargets = [];
 
-		relationships.children.forEach( function ( child ) {
+		for ( var i = 0; i < relationships.children.length; i ++ ) {
+
+			if ( i === 8 ) {
+
+				console.warn( 'FBXLoader: maximum of 8 morph targets supported. Ignoring additional targets.' );
+
+				break;
+
+			}
+
+			var child = relationships.children[ i ];
 
 			var morphTargetNode = deformerNodes[ child.ID ];
 
@@ -693,13 +703,14 @@
 
 				if ( child.relationship === 'DeformPercent' ) {
 
+					// TODO: animation of morph targets is currently unsupported
 					rawMorphTarget.weightCurveID = child.ID;
-					// FBXTree.Objects.AnimationCurveNode[ child.ID ];
+					// weightCurve = FBXTree.Objects.AnimationCurveNode[ weightCurveID ];
 
 				} else {
 
 					rawMorphTarget.geoID = child.ID;
-					// FBXTree.Objects.Geometry[ child.ID ];
+					// morphGeo = FBXTree.Objects.Geometry[ geoID ];
 
 				}
 
@@ -707,8 +718,7 @@
 
 			rawMorphTargets.push( rawMorphTarget );
 
-
-		} );
+		}
 
 		return rawMorphTargets;
 
@@ -1178,8 +1188,6 @@
 
 		geo.addAttribute( 'position', positionAttribute );
 
-		console.log( 'orig positionAttribute', positionAttribute );
-
 		if ( colorsBuffer.length > 0 ) {
 
 			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsBuffer, 3 ) );
@@ -1269,8 +1277,6 @@
 
 		addMorphTargets( FBXTree, geo, geoNode, morphTarget, preTransform );
 
-		// console.log( 'main geo ', geo );
-
 		return geo;
 
 	}
@@ -1300,33 +1306,38 @@
 	// in FBXTree.Objects.Geometry, however it can only have attributes for position, normal
 	// and a special attribute Index defining which vertices of the original geometry
 	// it controls
-	function genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, index ) {
+	function genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform ) {
 
 		var morphGeo = new THREE.BufferGeometry();
 		if ( morphGeoNode.attrName ) morphGeo.name = morphGeoNode.attrName;
 
-		var vertexPositions = ( morphGeoNode.Vertices !== undefined ) ? morphGeoNode.Vertices.a : [];
-		// console.log( 'vertexPositions', vertexPositions );
+		var vertexIndices = ( parentGeoNode.PolygonVertexIndex !== undefined ) ? parentGeoNode.PolygonVertexIndex.a.slice( 0 ) : [];
+		var vertexPositions = ( parentGeoNode.Vertices !== undefined ) ? parentGeoNode.Vertices.a : [];
 
-		// var normalsPositions = ( geoNode.Normals !== undefined ) ? geoNode.Normals.a : [];
-		// var indices = ( geoNode.Indexes !== undefined ) ? geoNode.Indexes.a : [];
+		var morphPositions = ( morphGeoNode.Vertices !== undefined ) ? morphGeoNode.Vertices.a : [];
+		var indices = ( morphGeoNode.Indexes !== undefined ) ? morphGeoNode.Indexes.a : [];
 
-		var vertexIndices = ( parentGeoNode.PolygonVertexIndex !== undefined ) ? parentGeoNode.PolygonVertexIndex.a : [];
-		// console.log( 'vertexIndices', vertexIndices );
+		for ( var i = 0; i < indices.length; i ++ ) {
 
+			var morphIndex = indices[ i ];
 
-		// create arrays to hold the final data used to build the buffergeometry
+			var morphX = morphPositions[ i * 3 ];
+			var morphY = morphPositions[ i * 3 + 1 ];
+			var morphZ = morphPositions[ i * 3 + 2 ];
+
+			vertexPositions[ morphIndex * 3 ] += morphX;
+			vertexPositions[ morphIndex * 3 + 1 ] += morphY;
+			vertexPositions[ morphIndex * 3 + 2 ] += morphZ;
+
+		}
+
 		var vertexBuffer = [];
 
 		var faceLength = 0;
-
-		// these will hold data for a single face
 		var vertexPositionIndexes = [];
-		// var faceNormals = [];
 
 		vertexIndices.forEach( function ( vertexIndex, polygonVertexIndex ) {
 
-			// console.log( 'vertexIndex', vertexIndex);
 			var endOfFace = false;
 
 			if ( vertexIndex < 0 ) {
@@ -1370,19 +1381,10 @@
 
 		} );
 
-		// console.log( 'vertexBuffer', vertexBuffer );
-
 		var positionAttribute = new THREE.Float32BufferAttribute( vertexBuffer, 3 );
 
 		preTransform.applyToBufferAttribute( positionAttribute );
-
-		parentGeo.morphAttributes.position[ index ] = positionAttribute;
-
-		morphGeo.addAttribute( 'position', positionAttribute );
-
-		console.log( 'morph positionAttribute', positionAttribute );
-
-		return morphGeo;
+		parentGeo.morphAttributes.position.push( positionAttribute );
 
 	}
 
