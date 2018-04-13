@@ -97,7 +97,7 @@
 
 			}
 
-			console.log( FBXTree.Objects );
+			// console.log( FBXTree.Objects );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -1302,10 +1302,9 @@
 
 	}
 
-	// a morph geometry is similar to a normal geometry, and the node is also included
+	// a morph geometry node is similar to a standard  node, and the node is also contained
 	// in FBXTree.Objects.Geometry, however it can only have attributes for position, normal
-	// and a special attribute Index defining which vertices of the original geometry
-	// it controls
+	// and a special attribute Index defining which vertices of the original geometry are affected
 	function genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform ) {
 
 		var morphGeo = new THREE.BufferGeometry();
@@ -1325,6 +1324,8 @@
 			var morphY = morphPositions[ i * 3 + 1 ];
 			var morphZ = morphPositions[ i * 3 + 2 ];
 
+			// since this is a blendshape rather than a morph target, the effect is
+			// gained by additively combining the positions with the original shape's positions
 			vertexPositions[ morphIndex * 3 ] += morphX;
 			vertexPositions[ morphIndex * 3 + 1 ] += morphY;
 			vertexPositions[ morphIndex * 3 + 2 ] += morphZ;
@@ -1373,8 +1374,6 @@
 				}
 
 				faceLength = 0;
-
-				// reset arrays for the next face
 				vertexPositionIndexes = [];
 
 			}
