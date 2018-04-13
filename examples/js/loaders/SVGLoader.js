@@ -495,13 +495,10 @@ THREE.SVGLoader.prototype = {
 
 		//
 
+		var paths = [];
 		var xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
 
-		var svg = xml.documentElement;
-
-		var paths = [];
-
-		parseNode( svg, { fill: '#000' } );
+		parseNode( xml.documentElement, { fill: '#000' } );
 
 		return paths;
 
