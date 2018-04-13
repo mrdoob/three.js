@@ -1325,7 +1325,7 @@
 			var morphZ = morphPositions[ i * 3 + 2 ];
 
 			// since this is a blendshape rather than a morph target, the effect is
-			// gained by additively combining the positions with the original shape's positions
+			// gained by additively combining the morhp positions with the original shape's positions
 			vertexPositions[ morphIndex * 3 ] += morphX;
 			vertexPositions[ morphIndex * 3 + 1 ] += morphY;
 			vertexPositions[ morphIndex * 3 + 2 ] += morphZ;
