@@ -70,19 +70,33 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				var material = new THREE.MeshBasicMaterial( { color: 0xff0000, morphTargets: true, side: THREE.DoubleSide } );
+				var material = new THREE.MeshBasicMaterial( { color: 0xff0000, morphTargets: true } );
 
-				// 2 x 2 square centered at (0, 0, 0)
+				// 2 x 2 cube centered at (0, 0, 0) defined by 8 corner vertices
 				var positions = [
-					-1, -1, 0,
-					1, -1, 0,
-					-1, 1, 0,
-					-1, 1, 0,
-					1, -1, 0,
-					1, 1, 0,
+					-1, -1, 1, // 0
+					1, -1, 1, // 1
+					-1, 1, 1, // 2
+					1, 1, 1, // 3
+					-1, -1, -1, // 4
+					1, -1, -1, // 5
+					-1, 1, -1, // 6
+					1, 1, -1, // 7
 				];
 
 				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+
+				// each face consists of two triangles
+				var indices = [
+				0, 1, 2, 2, 1, 3, // front
+				4, 6, 5, 6, 7, 5, // back
+				2, 3, 6, 3, 7, 6, // top
+				0, 4, 5, 5, 1, 0, // bottom
+				0, 6, 4, 6, 0, 2, // left
+				1, 5, 3, 3, 5, 7 // right
+
+			];
+				geometry.setIndex( new THREE.Uint16BufferAttribute( indices, 1 ) )
 
 				// create an empty array to  hold targets for the attribute we want to morph
 				// morphing positions and normals is supported
@@ -90,50 +104,56 @@
 
 				// morph bottom left corner
 				var morphTargetPositions0 = [
-					-2, -2, 0,
-					1, -1, 0,
-					-1, 1, 0,
-					-1, 1, 0,
-					1, -1, 0,
-					1, 1, 0,
+					-2, -2, 1,
+					1, -1, 1,
+					-1, 1, 1,
+					1, 1, 1,
+					-1, -1, -1,
+					1, -1, -1,
+					-1, 1, -1,
+					1, 1, -1,
 				];
 
 				geometry.morphAttributes.position[ 0 ] = new THREE.Float32BufferAttribute( morphTargetPositions0, 3 );
 
 				// morph bottom right corner
-				// since the square consists of two distinct triangles,
-				// we need to move vertices of upper and lower triangles together here
 				var morphTargetPositions1 = [
-					-1, -1, 0,
-					2, -2, 0,
-					-1, 1, 0,
-					-1, 1, 0,
-					2, -2, 0,
-					1, 1, 0,
+					-1, -1, 1,
+					2, -2, 1,
+					-1, 1, 1,
+					1, 1, 1,
+					-1, -1, -1,
+					1, -1, -1,
+					-1, 1, -1,
+					1, 1, -1,
 				];
 
 				geometry.morphAttributes.position[ 1 ] = new THREE.Float32BufferAttribute( morphTargetPositions1, 3 );
 
 				// morph top left corner
 				var morphTargetPositions2 = [
-					-1, -1, 0,
-					1, -1, 0,
-					-2, 2, 0,
-					-2, 2, 0,
-					1, -1, 0,
-					1, 1, 0,
+					-1, -1, 1,
+					1, -1, 1,
+					-2, 2, 1,
+					1, 1, 1,
+					-1, -1, -1,
+					1, -1, -1,
+					-1, 1, -1,
+					1, 1, -1,
 				];
 
 				geometry.morphAttributes.position[ 2 ] = new THREE.Float32BufferAttribute( morphTargetPositions2, 3 );
 
 				// morph top right corner
 				var morphTargetPositions3 = [
-					-1, -1, 0,
-					1, -1, 0,
-					-1, 1, 0,
-					-1, 1, 0,
-					1, -1, 0,
-					2, 2, 0,
+					-1, -1, 1,
+					1, -1, 1,
+					-1, 1, 1,
+					2, 2, 1,
+					-1, -1, -1,
+					1, -1, -1,
+					-1, 1, -1,
+					1, 1, -1,
 				];
 
 				geometry.morphAttributes.position[ 3 ] = new THREE.Float32BufferAttribute( morphTargetPositions3, 3 );
@@ -168,7 +188,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				// controls
+				// Controls
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
