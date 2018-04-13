@@ -104,7 +104,6 @@
 			var textures = parseTextures( FBXTree, new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ), images, connections );
 			var materials = parseMaterials( FBXTree, textures, connections );
 			var deformers = parseDeformers( FBXTree, connections );
-			console.log( 'deformers', deformers );
 			var geometryMap = parseGeometries( FBXTree, connections, deformers );
 			var sceneGraph = parseScene( FBXTree, connections, deformers.skeletons, geometryMap, materials );
 
@@ -595,11 +594,15 @@
 
 				} else if ( deformerNode.attrType === 'BlendShape' ) {
 
-					var morphTarget = parseMorphTargets( relationships, deformerNode, DeformerNodes, connections, FBXTree );
+					var morphTarget = {
+						id: nodeID,
+					};
+
+					morphTarget.rawTargets = parseMorphTargets( relationships, deformerNode, DeformerNodes, connections, FBXTree );
 					morphTarget.id = nodeID;
 
 					if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: morph target attached to more than one geometry is not supported.' );
-					morphTarget.parentID = relationships.parents[ 0 ].ID;
+					morphTarget.parentGeoID = relationships.parents[ 0 ].ID;
 
 					morphTargets[ nodeID ] = morphTarget;
 
@@ -709,7 +712,6 @@
 
 	}
 
-
 	// Parse nodes in FBXTree.Objects.Geometry
 	function parseGeometries( FBXTree, connections, deformers ) {
 
@@ -718,8 +720,6 @@
 		if ( 'Geometry' in FBXTree.Objects ) {
 
 			var geometryNodes = FBXTree.Objects.Geometry;
-
-
 
 			for ( var nodeID in geometryNodes ) {
 
@@ -752,7 +752,6 @@
 		}
 
 	}
-
 
 	// Parse single node mesh geometry in FBXTree.Objects.Geometry
 	function parseMeshGeometry( FBXTree, relationships, geometryNode, deformers ) {
@@ -819,11 +818,47 @@
 
 	}
 
-	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
-	function genGeometry( FBXTree, geometryNode, skeleton, morphTarget, preTransform ) {
+	function addMorphTargets( FBXTree, parentGeo, morphTarget, preTransform ) {
 
-		var vertexPositions = geometryNode.Vertices.a;
-		var vertexIndices = geometryNode.PolygonVertexIndex.a;
+		if ( morphTarget === null ) return;
+
+		parentGeo.morphAttributes.position = [];
+		parentGeo.morphAttributes.normal = [];
+
+		morphTarget.rawTargets.forEach( function ( rawTarget, index ) {
+
+			var geoNode = FBXTree.Objects.Geometry[ rawTarget.geoID ];
+
+			if ( geoNode !== undefined ) {
+
+				genMorphGeometry( parentGeo, geoNode, preTransform, index );
+
+			}
+
+		} );
+
+	}
+
+	// a morph geometry is similar to a normal geometry, and the node is also included
+	// in FBXTree.Objects.Geometry, however it can only have attributes for position, normal
+	// and a special attribute Index defining which vertices of the original geometry
+	// it controls
+	function genMorphGeometry( parentGeo, geoNode, preTransform ) {
+
+		var vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
+		var normalsPositions = ( geoNode.Normals !== undefined ) ? geoNode.Normals.a : [];
+		var indices = ( geoNode.Indexes !== undefined ) ? geoNode.Indexes.a : [];
+
+	}
+
+	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
+	function genGeometry( FBXTree, geometryNode, skeleton, morphTarget, preTransform, calledFrom ) {
+
+		var geo = new THREE.BufferGeometry();
+		if ( geometryNode.attrName ) geo.name = geometryNode.attrName;
+
+		var vertexPositions = ( geometryNode.Vertices !== undefined ) ? geometryNode.Vertices.a : [];
+		var vertexIndices = ( geometryNode.PolygonVertexIndex !== undefined ) ? geometryNode.PolygonVertexIndex.a : [];
 
 		// create arrays to hold the final data used to build the buffergeometry
 		var vertexBuffer = [];
@@ -1166,9 +1201,6 @@
 
 		} );
 
-		var geo = new THREE.BufferGeometry();
-		geo.name = geometryNode.name;
-
 		var positionAttribute = new THREE.Float32BufferAttribute( vertexBuffer, 3 );
 
 		preTransform.applyToBufferAttribute( positionAttribute );
@@ -1262,10 +1294,11 @@
 
 		}
 
+		addMorphTargets( FBXTree, geo, morphTarget, preTransform );
+
 		return geo;
 
 	}
-
 
 	// Parse normal from FBXTree.Objects.Geometry.LayerElementNormal if it exists
 	function getNormals( NormalNode ) {
