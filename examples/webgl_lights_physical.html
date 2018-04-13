@@ -111,7 +111,7 @@
 
 				scene = new THREE.Scene();
 
-				var bulbGeometry = new THREE.SphereGeometry( 0.02, 16, 8 );
+				var bulbGeometry = new THREE.SphereBufferGeometry( 0.02, 16, 8 );
 				bulbLight = new THREE.PointLight( 0xffee88, 1, 100, 2 );
 
 				bulbMat = new THREE.MeshStandardMaterial( {
@@ -204,14 +204,14 @@
 				floorMesh.rotation.x = -Math.PI / 2.0;
 				scene.add( floorMesh );
 
-				var ballGeometry = new THREE.SphereGeometry( 0.5, 32, 32 );
+				var ballGeometry = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
 				var ballMesh = new THREE.Mesh( ballGeometry, ballMat );
 				ballMesh.position.set( 1, 0.5, 1 );
 				ballMesh.rotation.y = Math.PI;
 				ballMesh.castShadow = true;
 				scene.add( ballMesh );
 
-				var boxGeometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+				var boxGeometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5 );
 				var boxMesh = new THREE.Mesh( boxGeometry, cubeMat );
 				boxMesh.position.set( -0.5, 0.25, -1 );
 				boxMesh.castShadow = true;
