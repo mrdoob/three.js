@@ -62,85 +62,111 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
-				camera.position.z = 500;
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 150 );
+				camera.position.z = 10;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
-				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
 
-				var light = new THREE.PointLight( 0xff2200 );
-				light.position.set( 100, 100, 100 );
-				scene.add( light );
+				var geometry = new THREE.BufferGeometry();
 
-				var light = new THREE.AmbientLight( 0x111111 );
-				scene.add( light );
+				var material = new THREE.MeshBasicMaterial( { color: 0xff0000, morphTargets: true, side: THREE.DoubleSide } );
 
-				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true } );
+				// 2 x 2 square centered at (0, 0, 0)
+				var positions = [
+					-1, -1, 0,
+					1, -1, 0,
+					-1, 1, 0,
+					-1, 1, 0,
+					1, -1, 0,
+					1, 1, 0,
+				];
 
-				// construct 8 blend shapes
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
-				for ( var i = 0; i < 8; i ++ ) {
+				// create an empty array to  hold targets for the attribute we want to morph
+				// morphing positions and normals is supported
+				geometry.morphAttributes.position = [];
 
-					var vertices = [];
+				// morph bottom left corner
+				var morphTargetPositions0 = [
+					-2, -2, 0,
+					1, -1, 0,
+					-1, 1, 0,
+					-1, 1, 0,
+					1, -1, 0,
+					1, 1, 0,
+				];
 
-					for ( var v = 0; v < geometry.vertices.length; v ++ ) {
+				geometry.morphAttributes.position[ 0 ] = new THREE.Float32BufferAttribute( morphTargetPositions0, 3 );
 
-						vertices.push( geometry.vertices[ v ].clone() );
+				// morph bottom right corner
+				var morphTargetPositions1 = [
+					-1, -1, 0,
+					2, -2, 0,
+					-1, 1, 0,
+					-1, 1, 0,
+					2, -2, 0,
+					1, 1, 0,
+				];
 
-						if ( v === i ) {
+				geometry.morphAttributes.position[ 1 ] = new THREE.Float32BufferAttribute( morphTargetPositions1, 3 );
 
-							vertices[ vertices.length - 1 ].x *= 2;
-							vertices[ vertices.length - 1 ].y *= 2;
-							vertices[ vertices.length - 1 ].z *= 2;
+				// morph top left corner
+				var morphTargetPositions2 = [
+					-1, -1, 0,
+					1, -1, 0,
+					-2, 2, 0,
+					-2, 2, 0,
+					1, -1, 0,
+					1, 1, 0,
+				];
 
-						}
+				geometry.morphAttributes.position[ 2 ] = new THREE.Float32BufferAttribute( morphTargetPositions2, 3 );
 
-					}
+				// morph top right corner
+				var morphTargetPositions3 = [
+					-1, -1, 0,
+					1, -1, 0,
+					-1, 1, 0,
+					-1, 1, 0,
+					1, -1, 0,
+					2, 2, 0,
+				];
 
-					geometry.morphTargets.push( { name: "target" + i, vertices: vertices } );
-
-				}
+				geometry.morphAttributes.position[ 3 ] = new THREE.Float32BufferAttribute( morphTargetPositions3, 3 );
 
 				mesh = new THREE.Mesh( geometry, material );
 
 				scene.add( mesh );
 
-				//
+				// Set up dat.GUI to control targets
 
 				var params = {
+					influence0: 0,
 					influence1: 0,
 					influence2: 0,
 					influence3: 0,
-					influence4: 0,
-					influence5: 0,
-					influence6: 0,
-					influence7: 0,
-					influence8: 0
 				};
 
 				var gui = new dat.GUI();
 
 				var folder = gui.addFolder( 'Morph Targets' );
-				folder.add( params, 'influence1', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 0 ] = value; } );
-				folder.add( params, 'influence2', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 1 ] = value; } );
-				folder.add( params, 'influence3', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 2 ] = value; } );
-				folder.add( params, 'influence4', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 3 ] = value; } );
-				folder.add( params, 'influence5', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 4 ] = value; } );
-				folder.add( params, 'influence6', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 5 ] = value; } );
-				folder.add( params, 'influence7', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 6 ] = value; } );
-				folder.add( params, 'influence8', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 7 ] = value; } );
+				folder.add( params, 'influence0', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 0 ] = value; } );
+				folder.add( params, 'influence1', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 1 ] = value; } );
+				folder.add( params, 'influence2', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 2 ] = value; } );
+				folder.add( params, 'influence3', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 3 ] = value; } );
+
 				folder.open();
 
-				//
+				// Renderer
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				//
+				// controls
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -167,8 +193,6 @@
 			}
 
 			function render() {
-
-				mesh.rotation.y += 0.01;
 
 				renderer.render( scene, camera );
 
