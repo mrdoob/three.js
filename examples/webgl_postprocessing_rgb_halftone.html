@@ -134,11 +134,23 @@
 		}
 
 		// post-processing
-		var composer, renderPass, halftonePass;
+		var composer, renderPass, halftonePass, params;
 
 		composer = new THREE.EffectComposer( renderer );
 		renderPass = new THREE.RenderPass( scene, camera );
-		halftonePass = new THREE.HalftonePass( window.innerWidth, window.innerHeight );
+		params = {
+			shape: 1,
+			radius: 4,
+			rotateR: Math.PI / 12,
+			rotateB: Math.PI / 12 * 2,
+			rotateG: Math.PI / 12 * 3,
+			scatter: 0,
+			blending: 1,
+			blendingMode: 1,
+			greyscale: false,
+			disable: false
+		};
+		halftonePass = new THREE.HalftonePass( window.innerWidth, window.innerHeight, params );
 		halftonePass.renderToScreen = true;
 		composer.addPass( renderPass );
 		composer.addPass( halftonePass );

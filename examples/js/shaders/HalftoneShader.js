@@ -2,7 +2,9 @@
  * @author meatbags / xavierburrow.com, github/meatbags
  *
  * RGB Halftone shader for three.js.
- *
+ *	NOTE:
+ * 		Shape (1 = Dot, 2 = Ellipse, 3 = Line, 4 = Square)
+ *		Blending Mode (1 = Linear, 2 = Multiply, 3 = Add, 4 = Lighter, 5 = Darker)
  */
 
 THREE.HalftoneShader = {
@@ -40,12 +42,12 @@ THREE.HalftoneShader = {
 
 		"#define SQRT2_MINUS_ONE 0.41421356",
 		"#define SQRT2_HALF_MINUS_ONE 0.20710678",
-		"#define SHAPE_DOT 1",
 		"#define PI2 6.28318531",
+		"#define SHAPE_DOT 1",
 		"#define SHAPE_ELLIPSE 2",
+		"#define SHAPE_LINE 3",
 		"#define SHAPE_SQUARE 4",
 		"#define BLENDING_LINEAR 1",
-		"#define SHAPE_LINE 3",
 		"#define BLENDING_MULTIPLY 2",
 		"#define BLENDING_ADD 3",
 		"#define BLENDING_LIGHTER 4",

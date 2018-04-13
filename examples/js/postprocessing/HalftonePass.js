@@ -5,11 +5,9 @@
  *
  */
 
-THREE.HalftonePass = function ( width, height ) {
+THREE.HalftonePass = function ( width, height, params ) {
 
 	THREE.Pass.call( this );
- 	this.width = width;
- 	this.height = height;
 
  	if ( THREE.HalftoneShader === undefined ) {
 
@@ -24,6 +22,20 @@ THREE.HalftonePass = function ( width, height ) {
  		vertexShader: THREE.HalftoneShader.vertexShader
  	} );
 
+	// set params
+	this.uniforms.width.value = width;
+	this.uniforms.height.value = height;
+
+	for ( var key in params ) {
+
+		if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
+
+			this.uniforms[key].value = params[key];
+
+		}
+
+	}
+
  	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
  	this.scene = new THREE.Scene();
  	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
@@ -33,8 +45,10 @@ THREE.HalftonePass = function ( width, height ) {
  };
 
  THREE.HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
- 	constructor: THREE.HalftonePass,
- 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+
+	constructor: THREE.HalftonePass,
+
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
  		this.material.uniforms[ "tDiffuse" ].value = readBuffer.texture;
  		this.quad.material = this.material;
@@ -50,12 +64,11 @@ THREE.HalftonePass = function ( width, height ) {
 		}
 
  	},
+
  	setSize: function ( width, height ) {
 
- 		this.width = width;
- 		this.height = height;
- 		this.uniforms[ 'width' ].value = this.width;
- 		this.uniforms[ 'height' ].value = this.height;
+ 		this.uniforms.width.value = width;
+ 		this.uniforms.height.value = height;
 
  	}
 } );
