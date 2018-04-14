@@ -29,7 +29,6 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - platformer demo. cubemap by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>.<br />Use arrow keys to look around, WASD to move and SPACE to jump.</div>
 
 		<script src="../build/three.js"></script>
@@ -217,22 +216,6 @@
 
 			// init 3D stuff
 
-			function makeSkybox( urls, size ) {
-				var skyboxCubemap = new THREE.CubeTextureLoader().load( urls );
-				skyboxCubemap.format = THREE.RGBFormat;
-
-				var skyboxShader = THREE.ShaderLib['cube'];
-				skyboxShader.uniforms['tCube'].value = skyboxCubemap;
-
-				return new THREE.Mesh(
-					new THREE.BoxGeometry( size, size, size ),
-					new THREE.ShaderMaterial({
-						fragmentShader : skyboxShader.fragmentShader, vertexShader : skyboxShader.vertexShader,
-						uniforms : skyboxShader.uniforms, depthWrite : false, side : THREE.BackSide
-					})
-				);
-			}
-
 			function makePlatform( jsonUrl, textureUrl, textureQuality ) {
 				var placeholder = new THREE.Object3D();
 
@@ -255,23 +238,25 @@
 				return placeholder;
 			}
 
-			var renderer = new THREE.WebGLRenderer({ antialias : true });
+			var renderer = new THREE.WebGLRenderer( { antialias : true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
+			document.body.appendChild( renderer.domElement );
 
 			var camera = new THREE.PerspectiveCamera( 60, 1, 0.1, 9000 );
 
 			var scene = new THREE.Scene();
 
-			scene.add( camera );
-
-			scene.add( makeSkybox( [
+			var envMap = new THREE.CubeTextureLoader().load( [
 				'textures/cube/skybox/px.jpg', // right
 				'textures/cube/skybox/nx.jpg', // left
 				'textures/cube/skybox/py.jpg', // top
 				'textures/cube/skybox/ny.jpg', // bottom
 				'textures/cube/skybox/pz.jpg', // back
 				'textures/cube/skybox/nz.jpg'  // front
-			], 8000 ));
+			] );
+			envMap.format = THREE.RGBFormat;
+
+			scene.background = envMap;
 
 			scene.add( makePlatform(
 				'models/platform/platform.json',
@@ -319,8 +304,6 @@
 			var gameViewportSize = function() { return {
 				width: window.innerWidth, height: window.innerHeight
 			}};
-
-			document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 			start( gameLoop, gameViewportSize );
 		</script>
