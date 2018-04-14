@@ -4,29 +4,21 @@
  * @author Lewy Blue https://github.com/looeee
  *
  * Loader loads FBX file and generates Group representing FBX scene.
- * Requires FBX file to be >= 7.0 and in ASCII or to be any version in Binary format.
- *
- * Supports:
- * 	Mesh Generation (Positional Data)
- * 	Normal Data (Per Vertex Drawing Instance)
- *	UV Data (Per Vertex Drawing Instance)
- *	Skinning
- *	Animation
- * 	- Separated Animations based on stacks.
- * 	- Skeletal & Non-Skeletal Animations
- *	NURBS (Open, Closed and Periodic forms)
+ * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
+ * Versions lower than this may load but will probably have errors
  *
  * Needs Support:
+ *  Morph targets / blend shapes
  *	Euler rotation order
- *
  *
  * FBX format references:
  * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
+ * 	http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
  *
  * 	Binary format specification:
  *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
- *		https://wiki.rogiken.org/specifications/file-format/fbx/ (more detail but Japanese)
  */
+
 
 ( function () {
 
@@ -97,7 +89,7 @@
 
 			}
 
-			// console.log( FBXTree.Objects );
+			// console.log( FBXTree );
 
 			var connections = parseConnections( FBXTree );
 			var images = parseImages( FBXTree );
@@ -837,9 +829,7 @@
 		if ( geoNode.attrName ) geo.name = geoNode.attrName;
 
 		var vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
-
-		// TEMP: Clone array so that it doesn't get changed and can be reused in genMorphGeo
-		var vertexIndices = ( geoNode.PolygonVertexIndex !== undefined ) ? geoNode.PolygonVertexIndex.a.slice( 0 ) : [];
+		var vertexIndices = ( geoNode.PolygonVertexIndex !== undefined ) ? geoNode.PolygonVertexIndex.a : [];
 
 		// create arrays to hold the final data used to build the buffergeometry
 		var vertexBuffer = [];
@@ -931,7 +921,6 @@
 			if ( vertexIndex < 0 ) {
 
 				vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
-				vertexIndices[ polygonVertexIndex ] = vertexIndex;
 				endOfFace = true;
 
 			}
@@ -1288,13 +1277,13 @@
 		parentGeo.morphAttributes.position = [];
 		parentGeo.morphAttributes.normal = [];
 
-		morphTarget.rawTargets.forEach( function ( rawTarget, index ) {
+		morphTarget.rawTargets.forEach( function ( rawTarget ) {
 
 			var morphGeoNode = FBXTree.Objects.Geometry[ rawTarget.geoID ];
 
 			if ( morphGeoNode !== undefined ) {
 
-				genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, index );
+				genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform );
 
 			}
 
@@ -1305,30 +1294,29 @@
 	// a morph geometry node is similar to a standard  node, and the node is also contained
 	// in FBXTree.Objects.Geometry, however it can only have attributes for position, normal
 	// and a special attribute Index defining which vertices of the original geometry are affected
+	// Normal and position attributes only have data for the vertices that are affected by the morph
 	function genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform ) {
 
 		var morphGeo = new THREE.BufferGeometry();
 		if ( morphGeoNode.attrName ) morphGeo.name = morphGeoNode.attrName;
 
-		var vertexIndices = ( parentGeoNode.PolygonVertexIndex !== undefined ) ? parentGeoNode.PolygonVertexIndex.a.slice( 0 ) : [];
-		var vertexPositions = ( parentGeoNode.Vertices !== undefined ) ? parentGeoNode.Vertices.a : [];
+		var vertexIndices = ( parentGeoNode.PolygonVertexIndex !== undefined ) ? parentGeoNode.PolygonVertexIndex.a : [];
+
+		// make a copy of the parent's vertex positions
+		var vertexPositions = ( parentGeoNode.Vertices !== undefined ) ? parentGeoNode.Vertices.a.slice() : [];
 
 		var morphPositions = ( morphGeoNode.Vertices !== undefined ) ? morphGeoNode.Vertices.a : [];
 		var indices = ( morphGeoNode.Indexes !== undefined ) ? morphGeoNode.Indexes.a : [];
 
 		for ( var i = 0; i < indices.length; i ++ ) {
 
-			var morphIndex = indices[ i ];
+			var morphIndex = indices[ i ] * 3;
 
-			var morphX = morphPositions[ i * 3 ];
-			var morphY = morphPositions[ i * 3 + 1 ];
-			var morphZ = morphPositions[ i * 3 + 2 ];
-
-			// since this is a blendshape rather than a morph target, the effect is
-			// gained by additively combining the morhp positions with the original shape's positions
-			vertexPositions[ morphIndex * 3 ] += morphX;
-			vertexPositions[ morphIndex * 3 + 1 ] += morphY;
-			vertexPositions[ morphIndex * 3 + 2 ] += morphZ;
+			// since this is a blend shape rather than a morph target, the effect is
+			// gained by additively combining the morph positions with the original shape's positions
+			vertexPositions[ morphIndex ] += morphPositions[ i * 3 ];
+			vertexPositions[ morphIndex + 1 ] += morphPositions[ i * 3 + 1 ];
+			vertexPositions[ morphIndex + 2 ] += morphPositions[ i * 3 + 2 ];
 
 		}
 
@@ -1337,14 +1325,13 @@
 		var faceLength = 0;
 		var vertexPositionIndexes = [];
 
-		vertexIndices.forEach( function ( vertexIndex, polygonVertexIndex ) {
+		vertexIndices.forEach( function ( vertexIndex ) {
 
 			var endOfFace = false;
 
 			if ( vertexIndex < 0 ) {
 
-				vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
-				vertexIndices[ polygonVertexIndex ] = vertexIndex;
+				vertexIndex = vertexIndex ^ - 1;
 				endOfFace = true;
 
 			}
@@ -1353,8 +1340,6 @@
 
 			faceLength ++;
 
-			// we have reached the end of a face - it may have 4 sides though
-			// in which case the data is split to represent two 3 sided faces
 			if ( endOfFace ) {
 
 				for ( var i = 2; i < faceLength; i ++ ) {
@@ -1381,6 +1366,7 @@
 		} );
 
 		var positionAttribute = new THREE.Float32BufferAttribute( vertexBuffer, 3 );
+		positionAttribute.name = morphGeoNode.attrName;
 
 		preTransform.applyToBufferAttribute( positionAttribute );
 		parentGeo.morphAttributes.position.push( positionAttribute );
