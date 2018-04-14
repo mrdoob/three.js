@@ -8,7 +8,9 @@
  * Versions lower than this may load but will probably have errors
  *
  * Needs Support:
- *  Morph targets / blend shapes
+ *  Morph normals / blend shape normals
+ *  Animation tracks for morph targets
+ *
  *	Euler rotation order
  *
  * FBX format references:
