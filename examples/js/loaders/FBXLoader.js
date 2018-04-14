@@ -237,27 +237,27 @@
 
 				type = 'image/tiff';
 				break;
-				
+
  			case 'tga':
-			
+
 				if ( typeof THREE.TGALoader !== 'function' ) {
-					
+
 					console.warn( 'FBXLoader: THREE.TGALoader is required to load TGA textures' );
 					return;
 
 				} else {
-					
+
 					if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
 
 						THREE.Loader.Handlers.add( /\.tga$/i, new THREE.TGALoader() );
 
 					}
-					
+
 					type = 'image/tga';
 					break;
 
 				}
-				
+
 			default:
 
 				console.warn( 'FBXLoader: Image type "' + extension + '" is not supported.' );
@@ -357,17 +357,17 @@
 		}
 
 		var texture;
-	
+
 		if ( textureNode.FileName.slice( -3 ).toLowerCase() === 'tga' ) {
-			
+
  			texture = THREE.Loader.Handlers.get( '.tga' ).load( fileName );
-			
+
  		} else {
-			
+
  			texture = loader.load( fileName );
-			
+
  		}
-		
+
 		loader.setPath( currentPath );
 
 		return texture;
@@ -855,16 +855,11 @@
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
 	function genGeometry( FBXTree, geoNode, skeleton, morphTarget, preTransform ) {
 
-<<<<<<< HEAD
 		var geo = new THREE.BufferGeometry();
 		if ( geoNode.attrName ) geo.name = geoNode.attrName;
 
 		var vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
 		var vertexIndices = ( geoNode.PolygonVertexIndex !== undefined ) ? geoNode.PolygonVertexIndex.a : [];
-=======
-		var vertexPositions = ( geometryNode.Vertices !== undefined ) ? geometryNode.Vertices.a : [];
-		var vertexIndices = ( geometryNode.PolygonVertexIndex !== undefined ) ? geometryNode.PolygonVertexIndex.a : [];
->>>>>>> 25446d6cfbae87c733c041f4b7fe1df6bf5665df
 
 		// create arrays to hold the final data used to build the buffergeometry
 		var vertexBuffer = [];
