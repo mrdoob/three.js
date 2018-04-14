@@ -448,8 +448,6 @@
 
 		var parameters = {};
 
-		parameters.morphTargets = true;
-
 		if ( properties.BumpFactor ) {
 
 			parameters.bumpScale = properties.BumpFactor.value;
@@ -858,61 +856,162 @@
 		var geo = new THREE.BufferGeometry();
 		if ( geoNode.attrName ) geo.name = geoNode.attrName;
 
-		var vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
-		var vertexIndices = ( geoNode.PolygonVertexIndex !== undefined ) ? geoNode.PolygonVertexIndex.a : [];
+		var geoInfo = getGeoInfo( geoNode, skeleton );
 
-		// create arrays to hold the final data used to build the buffergeometry
-		var vertexBuffer = [];
-		var normalBuffer = [];
-		var colorsBuffer = [];
-		var uvsBuffer = [];
-		var materialIndexBuffer = [];
-		var vertexWeightsBuffer = [];
-		var weightsIndicesBuffer = [];
+		var buffers = genBuffers( geoInfo );
+
+		var positionAttribute = new THREE.Float32BufferAttribute( buffers.vertex, 3 );
+
+		preTransform.applyToBufferAttribute( positionAttribute );
+
+		geo.addAttribute( 'position', positionAttribute );
+
+		if ( buffers.colors.length > 0 ) {
+
+			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( buffers.colors, 3 ) );
+
+		}
+
+		if ( skeleton ) {
+
+			geo.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( buffers.weightsIndices, 4 ) );
+
+			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffers.vertexWeights, 4 ) );
+
+			// used later to bind the skeleton to the model
+			geo.FBX_Deformer = skeleton;
+
+		}
+
+		if ( buffers.normal.length > 0 ) {
+
+			var normalAttribute = new THREE.Float32BufferAttribute( buffers.normal, 3 );
+
+			var normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
+			normalMatrix.applyToBufferAttribute( normalAttribute );
+
+			geo.addAttribute( 'normal', normalAttribute );
+
+		}
+
+		buffers.uvs.forEach( function ( uvBuffer, i ) {
+
+			// subsequent uv buffers are called 'uv1', 'uv2', ...
+			var name = 'uv' + ( i + 1 ).toString();
+
+			// the first uv buffer is just called 'uv'
+			if ( i === 0 ) {
+
+				name = 'uv';
+
+			}
+
+			geo.addAttribute( name, new THREE.Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
+
+		} );
+
+		if ( geoInfo.material && geoInfo.material.mappingType !== 'AllSame' ) {
+
+			// Convert the material indices of each vertex into rendering groups on the geometry.
+			var prevMaterialIndex = buffers.materialIndex[ 0 ];
+			var startIndex = 0;
+
+			buffers.materialIndex.forEach( function ( currentIndex, i ) {
+
+				if ( currentIndex !== prevMaterialIndex ) {
+
+					geo.addGroup( startIndex, i - startIndex, prevMaterialIndex );
+
+					prevMaterialIndex = currentIndex;
+					startIndex = i;
+
+				}
+
+			} );
+
+			// the loop above doesn't add the last group, do that here.
+			if ( geo.groups.length > 0 ) {
+
+				var lastGroup = geo.groups[ geo.groups.length - 1 ];
+				var lastIndex = lastGroup.start + lastGroup.count;
+
+				if ( lastIndex !== buffers.materialIndex.length ) {
+
+					geo.addGroup( lastIndex, buffers.materialIndex.length - lastIndex, prevMaterialIndex );
+
+				}
+
+			}
+
+			// case where there are multiple materials but the whole geometry is only
+			// using one of them
+			if ( geo.groups.length === 0 ) {
+
+				geo.addGroup( 0, buffers.materialIndex.length, buffers.materialIndex[ 0 ] );
+
+			}
+
+		}
+
+		addMorphTargets( FBXTree, geo, geoNode, morphTarget, preTransform );
+
+		return geo;
+
+	}
+
+	function getGeoInfo( geoNode, skeleton ) {
+
+		var geoInfo = {};
+
+		geoInfo.vertexPositions = ( geoNode.Vertices !== undefined ) ? geoNode.Vertices.a : [];
+		geoInfo.vertexIndices = ( geoNode.PolygonVertexIndex !== undefined ) ? geoNode.PolygonVertexIndex.a : [];
 
 		if ( geoNode.LayerElementColor ) {
 
-			var colorInfo = getColors( geoNode.LayerElementColor[ 0 ] );
+			geoInfo.color = getColors( geoNode.LayerElementColor[ 0 ] );
 
 		}
 
 		if ( geoNode.LayerElementMaterial ) {
 
-			var materialInfo = getMaterials( geoNode.LayerElementMaterial[ 0 ] );
+			geoInfo.material = getMaterials( geoNode.LayerElementMaterial[ 0 ] );
 
 		}
 
 		if ( geoNode.LayerElementNormal ) {
 
-			var normalInfo = getNormals( geoNode.LayerElementNormal[ 0 ] );
+			geoInfo.normal = getNormals( geoNode.LayerElementNormal[ 0 ] );
 
 		}
 
 		if ( geoNode.LayerElementUV ) {
 
-			var uvInfo = [];
+			geoInfo.uv = [];
+
 			var i = 0;
 			while ( geoNode.LayerElementUV[ i ] ) {
 
-				uvInfo.push( getUVs( geoNode.LayerElementUV[ i ] ) );
+				geoInfo.uv.push( getUVs( geoNode.LayerElementUV[ i ] ) );
 				i ++;
 
 			}
 
 		}
 
-		var weightTable = {};
+		geoInfo.weightTable = {};
 
 		if ( skeleton !== null ) {
+
+			geoInfo.skeleton = skeleton;
 
 			skeleton.rawBones.forEach( function ( rawBone, i ) {
 
 				// loop over the bone's vertex indices and weights
 				rawBone.indices.forEach( function ( index, j ) {
 
-					if ( weightTable[ index ] === undefined ) weightTable[ index ] = [];
+					if ( geoInfo.weightTable[ index ] === undefined ) geoInfo.weightTable[ index ] = [];
 
-					weightTable[ index ].push( {
+					geoInfo.weightTable[ index ].push( {
 
 						id: i,
 						weight: rawBone.weights[ j ],
@@ -925,19 +1024,35 @@
 
 		}
 
+		return geoInfo;
+
+	}
+
+	function genBuffers( geoInfo ) {
+
+		var buffers = {
+			vertex: [],
+			normal: [],
+			colors: [],
+			uvs: [],
+			materialIndex: [],
+			vertexWeights: [],
+			weightsIndices: [],
+		};
+
 		var polygonIndex = 0;
 		var faceLength = 0;
 		var displayedWeightsWarning = false;
 
 		// these will hold data for a single face
-		var vertexPositionIndexes = [];
+		var facePositionIndexes = [];
 		var faceNormals = [];
 		var faceColors = [];
 		var faceUVs = [];
 		var faceWeights = [];
 		var faceWeightIndices = [];
 
-		vertexIndices.forEach( function ( vertexIndex, polygonVertexIndex ) {
+		geoInfo.vertexIndices.forEach( function ( vertexIndex, polygonVertexIndex ) {
 
 			var endOfFace = false;
 
@@ -947,7 +1062,7 @@
 			//  a: 0, 1, 3, -3, 2, 3, 5, -5, 4, 5, 7, -7, 6, 7, 1, -1, 1, 7, 5, -4, 6, 0, 2, -5
 			//  }
 			// Negative numbers mark the end of a face - first face here is 0, 1, 3, -3
-			// to find index of last vertex multiply by -1 and subtract 1: -3 * - 1 - 1 = 2
+			// to find index of last vertex bit shift the index: ^ - 1
 			if ( vertexIndex < 0 ) {
 
 				vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
@@ -958,21 +1073,21 @@
 			var weightIndices = [];
 			var weights = [];
 
-			vertexPositionIndexes.push( vertexIndex * 3, vertexIndex * 3 + 1, vertexIndex * 3 + 2 );
+			facePositionIndexes.push( vertexIndex * 3, vertexIndex * 3 + 1, vertexIndex * 3 + 2 );
 
-			if ( colorInfo ) {
+			if ( geoInfo.color ) {
 
-				var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, colorInfo );
+				var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.color );
 
 				faceColors.push( data[ 0 ], data[ 1 ], data[ 2 ] );
 
 			}
 
-			if ( skeleton ) {
+			if ( geoInfo.skeleton ) {
 
-				if ( weightTable[ vertexIndex ] !== undefined ) {
+				if ( geoInfo.weightTable[ vertexIndex ] !== undefined ) {
 
-					weightTable[ vertexIndex ].forEach( function ( wt ) {
+					geoInfo.weightTable[ vertexIndex ].forEach( function ( wt ) {
 
 						weights.push( wt.weight );
 						weightIndices.push( wt.id );
@@ -1038,23 +1153,23 @@
 
 			}
 
-			if ( normalInfo ) {
+			if ( geoInfo.normal ) {
 
-				var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, normalInfo );
+				var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.normal );
 
 				faceNormals.push( data[ 0 ], data[ 1 ], data[ 2 ] );
 
 			}
 
-			if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
+			if ( geoInfo.material && geoInfo.material.mappingType !== 'AllSame' ) {
 
-				var materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, materialInfo )[ 0 ];
+				var materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.material )[ 0 ];
 
 			}
 
-			if ( uvInfo ) {
+			if ( geoInfo.uv ) {
 
-				uvInfo.forEach( function ( uv, i ) {
+				geoInfo.uv.forEach( function ( uv, i ) {
 
 					var data = getData( polygonVertexIndex, polygonIndex, vertexIndex, uv );
 
@@ -1073,124 +1188,15 @@
 
 			faceLength ++;
 
-			// we have reached the end of a face - it may have 4 sides though
-			// in which case the data is split to represent two 3 sided faces
 			if ( endOfFace ) {
 
-				for ( var i = 2; i < faceLength; i ++ ) {
-
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 0 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 1 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 2 ] ] );
-
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 1 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 2 ] ] );
-
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ] );
-
-					if ( skeleton ) {
-
-						vertexWeightsBuffer.push( faceWeights[ 0 ] );
-						vertexWeightsBuffer.push( faceWeights[ 1 ] );
-						vertexWeightsBuffer.push( faceWeights[ 2 ] );
-						vertexWeightsBuffer.push( faceWeights[ 3 ] );
-
-						vertexWeightsBuffer.push( faceWeights[ ( i - 1 ) * 4 ] );
-						vertexWeightsBuffer.push( faceWeights[ ( i - 1 ) * 4 + 1 ] );
-						vertexWeightsBuffer.push( faceWeights[ ( i - 1 ) * 4 + 2 ] );
-						vertexWeightsBuffer.push( faceWeights[ ( i - 1 ) * 4 + 3 ] );
-
-						vertexWeightsBuffer.push( faceWeights[ i * 4 ] );
-						vertexWeightsBuffer.push( faceWeights[ i * 4 + 1 ] );
-						vertexWeightsBuffer.push( faceWeights[ i * 4 + 2 ] );
-						vertexWeightsBuffer.push( faceWeights[ i * 4 + 3 ] );
-
-						weightsIndicesBuffer.push( faceWeightIndices[ 0 ] );
-						weightsIndicesBuffer.push( faceWeightIndices[ 1 ] );
-						weightsIndicesBuffer.push( faceWeightIndices[ 2 ] );
-						weightsIndicesBuffer.push( faceWeightIndices[ 3 ] );
-
-						weightsIndicesBuffer.push( faceWeightIndices[ ( i - 1 ) * 4 ] );
-						weightsIndicesBuffer.push( faceWeightIndices[ ( i - 1 ) * 4 + 1 ] );
-						weightsIndicesBuffer.push( faceWeightIndices[ ( i - 1 ) * 4 + 2 ] );
-						weightsIndicesBuffer.push( faceWeightIndices[ ( i - 1 ) * 4 + 3 ] );
-
-						weightsIndicesBuffer.push( faceWeightIndices[ i * 4 ] );
-						weightsIndicesBuffer.push( faceWeightIndices[ i * 4 + 1 ] );
-						weightsIndicesBuffer.push( faceWeightIndices[ i * 4 + 2 ] );
-						weightsIndicesBuffer.push( faceWeightIndices[ i * 4 + 3 ] );
-
-					}
-
-					if ( colorInfo ) {
-
-						colorsBuffer.push( faceColors[ 0 ] );
-						colorsBuffer.push( faceColors[ 1 ] );
-						colorsBuffer.push( faceColors[ 2 ] );
-
-						colorsBuffer.push( faceColors[ ( i - 1 ) * 3 ] );
-						colorsBuffer.push( faceColors[ ( i - 1 ) * 3 + 1 ] );
-						colorsBuffer.push( faceColors[ ( i - 1 ) * 3 + 2 ] );
-
-						colorsBuffer.push( faceColors[ i * 3 ] );
-						colorsBuffer.push( faceColors[ i * 3 + 1 ] );
-						colorsBuffer.push( faceColors[ i * 3 + 2 ] );
-
-					}
-
-					if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
-
-						materialIndexBuffer.push( materialIndex );
-						materialIndexBuffer.push( materialIndex );
-						materialIndexBuffer.push( materialIndex );
-
-					}
-
-					if ( normalInfo ) {
-
-						normalBuffer.push( faceNormals[ 0 ] );
-						normalBuffer.push( faceNormals[ 1 ] );
-						normalBuffer.push( faceNormals[ 2 ] );
-
-						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 ] );
-						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 + 1 ] );
-						normalBuffer.push( faceNormals[ ( i - 1 ) * 3 + 2 ] );
-
-						normalBuffer.push( faceNormals[ i * 3 ] );
-						normalBuffer.push( faceNormals[ i * 3 + 1 ] );
-						normalBuffer.push( faceNormals[ i * 3 + 2 ] );
-
-					}
-
-					if ( uvInfo ) {
-
-						uvInfo.forEach( function ( uv, j ) {
-
-							if ( uvsBuffer[ j ] === undefined ) uvsBuffer[ j ] = [];
-
-							uvsBuffer[ j ].push( faceUVs[ j ][ 0 ] );
-							uvsBuffer[ j ].push( faceUVs[ j ][ 1 ] );
-
-							uvsBuffer[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 ] );
-							uvsBuffer[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 + 1 ] );
-
-							uvsBuffer[ j ].push( faceUVs[ j ][ i * 2 ] );
-							uvsBuffer[ j ].push( faceUVs[ j ][ i * 2 + 1 ] );
-
-						} );
-
-					}
-
-				}
+				genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
 
 				polygonIndex ++;
 				faceLength = 0;
 
 				// reset arrays for the next face
-				vertexPositionIndexes = [];
+				facePositionIndexes = [];
 				faceNormals = [];
 				faceColors = [];
 				faceUVs = [];
@@ -1201,102 +1207,121 @@
 
 		} );
 
-		var positionAttribute = new THREE.Float32BufferAttribute( vertexBuffer, 3 );
+		return buffers;
 
-		preTransform.applyToBufferAttribute( positionAttribute );
+	}
 
-		geo.addAttribute( 'position', positionAttribute );
+	// Generate data for a single face in a geometry. If the face is a quad then split it into 2 tris
+	function genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength ) {
 
-		if ( colorsBuffer.length > 0 ) {
+		for ( var i = 2; i < faceLength; i ++ ) {
 
-			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsBuffer, 3 ) );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ 0 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ 1 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ 2 ] ] );
 
-		}
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ ( i - 1 ) * 3 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ ( i - 1 ) * 3 + 1 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ ( i - 1 ) * 3 + 2 ] ] );
 
-		if ( skeleton ) {
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i * 3 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i * 3 + 1 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i * 3 + 2 ] ] );
 
-			geo.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( weightsIndicesBuffer, 4 ) );
+			if ( geoInfo.skeleton ) {
 
-			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( vertexWeightsBuffer, 4 ) );
+				buffers.vertexWeights.push( faceWeights[ 0 ] );
+				buffers.vertexWeights.push( faceWeights[ 1 ] );
+				buffers.vertexWeights.push( faceWeights[ 2 ] );
+				buffers.vertexWeights.push( faceWeights[ 3 ] );
 
-			// used later to bind the skeleton to the model
-			geo.FBX_Deformer = skeleton;
+				buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 ] );
+				buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 + 1 ] );
+				buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 + 2 ] );
+				buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 + 3 ] );
 
-		}
+				buffers.vertexWeights.push( faceWeights[ i * 4 ] );
+				buffers.vertexWeights.push( faceWeights[ i * 4 + 1 ] );
+				buffers.vertexWeights.push( faceWeights[ i * 4 + 2 ] );
+				buffers.vertexWeights.push( faceWeights[ i * 4 + 3 ] );
 
-		if ( normalBuffer.length > 0 ) {
+				buffers.weightsIndices.push( faceWeightIndices[ 0 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ 1 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ 2 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ 3 ] );
 
-			var normalAttribute = new THREE.Float32BufferAttribute( normalBuffer, 3 );
+				buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 + 1 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 + 2 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 + 3 ] );
 
-			var normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
-			normalMatrix.applyToBufferAttribute( normalAttribute );
-
-			geo.addAttribute( 'normal', normalAttribute );
-
-		}
-
-		uvsBuffer.forEach( function ( uvBuffer, i ) {
-
-			// subsequent uv buffers are called 'uv1', 'uv2', ...
-			var name = 'uv' + ( i + 1 ).toString();
-
-			// the first uv buffer is just called 'uv'
-			if ( i === 0 ) {
-
-				name = 'uv';
-
-			}
-
-			geo.addAttribute( name, new THREE.Float32BufferAttribute( uvsBuffer[ i ], 2 ) );
-
-		} );
-
-		if ( materialInfo && materialInfo.mappingType !== 'AllSame' ) {
-
-			// Convert the material indices of each vertex into rendering groups on the geometry.
-			var prevMaterialIndex = materialIndexBuffer[ 0 ];
-			var startIndex = 0;
-
-			materialIndexBuffer.forEach( function ( currentIndex, i ) {
-
-				if ( currentIndex !== prevMaterialIndex ) {
-
-					geo.addGroup( startIndex, i - startIndex, prevMaterialIndex );
-
-					prevMaterialIndex = currentIndex;
-					startIndex = i;
-
-				}
-
-			} );
-
-			// the loop above doesn't add the last group, do that here.
-			if ( geo.groups.length > 0 ) {
-
-				var lastGroup = geo.groups[ geo.groups.length - 1 ];
-				var lastIndex = lastGroup.start + lastGroup.count;
-
-				if ( lastIndex !== materialIndexBuffer.length ) {
-
-					geo.addGroup( lastIndex, materialIndexBuffer.length - lastIndex, prevMaterialIndex );
-
-				}
+				buffers.weightsIndices.push( faceWeightIndices[ i * 4 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i * 4 + 1 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i * 4 + 2 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i * 4 + 3 ] );
 
 			}
 
-			// case where there are multiple materials but the whole geometry is only
-			// using one of them
-			if ( geo.groups.length === 0 ) {
+			if ( geoInfo.color ) {
 
-				geo.addGroup( 0, materialIndexBuffer.length, materialIndexBuffer[ 0 ] );
+				buffers.colors.push( faceColors[ 0 ] );
+				buffers.colors.push( faceColors[ 1 ] );
+				buffers.colors.push( faceColors[ 2 ] );
+
+				buffers.colors.push( faceColors[ ( i - 1 ) * 3 ] );
+				buffers.colors.push( faceColors[ ( i - 1 ) * 3 + 1 ] );
+				buffers.colors.push( faceColors[ ( i - 1 ) * 3 + 2 ] );
+
+				buffers.colors.push( faceColors[ i * 3 ] );
+				buffers.colors.push( faceColors[ i * 3 + 1 ] );
+				buffers.colors.push( faceColors[ i * 3 + 2 ] );
+
+			}
+
+			if ( geoInfo.material && geoInfo.material.mappingType !== 'AllSame' ) {
+
+				buffers.materialIndex.push( materialIndex );
+				buffers.materialIndex.push( materialIndex );
+				buffers.materialIndex.push( materialIndex );
+
+			}
+
+			if ( geoInfo.normal ) {
+
+				buffers.normal.push( faceNormals[ 0 ] );
+				buffers.normal.push( faceNormals[ 1 ] );
+				buffers.normal.push( faceNormals[ 2 ] );
+
+				buffers.normal.push( faceNormals[ ( i - 1 ) * 3 ] );
+				buffers.normal.push( faceNormals[ ( i - 1 ) * 3 + 1 ] );
+				buffers.normal.push( faceNormals[ ( i - 1 ) * 3 + 2 ] );
+
+				buffers.normal.push( faceNormals[ i * 3 ] );
+				buffers.normal.push( faceNormals[ i * 3 + 1 ] );
+				buffers.normal.push( faceNormals[ i * 3 + 2 ] );
+
+			}
+
+			if ( geoInfo.uv ) {
+
+				geoInfo.uv.forEach( function ( uv, j ) {
+
+					if ( buffers.uvs[ j ] === undefined ) buffers.uvs[ j ] = [];
+
+					buffers.uvs[ j ].push( faceUVs[ j ][ 0 ] );
+					buffers.uvs[ j ].push( faceUVs[ j ][ 1 ] );
+
+					buffers.uvs[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 ] );
+					buffers.uvs[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 + 1 ] );
+
+					buffers.uvs[ j ].push( faceUVs[ j ][ i * 2 ] );
+					buffers.uvs[ j ].push( faceUVs[ j ][ i * 2 + 1 ] );
+
+				} );
 
 			}
 
 		}
-
-		addMorphTargets( FBXTree, geo, geoNode, morphTarget, preTransform );
-
-		return geo;
 
 	}
 
@@ -1342,63 +1367,27 @@
 
 			var morphIndex = indices[ i ] * 3;
 
-			// since this is a blend shape rather than a morph target, the effect is
-			// gained by additively combining the morph positions with the original shape's positions
+			// FBX format uses blend shapes rather than morph targets. This can be converted
+			// by additively combining the blend shape positions with the original geometry's positions
 			vertexPositions[ morphIndex ] += morphPositions[ i * 3 ];
 			vertexPositions[ morphIndex + 1 ] += morphPositions[ i * 3 + 1 ];
 			vertexPositions[ morphIndex + 2 ] += morphPositions[ i * 3 + 2 ];
 
 		}
 
-		var vertexBuffer = [];
+		// TODO: add morph normal support
+		var morphGeoInfo = {
+			vertexIndices: vertexIndices,
+			vertexPositions: vertexPositions,
+		};
 
-		var faceLength = 0;
-		var vertexPositionIndexes = [];
+		var morphBuffers = genBuffers( morphGeoInfo );
 
-		vertexIndices.forEach( function ( vertexIndex ) {
-
-			var endOfFace = false;
-
-			if ( vertexIndex < 0 ) {
-
-				vertexIndex = vertexIndex ^ - 1;
-				endOfFace = true;
-
-			}
-
-			vertexPositionIndexes.push( vertexIndex * 3, vertexIndex * 3 + 1, vertexIndex * 3 + 2 );
-
-			faceLength ++;
-
-			if ( endOfFace ) {
-
-				for ( var i = 2; i < faceLength; i ++ ) {
-
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 0 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 1 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ 2 ] ] );
-
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 1 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ ( i - 1 ) * 3 + 2 ] ] );
-
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 1 ] ] );
-					vertexBuffer.push( vertexPositions[ vertexPositionIndexes[ i * 3 + 2 ] ] );
-
-				}
-
-				faceLength = 0;
-				vertexPositionIndexes = [];
-
-			}
-
-		} );
-
-		var positionAttribute = new THREE.Float32BufferAttribute( vertexBuffer, 3 );
+		var positionAttribute = new THREE.Float32BufferAttribute( morphBuffers.vertex, 3 );
 		positionAttribute.name = morphGeoNode.attrName;
 
 		preTransform.applyToBufferAttribute( positionAttribute );
+
 		parentGeo.morphAttributes.position.push( positionAttribute );
 
 	}
