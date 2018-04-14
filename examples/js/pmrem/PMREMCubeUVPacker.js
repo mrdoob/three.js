@@ -13,10 +13,9 @@
  * The arrangement of the faces is fixed, as assuming this arrangement, the sampling function has been written.
  */
 
-THREE.PMREMCubeUVPacker = function ( cubeTextureLods, numLods ) {
+THREE.PMREMCubeUVPacker = function ( cubeTextureLods ) {
 
 	this.cubeLods = cubeTextureLods;
-	this.numLods = numLods;
 	var size = cubeTextureLods[ 0 ].width * 4;
 
 	var sourceTexture = cubeTextureLods[ 0 ].texture;
@@ -189,7 +188,21 @@ THREE.PMREMCubeUVPacker.prototype = {
 
 		} );
 
+		shaderMaterial.type = 'PMREMCubeUVPacker';
+
 		return shaderMaterial;
+
+	},
+
+	dispose: function () {
+
+		for ( var i = 0, l = this.objects.length; i < l; i ++ ) {
+
+			this.objects[ i ].material.dispose();
+
+		}
+
+		this.objects[ 0 ].geometry.dispose();
 
 	}
 

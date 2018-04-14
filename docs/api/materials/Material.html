@@ -41,7 +41,7 @@
 		<p>
 		Blending destination. Default is [page:CustomBlendingEquation OneMinusSrcAlphaFactor].
 		See the destination factors [page:CustomBlendingEquation constants] for all possible values.<br />
-		The material's [property:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
+		The material's [page:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
 		</p>
 
 		<h3>[property:Integer blendDstAlpha]</h3>
@@ -51,7 +51,7 @@
 		<p>
 		Blending equation to use when applying blending. Default is [page:CustomBlendingEquation AddEquation].
 		See the blending equation [page:CustomBlendingEquation constants] for all possible values.<br />
-		The material's [property:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
+		The material's [page:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
 		</p>
 
 		<h3>[property:Integer blendEquationAlpha]</h3>
@@ -60,7 +60,7 @@
 		<h3>[property:Blending blending]</h3>
 		<p>
 		Which blending to use when displaying objects with this material. <br />
-		This must be set to [page:Materials CustomBlending] to use custom [property:Constant blendSrc], [property:Constant blendDst] or [property:Constant blendEquation].<br />
+		This must be set to [page:Materials CustomBlending] to use custom [page:Constant blendSrc], [page:Constant blendDst] or [page:Constant blendEquation].<br />
 		See the blending mode [page:Materials constants] for all possible values. Default is [page:Materials NormalBlending].
 		</p>
 
@@ -68,7 +68,7 @@
 		<p>
 		Blending source. Default is [page:CustomBlendingEquation SrcAlphaFactor].
 		See the source factors [page:CustomBlendingEquation constants] for all possible values.<br />
-		The material's [property:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
+		The material's [page:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
 		</p>
 
 		<h3>[property:Integer blendSrcAlpha]</h3>
@@ -98,7 +98,7 @@
 		<h3>[property:Boolean colorWrite]</h3>
 		<p>
 		Whether to render the material's color.
-		This can be used in conjunction with a mesh's [property:Integer renderOrder] property to create invisible objects that occlude other objects. Default is *true*.
+		This can be used in conjunction with a mesh's [page:Integer renderOrder] property to create invisible objects that occlude other objects. Default is *true*.
 		</p>
 
 		<h3>[property:Material customDepthMaterial]</h3>
@@ -171,7 +171,7 @@
 		<p>
 		Float in the range of *0.0* - *1.0* indicating how transparent the material is.
 		A value of *0.0* indicates fully transparent, *1.0* is fully opaque.<br />
-		If the material's [property:Boolean transparent] property is not set to *true*, the material will remain
+		If the material's [page:Boolean transparent] property is not set to *true*, the material will remain
 		fully opaque and this value will only affect its color. <br />
 		Default is *1.0*.
 		</p>
@@ -259,7 +259,7 @@
 		as transparent objects need special treatment and are rendered after
 		non-transparent objects. <br />
 		When set to true, the extent to which the material is transparent is
-		controlled by setting it's [property:Float opacity] property. <br />
+		controlled by setting it's [page:Float opacity] property. <br />
 		Default is *false*.
 		</p>
 

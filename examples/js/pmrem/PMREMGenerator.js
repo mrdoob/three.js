@@ -138,7 +138,7 @@ THREE.PMREMGenerator.prototype = {
 
 	getShader: function () {
 
-		return new THREE.ShaderMaterial( {
+		var shaderMaterial = new THREE.ShaderMaterial( {
 
 			defines: {
 				"SAMPLES_PER_LEVEL": 20,
@@ -268,6 +268,23 @@ THREE.PMREMGenerator.prototype = {
 			blendEquation: THREE.AddEquation
 
 		} );
+
+		shaderMaterial.type = 'PMREMGenerator';
+
+		return shaderMaterial;
+
+	},
+
+	dispose: function () {
+
+		for ( var i = 0, l = this.cubeLods.length; i < l; i ++ ) {
+
+			this.cubeLods[ i ].dispose();
+
+		}
+
+		this.planeMesh.geometry.dispose();
+		this.planeMesh.material.dispose();
 
 	}
 

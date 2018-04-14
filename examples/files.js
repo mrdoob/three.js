@@ -227,6 +227,7 @@ var files = {
 		"webgl_postprocessing_fxaa",
 		"webgl_postprocessing_glitch",
 		"webgl_postprocessing_godrays",
+		"webgl_postprocessing_rgb_halftone",
 		"webgl_postprocessing_masking",
 		"webgl_postprocessing_ssaa",
 		"webgl_postprocessing_ssaa_unbiased",
@@ -347,6 +348,7 @@ var files = {
 	],
 	"css3d": [
 		"css3d_molecules",
+		"css3d_orthographic",
 		"css3d_panorama",
 		"css3d_panorama_deviceorientation",
 		"css3d_periodictable",

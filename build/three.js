@@ -10384,6 +10384,7 @@
 
 		copy: function ( source ) {
 
+			this.name = source.name;
 			this.array = new source.array.constructor( source.array );
 			this.itemSize = source.itemSize;
 			this.count = source.count;
@@ -16756,6 +16757,7 @@
 
 		//
 
+		this.name = shader.name;
 		this.id = programIdCount ++;
 		this.code = code;
 		this.usedTimes = 1;
