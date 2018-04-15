@@ -243,7 +243,7 @@ THREE.GLTFLoader = ( function () {
 	 */
 	function GLTFTextureDDSExtension() {
 
-		if (!THREE.DDSLoader) {
+		if ( ! THREE.DDSLoader ) {
 
 			throw new Error( 'THREE.GLTFLoader: Attempting to load .dds texture without importing THREE.DDSLoader' );
 
@@ -1906,6 +1906,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( textureDef.name !== undefined ) texture.name = textureDef.name;
 
+			// .format of dds texture is set in DDSLoader
 			if ( ! textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] ) {
 
 				texture.format = textureDef.format !== undefined ? WEBGL_TEXTURE_FORMATS[ textureDef.format ] : THREE.RGBAFormat;
