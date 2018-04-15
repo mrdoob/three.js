@@ -4,29 +4,21 @@
  * @author Lewy Blue https://github.com/looeee
  *
  * Loader loads FBX file and generates Group representing FBX scene.
- * Requires FBX file to be >= 7.0 and in ASCII or to be any version in Binary format.
- *
- * Supports:
- * 	Mesh Generation (Positional Data)
- * 	Normal Data (Per Vertex Drawing Instance)
- *	UV Data (Per Vertex Drawing Instance)
- *	Skinning
- *	Animation
- * 	- Separated Animations based on stacks.
- * 	- Skeletal & Non-Skeletal Animations
- *	NURBS (Open, Closed and Periodic forms)
+ * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
+ * Versions lower than this may load but will probably have errors
  *
  * Needs Support:
+ *  Morph targets / blend shapes
  *	Euler rotation order
- *
  *
  * FBX format references:
  * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
+ * 	http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
  *
  * 	Binary format specification:
  *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
- *		https://wiki.rogiken.org/specifications/file-format/fbx/ (more detail but Japanese)
  */
+
 
 ( function () {
 
@@ -245,7 +237,27 @@
 
 				type = 'image/tiff';
 				break;
+				
+ 			case 'tga':
+			
+				if ( typeof THREE.TGALoader !== 'function' ) {
+					
+					console.warn( 'FBXLoader: THREE.TGALoader is required to load TGA textures' );
+					return;
 
+				} else {
+					
+					if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
+
+						THREE.Loader.Handlers.add( /\.tga$/i, new THREE.TGALoader() );
+
+					}
+					
+					type = 'image/tga';
+					break;
+
+				}
+				
 			default:
 
 				console.warn( 'FBXLoader: Image type "' + extension + '" is not supported.' );
@@ -344,8 +356,18 @@
 
 		}
 
-		var texture = loader.load( fileName );
-
+		var texture;
+	
+		if ( textureNode.FileName.slice( -3 ).toLowerCase() === 'tga' ) {
+			
+ 			texture = THREE.Loader.Handlers.get( '.tga' ).load( fileName );
+			
+ 		} else {
+			
+ 			texture = loader.load( fileName );
+			
+ 		}
+		
 		loader.setPath( currentPath );
 
 		return texture;
@@ -747,8 +769,8 @@
 	// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
 	function genGeometry( FBXTree, relationships, geometryNode, skeleton, preTransform ) {
 
-		var vertexPositions = geometryNode.Vertices.a;
-		var vertexIndices = geometryNode.PolygonVertexIndex.a;
+		var vertexPositions = ( geometryNode.Vertices !== undefined ) ? geometryNode.Vertices.a : [];
+		var vertexIndices = ( geometryNode.PolygonVertexIndex !== undefined ) ? geometryNode.PolygonVertexIndex.a : [];
 
 		// create arrays to hold the final data used to build the buffergeometry
 		var vertexBuffer = [];

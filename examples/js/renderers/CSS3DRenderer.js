@@ -1,6 +1,7 @@
 /**
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  * @author mrdoob / http://mrdoob.com/
+ * @author yomotsu / https://yomotsu.net/
  */
 
 THREE.CSS3DObject = function ( element ) {
@@ -58,7 +59,6 @@ THREE.CSS3DRenderer = function () {
 	var cameraElement = document.createElement( 'div' );
 
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
-	cameraElement.style.MozTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
 
 	domElement.appendChild( cameraElement );
@@ -189,7 +189,6 @@ THREE.CSS3DRenderer = function () {
 			if ( cachedStyle === undefined || cachedStyle !== style ) {
 
 				element.style.WebkitTransform = style;
-				element.style.MozTransform = style;
 				element.style.transform = style;
 
 				cache.objects[ object.id ] = { style: style };
@@ -263,9 +262,12 @@ THREE.CSS3DRenderer = function () {
 
 		if ( cache.camera.fov !== fov ) {
 
-			domElement.style.WebkitPerspective = fov + 'px';
-			domElement.style.MozPerspective = fov + 'px';
-			domElement.style.perspective = fov + 'px';
+			if ( camera.isPerspectiveCamera ) {
+
+				domElement.style.WebkitPerspective = fov + 'px';
+				domElement.style.perspective = fov + 'px';
+
+			}
 
 			cache.camera.fov = fov;
 
@@ -275,8 +277,9 @@ THREE.CSS3DRenderer = function () {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		var cameraCSSMatrix = 'translateZ(' + fov + 'px)' +
-			getCameraCSSMatrix( camera.matrixWorldInverse );
+		var cameraCSSMatrix = camera.isOrthographicCamera ?
+			'scale(' + fov + ')' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
+			'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
 		var style = cameraCSSMatrix +
 			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
@@ -284,7 +287,6 @@ THREE.CSS3DRenderer = function () {
 		if ( cache.camera.style !== style && ! isIE ) {
 
 			cameraElement.style.WebkitTransform = style;
-			cameraElement.style.MozTransform = style;
 			cameraElement.style.transform = style;
 
 			cache.camera.style = style;
