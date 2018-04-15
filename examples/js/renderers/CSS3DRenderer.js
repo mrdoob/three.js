@@ -185,8 +185,9 @@ THREE.CSS3DRenderer = function () {
 
 			var element = object.element;
 			var cachedStyle = cache.objects[ object.id ] && cache.objects[ object.id ].style;
+			var firstTime = cachedStyle === undefined;
 
-			if ( cachedStyle === undefined || cachedStyle !== style ) {
+			if ( firstTime || cachedStyle !== style ) {
 
 				element.style.WebkitTransform = style;
 				element.style.transform = style;
@@ -198,6 +199,16 @@ THREE.CSS3DRenderer = function () {
 					cache.objects[ object.id ].distanceToCameraSquared = getDistanceToSquared( camera, object );
 
 				}
+
+			}
+
+			if ( firstTime ) {
+
+				object.addEventListener( 'removed', function () {
+
+					delete cache.objects[ object.id ];
+
+				} );
 
 			}
 
