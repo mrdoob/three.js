@@ -2692,7 +2692,7 @@
 			var initialValue = curve.values[ i - 1 ];
 			var valuesSpan = curve.values[ i ] - initialValue;
 
-			if ( valuesSpan > 179 ) {
+			if ( valuesSpan >= 180 ) {
 
 				var numSubIntervals = Math.abs( valuesSpan / 180 );
 
