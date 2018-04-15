@@ -795,10 +795,13 @@ Object.assign( ObjectLoader.prototype, {
 		object.uuid = data.uuid;
 
 		if ( data.name !== undefined ) object.name = data.name;
+
 		if ( data.matrix !== undefined ) {
 
 			object.matrix.fromArray( data.matrix );
-			object.matrix.decompose( object.position, object.quaternion, object.scale );
+
+			if ( data.matrixAutoUpdate !== undefined ) object.matrixAutoUpdate = data.matrixAutoUpdate;
+			if ( object.matrixAutoUpdate ) object.matrix.decompose( object.position, object.quaternion, object.scale );
 
 		} else {
 
