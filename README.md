@@ -5,6 +5,7 @@ three.js
 [![License][license-badge]][license-badge-url]
 [![Dependencies][dependencies-badge]][dependencies-badge-url]
 [![Dev Dependencies][devDependencies-badge]][devDependencies-badge-url]
+[![Build Status](https://travis-ci.org/mrdoob/three.js.svg?branch=dev)](https://travis-ci.org/mrdoob/three.js)
 
 #### JavaScript 3D library ####
 

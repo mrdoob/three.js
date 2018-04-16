@@ -53,6 +53,7 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/DRACOLoader.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
@@ -71,7 +72,7 @@
 					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
 					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
 					addLights: true,
-					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary' ],
+					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds' ],
 					addEnvMap: true
 				},
 				'Bot Skinned': {
@@ -122,7 +123,7 @@
 					addLights: true,
 					shadows: true,
 					addGround: true,
-					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco' ]
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco', 'glTF-lights' ]
 				},
 				'Cesium Man': {
 					name: 'Cesium Man',
@@ -202,14 +203,13 @@
 					var ambient = new THREE.AmbientLight( 0x222222 );
 					scene.add( ambient );
 
-					var directionalLight = new THREE.DirectionalLight( 0xdddddd );
+					var directionalLight = new THREE.DirectionalLight( 0xdddddd, 4 );
 					directionalLight.position.set( 0, 0, 1 ).normalize();
 					scene.add( directionalLight );
 
 					spot1 = new THREE.SpotLight( 0xffffff, 1 );
 					spot1.position.set( 10, 20, 10 );
 					spot1.angle = 0.25;
-					spot1.distance = 1024;
 					spot1.penumbra = 0.75;
 
 					if ( sceneInfo.shadows ) {
@@ -232,6 +232,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
+				renderer.physicallyCorrectLights = true;
 
 				if ( sceneInfo.shadows ) {
 
@@ -348,7 +349,7 @@
 
 					object.traverse( function ( node ) {
 
-						if ( node.isMesh ) node.castShadow = true;
+						if ( node.isMesh || node.isLight ) node.castShadow = true;
 
 					} );
 

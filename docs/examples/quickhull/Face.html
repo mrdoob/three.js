@@ -10,54 +10,54 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			Represents a section bounded by a specific amount of half-edges. The current implmentation assumes that a face always consist of three edges.
-		</div>
+		</p>
 
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]()</h3>
-
-		</div>
+		<p>
+		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Vector3 normal]</h3>
-		<div>
+		<p>
 			The normal vector of the face. Default is a [page:Vector3] at (0, 0, 0).
-		</div>
+		</p>
 
 		<h3>[property:Vector3 midpoint]</h3>
-		<div>
+		<p>
 			The midpoint or centroid of the face. Default is a [page:Vector3] at (0, 0, 0).
-		</div>
+		</p>
 
 		<h3>[property:Float area]</h3>
-		<div>
+		<p>
 			The area of the face. Default is 0.
-		</div>
+		</p>
 
 		<h3>[property:Float constant]</h3>
-		<div>
+		<p>
 			Signed distance from face to the origin. Default is 0.
-		</div>
+		</p>
 
 		<h3>[property:VertexNode outside]</h3>
-		<div>
+		<p>
 			Reference to a vertex in a vertex list this face can see. Default is null.
-		</div>
+		</p>
 
 		<h3>[property:Integer mark]</h3>
-		<div>
+		<p>
 			Marks if a face is visible or deleted. Default is 'Visible'.
-		</div>
+		</p>
 
 		<h3>[property:HalfEdge edge]</h3>
-		<div>
+		<p>
 			Reference to the base edge of a face. To retrieve all edges, you can use the 'next' reference of the current edge. Default is null.
-		</div>
+		</p>
 
 		<h2>Methods</h2>
 
@@ -66,21 +66,21 @@
 		[page:VertexNode b] - Second vertex of the face.<br /><br />
 		[page:VertexNode c] - Third vertex of the face.<br /><br />
 
-		<div>Creates a face.</div>
+		<p>Creates a face.</p>
 
 		<h3>[method:HalfEdge getEdge]( [param:Integer i] )</h3>
 		[page:Integer i] - The index of the edge.<br /><br />
 
-		<div>Returns an edge by the given index.</div>
+		<p>Returns an edge by the given index.</p>
 
 		<h3>[method:Face compute] ()</h3>
 
-		<div>Computes all properties of the face.</div>
+		<p>Computes all properties of the face.</p>
 
 		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
 		[page:Vector3 point] - Any point in 3D space.<br /><br />
 
-		<div>Returns the signed distance from a given point to the plane representation of this face.</div>
+		<p>Returns the signed distance from a given point to the plane representation of this face.</p>
 
 		<h2>Source</h2>
 
