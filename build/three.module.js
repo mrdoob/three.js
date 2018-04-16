@@ -8446,6 +8446,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		object.matrix = this.matrix.toArray();
 
+		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
+
 		//
 
 		function serialize( library, element ) {
@@ -10365,6 +10367,8 @@ Object.assign( BufferAttribute.prototype, {
 
 		this.count = array !== undefined ? array.length / this.itemSize : 0;
 		this.array = array;
+
+		return this;
 
 	},
 
@@ -37415,10 +37419,13 @@ Object.assign( ObjectLoader.prototype, {
 		object.uuid = data.uuid;
 
 		if ( data.name !== undefined ) object.name = data.name;
+
 		if ( data.matrix !== undefined ) {
 
 			object.matrix.fromArray( data.matrix );
-			object.matrix.decompose( object.position, object.quaternion, object.scale );
+
+			if ( data.matrixAutoUpdate !== undefined ) object.matrixAutoUpdate = data.matrixAutoUpdate;
+			if ( object.matrixAutoUpdate ) object.matrix.decompose( object.position, object.quaternion, object.scale );
 
 		} else {
 
@@ -41864,6 +41871,8 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		this.count = array !== undefined ? array.length / this.stride : 0;
 		this.array = array;
+
+		return this;
 
 	},
 
