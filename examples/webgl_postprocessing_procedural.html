@@ -87,7 +87,7 @@
 			var camera, postScene, renderer, postMaterial, noiseRandom1DMaterial, noiseRandon2DMaterial, noiseRandom3DMaterial, postQuad;
 			var gui, stats, texture;
 
-			var params = { procedure: "noiseRandom3D" };
+			var params = { procedure: 'noiseRandom3D' };
 
 			init();
 			animate();
@@ -114,22 +114,22 @@
 				container.appendChild( stats.dom );
 
 				// Setup post processing stage
-				postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 				noiseRandom1DMaterial = new THREE.ShaderMaterial({
-					vertexShader: document.querySelector('#procedural-vert').textContent.trim(),
-					fragmentShader: document.querySelector('#noiseRandom1D-frag').textContent.trim()
+					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
+					fragmentShader: document.querySelector( '#noiseRandom1D-frag' ).textContent.trim()
 				});
 				noiseRandom2DMaterial = new THREE.ShaderMaterial({
-					vertexShader: document.querySelector('#procedural-vert').textContent.trim(),
-					fragmentShader: document.querySelector('#noiseRandom2D-frag').textContent.trim()
+					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
+					fragmentShader: document.querySelector( '#noiseRandom2D-frag' ).textContent.trim()
 				});
 				noiseRandom3DMaterial = new THREE.ShaderMaterial({
-					vertexShader: document.querySelector('#procedural-vert').textContent.trim(),
-					fragmentShader: document.querySelector('#noiseRandom3D-frag').textContent.trim()
+					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
+					fragmentShader: document.querySelector( '#noiseRandom3D-frag' ).textContent.trim()
 				});
 				postMaterial = noiseRandom3DMaterial;
-				var postPlane = new THREE.PlaneGeometry(2, 2);
-				postQuad = new THREE.Mesh(postPlane, postMaterial);
+				var postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
+				postQuad = new THREE.Mesh( postPlane, postMaterial );
 				postScene = new THREE.Scene();
 				postScene.add(postQuad);
 
