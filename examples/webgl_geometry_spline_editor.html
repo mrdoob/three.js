@@ -57,13 +57,13 @@
 			var splineHelperObjects = [], splineOutline;
 			var splinePointsLength = 4;
 			var positions = [];
+			var point = new THREE.Vector3();
 			var options;
 
-			var geometry = new THREE.BoxGeometry( 20, 20, 20 );
+			var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 			var transformControl;
 
 			var ARC_SEGMENTS = 200;
-			var splineMesh;
 
 			var splines = {};
 
@@ -102,7 +102,7 @@
 				scene.add( light );
 				spotlight = light;
 
-				var planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
+				var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
 				var planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
 
@@ -230,7 +230,6 @@
 
 				}
 
-
 				/*******
 				 * Curves
 				 *********/
@@ -249,13 +248,8 @@
 
 				}
 
-				var geometry = new THREE.Geometry();
-
-				for ( var i = 0; i < ARC_SEGMENTS; i ++ ) {
-
-					geometry.vertices.push( new THREE.Vector3() );
-
-				}
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( ARC_SEGMENTS * 3 ), 3 ) );
 
 				var curve = new THREE.CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
@@ -357,17 +351,18 @@
 
 					var spline = splines[ k ];
 
-					splineMesh = spline.mesh;
+					var splineMesh = spline.mesh;
+					var position = splineMesh.geometry.attributes.position;
 
 					for ( var i = 0; i < ARC_SEGMENTS; i ++ ) {
 
-						var p = splineMesh.geometry.vertices[ i ];
 						var t = i /  ( ARC_SEGMENTS - 1 );
-						spline.getPoint( t, p );
+						spline.getPoint( t, point );
+						position.setXYZ( i, point.x, point.y, point.z );
 
 					}
 
-					splineMesh.geometry.verticesNeedUpdate = true;
+					position.needsUpdate = true;
 
 				}
 

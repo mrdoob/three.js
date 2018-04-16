@@ -241,7 +241,7 @@
 					earthCloudsMat.needsUpdate = true;
 				} );
 
-				var earthGeo = new THREE.SphereGeometry( 600, 24, 24 );
+				var earthGeo = new THREE.SphereBufferGeometry( 600, 24, 24 );
 				var sphereMesh = new THREE.Mesh( earthGeo, earthMat );
 				scene.add( sphereMesh );
 
