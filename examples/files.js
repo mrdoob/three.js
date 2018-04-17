@@ -133,6 +133,7 @@ var files = {
 		"webgl_loader_texture_tga",
 		"webgl_loader_ttf",
 		"webgl_loader_utf8",
+		"webgl_loader_vrm",
 		"webgl_loader_vrml",
 		"webgl_loader_vtk",
 		"webgl_loader_x",
