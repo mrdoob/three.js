@@ -43,37 +43,37 @@ THREE.SVGLoader.prototype = {
 
 				case 'path':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' && node.hasAttribute( 'd' ) ) paths.push( parsePathNode( node, style ) );
+					if ( node.hasAttribute( 'd' ) && isVisible( style ) ) paths.push( parsePathNode( node, style ) );
 					break;
 
 				case 'rect':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parseRectNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parseRectNode( node, style ) );
 					break;
 
 				case 'polygon':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parsePolygonNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parsePolygonNode( node, style ) );
 					break;
 
 				case 'polyline':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parsePolylineNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parsePolylineNode( node, style ) );
 					break;
 
 				case 'circle':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parseCircleNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parseCircleNode( node, style ) );
 					break;
 
 				case 'ellipse':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parseEllipseNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parseEllipseNode( node, style ) );
 					break;
 
 				case 'line':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parseLineNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parseLineNode( node, style ) );
 					break;
 
 				default:
@@ -507,6 +507,12 @@ THREE.SVGLoader.prototype = {
 			if ( node.style.fill !== '' ) style.fill = node.style.fill;
 
 			return style;
+
+		}
+
+		function isVisible( style ) {
+
+			return style.fill !== 'none' && style.fill !== 'transparent';
 
 		}
 
