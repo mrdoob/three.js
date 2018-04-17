@@ -220,7 +220,19 @@ THREE.SVGLoader.prototype = {
 						point.y = numbers[ 1 ];
 						break;
 
-					// case 'A': break;
+					case 'A':
+						console.warn( command );
+						var numbers = parseFloats( data );
+						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
+							// TODO
+							point.x = numbers[ j + 5 ];
+							point.y = numbers[ j + 6 ];
+							control.x = point.x;
+							control.y = point.y;
+						}
+						break;
+
+					//
 
 					case 'm':
 						var numbers = parseFloats( data );
@@ -328,7 +340,19 @@ THREE.SVGLoader.prototype = {
 						point.y = point.y + numbers[ 1 ];
 						break;
 
-					// case 'a': break;
+					case 'a':
+						console.warn( command );
+						var numbers = parseFloats( data );
+						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
+							// TODO
+							point.x += numbers[ j + 5 ];
+							point.y += numbers[ j + 6 ];
+							control.x = point.x;
+							control.y = point.y;
+						}
+						break;
+
+					//
 
 					case 'Z':
 					case 'z':
