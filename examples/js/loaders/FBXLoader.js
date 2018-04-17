@@ -2692,9 +2692,11 @@
 			var initialValue = curve.values[ i - 1 ];
 			var valuesSpan = curve.values[ i ] - initialValue;
 
-			if ( valuesSpan >= 180 ) {
+			var absoluteSpan = Math.abs( valuesSpan );
 
-				var numSubIntervals = Math.abs( valuesSpan / 180 );
+			if ( absoluteSpan >= 180 ) {
+
+				var numSubIntervals = absoluteSpan / 180;
 
 				var step = valuesSpan / numSubIntervals;
 				var nextValue = initialValue + step;
