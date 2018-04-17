@@ -155,8 +155,6 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			console.time( 'GLTFLoader' );
-
 			var parser = new GLTFParser( json, extensions, {
 
 				path: path || this.path || '',
@@ -166,8 +164,6 @@ THREE.GLTFLoader = ( function () {
 			} );
 
 			parser.parse( function ( scene, scenes, cameras, animations, asset ) {
-
-				console.timeEnd( 'GLTFLoader' );
 
 				var glTF = {
 					scene: scene,
