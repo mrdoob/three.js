@@ -80,7 +80,7 @@
 				// create object to show search radius and add to scene
 
 				searchMesh = new THREE.Mesh(
-					new THREE.SphereGeometry( radiusSearch ),
+					new THREE.SphereBufferGeometry( radiusSearch ),
 					new THREE.MeshBasicMaterial( { color: 0x00FF00, transparent: true, opacity: 0.4 } )
 				);
 				scene.add( searchMesh );
@@ -122,7 +122,7 @@
 
 			}
 
-			var geometry = new THREE.BoxGeometry( 50, 50, 50 );
+			var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
 
 			function modifyOctree() {
 
