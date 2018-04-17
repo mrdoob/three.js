@@ -191,7 +191,7 @@
 				// targets but the aliasing causes some temporal flickering
 
 				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-				postprocessing.rtTextureDepthCustom = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				postprocessing.rtTextureDepthMask = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
 				// Aggressive downsize god-ray ping-pong render targets to minimize cost
 
@@ -202,13 +202,13 @@
 
 				// god-ray shaders
 
-				var godraysInvShader = THREE.ShaderGodRays[ "godrays_invert" ];
-				postprocessing.godrayInvUniforms = THREE.UniformsUtils.clone( godraysInvShader.uniforms );
-				postprocessing.materialGodraysInvert = new THREE.ShaderMaterial( {
+				var godraysMaskShader = THREE.ShaderGodRays[ "godrays_depthMask" ];
+				postprocessing.godrayMaskUniforms = THREE.UniformsUtils.clone( godraysMaskShader.uniforms );
+				postprocessing.materialGodraysDepthMask = new THREE.ShaderMaterial( {
 
-					uniforms: postprocessing.godrayInvUniforms,
-					vertexShader: godraysInvShader.vertexShader,
-					fragmentShader: godraysInvShader.fragmentShader
+					uniforms: postprocessing.godrayMaskUniforms,
+					vertexShader: godraysMaskShader.vertexShader,
+					fragmentShader: godraysMaskShader.fragmentShader
 
 				} );
 
@@ -336,10 +336,10 @@
 
 					//
 
-					postprocessing.godrayInvUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
+					postprocessing.godrayMaskUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
 
-					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysInvert;
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureDepthCustom  );
+					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysDepthMask;
+					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureDepthMask  );
 
 					// -- Render god-rays --
 
@@ -362,7 +362,7 @@
 					var stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
-					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepthCustom.texture;
+					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepthMask.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysGenerate;
 

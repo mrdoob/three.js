@@ -20,7 +20,7 @@
 
 THREE.ShaderGodRays = {
 
-	'godrays_invert': {
+	'godrays_depthMask': {
 
 		uniforms: {
 
