@@ -350,7 +350,7 @@
 		var materialList = [];
 		var geometryList = [];
 		var objectCount = 0;
-		var geometrySize;
+		var geometrySize = new THREE.Vector3();
 		var mouse = new THREE.Vector2();
 		var scale = 1.03;
 
@@ -500,10 +500,10 @@
 			clean();
 
 			// make instances
-			loader.load( 'obj/Suzanne.js', function ( geo ) {
+			loader.load( 'models/json/suzanne_geometry.json', function ( geo ) {
 
 				geo.computeBoundingBox();
-				geometrySize = geo.boundingBox.getSize();
+				geo.boundingBox.getSize( geometrySize );
 				geometryList.push( geo );
 
 				var start = window.performance.now();
@@ -751,18 +751,31 @@
 			var vertices = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * posLen ), 3
 			);
+
+			var vertex = new THREE.Vector3();
 			var matrix = new THREE.Matrix4();
+
 			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
+
+				var offset = i * posLen;
 
 				randomizeMatrix( matrix );
 				var object = new THREE.Object3D();
 				objectCount ++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
-				vertices.set( pos.array, i * posLen );
-				matrix.applyToVector3Array( vertices.array, i * posLen, posLen )
+				vertices.set( pos.array, offset );
+
+				for ( var k = 0, l = offset; k < posLen; k += 3, l += 3 ) {
+
+					vertex.fromArray( vertices.array, l );
+					vertex.applyMatrix4( matrix );
+					vertex.toArray( vertices.array, l );
+
+				}
 
 			}
+
 			mgeo.addAttribute( 'position', vertices );
 
 			var colCount = posLen / 3;
@@ -952,7 +965,7 @@
 				antialias: true,
 				alpha: true
 			} );
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 				document.getElementById( "notSupported" ).style.display = "";
 				return;
@@ -963,7 +976,7 @@
 			//renderer.sortObjects = false;
 			container.appendChild( renderer.domElement );
 
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 				throw 'ANGLE_instanced_arrays not supported';
 

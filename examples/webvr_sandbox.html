@@ -4,8 +4,8 @@
 		<title>three.js webvr - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-02-26 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-02-26" content="ApUnsKNm8cOce0NnJY05mJWYKGaTC2dw9o/+zbrmpEZk/ePiOfxjvcRnKlJUo6zYOrltLnYMcvdWjPTMCJzR1g4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxOTY0ODk5MX0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-05-12 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-05-12" content="AkM+gi6Fb7IUBwFLs18hn/x6dusbsVRYG9KBTWUUjvmT0m0wGkxRPy63Aj/i+Ti4d6qMEMnRcsR7MVV5Wuvp/AIAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyNjExODIwMH0=">
 		<style>
 			body {
 				margin: 0px;
@@ -41,12 +41,7 @@
 				scene = new THREE.Scene();
 				scene.background = background;
 
-				var user = new THREE.Group();
-				user.position.set( 0, 0.75, 0 );
-				scene.add( user );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
-				user.add( camera );
 
 				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
 				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
@@ -91,16 +86,16 @@
 				// lensflare
 				var loader = new THREE.TextureLoader();
 				var texture0 = loader.load( "textures/lensflare/lensflare0.png" );
-				var texture2 = loader.load( "textures/lensflare/lensflare2.png" );
 				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
 
-				var lensFlare = new THREE.Lensflare();
-				lensFlare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
-				lensFlare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
-				lensFlare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
-				lensFlare.addElement( new THREE.LensflareElement( texture3, 120, 0.9 ) );
-				lensFlare.addElement( new THREE.LensflareElement( texture3, 70, 1 ) );
-				light.add( lensFlare );
+				var lensflare = new THREE.Lensflare();
+				lensflare.position.set( 0, 5, -5 );
+				lensflare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 120, 0.9 ) );
+				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 1 ) );
+				scene.add( lensflare );
 
 				//
 
@@ -113,7 +108,7 @@
 				reflector.position.y = 0.5;
 				reflector.position.z = -3;
 				reflector.rotation.y = - Math.PI / 4;
-				// scene.add( reflector );
+				scene.add( reflector );
 
 				var geometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
 				var material = new THREE.MeshPhongMaterial();
@@ -159,7 +154,7 @@
 			function render() {
 
 				var time = performance.now() * 0.0002;
-				var mesh = scene.children[ 1 ];
+				var mesh = scene.children[ 0 ];
 				mesh.rotation.x = time * 2;
 				mesh.rotation.y = time * 5;
 

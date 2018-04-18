@@ -77,7 +77,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 			// vertex
 
-			p0 = func( u, v, p0 );
+			func( u, v, p0 );
 			vertices.push( p0.x, p0.y, p0.z );
 
 			// normal
@@ -86,24 +86,24 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 			if ( u - EPS >= 0 ) {
 
-				p1 = func( u - EPS, v, p1 );
+				func( u - EPS, v, p1 );
 				pu.subVectors( p0, p1 );
 
 			} else {
 
-				p1 = func( u + EPS, v, p1 );
+				func( u + EPS, v, p1 );
 				pu.subVectors( p1, p0 );
 
 			}
 
 			if ( v - EPS >= 0 ) {
 
-				p1 = func( u, v - EPS, p1 );
+				func( u, v - EPS, p1 );
 				pv.subVectors( p0, p1 );
 
 			} else {
 
-				p1 = func( u, v + EPS, p1 );
+				func( u, v + EPS, p1 );
 				pv.subVectors( p1, p0 );
 
 			}

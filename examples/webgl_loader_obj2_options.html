@@ -166,7 +166,7 @@
 						var fileLoader = new THREE.FileLoader();
 						fileLoader.setPath( '' );
 						fileLoader.setResponseType( 'arraybuffer' );
-						fileLoader.load( 'obj/female02/female02.obj',
+						fileLoader.load( 'models/obj/female02/female02.obj',
 							function ( content ) {
 								var local = new THREE.Object3D();
 								local.name = 'Pivot_female02';
@@ -178,7 +178,7 @@
 							}
 						);
 					};
-					objLoader.loadMtl( 'obj/female02/female02.mtl', null, onLoadMtl );
+					objLoader.loadMtl( 'models/obj/female02/female02.mtl', null, onLoadMtl );
 				};
 
 
@@ -203,7 +203,7 @@
 					var fileLoader = new THREE.FileLoader();
 					fileLoader.setPath( '' );
 					fileLoader.setResponseType( 'arraybuffer' );
-					var filename = 'obj/female02/female02_vertex_colors.obj';
+					var filename = 'models/obj/female02/female02_vertex_colors.obj';
 					fileLoader.load( filename,
 						function ( content ) {
 							objLoader.parseAsync( content, callbackOnLoad );
@@ -232,9 +232,9 @@
 						objLoader.setModelName( modelName );
 						objLoader.setMaterials( materials );
 						objLoader.setUseIndices( true );
-						objLoader.load( 'obj/male02/male02.obj', callbackOnLoad, null, null, null, false );
+						objLoader.load( 'models/obj/male02/male02.obj', callbackOnLoad, null, null, null, false );
 					};
-					objLoader.loadMtl( 'obj/male02/male02.mtl', null, onLoadMtl );
+					objLoader.loadMtl( 'models/obj/male02/male02.mtl', null, onLoadMtl );
 				};
 
 				WWOBJLoader2Example.prototype.useLoadAsync = function () {
@@ -261,9 +261,9 @@
 						objLoader.setModelName( modelName );
 						objLoader.setMaterials( materials );
 						objLoader.terminateWorkerOnLoad = false;
-						objLoader.load( 'obj/walt/WaltHead.obj', callbackOnLoad, null, null, null, true );
+						objLoader.load( 'models/obj/walt/WaltHead.obj', callbackOnLoad, null, null, null, true );
 					};
-					objLoader.loadMtl( 'obj/walt/WaltHead.mtl', null, onLoadMtl );
+					objLoader.loadMtl( 'models/obj/walt/WaltHead.mtl', null, onLoadMtl );
 				};
 
 				WWOBJLoader2Example.prototype.useRunSync = function () {
@@ -277,7 +277,7 @@
 					local.position.set( 0, 0, 100 );
 					local.scale.set( 50.0, 50.0, 50.0 );
 					this.pivot.add( local );
-					prepData.setStreamMeshesTo( local );
+					prepData.streamMeshesTo = local;
 					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/cerberus/Cerberus.obj', 'OBJ' ) );
 					var callbacks = prepData.getCallbacks();
 					callbacks.setCallbackOnProgress( this._reportProgress );
@@ -298,9 +298,9 @@
 					local.position.set( 125, 50, 0 );
 					local.name = 'Pivot_vive-controller';
 					this.pivot.add( local );
-					prepData.setStreamMeshesTo( local );
+					prepData.streamMeshesTo = local;
 					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/vive-controller/vr_controller_vive_1_5.obj', 'OBJ' ) );
-					prepData.setUseAsync( true );
+					prepData.useAsync = true;
 					var callbacks = prepData.getCallbacks();
 					var callbackMeshAlter = function ( event ) {
 						var override = new THREE.LoaderSupport.LoadedMeshUserOverride( false, true );

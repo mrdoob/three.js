@@ -59,6 +59,7 @@ var list = {
 		},
 
 		"Cameras": {
+			"ArrayCamera": "api/cameras/ArrayCamera",
 			"Camera": "api/cameras/Camera",
 			"CubeCamera": "api/cameras/CubeCamera",
 			"OrthographicCamera": "api/cameras/OrthographicCamera",
@@ -147,8 +148,8 @@ var list = {
 			"DodecahedronBufferGeometry": "api/geometries/DodecahedronBufferGeometry",
 			"DodecahedronGeometry": "api/geometries/DodecahedronGeometry",
 			"EdgesGeometry": "api/geometries/EdgesGeometry",
-			"ExtrudeGeometry": "api/geometries/ExtrudeGeometry",
 			"ExtrudeBufferGeometry": "api/geometries/ExtrudeBufferGeometry",
+			"ExtrudeGeometry": "api/geometries/ExtrudeGeometry",
 			"IcosahedronBufferGeometry": "api/geometries/IcosahedronBufferGeometry",
 			"IcosahedronGeometry": "api/geometries/IcosahedronGeometry",
 			"LatheBufferGeometry": "api/geometries/LatheBufferGeometry",
@@ -382,10 +383,15 @@ var list = {
 		},
 
 		"Renderers": {
-			"CanvasRenderer": "examples/renderers/CanvasRenderer"
+			"CanvasRenderer": "examples/renderers/CanvasRenderer",
+			"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
+			"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
+			"SVGRenderer": "examples/renderers/SVGRenderer"
+
 		},
 
 		"Utils": {
+			"BufferGeometryUtils": "examples/BufferGeometryUtils",
 			"SceneUtils": "examples/utils/SceneUtils"
 		}
 

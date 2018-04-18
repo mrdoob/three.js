@@ -141,7 +141,7 @@
 				dirLight.shadow.camera.far = 3500;
 				dirLight.shadow.bias = -0.0001;
 
-				dirLightHeper = new THREE.DirectionalLightHelper( dirLight, 10 ) 
+				dirLightHeper = new THREE.DirectionalLightHelper( dirLight, 10 );
 				scene.add( dirLightHeper );
 
 				// GROUND
@@ -171,7 +171,7 @@
 
 				scene.fog.color.copy( uniforms.bottomColor.value );
 
-				var skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
+				var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
 				var skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, side: THREE.BackSide } );
 
 				var sky = new THREE.Mesh( skyGeo, skyMat );

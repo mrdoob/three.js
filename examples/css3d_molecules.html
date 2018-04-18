@@ -103,6 +103,7 @@
 			var tmpVec2 = new THREE.Vector3();
 			var tmpVec3 = new THREE.Vector3();
 			var tmpVec4 = new THREE.Vector3();
+			var offset = new THREE.Vector3();
 
 			var visualizationType = 2;
 
@@ -334,7 +335,10 @@
 					var geometryBonds = pdb.geometryBonds;
 					var json = pdb.json;
 
-					var offset = geometryAtoms.center();
+					geometryAtoms.computeBoundingBox();
+					geometryAtoms.boundingBox.getCenter( offset ).negate();
+
+					geometryAtoms.translate( offset.x, offset.y, offset.z );
 					geometryBonds.translate( offset.x, offset.y, offset.z );
 
 					var positions = geometryAtoms.getAttribute( 'position' );

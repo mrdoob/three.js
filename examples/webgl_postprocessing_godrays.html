@@ -92,7 +92,7 @@
 				// tree
 
 				var loader = new THREE.OBJLoader();
-				loader.load( "models/obj/tree.obj", function ( object ) {
+				loader.load( 'models/obj/tree.obj', function ( object ) {
 
 					object.material = materialScene;
 					object.position.set( 0, -150, -150 );
@@ -103,14 +103,14 @@
 
 				// sphere
 
-				var geo = new THREE.SphereGeometry( 1, 20, 10 );
+				var geo = new THREE.SphereBufferGeometry( 1, 20, 10 );
 				sphereMesh = new THREE.Mesh( geo, materialScene );
 				sphereMesh.scale.multiplyScalar( 20 );
 				scene.add( sphereMesh );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

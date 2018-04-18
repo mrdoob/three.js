@@ -92,7 +92,7 @@
 			} );
 
 			var loader = new THREE.JSONLoader();
-			loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
+			loader.load( 'models/json/WaltHeadLo.json', function ( geometry ) {
 
 				geometriesParams.push({type: 'WaltHead', args: [ ], meshScale: 6 });
 
@@ -105,7 +105,7 @@
 			});
 
 			var loader2 = new THREE.JSONLoader();
-			loader2.load( 'obj/Suzanne.js', function ( geometry ) {
+			loader2.load( 'models/json/suzanne_geometry.json', function ( geometry ) {
 
 				geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
 

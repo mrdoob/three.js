@@ -6,6 +6,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { LineSegments } from './LineSegments.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -63,7 +64,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					}
 
-					geometry.addAttribute( 'lineDistance', new THREE.Float32BufferAttribute( lineDistances, 1 ) );
+					geometry.addAttribute( 'lineDistance', new Float32BufferAttribute( lineDistances, 1 ) );
 
 				} else {
 

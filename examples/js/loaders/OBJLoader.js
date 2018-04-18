@@ -286,19 +286,17 @@ THREE.OBJLoader = ( function () {
 
 				this.addVertex( ia, ib, ic );
 
-				if ( ua !== undefined ) {
+				if ( ua !== undefined && ua !== '' ) {
 
 					var uvLen = this.uvs.length;
-
 					ia = this.parseUVIndex( ua, uvLen );
 					ib = this.parseUVIndex( ub, uvLen );
 					ic = this.parseUVIndex( uc, uvLen );
-
 					this.addUV( ia, ib, ic );
 
 				}
 
-				if ( na !== undefined ) {
+				if ( na !== undefined && na !== '' ) {
 
 					// Normals are many times the same. If so, skip function call and parseInt.
 					var nLen = this.normals.length;
@@ -393,6 +391,8 @@ THREE.OBJLoader = ( function () {
 		setPath: function ( value ) {
 
 			this.path = value;
+
+			return this;
 
 		},
 

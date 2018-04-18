@@ -36,7 +36,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl simple single-pass skin material with <a href="http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html">tangent-less bump mapping</a> -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl simple, single-pass, skin material with tangent-less bump mapping</a> -
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
@@ -126,7 +126,7 @@
 				//
 
 				loader = new THREE.JSONLoader();
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function ( geometry ) {
+				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function ( geometry ) {
 
 					createScene( geometry, 100 )
 
@@ -187,19 +187,19 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				var mapHeight = textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var mapHeight = textureLoader.load( "models/json/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				mapHeight.anisotropy = 4;
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 				mapHeight.format = THREE.RGBFormat;
 
-				var mapSpecular = textureLoader.load( "obj/leeperrysmith/Map-SPEC.jpg" );
+				var mapSpecular = textureLoader.load( "models/json/leeperrysmith/Map-SPEC.jpg" );
 
 				mapSpecular.anisotropy = 4;
 				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
 				mapSpecular.format = THREE.RGBFormat;
 
-				var mapColor = textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" );
+				var mapColor = textureLoader.load( "models/json/leeperrysmith/Map-COL.jpg" );
 
 				mapColor.anisotropy = 4;
 				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
