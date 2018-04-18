@@ -86,6 +86,7 @@ var list = {
 			"Face3": "api/core/Face3",
 			"Geometry": "api/core/Geometry",
 			"InstancedBufferAttribute": "api/core/InstancedBufferAttribute",
+			"GLBufferAttribute": "api/core/GLBufferAttribute",
 			"InstancedBufferGeometry": "api/core/InstancedBufferGeometry",
 			"InstancedInterleavedBuffer": "api/core/InstancedInterleavedBuffer",
 			"InterleavedBuffer": "api/core/InterleavedBuffer",

@@ -287,6 +287,7 @@ var files = {
 		"webgl_buffergeometry_lines",
 		"webgl_buffergeometry_lines_indexed",
 		"webgl_buffergeometry_points",
+		"webgl_buffergeometry_points_glbufferattribute",
 		"webgl_buffergeometry_points_interleaved",
 		"webgl_buffergeometry_rawshader",
 		"webgl_buffergeometry_selective_draw",

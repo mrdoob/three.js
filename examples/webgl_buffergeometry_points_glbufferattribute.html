@@ -111,30 +111,34 @@
 				var gl = renderer.context;
 
 				var pos = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, pos);
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+				gl.bindBuffer( gl.ARRAY_BUFFER, pos );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( positions ), gl.STATIC_DRAW );
 
 				var pos2 = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, pos2);
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions2), gl.STATIC_DRAW);
+				gl.bindBuffer( gl.ARRAY_BUFFER, pos2 );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( positions2 ), gl.STATIC_DRAW );
 
 				var rgb = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, rgb);
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+				gl.bindBuffer( gl.ARRAY_BUFFER, rgb );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( colors ), gl.STATIC_DRAW );
 
 				var posAttr = new THREE.GLBufferAttribute( gl, pos, gl.FLOAT, 3, particles );
 				geometry.addAttribute( 'position', posAttr );
 
-				setInterval(function () {
-					posAttr.buffer = (posAttr.buffer === pos) ? pos2 : pos;
+				setInterval( function () {
+
+					posAttr.buffer = (posAttr.buffer === pos ) ? pos2 : pos;
 					posAttr.needsUpdate = true;
-				}, 2000);
+
+				}, 2000 );
 
 				var drawCount = 0;
-				setInterval(function () {
-					drawCount = 1 + (drawCount + Math.floor(1000 * Math.random())) % particles;
-					geometry.setDrawRange(0, drawCount);
-				}, 20);
+				setInterval( function () {
+
+					drawCount = 1 + ( drawCount + Math.floor( 1000 * Math.random() ) ) % particles;
+					geometry.setDrawRange( 0, drawCount );
+
+				}, 20 );
 
 				geometry.addAttribute( 'color', new THREE.GLBufferAttribute( gl, rgb, gl.FLOAT, 3, particles ) );
 
