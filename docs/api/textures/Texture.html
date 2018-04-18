@@ -154,21 +154,21 @@
 
 		<h3>[property:Vector2 center]</h3>
 		<p>
-		Indicates where the center of rotation is. To rotate around the center point set this value to (0.5, 0.5). Default value is (0.0, 0.0).
+		The point around which rotation occurs. A value of (0.5, 0.5) corresponds to the center of the texture. Default is (0, 0), the lower left.
 		</p>
 
 		<h3>[property:boolean matrixAutoUpdate]</h3>
 		<p>
-		Whether to update the texture's uv-transform [property:Matrix3 matrix] based on the [property:Vector2 offset],
-		[property:Vector2 repeat], and [property:number rotation] settings. True by default.
+		Whether to update the texture's uv-transform [page:Texture.matrix .matrix] from the texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat],
+		[page:Texture.rotation .rotation], and [page:Texture.center .center]. True by default.
 		Set this to false if you are specifying the uv-transform matrix directly.
 		</p>
 
 		<h3>[property:Matrix3 matrix]</h3>
 		<p>
-		The uv-transform matrix for the texture. Updated by the renderer from the texture properties [property:Vector2 offset], [property:Vector2 repeat],
-		and [property:number rotation] when the texture's [property:boolean matrixAutoUpdate] property is true.
-		When [property:boolean matrixAutoUpdate] property is false, this matrix may be set manually.
+		The uv-transform matrix for the texture. Updated by the renderer from the texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat],
+		[page:Texture.rotation .rotation], and [page:Texture.center .center] when the texture's [page:Texture.matrixAutoUpdate .matrixAutoUpdate] property is true.
+		When [page:Texture.matrixAutoUpdate .matrixAutoUpdate] property is false, this matrix may be set manually.
 		Default is the identity matrix.
 		</p>
 
@@ -228,6 +228,12 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
+		<h3>[method:null updateMatrix]()</h3>
+		<p>
+		Update the texture's uv-transform [page:Texture.matrix .matrix] from the texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat],
+		[page:Texture.rotation .rotation], and [page:Texture.center .center].
+		</p>
+
 		<h3>[method:Texture clone]( [param:Texture texture] )</h3>
 		<p>
 		Make copy of the texture. Note this is not a "deep copy", the image is shared.
@@ -246,7 +252,7 @@
 
 		<h3>[method:null transformUv]( uv )</h3>
 		<p>
-		Transform the uv based on the value of this texture's [page:Texture.repeat .repeat], [page:Texture.offset .offset],
+		Transform the uv based on the value of this texture's [page:Texture.offset .offset], [page:Texture.repeat .repeat],
 		[page:Texture.wrapS .wrapS], [page:Texture.wrapT .wrapT] and [page:Texture.flipY .flipY] properties.
 		</p>
 
