@@ -68,7 +68,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	addAttribute: function ( name, attribute ) {
 
-		if ( ! (attribute && (attribute.isBufferAttribute || attribute.isInterleavedBufferAttribute || attribute.isExternalBufferAttribute) ) ) {
+		if ( ! (attribute && (attribute.isBufferAttribute || attribute.isInterleavedBufferAttribute || attribute.isGLBufferAttribute) ) ) {
 
 			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
@@ -596,12 +596,12 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		var position = this.attributes.position;
 
-		if ( position && position.isExternalBufferAttribute ) {
+		if ( position && position.isGLBufferAttribute ) {
 
 			this.boundingBox.set(
 				new Vector3( - Infinity, - Infinity, - Infinity ),
 				new Vector3( + Infinity, + Infinity, + Infinity )
-			)
+			);
 
 			return;
 
@@ -640,9 +640,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var position = this.attributes.position;
 
-			if ( position && position.isExternalBufferAttribute ) {
+			if ( position && position.isGLBufferAttribute ) {
 
-				this.boundingSphere.set(new Vector3(), Infinity)
+				this.boundingSphere.set( new Vector3(), Infinity );
 
 				return;
 

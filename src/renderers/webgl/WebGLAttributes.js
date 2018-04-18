@@ -123,12 +123,14 @@ function WebGLAttributes( gl ) {
 
 	function update( attribute, bufferType ) {
 
-		if (attribute.isExternalBufferAttribute) {
+		if ( attribute.isGLBufferAttribute ) {
 
 			var cached = buffers[ attribute.uuid ];
 
-			if (cached && cached.version >= attribute.version) {
+			if ( cached && cached.version >= attribute.version ) {
+
 				return;
+
 			}
 
 			buffers[ attribute.uuid ] = {
