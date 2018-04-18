@@ -125,7 +125,7 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isGLBufferAttribute ) {
 
-			var cached = buffers[ attribute.uuid ];
+			var cached = buffers.get( attribute );
 
 			if ( cached && cached.version >= attribute.version ) {
 
@@ -133,12 +133,12 @@ function WebGLAttributes( gl ) {
 
 			}
 
-			buffers[ attribute.uuid ] = {
+			buffers.set( attribute, {
 				buffer: attribute.buffer,
 				type: attribute.type,
 				bytesPerElement: attribute.elementSize,
 				version: attribute.version
-			};
+			} );
 
 			return;
 
