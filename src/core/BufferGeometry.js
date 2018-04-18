@@ -68,7 +68,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	addAttribute: function ( name, attribute ) {
 
-		if ( ! (attribute && (attribute.isBufferAttribute || attribute.isInterleavedBufferAttribute || attribute.isGLBufferAttribute) ) ) {
+		if ( ! ( attribute && ( attribute.isBufferAttribute || attribute.isInterleavedBufferAttribute || attribute.isGLBufferAttribute ) ) ) {
 
 			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
