@@ -12,41 +12,41 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			A continuous line that connects back to the start.<br /><br />
 
 			This is nearly the same	as [page:Line]; the only difference is that it is rendered using
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_LOOP]
 			instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP],
 			which draws a straight line to the next vertex, and connects the last vertex back to the first.
-		</div>
+		</p>
 
 
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
 
-		<div>
+		<p>
 		[page:Geometry geometry] — List of vertices representing points on the line loop.<br />
 		[page:Material material] — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].
-		</div>
+		</p>
 
-		<div>If no material is supplied, a randomized line material will be created and assigned to the object.</div>
+		<p>If no material is supplied, a randomized line material will be created and assigned to the object.</p>
 
 
 		<h2>Properties</h2>
-		<div>See the base [page:Line] class for common properties.</div>
+		<p>See the base [page:Line] class for common properties.</p>
 
 		<h3>[property:Boolean isLineLoop]</h3>
-		<div>
+		<p>
 			Used to check whether this or derived classes are line loops. Default is *true*.<br /><br />
 
 			You should not change this, as it used internally for optimisation.
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
-		<div>See the base [page:Line] class for common methods.</div>
+		<p>See the base [page:Line] class for common methods.</p>
 
 		<h2>Source</h2>
 

@@ -59,6 +59,7 @@ var list = {
 		},
 
 		"Cameras": {
+			"ArrayCamera": "api/cameras/ArrayCamera",
 			"Camera": "api/cameras/Camera",
 			"CubeCamera": "api/cameras/CubeCamera",
 			"OrthographicCamera": "api/cameras/OrthographicCamera",
@@ -383,8 +384,10 @@ var list = {
 
 		"Renderers": {
 			"CanvasRenderer": "examples/renderers/CanvasRenderer",
+			"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
 			"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
-			"CSS2DRenderer": "examples/renderers/CSS2DRenderer"
+			"SVGRenderer": "examples/renderers/SVGRenderer"
+
 		},
 
 		"Utils": {

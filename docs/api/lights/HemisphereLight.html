@@ -12,12 +12,12 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			A light source positioned directly above the scene, with color fading from the
 			sky color to the ground color. <br /><br />
 
 			This light cannot be used to cast shadows.
-		</div>
+		</p>
 
 		<h2>Example</h2>
 
@@ -37,48 +37,48 @@ scene.add( light );
 
 		<h2>Constructor</h2>
 		<h3>[name]( [param:Integer skyColor], [param:Integer groundColor], [param:Float intensity] )</h3>
-    <div>
+    <p>
 		[page:Integer skyColor] - (optional) hexadecimal color of the sky. Default is 0xffffff.<br />
 		[page:Integer groundColor] - (optional) hexadecimal color of the ground. Default is 0xffffff.<br />
 		[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
 
 		Creates a new [name].
-		</div>
+		</p>
 
 		<h2>Properties</h2>
-		<div>
+		<p>
 			See the base [page:Light Light] class for common properties.
-		</div>
+		</p>
 
 		<h3>[property:Boolean castShadow]</h3>
-		<div>
+		<p>
 			This is set to *undefined* in the constructor as hemisphere lights cannot cast shadows.
-		</div>
+		</p>
 
 
 		<h3>[property:Float color]</h3>
-		<div>
+		<p>
 			The light's sky color, as passed in the constructor.
 			Default is a new [page:Color] set to white (0xffffff).
-		</div>
+		</p>
 
 		<h3>[property:Float groundColor]</h3>
-		<div>
+		<p>
 			The light's ground color, as passed in the constructor.
 			Default is a new [page:Color] set to white (0xffffff).
-		</div>
+		</p>
 
 		<h3>[property:Boolean isHemisphereLight]</h3>
-		<div>
+		<p>
 			Used to check whether this or derived classes are hemisphere lights. Default is *true*.<br /><br />
 
 			You should not change this, as it used internally for optimisation.
-		</div>
+		</p>
 
 		<h3>[property:Vector3 position]</h3>
-		<div>
+		<p>
 			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
-		</div>
+		</p>
 
 
 
@@ -87,10 +87,10 @@ scene.add( light );
 		See the base [page:Light Light] class for common methods.
 
 		<h3>[method:HemisphereLight copy]( [param:HemisphereLight source] )</h3>
-		<div>
+		<p>
 			Copies the value of [page:.color color], [page:.intensity intensity] and
 			[page:.groundColor groundColor] from the [page:Light source] light into this one.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 
