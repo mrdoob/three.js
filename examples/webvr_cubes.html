@@ -61,7 +61,7 @@
 				scene.add( camera );
 
 				crosshair = new THREE.Mesh(
-					new THREE.RingGeometry( 0.02, 0.04, 32 ),
+					new THREE.RingBufferGeometry( 0.02, 0.04, 32 ),
 					new THREE.MeshBasicMaterial( {
 						color: 0xffffff,
 						opacity: 0.5,
@@ -72,7 +72,7 @@
 				camera.add( crosshair );
 
 				room = new THREE.Mesh(
-					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+					new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
 				);
 				room.position.y = 3;
@@ -84,7 +84,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
+				var geometry = new THREE.BoxBufferGeometry( 0.15, 0.15, 0.15 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
