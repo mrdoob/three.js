@@ -1,6 +1,6 @@
 /**
  * @author Eberhard Graether / http://egraether.com/
- * @author Mark Lundin 	/ http://mark-lundin.com
+ * @author Mark Lundin  / http://mark-lundin.com
  * @author Patrick Fuller / http://patrick-fuller.com
  * @author Max Smolens / https://github.com/msmolens
  */
@@ -37,8 +37,6 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 	// internals
 
 	this.target = new THREE.Vector3();
-
-	var EPS = 0.000001;
 
 	var _changed = true;
 
@@ -241,27 +239,23 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		} else {
 
-			var factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
+			factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
 
-			if ( Math.abs( factor - 1.0 ) > EPS && factor > 0.0 ) {
+			if ( factor !== 1.0 && factor > 0.0 ) {
 
 				_this.object.zoom /= factor;
 
-				if ( _this.staticMoving ) {
-
-					_zoomStart.copy( _zoomEnd );
-
-				} else {
-
-					_zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor;
-
-				}
-
 				_changed = true;
+
+			}
+
+			if ( _this.staticMoving ) {
+
+				_zoomStart.copy( _zoomEnd );
 
 			} else {
 
-				_zoomStart.copy( { x: 0, y: 0 } );
+				_zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor;
 
 			}
 
