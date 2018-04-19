@@ -185,7 +185,7 @@
 
 	} );
 
-	var REVISION = '92dev';
+	var REVISION = '92';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 	var CullFaceNone = 0;
 	var CullFaceBack = 1;
@@ -3669,6 +3669,12 @@
 		constructor: Texture,
 
 		isTexture: true,
+
+		updateMatrix: function () {
+
+			this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
+
+		},
 
 		clone: function () {
 
@@ -8452,6 +8458,8 @@
 
 			object.matrix = this.matrix.toArray();
 
+			if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
+
 			//
 
 			function serialize( library, element ) {
@@ -10372,6 +10380,8 @@
 			this.count = array !== undefined ? array.length / this.itemSize : 0;
 			this.array = array;
 
+			return this;
+
 		},
 
 		setDynamic: function ( value ) {
@@ -10384,6 +10394,7 @@
 
 		copy: function ( source ) {
 
+			this.name = source.name;
 			this.array = new source.array.constructor( source.array );
 			this.itemSize = source.itemSize;
 			this.count = source.count;
@@ -16756,6 +16767,7 @@
 
 		//
 
+		this.name = shader.name;
 		this.id = programIdCount ++;
 		this.code = code;
 		this.usedTimes = 1;
@@ -20927,6 +20939,7 @@
 		if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
 			frameData = new window.VRFrameData();
+			window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
 		}
 
@@ -20948,11 +20961,17 @@
 
 		//
 
+		function isPresenting() {
+
+			return device !== null && device.isPresenting === true;
+
+		}
+
 		var currentSize, currentPixelRatio;
 
 		function onVRDisplayPresentChange() {
 
-			if ( device !== null && device.isPresenting ) {
+			if ( isPresenting() ) {
 
 				var eyeParameters = device.getEyeParameters( 'left' );
 				var renderWidth = eyeParameters.renderWidth;
@@ -20968,12 +20987,6 @@
 				renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
 
 			}
-
-		}
-
-		if ( typeof window !== 'undefined' ) {
-
-			window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
 		}
 
@@ -21130,7 +21143,7 @@
 
 		this.submitFrame = function () {
 
-			if ( device && device.isPresenting ) device.submitFrame();
+			if ( isPresenting() ) device.submitFrame();
 
 		};
 
@@ -23154,12 +23167,7 @@
 
 				if ( uvScaleMap.matrixAutoUpdate === true ) {
 
-					var offset = uvScaleMap.offset;
-					var repeat = uvScaleMap.repeat;
-					var rotation = uvScaleMap.rotation;
-					var center = uvScaleMap.center;
-
-					uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+					uvScaleMap.updateMatrix();
 
 				}
 
@@ -23197,12 +23205,7 @@
 
 				if ( material.map.matrixAutoUpdate === true ) {
 
-					var offset = material.map.offset;
-					var repeat = material.map.repeat;
-					var rotation = material.map.rotation;
-					var center = material.map.center;
-
-					material.map.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+					material.map.updateMatrix();
 
 				}
 
@@ -32027,7 +32030,7 @@
 
 		if ( this.closed ) {
 
-			intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
+			intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / l ) + 1 ) * l;
 
 		} else if ( weight === 0 && intPoint === l - 1 ) {
 
@@ -37419,10 +37422,13 @@
 			object.uuid = data.uuid;
 
 			if ( data.name !== undefined ) object.name = data.name;
+
 			if ( data.matrix !== undefined ) {
 
 				object.matrix.fromArray( data.matrix );
-				object.matrix.decompose( object.position, object.quaternion, object.scale );
+
+				if ( data.matrixAutoUpdate !== undefined ) object.matrixAutoUpdate = data.matrixAutoUpdate;
+				if ( object.matrixAutoUpdate ) object.matrix.decompose( object.position, object.quaternion, object.scale );
 
 			} else {
 
@@ -41868,6 +41874,8 @@
 
 			this.count = array !== undefined ? array.length / this.stride : 0;
 			this.array = array;
+
+			return this;
 
 		},
 

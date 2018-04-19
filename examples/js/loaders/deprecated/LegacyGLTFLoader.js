@@ -75,8 +75,6 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			}
 
-			console.time( 'LegacyGLTFLoader' );
-
 			var parser = new GLTFParser( json, extensions, {
 
 				path: path || this.path,
@@ -85,8 +83,6 @@ THREE.LegacyGLTFLoader = ( function () {
 			} );
 
 			parser.parse( function ( scene, scenes, cameras, animations ) {
-
-				console.timeEnd( 'LegacyGLTFLoader' );
 
 				var glTF = {
 					"scene": scene,

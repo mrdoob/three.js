@@ -29,8 +29,6 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
-
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - equirectangular panorama demo with DeviceOrientation controls.
 			photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón Ragnarsson</a>.
@@ -41,14 +39,12 @@
 
 		<script>
 
-			var container, camera, scene, renderer, controls;
+			var camera, scene, renderer, controls;
 
 			init();
 			animate();
 
 			function init() {
-
-				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 
@@ -74,10 +70,10 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
 

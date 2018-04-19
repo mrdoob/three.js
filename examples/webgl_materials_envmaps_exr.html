@@ -67,7 +67,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 0.0, 0, 120 );
+				camera.position.set( 0, 0, 120 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x000000 );
@@ -107,7 +107,7 @@
 					texture.encoding = THREE.LinearEncoding;
 
 					var cubemapGenerator = new THREE.EquiangularToCubeGenerator( texture, 512 );
-					var cubeMapTexture = cubemapGenerator.generate( renderer );
+					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
 					pmremGenerator.update( renderer );
@@ -117,6 +117,11 @@
 
 					exrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
+					texture.dispose();
+					cubemapGenerator.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
 				} );
 
 				new THREE.TextureLoader().load( 'textures/equiangular.png', function ( texture ) {
@@ -124,7 +129,7 @@
 					texture.encoding = THREE.sRGBEncoding;
 
 					var cubemapGenerator = new THREE.EquiangularToCubeGenerator( texture, 512 );
-					var cubeMapTexture = cubemapGenerator.generate( renderer );
+					var cubeMapTexture = cubemapGenerator.update( renderer );
 
 					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
 					pmremGenerator.update( renderer );
@@ -133,6 +138,11 @@
 					pmremCubeUVPacker.update( renderer );
 
 					pngCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+					texture.dispose();
+					cubemapGenerator.dispose();
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
 
 				} );
 

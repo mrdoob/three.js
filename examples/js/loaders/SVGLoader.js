@@ -43,37 +43,37 @@ THREE.SVGLoader.prototype = {
 
 				case 'path':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parsePathNode( node, style ) );
+					if ( node.hasAttribute( 'd' ) && isVisible( style ) ) paths.push( parsePathNode( node, style ) );
 					break;
 
 				case 'rect':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parseRectNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parseRectNode( node, style ) );
 					break;
 
 				case 'polygon':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parsePolygonNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parsePolygonNode( node, style ) );
 					break;
 
 				case 'polyline':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parsePolylineNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parsePolylineNode( node, style ) );
 					break;
 
 				case 'circle':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parseCircleNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parseCircleNode( node, style ) );
 					break;
 
 				case 'ellipse':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parseEllipseNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parseEllipseNode( node, style ) );
 					break;
 
 				case 'line':
 					style = parseStyle( node, style );
-					if ( style.fill !== 'none' ) paths.push( parseLineNode( node, style ) );
+					if ( isVisible( style ) ) paths.push( parseLineNode( node, style ) );
 					break;
 
 				default:
@@ -105,7 +105,7 @@ THREE.SVGLoader.prototype = {
 
 			var commands = d.match( /[a-df-z][^a-df-z]*/ig );
 
-			for ( var i = 0; i < commands.length; i ++ ) {
+			for ( var i = 0, l = commands.length; i < l; i ++ ) {
 
 				var command = commands[ i ];
 
@@ -116,51 +116,62 @@ THREE.SVGLoader.prototype = {
 
 					case 'M':
 						var numbers = parseFloats( data );
-						point.fromArray( numbers );
-						control.x = point.x;
-						control.y = point.y;
-						path.moveTo( point.x, point.y );
+						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+							point.x = numbers[ j + 0 ];
+							point.y = numbers[ j + 1 ];
+							control.x = point.x;
+							control.y = point.y;
+							path.moveTo( point.x, point.y );
+						}
 						break;
 
 					case 'H':
 						var numbers = parseFloats( data );
-						point.x = numbers[ 0 ];
-						control.x = point.x;
-						control.y = point.y;
-						path.lineTo( point.x, point.y );
+						for ( var j = 0, jl = numbers.length; j < jl; j ++ ) {
+							point.x = numbers[ j ];
+							control.x = point.x;
+							control.y = point.y;
+							path.lineTo( point.x, point.y );
+						}
 						break;
 
 					case 'V':
 						var numbers = parseFloats( data );
-						point.y = numbers[ 0 ];
-						control.x = point.x;
-						control.y = point.y;
-						path.lineTo( point.x, point.y );
+						for ( var j = 0, jl = numbers.length; j < jl; j ++ ) {
+							point.y = numbers[ j ];
+							control.x = point.x;
+							control.y = point.y;
+							path.lineTo( point.x, point.y );
+						}
 						break;
 
 					case 'L':
 						var numbers = parseFloats( data );
-						point.x = numbers[ 0 ];
-						point.y = numbers[ 1 ];
-						control.x = point.x;
-						control.y = point.y;
-						path.lineTo( point.x, point.y );
+						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+							point.x = numbers[ j + 0 ];
+							point.y = numbers[ j + 1 ];
+							control.x = point.x;
+							control.y = point.y;
+							path.lineTo( point.x, point.y );
+						}
 						break;
 
 					case 'C':
 						var numbers = parseFloats( data );
-						path.bezierCurveTo(
-							numbers[ 0 ],
-							numbers[ 1 ],
-							numbers[ 2 ],
-							numbers[ 3 ],
-							numbers[ 4 ],
-							numbers[ 5 ]
-						);
-						control.x = numbers[ 2 ];
-						control.y = numbers[ 3 ];
-						point.x = numbers[ 4 ];
-						point.y = numbers[ 5 ];
+						for ( var j = 0, jl = numbers.length; j < jl; j += 6 ) {
+							path.bezierCurveTo(
+								numbers[ j + 0 ],
+								numbers[ j + 1 ],
+								numbers[ j + 2 ],
+								numbers[ j + 3 ],
+								numbers[ j + 4 ],
+								numbers[ j + 5 ]
+							);
+							control.x = numbers[ j + 2 ];
+							control.y = numbers[ j + 3 ];
+							point.x = numbers[ j + 4 ];
+							point.y = numbers[ j + 5 ];
+						}
 						break;
 
 					case 'S':
@@ -209,54 +220,76 @@ THREE.SVGLoader.prototype = {
 						point.y = numbers[ 1 ];
 						break;
 
-					// case 'A': break;
+					case 'A':
+						console.warn( command );
+						var numbers = parseFloats( data );
+						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
+							// TODO
+							point.x = numbers[ j + 5 ];
+							point.y = numbers[ j + 6 ];
+							control.x = point.x;
+							control.y = point.y;
+						}
+						break;
+
+					//
 
 					case 'm':
 						var numbers = parseFloats( data );
-						point.x += numbers[ 0 ];
-						point.y += numbers[ 1 ];
-						control.x = point.x;
-						control.y = point.y;
-						path.moveTo( point.x, point.y );
+						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+							point.x += numbers[ j + 0 ];
+							point.y += numbers[ j + 1 ];
+							control.x = point.x;
+							control.y = point.y;
+							path.moveTo( point.x, point.y );
+						}
 						break;
 
 					case 'h':
 						var numbers = parseFloats( data );
-						point.x += numbers[ 0 ];
-						control.x = point.x;
-						control.y = point.y;
-						path.lineTo( point.x, point.y );
+						for ( var j = 0, jl = numbers.length; j < jl; j ++ ) {
+							point.x += numbers[ j ];
+							control.x = point.x;
+							control.y = point.y;
+							path.lineTo( point.x, point.y );
+						}
 						break;
 
 					case 'v':
 						var numbers = parseFloats( data );
-						point.y += numbers[ 0 ];
-						control.x = point.x;
-						control.y = point.y;
-						path.lineTo( point.x, point.y );
+						for ( var j = 0, jl = numbers.length; j < jl; j ++ ) {
+							point.y += numbers[ j ];
+							control.x = point.x;
+							control.y = point.y;
+							path.lineTo( point.x, point.y );
+						}
 						break;
 
 					case 'l':
 						var numbers = parseFloats( data );
-						point.x += numbers[ 0 ];
-						point.y += numbers[ 1 ];
-						control.x = point.x;
-						control.y = point.y;
-						path.lineTo( point.x, point.y );
+						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+							point.x += numbers[ j + 0 ];
+							point.y += numbers[ j + 1 ];
+							control.x = point.x;
+							control.y = point.y;
+							path.lineTo( point.x, point.y );
+						}
 						break;
 
 					case 'c':
 						var numbers = parseFloats( data );
-						path.bezierCurveTo(
-							point.x + numbers[ 0 ],
-							point.y + numbers[ 1 ],
-							point.x + numbers[ 2 ],
-							point.y + numbers[ 3 ],
-							point.x + numbers[ 4 ],
-							point.y + numbers[ 5 ]
-						);
-						point.x += numbers[ 4 ];
-						point.y += numbers[ 5 ];
+						for ( var j = 0, jl = numbers.length; j < jl; j += 6 ) {
+							path.bezierCurveTo(
+								point.x + numbers[ j + 0 ],
+								point.y + numbers[ j + 1 ],
+								point.x + numbers[ j + 2 ],
+								point.y + numbers[ j + 3 ],
+								point.x + numbers[ j + 4 ],
+								point.y + numbers[ j + 5 ]
+							);
+							point.x += numbers[ j + 4 ];
+							point.y += numbers[ j + 5 ];
+						}
 						break;
 
 					case 's':
@@ -307,7 +340,19 @@ THREE.SVGLoader.prototype = {
 						point.y = point.y + numbers[ 1 ];
 						break;
 
-					// case 'a': break;
+					case 'a':
+						console.warn( command );
+						var numbers = parseFloats( data );
+						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
+							// TODO
+							point.x += numbers[ j + 5 ];
+							point.y += numbers[ j + 6 ];
+							control.x = point.x;
+							control.y = point.y;
+						}
+						break;
+
+					//
 
 					case 'Z':
 					case 'z':
@@ -315,9 +360,11 @@ THREE.SVGLoader.prototype = {
 						break;
 
 					default:
-						console.log( command );
+						console.warn( command );
 
 				}
+
+				// console.log( type, parseFloats( data ), parseFloats( data ).length  )
 
 			}
 
@@ -325,19 +372,35 @@ THREE.SVGLoader.prototype = {
 
 		}
 
+		/*
+		* According to https://www.w3.org/TR/SVG/shapes.html#RectElementRXAttribute
+		* rounded corner should be rendered to elliptical arc, but bezier curve does the job well enough
+		*/
 		function parseRectNode( node, style ) {
 
 			var x = parseFloat( node.getAttribute( 'x' ) || 0 );
 			var y = parseFloat( node.getAttribute( 'y' ) || 0 );
+			var rx = parseFloat( node.getAttribute( 'rx' ) || 0 );
+			var ry = parseFloat( node.getAttribute( 'ry' ) || 0 );
 			var w = parseFloat( node.getAttribute( 'width' ) );
 			var h = parseFloat( node.getAttribute( 'height' ) );
 
 			var path = new THREE.ShapePath();
 			path.color.setStyle( style.fill );
-			path.moveTo( x, y );
-			path.lineTo( x + w, y );
-			path.lineTo( x + w, y + h );
-			path.lineTo( x, y + h );
+			path.moveTo( x + 2 * rx, y );
+			path.lineTo( x + w - 2 * rx, y );
+			if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y, x + w, y, x + w, y + 2 * ry );
+			path.lineTo( x + w, y + h - 2 * ry );
+			if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y + h, x + w, y + h, x + w - 2 * rx, y + h );
+			path.lineTo( x + 2 * rx, y + h );
+
+			if ( rx !== 0 || ry !== 0 ) {
+
+				path.bezierCurveTo( x, y + h, x, y + h, x, y + h - 2 * ry );
+				path.lineTo( x, y + 2 * ry );
+				path.bezierCurveTo( x, y, x, y, x + 2 * rx, y );
+
+			}
 
 			return path;
 
@@ -471,6 +534,12 @@ THREE.SVGLoader.prototype = {
 
 		}
 
+		function isVisible( style ) {
+
+			return style.fill !== 'none' && style.fill !== 'transparent';
+
+		}
+
 		// http://www.w3.org/TR/SVG11/implnote.html#PathElementImplementationNotes
 
 		function getReflection( a, b ) {
@@ -495,13 +564,23 @@ THREE.SVGLoader.prototype = {
 
 		//
 
-		var xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
-
-		var svg = xml.documentElement;
+		console.log( 'THREE.SVGLoader' );
 
 		var paths = [];
 
-		parseNode( svg, { fill: '#000' } );
+		console.time( 'THREE.SVGLoader: DOMParser' );
+
+		var xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
+
+		console.timeEnd( 'THREE.SVGLoader: DOMParser' );
+
+		console.time( 'THREE.SVGLoader: Parse' );
+
+		parseNode( xml.documentElement, { fill: '#000' } );
+
+		// console.log( paths );
+
+		console.timeEnd( 'THREE.SVGLoader: Parse' );
 
 		return paths;
 
