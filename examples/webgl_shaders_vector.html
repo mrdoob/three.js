@@ -74,26 +74,7 @@
 
 			var camera, scene, renderer, controls;
 
-			var group, text;
-
-			var t = false;
-
-			function toggle() {
-
-				if ( t ) {
-
-					text2.visible = 0;
-					text1.visible = 1;
-
-				} else {
-
-					text2.visible = 1;
-					text1.visible = 0;
-
-				}
-
-				t = !t;
-			}
+			var group;
 
 			var loader = new THREE.FontLoader();
 			loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
@@ -106,35 +87,32 @@
 			function init( font ) {
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 0, 100, 500 );
+				camera.position.set( 50, 100, 500 );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 100, 0 );
+				controls.target.set( 50, 100, 0 );
 				controls.update();
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var theText = "&"; // i % & j b 8
+				var theText = '&'; // i % & j b 8
 
 				group = new THREE.Group();
 				scene.add( group );
 
 				var textMaterial = new THREE.MeshBasicMaterial( {
-					color: new THREE.Color(0, 0, 1 ),
+					color: new THREE.Color( 0, 0, 1 ),
 					side: THREE.DoubleSide,
 					wireframe: true
 				} );
 
 				var textShapes = font.generateShapes( theText, 180, 2 );
 
-				var text3d = new THREE.ShapeBufferGeometry( textShapes );
+				var geometry = new THREE.ShapeBufferGeometry( textShapes );
 
-				text3d.computeBoundingBox();
-				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
-				text = new THREE.Mesh( text3d, textMaterial );
-
-				text.position.x = centerOffset - 150;
+				var text = new THREE.Mesh( geometry, textMaterial );
+				text.position.x = - 200;
 				group.add( text );
 
 				//
@@ -234,7 +212,6 @@
 					for ( var i = 0; i < subshape.holes.length; i ++ ) {
 
 						hole = subshape.holes[ i ];
-						// console.log('hole', hole);
 
 						process = processShape( hole.curves, true );
 
@@ -271,21 +248,17 @@
 				bezierGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 				bezierGeometry.addAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
 
-				text3d = new THREE.ShapeBufferGeometry( convexhullShapeGroup );
-				text3d.computeBoundingBox();
-				var centerOffset = - 0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
+				geometry = new THREE.ShapeBufferGeometry( convexhullShapeGroup );
 
-				var text1 = new THREE.Mesh( text3d, textMaterial );
-				text1.position.x = centerOffset + 150;
-				group.add( text1 );
+				text = new THREE.Mesh( geometry, textMaterial );
+				text.position.x = 200;
+				group.add( text );
 
-				text3d = new THREE.ShapeBufferGeometry( solidShapeGroup );
-				text3d.computeBoundingBox();
-				var centerOffset = - 0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
+				geometry = new THREE.ShapeBufferGeometry( solidShapeGroup );
 
-				var text2 = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: new THREE.Color(1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
-				text2.position.x = centerOffset + 150;
-				group.add( text2 );
+				text = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: new THREE.Color( 1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
+				text.position.x = 200;
+				group.add( text );
 
 				//
 
@@ -299,11 +272,6 @@
 				} );
 
 				text = new THREE.Mesh( bezierGeometry, newMaterial );
-				text.position.x = centerOffset;
-				text.position.y = 0;
-				text.position.z = 0;
-
-				text.rotation.x = 0;
 				text.rotation.y = Math.PI * 2;
 
 				group.add( text );
@@ -311,15 +279,9 @@
 				//
 
 
-				text3d = new THREE.ShapeBufferGeometry( solidShapeGroup );
-				text3d.computeBoundingBox();
+				geometry = new THREE.ShapeBufferGeometry( solidShapeGroup );
 
-				text = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: 0.45 * 0xffffff, side: THREE.DoubleSide } ) );
-				text.position.x = centerOffset;
-				text.position.y = 0;
-				text.position.z = 0;
-
-				text.rotation.x = 0;
+				text = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0.45 * 0xffffff, side: THREE.DoubleSide } ) );
 				text.rotation.y = Math.PI * 2;
 
 				group.add( text );
@@ -334,8 +296,6 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				document.addEventListener( 'mousedown', toggle, false );
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -348,7 +308,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
 
 			//
 
