@@ -572,7 +572,6 @@ THREE.GLTFLoader = ( function () {
 				].join( '\n' );
 
 				var fragmentShader = shader.fragmentShader
-					.replace( '#include <specularmap_fragment>', '' )
 					.replace( 'uniform float roughness;', 'uniform vec3 specular;' )
 					.replace( 'uniform float metalness;', 'uniform float glossiness;' )
 					.replace( '#include <roughnessmap_pars_fragment>', specularMapParsFragmentChunk )
