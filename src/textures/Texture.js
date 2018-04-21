@@ -191,11 +191,18 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			wrap: [ this.wrapS, this.wrapT ],
 
 			format: this.format,
+			type: this.type,
+			encoding: this.encoding,
+
 			minFilter: this.minFilter,
 			magFilter: this.magFilter,
 			anisotropy: this.anisotropy,
+			mipmaps: this.mipmaps.slice(),
 
-			flipY: this.flipY
+			flipY: this.flipY,
+
+			premultiplyAlpha: this.premultiplyAlpha,
+			unpackAlignment: this.unpackAlignment
 
 		};
 
