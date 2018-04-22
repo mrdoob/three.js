@@ -92,18 +92,18 @@
 		</p>
 
 		<code>
-loader.load('foo.gltf', function ( gltf ) {
+		loader.load('foo.gltf', function ( gltf ) {
 
-  var scene = gltf.scene;
+			var scene = gltf.scene;
 
-  var mesh = scene.children[ 3 ];
+			var mesh = scene.children[ 3 ];
 
-  var fooExtension = mesh.userData.gltfExtensions.EXT_foo;
+			var fooExtension = mesh.userData.gltfExtensions.EXT_foo;
 
-  gltf.parser.getDependency( 'bufferView', fooExtension.bufferView )
-    .then( function ( fooBuffer ) { ... } );
+			gltf.parser.getDependency( 'bufferView', fooExtension.bufferView )
+				.then( function ( fooBuffer ) { ... } );
 
-});
+		} );
 		</code>
 
 		<br>
