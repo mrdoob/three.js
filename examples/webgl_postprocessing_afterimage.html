@@ -76,7 +76,7 @@
 
 				var gui = new dat.GUI( { name: 'Damp setting' } );
 				gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
-				gui.add( this, 'openPass');
+				gui.add( this, 'enable' );
 
 			}
 
