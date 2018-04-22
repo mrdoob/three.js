@@ -1,9 +1,9 @@
 /**
  * @author HypnosNova / https://www.threejs.org.cn/gallery/
- * I'm lucky to get this domain name.(threejs.org.cn)
  *
  * Afterimage shader
- * I created this effect inspired by a demo on codepen. (Unfortunately, I forgot the url)
+ * I created this effect inspired by a demo on codepen:
+ * https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&
  */
 
 THREE.AfterimageShader = {
