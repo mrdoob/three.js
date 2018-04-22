@@ -2567,7 +2567,7 @@ THREE.GLTFLoader = ( function () {
 						if ( useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
 
 							material = material.isGLTFSpecularGlossinessMaterial
-									? extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].cloneMaterial( materials )
+									? extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].cloneMaterial( material )
 									: material.clone();
 
 						}
