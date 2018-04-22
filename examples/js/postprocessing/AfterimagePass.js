@@ -23,11 +23,11 @@ THREE.AfterimagePass = function ( damp ) {
 
 	} );
 
-    this.textureOld = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
+	this.textureOld = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
 
-    	minFilter: THREE.LinearFilter,
-    	magFilter: THREE.NearestFilter,
-    	format: THREE.RGBAFormat
+		minFilter: THREE.LinearFilter,
+		magFilter: THREE.NearestFilter,
+		format: THREE.RGBAFormat
 
 	} );
 
@@ -37,7 +37,7 @@ THREE.AfterimagePass = function ( damp ) {
 		vertexShader: this.shader.vertexShader,
 		fragmentShader: this.shader.fragmentShader
 
-    } );
+	} );
 
 	this.sceneComp = new THREE.Scene();
 	this.scene = new THREE.Scene();
