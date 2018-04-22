@@ -32,7 +32,7 @@
 			var camera, scene, renderer, composer;
 			var mesh, light;
 
-			var afterimagePass, openPass=true;
+			var afterimagePass, turnOnPass = true;
 
 			init();
 			createGUI();
@@ -99,13 +99,13 @@
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
 				
-				if(openPass){
+				if( turnOnPass ){
 
 					composer.render();
 
 				} else {
 
-					renderer.render(scene, camera);
+					renderer.render( scene, camera );
 
 				}
 
