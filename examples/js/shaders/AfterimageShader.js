@@ -51,12 +51,19 @@ THREE.AfterimageShader = {
 			
 			"texelOld *= damp;",
 			
-			"texelOld.r *= when_gt( texelOld.r, 0.2 );",
-			"texelOld.g *= when_gt( texelOld.g, 0.2 );",
-			"texelOld.b *= when_gt( texelOld.b, 0.2 );",
-			"texelOld.a *= when_gt( texelOld.a, 0.2 );",
+			"texelOld.r *= when_gt( texelOld.r, 0.1 );",
+			"texelOld.g *= when_gt( texelOld.g, 0.1 );",
+			"texelOld.b *= when_gt( texelOld.b, 0.1 );",
+			"texelOld.a *= when_gt( texelOld.a, 0.1 );",
 
-			"gl_FragColor = texelOld + texelNew;",
+			"gl_FragColor = vec4(",
+
+				"max( texelNew.r, texelOld.r ),",
+				"max( texelNew.g, texelOld.g ),",
+				"max( texelNew.b, texelOld.b ),",
+				"max( texelNew.a, texelOld.a )",
+
+			");",
 
 		"}"
 
