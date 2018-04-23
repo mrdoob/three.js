@@ -38,7 +38,7 @@ THREE.AfterimageShader = {
 
 		"varying vec2 vUv;",
 		
-		"float when_gt( float x, float y ) {",
+		"vec4 when_gt( vec4 x, float y ) {",
 
 			"return max( sign( x - y ), 0.0 );",
 
@@ -49,21 +49,9 @@ THREE.AfterimageShader = {
 			"vec4 texelOld = texture2D( tOld, vUv );",
 			"vec4 texelNew = texture2D( tNew, vUv );",
 			
-			"texelOld *= damp;",
-			
-			"texelOld.r *= when_gt( texelOld.r, 0.1 );",
-			"texelOld.g *= when_gt( texelOld.g, 0.1 );",
-			"texelOld.b *= when_gt( texelOld.b, 0.1 );",
-			"texelOld.a *= when_gt( texelOld.a, 0.1 );",
+			"texelOld *= damp * when_gt( texelOld, 0.1 );",
 
-			"gl_FragColor = vec4(",
-
-				"max( texelNew.r, texelOld.r ),",
-				"max( texelNew.g, texelOld.g ),",
-				"max( texelNew.b, texelOld.b ),",
-				"max( texelNew.a, texelOld.a )",
-
-			");",
+			"gl_FragColor = max(texelNew, texelOld);",
 
 		"}"
 
