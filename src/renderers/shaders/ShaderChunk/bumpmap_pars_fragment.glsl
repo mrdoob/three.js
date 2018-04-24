@@ -34,6 +34,8 @@
 
 		float fDet = dot( vSigmaX, R1 );
 
+		fDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+
 		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );
 		return normalize( abs( fDet ) * surf_norm - vGrad );
 
