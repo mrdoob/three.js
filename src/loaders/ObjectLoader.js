@@ -570,7 +570,43 @@ Object.assign( ObjectLoader.prototype, {
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
-				if ( data.mipmaps !== undefined ) texture.mipmaps = data.mipmaps;
+
+				if ( data.mipmaps !== undefined ) {
+
+					var TYPED_ARRAYS = {
+						Int8Array: Int8Array,
+						Uint8Array: Uint8Array,
+						// Workaround for IE11 pre KB2929437. See #11440
+						Uint8ClampedArray: typeof Uint8ClampedArray !== 'undefined' ? Uint8ClampedArray : Uint8Array,
+						Int16Array: Int16Array,
+						Uint16Array: Uint16Array,
+						Int32Array: Int32Array,
+						Uint32Array: Uint32Array,
+						Float32Array: Float32Array,
+						Float64Array: Float64Array
+					};
+
+					for ( var j = 0, jl = data.mipmaps.length; j < jl; j ++ ) {
+
+						var mipmap = data.mipmaps[ j ];
+
+						if ( mipmap.array !== undefined ) {
+
+							texture.mipmaps.push( {
+								width: mipmap.width,
+								height: mipmap.height,
+								data: new TYPED_ARRAYS[ mipmap.type ]( mipmap.array )
+							} );
+
+						} else {
+
+							texture.mipmaps.push( images[ mipmap ] );
+
+						}
+
+					}
+
+				}
 
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
 
