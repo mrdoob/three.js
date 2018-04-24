@@ -109,7 +109,8 @@
 		</p>
 
 		<h3>[property:Object3D parent]</h3>
-		<p>Object's parent in the [link:https://en.wikipedia.org/wiki/Scene_graph scene graph].</p>
+		<p>Object's parent in the [link:https://en.wikipedia.org/wiki/Scene_graph scene graph]. An object can have at most
+		one parent.</p>
 
 		<h3>[property:Vector3 position]</h3>
 		<p>A [page:Vector3] representing the object's local position. Default is (0, 0, 0).</p>
@@ -190,7 +191,8 @@
 
 		<h3>[method:null add]( [param:Object3D object], ... )</h3>
 		<p>
-		Adds *object* as child of this object. An arbitrary number of objects may be added.<br /><br />
+		Adds *object* as child of this object. An arbitrary number of objects may be added. Any current parent on an 
+		object passed in here will be removed, since an object can have at most one parent.<br /><br />
 
 		See [page:Group] for info on manually grouping objects.
 		</p>
