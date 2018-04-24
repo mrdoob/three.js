@@ -46,8 +46,6 @@ function Geometry() {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
-	this.userData = {};
-
 	// update flags
 
 	this.elementsNeedUpdate = false;
@@ -989,7 +987,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		data.uuid = this.uuid;
 		data.type = this.type;
 		if ( this.name !== '' ) data.name = this.name;
-		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
 		if ( this.parameters !== undefined ) {
 
@@ -1417,10 +1414,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			this.boundingSphere = boundingSphere.clone();
 
 		}
-
-		// user data
-
-		this.userData = source.userData;
 
 		// update flags
 
