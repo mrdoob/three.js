@@ -120,18 +120,18 @@
 
 				//
 
-				var geometry = new THREE.Geometry();
+				var geometry = new THREE.BufferGeometry();
+				var vertices = [];
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
-					var vertex = new THREE.Vector3();
-					vertex.x = THREE.Math.randFloatSpread( 2000 );
-					vertex.y = THREE.Math.randFloatSpread( 2000 );
-					vertex.z = THREE.Math.randFloatSpread( 2000 );
-
-					geometry.vertices.push( vertex );
+					vertices.push(  THREE.Math.randFloatSpread( 2000 ) ); // x
+					vertices.push(  THREE.Math.randFloatSpread( 2000 ) ); // y
+					vertices.push(  THREE.Math.randFloatSpread( 2000 ) ); // z
 
 				}
+
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				var particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
@@ -142,7 +142,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
 				renderer.autoClear = false;
