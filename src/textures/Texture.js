@@ -240,7 +240,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 					width: mipmap.width,
 					height: mipmap.height,
 					type: mipmap.data.constructor.name,
-					array: Array.prototype.slice.call( mipmap.data )
+					array:  Array.prototype.slice.call( mipmap.data )
 				} );
 
 			} else {
