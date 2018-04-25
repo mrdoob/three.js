@@ -197,7 +197,6 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			minFilter: this.minFilter,
 			magFilter: this.magFilter,
 			anisotropy: this.anisotropy,
-			mipmaps: this.mipmaps.slice(),
 
 			flipY: this.flipY,
 

@@ -570,7 +570,6 @@ Object.assign( ObjectLoader.prototype, {
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
-				if ( data.mipmaps !== undefined ) texture.mipmaps = data.mipmaps;
 
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
 
