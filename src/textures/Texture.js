@@ -170,29 +170,6 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		}
 
-		function addImage( image ) {
-
-			// TODO: Move to THREE.Image
-
-			if ( image.uuid === undefined ) {
-
-				image.uuid = _Math.generateUUID(); // UGH
-
-			}
-
-			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
-
-				meta.images[ image.uuid ] = {
-					uuid: image.uuid,
-					url: getDataURL( image )
-				};
-
-			}
-
-			return image.uuid;
-
-		}
-
 		var output = {
 
 			metadata: {
@@ -220,6 +197,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			minFilter: this.minFilter,
 			magFilter: this.magFilter,
 			anisotropy: this.anisotropy,
+			mipmaps: this.mipmaps.slice(),
 
 			flipY: this.flipY,
 
@@ -228,32 +206,30 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		};
 
-		var mipmaps = [];
+		if ( this.image !== undefined ) {
 
-		for ( var i = 0, il = this.mipmaps.length; i < il; i ++ ) {
+			// TODO: Move to THREE.Image
 
-			var mipmap = this.mipmaps[ i ];
+			var image = this.image;
 
-			if ( mipmap.data !== undefined ) {
+			if ( image.uuid === undefined ) {
 
-				mipmaps.push( {
-					width: mipmap.width,
-					height: mipmap.height,
-					type: mipmap.data.constructor.name,
-					array:  Array.prototype.slice.call( mipmap.data )
-				} );
-
-			} else {
-
-				mipmaps.push( addImage( mipmap ) );
+				image.uuid = _Math.generateUUID(); // UGH
 
 			}
 
+			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
+
+				meta.images[ image.uuid ] = {
+					uuid: image.uuid,
+					url: getDataURL( image )
+				};
+
+			}
+
+			output.image = image.uuid;
+
 		}
-
-		if ( mipmaps.length > 0 ) output.mipmaps = mipmaps;
-
-		if ( this.image !== undefined ) output.image = addImage( this.image );
 
 		if ( ! isRootObject ) {
 
