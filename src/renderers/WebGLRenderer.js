@@ -2577,11 +2577,18 @@ function WebGLRenderer( parameters ) {
 		var height = srcTexture.image.height;
 		var glFormat = utils.convert( dstTexture.format );
 		var glType = utils.convert( dstTexture.type );
-		var pixels = srcTexture.isDataTexture ? srcTexture.image.data : srcTexture.image;
 
 		this.setTexture2D( dstTexture, 0 );
 
-		_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, width, height, glFormat, glType, pixels );
+		if ( srcTexture.isDataTexture ) {
+
+			_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, width, height, glFormat, glType, srcTexture.image.data );
+
+		} else {
+
+			_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, glFormat, glType, srcTexture.image );
+
+		}
 
 	};
 
