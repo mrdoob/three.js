@@ -13,13 +13,13 @@ import { _Math } from '../math/Math.js';
  * @author David Sarno / http://lighthaus.us/
  */
 
-function AnimationClip( name, duration, tracks ) {
+function AnimationClip( name, duration, tracks, uuid = _Math.generateUUID() ) {
 
 	this.name = name;
 	this.tracks = tracks;
 	this.duration = ( duration !== undefined ) ? duration : - 1;
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = uuid;
 
 	// this means it should figure out its duration by scanning the tracks
 	if ( this.duration < 0 ) {
@@ -46,7 +46,7 @@ Object.assign( AnimationClip, {
 
 		}
 
-		return new AnimationClip( json.name, json.duration, tracks );
+		return new AnimationClip( json.name, json.duration, tracks, json.uuid );
 
 	},
 
