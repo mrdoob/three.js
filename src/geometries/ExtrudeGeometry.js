@@ -7,7 +7,7 @@
  *
  *  curveSegments: <int>, // number of points on the curves
  *  steps: <int>, // number of points for z-side extrusions / used for subdividing segments of extrude spline too
- *  amount: <float>, // Depth to extrude the shape
+ *  depth: <float>, // Depth to extrude the shape
  *
  *  bevelEnabled: <bool>, // turn on bevel
  *  bevelThickness: <float>, // how deep into the original shape bevel goes
@@ -93,7 +93,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 		var steps = options.steps !== undefined ? options.steps : 1;
-		var amount = options.amount !== undefined ? options.amount : 100;
+		var depth = options.depth !== undefined ? options.depth : 100;
 
 		var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
 		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
@@ -103,6 +103,15 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		var extrudePath = options.extrudePath;
 
 		var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
+
+		// deprecated options
+
+		if ( options.amount !== undefined ) {
+
+			console.warn( 'THREE.ExtrudeBufferGeometry: amount has been renamed to depth.' );
+			depth = options.amount;
+
+		}
 
 		//
 
@@ -444,7 +453,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				if ( ! extrudeByPath ) {
 
-					v( vert.x, vert.y, amount / steps * s );
+					v( vert.x, vert.y, depth / steps * s );
 
 				} else {
 
@@ -478,7 +487,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 			for ( i = 0, il = contour.length; i < il; i ++ ) {
 
 				vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-				v( vert.x, vert.y, amount + z );
+				v( vert.x, vert.y, depth + z );
 
 			}
 
@@ -495,7 +504,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 					if ( ! extrudeByPath ) {
 
-						v( vert.x, vert.y, amount + z );
+						v( vert.x, vert.y, depth + z );
 
 					} else {
 
