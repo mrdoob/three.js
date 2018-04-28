@@ -35,7 +35,7 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 		if ( position.isInterleavedBufferAttribute ) {
 
-			count = position.data.count;
+			count = position.count;
 
 			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
 
