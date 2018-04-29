@@ -104,19 +104,15 @@
 
 		//
 
-		var audioLoader = new THREE.AudioLoader();
-
 		var listener = new THREE.AudioListener();
 
 		var audio = new THREE.Audio( listener );
 
-		audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3', function ( buffer ) {
+		var mediaElement = new Audio( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3' );
+		mediaElement.loop = true;
+		mediaElement.play();
 
-			audio.setBuffer( buffer );
-			audio.setLoop( true );
-			audio.play();
-
-		} );
+		audio.setMediaElementSource( mediaElement );
 
 		analyser = new THREE.AudioAnalyser( audio, fftSize );
 

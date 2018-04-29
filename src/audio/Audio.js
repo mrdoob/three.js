@@ -52,6 +52,17 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
+	setMediaElementSource: function ( mediaElement ) {
+
+		this.hasPlaybackControl = false;
+		this.sourceType = 'mediaNode';
+		this.source = this.context.createMediaElementSource( mediaElement );
+		this.connect();
+
+		return this;
+
+	},
+
 	setBuffer: function ( audioBuffer ) {
 
 		this.buffer = audioBuffer;
