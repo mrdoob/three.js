@@ -735,6 +735,38 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 	};
 
+	this.generateBufferGeometry = function() {
+
+		var start = 0, geo = new THREE.BufferGeometry();
+		var indices = [];
+		var posArray = new Float32Array();
+		var normArray = new Float32Array();
+		var colorArray = new Float32Array();
+		var uvArray = new Float32Array();
+		var scope = this;
+
+		var geo_callback = function( object ) {
+
+			if (scope.hasPositions) posArray = concatenate(Float32Array, posArray, object.positionArray, object.count*3);
+			if (scope.hasNormals) normArray = concatenate(Float32Array, normArray, object.normalArray, object.count*3);
+			if (scope.hasColors) colorArray = concatenate(Float32Array, colorArray, object.colorArray, object.count*3);
+			if (scope.hasUvs) uvArray = concatenate(Float32Array, uvArray, object.uvArray, object.count*2);
+
+			object.count = 0;
+
+		};
+
+		this.render( geo_callback );
+
+		if (this.hasPositions) geo.addAttribute( 'position', new THREE.BufferAttribute(posArray,3));
+		if (this.hasNormals) geo.addAttribute( 'normal', new THREE.BufferAttribute(normArray,3));
+		if (this.hasColors) geo.addAttribute( 'color', new THREE.BufferAttribute(colorArray,3));
+		if (this.hasUvs) geo.addAttribute( 'uv', new THREE.BufferAttribute(uvArray,3));
+
+		return geo;
+
+	};
+
 	this.init( resolution );
 
 };
