@@ -18,21 +18,24 @@ Object.assign( AudioLoader.prototype, {
 
 		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function ( buffer ) {
+		loader.setDecodeCallback( decode );
+		loader.load( url, function ( audioBuffer ) {
 
-			var context = AudioContext.getContext();
-
-			context.decodeAudioData( buffer, function ( audioBuffer ) {
-
-				onLoad( audioBuffer );
-
-			} );
+			onLoad( audioBuffer );
 
 		}, onProgress, onError );
 
 	}
 
 } );
+
+function decode( buffer, onLoad ) {
+
+	var context = AudioContext.getContext();
+
+	context.decodeAudioData( buffer, onLoad );
+
+}
 
 
 export { AudioLoader };
