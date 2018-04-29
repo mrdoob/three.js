@@ -761,7 +761,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		if (this.hasPositions) geo.addAttribute( 'position', new THREE.BufferAttribute(posArray,3));
 		if (this.hasNormals) geo.addAttribute( 'normal', new THREE.BufferAttribute(normArray,3));
 		if (this.hasColors) geo.addAttribute( 'color', new THREE.BufferAttribute(colorArray,3));
-		if (this.hasUvs) geo.addAttribute( 'uv', new THREE.BufferAttribute(uvArray,3));
+		if (this.hasUvs) geo.addAttribute( 'uv', new THREE.BufferAttribute(uvArray,2));
 
 		return geo;
 
