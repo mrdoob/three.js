@@ -46,7 +46,7 @@
 
 		<script>
 
-			var camera, scene, renderer, renderer2;
+			var camera, scene, renderer, labelRenderer;
 			var controls;
 			var clock = new THREE.Clock();
 			var textureLoader = new THREE.TextureLoader();
@@ -124,11 +124,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer2 = new THREE.CSS2DRenderer();
-				renderer2.setSize( window.innerWidth, window.innerHeight );
-				renderer2.domElement.style.position = 'absolute';
-				renderer2.domElement.style.top = 0;
-				document.body.appendChild( renderer2.domElement );
+				labelRenderer = new THREE.CSS2DRenderer();
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.domElement.style.position = 'absolute';
+				labelRenderer.domElement.style.top = 0;
+				document.body.appendChild( labelRenderer.domElement );
 
 			}
 
@@ -141,7 +141,7 @@
 				moon.position.set( Math.sin( elapsed ) * 5, 0, Math.cos( elapsed ) * 5 );
 
 				renderer.render( scene, camera );
-				renderer2.render( scene, camera );
+				labelRenderer.render( scene, camera );
 
 			}
 
