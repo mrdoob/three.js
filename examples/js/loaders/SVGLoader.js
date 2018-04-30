@@ -433,9 +433,8 @@ THREE.SVGLoader.prototype = {
 			var theta = svgAngle( 1, 0, ( x1p - cxp ) / rx, ( y1p - cyp ) / ry );
 			var delta = svgAngle( ( x1p - cxp ) / rx, ( y1p - cyp ) / ry, ( - x1p - cxp ) / rx, ( - y1p - cyp ) / ry );
 			delta = delta % ( Math.PI * 2 );
-			if ( ! sweep_flag ) delta -= 2 * Math.PI;
 
-			path.currentPath.absellipse( cx, cy, rx, ry, theta, theta + delta, theta + delta < theta, x_axis_rotation );
+			path.currentPath.absellipse( cx, cy, rx, ry, theta, theta + delta, sweep_flag === 0, x_axis_rotation );
 
 		}
 
