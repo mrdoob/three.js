@@ -734,6 +734,14 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		return geo;
 
 	};
+	
+	function concatenate(resultConstructor, a1, a2, length) {
+		let totalLength = a1.length + length;
+		let result = new resultConstructor(totalLength);
+		result.set(a1, 0);
+		result.set(a2.slice(0,length), a1.length);
+		return result;
+	}
 
 	this.generateBufferGeometry = function() {
 
