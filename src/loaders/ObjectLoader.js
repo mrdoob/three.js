@@ -458,6 +458,12 @@ Object.assign( ObjectLoader.prototype, {
 
 			var clip = AnimationClip.parse( json[ i ] );
 
+			if ( json[ i ].uuid !== undefined ) {
+
+				clip.uuid = json[ i ].uuid;
+
+			}
+
 			animations.push( clip );
 
 		}
