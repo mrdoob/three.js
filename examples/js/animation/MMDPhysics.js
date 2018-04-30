@@ -814,9 +814,9 @@ THREE.MMDPhysics.RigidBody.prototype = {
 		var helper = this.helper;
 		var p = helper.allocThreeVector3();
 		var q = helper.allocThreeQuaternion();
+		var s = helper.allocThreeVector3();
 
-		this.bone.getWorldPosition( p );
-		this.bone.getWorldQuaternion( q );
+		this.bone.matrixWorld.decompose( p, q, s );
 
 		var tr = helper.allocTransform();
 		helper.setOriginFromThreeVector3( tr, p );
@@ -825,6 +825,7 @@ THREE.MMDPhysics.RigidBody.prototype = {
 		var form = helper.multiplyTransforms( tr, this.boneOffsetForm );
 
 		helper.freeTransform( tr );
+		helper.freeThreeVector3( s );
 		helper.freeThreeQuaternion( q );
 		helper.freeThreeVector3( p );
 
@@ -880,8 +881,6 @@ THREE.MMDPhysics.RigidBody.prototype = {
 	},
 
 	updateBoneRotation: function () {
-
-		this.bone.updateMatrixWorld( true );
 
 		var helper = this.helper;
 
