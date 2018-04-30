@@ -14236,7 +14236,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				Triangle.getNormal( vA, vB, vC, face.normal );
 
 				intersection.face = face;
-				intersection.faceIndex = a;
 
 			}
 
@@ -14298,7 +14297,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 						if ( intersection ) {
 
-							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indices buffer semantics
+							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
 							intersects.push( intersection );
 
 						}
@@ -14317,7 +14316,12 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
-						if ( intersection ) intersects.push( intersection );
+						if ( intersection ) {
+
+							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+							intersects.push( intersection );
+
+						}
 
 					}
 
@@ -14420,7 +14424,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
+function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 	var clearColor = new Color( 0x000000 );
 	var clearAlpha = 0;
@@ -14475,7 +14479,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 				};
 
-				geometries.update( boxMesh.geometry );
+				objects.update( boxMesh );
 
 			}
 
@@ -14494,7 +14498,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 					new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
 				);
 
-				geometries.update( planeMesh.geometry );
+				objects.update( planeMesh );
 
 			}
 
@@ -14578,19 +14582,7 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 		}
 
-		var position = geometry.attributes.position;
-
-		if ( position.isInterleavedBufferAttribute ) {
-
-			count = position.data.count;
-
-			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
-
-		} else {
-
-			extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
-
-		}
+		extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
 
 		info.update( count, mode, geometry.maxInstancedCount );
 
@@ -21381,7 +21373,7 @@ function WebGLRenderer( parameters ) {
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates();
 
-		background = new WebGLBackground( _this, state, geometries, _premultipliedAlpha );
+		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
@@ -23693,11 +23685,18 @@ function WebGLRenderer( parameters ) {
 		var height = srcTexture.image.height;
 		var glFormat = utils.convert( dstTexture.format );
 		var glType = utils.convert( dstTexture.type );
-		var pixels = srcTexture.isDataTexture ? srcTexture.image.data : srcTexture.image;
 
 		this.setTexture2D( dstTexture, 0 );
 
-		_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, width, height, glFormat, glType, pixels );
+		if ( srcTexture.isDataTexture ) {
+
+			_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, width, height, glFormat, glType, srcTexture.image.data );
+
+		} else {
+
+			_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, glFormat, glType, srcTexture.image );
+
+		}
 
 	};
 
@@ -27562,7 +27561,7 @@ function addContour( vertices, contour ) {
  *
  *  curveSegments: <int>, // number of points on the curves
  *  steps: <int>, // number of points for z-side extrusions / used for subdividing segments of extrude spline too
- *  amount: <int>, // Depth to extrude the shape
+ *  depth: <float>, // Depth to extrude the shape
  *
  *  bevelEnabled: <bool>, // turn on bevel
  *  bevelThickness: <float>, // how deep into the original shape bevel goes
@@ -27620,7 +27619,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 	for ( var i = 0, l = shapes.length; i < l; i ++ ) {
 
 		var shape = shapes[ i ];
-		addShape( shape, options );
+		addShape( shape );
 
 	}
 
@@ -27641,7 +27640,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 		var steps = options.steps !== undefined ? options.steps : 1;
-		var amount = options.amount !== undefined ? options.amount : 100;
+		var depth = options.depth !== undefined ? options.depth : 100;
 
 		var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
 		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
@@ -27651,6 +27650,15 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		var extrudePath = options.extrudePath;
 
 		var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
+
+		// deprecated options
+
+		if ( options.amount !== undefined ) {
+
+			console.warn( 'THREE.ExtrudeBufferGeometry: amount has been renamed to depth.' );
+			depth = options.amount;
+
+		}
 
 		//
 
@@ -27992,7 +28000,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				if ( ! extrudeByPath ) {
 
-					v( vert.x, vert.y, amount / steps * s );
+					v( vert.x, vert.y, depth / steps * s );
 
 				} else {
 
@@ -28026,7 +28034,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 			for ( i = 0, il = contour.length; i < il; i ++ ) {
 
 				vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-				v( vert.x, vert.y, amount + z );
+				v( vert.x, vert.y, depth + z );
 
 			}
 
@@ -28043,7 +28051,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 					if ( ! extrudeByPath ) {
 
-						v( vert.x, vert.y, amount + z );
+						v( vert.x, vert.y, depth + z );
 
 					} else {
 
@@ -28372,7 +28380,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	// translate parameters to ExtrudeGeometry API
 
-	parameters.amount = parameters.height !== undefined ? parameters.height : 50;
+	parameters.depth = parameters.height !== undefined ? parameters.height : 50;
 
 	// defaults
 
@@ -36745,12 +36753,14 @@ Object.assign( ObjectLoader.prototype, {
 	setTexturePath: function ( value ) {
 
 		this.texturePath = value;
+		return this;
 
 	},
 
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
 
 	},
 
