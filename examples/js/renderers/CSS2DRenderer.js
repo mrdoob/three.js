@@ -133,7 +133,7 @@ THREE.CSS2DRenderer = function () {
 
 		return result;
 
-	}
+	};
 
 	var zOrder = function ( scene ) {
 
