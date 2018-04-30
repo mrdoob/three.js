@@ -11,15 +11,15 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			Create a AudioAnalyser object, which uses an [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode]
-			to analyse audio data.<br /><br />
+			创建一个 AudioAnalyser 对象，使用 [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode]
+			分析音频数据。<br /><br />
 
-			This uses the [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
+			使用了 [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API]。
 
 		</div>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<div>
 			[example:webaudio_sandbox webaudio / sandbox ]</br>
@@ -27,14 +27,14 @@
 		</div>
 
 		<code>
-		// create an AudioListener and add it to the camera
+		// 创建一个 AudioListener 并将其加入到 camera 中
 		var listener = new THREE.AudioListener();
 		camera.add( listener );
 
-		// create an Audio source
+		// 创建音频源
 		var sound = new THREE.Audio( listener );
 
-		// load a sound and set it as the Audio object's buffer
+		// 加载声音并设置为 Audio 对象的 buffer（缓冲）
 		var audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
@@ -43,56 +43,56 @@
 			sound.play();
 		});
 
-		// create an AudioAnalyser, passing in the sound and desired fftSize
+		// 创建一个 AudioAnalyser，传入音频和 fftSize
 		var analyser = new THREE.AudioAnalyser( sound, 32 );
 
-		// get the average frequency of the sound
+		// 获取音频的平均频率
 		var data = analyser.getAverageFrequency();
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( audio, [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize fftSize] )</h3>
 		<div>
-		Create a new [page:AudioAnalyser AudioAnalyser].
+		创建新的 [page:AudioAnalyser AudioAnalyser].
 		</div>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:AnalyserNode analyser]</h3>
-		<div>An [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode] used to analyze audio.</div>
+		<div>用于分析音频的 [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode]。</div>
 
 		<h3>[property:Integer fftSize]</h3>
 		<div>
-		A non-zero power of two up to 2048, representing the size of the FFT (Fast Fourier Transform) to be used to determine the frequency domain.<br />
-		See [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize this page] for details.
+		2 的非零次幂，最大为 2048，表示用于确定 frequency domain （频域）的 FFT (Fast Fourier Transform) 的大小。<br />
+		详情参考 [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize this page]。
 		</div>
 
 		<h3>[property:Uint8Array data]</h3>
 		<div>
-		A Uint8Array with size determined by [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/frequencyBinCount analyser.frequencyBinCount]
-		used to hold analysis data.
+		一个 Uint8Array，其大小由保存分析数据的 [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/frequencyBinCount analyser.frequencyBinCount] 决定。
+		
 		</div>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 
 		<h3>[method:Uint8Array getFrequencyData]()</h3>
 		<div>
-		Uses the Web Audio's [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getByteFrequencyData getByteFrequencyData] method.
-		See that page.
+		使用 Web Audio 的 [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getByteFrequencyData getByteFrequencyData] 方法。
+		
 		</div>
 
 		<h3>[method:Number getAverageFrequency]()</h3>
 		<div>
-		Get the average of the frequencies returned by the [page:AudioAnalyser.getFrequencyData getFrequencyData] method.
+		获取音频的平均频率，由 [page:AudioAnalyser.getFrequencyData getFrequencyData] 方法返回。 
 		</div>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
