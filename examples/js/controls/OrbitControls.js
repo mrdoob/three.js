@@ -74,8 +74,22 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// The four arrow keys
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
-	// Mouse buttons
-	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+	// Mouse buttons -- each may be a mouse button value or a MouseEvent->Boolean predicate
+	this.mouseButtons = {
+		ORBIT: function ( event ) {
+
+			return event.button === THREE.MOUSE.LEFT && ! event.ctrlKey;
+
+		},
+
+		ZOOM: THREE.MOUSE.MIDDLE,
+
+		PAN: function ( event ) {
+
+			return event.button === THREE.MOUSE.RIGHT || ( event.button === THREE.MOUSE.LEFT && event.ctrlKey );
+
+		}
+	};
 
 	// for reset
 	this.target0 = this.target.clone();
@@ -675,37 +689,29 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		switch ( event.button ) {
+		if ( typeof scope.mouseButtons.ORBIT === 'function' ? scope.mouseButtons.ORBIT(event) : event.button === scope.mouseButtons.ORBIT ) {
 
-			case scope.mouseButtons.ORBIT:
+			if ( scope.enableRotate === false ) return;
 
-				if ( scope.enableRotate === false ) return;
+			handleMouseDownRotate( event );
 
-				handleMouseDownRotate( event );
+			state = STATE.ROTATE;
 
-				state = STATE.ROTATE;
+		} else if ( typeof scope.mouseButtons.ZOOM === 'function' ? scope.mouseButtons.ZOOM(event) : event.button === scope.mouseButtons.ZOOM ) {
 
-				break;
+			if ( scope.enableZoom === false ) return;
 
-			case scope.mouseButtons.ZOOM:
+			handleMouseDownDolly( event );
 
-				if ( scope.enableZoom === false ) return;
+			state = STATE.DOLLY;
 
-				handleMouseDownDolly( event );
+		} else if ( typeof scope.mouseButtons.PAN === 'function' ? scope.mouseButtons.PAN(event) : event.button === scope.mouseButtons.PAN ) {
 
-				state = STATE.DOLLY;
+			if ( scope.enablePan === false ) return;
 
-				break;
+			handleMouseDownPan( event );
 
-			case scope.mouseButtons.PAN:
-
-				if ( scope.enablePan === false ) return;
-
-				handleMouseDownPan( event );
-
-				state = STATE.PAN;
-
-				break;
+			state = STATE.PAN;
 
 		}
 
