@@ -221,7 +221,6 @@ THREE.SVGLoader.prototype = {
 						break;
 
 					case 'A':
-						console.warn( command );
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
 							var start = point.clone();
@@ -344,7 +343,6 @@ THREE.SVGLoader.prototype = {
 						break;
 
 					case 'a':
-						console.warn( command );
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
 							var start = point.clone();
@@ -409,13 +407,16 @@ THREE.SVGLoader.prototype = {
 
 			// Ensure radii are large enough
 			var cr = x1ps / rxs + y1ps / rys;
+
 			if ( cr > 1 ) {
+
 				// scale up rx,ry equally so cr == 1
 				var s = Math.sqrt( cr );
 				rx = s * rx;
 				ry = s * ry;
 				rxs = rx * rx;
 				rys = ry * ry;
+
 			}
 
 			var dq = ( rxs * y1ps + rys * x1ps );
@@ -431,19 +432,20 @@ THREE.SVGLoader.prototype = {
 
 			// Step 4: Compute θ1 and Δθ
 			var theta = svgAngle( 1, 0, ( x1p - cxp ) / rx, ( y1p - cyp ) / ry );
-			var delta = svgAngle( ( x1p - cxp ) / rx, ( y1p - cyp ) / ry, ( - x1p - cxp ) / rx, ( - y1p - cyp ) / ry );
-			delta = delta % ( Math.PI * 2 );
+			var delta = svgAngle( ( x1p - cxp ) / rx, ( y1p - cyp ) / ry, ( - x1p - cxp ) / rx, ( - y1p - cyp ) / ry ) % ( Math.PI * 2 );
 
 			path.currentPath.absellipse( cx, cy, rx, ry, theta, theta + delta, sweep_flag === 0, x_axis_rotation );
 
 		}
 
 		function svgAngle( ux, uy, vx, vy ) {
+
 			var dot = ux * vx + uy * vy;
 			var len = Math.sqrt( ux * ux + uy * uy ) *  Math.sqrt( vx * vx + vy * vy );
-			var ang = Math.acos( Math.max( -1, Math.min( 1, dot / len ) ) ); //floating point precision, slightly over values appear
+			var ang = Math.acos( Math.max( -1, Math.min( 1, dot / len ) ) ); // floating point precision, slightly over values appear
 			if ( ( ux * vy - uy * vx ) < 0 ) ang = - ang;
 			return ang;
+
 		}
 
 		/*
