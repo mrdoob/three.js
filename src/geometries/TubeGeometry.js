@@ -165,9 +165,10 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 			// vertex
 
-			vertex.x = P.x + radius * normal.x;
-			vertex.y = P.y + radius * normal.y;
-			vertex.z = P.z + radius * normal.z;
+			var r = radius instanceof THREE.Path ? radius.getPointAt( i / tubularSegments ).y : radius;
+			vertex.x = P.x + r * normal.x;
+			vertex.y = P.y + r * normal.y;
+			vertex.z = P.z + r * normal.z;
 
 			vertices.push( vertex.x, vertex.y, vertex.z );
 
