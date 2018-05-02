@@ -21,6 +21,12 @@
 
 THREE.MMDPhysics = function ( mesh, params ) {
 
+	if ( typeof Ammo === 'undefined' ) {
+
+		throw new Error( 'THREE.MMDPhysics: Import ammo.js https://github.com/kripken/ammo.js' );
+
+	}
+
 	if ( params === undefined ) params = {};
 
 	this.mesh = mesh;
@@ -1059,17 +1065,18 @@ THREE.MMDPhysics.Constraint.prototype = {
 };
 
 
-THREE.MMDPhysicsHelper = function ( mesh ) {
+THREE.MMDPhysicsHelper = function ( mesh, physics ) {
 
-	if ( mesh.physics === undefined || mesh.geometry.rigidBodies === undefined ) {
+	if ( mesh.geometry.rigidBodies === undefined ) {
 
-		throw 'THREE.MMDPhysicsHelper requires physics in mesh and rigidBodies in mesh.geometry.';
+		throw new Error( 'THREE.MMDPhysicsHelper requires rigidBodies in mesh.geometry.' );
 
 	}
 
 	THREE.Object3D.call( this );
 
 	this.root = mesh;
+	this.physics = physics;
 
 	this.matrix = mesh.matrixWorld;
 	this.matrixAutoUpdate = false;
@@ -1175,7 +1182,7 @@ THREE.MMDPhysicsHelper.prototype.update = function () {
 
 	var mesh = this.root;
 	var rigidBodies = mesh.geometry.rigidBodies;
-	var bodies = mesh.physics.bodies;
+	var bodies = this.physics.bodies;
 
 	var matrixWorldInv = new THREE.Matrix4().getInverse( mesh.matrixWorld );
 	var vector = new THREE.Vector3();
