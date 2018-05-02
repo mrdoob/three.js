@@ -1,5 +1,5 @@
 #ifdef ALPHATEST
 
-	if ( diffuseColor.a < ALPHATEST ) discard;
+	if ( diffuseColor.a < float( ALPHATEST ) ) discard;
 
 #endif
