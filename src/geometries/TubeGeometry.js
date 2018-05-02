@@ -140,7 +140,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 		// we use getPointAt to sample evenly distributed points from the given path
 
-		path.getPointAt( i / tubularSegments, P );
+		P = path.getPointAt( i / tubularSegments, P );
 		var P1 = new Vector3();
 		var P2 = new Vector3();
 
