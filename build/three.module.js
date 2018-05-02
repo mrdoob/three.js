@@ -21133,6 +21133,14 @@ function WebVRManager( renderer ) {
 
 	};
 
+	this.isPresenting = isPresenting;
+
+	this.requestAnimationFrame = function ( callback ) {
+
+		device.requestAnimationFrame( callback );
+
+	};
+
 	this.submitFrame = function () {
 
 		if ( isPresenting() ) device.submitFrame();
@@ -21146,6 +21154,141 @@ function WebVRManager( renderer ) {
 			window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
 
 		}
+
+	};
+
+}
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+function WebXRManager( gl ) {
+
+	var device = null;
+	var session = null;
+
+	var frameOfRef = null;
+	var isExclusive = false;
+
+	var pose = null;
+
+	function isPresenting() {
+
+		return session !== null && frameOfRef !== null;
+
+	}
+
+	//
+
+	var cameraL = new PerspectiveCamera();
+	cameraL.layers.enable( 1 );
+	cameraL.viewport = new Vector4();
+
+	var cameraR = new PerspectiveCamera();
+	cameraR.layers.enable( 2 );
+	cameraR.viewport = new Vector4();
+
+	var cameraVR = new ArrayCamera( [ cameraL, cameraR ] );
+	cameraVR.layers.enable( 1 );
+	cameraVR.layers.enable( 2 );
+
+	//
+
+	this.enabled = false;
+
+	this.getDevice = function () {
+
+		return device;
+
+	};
+
+	this.setDevice = function ( value ) {
+
+		if ( value !== undefined ) device = value;
+
+		gl.setCompatibleXRDevice( value );
+
+	};
+
+	this.setSession = function ( value ) {
+
+		session = value;
+
+		if ( session !== null ) {
+
+			session.baseLayer = new XRWebGLLayer( session, gl );
+			session.requestFrameOfReference( 'stage' ).then( function ( value ) {
+
+				frameOfRef = value;
+				isExclusive = session.exclusive;
+
+				console.log( 0 );
+
+			} );
+
+		}
+
+	};
+
+	this.getCamera = function ( camera ) {
+
+		return isPresenting() ? cameraVR : camera;
+
+	};
+
+	this.isPresenting = isPresenting;
+
+	this.requestAnimationFrame = function ( callback ) {
+
+		console.log( 1 );
+
+		function onFrame( time, frame ) {
+
+			pose = frame.getDevicePose( frameOfRef );
+
+			var layer = session.baseLayer;
+			var views = frame.views;
+
+			for ( var i = 0; i < views.length; i ++ ) {
+
+				var view = views[ i ];
+				var viewport = layer.getViewport( view );
+				var viewMatrix = pose.getViewMatrix( view );
+
+				var camera = cameraVR.cameras[ i ];
+				camera.projectionMatrix.fromArray( view.projectionMatrix );
+				camera.matrixWorldInverse.fromArray( viewMatrix );
+				camera.matrixWorld.getInverse( camera.matrixWorldInverse );
+				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
+
+				if ( i === 0 ) {
+
+					cameraVR.matrixWorld.copy( camera.matrixWorld );
+					cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
+
+					// HACK (mrdoob)
+					// https://github.com/w3c/webvr/issues/203
+
+					cameraVR.projectionMatrix.copy( camera.projectionMatrix );
+
+				}
+
+			}
+
+			gl.bindFramebuffer( gl.FRAMEBUFFER, session.baseLayer.framebuffer );
+
+			callback();
+
+		}
+
+		session.requestAnimationFrame( onFrame );
+
+	};
+
+	this.submitFrame = function () {
+
+		// if ( device && device.isPresenting ) device.submitFrame();
 
 	};
 
@@ -21396,7 +21539,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = new WebVRManager( _this );
+	var vr = ( 'xr' in navigator ) ? new WebXRManager( _gl ) : new WebVRManager( _this );
 
 	this.vr = vr;
 
@@ -21461,9 +21604,7 @@ function WebGLRenderer( parameters ) {
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		var device = vr.getDevice();
-
-		if ( device && device.isPresenting ) {
+		if ( vr.isPresenting() ) {
 
 			console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
 			return;
@@ -22145,11 +22286,9 @@ function WebGLRenderer( parameters ) {
 
 	function requestAnimationLoopFrame() {
 
-		var device = vr.getDevice();
+		if ( vr.isPresenting() ) {
 
-		if ( device && device.isPresenting ) {
-
-			device.requestAnimationFrame( animationLoop );
+			vr.requestAnimationFrame( animationLoop );
 
 		} else {
 
@@ -22496,14 +22635,22 @@ function WebGLRenderer( parameters ) {
 
 					if ( object.layers.test( camera2.layers ) ) {
 
-						var bounds = camera2.bounds;
+						if ( 'viewport' in camera2 ) { // XR
 
-						var x = bounds.x * _width;
-						var y = bounds.y * _height;
-						var width = bounds.z * _width;
-						var height = bounds.w * _height;
+							state.viewport( _currentViewport.copy( camera2.viewport ) );
 
-						state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
+						} else {
+
+							var bounds = camera2.bounds;
+
+							var x = bounds.x * _width;
+							var y = bounds.y * _height;
+							var width = bounds.z * _width;
+							var height = bounds.w * _height;
+
+							state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
+
+						}
 
 						renderObject( object, scene, camera2, geometry, material, group );
 
@@ -35216,7 +35363,8 @@ Object.assign( AnimationClip, {
 
 			'name': clip.name,
 			'duration': clip.duration,
-			'tracks': tracks
+			'tracks': tracks,
+			'uuid': clip.uuid
 
 		};
 
@@ -37099,7 +37247,11 @@ Object.assign( ObjectLoader.prototype, {
 
 		for ( var i = 0; i < json.length; i ++ ) {
 
-			var clip = AnimationClip.parse( json[ i ] );
+			var data = json[ i ];
+
+			var clip = AnimationClip.parse( data );
+
+			if ( data.uuid !== undefined ) clip.uuid = data.uuid;
 
 			animations.push( clip );
 
@@ -38541,6 +38693,17 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		this.hasPlaybackControl = false;
 		this.sourceType = 'audioNode';
 		this.source = audioNode;
+		this.connect();
+
+		return this;
+
+	},
+
+	setMediaElementSource: function ( mediaElement ) {
+
+		this.hasPlaybackControl = false;
+		this.sourceType = 'mediaNode';
+		this.source = this.context.createMediaElementSource( mediaElement );
 		this.connect();
 
 		return this;
