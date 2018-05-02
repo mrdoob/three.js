@@ -14,6 +14,7 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
+import { Path } from '../extras/core/Path.js';
 
 // TubeGeometry
 
@@ -139,7 +140,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 		// we use getPointAt to sample evenly distributed points from the given path
 
-		var P = path.getPointAt( i / tubularSegments, P );
+		path.getPointAt( i / tubularSegments, P );
 		var P1 = new Vector3();
 		var P2 = new Vector3();
 
@@ -196,8 +197,10 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 				// prevent dividing by zero
 
-				if( delta !== 0 ) {
+				if ( delta !== 0 ) {
+
 					normal.addScaledVector( T, - ( r2 - r1 ) / delta ).normalize();
+
 				}
 
 			}
