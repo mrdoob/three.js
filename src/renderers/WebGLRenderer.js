@@ -42,6 +42,7 @@ import { WebGLTextures } from './webgl/WebGLTextures.js';
 import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebVRManager } from './webvr/WebVRManager.js';
+import { WebXRManager } from './webvr/WebXRManager.js';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -288,7 +289,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = new WebVRManager( _this );
+	var vr = ( 'xr' in navigator ) ? new WebXRManager( _gl ) : new WebVRManager( _this );
 
 	this.vr = vr;
 
@@ -353,9 +354,7 @@ function WebGLRenderer( parameters ) {
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		var device = vr.getDevice();
-
-		if ( device && device.isPresenting ) {
+		if ( vr.isPresenting() ) {
 
 			console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
 			return;
@@ -1037,11 +1036,9 @@ function WebGLRenderer( parameters ) {
 
 	function requestAnimationLoopFrame() {
 
-		var device = vr.getDevice();
+		if ( vr.isPresenting() ) {
 
-		if ( device && device.isPresenting ) {
-
-			device.requestAnimationFrame( animationLoop );
+			vr.requestAnimationFrame( animationLoop );
 
 		} else {
 
@@ -1388,14 +1385,22 @@ function WebGLRenderer( parameters ) {
 
 					if ( object.layers.test( camera2.layers ) ) {
 
-						var bounds = camera2.bounds;
+						if ( 'viewport' in camera2 ) { // XR
 
-						var x = bounds.x * _width;
-						var y = bounds.y * _height;
-						var width = bounds.z * _width;
-						var height = bounds.w * _height;
+							state.viewport( _currentViewport.copy( camera2.viewport ) );
 
-						state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
+						} else {
+
+							var bounds = camera2.bounds;
+
+							var x = bounds.x * _width;
+							var y = bounds.y * _height;
+							var width = bounds.z * _width;
+							var height = bounds.w * _height;
+
+							state.viewport( _currentViewport.set( x, y, width, height ).multiplyScalar( _pixelRatio ) );
+
+						}
 
 						renderObject( object, scene, camera2, geometry, material, group );
 

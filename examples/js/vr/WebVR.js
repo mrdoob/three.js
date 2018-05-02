@@ -9,7 +9,7 @@ var WEBVR = {
 
 	createButton: function ( renderer ) {
 
-		function showEnterVR( display ) {
+		function showEnterVR( device ) {
 
 			button.style.display = '';
 
@@ -24,11 +24,29 @@ var WEBVR = {
 
 			button.onclick = function () {
 
-				display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: renderer.domElement } ] );
+				if ( 'xr' in navigator ) {
+
+					device.requestSession( { exclusive: true } ).then( function ( session ) {
+
+						renderer.vr.setSession( session );
+
+						session.addEventListener( 'end', function ( event ) {
+
+							renderer.vr.setSession( null );
+
+						} );
+
+					} );
+
+				} else {
+
+					device.isPresenting ? device.exitPresent() : device.requestPresent( [ { source: renderer.domElement } ] );
+
+				}
 
 			};
 
-			renderer.vr.setDevice( display );
+			renderer.vr.setDevice( device );
 
 		}
 
@@ -68,7 +86,31 @@ var WEBVR = {
 
 		}
 
-		if ( 'getVRDisplays' in navigator ) {
+		var isWebXR = false;
+
+		if ( 'xr' in navigator ) {
+
+			isWebXR = true;
+
+			var button = document.createElement( 'button' );
+			button.style.display = 'none';
+
+			stylizeElement( button );
+
+			navigator.xr.requestDevice().then( function ( device ) {
+
+				device.supportsSession( { exclusive: true } ).then( function () {
+
+					showEnterVR( device );
+					button.textContent = 'ENTER XR'; // TODO
+
+				} ).catch( showVRNotFound );
+
+			} ).catch( showVRNotFound );
+
+			return button;
+
+		} else if ( 'getVRDisplays' in navigator ) {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
