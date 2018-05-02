@@ -3,8 +3,8 @@
  */
 
 import { Matrix4 } from '../../math/Matrix4.js';
-import { Vector4 } from '../../math/Vector4.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { Vector4 } from '../../math/Vector4.js';
 import { Quaternion } from '../../math/Quaternion.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
@@ -223,6 +223,14 @@ function WebVRManager( renderer ) {
 	this.getStandingMatrix = function () {
 
 		return standingMatrix;
+
+	};
+
+	this.isPresenting = isPresenting;
+
+	this.requestAnimationFrame = function ( callback ) {
+
+		device.requestAnimationFrame( callback );
 
 	};
 
