@@ -5,6 +5,7 @@
  * @author miningold / https://github.com/miningold
  * @author jonobr1 / https://github.com/jonobr1
  * @author Mugen87 / https://github.com/Mugen87
+ * @author spite / https://github.com/spite
  *
  */
 
@@ -138,10 +139,13 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 		// we use getPointAt to sample evenly distributed points from the given path
 
-		P = path.getPointAt( i / tubularSegments, P );
+		var P = path.getPointAt( i / tubularSegments, P );
+		var P1 = new Vector3();
+		var P2 = new Vector3();
 
 		// retrieve corresponding normal and binormal
 
+		var T = frames.tangents[ i ];
 		var N = frames.normals[ i ];
 		var B = frames.binormals[ i ];
 
@@ -161,16 +165,46 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 			normal.z = ( cos * N.z + sin * B.z );
 			normal.normalize();
 
-			normals.push( normal.x, normal.y, normal.z );
-
 			// vertex
 
-			var r = radius instanceof THREE.Path ? radius.getPointAt( i / tubularSegments ).y : radius;
+			var r = radius instanceof Path ? radius.getPointAt( i / tubularSegments ).y : radius;
 			vertex.x = P.x + r * normal.x;
 			vertex.y = P.y + r * normal.y;
 			vertex.z = P.z + r * normal.z;
 
 			vertices.push( vertex.x, vertex.y, vertex.z );
+
+			// adjust normals if the radius is a Path
+
+			if ( radius instanceof Path ) {
+
+				var delta = 0.0001;
+				var t1 = i / tubularSegments - delta;
+				var t2 = i / tubularSegments + delta;
+
+				// Capping in case of danger
+
+				if ( t1 < 0 ) t1 = 0;
+				if ( t2 > 1 ) t2 = 1;
+
+				path.getPointAt( t1, P1 );
+				path.getPointAt( t2, P2 );
+				var delta = P1.distanceTo( P2 );
+
+				var r1 = radius.getPointAt( t1 ).y;
+				var r2 = radius.getPointAt( t2 ).y;
+
+				// prevent dividing by zero
+
+				if( delta !== 0 ) {
+					normal.addScaledVector( T, - ( r2 - r1 ) / delta ).normalize();
+				}
+
+			}
+
+			// push the normal
+
+			normals.push( normal.x, normal.y, normal.z );
 
 		}
 
