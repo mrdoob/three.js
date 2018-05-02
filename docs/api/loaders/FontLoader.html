@@ -10,20 +10,20 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 		Class for loading a font in JSON format. Returns a [page:Font Font], which is an
 		array of [page:Shape Shape]s representing the font.
 		This uses the [page:FileLoader] internally for loading files. <br /><br />
 
 		You can convert fonts online using [link:https://gero3.github.io/facetype.js/ facetype.js]
-		</div>
+		</p>
 
 		<h2>Examples</h2>
 
-		<div>
+		<p>
 		[example:webgl_geometry_text_shapes geometry / text / shapes ]<br/>
 		[example:webgl_geometry_text geometry / text ]
-		</div>
+		</p>
 
 		<code>
 		var loader = new THREE.FontLoader();
@@ -52,25 +52,25 @@
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:LoadingManager manager] )</h3>
-		<div>
+		<p>
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
 		Creates a new [name].
-		</div>
+		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:LoadingManager manager]</h3>
-		<div>
+		<p>
 			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
-		</div>
+		</p>
 
 		<h3>[property:String path]</h3>
-		<div>The base path from which fonts will be loaded. See [page:.setPath]. Default is *undefined*.</div>
+		<p>The base path from which fonts will be loaded. See [page:.setPath]. Default is *undefined*.</p>
 
 		<h2>Methods</h2>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
-		<div>
+		<p>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Texture texture].<br />
@@ -78,19 +78,19 @@
 		[page:Function onError] — Will be called when load errors.<br /><br />
 
 		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
-		</div>
+		</p>
 
 		<h3>[method:Font parse]( [param:Object json] )</h3>
-		<div>
+		<p>
 		[page:Object json] — The <em>JSON</em> structure to parse.<br /><br />
 		Parse a <em>JSON</em> structure and return a [page:Font].
-		</div>
+		</p>
 
 		<h3>[method:FontLoader setPath]( [param:String path] )</h3>
-		<div>
+		<p>
 			Set the base path or URL from which to load fonts. This can be useful if
 			you are loading many fonts from the same directory.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

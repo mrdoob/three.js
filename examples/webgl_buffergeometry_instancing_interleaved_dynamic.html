@@ -233,7 +233,7 @@
 		scene.add( mesh );
 
 
-		if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+		if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 			document.getElementById( "notSupported" ).style.display = "";
 			return;
 		}

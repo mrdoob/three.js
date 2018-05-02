@@ -45,7 +45,7 @@ h3 {
 	margin-top: 40px;
 }
 
-p {
+p, ul, ol {
 	margin-top: 0;
 	margin-bottom: 20px;
 	max-width: 780px;
@@ -56,7 +56,7 @@ div {
 	margin-bottom: 20px;
 }
 
-div.desc {
+.desc {
 	padding-left: 0px;
 }
 

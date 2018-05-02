@@ -4,8 +4,8 @@
 		<title>three.js webvr - daydream</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-04-03 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-04-03" content="AqIrNtaoJSmDZatgEEW2ehuK9ITIiFk3gZ3/gC6Vp0gF85NDYl7IzVPj4Bh7O6SIcr3ICOm6kocYSaS+BPkazgYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyMjc2MzAwMn0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-05-12 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-05-12" content="AkM+gi6Fb7IUBwFLs18hn/x6dusbsVRYG9KBTWUUjvmT0m0wGkxRPy63Aj/i+Ti4d6qMEMnRcsR7MVV5Wuvp/AIAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyNjExODIwMH0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -58,7 +58,7 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 
 				room = new THREE.Mesh(
-					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+					new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x808080, wireframe: true } )
 				);
 				room.position.y = 3;
@@ -70,7 +70,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.IcosahedronGeometry( 0.08, 2 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 0.08, 2 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 

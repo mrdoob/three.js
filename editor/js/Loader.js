@@ -401,7 +401,7 @@ var Loader = function ( editor ) {
 						var path = paths[ i ];
 
 						var material = new THREE.MeshBasicMaterial( {
-							color: Math.random() * 0xffffff,
+							color: path.color,
 							depthWrite: false
 						} );
 

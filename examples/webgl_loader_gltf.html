@@ -66,12 +66,12 @@
 				controls.update();
 
 				// envmap
-				var path = 'textures/cube/skyboxsun25deg/';
+				var path = 'textures/cube/Bridge2/';
 				var format = '.jpg';
 				var envMap = new THREE.CubeTextureLoader().load( [
-					path + 'px' + format, path + 'nx' + format,
-					path + 'py' + format, path + 'ny' + format,
-					path + 'pz' + format, path + 'nz' + format
+					path + 'posx' + format, path + 'negx' + format,
+					path + 'posy' + format, path + 'negy' + format,
+					path + 'posz' + format, path + 'negz' + format
 				] );
 
 				scene = new THREE.Scene();
@@ -79,10 +79,6 @@
 
 				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
 				light.position.set( 0, 1, 0 );
-				scene.add( light );
-
-				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( -10, 6, -10 );
 				scene.add( light );
 
 				// model

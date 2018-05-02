@@ -154,7 +154,7 @@
 					this.scene.add( directionalLight2 );
 					this.scene.add( ambientLight );
 
-					var geometry = new THREE.BoxGeometry( 10, 10, 10 );
+					var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 					var material = new THREE.MeshNormalMaterial();
 					this.cube = new THREE.Mesh( geometry, material );
 					this.cube.position.set( 0, 0, 0 );

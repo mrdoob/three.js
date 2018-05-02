@@ -10,15 +10,15 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			This article shows how to get three.js into a [link:https://nodejs.org/en/ node.js] environment so that you
 			can execute automated tests. Tests can be run on the command line, or by automated
 			CI tools like [link:https://travis-ci.org/ Travis].
-		</div>
+		</p>
 
 		<h2>The short version</h2>
 
-		<div>
+		<p>
 			If you're comfortable with node and npm,
 			<code>
 				$ npm install three --save-dev
@@ -28,13 +28,13 @@
 			var THREE = require('three');
 		</code>
 			to your test.
-		</div>
+		</p>
 
 		<h2>Create a testable project from scratch</h2>
-		<div>
+		<p>
 			If you're not familiar with these tools, here's a quick guide (for linux, the installation process
 			will be slightly different using windows, but the NPM commands are identical).
-		</div>
+		</p>
 
 		<h3>Basic setup</h3>
 		<div>
@@ -200,8 +200,10 @@ The THREE object should be able to construct a Vector3 with default of x=0: 0ms
 				</li>
 			</ol>
 
-			Items 2 and 3 will vary depending on how you manage your code. In the example of Physics.js
-		  given above, the export part is right at the end. We assign an object to module.exports:
+			<p>
+				Items 2 and 3 will vary depending on how you manage your code. In the example of Physics.js
+		  	given above, the export part is right at the end. We assign an object to module.exports:
+			</p>
 			<code>
 //=============================================================================
 // make available in nodejs

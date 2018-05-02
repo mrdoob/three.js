@@ -179,7 +179,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '92dev';
+var REVISION = '93dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -352,7 +352,7 @@ var _Math = {
 				lut[ d2 & 0x3f | 0x80 ] + lut[ d2 >> 8 & 0xff ] + '-' + lut[ d2 >> 16 & 0xff ] + lut[ d2 >> 24 & 0xff ] +
 				lut[ d3 & 0xff ] + lut[ d3 >> 8 & 0xff ] + lut[ d3 >> 16 & 0xff ] + lut[ d3 >> 24 & 0xff ];
 
-			// .toUpperCase() here flattens concatenated strings to save heap memory space. 
+			// .toUpperCase() here flattens concatenated strings to save heap memory space.
 			return uuid.toUpperCase();
 
 		};
@@ -3664,6 +3664,12 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	isTexture: true,
 
+	updateMatrix: function () {
+
+		this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
+
+	},
+
 	clone: function () {
 
 		return new this.constructor().copy( this );
@@ -5908,7 +5914,7 @@ var beginnormal_vertex = "\nvec3 objectNormal = vec3( normal );\n";
 
 var bsdfs = "float punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {\n\tif( decayExponent > 0.0 ) {\n#if defined ( PHYSICALLY_CORRECT_LIGHTS )\n\t\tfloat distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );\n\t\tfloat maxDistanceCutoffFactor = pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );\n\t\treturn distanceFalloff * maxDistanceCutoffFactor;\n#else\n\t\treturn pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );\n#endif\n\t}\n\treturn 1.0;\n}\nvec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\n\treturn RECIPROCAL_PI * diffuseColor;\n}\nvec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\n\tfloat fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\n\treturn ( 1.0 - specularColor ) * fresnel + specularColor;\n}\nfloat G_GGX_Smith( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gl = dotNL + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\tfloat gv = dotNV + sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\treturn 1.0 / ( gl * gv );\n}\nfloat G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\tfloat gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\treturn 0.5 / max( gv + gl, EPSILON );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n\tfloat a2 = pow2( alpha );\n\tfloat denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n\treturn RECIPROCAL_PI * a2 / pow2( denom );\n}\nvec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n\tfloat alpha = pow2( roughness );\n\tvec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n\tfloat dotNL = saturate( dot( geometry.normal, incidentLight.direction ) );\n\tfloat dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n\tfloat dotNH = saturate( dot( geometry.normal, halfDir ) );\n\tfloat dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n\tvec3 F = F_Schlick( specularColor, dotLH );\n\tfloat G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\tfloat D = D_GGX( alpha, dotNH );\n\treturn F * ( G * D );\n}\nvec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {\n\tconst float LUT_SIZE  = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS  = 0.5 / LUT_SIZE;\n\tfloat dotNV = saturate( dot( N, V ) );\n\tvec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\treturn uv;\n}\nfloat LTC_ClippedSphereFormFactor( const in vec3 f ) {\n\tfloat l = length( f );\n\treturn max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );\n}\nvec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {\n\tfloat x = dot( v1, v2 );\n\tfloat y = abs( x );\n\tfloat a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;\n\tfloat b = 3.4175940 + ( 4.1616724 + y ) * y;\n\tfloat v = a / b;\n\tfloat theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;\n\treturn cross( v1, v2 ) * theta_sintheta;\n}\nvec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {\n\tvec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];\n\tvec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];\n\tvec3 lightNormal = cross( v1, v2 );\n\tif( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );\n\tvec3 T1, T2;\n\tT1 = normalize( V - N * dot( V, N ) );\n\tT2 = - cross( N, T1 );\n\tmat3 mat = mInv * transposeMat3( mat3( T1, T2, N ) );\n\tvec3 coords[ 4 ];\n\tcoords[ 0 ] = mat * ( rectCoords[ 0 ] - P );\n\tcoords[ 1 ] = mat * ( rectCoords[ 1 ] - P );\n\tcoords[ 2 ] = mat * ( rectCoords[ 2 ] - P );\n\tcoords[ 3 ] = mat * ( rectCoords[ 3 ] - P );\n\tcoords[ 0 ] = normalize( coords[ 0 ] );\n\tcoords[ 1 ] = normalize( coords[ 1 ] );\n\tcoords[ 2 ] = normalize( coords[ 2 ] );\n\tcoords[ 3 ] = normalize( coords[ 3 ] );\n\tvec3 vectorFormFactor = vec3( 0.0 );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );\n\tfloat result = LTC_ClippedSphereFormFactor( vectorFormFactor );\n\treturn vec3( result );\n}\nvec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {\n\tfloat dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n\tconst vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n\tconst vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n\tvec4 r = roughness * c0 + c1;\n\tfloat a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n\tvec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;\n\treturn specularColor * AB.x + AB.y;\n}\nfloat G_BlinnPhong_Implicit( ) {\n\treturn 0.25;\n}\nfloat D_BlinnPhong( const in float shininess, const in float dotNH ) {\n\treturn RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_Specular_BlinnPhong( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\n\tvec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\n\tfloat dotNH = saturate( dot( geometry.normal, halfDir ) );\n\tfloat dotLH = saturate( dot( incidentLight.direction, halfDir ) );\n\tvec3 F = F_Schlick( specularColor, dotLH );\n\tfloat G = G_BlinnPhong_Implicit( );\n\tfloat D = D_BlinnPhong( shininess, dotNH );\n\treturn F * ( G * D );\n}\nfloat GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {\n\treturn ( 2.0 / pow2( ggxRoughness + 0.0001 ) - 2.0 );\n}\nfloat BlinnExponentToGGXRoughness( const in float blinnExponent ) {\n\treturn sqrt( 2.0 / ( blinnExponent + 2.0 ) );\n}\n";
 
-var bumpmap_pars_fragment = "#ifdef USE_BUMPMAP\n\tuniform sampler2D bumpMap;\n\tuniform float bumpScale;\n\tvec2 dHdxy_fwd() {\n\t\tvec2 dSTdx = dFdx( vUv );\n\t\tvec2 dSTdy = dFdy( vUv );\n\t\tfloat Hll = bumpScale * texture2D( bumpMap, vUv ).x;\n\t\tfloat dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;\n\t\tfloat dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;\n\t\treturn vec2( dBx, dBy );\n\t}\n\tvec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {\n\t\tvec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );\n\t\tvec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );\n\t\tvec3 vN = surf_norm;\n\t\tvec3 R1 = cross( vSigmaY, vN );\n\t\tvec3 R2 = cross( vN, vSigmaX );\n\t\tfloat fDet = dot( vSigmaX, R1 );\n\t\tvec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );\n\t\treturn normalize( abs( fDet ) * surf_norm - vGrad );\n\t}\n#endif\n";
+var bumpmap_pars_fragment = "#ifdef USE_BUMPMAP\n\tuniform sampler2D bumpMap;\n\tuniform float bumpScale;\n\tvec2 dHdxy_fwd() {\n\t\tvec2 dSTdx = dFdx( vUv );\n\t\tvec2 dSTdy = dFdy( vUv );\n\t\tfloat Hll = bumpScale * texture2D( bumpMap, vUv ).x;\n\t\tfloat dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;\n\t\tfloat dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;\n\t\treturn vec2( dBx, dBy );\n\t}\n\tvec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {\n\t\tvec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );\n\t\tvec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );\n\t\tvec3 vN = surf_norm;\n\t\tvec3 R1 = cross( vSigmaY, vN );\n\t\tvec3 R2 = cross( vN, vSigmaX );\n\t\tfloat fDet = dot( vSigmaX, R1 );\n\t\tfDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\tvec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );\n\t\treturn normalize( abs( fDet ) * surf_norm - vGrad );\n\t}\n#endif\n";
 
 var clipping_planes_fragment = "#if NUM_CLIPPING_PLANES > 0\n\tvec4 plane;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < UNION_CLIPPING_PLANES; i ++ ) {\n\t\tplane = clippingPlanes[ i ];\n\t\tif ( dot( vViewPosition, plane.xyz ) > plane.w ) discard;\n\t}\n\t#if UNION_CLIPPING_PLANES < NUM_CLIPPING_PLANES\n\t\tbool clipped = true;\n\t\t#pragma unroll_loop\n\t\tfor ( int i = UNION_CLIPPING_PLANES; i < NUM_CLIPPING_PLANES; i ++ ) {\n\t\t\tplane = clippingPlanes[ i ];\n\t\t\tclipped = ( dot( vViewPosition, plane.xyz ) > plane.w ) && clipped;\n\t\t}\n\t\tif ( clipped ) discard;\n\t#endif\n#endif\n";
 
@@ -6016,7 +6022,7 @@ var normal_fragment_begin = "#ifdef FLAT_SHADED\n\tvec3 fdx = vec3( dFdx( vViewP
 
 var normal_fragment_maps = "#ifdef USE_NORMALMAP\n\tnormal = perturbNormal2Arb( -vViewPosition, normal );\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );\n#endif\n";
 
-var normalmap_pars_fragment = "#ifdef USE_NORMALMAP\n\tuniform sampler2D normalMap;\n\tuniform vec2 normalScale;\n\tvec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm ) {\n\t\tvec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );\n\t\tvec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );\n\t\tvec2 st0 = dFdx( vUv.st );\n\t\tvec2 st1 = dFdy( vUv.st );\n\t\tvec3 S = normalize( q0 * st1.t - q1 * st0.t );\n\t\tvec3 T = normalize( -q0 * st1.s + q1 * st0.s );\n\t\tvec3 N = normalize( surf_norm );\n\t\tvec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\t\tmapN.xy = normalScale * mapN.xy;\n\t\tmat3 tsn = mat3( S, T, N );\n\t\treturn normalize( tsn * mapN );\n\t}\n#endif\n";
+var normalmap_pars_fragment = "#ifdef USE_NORMALMAP\n\tuniform sampler2D normalMap;\n\tuniform vec2 normalScale;\n\tvec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm ) {\n\t\tvec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );\n\t\tvec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );\n\t\tvec2 st0 = dFdx( vUv.st );\n\t\tvec2 st1 = dFdy( vUv.st );\n\t\tfloat scale = sign( st1.t * st0.s - st0.t * st1.s );\n\t\tvec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );\n\t\tvec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );\n\t\tvec3 N = normalize( surf_norm );\n\t\tmat3 tsn = mat3( S, T, N );\n\t\tvec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\t\tmapN.xy *= normalScale;\n\t\tmapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\treturn normalize( tsn * mapN );\n\t}\n#endif\n";
 
 var packing = "vec3 packNormalToRGB( const in vec3 normal ) {\n\treturn normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n\treturn 2.0 * rgb.xyz - 1.0;\n}\nconst float PackUpscale = 256. / 255.;const float UnpackDownscale = 255. / 256.;\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\nconst float ShiftRight8 = 1. / 256.;\nvec4 packDepthToRGBA( const in float v ) {\n\tvec4 r = vec4( fract( v * PackFactors ), v );\n\tr.yzw -= r.xyz * ShiftRight8;\treturn r * PackUpscale;\n}\nfloat unpackRGBAToDepth( const in vec4 v ) {\n\treturn dot( v, UnpackFactors );\n}\nfloat viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( viewZ + near ) / ( near - far );\n}\nfloat orthographicDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {\n\treturn linearClipZ * ( near - far ) - near;\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn (( near + viewZ ) * far ) / (( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {\n\treturn ( near * far ) / ( ( far - near ) * invClipZ - far );\n}\n";
 
@@ -6613,23 +6619,17 @@ Object.assign( Color.prototype, {
 
 	},
 
-	convertGammaToLinear: function () {
+	convertGammaToLinear: function ( gammaFactor ) {
 
-		var r = this.r, g = this.g, b = this.b;
-
-		this.r = r * r;
-		this.g = g * g;
-		this.b = b * b;
+		this.copyGammaToLinear( this, gammaFactor );
 
 		return this;
 
 	},
 
-	convertLinearToGamma: function () {
+	convertLinearToGamma: function ( gammaFactor ) {
 
-		this.r = Math.sqrt( this.r );
-		this.g = Math.sqrt( this.g );
-		this.b = Math.sqrt( this.b );
+		this.copyLinearToGamma( this, gammaFactor );
 
 		return this;
 
@@ -8445,6 +8445,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
 
 		object.matrix = this.matrix.toArray();
+
+		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
 
 		//
 
@@ -10366,6 +10368,8 @@ Object.assign( BufferAttribute.prototype, {
 		this.count = array !== undefined ? array.length / this.itemSize : 0;
 		this.array = array;
 
+		return this;
+
 	},
 
 	setDynamic: function ( value ) {
@@ -10378,6 +10382,7 @@ Object.assign( BufferAttribute.prototype, {
 
 	copy: function ( source ) {
 
+		this.name = source.name;
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
 		this.count = source.count;
@@ -12614,18 +12619,28 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
 		if ( this.alphaMap && this.alphaMap.isTexture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
 		if ( this.lightMap && this.lightMap.isTexture ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
+
+		if ( this.aoMap && this.aoMap.isTexture ) {
+
+			data.aoMap = this.aoMap.toJSON( meta ).uuid;
+			data.aoMapIntensity = this.aoMapIntensity;
+
+		}
+
 		if ( this.bumpMap && this.bumpMap.isTexture ) {
 
 			data.bumpMap = this.bumpMap.toJSON( meta ).uuid;
 			data.bumpScale = this.bumpScale;
 
 		}
+
 		if ( this.normalMap && this.normalMap.isTexture ) {
 
 			data.normalMap = this.normalMap.toJSON( meta ).uuid;
 			data.normalScale = this.normalScale.toArray();
 
 		}
+
 		if ( this.displacementMap && this.displacementMap.isTexture ) {
 
 			data.displacementMap = this.displacementMap.toJSON( meta ).uuid;
@@ -12633,6 +12648,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			data.displacementBias = this.displacementBias;
 
 		}
+
 		if ( this.roughnessMap && this.roughnessMap.isTexture ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
 		if ( this.metalnessMap && this.metalnessMap.isTexture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
 
@@ -14220,7 +14236,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				Triangle.getNormal( vA, vB, vC, face.normal );
 
 				intersection.face = face;
-				intersection.faceIndex = a;
 
 			}
 
@@ -14282,7 +14297,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 						if ( intersection ) {
 
-							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indices buffer semantics
+							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
 							intersects.push( intersection );
 
 						}
@@ -14301,7 +14316,12 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
-						if ( intersection ) intersects.push( intersection );
+						if ( intersection ) {
+
+							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+							intersects.push( intersection );
+
+						}
 
 					}
 
@@ -14404,7 +14424,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
+function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 	var clearColor = new Color( 0x000000 );
 	var clearAlpha = 0;
@@ -14459,7 +14479,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 
 				};
 
-				geometries.update( boxMesh.geometry );
+				objects.update( boxMesh );
 
 			}
 
@@ -14478,7 +14498,7 @@ function WebGLBackground( renderer, state, geometries, premultipliedAlpha ) {
 					new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
 				);
 
-				geometries.update( planeMesh.geometry );
+				objects.update( planeMesh );
 
 			}
 
@@ -14562,19 +14582,7 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 		}
 
-		var position = geometry.attributes.position;
-
-		if ( position.isInterleavedBufferAttribute ) {
-
-			count = position.data.count;
-
-			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
-
-		} else {
-
-			extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
-
-		}
+		extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
 
 		info.update( count, mode, geometry.maxInstancedCount );
 
@@ -14893,10 +14901,6 @@ function WebGLExtensions( gl ) {
 
 				case 'WEBGL_compressed_texture_pvrtc':
 					extension = gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
-					break;
-
-				case 'WEBGL_compressed_texture_etc1':
-					extension = gl.getExtension( 'WEBGL_compressed_texture_etc1' );
 					break;
 
 				default:
@@ -16754,6 +16758,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	//
 
+	this.name = shader.name;
 	this.id = programIdCount ++;
 	this.code = code;
 	this.usedTimes = 1;
@@ -18286,6 +18291,7 @@ function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, for
 
 CanvasTexture.prototype = Object.create( Texture.prototype );
 CanvasTexture.prototype.constructor = CanvasTexture;
+CanvasTexture.prototype.isCanvasTexture = true;
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -19721,7 +19727,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.generateMipmap( target );
 
 		var textureProperties = properties.get( texture );
-		textureProperties.__maxMipLevel = Math.log2( Math.max( width, height ) );
+
+		// Note: Math.log( x ) * Math.LOG2E used instead of Math.log2( x ) which is not supported by IE11
+		textureProperties.__maxMipLevel = Math.log( Math.max( width, height ) ) * Math.LOG2E;
 
 	}
 
@@ -20923,6 +20931,7 @@ function WebVRManager( renderer ) {
 	if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
 		frameData = new window.VRFrameData();
+		window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
 	}
 
@@ -20944,11 +20953,17 @@ function WebVRManager( renderer ) {
 
 	//
 
+	function isPresenting() {
+
+		return device !== null && device.isPresenting === true;
+
+	}
+
 	var currentSize, currentPixelRatio;
 
 	function onVRDisplayPresentChange() {
 
-		if ( device !== null && device.isPresenting ) {
+		if ( isPresenting() ) {
 
 			var eyeParameters = device.getEyeParameters( 'left' );
 			var renderWidth = eyeParameters.renderWidth;
@@ -20964,12 +20979,6 @@ function WebVRManager( renderer ) {
 			renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
 
 		}
-
-	}
-
-	if ( typeof window !== 'undefined' ) {
-
-		window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
 	}
 
@@ -21126,7 +21135,7 @@ function WebVRManager( renderer ) {
 
 	this.submitFrame = function () {
 
-		if ( device && device.isPresenting ) device.submitFrame();
+		if ( isPresenting() ) device.submitFrame();
 
 	};
 
@@ -21364,7 +21373,7 @@ function WebGLRenderer( parameters ) {
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates();
 
-		background = new WebGLBackground( _this, state, geometries, _premultipliedAlpha );
+		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
@@ -23150,12 +23159,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( uvScaleMap.matrixAutoUpdate === true ) {
 
-				var offset = uvScaleMap.offset;
-				var repeat = uvScaleMap.repeat;
-				var rotation = uvScaleMap.rotation;
-				var center = uvScaleMap.center;
-
-				uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+				uvScaleMap.updateMatrix();
 
 			}
 
@@ -23193,12 +23197,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( material.map.matrixAutoUpdate === true ) {
 
-				var offset = material.map.offset;
-				var repeat = material.map.repeat;
-				var rotation = material.map.rotation;
-				var center = material.map.center;
-
-				material.map.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+				material.map.updateMatrix();
 
 			}
 
@@ -23250,6 +23249,7 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.bumpMap.value = material.bumpMap;
 			uniforms.bumpScale.value = material.bumpScale;
+			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
 
 		}
 
@@ -23257,6 +23257,7 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
+			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
 
 		}
 
@@ -23309,6 +23310,7 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.bumpMap.value = material.bumpMap;
 			uniforms.bumpScale.value = material.bumpScale;
+			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
 
 		}
 
@@ -23316,6 +23318,7 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
+			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
 
 		}
 
@@ -23379,6 +23382,7 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.bumpMap.value = material.bumpMap;
 			uniforms.bumpScale.value = material.bumpScale;
+			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
 
 		}
 
@@ -23386,6 +23390,7 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
+			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
 
 		}
 
@@ -23680,11 +23685,18 @@ function WebGLRenderer( parameters ) {
 		var height = srcTexture.image.height;
 		var glFormat = utils.convert( dstTexture.format );
 		var glType = utils.convert( dstTexture.type );
-		var pixels = srcTexture.isDataTexture ? srcTexture.image.data : srcTexture.image;
 
 		this.setTexture2D( dstTexture, 0 );
 
-		_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, width, height, glFormat, glType, pixels );
+		if ( srcTexture.isDataTexture ) {
+
+			_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, width, height, glFormat, glType, srcTexture.image.data );
+
+		} else {
+
+			_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, glFormat, glType, srcTexture.image );
+
+		}
 
 	};
 
@@ -23708,7 +23720,7 @@ FogExp2.prototype.isFogExp2 = true;
 
 FogExp2.prototype.clone = function () {
 
-	return new FogExp2( this.color.getHex(), this.density );
+	return new FogExp2( this.color, this.density );
 
 };
 
@@ -23742,7 +23754,7 @@ Fog.prototype.isFog = true;
 
 Fog.prototype.clone = function () {
 
-	return new Fog( this.color.getHex(), this.near, this.far );
+	return new Fog( this.color, this.near, this.far );
 
 };
 
@@ -27549,7 +27561,7 @@ function addContour( vertices, contour ) {
  *
  *  curveSegments: <int>, // number of points on the curves
  *  steps: <int>, // number of points for z-side extrusions / used for subdividing segments of extrude spline too
- *  amount: <int>, // Depth to extrude the shape
+ *  depth: <float>, // Depth to extrude the shape
  *
  *  bevelEnabled: <bool>, // turn on bevel
  *  bevelThickness: <float>, // how deep into the original shape bevel goes
@@ -27557,7 +27569,6 @@ function addContour( vertices, contour ) {
  *  bevelSegments: <int>, // number of bevel layers
  *
  *  extrudePath: <THREE.Curve> // curve to extrude shape along
- *  frames: <Object> // containing arrays of tangents, normals, binormals
  *
  *  UVGenerator: <Object> // object that provides UV generator functions
  *
@@ -27589,279 +27600,238 @@ ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
 
 function ExtrudeBufferGeometry( shapes, options ) {
 
-	if ( typeof ( shapes ) === "undefined" ) {
-
-		return;
-
-	}
-
 	BufferGeometry.call( this );
 
 	this.type = 'ExtrudeBufferGeometry';
 
+	this.parameters = {
+		shapes: shapes,
+		options: options
+	};
+
 	shapes = Array.isArray( shapes ) ? shapes : [ shapes ];
 
-	this.addShapeList( shapes, options );
+	var scope = this;
+
+	var verticesArray = [];
+	var uvArray = [];
+
+	for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+
+		var shape = shapes[ i ];
+		addShape( shape );
+
+	}
+
+	// build geometry
+
+	this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
+	this.addAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
 
 	this.computeVertexNormals();
 
-	// can't really use automatic vertex normals
-	// as then front and back sides get smoothed too
-	// should do separate smoothing just for sides
+	// functions
 
-	//this.computeVertexNormals();
+	function addShape( shape ) {
 
-	//console.log( "took", ( Date.now() - startTime ) );
+		var placeholder = [];
 
-}
+		// options
 
-ExtrudeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-ExtrudeBufferGeometry.prototype.constructor = ExtrudeBufferGeometry;
+		var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
+		var steps = options.steps !== undefined ? options.steps : 1;
+		var depth = options.depth !== undefined ? options.depth : 100;
 
-ExtrudeBufferGeometry.prototype.getArrays = function () {
+		var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
+		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
+		var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
+		var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 
-	var positionAttribute = this.getAttribute( "position" );
-	var verticesArray = positionAttribute ? Array.prototype.slice.call( positionAttribute.array ) : [];
+		var extrudePath = options.extrudePath;
 
-	var uvAttribute = this.getAttribute( "uv" );
-	var uvArray = uvAttribute ? Array.prototype.slice.call( uvAttribute.array ) : [];
+		var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
 
-	var IndexAttribute = this.index;
-	var indicesArray = IndexAttribute ? Array.prototype.slice.call( IndexAttribute.array ) : [];
+		// deprecated options
 
-	return {
-		position: verticesArray,
-		uv: uvArray,
-		index: indicesArray
-	};
+		if ( options.amount !== undefined ) {
 
-};
+			console.warn( 'THREE.ExtrudeBufferGeometry: amount has been renamed to depth.' );
+			depth = options.amount;
 
-ExtrudeBufferGeometry.prototype.addShapeList = function ( shapes, options ) {
+		}
 
-	var sl = shapes.length;
-	options.arrays = this.getArrays();
+		//
 
-	for ( var s = 0; s < sl; s ++ ) {
+		var extrudePts, extrudeByPath = false;
+		var splineTube, binormal, normal, position2;
 
-		var shape = shapes[ s ];
-		this.addShape( shape, options );
+		if ( extrudePath ) {
 
-	}
+			extrudePts = extrudePath.getSpacedPoints( steps );
 
-	this.setIndex( options.arrays.index );
-	this.addAttribute( 'position', new Float32BufferAttribute( options.arrays.position, 3 ) );
-	this.addAttribute( 'uv', new Float32BufferAttribute( options.arrays.uv, 2 ) );
+			extrudeByPath = true;
+			bevelEnabled = false; // bevels not supported for path extrusion
 
-};
+			// SETUP TNB variables
 
-ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
+			// TODO1 - have a .isClosed in spline?
 
-	var arrays = options.arrays ? options.arrays : this.getArrays();
-	var verticesArray = arrays.position;
-	var indicesArray = arrays.index;
-	var uvArray = arrays.uv;
+			splineTube = extrudePath.computeFrenetFrames( steps, false );
 
-	var placeholder = [];
+			// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
+			binormal = new Vector3();
+			normal = new Vector3();
+			position2 = new Vector3();
 
-	var amount = options.amount !== undefined ? options.amount : 100;
+		}
 
-	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6; // 10
-	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2; // 8
-	var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
+		// Safeguards if bevels are not enabled
 
-	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
+		if ( ! bevelEnabled ) {
 
-	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
+			bevelSegments = 0;
+			bevelThickness = 0;
+			bevelSize = 0;
 
-	var steps = options.steps !== undefined ? options.steps : 1;
+		}
 
-	var extrudePath = options.extrudePath;
-	var extrudePts, extrudeByPath = false;
+		// Variables initialization
 
-	// Use default WorldUVGenerator if no UV generators are specified.
-	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : ExtrudeGeometry.WorldUVGenerator;
+		var ahole, h, hl; // looping of holes
 
-	var splineTube, binormal, normal, position2;
-	if ( extrudePath ) {
+		var shapePoints = shape.extractPoints( curveSegments );
 
-		extrudePts = extrudePath.getSpacedPoints( steps );
+		var vertices = shapePoints.shape;
+		var holes = shapePoints.holes;
 
-		extrudeByPath = true;
-		bevelEnabled = false; // bevels not supported for path extrusion
+		var reverse = ! ShapeUtils.isClockWise( vertices );
 
-		// SETUP TNB variables
+		if ( reverse ) {
 
-		// TODO1 - have a .isClosed in spline?
+			vertices = vertices.reverse();
 
-		splineTube = options.frames !== undefined ? options.frames : extrudePath.computeFrenetFrames( steps, false );
+			// Maybe we should also check if holes are in the opposite direction, just to be safe ...
 
-		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
+			for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
-		binormal = new Vector3();
-		normal = new Vector3();
-		position2 = new Vector3();
+				ahole = holes[ h ];
 
-	}
+				if ( ShapeUtils.isClockWise( ahole ) ) {
 
-	// Safeguards if bevels are not enabled
+					holes[ h ] = ahole.reverse();
 
-	if ( ! bevelEnabled ) {
-
-		bevelSegments = 0;
-		bevelThickness = 0;
-		bevelSize = 0;
-
-	}
-
-	// Variables initialization
-
-	var ahole, h, hl; // looping of holes
-	var scope = this;
-
-	var shapePoints = shape.extractPoints( curveSegments );
-
-	var vertices = shapePoints.shape;
-	var holes = shapePoints.holes;
-
-	var reverse = ! ShapeUtils.isClockWise( vertices );
-
-	if ( reverse ) {
-
-		vertices = vertices.reverse();
-
-		// Maybe we should also check if holes are in the opposite direction, just to be safe ...
-
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-			ahole = holes[ h ];
-
-			if ( ShapeUtils.isClockWise( ahole ) ) {
-
-				holes[ h ] = ahole.reverse();
+				}
 
 			}
 
 		}
 
-	}
+
+		var faces = ShapeUtils.triangulateShape( vertices, holes );
+
+		/* Vertices */
+
+		var contour = vertices; // vertices has all points but contour has only points of circumference
+
+		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+
+			ahole = holes[ h ];
+
+			vertices = vertices.concat( ahole );
+
+		}
 
 
-	var faces = ShapeUtils.triangulateShape( vertices, holes );
+		function scalePt2( pt, vec, size ) {
 
-	/* Vertices */
+			if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
 
-	var contour = vertices; // vertices has all points but contour has only points of circumference
+			return vec.clone().multiplyScalar( size ).add( pt );
 
-	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+		}
 
-		ahole = holes[ h ];
-
-		vertices = vertices.concat( ahole );
-
-	}
+		var b, bs, t, z,
+			vert, vlen = vertices.length,
+			face, flen = faces.length;
 
 
-	function scalePt2( pt, vec, size ) {
-
-		if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
-
-		return vec.clone().multiplyScalar( size ).add( pt );
-
-	}
-
-	var b, bs, t, z,
-		vert, vlen = vertices.length,
-		face, flen = faces.length;
+		// Find directions for point movement
 
 
-	// Find directions for point movement
+		function getBevelVec( inPt, inPrev, inNext ) {
 
+			// computes for inPt the corresponding point inPt' on a new contour
+			//   shifted by 1 unit (length of normalized vector) to the left
+			// if we walk along contour clockwise, this new contour is outside the old one
+			//
+			// inPt' is the intersection of the two lines parallel to the two
+			//  adjacent edges of inPt at a distance of 1 unit on the left side.
 
-	function getBevelVec( inPt, inPrev, inNext ) {
+			var v_trans_x, v_trans_y, shrink_by; // resulting translation vector for inPt
 
-		// computes for inPt the corresponding point inPt' on a new contour
-		//   shifted by 1 unit (length of normalized vector) to the left
-		// if we walk along contour clockwise, this new contour is outside the old one
-		//
-		// inPt' is the intersection of the two lines parallel to the two
-		//  adjacent edges of inPt at a distance of 1 unit on the left side.
+			// good reading for geometry algorithms (here: line-line intersection)
+			// http://geomalgorithms.com/a05-_intersect-1.html
 
-		var v_trans_x, v_trans_y, shrink_by; // resulting translation vector for inPt
+			var v_prev_x = inPt.x - inPrev.x,
+				v_prev_y = inPt.y - inPrev.y;
+			var v_next_x = inNext.x - inPt.x,
+				v_next_y = inNext.y - inPt.y;
 
-		// good reading for geometry algorithms (here: line-line intersection)
-		// http://geomalgorithms.com/a05-_intersect-1.html
+			var v_prev_lensq = ( v_prev_x * v_prev_x + v_prev_y * v_prev_y );
 
-		var v_prev_x = inPt.x - inPrev.x,
-			v_prev_y = inPt.y - inPrev.y;
-		var v_next_x = inNext.x - inPt.x,
-			v_next_y = inNext.y - inPt.y;
+			// check for collinear edges
+			var collinear0 = ( v_prev_x * v_next_y - v_prev_y * v_next_x );
 
-		var v_prev_lensq = ( v_prev_x * v_prev_x + v_prev_y * v_prev_y );
+			if ( Math.abs( collinear0 ) > Number.EPSILON ) {
 
-		// check for collinear edges
-		var collinear0 = ( v_prev_x * v_next_y - v_prev_y * v_next_x );
+				// not collinear
 
-		if ( Math.abs( collinear0 ) > Number.EPSILON ) {
+				// length of vectors for normalizing
 
-			// not collinear
+				var v_prev_len = Math.sqrt( v_prev_lensq );
+				var v_next_len = Math.sqrt( v_next_x * v_next_x + v_next_y * v_next_y );
 
-			// length of vectors for normalizing
+				// shift adjacent points by unit vectors to the left
 
-			var v_prev_len = Math.sqrt( v_prev_lensq );
-			var v_next_len = Math.sqrt( v_next_x * v_next_x + v_next_y * v_next_y );
+				var ptPrevShift_x = ( inPrev.x - v_prev_y / v_prev_len );
+				var ptPrevShift_y = ( inPrev.y + v_prev_x / v_prev_len );
 
-			// shift adjacent points by unit vectors to the left
+				var ptNextShift_x = ( inNext.x - v_next_y / v_next_len );
+				var ptNextShift_y = ( inNext.y + v_next_x / v_next_len );
 
-			var ptPrevShift_x = ( inPrev.x - v_prev_y / v_prev_len );
-			var ptPrevShift_y = ( inPrev.y + v_prev_x / v_prev_len );
+				// scaling factor for v_prev to intersection point
 
-			var ptNextShift_x = ( inNext.x - v_next_y / v_next_len );
-			var ptNextShift_y = ( inNext.y + v_next_x / v_next_len );
+				var sf = ( ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
+						( ptNextShift_y - ptPrevShift_y ) * v_next_x ) /
+					( v_prev_x * v_next_y - v_prev_y * v_next_x );
 
-			// scaling factor for v_prev to intersection point
+				// vector from inPt to intersection point
 
-			var sf = ( ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
-					( ptNextShift_y - ptPrevShift_y ) * v_next_x ) /
-				( v_prev_x * v_next_y - v_prev_y * v_next_x );
+				v_trans_x = ( ptPrevShift_x + v_prev_x * sf - inPt.x );
+				v_trans_y = ( ptPrevShift_y + v_prev_y * sf - inPt.y );
 
-			// vector from inPt to intersection point
+				// Don't normalize!, otherwise sharp corners become ugly
+				//  but prevent crazy spikes
+				var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
+				if ( v_trans_lensq <= 2 ) {
 
-			v_trans_x = ( ptPrevShift_x + v_prev_x * sf - inPt.x );
-			v_trans_y = ( ptPrevShift_y + v_prev_y * sf - inPt.y );
+					return new Vector2( v_trans_x, v_trans_y );
 
-			// Don't normalize!, otherwise sharp corners become ugly
-			//  but prevent crazy spikes
-			var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
-			if ( v_trans_lensq <= 2 ) {
+				} else {
 
-				return new Vector2( v_trans_x, v_trans_y );
-
-			} else {
-
-				shrink_by = Math.sqrt( v_trans_lensq / 2 );
-
-			}
-
-		} else {
-
-			// handle special case of collinear edges
-
-			var direction_eq = false; // assumes: opposite
-			if ( v_prev_x > Number.EPSILON ) {
-
-				if ( v_next_x > Number.EPSILON ) {
-
-					direction_eq = true;
+					shrink_by = Math.sqrt( v_trans_lensq / 2 );
 
 				}
 
 			} else {
 
-				if ( v_prev_x < - Number.EPSILON ) {
+				// handle special case of collinear edges
 
-					if ( v_next_x < - Number.EPSILON ) {
+				var direction_eq = false; // assumes: opposite
+				if ( v_prev_x > Number.EPSILON ) {
+
+					if ( v_next_x > Number.EPSILON ) {
 
 						direction_eq = true;
 
@@ -27869,150 +27839,130 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 				} else {
 
-					if ( Math.sign( v_prev_y ) === Math.sign( v_next_y ) ) {
+					if ( v_prev_x < - Number.EPSILON ) {
 
-						direction_eq = true;
+						if ( v_next_x < - Number.EPSILON ) {
+
+							direction_eq = true;
+
+						}
+
+					} else {
+
+						if ( Math.sign( v_prev_y ) === Math.sign( v_next_y ) ) {
+
+							direction_eq = true;
+
+						}
 
 					}
 
 				}
 
+				if ( direction_eq ) {
+
+					// console.log("Warning: lines are a straight sequence");
+					v_trans_x = - v_prev_y;
+					v_trans_y = v_prev_x;
+					shrink_by = Math.sqrt( v_prev_lensq );
+
+				} else {
+
+					// console.log("Warning: lines are a straight spike");
+					v_trans_x = v_prev_x;
+					v_trans_y = v_prev_y;
+					shrink_by = Math.sqrt( v_prev_lensq / 2 );
+
+				}
+
 			}
 
-			if ( direction_eq ) {
-
-				// console.log("Warning: lines are a straight sequence");
-				v_trans_x = - v_prev_y;
-				v_trans_y = v_prev_x;
-				shrink_by = Math.sqrt( v_prev_lensq );
-
-			} else {
-
-				// console.log("Warning: lines are a straight spike");
-				v_trans_x = v_prev_x;
-				v_trans_y = v_prev_y;
-				shrink_by = Math.sqrt( v_prev_lensq / 2 );
-
-			}
+			return new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
 
 		}
 
-		return new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
 
-	}
+		var contourMovements = [];
 
-
-	var contourMovements = [];
-
-	for ( var i = 0, il = contour.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
-
-		if ( j === il ) j = 0;
-		if ( k === il ) k = 0;
-
-		//  (j)---(i)---(k)
-		// console.log('i,j,k', i, j , k)
-
-		contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
-
-	}
-
-	var holesMovements = [],
-		oneHoleMovements, verticesMovements = contourMovements.concat();
-
-	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-		ahole = holes[ h ];
-
-		oneHoleMovements = [];
-
-		for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
+		for ( var i = 0, il = contour.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
 
 			if ( j === il ) j = 0;
 			if ( k === il ) k = 0;
 
 			//  (j)---(i)---(k)
-			oneHoleMovements[ i ] = getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
+			// console.log('i,j,k', i, j , k)
+
+			contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
 
 		}
 
-		holesMovements.push( oneHoleMovements );
-		verticesMovements = verticesMovements.concat( oneHoleMovements );
-
-	}
-
-
-	// Loop bevelSegments, 1 for the front, 1 for the back
-
-	for ( b = 0; b < bevelSegments; b ++ ) {
-
-		//for ( b = bevelSegments; b > 0; b -- ) {
-
-		t = b / bevelSegments;
-		z = bevelThickness * Math.cos( t * Math.PI / 2 );
-		bs = bevelSize * Math.sin( t * Math.PI / 2 );
-
-		// contract shape
-
-		for ( i = 0, il = contour.length; i < il; i ++ ) {
-
-			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-
-			v( vert.x, vert.y, - z );
-
-		}
-
-		// expand holes
+		var holesMovements = [],
+			oneHoleMovements, verticesMovements = contourMovements.concat();
 
 		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
 			ahole = holes[ h ];
-			oneHoleMovements = holesMovements[ h ];
 
-			for ( i = 0, il = ahole.length; i < il; i ++ ) {
+			oneHoleMovements = [];
 
-				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+			for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
+
+				if ( j === il ) j = 0;
+				if ( k === il ) k = 0;
+
+				//  (j)---(i)---(k)
+				oneHoleMovements[ i ] = getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
+
+			}
+
+			holesMovements.push( oneHoleMovements );
+			verticesMovements = verticesMovements.concat( oneHoleMovements );
+
+		}
+
+
+		// Loop bevelSegments, 1 for the front, 1 for the back
+
+		for ( b = 0; b < bevelSegments; b ++ ) {
+
+			//for ( b = bevelSegments; b > 0; b -- ) {
+
+			t = b / bevelSegments;
+			z = bevelThickness * Math.cos( t * Math.PI / 2 );
+			bs = bevelSize * Math.sin( t * Math.PI / 2 );
+
+			// contract shape
+
+			for ( i = 0, il = contour.length; i < il; i ++ ) {
+
+				vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 
 				v( vert.x, vert.y, - z );
 
 			}
 
-		}
+			// expand holes
 
-	}
+			for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
-	bs = bevelSize;
+				ahole = holes[ h ];
+				oneHoleMovements = holesMovements[ h ];
 
-	// Back facing vertices
+				for ( i = 0, il = ahole.length; i < il; i ++ ) {
 
-	for ( i = 0; i < vlen; i ++ ) {
+					vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
-		vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
+					v( vert.x, vert.y, - z );
 
-		if ( ! extrudeByPath ) {
+				}
 
-			v( vert.x, vert.y, 0 );
-
-		} else {
-
-			// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
-
-			normal.copy( splineTube.normals[ 0 ] ).multiplyScalar( vert.x );
-			binormal.copy( splineTube.binormals[ 0 ] ).multiplyScalar( vert.y );
-
-			position2.copy( extrudePts[ 0 ] ).add( normal ).add( binormal );
-
-			v( position2.x, position2.y, position2.z );
+			}
 
 		}
 
-	}
+		bs = bevelSize;
 
-	// Add stepped vertices...
-	// Including front facing vertices
-
-	var s;
-
-	for ( s = 1; s <= steps; s ++ ) {
+		// Back facing vertices
 
 		for ( i = 0; i < vlen; i ++ ) {
 
@@ -28020,16 +27970,16 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 			if ( ! extrudeByPath ) {
 
-				v( vert.x, vert.y, amount / steps * s );
+				v( vert.x, vert.y, 0 );
 
 			} else {
 
-				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
+				// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
 
-				normal.copy( splineTube.normals[ s ] ).multiplyScalar( vert.x );
-				binormal.copy( splineTube.binormals[ s ] ).multiplyScalar( vert.y );
+				normal.copy( splineTube.normals[ 0 ] ).multiplyScalar( vert.x );
+				binormal.copy( splineTube.binormals[ 0 ] ).multiplyScalar( vert.y );
 
-				position2.copy( extrudePts[ s ] ).add( normal ).add( binormal );
+				position2.copy( extrudePts[ 0 ] ).add( normal ).add( binormal );
 
 				v( position2.x, position2.y, position2.z );
 
@@ -28037,45 +27987,31 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-	}
+		// Add stepped vertices...
+		// Including front facing vertices
 
+		var s;
 
-	// Add bevel segments planes
+		for ( s = 1; s <= steps; s ++ ) {
 
-	//for ( b = 1; b <= bevelSegments; b ++ ) {
-	for ( b = bevelSegments - 1; b >= 0; b -- ) {
+			for ( i = 0; i < vlen; i ++ ) {
 
-		t = b / bevelSegments;
-		z = bevelThickness * Math.cos( t * Math.PI / 2 );
-		bs = bevelSize * Math.sin( t * Math.PI / 2 );
-
-		// contract shape
-
-		for ( i = 0, il = contour.length; i < il; i ++ ) {
-
-			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-			v( vert.x, vert.y, amount + z );
-
-		}
-
-		// expand holes
-
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-			ahole = holes[ h ];
-			oneHoleMovements = holesMovements[ h ];
-
-			for ( i = 0, il = ahole.length; i < il; i ++ ) {
-
-				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+				vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
 
 				if ( ! extrudeByPath ) {
 
-					v( vert.x, vert.y, amount + z );
+					v( vert.x, vert.y, depth / steps * s );
 
 				} else {
 
-					v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
+					// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
+
+					normal.copy( splineTube.normals[ s ] ).multiplyScalar( vert.x );
+					binormal.copy( splineTube.binormals[ s ] ).multiplyScalar( vert.y );
+
+					position2.copy( extrudePts[ s ] ).add( normal ).add( binormal );
+
+					v( position2.x, position2.y, position2.z );
 
 				}
 
@@ -28083,212 +28019,252 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-	}
 
-	/* Faces */
+		// Add bevel segments planes
 
-	// Top and bottom faces
+		//for ( b = 1; b <= bevelSegments; b ++ ) {
+		for ( b = bevelSegments - 1; b >= 0; b -- ) {
 
-	buildLidFaces();
+			t = b / bevelSegments;
+			z = bevelThickness * Math.cos( t * Math.PI / 2 );
+			bs = bevelSize * Math.sin( t * Math.PI / 2 );
 
-	// Sides faces
+			// contract shape
 
-	buildSideFaces();
+			for ( i = 0, il = contour.length; i < il; i ++ ) {
 
-
-	/////  Internal functions
-
-	function buildLidFaces() {
-
-		var start = verticesArray.length / 3;
-
-		if ( bevelEnabled ) {
-
-			var layer = 0; // steps + 1
-			var offset = vlen * layer;
-
-			// Bottom faces
-
-			for ( i = 0; i < flen; i ++ ) {
-
-				face = faces[ i ];
-				f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
+				vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
+				v( vert.x, vert.y, depth + z );
 
 			}
 
-			layer = steps + bevelSegments * 2;
-			offset = vlen * layer;
+			// expand holes
 
-			// Top faces
+			for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
-			for ( i = 0; i < flen; i ++ ) {
+				ahole = holes[ h ];
+				oneHoleMovements = holesMovements[ h ];
 
-				face = faces[ i ];
-				f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
+				for ( i = 0, il = ahole.length; i < il; i ++ ) {
 
-			}
+					vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
-		} else {
+					if ( ! extrudeByPath ) {
 
-			// Bottom faces
+						v( vert.x, vert.y, depth + z );
 
-			for ( i = 0; i < flen; i ++ ) {
+					} else {
 
-				face = faces[ i ];
-				f3( face[ 2 ], face[ 1 ], face[ 0 ] );
+						v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
 
-			}
+					}
 
-			// Top faces
-
-			for ( i = 0; i < flen; i ++ ) {
-
-				face = faces[ i ];
-				f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
+				}
 
 			}
 
 		}
 
-		scope.addGroup( start, verticesArray.length / 3 - start, 0 );
+		/* Faces */
 
-	}
+		// Top and bottom faces
 
-	// Create faces for the z-sides of the shape
+		buildLidFaces();
 
-	function buildSideFaces() {
+		// Sides faces
 
-		var start = verticesArray.length / 3;
-		var layeroffset = 0;
-		sidewalls( contour, layeroffset );
-		layeroffset += contour.length;
+		buildSideFaces();
 
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
-			ahole = holes[ h ];
-			sidewalls( ahole, layeroffset );
+		/////  Internal functions
 
-			//, true
-			layeroffset += ahole.length;
+		function buildLidFaces() {
+
+			var start = verticesArray.length / 3;
+
+			if ( bevelEnabled ) {
+
+				var layer = 0; // steps + 1
+				var offset = vlen * layer;
+
+				// Bottom faces
+
+				for ( i = 0; i < flen; i ++ ) {
+
+					face = faces[ i ];
+					f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
+
+				}
+
+				layer = steps + bevelSegments * 2;
+				offset = vlen * layer;
+
+				// Top faces
+
+				for ( i = 0; i < flen; i ++ ) {
+
+					face = faces[ i ];
+					f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
+
+				}
+
+			} else {
+
+				// Bottom faces
+
+				for ( i = 0; i < flen; i ++ ) {
+
+					face = faces[ i ];
+					f3( face[ 2 ], face[ 1 ], face[ 0 ] );
+
+				}
+
+				// Top faces
+
+				for ( i = 0; i < flen; i ++ ) {
+
+					face = faces[ i ];
+					f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
+
+				}
+
+			}
+
+			scope.addGroup( start, verticesArray.length / 3 - start, 0 );
 
 		}
 
+		// Create faces for the z-sides of the shape
 
-		scope.addGroup( start, verticesArray.length / 3 - start, 1 );
+		function buildSideFaces() {
+
+			var start = verticesArray.length / 3;
+			var layeroffset = 0;
+			sidewalls( contour, layeroffset );
+			layeroffset += contour.length;
+
+			for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+
+				ahole = holes[ h ];
+				sidewalls( ahole, layeroffset );
+
+				//, true
+				layeroffset += ahole.length;
+
+			}
 
 
-	}
+			scope.addGroup( start, verticesArray.length / 3 - start, 1 );
 
-	function sidewalls( contour, layeroffset ) {
 
-		var j, k;
-		i = contour.length;
+		}
 
-		while ( -- i >= 0 ) {
+		function sidewalls( contour, layeroffset ) {
 
-			j = i;
-			k = i - 1;
-			if ( k < 0 ) k = contour.length - 1;
+			var j, k;
+			i = contour.length;
 
-			//console.log('b', i,j, i-1, k,vertices.length);
+			while ( -- i >= 0 ) {
 
-			var s = 0,
-				sl = steps + bevelSegments * 2;
+				j = i;
+				k = i - 1;
+				if ( k < 0 ) k = contour.length - 1;
 
-			for ( s = 0; s < sl; s ++ ) {
+				//console.log('b', i,j, i-1, k,vertices.length);
 
-				var slen1 = vlen * s;
-				var slen2 = vlen * ( s + 1 );
+				var s = 0,
+					sl = steps + bevelSegments * 2;
 
-				var a = layeroffset + j + slen1,
-					b = layeroffset + k + slen1,
-					c = layeroffset + k + slen2,
-					d = layeroffset + j + slen2;
+				for ( s = 0; s < sl; s ++ ) {
 
-				f4( a, b, c, d );
+					var slen1 = vlen * s;
+					var slen2 = vlen * ( s + 1 );
+
+					var a = layeroffset + j + slen1,
+						b = layeroffset + k + slen1,
+						c = layeroffset + k + slen2,
+						d = layeroffset + j + slen2;
+
+					f4( a, b, c, d );
+
+				}
 
 			}
 
 		}
 
-	}
+		function v( x, y, z ) {
 
-	function v( x, y, z ) {
+			placeholder.push( x );
+			placeholder.push( y );
+			placeholder.push( z );
 
-		placeholder.push( x );
-		placeholder.push( y );
-		placeholder.push( z );
-
-	}
+		}
 
 
-	function f3( a, b, c ) {
+		function f3( a, b, c ) {
 
-		addVertex( a );
-		addVertex( b );
-		addVertex( c );
+			addVertex( a );
+			addVertex( b );
+			addVertex( c );
 
-		var nextIndex = verticesArray.length / 3;
-		var uvs = uvgen.generateTopUV( scope, verticesArray, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
+			var nextIndex = verticesArray.length / 3;
+			var uvs = uvgen.generateTopUV( scope, verticesArray, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
 
-		addUV( uvs[ 0 ] );
-		addUV( uvs[ 1 ] );
-		addUV( uvs[ 2 ] );
+			addUV( uvs[ 0 ] );
+			addUV( uvs[ 1 ] );
+			addUV( uvs[ 2 ] );
 
-	}
+		}
 
-	function f4( a, b, c, d ) {
+		function f4( a, b, c, d ) {
 
-		addVertex( a );
-		addVertex( b );
-		addVertex( d );
+			addVertex( a );
+			addVertex( b );
+			addVertex( d );
 
-		addVertex( b );
-		addVertex( c );
-		addVertex( d );
-
-
-		var nextIndex = verticesArray.length / 3;
-		var uvs = uvgen.generateSideWallUV( scope, verticesArray, nextIndex - 6, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
-
-		addUV( uvs[ 0 ] );
-		addUV( uvs[ 1 ] );
-		addUV( uvs[ 3 ] );
-
-		addUV( uvs[ 1 ] );
-		addUV( uvs[ 2 ] );
-		addUV( uvs[ 3 ] );
-
-	}
-
-	function addVertex( index ) {
-
-		indicesArray.push( verticesArray.length / 3 );
-		verticesArray.push( placeholder[ index * 3 + 0 ] );
-		verticesArray.push( placeholder[ index * 3 + 1 ] );
-		verticesArray.push( placeholder[ index * 3 + 2 ] );
-
-	}
+			addVertex( b );
+			addVertex( c );
+			addVertex( d );
 
 
-	function addUV( vector2 ) {
+			var nextIndex = verticesArray.length / 3;
+			var uvs = uvgen.generateSideWallUV( scope, verticesArray, nextIndex - 6, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
 
-		uvArray.push( vector2.x );
-		uvArray.push( vector2.y );
+			addUV( uvs[ 0 ] );
+			addUV( uvs[ 1 ] );
+			addUV( uvs[ 3 ] );
 
-	}
+			addUV( uvs[ 1 ] );
+			addUV( uvs[ 2 ] );
+			addUV( uvs[ 3 ] );
 
-	if ( ! options.arrays ) {
+		}
 
-		this.setIndex( indicesArray );
-		this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
-		this.addAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
+		function addVertex( index ) {
+
+			verticesArray.push( placeholder[ index * 3 + 0 ] );
+			verticesArray.push( placeholder[ index * 3 + 1 ] );
+			verticesArray.push( placeholder[ index * 3 + 2 ] );
+
+		}
+
+
+		function addUV( vector2 ) {
+
+			uvArray.push( vector2.x );
+			uvArray.push( vector2.y );
+
+		}
 
 	}
 
-};
+}
 
-ExtrudeGeometry.WorldUVGenerator = {
+ExtrudeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+ExtrudeBufferGeometry.prototype.constructor = ExtrudeBufferGeometry;
+
+var WorldUVGenerator = {
 
 	generateTopUV: function ( geometry, vertices, indexA, indexB, indexC ) {
 
@@ -28404,7 +28380,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	// translate parameters to ExtrudeGeometry API
 
-	parameters.amount = parameters.height !== undefined ? parameters.height : 50;
+	parameters.depth = parameters.height !== undefined ? parameters.height : 50;
 
 	// defaults
 
@@ -32068,7 +32044,7 @@ CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
 	if ( this.closed ) {
 
-		intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
+		intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / l ) + 1 ) * l;
 
 	} else if ( weight === 0 && intPoint === l - 1 ) {
 
@@ -36777,12 +36753,14 @@ Object.assign( ObjectLoader.prototype, {
 	setTexturePath: function ( value ) {
 
 		this.texturePath = value;
+		return this;
 
 	},
 
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
 
 	},
 
@@ -37460,10 +37438,13 @@ Object.assign( ObjectLoader.prototype, {
 		object.uuid = data.uuid;
 
 		if ( data.name !== undefined ) object.name = data.name;
+
 		if ( data.matrix !== undefined ) {
 
 			object.matrix.fromArray( data.matrix );
-			object.matrix.decompose( object.position, object.quaternion, object.scale );
+
+			if ( data.matrixAutoUpdate !== undefined ) object.matrixAutoUpdate = data.matrixAutoUpdate;
+			if ( object.matrixAutoUpdate ) object.matrix.decompose( object.position, object.quaternion, object.scale );
 
 		} else {
 
@@ -37665,6 +37646,8 @@ ImageBitmapLoader.prototype = {
 function ShapePath() {
 
 	this.type = 'ShapePath';
+
+	this.color = new Color();
 
 	this.subPaths = [];
 	this.currentPath = null;
@@ -38464,7 +38447,7 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	setMasterVolume: function ( value ) {
 
-		this.gain.gain.value = value;
+		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
 
 	},
 
@@ -38807,7 +38790,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	setVolume: function ( value ) {
 
-		this.gain.gain.value = value;
+		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
 
 		return this;
 
@@ -41908,6 +41891,8 @@ Object.assign( InterleavedBuffer.prototype, {
 		this.count = array !== undefined ? array.length / this.stride : 0;
 		this.array = array;
 
+		return this;
+
 	},
 
 	setDynamic: function ( value ) {
@@ -43943,6 +43928,8 @@ PlaneHelper.prototype.updateMatrixWorld = function ( force ) {
 
 	this.scale.set( 0.5 * this.size, 0.5 * this.size, scale );
 
+	this.children[ 0 ].material.side = ( scale < 0 ) ? BackSide : FrontSide; // renderer flips side when determinant < 0; flipping not wanted here
+
 	this.lookAt( this.plane.normal );
 
 	Object3D.prototype.updateMatrixWorld.call( this, force );
@@ -45216,6 +45203,30 @@ Object.defineProperties( BufferGeometry.prototype, {
 			return this.groups;
 
 		}
+	}
+
+} );
+
+//
+
+Object.assign( ExtrudeBufferGeometry.prototype, {
+
+	getArrays: function () {
+
+		console.error( 'THREE.ExtrudeBufferGeometry: .getArrays() has been removed.' );
+
+	},
+
+	addShapeList: function () {
+
+		console.error( 'THREE.ExtrudeBufferGeometry: .addShapeList() has been removed.' );
+
+	},
+
+	addShape: function () {
+
+		console.error( 'THREE.ExtrudeBufferGeometry: .addShape() has been removed.' );
+
 	}
 
 } );

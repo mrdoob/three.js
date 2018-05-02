@@ -94,7 +94,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.generateMipmap( target );
 
 		var textureProperties = properties.get( texture );
-		textureProperties.__maxMipLevel = Math.log2( Math.max( width, height ) );
+
+		// Note: Math.log( x ) * Math.LOG2E used instead of Math.log2( x ) which is not supported by IE11
+		textureProperties.__maxMipLevel = Math.log( Math.max( width, height ) ) * Math.LOG2E;
 
 	}
 

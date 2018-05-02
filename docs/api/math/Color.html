@@ -10,9 +10,9 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 		Class representing a color.
-		</div>
+		</p>
 
 
 		<h2>Examples</h2>
@@ -45,7 +45,7 @@ var color = new THREE.Color( 1, 0, 0 );
 
 
 		<h3>[name]( [param:Color_Hex_or_String r], [param:Float g], [param:Float b] )</h3>
-		<div>
+		<p>
 		[page:Color_Hex_or_String r] - (optional) If arguments [page:Float g] and [page:Float b] are defined, the red component of the color.
 		If they are not defined, it can be a [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (recommended), a CSS-style string, or another Color instance.<br />
 		[page:Float g] - (optional) If it is defined, the green component of the color.<br />
@@ -71,31 +71,31 @@ var color = new THREE.Color( 1, 0, 0 );
 
 			</li>
 		</ul>
-		</div>
+		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Boolean isColor]</h3>
-		<div>
+		<p>
 			Used to check whether this or derived classes are Colors. Default is *true*.<br /><br />
 
 			You should not change this, as it used internally for optimisation.
-		</div>
+		</p>
 
 		<h3>[property:Float r]</h3>
-		<div>
+		<p>
 		Red channel value between 0 and 1. Default is 1.
-		</div>
+		</p>
 
 		<h3>[property:Float g]</h3>
-		<div>
+		<p>
 		Green channel value between 0 and 1. Default is 1.
-		</div>
+		</p>
 
 		<h3>[property:Float b]</h3>
-		<div>
+		<p>
 		Blue channel value between 0 and 1. Default is 1.
-		</div>
+		</p>
 
 
 
@@ -105,65 +105,71 @@ var color = new THREE.Color( 1, 0, 0 );
 		<h2>Methods</h2>
 
 		<h3>[method:Color add]( [param:Color color] ) </h3>
-		<div>Adds the RGB values of [page:Color color] to the RGB values of this color.</div>
+		<p>Adds the RGB values of [page:Color color] to the RGB values of this color.</p>
 
 		<h3>[method:Color addColors]( [param:Color color1], [param:Color color2] ) </h3>
-		<div>Sets this color's RGB values to the sum of the RGB values of [page:Color color1] and [page:Color color2].</div>
+		<p>Sets this color's RGB values to the sum of the RGB values of [page:Color color1] and [page:Color color2].</p>
 
 		<h3>[method:Color addScalar]( [param:Number s] ) </h3>
-		<div>Adds [page:Number s] to the RGB values of this color.</div>
+		<p>Adds [page:Number s] to the RGB values of this color.</p>
 
 		<h3>[method:Color clone]() </h3>
-		<div>Returns a new Color with the same [page:.r r], [page:.g g] and [page:.b b] values as this one.</div>
+		<p>Returns a new Color with the same [page:.r r], [page:.g g] and [page:.b b] values as this one.</p>
 
 		<h3>[method:Color copy]( [param:Color color] ) </h3>
-		<div>
+		<p>
 			Copies the [page:.r r], [page:.g g] and [page:.b b] parameters from [page:Color color] in to this color.
-		</div>
+		</p>
 
-		<h3>[method:Color convertGammaToLinear]() </h3>
-		<div>Converts this color from gamma to linear space by squaring the values of [page:.r r], [page:.g g] and [page:.b b] ).</div>
-
-		<h3>[method:Color convertLinearToGamma]() </h3>
-		<div>Converts this color from linear to gamma space by taking the square root of [page:.r r], [page:.g g] and [page:.b b]).</div>
+		<h3>[method:Color convertGammaToLinear]( [param:Float gammaFactor] ) </h3>
+		<p>
+		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
+		Converts this color from gamma to linear space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
+		</p>
+		
+		<h3>[method:Color convertLinearToGamma]( [param:Float gammaFactor] ) </h3>
+		<p>
+		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
+		Converts this color from linear to gamma space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of 1 / [page:Float gammaFactor].
+		</p>
 
 		<h3>[method:Color copyGammaToLinear]( [param:Color color], [param:Float gammaFactor] ) </h3>
-		<div>
+		<p>
 		[page:Color color] — Color to copy.<br />
 		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
 
 		Copies the given color into this color while converting it from gamma to linear space
 		by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
-		</div>
+		</p>
 
 		<h3>[method:Color copyLinearToGamma]( [param:Color color], [param:Float gammaFactor] ) </h3>
-		<div>
+		<p>
 		[page:Color color] — Color to copy.<br />
 		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
 
 		Copies the given color into this color while converting it from linear to gamma space
 		by taking [page:.r r], [page:.g g] and [page:.b b] to the power of 1 / [page:Float gammaFactor].
-		</div>
+		</p>
 
 		<h3>[method:Boolean equals]( [param:Color color] ) </h3>
-		<div>Compares the RGB values of [page:Color color] with those of this object. Returns true if they are the same, false otherwise.</div>
+		<p>Compares the RGB values of [page:Color color] with those of this object. Returns true if they are the same, false otherwise.</p>
 
 		<h3>[method:Color fromArray]( [param:Array array], [param:Integer offset] ) </h3>
-		<div>
+		<p>
 		[page:Array array] - [page:Array] of floats in the form [ [page:Float r], [page:Float g], [page:Float b] ].<br />
 		[page:Integer offset] - An optional offset into the array.<br /><br />
 
 		Sets this color's components based on an array formatted like [ [page:Float r], [page:Float g], [page:Float b] ].
-		</div>
+		</p>
 
 		<h3>[method:Integer getHex]()</h3>
-		<div>Returns the hexadecimal value of this color.</div>
+		<p>Returns the hexadecimal value of this color.</p>
 
 		<h3>[method:String getHexString]()</h3>
-		<div>Returns the hexadecimal value of this color as a string (for example, 'FFFFFF').</div>
+		<p>Returns the hexadecimal value of this color as a string (for example, 'FFFFFF').</p>
 
 		<h3>[method:Object getHSL]( [param:Object target] )</h3>
-		<div>
+		<p>
 			[page:Object target] — the result will be copied into this Object. Adds h, s and l keys to the object (if not already present).<br /><br />
 
 			Convert this Color's [page:.r r], [page:.g g] and [page:.b b] values to [link:https://en.wikipedia.org/wiki/HSL_and_HSV HSL]
@@ -173,76 +179,76 @@ var color = new THREE.Color( 1, 0, 0 );
 				{ h: 0, s: 0, l: 0 }
 			</code>
 
-		</div>
+		</p>
 
 		<h3>[method:String getStyle]()</h3>
-		<div>Returns the value of this color as a CSS style string. Example: 'rgb(255,0,0)'.</div>
+		<p>Returns the value of this color as a CSS style string. Example: 'rgb(255,0,0)'.</p>
 
 		<h3>[method:Color lerp]( [param:Color color], [param:Float alpha] ) </h3>
-		<div>
+		<p>
 		[page:Color color] - color to converge on.<br />
 		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
 
 		Linearly interpolates this color's RGB values toward the RGB values of the passed argument.
 		The alpha argument can be thought of as the ratio between the two colors, where 0.0 is
 		this color and 1.0 is the first argument.
-		</div>
+		</p>
 
 		<h3>[method:Color multiply]( [param:Color color] ) </h3>
-		<div>Multiplies this color's RGB values by the given [page:Color color]'s RGB values.</div>
+		<p>Multiplies this color's RGB values by the given [page:Color color]'s RGB values.</p>
 
 		<h3>[method:Color multiplyScalar]( [param:Number s] ) </h3>
-		<div>Multiplies this color's RGB values by [page:Number s].</div>
+		<p>Multiplies this color's RGB values by [page:Number s].</p>
 
 		<h3>[method:Color offsetHSL]( [param:Float h], [param:Float s], [param:Float l] ) </h3>
-		<div>
+		<p>
 			Adds the given [page:Float h], [page:Float s], and [page:Float l] to this color's values.
 			Internally, this converts the color's [page:.r r], [page:.g g] and [page:.b b] values to HSL, adds
 			[page:Float h], [page:Float s], and [page:Float l], and then converts the color back to RGB.
-		</div>
+		</p>
 
 		<h3>[method:Color set]( [param:Color_Hex_or_String value] ) </h3>
-		<div>
+		<p>
 		[page:Color_Hex_or_String value] - Value to set this color to.<br /><br />
 
 		See the Constructor above for full details of what [page:Color_Hex_or_String value] can be.
 		Delegates to [page:.copy], [page:.setStyle], or [page:.setHex] depending on input type.
-		</div>
+		</p>
 
 		<h3>[method:Color setHex]( [param:Integer hex] ) </h3>
-		<div>
+		<p>
 		[page:Integer hex] — [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] format.<br /><br />
 
 		Sets this color from a hexadecimal value.
-		</div>
+		</p>
 
 		<h3>[method:Color setHSL]( [param:Float h], [param:Float s], [param:Float l] ) </h3>
-		<div>
+		<p>
 		[page:Float h] — hue value between 0.0 and 1.0 <br />
 		[page:Float s] — saturation value between 0.0 and 1.0 <br />
 		[page:Float l] — lightness value between 0.0 and 1.0<br /><br />
 
 		Sets color from HSL values.
-		</div>
+		</p>
 
 		<h3>[method:Color setRGB]( [param:Float r], [param:Float g], [param:Float b] ) </h3>
-		<div>
+		<p>
 		[page:Float r] — Red channel value between 0.0 and 1.0.<br />
 		[page:Float g] — Green channel value between 0.0 and 1.0.<br />
 		[page:Float b] — Blue channel value between 0.0 and 1.0.<br /><br />
 
 		Sets this color from RGB values.
-		</div>
+		</p>
 
 		<h3>[method:Color setScalar]( [param:Float scalar] ) </h3>
-		<div>
+		<p>
 		[page:Float scalar] — a value between 0.0 and 1.0.<br /><br />
 
 		Sets all three color components to the value [page:Float scalar].
-		</div>
+		</p>
 
 		<h3>[method:Color setStyle]( [param:String style] ) </h3>
-		<div>
+		<p>
 		[page:String style] — color as a CSS-style string.<br /><br />
 
 		Sets this color from a CSS-style string. For example,
@@ -258,21 +264,21 @@ var color = new THREE.Color( 1, 0, 0 );
 		but the alpha-channel coordinate will be discarded.<br /><br />
 
 		Note that for X11 color names, multiple words such as Dark Orange become the string 'darkorange' (all lowercase).
-		</div>
+		</p>
 
 		<h3>[method:Color sub]( [param:Color color] ) </h3>
-		<div>
+		<p>
 		Subtracts the RGB components of the given color from the RGB components of this color.
 		If this results in a negative component, that component is set to zero.
-		</div>
+		</p>
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] ) </h3>
-		<div>
+		<p>
 		[page:Array array] - An optional array to store the color to. <br />
 		[page:Integer offset] - An optional offset into the array.<br /><br />
 
 		Returns an array of the form [ r, g, b ].
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

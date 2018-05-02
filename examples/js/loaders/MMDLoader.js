@@ -354,7 +354,15 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 
 			}
 
-			return new THREE.MMDLoader[ type ]( node, times, values, interpolations );
+			var track = new THREE[ type ]( node, times, values );
+
+			track.createInterpolant = function InterpolantFactoryMethodCubicBezier( result ) {
+
+				return new THREE.MMDLoader.CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, new Float32Array( interpolations ) );
+
+			};
+
+			return track;
 
 		};
 
@@ -377,16 +385,6 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 
 			position.add( center );
 			position.applyQuaternion( quaternion );
-
-			/*
-			 * Note: This is a workaround not to make Animation system calculate lerp
-			 *       if the diff from the last frame is 1 frame (in 30fps).
-			 */
-			if ( times.length > 0 && time < times[ times.length - 1 ] + ( 1 / 30 ) * 1.5 ) {
-
-				times[ times.length - 1 ] = time - 1e-13;
-
-			}
 
 			times.push( time );
 
@@ -419,10 +417,10 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 
 		var tracks = [];
 
-		tracks.push( createTrack( '.center', 'VectorKeyframeTrackEx', times, centers, cInterpolations ) );
-		tracks.push( createTrack( '.quaternion', 'QuaternionKeyframeTrackEx', times, quaternions, qInterpolations ) );
-		tracks.push( createTrack( '.position', 'VectorKeyframeTrackEx', times, positions, pInterpolations ) );
-		tracks.push( createTrack( '.fov', 'NumberKeyframeTrackEx', times, fovs, fInterpolations ) );
+		tracks.push( createTrack( '.center', 'VectorKeyframeTrack', times, centers, cInterpolations ) );
+		tracks.push( createTrack( '.quaternion', 'QuaternionKeyframeTrack', times, quaternions, qInterpolations ) );
+		tracks.push( createTrack( '.position', 'VectorKeyframeTrack', times, positions, pInterpolations ) );
+		tracks.push( createTrack( '.fov', 'NumberKeyframeTrack', times, fovs, fInterpolations ) );
 
 		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, - 1, tracks );
 
@@ -1528,6 +1526,20 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		};
 
+		var createTrack = function ( node, type, times, values, interpolations ) {
+
+			var track = new THREE[ type ]( node, times, values );
+
+			track.createInterpolant = function InterpolantFactoryMethodCubicBezier( result ) {
+
+				return new THREE.MMDLoader.CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, new Float32Array( interpolations ) );
+
+			};
+
+			return track;
+
+		};
+
 		for ( var i = 0; i < orderedMotions.length; i ++ ) {
 
 			var times = [];
@@ -1574,8 +1586,8 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 			var boneName = '.bones[' + bone.name + ']';
 
-			tracks.push( new THREE.MMDLoader.VectorKeyframeTrackEx( boneName + '.position', times, positions, pInterpolations ) );
-			tracks.push( new THREE.MMDLoader.QuaternionKeyframeTrackEx( boneName + '.quaternion', times, rotations, rInterpolations ) );
+			tracks.push( createTrack( boneName + '.position', 'VectorKeyframeTrack', times, positions, pInterpolations ) );
+			tracks.push( createTrack( boneName + '.quaternion', 'QuaternionKeyframeTrack', times, rotations, rInterpolations ) );
 
 		}
 
@@ -1759,83 +1771,6 @@ THREE.MMDLoader.DataCreationHelper.prototype = {
 
 };
 
-/*
- * extends existing KeyframeTrack for bone and camera animation.
- *   - use Float64Array for times
- *   - use Cubic Bezier curves interpolation
- */
-THREE.MMDLoader.VectorKeyframeTrackEx = function ( name, times, values, interpolationParameterArray ) {
-
-	this.interpolationParameters = new Float32Array( interpolationParameterArray );
-
-	THREE.VectorKeyframeTrack.call( this, name, times, values );
-
-};
-
-THREE.MMDLoader.VectorKeyframeTrackEx.prototype = Object.create( THREE.VectorKeyframeTrack.prototype );
-THREE.MMDLoader.VectorKeyframeTrackEx.prototype.constructor = THREE.MMDLoader.VectorKeyframeTrackEx;
-THREE.MMDLoader.VectorKeyframeTrackEx.prototype.TimeBufferType = Float64Array;
-
-THREE.MMDLoader.VectorKeyframeTrackEx.prototype.InterpolantFactoryMethodCubicBezier = function ( result ) {
-
-	return new THREE.MMDLoader.CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, this.interpolationParameters );
-
-};
-
-THREE.MMDLoader.VectorKeyframeTrackEx.prototype.setInterpolation = function ( interpolation ) {
-
-	this.createInterpolant = this.InterpolantFactoryMethodCubicBezier;
-
-};
-
-THREE.MMDLoader.QuaternionKeyframeTrackEx = function ( name, times, values, interpolationParameterArray ) {
-
-	this.interpolationParameters = new Float32Array( interpolationParameterArray );
-
-	THREE.QuaternionKeyframeTrack.call( this, name, times, values );
-
-};
-
-THREE.MMDLoader.QuaternionKeyframeTrackEx.prototype = Object.create( THREE.QuaternionKeyframeTrack.prototype );
-THREE.MMDLoader.QuaternionKeyframeTrackEx.prototype.constructor = THREE.MMDLoader.QuaternionKeyframeTrackEx;
-THREE.MMDLoader.QuaternionKeyframeTrackEx.prototype.TimeBufferType = Float64Array;
-
-THREE.MMDLoader.QuaternionKeyframeTrackEx.prototype.InterpolantFactoryMethodCubicBezier = function ( result ) {
-
-	return new THREE.MMDLoader.CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, this.interpolationParameters );
-
-};
-
-THREE.MMDLoader.QuaternionKeyframeTrackEx.prototype.setInterpolation = function ( interpolation ) {
-
-	this.createInterpolant = this.InterpolantFactoryMethodCubicBezier;
-
-};
-
-THREE.MMDLoader.NumberKeyframeTrackEx = function ( name, times, values, interpolationParameterArray ) {
-
-	this.interpolationParameters = new Float32Array( interpolationParameterArray );
-
-	THREE.NumberKeyframeTrack.call( this, name, times, values );
-
-};
-
-THREE.MMDLoader.NumberKeyframeTrackEx.prototype = Object.create( THREE.NumberKeyframeTrack.prototype );
-THREE.MMDLoader.NumberKeyframeTrackEx.prototype.constructor = THREE.MMDLoader.NumberKeyframeTrackEx;
-THREE.MMDLoader.NumberKeyframeTrackEx.prototype.TimeBufferType = Float64Array;
-
-THREE.MMDLoader.NumberKeyframeTrackEx.prototype.InterpolantFactoryMethodCubicBezier = function ( result ) {
-
-	return new THREE.MMDLoader.CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, this.interpolationParameters );
-
-};
-
-THREE.MMDLoader.NumberKeyframeTrackEx.prototype.setInterpolation = function ( interpolation ) {
-
-	this.createInterpolant = this.InterpolantFactoryMethodCubicBezier;
-
-};
-
 THREE.MMDLoader.CubicBezierInterpolation = function ( parameterPositions, sampleValues, sampleSize, resultBuffer, params ) {
 
 	THREE.Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
@@ -1856,7 +1791,8 @@ THREE.MMDLoader.CubicBezierInterpolation.prototype.interpolate_ = function ( i1,
 	var offset1 = i1 * stride;
 	var offset0 = offset1 - stride;
 
-	var weight1 = ( t - t0 ) / ( t1 - t0 );
+	// No interpolation if next key frame is in one frame in 30fps. This is from MMD animation spec.
+	var weight1 = ( ( t1 - t0 ) < 1 / 30 * 1.5 ) ? 0.0 : ( t - t0 ) / ( t1 - t0 );
 
 	if ( stride === 4 ) { // Quaternion
 

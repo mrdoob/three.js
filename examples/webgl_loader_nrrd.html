@@ -112,8 +112,8 @@
 						sliceX;
 
 					//box helper to see the extend of the volume
-					var geometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
-					var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+					var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
+					var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					var cube = new THREE.Mesh( geometry, material );
 					cube.visible = false;
 					var box = new THREE.BoxHelper( cube );

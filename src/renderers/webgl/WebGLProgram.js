@@ -711,6 +711,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	//
 
+	this.name = shader.name;
 	this.id = programIdCount ++;
 	this.code = code;
 	this.usedTimes = 1;

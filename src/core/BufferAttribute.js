@@ -56,6 +56,8 @@ Object.assign( BufferAttribute.prototype, {
 		this.count = array !== undefined ? array.length / this.itemSize : 0;
 		this.array = array;
 
+		return this;
+
 	},
 
 	setDynamic: function ( value ) {
@@ -68,6 +70,7 @@ Object.assign( BufferAttribute.prototype, {
 
 	copy: function ( source ) {
 
+		this.name = source.name;
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
 		this.count = source.count;

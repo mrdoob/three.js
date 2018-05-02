@@ -41,19 +41,7 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 		}
 
-		var position = geometry.attributes.position;
-
-		if ( position.isInterleavedBufferAttribute ) {
-
-			count = position.data.count;
-
-			extension[ gl.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, 0, count, geometry.maxInstancedCount );
-
-		} else {
-
-			extension[ gl.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, start, count, geometry.maxInstancedCount );
-
-		}
+		extension[ gl.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, start, count, geometry.maxInstancedCount );
 
 		info.update( count, mode, geometry.maxInstancedCount );
 

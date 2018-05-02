@@ -10,8 +10,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">Uniforms are global [link:https://www.opengl.org/documentation/glsl/ GLSL] variables. They are passed to shader programs.
-		</div>
+		<p class="desc">Uniforms are global [link:https://www.opengl.org/documentation/glsl/ GLSL] variables. They are passed to shader programs.
+		</p>
 
 		<h3>Example</h3>
 		<p>
@@ -185,26 +185,26 @@
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Object value] )</h3>
-		<div>
+		<p>
 		value -- An object containing the value to set up the uniform. It's type must be one of the Uniform Types described above.
-		</div>
+		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Object value]</h3>
-		<div>
+		<p>
 		Current value of the uniform.
-		</div>
+		</p>
 
 		<h2>Methods</h2>
 
 		<h3>[method:Uniform clone]()</h3>
-		<div>
+		<p>
 		Returns a clone of this uniform.<br />
 		If the uniform's value property is an [page:Object] with a clone() method, this is used, otherwise the value is copied by assigment.
 		Array values are shared between cloned [page:Uniform]s.<br /><br />
 		See [example:webgldeferred_animation WebGL deferred animation] for an example of this method in use.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 
