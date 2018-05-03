@@ -43,6 +43,7 @@
 		<script src="js/effects/OutlineEffect.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
+		<script src="js/animation/MMDAnimationHelper.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -120,36 +121,33 @@
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
 
-				helper = new THREE.MMDHelper();
+				helper = new THREE.MMDAnimationHelper( {
+					afterglow: 2.0
+				} );
 
 				var loader = new THREE.MMDLoader();
 
-				loader.load( modelFile, vmdFiles, function ( object ) {
+				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
 
-					mesh = object;
+					mesh = mmd.mesh;
 					mesh.position.y = -10;
 					scene.add( mesh );
 
-					helper.add( mesh );
-					helper.setAnimation( mesh );
+					helper.add( mesh, {
+						animation: mmd.animation,
+						physics: true
+					} );
 
 					/*
-					 * Note: create CCDIKHelper after calling helper.setAnimation()
+					 * Note: create CCDIKHelper and MMDPhysicsHelper after calling helper.add( mesh )
 					 */
 					ikHelper = new THREE.CCDIKHelper( mesh );
 					ikHelper.visible = false;
 					scene.add( ikHelper );
 
-					/*
-					 * Note: You're recommended to call helper.setPhysics()
-					 *       after calling helper.setAnimation().
-			 		 */
-					helper.setPhysics( mesh );
-					physicsHelper = new THREE.MMDPhysicsHelper( mesh );
+					physicsHelper = new THREE.MMDPhysicsHelper( mesh, helper.objects.get( mesh ).physics );
 					physicsHelper.visible = false;
 					scene.add( physicsHelper );
-
-					helper.unifyAnimationDuration( { afterglow: 2.0 } );
 
 					initGui();
 
@@ -195,7 +193,7 @@
 					var gui = new dat.GUI();
 
 					gui.add( api, 'animation' ).onChange( function () {
-						helper.doAnimation = api[ 'animation' ];
+						helper.enable( 'animation', api[ 'animation' ] );
 					} );
 
 					gui.add( api, 'gradient mapping' ).onChange( function () {
@@ -216,7 +214,7 @@
 					} );
 
 					gui.add( api, 'ik' ).onChange( function () {
-						helper.doIk = api[ 'ik' ];
+						helper.enable( 'ik', api[ 'ik' ] );
 					} );
 
 					gui.add( api, 'outline' ).onChange( function () {
@@ -224,7 +222,7 @@
 					} );
 
 					gui.add( api, 'physics' ).onChange( function () {
-						helper.enablePhysics( api[ 'physics' ] );
+						helper.enable( 'physics', api[ 'physics' ] );
 					} );
 
 					gui.add( api, 'show IK bones' ).onChange( function () {
@@ -265,9 +263,11 @@
 
 			function render() {
 
-				helper.animate( clock.getDelta() );
+				helper.update( clock.getDelta() );
+
 				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
 				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
+
 				effect.render( scene, camera );
 
 			}
