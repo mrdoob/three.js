@@ -140,6 +140,8 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 		// we use getPointAt to sample evenly distributed points from the given path
 
 		var P = path.getPointAt( i / tubularSegments );
+		var P1;
+		var P2;
 
 		// retrieve corresponding normal and binormal
 
@@ -185,20 +187,14 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 				if ( t1 < 0 ) t1 = 0;
 				if ( t2 > 1 ) t2 = 1;
 
-				var P1 = path.getPointAt( t1 );
-				var P2 = path.getPointAt( t2 );
+				P1 = path.getPointAt( t1, P1 );
+				P2 = path.getPointAt( t2, P2 );
 				var delta = P1.distanceTo( P2 );
 
 				var r1 = radius.getPointAt( t1 ).y;
 				var r2 = radius.getPointAt( t2 ).y;
 
-				// prevent dividing by zero
-
-				if ( delta !== 0 ) {
-
-					normal.addScaledVector( T, - ( r2 - r1 ) / delta ).normalize();
-
-				}
+				normal.addScaledVector( T, - ( r2 - r1 ) / delta ).normalize();
 
 			}
 
