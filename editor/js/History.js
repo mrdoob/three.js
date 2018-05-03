@@ -16,7 +16,7 @@ History = function ( editor ) {
 
 	//Set editor-reference in Command
 
-	Command( editor );
+	new Command( editor );
 
 	// signals
 
