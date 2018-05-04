@@ -177,6 +177,17 @@ THREE.MMDPhysics = ( function () {
 
 		},
 
+		/**
+		 * Creates MMDPhysicsHelper
+		 *
+		 * @return {MMDPhysicsHelper}
+		 */
+		createHelper: function () {
+
+			return new MMDPhysicsHelper( this.mesh, this );
+
+		},
+
 		// private methods
 
 		_init: function ( mesh, rigidBodyParams, constraintParams ) {
@@ -1212,17 +1223,9 @@ THREE.MMDPhysics = ( function () {
 
 	};
 
-	return MMDPhysics;
-
-} )();
-
-
-/**
- * Visualize Rigid bodies of MMDPhysics
- */
-THREE.MMDPhysicsHelper = ( function () {
-
 	/**
+	 * Visualize Rigid bodies
+	 *
 	 * @param {THREE.SkinnedMesh} mesh
 	 * @param {THREE.Physics} physics
 	 */
@@ -1394,6 +1397,6 @@ THREE.MMDPhysicsHelper = ( function () {
 
 	} );
 
-	return MMDPhysicsHelper;
+	return MMDPhysics;
 
 } )();
