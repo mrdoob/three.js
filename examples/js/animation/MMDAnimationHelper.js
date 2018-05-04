@@ -275,7 +275,7 @@ THREE.MMDAnimationHelper = ( function () {
 		 */
 		createGrantSolver: function ( mesh ) {
 
-			return new GrantSolver( mesh );
+			return new GrantSolver( mesh, mesh.geometry.grants );
 
 		},
 
@@ -531,6 +531,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 				if ( ikSolver && this.enabled.ik ) {
 
+					mesh.updateMatrixWorld( true );
 					ikSolver.update();
 
 				}
@@ -618,7 +619,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-			return new THREE.CCDIKSolver( mesh );
+			return new THREE.CCDIKSolver( mesh, mesh.geometry.iks );
 
 		},
 
@@ -959,10 +960,12 @@ THREE.MMDAnimationHelper = ( function () {
 
 	/**
 	 * @param {THREE.SkinnedMesh} mesh
+	 * @param {Array<Object>} grants
 	 */
-	function GrantSolver( mesh ) {
+	function GrantSolver( mesh, grants ) {
 
 		this.mesh = mesh;
+		this.grants = grants || [];
 
 	}
 
@@ -979,11 +982,14 @@ THREE.MMDAnimationHelper = ( function () {
 
 			return function () {
 
-				for ( var i = 0, il = this.mesh.geometry.grants.length; i < il; i ++ ) {
+				var bones = this.mesh.skeleton.bones;
+				var grants = this.grants;
 
-					var grant = this.mesh.geometry.grants[ i ];
-					var bone = this.mesh.skeleton.bones[ grant.index ];
-					var parentBone = this.mesh.skeleton.bones[ grant.parentIndex ];
+				for ( var i = 0, il = grants.length; i < il; i ++ ) {
+
+					var grant = grants[ i ];
+					var bone = bones[ grant.index ];
+					var parentBone = bones[ grant.parentIndex ];
 
 					if ( grant.isLocal ) {
 
@@ -1016,7 +1022,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 				}
 
-				this;
+				return this;
 
 			};
 
