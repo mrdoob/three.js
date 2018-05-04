@@ -45,13 +45,13 @@ function generateGeometry( objectType, numObjects ) {
 			geometry = geometry.toNonIndexed(); // merging needs consistent buffer geometries
 			scale.y = Math.random() * 200 + 100;
 			scale.z = Math.random() * 200 + 100;
-			color.setRGB( 0, 0, Math.random() + 0.1 );
+			color.setRGB( 0, 0, 0.1 + 0.9 * Math.random() );
 
 		} else if ( objectType === 'sphere' ) {
 
 			geometry = new THREE.IcosahedronBufferGeometry( 1, 1 );
 			scale.y = scale.z = scale.x;
-			color.setRGB( Math.random() + 0.1, 0, 0 );
+			color.setRGB( 0.1 + 0.9 * Math.random(), 0, 0 );
 
 		}
 
