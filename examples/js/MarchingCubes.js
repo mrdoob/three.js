@@ -688,7 +688,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 	};
 
-	this.generateGeometry = function() {
+	this.generateGeometry = function () {
 
 		var start = 0, geo = new THREE.Geometry();
 		var normals = [];
@@ -734,16 +734,17 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		return geo;
 
 	};
-	
-	function concatenate(resultConstructor, a1, a2, length) {
-		let totalLength = a1.length + length;
-		let result = new resultConstructor(totalLength);
-		result.set(a1, 0);
-		result.set(a2.slice(0,length), a1.length);
+
+	function concatenate( a, b, length ) {
+
+		var result = new Float32Array( a.length + length );
+		result.set( a, 0 );
+		result.set( b.slice( 0, length ), a.length );
 		return result;
+
 	}
 
-	this.generateBufferGeometry = function() {
+	this.generateBufferGeometry = function () {
 
 		var start = 0, geo = new THREE.BufferGeometry();
 		var indices = [];
@@ -753,12 +754,12 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		var uvArray = new Float32Array();
 		var scope = this;
 
-		var geo_callback = function( object ) {
+		var geo_callback = function ( object ) {
 
-			if (scope.hasPositions) posArray = concatenate(Float32Array, posArray, object.positionArray, object.count*3);
-			if (scope.hasNormals) normArray = concatenate(Float32Array, normArray, object.normalArray, object.count*3);
-			if (scope.hasColors) colorArray = concatenate(Float32Array, colorArray, object.colorArray, object.count*3);
-			if (scope.hasUvs) uvArray = concatenate(Float32Array, uvArray, object.uvArray, object.count*2);
+			if ( scope.hasPositions ) posArray = concatenate( posArray, object.positionArray, object.count * 3 );
+			if ( scope.hasNormals ) normArray = concatenate( normArray, object.normalArray, object.count * 3 );
+			if ( scope.hasColors ) colorArray = concatenate( colorArray, object.colorArray, object.count * 3 );
+			if ( scope.hasUvs ) uvArray = concatenate( uvArray, object.uvArray, object.count * 2 );
 
 			object.count = 0;
 
@@ -766,10 +767,10 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 		this.render( geo_callback );
 
-		if (this.hasPositions) geo.addAttribute( 'position', new THREE.BufferAttribute(posArray,3));
-		if (this.hasNormals) geo.addAttribute( 'normal', new THREE.BufferAttribute(normArray,3));
-		if (this.hasColors) geo.addAttribute( 'color', new THREE.BufferAttribute(colorArray,3));
-		if (this.hasUvs) geo.addAttribute( 'uv', new THREE.BufferAttribute(uvArray,2));
+		if ( this.hasPositions ) geo.addAttribute( 'position', new THREE.BufferAttribute( posArray, 3 ) );
+		if ( this.hasNormals ) geo.addAttribute( 'normal', new THREE.BufferAttribute( normArray, 3 ) );
+		if ( this.hasColors ) geo.addAttribute( 'color', new THREE.BufferAttribute( colorArray, 3 ) );
+		if ( this.hasUvs ) geo.addAttribute( 'uv', new THREE.BufferAttribute( uvArray, 2 ) );
 
 		return geo;
 
