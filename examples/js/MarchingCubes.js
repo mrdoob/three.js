@@ -690,48 +690,8 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 	this.generateGeometry = function () {
 
-		var start = 0, geo = new THREE.Geometry();
-		var normals = [];
-
-		var geo_callback = function( object ) {
-
-			for ( var i = 0; i < object.count; i ++ ) {
-
-				var vertex = new THREE.Vector3().fromArray( object.positionArray, i * 3 );
-				var normal = new THREE.Vector3().fromArray( object.normalArray, i * 3 );
-
-				geo.vertices.push( vertex );
-				normals.push( normal );
-
-			}
-
-			var nfaces = object.count / 3;
-
-			for ( i = 0; i < nfaces; i ++ ) {
-
-				var a = ( start + i ) * 3;
-				var b = a + 1;
-				var c = a + 2;
-
-				var na = normals[ a ];
-				var nb = normals[ b ];
-				var nc = normals[ c ];
-
-				var face = new THREE.Face3( a, b, c, [ na, nb, nc ] );
-				geo.faces.push( face );
-
-			}
-
-			start += nfaces;
-			object.count = 0;
-
-		};
-
-		this.render( geo_callback );
-
-		// console.log( "generated " + geo.faces.length + " triangles" );
-
-		return geo;
+		console.warn( 'THREE.MarchingCubes: generateGeometry() now returns THREE.BufferGeometry' );
+		return this.generateBufferGeometry();
 
 	};
 
