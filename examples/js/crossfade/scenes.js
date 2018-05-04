@@ -33,7 +33,7 @@ function generateGeometry( objectType, numObjects ) {
 		rotation.x = Math.random() * 2 * Math.PI;
 		rotation.y = Math.random() * 2 * Math.PI;
 		rotation.z = Math.random() * 2 * Math.PI;
-		quaternion.setFromEuler( rotation );
+		quaternion.setFromEuler( rotation, false );
 
 		scale.x = Math.random() * 200 + 100;
 
