@@ -97,6 +97,8 @@
 		<h3>[property:WeakMap objects]</h3>
 		<p>A [page:WeakMap] which holds animation stuffs used in helper for objects added to helper. For example, you can access [page:AnimationMixer] for an added [page:SkinnedMesh] with "helper.objects.get( mesh ).mixer"</p>
 
+		<h3>[property:function onBeforePhysics]</h3>
+		<p>An optional callback that is executed immediately before the physicis calculation for an [page:SkinnedMesh]. This function is called with the [page:SkinnedMesh].</p>
 
 		<h2>Methods</h2>
 
@@ -107,6 +109,10 @@
 		<ul>
 			<li>[page:AnimationClip animation] - an [page:AnimationClip] or an array of [page:AnimationClip] set to object. Only for [page:SkinnedMesh] and [page:Camera]. Default is undefined.</li>
 			<li>[page:Boolean physics] - Only for [page:SkinnedMesh]. A flag whether turn on physics. Default is true.</li>
+			<li>[page:Integer warmup] - Only for [page:SkinnedMesh] and physics is true. Physics parameter. Default is 60.</li>
+			<li>[page:Number unitStep] - Only for [page:SkinnedMesh] and physics is true. Physics parameter. Default is 1 / 65.</li>
+			<li>[page:Integer maxStepNum] - Only for [page:SkinnedMesh] and physics is true. Physics parameter. Default is 3.</li>
+			<li>[page:Vector3 gravity] - Only for [page:SkinnedMesh] and physics is true. Physics parameter. Default is ( 0, - 9.8 * 10, 0 ).</li>
 			<li>[page:Number delayTime] - Only for [page:Audio]. Default is 0.0.</li>
 		</ul>
 		</p>
