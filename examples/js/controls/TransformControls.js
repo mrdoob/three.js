@@ -227,12 +227,8 @@
 
 		THREE.TransformGizmo.call( this );
 
-		var arrowGeometry = new THREE.Geometry();
-		var mesh = new THREE.Mesh( new THREE.CylinderGeometry( 0, 0.05, 0.2, 12, 1, false ) );
-		mesh.position.y = 0.5;
-		mesh.updateMatrix();
-
-		arrowGeometry.merge( mesh.geometry, mesh.matrix );
+		var arrowGeometry = new THREE.ConeBufferGeometry( 0.05, 0.2, 12, 1, false );
+		arrowGeometry.translate( 0, 0.5, 0 );
 
 		var lineXGeometry = new THREE.BufferGeometry();
 		lineXGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0 ], 3 ) );
@@ -505,12 +501,8 @@
 
 		THREE.TransformGizmo.call( this );
 
-		var arrowGeometry = new THREE.Geometry();
-		var mesh = new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ) );
-		mesh.position.y = 0.5;
-		mesh.updateMatrix();
-
-		arrowGeometry.merge( mesh.geometry, mesh.matrix );
+		var arrowGeometry = new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 );
+		arrowGeometry.translate( 0, 0.5, 0 );
 
 		var lineXGeometry = new THREE.BufferGeometry();
 		lineXGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  1, 0, 0 ], 3 ) );
