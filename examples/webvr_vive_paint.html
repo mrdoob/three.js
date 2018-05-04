@@ -71,7 +71,7 @@
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
 
-				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
+				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0x444444,
 					roughness: 1.0,
@@ -93,7 +93,7 @@
 				scene.add( table );
 				*/
 
-				var geometry = new THREE.PlaneGeometry( 4, 4 );
+				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0x222222,
 					roughness: 1.0,
@@ -162,8 +162,8 @@
 					controller.receiveShadow = true;
 
 					// var pivot = new THREE.Group();
-					// var pivot = new THREE.Mesh( new THREE.BoxGeometry( 0.01, 0.01, 0.01 ) );
-					var pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.01, 2 ) );
+					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
+					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
 					pivot.name = 'pivot';
 					pivot.position.y = -0.016;
 					pivot.position.z = -0.043;
@@ -230,20 +230,22 @@
 				scene.add( line );
 
 				// Shapes
-				shapes[ 'tube' ] = getTubeShapes(1.0);
+				shapes[ 'tube' ] = getTubeShapes( 1.0 );
 			}
 
-			function getTubeShapes(size) {
+			function getTubeShapes( size ) {
 
 				var PI2 = Math.PI * 2;
 
 				var sides = 10;
 				var array = [];
 				var radius = 0.01 * size;
-				for( var i = 0; i < sides; i ++ ){
+
+				for( var i = 0; i < sides; i ++ ) {
 
 					var angle = ( i / sides ) * PI2;
 					array.push( new THREE.Vector3( Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
+
 				}
 
 				return array;

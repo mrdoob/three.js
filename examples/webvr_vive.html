@@ -60,7 +60,7 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 
 				room = new THREE.Mesh(
-					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+					new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
 				);
 				room.position.y = 3;
@@ -72,7 +72,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+				var geometry = new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
@@ -217,7 +217,7 @@
 
 					var cube = room.children[ i ];
 
-					if ( cube.geometry instanceof THREE.BoxGeometry === false ) continue;
+					if ( cube.geometry instanceof THREE.BoxBufferGeometry === false ) continue;
 
 					// cube.position.add( cube.userData.velocity );
 
