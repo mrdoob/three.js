@@ -564,31 +564,31 @@ Object.assign( Box3.prototype, {
 		// transform of empty box is an empty box.
 		if ( this.isEmpty( ) ) return this;
 
-		const m = matrix.elements;
+		var m = matrix.elements;
 
-		const xax = m[ 0 ] * this.min.x;
-		const xay = m[ 1 ] * this.min.x;
-		const xaz = m[ 2 ] * this.min.x;
+		var xax = m[ 0 ] * this.min.x;
+		var xay = m[ 1 ] * this.min.x;
+		var xaz = m[ 2 ] * this.min.x;
 
-		const xbx = m[ 0 ] * this.max.x;
-		const xby = m[ 1 ] * this.max.x;
-		const xbz = m[ 2 ] * this.max.x;
+		var xbx = m[ 0 ] * this.max.x;
+		var xby = m[ 1 ] * this.max.x;
+		var xbz = m[ 2 ] * this.max.x;
 
-		const yax = m[ 4 ] * this.min.y;
-		const yay = m[ 5 ] * this.min.y;
-		const yaz = m[ 6 ] * this.min.y;
+		var yax = m[ 4 ] * this.min.y;
+		var yay = m[ 5 ] * this.min.y;
+		var yaz = m[ 6 ] * this.min.y;
 
-		const ybx = m[ 4 ] * this.max.y;
-		const yby = m[ 5 ] * this.max.y;
-		const ybz = m[ 6 ] * this.max.y;
+		var ybx = m[ 4 ] * this.max.y;
+		var yby = m[ 5 ] * this.max.y;
+		var ybz = m[ 6 ] * this.max.y;
 
-		const zax = m[ 8 ] * this.min.z;
-		const zay = m[ 9 ] * this.min.z;
-		const zaz = m[ 10 ] * this.min.z;
+		var zax = m[ 8 ] * this.min.z;
+		var zay = m[ 9 ] * this.min.z;
+		var zaz = m[ 10 ] * this.min.z;
 
-		const zbx = m[ 8 ] * this.max.z;
-		const zby = m[ 9 ] * this.max.z;
-		const zbz = m[ 10 ] * this.max.z;
+		var zbx = m[ 8 ] * this.max.z;
+		var zby = m[ 9 ] * this.max.z;
+		var zbz = m[ 10 ] * this.max.z;
 
 		this.min.x = Math.min( xax, xbx ) + Math.min( yax, ybx ) + Math.min( zax, zbx ) + m[ 12 ];
 		this.min.y = Math.min( xay, xby ) + Math.min( yay, yby ) + Math.min( zay, zby ) + m[ 13 ];
