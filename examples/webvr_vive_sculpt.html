@@ -264,7 +264,7 @@
 
 							updateBlob();
 
-							var geometry = blob.generateGeometry();
+							var geometry = blob.generateBufferGeometry();
 							var mesh = new THREE.Mesh( geometry, blob.material.clone() );
 							mesh.position.y = 1;
 							mesh.castShadow = true;
