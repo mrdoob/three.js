@@ -143,7 +143,7 @@ THREE.GLTFLoader = ( function () {
 							break;
 
 						case EXTENSIONS.KHR_DRACO_MESH_COMPRESSION:
-							extensions[ extensionName ] = new GLTFDracoMeshCompressionExtension( this.dracoLoader );
+							extensions[ extensionName ] = new GLTFDracoMeshCompressionExtension( json, this.dracoLoader );
 							break;
 
 						case EXTENSIONS.MSFT_TEXTURE_DDS:
@@ -455,7 +455,7 @@ THREE.GLTFLoader = ( function () {
 	 *
 	 * Specification: https://github.com/KhronosGroup/glTF/pull/874
 	 */
-	function GLTFDracoMeshCompressionExtension ( dracoLoader ) {
+	function GLTFDracoMeshCompressionExtension ( json, dracoLoader ) {
 
 		if ( ! dracoLoader ) {
 
@@ -464,12 +464,14 @@ THREE.GLTFLoader = ( function () {
 		}
 
 		this.name = EXTENSIONS.KHR_DRACO_MESH_COMPRESSION;
+		this.json = json;
 		this.dracoLoader = dracoLoader;
 
 	}
 
 	GLTFDracoMeshCompressionExtension.prototype.decodePrimitive = function ( primitive, parser ) {
 
+		var json = this.json;
 		var dracoLoader = this.dracoLoader;
 		var bufferViewIndex = primitive.extensions[ this.name ].bufferView;
 		var gltfAttributeMap = primitive.extensions[ this.name ].attributes;
@@ -487,7 +489,29 @@ THREE.GLTFLoader = ( function () {
 
 			return new Promise( function ( resolve ) {
 
-				dracoLoader.decodeDracoFile( bufferView, resolve, threeAttributeMap );
+				dracoLoader.decodeDracoFile( bufferView, function ( geometry ) {
+
+					for ( var attributeName in primitive.attributes ) {
+
+						if ( ATTRIBUTES[ attributeName ] && geometry.attributes[ ATTRIBUTES[ attributeName ] ] ) {
+
+							var accessorDef = json.accessors[ primitive.attributes[ attributeName ] ];
+
+							if ( accessorDef.normalized === true ) {
+
+								var attribute = geometry.attributes[ ATTRIBUTES[ attributeName ] ];
+								geometry.attributes[ ATTRIBUTES[ attributeName ] ].normalized = true;
+								geometry.attributes[ ATTRIBUTES[ attributeName ] ].needsUpdate = true;
+
+							}
+
+						}
+
+					}
+
+					resolve( geometry );
+
+				}, threeAttributeMap );
 
 			} );
 
