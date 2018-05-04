@@ -53,6 +53,8 @@ THREE.MMDAnimationHelper = ( function () {
 			cameraAnimation: true
 		};
 
+		this.onBeforePhysics = function ( mesh ) {};
+
 		// experimental
 		this.sharedPhysics = false;
 		this.masterPhysics = null;
@@ -72,6 +74,10 @@ THREE.MMDAnimationHelper = ( function () {
 		 * @param {Object} params - (optional)
 		 * @param {THREE.AnimationClip|Array<THREE.AnimationClip>} params.animation - Only for THREE.SkinnedMesh and THREE.Camera. Default is undefined.
 		 * @param {boolean} params.physics - Only for THREE.SkinnedMesh. Default is true.
+		 * @param {Integer} params.warmup - Only for THREE.SkinnedMesh and physics is true. Default is 60.
+		 * @param {Number} params.unitStep - Only for THREE.SkinnedMesh and physics is true. Default is 1 / 65.
+		 * @param {Integer} params.maxStepNum - Only for THREE.SkinnedMesh and physics is true. Default is 3.
+		 * @param {THREE.Vector3} params.gravity - Only for THREE.SkinnedMesh and physics is true. Default ( 0, - 9.8 * 10, 0 ).
 		 * @param {Number} params.delayTime - Only for THREE.Audio. Default is 0.0.
 		 * @return {THREE.MMDAnimationHelper}
 		 */
@@ -215,15 +221,13 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( params.ik !== false ) {
 
-				var solver = this._createCCDIKSolver( mesh );
-				solver.update( params.saveOriginalBonesBeforeIK );  // this param is experimental
+				this._createCCDIKSolver( mesh ).update( params.saveOriginalBonesBeforeIK );  // this param is experimental
 
 			}
 
 			if ( params.grant !== false ) {
 
-				var solver = this.createGrantSolver( mesh );
-				solver.update();
+				this.createGrantSolver( mesh ).update();
 
 			}
 
@@ -288,9 +292,6 @@ THREE.MMDAnimationHelper = ( function () {
 
 			this.meshes.push( mesh );
 			this.objects.set( mesh, { looped: false } );
-
-			// workaround until I make IK and Physics Animation plugin
-			this._initBackupBones( mesh );
 
 			if ( params.animation !== undefined ) {
 
@@ -401,7 +402,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			this.camera.remove( this.cameraTarget );
 
-			this.params.delete( this.camera );
+			this.objects.delete( this.camera );
 			this.camera = null;
 
 			return this;
@@ -479,8 +480,6 @@ THREE.MMDAnimationHelper = ( function () {
 
 		_setupMeshPhysics: function ( mesh, params ) {
 
-			params = Object.assign( {}, params );
-
 			var objects = this.objects.get( mesh );
 
 			// shared physics is experimental
@@ -493,8 +492,6 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-			var warmup = params.warmup !== undefined ? params.warmup : 60;
-
 			objects.physics = this._createMMDPhysics( mesh, params );
 
 			if ( objects.mixer && params.animationWarmup !== false ) {
@@ -504,7 +501,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-			objects.physics.warmup( warmup );
+			objects.physics.warmup( params.warmup !== undefined ? params.warmup : 60 );
 
 			this._optimizeIK( mesh, true );
 
@@ -522,25 +519,27 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( mixer && this.enabled.animation ) {
 
-				// restore/backupBones are workaround
-				// until I make IK, Grant, and Physics Animation plugin
 				this._restoreBones( mesh );
+
+				// another solution but less performant?
+				//mesh.pose();
+				//this._updatePropertyMixersBuffer( mesh );
 
 				mixer.update( delta );
 
-				this._backupBones( mesh );
+				this._saveBones( mesh );
 
-			}
+				if ( ikSolver && this.enabled.ik ) {
 
-			if ( ikSolver && this.enabled.ik ) {
+					ikSolver.update();
 
-				ikSolver.update();
+				}
 
-			}
+				if ( grantSolver && this.enabled.grant ) {
 
-			if ( grantSolver && this.enabled.grant ) {
+					grantSolver.update();
 
-				grantSolver.update();
+				}
 
 			}
 
@@ -554,6 +553,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( physics && this.enabled.physics && ! this.sharedPhysics ) {
 
+				this.onBeforePhysics( mesh );
 				physics.update( delta );
 
 			}
@@ -630,7 +630,8 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-			return new THREE.MMDPhysics( mesh, params );
+			return new THREE.MMDPhysics(
+				mesh, mesh.geometry.rigidBodies, mesh.geometry.constraints, params );
 
 		},
 
@@ -749,44 +750,55 @@ THREE.MMDAnimationHelper = ( function () {
 
 		// workaround
 
-		/*
-		 * Note: These following three functions are workaround for r74dev.
-		 *       THREE.PropertyMixer.apply() seems to save values into buffer cache
-		 *       when mixer.update() is called.
-		 *       ikSolver.update() and physics.update() change bone position/quaternion
-		 *       without mixer.update() then buffer cache will be inconsistent.
-		 *       So trying to avoid buffer cache inconsistency by doing
-		 *       backup bones position/quaternion right after mixer.update() call
-		 *       and then restore them after rendering.
-		 */
-		_initBackupBones: function ( mesh ) {
+		_updatePropertyMixersBuffer: function ( mesh ) {
 
-			var backupBones = [];
+			var mixer = this.objects.get( mesh ).mixer;
 
-			for ( var i = 0, il = mesh.skeleton.bones.length; i < il; i ++ ) {
+			var propertyMixers = mixer._bindings;
+			var accuIndex = mixer._accuIndex;
 
-				backupBones.push( mesh.skeleton.bones[ i ].clone() );
+			for ( var i = 0, il = propertyMixers.length; i < il; i ++ ) {
+
+				var propertyMixer = propertyMixers[ i ];
+				var buffer = propertyMixer.buffer;
+				var stride = propertyMixer.valueSize;
+				var offset = ( accuIndex + 1 ) * stride;
+
+				propertyMixer.binding.getValue( buffer, offset );
 
 			}
 
-			this.objects.get( mesh ).backupBones = backupBones;
-
 		},
 
-		_backupBones: function ( mesh ) {
+		/*
+		 * Avoiding these two issues by restore/save bones before/after mixer animation.
+		 *
+		 * 1. PropertyMixer used by AnimationMixer holds cache value in .buffer.
+		 *    Calculating IK, Grant, and Physics after mixer animation can break
+		 *    the cache coherency.
+		 *
+		 * 2. Applying Grant two or more times without reset the posing breaks model.
+		 */
+		_saveBones: function ( mesh ) {
 
 			var objects = this.objects.get( mesh );
 
-			objects.backupBoneIsSaved = true;
+			var bones = mesh.skeleton.bones;
 
 			var backupBones = objects.backupBones;
 
-			for ( var i = 0, il = mesh.skeleton.bones.length; i < il; i ++ ) {
+			if ( backupBones === undefined ) {
 
-				var backupBone = backupBones[ i ];
-				var bone = mesh.skeleton.bones[ i ];
-				backupBone.position.copy( bone.position );
-				backupBone.quaternion.copy( bone.quaternion );
+				backupBones = new Float32Array( bones.length * 7 );
+				objects.backupBones = backupBones;
+
+			}
+
+			for ( var i = 0, il = bones.length; i < il; i ++ ) {
+
+				var bone = bones[ i ];
+				bone.position.toArray( backupBones, i * 7 );
+				bone.quaternion.toArray( backupBones, i * 7 + 3 );
 
 			}
 
@@ -796,18 +808,17 @@ THREE.MMDAnimationHelper = ( function () {
 
 			var objects = this.objects.get( mesh );
 
-			if ( objects.backupBoneIsSaved !== true ) return;
-
-			objects.backupBoneIsSaved = false;
-
 			var backupBones = objects.backupBones;
 
-			for ( var i = 0, il = mesh.skeleton.bones.length; i < il; i ++ ) {
+			if ( backupBones === undefined ) return;
 
-				var bone = mesh.skeleton.bones[ i ];
-				var backupBone = backupBones[ i ];
-				bone.position.copy( backupBone.position );
-				bone.quaternion.copy( backupBone.quaternion );
+			var bones = mesh.skeleton.bones;
+
+			for ( var i = 0, il = bones.length; i < il; i ++ ) {
+
+				var bone = bones[ i ];
+				bone.position.fromArray( backupBones, i * 7 );
+				bone.quaternion.fromArray( backupBones, i * 7 + 3 );
 
 			}
 
