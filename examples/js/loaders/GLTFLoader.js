@@ -509,7 +509,10 @@ THREE.GLTFLoader = ( function () {
 
 					for ( var attributeName in geometry.attributes ) {
 
-						geometry.attributes[ attributeName ].normalized = attributeNormalizedMap[ attributeName ];
+						var attribute = geometry.attributes[ attributeName ];
+						var normalized = attributeNormalizedMap[ attributeName ];
+
+						if ( normalized !== undefined ) attribute.normalized = normalized;
 
 					}
 
