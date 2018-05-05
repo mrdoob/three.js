@@ -338,7 +338,9 @@ var list = {
 	"Examples": {
 
 		"Animations": {
-			"MMDAnimationHelper": "examples/animations/MMDAnimationHelper"
+			"CCDIKSolver": "examples/animations/CCDIKSolver",
+			"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
+			"MMDPhysics": "examples/animations/MMDPhysics"
 		},
 
 		"Controls": {

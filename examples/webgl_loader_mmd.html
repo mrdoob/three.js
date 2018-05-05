@@ -138,14 +138,11 @@
 						physics: true
 					} );
 
-					/*
-					 * Note: create CCDIKHelper and MMDPhysicsHelper after calling helper.add( mesh )
-					 */
-					ikHelper = new THREE.CCDIKHelper( mesh );
+					ikHelper = helper.objects.get( mesh ).ikSolver.createHelper();
 					ikHelper.visible = false;
 					scene.add( ikHelper );
 
-					physicsHelper = new THREE.MMDPhysicsHelper( mesh, helper.objects.get( mesh ).physics );
+					physicsHelper = helper.objects.get( mesh ).physics.createHelper();
 					physicsHelper.visible = false;
 					scene.add( physicsHelper );
 
@@ -264,10 +261,6 @@
 			function render() {
 
 				helper.update( clock.getDelta() );
-
-				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
-				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
-
 				effect.render( scene, camera );
 
 			}
