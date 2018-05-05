@@ -74,22 +74,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// The four arrow keys
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
-	// Mouse buttons -- each may be a mouse button value or a MouseEvent->Boolean predicate
-	this.mouseButtons = {
-		ORBIT: function ( event ) {
-
-			return event.button === THREE.MOUSE.LEFT && ! event.ctrlKey;
-
-		},
-
-		ZOOM: THREE.MOUSE.MIDDLE,
-
-		PAN: function ( event ) {
-
-			return event.button === THREE.MOUSE.RIGHT || ( event.button === THREE.MOUSE.LEFT && event.ctrlKey );
-
-		}
-	};
+	// Mouse buttons
+	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 
 	// for reset
 	this.target0 = this.target.clone();
@@ -99,6 +85,18 @@ THREE.OrbitControls = function ( object, domElement ) {
 	//
 	// public methods
 	//
+
+	this.getStateForMouseDown = function ( event ) {
+
+		if ( event.button === scope.mouseButtons.ORBIT && ! event.ctrlKey ) return STATE.ROTATE;
+
+		if ( event.button === scope.mouseButtons.ZOOM ) return STATE.DOLLY;
+
+		if ( event.button === scope.mouseButtons.PAN || ( event.button === scope.mouseButtons.ORBIT && event.ctrlKey ) ) return STATE.PAN;
+
+		return STATE.NONE;
+
+	};
 
 	this.getPolarAngle = function () {
 
@@ -689,40 +687,46 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		if ( typeof scope.mouseButtons.ORBIT === 'function' ? scope.mouseButtons.ORBIT(event) : event.button === scope.mouseButtons.ORBIT ) {
+		var newState = scope.getStateForMouseDown( event );
 
-			if ( scope.enableRotate === false ) return;
+		switch ( newState ) {
 
-			handleMouseDownRotate( event );
+			case STATE.ROTATE:
 
-			state = STATE.ROTATE;
+				if ( scope.enableRotate === false ) return;
 
-		} else if ( typeof scope.mouseButtons.ZOOM === 'function' ? scope.mouseButtons.ZOOM(event) : event.button === scope.mouseButtons.ZOOM ) {
+				handleMouseDownRotate( event );
 
-			if ( scope.enableZoom === false ) return;
+				break;
 
-			handleMouseDownDolly( event );
+			case STATE.DOLLY:
 
-			state = STATE.DOLLY;
+				if ( scope.enableZoom === false ) return;
 
-		} else if ( typeof scope.mouseButtons.PAN === 'function' ? scope.mouseButtons.PAN(event) : event.button === scope.mouseButtons.PAN ) {
+				handleMouseDownDolly( event );
 
-			if ( scope.enablePan === false ) return;
+				break;
 
-			handleMouseDownPan( event );
+			case STATE.PAN:
 
-			state = STATE.PAN;
+				if ( scope.enablePan === false ) return;
+
+				handleMouseDownPan( event );
+
+				break;
+
+			default: // STATE.NONE
+
+				return;
 
 		}
 
-		if ( state !== STATE.NONE ) {
+		state = newState;
 
-			document.addEventListener( 'mousemove', onMouseMove, false );
-			document.addEventListener( 'mouseup', onMouseUp, false );
+		document.addEventListener( 'mousemove', onMouseMove, false );
+		document.addEventListener( 'mouseup', onMouseUp, false );
 
-			scope.dispatchEvent( startEvent );
-
-		}
+		scope.dispatchEvent( startEvent );
 
 	}
 
