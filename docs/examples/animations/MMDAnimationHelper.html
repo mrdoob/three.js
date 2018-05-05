@@ -12,6 +12,7 @@
 
 		<p class="desc"> A animation helper for <a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a> resources. <br /><br />
 		[name] handles animation of MMD assets loaded by [page:MMDLoader] with MMD special features as IK, Grant, and Physics.
+		It uses [page:CCDIKSolver] and [page:MMDPhysics] inside.
 		</p>
 
 		<h2>Example</h2>
@@ -31,7 +32,7 @@
 					physics: true
 				} );
 
-				scene.add( mesh );
+				scene.add( mmd.mesh );
 
 				new THREE.AudioLoader().load(
 					'audios/mmd/song.mp3',
