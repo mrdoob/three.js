@@ -171,7 +171,7 @@ THREE.CCDIKSolver = ( function () {
 
 				return this;
 
-			}
+			};
 
 		}(),
 
@@ -235,7 +235,7 @@ THREE.CCDIKSolver = ( function () {
 		this.root = mesh;
 		this.iks = iks || [];
 
-		this.matrix = mesh.matrixWorld;
+		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
 
 		this.sphereGeometry = new THREE.SphereBufferGeometry( 0.25, 16, 8 );
@@ -278,20 +278,17 @@ THREE.CCDIKSolver = ( function () {
 
 		/**
 		 * Updates IK bones visualization.
-		 *
-		 * @return {CCDIKHelper}
 		 */
-		update: function () {
+		updateMatrixWorld: function () {
 
 			var matrix = new THREE.Matrix4();
 			var vector = new THREE.Vector3();
 
 			function getPosition( bone, matrixWorldInv ) {
 
-				vector.setFromMatrixPosition( bone.matrixWorld );
-				vector.applyMatrix4( matrixWorldInv );
-
-				return vector;
+				return vector
+					.setFromMatrixPosition( bone.matrixWorld )
+					.applyMatrix4( matrixWorldInv );
 
 			}
 
@@ -305,59 +302,68 @@ THREE.CCDIKSolver = ( function () {
 
 			}
 
-			return function update() {
-
-				var offset = 0;
+			return function updateMatrixWorld( force ) {
 
 				var mesh = this.root;
-				var iks = this.iks;
-				var bones = mesh.skeleton.bones;
 
-				matrix.getInverse( mesh.matrixWorld );
+				if ( this.visible ) {
 
-				for ( var i = 0, il = iks.length; i < il; i ++ ) {
+					var offset = 0;
 
-					var ik = iks[ i ];
+					var iks = this.iks;
+					var bones = mesh.skeleton.bones;
 
-					var targetBone = bones[ ik.target ];
-					var effectorBone = bones[ ik.effector ];
+					matrix.getInverse( mesh.matrixWorld );
 
-					var targetMesh = this.children[ offset ++ ];
-					var effectorMesh = this.children[ offset ++ ];
+					for ( var i = 0, il = iks.length; i < il; i ++ ) {
 
-					targetMesh.position.copy( getPosition( targetBone, matrix ) );
-					effectorMesh.position.copy( getPosition( effectorBone, matrix ) );
+						var ik = iks[ i ];
 
-					for ( var j = 0, jl = ik.links.length; j < jl; j ++ ) {
+						var targetBone = bones[ ik.target ];
+						var effectorBone = bones[ ik.effector ];
 
-						var link = ik.links[ j ];
-						var linkBone = bones[ link.index ];
+						var targetMesh = this.children[ offset ++ ];
+						var effectorMesh = this.children[ offset ++ ];
 
-						var linkMesh = this.children[ offset ++ ];
+						targetMesh.position.copy( getPosition( targetBone, matrix ) );
+						effectorMesh.position.copy( getPosition( effectorBone, matrix ) );
 
-						linkMesh.position.copy( getPosition( linkBone, matrix ) );
+						for ( var j = 0, jl = ik.links.length; j < jl; j ++ ) {
+
+							var link = ik.links[ j ];
+							var linkBone = bones[ link.index ];
+
+							var linkMesh = this.children[ offset ++ ];
+
+							linkMesh.position.copy( getPosition( linkBone, matrix ) );
+
+						}
+
+						var line = this.children[ offset ++ ];
+						var array = line.geometry.attributes.position.array;
+
+						setPositionOfBoneToAttributeArray( array, 0, targetBone, matrix );
+						setPositionOfBoneToAttributeArray( array, 1, effectorBone, matrix );
+
+						for ( var j = 0, jl = ik.links.length; j < jl; j ++ ) {
+
+							var link = ik.links[ j ];
+							var linkBone = bones[ link.index ];
+							setPositionOfBoneToAttributeArray( array, j + 2, linkBone, matrix );
+
+						}
+
+						line.geometry.attributes.position.needsUpdate = true;
 
 					}
-
-					var line = this.children[ offset ++ ];
-					var array = line.geometry.attributes.position.array;
-
-					setPositionOfBoneToAttributeArray( array, 0, targetBone, matrix );
-					setPositionOfBoneToAttributeArray( array, 1, effectorBone, matrix );
-
-					for ( var j = 0, jl = ik.links.length; j < jl; j ++ ) {
-
-						var link = ik.links[ j ];
-						var linkBone = bones[ link.index ];
-						setPositionOfBoneToAttributeArray( array, j + 2, linkBone, matrix );
-
-					}
-
-					line.geometry.attributes.position.needsUpdate = true;
 
 				}
 
-			}
+				this.matrix.copy( mesh.matrixWorld );
+
+				THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+
+			};
 
 		}(),
 
