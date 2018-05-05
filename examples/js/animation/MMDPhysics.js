@@ -97,7 +97,7 @@ THREE.MMDPhysics = ( function () {
 
 				parent = mesh.parent;
 
-				if ( parent !== null ) parent.remove( mesh );
+				if ( parent !== null ) mesh.parent = null;
 
 				scale.copy( this.mesh.scale );
 
@@ -116,7 +116,7 @@ THREE.MMDPhysics = ( function () {
 
 			if ( isNonDefaultScale ) {
 
-				if ( parent !== null ) parent.add( mesh );
+				if ( parent !== null ) parent.parent = parent;
 
 				mesh.scale.copy( scale );
 
@@ -148,7 +148,7 @@ THREE.MMDPhysics = ( function () {
 		},
 
 		/**
-		 * Warm ups Physics. Calculates 1/60s cycles steps.
+		 * Warm ups Rigid bodies. Calculates cycles steps.
 		 *
 		 * @param {Integer} cycles
 		 * @return {THREE.MMDPhysics}
@@ -169,11 +169,14 @@ THREE.MMDPhysics = ( function () {
 		 * Sets gravity.
 		 *
 		 * @param {THREE.Vector3} gravity
+		 * @return {MMDPhysicsHelper}
 		 */
 		setGravity: function ( gravity ) {
 
 			this.world.setGravity( new Ammo.btVector3( gravity.x, gravity.y, gravity.z ) );
 			this.gravity.copy( gravity );
+
+			return this;
 
 		},
 
@@ -200,7 +203,7 @@ THREE.MMDPhysics = ( function () {
 
 			var parent = mesh.parent;
 
-			if ( parent !== null ) parent.remove( mesh );
+			if ( parent !== null ) parent = null;
 
 			var currentPosition = manager.allocThreeVector3();
 			var currentQuaternion = manager.allocThreeQuaternion();
@@ -226,7 +229,7 @@ THREE.MMDPhysics = ( function () {
 			this._initRigidBodies( rigidBodyParams );
 			this._initConstraints( constraintParams );
 
-			if ( parent !== null ) parent.add( mesh );
+			if ( parent !== null ) mesh.parent = parent;
 
 			mesh.position.copy( currentPosition );
 			mesh.quaternion.copy( currentQuaternion );
@@ -1236,7 +1239,7 @@ THREE.MMDPhysics = ( function () {
 		this.root = mesh;
 		this.physics = physics;
 
-		this.matrix = mesh.matrixWorld;
+		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
 
 		this.materials = [];
@@ -1275,7 +1278,6 @@ THREE.MMDPhysics = ( function () {
 		);
 
 		this._init();
-		this.update();
 
 	}
 
@@ -1285,57 +1287,60 @@ THREE.MMDPhysics = ( function () {
 
 		/**
 		 * Updates Rigid Bodies visualization.
-		 *
-		 * @return {THREE.MMDPhysicsHelper}
 		 */
-		update: function () {
+		updateMatrixWorld: function () {
 
-			var vector = new THREE.Vector3();
+			var position = new THREE.Vector3();
 			var quaternion = new THREE.Quaternion();
-			var quaternion2 = new THREE.Quaternion();
-			var matrix = new THREE.Matrix4();
+			var scale = new THREE.Vector3();
+			var matrixWorldInv = new THREE.Matrix4();
 
-			function getPosition( origin, matrixWorldInv ) {
-
-				vector.set( origin.x(), origin.y(), origin.z() );
-				vector.applyMatrix4( matrixWorldInv );
-
-				return vector;
-
-			}
-
-			function getQuaternion( rotation, matrixWorldInv ) {
-
-				quaternion.set( rotation.x(), rotation.y(), rotation.z(), rotation.w() );
-				quaternion2.setFromRotationMatrix( matrixWorldInv );
-				quaternion2.multiply( quaternion );
-
-				return quaternion2;
-
-			}
-
-			return function update() {
+			return function updateMatrixWorld( force ) {
 
 				var mesh = this.root;
-				var bodies = this.physics.bodies;
 
-				matrix.getInverse( mesh.matrixWorld );
+				if ( this.visible ) {
 
-				for ( var i = 0, il = bodies.length; i < il; i ++ ) {
+					var bodies = this.physics.bodies;
 
-					var body = bodies[ i ].body;
-					var mesh = this.children[ i ];
+					matrixWorldInv
+						.copy( mesh.matrixWorld )
+						.decompose( position, quaternion, scale )
+						.compose( position, quaternion, scale.set( 1, 1, 1 ) )
+						.getInverse( matrixWorldInv );
 
-					var tr = body.getCenterOfMassTransform();
+					for ( var i = 0, il = bodies.length; i < il; i ++ ) {
 
-					mesh.position.copy( getPosition( tr.getOrigin(), matrix ) );
-					mesh.quaternion.copy( getQuaternion( tr.getRotation(), matrix ) );
+						var body = bodies[ i ].body;
+						var child = this.children[ i ];
+
+						var tr = body.getCenterOfMassTransform();
+						var origin = tr.getOrigin();
+						var rotation = tr.getRotation();
+
+						child.position
+							.set( origin.x(), origin.y(), origin.z() )
+							.applyMatrix4( matrixWorldInv );
+
+						child.quaternion
+							.setFromRotationMatrix( matrixWorldInv )
+							.multiply(
+								quaternion.set(
+									rotation.x(), rotation.y(), rotation.z(), rotation.w() )
+							);
+
+					}
 
 				}
 
-				return this;
+				this.matrix
+					.copy( mesh.matrixWorld )
+					.decompose( position, quaternion, scale )
+					.compose( position, quaternion, scale.set( 1, 1, 1 ) );
 
-			}
+				THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+
+			};
 
 		}(),
 
