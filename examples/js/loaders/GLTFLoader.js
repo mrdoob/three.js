@@ -476,6 +476,8 @@ THREE.GLTFLoader = ( function () {
 		var bufferViewIndex = primitive.extensions[ this.name ].bufferView;
 		var gltfAttributeMap = primitive.extensions[ this.name ].attributes;
 		var threeAttributeMap = {};
+		var attributeNormalizedMap = {};
+		var attributeTypeMap = {};
 
 		for ( var attributeName in gltfAttributeMap ) {
 
@@ -485,33 +487,35 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		for ( attributeName in primitive.attributes ) {
+
+			if ( ATTRIBUTES[ attributeName ] !== undefined && gltfAttributeMap[ attributeName ] !== undefined ) {
+
+				var accessorDef = json.accessors[ primitive.attributes[ attributeName ] ];
+				var componentType = WEBGL_COMPONENT_TYPES[ accessorDef.componentType ];
+
+				attributeTypeMap[ ATTRIBUTES[ attributeName ] ]  = componentType;
+				attributeNormalizedMap[ ATTRIBUTES[ attributeName ] ] = accessorDef.normalized === true;
+
+			}
+
+		}
+
 		return parser.getDependency( 'bufferView', bufferViewIndex ).then( function ( bufferView ) {
 
 			return new Promise( function ( resolve ) {
 
 				dracoLoader.decodeDracoFile( bufferView, function ( geometry ) {
 
-					for ( var attributeName in primitive.attributes ) {
+					for ( var attributeName in geometry.attributes ) {
 
-						if ( ATTRIBUTES[ attributeName ] && geometry.attributes[ ATTRIBUTES[ attributeName ] ] ) {
-
-							var accessorDef = json.accessors[ primitive.attributes[ attributeName ] ];
-
-							if ( accessorDef.normalized === true ) {
-
-								var attribute = geometry.attributes[ ATTRIBUTES[ attributeName ] ];
-								geometry.attributes[ ATTRIBUTES[ attributeName ] ].normalized = true;
-								geometry.attributes[ ATTRIBUTES[ attributeName ] ].needsUpdate = true;
-
-							}
-
-						}
+						geometry.attributes[ attributeName ].normalized = attributeNormalizedMap[ attributeName ];
 
 					}
 
 					resolve( geometry );
 
-				}, threeAttributeMap );
+				}, threeAttributeMap, attributeTypeMap );
 
 			} );
 
