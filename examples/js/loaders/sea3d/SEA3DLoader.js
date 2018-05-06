@@ -1211,7 +1211,7 @@ THREE.SEA3D.Dummy = function ( width, height, depth ) {
 	this.height = height != undefined ? height : 100;
 	this.depth = depth != undefined ? depth : 100;
 
-	var geo = new THREE.BoxGeometry( this.width, this.height, this.depth, 1, 1, 1 );
+	var geo = new THREE.BoxBufferGeometry( this.width, this.height, this.depth, 1, 1, 1 );
 
 	geo.computeBoundingBox();
 	geo.computeBoundingSphere();
