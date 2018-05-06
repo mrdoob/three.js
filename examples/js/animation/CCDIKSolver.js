@@ -56,7 +56,6 @@ THREE.CCDIKSolver = ( function () {
 			var linkScale = new THREE.Vector3();
 			var axis = new THREE.Vector3();
 			var vector = new THREE.Vector3();
-			var vector2 = new THREE.Vector3();
 
 			return function update() {
 
@@ -166,7 +165,7 @@ THREE.CCDIKSolver = ( function () {
 								link.rotation.setFromVector3(
 									link.rotation
 										.toVector3( vector )
-										.max( vector2.fromArray( rotationMin ) ) );
+										.max( rotationMin ) );
 
 							}
 
@@ -175,7 +174,7 @@ THREE.CCDIKSolver = ( function () {
 								link.rotation.setFromVector3(
 									link.rotation
 										.toVector3( vector )
-										.min( vector2.fromArray( rotationMax ) ) );
+										.min( rotationMax ) );
 
 							}
 

@@ -576,15 +576,24 @@ THREE.MMDLoader = ( function () {
 
 						if ( ik.links[ j ].angleLimitation === 1 ) {
 
-							link.rotationMin = ik.links[ j ].lowerLimitationAngle;
-							link.rotationMax = ik.links[ j ].upperLimitationAngle;
+							// Revert if rotationMin/Max doesn't work well
+							// link.limitation = new THREE.Vector3( 1.0, 0.0, 0.0 );
 
-							var tmp1 = - link.rotationMax[ 0 ];
-							var tmp2 = - link.rotationMax[ 1 ];
-							link.rotationMax[ 0 ] = - link.rotationMin[ 0 ];
-							link.rotationMax[ 1 ] = - link.rotationMin[ 1 ];
-							link.rotationMin[ 0 ] = tmp1;
-							link.rotationMin[ 1 ] = tmp2;
+							var rotationMin = ik.links[ j ].lowerLimitationAngle;
+							var rotationMax = ik.links[ j ].upperLimitationAngle;
+
+							// Convert Left to Right coordinate by myself because
+							// MMDParser doesn't convert. It's a MMDParser's bug
+
+							var tmp1 = - rotationMax[ 0 ];
+							var tmp2 = - rotationMax[ 1 ];
+							rotationMax[ 0 ] = - rotationMin[ 0 ];
+							rotationMax[ 1 ] = - rotationMin[ 1 ];
+							rotationMin[ 0 ] = tmp1;
+							rotationMin[ 1 ] = tmp2;
+
+							link.rotationMin = new THREE.Vector3().fromArray( rotationMin );
+							link.rotationMax = new THREE.Vector3().fromArray( rotationMax );
 
 						}
 
