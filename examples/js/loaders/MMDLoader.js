@@ -576,10 +576,15 @@ THREE.MMDLoader = ( function () {
 
 						if ( ik.links[ j ].angleLimitation === 1 ) {
 
-							link.limitation = new THREE.Vector3( 1.0, 0.0, 0.0 );
-							// TODO: use limitation angles
-							// link.lowerLimitationAngle;
-							// link.upperLimitationAngle;
+							link.rotationMin = ik.links[ j ].lowerLimitationAngle;
+							link.rotationMax = ik.links[ j ].upperLimitationAngle;
+
+							var tmp1 = - link.rotationMax[ 0 ];
+							var tmp2 = - link.rotationMax[ 1 ];
+							link.rotationMax[ 0 ] = - link.rotationMin[ 0 ];
+							link.rotationMax[ 1 ] = - link.rotationMin[ 1 ];
+							link.rotationMin[ 0 ] = tmp1;
+							link.rotationMin[ 1 ] = tmp2;
 
 						}
 
