@@ -168,9 +168,9 @@ THREE.ShaderLib[ 'line' ] = {
 
 			gl_Position = clip;
 
-			#include <logdepthbuf_vertex>
+			vec4 mvPosition = ( position.y < 0.5 ) ? start : end; // this is an approximation
 
-			#include <worldpos_vertex>
+			#include <logdepthbuf_vertex>
 			#include <clipping_planes_vertex>
 			#include <fog_vertex>
 
