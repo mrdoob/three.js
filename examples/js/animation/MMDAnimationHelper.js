@@ -293,11 +293,7 @@ THREE.MMDAnimationHelper = ( function () {
 			this.meshes.push( mesh );
 			this.objects.set( mesh, { looped: false } );
 
-			if ( params.animation !== undefined ) {
-
-				this._setupMeshAnimation( mesh, params.animation );
-
-			}
+			this._setupMeshAnimation( mesh, params.animation );
 
 			if ( params.physics !== false ) {
 
@@ -429,30 +425,34 @@ THREE.MMDAnimationHelper = ( function () {
 
 		_setupMeshAnimation: function ( mesh, animation ) {
 
-			var animations = Array.isArray( animation )
-				? animation : [ animation ];
-
 			var objects = this.objects.get( mesh );
 
-			objects.mixer = new THREE.AnimationMixer( mesh );
+			if ( animation !== undefined ) {
 
-			for ( var i = 0, il = animations.length; i < il; i ++ ) {
+				var animations = Array.isArray( animation )
+					? animation : [ animation ];
 
-				objects.mixer.clipAction( animations[ i ] ).play();
+				objects.mixer = new THREE.AnimationMixer( mesh );
+
+				for ( var i = 0, il = animations.length; i < il; i ++ ) {
+
+					objects.mixer.clipAction( animations[ i ] ).play();
+
+				}
+
+				// TODO: find a workaround not to access ._clip looking like a private property
+				objects.mixer.addEventListener( 'loop', function ( event ) {
+
+					var tracks = event.action._clip.tracks;
+
+					if ( tracks.length > 0 &&
+					     tracks[ 0 ].name.slice( 0, 6 ) !== '.bones' ) return;
+
+					objects.looped = true;
+
+				} );
 
 			}
-
-			// TODO: find a workaround not to access ._clip looking like a private property
-			objects.mixer.addEventListener( 'loop', function ( event ) {
-
-				var tracks = event.action._clip.tracks;
-
-				if ( tracks.length > 0 &&
-				     tracks[ 0 ].name.slice( 0, 6 ) !== '.bones' ) return;
-
-				objects.looped = true;
-
-			} );
 
 			objects.ikSolver = this._createCCDIKSolver( mesh );
 			objects.grantSolver = this.createGrantSolver( mesh );
@@ -517,13 +517,13 @@ THREE.MMDAnimationHelper = ( function () {
 			var physics = objects.physics;
 			var looped = objects.looped;
 
+			// alternate solution to save/restore bones but less performant?
+			//mesh.pose();
+			//this._updatePropertyMixersBuffer( mesh );
+
 			if ( mixer && this.enabled.animation ) {
 
 				this._restoreBones( mesh );
-
-				// another solution but less performant?
-				//mesh.pose();
-				//this._updatePropertyMixersBuffer( mesh );
 
 				mixer.update( delta );
 
