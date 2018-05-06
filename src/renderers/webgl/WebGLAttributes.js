@@ -75,20 +75,20 @@ function WebGLAttributes( gl ) {
 			gl.bufferData( bufferType, array, gl.STATIC_DRAW );
 
 		} else if ( typeof updateRange.offset == "undefined" &&
-																	typeof updateRange.count == "undefined" ){
+																	typeof updateRange.count == "undefined" ) {
 
 			// updateRange is an array of {offset: x, count: y}
 
-			for ( var i = 0; i < updateRange.length; i++ ) {
+			for ( var i = 0; i < updateRange.length; i ++ ) {
 
 				var curCount = updateRange[ i ].count;
 				var curOffset = updateRange[ i ].offset;
 
-				if ( curCount != 0 && curCount != -1 ) {
+				if ( curCount != 0 && curCount != - 1 ) {
 
 					if ( curOffset >= array.length || curCount > array.length ) {
 
-						console.error ( 'THREE.WebGLObjects.updateBuffer: Buffer overflow.' );
+						console.error( 'THREE.WebGLObjects.updateBuffer: Buffer overflow.' );
 
 					} else {
 
@@ -101,7 +101,7 @@ function WebGLAttributes( gl ) {
 
 				} else if ( updateRange == 0 ) {
 
-					console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0 for index '+ i +', ensure you are using set methods or updating manually.' );
+					console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0 for index ' + i + ', ensure you are using set methods or updating manually.' );
 
 				}
 
@@ -120,7 +120,7 @@ function WebGLAttributes( gl ) {
 
 			// updateRange is {offset: x, count: y}
 
-			if ( updateRange.count === -1 )  {
+			if ( updateRange.count === - 1 ) {
 
 				// Not using update ranges
 
@@ -133,9 +133,9 @@ function WebGLAttributes( gl ) {
 			} else {
 
 				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-							array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+				     array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
 
-				updateRange.count = -1; // reset range
+				updateRange.count = - 1; // reset range
 
 			}
 
