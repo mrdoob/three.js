@@ -55,6 +55,8 @@ THREE.CCDIKSolver = ( function () {
 			var invLinkQ = new THREE.Quaternion();
 			var linkScale = new THREE.Vector3();
 			var axis = new THREE.Vector3();
+			var vector = new THREE.Vector3();
+			var vector2 = new THREE.Vector3();
 
 			return function update() {
 
@@ -90,6 +92,8 @@ THREE.CCDIKSolver = ( function () {
 							if ( links[ k ].enabled === false ) break;
 
 							var limitation = links[ k ].limitation;
+							var rotationMin = links[ k ].rotationMin;
+							var rotationMax = links[ k ].rotationMax;
 
 							// don't use getWorldPosition/Quaternion() here for the performance
 							// because they call updateMatrixWorld( true ) inside.
@@ -154,6 +158,24 @@ THREE.CCDIKSolver = ( function () {
 								                     limitation.y * c2,
 								                     limitation.z * c2,
 								                     c );
+
+							}
+
+							if ( rotationMin !== undefined ) {
+
+								link.rotation.setFromVector3(
+									link.rotation
+										.toVector3( vector )
+										.max( vector2.fromArray( rotationMin ) ) );
+
+							}
+
+							if ( rotationMax !== undefined ) {
+
+								link.rotation.setFromVector3(
+									link.rotation
+										.toVector3( vector )
+										.min( vector2.fromArray( rotationMax ) ) );
 
 							}
 
