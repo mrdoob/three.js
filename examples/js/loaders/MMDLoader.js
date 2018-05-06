@@ -1123,7 +1123,7 @@ THREE.MMDLoader = ( function () {
 
 						for ( var j = 0, jl = elements.length; j < jl; j ++ ) {
 
-							var morph2 = model.morphs[ elements[ j ].index ];
+							var morph2 = data.morphs[ elements[ j ].index ];
 
 							if ( morph2.type !== 8 ) continue;
 
