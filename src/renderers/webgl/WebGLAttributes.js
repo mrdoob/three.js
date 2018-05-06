@@ -74,7 +74,10 @@ function WebGLAttributes( gl ) {
 
 			gl.bufferData( bufferType, array, gl.STATIC_DRAW );
 
-		} else {
+		} else if (typeof updateRange.offset == "undefined" &&
+																	typeof updateRange.count == "undefined"){
+
+			// updateRange is an array of {offset: x, count: y}
 
 			var updatedRange = false;
 
@@ -114,9 +117,33 @@ function WebGLAttributes( gl ) {
 
 			}
 
-		}
+			// Reset update ranges
+			attribute.updateRange = [];
 
-		attribute.updateRange = [];
+		} else {
+
+			// updateRange is {offset: x, count: y}
+
+			if (updateRange.count === -1){
+
+				// Not using update ranges
+
+				gl.bufferSubData(bufferType, 0, array);
+
+			} else if (updateRange.count === 0){
+
+				console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
+
+			} else {
+
+				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+							array.subarray(updateRange.offset, updateRange.offset + updateRange.count));
+
+				updateRange.count = -1; // reset range
+
+			}
+
+		}
 
 	}
 
