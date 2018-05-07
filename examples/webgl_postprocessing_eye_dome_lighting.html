@@ -222,18 +222,22 @@
 
 			// Setup some geometries
 			var geometry = new THREE.TorusKnotBufferGeometry(1, 0.3, 128, 64);
-			var material = new THREE.MeshBasicMaterial({ color: 'gray' });
 
 			var count = 50;
 			var scale = 5;
 
 			for (var i = 0; i < count; i++) {
 
+				color = new THREE.Color(0xffffff);
+				color.setHex(Math.random() * 0xffffff);
+				var material = new THREE.MeshBasicMaterial({ color: color });
+
+				var mesh = new THREE.Mesh(geometry, material);
+
 				var r = Math.random() * 2.0 * Math.PI;
 				var z = (Math.random() * 2.0) - 1.0;
 				var zScale = Math.sqrt(1.0 - z * z) * scale;
 
-				var mesh = new THREE.Mesh(geometry, material);
 				mesh.position.set(
 					Math.cos(r) * zScale,
 					Math.sin(r) * zScale,
@@ -241,12 +245,8 @@
 				);
 				mesh.rotation.set(Math.random(), Math.random(), Math.random());
 				scene.add(mesh);
-
-
-				scene.background = new THREE.Color('white');
-
 			}
-
+			scene.background = new THREE.Color('white');
 		}
 
 		function onWindowResize() {
