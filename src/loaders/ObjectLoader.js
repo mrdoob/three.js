@@ -810,6 +810,8 @@ Object.assign( ObjectLoader.prototype, {
 
 				}
 
+				break;
+
 			case 'Bone':
 
 				object = new Bone();
