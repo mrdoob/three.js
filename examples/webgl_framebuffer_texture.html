@@ -75,6 +75,7 @@
 			var dpr = window.devicePixelRatio;
 
 			var textureSize = 128 * dpr;
+			var vector = new THREE.Vector2();
 
 			init();
 			animate();
@@ -114,13 +115,11 @@
 
 				//
 
-				var canvas = document.createElement( 'canvas' );
-				canvas.width = textureSize;
-				canvas.height = textureSize;
+				var data = new Uint8Array( textureSize * textureSize * 3 );
 
-				texture = new THREE.CanvasTexture( canvas );
-				texture.format = THREE.RGBFormat;
-				texture.minFilter = texture.magFilter = THREE.NearestFilter;
+				texture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
+				texture.minFilter = THREE.NearestFilter;
+				texture.magFilter = THREE.NearestFilter;
 				texture.needsUpdate = true;
 
 				//
@@ -196,10 +195,10 @@
 
 				// calculate start position for copying data
 
-				var x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
-				var y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
+				vector.x = ( window.innerWidth * dpr / 2 ) - ( textureSize / 2 );
+				vector.y = ( window.innerHeight * dpr / 2 ) - ( textureSize / 2 );
 
-				renderer.copyFramebufferToTexture( x, y, texture );
+				renderer.copyFramebufferToTexture( vector, texture );
 
 				renderer.clearDepth();
 				renderer.render( sceneOrtho, cameraOrtho );

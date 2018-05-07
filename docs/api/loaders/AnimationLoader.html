@@ -10,10 +10,10 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			Class for loading [page:AnimationClip AnimationClips] in JSON format.
 			This uses the [page:FileLoader] internally for loading files.
-		</div>
+		</p>
 
 		<h2>Example</h2>
 
@@ -45,24 +45,24 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:LoadingManager manager] )</h3>
-		<div>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
 
 		Creates a new [name].
-		</div>
+		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:LoadingManager manager]</h3>
-		<div>
+		<p>
 			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
-		</div>
+		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
-		<div>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Animation animation].<br />
@@ -70,16 +70,16 @@
 		[page:Function onError] — Will be called if load errors.<br /><br />
 
 		Begin loading from url and pass the loaded animation to onLoad.
-		</div>
+		</p>
 
-		<h3>[method:null parse]( [page:JSON json], [page:Function onLoad] )</h3>
-		<div>
+		<h3>[method:null parse]( [param:JSON json], [param:Function onLoad] )</h3>
+		<p>
 		[page:JSON json] — required<br />
 		[page:Function onLoad] — Will be called when parsing completes. <br /><br />
 
 		Parse the JSON object and pass the result to onLoad. Individual clips in the object will
 		be parsed with [page:AnimationClip.parse].
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

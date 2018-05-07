@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>three.js webgl - instanced particles - billboards - colors</title>
@@ -125,7 +125,7 @@
 
 			renderer = new THREE.WebGLRenderer();
 
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 				document.getElementById( 'notSupported' ).style.display = '';
 				return false;
 			}

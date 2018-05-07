@@ -55,7 +55,7 @@ THREE.BlurNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.BlurNode.prototype.constructor = THREE.BlurNode;
 THREE.BlurNode.prototype.nodeType = "Blur";
 
-THREE.BlurNode.prototype.updateFrame = function ( delta ) {
+THREE.BlurNode.prototype.updateFrame = function ( frame ) {
 
 	if ( this.size ) {
 

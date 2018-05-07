@@ -73,7 +73,7 @@
 
 				} );
 
-				var geometry = new THREE.Geometry();
+				var points = [];
 
 				for ( var i = 0; i < 100; i ++ ) {
 
@@ -86,11 +86,13 @@
 					particle.scale.x = particle.scale.y = 10;
 					scene.add( particle );
 
-					geometry.vertices.push( particle.position );
+					points.push( particle.position );
 
 				}
 
 				// lines
+
+				var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
 				var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.5 } ) );
 				scene.add( line );

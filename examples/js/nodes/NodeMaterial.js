@@ -9,6 +9,8 @@ THREE.NodeMaterial = function ( vertex, fragment ) {
 	this.vertex = vertex || new THREE.RawNode( new THREE.PositionNode( THREE.PositionNode.PROJECTION ) );
 	this.fragment = fragment || new THREE.RawNode( new THREE.ColorNode( 0xFF0000 ) );
 
+	this.updaters = [];
+
 };
 
 THREE.NodeMaterial.types = {
@@ -66,11 +68,11 @@ THREE.NodeMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
 THREE.NodeMaterial.prototype.constructor = THREE.NodeMaterial;
 THREE.NodeMaterial.prototype.type = "NodeMaterial";
 
-THREE.NodeMaterial.prototype.updateFrame = function ( delta ) {
+THREE.NodeMaterial.prototype.updateFrame = function ( frame ) {
 
 	for ( var i = 0; i < this.updaters.length; ++ i ) {
 
-		this.updaters[ i ].updateFrame( delta );
+		frame.updateNode( this.updaters[ i ] );
 
 	}
 

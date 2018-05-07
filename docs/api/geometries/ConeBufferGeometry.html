@@ -12,7 +12,7 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">This is the [page:BufferGeometry] port of [page:ConeGeometry].</div>
+		<p class="desc">This is the [page:BufferGeometry] port of [page:ConeGeometry].</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#ConeBufferGeometry"></iframe>
 
@@ -42,22 +42,22 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([page:Float radius], [page:Float height], [page:Integer radialSegments], [page:Integer heightSegments], [page:Boolean openEnded], [page:Float thetaStart], [page:Float thetaLength])</h3>
-		<div>
-		radius — Radius of the cone base. Default is 20.<br />
-		height — Height of the cone. Default is 100.<br />
+		<h3>[name]([param:Float radius], [param:Float height], [param:Integer radialSegments], [param:Integer heightSegments], [param:Boolean openEnded], [param:Float thetaStart], [param:Float thetaLength])</h3>
+		<p>
+		radius — Radius of the cone base. Default is 1.<br />
+		height — Height of the cone. Default is 1.<br />
 		radialSegments — Number of segmented faces around the circumference of the cone. Default is 8<br />
 		heightSegments — Number of rows of faces along the height of the cone. Default is 1.<br />
 		openEnded — A Boolean indicating whether the base of the cone is open or capped. Default is false, meaning capped.<br />
 		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
 		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete cone.
-		</div>
+		</p>
 
 		<h2>Properties</h2>
 
-		<div>
+		<p>
 		Each of the constructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

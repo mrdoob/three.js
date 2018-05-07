@@ -6,38 +6,39 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
+				font-family: Monospace;
+				margin: 0px;
+				overflow: hidden;
 			}
-			a {	color: #ff0080;	text-decoration: none; }
-			a:hover { color: #0080ff; }
-
-			canvas { pointer-events:none; z-index:10; }
-
-			#d { text-align:center; margin:1em 0 -7.5em 0; z-index:1000; position:relative; display:block }
-			.button { background:orange; color:#fff; padding:0.2em 0.5em; cursor:pointer }
-			.inactive { background:#999; color:#eee }
-
-			#oldie { margin-top:11em !important }
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a {
+				color: #ff0080;
+				font-weight: bold;
+			}
 		</style>
 	</head>
 
 	<body>
-		<div id="d">
-			<p><a href="http://threejs.org">Three.js</a> cube mapping demo
 
-			<p>Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
-			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cube mapping demo.<br />
+			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a> Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
 		</div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -52,17 +53,7 @@
 
 			var mesh, geometry;
 
-			var loader;
-
 			var pointLight;
-
-			var mouseX = 0;
-			var mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 			init();
 			animate();
@@ -75,8 +66,14 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 2000;
 
-				//
+				//controls
+				var controls = new THREE.OrbitControls( camera );
+				controls.enableZoom = false;
+				controls.enablePan = false;
+				controls.minPolarAngle = Math.PI / 4;
+				controls.maxPolarAngle = Math.PI / 1.5;
 
+				//cubemap
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
@@ -88,61 +85,64 @@
 				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 				reflectionCube.format = THREE.RGBFormat;
 
+				var refractionCube = new THREE.CubeTextureLoader().load( urls );
+				refractionCube.mapping = THREE.CubeRefractionMapping;
+				refractionCube.format = THREE.RGBFormat;
+
 				scene = new THREE.Scene();
 				scene.background = reflectionCube;
 
-				// LIGHTS
-
+				//lights
 				var ambient = new THREE.AmbientLight( 0xffffff );
 				scene.add( ambient );
 
 				pointLight = new THREE.PointLight( 0xffffff, 2 );
 				scene.add( pointLight );
 
-				// light representation
-
-				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
-
-				var mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
-				mesh.scale.set( 0.05, 0.05, 0.05 );
-				pointLight.add( mesh );
-
-				var refractionCube = new THREE.CubeTextureLoader().load( urls );
-				refractionCube.mapping = THREE.CubeRefractionMapping;
-				refractionCube.format = THREE.RGBFormat;
-
-				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.25 } );
+				//materials
 				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
 				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } );
 
-				//
+				//models
+				var objLoader = new THREE.OBJLoader();
 
+				objLoader.setPath( 'models/obj/walt/' );
+				objLoader.load( 'WaltHead.obj', function ( object ) {
+
+					var head = object.children[0];
+
+					head.scale.multiplyScalar( 15 );
+					head.position.y = -500;
+					head.material = cubeMaterial1;
+
+					var head2 = head.clone();
+					head2.position.x = - 900;
+					head2.material = cubeMaterial2;
+
+					var head3 = head.clone();
+					head3.position.x = 900;
+					head3.material = cubeMaterial3;
+
+					scene.add( head, head2, head3 )
+
+				} );
+
+				//renderer
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				//
-
+				//stats
 				stats = new Stats();
 				container.appendChild( stats.dom );
-
-				//
-
-				loader = new THREE.BinaryLoader();
-				loader.load( "obj/walt/WaltHead_bin.js", function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
-
-				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -151,60 +151,16 @@
 
 			}
 
-			function createScene( geometry, m1, m2, m3 ) {
-
-				var s = 15;
-
-				var mesh = new THREE.Mesh( geometry, m1 );
-				mesh.position.z = - 100;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.add( mesh );
-
-				var mesh = new THREE.Mesh( geometry, m2 );
-				mesh.position.x = - 900;
-				mesh.position.z = - 100;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.add( mesh );
-
-				var mesh = new THREE.Mesh( geometry, m3 );
-				mesh.position.x = 900;
-				mesh.position.z = - 100;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.add( mesh );
-
-			}
-
-			function onDocumentMouseMove(event) {
-
-				mouseX = ( event.clientX - windowHalfX ) * 4;
-				mouseY = ( event.clientY - windowHalfY ) * 4;
-
-			}
-
-			//
-
 			function animate() {
 
 				requestAnimationFrame( animate );
-
 				render();
-				stats.update();
-
 			}
 
 			function render() {
 
-				var timer = -0.0002 * Date.now();
-
-				pointLight.position.x = 1500 * Math.cos( timer );
-				pointLight.position.z = 1500 * Math.sin( timer );
-
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-				camera.lookAt( scene.position );
-
 				renderer.render( scene, camera );
+				stats.update();
 
 			}
 

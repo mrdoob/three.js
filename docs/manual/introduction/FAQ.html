@@ -10,9 +10,14 @@
 	<body>
 		<h1>[name]</h1>
 
-		<h2>Which Import Format/Exporter is best supported?</h2>
+		<h2>Which 3D model format is best supported?</h2>
 		<div>
-TODO
+			<p>
+				The recommended format for importing and exporting assets is glTF (GL Transmission Format). Because glTF is focused on runtime asset delivery, it is compact to transmit and fast to load.
+			</p>
+			<p>
+				three.js provides loaders for many other popular formats like FBX, Collada or OBJ as well. Nevertheless, you should always try to establish a glTF based workflow in your projects first.
+			</p>
 		</div>
 
 		<h2>Why are there meta viewport tags in examples?</h2>
@@ -21,13 +26,13 @@ TODO
 
 				<p>These tags control viewport size and scale for mobile browsers (where page content may be rendered at different size than visible viewport).</p>
 
-				<p><a href="http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html">http://developer.apple.com/library/safari/#documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html</a></p>
+				<p><a href="https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html">Safari: Using the Viewport</a></p>
 
-				<p><a href="https://developer.mozilla.org/en/Mobile/Viewport_meta_tag">https://developer.mozilla.org/en/Mobile/Viewport_meta_tag</a></p>
+				<p><a href="https://developer.mozilla.org/en/Mobile/Viewport_meta_tag">MDN: Using the viewport meta tag</a></p>
 		</div>
 
 		<h2>How can scene scale be preserved on resize?</h2>
-		<div>
+		<p>
 			We want all objects, regardless of their distance from the camera, to appear the same size, even as the window is resized.
 
 			The key equation to solving this is this formula for the visible height at a given distance:
@@ -40,12 +45,12 @@ visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_f
 
 			This can not be done by changing the camera position. Instead you have to change the camera field-of-view.
 			[link:http://jsfiddle.net/Q4Jpu/ Example].
-		</div>
+		</p>
 
 		<h2>Why is part of my object invisible?</h2>
-		<div>
+		<p>
 			This could be because of face culling. Faces have an orientation that  decides which side is which. And the culling removes the backside in normal circumstances. To see if this is your problem, change the material side to THREE.DoubleSide.
 			<code>material.side = THREE.DoubleSide</code>
-		</div>
+		</p>
 	</body>
 </html>

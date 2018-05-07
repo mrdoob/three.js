@@ -154,6 +154,8 @@
 
 			}
 
+			var center = new THREE.Vector3();
+
 			function loadModel ( colorMap, numberOfColors, legendLayout ) {
 
 				var loader = new THREE.BufferGeometryLoader();
@@ -204,7 +206,7 @@
 
 					geometry.computeBoundingBox();
 					var boundingBox = geometry.boundingBox;
-					var center = boundingBox.getCenter();
+					boundingBox.getCenter( center );
 
 					if ( position === undefined ) {
 

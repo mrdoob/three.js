@@ -4,74 +4,6 @@
 
 var twoPi = Math.PI * 2;
 
-var constants = {
-
-	combine: {
-
-		"THREE.MultiplyOperation" : THREE.MultiplyOperation,
-		"THREE.MixOperation" : THREE.MixOperation,
-		"THREE.AddOperation" : THREE.AddOperation
-
-	},
-
-	side : {
-
-		"THREE.FrontSide" : THREE.FrontSide,
-		"THREE.BackSide" : THREE.BackSide,
-		"THREE.DoubleSide" : THREE.DoubleSide
-
-	},
-
-	colors : {
-
-		"THREE.NoColors" : THREE.NoColors,
-		"THREE.FaceColors" : THREE.FaceColors,
-		"THREE.VertexColors" : THREE.VertexColors
-
-	},
-
-	blendingMode : {
-
-		"THREE.NoBlending" : THREE.NoBlending,
-		"THREE.NormalBlending" : THREE.NormalBlending,
-		"THREE.AdditiveBlending" : THREE.AdditiveBlending,
-		"THREE.SubtractiveBlending" : THREE.SubtractiveBlending,
-		"THREE.MultiplyBlending" : THREE.MultiplyBlending,
-		"THREE.CustomBlending" : THREE.CustomBlending
-
-	},
-
-	equations : {
-
-		"THREE.AddEquation" : THREE.AddEquation,
-		"THREE.SubtractEquation" : THREE.SubtractEquation,
-		"THREE.ReverseSubtractEquation" : THREE.ReverseSubtractEquation
-
-	},
-
-	destinationFactors : {
-
-		"THREE.ZeroFactor" : THREE.ZeroFactor,
-		"THREE.OneFactor" : THREE.OneFactor,
-		"THREE.SrcColorFactor" : THREE.SrcColorFactor,
-		"THREE.OneMinusSrcColorFactor" : THREE.OneMinusSrcColorFactor,
-		"THREE.SrcAlphaFactor" : THREE.SrcAlphaFactor,
-		"THREE.OneMinusSrcAlphaFactor" : THREE.OneMinusSrcAlphaFactor,
-		"THREE.DstAlphaFactor" : THREE.DstAlphaFactor,
-		"THREE.OneMinusDstAlphaFactor" : THREE.OneMinusDstAlphaFactor
-
-	},
-
-	sourceFactors : {
-
-		"THREE.DstColorFactor" : THREE.DstColorFactor,
-		"THREE.OneMinusDstColorFactor" : THREE.OneMinusDstColorFactor,
-		"THREE.SrcAlphaSaturateFactor" : THREE.SrcAlphaSaturateFactor
-
-	}
-
-};
-
 function updateGroupGeometry( mesh, geometry ) {
 
 	mesh.children[ 0 ].geometry.dispose();
@@ -113,7 +45,7 @@ var heartShape = new THREE.Shape();
 
 heartShape.moveTo( x + 5, y + 5 );
 heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
-heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
+heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7, x - 6, y + 7 );
 heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
 heartShape.bezierCurveTo( x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7 );
 heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
@@ -121,15 +53,15 @@ heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
 
 var guis = {
 
-	BoxBufferGeometry : function( mesh ) {
+	BoxBufferGeometry: function ( mesh ) {
 
 		var data = {
-			width : 15,
-			height : 15,
-			depth : 15,
-			widthSegments : 1,
-			heightSegments : 1,
-			depthSegments : 1
+			width: 15,
+			height: 15,
+			depth: 15,
+			widthSegments: 1,
+			heightSegments: 1,
+			depthSegments: 1
 		};
 
 		function generateGeometry() {
@@ -155,15 +87,15 @@ var guis = {
 
 	},
 
-	BoxGeometry : function( mesh ) {
+	BoxGeometry: function ( mesh ) {
 
 		var data = {
-			width : 15,
-			height : 15,
-			depth : 15,
-			widthSegments : 1,
-			heightSegments : 1,
-			depthSegments : 1
+			width: 15,
+			height: 15,
+			depth: 15,
+			widthSegments: 1,
+			heightSegments: 1,
+			depthSegments: 1
 		};
 
 		function generateGeometry() {
@@ -189,17 +121,17 @@ var guis = {
 
 	},
 
-	CylinderBufferGeometry : function( mesh ) {
+	CylinderBufferGeometry: function ( mesh ) {
 
 		var data = {
-			radiusTop : 5,
-			radiusBottom : 5,
-			height : 10,
-			radiusSegments : 8,
-			heightSegments : 1,
-			openEnded : false,
-			thetaStart : 0,
-			thetaLength : twoPi
+			radiusTop: 5,
+			radiusBottom: 5,
+			height: 10,
+			radialSegments: 8,
+			heightSegments: 1,
+			openEnded: false,
+			thetaStart: 0,
+			thetaLength: twoPi
 		};
 
 		function generateGeometry() {
@@ -209,7 +141,7 @@ var guis = {
 					data.radiusTop,
 					data.radiusBottom,
 					data.height,
-					data.radiusSegments,
+					data.radialSegments,
 					data.heightSegments,
 					data.openEnded,
 					data.thetaStart,
@@ -224,7 +156,7 @@ var guis = {
 		folder.add( data, 'radiusTop', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'radiusBottom', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'openEnded' ).onChange( generateGeometry );
 		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
@@ -235,17 +167,17 @@ var guis = {
 
 	},
 
-	CylinderGeometry : function( mesh ) {
+	CylinderGeometry: function ( mesh ) {
 
 		var data = {
-			radiusTop : 5,
-			radiusBottom : 5,
-			height : 10,
-			radiusSegments : 8,
-			heightSegments : 1,
-			openEnded : false,
-			thetaStart : 0,
-			thetaLength : twoPi
+			radiusTop: 5,
+			radiusBottom: 5,
+			height: 10,
+			radialSegments: 8,
+			heightSegments: 1,
+			openEnded: false,
+			thetaStart: 0,
+			thetaLength: twoPi
 		};
 
 		function generateGeometry() {
@@ -255,7 +187,7 @@ var guis = {
 					data.radiusTop,
 					data.radiusBottom,
 					data.height,
-					data.radiusSegments,
+					data.radialSegments,
 					data.heightSegments,
 					data.openEnded,
 					data.thetaStart,
@@ -270,7 +202,7 @@ var guis = {
 		folder.add( data, 'radiusTop', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'radiusBottom', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'openEnded' ).onChange( generateGeometry );
 		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
@@ -281,16 +213,16 @@ var guis = {
 
 	},
 
-	ConeBufferGeometry : function( mesh ) {
+	ConeBufferGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 5,
-			height : 10,
-			radiusSegments : 8,
-			heightSegments : 1,
-			openEnded : false,
-			thetaStart : 0,
-			thetaLength : twoPi
+			radius: 5,
+			height: 10,
+			radialSegments: 8,
+			heightSegments: 1,
+			openEnded: false,
+			thetaStart: 0,
+			thetaLength: twoPi
 		};
 
 		function generateGeometry() {
@@ -299,7 +231,7 @@ var guis = {
 				new THREE.ConeBufferGeometry(
 					data.radius,
 					data.height,
-					data.radiusSegments,
+					data.radialSegments,
 					data.heightSegments,
 					data.openEnded,
 					data.thetaStart,
@@ -313,7 +245,7 @@ var guis = {
 
 		folder.add( data, 'radius', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'openEnded' ).onChange( generateGeometry );
 		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
@@ -324,16 +256,16 @@ var guis = {
 
 	},
 
-	ConeGeometry : function( mesh ) {
+	ConeGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 5,
-			height : 10,
-			radiusSegments : 8,
-			heightSegments : 1,
-			openEnded : false,
-			thetaStart : 0,
-			thetaLength : twoPi
+			radius: 5,
+			height: 10,
+			radialSegments: 8,
+			heightSegments: 1,
+			openEnded: false,
+			thetaStart: 0,
+			thetaLength: twoPi
 		};
 
 		function generateGeometry() {
@@ -342,7 +274,7 @@ var guis = {
 				new THREE.ConeGeometry(
 					data.radius,
 					data.height,
-					data.radiusSegments,
+					data.radialSegments,
 					data.heightSegments,
 					data.openEnded,
 					data.thetaStart,
@@ -356,7 +288,7 @@ var guis = {
 
 		folder.add( data, 'radius', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'openEnded' ).onChange( generateGeometry );
 		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
@@ -368,13 +300,13 @@ var guis = {
 	},
 
 
-	CircleBufferGeometry : function( mesh ) {
+	CircleBufferGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			segments : 32,
-			thetaStart : 0,
-			thetaLength : twoPi
+			radius: 10,
+			segments: 32,
+			thetaStart: 0,
+			thetaLength: twoPi
 		};
 
 		function generateGeometry() {
@@ -398,13 +330,13 @@ var guis = {
 
 	},
 
-	CircleGeometry : function( mesh ) {
+	CircleGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			segments : 32,
-			thetaStart : 0,
-			thetaLength : twoPi
+			radius: 10,
+			segments: 32,
+			thetaStart: 0,
+			thetaLength: twoPi
 		};
 
 		function generateGeometry() {
@@ -428,11 +360,11 @@ var guis = {
 
 	},
 
-	DodecahedronGeometry : function() {
+	DodecahedronGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			detail : 0
+			radius: 10,
+			detail: 0
 		};
 
 		function generateGeometry() {
@@ -454,11 +386,11 @@ var guis = {
 
 	},
 
-	DodecahedronBufferGeometry : function() {
+	DodecahedronBufferGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			detail : 0
+			radius: 10,
+			detail: 0
 		};
 
 		function generateGeometry() {
@@ -480,11 +412,11 @@ var guis = {
 
 	},
 
-	IcosahedronGeometry : function() {
+	IcosahedronGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			detail : 0
+			radius: 10,
+			detail: 0
 		};
 
 		function generateGeometry() {
@@ -506,11 +438,11 @@ var guis = {
 
 	},
 
-	IcosahedronBufferGeometry : function() {
+	IcosahedronBufferGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			detail : 0
+			radius: 10,
+			detail: 0
 		};
 
 		function generateGeometry() {
@@ -532,7 +464,7 @@ var guis = {
 
 	},
 
-	LatheBufferGeometry : function() {
+	LatheBufferGeometry: function ( mesh ) {
 
 		var points = [];
 
@@ -543,9 +475,9 @@ var guis = {
 		}
 
 		var data = {
-			segments : 12,
-			phiStart : 0,
-			phiLength : twoPi
+			segments: 12,
+			phiStart: 0,
+			phiLength: twoPi
 		};
 
 		function generateGeometry() {
@@ -568,7 +500,7 @@ var guis = {
 
 	},
 
-	LatheGeometry : function() {
+	LatheGeometry: function ( mesh ) {
 
 		var points = [];
 
@@ -579,9 +511,9 @@ var guis = {
 		}
 
 		var data = {
-			segments : 12,
-			phiStart : 0,
-			phiLength : twoPi
+			segments: 12,
+			phiStart: 0,
+			phiLength: twoPi
 		};
 
 		function generateGeometry() {
@@ -604,11 +536,11 @@ var guis = {
 
 	},
 
-	OctahedronGeometry : function() {
+	OctahedronGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			detail : 0
+			radius: 10,
+			detail: 0
 		};
 
 		function generateGeometry() {
@@ -630,11 +562,11 @@ var guis = {
 
 	},
 
-	OctahedronBufferGeometry : function() {
+	OctahedronBufferGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			detail : 0
+			radius: 10,
+			detail: 0
 		};
 
 		function generateGeometry() {
@@ -656,13 +588,13 @@ var guis = {
 
 	},
 
-	PlaneBufferGeometry : function( mesh ) {
+	PlaneBufferGeometry: function ( mesh ) {
 
 		var data = {
-			width : 10,
-			height : 10,
-			widthSegments : 1,
-			heightSegments : 1
+			width: 10,
+			height: 10,
+			widthSegments: 1,
+			heightSegments: 1
 		};
 
 		function generateGeometry() {
@@ -686,13 +618,13 @@ var guis = {
 
 	},
 
-	PlaneGeometry : function( mesh ) {
+	PlaneGeometry: function ( mesh ) {
 
 		var data = {
-			width : 10,
-			height : 10,
-			widthSegments : 1,
-			heightSegments : 1
+			width: 10,
+			height: 10,
+			widthSegments: 1,
+			heightSegments: 1
 		};
 
 		function generateGeometry() {
@@ -716,15 +648,15 @@ var guis = {
 
 	},
 
-	RingBufferGeometry : function( mesh ) {
+	RingBufferGeometry: function ( mesh ) {
 
 		var data = {
-			innerRadius : 5,
-			outerRadius : 10,
-			thetaSegments : 8,
-			phiSegments : 8,
-			thetaStart : 0,
-			thetaLength : twoPi
+			innerRadius: 5,
+			outerRadius: 10,
+			thetaSegments: 8,
+			phiSegments: 8,
+			thetaStart: 0,
+			thetaLength: twoPi
 		};
 
 		function generateGeometry() {
@@ -750,15 +682,15 @@ var guis = {
 
 	},
 
-	RingGeometry : function( mesh ) {
+	RingGeometry: function ( mesh ) {
 
 		var data = {
-			innerRadius : 5,
-			outerRadius : 10,
-			thetaSegments : 8,
-			phiSegments : 8,
-			thetaStart : 0,
-			thetaLength : twoPi
+			innerRadius: 5,
+			outerRadius: 10,
+			thetaSegments: 8,
+			phiSegments: 8,
+			thetaStart: 0,
+			thetaLength: twoPi
 		};
 
 		function generateGeometry() {
@@ -784,16 +716,16 @@ var guis = {
 
 	},
 
-	SphereBufferGeometry : function( mesh ) {
+	SphereBufferGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 15,
-			widthSegments : 8,
-			heightSegments : 6,
-			phiStart : 0,
-			phiLength : twoPi,
-			thetaStart : 0,
-			thetaLength : Math.PI
+			radius: 15,
+			widthSegments: 8,
+			heightSegments: 6,
+			phiStart: 0,
+			phiLength: twoPi,
+			thetaStart: 0,
+			thetaLength: Math.PI
 		};
 
 		function generateGeometry() {
@@ -820,16 +752,16 @@ var guis = {
 
 	},
 
-	SphereGeometry : function( mesh ) {
+	SphereGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 15,
-			widthSegments : 8,
-			heightSegments : 6,
-			phiStart : 0,
-			phiLength : twoPi,
-			thetaStart : 0,
-			thetaLength : Math.PI
+			radius: 15,
+			widthSegments: 8,
+			heightSegments: 6,
+			phiStart: 0,
+			phiLength: twoPi,
+			thetaStart: 0,
+			thetaLength: Math.PI
 		};
 
 		function generateGeometry() {
@@ -856,11 +788,11 @@ var guis = {
 
 	},
 
-	TetrahedronGeometry : function() {
+	TetrahedronGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			detail : 0
+			radius: 10,
+			detail: 0
 		};
 
 		function generateGeometry() {
@@ -882,11 +814,11 @@ var guis = {
 
 	},
 
-	TetrahedronBufferGeometry : function() {
+	TetrahedronBufferGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			detail : 0
+			radius: 10,
+			detail: 0
 		};
 
 		function generateGeometry() {
@@ -908,19 +840,19 @@ var guis = {
 
 	},
 
-	TextGeometry : function( mesh ) {
+	TextGeometry: function ( mesh ) {
 
 		var data = {
-			text : "TextGeometry",
-			size : 5,
-			height : 2,
-			curveSegments : 12,
-			font : "helvetiker",
-			weight : "regular",
-			bevelEnabled : false,
-			bevelThickness : 1,
-			bevelSize : 0.5,
-			bevelSegments : 3
+			text: "TextGeometry",
+			size: 5,
+			height: 2,
+			curveSegments: 12,
+			font: "helvetiker",
+			weight: "regular",
+			bevelEnabled: false,
+			bevelThickness: 1,
+			bevelSize: 0.5,
+			bevelSegments: 3
 		};
 
 		var fonts = [
@@ -977,19 +909,19 @@ var guis = {
 
 	},
 
-	TextBufferGeometry : function( mesh ) {
+	TextBufferGeometry: function ( mesh ) {
 
 		var data = {
-			text : "TextBufferGeometry",
-			size : 5,
-			height : 2,
-			curveSegments : 12,
-			font : "helvetiker",
-			weight : "regular",
-			bevelEnabled : false,
-			bevelThickness : 1,
-			bevelSize : 0.5,
-			bevelSegments : 3
+			text: "TextBufferGeometry",
+			size: 5,
+			height: 2,
+			curveSegments: 12,
+			font: "helvetiker",
+			weight: "regular",
+			bevelEnabled: false,
+			bevelThickness: 1,
+			bevelSize: 0.5,
+			bevelSegments: 3
 		};
 
 		var fonts = [
@@ -1046,14 +978,14 @@ var guis = {
 
 	},
 
-	TorusBufferGeometry : function( mesh ) {
+	TorusBufferGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			tube : 3,
-			radialSegments : 16,
-			tubularSegments : 100,
-			arc : twoPi
+			radius: 10,
+			tube: 3,
+			radialSegments: 16,
+			tubularSegments: 100,
+			arc: twoPi
 		};
 
 		function generateGeometry() {
@@ -1078,14 +1010,14 @@ var guis = {
 
 	},
 
-	TorusGeometry : function( mesh ) {
+	TorusGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			tube : 3,
-			radialSegments : 16,
-			tubularSegments : 100,
-			arc : twoPi
+			radius: 10,
+			tube: 3,
+			radialSegments: 16,
+			tubularSegments: 100,
+			arc: twoPi
 		};
 
 		function generateGeometry() {
@@ -1110,15 +1042,15 @@ var guis = {
 
 	},
 
-	TorusKnotBufferGeometry : function( mesh ) {
+	TorusKnotBufferGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			tube : 3,
-			tubularSegments : 64,
-			radialSegments : 8,
-			p : 2,
-			q : 3
+			radius: 10,
+			tube: 3,
+			tubularSegments: 64,
+			radialSegments: 8,
+			p: 2,
+			q: 3
 		};
 
 		function generateGeometry() {
@@ -1145,15 +1077,15 @@ var guis = {
 
 	},
 
-	TorusKnotGeometry : function( mesh ) {
+	TorusKnotGeometry: function ( mesh ) {
 
 		var data = {
-			radius : 10,
-			tube : 3,
-			tubularSegments : 64,
-			radialSegments : 8,
-			p : 2,
-			q : 3
+			radius: 10,
+			tube: 3,
+			tubularSegments: 64,
+			radialSegments: 8,
+			p: 2,
+			q: 3
 		};
 
 		function generateGeometry() {
@@ -1180,11 +1112,11 @@ var guis = {
 
 	},
 
-	ParametricBufferGeometry : function( mesh ) {
+	ParametricBufferGeometry: function ( mesh ) {
 
 		var data = {
-			slices : 25,
-			stacks : 25
+			slices: 25,
+			stacks: 25
 		};
 
 		function generateGeometry() {
@@ -1204,11 +1136,11 @@ var guis = {
 
 	},
 
-	ParametricGeometry : function( mesh ) {
+	ParametricGeometry: function ( mesh ) {
 
 		var data = {
-			slices : 25,
-			stacks : 25
+			slices: 25,
+			stacks: 25
 		};
 
 		function generateGeometry() {
@@ -1228,12 +1160,12 @@ var guis = {
 
 	},
 
-	TubeGeometry : function( mesh ) {
+	TubeGeometry: function ( mesh ) {
 
 		var data = {
-			segments : 20,
-			radius : 2,
-			radiusSegments: 8
+			segments: 20,
+			radius: 2,
+			radialSegments: 8
 		};
 
 		var path = new CustomSinCurve( 10 );
@@ -1241,7 +1173,7 @@ var guis = {
 		function generateGeometry() {
 
 			updateGroupGeometry( mesh,
-				new THREE.TubeGeometry( path, data.segments, data.radius, data.radiusSegments, false )
+				new THREE.TubeGeometry( path, data.segments, data.radius, data.radialSegments, false )
 			);
 
 		}
@@ -1250,18 +1182,18 @@ var guis = {
 
 		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 
 	},
 
-	TubeBufferGeometry : function( mesh ) {
+	TubeBufferGeometry: function ( mesh ) {
 
 		var data = {
-			segments : 20,
-			radius : 2,
-			radiusSegments: 8
+			segments: 20,
+			radius: 2,
+			radialSegments: 8
 		};
 
 		var path = new CustomSinCurve( 10 );
@@ -1269,7 +1201,7 @@ var guis = {
 		function generateGeometry() {
 
 			updateGroupGeometry( mesh,
-				new THREE.TubeBufferGeometry( path, data.segments, data.radius, data.radiusSegments, false )
+				new THREE.TubeBufferGeometry( path, data.segments, data.radius, data.radialSegments, false )
 			);
 
 		}
@@ -1278,23 +1210,24 @@ var guis = {
 
 		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
-		folder.add( data, 'radiusSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radialSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 
 	},
 
-	ShapeGeometry: function( mesh ) {
+	ShapeGeometry: function ( mesh ) {
 
 		var data = {
-			segments : 12
+			segments: 12
 		};
 
 		function generateGeometry() {
 
-			updateGroupGeometry( mesh,
-				new THREE.ShapeGeometry( heartShape, data.segments )
-			);
+			var geometry = new THREE.ShapeGeometry( heartShape, data.segments );
+			geometry.center();
+
+			updateGroupGeometry( mesh, geometry );
 
 		}
 
@@ -1305,17 +1238,18 @@ var guis = {
 
 	},
 
-	ShapeBufferGeometry: function( mesh ) {
+	ShapeBufferGeometry: function ( mesh ) {
 
 		var data = {
-			segments : 12
+			segments: 12
 		};
 
 		function generateGeometry() {
 
-			updateGroupGeometry( mesh,
-				new THREE.ShapeBufferGeometry( heartShape, data.segments )
-			);
+			var geometry = new THREE.ShapeBufferGeometry( heartShape, data.segments );
+			geometry.center();
+
+			updateGroupGeometry( mesh, geometry );
 
 		}
 
@@ -1326,11 +1260,11 @@ var guis = {
 
 	},
 
-	ExtrudeGeometry: function( mesh ) {
+	ExtrudeGeometry: function ( mesh ) {
 
 		var data = {
 			steps: 2,
-			amount: 16,
+			depth: 16,
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
@@ -1340,7 +1274,7 @@ var guis = {
 		var length = 12, width = 8;
 
 		var shape = new THREE.Shape();
-		shape.moveTo( 0,0 );
+		shape.moveTo( 0, 0 );
 		shape.lineTo( 0, width );
 		shape.lineTo( length, width );
 		shape.lineTo( length, 0 );
@@ -1348,16 +1282,17 @@ var guis = {
 
 		function generateGeometry() {
 
-			updateGroupGeometry( mesh,
-				new THREE.ExtrudeGeometry( shape, data )
-			);
+			var geometry = new THREE.ExtrudeGeometry( shape, data );
+			geometry.center();
+
+			updateGroupGeometry( mesh, geometry );
 
 		}
 
 		var folder = gui.addFolder( 'THREE.ExtrudeGeometry' );
 
 		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'depth', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );
@@ -1366,11 +1301,11 @@ var guis = {
 
 	},
 
-	ExtrudeBufferGeometry: function( mesh ) {
+	ExtrudeBufferGeometry: function ( mesh ) {
 
 		var data = {
 			steps: 2,
-			amount: 16,
+			depth: 16,
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
@@ -1380,7 +1315,7 @@ var guis = {
 		var length = 12, width = 8;
 
 		var shape = new THREE.Shape();
-		shape.moveTo( 0,0 );
+		shape.moveTo( 0, 0 );
 		shape.lineTo( 0, width );
 		shape.lineTo( length, width );
 		shape.lineTo( length, 0 );
@@ -1388,16 +1323,17 @@ var guis = {
 
 		function generateGeometry() {
 
-			updateGroupGeometry( mesh,
-				new THREE.ExtrudeBufferGeometry( shape, data )
-			);
+			var geometry = new THREE.ExtrudeBufferGeometry( shape, data );
+			geometry.center();
+
+			updateGroupGeometry( mesh, geometry );
 
 		}
 
 		var folder = gui.addFolder( 'THREE.ExtrudeBufferGeometry' );
 
 		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
-		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'depth', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );
@@ -1408,7 +1344,7 @@ var guis = {
 
 };
 
-function chooseFromHash ( mesh ) {
+function chooseFromHash( mesh ) {
 
 	var selectedGeometry = window.location.hash.substring( 1 ) || "TorusGeometry";
 
@@ -1420,7 +1356,7 @@ function chooseFromHash ( mesh ) {
 
 	if ( selectedGeometry === 'TextGeometry' || selectedGeometry === 'TextBufferGeometry' ) {
 
-		return { fixed : true };
+		return { fixed: true };
 
 	}
 

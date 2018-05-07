@@ -100,6 +100,7 @@
 			};
 
 			var loader = new THREE.PDBLoader();
+			var offset = new THREE.Vector3();
 
 			var menu = document.getElementById( 'menu' );
 
@@ -205,7 +206,10 @@
 					var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 					var sphereGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
 
-					var offset = geometryAtoms.center();
+					geometryAtoms.computeBoundingBox();
+					geometryAtoms.boundingBox.getCenter( offset ).negate();
+
+					geometryAtoms.translate( offset.x, offset.y, offset.z );
 					geometryBonds.translate( offset.x, offset.y, offset.z );
 
 					var positions = geometryAtoms.getAttribute( 'position' );

@@ -1,7 +1,10 @@
 //
 // Custom QUnit assertions.
 //
-/* global QUnit, SmartComparer */
+/* global QUnit */
+
+import { SmartComparer } from './SmartComparer';
+import { ObjectLoader } from '../../src/loaders/ObjectLoader';
 
 QUnit.assert.success = function ( message ) {
 
@@ -163,7 +166,7 @@ function checkGeometryJsonReading( json, geom ) {
 
 	var wrap = [ json ];
 
-	var loader = new THREE.ObjectLoader();
+	var loader = new ObjectLoader();
 	var output = loader.parseGeometries( wrap );
 
 	QUnit.assert.ok( output[ geom.uuid ], 'geometry matching source uuid not in output' );
@@ -315,7 +318,7 @@ function checkLightJsonWriting( assert, light, json ) {
 // Check parsing and reconstruction of json Light
 function checkLightJsonReading( assert, json, light ) {
 
-	var loader = new THREE.ObjectLoader();
+	var loader = new ObjectLoader();
 	var outputLight = loader.parse( json );
 
 	assert.smartEqual( outputLight, light, 'Reconstruct Light from ObjectLoader' );
@@ -330,3 +333,5 @@ function checkLightJsonRoundtrip( assert, light ) {
 	checkLightJsonReading( assert, json, light );
 
 }
+
+export { runStdLightTests, runStdGeometryTests };

@@ -10,9 +10,9 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			This class is used internally to convert from [page:Geometry] to [page:BufferGeometry].
-		</div>
+		</p>
 
 
 
@@ -20,106 +20,85 @@
 
 
 		<h3>[name]()</h3>
-		<div>This creates a new [name].</div>
+		<p>This creates a new [name].</p>
 
 
 		<h2>Properties</h2>
 
 		<h3>[property:Integer id]</h3>
-		<div>Unique number for this [name] instance.</div>
+		<p>Unique number for this [name] instance.</p>
 
 		<h3>[property:String name]</h3>
-		<div>Optional name. Default is the empty string.</div>
+		<p>Optional name. Default is the empty string.</p>
 
 		<h3>[property:Array type]</h3>
-		<div>String 'DirectGeometry'.</div>
-
-		<h3>[property:Array indices]</h3>
-		<div>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</div>
+		<p>String 'DirectGeometry'.</p>
 
 		<h3>[property:Array vertices]</h3>
-		<div>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</div>
+		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
 
 		<h3>[property:Array normals]</h3>
-		<div>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</div>
+		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
 
 		<h3>[property:Array colors]</h3>
-		<div>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</div>
+		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
 
 		<h3>[property:Array uvs]</h3>
-		<div>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</div>
+		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
 
 		<h3>[property:Array uvs2]</h3>
-		<div>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</div>
+		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
 
 		<h3>[property:Array groups]</h3>
-		<div>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</div>
+		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
 
 		<h3>[property:Array morphTargets]</h3>
-		<div>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</div>
+		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
 
 		<h3>[property:Array skinWeights]</h3>
-		<div>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</div>
+		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
 
 		<h3>[property:Array skinIndices]</h3>
-		<div>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</div>
+		<p>Initialiased as an empty array, this is populated by [page:.fromGeometry]().</p>
 
 		<h3>[property:Box3 boundingBox]</h3>
-		<div>
+		<p>
 			Bounding box for the bufferGeometry, which can be calculated with
 			[page:.computeBoundingBox](). Default is *null*.
-		</div>
+		</p>
 
 		<h3>[property:Sphere boundingSphere]</h3>
-		<div>
+		<p>
 			Bounding sphere for the bufferGeometry, which can be calculated with
 			[page:.computeBoundingSphere](). Default is *null*.
-		</div>
+		</p>
 
 		<h3>[property:Boolean verticesNeedUpdate]</h3>
-		<div>Default is false.</div>
+		<p>Default is false.</p>
 
 		<h3>[property:Boolean normalsNeedUpdate]</h3>
-		<div>Default is false.</div>
+		<p>Default is false.</p>
 
 		<h3>[property:Boolean colorsNeedUpdate]</h3>
-		<div>Default is false.</div>
+		<p>Default is false.</p>
 
 		<h3>[property:Boolean uvsNeedUpdate]</h3>
-		<div>Default is false.</div>
+		<p>Default is false.</p>
 
 		<h3>[property:Boolean groupsNeedUpdate]</h3>
-		<div>Default is false.</div>
+		<p>Default is false.</p>
 
 
 		<h2>Methods</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
-
-		<h3>[property:null computeBoundingBox](  )</h3>
-		<div>
-		 See [page:Geometry.computeBoundingBox].
-		</div>
-
-		<h3>[property:null computeBoundingSphere](  )</h3>
-		<div>
-		 See [page:Geometry.computeBoundingSphere].
-		</div>
-
 		<h3>[property:null computeGroups]( [page:Geometry geometry] )</h3>
-		<div>
+		<p>
 			Compute the parts of the geometry that have different materialIndex.
 			See [page:BufferGeometry.groups].
-		</div>
-
-		<h3>[method:null dispose]()</h3>
-		<div>
-		Disposes the object from memory. <br />
-		You need to call this when you want the directGeometry removed while the application is running.
-		</div>
+		</p>
 
 		<h3>[property:null fromGeometry]( [page:Geometry geometry] )</h3>
-		<div>Pass in a [page:Geometry] instance for conversion.</div>
+		<p>Pass in a [page:Geometry] instance for conversion.</p>
 
 
 		<h2>Source</h2>

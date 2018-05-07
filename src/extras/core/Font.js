@@ -3,7 +3,6 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { QuadraticBezier, CubicBezier } from './Interpolations.js';
 import { ShapePath } from './ShapePath.js';
 
 
@@ -80,8 +79,7 @@ function createPath( char, divisions, scale, offsetX, offsetY, data ) {
 
 	var path = new ShapePath();
 
-	var pts = [];
-	var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
+	var x, y, cpx, cpy, cpx1, cpy1, cpx2, cpy2;
 
 	if ( glyph.o ) {
 
@@ -120,23 +118,6 @@ function createPath( char, divisions, scale, offsetX, offsetY, data ) {
 
 					path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
 
-					laste = pts[ pts.length - 1 ];
-
-					if ( laste ) {
-
-						cpx0 = laste.x;
-						cpy0 = laste.y;
-
-						for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
-
-							var t = i2 / divisions;
-							QuadraticBezier( t, cpx0, cpx1, cpx );
-							QuadraticBezier( t, cpy0, cpy1, cpy );
-
-						}
-
-					}
-
 					break;
 
 				case 'b': // bezierCurveTo
@@ -149,23 +130,6 @@ function createPath( char, divisions, scale, offsetX, offsetY, data ) {
 					cpy2 = outline[ i ++ ] * scale + offsetY;
 
 					path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
-
-					laste = pts[ pts.length - 1 ];
-
-					if ( laste ) {
-
-						cpx0 = laste.x;
-						cpy0 = laste.y;
-
-						for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
-
-							var t = i2 / divisions;
-							CubicBezier( t, cpx0, cpx1, cpx2, cpx );
-							CubicBezier( t, cpy0, cpy1, cpy2, cpy );
-
-						}
-
-					}
 
 					break;
 
