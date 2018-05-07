@@ -337,7 +337,7 @@ THREE.GLTFExporter.prototype = {
 
 				return JSON.parse( JSON.stringify( userData ) );
 
-			} catch {
+			} catch ( error ) {
 
 				throw new Error( 'THREE.GLTFExporter: userData can\'t be serialized' );
 
