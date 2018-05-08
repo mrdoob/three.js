@@ -34,8 +34,17 @@
 	<body>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl2 sandbox.</div>
 
-		<script src="../build/three.js"></script>
-		<script>
+		<script type="module">
+
+			import { PerspectiveCamera } from '../src/cameras/PerspectiveCamera.js';
+			import { SphereBufferGeometry } from '../src/geometries/SphereGeometry.js';
+			import { MeshNormalMaterial } from '../src/materials/MeshNormalMaterial.js';
+			import { PointLight } from '../src/lights/PointLight.js';
+			import { Color } from '../src/math/Color.js';
+			import { Mesh } from '../src/objects/Mesh.js';
+			import { Fog } from '../src/scenes/Fog.js';
+			import { Scene } from '../src/scenes/Scene.js';
+			import { WebGL2Renderer } from '../src/renderers/WebGL2Renderer.js';
 
 			//
 
@@ -51,22 +60,22 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.z = 3200;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0, 0, 0.5 );
-				scene.fog = new THREE.Fog( 0x000000, 1, 20000 );
+				scene = new Scene();
+				scene.background = new Color( 0, 0, 0.5 );
+				scene.fog = new Fog( 0x000000, 1, 20000 );
 
-				var light = new THREE.PointLight( 0xffffff );
+				var light = new PointLight( 0xffffff );
 				scene.add( light );
 
-				var geometry = new THREE.SphereBufferGeometry( 50, 32, 16 );
-				var material = new THREE.MeshNormalMaterial();
+				var geometry = new SphereBufferGeometry( 50, 32, 16 );
+				var material = new MeshNormalMaterial();
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
@@ -80,7 +89,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { webglVersion: 'webgl2' } );
+				renderer = new WebGL2Renderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
