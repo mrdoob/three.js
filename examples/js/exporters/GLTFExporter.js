@@ -328,18 +328,19 @@ THREE.GLTFExporter.prototype = {
 		/**
 		 * Serializes a userData.
 		 *
-		 * @param {Object} userData
+		 * @param {THREE.Object3D|THREE.Material} object
 		 * @returns {Object}
 		 */
-		function serializeUserData( userData ) {
+		function serializeUserData( object ) {
 
 			try {
 
-				return JSON.parse( JSON.stringify( userData ) );
+				return JSON.parse( JSON.stringify( object.userData ) );
 
 			} catch ( error ) {
 
-				throw new Error( 'THREE.GLTFExporter: userData can\'t be serialized' );
+				console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' +
+					'won\'t be serialized because of JSON.stringify error - ' + error.message );
 
 			}
 
@@ -958,7 +959,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( Object.keys( material.userData ).length > 0 ) {
 
-				gltfMaterial.extras = serializeUserData( material.userData );
+				gltfMaterial.extras = serializeUserData( material );
 
 			}
 
@@ -1538,7 +1539,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.userData && Object.keys( object.userData ).length > 0 ) {
 
-				gltfNode.extras = serializeUserData( object.userData );
+				gltfNode.extras = serializeUserData( object );
 
 			}
 
