@@ -163,7 +163,7 @@ function setValue2fv( gl, v ) {
 
 	if ( v.x === undefined ) {
 
-		if ( this.cache[ 0 ] === v[ 0 ] &&  this.cache[ 1 ] === v[ 1 ] ) return;
+		if ( this.cache[ 0 ] === v[ 0 ] && this.cache[ 1 ] === v[ 1 ] ) return;
 
 		gl.uniform2fv( this.addr, v );
 
