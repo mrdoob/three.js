@@ -69,11 +69,6 @@ function UniformContainer() {
 var arrayCacheF32 = [];
 var arrayCacheI32 = [];
 
-// Float32Array caches used for uploading Matrix uniforms
-
-var mat4array = new Float32Array( 16 );
-var mat3array = new Float32Array( 9 );
-
 // Flattening for arrays of vectors and matrices
 
 function flatten( array, nBlocks, blockSize ) {
@@ -140,13 +135,25 @@ function allocTexUnits( renderer, n ) {
 
 function setValue1f( gl, v ) {
 
+	if ( this.cache[ 0 ] === v ) return;
+
 	gl.uniform1f( this.addr, v );
+
+	this.cache[ 0 ] = v;
+
+	this.info.render.uniformUpdates ++;
 
 }
 
 function setValue1i( gl, v ) {
 
+	if ( this.cache[ 0 ] === v ) return;
+
 	gl.uniform1i( this.addr, v );
+
+	this.cache[ 0 ] = v;
+
+	this.info.render.uniformUpdates ++;
 
 }
 
@@ -156,13 +163,25 @@ function setValue2fv( gl, v ) {
 
 	if ( v.x === undefined ) {
 
+		if ( this.cache[ 0 ] === v[ 0 ] &&  this.cache[ 1 ] === v[ 1 ] ) return;
+
 		gl.uniform2fv( this.addr, v );
+
+		this.cache[ 0 ] = v[ 0 ];
+		this.cache[ 1 ] = v[ 1 ];
 
 	} else {
 
+		if ( this.cache[ 0 ] === v.x && this.cache[ 1 ] === v.y ) return;
+
 		gl.uniform2f( this.addr, v.x, v.y );
 
+		this.cache[ 0 ] = v.x;
+		this.cache[ 1 ] = v.y;
+
 	}
+
+	this.info.render.uniformUpdates ++;
 
 }
 
@@ -170,17 +189,43 @@ function setValue3fv( gl, v ) {
 
 	if ( v.x !== undefined ) {
 
+		if ( this.cache[ 0 ] === v.x &&
+			this.cache[ 1 ] === v.y &&
+			this.cache[ 2 ] === v.z ) return;
+
 		gl.uniform3f( this.addr, v.x, v.y, v.z );
+
+		this.cache[ 0 ] = v.x;
+		this.cache[ 1 ] = v.y;
+		this.cache[ 2 ] = v.z;
 
 	} else if ( v.r !== undefined ) {
 
+		if ( this.cache[ 0 ] === v.r &&
+			this.cache[ 1 ] === v.g &&
+			this.cache[ 2 ] === v.b ) return;
+
 		gl.uniform3f( this.addr, v.r, v.g, v.b );
+
+		this.cache[ 0 ] = v.r;
+		this.cache[ 1 ] = v.g;
+		this.cache[ 2 ] = v.b;
 
 	} else {
 
+		if ( this.cache[ 0 ] === v[ 0 ] &&
+			this.cache[ 1 ] === v[ 1 ] &&
+			this.cache[ 2 ] === v[ 2 ] ) return;
+
 		gl.uniform3fv( this.addr, v );
 
+		this.cache[ 0 ] = v[ 0 ];
+		this.cache[ 1 ] = v[ 1 ];
+		this.cache[ 2 ] = v[ 2 ];
+
 	}
+
+	this.info.render.uniformUpdates ++;
 
 }
 
@@ -188,13 +233,35 @@ function setValue4fv( gl, v ) {
 
 	if ( v.x === undefined ) {
 
+		if ( this.cache[ 0 ] === v[ 0 ] &&
+			this.cache[ 1 ] === v[ 1 ] &&
+			this.cache[ 2 ] === v[ 2 ] &&
+			this.cache[ 3 ] === v[ 3 ] ) return;
+
 		gl.uniform4fv( this.addr, v );
+
+		this.cache[ 0 ] = v[ 0 ];
+		this.cache[ 1 ] = v[ 1 ];
+		this.cache[ 2 ] = v[ 2 ];
+		this.cache[ 3 ] = v[ 3 ];
 
 	} else {
 
+		if ( this.cache[ 0 ] === v.x &&
+			this.cache[ 1 ] === v.y &&
+			this.cache[ 2 ] === v.z &&
+			this.cache[ 3 ] === v.w ) return;
+
 		 gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
 
+		 this.cache[ 0 ] = v.x;
+		 this.cache[ 1 ] = v.y;
+		 this.cache[ 2 ] = v.z;
+		 this.cache[ 3 ] = v.w;
+
 	}
+
+	this.info.render.uniformUpdates ++;
 
 }
 
@@ -202,37 +269,95 @@ function setValue4fv( gl, v ) {
 
 function setValue2fm( gl, v ) {
 
-	gl.uniformMatrix2fv( this.addr, false, v.elements || v );
+	var data = v.elements || v;
+
+	if ( this.cache[ 0 ] === data[ 0 ] &&
+		this.cache[ 1 ] === data[ 1 ] &&
+		this.cache[ 2 ] === data[ 2 ] &&
+		this.cache[ 3 ] === data[ 3 ] ) return;
+
+	gl.uniformMatrix2fv( this.addr, false, data );
+
+	this.cache[ 0 ] = data[ 0 ];
+	this.cache[ 1 ] = data[ 1 ];
+	this.cache[ 2 ] = data[ 2 ];
+	this.cache[ 3 ] = data[ 3 ];
+
+	this.info.render.uniformUpdates ++;
 
 }
 
 function setValue3fm( gl, v ) {
 
-	if ( v.elements === undefined ) {
+	var data = v.elements || v;
 
-		gl.uniformMatrix3fv( this.addr, false, v );
+	if ( this.cache[ 0 ] === data[ 0 ] &&
+		this.cache[ 1 ] === data[ 1 ] &&
+		this.cache[ 2 ] === data[ 2 ] &&
+		this.cache[ 3 ] === data[ 3 ] &&
+		this.cache[ 4 ] === data[ 4 ] &&
+		this.cache[ 5 ] === data[ 5 ] &&
+		this.cache[ 6 ] === data[ 6 ] &&
+		this.cache[ 7 ] === data[ 7 ] &&
+		this.cache[ 8 ] === data[ 8 ] ) return;
 
-	} else {
+	gl.uniformMatrix3fv( this.addr, false, data );
 
-		mat3array.set( v.elements );
-		gl.uniformMatrix3fv( this.addr, false, mat3array );
+	this.cache[ 0 ] = data[ 0 ];
+	this.cache[ 1 ] = data[ 1 ];
+	this.cache[ 2 ] = data[ 2 ];
+	this.cache[ 3 ] = data[ 3 ];
+	this.cache[ 4 ] = data[ 4 ];
+	this.cache[ 5 ] = data[ 5 ];
+	this.cache[ 6 ] = data[ 6 ];
+	this.cache[ 7 ] = data[ 7 ];
+	this.cache[ 8 ] = data[ 8 ];
 
-	}
+	this.info.render.uniformUpdates ++;
 
 }
 
 function setValue4fm( gl, v ) {
 
-	if ( v.elements === undefined ) {
+	var data = v.elements || v;
 
-		gl.uniformMatrix4fv( this.addr, false, v );
+	if ( this.cache[ 0 ] === data[ 0 ] &&
+		this.cache[ 1 ] === data[ 1 ] &&
+		this.cache[ 2 ] === data[ 2 ] &&
+		this.cache[ 3 ] === data[ 3 ] &&
+		this.cache[ 4 ] === data[ 4 ] &&
+		this.cache[ 5 ] === data[ 5 ] &&
+		this.cache[ 6 ] === data[ 6 ] &&
+		this.cache[ 7 ] === data[ 7 ] &&
+		this.cache[ 8 ] === data[ 8 ] &&
+		this.cache[ 9 ] === data[ 9 ] &&
+		this.cache[ 10 ] === data[ 10 ] &&
+		this.cache[ 11 ] === data[ 11 ] &&
+		this.cache[ 12 ] === data[ 12 ] &&
+		this.cache[ 13 ] === data[ 13 ] &&
+		this.cache[ 14 ] === data[ 14 ] &&
+		this.cache[ 15 ] === data[ 15 ] ) return;
 
-	} else {
+	gl.uniformMatrix4fv( this.addr, false, data );
 
-		mat4array.set( v.elements );
-		gl.uniformMatrix4fv( this.addr, false, mat4array );
+	this.cache[ 0 ] = data[ 0 ];
+	this.cache[ 1 ] = data[ 1 ];
+	this.cache[ 2 ] = data[ 2 ];
+	this.cache[ 3 ] = data[ 3 ];
+	this.cache[ 4 ] = data[ 4 ];
+	this.cache[ 5 ] = data[ 5 ];
+	this.cache[ 6 ] = data[ 6 ];
+	this.cache[ 7 ] = data[ 7 ];
+	this.cache[ 8 ] = data[ 8 ];
+	this.cache[ 9 ] = data[ 9 ];
+	this.cache[ 10 ] = data[ 10 ];
+	this.cache[ 11 ] = data[ 11 ];
+	this.cache[ 12 ] = data[ 12 ];
+	this.cache[ 13 ] = data[ 13 ];
+	this.cache[ 14 ] = data[ 14 ];
+	this.cache[ 15 ] = data[ 15 ];
 
-	}
+	this.info.render.uniformUpdates ++;
 
 }
 
@@ -241,7 +366,15 @@ function setValue4fm( gl, v ) {
 function setValueT1( gl, v, renderer ) {
 
 	var unit = renderer.allocTextureUnit();
-	gl.uniform1i( this.addr, unit );
+
+	if ( this.cache[ 0 ] !== unit ) {
+
+		gl.uniform1i( this.addr, unit );
+		this.cache[ 0 ] = unit;
+		this.info.render.uniformUpdates ++;
+
+	}
+
 	renderer.setTexture2D( v || emptyTexture, unit );
 
 }
@@ -249,7 +382,15 @@ function setValueT1( gl, v, renderer ) {
 function setValueT6( gl, v, renderer ) {
 
 	var unit = renderer.allocTextureUnit();
-	gl.uniform1i( this.addr, unit );
+
+	if ( this.cache[ 0 ] !== unit ) {
+
+		gl.uniform1i( this.addr, unit );
+		this.cache[ 0 ] = unit;
+		this.info.render.uniformUpdates ++;
+
+	}
+
 	renderer.setTextureCube( v || emptyCubeTexture, unit );
 
 }
@@ -258,19 +399,48 @@ function setValueT6( gl, v, renderer ) {
 
 function setValue2iv( gl, v ) {
 
+	if ( this.cache[ 0 ] === v[ 0 ] && this.cache[ 1 ] === v[ 1 ] ) return;
+
 	gl.uniform2iv( this.addr, v );
+
+	this.cache[ 0 ] = v[ 0 ];
+	this.cache[ 1 ] = v[ 1 ];
+
+	this.info.render.uniformUpdates ++;
 
 }
 
 function setValue3iv( gl, v ) {
 
+	if ( this.cache[ 0 ] === v[ 0 ] &&
+		this.cache[ 1 ] === v[ 1 ] &&
+		this.cache[ 2 ] === v[ 2 ] ) return;
+
 	gl.uniform3iv( this.addr, v );
+
+	this.cache[ 0 ] = v[ 0 ];
+	this.cache[ 1 ] = v[ 1 ];
+	this.cache[ 2 ] = v[ 2 ];
+
+	this.info.render.uniformUpdates ++;
 
 }
 
 function setValue4iv( gl, v ) {
 
+	if ( this.cache[ 0 ] === v[ 0 ] &&
+		this.cache[ 1 ] === v[ 1 ] &&
+		this.cache[ 2 ] === v[ 2 ] &&
+		this.cache[ 3 ] === v[ 3 ] ) return;
+
 	gl.uniform4iv( this.addr, v );
+
+	this.cache[ 0 ] = v[ 0 ];
+	this.cache[ 1 ] = v[ 1 ];
+	this.cache[ 2 ] = v[ 2 ];
+	this.cache[ 3 ] = v[ 3 ];
+
+	this.info.render.uniformUpdates ++;
 
 }
 
@@ -307,10 +477,14 @@ function setValue1fv( gl, v ) {
 
 	gl.uniform1fv( this.addr, v );
 
+	this.info.render.uniformUpdates ++;
+
 }
 function setValue1iv( gl, v ) {
 
 	gl.uniform1iv( this.addr, v );
+
+	this.info.render.uniformUpdates ++;
 
 }
 
@@ -320,17 +494,23 @@ function setValueV2a( gl, v ) {
 
 	gl.uniform2fv( this.addr, flatten( v, this.size, 2 ) );
 
+	this.info.render.uniformUpdates ++;
+
 }
 
 function setValueV3a( gl, v ) {
 
 	gl.uniform3fv( this.addr, flatten( v, this.size, 3 ) );
 
+	this.info.render.uniformUpdates ++;
+
 }
 
 function setValueV4a( gl, v ) {
 
 	gl.uniform4fv( this.addr, flatten( v, this.size, 4 ) );
+
+	this.info.render.uniformUpdates ++;
 
 }
 
@@ -340,17 +520,23 @@ function setValueM2a( gl, v ) {
 
 	gl.uniformMatrix2fv( this.addr, false, flatten( v, this.size, 4 ) );
 
+	this.info.render.uniformUpdates ++;
+
 }
 
 function setValueM3a( gl, v ) {
 
 	gl.uniformMatrix3fv( this.addr, false, flatten( v, this.size, 9 ) );
 
+	this.info.render.uniformUpdates ++;
+
 }
 
 function setValueM4a( gl, v ) {
 
 	gl.uniformMatrix4fv( this.addr, false, flatten( v, this.size, 16 ) );
+
+	this.info.render.uniformUpdates ++;
 
 }
 
@@ -369,6 +555,8 @@ function setValueT1a( gl, v, renderer ) {
 
 	}
 
+	this.info.render.uniformUpdates ++;
+
 }
 
 function setValueT6a( gl, v, renderer ) {
@@ -383,6 +571,8 @@ function setValueT6a( gl, v, renderer ) {
 		renderer.setTextureCube( v[ i ] || emptyCubeTexture, units[ i ] );
 
 	}
+
+	this.info.render.uniformUpdates ++;
 
 }
 
@@ -415,20 +605,23 @@ function getPureArraySetter( type ) {
 
 // --- Uniform Classes ---
 
-function SingleUniform( id, activeInfo, addr ) {
+function SingleUniform( id, activeInfo, addr, info ) {
 
 	this.id = id;
 	this.addr = addr;
+	this.cache = [];
+	this.info = info;
 	this.setValue = getSingularSetter( activeInfo.type );
 
 	// this.path = activeInfo.name; // DEBUG
 
 }
 
-function PureArrayUniform( id, activeInfo, addr ) {
+function PureArrayUniform( id, activeInfo, addr, info ) {
 
 	this.id = id;
 	this.addr = addr;
+	this.info = info;
 	this.size = activeInfo.size;
 	this.setValue = getPureArraySetter( activeInfo.type );
 
@@ -436,11 +629,13 @@ function PureArrayUniform( id, activeInfo, addr ) {
 
 }
 
-function StructuredUniform( id ) {
+function StructuredUniform( id, renderer ) {
 
 	this.id = id;
 
 	UniformContainer.call( this ); // mix-in
+
+	this.renderer = renderer;
 
 }
 
@@ -490,7 +685,7 @@ function parseUniform( activeInfo, addr, container ) {
 	// reset RegExp object, because of the early exit of a previous run
 	RePathPart.lastIndex = 0;
 
-	for ( ; ; ) {
+	while ( true ) {
 
 		var match = RePathPart.exec( path ),
 			matchEnd = RePathPart.lastIndex,
@@ -506,8 +701,8 @@ function parseUniform( activeInfo, addr, container ) {
 			// bare name or "pure" bottom-level array "[0]" suffix
 
 			addUniform( container, subscript === undefined ?
-				new SingleUniform( id, activeInfo, addr ) :
-				new PureArrayUniform( id, activeInfo, addr ) );
+				new SingleUniform( id, activeInfo, addr, container.renderer.info ) :
+				new PureArrayUniform( id, activeInfo, addr, container.renderer.info ) );
 
 			break;
 
@@ -519,7 +714,7 @@ function parseUniform( activeInfo, addr, container ) {
 
 			if ( next === undefined ) {
 
-				next = new StructuredUniform( id );
+				next = new StructuredUniform( id, container.renderer );
 				addUniform( container, next );
 
 			}
