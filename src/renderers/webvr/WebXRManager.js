@@ -71,8 +71,6 @@ function WebXRManager( gl ) {
 				frameOfRef = value;
 				isExclusive = session.exclusive;
 
-				console.log( 0 );
-
 			} );
 
 		}
@@ -88,8 +86,6 @@ function WebXRManager( gl ) {
 	this.isPresenting = isPresenting;
 
 	this.requestAnimationFrame = function ( callback ) {
-
-		console.log( 1 );
 
 		function onFrame( time, frame ) {
 
