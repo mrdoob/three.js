@@ -66,8 +66,7 @@ function WebGLRenderer( parameters ) {
 		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
-		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
-		_webglVersion = parameters.webglVersion !== undefined ? parameters.webglVersion : 'webgl';
+		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default';
 
 	var currentRenderList = null;
 	var currentRenderState = null;
@@ -192,17 +191,11 @@ function WebGLRenderer( parameters ) {
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
-		var webglVersion = ( _webglVersion === 'webgl2' || _webglVersion === 'auto' ) ? 'webgl2' : 'webgl';
-
-		_gl = _context || _canvas.getContext( webglVersion, contextAttributes );
-
-		if ( _gl === null && _webglVersion === 'auto' ) _gl = _canvas.getContext( 'webgl', contextAttributes );
-
-		if ( _gl === null && ( webglVersion === 'webgl' || _webglVersion === 'auto' ) ) _gl = _canvas.getContext( 'experimental-webgl', contextAttributes );
+		_gl = _context || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
 
 		if ( _gl === null ) {
 
-			if ( _canvas.getContext( webglVersion ) !== null ) {
+			if ( _canvas.getContext( 'webgl' ) !== null ) {
 
 				throw new Error( 'Error creating WebGL context with your selected attributes.' );
 
