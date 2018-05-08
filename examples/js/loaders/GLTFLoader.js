@@ -29,9 +29,7 @@ THREE.GLTFLoader = ( function () {
 
 			var loader = new THREE.FileLoader( scope.manager );
 
-			if ( this.path !== undefined ) {
-				loader.setPath( path );
-			}
+			if ( this.path !== undefined ) loader.setPath( path );
 
 			loader.setResponseType( 'arraybuffer' );
 
