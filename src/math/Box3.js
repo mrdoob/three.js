@@ -559,36 +559,19 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	applyMatrix4: function applyMatrix4( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		// transform of empty box is an empty box.
 		if ( this.isEmpty( ) ) return this;
 
 		var m = matrix.elements;
 
-		var xax = m[ 0 ] * this.min.x;
-		var xay = m[ 1 ] * this.min.x;
-		var xaz = m[ 2 ] * this.min.x;
-
-		var xbx = m[ 0 ] * this.max.x;
-		var xby = m[ 1 ] * this.max.x;
-		var xbz = m[ 2 ] * this.max.x;
-
-		var yax = m[ 4 ] * this.min.y;
-		var yay = m[ 5 ] * this.min.y;
-		var yaz = m[ 6 ] * this.min.y;
-
-		var ybx = m[ 4 ] * this.max.y;
-		var yby = m[ 5 ] * this.max.y;
-		var ybz = m[ 6 ] * this.max.y;
-
-		var zax = m[ 8 ] * this.min.z;
-		var zay = m[ 9 ] * this.min.z;
-		var zaz = m[ 10 ] * this.min.z;
-
-		var zbx = m[ 8 ] * this.max.z;
-		var zby = m[ 9 ] * this.max.z;
-		var zbz = m[ 10 ] * this.max.z;
+		var xax = m[ 0 ] * this.min.x, xay = m[ 1 ] * this.min.x, xaz = m[ 2 ] * this.min.x;
+		var xbx = m[ 0 ] * this.max.x, xby = m[ 1 ] * this.max.x, xbz = m[ 2 ] * this.max.x;
+		var yax = m[ 4 ] * this.min.y, yay = m[ 5 ] * this.min.y, yaz = m[ 6 ] * this.min.y;
+		var ybx = m[ 4 ] * this.max.y, yby = m[ 5 ] * this.max.y, ybz = m[ 6 ] * this.max.y;
+		var zax = m[ 8 ] * this.min.z, zay = m[ 9 ] * this.min.z, zaz = m[ 10 ] * this.min.z;
+		var zbx = m[ 8 ] * this.max.z, zby = m[ 9 ] * this.max.z, zbz = m[ 10 ] * this.max.z;
 
 		this.min.x = Math.min( xax, xbx ) + Math.min( yax, ybx ) + Math.min( zax, zbx ) + m[ 12 ];
 		this.min.y = Math.min( xay, xby ) + Math.min( yay, yby ) + Math.min( zay, zby ) + m[ 13 ];
