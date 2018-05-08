@@ -438,7 +438,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			customDefines,
 
-			parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
+			parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest + ( Number.isInteger( parameters.alphaTest ) ? '.0' : '' ) : '',
 
 			'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
