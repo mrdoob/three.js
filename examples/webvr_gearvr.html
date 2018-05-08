@@ -231,6 +231,10 @@
 						
 						if ( normal.length() < 2 * radius ) {
 							
+							normal.multiplyScalar( 0.5 * normal.length() - radius );
+							cube.position.sub( normal );
+							cube2.position.add( normal );
+
 							normal.normalize();
 
 							relativeVelocity.copy( cube.userData.velocity ).sub( cube2.userData.velocity );
