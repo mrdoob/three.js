@@ -242,15 +242,7 @@ function setValue3fv( gl, v ) {
 
 function setValue4fv( gl, v ) {
 
-	if ( v.x === undefined ) {
-
-		if ( arraysEqual( this.cache, v ) ) return;
-
-		gl.uniform4fv( this.addr, v );
-
-		copyArray( this.cache, v );
-
-	} else {
+	if ( v.x !== undefined ) {
 
 		if ( this.cache[ 0 ] === v.x &&
 			this.cache[ 1 ] === v.y &&
@@ -263,6 +255,14 @@ function setValue4fv( gl, v ) {
 		 this.cache[ 1 ] = v.y;
 		 this.cache[ 2 ] = v.z;
 		 this.cache[ 3 ] = v.w;
+
+	} else {
+
+		if ( arraysEqual( this.cache, v ) ) return;
+
+		gl.uniform4fv( this.addr, v );
+
+		copyArray( this.cache, v );
 
 	}
 
