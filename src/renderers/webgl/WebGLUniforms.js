@@ -69,6 +69,12 @@ function UniformContainer() {
 var arrayCacheF32 = [];
 var arrayCacheI32 = [];
 
+// Float32Array caches used for uploading Matrix uniforms
+
+var mat4array = new Float32Array( 16 );
+var mat3array = new Float32Array( 9 );
+var mat2array = new Float32Array( 4 );
+
 // Flattening for arrays of vectors and matrices
 
 function flatten( array, nBlocks, blockSize ) {
@@ -110,7 +116,7 @@ function arraysEqual( a, b ) {
 
 	if ( a.length !== b.length ) return false;
 
-	for ( var i = 0; i < a.length; i ++ ) {
+	for ( var i = 0, l = a.length; i < l; i ++ ) {
 
 		if ( a[ i ] !== b[ i ] ) return false;
 
@@ -122,7 +128,7 @@ function arraysEqual( a, b ) {
 
 function copyArray( a, b ) {
 
-	for ( var i = 0; i < b.length; i ++ ) {
+	for ( var i = 0, l = b.length; i < l; i ++ ) {
 
 		a[ i ] = b[ i ];
 
@@ -159,21 +165,25 @@ function allocTexUnits( renderer, n ) {
 
 function setValue1f( gl, v ) {
 
-	if ( this.cache[ 0 ] === v ) return;
+	var cache = this.cache;
+
+	if ( cache[ 0 ] === v ) return;
 
 	gl.uniform1f( this.addr, v );
 
-	this.cache[ 0 ] = v;
+	cache[ 0 ] = v;
 
 }
 
 function setValue1i( gl, v ) {
 
-	if ( this.cache[ 0 ] === v ) return;
+	var cache = this.cache;
+
+	if ( cache[ 0 ] === v ) return;
 
 	gl.uniform1i( this.addr, v );
 
-	this.cache[ 0 ] = v;
+	cache[ 0 ] = v;
 
 }
 
@@ -181,22 +191,26 @@ function setValue1i( gl, v ) {
 
 function setValue2fv( gl, v ) {
 
+	var cache = this.cache;
+
 	if ( v.x !== undefined ) {
 
-		if ( this.cache[ 0 ] === v.x && this.cache[ 1 ] === v.y ) return;
+		if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y ) {
 
-		gl.uniform2f( this.addr, v.x, v.y );
+			gl.uniform2f( this.addr, v.x, v.y );
 
-		this.cache[ 0 ] = v.x;
-		this.cache[ 1 ] = v.y;
+			cache[ 0 ] = v.x;
+			cache[ 1 ] = v.y;
+
+		}
 
 	} else {
 
-		if ( arraysEqual( this.cache, v ) ) return;
+		if ( arraysEqual( cache, v ) ) return;
 
 		gl.uniform2fv( this.addr, v );
 
-		copyArray( this.cache, v );
+		copyArray( cache, v );
 
 	}
 
@@ -204,37 +218,39 @@ function setValue2fv( gl, v ) {
 
 function setValue3fv( gl, v ) {
 
+	var cache = this.cache;
+
 	if ( v.x !== undefined ) {
 
-		if ( this.cache[ 0 ] === v.x &&
-			this.cache[ 1 ] === v.y &&
-			this.cache[ 2 ] === v.z ) return;
+		if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y || cache[ 2 ] !== v.z ) {
 
-		gl.uniform3f( this.addr, v.x, v.y, v.z );
+			gl.uniform3f( this.addr, v.x, v.y, v.z );
 
-		this.cache[ 0 ] = v.x;
-		this.cache[ 1 ] = v.y;
-		this.cache[ 2 ] = v.z;
+			cache[ 0 ] = v.x;
+			cache[ 1 ] = v.y;
+			cache[ 2 ] = v.z;
+
+		}
 
 	} else if ( v.r !== undefined ) {
 
-		if ( this.cache[ 0 ] === v.r &&
-			this.cache[ 1 ] === v.g &&
-			this.cache[ 2 ] === v.b ) return;
+		if ( cache[ 0 ] !== v.r || cache[ 1 ] !== v.g || cache[ 2 ] !== v.b ) {
 
-		gl.uniform3f( this.addr, v.r, v.g, v.b );
+			gl.uniform3f( this.addr, v.r, v.g, v.b );
 
-		this.cache[ 0 ] = v.r;
-		this.cache[ 1 ] = v.g;
-		this.cache[ 2 ] = v.b;
+			cache[ 0 ] = v.r;
+			cache[ 1 ] = v.g;
+			cache[ 2 ] = v.b;
+
+		}
 
 	} else {
 
-		if ( arraysEqual( this.cache, v ) ) return;
+		if ( arraysEqual( cache, v ) ) return;
 
 		gl.uniform3fv( this.addr, v );
 
-		copyArray( this.cache, v );
+		copyArray( cache, v );
 
 	}
 
@@ -242,27 +258,28 @@ function setValue3fv( gl, v ) {
 
 function setValue4fv( gl, v ) {
 
+	var cache = this.cache;
+
 	if ( v.x !== undefined ) {
 
-		if ( this.cache[ 0 ] === v.x &&
-			this.cache[ 1 ] === v.y &&
-			this.cache[ 2 ] === v.z &&
-			this.cache[ 3 ] === v.w ) return;
+		if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y || cache[ 2 ] !== v.z || cache[ 3 ] !== v.w ) {
 
-		 gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
+			gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
 
-		 this.cache[ 0 ] = v.x;
-		 this.cache[ 1 ] = v.y;
-		 this.cache[ 2 ] = v.z;
-		 this.cache[ 3 ] = v.w;
+			cache[ 0 ] = v.x;
+			cache[ 1 ] = v.y;
+			cache[ 2 ] = v.z;
+			cache[ 3 ] = v.w;
+
+		}
 
 	} else {
 
-		if ( arraysEqual( this.cache, v ) ) return;
+		if ( arraysEqual( cache, v ) ) return;
 
 		gl.uniform4fv( this.addr, v );
 
-		copyArray( this.cache, v );
+		copyArray( cache, v );
 
 	}
 
@@ -272,37 +289,82 @@ function setValue4fv( gl, v ) {
 
 function setValue2fm( gl, v ) {
 
-	var data = v.elements || v;
+	var cache = this.cache;
+	var elements = v.elements;
 
-	if ( arraysEqual( this.cache, data ) ) return;
+	if ( elements === undefined ) {
 
-	gl.uniformMatrix2fv( this.addr, false, data );
+		if ( arraysEqual( cache, v ) ) return;
 
-	copyArray( this.cache, data );
+		gl.uniformMatrix2fv( this.addr, false, v );
+
+		copyArray( cache, v );
+
+	} else {
+
+		if ( arraysEqual( cache, elements ) ) return;
+
+		mat2array.set( elements );
+
+		gl.uniformMatrix2fv( this.addr, false, mat2array );
+
+		copyArray( cache, elements );
+
+	}
 
 }
 
 function setValue3fm( gl, v ) {
 
-	var data = v.elements || v;
+	var cache = this.cache;
+	var elements = v.elements;
 
-	if ( arraysEqual( this.cache, data ) ) return;
+	if ( elements === undefined ) {
 
-	gl.uniformMatrix3fv( this.addr, false, data );
+		if ( arraysEqual( cache, v ) ) return;
 
-	copyArray( this.cache, data );
+		gl.uniformMatrix3fv( this.addr, false, v );
+
+		copyArray( cache, v );
+
+	} else {
+
+		if ( arraysEqual( cache, elements ) ) return;
+
+		mat3array.set( elements );
+
+		gl.uniformMatrix3fv( this.addr, false, mat3array );
+
+		copyArray( cache, elements );
+
+	}
 
 }
 
 function setValue4fm( gl, v ) {
 
-	var data = v.elements || v;
+	var cache = this.cache;
+	var elements = v.elements;
 
-	if ( arraysEqual( this.cache, data ) ) return;
+	if ( elements === undefined ) {
 
-	gl.uniformMatrix4fv( this.addr, false, data );
+		if ( arraysEqual( cache, v ) ) return;
 
-	copyArray( this.cache, data );
+		gl.uniformMatrix4fv( this.addr, false, v );
+
+		copyArray( cache, v );
+
+	} else {
+
+		if ( arraysEqual( cache, elements ) ) return;
+
+		mat4array.set( elements );
+
+		gl.uniformMatrix4fv( this.addr, false, mat4array );
+
+		copyArray( cache, elements );
+
+	}
 
 }
 
