@@ -12,7 +12,6 @@ function WebGLInfo( gl ) {
 	var render = {
 		frame: 0,
 		calls: 0,
-		uniformUpdates: 0,
 		triangles: 0,
 		points: 0,
 		lines: 0
@@ -63,7 +62,6 @@ function WebGLInfo( gl ) {
 
 		render.frame ++;
 		render.calls = 0;
-		render.uniformUpdates = 0;
 		render.triangles = 0;
 		render.points = 0;
 		render.lines = 0;
