@@ -106,6 +106,30 @@ function flatten( array, nBlocks, blockSize ) {
 
 }
 
+function arraysEqual( a, b ) {
+
+	if ( a.length !== b.length ) return false;
+
+	for ( var i = 0; i < a.length; i ++ ) {
+
+		if ( a[ i ] !== b[ i ] ) return false;
+
+	}
+
+	return true;
+
+}
+
+function copyArray( a, b ) {
+
+	for ( var i = 0; i < b.length; i ++ ) {
+
+		a[ i ] = b[ i ];
+
+	}
+
+}
+
 // Texture unit allocation
 
 function allocTexUnits( renderer, n ) {
@@ -157,16 +181,7 @@ function setValue1i( gl, v ) {
 
 function setValue2fv( gl, v ) {
 
-	if ( v.x === undefined ) {
-
-		if ( this.cache[ 0 ] === v[ 0 ] && this.cache[ 1 ] === v[ 1 ] ) return;
-
-		gl.uniform2fv( this.addr, v );
-
-		this.cache[ 0 ] = v[ 0 ];
-		this.cache[ 1 ] = v[ 1 ];
-
-	} else {
+	if ( v.x !== undefined ) {
 
 		if ( this.cache[ 0 ] === v.x && this.cache[ 1 ] === v.y ) return;
 
@@ -174,6 +189,14 @@ function setValue2fv( gl, v ) {
 
 		this.cache[ 0 ] = v.x;
 		this.cache[ 1 ] = v.y;
+
+	} else {
+
+		if ( arraysEqual( this.cache, v ) ) return;
+
+		gl.uniform2fv( this.addr, v );
+
+		copyArray( this.cache, v );
 
 	}
 
@@ -207,15 +230,11 @@ function setValue3fv( gl, v ) {
 
 	} else {
 
-		if ( this.cache[ 0 ] === v[ 0 ] &&
-			this.cache[ 1 ] === v[ 1 ] &&
-			this.cache[ 2 ] === v[ 2 ] ) return;
+		if ( arraysEqual( this.cache, v ) ) return;
 
 		gl.uniform3fv( this.addr, v );
 
-		this.cache[ 0 ] = v[ 0 ];
-		this.cache[ 1 ] = v[ 1 ];
-		this.cache[ 2 ] = v[ 2 ];
+		copyArray( this.cache, v );
 
 	}
 
@@ -225,17 +244,11 @@ function setValue4fv( gl, v ) {
 
 	if ( v.x === undefined ) {
 
-		if ( this.cache[ 0 ] === v[ 0 ] &&
-			this.cache[ 1 ] === v[ 1 ] &&
-			this.cache[ 2 ] === v[ 2 ] &&
-			this.cache[ 3 ] === v[ 3 ] ) return;
+		if ( arraysEqual( this.cache, v ) ) return;
 
 		gl.uniform4fv( this.addr, v );
 
-		this.cache[ 0 ] = v[ 0 ];
-		this.cache[ 1 ] = v[ 1 ];
-		this.cache[ 2 ] = v[ 2 ];
-		this.cache[ 3 ] = v[ 3 ];
+		copyArray( this.cache, v );
 
 	} else {
 
@@ -261,17 +274,11 @@ function setValue2fm( gl, v ) {
 
 	var data = v.elements || v;
 
-	if ( this.cache[ 0 ] === data[ 0 ] &&
-		this.cache[ 1 ] === data[ 1 ] &&
-		this.cache[ 2 ] === data[ 2 ] &&
-		this.cache[ 3 ] === data[ 3 ] ) return;
+	if ( arraysEqual( this.cache, data ) ) return;
 
 	gl.uniformMatrix2fv( this.addr, false, data );
 
-	this.cache[ 0 ] = data[ 0 ];
-	this.cache[ 1 ] = data[ 1 ];
-	this.cache[ 2 ] = data[ 2 ];
-	this.cache[ 3 ] = data[ 3 ];
+	copyArray( this.cache, data );
 
 }
 
@@ -279,27 +286,11 @@ function setValue3fm( gl, v ) {
 
 	var data = v.elements || v;
 
-	if ( this.cache[ 0 ] === data[ 0 ] &&
-		this.cache[ 1 ] === data[ 1 ] &&
-		this.cache[ 2 ] === data[ 2 ] &&
-		this.cache[ 3 ] === data[ 3 ] &&
-		this.cache[ 4 ] === data[ 4 ] &&
-		this.cache[ 5 ] === data[ 5 ] &&
-		this.cache[ 6 ] === data[ 6 ] &&
-		this.cache[ 7 ] === data[ 7 ] &&
-		this.cache[ 8 ] === data[ 8 ] ) return;
+	if ( arraysEqual( this.cache, data ) ) return;
 
 	gl.uniformMatrix3fv( this.addr, false, data );
 
-	this.cache[ 0 ] = data[ 0 ];
-	this.cache[ 1 ] = data[ 1 ];
-	this.cache[ 2 ] = data[ 2 ];
-	this.cache[ 3 ] = data[ 3 ];
-	this.cache[ 4 ] = data[ 4 ];
-	this.cache[ 5 ] = data[ 5 ];
-	this.cache[ 6 ] = data[ 6 ];
-	this.cache[ 7 ] = data[ 7 ];
-	this.cache[ 8 ] = data[ 8 ];
+	copyArray( this.cache, data );
 
 }
 
@@ -307,41 +298,11 @@ function setValue4fm( gl, v ) {
 
 	var data = v.elements || v;
 
-	if ( this.cache[ 0 ] === data[ 0 ] &&
-		this.cache[ 1 ] === data[ 1 ] &&
-		this.cache[ 2 ] === data[ 2 ] &&
-		this.cache[ 3 ] === data[ 3 ] &&
-		this.cache[ 4 ] === data[ 4 ] &&
-		this.cache[ 5 ] === data[ 5 ] &&
-		this.cache[ 6 ] === data[ 6 ] &&
-		this.cache[ 7 ] === data[ 7 ] &&
-		this.cache[ 8 ] === data[ 8 ] &&
-		this.cache[ 9 ] === data[ 9 ] &&
-		this.cache[ 10 ] === data[ 10 ] &&
-		this.cache[ 11 ] === data[ 11 ] &&
-		this.cache[ 12 ] === data[ 12 ] &&
-		this.cache[ 13 ] === data[ 13 ] &&
-		this.cache[ 14 ] === data[ 14 ] &&
-		this.cache[ 15 ] === data[ 15 ] ) return;
+	if ( arraysEqual( this.cache, data ) ) return;
 
 	gl.uniformMatrix4fv( this.addr, false, data );
 
-	this.cache[ 0 ] = data[ 0 ];
-	this.cache[ 1 ] = data[ 1 ];
-	this.cache[ 2 ] = data[ 2 ];
-	this.cache[ 3 ] = data[ 3 ];
-	this.cache[ 4 ] = data[ 4 ];
-	this.cache[ 5 ] = data[ 5 ];
-	this.cache[ 6 ] = data[ 6 ];
-	this.cache[ 7 ] = data[ 7 ];
-	this.cache[ 8 ] = data[ 8 ];
-	this.cache[ 9 ] = data[ 9 ];
-	this.cache[ 10 ] = data[ 10 ];
-	this.cache[ 11 ] = data[ 11 ];
-	this.cache[ 12 ] = data[ 12 ];
-	this.cache[ 13 ] = data[ 13 ];
-	this.cache[ 14 ] = data[ 14 ];
-	this.cache[ 15 ] = data[ 15 ];
+	copyArray( this.cache, data );
 
 }
 
@@ -355,6 +316,7 @@ function setValueT1( gl, v, renderer ) {
 
 		gl.uniform1i( this.addr, unit );
 		this.cache[ 0 ] = unit;
+
 	}
 
 	renderer.setTexture2D( v || emptyTexture, unit );
@@ -369,6 +331,7 @@ function setValueT6( gl, v, renderer ) {
 
 		gl.uniform1i( this.addr, unit );
 		this.cache[ 0 ] = unit;
+
 	}
 
 	renderer.setTextureCube( v || emptyCubeTexture, unit );
@@ -379,42 +342,31 @@ function setValueT6( gl, v, renderer ) {
 
 function setValue2iv( gl, v ) {
 
-	if ( this.cache[ 0 ] === v[ 0 ] && this.cache[ 1 ] === v[ 1 ] ) return;
+	if ( arraysEqual( this.cache, v ) ) return;
 
 	gl.uniform2iv( this.addr, v );
 
-	this.cache[ 0 ] = v[ 0 ];
-	this.cache[ 1 ] = v[ 1 ];
+	copyArray( this.cache, v );
 
 }
 
 function setValue3iv( gl, v ) {
 
-	if ( this.cache[ 0 ] === v[ 0 ] &&
-		this.cache[ 1 ] === v[ 1 ] &&
-		this.cache[ 2 ] === v[ 2 ] ) return;
+	if ( arraysEqual( this.cache, v ) ) return;
 
 	gl.uniform3iv( this.addr, v );
 
-	this.cache[ 0 ] = v[ 0 ];
-	this.cache[ 1 ] = v[ 1 ];
-	this.cache[ 2 ] = v[ 2 ];
+	copyArray( this.cache, v );
 
 }
 
 function setValue4iv( gl, v ) {
 
-	if ( this.cache[ 0 ] === v[ 0 ] &&
-		this.cache[ 1 ] === v[ 1 ] &&
-		this.cache[ 2 ] === v[ 2 ] &&
-		this.cache[ 3 ] === v[ 3 ] ) return;
+	if ( arraysEqual( this.cache, v ) ) return;
 
 	gl.uniform4iv( this.addr, v );
 
-	this.cache[ 0 ] = v[ 0 ];
-	this.cache[ 1 ] = v[ 1 ];
-	this.cache[ 2 ] = v[ 2 ];
-	this.cache[ 3 ] = v[ 3 ];
+	copyArray( this.cache, v );
 
 }
 
@@ -581,7 +533,7 @@ function PureArrayUniform( id, activeInfo, addr ) {
 
 }
 
-function StructuredUniform( id, renderer ) {
+function StructuredUniform( id ) {
 
 	this.id = id;
 
