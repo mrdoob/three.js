@@ -184,6 +184,7 @@ var files = {
 		"webgl_materials_video",
 		"webgl_materials_video_webcam",
 		"webgl_materials_wireframe",
+		'webgl_materials_shader_override',
 		"webgl_mirror",
 		"webgl_mirror_nodes",
 		"webgl_modifier_simplifier",
