@@ -10,20 +10,20 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A global instance of the [page:LoadingManager LoadingManager], used by most loaders
+		<p class="desc">A global instance of the [page:LoadingManager LoadingManager], used by most loaders
 			when no custom manager has been specified.<br /><br />
 
 		  This will be sufficient for most purposes, however there may be times when you desire seperate loading managers
 			for say, textures and models.
-		</div>
+		</p>
 
 		<h2>Example</h2>
 
-		<div>
+		<p>
 			[example:webgl_loader_scene WebGL / loader / scene]<br />
-		</div>
+		</p>
 
-		<div>
+		<p>
 			You can optionally set the [page:LoadingManager.onStart onStart], [page:LoadingManager.onLoad onLoad],
 			[page:LoadingManager.onProgress onProgress], [page:LoadingManager.onStart onError] functions for the manager.
 			These will then apply to any loaders using the DefaultLoadingManager.<br /><br />
@@ -31,7 +31,7 @@
 			Note that these shouldn't be confused with the similarly named functions of individual loaders,
 			as they are intended for displaying information about the overall status of loading,
 			rather than dealing with the data that has been loaded.
-		</div>
+		</p>
 		<code>
 THREE.DefaultLoadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
 
@@ -62,11 +62,11 @@ THREE.DefaultLoadingManager.onError = function ( url ) {
 
 		<h2>Properties</h2>
 
-		<div>See the [page:LoadingManager LoadingManager] page for details of properties.</div>
+		<p>See the [page:LoadingManager LoadingManager] page for details of properties.</p>
 
 		<h2>Methods</h2>
 
-		<div>See the [page:LoadingManager LoadingManager] page for details of methods.</div>
+		<p>See the [page:LoadingManager LoadingManager] page for details of methods.</p>
 
 		<h2>Source</h2>
 

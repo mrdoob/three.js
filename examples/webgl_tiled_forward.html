@@ -32,6 +32,7 @@
 			Created by <a href="https://github.com/wizgrav" target="_blank" rel="noopener">wizgrav</a>.
 		</div>
 		<script src="../build/three.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -51,7 +52,7 @@
 
 		var RADIUS = 75;
 
-		THREE.ShaderChunk[ 'lights_pars' ] += [
+		THREE.ShaderChunk[ 'lights_pars_maps' ] += [
 			'#if defined TILED_FORWARD',
 			'uniform vec4 tileData;',
 			'uniform sampler2D tileTexture;',
@@ -59,7 +60,7 @@
 			'#endif'
 		].join( '\n' );
 
-		THREE.ShaderChunk[ 'lights_template' ] += [
+		THREE.ShaderChunk[ 'lights_fragment_maps' ] += [
 			'',
 			'#if defined TILED_FORWARD',
 			'vec2 tUv = floor(gl_FragCoord.xy / tileData.xy * 32.) / 32. + tileData.zw;',
@@ -95,10 +96,9 @@
 			cols: 0,
 			width: 0,
 			height: 0,
-			tileData: { type: 'v4', value: null },
-			tileTexture: { type: 't', value: null },
+			tileData: { value: null },
+			tileTexture: { value: null },
 			lightTexture: {
-				type: 't',
 				value: new THREE.DataTexture( new Float32Array( 32 * 2 * 4 ), 32, 2, THREE.RGBAFormat, THREE.FloatType )
 			},
 		};
@@ -208,7 +208,7 @@
 		var scene = new THREE.Scene();
 		scene.background = new THREE.Color( 0x111111 );
 
-		var renderer = new THREE.WebGLRenderer( { antialias: false } );
+		var renderer = new THREE.WebGLRenderer();
 		renderer.toneMapping = THREE.LinearToneMapping;
 		container.appendChild( renderer.domElement );
 
@@ -241,6 +241,7 @@
 
 			var sphereGeom = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
 			var tIndex = Math.round( Math.random() * 3 );
+
 			Object.keys( Heads ).forEach( function ( t, index ) {
 
 				var g = new THREE.Group();
@@ -253,7 +254,6 @@
 					uniforms: THREE.UniformsUtils.clone( ml.uniforms ),
 					defines: conf.defines,
 					transparent: tIndex === index ? true : false,
-
 				} );
 
 				mtl.uniforms.opacity.value = tIndex === index ? 0.9 : 1;
@@ -279,7 +279,9 @@
 
 				mtl.defines[ 'TILED_FORWARD' ] = 1;
 				materials.push( mtl );
+
 				var obj = new THREE.Mesh( geom, mtl );
+				obj.position.y = - 37;
 				mtl.side = tIndex === index ? THREE.FrontSide : THREE.DoubleSide;
 
 				g.rotation.y = index * Math.PI / 2;
@@ -370,11 +372,14 @@
 
 		scene.onAfterRender = postEffect;
 
-		var loader = new THREE.JSONLoader();
+		var loader = new THREE.OBJLoader();
 
-		loader.load( './obj/walt/WaltHead_slim.js', function ( geometry ) {
+		loader.load( 'models/obj/walt/WaltHead.obj', function ( object ) {
+
+			var geometry = object.children[ 0 ].geometry;
 
 			window.addEventListener( 'resize', resize );
+
 			init( geometry );
 			resize();
 

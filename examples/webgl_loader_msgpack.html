@@ -96,17 +96,17 @@ https://github.com/creationix/msgpack-js-browser
 
 			function loadMSGPack() {
 
-				var loader = new THREE.FileLoader();
-				loader.setResponseType( 'arraybuffer' );
-				loader.load( 'scenes/robo_pigeon.pack', function ( data ) {
+				new THREE.FileLoader()
+					.setResponseType( 'arraybuffer' )
+					.load( 'scenes/robo_pigeon.pack', function ( data ) {
 
-					var decoded = msgpack.decode( data );
+						var decoded = msgpack.decode( data );
 
-					var loader = new THREE.ObjectLoader();
+						var loader = new THREE.ObjectLoader();
 
-					setupScene( loader.parse( decoded ) );
+						setupScene( loader.parse( decoded ) );
 
-				} );
+					} );
 
 			}
 

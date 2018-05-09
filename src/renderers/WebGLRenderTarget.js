@@ -2,7 +2,6 @@ import { EventDispatcher } from '../core/EventDispatcher.js';
 import { Texture } from '../textures/Texture.js';
 import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
-import { _Math } from '../math/Math.js';
 
 /**
  * @author szimek / https://github.com/szimek/
@@ -17,8 +16,6 @@ import { _Math } from '../math/Math.js';
 */
 function WebGLRenderTarget( width, height, options ) {
 
-	this.uuid = _Math.generateUUID();
-
 	this.width = width;
 	this.height = height;
 
@@ -32,6 +29,8 @@ function WebGLRenderTarget( width, height, options ) {
 	if ( options.minFilter === undefined ) options.minFilter = LinearFilter;
 
 	this.texture = new Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+
+	this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : true;
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;

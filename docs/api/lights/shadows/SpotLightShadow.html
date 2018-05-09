@@ -12,12 +12,12 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			This is used internally by [page:SpotLight SpotLights] for calculating shadows.
-		</div>
+		</p>
 
 		<h2>Example</h2>
-		<div>
+		<p>
 			<code>
 //Create a WebGLRenderer and turn on shadows in the renderer
 var renderer = new THREE.WebGLRenderer();
@@ -54,45 +54,45 @@ scene.add( plane );
 var helper = new THREE.CameraHelper( light.shadow.camera );
 scene.add( helper );
 			</code>
-		</div>
+		</p>
 
 
 		<h2>Constructor</h2>
 
-		The constructor creates a [page:PerspectiveCamera PerspectiveCamera] to manage the shadow's view of the world.
+		The constructor creates a [param:PerspectiveCamera PerspectiveCamera] to manage the shadow's view of the world.
 
 		<h2>Properties</h2>
 		See the base [page:LightShadow LightShadow] class for common properties.
 
 
 	 <h3>[property:Camera camera]</h3>
-	 <div>
+	 <p>
 		 The light's view of the world. This is used to generate a depth map of the scene; objects behind
 		 other objects from the light's perspective will be in shadow.<br /><br />
 
 		 The default is a  [page:PerspectiveCamera] with [page:PerspectiveCamera.near near] clipping plane at 0.5.
 		 The [page:PerspectiveCamera.fov fov] will track the [page:SpotLight.angle angle] property of the owning
-		 [page:SpotLight SpotLight] via the [page:SpotLightShadow.update update] method. Similarly, the 
+		 [page:SpotLight SpotLight] via the [page:SpotLightShadow.update update] method. Similarly, the
 		 [page:PerspectiveCamera.aspect aspect] property will track the aspect of the
-		 [page:LightShadow.mapSize mapSize]. If the [page:SpotLight.distance distance] property of the light is 
+		 [page:LightShadow.mapSize mapSize]. If the [page:SpotLight.distance distance] property of the light is
 		 set, the [page:PerspectiveCamera.far far] clipping plane will track that, otherwise it defaults to 500.
-		 
-	 </div>
+
+	 </p>
 
 	 <h3>[property:Boolean isSpotLightShadow]</h3>
-	 <div>
+	 <p>
 		 Used to check whether this or derived classes are spot light shadows. Default is *true*.<br /><br />
 
 		 You should not change this, as it used internally for optimisation.
-	 </div>
+	 </p>
 
 		<h2>Methods</h2>
 		See the base [page:LightShadow LightShadow] class for common methods.
 
-		<h3>[method:SpotLightShadow update]( [page:SpotLight light] )</h3>
-		<div>
+		<h3>[method:SpotLightShadow update]( [param:SpotLight light] )</h3>
+		<p>
 		Updates the internal perspective [page:.camera camera] based on the passed in [page:SpotLight light].
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

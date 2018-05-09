@@ -59,6 +59,7 @@ var list = {
 		},
 
 		"Cameras": {
+			"ArrayCamera": "api/cameras/ArrayCamera",
 			"Camera": "api/cameras/Camera",
 			"CubeCamera": "api/cameras/CubeCamera",
 			"OrthographicCamera": "api/cameras/OrthographicCamera",
@@ -147,8 +148,8 @@ var list = {
 			"DodecahedronBufferGeometry": "api/geometries/DodecahedronBufferGeometry",
 			"DodecahedronGeometry": "api/geometries/DodecahedronGeometry",
 			"EdgesGeometry": "api/geometries/EdgesGeometry",
-			"ExtrudeGeometry": "api/geometries/ExtrudeGeometry",
 			"ExtrudeBufferGeometry": "api/geometries/ExtrudeBufferGeometry",
+			"ExtrudeGeometry": "api/geometries/ExtrudeGeometry",
 			"IcosahedronBufferGeometry": "api/geometries/IcosahedronBufferGeometry",
 			"IcosahedronGeometry": "api/geometries/IcosahedronGeometry",
 			"LatheBufferGeometry": "api/geometries/LatheBufferGeometry",
@@ -336,6 +337,12 @@ var list = {
 
 	"Examples": {
 
+		"Animations": {
+			"CCDIKSolver": "examples/animations/CCDIKSolver",
+			"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
+			"MMDPhysics": "examples/animations/MMDPhysics"
+		},
+
 		"Controls": {
 			"OrbitControls": "examples/controls/OrbitControls"
 		},
@@ -349,6 +356,7 @@ var list = {
 		"Loaders": {
 			"BabylonLoader": "examples/loaders/BabylonLoader",
 			"GLTFLoader": "examples/loaders/GLTFLoader",
+			"MMDLoader": "examples/loaders/MMDLoader",
 			"MTLLoader": "examples/loaders/MTLLoader",
 			"OBJLoader": "examples/loaders/OBJLoader",
 			"OBJLoader2": "examples/loaders/OBJLoader2",
@@ -361,7 +369,7 @@ var list = {
 		},
 
 		"Objects": {
-			"LensFlare": "examples/objects/LensFlare",
+			"Lensflare": "examples/objects/Lensflare",
 		},
 
 		"Exporters": {
@@ -382,10 +390,15 @@ var list = {
 		},
 
 		"Renderers": {
-			"CanvasRenderer": "examples/renderers/CanvasRenderer"
+			"CanvasRenderer": "examples/renderers/CanvasRenderer",
+			"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
+			"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
+			"SVGRenderer": "examples/renderers/SVGRenderer"
+
 		},
 
 		"Utils": {
+			"BufferGeometryUtils": "examples/BufferGeometryUtils",
 			"SceneUtils": "examples/utils/SceneUtils"
 		}
 
@@ -404,7 +417,6 @@ var list = {
 		},
 
 		"WebGLRenderer / Plugins": {
-			"LensFlarePlugin": "api/renderers/webgl/plugins/LensFlarePlugin",
 			"SpritePlugin": "api/renderers/webgl/plugins/SpritePlugin"
 		}
 

@@ -33,6 +33,10 @@ OR (for 2.6)
 In your user's library for user installed Blender addons:
 
     /Users/(myuser)/Library/Application Support/Blender/2.7X/scripts/addons
+    
+OR (for 2.79)
+    
+    /Applications/Blender/blender.app/Contents/Resources/2.79/scripts/addons
 
 ### Linux
 

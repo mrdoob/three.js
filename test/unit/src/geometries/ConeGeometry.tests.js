@@ -3,6 +3,7 @@
  */
 /* global QUnit */
 
+import { runStdGeometryTests } from '../../qunit-utils';
 import {
 	ConeGeometry,
 	ConeBufferGeometry
@@ -14,8 +15,6 @@ export default QUnit.module( 'Geometries', () => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
-
-			const parameters = {};
 
 			geometries = [
 				new ConeGeometry()
@@ -50,8 +49,6 @@ export default QUnit.module( 'Geometries', () => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
-
-			const parameters = {};
 
 			geometries = [
 				new ConeBufferGeometry()

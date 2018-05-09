@@ -41,35 +41,6 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		// STATIC STUFF
-		QUnit.todo( "WorldUVGenerator.generateTopUV", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-		QUnit.todo( "WorldUVGenerator.generateSideWallUV", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		// OTHERS
-		QUnit.todo( "getArrays", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-		QUnit.todo( "addShapeList", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-		QUnit.todo( "addShape", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
 
 	} );
 

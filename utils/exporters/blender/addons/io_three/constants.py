@@ -93,6 +93,7 @@ FRAME_INDEX_AS_TIME = 'frameIndexAsTime'
 ANIMATION = 'animations'
 CLIPS="clips"
 KEYFRAMES = 'tracks'
+BAKE_KEYFRAMES = 'bake_tracks'
 MORPH_TARGETS = 'morphTargets'
 MORPH_TARGETS_ANIM = 'morphTargetsAnimation'
 BLEND_SHAPES = 'blendShapes'
@@ -161,6 +162,7 @@ EXPORT_OPTIONS = {
     MAPS: False,
     ANIMATION: OFF,
     KEYFRAMES: False,
+    BAKE_KEYFRAMES: False,
     BONES: False,
     SKINNING: False,
     MORPH_TARGETS: False,

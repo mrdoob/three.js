@@ -50,6 +50,7 @@
 		<script src="js/nodes/FunctionCallNode.js"></script>
 		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
 		<!-- Accessors -->
@@ -125,6 +126,8 @@
 
 		var sphereGroup, smallSphere;
 		var groundMirrorMaterial;
+
+		var frame = new THREE.NodeFrame();
 
 		function init() {
 
@@ -224,20 +227,22 @@
 			//--
 
 			var mirrorMesh = new THREE.Mesh( planeGeo, groundMirrorMaterial );
-			mirrorMesh.add( groundMirror );
-			mirrorMesh.rotateX( - Math.PI / 2 );
-			scene.add( mirrorMesh );
+			// add all alternative mirror materials inside the ReflectorRTT to prevent:
+			// glDrawElements: Source and destination textures of the draw are the same.
+			groundMirror.add( mirrorMesh );
+			groundMirror.rotateX( - Math.PI / 2 );
+			scene.add( groundMirror );
 
 			sphereGroup = new THREE.Object3D();
 			scene.add( sphereGroup );
 
-			var geometry = new THREE.CylinderGeometry( 0.1, 15 * Math.cos( Math.PI / 180 * 30 ), 0.1, 24, 1 );
+			var geometry = new THREE.CylinderBufferGeometry( 0.1, 15 * Math.cos( Math.PI / 180 * 30 ), 0.1, 24, 1 );
 			var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x444444 } );
 			var sphereCap = new THREE.Mesh( geometry, material );
 			sphereCap.position.y = - 15 * Math.sin( Math.PI / 180 * 30 ) - 0.05;
 			sphereCap.rotateX( - Math.PI );
 
-			var geometry = new THREE.SphereGeometry( 15, 24, 24, Math.PI / 2, Math.PI * 2, 0, Math.PI / 180 * 120 );
+			var geometry = new THREE.SphereBufferGeometry( 15, 24, 24, Math.PI / 2, Math.PI * 2, 0, Math.PI / 180 * 120 );
 			var halfSphere = new THREE.Mesh( geometry, material );
 			halfSphere.add( sphereCap );
 			halfSphere.rotateX( - Math.PI / 180 * 135 );
@@ -246,7 +251,7 @@
 
 			sphereGroup.add( halfSphere );
 
-			var geometry = new THREE.IcosahedronGeometry( 5, 0 );
+			var geometry = new THREE.IcosahedronBufferGeometry( 5, 0 );
 			var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, flatShading: true } );
 			smallSphere = new THREE.Mesh( geometry, material );
 			scene.add( smallSphere );
@@ -322,7 +327,7 @@
 			smallSphere.rotation.y = ( Math.PI / 2 ) - timer * 0.1;
 			smallSphere.rotation.z = timer * 0.8;
 
-			groundMirrorMaterial.updateFrame( delta );
+			frame.update( delta ).updateNode( groundMirrorMaterial );
 
 			render();
 

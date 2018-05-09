@@ -36,7 +36,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1000;
 
 				controls = new THREE.TrackballControls( camera );
@@ -55,17 +55,17 @@
 
 				var light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
+				light.angle = Math.PI / 9;
+
 				light.castShadow = true;
-
-				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 200, 10000 ) );
-				light.shadow.bias = - 0.00022;
-
-				light.shadow.mapSize.width = 2048;
-				light.shadow.mapSize.height = 2048;
+				light.shadow.camera.near = 1000;
+				light.shadow.camera.far = 4000;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
 
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 40, 40, 40 );
+				var geometry = new THREE.BoxBufferGeometry( 40, 40, 40 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 

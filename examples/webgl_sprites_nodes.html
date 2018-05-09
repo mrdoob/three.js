@@ -51,6 +51,7 @@
 		<script src="js/nodes/AttributeNode.js"></script>
 		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeFrame.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
 		<!-- Accessors -->
@@ -106,6 +107,7 @@
 		var container = document.getElementById( 'container' );
 
 		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+		var frame = new THREE.NodeFrame();
 		var plane, sprite1, sprite2, sprite3;
 		var walkingManTexture, walkingManTextureURL;
 		var library = {};
@@ -213,7 +215,7 @@
 			// horizontal zigzag sprite
 			sprite2.material.transform = new THREE.OperatorNode(
 				new THREE.OperatorNode(
-					new THREE.Math1Node( new THREE.TimerNode( 0, 3 ), THREE.Math1Node.SIN ), // 3 is speed (time scale)
+					new THREE.Math1Node( new THREE.TimerNode( 3 ), THREE.Math1Node.SIN ), // 3 is speed (time scale)
 					new THREE.Vector2Node( .3, 0 ), // horizontal scale (position)
 					THREE.OperatorNode.MUL
 				),
@@ -299,9 +301,10 @@
 			var delta = clock.getDelta();
 
 			// update material animation and/or gpu calcs (pre-renderer)
-			sprite1.material.updateFrame( delta );
-			sprite2.material.updateFrame( delta );
-			sprite3.material.updateFrame( delta );
+			frame.update( delta )
+				.updateNode( sprite1.material )
+				.updateNode( sprite2.material )
+				.updateNode( sprite3.material );
 
 			// rotate sprite
 			sprite3.rotation.z -= Math.PI * .005;

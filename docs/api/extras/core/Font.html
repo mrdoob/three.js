@@ -10,50 +10,50 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 		Create a set of [page:Shape Shapes] representing a font loaded in JSON format.<br /><br />
 
 		This is used internally by the [page:FontLoader].
-		</div>
+		</p>
 
 		<h2>Examples</h2>
 
-		<div>
+		<p>
 		[example:webgl_geometry_text_shapes geometry / text / shapes ]<br/>
 		[example:webgl_shaders_vector vector / text ]<br/>
-		</div>
+		</p>
 
 		<h2>Constructor</h2>
 
 		<h3>[name]( data )</h3>
-		<div>
+		<p>
 		data -- JSON data representing the font.<br /><br />
 
 		This constructor creates a new [name], which is an array of [page:Shape Shapes].
-		</div>
+		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:array data]</h3>
-		<div>The JSON data passed in the constructor.</div>
+		<p>The JSON data passed in the constructor.</p>
 
 		<h3>[property:Boolean isFont]</h3>
-		<div>
+		<p>
 			Used to check whether this or derived classes are fonts. Default is *true*.<br /><br />
 
 			You should not change this, as it used internally by the renderer for optimisation.
-		</div>
+		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:null generateShapes]( [page:String text], [page:Float size], [page:Integer divisions] )</h3>
-		<div>
+		<h3>[method:null generateShapes]( [param:String text], [param:Float size], [param:Integer divisions] )</h3>
+		<p>
 			[page:String text] -- string of text.<br />
 			[page:Float size] -- (optional) scale for the [page:Shape Shapes]. Default is *100*.<br />
 			[page:Integer divisions] -- (optional) fineness of the [page:Shape Shapes]. Default is *4*.<br />
 
 			Creates an array of [page:Shape Shapes] representing the text in the font.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

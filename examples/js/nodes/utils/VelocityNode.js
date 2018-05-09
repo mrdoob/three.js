@@ -19,6 +19,12 @@ THREE.VelocityNode.prototype = Object.create( THREE.Vector3Node.prototype );
 THREE.VelocityNode.prototype.constructor = THREE.VelocityNode;
 THREE.VelocityNode.prototype.nodeType = "Velocity";
 
+THREE.VelocityNode.prototype.isReadonly = function ( builder ) {
+
+	return false;
+
+};
+
 THREE.VelocityNode.prototype.setParams = function ( params ) {
 
 	switch ( this.params.type ) {
@@ -75,7 +81,7 @@ THREE.VelocityNode.prototype.setTarget = function ( target ) {
 
 };
 
-THREE.VelocityNode.prototype.updateFrameVelocity = function ( delta ) {
+THREE.VelocityNode.prototype.updateFrameVelocity = function ( frame ) {
 
 	if ( this.target ) {
 
@@ -87,16 +93,16 @@ THREE.VelocityNode.prototype.updateFrameVelocity = function ( delta ) {
 
 };
 
-THREE.VelocityNode.prototype.updateFrame = function ( delta ) {
+THREE.VelocityNode.prototype.updateFrame = function ( frame ) {
 
-	this.updateFrameVelocity( delta );
+	this.updateFrameVelocity( frame );
 
 	switch ( this.params.type ) {
 
 		case "elastic":
 
 			// convert to real scale: 0 at 1 values
-			var deltaFps = delta * ( this.params.fps || 60 );
+			var deltaFps = frame.delta * ( this.params.fps || 60 );
 
 			var spring = Math.pow( this.params.spring, deltaFps ),
 				damping = Math.pow( this.params.damping, deltaFps );
