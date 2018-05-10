@@ -949,12 +949,11 @@
 			// highlight box
 
 			highlightBox = new THREE.Mesh(
-				new THREE.BoxGeometry( 1, 1, 1 ),
+				new THREE.BoxBufferGeometry( 1, 1, 1 ),
 				new THREE.MeshLambertMaterial( {
 					emissive: 0xffff00,
 					transparent: true,
-					opacity: 0.5,
-					side: THREE.FrontSide
+					opacity: 0.5
 				} )
 			);
 
