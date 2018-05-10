@@ -692,8 +692,29 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( state !== STATE.TOUCH ) return; // is this needed?
 		if ( touchState & TOUCH_STATES.PAN === 0 ) return; // is this needed?
 
-		var x = ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX + event.touches[ 2 ].pageX ) / 3;
-		var y = ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY + event.touches[ 2 ].pageY ) / 3;
+		var x, y;
+
+		switch ( scope.touchMode ) {
+
+			case THREE.TOUCH_MODES.CLASSIC:
+
+				x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
+				y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+
+				break;
+
+			case THREE.TOUCH_MODES.LEGACY:
+
+				x = ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX + event.touches[ 2 ].pageX ) / 3;
+				y = ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY + event.touches[ 2 ].pageY ) / 3;
+
+				break;
+
+			default:
+
+				throw new Error( 'OrbitControls: Unexpected touchMode' );
+
+		}
 
 		panEnd.set( x, y );
 
