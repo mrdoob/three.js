@@ -21438,11 +21438,16 @@
 
 		};
 
-		this.submitFrame = function () {
+		// DEPRECATED
 
-			// if ( device && device.isPresenting ) device.submitFrame();
+		this.getStandingMatrix = function () {
+
+			console.warn( 'THREE.WebXRManager: getStandingMatrix() is no longer needed.' );
+			return new THREE.Matrix4();
 
 		};
+
+		this.submitFrame = function () {};
 
 	}
 
