@@ -161,6 +161,7 @@
 						objLoader2.setModelName( modelName );
 						objLoader2.setMaterials( materials );
 						objLoader2.setLogging( true, false );
+						objLoader2.setUseOAsMesh( true );
 						objLoader2.load( './verify.obj', callbackOnLoad, null, null, null, false );
 					};
 					objLoader2.loadMtl( './verify.mtl', null, onLoadMtl );
