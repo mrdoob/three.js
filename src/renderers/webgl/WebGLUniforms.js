@@ -536,10 +536,17 @@ function setValueM4a( gl, v ) {
 
 function setValueT1a( gl, v, renderer ) {
 
-	var n = v.length,
-		units = allocTexUnits( renderer, n );
+	var cache = this.cache;
+	var n = v.length;
 
-	gl.uniform1iv( this.addr, units );
+	var units = allocTexUnits( renderer, n );
+
+	if ( arraysEqual( cache, units ) === false ) {
+
+		gl.uniform1iv( this.addr, units );
+		copyArray( cache, units );
+
+	}
 
 	for ( var i = 0; i !== n; ++ i ) {
 
@@ -551,10 +558,17 @@ function setValueT1a( gl, v, renderer ) {
 
 function setValueT6a( gl, v, renderer ) {
 
-	var n = v.length,
-		units = allocTexUnits( renderer, n );
+	var cache = this.cache;
+	var n = v.length;
 
-	gl.uniform1iv( this.addr, units );
+	var units = allocTexUnits( renderer, n );
+
+	if ( arraysEqual( cache, units ) === false ) {
+
+		gl.uniform1iv( this.addr, units );
+		copyArray( cache, units );
+
+	}
 
 	for ( var i = 0; i !== n; ++ i ) {
 
