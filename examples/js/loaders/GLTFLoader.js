@@ -26,7 +26,7 @@ THREE.GLTFLoader = ( function () {
 			var scope = this;
 
 			var path = this.resourcePath !== undefined
-				? this.resourcePpath
+				? this.resourcePath
 				: THREE.LoaderUtils.extractUrlBase( url );
 
 			var loader = new THREE.FileLoader( scope.manager );
