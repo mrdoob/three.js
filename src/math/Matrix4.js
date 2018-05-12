@@ -288,6 +288,7 @@ Object.assign( Matrix4.prototype, {
 			return this.compose( zero, q, one );
 
 		};
+
 	}(),
 
 	lookAt: function () {
@@ -732,24 +733,24 @@ Object.assign( Matrix4.prototype, {
 		var te = this.elements;
 
 		var x = quaternion._x, y = quaternion._y, z = quaternion._z, w = quaternion._w;
-		var x2 = x + x,	 y2 = y + y,  z2 = z + z;
+		var x2 = x + x,	y2 = y + y, z2 = z + z;
 		var xx = x * x2, xy = x * y2, xz = x * z2;
 		var yy = y * y2, yz = y * z2, zz = z * z2;
 		var wx = w * x2, wy = w * y2, wz = w * z2;
 
 		var sx = scale.x, sy = scale.y, sz = scale.z;
 
-		te[ 0 ] = (1 - ( yy + zz )) * sx;
-		te[ 4 ] = (xy - wz) * sy;
-		te[ 8 ] = (xz + wy) * sz;
+		te[ 0 ] = ( 1 - ( yy + zz ) ) * sx;
+		te[ 4 ] = ( xy - wz ) * sy;
+		te[ 8 ] = ( xz + wy ) * sz;
 
-		te[ 1 ] = (xy + wz) * sx;
-		te[ 5 ] = (1 - ( xx + zz )) * sy;
-		te[ 9 ] = (yz - wx) * sz;
+		te[ 1 ] = ( xy + wz ) * sx;
+		te[ 5 ] = ( 1 - ( xx + zz ) ) * sy;
+		te[ 9 ] = ( yz - wx ) * sz;
 
-		te[ 2 ] = (xz - wy) * sx;
-		te[ 6 ] = (yz + wx) * sy;
-		te[ 10 ] = (1 - ( xx + yy )) * sz;
+		te[ 2 ] = ( xz - wy ) * sx;
+		te[ 6 ] = ( yz + wx ) * sy;
+		te[ 10 ] = ( 1 - ( xx + yy ) ) * sz;
 
 		// last column
 		te[ 3 ] = 0;
@@ -763,6 +764,7 @@ Object.assign( Matrix4.prototype, {
 		te[ 15 ] = 1;
 
 		return this;
+
 	},
 
 	decompose: function () {
