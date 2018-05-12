@@ -42,7 +42,7 @@
 			var controller;
 
 			var room;
-			
+
 			var radius = 0.08;
 			var normal = new THREE.Vector3();
 			var relativeVelocity = new THREE.Vector3();
@@ -183,7 +183,7 @@
 					cube.position.copy( controller.position ).sub( room.position );
 					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
 					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
-					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.1 );
+					cube.userData.velocity.z = ( Math.random() * 0.02 - 0.1 );
 					cube.userData.velocity.applyQuaternion( controller.quaternion );
 					room.add( cube );
 
@@ -222,15 +222,15 @@
 						cube.userData.velocity.z = - cube.userData.velocity.z;
 
 					}
-					
+
 					for ( var j = i + 1; j < room.children.length; j ++ ) {
-						
+
 						var cube2 = room.children[ j ];
-						
+
 						normal.copy( cube.position ).sub( cube2.position );
-						
+
 						if ( normal.length() < 2 * radius ) {
-							
+
 							normal.multiplyScalar( 0.5 * normal.length() - radius );
 							cube.position.sub( normal );
 							cube2.position.add( normal );
@@ -246,7 +246,7 @@
 							cube2.userData.velocity.add( normal );
 
 						}
-						
+
 					}
 
 					cube.userData.velocity.y -= 0.00098;
