@@ -214,7 +214,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var vertexShader = shader.vertexShader;
 	var fragmentShader = shader.fragmentShader;
-	var materialIncludes = material.shaderIncludes;
 
 	var shadowMapTypeDefine = 'SHADOWMAP_TYPE_BASIC';
 

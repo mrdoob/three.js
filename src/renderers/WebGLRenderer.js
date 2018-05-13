@@ -1507,15 +1507,26 @@ function WebGLRenderer( parameters ) {
 				// if the uniform is provided with { value , type } inject this GLSL automatically
 				// (no need to write `uniform float uFoo;` and include manually in a snippet)
 				// which may be a poor idea because they would get injected into both vert and frag
-				var shaderUniformsGLSL = ''; //collect the GLSL in here
+				var shaderUniformsGLSLFrag = ''; //collect the GLSL in here
+				var shaderUniformsGLSLVert = ''; //collect the GLSL in here
 
 				for ( var uniformName in material.shaderUniforms ) {
 
-					var type = material.shaderUniforms[ uniformName ].type;
+					var uniform = material.shaderUniforms[ uniformName ];
+					var type = uniform.type;
+					var stage = uniform.stage;
 
 					if ( type ) {
 
-						shaderUniformsGLSL += 'uniform ' + type + ' ' + uniformName + ';\n';
+						if ( stage === 'vertex' ) {
+
+							shaderUniformsGLSLVert += 'uniform ' + type + ' ' + uniformName + ';\n';
+
+						} else {
+
+							shaderUniformsGLSLFrag += 'uniform ' + type + ' ' + uniformName + ';\n';
+
+						}
 
 					}
 
@@ -1526,8 +1537,8 @@ function WebGLRenderer( parameters ) {
 				materialProperties.shader = {
 					name: material.type,
 					uniforms: combinedUniforms,
-					vertexShader: shaderUniformsGLSL + shader.vertexShader,
-					fragmentShader: shaderUniformsGLSL + shader.fragmentShader //maybe not use the same
+					vertexShader: shaderUniformsGLSLVert + shader.vertexShader,
+					fragmentShader: shaderUniformsGLSLFrag + shader.fragmentShader //maybe not use the same
 
 				};
 
