@@ -323,6 +323,8 @@ function WebGLState( gl, extensions, utils ) {
 
 	var currentProgram = null;
 
+	var currentMaterial = null;
+
 	var currentBlending = null;
 	var currentBlendEquation = null;
 	var currentBlendSrc = null;
@@ -348,13 +350,13 @@ function WebGLState( gl, extensions, utils ) {
 
 	if ( glVersion.indexOf( 'WebGL' ) !== - 1 ) {
 
-	   version = parseFloat( /^WebGL\ ([0-9])/.exec( glVersion )[ 1 ] );
-	   lineWidthAvailable = ( version >= 1.0 );
+		version = parseFloat( /^WebGL\ ([0-9])/.exec( glVersion )[ 1 ] );
+		lineWidthAvailable = ( version >= 1.0 );
 
 	} else if ( glVersion.indexOf( 'OpenGL ES' ) !== - 1 ) {
 
-	   version = parseFloat( /^OpenGL\ ES\ ([0-9])/.exec( glVersion )[ 1 ] );
-	   lineWidthAvailable = ( version >= 2.0 );
+		version = parseFloat( /^OpenGL\ ES\ ([0-9])/.exec( glVersion )[ 1 ] );
+		lineWidthAvailable = ( version >= 2.0 );
 
 	}
 
@@ -401,6 +403,7 @@ function WebGLState( gl, extensions, utils ) {
 	enable( gl.CULL_FACE );
 
 	enable( gl.BLEND );
+	currentMaterial = null;
 	setBlending( NormalBlending );
 
 	//
@@ -417,23 +420,7 @@ function WebGLState( gl, extensions, utils ) {
 
 	function enableAttribute( attribute ) {
 
-		newAttributes[ attribute ] = 1;
-
-		if ( enabledAttributes[ attribute ] === 0 ) {
-
-			gl.enableVertexAttribArray( attribute );
-			enabledAttributes[ attribute ] = 1;
-
-		}
-
-		if ( attributeDivisors[ attribute ] !== 0 ) {
-
-			var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-			extension.vertexAttribDivisorANGLE( attribute, 0 );
-			attributeDivisors[ attribute ] = 0;
-
-		}
+		enableAttributeAndDivisor( attribute, 0 );
 
 	}
 
@@ -551,6 +538,20 @@ function WebGLState( gl, extensions, utils ) {
 
 		}
 
+		var blendEquationCacheHit = false;
+
+		// Blending caching to remove unecessary WebGL calls
+		if ( currentMaterial != null ) {
+
+			if ( currentMaterial.lastBlendingSet == blending &&
+				currentMaterial.lastPremultipliedAlphaSet == premultipliedAlpha ) {
+
+					blendEquationCacheHit = true;
+
+				}
+
+		}
+
 		if ( blending !== CustomBlending ) {
 
 			if ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) {
@@ -561,12 +562,22 @@ function WebGLState( gl, extensions, utils ) {
 
 						if ( premultipliedAlpha ) {
 
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+							if ( ! blendEquationCacheHit ) {
+
+									gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+
+							}
+
 							gl.blendFuncSeparate( gl.ONE, gl.ONE, gl.ONE, gl.ONE );
 
 						} else {
 
-							gl.blendEquation( gl.FUNC_ADD );
+							if ( ! blendEquationCacheHit ) {
+
+								gl.blendEquation( gl.FUNC_ADD );
+
+							}
+
 							gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
 
 						}
@@ -576,12 +587,22 @@ function WebGLState( gl, extensions, utils ) {
 
 						if ( premultipliedAlpha ) {
 
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+							if ( ! blendEquationCacheHit ) {
+
+									gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+
+							}
+
 							gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
 
 						} else {
 
-							gl.blendEquation( gl.FUNC_ADD );
+							if ( ! blendEquationCacheHit ) {
+
+								gl.blendEquation( gl.FUNC_ADD );
+
+							}
+
 							gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
 
 						}
@@ -591,12 +612,22 @@ function WebGLState( gl, extensions, utils ) {
 
 						if ( premultipliedAlpha ) {
 
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+							if ( ! blendEquationCacheHit ) {
+
+									gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+
+							}
+
 							gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
 
 						} else {
 
-							gl.blendEquation( gl.FUNC_ADD );
+							if ( ! blendEquationCacheHit ) {
+
+								gl.blendEquation( gl.FUNC_ADD );
+
+							}
+
 							gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
 
 						}
@@ -606,15 +637,33 @@ function WebGLState( gl, extensions, utils ) {
 
 						if ( premultipliedAlpha ) {
 
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+							if ( ! blendEquationCacheHit ) {
+
+									gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+
+							}
+
 							gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
 
 						} else {
 
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+							if ( ! blendEquationCacheHit ) {
+
+									gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+
+							}
+
 							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
 
 						}
+
+				}
+
+				// Caching the blending and premultipliedAlpha values inside the material
+				if ( currentMaterial != null ) {
+
+					currentMaterial.lastBlendingSet = blending;
+					currentMaterial.lastPremultipliedAlphaSet = premultipliedAlpha;
 
 				}
 
@@ -670,7 +719,7 @@ function WebGLState( gl, extensions, utils ) {
 		if ( frontFaceCW ) flipSided = ! flipSided;
 
 		setFlipSided( flipSided );
-
+		currentMaterial = material;
 		material.transparent === true
 			? setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )
 			: setBlending( NoBlending );
