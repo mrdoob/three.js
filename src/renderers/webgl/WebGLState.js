@@ -546,9 +546,9 @@ function WebGLState( gl, extensions, utils ) {
 			if ( currentMaterial.lastBlendingSet == blending &&
 				currentMaterial.lastPremultipliedAlphaSet == premultipliedAlpha ) {
 
-					blendEquationCacheHit = true;
+								blendEquationCacheHit = true;
 
-				}
+									}
 
 		}
 
@@ -564,7 +564,7 @@ function WebGLState( gl, extensions, utils ) {
 
 							if ( ! blendEquationCacheHit ) {
 
-									gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+															gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 
 							}
 
@@ -589,7 +589,7 @@ function WebGLState( gl, extensions, utils ) {
 
 							if ( ! blendEquationCacheHit ) {
 
-									gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+															gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 
 							}
 
@@ -614,7 +614,7 @@ function WebGLState( gl, extensions, utils ) {
 
 							if ( ! blendEquationCacheHit ) {
 
-									gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+															gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 
 							}
 
@@ -639,7 +639,7 @@ function WebGLState( gl, extensions, utils ) {
 
 							if ( ! blendEquationCacheHit ) {
 
-									gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+															gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 
 							}
 
@@ -649,7 +649,7 @@ function WebGLState( gl, extensions, utils ) {
 
 							if ( ! blendEquationCacheHit ) {
 
-									gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+															gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 
 							}
 
