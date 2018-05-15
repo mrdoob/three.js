@@ -10,18 +10,18 @@
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
 
 THREE.TOUCH_MODES = {
-    //    Orbit - left mouse / touch: one-finger move
-    //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-    //    Pan - right mouse, or arrow keys / touch: two-finger move
-    CLASSIC: 1,
-    //    Orbit - left mouse / touch: one-finger move
-    //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-    //    Pan - right mouse, or arrow keys / touch: three-finger move
-    LEGACY: 2,
-    //    Orbit - left mouse / touch: two-finger rotate
-    //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-    //    Pan - right mouse, or arrow keys / touch: one-finger move
-    MAP: 3,
+	//    Orbit - left mouse / touch: one-finger move
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - right mouse, or arrow keys / touch: two-finger move
+	CLASSIC: 1,
+	//    Orbit - left mouse / touch: one-finger move
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - right mouse, or arrow keys / touch: three-finger move
+	LEGACY: 2,
+	//    Orbit - left mouse / touch: two-finger rotate
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - right mouse, or arrow keys / touch: one-finger move
+	MAP: 3,
 };
 
 THREE.OrbitControls = function ( object, domElement ) {
