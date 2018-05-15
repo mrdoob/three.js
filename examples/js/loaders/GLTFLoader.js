@@ -2841,20 +2841,34 @@ THREE.GLTFLoader = ( function () {
 
 						if ( PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.weights ) {
 
-							// node should be THREE.Group here but
+							// node can be THREE.Group here but
 							// PATH_PROPERTIES.weights(morphTargetInfluences) should be
-							// the property of a mesh object under node.
-							// So finding targets here.
+							// the property of a mesh object under group.
 
-							node.traverse( function ( object ) {
+							var children = node.isGroup ? node.children : [ node ];
 
-								if ( object.isMesh === true && object.material.morphTargets === true ) {
+							for ( var j = 0, jl = children.length; j < jl; j ++ ) {
 
-									targetNames.push( object.name ? object.name : object.uuid );
+								if ( children[ j ].isMesh === true ) {
+
+									var materials = Array.isArray( children[ j ].material )
+										? children[ j ].material
+										: [ children[ j ].material ];
+
+									for ( var k = 0, kl = materials.length; k < kl; k ++ ) {
+
+										if ( materials[ k ].morphTargets === true ) {
+
+											targetNames.push( children[ j ].name ? children[ j ].name : children[ j ].uuid );
+											break;
+
+										}
+
+									}
 
 								}
 
-							} );
+							};
 
 						} else {
 
