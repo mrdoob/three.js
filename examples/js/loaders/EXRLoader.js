@@ -753,7 +753,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		var whiteX = parseFloat32( dataView, offset );
 		var whiteY = parseFloat32( dataView, offset );
 
-		return { redX: redX, redY: redY, greenX, greenY, blueX, blueY, whiteX, whiteY };
+		return { redX: redX, redY: redY, greenX: greenX, greenY: greenY, blueX: blueX, blueY: blueY, whiteX: whiteX, whiteY: whiteY };
 
 	}
 
