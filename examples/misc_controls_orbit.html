@@ -39,12 +39,13 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, controls, scene, renderer;
+			var camera, controls, scene, renderer, panel;
 
 			init();
 			//render(); // remove when using next line for animation loop (requestAnimationFrame)
@@ -76,7 +77,7 @@
 				controls.screenSpacePanning = false;
 
 				controls.minDistance = 100;
-				controls.maxDistance = 500
+				controls.maxDistance = 500;
 
 				controls.maxPolarAngle = Math.PI / 2;
 
@@ -109,6 +110,25 @@
 
 				var light = new THREE.AmbientLight( 0x222222 );
 				scene.add( light );
+
+                panel = new dat.GUI();
+
+                var settings = {
+                    'Touch mode': controls.touchMode,
+                    onChange: function(touchMode) {
+                        controls.touchMode = parseInt(touchMode);
+                    }
+                };
+
+                panel.add(
+                    settings,
+					'Touch mode',
+					{
+					    "classic": THREE.TOUCH_MODES.CLASSIC,
+						"legacy": THREE.TOUCH_MODES.LEGACY,
+						"map": THREE.TOUCH_MODES.MAP
+					}
+				).onChange(settings.onChange);
 
 				//
 

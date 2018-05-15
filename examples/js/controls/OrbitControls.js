@@ -87,7 +87,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Mouse buttons
 	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
-	this.touchMode = THREE.TOUCH_MODES.LEGACY;
+	this.touchMode = THREE.TOUCH_MODES.CLASSIC;
 
 	// for reset
 	this.target0 = this.target.clone();
@@ -484,10 +484,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-		// rotating across whole screen goes 360 degrees around
-		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth );
+		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
 
-		// rotating up and down along whole screen attempts to go 360, but limited to 180
 		rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
 
 		rotateStart.copy( rotateEnd );
@@ -598,8 +596,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		switch ( scope.touchMode ) {
 
-			case TOUCH_MODES.CLASSIC:
-			case TOUCH_MODES.LEGACY:
+			case THREE.TOUCH_MODES.CLASSIC:
+			case THREE.TOUCH_MODES.LEGACY:
 
 				x = event.touches[ 0 ].pageX;
 				y = event.touches[ 0 ].pageY;
@@ -608,7 +606,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				break;
 
-			case TOUCH_MODES.MAP:
+			case THREE.TOUCH_MODES.MAP:
 
 				// First finger
 				x = event.touches[ 0 ].pageX;
@@ -697,8 +695,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		switch ( scope.touchMode ) {
 
-			case TOUCH_MODES.CLASSIC:
-			case TOUCH_MODES.LEGACY:
+			case THREE.TOUCH_MODES.CLASSIC:
+			case THREE.TOUCH_MODES.LEGACY:
 
 				rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
@@ -706,17 +704,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-				// rotating across whole screen goes 360 degrees around
-				rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth );
+				rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
 
-				// rotating up and down along whole screen attempts to go 360, but limited to 180
 				rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
 
 				rotateStart.copy( rotateEnd );
 
 				break;
 
-			case TOUCH_MODES.MAP:
+			case THREE.TOUCH_MODES.MAP:
 
 				// First finger
 				var x = event.touches[ 0 ].pageX;
@@ -749,9 +745,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 				var epsilonAngle = 1 / 2; // ~= sin(PI / 6)
 				if (
 					Math.abs( Math.sin( angleStartFingers ) ) < epsilonAngle
-          && Math.abs( Math.sin( angleEndFingers ) ) < epsilonAngle
-          && Math.abs( Math.cos( angleMoveFinger1 ) ) < epsilonAngle // angleStartFingers is between 0-2PI
-          && Math.abs( Math.cos( angleMoveFinger2 ) ) < epsilonAngle // angleStartFingers is between 0-2PI
+					&& Math.abs( Math.sin( angleEndFingers ) ) < epsilonAngle
+					&& Math.abs( Math.cos( angleMoveFinger1 ) ) < epsilonAngle
+					&& Math.abs( Math.cos( angleMoveFinger2 ) ) < epsilonAngle
 				) {
 
 					rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
