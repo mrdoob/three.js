@@ -24,23 +24,60 @@ var WEBVR = {
 
 			button.onclick = function () {
 
-				if ( 'xr' in navigator ) {
+				device.isPresenting ? device.exitPresent() : device.requestPresent( [ { source: renderer.domElement } ] );
 
-					device.requestSession( { exclusive: true } ).then( function ( session ) {
+			};
 
-						renderer.vr.setSession( session );
+			renderer.vr.setDevice( device );
 
-						session.addEventListener( 'end', function ( event ) {
+		}
 
-							renderer.vr.setSession( null );
+		function showEnterXR( device ) {
 
-						} );
+			var currentSession = null;
 
-					} );
+			function onSessionStarted( session ) {
+
+				session.addEventListener( 'end', onSessionEnded );
+
+				renderer.vr.setSession( session );
+				button.textContent = 'EXIT XR';
+
+				currentSession = session;
+
+			}
+
+			function onSessionEnded( event ) {
+
+				renderer.vr.setSession( null );
+				button.textContent = 'ENTER XR';
+
+				currentSession = null;
+
+			}
+
+			//
+
+			button.style.display = '';
+
+			button.style.cursor = 'pointer';
+			button.style.left = 'calc(50% - 50px)';
+			button.style.width = '100px';
+
+			button.textContent = 'ENTER XR';
+
+			button.onmouseenter = function () { button.style.opacity = '1.0'; };
+			button.onmouseleave = function () { button.style.opacity = '0.5'; };
+
+			button.onclick = function () {
+
+				if ( currentSession === null ) {
+
+					device.requestSession( { exclusive: true } ).then( onSessionStarted );
 
 				} else {
 
-					device.isPresenting ? device.exitPresent() : device.requestPresent( [ { source: renderer.domElement } ] );
+					currentSession.end();
 
 				}
 
@@ -101,8 +138,7 @@ var WEBVR = {
 
 				device.supportsSession( { exclusive: true } ).then( function () {
 
-					showEnterVR( device );
-					button.textContent = 'ENTER XR'; // TODO
+					showEnterXR( device );
 
 				} ).catch( showVRNotFound );
 
