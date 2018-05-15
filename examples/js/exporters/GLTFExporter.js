@@ -103,6 +103,7 @@ THREE.GLTFExporter.prototype = {
 		var extensionsUsed = {};
 		var cachedData = {
 
+			attributes: new Map(),
 			materials: new Map(),
 			textures: new Map()
 
@@ -199,6 +200,78 @@ THREE.GLTFExporter.prototype = {
 		function isPowerOfTwo( image ) {
 
 			return THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height );
+
+		}
+
+		/**
+		 * Checks if normal attribute values are normalized.
+		 *
+		 * @param {THREE.BufferAttribute} normal
+		 * @returns {Boolean}
+		 *
+		 */
+		function isNormalizedNormalAttribute( normal ) {
+
+			if ( cachedData.attributes.has( normal ) ) {
+
+				return false;
+
+			}
+
+			var v = new THREE.Vector3();
+
+			for ( var i = 0, il = normal.count; i < il; i ++ ) {
+
+				// 0.0005 is from glTF-validator
+				if ( Math.abs( v.fromArray( normal.array, i * 3 ).length() - 1.0 ) > 0.0005 ) return false;
+
+			}
+
+			return true;
+
+		}
+
+		/**
+		 * Creates normalized normal buffer attribute.
+		 *
+		 * @param {THREE.BufferAttribute} normal
+		 * @returns {THREE.BufferAttribute}
+		 *
+		 */
+		function createNormalizedNormalAttribute( normal ) {
+
+			if ( cachedData.attributes.has( normal ) ) {
+
+				return cachedData.textures.get( normal );
+
+			}
+
+			var attribute = normal.clone();
+
+			var v = new THREE.Vector3();
+
+			for ( var i = 0, il = attribute.count; i < il; i ++ ) {
+
+				v.fromArray( attribute.array, i * 3 );
+
+				if ( v.x === 0 && v.y === 0 && v.z === 0 ) {
+
+					// if values can't be normalized set (1, 0, 0)
+					v.setX( 1.0 );
+
+				} else {
+
+					v.normalize();
+
+				}
+
+				v.toArray( attribute.array, i * 3 );
+
+			}
+
+			cachedData.attributes.set( normal, attribute );
+
+			return attribute;
 
 		}
 
@@ -944,6 +1017,16 @@ THREE.GLTFExporter.prototype = {
 
 			};
 
+			var originalNormal = geometry.getAttribute( 'normal' );
+
+			if ( originalNormal !== undefined && ! isNormalizedNormalAttribute( originalNormal ) ) {
+
+				console.warn( 'THREE.GLTFExporter: Creating normalized normal attribute from the non-normalized one.' );
+
+				geometry.addAttribute( 'normal', createNormalizedNormalAttribute( originalNormal ) );
+
+			}
+
 			// @QUESTION Detect if .vertexColors = THREE.VertexColors?
 			// For every attribute create an accessor
 			for ( var attributeName in geometry.attributes ) {
@@ -974,6 +1057,8 @@ THREE.GLTFExporter.prototype = {
 				}
 
 			}
+
+			if ( originalNormal !== undefined ) geometry.addAttribute( 'normal', originalNormal );
 
 			// Skip if no exportable attributes found
 			if ( Object.keys( attributes ).length === 0 ) {

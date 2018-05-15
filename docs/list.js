@@ -337,6 +337,12 @@ var list = {
 
 	"Examples": {
 
+		"Animations": {
+			"CCDIKSolver": "examples/animations/CCDIKSolver",
+			"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
+			"MMDPhysics": "examples/animations/MMDPhysics"
+		},
+
 		"Controls": {
 			"OrbitControls": "examples/controls/OrbitControls"
 		},
@@ -350,6 +356,7 @@ var list = {
 		"Loaders": {
 			"BabylonLoader": "examples/loaders/BabylonLoader",
 			"GLTFLoader": "examples/loaders/GLTFLoader",
+			"MMDLoader": "examples/loaders/MMDLoader",
 			"MTLLoader": "examples/loaders/MTLLoader",
 			"OBJLoader": "examples/loaders/OBJLoader",
 			"OBJLoader2": "examples/loaders/OBJLoader2",

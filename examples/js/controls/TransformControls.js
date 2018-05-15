@@ -21,7 +21,7 @@
 		this.oldColor = this.color.clone();
 		this.oldOpacity = this.opacity;
 
-		this.highlight = function( highlighted ) {
+		this.highlight = function ( highlighted ) {
 
 			if ( highlighted ) {
 
@@ -58,7 +58,7 @@
 		this.oldColor = this.color.clone();
 		this.oldOpacity = this.opacity;
 
-		this.highlight = function( highlighted ) {
+		this.highlight = function ( highlighted ) {
 
 			if ( highlighted ) {
 
@@ -103,9 +103,9 @@
 			var planeMaterial = new THREE.MeshBasicMaterial( { visible: false, side: THREE.DoubleSide } );
 
 			var planes = {
-				"XY":   new THREE.Mesh( planeGeometry, planeMaterial ),
-				"YZ":   new THREE.Mesh( planeGeometry, planeMaterial ),
-				"XZ":   new THREE.Mesh( planeGeometry, planeMaterial ),
+				"XY": new THREE.Mesh( planeGeometry, planeMaterial ),
+				"YZ": new THREE.Mesh( planeGeometry, planeMaterial ),
+				"XZ": new THREE.Mesh( planeGeometry, planeMaterial ),
 				"XYZE": new THREE.Mesh( planeGeometry, planeMaterial )
 			};
 
@@ -124,7 +124,7 @@
 
 			//// HANDLES AND PICKERS
 
-			var setupGizmos = function( gizmoMap, parent ) {
+			var setupGizmos = function ( gizmoMap, parent ) {
 
 				for ( var name in gizmoMap ) {
 
@@ -176,7 +176,7 @@
 
 		this.highlight = function ( axis ) {
 
-			this.traverse( function( child ) {
+			this.traverse( function ( child ) {
 
 				if ( child.material && child.material.highlight ) {
 
@@ -207,7 +207,7 @@
 		var vec2 = new THREE.Vector3( 0, 1, 0 );
 		var lookAtMatrix = new THREE.Matrix4();
 
-		this.traverse( function( child ) {
+		this.traverse( function ( child ) {
 
 			if ( child.name.search( "E" ) !== - 1 ) {
 
@@ -227,21 +227,17 @@
 
 		THREE.TransformGizmo.call( this );
 
-		var arrowGeometry = new THREE.Geometry();
-		var mesh = new THREE.Mesh( new THREE.CylinderGeometry( 0, 0.05, 0.2, 12, 1, false ) );
-		mesh.position.y = 0.5;
-		mesh.updateMatrix();
-
-		arrowGeometry.merge( mesh.geometry, mesh.matrix );
+		var arrowGeometry = new THREE.ConeBufferGeometry( 0.05, 0.2, 12, 1, false );
+		arrowGeometry.translate( 0, 0.5, 0 );
 
 		var lineXGeometry = new THREE.BufferGeometry();
-		lineXGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  1, 0, 0 ], 3 ) );
+		lineXGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0 ], 3 ) );
 
 		var lineYGeometry = new THREE.BufferGeometry();
-		lineYGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  0, 1, 0 ], 3 ) );
+		lineYGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
 		var lineZGeometry = new THREE.BufferGeometry();
-		lineZGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  0, 0, 1 ], 3 ) );
+		lineZGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
 
 		this.handleGizmos = {
 
@@ -422,10 +418,12 @@
 			],
 
 			XYZE: [
-				[ new THREE.Mesh() ]// TODO
+				[ new THREE.Mesh( new THREE.TorusBufferGeometry( 1, 0.12, 2, 24 ), pickerMaterial ) ]
 			]
 
 		};
+
+		this.pickerGizmos.XYZE[ 0 ][ 0 ].visible = false; // disable XYZE picker gizmo
 
 		this.setActivePlane = function ( axis ) {
 
@@ -503,12 +501,8 @@
 
 		THREE.TransformGizmo.call( this );
 
-		var arrowGeometry = new THREE.Geometry();
-		var mesh = new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ) );
-		mesh.position.y = 0.5;
-		mesh.updateMatrix();
-
-		arrowGeometry.merge( mesh.geometry, mesh.matrix );
+		var arrowGeometry = new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 );
+		arrowGeometry.translate( 0, 0.5, 0 );
 
 		var lineXGeometry = new THREE.BufferGeometry();
 		lineXGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,  1, 0, 0 ], 3 ) );
@@ -671,12 +665,12 @@
 		var oldScale = new THREE.Vector3();
 		var oldRotationMatrix = new THREE.Matrix4();
 
-		var parentRotationMatrix  = new THREE.Matrix4();
+		var parentRotationMatrix = new THREE.Matrix4();
 		var parentScale = new THREE.Vector3();
 
 		var worldPosition = new THREE.Vector3();
 		var worldRotation = new THREE.Euler();
-		var worldRotationMatrix  = new THREE.Matrix4();
+		var worldRotationMatrix = new THREE.Matrix4();
 		var camPosition = new THREE.Vector3();
 		var camRotation = new THREE.Euler();
 

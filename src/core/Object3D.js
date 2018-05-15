@@ -661,6 +661,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		object.matrix = this.matrix.toArray();
 
+		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
+
 		//
 
 		function serialize( library, element ) {

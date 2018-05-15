@@ -10,26 +10,26 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			Handles and keeps track of loaded and pending data. A default global instance of this class
 			is created and used by loaders if not supplied manually - see [page:DefaultLoadingManager].<br /><br />
 
 			In general that should be sufficient, however there are times when it can be useful to have seperate loaders -
 			for example if you want to show seperate loading bars for objects and textures.
 
-		</div>
+		</p>
 
 
 		<h2>Example</h2>
 
-		<div>
+		<p>
 			[example:webgl_loader_babylon WebGL / loader / babylon]<br />
 			[example:webgl_loader_fbx WebGL / loader / fbx]<br />
 			[example:webgl_loader_obj WebGL / loader / obj]<br />
 			[example:webgl_materials_reflectivity WebGL / materials / reflectivity]<br />
 			[example:webgl_postprocessing_outline WebGL / postprocesing / outline]<br />
 			[example:webgl_terrain_dynamic WebGL / terrain / dynamic]
-		</div>
+		</p>
 
 		<p>
 			This example shows how to use LoadingManager to track the progress of
@@ -110,19 +110,19 @@
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
-		<div>
+		<p>
 		[page:Function onLoad] — (optional) this function will be called when all loaders are done.<br />
 		[page:Function onProgress] — (optional) this function will be called when an item is complete.<br />
 		[page:Function onError] — (optional) this function will be called a loader encounters errors. <br />
 
 		Creates a new [name].
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
 
 		<h3>[property:Function onStart]</h3>
-		<div>
+		<p>
 			This function will be called when loading starts.
 			The arguments are:<br />
 			[page:String url] — The url of the item just loaded.<br />
@@ -130,16 +130,16 @@
 			[page:Iteger itemsTotal] — the total amount of items to be loaded.<br /><br />
 
 			By default this is undefined.
-		</div>
+		</p>
 
 		<h3>[property:Function onLoad]</h3>
-		<div>
+		<p>
 			This function will be called when all loading is completed. By default this is undefined,
 			unless passed in the constructor.
-		</div>
+		</p>
 
 		<h3>[property:Function onProgress]</h3>
-		<div>
+		<p>
 		This function will be called when an item is complete.
 		The arguments are:<br />
 		[page:String url] — The url of the item just loaded.<br />
@@ -147,64 +147,64 @@
 		[page:Iteger itemsTotal] — the total amount of items to be loaded.<br /><br />
 
 		By default this is undefined, unless passed in the constructor.
-		</div>
+		</p>
 
 		<h3>[property:Function onError]</h3>
-		<div>
+		<p>
 			This function will be called when any item errors, with the argument:<br />
 			[page:String url] — The url of the item that errored.<br /><br />
 
 			By default this is undefined, unless passed in the constructor.
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
 
 		<h3>[method:null setURLModifier]( [param:Function callback] )</h3>
-		<div>
+		<p>
 		[page:Function callback] — URL modifier callback. Called with [page:String url] argument, and
 		must return [page:String resolvedURL].<br /><br />
 
 		If provided, the callback will be passed each resource URL before a request is sent. The
 		callback may return the original URL, or a new URL to override loading behavior. This
 		behavior can be used to load assets from .ZIP files, drag-and-drop APIs, and Data URIs.
-		</div>
+		</p>
 
 		<h3>[method:String resolveURL]( [param:String url] )</h3>
-		<div>
+		<p>
 		[page:String url] — the url to load<br /><br />
 
 		Given a URL, uses the URL modifier callback (if any) and returns a resolved URL. If no
 		URL modifier is set, returns the original URL.
-		</div>
+		</p>
 
 		<br /><br />
-		<div>
+		<p>
 			<em>Note: The following methods are designed to be called internally by loaders. You shouldn't call
 			them directly.</em>
-		</div>
+		</p>
 
 		<h3>[method:null itemStart]( [param:String url] )</h3>
-		<div>
+		<p>
 		[page:String url] — the url to load<br /><br />
 
 		This should be called by any loader using the manager when the loader starts loading an url.
-		</div>
+		</p>
 
 		<h3>[method:null itemEnd]( [param:String url] )</h3>
-		<div>
+		<p>
 		[page:String url] — the loaded url<br /><br />
 
 		This should be called by any loader using the manager when the loader ended loading an url.
-		</div>
+		</p>
 
 
 		<h3>[method:null itemError]( [param:String url] )</h3>
-		<div>
+		<p>
 		[page:String url] — the loaded url<br /><br />
 
 		This should be called by any loader using the manager when the loader errors loading an url.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

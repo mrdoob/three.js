@@ -144,16 +144,26 @@
 
 				//
 
-				var geometry = new THREE.IcosahedronGeometry( 20, 1 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 20, 1 );
+				var count = geometry.attributes.position.count;
 
-				for ( var i = 0, j = geometry.faces.length; i < j; i ++ ) {
+				var colors = [];
+				var color = new THREE.Color();
 
-					geometry.faces[ i ].color.setHex( Math.random() * 0xffffff );
+				for ( var i = 0; i < count; i += 3 ) {
+
+					color.setHex( Math.random() * 0xffffff );
+
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
 
 				}
 
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
 				var material = new THREE.MeshStandardMaterial( {
-					vertexColors: THREE.FaceColors,
+					vertexColors: THREE.VertexColors,
 					roughness: 0.0,
 					flatShading: true,
 					envMap: cubeCamera.renderTarget.texture,

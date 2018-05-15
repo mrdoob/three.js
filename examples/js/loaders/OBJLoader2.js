@@ -17,7 +17,7 @@ if ( THREE.LoaderSupport === undefined ) console.error( '"THREE.LoaderSupport" i
  */
 THREE.OBJLoader2 = (function () {
 
-	var OBJLOADER2_VERSION = '2.4.0';
+	var OBJLOADER2_VERSION = '2.4.1';
 	var Validator = THREE.LoaderSupport.Validator;
 
 	function OBJLoader2( manager ) {
@@ -35,6 +35,7 @@ THREE.OBJLoader2 = (function () {
 		this.useIndices = false;
 		this.disregardNormals = false;
 		this.materialPerSmoothingGroup = false;
+		this.useOAsMesh = false;
 		this.loaderRootNode = new THREE.Group();
 
 		this.meshBuilder = new THREE.LoaderSupport.MeshBuilder();
@@ -124,6 +125,16 @@ THREE.OBJLoader2 = (function () {
 	 */
 	OBJLoader2.prototype.setMaterialPerSmoothingGroup = function ( materialPerSmoothingGroup ) {
 		this.materialPerSmoothingGroup = materialPerSmoothingGroup === true;
+	};
+
+	/**
+	 * Usually 'o' is meta-information and does not result in creation of new meshes, but mesh creation on occurrence of "o" can be enforced.
+	 * @memberOf THREE.OBJLoader2
+	 *
+	 * @param {boolean} useOAsMesh=false
+	 */
+	OBJLoader2.prototype.setUseOAsMesh = function ( useOAsMesh ) {
+		this.useOAsMesh = useOAsMesh === true;
 	};
 
 	OBJLoader2.prototype._setCallbacks = function ( callbacks ) {
@@ -297,6 +308,7 @@ THREE.OBJLoader2 = (function () {
 			this.setUseIndices( prepData.useIndices );
 			this.setDisregardNormals( prepData.disregardNormals );
 			this.setMaterialPerSmoothingGroup( prepData.materialPerSmoothingGroup );
+			this.setUseOAsMesh( prepData.useOAsMesh );
 
 			this._setCallbacks( prepData.getCallbacks() );
 
@@ -323,6 +335,7 @@ THREE.OBJLoader2 = (function () {
 		var parser = new Parser();
 		parser.setLogging( this.logging.enabled, this.logging.debug );
 		parser.setMaterialPerSmoothingGroup( this.materialPerSmoothingGroup );
+		parser.setUseOAsMesh( this.useOAsMesh );
 		parser.setUseIndices( this.useIndices );
 		parser.setDisregardNormals( this.disregardNormals );
 		// sync code works directly on the material references
@@ -434,6 +447,7 @@ THREE.OBJLoader2 = (function () {
 				params: {
 					useAsync: true,
 					materialPerSmoothingGroup: this.materialPerSmoothingGroup,
+					useOAsMesh: this.useOAsMesh,
 					useIndices: this.useIndices,
 					disregardNormals: this.disregardNormals
 				},
@@ -469,6 +483,7 @@ THREE.OBJLoader2 = (function () {
 			this.materials = {};
 			this.useAsync = false;
 			this.materialPerSmoothingGroup = false;
+			this.useOAsMesh = false;
 			this.useIndices = false;
 			this.disregardNormals = false;
 
@@ -541,6 +556,10 @@ THREE.OBJLoader2 = (function () {
 			this.materialPerSmoothingGroup = materialPerSmoothingGroup;
 		};
 
+		Parser.prototype.setUseOAsMesh = function ( useOAsMesh ) {
+			this.useOAsMesh = useOAsMesh;
+		};
+
 		Parser.prototype.setUseIndices = function ( useIndices ) {
 			this.useIndices = useIndices;
 		};
@@ -579,6 +598,7 @@ THREE.OBJLoader2 = (function () {
 					+ matNames
 					+ '\n\tuseAsync: ' + this.useAsync
 					+ '\n\tmaterialPerSmoothingGroup: ' + this.materialPerSmoothingGroup
+					+ '\n\tuseOAsMesh: ' + this.useOAsMesh
 					+ '\n\tuseIndices: ' + this.useIndices
 					+ '\n\tdisregardNormals: ' + this.disregardNormals
 					+ '\n\tcallbackMeshBuilderName: ' + this.callbackMeshBuilder.name
@@ -826,7 +846,8 @@ THREE.OBJLoader2 = (function () {
 					break;
 
 				case 'o':
-					// 'o' is pure meta-information and does not result in creation of new meshes
+					// 'o' is meta-information and usually does not result in creation of new meshes, but can be enforced with "useOAsMesh"
+					if ( this.useOAsMesh ) this.processCompletedMesh();
 					this.rawMesh.objectName = reconstructString( this.contentRef, this.legacyMode, this.globalCounts.lineByte + 2, this.globalCounts.currentByte );
 					break;
 
@@ -926,7 +947,7 @@ THREE.OBJLoader2 = (function () {
 				vertices.push( scope.vertices[ indexPointerV++ ] );
 				vertices.push( scope.vertices[ indexPointerV ] );
 
-				var indexPointerC = scope.colors.length > 0 ? indexPointerV : null;
+				var indexPointerC = scope.colors.length > 0 ? indexPointerV + 1 : null;
 				if ( indexPointerC !== null ) {
 
 					var colors = scope.rawMesh.subGroupInUse.colors;
@@ -1356,19 +1377,31 @@ THREE.OBJLoader2 = (function () {
 			mtlLoader.setPath( resource.path );
 			if ( Validator.isValid( materialOptions ) ) mtlLoader.setMaterialOptions( materialOptions );
 
+			var parseTextWithMtlLoader = function ( content ) {
+				var contentAsText = content;
+				if ( typeof( content ) !== 'string' && ! ( content instanceof String ) ) {
+
+					if ( content.length > 0 || content.byteLength > 0 ) {
+
+						contentAsText = THREE.LoaderUtils.decodeText( content );
+
+					} else {
+
+						throw 'Unable to parse mtl as it it seems to be neither a String, an Array or an ArrayBuffer!';
+					}
+
+				}
+				processMaterials( mtlLoader.parse( contentAsText ) );
+			};
+
 			if ( Validator.isValid( resource.content ) ) {
 
-				processMaterials( Validator.isValid( resource.content ) ? mtlLoader.parse( resource.content ) : null );
+				parseTextWithMtlLoader( resource.content );
 
 			} else if ( Validator.isValid( resource.url ) ) {
 
 				var fileLoader = new THREE.FileLoader( this.manager );
-				fileLoader.load( resource.url, function ( text ) {
-
-					resource.content = text;
-					processMaterials( mtlLoader.parse( text ) );
-
-				}, this._onProgress, this._onError );
+				fileLoader.load( resource.url, parseTextWithMtlLoader, this._onProgress, this._onError );
 
 			}
 		}

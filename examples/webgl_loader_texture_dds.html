@@ -55,7 +55,7 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 
 				/*
 				This is how compressed textures are supposed to be used:
@@ -118,7 +118,7 @@
 				var material8 = new THREE.MeshBasicMaterial( { map: map6 } );
 
 
-				var mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 50, 32, 16 ), material1 );
+				var mesh = new THREE.Mesh( new THREE.TorusBufferGeometry( 100, 50, 32, 16 ), material1 );
 				mesh.position.x = -600;
 				mesh.position.y = -200;
 				scene.add( mesh );

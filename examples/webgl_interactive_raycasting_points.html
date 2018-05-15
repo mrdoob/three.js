@@ -247,7 +247,7 @@
 
 				//
 
-				var sphereGeometry = new THREE.SphereGeometry( 0.1, 32, 32 );
+				var sphereGeometry = new THREE.SphereBufferGeometry( 0.1, 32, 32 );
 				var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
 				for ( var i = 0; i < 40; i++ ) {
@@ -260,7 +260,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
