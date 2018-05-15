@@ -290,6 +290,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var rotateStart2 = new THREE.Vector2();
 	var rotateEnd2 = new THREE.Vector2();
 	var rotateDelta = new THREE.Vector2();
+	var rotateDelta2 = new THREE.Vector2();
 
 	var panStart = new THREE.Vector2();
 	var panEnd = new THREE.Vector2();
@@ -730,9 +731,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 				var angleStartFingers = rotateDelta.subVectors( rotateStart2, rotateStart ).angle();
 				var angleEndFingers = rotateDelta.subVectors( rotateEnd2, rotateEnd ).angle();
 
+				rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
+				rotateDelta2.subVectors( rotateEnd2, rotateStart2 ).multiplyScalar( scope.rotateSpeed );
+
 				// Angle between start and end position for each finger
-				var angleMoveFinger1 = rotateDelta.subVectors( rotateEnd, rotateStart ).angle();
-				var angleMoveFinger2 = rotateDelta.subVectors( rotateEnd2, rotateStart2 ).angle();
+				var angleMoveFinger1 = rotateDelta.angle();
+				var angleMoveFinger2 = rotateDelta2.angle();
 
 				// We want to rotate up only if the two fingers move vertically without zooming or rotateLeft
 				// This end up by:
@@ -740,17 +744,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 				//  - angleEndFingers nearly colinear to x axis ==> fingers are aligned horizontally at end
 				//  - angleMoveFinger1 nearly colinear to y axis ==> finger1 is moved vertically (ensure distance between finger is constant)
 				//  - angleMoveFinger2 nearly colinear to y axis ==> finger2 is moved vertically (ensure distance between finger is constant)
-
+				//  - Vector rotateStart --> rotateEnd and rotateStart2 --> rotateEnd2 are in the same way (prevent moving one finger vertically up while the other goes down)
 
 				var epsilonAngle = 1 / 2; // ~= sin(PI / 6)
 				if (
-					Math.abs( Math.sin( angleStartFingers ) ) < epsilonAngle
+					rotateDelta.dot( rotateDelta2 ) > 0
+					&& Math.abs( Math.sin( angleStartFingers ) ) < epsilonAngle
 					&& Math.abs( Math.sin( angleEndFingers ) ) < epsilonAngle
 					&& Math.abs( Math.cos( angleMoveFinger1 ) ) < epsilonAngle
 					&& Math.abs( Math.cos( angleMoveFinger2 ) ) < epsilonAngle
 				) {
 
-					rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
 
 					var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
