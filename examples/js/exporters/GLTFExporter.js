@@ -105,7 +105,8 @@ THREE.GLTFExporter.prototype = {
 
 			attributes: new Map(),
 			materials: new Map(),
-			textures: new Map()
+			textures: new Map(),
+			images: new Map()
 
 		};
 
@@ -603,7 +604,11 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processImage( map ) {
 
-			// @TODO Cache
+			if ( cachedData.images.has( map.image ) ) {
+
+				return cachedData.images.get( map.image );
+
+			}
 
 			if ( ! outputJSON.images ) {
 
@@ -673,8 +678,10 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.images.push( gltfImage );
 
-			return outputJSON.images.length - 1;
+			var index = outputJSON.images.length - 1;
+			cachedData.images.set( map.image, index );
 
+			return index;
 		}
 
 		/**
