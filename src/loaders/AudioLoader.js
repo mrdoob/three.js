@@ -50,19 +50,20 @@ Object.assign( AudioLoader.prototype, {
 		} ).then( function ( arrayBuffer ) {
 
 			var context = AudioContext.getContext();
-			return context.decodeAudioData( arrayBuffer );
 
-		} ).then( function ( audioBuffer ) {
+			context.decodeAudioData( arrayBuffer, function ( audioBuffer ) {
 
-			Cache.add( url, audioBuffer );
+				Cache.add( url, audioBuffer );
 
-			if ( onLoad ) onLoad( audioBuffer );
+				if ( onLoad ) onLoad( audioBuffer );
 
-			scope.manager.itemEnd( url );
+				scope.manager.itemEnd( url );
 
-		} ).catch( function ( e ) {
+			} );
 
-			if ( onError ) onError( e );
+		} ).catch( function ( error ) {
+
+			if ( onError ) onError( error );
 
 			scope.manager.itemEnd( url );
 			scope.manager.itemError( url );
