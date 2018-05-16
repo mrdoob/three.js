@@ -1499,11 +1499,47 @@ function WebGLRenderer( parameters ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
 
+				// 1. if any extra uniforms are provided, merge them with the others
+				var combinedUniforms = undefined !== material.shaderUniforms ?
+					UniformsUtils.merge( [ UniformsUtils.clone( shader.uniforms ), material.shaderUniforms ] ) :
+					UniformsUtils.clone( shader.uniforms );
+
+				// if the uniform is provided with { value , type } inject this GLSL automatically
+				// (no need to write `uniform float uFoo;` and include manually in a snippet)
+				// which may be a poor idea because they would get injected into both vert and frag
+				var shaderUniformsGLSLFrag = ''; //collect the GLSL in here
+				var shaderUniformsGLSLVert = ''; //collect the GLSL in here
+
+				for ( var uniformName in material.shaderUniforms ) {
+
+					var uniform = material.shaderUniforms[ uniformName ];
+					var type = uniform.type;
+					var stage = uniform.stage;
+
+					if ( type ) {
+
+						if ( stage === 'vertex' ) {
+
+							shaderUniformsGLSLVert += 'uniform ' + type + ' ' + uniformName + ';\n';
+
+						} else {
+
+							shaderUniformsGLSLFrag += 'uniform ' + type + ' ' + uniformName + ';\n';
+
+						}
+
+					}
+
+				}
+
+				//inject these here, maybe this is a bad idea
+				//because they end up in both vert and frag
 				materialProperties.shader = {
 					name: material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
-					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader
+					uniforms: combinedUniforms,
+					vertexShader: shaderUniformsGLSLVert + shader.vertexShader,
+					fragmentShader: shaderUniformsGLSLFrag + shader.fragmentShader //maybe not use the same
+
 				};
 
 			} else {
@@ -1822,8 +1858,16 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			// refresh uniforms common to several materials
+			//2. follow the same pattern with common uniforms -
+			//   refreshUniformsCommon looks at some known uniforms and refreshes them
+			//   refreshUniformsCustom should look at unknown uniforms but in a known place
+			if ( undefined !== material.shaderUniforms ) {
 
+				refreshUniformsCustom( m_uniforms, material );
+
+			}
+
+			// refresh uniforms common to several materials
 			if ( fog && material.fog ) {
 
 				refreshUniformsFog( m_uniforms, fog );
@@ -2061,6 +2105,17 @@ function WebGLRenderer( parameters ) {
 			}
 
 			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
+
+		}
+
+	}
+
+	//2. same pattern as refreshUniformsFoobar
+	function refreshUniformsCustom( uniforms, material ) {
+
+		for ( var uniform in material.shaderUniforms ) {
+
+			uniforms[ uniform ].value = material.shaderUniforms[ uniform ].value;
 
 		}
 

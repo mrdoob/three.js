@@ -57,6 +57,7 @@
 		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
+			/*eslint-disable*/
 			var orbitControls;
 			var container, camera, scene, renderer, loader;
 			var gltf, envMap, mixer, gui, extensionControls;
@@ -379,7 +380,14 @@
 
 					}
 
+
 					scene.add( object );
+
+					var myClone = object.clone()
+					// myClone.rotation.x = Math.PI/2;
+					myClone.position.x = .02;
+					scene.add(myClone)
+
 					onWindowResize();
 
 				}, undefined, function ( error ) {
