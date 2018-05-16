@@ -150,12 +150,11 @@ Use WEBGL Depth buffer support?
 					geometry.computeVertexNormals();
 
 					var material = new THREE.MeshPhongMaterial( {
-						color: 0xffffff,
-						specular:0xffffff,
+						specular: 0xffffff,
 						envMap: textureCube,
-						combine: THREE.MultiplyOperation,
 						shininess: 50,
-						reflectivity: 1.0
+						reflectivity: 1.0,
+						flatShading: true
 					});
 
 					var monkeys = 20;
@@ -163,14 +162,14 @@ Use WEBGL Depth buffer support?
 					for ( var i = 0; i < monkeys; i ++ ) {
 
 						var mesh = new THREE.Mesh( geometry, material );
-						mesh.scale.multiplyScalar(30);
 
 						mesh.position.z = Math.cos( i / monkeys * Math.PI * 2 ) * 200;
 						mesh.position.y = Math.sin( i / monkeys * Math.PI * 3 ) * 20;
 						mesh.position.x = Math.sin( i / monkeys * Math.PI * 2 ) * 200;
 
-						mesh.rotation.y = - Math.PI / 2;
-						mesh.rotation.z = - i / monkeys * Math.PI * 2;
+						mesh.rotation.y = i / monkeys * Math.PI * 2;
+
+						mesh.scale.setScalar( 30 );
 
 						scene.add( mesh );
 
