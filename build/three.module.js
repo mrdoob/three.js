@@ -37935,7 +37935,7 @@ ImageBitmapLoader.prototype = {
 
 	},
 
-	load: function load( url, onLoad, onProgress, onError ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
 
