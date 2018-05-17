@@ -65,7 +65,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	if ( func.length < 3 ) {
 
-		console.error( 'Parametric geometries now require modification of a third THREE.Vector3 argument.' );
+		console.error( 'THREE.ParametricGeometry: Function must now modify a Vector3 as third parameter.' );
 
 	}
 
