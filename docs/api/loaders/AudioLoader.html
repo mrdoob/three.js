@@ -12,8 +12,8 @@
 
 		<p class="desc">
 			Class for loading an
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer AudioBuffer].
-			This uses the [page:FileLoader] internally for loading files.
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer AudioBuffer]. <br/>
+			Unlike [page:FileLoader], [name] does not avoid multiple concurrent requests to the same URL.
 		</p>
 
 		<h2>Example</h2>
@@ -48,10 +48,8 @@
 				oceanAmbientSound.play();
 			},
 
-			// onProgress callback
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
+			// onProgress callback currently not supported
+			undefined,
 
 			// onError callback
 			function ( err ) {
@@ -90,6 +88,12 @@
 		</p>
 		<p>
 		Begin loading from url and pass the loaded [page:String AudioBuffer] to onLoad.
+		</p>
+
+		<h3>[method:AudioLoader setPath]( [param:String path] )</h3>
+		<p>
+			Sets the base path or URL from which to load files. This can be useful if
+			you are loading many images from the same directory.
 		</p>
 
 		<h2>Source</h2>
