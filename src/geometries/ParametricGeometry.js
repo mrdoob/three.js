@@ -63,6 +63,12 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	var i, j;
 
+	if ( func.length < 3 ) {
+
+		console.error( 'Parametric geometries now require modification of a third THREE.Vector3 argument.' );
+
+	}
+
 	// generate vertices, normals and uvs
 
 	var sliceCount = slices + 1;
