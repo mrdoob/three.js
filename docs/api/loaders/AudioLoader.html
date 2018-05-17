@@ -48,10 +48,8 @@
 				oceanAmbientSound.play();
 			},
 
-			// onProgress callback
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
+			// onProgress callback currently not supported
+			undefined,
 
 			// onError callback
 			function ( err ) {
