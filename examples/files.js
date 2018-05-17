@@ -230,6 +230,7 @@ var files = {
 		"webgl_postprocessing_godrays",
 		"webgl_postprocessing_rgb_halftone",
 		"webgl_postprocessing_masking",
+		"webgl_postprocessing_mosaic",
 		"webgl_postprocessing_ssaa",
 		"webgl_postprocessing_ssaa_unbiased",
 		"webgl_postprocessing_nodes",
