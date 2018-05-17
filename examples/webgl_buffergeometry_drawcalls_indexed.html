@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - buffergeometry - lines drawcalls indexed</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #cccccc;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+				color: #0080ff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry drawcalls indexed - by <a href="https://twitter.com/P5Aholic_en">P5Aholic</a>
+		</div>
+
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var group;
+			var container, stats;
+			var camera, scene, renderer;
+			var particlesData = [];
+			var pointCloud, linesMesh;
+			var positions, colors, indices;
+
+			var maxParticleCount = 2000;
+			var particleCount = 500;
+			var r = 800;
+			var rHalf = r / 2;
+
+			var effectController = {
+				showDots: true,
+				showLines: true,
+				minDistance: 150,
+				limitConnections: false,
+				maxConnections: 20,
+				particleCount: 500
+			};
+
+			init();
+			animate();
+
+			function initGUI() {
+
+				var gui = new dat.GUI();
+
+				gui.add( effectController, "showDots" ).onChange( function( value ) { pointCloud.visible = value; } );
+				gui.add( effectController, "showLines" ).onChange( function( value ) { linesMesh.visible = value; } );
+				gui.add( effectController, "minDistance", 10, 300 );
+				gui.add( effectController, "limitConnections" );
+				gui.add( effectController, "maxConnections", 0, 30, 1 );
+				gui.add( effectController, "particleCount", 0, maxParticleCount, 1 ).onChange( function( value ) {
+
+					particleCount = parseInt( value );
+					pointCloud.geometry.setDrawRange( 0, particleCount );
+
+				});
+
+			}
+
+			function init() {
+
+				initGUI();
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
+				camera.position.z = 1750;
+
+				var controls = new THREE.OrbitControls( camera, container );
+
+				scene = new THREE.Scene();
+
+				group = new THREE.Group();
+				scene.add( group );
+
+				var helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxGeometry( r, r, r ) ) );
+				helper.material.color.setHex( 0x080808 );
+				helper.material.blending = THREE.AdditiveBlending;
+				helper.material.transparent = true;
+				group.add( helper );
+
+
+				// create position attribute (for both pointCloud and lineMesh)
+				positions = new THREE.Float32BufferAttribute( maxParticleCount * 3, 3 ).setDynamic( true );
+				
+				for ( var i = 0; i < maxParticleCount; i++ ) {
+					
+					var x = Math.random() * r - r / 2;
+					var y = Math.random() * r - r / 2;
+					var z = Math.random() * r - r / 2;
+
+					// setXYZ() is usefull to set values. See documentation https://threejs.org/docs/#api/core/BufferAttribute
+					positions.setXYZ( i, x, y, z );
+					
+					particlesData.push( {
+						velocity: new THREE.Vector3( -1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2 ),
+						numConnections: 0
+					} );
+					
+				}
+
+				// create color attribute (only for lineMesh)
+				colors = new THREE.Float32BufferAttribute( maxParticleCount * 3, 3 );
+
+				// create index attribute (only for lineMesh)
+				var numIndices = maxParticleCount * ( maxParticleCount - 1 );
+				indices = new THREE.Uint32BufferAttribute( numIndices, 1 ).setDynamic( true );
+				
+				// create particles
+				var particleGeometry = new THREE.BufferGeometry();
+				particleGeometry.addAttribute( 'position', positions );
+				particleGeometry.setDrawRange( 0, particleCount );
+				
+				var particleMaterial = new THREE.PointsMaterial( {
+					color: 0xFFFFFF,
+					size: 3,
+					blending: THREE.AdditiveBlending,
+					transparent: true,
+					sizeAttenuation: false
+				});
+				
+				pointCloud = new THREE.Points( particleGeometry, particleMaterial );
+				group.add( pointCloud );
+				
+				// create lines
+				var lineGeometry = new THREE.BufferGeometry();
+				lineGeometry.addAttribute( 'position', positions );
+				lineGeometry.addAttribute( 'color', colors );
+				lineGeometry.setIndex( indices );
+				lineGeometry.computeBoundingSphere();
+				lineGeometry.setDrawRange( 0, 0 );
+
+				var lineMaterial = new THREE.LineBasicMaterial( {
+					vertexColors: THREE.VertexColors,
+					blending: THREE.AdditiveBlending,
+					transparent: true
+				} );
+
+				linesMesh = new THREE.LineSegments( lineGeometry, lineMaterial );
+				group.add( linesMesh );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+				
+				// update particle position
+				for ( var i = 0; i < particleCount; i++ ) {
+
+					var pData = particlesData[ i ];
+					pData.numConnections = 0;
+
+					positions.array[ i * 3     ] += pData.velocity.x;
+					positions.array[ i * 3 + 1 ] += pData.velocity.y;
+					positions.array[ i * 3 + 2 ] += pData.velocity.z;
+
+					if ( positions.getX( i ) < -rHalf || positions.getX( i ) > rHalf )
+						pData.velocity.x = -pData.velocity.x;
+
+					if ( positions.getY( i ) < -rHalf || positions.getY( i ) > rHalf )
+						pData.velocity.y = -pData.velocity.y;
+
+					if ( positions.getZ( i ) < -rHalf || positions.getZ( i ) > rHalf )
+						pData.velocity.z = -pData.velocity.z;
+					
+				}
+
+				/*
+				for example, imagine there are 5 points and we want connect all points each other
+				
+				point[0] to point[1]
+				point[0] to point[2]
+				point[0] to point[3]
+				point[0] to point[4]
+				
+				point[1] to point[2] // we don't need to connect point[1] and point[0]
+				point[1] to point[3]
+				point[1] to point[4]
+				
+				point[2] to point[3] // we don't need to connect point[2] and point[0], point[1]
+				point[2] to point[4]
+				
+				point[3] to point[4] // we don't need to connect point[3] and point[0], point[1], point[2]
+
+				// we don't need to connect point[4] and all other points
+				*/
+				
+				var indicesCount = 0;
+
+				// check connection
+				for ( var i = 0; i < particleCount - 1; i++ ) {
+
+					var pDataA = particlesData[ i ];
+					if ( effectController.limitConnections && pDataA.numConnections >= effectController.maxConnections )
+						continue;
+
+					for ( var j = i + 1; j < particleCount; j++ ) {
+
+						var pDataB = particlesData[ j ];
+						if ( effectController.limitConnections && pDataB.numConnections >= effectController.maxConnections )
+							continue;
+
+						// calculate distance between 2 points
+						var dx = positions.array[ i * 3     ] - positions.array[ j * 3     ];
+						var dy = positions.array[ i * 3 + 1 ] - positions.array[ j * 3 + 1 ];
+						var dz = positions.array[ i * 3 + 2 ] - positions.array[ j * 3 + 2 ];
+						var dist = Math.sqrt( dx * dx + dy * dy + dz * dz );
+
+						if ( dist < effectController.minDistance ) {
+
+							pDataA.numConnections++;
+							pDataB.numConnections++;
+
+							indices.array[ indicesCount++ ] = i;
+							indices.array[ indicesCount++ ] = j;
+
+							var alpha = 1.0 - ( dist / effectController.minDistance );
+							colors.setXYZ( i, alpha, alpha, alpha );
+							colors.setXYZ( j, alpha, alpha, alpha );
+						}
+					}
+				}
+
+				pointCloud.geometry.attributes.position.needsUpdate = true;
+
+				linesMesh.geometry.setDrawRange( 0, indicesCount - 1 );
+				linesMesh.geometry.attributes.position.needsUpdate = true;
+				linesMesh.geometry.attributes.color.needsUpdate = true;
+				linesMesh.geometry.index.needsUpdate = true;
+
+				requestAnimationFrame( animate );
+
+				stats.update();
+				render();
+
+			}
+
+			function render() {
+
+				var time = Date.now() * 0.001;
+
+				group.rotation.y = time * 0.1;
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
