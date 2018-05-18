@@ -26,9 +26,7 @@ THREE.BokehShader = {
 
 		"maxblur":  { value: 1.0 },
 
-		"showFocus":   { value: 0 },
 		"manualdof":   { value: 0 },
-		"vignetting":   { value: 0 },
 		"depthblur":   { value: 0 },
 
 		"threshold":  { value: 0.5 },
@@ -77,7 +75,6 @@ THREE.BokehShader = {
 		"uniform float focalDepth;  //focal distance value in meters, but you may use autofocus option below",
 		"uniform float focalLength; //focal length in mm",
 		"uniform float fstop; //f-stop value",
-		"uniform bool showFocus; //show debug focus point and focal range (red = focal point, green = focal range)",
 
 		"/*",
 		"make sure that these two values are the same for your camera, otherwise distances will be wrong.",
@@ -101,12 +98,6 @@ THREE.BokehShader = {
 		"float fdofdist = 3.0; // far dof blur falloff distance",
 
 		"float CoC = 0.03; //circle of confusion size in mm (35mm film = 0.03mm)",
-
-		"uniform bool vignetting; // use optical lens vignetting",
-
-		"float vignout = 1.3; // vignetting outer border",
-		"float vignin = 0.0; // vignetting inner border",
-		"float vignfade = 22.0; // f-stops till vignete fades",
 
 		"uniform bool shaderFocus;",
 		"// disable if you use external focalDepth value",
@@ -147,6 +138,14 @@ THREE.BokehShader = {
 		"	return unpackRGBAToDepth( texture2D( tDepth, screenPosition ) );",
 		"	#else",
 		"	return texture2D( tDepth, screenPosition ).x;",
+		"	#endif",
+		"}",
+
+		"float getViewZ( const in float depth ) {",
+		"	#if PERSPECTIVE_CAMERA == 1",
+		"	return perspectiveDepthToViewZ( depth, znear, zfar );",
+		"	#else",
+		"	return orthographicDepthToViewZ( depth, znear, zfar );",
 		"	#endif",
 		"}",
 
@@ -235,28 +234,6 @@ THREE.BokehShader = {
 			"return col+mix(vec3(0.0),col,thresh*blur);",
 		"}",
 
-		"vec3 debugFocus(vec3 col, float blur, float depth) {",
-			"float edge = 0.002*depth; //distance based edge smoothing",
-			"float m = clamp(smoothstep(0.0,edge,blur),0.0,1.0);",
-			"float e = clamp(smoothstep(1.0-edge,1.0,blur),0.0,1.0);",
-
-			"col = mix(col,vec3(1.0,0.5,0.0),(1.0-m)*0.6);",
-			"col = mix(col,vec3(0.0,0.5,1.0),((1.0-e)-(1.0-m))*0.2);",
-
-			"return col;",
-		"}",
-
-		"float linearize(float depth) {",
-			"return -zfar * znear / (depth * (zfar - znear) - zfar);",
-		"}",
-
-
-		"float vignette() {",
-			"float dist = distance(vUv.xy, vec2(0.5,0.5));",
-			"dist = smoothstep(vignout+(fstop/vignfade), vignin+(fstop/vignfade), dist);",
-			"return clamp(dist,0.0,1.0);",
-		"}",
-
 		"float gather(float i, float j, int ringsamples, inout vec3 col, float w, float h, float blur) {",
 			"float rings2 = float(rings);",
 			"float step = PI*2.0 / float(ringsamples);",
@@ -273,20 +250,20 @@ THREE.BokehShader = {
 		"void main() {",
 			"//scene depth calculation",
 
-			"float depth = linearize( getDepth( vUv.xy ) );",
+			"float depth = getViewZ( getDepth( vUv.xy ) );",
 
 			"// Blur depth?",
 			"if (depthblur) {",
-				"depth = linearize(bdepth(vUv.xy));",
+				"depth = getViewZ(bdepth(vUv.xy));",
 			"}",
 
 			"//focal plane calculation",
 
-			"float fDepth = focalDepth;",
+			"float fDepth = - focalDepth;", // viewZ is negative
 
 			"if (shaderFocus) {",
 
-				"fDepth = linearize( getDepth( focusCoords ) );",
+				"//fDepth = getViewZ( getDepth( focusCoords ) );",
 
 			"}",
 
@@ -295,18 +272,18 @@ THREE.BokehShader = {
 			"float blur = 0.0;",
 
 			"if (manualdof) {",
-				"float a = depth-fDepth; // Focal plane",
+				"float a = fDepth + depth; // Focal plane",
 				"float b = (a-fdofstart)/fdofdist; // Far DoF",
 				"float c = (-a-ndofstart)/ndofdist; // Near Dof",
 				"blur = (a>0.0) ? b : c;",
 			"} else {",
-				"float f = focalLength; // focal length in mm",
-				"float d = fDepth*1000.0; // focal plane in mm",
-				"float o = depth*1000.0; // depth in mm",
+				"float f = focalLength;",
+				"float d = fDepth;",
+				"float o = depth;",
 
-				"float a = (o*f)/(o-f);",
-				"float b = (d*f)/(d-f);",
-				"float c = (d-f)/(d*fstop*CoC);",
+				"float a = (o*f)/(f+o);",
+				"float b = (d*f)/(f+d);",
+				"float c = (f+d)/(d*fstop*CoC);",
 
 				"blur = abs(a-b)*c;",
 			"}",
@@ -346,14 +323,6 @@ THREE.BokehShader = {
 				"}",
 
 				"col /= s; //divide by sample count",
-			"}",
-
-			"if (showFocus) {",
-				"col = debugFocus(col, blur, depth);",
-			"}",
-
-			"if (vignetting) {",
-				"col *= vignette();",
 			"}",
 
 			"gl_FragColor.rgb = col;",
