@@ -537,7 +537,7 @@ function WebGLState( gl, extensions, utils ) {
 
 		if ( blending !== CustomBlending ) {
 
-			if ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) {
+			if ( ( blending !== NoBlending ) && ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) ) {
 
 				switch ( blending ) {
 
@@ -639,8 +639,12 @@ function WebGLState( gl, extensions, utils ) {
 
 		}
 
-		currentBlending = blending;
-		currentPremultipledAlpha = premultipliedAlpha;
+		if ( blending !== NoBlending ) {
+
+			currentBlending = blending;
+			currentPremultipledAlpha = premultipliedAlpha;
+
+		}
 
 	}
 
