@@ -2845,30 +2845,15 @@ THREE.GLTFLoader = ( function () {
 							// PATH_PROPERTIES.weights(morphTargetInfluences) should be
 							// the property of a mesh object under group.
 
-							var children = node.isGroup ? node.children : [ node ];
+							node.traverse( function ( object ) {
 
-							for ( var j = 0, jl = children.length; j < jl; j ++ ) {
+								if ( object.isMesh === true && object.morphTargetInfluences ) {
 
-								if ( children[ j ].isMesh === true ) {
-
-									var materials = Array.isArray( children[ j ].material )
-										? children[ j ].material
-										: [ children[ j ].material ];
-
-									for ( var k = 0, kl = materials.length; k < kl; k ++ ) {
-
-										if ( materials[ k ].morphTargets === true ) {
-
-											targetNames.push( children[ j ].name ? children[ j ].name : children[ j ].uuid );
-											break;
-
-										}
-
-									}
+									targetNames.push( object.name ? object.name : object.uuid );
 
 								}
 
-							};
+							} );
 
 						} else {
 
