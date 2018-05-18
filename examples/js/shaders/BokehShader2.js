@@ -263,7 +263,7 @@ THREE.BokehShader = {
 
 			"if (shaderFocus) {",
 
-				"//fDepth = getViewZ( getDepth( focusCoords ) );",
+				"fDepth = getViewZ( getDepth( focusCoords ) );",
 
 			"}",
 
