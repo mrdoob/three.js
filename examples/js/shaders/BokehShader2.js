@@ -272,7 +272,7 @@ THREE.BokehShader = {
 			"float blur = 0.0;",
 
 			"if (manualdof) {",
-				"float a = fDepth + depth; // Focal plane",
+				"float a = depth - fDepth; // Focal plane",
 				"float b = (a-fdofstart)/fdofdist; // Far DoF",
 				"float c = (-a-ndofstart)/ndofdist; // Near Dof",
 				"blur = (a>0.0) ? b : c;",
@@ -281,9 +281,9 @@ THREE.BokehShader = {
 				"float d = fDepth;",
 				"float o = depth;",
 
-				"float a = (o*f)/(f+o);",
-				"float b = (d*f)/(f+d);",
-				"float c = (f+d)/(d*fstop*CoC);",
+				"float a = (o*f)/(o-f);",
+				"float b = (d*f)/(d-f);",
+				"float c = (d-f)/(d*fstop*CoC);",
 
 				"blur = abs(a-b)*c;",
 			"}",
