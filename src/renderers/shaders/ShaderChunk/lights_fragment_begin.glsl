@@ -21,6 +21,8 @@ geometry.viewDir = normalize( vViewPosition );
 
 IncidentLight directLight;
 
+float shadow = 0.0;
+
 #if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )
 
 	PointLight pointLight;
@@ -33,7 +35,8 @@ IncidentLight directLight;
 		getPointDirectLightIrradiance( pointLight, geometry, directLight );
 
 		#ifdef USE_SHADOWMAP
-		directLight.color *= all( bvec2( pointLight.shadow, directLight.visible ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;
+		shadow = all( bvec2( pointLight.shadow, directLight.visible ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;
+		directLight.color *= mix( 1.0, shadow, shadowIntensity );
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -54,7 +57,8 @@ IncidentLight directLight;
 		getSpotDirectLightIrradiance( spotLight, geometry, directLight );
 
 		#ifdef USE_SHADOWMAP
-		directLight.color *= all( bvec2( spotLight.shadow, directLight.visible ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
+		shadow = all( bvec2( spotLight.shadow, directLight.visible ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
+		directLight.color *= mix( 1.0, shadow, shadowIntensity );
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -75,7 +79,8 @@ IncidentLight directLight;
 		getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );
 
 		#ifdef USE_SHADOWMAP
-		directLight.color *= all( bvec2( directionalLight.shadow, directLight.visible ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+		shadow = all( bvec2( directionalLight.shadow, directLight.visible ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+		directLight.color *= mix( 1.0, shadow, shadowIntensity );
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );

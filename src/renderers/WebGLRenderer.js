@@ -109,6 +109,10 @@ function WebGLRenderer( parameters ) {
 	this.toneMappingExposure = 1.0;
 	this.toneMappingWhitePoint = 1.0;
 
+	// shadows
+
+	this.shadowIntensity = 1.0;
+
 	// morphs
 
 	this.maxMorphTargets = 8;
@@ -1806,6 +1810,8 @@ function WebGLRenderer( parameters ) {
 
 			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
 			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
+
+			p_uniforms.setValue( _gl, 'shadowIntensity', _this.shadowIntensity );
 
 			if ( material.lights ) {
 
