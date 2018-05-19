@@ -44,7 +44,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/RGBELoader.js"></script>
 		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
@@ -96,7 +96,7 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 1000 );
 				camera.position.z = 2;
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
 				//
 
@@ -210,6 +210,7 @@
 
 				requestAnimationFrame( animate );
 
+				controls.update();
 				renderer.render( scene, camera );
 
 				if ( statsEnabled ) stats.update();

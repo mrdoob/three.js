@@ -11063,9 +11063,7 @@
 
 				console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
-				this.addAttribute( name, new BufferAttribute( arguments[ 1 ], arguments[ 2 ] ) );
-
-				return;
+				return this.addAttribute( name, new BufferAttribute( arguments[ 1 ], arguments[ 2 ] ) );
 
 			}
 
@@ -11074,7 +11072,7 @@
 				console.warn( 'THREE.BufferGeometry.addAttribute: Use .setIndex() for index attribute.' );
 				this.setIndex( attribute );
 
-				return;
+				return this;
 
 			}
 
@@ -15515,6 +15513,7 @@
 
 	var mat4array = new Float32Array( 16 );
 	var mat3array = new Float32Array( 9 );
+	var mat2array = new Float32Array( 4 );
 
 	// Flattening for arrays of vectors and matrices
 
@@ -15553,6 +15552,30 @@
 
 	}
 
+	function arraysEqual( a, b ) {
+
+		if ( a.length !== b.length ) return false;
+
+		for ( var i = 0, l = a.length; i < l; i ++ ) {
+
+			if ( a[ i ] !== b[ i ] ) return false;
+
+		}
+
+		return true;
+
+	}
+
+	function copyArray( a, b ) {
+
+		for ( var i = 0, l = b.length; i < l; i ++ ) {
+
+			a[ i ] = b[ i ];
+
+		}
+
+	}
+
 	// Texture unit allocation
 
 	function allocTexUnits( renderer, n ) {
@@ -15582,13 +15605,25 @@
 
 	function setValue1f( gl, v ) {
 
+		var cache = this.cache;
+
+		if ( cache[ 0 ] === v ) return;
+
 		gl.uniform1f( this.addr, v );
+
+		cache[ 0 ] = v;
 
 	}
 
 	function setValue1i( gl, v ) {
 
+		var cache = this.cache;
+
+		if ( cache[ 0 ] === v ) return;
+
 		gl.uniform1i( this.addr, v );
+
+		cache[ 0 ] = v;
 
 	}
 
@@ -15596,13 +15631,26 @@
 
 	function setValue2fv( gl, v ) {
 
-		if ( v.x === undefined ) {
+		var cache = this.cache;
 
-			gl.uniform2fv( this.addr, v );
+		if ( v.x !== undefined ) {
+
+			if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y ) {
+
+				gl.uniform2f( this.addr, v.x, v.y );
+
+				cache[ 0 ] = v.x;
+				cache[ 1 ] = v.y;
+
+			}
 
 		} else {
 
-			gl.uniform2f( this.addr, v.x, v.y );
+			if ( arraysEqual( cache, v ) ) return;
+
+			gl.uniform2fv( this.addr, v );
+
+			copyArray( cache, v );
 
 		}
 
@@ -15610,17 +15658,39 @@
 
 	function setValue3fv( gl, v ) {
 
+		var cache = this.cache;
+
 		if ( v.x !== undefined ) {
 
-			gl.uniform3f( this.addr, v.x, v.y, v.z );
+			if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y || cache[ 2 ] !== v.z ) {
+
+				gl.uniform3f( this.addr, v.x, v.y, v.z );
+
+				cache[ 0 ] = v.x;
+				cache[ 1 ] = v.y;
+				cache[ 2 ] = v.z;
+
+			}
 
 		} else if ( v.r !== undefined ) {
 
-			gl.uniform3f( this.addr, v.r, v.g, v.b );
+			if ( cache[ 0 ] !== v.r || cache[ 1 ] !== v.g || cache[ 2 ] !== v.b ) {
+
+				gl.uniform3f( this.addr, v.r, v.g, v.b );
+
+				cache[ 0 ] = v.r;
+				cache[ 1 ] = v.g;
+				cache[ 2 ] = v.b;
+
+			}
 
 		} else {
 
+			if ( arraysEqual( cache, v ) ) return;
+
 			gl.uniform3fv( this.addr, v );
+
+			copyArray( cache, v );
 
 		}
 
@@ -15628,13 +15698,28 @@
 
 	function setValue4fv( gl, v ) {
 
-		if ( v.x === undefined ) {
+		var cache = this.cache;
 
-			gl.uniform4fv( this.addr, v );
+		if ( v.x !== undefined ) {
+
+			if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y || cache[ 2 ] !== v.z || cache[ 3 ] !== v.w ) {
+
+				gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
+
+				cache[ 0 ] = v.x;
+				cache[ 1 ] = v.y;
+				cache[ 2 ] = v.z;
+				cache[ 3 ] = v.w;
+
+			}
 
 		} else {
 
-			 gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
+			if ( arraysEqual( cache, v ) ) return;
+
+			gl.uniform4fv( this.addr, v );
+
+			copyArray( cache, v );
 
 		}
 
@@ -15644,20 +15729,53 @@
 
 	function setValue2fm( gl, v ) {
 
-		gl.uniformMatrix2fv( this.addr, false, v.elements || v );
+		var cache = this.cache;
+		var elements = v.elements;
+
+		if ( elements === undefined ) {
+
+			if ( arraysEqual( cache, v ) ) return;
+
+			gl.uniformMatrix2fv( this.addr, false, v );
+
+			copyArray( cache, v );
+
+		} else {
+
+			if ( arraysEqual( cache, elements ) ) return;
+
+			mat2array.set( elements );
+
+			gl.uniformMatrix2fv( this.addr, false, mat2array );
+
+			copyArray( cache, elements );
+
+		}
 
 	}
 
 	function setValue3fm( gl, v ) {
 
-		if ( v.elements === undefined ) {
+		var cache = this.cache;
+		var elements = v.elements;
+
+		if ( elements === undefined ) {
+
+			if ( arraysEqual( cache, v ) ) return;
 
 			gl.uniformMatrix3fv( this.addr, false, v );
 
+			copyArray( cache, v );
+
 		} else {
 
-			mat3array.set( v.elements );
+			if ( arraysEqual( cache, elements ) ) return;
+
+			mat3array.set( elements );
+
 			gl.uniformMatrix3fv( this.addr, false, mat3array );
+
+			copyArray( cache, elements );
 
 		}
 
@@ -15665,14 +15783,26 @@
 
 	function setValue4fm( gl, v ) {
 
-		if ( v.elements === undefined ) {
+		var cache = this.cache;
+		var elements = v.elements;
+
+		if ( elements === undefined ) {
+
+			if ( arraysEqual( cache, v ) ) return;
 
 			gl.uniformMatrix4fv( this.addr, false, v );
 
+			copyArray( cache, v );
+
 		} else {
 
-			mat4array.set( v.elements );
+			if ( arraysEqual( cache, elements ) ) return;
+
+			mat4array.set( elements );
+
 			gl.uniformMatrix4fv( this.addr, false, mat4array );
+
+			copyArray( cache, elements );
 
 		}
 
@@ -15682,16 +15812,32 @@
 
 	function setValueT1( gl, v, renderer ) {
 
+		var cache = this.cache;
 		var unit = renderer.allocTextureUnit();
-		gl.uniform1i( this.addr, unit );
+
+		if ( cache[ 0 ] !== unit ) {
+
+			gl.uniform1i( this.addr, unit );
+			cache[ 0 ] = unit;
+
+		}
+
 		renderer.setTexture2D( v || emptyTexture, unit );
 
 	}
 
 	function setValueT6( gl, v, renderer ) {
 
+		var cache = this.cache;
 		var unit = renderer.allocTextureUnit();
-		gl.uniform1i( this.addr, unit );
+
+		if ( cache[ 0 ] !== unit ) {
+
+			gl.uniform1i( this.addr, unit );
+			cache[ 0 ] = unit;
+
+		}
+
 		renderer.setTextureCube( v || emptyCubeTexture, unit );
 
 	}
@@ -15700,19 +15846,37 @@
 
 	function setValue2iv( gl, v ) {
 
+		var cache = this.cache;
+
+		if ( arraysEqual( cache, v ) ) return;
+
 		gl.uniform2iv( this.addr, v );
+
+		copyArray( cache, v );
 
 	}
 
 	function setValue3iv( gl, v ) {
 
+		var cache = this.cache;
+
+		if ( arraysEqual( cache, v ) ) return;
+
 		gl.uniform3iv( this.addr, v );
+
+		copyArray( cache, v );
 
 	}
 
 	function setValue4iv( gl, v ) {
 
+		var cache = this.cache;
+
+		if ( arraysEqual( cache, v ) ) return;
+
 		gl.uniform4iv( this.addr, v );
+
+		copyArray( cache, v );
 
 	}
 
@@ -15747,12 +15911,24 @@
 
 	function setValue1fv( gl, v ) {
 
+		var cache = this.cache;
+
+		if ( arraysEqual( cache, v ) ) return;
+
 		gl.uniform1fv( this.addr, v );
+
+		copyArray( cache, v );
 
 	}
 	function setValue1iv( gl, v ) {
 
+		var cache = this.cache;
+
+		if ( arraysEqual( cache, v ) ) return;
+
 		gl.uniform1iv( this.addr, v );
+
+		copyArray( cache, v );
 
 	}
 
@@ -15760,19 +15936,40 @@
 
 	function setValueV2a( gl, v ) {
 
-		gl.uniform2fv( this.addr, flatten( v, this.size, 2 ) );
+		var cache = this.cache;
+		var data = flatten( v, this.size, 2 );
+
+		if ( arraysEqual( cache, data ) ) return;
+
+		gl.uniform2fv( this.addr, data );
+
+		this.updateCache( data );
 
 	}
 
 	function setValueV3a( gl, v ) {
 
-		gl.uniform3fv( this.addr, flatten( v, this.size, 3 ) );
+		var cache = this.cache;
+		var data = flatten( v, this.size, 3 );
+
+		if ( arraysEqual( cache, data ) ) return;
+
+		gl.uniform3fv( this.addr, data );
+
+		this.updateCache( data );
 
 	}
 
 	function setValueV4a( gl, v ) {
 
-		gl.uniform4fv( this.addr, flatten( v, this.size, 4 ) );
+		var cache = this.cache;
+		var data = flatten( v, this.size, 4 );
+
+		if ( arraysEqual( cache, data ) ) return;
+
+		gl.uniform4fv( this.addr, data );
+
+		this.updateCache( data );
 
 	}
 
@@ -15780,19 +15977,40 @@
 
 	function setValueM2a( gl, v ) {
 
-		gl.uniformMatrix2fv( this.addr, false, flatten( v, this.size, 4 ) );
+		var cache = this.cache;
+		var data = flatten( v, this.size, 4 );
+
+		if ( arraysEqual( cache, data ) ) return;
+
+		gl.uniformMatrix2fv( this.addr, false, data );
+
+		this.updateCache( data );
 
 	}
 
 	function setValueM3a( gl, v ) {
 
-		gl.uniformMatrix3fv( this.addr, false, flatten( v, this.size, 9 ) );
+		var cache = this.cache;
+		var data = flatten( v, this.size, 9 );
+
+		if ( arraysEqual( cache, data ) ) return;
+
+		gl.uniformMatrix3fv( this.addr, false, data );
+
+		this.updateCache( data );
 
 	}
 
 	function setValueM4a( gl, v ) {
 
-		gl.uniformMatrix4fv( this.addr, false, flatten( v, this.size, 16 ) );
+		var cache = this.cache;
+		var data = flatten( v, this.size, 16 );
+
+		if ( arraysEqual( cache, data ) ) return;
+
+		gl.uniformMatrix4fv( this.addr, false, data );
+
+		this.updateCache( data );
 
 	}
 
@@ -15800,10 +16018,17 @@
 
 	function setValueT1a( gl, v, renderer ) {
 
-		var n = v.length,
-			units = allocTexUnits( renderer, n );
+		var cache = this.cache;
+		var n = v.length;
 
-		gl.uniform1iv( this.addr, units );
+		var units = allocTexUnits( renderer, n );
+
+		if ( arraysEqual( cache, units ) === false ) {
+
+			gl.uniform1iv( this.addr, units );
+			copyArray( cache, units );
+
+		}
 
 		for ( var i = 0; i !== n; ++ i ) {
 
@@ -15815,10 +16040,17 @@
 
 	function setValueT6a( gl, v, renderer ) {
 
-		var n = v.length,
-			units = allocTexUnits( renderer, n );
+		var cache = this.cache;
+		var n = v.length;
 
-		gl.uniform1iv( this.addr, units );
+		var units = allocTexUnits( renderer, n );
+
+		if ( arraysEqual( cache, units ) === false ) {
+
+			gl.uniform1iv( this.addr, units );
+			copyArray( cache, units );
+
+		}
 
 		for ( var i = 0; i !== n; ++ i ) {
 
@@ -15861,6 +16093,7 @@
 
 		this.id = id;
 		this.addr = addr;
+		this.cache = [];
 		this.setValue = getSingularSetter( activeInfo.type );
 
 		// this.path = activeInfo.name; // DEBUG
@@ -15871,12 +16104,27 @@
 
 		this.id = id;
 		this.addr = addr;
+		this.cache = [];
 		this.size = activeInfo.size;
 		this.setValue = getPureArraySetter( activeInfo.type );
 
 		// this.path = activeInfo.name; // DEBUG
 
 	}
+
+	PureArrayUniform.prototype.updateCache = function ( data ) {
+
+		var cache = this.cache;
+
+		if ( data instanceof Float32Array && cache.length !== data.length ) {
+
+			this.cache = new Float32Array( data.length );
+
+		}
+
+		copyArray( cache, data );
+
+	};
 
 	function StructuredUniform( id ) {
 
@@ -15932,7 +16180,7 @@
 		// reset RegExp object, because of the early exit of a previous run
 		RePathPart.lastIndex = 0;
 
-		for ( ; ; ) {
+		while ( true ) {
 
 			var match = RePathPart.exec( path ),
 				matchEnd = RePathPart.lastIndex,
@@ -16526,7 +16774,7 @@
 
 				customDefines,
 
-				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
+				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest + ( parameters.alphaTest % 1 ? '' : '.0' ) : '', // add '.0' if integer
 
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
@@ -19087,23 +19335,7 @@
 
 		function enableAttribute( attribute ) {
 
-			newAttributes[ attribute ] = 1;
-
-			if ( enabledAttributes[ attribute ] === 0 ) {
-
-				gl.enableVertexAttribArray( attribute );
-				enabledAttributes[ attribute ] = 1;
-
-			}
-
-			if ( attributeDivisors[ attribute ] !== 0 ) {
-
-				var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-				extension.vertexAttribDivisorANGLE( attribute, 0 );
-				attributeDivisors[ attribute ] = 0;
-
-			}
+			enableAttributeAndDivisor( attribute, 0 );
 
 		}
 
@@ -21279,11 +21511,16 @@
 
 		};
 
-		this.submitFrame = function () {
+		// DEPRECATED
 
-			// if ( device && device.isPresenting ) device.submitFrame();
+		this.getStandingMatrix = function () {
+
+			console.warn( 'THREE.WebXRManager: getStandingMatrix() is no longer needed.' );
+			return new THREE.Matrix4();
 
 		};
+
+		this.submitFrame = function () {};
 
 	}
 
@@ -30900,23 +31137,12 @@
 
 					delete loading[ url ];
 
-					if ( this.status === 200 ) {
-
-						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
-
-							var callback = callbacks[ i ];
-							if ( callback.onLoad ) callback.onLoad( response );
-
-						}
-
-						scope.manager.itemEnd( url );
-
-					} else if ( this.status === 0 ) {
+					if ( this.status === 200 || this.status === 0 ) {
 
 						// Some browsers return HTTP Status 0 when using non-http protocol
 						// e.g. 'file://' or 'data://'. Handle as success.
 
-						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+						if ( this.status === 0 ) console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
 						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
@@ -37715,11 +37941,13 @@
 
 		},
 
-		load: function load( url, onLoad, onProgress, onError ) {
+		load: function ( url, onLoad, onProgress, onError ) {
 
 			if ( url === undefined ) url = '';
 
 			if ( this.path !== undefined ) url = this.path + url;
+
+			url = this.manager.resolveURL( url );
 
 			var scope = this;
 

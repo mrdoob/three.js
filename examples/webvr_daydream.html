@@ -40,6 +40,10 @@
 
 			var room;
 
+			var radius = 0.08;
+			var normal = new THREE.Vector3();
+			var relativeVelocity = new THREE.Vector3();
+
 			init();
 			animate();
 
@@ -74,7 +78,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 0.08, 2 );
+				var geometry = new THREE.IcosahedronBufferGeometry( radius, 2 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
@@ -162,7 +166,7 @@
 
 				// keep cubes inside room
 
-				var range = 3 - 0.08;
+				var range = 3 - radius;
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
@@ -177,7 +181,7 @@
 
 					}
 
-					if ( cube.position.y < - range ) {
+					if ( cube.position.y < - range || cube.position.y > range ) {
 
 						cube.position.y = Math.max( cube.position.y, - range );
 
@@ -191,6 +195,32 @@
 
 						cube.position.z = THREE.Math.clamp( cube.position.z, - range, range );
 						cube.userData.velocity.z = - cube.userData.velocity.z;
+
+					}
+
+					for ( var j = i + 1; j < room.children.length; j ++ ) {
+
+						var cube2 = room.children[ j ];
+
+						normal.copy( cube.position ).sub( cube2.position );
+
+						if ( normal.length() < 2 * radius ) {
+
+							normal.multiplyScalar( 0.5 * normal.length() - radius );
+							cube.position.sub( normal );
+							cube2.position.add( normal );
+
+							normal.normalize();
+
+							relativeVelocity.copy( cube.userData.velocity ).sub( cube2.userData.velocity );
+							var dot = relativeVelocity.dot( normal );
+
+							normal = normal.multiplyScalar( dot );
+
+							cube.userData.velocity.sub( normal );
+							cube2.userData.velocity.add( normal );
+
+						}
 
 					}
 
