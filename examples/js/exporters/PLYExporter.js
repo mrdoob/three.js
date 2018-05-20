@@ -241,7 +241,7 @@ THREE.PLYExporter.prototype = {
 			console.error(
 
 				'PLYExporter: Failed to generate a valid PLY file with triangle indices because the ' +
-				'number of faces is not divisible by 3.'
+				'number of indices is not divisible by 3.'
 
 			);
 
