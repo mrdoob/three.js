@@ -2620,43 +2620,37 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						// If the material will be modified later on, clone it now.
+						// Clone the material if it will be modified
 						if ( useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
 
-							material = material.isGLTFSpecularGlossinessMaterial
-									? extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].cloneMaterial( material )
-									: material.clone();
+							var cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 
-						}
+							if ( material.isGLTFSpecularGlossinessMaterial ) cacheKey += 'specular-glossiness:';
+							if ( useSkinning ) cacheKey += 'skinning:';
+							if ( useVertexColors ) cacheKey += 'vertex-colors:';
+							if ( useFlatShading ) cacheKey += 'flat-shading:';
+							if ( useMorphTargets ) cacheKey += 'morph-targets:';
+							if ( useMorphNormals ) cacheKey += 'morph-normals:';
 
-						if ( useSkinning ) {
+							var clonedMaterial = scope.cache.get( cacheKey );
 
-							material.skinning = true;
+							if ( ! clonedMaterial ) {
 
-						}
+								clonedMaterial = material.isGLTFSpecularGlossinessMaterial
+										? extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].cloneMaterial( material )
+										: material.clone();
 
-						if ( useVertexColors ) {
+								if ( useSkinning ) clonedMaterial.skinning = true;
+								if ( useVertexColors ) clonedMaterial.vertexColors = THREE.VertexColors;
+								if ( useFlatShading ) clonedMaterial.flatShading = true;
+								if ( useMorphTargets ) clonedMaterial.morphTargets = true;
+								if ( useMorphNormals ) clonedMaterial.morphNormals = true;
 
-							material.vertexColors = THREE.VertexColors;
-							material.needsUpdate = true;
+								scope.cache.add( cacheKey, clonedMaterial );
 
-						}
+							}
 
-						if ( useFlatShading ) {
-
-							material.flatShading = true;
-
-						}
-
-						if ( useMorphTargets ) {
-
-							material.morphTargets = true;
-
-						}
-
-						if ( useMorphNormals ) {
-
-							material.morphNormals = true;
+							material = clonedMaterial;
 
 						}
 
