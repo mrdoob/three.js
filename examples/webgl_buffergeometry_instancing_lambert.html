@@ -216,7 +216,7 @@
 				combine: THREE.MultiplyOperation,
 				reflectivity: 0.8,
 
-				// vertexColors: THREE.VertexColors,
+				vertexColors: THREE.VertexColors,
 				fog: true
 
 			} );
@@ -234,7 +234,7 @@
 					`${THREE.ShaderChunk.begin_vertex}
 					${chunksLambert.after_begin_vertex}`
 				)
-				shader.vertexShader = shader.vertexShader.replace('#include <after_color_vertex>',
+				shader.vertexShader = shader.vertexShader.replace('#include <color_vertex>',
 					`${THREE.ShaderChunk.color_vertex}
 					${chunksLambert.after_color_vertex}`
 				)
