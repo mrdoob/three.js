@@ -224,6 +224,7 @@
 			material.defines = material.defines || {};
 			material.defines['INSTANCED'] = "";
 
+			//there is a less verbose way to do this please see #14031
 			material.onBeforeCompile = function(shader){
 				shader.vertexShader = `
 					${chunksLambert.global}
