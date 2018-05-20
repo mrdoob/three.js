@@ -69,11 +69,6 @@
 
 			function init() {
 
-				var container;
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 80, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000 );
 				camera.position.z = 1000;
 
@@ -93,7 +88,7 @@
 
 					line = new THREE.LineSegments( geometry, material );
 					line.scale.x = line.scale.y = line.scale.z = p[ 0 ];
-					line.originalScale = p[ 0 ];
+					line.userData.originalScale = p[ 0 ];
 					line.rotation.y = Math.random() * Math.PI;
 					line.updateMatrix();
 					scene.add( line );
@@ -103,7 +98,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -121,7 +116,7 @@
 
 					scene.traverse( function ( object ) {
 
-						if ( object instanceof THREE.Line ) {
+						if ( object.isLine ) {
 
 							object.geometry.dispose();
 							object.geometry = geometry;
@@ -136,24 +131,28 @@
 
 			function createGeometry() {
 
-				var geometry = new THREE.Geometry();
+				var geometry = new THREE.BufferGeometry();
+				var vertices = [];
+
+				var vertex = new THREE.Vector3();
 
 				for ( var i = 0; i < 1500; i ++ ) {
 
-					var vertex1 = new THREE.Vector3();
-					vertex1.x = Math.random() * 2 - 1;
-					vertex1.y = Math.random() * 2 - 1;
-					vertex1.z = Math.random() * 2 - 1;
-					vertex1.normalize();
-					vertex1.multiplyScalar( r );
+					vertex.x = Math.random() * 2 - 1;
+					vertex.y = Math.random() * 2 - 1;
+					vertex.z = Math.random() * 2 - 1;
+					vertex.normalize();
+					vertex.multiplyScalar( r );
 
-					var vertex2 = vertex1.clone();
-					vertex2.multiplyScalar( Math.random() * 0.09 + 1 );
+					vertices.push( vertex.x, vertex.y, vertex.z );
 
-					geometry.vertices.push( vertex1 );
-					geometry.vertices.push( vertex2 );
+					vertex.multiplyScalar( Math.random() * 0.09 + 1 );
+
+					vertices.push( vertex.x, vertex.y, vertex.z );
 
 				}
+
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				return geometry;
 
@@ -227,11 +226,17 @@
 
 					var object = scene.children[ i ];
 
-					if ( object instanceof THREE.Line ) {
+					if ( object.isLine ) {
 
 						object.rotation.y = time * ( i < 4 ? ( i + 1 ) : - ( i + 1 ) );
 
-						if ( i < 5 ) object.scale.x = object.scale.y = object.scale.z = object.originalScale * (i/5+1) * (1 + 0.5 * Math.sin( 7*time ) );
+						if ( i < 5 ) {
+
+							var scale = object.userData.originalScale * ( i / 5 + 1 ) * ( 1 + 0.5 * Math.sin( 7 * time ) );
+
+							object.scale.x = object.scale.y = object.scale.z = scale;
+
+						}
 
 					}
 

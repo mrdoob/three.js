@@ -32,7 +32,6 @@
 	</head>
 
 	<body>
-		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - orbit controls example
 		</div>
@@ -57,12 +56,10 @@
 				scene.background = new THREE.Color( 0xcccccc );
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				var container = document.getElementById( 'container' );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 400, 200, 0 );
@@ -76,7 +73,7 @@
 				controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
 				controls.dampingFactor = 0.25;
 
-				controls.panningMode = THREE.HorizontalPanning; // default is THREE.ScreenSpacePanning
+				controls.screenSpacePanning = false;
 
 				controls.minDistance = 100;
 				controls.maxDistance = 500
@@ -85,7 +82,7 @@
 
 				// world
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
+				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 30, 4, 1 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( var i = 0; i < 500; i ++ ) {

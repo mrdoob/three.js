@@ -163,17 +163,29 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	getCenter: function ( optionalTarget ) {
+	getCenter: function ( target ) {
 
-		var result = optionalTarget || new Vector3();
-		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Box3: .getCenter() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	getSize: function ( optionalTarget ) {
+	getSize: function ( target ) {
 
-		var result = optionalTarget || new Vector3();
-		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.subVectors( this.max, this.min );
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Box3: .getSize() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.subVectors( this.max, this.min );
 
 	},
 
@@ -284,14 +296,19 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	getParameter: function ( point, optionalTarget ) {
+	getParameter: function ( point, target ) {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		var result = optionalTarget || new Vector3();
+		if ( target === undefined ) {
 
-		return result.set(
+			console.warn( 'THREE.Box3: .getParameter() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return target.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
 			( point.z - this.min.z ) / ( this.max.z - this.min.z )
@@ -472,10 +489,16 @@ Object.assign( Box3.prototype, {
 
 	} )(),
 
-	clampPoint: function ( point, optionalTarget ) {
+	clampPoint: function ( point, target ) {
 
-		var result = optionalTarget || new Vector3();
-		return result.copy( point ).clamp( this.min, this.max );
+		if ( target === undefined ) {
+
+			console.warn( 'THREE.Box3: .clampPoint() target is now required' );
+			target = new Vector3();
+
+		}
+
+		return target.copy( point ).clamp( this.min, this.max );
 
 	},
 
@@ -496,15 +519,20 @@ Object.assign( Box3.prototype, {
 
 		var v1 = new Vector3();
 
-		return function getBoundingSphere( optionalTarget ) {
+		return function getBoundingSphere( target ) {
 
-			var result = optionalTarget || new Sphere();
+			if ( target === undefined ) {
 
-			this.getCenter( result.center );
+				console.warn( 'THREE.Box3: .getBoundingSphere() target is now required' );
+				target = new Sphere();
 
-			result.radius = this.getSize( v1 ).length() * 0.5;
+			}
 
-			return result;
+			this.getCenter( target.center );
+
+			target.radius = this.getSize( v1 ).length() * 0.5;
+
+			return target;
 
 		};
 
@@ -531,41 +559,30 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	applyMatrix4: function () {
+	applyMatrix4: function ( matrix ) {
 
-		var points = [
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3()
-		];
+		// transform of empty box is an empty box.
+		if ( this.isEmpty( ) ) return this;
 
-		return function applyMatrix4( matrix ) {
+		var m = matrix.elements;
 
-			// transform of empty box is an empty box.
-			if ( this.isEmpty() ) return this;
+		var xax = m[ 0 ] * this.min.x, xay = m[ 1 ] * this.min.x, xaz = m[ 2 ] * this.min.x;
+		var xbx = m[ 0 ] * this.max.x, xby = m[ 1 ] * this.max.x, xbz = m[ 2 ] * this.max.x;
+		var yax = m[ 4 ] * this.min.y, yay = m[ 5 ] * this.min.y, yaz = m[ 6 ] * this.min.y;
+		var ybx = m[ 4 ] * this.max.y, yby = m[ 5 ] * this.max.y, ybz = m[ 6 ] * this.max.y;
+		var zax = m[ 8 ] * this.min.z, zay = m[ 9 ] * this.min.z, zaz = m[ 10 ] * this.min.z;
+		var zbx = m[ 8 ] * this.max.z, zby = m[ 9 ] * this.max.z, zbz = m[ 10 ] * this.max.z;
 
-			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
-			points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
-			points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
-			points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
-			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
-			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
-			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );	// 111
+		this.min.x = Math.min( xax, xbx ) + Math.min( yax, ybx ) + Math.min( zax, zbx ) + m[ 12 ];
+		this.min.y = Math.min( xay, xby ) + Math.min( yay, yby ) + Math.min( zay, zby ) + m[ 13 ];
+		this.min.z = Math.min( xaz, xbz ) + Math.min( yaz, ybz ) + Math.min( zaz, zbz ) + m[ 14 ];
+		this.max.x = Math.max( xax, xbx ) + Math.max( yax, ybx ) + Math.max( zax, zbx ) + m[ 12 ];
+		this.max.y = Math.max( xay, xby ) + Math.max( yay, yby ) + Math.max( zay, zby ) + m[ 13 ];
+		this.max.z = Math.max( xaz, xbz ) + Math.max( yaz, ybz ) + Math.max( zaz, zbz ) + m[ 14 ];
 
-			this.setFromPoints( points );
+		return this;
 
-			return this;
-
-		};
-
-	}(),
+	},
 
 	translate: function ( offset ) {
 

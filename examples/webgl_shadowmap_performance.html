@@ -212,7 +212,7 @@
 
 				// CUBES
 
-				var mesh = new THREE.Mesh( new THREE.BoxGeometry( 1500, 220, 150 ), planeMaterial );
+				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1500, 220, 150 ), planeMaterial );
 
 				mesh.position.y = FLOOR - 50;
 				mesh.position.z = 20;
@@ -222,7 +222,7 @@
 
 				scene.add( mesh );
 
-				var mesh = new THREE.Mesh( new THREE.BoxGeometry( 1600, 170, 250 ), planeMaterial );
+				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1600, 170, 250 ), planeMaterial );
 
 				mesh.position.y = FLOOR - 50;
 				mesh.position.z = 20;

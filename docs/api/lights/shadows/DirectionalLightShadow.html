@@ -12,16 +12,16 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			This is used internally by [page:DirectionalLight DirectionalLights] for calculating shadows.<br /><br />
 
 			Unlike the other shadow classes, this uses an [page:OrthographicCamera] to calculate the shadows,
 			rather than a [page:PerspectiveCamera]. This is because light rays from a [page:DirectionalLight]
 			are parallel.
-		</div>
+		</p>
 
 		<h2>Example</h2>
-		<div>
+		<p>
 			<code>
 //Create a WebGLRenderer and turn on shadows in the renderer
 var renderer = new THREE.WebGLRenderer();
@@ -59,22 +59,22 @@ scene.add( plane );
 var helper = new THREE.CameraHelper( light.shadow.camera );
 scene.add( helper );
 			</code>
-		</div>
+		</p>
 
 		<h2>Constructor</h2>
 		<h3>[name]( )</h3>
-		<div>
+		<p>
 			Creates a new [name]. This is not intended to be called directly - it is called
 			internally by [page:DirectionalLight].
-		</div>
+		</p>
 
 		<h2>Properties</h2>
-		<div>
+		<p>
 			See the base [page:LightShadow LightShadow] class for common properties.
-		</div>
+		</p>
 
 		<h3>[property:Camera camera]</h3>
-		<div>
+		<p>
 			The light's view of the world. This is used to generate a depth map of the scene; objects behind
 			other objects from the light's perspective will be in shadow.<br /><br />
 
@@ -82,13 +82,13 @@ scene.add( helper );
 			[page:OrthographicCamera.bottom bottom] set to -5,  [page:OrthographicCamera.right right]
 			and  [page:OrthographicCamera.top top] set to 5, the [page:OrthographicCamera.near near]
 			clipping plane at 0.5 and the [page:OrthographicCamera.far far] clipping plane at 500.
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
-		<div>
+		<p>
 			See the base [page:LightShadow LightShadow] class for common methods.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

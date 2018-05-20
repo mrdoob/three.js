@@ -24,7 +24,7 @@ THREE.GearVRController = function () {
 
 			var gamepad = gamepads[ i ];
 
-			if ( gamepad && ( gamepad.id === 'Gear VR Controller' ) ) {
+			if ( gamepad && ( gamepad.id === 'Gear VR Controller' || gamepad.id === 'Oculus Go Controller' ) ) {
 
 				return gamepad;
 
@@ -33,26 +33,6 @@ THREE.GearVRController = function () {
 		}
 
 	}
-
-	this.setHand = function ( hand = 'right' ) {
-
-		var handPos;
-
-		if ( hand === 'right' ) {
-
-			handPos = 0.3;
-
-		} else {
-
-			handPos = - 0.3;
-
-		}
-
-		this.translateX( handPos );
-		this.translateY( - 0.35 );
-		this.translateZ( - 0.4 );
-
-	};
 
 	this.getGamepad = function () {
 
@@ -137,6 +117,12 @@ THREE.GearVRController = function () {
 
 		console.warn( 'THREE.GearVRController: getTouchPadState() is now getTouchpadState()' );
 		return touchpadIsPressed;
+
+	};
+
+	this.setHand = function () {
+
+		console.warn( 'THREE.GearVRController: setHand() has been removed.' );
 
 	};
 

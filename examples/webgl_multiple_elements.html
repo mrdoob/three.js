@@ -98,10 +98,10 @@
 				canvas = document.getElementById( "c" );
 
 				var geometries = [
-					new THREE.BoxGeometry( 1, 1, 1 ),
-					new THREE.SphereGeometry( 0.5, 12, 8 ),
-					new THREE.DodecahedronGeometry( 0.5 ),
-					new THREE.CylinderGeometry( 0.5, 0.5, 1, 12 )
+					new THREE.BoxBufferGeometry( 1, 1, 1 ),
+					new THREE.SphereBufferGeometry( 0.5, 12, 8 ),
+					new THREE.DodecahedronBufferGeometry( 0.5 ),
+					new THREE.CylinderBufferGeometry( 0.5, 0.5, 1, 12 )
 				];
 
 				var template = document.getElementById( "template" ).text;
@@ -168,7 +168,7 @@
 				var width = canvas.clientWidth;
 				var height = canvas.clientHeight;
 
-				if ( canvas.width !== width || canvas.height != height ) {
+				if ( canvas.width !== width || canvas.height !== height ) {
 
 					renderer.setSize( width, height, false );
 
@@ -197,7 +197,7 @@
 				scenes.forEach( function( scene ) {
 
 					// so something moves
-					scene.children[0].rotation.y = Date.now() * 0.001;
+					scene.children[ 0 ].rotation.y = Date.now() * 0.001;
 
 					// get the element that is a place holder for where we want to
 					// draw the scene

@@ -12,7 +12,7 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Generate geometry representing a parametric surface.</div>
+		<p class="desc">Generate geometry representing a parametric surface.</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#ParametricBufferGeometry"></iframe>
 
@@ -37,8 +37,8 @@
 		<code>
 		var geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, 25, 25 );
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-		var cube = new THREE.Mesh( geometry, material );
-		scene.add( cube );
+		var klein = new THREE.Mesh( geometry, material );
+		scene.add( klein );
 		</code>
 
 
@@ -46,11 +46,11 @@
 
 
 		<h3>[name]([param:Function func], [param:Integer slices], [param:Integer stacks])</h3>
-		<div>
-		func — A function that takes in a [page:Float u] and [page:Float v] value each between 0 and 1 and returns a [page:Vector3]<br />
+		<p>
+		func — A function that takes in a [page:Float u] and [page:Float v] value each between 0 and 1 and modifies a third [page:Vector3] argument<br />
 		slices — The count of slices to use for the parametric function <br />
 		stacks — The count of stacks to use for the parametric function
-		</div>
+		</p>
 
 
 		<h2>Source</h2>

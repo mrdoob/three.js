@@ -6,6 +6,7 @@
 
 import { Triangle } from '../../../../src/math/Triangle';
 import { Box3 } from '../../../../src/math/Box3';
+import { Plane } from '../../../../src/math/Plane';
 import { Vector3 } from '../../../../src/math/Vector3';
 import {
 	zero3,
@@ -33,13 +34,13 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// STATIC STUFF
-		QUnit.todo( "normal", ( assert ) => {
+		QUnit.todo( "getNormal", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.todo( "barycoordFromPoint", ( assert ) => {
+		QUnit.todo( "getBarycoord", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
@@ -99,123 +100,152 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "area", ( assert ) => {
+		QUnit.test( "getArea", ( assert ) => {
 
 			var a = new Triangle();
 
-			assert.ok( a.area() == 0, "Passed!" );
+			assert.ok( a.getArea() == 0, "Passed!" );
 
 			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
-			assert.ok( a.area() == 0.5, "Passed!" );
+			assert.ok( a.getArea() == 0.5, "Passed!" );
 
 			var a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 2 ) );
-			assert.ok( a.area() == 2, "Passed!" );
+			assert.ok( a.getArea() == 2, "Passed!" );
 
 			// colinear triangle.
 			var a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 3, 0, 0 ) );
-			assert.ok( a.area() == 0, "Passed!" );
+			assert.ok( a.getArea() == 0, "Passed!" );
 
 		} );
 
-		QUnit.test( "midpoint", ( assert ) => {
+		QUnit.test( "getMidpoint", ( assert ) => {
 
 			var a = new Triangle();
+			var midpoint = new Vector3();
 
-			assert.ok( a.midpoint().equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+			assert.ok( a.getMidpoint( midpoint ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
-			assert.ok( a.midpoint().equals( new Vector3( 1 / 3, 1 / 3, 0 ) ), "Passed!" );
+			assert.ok( a.getMidpoint( midpoint ).equals( new Vector3( 1 / 3, 1 / 3, 0 ) ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 2 ) );
-			assert.ok( a.midpoint().equals( new Vector3( 2 / 3, 0, 2 / 3 ) ), "Passed!" );
+			assert.ok( a.getMidpoint( midpoint ).equals( new Vector3( 2 / 3, 0, 2 / 3 ) ), "Passed!" );
 
 		} );
 
-		QUnit.test( "normal", ( assert ) => {
+		QUnit.test( "getNormal", ( assert ) => {
 
 			var a = new Triangle();
+			var normal = new Vector3();
 
-			assert.ok( a.normal().equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+			assert.ok( a.getNormal( normal ).equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
-			assert.ok( a.normal().equals( new Vector3( 0, 0, 1 ) ), "Passed!" );
+			assert.ok( a.getNormal( normal ).equals( new Vector3( 0, 0, 1 ) ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 2 ) );
-			assert.ok( a.normal().equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
+			assert.ok( a.getNormal( normal ).equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
 
 		} );
 
-		QUnit.test( "plane", ( assert ) => {
+		QUnit.test( "getPlane", ( assert ) => {
 
 			var a = new Triangle();
+			var plane = new Plane();
+			var normal = new Vector3();
 
-			assert.notOk( isNaN( a.plane().distanceToPoint( a.a ) ), "Passed!" );
-			assert.notOk( isNaN( a.plane().distanceToPoint( a.b ) ), "Passed!" );
-			assert.notOk( isNaN( a.plane().distanceToPoint( a.c ) ), "Passed!" );
-			assert.notPropEqual( a.plane().normal, {
+			a.getPlane( plane );
+			assert.notOk( isNaN( plane.distanceToPoint( a.a ) ), "Passed!" );
+			assert.notOk( isNaN( plane.distanceToPoint( a.b ) ), "Passed!" );
+			assert.notOk( isNaN( plane.distanceToPoint( a.c ) ), "Passed!" );
+			assert.notPropEqual( plane.normal, {
 				x: NaN,
 				y: NaN,
 				z: NaN
 			}, "Passed!" );
 
 			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
-			assert.ok( a.plane().distanceToPoint( a.a ) == 0, "Passed!" );
-			assert.ok( a.plane().distanceToPoint( a.b ) == 0, "Passed!" );
-			assert.ok( a.plane().distanceToPoint( a.c ) == 0, "Passed!" );
-			assert.ok( a.plane().normal.equals( a.normal() ), "Passed!" );
+			a.getPlane( plane );
+			a.getNormal( normal );
+			assert.ok( plane.distanceToPoint( a.a ) == 0, "Passed!" );
+			assert.ok( plane.distanceToPoint( a.b ) == 0, "Passed!" );
+			assert.ok( plane.distanceToPoint( a.c ) == 0, "Passed!" );
+			assert.ok( plane.normal.equals( normal ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 2 ) );
-			assert.ok( a.plane().distanceToPoint( a.a ) == 0, "Passed!" );
-			assert.ok( a.plane().distanceToPoint( a.b ) == 0, "Passed!" );
-			assert.ok( a.plane().distanceToPoint( a.c ) == 0, "Passed!" );
-			assert.ok( a.plane().normal.clone().normalize().equals( a.normal() ), "Passed!" );
+			a.getPlane( plane );
+			a.getNormal( normal );
+			assert.ok( plane.distanceToPoint( a.a ) == 0, "Passed!" );
+			assert.ok( plane.distanceToPoint( a.b ) == 0, "Passed!" );
+			assert.ok( plane.distanceToPoint( a.c ) == 0, "Passed!" );
+			assert.ok( plane.normal.clone().normalize().equals( normal ), "Passed!" );
 
 		} );
 
-		QUnit.test( "barycoordFromPoint", ( assert ) => {
+		QUnit.test( "getBarycoord", ( assert ) => {
 
 			var a = new Triangle();
 
 			var bad = new Vector3( - 2, - 1, - 1 );
+			var barycoord = new Vector3();
+			var midpoint = new Vector3();
 
-			assert.ok( a.barycoordFromPoint( a.a ).equals( bad ), "Passed!" );
-			assert.ok( a.barycoordFromPoint( a.b ).equals( bad ), "Passed!" );
-			assert.ok( a.barycoordFromPoint( a.c ).equals( bad ), "Passed!" );
+			a.getBarycoord( a.a, barycoord );
+			assert.ok( barycoord.equals( bad ), "Passed!" );
+			a.getBarycoord( a.b, barycoord );
+			assert.ok( barycoord.equals( bad ), "Passed!" );
+			a.getBarycoord( a.c, barycoord );
+			assert.ok( barycoord.equals( bad ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
-			assert.ok( a.barycoordFromPoint( a.a ).equals( new Vector3( 1, 0, 0 ) ), "Passed!" );
-			assert.ok( a.barycoordFromPoint( a.b ).equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
-			assert.ok( a.barycoordFromPoint( a.c ).equals( new Vector3( 0, 0, 1 ) ), "Passed!" );
-			assert.ok( a.barycoordFromPoint( a.midpoint() ).distanceTo( new Vector3( 1 / 3, 1 / 3, 1 / 3 ) ) < 0.0001, "Passed!" );
+			a.getMidpoint( midpoint );
+
+			a.getBarycoord( a.a, barycoord );
+			assert.ok( barycoord.equals( new Vector3( 1, 0, 0 ) ), "Passed!" );
+			a.getBarycoord( a.b, barycoord );
+			assert.ok( barycoord.equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
+			a.getBarycoord( a.c, barycoord );
+			assert.ok( barycoord.equals( new Vector3( 0, 0, 1 ) ), "Passed!" );
+			a.getBarycoord( midpoint, barycoord );
+			assert.ok( barycoord.distanceTo( new Vector3( 1 / 3, 1 / 3, 1 / 3 ) ) < 0.0001, "Passed!" );
 
 			var a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 2 ) );
-			assert.ok( a.barycoordFromPoint( a.a ).equals( new Vector3( 1, 0, 0 ) ), "Passed!" );
-			assert.ok( a.barycoordFromPoint( a.b ).equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
-			assert.ok( a.barycoordFromPoint( a.c ).equals( new Vector3( 0, 0, 1 ) ), "Passed!" );
-			assert.ok( a.barycoordFromPoint( a.midpoint() ).distanceTo( new Vector3( 1 / 3, 1 / 3, 1 / 3 ) ) < 0.0001, "Passed!" );
+			a.getMidpoint( midpoint );
+
+			a.getBarycoord( a.a, barycoord );
+			assert.ok( barycoord.equals( new Vector3( 1, 0, 0 ) ), "Passed!" );
+			a.getBarycoord( a.b, barycoord );
+			assert.ok( barycoord.equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
+			a.getBarycoord( a.c, barycoord );
+			assert.ok( barycoord.equals( new Vector3( 0, 0, 1 ) ), "Passed!" );
+			a.getBarycoord( midpoint, barycoord );
+			assert.ok( barycoord.distanceTo( new Vector3( 1 / 3, 1 / 3, 1 / 3 ) ) < 0.0001, "Passed!" );
 
 		} );
 
 		QUnit.test( "containsPoint", ( assert ) => {
 
 			var a = new Triangle();
+			var midpoint = new Vector3();
 
 			assert.ok( ! a.containsPoint( a.a ), "Passed!" );
 			assert.ok( ! a.containsPoint( a.b ), "Passed!" );
 			assert.ok( ! a.containsPoint( a.c ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
+			a.getMidpoint( midpoint );
 			assert.ok( a.containsPoint( a.a ), "Passed!" );
 			assert.ok( a.containsPoint( a.b ), "Passed!" );
 			assert.ok( a.containsPoint( a.c ), "Passed!" );
-			assert.ok( a.containsPoint( a.midpoint() ), "Passed!" );
+			assert.ok( a.containsPoint( midpoint ), "Passed!" );
 			assert.ok( ! a.containsPoint( new Vector3( - 1, - 1, - 1 ) ), "Passed!" );
 
 			var a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 2 ) );
+			a.getMidpoint( midpoint );
 			assert.ok( a.containsPoint( a.a ), "Passed!" );
 			assert.ok( a.containsPoint( a.b ), "Passed!" );
 			assert.ok( a.containsPoint( a.c ), "Passed!" );
-			assert.ok( a.containsPoint( a.midpoint() ), "Passed!" );
+			assert.ok( a.containsPoint( midpoint ), "Passed!" );
 			assert.ok( ! a.containsPoint( new Vector3( - 1, - 1, - 1 ) ), "Passed!" );
 
 		} );
@@ -240,37 +270,38 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "closestPointToPoint", ( assert ) => {
 
 			var a = new Triangle( new Vector3( - 1, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
+			var point = new Vector3();
 
 			// point lies inside the triangle
-			var b0 = a.closestPointToPoint( new Vector3( 0, 0.5, 0 ) );
-			assert.ok( b0.equals( new Vector3( 0, 0.5, 0 ) ), "Passed!" );
+			a.closestPointToPoint( new Vector3( 0, 0.5, 0 ), point );
+			assert.ok( point.equals( new Vector3( 0, 0.5, 0 ) ), "Passed!" );
 
 			// point lies on a vertex
-			var b0 = a.closestPointToPoint( a.a );
-			assert.ok( b0.equals( a.a ), "Passed!" );
+			a.closestPointToPoint( a.a, point );
+			assert.ok( point.equals( a.a ), "Passed!" );
 
-			var b0 = a.closestPointToPoint( a.b );
-			assert.ok( b0.equals( a.b ), "Passed!" );
+			a.closestPointToPoint( a.b, point );
+			assert.ok( point.equals( a.b ), "Passed!" );
 
-			var b0 = a.closestPointToPoint( a.c );
-			assert.ok( b0.equals( a.c ), "Passed!" );
+			a.closestPointToPoint( a.c, point );
+			assert.ok( point.equals( a.c ), "Passed!" );
 
 			// point lies on an edge
-			var b0 = a.closestPointToPoint( zero3.clone() );
-			assert.ok( b0.equals( zero3.clone() ), "Passed!" );
+			a.closestPointToPoint( zero3.clone(), point );
+			assert.ok( point.equals( zero3.clone() ), "Passed!" );
 
 			// point lies outside the triangle
-			var b0 = a.closestPointToPoint( new Vector3( - 2, 0, 0 ) );
-			assert.ok( b0.equals( new Vector3( - 1, 0, 0 ) ), "Passed!" );
+			a.closestPointToPoint( new Vector3( - 2, 0, 0 ), point );
+			assert.ok( point.equals( new Vector3( - 1, 0, 0 ) ), "Passed!" );
 
-			var b0 = a.closestPointToPoint( new Vector3( 2, 0, 0 ) );
-			assert.ok( b0.equals( new Vector3( 1, 0, 0 ) ), "Passed!" );
+			a.closestPointToPoint( new Vector3( 2, 0, 0 ), point );
+			assert.ok( point.equals( new Vector3( 1, 0, 0 ) ), "Passed!" );
 
-			var b0 = a.closestPointToPoint( new Vector3( 0, 2, 0 ) );
-			assert.ok( b0.equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
+			a.closestPointToPoint( new Vector3( 0, 2, 0 ), point );
+			assert.ok( point.equals( new Vector3( 0, 1, 0 ) ), "Passed!" );
 
-			var b0 = a.closestPointToPoint( new Vector3( 0, - 2, 0 ) );
-			assert.ok( b0.equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
+			a.closestPointToPoint( new Vector3( 0, - 2, 0 ), point );
+			assert.ok( point.equals( new Vector3( 0, 0, 0 ) ), "Passed!" );
 
 		} );
 

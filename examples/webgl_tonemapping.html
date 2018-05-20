@@ -129,7 +129,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
+				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
 				var mesh = new THREE.Mesh( geometry, standardMaterial );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;

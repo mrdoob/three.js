@@ -79,7 +79,7 @@
 
 			var camera, scene, renderer;
 
-			var ninjaMeshRaw, curvatureAttribute;
+			var ninjaMeshRaw, curvatureAttribute, bufferGeo;
 
 			init();
 			animate();
@@ -164,7 +164,7 @@
 				//load the obj
 				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( object ) {
 					object.traverse( function ( child ) {
-						if ( child instanceof THREE.Mesh ) {
+						if ( child.isMesh ) {
 
 							bufferGeo = child.geometry;
 							bufferGeo.center();
@@ -222,7 +222,7 @@
 
 							}
 
-							curvatureDict = {};
+							var curvatureDict = {};
 							var min = 10, max = 0;
 
 							Object.keys( dict ).forEach( function( key ) {
@@ -253,7 +253,7 @@
 							// fit values to 0 and 1
 							Object.keys( curvatureDict ).forEach( function( key ) {
 
-								val = Math.abs( curvatureDict[ key ] );
+								var val = Math.abs( curvatureDict[ key ] );
 								if ( val < min ) min = val;
 								if ( val > max ) max = val;
 
@@ -263,7 +263,7 @@
 
 							Object.keys( curvatureDict ).forEach( function( key ) {
 
-								val = Math.abs( curvatureDict[ key ] );
+								var val = Math.abs( curvatureDict[ key ] );
 								if ( curvatureDict[ key ] < 0 ) {
 									curvatureDict[ key ] = (min - val) / range
 								} else {
@@ -338,7 +338,7 @@
 
 				var gui = new dat.GUI();
 
-				topologyFolder = gui.addFolder( 'Topology' );
+				var topologyFolder = gui.addFolder( 'Topology' );
 				topologyFolder.add( params, 'filterConvex' );
 				topologyFolder.add( params, 'filterConcave' );
 				topologyFolder.add( params, 'filterBoth' );

@@ -12,10 +12,10 @@
 
 		<h1>BufferAttribute Types</h1>
 
-		<div class="desc">
+		<p class="desc">
 		There are nine types of [page:BufferAttribute] available in three.js. These correspond to the JavaScript
 		[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray#Syntax Typed Arrays].
-		</div>
+		</p>
 
 		<code>
 		THREE.Float64BufferAttribute
@@ -32,12 +32,14 @@
 		<h2>Constructor</h2>
 
 		All of the above are called in the same way.
-		<h3>TypedBufferAttribute( [page:Array array], [page:Integer itemSize] )</h3>
-		<div>
+		<h3>TypedBufferAttribute( [param:Array array], [param:Integer itemSize], [param:Boolean normalized] )</h3>
+		<p>
 			array -- this can be a typed or untyped (normal) array. It will be converted to the Type specified.<br /><br />
 
-			itemSize -- the number of values of the array that should be associated with a particular vertex.
-		</div>
+			itemSize -- the number of values of the array that should be associated with a particular vertex.<br /><br />
+
+			normalized -- (optional) indicates how the underlying data in the buffer maps to the values in the GLSL code.
+		</p>
 
 		<h2>Properties</h2>
 

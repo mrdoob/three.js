@@ -46,13 +46,15 @@ var lastTime;
 
 function plane( width, height ) {
 
-	return function( u, v ) {
+	return function ( u, v, optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
 
 		var x = ( u - 0.5 ) * width;
 		var y = ( v + 0.5 ) * height;
 		var z = 0;
 
-		return new THREE.Vector3( x, y, z );
+		return result.set( x, y, z );
 
 	};
 

@@ -4,6 +4,7 @@
  */
 /* global QUnit */
 
+import { runStdLightTests } from '../../qunit-utils';
 import { HemisphereLight } from '../../../../src/lights/HemisphereLight';
 
 export default QUnit.module( 'Lights', () => {

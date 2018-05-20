@@ -4,8 +4,12 @@
 		<title>three.js webvr - gear vr</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-04-03 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-04-03" content="AqIrNtaoJSmDZatgEEW2ehuK9ITIiFk3gZ3/gC6Vp0gF85NDYl7IzVPj4Bh7O6SIcr3ICOm6kocYSaS+BPkazgYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyMjc2MzAwMn0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-06-19 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-06-19" content="Alxt96tYGgIr9l6EXU0eeI360zcmzOY6Kuo3kcTfBGIRDOQbgFIZKRQ1joExQ74WZr1einsE+cUMHgSclNHCQQ4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyOTM5NzgyOH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API, origin = https://threejs.org, expires = 2018-06-15 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API" data-expires="2018-06-15" content="AtJH9g6nn0B87bnjJt+9m1joZXEYDmLSlRvtMr5qJD52hMcm3S86S7jg5I7y2I5cgQglE0rzsXzti5DECQLb8QkAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZSIsImV4cGlyeSI6MTUyOTA4NDY2OH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-06-15 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-06-15" content="Aihhr0yXkVlCKF0DIpTbH8WX7ZmEexUhI/95+t8aoLfvBkePMiZ/iOoDPU3xefyfuczkDahH1L6eiPvRsuzITAAAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTI5MDg0NjY4fQ==">
 		<style>
 			body {
 				font-family: Monospace;
@@ -34,10 +38,14 @@
 			var clock = new THREE.Clock();
 
 			var container;
-			var camera, camBox, scene, renderer;
+			var camera, scene, renderer;
 			var controller;
 
 			var room;
+
+			var radius = 0.08;
+			var normal = new THREE.Vector3();
+			var relativeVelocity = new THREE.Vector3();
 
 			init();
 			animate();
@@ -59,15 +67,9 @@
 				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camBox = new THREE.Object3D();
-
-				camBox.position.y = 1.8;
-
-				camBox.add( camera );
-				scene.add( camBox );
 
 				room = new THREE.Mesh(
-					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+					new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
 				);
 				room.position.y = 3;
@@ -79,7 +81,7 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+				var geometry = new THREE.IcosahedronBufferGeometry( radius, 2 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
@@ -91,14 +93,6 @@
 					object.position.x = Math.random() * 4 - 2;
 					object.position.y = Math.random() * 4 - 2;
 					object.position.z = Math.random() * 4 - 2;
-
-					object.rotation.x = Math.random() * 2 * Math.PI;
-					object.rotation.y = Math.random() * 2 * Math.PI;
-					object.rotation.z = Math.random() * 2 * Math.PI;
-
-					object.scale.x = Math.random() + 0.5;
-					object.scale.y = Math.random() + 0.5;
-					object.scale.z = Math.random() + 0.5;
 
 					object.userData.velocity = new THREE.Vector3();
 					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
@@ -118,9 +112,8 @@
 				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				controller = new THREE.GearVRController();
-				camBox.position.y = 1.8;
-				controller.setHand( 'right' );
-				camBox.add( controller );
+				controller.position.set( 0.25, 0.75, 0 );
+				scene.add( controller );
 
 				var skyBox = {
 					front: 'textures/cube/Bridge2/posz.jpg',
@@ -187,10 +180,10 @@
 					var cube = room.children[ 0 ];
 					room.remove( cube );
 
-					cube.position.copy( controller.position );
-					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02 * delta;
-					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02 * delta;
-					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 ) * delta;
+					cube.position.copy( controller.position ).sub( room.position );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
+					cube.userData.velocity.z = ( Math.random() * 0.02 - 0.1 );
 					cube.userData.velocity.applyQuaternion( controller.quaternion );
 					room.add( cube );
 
@@ -198,36 +191,65 @@
 
 				// keep cubes inside room
 
+				var range = 3 - radius;
+
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
 					var cube = room.children[ i ];
 
 					cube.position.add( cube.userData.velocity );
 
-					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
+					if ( cube.position.x < - range || cube.position.x > range ) {
 
-						cube.position.x = THREE.Math.clamp( cube.position.x, - 3, 3 );
+						cube.position.x = THREE.Math.clamp( cube.position.x, - range, range );
 						cube.userData.velocity.x = - cube.userData.velocity.x;
 
 					}
 
-					if ( cube.position.y < - 3 || cube.position.y > 3 ) {
+					if ( cube.position.y < - range || cube.position.y > range ) {
 
-						cube.position.y = THREE.Math.clamp( cube.position.y, - 3, 3 );
-						cube.userData.velocity.y = - cube.userData.velocity.y;
+						cube.position.y = Math.max( cube.position.y, - range );
+
+						cube.userData.velocity.x *= 0.9;
+						cube.userData.velocity.y = - cube.userData.velocity.y * 0.8;
+						cube.userData.velocity.z *= 0.9;
 
 					}
 
-					if ( cube.position.z < - 3 || cube.position.z > 3 ) {
+					if ( cube.position.z < - range || cube.position.z > range ) {
 
-						cube.position.z = THREE.Math.clamp( cube.position.z, - 3, 3 );
+						cube.position.z = THREE.Math.clamp( cube.position.z, - range, range );
 						cube.userData.velocity.z = - cube.userData.velocity.z;
 
 					}
 
-					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
-					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
-					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
+					for ( var j = i + 1; j < room.children.length; j ++ ) {
+
+						var cube2 = room.children[ j ];
+
+						normal.copy( cube.position ).sub( cube2.position );
+
+						if ( normal.length() < 2 * radius ) {
+
+							normal.multiplyScalar( 0.5 * normal.length() - radius );
+							cube.position.sub( normal );
+							cube2.position.add( normal );
+
+							normal.normalize();
+
+							relativeVelocity.copy( cube.userData.velocity ).sub( cube2.userData.velocity );
+							var dot = relativeVelocity.dot( normal );
+
+							normal = normal.multiplyScalar( dot );
+
+							cube.userData.velocity.sub( normal );
+							cube2.userData.velocity.add( normal );
+
+						}
+
+					}
+
+					cube.userData.velocity.y -= 0.00098;
 
 				}
 

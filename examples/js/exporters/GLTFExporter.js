@@ -98,12 +98,14 @@ THREE.GLTFExporter.prototype = {
 		var byteOffset = 0;
 		var buffers = [];
 		var pending = [];
-		var nodeMap = {};
+		var nodeMap = new Map();
 		var skins = [];
+		var extensionsUsed = {};
 		var cachedData = {
 
-			materials: {},
-			textures: {}
+			attributes: new Map(),
+			materials: new Map(),
+			textures: new Map()
 
 		};
 
@@ -133,18 +135,7 @@ THREE.GLTFExporter.prototype = {
 		 * @param  {string} text
 		 * @return {ArrayBuffer}
 		 */
-		function stringToArrayBuffer( text, padded ) {
-			if ( padded ) {
-
-				var pad = getPaddedBufferSize( text.length ) - text.length;
-
-				for ( var i = 0; i < pad; i++ ) {
-
-					text += ' ';
-
-				}
-
-			}
+		function stringToArrayBuffer( text ) {
 
 			if ( window.TextEncoder !== undefined ) {
 
@@ -152,26 +143,29 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var buffer = new ArrayBuffer( text.length );
+			var array = new Uint8Array( new ArrayBuffer( text.length ) );
 
-			var bufferView = new Uint8Array( buffer );
+			for ( var i = 0, il = text.length; i < il; i ++ ) {
 
-			for ( var i = 0; i < text.length; ++ i ) {
+				var value = text.charCodeAt( i );
 
-				bufferView[ i ] = text.charCodeAt( i );
+				// Replacing multi-byte character with space(0x20).
+				array[ i ] = value > 0xFF ? 0x20 : value;
 
 			}
 
-			return buffer;
+			return array.buffer;
 
 		}
 
 		/**
 		 * Get the min and max vectors from the given attribute
-		 * @param  {THREE.BufferAttribute} attribute Attribute to find the min/max
+		 * @param  {THREE.BufferAttribute} attribute Attribute to find the min/max in range from start to start + count
+		 * @param  {Integer} start
+		 * @param  {Integer} count
 		 * @return {Object} Object containing the `min` and `max` values (As an array of attribute.itemSize components)
 		 */
-		function getMinMax( attribute ) {
+		function getMinMax( attribute, start, count ) {
 
 			var output = {
 
@@ -180,7 +174,7 @@ THREE.GLTFExporter.prototype = {
 
 			};
 
-			for ( var i = 0; i < attribute.count; i ++ ) {
+			for ( var i = start; i < start + count; i ++ ) {
 
 				for ( var a = 0; a < attribute.itemSize; a ++ ) {
 
@@ -210,6 +204,78 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
+		 * Checks if normal attribute values are normalized.
+		 *
+		 * @param {THREE.BufferAttribute} normal
+		 * @returns {Boolean}
+		 *
+		 */
+		function isNormalizedNormalAttribute( normal ) {
+
+			if ( cachedData.attributes.has( normal ) ) {
+
+				return false;
+
+			}
+
+			var v = new THREE.Vector3();
+
+			for ( var i = 0, il = normal.count; i < il; i ++ ) {
+
+				// 0.0005 is from glTF-validator
+				if ( Math.abs( v.fromArray( normal.array, i * 3 ).length() - 1.0 ) > 0.0005 ) return false;
+
+			}
+
+			return true;
+
+		}
+
+		/**
+		 * Creates normalized normal buffer attribute.
+		 *
+		 * @param {THREE.BufferAttribute} normal
+		 * @returns {THREE.BufferAttribute}
+		 *
+		 */
+		function createNormalizedNormalAttribute( normal ) {
+
+			if ( cachedData.attributes.has( normal ) ) {
+
+				return cachedData.textures.get( normal );
+
+			}
+
+			var attribute = normal.clone();
+
+			var v = new THREE.Vector3();
+
+			for ( var i = 0, il = attribute.count; i < il; i ++ ) {
+
+				v.fromArray( attribute.array, i * 3 );
+
+				if ( v.x === 0 && v.y === 0 && v.z === 0 ) {
+
+					// if values can't be normalized set (1, 0, 0)
+					v.setX( 1.0 );
+
+				} else {
+
+					v.normalize();
+
+				}
+
+				v.toArray( attribute.array, i * 3 );
+
+			}
+
+			cachedData.attributes.set( normal, attribute );
+
+			return attribute;
+
+		}
+
+		/**
 		 * Get the required size + padding for a buffer, rounded to the next 4-byte boundary.
 		 * https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#data-alignment
 		 *
@@ -227,21 +293,58 @@ THREE.GLTFExporter.prototype = {
 		 * Returns a buffer aligned to 4-byte boundary.
 		 *
 		 * @param {ArrayBuffer} arrayBuffer Buffer to pad
+		 * @param {Integer} paddingByte (Optional)
 		 * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
 		 */
-		function getPaddedArrayBuffer( arrayBuffer ) {
+		function getPaddedArrayBuffer( arrayBuffer, paddingByte ) {
+
+			paddingByte = paddingByte || 0;
 
 			var paddedLength = getPaddedBufferSize( arrayBuffer.byteLength );
 
-			if (paddedLength !== arrayBuffer.byteLength ) {
+			if ( paddedLength !== arrayBuffer.byteLength ) {
 
-				var paddedBuffer = new ArrayBuffer( paddedLength );
-				new Uint8Array( paddedBuffer ).set(new Uint8Array(arrayBuffer));
-				return paddedBuffer;
+				var array = new Uint8Array( paddedLength );
+				array.set( new Uint8Array( arrayBuffer ) );
+
+				if ( paddingByte !== 0 ) {
+
+					for ( var i = arrayBuffer.byteLength; i < paddedLength; i ++ ) {
+
+						array[ i ] = paddingByte;
+
+					}
+
+				}
+
+				return array.buffer;
 
 			}
 
 			return arrayBuffer;
+
+		}
+
+		/**
+		 * Serializes a userData.
+		 *
+		 * @param {THREE.Object3D|THREE.Material} object
+		 * @returns {Object}
+		 */
+		function serializeUserData( object ) {
+
+			try {
+
+				return JSON.parse( JSON.stringify( object.userData ) );
+
+			} catch ( error ) {
+
+				console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' +
+					'won\'t be serialized because of JSON.stringify error - ' + error.message );
+
+				return {};
+
+			}
 
 		}
 
@@ -283,7 +386,23 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			// Create a new dataview and dump the attribute's array into it
-			var componentSize = componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ? 2 : 4;
+
+			var componentSize;
+
+			if ( componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE ) {
+
+				componentSize = 1;
+
+			} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ) {
+
+				componentSize = 2;
+
+			} else {
+
+				componentSize = 4;
+
+			}
+
 			var byteLength = getPaddedBufferSize( count * attribute.itemSize * componentSize );
 			var dataView = new DataView( new ArrayBuffer( byteLength ) );
 			var offset = 0;
@@ -307,6 +426,10 @@ THREE.GLTFExporter.prototype = {
 					} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ) {
 
 						dataView.setUint16( offset, value, true );
+
+					} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE ) {
+
+						dataView.setUint8( offset, value );
 
 					}
 
@@ -392,15 +515,11 @@ THREE.GLTFExporter.prototype = {
 		 * Process attribute to generate an accessor
 		 * @param  {THREE.BufferAttribute} attribute Attribute to process
 		 * @param  {THREE.BufferGeometry} geometry (Optional) Geometry used for truncated draw range
+		 * @param  {Integer} start (Optional)
+		 * @param  {Integer} count (Optional)
 		 * @return {Integer}           Index of the processed accessor on the "accessors" array
 		 */
-		function processAccessor( attribute, geometry ) {
-
-			if ( ! outputJSON.accessors ) {
-
-				outputJSON.accessors = [];
-
-			}
+		function processAccessor( attribute, geometry, start, count ) {
 
 			var types = {
 
@@ -427,24 +546,42 @@ THREE.GLTFExporter.prototype = {
 
 				componentType = WEBGL_CONSTANTS.UNSIGNED_SHORT;
 
+			} else if ( attribute.array.constructor === Uint8Array ) {
+
+				componentType = WEBGL_CONSTANTS.UNSIGNED_BYTE;
+
 			} else {
 
 				throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type.' );
 
 			}
 
-			var minMax = getMinMax( attribute );
-
-			var start = 0;
-			var count = attribute.count;
+			if ( start === undefined ) start = 0;
+			if ( count === undefined ) count = attribute.count;
 
 			// @TODO Indexed buffer geometry with drawRange not supported yet
 			if ( options.truncateDrawRange && geometry !== undefined && geometry.index === null ) {
 
-				start = geometry.drawRange.start;
-				count = geometry.drawRange.count !== Infinity ? geometry.drawRange.count : attribute.count;
+				var end = start + count;
+				var end2 = geometry.drawRange.count === Infinity
+						? attribute.count
+						: geometry.drawRange.start + geometry.drawRange.count;
+
+				start = Math.max( start, geometry.drawRange.start );
+				count = Math.min( end, end2 ) - start;
+
+				if ( count < 0 ) count = 0;
 
 			}
+
+			// Skip creating an accessor if the attribute doesn't have data to export
+			if ( count === 0 ) {
+
+				return null;
+
+			}
+
+			var minMax = getMinMax( attribute, start, count );
 
 			var bufferViewTarget;
 
@@ -452,8 +589,7 @@ THREE.GLTFExporter.prototype = {
 			// animation samplers, target must not be set.
 			if ( geometry !== undefined ) {
 
-				var isVertexAttributes = componentType === WEBGL_CONSTANTS.FLOAT;
-				bufferViewTarget = isVertexAttributes ? WEBGL_CONSTANTS.ARRAY_BUFFER : WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER;
+				bufferViewTarget = attribute === geometry.index ? WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER : WEBGL_CONSTANTS.ARRAY_BUFFER;
 
 			}
 
@@ -470,6 +606,12 @@ THREE.GLTFExporter.prototype = {
 				type: types[ attribute.itemSize ]
 
 			};
+
+			if ( ! outputJSON.accessors ) {
+
+				outputJSON.accessors = [];
+
+			}
 
 			outputJSON.accessors.push( gltfAccessor );
 
@@ -593,9 +735,9 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processTexture( map ) {
 
-			if ( cachedData.textures[ map.uuid ] !== undefined ) {
+			if ( cachedData.textures.has( map ) ) {
 
-				return cachedData.textures[ map.uuid ];
+				return cachedData.textures.get( map );
 
 			}
 
@@ -615,7 +757,7 @@ THREE.GLTFExporter.prototype = {
 			outputJSON.textures.push( gltfTexture );
 
 			var index = outputJSON.textures.length - 1;
-			cachedData.textures[ map.uuid ] = index;
+			cachedData.textures.set( map, index );
 
 			return index;
 
@@ -628,9 +770,9 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMaterial( material ) {
 
-			if ( cachedData.materials[ material.uuid ] !== undefined ) {
+			if ( cachedData.materials.has( material ) ) {
 
-				return cachedData.materials[ material.uuid ];
+				return cachedData.materials.get( material );
 
 			}
 
@@ -640,17 +782,10 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material instanceof THREE.ShaderMaterial ) {
+			if ( material.isShaderMaterial ) {
 
 				console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
 				return null;
-
-			}
-
-
-			if ( ! ( material instanceof THREE.MeshStandardMaterial ) ) {
-
-				console.warn( 'GLTFExporter: Currently just THREE.MeshStandardMaterial is supported. Material conversion may lose information.' );
 
 			}
 
@@ -661,6 +796,18 @@ THREE.GLTFExporter.prototype = {
 
 			};
 
+			if ( material.isMeshBasicMaterial ) {
+
+				gltfMaterial.extensions = { KHR_materials_unlit: {} };
+
+				extensionsUsed[ 'KHR_materials_unlit' ] = true;
+
+			} else if ( ! material.isMeshStandardMaterial ) {
+
+				console.warn( 'GLTFExporter: Use MeshStandardMaterial or MeshBasicMaterial for best results.' );
+
+			}
+
 			// pbrMetallicRoughness.baseColorFactor
 			var color = material.color.toArray().concat( [ material.opacity ] );
 
@@ -670,10 +817,15 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material instanceof THREE.MeshStandardMaterial ) {
+			if ( material.isMeshStandardMaterial ) {
 
 				gltfMaterial.pbrMetallicRoughness.metallicFactor = material.metalness;
 				gltfMaterial.pbrMetallicRoughness.roughnessFactor = material.roughness;
+
+			} else if ( material.isMeshBasicMaterial ) {
+
+				gltfMaterial.pbrMetallicRoughness.metallicFactor = 0.0;
+				gltfMaterial.pbrMetallicRoughness.roughnessFactor = 0.9;
 
 			} else {
 
@@ -712,9 +864,9 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material instanceof THREE.MeshBasicMaterial ||
-				material instanceof THREE.LineBasicMaterial ||
-				material instanceof THREE.PointsMaterial ) {
+			if ( material.isMeshBasicMaterial ||
+				material.isLineBasicMaterial ||
+				material.isPointsMaterial ) {
 
 			} else {
 
@@ -807,10 +959,16 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			if ( Object.keys( material.userData ).length > 0 ) {
+
+				gltfMaterial.extras = serializeUserData( material );
+
+			}
+
 			outputJSON.materials.push( gltfMaterial );
 
 			var index = outputJSON.materials.length - 1;
-			cachedData.materials[ material.uuid ] = index;
+			cachedData.materials.set( material, index );
 
 			return index;
 
@@ -823,30 +981,24 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processMesh( mesh ) {
 
-			if ( ! outputJSON.meshes ) {
-
-				outputJSON.meshes = [];
-
-			}
-
 			var geometry = mesh.geometry;
 
 			var mode;
 
 			// Use the correct mode
-			if ( mesh instanceof THREE.LineSegments ) {
+			if ( mesh.isLineSegments ) {
 
 				mode = WEBGL_CONSTANTS.LINES;
 
-			} else if ( mesh instanceof THREE.LineLoop ) {
+			} else if ( mesh.isLineLoop ) {
 
 				mode = WEBGL_CONSTANTS.LINE_LOOP;
 
-			} else if ( mesh instanceof THREE.Line ) {
+			} else if ( mesh.isLine ) {
 
 				mode = WEBGL_CONSTANTS.LINE_STRIP;
 
-			} else if ( mesh instanceof THREE.Points ) {
+			} else if ( mesh.isPoints ) {
 
 				mode = WEBGL_CONSTANTS.POINTS;
 
@@ -877,43 +1029,11 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var gltfMesh = {
-				primitives: [
-					{
-						mode: mode,
-						attributes: {},
-					}
-				]
-			};
+			var gltfMesh = {};
 
-			var material = processMaterial( mesh.material );
-			if ( material !== null ) {
-
-				gltfMesh.primitives[ 0 ].material = material;
-
-			}
-
-
-			if ( geometry.index ) {
-
-				gltfMesh.primitives[ 0 ].indices = processAccessor( geometry.index, geometry );
-
-			} else if ( options.forceIndices ) {
-
-				var numFaces = geometry.attributes.position.count;
-				var indices = new Uint32Array( numFaces );
-				for ( var i = 0; i < numFaces; i ++ ) {
-
-					indices[ i ] = i;
-
-				}
-
-				gltfMesh.primitives[ 0 ].indices = processAccessor( new THREE.Uint32BufferAttribute( indices, 1 ), geometry );
-
-			}
-
-			// We've just one primitive per mesh
-			var gltfAttributes = gltfMesh.primitives[ 0 ].attributes;
+			var attributes = {};
+			var primitives = [];
+			var targets = [];
 
 			// Conversion between attributes names in threejs and gltf spec
 			var nameConversion = {
@@ -926,6 +1046,16 @@ THREE.GLTFExporter.prototype = {
 
 			};
 
+			var originalNormal = geometry.getAttribute( 'normal' );
+
+			if ( originalNormal !== undefined && ! isNormalizedNormalAttribute( originalNormal ) ) {
+
+				console.warn( 'THREE.GLTFExporter: Creating normalized normal attribute from the non-normalized one.' );
+
+				geometry.addAttribute( 'normal', createNormalizedNormalAttribute( originalNormal ) );
+
+			}
+
 			// @QUESTION Detect if .vertexColors = THREE.VertexColors?
 			// For every attribute create an accessor
 			for ( var attributeName in geometry.attributes ) {
@@ -933,11 +1063,36 @@ THREE.GLTFExporter.prototype = {
 				var attribute = geometry.attributes[ attributeName ];
 				attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
 
-				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
+				// JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
+				var array = attribute.array;
+				if ( attributeName === 'JOINTS_0' &&
+					! ( array instanceof Uint16Array ) &&
+					! ( array instanceof Uint8Array ) ) {
 
-					gltfAttributes[ attributeName ] = processAccessor( attribute, geometry );
+					console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
+					attribute = new THREE.BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
 
 				}
+
+				if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
+
+					var accessor = processAccessor( attribute, geometry );
+					if ( accessor !== null ) {
+
+						attributes[ attributeName ] = accessor;
+
+					}
+
+				}
+
+			}
+
+			if ( originalNormal !== undefined ) geometry.addAttribute( 'normal', originalNormal );
+
+			// Skip if no exportable attributes found
+			if ( Object.keys( attributes ).length === 0 ) {
+
+				return null;
 
 			}
 
@@ -957,8 +1112,6 @@ THREE.GLTFExporter.prototype = {
 					}
 
 				}
-
-				gltfMesh.primitives[ 0 ].targets = [];
 
 				for ( var i = 0; i < mesh.morphTargetInfluences.length; ++ i ) {
 
@@ -1010,7 +1163,7 @@ THREE.GLTFExporter.prototype = {
 
 					}
 
-					gltfMesh.primitives[ 0 ].targets.push( target );
+					targets.push( target );
 
 					weights.push( mesh.morphTargetInfluences[ i ] );
 					if ( mesh.morphTargetDictionary !== undefined ) targetNames.push( reverseDictionary[ i ] );
@@ -1025,6 +1178,81 @@ THREE.GLTFExporter.prototype = {
 					gltfMesh.extras.targetNames = targetNames;
 
 				}
+
+			}
+
+			var forceIndices = options.forceIndices;
+			var isMultiMaterial = Array.isArray( mesh.material );
+
+			if ( isMultiMaterial && mesh.geometry.groups.length === 0 ) return null;
+
+			if ( ! forceIndices && geometry.index === null && isMultiMaterial ) {
+
+				// temporal workaround.
+				console.warn( 'THREE.GLTFExporter: Creating index for non-indexed multi-material mesh.' );
+				forceIndices = true;
+
+			}
+
+			var didForceIndices = false;
+
+			if ( geometry.index === null && forceIndices ) {
+
+				var indices = [];
+
+				for ( var i = 0, il = geometry.attributes.position.count; i < il; i ++ ) {
+
+					indices[ i ] = i;
+
+				}
+
+				geometry.setIndex( indices );
+
+				didForceIndices = true;
+
+			}
+
+			var materials = isMultiMaterial ? mesh.material : [ mesh.material ];
+			var groups = isMultiMaterial ? mesh.geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
+
+			for ( var i = 0, il = groups.length; i < il; i ++ ) {
+
+				var primitive = {
+					mode: mode,
+					attributes: attributes,
+				};
+
+				if ( targets.length > 0 ) primitive.targets = targets;
+
+				if ( geometry.index !== null ) {
+
+					primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
+
+				}
+
+				var material = processMaterial( materials[ groups[ i ].materialIndex ] );
+
+				if ( material !== null ) {
+
+					primitive.material = material;
+
+				}
+
+				primitives.push( primitive );
+
+			}
+
+			if ( didForceIndices ) {
+
+				geometry.setIndex( null );
+
+			}
+
+			gltfMesh.primitives = primitives;
+
+			if ( ! outputJSON.meshes ) {
+
+				outputJSON.meshes = [];
 
 			}
 
@@ -1047,7 +1275,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var isOrtho = camera instanceof THREE.OrthographicCamera;
+			var isOrtho = camera.isOrthographicCamera;
 
 			var gltfCamera = {
 
@@ -1187,7 +1415,7 @@ THREE.GLTFExporter.prototype = {
 
 					sampler: samplers.length - 1,
 					target: {
-						node: nodeMap[ trackNode.uuid ],
+						node: nodeMap.get( trackNode ),
 						path: trackProperty
 					}
 
@@ -1209,7 +1437,7 @@ THREE.GLTFExporter.prototype = {
 
 		function processSkin( object ) {
 
-			var node = outputJSON.nodes[ nodeMap[ object.uuid ] ];
+			var node = outputJSON.nodes[ nodeMap.get( object ) ];
 
 			var skeleton = object.skeleton;
 			var rootJoint = object.skeleton.bones[ 0 ];
@@ -1221,7 +1449,7 @@ THREE.GLTFExporter.prototype = {
 
 			for ( var i = 0; i < skeleton.bones.length; ++ i ) {
 
-				joints.push( nodeMap[ skeleton.bones[ i ].uuid ] );
+				joints.push( nodeMap.get( skeleton.bones[ i ] ) );
 
 				skeleton.boneInverses[ i ].toArray( inverseBindMatrices, i * 16 );
 
@@ -1237,7 +1465,7 @@ THREE.GLTFExporter.prototype = {
 
 				inverseBindMatrices: processAccessor( new THREE.BufferAttribute( inverseBindMatrices, 16 ) ),
 				joints: joints,
-				skeleton: nodeMap[ rootJoint.uuid ]
+				skeleton: nodeMap.get( rootJoint )
 
 			} );
 
@@ -1254,7 +1482,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processNode( object ) {
 
-			if ( object instanceof THREE.Light ) {
+			if ( object.isLight ) {
 
 				console.warn( 'GLTFExporter: Unsupported node type:', object.constructor.name );
 				return null;
@@ -1313,31 +1541,27 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.userData && Object.keys( object.userData ).length > 0 ) {
 
-				try {
-
-					gltfNode.extras = JSON.parse( JSON.stringify( object.userData ) );
-
-				} catch ( e ) {
-
-					throw new Error( 'THREE.GLTFExporter: userData can\'t be serialized' );
-
-				}
+				gltfNode.extras = serializeUserData( object );
 
 			}
 
-			if ( object instanceof THREE.Mesh ||
-				object instanceof THREE.Line ||
-				object instanceof THREE.Points ) {
+			if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				gltfNode.mesh = processMesh( object );
+				var mesh = processMesh( object );
 
-			} else if ( object instanceof THREE.Camera ) {
+				if ( mesh !== null ) {
+
+					gltfNode.mesh = mesh;
+
+				}
+
+			} else if ( object.isCamera ) {
 
 				gltfNode.camera = processCamera( object );
 
 			}
 
-			if ( object instanceof THREE.SkinnedMesh ) {
+			if ( object.isSkinnedMesh ) {
 
 				skins.push( object );
 
@@ -1376,7 +1600,8 @@ THREE.GLTFExporter.prototype = {
 
 			outputJSON.nodes.push( gltfNode );
 
-			var nodeIndex = nodeMap[ object.uuid ] = outputJSON.nodes.length - 1;
+			var nodeIndex = outputJSON.nodes.length - 1;
+			nodeMap.set( object, nodeIndex );
 
 			return nodeIndex;
 
@@ -1505,6 +1730,10 @@ THREE.GLTFExporter.prototype = {
 			// Merge buffers.
 			var blob = new Blob( buffers, { type: 'application/octet-stream' } );
 
+			// Declare extensions.
+			var extensionsUsedList = Object.keys( extensionsUsed );
+			if ( extensionsUsedList.length > 0 ) outputJSON.extensionsUsed = extensionsUsedList;
+
 			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
 
 				// Update bytelength of the single buffer.
@@ -1534,7 +1763,7 @@ THREE.GLTFExporter.prototype = {
 						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
 
 						// JSON chunk.
-						var jsonChunk = stringToArrayBuffer( JSON.stringify( outputJSON ), true );
+						var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ) ), 0x20 );
 						var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
 						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
 						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );

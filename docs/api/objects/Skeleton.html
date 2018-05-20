@@ -11,14 +11,12 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 		Use an array of [page:Bone bones] to create a skeleton that can be used by a
 		[page:SkinnedMesh].
-		</div>
+		</p>
 
 		<h2>Example</h2>
-		<div>
-
 <code>
 // Create a simple "arm"
 
@@ -41,67 +39,75 @@ hand.position.y = 5;
 
 var armSkeleton = new THREE.Skeleton( bones );
 </code>
+		<p>
 			See the [page:SkinnedMesh] page for an example of usage with standard [page:BufferGeometry].
- 		</div>
+ 		</p>
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]( [param:Array bones], [param:Array boneInverses] )</h3>
-		<div>
+		<p>
 		[page:Array bones] - The array of [page:Bone bones]. Default is an empty array.<br/>
 		[page:Array boneInverses] - (optional) An array of [page:Matrix4 Matrix4s].<br /><br />
 
 		Creates a new [name].
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
 
 		<h3>[property:Array bones]</h3>
-		<div>
+		<p>
 		The array of [page:bone bones]. Note this is a copy of the original array, not a reference,
 		so you can modify the original array without effecting this one.
-		</div>
+		</p>
 
 		<h3>[property:Array boneInverses]</h3>
-		<div>
+		<p>
 		An array of [page:Matrix4 Matrix4s] that represent the inverse of the [page:Matrix4 matrixWorld]
 		of the individual bones.
-		</div>
+		</p>
 
 		<h3>[property:Float32Array boneMatrices]</h3>
-		<div>
+		<p>
 		The array buffer holding the bone data when using a vertex texture.
-		</div>
+		</p>
 
 		<h3>[property:DataTexture boneTexture]</h3>
-		<div>
+		<p>
 		The [page:DataTexture] holding the bone data when using a vertex texture.
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
 
 		<h3>[method:Skeleton clone]()</h3>
-		<div>
+		<p>
 		Returns a clone of this Skeleton object.
-		</div>
+		</p>
 
 
 		<h3>[method:null calculateInverses]()</h3>
-		<div>Generates the [page:.boneInverses boneInverses] array if not provided in the constructor.</div>
+		<p>Generates the [page:.boneInverses boneInverses] array if not provided in the constructor.</p>
 
 
 		<h3>[method:null pose]()</h3>
-		<div>Returns the skeleton to the base pose.</div>
+		<p>Returns the skeleton to the base pose.</p>
 
 
 		<h3>[method:null update]()</h3>
-		<div>
+		<p>
 		Updates the [page:Float32Array boneMatrices] and [page:DataTexture boneTexture] after changing the bones.
 		This is called automatically by the [page:WebGLRenderer] if the skeleton is used with a [page:SkinnedMesh].
-		</div>
+		</p>
+
+		<h3>[method:Bone getBoneByName]( [param:String name] )</h3>
+		<p>
+		name -- String to match to the Bone's .name property. <br /><br />
+
+		Searches through the skeleton's bone array and returns the first with a matching name.<br />
+		</p>
 
 		<h2>Source</h2>
 

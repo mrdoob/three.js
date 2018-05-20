@@ -387,7 +387,7 @@
 				var ballMass = 35;
 				var ballRadius = 0.4;
 
-				var ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 14, 10 ), ballMaterial );
+				var ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 14, 10 ), ballMaterial );
 				ball.castShadow = true;
 				ball.receiveShadow = true;
 				var ballShape = new Ammo.btSphereShape( ballRadius );

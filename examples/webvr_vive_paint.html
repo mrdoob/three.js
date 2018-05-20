@@ -4,8 +4,12 @@
 		<title>three.js webvr - htc vive - paint</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-04-03 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-04-03" content="AqIrNtaoJSmDZatgEEW2ehuK9ITIiFk3gZ3/gC6Vp0gF85NDYl7IzVPj4Bh7O6SIcr3ICOm6kocYSaS+BPkazgYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyMjc2MzAwMn0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-06-19 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-06-19" content="Alxt96tYGgIr9l6EXU0eeI360zcmzOY6Kuo3kcTfBGIRDOQbgFIZKRQ1joExQ74WZr1einsE+cUMHgSclNHCQQ4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyOTM5NzgyOH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API, origin = https://threejs.org, expires = 2018-06-15 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API" data-expires="2018-06-15" content="AtJH9g6nn0B87bnjJt+9m1joZXEYDmLSlRvtMr5qJD52hMcm3S86S7jg5I7y2I5cgQglE0rzsXzti5DECQLb8QkAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZSIsImV4cGlyeSI6MTUyOTA4NDY2OH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-06-15 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-06-15" content="Aihhr0yXkVlCKF0DIpTbH8WX7ZmEexUhI/95+t8aoLfvBkePMiZ/iOoDPU3xefyfuczkDahH1L6eiPvRsuzITAAAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTI5MDg0NjY4fQ==">
 		<style>
 			body {
 				font-family: Monospace;
@@ -69,13 +73,9 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				var user = new THREE.Group();
-				scene.add( user );
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
-				user.add( camera );
 
-				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
+				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0x444444,
 					roughness: 1.0,
@@ -97,7 +97,7 @@
 				scene.add( table );
 				*/
 
-				var geometry = new THREE.PlaneGeometry( 4, 4 );
+				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0x222222,
 					roughness: 1.0,
@@ -144,13 +144,13 @@
 				controller1.standingMatrix = renderer.vr.getStandingMatrix();
 				controller1.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
-				user.add( controller1 );
+				scene.add( controller1 );
 
 				controller2 = new THREE.PaintViveController( 1 );
 				controller2.standingMatrix = renderer.vr.getStandingMatrix();
 				controller2.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
-				user.add( controller2 );
+				scene.add( controller2 );
 
 				var loader = new THREE.OBJLoader();
 				loader.setPath( 'models/obj/vive-controller/' );
@@ -166,8 +166,8 @@
 					controller.receiveShadow = true;
 
 					// var pivot = new THREE.Group();
-					// var pivot = new THREE.Mesh( new THREE.BoxGeometry( 0.01, 0.01, 0.01 ) );
-					var pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.01, 2 ) );
+					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
+					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
 					pivot.name = 'pivot';
 					pivot.position.y = -0.016;
 					pivot.position.z = -0.043;
@@ -234,20 +234,22 @@
 				scene.add( line );
 
 				// Shapes
-				shapes[ 'tube' ] = getTubeShapes(1.0);
+				shapes[ 'tube' ] = getTubeShapes( 1.0 );
 			}
 
-			function getTubeShapes(size) {
+			function getTubeShapes( size ) {
 
 				var PI2 = Math.PI * 2;
 
 				var sides = 10;
 				var array = [];
 				var radius = 0.01 * size;
-				for( var i = 0; i < sides; i ++ ){
+
+				for( var i = 0; i < sides; i ++ ) {
 
 					var angle = ( i / sides ) * PI2;
 					array.push( new THREE.Vector3( Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
+
 				}
 
 				return array;
