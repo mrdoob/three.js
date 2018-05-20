@@ -6,7 +6,8 @@
  *  var exporter = new THREE.PLYExporter();
  *
  *  // second argument is an array of attributes to
- *  // exclude from the format ('color', 'uv', 'normal')
+ *  // explicitly exclude from the file:
+ *  // 'color', 'uv', 'normal', 'index'
  *  var data = exporter.parse(mesh, [ 'color' ]);
  *
  * Format Definition:
@@ -27,9 +28,59 @@ THREE.PLYExporter.prototype = {
 
 		}
 
-		var includeNormals = excludeProperties.indexOf( 'normal' ) === - 1;
-		var includeColors = excludeProperties.indexOf( 'color' ) === - 1;
-		var includeUVs = excludeProperties.indexOf( 'uv' ) === - 1;
+		var geomToBufferGeom = new WeakMap();
+		var includeNormals = false;
+		var includeColors = false;
+		var includeUVs = false;
+		var includeIndices = true;
+
+		object.traverse( function ( child ) {
+
+			if ( child instanceof THREE.Mesh ) {
+
+				var mesh = child;
+				var geometry = mesh.geometry;
+
+				if ( geometry instanceof THREE.Geometry ) {
+
+					var bufferGeometry = geomToBufferGeom.get( geometry ) || new THREE.BufferGeometry().setFromObject( mesh );
+					geomToBufferGeom.set( geometry, bufferGeometry );
+					geometry = bufferGeometry;
+
+				}
+
+				if ( geometry instanceof THREE.BufferGeometry ) {
+
+					var vertices = geometry.getAttribute( 'position' );
+					var normals = geometry.getAttribute( 'normal' );
+					var uvs = geometry.getAttribute( 'uv' );
+					var colors = geometry.getAttribute( 'color' );
+					var indices = geometry.getIndex();
+
+					if ( vertices == null ) {
+
+						return;
+
+					}
+
+
+					if ( normals != null ) includeNormals = true;
+
+					if ( uvs != null ) includeUVs = true;
+
+					if ( colors != null ) includeColors = true;
+
+				}
+
+			}
+
+		} );
+
+		includeNormals = includeNormals && excludeProperties.indexOf( 'normal' ) === - 1;
+		includeColors = includeColors && excludeProperties.indexOf( 'color' ) === - 1;
+		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) === - 1;
+		includeIndices = includeIndices && excludeProperties.indexOf( 'index' ) === - 1;
+
 
 		// count the number of vertices
 		var vertexCount = 0;
@@ -48,7 +99,7 @@ THREE.PLYExporter.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					geometry = new THREE.BufferGeometry().setFromObject( mesh );
+					geometry = geomToBufferGeom.get( geometry );
 
 				}
 
@@ -62,7 +113,7 @@ THREE.PLYExporter.prototype = {
 
 					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
-					if ( vertices === undefined ) {
+					if ( vertices == null ) {
 
 						return;
 
@@ -87,7 +138,7 @@ THREE.PLYExporter.prototype = {
 						// Normal information
 						if ( includeNormals === true ) {
 
-							if ( normals !== undefined ) {
+							if ( normals != null ) {
 
 								vertex.x = normals.getX( i );
 								vertex.y = normals.getY( i );
@@ -111,7 +162,7 @@ THREE.PLYExporter.prototype = {
 						// UV information
 						if ( includeUVs === true ) {
 
-							if ( uvs !== undefined ) {
+							if ( uvs != null ) {
 
 								line += ' ' +
 									uvs.getX( i ) + ' ' +
@@ -128,12 +179,12 @@ THREE.PLYExporter.prototype = {
 						// Color information
 						if ( includeColors === true ) {
 
-							if ( colors !== undefined ) {
+							if ( colors != null ) {
 
 								line += ' ' +
-									Math.floor( colors.getX( i ) ) + ' ' +
-									Math.floor( colors.getY( i ) ) + ' ' +
-									Math.floor( colors.getZ( i ) );
+									Math.floor( colors.getX( i ) * 255 ) + ' ' +
+									Math.floor( colors.getY( i ) * 255 ) + ' ' +
+									Math.floor( colors.getZ( i ) * 255 );
 
 							} else {
 
@@ -147,36 +198,57 @@ THREE.PLYExporter.prototype = {
 
 					}
 
-
 					// Create the face list
-					if ( indices !== null ) {
+					if ( includeIndices === true ) {
 
-						for ( i = 0, l = indices.count; i < l; i += 3 ) {
+						if ( indices !== null ) {
 
-							faceList += `3 ${ indices.getX( i + 0 ) + vertexCount }`;
-							faceList += ` ${ indices.getX( i + 1 ) + vertexCount }`;
-							faceList += ` ${ indices.getX( i + 2 ) + vertexCount }\n`;
+							for ( var i = 0, l = indices.count; i < l; i += 3 ) {
+
+								faceList += `3 ${ indices.getX( i + 0 ) + vertexCount }`;
+								faceList += ` ${ indices.getX( i + 1 ) + vertexCount }`;
+								faceList += ` ${ indices.getX( i + 2 ) + vertexCount }\n`;
+
+							}
+
+						} else {
+
+							for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
+
+								faceList += `3 ${ vertexCount + i } ${ vertexCount + i + 1 } ${ vertexCount + i + 2 }\n`;
+
+							}
 
 						}
 
-					} else {
-
-						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
-
-							faceList += `3 ${ vertexCount + i } ${ vertexCount + i + 1 } ${ vertexCount + i + 2 }\n`;
-
-						}
+						faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
 					}
 
 					vertexCount += vertices.count;
-					faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
 				}
 
 			}
 
 		} );
+
+		if ( includeIndices && faceCount !== Math.floor( faceCount ) ) {
+
+			// point cloud meshes will not have an index array and may not have a
+			// number of vertices that is divisble by 3 (and therefore representable
+			// as triangles)
+			console.error(
+
+				'PLYExporter: Failed to generate a valid PLY file because the ' +
+				'number of faces is not divisible by 3. This can be caused by ' +
+				'exporting a mix of triangle and non-triangle mesh types.'
+
+			);
+
+			return null;
+
+		}
 
 		var output =
 			'ply\n' +
@@ -217,14 +289,19 @@ THREE.PLYExporter.prototype = {
 
 		}
 
-		// faces
-		output +=
-			`element face ${faceCount}\n` +
-			'property list uchar int vertex_index\n' +
-			'end_header\n' +
+		if ( includeIndices === true ) {
 
+			// faces
+			output +=
+				`element face ${faceCount}\n` +
+				'property list uchar int vertex_index\n';
+
+		}
+
+		output +=
+			'end_header\n' +
 			`${vertexList}\n` +
-			`${faceList}\n`;
+			( includeIndices ? `${faceList}\n` : '' );
 
 		return output;
 
