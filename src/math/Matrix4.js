@@ -263,12 +263,12 @@ Object.assign( Matrix4.prototype, {
 
 		}
 
-		// last column
+		// bottom row
 		te[ 3 ] = 0;
 		te[ 7 ] = 0;
 		te[ 11 ] = 0;
 
-		// bottom row
+		// last column
 		te[ 12 ] = 0;
 		te[ 13 ] = 0;
 		te[ 14 ] = 0;
@@ -752,12 +752,12 @@ Object.assign( Matrix4.prototype, {
 		te[ 6 ] = ( yz + wx ) * sy;
 		te[ 10 ] = ( 1 - ( xx + yy ) ) * sz;
 
-		// last column
+		// bottom row
 		te[ 3 ] = 0;
 		te[ 7 ] = 0;
 		te[ 11 ] = 0;
 
-		// bottom row
+		// last column
 		te[ 12 ] = position.x;
 		te[ 13 ] = position.y;
 		te[ 14 ] = position.z;
