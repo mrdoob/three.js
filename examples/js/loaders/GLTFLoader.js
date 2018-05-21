@@ -2620,43 +2620,37 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						// If the material will be modified later on, clone it now.
+						// Clone the material if it will be modified
 						if ( useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
 
-							material = material.isGLTFSpecularGlossinessMaterial
-									? extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].cloneMaterial( material )
-									: material.clone();
+							var cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 
-						}
+							if ( material.isGLTFSpecularGlossinessMaterial ) cacheKey += 'specular-glossiness:';
+							if ( useSkinning ) cacheKey += 'skinning:';
+							if ( useVertexColors ) cacheKey += 'vertex-colors:';
+							if ( useFlatShading ) cacheKey += 'flat-shading:';
+							if ( useMorphTargets ) cacheKey += 'morph-targets:';
+							if ( useMorphNormals ) cacheKey += 'morph-normals:';
 
-						if ( useSkinning ) {
+							var cachedMaterial = scope.cache.get( cacheKey );
 
-							material.skinning = true;
+							if ( ! cachedMaterial ) {
 
-						}
+								cachedMaterial = material.isGLTFSpecularGlossinessMaterial
+										? extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].cloneMaterial( material )
+										: material.clone();
 
-						if ( useVertexColors ) {
+								if ( useSkinning ) cachedMaterial.skinning = true;
+								if ( useVertexColors ) cachedMaterial.vertexColors = THREE.VertexColors;
+								if ( useFlatShading ) cachedMaterial.flatShading = true;
+								if ( useMorphTargets ) cachedMaterial.morphTargets = true;
+								if ( useMorphNormals ) cachedMaterial.morphNormals = true;
 
-							material.vertexColors = THREE.VertexColors;
-							material.needsUpdate = true;
+								scope.cache.add( cacheKey, cachedMaterial );
 
-						}
+							}
 
-						if ( useFlatShading ) {
-
-							material.flatShading = true;
-
-						}
-
-						if ( useMorphTargets ) {
-
-							material.morphTargets = true;
-
-						}
-
-						if ( useMorphNormals ) {
-
-							material.morphNormals = true;
+							material = cachedMaterial;
 
 						}
 
