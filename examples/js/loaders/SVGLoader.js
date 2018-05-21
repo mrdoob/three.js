@@ -630,7 +630,18 @@ THREE.SVGLoader.prototype = {
 
 			for ( var i = 0; i < array.length; i ++ ) {
 
-				array[ i ] = parseFloat( array[ i ] );
+				var number = array[ i ];
+
+				// Handle values like 48.6037.7
+				// TODO Find a regex for this
+
+				if ( number.indexOf( '.' ) !== number.lastIndexOf( '.' ) ) {
+
+					array.splice( i + 1, 0, '0.' + number.split( '.' )[ 2 ] );
+
+				}
+
+				array[ i ] = parseFloat( number );
 
 			}
 
