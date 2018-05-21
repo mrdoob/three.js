@@ -2632,25 +2632,25 @@ THREE.GLTFLoader = ( function () {
 							if ( useMorphTargets ) cacheKey += 'morph-targets:';
 							if ( useMorphNormals ) cacheKey += 'morph-normals:';
 
-							var clonedMaterial = scope.cache.get( cacheKey );
+							var cachedMaterial = scope.cache.get( cacheKey );
 
-							if ( ! clonedMaterial ) {
+							if ( ! cachedMaterial ) {
 
-								clonedMaterial = material.isGLTFSpecularGlossinessMaterial
+								cachedMaterial = material.isGLTFSpecularGlossinessMaterial
 										? extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].cloneMaterial( material )
 										: material.clone();
 
-								if ( useSkinning ) clonedMaterial.skinning = true;
-								if ( useVertexColors ) clonedMaterial.vertexColors = THREE.VertexColors;
-								if ( useFlatShading ) clonedMaterial.flatShading = true;
-								if ( useMorphTargets ) clonedMaterial.morphTargets = true;
-								if ( useMorphNormals ) clonedMaterial.morphNormals = true;
+								if ( useSkinning ) cachedMaterial.skinning = true;
+								if ( useVertexColors ) cachedMaterial.vertexColors = THREE.VertexColors;
+								if ( useFlatShading ) cachedMaterial.flatShading = true;
+								if ( useMorphTargets ) cachedMaterial.morphTargets = true;
+								if ( useMorphNormals ) cachedMaterial.morphNormals = true;
 
-								scope.cache.add( cacheKey, clonedMaterial );
+								scope.cache.add( cacheKey, cachedMaterial );
 
 							}
 
-							material = clonedMaterial;
+							material = cachedMaterial;
 
 						}
 
