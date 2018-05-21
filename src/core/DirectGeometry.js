@@ -139,7 +139,7 @@ Object.assign( DirectGeometry.prototype, {
 		var hasSkinWeights = skinWeights.length === vertices.length;
 
 		//
-		
+
 		if ( faces.length === 0 ) {
 
 			console.error( 'THREE.DirectGeometry: Faceless geometries are not supported.' );
