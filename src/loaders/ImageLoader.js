@@ -46,7 +46,10 @@ Object.assign( ImageLoader.prototype, {
 
 		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 
-		image.addEventListener( 'load', function () {
+		function onInternalLoad() {
+
+			image.removeEventListener( 'load', onInternalLoad, false );
+			image.removeEventListener( 'error', onInternalError, false );
 
 			Cache.add( url, this );
 
@@ -54,7 +57,21 @@ Object.assign( ImageLoader.prototype, {
 
 			scope.manager.itemEnd( url );
 
-		}, false );
+		}
+
+		function onInternalError( event ) {
+
+			image.removeEventListener( 'load', onInternalLoad, false );
+			image.removeEventListener( 'error', onInternalError, false );
+
+			if ( onError ) onError( event );
+
+			scope.manager.itemEnd( url );
+			scope.manager.itemError( url );
+
+		}
+
+		image.addEventListener( 'load', onInternalLoad, false );
 
 		/*
 		image.addEventListener( 'progress', function ( event ) {
@@ -64,14 +81,7 @@ Object.assign( ImageLoader.prototype, {
 		}, false );
 		*/
 
-		image.addEventListener( 'error', function ( event ) {
-
-			if ( onError ) onError( event );
-
-			scope.manager.itemEnd( url );
-			scope.manager.itemError( url );
-
-		}, false );
+		image.addEventListener( 'error', onInternalError, false );
 
 		if ( url.substr( 0, 5 ) !== 'data:' ) {
 
