@@ -248,19 +248,19 @@
 		<h3>[method:null dispose]()</h3>
 		<p>
 		Disposes the object from memory. <br />
-		You need to call this when you want the bufferGeometry removed while the application is running.
+		You need to call this when you want the BufferGeometry removed while the application is running.
 		</p>
 
 		<h3>[method:BufferGeometry fromDirectGeometry]( [param:Geometry] )</h3>
 		<p>
-			Populates this BufferGeometry with data from a [page:DirectGeometry] object.<br /><br />
+			Populates this BufferGeometry with data from a [page:DirectGeometry] object containing faces. Not implemented for a line geometry.<br /><br />
 
 			Note: [page:DirectGeometry] is mainly used as an intermediary object for converting between [page:Geometry]
 			and BufferGeometry.
 		</p>
 
 		<h3>[method:BufferGeometry fromGeometry]( [param:Geometry] )</h3>
-		<p>Populates this BufferGeometry with data from a [page:Geometry] object.</p>
+		<p>Populates this BufferGeometry with data from a [page:Geometry] object containing faces. Not implemented for a line geometry.</p>
 
 		<h3>[method:BufferAttribute getAttribute]( [param:String name] )</h3>
 		<p>Returns the [page:BufferAttribute attribute] with the specified name.</p>
