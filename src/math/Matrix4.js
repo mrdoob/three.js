@@ -740,30 +740,27 @@ Object.assign( Matrix4.prototype, {
 
 		var sx = scale.x, sy = scale.y, sz = scale.z;
 
-		te[ 0 ] = ( 1 - ( yy + zz ) ) * sx;
-		te[ 4 ] = ( xy - wz ) * sy;
-		te[ 8 ] = ( xz + wy ) * sz;
+	        te[ 0 ] = ( 1 - ( yy + zz ) ) * sx;
+	        te[ 1 ] = ( xy + wz ) * sx;
+	        te[ 2 ] = ( xz - wy ) * sx;
+	        te[ 3 ] = 0;
 
-		te[ 1 ] = ( xy + wz ) * sx;
-		te[ 5 ] = ( 1 - ( xx + zz ) ) * sy;
-		te[ 9 ] = ( yz - wx ) * sz;
+	        te[ 4 ] = ( xy - wz ) * sy;
+	        te[ 5 ] = ( 1 - ( xx + zz ) ) * sy;
+	        te[ 6 ] = ( yz + wx ) * sy;
+	        te[ 7 ] = 0;
 
-		te[ 2 ] = ( xz - wy ) * sx;
-		te[ 6 ] = ( yz + wx ) * sy;
-		te[ 10 ] = ( 1 - ( xx + yy ) ) * sz;
+	        te[ 8 ] = ( xz + wy ) * sz;
+	        te[ 9 ] = ( yz - wx ) * sz;
+	        te[ 10 ] = ( 1 - ( xx + yy ) ) * sz;
+	        te[ 11 ] = 0;
 
-		// bottom row
-		te[ 3 ] = 0;
-		te[ 7 ] = 0;
-		te[ 11 ] = 0;
+	        te[ 12 ] = position.x;
+	        te[ 13 ] = position.y;
+	        te[ 14 ] = position.z;
+	        te[ 15 ] = 1;
 
-		// last column
-		te[ 12 ] = position.x;
-		te[ 13 ] = position.y;
-		te[ 14 ] = position.z;
-		te[ 15 ] = 1;
-
-		return this;
+	        return this;
 
 	},
 
