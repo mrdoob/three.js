@@ -2942,14 +2942,17 @@ THREE.GLTFLoader = ( function () {
 
 				if ( meshReferences[ nodeDef.mesh ] > 1 ) {
 
-					node = mesh.clone();
-					node.name += '_instance_' + meshUses[ nodeDef.mesh ] ++;
+					var instanceNum = meshUses[ nodeDef.mesh ] ++;
 
-					// for Specular-Glossiness
+					node = mesh.clone();
+					node.name += '_instance_' + instanceNum;
+
+					// onBeforeRender copy for Specular-Glossiness
 					node.onBeforeRender = mesh.onBeforeRender;
 
 					for ( var i = 0, il = node.children.length; i < il; i ++ ) {
 
+						node.children[ i ].name += '_instance_' + instanceNum;
 						node.children[ i ].onBeforeRender = mesh.children[ i ].onBeforeRender;
 
 					}
