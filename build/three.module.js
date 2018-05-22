@@ -1224,12 +1224,12 @@ Object.assign( Matrix4.prototype, {
 
 		}
 
-		// last column
+		// bottom row
 		te[ 3 ] = 0;
 		te[ 7 ] = 0;
 		te[ 11 ] = 0;
 
-		// bottom row
+		// last column
 		te[ 12 ] = 0;
 		te[ 13 ] = 0;
 		te[ 14 ] = 0;
@@ -1239,42 +1239,18 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	makeRotationFromQuaternion: function ( q ) {
+	makeRotationFromQuaternion: function () {
 
-		var te = this.elements;
+		var zero = new Vector3( 0, 0, 0 );
+		var one = new Vector3( 1, 1, 1 );
 
-		var x = q._x, y = q._y, z = q._z, w = q._w;
-		var x2 = x + x, y2 = y + y, z2 = z + z;
-		var xx = x * x2, xy = x * y2, xz = x * z2;
-		var yy = y * y2, yz = y * z2, zz = z * z2;
-		var wx = w * x2, wy = w * y2, wz = w * z2;
+		return function makeRotationFromQuaternion( q ) {
 
-		te[ 0 ] = 1 - ( yy + zz );
-		te[ 4 ] = xy - wz;
-		te[ 8 ] = xz + wy;
+			return this.compose( zero, q, one );
 
-		te[ 1 ] = xy + wz;
-		te[ 5 ] = 1 - ( xx + zz );
-		te[ 9 ] = yz - wx;
+		};
 
-		te[ 2 ] = xz - wy;
-		te[ 6 ] = yz + wx;
-		te[ 10 ] = 1 - ( xx + yy );
-
-		// last column
-		te[ 3 ] = 0;
-		te[ 7 ] = 0;
-		te[ 11 ] = 0;
-
-		// bottom row
-		te[ 12 ] = 0;
-		te[ 13 ] = 0;
-		te[ 14 ] = 0;
-		te[ 15 ] = 1;
-
-		return this;
-
-	},
+	}(),
 
 	lookAt: function () {
 
@@ -1715,11 +1691,37 @@ Object.assign( Matrix4.prototype, {
 
 	compose: function ( position, quaternion, scale ) {
 
-		this.makeRotationFromQuaternion( quaternion );
-		this.scale( scale );
-		this.setPosition( position );
+		var te = this.elements;
 
-		return this;
+		var x = quaternion._x, y = quaternion._y, z = quaternion._z, w = quaternion._w;
+		var x2 = x + x,	y2 = y + y, z2 = z + z;
+		var xx = x * x2, xy = x * y2, xz = x * z2;
+		var yy = y * y2, yz = y * z2, zz = z * z2;
+		var wx = w * x2, wy = w * y2, wz = w * z2;
+
+		var sx = scale.x, sy = scale.y, sz = scale.z;
+
+	        te[ 0 ] = ( 1 - ( yy + zz ) ) * sx;
+	        te[ 1 ] = ( xy + wz ) * sx;
+	        te[ 2 ] = ( xz - wy ) * sx;
+	        te[ 3 ] = 0;
+
+	        te[ 4 ] = ( xy - wz ) * sy;
+	        te[ 5 ] = ( 1 - ( xx + zz ) ) * sy;
+	        te[ 6 ] = ( yz + wx ) * sy;
+	        te[ 7 ] = 0;
+
+	        te[ 8 ] = ( xz + wy ) * sz;
+	        te[ 9 ] = ( yz - wx ) * sz;
+	        te[ 10 ] = ( 1 - ( xx + yy ) ) * sz;
+	        te[ 11 ] = 0;
+
+	        te[ 12 ] = position.x;
+	        te[ 13 ] = position.y;
+	        te[ 14 ] = position.z;
+	        te[ 15 ] = 1;
+
+	        return this;
 
 	},
 
@@ -6109,7 +6111,7 @@ var normal_vert = "#define NORMAL\n#if defined( FLAT_SHADED ) || defined( USE_BU
 
 var points_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <color_pars_fragment>\n#include <map_particle_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_particle_fragment>\n\t#include <color_fragment>\n\t#include <alphatest_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
 
-var points_vert = "uniform float size;\nuniform float scale;\n#include <common>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <color_vertex>\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\t#ifdef USE_SIZEATTENUATION\n\t\tgl_PointSize = size * ( scale / - mvPosition.z );\n\t#else\n\t\tgl_PointSize = size;\n\t#endif\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <worldpos_vertex>\n\t#include <fog_vertex>\n}\n";
+var points_vert = "uniform float size;\nuniform float scale;\n#include <common>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <color_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <project_vertex>\n\t#ifdef USE_SIZEATTENUATION\n\t\tgl_PointSize = size * ( scale / - mvPosition.z );\n\t#else\n\t\tgl_PointSize = size;\n\t#endif\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <worldpos_vertex>\n\t#include <fog_vertex>\n}\n";
 
 var shadow_frag = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n\t#include <fog_fragment>\n}\n";
 
@@ -10856,6 +10858,12 @@ Object.assign( DirectGeometry.prototype, {
 		var hasSkinWeights = skinWeights.length === vertices.length;
 
 		//
+
+		if ( faces.length === 0 ) {
+
+			console.error( 'THREE.DirectGeometry: Faceless geometries are not supported.' );
+
+		}
 
 		for ( var i = 0; i < faces.length; i ++ ) {
 
@@ -25292,6 +25300,8 @@ LineLoop.prototype = Object.assign( Object.create( Line.prototype ), {
  *
  *  size: <float>,
  *  sizeAttenuation: <bool>
+ *
+ *  morphTargets: <bool>
  * }
  */
 
@@ -25307,6 +25317,8 @@ function PointsMaterial( parameters ) {
 
 	this.size = 1;
 	this.sizeAttenuation = true;
+
+	this.morphTargets = false;
 
 	this.lights = false;
 
@@ -25329,6 +25341,8 @@ PointsMaterial.prototype.copy = function ( source ) {
 
 	this.size = source.size;
 	this.sizeAttenuation = source.sizeAttenuation;
+
+	this.morphTargets = source.morphTargets;
 
 	return this;
 
@@ -31525,7 +31539,10 @@ Object.assign( ImageLoader.prototype, {
 
 		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 
-		image.addEventListener( 'load', function () {
+		function onImageLoad() {
+
+			image.removeEventListener( 'load', onImageLoad, false );
+			image.removeEventListener( 'error', onImageError, false );
 
 			Cache.add( url, this );
 
@@ -31533,24 +31550,22 @@ Object.assign( ImageLoader.prototype, {
 
 			scope.manager.itemEnd( url );
 
-		}, false );
+		}
 
-		/*
-		image.addEventListener( 'progress', function ( event ) {
+		function onImageError( event ) {
 
-			if ( onProgress ) onProgress( event );
-
-		}, false );
-		*/
-
-		image.addEventListener( 'error', function ( event ) {
+			image.removeEventListener( 'load', onImageLoad, false );
+			image.removeEventListener( 'error', onImageError, false );
 
 			if ( onError ) onError( event );
 
 			scope.manager.itemEnd( url );
 			scope.manager.itemError( url );
 
-		}, false );
+		}
+
+		image.addEventListener( 'load', onImageLoad, false );
+		image.addEventListener( 'error', onImageError, false );
 
 		if ( url.substr( 0, 5 ) !== 'data:' ) {
 
