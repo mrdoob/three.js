@@ -46,10 +46,10 @@ Object.assign( ImageLoader.prototype, {
 
 		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 
-		function onInternalLoad() {
+		function onImageLoad() {
 
-			image.removeEventListener( 'load', onInternalLoad, false );
-			image.removeEventListener( 'error', onInternalError, false );
+			image.removeEventListener( 'load', onImageLoad, false );
+			image.removeEventListener( 'error', onImageError, false );
 
 			Cache.add( url, this );
 
@@ -59,10 +59,10 @@ Object.assign( ImageLoader.prototype, {
 
 		}
 
-		function onInternalError( event ) {
+		function onImageError( event ) {
 
-			image.removeEventListener( 'load', onInternalLoad, false );
-			image.removeEventListener( 'error', onInternalError, false );
+			image.removeEventListener( 'load', onImageLoad, false );
+			image.removeEventListener( 'error', onImageError, false );
 
 			if ( onError ) onError( event );
 
@@ -71,17 +71,8 @@ Object.assign( ImageLoader.prototype, {
 
 		}
 
-		image.addEventListener( 'load', onInternalLoad, false );
-
-		/*
-		image.addEventListener( 'progress', function ( event ) {
-
-			if ( onProgress ) onProgress( event );
-
-		}, false );
-		*/
-
-		image.addEventListener( 'error', onInternalError, false );
+		image.addEventListener( 'load', onImageLoad, false );
+		image.addEventListener( 'error', onImageError, false );
 
 		if ( url.substr( 0, 5 ) !== 'data:' ) {
 
