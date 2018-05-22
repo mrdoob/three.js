@@ -66,6 +66,7 @@ THREE.GLTFExporter.prototype = {
 	parse: function ( input, onDone, options ) {
 
 		var DEFAULT_OPTIONS = {
+			binary: false,
 			trs: false,
 			onlyVisible: true,
 			truncateDrawRange: true,
