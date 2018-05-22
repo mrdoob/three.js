@@ -6,7 +6,7 @@
  *  var exporter = new THREE.PLYExporter();
  *
  *  // second argument is a list of options
- *  var data = exporter.parse(mesh, { binar: true, excludeProperties: [ 'color' ] });
+ *  var data = exporter.parse(mesh, { binar: true, excludeAttributes: [ 'color' ] });
  *
  * Format Definition:
  *  http://paulbourke.net/dataformats/ply/
@@ -55,12 +55,12 @@ THREE.PLYExporter.prototype = {
 		// Default options
 		var defaultOptions = {
 			binary: false,
-			excludeProperties: [] // normal, uv, color, index
+			excludeAttributes: [] // normal, uv, color, index
 		};
 
 		options = Object.assign( defaultOptions, options );
 
-		var excludeProperties = options.excludeProperties;
+		var excludeAttributes = options.excludeAttributes;
 		var geomToBufferGeom = new WeakMap();
 		var includeNormals = false;
 		var includeColors = false;
@@ -115,10 +115,10 @@ THREE.PLYExporter.prototype = {
 
 		} );
 
-		includeNormals = includeNormals && excludeProperties.indexOf( 'normal' ) === - 1;
-		includeColors = includeColors && excludeProperties.indexOf( 'color' ) === - 1;
-		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) === - 1;
-		includeIndices = includeIndices && excludeProperties.indexOf( 'index' ) === - 1;
+		includeNormals = includeNormals && excludeAttributes.indexOf( 'normal' ) === - 1;
+		includeColors = includeColors && excludeAttributes.indexOf( 'color' ) === - 1;
+		includeUVs = includeUVs && excludeAttributes.indexOf( 'uv' ) === - 1;
+		includeIndices = includeIndices && excludeAttributes.indexOf( 'index' ) === - 1;
 
 
 		if ( includeIndices && faceCount !== Math.floor( faceCount ) ) {
