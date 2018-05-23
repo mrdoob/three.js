@@ -202,33 +202,33 @@
 
 						// GUI
 
-						addGui( 'hue', hue.number, function ( val ) {
+						addGui( 'hue', hue.value, function ( val ) {
 
-							hue.number = val;
+							hue.value = val;
 
 						}, false, 0, Math.PI * 2 );
 
-						addGui( 'saturation', sataturation.number, function ( val ) {
+						addGui( 'saturation', sataturation.value, function ( val ) {
 
-							sataturation.number = val;
+							sataturation.value = val;
 
 						}, false, 0, 2 );
 
-						addGui( 'vibrance', vibrance.number, function ( val ) {
+						addGui( 'vibrance', vibrance.value, function ( val ) {
 
-							vibrance.number = val;
+							vibrance.value = val;
 
 						}, false, - 1, 1 );
 
-						addGui( 'brightness', brightness.number, function ( val ) {
+						addGui( 'brightness', brightness.value, function ( val ) {
 
-							brightness.number = val;
+							brightness.value = val;
 
 						}, false, 0, .5 );
 
-						addGui( 'contrast', contrast.number, function ( val ) {
+						addGui( 'contrast', contrast.value, function ( val ) {
 
-							contrast.number = val;
+							contrast.value = val;
 
 						}, false, 0, 2 );
 
@@ -258,9 +258,9 @@
 
 						}, true );
 
-						addGui( 'fade', percent.number, function ( val ) {
+						addGui( 'fade', percent.value, function ( val ) {
 
-							percent.number = val;
+							percent.value = val;
 
 						}, false, 0, 1 );
 
@@ -286,9 +286,9 @@
 
 						// GUI
 
-						addGui( 'alpha', alpha.number, function ( val ) {
+						addGui( 'alpha', alpha.value, function ( val ) {
 
-							alpha.number = val;
+							alpha.value = val;
 
 						}, false, 0, 1 );
 
@@ -346,9 +346,9 @@
 
 						// GUI
 
-						addGui( 'saturation', sat.number, function ( val ) {
+						addGui( 'saturation', sat.value, function ( val ) {
 
-							sat.number = val;
+							sat.value = val;
 
 						}, false, 0, 2 );
 
@@ -399,9 +399,9 @@
 
 						// GUI
 
-						addGui( 'scale', scale.number, function ( val ) {
+						addGui( 'scale', scale.value, function ( val ) {
 
-							scale.number = val;
+							scale.value = val;
 
 						}, false, 0, 1 );
 
@@ -451,15 +451,15 @@
 
 						// GUI
 
-						addGui( 'scale', scale.number, function ( val ) {
+						addGui( 'scale', scale.value, function ( val ) {
 
-							scale.number = val;
+							scale.value = val;
 
 						}, false, 16, 1024 );
 
-						addGui( 'fade', fade.number, function ( val ) {
+						addGui( 'fade', fade.value, function ( val ) {
 
-							fade.number = val;
+							fade.value = val;
 
 						}, false, 0, 1 );
 

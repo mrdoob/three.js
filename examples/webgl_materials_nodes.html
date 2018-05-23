@@ -433,33 +433,33 @@
 
 					}, true );
 
-					addGui( 'roughnessA', roughnessA.number, function ( val ) {
+					addGui( 'roughnessA', roughnessA.value, function ( val ) {
 
-						roughnessA.number = val;
-
-					}, false, 0, 1 );
-
-					addGui( 'metalnessA', metalnessA.number, function ( val ) {
-
-						metalnessA.number = val;
+						roughnessA.value = val;
 
 					}, false, 0, 1 );
 
-					addGui( 'roughnessB', roughnessB.number, function ( val ) {
+					addGui( 'metalnessA', metalnessA.value, function ( val ) {
 
-						roughnessB.number = val;
-
-					}, false, 0, 1 );
-
-					addGui( 'metalnessB', metalnessB.number, function ( val ) {
-
-						metalnessB.number = val;
+						metalnessA.value = val;
 
 					}, false, 0, 1 );
 
-					addGui( 'normalScale', normalScale.number, function ( val ) {
+					addGui( 'roughnessB', roughnessB.value, function ( val ) {
 
-						normalScale.number = val;
+						roughnessB.value = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'metalnessB', metalnessB.value, function ( val ) {
+
+						metalnessB.value = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'normalScale', normalScale.value, function ( val ) {
+
+						normalScale.value = val;
 
 					}, false, 0, 1 );
 
@@ -540,51 +540,51 @@
 
 					}, true );
 
-					addGui( 'reflectivity', reflectivity.number, function ( val ) {
+					addGui( 'reflectivity', reflectivity.value, function ( val ) {
 
-						reflectivity.number = val;
-
-					}, false, 0, 1 );
-
-					addGui( 'clearCoat', clearCoat.number, function ( val ) {
-
-						clearCoat.number = val;
+						reflectivity.value = val;
 
 					}, false, 0, 1 );
 
-					addGui( 'clearCoatRoughness', clearCoatRoughness.number, function ( val ) {
+					addGui( 'clearCoat', clearCoat.value, function ( val ) {
 
-						clearCoatRoughness.number = val;
-
-					}, false, 0, 1 );
-
-					addGui( 'roughnessA', roughnessA.number, function ( val ) {
-
-						roughnessA.number = val;
+						clearCoat.value = val;
 
 					}, false, 0, 1 );
 
-					addGui( 'metalnessA', metalnessA.number, function ( val ) {
+					addGui( 'clearCoatRoughness', clearCoatRoughness.value, function ( val ) {
 
-						metalnessA.number = val;
-
-					}, false, 0, 1 );
-
-					addGui( 'roughnessB', roughnessB.number, function ( val ) {
-
-						roughnessB.number = val;
+						clearCoatRoughness.value = val;
 
 					}, false, 0, 1 );
 
-					addGui( 'metalnessB', metalnessB.number, function ( val ) {
+					addGui( 'roughnessA', roughnessA.value, function ( val ) {
 
-						metalnessB.number = val;
+						roughnessA.value = val;
 
 					}, false, 0, 1 );
 
-					addGui( 'normalScale', normalScale.number, function ( val ) {
+					addGui( 'metalnessA', metalnessA.value, function ( val ) {
 
-						normalScale.number = val;
+						metalnessA.value = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'roughnessB', roughnessB.value, function ( val ) {
+
+						roughnessB.value = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'metalnessB', metalnessB.value, function ( val ) {
+
+						metalnessB.value = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'normalScale', normalScale.value, function ( val ) {
+
+						normalScale.value = val;
 
 					}, false, 0, 1 );
 
@@ -664,21 +664,21 @@
 
 					// GUI
 
-					addGui( 'speed', speed.number, function ( val ) {
+					addGui( 'speed', speed.value, function ( val ) {
 
-						speed.number = val;
+						speed.value = val;
 
 					}, false, 0, 10 );
 
-					addGui( 'scale', scale.number, function ( val ) {
+					addGui( 'scale', scale.value, function ( val ) {
 
-						scale.number = val;
+						scale.value = val;
 
 					}, false, 0, 3 );
 
-					addGui( 'worldScale', worldScale.number, function ( val ) {
+					addGui( 'worldScale', worldScale.value, function ( val ) {
 
-						worldScale.number = val;
+						worldScale.value = val;
 
 					}, false, 0, 1 );
 
@@ -754,14 +754,14 @@
 						intensity = val;
 
 						viewZ.b.z = - intensity;
-						rim.b.number = intensity;
+						rim.b.value = intensity;
 
 
 					}, false, 0, 3 );
 
-					addGui( 'power', power.number, function ( val ) {
+					addGui( 'power', power.value, function ( val ) {
 
-						power.number = val;
+						power.value = val;
 
 					}, false, 0, 6 );
 
@@ -813,33 +813,33 @@
 
 					// GUI
 
-					addGui( 'hue', hue.number, function ( val ) {
+					addGui( 'hue', hue.value, function ( val ) {
 
-						hue.number = val;
+						hue.value = val;
 
 					}, false, 0, Math.PI * 2 );
 
-					addGui( 'saturation', sataturation.number, function ( val ) {
+					addGui( 'saturation', sataturation.value, function ( val ) {
 
-						sataturation.number = val;
+						sataturation.value = val;
 
 					}, false, 0, 2 );
 
-					addGui( 'vibrance', vibrance.number, function ( val ) {
+					addGui( 'vibrance', vibrance.value, function ( val ) {
 
-						vibrance.number = val;
+						vibrance.value = val;
 
 					}, false, - 1, 1 );
 
-					addGui( 'brightness', brightness.number, function ( val ) {
+					addGui( 'brightness', brightness.value, function ( val ) {
 
-						brightness.number = val;
+						brightness.value = val;
 
 					}, false, 0, .5 );
 
-					addGui( 'contrast', contrast.number, function ( val ) {
+					addGui( 'contrast', contrast.value, function ( val ) {
 
-						contrast.number = val;
+						contrast.value = val;
 
 					}, false, 0, 2 );
 
@@ -1027,15 +1027,15 @@
 
 					// GUI
 
-					addGui( 'reflectance', reflectance.number, function ( val ) {
+					addGui( 'reflectance', reflectance.value, function ( val ) {
 
-						reflectance.number = val;
+						reflectance.value = val;
 
 					}, false, 0, 3 );
 
-					addGui( 'power', power.number, function ( val ) {
+					addGui( 'power', power.value, function ( val ) {
 
-						power.number = val;
+						power.value = val;
 
 					}, false, 0, 5 );
 
@@ -1080,15 +1080,15 @@
 
 					// GUI
 
-					addGui( 'offset', offset.number, function ( val ) {
+					addGui( 'offset', offset.value, function ( val ) {
 
-						offset.number = val;
+						offset.value = val;
 
 					}, false, 0, 1 );
 
-					addGui( 'scale', scale.number, function ( val ) {
+					addGui( 'scale', scale.value, function ( val ) {
 
-						scale.number = val;
+						scale.value = val;
 
 					}, false, 0, 10 );
 
@@ -1124,9 +1124,9 @@
 
 					// GUI
 
-					addGui( 'saturation', sat.number, function ( val ) {
+					addGui( 'saturation', sat.value, function ( val ) {
 
-						sat.number = val;
+						sat.value = val;
 
 					}, false, 0, 2 );
 
@@ -1167,15 +1167,15 @@
 
 					// GUI
 
-					addGui( 'hard', hard.number, function ( val ) {
+					addGui( 'hard', hard.value, function ( val ) {
 
-						hard.number = val;
+						hard.value = val;
 
 					}, false, 0, 20 );
 
-					addGui( 'offset', offset.number, function ( val ) {
+					addGui( 'offset', offset.value, function ( val ) {
 
-						offset.number = val;
+						offset.value = val;
 
 					}, false, - 10, 10 );
 
@@ -1245,15 +1245,15 @@
 
 					// GUI
 
-					addGui( 'speed', speed.number, function ( val ) {
+					addGui( 'speed', speed.value, function ( val ) {
 
-						speed.number = val;
+						speed.value = val;
 
 					}, false, 0, 1 );
 
-					addGui( 'scale', scale.number, function ( val ) {
+					addGui( 'scale', scale.value, function ( val ) {
 
-						scale.number = val;
+						scale.value = val;
 
 					}, false, 0, 10 );
 
@@ -1334,8 +1334,8 @@
 					var colorB = new THREE.ColorNode( 0x0054df );
 
 					var depth = new THREE.CameraNode( THREE.CameraNode.DEPTH );
-					depth.near.number = 1;
-					depth.far.number = 200;
+					depth.near.value = 1;
+					depth.far.value = 200;
 
 					var colors = new THREE.Math3Node(
 						colorB,
@@ -1349,15 +1349,15 @@
 
 					// GUI
 
-					addGui( 'near', depth.near.number, function ( val ) {
+					addGui( 'near', depth.near.value, function ( val ) {
 
-						depth.near.number = val;
+						depth.near.value = val;
 
 					}, false, 1, 1200 );
 
-					addGui( 'far', depth.far.number, function ( val ) {
+					addGui( 'far', depth.far.value, function ( val ) {
 
-						depth.far.number = val;
+						depth.far.value = val;
 
 					}, false, 1, 1200 );
 
@@ -1503,27 +1503,27 @@
 
 					// GUI
 
-					addGui( 'timeScale', timeScale.number, function ( val ) {
+					addGui( 'timeScale', timeScale.value, function ( val ) {
 
-						timeScale.number = val;
+						timeScale.value = val;
 
 					}, false, 0, 5 );
 
-					addGui( 'intensity', intensity.number, function ( val ) {
+					addGui( 'intensity', intensity.value, function ( val ) {
 
-						intensity.number = val;
+						intensity.value = val;
 
 					}, false, 0, 3 );
 
-					addGui( 'scale', scale.number, function ( val ) {
+					addGui( 'scale', scale.value, function ( val ) {
 
-						scale.number = val;
+						scale.value = val;
 
 					}, false, 0, 1 );
 
-					addGui( 'alpha', alpha.number, function ( val ) {
+					addGui( 'alpha', alpha.value, function ( val ) {
 
-						alpha.number = val;
+						alpha.value = val;
 
 					}, false, 0, 1 );
 
@@ -1612,9 +1612,9 @@
 
 					}, false, 0, .95 );
 
-					addGui( 'scale', scale.number, function ( val ) {
+					addGui( 'scale', scale.value, function ( val ) {
 
-						scale.number = val;
+						scale.value = val;
 
 					}, false, 0, 3 );
 
@@ -1679,15 +1679,15 @@
 
 					}, true );
 
-					addGui( 'mildness', mildness.number, function ( val ) {
+					addGui( 'mildness', mildness.value, function ( val ) {
 
-						mildness.number = val;
+						mildness.value = val;
 
 					}, false, 1, 2 );
 
-					addGui( 'fur', fur.number, function ( val ) {
+					addGui( 'fur', fur.value, function ( val ) {
 
-						fur.number = val;
+						fur.value = val;
 
 					}, false, 0, 2 );
 
@@ -1775,15 +1775,15 @@
 
 					}, true );
 
-					addGui( 'wrapLight', wrapLight.number, function ( val ) {
+					addGui( 'wrapLight', wrapLight.value, function ( val ) {
 
-						wrapLight.number = val;
+						wrapLight.value = val;
 
 					}, false, 0, 3 );
 
-					addGui( 'wrapShadow', wrapShadow.number, function ( val ) {
+					addGui( 'wrapShadow', wrapShadow.value, function ( val ) {
 
-						wrapShadow.number = val;
+						wrapShadow.value = val;
 
 					}, false, - 1, 0 );
 
@@ -1878,21 +1878,21 @@
 
 					}, true );
 
-					addGui( 'count', count.number, function ( val ) {
+					addGui( 'count', count.value, function ( val ) {
 
-						count.number = val;
+						count.value = val;
 
 					}, false, 1, 8 );
 
-					addGui( 'lineSize', lineSize.number, function ( val ) {
+					addGui( 'lineSize', lineSize.value, function ( val ) {
 
-						lineSize.number = val;
+						lineSize.value = val;
 
 					}, false, 0, 1 );
 
-					addGui( 'lineInner', lineInner.number, function ( val ) {
+					addGui( 'lineInner', lineInner.value, function ( val ) {
 
-						lineInner.number = val;
+						lineInner.value = val;
 
 					}, false, 0, 1 );
 
@@ -1948,9 +1948,9 @@
 
 					// GUI
 
-					addGui( 'speed', speed.number, function ( val ) {
+					addGui( 'speed', speed.value, function ( val ) {
 
-						speed.number = val;
+						speed.value = val;
 
 					}, false, 0, 1 );
 
@@ -2082,9 +2082,9 @@
 
 					// GUI
 
-					addGui( 'alpha', alpha.number, function ( val ) {
+					addGui( 'alpha', alpha.value, function ( val ) {
 
-						alpha.number = val;
+						alpha.value = val;
 
 					}, false, 0, 1 );
 
@@ -2140,9 +2140,9 @@
 
 					// GUI
 
-					addGui( 'speed', speed.number, function ( val ) {
+					addGui( 'speed', speed.value, function ( val ) {
 
-						speed.number = val;
+						speed.value = val;
 
 					}, false, 0, 3 );
 
@@ -2293,9 +2293,9 @@
 
 					}, true );
 
-					addGui( 'area', sss.b.number, function ( val ) {
+					addGui( 'area', sss.b.value, function ( val ) {
 
-						sss.b.number = val;
+						sss.b.value = val;
 
 					}, false, 0, 1 );
 
