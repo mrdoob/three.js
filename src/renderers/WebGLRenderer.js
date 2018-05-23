@@ -505,7 +505,7 @@ function WebGLRenderer( parameters ) {
 
 		vr.dispose();
 
-		stopAnimation();
+		animation.stop();
 
 	};
 
@@ -1032,9 +1032,9 @@ function WebGLRenderer( parameters ) {
 	this.setAnimationLoop = function ( callback ) {
 
 		onAnimationFrameCallback = callback;
-		animation.start();
-
 		vr.setAnimationLoop( callback );
+
+		animation.start();
 
 	};
 
