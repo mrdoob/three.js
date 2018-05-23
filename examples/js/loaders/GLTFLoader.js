@@ -5,8 +5,9 @@
  * @author Takahiro / https://github.com/takahirox
  * @author Don McCurdy / https://www.donmccurdy.com
  */
+import * as THREE from 'three';
 
-THREE.GLTFLoader = ( function () {
+var GLTFLoader = ( function () {
 
 	function GLTFLoader( manager ) {
 
@@ -3163,3 +3164,5 @@ THREE.GLTFLoader = ( function () {
 	return GLTFLoader;
 
 } )();
+
+export { GLTFLoader };
