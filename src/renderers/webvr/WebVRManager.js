@@ -79,6 +79,7 @@ function WebVRManager( renderer ) {
 
 	this.enabled = false;
 	this.userHeight = 1.6;
+	this.autoSubmitFrame = true;
 
 	this.getDevice = function () {
 
