@@ -462,7 +462,7 @@ THREE.NURBSUtils = {
 		}
 
 		Sw.divideScalar( Sw.w );
-		return target.set( Sw.x, Sw.y, Sw.z );
+		target.set( Sw.x, Sw.y, Sw.z );
 
 	}
 

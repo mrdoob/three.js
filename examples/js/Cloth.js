@@ -52,7 +52,7 @@ function plane( width, height ) {
 		var y = ( v + 0.5 ) * height;
 		var z = 0;
 
-		return target.set( x, y, z );
+		target.set( x, y, z );
 
 	};
 

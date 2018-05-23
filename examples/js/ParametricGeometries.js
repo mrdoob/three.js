@@ -28,7 +28,7 @@ THREE.ParametricGeometries = {
 
 		y = - 2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( v );
 
-		return target.set( x, y, z );
+		target.set( x, y, z );
 
 	},
 
@@ -40,7 +40,7 @@ THREE.ParametricGeometries = {
 			var y = 0;
 			var z = v * height;
 
-			return target.set( x, y, z );
+			target.set( x, y, z );
 
 		};
 
@@ -61,7 +61,7 @@ THREE.ParametricGeometries = {
 		y = Math.sin( v ) * ( a + u * Math.cos( v / 2 ) );
 		z = u * Math.sin( v / 2 );
 
-		return target.set( x, y, z );
+		target.set( x, y, z );
 
 	},
 
@@ -83,7 +83,7 @@ THREE.ParametricGeometries = {
 		y = ( major + x ) * Math.sin( u );
 		x = ( major + x ) * Math.cos( u );
 
-		return target.set( x, y, z );
+		target.set( x, y, z );
 
 	}
 
@@ -146,7 +146,7 @@ THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, seg
 		pos.y += cx * normal.y + cy * binormal.y;
 		pos.z += cx * normal.z + cy * binormal.z;
 
-		return target.copy( pos );
+		target.copy( pos );
 
 	};
 
@@ -225,7 +225,7 @@ THREE.ParametricGeometries.SphereGeometry = function ( size, u, v ) {
 		var y = size * Math.sin( u ) * Math.sin( v );
 		var z = size * Math.cos( u );
 
-		return target.set( x, y, z );
+		target.set( x, y, z );
 
 	}
 
@@ -251,7 +251,7 @@ THREE.ParametricGeometries.PlaneGeometry = function ( width, depth, segmentsWidt
 		var y = 0;
 		var z = v * depth;
 
-		return target.set( x, y, z );
+		target.set( x, y, z );
 
 	}
 
