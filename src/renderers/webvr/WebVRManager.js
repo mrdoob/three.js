@@ -8,6 +8,7 @@ import { Vector4 } from '../../math/Vector4.js';
 import { Quaternion } from '../../math/Quaternion.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 
 function WebVRManager( renderer ) {
 
@@ -67,9 +68,13 @@ function WebVRManager( renderer ) {
 
 			renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
 
+			animation.start();
+
 		} else if ( scope.enabled ) {
 
 			renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
+
+			animation.stop();
 
 		}
 
@@ -89,6 +94,8 @@ function WebVRManager( renderer ) {
 	this.setDevice = function ( value ) {
 
 		if ( value !== undefined ) device = value;
+
+		animation.setContext( value );
 
 	};
 
@@ -228,9 +235,13 @@ function WebVRManager( renderer ) {
 
 	this.isPresenting = isPresenting;
 
-	this.requestAnimationFrame = function ( callback ) {
+	// Animation Loop
 
-		device.requestAnimationFrame( callback );
+	var animation = new WebGLAnimation();
+
+	this.setAnimationLoop = function ( callback ) {
+
+		animation.setAnimationLoop( callback );
 
 	};
 
@@ -247,6 +258,14 @@ function WebVRManager( renderer ) {
 			window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
 
 		}
+
+	};
+
+	// DEPRECATED
+
+	this.requestAnimationFrame = function ( callback ) {
+
+		// device.requestAnimationFrame( callback );
 
 	};
 
