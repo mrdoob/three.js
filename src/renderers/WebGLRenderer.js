@@ -1058,7 +1058,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	this.animate = function ( callback ) {
+	this.setAnimationLoop = function ( callback ) {
 
 		onAnimationFrame = callback;
 		onAnimationFrame !== null ? startAnimation() : stopAnimation();
