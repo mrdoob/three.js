@@ -17,6 +17,7 @@ function WebVRManager( renderer ) {
 	var frameData = null;
 
 	var poseTarget = null;
+	var renderScaling = 1.0;
 
 	var standingMatrix = new Matrix4();
 	var standingMatrixInverse = new Matrix4();
@@ -59,8 +60,8 @@ function WebVRManager( renderer ) {
 		if ( isPresenting() ) {
 
 			var eyeParameters = device.getEyeParameters( 'left' );
-			var renderWidth = eyeParameters.renderWidth;
-			var renderHeight = eyeParameters.renderHeight;
+			var renderWidth = eyeParameters.renderWidth * renderScaling;
+			var renderHeight = eyeParameters.renderHeight * renderScaling;
 
 			currentPixelRatio = renderer.getPixelRatio();
 			currentSize = renderer.getSize();
@@ -80,6 +81,12 @@ function WebVRManager( renderer ) {
 	this.enabled = false;
 	this.userHeight = 1.6;
 	this.autoSubmitFrame = true;
+
+	this.setScaling = function ( value ) {
+
+		renderScaling = value;
+
+	}
 
 	this.getDevice = function () {
 
