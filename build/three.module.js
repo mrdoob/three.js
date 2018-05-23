@@ -7247,6 +7247,61 @@ ShaderLib.physical = {
  * @author mrdoob / http://mrdoob.com/
  */
 
+function WebGLAnimation() {
+
+	var context = null;
+	var isAnimating = false;
+	var animationLoop = null;
+
+	function onAnimationFrame( time, frame ) {
+
+		if ( isAnimating === false ) return;
+
+		animationLoop( time, frame );
+
+		context.requestAnimationFrame( onAnimationFrame );
+
+	}
+
+	return {
+
+		start: function () {
+
+			if ( isAnimating === true ) return;
+			if ( animationLoop === null ) return;
+
+			context.requestAnimationFrame( onAnimationFrame );
+
+			isAnimating = true;
+
+		},
+
+		stop: function () {
+
+			isAnimating = false;
+
+		},
+
+		setAnimationLoop: function ( callback ) {
+
+			animationLoop = callback;
+
+		},
+
+		setContext: function ( value ) {
+
+			context = value;
+
+		}
+
+	}
+
+}
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 function WebGLAttributes( gl ) {
 
 	var buffers = new WeakMap();
@@ -21212,9 +21267,13 @@ function WebVRManager( renderer ) {
 
 			renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
 
+			animation.start();
+
 		} else if ( scope.enabled ) {
 
 			renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
+
+			animation.stop();
 
 		}
 
@@ -21234,6 +21293,8 @@ function WebVRManager( renderer ) {
 	this.setDevice = function ( value ) {
 
 		if ( value !== undefined ) device = value;
+
+		animation.setContext( value );
 
 	};
 
@@ -21373,9 +21434,13 @@ function WebVRManager( renderer ) {
 
 	this.isPresenting = isPresenting;
 
-	this.requestAnimationFrame = function ( callback ) {
+	// Animation Loop
 
-		device.requestAnimationFrame( callback );
+	var animation = new WebGLAnimation();
+
+	this.setAnimationLoop = function ( callback ) {
+
+		animation.setAnimationLoop( callback );
 
 	};
 
@@ -21392,6 +21457,14 @@ function WebVRManager( renderer ) {
 			window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
 
 		}
+
+	};
+
+	// DEPRECATED
+
+	this.requestAnimationFrame = function ( callback ) {
+
+		// device.requestAnimationFrame( callback );
 
 	};
 
@@ -21449,17 +21522,29 @@ function WebXRManager( gl ) {
 
 	};
 
+	//
+
 	this.setSession = function ( value ) {
 
 		session = value;
 
 		if ( session !== null ) {
 
+			session.addEventListener( 'end', function () {
+
+				gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+				animation.stop();
+
+			} );
+
 			session.baseLayer = new XRWebGLLayer( session, gl );
 			session.requestFrameOfReference( 'stage' ).then( function ( value ) {
 
 				frameOfRef = value;
 				isExclusive = session.exclusive;
+
+				animation.setContext( session );
+				animation.start();
 
 			} );
 
@@ -21475,48 +21560,55 @@ function WebXRManager( gl ) {
 
 	this.isPresenting = isPresenting;
 
-	this.requestAnimationFrame = function ( callback ) {
+	// Animation Loop
 
-		function onFrame( time, frame ) {
+	var onAnimationFrameCallback = null;
 
-			pose = frame.getDevicePose( frameOfRef );
+	function onAnimationFrame( time, frame ) {
 
-			var layer = session.baseLayer;
-			var views = frame.views;
+		pose = frame.getDevicePose( frameOfRef );
 
-			for ( var i = 0; i < views.length; i ++ ) {
+		var layer = session.baseLayer;
+		var views = frame.views;
 
-				var view = views[ i ];
-				var viewport = layer.getViewport( view );
-				var viewMatrix = pose.getViewMatrix( view );
+		for ( var i = 0; i < views.length; i ++ ) {
 
-				var camera = cameraVR.cameras[ i ];
-				camera.projectionMatrix.fromArray( view.projectionMatrix );
-				camera.matrixWorldInverse.fromArray( viewMatrix );
-				camera.matrixWorld.getInverse( camera.matrixWorldInverse );
-				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
+			var view = views[ i ];
+			var viewport = layer.getViewport( view );
+			var viewMatrix = pose.getViewMatrix( view );
 
-				if ( i === 0 ) {
+			var camera = cameraVR.cameras[ i ];
+			camera.projectionMatrix.fromArray( view.projectionMatrix );
+			camera.matrixWorldInverse.fromArray( viewMatrix );
+			camera.matrixWorld.getInverse( camera.matrixWorldInverse );
+			camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
-					cameraVR.matrixWorld.copy( camera.matrixWorld );
-					cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
+			if ( i === 0 ) {
 
-					// HACK (mrdoob)
-					// https://github.com/w3c/webvr/issues/203
+				cameraVR.matrixWorld.copy( camera.matrixWorld );
+				cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
 
-					cameraVR.projectionMatrix.copy( camera.projectionMatrix );
+				// HACK (mrdoob)
+				// https://github.com/w3c/webvr/issues/203
 
-				}
+				cameraVR.projectionMatrix.copy( camera.projectionMatrix );
 
 			}
 
-			gl.bindFramebuffer( gl.FRAMEBUFFER, session.baseLayer.framebuffer );
-
-			callback();
-
 		}
 
-		session.requestAnimationFrame( onFrame );
+		gl.bindFramebuffer( gl.FRAMEBUFFER, session.baseLayer.framebuffer );
+
+		if ( onAnimationFrameCallback ) onAnimationFrameCallback();
+
+	}
+
+	var animation = new WebGLAnimation();
+	animation.setAnimationLoop( onAnimationFrame );
+
+	this.setAnimationLoop = function ( callback ) {
+
+		onAnimationFrameCallback = callback;
 
 	};
 
@@ -21528,6 +21620,8 @@ function WebXRManager( gl ) {
 		return new THREE.Matrix4();
 
 	};
+
+	this.requestAnimationFrame = function () {};
 
 	this.submitFrame = function () {};
 
@@ -21993,7 +22087,7 @@ function WebGLRenderer( parameters ) {
 
 		vr.dispose();
 
-		stopAnimation();
+		animation.stop();
 
 	};
 
@@ -22504,53 +22598,25 @@ function WebGLRenderer( parameters ) {
 
 	// Animation Loop
 
-	var isAnimating = false;
-	var onAnimationFrame = null;
+	var onAnimationFrameCallback = null;
 
-	function startAnimation() {
+	function onAnimationFrame() {
 
-		if ( isAnimating ) return;
-
-		requestAnimationLoopFrame();
-
-		isAnimating = true;
+		if ( vr.isPresenting() ) return;
+		if ( onAnimationFrameCallback ) onAnimationFrameCallback();
 
 	}
 
-	function stopAnimation() {
+	var animation = new WebGLAnimation();
+	animation.setAnimationLoop( onAnimationFrame );
+	animation.setContext( window );
 
-		isAnimating = false;
+	this.setAnimationLoop = function ( callback ) {
 
-	}
+		onAnimationFrameCallback = callback;
+		vr.setAnimationLoop( callback );
 
-	function requestAnimationLoopFrame() {
-
-		if ( vr.isPresenting() ) {
-
-			vr.requestAnimationFrame( animationLoop );
-
-		} else {
-
-			window.requestAnimationFrame( animationLoop );
-
-		}
-
-	}
-
-	function animationLoop( time ) {
-
-		if ( isAnimating === false ) return;
-
-		onAnimationFrame( time );
-
-		requestAnimationLoopFrame();
-
-	}
-
-	this.animate = function ( callback ) {
-
-		onAnimationFrame = callback;
-		onAnimationFrame !== null ? startAnimation() : stopAnimation();
+		animation.start();
 
 	};
 
@@ -25832,6 +25898,12 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 	var pu = new Vector3(), pv = new Vector3();
 
 	var i, j;
+
+	if ( func.length < 3 ) {
+
+		console.error( 'THREE.ParametricGeometry: Function must now modify a Vector3 as third parameter.' );
+
+	}
 
 	// generate vertices, normals and uvs
 
@@ -38346,7 +38418,7 @@ Object.assign( Font.prototype, {
 
 function createPaths( text, size, divisions, data ) {
 
-	var chars = String( text ).split( '' );
+	var chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // see #13988
 	var scale = size / data.resolution;
 	var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
 
@@ -45735,6 +45807,13 @@ Object.defineProperties( ShaderMaterial.prototype, {
 //
 
 Object.assign( WebGLRenderer.prototype, {
+
+	animate: function ( callback ) {
+
+		console.warn( 'THREE.WebGLRenderer: .animate() is now .setAnimationLoop().' );
+		this.setAnimationLoop( callback );
+
+	},
 
 	getCurrentRenderTarget: function () {
 
