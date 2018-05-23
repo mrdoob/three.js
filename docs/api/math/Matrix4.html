@@ -119,7 +119,7 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[method:Matrix4 clone]()</h3>
 		<p>Creates a new Matrix4 with identical [page:.elements elements] to this one.</p>
 
-		<h3>[method:Matrix4 compose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
+		<h3>[method:this compose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
 		Sets this matrix to the transformation composed of [page:Vector3 position],
 		[page:Quaternion quaternion] and [page:Vector3 scale]. Internally this calls
@@ -128,10 +128,10 @@ m.elements = [ 11, 21, 31, 41,
 		[page:.setPosition setPosition]( [page:Vector3 position] ).
 		</p>
 
-		<h3>[method:Matrix4 copy]( [param:Matrix4 m] )</h3>
+		<h3>[method:this copy]( [param:Matrix4 m] )</h3>
 		<p>Copies the [page:.elements elements] of matrix [page:Matrix4 m] into this matrix.</p>
 
-		<h3>[method:Matrix4 copyPosition]( [param:Matrix4 m] )</h3>
+		<h3>[method:this copyPosition]( [param:Matrix4 m] )</h3>
 		<p>
 		Copies the translation component of the supplied matrix [page:Matrix4 m] into this
 		matrix's translation component.
@@ -154,7 +154,7 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[method:Boolean equals]( [param:Matrix4 m] )</h3>
 		<p>Return true if this matrix and [page:Matrix4 m] are equal.</p>
 
-		<h3>[method:Matrix4 extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
+		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
 		Extracts the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] of this
 		matrix into the three axis vectors provided. If this matrix is:
@@ -172,13 +172,13 @@ zAxis = (c, g, k)
 		</code>
 		</p>
 
-		<h3>[method:Matrix4 extractRotation]( [param:Matrix4 m] )</h3>
+		<h3>[method:this extractRotation]( [param:Matrix4 m] )</h3>
 		<p>
 		Extracts the rotation component of the supplied matrix [page:Matrix4 m] into this matrix's
 		rotation component.
 		</p>
 
-		<h3>[method:Matrix4 fromArray]( [param:Array array], [param:Integer offset] )</h3>
+		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
 		[page:Array array] - the array to read the elements from.<br />
 		[page:Integer offset] - ( optional ) offset into the array. Default is 0.<br /><br />
@@ -187,7 +187,7 @@ zAxis = (c, g, k)
 		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
 		</p>
 
-		<h3>[method:Matrix4 getInverse]( [param:Matrix4 m], [param:Boolean throwOnDegenerate] )</h3>
+		<h3>[method:this getInverse]( [param:Matrix4 m], [param:Boolean throwOnDegenerate] )</h3>
 		<p>
 		[page:Matrix4 m] - the matrix to take the inverse of.<br />
 		[page:Boolean throwOnDegenerate] - (optional) If true, throw an error if the matrix is degenerate (not invertible).<br /><br />
@@ -202,16 +202,16 @@ zAxis = (c, g, k)
 		<h3>[method:Float getMaxScaleOnAxis]()</h3>
 		<p>Gets the maximum scale value of the 3 axes.</p>
 
-		<h3>[method:Matrix4 identity]()</h3>
+		<h3>[method:this identity]()</h3>
 		<p>Resets this matrix to the [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].</p>
 
-		<h3>[method:Matrix4 lookAt]( [param:Vector3 eye], [param:Vector3 center], [param:Vector3 up], )</h3>
+		<h3>[method:this lookAt]( [param:Vector3 eye], [param:Vector3 center], [param:Vector3 up], )</h3>
 		<p>
 			Constructs a rotation matrix, looking from [page:Vector3 eye] towards [page:Vector3 center]
 			oriented by the [page:Vector3 up] vector.
 		</p>
 
-		<h3>[method:Matrix4 makeRotationAxis]( [param:Vector3 axis], [param:Float theta] )</h3>
+		<h3>[method:this makeRotationAxis]( [param:Vector3 axis], [param:Float theta] )</h3>
 		<p>
 		[page:Vector3 axis] — Rotation axis, should be normalized.<br />
 		[page:Float theta] — Rotation angle in radians.<br /><br />
@@ -222,7 +222,7 @@ zAxis = (c, g, k)
 		See the discussion [link:http://www.gamedev.net/reference/articles/article1199.asp here].
 		</p>
 
-		<h3>[method:Matrix4 makeBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
+		<h3>[method:this makeBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
 		Set this to the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] matrix consisting
 		of the three provided basis vectors:
@@ -234,26 +234,26 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		</code>
 		</p>
 
-		<h3>[method:Matrix4 makePerspective]( [param:Float left], [param:Float right], [param:Float top], [param:Float bottom], [param:Float near], [param:Float far] )</h3>
+		<h3>[method:this makePerspective]( [param:Float left], [param:Float right], [param:Float top], [param:Float bottom], [param:Float near], [param:Float far] )</h3>
 		<p>
 			Creates a [link:https://en.wikipedia.org/wiki/3D_projection#Perspective_projection perspective projection] matrix.
 			This is used internally by [page:PerspectiveCamera.updateProjectionMatrix]()
 		</p>
 
-		<h3>[method:Matrix4 makeOrthographic]( [param:Float left], [param:Float right], [param:Float top], [param:Float bottom], [param:Float near], [param:Float far] )</h3>
+		<h3>[method:this makeOrthographic]( [param:Float left], [param:Float right], [param:Float top], [param:Float bottom], [param:Float near], [param:Float far] )</h3>
 		<p>
 		Creates an [link:https://en.wikipedia.org/wiki/Orthographic_projection orthographic projection] matrix.
 		This is used internally by [page:OrthographicCamera.updateProjectionMatrix]().
 		</p>
 
-		<h3>[method:Matrix4 makeRotationFromEuler]( [param:Euler euler] )</h3>
+		<h3>[method:this makeRotationFromEuler]( [param:Euler euler] )</h3>
 		<p>
 		Sets the rotation component (the upper left 3x3 matrix) of this matrix to the rotation specified by the given [page:Euler Euler Angle].
 		The rest of the matrix is set to the identity. Depending on the [page:Euler.order order] of the [page:Euler euler], there are six possible outcomes.
 		See [link:https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix this page] for a complete list.
 		</p>
 
-		<h3>[method:Matrix4 makeRotationFromQuaternion]( [param:Quaternion q] )</h3>
+		<h3>[method:this makeRotationFromQuaternion]( [param:Quaternion q] )</h3>
 		<p>
 		Sets the rotation component of this matrix to the rotation specified by [page:Quaternion q], as outlined
 		[link:https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion here].
@@ -266,7 +266,7 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		</code>
 		</p>
 
-		<h3>[method:Matrix4 makeRotationX]( [param:Float theta] )</h3>
+		<h3>[method:this makeRotationX]( [param:Float theta] )</h3>
 		<p>
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
@@ -280,7 +280,7 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		</code>
 		</p>
 
-		<h3>[method:Matrix4 makeRotationY]( [param:Float theta] )</h3>
+		<h3>[method:this makeRotationY]( [param:Float theta] )</h3>
 		<p>
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
@@ -294,7 +294,7 @@ cos(&theta;)  0 sin(&theta;) 0
 		</code>
 		</p>
 
-		<h3>[method:Matrix4 makeRotationZ]( [param:Float theta] )</h3>
+		<h3>[method:this makeRotationZ]( [param:Float theta] )</h3>
 		<p>
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
@@ -308,7 +308,7 @@ sin(&theta;) cos(&theta;)  0 0
 		</code>
 		</p>
 
-		<h3>[method:Matrix4 makeScale]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this makeScale]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 			[page:Float x] - the amount to scale in the X axis.<br />
 			[page:Float y] - the amount to scale in the Y axis.<br />
@@ -323,7 +323,7 @@ x, 0, 0, 0,
 			</code>
 		</p>
 
-		<h3>[method:Matrix4 makeShear]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this makeShear]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		[page:Float x] - the amount to shear in the X axis.<br />
 		[page:Float y] - the amount to shear in the Y axis.<br />
@@ -338,7 +338,7 @@ x, y, 1, 0,
 </code>
 		</p>
 
-		<h3>[method:Matrix4 makeTranslation]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 			[page:Float x] - the amount to translate in the X axis.<br />
 			[page:Float y] - the amount to translate in the Y axis.<br />
@@ -353,22 +353,22 @@ x, y, 1, 0,
 		</code>
 		</p>
 
-		<h3>[method:Matrix4 multiply]( [param:Matrix4 m] )</h3>
+		<h3>[method:this multiply]( [param:Matrix4 m] )</h3>
 		<p>Post-multiplies this matrix by [page:Matrix4 m].</p>
 
-		<h3>[method:Matrix4 multiplyMatrices]( [param:Matrix4 a], [param:Matrix4 b] )</h3>
+		<h3>[method:this multiplyMatrices]( [param:Matrix4 a], [param:Matrix4 b] )</h3>
 		<p>Sets this matrix to [page:Matrix4 a] x [page:Matrix4 b].</p>
 
-		<h3>[method:Matrix4 multiplyScalar]( [param:Float s] )</h3>
+		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>Multiplies every component of the matrix by a scalar value [page:Float s].</p>
 
-		<h3>[method:Matrix4 premultiply]( [param:Matrix4 m] )</h3>
+		<h3>[method:this premultiply]( [param:Matrix4 m] )</h3>
 		<p>Pre-multiplies this matrix by [page:Matrix4 m].</p>
 
-		<h3>[method:Matrix4 scale]( [param:Vector3 v] )</h3>
+		<h3>[method:this scale]( [param:Vector3 v] )</h3>
 		<p>Multiplies the columns of this matrix by vector [page:Vector3 v].</p>
 
-		<h3>[method:Matrix4 set](
+		<h3>[method:this set](
 			[page:Float n11], [page:Float n12], [page:Float n13], [page:Float n14],
 			[page:Float n21], [page:Float n22], [page:Float n23], [page:Float n24],
 			[page:Float n31], [page:Float n32], [page:Float n33], [page:Float n34],
@@ -378,7 +378,7 @@ x, y, 1, 0,
 			[page:Float n12], ... [page:Float n44].
 		</p>
 
-		<h3>[method:Matrix4 setPosition]( [param:Vector3 v] )</h3>
+		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
 		<p>
 			Sets the position component for this matrix from vector [page:Vector3 v], without affecting the
 			rest of the matrix - i.e. if the matrix is currently:
@@ -406,7 +406,7 @@ m, n, o, p
 		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
 		</p>
 
-		<h3>[method:Matrix4 transpose]()</h3>
+		<h3>[method:this transpose]()</h3>
 		<p>[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix.</p>
 
 		<h2>Source</h2>
