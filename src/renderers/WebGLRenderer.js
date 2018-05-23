@@ -1200,7 +1200,7 @@ function WebGLRenderer( parameters ) {
 
 		scene.onAfterRender( _this, scene, camera );
 
-		if ( vr.enabled ) {
+		if ( vr.enabled && vr.autoSubmitFrame) {
 
 			vr.submitFrame();
 
