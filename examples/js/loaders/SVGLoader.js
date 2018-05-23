@@ -289,6 +289,8 @@ THREE.SVGLoader.prototype = {
 								point.x + numbers[ j + 4 ],
 								point.y + numbers[ j + 5 ]
 							);
+							control.x = point.x + numbers[ j + 2 ];
+							control.y = point.y + numbers[ j + 3 ];
 							point.x += numbers[ j + 4 ];
 							point.y += numbers[ j + 5 ];
 						}
@@ -297,8 +299,6 @@ THREE.SVGLoader.prototype = {
 					case 's':
 						var numbers = parseFloats( data );
 						path.bezierCurveTo(
-							// TODO: Not sure if point needs
-							// to be added to reflection...
 							getReflection( point.x, control.x ),
 							getReflection( point.y, control.y ),
 							point.x + numbers[ 0 ],
@@ -620,7 +620,7 @@ THREE.SVGLoader.prototype = {
 
 		function getReflection( a, b ) {
 
-			return 2 * a - ( b - a );
+			return a - ( b - a );
 
 		}
 
