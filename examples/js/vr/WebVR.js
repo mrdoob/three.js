@@ -49,6 +49,8 @@ var WEBVR = {
 
 			function onSessionEnded( event ) {
 
+				currentSession.removeEventListener( 'end', onSessionEnded );
+
 				renderer.vr.setSession( null );
 				button.textContent = 'ENTER XR';
 

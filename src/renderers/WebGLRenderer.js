@@ -20,6 +20,7 @@ import { UniformsLib } from './shaders/UniformsLib.js';
 import { UniformsUtils } from './shaders/UniformsUtils.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
+import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
@@ -1015,53 +1016,25 @@ function WebGLRenderer( parameters ) {
 
 	// Animation Loop
 
-	var isAnimating = false;
-	var onAnimationFrame = null;
+	var onAnimationFrameCallback = null;
 
-	function startAnimation() {
+	function onAnimationFrame() {
 
-		if ( isAnimating ) return;
-
-		requestAnimationLoopFrame();
-
-		isAnimating = true;
+		if ( vr.isPresenting() ) return;
+		if ( onAnimationFrameCallback ) onAnimationFrameCallback();
 
 	}
 
-	function stopAnimation() {
-
-		isAnimating = false;
-
-	}
-
-	function requestAnimationLoopFrame() {
-
-		if ( vr.isPresenting() ) {
-
-			vr.requestAnimationFrame( animationLoop );
-
-		} else {
-
-			window.requestAnimationFrame( animationLoop );
-
-		}
-
-	}
-
-	function animationLoop( time ) {
-
-		if ( isAnimating === false ) return;
-
-		onAnimationFrame( time );
-
-		requestAnimationLoopFrame();
-
-	}
+	var animation = new WebGLAnimation();
+	animation.setAnimationLoop( onAnimationFrame );
+	animation.setContext( window );
 
 	this.setAnimationLoop = function ( callback ) {
 
-		onAnimationFrame = callback;
-		onAnimationFrame !== null ? startAnimation() : stopAnimation();
+		onAnimationFrameCallback = callback;
+		animation.start();
+
+		vr.setAnimationLoop( callback );
 
 	};
 

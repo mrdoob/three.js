@@ -8,6 +8,7 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Quaternion } from '../../math/Quaternion.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 
 function WebXRManager( gl ) {
 
@@ -59,17 +60,29 @@ function WebXRManager( gl ) {
 
 	};
 
+	//
+
 	this.setSession = function ( value ) {
 
 		session = value;
 
 		if ( session !== null ) {
 
+			session.addEventListener( 'end', function () {
+
+				gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+				animation.stop();
+
+			} );
+
 			session.baseLayer = new XRWebGLLayer( session, gl );
 			session.requestFrameOfReference( 'stage' ).then( function ( value ) {
 
 				frameOfRef = value;
 				isExclusive = session.exclusive;
+
+				animation.setContext( session );
+				animation.start();
 
 			} );
 
@@ -85,48 +98,55 @@ function WebXRManager( gl ) {
 
 	this.isPresenting = isPresenting;
 
-	this.requestAnimationFrame = function ( callback ) {
+	// Animation Loop
 
-		function onFrame( time, frame ) {
+	var onAnimationFrameCallback = null;
 
-			pose = frame.getDevicePose( frameOfRef );
+	function onAnimationFrame( time, frame ) {
 
-			var layer = session.baseLayer;
-			var views = frame.views;
+		pose = frame.getDevicePose( frameOfRef );
 
-			for ( var i = 0; i < views.length; i ++ ) {
+		var layer = session.baseLayer;
+		var views = frame.views;
 
-				var view = views[ i ];
-				var viewport = layer.getViewport( view );
-				var viewMatrix = pose.getViewMatrix( view );
+		for ( var i = 0; i < views.length; i ++ ) {
 
-				var camera = cameraVR.cameras[ i ];
-				camera.projectionMatrix.fromArray( view.projectionMatrix );
-				camera.matrixWorldInverse.fromArray( viewMatrix );
-				camera.matrixWorld.getInverse( camera.matrixWorldInverse );
-				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
+			var view = views[ i ];
+			var viewport = layer.getViewport( view );
+			var viewMatrix = pose.getViewMatrix( view );
 
-				if ( i === 0 ) {
+			var camera = cameraVR.cameras[ i ];
+			camera.projectionMatrix.fromArray( view.projectionMatrix );
+			camera.matrixWorldInverse.fromArray( viewMatrix );
+			camera.matrixWorld.getInverse( camera.matrixWorldInverse );
+			camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
-					cameraVR.matrixWorld.copy( camera.matrixWorld );
-					cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
+			if ( i === 0 ) {
 
-					// HACK (mrdoob)
-					// https://github.com/w3c/webvr/issues/203
+				cameraVR.matrixWorld.copy( camera.matrixWorld );
+				cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
 
-					cameraVR.projectionMatrix.copy( camera.projectionMatrix );
+				// HACK (mrdoob)
+				// https://github.com/w3c/webvr/issues/203
 
-				}
+				cameraVR.projectionMatrix.copy( camera.projectionMatrix );
 
 			}
 
-			gl.bindFramebuffer( gl.FRAMEBUFFER, session.baseLayer.framebuffer );
-
-			callback();
-
 		}
 
-		session.requestAnimationFrame( onFrame );
+		gl.bindFramebuffer( gl.FRAMEBUFFER, session.baseLayer.framebuffer );
+
+		if ( onAnimationFrameCallback ) onAnimationFrameCallback();
+
+	}
+
+	var animation = new WebGLAnimation();
+	animation.setAnimationLoop( onAnimationFrame );
+
+	this.setAnimationLoop = function ( callback ) {
+
+		onAnimationFrameCallback = callback;
 
 	};
 
@@ -138,6 +158,8 @@ function WebXRManager( gl ) {
 		return new THREE.Matrix4();
 
 	};
+
+	this.requestAnimationFrame = function () {};
 
 	this.submitFrame = function () {};
 
