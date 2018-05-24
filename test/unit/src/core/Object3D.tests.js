@@ -99,7 +99,16 @@ export default QUnit.module( 'Core', () => {
 
 			a.applyMatrix( m );
 
-			assert.deepEqual( a.position, expectedPos, "Position has the expected values" );
+			assert.propEqual( {
+				x: a.position.x,
+				y: a.position.y,
+				z: a.position.z
+			}, {
+				x: expectedPos.x,
+				y: expectedPos.y,
+				z: expectedPos.z
+			}, "Position has the expected values" );
+
 			assert.ok(
 				Math.abs( a.quaternion.x - expectedQuat.x ) <= eps &&
 				Math.abs( a.quaternion.y - expectedQuat.y ) <= eps &&
@@ -244,7 +253,11 @@ export default QUnit.module( 'Core', () => {
 			obj.translateOnAxis( new Vector3( 0, 1, 0 ), 1.23 );
 			obj.translateOnAxis( new Vector3( 0, 0, 1 ), - 4.56 );
 
-			assert.propEqual( obj.position, {
+			assert.propEqual( {
+				x: obj.position.x,
+				y: obj.position.y,
+				z: obj.position.z
+			}, {
 				x: 1,
 				y: 1.23,
 				z: - 4.56
