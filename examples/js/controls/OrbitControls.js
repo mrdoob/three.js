@@ -14,14 +14,10 @@ THREE.TOUCH_MODES = {
 	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 	//    Pan - right mouse, or arrow keys / touch: two-finger move
 	CLASSIC: 1,
-	//    Orbit - left mouse / touch: one-finger move
-	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-	//    Pan - right mouse, or arrow keys / touch: three-finger move
-	LEGACY: 2,
 	//    Orbit - left mouse / touch: two-finger rotate
 	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 	//    Pan - right mouse, or arrow keys / touch: one-finger move
-	MAP: 3,
+	MAP: 2,
 };
 
 THREE.OrbitControls = function ( object, domElement ) {
@@ -598,7 +594,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 		switch ( scope.touchMode ) {
 
 			case THREE.TOUCH_MODES.CLASSIC:
-			case THREE.TOUCH_MODES.LEGACY:
 
 				x = event.touches[ 0 ].pageX;
 				y = event.touches[ 0 ].pageY;
@@ -665,14 +660,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 					break;
 
-				case THREE.TOUCH_MODES.LEGACY:
-
-					x = ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX + event.touches[ 2 ].pageX ) / 3;
-					y = ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY + event.touches[ 2 ].pageY ) / 3;
-					break;
 				case THREE.TOUCH_MODES.MAP:
+
 					x = event.touches[ 0 ].pageX;
 					y = event.touches[ 0 ].pageY;
+
 					break;
 
 				default:
@@ -697,7 +689,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 		switch ( scope.touchMode ) {
 
 			case THREE.TOUCH_MODES.CLASSIC:
-			case THREE.TOUCH_MODES.LEGACY:
 
 				rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
@@ -820,13 +811,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
 				y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
-
-				break;
-
-			case THREE.TOUCH_MODES.LEGACY:
-
-				x = ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX + event.touches[ 2 ].pageX ) / 3;
-				y = ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY + event.touches[ 2 ].pageY ) / 3;
 
 				break;
 
@@ -1002,12 +986,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				break;
 
-			case THREE.TOUCH_MODES.LEGACY:
-
-				onTouchStartLegacyMode( event );
-
-				break;
-
 			case THREE.TOUCH_MODES.MAP:
 
 				onTouchStartMapMode( event );
@@ -1069,50 +1047,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function onTouchStartLegacyMode( event ) {
-
-		// console.log( 'onTouchStartLegacyMode' );
-
-		switch ( event.touches.length ) {
-
-			case 1:	// one-fingered touch: rotate
-
-				if ( scope.enableRotate === false ) return;
-
-				handleTouchStartRotate( event );
-
-				state = STATE.ROTATE;
-
-				break;
-
-			case 2:	// two-fingered touch: dolly
-
-				if ( scope.enableZoom === false ) return;
-
-				handleTouchStartDolly( event );
-
-				state = STATE.DOLLY;
-
-				break;
-
-			case 3:	// three-fingered touch: pan
-
-				if ( scope.enableZoom === false ) return;
-
-				handleTouchStartPan( event );
-
-				state = STATE.PAN;
-
-				break;
-
-			default:
-
-				state = STATE.NONE;
-
-		}
-
-	}
-
 	function onTouchStartMapMode( event ) {
 
 		// console.log( 'onTouchStartMapMode' );
@@ -1164,12 +1098,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				break;
 
-			case THREE.TOUCH_MODES.LEGACY:
-
-				onTouchMoveLegacyMode( event );
-
-				break;
-
 			case THREE.TOUCH_MODES.MAP:
 
 				onTouchMoveMapMode( event );
@@ -1210,45 +1138,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			case 3:
 
-
-			default:
-
-				state = STATE.NONE;
-
-		}
-
-	}
-
-	function onTouchMoveLegacyMode( event ) {
-
-		// console.log( 'onTouchMoveLegacyMode' );
-
-		switch ( event.touches.length ) {
-
-			case 1: // one-fingered touch: rotate
-
-				handleTouchMoveRotate( event );
-
-				scope.update();
-
-				break;
-
-			case 2: // two-fingered touch: dolly-pan
-
-
-				handleTouchMoveDolly( event );
-
-				scope.update();
-
-				break;
-
-			case 3:
-
-				handleTouchMovePan( event );
-
-				scope.update();
-
-				break;
 
 			default:
 
