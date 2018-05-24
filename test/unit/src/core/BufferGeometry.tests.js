@@ -13,6 +13,8 @@ import {
 	Uint32BufferAttribute,
 	Float32BufferAttribute
 } from '../../../../src/core/BufferAttribute';
+import { InterleavedBufferAttribute } from '../../../../src/core/InterleavedBufferAttribute';
+import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Sphere } from '../../../../src/math/Sphere';
@@ -901,9 +903,10 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "clone", ( assert ) => {
 
+			// ensure cloning works with both BufferAttributes and InterleavedBufferAttributes
 			var a = new BufferGeometry();
 			a.addAttribute( "attribute1", new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
-			a.addAttribute( "attribute2", new BufferAttribute( new Float32Array( [ 0, 1, 3, 5, 6 ] ), 1 ) );
+			a.addAttribute( "attribute2", new InterleavedBufferAttribute( new InterleavedBuffer( new Float32Array( [ 0, 1, 3, 5, 6 ] ), 1 ), 1, 0 ) );
 			a.addGroup( 0, 1, 2 );
 			a.computeBoundingBox();
 			a.computeBoundingSphere();
