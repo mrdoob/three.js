@@ -391,6 +391,90 @@ THREE.BufferGeometryUtils = {
 
 		return new THREE.BufferAttribute( array, itemSize, normalized );
 
+	},
+
+	/**
+	 * @param {Array<THREE.BufferAttribute>} attributes
+	 * @return {Array<THREE.InterleavedBufferAttribute>}
+	 */
+	interleaveAttributes: function ( attributes ) {
+
+		// Interleaves the provided attributes into an InterleavedBuffer and returns
+		// a set of InterleavedBufferAttributes for each attribute
+		var TypedArray;
+		var arrayLength = 0;
+		var stride = 0;
+
+		// calculate the the length and type of the interleavedBuffer
+		for ( var i = 0, l = attributes.length; i < l; ++ i ) {
+
+			var attribute = attributes[ i ];
+
+			if ( TypedArray === undefined ) TypedArray = attribute.array.constructor;
+			if ( TypedArray !== attribute.array.constructor ) {
+
+				console.warn( 'AttributeBuffers of different types cannot be interleaved' );
+				return null;
+
+			}
+
+			arrayLength += attribute.array.length;
+			stride += attribute.itemSize;
+
+		}
+
+		// Create the set of buffer attributes
+		var interleavedBuffer = new THREE.InterleavedBuffer( new TypedArray( arrayLength ), stride );
+		var offset = 0;
+		var res = [];
+		var getters = [ 'getX', 'getY', 'getZ', 'getW' ];
+		var setters = [ 'setX', 'setY', 'setZ', 'setW' ];
+
+		for ( var j = 0, l = attributes.length; j < l; j ++ ) {
+
+			var attribute = attributes[ j ];
+			var itemSize = attribute.itemSize;
+			var count = attribute.count;
+			var iba = new THREE.InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, attribute.normalized );
+			res.push( iba );
+
+			offset += itemSize;
+
+			// Move the data for each attribute into the new interleavedBuffer
+			// at the appropriate offset
+			for ( var c = 0; c < count; c ++ ) {
+
+				for ( var k = 0; k < itemSize; k ++ ) {
+
+					iba[ setters[ k ] ]( c, attribute[ getters[ k ] ]( c ) );
+
+				}
+
+			}
+
+		}
+
+		return res;
+
+	},
+
+	/**
+	 * @param {Array<THREE.BufferGeometry>} geometry
+	 * @return {number}
+	 */
+	getMemoryUse: function ( geometry ) {
+
+		// Return the estimated memory used by this geometry
+		var mem = 0;
+		for ( var name in geometry.attributes ) {
+
+			mem += geometry.getAttribute( name ).array.byteLength;
+
+		}
+
+		mem += geometry.getIndex() ? geometry.getIndex().array.byteLength : 0;
+		return mem;
+
 	}
 
 };
