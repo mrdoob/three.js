@@ -2,7 +2,7 @@
 * @author Richard M. / https://github.com/richardmonette
 */
 
-THREE.EquiangularToCubeGenerator = function ( sourceTexture, resolution ) {
+THREE.EquiangularToCubeGenerator = function ( sourceTexture, resolution, type, format ) {
 
 	this.sourceTexture = sourceTexture;
 	this.resolution = resolution;
@@ -23,10 +23,10 @@ THREE.EquiangularToCubeGenerator = function ( sourceTexture, resolution ) {
 	this.scene.add( this.boxMesh );
 
 	var params = {
-		format: THREE.RGBAFormat,
+		format: format ? format : this.sourceTexture.format,
 		magFilter: this.sourceTexture.magFilter,
 		minFilter: this.sourceTexture.minFilter,
-		type: this.sourceTexture.type,
+		type: type ? type : this.sourceTexture.type,
 		generateMipmaps: this.sourceTexture.generateMipmaps,
 		anisotropy: this.sourceTexture.anisotropy,
 		encoding: this.sourceTexture.encoding
