@@ -6,7 +6,6 @@ import { Vector2 } from '../math/Vector2.js';
 
 function DirectGeometry() {
 
-	this.indices = [];
 	this.vertices = [];
 	this.normals = [];
 	this.colors = [];
@@ -140,6 +139,12 @@ Object.assign( DirectGeometry.prototype, {
 		var hasSkinWeights = skinWeights.length === vertices.length;
 
 		//
+
+		if ( faces.length === 0 ) {
+
+			console.error( 'THREE.DirectGeometry: Faceless geometries are not supported.' );
+
+		}
 
 		for ( var i = 0; i < faces.length; i ++ ) {
 

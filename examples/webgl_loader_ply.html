@@ -146,7 +146,6 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.renderReverseSided = false;
 
 				container.appendChild( renderer.domElement );
 
@@ -181,7 +180,7 @@
 				directionalLight.shadow.mapSize.width = 1024;
 				directionalLight.shadow.mapSize.height = 1024;
 
-				directionalLight.shadow.bias = -0.005;
+				directionalLight.shadow.bias = -0.001;
 
 			}
 

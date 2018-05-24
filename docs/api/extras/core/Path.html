@@ -12,29 +12,34 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
-		A 2d path representation, comprising of points, lines, and cubes, similar to the 2D Canvas API.
-		It extends [page:CurvePath].
-		</div>
+		<p class="desc">
+		A 2D path representation. The class provides methods for creating paths and contours of 2D shapes similar to the 2D Canvas API.
+		</p>
 
 		<h2>Example</h2>
 
 		<code>
-var v1 = new THREE.Vector2();
-var v2 = new THREE.Vector2(1, 45);
-var v3 = new THREE.Vector2(34, 34);
+			var path = new THREE.Path();
 
-var vectors = [v1, v2, v3];
+			path.lineTo( 0, 0.8 );
+			path.quadraticCurveTo( 0, 1, 0.2, 1 );
+			path.lineTo( 1, 1 );
 
-var path = new THREE.Path(vectors);
+			var points = path.getPoints();
+
+			var geometry = new THREE.BufferGeometry().setFromPoints( points );
+			var material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+
+			var line = new THREE.Line( geometry, material );
+			scene.add( line );
 		</code>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Array points] )</h3>
-		<div>
+		<h3>[name]( [param:Array points] )</h3>
+		<p>
 		points -- (optional) array of [page:Vector2 Vector2s].<br /><br />
 
 		Creates a Path from the points. The first point defines the offset, then successive points
@@ -42,21 +47,21 @@ var path = new THREE.Path(vectors);
 
 		If no points are specified, an empty path is created and the [page:.currentPoint] is set to
 		the origin.
-		</div>
+		</p>
 
 
 		<h2>Properties</h2>
-		<div>See the base [page:CurvePath] class for common properties.</div>
+		<p>See the base [page:CurvePath] class for common properties.</p>
 
 		<h3>[property:array currentPoint]</h3>
-		<div>The current offset of the path. Any new [page:Curve] added will start here.</div>
+		<p>The current offset of the path. Any new [page:Curve] added will start here.</p>
 
 
 		<h2>Methods</h2>
-		<div>See the base [page:CurvePath] class for common methods.</div>
+		<p>See the base [page:CurvePath] class for common methods.</p>
 
-		<h3>[method:null absarc]( [page:Float x], [page:Float y], [page:Float radius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise] )</h3>
-		<div>
+		<h3>[method:null absarc]( [param:Float x], [param:Float y], [param:Float radius], [param:Float startAngle], [param:Float endAngle], [param:Float clockwise] )</h3>
+		<p>
 			x, y -- The absolute center of the arc.<br />
 			radius -- The radius of the arc.<br />
 			startAngle -- The start angle in radians.<br />
@@ -64,10 +69,10 @@ var path = new THREE.Path(vectors);
 			clockwise -- Sweep the arc clockwise. Defaults to *false*.<br /><br />
 
 			Adds an absolutely positioned [page:EllipseCurve EllipseCurve] to the path.
-		</div>
+		</p>
 
-		<h3>[method:null absellipse]( [page:Float x], [page:Float y], [page:Float xRadius], [page:Float yRadius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise], [page:Float rotation] )</h3>
-		<div>
+		<h3>[method:null absellipse]( [param:Float x], [param:Float y], [param:Float xRadius], [param:Float yRadius], [param:Float startAngle], [param:Float endAngle], [param:Float clockwise], [param:Float rotation] )</h3>
+		<p>
 			x, y -- The absolute center of the ellipse.<br />
 			xRadius -- The radius of the ellipse in the x axis.<br />
 			yRadius -- The radius of the ellipse in the y axis.<br />
@@ -77,10 +82,10 @@ var path = new THREE.Path(vectors);
 			rotation -- The rotation angle of the ellipse in radians, counterclockwise from the positive X axis. Optional, defaults to 0.<br /><br />
 
 			Adds an absolutely positioned [page:EllipseCurve EllipseCurve] to the path.
-		</div>
+		</p>
 
-		<h3>[method:null arc]( [page:Float x], [page:Float y], [page:Float radius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise] )</h3>
-		<div>
+		<h3>[method:null arc]( [param:Float x], [param:Float y], [param:Float radius], [param:Float startAngle], [param:Float endAngle], [param:Float clockwise] )</h3>
+		<p>
 		x, y -- The center of the arc offset from the last call.<br />
 		radius -- The radius of the arc.<br />
 		startAngle -- The start angle in radians.<br />
@@ -88,14 +93,14 @@ var path = new THREE.Path(vectors);
 		clockwise -- Sweep the arc clockwise. Defaults to *false*.<br /><br />
 
 		Adds an [page:EllipseCurve EllipseCurve] to the path, positioned relative to [page:.currentPoint].
-		</div>
+		</p>
 
 
-		<h3>[method:null bezierCurveTo]( [page:Float cp1X], [page:Float cp1Y], [page:Float cp2X], [page:Float cp2Y], [page:Float x], [page:Float y] )</h3>
-		<div>This creates a bezier curve from [page:.currentPoint] with (cp1X, cp1Y) and (cp2X, cp2Y) as control points and updates [page:.currentPoint] to x and y.</div>
+		<h3>[method:null bezierCurveTo]( [param:Float cp1X], [param:Float cp1Y], [param:Float cp2X], [param:Float cp2Y], [param:Float x], [param:Float y] )</h3>
+		<p>This creates a bezier curve from [page:.currentPoint] with (cp1X, cp1Y) and (cp2X, cp2Y) as control points and updates [page:.currentPoint] to x and y.</p>
 
-		<h3>[method:null ellipse]( [page:Float x], [page:Float y], [page:Float xRadius], [page:Float yRadius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise], [page:Float rotation] )</h3>
-		<div>
+		<h3>[method:null ellipse]( [param:Float x], [param:Float y], [param:Float xRadius], [param:Float yRadius], [param:Float startAngle], [param:Float endAngle], [param:Float clockwise], [param:Float rotation] )</h3>
+		<p>
 			x, y -- The center of the ellipse offset from the last call.<br />
 			xRadius -- The radius of the ellipse in the x axis.<br />
 			yRadius -- The radius of the ellipse in the y axis.<br />
@@ -105,33 +110,33 @@ var path = new THREE.Path(vectors);
 			rotation -- The rotation angle of the ellipse in radians, counterclockwise from the positive X axis. Optional, defaults to *0*.<br /><br />
 
 			Adds an [page:EllipseCurve EllipseCurve] to the path, positioned relative to [page:.currentPoint].
-		</div>
+		</p>
 
-		<h3>[method:null lineTo]( [page:Float x], [page:Float y] )</h3>
-		<div>Connects a [page:LineCurve] from [page:.currentPoint] to x, y onto the path.</div>
-
-
-		<h3>[method:null moveTo]( [page:Float x], [page:Float y] )</h3>
-		<div>Move the [page:.currentPoint] to x, y.</div>
+		<h3>[method:null lineTo]( [param:Float x], [param:Float y] )</h3>
+		<p>Connects a [page:LineCurve] from [page:.currentPoint] to x, y onto the path.</p>
 
 
-		<h3>[method:null quadraticCurveTo]( [page:Float cpX], [page:Float cpY], [page:Float x], [page:Float y] )</h3>
-		<div>Creates a quadratic curve from [page:.currentPoint] with cpX and cpY as control point and updates [page:.currentPoint] to x and y.</div>
+		<h3>[method:null moveTo]( [param:Float x], [param:Float y] )</h3>
+		<p>Move the [page:.currentPoint] to x, y.</p>
 
-		<h3>[method:null setFromPoints]( [page:Array vector2s] )</h3>
-		<div>
+
+		<h3>[method:null quadraticCurveTo]( [param:Float cpX], [param:Float cpY], [param:Float x], [param:Float y] )</h3>
+		<p>Creates a quadratic curve from [page:.currentPoint] with cpX and cpY as control point and updates [page:.currentPoint] to x and y.</p>
+
+		<h3>[method:null setFromPoints]( [param:Array vector2s] )</h3>
+		<p>
 			points --  array of [page:Vector2 Vector2s].<br /><br />
 
 			Points are added to the [page:CurvePath.curves curves]
 			array as [page:LineCurve LineCurves].
-		</div>
+		</p>
 
-		<h3>[method:null splineThru] ( [page:Array points] ) </h3>
-		<div>
+		<h3>[method:null splineThru] ( [param:Array points] ) </h3>
+		<p>
 			points - An array of [page:Vector2 Vector2s]<br /><br />
 
 			Connects a new [page:SplineCurve] onto the path.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

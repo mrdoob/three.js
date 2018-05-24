@@ -7,7 +7,7 @@ var list = {
 			"Import via modules": "manual/introduction/Import-via-modules",
 			"Browser support": "manual/introduction/Browser-support",
 			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
-			"How to run things locally": "manual/introduction/How-to-run-thing-locally",
+			"How to run things locally": "manual/introduction/How-to-run-things-locally",
 			"Drawing Lines": "manual/introduction/Drawing-lines",
 			"Creating Text": "manual/introduction/Creating-text",
 			"Migration Guide": "manual/introduction/Migration-guide",
@@ -59,6 +59,7 @@ var list = {
 		},
 
 		"Cameras": {
+			"ArrayCamera": "api/cameras/ArrayCamera",
 			"Camera": "api/cameras/Camera",
 			"CubeCamera": "api/cameras/CubeCamera",
 			"OrthographicCamera": "api/cameras/OrthographicCamera",
@@ -105,7 +106,6 @@ var list = {
 
 		"Extras": {
 			"Earcut": "api/extras/Earcut",
-			"SceneUtils": "api/extras/SceneUtils",
 			"ShapeUtils": "api/extras/ShapeUtils"
 		},
 
@@ -148,8 +148,8 @@ var list = {
 			"DodecahedronBufferGeometry": "api/geometries/DodecahedronBufferGeometry",
 			"DodecahedronGeometry": "api/geometries/DodecahedronGeometry",
 			"EdgesGeometry": "api/geometries/EdgesGeometry",
-			"ExtrudeGeometry": "api/geometries/ExtrudeGeometry",
 			"ExtrudeBufferGeometry": "api/geometries/ExtrudeBufferGeometry",
+			"ExtrudeGeometry": "api/geometries/ExtrudeGeometry",
 			"IcosahedronBufferGeometry": "api/geometries/IcosahedronBufferGeometry",
 			"IcosahedronGeometry": "api/geometries/IcosahedronGeometry",
 			"LatheBufferGeometry": "api/geometries/LatheBufferGeometry",
@@ -293,7 +293,6 @@ var list = {
 		"Objects": {
 			"Bone": "api/objects/Bone",
 			"Group": "api/objects/Group",
-			"LensFlare": "api/objects/LensFlare",
 			"Line": "api/objects/Line",
 			"LineLoop": "api/objects/LineLoop",
 			"LineSegments": "api/objects/LineSegments",
@@ -338,6 +337,12 @@ var list = {
 
 	"Examples": {
 
+		"Animations": {
+			"CCDIKSolver": "examples/animations/CCDIKSolver",
+			"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
+			"MMDPhysics": "examples/animations/MMDPhysics"
+		},
+
 		"Controls": {
 			"OrbitControls": "examples/controls/OrbitControls"
 		},
@@ -351,6 +356,7 @@ var list = {
 		"Loaders": {
 			"BabylonLoader": "examples/loaders/BabylonLoader",
 			"GLTFLoader": "examples/loaders/GLTFLoader",
+			"MMDLoader": "examples/loaders/MMDLoader",
 			"MTLLoader": "examples/loaders/MTLLoader",
 			"OBJLoader": "examples/loaders/OBJLoader",
 			"OBJLoader2": "examples/loaders/OBJLoader2",
@@ -360,6 +366,10 @@ var list = {
 			"SVGLoader": "examples/loaders/SVGLoader",
 			"TGALoader": "examples/loaders/TGALoader",
 			"PRWMLoader": "examples/loaders/PRWMLoader"
+		},
+
+		"Objects": {
+			"Lensflare": "examples/objects/Lensflare",
 		},
 
 		"Exporters": {
@@ -380,7 +390,16 @@ var list = {
 		},
 
 		"Renderers": {
-			"CanvasRenderer": "examples/renderers/CanvasRenderer"
+			"CanvasRenderer": "examples/renderers/CanvasRenderer",
+			"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
+			"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
+			"SVGRenderer": "examples/renderers/SVGRenderer"
+
+		},
+
+		"Utils": {
+			"BufferGeometryUtils": "examples/BufferGeometryUtils",
+			"SceneUtils": "examples/utils/SceneUtils"
 		}
 
 	},
@@ -398,7 +417,6 @@ var list = {
 		},
 
 		"WebGLRenderer / Plugins": {
-			"LensFlarePlugin": "api/renderers/webgl/plugins/LensFlarePlugin",
 			"SpritePlugin": "api/renderers/webgl/plugins/SpritePlugin"
 		}
 

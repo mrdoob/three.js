@@ -42,7 +42,8 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer1, renderer2;
-			var group1, group2, group3;
+
+			var mesh1, mesh2, mesh3;
 
 			init();
 			animate();
@@ -81,22 +82,24 @@
 				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
 				var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
 
-				var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.y = - 250;
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+				var shadowMesh;
 
-				var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.x = - 400;
-				mesh.position.y = - 250;
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+				shadowMesh.position.y = - 250;
+				shadowMesh.rotation.x = - Math.PI / 2;
+				scene.add( shadowMesh );
 
-				var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.x = 400;
-				mesh.position.y = - 250;
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+				shadowMesh.position.x = - 400;
+				shadowMesh.position.y = - 250;
+				shadowMesh.rotation.x = - Math.PI / 2;
+				scene.add( shadowMesh );
+
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+				shadowMesh.position.x = 400;
+				shadowMesh.position.y = - 250;
+				shadowMesh.rotation.x = - Math.PI / 2;
+				scene.add( shadowMesh );
 
 				var faceIndices = [ 'a', 'b', 'c' ];
 
@@ -139,23 +142,28 @@
 
 				}
 
-				var materials = [
+				var wireframe;
 
-					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } ),
-					new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } )
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 } );
+				var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
-				];
+				mesh1 = new THREE.Mesh( geometry1, material );
+				wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
+				mesh1.add( wireframe );
+				mesh1.position.x = - 400;
+				mesh1.rotation.x = - 1.87;
+				scene.add( mesh1 );
 
-				group1 = THREE.SceneUtils.createMultiMaterialObject( geometry1, materials );
-				group1.position.x = -400;
-				scene.add( group1 );
+				mesh2 = new THREE.Mesh( geometry2, material );
+				wireframe = new THREE.Mesh( geometry2, wireframeMaterial );
+				mesh2.add( wireframe );
+				mesh2.position.x = 400;
+				scene.add( mesh2 );
 
-				group2 = THREE.SceneUtils.createMultiMaterialObject( geometry2, materials );
-				group2.position.x = 400;
-				scene.add( group2 );
-
-				group3 = THREE.SceneUtils.createMultiMaterialObject( geometry3, materials );
-				scene.add( group3 );
+				mesh3 = new THREE.Mesh( geometry3, material );
+				wireframe = new THREE.Mesh( geometry3, wireframeMaterial );
+				mesh3.add( wireframe );
+				scene.add( mesh3 );
 
 				//
 
@@ -164,7 +172,7 @@
 				renderer1.setSize( window.innerWidth, window.innerHeight / 2 );
 				document.body.appendChild( renderer1.domElement );
 
-				renderer2 = new THREE.WebGLRenderer( { antialias: false } );
+				renderer2 = new THREE.WebGLRenderer();
 				renderer2.setPixelRatio( window.devicePixelRatio );
 				renderer2.setSize( window.innerWidth, window.innerHeight / 2 );
 				document.body.appendChild( renderer2.domElement );
@@ -177,11 +185,11 @@
 
 				// update scene
 
-				group1.rotation.z += Math.PI / 500;
-				group2.rotation.z += Math.PI / 500;
-				group3.rotation.z += Math.PI / 500;
+				mesh1.rotation.z += Math.PI / 500;
+				mesh2.rotation.z += Math.PI / 500;
+				mesh3.rotation.z += Math.PI / 500;
 
-				var geometry = group3.children[ 0 ].geometry;
+				var geometry = mesh3.geometry;
 
 				for ( var i = 0; i < geometry.faces.length; i ++ ) {
 

@@ -10,6 +10,7 @@ Sidebar.Settings = function ( editor ) {
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
+	container.setPaddingBottom( '20px' );
 
 	// class
 
@@ -43,6 +44,7 @@ Sidebar.Settings = function ( editor ) {
 	container.add( themeRow );
 
 	container.add( new Sidebar.Settings.Shortcuts( editor ) );
+	container.add( new Sidebar.Settings.Viewport( editor ) );
 
 	return container;
 

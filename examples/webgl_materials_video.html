@@ -49,9 +49,9 @@
 
 		<script src="js/Detector.js"></script>
 
-		<video id="video" autoplay loop webkit-playsinline style="display:none">
-			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+		<video id="video" autoplay loop crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
+			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 		</video>
 
 		<script>
@@ -97,7 +97,7 @@
 				light.position.set( 0.5, 1, 1 ).normalize();
 				scene.add( light );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -131,7 +131,7 @@
 					ox = i;
 					oy = j;
 
-					geometry = new THREE.BoxGeometry( xsize, ysize, xsize );
+					geometry = new THREE.BoxBufferGeometry( xsize, ysize, xsize );
 
 					change_uvs( geometry, ux, uy, ox, oy );
 
@@ -202,20 +202,12 @@
 
 			function change_uvs( geometry, unitx, unity, offsetx, offsety ) {
 
-				var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
+				var uvs = geometry.attributes.uv.array;
 
-				for ( var i = 0; i < faceVertexUvs.length; i ++ ) {
+				for ( var i = 0; i < uvs.length; i += 2 ) {
 
-					var uvs = faceVertexUvs[ i ];
-
-					for ( var j = 0; j < uvs.length; j ++ ) {
-
-						var uv = uvs[ j ];
-
-						uv.x = ( uv.x + offsetx ) * unitx;
-						uv.y = ( uv.y + offsety ) * unity;
-
-					}
+					uvs[ i ] = ( uvs[ i ] + offsetx ) * unitx;
+					uvs[ i + 1 ] = ( uvs[ i + 1 ] + offsety ) * unity;
 
 				}
 

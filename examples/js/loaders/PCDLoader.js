@@ -167,6 +167,8 @@ THREE.PCDLoader.prototype = {
 
 			for ( var i = 0, l = lines.length; i < l; i ++ ) {
 
+				if ( lines[ i ] === '' ) continue;
+
 				var line = lines[ i ].split( ' ' );
 
 				if ( offset.x !== undefined ) {

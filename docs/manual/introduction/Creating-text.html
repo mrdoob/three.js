@@ -68,7 +68,7 @@
 				<code>new THREE.TextGeometry( text, parameters );</code>
 			</p>
 			<p>
-				In order for this to work, however, your TextGeometry will need an instance of THREE.Font 
+				In order for this to work, however, your TextGeometry will need an instance of THREE.Font
 				to be set on its "font" parameter.
 
 				See the [page:TextGeometry] page for more info on how this can be done, descriptions of each
@@ -86,6 +86,31 @@
 				[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]
 				</p>
 
+		</div>
+
+
+
+		<h2>5. Bitmap Fonts</h2>
+		<div>
+			<p>
+				BMFonts (bitmap fonts) allow batching glyphs into a single BufferGeometry. BMFont rendering
+				supports word-wrapping, letter spacing, kerning, signed distance fields with standard
+				derivatives, multi-channel signed distance fields, multi-texture fonts, and more.
+				See [link:https://github.com/Jam3/three-bmfont-text three-bmfont-text].
+			</p>
+			<p>
+				Stock fonts are available in projects like
+				[link:https://github.com/etiennepinchon/aframe-fonts A-Frame Fonts], or you can create your own
+				from any .TTF font, optimizing to include only characters required for a project.
+			</p>
+			<p>
+				Some helpful tools:
+			</p>
+			<ul>
+				<li>[link:http://msdf-bmfont.donmccurdy.com/ msdf-bmfont-web] <i>(web-based)</i></li>
+				<li>[link:https://github.com/soimy/msdf-bmfont-xml msdf-bmfont-xml] <i>(commandline)</i></li>
+				<li>[link:https://github.com/libgdx/libgdx/wiki/Hiero hiero] <i>(desktop app)</i></li>
+			</ul>
 		</div>
 
 

@@ -78,9 +78,9 @@
 				closedSpline.closed = true;
 
 				var extrudeSettings = {
-					steps			: 100,
-					bevelEnabled	: false,
-					extrudePath		: closedSpline
+					steps: 100,
+					bevelEnabled: false,
+					extrudePath: closedSpline
 				};
 
 
@@ -123,9 +123,9 @@
 				//
 
 				var extrudeSettings = {
-					steps			: 200,
-					bevelEnabled	: false,
-					extrudePath		: randomSpline
+					steps: 200,
+					bevelEnabled: false,
+					extrudePath: randomSpline
 				};
 
 
@@ -154,18 +154,15 @@
 
 				//
 
-
 				var materials = [ material, material2 ];
 
 				var extrudeSettings = {
-					amount			: 20,
-					steps			: 1,
-					material		: 1,
-					extrudeMaterial : 0,
-					bevelEnabled	: true,
-					bevelThickness  : 2,
-					bevelSize       : 4,
-					bevelSegments   : 1
+					depth: 20,
+					steps: 1,
+					bevelEnabled: true,
+					bevelThickness : 2,
+					bevelSize: 4,
+					bevelSegments: 1
 				};
 
 				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
@@ -183,7 +180,6 @@
 				requestAnimationFrame( animate );
 
 				controls.update();
-
 				renderer.render( scene, camera );
 
 			}

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>three.js webgl - indexed instancing (single box), interleaved buffers, dynamic updates</title>
@@ -66,11 +66,17 @@
 
 		varying vec2 vUv;
 
+		// http://www.geeks3d.com/20141201/how-to-rotate-a-vertex-by-a-quaternion-in-glsl/
+
+		vec3 applyQuaternionToVector( vec4 q, vec3 v ){
+
+			return v + 2.0 * cross( q.xyz, cross( q.xyz, v ) + q.w * v );
+
+		}
+
 		void main() {
 
-			vec3 vPosition = position;
-			vec3 vcV = cross(orientation.xyz, vPosition);
-			vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
+			vec3 vPosition = applyQuaternionToVector( orientation, position );
 
 			vUv = uv;
 
@@ -214,7 +220,7 @@
 
 		// material
 		var texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
-		texture.anisotropy = renderer.getMaxAnisotropy();
+		texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 		var material = new THREE.RawShaderMaterial( {
 
@@ -233,7 +239,7 @@
 		scene.add( mesh );
 
 
-		if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+		if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 			document.getElementById( "notSupported" ).style.display = "";
 			return;
 		}

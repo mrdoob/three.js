@@ -96,7 +96,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x111111 );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.toneMapping = THREE.LinearToneMapping;
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
@@ -105,7 +105,7 @@
 					metalness: 1.0
 				} );
 
-				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
+				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
 				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				torusMesh1.position.x = 0.0;
 				torusMesh1.castShadow = true;

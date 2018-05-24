@@ -140,7 +140,7 @@ THREE.PlayCanvasLoader.prototype = {
 			object.name = data.name;
 
 			object.position.fromArray( data.position );
-			object.rotation.fromArray( data.rotation );
+			object.quaternion.setFromEuler( new THREE.Euler().fromArray( data.rotation ) );
 			object.scale.fromArray( data.scale );
 
 			data._object = object;

@@ -12,10 +12,10 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			Class representing triangular [link:https://en.wikipedia.org/wiki/Polygon_mesh polygon mesh] based objects.
 		  Also serves as a base for other classes such as [page:SkinnedMesh].
-		</div>
+		</p>
 
 
 		<h2>Example</h2>
@@ -30,81 +30,80 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
-		<div>
+		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+		<p>
 		[page:Geometry geometry] — (optional) an instance of [page:Geometry] or [page:BufferGeometry].
 		  Default is a new [page:BufferGeometry].<br />
-		[page:Material material] — (optional) a [page:Material]. Default is a new [page:MeshBasicMaterial]
-		  with a random color.
-		</div>
+		[page:Material material] — (optional) a single or an array of [page:Material]. Default is a new [page:MeshBasicMaterial]
+		</p>
 
 
 		<h2>Properties</h2>
-		<div>See the base [page:Object3D] class for common properties.</div>
+		<p>See the base [page:Object3D] class for common properties.</p>
 
 		<h3>[property:Integer drawMode]</h3>
-		<div>
+		<p>
 		Determines how the mesh triangles are constructed from the vertices.
 		See the draw mode [page:DrawModes constants] for all possible values.
 		Default is [page:DrawModes TrianglesDrawMode].
-		</div>
+		</p>
 
 
 		<h3>[property:Boolean isMesh]</h3>
-		<div>
+		<p>
 			Used to check whether this or derived classes are meshes. Default is *true*.<br /><br />
 
 			You should not change this, as it is used internally for optimisation.
-		</div>
+		</p>
 
 		<h3>[property:Geometry geometry]</h3>
-		<div>
+		<p>
 			An instance of [page:Geometry] or [page:BufferGeometry] (or derived classes),
 			defining the object's structure.<br /><br />
 
 			It's recommended to always use a [page:BufferGeometry] if possible for best performance.
-		</div>
+		</p>
 
 		<h3>[property:Material material]</h3>
-		<div>
+		<p>
 			An instance of material derived from the [page:Material] base class or an array of materials, defining the
-			object's appearance. Default is a [page:MeshBasicMaterial] with a random colour.
-		</div>
+			object's appearance. Default is a [page:MeshBasicMaterial] with a random color.
+		</p>
 
 		<h3>[property:Array morphTargetInfluences]</h3>
-		<div>
+		<p>
 		An array of weights typically from 0-1 that specify how much of the morph is applied.
 		Undefined by default, but reset to a blank array by [page:Mesh.updateMorphTargets updateMorphTargets].
-		</div>
+		</p>
 
-		<h3>[property:Array morphTargetDictionary]</h3>
-		<div>
+		<h3>[property:Object morphTargetDictionary]</h3>
+		<p>
 		A dictionary of morphTargets based on the morphTarget.name property.
 		Undefined by default, but rebuilt [page:Mesh.updateMorphTargets updateMorphTargets].
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
-		<div>See the base [page:Object3D] class for common methods.</div>
+		<p>See the base [page:Object3D] class for common methods.</p>
 
 		<h3>[method:null setDrawMode]()</h3>
-		<div>Set the value of [page:.drawMode drawMode].</div>
+		<p>Set the value of [page:.drawMode drawMode].</p>
 
 		<h3>[method:Mesh clone]()</h3>
-		<div>Returns a clone of this [name] object and its descendants.</div>
+		<p>Returns a clone of this [name] object and its descendants.</p>
 
-		<h3>[method:Array raycast]( [page:Raycaster raycaster], [page:Array intersects] )</h3>
-		<div>
+		<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
 		Get intersections between a casted ray and this mesh.
 		[page:Raycaster.intersectObject] will call this method.
-		</div>
+		</p>
 
 		<h3>[method:null updateMorphTargets]()</h3>
-		<div>
+		<p>
 		Updates the morphTargets to have no influence on the object. Resets the
 		[page:Mesh.morphTargetInfluences morphTargetInfluences] and
 		[page:Mesh.morphTargetDictionary morphTargetDictionary] properties.
-		</div>
+		</p>
 
 
 		<h2>Source</h2>

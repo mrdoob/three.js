@@ -500,10 +500,6 @@
         "dispose": {
           "!type": "fn()",
           "!doc": "Removes The object from memory. <br>\n\t\tDon't forget to call this method when you remove a geometry because it can cause memory leaks."
-        },
-        "computeLineDistances": {
-          "!type": "fn()",
-          "!doc": "Compute distances between vertices for Line geometries."
         }
       },
       "!doc": "Base class for geometries.<br>\n\t\tA geometry holds all data necessary to describe a 3D model.",
@@ -804,24 +800,6 @@
       "!url": "http://threejs.org/docs/#Reference/extras/GeometryUtils",
       "prototype": {},
       "!doc": "Contains handy functions geometry manipulations."
-    },
-    "SceneUtils": {
-      "!url": "http://threejs.org/docs/#Reference/extras/SceneUtils",
-      "prototype": {
-        "createMultiMaterialObject": {
-          "!type": "fn(geometry: +THREE.Geometry, materials: []) -> +THREE.Object3D",
-          "!doc": "Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as MultiMaterial which defines multiple material for 1 mesh.<br>\n\t\tThis is mostly useful for object that need a material and a wireframe implementation."
-        },
-        "attach": {
-          "!type": "fn(child: +THREE.Object3D, scene: +THREE.Object3D, parent: +THREE.Object3D)",
-          "!doc": "Attaches the object to the parent without the moving the object in the worldspace."
-        },
-        "detach": {
-          "!type": "fn(child: +THREE.Object3D, parent: +THREE.Object3D, scene: +THREE.Object3D)",
-          "!doc": "Detaches the object from the parent and adds it back to the scene without moving in worldspace."
-        }
-      },
-      "!doc": "A class containing useful utility functions for scene manipulation."
     },
     "Curve": {
       "!url": "http://threejs.org/docs/#Reference/extras/core/Curve",
@@ -3724,11 +3702,11 @@
           "!type": "fn(a: +THREE.Vector3, b: +THREE.Vector3, c: +THREE.Vector3) -> +THREE.Triangle",
           "!doc": "Sets the triangle's vectors to the passed vectors."
         },
-        "normal": {
+        "getNormal": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the calculated normal of the triangle."
         },
-        "barycoordFromPoint": {
+        "getBarycoord": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return a barycentric coordinate from the given vector. <br><br>\n\t\t[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png](Picture of barycentric coordinates)"
         },
@@ -3736,11 +3714,11 @@
           "!type": "fn() -> +THREE.Triangle",
           "!doc": "Return a new copy of this triangle."
         },
-        "area": {
+        "getArea": {
           "!type": "fn() -> number",
           "!doc": "Return the area of the triangle."
         },
-        "midpoint": {
+        "getMidpoint": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the midpoint of the triangle. Optionally sets a target vector."
         },
@@ -3748,7 +3726,7 @@
           "!type": "fn(triangle: +THREE.Triangle) -> bool",
           "!doc": "Checks to see if two triangles are equal (share the same vectors)."
         },
-        "plane": {
+        "getPlane": {
           "!type": "fn(optionalTarget: +THREE.Plane) -> +THREE.Plane",
           "!doc": "Return a [page:Plane plane] based on the triangle. Optionally sets a target plane."
         },
@@ -4366,30 +4344,6 @@
       "!doc": "todo",
       "!type": "fn()"
     },
-    "LensFlare": {
-      "!url": "http://threejs.org/docs/#Reference/objects/LensFlare",
-      "prototype": {
-        "!proto": "THREE.Object3D.prototype",
-        "lensFlares": {
-          "!type": "array",
-          "!doc": "todo"
-        },
-        "positionScreen": {
-          "!type": "+THREE.Vector3",
-          "!doc": "todo"
-        },
-        "customUpdateCallback": {
-          "!type": "todo",
-          "!doc": "todo"
-        },
-        "updateLensFlares": {
-          "!type": "fn() -> todo",
-          "!doc": "todo"
-        }
-      },
-      "!doc": "todo",
-      "!type": "fn(texture: todo, size: todo, distance: todo, blending: todo, color: todo)"
-    },
     "Line": {
       "!url": "http://threejs.org/docs/#Reference/objects/Line",
       "prototype": {
@@ -4424,7 +4378,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised color."
         },
         "getMorphTargetIndexByName": {
           "!type": "fn(name: string) -> number",
@@ -4528,7 +4482,7 @@
         },
         "material": {
           "!type": "+THREE.Material",
-          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised colour."
+          "!doc": "An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised color."
         },
         "clone": {
           "!type": "fn() -> +THREE.PointCloud",
@@ -4863,10 +4817,6 @@
           "!type": "fn(camera, lights, fog, material, object)",
           "!doc": "Renders an immediate Object using a camera."
         },
-        "setFaceCulling": {
-          "!type": "fn(cullFace, frontFace)",
-          "!doc": "If cullFace is false, culling will be disabled."
-        },
         "setDepthTest": {
           "!type": "fn(depthTest: boolean)",
           "!doc": "This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer."
@@ -4959,23 +4909,12 @@
       "prototype": {},
       "!doc": "todo"
     },
-    "LensFlarePlugin": {
-      "!url": "http://threejs.org/docs/#Reference/renderers/webgl/plugins/LensFlarePlugin",
-      "prototype": {
-        "render": {
-          "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera, viewportWidth: number, viewportHeight: number)",
-          "!doc": "Renders the lensflares defined in the scene. This gets automatically called as post render function to draw the lensflares."
-        }
-      },
-      "!doc": "The Webglrenderer plugin class that allows lensflares to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
-      "!type": "fn()"
-    },
     "ShadowMapPlugin": {
       "!url": "http://threejs.org/docs/#Reference/renderers/webgl/plugins/ShadowMapPlugin",
       "prototype": {
         "render": {
           "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera)",
-          "!doc": "Prepares the shadowmaps to be rendered defined in the scene. This gets automatically called as pre render function to draw the lensflares."
+          "!doc": "Prepares the shadowmaps to be rendered defined in the scene."
         }
       },
       "!doc": "The Webglrenderer plugin class that allows shadowmaps to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
@@ -4986,7 +4925,7 @@
       "prototype": {
         "render": {
           "!type": "fn(scene: +THREE.Scene, camera: +THREE.Camera)",
-          "!doc": "Renders the sprites defined in the scene. This gets automatically called as post-render function to draw the lensflares."
+          "!doc": "Renders the sprites defined in the scene."
         }
       },
       "!doc": "The Webglrenderer plugin class that allows Sprites to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",

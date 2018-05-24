@@ -4,8 +4,12 @@
 		<title>three.js webvr - video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2017-12-16 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2017-12-16" content="AvEXeg7kY84HQ60ApBlqf6zPqClJwEy499YltannXHd+qIIN8ibQQFbHDkKL/Na/L7ha4VOqsjsGHhFpI6HYfgAAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxMzQ0NjE5Nn0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-06-19 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-06-19" content="Alxt96tYGgIr9l6EXU0eeI360zcmzOY6Kuo3kcTfBGIRDOQbgFIZKRQ1joExQ74WZr1einsE+cUMHgSclNHCQQ4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyOTM5NzgyOH0=">
+		<!-- Origin Trial Token, feature = WebXR Device API, origin = https://threejs.org, expires = 2018-06-15 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API" data-expires="2018-06-15" content="AtJH9g6nn0B87bnjJt+9m1joZXEYDmLSlRvtMr5qJD52hMcm3S86S7jg5I7y2I5cgQglE0rzsXzti5DECQLb8QkAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZSIsImV4cGlyeSI6MTUyOTA4NDY2OH0=">
+		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-06-15 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-06-15" content="Aihhr0yXkVlCKF0DIpTbH8WX7ZmEexUhI/95+t8aoLfvBkePMiZ/iOoDPU3xefyfuczkDahH1L6eiPvRsuzITAAAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTI5MDg0NjY4fQ==">
 		<style>
 			body {
 				font-family: Monospace;
@@ -59,36 +63,43 @@
 				// video
 
 				video = document.createElement( 'video' );
+				video.crossOrigin = 'anonymous';
 				video.loop = true;
 				video.muted = true;
 				video.src = 'textures/MaryOculus.webm';
 				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
 				video.play();
 
-				texture = new THREE.VideoTexture( video );
+				texture = new THREE.Texture( video );
+				texture.generateMipmaps = false;
 				texture.minFilter = THREE.NearestFilter;
 				texture.maxFilter = THREE.NearestFilter;
 				texture.format = THREE.RGBFormat;
-				texture.generateMipmaps = false;
+
+				setInterval( function () {
+
+					if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+
+						texture.needsUpdate = true;
+
+					}
+
+				}, 1000 / 24 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
 
 				// left
 
-				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+				var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
 				// invert the geometry on the x-axis so that all of the faces point inward
 				geometry.scale( - 1, 1, 1 );
 
-				var uvs = geometry.faceVertexUvs[ 0 ];
+				var uvs = geometry.attributes.uv.array;
 
-				for ( var i = 0; i < uvs.length; i ++ ) {
+				for ( var i = 0; i < uvs.length; i += 2 ) {
 
-					for ( var j = 0; j < 3; j ++ ) {
-
-						uvs[ i ][ j ].x *= 0.5;
-
-					}
+					uvs[ i ] *= 0.5;
 
 				}
 
@@ -101,19 +112,15 @@
 
 				// right
 
-				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+				var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
 				geometry.scale( - 1, 1, 1 );
 
-				var uvs = geometry.faceVertexUvs[ 0 ];
+				var uvs = geometry.attributes.uv.array;
 
-				for ( var i = 0; i < uvs.length; i ++ ) {
+				for ( var i = 0; i < uvs.length; i += 2 ) {
 
-					for ( var j = 0; j < 3; j ++ ) {
-
-						uvs[ i ][ j ].x *= 0.5;
-						uvs[ i ][ j ].x += 0.5;
-
-					}
+					uvs[ i ] *= 0.5;
+					uvs[ i ] += 0.5;
 
 				}
 
@@ -130,6 +137,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.vr.enabled = true;
+				renderer.vr.userHeight = 0; // TOFIX
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( WEBVR.createButton( renderer ) );

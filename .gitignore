@@ -6,3 +6,5 @@ node_modules
 .vscode/
 npm-debug.log
 .jshintrc
+.vs/
+test/unit/three.*.unit.js

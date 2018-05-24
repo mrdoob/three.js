@@ -10,11 +10,11 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">
+		<p class="desc">
 			Class for loading an
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer AudioBuffer].
 			This uses the [page:FileLoader] internally for loading files.
-		</div>
+		</p>
 
 		<h2>Example</h2>
 
@@ -62,35 +62,35 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:String context], [page:LoadingManager manager] )</h3>
-		<div>
+		<h3>[name]( [param:String context], [param:LoadingManager manager] )</h3>
+		<p>
 		[page:String context] — The [page:String AudioContext] for the loader to use. Default is [page:String window.AudioContext].<br />
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
 
 		Creates a new [name].
-		</div>
+		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:LoadingManager manager]</h3>
-		<div>
+		<p>
 			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
-		</div>
+		</p>
 
 
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
-		<div>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
 		[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded text response.<br />
 		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
 		[page:Function onError] — Will be called when load errors.<br />
-		</div>
-		<div>
+		</p>
+		<p>
 		Begin loading from url and pass the loaded [page:String AudioBuffer] to onLoad.
-		</div>
+		</p>
 
 		<h2>Source</h2>
 

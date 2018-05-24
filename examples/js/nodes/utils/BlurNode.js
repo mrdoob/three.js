@@ -2,11 +2,9 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.BlurNode = function( value, coord, radius, size ) {
+THREE.BlurNode = function ( value, coord, radius, size ) {
 
 	THREE.TempNode.call( this, 'v4' );
-
-	this.requestUpdate = true;
 
 	this.value = value;
 	this.coord = coord || new THREE.UVNode();
@@ -22,59 +20,60 @@ THREE.BlurNode = function( value, coord, radius, size ) {
 };
 
 THREE.BlurNode.fBlurX = new THREE.FunctionNode( [
-"vec4 blurX( sampler2D texture, vec2 uv, float s ) {",
-"	vec4 sum = vec4( 0.0 );",
-"	sum += texture2D( texture, vec2( uv.x - 4.0 * s, uv.y ) ) * 0.051;",
-"	sum += texture2D( texture, vec2( uv.x - 3.0 * s, uv.y ) ) * 0.0918;",
-"	sum += texture2D( texture, vec2( uv.x - 2.0 * s, uv.y ) ) * 0.12245;",
-"	sum += texture2D( texture, vec2( uv.x - 1.0 * s, uv.y ) ) * 0.1531;",
-"	sum += texture2D( texture, vec2( uv.x, uv.y ) ) * 0.1633;",
-"	sum += texture2D( texture, vec2( uv.x + 1.0 * s, uv.y ) ) * 0.1531;",
-"	sum += texture2D( texture, vec2( uv.x + 2.0 * s, uv.y ) ) * 0.12245;",
-"	sum += texture2D( texture, vec2( uv.x + 3.0 * s, uv.y ) ) * 0.0918;",
-"	sum += texture2D( texture, vec2( uv.x + 4.0 * s, uv.y ) ) * 0.051;",
-"	return sum;",
-"}"
+	"vec4 blurX( sampler2D texture, vec2 uv, float s ) {",
+	"	vec4 sum = vec4( 0.0 );",
+	"	sum += texture2D( texture, vec2( uv.x - 4.0 * s, uv.y ) ) * 0.051;",
+	"	sum += texture2D( texture, vec2( uv.x - 3.0 * s, uv.y ) ) * 0.0918;",
+	"	sum += texture2D( texture, vec2( uv.x - 2.0 * s, uv.y ) ) * 0.12245;",
+	"	sum += texture2D( texture, vec2( uv.x - 1.0 * s, uv.y ) ) * 0.1531;",
+	"	sum += texture2D( texture, vec2( uv.x, uv.y ) ) * 0.1633;",
+	"	sum += texture2D( texture, vec2( uv.x + 1.0 * s, uv.y ) ) * 0.1531;",
+	"	sum += texture2D( texture, vec2( uv.x + 2.0 * s, uv.y ) ) * 0.12245;",
+	"	sum += texture2D( texture, vec2( uv.x + 3.0 * s, uv.y ) ) * 0.0918;",
+	"	sum += texture2D( texture, vec2( uv.x + 4.0 * s, uv.y ) ) * 0.051;",
+	"	return sum;",
+	"}"
 ].join( "\n" ) );
 
 THREE.BlurNode.fBlurY = new THREE.FunctionNode( [
-"vec4 blurY( sampler2D texture, vec2 uv, float s ) {",
-"	vec4 sum = vec4( 0.0 );",
-"	sum += texture2D( texture, vec2( uv.x, uv.y - 4.0 * s ) ) * 0.051;",
-"	sum += texture2D( texture, vec2( uv.x, uv.y - 3.0 * s ) ) * 0.0918;",
-"	sum += texture2D( texture, vec2( uv.x, uv.y - 2.0 * s ) ) * 0.12245;",
-"	sum += texture2D( texture, vec2( uv.x, uv.y - 1.0 * s ) ) * 0.1531;",
-"	sum += texture2D( texture, vec2( uv.x, uv.y ) ) * 0.1633;",
-"	sum += texture2D( texture, vec2( uv.x, uv.y + 1.0 * s ) ) * 0.1531;",
-"	sum += texture2D( texture, vec2( uv.x, uv.y + 2.0 * s ) ) * 0.12245;",
-"	sum += texture2D( texture, vec2( uv.x, uv.y + 3.0 * s ) ) * 0.0918;",
-"	sum += texture2D( texture, vec2( uv.x, uv.y + 4.0 * s ) ) * 0.051;",
-"	return sum;",
-"}"
+	"vec4 blurY( sampler2D texture, vec2 uv, float s ) {",
+	"	vec4 sum = vec4( 0.0 );",
+	"	sum += texture2D( texture, vec2( uv.x, uv.y - 4.0 * s ) ) * 0.051;",
+	"	sum += texture2D( texture, vec2( uv.x, uv.y - 3.0 * s ) ) * 0.0918;",
+	"	sum += texture2D( texture, vec2( uv.x, uv.y - 2.0 * s ) ) * 0.12245;",
+	"	sum += texture2D( texture, vec2( uv.x, uv.y - 1.0 * s ) ) * 0.1531;",
+	"	sum += texture2D( texture, vec2( uv.x, uv.y ) ) * 0.1633;",
+	"	sum += texture2D( texture, vec2( uv.x, uv.y + 1.0 * s ) ) * 0.1531;",
+	"	sum += texture2D( texture, vec2( uv.x, uv.y + 2.0 * s ) ) * 0.12245;",
+	"	sum += texture2D( texture, vec2( uv.x, uv.y + 3.0 * s ) ) * 0.0918;",
+	"	sum += texture2D( texture, vec2( uv.x, uv.y + 4.0 * s ) ) * 0.051;",
+	"	return sum;",
+	"}"
 ].join( "\n" ) );
 
 THREE.BlurNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.BlurNode.prototype.constructor = THREE.BlurNode;
+THREE.BlurNode.prototype.nodeType = "Blur";
 
-THREE.BlurNode.prototype.updateFrame = function( delta ) {
+THREE.BlurNode.prototype.updateFrame = function ( frame ) {
 
 	if ( this.size ) {
 
-		this.horizontal.number = this.radius.x / this.size.x;
-		this.vertical.number = this.radius.y / this.size.y;
+		this.horizontal.value = this.radius.x / this.size.x;
+		this.vertical.value = this.radius.y / this.size.y;
 
 	} else if ( this.value.value && this.value.value.image ) {
 
 		var image = this.value.value.image;
 
-		this.horizontal.number = this.radius.x / image.width;
-		this.vertical.number = this.radius.y / image.height;
+		this.horizontal.value = this.radius.x / image.width;
+		this.vertical.value = this.radius.y / image.height;
 
 	}
 
 };
 
-THREE.BlurNode.prototype.generate = function( builder, output ) {
+THREE.BlurNode.prototype.generate = function ( builder, output ) {
 
 	var material = builder.material, blurX = THREE.BlurNode.fBlurX, blurY = THREE.BlurNode.fBlurY;
 
@@ -110,5 +109,28 @@ THREE.BlurNode.prototype.generate = function( builder, output ) {
 		return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
 
 	}
+
+};
+
+THREE.BlurNode.prototype.toJSON = function ( meta ) {
+
+	var data = this.getJSONNode( meta );
+
+	if ( ! data ) {
+
+		data = this.createJSONNode( meta );
+
+		data.value = this.value.toJSON( meta ).uuid;
+		data.coord = this.coord.toJSON( meta ).uuid;
+		data.radius = this.radius.toJSON( meta ).uuid;
+
+		if ( this.size ) data.size = { x: this.size.x, y: this.size.y };
+
+		data.blurX = this.blurX;
+		data.blurY = this.blurY;
+
+	}
+
+	return data;
 
 };

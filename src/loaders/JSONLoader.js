@@ -58,13 +58,6 @@ Object.assign( JSONLoader.prototype, {
 
 					}
 
-					if ( type.toLowerCase() === 'scene' ) {
-
-						console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.SceneLoader instead.' );
-						return;
-
-					}
-
 				}
 
 			}
@@ -525,7 +518,7 @@ Object.assign( JSONLoader.prototype, {
 
 		}
 
-		return function ( json, texturePath ) {
+		return function parse( json, texturePath ) {
 
 			if ( json.data !== undefined ) {
 

@@ -44,7 +44,7 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -65,9 +65,9 @@
 
 				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
 				texture.mapping = THREE.UVMapping;
-				texture.anisotropy = renderer.getMaxAnisotropy();
+				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );
 
 				control = new THREE.TransformControls( camera, renderer.domElement );
@@ -153,8 +153,7 @@
 
 				];
 
-				new Timeliner(
-						new THREE.TimelinerController( scene, trackInfo, render ) );
+				new Timeliner( new THREE.TimelinerController( scene, trackInfo, render ) );
 
 			}
 

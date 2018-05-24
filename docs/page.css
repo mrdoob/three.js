@@ -45,12 +45,18 @@ h3 {
 	margin-top: 40px;
 }
 
+p, ul, ol {
+	margin-top: 0;
+	margin-bottom: 20px;
+	max-width: 780px;
+}
+
 div {
 	/* padding-left: 30px; */
 	margin-bottom: 20px;
 }
 
-div.desc {
+.desc {
 	padding-left: 0px;
 }
 
@@ -114,4 +120,13 @@ strong {
 a.permalink {
 	float: right;
 	margin-left: 5px;
+}
+
+a.param,
+span.param {
+	color: #999;
+}
+
+a.param:hover {
+	color: #777;
 }

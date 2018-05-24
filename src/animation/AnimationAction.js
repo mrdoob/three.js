@@ -546,7 +546,7 @@ Object.assign( AnimationAction.prototype, {
 
 				var pending = this.repetitions - loopCount;
 
-				if ( pending < 0 ) {
+				if ( pending <= 0 ) {
 
 					// have to stop (switch state, clamp time, fire event)
 
@@ -564,7 +564,7 @@ Object.assign( AnimationAction.prototype, {
 
 					// keep running
 
-					if ( pending === 0 ) {
+					if ( pending === 1 ) {
 
 						// entering the last round
 
