@@ -13,11 +13,66 @@ import { Quaternion } from './Quaternion.js';
 
 function Vector3( x, y, z ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
+	this._x = x || 0;
+	this._y = y || 0;
+	this._z = z || 0;
 
 }
+
+Object.defineProperties( Vector3.prototype, {
+
+	x: {
+
+		get: function () {
+
+			return this._x;
+
+		},
+
+		set: function ( value ) {
+
+			this._x = value;
+			this.onChangeCallback();
+
+		}
+
+	},
+
+	y: {
+
+		get: function () {
+
+			return this._y;
+
+		},
+
+		set: function ( value ) {
+
+			this._y = value;
+			this.onChangeCallback();
+
+		}
+
+	},
+
+	z: {
+
+		get: function () {
+
+			return this._z;
+
+		},
+
+		set: function ( value ) {
+
+			this._z = value;
+			this.onChangeCallback();
+
+		}
+
+	}
+
+} );
 
 Object.assign( Vector3.prototype, {
 
@@ -25,9 +80,11 @@ Object.assign( Vector3.prototype, {
 
 	set: function ( x, y, z ) {
 
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this._x = x;
+		this._y = y;
+		this._z = z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -35,9 +92,11 @@ Object.assign( Vector3.prototype, {
 
 	setScalar: function ( scalar ) {
 
-		this.x = scalar;
-		this.y = scalar;
-		this.z = scalar;
+		this._x = scalar;
+		this._y = scalar;
+		this._z = scalar;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -45,7 +104,9 @@ Object.assign( Vector3.prototype, {
 
 	setX: function ( x ) {
 
-		this.x = x;
+		this._x = x;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -53,7 +114,9 @@ Object.assign( Vector3.prototype, {
 
 	setY: function ( y ) {
 
-		this.y = y;
+		this._y = y;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -61,7 +124,9 @@ Object.assign( Vector3.prototype, {
 
 	setZ: function ( z ) {
 
-		this.z = z;
+		this._z = z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -71,12 +136,14 @@ Object.assign( Vector3.prototype, {
 
 		switch ( index ) {
 
-			case 0: this.x = value; break;
-			case 1: this.y = value; break;
-			case 2: this.z = value; break;
+			case 0: this._x = value; break;
+			case 1: this._y = value; break;
+			case 2: this._z = value; break;
 			default: throw new Error( 'index is out of range: ' + index );
 
 		}
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -86,9 +153,9 @@ Object.assign( Vector3.prototype, {
 
 		switch ( index ) {
 
-			case 0: return this.x;
-			case 1: return this.y;
-			case 2: return this.z;
+			case 0: return this._x;
+			case 1: return this._y;
+			case 2: return this._z;
 			default: throw new Error( 'index is out of range: ' + index );
 
 		}
@@ -97,15 +164,17 @@ Object.assign( Vector3.prototype, {
 
 	clone: function () {
 
-		return new this.constructor( this.x, this.y, this.z );
+		return new this.constructor( this._x, this._y, this._z );
 
 	},
 
 	copy: function ( v ) {
 
-		this.x = v.x;
-		this.y = v.y;
-		this.z = v.z;
+		this._x = v.x;
+		this._y = v.y;
+		this._z = v.z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -120,9 +189,11 @@ Object.assign( Vector3.prototype, {
 
 		}
 
-		this.x += v.x;
-		this.y += v.y;
-		this.z += v.z;
+		this._x += v.x;
+		this._y += v.y;
+		this._z += v.z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -130,9 +201,11 @@ Object.assign( Vector3.prototype, {
 
 	addScalar: function ( s ) {
 
-		this.x += s;
-		this.y += s;
-		this.z += s;
+		this._x += s;
+		this._y += s;
+		this._z += s;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -140,9 +213,11 @@ Object.assign( Vector3.prototype, {
 
 	addVectors: function ( a, b ) {
 
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
-		this.z = a.z + b.z;
+		this._x = a.x + b.x;
+		this._y = a.y + b.y;
+		this._z = a.z + b.z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -150,9 +225,11 @@ Object.assign( Vector3.prototype, {
 
 	addScaledVector: function ( v, s ) {
 
-		this.x += v.x * s;
-		this.y += v.y * s;
-		this.z += v.z * s;
+		this._x += v.x * s;
+		this._y += v.y * s;
+		this._z += v.z * s;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -167,9 +244,11 @@ Object.assign( Vector3.prototype, {
 
 		}
 
-		this.x -= v.x;
-		this.y -= v.y;
-		this.z -= v.z;
+		this._x -= v.x;
+		this._y -= v.y;
+		this._z -= v.z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -177,9 +256,11 @@ Object.assign( Vector3.prototype, {
 
 	subScalar: function ( s ) {
 
-		this.x -= s;
-		this.y -= s;
-		this.z -= s;
+		this._x -= s;
+		this._y -= s;
+		this._z -= s;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -187,9 +268,11 @@ Object.assign( Vector3.prototype, {
 
 	subVectors: function ( a, b ) {
 
-		this.x = a.x - b.x;
-		this.y = a.y - b.y;
-		this.z = a.z - b.z;
+		this._x = a.x - b.x;
+		this._y = a.y - b.y;
+		this._z = a.z - b.z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -204,9 +287,11 @@ Object.assign( Vector3.prototype, {
 
 		}
 
-		this.x *= v.x;
-		this.y *= v.y;
-		this.z *= v.z;
+		this._x *= v.x;
+		this._y *= v.y;
+		this._z *= v.z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -214,9 +299,11 @@ Object.assign( Vector3.prototype, {
 
 	multiplyScalar: function ( scalar ) {
 
-		this.x *= scalar;
-		this.y *= scalar;
-		this.z *= scalar;
+		this._x *= scalar;
+		this._y *= scalar;
+		this._z *= scalar;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -224,9 +311,11 @@ Object.assign( Vector3.prototype, {
 
 	multiplyVectors: function ( a, b ) {
 
-		this.x = a.x * b.x;
-		this.y = a.y * b.y;
-		this.z = a.z * b.z;
+		this._x = a.x * b.x;
+		this._y = a.y * b.y;
+		this._z = a.z * b.z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -264,12 +353,14 @@ Object.assign( Vector3.prototype, {
 
 	applyMatrix3: function ( m ) {
 
-		var x = this.x, y = this.y, z = this.z;
+		var x = this._x, y = this._y, z = this._z;
 		var e = m.elements;
 
-		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
-		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ] * z;
-		this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
+		this._x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
+		this._y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ] * z;
+		this._z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -277,14 +368,16 @@ Object.assign( Vector3.prototype, {
 
 	applyMatrix4: function ( m ) {
 
-		var x = this.x, y = this.y, z = this.z;
+		var x = this._x, y = this._y, z = this._z;
 		var e = m.elements;
 
 		var w = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] );
 
-		this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] ) * w;
-		this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ] ) * w;
-		this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * w;
+		this._x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] ) * w;
+		this._y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ] ) * w;
+		this._z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * w;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -292,7 +385,7 @@ Object.assign( Vector3.prototype, {
 
 	applyQuaternion: function ( q ) {
 
-		var x = this.x, y = this.y, z = this.z;
+		var x = this._x, y = this._y, z = this._z;
 		var qx = q.x, qy = q.y, qz = q.z, qw = q.w;
 
 		// calculate quat * vector
@@ -304,9 +397,11 @@ Object.assign( Vector3.prototype, {
 
 		// calculate result * inverse quat
 
-		this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
-		this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
-		this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
+		this._x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
+		this._y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
+		this._z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -343,12 +438,12 @@ Object.assign( Vector3.prototype, {
 		// input: THREE.Matrix4 affine matrix
 		// vector interpreted as a direction
 
-		var x = this.x, y = this.y, z = this.z;
+		var x = this._x, y = this._y, z = this._z;
 		var e = m.elements;
 
-		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z;
-		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z;
-		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z;
+		this._x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z;
+		this._y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z;
+		this._z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z;
 
 		return this.normalize();
 
@@ -356,9 +451,11 @@ Object.assign( Vector3.prototype, {
 
 	divide: function ( v ) {
 
-		this.x /= v.x;
-		this.y /= v.y;
-		this.z /= v.z;
+		this._x /= v.x;
+		this._y /= v.y;
+		this._z /= v.z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -372,9 +469,11 @@ Object.assign( Vector3.prototype, {
 
 	min: function ( v ) {
 
-		this.x = Math.min( this.x, v.x );
-		this.y = Math.min( this.y, v.y );
-		this.z = Math.min( this.z, v.z );
+		this._x = Math.min( this._x, v.x );
+		this._y = Math.min( this._y, v.y );
+		this._z = Math.min( this._z, v.z );
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -382,9 +481,11 @@ Object.assign( Vector3.prototype, {
 
 	max: function ( v ) {
 
-		this.x = Math.max( this.x, v.x );
-		this.y = Math.max( this.y, v.y );
-		this.z = Math.max( this.z, v.z );
+		this._x = Math.max( this._x, v.x );
+		this._y = Math.max( this._y, v.y );
+		this._z = Math.max( this._z, v.z );
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -394,9 +495,11 @@ Object.assign( Vector3.prototype, {
 
 		// assumes min < max, componentwise
 
-		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
-		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
-		this.z = Math.max( min.z, Math.min( max.z, this.z ) );
+		this._x = Math.max( min.x, Math.min( max.x, this._x ) );
+		this._y = Math.max( min.y, Math.min( max.y, this._y ) );
+		this._z = Math.max( min.z, Math.min( max.z, this._z ) );
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -428,9 +531,11 @@ Object.assign( Vector3.prototype, {
 
 	floor: function () {
 
-		this.x = Math.floor( this.x );
-		this.y = Math.floor( this.y );
-		this.z = Math.floor( this.z );
+		this._x = Math.floor( this._x );
+		this._y = Math.floor( this._y );
+		this._z = Math.floor( this._z );
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -438,9 +543,11 @@ Object.assign( Vector3.prototype, {
 
 	ceil: function () {
 
-		this.x = Math.ceil( this.x );
-		this.y = Math.ceil( this.y );
-		this.z = Math.ceil( this.z );
+		this._x = Math.ceil( this._x );
+		this._y = Math.ceil( this._y );
+		this._z = Math.ceil( this._z );
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -448,9 +555,11 @@ Object.assign( Vector3.prototype, {
 
 	round: function () {
 
-		this.x = Math.round( this.x );
-		this.y = Math.round( this.y );
-		this.z = Math.round( this.z );
+		this._x = Math.round( this._x );
+		this._y = Math.round( this._y );
+		this._z = Math.round( this._z );
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -458,9 +567,11 @@ Object.assign( Vector3.prototype, {
 
 	roundToZero: function () {
 
-		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
-		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
-		this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
+		this._x = ( this._x < 0 ) ? Math.ceil( this._x ) : Math.floor( this._x );
+		this._y = ( this._y < 0 ) ? Math.ceil( this._y ) : Math.floor( this._y );
+		this._z = ( this._z < 0 ) ? Math.ceil( this._z ) : Math.floor( this._z );
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -468,9 +579,11 @@ Object.assign( Vector3.prototype, {
 
 	negate: function () {
 
-		this.x = - this.x;
-		this.y = - this.y;
-		this.z = - this.z;
+		this._x = - this._x;
+		this._y = - this._y;
+		this._z = - this._z;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -478,7 +591,7 @@ Object.assign( Vector3.prototype, {
 
 	dot: function ( v ) {
 
-		return this.x * v.x + this.y * v.y + this.z * v.z;
+		return this._x * v.x + this._y * v.y + this._z * v.z;
 
 	},
 
@@ -486,19 +599,19 @@ Object.assign( Vector3.prototype, {
 
 	lengthSq: function () {
 
-		return this.x * this.x + this.y * this.y + this.z * this.z;
+		return this._x * this._x + this._y * this._y + this._z * this._z;
 
 	},
 
 	length: function () {
 
-		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
+		return Math.sqrt( this._x * this._x + this._y * this._y + this._z * this._z );
 
 	},
 
 	manhattanLength: function () {
 
-		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
+		return Math.abs( this._x ) + Math.abs( this._y ) + Math.abs( this._z );
 
 	},
 
@@ -516,9 +629,11 @@ Object.assign( Vector3.prototype, {
 
 	lerp: function ( v, alpha ) {
 
-		this.x += ( v.x - this.x ) * alpha;
-		this.y += ( v.y - this.y ) * alpha;
-		this.z += ( v.z - this.z ) * alpha;
+		this._x += ( v.x - this._x ) * alpha;
+		this._y += ( v.y - this._y ) * alpha;
+		this._z += ( v.z - this._z ) * alpha;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -548,9 +663,11 @@ Object.assign( Vector3.prototype, {
 		var ax = a.x, ay = a.y, az = a.z;
 		var bx = b.x, by = b.y, bz = b.z;
 
-		this.x = ay * bz - az * by;
-		this.y = az * bx - ax * bz;
-		this.z = ax * by - ay * bx;
+		this._x = ay * bz - az * by;
+		this._y = az * bx - ax * bz;
+		this._z = ax * by - ay * bx;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -611,7 +728,7 @@ Object.assign( Vector3.prototype, {
 
 	distanceToSquared: function ( v ) {
 
-		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
+		var dx = this._x - v.x, dy = this._y - v.y, dz = this._z - v.z;
 
 		return dx * dx + dy * dy + dz * dz;
 
@@ -619,7 +736,7 @@ Object.assign( Vector3.prototype, {
 
 	manhattanDistanceTo: function ( v ) {
 
-		return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y ) + Math.abs( this.z - v.z );
+		return Math.abs( this._x - v.x ) + Math.abs( this._y - v.y ) + Math.abs( this._z - v.z );
 
 	},
 
@@ -627,9 +744,11 @@ Object.assign( Vector3.prototype, {
 
 		var sinPhiRadius = Math.sin( s.phi ) * s.radius;
 
-		this.x = sinPhiRadius * Math.sin( s.theta );
-		this.y = Math.cos( s.phi ) * s.radius;
-		this.z = sinPhiRadius * Math.cos( s.theta );
+		this._x = sinPhiRadius * Math.sin( s.theta );
+		this._y = Math.cos( s.phi ) * s.radius;
+		this._z = sinPhiRadius * Math.cos( s.theta );
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -637,9 +756,11 @@ Object.assign( Vector3.prototype, {
 
 	setFromCylindrical: function ( c ) {
 
-		this.x = c.radius * Math.sin( c.theta );
-		this.y = c.y;
-		this.z = c.radius * Math.cos( c.theta );
+		this._x = c.radius * Math.sin( c.theta );
+		this._y = c.y;
+		this._z = c.radius * Math.cos( c.theta );
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -649,9 +770,11 @@ Object.assign( Vector3.prototype, {
 
 		var e = m.elements;
 
-		this.x = e[ 12 ];
-		this.y = e[ 13 ];
-		this.z = e[ 14 ];
+		this._x = e[ 12 ];
+		this._y = e[ 13 ];
+		this._z = e[ 14 ];
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -663,9 +786,11 @@ Object.assign( Vector3.prototype, {
 		var sy = this.setFromMatrixColumn( m, 1 ).length();
 		var sz = this.setFromMatrixColumn( m, 2 ).length();
 
-		this.x = sx;
-		this.y = sy;
-		this.z = sz;
+		this._x = sx;
+		this._y = sy;
+		this._z = sz;
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -679,7 +804,7 @@ Object.assign( Vector3.prototype, {
 
 	equals: function ( v ) {
 
-		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
+		return ( ( v.x === this._x ) && ( v.y === this._y ) && ( v.z === this._z ) );
 
 	},
 
@@ -687,9 +812,11 @@ Object.assign( Vector3.prototype, {
 
 		if ( offset === undefined ) offset = 0;
 
-		this.x = array[ offset ];
-		this.y = array[ offset + 1 ];
-		this.z = array[ offset + 2 ];
+		this._x = array[ offset ];
+		this._y = array[ offset + 1 ];
+		this._z = array[ offset + 2 ];
+
+		this.onChangeCallback();
 
 		return this;
 
@@ -700,9 +827,9 @@ Object.assign( Vector3.prototype, {
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
 
-		array[ offset ] = this.x;
-		array[ offset + 1 ] = this.y;
-		array[ offset + 2 ] = this.z;
+		array[ offset ] = this._x;
+		array[ offset + 1 ] = this._y;
+		array[ offset + 2 ] = this._z;
 
 		return array;
 
@@ -716,13 +843,25 @@ Object.assign( Vector3.prototype, {
 
 		}
 
-		this.x = attribute.getX( index );
-		this.y = attribute.getY( index );
-		this.z = attribute.getZ( index );
+		this._x = attribute.getX( index );
+		this._y = attribute.getY( index );
+		this._z = attribute.getZ( index );
+
+		this.onChangeCallback();
 
 		return this;
 
-	}
+	},
+
+	onChange: function ( callback ) {
+
+		this.onChangeCallback = callback;
+
+		return this;
+
+	},
+
+	onChangeCallback: function () {}
 
 } );
 
