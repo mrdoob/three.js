@@ -49,7 +49,7 @@ function WebGLAnimation() {
 
 		}
 
-	}
+	};
 
 }
 
