@@ -40,7 +40,7 @@ Object.assign( Font.prototype, {
 
 function createPaths( text, size, divisions, data ) {
 
-	var chars = String( text ).split( '' );
+	var chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // see #13988
 	var scale = size / data.resolution;
 	var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
 

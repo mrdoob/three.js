@@ -1329,6 +1329,13 @@ Object.defineProperties( ShaderMaterial.prototype, {
 
 Object.assign( WebGLRenderer.prototype, {
 
+	animate: function ( callback ) {
+
+		console.warn( 'THREE.WebGLRenderer: .animate() is now .setAnimationLoop().' );
+		this.setAnimationLoop( callback );
+
+	},
+
 	getCurrentRenderTarget: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );

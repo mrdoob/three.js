@@ -289,6 +289,8 @@ THREE.SVGLoader.prototype = {
 								point.x + numbers[ j + 4 ],
 								point.y + numbers[ j + 5 ]
 							);
+							control.x = point.x + numbers[ j + 2 ];
+							control.y = point.y + numbers[ j + 3 ];
 							point.x += numbers[ j + 4 ];
 							point.y += numbers[ j + 5 ];
 						}
@@ -297,8 +299,6 @@ THREE.SVGLoader.prototype = {
 					case 's':
 						var numbers = parseFloats( data );
 						path.bezierCurveTo(
-							// TODO: Not sure if point needs
-							// to be added to reflection...
 							getReflection( point.x, control.x ),
 							getReflection( point.y, control.y ),
 							point.x + numbers[ 0 ],
@@ -620,7 +620,7 @@ THREE.SVGLoader.prototype = {
 
 		function getReflection( a, b ) {
 
-			return 2 * a - ( b - a );
+			return a - ( b - a );
 
 		}
 
@@ -630,7 +630,18 @@ THREE.SVGLoader.prototype = {
 
 			for ( var i = 0; i < array.length; i ++ ) {
 
-				array[ i ] = parseFloat( array[ i ] );
+				var number = array[ i ];
+
+				// Handle values like 48.6037.7
+				// TODO Find a regex for this
+
+				if ( number.indexOf( '.' ) !== number.lastIndexOf( '.' ) ) {
+
+					array.splice( i + 1, 0, '0.' + number.split( '.' )[ 2 ] );
+
+				}
+
+				array[ i ] = parseFloat( number );
 
 			}
 
