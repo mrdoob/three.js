@@ -10,6 +10,7 @@ import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 function WebXRManager( renderer ) {
 
 	var gl = renderer.context;
+
 	var device = null;
 	var session = null;
 
@@ -86,9 +87,56 @@ function WebXRManager( renderer ) {
 
 	};
 
+	function updateCamera( camera, parent ) {
+
+		if ( parent === null ) {
+
+			camera.matrixWorld.copy( camera.matrix );
+
+		} else {
+
+			camera.matrixWorld.multiplyMatrices( parent.matrixWorld, camera.matrix );
+
+		}
+
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+
+	}
+
 	this.getCamera = function ( camera ) {
 
-		return isPresenting() ? cameraVR : camera;
+		if ( isPresenting() ) {
+
+			var parent = camera.parent;
+			var cameras = cameraVR.cameras;
+
+			// apply camera.parent to cameraVR
+
+			updateCamera( cameraVR, parent );
+
+			for ( var i = 0; i < cameras.length; i ++ ) {
+
+				updateCamera( cameras[ i ], parent );
+
+			}
+
+			// update camera and its children
+
+			camera.matrixWorld.copy( cameraVR.matrixWorld );
+
+			var children = camera.children;
+
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+				children[ i ].updateMatrixWorld( true );
+
+			}
+
+			return cameraVR;
+
+		}
+
+		return camera;
 
 	};
 
@@ -112,15 +160,13 @@ function WebXRManager( renderer ) {
 			var viewMatrix = pose.getViewMatrix( view );
 
 			var camera = cameraVR.cameras[ i ];
+			camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
 			camera.projectionMatrix.fromArray( view.projectionMatrix );
-			camera.matrixWorldInverse.fromArray( viewMatrix );
-			camera.matrixWorld.getInverse( camera.matrixWorldInverse );
 			camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
 			if ( i === 0 ) {
 
-				cameraVR.matrixWorld.copy( camera.matrixWorld );
-				cameraVR.matrixWorldInverse.copy( camera.matrixWorldInverse );
+				cameraVR.matrix.copy( camera.matrix );
 
 				// HACK (mrdoob)
 				// https://github.com/w3c/webvr/issues/203
