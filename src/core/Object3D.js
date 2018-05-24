@@ -36,20 +36,38 @@ function Object3D() {
 	var quaternion = new Quaternion();
 	var scale = new Vector3( 1, 1, 1 );
 
+	var scope = this;
+
 	function onRotationChange() {
 
 		quaternion.setFromEuler( rotation, false );
+		scope.matrixNeedsUpdate = true;
 
 	}
 
 	function onQuaternionChange() {
 
 		rotation.setFromQuaternion( quaternion, undefined, false );
+		scope.matrixNeedsUpdate = true;
+
+	}
+
+	function onPositionChange() {
+
+		scope.matrixNeedsUpdate = true;
+
+	}
+
+	function onScaleChange() {
+
+		scope.matrixNeedsUpdate = true;
 
 	}
 
 	rotation.onChange( onRotationChange );
 	quaternion.onChange( onQuaternionChange );
+	position.onChange( onPositionChange );
+	scale.onChange( onScaleChange );
 
 	Object.defineProperties( this, {
 		position: {
@@ -80,6 +98,7 @@ function Object3D() {
 	this.matrixWorld = new Matrix4();
 
 	this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
+	this.matrixNeedsUpdate = false;
 	this.matrixWorldNeedsUpdate = false;
 
 	this.layers = new Layers();
@@ -577,13 +596,14 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.matrix.compose( this.position, this.quaternion, this.scale );
 
+		this.matrixNeedsUpdate = false;
 		this.matrixWorldNeedsUpdate = true;
 
 	},
 
 	updateMatrixWorld: function ( force ) {
 
-		if ( this.matrixAutoUpdate ) this.updateMatrix();
+		if ( this.matrixNeedsUpdate && this.matrixAutoUpdate ) this.updateMatrix();
 
 		if ( this.matrixWorldNeedsUpdate || force ) {
 
