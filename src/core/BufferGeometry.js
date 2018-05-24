@@ -915,7 +915,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	optimizeTriangleIndices: function ( precision = 3 ) {
+	mergeVertices: function ( precision = 4 ) {
 
 		// Generate an index buffer if the geometry doesn't have one, or optimize it
 		// if it's already available.
@@ -931,6 +931,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		var attributeNames = Object.keys( this.attributes );
 		var attrArrays = {};
 		var newIndices = [];
+		var getters = [ 'getX', 'getY', 'getZ', 'getW' ];
 
 		var precisionMultiplier = Math.pow( 10, precision + 1 );
 		for ( var i = 0; i < vertexCount; i ++ ) {
@@ -941,14 +942,12 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				var name = attributeNames[ j ];
 				var attribute = this.getAttribute( name );
-				var size = attribute.itemSize;
-				var array = attribute.array;
+				var itemSize = attribute.itemSize;
 
-				for ( var k = 0; k < size; k ++ ) {
+				for ( var k = 0; k < itemSize; k ++ ) {
 
 					// double tilde truncates the decimal value
-					var val = array[ i * size + k ];
-					hash += `${ ~ ~ ( val * precisionMultiplier ) / precisionMultiplier },`;
+					hash += `${ ~ ~ ( attribute[ getters[ k ] ]( i ) * precisionMultiplier ) },`;
 
 				}
 
@@ -967,14 +966,13 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 					var name = attributeNames[ j ];
 					var attribute = this.getAttribute( name );
-					var array = attribute.array;
 					var itemSize = attribute.itemSize;
 
 					attrArrays[ name ] = attrArrays[ name ] || [];
 					var newarray = attrArrays[ name ];
 					for ( var k = 0; k < itemSize; k ++ ) {
 
-						newarray.push( array[ i * itemSize + k ] );
+						newarray.push( attribute[ getters[ k ] ]( i ) );
 
 					}
 
@@ -993,11 +991,22 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		for ( var i = 0, l = attributeNames.length; i < l; i ++ ) {
 
 			var name = attributeNames[ i ];
-			var attribute = this.getAttribute( name );
-			var buffer = new attribute.array.constructor( attrArrays[ name ] );
+			var oldAttribute = this.getAttribute( name );
+			var attribute;
 
-			attribute.setArray( buffer );
-			attribute.needsUpdate = true;
+			var buffer = new attribute.array.constructor( attrArrays[ name ] );
+			if ( oldAttribute.isInterleavedBufferAttribute ) {
+
+				attribute = new THREE.BufferAttribute( buffer, oldAttribute.itemSize, oldAttribute.itemSize );
+
+			} else {
+
+				attribute = this.getAttribute( name ).clone();
+				attribute.setArray( buffer );
+
+			}
+
+			this.addAttribute( name, attribute );
 
 		}
 
@@ -1007,32 +1016,21 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		if ( newIndices.length >= Math.pow( 2, 16 ) ) cons = Uint32Array;
 
 		var newIndexBuffer = new cons( newIndices );
+		var newIndices = null;
 		if ( indices === null ) {
 
-			indices = new THREE.BufferAttribute( newIndexBuffer, 1 );
-			this.setIndex( indices );
+			newIndices = new THREE.BufferAttribute( newIndexBuffer, 1 );
 
 		} else {
 
-			indices.setArray( newIndexBuffer );
-			indices.needsUpdate = true;
+			newIndices = this.getIndex().clone();
+			newIndices.setArray( newIndexBuffer );
 
 		}
 
-	},
+		this.setIndex( newIndices );
 
-	getMemoryUsage: function () {
-
-		// Return the estimated memory used by this geometry
-		var mem = 0;
-		for ( var name in this.attributes ) {
-
-			mem += this.attributes[ name ].array.byteLength;
-
-		}
-
-		mem += this.index ? this.index.array.byteLength : 0;
-		return mem;
+		return this;
 
 	},
 
