@@ -2,17 +2,12 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { Vector3 } from '../../math/Vector3.js';
-import { Quaternion } from '../../math/Quaternion.js';
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 
 function WebXRManager( renderer ) {
-
-	var scope = this;
 
 	var gl = renderer.context;
 	var device = null;

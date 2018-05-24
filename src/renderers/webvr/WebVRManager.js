@@ -263,7 +263,7 @@ function WebVRManager( renderer ) {
 
 	// DEPRECATED
 
-	this.requestAnimationFrame = function ( callback ) {
+	this.requestAnimationFrame = function ( /* callback */ ) {
 
 		// device.requestAnimationFrame( callback );
 
