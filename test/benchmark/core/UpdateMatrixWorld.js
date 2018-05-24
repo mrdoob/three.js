@@ -8,9 +8,9 @@
   rotation.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 8);
   var createLocallyOffsetChild = function() {
     var child = new THREE.Object3D();
-    child.position = position;
-    child.scale = scale;
-    child.rotation = rotation;
+    child.position.copy(position);
+    child.scale.copy(scale);
+    child.rotation.copy(rotation);
     return child;
   };
 
