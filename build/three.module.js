@@ -7294,7 +7294,7 @@ function WebGLAnimation() {
 
 		}
 
-	}
+	};
 
 }
 
@@ -21460,14 +21460,6 @@ function WebVRManager( renderer ) {
 
 	};
 
-	// DEPRECATED
-
-	this.requestAnimationFrame = function ( callback ) {
-
-		// device.requestAnimationFrame( callback );
-
-	};
-
 }
 
 /**
@@ -21481,7 +21473,6 @@ function WebXRManager( renderer ) {
 	var session = null;
 
 	var frameOfRef = null;
-	var isExclusive = false;
 
 	var pose = null;
 
@@ -21542,7 +21533,6 @@ function WebXRManager( renderer ) {
 			session.requestFrameOfReference( 'stage' ).then( function ( value ) {
 
 				frameOfRef = value;
-				isExclusive = session.exclusive;
 
 				renderer.setFramebuffer( session.baseLayer.framebuffer );
 
@@ -21621,8 +21611,6 @@ function WebXRManager( renderer ) {
 		return new THREE.Matrix4();
 
 	};
-
-	this.requestAnimationFrame = function () {};
 
 	this.submitFrame = function () {};
 
