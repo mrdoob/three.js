@@ -21474,8 +21474,9 @@ function WebVRManager( renderer ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebXRManager( gl ) {
+function WebXRManager( renderer ) {
 
+	var gl = renderer.context;
 	var device = null;
 	var session = null;
 
@@ -21532,7 +21533,7 @@ function WebXRManager( gl ) {
 
 			session.addEventListener( 'end', function () {
 
-				gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+				renderer.setFramebuffer( null );
 				animation.stop();
 
 			} );
@@ -21542,6 +21543,8 @@ function WebXRManager( gl ) {
 
 				frameOfRef = value;
 				isExclusive = session.exclusive;
+
+				renderer.setFramebuffer( session.baseLayer.framebuffer );
 
 				animation.setContext( session );
 				animation.start();
@@ -21596,8 +21599,6 @@ function WebXRManager( gl ) {
 			}
 
 		}
-
-		gl.bindFramebuffer( gl.FRAMEBUFFER, session.baseLayer.framebuffer );
 
 		if ( onAnimationFrameCallback ) onAnimationFrameCallback();
 
@@ -21704,6 +21705,8 @@ function WebGLRenderer( parameters ) {
 		_isContextLost = false,
 
 		// internal state cache
+
+		_framebuffer = null,
 
 		_currentRenderTarget = null,
 		_currentFramebuffer = null,
@@ -21872,7 +21875,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( 'xr' in navigator ) ? new WebXRManager( _gl ) : new WebVRManager( _this );
+	var vr = ( 'xr' in navigator ) ? new WebXRManager( _this ) : new WebVRManager( _this );
 
 	this.vr = vr;
 
@@ -23978,6 +23981,14 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
+	//
+
+	this.setFramebuffer = function ( value ) {
+
+		_framebuffer = value;
+
+	};
+
 	this.getRenderTarget = function () {
 
 		return _currentRenderTarget;
@@ -23994,7 +24005,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var framebuffer = null;
+		var framebuffer = _framebuffer;
 		var isCube = false;
 
 		if ( renderTarget ) {
