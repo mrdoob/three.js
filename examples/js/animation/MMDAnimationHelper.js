@@ -275,7 +275,7 @@ THREE.MMDAnimationHelper = ( function () {
 		 */
 		createGrantSolver: function ( mesh ) {
 
-			return new GrantSolver( mesh, mesh.geometry.grants );
+			return new GrantSolver( mesh, mesh.geometry.userData.MMD.grants );
 
 		},
 
@@ -581,7 +581,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 		_optimizeIK: function ( mesh, physicsEnabled ) {
 
-			var iks = mesh.geometry.iks;
+			var iks = mesh.geometry.userData.MMD.iks;
 			var bones = mesh.geometry.bones;
 
 			for ( var i = 0, il = iks.length; i < il; i ++ ) {
@@ -619,7 +619,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-			return new THREE.CCDIKSolver( mesh, mesh.geometry.iks );
+			return new THREE.CCDIKSolver( mesh, mesh.geometry.userData.MMD.iks );
 
 		},
 
@@ -632,7 +632,10 @@ THREE.MMDAnimationHelper = ( function () {
 			}
 
 			return new THREE.MMDPhysics(
-				mesh, mesh.geometry.rigidBodies, mesh.geometry.constraints, params );
+				mesh,
+				mesh.geometry.userData.MMD.rigidBodies,
+				mesh.geometry.userData.MMD.constraints,
+				params );
 
 		},
 

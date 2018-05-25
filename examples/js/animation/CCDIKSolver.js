@@ -203,7 +203,7 @@ THREE.CCDIKSolver = ( function () {
 		 */
 		createHelper: function () {
 
-			return new CCDIKHelper( this.mesh, this.mesh.geometry.iks );
+			return new CCDIKHelper( this.mesh, this.mesh.geometry.userData.MMD.iks );
 
 		},
 
