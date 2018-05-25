@@ -13,7 +13,7 @@
 		<p class="desc">
 		An exporter for *PLY*.
 		<br /><br />
-		<a href="https://www.khronos.org/gltf">PLY</a> (Polygon or Stanford Triangle Format) is
+		<a href="https://www.khronos.org/gltf">PLY</a> (Polygon or Stanford Triangle Format) is a
 		file format for efficient delivery and loading of simple, static 3D content in a dense format.
 		Both binary and ascii formats are supported. PLY can store vertex positions, colors, normals and
 		uv coordinates. No textures or texture references are saved.
@@ -46,7 +46,7 @@
 		[page:Object input] — Object3D<br />
 		[page:Options options] — Export options<br />
 		<ul>
-			<li>excludeAttributes - array. Which properties to explicitly exclude from the exported PLY file. Valid values are 'color', 'normal', 'uv', and 'index'. If indices are excluded, then a point cloud is exported. Default is an empty array.</li>
+			<li>excludeAttributes - array. Which properties to explicitly exclude from the exported PLY file. Valid values are 'color', 'normal', 'uv', and 'index'. If triangle indices are excluded, then a point cloud is exported. Default is an empty array.</li>
 			<li>binary - bool. Export in binary format, returning an ArrayBuffer. Default is false.</li>
 		</ul>
 		</p>
