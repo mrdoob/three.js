@@ -21523,7 +21523,7 @@
 
 		//
 
-		this.setSession = function ( value ) {
+		this.setSession = function ( value, options ) {
 
 			session = value;
 
@@ -21537,7 +21537,7 @@
 				} );
 
 				session.baseLayer = new XRWebGLLayer( session, gl );
-				session.requestFrameOfReference( 'stage' ).then( function ( value ) {
+				session.requestFrameOfReference( options.frameOfReferenceType ).then( function ( value ) {
 
 					frameOfRef = value;
 
