@@ -95,9 +95,8 @@
 
 			}
 
-			var imageObj = new Image();
-
-			imageObj.onload = function() {
+			var loader = new THREE.ImageLoader();
+			loader.load( atlasImgUrl, function ( imageObj ) {
 
 				var canvas, context;
 				var tileWidth = imageObj.height;
@@ -114,9 +113,7 @@
 
 				}
 
-			};
-
-			imageObj.src = atlasImgUrl;
+			} );
 
 			return textures;
 
