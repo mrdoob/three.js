@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - a quick implementation of depth-of-field effect</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color:#0078ff;
+			}
+
+			#info {
+				color:#fff;
+				position: relative;
+				top: 0px;
+				width: 100em;
+				margin: 0 auto -2.1em;
+				padding: 5px;
+				z-index:100;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<script src="../build/three.js"></script>
+		
+		<script src="js/shaders/HorizontalBlurShader.js"></script>
+		<script src="js/shaders/VerticalBlurShader.js"></script>
+		<script src="js/shaders/DepthDetectShader.js"></script>
+		<script src="js/shaders/DepthRangeDofShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/SMAAShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/SMAAPass.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/DepthRangeDofPass.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src='js/libs/dat.gui.min.js'></script>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - a quick implementation of depth-of-field effect, with depth range blur.</a>
+		</div>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			//renderer ---------------
+			var renderer = new THREE.WebGLRenderer({ antialias: false });
+			renderer.setClearColor('rgb(0,0,0)', 0);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			
+			container.appendChild(renderer.domElement);
+
+			//scene screen ---------------
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+
+			camera.position.x = 0;
+			camera.position.y = 30;
+			camera.position.z = 180;
+			
+			//light ---------------
+			var ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
+			scene.add( ambientLight );
+
+			var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.9 );
+			directionalLight.position.set( 100, 200, 0 );
+			scene.add( directionalLight );
+
+			var pointLight = new THREE.PointLight( 0xffffff, 0.2 );
+			pointLight.position.set( 0, 0, 0);
+			// console.log(pointLight.position.z);
+			scene.add(pointLight);
+			
+			// //add mesh
+			createMesh(-25, 0, '#33ffff', 20);
+			createMesh(-25, 60, '#33ffff', 20);
+
+			createMesh(0, 0, '#ff33ff', 20);
+			createMesh(0, 60, '#ff33ff', 20);
+
+			createMesh(25, 0, '#ffff33', 20);
+			createMesh(25, 60, '#ffff33', 20);
+			
+			//post processing
+			var renderScene = new THREE.RenderPass(scene, camera);
+
+			var depthRangeDofPass = new THREE.DepthRangeDofPass(scene, camera, {});
+
+			var smaaPass = new THREE.SMAAPass(window.innerWidth, window.innerHeight);
+			smaaPass.renderToScreen = true;
+			
+			var composer = new THREE.EffectComposer(renderer);
+			composer.setSize(window.innerWidth, window.innerHeight);
+			composer.addPass(renderScene);
+			composer.addPass(depthRangeDofPass);
+			composer.addPass(smaaPass);
+			
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			var effectController  = {
+				resolutionWidth: 1920,
+				resolutionHeight: 1080,
+				blurRatio: 0.7,
+				nearFocusDist: 100,
+				farFocusDist: 200
+			};
+
+			var matChanger = function() {
+				// postprocessing.bokeh.uniforms[ "focus" ].value = effectController.focus;
+				depthRangeDofPass.hBlurMaterial.uniforms[ "h" ].value = 1.0 / (effectController.resolutionWidth * effectController.blurRatio);
+				depthRangeDofPass.vBlurMaterial.uniforms[ "v" ].value = 1.0 / (effectController.resolutionHeight * effectController.blurRatio);
+				depthRangeDofPass.nearFocusDist = effectController.nearFocusDist;
+				depthRangeDofPass.farFocusDist = effectController.farFocusDist;
+			};
+
+			var gui = new dat.GUI();
+			gui.add( effectController, "resolutionWidth", 1920, 3840, 1920).step(1920).onChange( matChanger );
+			gui.add( effectController, "resolutionHeight", 1080, 2160, 1080).step(1080).onChange( matChanger );
+			gui.add( effectController, "blurRatio", 0.0, 1.0, 0.7).step(0.1).onChange( matChanger );
+			gui.add( effectController, "nearFocusDist", 0.0, 500, 100).step(1).onChange( matChanger );
+			gui.add( effectController, "farFocusDist", 10.0, 1000, 200).step(1).onChange( matChanger );
+
+			render();
+
+			var zFlag = 1;
+			var zLimit = 100;
+			var zStep = 0.01;
+
+			function render() {
+				composer.render();
+
+				requestAnimationFrame(render);
+			}
+
+			function createMesh(xp, yp, color, ballRowNum) {
+				var sphereGeometry = new THREE.SphereGeometry(5, 16, 12);
+				var blueMaterial = new THREE.MeshStandardMaterial({
+					color: color,
+					flatShading: true,
+					roughness: 0.6,
+					metalness: 0.7
+				});
+				var ballBlue = new THREE.Mesh(sphereGeometry, blueMaterial);
+
+				for (var index = 0; index < ballRowNum; index++) {
+					var zp = (index - ballRowNum/2) * 25;
+
+					var ballCopy = ballBlue.clone();
+					ballCopy.position.set(xp, yp, zp);
+					scene.add(ballCopy);
+				}
+			}
+
+			function onWindowResize() {
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+				var pixelRatio = renderer.getPixelRatio();
+				var newWidth  = Math.floor( width * pixelRatio ) || 1;
+				var newHeight = Math.floor( height * pixelRatio ) || 1;
+				composer.setSize( newWidth, newHeight );
+			}
+
+
+		</script>
+	</body>
+</html>
