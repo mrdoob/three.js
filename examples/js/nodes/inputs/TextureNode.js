@@ -49,17 +49,19 @@ THREE.TextureNode.prototype.generate = function ( builder, output ) {
 	if ( bias ) code = method + '(' + tex + ',' + coord + ',' + bias + ')';
 	else code = method + '(' + tex + ',' + coord + ')';
 
+	// TODO: This is a hack, but WebGLProgram does not know enough about
+	// node materials to infer correct colorspace.
 	if ( builder.isSlot( 'color' ) ) {
 
-		code = 'mapTexelToLinear(' + code + ')';
+		code = 'sRGBToLinear(' + code + ')';
 
 	} else if ( builder.isSlot( 'emissive' ) ) {
 
-		code = 'emissiveMapTexelToLinear(' + code + ')';
+		code = 'sRGBToLinear(' + code + ')';
 
 	} else if ( builder.isSlot( 'environment' ) ) {
 
-		code = 'envMapTexelToLinear(' + code + ')';
+		code = 'sRGBToLinear(' + code + ')';
 
 	}
 
