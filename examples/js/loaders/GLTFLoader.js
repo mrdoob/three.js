@@ -1182,15 +1182,12 @@ THREE.GLTFLoader = ( function () {
 	 */
 	function createDefaultMaterial() {
 
-		return new THREE.MeshStandardMaterial( {
-			color: 0xFFFFFF,
-			emissive: 0x000000,
-			metalness: 1,
-			roughness: 1,
-			transparent: false,
-			depthTest: true,
-			side: THREE.FrontSide
-		} );
+		var material = new THREE.StandardNodeMaterial();
+		material.color.value.setHex( 0xFFFFFF );
+		material.emissive.value.setHex( 0x000000 );
+		material.metalness.value = 1.0;
+		material.roughness.value = 1.0;
+		return material;
 
 	}
 
@@ -2074,11 +2071,35 @@ THREE.GLTFLoader = ( function () {
 	 * @param {number} textureIndex
 	 * @return {Promise}
 	 */
-	GLTFParser.prototype.assignTexture = function ( materialParams, textureName, textureIndex ) {
+	GLTFParser.prototype.assignTexture = function ( material, textureName, textureIndex, textureComponent ) {
 
 		return this.getDependency( 'texture', textureIndex ).then( function ( texture ) {
 
-			materialParams[ textureName ] = texture;
+			var factorNode = material[ textureName ];
+			var textureNode = new THREE.TextureNode( texture );
+
+			// baseColorTexture and emissiveTexture use sRGB encoding.
+			if ( textureName === 'color' || textureName === 'emissive' ) {
+
+				textureNode.value.encoding = THREE.sRGBEncoding;
+
+			}
+
+			if ( textureComponent !== undefined ) {
+
+				textureNode = new THREE.SwitchNode( textureNode, textureComponent );
+
+			}
+
+			if ( factorNode === undefined ) {
+
+				material[ textureName ] = textureNode;
+
+			} else {
+
+				material[ textureName ] =  new THREE.OperatorNode( factorNode, textureNode, THREE.OperatorNode.MUL );
+
+			}
 
 		} );
 
@@ -2096,6 +2117,7 @@ THREE.GLTFLoader = ( function () {
 		var extensions = this.extensions;
 		var materialDef = this.json.materials[ materialIndex ];
 
+		var material;
 		var materialType;
 		var materialParams = {};
 		var materialExtensions = materialDef.extensions || {};
@@ -2119,36 +2141,36 @@ THREE.GLTFLoader = ( function () {
 			// Specification:
 			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#metallic-roughness-material
 
-			materialType = THREE.MeshStandardMaterial;
+			material = new THREE.StandardNodeMaterial();
 
 			var metallicRoughness = materialDef.pbrMetallicRoughness || {};
 
-			materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
-			materialParams.opacity = 1.0;
+			material.color = new THREE.ColorNode( 0xFFFFFF );
+			material.alpha = new THREE.FloatNode( 1.0 );
 
 			if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
 
 				var array = metallicRoughness.baseColorFactor;
 
-				materialParams.color.fromArray( array );
-				materialParams.opacity = array[ 3 ];
+				material.color.value.fromArray( array );
+				material.alpha.value = array[ 3 ];
 
 			}
 
 			if ( metallicRoughness.baseColorTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture.index ) );
+				pending.push( parser.assignTexture( material, 'color', metallicRoughness.baseColorTexture.index ) );
 
 			}
 
-			materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
-			materialParams.roughness = metallicRoughness.roughnessFactor !== undefined ? metallicRoughness.roughnessFactor : 1.0;
+			material.metalness.value = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
+			material.roughness.value = metallicRoughness.roughnessFactor !== undefined ? metallicRoughness.roughnessFactor : 1.
 
 			if ( metallicRoughness.metallicRoughnessTexture !== undefined ) {
 
 				var textureIndex = metallicRoughness.metallicRoughnessTexture.index;
-				pending.push( parser.assignTexture( materialParams, 'metalnessMap', textureIndex ) );
-				pending.push( parser.assignTexture( materialParams, 'roughnessMap', textureIndex ) );
+				pending.push( parser.assignTexture( material, 'metalness', textureIndex, 'z' ) );
+				pending.push( parser.assignTexture( material, 'roughness', textureIndex, 'y' ) );
 
 			}
 
@@ -2156,7 +2178,7 @@ THREE.GLTFLoader = ( function () {
 
 		if ( materialDef.doubleSided === true ) {
 
-			materialParams.side = THREE.DoubleSide;
+			material.side = THREE.DoubleSide;
 
 		}
 
@@ -2164,15 +2186,15 @@ THREE.GLTFLoader = ( function () {
 
 		if ( alphaMode === ALPHA_MODES.BLEND ) {
 
-			materialParams.transparent = true;
+			material.transparent = true;
 
 		} else {
 
-			materialParams.transparent = false;
+			material.transparent = false;
 
 			if ( alphaMode === ALPHA_MODES.MASK ) {
 
-				materialParams.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
+				material.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
 
 			}
 
@@ -2180,13 +2202,13 @@ THREE.GLTFLoader = ( function () {
 
 		if ( materialDef.normalTexture !== undefined && materialType !== THREE.MeshBasicMaterial) {
 
-			pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture.index ) );
+			pending.push( parser.assignTexture( material, 'normal', materialDef.normalTexture.index ) );
 
-			materialParams.normalScale = new THREE.Vector2( 1, 1 );
+			material.normalScale = new THREE.FloatNode( 1.0 );
 
 			if ( materialDef.normalTexture.scale !== undefined ) {
 
-				materialParams.normalScale.set( materialDef.normalTexture.scale, materialDef.normalTexture.scale );
+				material.normalScale.value = materialDef.normalTexture.scale;
 
 			}
 
@@ -2194,59 +2216,49 @@ THREE.GLTFLoader = ( function () {
 
 		if ( materialDef.occlusionTexture !== undefined && materialType !== THREE.MeshBasicMaterial) {
 
-			pending.push( parser.assignTexture( materialParams, 'aoMap', materialDef.occlusionTexture.index ) );
+			material.ao = new THREE.FloatNode( 1.0 );
 
 			if ( materialDef.occlusionTexture.strength !== undefined ) {
 
-				materialParams.aoMapIntensity = materialDef.occlusionTexture.strength;
+				material.ao.value = materialDef.occlusionTexture.strength;
 
 			}
 
+			pending.push( parser.assignTexture( material, 'ao', materialDef.occlusionTexture.index, 'x' ) );
+
 		}
+
+		material.emissive = new THREE.ColorNode( 0x000000 );
 
 		if ( materialDef.emissiveFactor !== undefined && materialType !== THREE.MeshBasicMaterial) {
 
-			materialParams.emissive = new THREE.Color().fromArray( materialDef.emissiveFactor );
+			material.emissive.value.fromArray( materialDef.emissiveFactor );
 
 		}
 
 		if ( materialDef.emissiveTexture !== undefined && materialType !== THREE.MeshBasicMaterial) {
 
-			pending.push( parser.assignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture.index ) );
+			pending.push( parser.assignTexture( material, 'emissive', materialDef.emissiveTexture.index ) );
 
 		}
 
 		return Promise.all( pending ).then( function () {
 
-			var material;
-
-			if ( materialType === THREE.ShaderMaterial ) {
-
-				material = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].createMaterial( materialParams );
-
-			} else {
-
-				material = new materialType( materialParams );
-
-			}
-
 			if ( materialDef.name !== undefined ) material.name = materialDef.name;
 
 			// Normal map textures use OpenGL conventions:
 			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
-			if ( material.normalScale ) {
+			// if ( material.normalScale ) {
 
-				material.normalScale.y = - material.normalScale.y;
+			// 	material.normalScale.y = - material.normalScale.y;
 
-			}
-
-			// emissiveTexture and baseColorTexture use sRGB encoding.
-			if ( material.map ) material.map.encoding = THREE.sRGBEncoding;
-			if ( material.emissiveMap ) material.emissiveMap.encoding = THREE.sRGBEncoding;
+			// }
 
 			if ( materialDef.extras ) material.userData = materialDef.extras;
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
+
+			material.build();
 
 			return material;
 
