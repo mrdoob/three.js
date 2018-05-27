@@ -367,8 +367,6 @@ THREE.BokehDepthShader = {
 
 	vertexShader: [
 
-		"#include <common>",
-
 		"varying float vViewZDepth;",
 
 		"void main() {",
@@ -388,9 +386,6 @@ THREE.BokehDepthShader = {
 		"uniform float mFar;",
 
 		"varying float vViewZDepth;",
-
-		"#include <common>",
-		"#include <packing>",
 
 		"void main() {",
 
