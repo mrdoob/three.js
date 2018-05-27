@@ -842,6 +842,7 @@ THREE.MMDLoader = ( function () {
 			geometry.morphAttributes.position = morphPositions;
 
 			geometry.userData.MMD = {
+				bones: bones,
 				iks: iks,
 				grants: grants,
 				rigidBodies: rigidBodies,
