@@ -2204,11 +2204,13 @@ THREE.GLTFLoader = ( function () {
 
 			pending.push( parser.assignTexture( material, 'normal', materialDef.normalTexture.index ) );
 
-			material.normalScale = new THREE.FloatNode( 1.0 );
+			// Normal map textures use OpenGL conventions:
+			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
+			material.normalScale = new THREE.Vector2Node( 1.0, -1.0 );
 
 			if ( materialDef.normalTexture.scale !== undefined ) {
 
-				material.normalScale.value = materialDef.normalTexture.scale;
+				material.normalScale.value.multiplyScalar( materialDef.normalTexture.scale );
 
 			}
 
@@ -2245,14 +2247,6 @@ THREE.GLTFLoader = ( function () {
 		return Promise.all( pending ).then( function () {
 
 			if ( materialDef.name !== undefined ) material.name = materialDef.name;
-
-			// Normal map textures use OpenGL conventions:
-			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
-			// if ( material.normalScale ) {
-
-			// 	material.normalScale.y = - material.normalScale.y;
-
-			// }
 
 			if ( materialDef.extras ) material.userData = materialDef.extras;
 
