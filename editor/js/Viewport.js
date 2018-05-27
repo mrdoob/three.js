@@ -92,7 +92,7 @@ var Viewport = function ( editor ) {
 
 		if ( object !== undefined ) {
 
-			switch ( transformControls.getMode() ) {
+			switch ( transformControls.mode ) {
 
 				case 'translate':
 
@@ -269,7 +269,6 @@ var Viewport = function ( editor ) {
 	var controls = new THREE.EditorControls( camera, container.dom );
 	controls.addEventListener( 'change', function () {
 
-		transformControls.update();
 		signals.cameraChanged.dispatch( camera );
 
 	} );
@@ -285,19 +284,19 @@ var Viewport = function ( editor ) {
 
 	signals.transformModeChanged.add( function ( mode ) {
 
-		transformControls.setMode( mode );
+		transformControls.mode = mode;
 
 	} );
 
 	signals.snapChanged.add( function ( dist ) {
 
-		transformControls.setTranslationSnap( dist );
+		transformControls.translationSnap = dist;
 
 	} );
 
 	signals.spaceChanged.add( function ( space ) {
 
-		transformControls.setSpace( space );
+		transformControls.space = space;
 
 	} );
 
@@ -391,7 +390,6 @@ var Viewport = function ( editor ) {
 		if ( editor.selected === object ) {
 
 			selectionBox.setFromObject( object );
-			transformControls.update();
 
 		}
 

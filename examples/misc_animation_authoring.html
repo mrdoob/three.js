@@ -87,34 +87,34 @@
 					switch ( event.keyCode ) {
 
 						case 81: // Q
-							control.setSpace( control.space === "local" ? "world" : "local" );
+							control.space = control.space === "local" ? "world" : "local";
 							break;
 
 						case 17: // Ctrl
-							control.setTranslationSnap( 100 );
-							control.setRotationSnap( THREE.Math.degToRad( 15 ) );
+							control.translationSnap = 100;
+							control.rotationSnap = THREE.Math.degToRad( 15 );
 							break;
 
 						case 87: // W
-							control.setMode( "translate" );
+							control.mode = "translate";
 							break;
 
 						case 69: // E
-							control.setMode( "rotate" );
+							control.mode = "rotate";
 							break;
 
 						case 82: // R
-							control.setMode( "scale" );
+							control.mode = "scale";
 							break;
 
 						case 187:
 						case 107: // +, =, num+
-							control.setSize( control.size + 0.1 );
+							control.size = control.size + 0.1;
 							break;
 
 						case 189:
 						case 109: // -, _, num-
-							control.setSize( Math.max( control.size - 0.1, 0.1 ) );
+							control.size = Math.max( control.size - 0.1, 0.1 );
 							break;
 
 					}
@@ -126,8 +126,8 @@
 					switch ( event.keyCode ) {
 
 						case 17: // Ctrl
-							control.setTranslationSnap( null );
-							control.setRotationSnap( null );
+							control.translationSnap = null;
+							control.rotationSnap = null;
 							break;
 
 					}
@@ -169,8 +169,6 @@
 			}
 
 			function render() {
-
-				control.update();
 
 				renderer.render( scene, camera );
 

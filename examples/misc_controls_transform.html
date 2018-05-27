@@ -31,10 +31,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/controls/EditorControls.js"></script>
 		<script src="js/controls/TransformControls.js"></script>
-		<script src="js/controls/TransformControlsPlane.js"></script>
-		<script src="js/controls/TransformControlsGizmo.js"></script>
 
 		<script>
 
@@ -70,21 +67,17 @@
 				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );
 
+				var group = new THREE.Group();
+				scene.add( group );
 
 				var mesh = new THREE.Mesh( geometry, material );
+
 				scene.add( mesh );
 
-				var control2 = new THREE.EditorControls( camera, renderer.domElement );
-				control2.addEventListener( 'change', render );
-
 				control = new THREE.TransformControls( camera, renderer.domElement );
-				control.addEventListener( 'change', function () {
-					control2.enabled = !control.dragging;
-					render();
-				} );
-				control.mode = "scale";
-				// control.space = "local";
-				mesh.rotation.set( 1, -2, -2 );
+				control.addEventListener( 'change', render );
+				control.mode = 'rotate'
+				control.space = 'local'
 
 				control.attach( mesh );
 				scene.add( control );
@@ -101,7 +94,7 @@
 
 						case 16: // Shift
 							control.translationSnap = 100;
-							control.rotationSnap = THREE.Math.degToRad( 15 );
+							control.rotationSnap = THREE.Math.degToRad( 45 );
 							break;
 
 						case 87: // W
