@@ -157,13 +157,13 @@
 
 			function createMesh(xp, yp, color, ballRowNum) {
 				var sphereGeometry = new THREE.SphereGeometry(5, 16, 12);
-				var blueMaterial = new THREE.MeshStandardMaterial({
+				var sphereMaterial = new THREE.MeshStandardMaterial({
 					color: color,
 					flatShading: true,
 					roughness: 0.6,
 					metalness: 0.7
 				});
-				var ballBlue = new THREE.Mesh(sphereGeometry, blueMaterial);
+				var ballBlue = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
 				for (var index = 0; index < ballRowNum; index++) {
 					var zp = (index - ballRowNum/2) * 25;

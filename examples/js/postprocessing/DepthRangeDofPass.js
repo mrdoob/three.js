@@ -16,9 +16,21 @@ THREE.DepthRangeDofPass = function (scene, camera, params) {
   var nearFocusDist = params.nearFocusDist || DEFAULTS_OPTIONS.nearFocusDist;
   var farFocusDist = params.farFocusDist || DEFAULTS_OPTIONS.farFocusDist;
 
+  //declear for update z 
   this.nearFocusDist = nearFocusDist;
   this.farFocusDist = farFocusDist;
+  this.camWorldDir = new THREE.Vector3();
+  this.cameraPositionCopy = new THREE.Vector3();
+  this.cameraPositionCopy2 = new THREE.Vector3();
+  this.viewDir;
+  this.viewDirCopy = new THREE.Vector3();
+  this.viewDirCopy2 = new THREE.Vector3();
+  this.nearFocus;
+  this.farFocus;
+  this.nearZ;
+  this.farZ;
 
+  //params for fbo
   var fboParams = {
     minFilter: THREE.LinearFilter,
     magFilter: THREE.LinearFilter,
@@ -83,7 +95,6 @@ THREE.DepthRangeDofPass = function (scene, camera, params) {
       farZ: { value: null},
       focusRange: { value: 0 },
       blurTex: { value: this.yblurTarget.texture },
-      // normalTex: { value: this.normalTarget.texture },
       normalTex: { value: null },
       depthTex: { value: this.depthTarget.texture }
     },
@@ -105,9 +116,6 @@ THREE.DepthRangeDofPass.prototype = Object.assign(Object.create(THREE.Pass.proto
     this.scene.overrideMaterial = this.depthMaterial;
     renderer.render(this.scene, this.camera, this.depthTarget);
     this.scene.overrideMaterial = null;
-    // //normal scene, for mix into blur
-    // this.scene.overrideMaterial = null;
-    // renderer.render(this.scene, this.camera, this.normalTarget);
 
     //out put blur pps screen quad into fbo
     this.quad2.material = this.hBlurMaterial;
@@ -132,16 +140,31 @@ THREE.DepthRangeDofPass.prototype = Object.assign(Object.create(THREE.Pass.proto
 });
 
 THREE.DepthRangeDofPass.prototype.updateFocusZ = function() {
-  var camWorldDir = new THREE.Vector3();
-  var camWorldDirVec3 = this.camera.getWorldDirection(camWorldDir);
-  var viewDir = camWorldDir.normalize();
+  // var camWorldDir = new THREE.Vector3();
+  // this.camera.getWorldDirection(camWorldDir);
+  // var viewDir = camWorldDir.normalize();
   
-  var nearFocus = this.camera.position.clone().add(viewDir.clone().multiplyScalar(this.nearFocusDist));
-  var farFocus = this.camera.position.clone().add(viewDir.clone().multiplyScalar(this.farFocusDist));
+  // var nearFocus = this.camera.position.clone().add(viewDir.clone().multiplyScalar(this.nearFocusDist));
+  // var farFocus = this.camera.position.clone().add(viewDir.clone().multiplyScalar(this.farFocusDist));
 
-  var nearZ = (nearFocus.project(this.camera).z + 1.0) * 0.5;
-  var farZ = (farFocus.project(this.camera).z + 1.0) * 0.5;
+  // var nearZ = (nearFocus.project(this.camera).z + 1.0) * 0.5;
+  // var farZ = (farFocus.project(this.camera).z + 1.0) * 0.5;
 
-  this.dofMaterial.uniforms.nearZ.value = nearZ;
-  this.dofMaterial.uniforms.farZ.value = farZ;
+  //fix memeory waste, use copy instead of clone and new vector3
+  this.camera.getWorldDirection(this.camWorldDir);
+  this.viewDir = this.camWorldDir.normalize();
+
+  this.cameraPositionCopy.copy(this.camera.position);
+  this.viewDirCopy.copy(this.viewDir);
+  this.cameraPositionCopy2.copy(this.camera.position);
+  this.viewDirCopy2.copy(this.viewDir);
+  
+  this.nearFocus = this.cameraPositionCopy.add(this.viewDirCopy.multiplyScalar(this.nearFocusDist));
+  this.farFocus = this.cameraPositionCopy2.add(this.viewDirCopy2.multiplyScalar(this.farFocusDist));
+
+  this.nearZ = (this.nearFocus.project(this.camera).z + 1.0) * 0.5;
+  this.farZ = (this.farFocus.project(this.camera).z + 1.0) * 0.5;
+
+  this.dofMaterial.uniforms.nearZ.value = this.nearZ;
+  this.dofMaterial.uniforms.farZ.value = this.farZ;
 }
