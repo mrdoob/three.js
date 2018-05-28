@@ -96,9 +96,16 @@ Use WEBGL Depth buffer support?
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
-				materialDepth = new THREE.MeshDepthMaterial();
-				materialDepth.depthPacking = THREE.RGBADepthPacking;
-				materialDepth.blending = THREE.NoBlending;
+				var depthShader = THREE.BokehDepthShader;
+
+				materialDepth = new THREE.ShaderMaterial( {
+					uniforms: depthShader.uniforms,
+					vertexShader: depthShader.vertexShader,
+					fragmentShader: depthShader.fragmentShader
+				} );
+
+				materialDepth.uniforms[ 'mNear' ].value = camera.near;
+				materialDepth.uniforms[ 'mFar' ].value = camera.far;
 
 				// skybox
 
@@ -110,7 +117,21 @@ Use WEBGL Depth buffer support?
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 
-				scene.background = textureCube;
+				var shader = THREE.ShaderLib[ 'cube' ];
+				shader.uniforms[ 'tCube' ].value = textureCube;
+
+				material = new THREE.ShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms,
+					depthWrite: false,
+					side: THREE.BackSide
+
+				} );
+
+				mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1000, 1000, 1000 ), material );
+				scene.add( mesh );
 
 				// plane particles
 
@@ -377,8 +398,7 @@ Use WEBGL Depth buffer support?
 					fragmentShader: bokeh_shader.fragmentShader,
 					defines: {
 						RINGS: shaderSettings.rings,
-						SAMPLES: shaderSettings.samples,
-						DEPTH_PACKING: 1 // RGBADepth
+						SAMPLES: shaderSettings.samples
 					}
 
 				} );
