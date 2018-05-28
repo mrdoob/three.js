@@ -582,7 +582,7 @@ THREE.MMDAnimationHelper = ( function () {
 		_optimizeIK: function ( mesh, physicsEnabled ) {
 
 			var iks = mesh.geometry.userData.MMD.iks;
-			var bones = mesh.geometry.bones;
+			var bones = mesh.geometry.userData.MMD.bones;
 
 			for ( var i = 0, il = iks.length; i < il; i ++ ) {
 
