@@ -34,8 +34,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.maxZoom = Infinity;
 	
 	// How far you can move horizontally.
-	this.minPan = - Infinity;
-	this.maxPan = Infinity;
+	this.minPanY = - Infinity;
+	this.maxPanY = Infinity;
 
 	// How far you can orbit vertically, upper and lower limits.
 	// Range is 0 to Math.PI radians.
@@ -173,8 +173,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 			spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
 
 			// move target to panned location
-			if ((scope.target.y + panOffset.y > this.minPan) &&
-			   (scope.target.y + panOffset.y < this.maxPan)) {
+			if ((scope.target.y + panOffset.y > this.minPanY) &&
+			   (scope.target.y + panOffset.y < this.maxPanY)) {
 				scope.target.add( panOffset );
 			}
 
