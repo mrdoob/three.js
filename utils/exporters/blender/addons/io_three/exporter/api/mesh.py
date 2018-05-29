@@ -180,7 +180,7 @@ def buffer_normal(mesh, options):
 
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = flip_axes(normal, _XY_Z) if face.use_smooth else flip_axes(face.normal, _XY_Z)
+                vector = flip_axes(normal, XZ_Y) if face.use_smooth else flip_axes(face.normal, XZ_Y)
                 normals_.extend(vector)
 
         # using JSON Loader with skinned mesh
@@ -249,7 +249,7 @@ def buffer_position(mesh, options):
 
             for vertex_index in face.vertices:
                 vertex = mesh.vertices[vertex_index]
-                vector = flip_axes(vertex.co, _XY_Z)
+                vector = flip_axes(vertex.co, XZ_Y)
                 position.extend(vector)
 
         # using JSON Loader with skinned mesh
