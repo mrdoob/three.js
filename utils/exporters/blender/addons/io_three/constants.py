@@ -64,6 +64,7 @@ NUMERIC = {
 JSON = 'json'
 EXTENSION = '.%s' % JSON
 INDENT = 'indent'
+Z_UP = 'z_up'
 
 
 MATERIALS = 'materials'
@@ -181,7 +182,8 @@ EXPORT_OPTIONS = {
     EMBED_ANIMATION: True,
     GEOMETRY_TYPE: BUFFER_GEOMETRY,
     INFLUENCES_PER_VERTEX: 2,
-    INDENT: True
+    INDENT: True,
+    Z_UP: True
 }
 
 

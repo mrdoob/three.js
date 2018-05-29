@@ -125,7 +125,7 @@ def bones(mesh, options):
         func = dispatch[anim_type]
 #        armature.data.pose_position = anim_type.upper()
 
-    bones_, bone_map = func(armature)
+    bones_, bone_map = func(armature, options)
 #    armature.data.pose_position = pose_position
 
     return (bones_, bone_map)
@@ -160,6 +160,7 @@ def buffer_normal(mesh, options):
 
     """
     normals_ = []
+    z_up = options.get(constants.Z_UP, True)
 
     for face in mesh.tessfaces:
         vert_count = len(face.vertices)
@@ -172,7 +173,7 @@ def buffer_normal(mesh, options):
         
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = flip_axes(normal, XZ_Y) if face.use_smooth else flip_axes(face.normal, XZ_Y)
+                vector = flip_axes(normal, XZ_Y if z_up else XYZ) if face.use_smooth else flip_axes(face.normal, XZ_Y if z_up else XYZ)
                 normals_.extend(vector)
 
         # using Object Loader with static mesh
@@ -229,6 +230,7 @@ def buffer_position(mesh, options):
 
     """
     position = []
+    z_up = options.get(constants.Z_UP, True)
 
     for face in mesh.tessfaces:
         vert_count = len(face.vertices)
@@ -241,7 +243,7 @@ def buffer_position(mesh, options):
 
             for vertex_index in face.vertices:
                 vertex = mesh.vertices[vertex_index]
-                vector = flip_axes(vertex.co, XZ_Y)
+                vector = flip_axes(vertex.co, XZ_Y if z_up else XYZ)
                 position.extend(vector)
 
         # using Object Loader with static mesh
@@ -415,6 +417,8 @@ def faces(mesh, options, material_list=None):
 
     faces_data = []
 
+    z_up = options.get(constants.Z_UP, True)
+
     colour_indices = {}
     if vertex_colours:
         logger.debug("Indexing colours")
@@ -504,7 +508,7 @@ def faces(mesh, options, material_list=None):
 
                 for vertex in face.vertices:
                     normal = mesh.vertices[vertex].normal
-                    normal = flip_axes(normal, XZ_Y) if face.use_smooth else flip_axes(face.normal, XZ_Y)
+                    normal = flip_axes(normal, XZ_Y if z_up else XYZ) if face.use_smooth else flip_axes(face.normal, XZ_Y if z_up else XYZ)
                     face_data.append(normal_indices[str(normal)])
                     mask[constants.NORMALS] = True
 
@@ -571,6 +575,7 @@ def morph_targets(mesh, options):
                          frame_step)
 
     morphs = []
+    z_up = options.get(constants.Z_UP, True)
 
     for frame in scene_frames:
         logger.info("Processing data at frame %d", frame)
@@ -582,7 +587,7 @@ def morph_targets(mesh, options):
         if options.get(constants.SCENE, True) and _armature(mesh):
 
             for vertex in vertices_:
-                morphs[-1].extend(flip_axes(vertex.co, XZ_Y))
+                morphs[-1].extend(flip_axes(vertex.co, XZ_Y if z_up else XYZ))
 
         # using Object Loader with static mesh
         elif options.get(constants.SCENE, True) and not _armature(mesh):
@@ -634,6 +639,7 @@ def blend_shapes(mesh, options):
     """
     logger.debug("mesh.blend_shapes(%s, %s)", mesh, options)
     manifest = []
+    z_up = options.get(constants.Z_UP, True)
     if mesh.shape_keys:
         logger.info("mesh.blend_shapes -- there's shape keys")
         key_blocks = mesh.shape_keys.key_blocks
@@ -642,7 +648,7 @@ def blend_shapes(mesh, options):
             morph = []
             for d in key_blocks[key].data:
                 co = d.co
-                morph.extend([co.x, co.y, co.z])
+                morph.extend([co.x, co.z, -co.y] if z_up else [co.x, co.y, co.z])
             manifest.append({
                 constants.NAME: key,
                 constants.VERTICES: morph
@@ -964,12 +970,13 @@ def vertices(mesh, options):
     """
     logger.debug("mesh.vertices(%s)", mesh)
     vertices_ = []
+    z_up = options.get(constants.Z_UP, True)
 
     # using Object Loader with skinned mesh
     if options.get(constants.SCENE, True) and _armature(mesh):
 
         for vertex in mesh.vertices:
-            vertices_.extend(flip_axes(vertex.co, XZ_Y))
+            vertices_.extend(flip_axes(vertex.co, XZ_Y if z_up else XYZ))
 
     # using Object Loader with static mesh
     elif options.get(constants.SCENE, True) and not _armature(mesh):
@@ -1124,6 +1131,7 @@ def _normals(mesh, options):
 
     """
     vectors = []
+    z_up = options.get(constants.Z_UP, True)
 
     vectors_ = {}
     for face in mesh.tessfaces:
@@ -1132,7 +1140,7 @@ def _normals(mesh, options):
 
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = flip_axes(normal, XZ_Y) if face.use_smooth else flip_axes(face.normal, XZ_Y)
+                vector = flip_axes(normal, XZ_Y if z_up else XYZ) if face.use_smooth else flip_axes(face.normal, XZ_Y if z_up else XYZ)
 
                 str_vec = str(vector)
                 try:
@@ -1145,7 +1153,7 @@ def _normals(mesh, options):
 
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = flip_axes(normal,_XY_Z) if face.use_smooth else flip_axes(face.normal,_XY_Z)
+                vector = flip_axes(normal, _XY_Z) if face.use_smooth else flip_axes(face.normal, _XY_Z)
 
                 str_vec = str(vector)
                 try:
@@ -1282,7 +1290,7 @@ def _skinning_data(mesh, bone_map, influences, anim_type, array_index):
     return manifest
 
 
-def _pose_bones(armature):
+def _pose_bones(armature, options):
     """
 
     :param armature:
@@ -1292,6 +1300,7 @@ def _pose_bones(armature):
     bones_ = []
     bone_map = {}
     bone_count = 0
+    z_up = options.get(constants.Z_UP, True)
 
     armature_matrix = armature.matrix_world
     for bone_count, pose_bone in enumerate(armature.pose.bones):
@@ -1321,15 +1330,15 @@ def _pose_bones(armature):
             constants.PARENT: bone_index,
             constants.NAME: armature_bone.name,
 
-            constants.POS: (pos.x, pos.z, -pos.y),
-            constants.ROTQ: (rot.x, rot.z, -rot.y, rot.w),
-            constants.SCL: (scl.x, scl.z, scl.y)
+            constants.POS: (pos.x, pos.z, -pos.y) if z_up else (pos.x, pos.y, pos.z),
+            constants.ROTQ: (rot.x, rot.z, -rot.y, rot.w) if z_up else (rot.x, rot.y, rot.z, rot.w),
+            constants.SCL: (scl.x, scl.z, scl.y) if z_up else (scl.x, scl.y, scl.z),
         })
 
     return bones_, bone_map
 
 
-def _rest_bones(armature):
+def _rest_bones(armature, options):
     """
 
     :param armature:
@@ -1340,6 +1349,7 @@ def _rest_bones(armature):
     bone_map = {}
     bone_count = 0
     bone_index_rel = 0
+    z_up = options.get(constants.Z_UP, True)
 
     for bone in armature.data.bones:
         logger.info("Parsing bone %s", bone.name)
@@ -1367,8 +1377,8 @@ def _rest_bones(armature):
         bone_world_pos = armature.matrix_world * bone_pos
 
         x_axis = bone_world_pos.x
-        y_axis = bone_world_pos.z
-        z_axis = -bone_world_pos.y
+        y_axis = bone_world_pos.z if z_up else bone_world_pos.y
+        z_axis = -bone_world_pos.y if z_up else bone_world_pos.z
 
         logger.debug("Bone pos:%s",str(bone_world_pos))
 

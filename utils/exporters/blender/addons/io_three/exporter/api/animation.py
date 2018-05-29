@@ -70,6 +70,7 @@ def _parse_rest_action(action, armature, options):
     parent_index = -1
     frame_step = options.get(constants.FRAME_STEP, 1)
     fps = context.scene.render.fps
+    z_up = options.get(constants.Z_UP, True)
 
     start = int(start_frame)
     end = int(end_frame / frame_step) + 1
@@ -95,9 +96,9 @@ def _parse_rest_action(action, armature, options):
             sca, schange = _scale(bone, computed_frame,
                                      action, armature.matrix_world)
 
-            pos_x, pos_y, pos_z = pos.x, pos.z, -pos.y
-            rot_x, rot_y, rot_z, rot_w = rot.x, rot.z, -rot.y, rot.w
-            sca_x, sca_y, sca_z = sca.x, sca.z, sca.y
+            pos_x, pos_y, pos_z = pos.x, pos.z, -pos.y if z_up else pos.x, pos.y, pos.z
+            rot_x, rot_y, rot_z, rot_w = rot.x, rot.z, -rot.y, rot.w if z_up else rot.x, rot.y, rot.z, rot.w
+            sca_x, sca_y, sca_z = sca.x, sca.z, sca.y if z_up else sca.x, sca.y, sca.z
 
             if frame == start_frame:
 
@@ -181,6 +182,9 @@ def _parse_pose_action(action, armature, options):
     :param options:
 
     """
+
+    z_up = options.get(constants.Z_UP, True)
+
     try:
         current_context = context.area.type
     except AttributeError:
@@ -302,9 +306,9 @@ def _parse_pose_action(action, armature, options):
             schange = True or has_keyframe_at(
                 channels_scale[bone_index], frame)
 
-            pos = (pos.x, pos.z, -pos.y)
-            rot = (rot.x, rot.z, -rot.y, rot.w)
-            scl = (scl.x, scl.z, scl.y)
+            pos = (pos.x, pos.z, -pos.y) if z_up else (pos.x, pos.y, pos.z)
+            rot = (rot.x, rot.z, -rot.y, rot.w) if z_up else (rot.x, rot.y, rot.z, rot.w)
+            scl = (scl.x, scl.z, scl.y) if z_up else (scl.x, scl.y, scl.z)
 
             keyframe = {constants.TIME: time}
             if frame == start_frame or frame == end_frame:

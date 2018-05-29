@@ -542,8 +542,10 @@ def extract_mesh(obj, options, recalculate=False):
             shp = original_mesh.shape_keys
 
             animCurves = shp.animation_data
-            if animCurves:
+            if animCurves and animCurves.action:
                 animCurves = animCurves.action.fcurves
+            else:
+                animCurves = None
 
             src_kbs = shp.key_blocks
             for key in src_kbs.keys():

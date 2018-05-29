@@ -377,6 +377,10 @@ def restore_export_settings(properties, settings):
     properties.option_indent = settings.get(
         constants.INDENT,
         constants.EXPORT_OPTIONS[constants.INDENT])
+    
+    properties.option_z_up = settings.get(
+        constants.Z_UP,
+        constants.EXPORT_OPTIONS[constants.Z_UP])
 
     properties.option_export_textures = settings.get(
         constants.EXPORT_TEXTURES,
@@ -480,6 +484,7 @@ def set_settings(properties):
         constants.LOGGING: properties.option_logging,
         constants.COMPRESSION: properties.option_compression,
         constants.INDENT: properties.option_indent,
+        constants.Z_UP: properties.option_z_up,
         constants.EXPORT_TEXTURES: properties.option_export_textures,
         constants.EMBED_TEXTURES: properties.option_embed_textures,
         constants.TEXTURE_FOLDER: properties.option_texture_folder,
@@ -764,6 +769,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name="Indent JSON",
         description="Disable this to reduce the file size",
         default=constants.EXPORT_OPTIONS[constants.INDENT])
+    
+    option_z_up = BoolProperty(
+        name="Convert to Z Up",
+        description="Turn Z direction to up",
+        default=constants.EXPORT_OPTIONS[constants.Z_UP])
 
     option_compression = EnumProperty(
         name="",
@@ -1009,6 +1019,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = box.row()
         row.prop(self.properties, 'option_indent')
+
+        row = box.row()
+        row.prop(self.properties, 'option_z_up')
 
         row = box.row()
         row.label(text="Logging verbosity:")
