@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - instancing - lambert shader</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			color: #ffffff;
+			font-family: Monospace;
+			font-size: 13px;
+			text-align: center;
+			font-weight: bold;
+			background-color: #000000;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		#info {
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			padding: 5px;
+		}
+
+		a {
+			color: #ffffff;
+		}
+
+		#notSupported {
+			width: 50%;
+			margin: auto;
+			border: 2px red solid;
+			margin-top: 20px;
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="container"></div>
+	<div id="info">
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - instancing - lambert shader
+		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
+	</div>
+
+	<script src="../build/three.js"></script>
+	<script src="js/Detector.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/CurveExtras.js"></script>
+	<script src="js/libs/dat.gui.min.js"></script>
+
+
+	<script>
+		/*eslint-disable*/
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+		/**
+		 * Requirement:
+		 * 
+		 *   Render the same geometry multiple times with varying scale and position.
+		 *
+		 * Problem:
+		 *
+		 *   Rendering a scene graph with multiple Mesh objects sharing the same geometry
+		 *   causes many draw calls to happen, incurring overhead.
+		 *
+		 * Solution:
+		 *
+		 *   Use instancing with InstancedBufferGeometry to draw multiple instances within
+		 *   one draw call.
+		 *
+		 * Pitfall:
+		 *
+		 *   Instancing requires GLSL code not present in built-in materials in order to work.
+		 *
+		 * Solution:
+		 *
+		 *   Couple additional GLSL code with materials, and inject it at parse time into the built-in materials.
+		 *   
+		 */
+
+
+		/**
+		 * All the built in materials are based on shader templates that can be found here:
+		 * https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderLib
+		 *
+		 * Each Material consists of a vertex and fragment shader which are suffixed with _vert and _frag.
+		 *
+		 * These templates consist of a list of #include statements which point to various GLSL chunks that
+		 * can be found here:
+		 * https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderChunk
+		 *
+		 * Some of the functionality overlaps, for example the MeshStandardMaterial is much more complex than
+		 * MeshBasicMaterial, but both need to perform the same discrete steps for basic 3d transformations.
+		 * 
+		 */
+		
+
+		/**
+		 * We want to perform instancing in lieu of setting Mesh.position.
+		 * A chunk present in most of the vertex shaders is:
+		 * https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/begin_vertex.glsl
+		 *
+		 * This is one line of GLSL code:
+		 *
+		 * vec3 transformed = vec3( position );
+		 *
+		 * It declares a vec3 variable called "transformed" and copies the value from the position buffer.
+		 * After this chunk executes, "transformed" holds the value from Geometry.vertices, this is referred to
+		 * as "model space".
+		 *
+		 * The next stage of the transformation uses the "modelViewMatrix" to transform the vertex into view space.
+		 * https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/project_vertex.glsl
+		 *
+		 * The modelViewMatrix is derived from the data we set with Mesh.position. We can insert another level
+		 * of transformation in between this. The Mesh doing the instancing assumes the role of a Group, and a 
+		 * buffer on InstancedBufferGeometry assumes the role of many Mesh objects that are a child of that Group.
+		 * 
+		 */
+		
+
+		//we will need some kind of input to the shader
+		//this example will set a uniform scale and a position offset
+		var global_instance_chunk = 
+		`
+		attribute vec3 instanceOffset; 
+		attribute float instanceScale;
+		`
+
+		//after the shader fetches the vertex in model space 
+		//we will add another step that varies between instances
+		var after_vertex_transform = 
+		`
+		transformed *= instanceScale; //the value present in transformed is in model space, 
+		transformed = transformed + instanceOffset;
+		`
+
+		//materials will call this callback before three.js parses the shader and before the shader is compiled
+		var onBeforeCompile = function ( shader ) {
+
+			//place the GLSL for uniforms outside of main (by prepending the entire shader)
+			shader.vertexShader = global_instance_chunk  + '\n' +  shader.vertexShader
+
+			shader.vertexShader = shader.vertexShader.replace(
+				'#include <begin_vertex>',
+				`
+				#include <begin_vertex>    //we keep the model space transform
+				${after_vertex_transform}  //and add an additional step
+				`
+			)
+		}
+
+		var renderer, scene, camera, controls, materials, meshesDictionary, meshesArray;
+		var stats;
+		var guiData = { material: 'MeshNormal' }
+
+		init();
+		initGUI();
+		animate();
+
+		function onMaterialChange( value ) {
+				
+			for( var i = 0 ; i < meshesArray.length ; i ++ ){
+
+				meshesArray[i].visible = meshesArray[i].name === value
+
+			}
+
+		} 
+
+		function initGUI(){
+
+			var gui = new dat.GUI();
+
+			gui.add( 
+
+				guiData, 
+				'material', 
+				[
+					'MeshLambert',
+					'MeshNormal',
+					'MeshBasic',
+					'MeshPhong',
+					'MeshStandard',
+					'MeshToon',
+				] 
+
+			).onChange(onMaterialChange);
+			
+			onMaterialChange(guiData.material)
+		}
+
+		function init() {
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.shadowMap.enabled = true;
+			document.body.appendChild( renderer.domElement );
+
+			renderer.gammaOutput = true;
+
+			scene = new THREE.Scene();
+
+			scene.fog = new THREE.FogExp2( 0x000000, 0.004 );
+			renderer.setClearColor( scene.fog.color, 1 );
+
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera.position.set( 80, 40, 80 );
+
+			scene.add( camera );
+
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.enableZoom = false;
+			controls.maxPolarAngle = Math.PI / 2;
+
+			scene.add( new THREE.AmbientLight( 0xffffff, 0.7 ) );
+
+			var light = new THREE.DirectionalLight( 0xffffff, 0.4 );
+			light.position.set( 50, 40, 0 );
+
+			light.castShadow = true;
+			light.shadow.camera.left = - 40;
+			light.shadow.camera.right = 40;
+			light.shadow.camera.top = 40;
+			light.shadow.camera.bottom = - 40;
+			light.shadow.camera.near = 10;
+			light.shadow.camera.far = 180;
+
+			light.shadow.bias = - 0.001;
+			light.shadow.mapSize.width = 512;
+			light.shadow.mapSize.height = 512;
+
+			scene.add( light );
+
+
+			// instanced buffer geometry
+
+			var geometry = new THREE.InstancedBufferGeometry();
+			geometry.copy( new THREE.TorusBufferGeometry( 2, 0.5, 8, 128 ) );
+
+			//this would cause 256 draw calls to happen if we used multiple Mesh objects
+			const INSTANCES = 256;
+
+			var knot = new THREE.Curves.TorusKnot( 10 );
+			var positions = knot.getSpacedPoints( INSTANCES );
+
+			var offsets = new Float32Array( INSTANCES * 3 ); // xyz
+			var colors = new Float32Array( INSTANCES * 3 ); // rgb
+			var scales = new Float32Array( INSTANCES * 1 ); // s
+
+			var color = new THREE.Color();
+
+			for ( var i = 0, l = INSTANCES; i < l; i ++ ) {
+
+				var index = 3 * i;
+
+				// per-instance position offset
+				offsets[ index ] = positions[ i ].x;
+				offsets[ index + 1 ] = positions[ i ].y;
+				offsets[ index + 2 ] = positions[ i ].z;
+
+				// per-instance scale variation
+				scales[ i ] = 1 + 0.5 * Math.sin( 32 * Math.PI * i / INSTANCES );
+
+			}
+
+			geometry.addAttribute( 'instanceOffset', new THREE.InstancedBufferAttribute( offsets, 3 ) );
+			geometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( scales, 1 ) );
+
+
+			//an environment map
+			var envMap = new THREE.TextureLoader().load( `textures/metal.jpg`, function ( texture ) {
+
+				texture.mapping = THREE.SphericalReflectionMapping;
+				texture.encoding = THREE.sRGBEncoding;
+				if ( mesh ) mesh.material.needsUpdate = true;
+
+			} );
+
+			//create an instance of a depth material for this effect
+			var customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking })
+			
+			//extend it
+			customDepthMaterial.onBeforeCompile = onBeforeCompile
+
+			//create an instance of various types of materials
+			materials = {
+
+				MeshLambert: new THREE.MeshLambertMaterial( {
+
+					color: 0xffb54a,
+					envMap: envMap,
+					combine: THREE.MultiplyOperation,
+					reflectivity: 0.8,
+					fog: true
+
+				} ),
+
+				MeshNormal: new THREE.MeshNormalMaterial(),
+
+				MeshBasic: new THREE.MeshBasicMaterial({ color: 'red' }),
+
+				MeshPhong: new THREE.MeshPhongMaterial({ 
+					color: 0xffb54a,
+					envMap: envMap,
+					fog: true
+				}),
+
+				MeshStandard: new THREE.MeshStandardMaterial({
+					color: 0xffb54a,
+					envMap: envMap,
+					metalness: 1,
+					roughness: 0,
+					fog: true
+				}),
+
+				MeshToon: new THREE.MeshToonMaterial({
+					color: 0xffb54a,
+					envMap: envMap,
+				})
+
+			}
+
+			meshesDictionary = {}
+			meshesArray = []
+
+			//extend these materials
+			for ( materialName in materials ) {
+
+				materials[materialName].onBeforeCompile = onBeforeCompile
+
+				//create a mesh for each
+				var mesh = new THREE.Mesh( geometry, materials[materialName] );
+				mesh.name = materialName
+				mesh.scale.set( 1, 1, 2 );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				mesh.customDepthMaterial = customDepthMaterial;
+				mesh.frustumCulled = false;
+
+				meshesDictionary[materialName] = mesh 
+				meshesArray.push(mesh)
+				scene.add( mesh );
+
+			}
+
+
+			//
+
+			var ground = new THREE.Mesh(
+				new THREE.PlaneBufferGeometry( 800, 800 ).rotateX( - Math.PI / 2 ),
+				new THREE.MeshPhongMaterial( { color: 0x888888 } )
+			);
+			ground.position.set( 0, - 40, 0 );
+			ground.receiveShadow = true;
+
+			scene.add( ground );
+
+			//
+
+			stats = new Stats();
+			document.body.appendChild( stats.dom );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize( event ) {
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			for( var i = 0 ; i < meshesArray.length ; i++ ){
+				meshesArray[i].rotation.y += 0.005
+			}
+
+			stats.update();
+
+			renderer.render( scene, camera );
+
+		}
+
+
+	</script>
+
+</body>
+
+</html>
