@@ -125,6 +125,8 @@ Object.assign( Matrix4.prototype, {
 
 		return function extractRotation( m ) {
 
+			// this method does not support reflection matrices
+
 			var te = this.elements;
 			var me = m.elements;
 
@@ -135,14 +137,22 @@ Object.assign( Matrix4.prototype, {
 			te[ 0 ] = me[ 0 ] * scaleX;
 			te[ 1 ] = me[ 1 ] * scaleX;
 			te[ 2 ] = me[ 2 ] * scaleX;
+			te[ 3 ] = 0;
 
 			te[ 4 ] = me[ 4 ] * scaleY;
 			te[ 5 ] = me[ 5 ] * scaleY;
 			te[ 6 ] = me[ 6 ] * scaleY;
+			te[ 7 ] = 0;
 
 			te[ 8 ] = me[ 8 ] * scaleZ;
 			te[ 9 ] = me[ 9 ] * scaleZ;
 			te[ 10 ] = me[ 10 ] * scaleZ;
+			te[ 11 ] = 0;
+
+			te[ 12 ] = 0;
+			te[ 13 ] = 0;
+			te[ 14 ] = 0;
+			te[ 15 ] = 1;
 
 			return this;
 
