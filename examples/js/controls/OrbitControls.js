@@ -32,6 +32,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// How far you can zoom in and out ( OrthographicCamera only )
 	this.minZoom = 0;
 	this.maxZoom = Infinity;
+	
+	// How far you can move horizontally.
+	this.minPan = - Infinity;
+	this.maxPan = Infinity;
 
 	// How far you can orbit vertically, upper and lower limits.
 	// Range is 0 to Math.PI radians.
@@ -169,7 +173,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 			spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
 
 			// move target to panned location
-			scope.target.add( panOffset );
+			if ((scope.target.y + panOffset.y > this.minPan) &&
+			   (scope.target.y + panOffset.y < this.maxPan)) {
+				scope.target.add( panOffset );
+			}
 
 			offset.setFromSpherical( spherical );
 
