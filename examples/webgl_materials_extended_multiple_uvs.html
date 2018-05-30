@@ -59,22 +59,44 @@
 
 
 		var renderer, scene, camera, controls, materials, mesh;
-		var stats;
+		var stats, gui, guiProps;
 		var guiData = { material: 'MeshStandard' }
 
 		init();
-		initGUI();
 		animate();
+
+		var guis = []
 
 		function onMaterialChange( value ) {
 				
+			while(guis.length){
+				guiProps.remove(guis.pop())
+			}
 			mesh.material = materials[value]
+
+			var u = function(){
+				for (var i = mesh.material.userData.extraProps.length - 1; i >= 0; i--) {
+					var n = mesh.material.userData.extraProps[i]
+					guis.push( guiProps.add(mesh.material[`${n}Offset`],'x', 0, 5).name(`${n}Offset U`) )
+					guis.push( guiProps.add(mesh.material[`${n}Offset`],'y', 0, 5).name(`${n}Offset V`) )
+					guis.push( guiProps.add(mesh.material[`${n}Scale`],'x', 0, 5).name(`${n}Scale U`) )
+					guis.push( guiProps.add(mesh.material[`${n}Scale`],'y', 0, 5).name(`${n}Scale V`) )
+				}
+			}
+
+			if(!mesh.material.userData.extraProps){
+				setTimeout(u,100)
+			} else {
+				u()
+			}
 
 		} 
 
+
+
 		function initGUI(){
 
-			var gui = new dat.GUI();
+			gui = new dat.GUI()
 
 			gui.add( 
 
@@ -85,10 +107,15 @@
 					'MeshStandard',
 				] 
 
-			).onChange(onMaterialChange);
+			).onChange(onMaterialChange)
+
+			guiProps = gui.addFolder('texture controls')
+			guiProps.open()
 			
 			onMaterialChange(guiData.material)
+
 		}
+
 
 		function init() {
 
@@ -161,7 +188,10 @@
 
 				texture.mapping = THREE.SphericalReflectionMapping;
 				texture.encoding = THREE.sRGBEncoding;
-				if ( mesh ) mesh.material.needsUpdate = true;
+
+				mesh = new THREE.Mesh( new THREE.SphereGeometry(10,32,16), materials[guiData.material] )
+
+				scene.add( mesh );
 
 			} );
 
@@ -171,15 +201,17 @@
 				MeshPhong: new THREE.MeshPhongMaterial({ 
 					color: 0xffb54a,
 					envMap: envMap,
-					fog: true
+					fog: true,
+					transparent: true
 				}),
 
 				MeshStandard: new THREE.MeshStandardMaterial({
 					color: 0xffb54a,
 					envMap: envMap,
 					metalness: 1,
-					roughness: 0,
-					fog: true
+					roughness: 1,
+					fog: true,
+					transparent: true
 				}),
 
 			}
@@ -228,19 +260,53 @@
 
 				var level = 1
 
+				const extraUniforms = {}
+				this.userData.extraUniforms = extraUniforms
+
+				const extraProps = []
+				this.userData.extraProps = extraProps
+
+				var _this = this
+
 				function replaceMaps( string ){
 
 					function replace( match, mapName ) {
 
 						if(!validMaps[mapName]) return match
 
-						var uniformName = `u_${mapName}ScaleOffset`
-						// shader.uniforms[uniformName] = { value: new THREE.Vector4(1,1,0,0) }
-						shader.uniforms[uniformName] = { value: new THREE.Vector4(level,level,level*0.25,level*0.25) }
+
+						var uniformNameScale = `u_${mapName}Scale`
+						var uniformNameOffset = `u_${mapName}Offset`
+
+						var uniformScale = { value: new THREE.Vector2(level,level) }
+						var uniformOffset = { value: new THREE.Vector2(level*0.25,level*0.25) }
+
+						shader.uniforms[uniformNameScale] = uniformScale
+						extraUniforms[uniformNameScale ] = uniformScale 
+						shader.uniforms[uniformNameOffset] = uniformOffset
+						extraUniforms[uniformNameOffset ] = uniformOffset 
+
 						level++
-						prependUniforms += `uniform vec4 ${uniformName};\n`
-						
-						var replace = `texture2D( ${mapName}, vUv * ${uniformName}.xy + ${uniformName}.zw )`
+						prependUniforms += `uniform vec2 ${uniformNameScale};\n`
+						prependUniforms += `uniform vec2 ${uniformNameOffset};\n`
+
+						extraProps.push(mapName)
+						var foo = {
+							[`${mapName}Scale`]: {
+								get: function(){ return extraUniforms[uniformNameScale].value },
+								set: function(val){ extraUniforms[uniformNameScale].value.copy(val) }
+							},
+							[`${mapName}Offset`]: {
+								get: function(){ return extraUniforms[uniformNameOffset].value },
+								set: function(val){ extraUniforms[uniformNameOffset].value.copy(val) }
+							}
+						}
+						Object.defineProperties(
+							_this,
+							foo
+						)
+
+						var replace = `texture2D( ${mapName}, vUv * ${uniformNameScale} + ${uniformNameOffset} )`
 						return replaceMaps( replace ) 
 					}
 
@@ -252,6 +318,8 @@
 
 				shader.fragmentShader = prependUniforms + shader.fragmentShader
 
+				//init here so it can take params
+				if(!gui) initGUI()
 			}
 
 			//extend these materials
@@ -262,19 +330,12 @@
 				for ( var map in validMaps ){
 					if(material[map] === null) {
 						material[map] = texture
-						console.log(material[map])
 					}
 				}
 
-				materials[materialName].onBeforeCompile = onBeforeCompile
+				material.onBeforeCompile = onBeforeCompile.bind( material )
 
 			}
-
-
-			mesh = new THREE.Mesh( new THREE.SphereGeometry(10,32,16), materials[guiData.material] )
-
-
-			scene.add( mesh );
 
 		}
 
@@ -291,7 +352,7 @@
 
 			requestAnimationFrame( animate );
 
-			mesh.rotation.y += 0.005
+			if(mesh) mesh.rotation.y += 0.005
 
 			stats.update();
 
