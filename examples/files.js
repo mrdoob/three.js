@@ -342,6 +342,7 @@ var files = {
 		"misc_controls_transform",
 		"misc_exporter_gltf",
 		"misc_exporter_obj",
+		"misc_exporter_stl",
 		"misc_fps",
 		"misc_lights_test",
 		"misc_lookat",
