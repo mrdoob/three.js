@@ -62,7 +62,8 @@
 		var stats, gui, guiProps, guiMap;
 		var guiData = { material: 'MeshStandard', map: 'map' }
 
-		init();
+		initStuff()
+		initExtension()
 		animate();
 
 		var guis = []
@@ -129,7 +130,7 @@
 		}
 
 
-		function init() {
+		function initStuff() {
 
 			//share with other extended examples?
 			// -----------------------------------------------------------------------------
@@ -189,7 +190,9 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			// -----------------------------------------------------------------------------
-			
+		}
+
+		function initExtension() {
 
 			// some textures ----------------------------------------------------------------------
 			
