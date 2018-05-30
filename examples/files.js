@@ -360,6 +360,9 @@ var files = {
 		"css3d_sprites",
 		"css3d_youtube"
 	],
+	"css2d": [
+		"css2d_label"
+	],
 	"canvas": [
 		"canvas_ascii_effect",
 		"canvas_camera_orthographic",
