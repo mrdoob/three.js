@@ -82,14 +82,14 @@
 				scene.background = new THREE.Color( 0xffffff );
 
 				var gridHelper = new THREE.PolarGridHelper( 30, 10 );
-				gridHelper.position.y = -10;
+				gridHelper.position.y = - 10;
 				scene.add( gridHelper );
 
 				var ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0x887766 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				//
@@ -108,14 +108,18 @@
 
 				// model
 
-				var onProgress = function ( xhr ) {
+				function onProgress( xhr ) {
+
 					if ( xhr.lengthComputable ) {
+
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
 					}
+
 				};
 
-				var onError = function ( xhr ) {
+				function onError( xhr ) {
 				};
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
@@ -130,7 +134,7 @@
 				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
 
 					mesh = mmd.mesh;
-					mesh.position.y = -10;
+					mesh.position.y = - 10;
 					scene.add( mesh );
 
 					helper.add( mesh, {
@@ -157,7 +161,7 @@
 				var phongMaterials;
 				var originalMaterials;
 
-				function makePhongMaterials ( materials ) {
+				function makePhongMaterials( materials ) {
 
 					var array = [];
 
@@ -175,7 +179,7 @@
 
 				}
 
-				function initGui () {
+				function initGui() {
 
 					var api = {
 						'animation': true,
