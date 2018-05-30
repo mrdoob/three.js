@@ -1,6 +1,8 @@
 /**
  * @author kovacsv / http://kovacsv.hu/
  * @author mrdoob / http://mrdoob.com/
+ * @author mudcube / http://mudcu.be/
+ * @author Mugen87 / https://github.com/Mugen87
  *
  * Usage:
  *  var exporter = new THREE.STLExporter();
