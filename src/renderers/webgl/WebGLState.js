@@ -657,7 +657,7 @@ function WebGLState( gl, extensions, utils ) {
 
 		( material.blending === NormalBlending && material.transparent === false )
 			? setBlending( NoBlending )
-			: setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )
+			: setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
 
 		depthBuffer.setFunc( material.depthFunc );
 		depthBuffer.setTest( material.depthTest );
