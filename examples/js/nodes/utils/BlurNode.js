@@ -59,15 +59,15 @@ THREE.BlurNode.prototype.updateFrame = function ( frame ) {
 
 	if ( this.size ) {
 
-		this.horizontal.number = this.radius.x / this.size.x;
-		this.vertical.number = this.radius.y / this.size.y;
+		this.horizontal.value = this.radius.x / this.size.x;
+		this.vertical.value = this.radius.y / this.size.y;
 
 	} else if ( this.value.value && this.value.value.image ) {
 
 		var image = this.value.value.image;
 
-		this.horizontal.number = this.radius.x / image.width;
-		this.vertical.number = this.radius.y / image.height;
+		this.horizontal.value = this.radius.x / image.width;
+		this.vertical.value = this.radius.y / image.height;
 
 	}
 

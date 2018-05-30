@@ -10,6 +10,7 @@ var list = {
 			"How to run things locally": "manual/introduction/How-to-run-things-locally",
 			"Drawing Lines": "manual/introduction/Drawing-lines",
 			"Creating Text": "manual/introduction/Creating-text",
+			"Loading 3D Models": "manual/introduction/Loading-3D-models",
 			"Migration Guide": "manual/introduction/Migration-guide",
 			"Code Style Guide": "manual/introduction/Code-style-guide",
 			"FAQ": "manual/introduction/FAQ",
@@ -337,6 +338,12 @@ var list = {
 
 	"Examples": {
 
+		"Animations": {
+			"CCDIKSolver": "examples/animations/CCDIKSolver",
+			"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
+			"MMDPhysics": "examples/animations/MMDPhysics"
+		},
+
 		"Controls": {
 			"OrbitControls": "examples/controls/OrbitControls"
 		},
@@ -350,6 +357,7 @@ var list = {
 		"Loaders": {
 			"BabylonLoader": "examples/loaders/BabylonLoader",
 			"GLTFLoader": "examples/loaders/GLTFLoader",
+			"MMDLoader": "examples/loaders/MMDLoader",
 			"MTLLoader": "examples/loaders/MTLLoader",
 			"OBJLoader": "examples/loaders/OBJLoader",
 			"OBJLoader2": "examples/loaders/OBJLoader2",
@@ -366,7 +374,8 @@ var list = {
 		},
 
 		"Exporters": {
-			"GLTFExporter": "examples/exporters/GLTFExporter"
+			"GLTFExporter": "examples/exporters/GLTFExporter",
+			"PLYExporter": "examples/exporters/PLYExporter"
 		},
 
 		"Plugins": {

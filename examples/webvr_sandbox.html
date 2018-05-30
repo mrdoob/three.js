@@ -47,7 +47,7 @@
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 
-				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
+				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 150, 20 );
 				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = 0.75;
@@ -56,7 +56,7 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var geometry = new THREE.BoxGeometry( 1.5, 0.1, 1.5 );
+				var geometry = new THREE.BoxBufferGeometry( 1.5, 0.1, 1.5 );
 				var material = new THREE.MeshPhongMaterial();
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 0.2;
@@ -114,7 +114,7 @@
 				reflector.rotation.y = - Math.PI / 4;
 				scene.add( reflector );
 
-				var geometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
+				var geometry = new THREE.BoxBufferGeometry( 1.5, 1.5, 0.1 );
 				var material = new THREE.MeshPhongMaterial();
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.z = - 0.07;
@@ -125,7 +125,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x000000 );
+				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -151,7 +151,7 @@
 
 			function animate() {
 
-				renderer.animate( render );
+				renderer.setAnimationLoop( render );
 
 			}
 

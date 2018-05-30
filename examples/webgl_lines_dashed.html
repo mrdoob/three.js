@@ -66,7 +66,7 @@
 				var spline = new THREE.CatmullRomCurve3( points );
 
 				var samples = spline.getPoints( points.length * subdivisions );
-				var geometrySpline = new THREE.Geometry().setFromPoints( samples );
+				var geometrySpline = new THREE.BufferGeometry().setFromPoints( samples );
 
 				var line = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
 				line.computeLineDistances();

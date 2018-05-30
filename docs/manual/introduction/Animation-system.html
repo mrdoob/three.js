@@ -35,11 +35,11 @@
 		<p class="desc">
 
 			If you have successfully imported an animated 3D object (it doesn't matter if it has
-			bones or morph targets or both) - for example exporting it from Blender with the
-			[link:https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/addons/io_three Blender exporter] and
-			loading it into a three.js scene using [page:JSONLoader] -, one of the geometry's
-			properties of the loaded mesh should be an array named "animations", containing the
-			[page:AnimationClip AnimationClips] for this model (see a list of possible loaders below).<br /><br />
+			bones or morph targets or both) — for example exporting, it from Blender with the
+			[link:https://github.com/KhronosGroup/glTF-Blender-Exporter glTF Blender exporter] and
+			loading it into a three.js scene using [page:GLTFLoader] — one of the response fields
+			should be an array named "animations", containing the [page:AnimationClip AnimationClips]
+			for this model (see a list of possible loaders below).<br /><br />
 
 			Each *AnimationClip* usually holds the data for a certain activity of the object. If the
 			mesh is a character, for example, there may be one AnimationClip for a walkcycle, a second

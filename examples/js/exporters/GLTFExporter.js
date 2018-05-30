@@ -66,6 +66,7 @@ THREE.GLTFExporter.prototype = {
 	parse: function ( input, onDone, options ) {
 
 		var DEFAULT_OPTIONS = {
+			binary: false,
 			trs: false,
 			onlyVisible: true,
 			truncateDrawRange: true,
@@ -322,6 +323,29 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			return arrayBuffer;
+
+		}
+
+		/**
+		 * Serializes a userData.
+		 *
+		 * @param {THREE.Object3D|THREE.Material} object
+		 * @returns {Object}
+		 */
+		function serializeUserData( object ) {
+
+			try {
+
+				return JSON.parse( JSON.stringify( object.userData ) );
+
+			} catch ( error ) {
+
+				console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' +
+					'won\'t be serialized because of JSON.stringify error - ' + error.message );
+
+				return {};
+
+			}
 
 		}
 
@@ -936,6 +960,12 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			if ( Object.keys( material.userData ).length > 0 ) {
+
+				gltfMaterial.extras = serializeUserData( material );
+
+			}
+
 			outputJSON.materials.push( gltfMaterial );
 
 			var index = outputJSON.materials.length - 1;
@@ -1152,6 +1182,8 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			var extras = ( Object.keys( geometry.userData ).length > 0 ) ? serializeUserData( geometry ) : undefined;
+
 			var forceIndices = options.forceIndices;
 			var isMultiMaterial = Array.isArray( mesh.material );
 
@@ -1192,6 +1224,8 @@ THREE.GLTFExporter.prototype = {
 					mode: mode,
 					attributes: attributes,
 				};
+
+				if ( extras ) primitive.extras = extras;
 
 				if ( targets.length > 0 ) primitive.targets = targets;
 
@@ -1512,15 +1546,7 @@ THREE.GLTFExporter.prototype = {
 
 			if ( object.userData && Object.keys( object.userData ).length > 0 ) {
 
-				try {
-
-					gltfNode.extras = JSON.parse( JSON.stringify( object.userData ) );
-
-				} catch ( e ) {
-
-					throw new Error( 'THREE.GLTFExporter: userData can\'t be serialized' );
-
-				}
+				gltfNode.extras = serializeUserData( object );
 
 			}
 

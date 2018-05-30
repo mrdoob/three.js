@@ -121,11 +121,17 @@ var color = new THREE.Color( 1, 0, 0 );
 			Copies the [page:.r r], [page:.g g] and [page:.b b] parameters from [page:Color color] in to this color.
 		</p>
 
-		<h3>[method:Color convertGammaToLinear]() </h3>
-		<p>Converts this color from gamma to linear space by squaring the values of [page:.r r], [page:.g g] and [page:.b b] ).</p>
-
-		<h3>[method:Color convertLinearToGamma]() </h3>
-		<p>Converts this color from linear to gamma space by taking the square root of [page:.r r], [page:.g g] and [page:.b b]).</p>
+		<h3>[method:Color convertGammaToLinear]( [param:Float gammaFactor] ) </h3>
+		<p>
+		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
+		Converts this color from gamma to linear space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
+		</p>
+		
+		<h3>[method:Color convertLinearToGamma]( [param:Float gammaFactor] ) </h3>
+		<p>
+		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
+		Converts this color from linear to gamma space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of 1 / [page:Float gammaFactor].
+		</p>
 
 		<h3>[method:Color copyGammaToLinear]( [param:Color color], [param:Float gammaFactor] ) </h3>
 		<p>
