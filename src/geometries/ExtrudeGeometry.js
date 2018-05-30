@@ -49,6 +49,17 @@ function ExtrudeGeometry( shapes, options ) {
 ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
 ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
 
+ExtrudeGeometry.prototype.toJSON = function () {
+
+	var data = Geometry.prototype.toJSON.call( this );
+
+	var shapes = this.parameters.shapes;
+	var options = this.parameters.options;
+
+	return toJSON( shapes, options, data );
+
+};
+
 // ExtrudeBufferGeometry
 
 function ExtrudeBufferGeometry( shapes, options ) {
@@ -717,6 +728,19 @@ function ExtrudeBufferGeometry( shapes, options ) {
 ExtrudeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 ExtrudeBufferGeometry.prototype.constructor = ExtrudeBufferGeometry;
 
+ExtrudeBufferGeometry.prototype.toJSON = function () {
+
+	var data = BufferGeometry.prototype.toJSON.call( this );
+
+	var shapes = this.parameters.shapes;
+	var options = this.parameters.options;
+
+	return toJSON( shapes, options, data );
+
+};
+
+//
+
 var WorldUVGenerator = {
 
 	generateTopUV: function ( geometry, vertices, indexA, indexB, indexC ) {
@@ -773,6 +797,36 @@ var WorldUVGenerator = {
 
 	}
 };
+
+function toJSON( shapes, options, data ) {
+
+	//
+
+	data.shapes = [];
+
+	if ( Array.isArray( shapes ) ) {
+
+		for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+
+			var shape = shapes[ i ];
+
+			data.shapes.push( shape.uuid );
+
+		}
+
+	} else {
+
+		data.shapes.push( shapes.uuid );
+
+	}
+
+	//
+
+	if ( options.extrudePath !== undefined ) data.options.extrudePath = options.extrudePath.toJSON();
+
+	return data;
+
+}
 
 
 export { ExtrudeGeometry, ExtrudeBufferGeometry };
