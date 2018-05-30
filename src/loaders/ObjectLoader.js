@@ -104,7 +104,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			}
 
-			scope.parse( json, onLoad );
+			onLoad( scope.parse( json ) );
 
 		}, onProgress, onError );
 
@@ -124,16 +124,12 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parse: function ( json, onLoad ) {
+	parse: function ( json ) {
 
 		var shapes = this.parseShape( json.shapes );
 		var geometries = this.parseGeometries( json.geometries, shapes );
 
-		var images = this.parseImages( json.images, function () {
-
-			if ( onLoad !== undefined ) onLoad( object );
-
-		} );
+		var images = this.parseImages( json.images );
 
 		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
@@ -143,12 +139,6 @@ Object.assign( ObjectLoader.prototype, {
 		if ( json.animations ) {
 
 			object.animations = this.parseAnimations( json.animations );
-
-		}
-
-		if ( json.images === undefined || json.images.length === 0 ) {
-
-			if ( onLoad !== undefined ) onLoad( object );
 
 		}
 
@@ -503,31 +493,13 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parseImages: function ( json, onLoad ) {
+	parseImages: function ( json ) {
 
-		var scope = this;
 		var images = {};
-
-		function loadImage( url ) {
-
-			scope.manager.itemStart( url );
-
-			return loader.load( url, function () {
-
-				scope.manager.itemEnd( url );
-
-			}, undefined, function () {
-
-				scope.manager.itemEnd( url );
-				scope.manager.itemError( url );
-
-			} );
-
-		}
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			var manager = new LoadingManager( onLoad );
+			var manager = new LoadingManager( this.loadingManager );
 
 			var loader = new ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
@@ -535,9 +507,9 @@ Object.assign( ObjectLoader.prototype, {
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
 				var image = json[ i ];
-				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
+				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : this.texturePath + image.url;
 
-				images[ image.uuid ] = loadImage( path );
+				images[ image.uuid ] = loader.load( path );
 
 			}
 
@@ -580,7 +552,6 @@ Object.assign( ObjectLoader.prototype, {
 				}
 
 				var texture = new Texture( images[ data.image ] );
-				texture.needsUpdate = true;
 
 				texture.uuid = data.uuid;
 
@@ -611,6 +582,26 @@ Object.assign( ObjectLoader.prototype, {
 				textures[ data.uuid ] = texture;
 
 			}
+
+		}
+
+		// ensure "texture.needsUpdate" is set when images are loaded
+
+		for ( var i in images ) {
+
+			var image = images[ i ];
+
+			image.addEventListener( 'load', function ( event ) {
+
+				for ( var t in textures ) {
+
+					var texture = textures[ t ];
+
+					if ( texture.image === event.target ) texture.needsUpdate = true;
+
+				}
+
+			} );
 
 		}
 
