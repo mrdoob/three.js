@@ -59,8 +59,8 @@
 
 
 		var renderer, scene, camera, controls, materials, mesh;
-		var stats, gui, guiProps;
-		var guiData = { material: 'MeshStandard' }
+		var stats, gui, guiProps, guiMap;
+		var guiData = { material: 'MeshStandard', map: 'map' }
 
 		init();
 		animate();
@@ -68,20 +68,37 @@
 		var guis = []
 
 		function onMaterialChange( value ) {
-				
-			while(guis.length){
-				guiProps.remove(guis.pop())
-			}
+			
+			if(guiMap) gui.remove(guiMap)
+
+			guiData.map = 'map'
+
 			mesh.material = materials[value]
 
+			guiMap = gui.add( guiData, 'map', mesh.material.userData.extraProps ).onChange(onPropChange)
+
+			onPropChange('map')
+		}
+
+		function onPropChange(value){
+
+			while(guis.length){
+				gui.remove(guis.pop())
+			}
+
 			var u = function(){
-				for (var i = mesh.material.userData.extraProps.length - 1; i >= 0; i--) {
-					var n = mesh.material.userData.extraProps[i]
-					guis.push( guiProps.add(mesh.material[`${n}Offset`],'x', 0, 5).name(`${n}Offset U`) )
-					guis.push( guiProps.add(mesh.material[`${n}Offset`],'y', 0, 5).name(`${n}Offset V`) )
-					guis.push( guiProps.add(mesh.material[`${n}Scale`],'x', 0, 5).name(`${n}Scale U`) )
-					guis.push( guiProps.add(mesh.material[`${n}Scale`],'y', 0, 5).name(`${n}Scale V`) )
-				}
+
+				let n = guiData.map
+
+				var texUpdate = mesh.material[`${n}UpdateMatrix`]
+
+				guis.push( gui.add(mesh.material[`${n}Offset`],'x', 0, 5).name(`${n}Offset U`).onChange(texUpdate))
+				guis.push( gui.add(mesh.material[`${n}Offset`],'y', 0, 5).name(`${n}Offset V`).onChange(texUpdate))
+				guis.push( gui.add(mesh.material[`${n}Scale`],'x', 0, 5).name(`${n}Scale U`).onChange(texUpdate))
+				guis.push( gui.add(mesh.material[`${n}Scale`],'y', 0, 5).name(`${n}Scale V`).onChange(texUpdate))
+				guis.push( gui.add(mesh.material, `${n}Rotation`, 0, Math.PI * 2).name(`${n}Rotation`).onChange(texUpdate))
+				
+				guis.push( gui.add(mesh.material,'transparent') )
 			}
 
 			if(!mesh.material.userData.extraProps){
@@ -89,9 +106,7 @@
 			} else {
 				u()
 			}
-
 		} 
-
 
 
 		function initGUI(){
@@ -109,9 +124,6 @@
 
 			).onChange(onMaterialChange)
 
-			guiProps = gui.addFolder('texture controls')
-			guiProps.open()
-			
 			onMaterialChange(guiData.material)
 
 		}
@@ -179,7 +191,8 @@
 			// -----------------------------------------------------------------------------
 			
 
-			// example
+			// some textures ----------------------------------------------------------------------
+			
 
 			var texture = new THREE.TextureLoader().load( `textures/roughness_map.jpg` )
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping
@@ -195,6 +208,20 @@
 
 			} );
 
+			// example ----------------------------------------------------------------------
+			var setUvTransform = function ( tx, ty, sx, sy, rotation, cx, cy ) {
+
+				var c = Math.cos( rotation );
+				var s = Math.sin( rotation );
+ 
+				this.set(
+					sx * c, sx * s, - sx * ( c * cx + s * cy ) + cx + tx,
+					- sy * s, sy * c, - sy * ( - s * cx + c * cy ) + cy + ty,
+					0, 0, 0
+				);
+
+			}
+			
 			//create an instance of various types of materials
 			materials = {
 
@@ -253,19 +280,10 @@
 			//look for maps that are mapped with vUv
 			var mapRegex = /texture2D\( (.*Map|map), vUv \)/gm
 
- 			
+ 			//TODO: refactor this so props are created syncroncously (and props)
 			var onBeforeCompile = function ( shader ) {
 
 				var prependUniforms = ''
-
-				var level = 1
-
-				const extraUniforms = {}
-				this.userData.extraUniforms = extraUniforms
-
-				const extraProps = []
-				this.userData.extraProps = extraProps
-
 				var _this = this
 
 				function replaceMaps( string ){
@@ -274,39 +292,14 @@
 
 						if(!validMaps[mapName]) return match
 
+						let uniformName = `u_${mapName}Transform`
 
-						var uniformNameScale = `u_${mapName}Scale`
-						var uniformNameOffset = `u_${mapName}Offset`
+						prependUniforms += `uniform mat3 ${uniformName};\n`
+						shader.uniforms[uniformName] = _this.userData.extraUniforms[uniformName]
+						shader.uniforms[uniformName].name = uniformName
+						var replace = `texture2D( ${mapName}, ( ${uniformName} * vec3( vUv, 1. ) ).xy )`
 
-						var uniformScale = { value: new THREE.Vector2(level,level) }
-						var uniformOffset = { value: new THREE.Vector2(level*0.25,level*0.25) }
 
-						shader.uniforms[uniformNameScale] = uniformScale
-						extraUniforms[uniformNameScale ] = uniformScale 
-						shader.uniforms[uniformNameOffset] = uniformOffset
-						extraUniforms[uniformNameOffset ] = uniformOffset 
-
-						level++
-						prependUniforms += `uniform vec2 ${uniformNameScale};\n`
-						prependUniforms += `uniform vec2 ${uniformNameOffset};\n`
-
-						extraProps.push(mapName)
-						var foo = {
-							[`${mapName}Scale`]: {
-								get: function(){ return extraUniforms[uniformNameScale].value },
-								set: function(val){ extraUniforms[uniformNameScale].value.copy(val) }
-							},
-							[`${mapName}Offset`]: {
-								get: function(){ return extraUniforms[uniformNameOffset].value },
-								set: function(val){ extraUniforms[uniformNameOffset].value.copy(val) }
-							}
-						}
-						Object.defineProperties(
-							_this,
-							foo
-						)
-
-						var replace = `texture2D( ${mapName}, vUv * ${uniformNameScale} + ${uniformNameOffset} )`
 						return replaceMaps( replace ) 
 					}
 
@@ -327,10 +320,47 @@
 
 				var material = materials[materialName]
 
-				for ( var map in validMaps ){
-					if(material[map] === null) {
-						material[map] = texture
+				const extraUniforms = {}
+				material.userData.extraUniforms = extraUniforms
+
+				const extraProps = []
+				material.userData.extraProps = extraProps
+
+				for ( var mapName in validMaps ){
+
+					if(material[mapName] === null) {
+
+						material[mapName] = texture
+						material[`${mapName}Scale`] = new THREE.Vector2(1,1)
+						material[`${mapName}Offset`] = new THREE.Vector2()
+						material[`${mapName}Rotation`] = 0
+
+						var uniformName = `u_${mapName}Transform`
+
+						var uniform = { value: new THREE.Matrix3() , name: mapName }
+						uniform.value.name = mapName
+						uniform.value.setUvTransform = setUvTransform.bind(uniform.value)
+
+						extraUniforms[uniformName] = uniform 
+						extraProps.push(mapName)
+
+						let _mapName = mapName
+						let _uniformName = uniformName
+
+						material[`${mapName}UpdateMatrix`] = function(){
+							this.userData.extraUniforms[_uniformName].value.setUvTransform( 
+								this[`${_mapName}Offset`].x,
+								this[`${_mapName}Offset`].y, 
+								this[`${_mapName}Scale`].x,
+								this[`${_mapName}Scale`].y, 
+								this[`${_mapName}Rotation`], 
+								0, 
+								0
+							)
+						}.bind(material)
+
 					}
+
 				}
 
 				material.onBeforeCompile = onBeforeCompile.bind( material )
