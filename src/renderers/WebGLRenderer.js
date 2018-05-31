@@ -55,7 +55,7 @@ import { WebXRManager } from './webvr/WebXRManager.js';
 
 function WebGLRenderer( parameters ) {
 
-	console.log( 'THREE.WebGLRenderer', REVISION );
+	// console.log( 'THREE.WebGLRenderer', REVISION );
 
 	parameters = parameters || {};
 
@@ -517,7 +517,7 @@ function WebGLRenderer( parameters ) {
 
 		event.preventDefault();
 
-		console.log( 'THREE.WebGLRenderer: Context Lost.' );
+		// console.log( 'THREE.WebGLRenderer: Context Lost.' );
 
 		_isContextLost = true;
 
@@ -525,7 +525,7 @@ function WebGLRenderer( parameters ) {
 
 	function onContextRestore( /* event */ ) {
 
-		console.log( 'THREE.WebGLRenderer: Context Restored.' );
+		// console.log( 'THREE.WebGLRenderer: Context Restored.' );
 
 		_isContextLost = false;
 
