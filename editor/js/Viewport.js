@@ -92,7 +92,7 @@ var Viewport = function ( editor ) {
 
 		if ( object !== undefined ) {
 
-			switch ( transformControls.mode ) {
+			switch ( transformControls.getMode() ) {
 
 				case 'translate':
 
@@ -284,19 +284,19 @@ var Viewport = function ( editor ) {
 
 	signals.transformModeChanged.add( function ( mode ) {
 
-		transformControls.mode = mode;
+		transformControls.setMode( mode );
 
 	} );
 
 	signals.snapChanged.add( function ( dist ) {
 
-		transformControls.translationSnap = dist;
+		transformControls.setTranslationSnap( dist );
 
 	} );
 
 	signals.spaceChanged.add( function ( space ) {
 
-		transformControls.space = space;
+		transformControls.setSpace( space );
 
 	} );
 

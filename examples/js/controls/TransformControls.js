@@ -576,15 +576,11 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		return scope.mode;
 
-		console.warn( 'THREE.TransformControls: getMode function has been depricated.' );
-
 	};
 
 	this.setMode = function ( mode ) {
 
 		scope.mode = mode;
-
-		console.warn( 'THREE.TransformControls: setMode function has been depricated.' );
 
 	};
 
@@ -592,15 +588,11 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		scope.translationSnap = translationSnap;
 
-		console.warn( 'THREE.TransformControls: setTranslationSnap function has been depricated.' );
-
 	};
 
 	this.setRotationSnap = function ( rotationSnap ) {
 
 		scope.rotationSnap = rotationSnap;
-
-		console.warn( 'THREE.TransformControls: setRotationSnap function has been depricated.' );
 
 	};
 
@@ -608,15 +600,11 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		scope.size = size;
 
-		console.warn( 'THREE.TransformControls: setSize function has been depricated.' );
-
 	};
 
 	this.setSpace = function ( space ) {
 
 		scope.space = space;
-
-		console.warn( 'THREE.TransformControls: setSpace function has been depricated.' );
 
 	};
 
@@ -1394,12 +1382,6 @@ THREE.TransformControlsGizmo = function () {
 		}
 
 		THREE.Object3D.prototype.updateMatrixWorld.call( this );
-
-	};
-
-	this.setMode = function() {
-
-		console.warn( 'THREE.TransformControlsGizmo: setMode function has been depricated.' );
 
 	};
 

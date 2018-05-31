@@ -27,7 +27,7 @@
 
 		<div id="info">
 		"W" translate | "E" rotate | "R" scale | "+" increase size | "-" decrease size<br />
-		Press "Q" to toggle world/local space, keep "Shift" down to snap to grid
+		Press "Q" to toggle world/local space, keep "Ctrl" down to snap to grid
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -49,9 +49,9 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.set( 1000, 500, 1000 );
-				camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+				camera.lookAt( new THREE.Vector3( 0, 200, 0 ) );
 
 				scene = new THREE.Scene();
 				scene.add( new THREE.GridHelper( 1000, 10 ) );
@@ -67,17 +67,11 @@
 				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );
 
-				var group = new THREE.Group();
-				scene.add( group );
-
-				var mesh = new THREE.Mesh( geometry, material );
-
-				scene.add( mesh );
-
 				control = new THREE.TransformControls( camera, renderer.domElement );
 				control.addEventListener( 'change', render );
-				control.mode = 'rotate'
-				control.space = 'local'
+
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
 
 				control.attach( mesh );
 				scene.add( control );
@@ -89,34 +83,34 @@
 					switch ( event.keyCode ) {
 
 						case 81: // Q
-							control.space = control.space === "local" ? "world" : "local";
+							control.setSpace( control.space === "local" ? "world" : "local" );
 							break;
 
-						case 16: // Shift
-							control.translationSnap = 100;
-							control.rotationSnap = THREE.Math.degToRad( 45 );
+						case 17: // Ctrl
+							control.setTranslationSnap( 100 );
+							control.setRotationSnap( THREE.Math.degToRad( 15 ) );
 							break;
 
 						case 87: // W
-							control.mode = "translate";
+							control.setMode( "translate" );
 							break;
 
 						case 69: // E
-							control.mode = "rotate";
+							control.setMode( "rotate" );
 							break;
 
 						case 82: // R
-							control.mode = "scale";
+							control.setMode( "scale" );
 							break;
 
 						case 187:
 						case 107: // +, =, num+
-							control.size = control.size + 0.1;
+							control.setSize( control.size + 0.1 );
 							break;
 
 						case 189:
 						case 109: // -, _, num-
-							control.size = Math.max( control.size - 0.1, 0.1 );
+							control.setSize( Math.max( control.size - 0.1, 0.1 ) );
 							break;
 
 					}
@@ -127,9 +121,9 @@
 
 					switch ( event.keyCode ) {
 
-						case 16: // Shift
-							control.translationSnap = null;
-							control.rotationSnap = null;
+						case 17: // Ctrl
+							control.setTranslationSnap( null );
+							control.setRotationSnap( null );
 							break;
 
 					}
