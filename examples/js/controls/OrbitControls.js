@@ -8,10 +8,17 @@
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
-//
-//    Orbit - left mouse / touch: one-finger move
-//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-//    Pan - right mouse, or arrow keys / touch: two-finger move
+
+THREE.TOUCH_MODES = {
+	//    Orbit - left mouse / touch: one-finger move
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - right mouse, or arrow keys / touch: two-finger move
+	CLASSIC: 1,
+	//    Orbit - left mouse / touch: two-finger rotate
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - right mouse, or arrow keys / touch: one-finger move
+	MAP: 2,
+};
 
 THREE.OrbitControls = function ( object, domElement ) {
 
@@ -76,6 +83,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Mouse buttons
 	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+	this.touchMode = THREE.TOUCH_MODES.CLASSIC;
 
 	// for reset
 	this.target0 = this.target.clone();
@@ -250,7 +258,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var startEvent = { type: 'start' };
 	var endEvent = { type: 'end' };
 
-	var STATE = { NONE: - 1, ROTATE: 0, DOLLY: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_DOLLY_PAN: 4 };
+	var STATE = {
+		NONE: 0,
+		ROTATE_UP: 1,
+		ROTATE_LEFT: 2,
+		ROTATE: 3, // ROTATE_UP | ROTATE_LEFT
+		DOLLY: 4,
+		DOLLY_ROTATE: 7, // ROTATE | DOLLY
+		PAN: 8,
+		DOLLY_PAN: 12, // DOLLY | PAN
+	};
 
 	var state = STATE.NONE;
 
@@ -266,7 +283,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	var rotateStart = new THREE.Vector2();
 	var rotateEnd = new THREE.Vector2();
+	var rotateStart2 = new THREE.Vector2();
+	var rotateEnd2 = new THREE.Vector2();
 	var rotateDelta = new THREE.Vector2();
+	var rotateDelta2 = new THREE.Vector2();
 
 	var panStart = new THREE.Vector2();
 	var panEnd = new THREE.Vector2();
@@ -569,13 +589,46 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleTouchStartRotate' );
 
-		rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+		var x, y;
+
+		switch ( scope.touchMode ) {
+
+			case THREE.TOUCH_MODES.CLASSIC:
+
+				x = event.touches[ 0 ].pageX;
+				y = event.touches[ 0 ].pageY;
+
+				rotateStart.set( x, y );
+
+				break;
+
+			case THREE.TOUCH_MODES.MAP:
+
+				// First finger
+				x = event.touches[ 0 ].pageX;
+				y = event.touches[ 0 ].pageY;
+
+				rotateStart.set( x, y );
+
+				// Second finger
+				var x2 = event.touches[ 1 ].pageX;
+				var y2 = event.touches[ 1 ].pageY;
+
+				rotateStart2.set( x2, y2 );
+
+				break;
+
+			default:
+
+				throw new Error( 'OrbitControls: Unexpected touchMode' );
+
+		}
 
 	}
 
-	function handleTouchStartDollyPan( event ) {
+	function handleTouchStartDolly( event ) {
 
-		//console.log( 'handleTouchStartDollyPan' );
+		//console.log( 'handleTouchStartDolly' );
 
 		if ( scope.enableZoom ) {
 
@@ -588,10 +641,37 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
+	}
+
+	function handleTouchStartPan( event ) {
+
+		//console.log( 'handleTouchStartPan' );
+
 		if ( scope.enablePan ) {
 
-			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
-			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+			var x, y;
+
+			switch ( scope.touchMode ) {
+
+				case THREE.TOUCH_MODES.CLASSIC:
+
+					x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
+					y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+
+					break;
+
+				case THREE.TOUCH_MODES.MAP:
+
+					x = event.touches[ 0 ].pageX;
+					y = event.touches[ 0 ].pageY;
+
+					break;
+
+				default:
+
+					throw new Error( 'OrbitControls: Unexpected touchMode' );
+
+			}
 
 			panStart.set( x, y );
 
@@ -603,59 +683,157 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleTouchMoveRotate' );
 
-		rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+		if ( scope.enableRotate === false ) return;
+		if ( ( state & STATE.ROTATE ) === 0 ) return;
 
-		rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
+		switch ( scope.touchMode ) {
 
-		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+			case THREE.TOUCH_MODES.CLASSIC:
 
-		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
+				rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
+				rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
 
-		rotateStart.copy( rotateEnd );
+				var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-		scope.update();
+				rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
+
+				rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
+
+				rotateStart.copy( rotateEnd );
+
+				break;
+
+			case THREE.TOUCH_MODES.MAP:
+
+				// First finger
+				var x = event.touches[ 0 ].pageX;
+				var y = event.touches[ 0 ].pageY;
+
+				rotateEnd.set( x, y );
+
+				// Second finger
+				var x2 = event.touches[ 1 ].pageX;
+				var y2 = event.touches[ 1 ].pageY;
+
+				rotateEnd2.set( x2, y2 );
+
+				// Angle between the two fingers at start and end
+				var angleStartFingers = rotateDelta.subVectors( rotateStart2, rotateStart ).angle();
+				var angleEndFingers = rotateDelta.subVectors( rotateEnd2, rotateEnd ).angle();
+
+				rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
+				rotateDelta2.subVectors( rotateEnd2, rotateStart2 ).multiplyScalar( scope.rotateSpeed );
+
+				// Angle between start and end position for each finger
+				var angleMoveFinger1 = rotateDelta.angle();
+				var angleMoveFinger2 = rotateDelta2.angle();
+
+				// We want to rotate up only if the two fingers move vertically without zooming or rotateLeft
+				// This end up by:
+				//  - angleStartFingers nearly colinear to x axis ==> fingers are aligned horizontally at start
+				//  - angleEndFingers nearly colinear to x axis ==> fingers are aligned horizontally at end
+				//  - angleMoveFinger1 nearly colinear to y axis ==> finger1 is moved vertically (ensure distance between finger is constant)
+				//  - angleMoveFinger2 nearly colinear to y axis ==> finger2 is moved vertically (ensure distance between finger is constant)
+				//  - Vector rotateStart --> rotateEnd and rotateStart2 --> rotateEnd2 are in the same way (prevent moving one finger vertically up while the other goes down)
+
+				var epsilonAngle = 1 / 2; // ~= sin(PI / 6)
+				if (
+					rotateDelta.dot( rotateDelta2 ) > 0
+					&& Math.abs( Math.sin( angleStartFingers ) ) < epsilonAngle
+					&& Math.abs( Math.sin( angleEndFingers ) ) < epsilonAngle
+					&& Math.abs( Math.cos( angleMoveFinger1 ) ) < epsilonAngle
+					&& Math.abs( Math.cos( angleMoveFinger2 ) ) < epsilonAngle
+				) {
+
+
+					var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+
+					// rotating up and down along whole screen attempts to go 360, but limited to 180
+					rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
+
+					// Start rotateUp ==> disable all movement to prevent flickering
+					state = STATE.ROTATE_UP;
+
+				} else if ( ( state & STATE.ROTATE_LEFT ) !== 0 ) {
+
+					rotateLeft( ( angleStartFingers - angleEndFingers ) * scope.rotateSpeed );
+
+				}
+
+				rotateStart.copy( rotateEnd );
+				rotateStart2.copy( rotateEnd2 );
+
+				break;
+
+			default:
+
+				throw new Error( 'OrbitControls: Unexpected touchMode' );
+
+		}
 
 	}
 
-	function handleTouchMoveDollyPan( event ) {
+	function handleTouchMoveDolly( event ) {
 
-		//console.log( 'handleTouchMoveDollyPan' );
+		//console.log( 'handleTouchMoveDolly' );
 
-		if ( scope.enableZoom ) {
+		if ( scope.enableZoom === false ) return;
+		if ( ( state & STATE.DOLLY ) === 0 ) return;
 
-			var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
-			var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+		var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
+		var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
 
-			var distance = Math.sqrt( dx * dx + dy * dy );
+		var distance = Math.sqrt( dx * dx + dy * dy );
 
-			dollyEnd.set( 0, distance );
+		dollyEnd.set( 0, distance );
 
-			dollyDelta.set( 0, Math.pow( dollyEnd.y / dollyStart.y, scope.zoomSpeed ) );
+		dollyDelta.set( 0, Math.pow( dollyEnd.y / dollyStart.y, scope.zoomSpeed ) );
 
-			dollyIn( dollyDelta.y );
+		dollyIn( dollyDelta.y );
 
-			dollyStart.copy( dollyEnd );
+		dollyStart.copy( dollyEnd );
+
+	}
+
+	function handleTouchMovePan( event ) {
+
+		//console.log( 'handleTouchMovePan' );
+
+		if ( scope.enablePan === false ) return;
+		if ( ( state & STATE.PAN ) === 0 ) return;
+
+		var x, y;
+
+		switch ( scope.touchMode ) {
+
+			case THREE.TOUCH_MODES.CLASSIC:
+
+				x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
+				y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+
+				break;
+
+			case THREE.TOUCH_MODES.MAP:
+
+				x = event.touches[ 0 ].pageX;
+				y = event.touches[ 0 ].pageY;
+
+				break;
+
+			default:
+
+				throw new Error( 'OrbitControls: Unexpected touchMode' );
 
 		}
 
-		if ( scope.enablePan ) {
+		panEnd.set( x, y );
 
-			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
-			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+		panDelta.subVectors( panEnd, panStart ).multiplyScalar( scope.panSpeed );
 
-			panEnd.set( x, y );
+		pan( panDelta.x, panDelta.y );
 
-			panDelta.subVectors( panEnd, panStart ).multiplyScalar( scope.panSpeed );
-
-			pan( panDelta.x, panDelta.y );
-
-			panStart.copy( panEnd );
-
-		}
-
-		scope.update();
+		panStart.copy( panEnd );
 
 	}
 
@@ -800,6 +978,38 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
+		switch ( scope.touchMode ) {
+
+			case THREE.TOUCH_MODES.CLASSIC:
+
+				onTouchStartClassicMode( event );
+
+				break;
+
+			case THREE.TOUCH_MODES.MAP:
+
+				onTouchStartMapMode( event );
+
+				break;
+
+			default:
+
+				throw new Error( 'OrbitControls: unknown touchMode' );
+
+		}
+
+		if ( state !== STATE.NONE ) {
+
+			scope.dispatchEvent( startEvent );
+
+		}
+
+	}
+
+	function onTouchStartClassicMode( event ) {
+
+		// console.log( 'onTouchStartClassicMode' );
+
 		switch ( event.touches.length ) {
 
 			case 1:	// one-fingered touch: rotate
@@ -808,7 +1018,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				handleTouchStartRotate( event );
 
-				state = STATE.TOUCH_ROTATE;
+				state = STATE.ROTATE;
 
 				break;
 
@@ -816,9 +1026,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				if ( scope.enableZoom === false && scope.enablePan === false ) return;
 
-				handleTouchStartDollyPan( event );
+				handleTouchStartDolly( event );
+				handleTouchStartPan( event );
 
-				state = STATE.TOUCH_DOLLY_PAN;
+				state = STATE.DOLLY_PAN;
 
 				break;
 
@@ -836,6 +1047,41 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
+	function onTouchStartMapMode( event ) {
+
+		// console.log( 'onTouchStartMapMode' );
+
+		switch ( event.touches.length ) {
+
+			case 1:	// one-fingered touch: pan
+
+				if ( scope.enablePan === false ) return;
+
+				handleTouchStartPan( event );
+
+				state = STATE.PAN;
+
+				break;
+
+			case 2:	// two-fingered touch: rotate-dolly
+
+				if ( scope.enableZoom === false || scope.enableRotate === false ) return;
+
+				handleTouchStartRotate( event );
+				handleTouchStartDolly( event );
+
+				state = STATE.DOLLY_ROTATE;
+
+				break;
+
+			default:
+
+				state = STATE.NONE;
+
+		}
+
+	}
+
 	function onTouchMove( event ) {
 
 		if ( scope.enabled === false ) return;
@@ -843,23 +1089,85 @@ THREE.OrbitControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
+
+		switch ( scope.touchMode ) {
+
+			case THREE.TOUCH_MODES.CLASSIC:
+
+				onTouchMoveClassicMode( event );
+
+				break;
+
+			case THREE.TOUCH_MODES.MAP:
+
+				onTouchMoveMapMode( event );
+
+				break;
+
+			default:
+
+				throw new Error( 'OrbitControls: unknown touchMode' );
+
+		}
+
+	}
+
+	function onTouchMoveClassicMode( event ) {
+
+		// console.log( 'onTouchMoveClassicMode' );
+
 		switch ( event.touches.length ) {
 
 			case 1: // one-fingered touch: rotate
 
-				if ( scope.enableRotate === false ) return;
-				if ( state !== STATE.TOUCH_ROTATE ) return; // is this needed?
-
 				handleTouchMoveRotate( event );
+
+				scope.update();
 
 				break;
 
 			case 2: // two-fingered touch: dolly-pan
 
-				if ( scope.enableZoom === false && scope.enablePan === false ) return;
-				if ( state !== STATE.TOUCH_DOLLY_PAN ) return; // is this needed?
 
-				handleTouchMoveDollyPan( event );
+				handleTouchMoveDolly( event );
+				handleTouchMovePan( event );
+
+				scope.update();
+
+				break;
+
+			case 3:
+
+
+			default:
+
+				state = STATE.NONE;
+
+		}
+
+	}
+
+	function onTouchMoveMapMode( event ) {
+
+		// console.log( 'onTouchMoveMapMode' );
+
+		switch ( event.touches.length ) {
+
+			case 1: // one-fingered touch: pan
+
+				handleTouchMovePan( event );
+
+				scope.update();
+
+				break;
+
+			case 2: // two-fingered touch: rotate-dolly
+
+
+				handleTouchMoveRotate( event );
+				handleTouchMoveDolly( event );
+
+				scope.update();
 
 				break;
 
