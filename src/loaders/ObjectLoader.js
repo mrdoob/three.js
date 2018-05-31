@@ -51,6 +51,7 @@ import { BufferGeometryLoader } from './BufferGeometryLoader.js';
 import { JSONLoader } from './JSONLoader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
+import * as Curves from '../extras/curves/Curves.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -373,6 +374,35 @@ Object.assign( ObjectLoader.prototype, {
 						geometry = new Geometries[ data.type ](
 							geometryShapes,
 							data.curveSegments
+						);
+
+						break;
+
+
+					case 'ExtrudeGeometry':
+					case 'ExtrudeBufferGeometry':
+
+						var geometryShapes = [];
+
+						for ( var j = 0, jl = data.shapes.length; j < jl; j ++ ) {
+
+							var shape = shapes[ data.shapes[ j ] ];
+
+							geometryShapes.push( shape );
+
+						}
+
+						var extrudePath = data.options.extrudePath;
+
+						if ( extrudePath !== undefined ) {
+
+							data.options.extrudePath = new Curves[ extrudePath.type ]().fromJSON( extrudePath );
+
+						}
+
+						geometry = new Geometries[ data.type ](
+							geometryShapes,
+							data.options
 						);
 
 						break;

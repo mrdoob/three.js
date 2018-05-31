@@ -342,6 +342,7 @@ var files = {
 		"misc_controls_transform",
 		"misc_exporter_gltf",
 		"misc_exporter_obj",
+		"misc_exporter_stl",
 		"misc_fps",
 		"misc_lights_test",
 		"misc_lookat",
@@ -358,6 +359,9 @@ var files = {
 		"css3d_sandbox",
 		"css3d_sprites",
 		"css3d_youtube"
+	],
+	"css2d": [
+		"css2d_label"
 	],
 	"canvas": [
 		"canvas_ascii_effect",

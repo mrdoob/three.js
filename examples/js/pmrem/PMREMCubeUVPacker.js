@@ -178,13 +178,7 @@ THREE.PMREMCubeUVPacker.prototype = {
 					gl_FragColor = linearToOutputTexel( color );\
 				}",
 
-			blending: THREE.CustomBlending,
-			premultipliedAlpha: false,
-			blendSrc: THREE.OneFactor,
-			blendDst: THREE.ZeroFactor,
-			blendSrcAlpha: THREE.OneFactor,
-			blendDstAlpha: THREE.ZeroFactor,
-			blendEquation: THREE.AddEquation
+			blending: THREE.NoBlending
 
 		} );
 

@@ -96,9 +96,16 @@ Use WEBGL Depth buffer support?
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
-				materialDepth = new THREE.MeshDepthMaterial();
-				materialDepth.depthPacking = THREE.RGBADepthPacking;
-				materialDepth.blending = THREE.NoBlending;
+				var depthShader = THREE.BokehDepthShader;
+
+				materialDepth = new THREE.ShaderMaterial( {
+					uniforms: depthShader.uniforms,
+					vertexShader: depthShader.vertexShader,
+					fragmentShader: depthShader.fragmentShader
+				} );
+
+				materialDepth.uniforms[ 'mNear' ].value = camera.near;
+				materialDepth.uniforms[ 'mFar' ].value = camera.far;
 
 				// skybox
 
@@ -110,7 +117,21 @@ Use WEBGL Depth buffer support?
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 
-				scene.background = textureCube;
+				var shader = THREE.ShaderLib[ 'cube' ];
+				shader.uniforms[ 'tCube' ].value = textureCube;
+
+				material = new THREE.ShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms,
+					depthWrite: false,
+					side: THREE.BackSide
+
+				} );
+
+				mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1000, 1000, 1000 ), material );
+				scene.add( mesh );
 
 				// plane particles
 
@@ -226,11 +247,13 @@ Use WEBGL Depth buffer support?
 					jsDepthCalculation: true,
 					shaderFocus: false,
 
-					fstop: 10,
+					fstop: 2.2,
 					maxblur: 1.0,
 
+					showFocus: false,
 					focalDepth: 2.8,
 					manualdof: false,
+					vignetting: false,
 					depthblur: false,
 
 					threshold: 0.5,
@@ -272,10 +295,13 @@ Use WEBGL Depth buffer support?
 				gui.add( effectController, 'shaderFocus' ).onChange( matChanger );
 				gui.add( effectController, 'focalDepth', 0.0, 200.0 ).listen().onChange( matChanger );
 
-				gui.add( effectController, 'fstop', 1, 50, 0.1 ).onChange( matChanger );
+				gui.add( effectController, 'fstop', 0.1, 22, 0.001 ).onChange( matChanger );
 				gui.add( effectController, 'maxblur', 0.0, 5.0, 0.025 ).onChange( matChanger );
 
+				gui.add( effectController, 'showFocus' ).onChange( matChanger );
 				gui.add( effectController, 'manualdof' ).onChange( matChanger );
+				gui.add( effectController, 'vignetting' ).onChange( matChanger );
+
 				gui.add( effectController, 'depthblur' ).onChange( matChanger );
 
 				gui.add( effectController, 'threshold', 0, 1, 0.001 ).onChange( matChanger );
@@ -284,8 +310,11 @@ Use WEBGL Depth buffer support?
 				gui.add( effectController, 'fringe', 0, 5, 0.001 ).onChange( matChanger );
 
 				gui.add( effectController, 'focalLength', 16, 80, 0.001 ).onChange( matChanger );
+
 				gui.add( effectController, 'noise' ).onChange( matChanger );
+
 				gui.add( effectController, 'dithering', 0, 0.001, 0.0001 ).onChange( matChanger );
+
 				gui.add( effectController, 'pentagon' ).onChange( matChanger );
 
 				gui.add( shaderSettings, 'rings', 1, 8).step(1).onChange( shaderUpdate );
@@ -369,9 +398,7 @@ Use WEBGL Depth buffer support?
 					fragmentShader: bokeh_shader.fragmentShader,
 					defines: {
 						RINGS: shaderSettings.rings,
-						SAMPLES: shaderSettings.samples,
-						DEPTH_PACKING: 1, // RGBADepth
-						PERSPECTIVE_CAMERA: 1
+						SAMPLES: shaderSettings.samples
 					}
 
 				} );
@@ -399,6 +426,28 @@ Use WEBGL Depth buffer support?
 
 			}
 
+			function linearize( depth ) {
+
+				var zfar = camera.far;
+				var znear = camera.near;
+				return - zfar * znear / ( depth * ( zfar - znear ) - zfar );
+
+			}
+
+
+			function smoothstep( near, far, depth ) {
+
+				var x = saturate( ( depth - near ) / ( far - near ) );
+				return x * x * ( 3 - 2 * x );
+
+			}
+
+			function saturate( x ) {
+
+				return Math.max( 0, Math.min( 1, x ) );
+
+			}
+
 			function render() {
 
 				var time = Date.now() * 0.00015;
@@ -417,13 +466,22 @@ Use WEBGL Depth buffer support?
 
 					var intersects = raycaster.intersectObjects( scene.children, true );
 
-					var targetDistance = ( intersects.length > 0 ) ? intersects[ 0 ].distance : 1000;
 
-					distance += ( targetDistance - distance ) * 0.05;
+					if ( intersects.length > 0 ) {
 
-					postprocessing.bokeh_uniforms[ 'focalDepth' ].value = distance;
+						var targetDistance = intersects[ 0 ].distance;
 
-					effectController[ 'focalDepth' ] = distance;
+						distance += (targetDistance - distance) * 0.03;
+
+						var sdistance = smoothstep(camera.near, camera.far, distance);
+
+						var ldistance = linearize(1 -  sdistance);
+
+						postprocessing.bokeh_uniforms[ 'focalDepth' ].value = ldistance;
+
+						effectController['focalDepth'] = ldistance;
+
+					}
 
 				}
 

@@ -40,7 +40,7 @@
 			renderer.vr.userHeight = 0; // TOFIX
 			document.body.appendChild( renderer.domElement );
 
-			document.body.appendChild( WEBVR.createButton( renderer ) );
+			document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'eyeLevel' } ) );
 
 			//
 
@@ -247,7 +247,7 @@
 
 			}
 
-			renderer.animate( render );
+			renderer.setAnimationLoop( render );
 
 		</script>
 
