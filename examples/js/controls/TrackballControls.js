@@ -12,7 +12,16 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
-	document.body.style.touchAction = 'none';
+
+	if ( this.domElement instanceof HTMLElement ) {
+
+		this.domElement.style.touchAction = 'none';
+
+	} else {
+
+		document.body.style.touchAction = 'none';
+
+	}
 
 	// API
 
