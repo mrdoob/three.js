@@ -354,7 +354,6 @@ THREE.TDSLoader.prototype = {
 
 				this.resetPosition( data );
 				this.readFaceArray( data, mesh );
-				geometry.computeVertexNormals();
 
 			} else if ( next === TEX_VERTS ) {
 
@@ -432,6 +431,8 @@ THREE.TDSLoader.prototype = {
 		}
 
 		this.endChunk( chunk );
+
+		geometry.computeVertexNormals();
 
 		return mesh;
 
