@@ -26,10 +26,10 @@
 
 			var camera, controls, scene, renderer;
 
-			var boxGeometry = new THREE.BoxGeometry( 80, 80, 80, 4, 4, 4 );
-			var torusGeometry = new THREE.TorusGeometry( 50, 25, 8, 8, Math.PI * 2 );
-			var sphereGeometry = new THREE.SphereGeometry( 50, 15, 15 );
-			var planeGeometry = new THREE.PlaneGeometry( 100, 100, 6, 6 );
+			var boxGeometry = new THREE.BoxBufferGeometry( 80, 80, 80, 4, 4, 4 );
+			var torusGeometry = new THREE.TorusBufferGeometry( 50, 25, 8, 8, Math.PI * 2 );
+			var sphereGeometry = new THREE.SphereBufferGeometry( 50, 15, 15 );
+			var planeGeometry = new THREE.PlaneBufferGeometry( 100, 100, 6, 6 );
 
 			var modifer = new THREE.SimplifyModifier();
 			var meshes = [];
@@ -49,7 +49,9 @@
 
 				var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
-				var simplified = modifer.modify( geometry, geometry.vertices.length * 0.5 | 0 );
+				var vertexCount = geometry.attributes.position.count;
+
+				var simplified = modifer.modify( geometry, Math.floor( vertexCount * 0.5 ) );
 
 				mesh = new THREE.Mesh( simplified, material );
 				wireframe = new THREE.Mesh( simplified, wireframeMaterial );
