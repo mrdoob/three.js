@@ -396,7 +396,7 @@ THREE.SimplifyModifier = function () {};
 		var vertices = [];
 		var faces = [];
 
-		var i, il, face;
+		var i, il;
 
 		//
 		// put data of original geometry in different data structures
@@ -406,7 +406,8 @@ THREE.SimplifyModifier = function () {};
 
 		for ( i = 0, il = oldVertices.length; i < il; i ++ ) {
 
-			vertices[ i ] = new Vertex( oldVertices[ i ], i );
+			var vertex = new Vertex( oldVertices[ i ], i );
+			vertices.push( vertex );
 
 		}
 
@@ -414,8 +415,14 @@ THREE.SimplifyModifier = function () {};
 
 		for ( i = 0, il = oldFaces.length; i < il; i ++ ) {
 
-			face = oldFaces[ i ];
-			faces[ i ] = new Triangle( vertices[ face.a ], vertices[ face.b ], vertices[ face.c ], face.a, face.b, face.c );
+			var face = oldFaces[ i ];
+
+			var a = face.a;
+			var b = face.b;
+			var c = face.c;
+
+			var triangle = new Triangle( vertices[ a ], vertices[ b ], vertices[ c ], a, b, c );
+			faces.push( triangle );
 
 		}
 
