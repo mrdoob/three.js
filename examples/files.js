@@ -336,6 +336,7 @@ var files = {
 		"misc_animation_keys",
 		"misc_controls_deviceorientation",
 		"misc_controls_fly",
+		"misc_controls_map",
 		"misc_controls_orbit",
 		"misc_controls_pointerlock",
 		"misc_controls_trackball",
