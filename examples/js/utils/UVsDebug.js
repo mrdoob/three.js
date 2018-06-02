@@ -18,12 +18,13 @@ THREE.UVsDebug = function ( geometry, size ) {
 	var a = new THREE.Vector2();
 	var b = new THREE.Vector2();
 
-	var geo = geometry;
+	var uvs = [
+		new THREE.Vector2(),
+		new THREE.Vector2(),
+		new THREE.Vector2()
+	];
 
-	if ( geo.isGeometry ) geo = new THREE.BufferGeometry().fromGeometry( geo );
-
-	var uvs = geo.attributes.uv;
-	var uv = new THREE.Vector2();
+	var face = [];
 
 	var canvas = document.createElement( 'canvas' );
 	var width = size || 1024; // power of 2 required for wrapping
@@ -41,34 +42,68 @@ THREE.UVsDebug = function ( geometry, size ) {
 	ctx.fillStyle = 'rgba( 255, 255, 255, 1.0 )';
 	ctx.fillRect( 0, 0, width, height );
 
-	var index = geo.index;
-	var face = [];
+	if ( geometry.isGeometry ) {
 
-	if ( index ) {
+		var faces = geometry.faces;
+		var uvSet = geometry.faceVertexUvs[ 0 ];
 
-		// indexed geometry
+		for ( var i = 0, il = uvSet.length; i < il; i ++ ) {
 
-		for ( var i = 0, il = index.count; i < il; i += 3 ) {
+			var face = faces[ i ];
+			var uv = uvSet[ i ];
 
-			face[ 0 ] = index.getX( i );
-			face[ 1 ] = index.getX( i + 1 );
-			face[ 2 ] = index.getX( i + 2 );
+			face[ 0 ] = face.a;
+			face[ 1 ] = face.b;
+			face[ 2 ] = face.c;
 
-			processFace( face, i );
+			uvs[ 0 ].copy( uv[ 0 ] );
+			uvs[ 1 ].copy( uv[ 1 ] );
+			uvs[ 2 ].copy( uv[ 2 ] );
+
+			processFace( face, uvs, i );
 
 		}
 
 	} else {
 
-		// non-indexed geometry
+		var index = geometry.index;
+		var uvAttribute = geometry.attributes.uv;
 
-		for ( var i = 0, il = uvs.count; i < il; i += 3 ) {
+		if ( index ) {
 
-			face[ 0 ] = i;
-			face[ 1 ] = i + 1;
-			face[ 2 ] = i + 2;
+			// indexed geometry
 
-			processFace( face, i );
+			for ( var i = 0, il = index.count; i < il; i += 3 ) {
+
+				face[ 0 ] = index.getX( i );
+				face[ 1 ] = index.getX( i + 1 );
+				face[ 2 ] = index.getX( i + 2 );
+
+				uvs[ 0 ].fromBufferAttribute( uvAttribute, face[ 0 ] );
+				uvs[ 1 ].fromBufferAttribute( uvAttribute, face[ 1 ] );
+				uvs[ 2 ].fromBufferAttribute( uvAttribute, face[ 2 ] );
+
+				processFace( face, uvs, i );
+
+			}
+
+		} else {
+
+			// non-indexed geometry
+
+			for ( var i = 0, il = uvAttribute.count; i < il; i += 3 ) {
+
+				face[ 0 ] = i;
+				face[ 1 ] = i + 1;
+				face[ 2 ] = i + 2;
+
+				uvs[ 0 ].fromBufferAttribute( uvAttribute, face[ 0 ] );
+				uvs[ 1 ].fromBufferAttribute( uvAttribute, face[ 1 ] );
+				uvs[ 2 ].fromBufferAttribute( uvAttribute, face[ 2 ] );
+
+				processFace( face, uvs, i );
+
+			}
 
 		}
 
@@ -76,9 +111,7 @@ THREE.UVsDebug = function ( geometry, size ) {
 
 	return canvas;
 
-	function processFace( face, index ) {
-
-		var indexCount = face.length;
+	function processFace( face, uvs, index ) {
 
 		// draw contour of face
 
@@ -86,9 +119,9 @@ THREE.UVsDebug = function ( geometry, size ) {
 
 		a.set( 0, 0 );
 
-		for ( var j = 0, jl = indexCount; j < jl; j ++ ) {
+		for ( var j = 0, jl = uvs.length; j < jl; j ++ ) {
 
-			uv.fromBufferAttribute( uvs, face[ j ] );
+			var uv = uvs[ j ];
 
 			a.x += uv.x;
 			a.y += uv.y;
@@ -110,7 +143,7 @@ THREE.UVsDebug = function ( geometry, size ) {
 
 		// calculate center of face
 
-		a.divideScalar( indexCount );
+		a.divideScalar( uvs.length );
 
 		// label the face number
 
@@ -133,9 +166,9 @@ THREE.UVsDebug = function ( geometry, size ) {
 
 		// label uv edge orders
 
-		for ( j = 0, jl = face.length; j < jl; j ++ ) {
+		for ( j = 0, jl = uvs.length; j < jl; j ++ ) {
 
-			uv.fromBufferAttribute( uvs, face[ j ] );
+			var uv = uvs[ j ];
 			b.addVectors( a, uv ).divideScalar( 2 );
 
 			var vnum = face[ j ];
