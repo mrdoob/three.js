@@ -39,8 +39,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	// Reusable utility variables
 
-	var _ray = new THREE.Raycaster();
-	var _pointerVector = new THREE.Vector2();
+	var ray = new THREE.Raycaster();
 
 	var _tempVector = new THREE.Vector3();
 	var _tempVector2 = new THREE.Vector3();
@@ -148,7 +147,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	};
 
-
 	// Defined getter, setter and store for a property
 	function defineProperty( propName, defaultValue ) {
 
@@ -212,117 +210,89 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	};
 
-	function onContext( event ) {
+	this.pointerHover = function( pointer ) {
 
-		event.preventDefault();
+		if ( this.object === undefined || this.dragging === true || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
 
-	}
+		ray.setFromCamera( pointer, this.camera );
 
-	function onPointerHover( event ) {
-
-		if ( scope.object === undefined || scope.dragging === true || ( event.button !== undefined && event.button !== 0 ) ) return;
-
-		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
-
-		var intersect = intersectObjects( pointer, _gizmo.picker[ scope.mode ].children, scope.camera );
+		var intersect = ray.intersectObjects( _gizmo.picker[ this.mode ].children, true )[ 0 ] || false;
 
 		if ( intersect ) {
 
-			scope.axis = intersect.object.name;
-
-			event.preventDefault();
+			this.axis = intersect.object.name;
 
 		} else {
 
-			scope.axis = null;
+			this.axis = null;
 
 		}
 
 	}
 
-	function onPointerDown( event ) {
+	this.pointerDown = function( pointer ) {
 
-		if ( scope.object === undefined || scope.dragging === true || ( event.button !== undefined && event.button !== 0 ) ) return;
+		if ( this.object === undefined || this.dragging === true || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
 
-		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+		if ( ( pointer.button === 0 || pointer.button === undefined ) && this.axis !== null ) {
 
-		if ( pointer.button === 0 || pointer.button === undefined ) {
+			ray.setFromCamera( pointer, this.camera );
 
-			var intersect = intersectObjects( pointer, _gizmo.picker[ scope.mode ].children, scope.camera );
+			var planeIntersect = ray.intersectObjects( [ _plane ], true )[ 0 ] || false;
 
-			if ( intersect ) {
+			if ( planeIntersect ) {
 
-				event.preventDefault();
-				event.stopPropagation();
+				var space = this.space;
 
-				scope.axis = intersect.object.name;
+				if ( this.mode === 'scale') {
 
-				var planeIntersect = intersectObjects( pointer, [ _plane ], scope.camera );
+					space = 'local';
 
-				if ( planeIntersect ) {
+				} else if ( this.axis === 'E' ||  this.axis === 'XYZE' ||  this.axis === 'XYZ' ) {
 
-					var space = scope.space;
-
-					if ( scope.mode === 'scale') {
-
-						space = 'local';
-
-					} else if ( scope.axis === 'E' ||  scope.axis === 'XYZE' ||  scope.axis === 'XYZ' ) {
-
-						space = 'world';
-
-					}
-
-					if ( space === 'local' && scope.mode === 'rotate' ) {
-
-						var snap = scope.rotationSnap;
-
-						if ( scope.axis === 'X' && snap ) scope.object.rotation.x = Math.round( scope.object.rotation.x / snap ) * snap;
-						if ( scope.axis === 'Y' && snap ) scope.object.rotation.y = Math.round( scope.object.rotation.y / snap ) * snap;
-						if ( scope.axis === 'Z' && snap ) scope.object.rotation.z = Math.round( scope.object.rotation.z / snap ) * snap;
-
-					}
-
-					scope.object.updateMatrixWorld();
-					scope.object.parent.updateMatrixWorld();
-
-					_positionStart.copy( scope.object.position );
-					_quaternionStart.copy( scope.object.quaternion );
-					_scaleStart.copy( scope.object.scale );
-
-					scope.object.matrixWorld.decompose( worldPositionStart, worldQuaternionStart, worldScaleStart );
-
-					pointStart.copy( planeIntersect.point ).sub( worldPositionStart );
-
-					if ( space === 'local' ) pointStart.applyQuaternion( worldQuaternionStart.clone().inverse() );
+					space = 'world';
 
 				}
 
-			} else {
+				if ( space === 'local' && this.mode === 'rotate' ) {
 
-				scope.axis = null;
+					var snap = this.rotationSnap;
+
+					if ( this.axis === 'X' && snap ) this.object.rotation.x = Math.round( this.object.rotation.x / snap ) * snap;
+					if ( this.axis === 'Y' && snap ) this.object.rotation.y = Math.round( this.object.rotation.y / snap ) * snap;
+					if ( this.axis === 'Z' && snap ) this.object.rotation.z = Math.round( this.object.rotation.z / snap ) * snap;
+
+				}
+
+				this.object.updateMatrixWorld();
+				this.object.parent.updateMatrixWorld();
+
+				_positionStart.copy( this.object.position );
+				_quaternionStart.copy( this.object.quaternion );
+				_scaleStart.copy( this.object.scale );
+
+				this.object.matrixWorld.decompose( worldPositionStart, worldQuaternionStart, worldScaleStart );
+
+				pointStart.copy( planeIntersect.point ).sub( worldPositionStart );
+
+				if ( space === 'local' ) pointStart.applyQuaternion( worldQuaternionStart.clone().inverse() );
 
 			}
 
-		}
-
-		scope.dragging = true;
-
-		if ( scope.axis !== null ) {
-
-			mouseDownEvent.mode = scope.mode;
-			scope.dispatchEvent( mouseDownEvent );
+			this.dragging = true;
+			mouseDownEvent.mode = this.mode;
+			this.dispatchEvent( mouseDownEvent );
 
 		}
 
 	}
 
-	function onPointerMove( event ) {
+	this.pointerMove = function( pointer ) {
 
-		var axis = scope.axis;
-		var mode = scope.mode;
-		var object = scope.object;
-		var space = scope.space;
+		var axis = this.axis;
+		var mode = this.mode;
+		var object = this.object;
+		var space = this.space;
 
 		if ( mode === 'scale') {
 
@@ -334,16 +304,13 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-		if ( object === undefined || axis === null || scope.dragging === false || ( event.button !== undefined && event.button !== 0 ) ) return;
+		if ( object === undefined || axis === null || this.dragging === false || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
 
-		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+		ray.setFromCamera( pointer, this.camera );
 
-		var planeIntersect = intersectObjects( pointer, [ _plane ], scope.camera );
+		var planeIntersect = ray.intersectObjects( [ _plane ], true )[ 0 ] || false;
 
 		if ( planeIntersect === false ) return;
-
-		event.preventDefault();
-		event.stopPropagation();
 
 		pointEnd.copy( planeIntersect.point ).sub( worldPositionStart );
 
@@ -373,22 +340,22 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 			// Apply translation snap
 
-			if ( scope.translationSnap ) {
+			if ( this.translationSnap ) {
 
 				if ( space === 'local' ) {
 
 					object.position.applyQuaternion(_tempQuaternion.copy( _quaternionStart ).inverse() );
 
 					if ( axis.search( 'X' ) !== -1 ) {
-						object.position.x = Math.round( object.position.x / scope.translationSnap ) * scope.translationSnap;
+						object.position.x = Math.round( object.position.x / this.translationSnap ) * this.translationSnap;
 					}
 
 					if ( axis.search( 'Y' ) !== -1 ) {
-						object.position.y = Math.round( object.position.y / scope.translationSnap ) * scope.translationSnap;
+						object.position.y = Math.round( object.position.y / this.translationSnap ) * this.translationSnap;
 					}
 
 					if ( axis.search( 'Z' ) !== -1 ) {
-						object.position.z = Math.round( object.position.z / scope.translationSnap ) * scope.translationSnap;
+						object.position.z = Math.round( object.position.z / this.translationSnap ) * this.translationSnap;
 					}
 
 					object.position.applyQuaternion( _quaternionStart );
@@ -402,15 +369,15 @@ THREE.TransformControls = function ( camera, domElement ) {
 					}
 
 					if ( axis.search( 'X' ) !== -1 ) {
-						object.position.x = Math.round( object.position.x / scope.translationSnap ) * scope.translationSnap;
+						object.position.x = Math.round( object.position.x / this.translationSnap ) * this.translationSnap;
 					}
 
 					if ( axis.search( 'Y' ) !== -1 ) {
-						object.position.y = Math.round( object.position.y / scope.translationSnap ) * scope.translationSnap;
+						object.position.y = Math.round( object.position.y / this.translationSnap ) * this.translationSnap;
 					}
 
 					if ( axis.search( 'Z' ) !== -1 ) {
-						object.position.z = Math.round( object.position.z / scope.translationSnap ) * scope.translationSnap;
+						object.position.z = Math.round( object.position.z / this.translationSnap ) * this.translationSnap;
 					}
 
 					if ( object.parent ) {
@@ -453,9 +420,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		} else if ( mode === 'rotate' ) {
 
-			var LINEAR_ROTATION_SPEED = 10 / worldPosition.distanceTo( _tempVector.setFromMatrixPosition( scope.camera.matrixWorld ) );
+			var LINEAR_ROTATION_SPEED = 10 / worldPosition.distanceTo( _tempVector.setFromMatrixPosition( this.camera.matrixWorld ) );
 
-			var quaternion = scope.space === "local" ? worldQuaternion : _identityQuaternion;
+			var quaternion = this.space === "local" ? worldQuaternion : _identityQuaternion;
 
 			var unit = _unit[ axis ];
 
@@ -503,7 +470,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 			// Apply rotation snap
 
-			if ( scope.rotationSnap ) rotationAngle = Math.round( rotationAngle / scope.rotationSnap ) * scope.rotationSnap;
+			if ( this.rotationSnap ) rotationAngle = Math.round( rotationAngle / this.rotationSnap ) * this.rotationSnap;
 
 			this.rotationAngle = rotationAngle;
 
@@ -523,8 +490,76 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-		scope.dispatchEvent( changeEvent );
-		scope.dispatchEvent( objectChangeEvent );
+		this.dispatchEvent( changeEvent );
+		this.dispatchEvent( objectChangeEvent );
+
+	}
+
+	this.pointerUp = function( pointer ) {
+
+		if ( pointer.button !== undefined && pointer.button !== 0 ) return;
+
+		if ( this.dragging && ( this.axis !== null ) ) {
+
+			mouseUpEvent.mode = this.mode;
+			this.dispatchEvent( mouseUpEvent );
+
+		}
+
+		this.dragging = false;
+
+		if ( pointer.button === undefined ) this.axis = null;
+
+	}
+
+	// normalize mouse / touch pointer and remap {x,y} to view space.
+
+	function getPointer( event ) {
+
+		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+
+		var rect = domElement.getBoundingClientRect();
+
+		return {
+			x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
+			y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
+			button: event.button
+		}
+
+	}
+
+	// mouse / touch event handlers
+
+	function onContext( event ) {
+
+		event.preventDefault();
+
+	}
+
+	function onPointerHover( event ) {
+
+		// event.preventDefault();
+
+		scope.pointerHover( getPointer( event ) );
+
+	}
+
+	function onPointerDown( event ) {
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		scope.pointerHover( getPointer( event ) );
+		scope.pointerDown( getPointer( event ) );
+
+	}
+
+	function onPointerMove( event ) {
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		scope.pointerMove( getPointer( event ) );
 
 	}
 
@@ -532,41 +567,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		event.preventDefault(); // Prevent MouseEvent on mobile
 
-		if ( event.button !== undefined && event.button !== 0 ) return;
-
-		if ( scope.dragging && ( scope.axis !== null ) ) {
-
-			mouseUpEvent.mode = scope.mode;
-			scope.dispatchEvent( mouseUpEvent );
-
-		}
-
-		scope.dragging = false;
-
-		if ( 'TouchEvent' in window && event instanceof TouchEvent ) {
-
-			scope.axis = null; // Force "rollover"
-
-		} else {
-
-			onPointerHover( event );
-
-		}
-
-	}
-
-	function intersectObjects( pointer, objects, camera ) {
-
-		var rect = domElement.getBoundingClientRect();
-		var x = ( pointer.clientX - rect.left ) / rect.width;
-		var y = ( pointer.clientY - rect.top ) / rect.height;
-
-		_pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1 );
-		_ray.setFromCamera( _pointerVector, camera );
-
-		var intersections = _ray.intersectObjects( objects, true );
-
-		return intersections[ 0 ] ? intersections[ 0 ] : false;
+		scope.pointerUp( getPointer( event ) );
 
 	}
 
