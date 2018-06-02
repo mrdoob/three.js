@@ -101,7 +101,7 @@ function onDocumentLoad( event ) {
 		var permalink = createLink( name + "." + member, "#", { target: "_parent", title: name + "." + member, class: "permalink" } );
 		var memberLink = createLink( name + "." + member, member, { id: member } );
 		var pageLink = createLink( pageName, pageName, { class: "param" } );
-		return permalink + " ." + memberLink + " " + title + " : " + pageLink;
+		return permalink + " ." + memberLink + " " + ( title || "" ) + " : " + pageLink;
 
 	} );
 	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, function ( match, pageName, title ) {
