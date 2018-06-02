@@ -52,7 +52,7 @@ function createLink( pageName, title, attributes ) {
 
 	}
 
-	return "<a onclick=\"window.parent.setUrlFragment('" + pageName + "')\" " + code + ">" + title + "</a>";
+	return "<a onclick=\"window.parent.setUrlFragment('" + pageName + "', event)\" " + code + ">" + title + "</a>";
 
 }
 
