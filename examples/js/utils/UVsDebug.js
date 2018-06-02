@@ -116,7 +116,7 @@ THREE.UVsDebug = function ( geometry, size ) {
 
 		ctx.font = '12pt Arial bold';
 		ctx.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
-		ctx.fillText( i / 3, a.x * width, ( 1 - a.y ) * height );
+		ctx.fillText( index, a.x * width, ( 1 - a.y ) * height );
 
 		if ( a.x > 0.95 ) {
 
