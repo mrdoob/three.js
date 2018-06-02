@@ -84,6 +84,13 @@
 			createNewIframe();
 
 			// Navigation Panel
+			
+			function isRegularClick( event ) {
+				if ( event.button !== 0 ) {
+					return false;
+				}
+				return !( event.metaKey || event.altKey || event.ctrlKey || event.shiftKey );
+			}
 
 			function createLink( pageName, pageURL ) {
 
@@ -93,15 +100,20 @@
 				link.setAttribute( 'target', 'viewer' );
 				link.addEventListener( 'click', function ( event ) {
 
-					window.location.hash = pageURL;
-					panel.classList.add( 'collapsed' );
+					if ( isRegularClick( event ) ) {
+
+						event.preventDefault();
+						window.location.hash = pageURL;
+						panel.classList.add( 'collapsed' );
+
+					}
 
 				} );
 
 				return link;
 
 			}
-
+			
 			function createNavigation() {
 
 				// Create the navigation panel using data from list.js
@@ -262,7 +274,21 @@
 
 
 			// Routing
+			
+			function getPageUrl( pageName ) {
 
+				var splitPageName = decomposePageName( pageName, '.', '#' );
+
+				var currentProperties = pageProperties[ splitPageName[ 0 ] ];
+
+				if ( currentProperties ) {
+
+					return currentProperties.pageURL + ".html" + splitPageName[ 1 ];
+
+				}
+
+			}
+			
 			function setUrlFragment( pageName ) {
 
 				// Handle navigation from the subpages (iframes):
