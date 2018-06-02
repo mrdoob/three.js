@@ -606,9 +606,18 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function processImage( image, mimeType, flipY ) {
 
-			if ( cachedData.images.has( image ) ) {
+			if ( ! cachedData.images.has( image ) ) {
 
-				return cachedData.images.get( image );
+				cachedData.images.set( image, {} );
+
+			}
+
+			var cachedImages = cachedData.images.get( image );
+			var key = mimeType + ":" + flipY.toString();
+
+			if ( cachedImages[ key ] !== undefined ) {
+
+				return cachedImages[ key ];
 
 			}
 
@@ -680,7 +689,7 @@ THREE.GLTFExporter.prototype = {
 			outputJSON.images.push( gltfImage );
 
 			var index = outputJSON.images.length - 1;
-			cachedData.images.set( image, index );
+			cachedImages[ key ] = index;
 
 			return index;
 
