@@ -96,12 +96,12 @@ function onDocumentLoad( event ) {
 	// text = text.replace( /\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$1')\" title=\"$1\">$2</a>" );
 
 	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, "[$1:$2 $2]" ); // [member:name] to [member:name title]
-	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, function ( match, pageName, member, title ) {
+	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, function ( match, typeName, pageName, argList ) {
 
-		var permalink = createLink( name + "." + member, "#", { target: "_parent", title: name + "." + member, class: "permalink" } );
-		var memberLink = createLink( name + "." + member, member, { id: member } );
-		var pageLink = createLink( pageName, pageName, { class: "param" } );
-		return permalink + " ." + memberLink + " " + ( title || "" ) + " : " + pageLink;
+		var permalink = createLink( name + "." + pageName, "#", { target: "_parent", title: name + "." + pageName, class: "permalink" } );
+		var pageLink = createLink( name + "." + pageName, pageName, { id: pageName } );
+		var typeLink = createLink( typeName, typeName, { class: "param" } );
+		return permalink + " ." + pageLink + " " + ( argList || "" ) + " : " + typeLink;
 
 	} );
 	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, function ( match, pageName, title ) {
