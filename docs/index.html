@@ -293,7 +293,14 @@
 
 			}
 
-			function setUrlFragment( pageName ) {
+			function setUrlFragment( pageName, event ) {
+
+				if ( ! isRegularClick( event ) ) {
+
+					return;
+
+				}
+				event.preventDefault();
 
 				// Handle navigation from the subpages (iframes):
 				// First separate the memeber (if existing) from the page name,
