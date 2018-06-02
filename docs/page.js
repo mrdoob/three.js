@@ -25,10 +25,8 @@ if ( !window.frameElement && window.location.protocol !== 'file:' ) {
 
 function createLink( pageName, title, attributes ) {
 
-	if ( !attributes ) {
-		attributes = {};
-	}
-	
+	attributes = attributes || {};
+
 	if ( pageName.match( /^(null|this|Boolean|Object|Array|Number|String|Integer|Float|TypedArray|ArrayBuffer)$/i ) ) {
 
 		// do not create links to primitive types
@@ -38,14 +36,18 @@ function createLink( pageName, title, attributes ) {
 
 	var url = window.parent.getPageUrl( pageName );
 	if ( url ) {
+
 		attributes.href = url;
+
 	}
-	
+
 	var code = "";
 	for ( var key in attributes ) {
 
 		if ( attributes.hasOwnProperty( key ) ) {
-			code += " " + key + "=\"" + attributes[key] + "\"";
+
+			code += " " + key + "=\"" + attributes[ key ] + "\"";
+
 		}
 
 	}
@@ -86,20 +88,26 @@ function onDocumentLoad( event ) {
 	text = text.replace( /\[path\]/gi, path );
 	text = text.replace( /\[page:([\w\.]+)\]/gi, "[page:$1 $1]" ); // [page:name] to [page:name title]
 	text = text.replace( /\[page:\.([\w\.]+) ([\w\.\s]+)\]/gi, "[page:" + name + ".$1 $2]" ); // [page:.member title] to [page:name.member title]
-	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, function( match, pageName, title ) {
-		return createLink( pageName, title, { "title" : pageName } );
+	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, function ( match, pageName, title ) {
+
+		return createLink( pageName, title, { title: pageName } );
+
 	} ); // [page:name title]
 	// text = text.replace( /\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$1')\" title=\"$1\">$2</a>" );
 
 	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, "[$1:$2 $2]" ); // [member:name] to [member:name title]
-	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, function( match, pageName, member, title ) {
-		var permalink = createLink( name + "." + member, "#", { "target" : "_parent", "title" : name + "." + member, "class" : "permalink" } );
-		var memberLink = createLink( name + "." + member, member, { "id" :  member } );
-		var pageLink = createLink( pageName, pageName, { "class": "param" } );
+	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, function ( match, pageName, member, title ) {
+
+		var permalink = createLink( name + "." + member, "#", { target: "_parent", title: name + "." + member, class: "permalink" } );
+		var memberLink = createLink( name + "." + member, member, { id: member } );
+		var pageLink = createLink( pageName, pageName, { class: "param" } );
 		return permalink + " ." + memberLink + " " + title + " : " + pageLink;
+
 	} );
-	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, function( match, pageName, title ) {
-		return title + " : " + createLink( pageName, pageName, { "class" : "param" } );
+	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, function ( match, pageName, title ) {
+
+		return title + " : " + createLink( pageName, pageName, { class: "param" } );
+
 	} ); // [param:name title]
 
 	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
