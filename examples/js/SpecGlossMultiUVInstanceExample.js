@@ -49,7 +49,7 @@ var glossinessMapFragmentChunk = [
 	'#ifdef USE_GLOSSINESSMAP',
 	'	vec4 texelGlossiness = texture2D( glossinessMap, vUv );',
 	'	// reads channel A, compatible with a glTF Specular-Glossiness (RGBA) texture',
-	'	glossinessFactor *= texelGlossiness.r;',
+	'	glossinessFactor *= texelGlossiness.a;',
 	// 'gl_FragColor = vec4(vec3(glossinessFactor),1.);',
 	// 'return;',
 	'#endif',
