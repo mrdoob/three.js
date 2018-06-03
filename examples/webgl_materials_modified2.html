@@ -48,6 +48,8 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/SpecGlossMultiUVInstanceExample.js"></script>
+
+		<script src="js/CurveExtras.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
@@ -115,7 +117,7 @@
 				var material = new THREE.MeshStandardMaterial({
 					color: 0xffb54a,
 				})
-				mesh = new THREE.Mesh(new THREE.SphereBufferGeometry(60), material)
+				mesh = new THREE.Mesh(new THREE.SphereBufferGeometry(10), material)
 				scene.add(mesh)
 
 				decorateMaterialWithSpecGloss(material)
@@ -129,6 +131,33 @@
 				gui.add( material.glossinessMapOffset,'x',0,1).onChange(material.glossinessMapUpdateMatrix)
 				gui.add( material, 'glossinessMapRotation',0,1).onChange(material.glossinessMapUpdateMatrix)
 
+				//instancing
+				const INSTANCES = 256;
+				var knot = new THREE.Curves.TorusKnot( 60 );
+				var positions = knot.getSpacedPoints( INSTANCES );
+
+				var offsets = new Float32Array( INSTANCES * 3 ); // xyz
+				var scales = new Float32Array( INSTANCES * 1 ); // s
+				for ( var i = 0, l = INSTANCES; i < l; i ++ ) {
+
+					var index = 3 * i;
+
+					// per-instance position offset
+					offsets[ index ] = positions[ i ].x;
+					offsets[ index + 1 ] = positions[ i ].y;
+					offsets[ index + 2 ] = positions[ i ].z;
+
+					// per-instance scale variation
+					scales[ i ] = 1 + 0.5 * Math.sin( 32 * Math.PI * i / INSTANCES );
+
+				}
+				mesh.geometry = new THREE.InstancedBufferGeometry().copy(mesh.geometry)
+				mesh.geometry.maxInstancedCount = INSTANCES
+				console.log(mesh.geometry)
+				mesh.geometry.addAttribute( 'instanceOffset', new THREE.InstancedBufferAttribute( offsets, 3 ) );
+				mesh.geometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( scales, 1 ) );
+
+				decorateMaterialWithSimpleInstancing(material)
 			}
 
 

@@ -198,12 +198,6 @@ function decorateMaterialWithPerMapTransforms( material, mapList ) {
 
 			var chunkName = PROP_TO_CHUNK_MAP[lookup]
 
-			console.log('chunkName',chunkName)
-
-			console.log('ownChunk?',(material.shaderIncludes && material.shaderIncludes[chunkName]))
-
-			console.log(mapName)
-
 			var shaderChunk = (material.shaderIncludes && material.shaderIncludes[chunkName]) || THREE.ShaderChunk[chunkName]
 
 			shaderChunk = shaderChunk.replace( mapRegex , getReplaceString(mapName) )
@@ -215,6 +209,39 @@ function decorateMaterialWithPerMapTransforms( material, mapList ) {
 	}
 
 	addOrMergeProp( material, 'shaderUniforms', shaderUniforms );
+	addOrMergeProp( material, 'shaderIncludes', shaderIncludes );
+
+}
+
+
+
+// simple instance stuff from lambert example  ---------------------------------------------------------
+
+var after_vertex_transform_chunk = `
+	transformed *= instanceScale; //the value present in transformed is in model space, 
+	transformed = transformed + instanceOffset;
+`
+
+function decorateMaterialWithSimpleInstancing( material ) {
+	if( material.isSimpleInstanceExtended ) return material
+	material.isSimpleInstanceExtended = true 
+	
+	var shaderIncludes = { 
+		begin_vertex:`
+			${THREE.ShaderChunk.begin_vertex}
+			${after_vertex_transform_chunk}
+		` 
+	}
+
+	//no good global chunk, but could be uv_pars, heres how to make it work with onbeforecompile
+	material.onBeforeCompile = shader => {
+		shader.vertexShader = `
+		attribute vec3 instanceOffset; 
+		attribute float instanceScale;
+		${shader.vertexShader}
+		`
+	}
+	
 	addOrMergeProp( material, 'shaderIncludes', shaderIncludes );
 
 }
