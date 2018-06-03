@@ -565,8 +565,6 @@ THREE.GLTFLoader = ( function () {
 
 			getMaterialType: function () {
 
-				// return THREE.ShaderMaterial;
-				// return THREE.MeshStandardMaterial
 				return 'SPEC_GLOSS';
 
 			},
@@ -574,45 +572,6 @@ THREE.GLTFLoader = ( function () {
 			extendParams: function ( params, material, parser ) {
 
 				var pbrSpecularGlossiness = material.extensions[ this.name ];
-
-				var specularMapFragmentChunk = [
-					'vec3 specularFactor = specular;',
-					'#ifdef USE_SPECULARMAP',
-					'	vec4 texelSpecular = texture2D( specularMap, vUv );',
-					'	texelSpecular = sRGBToLinear( texelSpecular );',
-					'	// reads channel RGB, compatible with a glTF Specular-Glossiness (RGBA) texture',
-					'	specularFactor *= texelSpecular.rgb;',
-					'#endif'
-				].join( '\n' );
-
-				var glossinessMapFragmentChunk = [
-					'float glossinessFactor = glossiness;',
-					'#ifdef USE_GLOSSINESSMAP',
-					'	vec4 texelGlossiness = texture2D( glossinessMap, vUv );',
-					'	// reads channel A, compatible with a glTF Specular-Glossiness (RGBA) texture',
-					'	glossinessFactor *= texelGlossiness.a;',
-					'#endif'
-				].join( '\n' );
-
-				var lightPhysicalFragmentChunk = [
-					'PhysicalMaterial material;',
-					'material.diffuseColor = diffuseColor.rgb;',
-					'material.specularRoughness = clamp( 1.0 - glossinessFactor, 0.04, 1.0 );',
-					'material.specularColor = specularFactor.rgb;',
-				].join( '\n' );
-
-				params.shaderUniforms = {
-					specular: { value: new THREE.Color().setHex( 0x111111 ), type: 'vec3' }, //atm these end up in both vert and frag :/
-					glossiness: { value: 0.5, type: 'float' },
-					glossinessMap: { value: null, type: 'sampler2D' },
-					specularMap: { value: null, type: 'sampler2D' },
-				};
-
-				params.shaderIncludes = {
-					roughnessmap_fragment: specularMapFragmentChunk,
-					metalnessmap_fragment: glossinessMapFragmentChunk,
-					lights_physical_fragment: lightPhysicalFragmentChunk,
-				};
 
 				params.color = new THREE.Color( 1.0, 1.0, 1.0 );
 				params.opacity = 1.0;
@@ -666,8 +625,7 @@ THREE.GLTFLoader = ( function () {
 
 				console.log( material );
 
-				material.shaderIncludes = params.shaderIncludes;
-				material.shaderUniforms = params.shaderUniforms;
+				decorateMaterialWithSpecGloss(material)
 
 				material.isGLTFSpecularGlossinessMaterial = true;
 
@@ -697,21 +655,21 @@ THREE.GLTFLoader = ( function () {
 
 				if ( params.specularMap ) {
 
-					material.shaderUniforms.specularMap.value = params.glossinessMap;
+					material.specularMap = params.specularMap;
 					material.defines.USE_SPECULARMAP = '';
 
 				}
 
-				material.shaderUniforms.specular.value = params.specular;
+				material.specular = params.specular;
 
 				if ( params.glossinessMap ) {
 
-					material.shaderUniforms.glossinessMap.value = params.glossinessMap;
+					material.glossinessMap = params.glossinessMap;
 					material.defines.USE_GLOSSINESSMAP = '';
 
 				}
 
-				material.shaderUniforms.glossiness.value = params.glossiness;
+				material.glossiness = params.glossiness;
 
 				material.alphaMap = null;
 
