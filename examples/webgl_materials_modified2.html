@@ -264,6 +264,10 @@
 				attribute float aIndex;
 				`
 
+				//to make it work with shadows,
+				mesh.customDepthMaterial.shaderIncludes.uv_pars_vertex = material.shaderIncludes.uv_pars_vertex //copy these
+				mesh.customDepthMaterial.shaderIncludes.begin_vertex = material.shaderIncludes.begin_vertex //copy these
+				mesh.customDepthMaterial.shaderUniforms = { uTime: material.shaderUniforms.uTime }//wire this by reference, whenever prop updates material uniform this material updates too by referencing the same uniform
 
 				//test needs update after all of this
 				gui.add(guiData, 'map').onChange(function(val){
