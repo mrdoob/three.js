@@ -163,11 +163,11 @@
 				decorateMaterialWithPerMapTransforms(material)
 
 				//results in thse Vector2 and primitev properties being immidiately available
-				gui.add( material.glossinessMapRepeat,'x',0,10).onChange(material.glossinessMapUpdateMatrix)
-				gui.add( material.glossinessMapRepeat,'y',0,10).onChange(material.glossinessMapUpdateMatrix)
-				gui.add( material.glossinessMapOffset,'x',0,1).onChange(material.glossinessMapUpdateMatrix)
-				gui.add( material.glossinessMapOffset,'x',0,1).onChange(material.glossinessMapUpdateMatrix)
-				gui.add( material, 'glossinessMapRotation',0,1).onChange(material.glossinessMapUpdateMatrix)
+				gui.add( material.specularMapRepeat,'x',0,10).onChange(material.specularMapUpdateMatrix)
+				gui.add( material.specularMapRepeat,'y',0,10).onChange(material.specularMapUpdateMatrix)
+				gui.add( material.specularMapOffset,'x',0,1).onChange(material.specularMapUpdateMatrix)
+				gui.add( material.specularMapOffset,'x',0,1).onChange(material.specularMapUpdateMatrix)
+				gui.add( material, 'specularMapRotation',0,1).onChange(material.specularMapUpdateMatrix)
 
 				//instancing
 				
