@@ -41,12 +41,15 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified material.
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
+			Author <a href="http://dusanbosnjak.com" target="_blank" rel="noopener">@pailhead.</a>
 		</div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
+		<script src="js/SpecGlossMultiUVInstanceExample.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -65,6 +68,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var gui = new dat.GUI()
+
 			init();
 			animate();
 
@@ -77,28 +82,15 @@
 
 				material = new THREE.MeshNormalMaterial(); //no need to create a uniform at some obscure compile time, it's available now (obsucure because its both onBeforeParse and onBeforeCompile`)
 
-				var my_begin_vertex = [ 
-					'float theta = sin( time + position.y ) / 2.0;',
-					'float c = cos( theta );',
-					'float s = sin( theta );',
-					'mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );',
-					'vec3 transformed = vec3( position ) * m;',
-					'vNormal = vNormal * m;'
-				].join( '\n' );
+				var light = new THREE.DirectionalLight( 0xffffff, 0.4 );
+				light.position.set( 50, 40, 40 );
+				
+				scene.add(light)
 
-				material.shaderIncludes = { begin_vertex: my_begin_vertex };
+				var light = new THREE.DirectionalLight( 0xffffff, 0.4 );
+				light.position.set( -50, 40, 40 );
+				scene.add(light)
 
-				material.shaderUniforms = { time: { value: 0, type: 'float', stage: 'vertex' } };
-
-				var loader = new THREE.JSONLoader();
-				loader.load( 'models/json/leeperrysmith/LeePerrySmith.json', function( geometry ) {
-
-					mesh = new THREE.Mesh( geometry, material );
-					mesh.position.y = - 50;
-					mesh.scale.setScalar( 100 );
-					scene.add( mesh );
-
-				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -115,9 +107,30 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 
+
+
+				var texture = new THREE.TextureLoader().load( `textures/roughness_map.jpg` )
+				texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+
+				var material = new THREE.MeshStandardMaterial({
+					color: 0xffb54a,
+				})
+				mesh = new THREE.Mesh(new THREE.SphereBufferGeometry(60), material)
+				scene.add(mesh)
+
+				decorateMaterialWithSpecGloss(material)
+				material.glossinessMap = texture
+				material.specularMap = texture
+				decorateMaterialWithPerMapTransforms(material)
+
+				gui.add( material.glossinessMapRepeat,'x',0,10).onChange(material.glossinessMapUpdateMatrix)
+				gui.add( material.glossinessMapRepeat,'y',0,10).onChange(material.glossinessMapUpdateMatrix)
+				gui.add( material.glossinessMapOffset,'x',0,1).onChange(material.glossinessMapUpdateMatrix)
+				gui.add( material.glossinessMapOffset,'x',0,1).onChange(material.glossinessMapUpdateMatrix)
+				gui.add( material, 'glossinessMapRotation',0,1).onChange(material.glossinessMapUpdateMatrix)
+
 			}
 
-			//
 
 			function onWindowResize( event ) {
 
@@ -138,10 +151,9 @@
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
-
+				console.log
 			}
 
-			//
 
 			function animate() {
 
@@ -164,9 +176,6 @@
 					mesh.rotation.x += 0.05 * ( targetY - mesh.rotation.x );
 
 				}
-
-				material.shaderUniforms.time.value = performance.now() / 1000; //doesnt defer creating the uniform, no need to check
-
 
 				renderer.render( scene, camera );
 

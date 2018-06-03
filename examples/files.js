@@ -298,6 +298,7 @@ var files = {
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
 		"webgl_materials_modified",
+		"webgl_materials_modified2",
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",

@@ -1489,7 +1489,7 @@ function WebGLRenderer( parameters ) {
 
 					if ( type ) {
 
-						if ( stage === 'vertex' ) {
+						if ( stage === 'vertex' ) { //dunno what to do here, maybe if not provided should inject into both
 
 							shaderUniformsGLSLVert += 'uniform ' + type + ' ' + uniformName + ';\n';
 
