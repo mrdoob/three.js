@@ -57,7 +57,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer, stats;
+			var camera, scene, renderer, stats, clock;
 
 			var mesh, material;
 
@@ -70,12 +70,21 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var gui = new dat.GUI()
+			var _gui = new dat.GUI()
+
+			var gui = _gui.addFolder('gui')
+			gui.open()
+
+			var guiData = { speed: 1 }
+
+			gui.add( guiData, 'speed', 0, 5 )
 
 			init();
 			animate();
 
 			function init() {
+
+				clock = new THREE.Clock();
 
 				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1200;
@@ -207,6 +216,47 @@
 				decorateMaterialWithSimpleInstancing(material)
 				//same for depth material
 				mesh.customDepthMaterial = decorateMaterialWithSimpleInstancing(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }))
+
+
+
+				//4. add a final custom animation effect on top of the instancing effect
+				var indecis = new Float32Array( INSTANCES * 1 ); 
+
+				for ( var i = 0, l = INSTANCES; i < l; i ++ ) {
+					indecis[i] = i / INSTANCES
+				}
+				//add this new attribute
+				mesh.geometry.addAttribute('aIndex', new THREE.InstancedBufferAttribute( indecis, 1 ) )
+
+				//remove the old attibute (we could have overloaded it though)
+				delete mesh.geometry.attributes.instanceScale
+
+				var frequency = 32
+				//knowing we decorated with simpleInstancing we have a parsed/included "compiled" chunk to work with
+				material.shaderIncludes.begin_vertex = material.shaderIncludes.begin_vertex.replace(
+					'transformed *= instanceScale;', //we know how simpleInstancing works
+					`float _ind = aIndex + uTime;
+					transformed *= 1. + 0.5 * sin(${frequency}.0 * ${Math.PI} * _ind );` //we override a part of that extension with our custom logic
+				)
+
+				//we need a custom time uniform for the effect
+				material.shaderUniforms.uTime = { value: 0, type: 'float', stage: 'vertex' }
+
+				//we expose it as a primitive
+				Object.defineProperty(material, 'time', {
+					get:()=>material.shaderUniforms.uTime.value,
+					set:v=>material.shaderUniforms.uTime.value = v
+				})
+
+				//because there is already an onBeforeCompile, it's tricky to add another one to append
+				//the new attribute ( and remove the old one ), fortunately, we can use the uv_pars_vertex
+				
+				material.shaderIncludes.uv_pars_vertex = `
+				${THREE.ShaderChunk.uv_pars_vertex}
+				attribute float aIndex;
+				`
+
+
 			}
 
 
@@ -229,7 +279,6 @@
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
-				console.log
 			}
 
 
@@ -253,6 +302,7 @@
 					mesh.rotation.y += 0.05 * ( targetX - mesh.rotation.y );
 					mesh.rotation.x += 0.05 * ( targetY - mesh.rotation.x );
 
+					mesh.material.time += clock.getDelta() * 0.01 * guiData.speed
 				}
 
 				renderer.render( scene, camera );
@@ -260,6 +310,5 @@
 			}
 
 		</script>
-
 	</body>
 </html>
