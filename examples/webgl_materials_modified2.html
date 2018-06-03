@@ -250,7 +250,15 @@
 
 				//because there is already an onBeforeCompile, it's tricky to add another one to append
 				//the new attribute ( and remove the old one ), fortunately, we can use the uv_pars_vertex
-				
+				//ideally there should be a chunk called global_vertex_pars or something like that where 
+				//one could inject uniforms functions varyings and attributes
+				//with this api, in this stage, at least one would have the unrolled raw glsl to work with 
+				//available in this scope at this time
+				//aka
+				//material.shaderIncludes.some_chunk = my_some_chunk || THREE.ShaderChunk.some_chunk 
+				//^ either way, shaderIncludes.some_chunk contains the GLSL, with onBeforeCompile this is blackboxed
+				// we could then do:
+				//  global_vertex.replace( 'attribute float instanceOffset', 'attribute float aIndex' )				
 				material.shaderIncludes.uv_pars_vertex = `
 				${THREE.ShaderChunk.uv_pars_vertex}
 				attribute float aIndex;
