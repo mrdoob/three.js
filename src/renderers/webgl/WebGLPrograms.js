@@ -243,7 +243,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		array.push( renderer.gammaOutput );
 
-		// if there is this dictionary present 
+		// if there is this dictionary present
 		if ( material.shaderIncludes !== undefined ) {
 
 			for ( var include in material.shaderIncludes ) {
