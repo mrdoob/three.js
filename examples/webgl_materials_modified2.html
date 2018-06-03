@@ -152,11 +152,17 @@
 				mesh.castShadow = true
 				mesh.receiveShadow = true
 
+				//decorate with spec gloss 
 				decorateMaterialWithSpecGloss(material)
+
+				//results in these maps being immidiately available
 				material.glossinessMap = texture
 				material.specularMap = texture
+
+				//decorate with map transforms
 				decorateMaterialWithPerMapTransforms(material)
 
+				//results in thse Vector2 and primitev properties being immidiately available
 				gui.add( material.glossinessMapRepeat,'x',0,10).onChange(material.glossinessMapUpdateMatrix)
 				gui.add( material.glossinessMapRepeat,'y',0,10).onChange(material.glossinessMapUpdateMatrix)
 				gui.add( material.glossinessMapOffset,'x',0,1).onChange(material.glossinessMapUpdateMatrix)
@@ -164,6 +170,8 @@
 				gui.add( material, 'glossinessMapRotation',0,1).onChange(material.glossinessMapUpdateMatrix)
 
 				//instancing
+				
+				//create geometry attributes
 				const INSTANCES = 256;
 				var knot = new THREE.Curves.TorusKnot( 60 );
 				var positions = knot.getSpacedPoints( INSTANCES );
@@ -185,12 +193,18 @@
 				}
 				mesh.geometry = new THREE.InstancedBufferGeometry().copy(mesh.geometry)
 				mesh.geometry.maxInstancedCount = INSTANCES
-				console.log(mesh.geometry)
+
+				//end custom geometry creation
+				
+
+				//material decorator exposes instanceOffset and instanceScale, 
+				//provide these to geometry
 				mesh.geometry.addAttribute( 'instanceOffset', new THREE.InstancedBufferAttribute( offsets, 3 ) );
 				mesh.geometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( scales, 1 ) );
 
-				mesh.customDepthMaterial = decorateMaterialWithSimpleInstancing(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }))
 				decorateMaterialWithSimpleInstancing(material)
+				//same for depth material
+				mesh.customDepthMaterial = decorateMaterialWithSimpleInstancing(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }))
 			}
 
 
