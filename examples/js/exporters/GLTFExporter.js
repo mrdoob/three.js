@@ -601,7 +601,7 @@ THREE.GLTFExporter.prototype = {
 		 * Process image
 		 * @param  {Image} image to process
 		 * @param  {Integer} format of the image (e.g. THREE.RGBFormat, THREE.RGBAFormat etc)
-		 * @param  {Boolean} flip the image in the Y before writing out
+		 * @param  {Boolean} flipY before writing out the image
 		 * @return {Integer}     Index of the processed texture in the "images" array
 		 */
 		function processImage( image, format, flipY ) {
