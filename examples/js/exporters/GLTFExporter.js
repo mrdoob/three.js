@@ -600,11 +600,11 @@ THREE.GLTFExporter.prototype = {
 		/**
 		 * Process image
 		 * @param  {Image} image to process
-		 * @param  {String} mimeType to use for writing out
+		 * @param  {Integer} format of the image (e.g. THREE.RGBFormat, THREE.RGBAFormat etc)
 		 * @param  {Boolean} flip the image in the Y before writing out
 		 * @return {Integer}     Index of the processed texture in the "images" array
 		 */
-		function processImage( image, mimeType, flipY ) {
+		function processImage( image, format, flipY ) {
 
 			if ( ! cachedData.images.has( image ) ) {
 
@@ -613,7 +613,8 @@ THREE.GLTFExporter.prototype = {
 			}
 
 			var cachedImages = cachedData.images.get( image );
-			var key = mimeType + ":" + flipY.toString();
+			var mimeType = format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
+			var key = mimeType + ":flipY/" + flipY.toString();
 
 			if ( cachedImages[ key ] !== undefined ) {
 
@@ -742,11 +743,10 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var mimeType = map.format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
 			var gltfTexture = {
 
 				sampler: processSampler( map ),
-				source: processImage( map.image, mimeType, map.flipY  )
+				source: processImage( map.image, map.format, map.flipY  )
 
 			};
 
