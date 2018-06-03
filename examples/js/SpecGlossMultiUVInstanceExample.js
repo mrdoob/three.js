@@ -74,6 +74,8 @@ function decorateMaterialWithSpecGloss( material ) {
 
 	material.isSpecGlossExtended = true;
 
+	// these are the extra uniforms, but instead of being stored in .userData, or some such place
+	// a designated prop could be used
 	var shaderUniforms = {
 		specular: { value: new THREE.Color().setHex( 0xffffff ), type: 'vec3', stage: 'fragment' }, //fragment can be ommitted (defaults to it) but for sake of clarity
 		glossiness: { value: 1, type: 'float', stage: 'fragment' },
@@ -88,9 +90,8 @@ function decorateMaterialWithSpecGloss( material ) {
 	addOrMergeProp( material, 'shaderIncludes', SHADER_INCLUDES_SPEC_GLOSS );
 	addOrMergeProp( material, 'defines', defines );
 
-	console.log(material.shaderUniforms)
-	console.log(material.shaderIncludes)
 	//expose uniforms as props for a cleaner interface (but shaderUniforms is also available so this can be omitted)
+	//it just leads to a cleaner more familiar interface (PhongMaterial has specularMap, so this now has it too)
 	for ( let propName in shaderUniforms ) {
 
 		Object.defineProperty( material, propName, {
@@ -99,7 +100,7 @@ function decorateMaterialWithSpecGloss( material ) {
 		} );
 
 	}
-	
+
 	return material
 
 }
@@ -120,6 +121,9 @@ var DEFAULT_MAP_LIST = [
 ];
 
 //this can be programatic
+//it tells the extension where to look for certain maps
+//these follow the /texture2D( $mapname, vUv )/ pattern
+//normal map is a bit more complex and would require a non programatic chunk 
 var PROP_TO_CHUNK_MAP = {
 	'alphaMap': 'alphamap_fragment',
 	'specularMap': 'specularmap_fragment',
@@ -133,17 +137,22 @@ var PROP_TO_CHUNK_MAP = {
 
 //some utils
 
-var mapRegex = /texture2D\( (.*Map|map), vUv \)/gm //look for this
+var mapRegex = /texture2D\( (.*Map|map), vUv \)/gm //look for the pattern /texture2D( $someMap, vUv )/
 
+//because the other extension changes roughnessMap to specularMap we need the $1 to replace the name, otherwise it could be `mapName`
 function getReplaceString(mapName){
 	return `texture2D( $1, ( ${getUniformNameFromProp(mapName)} * vec3( vUv, 1. ) ).xy )`
 }
 
-
+//in order to keep the uniform name obvious that it belongs to the GLSL context, and to make it as private sounding as possible
 function getUniformNameFromProp(prop){
 	return `u_${prop}Transform`
 }
 
+//a utility to add the necessary transform properties to a material based on an arbitrary map name
+//so if specularMap is provided it will create these Vector2, a float, and an updateMatrix method
+//this is very similar to the Texture transform interface the only difference being that the props are prefixed
+//myTexture.repeat vs myMaterial.specularMapRepeat 
 function addMapTransformPropsToMaterial( material, mapName ){
 
 	let _mapName = mapName
@@ -172,9 +181,14 @@ function decorateMaterialWithPerMapTransforms( material, mapList ) {
 
 	material.isPerMapTransformExtended = true;
 
-	delete material.metalnessMap
-	delete material.roughnessMap
+	//this could be more generic, say, check if the chunks belonging to these maps have been altered
+	//but also knowing about the other extension, makes for an easy check
+	if( material.isSpecGlossExtended){
+		delete material.metalnessMap //remove the unused map names so the loop below doesnt account for them (conflict)
+		delete material.roughnessMap
+	}
 
+	//one can provide a subset from outside
 	mapList = mapList || DEFAULT_MAP_LIST;
 
 	var shaderUniforms = {}
@@ -184,32 +198,42 @@ function decorateMaterialWithPerMapTransforms( material, mapList ) {
 
 		var mapName = mapList[ i ];
 
-		addMapTransformPropsToMaterial(material, mapName)
 
 		if ( material[ mapName ] !== undefined ) {
+
+			addMapTransformPropsToMaterial(material, mapName)
 
 			var uniform = { value: new THREE.Matrix3(), type:'mat3', stage: 'fragment' };
 			uniform.value.setUvTransform = setUvTransform.bind( uniform.value );
 
 			shaderUniforms[getUniformNameFromProp(mapName)] = uniform
 
+			//this is for resolving the conflict, its not the most elegant solution but it works
+			//i believe that this would be solved by refactoring the shader templates
 			var lookup = mapName
 			if( material.isSpecGlossExtended && mapName === 'specularMap'){
 				lookup = 'specularMapGloss' 
 			}
 
+			//based on the map name ie. specularMap or even an extended glossinessMap pick a chunk
 			var chunkName = PROP_TO_CHUNK_MAP[lookup]
 
+			//if there already is a chunk from some extension, pick that, otherwise copy the default chunk
 			var shaderChunk = (material.shaderIncludes && material.shaderIncludes[chunkName]) || THREE.ShaderChunk[chunkName]
 
+			//apply the string transformation, this contains the copy of whatever chunk was provided (default or custom)
 			shaderChunk = shaderChunk.replace( mapRegex , getReplaceString(mapName) )
 
+			//provide this copy as the include chunk, this shader wont look up THREE.ShaderChunk 
+			//and doesnt have to wait for onBeforeCompile to do the transformation
+			//final transformed chunk is already stored here in this context sync
 			shaderIncludes[ chunkName ] = shaderChunk
 
 		}
 
 	}
 
+	//combine with other chunks
 	addOrMergeProp( material, 'shaderUniforms', shaderUniforms );
 	addOrMergeProp( material, 'shaderIncludes', shaderIncludes );
 
@@ -220,15 +244,20 @@ function decorateMaterialWithPerMapTransforms( material, mapList ) {
 
 // simple instance stuff from lambert example  ---------------------------------------------------------
 
+//this is a stage after begin_vertex, this would be more elegant with hooks and template refactor
 var after_vertex_transform_chunk = `
 	transformed *= instanceScale; //the value present in transformed is in model space, 
 	transformed = transformed + instanceOffset;
 `
 
 function decorateMaterialWithSimpleInstancing( material ) {
+
 	if( material.isSimpleInstanceExtended ) return material
+
 	material.isSimpleInstanceExtended = true 
 	
+	//make a custom chunk that includes a copy of the default chunk from THREE.ShaderChunk
+	//followed by a custom chunk, that is simply appended to the copy
 	var shaderIncludes = { 
 		begin_vertex:`
 			${THREE.ShaderChunk.begin_vertex}
@@ -237,13 +266,33 @@ function decorateMaterialWithSimpleInstancing( material ) {
 	}
 
 	//no good global chunk, but could be uv_pars, heres how to make it work with onbeforecompile
-	material.onBeforeCompile = shader => {
-		shader.vertexShader = `
+	//because this is somewhat of a set and forget thing, onBeforeCompile (or onBeforeParse) is 
+	//perfectly valid to use here
+	//"here are some attribute names, whenver you get around to assemblying the shader on WebGL level use them"
+	//A uniform (over an attribute) would be better if it were available in this scope
+	
+	var attributeInjection = `
 		attribute vec3 instanceOffset; 
 		attribute float instanceScale;
+	`
+
+	material.onBeforeCompile = shader => {
+		shader.vertexShader = `
+		${attributeInjection}
 		${shader.vertexShader}
 		`
 	}
+
+	//alternatively one can use `uv_pars_vertex`
+	//since displacement map is used in almost all of the shaders, this chunk is present 
+	//depth for example, has this chunk, so whatever attribute is added to StandardMaterial
+	//is also going to be added to DepthMaterial
+	/*shaderIncludes = {
+		uv_pars_vertex: `
+		${attributeInjection}
+		${THREE.ShaderChunk.uv_pars_vertex}
+		`
+	}*/
 
 	addOrMergeProp( material, 'shaderIncludes', shaderIncludes );
 
