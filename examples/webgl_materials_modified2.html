@@ -82,18 +82,43 @@
 
 				scene = new THREE.Scene();
 
-				material = new THREE.MeshNormalMaterial(); //no need to create a uniform at some obscure compile time, it's available now (obsucure because its both onBeforeParse and onBeforeCompile`)
-
 				var light = new THREE.DirectionalLight( 0xffffff, 0.4 );
-				light.position.set( 50, 40, 40 );
+				light.position.set( 100, 260, 160 );
 				
+				light.castShadow = true;
+				light.shadow.camera.left = - 240;
+				light.shadow.camera.right = 240;
+				light.shadow.camera.top = 240;
+				light.shadow.camera.bottom = - 240;
+				light.shadow.camera.near = 10;
+				light.shadow.camera.far = 1500;
+
+				light.shadow.bias = - 0.001;
+				light.shadow.mapSize.width = 512;
+				light.shadow.mapSize.height = 512;
 				scene.add(light)
+
+
+				// light shadow camera helper
+				light.shadowCameraHelper = new THREE.CameraHelper( light.shadow.camera );
+				scene.add( light.shadowCameraHelper );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.17 ) );
+
+				var ground = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 800, 800 ).rotateX( - Math.PI / 2 ),
+					new THREE.MeshPhongMaterial( { color: 0x888888 } )
+				);
+				ground.position.set( 0, - 200, 0 );
+				ground.receiveShadow = true;
+	
+				scene.add( ground );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				renderer.shadowMap.enabled = true;
 				//
 
 				stats = new Stats();
@@ -124,6 +149,8 @@
 
 				mesh = new THREE.Mesh(new THREE.SphereBufferGeometry(10), material)
 				scene.add(mesh)
+				mesh.castShadow = true
+				mesh.receiveShadow = true
 
 				decorateMaterialWithSpecGloss(material)
 				material.glossinessMap = texture
@@ -162,6 +189,7 @@
 				mesh.geometry.addAttribute( 'instanceOffset', new THREE.InstancedBufferAttribute( offsets, 3 ) );
 				mesh.geometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( scales, 1 ) );
 
+				mesh.customDepthMaterial = decorateMaterialWithSimpleInstancing(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }))
 				decorateMaterialWithSimpleInstancing(material)
 			}
 

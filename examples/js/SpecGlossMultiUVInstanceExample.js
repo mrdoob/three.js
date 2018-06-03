@@ -99,6 +99,8 @@ function decorateMaterialWithSpecGloss( material ) {
 		} );
 
 	}
+	
+	return material
 
 }
 
@@ -211,6 +213,7 @@ function decorateMaterialWithPerMapTransforms( material, mapList ) {
 	addOrMergeProp( material, 'shaderUniforms', shaderUniforms );
 	addOrMergeProp( material, 'shaderIncludes', shaderIncludes );
 
+	return material
 }
 
 
@@ -241,7 +244,9 @@ function decorateMaterialWithSimpleInstancing( material ) {
 		${shader.vertexShader}
 		`
 	}
-	
+
 	addOrMergeProp( material, 'shaderIncludes', shaderIncludes );
+
+	return material
 
 }
