@@ -89,11 +89,6 @@
 				
 				scene.add(light)
 
-				var light = new THREE.DirectionalLight( 0xffffff, 0.4 );
-				light.position.set( -50, 40, 40 );
-				scene.add(light)
-
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -114,9 +109,19 @@
 				var texture = new THREE.TextureLoader().load( `textures/roughness_map.jpg` )
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping
 
+				var envMap = new THREE.TextureLoader().load( `textures/metal.jpg`, function ( texture ) {
+	
+					texture.mapping = THREE.SphericalReflectionMapping;
+					texture.encoding = THREE.sRGBEncoding;
+					if ( mesh ) mesh.material.needsUpdate = true;
+	
+				} );
+
 				var material = new THREE.MeshStandardMaterial({
 					color: 0xffb54a,
+					envMap: envMap,
 				})
+
 				mesh = new THREE.Mesh(new THREE.SphereBufferGeometry(10), material)
 				scene.add(mesh)
 
