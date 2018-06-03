@@ -75,7 +75,7 @@
 			var gui = _gui.addFolder('gui')
 			gui.open()
 
-			var guiData = { speed: 1 }
+			var guiData = { speed: 1 , map: true}
 
 			gui.add( guiData, 'speed', 0, 5 )
 
@@ -265,6 +265,11 @@
 				`
 
 
+				//test needs update after all of this
+				gui.add(guiData, 'map').onChange(function(val){
+					material.map = val ? texture : null
+					material.needsUpdate = true
+				})
 			}
 
 
