@@ -1474,11 +1474,41 @@ function WebGLRenderer( parameters ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
 
+				var combinedUniforms = undefined !== material.shaderUniforms ?
+					UniformsUtils.merge( [ UniformsUtils.clone( shader.uniforms ), material.shaderUniforms ] ) :
+					UniformsUtils.clone( shader.uniforms );
+
+				var shaderUniformsGLSLFrag = ''; //collect the GLSL in here
+				var shaderUniformsGLSLVert = ''; //collect the GLSL in here
+
+				for ( var uniformName in material.shaderUniforms ) {
+
+					var uniform = material.shaderUniforms[ uniformName ];
+					var type = uniform.type;
+					var stage = uniform.stage;
+
+					if ( type ) {
+
+						if ( stage === 'vertex' ) {
+
+							shaderUniformsGLSLVert += 'uniform ' + type + ' ' + uniformName + ';\n';
+
+						} else {
+
+							shaderUniformsGLSLFrag += 'uniform ' + type + ' ' + uniformName + ';\n';
+
+						}
+
+					}
+
+				}
+
 				materialProperties.shader = {
 					name: material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
-					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader
+					uniforms: combinedUniforms,
+					vertexShader: shaderUniformsGLSLVert + shader.vertexShader,
+					fragmentShader: shaderUniformsGLSLFrag + shader.fragmentShader //maybe not use the same
+
 				};
 
 			} else {
@@ -1797,8 +1827,14 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			// refresh uniforms common to several materials
+			//refresh custom provided uniforms
+			if ( undefined !== material.shaderUniforms ) {
 
+				refreshUniformsCustom( m_uniforms, material );
+
+			}
+
+			// refresh uniforms common to several materials
 			if ( fog && material.fog ) {
 
 				refreshUniformsFog( m_uniforms, fog );
@@ -2036,6 +2072,17 @@ function WebGLRenderer( parameters ) {
 			}
 
 			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
+
+		}
+
+	}
+
+	//refresh custom provided uniforms
+	function refreshUniformsCustom( uniforms, material ) {
+
+		for ( var uniform in material.shaderUniforms ) {
+
+			uniforms[ uniform ].value = material.shaderUniforms[ uniform ].value;
 
 		}
 
