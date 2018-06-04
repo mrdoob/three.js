@@ -274,8 +274,6 @@ THREE.NodeMaterial.prototype.build = function ( params ) {
 
 		// force update
 
-		this.needsUpdate = false;
-
 		this.dispose();
 
 	}
