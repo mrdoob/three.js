@@ -6,6 +6,8 @@ THREE.NodePass = function () {
 
 	THREE.ShaderPass.call( this );
 
+	var self = this;
+
 	this.name = "";
 	this.uuid = THREE.Math.generateUUID();
 
@@ -18,7 +20,15 @@ THREE.NodePass = function () {
 	this.node = new THREE.NodeMaterial();
 	this.node.fragment = this.fragment;
 
-	this.build();
+	this.needsUpdate = true;
+
+	this.node.build = function ( params ) {
+
+		THREE.NodeMaterial.prototype.build.call( this, params );
+
+		self.uniforms = this.uniforms;
+
+	};
 
 };
 
@@ -27,12 +37,28 @@ THREE.NodePass.prototype.constructor = THREE.NodePass;
 
 THREE.NodeMaterial.addShortcuts( THREE.NodePass.prototype, 'fragment', [ 'value' ] );
 
+THREE.NodePass.prototype.render = function () {
+
+	if ( this.needsUpdate ) {
+
+		this.node.dispose();
+
+		this.needsUpdate = false;
+
+	}
+
+	this.uniforms = this.node.uniforms;
+	this.material = this.node;
+
+	THREE.ShaderPass.prototype.render.apply( this, arguments );
+
+};
+
 THREE.NodePass.prototype.build = function () {
 
 	this.node.build();
 
-	this.uniforms = this.node.uniforms;
-	this.material = this.node;
+	this.needsUpdate = false;
 
 };
 

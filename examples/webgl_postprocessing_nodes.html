@@ -504,7 +504,7 @@
 
 				}
 
-				nodepass.build();
+				nodepass.needsUpdate = true;
 
 				// test serialization
 /*
@@ -515,7 +515,6 @@
 				var json = nodepass.toJSON();
 
 				nodepass.value = new THREE.NodeMaterialLoader( null, library ).parse( json ).value;
-				nodepass.build();
 */
 			}
 
