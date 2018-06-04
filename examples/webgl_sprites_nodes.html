@@ -275,7 +275,7 @@
 
 			// unserialize
 
-			var material = new THREE.NodeMaterialLoader( null, library ).parse( json );
+			var material = new THREE.NodeMaterialLoader( null, library ).parse( json ).build();
 
 			// replace material
 

@@ -565,8 +565,6 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 			}
 
-			object.build();
-
 			if ( node.fog !== undefined ) object.fog = node.fog;
 			if ( node.lights !== undefined ) object.lights = node.lights;
 

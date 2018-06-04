@@ -22,14 +22,6 @@ THREE.NodePass = function () {
 
 	this.needsUpdate = true;
 
-	this.node.build = function ( params ) {
-
-		THREE.NodeMaterial.prototype.build.call( this, params );
-
-		self.uniforms = this.uniforms;
-
-	};
-
 };
 
 THREE.NodePass.prototype = Object.create( THREE.ShaderPass.prototype );
