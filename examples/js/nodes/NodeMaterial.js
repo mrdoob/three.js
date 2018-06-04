@@ -78,7 +78,24 @@ THREE.NodeMaterial.prototype.updateFrame = function ( frame ) {
 
 };
 
-THREE.NodeMaterial.prototype.build = function () {
+THREE.NodeMaterial.prototype.onBeforeCompile = function (shader, renderer) {
+
+	if ( this.needsUpdate ) {
+
+		this.build( { dispose : false } );
+
+		shader.uniforms = this.uniforms;
+		shader.vertexShader = this.vertexShader;
+		shader.fragmentShader = this.fragmentShader;
+
+	}
+
+};
+
+THREE.NodeMaterial.prototype.build = function ( params ) {
+
+	params = params || {};
+	params.dispose = params.dispose !== undefined ? params.dispose : true;
 
 	var vertex, fragment;
 
@@ -253,8 +270,15 @@ THREE.NodeMaterial.prototype.build = function () {
 		'}'
 	].join( "\n" );
 
-	this.needsUpdate = true;
-	this.dispose(); // force update
+	if ( params.dispose ) {
+
+		// force update
+
+		this.needsUpdate = false;
+
+		this.dispose();
+
+	}
 
 	return this;
 
