@@ -581,8 +581,6 @@ Object.assign( THREE.NodeMaterialLoader.prototype, {
 
 			object.value = this.getNode( node.value );
 
-			object.build();
-
 		}
 
 		return this.material || this.pass || this;

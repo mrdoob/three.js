@@ -54,14 +54,6 @@ THREE.NodePass.prototype.render = function () {
 
 };
 
-THREE.NodePass.prototype.build = function () {
-
-	this.node.build();
-
-	this.needsUpdate = false;
-
-};
-
 THREE.NodePass.prototype.toJSON = function ( meta ) {
 
 	var isRootObject = ( meta === undefined || typeof meta === 'string' );
