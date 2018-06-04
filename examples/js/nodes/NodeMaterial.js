@@ -82,7 +82,7 @@ THREE.NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
 
 	if ( this.needsUpdate ) {
 
-		this.build( { dispose : false } );
+		this.build( { dispose: false } );
 
 		shader.uniforms = this.uniforms;
 		shader.vertexShader = this.vertexShader;
