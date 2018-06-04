@@ -78,7 +78,7 @@ THREE.NodeMaterial.prototype.updateFrame = function ( frame ) {
 
 };
 
-THREE.NodeMaterial.prototype.onBeforeCompile = function (shader, renderer) {
+THREE.NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
 
 	if ( this.needsUpdate ) {
 
