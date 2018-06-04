@@ -1378,6 +1378,16 @@ THREE.GLTFExporter.prototype = {
 
 				if ( trackProperty === PATH_PROPERTIES.morphTargetInfluences ) {
 
+					if ( trackNode.morphTargetInfluences.length !== 1 &&
+						trackBinding.propertyIndex !== undefined ) {
+
+						console.warn( 'THREE.GLTFExporter: Skipping animation track "%s" because ' +
+							'glTF can not handle single morph animation. ' +
+							'Try to merge .morphTargetInfluences elements instead.', track.name );
+						continue;
+
+					}
+
 					outputItemSize /= trackNode.morphTargetInfluences.length;
 
 				}
