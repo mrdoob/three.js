@@ -1,3 +1,8 @@
+/**
+ * @author adrs2002 / https://github.com/adrs2002
+ */
+
+
 ( function ( global, factory ) {
 
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -203,13 +208,13 @@
 
 	var XLoader = function () {
 
-		function XLoader( manager, texloader ) {
+		function XLoader( manager ) {
 
 			classCallCheck( this, XLoader );
 
 			this.debug = false;
 			this.manager = manager !== undefined ? manager : new THREE.DefaultLoadingManager();
-			this.texloader = texloader !== undefined ? texloader : new THREE.TextureLoader();
+			this.texloader = new THREE.TextureLoader( this.manager );
 			this.url = "";
 			this.baseDir = "";
 			this._putMatLength = 0;
