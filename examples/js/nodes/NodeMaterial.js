@@ -6,6 +6,8 @@ THREE.NodeMaterial = function ( vertex, fragment ) {
 
 	THREE.ShaderMaterial.call( this );
 
+	this.defines.UUID = THREE.Math.generateUUID();
+
 	this.vertex = vertex || new THREE.RawNode( new THREE.PositionNode( THREE.PositionNode.PROJECTION ) );
 	this.fragment = fragment || new THREE.RawNode( new THREE.ColorNode( 0xFF0000 ) );
 
@@ -101,7 +103,7 @@ THREE.NodeMaterial.prototype.build = function ( params ) {
 
 	this.nodes = [];
 
-	this.defines = {};
+	this.defines = { UUID: this.defines.UUID };
 	this.uniforms = {};
 	this.attributes = {};
 
@@ -310,7 +312,7 @@ THREE.NodeMaterial.prototype.createUniform = function ( type, node, ns, needsUpd
 
 	var uniform = new THREE.NodeUniform( {
 		type: type,
-		name: ns ? ns : 'nVu' + index,
+		name: ns ? ns : 'nVu' +  index + '_' + THREE.Math.generateUUID().substr(0, 8),
 		node: node,
 		needsUpdate: needsUpdate
 	} );
