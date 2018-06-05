@@ -6,8 +6,6 @@ THREE.NodePass = function () {
 
 	THREE.ShaderPass.call( this );
 
-	var self = this;
-
 	this.name = "";
 	this.uuid = THREE.Math.generateUUID();
 
