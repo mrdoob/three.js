@@ -343,6 +343,7 @@ function WebGLState( gl, extensions, utils ) {
 	var maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
 
 	var lineWidthAvailable = false;
+	var vaoActive = false;
 	var version = 0;
 	var glVersion = gl.getParameter( gl.VERSION );
 
@@ -423,21 +424,36 @@ function WebGLState( gl, extensions, utils ) {
 
 	function enableAttributeAndDivisor( attribute, meshPerAttribute ) {
 
-		newAttributes[ attribute ] = 1;
-
-		if ( enabledAttributes[ attribute ] === 0 ) {
+		if ( vaoActive ) {
 
 			gl.enableVertexAttribArray( attribute );
-			enabledAttributes[ attribute ] = 1;
 
-		}
+			if ( meshPerAttribute ) {
 
-		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
+				var extension = extensions.get( 'ANGLE_instanced_arrays' );
+				extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
 
-			var extension = extensions.get( 'ANGLE_instanced_arrays' );
+			}
 
-			extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
-			attributeDivisors[ attribute ] = meshPerAttribute;
+		} else {
+
+			newAttributes[ attribute ] = 1;
+
+			if ( enabledAttributes[ attribute ] === 0 ) {
+
+				gl.enableVertexAttribArray( attribute );
+				enabledAttributes[ attribute ] = 1;
+
+			}
+
+			if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
+
+				var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+				extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
+				attributeDivisors[ attribute ] = meshPerAttribute;
+
+			}
 
 		}
 
@@ -445,12 +461,16 @@ function WebGLState( gl, extensions, utils ) {
 
 	function disableUnusedAttributes() {
 
-		for ( var i = 0, l = enabledAttributes.length; i !== l; ++ i ) {
+		if ( vaoActive === false ) {
 
-			if ( enabledAttributes[ i ] !== newAttributes[ i ] ) {
+			for ( var i = 0, l = enabledAttributes.length; i !== l; ++ i ) {
 
-				gl.disableVertexAttribArray( i );
-				enabledAttributes[ i ] = 0;
+				if ( enabledAttributes[ i ] !== newAttributes[ i ] ) {
+
+					gl.disableVertexAttribArray( i );
+					enabledAttributes[ i ] = 0;
+
+				}
 
 			}
 
@@ -868,6 +888,18 @@ function WebGLState( gl, extensions, utils ) {
 
 	}
 
+	function enableVAO() {
+
+		vaoActive = true;
+
+	}
+
+	function disableVAO() {
+
+		vaoActive = false;
+
+	}
+
 	//
 
 	function reset() {
@@ -918,6 +950,9 @@ function WebGLState( gl, extensions, utils ) {
 		enable: enable,
 		disable: disable,
 		getCompressedTextureFormats: getCompressedTextureFormats,
+
+		enableVAO: enableVAO,
+		disableVAO: disableVAO,
 
 		useProgram: useProgram,
 
