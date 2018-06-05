@@ -312,7 +312,7 @@ THREE.NodeMaterial.prototype.createUniform = function ( type, node, ns, needsUpd
 
 	var uniform = new THREE.NodeUniform( {
 		type: type,
-		name: ns ? ns : 'nVu' +  index + '_' + THREE.Math.generateUUID().substr(0, 8),
+		name: ns ? ns : 'nVu' + index + '_' + THREE.Math.generateUUID().substr(0, 8),
 		node: node,
 		needsUpdate: needsUpdate
 	} );
