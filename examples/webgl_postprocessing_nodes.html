@@ -465,9 +465,9 @@
 
 						}, false, 0, 1 );
 
-						addGui( 'mask', true, function ( val ) {
+						addGui( 'mask', false, function ( val ) {
 
-							fadeCoord.c = val ? maskAlpha : fade;
+							fadeScreen.c = val ? new THREE.TextureNode( lensflare2 ) : fade;
 
 							nodepass.needsUpdate = true;
 
