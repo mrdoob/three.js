@@ -10,7 +10,7 @@ function WebGLBindingStates( gl, extensions, state, attributes ) {
 
 	function setup( material, program, geometry, index, hasMorphTarget ) {
 
-		var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
+		var geometryProgram = geometry.id + '_' + geometry.version + '_' + program.id + '_' + ( material.wireframe === true );
 
 		// only use VAO if extension is available
 		// if morph targets are present we render it the old way
