@@ -54,7 +54,7 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
-
+/*eslint-disable*/
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer, stats, clock;
@@ -142,6 +142,7 @@
 
 				var texture = new THREE.TextureLoader().load( `textures/roughness_map.jpg` )
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+				texture.name = "texture"
 
 				var envMap = new THREE.TextureLoader().load( `textures/metal.jpg`, function ( texture ) {
 	
@@ -150,6 +151,8 @@
 					if ( mesh ) mesh.material.needsUpdate = true;
 	
 				} );
+
+				envMap.name = "envMap"
 
 				var material = new THREE.MeshStandardMaterial({
 					color: 0xffb54a,
@@ -274,6 +277,8 @@
 					material.map = val ? texture : null
 					material.needsUpdate = true
 				})
+
+				console.log(material.toJSON())
 			}
 
 
