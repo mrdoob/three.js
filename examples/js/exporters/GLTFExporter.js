@@ -1381,9 +1381,9 @@ THREE.GLTFExporter.prototype = {
 					if ( trackNode.morphTargetInfluences.length !== 1 &&
 						trackBinding.propertyIndex !== undefined ) {
 
-						console.warn( 'THREE.GLTFExporter: Skipping animation track "%s" because ' +
-							'glTF can not handle single morph animation. ' +
-							'Try to merge .morphTargetInfluences elements instead.', track.name );
+						console.warn( 'THREE.GLTFExporter: Skipping animation track "%s". ' +
+							'Morph target keyframe tracks must target all available morph targets ' +
+							'for the given mesh.', track.name );
 						continue;
 
 					}
