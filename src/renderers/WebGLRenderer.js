@@ -23,6 +23,7 @@ import { Vector4 } from '../math/Vector4.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
+import { WebGLBindingStates } from './webgl/WebGLBindingStates.js';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
 import { WebGLClipping } from './webgl/WebGLClipping.js';
@@ -128,7 +129,6 @@ function WebGLRenderer( parameters ) {
 		_currentRenderTarget = null,
 		_currentFramebuffer = null,
 		_currentMaterialId = - 1,
-		_currentGeometryProgram = '',
 
 		_currentCamera = null,
 		_currentArrayCamera = null,
@@ -231,7 +231,7 @@ function WebGLRenderer( parameters ) {
 
 	var extensions, capabilities, state, info;
 	var properties, textures, attributes, geometries, objects;
-	var programCache, renderLists, renderStates;
+	var programCache, renderLists, renderStates, bindingStates;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 	var spriteRenderer;
@@ -248,6 +248,8 @@ function WebGLRenderer( parameters ) {
 		extensions.get( 'OES_texture_half_float_linear' );
 		extensions.get( 'OES_standard_derivatives' );
 		extensions.get( 'OES_element_index_uint' );
+		extensions.get( 'OES_vertex_array_object' );
+		extensions.get( 'ANGLE_instanced_arrays' );
 		extensions.get( 'ANGLE_instanced_arrays' );
 
 		utils = new WebGLUtils( _gl, extensions );
@@ -268,6 +270,7 @@ function WebGLRenderer( parameters ) {
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates();
+		bindingStates = new WebGLBindingStates( _gl, extensions, state, attributes );
 
 		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
@@ -504,6 +507,7 @@ function WebGLRenderer( parameters ) {
 		renderStates.dispose();
 		properties.dispose();
 		objects.dispose();
+		bindingStates.dispose();
 
 		vr.dispose();
 
@@ -681,22 +685,13 @@ function WebGLRenderer( parameters ) {
 		state.setMaterial( material, frontFaceCW );
 
 		var program = setProgram( camera, fog, material, object );
-		var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
 
-		var updateBuffers = false;
-
-		if ( geometryProgram !== _currentGeometryProgram ) {
-
-			_currentGeometryProgram = geometryProgram;
-			updateBuffers = true;
-
-		}
+		var hasMorphTarget = false;
 
 		if ( object.morphTargetInfluences ) {
 
 			morphtargets.update( object, geometry, material, program );
-
-			updateBuffers = true;
+			hasMorphTarget = true;
 
 		}
 
@@ -725,17 +720,9 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( updateBuffers ) {
+		//
 
-			setupVertexAttributes( material, program, geometry );
-
-			if ( index !== null ) {
-
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attribute.buffer );
-
-			}
-
-		}
+		bindingStates.setup( material, program, geometry, index, hasMorphTarget );
 
 		//
 
@@ -836,136 +823,9 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		bindingStates.resetBindingState();
+
 	};
-
-	function setupVertexAttributes( material, program, geometry ) {
-
-		if ( geometry && geometry.isInstancedBufferGeometry ) {
-
-			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
-
-				console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-				return;
-
-			}
-
-		}
-
-		state.initAttributes();
-
-		var geometryAttributes = geometry.attributes;
-
-		var programAttributes = program.getAttributes();
-
-		var materialDefaultAttributeValues = material.defaultAttributeValues;
-
-		for ( var name in programAttributes ) {
-
-			var programAttribute = programAttributes[ name ];
-
-			if ( programAttribute >= 0 ) {
-
-				var geometryAttribute = geometryAttributes[ name ];
-
-				if ( geometryAttribute !== undefined ) {
-
-					var normalized = geometryAttribute.normalized;
-					var size = geometryAttribute.itemSize;
-
-					var attribute = attributes.get( geometryAttribute );
-
-					// TODO Attribute may not be available on context restore
-
-					if ( attribute === undefined ) continue;
-
-					var buffer = attribute.buffer;
-					var type = attribute.type;
-					var bytesPerElement = attribute.bytesPerElement;
-
-					if ( geometryAttribute.isInterleavedBufferAttribute ) {
-
-						var data = geometryAttribute.data;
-						var stride = data.stride;
-						var offset = geometryAttribute.offset;
-
-						if ( data && data.isInstancedInterleavedBuffer ) {
-
-							state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
-
-							if ( geometry.maxInstancedCount === undefined ) {
-
-								geometry.maxInstancedCount = data.meshPerAttribute * data.count;
-
-							}
-
-						} else {
-
-							state.enableAttribute( programAttribute );
-
-						}
-
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
-
-					} else {
-
-						if ( geometryAttribute.isInstancedBufferAttribute ) {
-
-							state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
-
-							if ( geometry.maxInstancedCount === undefined ) {
-
-								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
-
-							}
-
-						} else {
-
-							state.enableAttribute( programAttribute );
-
-						}
-
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
-
-					}
-
-				} else if ( materialDefaultAttributeValues !== undefined ) {
-
-					var value = materialDefaultAttributeValues[ name ];
-
-					if ( value !== undefined ) {
-
-						switch ( value.length ) {
-
-							case 2:
-								_gl.vertexAttrib2fv( programAttribute, value );
-								break;
-
-							case 3:
-								_gl.vertexAttrib3fv( programAttribute, value );
-								break;
-
-							case 4:
-								_gl.vertexAttrib4fv( programAttribute, value );
-								break;
-
-							default:
-								_gl.vertexAttrib1fv( programAttribute, value );
-
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-		state.disableUnusedAttributes();
-
-	}
 
 	// Compile
 
@@ -1055,7 +915,7 @@ function WebGLRenderer( parameters ) {
 
 		// reset caching for this frame
 
-		_currentGeometryProgram = '';
+		bindingStates.resetGeometryProgram();
 		_currentMaterialId = - 1;
 		_currentCamera = null;
 
@@ -1411,7 +1271,7 @@ function WebGLRenderer( parameters ) {
 
 			var program = setProgram( camera, scene.fog, material, object );
 
-			_currentGeometryProgram = '';
+			bindingStates.resetGeometryProgram();
 
 			renderObjectImmediate( object, program, material );
 
