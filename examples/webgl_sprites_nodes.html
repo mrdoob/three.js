@@ -273,12 +273,13 @@
 
 			THREE.NodeMaterialLoaderUtils.replaceUUID( json, walkingManTexture, walkingManTextureURL );
 
-			// unserialize
 			// deserialize
 
-			var material = new THREE.NodeMaterialLoader( null, library ).parse( json ).build();
+			var material = new THREE.NodeMaterialLoader( null, library ).parse( json );
 
 			// replace material
+
+			sprite.material.dispose();
 
 			sprite.material = material;
 
