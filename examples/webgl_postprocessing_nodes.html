@@ -319,7 +319,7 @@
 
 							multiply.op = val;
 
-							nodepass.build();
+							nodepass.needsUpdate = true;
 
 						} );
 
@@ -411,7 +411,7 @@
 
 							offsetNormal.a = val ? normalXYFlip : normalXY;
 
-							nodepass.build();
+							nodepass.needsUpdate = true;
 
 						} );
 
@@ -469,7 +469,7 @@
 
 							fadeCoord.c = val ? maskAlpha : fade;
 
-							nodepass.build();
+							nodepass.needsUpdate = true;
 
 						} );
 
