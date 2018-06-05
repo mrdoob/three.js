@@ -14,6 +14,11 @@ function addOrMergeProp( material, propName, data ) {
 
 }
 
+//serialize
+function toJSON(){
+	return THREE.Material.prototype.toJSON.call(this, undefined, this._serializationManager.serialize.bind(this._serializationManager))
+}
+
 // from three's texture transform api, to be applied to a uniform matrix
 function setUvTransform( tx, ty, sx, sy, rotation, cx, cy ) {
 
@@ -90,6 +95,7 @@ function decorateMaterialWithSpecGloss( material ) {
 	addOrMergeProp( material, 'shaderIncludes', SHADER_INCLUDES_SPEC_GLOSS );
 	addOrMergeProp( material, 'defines', defines );
 
+
 	//expose uniforms as props for a cleaner interface (but shaderUniforms is also available so this can be omitted)
 	//it just leads to a cleaner more familiar interface (PhongMaterial has specularMap, so this now has it too)
 	for ( let propName in shaderUniforms ) {
@@ -100,6 +106,19 @@ function decorateMaterialWithSpecGloss( material ) {
 		} );
 
 	}
+
+	if(!material._serializationManager) material._serializationManager = new SerializationManager()
+	var f = function(data,meta){
+		if( !data.metadata.extensions ) data.metadata.extensions = {}
+		data.metadata.extensions.isSpecGlossExtended = true
+		data.glossiness = this.glossiness
+		data.specular = this.specular.getHex()
+		if(this.glossinessMap && this.glossinessMap.isTexture) data.glossinessMap = this.glossinessMap.toJSON( meta ) 
+	}.bind(material)
+
+	material._serializationManager.addFunction(f)
+		
+	material.toJSON = toJSON.bind(material)
 
 	return material
 
@@ -193,6 +212,7 @@ function decorateMaterialWithPerMapTransforms( material, mapList ) {
 
 	var shaderUniforms = {}
 	var shaderIncludes = {}
+	var serialize = []
 
 	for ( var i = 0; i < mapList.length; i ++ ) {
 
@@ -214,6 +234,7 @@ function decorateMaterialWithPerMapTransforms( material, mapList ) {
 			if( material.isSpecGlossExtended && mapName === 'specularMap'){
 				lookup = 'specularMapGloss' 
 			}
+			serialize.push(mapName)
 
 			//based on the map name ie. specularMap or even an extended glossinessMap pick a chunk
 			var chunkName = PROP_TO_CHUNK_MAP[lookup]
@@ -236,6 +257,25 @@ function decorateMaterialWithPerMapTransforms( material, mapList ) {
 	//combine with other chunks
 	addOrMergeProp( material, 'shaderUniforms', shaderUniforms );
 	addOrMergeProp( material, 'shaderIncludes', shaderIncludes );
+
+	if(!material._serializationManager) material._serializationManager = new SerializationManager()
+
+	material._serializationManager.addFunction(((data,meta)=>{
+		if( !data.metadata.extensions ) data.metadata.extensions = {}
+		data.metadata.extensions.isPerMapTransformExtended = true
+
+		serialize.forEach(mapName=>{
+			data[`${mapName}Repeat`] = material[`${mapName}Repeat`].toArray()
+			data[`${mapName}Offset`] = material[`${mapName}Offset`].toArray()
+			data[`${mapName}Center`] = material[`${mapName}Center`].toArray()
+			data[`${mapName}Rotation`] = material[`${mapName}Rotation`]
+		})
+
+		return data
+
+	}).bind(material))
+	
+	material.toJSON = toJSON.bind(material)
 
 	return material
 }
@@ -296,6 +336,30 @@ function decorateMaterialWithSimpleInstancing( material ) {
 
 	addOrMergeProp( material, 'shaderIncludes', shaderIncludes );
 
+	if(!material._serializationManager) material._serializationManager = new SerializationManager()
+
+	material._serializationManager.addFunction((data)=>{
+		if( !data.metadata.extensions ) data.metadata.extensions = {}
+		data.metadata.extensions.isSimpleInstanceExtended = true
+	})
+	
+	material.toJSON = toJSON.bind(material)
+
 	return material
 
+}
+
+
+function SerializationManager(){
+	this.processFunctions = []
+}
+
+SerializationManager.prototype = {
+	addFunction: function( func ){
+		this.processFunctions.push(func)
+	},
+	serialize(data, meta){
+		this.processFunctions.forEach(f=>f(data))
+		return data
+	}
 }
