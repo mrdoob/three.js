@@ -84,7 +84,7 @@ THREE.NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
 
 	if ( this.needsUpdate ) {
 
-		this.build( { dispose: false } );
+		this.build( { dispose: false, renderer: renderer } );
 
 		shader.uniforms = this.uniforms;
 		shader.vertexShader = this.vertexShader;
@@ -164,7 +164,7 @@ THREE.NodeMaterial.prototype.build = function ( params ) {
 
 	].join( "\n" );
 
-	var builder = new THREE.NodeBuilder( this );
+	var builder = new THREE.NodeBuilder( this, params.renderer );
 
 	vertex = this.vertex.build( builder.setShader( 'vertex' ), 'v4' );
 	fragment = this.fragment.build( builder.setShader( 'fragment' ), 'v4' );
