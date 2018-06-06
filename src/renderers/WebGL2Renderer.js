@@ -10,7 +10,7 @@ import { Vector4 } from '../math/Vector4.js';
 
 function WebGL2Renderer( parameters ) {
 
-	console.log( 'THREE.WebGL2Renderer', REVISION );
+	// console.log( 'THREE.WebGL2Renderer', REVISION );
 
 	parameters = parameters || {};
 
