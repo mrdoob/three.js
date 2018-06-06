@@ -6,7 +6,7 @@ THREE.NodeMaterial = function ( vertex, fragment ) {
 
 	THREE.ShaderMaterial.call( this );
 
-	this.defines.UUID = THREE.Math.generateUUID();
+	this.defines.UUID = this.uuid;
 
 	this.vertex = vertex || new THREE.RawNode( new THREE.PositionNode( THREE.PositionNode.PROJECTION ) );
 	this.fragment = fragment || new THREE.RawNode( new THREE.ColorNode( 0xFF0000 ) );
@@ -103,7 +103,7 @@ THREE.NodeMaterial.prototype.build = function ( params ) {
 
 	this.nodes = [];
 
-	this.defines = { UUID: this.defines.UUID };
+	this.defines = { UUID: this.uuid };
 	this.uniforms = {};
 	this.attributes = {};
 
