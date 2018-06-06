@@ -14,6 +14,7 @@
  *  bevelEnabled: <bool>, // turn on bevel
  *  bevelThickness: <float>, // how deep into text bevel goes
  *  bevelSize: <float> // how far from text outline is bevel
+ *  bevelSubtract: <bool>, // subtract bevel instead of adding it
  * }
  */
 

@@ -13,6 +13,7 @@
  *  bevelThickness: <float>, // how deep into the original shape bevel goes
  *  bevelSize: <float>, // how far from shape outline is bevel
  *  bevelSegments: <int>, // number of bevel layers
+ *  bevelSubtract: <bool>, // subtract bevel instead of adding it
  *
  *  extrudePath: <THREE.Curve> // curve to extrude shape along
  *
@@ -110,6 +111,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
 		var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
 		var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
+		var bevelSubtract = options.bevelSubtract !== undefined ? options.bevelSubtract : false;
 
 		var extrudePath = options.extrudePath;
 
@@ -384,7 +386,6 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		}
 
-
 		// Loop bevelSegments, 1 for the front, 1 for the back
 
 		for ( b = 0; b < bevelSegments; b ++ ) {
@@ -394,6 +395,12 @@ function ExtrudeBufferGeometry( shapes, options ) {
 			t = b / bevelSegments;
 			z = bevelThickness * Math.cos( t * Math.PI / 2 );
 			bs = bevelSize * Math.sin( t * Math.PI / 2 );
+
+			if ( bevelSubtract ) {
+
+				bs -= bevelSize;
+
+			}
 
 			// contract shape
 
@@ -424,7 +431,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		}
 
-		bs = bevelSize;
+		bs = ( bevelSubtract ? 0 : bevelSize );
 
 		// Back facing vertices
 
@@ -492,6 +499,12 @@ function ExtrudeBufferGeometry( shapes, options ) {
 			t = b / bevelSegments;
 			z = bevelThickness * Math.cos( t * Math.PI / 2 );
 			bs = bevelSize * Math.sin( t * Math.PI / 2 );
+
+			if ( bevelSubtract ) {
+
+				bs -= bevelSize;
+
+			}
 
 			// contract shape
 
