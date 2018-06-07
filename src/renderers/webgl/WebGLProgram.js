@@ -210,8 +210,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var defines = material.defines;
 
-	var materialIncludes = material.shaderIncludes; //custom chunks
-
 	var vertexShader = shader.vertexShader;
 	var fragmentShader = shader.fragmentShader;
 
@@ -293,7 +291,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var customDefines = generateDefines( defines );
 
-	var customIncludes = undefined !== materialIncludes ? materialIncludes : {}; //user is not aware of this feature, fine
+	var customIncludes = undefined !== material.shaderIncludes ? material.shaderIncludes : {}; //user is not aware of this feature, fine
 
 	//
 
