@@ -1478,8 +1478,8 @@ function WebGLRenderer( parameters ) {
 					UniformsUtils.merge( [ UniformsUtils.clone( shader.uniforms ), material.shaderUniforms ] ) :
 					UniformsUtils.clone( shader.uniforms );
 
-				var shaderUniformsGLSLFrag = ''; //collect the GLSL in here
-				var shaderUniformsGLSLVert = ''; //collect the GLSL in here
+				var shaderUniformsGLSLFrag = '';
+				var shaderUniformsGLSLVert = '';
 
 				for ( var uniformName in material.shaderUniforms ) {
 
@@ -1489,12 +1489,17 @@ function WebGLRenderer( parameters ) {
 
 					if ( type ) {
 
-						if ( stage === 'vertex' ) { //dunno what to do here, maybe if not provided should inject into both
+						if ( stage === 'vertex' ) {
 
 							shaderUniformsGLSLVert += 'uniform ' + type + ' ' + uniformName + ';\n';
 
+						} else if ( stage === 'fragment' ) {
+
+							shaderUniformsGLSLFrag += 'uniform ' + type + ' ' + uniformName + ';\n';
+
 						} else {
 
+							shaderUniformsGLSLVert += 'uniform ' + type + ' ' + uniformName + ';\n';
 							shaderUniformsGLSLFrag += 'uniform ' + type + ' ' + uniformName + ';\n';
 
 						}
@@ -1507,7 +1512,7 @@ function WebGLRenderer( parameters ) {
 					name: material.type,
 					uniforms: combinedUniforms,
 					vertexShader: shaderUniformsGLSLVert + shader.vertexShader,
-					fragmentShader: shaderUniformsGLSLFrag + shader.fragmentShader //maybe not use the same
+					fragmentShader: shaderUniformsGLSLFrag + shader.fragmentShader
 
 				};
 
@@ -1827,7 +1832,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			//refresh custom provided uniforms
+			//refresh custom user provided uniforms if they exist
 			if ( undefined !== material.shaderUniforms ) {
 
 				refreshUniformsCustom( m_uniforms, material );
@@ -2077,7 +2082,6 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	//refresh custom provided uniforms
 	function refreshUniformsCustom( uniforms, material ) {
 
 		for ( var uniform in material.shaderUniforms ) {

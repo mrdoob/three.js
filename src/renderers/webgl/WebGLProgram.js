@@ -158,7 +158,6 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 }
 
-//consider provided dictionary when parsing the includes (not just THREE.ShaderChunk)
 function parseIncludes( string, materialIncludes ) {
 
 	var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
@@ -291,7 +290,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var customDefines = generateDefines( defines );
 
-	var customIncludes = undefined !== material.shaderIncludes ? material.shaderIncludes : {}; //user is not aware of this feature, fine
+	var customIncludes = undefined !== material.shaderIncludes ? material.shaderIncludes : {}; //if the shaderIncludes dictionary is not provided
 
 	//
 
