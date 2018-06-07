@@ -245,6 +245,18 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		array.push( renderer.gammaOutput );
 
+		// if there is this dictionary present
+		if ( material.shaderIncludes !== undefined ) {
+
+			for ( var include in material.shaderIncludes ) {
+
+				// hash with chunks?
+				array.push( material.shaderIncludes[ include ] );
+
+			}
+
+		}
+
 		return array.join();
 
 	};
