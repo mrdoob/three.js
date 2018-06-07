@@ -51,7 +51,8 @@
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
-			bevelSegments: 1
+			bevelSegments: 1,
+			bevelSubtract: false
 		};
 
 		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
@@ -77,6 +78,7 @@
 				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
 				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
+				<li>bevelSubtract — bool. Subtract bevel instead of adding it. Default is false.</li>
 				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded.</li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
