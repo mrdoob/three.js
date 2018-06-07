@@ -554,7 +554,6 @@ Object.assign( ObjectLoader.prototype, {
 
 					}
 
-
 				} else {
 
 					// load single image
@@ -562,7 +561,6 @@ Object.assign( ObjectLoader.prototype, {
 					var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
 
 					images[ image.uuid ] = loadImage( path );
-
 
 				}
 
