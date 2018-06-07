@@ -42,6 +42,7 @@ import { RectAreaLight } from '../lights/RectAreaLight.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
+import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
 import { ImageLoader } from './ImageLoader.js';
 import { LoadingManager, DefaultLoadingManager } from './LoadingManager.js';
@@ -532,12 +533,38 @@ Object.assign( ObjectLoader.prototype, {
 			var loader = new ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( var i = 0, il = json.length; i < il; i ++ ) {
 
 				var image = json[ i ];
-				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
+				var url = image.url;
 
-				images[ image.uuid ] = loadImage( path );
+				if ( Array.isArray( url ) ) {
+
+					// load array of images e.g CubeTexture
+
+					images[ image.uuid ] = [];
+
+					for ( var j = 0, jl = url.length; j < jl; j ++ ) {
+
+						var currentUrl = url[ j ];
+
+						var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( currentUrl ) ? currentUrl : scope.texturePath + currentUrl;
+
+						images[ image.uuid ].push( loadImage( path ) );
+
+					}
+
+
+				} else {
+
+					// load single image
+
+					var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
+
+					images[ image.uuid ] = loadImage( path );
+
+
+				}
 
 			}
 
@@ -579,7 +606,18 @@ Object.assign( ObjectLoader.prototype, {
 
 				}
 
-				var texture = new Texture( images[ data.image ] );
+				var texture;
+
+				if ( Array.isArray( images[ data.image ] ) ) {
+
+					texture = new CubeTexture( images[ data.image ] );
+
+				} else {
+
+					texture = new Texture( images[ data.image ] );
+
+				}
+
 				texture.needsUpdate = true;
 
 				texture.uuid = data.uuid;
