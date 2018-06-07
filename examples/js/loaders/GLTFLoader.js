@@ -625,7 +625,7 @@ THREE.GLTFLoader = ( function () {
 
 				console.log( material );
 
-				decorateMaterialWithSpecGloss(material)
+				decorateMaterialWithSpecGloss( material );
 
 				material.isGLTFSpecularGlossinessMaterial = true;
 
@@ -2435,8 +2435,8 @@ THREE.GLTFLoader = ( function () {
 							if ( ! cachedMaterial ) {
 
 								cachedMaterial = material.isGLTFSpecularGlossinessMaterial
-										? extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].cloneMaterial( material )
-										: material.clone();
+									? extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].cloneMaterial( material )
+									: material.clone();
 
 								if ( useSkinning ) cachedMaterial.skinning = true;
 								if ( useVertexColors ) cachedMaterial.vertexColors = THREE.VertexColors;
