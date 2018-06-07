@@ -88,13 +88,17 @@ function decorateMaterialWithSpecGloss( material ) {
 		specularMap: { value: null, type: 'sampler2D', stage: 'fragment' },
 	};
 
+	var shaderIncludes = Object.assign({},SHADER_INCLUDES_SPEC_GLOSS)
+
 	var defines = {USE_GLOSSINESSMAP: ''}
 
 	//conflicts could be resolved here
 	addOrMergeProp( material, 'shaderUniforms', shaderUniforms );
-	addOrMergeProp( material, 'shaderIncludes', SHADER_INCLUDES_SPEC_GLOSS );
+	addOrMergeProp( material, 'shaderIncludes', shaderIncludes );
 	addOrMergeProp( material, 'defines', defines );
 
+	delete material.metalnessMap
+	delete material.roughnessMap
 
 	//expose uniforms as props for a cleaner interface (but shaderUniforms is also available so this can be omitted)
 	//it just leads to a cleaner more familiar interface (PhongMaterial has specularMap, so this now has it too)
@@ -195,17 +199,10 @@ function addMapTransformPropsToMaterial( material, mapName ){
 
 
 function decorateMaterialWithPerMapTransforms( material, mapList ) {
-
+	
 	if ( material.isPerMapTransformExtended ) return material;
 
 	material.isPerMapTransformExtended = true;
-
-	//this could be more generic, say, check if the chunks belonging to these maps have been altered
-	//but also knowing about the other extension, makes for an easy check
-	if( material.isSpecGlossExtended){
-		delete material.metalnessMap //remove the unused map names so the loop below doesnt account for them (conflict)
-		delete material.roughnessMap
-	}
 
 	//one can provide a subset from outside
 	mapList = mapList || DEFAULT_MAP_LIST;

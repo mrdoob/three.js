@@ -625,7 +625,7 @@ THREE.GLTFLoader = ( function () {
 
 				console.log( material );
 
-				decorateMaterialWithSpecGloss(material)
+				decorateMaterialWithSpecGloss( material );
 
 				material.isGLTFSpecularGlossinessMaterial = true;
 
