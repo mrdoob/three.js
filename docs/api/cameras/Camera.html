@@ -13,74 +13,74 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			Abstract base class for cameras. This class should always be inherited when you build a new camera.
+			相机的抽象基类。当你构建一个新类型相机时，应该总是继承于这个类。
 		</div>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]()</h3>
 		<div>
-			Creates a new [name]. Note that this class is not intended to be called directly;
-			you probably want a [page:PerspectiveCamera] or [page:OrthographicCamera] instead.
+			创建一个新的 [name]。请注意这个类并不是刻意用来直接调用的；
+			你可能需要的是一个 [page:PerspectiveCamera] 或者 [page:OrthographicCamera]。
 		</div>
 
 
-		<h2>Properties</h2>
-		<div>See the base [page:Object3D] class for common properties.</div>
+		<h2>属性</h2>
+		<div>通过 [page:Object3D] 基类，可了解相关公共属性。</div>
 
 		<h3>[property:Boolean isCamera]</h3>
 		<div>
-			Used to check whether this or derived classes are cameras. Default is *true*.<br /><br />
+			用于检查此类是否是相机或派生于相机类。默认值是 *true*。<br /><br />
 
-			You should not change this, as it used internally by the renderer for optimisation.
+			你不应该修改它，因为渲染器内部需要使用它进行优化操作。
 		</div>
 
 		<h3>[property:Layers layers]</h3>
 		<div>
-		The [page:Layers layers] that the camera is a member of. This is an inherited
-		property from [page:Object3D].<br /><br />
+		 [page:Layers layers] 是相机所属的层。这是一个从 [page:Object3D] 继承而来的属性。<br /><br />
 
-		Objects must share at least one layer with the camera to be seen
-		when the camera's viewpoint is rendered.
+
+		当相机的视角渲染完成时，物体至少需要分配一个层给相机照射到才能被看见。
+		
 		</div>
 
 		<h3>[property:Matrix4 matrixWorldInverse]</h3>
 		<div>
-			This is the inverse of matrixWorld. MatrixWorld contains the Matrix which has
-			the world transform of the Camera.
+			这是 matrixWorld 的逆矩阵。matrixWorld 包含相机在世界坐标系的变换矩阵。
+
 		</div>
 
 		<h3>[property:Matrix4 projectionMatrix]</h3>
-		<div>This is the matrix which contains the projection.</div>
+		<div>这是包含投影的矩阵。</div>
 
 
-		<h2>Methods</h2>
-		<div>See the base [page:Object3D] class for common methods.</div>
+		<h2>方法</h2>
+		<div>通过 [page:Object3D] 基类，可了解相关公共方法。</div>
 
 		<h3>[method:Camera clone]( )</h3>
 		<div>
-			Return a new camera with the same properties as this one.
+			返回一个拥有相同属性方法的新相机。
 		</div>
 
 		<h3>[method:Camera copy]( [param:Camera source] )</h3>
 		<div>
-		Copy the properties from the source camera into this one.
+		从源相机复制它的所有属性方法到当前这个相机内。
 		</div>
 
 		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 optionalTarget] )</h3>
 		<div>
-		Returns a [page:Vector3] representing the world space direction in which the camera is looking.<br /><br />
+		返回一个 [page:Vector3] 用来表示相机当前所看向的世界坐标系方向。<br /><br />
 
-		Note: This is not the camera’s positive, but its negative z-axis, in contrast to
-		[page:Object3D.getWorldDirection getWorldDirection] of the base class (Object3D).<br /><br />
+		注意：这不是相机的 positive（正轴），而是它的负 z 轴, 是基类（ Object3D ）调用方法
+		[page:Object3D.getWorldDirection getWorldDirection] 后的相反方向。<br /><br />
 
-		If an [page:Vector3 optionalTarget] vector is specified, the result will be copied into this vector
-		(which can be reused in this way), otherwise a new vector will be created.
+		假如一个 [page:Vector3 optionalTarget] vector（向量）被明确指定了, 则将结果复制到此 vector 中，
+		（可以以这种方式重复使用） 否则将创建新 vector。
 		</div>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
