@@ -12,29 +12,29 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A KeyframeTrack is a timed sequence of [link:https://en.wikipedia.org/wiki/Key_frame keyframes],
-			which are composed of lists of times and related values, and which are used to animate a
-			specific property of an object.<br /><br />
+			一个 KeyframeTrack 是一个由时间和相关值构成用于动画一个对象的特定属性的列表 [link:https://en.wikipedia.org/wiki/Key_frame keyframes] 的时间序列。<br /><br />
 
-			For an overview of the different elements of the three.js animation system see the
-			"Animation System" article in the "Next Steps" section of the manual.<br /><br />
 
-			In contrast to the animation hierarchy of the
-			[link:https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3 JSON model format] a
-			*KeyframeTrack* doesn't store its single keyframes as objects in a "keys" array (holding the
-			times and the values for each frame together in one place).<br /><br />
 
-			Instead of this there are always two arrays in a *KeyframeTrack*: the [page:.times times] array
-			stores the time values for all keyframes of this track in sequential order, and the
-			[page:.values values] array contains the corresponding changing values of the animated property.<br /><br />
 
-			A single value, belonging to a certain point of time, can not only be a simple number, but (for
-			example) a vector (if a position is animated) or a quaternion (if a rotation is animated). For
-			this reason the values array (which is a flat array, too) might be three or four times as long as the
-			times array.<br /><br />
+			有关 three.js 动画系统的不同元素概览，请参阅本手册 'Next Steps' 部分的 'Animation System' 一文查看。<br /><br />
 
-			Corresponding to the different possible types of animated values there are several subclasses of
-			*KeyframeTrack*, inheriting the most properties and methods:
+
+			与 [link:https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3 JSON model format] 相反，一个 *KeyframeTrack* 不会像对象一样将它的单个关键帧存储为一个 "keys" 数组（将每帧的时间和值一同保存在一个位置）。<br /><br />
+
+
+
+
+			除此之外， 一个 *KeyframeTrack* 中通常有两个数组：
+			按序存储所有关键帧的时间值 [page:.times times] 数组，
+			包含动画属性在相应的时间的值的数组 [page:.values values]。<br /><br />
+
+			某个时间点的值不仅可以是一个简单的数字，也可以（例如）是一个 vector（向量）（如果可以被动画），或一个 quaternion（四元数）。
+			因此，value 数组（[page:.values values]）（也是一个 flat array）可能是 time 数组（[page:.times times]）的三到四倍长。<br /><br />
+
+
+
+			关于动画值的其他可能的不同类型，有一些 *KeyframeTrack* 的子类，继承了大部分的属性和方法：
 
 			<ul>
 				<li>[page:BooleanKeyframeTrack]</li>
@@ -44,192 +44,192 @@
 				<li>[page:StringKeyframeTrack]</li>
 				<li>[page:VectorKeyframeTrack]</li>
 			</ul>
-			Some examples of how to manually create [page:AnimationClip AnimationClips] with different sorts
-			of KeyframeTracks can be found in the [link:https://threejs.org/examples/js/AnimationClipCreator.js]
-			file.<br /><br />
+			用不同类型 KeyframeTrack 手动创建 [page:AnimationClip AnimationClips]的一些示例可以在 [link:https://threejs.org/examples/js/AnimationClipCreator.js] 中查看。<br /><br />
 
-			Since explicit values are only specified for the discrete points of time stored in the times array,
-			all values in between have to be interpolated.<br /><br />
 
-			The track's name is important for the connection of this track with a specific property of the
-			animated node (done by [page:PropertyBinding]).
+
+			由于显式值仅指定给 times 数组（[page:.times times]）中的离散时间点，因此这些值中间的值都需要通过插值得到。
+
+
+			track 的名称对于这一 track 和有特定属性的动画节点的联系（通过 [page:PropertyBinding] 实现）非常重要。
+
 
 
 		</div>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:String name], [param:Array times], [param:Array values], [param:Constant interpolation] )</h3>
 		<div>
-			[page:String name] - the identifier for the *KeyframeTrack*.<br />
-			[page:Array times] - an array of keyframe times, converted internally to a
-			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
-			[page:Array values] - an array with the values related to the times array, converted internally to a
-			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
-			[page:Constant interpolation] - the type of interpolation to use. See
-			[page:Animation Animation Constants] for possible values. Default is [page:Animation InterpolateLinear].
+			[page:String name] —— *KeyframeTrack* 的标识符。<br />
+			[page:Array times] —— 关键帧的 time 数组，被转换为一个 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array]。<br />
+			[page:Array values] —— time 数组相关的 value 数组，被转换为一个 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array]。<br />
+			[page:Constant interpolation] —— 要使用的插值类型。参考 [page:Animation Animation Constants]，默认为 [page:Animation InterpolateLinear]。
+
+
+
 		</div>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 
 		<h3>[property:String name]</h3>
 		<div>
-			The track's name can refer to [page:Geometry.morphTargets morph targets] or
-			[page:SkinnedMesh bones] or possibly other values within an animated object. See
-			[page:PropertyBinding.parseTrackName] for the forms of strings that can be parsed for property
-			binding:<br /><br />
+			track 的名称可以参考 [page:Geometry.morphTargets morph targets] 或 [page:SkinnedMesh bones] 或动画对象内其他可能的值。
+			可以被属性绑定解析的字符串形式可参考 [page:PropertyBinding.parseTrackName]：<br /><br />
 
-			The name can specify the node either using its name or its uuid (although it needs to be in the
-			subtree of the scene graph node passed into the mixer). Or, if the track name starts with a dot,
-			the track applies to the root node that was passed into the mixer.<br /><br />
 
-			Usually after the node a property will be specified directly. But you can also specify a
-			subproperty, such as .rotation[x], if you just want to drive the X component of the rotation
-			via a float track.<br /><br />
 
-			You can also specify bones or multimaterials by using an object name, for example:
-			.bones[R_hand].scale; the red channel of the diffuse color of the fourth material in a
-			materials array - as a further example - can be accessed with .materials[3].diffuse[r].<br /><br />
+			该名称可以通过 name 或 uuid 指定节点（尽管需要将在场景图节点中的子树传入到 mixer中）。
+			或者，如果该名称以 "."开始，这一 track 将会应用在传入 mixer 中的根节点上。<br /><br />
 
-			PropertyBinding will also resolve morph target names, for example: .morphTargetInfluences[run].<br /><br />
 
-			Note: The track's name does not necessarily have to be unique. Multiple tracks can drive the same
-			property. The result should be based on a weighted blend between the multiple tracks according to
-			the weights of their respective actions.
+			通常在节点后，一个属性会被直接指定。但你也可以指定一个子属性，例如，如果你只想要通过 float track 驱动 rotation 的 X 组件，可以指定 .rotation[x]。<br /><br />
+
+
+
+			你也可以通过使用对象名称来指定骨骼或多重材质，例如：
+			.bones[R_hand].scale，材质数组中的第四个材质的漫反射颜色的红色通道 —— 作为一个更深层的例子 —— 可以通过 .materials[3].diffuse[r] 来获取。<br /><br />
+
+
+			PropertyBinding 也会清除变形目标的名称，例如：.morphTargetInfluences[run]。<br /><br />
+
+			注意：该 track 的名称不一定是唯一的。多个 track 可以驱动相同的属性。
+			根据每个 action 各自的权重，结果应该是一个基于多 track 的加权混合。
+
 		</div>
 
 		<h3>[property:Float32Array times]</h3>
 		<div>
-			A [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
-			converted from the times array which is passed in the constructor.
+			一个 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			通过传入构造器的 time 数组转换得到。
 		</div>
 
 		<h3>[property:Float32Array values]</h3>
 		<div>
-			A [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
-			converted from the values array which is passed in the constructor.
+			一个 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			通过传入构造器的 value 数组转换得到。
 		</div>
 
 		<h3>[property:Constant DefaultInterpolation]</h3>
 		<div>
-			The default interpolation type: [page:Animation InterpolateLinear].
+			默认的插值类型： [page:Animation InterpolateLinear]。
 		</div>
 
 		<h3>[property:Constant TimeBufferType ]</h3>
 		<div>
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
-			the type of the buffer internally used for the times.
+			内部使用的 time buffer 的类型。
 		</div>
 
 		<h3>[property:Constant ValueBufferType ]</h3>
 		<div>
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
-			the type of the buffer internally used for the values.
+			内部使用的 value buffer 的类型。
 		</div>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 
 		<h3>[method:null createInterpolant]()</h3>
 		<div>
-			Creates a [page:LinearInterpolant LinearInterpolant], [page:CubicInterpolant CubicInterpolant]
-			or [page:DiscreteInterpolant DiscreteInterpolant], depending on the value of the interpolation
-			parameter passed in the constructor.
+			根据传给构造器的插值参数的值，创建一个 [page:LinearInterpolant LinearInterpolant]， [page:CubicInterpolant CubicInterpolant] 或 [page:DiscreteInterpolant DiscreteInterpolant]
+
+
 		</div>
 
 		<h3>[method:null getInterpolation]()</h3>
 		<div>
-			Returns the interpolation type.
+			返回插值类型。
 		</div>
 
 		<h3>[method:Number getValueSize]()</h3>
 		<div>
-			Returns the size of each value (that is the length of the [page:.values values] array divided
-			by the length of the [page:.times times] array).
+			返回每个值的大小（size）（即 [page:.values values] 数组按照 [page:.times times]数组的长度分割后的长度）。
+
 		</div>
 
 		<h3>[method:DiscreteInterpolant InterpolantFactoryMethodDiscrete]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<div>
-			Creates a new [page:DiscreteInterpolant DiscreteInterpolant] from the
-			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
-			passed which will receive the results. Otherwise a new array with the appropriate size will be
-			created automatically.
+			根据 [page:KeyframeTrack.times times] 和 [page:KeyframeTrack.times values] 创建一个新的 [page:DiscreteInterpolant DiscreteInterpolant]。
+			可以传入一个 Float32Array 来接收结果。否则会自动创建一个大小合适的新数组。
+
+
 		</div>
 
 		<h3>[method:null InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<div>
-			Creates a new [page:LinearInterpolant LinearInterpolant] from the
-			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
-			passed which will receive the results. Otherwise a new array with the appropriate size will be
-			created automatically.
+			根据 [page:KeyframeTrack.times times] 和 [page:KeyframeTrack.times values] 创建一个新的 [page:LinearInterpolant LinearInterpolant]。
+			可以传入一个 Float32Array 来接收结果。否则会自动创建一个大小合适的新数组。
+
+
 		</div>
 
 		<h3>[method:null InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<div>
-			Create a new [page:CubicInterpolant CubicInterpolant] from the
-			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
-			passed which will receive the results. Otherwise a new array with the appropriate size will be
-			created automatically.
+			根据 [page:KeyframeTrack.times times] 和 [page:KeyframeTrack.times values] 创建一个新的 [page:LinearInterpolant LinearInterpolant]。
+			可以传入一个 Float32Array 来接收结果。否则会自动创建一个大小合适的新数组。
+
+
 		</div>
 
 		<h3>[method:null optimize]()</h3>
 		<div>
-			Removes equivalent sequential keys, which are common in morph target sequences. Called
-			automatically by the constructor.
+			清除 equivalent sequential keys（在变性目标序列中很常见）。通过构造器自动调用。
+
 		</div>
 
 		<h3>[method:null scale]()</h3>
 		<div>
-			Scales all keyframe times by a factor.<br /><br />
+			通过一个因子来缩放所有关键帧的时间。<br /><br />
 
-			Note: This is useful, for example, for conversions to a certain rate of frames per seconds (as it
-			is done internally by
-			[page:AnimationClip.CreateFromMorphTargetSequence animationClip.CreateFromMorphTargetSequence]).
+			注意：这一方法非常有用，例如，转换成每秒钟一定的帧速率（内部通过 [page:AnimationClip.CreateFromMorphTargetSequence animationClip.CreateFromMorphTargetSequence] 实现）。
+
+
 		</div>
 
 		<h3>[method:null setInterpolation]( [param:Constant interpolationType] )</h3>
 		<div>
-			Sets the interpolation type. See [page:Animation Animation Constants] for choices.
+			设置插值类型。详见 [page:Animation Animation Constants]。
 		</div>
 
 		<h3>[method:null shift]( [param:Number timeOffsetInSeconds] )</h3>
 		<div>
-			Moves all keyframes either forward or backward in time.
+			及时地将关键帧前移或倒退。
 		</div>
 
 
 		<h3>[method:null trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
 		<div>
-			Removes keyframes before *startTime* and after *endTime*,
-			without changing any values within the range [*startTime*, *endTime*].
+			在 *startTime* 之前和 *endTime* 之后清除关键帧，
+			无需改变 [*startTime*, *endTime*] 范围内的任何值。
 		</div>
 
 		<h3>[method:null validate]()</h3>
 		<div>
-			Performs minimal validation on the tracks. Called automatically by the constructor.<br /><br />
-			This method logs errors to the console, if a track is empty, if the [page:.valueSize value size] is not valid, if an item
-			in the [page:.times times] or [page:.values values] array is not a valid number or if the items in the *times* array are out of order.
+			在 track 上执行最小限度的验证。通过构造器自动调用。<br /><br />
+			这个方法会在以下状况打印错误信息到控制台：如果 track 为空，如果 [page:.valueSize value size] 是不合法的，
+			如果 [page:.times times] 或 [page:.values values] 数组中的任何一个值不合法，或者如果 *times* 数组中的元素是无序的，
 		</div>
 
-		<h2>Static Methods</h2>
+		<h2>静态方法</h2>
 
 		<h3>[method:KeyframeTrack parse]( [param:JSON json] )</h3>
 		<div>
-		Parses a JSON object and returns a new keyframe track of the correct type.
+		解析一个 JSON 对象并返回一个新的正确类型的关键帧 track。
 		</div>
 
 		<h3>[method:JSON toJSON]( [param:KeyframeTrack track] )</h3>
 		<div>
-		Converts the track to JSON.
+		将 track 转换为 JSON形式。
 		</div>
 
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

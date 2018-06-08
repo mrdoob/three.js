@@ -11,18 +11,18 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			This holds a reference to a real property in the scene graph; used internally.
+			包含场景图中实际属性的引用，内部使用。
 		</div>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:Object3D rootNode], path, parsedPath )</h3>
 		<div>
 			-- [page:Object3D rootNode]:
 			-- path
-			-- parsedPath (optional)
+			-- parsedPath (可选)
 
 		</div>
 
@@ -82,28 +82,28 @@
 
 		<h3>[method:null bind]( )</h3>
 		<div>
-			Create getter / setter pair for a property in the scene graph. Used internally by
-			[page:PropertyBinding.getValue getValue] and [page:PropertyBinding.setValue setValue].
+			创建场景图中一个属性的 getter / setter 对函数。内部通过 [page:PropertyBinding.getValue getValue] 和 [page:PropertyBinding.setValue setValue] 使用。
+
 		</div>
 
 		<h3>[method:null unbind]( )</h3>
 		<div>
-			Unbind getter / setter pair for a property in the scene graph.
+			解除场景图中属性的 getter / setter 对。
 		</div>
 
 		<h3>[method:Constructor Composite]( targetGroup, path, optionalParsedPath )</h3>
 		<div>
-			Create a new Composite PropertyBinding.
+			创建一个新的 Composite PropertyBinding。
 		</div>
 
 		<h3>[method:Constructor create]( root, path, parsedPath )</h3>
 		<div>
-			Create a new Composite PropertyBinding (if root is an [page:AnimationObjectGroup]) or PropertyBinding.
+			创建一个新的 Composite PropertyBinding （如果根为一个 [page:AnimationObjectGroup]）或 PropertyBinding。
 		</div>
 
 		<h3>[method:Constructor parseTrackName]( trackName )</h3>
 		<div>
-			Matches strings in the following forms:<br />
+			匹配以下形式的字符串：<br />
 			-- nodeName.property<br />
 			-- nodeName.property[accessor]<br />
 			-- nodeName.material.property[accessor]<br />
@@ -117,13 +117,13 @@
 
 		<h3>[method:Constructor findNode]( root, nodeName )</h3>
 		<div>
-			Find a node in a node tree or [page:Skeleton Skeleton].
+			寻找节点树中的节点或 [page:Skeleton Skeleton]。
 		</div>
 
 
 
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
