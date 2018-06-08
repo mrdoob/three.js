@@ -14,47 +14,47 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A Track of keyframe values that represent color changes.<br /><br />
-			The very basic implementation of this subclass has nothing special yet. However, this is the place
-			for color space parameterization.
+			表示颜色变化的关键帧值的 track。<br /><br />
+			这个子类的实现无特别说明，但需注意其参数范围为颜色值范围。
+
 		</div>
 
 
-		<h2>Constructor</h2>
+		<h2>构造器</h2>
 
 
 		<h3>[name]( [param:String name], [param:Array times], [param:Array values] )</h3>
 		<div>
-			[page:String name] - (required) identifier for the KeyframeTrack.<br />
-			[page:Array times] - (required) array of keyframe times.<br />
-			[page:Array values] - values for the keyframes at the times specified.<br />
-			[page:Constant interpolation] - the type of interpolation to use. See
-			[page:Animation Animation Constants] for possible values. Default is
-			[page:Animation InterpolateLinear].
+			[page:String name] —— （必须）KeyframeTrack 的标识符。<br />
+			[page:Array times] —— （必须）关键帧的 time 数组。<br />
+			[page:Array values] —— time 数组对应的关键帧的 value 数组。<br />
+			[page:Constant interpolation] —— 要使用的插值类型。参考 [page:Animation Animation Constants]，默认为 [page:Animation InterpolateLinear]。
+
+			
 		</div>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 
 		<div class="desc">
-			See [page:KeyframeTrack] for inherited properties.
+			参考 [page:KeyframeTrack] 查看继承的属性。
 		</div>
 
 		<h3>[property:String ValueTypeName]</h3>
 		<div>
-			String 'color'.
+			字符串 'color'。
 		</div>
 
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 
 		<div class="desc">
-			See [page:KeyframeTrack] for inherited methods.
+			参考 [page:KeyframeTrack] 查看继承的方法。
 		</div>
 
-		<h2>Source</h2>
+		<h2>源码</h2>
 
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
