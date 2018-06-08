@@ -38,7 +38,7 @@
     "lint": "eslint src",
     "test": "npm run build-test && qunit test/unit/three.source.unit.js",
     "editor": "electron ./editor/main.js",
-    "deploy": "gh-pages -d docs"
+    "deploy": "cp -R ./build ./docs/build && gh-pages -d docs"
   },
   "keywords": [
     "three",
