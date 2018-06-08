@@ -80,7 +80,7 @@
 				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0x887766 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				//
@@ -94,14 +94,18 @@
 
 				// model
 
-				var onProgress = function ( xhr ) {
+				function onProgress( xhr ) {
+
 					if ( xhr.lengthComputable ) {
+
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
 					}
+
 				};
 
-				var onError = function ( xhr ) {
+				function onError( xhr ) {
 				};
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
@@ -126,13 +130,13 @@
 				loader.load( modelFile, function ( object ) {
 
 					mesh = object;
-					mesh.position.y = -10;
+					mesh.position.y = - 10;
 
 					scene.add( mesh );
 
 					var vpdIndex = 0;
 
-					function loadVpd () {
+					function loadVpd() {
 
 						var vpdFile = vpdFiles[ vpdIndex ];
 
@@ -140,7 +144,7 @@
 
 							vpds.push( vpd );
 
-							vpdIndex++;
+							vpdIndex ++;
 
 							if ( vpdIndex < vpdFiles.length ) {
 
@@ -155,6 +159,7 @@
 						}, onProgress, onError );
 
 					}
+
 					loadVpd();
 
 				}, onProgress, onError );
@@ -163,7 +168,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				function initGui () {
+				function initGui() {
 
 					var gui = new dat.GUI();
 
@@ -175,13 +180,13 @@
 					var poses = gui.addFolder( 'Poses' );
 					var morphs = gui.addFolder( 'Morphs' );
 
-					function getBaseName ( s ) {
+					function getBaseName( s ) {
 
 						return s.slice( s.lastIndexOf( '/' ) + 1 );
 
 					}
 
-					function initControls () {
+					function initControls() {
 
 						for ( var key in dictionary ) {
 
@@ -189,7 +194,7 @@
 
 						}
 
-						controls.pose = -1;
+						controls.pose = - 1;
 
 						for ( var i = 0; i < vpdFiles.length; i++ ) {
 
@@ -199,7 +204,7 @@
 
 					}
 
-					function initKeys () {
+					function initKeys() {
 
 						for ( var key in dictionary ) {
 
@@ -209,9 +214,9 @@
 
 					}
 
-					function initPoses () {
+					function initPoses() {
 
-						var files = { default: -1 };
+						var files = { default: - 1 };
 
 						for ( var i = 0; i < vpdFiles.length; i++ ) {
 
@@ -223,7 +228,7 @@
 
 					}
 
-					function initMorphs () {
+					function initMorphs() {
 
 						for ( var key in dictionary ) {
 
@@ -233,7 +238,7 @@
 
 					}
 
-					function onChangeMorph () {
+					function onChangeMorph() {
 
 						for ( var i = 0; i < keys.length; i++ ) {
 
@@ -245,11 +250,11 @@
 
 					}
 
-					function onChangePose () {
+					function onChangePose() {
 
 						var index = parseInt( controls.pose );
 
-						if ( index === -1 ) {
+						if ( index === - 1 ) {
 
 							mesh.pose();
 
