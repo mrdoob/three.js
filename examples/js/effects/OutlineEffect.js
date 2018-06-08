@@ -448,7 +448,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	 * The following property copies and wrapper methods enable
 	 * THREE.OutlineEffect to be called from other *Effect, like
 	 *
-	 * effect = new THREE.VREffect( new THREE.OutlineEffect( renderer ) );
+	 * effect = new THREE.StereoEffect( new THREE.OutlineEffect( renderer ) );
 	 *
 	 * function render () {
 	 *

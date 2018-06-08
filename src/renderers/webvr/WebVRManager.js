@@ -261,14 +261,6 @@ function WebVRManager( renderer ) {
 
 	};
 
-	// DEPRECATED
-
-	this.requestAnimationFrame = function ( callback ) {
-
-		// device.requestAnimationFrame( callback );
-
-	};
-
 }
 
 export { WebVRManager };

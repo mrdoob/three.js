@@ -52,14 +52,17 @@ THREE.DRACOLoader.prototype = {
 
     setPath: function(value) {
         this.path = value;
+        return this;
     },
 
     setCrossOrigin: function(value) {
         this.crossOrigin = value;
+        return this;
     },
 
     setVerbosity: function(level) {
         this.verbosity = level;
+        return this;
     },
 
     /**
@@ -70,6 +73,7 @@ THREE.DRACOLoader.prototype = {
      */
     setDrawMode: function(drawMode) {
         this.drawMode = drawMode;
+        return this;
     },
 
     /**
@@ -84,6 +88,7 @@ THREE.DRACOLoader.prototype = {
           skipDequantization = skip;
         this.getAttributeOptions(attributeName).skipDequantization =
             skipDequantization;
+        return this;
     },
 
     /**

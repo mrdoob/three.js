@@ -22,7 +22,7 @@ var files = {
 		"webgl_geometries",
 		"webgl_geometries_parametric",
 		"webgl_geometry_colors",
-		"webgl_geometry_colors_blender",
+		"webgl_geometry_colors_json",
 		"webgl_geometry_colors_lookuptable",
 		"webgl_geometry_convex",
 		"webgl_geometry_cube",
@@ -93,7 +93,7 @@ var files = {
 		"webgl_loader_gltf",
 		"webgl_loader_gltf_extensions",
 		"webgl_loader_imagebitmap",
-		"webgl_loader_json_blender",
+		"webgl_loader_json",
 		"webgl_loader_json_claraio",
 		"webgl_loader_json_objconverter",
 		"webgl_loader_kmz",
@@ -342,6 +342,7 @@ var files = {
 		"misc_controls_transform",
 		"misc_exporter_gltf",
 		"misc_exporter_obj",
+		"misc_exporter_stl",
 		"misc_fps",
 		"misc_lights_test",
 		"misc_lookat",
@@ -358,6 +359,9 @@ var files = {
 		"css3d_sandbox",
 		"css3d_sprites",
 		"css3d_youtube"
+	],
+	"css2d": [
+		"css2d_label"
 	],
 	"canvas": [
 		"canvas_ascii_effect",

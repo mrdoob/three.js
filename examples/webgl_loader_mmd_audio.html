@@ -87,7 +87,7 @@
 				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0x887766 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				//
@@ -101,14 +101,18 @@
 
 				// model
 
-				var onProgress = function ( xhr ) {
+				function onProgress( xhr ) {
+
 					if ( xhr.lengthComputable ) {
+
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
 					}
+
 				};
 
-				var onError = function ( xhr ) {
+				function onError( xhr ) {
 				};
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
